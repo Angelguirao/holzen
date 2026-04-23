@@ -11,6 +11,8 @@ import { getManualReflectionCooldownMs, isHolzenDevMode } from '@/lib/holzen-man
 import { buildPauseContextFromBtc } from '@/lib/pause-context-from-btc';
 import { severityFromBtcChangePercent } from '@/lib/btc-move-severity';
 import { millisecondsUntilNextQuarterHour } from '@/lib/next-cron-quarter';
+import { isPauseV2Enabled } from '@/lib/pause-v2-flag';
+import { runPauseV2DualWrite } from '@/lib/pause-dual-write';
 
 export function useHolzen() {
   const { user } = useAuth();
@@ -40,6 +42,7 @@ export function useHolzen() {
   const [error, setError] = useState<string | null>(null);
   const [newReflection, setNewReflection] = useState(false);
   const [lastReflectionId, setLastReflectionId] = useState<string | null>(null);
+  const [lastPauseInstanceId, setLastPauseInstanceId] = useState<string | null>(null);
   const [lastTriggerAt, setLastTriggerAt] = useState<string | null>(null);
 
   // Handle reflection data from profile load
@@ -141,6 +144,25 @@ export function useHolzen() {
           last_trigger_at: new Date().toISOString(),
         }).eq('user_id', user.id),
       ]);
+
+      // Pause V2 parallel write (silent mode). Fire and forget; failures logged.
+      void (async () => {
+        if (!(await isPauseV2Enabled())) return;
+        const instanceId = await runPauseV2DualWrite({
+          userId: user.id,
+          reflectionMessage: silentMsg,
+          context: ctx,
+          haiku: null,
+          groundingTitle: null,
+          groundingBody: null,
+          groundingCitation: null,
+          groundingUrl: null,
+          btcChangePct: data.changePercent,
+          cumulativeChangePct: data.cumulativeChangePercent ?? null,
+          initialMood: mood ?? null,
+        });
+        if (instanceId) setLastPauseInstanceId(instanceId);
+      })();
 
       setLastTriggerAt(new Date().toISOString());
       holzenLog.manual( 'generateMessage: silent mode done', { reflectionId: insertedReflection?.id });
@@ -301,6 +323,27 @@ export function useHolzen() {
             syncedGroundNudge: hasInitialGrounding && !groundNudgeErr,
           });
         }
+
+        // Pause V2 parallel write. Fire and forget; failures logged.
+        void (async () => {
+          if (!(await isPauseV2Enabled())) return;
+          const instanceId = await runPauseV2DualWrite({
+            userId: user.id,
+            reflectionMessage: msg,
+            context: ctx,
+            haiku: companionData.haiku,
+            groundingTitle: companionData.groundingTitle,
+            groundingBody: companionData.groundingBody,
+            groundingCitation:
+              typeof fnData?.grounding_citation === 'string' ? fnData.grounding_citation : null,
+            groundingUrl:
+              typeof fnData?.grounding_url === 'string' ? fnData.grounding_url : null,
+            btcChangePct: data.changePercent,
+            cumulativeChangePct: data.cumulativeChangePercent ?? null,
+            initialMood: mood ?? null,
+          });
+          if (instanceId) setLastPauseInstanceId(instanceId);
+        })();
       }
     } catch (e: any) {
       holzenLog.manual('generateMessage: error', { message: String(e?.message ?? e) });
@@ -484,6 +527,7 @@ export function useHolzen() {
     companions,
     severity,
     lastReflectionId,
+    lastPauseInstanceId,
     loading,
     error,
     newReflection,

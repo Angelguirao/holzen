@@ -276,7 +276,42 @@ At Phase J the flag flips to true in prod; at Phase L the legacy write
 
 ## 7. Manual-trigger rules
 
-_Documented in full alongside Phase D (client hook rewire)._
+Manual triggers come from the "Need a moment" button on Home (and the
+identical "Try again" button when an error state is shown). They run
+through `useHolzen.manualTrigger` -> `generateMessage`, not through cron.
+
+During Phase D (this phase), the V2 hook sits alongside the legacy
+`reflections` insert with the same dual-write pattern used by the cron
+(see §6):
+
+1. Compute `new_fingerprint` from the current BTC context (24h bucket,
+   cumulative bucket, severity tier). The client helper
+   `src/lib/pause-fingerprint.ts` mirrors the edge helper bit-for-bit.
+2. When `pause_v2_enabled` is true and the legacy insert succeeded,
+   call `pause_create_or_reuse` via `src/lib/pause-api.ts`. The RPC
+   implements the same rules as the cron path:
+   - Open pause with matching fingerprint -> reuse. `lastPauseInstanceId`
+     points at the existing row, no artifacts are rewritten.
+   - Open pause with differing fingerprint -> old expires with
+     `context_lost` + `superseded_by`; new instance is created.
+   - No open pause but recent-dismissal with matching fingerprint -> null
+     instance id; the client keeps the legacy message visible but does
+     not create a V2 row (respects the user's just-now walk-away).
+3. On successful create, the hook upserts `reflection_text` + optional
+   `haiku` + optional `ground_nudge` into `pause_ai_artifacts`.
+
+There is **no** manual "re-fire when an open pause already exists" path:
+the "Need a moment" cooldown in the UI only gates *creation*, and the
+RPC's fingerprint check handles the rest. Opening the existing pause is
+the library / bell card's job (Phase F).
+
+Every V2 write is fire-and-forget inside a `void (async () => { ... })()`
+so a mirror failure never degrades the legacy surface. Failures land in
+the `holzenLog.manual` stream as `pause_v2 manual: …` entries.
+
+Cooldowns, quiet hours, and snoozes remain in the legacy hook for Phase
+D — they live on the `profiles` row, not the pause instance. They move
+(or don't) in Phase L cleanup.
 
 ## 8. Companion counting rule
 
