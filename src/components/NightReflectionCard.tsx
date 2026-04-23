@@ -13,6 +13,30 @@ interface NightReflection {
   created_at: string;
 }
 
+function getDismissedCacheKey(userId: string) {
+  return `holzen_night_reflection_dismissed_${userId}`;
+}
+
+function readDismissedIds(userId: string): string[] {
+  try {
+    const raw = localStorage.getItem(getDismissedCacheKey(userId));
+    if (!raw) return [];
+    const parsed = JSON.parse(raw);
+    return Array.isArray(parsed) ? parsed.filter((v) => typeof v === 'string') : [];
+  } catch {
+    return [];
+  }
+}
+
+function writeDismissedIds(userId: string, ids: string[]) {
+  try {
+    // Keep only the latest handful to avoid unbounded growth.
+    localStorage.setItem(getDismissedCacheKey(userId), JSON.stringify(ids.slice(-50)));
+  } catch {
+    // ignore local cache write failures
+  }
+}
+
 export function useNightReflection() {
   const { user } = useAuth();
   const [reflection, setReflection] = useState<NightReflection | null>(null);
@@ -20,29 +44,43 @@ export function useNightReflection() {
 
   useEffect(() => {
     if (!user) return;
+    const locallyDismissed = new Set(readDismissedIds(user.id));
     supabase
       .from('night_reflections')
       .select('id, message, btc_change_percent, btc_direction, created_at')
       .eq('user_id', user.id)
       .eq('dismissed', false)
       .order('created_at', { ascending: false })
-      .limit(1)
+      .limit(10)
       .then(({ data }) => {
         if (data && data.length > 0) {
-          setReflection(data[0] as unknown as NightReflection);
+          const firstVisible = data.find((item) => !locallyDismissed.has(item.id));
+          if (firstVisible) {
+            setReflection(firstVisible as unknown as NightReflection);
+          } else {
+            setReflection(null);
+          }
+        } else {
+          setReflection(null);
         }
         setLoaded(true);
       });
   }, [user]);
 
   const dismiss = async () => {
-    if (!reflection) return;
+    if (!reflection || !user) return;
     const id = reflection.id;
     setReflection(null);
+    const dismissedIds = readDismissedIds(user.id);
+    if (!dismissedIds.includes(id)) {
+      writeDismissedIds(user.id, [...dismissedIds, id]);
+    }
+
     await supabase
       .from('night_reflections')
       .update({ dismissed: true } as any)
-      .eq('id', id);
+      .eq('user_id', user.id)
+      .eq('dismissed', false);
   };
 
   return { reflection, loaded, dismiss };
