@@ -1,0 +1,362 @@
+# Stats System (Current App Order)
+
+This document explains the metrics shown **today** in `Profile > Stats`, in the same order the UI renders them.
+
+## Counting rules used today
+
+Stats currently mix multiple counting bases. These are the active definitions in code:
+
+1. **Generated pause**: any row in `reflections`.
+2. **Completed pause**: `outcome` is set (used by most score/trend metrics).
+3. **Full ritual pause**: breathing + mood + mood_after + outcome (used selectively).
+
+Where possible, time bucketing uses `engaged_at` (via `pauseTimestamp`) so delayed engagement is placed in the day/week when the user actually acted.
+
+---
+
+## 1) Hero card (top of Stats tab)
+
+### 1.1 Holzen Score ring (`0-100`)
+
+Computed from the last 30 completed pauses using 5 skill dimensions:
+
+- **Emotional Regulation**: mood -> mood_after improvement + breathing bonus
+- **Distress Tolerance**: outcome quality under volatility context
+- **Decision Alignment**: alignment to hold-goal strategy (only when hold goal exists)
+- **Cognitive Reappraisal**: use of perspective companions (zoom/history/signal/grounding)
+- **Self-Awareness**: note depth, tags, favorite, full pause completion signals
+
+If no hold goal exists, decision-alignment weight is redistributed across the other four dimensions.
+
+### 1.2 Micro stat: `Pauses`
+
+- **Value**: `engagedCount` = number of full ritual pauses (`breathing_completed && mood && mood_after && outcome`).
+- **Context text**:
+  - if generated > engaged: shows "`X generated`"
+  - otherwise: shows elapsed time context since first pause (`d/w/mo`)
+
+### 1.3 Micro stat: `Active`
+
+- Distinct active days in the last 30 days from:
+  - reflection days, plus
+  - practice-entry days
+
+### 1.4 Micro stat: `Practice`
+
+- Distinct practice days during the current month.
+
+### 1.5 Micro stat: `Trend`
+
+- Trend arrow derived from Holzen Score trend:
+  - `↑ improving`, `→ stable`, `↓ declining`
+- Trend is based on recent vs older composure trajectory in `use-holzen-score`.
+
+### 1.6 Skill bars (under score ring)
+
+Order shown:
+
+1. Regulation
+2. Tolerance
+3. Alignment (only if hold goal exists)
+4. Reappraisal
+5. Awareness
+
+Each bar displays a `0-100` value from the score model above.
+
+---
+
+## 2) Section: Your Journey
+
+## 2.1 Streak timeline widget
+
+### 2.1.1 28-day heatmap statuses
+
+Per day status priority:
+
+- `outcome`: at least one completed pause
+- `practice`: practice activity but no completed pause
+- `freeze`: streak-freeze day
+- `empty`: no activity
+- `pre`: before signup
+
+### 2.1.2 Current streak
+
+Consecutive active days (completed pauses + practice + freeze days), counting from today/yesterday backwards.
+
+### 2.1.3 Longest streak
+
+Maximum historical consecutive-day streak from all active-day sources.
+
+### 2.1.4 Milestone progress bar
+
+Progress from current streak to next milestone in `[3, 7, 14, 30, 60, 100]`.
+
+### 2.1.5 Expanded calendar metrics (when expanded)
+
+Day detail shows:
+
+- pause count
+- letter count
+- badge count
+- practice count
+- mood distribution for that day (for reflection items)
+
+## 2.2 Milestone timeline
+
+Chronological milestones (most recent first), including:
+
+- first pause
+- first calm exit (`mood_after` in calm/detached)
+- first hold (`held` or `nothing`)
+- highest reached pause-count milestone (`5/10/25/50/100/250/500`)
+- longest streak milestone (>=3 days)
+- first practice
+- first letter written
+- first letter delivered
+
+---
+
+## 3) Section: Progress (Pro)
+
+## 3.1 Period Comparison card
+
+Toggle: weekly or monthly.
+
+Rows shown in this order:
+
+1. **Pauses**: completed-pause count
+2. **Hold rate**: `% held|nothing` among completed
+3. **Calm exits**: `% with calm/detached mood_after` among completed with mood_after
+
+Each row shows previous period, current period, and delta.
+
+## 3.2 Weekly Trends card group
+
+### 3.2.1 Score Over Time
+
+- Weekly skill-weighted score (`0-100`) from completed pauses.
+- Badge shows first-vs-last score delta.
+
+### 3.2.2 Regulation Opportunity
+
+- Stacked share of:
+  - high-regulation-needed moments (reactive mood)
+  - low-regulation-needed moments
+- Also tracks `% navigated` when high-regulation moments occur.
+
+### 3.2.3 Hold Rate
+
+- Weekly hold-or-nothing percentage trend.
+
+Unlock condition: at least 3 weekly buckets.
+
+## 3.3 Practice Activity card
+
+Shows:
+
+- total practice sessions
+- total practice minutes (if durations exist)
+- last 8-week bar sparkline
+- per-practice-type counts (`checkin`, `journal`, `bodyscan`, `replay`, etc.)
+
+---
+
+## 4) Section: Decision Making (Pro)
+
+## 4.1 Decision Quality
+
+Requires >=3 reflections with outcomes.
+
+Metrics shown:
+
+- with-pause hold rate (any companion engaged)
+- without-pause hold rate (no companion engagement)
+- delta insight text (if both cohorts have enough data)
+- trend label (`improving/stable/declining`) from first-half vs second-half hold rate
+- optional companion breakdown:
+  - breathing, haiku, grounding, signal, zoom out, history
+  - each with usage count and hold-rate vs baseline delta
+
+## 4.2 Decision Accuracy
+
+Source: `follow_ups` table (`decision_held` not null), up to latest 100.
+
+Metrics shown:
+
+- overall accuracy `%` = held follow-ups / total follow-ups
+- trend (`improving/stable/declining`) from recent 3 vs prior 3
+- per-original-decision breakdown (rate + numerator/denominator)
+
+Unlock condition: at least 3 follow-ups.
+
+## 4.3 Volatility Tolerance
+
+Uses drop events parsed from reflection `context` (`down X%`).
+
+Shows:
+
+- overall volatility score ring (`0-100`)
+- qualitative grade:
+  - iron hands / steady / shaky / paper hands
+- bucket rows:
+  - mild dips (`0-3%`)
+  - moderate drops (`3-6%`)
+  - heavy drops (`6%+`)
+- each bucket includes:
+  - event count
+  - composure label (reactive/mixed/composed)
+  - hold rate within bucket when outcome exists
+
+Unlock condition: at least 3 drop events.
+
+---
+
+## 5) Section: Deep Patterns (Pro)
+
+## 5.1 Regulation Effect (Mood Shift Chart)
+
+- Weekly `delta = avg(mood_after_score) - avg(mood_score)`
+- Positive values indicate improved composure after pause.
+- Shows average shift badge + session count.
+
+Unlock condition: at least 2 weekly buckets with both mood checks.
+
+## 5.2 Mood Trend
+
+- Average mood score over time (`1..5`) with daily/weekly toggle.
+- Trend state from first-vs-last average (`improving/stable/declining`).
+
+Unlock condition: at least 3 data buckets.
+
+## 5.3 Mood x Price Change
+
+For each mood label:
+
+- average BTC context change (`%`) when that mood was logged
+- sample count per mood
+- correlation summary `r` + weak/moderate/strong strength
+
+Unlock condition: enough mood+context pairs to form at least 2 mood groups.
+
+## 5.4 Mood x Price Scatter
+
+- Each point = one reflection (`x = BTC % change`, `y = mood score 1..5`)
+- Includes neutral reference lines (`x=0`, `y=3`)
+- Optional auto insight comparing dominant mood in negative vs positive moves
+
+Unlock condition: at least 8 points with both mood and context.
+
+---
+
+## Notes for maintainers
+
+- Rendering order is defined in `src/pages/Profile.tsx` inside `StatsContent`.
+- Score internals are defined in `src/hooks/use-holzen-score.ts`.
+- Shared pause-count semantics are in `src/lib/engaged-pause.ts`.
+
+---
+
+## Recommended target model (skills-first)
+
+Yes: target organization should revolve around the five core skills as much as possible.
+
+## A) Target information architecture
+
+Keep Stats in this order:
+
+1. **Skill Overview** (single glance)
+2. **Skill Deep Dives** (one card per skill)
+3. **Journey & Consistency** (supporting context)
+4. **Advanced patterns** (optional, collapsed by default)
+
+This makes the skills the primary lens, and everything else secondary context.
+
+## B) Skill Overview (top card)
+
+One unified card with:
+
+- overall Holzen Score
+- 5 skill bars in fixed order:
+  1. Regulation
+  2. Tolerance
+  3. Alignment
+  4. Reappraisal
+  5. Awareness
+- trend chip per skill (up/stable/down vs prior window)
+- confidence chip per skill (high/medium/low sample reliability)
+
+## C) Skill Deep Dives (recommended cards)
+
+Map each current metric family into one skill owner:
+
+### C.1 Regulation
+
+- Keep: Mood Shift chart, Mood Trend
+- Add: "Reactive -> Composed conversion rate"
+- Remove from default view: duplicate mood scatter (move to Advanced)
+
+### C.2 Tolerance
+
+- Keep: Volatility Tolerance card
+- Keep: hold/nothing during drops by bucket
+- Add: "High-volatility hold rate" as headline metric
+
+### C.3 Alignment
+
+- Keep: hold-goal alignment logic when hold goal exists
+- Fallback when no hold goal: show "Not configured" state, not a synthetic score bar
+- Add CTA: configure hold goal from card
+
+### C.4 Reappraisal
+
+- Keep: companion-engagement effect from Decision Quality
+- Change: show as one normalized "Perspective tools impact" metric
+- Add: per-tool marginal lift only if sample threshold is met
+
+### C.5 Awareness
+
+- Keep: notes/tags/favorites + completion signals
+- Add: "reflection depth score" breakdown (notes, tags, revisit behavior)
+
+## D) Journey & Consistency (supporting section)
+
+Keep, but explicitly mark as supporting:
+
+- streak timeline
+- milestones
+- practice activity
+- period comparison
+
+These should not compete visually with skill cards.
+
+## E) Metrics to de-emphasize or relocate
+
+- Move Mood x Price Scatter to Advanced by default.
+- Keep Mood x Price Change in Advanced unless user has enough data confidence.
+- Keep Decision Accuracy, but frame as "Outcome stability" under Tolerance/Alignment context.
+
+## F) Common rules for all skill cards
+
+- Show formula summary in plain language.
+- Show denominator and sample size.
+- Show last-updated window (for example last 30 completed pauses).
+- Hide or gray cards below minimum reliability threshold.
+
+## G) Suggested phased rollout
+
+### Phase 1 (quick wins)
+
+- Re-label sections to skills-first wording.
+- Keep existing computations, just remap UI grouping to skill ownership.
+- Add confidence/sample chips.
+
+### Phase 2 (model cleanup)
+
+- Centralize volatility parsing and trend logic.
+- Ensure all time-bucketing uses `pauseTimestamp`.
+- Normalize denominators across cards.
+
+### Phase 3 (advanced)
+
+- Add per-skill confidence scoring and variance-aware trend detection.
+- Add adaptive recommendations ("best next action to improve weakest skill").
