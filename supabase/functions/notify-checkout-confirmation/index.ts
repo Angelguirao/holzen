@@ -77,9 +77,10 @@ serve(
       });
     }
 
-    const supabase = createClient(
+    const supabase = createCidSupabaseClient(
       Deno.env.get("SUPABASE_URL") ?? "",
       Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? "",
+      cid,
       { auth: { persistSession: false } },
     );
 
