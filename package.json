@@ -14,7 +14,7 @@
     "preview": "vite preview",
     "test": "vitest run",
     "test:watch": "vitest",
-    "test:ci": "vitest run --coverage --reporter=default --reporter=junit --outputFile.junit=./coverage/junit.xml",
+    "test:ci": "npm run check:edge-logging && vitest run --coverage --reporter=default --reporter=junit --outputFile.junit=./coverage/junit.xml",
     "test:coverage": "vitest run --coverage",
     "check:edge": "node scripts/check-edge.mjs",
     "check:edge-logging": "node scripts/check-edge-logging.mjs",
