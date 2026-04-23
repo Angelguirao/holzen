@@ -79,6 +79,28 @@ function writePersistedSnapshot(snap: CooldownSnapshot): void {
   } catch { void 0; }
 }
 
+const CRON_INTERVAL_MS = 15 * 60_000; // matches `millisecondsUntilNextQuarterHour` cadence
+
+/**
+ * Compute the wall-clock instant of the first cron check that can actually
+ * act on this user. The cron itself fires every 15 minutes regardless of
+ * cooldown, but ticks that land while the user is still cooling down are
+ * effectively no-ops for them — so the next *meaningful* scan is the first
+ * quarter-hour boundary at or after cooldown ends.
+ */
+function computeNextScanAt(now: number, cooldownMsRemaining: number, msUntilNextCron: number): number {
+  // While idle, the next cron tick is the next meaningful scan.
+  if (cooldownMsRemaining <= 0) return now + msUntilNextCron;
+  // While cooling down, anchor to the cron grid: round the cooldown-end
+  // moment up to the next quarter-hour boundary.
+  const cooldownEndsAt = now + cooldownMsRemaining;
+  const nextCronAt = now + msUntilNextCron;
+  if (nextCronAt >= cooldownEndsAt) return nextCronAt;
+  const gap = cooldownEndsAt - nextCronAt;
+  const additionalIntervals = Math.ceil(gap / CRON_INTERVAL_MS);
+  return nextCronAt + additionalIntervals * CRON_INTERVAL_MS;
+}
+
 function computeFreshSnapshot(
   cooldownRemaining: () => number,
   nextCronCheckIn: () => number,
@@ -86,7 +108,7 @@ function computeFreshSnapshot(
   const rem = cooldownRemaining();
   const cron = nextCronCheckIn();
   const now = Date.now();
-  return { remaining: rem, readyAt: now + rem, nextScanAt: now + cron };
+  return { remaining: rem, readyAt: now + rem, nextScanAt: computeNextScanAt(now, rem, cron) };
 }
 
 
@@ -212,7 +234,7 @@ export function AutoCooldownIndicator({
         : Number.POSITIVE_INFINITY;
       const shouldCommit = opts?.force === true || previousTargetMs <= DRIFT_TOLERANCE_MS;
       if (shouldCommit) {
-        const next = { remaining: rem, readyAt: now + rem, nextScanAt: now + cron };
+        const next = { remaining: rem, readyAt: now + rem, nextScanAt: computeNextScanAt(now, rem, cron) };
         snapshotRef.current = next;
         setSnapshot(next);
         writePersistedSnapshot(next);
