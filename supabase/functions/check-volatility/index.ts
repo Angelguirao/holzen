@@ -1,6 +1,6 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
-import { createClient } from "https://esm.sh/@supabase/supabase-js@2.57.2";
 import webpush from "https://esm.sh/web-push@3.6.7";
+import { createCidSupabaseClient, sendWebPushWithCid } from "../_shared/cid-clients.ts";
 import {
   generateUnifiedReflection,
   REFLECTION_PROMPT_VERSION,
