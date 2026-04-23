@@ -45,6 +45,50 @@ function createStableClockFormatter(): (ms: number) => string {
   return (ms: number) => fmt.format(new Date(ms));
 }
 
+type CooldownSnapshot = { remaining: number; readyAt: number; nextScanAt: number };
+
+const SNAPSHOT_STORAGE_KEY = 'holzen_home_cooldown_snapshot_v1';
+
+/**
+ * Hydrate the snapshot from localStorage. Returns null when nothing valid is
+ * stored, when the persisted target moments are already in the past, or when
+ * the storage layer throws (private mode, quota, etc.). The freshness check
+ * keeps us from rendering a stale "Ready at 09:12" hours after the fact.
+ */
+function readPersistedSnapshot(): CooldownSnapshot | null {
+  try {
+    const raw = localStorage.getItem(SNAPSHOT_STORAGE_KEY);
+    if (!raw) return null;
+    const parsed = JSON.parse(raw) as Partial<CooldownSnapshot> | null;
+    if (!parsed || typeof parsed.readyAt !== 'number' || typeof parsed.nextScanAt !== 'number' || typeof parsed.remaining !== 'number') {
+      return null;
+    }
+    const now = Date.now();
+    // If both displayed moments are already in the past, the value is stale.
+    const activeTarget = parsed.remaining > 0 ? parsed.readyAt : parsed.nextScanAt;
+    if (activeTarget <= now) return null;
+    return { remaining: parsed.remaining, readyAt: parsed.readyAt, nextScanAt: parsed.nextScanAt };
+  } catch {
+    return null;
+  }
+}
+
+function writePersistedSnapshot(snap: CooldownSnapshot): void {
+  try {
+    localStorage.setItem(SNAPSHOT_STORAGE_KEY, JSON.stringify(snap));
+  } catch { void 0; }
+}
+
+function computeFreshSnapshot(
+  cooldownRemaining: () => number,
+  nextCronCheckIn: () => number,
+): CooldownSnapshot {
+  const rem = cooldownRemaining();
+  const cron = nextCronCheckIn();
+  const now = Date.now();
+  return { remaining: rem, readyAt: now + rem, nextScanAt: now + cron };
+}
+
 
 export function NeedAMomentButton({
   onTrigger,
@@ -133,12 +177,12 @@ export function AutoCooldownIndicator({
   // instead of a live "X min left" countdown. The widget is then completely
   // static: no per-minute re-render, no blink. We re-snapshot exactly once,
   // when the displayed target moment passes.
-  const [snapshot, setSnapshot] = useState(() => {
-    const rem = cooldownRemaining();
-    const cron = nextCronCheckIn();
-    const now = Date.now();
-    return { remaining: rem, readyAt: now + rem, nextScanAt: now + cron };
-  });
+  //
+  // The latest snapshot is mirrored to localStorage so a hard refresh hydrates
+  // the same static values immediately — avoiding the brief "blink" that
+  // happens when the first paint computes a slightly different target than
+  // the one the user saw moments ago.
+  const [snapshot, setSnapshot] = useState(() => readPersistedSnapshot() ?? computeFreshSnapshot(cooldownRemaining, nextCronCheckIn));
 
   useEffect(() => {
     let timeoutId: number | undefined;
@@ -148,7 +192,9 @@ export function AutoCooldownIndicator({
       const rem = cooldownRemaining();
       const cron = nextCronCheckIn();
       const now = Date.now();
-      setSnapshot({ remaining: rem, readyAt: now + rem, nextScanAt: now + cron });
+      const next = { remaining: rem, readyAt: now + rem, nextScanAt: now + cron };
+      setSnapshot(next);
+      writePersistedSnapshot(next);
       const target = rem > 0 ? rem : cron;
       if (target <= 0) return;
       timeoutId = window.setTimeout(resnapshotAndSchedule, target + 500);
