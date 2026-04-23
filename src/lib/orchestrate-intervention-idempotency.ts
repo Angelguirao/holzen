@@ -161,6 +161,9 @@ export async function runOnceIntervention<T>(
   const promise = (async () => {
     try {
       const result = await factory();
+      // Always set the in-memory fallback first — it cannot throw and
+      // guarantees the marker survives a sessionStorage failure.
+      memoryMarkers.add(key);
       try {
         sessionStorage.setItem(storageKey(key), '1');
       } catch {
@@ -179,6 +182,7 @@ export async function runOnceIntervention<T>(
     } catch (err) {
       // Allow a manual retry to fire a fresh call; the in-memory entry is
       // dropped in `finally` below either way.
+      memoryMarkers.delete(key);
       try {
         sessionStorage.removeItem(storageKey(key));
       } catch {
@@ -211,6 +215,7 @@ export async function runOnceIntervention<T>(
 export function resetInterventionIdempotency(reflectionId: string): void {
   if (!reflectionId) return;
   inFlight.delete(reflectionId);
+  memoryMarkers.delete(reflectionId);
   try {
     sessionStorage.removeItem(storageKey(reflectionId));
   } catch {
