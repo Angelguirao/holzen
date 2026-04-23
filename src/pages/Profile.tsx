@@ -95,6 +95,8 @@ interface PracticeEntry {
   duration_seconds: number | null;
 }
 
+const REFLECTIONS_PAGE_SIZE = 50;
+
 const Profile = () => {
   const { user } = useAuth();
   const { t } = useTranslation();
@@ -151,13 +153,25 @@ const Profile = () => {
   useEffect(() => {
     if (!user) return;
     const loadReflections = async () => {
-      const { data } = await (supabase
-        .from('v_reflection_with_companions')
-        .select('id, message, context, created_at, is_favorite, haiku, grounding_title, grounding_body, note, mood, mood_after, outcome, tags, breathing_completed, haiku_read, grounding_read, signal_read, signal_source, zoom_out_read, history_read')
-        .eq('user_id', user.id)
-        .order('created_at', { ascending: false })
-        .limit(1000) as any);
-      setReflections((data as unknown as Reflection[]) ?? []);
+      let offset = 0;
+      const allRows: Reflection[] = [];
+
+      while (true) {
+        const { data } = await (supabase
+          .from('v_reflection_with_companions')
+          .select('id, message, context, created_at, is_favorite, haiku, grounding_title, grounding_body, note, mood, mood_after, outcome, tags, breathing_completed, haiku_read, grounding_read, signal_read, signal_source, zoom_out_read, history_read')
+          .eq('user_id', user.id)
+          .order('created_at', { ascending: false })
+          .range(offset, offset + REFLECTIONS_PAGE_SIZE - 1));
+
+        const pageRows = (data as unknown as Reflection[]) ?? [];
+        allRows.push(...pageRows);
+
+        if (pageRows.length < REFLECTIONS_PAGE_SIZE) break;
+        offset += REFLECTIONS_PAGE_SIZE;
+      }
+
+      setReflections(allRows);
       setLoading(false);
     };
     const loadLetters = async () => {
