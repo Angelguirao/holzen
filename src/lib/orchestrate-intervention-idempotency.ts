@@ -117,13 +117,22 @@ export function hasInvokedIntervention(reflectionId: string): boolean {
       });
       return true;
     }
-  } catch {
+  } catch (err) {
+    emit('intervention_idempotency_storage_error', {
+      reflection_prefix: reflectionPrefix(reflectionId),
+      op: 'getItem',
+      error_name: (err as { name?: string } | null)?.name ?? 'unknown',
+    });
     /* fall through to in-memory fallback */
   }
   if (memoryMarkers.has(reflectionId)) {
     emit('intervention_idempotency_skip', {
       reflection_prefix: reflectionPrefix(reflectionId),
       layer: 'memory_fallback',
+    });
+    emit('intervention_idempotency_fallback_used', {
+      reflection_prefix: reflectionPrefix(reflectionId),
+      phase: 'read',
     });
     return true;
   }
