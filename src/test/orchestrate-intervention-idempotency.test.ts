@@ -168,3 +168,142 @@ describe('orchestrate intervention idempotency', () => {
     await Promise.all([a, b]);
   });
 });
+
+/**
+ * Safari ITP / private mode / Lockdown mode can make every `sessionStorage`
+ * access throw `SecurityError` (or `QuotaExceededError` when the quota is
+ * 0). The idempotency layer must NOT silently lose the marker in that
+ * case — otherwise the in-flight Map clears as soon as the promise
+ * settles, and a remount immediately after re-fires `companion-orchestrate`
+ * for the same `reflectionId`.
+ *
+ * We simulate that by replacing `window.sessionStorage` with a stub whose
+ * every method throws, then assert the duplicate-call guarantee still
+ * holds via the in-memory fallback Set.
+ */
+describe('orchestrate intervention idempotency — sessionStorage unavailable', () => {
+  const realSessionStorage = window.sessionStorage;
+
+  function installThrowingSessionStorage(): void {
+    const throwing = {
+      getItem: () => {
+        throw new DOMException('sessionStorage disabled', 'SecurityError');
+      },
+      setItem: () => {
+        throw new DOMException('sessionStorage disabled', 'SecurityError');
+      },
+      removeItem: () => {
+        throw new DOMException('sessionStorage disabled', 'SecurityError');
+      },
+      clear: () => {
+        throw new DOMException('sessionStorage disabled', 'SecurityError');
+      },
+      key: () => {
+        throw new DOMException('sessionStorage disabled', 'SecurityError');
+      },
+      get length(): number {
+        throw new DOMException('sessionStorage disabled', 'SecurityError');
+      },
+    };
+    Object.defineProperty(window, 'sessionStorage', {
+      configurable: true,
+      value: throwing,
+    });
+  }
+
+  beforeEach(() => {
+    installThrowingSessionStorage();
+    trackEvent.mockClear();
+    // The in-memory Map + Set live inside the module — clear via the
+    // public reset hook for the ids we touch in this block.
+    resetInterventionIdempotency('safari-ref-1');
+    resetInterventionIdempotency('safari-ref-2');
+  });
+
+  afterEach(() => {
+    Object.defineProperty(window, 'sessionStorage', {
+      configurable: true,
+      value: realSessionStorage,
+    });
+  });
+
+  it('still calls the factory exactly once across remounts when sessionStorage throws', async () => {
+    const factory = vi.fn().mockResolvedValue({ ok: true });
+
+    // First mount: real call, sessionStorage write throws internally.
+    await runOnceIntervention('safari-ref-1', factory);
+    expect(factory).toHaveBeenCalledTimes(1);
+
+    // The marker MUST still report invoked — backed by the in-memory
+    // fallback Set since sessionStorage is dead.
+    expect(hasInvokedIntervention('safari-ref-1')).toBe(true);
+
+    // Simulate 5 remounts. Each gates on `hasInvokedIntervention` first,
+    // exactly like the real call sites do. Without the in-memory fallback
+    // the gate would return false here and re-fire the factory.
+    for (let i = 0; i < 5; i++) {
+      if (!hasInvokedIntervention('safari-ref-1')) {
+        await runOnceIntervention('safari-ref-1', factory);
+      }
+    }
+
+    expect(factory).toHaveBeenCalledTimes(1);
+  });
+
+  it('emits the memory_fallback skip layer when sessionStorage is unavailable', async () => {
+    const factory = vi.fn().mockResolvedValue({ ok: true });
+    await runOnceIntervention('safari-ref-1', factory);
+
+    trackEvent.mockClear();
+    expect(hasInvokedIntervention('safari-ref-1')).toBe(true);
+
+    expect(trackEvent).toHaveBeenCalledWith(
+      'intervention_idempotency_skip',
+      expect.objectContaining({ layer: 'memory_fallback' }),
+    );
+    // It must NOT misreport as `session_storage` — that layer threw.
+    expect(trackEvent).not.toHaveBeenCalledWith(
+      'intervention_idempotency_skip',
+      expect.objectContaining({ layer: 'session_storage' }),
+    );
+  });
+
+  it('clears the in-memory fallback on factory rejection so retry can re-invoke', async () => {
+    const failing = vi.fn().mockRejectedValue(new Error('network down'));
+
+    await expect(runOnceIntervention('safari-ref-1', failing)).rejects.toThrow('network down');
+    expect(hasInvokedIntervention('safari-ref-1')).toBe(false);
+
+    const succeeding = vi.fn().mockResolvedValue({ ok: true });
+    await runOnceIntervention('safari-ref-1', succeeding);
+    expect(succeeding).toHaveBeenCalledTimes(1);
+    expect(hasInvokedIntervention('safari-ref-1')).toBe(true);
+  });
+
+  it('resetInterventionIdempotency clears the in-memory fallback even when sessionStorage throws', async () => {
+    const factory = vi.fn().mockResolvedValue({ ok: true });
+    await runOnceIntervention('safari-ref-1', factory);
+    expect(hasInvokedIntervention('safari-ref-1')).toBe(true);
+
+    resetInterventionIdempotency('safari-ref-1');
+    expect(hasInvokedIntervention('safari-ref-1')).toBe(false);
+
+    await runOnceIntervention('safari-ref-1', factory);
+    expect(factory).toHaveBeenCalledTimes(2);
+  });
+
+  it('keeps reflections isolated by id when using the in-memory fallback', async () => {
+    const f1 = vi.fn().mockResolvedValue('a');
+    const f2 = vi.fn().mockResolvedValue('b');
+
+    await runOnceIntervention('safari-ref-1', f1);
+    expect(hasInvokedIntervention('safari-ref-1')).toBe(true);
+    expect(hasInvokedIntervention('safari-ref-2')).toBe(false);
+
+    await runOnceIntervention('safari-ref-2', f2);
+    expect(hasInvokedIntervention('safari-ref-2')).toBe(true);
+
+    expect(f1).toHaveBeenCalledTimes(1);
+    expect(f2).toHaveBeenCalledTimes(1);
+  });
+});
