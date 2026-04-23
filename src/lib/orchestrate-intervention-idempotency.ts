@@ -258,10 +258,12 @@ export async function runOnceIntervention<T>(
  */
 export function resetInterventionIdempotency(reflectionId: string): void {
   if (!reflectionId) return;
-  inFlight.delete(reflectionId);
-  memoryMarkers.delete(reflectionId);
+  const id = normalizeReflectionId(reflectionId);
+  if (!id) return;
+  inFlight.delete(id);
+  memoryMarkers.delete(id);
   try {
-    sessionStorage.removeItem(storageKey(reflectionId));
+    sessionStorage.removeItem(storageKey(id));
   } catch {
     /* ignore */
   }
@@ -296,14 +298,16 @@ export function getInterventionIdempotencyDecision(
   reflectionId: string,
 ): InterventionIdempotencyDecision {
   if (!reflectionId) return 'none';
-  if (inFlight.has(reflectionId)) return 'inFlight';
+  const id = normalizeReflectionId(reflectionId);
+  if (!id) return 'none';
+  if (inFlight.has(id)) return 'inFlight';
   try {
-    if (sessionStorage.getItem(storageKey(reflectionId)) === '1') {
+    if (sessionStorage.getItem(storageKey(id)) === '1') {
       return 'completedStorage';
     }
   } catch {
     /* fall through */
   }
-  if (memoryMarkers.has(reflectionId)) return 'completedFallback';
+  if (memoryMarkers.has(id)) return 'completedFallback';
   return 'none';
 }
