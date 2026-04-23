@@ -89,7 +89,7 @@ export function AIInsightsPanel({ reflectionCount }: Props) {
       .select('*')
       .eq('user_id', user.id)
       .order('generated_at', { ascending: false })
-      .limit(PAGE_SIZE);
+      .range(0, PAGE_SIZE - 1);
 
     const parsed = (rows as unknown as InsightsRow[]) ?? [];
     setAllData(parsed);
@@ -104,17 +104,18 @@ export function AIInsightsPanel({ reflectionCount }: Props) {
   const loadMore = useCallback(async () => {
     if (!user || loadingMore || !hasMore) return;
     setLoadingMore(true);
-    const last = allData[allData.length - 1];
-    if (!last) { setLoadingMore(false); return; }
+    const offset = allData.length;
     const { data: rows } = await supabase
       .from('reflection_insights')
       .select('*')
       .eq('user_id', user.id)
       .order('generated_at', { ascending: false })
-      .lt('generated_at', last.generated_at)
-      .limit(PAGE_SIZE);
+      .range(offset, offset + PAGE_SIZE - 1);
     const parsed = (rows as unknown as InsightsRow[]) ?? [];
-    setAllData((prev) => [...prev, ...parsed]);
+    setAllData((prev) => {
+      const seen = new Set(prev.map((row) => row.id));
+      return [...prev, ...parsed.filter((row) => !seen.has(row.id))];
+    });
     setHasMore(parsed.length === PAGE_SIZE);
     setLoadingMore(false);
   }, [user, loadingMore, hasMore, allData]);
