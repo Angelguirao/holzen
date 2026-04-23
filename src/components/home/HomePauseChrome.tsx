@@ -13,6 +13,18 @@ function formatMsAsMS(ms: number): string {
   return `${m}:${s.toString().padStart(2, '0')}`;
 }
 
+/**
+ * Format ms as a coarse "in Nm" / "<1m" label for the idle "Next scan" line.
+ * Stable to the minute — lets us avoid second-level re-renders that caused a
+ * subtle continuous flicker on Home.
+ */
+function formatMsAsMinutes(ms: number): string {
+  const totalSec = Math.max(0, Math.floor(ms / 1000));
+  if (totalSec < 60) return '<1m';
+  const m = Math.ceil(totalSec / 60);
+  return `${m}m`;
+}
+
 export function NeedAMomentButton({
   onTrigger,
   cooldownRemaining,
@@ -100,16 +112,32 @@ export function AutoCooldownIndicator({
   const [cronIn, setCronIn] = useState(nextCronCheckIn());
 
   useEffect(() => {
-    // Idle state ("Next scan · m:ss") only needs minute-level granularity —
-    // ticking every second caused a perpetual subtle re-render flicker on Home.
-    // Active cooldown still ticks each second so the progress bar stays smooth.
-    const tickMs = remaining > 0 ? 1000 : 15_000;
-    const interval = setInterval(() => {
+    // Active cooldown ticks each second so the progress bar stays smooth.
+    // Idle state only re-renders when the displayed minute changes, so the
+    // "Next scan" line is visually stable (no per-second flicker).
+    if (remaining > 0) {
+      const interval = setInterval(() => {
+        const rem = cooldownRemaining();
+        setRemaining(rem);
+        if (rem <= 0) setCronIn(nextCronCheckIn());
+      }, 1000);
+      return () => clearInterval(interval);
+    }
+    // Idle: align next tick to the next minute boundary of the cron countdown.
+    let timeoutId: number | undefined;
+    const scheduleNext = () => {
       const rem = cooldownRemaining();
-      setRemaining(rem);
-      setCronIn(nextCronCheckIn());
-    }, tickMs);
-    return () => clearInterval(interval);
+      const cron = nextCronCheckIn();
+      // Time until the displayed minute label changes (or 30s as a floor).
+      const msUntilMinuteChange = cron > 0 ? ((cron - 1) % 60_000) + 1 : 30_000;
+      timeoutId = window.setTimeout(() => {
+        setRemaining(rem);
+        setCronIn(cron);
+        scheduleNext();
+      }, Math.max(1_000, msUntilMinuteChange));
+    };
+    scheduleNext();
+    return () => { if (timeoutId !== undefined) window.clearTimeout(timeoutId); };
   }, [cooldownRemaining, nextCronCheckIn, remaining]);
 
   if (remaining <= 0) {
@@ -120,7 +148,7 @@ export function AutoCooldownIndicator({
       >
         <p className={homeInWidget.nextScanCountdown}>
           {t('home.nextScanLine', {
-            scan: formatMsAsMS(cronIn),
+            scan: formatMsAsMinutes(cronIn),
             defaultValue: 'Next scan · {{scan}}',
           })}
         </p>
