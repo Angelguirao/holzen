@@ -39,6 +39,24 @@ const STORAGE_PREFIX = 'holzen.orchestrate.intervention.invoked:';
 
 const inFlight = new Map<string, Promise<unknown>>();
 
+/**
+ * In-memory fallback for environments where `sessionStorage` is unavailable
+ * or throws on access — Safari ITP after the 7-day cap, private/Lockdown
+ * mode, embedded webviews with storage disabled, or quota-exceeded errors.
+ *
+ * Without this set, a `sessionStorage.setItem` failure would silently drop
+ * the marker. The single-flight `inFlight` Map clears as soon as the
+ * promise settles, so a subsequent remount (StrictMode's second pass, a
+ * route bounce) would re-fire `companion-orchestrate` for the same
+ * `reflectionId` — exactly the duplicate-call regression this module
+ * exists to prevent.
+ *
+ * The set is per tab (module-scoped, lost on full reload) which mirrors
+ * `sessionStorage` semantics closely enough for the intervention contract:
+ * "at most one call per reflectionId per tab session".
+ */
+const memoryMarkers = new Set<string>();
+
 // ── Metrics ──────────────────────────────────────────────────────────────────
 // We instrument the idempotency layer itself so every caller (current and
 // future) is observed without needing to remember to log at the call-site.
@@ -97,11 +115,19 @@ export function hasInvokedIntervention(reflectionId: string): boolean {
         reflection_prefix: reflectionPrefix(reflectionId),
         layer: 'session_storage',
       });
+      return true;
     }
-    return hit;
   } catch {
-    return false;
+    /* fall through to in-memory fallback */
   }
+  if (memoryMarkers.has(reflectionId)) {
+    emit('intervention_idempotency_skip', {
+      reflection_prefix: reflectionPrefix(reflectionId),
+      layer: 'memory_fallback',
+    });
+    return true;
+  }
+  return false;
 }
 
 /**
@@ -135,6 +161,9 @@ export async function runOnceIntervention<T>(
   const promise = (async () => {
     try {
       const result = await factory();
+      // Always set the in-memory fallback first — it cannot throw and
+      // guarantees the marker survives a sessionStorage failure.
+      memoryMarkers.add(key);
       try {
         sessionStorage.setItem(storageKey(key), '1');
       } catch {
@@ -153,6 +182,7 @@ export async function runOnceIntervention<T>(
     } catch (err) {
       // Allow a manual retry to fire a fresh call; the in-memory entry is
       // dropped in `finally` below either way.
+      memoryMarkers.delete(key);
       try {
         sessionStorage.removeItem(storageKey(key));
       } catch {
@@ -185,6 +215,7 @@ export async function runOnceIntervention<T>(
 export function resetInterventionIdempotency(reflectionId: string): void {
   if (!reflectionId) return;
   inFlight.delete(reflectionId);
+  memoryMarkers.delete(reflectionId);
   try {
     sessionStorage.removeItem(storageKey(reflectionId));
   } catch {
