@@ -427,11 +427,34 @@ const Settings = forwardRef<HTMLDivElement>(function Settings(_props, ref) {
 
             {/* Cooldown */}
             <div className="space-y-3 text-sm font-sans">
-              <p className="text-muted-foreground/60 uppercase tracking-wider text-sm font-sans">{t('settings.cooldown')}</p>
+              <p id="settings-cooldown-label" className="text-muted-foreground/60 uppercase tracking-wider text-sm font-sans">
+                {t('settings.cooldown')}
+              </p>
               <p className="leading-relaxed text-sm text-secondary-foreground">
                 {t('settings.cooldownDesc')}
               </p>
-              <div className="grid grid-cols-4 gap-2">
+              <section
+                role="note"
+                aria-labelledby="settings-cooldown-help-title"
+                aria-describedby="settings-cooldown-help-body"
+                className="space-y-1 rounded-md border border-border/50 bg-muted/20 px-3 py-2"
+              >
+                <h3 id="settings-cooldown-help-title" className="text-sm font-medium text-secondary-foreground">
+                  {t('settings.cooldownHelpTitle', 'Cooldown help')}
+                </h3>
+                <p id="settings-cooldown-help-body" className="text-sm leading-relaxed text-muted-foreground">
+                  {t(
+                    'settings.cooldownHelpBody',
+                    'After an automatic pause, Holzen waits before sending another one. You can set this wait between 6 and 24 hours: shorter means more frequent pauses, longer means more quiet time.',
+                  )}
+                </p>
+              </section>
+              <div
+                className="grid grid-cols-4 gap-2"
+                role="group"
+                aria-labelledby="settings-cooldown-label"
+                aria-describedby="settings-cooldown-help-body"
+              >
                 {([1, 6, 12, 24] as const).map((h) => (
                   <button
                     key={h}
