@@ -66,6 +66,58 @@ describe('orchestrate intervention idempotency', () => {
     expect(factory).toHaveBeenCalledTimes(2);
   });
 
+  /**
+   * Reflection IDs are UUIDs minted by Postgres (always lowercase) but they
+   * reach the idempotency layer through React Router params, deep links,
+   * and copy-pasted admin URLs — any of which can corrupt the case or
+   * tack on whitespace. Without normalization these variants would each
+   * write to their own sessionStorage slot and the duplicate-call
+   * guarantee would silently break across remounts that disagree on
+   * spelling. This test pins the canonical form: trim + lowercase.
+   */
+  it('normalizes reflectionId (trim + case) so equivalent spellings share one idempotency key', async () => {
+    const factory = vi.fn().mockResolvedValue({ ok: true });
+    const canonical = 'a1b2c3d4-e5f6-7890-abcd-ef0123456789';
+    const variants = [
+      canonical,
+      canonical.toUpperCase(),
+      `  ${canonical}  `,
+      `\n${canonical.toUpperCase()}\t`,
+      canonical.replace(/[a-f]/g, (c) => c.toUpperCase()),
+    ];
+
+    // First mount uses the lowercase canonical form.
+    await runOnceIntervention(canonical, factory);
+    expect(factory).toHaveBeenCalledTimes(1);
+
+    // Every variant must be recognized as already invoked — they all
+    // collapse to the same key.
+    for (const v of variants) {
+      expect(hasInvokedIntervention(v)).toBe(true);
+    }
+
+    // Subsequent calls keyed on any variant must NOT re-fire the factory.
+    for (const v of variants) {
+      if (!hasInvokedIntervention(v)) {
+        await runOnceIntervention(v, factory);
+      }
+    }
+    expect(factory).toHaveBeenCalledTimes(1);
+
+    // Only one sessionStorage slot exists — no per-spelling fragmentation.
+    expect(sessionStorage.getItem(`holzen.orchestrate.intervention.invoked:${canonical}`)).toBe('1');
+    expect(
+      sessionStorage.getItem(`holzen.orchestrate.intervention.invoked:${canonical.toUpperCase()}`),
+    ).toBeNull();
+
+    // Reset via a dirty variant must also clear the canonical key, proving
+    // both write- and read-paths use the same normalized form.
+    resetInterventionIdempotency(`  ${canonical.toUpperCase()}  `);
+    expect(hasInvokedIntervention(canonical)).toBe(false);
+    expect(sessionStorage.getItem(`holzen.orchestrate.intervention.invoked:${canonical}`)).toBeNull();
+  });
+
+
 
   it('invokes the factory exactly once across simulated remounts', async () => {
     const factory = vi.fn().mockResolvedValue({ ok: true });
