@@ -385,6 +385,16 @@ export function CheckoutConfirmation() {
   // Bumped in lock-step inside `handleRetryRefresh` so the banner can show
   // "Attempt N/MAX" without us having to thread a derived value through props.
   const [refreshAttempt, setRefreshAttempt] = useState(0);
+  // Signature of the last lifecycle row we wrote to localStorage. Used to
+  // throttle the persistence effect: the deps array also includes
+  // `projectedBalance` / `creditsAdded` (so the persisted snapshot stays in
+  // sync with whatever sticky values we'd restore on remount), but those
+  // numbers can wobble between identical Stripe / wallet snapshots without
+  // the user-visible lifecycle (state / error / attempts) actually moving.
+  // Re-serialising + writing on every such tick is wasted work and shows up
+  // as `storage` events to other tabs. We only flush when the lifecycle
+  // tuple itself changes — sticky/baseline numbers piggy-back on those flushes.
+  const lastPersistedSigRef = useRef<string | null>(null);
   // Hard cap on user-initiated retries within a single confirmation window.
   // Matches the implicit ceiling already enforced by the backoff polling
   // (`maxAttempts = 6`) but applies to the *manual* "Try again" button only.
