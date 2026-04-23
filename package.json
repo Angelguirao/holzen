@@ -18,6 +18,7 @@
     "test:coverage": "vitest run --coverage",
     "check:edge": "node scripts/check-edge.mjs",
     "check:edge-logging": "node scripts/check-edge-logging.mjs",
+    "smoke:edge-logging": "node scripts/smoke-edge-logging.mjs",
     "check:version-sync": "node scripts/check-version-sync.mjs",
     "check:view-migrations": "node scripts/lint-view-migrations.mjs",
     "check:prepush": "bash scripts/pre-push-check.sh",

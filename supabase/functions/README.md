@@ -113,6 +113,13 @@ also catches.
    installed) and `npm run check:edge-logging` (the wrapper guardrail).
 4. If the function needs a secret, add it via the secrets tool — never via
    `VITE_*` or committed `.env` files.
+5. To verify the wrapper is wired up end-to-end against the deployed
+   project, run `npm run smoke:edge-logging` (optionally pass function
+   names: `npm run smoke:edge-logging -- health notify-checkout-confirmation`).
+   It pings each HTTP-serving function with a unique `x-cid` and asserts the
+   response carries the same `x-cid` back — proving `withRequestLogging`
+   ran. Set `LOG_DRAIN_QUERY_URL` + `LOG_DRAIN_QUERY_TOKEN` to also
+   confirm BetterStack received the `event:"request"` line for that cid.
 
 ## Don't
 
