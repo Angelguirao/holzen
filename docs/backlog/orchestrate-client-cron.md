@@ -2,7 +2,7 @@
 
 ## Context
 
-The manual pause path calls `companion-orchestrate` from the client (`use-companion-data`). **`check-volatility`** also POSTs the same function with service role + `userId` (fire-and-forget). Both can target the same `reflectionId` around the same time → possible duplicate work and races.
+The manual pause path calls `companion-orchestrate` from the client (`use-companion-data`). **`check-volatility`** also POSTs the same function with service role + `userId` (fire-and-forget). Both can target the same `pauseInstanceId` around the same time → possible duplicate work and races.
 
 ## Shipped (2026-04) — measure + skip-if-served
 
@@ -11,7 +11,7 @@ The manual pause path calls `companion-orchestrate` from the client (`use-compan
 **Structured invoke log** on every `companion-orchestrate` entry (full + regenerate paths):
 
 - Grep Edge logs for **`orchestrate_invoke`** or **`"holzen_event":"orchestrate_invoke"`**.
-- Fields: **`invoke_source`** (caller-supplied **`holzenInvokeSource`**), **`auth_mode`**, **`reflection_prefix`**, **`regenerate_only`**.
+- Fields: **`invoke_source`** (caller-supplied **`holzenInvokeSource`**), **`auth_mode`**, **`pause_instance_prefix`**, **`regenerate_only`**.
 
 | `holzenInvokeSource` | Set by |
 |----------------------|--------|
@@ -22,7 +22,7 @@ The manual pause path calls `companion-orchestrate` from the client (`use-compan
 
 ### Skip cached (dedup)
 
-After **`selectIntervention`** and computing which generator slots would run, the orchestrator **loads `reflection_companions`** for the `reflectionId`. If **every** required slot already has valid content (same shape as the client’s `fetchParsedReflectionCompanionCache`), it returns **200** with JSON built from those rows, **`source: "cache"`**, and:
+After **`selectIntervention`** and computing which generator slots would run, the orchestrator **loads `pause_ai_artifacts`** for the `pauseInstanceId`. If **every** required slot already has valid content (same shape as the client’s `fetchParsedPauseArtifactCache`), it returns **200** with JSON built from those rows, **`source: "cache"`**, and:
 
 - **Does not** run **`generateQuestion`** or companion generators.
 - **Does not** charge **rate limit** or **daily budget**.
@@ -34,7 +34,7 @@ Typical win: cron finishes orchestration before the user opens `/pause` — the 
 
 ## Optional follow-up
 
-- **Idempotency** tokens per reflection + slot.
+- **Idempotency** tokens per pause + slot.
 - **`automatic-pause-notification-timing.md`** if “pause ready” UX should wait on orchestration.
 
 ## Related code

@@ -11,7 +11,7 @@ Use this when you want to **trace one full path** from landing on **`/pause`** t
 | 3 | **Slot outcome is explicit** | Edge line **`holzen_event":"companion_slot_resolved"`** with **`orchestrator_slot":"signal"`**, **`source`** (`cache` / `live` / `curated` / `empty`), **`filled`**, optional **`cache_relaxation`**. |
 | 4 | **Cache tier visible (if cache path)** | If Signal came from **`companion_cache`**, you may also see **`cache_serve`** with **`cache_relaxation`**; should be consistent with **`companion_slot_resolved.cache_relaxation`**. |
 | 5 | **Live path failures visible** | If live generation fails quality gate: **`quality_gate_reject`** with **`companion_type":"signal"`**; check **`generation_attempts`** for the same reflection. |
-| 6 | **Client and Edge line up** | **`lazy fetch slot filled`** (client) **`source`** matches Edge **`companion_slot_resolved`** **`source`** for the same request (same wall-clock window, same **`reflection_prefix`**). |
+| 6 | **Client and Edge line up** | **`lazy fetch slot filled`** (client) **`source`** matches Edge **`companion_slot_resolved`** **`source`** for the same request (same wall-clock window, same **`pause_instance_prefix`**). |
 
 ## Preconditions
 
@@ -24,10 +24,10 @@ Use this when you want to **trace one full path** from landing on **`/pause`** t
 2. Wait for intervention / shell to load (first **`companion-orchestrate`** may be intervention-only).
 3. Expand **Read the signal →** (Signal companion card).
 4. **Client:** Confirm lines similar to:
-   - **`[holzen:companion] lazy fetch orchestrate invoke`** — `slot: signal`, `holzenInvokeSource: browser_lazy_fetch`, `reflection_prefix`.
+   - **`[holzen:companion] lazy fetch orchestrate invoke`** — `slot: signal`, `holzenInvokeSource: browser_lazy_fetch`, `pause_instance_prefix`.
    - **`[holzen:companion] lazy fetch slot filled`** — `source`, `latencyMs`, optional `cacheRelaxation`.
 5. **Supabase → Edge Functions → Logs** (same time window):
-   - **`orchestrate_invoke`** — `invoke_source` / `reflection_prefix`.
+   - **`orchestrate_invoke`** — `invoke_source` / `pause_instance_prefix`.
    - **`companion_slot_resolved`** — `orchestrator_slot: signal`, `filled: true`, `source` as expected.
 
 ## Variants to exercise

@@ -17,18 +17,22 @@ This document explains the badge system exactly as it worked **before the Pause 
 
 ## Data and counting rules used today
 
-Badges are computed client-side from the `reflections` array passed into `BadgesPanel`.
+Badges are computed client-side from Pause V2 sources:
+`v_pause_full`, `pause_step_events`, `pause_companion_events`, and
+`practice_entries`, assembled in `use-badges.ts` before calling
+`computeBadges`.
 
-Current counting bases:
+Current counting bases (see `src/lib/badges/compute.ts`):
 
-1. **Any reflection row**: most badge counters.
-2. **Full ritual reflection**: used only for pause-volume badges via `filterFullRitual`:
-   - `breathing_completed === true`
-   - `mood` exists
-   - `mood_after` exists
-   - `outcome` exists
+1. **Any pause instance**: most badge counters use `v_pause_full` rows.
+2. **Completed pause**: for “full ritual” requirements (breath + initial
+   emotion + shift emotion + outcome + counted companion).
+3. **Companion engagement**: `pause_companion_events.counts_for_pause`.
+4. **Practice activity**: `practice_entries` for streak + practice-linked
+   badges.
 
-Important: only the Volume family uses strict full-ritual counting; many other badges count broader events.
+Important: all badge families now flow from Pause V2 events; the legacy
+reflection-derived counters were removed at cutover.
 
 ---
 

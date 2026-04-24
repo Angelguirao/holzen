@@ -2,24 +2,24 @@
 
 ## Context
 
-Automatic pauses from `check-volatility` may insert `reflections` with **`grounding_title` / `grounding_body` null** initially; expanded content is filled by `companion-orchestrate` and `reflection_companions`. Manual pauses may arrive with more merged `location.state` from the browser.
+Automatic pauses from `check-volatility` may create `pause_instances` with **`pause_ai_artifacts`** missing grounding content initially; expanded content is filled by `companion-orchestrate`. Manual pauses may arrive with more merged `location.state` from the browser.
 
 ## What we shipped
 
-**Client loader priming** in `use-companion-data`: a `useLayoutEffect` keyed on `reflectionId` sets `interventionLoading` and per-pref companion loaders (`signal`, `grounding` / nudge, `history`, `zoomOut`) to **true** before the browser paints when a reflection is active. That removes the first-frame gap where hooks initialized `loading` to `false`, so `InterventionSection` and `CompanionSection` did not render skeletons and grounding could look **silently empty** on notification opens.
+**Client loader priming** in `use-companion-data`: a `useLayoutEffect` keyed on `pauseInstanceId` sets `interventionLoading` and per-pref companion loaders (`signal`, `grounding` / nudge, `history`, `zoomOut`) to **true** before the browser paints when a pause is active. That removes the first-frame gap where hooks initialized `loading` to `false`, so `InterventionSection` and `CompanionSection` did not render skeletons and grounding could look **silently empty** on notification opens.
 
 Existing UI already had skeletons for intervention (`InterventionSection`) and grounding (`LearningInput` when `nudgeLoading`); this change ensures those paths are active on the first painted frame for cron-driven opens.
 
 ## Related code pointers
 
-- `src/hooks/use-companion-data.ts` — `useLayoutEffect` loader priming when `reflectionId` is set
+- `src/hooks/use-companion-data.ts` — `useLayoutEffect` loader priming when `pauseInstanceId` is set
 - `src/components/CompanionSection.tsx` — intervention + companion cards
 - `src/components/InterventionSection.tsx` — featured intervention skeletons
 - `src/components/LearningInput.tsx` — grounding skeleton while nudge loads
-- `supabase/functions/check-volatility/index.ts` — reflection write before orchestrate
+- `supabase/functions/check-volatility/index.ts` — pause instance write before orchestrate
 - `docs/reviews/phase-3-server-cron-triggers.md`
 
 ## Acceptance (met)
 
 1. Opening `/pause` from a notification right after an automatic pause does not show a **silent** empty featured or grounding area without a loading affordance (skeletons / pulse on cards).
-2. After orchestration completes, content **converges** with the manual path for the same prefs (same orchestrate + `reflection_companions` sources).
+2. After orchestration completes, content **converges** with the manual path for the same prefs (same orchestrate + `pause_ai_artifacts` sources).

@@ -28,7 +28,7 @@ Rule of thumb used here:
 | 2026-04 | [pwa-mobile-web-app-meta.md](pwa-mobile-web-app-meta.md) | `mobile-web-app-capable` in `index.html`. |
 | 2026-04 | [cache-async-error-handling.md](cache-async-error-handling.md) | `.catch` + structured log on cache side-effect Supabase calls. |
 | 2026-04 | [reflection-insert-partial-failure.md](reflection-insert-partial-failure.md) | Revert optimistic UI + `isReflectionPersistError` on Home when `reflections` insert fails after generate. |
-| 2026-04 | [writeCompanionData-grounding-consistency.md](writeCompanionData-grounding-consistency.md) | Grounding only in `ground_nudge`; view COALESCE; no `reflections.grounding_*` writes. |
+| 2026-04 | [writeCompanionData-grounding-consistency.md](writeCompanionData-grounding-consistency.md) | Superseded by Pause V2; grounding lives in `pause_ai_artifacts`. |
 | 2026-04 | [react-router-v7-future-flags.md](react-router-v7-future-flags.md) | `BrowserRouter` `future`: `v7_startTransition`, `v7_relativeSplatPath`. |
 | 2026-04 | [pause-session-hydration.md](pause-session-hydration.md) | Coherent `/pause` hydration: storage → aligned hook → nav → fetch by id; loading/error UI. |
 | 2026-04 | [home-fetch-deduplication.md](home-fetch-deduplication.md) | `useQuery` for `check-subscription`; `fetchBtcData` per-currency in-flight coalescing. |
@@ -47,9 +47,9 @@ Rule of thumb used here:
 | 2026-04 | [rate-budget-fail-open-observability.md](rate-budget-fail-open-observability.md) | Structured **`limit_check_fail_open`** JSON logs (`scope` / `phase`) on rate, budget, regenerate fail-open. |
 | 2026-04 | [quality-gates-false-positives.md](quality-gates-false-positives.md) | **`quality_gate_reject`** logs + **`generation_attempts`** on post-AI gate fail; DOI / et al. / Unicode names; numeric dates for history. |
 | 2026-04 | [btc-price-cache-freshness.md](btc-price-cache-freshness.md) | **Doc:** Zoom Out **`btc_price_cache`** contract — 24h historical TTL, UTC, cron ~15m; `cron-setup` + `refresh-btc-prices` header. |
-| 2026-04 | [orchestrate-client-cron.md](orchestrate-client-cron.md) | **`orchestrate_invoke`** + **`orchestrate_skip_cached`** (`reflection_companions`); **`holzenInvokeSource`** on client/cron. |
+| 2026-04 | [orchestrate-client-cron.md](orchestrate-client-cron.md) | **`orchestrate_invoke`** + **`orchestrate_skip_cached`** (`pause_ai_artifacts`); **`holzenInvokeSource`** on client/cron. |
 | 2026-04 | [automatic-pause-notification-timing.md](automatic-pause-notification-timing.md) | **Doc:** keep **fire-and-forget** notify vs orchestrate; alternatives recorded in ticket. |
-| 2026-04 | [cron-pause-featured-parity.md](cron-pause-featured-parity.md) | **`useLayoutEffect`** in **`use-companion-data`** primes intervention + companion loaders on **`reflectionId`** (no silent empty first paint). |
+| 2026-04 | [cron-pause-featured-parity.md](cron-pause-featured-parity.md) | **`useLayoutEffect`** in **`use-companion-data`** primes intervention + companion loaders on **`pauseInstanceId`** (no silent empty first paint). |
 | 2026-04 | [cache-dedup-near-duplicates.md](cache-dedup-near-duplicates.md) | **`content-dedup`**: URL + **`title_norm`** for **`content_library`**; **`title_norm`** / **`source_url`** / **`fingerprint`** + indexed checks for **`companion_cache`**. |
 
 ---
@@ -94,7 +94,7 @@ Use this when you are **choosing what to work on next**. Items are **not** stric
 | Priority hint | Ticket | Summary |
 |---------------|--------|---------|
 | — | [automatic-pause-notification-timing.md](automatic-pause-notification-timing.md) | **Done (2026-04).** Fire-and-forget policy documented — see ticket. |
-| — | [cron-pause-featured-parity.md](cron-pause-featured-parity.md) | **Done (2026-04).** Loader priming on **`reflectionId`** — see ticket. |
+| — | [cron-pause-featured-parity.md](cron-pause-featured-parity.md) | **Done (2026-04).** Loader priming on **`pauseInstanceId`** — see ticket. |
 | — | [route-gating.md](route-gating.md) | **Done (2026-04).** Explicit session-restore copy on `AuthLoading` — see ticket. |
 | — | [cache-serve-relaxation-ux.md](cache-serve-relaxation-ux.md) | **Done (2026-04).** Telemetry + UI hint + **`companion_serves.cache_relaxation`** — see ticket. |
 | — | [form-field-name-id-a11y.md](form-field-name-id-a11y.md) | **Done (2026-04).** Auth, settings, library, hold goal, onboarding — see ticket. |

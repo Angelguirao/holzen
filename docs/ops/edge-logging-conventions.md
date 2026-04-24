@@ -52,7 +52,7 @@ Edge function
 ## PII rules (see [pii-masking-review.md](pii-masking-review.md) for the PR checklist)
 
 - Never pass `prompt`, `reflection`, `content`, `message`, `body`, `input` as keys in `log()` extra.
-- Pass IDs (`reflection_id`, `companion_id`) and stable codes.
+- Pass IDs (`pause_instance_id`, `companion_id`) and stable codes.
 - Don't log full emails; use `user_id`.
 - Don't log full URLs with query strings that include identifying data. The BetterStack forwarder includes the path, not the full URL, for `request.start`.
 
