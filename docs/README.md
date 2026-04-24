@@ -17,6 +17,7 @@ This folder contains human-readable notes that complement the source code and in
 |---------------------|---------------------|--------|
 | Commands, env vars, “where to edit” table | [AGENTS.md](../AGENTS.md) | Keep tables here; link out for narratives. |
 | Boot sequence, repo tour, Lovable vs local | [fundamentals/navigating-the-codebase.md](fundamentals/navigating-the-codebase.md) | Do not duplicate long boot narratives in AGENTS. |
+| Pause lifecycle (instances, events, artifacts) | [systems/pause-system.md](systems/pause-system.md) | Post-Pause-V2 canonical doc. |
 | How a subsystem behaves (contracts, flows) | [systems/](systems/) | One primary doc per concern; cross-link related systems. |
 | Irreversible or costly-to-reverse choices | [decisions/](decisions/) | Short ADR-style notes; see [decisions/README.md](decisions/README.md). |
 | Incidents, invariants, “why we hardened X” | [postmortems/](postmortems/) | |

@@ -1,6 +1,19 @@
-# Badges System (Current App Order)
+# Badges System
 
-This document explains the badge system exactly as it works **today** in `Profile > Badges`, in the same order users see it.
+> **Status:** the "Recommended target model (skills-aligned badges)" at the
+> bottom of this doc is **shipped** as the 4-family / 14-active model.
+> `Profile > Badges` renders
+> [`BadgesPanelV2`](../../src/components/BadgesPanelV2.tsx), definitions in
+> [`src/lib/badges/definitions.ts`](../../src/lib/badges/definitions.ts),
+> computation in [`src/lib/badges/compute.ts`](../../src/lib/badges/compute.ts).
+> See [`pause-system.md`](pause-system.md) §10.
+>
+> The "Current App Order" section below is retained as historical context —
+> it describes the legacy panel that was removed in the Pause V2 cutover.
+
+## Current App Order (legacy, removed in Pause V2)
+
+This document explains the badge system exactly as it worked **before the Pause V2 cutover** in `Profile > Badges`, in the same order users saw it.
 
 ## Data and counting rules used today
 
