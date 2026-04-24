@@ -102,7 +102,7 @@ const Home = () => {
     companions,
     companionPrefs,
     severity,
-    lastReflectionId,
+    lastPauseInstanceId,
     loading,
     error,
     newReflection,
@@ -386,7 +386,7 @@ const Home = () => {
                 message={message} context={context} onDismiss={handleDismiss}
                 companions={companions}
                 companionPrefs={{ breathing: companionPrefs.breathing, haiku: false, grounding: false, signal: false, zoomOut: false, history: false }}
-                severity={severity} reflectionId={lastReflectionId}
+                severity={severity} pauseInstanceId={lastPauseInstanceId}
               />
             </motion.div>
           ) : loading ? (
@@ -557,13 +557,13 @@ const Home = () => {
                           const navState: PauseSessionLocationState = {
                             reflectionMessage: message,
                             context,
-                            reflectionId: lastReflectionId ?? undefined,
+                            pauseInstanceId: lastPauseInstanceId ?? undefined,
                             companions,
                             companionPrefs,
                             severity,
                           };
                           holzenLog.home('Navigate to /pause (pause with this message)', {
-                            reflectionId: lastReflectionId,
+                            pauseInstanceId: lastPauseInstanceId,
                             severity,
                             messageLen: message?.length ?? 0,
                             hasContext: !!context,

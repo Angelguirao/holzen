@@ -1,15 +1,10 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useNavigate, useParams, useLocation, Navigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { supabase } from '@/integrations/supabase/client';
 import { useHolzen } from '@/hooks/use-holzen';
 import { useCompanionData } from '@/hooks/use-companion-data';
-import {
-  DEFAULT_COMPANIONS,
-  DEFAULT_PREFS,
-  viewRowToCompanionData,
-  type FetchedReflectionRow,
-} from '@/lib/pause-session-storage';
+import { DEFAULT_COMPANIONS, DEFAULT_PREFS } from '@/lib/pause-session-storage';
+import { loadPauseSessionSnapshot, type PauseSessionSnapshot } from '@/lib/pause-page-loader';
 import { CompanionFeedback } from '@/components/CompanionFeedback';
 import { CompanionFocusLayout } from '@/components/companion/CompanionFocusLayout';
 import { GroundingFullView } from '@/components/companion/GroundingFullView';
@@ -26,7 +21,6 @@ import { PageMeta } from '@/components/PageMeta';
 const SEVERITY_NUMBER: Record<string, number> = { mild: 3, moderate: 6, high: 10 };
 const BREATHING_ROOM_MS = 8000;
 
-type Row = FetchedReflectionRow & { mood?: string | null };
 
 /**
  * Full-screen Grounding chapter. Mirrors `CompanionHistoryPage` / `SignalPage`.
@@ -34,43 +28,39 @@ type Row = FetchedReflectionRow & { mood?: string | null };
  * the `grounding-enrich` edge-function output here via `use-grounding-enrichment`.
  */
 export default function CompanionGroundingPage() {
-  const { reflectionId: rid } = useParams<{ reflectionId: string }>();
+  const { pauseInstanceId: rid } = useParams<{ pauseInstanceId: string }>();
   const navigate = useNavigate();
   const location = useLocation();
   const { t } = useTranslation();
   const { companionPrefs, severity } = useHolzen();
 
-  const [row, setRow] = useState<Row | null>(null);
+  const [snapshot, setSnapshot] = useState<PauseSessionSnapshot | null>(null);
   const [loadError, setLoadError] = useState(false);
 
   useEffect(() => {
     if (!rid) return;
     let cancelled = false;
-    setRow(null);
+    setSnapshot(null);
     setLoadError(false);
     void (async () => {
-      const { data, error } = await supabase
-        .from('v_reflection_with_companions')
-        .select('id, message, context, mood, haiku, grounding_title, grounding_body')
-        .eq('id', rid)
-        .maybeSingle();
+      const s = await loadPauseSessionSnapshot(rid);
       if (cancelled) return;
-      if (error || !data?.message) {
+      if (!s) {
         setLoadError(true);
         return;
       }
-      setRow(data as Row);
+      setSnapshot(s);
     })();
     return () => {
       cancelled = true;
     };
   }, [rid]);
 
-  const reflectionId = row?.id ?? null;
-  const reflectionMessage = row?.message ?? '';
-  const context = row?.context ?? null;
-  const mood = row?.mood ?? null;
-  const companions = useMemo(() => (row ? viewRowToCompanionData(row) : DEFAULT_COMPANIONS), [row]);
+  const pauseInstanceId = snapshot?.id ?? null;
+  const reflectionMessage = snapshot?.reflectionMessage ?? '';
+  const context = snapshot?.context ?? null;
+  const mood = snapshot?.mood ?? null;
+  const companions = snapshot?.companions ?? DEFAULT_COMPANIONS;
   const prefs = companionPrefs ?? DEFAULT_PREFS;
   const severityNumber = SEVERITY_NUMBER[severity] ?? 6;
 
@@ -88,7 +78,7 @@ export default function CompanionGroundingPage() {
   } = useCompanionData({
     companions,
     prefs: { ...prefs, grounding: true },
-    reflectionId,
+    pauseInstanceId,
     context,
     reflectionMessage,
     mood,
@@ -96,12 +86,12 @@ export default function CompanionGroundingPage() {
   });
 
   useEffect(() => {
-    if (!reflectionId || !reflectionMessage) return;
+    if (!pauseInstanceId || !reflectionMessage) return;
     if (interventionLoading) return;
     if (nudge || nudgeLoading || nudgeError) return;
     void fetchCompanion('grounding');
   }, [
-    reflectionId,
+    pauseInstanceId,
     reflectionMessage,
     interventionLoading,
     nudge,
@@ -111,7 +101,7 @@ export default function CompanionGroundingPage() {
   ]);
 
   const revealed = useStaggeredReveal(BREATHING_ROOM_MS);
-  useFullviewTelemetry('grounding', reflectionId);
+  useFullviewTelemetry('grounding', pauseInstanceId);
 
   const enrichmentQuery = useGroundingEnrichment({
     citation: nudge?.citation ?? null,
@@ -139,7 +129,7 @@ export default function CompanionGroundingPage() {
     );
   }
 
-  if (!row) {
+  if (!snapshot) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-background" role="status" aria-busy="true">
         <div className="h-8 w-8 rounded-full border-2 border-primary/20 border-t-primary/60 animate-spin" />
@@ -186,10 +176,10 @@ export default function CompanionGroundingPage() {
               seedTitle={nudge.title}
               seedContext={nudge.body}
               companion="grounding"
-              reflectionId={reflectionId}
+              pauseInstanceId={pauseInstanceId}
             />
             <CompanionFeedback
-              reflectionId={reflectionId}
+              pauseInstanceId={pauseInstanceId}
               companionType="grounding"
               cacheId={cacheIds.nudge}
               regenerateSlot="grounding"
@@ -200,11 +190,11 @@ export default function CompanionGroundingPage() {
         )}
 
         <RelatedBiasesThisMonth
-          currentReflectionId={reflectionId}
+          currentReflectionId={pauseInstanceId}
           currentTitle={nudge?.title ?? null}
         />
 
-        <HistoryThread companion="grounding" currentReflectionId={reflectionId} />
+        <HistoryThread companion="grounding" currentReflectionId={pauseInstanceId} />
       </div>
     </CompanionFocusLayout>
   );

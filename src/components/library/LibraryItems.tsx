@@ -134,10 +134,10 @@ export function LibraryItems({ library, filtered }: Props) {
   const linkedMap = useMemo(() => {
     const map = new Map<string, LibraryItem[]>();
     items.forEach((i) => {
-      if (i.reflection_id && i.source_type !== 'reflection' && i.status !== 'deleted') {
-        const arr = map.get(i.reflection_id) ?? [];
+      if (i.pause_instance_id && i.source_type !== 'reflection' && i.status !== 'deleted') {
+        const arr = map.get(i.pause_instance_id) ?? [];
         arr.push(i);
-        map.set(i.reflection_id, arr);
+        map.set(i.pause_instance_id, arr);
       }
     });
     return map;
@@ -149,8 +149,8 @@ export function LibraryItems({ library, filtered }: Props) {
   }, [selectedItem, items]);
 
   const selectedLinkedItems = useMemo(() => {
-    if (!currentSelectedItem?.reflection_id || currentSelectedItem.source_type !== 'reflection') return undefined;
-    return linkedMap.get(currentSelectedItem.reflection_id);
+    if (!currentSelectedItem?.pause_instance_id || currentSelectedItem.source_type !== 'reflection') return undefined;
+    return linkedMap.get(currentSelectedItem.pause_instance_id);
   }, [currentSelectedItem, linkedMap]);
 
   const handleSelectFromViewer = useCallback((item: LibraryItem) => {

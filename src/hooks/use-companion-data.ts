@@ -67,7 +67,7 @@ interface SignalData {
 interface UseCompanionDataParams {
   companions: CompanionData;
   prefs: CompanionPrefs;
-  reflectionId?: string | null;
+  pauseInstanceId?: string | null;
   context?: string | null;
   reflectionMessage?: string | null;
   /** Current user mood — passed to intervention selector */
@@ -76,10 +76,10 @@ interface UseCompanionDataParams {
   severityNumber?: number;
 }
 
-export function useCompanionData({ companions, prefs, reflectionId, context, reflectionMessage, mood, severityNumber }: UseCompanionDataParams) {
+export function useCompanionData({ companions, prefs, pauseInstanceId, context, reflectionMessage, mood, severityNumber }: UseCompanionDataParams) {
   const { language } = useHolzen();
   const { toast } = useToast();
-  const { favorites, toggleCompanionFavorite } = useCompanionLibraryFavorites(reflectionId);
+  const { favorites, toggleCompanionFavorite } = useCompanionLibraryFavorites(pauseInstanceId);
   const { isPro, requirePro, startCheckout } = useProGate();
   const { companionRemaining, flexCreditsBalance, applyOptimisticDecrement, refresh: refreshSubscription } = useSubscription();
 
@@ -105,9 +105,9 @@ export function useCompanionData({ companions, prefs, reflectionId, context, ref
   const libraryAutosaveDedupRef = useRef<Set<string>>(new Set());
   const autoSaveToLibrary = useCallback(
     async (params: { title: string; body: string; sourceType: string; sourceUrl?: string }) => {
-      await saveCompanionLibraryBookmarkOnce(reflectionId, params, libraryAutosaveDedupRef.current);
+      await saveCompanionLibraryBookmarkOnce(pauseInstanceId, params, libraryAutosaveDedupRef.current);
     },
-    [reflectionId],
+    [pauseInstanceId],
   );
 
   // ── Completion state ──
@@ -128,18 +128,18 @@ export function useCompanionData({ companions, prefs, reflectionId, context, ref
   const [cacheRelaxations, setCacheRelaxations] = useState<CompanionSlotRelaxations>(EMPTY_COMPANION_SLOT_RELAXATIONS);
 
   useEffect(() => {
-    if (!reflectionId) return;
-    loadCompanionUiCompletionState(reflectionId).then(setCompletion);
-  }, [reflectionId]);
+    if (!pauseInstanceId) return;
+    loadCompanionUiCompletionState(pauseInstanceId).then(setCompletion);
+  }, [pauseInstanceId]);
 
   const markCompleted = useCallback(async (key: CompanionUiCompletionStep) => {
     if (completion[key]) return;
     setCompletion((prev) => ({ ...prev, [key]: true }));
     hapticFeedback('light');
-    if (reflectionId) {
-      await persistCompanionUiStepCompletion(reflectionId, key);
+    if (pauseInstanceId) {
+      await persistCompanionUiStepCompletion(pauseInstanceId, key);
     }
-  }, [reflectionId, completion]);
+  }, [pauseInstanceId, completion]);
 
   // ── Companion state ──
   const [nudge, setNudge] = useState<NudgeData | null>(null);
@@ -175,7 +175,7 @@ export function useCompanionData({ companions, prefs, reflectionId, context, ref
   const interventionSkippedRef = useRef<boolean>(false);
 
   // When `retryOrchestrate` is triggered from a skipped state, we stash the
-  // `reflectionId` here so the watcher effect below can fire a confirmation
+  // `pauseInstanceId` here so the watcher effect below can fire a confirmation
   // toast as soon as fresh intervention data arrives. Cleared after firing
   // (or on reflection switch) so we never confirm twice.
   const pendingRetryConfirmRef = useRef<string | null>(null);
@@ -205,12 +205,12 @@ export function useCompanionData({ companions, prefs, reflectionId, context, ref
     interventionSkippedRef.current = false;
     pendingRetryConfirmRef.current = null;
 
-    if (!reflectionId) {
+    if (!pauseInstanceId) {
       setInterventionLoading(false);
       return;
     }
     setInterventionLoading(true);
-  }, [reflectionId]);
+  }, [pauseInstanceId]);
 
   // Watcher: when a deliberate retry that followed an idempotency skip lands
   // a fresh `intervention` payload, confirm to the user that the retry went
@@ -219,20 +219,20 @@ export function useCompanionData({ companions, prefs, reflectionId, context, ref
   useEffect(() => {
     if (!intervention) return;
     if (!pendingRetryConfirmRef.current) return;
-    if (pendingRetryConfirmRef.current !== reflectionId) return;
+    if (pendingRetryConfirmRef.current !== pauseInstanceId) return;
     sonnerToast.success('New perspective loaded', {
-      id: `intervention-retry:${reflectionId}`,
+      id: `intervention-retry:${pauseInstanceId}`,
     });
     pendingRetryConfirmRef.current = null;
     interventionSkippedRef.current = false;
-  }, [intervention, reflectionId]);
+  }, [intervention, pauseInstanceId]);
 
   // ── Intervention-only fetch + cached companion hydration ──
   // Companions are NOT fetched here — only on user tap (see fetchCompanion below).
   useEffect(() => {
-    if (!reflectionId) return;
+    if (!pauseInstanceId) return;
 
-    const key = `${reflectionId}:${retryCount}`;
+    const key = `${pauseInstanceId}:${retryCount}`;
     if (fetchedRef.current === key) return;
     fetchedRef.current = key;
 
@@ -243,7 +243,7 @@ export function useCompanionData({ companions, prefs, reflectionId, context, ref
     (async () => {
       try {
         // Hydrate any already-persisted companion data from reflection_companions
-        const cached = await fetchParsedReflectionCompanionCache(reflectionId);
+        const cached = await fetchParsedReflectionCompanionCache(pauseInstanceId);
         if (cancelled) return;
 
         if (cached.signal) {
@@ -274,15 +274,15 @@ export function useCompanionData({ companions, prefs, reflectionId, context, ref
         }
 
         // Per-trigger idempotency. If we've already issued the intervention
-        // call for this `reflectionId` in the current tab session — even if
+        // call for this `pauseInstanceId` in the current tab session — even if
         // a remount happened before the server persisted the row that the
         // cache lookup above reads — bail out and wait for the
         // `reflection_companions` realtime subscription / next remount to
         // hydrate. The `retryOrchestrate` path explicitly resets the marker
         // so a deliberate retry still gets through.
-        if (hasInvokedIntervention(reflectionId)) {
+        if (hasInvokedIntervention(pauseInstanceId)) {
           holzenLog.companion('orchestrate intervention skipped (idempotency)', {
-            reflection_prefix: reflectionId.slice(0, 8),
+            reflection_prefix: pauseInstanceId.slice(0, 8),
           });
           // Passive remount/idempotency skips are expected (StrictMode, quick
           // route bounces). Keep this path silent to avoid surfacing
@@ -297,19 +297,19 @@ export function useCompanionData({ companions, prefs, reflectionId, context, ref
 
         holzenLog.companion('orchestrate invoke (intervention only)', {
           holzenInvokeSource: 'browser_pause_intervention',
-          reflection_prefix: reflectionId.slice(0, 8),
+          reflection_prefix: pauseInstanceId.slice(0, 8),
         });
 
-        // Single-flight per `reflectionId`: concurrent renders share the
+        // Single-flight per `pauseInstanceId`: concurrent renders share the
         // same Promise, and on success a `sessionStorage` marker prevents
         // future remounts in the same tab session from re-issuing the call.
         const { data, error: fnError } = await runOnceIntervention(
-          reflectionId,
+          pauseInstanceId,
           () =>
             supabase.functions.invoke('companion-orchestrate', {
               body: {
                 holzenInvokeSource: 'browser_pause_intervention',
-                reflectionId,
+                pauseInstanceId,
                 context: context ?? '',
                 language,
                 reflectionMessage: reflectionMessage ?? '',
@@ -330,7 +330,7 @@ export function useCompanionData({ companions, prefs, reflectionId, context, ref
         const body = data as Record<string, unknown> | null;
         if (!!fnError || !body || Boolean(body.error)) {
           holzenLog.companion('orchestrate intervention invoke failed', {
-            reflection_prefix: reflectionId.slice(0, 8),
+            reflection_prefix: pauseInstanceId.slice(0, 8),
             fnError: fnError?.message ?? null,
             bodyError: typeof body?.error === 'string' ? body.error : null,
           });
@@ -347,7 +347,7 @@ export function useCompanionData({ companions, prefs, reflectionId, context, ref
         setInterventionLoading(false);
 
         holzenLog.companion('orchestrate intervention ok', {
-          reflection_prefix: reflectionId.slice(0, 8),
+          reflection_prefix: pauseInstanceId.slice(0, 8),
           hasIntervention: Boolean(data.intervention),
         });
 
@@ -393,7 +393,7 @@ export function useCompanionData({ companions, prefs, reflectionId, context, ref
         const sigSlot = readOrchestrateSlotBody(orchestrateBody, 'signal');
         if (isFilledOrchestrateSlot(sigSlot)) {
           holzenLog.companion('hydrated signal from intervention response', {
-            reflection_prefix: reflectionId.slice(0, 8),
+            reflection_prefix: pauseInstanceId.slice(0, 8),
             source: sigSlot.source,
             cacheRelaxation: sigSlot.cacheRelaxation ?? null,
           });
@@ -407,11 +407,11 @@ export function useCompanionData({ companions, prefs, reflectionId, context, ref
     })();
 
     return () => { cancelled = true; };
-  }, [reflectionId, retryCount, context, reflectionMessage, mood, severityNumber, language, autoSaveToLibrary]);
+  }, [pauseInstanceId, retryCount, context, reflectionMessage, mood, severityNumber, language, autoSaveToLibrary]);
 
   // ── On-demand companion slot fetch (triggered when user taps a card) ──
   const fetchCompanion = useCallback(async (slot: RegenerateCompanionSlot) => {
-    if (!reflectionId) return;
+    if (!pauseInstanceId) return;
     if (fetchedSlotsRef.current.has(slot)) return;
 
     // Mirror the regenerate paywall: free users get the standard upgrade
@@ -451,13 +451,13 @@ export function useCompanionData({ companions, prefs, reflectionId, context, ref
       holzenLog.companion('lazy fetch orchestrate invoke', {
         slot,
         holzenInvokeSource: 'browser_lazy_fetch',
-        reflection_prefix: reflectionId.slice(0, 8),
+        reflection_prefix: pauseInstanceId.slice(0, 8),
       });
 
       const { data, error: fnError } = await supabase.functions.invoke('companion-orchestrate', {
         body: {
           holzenInvokeSource: 'browser_lazy_fetch',
-          reflectionId,
+          pauseInstanceId,
           context: context ?? '',
           language,
           reflectionMessage: reflectionMessage ?? '',
@@ -489,7 +489,7 @@ export function useCompanionData({ companions, prefs, reflectionId, context, ref
         );
         holzenLog.companion('lazy fetch orchestrate failed', {
           slot,
-          reflection_prefix: reflectionId.slice(0, 8),
+          reflection_prefix: pauseInstanceId.slice(0, 8),
           fnError: fnError?.message ?? null,
           bodyError: msg,
           bodyCode: code,
@@ -529,7 +529,7 @@ export function useCompanionData({ companions, prefs, reflectionId, context, ref
         applyOrchestrateSlotLazyOrRegenerate(slot, r, setCacheIds, slotCommitters, setCacheRelaxations);
         holzenLog.companion('lazy fetch slot filled', {
           slot,
-          reflection_prefix: reflectionId.slice(0, 8),
+          reflection_prefix: pauseInstanceId.slice(0, 8),
           source: r.source,
           latencyMs: r.latencyMs,
           cacheRelaxation: r.cacheRelaxation ?? null,
@@ -538,7 +538,7 @@ export function useCompanionData({ companions, prefs, reflectionId, context, ref
       } else {
         holzenLog.companion('lazy fetch empty or error slot', {
           slot,
-          reflection_prefix: reflectionId.slice(0, 8),
+          reflection_prefix: pauseInstanceId.slice(0, 8),
         });
         setErr(true);
       }
@@ -550,7 +550,7 @@ export function useCompanionData({ companions, prefs, reflectionId, context, ref
       void refreshSubscription();
     }
   }, [
-    reflectionId,
+    pauseInstanceId,
     context,
     reflectionMessage,
     mood,
@@ -578,12 +578,12 @@ export function useCompanionData({ companions, prefs, reflectionId, context, ref
     // fresh `companion-orchestrate` call. Without this the user-facing
     // "Try again" affordance would silently skip due to the marker set on
     // the previous (failed or stale) attempt.
-    if (reflectionId) resetInterventionIdempotency(reflectionId);
+    if (pauseInstanceId) resetInterventionIdempotency(pauseInstanceId);
     // If the prior auto-fetch was short-circuited by idempotency, arm the
     // success-confirmation toast (fired below in the effect that watches
     // `intervention`) once this deliberate retry lands.
-    if (interventionSkippedRef.current && reflectionId) {
-      pendingRetryConfirmRef.current = reflectionId;
+    if (interventionSkippedRef.current && pauseInstanceId) {
+      pendingRetryConfirmRef.current = pauseInstanceId;
     }
     fetchedSlotsRef.current = new Set();
     setSignal(null); setSignalError(false);
@@ -593,10 +593,10 @@ export function useCompanionData({ companions, prefs, reflectionId, context, ref
     setIntervention(null); setInterventionError(false);
     setCacheRelaxations(EMPTY_COMPANION_SLOT_RELAXATIONS);
     setRetryCount(c => c + 1);
-  }, [reflectionId]);
+  }, [pauseInstanceId]);
 
   const regenerateCompanion = useCallback(async (slot: RegenerateCompanionSlot) => {
-    if (!reflectionId) return;
+    if (!pauseInstanceId) return;
     // Defensive gate: some callers already block before invoking this
     // callback, but enforcing the check here guarantees we never issue a
     // paid regenerate request when the user is out of allowance/credits.
@@ -626,13 +626,13 @@ export function useCompanionData({ companions, prefs, reflectionId, context, ref
       holzenLog.companion('regenerate orchestrate invoke', {
         slot,
         holzenInvokeSource: 'browser_regenerate',
-        reflection_prefix: reflectionId.slice(0, 8),
+        reflection_prefix: pauseInstanceId.slice(0, 8),
       });
 
       const { data, error: fnError } = await supabase.functions.invoke('companion-orchestrate', {
         body: {
           holzenInvokeSource: 'browser_regenerate',
-          reflectionId,
+          pauseInstanceId,
           regenerateOnly: slot,
           context: context ?? '',
           language,
@@ -663,7 +663,7 @@ export function useCompanionData({ companions, prefs, reflectionId, context, ref
         );
         holzenLog.companion('regenerate orchestrate failed', {
           slot,
-          reflection_prefix: reflectionId.slice(0, 8),
+          reflection_prefix: pauseInstanceId.slice(0, 8),
           fnError: fnError?.message ?? null,
           bodyError: typeof body?.error === 'string' ? body.error : null,
           bodyCode: code,
@@ -693,13 +693,13 @@ export function useCompanionData({ companions, prefs, reflectionId, context, ref
         applyOrchestrateSlotLazyOrRegenerate(slot, r, setCacheIds, slotCommitters, setCacheRelaxations);
         holzenLog.companion('regenerate slot filled', {
           slot,
-          reflection_prefix: reflectionId.slice(0, 8),
+          reflection_prefix: pauseInstanceId.slice(0, 8),
           source: r.source,
           latencyMs: r.latencyMs,
           cacheRelaxation: r.cacheRelaxation ?? null,
         });
       } else {
-        holzenLog.companion('regenerate empty slot', { slot, reflection_prefix: reflectionId.slice(0, 8) });
+        holzenLog.companion('regenerate empty slot', { slot, reflection_prefix: pauseInstanceId.slice(0, 8) });
         setErr(true);
       }
     } catch (e) {
@@ -709,7 +709,7 @@ export function useCompanionData({ companions, prefs, reflectionId, context, ref
     } finally {
       setLoading(false);
     }
-  }, [reflectionId, context, reflectionMessage, mood, severityNumber, language, toast, autoSaveToLibrary, canAccessCompanion]);
+  }, [pauseInstanceId, context, reflectionMessage, mood, severityNumber, language, toast, autoSaveToLibrary, canAccessCompanion]);
 
   return {
     favorites,

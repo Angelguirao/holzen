@@ -31,12 +31,13 @@ export function SaveToLibraryButton({ title, body, sourceType, sourceUrl, reflec
   useEffect(() => {
     if (!user) { setChecking(false); return; }
     const check = async () => {
-      let query = supabase
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      let query: any = supabase
         .from('library_items')
         .select('id')
         .eq('user_id', user.id)
         .eq('source_type', sourceType);
-      if (reflectionId) query = query.eq('reflection_id', reflectionId);
+      if (reflectionId) query = query.eq('pause_instance_id', reflectionId);
       else if (body) query = query.eq('body', body);
       else if (title) query = query.eq('title', title);
       const { data } = await query.limit(1);
@@ -49,12 +50,25 @@ export function SaveToLibraryButton({ title, body, sourceType, sourceUrl, reflec
   useEffect(() => {
     if (!showTags || !user) return;
     const fetch = async () => {
-      const [{ data: refTags }, { data: libTags }] = await Promise.all([
-        supabase.from('reflections').select('tags').eq('user_id', user.id),
+      const [{ data: stepTags }, { data: libTags }] = await Promise.all([
+        supabase
+          .from('pause_step_events' as never)
+          .select('payload')
+          .eq('user_id', user.id)
+          .eq('step_type', 'tag_updated')
+          .order('created_at', { ascending: false })
+          .limit(200),
         supabase.from('library_items').select('tags').eq('user_id', user.id),
       ]);
       const set = new Set<string>();
-      refTags?.forEach((r) => (r.tags as string[])?.forEach((t: string) => set.add(t)));
+      (stepTags ?? []).forEach((r) => {
+        const tagsArr = (r as { payload?: { tags?: unknown } }).payload?.tags;
+        if (Array.isArray(tagsArr)) {
+          tagsArr.forEach((t) => {
+            if (typeof t === 'string') set.add(t);
+          });
+        }
+      });
       libTags?.forEach((r) => (r.tags as string[])?.forEach((t: string) => set.add(t)));
       setAllUserTags(Array.from(set).sort());
     };
@@ -104,7 +118,7 @@ export function SaveToLibraryButton({ title, body, sourceType, sourceUrl, reflec
       body: body || undefined,
       source_type: sourceType,
       source_url: sourceUrl,
-      reflection_id: reflectionId,
+      pause_instance_id: reflectionId,
       tags,
     });
     if (result) {

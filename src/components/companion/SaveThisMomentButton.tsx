@@ -14,7 +14,7 @@ interface Props {
   /** Which companion this moment came from. Used for `source_type` + tags. */
   companion: 'signal' | 'grounding' | 'history' | 'zoomOut';
   /** Current reflection id — links the saved note back to the pause session. */
-  reflectionId?: string | null;
+  pauseInstanceId?: string | null;
 }
 
 /**
@@ -29,7 +29,7 @@ interface Props {
  * `library_items` with `type: 'note'`, `source_type: 'companion_moment'`, tags
  * `['moment', <companion>]`, so the saved moment shows up in the library.
  */
-export function SaveThisMomentButton({ seedTitle, seedContext, companion, reflectionId }: Props) {
+export function SaveThisMomentButton({ seedTitle, seedContext, companion, pauseInstanceId }: Props) {
   const { t } = useTranslation();
   const { isPro, requirePro } = useProGate();
   const saveToLibrary = useSaveToLibrary();
@@ -53,7 +53,7 @@ export function SaveThisMomentButton({ seedTitle, seedContext, companion, reflec
       title: noteTitle,
       body: body.trim(),
       source_type: 'companion_moment',
-      reflection_id: reflectionId ?? undefined,
+      pause_instance_id: pauseInstanceId ?? undefined,
       tags: ['moment', companion],
     });
     setSaving(false);
@@ -65,7 +65,7 @@ export function SaveThisMomentButton({ seedTitle, seedContext, companion, reflec
     } else {
       toast.error(t('common.tryAgain'));
     }
-  }, [body, saveToLibrary, seedTitle, companion, reflectionId, t]);
+  }, [body, saveToLibrary, seedTitle, companion, pauseInstanceId, t]);
 
   if (saved) {
     return (

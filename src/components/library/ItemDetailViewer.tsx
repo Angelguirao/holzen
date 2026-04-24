@@ -121,8 +121,8 @@ export function ItemDetailViewer({
   }, [open, item?.id]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const siblings = useMemo(() => {
-    if (!item?.reflection_id || !allItems) return [];
-    return allItems.filter((i) => i.reflection_id === item.reflection_id && i.id !== item.id && i.status !== 'deleted');
+    if (!item?.pause_instance_id || !allItems) return [];
+    return allItems.filter((i) => i.pause_instance_id === item.pause_instance_id && i.id !== item.id && i.status !== 'deleted');
   }, [item, allItems]);
 
   const zoomOutData = useMemo(() => {
@@ -148,17 +148,17 @@ export function ItemDetailViewer({
   }, [item, onUpdateTags]);
 
   const handleRecordOutcome = useCallback(async (outcome: string) => {
-    if (!item?.reflection_id || outcomeLoading) return;
+    if (!item?.pause_instance_id || outcomeLoading) return;
     setOutcomeLoading(true);
     await supabase
       .from('reflections')
       .update({ outcome })
-      .eq('id', item.reflection_id);
+      .eq('id', item.pause_instance_id);
     setOutcomeLoading(false);
     setRecordedOutcome(outcome);
     setShowOutcomePicker(false);
     onOutcomeRecorded?.();
-  }, [item?.reflection_id, outcomeLoading, onOutcomeRecorded]);
+  }, [item?.pause_instance_id, outcomeLoading, onOutcomeRecorded]);
 
   if (!item) return null;
 
@@ -170,7 +170,7 @@ export function ItemDetailViewer({
   // Determine the effective outcome: freshly recorded > current from DB
   const effectiveOutcome = recordedOutcome ?? currentOutcome;
   // Show the outcome section for reflections: either incomplete or has an outcome to display
-  const showOutcomeSection = isReflection && item.reflection_id;
+  const showOutcomeSection = isReflection && item.pause_instance_id;
 
   const handleDelete = () => {
     onDelete(item.id);
@@ -260,15 +260,15 @@ export function ItemDetailViewer({
             return null;
           })()}
 
-          {item.reflection_id &&
+          {item.pause_instance_id &&
             (item.source_type === 'zoom_out' || item.source_type === 'history_insight') && (
               <button
                 type="button"
                 onClick={() => {
                   const path =
                     item.source_type === 'zoom_out'
-                      ? `/companion/zoom-out/${item.reflection_id}`
-                      : `/companion/history/${item.reflection_id}`;
+                      ? `/companion/zoom-out/${item.pause_instance_id}`
+                      : `/companion/history/${item.pause_instance_id}`;
                   navigate(path, { state: { from: 'library' } });
                   onClose();
                 }}
@@ -280,9 +280,9 @@ export function ItemDetailViewer({
             )}
 
           {/* Companion feedback — for companion-type library items */}
-          {item.source_type && ['signal', 'grounding', 'learning', 'zoom_out', 'history_insight', 'haiku'].includes(item.source_type) && item.reflection_id && (
+          {item.source_type && ['signal', 'grounding', 'learning', 'zoom_out', 'history_insight', 'haiku'].includes(item.source_type) && item.pause_instance_id && (
             <CompanionFeedback
-              reflectionId={item.reflection_id}
+              pauseInstanceId={item.pause_instance_id}
               companionType={item.source_type}
             />
           )}
