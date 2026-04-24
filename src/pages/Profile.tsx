@@ -10,6 +10,7 @@ import { formatBtcPrice } from '@/lib/btc';
 import { format } from 'date-fns';
 import { Mail, Lock, Clock, Trash2, BarChart3, Sparkles, Award, CalendarDays, Info } from 'lucide-react';
 import HistoryContent from '@/components/library/HistoryContent';
+import { StatsContentV2 } from '@/components/stats/StatsContentV2';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sheet';
 import { NoxHeaderMain } from '@/components/ui/nox-header';
@@ -281,7 +282,7 @@ const Profile = () => {
             <Skeleton className="h-40 w-full rounded-md" />
           </div>
         ) : (
-          <StatsContent reflections={reflections} practiceEntries={practiceEntries} letters={letters} memberSince={user?.created_at} holdGoal={holdGoal} />
+          <StatsContentV2 holdGoal={holdGoal} />
         )
       ) : tab === 'insights' ? (
         <ProLock feature="ai_insights" hideContent>
