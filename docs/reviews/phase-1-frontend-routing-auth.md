@@ -151,7 +151,7 @@ Phase 2 is **not** "the next arbitrary folder in the repo." It is the **first en
 
 1. **Builds directly on Phase 1**: Phase 1 answered who can reach `/pause` and how `user` / `loading` behave. Phase 2 answers what happens **inside** the app once that gate opens: which hooks write what, and what `PauseSession` must consume. Other areas often assume that contract without defining it.
 
-2. **Highest cross-cutting integration early**: This slice touches **React hooks**, **Supabase client writes**, **edge functions** (e.g. `holzen-reflect`, `companion-orchestrate`), and **Postgres** (`reflections`, `profiles`, companion-related tables) in one story. Understanding it first gives you vocabulary for later phases (cron, RLS, workers).
+2. **Highest cross-cutting integration early**: This slice touches **React hooks**, **Supabase client writes**, **edge functions** (e.g. `holzen-reflect`, `companion-orchestrate`), and **Postgres** (`pause_instances`, `pause_ai_artifacts`, `profiles`) in one story. Understanding it first gives you vocabulary for later phases (cron, RLS, workers).
 
 3. **What we are not prioritizing first (and why)**:
    - **Library / profile / settings**: mostly CRUD and preferences on top of the same session; fewer moving parts than pause + AI + session persistence.

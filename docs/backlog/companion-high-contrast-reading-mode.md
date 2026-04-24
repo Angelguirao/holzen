@@ -2,7 +2,7 @@
 
 **Status:** backlog — not started.
 
-**Scope:** **Companions** — inline pause cards, **Signal Full View** (`/companion/signal/:reflectionId`), and any other long-form companion reading surfaces where typography and backgrounds should support low vision or bright sunlight without changing global app chrome.
+**Scope:** **Companions** — inline pause cards, **Signal Full View** (`/companion/signal/:pauseInstanceId`), and any other long-form companion reading surfaces where typography and backgrounds should support low vision or bright sunlight without changing global app chrome.
 
 ---
 

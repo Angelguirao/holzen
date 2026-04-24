@@ -2,10 +2,10 @@
 
 > **Pause V2:** This doc reflects the current model. Companion payloads
 > are stored in `pause_ai_artifacts` (one row per `pause_instance_id` + `kind`).
-> Legacy `reflection_companions` / `reflections` storage paths were removed.
+> Legacy reflection tables were removed.
 
 
-**Zoom Out** is the pause **card** that provides **temporal perspective**: historical BTC prices on this day in past years, an optional echo from the user's own past reflections, and a **deep-time** narrative that places the current moment against geological, civilizational, or technological timescales.
+**Zoom Out** is the pause **card** that provides **temporal perspective**: historical BTC prices on this day in past years, an optional echo from the user's own past pauses, and a **deep-time** narrative that places the current moment against geological, civilizational, or technological timescales.
 
 This page is the **companion-level** view. For **manual vs automatic pause**, **interventions**, **cost limits**, and the full **orchestrator** contract, see the system doc: **[AI-powered pause system](../ai-powered-pause-system.md)** (especially **§5** `companion-orchestrate`, **§6** generators, **§7.9** Zoom Out reference table).
 

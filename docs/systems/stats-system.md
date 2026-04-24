@@ -15,11 +15,11 @@
 
 This document explains the metrics shown **before the Pause V2 cutover** in `Profile > Stats`, in the same order the UI rendered them.
 
-## Counting rules used today
+## Legacy counting rules (pre-V2)
 
-Stats currently mix multiple counting bases. These are the active definitions in code:
+The legacy Stats panel mixed multiple counting bases in the `reflections` table:
 
-1. **Generated pause**: any row in `reflections`.
+1. **Generated pause**: any row in `reflections` (table removed in Pause V2).
 2. **Completed pause**: `outcome` is set (used by most score/trend metrics).
 3. **Full ritual pause**: breathing + mood + mood_after + outcome (used selectively).
 
