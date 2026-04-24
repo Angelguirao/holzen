@@ -109,6 +109,26 @@ DROP TABLE IF EXISTS public.reflections CASCADE;
 -- ---------------------------------------------------------------------------
 TRUNCATE public.user_badges RESTART IDENTITY;
 
+-- ---------------------------------------------------------------------------
+-- 9. Unschedule cron jobs whose target edge function was deleted in this PR.
+--    check-followups was removed because follow_ups has been dropped.
+--    cron.unschedule(name) raises if the job doesn't exist, so guard with
+--    a lookup; we also try/catch because the extension may not be present
+--    in every environment (local psql without pg_cron).
+-- ---------------------------------------------------------------------------
+DO $$
+DECLARE
+  v_jobid bigint;
+BEGIN
+  SELECT jobid INTO v_jobid FROM cron.job WHERE jobname = 'check-followups-hourly';
+  IF v_jobid IS NOT NULL THEN
+    PERFORM cron.unschedule(v_jobid);
+  END IF;
+EXCEPTION WHEN undefined_table OR undefined_schema THEN
+  -- pg_cron not installed (local psql without extensions); safe to skip.
+  NULL;
+END$$;
+
 COMMIT;
 
 -- ---------------------------------------------------------------------------
