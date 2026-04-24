@@ -1,38 +1,36 @@
 /**
  * Pure helpers for `RelatedBiasesThisMonth`. Extracted so Vitest can import
- * them without pulling the Supabase client chain (importing the component
- * itself triggers `src/integrations/supabase/client.ts` side effects).
+ * them without pulling the Supabase client chain.
  */
 
 export interface RelatedBiasesRow {
-  reflection_id: string;
+  pause_instance_id: string;
   created_at: string | null;
   content: { title?: string } | null;
 }
 
 export interface RelatedBias {
   title: string;
-  reflection_id: string;
+  pause_instance_id: string;
 }
 
 /**
  * Normalize a Grounding title so "Anchoring bias." and "anchoring bias"
- * collapse into the same bias key. Trailing punctuation (. , ; : — -) is
- * stripped because the structuring prompt doesn't constrain it.
+ * collapse into the same bias key.
  */
 export function normalizeBiasTitle(s: string): string {
   return s.toLowerCase().replace(/\s+/g, ' ').replace(/[\s.,;:—-]+$/g, '').trim();
 }
 
 /**
- * Dedupe raw `reflection_companions` rows into a list of distinct biases by
- * normalized title. Assumes input is ordered newest-first so the surviving
- * row per key is the most recent occurrence (chips deep-link to the freshest
- * card for that bias). Excludes the current title and the current reflection.
+ * Dedupe raw `pause_ai_artifacts` rows (kind='ground_nudge') into a list of
+ * distinct biases by normalized title. Assumes input is ordered newest-first;
+ * surviving row per key is the freshest. Excludes the current title and
+ * current pause instance.
  */
 export function dedupeBiases(
   rows: RelatedBiasesRow[],
-  opts: { currentReflectionId: string | null; currentTitle: string | null; limit: number },
+  opts: { currentPauseInstanceId: string | null; currentTitle: string | null; limit: number },
 ): RelatedBias[] {
   const currentKey = normalizeBiasTitle(opts.currentTitle ?? '');
   const seen = new Set<string>();
@@ -43,9 +41,9 @@ export function dedupeBiases(
     const key = normalizeBiasTitle(title);
     if (!key || key === currentKey) continue;
     if (seen.has(key)) continue;
-    if (r.reflection_id === opts.currentReflectionId) continue;
+    if (r.pause_instance_id === opts.currentPauseInstanceId) continue;
     seen.add(key);
-    out.push({ title, reflection_id: r.reflection_id });
+    out.push({ title, pause_instance_id: r.pause_instance_id });
     if (out.length >= opts.limit) break;
   }
   return out;

@@ -6,8 +6,8 @@ import { useAuth } from '@/hooks/use-auth';
 import type { RegenerateCompanionSlot } from '@/lib/companion-orchestrate-types';
 
 /**
- * Maps an internal orchestrator slot name to the `companion_type` value
- * persisted in `reflection_companions.companion_type` (DB-facing).
+ * Maps an internal orchestrator slot name to the `kind` value persisted
+ * in `pause_ai_artifacts.kind`.
  */
 const DB_TYPE: Record<RegenerateCompanionSlot, string> = {
   signal: 'signal',
@@ -18,7 +18,6 @@ const DB_TYPE: Record<RegenerateCompanionSlot, string> = {
 
 /**
  * Maps an internal orchestrator slot name to the Full View route prefix.
- * Kept here so the thread can deep-link directly to each card's own Full View.
  */
 const ROUTE_PREFIX: Record<RegenerateCompanionSlot, string> = {
   signal: '/companion/signal',
@@ -29,29 +28,30 @@ const ROUTE_PREFIX: Record<RegenerateCompanionSlot, string> = {
 
 interface ThreadRow {
   id: string;
-  reflection_id: string;
+  pause_instance_id: string;
   created_at: string | null;
   content: { title?: string; body?: string; btcInsight?: string } | null;
 }
 
 interface Props {
   companion: RegenerateCompanionSlot;
-  /** Reflection id we're currently viewing — excluded from the list. */
-  currentReflectionId?: string | null;
+  /** Pause instance currently viewed — excluded from the list. */
+  currentPauseInstanceId?: string | null;
   /** How many prior cards to show. Defaults to 5. */
   limit?: number;
   className?: string;
 }
 
 /**
- * Renders the user's last few cards of the same companion type, excluding the
- * current one. Lets the Full View double as a small personal archive so people
- * can see how their Signal / Ground / History / Zoom Out have evolved.
- *
- * Relies on `reflection_companions` RLS (the existing policy scopes rows to the
- * reflection's owner), so no explicit `user_id` filter is needed here.
+ * Renders the user's last few cards of the same companion type, excluding
+ * the current one. Reads from `pause_ai_artifacts`.
  */
-export function HistoryThread({ companion, currentReflectionId, limit = 5, className = '' }: Props) {
+export function HistoryThread({
+  companion,
+  currentPauseInstanceId,
+  limit = 5,
+  className = '',
+}: Props) {
   const { t } = useTranslation();
   const { user } = useAuth();
   const [rows, setRows] = useState<ThreadRow[] | null>(null);
@@ -64,9 +64,10 @@ export function HistoryThread({ companion, currentReflectionId, limit = 5, class
     let cancelled = false;
     void (async () => {
       const { data, error } = await supabase
-        .from('reflection_companions')
-        .select('id, reflection_id, created_at, content')
-        .eq('companion_type', DB_TYPE[companion])
+        .from('pause_ai_artifacts' as never)
+        .select('id, pause_instance_id, created_at, content')
+        .eq('user_id', user.id)
+        .eq('kind', DB_TYPE[companion])
         .order('created_at', { ascending: false })
         .limit(limit + 1);
 
@@ -75,15 +76,15 @@ export function HistoryThread({ companion, currentReflectionId, limit = 5, class
         setRows([]);
         return;
       }
-      const filtered = data
-        .filter((r) => r.reflection_id !== currentReflectionId)
+      const filtered = (data as unknown as ThreadRow[])
+        .filter((r) => r.pause_instance_id !== currentPauseInstanceId)
         .slice(0, limit);
-      setRows(filtered as ThreadRow[]);
+      setRows(filtered);
     })();
     return () => {
       cancelled = true;
     };
-  }, [user, companion, currentReflectionId, limit]);
+  }, [user, companion, currentPauseInstanceId, limit]);
 
   if (!rows || rows.length === 0) return null;
 
@@ -99,7 +100,7 @@ export function HistoryThread({ companion, currentReflectionId, limit = 5, class
           return (
             <li key={r.id}>
               <Link
-                to={`${ROUTE_PREFIX[companion]}/${r.reflection_id}`}
+                to={`${ROUTE_PREFIX[companion]}/${r.pause_instance_id}`}
                 state={{ from: 'thread' }}
                 className="group flex items-baseline justify-between gap-3 py-1 text-xs text-foreground/75 hover:text-foreground transition-colors"
               >
@@ -116,7 +117,6 @@ export function HistoryThread({ companion, currentReflectionId, limit = 5, class
   );
 }
 
-/** Very small relative-date helper — avoids pulling `date-fns` into this chunk. */
 function formatRelativeDay(iso: string): string {
   const then = new Date(iso).getTime();
   if (Number.isNaN(then)) return '';

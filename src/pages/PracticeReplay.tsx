@@ -12,8 +12,8 @@ export default function PracticeReplay() {
   const navigate = useNavigate();
   const location = useLocation();
   const { t } = useTranslation();
-  const state = location.state as { reflectionId?: string; returnTo?: string } | undefined;
-  const reflectionId = state?.reflectionId;
+  const state = location.state as { pauseInstanceId?: string; returnTo?: string } | undefined;
+  const pauseInstanceId = state?.pauseInstanceId;
   const returnTo = state?.returnTo;
 
   const handleClose = returnTo
@@ -23,7 +23,7 @@ export default function PracticeReplay() {
   return (
     <ImmersivePracticeShell title={t('practice.replayLabel')} onClose={handleClose}>
       <ReflectionReplay
-        initialReflectionId={reflectionId}
+        initialReflectionId={pauseInstanceId}
         onComplete={() => navigate(returnTo ?? '/', { replace: true })}
         {...COLORS}
       />

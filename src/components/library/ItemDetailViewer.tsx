@@ -150,10 +150,15 @@ export function ItemDetailViewer({
   const handleRecordOutcome = useCallback(async (outcome: string) => {
     if (!item?.pause_instance_id || outcomeLoading) return;
     setOutcomeLoading(true);
-    await supabase
-      .from('reflections')
-      .update({ outcome })
-      .eq('id', item.pause_instance_id);
+    // Log outcome_logged step event via the RPC. The instance may already
+    // be terminal (expired) — the RPC silently no-ops in that case but
+    // leaves a record we can use for retrospective analytics.
+    const { pauseLogStep } = await import('@/lib/pause-api');
+    await pauseLogStep({
+      instanceId: item.pause_instance_id,
+      stepType: 'outcome_logged',
+      payload: { outcome },
+    }).catch(() => undefined);
     setOutcomeLoading(false);
     setRecordedOutcome(outcome);
     setShowOutcomePicker(false);

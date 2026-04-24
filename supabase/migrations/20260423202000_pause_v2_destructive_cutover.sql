@@ -46,19 +46,30 @@ DROP VIEW IF EXISTS public.v_reflection_with_companion_serve_sources CASCADE;
 --    The paired pause_instance_id columns were added in the additive
 --    migration 20260423201300_companion_serves_pause_instance_id.
 -- ---------------------------------------------------------------------------
-ALTER TABLE public.library_items
-  DROP CONSTRAINT IF EXISTS library_items_user_id_reflection_id_source_type_key;
-DROP INDEX IF EXISTS public.idx_library_items_reflection_id;
-DROP INDEX IF EXISTS public.library_items_user_id_reflection_id_source_type_key;
-ALTER TABLE public.library_items DROP COLUMN IF EXISTS reflection_id;
+-- Indexes on library_items that depend on reflection_id; drop them first
+-- so the column DROP doesn't fail. The actual index from migration
+-- 20260319002444 is `idx_library_items_user_reflection_source`. There is
+-- also `idx_library_items_reflection` from the original table migration.
+DROP INDEX IF EXISTS public.idx_library_items_user_reflection_source;
+DROP INDEX IF EXISTS public.idx_library_items_reflection;
+ALTER TABLE public.library_items DROP COLUMN IF EXISTS reflection_id CASCADE;
 
-ALTER TABLE public.practice_entries DROP COLUMN IF EXISTS source_reflection_id;
+ALTER TABLE public.practice_entries DROP COLUMN IF EXISTS source_reflection_id CASCADE;
 
-ALTER TABLE public.ritual_completions DROP COLUMN IF EXISTS reflection_id;
+ALTER TABLE public.ritual_completions DROP COLUMN IF EXISTS reflection_id CASCADE;
 
-ALTER TABLE public.companion_serves DROP COLUMN IF EXISTS reflection_id;
+ALTER TABLE public.companion_serves DROP COLUMN IF EXISTS reflection_id CASCADE;
 
-ALTER TABLE public.generation_attempts DROP COLUMN IF EXISTS reflection_id;
+DROP INDEX IF EXISTS public.idx_generation_attempts_reflection_id;
+ALTER TABLE public.generation_attempts DROP COLUMN IF EXISTS reflection_id CASCADE;
+
+-- ---------------------------------------------------------------------------
+-- 3b. Clean up orphan rows in the unified notifications table whose
+--     source_table points at tables we're about to drop. The table
+--     itself (public.notifications) stays; only stale 'pause' rows go.
+-- ---------------------------------------------------------------------------
+DELETE FROM public.notifications
+ WHERE source_table IN ('reflections', 'pause_notifications', 'follow_ups');
 
 -- ---------------------------------------------------------------------------
 -- 4. follow_ups (hard FK to reflections; feature retired in V2).

@@ -178,7 +178,7 @@ export default function CompanionSignalPage() {
           </div>
         )}
 
-        <HistoryThread companion="signal" currentReflectionId={pauseInstanceId} />
+        <HistoryThread companion="signal" currentPauseInstanceId={pauseInstanceId} />
       </div>
     </CompanionFocusLayout>
   );

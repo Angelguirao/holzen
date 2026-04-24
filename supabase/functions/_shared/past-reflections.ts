@@ -1,46 +1,52 @@
 /**
- * Edge-side DB helper for the "past reflection with user words" read model.
+ * Edge-side read model for the "past reflection with user words" feature.
  *
- * See `_shared/past-reflection-util.ts` for the shape and pure selection logic.
+ * Reads `v_pause_full` for completed pauses older than `cutoffDays` and
+ * joins them with `pause_step_events(step_type='note_updated')` entries
+ * to produce the user-authored words. Projects into the same
+ * `PastReflectionWithWords` shape that the pure util already owns.
  *
- * Used by Zoom Out (`generators/zoom-out.ts` — Echo rail). The client-side
- * counterpart lives at `src/hooks/use-past-reflection.ts` (Daily Practice Replay
- * thread view). Both compose the same pure helpers over their respective data
- * stores so the read model is consistent across surfaces.
+ * Used by Zoom Out (`generators/zoom-out.ts` — Echo rail). Returns null
+ * when the user has no qualifying past pause.
  */
 import {
-  assemblePastReflectionPool,
   parseDirectionFromContext,
-  type PastReflectionWithWords,
-  type PracticeEntryRow,
   pickPastReflection,
-  type ReflectionRow,
+  type PastReflectionWithWords,
+  type UserWord,
 } from "./past-reflection-util.ts";
 
 export type { PastReflectionWithWords } from "./past-reflection-util.ts";
 
 export interface FetchPastReflectionOpts {
-  /** Minimum age (days) — defaults to 3. Callers can loosen for tests. */
   cutoffDays?: number;
-  /** Pool size for the initial reflections query; defaults to 30. */
   poolSize?: number;
-  /** Present-day session context; parsed for `up`/`down` preference. */
   sessionContext?: string | null | undefined;
 }
 
-/**
- * Fetch one past reflection that has at least one user-authored entry
- * (`reflections.note` or a linked `practice_entries.body`), returned as the
- * `PastReflectionWithWords` shape. Returns `null` when the user has no
- * qualifying past reflections — Zoom Out's Echo card should render its empty
- * state in that case (see ZoomOutDisplay.tsx), NOT fall back to AI text.
- *
- * Strategy (two queries, same user):
- *   1. Pull the most recent `poolSize` reflections older than `cutoffDays` days.
- *   2. Pull all `practice_entries` with `source_reflection_id` in that set.
- *   3. Assemble the pool (drop reflections with zero user words), then pick
- *      one, preferring a match on today's market direction when available.
- */
+type PauseFullRow = {
+  id: string;
+  created_at: string;
+  completed_at: string | null;
+  engaged_at: string | null;
+  initial_mood: string | null;
+  outcome: string | null;
+  context_snapshot: Record<string, unknown> | null;
+  reflection_text: string | null;
+  note_text: string | null;
+};
+
+type NoteEventRow = {
+  pause_instance_id: string;
+  payload: Record<string, unknown> | null;
+  created_at: string;
+};
+
+function contextTextOf(r: PauseFullRow): string | null {
+  const c = r.context_snapshot?.context_text;
+  return typeof c === "string" ? c : null;
+}
+
 export async function fetchPastReflectionWithWords(
   svcClient: any,
   userId: string,
@@ -52,56 +58,85 @@ export async function fetchPastReflectionWithWords(
   const direction = parseDirectionFromContext(opts.sessionContext);
   const cutoffIso = new Date(Date.now() - cutoffDays * 86400000).toISOString();
 
-  let reflections: ReflectionRow[] = [];
+  let pauses: PauseFullRow[] = [];
   try {
     const { data, error } = await svcClient
-      .from("reflections")
-      .select("id, message, note, mood, outcome, context, created_at")
+      .from("v_pause_full")
+      .select(
+        "id, created_at, completed_at, engaged_at, initial_mood, outcome, context_snapshot, reflection_text, note_text",
+      )
       .eq("user_id", userId)
+      .eq("state", "completed")
       .lt("created_at", cutoffIso)
       .order("created_at", { ascending: false })
       .limit(poolSize);
     if (error) throw error;
-    reflections = (data ?? []) as ReflectionRow[];
+    pauses = (data ?? []) as PauseFullRow[];
   } catch (e) {
-    log?.("past-reflection: reflections query failed", { error: String(e) });
+    log?.("past-reflection: v_pause_full query failed", { error: String(e) });
     return null;
   }
 
-  if (reflections.length === 0) {
-    log?.("past-reflection: no reflections ≥ cutoff");
+  if (pauses.length === 0) {
+    log?.("past-reflection: no completed pauses ≥ cutoff");
     return null;
   }
 
-  const ids = reflections.map((r) => r.id);
-  let entries: PracticeEntryRow[] = [];
+  const ids = pauses.map((p) => p.id);
+  let noteEvents: NoteEventRow[] = [];
   try {
     const { data, error } = await svcClient
-      .from("practice_entries")
-      .select("source_reflection_id, body, created_at")
-      .in("source_reflection_id", ids)
-      .eq("type", "replay");
+      .from("pause_step_events")
+      .select("pause_instance_id, payload, created_at")
+      .eq("step_type", "note_updated")
+      .in("pause_instance_id", ids);
     if (error) throw error;
-    entries = (data ?? []) as PracticeEntryRow[];
+    noteEvents = (data ?? []) as NoteEventRow[];
   } catch (e) {
-    // Non-fatal: we can still surface reflections whose `note` field has text.
-    log?.("past-reflection: practice_entries query failed", { error: String(e) });
-    entries = [];
+    log?.("past-reflection: note_updated events query failed", { error: String(e) });
+    noteEvents = [];
   }
 
-  const pool = assemblePastReflectionPool(reflections, entries);
-  if (pool.length === 0) {
-    log?.("past-reflection: no past rows with user words", {
-      reflections: reflections.length,
-      replay_entries: entries.length,
+  const notesByPause = new Map<string, UserWord[]>();
+  for (const e of noteEvents) {
+    const text = typeof e.payload?.text === "string" ? (e.payload.text as string).trim() : "";
+    if (!text) continue;
+    const list = notesByPause.get(e.pause_instance_id) ?? [];
+    list.push({ kind: "note", body: text, created_at: e.created_at });
+    notesByPause.set(e.pause_instance_id, list);
+  }
+
+  const pool: PastReflectionWithWords[] = [];
+  for (const p of pauses) {
+    const eventWords = (notesByPause.get(p.id) ?? []).sort((a, b) =>
+      a.created_at === b.created_at ? 0 : a.created_at < b.created_at ? -1 : 1,
+    );
+    // If the latest note_text on v_pause_full isn't represented by an event
+    // row (shouldn't happen in V2, but defensive), add it in.
+    if (eventWords.length === 0 && typeof p.note_text === "string" && p.note_text.trim().length > 0) {
+      eventWords.push({ kind: "note", body: p.note_text.trim(), created_at: p.created_at });
+    }
+    if (eventWords.length === 0) continue;
+    pool.push({
+      id: p.id,
+      created_at: p.created_at,
+      mood: p.initial_mood,
+      outcome: p.outcome,
+      context: contextTextOf(p),
+      aiPrompt: p.reflection_text,
+      userWords: eventWords,
     });
+  }
+
+  if (pool.length === 0) {
+    log?.("past-reflection: no past pauses with user words");
     return null;
   }
 
   const picked = pickPastReflection(pool, direction);
   if (picked) {
     log?.("past-reflection: picked", {
-      reflection_id: picked.id.slice(0, 8),
+      pause_instance_id: picked.id.slice(0, 8),
       user_words: picked.userWords.length,
       direction,
       pool_size: pool.length,
