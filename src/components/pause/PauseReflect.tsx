@@ -3,15 +3,15 @@ import { useTranslation } from 'react-i18next';
 import { ChevronLeft } from 'lucide-react';
 import { CompanionSection, type CompanionData, type CompanionPrefs } from '@/components/CompanionSection';
 import { CollapsibleReflectionHeader } from '@/components/pause/CollapsibleReflectionHeader';
-import { ReflectionNote } from '@/components/ReflectionNote';
-import { ReflectionTags } from '@/components/ReflectionTags';
+import { PauseNote } from '@/components/pause/PauseNote';
+import { PauseTags } from '@/components/pause/PauseTags';
 import { pauseStepLayout } from '@/components/pause/pause-step-layout';
 
 interface Props {
   companions: CompanionData;
   companionPrefs: CompanionPrefs;
   severity: 'mild' | 'moderate' | 'high';
-  reflectionId: string | null;
+  pauseInstanceId: string | null;
   context: string | null;
   reflectionMessage: string;
   isFavorite: boolean;
@@ -24,8 +24,18 @@ interface Props {
 }
 
 export function PauseReflect({
-  companions, companionPrefs, severity, reflectionId, context, reflectionMessage,
-  isFavorite, onToggleFavorite, subscribed, onContinue, onBack, mood,
+  companions,
+  companionPrefs,
+  severity,
+  pauseInstanceId,
+  context,
+  reflectionMessage,
+  isFavorite,
+  onToggleFavorite,
+  subscribed,
+  onContinue,
+  onBack,
+  mood,
 }: Props) {
   const { t } = useTranslation();
 
@@ -60,7 +70,7 @@ export function PauseReflect({
           defaultExpanded
         />
 
-        {reflectionId && subscribed && (
+        {pauseInstanceId && subscribed && (
           <motion.div
             className="mt-6 space-y-4 border-t border-border/30 pt-5"
             initial={{ opacity: 0, y: 8 }}
@@ -70,12 +80,12 @@ export function PauseReflect({
             <p className="text-sm font-medium text-muted-foreground">
               {t('pause.reflect.proTools', 'Your note & tags')}
             </p>
-            <ReflectionNote reflectionId={reflectionId} initialNote={null} />
-            <ReflectionTags reflectionId={reflectionId} initialTags={[]} />
+            <PauseNote pauseInstanceId={pauseInstanceId} />
+            <PauseTags pauseInstanceId={pauseInstanceId} />
           </motion.div>
         )}
 
-        {reflectionId && !subscribed && (
+        {pauseInstanceId && !subscribed && (
           <p className="mt-5 border-t border-border/30 pt-4 text-center text-xs leading-relaxed text-muted-foreground">
             {t(
               'pause.reflect.freeHint',
@@ -89,7 +99,7 @@ export function PauseReflect({
         companions={companions}
         prefs={companionPrefs}
         severity={severity}
-        reflectionId={reflectionId}
+        pauseInstanceId={pauseInstanceId}
         context={context}
         reflectionMessage={reflectionMessage}
         mood={mood}
@@ -109,7 +119,10 @@ export function PauseReflect({
           {t('pause.steps.continue', 'Continue')}
         </button>
         <p className="max-w-xs text-center text-xs text-muted-foreground">
-          {t('pause.reflect.continueHint', 'There is no “right” amount of time — continue when you feel done.')}
+          {t(
+            'pause.reflect.continueHint',
+            'There is no "right" amount of time — continue when you feel done.',
+          )}
         </p>
       </motion.div>
 
@@ -120,11 +133,7 @@ export function PauseReflect({
           animate={{ opacity: 1 }}
           transition={{ delay: 0.5, duration: 0.6 }}
         >
-          <button
-            type="button"
-            onClick={onBack}
-            className={pauseStepLayout.backButton}
-          >
+          <button type="button" onClick={onBack} className={pauseStepLayout.backButton}>
             <ChevronLeft className="h-3 w-3" />
             {t('pause.steps.back', 'Back')}
           </button>

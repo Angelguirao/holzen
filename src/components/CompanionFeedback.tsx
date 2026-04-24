@@ -11,7 +11,7 @@ import { showLimitReachedToast, isPaidLimitReached } from '@/lib/limit-upsell';
 
 interface Props {
   /** Reflection ID this companion belongs to */
-  reflectionId?: string | null;
+  pauseInstanceId?: string | null;
   /** Companion type key (e.g. 'signal', 'grounding', 'zoom_out', 'history_insight') */
   companionType: string;
   /** Cache entry ID for quality score correlation */
@@ -29,7 +29,7 @@ interface Props {
  * Persists vote state so the user can't vote twice on the same reflection+companion.
  */
 export function CompanionFeedback({
-  reflectionId,
+  pauseInstanceId,
   companionType,
   cacheId,
   compact,
@@ -43,7 +43,7 @@ export function CompanionFeedback({
   const { isPro, requirePro, startCheckout } = useProGate();
   const { companionRemaining, flexCreditsBalance, applyOptimisticDecrement, refresh: refreshSubscription } = useSubscription();
 
-  const canRegenerate = Boolean(reflectionId && regenerateSlot && onRegenerate);
+  const canRegenerate = Boolean(pauseInstanceId && regenerateSlot && onRegenerate);
   const regenBusy = Boolean(regenerating);
   // Pro users hit a true wall when both the monthly companion bucket AND
   // their flex credits are empty — gate the button visually then.
@@ -54,7 +54,7 @@ export function CompanionFeedback({
 
   // Load existing vote on mount (check if user already voted for this reflection+companion)
   useEffect(() => {
-    if (!reflectionId) return;
+    if (!pauseInstanceId) return;
 
     let cancelled = false;
     (async () => {
@@ -67,7 +67,7 @@ export function CompanionFeedback({
           .select('metadata')
           .eq('user_id', user.id)
           .eq('event', 'companion_feedback')
-          .filter('metadata->>reflection_id', 'eq', reflectionId)
+          .filter('metadata->>pause_instance_id', 'eq', pauseInstanceId)
           .filter('metadata->>companion_type', 'eq', companionType)
           .limit(1);
 
@@ -80,7 +80,7 @@ export function CompanionFeedback({
     })();
 
     return () => { cancelled = true; };
-  }, [reflectionId, companionType]);
+  }, [pauseInstanceId, companionType]);
 
   const handleVote = async (type: 'up' | 'down') => {
     if (vote || loading || regenBusy) return;
@@ -102,7 +102,7 @@ export function CompanionFeedback({
           cache_type: cacheType || companionType,
           vote: type,
           cache_id: cacheId || null,
-          reflection_id: reflectionId || null,
+          pause_instance_id: pauseInstanceId || null,
         },
       });
       if (error) setVote(null); // rollback optimistic update on failure
