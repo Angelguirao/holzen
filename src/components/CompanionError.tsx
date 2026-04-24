@@ -20,7 +20,7 @@ const COMPANION_EMPTY_STATES: Record<string, { icon: React.ElementType; message:
   zoomOut: {
     icon: Mountain,
     message: 'Zoom out view couldn\'t load.',
-    hint: 'Perspective needs a moment to gather — your past reflections and prices will appear here.',
+    hint: 'Perspective needs a moment to gather — your past pauses and prices will appear here.',
   },
   haiku: {
     icon: Feather,

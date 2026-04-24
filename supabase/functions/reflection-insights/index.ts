@@ -177,7 +177,7 @@ serve(
         userLanguage = (prof as any)?.language || "en";
       }
 
-      const { data: reflections, error: refError } = await supabase
+      const { data: pauseRows, error: pauseReadError } = await supabase
         .from("v_pause_full")
         .select(
           "reflection_text, context_snapshot, initial_mood, shift_mood, outcome, tags, created_at, has_breath_completed, counted_companion_types, note_text",
@@ -186,7 +186,7 @@ serve(
         .order("created_at", { ascending: false })
         .limit(200);
 
-      if (refError || !reflections || reflections.length < 5) continue;
+      if (pauseReadError || !pauseRows || pauseRows.length < 5) continue;
 
       if (singleUserId) {
         const { data: profile } = await supabase
@@ -231,7 +231,7 @@ serve(
       }
 
       // Build skill-oriented summary
-      const summary = reflections.map((r: any) => {
+      const summary = pauseRows.map((r: any) => {
         const date = new Date(r.created_at);
         const dayName = date.toLocaleDateString("en-US", { weekday: "short" });
         const hour = date.getHours();
@@ -309,9 +309,9 @@ Each insight must have these JSON keys:
 
 Return a JSON object with a single key "insights" containing an array of these objects.${langInstruction}`;
 
-      const userPrompt = `Here is the user's skill data (${reflections.length} total pauses):
+      const userPrompt = `Here is the user's skill data (${pauseRows.length} total pauses):
 
-Skill frequency (out of ${reflections.length} pauses):
+Skill frequency (out of ${pauseRows.length} pauses):
 ${JSON.stringify(skillCounts)}
 
 Recent pauses with skill tags (newest first):
@@ -359,9 +359,9 @@ Generate 3-5 skill development insights based on real patterns in this data. Ret
       await supabase.from("reflection_insights").insert({
         user_id: userId,
         insights,
-        reflection_count: reflections.length,
-        period_start: reflections[reflections.length - 1].created_at,
-        period_end: reflections[0].created_at,
+        reflection_count: pauseRows.length,
+        period_start: pauseRows[pauseRows.length - 1].created_at,
+        period_end: pauseRows[0].created_at,
         generated_at: new Date().toISOString(),
         language: userLanguage,
       });

@@ -23,7 +23,7 @@ export default function PracticeReplay() {
   return (
     <ImmersivePracticeShell title={t('practice.replayLabel')} onClose={handleClose}>
       <ReflectionReplay
-        initialReflectionId={pauseInstanceId}
+        initialPauseInstanceId={pauseInstanceId}
         onComplete={() => navigate(returnTo ?? '/', { replace: true })}
         {...COLORS}
       />

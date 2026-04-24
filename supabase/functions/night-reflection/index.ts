@@ -291,7 +291,7 @@ serve(
       const userLang = (profile as any).language || "en";
       const tone = (profile as any).reflection_tone || "stoic";
 
-      // Fetch today's reflections for this user
+      // Fetch today's pause sessions for this user (read model)
       const todayStart = new Date();
       todayStart.setHours(0, 0, 0, 0);
 

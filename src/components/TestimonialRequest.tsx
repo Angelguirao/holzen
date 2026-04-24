@@ -13,9 +13,9 @@ import { toast } from 'sonner';
 const DISMISS_KEY = 'holzen_testimonial_dismissed';
 const SUBMITTED_KEY = 'holzen_testimonial_submitted';
 
-// Show after 10+ reflections, not dismissed, not already submitted
-function shouldShow(reflectionCount: number): boolean {
-  if (reflectionCount < 10) return false;
+// Show after 10+ completed pauses, not dismissed, not already submitted
+function shouldShow(completedPauseCount: number): boolean {
+  if (completedPauseCount < 10) return false;
   if (localStorage.getItem(SUBMITTED_KEY)) return false;
   const dismissed = localStorage.getItem(DISMISS_KEY);
   if (dismissed) {
@@ -28,10 +28,10 @@ function shouldShow(reflectionCount: number): boolean {
 
 
 interface Props {
-  reflectionCount: number;
+  completedPauseCount: number;
 }
 
-export function TestimonialRequest({ reflectionCount }: Props) {
+export function TestimonialRequest({ completedPauseCount }: Props) {
   const { user } = useAuth();
   const { firstName } = useHolzen();
   const { t } = useTranslation();
@@ -41,8 +41,8 @@ export function TestimonialRequest({ reflectionCount }: Props) {
   const [submitting, setSubmitting] = useState(false);
 
   useEffect(() => {
-    setVisible(shouldShow(reflectionCount));
-  }, [reflectionCount]);
+    setVisible(shouldShow(completedPauseCount));
+  }, [completedPauseCount]);
 
   useEffect(() => {
     if (firstName) setDisplayName(firstName);

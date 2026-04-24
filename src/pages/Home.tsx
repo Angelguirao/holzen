@@ -144,7 +144,7 @@ const Home = () => {
   const [zenMode] = useState(() => localStorage.getItem('holzen_zen_mode') === 'true');
   const [pinnedReflection, setPinnedReflection] = useState<PinnedReflection | null>(null);
   const prefersReducedMotion = useReducedMotion();
-  const [reflectionCount, setReflectionCount] = useState(0);
+  const [completedPauseCount, setCompletedPauseCount] = useState(0);
 
   // Grounding suggestion state (mirrors pause message pattern)
   const groundStorageKey = user ? `holzen_ground_suggestion_${user.id}` : 'holzen_ground_suggestion';
@@ -250,7 +250,7 @@ const Home = () => {
       .eq('user_id', user.id)
       .eq('state', 'completed')
       .then(({ count }: { count: number | null }) => {
-        if (count != null) setReflectionCount(count);
+        if (count != null) setCompletedPauseCount(count);
       });
   }, [user]);
 
@@ -956,7 +956,7 @@ const Home = () => {
       {/* Modals (outside widget flow) */}
 
       {/* Testimonial request */}
-      <TestimonialRequest reflectionCount={reflectionCount} />
+      <TestimonialRequest completedPauseCount={completedPauseCount} />
     </div>
   );
 };

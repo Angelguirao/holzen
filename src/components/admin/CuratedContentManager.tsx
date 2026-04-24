@@ -148,7 +148,7 @@ export function CuratedContentManager({ entries, onRefresh }: { entries: CacheEn
             <span className="text-destructive font-mono">↓ Demote</span> — quality 1 and 7-day expiry.
           </p>
           <p className="text-[9px] text-muted-foreground/60">
-            <span className="text-destructive font-mono">🗑 Delete</span> — remove this pool row (does not delete reflections or Library entries).
+            <span className="text-destructive font-mono">🗑 Delete</span> — remove this pool row (does not delete user pauses or Library entries).
           </p>
         </div>
         <p className="text-[9px] text-muted-foreground/50">

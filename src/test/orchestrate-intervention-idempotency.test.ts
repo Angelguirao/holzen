@@ -164,7 +164,7 @@ describe('orchestrate intervention idempotency', () => {
     expect(hasInvokedIntervention('r-1')).toBe(true);
   });
 
-  it('keeps reflections isolated by id', async () => {
+  it('keeps pause instances isolated by id', async () => {
     const factory1 = vi.fn().mockResolvedValue('r1');
     const factory2 = vi.fn().mockResolvedValue('r2');
 
@@ -376,7 +376,7 @@ describe('orchestrate intervention idempotency — sessionStorage unavailable', 
     expect(factory).toHaveBeenCalledTimes(2);
   });
 
-  it('keeps reflections isolated by id when using the in-memory fallback', async () => {
+  it('keeps pause instances isolated by id when using the in-memory fallback', async () => {
     const f1 = vi.fn().mockResolvedValue('a');
     const f2 = vi.fn().mockResolvedValue('b');
 

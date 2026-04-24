@@ -3,7 +3,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/use-auth';
 
 /**
- * Listens for server-side auto-triggered reflections via realtime subscription
+ * Listens for server-side auto-triggered pause notifications via realtime subscription
  * on the profiles table (last_message changes).
  * Returns a flag + dismiss function for non-Home pages to show a banner.
  */
