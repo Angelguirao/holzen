@@ -1,5 +1,14 @@
 # Pause session API cost estimates
 
+> **Pause V2 note:** this document predates the Pause V2 cutover and
+> still describes the legacy `reflections` / `reflection_companions`
+> model. The canonical runtime now lives on `pause_instances` + event
+> tables + `pause_ai_artifacts`. See [`pause-system.md`](../pause-system.md)
+> for the current data flow; the per-companion pages below are retained
+> for historical context until each is rewritten.
+>
+
+
 > **Canonical source:** [`docs/systems/costs/ai-cost-model.md`](../costs/ai-cost-model.md).
 > That doc covers **all** AI-powered features + the guardrail architecture
 > + runbooks + auto top-up recommendations. This file is now a narrow

@@ -1,5 +1,14 @@
 # Haiku companion (end-to-end)
 
+> **Pause V2 note:** this document predates the Pause V2 cutover and
+> still describes the legacy `reflections` / `reflection_companions`
+> model. The canonical runtime now lives on `pause_instances` + event
+> tables + `pause_ai_artifacts`. See [`pause-system.md`](../../pause-system.md)
+> for the current data flow; the per-companion pages below are retained
+> for historical context until each is rewritten.
+>
+
+
 **Haiku** is the pause **card** that displays a short, market-anchored haiku generated alongside the reflection text. It is the **only** companion that does not go through **`companion-orchestrate`** — it is produced by the **reflection step** itself.
 
 This page is the **companion-level** view. For **manual vs automatic pause**, **interventions**, **cost limits**, and the full **orchestrator** contract, see the system doc: **[AI-powered pause system](../ai-powered-pause-system.md)** (especially **§7.6** Haiku reference table).
