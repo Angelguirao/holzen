@@ -190,17 +190,11 @@ Metrics shown:
   - breathing, haiku, grounding, signal, zoom out, history
   - each with usage count and hold-rate vs baseline delta
 
-## 4.2 Decision Accuracy
+## 4.2 Decision Accuracy (retired)
 
-Source: `follow_ups` table (`decision_held` not null), up to latest 100.
-
-Metrics shown:
-
-- overall accuracy `%` = held follow-ups / total follow-ups
-- trend (`improving/stable/declining`) from recent 3 vs prior 3
-- per-original-decision breakdown (rate + numerator/denominator)
-
-Unlock condition: at least 3 follow-ups.
+> **Pause V2 note:** the `follow_ups` table was dropped in the V2
+> destructive cutover, so the legacy Decision Accuracy card no longer
+> has a backing data source. It has been removed from the Profile UI.
 
 ## 4.3 Volatility Tolerance
 

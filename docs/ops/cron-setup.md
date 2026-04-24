@@ -288,71 +288,21 @@ SELECT cron.schedule(
 );
 ```
 
-## Purge Orphan Notification Reflections
+## Purge Orphan Notification Reflections (deprecated)
 
-Every cron-generated reflection that a user never engaged with (no outcome, no
-`mood_after`, no `breathing_completed`) is an **ignored notification**. These
-rows are already excluded from every metric via `src/lib/engaged-pause.ts`
-(`isCompletedPause` / `isFullRitualPause`) and the server-side `v_reflections_*`
-views — but they still accumulate in `public.reflections`.
+> **Pause V2 note:** the destructive cutover drops `reflections` and
+> `pause_notifications`, and the purge function
+> `purge_orphan_notification_reflections` is removed. This section is retained
+> for historical context only and should **not** be re-scheduled in a V2
+> environment.
 
-This cron deletes them after a TTL to keep the table lean. Because
-`pause_notifications.reflection_id` is `ON DELETE SET NULL`, the bell history
-stays intact; only the dangling reflection row is removed. The purge function
-lives in migration `20260420220000_reflection_source_and_engagement_views.sql`.
+Legacy background job that used to delete unengaged, cron-generated reflection
+rows after a TTL so the `reflections` table stayed lean. With Pause V2, the
+canonical model is `pause_instances` + events; orphaned reflections no longer
+exist, so the job is obsolete.
 
-**Before scheduling:** confirm `v_notification_response_rate` (Admin → Monitor
-→ Notification Response) looks reasonable — that view counts these rows, so a
-too-short TTL shrinks its window.
+### Historical reference only
 
-Predicate (enforced inside the function):
-
-```sql
-source IS NOT NULL
-AND source <> 'manual'
-AND outcome IS NULL
-AND mood_after IS NULL
-AND (breathing_completed IS NULL OR breathing_completed = false)
-AND created_at < now() - make_interval(days => <cutoff_days>)
-```
-
-### Schedule (daily at 03:15 UTC, 30-day TTL)
-
-```sql
-SELECT cron.schedule(
-  'purge-orphan-notification-reflections',
-  '15 3 * * *',
-  $$
-  SELECT public.purge_orphan_notification_reflections(30);
-  $$
-);
-```
-
-### Dry-run / one-off
-
-```sql
--- How many rows would be purged at the current TTL (read-only probe).
-SELECT count(*) AS candidates
-FROM public.reflections
-WHERE source IS NOT NULL
-  AND source <> 'manual'
-  AND outcome IS NULL
-  AND mood_after IS NULL
-  AND (breathing_completed IS NULL OR breathing_completed = false)
-  AND created_at < now() - interval '30 days';
-
--- Run once manually (returns the actual deleted count).
-SELECT public.purge_orphan_notification_reflections(30);
-```
-
-### Tuning the TTL
-
-- **Shorter TTL** (7–14 days): leaner table, but the admin Notification
-  Response card only sees the last N days of history.
-- **Longer TTL** (60–90 days): more historical context for pipeline analysis at
-  the cost of extra rows that the `idx_reflections_orphan_notifications`
-  partial index already keeps cheap to scan.
-
-Adjust with `cron.alter_job('purge-orphan-notification-reflections', schedule :=
-'…')` and pass a different `cutoff_days` arg by updating the command body
-(`SELECT public.purge_orphan_notification_reflections(<N>);`).
+The original cron SQL, TTL tuning, and probe queries have been removed from
+this doc to avoid accidental reuse after the V2 cutover. If you need to review
+the legacy job, consult the 2026-04-22/23 migrations in git history.
