@@ -145,8 +145,8 @@ serve(
       const absMonthChange = Math.abs(btc.monthChange).toFixed(1);
 
       const { data: reflections } = await supabase
-        .from("reflections")
-        .select("message, mood, outcome, tags, created_at")
+        .from("v_pause_full")
+        .select("reflection_text, initial_mood, outcome, tags, created_at")
         .eq("user_id", profile.user_id)
         .gte("created_at", monthAgo)
         .order("created_at", { ascending: true });
@@ -156,8 +156,12 @@ serve(
       const moods: Record<string, number> = {};
       const outcomes: Record<string, number> = {};
       const tags: Record<string, number> = {};
-      for (const r of reflections ?? []) {
-        if (r.mood) moods[r.mood] = (moods[r.mood] || 0) + 1;
+      for (const r of (reflections ?? []) as Array<{
+        initial_mood: string | null;
+        outcome: string | null;
+        tags: string[] | null;
+      }>) {
+        if (r.initial_mood) moods[r.initial_mood] = (moods[r.initial_mood] || 0) + 1;
         if (r.outcome) outcomes[r.outcome] = (outcomes[r.outcome] || 0) + 1;
         if (r.tags) for (const t of r.tags) tags[t] = (tags[t] || 0) + 1;
       }

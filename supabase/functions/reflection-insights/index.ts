@@ -178,8 +178,10 @@ serve(
       }
 
       const { data: reflections, error: refError } = await supabase
-        .from("v_reflection_with_companions")
-        .select("message, context, mood, mood_after, outcome, tags, created_at, breathing_completed, haiku_read, grounding_read, companion_signal_read, companion_zoom_out_read, companion_history_read, note")
+        .from("v_pause_full")
+        .select(
+          "reflection_text, context_snapshot, initial_mood, shift_mood, outcome, tags, created_at, has_breath_completed, counted_companion_types, note_text",
+        )
         .eq("user_id", userId)
         .order("created_at", { ascending: false })
         .limit(200);
@@ -233,26 +235,48 @@ serve(
         const date = new Date(r.created_at);
         const dayName = date.toLocaleDateString("en-US", { weekday: "short" });
         const hour = date.getHours();
-        const volMatch = r.context?.match(/[↑↓](\d+(?:\.\d+)?)%/);
-        const volatility = volMatch ? parseFloat(volMatch[1]) : 0;
+        const ctxPct = Number(r.context_snapshot?.change_24h_pct ?? r.context_snapshot?.change_7d_pct ?? 0);
+        const volatility = Number.isFinite(ctxPct) ? Math.abs(ctxPct) : 0;
+        const countedTypes: string[] = Array.isArray(r.counted_companion_types)
+          ? r.counted_companion_types
+          : [];
 
         const skills: string[] = [];
-        if (r.mood_after && r.mood) {
+        if (r.shift_mood && r.initial_mood) {
           const COMPOSURE: Record<string, number> = { fomo: 10, greedy: 15, anxious: 20, fearful: 25, excited: 40, uncertain: 50, detached: 75, calm: 100 };
-          if ((COMPOSURE[r.mood_after] ?? 50) > (COMPOSURE[r.mood] ?? 50)) skills.push("regulation");
+          if ((COMPOSURE[r.shift_mood] ?? 50) > (COMPOSURE[r.initial_mood] ?? 50)) skills.push("regulation");
         }
-        if (r.breathing_completed && !skills.includes("regulation")) skills.push("regulation");
+        if (r.has_breath_completed && !skills.includes("regulation")) skills.push("regulation");
         if (volatility >= 3 && (r.outcome === "held" || r.outcome === "nothing")) skills.push("tolerance");
         if (r.outcome === "held" || r.outcome === "nothing") skills.push("alignment");
-        if (r.companion_zoom_out_read || r.companion_history_read || r.companion_signal_read || r.grounding_read) skills.push("reappraisal");
-        if ((r.note && r.note.length > 10) || (r.tags && r.tags.length > 0)) skills.push("awareness");
+        if (
+          countedTypes.includes("zoom_out") ||
+          countedTypes.includes("zoom_out_deep_time") ||
+          countedTypes.includes("historical_insight") ||
+          countedTypes.includes("signal") ||
+          countedTypes.includes("ground_nudge")
+        )
+          skills.push("reappraisal");
+        if ((r.note_text && r.note_text.length > 10) || (r.tags && r.tags.length > 0)) skills.push("awareness");
 
         return {
-          day: dayName, hour, date: r.created_at.slice(0, 10),
-          mood: r.mood || "none", mood_after: r.mood_after || "none",
-          outcome: r.outcome || "none", volatility, skills,
-          tools: [r.breathing_completed && "breathing", r.companion_zoom_out_read && "zoom_out", r.companion_history_read && "history", r.companion_signal_read && "signal", r.grounding_read && "grounding"].filter(Boolean),
-          hasNote: !!(r.note && r.note.length > 10), tagCount: r.tags?.length || 0,
+          day: dayName,
+          hour,
+          date: r.created_at.slice(0, 10),
+          mood: r.initial_mood || "none",
+          mood_after: r.shift_mood || "none",
+          outcome: r.outcome || "none",
+          volatility,
+          skills,
+          tools: [
+            r.has_breath_completed && "breathing",
+            countedTypes.includes("zoom_out") && "zoom_out",
+            countedTypes.includes("historical_insight") && "history",
+            countedTypes.includes("signal") && "signal",
+            countedTypes.includes("ground_nudge") && "grounding",
+          ].filter(Boolean),
+          hasNote: !!(r.note_text && r.note_text.length > 10),
+          tagCount: r.tags?.length || 0,
         };
       });
 
