@@ -33,6 +33,53 @@ DROP FUNCTION IF EXISTS public.find_similar_reflection(uuid, uuid);
 DROP FUNCTION IF EXISTS public.find_similar_reflection(uuid, uuid, integer);
 
 -- ---------------------------------------------------------------------------
+-- 1b. Rewrite public.get_holzen_number() to query V2 — otherwise the
+--     holzen-number edge function RPC breaks the moment reflections is
+--     dropped below. V2 semantics match: % of completed pauses in the
+--     last 7 days whose outcome is 'held' or 'nothing'.
+-- ---------------------------------------------------------------------------
+-- Query base tables (not v_pause_full) because the view is
+-- security_invoker=true; calling it from a DEFINER function would scope
+-- to only the invoker's own pauses. The function computes a global
+-- aggregate so we need DEFINER-scoped reads on pause_instances +
+-- pause_step_events directly.
+CREATE OR REPLACE FUNCTION public.get_holzen_number()
+  RETURNS jsonb
+  LANGUAGE sql
+  STABLE SECURITY DEFINER
+  SET search_path = public
+AS $$
+  WITH latest_outcomes AS (
+    SELECT DISTINCT ON (e.pause_instance_id)
+           e.pause_instance_id,
+           e.payload->>'outcome' AS outcome
+      FROM public.pause_step_events e
+     WHERE e.step_type = 'outcome_logged'
+     ORDER BY e.pause_instance_id, e.created_at DESC
+  ),
+  window_rows AS (
+    SELECT lo.outcome
+      FROM public.pause_instances pi
+      JOIN latest_outcomes lo ON lo.pause_instance_id = pi.id
+     WHERE pi.state = 'completed'
+       AND pi.completed_at >= (now() - interval '7 days')
+  )
+  SELECT jsonb_build_object(
+    'total', COUNT(*) FILTER (WHERE outcome IS NOT NULL),
+    'held_steady', COUNT(*) FILTER (WHERE outcome IN ('held','nothing')),
+    'percent', CASE
+      WHEN COUNT(*) FILTER (WHERE outcome IS NOT NULL) = 0 THEN 0
+      ELSE ROUND(
+        (COUNT(*) FILTER (WHERE outcome IN ('held','nothing'))::numeric /
+         COUNT(*) FILTER (WHERE outcome IS NOT NULL)::numeric) * 100
+      )
+    END,
+    'calculated_at', now()
+  )
+  FROM window_rows;
+$$;
+
+-- ---------------------------------------------------------------------------
 -- 2. Legacy views. Drop with CASCADE to catch any dependent views.
 -- ---------------------------------------------------------------------------
 DROP VIEW IF EXISTS public.v_reflection_with_companions CASCADE;
@@ -106,7 +153,11 @@ DROP TABLE IF EXISTS public.reflections CASCADE;
 -- 8. Baseline reset for user_badges.
 --    BadgesPanelV2's useBadgeSync silently seeds on first render; no push
 --    flood. See src/hooks/use-badge-sync.ts.
+--    Clean the paired notifications feed rows too — source_id on
+--    notifications is not an FK, so orphan badge rows would otherwise
+--    linger in the bell after the TRUNCATE.
 -- ---------------------------------------------------------------------------
+DELETE FROM public.notifications WHERE source_table = 'user_badges';
 TRUNCATE public.user_badges RESTART IDENTITY;
 
 -- ---------------------------------------------------------------------------
