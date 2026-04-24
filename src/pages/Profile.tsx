@@ -25,7 +25,7 @@ import { AIInsightsPanel } from '@/components/AIInsightsPanel';
 import { ProLock } from '@/components/ProLock';
 import { LetterViewer } from '@/components/LetterViewer';
 
-import { BadgesPanel } from '@/components/BadgesPanel';
+import { BadgesPanelV2 } from '@/components/BadgesPanelV2';
 import { MoodPriceChart } from '@/components/MoodPriceChart';
 import { MoodTrendChart } from '@/components/MoodTrendChart';
 import { MoodPriceScatter } from '@/components/MoodPriceScatter';
@@ -301,7 +301,7 @@ const Profile = () => {
             <Skeleton className="h-40 w-full rounded-md" />
           </div>
         ) : (
-          <BadgesPanel reflections={reflections} subscribed={subscribed} />
+          <BadgesPanelV2 subscribed={subscribed} holdGoal={holdGoal} />
         )
       ) : tab === 'activity' ? (
         <ProLock feature="history" hideContent>
