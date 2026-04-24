@@ -503,8 +503,12 @@ serve(
         severityBand,
         dailyBucketPct: bucketChangePercent(userBtc.changePercent),
         cumulativeBucketPct: bucketChangePercent(userBtc.cumulativeChangePercent),
-        fearGreedBand: fearGreedSnapshot?.classification ?? null,
-        onChainBand: onChainSnapshot?.regime ?? null,
+        fearGreedBand: fearGreedSnapshot?.label ?? null,
+        onChainBand: onChainSnapshot
+          ? ([onChainSnapshot.mempoolSize, onChainSnapshot.fastestFee, onChainSnapshot.medianFee].filter(
+              (x) => typeof x === "number" && Number.isFinite(x),
+            ) as number[]).join(":") || null
+          : null,
       });
 
       const { data: createRes, error: createErr } = await supabase.rpc(
