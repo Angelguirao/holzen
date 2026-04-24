@@ -13,6 +13,9 @@ export function isReflectionPersistError(error: string | null | undefined): bool
   );
 }
 
+/** Pause V2–friendly alias (same behavior as {@link isReflectionPersistError}). */
+export const isPausePersistError = isReflectionPersistError;
+
 export function reflectionPersistErrorMessage(insertErr: { message?: string } | null): string {
   const raw = insertErr?.message ?? '';
   const net = /network|fetch|Failed to fetch|timeout|ECONNRESET/i.test(raw);

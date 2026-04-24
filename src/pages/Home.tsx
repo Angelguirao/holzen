@@ -2,7 +2,7 @@ import { useTranslation } from 'react-i18next';
 import { usePullToRefresh } from '@/hooks/use-pull-to-refresh';
 import { useOutletContext } from 'react-router-dom';
 import { useHolzen } from '@/hooks/use-holzen';
-import { isReflectionPersistError } from '@/lib/reflection-persist-error';
+import { isPausePersistError } from '@/lib/reflection-persist-error';
 import { TestimonialRequest } from '@/components/TestimonialRequest';
 import { LetterToFutureSelf } from '@/components/LetterToFutureSelf';
 import AuthLoading from '@/components/AuthLoading';
@@ -60,7 +60,7 @@ import { restrictToVerticalAxis } from '@dnd-kit/modifiers';
 const WIDGET_IDS = ['btc-status', 'hold-goal', 'reflection', 'ground', 'night', 'letter', 'practice', 'breathe'] as const;
 type WidgetId = typeof WIDGET_IDS[number];
 
-interface PinnedReflection {
+interface PinnedPausePreview {
   id: string;
   message: string;
   context: string | null;
@@ -142,7 +142,7 @@ const Home = () => {
   const [priceHidden, setPriceHidden] = useState(() => localStorage.getItem('holzen_hide_price') === 'true');
   const [btcMode, setBtcMode] = useState(() => localStorage.getItem('holzen_btc_mode') === 'true');
   const [zenMode] = useState(() => localStorage.getItem('holzen_zen_mode') === 'true');
-  const [pinnedReflection, setPinnedReflection] = useState<PinnedReflection | null>(null);
+  const [pinnedPausePreview, setPinnedPausePreview] = useState<PinnedPausePreview | null>(null);
   const prefersReducedMotion = useReducedMotion();
   const [completedPauseCount, setCompletedPauseCount] = useState(0);
 
@@ -227,7 +227,7 @@ const Home = () => {
       }
       const ctxSnap = ((inst as { context_snapshot: Record<string, unknown> | null }).context_snapshot ?? {}) as Record<string, unknown>;
       const context = typeof ctxSnap.context_text === 'string' ? (ctxSnap.context_text as string) : null;
-      setPinnedReflection({
+      setPinnedPausePreview({
         id: pinnedId,
         message,
         context,
@@ -383,9 +383,9 @@ const Home = () => {
     return () => { document.title = 'Holzen — Pause before you act'; };
   }, []);
 
-  const unpinReflection = useCallback(() => {
+  const unpinPausePreview = useCallback(() => {
     localStorage.removeItem('holzen_pinned_reflection');
-    setPinnedReflection(null);
+    setPinnedPausePreview(null);
   }, []);
 
   const handlePullRefresh = useCallback(async () => {
@@ -433,12 +433,12 @@ const Home = () => {
             <motion.div key="zen-loading" variants={zenVariants} initial="hidden" animate="visible" exit="hidden" className="space-y-4">
               <div className="flex items-center gap-2 text-muted-foreground">
                 <Loader2 className="h-3 w-3 animate-spin" />
-                <p className="text-xs font-mono">Generating reflection…</p>
+                <p className="text-xs font-mono">{t('home.generatingReflection')}</p>
               </div>
               <Skeleton className="h-4 w-full" />
               <Skeleton className="h-4 w-3/4" />
             </motion.div>
-          ) : isReflectionPersistError(error) ? (
+          ) : isPausePersistError(error) ? (
             <motion.div
               key="zen-reflection-save-error"
               variants={zenVariants}
@@ -454,7 +454,7 @@ const Home = () => {
               <button
                 type="button"
                 onClick={() => {
-                  holzenLog.home('Try again after reflection save error: manualTrigger');
+                  holzenLog.home('Try again after pause persist error: manualTrigger');
                   manualTrigger();
                 }}
                 className="text-xs font-mono text-primary underline"
@@ -632,12 +632,12 @@ const Home = () => {
                           <Skeleton className="h-4 w-3/4" />
                           <Skeleton className="h-4 w-1/2" />
                         </div>
-                      ) : (error && !btcData) || isReflectionPersistError(error) ? (
+                      ) : (error && !btcData) || isPausePersistError(error) ? (
                         <div className={homeInWidget.errorPanel}>
                           <div className="flex items-center gap-2 text-destructive">
                             <AlertCircle className="h-4 w-4 shrink-0" />
                             <p className="text-sm font-medium leading-snug">
-                              {isReflectionPersistError(error)
+                              {isPausePersistError(error)
                                 ? error
                                 : error.includes('fetch') || error.includes('network') || error.includes('Failed to fetch')
                                 ? t('home.errors.couldNotReachPrice')
@@ -646,7 +646,7 @@ const Home = () => {
                                 : t('home.errors.somethingWentWrong')}
                             </p>
                           </div>
-                          {!isReflectionPersistError(error) && (
+                          {!isPausePersistError(error) && (
                             <p className={homeInWidget.meta}>
                               {error.includes('fetch') || error.includes('network') || error.includes('Failed to fetch')
                                 ? t('home.errors.checkConnection')
@@ -668,7 +668,7 @@ const Home = () => {
                         </div>
                       ) : (
                         <div className="space-y-6">
-                          {pinnedReflection && (
+                          {pinnedPausePreview && (
                             <div className={cn(homeInWidget.inset, 'space-y-3')}>
                               <div className="flex items-center justify-between gap-2">
                                 <div className="flex items-center gap-2 text-muted-foreground">
@@ -677,13 +677,13 @@ const Home = () => {
                                 </div>
                                 <button
                                   type="button"
-                                  onClick={unpinReflection}
+                                  onClick={unpinPausePreview}
                                   className="text-xs font-medium text-muted-foreground transition-colors hover:text-foreground"
                                 >
                                   {t('common.unpin')}
                                 </button>
                               </div>
-                              <p className={homeInWidget.body}>{pinnedReflection.message}</p>
+                              <p className={homeInWidget.body}>{pinnedPausePreview.message}</p>
                             </div>
                           )}
                           <NeedAMomentButton onTrigger={handleNeedAPause} cooldownRemaining={manualCooldownRemaining} loading={loading} />
