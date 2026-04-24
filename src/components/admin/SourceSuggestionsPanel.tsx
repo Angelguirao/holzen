@@ -116,11 +116,12 @@ export function SourceSuggestionsPanel({ onCatalogChanged }: { onCatalogChanged?
         <div className="space-y-2">
           {rows.map((row) => {
             const busy = acting === row.id;
-            // Writers persist `pause_instance_id` (Pause V2) for attribution.
-            const rid = row.metadata && typeof row.metadata === 'object' && row.metadata !== null
-              ? ('pause_instance_id' in row.metadata
-                  ? String((row.metadata as { pause_instance_id?: string }).pause_instance_id ?? '')
-                  : '')
+            // Writers persist `pause_instance_id` (Pause V2) for attribution; legacy rows may use `reflection_id`.
+            const meta = row.metadata && typeof row.metadata === 'object' && row.metadata !== null
+              ? (row.metadata as { pause_instance_id?: string; reflection_id?: string })
+              : null;
+            const rid = meta
+              ? String(meta.pause_instance_id ?? meta.reflection_id ?? '')
               : '';
             return (
               <div key={row.id} className="rounded-lg border border-border/15 bg-card/5 px-3 py-2 flex flex-col sm:flex-row sm:items-center gap-2 sm:justify-between">

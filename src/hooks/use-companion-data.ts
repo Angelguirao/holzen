@@ -166,7 +166,7 @@ export function useCompanionData({ companions, prefs, pauseInstanceId, context, 
   const [interventionLoading, setInterventionLoading] = useState(false);
   const [interventionError, setInterventionError] = useState(false);
 
-  // Track which companion slots have already been fetched/requested for this reflection
+  // Track which companion slots have already been fetched/requested for this pause instance
   const fetchedSlotsRef = useRef<Set<string>>(new Set());
 
   // Tracks whether the most recent intervention auto-fetch was short-circuited
@@ -177,11 +177,11 @@ export function useCompanionData({ companions, prefs, pauseInstanceId, context, 
   // When `retryOrchestrate` is triggered from a skipped state, we stash the
   // `pauseInstanceId` here so the watcher effect below can fire a confirmation
   // toast as soon as fresh intervention data arrives. Cleared after firing
-  // (or on reflection switch) so we never confirm twice.
+  // (or on pause switch) so we never confirm twice.
   const pendingRetryConfirmRef = useRef<string | null>(null);
 
-  // Reset all companion state when switching reflections so stale data from a
-  // previous reflection never leaks into the new one.
+  // Reset all companion state when switching pause instances so stale data from a
+  // previous session never leaks into the new one.
   useLayoutEffect(() => {
     setSignal(null);
     setSignalLoading(false);
@@ -200,7 +200,7 @@ export function useCompanionData({ companions, prefs, pauseInstanceId, context, 
     setCacheIds({ nudge: null, signal: null, zoomOut: null, history: null });
     setCacheRelaxations(EMPTY_COMPANION_SLOT_RELAXATIONS);
     fetchedSlotsRef.current = new Set();
-    // New reflection → forget any stale skip / retry-confirm state from the
+    // New pause → forget any stale skip / retry-confirm state from the
     // previous one so we never confirm a retry against the wrong id.
     interventionSkippedRef.current = false;
     pendingRetryConfirmRef.current = null;

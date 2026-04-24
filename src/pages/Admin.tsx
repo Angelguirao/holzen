@@ -406,7 +406,7 @@ export default function Admin() {
         </TabsList>
         <p className="text-[9px] font-mono text-muted-foreground/45 leading-relaxed max-w-3xl">
           Tab order matches the pipeline: <span className="text-muted-foreground/55">Monitor</span> (telemetry + generation failures).
-          <span className="text-muted-foreground/55"> Activity</span> — user reflections and newest cache writes.
+          <span className="text-muted-foreground/55"> Activity</span> — pause sessions and newest cache writes.
           <span className="text-muted-foreground/55"> Sources</span> — live-search catalog + pending AI-suggested rows (approve/reject).
           <span className="text-muted-foreground/55"> Library</span> — curated essays/papers/events used when live generation falls back.
           <span className="text-muted-foreground/55"> Cache</span> — pregen pool in <code className="text-muted-foreground/50">companion_cache</code> (promote/demote/delete).
@@ -720,13 +720,13 @@ export default function Admin() {
 
         <TabsContent value="activity" className="space-y-8 mt-0">
           <p className="text-[9px] font-mono text-muted-foreground/45 leading-relaxed max-w-3xl">
-            <span className="text-muted-foreground/55">Reflections</span> below are saved user sessions (<code className="text-muted-foreground/50">reflections</code>). <span className="text-muted-foreground/55">Latest cache writes</span> are new rows in <code className="text-muted-foreground/50">companion_cache</code> (cron + live writes) — same pool you manage under the Cache tab, shown here chronologically for a quick audit.
+            <span className="text-muted-foreground/55">Pauses</span> below are rows from <code className="text-muted-foreground/50">v_pause_full</code> (completed / in-progress read model). <span className="text-muted-foreground/55">Latest cache writes</span> are new rows in <code className="text-muted-foreground/50">companion_cache</code> (cron + live writes) — same pool you manage under the Cache tab, shown here chronologically for a quick audit.
           </p>
 
           <div className="space-y-2">
-            <p className="text-[10px] font-mono uppercase tracking-wider text-muted-foreground/60">Recent reflections</p>
+            <p className="text-[10px] font-mono uppercase tracking-wider text-muted-foreground/60">Recent pauses</p>
             <p className="text-[9px] font-mono text-muted-foreground/45 leading-relaxed">
-              Green chips mean that companion row exists on the reflection. Expand for <strong className="font-normal text-muted-foreground/55">live</strong> / <strong className="font-normal text-muted-foreground/55">library</strong> / <strong className="font-normal text-muted-foreground/55">cache</strong> / <strong className="font-normal text-muted-foreground/55">curated</strong> / <strong className="font-normal text-muted-foreground/55">empty</strong> from <code className="text-muted-foreground/55">companion_serves</code> (library = curated <code className="text-muted-foreground/55">content_library</code> hit; cache = runtime <code className="text-muted-foreground/55">companion_cache</code>; n/a = no log row, e.g. older sessions).
+              Green chips mean that companion slot counted for this pause. Expand for <strong className="font-normal text-muted-foreground/55">live</strong> / <strong className="font-normal text-muted-foreground/55">library</strong> / <strong className="font-normal text-muted-foreground/55">cache</strong> / <strong className="font-normal text-muted-foreground/55">curated</strong> / <strong className="font-normal text-muted-foreground/55">empty</strong> from <code className="text-muted-foreground/55">companion_serves</code> (library = curated <code className="text-muted-foreground/55">content_library</code> hit; cache = runtime <code className="text-muted-foreground/55">companion_cache</code>; n/a = no log row, e.g. older sessions).
             </p>
             <div className="space-y-1.5">
               <FilterRow label="Mood" options={sessionMoodOptions} value={sessionMoodFilter} onChange={setSessionMoodFilter} />
@@ -797,7 +797,7 @@ export default function Admin() {
                   {expanded && (
                     <div className="mt-1.5 space-y-2 rounded border border-border/20 bg-card/10 px-3 py-2 text-[9px] font-mono">
                       <div className="space-y-0.5">
-                        <p className="text-muted-foreground/50 uppercase tracking-wider">Reflection</p>
+                        <p className="text-muted-foreground/50 uppercase tracking-wider">Reflection text</p>
                         <p className="text-foreground/70 whitespace-pre-wrap break-words leading-relaxed">{s.reflection_text ?? '—'}</p>
                       </div>
                       <div className="space-y-1.5 border-t border-border/10 pt-2">

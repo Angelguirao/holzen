@@ -39,28 +39,6 @@ import {
   AlertDialogTrigger,
 } from '@/components/ui/alert-dialog';
 
-interface Reflection {
-  id: string;
-  message: string;
-  context: string | null;
-  created_at: string;
-  is_favorite: boolean;
-  haiku: string | null;
-  grounding_title: string | null;
-  grounding_body: string | null;
-  note: string | null;
-  mood: string | null;
-  mood_after: string | null;
-  outcome: string | null;
-  tags: string[];
-  breathing_completed: boolean;
-  haiku_read: boolean;
-  grounding_read: boolean;
-  signal_read?: boolean;
-  zoom_out_read?: boolean;
-  history_read?: boolean;
-}
-
 interface Letter {
   id: string;
   body: string;
@@ -83,15 +61,13 @@ interface PracticeEntry {
   duration_seconds: number | null;
 }
 
-const REFLECTIONS_PAGE_SIZE = 50;
-
 const Profile = () => {
   const { user } = useAuth();
   const { t } = useTranslation();
   const { subscribed } = useSubscription();
   const location = useLocation();
   const { tab: locationTab, letterId: locationLetterId } = parseProfileLocationState(location.state);
-  const [reflections, setReflections] = useState<Reflection[]>([]);
+  const [completedPauseCount, setCompletedPauseCount] = useState(0);
   const [letters, setLetters] = useState<Letter[]>([]);
   const [practiceEntries, setPracticeEntries] = useState<PracticeEntry[]>([]);
   const [holdGoal, setHoldGoal] = useState<{ type: string | null; targetMonths: number | null; targetPrice: number | null; start: string | null } | null>(null);
@@ -140,16 +116,13 @@ const Profile = () => {
 
   useEffect(() => {
     if (!user) return;
-    const loadReflections = async () => {
-      // Only the count is used downstream (AIInsightsPanel). Count completed
-      // pauses directly — avoids pulling every row client-side.
+    const loadCompletedPauseCount = async () => {
       const { count } = await supabase
         .from('pause_instances' as never)
         .select('id', { count: 'exact', head: true })
         .eq('user_id', user.id)
         .eq('state', 'completed');
-      const n = count ?? 0;
-      setReflections(new Array(n).fill(null).map((_, i) => ({ id: `p${i}` } as Reflection)));
+      setCompletedPauseCount(count ?? 0);
       setLoading(false);
     };
     const loadLetters = async () => {
@@ -192,7 +165,7 @@ const Profile = () => {
         });
       }
     };
-    loadReflections();
+    loadCompletedPauseCount();
     loadLetters();
     loadPractice();
     loadProfile();
@@ -269,7 +242,7 @@ const Profile = () => {
               <Skeleton className="h-20 w-full rounded-md" />
             </div>
           ) : (
-            <AIInsightsPanel reflectionCount={reflections.length} />
+            <AIInsightsPanel completedPauseCount={completedPauseCount} />
           )}
         </ProLock>
       ) : tab === 'badges' ? (
