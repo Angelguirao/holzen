@@ -1,15 +1,11 @@
 # Intervention (end-to-end)
 
-> **Pause V2 note:** this document predates the Pause V2 cutover and
-> still describes the legacy `reflections` / `reflection_companions`
-> model. The canonical runtime now lives on `pause_instances` + event
-> tables + `pause_ai_artifacts`. See [`pause-system.md`](../../pause-system.md)
-> for the current data flow; the per-companion pages below are retained
-> for historical context until each is rewritten.
->
+> **Pause V2:** This doc reflects the current model. Interventions are stored
+> in `pause_ai_artifacts` (kind `intervention`) keyed by `pause_instance_id`.
+> Legacy `reflections` / `reflection_companions` storage was removed.
 
 
-The **intervention** is the featured cognitive headline at the top of the pause UI (`InterventionSection`). It is **not** a companion card — it is a separate concept that sits above the companion card grid.
+The **intervention** is the featured cognitive headline at the top of the pause UI. It is **not** a companion card — it is a separate concept that sits above the companion card grid.
 
 This page is the **intervention-level** view. For the full **orchestrator** contract, **companion cards**, **cost limits**, and the **end-to-end pipeline**, see the system doc: **[AI-powered pause system](../ai-powered-pause-system.md)** (especially **§5** `companion-orchestrate`, **§5.2** intervention selection, **§7** per-type reference).
 
@@ -17,11 +13,11 @@ This page is the **intervention-level** view. For the full **orchestrator** cont
 
 ## 1. Where the intervention sits in the pipeline
 
-1. Client inserts a `reflections` row (manual) or `check-volatility` creates one (automatic).
+1. Client creates a `pause_instances` row (manual via `pause_create_or_reuse`) or `check-volatility` creates one (automatic via `pause_create_or_reuse_as`).
 2. **`use-companion-data`** calls **`companion-orchestrate`** with **`useIntervention: true`** and all **`enable*`** flags **false** (intervention-only request, `holzenInvokeSource: 'browser_pause_intervention'`).
 3. **`companion-orchestrate`** runs **`selectIntervention`** (`_shared/intervention-selector.ts`), which evaluates rules in priority order and returns a **selection** object (`mode`, `primary`, `secondary`, optional `mirrorData`).
-4. The orchestrator assembles the **intervention payload** and persists it to **`reflection_companions`** (type `intervention`).
-5. `InterventionSection.tsx` renders the result: mirror / trap / pattern / question, plus optional zoom-out secondary.
+4. The orchestrator assembles the **intervention payload** and persists it to **`pause_ai_artifacts`** (kind `intervention`).
+5. The Pause UI renders the result: mirror / trap / pattern / question, plus optional zoom-out secondary (via `CompanionSection` and related components).
 
 Companion cards are fetched **separately** via lazy single-slot requests when the user taps them. The intervention request does **not** generate companion data — it only selects the headline type and, for mirror, assembles DB-only data.
 
@@ -57,7 +53,7 @@ flowchart LR
 
 | Aspect | Detail |
 |--------|--------|
-| **Data source** | Postgres RPC **`find_similar_reflection`** — same user, same direction (`is up` / `is down`), ≥30 days older, closest matching % move. |
+| **Data source** | Postgres query against **`v_pause_full`** + `pause_step_events` — same user, same direction (`is up` / `is down`), ≥30 days older, closest matching % move. |
 | **Extra gate** | Matched row must have a non-null **`outcome`** (`mirror.ts`); otherwise mirror is ineligible. |
 | **AI** | **No** — template assembly from DB fields only (past mood, context, outcome, time ago). |
 | **Payload** | `intervention.primary = { type: "mirror", data: mirrorData }` with `timeAgo`, `pastMood`, `pastContext`, `pastOutcome`, `message`. |
@@ -93,7 +89,7 @@ flowchart LR
 
 | Aspect | Detail |
 |--------|--------|
-| **Trigger conditions** | `severity === "mild"` (<5% move) **and** total reflection count for user **≥ 20**. |
+| **Trigger conditions** | `severity === "mild"` (<5% move) **and** total completed pause count for user **≥ 20**. |
 | **Data source** | **`generateQuestion`** (`_shared/generators/question.ts`) — dedicated AI path via Gemini. |
 | **AI** | **Yes** — single reflective question, parallel with companion tasks. |
 | **Payload** | `intervention.mode === "question"`, `intervention.question` string. No `primary` / `secondary`. |
@@ -143,7 +139,7 @@ The intervention type does not change the session theme, and the session theme d
 | Question generator | `supabase/functions/_shared/generators/question.ts` |
 | Session intent | `supabase/functions/_shared/session-intent.ts` |
 | Orchestrator | `supabase/functions/companion-orchestrate/index.ts` |
-| UI | `src/components/InterventionSection.tsx` |
+| UI | `src/components/CompanionSection.tsx` (intervention block + cross-ref badges) |
 
 ---
 

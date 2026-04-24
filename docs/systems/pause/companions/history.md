@@ -1,12 +1,8 @@
 # History companion (end-to-end)
 
-> **Pause V2 note:** this document predates the Pause V2 cutover and
-> still describes the legacy `reflections` / `reflection_companions`
-> model. The canonical runtime now lives on `pause_instances` + event
-> tables + `pause_ai_artifacts`. See [`pause-system.md`](../../pause-system.md)
-> for the current data flow; the per-companion pages below are retained
-> for historical context until each is rewritten.
->
+> **Pause V2:** This doc reflects the current model. Companion payloads
+> are stored in `pause_ai_artifacts` (one row per `pause_instance_id` + `kind`);
+> legacy `reflection_companions` storage was removed in the V2 cutover.
 
 
 **History** (UI label: **Look Back**) is the pause **card** that surfaces a **historical insight**: a past event from Bitcoin or traditional finance that mirrors the current market situation, with a cross-asset analogy to provide perspective.
@@ -17,9 +13,9 @@ This page is the **companion-level** view. For **manual vs automatic pause**, **
 
 ## 1. Where History sits in the pipeline
 
-1. User completes reflection; when the user **taps the Look Back card**, **`use-companion-data`** invokes **`companion-orchestrate`** with `enableHistory: true` (lazy loading). If History data is already cached in `reflection_companions`, it is hydrated from DB without a network call.
+1. User completes reflection; when the user **taps the Look Back card**, **`use-companion-data`** invokes **`companion-orchestrate`** with `enableHistory: true` (lazy loading). If History data is already cached in `pause_ai_artifacts`, it is hydrated from DB without a network call.
 2. **`companion-orchestrate`** runs **`generateHistory`** in `_shared/generators/history.ts` when **`enableHistory`** is true (or when the intervention **requires** it — pattern type), passing **context**, **session intent** (`preferredMood`), and **recency dedup** fields.
-3. **`generateHistory`** returns structured History payload; the orchestrator **writes** **`reflection_companions`** (type `historical_insight`) and **`companion_serves`**.
+3. **`generateHistory`** returns structured History payload; the orchestrator **writes** **`pause_ai_artifacts`** (kind `historical_insight`) and **`companion_serves`**.
 
 History also serves as the **data source for pattern interventions**: when `selectIntervention` picks pattern, the orchestrator copies the history task result into `intervention.primary`.
 
@@ -29,7 +25,7 @@ History also serves as the **data source for pattern interventions**: when `sele
 
 | Input | Source | Role |
 |--------|--------|------|
-| **`recentNudgeTopics`** | Recent history titles from `reflection_companions` + `localStorage` | Dedup: avoid repeating same historical eras/events. |
+| **`recentNudgeTopics`** | Recent history titles from `pause_ai_artifacts` + `localStorage` | Dedup: avoid repeating same historical eras/events. |
 | **`context`** | BTC + Fear & Greed + on-chain line | Grounds the era selection in the current market move. |
 | **`preferredMood`** | `determineSessionIntent()` → **`historyMood`** (`session-intent.ts`) | Selects recovery vs cautionary vs neutral historical eras. |
 | **`mood`** | Current session mood | Maps to `historyMoodTag` for era filtering. |
@@ -115,8 +111,7 @@ When `selectIntervention` picks **pattern** as the primary intervention:
 
 | Target | What | Why |
 |--------|------|-----|
-| **`reflection_companions`** | Full JSON payload (title, btcInsight, analogy, assetClass, period, source, url) as type `historical_insight` | Canonical normalized store. |
-| **`reflections.history_insight_data`** | *(deprecated — legacy column exists but is no longer populated by the orchestrator; `pause-cron-parity.ts` still reads it for recency hints)* | Legacy storage; new reads use `reflection_companions`. |
+| **`pause_ai_artifacts`** | Full JSON payload (title, btcInsight, analogy, assetClass, period, source, url) as kind `historical_insight` | Canonical normalized store. |
 | **`companion_serves`** | Source, latency, fingerprint | Analytics and monitoring. |
 | **`companion_cache`** | Cached payload with dedup fingerprint | Pool for future serves. |
 
@@ -149,7 +144,7 @@ When `selectIntervention` picks **pattern** as the primary intervention:
 | Phase config | `supabase/functions/_shared/phase-config.ts` |
 | Content library | `supabase/functions/_shared/content-library.ts` |
 | Client invoke | `src/hooks/use-companion-data.ts` |
-| Full-screen view | `src/pages/CompanionHistoryPage.tsx` — route `/companion/history/:reflectionId` |
+| Full-screen view | `src/pages/CompanionHistoryPage.tsx` — route `/companion/history/:pauseInstanceId` |
 | UI | `src/components/CompanionSection.tsx` (Look Back card via `HistoricalInsightDisplay`) |
 
 ---
