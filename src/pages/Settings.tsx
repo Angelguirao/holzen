@@ -748,13 +748,13 @@ const Settings = forwardRef<HTMLDivElement>(function Settings(_props, ref) {
 
             {/* Notification Sound */}
             <div className="space-y-3">
-              <p className="text-muted-foreground/60 uppercase tracking-wider text-sm font-sans">{t('settings.notificationSound', 'Notification sound')}</p>
+              <p className="text-muted-foreground/60 uppercase tracking-wider text-sm font-sans">{t('settings.notificationSound')}</p>
               <p className="leading-relaxed text-primary text-sm">
-                {t('settings.notificationSoundDesc', 'Play a singing-bowl chime when a new reflection arrives.')}
+                {t('settings.notificationSoundDesc')}
               </p>
               <div className="flex items-center justify-between">
                 <Label htmlFor="sound-toggle" className="text-xs font-mono text-muted-foreground">
-                  {t('settings.enableSound', 'Enable sound')}
+                  {t('settings.enableSound')}
                 </Label>
                 <Switch id="sound-toggle" checked={soundEnabled} onCheckedChange={(val) => { setSoundEnabled(val); localStorage.setItem('holzen_sound_enabled', String(val)); }} />
               </div>
