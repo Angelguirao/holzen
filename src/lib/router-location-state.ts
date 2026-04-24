@@ -7,8 +7,6 @@ const PAUSE_SEVERITIES: readonly PauseSeverity[] = ['mild', 'moderate', 'high'];
 
 /** Payload for `navigate('/pause', { state })` — all fields optional at the wire. */
 export interface PauseSessionLocationState {
-  /** Legacy reflection id — retained while the client rewrite is in flight. */
-  reflectionId?: string;
   /** Pause V2 instance id. Set by Bell + Library current-pause card. */
   pauseInstanceId?: string;
   reflectionMessage?: string;
@@ -19,7 +17,6 @@ export interface PauseSessionLocationState {
 }
 
 export interface PauseSessionNavParsed {
-  reflectionId: string | null;
   pauseInstanceId: string | null;
   reflectionMessage: string;
   context: string | null;
@@ -50,7 +47,6 @@ function isCompanionPrefs(v: unknown): v is CompanionPrefs {
 
 export function parsePauseSessionLocationState(state: unknown): PauseSessionNavParsed {
   const empty: PauseSessionNavParsed = {
-    reflectionId: null,
     pauseInstanceId: null,
     reflectionMessage: '',
     context: null,
@@ -61,7 +57,6 @@ export function parsePauseSessionLocationState(state: unknown): PauseSessionNavP
   if (!state || typeof state !== 'object') return empty;
   const o = state as Record<string, unknown>;
 
-  const reflectionId = typeof o.reflectionId === 'string' ? o.reflectionId : null;
   const pauseInstanceId =
     typeof o.pauseInstanceId === 'string' ? o.pauseInstanceId : null;
   const reflectionMessage =
@@ -76,7 +71,6 @@ export function parsePauseSessionLocationState(state: unknown): PauseSessionNavP
       : undefined;
 
   return {
-    reflectionId,
     pauseInstanceId,
     reflectionMessage,
     context,

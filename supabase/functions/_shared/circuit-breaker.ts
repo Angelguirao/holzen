@@ -8,7 +8,7 @@
  *
  * Important scope:
  *   - Breakers only affect **live** generation. Cached serves
- *     (`reflection_companions`, `companion_cache`, `content_library`) are
+ *     (`pause_ai_artifacts`, `companion_cache`, `content_library`) are
  *     unaffected. Cache + library + curated fallback continue to serve.
  *   - Recovery is automatic. Every time `getProviderHealth` is called (after
  *     the per-instance TTL expires) it re-computes from the latest window;

@@ -106,18 +106,12 @@ interface AttemptLoggerOptions {
  * Create an attempt logger bound to a service client.
  * Returns a function that logs generation attempts with cost estimation.
  *
- * Pass userId and reflectionId in options to enable per-user cost attribution
- * and per-session debugging. These columns are nullable in generation_attempts —
- * if the DB doesn't have them yet, the insert still succeeds (Supabase ignores
- * unknown columns in inserts when not using strict mode).
- *
- * SQL migration to add these columns:
- * ```sql
- * ALTER TABLE generation_attempts ADD COLUMN IF NOT EXISTS user_id uuid REFERENCES auth.users(id);
- * ALTER TABLE generation_attempts ADD COLUMN IF NOT EXISTS reflection_id uuid REFERENCES reflections(id);
- * CREATE INDEX IF NOT EXISTS idx_generation_attempts_user_id ON generation_attempts(user_id);
- * CREATE INDEX IF NOT EXISTS idx_generation_attempts_reflection_id ON generation_attempts(reflection_id);
- * ```
+ * Pass `userId` and (optionally) `pauseInstanceId` via the caller's payload
+ * when building `AttemptLoggerOptions`. `generation_attempts.pause_instance_id`
+ * is added in migration 20260423201300. Nullable; if the column hasn't been
+ * applied yet the insert still succeeds (Supabase ignores unknown columns in
+ * inserts when not using strict mode). The legacy `reflection_id` column was
+ * dropped in the Pause V2 destructive cutover migration.
  */
 export function createAttemptLogger(svcClient: any, options?: AttemptLoggerOptions) {
   let attemptOrder = 0;

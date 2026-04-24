@@ -72,6 +72,17 @@ DELETE FROM public.notifications
  WHERE source_table IN ('reflections', 'pause_notifications', 'follow_ups');
 
 -- ---------------------------------------------------------------------------
+-- 3c. analytics_events feedback index — the companion_feedback writer now
+--     persists `metadata.pause_instance_id` (not `metadata.reflection_id`).
+--     Swap the partial index so the admin feedback-ratio view lookups stay
+--     covered.
+-- ---------------------------------------------------------------------------
+DROP INDEX IF EXISTS public.idx_analytics_events_companion_feedback;
+CREATE INDEX IF NOT EXISTS idx_analytics_events_companion_feedback
+  ON public.analytics_events ((metadata->>'pause_instance_id'), (metadata->>'companion_type'))
+  WHERE event = 'companion_feedback';
+
+-- ---------------------------------------------------------------------------
 -- 4. follow_ups (hard FK to reflections; feature retired in V2).
 -- ---------------------------------------------------------------------------
 DROP TABLE IF EXISTS public.follow_ups CASCADE;
