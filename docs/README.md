@@ -7,7 +7,7 @@ This folder contains human-readable notes that complement the source code and in
 1. **[architecture/c4-holzen.md](architecture/c4-holzen.md)** — who the system talks to (System Context + Container). Optional: [workspace.dsl](architecture/workspace.dsl) in Structurizr.
 2. **[fundamentals/navigating-the-codebase.md](fundamentals/navigating-the-codebase.md)** — boot flow, routing, auth, hooks, and how Supabase pieces connect at runtime. **§19** — phased **learning path** (pause slice first, then whole app).
 3. **Optional — [fundamentals/mental-models-for-contributors.md](fundamentals/mental-models-for-contributors.md)** — plain-language glossary, SPA/React/Supabase mental models, and suggested external primers if you’re coming from a backend-heavy background.
-4. **Your vertical slice** — pick one area below (e.g. [systems/routing/route-gating-system.md](systems/routing/route-gating-system.md) or [systems/pause/ai-powered-pause-system.md](systems/pause/ai-powered-pause-system.md)) and read the phased [reviews/](reviews/) docs in order when you need depth on security and pipelines.
+4. **Your vertical slice** — pick one area below (e.g. [systems/routing/route-gating-system.md](systems/routing/route-gating-system.md) or [systems/pause-system.md](systems/pause-system.md)) and read the phased [reviews/](reviews/) docs in order when you need depth on security and pipelines.
 
 [AGENTS.md](../AGENTS.md) at the repo root is the **quick reference** for commands and “where to change what” (optimized for automation and fast lookup). This index is the **full map**.
 
@@ -18,6 +18,7 @@ This folder contains human-readable notes that complement the source code and in
 | Commands, env vars, “where to edit” table | [AGENTS.md](../AGENTS.md) | Keep tables here; link out for narratives. |
 | Boot sequence, repo tour, Lovable vs local | [fundamentals/navigating-the-codebase.md](fundamentals/navigating-the-codebase.md) | Do not duplicate long boot narratives in AGENTS. |
 | Pause lifecycle (instances, events, artifacts) | [systems/pause-system.md](systems/pause-system.md) | Post-Pause-V2 canonical doc. |
+| Pause pipeline (legacy, pre‑V2) | [systems/pause/ai-powered-pause-system.md](systems/pause/ai-powered-pause-system.md) | Historical only; see pause-system.md for current model. |
 | How a subsystem behaves (contracts, flows) | [systems/](systems/) | One primary doc per concern; cross-link related systems. |
 | Irreversible or costly-to-reverse choices | [decisions/](decisions/) | Short ADR-style notes; see [decisions/README.md](decisions/README.md). |
 | Incidents, invariants, “why we hardened X” | [postmortems/](postmortems/) | |
@@ -85,7 +86,8 @@ When you change behavior, update the **one** doc that owns that slice (and ADRs 
 
 - `systems/auth/auth-and-referral-system.md` — Auth system (Supabase) + optional referral side-effect
 - `systems/routing/route-gating-system.md` — protected vs public-only vs ungated routes; `ProtectedRoute` / `PublicOnlyRoute` contracts
-- `systems/pause/ai-powered-pause-system.md` — end-to-end architecture of manual vs automatic pause and how companions/interventions are produced.
+- `systems/pause-system.md` — end-to-end architecture of the Pause V2 lifecycle (instances, events, artifacts, stats, badges).
+- `systems/pause/ai-powered-pause-system.md` — **legacy (pre‑V2)** manual vs automatic pause pipeline; kept for historical reference only.
 - `systems/costs/ai-cost-model.md` — **canonical** cost + guardrail reference. All AI-powered edge functions, cost ceilings, panic mode, feature flags, scenario modeling, runbooks, auto-top-up.
 - `systems/pause/pause-session-cost-estimates.md` — pause-flow case study. Defer to `systems/costs/ai-cost-model.md` for anything cross-feature.
 - `systems/pause/companions/` — deep dives per companion type (see [companions/signal.md](systems/pause/companions/signal.md) for Signal).
