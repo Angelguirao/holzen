@@ -1,8 +1,7 @@
 import { useTranslation } from 'react-i18next';
-import { useEffect, useState, useMemo } from 'react';
+import { useEffect, useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/use-auth';
-import { format } from 'date-fns';
 import { Skeleton } from '@/components/ui/skeleton';
 import { HistoryCalendar, type CalendarActivity } from '@/components/HistoryCalendar';
 
@@ -16,11 +15,12 @@ const HistoryContent = () => {
   useEffect(() => {
     if (!user) return;
     const load = async () => {
-      const [{ data: refs }, { data: lets }, { data: bads }, { data: pracs }] = await Promise.all([
+      const [{ data: pauses }, { data: lets }, { data: bads }, { data: pracs }] = await Promise.all([
         supabase
-          .from('reflections')
-          .select('id, created_at, mood, mood_after, outcome, breathing_completed')
-          .eq('user_id', user.id),
+          .from('v_pause_full' as never)
+          .select('id, created_at, completed_at, engaged_at, initial_mood, shift_mood, outcome, state, has_breath_completed')
+          .eq('user_id', user.id)
+          .eq('state', 'completed'),
         supabase.from('future_letters').select('id, written_at, deliver_during').eq('user_id', user.id),
         supabase.from('user_badges').select('id, earned_at, badge_id').eq('user_id', user.id),
         supabase.from('practice_entries').select('id, created_at, type, mood, prompt').eq('user_id', user.id),
@@ -34,20 +34,43 @@ const HistoryContent = () => {
       };
 
       const items: CalendarActivity[] = [];
-      // Activity timeline shows engaged pauses only — those the user actually completed.
-      (refs ?? [])
-        .filter((r: any) => r.breathing_completed && r.mood && r.mood_after && r.outcome)
-        .forEach((r: any) => items.push({ date: r.created_at, type: 'reflection', mood: r.mood, id: r.id }));
-      (lets ?? []).forEach((l: any) => items.push({ date: l.written_at, type: 'letter', id: l.id, label: `Letter → ${l.deliver_during}` }));
-      (bads ?? []).forEach((b: any) => items.push({ date: b.earned_at, type: 'badge', id: b.id, label: b.badge_id }));
-      (pracs ?? []).forEach((p: any) => items.push({
-        date: p.created_at,
-        type: 'practice',
-        id: p.id,
-        label: PRACTICE_LABELS[p.type] ?? p.type,
-        mood: p.mood,
-        practiceType: p.type,
-      }));
+      // Completed pauses only; use completed_at (fall back to engaged_at /
+      // created_at) to bucket into the right local day.
+      ((pauses ?? []) as Array<{
+        id: string;
+        created_at: string;
+        completed_at: string | null;
+        engaged_at: string | null;
+        initial_mood: string | null;
+      }>).forEach((p) => {
+        items.push({
+          date: p.completed_at ?? p.engaged_at ?? p.created_at,
+          type: 'reflection',
+          mood: p.initial_mood ?? undefined,
+          id: p.id,
+        });
+      });
+      (lets ?? []).forEach((l: any) =>
+        items.push({
+          date: l.written_at,
+          type: 'letter',
+          id: l.id,
+          label: `Letter → ${l.deliver_during}`,
+        }),
+      );
+      (bads ?? []).forEach((b: any) =>
+        items.push({ date: b.earned_at, type: 'badge', id: b.id, label: b.badge_id }),
+      );
+      (pracs ?? []).forEach((p: any) =>
+        items.push({
+          date: p.created_at,
+          type: 'practice',
+          id: p.id,
+          label: PRACTICE_LABELS[p.type] ?? p.type,
+          mood: p.mood,
+          practiceType: p.type,
+        }),
+      );
       setActivities(items);
       setLoading(false);
     };

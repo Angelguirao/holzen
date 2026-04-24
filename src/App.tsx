@@ -156,7 +156,6 @@ const App = () => (
                   <Route path="/" element={<Home />} />
                   <Route path="/index" element={<Navigate to="/" replace />} />
                   <Route path="/library" element={<Library />} />
-                  <Route path="/history" element={<Navigate to="/library" replace />} />
                   <Route path="/profile" element={<Profile />} />
                   <Route path="/settings" element={<Settings />} />
                   <Route path="/settings/billing-history" element={<BillingHistory />} />
@@ -164,19 +163,19 @@ const App = () => (
                 {/* Immersive full-screen experiences — no nav bar */}
                 <Route path="/pause" element={<ProtectedRoute><PauseSession /></ProtectedRoute>} />
                 <Route
-                  path="/companion/zoom-out/:reflectionId"
+                  path="/companion/zoom-out/:pauseInstanceId"
                   element={<ProtectedRoute><CompanionZoomOutPage /></ProtectedRoute>}
                 />
                 <Route
-                  path="/companion/history/:reflectionId"
+                  path="/companion/history/:pauseInstanceId"
                   element={<ProtectedRoute><CompanionHistoryPage /></ProtectedRoute>}
                 />
                 <Route
-                  path="/companion/signal/:reflectionId"
+                  path="/companion/signal/:pauseInstanceId"
                   element={<ProtectedRoute><CompanionSignalPage /></ProtectedRoute>}
                 />
                 <Route
-                  path="/companion/grounding/:reflectionId"
+                  path="/companion/grounding/:pauseInstanceId"
                   element={<ProtectedRoute><CompanionGroundingPage /></ProtectedRoute>}
                 />
                 <Route path="/breathe" element={<ProtectedRoute><Breathe /></ProtectedRoute>} />

@@ -165,18 +165,17 @@ async function fetchSubscriptionSnapshot(userId: string, force: boolean): Promis
 
   const now = new Date();
   const monthStart = new Date(now.getFullYear(), now.getMonth(), 1).toISOString();
-  // Only full-ritual pauses count toward the free-tier monthly quota:
-  // breathing completed AND mood/mood_after/outcome set. Ignored notifications
-  // (rows that were merely generated) don't burn quota, and neither do
-  // quick decision-only taps — this is the anti-gaming quota gate.
+  // Free-tier monthly quota: count completed pauses in the current month.
+  // Completion requires strict full ritual (breath + initial/shift mood +
+  // outcome + counted companion) — enforced by the pause state machine.
   const { data: rows } = await supabase
-    .from('reflections')
-    .select('breathing_completed, mood, mood_after, outcome')
+    .from('pause_instances' as never)
+    .select('id')
     .eq('user_id', userId)
+    .eq('state', 'completed')
     .gte('created_at', monthStart);
 
-  const { isFullRitualPause } = await import('@/lib/engaged-pause');
-  const used = (rows ?? []).filter(isFullRitualPause).length;
+  const used = (rows ?? []).length;
   const remaining = Math.max(0, FREE_MONTHLY_LIMIT - used);
   writeSubCache({
     subscribed: false,

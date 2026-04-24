@@ -8,9 +8,9 @@ import { useCompanionLibraryFavorites } from '@/hooks/use-companion-library-favo
 import type { CompanionData, CompanionPrefs } from '@/components/CompanionSection';
 import type { RegenerateCompanionSlot, InterventionState } from '@/lib/companion-orchestrate-types';
 import {
-  fetchParsedReflectionCompanionCache,
-} from '@/lib/companion-reflection-cache';
-import type { CachedHistoricalInsightShape } from '@/lib/companion-reflection-cache';
+  fetchParsedPauseArtifactCache,
+} from '@/lib/pause-artifact-cache';
+import type { CachedHistoricalInsightShape } from '@/components/HistoricalInsightDisplay';
 import type { CompanionUiCompletionStep } from '@/lib/companion-completion-sync';
 import {
   loadCompanionUiCompletionState,
@@ -243,7 +243,7 @@ export function useCompanionData({ companions, prefs, pauseInstanceId, context, 
     (async () => {
       try {
         // Hydrate any already-persisted companion data from reflection_companions
-        const cached = await fetchParsedReflectionCompanionCache(pauseInstanceId);
+        const cached = await fetchParsedPauseArtifactCache(pauseInstanceId);
         if (cancelled) return;
 
         if (cached.signal) {
