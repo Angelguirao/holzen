@@ -36,19 +36,19 @@ export interface DuplicateGroup {
 const SIMILARITY_THRESHOLD = 0.6;
 
 /**
- * Detect near-duplicate reflections in the library.
+ * Detect near-duplicate pause bookmarks in the library (`source_type === 'reflection'`).
  * Groups items by text similarity using Jaccard index on word tokens.
- * Only considers reflection source_type items with a body.
+ * Only considers items with a body.
  */
 export function detectDuplicates(items: LibraryItem[]): DuplicateGroup[] {
-  const reflections = items.filter(
+  const reflectionBookmarks = items.filter(
     (i) => i.source_type === 'reflection' && i.body && i.body.length > 20 && i.status !== 'deleted'
   );
 
-  if (reflections.length < 2) return [];
+  if (reflectionBookmarks.length < 2) return [];
 
   // Sort oldest first so the "primary" is the original
-  const sorted = [...reflections].sort(
+  const sorted = [...reflectionBookmarks].sort(
     (a, b) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime()
   );
 

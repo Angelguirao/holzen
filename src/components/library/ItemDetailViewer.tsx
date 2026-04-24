@@ -174,7 +174,7 @@ export function ItemDetailViewer({
 
   // Determine the effective outcome: freshly recorded > current from DB
   const effectiveOutcome = recordedOutcome ?? currentOutcome;
-  // Show the outcome section for reflections: either incomplete or has an outcome to display
+  // Show the outcome section for pause-linked library bookmarks (source_type reflection): incomplete or recorded outcome
   const showOutcomeSection = isReflection && item.pause_instance_id;
 
   const handleDelete = () => {

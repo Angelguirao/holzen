@@ -95,7 +95,7 @@ async function fetchBtcWeekData(currency: string): Promise<BtcWeekData> {
 }
 
 async function generateAIInsight(
-  reflectionCount: number,
+  pauseCount: number,
   topMood: string | undefined,
   steadyCount: number,
   weekDir: string,
@@ -104,7 +104,7 @@ async function generateAIInsight(
   language: string | undefined,
   logAttempt: (params: Parameters<ReturnType<typeof createAttemptLogger>>[0]) => void
 ): Promise<string | null> {
-  if (reflectionCount === 0) return null;
+  if (pauseCount === 0) return null;
 
   const t0 = Date.now();
   try {
@@ -113,15 +113,15 @@ async function generateAIInsight(
     const langName = LANG_NAMES[langCode] || "English";
     const langInstruction = langCode !== "en" ? `\nWrite in ${langName}.` : "";
 
-    const prompt = `You are Holzen, a mindful Bitcoin reflection app. Generate ONE short behavioral observation (1-2 sentences max) based on this user's week:
+    const prompt = `You are Holzen, a mindful Bitcoin pause app. Generate ONE short behavioral observation (1-2 sentences max) based on this user's week:
 - BTC moved ${weekDir} ${absWeekChange}% this week
-- They reflected ${reflectionCount} time(s)
+- They completed ${pauseCount} pause session(s)
 - Most common mood: ${topMood || "unknown"}
 - Stayed steady (held/did nothing): ${steadyCount} time(s)
 
 Be observational, not prescriptive. No advice, no exclamation marks. Calm and grounded. Examples:
 - "You noticed the dip but didn't flinch. That pattern is strengthening."
-- "Three reflections during a quiet week — you're building awareness beyond volatility."
+- "Three pauses during a quiet week — you're building awareness beyond volatility."
 - "Anxiety appeared twice this week, both during drops. The pattern is worth noticing."${langInstruction}`;
 
     const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
@@ -236,18 +236,18 @@ serve(
       const weekDir = btc.weekChange >= 0 ? "up" : "down";
       const absWeekChange = Math.abs(btc.weekChange).toFixed(1);
 
-      const { data: reflections } = await supabase
+      const { data: pauseRows } = await supabase
         .from("v_pause_full")
         .select("reflection_text, initial_mood, outcome, created_at")
         .eq("user_id", profile.user_id)
         .gte("created_at", weekAgo)
         .order("created_at", { ascending: true });
 
-      const reflectionCount = reflections?.length ?? 0;
+      const pauseCount = pauseRows?.length ?? 0;
 
       const moods: Record<string, number> = {};
       const outcomes: Record<string, number> = {};
-      for (const r of (reflections ?? []) as Array<{
+      for (const r of (pauseRows ?? []) as Array<{
         initial_mood: string | null;
         outcome: string | null;
       }>) {
@@ -269,19 +269,19 @@ serve(
 
       // Generate AI insight
       let aiInsight: string | null = null;
-      if (LOVABLE_API_KEY && reflectionCount > 0) {
+      if (LOVABLE_API_KEY && pauseCount > 0) {
         const logAttempt = createAttemptLogger(supabase, { userId: profile.user_id });
         aiInsight = await generateAIInsight(
-          reflectionCount, topMood, steadyCount, weekDir, absWeekChange, LOVABLE_API_KEY, (profile as any).language,
+          pauseCount, topMood, steadyCount, weekDir, absWeekChange, LOVABLE_API_KEY, (profile as any).language,
           logAttempt,
         );
       }
 
-      const reflectionsList =
-        reflectionCount === 0
-          ? `<p style="font-size: 13px; color: #737373; line-height: 1.6;">No reflections this week. Sometimes the best move is no move at all.</p>`
+      const pauseSummaryHtml =
+        pauseCount === 0
+          ? `<p style="font-size: 13px; color: #737373; line-height: 1.6;">No pause sessions this week. Sometimes the best move is no move at all.</p>`
           : `<p style="font-size: 13px; color: #737373; line-height: 1.6;">
-              You reflected <strong style="color: #2a2a2a;">${reflectionCount} time${reflectionCount !== 1 ? "s" : ""}</strong> this week.${
+              You took <strong style="color: #2a2a2a;">${pauseCount} pause${pauseCount !== 1 ? "s" : ""}</strong> this week.${
                 topMood ? ` Your most common mood was <strong style="color: #2a2a2a;">${topMood}</strong>.` : ""
               }${
                 steadyCount > 0
@@ -329,7 +329,7 @@ serve(
     </tr>
   </table>
 
-  ${reflectionsList}
+  ${pauseSummaryHtml}
 
   ${aiInsightHtml}
 

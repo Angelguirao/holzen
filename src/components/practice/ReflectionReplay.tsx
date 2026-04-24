@@ -15,7 +15,8 @@ interface Props {
   onComplete?: () => void;
   textColor?: string;
   ringColor?: string;
-  initialReflectionId?: string;
+  /** Reserved for when replay is rebuilt on `v_pause_full` (navigation already passes pause id). */
+  initialPauseInstanceId?: string;
 }
 
 export function ReflectionReplay({ onComplete }: Props) {

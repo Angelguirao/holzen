@@ -144,19 +144,19 @@ serve(
       const monthDir = btc.monthChange >= 0 ? "up" : "down";
       const absMonthChange = Math.abs(btc.monthChange).toFixed(1);
 
-      const { data: reflections } = await supabase
+      const { data: pauseRows } = await supabase
         .from("v_pause_full")
         .select("reflection_text, initial_mood, outcome, tags, created_at")
         .eq("user_id", profile.user_id)
         .gte("created_at", monthAgo)
         .order("created_at", { ascending: true });
 
-      const reflectionCount = reflections?.length ?? 0;
+      const pauseCount = pauseRows?.length ?? 0;
 
       const moods: Record<string, number> = {};
       const outcomes: Record<string, number> = {};
       const tags: Record<string, number> = {};
-      for (const r of (reflections ?? []) as Array<{
+      for (const r of (pauseRows ?? []) as Array<{
         initial_mood: string | null;
         outcome: string | null;
         tags: string[] | null;
@@ -180,7 +180,7 @@ serve(
 
       // AI monthly insight
       let aiInsight = "";
-      if (LOVABLE_API_KEY && reflectionCount > 0) {
+      if (LOVABLE_API_KEY && pauseCount > 0) {
         const logAttempt = createAttemptLogger(supabase, { userId: profile.user_id });
         const t0 = Date.now();
         try {
@@ -191,7 +191,7 @@ serve(
 
           const prompt = `You are Holzen. Write ONE short behavioral observation (1-2 sentences) for a monthly report:
 - BTC moved ${monthDir} ${absMonthChange}% last month
-- User reflected ${reflectionCount} times
+- User completed ${pauseCount} pause session(s)
 - Top mood: ${topMood?.[0] || "unknown"} (${topMood?.[1] || 0} times)
 - Held steady: ${steadyCount}, bought: ${boughtCount}, sold: ${soldCount}
 - Top tags: ${topTags.map(([t, c]) => `${t}(${c})`).join(", ") || "none"}
@@ -286,7 +286,7 @@ Be observational, calm. No advice, no exclamation marks.${langInstruction}`;
   <hr style="border: none; border-top: 1px solid #e5e2dc; margin: 24px 0;">
 
   <p style="font-size: 13px; color: #737373; line-height: 1.6;">
-    You reflected <strong style="color: #2a2a2a;">${reflectionCount} time${reflectionCount !== 1 ? "s" : ""}</strong> in ${lastMonth}.${
+    You took <strong style="color: #2a2a2a;">${pauseCount} pause${pauseCount !== 1 ? "s" : ""}</strong> in ${lastMonth}.${
       topMood ? ` Your most common mood was <strong style="color: #2a2a2a;">${topMood[0]}</strong>.` : ""
     }
   </p>
