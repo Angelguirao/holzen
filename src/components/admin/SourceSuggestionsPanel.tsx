@@ -116,8 +116,15 @@ export function SourceSuggestionsPanel({ onCatalogChanged }: { onCatalogChanged?
         <div className="space-y-2">
           {rows.map((row) => {
             const busy = acting === row.id;
-            const rid = row.metadata && typeof row.metadata === 'object' && row.metadata !== null && 'reflection_id' in row.metadata
-              ? String((row.metadata as { reflection_id?: string }).reflection_id ?? '')
+            // Writers persist `pause_instance_id` (Pause V2). Accept legacy
+            // `reflection_id` only as a best-effort display fallback for any
+            // suggestion rows still sitting in a pre-cutover environment.
+            const rid = row.metadata && typeof row.metadata === 'object' && row.metadata !== null
+              ? ('pause_instance_id' in row.metadata
+                  ? String((row.metadata as { pause_instance_id?: string }).pause_instance_id ?? '')
+                  : 'reflection_id' in row.metadata
+                    ? String((row.metadata as { reflection_id?: string }).reflection_id ?? '')
+                    : '')
               : '';
             return (
               <div key={row.id} className="rounded-lg border border-border/15 bg-card/5 px-3 py-2 flex flex-col sm:flex-row sm:items-center gap-2 sm:justify-between">
@@ -137,7 +144,7 @@ export function SourceSuggestionsPanel({ onCatalogChanged }: { onCatalogChanged?
                     </a>
                   )}
                   {rid && (
-                    <p className="text-[8px] font-mono text-muted-foreground/35 mt-1 truncate">reflection {rid.slice(0, 8)}…</p>
+                    <p className="text-[8px] font-mono text-muted-foreground/35 mt-1 truncate">pause {rid.slice(0, 8)}…</p>
                   )}
                 </div>
                 <div className="flex items-center gap-1.5 shrink-0">

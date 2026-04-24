@@ -9,16 +9,19 @@ export interface CompanionLibraryBookmarkParams {
 
 /**
  * Upsert a companion-derived bookmark into `library_items` if none exists for this
- * reflection + source_type. Uses `lifecycleDedup` so each key is attempted at most once
+ * pause + source_type. Uses `lifecycleDedup` so each key is attempted at most once
  * per hook mount lifecycle (same behavior as the former in-hook Set ref).
+ *
+ * Post Pause V2: keyed on `pause_instance_id`; the legacy `reflection_id`
+ * column was dropped in the destructive cutover migration.
  */
 export async function saveCompanionLibraryBookmarkOnce(
-  reflectionId: string | null | undefined,
+  pauseInstanceId: string | null | undefined,
   params: CompanionLibraryBookmarkParams,
   lifecycleDedup: Set<string>,
 ): Promise<void> {
-  if (!reflectionId) return;
-  const dedupKey = `${reflectionId}:${params.sourceType}`;
+  if (!pauseInstanceId) return;
+  const dedupKey = `${pauseInstanceId}:${params.sourceType}`;
   if (lifecycleDedup.has(dedupKey)) return;
   lifecycleDedup.add(dedupKey);
 
@@ -30,7 +33,9 @@ export async function saveCompanionLibraryBookmarkOnce(
       .from('library_items')
       .select('id')
       .eq('user_id', userId)
-      .eq('reflection_id', reflectionId)
+      // `pause_instance_id` column exists post-201300 migration but isn't
+      // yet in the generated types.ts — cast to `never` to bypass inference.
+      .eq('pause_instance_id' as never, pauseInstanceId)
       .eq('source_type', params.sourceType)
       .limit(1);
     if (existing && existing.length > 0) return;
@@ -42,10 +47,10 @@ export async function saveCompanionLibraryBookmarkOnce(
         body: params.body,
         source_type: params.sourceType,
         source_url: params.sourceUrl || null,
-        reflection_id: reflectionId,
+        pause_instance_id: pauseInstanceId,
         tags: [],
-      },
-      { onConflict: 'user_id,reflection_id,source_type', ignoreDuplicates: true },
+      } as never,
+      { onConflict: 'user_id,pause_instance_id,source_type', ignoreDuplicates: true },
     );
   } finally {
     // Keep dedupKey — do not retry within the same component lifecycle

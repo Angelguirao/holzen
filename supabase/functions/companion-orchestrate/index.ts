@@ -332,7 +332,7 @@ serve(
     }
 
     // ── Per-user rate limit + cost ceilings + panic mode ──
-    // (all skipped when we successfully served from reflection_companions above).
+    // (all skipped when we successfully served from pause_ai_artifacts above).
     const rateLimit = await checkRateLimit(svcClient, userId, 60, 30);
     if (!rateLimit.allowed) {
       log(`rate limited: ${rateLimit.reason}`);
@@ -345,7 +345,7 @@ serve(
     const appConfig = await loadAppConfig(svcClient);
 
     // Panic mode: companion features are off. Return empty companions and let
-    // the client fall back to its local cache / reflection_companions path.
+    // the client fall back to its local cache / pause_ai_artifacts path.
     // Reflection is not affected (see PANIC_MODE_FEATURES in _shared/app-config.ts).
     if (appConfig.panic_mode && PANIC_MODE_FEATURES.has("companion_signal")) {
       log("panic mode active — bypassing companion generation");

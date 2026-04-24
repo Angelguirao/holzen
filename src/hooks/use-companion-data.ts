@@ -242,7 +242,7 @@ export function useCompanionData({ companions, prefs, pauseInstanceId, context, 
 
     (async () => {
       try {
-        // Hydrate any already-persisted companion data from reflection_companions
+        // Hydrate any already-persisted companion data from pause_ai_artifacts
         const cached = await fetchParsedPauseArtifactCache(pauseInstanceId);
         if (cancelled) return;
 
@@ -277,7 +277,7 @@ export function useCompanionData({ companions, prefs, pauseInstanceId, context, 
         // call for this `pauseInstanceId` in the current tab session — even if
         // a remount happened before the server persisted the row that the
         // cache lookup above reads — bail out and wait for the
-        // `reflection_companions` realtime subscription / next remount to
+        // `pause_ai_artifacts` realtime subscription / next remount to
         // hydrate. The `retryOrchestrate` path explicitly resets the marker
         // so a deliberate retry still gets through.
         if (hasInvokedIntervention(pauseInstanceId)) {

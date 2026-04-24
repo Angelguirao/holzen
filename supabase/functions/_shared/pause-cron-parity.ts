@@ -80,15 +80,6 @@ type UserSignalPreferenceRow = {
   category: string;
 };
 
-type ReflectionRow = {
-  signal_title?: string | null;
-  signal_source?: string | null;
-  grounding_title?: string | null;
-  companion_grounding_url?: string | null;
-  zoom_out_data?: unknown;
-  history_insight_data?: unknown;
-};
-
 function hostnameFromReflectionUrl(url: string | null | undefined): string | null {
   if (!url || typeof url !== "string") return null;
   try {
@@ -242,45 +233,6 @@ export async function pauseRecencyInputs(
   }
 
   return { moodHistory, recentMessages, recentHaikus };
-}
-
-/** Derive orchestrator recency hints from recent reflection rows (newest first). */
-export function recencyHintsFromReflectionRows(rows: ReflectionRow[]): OrchestratorRecencyHints {
-  const recentSignalSources: string[] = [];
-  const recentSignalTitles: string[] = [];
-  const recentNudgeTopics: string[] = [];
-  const recentGroundingSources: string[] = [];
-  const recentHistoryTitles: string[] = [];
-  const recentZoomOutTitles: string[] = [];
-
-  for (const r of rows) {
-    if (r.signal_source) pushUnique(recentSignalSources, r.signal_source, 5);
-    if (r.signal_title) pushUnique(recentSignalTitles, r.signal_title, 5);
-    if (r.grounding_title) pushUnique(recentNudgeTopics, r.grounding_title, 5);
-    const gh = hostnameFromReflectionUrl(r.companion_grounding_url);
-    if (gh) pushUnique(recentGroundingSources, gh, 5);
-
-    const hi = r.history_insight_data;
-    if (hi && typeof hi === "object" && "title" in hi) {
-      const t = (hi as { title?: string }).title;
-      if (t) pushUnique(recentHistoryTitles, t, 5);
-    }
-
-    const zo = r.zoom_out_data;
-    if (zo && typeof zo === "object" && zo !== null && "deepTime" in zo) {
-      const dt = (zo as { deepTime?: { title?: string } }).deepTime;
-      if (dt?.title) pushUnique(recentZoomOutTitles, dt.title, 5);
-    }
-  }
-
-  return {
-    recentSignalSources,
-    recentSignalTitles,
-    recentNudgeTopics,
-    recentGroundingSources,
-    recentHistoryTitles,
-    recentZoomOutTitles,
-  };
 }
 
 /** Active signal catalog + custom URLs for Signal companion (same rules as use-companion-data). */

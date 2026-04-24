@@ -2,12 +2,12 @@
  * Per-trigger idempotency for the AI intervention call.
  *
  * The AI "intervention" recommendation served on the pause screen is keyed
- * one-to-one against a `reflectionId` (each volatility trigger or manual
- * pause inserts exactly one reflection row). Once that recommendation has
- * been requested for a given reflection we never need to call
+ * one-to-one against a `pauseInstanceId` (each volatility trigger or manual
+ * pause creates exactly one `pause_instances` row). Once that recommendation
+ * has been requested for a given pause we never need to call
  * `companion-orchestrate` again for the same id — the persisted result
- * lives in `reflection_companions` and is hydrated via
- * `fetchParsedReflectionCompanionCache`.
+ * lives in `pause_ai_artifacts` and is hydrated via
+ * `fetchParsedPauseArtifactCache`.
  *
  * In practice though, the network call could still fire multiple times
  * within a single tab session even when the user has not opened a brand
