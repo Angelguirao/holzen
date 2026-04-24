@@ -10,6 +10,7 @@ import { SubscriptionSkeleton } from '@/components/SubscriptionSkeleton';
 import { LibraryItems } from '@/components/library/LibraryItems';
 import { LibraryCollections } from '@/components/library/LibraryCollections';
 import { SmartCollections } from '@/components/library/SmartCollections';
+import { CurrentPauseCard } from '@/components/library/CurrentPauseCard';
 import { usePullToRefresh } from '@/hooks/use-pull-to-refresh';
 import { DuplicateBanner } from '@/components/library/DuplicateBanner';
 
@@ -165,6 +166,9 @@ export default function Library() {
     <div className="space-y-6 pb-24" {...handlers}>
       <PageMeta title={t('library.pageTitle')} description={t('library.pageDescription')} />
       <NoxHeaderMain title={t('library.title')} subtitle={t('library.pageDescription')} />
+
+      {/* Current pause card (Pause V2). Hidden when the user has no open pause. */}
+      <CurrentPauseCard />
 
       {/* Pull-to-refresh indicator */}
       <AnimatePresence>
