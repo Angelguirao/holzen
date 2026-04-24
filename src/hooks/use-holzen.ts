@@ -49,7 +49,8 @@ export function useHolzen() {
   });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [newReflection, setNewReflection] = useState(false);
+  /** True briefly after a new pause message is shown — Home uses it for one-shot chime. */
+  const [newPauseArrival, setNewPauseArrival] = useState(false);
   const [lastPauseInstanceId, setLastPauseInstanceId] = useState<string | null>(null);
   const [lastTriggerAt, setLastTriggerAt] = useState<string | null>(null);
 
@@ -104,7 +105,7 @@ export function useHolzen() {
     };
   }, [user]);
 
-  /** Generate a reflection and create the V2 pause instance + artifacts. */
+  /** Generate reflect-step text (holzen-reflect) and create the V2 pause instance + artifacts. */
   const generateMessage = useCallback(
     async (data: BtcPriceData, mood?: string) => {
       if (!user) {
@@ -134,7 +135,7 @@ export function useHolzen() {
         setMessage(silentMsg);
         setContext(ctx);
         setCompanions({ haiku: null, groundingTitle: null, groundingBody: null });
-        setNewReflection(true);
+        setNewPauseArrival(true);
 
         try {
           const res = await pauseCreateOrReuse({
@@ -166,7 +167,7 @@ export function useHolzen() {
             {
               user_id: user.id,
               type: 'bookmark',
-              title: 'Reflection',
+              title: 'Pause',
               body: silentMsg,
               source_type: 'reflection',
               pause_instance_id: res.instance_id,
@@ -205,7 +206,7 @@ export function useHolzen() {
         if (fnError) throw fnError;
 
         const msg: string | undefined = fnData?.message;
-        if (!msg) throw new Error('No reflection returned');
+        if (!msg) throw new Error('No pause message returned');
 
         const companionData: CompanionData = {
           haiku: fnData?.haiku ?? null,
@@ -236,7 +237,7 @@ export function useHolzen() {
           setMessage(msg);
           setContext(ctx);
           setCompanions(companionData);
-          setNewReflection(true);
+          setNewPauseArrival(true);
           return;
         }
 
@@ -244,7 +245,7 @@ export function useHolzen() {
         setMessage(msg);
         setContext(ctx);
         setCompanions(companionData);
-        setNewReflection(true);
+        setNewPauseArrival(true);
 
         const artifacts: Array<{
           pause_instance_id: string;
@@ -288,7 +289,7 @@ export function useHolzen() {
           {
             user_id: user.id,
             type: 'bookmark',
-            title: 'Reflection',
+            title: 'Pause',
             body: msg,
             source_type: 'reflection',
             pause_instance_id: res.instance_id,
@@ -305,11 +306,11 @@ export function useHolzen() {
         const raw = e instanceof Error ? e.message : String(e);
         holzenLog.manual('generateMessage: error', { message: raw });
         if (raw.includes('fetch') || raw.includes('network') || raw.includes('Failed to fetch')) {
-          setError('Could not reach the reflection service. Check your connection.');
+          setError('Could not reach Holzen. Check your connection.');
         } else if (raw.includes('rate') || raw.includes('limit') || raw.includes('429')) {
           setError('Too many requests — please wait a moment and try again.');
         } else {
-          setError('AI reflection unavailable right now. Try again shortly.');
+          setError('AI pause prompt unavailable right now. Try again shortly.');
         }
       } finally {
         setLoading(false);
@@ -399,7 +400,7 @@ export function useHolzen() {
         if (raw.includes('fetch') || raw.includes('Failed to fetch')) {
           setError('Could not connect. Check your internet and try again.');
         } else {
-          setError('Reflection could not be generated right now. Try again in a moment.');
+          setError('A pause message could not be generated right now. Try again in a moment.');
         }
       }
     },
@@ -448,8 +449,8 @@ export function useHolzen() {
     lastPauseInstanceId,
     loading,
     error,
-    newReflection,
-    clearNewReflection: () => setNewReflection(false),
+    newPauseArrival,
+    clearNewPauseArrival: () => setNewPauseArrival(false),
     dismissMessage,
     manualTrigger,
     manualCooldownRemaining,
