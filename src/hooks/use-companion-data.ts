@@ -282,7 +282,7 @@ export function useCompanionData({ companions, prefs, pauseInstanceId, context, 
         // so a deliberate retry still gets through.
         if (hasInvokedIntervention(pauseInstanceId)) {
           holzenLog.companion('orchestrate intervention skipped (idempotency)', {
-            reflection_prefix: pauseInstanceId.slice(0, 8),
+            pause_instance_prefix: pauseInstanceId.slice(0, 8),
           });
           // Passive remount/idempotency skips are expected (StrictMode, quick
           // route bounces). Keep this path silent to avoid surfacing
@@ -297,7 +297,7 @@ export function useCompanionData({ companions, prefs, pauseInstanceId, context, 
 
         holzenLog.companion('orchestrate invoke (intervention only)', {
           holzenInvokeSource: 'browser_pause_intervention',
-          reflection_prefix: pauseInstanceId.slice(0, 8),
+          pause_instance_prefix: pauseInstanceId.slice(0, 8),
         });
 
         // Single-flight per `pauseInstanceId`: concurrent renders share the
@@ -330,7 +330,7 @@ export function useCompanionData({ companions, prefs, pauseInstanceId, context, 
         const body = data as Record<string, unknown> | null;
         if (!!fnError || !body || Boolean(body.error)) {
           holzenLog.companion('orchestrate intervention invoke failed', {
-            reflection_prefix: pauseInstanceId.slice(0, 8),
+            pause_instance_prefix: pauseInstanceId.slice(0, 8),
             fnError: fnError?.message ?? null,
             bodyError: typeof body?.error === 'string' ? body.error : null,
           });
@@ -347,7 +347,7 @@ export function useCompanionData({ companions, prefs, pauseInstanceId, context, 
         setInterventionLoading(false);
 
         holzenLog.companion('orchestrate intervention ok', {
-          reflection_prefix: pauseInstanceId.slice(0, 8),
+          pause_instance_prefix: pauseInstanceId.slice(0, 8),
           hasIntervention: Boolean(data.intervention),
         });
 
@@ -393,7 +393,7 @@ export function useCompanionData({ companions, prefs, pauseInstanceId, context, 
         const sigSlot = readOrchestrateSlotBody(orchestrateBody, 'signal');
         if (isFilledOrchestrateSlot(sigSlot)) {
           holzenLog.companion('hydrated signal from intervention response', {
-            reflection_prefix: pauseInstanceId.slice(0, 8),
+            pause_instance_prefix: pauseInstanceId.slice(0, 8),
             source: sigSlot.source,
             cacheRelaxation: sigSlot.cacheRelaxation ?? null,
           });
@@ -451,7 +451,7 @@ export function useCompanionData({ companions, prefs, pauseInstanceId, context, 
       holzenLog.companion('lazy fetch orchestrate invoke', {
         slot,
         holzenInvokeSource: 'browser_lazy_fetch',
-        reflection_prefix: pauseInstanceId.slice(0, 8),
+        pause_instance_prefix: pauseInstanceId.slice(0, 8),
       });
 
       const { data, error: fnError } = await supabase.functions.invoke('companion-orchestrate', {
@@ -489,7 +489,7 @@ export function useCompanionData({ companions, prefs, pauseInstanceId, context, 
         );
         holzenLog.companion('lazy fetch orchestrate failed', {
           slot,
-          reflection_prefix: pauseInstanceId.slice(0, 8),
+          pause_instance_prefix: pauseInstanceId.slice(0, 8),
           fnError: fnError?.message ?? null,
           bodyError: msg,
           bodyCode: code,
@@ -529,7 +529,7 @@ export function useCompanionData({ companions, prefs, pauseInstanceId, context, 
         applyOrchestrateSlotLazyOrRegenerate(slot, r, setCacheIds, slotCommitters, setCacheRelaxations);
         holzenLog.companion('lazy fetch slot filled', {
           slot,
-          reflection_prefix: pauseInstanceId.slice(0, 8),
+          pause_instance_prefix: pauseInstanceId.slice(0, 8),
           source: r.source,
           latencyMs: r.latencyMs,
           cacheRelaxation: r.cacheRelaxation ?? null,
@@ -538,7 +538,7 @@ export function useCompanionData({ companions, prefs, pauseInstanceId, context, 
       } else {
         holzenLog.companion('lazy fetch empty or error slot', {
           slot,
-          reflection_prefix: pauseInstanceId.slice(0, 8),
+          pause_instance_prefix: pauseInstanceId.slice(0, 8),
         });
         setErr(true);
       }
@@ -626,7 +626,7 @@ export function useCompanionData({ companions, prefs, pauseInstanceId, context, 
       holzenLog.companion('regenerate orchestrate invoke', {
         slot,
         holzenInvokeSource: 'browser_regenerate',
-        reflection_prefix: pauseInstanceId.slice(0, 8),
+        pause_instance_prefix: pauseInstanceId.slice(0, 8),
       });
 
       const { data, error: fnError } = await supabase.functions.invoke('companion-orchestrate', {
@@ -663,7 +663,7 @@ export function useCompanionData({ companions, prefs, pauseInstanceId, context, 
         );
         holzenLog.companion('regenerate orchestrate failed', {
           slot,
-          reflection_prefix: pauseInstanceId.slice(0, 8),
+          pause_instance_prefix: pauseInstanceId.slice(0, 8),
           fnError: fnError?.message ?? null,
           bodyError: typeof body?.error === 'string' ? body.error : null,
           bodyCode: code,
@@ -693,13 +693,13 @@ export function useCompanionData({ companions, prefs, pauseInstanceId, context, 
         applyOrchestrateSlotLazyOrRegenerate(slot, r, setCacheIds, slotCommitters, setCacheRelaxations);
         holzenLog.companion('regenerate slot filled', {
           slot,
-          reflection_prefix: pauseInstanceId.slice(0, 8),
+          pause_instance_prefix: pauseInstanceId.slice(0, 8),
           source: r.source,
           latencyMs: r.latencyMs,
           cacheRelaxation: r.cacheRelaxation ?? null,
         });
       } else {
-        holzenLog.companion('regenerate empty slot', { slot, reflection_prefix: pauseInstanceId.slice(0, 8) });
+        holzenLog.companion('regenerate empty slot', { slot, pause_instance_prefix: pauseInstanceId.slice(0, 8) });
         setErr(true);
       }
     } catch (e) {

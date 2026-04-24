@@ -8,8 +8,8 @@ export function logOrchestrateInvoke(
     typeof raw === "string" && /^[a-z0-9_.:-]+$/i.test(raw) && raw.length <= 48
       ? raw
       : "unknown";
-  const rid = body.reflectionId;
-  const reflectionPrefix = typeof rid === "string" && rid.length >= 8 ? rid.slice(0, 8) : null;
+  const pid = body.pauseInstanceId;
+  const pausePrefix = typeof pid === "string" && pid.length >= 8 ? pid.slice(0, 8) : null;
   const regen = body.regenerateOnly;
   try {
     console.log(
@@ -17,7 +17,7 @@ export function logOrchestrateInvoke(
         holzen_event: "orchestrate_invoke",
         invoke_source: invokeSource,
         auth_mode: authMode,
-        reflection_prefix: reflectionPrefix,
+        pause_instance_prefix: pausePrefix,
         regenerate_only: typeof regen === "string" ? regen : null,
         ts: new Date().toISOString(),
       }),

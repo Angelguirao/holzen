@@ -18,7 +18,7 @@ import {
  * These tests pin down the contract of the per-tab-session idempotency key
  * that wraps `companion-orchestrate` intervention calls:
  *
- *  - One reflectionId → at most one network call across remounts.
+ *  - One pause instance id → at most one network call across remounts.
  *  - Concurrent callers (StrictMode double-invoke, near-simultaneous
  *    remounts) share a single in-flight Promise.
  *  - The retry affordance (`resetInterventionIdempotency`) clears both
@@ -75,7 +75,7 @@ describe('orchestrate intervention idempotency', () => {
    * guarantee would silently break across remounts that disagree on
    * spelling. This test pins the canonical form: trim + lowercase.
    */
-  it('normalizes reflectionId (trim + case) so equivalent spellings share one idempotency key', async () => {
+  it('normalizes pause instance id (trim + case) so equivalent spellings share one idempotency key', async () => {
     const factory = vi.fn().mockResolvedValue({ ok: true });
     const canonical = 'a1b2c3d4-e5f6-7890-abcd-ef0123456789';
     const variants = [
@@ -245,7 +245,7 @@ describe('orchestrate intervention idempotency', () => {
 
     expect(trackEvent).toHaveBeenCalledWith(
       'intervention_idempotency_dedup',
-      expect.objectContaining({ reflection_prefix: 'r-2' }),
+      expect.objectContaining({ pause_instance_prefix: 'r-2' }),
     );
 
     resolveFactory({ ok: true });
@@ -259,7 +259,7 @@ describe('orchestrate intervention idempotency', () => {
  * 0). The idempotency layer must NOT silently lose the marker in that
  * case — otherwise the in-flight Map clears as soon as the promise
  * settles, and a remount immediately after re-fires `companion-orchestrate`
- * for the same `reflectionId`.
+   * for the same pause instance id.
  *
  * We simulate that by replacing `window.sessionStorage` with a stub whose
  * every method throws, then assert the duplicate-call guarantee still

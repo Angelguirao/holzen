@@ -110,8 +110,7 @@ interface AttemptLoggerOptions {
  * when building `AttemptLoggerOptions`. `generation_attempts.pause_instance_id`
  * is added in migration 20260423201300. Nullable; if the column hasn't been
  * applied yet the insert still succeeds (Supabase ignores unknown columns in
- * inserts when not using strict mode). The legacy `reflection_id` column was
- * dropped in the Pause V2 destructive cutover migration.
+ * inserts when not using strict mode).
  */
 export function createAttemptLogger(svcClient: any, options?: AttemptLoggerOptions) {
   let attemptOrder = 0;
