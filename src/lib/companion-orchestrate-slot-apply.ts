@@ -2,7 +2,7 @@ import type {
   CompanionOrchestrateSlotResult,
   RegenerateCompanionSlot,
 } from '@/lib/companion-orchestrate-types';
-import type { CachedHistoricalInsightShape } from '@/lib/companion-reflection-cache';
+import type { CachedHistoricalInsightShape } from '@/components/HistoricalInsightDisplay';
 import type { CompanionLibraryBookmarkParams } from '@/lib/companion-library-autosave';
 import { updateRecencyHints } from '@/lib/companion-recency-hints';
 import { hostnameFromUrl } from '@/lib/companion-url';

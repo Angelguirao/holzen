@@ -12,7 +12,6 @@ import { NightReflectionCard, useNightReflection } from '@/components/NightRefle
 import { FollowUpCard } from '@/components/FollowUpCard';
 import { ReflectionMessage } from '@/components/ReflectionMessage';
 import { HolzenNumber } from '@/components/HolzenNumber';
-import { ReflectionComparison } from '@/components/ReflectionComparison';
 import { Onboarding } from '@/components/Onboarding';
 import { HoldGoalWidget } from '@/components/HoldGoalWidget';
 import { MyWhyWidget } from '@/components/MyWhyWidget';
