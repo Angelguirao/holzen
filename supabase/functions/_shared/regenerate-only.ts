@@ -254,7 +254,7 @@ export async function handleRegenerateOnly(params: {
       let mergedRecentSignalUrls: string[] | undefined;
       try {
         const fromDb = await fetchRecentSignalCitationUrls(svcClient, userId, {
-          excludeReflectionId: pauseInstanceId,
+          excludePauseInstanceId: pauseInstanceId,
           limit: 24,
         });
         mergedRecentSignalUrls = mergeRecentSignalUrls(fromDb, clientSignalUrls, 24);
