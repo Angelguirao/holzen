@@ -89,15 +89,15 @@ serve(
     const queued: LovableEmail[] = [];
 
     for (const profile of eligible) {
-      // Check if user has reflected in the last 48 hours
+      // Check if user has a pause in the last 48 hours
       const { data: recentReflections } = await supabase
-        .from("reflections")
+        .from("pause_instances")
         .select("id")
         .eq("user_id", profile.user_id)
         .gte("created_at", cutoff)
         .limit(1);
 
-      // If they have recent reflections, skip
+      // If they have a recent pause, skip
       if (recentReflections && recentReflections.length > 0) continue;
 
       // Get user email

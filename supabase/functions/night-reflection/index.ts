@@ -115,8 +115,11 @@ async function generateAIMessage(
     : "No mood data this week.";
 
   const reflectionSummary = recentReflections.length > 0
-    ? recentReflections.map((r, i) => `${i + 1}. Context: "${r.context || 'none'}" | Mood: ${r.mood || 'unknown'} → ${r.mood_after || '?'} | Decision: ${r.outcome || 'pending'}`).join("\n")
-    : "No reflections today.";
+    ? recentReflections.map((r, i) => {
+        const ctx = (r.context_snapshot?.context_text as string | undefined) || r.context || 'none';
+        return `${i + 1}. Context: "${ctx}" | Mood: ${r.initial_mood || 'unknown'} → ${r.shift_mood || '?'} | Decision: ${r.outcome || 'pending'}`;
+      }).join("\n")
+    : "No pauses today.";
 
   const systemPrompt = `You are Holzen's night reflection companion — a calm, wise presence that helps Bitcoin holders build emotional composure.
 
@@ -293,41 +296,43 @@ serve(
       todayStart.setHours(0, 0, 0, 0);
 
       const [
-        { data: todayReflections },
-        { data: recentMoodEntries },
-        { data: streakReflections },
+        { data: todayPauses },
+        { data: recentMoodEvents },
+        { data: streakPauses },
       ] = await Promise.all([
         supabase
-          .from("reflections")
-          .select("context, mood, mood_after, outcome, message")
+          .from("v_pause_full")
+          .select("context_snapshot, initial_mood, shift_mood, outcome, reflection_text")
           .eq("user_id", profile.user_id)
           .gte("created_at", todayStart.toISOString())
           .order("created_at", { ascending: false })
           .limit(5),
         supabase
-          .from("reflections")
-          .select("mood")
+          .from("pause_step_events")
+          .select("payload")
           .eq("user_id", profile.user_id)
+          .eq("step_type", "initial_emotion_logged")
           .gte("created_at", new Date(Date.now() - 7 * 86400000).toISOString())
-          .not("mood", "is", null)
           .order("created_at", { ascending: false })
           .limit(20),
         supabase
-          .from("reflections")
+          .from("pause_instances")
           .select("created_at")
           .eq("user_id", profile.user_id)
           .gte("created_at", new Date(Date.now() - 30 * 86400000).toISOString())
           .order("created_at", { ascending: false }),
       ]);
 
-      const hadReflection = (todayReflections?.length ?? 0) > 0;
-      const recentMoods = (recentMoodEntries ?? []).map((r: any) => r.mood).filter(Boolean);
+      const hadReflection = (todayPauses?.length ?? 0) > 0;
+      const recentMoods = (recentMoodEvents ?? [])
+        .map((r: any) => r.payload?.mood)
+        .filter((m: unknown): m is string => typeof m === "string");
 
-      // Calculate streak (consecutive days with at least one reflection)
+      // Calculate streak (consecutive days with at least one pause)
       let streakDays = 0;
-      if (streakReflections && streakReflections.length > 0) {
+      if (streakPauses && streakPauses.length > 0) {
         const daySet = new Set(
-          streakReflections.map((r: any) => new Date(r.created_at).toISOString().slice(0, 10))
+          streakPauses.map((r: any) => new Date(r.created_at).toISOString().slice(0, 10))
         );
         const today = new Date();
         for (let i = 0; i < 30; i++) {
@@ -351,7 +356,7 @@ serve(
           btc.absChange,
           btc.direction,
           hadReflection,
-          todayReflections ?? [],
+          todayPauses ?? [],
           recentMoods,
           streakDays,
           tone,

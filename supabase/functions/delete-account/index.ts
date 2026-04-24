@@ -109,7 +109,9 @@ serve(
     }
 
     // Delete all user data from every table.
-    // Order: dependent tables first (collection_items before collections, library_items before reflections).
+    // Pause V2 tables (pause_instances / pause_step_events /
+    // pause_companion_events / pause_ai_artifacts) already cascade from
+    // auth.users(id); explicit deletes here keep the order obvious.
     await serviceClient
       .from("collection_items")
       .delete()
@@ -139,9 +141,12 @@ serve(
       serviceClient.from("push_subscriptions").delete().eq("user_id", userId),
       serviceClient.from("referral_rewards").delete().eq("user_id", userId),
       serviceClient.from("referrals").delete().eq("referrer_id", userId),
+      serviceClient.from("pause_ai_artifacts").delete().eq("user_id", userId),
+      serviceClient.from("pause_step_events").delete().eq("user_id", userId),
+      serviceClient.from("pause_companion_events").delete().eq("user_id", userId),
+      serviceClient.from("pause_instances").delete().eq("user_id", userId),
     ]);
 
-    await serviceClient.from("reflections").delete().eq("user_id", userId);
     await serviceClient.from("profiles").delete().eq("user_id", userId);
 
     const { error: deleteError } = await serviceClient.auth.admin.deleteUser(userId);

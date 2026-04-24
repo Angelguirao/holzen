@@ -110,8 +110,8 @@ serve(
     const langName = LANG_NAMES[langCode] || "English";
 
     const { data: reflections } = await sb
-      .from("reflections")
-      .select("message, context, mood, outcome, created_at")
+      .from("v_pause_full")
+      .select("reflection_text, context_snapshot, initial_mood, outcome, created_at")
       .eq("user_id", user.id)
       .order("created_at", { ascending: false })
       .limit(5);
@@ -125,7 +125,10 @@ serve(
       .limit(3);
 
     const contextBlock = reflections?.length
-      ? `Recent reflections:\n${reflections.map((r: any) => `- [${r.context ?? "no context"}] ${r.message} (mood: ${r.mood ?? "unknown"}, outcome: ${r.outcome ?? "pending"})`).join("\n")}`
+      ? `Recent reflections:\n${reflections.map((r: any) => {
+          const ctx = r.context_snapshot?.context_text ?? "no context";
+          return `- [${ctx}] ${r.reflection_text ?? ""} (mood: ${r.initial_mood ?? "unknown"}, outcome: ${r.outcome ?? "pending"})`;
+        }).join("\n")}`
       : "No recent reflections available.";
 
     const recentPromptsBlock = recentJournals?.length
