@@ -108,14 +108,23 @@ CREATE TABLE IF NOT EXISTS public.pause_instances (
   superseded_by uuid REFERENCES public.pause_instances(id) ON DELETE SET NULL,
   dismissed_by_user boolean NOT NULL DEFAULT false,
   metadata jsonb NOT NULL DEFAULT '{}'::jsonb,
-  -- Temporal invariants: engaged/completed/terminal_at implied by state
+  -- Temporal invariants:
+  -- * window_ends_at must be strictly after window_starts_at;
+  -- * state='active' must have engaged_at IS NULL; state='engaged' must
+  --   have engaged_at set; state='completed' must have both engaged_at
+  --   and completed_at set; dismissed/expired may have either depending
+  --   on whether the instance was engaged before ending;
+  -- * terminal_at is set iff state is terminal (completed|dismissed|expired);
+  -- * expired_reason is set iff state='expired'.
   CONSTRAINT pause_instances_window_bounds CHECK (window_ends_at > window_starts_at),
-  CONSTRAINT pause_instances_engaged_ts CHECK (
-    (state IN ('active') AND engaged_at IS NULL)
-    OR (state IN ('engaged','completed','dismissed','expired'))
+  CONSTRAINT pause_instances_active_no_engaged CHECK (
+    state <> 'active' OR engaged_at IS NULL
+  ),
+  CONSTRAINT pause_instances_engaged_has_engaged_at CHECK (
+    state <> 'engaged' OR engaged_at IS NOT NULL
   ),
   CONSTRAINT pause_instances_completed_ts CHECK (
-    (state = 'completed' AND completed_at IS NOT NULL)
+    (state = 'completed' AND completed_at IS NOT NULL AND engaged_at IS NOT NULL)
     OR (state <> 'completed' AND completed_at IS NULL)
   ),
   CONSTRAINT pause_instances_terminal_ts CHECK (

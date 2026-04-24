@@ -228,57 +228,104 @@ const Settings = forwardRef<HTMLDivElement>(function Settings(_props, ref) {
     if (!user) return;
     setExporting(true);
     try {
-      const [{ data: profile }, { data: reflections }] = await Promise.all([
+      // Pull V2 rows: instance + hydrated fields from v_pause_full,
+      // step events, companion events, artifacts. The CSV is
+      // instance-level (flat); the JSON includes everything.
+      const [
+        { data: profile },
+        { data: pauses },
+        { data: stepEvents },
+        { data: companionEvents },
+        { data: artifacts },
+      ] = await Promise.all([
         supabase.from('profiles').select('*').eq('user_id', user.id).single(),
-        (supabase.from('v_reflection_with_companions').select('*').eq('user_id', user.id).order('created_at', { ascending: false }) as any),
+        supabase
+          .from('v_pause_full' as never)
+          .select('*')
+          .eq('user_id', user.id)
+          .order('created_at', { ascending: false }),
+        supabase
+          .from('pause_step_events' as never)
+          .select('pause_instance_id, step_type, payload, created_at')
+          .eq('user_id', user.id),
+        supabase
+          .from('pause_companion_events' as never)
+          .select(
+            'pause_instance_id, companion_type, action, counts_for_pause, non_counting_reason, entry_point, created_at',
+          )
+          .eq('user_id', user.id),
+        supabase
+          .from('pause_ai_artifacts' as never)
+          .select('pause_instance_id, kind, content, created_at')
+          .eq('user_id', user.id),
       ]);
 
+      const pauseRows = (pauses ?? []) as any[];
       const dateStr = new Date().toISOString().slice(0, 10);
 
       if (format === 'csv') {
-        const refHeaders = ['created_at', 'message', 'context', 'mood', 'outcome', 'note', 'tags', 'haiku', 'is_favorite'];
-        const refRows = (reflections ?? []).map((r: any) =>
-          refHeaders.map(h => {
-            const val = h === 'tags' ? (r[h] ?? []).join('; ') : (r[h] ?? '');
-            return `"${String(val).replace(/"/g, '""')}"`;
-          }).join(',')
+        const refHeaders = [
+          'created_at',
+          'state',
+          'initial_mood',
+          'shift_mood',
+          'outcome',
+          'note_text',
+          'tags',
+          'is_favorite',
+          'counted_companion_types',
+          'reflection_text',
+        ];
+        const refRows = pauseRows.map((r) =>
+          refHeaders
+            .map((h) => {
+              const val = Array.isArray(r[h]) ? r[h].join('; ') : r[h] ?? '';
+              return `"${String(val).replace(/"/g, '""')}"`;
+            })
+            .join(','),
         );
         const refCsv = [refHeaders.join(','), ...refRows].join('\n');
 
         const refBlob = new Blob([refCsv], { type: 'text/csv' });
         const refUrl = URL.createObjectURL(refBlob);
         const a1 = document.createElement('a');
-        a1.href = refUrl; a1.download = `holzen-reflections-${dateStr}.csv`; a1.click();
+        a1.href = refUrl;
+        a1.download = `holzen-pauses-${dateStr}.csv`;
+        a1.click();
         URL.revokeObjectURL(refUrl);
 
-        toast.success('CSV exported', { description: `${reflections?.length ?? 0} pauses.` });
+        toast.success('CSV exported', { description: `${pauseRows.length} pauses.` });
       } else {
         const exportPayload = {
           exported_at: new Date().toISOString(),
-          profile: profile ? {
-            threshold: profile.threshold,
-            threshold_down: profile.threshold_down,
-            cooldown_hours: profile.cooldown_hours,
-            reflection_tone: profile.reflection_tone,
-            reflection_style: profile.reflection_style,
-            language: profile.language,
-            email_notifications: profile.email_notifications,
-            created_at: profile.created_at,
-          } : null,
-          reflections: (reflections ?? []).map((r: any) => ({
-            message: r.message, context: r.context, mood: r.mood, outcome: r.outcome,
-            note: r.note, tags: r.tags, haiku: r.haiku, is_favorite: r.is_favorite,
-            grounding_title: r.grounding_title, grounding_body: r.grounding_body,
-            signal_title: r.signal_title, signal_body: r.signal_body, created_at: r.created_at,
-          })),
+          profile: profile
+            ? {
+                threshold: profile.threshold,
+                threshold_down: profile.threshold_down,
+                cooldown_hours: profile.cooldown_hours,
+                reflection_tone: profile.reflection_tone,
+                reflection_style: profile.reflection_style,
+                language: profile.language,
+                email_notifications: profile.email_notifications,
+                created_at: profile.created_at,
+              }
+            : null,
+          pauses: pauseRows,
+          step_events: stepEvents ?? [],
+          companion_events: companionEvents ?? [],
+          ai_artifacts: artifacts ?? [],
         };
 
-        const blob = new Blob([JSON.stringify(exportPayload, null, 2)], { type: 'application/json' });
+        const blob = new Blob([JSON.stringify(exportPayload, null, 2)], {
+          type: 'application/json',
+        });
         const url = URL.createObjectURL(blob);
         const a = document.createElement('a');
-        a.href = url; a.download = `holzen-export-${dateStr}.json`; a.click();
+        a.href = url;
+        a.download = `holzen-export-${dateStr}.json`;
+        a.click();
         URL.revokeObjectURL(url);
-        toast.success('Data exported', { description: `${reflections?.length ?? 0} pauses.` });
+        toast.success('Data exported', { description: `${pauseRows.length} pauses.` });
       }
     } catch {
       toast.error('Export failed');

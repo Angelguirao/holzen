@@ -102,21 +102,13 @@ export interface RecentContentRow {
 export interface SessionRow {
   id: string;
   created_at: string;
-  message: string;
-  context: string | null;
-  mood: string | null;
+  state: string;
+  reflection_text: string | null;
+  context_snapshot: Record<string, unknown> | null;
+  initial_mood: string | null;
   outcome: string | null;
-  signal_title: string | null;
-  signal_source: string | null;
-  grounding_title: string | null;
-  history_insight_data: any;
-  zoom_out_data: any;
-  haiku: string | null;
-  /** From companion_serves (admin RLS); null for non-admins or pre-tracking rows */
-  serve_source_signal?: string | null;
-  serve_source_ground_nudge?: string | null;
-  serve_source_historical_insight?: string | null;
-  serve_source_zoom_out?: string | null;
+  haiku_text: string | null;
+  counted_companion_types: string[] | null;
 }
 
 export interface LibraryEntryRow {
@@ -415,10 +407,12 @@ export function useAdminStats(enabled = true): AdminStats {
       .limit(20);
     setRecentContent((contentData ?? []) as RecentContentRow[]);
 
-    // Recent sessions (last 20 reflections)
+    // Recent sessions (last 20 completed pauses).
     const { data: sessionData } = await (supabase
-      .from('v_reflection_with_companions')
-      .select('id, created_at, message, context, mood, outcome, signal_title, signal_source, grounding_title, history_insight_data, zoom_out_data, haiku, serve_source_signal, serve_source_ground_nudge, serve_source_historical_insight, serve_source_zoom_out')
+      .from('v_pause_full' as never)
+      .select(
+        'id, created_at, state, reflection_text, context_snapshot, initial_mood, outcome, haiku_text, counted_companion_types',
+      )
       .order('created_at', { ascending: false })
       .limit(20) as any);
     setSessions((sessionData ?? []) as SessionRow[]);

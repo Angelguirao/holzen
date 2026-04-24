@@ -155,11 +155,16 @@ DECLARE
   v_now timestamptz := now();
   v_window_end timestamptz;
 BEGIN
-  IF v_uid IS NULL AND v_role <> 'service_role' THEN
-    RAISE EXCEPTION 'pause_create_or_reuse: not authorized';
+  IF v_uid IS NULL THEN
+    -- Base RPC requires an authenticated caller; service_role goes through
+    -- pause_create_or_reuse_as (which takes an explicit user_id).
+    RAISE EXCEPTION 'pause_create_or_reuse: authenticated user required (service_role -> pause_create_or_reuse_as)';
   END IF;
 
   PERFORM pg_advisory_xact_lock(hashtextextended(v_uid::text, 0));
+
+  -- v_role is read but not used beyond the defense above; suppress unused-var warn.
+  PERFORM v_role;
 
   SELECT * INTO v_tpl FROM public.pause_templates WHERE slug = p_template_slug AND active = true;
   IF NOT FOUND THEN

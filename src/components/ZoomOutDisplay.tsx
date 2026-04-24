@@ -113,7 +113,7 @@ export function ZoomOutDisplay({ data, loading, error, onRetry }: Props) {
       return;
     }
     navigate('/practice/replay', {
-      state: { reflectionId: echo.id, returnTo: location.pathname + location.search },
+      state: { pauseInstanceId: echo.id, returnTo: location.pathname + location.search },
     });
   };
 

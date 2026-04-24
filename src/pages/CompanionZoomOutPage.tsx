@@ -179,7 +179,7 @@ export default function CompanionZoomOutPage() {
           </div>
         )}
 
-        <HistoryThread companion="zoomOut" currentReflectionId={pauseInstanceId} />
+        <HistoryThread companion="zoomOut" currentPauseInstanceId={pauseInstanceId} />
       </div>
     </CompanionFocusLayout>
   );

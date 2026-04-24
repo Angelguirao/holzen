@@ -190,11 +190,11 @@ export default function CompanionGroundingPage() {
         )}
 
         <RelatedBiasesThisMonth
-          currentReflectionId={pauseInstanceId}
+          currentPauseInstanceId={pauseInstanceId}
           currentTitle={nudge?.title ?? null}
         />
 
-        <HistoryThread companion="grounding" currentReflectionId={pauseInstanceId} />
+        <HistoryThread companion="grounding" currentPauseInstanceId={pauseInstanceId} />
       </div>
     </CompanionFocusLayout>
   );

@@ -179,7 +179,7 @@ export default function CompanionHistoryPage() {
           </div>
         )}
 
-        <HistoryThread companion="history" currentReflectionId={pauseInstanceId} />
+        <HistoryThread companion="history" currentPauseInstanceId={pauseInstanceId} />
       </div>
     </CompanionFocusLayout>
   );

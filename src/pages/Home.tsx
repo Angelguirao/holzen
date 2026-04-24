@@ -9,7 +9,6 @@ import AuthLoading from '@/components/AuthLoading';
 import { useSubscription } from '@/hooks/use-subscription';
 import { BtcStatus } from '@/components/BtcStatus';
 import { NightReflectionCard, useNightReflection } from '@/components/NightReflectionCard';
-import { FollowUpCard } from '@/components/FollowUpCard';
 import { ReflectionMessage } from '@/components/ReflectionMessage';
 import { HolzenNumber } from '@/components/HolzenNumber';
 import { Onboarding } from '@/components/Onboarding';
@@ -189,28 +188,70 @@ const Home = () => {
     [order, reorder],
   );
 
-  // Load pinned reflection
+  // Load pinned pause (legacy key name retained for localStorage back-compat).
   useEffect(() => {
     if (!user) return;
     const pinnedId = localStorage.getItem('holzen_pinned_reflection');
     if (!pinnedId) return;
-    supabase
-      .from('v_reflection_with_companions')
-      .select('id, message, context, haiku, grounding_title, grounding_body')
-      .eq('id', pinnedId)
-      .eq('user_id', user.id)
-      .single()
-      .then(({ data }) => {
-        if (data) setPinnedReflection(data as unknown as PinnedReflection);
-        else localStorage.removeItem('holzen_pinned_reflection');
+    let cancelled = false;
+    void (async () => {
+      const { data: inst } = await supabase
+        .from('pause_instances' as never)
+        .select('id, context_snapshot')
+        .eq('id', pinnedId)
+        .eq('user_id', user.id)
+        .maybeSingle();
+      if (cancelled) return;
+      if (!inst) {
+        localStorage.removeItem('holzen_pinned_reflection');
+        return;
+      }
+      const { data: artifacts } = await supabase
+        .from('pause_ai_artifacts' as never)
+        .select('kind, content')
+        .eq('pause_instance_id', pinnedId);
+      if (cancelled) return;
+      let message = '';
+      let haiku: string | null = null;
+      let groundingTitle: string | null = null;
+      let groundingBody: string | null = null;
+      for (const a of ((artifacts ?? []) as Array<{ kind: string; content: Record<string, unknown> }>)) {
+        if (a.kind === 'reflection_text' && typeof a.content?.message === 'string') {
+          message = a.content.message as string;
+        } else if (a.kind === 'haiku' && typeof a.content?.haiku === 'string') {
+          haiku = a.content.haiku as string;
+        } else if (a.kind === 'ground_nudge') {
+          if (typeof a.content?.title === 'string') groundingTitle = a.content.title as string;
+          if (typeof a.content?.body === 'string') groundingBody = a.content.body as string;
+        }
+      }
+      const ctxSnap = ((inst as { context_snapshot: Record<string, unknown> | null }).context_snapshot ?? {}) as Record<string, unknown>;
+      const context = typeof ctxSnap.context_text === 'string' ? (ctxSnap.context_text as string) : null;
+      setPinnedReflection({
+        id: pinnedId,
+        message,
+        context,
+        haiku,
+        grounding_title: groundingTitle,
+        grounding_body: groundingBody,
       });
+    })();
+    return () => {
+      cancelled = true;
+    };
   }, [user]);
 
-  // Fetch reflection count for testimonial prompt
+  // Fetch completed-pause count for testimonial prompt.
   useEffect(() => {
     if (!user) return;
-    supabase.from('reflections').select('id', { count: 'exact', head: true }).eq('user_id', user.id)
-      .then(({ count }) => { if (count != null) setReflectionCount(count); });
+    supabase
+      .from('pause_instances' as never)
+      .select('id', { count: 'exact', head: true })
+      .eq('user_id', user.id)
+      .eq('state', 'completed')
+      .then(({ count }: { count: number | null }) => {
+        if (count != null) setReflectionCount(count);
+      });
   }, [user]);
 
   const togglePriceHidden = useCallback(() => {
@@ -501,7 +542,6 @@ const Home = () => {
               <BulkHoldCard />
 
               {/* 24h follow-up check-in */}
-              <FollowUpCard />
 
               {!subLoading && !hasAccess ? (
                 <div className="space-y-3">

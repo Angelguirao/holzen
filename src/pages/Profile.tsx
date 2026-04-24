@@ -141,25 +141,15 @@ const Profile = () => {
   useEffect(() => {
     if (!user) return;
     const loadReflections = async () => {
-      let offset = 0;
-      const allRows: Reflection[] = [];
-
-      while (true) {
-        const { data } = await (supabase
-          .from('v_reflection_with_companions')
-          .select('id, message, context, created_at, is_favorite, haiku, grounding_title, grounding_body, note, mood, mood_after, outcome, tags, breathing_completed, haiku_read, grounding_read, signal_read, signal_source, zoom_out_read, history_read')
-          .eq('user_id', user.id)
-          .order('created_at', { ascending: false })
-          .range(offset, offset + REFLECTIONS_PAGE_SIZE - 1));
-
-        const pageRows = (data as unknown as Reflection[]) ?? [];
-        allRows.push(...pageRows);
-
-        if (pageRows.length < REFLECTIONS_PAGE_SIZE) break;
-        offset += REFLECTIONS_PAGE_SIZE;
-      }
-
-      setReflections(allRows);
+      // Only the count is used downstream (AIInsightsPanel). Count completed
+      // pauses directly — avoids pulling every row client-side.
+      const { count } = await supabase
+        .from('pause_instances' as never)
+        .select('id', { count: 'exact', head: true })
+        .eq('user_id', user.id)
+        .eq('state', 'completed');
+      const n = count ?? 0;
+      setReflections(new Array(n).fill(null).map((_, i) => ({ id: `p${i}` } as Reflection)));
       setLoading(false);
     };
     const loadLetters = async () => {
