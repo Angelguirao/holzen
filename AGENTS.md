@@ -26,6 +26,9 @@ Instructions for AI assistants and automation working in this repository (e.g. C
 |------|----------|
 | Routes | `src/App.tsx` — `ProtectedRoute` / `PublicOnlyRoute`, layout vs full-screen routes |
 | Page screens | `src/pages/` |
+| Pause lifecycle | `src/lib/pause-state.ts` (state machine helpers), `src/lib/pause-api.ts` (typed RPC wrappers), `src/lib/pause-quality.ts` (quality score), `src/lib/pause-fingerprint.ts`, `src/lib/pause-artifact-cache.ts`. Canonical model: [docs/systems/pause-system.md](docs/systems/pause-system.md). Schema + RPCs: `supabase/migrations/20260423200{700..750}_pause_*.sql` + `20260423201000_pause_rpc_functions.sql` + `20260423201200_pause_create_or_reuse_service.sql`. |
+| Stats | `src/components/stats/` (skills-first IA post-Pause-V2). Hero: `SkillOverviewCard.tsx`. Deep dives under `src/components/stats/{regulation,tolerance,alignment,reappraisal,awareness}/`. Journey under `src/components/stats/journey/`. Advanced under `src/components/stats/advanced/`. Score: `src/lib/stats/pause-score.ts`. Confidence: `src/lib/stats/confidence.ts`. Loader: `src/hooks/use-pause-stats-data.ts`. |
+| Badges | `src/components/BadgesPanelV2.tsx` (4-family / 14-active). Definitions: `src/lib/badges/definitions.ts`. Computation: `src/lib/badges/compute.ts`. Sync + celebration + silent-seed: `src/hooks/use-badge-sync.ts`. |
 | Shared UI | `src/components/`; primitives in `src/components/ui/` (shadcn / Radix patterns) |
 | Auth state | `src/hooks/use-auth.tsx` + `AuthProvider` in `App.tsx` |
 | Supabase browser client | `src/integrations/supabase/client.ts` |

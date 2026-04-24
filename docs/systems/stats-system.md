@@ -1,6 +1,19 @@
-# Stats System (Current App Order)
+# Stats System
 
-This document explains the metrics shown **today** in `Profile > Stats`, in the same order the UI renders them.
+> **Status:** the "Recommended target model (skills-first)" at the bottom of
+> this doc is **shipped**. `Profile > Stats` renders
+> [`StatsContentV2`](../../src/components/stats/StatsContentV2.tsx) with all
+> 13 deep-dive / Journey / Advanced cards, reading exclusively from
+> `v_pause_full` + `pause_step_events` + `pause_companion_events`. See
+> [`pause-system.md`](pause-system.md) §9 for the data flow.
+>
+> The "Current App Order" section below is retained as historical context —
+> it describes the legacy layout that ran on `reflections` and was removed
+> in the Pause V2 cutover.
+
+## Current App Order (legacy, removed in Pause V2)
+
+This document explains the metrics shown **before the Pause V2 cutover** in `Profile > Stats`, in the same order the UI rendered them.
 
 ## Counting rules used today
 

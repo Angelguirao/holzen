@@ -42,6 +42,23 @@ The authoritative list of PostHog events Holzen emits. Deliberate events only �
 
 Note: never send the message text, prompt text, or companion content.
 
+### pause (V2 lifecycle)
+
+All six events share a `pause_instance_id` super-property so PostHog can
+stitch a user journey across creation → engagement → completion / expiry,
+and pivot against Sentry + BetterStack using the same id.
+
+| Event | When | Properties | Owner |
+|---|---|---|---|
+| `pause_instance_created` | A `pause_instances` row lands in state `active` (manual hook or cron). | `{ pause_instance_id; template_slug; source: 'manual' \| 'cron_volatility' \| …; severity: 'mild' \| 'moderate' \| 'high' }` | @holzen |
+| `pause_engaged` | Transition `active → engaged` (both start gates met). | `{ pause_instance_id; ms_since_created: number }` | @holzen |
+| `pause_completed` | Transition to `completed` (strict gates met, ≥1 counted companion). | `{ pause_instance_id; ms_since_created: number; counted_companion_count: number }` | @holzen |
+| `pause_expired` | Sweeper or explicit expire. | `{ pause_instance_id; reason: 'context_lost' \| 'window_elapsed' \| 'superseded' \| 'ineligible_user_state' \| 'system_cancelled' }` | @holzen |
+| `pause_companion_counted` | Companion complete event with `counts_for_pause=true`. | `{ pause_instance_id; companion_type; entry_point: 'pause_flow' \| 'library' \| 'bell' \| 'admin_preview' }` | @holzen |
+| `pause_companion_not_counted` | Companion complete event with `counts_for_pause=false`. | `{ pause_instance_id?: string; companion_type; reason: 'no_active_pause' \| 'outside_window' \| 'context_lost' \| 'not_allowed_for_template' \| 'already_counted'; entry_point }` | @holzen |
+
+PII stance unchanged: no reflection text, no companion content, no mood/outcome payload values — just ids, types, and numeric metadata.
+
 ### generation
 
 | Event | When | Properties | Owner |
