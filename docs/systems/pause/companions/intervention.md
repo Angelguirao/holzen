@@ -1,5 +1,14 @@
 # Intervention (end-to-end)
 
+> **Pause V2 note:** this document predates the Pause V2 cutover and
+> still describes the legacy `reflections` / `reflection_companions`
+> model. The canonical runtime now lives on `pause_instances` + event
+> tables + `pause_ai_artifacts`. See [`pause-system.md`](../../pause-system.md)
+> for the current data flow; the per-companion pages below are retained
+> for historical context until each is rewritten.
+>
+
+
 The **intervention** is the featured cognitive headline at the top of the pause UI (`InterventionSection`). It is **not** a companion card — it is a separate concept that sits above the companion card grid.
 
 This page is the **intervention-level** view. For the full **orchestrator** contract, **companion cards**, **cost limits**, and the **end-to-end pipeline**, see the system doc: **[AI-powered pause system](../ai-powered-pause-system.md)** (especially **§5** `companion-orchestrate`, **§5.2** intervention selection, **§7** per-type reference).

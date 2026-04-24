@@ -1,5 +1,14 @@
 # Grounding companion (end-to-end)
 
+> **Pause V2 note:** this document predates the Pause V2 cutover and
+> still describes the legacy `reflections` / `reflection_companions`
+> model. The canonical runtime now lives on `pause_instances` + event
+> tables + `pause_ai_artifacts`. See [`pause-system.md`](../../pause-system.md)
+> for the current data flow; the per-companion pages below are retained
+> for historical context until each is rewritten.
+>
+
+
 **Grounding** (also called **Ground** in the UI) is the pause **card** that surfaces a short **behavioral finance nudge**: a research-grounded insight about a cognitive bias relevant to the current market situation, with an academic citation.
 
 This page is the **companion-level** view. For **manual vs automatic pause**, **interventions**, **cost limits**, and the full **orchestrator** contract, see the system doc: **[AI-powered pause system](../ai-powered-pause-system.md)** (especially **§5** `companion-orchestrate`, **§6** generators, **§7.7** Grounding reference table).

@@ -1,5 +1,14 @@
 # Past reflections (user-words read model)
 
+> **Pause V2 note:** this document predates the Pause V2 cutover and
+> still describes the legacy `reflections` / `reflection_companions`
+> model. The canonical runtime now lives on `pause_instances` + event
+> tables + `pause_ai_artifacts`. See [`pause-system.md`](../pause-system.md)
+> for the current data flow; the per-companion pages below are retained
+> for historical context until each is rewritten.
+>
+
+
 A **shared read model** for surfacing a user's **own words from a past pause**. Used by two surfaces:
 
 | Surface | Where | Uses |
