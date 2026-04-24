@@ -127,7 +127,7 @@ async function sendNotificationEmail(
     </html>
   `;
 
-  // Each reflection has a unique UUID — perfect idempotency key. A retry of
+  // Each pause instance has a unique UUID — perfect idempotency key. A retry of
   // the same volatility cron (or a double-fire from pg_cron) never produces
   // a duplicate email within Lovable Email's idempotency window.
   const result = await sendLovableEmailMessage(

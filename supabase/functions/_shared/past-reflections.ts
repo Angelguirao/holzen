@@ -1,5 +1,5 @@
 /**
- * Edge-side read model for the "past reflection with user words" feature.
+ * Edge-side read model for the "past pause with user words" (Echo) feature.
  *
  * Reads `v_pause_full` for completed pauses older than `cutoffDays` and
  * joins them with `pause_step_events(step_type='note_updated')` entries

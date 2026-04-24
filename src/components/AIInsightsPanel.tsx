@@ -59,10 +59,11 @@ const SENTIMENT_STYLES: Record<string, string> = {
 };
 
 interface Props {
-  reflectionCount: number;
+  /** Completed pause instances (used for minimum-data gate and progress copy). */
+  completedPauseCount: number;
 }
 
-export function AIInsightsPanel({ reflectionCount }: Props) {
+export function AIInsightsPanel({ completedPauseCount }: Props) {
   const { t } = useTranslation();
   const { user } = useAuth();
   const { language } = useHolzen();
@@ -199,12 +200,12 @@ export function AIInsightsPanel({ reflectionCount }: Props) {
     );
   }
 
-  if (reflectionCount < 5) {
+  if (completedPauseCount < 5) {
     return (
       <div className="py-8 text-center space-y-2">
         <Brain className="h-5 w-5 mx-auto text-muted-foreground/40" />
         <p className="text-xs text-muted-foreground">
-          {t('aiInsights.needMinReflections', { count: reflectionCount })}
+          {t('aiInsights.needMinReflections', { count: completedPauseCount })}
         </p>
       </div>
     );
@@ -256,7 +257,7 @@ export function AIInsightsPanel({ reflectionCount }: Props) {
         <div className="py-6 text-center space-y-3">
           <Loader2 className="h-5 w-5 mx-auto text-muted-foreground animate-spin" />
           <p className="text-xs font-mono text-muted-foreground">
-            {t('aiInsights.analyzingCount', { count: reflectionCount })}
+            {t('aiInsights.analyzingCount', { count: completedPauseCount })}
           </p>
         </div>
       )}
