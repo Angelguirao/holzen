@@ -1,11 +1,8 @@
 # Pause companions and intervention (deep dives)
 
-> **Pause V2 note:** this document predates the Pause V2 cutover and
-> still describes the legacy `reflections` / `reflection_companions`
-> model. The canonical runtime now lives on `pause_instances` + event
-> tables + `pause_ai_artifacts`. See [`pause-system.md`](../../pause-system.md)
-> for the current data flow; the per-companion pages below are retained
-> for historical context until each is rewritten.
+> **Pause V2:** Companion payloads are stored in `pause_ai_artifacts`
+> (one row per `pause_instance_id` + `kind`). Legacy `reflection_companions`
+> storage was removed in the V2 cutover.
 >
 
 

@@ -1,12 +1,8 @@
 # Signal companion (end-to-end)
 
-> **Pause V2 note:** this document predates the Pause V2 cutover and
-> still describes the legacy `reflections` / `reflection_companions`
-> model. The canonical runtime now lives on `pause_instances` + event
-> tables + `pause_ai_artifacts`. See [`pause-system.md`](../../pause-system.md)
-> for the current data flow; the per-companion pages below are retained
-> for historical context until each is rewritten.
->
+> **Pause V2:** This doc reflects the current model. Companion payloads
+> are stored in `pause_ai_artifacts` (one row per `pause_instance_id` + `kind`);
+> legacy `reflection_companions` storage was removed in the V2 cutover.
 
 
 **Signal** is the pause **card** that surfaces a short **cognitive reappraisal** snippet: title, body, and a real **citation URL**, grounded in Bitcoin-focused writing (not trading hype).
@@ -17,9 +13,9 @@ This page is the **companion-level** view. For **manual vs automatic pause**, **
 
 ## 1. Where Signal sits in the pipeline
 
-1. User completes reflection; when the user **taps the Signal card**, **`use-companion-data`** invokes **`companion-orchestrate`** with `enableSignal: true` (lazy loading). If Signal data is already cached in `reflection_companions`, it is hydrated from DB without a network call.
+1. User completes reflection; when the user **taps the Signal card**, **`use-companion-data`** invokes **`companion-orchestrate`** with `enableSignal: true` (lazy loading). If Signal data is already cached in `pause_ai_artifacts`, it is hydrated from DB without a network call.
 2. **`companion-orchestrate`** runs **`generateSignal`** in `_shared/generators/signal.ts` when **`enableSignal`** is true, passing **context**, **session intent** (`searchAngle`), **signal source catalog** hints, and **recency dedup** fields from the client.
-3. **`generateSignal`** returns structured Signal payload; the orchestrator **writes** **`reflection_companions`** (canonical) and **`companion_serves`** — not duplicate Signal columns on **`reflections`** (legacy `signal_*` columns exist but are **deprecated and no longer populated**; only **Grounding** still denormalizes to **`reflections.grounding_*`** for Home). The compatibility view **`v_reflection_with_companions`** can still expose `signal_url` as a computed alias for reads.
+3. **`generateSignal`** returns structured Signal payload; the orchestrator **writes** **`pause_ai_artifacts`** (canonical) and **`companion_serves`** for analytics.
 
 Signal is **not** a primary **intervention** type (mirror / trap / pattern / question); it is always a **companion card** when the user enables it. See **§7.8** in the [system doc](../ai-powered-pause-system.md).
 
@@ -87,7 +83,7 @@ Signal’s design problem splits into **(a)** “is this a good Bitcoin cognitiv
 | **Retrieval settings** | Perplexity **`temperature`**, **`top_p`**, and **`web_search_options.search_context_size`** widen or sharpen web results relative to defaults (cost vs variety tradeoff). |
 | **Catalog / domains** | Optional user catalog → **shuffled** hostname allowlist for **`search_domain_filter`**; empty catalog → open web (unless **`SIGNAL_DOMAIN_DENYLIST`** is extended in code). Shuffling avoids always searching the same subset of hosts. |
 | **Query variation** | Each live run appends a **random exploration facet** (short sub-theme) to the user message so similar market **context** does not always yield the same search. Facets live in **`SIGNAL_EXPLORATION_FACETS`** in **`signal.ts`** — expand there (and bump **`PROMPT_VERSION`**) to cover more angles without bloating this doc. |
-| **Recency dedup** | **Device:** client **`recentSignalUrls`** / titles / sources (`localStorage`). **Account:** orchestrator merges those hints with recent Signal **`content.url`** values from **`reflection_companions`** for the same user (excluding the current reflection when known). **Implementation note:** today this uses two DB round trips and a capped reflection id list; a single RPC/join could reduce latency if needed. |
+| **Recency dedup** | **Device:** client **`recentSignalUrls`** / titles / sources (`localStorage`). **Account:** orchestrator merges those hints with recent Signal **`content.url`** values from **`pause_ai_artifacts`** for the same user (excluding the current pause when known). **Implementation note:** today this uses two DB round trips and a capped pause id list; a single RPC/join could reduce latency if needed. |
 | **Citation handling** | When both YouTube and non-YouTube URLs appear in Perplexity output, **non-YouTube URLs are ordered first** before structuring so the model tends to pick a publisher page when one exists. |
 | **Attribution** | **`validateSource`** reconciles stated source with URL hostname rules (best-effort; see limits below). |
 | **Structural quality** | **`qualityGate("signal", …)`** enforces length, banned terms, and Bitcoin-only constraints before the card is served live. |
@@ -111,8 +107,7 @@ Engineering and product options to revisit when repetition or quality still feel
 - **Phase tuning** — Adjust `COMPANION_PHASE_*` env vars to disable live generation for some deployments, or disable library/cache to force fresh AI content.
 - **Analytics-driven tuning** — Use **`companion_serves`** / fingerprints to spot dominant domains or titles and feed that into exclusions or catalog suggestions.
 - **User-visible controls** — Narrower “only these sources” vs “surprise me” modes change the diversity–predictability tradeoff by design.
-- **Faster dedup path** — One Postgres RPC or a single query with a join (instead of two round trips) for recent Signal URLs; watch **`.in(reflection_id, …)`** size if the reflection window grows very large.
-- **Grounding / Home consistency** — Not Signal-specific, but it *is* pause-adjacent quality: dual-write drift between **`reflection_companions`** and **`reflections.grounding_*`** is tracked in the backlog (see **§7**).
+- **Faster dedup path** — One Postgres RPC or a single query with a join (instead of two round trips) for recent Signal URLs; watch **`.in(pause_instance_id, …)`** size if the pause window grows very large.
 
 Exact behavior in code changes with **`PROMPT_VERSION`** and the files in **§6**; treat this section as **design intent**, not a changelog.
 
@@ -148,20 +143,20 @@ Exact behavior in code changes with **`PROMPT_VERSION`** and the files in **§6*
 | Client invoke + recency | `src/hooks/use-companion-data.ts` |
 | Attribution | `supabase/functions/_shared/source-validation.ts` |
 | Quality gate | `supabase/functions/_shared/quality.ts` |
-| Full View page | `src/pages/CompanionSignalPage.tsx` (route `/companion/signal/:reflectionId`) |
+| Full View page | `src/pages/CompanionSignalPage.tsx` (route `/companion/signal/:pauseInstanceId`) |
 | Full View presentation | `src/components/companion/SignalFullView.tsx` |
 
 ---
 
 ## 7. Full View (reflect-step deep read)
 
-The inline card in `CompanionSection` has an **"Open full view"** button that routes to **`/companion/signal/:reflectionId`** (lazy-loaded in `src/App.tsx`). The Full View renders the same Signal payload with extra reading affordances that don't fit in the inline card:
+The inline card in `CompanionSection` has an **"Open full view"** button that routes to **`/companion/signal/:pauseInstanceId`** (lazy-loaded in `src/App.tsx`). The Full View renders the same Signal payload with extra reading affordances that don't fit in the inline card:
 
 - **Favicon + publisher host** above the source link — the source reads as credibility, not as a footnote.
 - **Trusted-source badge** — only shown when the signal URL's host matches a row in `signal_sources`. Falls back silently when there is no match (no negative "untrusted" state).
 - **Read-time indicator** + **"Why this card now?"** collapsible disclosure (mood / market direction / session bias transparency).
 - **Breathing-room pacing** (8 s) before feedback and save CTAs fade in, so the screen doesn't demand input before the user has read.
-- **Per-user history thread** — the last 5 Signal cards for this user from `reflection_companions`, deep-linked to their own Full Views.
+- **Per-user history thread** — the last 5 Signal cards for this user from `pause_ai_artifacts`, deep-linked to their own Full Views.
 - **Pro-gated "Save this moment"** — writes a `library_items` row of `type: note`, `source_type: companion_moment`, capturing the user's own thinking about the card (not the card itself, which is already autosaved as a bookmark).
 
 The free "Open full view" button is visible to all users; gating only applies to the **Save this moment** action.
