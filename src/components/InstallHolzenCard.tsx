@@ -123,7 +123,7 @@ export function InstallHolzenCard({ alwaysShow = false, compact = false, classNa
           manifest-url="/manifest.json"
           icon="/icon-512.png"
           name="Holzen"
-          description="Pause before you act. Bitcoin volatility reflections."
+          description="Pause before you act. Bitcoin volatility check-ins."
           manual-chrome="true"
         />
       )}

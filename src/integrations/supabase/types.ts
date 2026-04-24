@@ -1,3 +1,9 @@
+/**
+ * Supabase-generated `Database` types. Re-run `supabase gen types` against the
+ * linked project after migrations. Until then, rows referencing removed Pause V1
+ * tables (`reflections`, `reflection_companions`, etc.) may still appear here —
+ * application code should follow the Pause V2 schema (`pause_instances`, `v_pause_full`, …).
+ */
 export type Json =
   | string
   | number

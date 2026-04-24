@@ -103,8 +103,8 @@ const Home = () => {
     lastPauseInstanceId,
     loading,
     error,
-    newReflection,
-    clearNewReflection,
+    newPauseArrival,
+    clearNewPauseArrival,
     dismissMessage,
     hasOnboarded,
     completeOnboarding,
@@ -310,7 +310,7 @@ const Home = () => {
 
   const lastToneMsgRef = useRef<string | null>(null);
   useEffect(() => {
-    if (newReflection && message) {
+    if (newPauseArrival && message) {
       // Only play tone once per unique message to prevent double-play
       if (message !== lastToneMsgRef.current) {
         lastToneMsgRef.current = message;
@@ -319,9 +319,9 @@ const Home = () => {
           playNotificationTone();
         }
       }
-      clearNewReflection();
+      clearNewPauseArrival();
     }
-  }, [newReflection, message, clearNewReflection]);
+  }, [newPauseArrival, message, clearNewPauseArrival]);
 
   useEffect(() => {
     prefetchNotificationTone();

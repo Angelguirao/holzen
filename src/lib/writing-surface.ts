@@ -1,7 +1,7 @@
 import { cn } from '@/lib/utils';
 
 /**
- * Shared styles for multi-line writing (notes, journal, reflections).
+ * Shared styles for multi-line writing (notes, journal, pause replays).
  * Keep in sync with inline editors that use {@link WritingField} with `disableFocusMode`.
  */
 export const writingTextareaClassName = cn(

@@ -605,7 +605,7 @@ serve(
         {
           user_id: profile.user_id,
           type: "bookmark",
-          title: "Reflection",
+          title: "Pause",
           body: result.message,
           source_type: "reflection",
           pause_instance_id: pauseInstanceId,

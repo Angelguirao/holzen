@@ -6,12 +6,14 @@
  * cutover migration; all callers must supply pauseInstanceId + userId.
  */
 
+import type { SupabaseClient } from "https://esm.sh/@supabase/supabase-js@2.57.2";
+
 interface CompanionContent {
   [key: string]: unknown;
 }
 
 export async function writeCompanionData(
-  svcClient: any,
+  svcClient: SupabaseClient,
   pauseInstanceId: string,
   userId: string,
   companionType: string,
@@ -29,7 +31,7 @@ export async function writeCompanionData(
 }
 
 export async function readCompanionData(
-  svcClient: any,
+  svcClient: SupabaseClient,
   pauseInstanceId: string,
 ): Promise<Record<string, { content: CompanionContent } | null>> {
   const result: Record<string, { content: CompanionContent } | null> = {
