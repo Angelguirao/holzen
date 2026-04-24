@@ -23,7 +23,6 @@ export type HolzenEdgeTag =
   | "seed-btc-history"
   | "fetch-feeds"
   | "pregenerate"
-  | "followups"
   | "night-reflection"
   | "weekly-digest"
   | "monthly-report"

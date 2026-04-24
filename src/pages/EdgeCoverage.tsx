@@ -23,7 +23,6 @@ const COVERAGE: Row[] = [
   { name: "auth-email-hook", wrl: true, edgeError: false, logger: false, audit: false },
   { name: "backfill-btc-prices", wrl: true, edgeError: false, logger: false, audit: false },
   { name: "badge-notify", wrl: true, edgeError: false, logger: false, audit: false },
-  { name: "check-followups", wrl: true, edgeError: false, logger: false, audit: false },
   { name: "check-subscription", wrl: true, edgeError: false, logger: false, audit: false },
   { name: "check-volatility", wrl: true, edgeError: false, logger: false, audit: false },
   { name: "companion-orchestrate", wrl: true, edgeError: false, logger: true, audit: false },
