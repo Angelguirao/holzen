@@ -10,9 +10,7 @@ import { useCurrentPause } from '@/hooks/use-current-pause';
  * partial unique index). Tapping it navigates to `/pause` with the
  * instance id in navigation state so PauseSession hydrates directly.
  *
- * Hidden entirely when:
- *   - pause_v2_enabled=false (flag not flipped yet in this environment)
- *   - user has no open pause
+ * Hidden entirely when the user has no open pause.
  *
  * Below this card, Library's existing history list continues to render
  * everything non-active as before.
