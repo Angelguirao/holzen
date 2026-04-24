@@ -110,7 +110,8 @@ All are non-Pro.
 
 ## 4) Category 2: Pause Count
 
-All are non-Pro and use **full-ritual pause count** (`total = filterFullRitual(reflections).length`).
+All are non-Pro and use **full-ritual pause count** (`completedRows` where
+`counted_companion_count >= required_companion_count` in `computeBadges`).
 
 ## 4.1 `reflect-10`
 
@@ -132,11 +133,12 @@ All are non-Pro and use **full-ritual pause count** (`total = filterFullRitual(r
 
 ## 5) Category 3: Composure
 
-All are non-Pro.
+All are non-Pro and derived from completed pause rows in `v_pause_full`
+(initial mood + outcome + context snapshot).
 
 ## 5.1 `calm-10`
 
-- Counter: `calmCount = reflections where mood === "calm"`.
+- Counter: `calmCount = completed pauses where initial_mood === "calm"`.
 - Requirement: `calmCount >= 10`.
 
 ## 5.2 `calm-50`
@@ -145,7 +147,7 @@ All are non-Pro.
 
 ## 5.3 `held-10`
 
-- Counter: `heldCount = reflections where outcome is "held" or "nothing"`.
+- Counter: `heldCount = completed pauses where outcome is "held" or "nothing"`.
 - Requirement: `heldCount >= 10`.
 
 ## 5.4 `held-50`
@@ -176,7 +178,8 @@ All badges in this category are `proOnly`.
 
 ## 6.4 Signal track
 
-- `signal-10`: reflections with `signal_source` present >= 10
+- `signal-10`: completed pauses where a counted companion event for `signal`
+  occurred (counts from `pause_companion_events`) >= 10
 - `signal-50`: count >= 50
 
 ## 6.5 Zoom Out track
@@ -191,7 +194,9 @@ All badges in this category are `proOnly`.
 
 ## 6.7 All companions in one pause track
 
-- `all-6-5`: count of reflections where all companion flags are true >= 5
+- `all-6-5`: count of completed pauses where **all** counted companion types
+  in the template are present (`counted_companion_count` >= `required_companion_count`
+  and `counted_companion_types` covers the canonical companion list) >= 5
 - `all-6-25`: same all-companions counter >= 25
 
 Current all-companions condition checks:
@@ -216,7 +221,8 @@ All badges in this category are `proOnly`.
 
 ## 7.2 Notes track
 
-- `notes-10`: reflections with `note` present >= 10
+- `notes-10`: pauses with a note step (`pause_step_events.step_type = 'note_updated'`,
+  `note_text` in `v_pause_full`) >= 10
 - `notes-50`: count >= 50
 
 ---
