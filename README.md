@@ -62,6 +62,7 @@ Open [http://localhost:8080](http://localhost:8080). For hosted Supabase you do 
 | `npm run supabase:status` | Print local API URL and anon key |
 | `npm run supabase:stop` | Stop local stack |
 | `npm run supabase:reset` | Reapply `supabase/migrations/` on local DB |
+| `npm run gen:types` | Regenerate `src/integrations/supabase/types.ts` from the **linked** project (`supabase login` or `SUPABASE_ACCESS_TOKEN`) |
 | `npm run check:edge` | Optional **Deno** typecheck of every `supabase/functions/*/index.ts`; **no-op** if `deno` is not installed |
 
 ## Repository layout

@@ -138,7 +138,7 @@ Do **not** add global **`QueryClient` defaultOptions** lightly: they affect ever
 ## 11. Supabase: migrations
 
 - Files in **`supabase/migrations/`** are ordered SQL changes. Apply them via your team’s workflow (CLI `db push`, dashboard, or local `npm run supabase:reset` for Docker).
-- **`src/integrations/supabase/types.ts`** should stay aligned with the schema (regenerate when the schema changes, per your usual Supabase typing workflow).
+- **`src/integrations/supabase/types.ts`** should stay aligned with the schema — **`npm run gen:types`** (requires Supabase CLI + `supabase login` or `SUPABASE_ACCESS_TOKEN`).
 
 ---
 
