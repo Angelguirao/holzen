@@ -104,6 +104,12 @@ Frontend is safe — it only goes live when you click **Publish → Update** in 
 □ **AI provider pricing** — if the last entry in `docs/systems/costs/ai-cost-model.md` §10 is **> 90 days old**, re-verify Perplexity + Google Gemini list prices via Context7, update `DEFAULT_COST_MAP` in `supabase/functions/_shared/observe.ts`, and add a changelog entry. See §1.3 of the cost doc for the drift policy.
 ```
 
+### Combined local gate (`npm run check:prepush`)
+
+`npm run check:prepush` runs `scripts/pre-push-check.sh`: edge release stamp, view-migration safety, every `supabase/functions/<name>/` has a matching `[functions.<name>]` in `config.toml`, **`npm run check:edge`** (skips if Deno missing), **`npm run check:edge-logging`**, **`npm run check:edge-coverage-manifest`**, **`npm run test`**, **`npm run build`**, and (when Docker + Supabase CLI are available) a local **`supabase db reset`**. **Requires `bash`** — on Windows use **Git Bash** or **WSL** (PowerShell alone will not run this script).
+
+**Optional deeper probe** after changing request logging / `x-cid` behavior: **`npm run smoke:edge-logging`** — OPTIONS each HTTP edge URL and assert `x-cid` round-trip (and optionally BetterStack query when `LOG_DRAIN_QUERY_*` are set). See **`supabase/functions/README.md`**.
+
 ### TypeScript types lag behind migrations (build-breaking chicken-and-egg)
 
 **Problem:** `src/integrations/supabase/types.ts` is auto-generated from the **live database**. When a migration adds a column and code references it in the same commit, the types file doesn't include the new column yet → TypeScript `SelectQueryError` → **build fails** → migration and edge function deployment are blocked too (because the build gate prevents deployment).
@@ -141,7 +147,9 @@ Some Edge functions assume columns already exist — e.g. **`fetch-source-feeds`
 
 **`npm run check:edge`:** Runs `scripts/check-edge.mjs` (`deno check` on every `supabase/functions/*/index.ts` except `_shared`). It resolves the Deno binary from PATH, then `DENO_INSTALL/bin`, then `~/.deno/bin` (official installer default). Uses `--no-lock` so it does not write a root `deno.lock`. If Deno is missing entirely, the script exits 0 with a skip message.
 
-**`npm run check:edge-coverage-manifest`:** Runs `scripts/verify-edge-coverage-manifest.mjs` — every `[functions.<name>]` in `supabase/config.toml` must appear in `src/pages/EdgeCoverage.tsx` `COVERAGE` (and extras are forbidden). CI runs this via `npm run test:ci`. **`npm run check:prepush`** (bash) runs the same check after `check:edge-logging`. Update the `COVERAGE` row flags when you change observability patterns in a function's `index.ts`.
+**`npm run check:edge-logging`:** Runs `scripts/check-edge-logging.mjs` — a fast regex guard that HTTP-serving edge entrypoints wrap handlers in `withRequestLogging` (BetterStack + Sentry path). CI runs it via `npm run test:ci`; **`npm run check:prepush`** runs it too.
+
+**`npm run check:edge-coverage-manifest`:** Runs `scripts/verify-edge-coverage-manifest.mjs` — every `[functions.<name>]` in `supabase/config.toml` must appear in `src/pages/EdgeCoverage.tsx` `COVERAGE` (and extras are forbidden). CI runs this via `npm run test:ci`. It is also included in **`npm run check:prepush`** (see **Combined local gate** above). Update the `COVERAGE` row flags when you change observability patterns in a function's `index.ts`.
 
 ## Troubleshooting
 

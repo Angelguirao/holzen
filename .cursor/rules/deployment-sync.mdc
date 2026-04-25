@@ -17,6 +17,7 @@ Run and address failures before push:
 - `npm run check:edge` when Deno is available (edge TS changes)
 - `npm run check:edge-logging` when adding or editing edge function HTTP entrypoints (`supabase/functions/*/index.ts`)
 - `npm run check:edge-coverage-manifest` when adding/removing `supabase/functions/*` or editing `[functions.*]` / `EdgeCoverage.tsx`
+- `npm run check:prepush` when `bash` is available (Git Bash / WSL / Unix) for the full scripted gate before a high-stakes push
 
 ## Always remember
 

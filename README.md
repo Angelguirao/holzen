@@ -67,6 +67,8 @@ Open [http://localhost:8080](http://localhost:8080). For hosted Supabase you do 
 | `npm run check:edge-logging` | Fail if an edge function serves HTTP without `withRequestLogging` (runs in `test:ci` / `check:prepush`) |
 | `npm run check:edge-coverage-manifest` | Fail if `EdgeCoverage.tsx` is missing any `supabase/config.toml` edge function name (runs in `test:ci` / `check:prepush`) |
 | `npm run check:edge` | Optional **Deno** typecheck of every `supabase/functions/*/index.ts`; **no-op** if `deno` is not installed |
+| `npm run check:prepush` | Full bash preflight (`scripts/pre-push-check.sh`); use **Git Bash** or **WSL** on Windows |
+| `npm run smoke:edge-logging` | Optional live HTTP probe of edge `x-cid` behavior (see `supabase/functions/README.md`) |
 
 ## Repository layout
 
