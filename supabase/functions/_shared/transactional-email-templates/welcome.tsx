@@ -49,7 +49,7 @@ const WelcomeEmail = ({ firstName }: WelcomeEmailProps) => (
 )
 
 export const template = {
-  component: WelcomeEmail,
+  component: WelcomeEmail as React.ComponentType<Record<string, unknown>>,
   subject: 'Welcome to Holzen',
   displayName: 'Welcome email',
   previewData: { firstName: 'Satoshi' },

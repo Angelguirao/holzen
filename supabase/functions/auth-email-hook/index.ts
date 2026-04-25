@@ -11,6 +11,23 @@ import { ReauthenticationEmail } from '../_shared/email-templates/reauthenticati
 import { redactEmailForLog } from "../_shared/email-log-helpers.ts";
 import { withRequestLogging, type RequestLoggingContext } from "../_shared/with-request-logging.ts";
 
+/** Props passed to Lovable auth email React templates (each template narrows its own fields). */
+type AuthEmailTemplateProps = Record<string, unknown>
+
+/** Webhook body after `verifyWebhookRequest` + `parseEmailWebhookPayload` (Lovable v1). */
+type AuthEmailWebhookPayload = {
+  version: string
+  run_id: string
+  data: {
+    action_type: string
+    email?: string
+    url?: string
+    token?: string
+    new_email?: string
+    callback_url?: string
+  }
+}
+
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Headers':
@@ -26,14 +43,14 @@ const EMAIL_SUBJECTS: Record<string, string> = {
   reauthentication: 'Your verification code',
 }
 
-// Template mapping
-const EMAIL_TEMPLATES: Record<string, React.ComponentType<any>> = {
-  signup: SignupEmail,
-  invite: InviteEmail,
-  magiclink: MagicLinkEmail,
-  recovery: RecoveryEmail,
-  email_change: EmailChangeEmail,
-  reauthentication: ReauthenticationEmail,
+// Template mapping (per-template strict props; webhooks pass a record-shaped object)
+const EMAIL_TEMPLATES: Record<string, React.ComponentType<AuthEmailTemplateProps>> = {
+  signup: SignupEmail as unknown as React.ComponentType<AuthEmailTemplateProps>,
+  invite: InviteEmail as unknown as React.ComponentType<AuthEmailTemplateProps>,
+  magiclink: MagicLinkEmail as unknown as React.ComponentType<AuthEmailTemplateProps>,
+  recovery: RecoveryEmail as unknown as React.ComponentType<AuthEmailTemplateProps>,
+  email_change: EmailChangeEmail as unknown as React.ComponentType<AuthEmailTemplateProps>,
+  reauthentication: ReauthenticationEmail as unknown as React.ComponentType<AuthEmailTemplateProps>,
 }
 
 // Configuration
@@ -121,7 +138,7 @@ async function handlePreview(req: Request): Promise<Response> {
     })
   }
 
-  const sampleData = SAMPLE_DATA[type] || {}
+  const sampleData = (SAMPLE_DATA[type] || {}) as AuthEmailTemplateProps
   const html = await renderAsync(React.createElement(EmailTemplate, sampleData))
 
   return new Response(html, {
@@ -149,7 +166,7 @@ async function handleWebhook(req: Request, log: RequestLoggingContext["log"]): P
   }
 
   // Verify signature + timestamp, then parse payload.
-  let payload: any
+  let payload: AuthEmailWebhookPayload
   let run_id = ''
   try {
     const verified = await verifyWebhookRequest({
@@ -157,7 +174,7 @@ async function handleWebhook(req: Request, log: RequestLoggingContext["log"]): P
       secret: apiKey,
       parser: parseEmailWebhookPayload,
     })
-    payload = verified.payload
+    payload = verified.payload as AuthEmailWebhookPayload
     run_id = payload.run_id
   } catch (error) {
     if (error instanceof WebhookError) {
@@ -279,7 +296,7 @@ async function handleWebhook(req: Request, log: RequestLoggingContext["log"]): P
   }
 
   // Build template props from payload.data (HookData structure)
-  const templateProps = {
+  const templateProps: AuthEmailTemplateProps = {
     siteName: SITE_NAME,
     siteUrl: `https://${ROOT_DOMAIN}`,
     recipient: payload.data.email,
@@ -314,12 +331,28 @@ async function handleWebhook(req: Request, log: RequestLoggingContext["log"]): P
     })
   }
 
+  const toEmail = typeof payload.data.email === "string" ? payload.data.email.trim() : "";
+  if (!toEmail) {
+    try {
+      log.error("auth_email_hook_missing_recipient", {
+        holzen_event: "auth_email_hook_missing_recipient",
+        run_id,
+      });
+    } catch {
+      /* non-fatal */
+    }
+    return new Response(JSON.stringify({ error: "Missing email in payload" }), {
+      status: 400,
+      headers: { ...corsHeaders, "Content-Type": "application/json" },
+    });
+  }
+
   let result: { message_id?: string }
   try {
     result = await sendLovableEmail(
       {
         run_id,
-        to: payload.data.email,
+        to: toEmail,
         from: `${SITE_NAME} <noreply@${FROM_DOMAIN}>`,
         sender_domain: SENDER_DOMAIN,
         subject: EMAIL_SUBJECTS[emailType] || 'Notification',
