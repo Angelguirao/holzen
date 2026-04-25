@@ -4,6 +4,8 @@
 
 **Source of truth for URLs:** `src/App.tsx` (React Router). **Primary nav:** `src/components/BottomNav.tsx` + `src/components/AppLayout.tsx`.
 
+**Alignment (2026-04-25):** Gaps in **§3** and the shipped / alternatives / follow-ups in **§4** are **accepted** as the working product direction. Reopen when analytics, support themes, or user research shows a need to change the model.
+
 ---
 
 ## 1. Current model (as shipped)
@@ -96,38 +98,44 @@ Under `/admin` and children (`/admin/smoke-test`, `/admin/sentry-alerts`, `/admi
 
 ---
 
-## 4. Recommended directions (non-prescriptive)
+## 4. Decision status + alternatives
 
-These are **directional** improvements; any change should be paired with nav affordances, i18n, and analytics (see `docs/ops/event-taxonomy.md`).
+This section captures the **current state** and what we may reconsider next.
 
-### 4.1 Unify “modalities” under one conceptual parent
+### 4.1 Unify modalities under one parent
 
-**Option A — URL structure:** A single tools prefix (shipped as **`/tools/*`**) for breathe, ground, practice, and ambient. No alternate short paths — external links and bookmarks should use these URLs.
+- **Shipped:** canonical **`/tools/*`** prefix for breathe, ambient, ground, ground history, and practice.
+- **Shipped:** no alternate short routes; external links/bookmarks should use `/tools/...`.
+- **Shipped:** information entry point via **`/tools`** (`ToolsHub`) plus Home links (“Browse all tools & experiences”).
+- **Alternative to revisit:** make Tools a dedicated bottom tab (replace one tab or move to 5 tabs) if discoverability remains low.
 
-**Option B — Information-only:** Keep URLs flat but add a **single “Tools” or “Guides”** entry on Home (or a fifth tab) that lists breathe, ground, practice, ambient with one-line intent — reducing reliance on widget order.
+### 4.2 Split identity/account from progress/archive
 
-### 4.2 Split “identity / account” from “progress & archive”
+- **Shipped:** progress area is **Journey** at `/journey/...` (not “Profile” in primary IA).
+- **Shipped:** Settings section labels now use task-oriented wording.
+- **Alternative to revisit:** promote a compact stats summary to Home, or create a top-level Stats tab, only if product analytics/user interviews show demand.
 
-- The tab is now **Journey** at **`/journey/...`**. Refine in-product copy if it still blurs with Settings.
-- Alternatively, **move high-value progress** (e.g. stats summary) to Home or a dedicated top-level “Stats” tab **only if** user research shows users expect a direct tab for numbers — otherwise keep density on Profile and improve labeling.
+### 4.3 Path-addressable Journey
 
-### 4.3 Path-addressable Journey (shipped)
+- **Shipped:** `/journey/:tab` for stats/insights/badges/letters/activity.
+- **Shipped:** `?letter=<id>` deep-link behavior for letters.
+- **Shipped:** no `location.state` fallback for tab/letter selection.
 
-- **`/journey/:tab`** and **`?letter=`** for letters — no `location.state` for tab/letter.
+### 4.4 Clarify Library vs Activity
 
-### 4.4 Clarify Library vs “activity”
+- **Shipped:** in-product explainer copy distinguishes Library (saved/browsable artifacts) vs Journey Activity (chronological log).
+- **Alternative to revisit:** if users still confuse surfaces, merge into one screen with view modes (`saved` / `timeline`) behind one information object.
 
-- Expose a **single sentence** in-product: Library = *curated saved artifacts*; Activity = *chronological practice/pause log* (or whatever the product truth is).  
-- If two lists duplicate content, consider **one list with view modes** rather than two mental models.
+### 4.5 Settings IA by task
 
-### 4.5 Triage Settings by task, not by implementation
-
-- Group into **Account & security**, **Subscription & Pro**, **Notifications & quiet hours**, **Content & data**, **App behavior** (haptics, install PWA) — with optional **Dev / About** last.  
-- Consider moving **low-frequency** items (changelog, deep FAQ) to Settings footer or a “About Holzen” subpage linked from Settings.
+- **Shipped:** task-oriented section headers (Account & profile, Pause behavior, App behavior, Content & data, Notifications & quiet hours, Subscription & Pro, Account & security, About & feedback).
+- **Further improvement:** re-home low-frequency items (e.g. changelog/version detail) into an explicit About sub-surface to keep Settings action-first.
+- **Further improvement:** consider splitting Settings into 2-level IA (overview + detail pages) if the accordion grows.
 
 ### 4.6 Admin IA
 
-- Keep admin routes as today; if the surface grows, use **sidebar or grouped links** on `/admin` only — never surface in consumer nav.
+- **Shipped:** admin remains isolated under `/admin*` and excluded from consumer navigation.
+- **Further improvement:** if admin surface grows, add grouped internal navigation only within `/admin`.
 
 ---
 
@@ -135,7 +143,7 @@ These are **directional** improvements; any change should be paired with nav aff
 
 | Doc | Relevance |
 |-----|------------|
-| `docs/decisions/2026-04-23-skills-first-stats-ia.md` | Stats organization inside Profile. |
+| `docs/decisions/2026-04-23-skills-first-stats-ia.md` | Stats organization inside **Journey** (was profile-tab era). |
 | `docs/systems/pause-system.md` | Pause lifecycle; informs companion and `/pause` placement. |
 | `docs/systems/stats-system.md` | Skills-first metrics model. |
 | `docs/design/nox/README.md` | Visual system; IA changes should still follow Nox patterns for nav/components. |
@@ -149,5 +157,7 @@ These are **directional** improvements; any change should be paired with nav aff
 |------|--------|--------|
 | 2026-04-25 | — | Initial inventory from `App.tsx` + nav components; gap analysis and recommendations. |
 | 2026-04-25 | — | Shipped: `/journey/*` (no state-based tabs), `/tools/*` + hub, notifications migration, Library/Activity copy; no legacy profile or pre-`/tools` routes. |
+| 2026-04-25 | — | Updated to a “decision status + alternatives” format to capture current IA, reconsideration options, and further improvements. |
+| 2026-04-25 | — | Recorded product alignment: §3 gaps and §4 decision/alternatives accepted as working direction. |
 
 When routes or bottom-nav items change, update **Section 1** and the **Changelog** row in the same PR.
