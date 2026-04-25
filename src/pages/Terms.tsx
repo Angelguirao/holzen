@@ -36,7 +36,7 @@ const Terms = () => {
         <section className="space-y-3">
           <h2 className="text-sm font-medium text-foreground">2. Description of Service</h2>
           <p className="text-xs text-muted-foreground leading-relaxed">
-            Holzen monitors Bitcoin volatility and delivers AI-generated reflections when market movement exceeds a user-defined threshold. Holzen is not a trading tool, financial advisor, or investment platform. Reflections are intended solely to encourage pause and self-awareness — never to suggest, recommend, or imply any financial action.
+            Holzen monitors Bitcoin volatility and delivers AI-generated pause prompts when market movement exceeds a user-defined threshold. Holzen is not a trading tool, financial advisor, or investment platform. Those prompts are intended solely to encourage pause and self-awareness — never to suggest, recommend, or imply any financial action.
           </p>
         </section>
 
@@ -64,28 +64,28 @@ const Terms = () => {
         <section className="space-y-3">
           <h2 className="text-sm font-medium text-foreground">6. Data Handling & Privacy</h2>
           <p className="text-xs text-muted-foreground leading-relaxed">
-            We collect only the data necessary to operate the Service: your email address, volatility threshold preference, and push notification tokens if enabled. Reflections are generated in real time and stored for your review. We do not sell, share, or monetize your personal data. Data is stored securely and transmitted over encrypted connections.
+            We collect only the data necessary to operate the Service: your email address, volatility threshold preference, and push notification tokens if enabled. Pause sessions and related AI copy are generated in real time and stored for your review. We do not sell, share, or monetize your personal data. Data is stored securely and transmitted over encrypted connections.
           </p>
         </section>
 
         <section className="space-y-3">
           <h2 className="text-sm font-medium text-foreground">7. Intellectual Property</h2>
           <p className="text-xs text-muted-foreground leading-relaxed">
-            All content, design, and code comprising the Service are the property of Holzen. AI-generated reflections delivered to you are for your personal use. You may not reproduce, redistribute, or commercially exploit any part of the Service without written permission.
+            All content, design, and code comprising the Service are the property of Holzen. AI-generated pause content delivered to you is for your personal use. You may not reproduce, redistribute, or commercially exploit any part of the Service without written permission.
           </p>
         </section>
 
         <section className="space-y-3">
           <h2 className="text-sm font-medium text-foreground">8. Disclaimer of Warranties</h2>
           <p className="text-xs text-muted-foreground leading-relaxed">
-            The Service is provided "as is" and "as available" without warranties of any kind. We do not guarantee uninterrupted access, accuracy of market data, or suitability of reflections for any purpose. Bitcoin price data is sourced from third-party APIs and may be delayed or inaccurate.
+            The Service is provided "as is" and "as available" without warranties of any kind. We do not guarantee uninterrupted access, accuracy of market data, or suitability of pause prompts for any purpose. Bitcoin price data is sourced from third-party APIs and may be delayed or inaccurate.
           </p>
         </section>
 
         <section className="space-y-3">
           <h2 className="text-sm font-medium text-foreground">9. Limitation of Liability</h2>
           <p className="text-xs text-muted-foreground leading-relaxed">
-            Holzen shall not be liable for any financial losses, damages, or consequences arising from your use of or reliance on the Service. This includes, without limitation, any trading decisions, investment outcomes, or actions taken based on reflections received through the Service. Our total liability is limited to the amount you paid in the 12 months preceding the claim.
+            Holzen shall not be liable for any financial losses, damages, or consequences arising from your use of or reliance on the Service. This includes, without limitation, any trading decisions, investment outcomes, or actions taken based on content received through the Service. Our total liability is limited to the amount you paid in the 12 months preceding the claim.
           </p>
         </section>
 

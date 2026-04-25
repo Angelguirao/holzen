@@ -166,17 +166,18 @@ export function HistoryCalendar({ activities, selectedDate, onSelectDate }: Prop
           );
         }
 
-        const reflections = dayItems.filter((a) => a.type === 'reflection');
+        // Activity feed type remains `reflection` (pause session marker in calendar model).
+        const pauseDayMarkers = dayItems.filter((a) => a.type === 'reflection');
         const lettersList = dayItems.filter((a) => a.type === 'letter');
         const badgesList = dayItems.filter((a) => a.type === 'badge');
         const practiceList = dayItems.filter((a) => a.type === 'practice');
 
         const moodCounts: Record<string, number> = {};
-        reflections.forEach((r) => {
+        pauseDayMarkers.forEach((r) => {
           const m = r.mood || 'neutral';
           moodCounts[m] = (moodCounts[m] || 0) + 1;
         });
-        const totalMoods = reflections.length;
+        const totalMoods = pauseDayMarkers.length;
         const sortedMoods = Object.entries(moodCounts).sort((a, b) => b[1] - a[1]);
 
         return (
@@ -186,9 +187,9 @@ export function HistoryCalendar({ activities, selectedDate, onSelectDate }: Prop
             </p>
 
             <div className="flex items-center gap-3">
-              {reflections.length > 0 && (
+              {pauseDayMarkers.length > 0 && (
                 <span className="text-[10px] font-mono text-muted-foreground">
-                  {t('calendar.reflectionCount', { count: reflections.length })}
+                  {t('calendar.reflectionCount', { count: pauseDayMarkers.length })}
                 </span>
               )}
               {lettersList.length > 0 && (
