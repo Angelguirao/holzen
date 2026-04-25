@@ -4,8 +4,6 @@
 
 **Source of truth for URLs:** `src/App.tsx` (React Router). **Primary nav:** `src/components/BottomNav.tsx` + `src/components/AppLayout.tsx`.
 
-**Alignment (2026-04-25):** Gaps in **§3** and the shipped / alternatives / follow-ups in **§4** are **accepted** as the working product direction. Reopen when analytics, support themes, or user research shows a need to change the model.
-
 ---
 
 ## 1. Current model (as shipped)
@@ -14,18 +12,19 @@
 
 ### 1.1 Primary navigation (authenticated shell)
 
-Four bottom tabs, all wrapped in `AppLayout` (header + `Outlet` + bottom nav, max width ~24rem mobile-first):
+Five bottom tabs, all wrapped in `AppLayout` (header + `Outlet` + bottom nav, max width ~24rem mobile-first):
 
 | Tab        | Path          | Role |
 |------------|---------------|------|
 | Home       | `/`           | Hub: widgets (market, hold goal, reflection, ground entry, night, letter, practice, breathe), pause triggers, onboarding. |
 | Library    | `/library`    | Saved pause artifacts, collections, search, source filters. |
+| Tools      | `/tools`      | In-app index (`ToolsHub`) for breathe, ambient, ground, ground history, practice. Immersive routes use `/tools/...` but hide the shell (no bottom nav). |
 | Journey    | `/journey/:tab` | Longitudinal “you” content: **stats, insights, badges, letters, activity** — each tab is a **path segment** (default `/journey/stats`). Letter deep links use `?letter=<id>`. |
 | Settings   | `/settings`   | Preferences, Pro/checkout, notifications, quiet hours, thresholds, sources, account actions, etc. |
 
 Notification `action_path` values use `/journey/...` (see migration `20260425200000_journey_routes_notification_paths.sql`). The app does not register `/profile` or pre-`/tools/*` paths.
 
-Billing history is nested: `/settings/billing-history` (still under the authenticated shell with bottom nav).
+**Settings sub-routes (still in shell + bottom nav):** `/settings/billing-history`, **`/settings/about`** (changelog, version, feedback — split out so the main Settings page stays action-first).
 
 **In-app index for immersive tools:** `/tools` lists breathe, ambient, ground, ground history, and practice — same destinations as the `/tools/...` URLs below. Linked from Home (Practice + Breathe widgets).
 
@@ -50,7 +49,7 @@ These are `ProtectedRoute` but **not** under `AppLayout` — no persistent prima
 | `/terms`, `/privacy`, `/about`, `/blog`, `/blog/:slug` | Open. |
 | `/reserve` | Open (reservation / waitlist style page). |
 | `/unsubscribe` | Open (email preferences / marketing unsubscribe). |
-| `/roadmap` | Redirects to `/welcome` (roadmap not a live route in app shell). |
+| `/roadmap` | Public **stub** (`RoadmapStub`): explains there is no in-app roadmap yet; links to blog, about, sign-in (avoids redirecting cold traffic to `/welcome` with no context). |
 
 ### 1.5 Admin and internal tooling
 
@@ -59,7 +58,7 @@ Under `/admin` and children (`/admin/smoke-test`, `/admin/sentry-alerts`, `/admi
 ### 1.6 Cross-cutting behaviors
 
 - **Global chrome:** `NotificationBell` (header), `FeedbackWidget` (signed-in), `CheckoutConfirmation`, `PauseReadyBanner` on non-Home when auto-trigger fires.
-- **Library vs Journey → Activity:** Copy on Library clarifies “saved, browsable” vs chronological log under **Journey → Activity**; product copy lives in i18n (`library.iaClarifier`, `journey.activityExplainer`).
+- **Library vs Journey → Activity:** Copy on Library clarifies “saved, browsable” vs chronological log under **Journey → Activity**; product copy lives in i18n (`library.iaClarifier`, `journey.activityExplainer`). **`HistoryCrossLinks`** adds “See also” links between Library, Journey → Activity, and `/tools/ground/history` so “where is my past?” routes are one tap apart.
 
 ---
 
@@ -85,16 +84,16 @@ Under `/admin` and children (`/admin/smoke-test`, `/admin/sentry-alerts`, `/admi
    - Library: saved artifacts and collections.  
    - Journey → activity (chronological log).  
    - `/tools/ground/history` for grounding-specific history.  
-   Users asking “where is my past?” may still check more than one surface.
+   **Mitigation shipped:** cross-links (`HistoryCrossLinks`) on Library, Journey → Activity, and Grounding history; the underlying three-surface model remains intentional.
 
 4. **Settings is long and multi-purpose**  
-   Pro, referrals, haptics, push, quiet hours, content sources, danger zone, changelog — it’s a **catch-all** “everything else,” which is practical but can feel like the junk drawer if not grouped with strong section IA inside the page.
+   Pro, referrals, haptics, push, quiet hours, content sources, danger zone — still a lot on one page, but low-frequency **changelog / version / feedback** moved to **`/settings/about`** with task-oriented grouping on the main page.
 
 5. **Discoverability of immersive tools**  
-   Breathe, ambient, ground, and practice are primarily reached from **Home widgets** and cross-links, not the bottom nav. That keeps the tab bar small but hides secondary modalities unless Home is configured to surface them. **`/tools`** is the in-app index.
+   **Mitigation shipped:** **Tools** is a **bottom tab** pointing at `/tools` (`ToolsHub`). Home widgets and deep links remain; full-screen tool routes still hide the shell.
 
 6. **Marketing vs app boundary**  
-   Public pages (`/about`, `/blog`, `/reserve`) are consistent; `/roadmap` redirect suggests roadmap content may return — worth tracking so external links don’t rot.
+   Public pages (`/about`, `/blog`, `/reserve`) are consistent; **`/roadmap`** is a small stub page so inbound links don’t rot or drop users on welcome with no explanation.
 
 ---
 
@@ -107,7 +106,8 @@ This section captures the **current state** and what we may reconsider next.
 - **Shipped:** canonical **`/tools/*`** prefix for breathe, ambient, ground, ground history, and practice.
 - **Shipped:** no alternate short routes; external links/bookmarks should use `/tools/...`.
 - **Shipped:** information entry point via **`/tools`** (`ToolsHub`) plus Home links (“Browse all tools & experiences”).
-- **Alternative to revisit:** make Tools a dedicated bottom tab (replace one tab or move to 5 tabs) if discoverability remains low.
+- **Shipped:** **Tools** as a **primary bottom tab** (five tabs total) for the hub URL only; immersive `/tools/...` stays full-screen.
+- **Alternative to revisit:** if five tabs feel crowded on small devices, revisit order/labeling or promote tools from Home only (metrics-driven).
 
 ### 4.2 Split identity/account from progress/archive
 
@@ -128,8 +128,8 @@ This section captures the **current state** and what we may reconsider next.
 
 ### 4.5 Settings IA by task
 
-- **Shipped:** task-oriented section headers (Account & profile, Pause behavior, App behavior, Content & data, Notifications & quiet hours, Subscription & Pro, Account & security, About & feedback).
-- **Further improvement:** re-home low-frequency items (e.g. changelog/version detail) into an explicit About sub-surface to keep Settings action-first.
+- **Shipped:** task-oriented section headers (Account & profile, Pause behavior, App behavior, Content & data, Notifications & quiet hours, Subscription & Pro, Account & security).
+- **Shipped:** **`/settings/about`** — changelog, version, feedback (linked from the bottom of Settings; “new” badge when an unseen changelog version exists).
 - **Further improvement:** consider splitting Settings into 2-level IA (overview + detail pages) if the accordion grows.
 
 ### 4.6 Admin IA
@@ -158,6 +158,6 @@ This section captures the **current state** and what we may reconsider next.
 | 2026-04-25 | — | Initial inventory from `App.tsx` + nav components; gap analysis and recommendations. |
 | 2026-04-25 | — | Shipped: `/journey/*` (no state-based tabs), `/tools/*` + hub, notifications migration, Library/Activity copy; no legacy profile or pre-`/tools` routes. |
 | 2026-04-25 | — | Updated to a “decision status + alternatives” format to capture current IA, reconsideration options, and further improvements. |
-| 2026-04-25 | — | Recorded product alignment: §3 gaps and §4 decision/alternatives accepted as working direction. |
+| 2026-04-25 | — | Acted on IA: Tools bottom tab; `/settings/about`; `HistoryCrossLinks` across Library / Journey Activity / Grounding history; `/roadmap` stub page. |
 
 When routes or bottom-nav items change, update **Section 1** and the **Changelog** row in the same PR.

@@ -3,6 +3,9 @@ import type { ProfileTab } from '@/lib/router-location-state';
 /** Authenticated “Journey” hub (stats, insights, badges, letters, activity). */
 export const JOURNEY_PREFIX = '/journey';
 
+/** In-app tools hub in the shell; immersive `/tools/...` routes are full-screen (no bottom nav). */
+export const TOOLS_PREFIX = '/tools';
+
 /** Build a bookmarkable Journey URL; optional `letter` opens that letter on the letters tab. */
 export function journeyPath(tab: ProfileTab, opts?: { letterId?: string }): string {
   const path = `${JOURNEY_PREFIX}/${tab}`;

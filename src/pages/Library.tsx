@@ -19,6 +19,7 @@ import { cn } from '@/lib/utils';
 import { useProGate } from '@/hooks/use-pro-gate';
 import { NoxHeaderMain } from '@/components/ui/nox-header';
 import { librarySourceLabel } from '@/lib/library-source-label';
+import { HistoryCrossLinks } from '@/components/HistoryCrossLinks';
 
 const SOURCE_CHIPS: { key: string; icon: LucideIcon }[] = [
   { key: 'reflection', icon: Pause },
@@ -127,6 +128,7 @@ export default function Library() {
         <PageMeta title={t('library.pageTitle')} description={t('library.pageDescription')} />
         <NoxHeaderMain title={t('library.title')} subtitle={t('library.pageDescription')} />
         <p className="text-xs text-muted-foreground/90 leading-relaxed -mt-2 mb-1">{t('library.iaClarifier')}</p>
+        <HistoryCrossLinks links={['journeyActivity', 'groundHistory']} />
         <SubscriptionSkeleton variant="inline" />
       </div>
     );
@@ -138,6 +140,7 @@ export default function Library() {
         <PageMeta title={t('library.pageTitle')} description={t('library.pageDescription')} />
         <NoxHeaderMain title={t('library.title')} subtitle={t('library.pageDescription')} />
         <p className="text-xs text-muted-foreground/90 leading-relaxed -mt-2 mb-1">{t('library.iaClarifier')}</p>
+        <HistoryCrossLinks links={['journeyActivity', 'groundHistory']} />
         <div className="flex flex-col items-center justify-center min-h-[40vh] gap-4 text-center px-6">
           <Lock className="h-6 w-6 text-[#dbb266]" />
           <h2 className="text-sm font-semibold text-foreground">{t('pro.featureLocked')}</h2>
@@ -175,6 +178,7 @@ export default function Library() {
       <PageMeta title={t('library.pageTitle')} description={t('library.pageDescription')} />
       <NoxHeaderMain title={t('library.title')} subtitle={t('library.pageDescription')} />
       <p className="text-xs text-muted-foreground/90 leading-relaxed -mt-2 mb-1">{t('library.iaClarifier')}</p>
+      <HistoryCrossLinks links={['journeyActivity', 'groundHistory']} />
 
       {/* Current pause card (Pause V2). Hidden when the user has no open pause. */}
       <CurrentPauseCard />

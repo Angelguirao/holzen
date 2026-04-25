@@ -7,6 +7,7 @@ import { useHolzen } from '@/hooks/use-holzen';
 import { useSubscription } from '@/hooks/use-subscription';
 import { type ProfileTab } from '@/lib/router-location-state';
 import { journeyPath, isProfileTab } from '@/lib/app-routes';
+import { HistoryCrossLinks } from '@/components/HistoryCrossLinks';
 import { formatBtcPrice } from '@/lib/btc';
 import { format } from 'date-fns';
 import { Mail, Lock, Clock, Trash2, BarChart3, Sparkles, Award, CalendarDays, Info } from 'lucide-react';
@@ -255,10 +256,15 @@ const Profile = () => {
           <BadgesPanelV2 subscribed={subscribed} holdGoal={holdGoal} />
         )
       ) : tab === 'activity' ? (
-        <ProLock feature="history" hideContent>
-          <p className="text-xs text-muted-foreground leading-relaxed mb-3">{t('journey.activityExplainer')}</p>
-          <HistoryContent />
-        </ProLock>
+        <>
+          <p className="text-xs text-muted-foreground leading-relaxed mb-2">{t('journey.activityExplainer')}</p>
+          <div className="mb-3">
+            <HistoryCrossLinks links={['library', 'groundHistory']} />
+          </div>
+          <ProLock feature="history" hideContent>
+            <HistoryContent />
+          </ProLock>
+        </>
       ) : (
         <ProLock feature="letters" hideContent>
           {lettersLoading || letterViewerPending ? (

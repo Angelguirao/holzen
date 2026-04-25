@@ -48,7 +48,7 @@ Routes are declared in one file. **Page components** under `src/pages/` are **`R
 - **`ProtectedRoute`** — If auth is still loading, show `AuthLoading`. If no user, redirect to `/welcome`. Otherwise render children.
 - **`PublicOnlyRoute`** — Logged-in users are redirected to `/`.
 
-**Main shell:** routes under `/`, `/library`, `/journey/*` (Journey hub; `/journey` redirects to `/journey/stats`), `/settings`, and `/tools` (tools index) use **`AppLayout`**: max-width column, **`<header>`** (“Holzen” + `NotificationBell`), **`<main id="main-content">`** around **`Outlet`**, and **`BottomNav`**. `AppLayout` also wires `useHolzen`, `useLanguageSync`, and `useAutoTrigger` (pause-ready banner on non-home routes).
+**Main shell:** routes under `/`, `/library`, `/tools` (tools index / `ToolsHub`), `/journey/*` (Journey hub; `/journey` redirects to `/journey/stats`), `/settings` (plus `/settings/about`, `/settings/billing-history`) use **`AppLayout`**: max-width column, **`<header>`** (“Holzen” + `NotificationBell`), **`<main id="main-content">`** around **`Outlet`**, and **`BottomNav`** (five tabs: Home, Library, Tools, Journey, Settings). `AppLayout` also wires `useHolzen`, `useLanguageSync`, and `useAutoTrigger` (pause-ready banner on non-home routes).
 
 **Full-screen / immersive routes** (no `AppLayout`): `/pause`, the **`/tools/*`** tree (`/tools/breathe`, `/tools/ground`, `/tools/ground/history`, `/tools/ambient`, `/tools/practice/*`), full-view companion pages under `/companion/...`, and `/admin*`. There are no alternate short paths for the same screens — bookmark **`/tools/...`**.
 
@@ -56,7 +56,7 @@ Routes are declared in one file. **Page components** under `src/pages/` are **`R
 
 **Redirects:** `/index` → `/`, `/journey` → `/journey/stats`.
 
-**Public pages:** `/welcome` (landing), `/auth`, `/reset-password`, `/terms`, `/privacy`, `/about`, `/blog`, `/blog/:slug`, `/roadmap`, `/reserve`.
+**Public pages:** `/welcome` (landing), `/auth`, `/reset-password`, `/terms`, `/privacy`, `/about`, `/blog`, `/blog/:slug`, `/roadmap` (stub: no in-app roadmap yet; links to blog/about), `/reserve`.
 
 **Catch-all:** `*` → `NotFound`.
 

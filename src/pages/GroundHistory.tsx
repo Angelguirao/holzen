@@ -9,6 +9,7 @@ import { MoodIcon } from '@/components/icons/MoodIcon';
 import { NoxHeaderMain } from '@/components/ui/nox-header';
 import { Button } from '@/components/ui/button';
 import { TOOLS } from '@/lib/app-routes';
+import { HistoryCrossLinks } from '@/components/HistoryCrossLinks';
 
 interface GroundingEntry {
   id: string;
@@ -131,6 +132,8 @@ export default function GroundHistory() {
       </div>
 
       <div className="mx-auto max-w-md space-y-8 px-5 py-8 sm:px-8">
+        <HistoryCrossLinks links={['library', 'journeyActivity']} />
+
         {/* Stats summary */}
         {!loading && totalSessions > 0 && (
           <motion.div

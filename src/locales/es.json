@@ -3,9 +3,30 @@
     "home": "Inicio",
     "history": "Historial",
     "library": "Biblioteca",
+    "tools": "Herramientas",
     "journey": "Camino",
     "profile": "Perfil",
     "settings": "Ajustes"
+  },
+  "ia": {
+    "crossLinkIntro": "Ver también:",
+    "crossLinkLibrary": "Biblioteca",
+    "crossLinkJourneyActivity": "Camino — Actividad",
+    "crossLinkGroundHistory": "Historial de grounding"
+  },
+  "settingsAbout": {
+    "back": "Ajustes",
+    "title": "Info, novedades y comentarios",
+    "subtitle": "Novedades, versión de la app y contacto con el equipo, aparte de tus preferencias diarias."
+  },
+  "roadmap": {
+    "pageTitle": "Hoja de ruta — Holzen",
+    "pageDescription": "Planes y novedades del producto",
+    "title": "Hoja de ruta",
+    "body": "Ahora no hay una hoja de ruta viva en la app. Sigue el blog para notas de versión y dirección, o lee por qué creamos Holzen.",
+    "linkBlog": "Blog",
+    "linkAbout": "Sobre Holzen",
+    "linkHome": "Iniciar sesión"
   },
   "common": {
     "back": "Volver",
