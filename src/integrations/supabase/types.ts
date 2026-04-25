@@ -384,6 +384,7 @@ export type Database = {
           created_at: string
           id: string
           latency_ms: number | null
+          pause_instance_id: string | null
           reflection_id: string | null
           serve_source: string
           user_id: string
@@ -397,6 +398,7 @@ export type Database = {
           created_at?: string
           id?: string
           latency_ms?: number | null
+          pause_instance_id?: string | null
           reflection_id?: string | null
           serve_source: string
           user_id: string
@@ -410,6 +412,7 @@ export type Database = {
           created_at?: string
           id?: string
           latency_ms?: number | null
+          pause_instance_id?: string | null
           reflection_id?: string | null
           serve_source?: string
           user_id?: string
@@ -420,6 +423,34 @@ export type Database = {
             columns: ["cache_entry_id"]
             isOneToOne: false
             referencedRelation: "companion_cache"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "companion_serves_pause_instance_id_fkey"
+            columns: ["pause_instance_id"]
+            isOneToOne: false
+            referencedRelation: "pause_instances"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "companion_serves_pause_instance_id_fkey"
+            columns: ["pause_instance_id"]
+            isOneToOne: false
+            referencedRelation: "v_pause_completed"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "companion_serves_pause_instance_id_fkey"
+            columns: ["pause_instance_id"]
+            isOneToOne: false
+            referencedRelation: "v_pause_current"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "companion_serves_pause_instance_id_fkey"
+            columns: ["pause_instance_id"]
+            isOneToOne: false
+            referencedRelation: "v_pause_full"
             referencedColumns: ["id"]
           },
           {
@@ -835,6 +866,7 @@ export type Database = {
           latency_ms: number | null
           model: string
           output_tokens: number | null
+          pause_instance_id: string | null
           provider: string
           quality_gate_reason: string | null
           reflection_id: string | null
@@ -852,6 +884,7 @@ export type Database = {
           latency_ms?: number | null
           model: string
           output_tokens?: number | null
+          pause_instance_id?: string | null
           provider: string
           quality_gate_reason?: string | null
           reflection_id?: string | null
@@ -869,6 +902,7 @@ export type Database = {
           latency_ms?: number | null
           model?: string
           output_tokens?: number | null
+          pause_instance_id?: string | null
           provider?: string
           quality_gate_reason?: string | null
           reflection_id?: string | null
@@ -987,6 +1021,7 @@ export type Database = {
           created_at: string
           id: string
           is_favorite: boolean
+          pause_instance_id: string | null
           pinned: boolean
           reflection_id: string | null
           source_type: string | null
@@ -1002,6 +1037,7 @@ export type Database = {
           created_at?: string
           id?: string
           is_favorite?: boolean
+          pause_instance_id?: string | null
           pinned?: boolean
           reflection_id?: string | null
           source_type?: string | null
@@ -1017,6 +1053,7 @@ export type Database = {
           created_at?: string
           id?: string
           is_favorite?: boolean
+          pause_instance_id?: string | null
           pinned?: boolean
           reflection_id?: string | null
           source_type?: string | null
@@ -1028,6 +1065,34 @@ export type Database = {
           user_id?: string
         }
         Relationships: [
+          {
+            foreignKeyName: "library_items_pause_instance_id_fkey"
+            columns: ["pause_instance_id"]
+            isOneToOne: false
+            referencedRelation: "pause_instances"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "library_items_pause_instance_id_fkey"
+            columns: ["pause_instance_id"]
+            isOneToOne: false
+            referencedRelation: "v_pause_completed"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "library_items_pause_instance_id_fkey"
+            columns: ["pause_instance_id"]
+            isOneToOne: false
+            referencedRelation: "v_pause_current"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "library_items_pause_instance_id_fkey"
+            columns: ["pause_instance_id"]
+            isOneToOne: false
+            referencedRelation: "v_pause_full"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "library_items_reflection_id_fkey"
             columns: ["reflection_id"]
@@ -3289,6 +3354,27 @@ export type Database = {
         Args: { _collection_id: string; _user_id: string }
         Returns: boolean
       }
+      pause_create_or_reuse: {
+        Args: {
+          p_context_fingerprint: string
+          p_context_rule_result: Json
+          p_context_snapshot: Json
+          p_source: string
+          p_template_slug: string
+        }
+        Returns: Json
+      }
+      pause_create_or_reuse_as: {
+        Args: {
+          p_context_fingerprint: string
+          p_context_rule_result: Json
+          p_context_snapshot: Json
+          p_source: string
+          p_template_slug: string
+          p_user_id: string
+        }
+        Returns: Json
+      }
       pause_dismiss: {
         Args: { p_instance_id: string; p_reason?: string }
         Returns: Database["public"]["Enums"]["pause_state"]
@@ -3301,6 +3387,23 @@ export type Database = {
         Args: {
           p_instance_id: string
           p_reason: Database["public"]["Enums"]["pause_expired_reason"]
+        }
+        Returns: Database["public"]["Enums"]["pause_state"]
+      }
+      pause_log_companion: {
+        Args: {
+          p_action: Database["public"]["Enums"]["pause_companion_action"]
+          p_companion_type: string
+          p_entry_point: string
+          p_instance_id: string
+        }
+        Returns: Json
+      }
+      pause_log_step: {
+        Args: {
+          p_instance_id: string
+          p_payload?: Json
+          p_step_type: Database["public"]["Enums"]["pause_step_type"]
         }
         Returns: Database["public"]["Enums"]["pause_state"]
       }
