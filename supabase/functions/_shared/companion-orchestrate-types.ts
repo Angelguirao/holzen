@@ -7,7 +7,8 @@ export type CompanionResultSource = "live" | "library" | "cache" | "curated" | "
 
 /** Response slot shape for companion-orchestrate JSON (mirrors client `CompanionOrchestrateSlotResult`). */
 export interface CompanionResult {
-  data: any | null;
+  /** Structured companion JSON — typed as unknown at the wire boundary. */
+  data: unknown | null;
   source: CompanionResultSource;
   cacheId: string | null;
   latencyMs: number;
@@ -21,8 +22,8 @@ export interface CompanionResult {
 
 export interface InterventionPayload {
   mode: "insight" | "question";
-  primary: { type: string; data: any } | null;
-  secondary: { type: string; data: any } | null;
+  primary: { type: string; data: unknown } | null;
+  secondary: { type: string; data: unknown } | null;
   question: string | null;
 }
 

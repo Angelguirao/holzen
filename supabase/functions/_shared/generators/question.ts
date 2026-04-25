@@ -6,6 +6,7 @@
  * external information or teach. No static pool; fully context-aware.
  */
 
+import type { SupabaseClient } from "https://esm.sh/@supabase/supabase-js@2.57.2";
 import { createAttemptLogger } from "../observe.ts";
 
 /** Bump when the system prompt or style rules change. */
@@ -19,7 +20,7 @@ export interface GenerateQuestionParams {
   moodHistory?: Array<{ mood: string; outcome?: string | null }>;
   apiKey: string;
   language?: string;
-  svcClient?: any;
+  svcClient?: SupabaseClient;
   userId?: string;
   log?: (msg: string, extra?: Record<string, unknown>) => void;
 }
