@@ -145,10 +145,10 @@ const Row = ({
 )
 
 export const template = {
-  component: CheckoutConfirmationEmail,
-  subject: (data: Record<string, any>) =>
-    data?.mode === 'subscription'
-      ? `Holzen ${data?.tierLabel ?? 'Pro'} subscription confirmed`
+  component: CheckoutConfirmationEmail as React.ComponentType<Record<string, unknown>>,
+  subject: (data: Record<string, unknown>) =>
+    data.mode === 'subscription'
+      ? `Holzen ${String(data.tierLabel ?? 'Pro')} subscription confirmed`
       : 'Holzen flex credits added',
   displayName: 'Checkout confirmation',
   previewData: {

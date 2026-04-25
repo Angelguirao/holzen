@@ -2,6 +2,7 @@
  * Shared referral attribution + milestone rewards. Used by record-referral (HTTP) and process-referral-pending (cron).
  * Idempotent: duplicate referrals / rewards are safe.
  */
+import type { SupabaseClient } from "https://esm.sh/@supabase/supabase-js@2.57.2";
 import Stripe from "https://esm.sh/stripe@18.5.0";
 import { redactEmailForLog } from "./email-log-helpers.ts";
 import { sendLovableEmailMessage, type LovableEmailLogger } from "./lovable-email.ts";
@@ -143,8 +144,8 @@ async function sendRewardEmail(
 
 async function grantReward(
   log: ReferralRecordLogger,
-  supabase: any,
-  stripe: any,
+  supabase: SupabaseClient,
+  stripe: Stripe,
   referrerId: string,
   referrerEmail: string,
   milestone: (typeof MILESTONES)[number],
@@ -230,7 +231,7 @@ async function grantReward(
 
 async function grantMilestonesForReferrer(
   log: ReferralRecordLogger,
-  supabase: any,
+  supabase: SupabaseClient,
   referrerId: string,
 ) {
   referralStep(log, "Referral recorded, checking milestones");
@@ -276,7 +277,7 @@ function isUniqueViolation(err: unknown): boolean {
  * Ensures referral row + profile attribution exist, then runs milestone grants (idempotent).
  */
 export async function applyReferralRecord(
-  supabase: any,
+  supabase: SupabaseClient,
   params: { referredUserId: string; referralCode: string; log: ReferralRecordLogger },
 ): Promise<ApplyReferralResult> {
   const referral_code = params.referralCode.trim();
@@ -388,7 +389,7 @@ export async function applyReferralRecord(
   return { ok: true };
 }
 
-export async function markReferralJobCompleted(supabase: any, referredUserId: string): Promise<void> {
+export async function markReferralJobCompleted(supabase: SupabaseClient, referredUserId: string): Promise<void> {
   await supabase
     .from("referral_pending_jobs")
     .update({
@@ -401,7 +402,7 @@ export async function markReferralJobCompleted(supabase: any, referredUserId: st
 }
 
 export async function markReferralJobFailedTerminal(
-  supabase: any,
+  supabase: SupabaseClient,
   referredUserId: string,
   reason: string,
 ): Promise<void> {

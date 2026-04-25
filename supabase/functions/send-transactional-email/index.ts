@@ -103,7 +103,7 @@ Deno.serve(withRequestLogging("send-transactional-email", async ({ req, log }) =
   let recipientEmail: string
   let idempotencyKey: string
   let messageId: string
-  let templateData: Record<string, any> = {}
+  let templateData: Record<string, unknown> = {}
   try {
     const body = await req.json()
     templateName = body.templateName || body.template_name

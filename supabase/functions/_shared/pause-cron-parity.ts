@@ -3,6 +3,7 @@
  * (shared with the client via `@holzen-pause-context`).
  */
 
+import type { SupabaseClient } from "https://esm.sh/@supabase/supabase-js@2.57.2";
 import type { PauseContextFearGreed, PauseContextOnChain } from "./pause-context-suffix.ts";
 import { enrichPauseContextWithMarketData } from "./pause-context-suffix.ts";
 
@@ -80,6 +81,13 @@ type UserSignalPreferenceRow = {
   category: string;
 };
 
+type SignalCatalogRow = {
+  id: string;
+  name: string;
+  type: string;
+  url: string;
+};
+
 function hostnameFromReflectionUrl(url: string | null | undefined): string | null {
   if (!url || typeof url !== "string") return null;
   try {
@@ -103,7 +111,7 @@ function pushUnique(cap: string[], v: string, max: number) {
  * but tuned to the V2 schema shape.
  */
 export async function recencyHintsFromPauseArtifacts(
-  svcClient: { from: (t: string) => any },
+  svcClient: SupabaseClient,
   userId: string,
 ): Promise<OrchestratorRecencyHints> {
   const recentSignalSources: string[] = [];
@@ -170,7 +178,7 @@ export async function recencyHintsFromPauseArtifacts(
  * used by check-volatility.
  */
 export async function pauseRecencyInputs(
-  svcClient: { from: (t: string) => any },
+  svcClient: SupabaseClient,
   userId: string,
 ): Promise<{
   moodHistory: Array<{ mood: string; outcome: string | null; created_at: string | undefined }> | undefined;
@@ -237,7 +245,7 @@ export async function pauseRecencyInputs(
 
 /** Active signal catalog + custom URLs for Signal companion (same rules as use-companion-data). */
 export async function fetchSignalSourcesForOrchestrate(
-  svcClient: any,
+  svcClient: SupabaseClient,
   userId: string,
 ): Promise<Array<{ name: string; type: string; url: string }> | undefined> {
   try {
@@ -255,15 +263,20 @@ export async function fetchSignalSourcesForOrchestrate(
         .filter((p) => typeof p.source_id === "string" && p.source_id.length > 0)
         .map((p) => [p.source_id as string, p] as const),
     );
-    const catalogActive = (catalog ?? [])
-      .filter((s: any) => {
+    const catalogRows = (catalog ?? []) as SignalCatalogRow[];
+    const catalogActive = catalogRows
+      .filter((s) => {
         const pref = prefsMap.get(s.id);
         return pref?.active ?? true;
       })
-      .map((s: any) => ({ name: s.name, type: s.type, url: s.url }));
+      .map((s) => ({ name: s.name, type: s.type, url: s.url }));
     const customActive = typedUserPrefs
-      .filter((p: any) => !p.source_id && p.custom_name && p.active)
-      .map((p: any) => ({ name: p.custom_name, type: p.custom_type || "blog", url: p.custom_url }));
+      .filter((p) => !p.source_id && p.custom_name && p.active)
+      .map((p) => ({
+        name: p.custom_name as string,
+        type: p.custom_type || "blog",
+        url: p.custom_url ?? "",
+      }));
     const sources = [...catalogActive, ...customActive];
     return sources.length > 0 ? sources : undefined;
   } catch {
@@ -273,7 +286,7 @@ export async function fetchSignalSourcesForOrchestrate(
 
 /** Active grounding catalog + custom URLs for Grounding companion (same merge rules as signal). */
 export async function fetchGroundingSourcesForOrchestrate(
-  svcClient: any,
+  svcClient: SupabaseClient,
   userId: string,
 ): Promise<Array<{ name: string; type: string; url: string }> | undefined> {
   try {
@@ -291,15 +304,20 @@ export async function fetchGroundingSourcesForOrchestrate(
         .filter((p) => typeof p.source_id === "string" && p.source_id.length > 0)
         .map((p) => [p.source_id as string, p] as const),
     );
-    const catalogActive = (catalog ?? [])
-      .filter((s: any) => {
+    const catalogRows = (catalog ?? []) as SignalCatalogRow[];
+    const catalogActive = catalogRows
+      .filter((s) => {
         const pref = prefsMap.get(s.id);
         return pref?.active ?? true;
       })
-      .map((s: any) => ({ name: s.name, type: s.type, url: s.url }));
+      .map((s) => ({ name: s.name, type: s.type, url: s.url }));
     const customActive = typedUserPrefs
-      .filter((p: any) => !p.source_id && p.custom_name && p.active)
-      .map((p: any) => ({ name: p.custom_name, type: p.custom_type || "blog", url: p.custom_url }));
+      .filter((p) => !p.source_id && p.custom_name && p.active)
+      .map((p) => ({
+        name: p.custom_name as string,
+        type: p.custom_type || "blog",
+        url: p.custom_url ?? "",
+      }));
     const sources = [...catalogActive, ...customActive];
     return sources.length > 0 ? sources : undefined;
   } catch {
