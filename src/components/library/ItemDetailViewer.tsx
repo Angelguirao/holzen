@@ -1,4 +1,4 @@
-import { useMemo, useState, useRef, useEffect, useCallback } from 'react';
+import { useMemo, useState, useRef, useEffect, useCallback, useLayoutEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sheet';
@@ -98,6 +98,10 @@ export function ItemDetailViewer({
   isIncomplete, onOutcomeRecorded, currentOutcome,
 }: Props) {
   const { t } = useTranslation();
+  const onStatusChangeRef = useRef(onStatusChange);
+  useLayoutEffect(() => {
+    onStatusChangeRef.current = onStatusChange;
+  }, [onStatusChange]);
   const navigate = useNavigate();
   const [editingTags, setEditingTags] = useState(false);
   const [tagInput, setTagInput] = useState('');
@@ -120,12 +124,12 @@ export function ItemDetailViewer({
     setShowOutcomePicker(false);
   }, [item?.id]);
 
-  // Auto-mark as read when opened
+  // Auto-mark as read when opened (callback via ref so parent identity changes do not re-trigger).
   useEffect(() => {
     if (open && item && item.status === 'unread') {
-      onStatusChange(item.id, 'read');
+      onStatusChangeRef.current(item.id, 'read');
     }
-  }, [open, item?.id]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [open, item]);
 
   const siblings = useMemo(() => {
     if (!item?.pause_instance_id || !allItems) return [];
