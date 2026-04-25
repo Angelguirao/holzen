@@ -18,6 +18,7 @@ import { Input } from '@/components/ui/input';
 import { cn } from '@/lib/utils';
 import { useProGate } from '@/hooks/use-pro-gate';
 import { NoxHeaderMain } from '@/components/ui/nox-header';
+import { librarySourceLabel } from '@/lib/library-source-label';
 
 const SOURCE_CHIPS: { key: string; icon: LucideIcon }[] = [
   { key: 'reflection', icon: Pause },
@@ -63,7 +64,7 @@ export default function Library() {
   const { items, collections } = library;
 
   const sourceChips = useMemo(
-    () => SOURCE_CHIPS.map((c) => ({ ...c, label: t(`librarySources.${c.key}`) })),
+    () => SOURCE_CHIPS.map((c) => ({ ...c, label: librarySourceLabel(c.key, t, c.key) })),
     [t]
   );
 

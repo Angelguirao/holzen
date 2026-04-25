@@ -878,7 +878,15 @@
     "dateYesterday": "Yesterday",
     "dateThisWeek": "This week",
     "dateThisMonth": "This month",
-    "dateEarlier": "Earlier"
+    "dateEarlier": "Earlier",
+    "export": "Export",
+    "exportCsv": "CSV (.csv)",
+    "exportMarkdown": "Markdown (.md)",
+    "decisionLabel": "Decision",
+    "changeDecision": "Change",
+    "changeDecisionLabel": "Change decision",
+    "incompleteLabel": "No decision recorded",
+    "incompleteDescription": "What did you end up doing after this pause?"
   },
   "pause": {
     "youPaused": "You paused. That's the hardest part.",
