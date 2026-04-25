@@ -1540,11 +1540,13 @@
     "reflection_note": "Note",
     "signal": "Signal",
     "grounding": "Grounding",
+    "ground": "Grounding",
     "learning": "Grounding",
     "haiku": "Haiku",
     "zoom_out": "Zoom Out",
     "history_insight": "History",
-    "external": "External"
+    "external": "External",
+    "practice": "Practice"
   },
   "itemDetail": {
     "onThisDay": "On this day",

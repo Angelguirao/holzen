@@ -8,6 +8,7 @@ import type { LibraryItem, Collection, CollectionItem } from '@/hooks/use-librar
 import { supabase } from '@/integrations/supabase/client';
 import { OutcomeIcon } from '@/components/icons/OutcomeIcon';
 import { CompanionFeedback } from '@/components/CompanionFeedback';
+import { librarySourceLabel } from '@/lib/library-source-label';
 
 const TYPE_EMOJIS: Record<string, string> = {
   bookmark: '🔖',
@@ -65,7 +66,7 @@ interface Props {
 
 function CompanionCard({ item, onSelect }: { item: LibraryItem; onSelect?: (item: LibraryItem) => void }) {
   const { t } = useTranslation();
-  const sourceLabel = t(`librarySources.${item.source_type}`, item.source_type ?? 'Item');
+  const sourceLabel = librarySourceLabel(item.source_type, t, item.source_type ?? 'Item');
   const bodyText = typeof item.body === 'string' ? item.body : item.body ? JSON.stringify(item.body) : null;
 
   return (
@@ -184,7 +185,7 @@ export function ItemDetailViewer({
 
   const companions = linkedItems && linkedItems.length > 0 ? linkedItems : siblings;
   const isReflection = item.source_type === 'reflection';
-  const sourceLabel = t(`librarySources.${item.source_type}`, item.source_type ?? 'Item');
+  const sourceLabel = librarySourceLabel(item.source_type, t, item.source_type ?? 'Item');
   const emoji = SOURCE_EMOJIS[item.source_type ?? ''] ?? TYPE_EMOJIS[item.type] ?? '📄';
 
   // Determine the effective outcome: freshly recorded > current from DB
