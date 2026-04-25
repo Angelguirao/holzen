@@ -3,13 +3,15 @@ import { companionFallbacksDisabled, COMPANION_FALLBACKS_DISABLED_MESSAGE } from
 import { sanitizePromptArray } from "../_shared/sanitize.ts";
 import { createAttemptLogger } from "../_shared/observe.ts";
 import { callPerplexityChat, type PerplexityUsage } from "../_shared/perplexity-client.ts";
-import { withRequestLogging } from "../_shared/with-request-logging.ts";
+import { withRequestLogging, type RequestLoggingContext } from "../_shared/with-request-logging.ts";
 import { AI_TEMPORARILY_UNAVAILABLE_MESSAGE } from "../_shared/ai-user-messages.ts";
 import {
   consumeAllowanceOrCredits,
   resolveTierFromProfile,
   tierLimits,
 } from "../_shared/subscription-entitlements.ts";
+
+type RequestLog = RequestLoggingContext["log"];
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -20,6 +22,7 @@ const corsHeaders = {
 async function searchRecentArticle(
   activity: string,
   _langCode: string,
+  log: RequestLog,
 ): Promise<{ title: string; url: string; snippet: string; usage?: PerplexityUsage; searchMs: number } | null> {
   const PERPLEXITY_API_KEY = Deno.env.get("PERPLEXITY_API_KEY");
   if (!PERPLEXITY_API_KEY) return null;
@@ -59,16 +62,30 @@ async function searchRecentArticle(
       : null;
   } catch (e) {
     if (e instanceof DOMException && e.name === "AbortError") {
-      console.warn("[suggest-grounding] Perplexity search timed out for:", activity);
+      try {
+        log.warn("suggest_grounding_perplexity_timeout", {
+          holzen_event: "suggest_grounding_perplexity_timeout",
+          activity_len: activity.length,
+        });
+      } catch {
+        /* non-fatal */
+      }
       return null;
     }
-    console.error("Perplexity search failed:", e);
+    try {
+      log.error("suggest_grounding_perplexity_error", {
+        holzen_event: "suggest_grounding_perplexity_error",
+        detail: e instanceof Error ? e.message : String(e),
+      });
+    } catch {
+      /* non-fatal */
+    }
     return null;
   }
 }
 
 serve(
-  withRequestLogging("suggest-grounding", async ({ req }) => {
+  withRequestLogging("suggest-grounding", async ({ req, log }) => {
   try {
     const authHeader = req.headers.get("Authorization");
     if (!authHeader?.startsWith("Bearer ")) {
@@ -98,7 +115,15 @@ serve(
         providers: ["perplexity", "lovable"],
       });
       if (!guard.allowed) {
-        console.warn(`[suggest-grounding] guard blocked: ${guard.reason ?? "unknown"}`);
+        try {
+          log.warn("suggest_grounding_guard_blocked", {
+            holzen_event: "suggest_grounding_guard_blocked",
+            reason: guard.reason ?? "unknown",
+            status: guard.status ?? null,
+          });
+        } catch {
+          /* non-fatal */
+        }
         return new Response(JSON.stringify({ error: AI_TEMPORARILY_UNAVAILABLE_MESSAGE }), {
           status: guard.status ?? 503,
           headers: { ...corsHeaders, "Content-Type": "application/json" },
@@ -289,7 +314,15 @@ Rules:
         );
       }
       const text = await response.text();
-      console.error("AI gateway error:", response.status, text);
+      try {
+        log.error("suggest_grounding_ai_gateway_error", {
+          holzen_event: "suggest_grounding_ai_gateway_error",
+          status: response.status,
+          response_chars: text.length,
+        });
+      } catch {
+        /* non-fatal */
+      }
       throw new Error("AI gateway error");
     }
 
@@ -303,7 +336,7 @@ Rules:
       const chosenActivity = args.activity;
 
       // Now search Perplexity for a recent article about the chosen activity
-      const article = await searchRecentArticle(chosenActivity, langCode);
+      const article = await searchRecentArticle(chosenActivity, langCode, log);
 
       if (logAttempt) {
         logAttempt({
@@ -361,7 +394,14 @@ Rules:
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
   } catch (e) {
-    console.error("suggest-grounding error:", e);
+    try {
+      log.error("suggest_grounding_uncaught", {
+        holzen_event: "suggest_grounding_uncaught",
+        detail: e instanceof Error ? e.message : String(e),
+      });
+    } catch {
+      /* non-fatal */
+    }
     return new Response(
       JSON.stringify({ error: e instanceof Error ? e.message : "Unknown error" }),
       { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
