@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
+import type { Json } from '@/integrations/supabase/types';
 
 // ── Existing types ──
 
@@ -57,7 +58,7 @@ export interface CacheEntryRow {
   thumbs_up: number | null;
   thumbs_down: number | null;
   created_at: string;
-  content: any;
+  content: Json;
   /** When true, pool selection prefers other rows first (body kept). */
   source_untrusted?: boolean | null;
 }
@@ -77,6 +78,33 @@ export interface SignalSourceRow {
 
 export type TimePeriod = 'today' | '7d' | '30d' | 'all';
 
+/** Rows from `v_companion_serves_per_day` (view — not in generated `Database`). */
+export interface DailyServeRow {
+  day?: string | null;
+  serve_count?: number | null;
+  serve_source?: string | null;
+}
+/** Rows from `v_generation_failures_per_day`. */
+export interface DailyFailureRow {
+  day?: string | null;
+  status?: string | null;
+  attempt_count?: number | null;
+}
+/** Rows from `v_companion_feedback_per_day`. */
+export interface DailyFeedbackRow {
+  day?: string | null;
+  vote?: string | null;
+  vote_count?: number | null;
+}
+/** Rows from `v_notification_response_rate`. */
+export interface DailyNotificationRow {
+  day?: string | null;
+  notifications?: number | null;
+  completed?: number | null;
+  engaged?: number | null;
+  ignored?: number | null;
+}
+
 export interface RejectionRow {
   id: string;
   companion_type: string;
@@ -91,7 +119,7 @@ export interface RejectionRow {
 export interface RecentContentRow {
   id: string;
   companion_type: string;
-  content: any;
+  content: Json;
   quality_score: number;
   title: string | null;
   created_at: string;
@@ -223,7 +251,7 @@ export function useAdminStats(enabled = true): AdminStats {
   const [periodStats, setPeriodStats] = useState<PeriodStats>({ serves: 0, cacheHits: 0, cacheHitRate: 0, cost: 0, failures: 0, totalAttempts: 0, feedbackUp: 0, feedbackDown: 0 });
   const [prevPeriodStats, setPrevPeriodStats] = useState<PeriodStats | null>(null);
   // Daily rows from v_notification_response_rate — filtered client-side by period.
-  const [notificationPerDay, setNotificationPerDay] = useState<any[]>([]);
+  const [notificationPerDay, setNotificationPerDay] = useState<DailyNotificationRow[]>([]);
   const [notificationStats, setNotificationStats] = useState<NotificationResponseStats>({
     notifications: 0, completed: 0, engaged: 0, ignored: 0,
     pctCompleted: null, pctEngaged: null, pctIgnored: null,
@@ -253,9 +281,9 @@ export function useAdminStats(enabled = true): AdminStats {
   }, [fetchCacheEntries]);
 
   // Store daily view data for period filtering
-  const [servesPerDay, setServesPerDay] = useState<any[]>([]);
-  const [failuresPerDay, setFailuresPerDay] = useState<any[]>([]);
-  const [feedbackPerDay, setFeedbackPerDay] = useState<any[]>([]);
+  const [servesPerDay, setServesPerDay] = useState<DailyServeRow[]>([]);
+  const [failuresPerDay, setFailuresPerDay] = useState<DailyFailureRow[]>([]);
+  const [feedbackPerDay, setFeedbackPerDay] = useState<DailyFeedbackRow[]>([]);
 
   /**
    * Compute period stats from daily views (client-side filtering).
@@ -269,10 +297,10 @@ export function useAdminStats(enabled = true): AdminStats {
     cacheHitsData: CacheHitRow[],
     failuresData: FailureRow[],
     feedbackData: FeedbackRow[],
-    dailyServes: any[],
-    dailyFailures: any[],
-    dailyFeedback: any[],
-    dailyNotifications: any[],
+    dailyServes: DailyServeRow[],
+    dailyFailures: DailyFailureRow[],
+    dailyFeedback: DailyFeedbackRow[],
+    dailyNotifications: DailyNotificationRow[],
   ) => {
     const start = periodStart(p);
     const startDate = start?.slice(0, 10);
@@ -282,12 +310,12 @@ export function useAdminStats(enabled = true): AdminStats {
     let totalCacheHits: number;
     if (dailyServes.length > 0) {
       const filtered = startDate
-        ? dailyServes.filter((r: any) => r.day && r.day >= startDate)
+        ? dailyServes.filter((r) => r.day && r.day >= startDate)
         : dailyServes;
-      totalServes = filtered.reduce((s: number, r: any) => s + (r.serve_count ?? 0), 0);
+      totalServes = filtered.reduce((s, r) => s + (r.serve_count ?? 0), 0);
       totalCacheHits = filtered
-        .filter((r: any) => r.serve_source === 'cache')
-        .reduce((s: number, r: any) => s + (r.serve_count ?? 0), 0);
+        .filter((r) => r.serve_source === 'cache')
+        .reduce((s, r) => s + (r.serve_count ?? 0), 0);
     } else {
       totalServes = cacheHitsData.reduce((s, r) => s + (r.total_serves ?? 0), 0);
       totalCacheHits = cacheHitsData.reduce((s, r) => s + (r.cache_hits ?? 0), 0);
@@ -305,12 +333,12 @@ export function useAdminStats(enabled = true): AdminStats {
     let totalAttempts: number;
     if (dailyFailures.length > 0) {
       const filtered = startDate
-        ? dailyFailures.filter((r: any) => r.day && r.day >= startDate)
+        ? dailyFailures.filter((r) => r.day && r.day >= startDate)
         : dailyFailures;
       totalFails = filtered
-        .filter((r: any) => r.status === 'error' || r.status === 'timeout')
-        .reduce((s: number, r: any) => s + (r.attempt_count ?? 0), 0);
-      totalAttempts = filtered.reduce((s: number, r: any) => s + (r.attempt_count ?? 0), 0);
+        .filter((r) => r.status === 'error' || r.status === 'timeout')
+        .reduce((s, r) => s + (r.attempt_count ?? 0), 0);
+      totalAttempts = filtered.reduce((s, r) => s + (r.attempt_count ?? 0), 0);
     } else {
       totalFails = failuresData.reduce((s, r) => s + (r.errors ?? 0) + (r.timeouts ?? 0), 0);
       totalAttempts = failuresData.reduce((s, r) => s + (r.total_attempts ?? 0), 0);
@@ -321,10 +349,10 @@ export function useAdminStats(enabled = true): AdminStats {
     let fbDown: number;
     if (dailyFeedback.length > 0) {
       const filtered = startDate
-        ? dailyFeedback.filter((r: any) => r.day && r.day >= startDate)
+        ? dailyFeedback.filter((r) => r.day && r.day >= startDate)
         : dailyFeedback;
-      fbUp = filtered.filter((r: any) => r.vote === 'up').reduce((s: number, r: any) => s + (r.vote_count ?? 0), 0);
-      fbDown = filtered.filter((r: any) => r.vote === 'down').reduce((s: number, r: any) => s + (r.vote_count ?? 0), 0);
+      fbUp = filtered.filter((r) => r.vote === 'up').reduce((s, r) => s + (r.vote_count ?? 0), 0);
+      fbDown = filtered.filter((r) => r.vote === 'down').reduce((s, r) => s + (r.vote_count ?? 0), 0);
     } else {
       fbUp = feedbackData.reduce((s, r) => s + (r.total_thumbs_up ?? 0), 0);
       fbDown = feedbackData.reduce((s, r) => s + (r.total_thumbs_down ?? 0), 0);
@@ -336,12 +364,12 @@ export function useAdminStats(enabled = true): AdminStats {
     // Empty array = view not available yet or zero notifications — render as zeros.
     const notifRows = dailyNotifications;
     const notifFiltered = startDate
-      ? notifRows.filter((r: any) => r.day && r.day >= startDate)
+      ? notifRows.filter((r) => r.day && r.day >= startDate)
       : notifRows;
-    const notifs = notifFiltered.reduce((s: number, r: any) => s + (r.notifications ?? 0), 0);
-    const notifCompleted = notifFiltered.reduce((s: number, r: any) => s + (r.completed ?? 0), 0);
-    const notifEngaged = notifFiltered.reduce((s: number, r: any) => s + (r.engaged ?? 0), 0);
-    const notifIgnored = notifFiltered.reduce((s: number, r: any) => s + (r.ignored ?? 0), 0);
+    const notifs = notifFiltered.reduce((s, r) => s + (r.notifications ?? 0), 0);
+    const notifCompleted = notifFiltered.reduce((s, r) => s + (r.completed ?? 0), 0);
+    const notifEngaged = notifFiltered.reduce((s, r) => s + (r.engaged ?? 0), 0);
+    const notifIgnored = notifFiltered.reduce((s, r) => s + (r.ignored ?? 0), 0);
     setNotificationStats({
       notifications: notifs,
       completed: notifCompleted,
@@ -359,16 +387,16 @@ export function useAdminStats(enabled = true): AdminStats {
 
       const prevCosts = costsData.filter(r => r.day && r.day >= prevStartDate && r.day < startDate);
       const prevServes = dailyServes.length > 0
-        ? dailyServes.filter((r: any) => r.day && r.day >= prevStartDate && r.day < startDate).reduce((s: number, r: any) => s + (r.serve_count ?? 0), 0)
+        ? dailyServes.filter((r) => r.day && r.day >= prevStartDate && r.day < startDate).reduce((s, r) => s + (r.serve_count ?? 0), 0)
         : 0;
       const prevFailFiltered = dailyFailures.length > 0
-        ? dailyFailures.filter((r: any) => r.day && r.day >= prevStartDate && r.day < startDate)
+        ? dailyFailures.filter((r) => r.day && r.day >= prevStartDate && r.day < startDate)
         : [];
-      const prevFails = prevFailFiltered.filter((r: any) => r.status === 'error' || r.status === 'timeout').reduce((s: number, r: any) => s + (r.attempt_count ?? 0), 0);
-      const prevTotalAttempts = prevFailFiltered.reduce((s: number, r: any) => s + (r.attempt_count ?? 0), 0);
+      const prevFails = prevFailFiltered.filter((r) => r.status === 'error' || r.status === 'timeout').reduce((s, r) => s + (r.attempt_count ?? 0), 0);
+      const prevTotalAttempts = prevFailFiltered.reduce((s, r) => s + (r.attempt_count ?? 0), 0);
 
       const prevCacheHits = dailyServes.length > 0
-        ? dailyServes.filter((r: any) => r.day && r.day >= prevStartDate && r.day < startDate && r.serve_source === 'cache').reduce((s: number, r: any) => s + (r.serve_count ?? 0), 0)
+        ? dailyServes.filter((r) => r.day && r.day >= prevStartDate && r.day < startDate && r.serve_source === 'cache').reduce((s, r) => s + (r.serve_count ?? 0), 0)
         : 0;
 
       setPrevPeriodStats({
@@ -472,10 +500,10 @@ export function useAdminStats(enabled = true): AdminStats {
       const dailyFeedback = fbDayRes.error ? [] : (fbDayRes.data ?? []);
       const dailyNotifications = notifRes.error ? [] : (notifRes.data ?? []);
 
-      setServesPerDay(dailyServes);
-      setFailuresPerDay(dailyFailures);
-      setFeedbackPerDay(dailyFeedback);
-      setNotificationPerDay(dailyNotifications);
+      setServesPerDay(dailyServes as DailyServeRow[]);
+      setFailuresPerDay(dailyFailures as DailyFailureRow[]);
+      setFeedbackPerDay(dailyFeedback as DailyFeedbackRow[]);
+      setNotificationPerDay(dailyNotifications as DailyNotificationRow[]);
 
       // Compute period stats from view data
       computePeriodStats(

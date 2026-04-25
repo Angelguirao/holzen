@@ -35,6 +35,13 @@ const OUTCOME_OPTIONS = [
   { key: 'bought', labelKey: 'ritual.decide.buy' },
 ] as const;
 
+type ZoomOutOnThisDayEntry = { yearsAgo: number; price?: number; date?: string };
+type ZoomOutParsedBody = {
+  onThisDay?: ZoomOutOnThisDayEntry[];
+  echo?: { message?: string };
+  deepTime?: string | { title?: string; body?: string };
+};
+
 interface Props {
   item: LibraryItem | null;
   linkedItems?: LibraryItem[];
@@ -49,7 +56,7 @@ interface Props {
   onSelectItem?: (item: LibraryItem) => void;
   collections?: Collection[];
   getItemCollections?: (itemId: string) => Collection[];
-  onAddToCollection?: (collectionId: string, itemId: string) => Promise<any>;
+  onAddToCollection?: (collectionId: string, itemId: string) => Promise<unknown>;
   onRemoveFromCollection?: (collectionId: string, itemId: string) => Promise<void>;
   isIncomplete?: boolean;
   onOutcomeRecorded?: () => void;
@@ -125,9 +132,13 @@ export function ItemDetailViewer({
     return allItems.filter((i) => i.pause_instance_id === item.pause_instance_id && i.id !== item.id && i.status !== 'deleted');
   }, [item, allItems]);
 
-  const zoomOutData = useMemo(() => {
+  const zoomOutData = useMemo((): ZoomOutParsedBody | null => {
     if (item?.source_type !== 'zoom_out' || !item?.body) return null;
-    try { return JSON.parse(item.body); } catch { return null; }
+    try {
+      return JSON.parse(item.body) as ZoomOutParsedBody;
+    } catch {
+      return null;
+    }
   }, [item?.source_type, item?.body]);
 
   const itemCollections = useMemo(() => {
@@ -229,7 +240,7 @@ export function ItemDetailViewer({
                   {zoomOutData.onThisDay?.length > 0 && (
                     <div className="space-y-1.5">
                       <p className="text-[9px] font-mono text-muted-foreground/50 uppercase tracking-wider">{t('itemDetail.onThisDay')}</p>
-                      {[...zoomOutData.onThisDay].reverse().map((entry: any) => (
+                      {[...zoomOutData.onThisDay].reverse().map((entry: ZoomOutOnThisDayEntry) => (
                         <div key={entry.yearsAgo} className="flex items-center justify-between gap-2 text-xs font-mono">
                           <span className="text-muted-foreground/60 w-14 shrink-0">{t('itemDetail.yearsAgo', { count: entry.yearsAgo })}</span>
                           <span className="text-muted-foreground tabular-nums">${entry.price?.toLocaleString()}</span>

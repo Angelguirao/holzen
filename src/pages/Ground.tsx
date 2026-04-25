@@ -176,7 +176,7 @@ export default function Ground() {
     };
 
     fetchSuggestion();
-  }, [isPending, isPro, groundingActivities, btcData, severity, language, t, navState.preGenerated, strictNoFallback]);
+  }, [isPending, isPro, groundingActivities, btcData, severity, language, t, navState.preGenerated, strictNoFallback, user?.id]);
 
   // Timer
   useEffect(() => {
@@ -232,15 +232,14 @@ export default function Ground() {
 
     // Save as practice_entry
     if (user) {
-      const entry: any = {
+      void supabase.from('practice_entries').insert({
         user_id: user.id,
         type: 'grounding',
         mood: selectedMood || null,
         duration_seconds: selectedDuration ? selectedDuration * 60 : null,
         body: reflectionText.trim() || null,
         trigger_text: activity || null,
-      };
-      supabase.from('practice_entries').insert(entry).then(() => {});
+      });
       // Clear cached suggestion — session completed
       try { localStorage.removeItem(`holzen_ground_suggestion_${user.id}`); } catch { /* ignore */ }
     }

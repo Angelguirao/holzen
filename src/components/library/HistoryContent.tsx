@@ -50,7 +50,7 @@ const HistoryContent = () => {
           id: p.id,
         });
       });
-      (lets ?? []).forEach((l: any) =>
+      (lets ?? []).forEach((l: { id: string; written_at: string; deliver_during: string }) =>
         items.push({
           date: l.written_at,
           type: 'letter',
@@ -58,10 +58,10 @@ const HistoryContent = () => {
           label: `Letter → ${l.deliver_during}`,
         }),
       );
-      (bads ?? []).forEach((b: any) =>
+      (bads ?? []).forEach((b: { id: string; earned_at: string; badge_id: string }) =>
         items.push({ date: b.earned_at, type: 'badge', id: b.id, label: b.badge_id }),
       );
-      (pracs ?? []).forEach((p: any) =>
+      (pracs ?? []).forEach((p: { id: string; created_at: string; type: string; mood: string | null; prompt: string | null }) =>
         items.push({
           date: p.created_at,
           type: 'practice',

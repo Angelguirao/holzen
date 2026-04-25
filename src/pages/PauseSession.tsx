@@ -415,12 +415,12 @@ export default function PauseSession() {
       stepType: 'favorite_toggled',
       payload: { is_favorite: newVal },
     }).catch(() => setIsFavorite(!newVal));
-    // Also update library_items row (cast to 'any' to avoid TS2589 on the
-    // generated Supabase types until types.ts is regenerated post-merge).
     try {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const q: any = supabase.from('library_items').update({ is_favorite: newVal });
-      await q.eq('pause_instance_id', pauseInstanceId).eq('source_type', 'reflection');
+      await supabase
+        .from('library_items')
+        .update({ is_favorite: newVal })
+        .eq('pause_instance_id', pauseInstanceId)
+        .eq('source_type', 'reflection');
     } catch {
       /* non-fatal */
     }
