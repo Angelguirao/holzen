@@ -6,6 +6,12 @@ export const JOURNEY_PREFIX = '/journey';
 /** In-app tools hub in the shell; immersive `/tools/...` routes are full-screen (no bottom nav). */
 export const TOOLS_PREFIX = '/tools';
 
+/**
+ * Instance-scoped companion flows (orchestrated from `/pause`). Not under `/tools/*`;
+ * that namespace is for regulation / practice / letters.
+ */
+export const COMPANION_PREFIX = '/companion' as const;
+
 /** Build a bookmarkable Journey URL. */
 export function journeyPath(tab: ProfileTab): string {
   return `${JOURNEY_PREFIX}/${tab}`;

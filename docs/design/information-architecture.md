@@ -28,7 +28,7 @@ Five bottom tabs, all wrapped in `AppLayout` (header + `Outlet` + bottom nav, ma
 
 **Letters (Pro):** canonical route `/tools/letters`. Optional query `?letter=<id>` scrolls to that delivered letter. Legacy `/journey/letters?...` redirects to `/tools/letters?...` (query preserved).
 
-Notification `action_path` for letter delivery uses `/tools/letters?letter=<id>` (see migrations `20260426010000_letters_tools_action_path.sql` and `20260425200000_journey_routes_notification_paths.sql`). The app does not register `/profile` or alternate pre-`/tools/*` path families.
+Notification `action_path` for letter delivery uses `/tools/letters?letter=<id>` (see migrations `20260426010000_letters_tools_action_path.sql` and `20260425200000_journey_routes_notification_paths.sql`). The app does not register `/profile` or alternate pre-`/tools/`* path families.
 
 **Settings sub-routes (still in shell + bottom nav):** `/settings/billing-history`, `/settings/about` (changelog, version, feedback — split out so the main Settings page stays action-first).
 
@@ -45,7 +45,7 @@ This matches the “skills-first” stats organization documented in `docs/decis
 | ----------------- | --------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------- |
 | Pause session     | `/pause`                                                                                                              | Core guided pause flow.                            |
 | Companions        | `/companion/zoom-out/:pauseInstanceId`, `/companion/history/...`, `/companion/signal/...`, `/companion/grounding/...` | Deep-linked to a pause instance.                   |
-| Tools (immersive) | `/tools/breathe`, `/tools/ambient`, `/tools/ground`, `/tools/ground/history`, `/tools/practice/*` | Regulation / grounding / practice — no bottom nav. |
+| Tools (immersive) | `/tools/breathe`, `/tools/ambient`, `/tools/ground`, `/tools/ground/history`, `/tools/practice/`*                     | Regulation / grounding / practice — no bottom nav. |
 
 
 **B. Same shell as primary tabs (not listed in §1.1 table)** — still `AppLayout` + bottom nav:
@@ -98,8 +98,8 @@ Under `/admin` and children (`/admin/smoke-test`, `/admin/sentry-alerts`, `/admi
 
 ## 3. Gaps and pain points (IA)
 
-1. **Companion URLs vs tools**
-  Companions remain under `/companion/...` (per pause instance) while **tools** use `/tools/...` — two honest families; naming is clearer than the old scatter of top-level paths.
+1. **Companion URLs vs tools (intentional)**
+  Companions use instance-scoped routes under `COMPANION_PREFIX` in `app-routes.ts` (e.g. `/companion/...` per pause) while the regulation / practice / letters namespace is `TOOLS_PREFIX` (`/tools/...`). Two URL families, one mental model each — not a bug to “merge.”
 2. **“Journey” still bundles several intents**
   The tab groups stats, insights, badges, and activity. Copy and the Library vs Activity explainer help; further split is a product call.
 3. **Progress / history split across three places**
@@ -133,7 +133,8 @@ This section captures the **current state** and what we may reconsider next.
 
 - **Shipped:** progress area is **Journey** at `/journey/...` (not “Profile” in primary IA).
 - **Shipped:** Settings section labels now use task-oriented wording.
-- **Alternative to revisit:** promote a compact stats summary to Home, or create a top-level Stats tab, only if product analytics/user interviews show demand.
+- **Shipped:** **compact Holzen score + Journey link** on Home (`JourneyHomeCard` — same formula as Journey → Stats, driven off shared `usePauseStatsData` + `useHoldGoalProfile`).
+- **Alternative to revisit:** a **dedicated Stats tab** or heavier Home module only if analytics/interviews show demand; full skills-first **Stats** remains the Journey → **Stats** sub-tab.
 
 ### 4.3 Path-addressable Journey
 
@@ -154,7 +155,7 @@ This section captures the **current state** and what we may reconsider next.
 
 ### 4.6 Admin IA
 
-- **Shipped:** admin remains isolated under `/admin*` and excluded from consumer navigation.
+- **Shipped:** admin remains isolated under `/admin`* and excluded from consumer navigation.
 - **Shipped:** `AdminSubNav` (horizontal links) on `/admin`, `/admin/smoke-test`, `/admin/sentry-alerts`, `/admin/edge-coverage` for quick movement between allowlisted admin screens.
 - **Further improvement:** if the admin surface grows, extend the same pattern (or a small layout wrapper) for new `/admin/...` routes.
 
@@ -165,12 +166,12 @@ Use this as a **checklist** when planning research or another IA pass. Detailed 
 
 | Theme                    | Shipped guardrails                                                   | Alternatives / improvements to consider                                                                     |
 | ------------------------ | -------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------- |
-| **Tools & shell**        | Canonical `/tools/*`, Tools hub tab, `navigation.primary_tab_opened` | Reorder tabs; drop back to four tabs and surface Tools only from Home; A/B or cohort review of tab events   |
-| **Journey vs “profile”** | `/journey/:tab`, skills-first stats                                  | Compact **stats on Home**; dedicated **Stats** tab if interviews + metrics justify it                       |
+| **Tools & shell**        | Canonical `/tools/`*, Tools hub tab, `navigation.primary_tab_opened` | Reorder tabs; drop back to four tabs and surface Tools only from Home; A/B or cohort review of tab events   |
+| **Journey vs “profile”** | `/journey/:tab`, skills-first stats; **Home** shows score preview    | Heavier Home module or a **dedicated Stats tab** if interviews + metrics justify it                         |
 | **Journey scope**        | One hub: stats, insights, badges, activity; letters under Tools      | Further **split tabs or routes** if one area dominates support load (product call)                          |
 | **Library vs Activity**  | Copy + `HistoryCrossLinks`                                           | **Single screen** with `saved` / `timeline` modes if users still mix them up                                |
 | **Settings**             | Task sections + `/settings/about`                                    | **Two-level IA** (overview → detail routes) if accordion length hurts completion                            |
-| **Admin**                | Isolated `/admin*` + in-page `AdminSubNav` between admin routes      | Deeper **grouping** or layout wrapper if more tools ship there                                              |
+| **Admin**                | Isolated `/admin`* + in-page `AdminSubNav` between admin routes      | Deeper **grouping** or layout wrapper if more tools ship there                                              |
 | **Companions vs tools**  | `/companion/...` vs `/tools/...`                                     | Keep two families; only consolidate if a future design unifies “instance” vs “tool” mentally                |
 | **Research**             | PostHog tab events                                                   | Short **hallway tests** or interviews for naming, tab crowding, “where is my past?” — complements analytics |
 
@@ -200,12 +201,13 @@ Use this as a **checklist** when planning research or another IA pass. Detailed 
 | Date       | Author | Change                                                                                                                                                                                      |
 | ---------- | ------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | 2026-04-25 | —      | Initial inventory from `App.tsx` + nav components; gap analysis and recommendations.                                                                                                        |
-| 2026-04-25 | —      | Shipped: `/journey/*` (no state-based tabs), `/tools/*` + hub, notifications migration, Library/Activity copy; no legacy profile or pre-`/tools` routes.                                    |
+| 2026-04-25 | —      | Shipped: `/journey/`* (no state-based tabs), `/tools/*` + hub, notifications migration, Library/Activity copy; no legacy profile or pre-`/tools` routes.                                    |
 | 2026-04-25 | —      | Updated to a “decision status + alternatives” format to capture current IA, reconsideration options, and further improvements.                                                              |
 | 2026-04-25 | —      | Acted on IA: Tools bottom tab; `/settings/about`; `HistoryCrossLinks` across Library / Journey Activity / Grounding history; `/roadmap` stub page.                                          |
 | 2026-04-26 | —      | Document **§1.7** nav analytics (`navigation.primary_tab_opened`); fix five-tab wording in **§2**; add **§4.7** consolidated alternatives; link event taxonomy; clarify doc vs app version. |
 | 2026-04-26 | —      | Letters moved to `/tools/letters` (not Journey); Home letter widget removed; DB notification paths + redirect from `/journey/letters`.                                                      |
-| 2026-04-26 | —      | Doc cleanup: shell vs immersive `/tools/*`; `ToolsHub` journey block; Home `JourneyHomeCard`; Library activity tab; Settings jump nav; `AdminSubNav`.                                       |
+| 2026-04-26 | —      | Doc cleanup: shell vs immersive `/tools/`*; `ToolsHub` journey block; Home `JourneyHomeCard`; Library activity tab; Settings jump nav; `AdminSubNav`.                                       |
+| 2026-04-26 | —      | **Code:** `usePauseStatsData` via TanStack Query; `useHoldGoalProfile`; Home `JourneyHomeCard` shows Holzen score + ring when ≥1 completed pause; `COMPANION_PREFIX` in `app-routes`.       |
 
 
 When routes, bottom-nav items, or nav-related analytics change, update **§1**, **§1.7**, **§4.1**, **§4.7**, **event-taxonomy.md** (if applicable), and a **Changelog** row in the same PR.
