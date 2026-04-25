@@ -103,9 +103,25 @@
       "market": "Market",
       "goal": "Goal",
       "reflection": "Pause",
+      "summary": "At a glance",
       "evening": "Evening",
       "letter": "Letter",
       "practice": "Practice"
+    },
+    "atAGlance": {
+      "libraryTitle": "Library",
+      "libraryOpen": "Open",
+      "libraryEmpty": "Nothing saved yet — pauses and moments you keep show up here.",
+      "libraryUntitled": "Saved item",
+      "checkinTitle": "Quick check-in",
+      "checkinPlaceholder": "Optional note (what matters right now)",
+      "checkinSave": "Log",
+      "checkinOpenTools": "Full check-in",
+      "checkinNeedOne": "Pick a mood or add a short note.",
+      "badgeTitle": "Closest badge",
+      "badgeProgress": "{{current}} / {{requirement}}",
+      "badgeOpen": "Badges & progress",
+      "allBadgesEarned": "Every badge earned — see Journey for the full set."
     },
     "subscription": {
       "monthlyLimitReached": "You've used your {{freeReflectionsPerMonth}} free pauses this month. Start your {{trialDays}}-day free trial for unlimited.",
@@ -158,7 +174,7 @@
     "reflectionPinned": "Pause pinned to Home"
   },
   "journey": {
-    "pageSubtitle": "Long-term progress, insights, and activity — not account settings (those live under Settings). Letters to your future self are under Tools.",
+    "pageSubtitle": "Your progress across stats, insights, badges, and activity.",
     "documentTitle": "Holzen — Journey",
     "activityExplainer": "A chronological log of pauses and practices. Your saved reflection cards and collections live in Library — browse and search there.",
     "homeCardTitle": "Your journey",
@@ -175,7 +191,7 @@
   },
   "tools": {
     "title": "Tools",
-    "subtitle": "Regulation, grounding, and practice — the same activities as on Home, listed in one place.",
+    "subtitle": "A place to enter your practices and companion tools.",
     "listIntro": "Open any tool below. Full-screen tools leave the tab bar; use Back or the in-flow actions to return.",
     "letters": "Letters to your future self",
     "lettersDesc": "Sealed in calm or storm, opened when the market flips. Pro feature.",
