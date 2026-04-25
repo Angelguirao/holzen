@@ -4,7 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sheet';
 import { Heart, ExternalLink, Tag, Link2, Clock, Pin, PinOff, Trash2, Archive, X, FolderPlus, Check, Maximize2 } from 'lucide-react';
 import { format } from 'date-fns';
-import type { LibraryItem, Collection } from '@/hooks/use-library';
+import type { LibraryItem, Collection, CollectionItem } from '@/hooks/use-library';
 import { supabase } from '@/integrations/supabase/client';
 import { OutcomeIcon } from '@/components/icons/OutcomeIcon';
 import { CompanionFeedback } from '@/components/CompanionFeedback';
@@ -56,7 +56,7 @@ interface Props {
   onSelectItem?: (item: LibraryItem) => void;
   collections?: Collection[];
   getItemCollections?: (itemId: string) => Collection[];
-  onAddToCollection?: (collectionId: string, itemId: string) => Promise<unknown>;
+  onAddToCollection?: (collectionId: string, itemId: string) => Promise<CollectionItem | null>;
   onRemoveFromCollection?: (collectionId: string, itemId: string) => Promise<void>;
   isIncomplete?: boolean;
   onOutcomeRecorded?: () => void;
