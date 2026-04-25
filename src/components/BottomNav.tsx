@@ -2,7 +2,7 @@ import { NavLink, useLocation } from 'react-router-dom';
 import { Home, BookOpen, LayoutGrid, User, Settings } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useTranslation } from 'react-i18next';
-import { JOURNEY_PREFIX, TOOLS_PREFIX } from '@/lib/app-routes';
+import { JOURNEY_PREFIX, TOOLS_PREFIX, TOOLS } from '@/lib/app-routes';
 import { trackEvent } from '@/lib/posthog';
 
 const tabs = [
@@ -18,7 +18,7 @@ export type PrimaryTabKey = (typeof tabs)[number]['key'];
 /** Matches which bottom tab is “current” (same rules as `NavLink` active styling). */
 export function isPrimaryTabActive(pathname: string, key: PrimaryTabKey): boolean {
   if (key === 'journey') return pathname.startsWith(JOURNEY_PREFIX);
-  if (key === 'tools') return pathname === TOOLS_PREFIX;
+  if (key === 'tools') return pathname === TOOLS_PREFIX || pathname === TOOLS.letters;
   if (key === 'settings') return pathname.startsWith('/settings');
   if (key === 'home') return pathname === '/';
   if (key === 'library') return pathname === '/library' || pathname.startsWith('/library/');

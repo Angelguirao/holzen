@@ -158,13 +158,15 @@
     "reflectionPinned": "Pause pinned to Home"
   },
   "journey": {
-    "pageSubtitle": "Long-term progress, insights, and saved writing — not account settings (those live under Settings).",
+    "pageSubtitle": "Long-term progress, insights, and activity — not account settings (those live under Settings). Letters to your future self are under Tools.",
     "documentTitle": "Holzen — Journey",
     "activityExplainer": "A chronological log of pauses and practices. Your saved reflection cards and collections live in Library — browse and search there."
   },
   "tools": {
     "title": "Tools",
     "subtitle": "Regulation, grounding, and practice — the same activities as on Home, listed in one place.",
+    "letters": "Letters to your future self",
+    "lettersDesc": "Sealed in calm or storm, opened when the market flips. Pro feature.",
     "breathe": "Stillness (breathe)",
     "breatheDesc": "A quiet, goal-free breathing space.",
     "ambient": "Ambient mode",
@@ -175,7 +177,7 @@
     "groundHistoryDesc": "History of past grounding sessions."
   },
   "profile": {
-    "pageSubtitle": "Your streak, charts, letters, and journey — in one place.",
+    "pageSubtitle": "Your streak, charts, and journey — in one place. (Letters are under Tools.)",
     "stats": "Stats",
     "insights": "Insights",
     "badges": "Badges",
@@ -195,7 +197,7 @@
     "completeMoreReflections_other": "Complete {{count}} more pauses to unlock trend charts, mood analysis, and scatter plots.",
     "sealed": "Sealed",
     "delivered": "Delivered",
-    "noLettersYet": "No letters yet. Write one from the home page — your future self will thank you.",
+    "noLettersYet": "No letters yet. Open Tools → Letters to write one — your future self will thank you.",
     "deleteSealedLetter": "Delete sealed letter",
     "deleteDeliveredLetter": "Delete delivered letter",
     "deleteLetterDesc": "This will permanently delete this letter.",
