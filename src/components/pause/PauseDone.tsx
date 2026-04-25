@@ -93,11 +93,16 @@ export function PauseDone({ decision, onReturn, pauseData }: Props) {
           <div className="flex items-center gap-2">
             <Sparkles className="h-3.5 w-3.5 text-primary/60" />
             <p className="text-xs font-medium text-foreground/80">
-              {t('pause.upsellTitle', 'You\'ve used all {{count}} free pauses this month', { count: PRICING.freeReflectionsPerMonth })}
+              {t('pause.upsellTitle', {
+                defaultValue: "You've used all {{count}} free pauses this month",
+                count: PRICING.freeReflectionsPerMonth,
+              })}
             </p>
           </div>
           <p className="text-center text-sm leading-relaxed text-muted-foreground">
-            {t('pause.upsellBody', 'Unlock unlimited pauses, AI companions, and your full reflection library.')}
+            {t('pause.upsellBody', {
+              defaultValue: 'Unlock unlimited pauses, AI companions, and your full reflection library.',
+            })}
           </p>
           <button
             type="button"
@@ -105,7 +110,7 @@ export function PauseDone({ decision, onReturn, pauseData }: Props) {
             disabled={checkoutLoading}
             className="text-sm font-medium text-primary underline-offset-4 hover:underline disabled:opacity-50"
           >
-            {t('pause.upsellCta', 'Start {{days}}-day free trial', { days: PRICING.trialDays })}
+            {t('pause.upsellCta', { defaultValue: 'Start {{days}}-day free trial', days: PRICING.trialDays })}
           </button>
         </motion.div>
       )}

@@ -34,7 +34,7 @@ export function PauseFeel({ onMoodSelect, onMoodSkip, onMoodReset, moodDone, sel
             animate={{ opacity: 1 }}
             transition={{ delay: 0.2, duration: 0.6 }}
           >
-            {t('pause.labelWhatYouFeel', 'What are you feeling right now?')}
+            {t('pause.labelWhatYouFeel', { defaultValue: 'What are you feeling right now?' })}
           </motion.p>
 
           <motion.div
@@ -63,7 +63,7 @@ export function PauseFeel({ onMoodSelect, onMoodSkip, onMoodReset, moodDone, sel
                 {t(`moodCheck.moods.${selectedMood}`)}
               </p>
               <p className="text-xs text-muted-foreground transition-colors group-hover:text-foreground/80">
-                {t('pause.tapToChange', 'tap to change')}
+                {t('pause.tapToChange', { defaultValue: 'tap to change' })}
               </p>
             </button>
           ) : (
@@ -72,10 +72,10 @@ export function PauseFeel({ onMoodSelect, onMoodSkip, onMoodReset, moodDone, sel
               className="group flex flex-col items-center gap-1"
             >
               <p className="text-sm font-medium text-muted-foreground transition-colors group-hover:text-foreground">
-                {t('common.skipped', 'Skipped')}
+                {t('common.skipped', { defaultValue: 'Skipped' })}
               </p>
               <p className="text-xs text-muted-foreground transition-colors group-hover:text-foreground/80">
-                {t('pause.tapToChange', 'tap to change')}
+                {t('pause.tapToChange', { defaultValue: 'tap to change' })}
               </p>
             </button>
           )}
@@ -84,7 +84,7 @@ export function PauseFeel({ onMoodSelect, onMoodSkip, onMoodReset, moodDone, sel
             onClick={onContinue}
             className={pauseStepLayout.textContinue}
           >
-            {t('pause.steps.continue', 'Continue')}
+            {t('pause.steps.continue', { defaultValue: 'Continue' })}
           </button>
         </motion.div>
       )}
@@ -103,7 +103,7 @@ export function PauseFeel({ onMoodSelect, onMoodSkip, onMoodReset, moodDone, sel
             className={pauseStepLayout.backButton}
           >
             <ChevronLeft className="h-3 w-3" />
-            {t('pause.steps.back', 'Back')}
+            {t('pause.steps.back', { defaultValue: 'Back' })}
           </button>
         </motion.div>
       )}

@@ -41,17 +41,17 @@ export function ScoreImpact({ data }: { data: PauseData }) {
     // Regulation
     if (data.breathingCompleted) {
       list.push({
-        label: t('holzenScore.emotionalRegulation', 'Regulation'),
+        label: t('holzenScore.emotionalRegulation', { defaultValue: 'Regulation' }),
         key: 'regulation',
         direction: 'up',
-        reason: t('scoreImpact.breathing', 'Breathing completed'),
+        reason: t('scoreImpact.breathing', { defaultValue: 'Breathing completed' }),
       });
     } else if (data.mood && data.moodAfter && COMPOSURE[data.moodAfter] > COMPOSURE[data.mood]) {
       list.push({
-        label: t('holzenScore.emotionalRegulation', 'Regulation'),
+        label: t('holzenScore.emotionalRegulation', { defaultValue: 'Regulation' }),
         key: 'regulation',
         direction: 'up',
-        reason: t('scoreImpact.moodImproved', 'Mood shifted toward composure'),
+        reason: t('scoreImpact.moodImproved', { defaultValue: 'Mood shifted toward composure' }),
       });
     }
 
@@ -59,32 +59,38 @@ export function ScoreImpact({ data }: { data: PauseData }) {
     const vol = parseVolatility(data.context);
     if (vol >= 3 && (data.decision === 'held' || data.decision === 'nothing')) {
       list.push({
-        label: t('holzenScore.distressTolerance', 'Tolerance'),
+        label: t('holzenScore.distressTolerance', { defaultValue: 'Tolerance' }),
         key: 'tolerance',
         direction: 'up',
-        reason: t('scoreImpact.heldVolatility', 'Held steady during {{vol}}% move', { vol: vol.toFixed(1) }),
+        reason: t('scoreImpact.heldVolatility', {
+          defaultValue: 'Held steady during {{vol}}% move',
+          vol: vol.toFixed(1),
+        }),
       });
     }
 
     // Reappraisal
     if (data.engagedTools > 0) {
       list.push({
-        label: t('holzenScore.cognitiveReappraisal', 'Reappraisal'),
+        label: t('holzenScore.cognitiveReappraisal', { defaultValue: 'Reappraisal' }),
         key: 'reappraisal',
         direction: 'up',
-        reason: t('scoreImpact.tools', 'Used {{count}} perspective tool(s)', { count: data.engagedTools }),
+        reason: t('scoreImpact.tools', {
+          defaultValue: 'Used {{count}} perspective tool(s)',
+          count: data.engagedTools,
+        }),
       });
     }
 
     // Awareness
     if (data.wroteNote || data.usedTags) {
       list.push({
-        label: t('holzenScore.selfAwareness', 'Awareness'),
+        label: t('holzenScore.selfAwareness', { defaultValue: 'Awareness' }),
         key: 'awareness',
         direction: 'up',
         reason: data.wroteNote
-          ? t('scoreImpact.note', 'Added a reflection note')
-          : t('scoreImpact.tags', 'Tagged this pause'),
+          ? t('scoreImpact.note', { defaultValue: 'Added a reflection note' })
+          : t('scoreImpact.tags', { defaultValue: 'Tagged this pause' }),
       });
     }
 
@@ -101,7 +107,7 @@ export function ScoreImpact({ data }: { data: PauseData }) {
       className="w-full max-w-sm space-y-3"
     >
       <p className="text-center text-xs font-medium uppercase tracking-wide text-muted-foreground">
-        {t('scoreImpact.title', 'Score impact')}
+        {t('scoreImpact.title', { defaultValue: 'Score impact' })}
       </p>
       <div className="space-y-2.5">
         {impacts.map((imp) => (
