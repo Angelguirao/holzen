@@ -80,7 +80,7 @@ export function buildOrchestrateCompanionTasks(
         skipLive: skipLiveGrounding,
       });
       const latencyMs = Date.now() - t;
-      logCompanionSlotResolved({
+      logCompanionSlotResolved(p.log, {
         companion_type: ORCHESTRATOR_KEY_MAP.grounding,
         orchestrator_slot: "grounding",
         pause_prefix: pid ? pid.slice(0, 8) : null,
@@ -117,7 +117,7 @@ export function buildOrchestrateCompanionTasks(
         skipLive: skipLiveHistory,
       });
       const latencyMs = Date.now() - t;
-      logCompanionSlotResolved({
+      logCompanionSlotResolved(p.log, {
         companion_type: ORCHESTRATOR_KEY_MAP.history,
         orchestrator_slot: "history",
         pause_prefix: pid ? pid.slice(0, 8) : null,
@@ -155,7 +155,7 @@ export function buildOrchestrateCompanionTasks(
         skipLive: skipLiveZoomOut,
       });
       const latencyMs = Date.now() - t;
-      logCompanionSlotResolved({
+      logCompanionSlotResolved(p.log, {
         companion_type: ORCHESTRATOR_KEY_MAP.zoomOut,
         orchestrator_slot: "zoomOut",
         pause_prefix: pid ? pid.slice(0, 8) : null,
@@ -217,7 +217,7 @@ export function buildOrchestrateCompanionTasks(
         skipLive: skipLiveSignal,
       });
       const latencyMs = Date.now() - t;
-      logCompanionSlotResolved({
+      logCompanionSlotResolved(p.log, {
         companion_type: ORCHESTRATOR_KEY_MAP.signal,
         orchestrator_slot: "signal",
         pause_prefix: pid ? pid.slice(0, 8) : null,

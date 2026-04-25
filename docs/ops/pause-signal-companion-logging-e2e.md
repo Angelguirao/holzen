@@ -16,7 +16,7 @@ Use this when you want to **trace one full path** from landing on **`/pause`** t
 ## Preconditions
 
 1. **Browser:** enable debug — any of: local **`npm run dev`**, **`localStorage.setItem('holzen:debug','1')`** + reload, **`?holzenDebug=1`**, or **`VITE_HOLZEN_DEBUG=1`** for hosted dev build.
-2. **Edge (optional, full trace):** leave **`HOLZEN_EDGE_LOG`** unset or `1` on the project while testing; use **`=0`** in prod to reduce noise (you still get **`orchestrate_invoke`**, **`companion_slot_resolved`**, errors — confirm in code if those are gated; **`orchestrate_invoke`** is emitted via the request **`log`** from **`withRequestLogging`** / **`createLogger`** (stdout + optional BetterStack drain), not ad-hoc `console.log`).
+2. **Edge (optional, full trace):** leave **`HOLZEN_EDGE_LOG`** unset or `1` on the project while testing; use **`=0`** in prod to reduce noise (you still get **`orchestrate_invoke`**, **`orchestrate_skip_cached`**, **`companion_slot_resolved`**, and errors — these use the request **`log`** from **`withRequestLogging`** / **`createLogger`** (stdout + optional BetterStack drain), not ad-hoc `console.log`).
 
 ## Happy-path steps (manual)
 

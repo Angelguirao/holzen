@@ -16,6 +16,7 @@ import { fetchGroundingSourcesForOrchestrate, fetchSignalSourcesForOrchestrate }
 import { fetchRecentSignalCitationUrls, mergeRecentSignalUrls } from "./recent-signal-urls.ts";
 import { ORCHESTRATOR_KEY_MAP } from "./companion-types.ts";
 import { logCompanionSlotResolved } from "./companion-orchestrate-slot-telemetry.ts";
+import type { createLogger } from "./observe.ts";
 import {
   consumeAllowanceOrCredits,
   resolveTierFromProfile,
@@ -40,7 +41,7 @@ export async function handleRegenerateOnly(params: {
   userId: string;
   svcClient: any;
   body: Record<string, unknown>;
-  log: (msg: string, extra?: Record<string, unknown>) => void;
+  log: ReturnType<typeof createLogger>;
 }): Promise<Response> {
   const { slot, userId, svcClient, body, log } = params;
 
@@ -344,7 +345,7 @@ export async function handleRegenerateOnly(params: {
   const orchestratorKey = slot;
   const companionType = ORCHESTRATOR_KEY_MAP[orchestratorKey];
 
-  logCompanionSlotResolved({
+  logCompanionSlotResolved(log, {
     companion_type: companionType,
     orchestrator_slot: slot,
     pause_prefix: pauseInstanceId.slice(0, 8),
