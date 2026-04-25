@@ -235,7 +235,9 @@ export function ContentLibraryViewer({ entries, onRefresh }: { entries: LibraryE
     };
 
     setSaving(true);
-    const { error } = await supabase.from('content_library').insert(payload);
+    const { error } = await supabase
+      .from('content_library')
+      .insert(payload as unknown as Database['public']['Tables']['content_library']['Insert']);
     setSaving(false);
     if (error) {
       toast({ title: 'Add library item failed', description: error.message, variant: 'destructive' });
