@@ -1,11 +1,9 @@
 import type { InterventionPayload, OrchestrateResponse } from "./companion-orchestrate-types.ts";
 import { contentSatisfiesCompanion } from "./companion-orchestrate-parse.ts";
+import type { createLogger } from "./observe.ts";
 
-/** Logger from `createLogger("orchestrate")` — minimal surface for skip-cache path. */
-export type OrchestrateSkipCacheLog = {
-  (msg: string, extra?: Record<string, unknown>): void;
-  error: (msg: string, extra?: Record<string, unknown>) => void;
-};
+/** Request logger from `withRequestLogging` / `createLogger`. */
+export type OrchestrateSkipCacheLog = ReturnType<typeof createLogger>;
 
 /**
  * If pause_ai_artifacts already has every slot this invoke would generate, return a
@@ -69,7 +67,7 @@ export async function tryOrchestrateSkipFromPauseArtifacts(params: {
 
   params.log("skip: all requested companion rows already on pause_ai_artifacts");
   try {
-    console.log(JSON.stringify({
+    params.log("orchestrate_skip_cached", {
       holzen_event: "orchestrate_skip_cached",
       pause_prefix: params.pauseInstanceId.slice(0, 8),
       need_signal: params.needSignal,
@@ -77,9 +75,10 @@ export async function tryOrchestrateSkipFromPauseArtifacts(params: {
       need_history: params.needHistory,
       need_zoom: params.needZoomOut,
       need_intervention: params.useIntervention,
-      ts: new Date().toISOString(),
-    }));
-  } catch { /* ignore */ }
+    });
+  } catch {
+    /* non-fatal */
+  }
 
   return response;
 }
