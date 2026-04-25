@@ -408,13 +408,13 @@ export function useAdminStats(enabled = true): AdminStats {
     setRecentContent((contentData ?? []) as RecentContentRow[]);
 
     // Recent sessions (last 20 completed pauses).
-    const { data: sessionData } = await (supabase
+    const { data: sessionData } = await supabase
       .from('v_pause_full' as never)
       .select(
         'id, created_at, state, reflection_text, context_snapshot, initial_mood, outcome, haiku_text, counted_companion_types',
       )
       .order('created_at', { ascending: false })
-      .limit(20) as any);
+      .limit(20);
     setSessions((sessionData ?? []) as SessionRow[]);
 
     // Content library entries (table may not exist before migration — fail gracefully)
@@ -435,7 +435,7 @@ export function useAdminStats(enabled = true): AdminStats {
 
     try {
       // Use the admin-only RPC that checks is_admin() server-side
-      const { data: adminData, error: rpcError } = await supabase.rpc('get_admin_stats' as any);
+      const { data: adminData, error: rpcError } = await supabase.rpc('get_admin_stats' as never);
 
       let cacheData: CacheHitRow[] = [];
       let costData: CostRow[] = [];
@@ -461,10 +461,10 @@ export function useAdminStats(enabled = true): AdminStats {
 
       // Fetch daily breakdown views (may return empty if migration hasn't run)
       const [servesRes, failDayRes, fbDayRes, notifRes] = await Promise.all([
-        supabase.from('v_companion_serves_per_day' as any).select('*').limit(500),
-        supabase.from('v_generation_failures_per_day' as any).select('*').limit(500),
-        supabase.from('v_companion_feedback_per_day' as any).select('*').limit(500),
-        supabase.from('v_notification_response_rate' as any).select('*').limit(500),
+        supabase.from('v_companion_serves_per_day' as never).select('*').limit(500),
+        supabase.from('v_generation_failures_per_day' as never).select('*').limit(500),
+        supabase.from('v_companion_feedback_per_day' as never).select('*').limit(500),
+        supabase.from('v_notification_response_rate' as never).select('*').limit(500),
       ]);
 
       const dailyServes = servesRes.error ? [] : (servesRes.data ?? []);
@@ -503,8 +503,8 @@ export function useAdminStats(enabled = true): AdminStats {
       if (!sourcesRes.error) setSignalSources((sourcesRes.data ?? []) as unknown as SignalSourceRow[]);
 
       setLastUpdated(new Date());
-    } catch (e: any) {
-      setError(e.message || 'Failed to load monitoring data');
+    } catch (e: unknown) {
+      setError(e instanceof Error ? e.message : 'Failed to load monitoring data');
     } finally {
       setLoading(false);
     }

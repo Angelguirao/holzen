@@ -46,7 +46,7 @@ export function useSnooze() {
     setSnoozedUntil(until);
     await supabase
       .from('profiles')
-      .update({ snoozed_until: until.toISOString() } as any)
+      .update({ snoozed_until: until.toISOString() })
       .eq('user_id', user.id);
   }, [user]);
 
@@ -55,7 +55,7 @@ export function useSnooze() {
     setSnoozedUntil(null);
     await supabase
       .from('profiles')
-      .update({ snoozed_until: null } as any)
+      .update({ snoozed_until: null })
       .eq('user_id', user.id);
   }, [user]);
 
