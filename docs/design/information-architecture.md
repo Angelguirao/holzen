@@ -21,7 +21,7 @@ Four bottom tabs, all wrapped in `AppLayout` (header + `Outlet` + bottom nav, ma
 | Journey    | `/journey/:tab` | Longitudinal “you” content: **stats, insights, badges, letters, activity** — each tab is a **path segment** (default `/journey/stats`). Letter deep links use `?letter=<id>`. |
 | Settings   | `/settings`   | Preferences, Pro/checkout, notifications, quiet hours, thresholds, sources, account actions, etc. |
 
-**Deprecated path:** `/profile` redirects to the equivalent Journey URL (and maps old `location.state` via `ProfileLegacyRedirect`). Notification rows in Postgres use `/journey/...` paths (see migration `20260425200000_journey_routes_notification_paths.sql`).
+Notification `action_path` values use `/journey/...` (see migration `20260425200000_journey_routes_notification_paths.sql`). The app does not register `/profile` or pre-`/tools/*` paths.
 
 Billing history is nested: `/settings/billing-history` (still under the authenticated shell with bottom nav).
 
@@ -37,8 +37,7 @@ These are `ProtectedRoute` but **not** under `AppLayout` — no persistent prima
 |------|--------|--------|
 | Pause session | `/pause` | Core guided pause flow. |
 | Companions | `/companion/zoom-out/:pauseInstanceId`, `/companion/history/...`, `/companion/signal/...`, `/companion/grounding/...` | Deep-linked to a pause instance. |
-| Tools (canonical) | `/tools/breathe`, `/tools/ambient`, `/tools/ground`, `/tools/ground/history`, `/tools/practice/*` | Single URL family for regulation / grounding / practice. |
-| **Legacy redirects** | `/breathe` → `/tools/breathe`, `/ground` → `/tools/ground`, etc. | Preserves `location.state` for grounding and replay where needed (`PreserveStateRedirect`). |
+| Tools (canonical) | `/tools/breathe`, `/tools/ambient`, `/tools/ground`, `/tools/ground/history`, `/tools/practice/*` | Single URL family for regulation / grounding / practice. No alternate routes. |
 
 ### 1.4 Public and semi-public marketing / legal
 
@@ -153,6 +152,6 @@ These are **directional** improvements; any change should be paired with nav aff
 | Date | Author | Change |
 |------|--------|--------|
 | 2026-04-25 | — | Initial inventory from `App.tsx` + nav components; gap analysis and recommendations. |
-| 2026-04-25 | — | Shipped: `/journey/*` tabs, `/tools/*` + hub, legacy `/profile` and old tool paths redirect; notifications migration; in-app copy for Library vs Activity. |
+| 2026-04-25 | — | Shipped: `/journey/*` (no state-based tabs), `/tools/*` + hub, notifications migration, Library/Activity copy; no legacy profile or pre-`/tools` routes. |
 
 When routes or bottom-nav items change, update **Section 1** and the **Changelog** row in the same PR.

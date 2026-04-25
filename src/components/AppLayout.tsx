@@ -37,7 +37,7 @@ function PageChunkFallback() {
 /**
  * Warm up the main-tab route chunks so switching tabs feels instant the first
  * time. Runs once when the authenticated shell mounts, on an idle callback so
- * it never competes with critical rendering.
+ * it never competes with critical rendering (Home, Library, Journey, Settings, Tools).
  */
 function useTabChunkPrefetch() {
   useEffect(() => {
