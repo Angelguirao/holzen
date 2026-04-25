@@ -1166,6 +1166,248 @@ export type Database = {
         }
         Relationships: []
       }
+      pause_ai_artifacts: {
+        Row: {
+          cache_entry_id: string | null
+          content: Json
+          created_at: string
+          id: string
+          kind: string
+          model: string | null
+          pause_instance_id: string
+          prompt_version: string | null
+          user_id: string
+        }
+        Insert: {
+          cache_entry_id?: string | null
+          content: Json
+          created_at?: string
+          id?: string
+          kind: string
+          model?: string | null
+          pause_instance_id: string
+          prompt_version?: string | null
+          user_id: string
+        }
+        Update: {
+          cache_entry_id?: string | null
+          content?: Json
+          created_at?: string
+          id?: string
+          kind?: string
+          model?: string | null
+          pause_instance_id?: string
+          prompt_version?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "pause_ai_artifacts_cache_entry_id_fkey"
+            columns: ["cache_entry_id"]
+            isOneToOne: false
+            referencedRelation: "companion_cache"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "pause_ai_artifacts_pause_instance_id_fkey"
+            columns: ["pause_instance_id"]
+            isOneToOne: false
+            referencedRelation: "pause_instances"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "pause_ai_artifacts_pause_instance_id_fkey"
+            columns: ["pause_instance_id"]
+            isOneToOne: false
+            referencedRelation: "v_pause_completed"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "pause_ai_artifacts_pause_instance_id_fkey"
+            columns: ["pause_instance_id"]
+            isOneToOne: false
+            referencedRelation: "v_pause_current"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "pause_ai_artifacts_pause_instance_id_fkey"
+            columns: ["pause_instance_id"]
+            isOneToOne: false
+            referencedRelation: "v_pause_full"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      pause_companion_events: {
+        Row: {
+          action: Database["public"]["Enums"]["pause_companion_action"]
+          companion_type: string
+          counts_for_pause: boolean
+          created_at: string
+          entry_point: string
+          id: string
+          non_counting_reason: string | null
+          pause_instance_id: string | null
+          user_id: string
+        }
+        Insert: {
+          action: Database["public"]["Enums"]["pause_companion_action"]
+          companion_type: string
+          counts_for_pause?: boolean
+          created_at?: string
+          entry_point: string
+          id?: string
+          non_counting_reason?: string | null
+          pause_instance_id?: string | null
+          user_id: string
+        }
+        Update: {
+          action?: Database["public"]["Enums"]["pause_companion_action"]
+          companion_type?: string
+          counts_for_pause?: boolean
+          created_at?: string
+          entry_point?: string
+          id?: string
+          non_counting_reason?: string | null
+          pause_instance_id?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "pause_companion_events_pause_instance_id_fkey"
+            columns: ["pause_instance_id"]
+            isOneToOne: false
+            referencedRelation: "pause_instances"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "pause_companion_events_pause_instance_id_fkey"
+            columns: ["pause_instance_id"]
+            isOneToOne: false
+            referencedRelation: "v_pause_completed"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "pause_companion_events_pause_instance_id_fkey"
+            columns: ["pause_instance_id"]
+            isOneToOne: false
+            referencedRelation: "v_pause_current"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "pause_companion_events_pause_instance_id_fkey"
+            columns: ["pause_instance_id"]
+            isOneToOne: false
+            referencedRelation: "v_pause_full"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      pause_instances: {
+        Row: {
+          completed_at: string | null
+          context_fingerprint: string
+          context_rule_result: Json
+          context_snapshot: Json
+          created_at: string
+          dismissed_by_user: boolean
+          engaged_at: string | null
+          expired_reason:
+            | Database["public"]["Enums"]["pause_expired_reason"]
+            | null
+          id: string
+          metadata: Json
+          source: string
+          state: Database["public"]["Enums"]["pause_state"]
+          superseded_by: string | null
+          template_id: string
+          terminal_at: string | null
+          user_id: string
+          window_ends_at: string
+          window_starts_at: string
+        }
+        Insert: {
+          completed_at?: string | null
+          context_fingerprint: string
+          context_rule_result?: Json
+          context_snapshot?: Json
+          created_at?: string
+          dismissed_by_user?: boolean
+          engaged_at?: string | null
+          expired_reason?:
+            | Database["public"]["Enums"]["pause_expired_reason"]
+            | null
+          id?: string
+          metadata?: Json
+          source: string
+          state?: Database["public"]["Enums"]["pause_state"]
+          superseded_by?: string | null
+          template_id: string
+          terminal_at?: string | null
+          user_id: string
+          window_ends_at: string
+          window_starts_at?: string
+        }
+        Update: {
+          completed_at?: string | null
+          context_fingerprint?: string
+          context_rule_result?: Json
+          context_snapshot?: Json
+          created_at?: string
+          dismissed_by_user?: boolean
+          engaged_at?: string | null
+          expired_reason?:
+            | Database["public"]["Enums"]["pause_expired_reason"]
+            | null
+          id?: string
+          metadata?: Json
+          source?: string
+          state?: Database["public"]["Enums"]["pause_state"]
+          superseded_by?: string | null
+          template_id?: string
+          terminal_at?: string | null
+          user_id?: string
+          window_ends_at?: string
+          window_starts_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "pause_instances_superseded_by_fkey"
+            columns: ["superseded_by"]
+            isOneToOne: false
+            referencedRelation: "pause_instances"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "pause_instances_superseded_by_fkey"
+            columns: ["superseded_by"]
+            isOneToOne: false
+            referencedRelation: "v_pause_completed"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "pause_instances_superseded_by_fkey"
+            columns: ["superseded_by"]
+            isOneToOne: false
+            referencedRelation: "v_pause_current"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "pause_instances_superseded_by_fkey"
+            columns: ["superseded_by"]
+            isOneToOne: false
+            referencedRelation: "v_pause_full"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "pause_instances_template_id_fkey"
+            columns: ["template_id"]
+            isOneToOne: false
+            referencedRelation: "pause_templates"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       pause_notifications: {
         Row: {
           context: string | null
@@ -1221,6 +1463,104 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      pause_step_events: {
+        Row: {
+          created_at: string
+          id: string
+          pause_instance_id: string
+          payload: Json
+          step_type: Database["public"]["Enums"]["pause_step_type"]
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          pause_instance_id: string
+          payload?: Json
+          step_type: Database["public"]["Enums"]["pause_step_type"]
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          pause_instance_id?: string
+          payload?: Json
+          step_type?: Database["public"]["Enums"]["pause_step_type"]
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "pause_step_events_pause_instance_id_fkey"
+            columns: ["pause_instance_id"]
+            isOneToOne: false
+            referencedRelation: "pause_instances"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "pause_step_events_pause_instance_id_fkey"
+            columns: ["pause_instance_id"]
+            isOneToOne: false
+            referencedRelation: "v_pause_completed"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "pause_step_events_pause_instance_id_fkey"
+            columns: ["pause_instance_id"]
+            isOneToOne: false
+            referencedRelation: "v_pause_current"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "pause_step_events_pause_instance_id_fkey"
+            columns: ["pause_instance_id"]
+            isOneToOne: false
+            referencedRelation: "v_pause_full"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      pause_templates: {
+        Row: {
+          active: boolean
+          allowed_companion_types: string[]
+          config: Json
+          created_at: string
+          id: string
+          required_companion_count: number
+          required_for_completed: string[]
+          required_for_engaged: string[]
+          slug: string
+          version: number
+          window_ms: number
+        }
+        Insert: {
+          active?: boolean
+          allowed_companion_types: string[]
+          config?: Json
+          created_at?: string
+          id?: string
+          required_companion_count?: number
+          required_for_completed: string[]
+          required_for_engaged: string[]
+          slug: string
+          version?: number
+          window_ms: number
+        }
+        Update: {
+          active?: boolean
+          allowed_companion_types?: string[]
+          config?: Json
+          created_at?: string
+          id?: string
+          required_companion_count?: number
+          required_for_completed?: string[]
+          required_for_engaged?: string[]
+          slug?: string
+          version?: number
+          window_ms?: number
+        }
+        Relationships: []
       }
       practice_entries: {
         Row: {
@@ -2274,6 +2614,380 @@ export type Database = {
         }
         Relationships: []
       }
+      v_pause_completed: {
+        Row: {
+          completed_at: string | null
+          context_fingerprint: string | null
+          context_rule_result: Json | null
+          context_snapshot: Json | null
+          created_at: string | null
+          dismissed_by_user: boolean | null
+          engaged_at: string | null
+          expired_reason:
+            | Database["public"]["Enums"]["pause_expired_reason"]
+            | null
+          id: string | null
+          metadata: Json | null
+          source: string | null
+          state: Database["public"]["Enums"]["pause_state"] | null
+          superseded_by: string | null
+          template_id: string | null
+          terminal_at: string | null
+          user_id: string | null
+          window_ends_at: string | null
+          window_starts_at: string | null
+        }
+        Insert: {
+          completed_at?: string | null
+          context_fingerprint?: string | null
+          context_rule_result?: Json | null
+          context_snapshot?: Json | null
+          created_at?: string | null
+          dismissed_by_user?: boolean | null
+          engaged_at?: string | null
+          expired_reason?:
+            | Database["public"]["Enums"]["pause_expired_reason"]
+            | null
+          id?: string | null
+          metadata?: Json | null
+          source?: string | null
+          state?: Database["public"]["Enums"]["pause_state"] | null
+          superseded_by?: string | null
+          template_id?: string | null
+          terminal_at?: string | null
+          user_id?: string | null
+          window_ends_at?: string | null
+          window_starts_at?: string | null
+        }
+        Update: {
+          completed_at?: string | null
+          context_fingerprint?: string | null
+          context_rule_result?: Json | null
+          context_snapshot?: Json | null
+          created_at?: string | null
+          dismissed_by_user?: boolean | null
+          engaged_at?: string | null
+          expired_reason?:
+            | Database["public"]["Enums"]["pause_expired_reason"]
+            | null
+          id?: string | null
+          metadata?: Json | null
+          source?: string | null
+          state?: Database["public"]["Enums"]["pause_state"] | null
+          superseded_by?: string | null
+          template_id?: string | null
+          terminal_at?: string | null
+          user_id?: string | null
+          window_ends_at?: string | null
+          window_starts_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "pause_instances_superseded_by_fkey"
+            columns: ["superseded_by"]
+            isOneToOne: false
+            referencedRelation: "pause_instances"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "pause_instances_superseded_by_fkey"
+            columns: ["superseded_by"]
+            isOneToOne: false
+            referencedRelation: "v_pause_completed"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "pause_instances_superseded_by_fkey"
+            columns: ["superseded_by"]
+            isOneToOne: false
+            referencedRelation: "v_pause_current"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "pause_instances_superseded_by_fkey"
+            columns: ["superseded_by"]
+            isOneToOne: false
+            referencedRelation: "v_pause_full"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "pause_instances_template_id_fkey"
+            columns: ["template_id"]
+            isOneToOne: false
+            referencedRelation: "pause_templates"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      v_pause_current: {
+        Row: {
+          completed_at: string | null
+          context_fingerprint: string | null
+          context_rule_result: Json | null
+          context_snapshot: Json | null
+          created_at: string | null
+          dismissed_by_user: boolean | null
+          engaged_at: string | null
+          expired_reason:
+            | Database["public"]["Enums"]["pause_expired_reason"]
+            | null
+          id: string | null
+          metadata: Json | null
+          source: string | null
+          state: Database["public"]["Enums"]["pause_state"] | null
+          superseded_by: string | null
+          template_id: string | null
+          terminal_at: string | null
+          user_id: string | null
+          window_ends_at: string | null
+          window_starts_at: string | null
+        }
+        Insert: {
+          completed_at?: string | null
+          context_fingerprint?: string | null
+          context_rule_result?: Json | null
+          context_snapshot?: Json | null
+          created_at?: string | null
+          dismissed_by_user?: boolean | null
+          engaged_at?: string | null
+          expired_reason?:
+            | Database["public"]["Enums"]["pause_expired_reason"]
+            | null
+          id?: string | null
+          metadata?: Json | null
+          source?: string | null
+          state?: Database["public"]["Enums"]["pause_state"] | null
+          superseded_by?: string | null
+          template_id?: string | null
+          terminal_at?: string | null
+          user_id?: string | null
+          window_ends_at?: string | null
+          window_starts_at?: string | null
+        }
+        Update: {
+          completed_at?: string | null
+          context_fingerprint?: string | null
+          context_rule_result?: Json | null
+          context_snapshot?: Json | null
+          created_at?: string | null
+          dismissed_by_user?: boolean | null
+          engaged_at?: string | null
+          expired_reason?:
+            | Database["public"]["Enums"]["pause_expired_reason"]
+            | null
+          id?: string | null
+          metadata?: Json | null
+          source?: string | null
+          state?: Database["public"]["Enums"]["pause_state"] | null
+          superseded_by?: string | null
+          template_id?: string | null
+          terminal_at?: string | null
+          user_id?: string | null
+          window_ends_at?: string | null
+          window_starts_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "pause_instances_superseded_by_fkey"
+            columns: ["superseded_by"]
+            isOneToOne: false
+            referencedRelation: "pause_instances"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "pause_instances_superseded_by_fkey"
+            columns: ["superseded_by"]
+            isOneToOne: false
+            referencedRelation: "v_pause_completed"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "pause_instances_superseded_by_fkey"
+            columns: ["superseded_by"]
+            isOneToOne: false
+            referencedRelation: "v_pause_current"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "pause_instances_superseded_by_fkey"
+            columns: ["superseded_by"]
+            isOneToOne: false
+            referencedRelation: "v_pause_full"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "pause_instances_template_id_fkey"
+            columns: ["template_id"]
+            isOneToOne: false
+            referencedRelation: "pause_templates"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      v_pause_full: {
+        Row: {
+          completed_at: string | null
+          context_fingerprint: string | null
+          context_rule_result: Json | null
+          context_snapshot: Json | null
+          counted_companion_count: number | null
+          counted_companion_types: string[] | null
+          created_at: string | null
+          dismissed_by_user: boolean | null
+          engaged_at: string | null
+          expired_reason:
+            | Database["public"]["Enums"]["pause_expired_reason"]
+            | null
+          haiku_text: string | null
+          has_breath_completed: boolean | null
+          has_initial_emotion_logged: boolean | null
+          has_outcome_logged: boolean | null
+          has_shift_emotion_logged: boolean | null
+          id: string | null
+          initial_mood: string | null
+          is_favorite: boolean | null
+          metadata: Json | null
+          note_text: string | null
+          outcome: string | null
+          reflection_text: string | null
+          shift_mood: string | null
+          source: string | null
+          state: Database["public"]["Enums"]["pause_state"] | null
+          superseded_by: string | null
+          tags: string[] | null
+          template_id: string | null
+          terminal_at: string | null
+          user_id: string | null
+          window_ends_at: string | null
+          window_starts_at: string | null
+        }
+        Insert: {
+          completed_at?: string | null
+          context_fingerprint?: string | null
+          context_rule_result?: Json | null
+          context_snapshot?: Json | null
+          counted_companion_count?: never
+          counted_companion_types?: never
+          created_at?: string | null
+          dismissed_by_user?: boolean | null
+          engaged_at?: string | null
+          expired_reason?:
+            | Database["public"]["Enums"]["pause_expired_reason"]
+            | null
+          haiku_text?: never
+          has_breath_completed?: never
+          has_initial_emotion_logged?: never
+          has_outcome_logged?: never
+          has_shift_emotion_logged?: never
+          id?: string | null
+          initial_mood?: never
+          is_favorite?: never
+          metadata?: Json | null
+          note_text?: never
+          outcome?: never
+          reflection_text?: never
+          shift_mood?: never
+          source?: string | null
+          state?: Database["public"]["Enums"]["pause_state"] | null
+          superseded_by?: string | null
+          tags?: never
+          template_id?: string | null
+          terminal_at?: string | null
+          user_id?: string | null
+          window_ends_at?: string | null
+          window_starts_at?: string | null
+        }
+        Update: {
+          completed_at?: string | null
+          context_fingerprint?: string | null
+          context_rule_result?: Json | null
+          context_snapshot?: Json | null
+          counted_companion_count?: never
+          counted_companion_types?: never
+          created_at?: string | null
+          dismissed_by_user?: boolean | null
+          engaged_at?: string | null
+          expired_reason?:
+            | Database["public"]["Enums"]["pause_expired_reason"]
+            | null
+          haiku_text?: never
+          has_breath_completed?: never
+          has_initial_emotion_logged?: never
+          has_outcome_logged?: never
+          has_shift_emotion_logged?: never
+          id?: string | null
+          initial_mood?: never
+          is_favorite?: never
+          metadata?: Json | null
+          note_text?: never
+          outcome?: never
+          reflection_text?: never
+          shift_mood?: never
+          source?: string | null
+          state?: Database["public"]["Enums"]["pause_state"] | null
+          superseded_by?: string | null
+          tags?: never
+          template_id?: string | null
+          terminal_at?: string | null
+          user_id?: string | null
+          window_ends_at?: string | null
+          window_starts_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "pause_instances_superseded_by_fkey"
+            columns: ["superseded_by"]
+            isOneToOne: false
+            referencedRelation: "pause_instances"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "pause_instances_superseded_by_fkey"
+            columns: ["superseded_by"]
+            isOneToOne: false
+            referencedRelation: "v_pause_completed"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "pause_instances_superseded_by_fkey"
+            columns: ["superseded_by"]
+            isOneToOne: false
+            referencedRelation: "v_pause_current"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "pause_instances_superseded_by_fkey"
+            columns: ["superseded_by"]
+            isOneToOne: false
+            referencedRelation: "v_pause_full"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "pause_instances_template_id_fkey"
+            columns: ["template_id"]
+            isOneToOne: false
+            referencedRelation: "pause_templates"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      v_pause_metrics_daily: {
+        Row: {
+          completed: number | null
+          created: number | null
+          day: string | null
+          dismissed: number | null
+          engaged: number | null
+          expired: number | null
+          expired_context_lost: number | null
+          expired_ineligible: number | null
+          expired_superseded: number | null
+          expired_system_cancelled: number | null
+          expired_window_elapsed: number | null
+          user_id: string | null
+        }
+        Relationships: []
+      }
       v_reflection_with_companions: {
         Row: {
           breathing_completed: boolean | null
@@ -2575,6 +3289,22 @@ export type Database = {
         Args: { _collection_id: string; _user_id: string }
         Returns: boolean
       }
+      pause_dismiss: {
+        Args: { p_instance_id: string; p_reason?: string }
+        Returns: Database["public"]["Enums"]["pause_state"]
+      }
+      pause_evaluate_transitions: {
+        Args: { p_instance_id: string }
+        Returns: Database["public"]["Enums"]["pause_state"]
+      }
+      pause_expire: {
+        Args: {
+          p_instance_id: string
+          p_reason: Database["public"]["Enums"]["pause_expired_reason"]
+        }
+        Returns: Database["public"]["Enums"]["pause_state"]
+      }
+      pause_sweep_window_elapsed: { Args: never; Returns: number }
       purge_orphan_notification_reflections: {
         Args: { cutoff_days?: number }
         Returns: number
@@ -2593,7 +3323,23 @@ export type Database = {
       }
     }
     Enums: {
-      [_ in never]: never
+      pause_companion_action: "open" | "complete"
+      pause_expired_reason:
+        | "context_lost"
+        | "window_elapsed"
+        | "superseded"
+        | "ineligible_user_state"
+        | "system_cancelled"
+      pause_state: "active" | "engaged" | "completed" | "dismissed" | "expired"
+      pause_step_type:
+        | "breath_completed"
+        | "initial_emotion_logged"
+        | "reflection_step"
+        | "shift_emotion_logged"
+        | "outcome_logged"
+        | "note_updated"
+        | "tag_updated"
+        | "favorite_toggled"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -2720,6 +3466,26 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      pause_companion_action: ["open", "complete"],
+      pause_expired_reason: [
+        "context_lost",
+        "window_elapsed",
+        "superseded",
+        "ineligible_user_state",
+        "system_cancelled",
+      ],
+      pause_state: ["active", "engaged", "completed", "dismissed", "expired"],
+      pause_step_type: [
+        "breath_completed",
+        "initial_emotion_logged",
+        "reflection_step",
+        "shift_emotion_logged",
+        "outcome_logged",
+        "note_updated",
+        "tag_updated",
+        "favorite_toggled",
+      ],
+    },
   },
 } as const
