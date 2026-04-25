@@ -15,7 +15,7 @@ const corsHeaders = {
 const STALE_PROCESSING_MS = 15 * 60 * 1000;
 
 serve(
-  withRequestLogging("process-referral-pending", async ({ req }) => {
+  withRequestLogging("process-referral-pending", async ({ req, log }) => {
   try {
     holzenEdgeRun("referral-pending", "request", { method: req.method });
     const { verifyServiceAuth } = await import("../_shared/auth.ts");
@@ -83,6 +83,7 @@ serve(
       const result = await applyReferralRecord(supabase, {
         referredUserId: job.referred_user_id,
         referralCode: job.referral_code,
+        log,
       });
 
       if (result.ok) {

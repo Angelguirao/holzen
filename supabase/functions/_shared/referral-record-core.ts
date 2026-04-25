@@ -3,7 +3,15 @@
  * Idempotent: duplicate referrals / rewards are safe.
  */
 import Stripe from "https://esm.sh/stripe@18.5.0";
-import { sendLovableEmailMessage } from "./lovable-email.ts";
+import { redactEmailForLog } from "./email-log-helpers.ts";
+import { sendLovableEmailMessage, type LovableEmailLogger } from "./lovable-email.ts";
+
+/** Matches `ReturnType<typeof createLogger>` — callers pass `log` from `withRequestLogging`. */
+export interface ReferralRecordLogger {
+  (msg: string, extra?: Record<string, unknown>): void;
+  warn: (msg: string, extra?: Record<string, unknown>) => void;
+  error: (msg: string, extra?: Record<string, unknown>) => void;
+}
 
 const MILESTONES = [
   { count: 1, reward: "1_week_free", trialDays: 7 },
@@ -17,19 +25,73 @@ const REWARD_LABELS: Record<string, string> = {
   lifetime: "lifetime access",
 };
 
-const logStep = (step: string, details?: unknown) => {
-  const d = details !== undefined ? ` - ${JSON.stringify(details)}` : "";
-  console.log(`[RECORD-REFERRAL] ${step}${d}`);
-};
+function redactReferralExtra(details?: Record<string, unknown>): Record<string, unknown> {
+  if (!details) return {};
+  const out: Record<string, unknown> = {};
+  for (const [k, v] of Object.entries(details)) {
+    if ((k === "email" || k === "from") && typeof v === "string") {
+      out[k] = redactEmailForLog(v);
+    } else if (k === "to" && Array.isArray(v)) {
+      out[k] = v.map((x) => (typeof x === "string" ? redactEmailForLog(x) : x));
+    } else if (k === "to" && typeof v === "string") {
+      out[k] = redactEmailForLog(v);
+    } else {
+      out[k] = v;
+    }
+  }
+  return out;
+}
+
+function referralStep(
+  log: ReferralRecordLogger,
+  step: string,
+  details?: Record<string, unknown>,
+  level: "info" | "warn" | "error" = "info",
+) {
+  const extra = {
+    holzen_event: "referral_record_step",
+    step,
+    ...redactReferralExtra(details),
+  };
+  if (level === "error") {
+    log.error("referral_record_step", extra);
+  } else if (level === "warn") {
+    log.warn("referral_record_step", extra);
+  } else {
+    log("referral_record_step", extra);
+  }
+}
+
+function lovableLoggerBridge(log: ReferralRecordLogger): LovableEmailLogger {
+  return {
+    log: (msg, data) => {
+      log("lovable_email", {
+        holzen_event: "lovable_email",
+        phase: "log",
+        message: msg,
+        ...redactReferralExtra(data),
+      });
+    },
+    error: (msg, data) => {
+      log.error("lovable_email", {
+        holzen_event: "lovable_email",
+        phase: "error",
+        message: msg,
+        ...redactReferralExtra(data),
+      });
+    },
+  };
+}
 
 async function sendRewardEmail(
+  log: ReferralRecordLogger,
   email: string,
   rewardType: string,
   referralCount: number,
   referrerId: string,
 ) {
   if (!Deno.env.get("LOVABLE_API_KEY")) {
-    logStep("LOVABLE_API_KEY not set, skipping reward email");
+    referralStep(log, "LOVABLE_API_KEY not set, skipping reward email");
     return;
   }
 
@@ -65,20 +127,22 @@ async function sendRewardEmail(
     {
       source: "referral-reward",
       idempotencyKey: `referral-reward:${referrerId}:${rewardType}`,
-      logger: {
-        log: (m, d) => logStep(m, d),
-        error: (m, d) => logStep(m, d),
-      },
+      logger: lovableLoggerBridge(log),
     },
   );
 
   if (result.ok) {
-    logStep("Reward email sent", { email, rewardType, attempts: result.attempts });
+    referralStep(log, "Reward email sent", {
+      recipient_redacted: redactEmailForLog(email),
+      rewardType,
+      attempts: result.attempts,
+    });
   }
   // Failures are already logged by sendLovableEmailMessage via the logger above.
 }
 
 async function grantReward(
+  log: ReferralRecordLogger,
   supabase: any,
   stripe: any,
   referrerId: string,
@@ -94,7 +158,7 @@ async function grantReward(
     .single();
 
   if (existing) {
-    logStep("Reward already granted", { milestone: milestone.count });
+    referralStep(log, "Reward already granted", { milestone: milestone.count });
     return;
   }
 
@@ -117,13 +181,18 @@ async function grantReward(
             cancel_at_period_end: true,
             metadata: { cancelled_reason: "lifetime_referral_reward" },
           });
-          logStep("Subscription set to cancel at period end for lifetime reward");
+          referralStep(log, "Subscription set to cancel at period end for lifetime reward");
         }
       }
     } catch (e) {
-      logStep("Error cancelling subscription for lifetime", {
-        error: e instanceof Error ? e.message : String(e),
-      });
+      referralStep(
+        log,
+        "Error cancelling subscription for lifetime",
+        {
+          error: e instanceof Error ? e.message : String(e),
+        },
+        "error",
+      );
     }
   } else {
     try {
@@ -136,10 +205,15 @@ async function grantReward(
           currency: "usd",
           description: `Referral reward: ${milestone.reward} (${milestone.count} referrals)`,
         });
-        logStep("Applied balance credit", { creditCents, milestone: milestone.count });
+        referralStep(log, "Applied balance credit", { creditCents, milestone: milestone.count });
       }
     } catch (e) {
-      logStep("Error applying credit", { error: e instanceof Error ? e.message : String(e) });
+      referralStep(
+        log,
+        "Error applying credit",
+        { error: e instanceof Error ? e.message : String(e) },
+        "error",
+      );
     }
   }
 
@@ -149,23 +223,24 @@ async function grantReward(
     reward_type: milestone.reward,
   });
 
-  logStep("Reward granted", { milestone: milestone.count, reward: milestone.reward });
+  referralStep(log, "Reward granted", { milestone: milestone.count, reward: milestone.reward });
 
-  await sendRewardEmail(referrerEmail, milestone.reward, referralCount, referrerId);
+  await sendRewardEmail(log, referrerEmail, milestone.reward, referralCount, referrerId);
 }
 
 async function grantMilestonesForReferrer(
+  log: ReferralRecordLogger,
   supabase: any,
   referrerId: string,
 ) {
-  logStep("Referral recorded, checking milestones");
+  referralStep(log, "Referral recorded, checking milestones");
 
   const { count: referralCount } = await supabase
     .from("referrals")
     .select("*", { count: "exact", head: true })
     .eq("referrer_id", referrerId);
 
-  logStep("Referrer total referrals", { count: referralCount });
+  referralStep(log, "Referrer total referrals", { count: referralCount });
 
   const { data: referrerAuth } = await supabase.auth.admin.getUserById(referrerId);
   const referrerEmail = referrerAuth?.user?.email;
@@ -176,7 +251,7 @@ async function grantMilestonesForReferrer(
 
   const stripeKey = Deno.env.get("STRIPE_SECRET_KEY");
   if (!stripeKey) {
-    logStep("STRIPE_SECRET_KEY not set, skipping rewards");
+    referralStep(log, "STRIPE_SECRET_KEY not set, skipping rewards");
     return;
   }
 
@@ -184,7 +259,7 @@ async function grantMilestonesForReferrer(
 
   for (const milestone of MILESTONES) {
     if (referralCount >= milestone.count) {
-      await grantReward(supabase, stripe, referrerId, referrerEmail, milestone, referralCount);
+      await grantReward(log, supabase, stripe, referrerId, referrerEmail, milestone, referralCount);
     }
   }
 }
@@ -202,10 +277,11 @@ function isUniqueViolation(err: unknown): boolean {
  */
 export async function applyReferralRecord(
   supabase: any,
-  params: { referredUserId: string; referralCode: string },
+  params: { referredUserId: string; referralCode: string; log: ReferralRecordLogger },
 ): Promise<ApplyReferralResult> {
   const referral_code = params.referralCode.trim();
   const referredUserId = params.referredUserId;
+  const { log } = params;
 
   if (!referral_code) {
     return { ok: false, reason: "Invalid referral", retryable: false };
@@ -218,7 +294,7 @@ export async function applyReferralRecord(
     .maybeSingle();
 
   if (refErr) {
-    logStep("Referrer lookup error", { error: refErr.message });
+    referralStep(log, "Referrer lookup error", { error: refErr.message }, "error");
     return { ok: false, reason: refErr.message, retryable: true };
   }
 
@@ -235,7 +311,7 @@ export async function applyReferralRecord(
     .maybeSingle();
 
   if (exErr) {
-    logStep("Existing referral check error", { error: exErr.message });
+    referralStep(log, "Existing referral check error", { error: exErr.message }, "error");
     return { ok: false, reason: exErr.message, retryable: true };
   }
 
@@ -246,15 +322,15 @@ export async function applyReferralRecord(
       .eq("user_id", referredUserId);
 
     if (upErr) {
-      logStep("Profile update error (existing referral path)", { error: upErr.message });
+      referralStep(log, "Profile update error (existing referral path)", { error: upErr.message }, "error");
       return { ok: false, reason: upErr.message, retryable: true };
     }
 
     try {
-      await grantMilestonesForReferrer(supabase, referrerId);
+      await grantMilestonesForReferrer(log, supabase, referrerId);
     } catch (e) {
       const msg = e instanceof Error ? e.message : String(e);
-      logStep("Milestone grant error (existing referral path)", { error: msg });
+      referralStep(log, "Milestone grant error (existing referral path)", { error: msg }, "error");
       return { ok: false, reason: msg, retryable: true };
     }
 
@@ -278,7 +354,7 @@ export async function applyReferralRecord(
       }
 
       try {
-        await grantMilestonesForReferrer(supabase, referrerId);
+        await grantMilestonesForReferrer(log, supabase, referrerId);
       } catch (e) {
         const msg = e instanceof Error ? e.message : String(e);
         return { ok: false, reason: msg, retryable: true };
@@ -287,7 +363,7 @@ export async function applyReferralRecord(
       return { ok: true };
     }
 
-    logStep("Referral insert error", { error: insErr.message });
+    referralStep(log, "Referral insert error", { error: insErr.message }, "error");
     return { ok: false, reason: insErr.message, retryable: true };
   }
 
@@ -297,15 +373,15 @@ export async function applyReferralRecord(
     .eq("user_id", referredUserId);
 
   if (profErr) {
-    logStep("Profile update error", { error: profErr.message });
+    referralStep(log, "Profile update error", { error: profErr.message }, "error");
     return { ok: false, reason: profErr.message, retryable: true };
   }
 
   try {
-    await grantMilestonesForReferrer(supabase, referrerId);
+    await grantMilestonesForReferrer(log, supabase, referrerId);
   } catch (e) {
     const msg = e instanceof Error ? e.message : String(e);
-    logStep("Milestone grant error", { error: msg });
+    referralStep(log, "Milestone grant error", { error: msg }, "error");
     return { ok: false, reason: msg, retryable: true };
   }
 

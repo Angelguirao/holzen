@@ -51,6 +51,7 @@ serve(
     const result = await applyReferralRecord(supabase, {
       referredUserId: user.id,
       referralCode: String(referral_code),
+      log,
     });
 
     if (result.ok) {
