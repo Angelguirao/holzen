@@ -85,13 +85,13 @@ export function SnoozeControl() {
     const hours = (tomorrow.getTime() - now.getTime()) / (60 * 60 * 1000);
     await snooze(hours);
     setOpen(false);
-    toast(t('snooze.untilTomorrowActivated', 'Snoozed until tomorrow 8am'), { duration: 3000 });
+    toast(t('snooze.untilTomorrowActivated', { defaultValue: 'Snoozed until tomorrow 8am' }), { duration: 3000 });
   };
 
   const handleCancel = async () => {
     hapticFeedback('light');
     await cancelSnooze();
-    toast(t('snooze.cancelled', 'Snooze cancelled'), { duration: 2000 });
+    toast(t('snooze.cancelled', { defaultValue: 'Snooze cancelled' }), { duration: 2000 });
   };
 
   if (isActive && snoozedUntil) {
@@ -115,7 +115,7 @@ export function SnoozeControl() {
           type="button"
           className="text-xs font-medium text-primary/70 transition-colors hover:text-primary"
         >
-          {t('snooze.wake', 'Wake')}
+          {t('snooze.wake', { defaultValue: 'Wake' })}
         </button>
       </motion.div>
     );
@@ -128,11 +128,11 @@ export function SnoozeControl() {
           className="flex items-center gap-1.5 py-1 leading-snug font-sans font-medium text-[#24b1c6] text-base"
         >
           <Moon className="h-3.5 w-3.5" />
-          {t('snooze.pausePauses', 'Snooze pauses')}
+          {t('snooze.pausePauses', { defaultValue: 'Snooze pauses' })}
         </button>
       </PopoverTrigger>
       <PopoverContent align="start" className="w-48 p-2 space-y-1">
-        <p className={`px-2 pb-1 ${homeInWidget.kicker}`}>{t('snooze.snoozeFor', 'Snooze for')}</p>
+        <p className={`px-2 pb-1 ${homeInWidget.kicker}`}>{t('snooze.snoozeFor', { defaultValue: 'Snooze for' })}</p>
         {SNOOZE_OPTIONS.map(({ hours, labelKey }) => (
           <button
             key={hours}
@@ -141,7 +141,7 @@ export function SnoozeControl() {
           >
             <Clock className="h-3 w-3 text-muted-foreground/40" />
             <span className="text-sm font-medium text-foreground/80">
-              {t(labelKey, `${hours} hours`)}
+              {t(labelKey, { defaultValue: `${hours} hours` })}
             </span>
           </button>
         ))}
@@ -151,7 +151,7 @@ export function SnoozeControl() {
         >
           <Clock className="h-3 w-3 text-muted-foreground/40" />
           <span className="text-sm font-medium text-foreground/80">
-            {t('snooze.untilTomorrow', 'Until tomorrow (8am)')}
+            {t('snooze.untilTomorrow', { defaultValue: 'Until tomorrow (8am)' })}
           </span>
         </button>
       </PopoverContent>
