@@ -54,6 +54,15 @@ import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 
 const LAST_SEEN_VERSION_KEY = 'holzen_last_seen_version';
 
+function readThrownMessage(e: unknown, fallback: string): string {
+  if (e instanceof Error && e.message) return e.message;
+  if (e && typeof e === 'object' && 'message' in e) {
+    const m = (e as { message: unknown }).message;
+    if (typeof m === 'string' && m.length > 0) return m;
+  }
+  return fallback;
+}
+
 function GroundingTagInput({ activities, onChange }: { activities: string[]; onChange: (v: string[]) => void }) {
   const { t } = useTranslation();
   const [inputValue, setInputValue] = useState('');
@@ -211,9 +220,8 @@ const Settings = forwardRef<HTMLDivElement>(function Settings(_props, ref) {
       toast.success(t('auth.passwordUpdated'));
       setNewPassword('');
       setConfirmPassword('');
-    } catch (e: any) {
-      const msg = e?.message || 'Something went wrong';
-      toast.error(msg);
+    } catch (e: unknown) {
+      toast.error(readThrownMessage(e, 'Something went wrong'));
     } finally {
       setChangingPassword(false);
     }
@@ -260,7 +268,7 @@ const Settings = forwardRef<HTMLDivElement>(function Settings(_props, ref) {
           .eq('user_id', user.id),
       ]);
 
-      const pauseRows = (pauses ?? []) as any[];
+      const pauseRows = (pauses ?? []) as Record<string, unknown>[];
       const dateStr = new Date().toISOString().slice(0, 10);
 
       if (format === 'csv') {
@@ -1348,8 +1356,8 @@ function ChangeEmailSection() {
       if (error) throw error;
       toast.success('Confirmation sent');
       setNewEmail('');
-    } catch (e: any) {
-      toast.error(e?.message || 'Something went wrong');
+    } catch (e: unknown) {
+      toast.error(readThrownMessage(e, 'Something went wrong'));
     } finally {
       setChanging(false);
     }
