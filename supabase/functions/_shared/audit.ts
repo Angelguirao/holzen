@@ -41,8 +41,7 @@ export interface AuditInsertResult {
   error: { message: string; code?: string } | null;
 }
 export interface AuditClient {
-  // deno-lint-ignore no-explicit-any
-  from(table: string): { insert(values: Record<string, unknown>): PromiseLike<AuditInsertResult> | any };
+  from(table: string): { insert(values: Record<string, unknown>): PromiseLike<AuditInsertResult> };
 }
 
 export async function logAudit(svc: AuditClient, entry: AuditLogEntry): Promise<void> {
