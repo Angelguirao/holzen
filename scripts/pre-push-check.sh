@@ -128,7 +128,7 @@ fi
 # ---- 4. Frontend build + tests ----------------------------------------------
 step "4/6  Frontend tests + build"
 
-if npm run test --silent -- --run 2>&1 | tail -30; then
+if npm run test --silent 2>&1 | tail -30; then
   ok "vitest passed"
 else
   fail_check "npm run test failed"

@@ -20,6 +20,8 @@ Instructions for AI assistants and automation working in this repository (e.g. C
 | `npm run check:edge` | Optional: `deno check` on all `supabase/functions/*/index.ts`; **skips** if Deno is missing. Resolves `deno` from PATH, then `DENO_INSTALL/bin`, then `~/.deno/bin` (official installer default). |
 | `npm run check:edge-logging` | Regex guardrail: HTTP-serving edge `index.ts` files must wrap handlers in `withRequestLogging` (BetterStack + Sentry). Runs in **`test:ci`** and **`check:prepush`**. |
 | `npm run check:edge-coverage-manifest` | Ensures `EdgeCoverage.tsx` lists every `supabase/config.toml` `[functions.*]` name (and no extras). Run when adding/removing edge functions. |
+| `npm run check:prepush` | Full scripted preflight (`scripts/pre-push-check.sh`). **Requires `bash`** (Git Bash / WSL on Windows). |
+| `npm run smoke:edge-logging` | Optional: HTTP smoke against deployed edges — verifies `x-cid` round-trip through `withRequestLogging` (see `supabase/functions/README.md`). |
 | `npm run gen:types` | Regenerate `src/integrations/supabase/types.ts` from the **linked** Supabase project (`supabase login` or `SUPABASE_ACCESS_TOKEN`). Run after DB migrations. |
 
 **Linting:** There are many **pre-existing** ESLint issues (~300). Do not treat cleaning the whole tree as part of a small task; avoid introducing *new* problems in files you touch.
