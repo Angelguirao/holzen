@@ -107,7 +107,7 @@ export function LibraryItems({ library, filtered }: Props) {
     if (selectedIds.size === 0) return;
     setBulkLoading(true);
     await Promise.all(
-      Array.from(selectedIds).map((id) => updateItem(id, { status: 'archived' } as any))
+      Array.from(selectedIds).map((id) => updateItem(id, { status: 'archived' }))
     );
     setBulkLoading(false);
     exitSelectMode();
@@ -117,18 +117,18 @@ export function LibraryItems({ library, filtered }: Props) {
     if (selectedIds.size === 0) return;
     setBulkLoading(true);
     await Promise.all(
-      Array.from(selectedIds).map((id) => updateItem(id, { is_favorite: true } as any))
+      Array.from(selectedIds).map((id) => updateItem(id, { is_favorite: true }))
     );
     setBulkLoading(false);
     exitSelectMode();
   }, [selectedIds, updateItem, exitSelectMode]);
 
   const handleStatusChange = async (id: string, status: 'unread' | 'read' | 'archived') => {
-    await updateItem(id, { status } as any);
+    await updateItem(id, { status });
   };
 
   const handleUpdateTags = async (id: string, tags: string[]) => {
-    await updateItem(id, { tags } as any);
+    await updateItem(id, { tags });
   };
 
   const linkedMap = useMemo(() => {

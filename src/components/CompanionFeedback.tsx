@@ -8,6 +8,13 @@ import type { RegenerateCompanionSlot } from '@/hooks/use-companion-data';
 import { useSubscription } from '@/hooks/use-subscription';
 import { useProGate } from '@/hooks/use-pro-gate';
 import { showLimitReachedToast, isPaidLimitReached } from '@/lib/limit-upsell';
+import type { Json } from '@/integrations/supabase/types';
+
+function voteFromMetadata(metadata: Json | null | undefined): 'up' | 'down' | null {
+  if (!metadata || typeof metadata !== 'object' || Array.isArray(metadata)) return null;
+  const v = (metadata as Record<string, unknown>).vote;
+  return v === 'up' || v === 'down' ? v : null;
+}
 
 interface Props {
   /** Reflection ID this companion belongs to */
@@ -73,7 +80,7 @@ export function CompanionFeedback({
 
         if (cancelled || !data || data.length === 0) return;
 
-        setVote((data[0].metadata as any)?.vote ?? null);
+        setVote(voteFromMetadata(data[0].metadata));
       } catch {
         // Non-critical
       }

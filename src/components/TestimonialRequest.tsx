@@ -60,7 +60,7 @@ export function TestimonialRequest({ completedPauseCount }: Props) {
       user_id: user.id,
       display_name: displayName.trim(),
       quote: quote.trim(),
-    } as any);
+    });
     setSubmitting(false);
     if (error) {
       toast.error(t('testimonial.failed'));
