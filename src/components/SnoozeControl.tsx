@@ -85,7 +85,9 @@ export function SnoozeControl() {
     const hours = (tomorrow.getTime() - now.getTime()) / (60 * 60 * 1000);
     await snooze(hours);
     setOpen(false);
-    toast(t('snooze.untilTomorrowActivated', { defaultValue: 'Snoozed until tomorrow 8am' }), { duration: 3000 });
+    toast(t('snooze.untilTomorrowActivated', { defaultValue: 'Snoozed until tomorrow 8am' }), {
+      duration: 3000,
+    });
   };
 
   const handleCancel = async () => {
@@ -132,7 +134,9 @@ export function SnoozeControl() {
         </button>
       </PopoverTrigger>
       <PopoverContent align="start" className="w-48 p-2 space-y-1">
-        <p className={`px-2 pb-1 ${homeInWidget.kicker}`}>{t('snooze.snoozeFor', { defaultValue: 'Snooze for' })}</p>
+        <p className={`px-2 pb-1 ${homeInWidget.kicker}`}>
+          {t('snooze.snoozeFor', { defaultValue: 'Snooze for' })}
+        </p>
         {SNOOZE_OPTIONS.map(({ hours, labelKey }) => (
           <button
             key={hours}
