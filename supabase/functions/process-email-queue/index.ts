@@ -1,5 +1,6 @@
 import { sendLovableEmail } from 'npm:@lovable.dev/email-js'
 import { createClient } from 'npm:@supabase/supabase-js@2'
+import type { SupabaseClient } from 'npm:@supabase/supabase-js@2'
 import { recipientHostFromEmail } from "../_shared/email-log-helpers.ts";
 import { withRequestLogging, type RequestLoggingContext } from "../_shared/with-request-logging.ts";
 
@@ -55,11 +56,10 @@ function parseJwtClaims(token: string): Record<string, unknown> | null {
 }
 
 // Move a message to the dead letter queue and log the reason.
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
 async function moveToDlq(
-  supabase: any,
+  supabase: SupabaseClient,
   queue: string,
-  msg: { msg_id: number; message: Record<string, any> },
+  msg: { msg_id: number; message: Record<string, unknown> },
   reason: string,
   log: RequestLoggingContext["log"],
 ): Promise<void> {

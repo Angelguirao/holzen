@@ -12,6 +12,14 @@ import {
 
 const REPORT_MODEL = "google/gemini-2.5-flash-lite";
 
+/** Subset of `profiles` selected for the monthly report loop. */
+interface MonthlyReportProfile {
+  user_id: string;
+  email_notifications?: boolean | null;
+  hold_goal_currency?: string | null;
+  language?: string | null;
+}
+
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Headers":
@@ -143,7 +151,8 @@ serve(
 
     if (profilesError) throw profilesError;
 
-    const eligible = (profiles ?? []).filter((p) => p.email_notifications);
+    const profileRows = (profiles ?? []) as MonthlyReportProfile[];
+    const eligible = profileRows.filter((p) => p.email_notifications);
     log("monthly_report_phase", {
       holzen_event: "monthly_report_cron",
       phase: "eligible_users",
@@ -156,7 +165,7 @@ serve(
     const monthAgo = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString();
 
     for (const profile of eligible) {
-      const currency = (profile as any).hold_goal_currency || "USD";
+      const currency = profile.hold_goal_currency || "USD";
       const btc = await fetchBtcMonthData(currency);
 
       const monthDir = btc.monthChange >= 0 ? "up" : "down";
@@ -203,7 +212,7 @@ serve(
         const t0 = Date.now();
         try {
           const LANG_NAMES: Record<string, string> = { en: "English", es: "Spanish", pt: "Portuguese", de: "German", nl: "Dutch", fr: "French", tr: "Turkish" };
-          const langCode = (profile as any).language || "en";
+          const langCode = profile.language || "en";
           const langName = LANG_NAMES[langCode] || "English";
           const langInstruction = langCode !== "en" ? `\nWrite in ${langName}.` : "";
 
