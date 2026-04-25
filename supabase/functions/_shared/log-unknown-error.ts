@@ -24,3 +24,12 @@ export function unknownErrorForLog(err: unknown): Record<string, unknown> {
   }
   return { error_message: String(err).slice(0, 2000) };
 }
+
+/** `web-push` errors often expose HTTP status for dead subscriptions (410/404). */
+export function webPushStatusCode(err: unknown): number | undefined {
+  if (err && typeof err === "object" && "statusCode" in err) {
+    const sc = (err as { statusCode?: unknown }).statusCode;
+    return typeof sc === "number" ? sc : undefined;
+  }
+  return undefined;
+}

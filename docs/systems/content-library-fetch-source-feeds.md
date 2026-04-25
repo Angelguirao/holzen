@@ -72,19 +72,19 @@ See [`.env.example`](../../.env.example) for commented examples.
 - **Fill from URL** — same form: **`admin-library-preview`** edge function (JWT + `profiles.is_admin`): Firecrawl markdown scrape, then optional Gemini JSON fields via **`LOVABLE_API_KEY`** (same as fetch-source-feeds). Without Lovable key, the UI still gets a short markdown excerpt. Listed in [`supabase/config.toml`](../../supabase/config.toml) as `[functions.admin-library-preview]` with **`verify_jwt = true`**.
 ## Logs (grep Supabase Edge logs)
 
-Filter with **`[holzen:fetch-feeds]`**. Verbose lines (`holzenEdgeLog` / `holzenEdgeWarn`) follow [logging-strategy.md](../ops/logging-strategy.md): **`HOLZEN_EDGE_LOG=0`** silences them in production; **`holzenEdgeRun`** always prints.
+Each line is **JSON**: filter **`"fn":"fetch-source-feeds"`** and, if needed, **`fetch_feeds_cron`** inside **`extra.holzen_event`**. The **`msg`** field carries the stable token below. See [logging-strategy.md](../ops/logging-strategy.md).
 
-| Message | When | Always |
+| **msg** | When | Level |
 |--------|------|--------|
-| `fetch_feeds_batch` | After loading sources; `sourcesTotal`, `toProcess`, `maxArticlesPerSource`, `mode` | Yes |
-| `fetch_feeds_discover` | After resolving URLs for one source; `discovery`, `poolSize`, **`poolPending`**, **`poolSkippedKnown`**, **`batchDedupOk`**, `feedAuthorsInPool` | If verbose |
-| `fetch_feeds_batch_dedup_failed` | Batch URL dedup query failed; falls back to per-URL pre-scrape checks | Warn |
-| `fetch_feeds_article` | Per article attempt: `outcome`, `reason` (e.g. `dedup_url_pre_scrape`, `dedup_url`, `dedup_title_norm`), `phase` on failure, `discovery`, `urlHost` | If verbose |
-| `fetch_feeds_complete` | Run finished; `fetched`, `sourcesTried`, `mode` | Yes |
-| `fetch_feeds_source_error` | Uncaught error in one source loop | If verbose (warn) |
-| `fetch_feeds_original_infer` | Per essay when inferring `original_url`: `path`, `phrase`, `candidateCount`, `candidatesPreview` (`host@distance`), `chosen`, `chosenDistanceAfterPhrase`; if `path` is `no_marker`, `noMarkerHint` (`hasPublished`, `hasFirst`, `headerScannedChars`) | If verbose (unless `FETCH_FEEDS_LOG_ORIGINAL_INFER=false`) |
-| `fetch_feeds_original_firecrawl` | When `original_url` comes from Firecrawl **`metadata`** (`source`, `metadataKeysChecked`, `chosen`) | If verbose (unless `FETCH_FEEDS_LOG_ORIGINAL_INFER=false`) |
-| `fetch_feeds_original_llm_rejected` | Model returned `original_url` on same host as article | If verbose |
+| `fetch_feeds_batch` | After loading sources; `sourcesTotal`, `toProcess`, `maxArticlesPerSource`, `mode` | info |
+| `fetch_feeds_discover` | After resolving URLs for one source; `discovery`, `poolSize`, **`poolPending`**, **`poolSkippedKnown`**, **`batchDedupOk`**, `feedAuthorsInPool` | info |
+| `fetch_feeds_batch_dedup_failed` | Batch URL dedup query failed; falls back to per-URL pre-scrape checks | warn |
+| `fetch_feeds_article` | Per article attempt: `outcome`, `reason` (e.g. `dedup_url_pre_scrape`, `dedup_url`, `dedup_title_norm`), `phase` on failure, `discovery`, `urlHost` | info |
+| `fetch_feeds_complete` | Run finished; `fetched`, `sourcesTried`, `mode` | info |
+| `fetch_feeds_source_error` | Uncaught error in one source loop | warn |
+| `fetch_feeds_original_infer` | Per essay when inferring `original_url`: `path`, `phrase`, `candidateCount`, `candidatesPreview` (`host@distance`), `chosen`, `chosenDistanceAfterPhrase`; if `path` is `no_marker`, `noMarkerHint` (`hasPublished`, `hasFirst`, `headerScannedChars`) | info (omit when `FETCH_FEEDS_LOG_ORIGINAL_INFER=false`) |
+| `fetch_feeds_original_firecrawl` | When `original_url` comes from Firecrawl **`metadata`** (`source`, `metadataKeysChecked`, `chosen`) | info (same gate) |
+| `fetch_feeds_original_llm_rejected` | Model returned `original_url` on same host as article | info |
 
 Stable grep tokens: **`fetch_feeds_batch`**, **`fetch_feeds_discover`**, **`fetch_feeds_article`**, **`fetch_feeds_complete`**, **`fetch_feeds_original_infer`**, **`fetch_feeds_original_firecrawl`**, **`fetch_feeds_original_llm_rejected`**.
 
@@ -96,5 +96,5 @@ Stable grep tokens: **`fetch_feeds_batch`**, **`fetch_feeds_discover`**, **`fetc
 
 ## Related docs
 
-- [logging-strategy.md](../ops/logging-strategy.md) — Edge vs browser logging; `HOLZEN_EDGE_LOG`.
+- [logging-strategy.md](../ops/logging-strategy.md) — Edge JSON logging vs browser `holzen-console`.
 - [AGENTS.md](../../AGENTS.md) — `supabase/functions/` and migrations.

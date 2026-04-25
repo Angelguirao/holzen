@@ -1,7 +1,7 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import webpush from "https://esm.sh/web-push@3.6.7";
 import { createCidSupabaseClient, sendWebPushWithCid } from "../_shared/cid-clients.ts";
-import { holzenEdgeError, holzenEdgeLog, holzenEdgeRun } from "../_shared/holzen-edge-log.ts";
+import { unknownErrorForLog, webPushStatusCode } from "../_shared/log-unknown-error.ts";
 import { coingeckoHeaders } from "../_shared/coingecko.ts";
 import { withRequestLogging } from "../_shared/with-request-logging.ts";
 
@@ -24,16 +24,21 @@ async function fetchWithRetry(url: string, retries = 3, delayMs = 2000): Promise
 serve(
   withRequestLogging("deliver-letters", async ({ req, log, cid }) => {
   try {
-    holzenEdgeRun("deliver-letters", "request", { method: req.method });
     const { verifyServiceAuth } = await import("../_shared/auth.ts");
     if (!verifyServiceAuth(req)) {
-      holzenEdgeRun("deliver-letters", "auth rejected");
+      log.warn("deliver_letters_phase", {
+        holzen_event: "deliver_letters_cron",
+        phase: "service_auth_rejected",
+      });
       return new Response(JSON.stringify({ error: "Unauthorized" }), {
         status: 401,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
-    holzenEdgeRun("deliver-letters", "auth ok");
+    log("deliver_letters_phase", {
+      holzen_event: "deliver_letters_cron",
+      phase: "service_auth_ok",
+    });
     const supabase = createCidSupabaseClient(
       Deno.env.get("SUPABASE_URL") ?? "",
       Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? "",
@@ -58,7 +63,12 @@ serve(
     const isSurge = changePercent > 0;
 
     if (changePercent === 0) {
-      holzenEdgeLog("deliver-letters", "run complete", { delivered: 0, condition: "neutral" });
+      log("deliver_letters_complete", {
+        holzen_event: "deliver_letters_cron",
+        phase: "run_complete",
+        delivered: 0,
+        condition: "neutral",
+      });
       return new Response(JSON.stringify({ delivered: 0, condition: "neutral" }), {
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
@@ -66,7 +76,12 @@ serve(
 
     const currentCondition = isCrash ? "crash" : "surge";
     const absChange = Math.abs(changePercent);
-    holzenEdgeLog("deliver-letters", "market context", { condition: currentCondition, absChange: Number(absChange.toFixed(1)) });
+    log("deliver_letters_phase", {
+      holzen_event: "deliver_letters_cron",
+      phase: "market_context",
+      condition: currentCondition,
+      absChange: Number(absChange.toFixed(1)),
+    });
 
     // 2. Find letters waiting for this condition
     const { data: letters, error: lettersError } = await supabase
@@ -77,7 +92,12 @@ serve(
 
     if (lettersError) throw lettersError;
     if (!letters || letters.length === 0) {
-      holzenEdgeLog("deliver-letters", "run complete", { delivered: 0, reason: "no_letters" });
+      log("deliver_letters_complete", {
+        holzen_event: "deliver_letters_cron",
+        phase: "run_complete",
+        delivered: 0,
+        reason: "no_letters",
+      });
       return new Response(JSON.stringify({ delivered: 0 }), {
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
@@ -92,7 +112,13 @@ serve(
 
       // Only deliver if the current change magnitude meets the letter's threshold
       if (absChange < letterThreshold) {
-        holzenEdgeLog("deliver-letters", "skip letter — below threshold", { letterIdPrefix: String(letter.id).slice(0, 8), letterThreshold, currentAbs: Number(absChange.toFixed(1)) });
+        log("deliver_letters_skip", {
+          holzen_event: "deliver_letters_cron",
+          phase: "skip_below_threshold",
+          letter_id_prefix: String(letter.id).slice(0, 8),
+          letter_threshold: letterThreshold,
+          current_abs: Number(absChange.toFixed(1)),
+        });
         continue;
       }
 
@@ -197,14 +223,19 @@ serve(
                   payload,
                   { notificationTag: "letter" }
                 );
-              } catch (pushErr: any) {
-                if (pushErr.statusCode === 410 || pushErr.statusCode === 404) {
+              } catch (pushErr: unknown) {
+                const sc = webPushStatusCode(pushErr);
+                if (sc === 410 || sc === 404) {
                   await supabase.from("push_subscriptions").delete().eq("endpoint", sub.endpoint);
                 }
               }
             }
           } catch (vapidErr) {
-            holzenEdgeError("deliver-letters", "push VAPID setup error", vapidErr);
+            log.error("deliver_letters_vapid", {
+              holzen_event: "deliver_letters_cron",
+              phase: "push_vapid_setup_error",
+              ...unknownErrorForLog(vapidErr),
+            });
           }
         }
       }
@@ -212,13 +243,22 @@ serve(
       delivered++;
     }
 
-    holzenEdgeLog("deliver-letters", "run complete", { delivered, condition: currentCondition });
+    log("deliver_letters_complete", {
+      holzen_event: "deliver_letters_cron",
+      phase: "run_complete",
+      delivered,
+      condition: currentCondition,
+    });
     return new Response(JSON.stringify({ delivered, condition: currentCondition }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
   } catch (e) {
     const msg = e instanceof Error ? e.message : String(e);
-    holzenEdgeError("deliver-letters", "uncaught error", msg);
+    log.error("deliver_letters_uncaught", {
+      holzen_event: "deliver_letters_cron",
+      phase: "uncaught",
+      ...unknownErrorForLog(e),
+    });
     return new Response(JSON.stringify({ error: msg }), {
       status: 500,
       headers: { ...corsHeaders, "Content-Type": "application/json" },
