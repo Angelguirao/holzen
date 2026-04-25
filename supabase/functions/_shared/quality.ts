@@ -121,13 +121,18 @@ const QUALITY_CONFIGS: Record<string, QualityConfig> = {
   },
 };
 
+function strField(obj: Record<string, unknown>, key: string): string {
+  const v = obj[key];
+  return typeof v === "string" ? v : "";
+}
+
 /**
  * Run the quality gate for a specific companion type.
  * Returns { pass: true } or { pass: false, reason: string }.
  */
 export function qualityGate(
   companionType: string,
-  content: any,
+  content: Record<string, unknown> | null | undefined,
 ): { pass: boolean; reason?: string } {
   if (!content || typeof content !== "object") {
     return { pass: false, reason: "null_or_invalid" };
@@ -136,27 +141,28 @@ export function qualityGate(
   const config = QUALITY_CONFIGS[companionType];
   if (!config) {
     // Unknown companion type — apply minimal validation
-    return content.title || content.body
+    return strField(content, "title").trim() || strField(content, "body").trim()
       ? { pass: true }
       : { pass: false, reason: "no_title_or_body" };
   }
 
   // Required fields check
   for (const field of config.requiredFields) {
-    if (typeof content[field] !== "string" || content[field].trim().length < 2) {
+    const fv = content[field];
+    if (typeof fv !== "string" || fv.trim().length < 2) {
       return { pass: false, reason: `missing_${field}` };
     }
   }
 
   // Title validation
-  const title = content.title?.trim() || "";
+  const title = strField(content, "title").trim();
   if (title.length < 5) return { pass: false, reason: "title_too_short" };
   const titleWords = title.split(/\s+/).length;
   if (titleWords < config.minTitleWords) return { pass: false, reason: "title_too_few_words" };
   if (titleWords > config.maxTitleWords) return { pass: false, reason: "title_too_many_words" };
 
   // Body validation
-  const body = content[config.bodyField]?.trim() || "";
+  const body = strField(content, config.bodyField).trim();
   if (body.length < config.minBodyLength) return { pass: false, reason: "body_too_short" };
   if (body.length > config.maxBodyLength) return { pass: false, reason: "body_too_long" };
 
@@ -228,11 +234,11 @@ function checkSentenceDiversity(text: string): { pass: boolean; reason?: string 
  * - Signal: should have an author attribution
  * - Zoom out: more lenient (poetic/philosophical)
  */
-function checkSpecificity(companionType: string, content: any): { pass: boolean; reason?: string } {
+function checkSpecificity(companionType: string, content: Record<string, unknown>): { pass: boolean; reason?: string } {
   switch (companionType) {
     case "ground_nudge": {
-      const body = content.body || "";
-      const citation = content.citation || "";
+      const body = strField(content, "body");
+      const citation = strField(content, "citation");
       const combined = `${body}\n${citation}`;
       const hasYear =
         /\b(19|20)\d{2}\b/.test(body) ||
@@ -247,7 +253,7 @@ function checkSpecificity(companionType: string, content: any): { pass: boolean;
       break;
     }
     case "historical_insight": {
-      const insight = content.btcInsight || "";
+      const insight = strField(content, "btcInsight");
       const hasYearWord = /\b(19|20)\d{2}\b/.test(insight);
       const hasMonthName =
         /\b(January|February|March|April|May|June|July|August|September|October|November|December)\b/i.test(
@@ -265,14 +271,14 @@ function checkSpecificity(companionType: string, content: any): { pass: boolean;
     }
     case "signal": {
       // Signal should have a meaningful source (not generic)
-      const source = (content.source || "").toLowerCase();
+      const source = strField(content, "source").toLowerCase();
       const genericSources = ["bitcoin", "various", "multiple", "unknown", "anonymous", "n/a"];
       if (genericSources.some(g => source === g || source.startsWith(g + " "))) {
         return { pass: false, reason: "signal_generic_source" };
       }
-      const body = (content.body || "").toLowerCase();
-      const title = (content.title || "").toLowerCase();
-      const url = (content.url || "").toLowerCase();
+      const body = strField(content, "body").toLowerCase();
+      const title = strField(content, "title").toLowerCase();
+      const url = strField(content, "url").toLowerCase();
       if (body.includes("cryptosovereignty") || title.includes("cryptosovereignty") || url.includes("cryptosovereignty.org")) {
         return { pass: false, reason: "signal_overused_meme_domain" };
       }
