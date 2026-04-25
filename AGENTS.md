@@ -92,7 +92,7 @@ Never commit `.env` or service role keys.
 
 Pushing triggers **automatic** DB migrations and edge function deploys to the linked project; the **frontend** still needs a manual **Publish → Update** in Lovable.
 
-**Run the pre-push checklist** in [docs/ops/deployment-sync-guide.md](docs/ops/deployment-sync-guide.md) (boxed list + **`npm run check:prepush`** bash gate). Day-to-day minimum: **`npm run test`**, **`npm run build`** ( **`prebuild` → `check:version-sync`** ), lint on touched files. When edge code or **`config.toml`** / **`EdgeCoverage.tsx`** changes: also **`npm run check:edge`** (if Deno is installed), **`npm run check:edge-logging`**, **`npm run check:edge-coverage-manifest`**. After schema changes: **`npm run gen:types`** when you can authenticate to Supabase, and **`as unknown as T`** for new columns until types catch up. Cursor loads the same expectations via `.cursor/rules/deployment-sync.mdc`.
+**Run the pre-push checklist** in [docs/ops/deployment-sync-guide.md](docs/ops/deployment-sync-guide.md) (boxed list + **`npm run check:prepush`** bash gate). Day-to-day minimum: **`npm run test`**, **`npm run build`** (**`prebuild`** → **`check:version-sync`**), lint on touched files. When edge code or **`config.toml`** / **`EdgeCoverage.tsx`** changes: also **`npm run check:edge`** (if Deno is installed), **`npm run check:edge-logging`**, **`npm run check:edge-coverage-manifest`**. After schema changes: **`npm run gen:types`** when you can authenticate to Supabase, and **`as unknown as T`** for new columns until types catch up. Cursor loads the same expectations via `.cursor/rules/deployment-sync.mdc`.
 
 ## Observability
 
