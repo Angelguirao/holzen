@@ -77,6 +77,8 @@ export default function PauseSession() {
     if (!saved?.message) return null;
     if (navPauseInstanceId && saved.pauseInstanceId && saved.pauseInstanceId !== navPauseInstanceId) return null;
     return saved;
+    // `loadSession` is a stable module import; `location.key` resets on navigation without
+    // changing `location` identity — both are intentionally omitted from deps (see rule text).
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [location.key, navPauseInstanceId]);
 
@@ -231,7 +233,8 @@ export default function PauseSession() {
       restoredFromStorage: restored !== null,
       hydrationStatus: hydration.status,
     });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+    // Intentional mount-only snapshot; listing deps would re-log on every navigation/hydration change.
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- mount-once diagnostic
   }, []);
 
   const message = resolved?.message ?? '';

@@ -184,19 +184,21 @@ export function LetterToFutureSelf({ currentPrice, changePercent }: Props) {
   const writtenDuring = effectiveMode === 'calm' ? 'calm' : isCrash ? 'crash' : 'surge';
   const deliverDuring = effectiveMode === 'calm' ? calmTarget : isCrash ? 'surge' : 'crash';
 
-  const prompts =
-    effectiveMode === 'calm'
-      ? calmTarget === 'crash'
-        ? WRITING_PROMPTS.calm
-        : WRITING_PROMPTS.crash
-      : isCrash
-        ? WRITING_PROMPTS.crash
-        : WRITING_PROMPTS.surge;
+  const prompts = useMemo(
+    () =>
+      effectiveMode === 'calm'
+        ? calmTarget === 'crash'
+          ? WRITING_PROMPTS.calm
+          : WRITING_PROMPTS.crash
+        : isCrash
+          ? WRITING_PROMPTS.crash
+          : WRITING_PROMPTS.surge,
+    [effectiveMode, isCrash, calmTarget],
+  );
   // Pick a stable prompt for the current mode/target so it doesn't flicker while typing.
   const randomPrompt = useMemo(
     () => prompts[Math.floor(Math.random() * prompts.length)],
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [effectiveMode, isCrash, calmTarget],
+    [prompts],
   );
   const letterValidation = useMemo(() => validateFutureLetterBody(body), [body]);
 
