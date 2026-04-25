@@ -20,7 +20,7 @@ const CACHE_TTL_MS = 5 * 60 * 1000; // 5 minutes
 const SUBSCRIBED_STATUSES = new Set(["active", "trialing"]);
 
 serve(
-  withRequestLogging("check-subscription", async ({ req }) => {
+  withRequestLogging("check-subscription", async ({ req, log }) => {
   const authHeader = req.headers.get("Authorization");
   if (!authHeader?.startsWith("Bearer ")) {
     return new Response(JSON.stringify({ error: "Unauthorized" }), {
@@ -197,7 +197,15 @@ serve(
             subscriptionEnd = new Date(raw).toISOString();
           }
         } catch (e) {
-          console.log("Could not parse subscription end date:", raw, e);
+          try {
+            log.warn("check_subscription_end_parse_failed", {
+              holzen_event: "check_subscription_end_parse_failed",
+              raw_type: typeof raw,
+              detail: e instanceof Error ? e.message : String(e),
+            });
+          } catch {
+            /* non-fatal */
+          }
         }
         const ts = (eligibleSub as any).trial_start;
         const te = (eligibleSub as any).trial_end;

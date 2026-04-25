@@ -14,7 +14,7 @@ const corsHeaders = {
 };
 
 serve(
-  withRequestLogging("record-referral", async ({ req }) => {
+  withRequestLogging("record-referral", async ({ req, log }) => {
   try {
     const authHeader = req.headers.get("Authorization");
     if (!authHeader) {
@@ -69,7 +69,14 @@ serve(
     });
   } catch (e) {
     const errorMessage = e instanceof Error ? e.message : String(e);
-    console.log(`[RECORD-REFERRAL] ERROR - ${JSON.stringify({ message: errorMessage })}`);
+    try {
+      log.error("record_referral_uncaught", {
+        holzen_event: "record_referral_uncaught",
+        detail: errorMessage,
+      });
+    } catch {
+      /* non-fatal */
+    }
     return new Response(JSON.stringify({ error: errorMessage }), {
       status: 500,
       headers: { ...corsHeaders, "Content-Type": "application/json" },

@@ -16,7 +16,7 @@ const corsHeaders = {
 };
 
 serve(
-  withRequestLogging("generate-wallpaper", async ({ req }) => {
+  withRequestLogging("generate-wallpaper", async ({ req, log }) => {
   try {
     const authHeader = req.headers.get("Authorization");
     if (!authHeader) throw new Error("Missing authorization");
@@ -87,7 +87,15 @@ serve(
       providers: ["lovable"],
     });
     if (!guard.allowed) {
-      console.warn(`[generate-wallpaper] guard blocked: ${guard.reason ?? "unknown"}`);
+      try {
+        log.warn("generate_wallpaper_guard_blocked", {
+          holzen_event: "generate_wallpaper_guard_blocked",
+          reason: guard.reason ?? "unknown",
+          status: guard.status ?? null,
+        });
+      } catch {
+        /* non-fatal */
+      }
       return new Response(JSON.stringify({ error: AI_TEMPORARILY_UNAVAILABLE_MESSAGE }), {
         status: guard.status ?? 503,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
