@@ -80,7 +80,7 @@ export function parsePauseSessionLocationState(state: unknown): PauseSessionNavP
   };
 }
 
-/** Pre-generated grounding card from Home → `/tools/ground` (legacy `/ground` redirects, state preserved). */
+/** Pre-generated grounding card from Home → `/tools/ground`. */
 export interface GroundPreGenerated {
   activity: string;
   suggestion: string;
@@ -126,24 +126,5 @@ export function parseGroundLocationState(state: unknown): GroundLocationState {
 export const PROFILE_TAB_IDS = ['stats', 'insights', 'badges', 'letters', 'activity'] as const;
 export type ProfileTab = (typeof PROFILE_TAB_IDS)[number];
 
-export interface ProfileLocationState {
-  tab?: ProfileTab;
-  letterId?: string;
-}
-
-export function parseProfileLocationState(state: unknown): ProfileLocationState {
-  if (!state || typeof state !== 'object') return {};
-  const o = state as Record<string, unknown>;
-  const tab = o.tab;
-  const letterId = o.letterId;
-  return {
-    tab:
-      typeof tab === 'string' && (PROFILE_TAB_IDS as readonly string[]).includes(tab)
-        ? (tab as ProfileTab)
-        : undefined,
-    letterId: typeof letterId === 'string' ? letterId : undefined,
-  };
-}
-
-/** Router state passed from notification actions (profile + pause deep links). */
-export type NotificationNavigateState = ProfileLocationState | PauseSessionLocationState;
+/** Router state passed from notification actions (e.g. pause uses reflectionId in state). */
+export type NotificationNavigateState = PauseSessionLocationState;

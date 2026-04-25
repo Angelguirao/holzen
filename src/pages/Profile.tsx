@@ -1,11 +1,11 @@
 import { useTranslation } from 'react-i18next';
-import { useEffect, useState, useMemo, useCallback, useRef } from 'react';
-import { useLocation, useNavigate, useParams, useSearchParams } from 'react-router-dom';
+import { useEffect, useState, useMemo, useCallback } from 'react';
+import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/use-auth';
 import { useHolzen } from '@/hooks/use-holzen';
 import { useSubscription } from '@/hooks/use-subscription';
-import { parseProfileLocationState, type ProfileTab } from '@/lib/router-location-state';
+import { type ProfileTab } from '@/lib/router-location-state';
 import { journeyPath, isProfileTab } from '@/lib/app-routes';
 import { formatBtcPrice } from '@/lib/btc';
 import { format } from 'date-fns';
@@ -66,13 +66,10 @@ const Profile = () => {
   const { user } = useAuth();
   const { t } = useTranslation();
   const { subscribed } = useSubscription();
-  const location = useLocation();
   const navigate = useNavigate();
   const { tab: urlTab } = useParams<{ tab: string }>();
   const [searchParams] = useSearchParams();
-  const { tab: stateTab, letterId: stateLetterId } = parseProfileLocationState(location.state);
-  const letterFromQuery = searchParams.get('letter');
-  const letterIdForOpen = letterFromQuery ?? stateLetterId;
+  const letterIdForOpen = searchParams.get('letter');
   const [completedPauseCount, setCompletedPauseCount] = useState(0);
   const [letters, setLetters] = useState<Letter[]>([]);
   const [practiceEntries, setPracticeEntries] = useState<PracticeEntry[]>([]);
@@ -91,22 +88,7 @@ const Profile = () => {
     }
   }, [urlTab, navigate]);
 
-  // Legacy: router state (tab, letter) → bookmarkable URL once
-  const legacyRouted = useRef(false);
-  useEffect(() => {
-    if (legacyRouted.current) return;
-    if (stateTab == null && stateLetterId == null) return;
-    legacyRouted.current = true;
-    const nextTab: ProfileTab =
-      stateTab && isProfileTab(stateTab)
-        ? stateTab
-        : stateLetterId
-          ? 'letters'
-          : 'stats';
-    navigate(journeyPath(nextTab, stateLetterId ? { letterId: stateLetterId } : undefined), { replace: true, state: null });
-  }, [stateTab, stateLetterId, navigate]);
-
-  // Open letter from `?letter=` or one-time state
+  // Open letter from `?letter=`
   useEffect(() => {
     if (!letterIdForOpen) {
       setLetterViewerPending(false);
