@@ -18,17 +18,16 @@ import { Input } from '@/components/ui/input';
 import { cn } from '@/lib/utils';
 import { useProGate } from '@/hooks/use-pro-gate';
 import { NoxHeaderMain } from '@/components/ui/nox-header';
-import { ZOOM_OUT_DEFAULT_LABEL } from '@/lib/zoom-out-payload';
 
-const SOURCE_CHIPS: { key: string; icon: LucideIcon; label: string }[] = [
-  { key: 'reflection', icon: Pause, label: 'Pause' },
-  { key: 'signal', icon: Radio, label: 'Signal' },
-  { key: 'grounding', icon: Leaf, label: 'Grounding' },
-  { key: 'haiku', icon: Feather, label: 'Haiku' },
-  { key: 'zoom_out', icon: Telescope, label: ZOOM_OUT_DEFAULT_LABEL },
-  { key: 'history_insight', icon: ScrollText, label: 'History' },
-  { key: 'reflection_note', icon: Pencil, label: 'Note' },
-  { key: 'external', icon: LinkIcon, label: 'External' },
+const SOURCE_CHIPS: { key: string; icon: LucideIcon }[] = [
+  { key: 'reflection', icon: Pause },
+  { key: 'signal', icon: Radio },
+  { key: 'grounding', icon: Leaf },
+  { key: 'haiku', icon: Feather },
+  { key: 'zoom_out', icon: Telescope },
+  { key: 'history_insight', icon: ScrollText },
+  { key: 'reflection_note', icon: Pencil },
+  { key: 'external', icon: LinkIcon },
 ];
 
 
@@ -63,11 +62,16 @@ export default function Library() {
 
   const { items, collections } = library;
 
+  const sourceChips = useMemo(
+    () => SOURCE_CHIPS.map((c) => ({ ...c, label: t(`librarySources.${c.key}`) })),
+    [t]
+  );
+
   // Available source types from actual data
   const availableSources = useMemo(() => {
     const existing = new Set(items.map((i) => i.source_type).filter(Boolean));
-    return SOURCE_CHIPS.filter((f) => existing.has(f.key));
-  }, [items]);
+    return sourceChips.filter((f) => existing.has(f.key));
+  }, [items, sourceChips]);
 
   // Available tags from actual data (sorted by frequency)
   const availableTags = useMemo(() => {

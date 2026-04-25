@@ -1,5 +1,6 @@
 import { useMemo } from 'react';
-import { ZOOM_OUT_DEFAULT_LABEL, zoomOutBodyPreviewFromJsonString } from '@/lib/zoom-out-payload';
+import { zoomOutBodyPreviewFromJsonString } from '@/lib/zoom-out-payload';
+import { librarySourceLabel } from '@/lib/library-source-label';
 import { Heart, Pause, Radio, Leaf, Feather, Telescope, ScrollText, Pencil, Link as LinkIcon, FileText, type LucideIcon } from 'lucide-react';
 import type { LibraryItem } from '@/hooks/use-library';
 import { useTranslation } from 'react-i18next';
@@ -14,18 +15,18 @@ interface Props {
   incomplete?: boolean;
 }
 
-const SOURCE_META: Record<string, { icon: LucideIcon; label: string }> = {
-  reflection: { icon: Pause, label: 'Pause' },
-  signal: { icon: Radio, label: 'Signal' },
-  grounding: { icon: Leaf, label: 'Grounding' },
-  learning: { icon: Leaf, label: 'Grounding' },
-  ground: { icon: Leaf, label: 'Grounding' },
-  haiku: { icon: Feather, label: 'Haiku' },
-  zoom_out: { icon: Telescope, label: ZOOM_OUT_DEFAULT_LABEL },
-  history_insight: { icon: ScrollText, label: 'History' },
-  reflection_note: { icon: Pencil, label: 'Note' },
-  external: { icon: LinkIcon, label: 'External' },
-  practice: { icon: Pencil, label: 'Practice' },
+const SOURCE_ICONS: Record<string, LucideIcon> = {
+  reflection: Pause,
+  signal: Radio,
+  grounding: Leaf,
+  learning: Leaf,
+  ground: Leaf,
+  haiku: Feather,
+  zoom_out: Telescope,
+  history_insight: ScrollText,
+  reflection_note: Pencil,
+  external: LinkIcon,
+  practice: Pencil,
 };
 
 // HSL-based color accents per source type (uses design system hues)
@@ -72,8 +73,13 @@ export function LibraryItemCard({ item, onToggleFavorite, onClick, engaged = tru
     }
   }, [item.created_at, item.status]);
 
-  const meta = SOURCE_META[item.source_type ?? ''] ?? { icon: FileText, label: item.type ?? 'Item' };
-  const CategoryIcon = meta.icon;
+  const st = item.source_type ?? '';
+  const CategoryIcon = SOURCE_ICONS[st] ?? FileText;
+  const sourceBadgeLabel = librarySourceLabel(
+    st || undefined,
+    t,
+    item.type ?? 'Item'
+  );
   const isCompanion = item.source_type && !['reflection', 'reflection_note', 'ground', 'practice', 'external'].includes(item.source_type);
   // Only show as skipped if the pause is complete (has outcome) and user didn't engage
   const dimmed = isCompanion && !engaged && !incomplete;
@@ -95,7 +101,7 @@ export function LibraryItemCard({ item, onToggleFavorite, onClick, engaged = tru
       <div className="flex-1 min-w-0 space-y-1">
         <span className="inline-flex items-center gap-1 px-2 py-1 rounded-full border border-foreground/20 bg-foreground/5 text-foreground text-xs font-sans whitespace-nowrap">
           <CategoryIcon className="h-3 w-3" />
-          {meta.label}
+          {sourceBadgeLabel}
         </span>
         <div className="flex items-center gap-1.5">
           {item.title && item.title !== 'Reflection' && (
