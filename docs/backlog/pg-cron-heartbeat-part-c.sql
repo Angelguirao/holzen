@@ -27,21 +27,16 @@ SELECT cron.schedule(
 );
 
 -- ─────────────────────────────────────────────────────────────────────────────
--- 2. check-followups-hourly   (hourly :15)
+-- 2. check-followups-hourly — OBSOLETE (Pause V2)
+--     Dropped with `follow_ups` + `check-followups` in
+--     20260423202000_pause_v2_destructive_cutover.sql. Do not re-schedule.
 -- ─────────────────────────────────────────────────────────────────────────────
-SELECT cron.unschedule('check-followups-hourly');
-SELECT cron.schedule(
-  'check-followups-hourly',
-  '15 * * * *',
-  $$
-    SELECT net.http_post(
-      url := 'https://edgbwdecaoottowliimu.supabase.co/functions/v1/check-followups',
-      headers := jsonb_build_object('Content-Type','application/json','Authorization','Bearer ' || (SELECT decrypted_secret FROM vault.decrypted_secrets WHERE name = 'CRON_SECRET')),
-      body := '{"time":"hourly"}'::jsonb
-    );
-    PERFORM public.emit_job_heartbeat('check_followups');
-  $$
-);
+-- SELECT cron.unschedule('check-followups-hourly');
+-- SELECT cron.schedule(
+--   'check-followups-hourly',
+--   '15 * * * *',
+--   $$ ... $$
+-- );
 
 -- ─────────────────────────────────────────────────────────────────────────────
 -- 3. check-volatility   (every 15 min)

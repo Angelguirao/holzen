@@ -96,7 +96,7 @@ Assume **Phases 3–8** cover security and cron **once**. Use this table for **f
 | **Journal / grounding / ritual** | `journal-prompt`, `suggest-grounding`, `suggest-ritual` | 3–5 |
 | **Reflection / number** | `reflection-insights`, `holzen-number` | 2–4 |
 | **Letters / digests / nudges** | `deliver-letters`, `weekly-digest`, `monthly-report`, `personalized-nudge`, `night-reflection` | 5–10 |
-| **Ops / cron / data** | `check-followups`, `check-volatility`, `fetch-source-feeds`, `refresh-btc-prices`, `badge-notify`, … | 6–12 |
+| **Ops / cron / data** | `check-volatility`, `fetch-source-feeds`, `refresh-btc-prices`, `badge-notify`, … | 6–12 |
 | **Account / trust** | `delete-account`, `send-feedback`, `record-referral`, `auth-email-hook`, `process-referral-pending` | 3–6 |
 
 Full name list: [bruno/functions-catalog.md](../../bruno/functions-catalog.md).

@@ -149,16 +149,16 @@ Tone, reflection style, custom prompt, motivations, mantra, grounding activities
 **2. `moodHistory` — “how have they been feeling lately?”**  
 Canonical source in Pause V2 is **`pause_step_events`**: pair **`initial_emotion_logged`** with **`outcome_logged`** per `pause_instance_id`, then sort newest-first (`**pause-cron-parity.ts**` → `**pauseRecencyInputs**` on the server; **`loadMoodHistoryForOrchestrate`** in the browser for **`companion-orchestrate`**). The **`generateUnifiedReflection`** prompt uses `moodHistory` when the **caller passes it**.
 
-- **Manual (reflect step):** `**use-holzen`** currently invokes `**holzen-reflect`** **without** `moodHistory` / `recentHaikus` / `recentMessages` in the JSON body, so the **reflect-step** model often runs **without** those hints (parity gap vs cron).  
-- **Manual (orchestrator):** `**use-companion-data`** loads `moodHistory` from **`pause_step_events`** and sends it to **`companion-orchestrate`** (intervention + lazy slots).  
-- **Automatic:** `**check-volatility`** calls `**pauseRecencyInputs**` so **`generateUnifiedReflection`** receives the same shapes as `holzen-reflect` *can* accept (`moodHistory`, `recentMessages`, `recentHaikus` from **`pause_step_events`** + **`pause_ai_artifacts`**).
+- **Manual (reflect step):** `**use-holzen`** loads the same shapes as cron via **`loadReflectRecencyHints`** (`**src/lib/load-reflect-recency-hints.ts**`) and passes `moodHistory` / `recentMessages` / `recentHaikus` into **`holzen-reflect`** when present (parity with **`pauseRecencyInputs`** in **`check-volatility`**).  
+- **Manual (orchestrator):** `**use-companion-data`** loads `moodHistory` from **`pause_step_events`** (`**loadMoodHistoryForOrchestrate`**) and sends it to **`companion-orchestrate`** (intervention + lazy slots).  
+- **Automatic:** `**check-volatility`** calls `**pauseRecencyInputs**` before **`generateUnifiedReflection`**.
 
 **Nuance:** A mood picked **only after** the reflect-step returns is **not** in `moodHistory` for **that** `generateUnifiedReflection` call; it will show up on **later** runs once logged to **`pause_step_events`**. If the user already chose a mood **before** invoking generation, `**use-holzen`** can pass **`last_reported_mood`** inside **`pause_create_or_reuse`**’s **`context_snapshot`** for storage/analytics.
 
 **3. `recentHaikus` / `recentMessages` — “don’t repeat yourself”**  
 Up to **five** recent haikus and **five** recent reflect-step **messages** (from **`pause_ai_artifacts`** kinds `haiku` / `reflection_text`). Used as **dedup hints** in **`generateUnifiedReflection`** when provided.
 
-- **Manual (reflect step):** Not currently sent by `**use-holzen**` (see §2.3.E.2).  
+- **Manual (reflect step):** Sent by `**use-holzen**` when **`loadReflectRecencyHints`** returns non-empty pools (§2.3.E.2).  
 - **Automatic:** Filled by `**pauseRecencyInputs**` alongside `moodHistory`.
 
 *Why reconstruct on the server for cron:* there is **no** open Pause tab — **`Postgres`** is the only place to assemble the same JSON shapes the edge functions expect.
@@ -184,7 +184,7 @@ Up to **five** recent haikus and **five** recent reflect-step **messages** (from
 **H. Notifications and profile bookkeeping**
 
 - **Manual:** In-app delivery; **`use-holzen`** persists **`pause_instances`** + **`pause_ai_artifacts`** + **`library_items`** after `**holzen-reflect`** succeeds (no legacy **`reflections`** insert). **`profiles.last_message`** / **`last_context`** are **not** updated by that hook in the current code.  
-- **Automatic:** Push / optional email / `**pause_notifications`** as configured; `**last_trigger_at`** updated when claiming work; **`check-volatility`** updates **`profiles.last_message`** / **`last_context`** when it creates the pause message.
+- **Automatic:** Push / optional email / unified **`notifications`** feed (and any digest paths) as configured; `**last_trigger_at`** updated when claiming work; **`check-volatility`** updates **`profiles.last_message`** / **`last_context`** when it creates the pause message.
 
 *Why:* automatic pause must **reach** the user outside the app; manual pause already has them in-session.
 
@@ -208,7 +208,7 @@ Up to **five** recent haikus and **five** recent reflect-step **messages** (from
 | **Cooldown / gates**  | Short client cooldown; no volatility gate      | Thresholds, `cooldown_hours`, quiet hours, snooze, `last_trigger_at` claim |
 | **Reflection AI**     | `holzen-reflect` → `generateUnifiedReflection` | `check-volatility` → same generator                                        |
 | **Orchestrator auth** | User JWT                                       | Service role + `userId` in body                                            |
-| **Notifications**     | In-app                                         | Push / email / `pause_notifications`                                       |
+| **Notifications**     | In-app                                         | Push / email / unified `notifications` (legacy `pause_notifications` removed) |
 
 
 ---
@@ -602,7 +602,7 @@ Reads that need hydrated pause + companion text use **`v_pause_full`** and/or **
 - `**generation_attempts**` — Model attempts, tokens, estimated cost (where instrumented).
 - `**analytics_events**` — e.g. `pause_ai_call`, `intervention_selected`, `reflection_generated` (legacy event name retained for dashboards).
 - `**companion_cache**`, `**user_companion_serves**`, `**content_library**` — Cache / dedup / fallback content.
-- `**pause_notifications**` — In-app bell for server-triggered sessions.
+- `**notifications**` — Unified in-app feed (server-triggered pause rows use `source_table` / `source_id`; legacy `pause_notifications` was dropped in Pause V2).
 - `**profiles**` — `**last_message**` / `**last_context**`: updated by **`check-volatility`** when a cron pause message is created (not by **`use-holzen`** today); `**last_trigger_at**` follows the automatic claim path (see §2 / cron docs).
 
 ---
@@ -658,7 +658,6 @@ Exact SQL lives in **[cron-setup.md](../../ops/cron-setup.md)**. Typical schedul
 | `refresh-btc-prices`     | Feeds zoom-out generator                                         |
 | `pregenerate-companions` | Cache lifecycle + warming                                        |
 | `fetch-source-feeds`     | Fills `content_library` for fallbacks                            |
-| `check-followups`        | Outcome follow-ups (feeds mirror / history of decisions)         |
 | `night-reflection`       | Separate end-of-day message path                                 |
 
 
@@ -731,7 +730,6 @@ supabase/functions/
 ├── refresh-btc-prices/index.ts
 ├── pregenerate-companions/index.ts
 ├── fetch-source-feeds/index.ts
-├── check-followups/index.ts
 ├── night-reflection/index.ts
 └── _shared/
     ├── companion-orchestrate-types.ts
@@ -750,6 +748,7 @@ supabase/functions/
     ├── phase-config.ts              # library → cache → live phase toggles (COMPANION_PHASE_*)
     ├── quality.ts, sanitize.ts, cache.ts, content-library.ts, observe.ts, ratelimit.ts, fallbacks.ts
 
+src/lib/load-reflect-recency-hints.ts   # manual holzen-reflect: moodHistory + dedup pools (cron parity)
 src/hooks/use-holzen.ts
 src/hooks/use-companion-data.ts
 src/components/InterventionSection.tsx

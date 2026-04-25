@@ -2,13 +2,12 @@
 
 Base URL: **`{{VITE_SUPABASE_URL}}/functions/v1/<name>`**
 
-**Bruno coverage:** Every function below has a matching `.bru` under `bruno/` (see folder READMEs). Bodies are minimal smoke-test payloads — read `supabase/functions/<name>/index.ts` for full contracts.
+**Bruno coverage:** Most functions below have a matching `.bru` under `bruno/` (see folder READMEs). Bodies are minimal smoke-test payloads — read `supabase/functions/<name>/index.ts` for full contracts. Functions removed from production (e.g. Pause V2) are omitted from the table.
 
 | Name | Bruno folder | Auth notes |
 |------|----------------|------------|
 | auth-email-hook | `auth-hook/` | Preview: `LOVABLE_API_KEY`. Main webhook: signed Lovable payload only. |
 | badge-notify | `user-jwt/` | User JWT |
-| check-followups | `service-cron/` | `SERVICE_CRON_BEARER` |
 | check-subscription | `billing/` | User JWT |
 | check-volatility | `service-cron/` | `SERVICE_CRON_BEARER` |
 | companion-orchestrate | `pause-pipeline/` | User JWT |

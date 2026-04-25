@@ -218,29 +218,23 @@ SELECT cron.schedule(
 );
 ```
 
-## Follow-up Check (check-followups)
+## Follow-up Check (`check-followups`) — **removed (Pause V2)**
 
-Creates 24-48h follow-up entries for reflections where the user sold or bought. This feeds outcome data back into the Mirror intervention — without it, Mirror has no outcome history to surface.
+> **Pause V2:** the `follow_ups` table, the `check-followups` edge function, and the `check-followups-hourly` pg_cron job were removed in [`20260423202000_pause_v2_destructive_cutover.sql`](../../supabase/migrations/20260423202000_pause_v2_destructive_cutover.sql). Mirror outcomes now come from **`pause_step_events`** / **`v_pause_full`** (see `buildMirror` in `_shared/generators/mirror.ts`). **Do not** re-schedule the SQL below.
 
-**Required for Mirror to work correctly.**
+<details>
+<summary>Historical snippet (pre–V2 only)</summary>
 
 ```sql
--- Run every 6 hours
+-- OBSOLETE — follow_ups + check-followups dropped
 SELECT cron.schedule(
   'check-followups',
   '0 */6 * * *',
-  $$
-  SELECT net.http_post(
-    url := 'https://<YOUR_SUPABASE_PROJECT_ID>.supabase.co/functions/v1/check-followups',
-    headers := jsonb_build_object(
-      'Content-Type', 'application/json',
-      'Authorization', 'Bearer ' || (SELECT decrypted_secret FROM vault.decrypted_secrets WHERE name = 'holzen_cron_service_role' LIMIT 1)
-    ),
-    body := '{}'::jsonb
-  );
-  $$
+  $$ /* … */ $$
 );
 ```
+
+</details>
 
 ## Referral pending queue (process-referral-pending)
 
