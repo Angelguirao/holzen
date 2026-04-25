@@ -5,7 +5,7 @@ import type {
 import type { CachedHistoricalInsightShape } from '@/components/HistoricalInsightDisplay';
 import type { ZoomOutData } from '@/components/ZoomOutDisplay';
 import type { CompanionLibraryBookmarkParams } from '@/lib/companion-library-autosave';
-import { toZoomOutDisplayData } from '@/lib/zoom-out-payload';
+import { toZoomOutDisplayData, zoomOutLibraryAutosaveFromDisplayData } from '@/lib/zoom-out-payload';
 import { updateRecencyHints } from '@/lib/companion-recency-hints';
 import { hostnameFromUrl } from '@/lib/companion-url';
 
@@ -109,12 +109,8 @@ function commitOrchestrateSlotData(
     case 'zoomOut': {
       const d = toZoomOutDisplayData(data);
       c.setZoomOut(d);
-      const zoomBody = d.deepTime?.body || d.echo?.message || 'Zoom Out perspective';
-      void c.autoSaveToLibrary({
-        title: d.deepTime?.title || 'Zoom Out',
-        body: zoomBody,
-        sourceType: 'zoom_out',
-      });
+      const { title, body } = zoomOutLibraryAutosaveFromDisplayData(d);
+      void c.autoSaveToLibrary({ title, body, sourceType: 'zoom_out' });
       break;
     }
   }
