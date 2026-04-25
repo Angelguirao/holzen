@@ -261,7 +261,7 @@ export function NotificationBell() {
     if (showLoading) setLoading(true);
 
     try {
-      const { data } = await (supabase as any)
+      const { data } = await supabase
         .from('notifications')
         .select('id, type, metadata, action_path, action_state, created_at, dismissed_at')
         .eq('user_id', user.id)
