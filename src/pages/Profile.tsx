@@ -4,6 +4,7 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/use-auth';
 import { useSubscription } from '@/hooks/use-subscription';
+import { useHoldGoalProfile } from '@/hooks/use-hold-goal';
 import { type ProfileTab } from '@/lib/router-location-state';
 import { journeyPath, isProfileTab } from '@/lib/app-routes';
 import { HistoryCrossLinks } from '@/components/HistoryCrossLinks';
@@ -23,12 +24,7 @@ const Profile = () => {
   const navigate = useNavigate();
   const { tab: urlTab } = useParams<{ tab: string }>();
   const [completedPauseCount, setCompletedPauseCount] = useState(0);
-  const [holdGoal, setHoldGoal] = useState<{
-    type: string | null;
-    targetMonths: number | null;
-    targetPrice: number | null;
-    start: string | null;
-  } | null>(null);
+  const { data: holdGoal } = useHoldGoalProfile();
   const [loading, setLoading] = useState(true);
 
   const tab: ProfileTab = urlTab && isProfileTab(urlTab) ? urlTab : 'stats';
@@ -58,23 +54,7 @@ const Profile = () => {
       setCompletedPauseCount(count ?? 0);
       setLoading(false);
     };
-    const loadProfile = async () => {
-      const { data } = await supabase
-        .from('profiles')
-        .select('hold_goal_type, hold_goal_target_months, hold_goal_target_price, hold_goal_start')
-        .eq('user_id', user.id)
-        .single();
-      if (data) {
-        setHoldGoal({
-          type: data.hold_goal_type,
-          targetMonths: data.hold_goal_target_months,
-          targetPrice: data.hold_goal_target_price,
-          start: data.hold_goal_start,
-        });
-      }
-    };
     loadCompletedPauseCount();
-    loadProfile();
   }, [user]);
 
   const tabs = [
@@ -116,7 +96,7 @@ const Profile = () => {
             <Skeleton className="h-40 w-full rounded-md" />
           </div>
         ) : (
-          <StatsContentV2 holdGoal={holdGoal} />
+          <StatsContentV2 holdGoal={holdGoal ?? null} />
         )
       ) : tab === 'insights' ? (
         <ProLock feature="ai_insights" hideContent>
@@ -135,7 +115,7 @@ const Profile = () => {
             <Skeleton className="h-40 w-full rounded-md" />
           </div>
         ) : (
-          <BadgesPanelV2 subscribed={subscribed} holdGoal={holdGoal} />
+          <BadgesPanelV2 subscribed={subscribed} holdGoal={holdGoal ?? null} />
         )
       ) : (
         <>
