@@ -15,12 +15,11 @@ The authoritative list of PostHog events Holzen emits. Deliberate events only �
 `<domain>.<action>` in lowercase snake-case. Past-tense verbs for completed actions, present-tense for initiations.
 
 - ✅ `pause.manual_completed`, `generation.initiated`, `paywall.viewed`
-- ❌ `reflectionCompleted`, `PaywallView`, `trackGeneration`
+- ❌ `pauseManualDone`, `PaywallView`, `trackGeneration`
 
 ## Instrumentation status
 
-- **Wired (PostHog):** `auth.*`, `navigation.primary_tab_opened`, `pause.manual_started` / `pause.manual_completed` (Home “Need a moment” + `holzen-reflect` + V2 instance — not pre–Pause-V2 “reflections”), `pause_instance_created` (manual new instance), `pause_engaged`, `pause_completed`, `pause_companion_counted` / `pause_companion_not_counted` (from `pause_log_step` / `pause_log_companion` RPCs), `generation.initiated`, `companion.served`, `paywall.viewed` (Pro toast + limit toast), `paywall.subscribed` (checkout return; plan defaults to `monthly` until API exposes interval), `feedback.submitted` (after `send-feedback` success), `performance.web_vital`, `ritual.suggested` / `ritual.accepted` / `ritual.declined` (Ground), plus **companion idempotency diagnostics** below.
-- **Deprecated (do not emit):** `reflection.started`, `reflection.completed` — legacy names from pre–Pause-V2 copy; use `pause.manual_*` for new data.
+- **Wired (PostHog):** `auth.*`, `navigation.primary_tab_opened`, `pause.manual_started` / `pause.manual_completed` (Home “Need a moment” + `holzen-reflect` + V2 instance), `pause_instance_created` (manual new instance), `pause_engaged`, `pause_completed`, `pause_companion_counted` / `pause_companion_not_counted` (from `pause_log_step` / `pause_log_companion` RPCs), `generation.initiated`, `companion.served`, `paywall.viewed` (Pro toast + limit toast), `paywall.subscribed` (checkout return; plan defaults to `monthly` until API exposes interval), `feedback.submitted` (after `send-feedback` success), `performance.web_vital`, `ritual.suggested` / `ritual.accepted` / `ritual.declined` (Ground), plus **companion idempotency diagnostics** below.
 - **Postgres (not PostHog):** PWA install prompts (`InstallHolzenCard` → `analytics_events`), edge `trackEvent` AI call counters, etc.
 - **Convention:** every new event adds a row below AND a `trackEvent` call in source — never define events only in the PostHog UI.
 
@@ -52,7 +51,7 @@ Does not fire when re-tapping the active tab or when navigation is not from the 
 
 ### pause — Home manual message (AI)
 
-Pause V2: user taps through Home to generate the pause message via `holzen-reflect` and persist it (silent or full). This replaces the old “reflections” product naming.
+User triggers from Home; `holzen-reflect` returns the text and the client persists the V2 instance and library row (silent or full).
 
 | Event | When | Properties | Owner |
 |---|---|---|---|
