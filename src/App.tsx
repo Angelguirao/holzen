@@ -51,6 +51,8 @@ const EdgeCoverage = lazy(() => import("./pages/EdgeCoverage"));
 const Unsubscribe = lazy(() => import("./pages/Unsubscribe"));
 const BillingHistory = lazy(() => import("./pages/BillingHistory"));
 const ToolsHub = lazy(() => import("./pages/ToolsHub"));
+const ToolsLetters = lazy(() => import("./pages/ToolsLetters"));
+const JourneyLettersRedirect = lazy(() => import("./pages/JourneyLettersRedirect"));
 const SettingsAbout = lazy(() => import("./pages/SettingsAbout"));
 const RoadmapStub = lazy(() => import("./pages/RoadmapStub"));
 
@@ -156,11 +158,13 @@ const App = () => (
                   <Route path="/index" element={<Navigate to="/" replace />} />
                   <Route path="/library" element={<Library />} />
                   <Route path="/journey" element={<Navigate to="/journey/stats" replace />} />
+                  <Route path="/journey/letters" element={<JourneyLettersRedirect />} />
                   <Route path="/journey/:tab" element={<Profile />} />
                   <Route path="/settings" element={<Settings />} />
                   <Route path="/settings/about" element={<SettingsAbout />} />
                   <Route path="/settings/billing-history" element={<BillingHistory />} />
                   <Route path="/tools" element={<ToolsHub />} />
+                  <Route path="/tools/letters" element={<ToolsLetters />} />
                 </Route>
                 {/* Immersive full-screen experiences — no nav bar */}
                 <Route path="/pause" element={<ProtectedRoute><PauseSession /></ProtectedRoute>} />

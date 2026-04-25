@@ -10,7 +10,7 @@
 
 ## 1. Current model (as shipped)
 
-**Route constants and helpers:** `src/lib/app-routes.ts` (`journeyPath`, `TOOLS`, `JOURNEY_PREFIX`, `TOOLS_PREFIX`).
+**Route constants and helpers:** `src/lib/app-routes.ts` (`journeyPath`, `toolsLettersPath`, `TOOLS`, `JOURNEY_PREFIX`, `TOOLS_PREFIX`).
 
 ### 1.1 Primary navigation (authenticated shell)
 
@@ -18,17 +18,19 @@ Five bottom tabs, all wrapped in `AppLayout` (header + `Outlet` + bottom nav, ma
 
 | Tab        | Path          | Role |
 |------------|---------------|------|
-| Home       | `/`           | Hub: widgets (market, hold goal, reflection, ground entry, night, letter, practice, breathe), pause triggers, onboarding. |
+| Home       | `/`           | Hub: widgets (market, hold goal, reflection, ground entry, night, practice, breathe), pause triggers, onboarding. *Letters are not a Home widget; they live under Tools.* |
 | Library    | `/library`    | Saved pause artifacts, collections, search, source filters. |
-| Tools      | `/tools`      | In-app index (`ToolsHub`) for breathe, ambient, ground, ground history, practice. Immersive routes use `/tools/...` but hide the shell (no bottom nav). |
-| Journey    | `/journey/:tab` | Longitudinal “you” content: **stats, insights, badges, letters, activity** — each tab is a **path segment** (default `/journey/stats`). Letter deep links use `?letter=<id>`. |
+| Tools      | `/tools`      | In-app index (`ToolsHub`) for **letters to your future self**, breathe, ambient, ground, ground history, practice. Same shell as this tab: **`/tools/letters`**. Other immersive tool routes use `/tools/...` and hide the shell (no bottom nav). |
+| Journey    | `/journey/:tab` | Longitudinal “you” content: **stats, insights, badges, activity** — each tab is a **path segment** (default `/journey/stats`). *Letters are not a Journey tab.* |
 | Settings   | `/settings`   | Preferences, Pro/checkout, notifications, quiet hours, thresholds, sources, account actions, etc. |
 
-Notification `action_path` values use `/journey/...` (see migration `20260425200000_journey_routes_notification_paths.sql`). The app does not register `/profile` or pre-`/tools/*` paths.
+**Letters (Pro):** canonical route **`/tools/letters`**. Optional query **`?letter=<id>`** scrolls to that delivered letter. Legacy **`/journey/letters?...` redirects to **`/tools/letters?...`**.
+
+Notification `action_path` for letter delivery uses **`/tools/letters?letter=<id>`** (see migrations `20260426010000_letters_tools_action_path.sql` and `20260425200000_journey_routes_notification_paths.sql`). The app does not register `/profile` or pre-`/tools/*` paths.
 
 **Settings sub-routes (still in shell + bottom nav):** `/settings/billing-history`, **`/settings/about`** (changelog, version, feedback — split out so the main Settings page stays action-first).
 
-**In-app index for immersive tools:** `/tools` lists breathe, ambient, ground, ground history, and practice — same destinations as the `/tools/...` URLs below. Linked from Home (Practice + Breathe widgets).
+**In-app index for tools:** `/tools` lists letters, breathe, ambient, ground, ground history, and practice — same destinations as the listed `/tools/...` URLs. Linked from Home (Practice + Breathe widgets).
 
 This matches the “skills-first” stats organization documented in `docs/decisions/2026-04-23-skills-first-stats-ia.md` and implemented in `StatsContentV2`.
 
@@ -86,7 +88,7 @@ Under `/admin` and children (`/admin/smoke-test`, `/admin/sentry-alerts`, `/admi
    Companions remain under `/companion/...` (per pause instance) while **tools** use `/tools/...` — two honest families; naming is clearer than the old scatter of top-level paths.
 
 2. **“Journey” still bundles several intents**  
-   The tab groups stats, insights, badges, letters, and activity. Copy and the Library vs Activity explainer help; further split is a product call.
+   The tab groups stats, insights, badges, and activity. Copy and the Library vs Activity explainer help; further split is a product call.
 
 3. **Progress / history split across three places**  
    - Library: saved artifacts and collections.  
@@ -111,7 +113,7 @@ This section captures the **current state** and what we may reconsider next.
 
 ### 4.1 Unify modalities under one parent
 
-- **Shipped:** canonical **`/tools/*`** prefix for breathe, ambient, ground, ground history, and practice.
+- **Shipped:** canonical **`/tools/*`** prefix for letters (future self), breathe, ambient, ground, ground history, and practice.
 - **Shipped:** no alternate short routes; external links/bookmarks should use `/tools/...`.
 - **Shipped:** information entry point via **`/tools`** (`ToolsHub`) plus Home links (“Browse all tools & experiences”).
 - **Shipped:** **Tools** as a **primary bottom tab** (five tabs total) for the hub URL only; immersive `/tools/...` stays full-screen.
@@ -126,9 +128,9 @@ This section captures the **current state** and what we may reconsider next.
 
 ### 4.3 Path-addressable Journey
 
-- **Shipped:** `/journey/:tab` for stats/insights/badges/letters/activity.
-- **Shipped:** `?letter=<id>` deep-link behavior for letters.
-- **Shipped:** no `location.state` fallback for tab/letter selection.
+- **Shipped:** `/journey/:tab` for stats/insights/badges/activity.
+- **Shipped:** letters at **`/tools/letters`** with optional **`?letter=<id>`** (delivered letter scroll / notification); legacy **`/journey/letters`** redirects.
+- **Shipped:** no `location.state` fallback for tab selection.
 
 ### 4.4 Clarify Library vs Activity
 
@@ -154,7 +156,7 @@ Use this as a **checklist** when planning research or another IA pass. Detailed 
 |--------|-------------------|----------------------------------------|
 | **Tools & shell** | Canonical `/tools/*`, Tools hub tab, `navigation.primary_tab_opened` | Reorder tabs; drop back to four tabs and surface Tools only from Home; A/B or cohort review of tab events |
 | **Journey vs “profile”** | `/journey/:tab`, skills-first stats | Compact **stats on Home**; dedicated **Stats** tab if interviews + metrics justify it |
-| **Journey scope** | One hub: stats, insights, badges, letters, activity | Further **split tabs or routes** if one area dominates support load (product call) |
+| **Journey scope** | One hub: stats, insights, badges, activity; letters under Tools | Further **split tabs or routes** if one area dominates support load (product call) |
 | **Library vs Activity** | Copy + `HistoryCrossLinks` | **Single screen** with `saved` / `timeline` modes if users still mix them up |
 | **Settings** | Task sections + `/settings/about` | **Two-level IA** (overview → detail routes) if accordion length hurts completion |
 | **Admin** | Isolated `/admin*` | **Grouped in-app nav** under `/admin` if more tools ship there |
@@ -187,5 +189,6 @@ Use this as a **checklist** when planning research or another IA pass. Detailed 
 | 2026-04-25 | — | Updated to a “decision status + alternatives” format to capture current IA, reconsideration options, and further improvements. |
 | 2026-04-25 | — | Acted on IA: Tools bottom tab; `/settings/about`; `HistoryCrossLinks` across Library / Journey Activity / Grounding history; `/roadmap` stub page. |
 | 2026-04-26 | — | Document **§1.7** nav analytics (`navigation.primary_tab_opened`); fix five-tab wording in **§2**; add **§4.7** consolidated alternatives; link event taxonomy; clarify doc vs app version. |
+| 2026-04-26 | — | Letters moved to **`/tools/letters`** (not Journey); Home widget removed; DB notification paths + redirect from **`/journey/letters`**. |
 
 When routes, bottom-nav items, or nav-related analytics change, update **§1**, **§1.7**, **§4.1**, **§4.7**, **event-taxonomy.md** (if applicable), and a **Changelog** row in the same PR.

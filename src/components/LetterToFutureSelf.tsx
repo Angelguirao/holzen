@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo, useCallback } from 'react';
+import { useState, useEffect, useMemo, useCallback, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/use-auth';
@@ -72,6 +72,8 @@ const WRITING_PROMPTS = {
 interface Props {
   currentPrice: number | null;
   changePercent: number | null;
+  /** From `?letter=` (e.g. notification deep link) — scroll that delivered letter into view once. */
+  scrollToLetterId?: string | null;
 }
 
 /**
@@ -157,7 +159,7 @@ function SealCracks() {
   );
 }
 
-export function LetterToFutureSelf({ currentPrice, changePercent }: Props) {
+export function LetterToFutureSelf({ currentPrice, changePercent, scrollToLetterId }: Props) {
   const { t } = useTranslation();
   const { user } = useAuth();
   const { currency, threshold, thresholdDown } = useHolzen();
@@ -172,6 +174,10 @@ export function LetterToFutureSelf({ currentPrice, changePercent }: Props) {
   const [composerOpen, setComposerOpen] = useState(false);
   // Calm-mode recipient: who should receive this letter?
   const [calmTarget, setCalmTarget] = useState<'crash' | 'surge'>('crash');
+  const didScrollToLetter = useRef(false);
+  useEffect(() => {
+    didScrollToLetter.current = false;
+  }, [scrollToLetterId]);
 
   const isCrash = changePercent !== null && changePercent <= -thresholdDown;
   const isSurge = changePercent !== null && changePercent >= threshold;
@@ -216,6 +222,18 @@ export function LetterToFutureSelf({ currentPrice, changePercent }: Props) {
         setLoaded(true);
       });
   }, [user]);
+
+  useEffect(() => {
+    if (!scrollToLetterId || !loaded || didScrollToLetter.current) return;
+    const raf = requestAnimationFrame(() => {
+      const el = document.getElementById(`letter-${scrollToLetterId}`);
+      if (el) {
+        didScrollToLetter.current = true;
+        el.scrollIntoView({ behavior: prefersReducedMotion ? 'auto' : 'smooth', block: 'center' });
+      }
+    });
+    return () => cancelAnimationFrame(raf);
+  }, [scrollToLetterId, loaded, deliveredLetters, prefersReducedMotion]);
 
   // Discard any draft when the composer closes without sealing.
   useEffect(() => {
@@ -549,6 +567,7 @@ export function LetterToFutureSelf({ currentPrice, changePercent }: Props) {
 
             return (
               <motion.article
+                id={`letter-${l.id}`}
                 key={l.id}
                 initial={{ opacity: 0, y: 6 }}
                 animate={{ opacity: 1, y: 0 }}

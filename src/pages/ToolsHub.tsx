@@ -2,10 +2,11 @@ import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { NoxHeaderMain } from '@/components/ui/nox-header';
 import { TOOLS } from '@/lib/app-routes';
-import { Wind, Ear, Leaf, History, Waves, PenLine, Activity, RotateCcw, ChevronRight } from 'lucide-react';
+import { Wind, Ear, Leaf, History, Waves, PenLine, Activity, RotateCcw, ChevronRight, Mail } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
 
 const LINKS: { to: string; labelKey: string; descKey: string; icon: LucideIcon }[] = [
+  { to: TOOLS.letters, labelKey: 'tools.letters', descKey: 'tools.lettersDesc', icon: Mail },
   { to: TOOLS.breathe, labelKey: 'tools.breathe', descKey: 'tools.breatheDesc', icon: Wind },
   { to: TOOLS.ambient, labelKey: 'tools.ambient', descKey: 'tools.ambientDesc', icon: Ear },
   { to: TOOLS.ground, labelKey: 'tools.ground', descKey: 'tools.groundDesc', icon: Leaf },

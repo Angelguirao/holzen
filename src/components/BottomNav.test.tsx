@@ -8,8 +8,9 @@ describe('isPrimaryTabActive', () => {
     expect(isPrimaryTabActive('/library', 'library')).toBe(true);
   });
 
-  it('matches tools hub only (not immersive /tools/*)', () => {
+  it('matches tools hub and shell letters (not immersive /tools/*)', () => {
     expect(isPrimaryTabActive('/tools', 'tools')).toBe(true);
+    expect(isPrimaryTabActive('/tools/letters', 'tools')).toBe(true);
     expect(isPrimaryTabActive('/tools/breathe', 'tools')).toBe(false);
   });
 

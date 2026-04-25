@@ -8,7 +8,7 @@
 
 - **`PauseSessionLocationState`** + **`parsePauseSessionLocationState`** — used by **`PauseSession`** (`/pause`).
 - **`GroundPreGenerated`** / **`GroundLocationState`** + **`parseGroundLocationState`** — used by **`Ground`**; **`Home`** uses **`GroundPreGenerated`** for the grounding widget and `navigate(TOOLS.ground, { state })` (`/tools/ground`).
-- **`ProfileTab`**, **`PROFILE_TAB_IDS`** — used by **Journey** (`/journey/*`) and **`journeyPath()`**; letter deep links use **`?letter=`**, not `location.state`.
+- **`ProfileTab`**, **`PROFILE_TAB_IDS`** — used by **Journey** (`/journey/*`) and **`journeyPath()`**; **letters** live at **`/tools/letters`** (`toolsLettersPath()`, query **`?letter=`** for deep links), not `location.state`.
 - **`NotificationNavigateState`** — pause-related router state for **`NotificationBell`** (same shape as **`PauseSessionLocationState`** where `action_state` is set).
 
 Parsers narrow **`unknown`** / wire objects at runtime (companions, prefs, grounding payload) so consumers avoid **`as any`**.

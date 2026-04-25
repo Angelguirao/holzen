@@ -85,6 +85,7 @@ Never commit `.env` or service role keys.
 
 ## Git
 
+- **Pause V2 / information-architecture work** that touches Journey, Tools, Home, or app routes: use branch **`cursor/pause-v2-final`** (not `main`) as the integration line unless you are told otherwise.
 - **Commit as you go** when a logical chunk of work is done (e.g. one fix, one migration, one doc update)—do not leave the tree dirty at the end of a task unless the user asked for WIP only.
 - Use clear commit messages (what changed and why). Prefer `git` from the system install if it is not on `PATH` (e.g. `C:\Program Files\Git\bin\git.exe` on Windows).
 
