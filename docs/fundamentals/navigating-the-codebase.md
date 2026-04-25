@@ -187,6 +187,8 @@ Each folder under **`supabase/functions/<name>/`** is a deployable function. Sha
 ## 14. Tests and quality gates
 
 - **`npm run test`** — Vitest, files matching `src/**/*.{test,spec}.{ts,tsx}`.
+- **`npm run test:ci`** — Runs **`check:edge-logging`**, **`check:edge-coverage-manifest`**, then Vitest with coverage + JUnit output (matches typical CI expectations).
+- **`npm run check:prepush`** — Full bash preflight in **`scripts/pre-push-check.sh`** (tests, build, edge checks, optional local `supabase db reset`). **Requires `bash`** — on Windows use **Git Bash** or **WSL**. Narrative checklist: [deployment-sync-guide.md](../ops/deployment-sync-guide.md).
 - **`src/test/`** — `setup.ts` plus tests for sanitization, fallbacks, companion types, etc.
 - **`npm run lint`** — ESLint; the repo may have many pre-existing warnings/errors — avoid adding new ones in touched files ([AGENTS.md](../AGENTS.md)).
 
