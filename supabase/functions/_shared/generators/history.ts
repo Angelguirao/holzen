@@ -27,6 +27,7 @@ import { createAttemptLogger, trackEvent } from "../observe.ts";
 import { callPerplexityChat, type PerplexityUsage } from "../perplexity-client.ts";
 import { searchLibrary, eventToHistory, recordLibraryServe } from "../content-library.ts";
 import { getPhaseConfig } from "../phase-config.ts";
+import { type CompanionCacheTitleRow } from "../companion-cache-dedup.ts";
 import { type HistoricalEra, pickEra } from "../history-util.ts";
 
 /** Bump when the search query, structuring prompt, or quality rules change. */
@@ -320,7 +321,8 @@ BANNED PHRASES — NEVER use any of these: ${BANNED_PHRASES.join(", ")}${mood ? 
   };
 
   const models = ["google/gemini-2.5-flash", "google/gemini-2.5-flash-lite"];
-  let insight: any = null;
+  type HistoryLiveData = NonNullable<HistoryResult["data"]>;
+  let insight: HistoryLiveData | null = null;
   let lastLovableModel: string | undefined;
 
   const AI_TIMEOUTS = [10000, 8000];
@@ -349,10 +351,10 @@ BANNED PHRASES — NEVER use any of these: ${BANNED_PHRASES.join(", ")}${mood ? 
       const usage = data.usage;
       const raw = data.choices?.[0]?.message?.content || "";
       try {
-        insight = JSON.parse(raw);
+        insight = JSON.parse(raw) as HistoryLiveData;
       } catch {
         const m = raw.match(/\{[\s\S]*\}/);
-        if (m) insight = JSON.parse(m[0]);
+        if (m) insight = JSON.parse(m[0]) as HistoryLiveData;
         else {
           logAttempt({ companion_type: "historical_insight", provider: "lovable", model, status: "error", latency_ms: Date.now() - attemptT0, error_message: "json_parse_failed", input_tokens: usage?.prompt_tokens, output_tokens: usage?.completion_tokens });
           if (model !== models[models.length - 1]) continue; else break;
@@ -389,7 +391,7 @@ BANNED PHRASES — NEVER use any of these: ${BANNED_PHRASES.join(", ")}${mood ? 
   }
 
   // ── Step 4: URL post-processing ──
-  if (citations.length > 0 && !citations.includes(insight.url)) {
+  if (citations.length > 0 && (insight.url == null || !citations.includes(insight.url))) {
     insight.url = citations[0];
   }
 
@@ -400,7 +402,7 @@ BANNED PHRASES — NEVER use any of these: ${BANNED_PHRASES.join(", ")}${mood ? 
       const { data: existing } = await svcClient.from("companion_cache").select("content").eq("companion_type", "historical_insight").eq("language", "en").limit(30);
       const norm = (s: string) => s.toLowerCase().replace(/[^a-z0-9 ]/g, "").trim();
       const newNorm = norm(insight.title);
-      const isDup = existing?.some((e: any) => {
+      const isDup = existing?.some((e: CompanionCacheTitleRow) => {
         const t = norm(e.content?.title || "");
         return t === newNorm || t.includes(newNorm) || newNorm.includes(t);
       });

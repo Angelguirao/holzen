@@ -35,14 +35,25 @@ import { getPhaseConfig } from "../phase-config.ts";
 import { BTC_ON_THIS_DAY_YEARS_BACK, btcOnThisDayYearOffsets } from "../btc-on-this-day-config.ts";
 import { warmMissingBtcPrices } from "../btc-price-warm.ts";
 import { fetchPastReflectionWithWords, type PastReflectionWithWords } from "../past-reflections.ts";
+import { type CompanionCacheTitleRow } from "../companion-cache-dedup.ts";
+import { errorMessageFromUnknown, getEdgeRuntime } from "../edge-runtime.ts";
 
 /** Bump when the deep-time prompt, seed pool, or quality rules change. */
 export const PROMPT_VERSION = "v4";
 
 // ── Public types ──
 
+/** Composite zoom-out payload returned to orchestrate / clients. */
+export interface ZoomOutCompositeData {
+  onThisDay: { yearsAgo: number; price: number; date: string }[];
+  currentPrice: number | null;
+  echo: Record<string, unknown> | null;
+  deepTime: { title: string; body: string } | null;
+  partial: boolean;
+}
+
 export interface ZoomOutResult {
-  data: any | null;  // { onThisDay, currentPrice, echo, deepTime, partial }
+  data: ZoomOutCompositeData | null;
   source: "live" | "cache" | "curated" | "empty";
   cacheId: string | null;
   /** Set when deep-time text came from `serveFromCache`. */
@@ -138,8 +149,8 @@ async function fetchHistoricalAndCurrentPrices(
   const missingDateKeys = yearTargets
     .filter((t) => !priceMap.has(t.dateKey))
     .map((t) => t.dateKey);
-  const rt = (globalThis as any).EdgeRuntime;
-  if (missingDateKeys.length > 0 && rt && typeof rt.waitUntil === "function") {
+  const rt = getEdgeRuntime();
+  if (missingDateKeys.length > 0 && rt) {
     try {
       rt.waitUntil(
         warmMissingBtcPrices(svcClient, missingDateKeys)
@@ -150,11 +161,11 @@ async function fetchHistoricalAndCurrentPrices(
             );
           })
           .catch((e) => {
-            log(`btc warm-on-read failed: ${e?.message ?? String(e)}`);
+            log(`btc warm-on-read failed: ${errorMessageFromUnknown(e)}`);
           }),
       );
     } catch (e) {
-      log(`btc warm-on-read scheduling failed: ${(e as any)?.message ?? String(e)}`);
+      log(`btc warm-on-read scheduling failed: ${errorMessageFromUnknown(e)}`);
     }
   }
 
@@ -396,7 +407,10 @@ FORMAT: JSON with "title" (3-8 word evocative phrase) and "body" (1-2 poetic but
                 const { data: existing } = await svcClient.from("companion_cache").select("content").eq("companion_type", COMPANION_ZOOM_OUT_DEEP_TIME).eq("language", "en").limit(30);
                 const norm = (s: string) => s.toLowerCase().replace(/[^a-z0-9 ]/g, "").trim();
                 const newNorm = norm(parsed.title);
-                const isDup = existing?.some((e: any) => { const t = norm(e.content?.title || ""); return t === newNorm || t.includes(newNorm) || newNorm.includes(t); });
+                const isDup = existing?.some((e: CompanionCacheTitleRow) => {
+                  const t = norm(e.content?.title || "");
+                  return t === newNorm || t.includes(newNorm) || newNorm.includes(t);
+                });
                 if (!isDup) {
                   const fingerprint = await contentFingerprint(newNorm);
                   const { error: cacheErr } = await svcClient.from("companion_cache").insert({
@@ -507,7 +521,7 @@ export async function generateZoomOut(params: GenerateZoomOutParams): Promise<Zo
         data: {
           onThisDay: prices.onThisDay,
           currentPrice: prices.currentPrice,
-          echo: echoPayloadFromPast(echoPast) as any,
+          echo: echoPayloadFromPast(echoPast),
           deepTime: cached.data as { title: string; body: string },
           partial: prices.isPartial,
         },
@@ -571,7 +585,7 @@ export async function generateZoomOut(params: GenerateZoomOutParams): Promise<Zo
   const result = {
     onThisDay: prices.onThisDay,
     currentPrice: prices.currentPrice,
-    echo: echoPayloadFromPast(echoPast) as any,
+    echo: echoPayloadFromPast(echoPast),
     deepTime: deepTimeResult.deepTime,
     partial: prices.isPartial,
   };
