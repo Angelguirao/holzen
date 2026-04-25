@@ -98,6 +98,7 @@ export function LetterViewer({ letter, onClose }: Props) {
   const { currency } = useHolzen();
   const prefersReducedMotion = useReducedMotion();
   const [phase, setPhase] = useState<Phase>('seal');
+  const letterId = letter?.id;
 
   const fmtPrice = (p: number) => formatBtcPrice(p, currency);
 
@@ -110,12 +111,12 @@ export function LetterViewer({ letter, onClose }: Props) {
     // Only play the seal-breaking ceremony the first time a letter is opened
     const seenKey = 'holzen_seen_letters';
     const seen: string[] = JSON.parse(localStorage.getItem(seenKey) || '[]');
-    const alreadySeen = seen.includes(letter.id);
+    const alreadySeen = seen.includes(letterId);
 
     if (prefersReducedMotion || alreadySeen) {
       setPhase('revealed');
       if (!alreadySeen) {
-        localStorage.setItem(seenKey, JSON.stringify([...seen, letter.id]));
+        localStorage.setItem(seenKey, JSON.stringify([...seen, letterId]));
       }
       return;
     }
@@ -125,10 +126,10 @@ export function LetterViewer({ letter, onClose }: Props) {
     const t1 = setTimeout(() => setPhase('cracking'), 800);
     const t2 = setTimeout(() => {
       setPhase('revealed');
-      localStorage.setItem(seenKey, JSON.stringify([...seen, letter.id]));
+      localStorage.setItem(seenKey, JSON.stringify([...seen, letterId]));
     }, 2200);
     return () => { clearTimeout(t1); clearTimeout(t2); };
-  }, [letter?.id, prefersReducedMotion]);
+  }, [letter, letterId, prefersReducedMotion]);
 
   const getWrittenDuringLabel = (during: string) => {
     if (during === 'crash') return t('letter.duringDrop');
