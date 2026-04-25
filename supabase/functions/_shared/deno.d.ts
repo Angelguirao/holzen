@@ -3,22 +3,35 @@
 // These files actually run on the Supabase Deno edge runtime — this shim
 // is purely to keep the local TS server quiet during frontend dev.
 
-declare const Deno: {
-  env: {
+declare namespace Deno {
+  export const env: {
     get(name: string): string | undefined;
     set(name: string, value: string): void;
     toObject(): Record<string, string>;
   };
-  serve: (handler: (req: Request) => Response | Promise<Response>) => void;
-  readTextFile(path: string | URL): Promise<string>;
-  readFile(path: string | URL): Promise<Uint8Array>;
-  // Catch-all for any other Deno API touched by edge code.
-  [key: string]: unknown;
-};
+  export function serve(
+    handler: (req: Request) => Response | Promise<Response>,
+  ): void;
+  export function readTextFile(path: string | URL): Promise<string>;
+  export function readFile(path: string | URL): Promise<Uint8Array>;
+}
 
 // Allow `import ... from "https://esm.sh/..."` and other URL imports
-// (npm:, jsr:, deno.land, etc.) without TS2307.
-declare module "https://*";
-declare module "http://*";
-declare module "npm:*";
-declare module "jsr:*";
+// (npm:, jsr:, deno.land, etc.) without TS2307. The wildcard form is what
+// the TypeScript compiler actually honors for arbitrary specifier prefixes.
+declare module "https://*" {
+  const value: any;
+  export = value;
+}
+declare module "http://*" {
+  const value: any;
+  export = value;
+}
+declare module "npm:*" {
+  const value: any;
+  export = value;
+}
+declare module "jsr:*" {
+  const value: any;
+  export = value;
+}
