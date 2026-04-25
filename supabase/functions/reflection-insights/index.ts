@@ -1,6 +1,7 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { holzenEdgeError, holzenEdgeLog, holzenEdgeRun } from "../_shared/holzen-edge-log.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.57.2";
+import type { createLogger } from "../_shared/observe.ts";
 import { withRequestLogging } from "../_shared/with-request-logging.ts";
 import {
   consumeAllowanceOrCredits,
@@ -8,6 +9,8 @@ import {
   tierLimits,
 } from "../_shared/subscription-entitlements.ts";
 import { AI_TEMPORARILY_UNAVAILABLE_MESSAGE } from "../_shared/ai-user-messages.ts";
+
+type RequestLog = ReturnType<typeof createLogger>;
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -21,7 +24,8 @@ async function callAIWithFallback(
   body: Record<string, unknown>,
   primaryModel: string,
   fallbackModel: string,
-  timeoutMs = 18000,
+  timeoutMs: number,
+  log: RequestLog,
 ): Promise<{ data: any; status: number }> {
   for (const model of [primaryModel, fallbackModel]) {
     const controller = new AbortController();
@@ -43,9 +47,27 @@ async function callAIWithFallback(
       }
       if (!res.ok) {
         const t = await res.text();
-        console.error(`[AI ${model}] error ${res.status}: ${t}`);
+        try {
+          log.error("reflection_insights_ai_upstream_error", {
+            holzen_event: "reflection_insights_ai_upstream_error",
+            model,
+            status: res.status,
+            response_chars: t.length,
+          });
+        } catch {
+          /* non-fatal */
+        }
         if (model === fallbackModel) return { data: null, status: res.status };
-        console.log(`[AI] Retrying with fallback model ${fallbackModel}`);
+        try {
+          log("reflection_insights_model_retry", {
+            holzen_event: "reflection_insights_model_retry",
+            reason: "http_not_ok",
+            from_model: model,
+            to_model: fallbackModel,
+          });
+        } catch {
+          /* non-fatal */
+        }
         continue;
       }
       const data = await res.json();
@@ -53,9 +75,26 @@ async function callAIWithFallback(
     } catch (e) {
       clearTimeout(timeout);
       if (e instanceof DOMException && e.name === "AbortError") {
-        console.warn(`[AI ${model}] timed out after ${timeoutMs}ms`);
+        try {
+          log.warn("reflection_insights_ai_timeout", {
+            holzen_event: "reflection_insights_ai_timeout",
+            model,
+            timeout_ms: timeoutMs,
+          });
+        } catch {
+          /* non-fatal */
+        }
         if (model === fallbackModel) return { data: null, status: 504 };
-        console.log(`[AI] Retrying with fallback model ${fallbackModel}`);
+        try {
+          log("reflection_insights_model_retry", {
+            holzen_event: "reflection_insights_model_retry",
+            reason: "timeout",
+            from_model: model,
+            to_model: fallbackModel,
+          });
+        } catch {
+          /* non-fatal */
+        }
         continue;
       }
       throw e;
@@ -65,7 +104,7 @@ async function callAIWithFallback(
 }
 
 serve(
-  withRequestLogging("reflection-insights", async ({ req }) => {
+  withRequestLogging("reflection-insights", async ({ req, log }) => {
   try {
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
     if (!LOVABLE_API_KEY) throw new Error("LOVABLE_API_KEY is not configured");
@@ -331,14 +370,31 @@ Generate 3-5 skill development insights based on real patterns in this data. Ret
         "google/gemini-3-flash-preview",
         "google/gemini-2.5-flash-lite",
         20000,
+        log,
       );
 
       if (status === 429 || status === 402) {
-        console.error(`[INSIGHTS] Rate limited or credits exhausted for user ${userId}`);
+        try {
+          log.error("reflection_insights_rate_limited", {
+            holzen_event: "reflection_insights_rate_limited",
+            user_id: userId,
+            status,
+          });
+        } catch {
+          /* non-fatal */
+        }
         continue;
       }
       if (!aiData) {
-        console.error(`[INSIGHTS] AI failed for user ${userId} with status ${status}`);
+        try {
+          log.error("reflection_insights_ai_empty", {
+            holzen_event: "reflection_insights_ai_empty",
+            user_id: userId,
+            status,
+          });
+        } catch {
+          /* non-fatal */
+        }
         continue;
       }
 
@@ -349,7 +405,17 @@ Generate 3-5 skill development insights based on real patterns in this data. Ret
         insights = parsed.insights || parsed;
       } catch {
         const m = raw.match(/\{[\s\S]*\}/);
-        if (!m) { console.error("[INSIGHTS] Failed to parse AI JSON"); continue; }
+        if (!m) {
+          try {
+            log.error("reflection_insights_parse_failed", {
+              holzen_event: "reflection_insights_parse_failed",
+              user_id: userId,
+            });
+          } catch {
+            /* non-fatal */
+          }
+          continue;
+        }
         const parsed = JSON.parse(m[0]);
         insights = parsed.insights || parsed;
       }
