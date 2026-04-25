@@ -11,7 +11,7 @@ const corsHeaders = {
 // Renders all registered templates with their previewData.
 // Gated by LOVABLE_API_KEY — only the Go API calls this.
 
-Deno.serve(withRequestLogging("preview-transactional-email", async ({ req }) => {
+Deno.serve(withRequestLogging("preview-transactional-email", async ({ req, log }) => {
   const apiKey = Deno.env.get('LOVABLE_API_KEY')
   if (!apiKey) {
     return new Response(
@@ -75,10 +75,15 @@ Deno.serve(withRequestLogging("preview-transactional-email", async ({ req }) => 
         status: 'ready',
       })
     } catch (err) {
-      console.error('Failed to render template for preview', {
-        template: name,
-        error: err,
-      })
+      try {
+        log.error("preview_transactional_email_render_failed", {
+          holzen_event: "preview_transactional_email_render_failed",
+          template_name: name,
+          detail: err instanceof Error ? err.message : String(err),
+        });
+      } catch {
+        /* non-fatal */
+      }
       results.push({
         templateName: name,
         displayName,

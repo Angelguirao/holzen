@@ -40,7 +40,7 @@ So: **production hosted** → `HOLZEN_EDGE_LOG=0` matches “no strategic spam i
 
 - Prefer **`createLogger`** over ad-hoc `console.log` in new or touched functions so logs are grep-friendly and share a **correlation id** (`cid`) per request.
 - When you add a **new critical path**, wire **attempt logging** if it calls external models or billable APIs.
-- **Never log:** service role keys, full JWTs, raw Stripe payloads with secrets, or full user journal text in `extra`—use ids (`user_id`, `pause_instance_id`) and short hashes if needed.
+- **Never log:** service role keys, full JWTs, raw Stripe payloads with secrets, full email addresses, or full user journal text in `extra`—use ids (`user_id`, `pause_instance_id`), **`recipient_host`** / **`redactEmailForLog`** from [`email-log-helpers.ts`](../../supabase/functions/_shared/email-log-helpers.ts) on transactional email paths, and short hashes if needed.
 
 ## 2. Browser (React) — **prefixed console + user-visible errors**
 

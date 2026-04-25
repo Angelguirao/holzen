@@ -2,6 +2,7 @@ import * as React from 'npm:react@18.3.1'
 import { renderAsync } from 'npm:@react-email/components@0.0.22'
 import { createClient } from 'npm:@supabase/supabase-js@2'
 import { TEMPLATES } from '../_shared/transactional-email-templates/registry.ts'
+import { recipientHostFromEmail, redactEmailForLog } from "../_shared/email-log-helpers.ts";
 import { withRequestLogging } from "../_shared/with-request-logging.ts";
 
 // Configuration baked in at scaffold time — do NOT change these manually.
@@ -36,7 +37,7 @@ function generateToken(): string {
 // in-function instead, allowing either a signed user session or an internal
 // service-role invocation from another backend function.
 
-Deno.serve(withRequestLogging("send-transactional-email", async ({ req }) => {
+Deno.serve(withRequestLogging("send-transactional-email", async ({ req, log }) => {
   // Handle CORS preflight
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders })
@@ -47,7 +48,13 @@ Deno.serve(withRequestLogging("send-transactional-email", async ({ req }) => {
   const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')
 
   if (!supabaseUrl || !supabaseAnonKey || !supabaseServiceKey) {
-    console.error('Missing required environment variables')
+    try {
+      log.error("send_transactional_email_missing_env", {
+        holzen_event: "send_transactional_email_missing_env",
+      });
+    } catch {
+      /* non-fatal */
+    }
     return new Response(
       JSON.stringify({ error: 'Server configuration error' }),
       {
@@ -76,9 +83,14 @@ Deno.serve(withRequestLogging("send-transactional-email", async ({ req }) => {
     )
 
     if (claimsError || !claimsData?.claims?.sub) {
-      console.error('Unauthorized send-transactional-email invocation', {
-        error: claimsError,
-      })
+      try {
+        log.warn("send_transactional_email_auth_rejected", {
+          holzen_event: "send_transactional_email_auth_rejected",
+          detail: claimsError?.message ?? "no_sub",
+        });
+      } catch {
+        /* non-fatal */
+      }
       return new Response(JSON.stringify({ error: 'Unauthorized' }), {
         status: 401,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
@@ -125,7 +137,14 @@ Deno.serve(withRequestLogging("send-transactional-email", async ({ req }) => {
   const template = TEMPLATES[templateName]
 
   if (!template) {
-    console.error('Template not found in registry', { templateName })
+    try {
+      log.error("send_transactional_email_template_missing", {
+        holzen_event: "send_transactional_email_template_missing",
+        template_name: templateName,
+      });
+    } catch {
+      /* non-fatal */
+    }
     return new Response(
       JSON.stringify({
         error: `Template '${templateName}' not found. Available: ${Object.keys(TEMPLATES).join(', ')}`,
@@ -165,10 +184,16 @@ Deno.serve(withRequestLogging("send-transactional-email", async ({ req }) => {
     .maybeSingle()
 
   if (suppressionError) {
-    console.error('Suppression check failed — refusing to send', {
-      error: suppressionError,
-      effectiveRecipient,
-    })
+    try {
+      log.error("send_transactional_email_suppression_check_failed", {
+        holzen_event: "send_transactional_email_suppression_check_failed",
+        template_name: templateName,
+        recipient_host: recipientHostFromEmail(effectiveRecipient),
+        detail: suppressionError.message,
+      });
+    } catch {
+      /* non-fatal */
+    }
     return new Response(
       JSON.stringify({ error: 'Failed to verify suppression status' }),
       {
@@ -187,7 +212,16 @@ Deno.serve(withRequestLogging("send-transactional-email", async ({ req }) => {
       status: 'suppressed',
     })
 
-    console.log('Email suppressed', { effectiveRecipient, templateName })
+    try {
+      log("send_transactional_email_suppressed", {
+        holzen_event: "send_transactional_email_suppressed",
+        template_name: templateName,
+        recipient_host: recipientHostFromEmail(effectiveRecipient),
+        message_id: messageId,
+      });
+    } catch {
+      /* non-fatal */
+    }
     return new Response(
       JSON.stringify({ success: false, reason: 'email_suppressed' }),
       {
@@ -209,10 +243,16 @@ Deno.serve(withRequestLogging("send-transactional-email", async ({ req }) => {
     .maybeSingle()
 
   if (tokenLookupError) {
-    console.error('Token lookup failed', {
-      error: tokenLookupError,
-      email: normalizedEmail,
-    })
+    try {
+      log.error("send_transactional_email_token_lookup_failed", {
+        holzen_event: "send_transactional_email_token_lookup_failed",
+        template_name: templateName,
+        recipient_redacted: redactEmailForLog(normalizedEmail),
+        detail: tokenLookupError.message,
+      });
+    } catch {
+      /* non-fatal */
+    }
     await supabase.from('email_send_log').insert({
       message_id: messageId,
       template_name: templateName,
@@ -243,9 +283,16 @@ Deno.serve(withRequestLogging("send-transactional-email", async ({ req }) => {
       )
 
     if (tokenError) {
-      console.error('Failed to create unsubscribe token', {
-        error: tokenError,
-      })
+      try {
+        log.error("send_transactional_email_token_create_failed", {
+          holzen_event: "send_transactional_email_token_create_failed",
+          template_name: templateName,
+          recipient_redacted: redactEmailForLog(normalizedEmail),
+          detail: tokenError.message,
+        });
+      } catch {
+        /* non-fatal */
+      }
       await supabase.from('email_send_log').insert({
         message_id: messageId,
         template_name: templateName,
@@ -271,10 +318,16 @@ Deno.serve(withRequestLogging("send-transactional-email", async ({ req }) => {
       .maybeSingle()
 
     if (reReadError || !storedToken) {
-      console.error('Failed to read back unsubscribe token after upsert', {
-        error: reReadError,
-        email: normalizedEmail,
-      })
+      try {
+        log.error("send_transactional_email_token_reread_failed", {
+          holzen_event: "send_transactional_email_token_reread_failed",
+          template_name: templateName,
+          recipient_redacted: redactEmailForLog(normalizedEmail),
+          detail: reReadError?.message ?? "no_row",
+        });
+      } catch {
+        /* non-fatal */
+      }
       await supabase.from('email_send_log').insert({
         message_id: messageId,
         template_name: templateName,
@@ -294,9 +347,15 @@ Deno.serve(withRequestLogging("send-transactional-email", async ({ req }) => {
   } else {
     // Token exists but is already used — email should have been caught by suppression check above.
     // This is a safety fallback; log and skip sending.
-    console.warn('Unsubscribe token already used but email not suppressed', {
-      email: normalizedEmail,
-    })
+    try {
+      log.warn("send_transactional_email_token_used_not_suppressed", {
+        holzen_event: "send_transactional_email_token_used_not_suppressed",
+        template_name: templateName,
+        recipient_redacted: redactEmailForLog(normalizedEmail),
+      });
+    } catch {
+      /* non-fatal */
+    }
     await supabase.from('email_send_log').insert({
       message_id: messageId,
       template_name: templateName,
@@ -359,11 +418,16 @@ Deno.serve(withRequestLogging("send-transactional-email", async ({ req }) => {
   })
 
   if (enqueueError) {
-    console.error('Failed to enqueue email', {
-      error: enqueueError,
-      templateName,
-      effectiveRecipient,
-    })
+    try {
+      log.error("send_transactional_email_enqueue_failed", {
+        holzen_event: "send_transactional_email_enqueue_failed",
+        template_name: templateName,
+        recipient_host: recipientHostFromEmail(effectiveRecipient),
+        detail: enqueueError.message,
+      });
+    } catch {
+      /* non-fatal */
+    }
 
     await supabase.from('email_send_log').insert({
       message_id: messageId,
@@ -379,7 +443,16 @@ Deno.serve(withRequestLogging("send-transactional-email", async ({ req }) => {
     })
   }
 
-  console.log('Transactional email enqueued', { templateName, effectiveRecipient })
+  try {
+    log("send_transactional_email_enqueued", {
+      holzen_event: "send_transactional_email_enqueued",
+      template_name: templateName,
+      recipient_host: recipientHostFromEmail(effectiveRecipient),
+      message_id: messageId,
+    });
+  } catch {
+    /* non-fatal */
+  }
 
   return new Response(
     JSON.stringify({ success: true, queued: true }),

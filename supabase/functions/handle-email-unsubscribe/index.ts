@@ -1,4 +1,5 @@
 import { createClient } from 'npm:@supabase/supabase-js@2'
+import { redactEmailForLog } from "../_shared/email-log-helpers.ts";
 import { withRequestLogging } from "../_shared/with-request-logging.ts";
 
 const corsHeaders = {
@@ -14,7 +15,7 @@ function jsonResponse(data: Record<string, unknown>, status = 200): Response {
   })
 }
 
-Deno.serve(withRequestLogging("handle-email-unsubscribe", async ({ req }) => {
+Deno.serve(withRequestLogging("handle-email-unsubscribe", async ({ req, log }) => {
   // Handle CORS preflight
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders })
@@ -101,7 +102,15 @@ Deno.serve(withRequestLogging("handle-email-unsubscribe", async ({ req }) => {
     .maybeSingle()
 
   if (updateError) {
-    console.error('Failed to mark token as used', { error: updateError, token })
+    try {
+      log.error("handle_email_unsubscribe_token_update_failed", {
+        holzen_event: "handle_email_unsubscribe_token_update_failed",
+        token_prefix: token.slice(0, 8),
+        detail: updateError.message,
+      });
+    } catch {
+      /* non-fatal */
+    }
     return jsonResponse({ error: 'Failed to process unsubscribe' }, 500)
   }
 
@@ -118,14 +127,26 @@ Deno.serve(withRequestLogging("handle-email-unsubscribe", async ({ req }) => {
     )
 
   if (suppressError) {
-    console.error('Failed to suppress email', {
-      error: suppressError,
-      email: tokenRecord.email,
-    })
+    try {
+      log.error("handle_email_unsubscribe_suppress_failed", {
+        holzen_event: "handle_email_unsubscribe_suppress_failed",
+        recipient_redacted: redactEmailForLog(String(tokenRecord.email)),
+        detail: suppressError.message,
+      });
+    } catch {
+      /* non-fatal */
+    }
     return jsonResponse({ error: 'Failed to process unsubscribe' }, 500)
   }
 
-  console.log('Email unsubscribed', { email: tokenRecord.email })
+  try {
+    log("handle_email_unsubscribe_ok", {
+      holzen_event: "handle_email_unsubscribe_ok",
+      recipient_redacted: redactEmailForLog(String(tokenRecord.email)),
+    });
+  } catch {
+    /* non-fatal */
+  }
 
   return jsonResponse({ success: true })
 }))

@@ -1,5 +1,6 @@
 import { createClient } from 'npm:@supabase/supabase-js@2'
 import { WebhookError, verifyWebhookRequest } from "https://esm.sh/@lovable.dev/webhooks-js"
+import { redactEmailForLog } from "../_shared/email-log-helpers.ts";
 import { withRequestLogging } from "../_shared/with-request-logging.ts";
 
 // Suppression event payload sent by the Go API when Mailgun reports
@@ -32,7 +33,7 @@ function jsonResponse(data: Record<string, unknown>, status = 200): Response {
   })
 }
 
-Deno.serve(withRequestLogging("handle-email-suppression", async ({ req }) => {
+Deno.serve(withRequestLogging("handle-email-suppression", async ({ req, log }) => {
   if (req.method !== 'POST') {
     return jsonResponse({ error: 'Method not allowed' }, 405)
   }
@@ -42,7 +43,13 @@ Deno.serve(withRequestLogging("handle-email-suppression", async ({ req }) => {
   const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')
 
   if (!apiKey || !supabaseUrl || !supabaseServiceKey) {
-    console.error('Missing required environment variables')
+    try {
+      log.error("handle_email_suppression_missing_env", {
+        holzen_event: "handle_email_suppression_missing_env",
+      });
+    } catch {
+      /* non-fatal */
+    }
     return jsonResponse({ error: 'Server configuration error' }, 500)
   }
 
@@ -59,24 +66,55 @@ Deno.serve(withRequestLogging("handle-email-suppression", async ({ req }) => {
     if (error instanceof WebhookError) {
       switch (error.code) {
         case 'invalid_signature':
-          console.error('Invalid webhook signature')
+          try {
+            log.warn("handle_email_suppression_invalid_signature", {
+              holzen_event: "handle_email_suppression_invalid_signature",
+            });
+          } catch {
+            /* non-fatal */
+          }
           return jsonResponse({ error: 'Invalid signature' }, 401)
         case 'stale_timestamp':
-          console.error('Stale webhook timestamp')
+          try {
+            log.warn("handle_email_suppression_stale_timestamp", {
+              holzen_event: "handle_email_suppression_stale_timestamp",
+            });
+          } catch {
+            /* non-fatal */
+          }
           return jsonResponse({ error: 'Stale timestamp' }, 401)
         case 'invalid_payload':
         case 'invalid_json':
-          console.error('Invalid payload', { code: error.code })
+          try {
+            log.warn("handle_email_suppression_invalid_payload", {
+              holzen_event: "handle_email_suppression_invalid_payload",
+              code: error.code,
+            });
+          } catch {
+            /* non-fatal */
+          }
           return jsonResponse({ error: 'Invalid payload' }, 400)
         default:
-          console.error('Webhook verification failed', {
-            code: error.code,
-            message: error.message,
-          })
+          try {
+            log.warn("handle_email_suppression_verify_failed", {
+              holzen_event: "handle_email_suppression_verify_failed",
+              code: error.code,
+              detail: error.message,
+            });
+          } catch {
+            /* non-fatal */
+          }
           return jsonResponse({ error: 'Verification failed' }, 401)
       }
     }
-    console.error('Unexpected error during verification', { error })
+    try {
+      log.error("handle_email_suppression_verify_uncaught", {
+        holzen_event: "handle_email_suppression_verify_uncaught",
+        detail: error instanceof Error ? error.message : String(error),
+      });
+    } catch {
+      /* non-fatal */
+    }
     return jsonResponse({ error: 'Internal error' }, 500)
   }
 
@@ -96,10 +134,15 @@ Deno.serve(withRequestLogging("handle-email-suppression", async ({ req }) => {
     )
 
   if (suppressError) {
-    console.error('Failed to upsert suppressed email', {
-      error: suppressError,
-      email_redacted: normalizedEmail[0] + '***@' + normalizedEmail.split('@')[1],
-    })
+    try {
+      log.error("handle_email_suppression_upsert_failed", {
+        holzen_event: "handle_email_suppression_upsert_failed",
+        recipient_redacted: redactEmailForLog(normalizedEmail),
+        detail: suppressError.message,
+      });
+    } catch {
+      /* non-fatal */
+    }
     return jsonResponse({ error: 'Failed to write suppression' }, 500)
   }
 
@@ -119,19 +162,29 @@ Deno.serve(withRequestLogging("handle-email-suppression", async ({ req }) => {
     })
 
   if (insertError) {
-    // Non-fatal — log and continue. The suppression was already recorded.
-    console.warn('Failed to insert email_send_log', {
-      error: insertError,
-    })
+    try {
+      log.warn("handle_email_suppression_send_log_failed", {
+        holzen_event: "handle_email_suppression_send_log_failed",
+        recipient_redacted: redactEmailForLog(normalizedEmail),
+        detail: insertError.message,
+      });
+    } catch {
+      /* non-fatal */
+    }
   }
 
-  console.log('Suppression processed', {
-    email_redacted: normalizedEmail[0] + '***@' + normalizedEmail.split('@')[1],
-    reason: payload.reason,
-    is_retry: payload.is_retry,
-    retry_count: payload.retry_count,
-    has_message_id: !!payload.message_id,
-  })
+  try {
+    log("handle_email_suppression_ok", {
+      holzen_event: "handle_email_suppression_ok",
+      recipient_redacted: redactEmailForLog(normalizedEmail),
+      reason: payload.reason,
+      is_retry: payload.is_retry,
+      retry_count: payload.retry_count,
+      has_message_id: Boolean(payload.message_id),
+    });
+  } catch {
+    /* non-fatal */
+  }
 
   return jsonResponse({ success: true })
 }))
