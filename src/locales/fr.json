@@ -3,9 +3,30 @@
     "home": "Accueil",
     "history": "Historique",
     "library": "Bibliothèque",
+    "tools": "Outils",
     "journey": "Parcours",
     "profile": "Profil",
     "settings": "Paramètres"
+  },
+  "ia": {
+    "crossLinkIntro": "Voir aussi :",
+    "crossLinkLibrary": "Bibliothèque",
+    "crossLinkJourneyActivity": "Parcours — Activité",
+    "crossLinkGroundHistory": "Historique de grounding"
+  },
+  "settingsAbout": {
+    "back": "Paramètres",
+    "title": "À propos, journal des versions & retours",
+    "subtitle": "Nouveautés, version de l’app et contact avec l’équipe — à part de tes réglages du quotidien."
+  },
+  "roadmap": {
+    "pageTitle": "Feuille de route — Holzen",
+    "pageDescription": "Projets et mises à jour produit",
+    "title": "Feuille de route",
+    "body": "Il n’y a pas de feuille de route publique dans l’app pour l’instant. Suis le blog pour les notes de version, ou la page À propos.",
+    "linkBlog": "Blog",
+    "linkAbout": "À propos de Holzen",
+    "linkHome": "Connexion"
   },
   "common": {
     "back": "Retour",

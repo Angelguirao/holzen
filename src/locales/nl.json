@@ -3,9 +3,30 @@
     "home": "Home",
     "history": "Geschiedenis",
     "library": "Bibliotheek",
+    "tools": "Tools",
     "journey": "Reis",
     "profile": "Profiel",
     "settings": "Instellingen"
+  },
+  "ia": {
+    "crossLinkIntro": "Zie ook:",
+    "crossLinkLibrary": "Bibliotheek",
+    "crossLinkJourneyActivity": "Reis — Activiteit",
+    "crossLinkGroundHistory": "Grounding-geschiedenis"
+  },
+  "settingsAbout": {
+    "back": "Instellingen",
+    "title": "Info, wijzigingslog & feedback",
+    "subtitle": "Nieuwe functies, appversie en contact met het team — los van je dagelijkse voorkeuren."
+  },
+  "roadmap": {
+    "pageTitle": "Roadmap — Holzen",
+    "pageDescription": "Plannen en productupdates",
+    "title": "Roadmap",
+    "body": "Er is momenteel geen live roadmap in de app. Volg de blog voor releases, of lees waarom we Holzen bouwen.",
+    "linkBlog": "Blog",
+    "linkAbout": "Over Holzen",
+    "linkHome": "Inloggen"
   },
   "common": {
     "back": "Terug",

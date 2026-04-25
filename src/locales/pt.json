@@ -3,9 +3,30 @@
     "home": "Início",
     "history": "Histórico",
     "library": "Biblioteca",
+    "tools": "Ferramentas",
     "journey": "Jornada",
     "profile": "Perfil",
     "settings": "Configurações"
+  },
+  "ia": {
+    "crossLinkIntro": "Ver também:",
+    "crossLinkLibrary": "Biblioteca",
+    "crossLinkJourneyActivity": "Jornada — Atividade",
+    "crossLinkGroundHistory": "Histórico de grounding"
+  },
+  "settingsAbout": {
+    "back": "Configurações",
+    "title": "Sobre, changelog e feedback",
+    "subtitle": "Novidades, versão do app e contacto com a equipa — separado das tuas preferências do dia a dia."
+  },
+  "roadmap": {
+    "pageTitle": "Roteiro — Holzen",
+    "pageDescription": "Planos e atualizações do produto",
+    "title": "Roteiro",
+    "body": "Não temos um roteiro em tempo real na app por agora. Segue o blog para notas de versão, ou lê porquê criámos a Holzen.",
+    "linkBlog": "Blog",
+    "linkAbout": "Sobre a Holzen",
+    "linkHome": "Iniciar sessão"
   },
   "common": {
     "back": "Voltar",

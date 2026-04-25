@@ -3,9 +3,30 @@
     "home": "Ana Sayfa",
     "history": "Geçmiş",
     "library": "Kütüphane",
+    "tools": "Araçlar",
     "journey": "Yolculuk",
     "profile": "Profil",
     "settings": "Ayarlar"
+  },
+  "ia": {
+    "crossLinkIntro": "Ayrıca bakın:",
+    "crossLinkLibrary": "Kütüphane",
+    "crossLinkJourneyActivity": "Yolculuk — Etkinlik",
+    "crossLinkGroundHistory": "Grounding geçmişi"
+  },
+  "settingsAbout": {
+    "back": "Ayarlar",
+    "title": "Hakkında, değişiklik kaydı ve geri bildirim",
+    "subtitle": "Yenilikler, sürüm ve ekiple iletişim — günlük tercihlerinizden ayrı."
+  },
+  "roadmap": {
+    "pageTitle": "Yol haritası — Holzen",
+    "pageDescription": "Ürün planları ve güncellemeler",
+    "title": "Yol haritası",
+    "body": "Şu an uygulamada canlı yol haritası yok. Sürüm notları için blogu takip edin veya Holzen’i neden yaptığımızı okuyun.",
+    "linkBlog": "Blog",
+    "linkAbout": "Holzen hakkında",
+    "linkHome": "Giriş yap"
   },
   "common": {
     "back": "Geri",

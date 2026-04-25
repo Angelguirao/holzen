@@ -3,10 +3,31 @@
     "home": "Home",
     "history": "History",
     "library": "Library",
+    "tools": "Tools",
     "journey": "Journey",
     "profile": "Profile",
     "settings": "Settings",
     "breathe": "Breathe"
+  },
+  "ia": {
+    "crossLinkIntro": "See also:",
+    "crossLinkLibrary": "Library",
+    "crossLinkJourneyActivity": "Journey — Activity",
+    "crossLinkGroundHistory": "Grounding history"
+  },
+  "settingsAbout": {
+    "back": "Settings",
+    "title": "About, changelog & feedback",
+    "subtitle": "What’s new, app version, and a direct line to the team — separate from day-to-day preferences."
+  },
+  "roadmap": {
+    "pageTitle": "Roadmap — Holzen",
+    "pageDescription": "Product plans and updates",
+    "title": "Roadmap",
+    "body": "We do not host a live roadmap in the app right now. Follow the blog for release notes and direction, or read about why we built Holzen.",
+    "linkBlog": "Blog",
+    "linkAbout": "About Holzen",
+    "linkHome": "Sign in"
   },
   "common": {
     "back": "Back",

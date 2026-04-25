@@ -29,7 +29,7 @@ const NotFound = lazy(() => import("./pages/NotFound"));
 const About = lazy(() => import("./pages/About"));
 const Blog = lazy(() => import("./pages/Blog"));
 const BlogPost = lazy(() => import("./pages/BlogPost"));
-// Roadmap page kept in repo; re-add lazy + route element when making it public again.
+// Roadmap: public stub page (`RoadmapStub`) — not a full product roadmap inside the shell.
 const Breathe = lazy(() => import("./pages/Breathe"));
 const Ambient = lazy(() => import("./pages/Ambient"));
 const Reserve = lazy(() => import("./pages/Reserve"));
@@ -51,6 +51,8 @@ const EdgeCoverage = lazy(() => import("./pages/EdgeCoverage"));
 const Unsubscribe = lazy(() => import("./pages/Unsubscribe"));
 const BillingHistory = lazy(() => import("./pages/BillingHistory"));
 const ToolsHub = lazy(() => import("./pages/ToolsHub"));
+const SettingsAbout = lazy(() => import("./pages/SettingsAbout"));
+const RoadmapStub = lazy(() => import("./pages/RoadmapStub"));
 
 const queryClient = createHolzenQueryClient();
 
@@ -156,6 +158,7 @@ const App = () => (
                   <Route path="/journey" element={<Navigate to="/journey/stats" replace />} />
                   <Route path="/journey/:tab" element={<Profile />} />
                   <Route path="/settings" element={<Settings />} />
+                  <Route path="/settings/about" element={<SettingsAbout />} />
                   <Route path="/settings/billing-history" element={<BillingHistory />} />
                   <Route path="/tools" element={<ToolsHub />} />
                 </Route>
@@ -197,7 +200,7 @@ const App = () => (
                 <Route path="/about" element={<About />} />
                 <Route path="/blog" element={<Blog />} />
                 <Route path="/blog/:slug" element={<BlogPost />} />
-                <Route path="/roadmap" element={<Navigate to="/welcome" replace />} />
+                <Route path="/roadmap" element={<RoadmapStub />} />
                 <Route path="/reserve" element={<Reserve />} />
                 <Route path="/unsubscribe" element={<Unsubscribe />} />
                 <Route path="*" element={<NotFound />} />

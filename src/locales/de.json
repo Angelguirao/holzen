@@ -3,9 +3,30 @@
     "home": "Startseite",
     "history": "Verlauf",
     "library": "Bibliothek",
+    "tools": "Tools",
     "journey": "Reise",
     "profile": "Profil",
     "settings": "Einstellungen"
+  },
+  "ia": {
+    "crossLinkIntro": "Siehe auch:",
+    "crossLinkLibrary": "Bibliothek",
+    "crossLinkJourneyActivity": "Reise — Aktivität",
+    "crossLinkGroundHistory": "Grounding-Verlauf"
+  },
+  "settingsAbout": {
+    "back": "Einstellungen",
+    "title": "Info, Changelog & Feedback",
+    "subtitle": "Neuheiten, App-Version und direkter Draht zum Team — getrennt von deinen alltäglichen Einstellungen."
+  },
+  "roadmap": {
+    "pageTitle": "Roadmap — Holzen",
+    "pageDescription": "Produktpläne und Updates",
+    "title": "Roadmap",
+    "body": "Aktuell gibt es in der App keine Live-Roadmap. Folge dem Blog zu Releases und Richtung, oder lies, warum wir Holzen gebaut haben.",
+    "linkBlog": "Blog",
+    "linkAbout": "Über Holzen",
+    "linkHome": "Anmelden"
   },
   "common": {
     "back": "Zurück",

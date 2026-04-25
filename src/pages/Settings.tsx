@@ -1,5 +1,5 @@
 import { useAuth } from '@/hooks/use-auth';
-import { AppVersionBadge } from '@/components/AppVersionBadge';
+import { Link } from 'react-router-dom';
 import { QuietWindowsManager } from '@/components/QuietWindowsManager';
 import { SourceManagement } from '@/components/SourceManagement';
 import { ProLock } from '@/components/ProLock';
@@ -12,8 +12,7 @@ import { PRICING } from '@/lib/pricing';
 import { ThresholdSetting } from '@/components/ThresholdSetting';
 import { ReferralSection } from '@/components/ReferralSection';
 import { CreditsDashboard } from '@/components/CreditsDashboard';
-import { Changelog } from '@/components/Changelog';
-import { FeedbackForm } from '@/components/FeedbackForm';
+import { useLatestChangelogVersion } from '@/hooks/use-latest-changelog-version';
 import { InstallHolzenCard } from '@/components/InstallHolzenCard';
 import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
@@ -51,8 +50,6 @@ import {
 } from '@/components/ui/alert-dialog';
 import { NoxHeaderMain } from '@/components/ui/nox-header';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
-
-const LAST_SEEN_VERSION_KEY = 'holzen_last_seen_version';
 
 function readThrownMessage(e: unknown, fallback: string): string {
   if (e instanceof Error && e.message) return e.message;
@@ -167,8 +164,7 @@ const Settings = forwardRef<HTMLDivElement>(function Settings(_props, ref) {
     [checkoutWindowMinutes],
   );
   const [btcMode, setBtcMode] = useState(() => localStorage.getItem('holzen_btc_mode') === 'true');
-  const [latestVersion, setLatestVersion] = useState<string | null>(null);
-  const [hasNewVersion, setHasNewVersion] = useState(false);
+  const { hasNewVersion: hasUnseenChangelog } = useLatestChangelogVersion();
   const initialLoadRef = useRef(true);
   const saveTimeoutRef = useRef<ReturnType<typeof setTimeout>>();
 
@@ -186,23 +182,6 @@ const Settings = forwardRef<HTMLDivElement>(function Settings(_props, ref) {
     return () => clearTimeout(saveTimeoutRef.current);
   }, [threshold, thresholdDown, cumulativeThreshold, emailNotifications, reflectionTone, reflectionStyle, silentMode, cooldownHours, digestFrequency, customPrompt, quietHoursStart, quietHoursEnd, firstName, nightReflectionHour, aiInsightsEnabled, notifyBadges, mantra, currency, language, groundingActivities, companionPrefs, profileLoaded, t]);
 
-
-  useEffect(() => {
-    supabase
-      .from('changelog_entries')
-      .select('version')
-      .order('created_at', { ascending: false })
-      .limit(1)
-      .maybeSingle()
-      .then(({ data }) => {
-        if (data?.version) {
-          const v = data.version;
-          setLatestVersion(v);
-          const lastSeen = localStorage.getItem(LAST_SEEN_VERSION_KEY);
-          setHasNewVersion(lastSeen !== v);
-        }
-      });
-  }, []);
 
   const changePassword = useCallback(async () => {
     if (newPassword.length < 6) {
@@ -1305,35 +1284,29 @@ const Settings = forwardRef<HTMLDivElement>(function Settings(_props, ref) {
           </AccordionContent>
         </AccordionItem>
 
-        {/* 8. About */}
-        <AccordionItem value="about" className="border border-border/40 rounded-md px-4 mb-[16px]">
-          <AccordionTrigger className="text-xs font-mono uppercase tracking-wider text-muted-foreground hover:text-foreground py-3 hover:no-underline">
-            <span className="flex items-center gap-4 flex-1">
-              {t('settings.aboutFeedback', { defaultValue: 'About & feedback' })}
-              {hasNewVersion && (
-                <span className="text-[10px] font-mono bg-primary/10 text-primary px-1.5 py-0.5 rounded-full">
-                  {t('common.new')}
-                </span>
-              )}
-            </span>
-          </AccordionTrigger>
-          <AccordionContent className="space-y-5 pb-4">
-            <FeedbackForm />
-            <div className="border-t border-border/30 pt-4 space-y-3">
-              <div className="flex items-center gap-3">
-                <Changelog
-                  onWhatsNewOpen={() => {
-                    if (latestVersion) {
-                      localStorage.setItem(LAST_SEEN_VERSION_KEY, latestVersion);
-                      setHasNewVersion(false);
-                    }
-                  }}
-                />
-              </div>
-              <AppVersionBadge changelogVersion={latestVersion} />
+        {/* 8. About (sub-route — keeps main Settings action-first) */}
+        <div className="border border-border/40 rounded-md px-4 py-3 mb-[16px]">
+          <Link
+            to="/settings/about"
+            className="flex items-center justify-between gap-3 -mx-1 rounded-md px-1 py-0.5 outline-none focus-visible:ring-2 focus-visible:ring-primary/30"
+          >
+            <div className="min-w-0 text-left">
+              <p className="text-xs font-mono uppercase tracking-wider text-muted-foreground">
+                {t('settings.aboutFeedback', { defaultValue: 'About & feedback' })}
+              </p>
+              <p className="text-xs text-muted-foreground/80 leading-relaxed mt-1">
+                {t('settings.aboutSubpageHint', {
+                  defaultValue: "What's new, version, and feedback — in one place",
+                })}
+              </p>
             </div>
-          </AccordionContent>
-        </AccordionItem>
+            {hasUnseenChangelog ? (
+              <span className="shrink-0 text-[10px] font-mono bg-primary/10 text-primary px-1.5 py-0.5 rounded-full">
+                {t('common.new')}
+              </span>
+            ) : null}
+          </Link>
+        </div>
 
       </Accordion>
     </div>
