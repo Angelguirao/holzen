@@ -1,8 +1,12 @@
-/**
- * Supabase-generated `Database` types. Re-run `supabase gen types` against the
- * linked project after migrations. Until then, rows referencing removed Pause V1
- * tables (`reflections`, `reflection_companions`, etc.) may still appear here —
- * application code should follow the Pause V2 schema (`pause_instances`, `v_pause_full`, …).
+﻿/**
+ * Supabase-generated `Database` types.
+ *
+ * Regenerate after migrations: `npm run gen:types` (requires `supabase login` or
+ * `SUPABASE_ACCESS_TOKEN`; uses `--linked` + `supabase/config.toml`).
+ *
+ * If this file drifts from production, dropped tables/columns may still appear
+ * until you re-run the generator. Application code targets Pause V2
+ * (`pause_instances`, `v_pause_full`, `pause_ai_artifacts`, …).
  */
 export type Json =
   | string

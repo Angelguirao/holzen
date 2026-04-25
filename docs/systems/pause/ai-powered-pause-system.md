@@ -377,7 +377,7 @@ For a full breakdown of **which intervention** maps to **which generator output*
 
 ## 7. Interventions and companions (reference)
 
-> **Pause V2 storage:** Companion payloads are persisted in **`pause_ai_artifacts`** (and **`companion_serves`** / **`generation_attempts`** for telemetry). Subsections below that still mention **`reflections`**, **`reflection_companions`**, or denormalized `reflections.*` columns describe the **pre–Pause V2** layout — those tables/columns were **removed** in the destructive cutover; hydrate from artifacts + **`v_pause_full`** instead.
+> **Pause V2 storage:** Companion payloads are persisted in **`pause_ai_artifacts`** (and **`companion_serves`** / **`generation_attempts`** for telemetry). §7 companion tables describe the **current** artifact kinds; legacy **`reflections`** / **`reflection_companions`** / **`v_reflection_*`** views were **removed** in the destructive cutover — hydrate from **`pause_ai_artifacts`** + **`v_pause_full`**.
 
 The pause step combines two ideas that are easy to conflate:
 

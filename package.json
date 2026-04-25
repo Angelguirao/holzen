@@ -27,7 +27,8 @@
     "supabase:start": "supabase start",
     "supabase:stop": "supabase stop",
     "supabase:status": "supabase status",
-    "supabase:reset": "supabase db reset"
+    "supabase:reset": "supabase db reset",
+    "gen:types": "node scripts/gen-supabase-types.mjs"
   },
   "dependencies": {
     "@dnd-kit/core": "^6.3.1",

@@ -125,6 +125,7 @@ Define your own interface for the expected shape and cast through `unknown`. The
 1. **Same-commit migrations + code:** Always use `as unknown as T` for queries touching new columns.
 2. **Two-commit approach (safest):** Push the migration first, wait for Lovable to sync and regenerate types, then push the code that uses the new columns.
 3. **Wrap in try/catch** when the table or column genuinely might not exist yet (pre-migration graceful degradation).
+4. **`npm run gen:types`** — Regenerates `src/integrations/supabase/types.ts` from the **linked** project (`supabase login` or `SUPABASE_ACCESS_TOKEN`). Run after schema-changing migrations so the repo matches production.
 
 ### Migrations that unlock Edge code (same push)
 

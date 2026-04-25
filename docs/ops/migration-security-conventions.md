@@ -88,13 +88,15 @@ $$;
 ### Per-user invoker function (no definer)
 
 ```sql
+-- Example shape (Pause V2): read the caller’s pause rows — not legacy `reflections`.
 CREATE OR REPLACE FUNCTION public.my_recent_pauses()
-RETURNS SETOF public.reflections
+RETURNS SETOF public.pause_instances
 LANGUAGE sql
 STABLE
 SET search_path = public
 AS $$
-  SELECT * FROM public.reflections
+  SELECT *
+  FROM public.pause_instances
   WHERE user_id = auth.uid()
   ORDER BY created_at DESC
   LIMIT 20;
