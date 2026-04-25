@@ -16,6 +16,26 @@ import {
   computeContextFingerprint,
 } from '@/lib/pause-fingerprint';
 import { loadReflectRecencyHints } from '@/lib/load-reflect-recency-hints';
+import { trackEvent } from '@/lib/posthog';
+
+const REFLECT_START_HOME = 'holzen_sess_reflection_started_home';
+
+function markReflectionStartedHomeOnce(): void {
+  try {
+    if (sessionStorage.getItem(REFLECT_START_HOME)) return;
+    sessionStorage.setItem(REFLECT_START_HOME, '1');
+    trackEvent('reflection.started', { source: 'home' });
+  } catch {
+    /* sessionStorage */
+  }
+}
+
+function previewCompanionTypeTags(c: CompanionData): string[] {
+  const tags: string[] = [];
+  if (c.haiku) tags.push('haiku');
+  if (c.groundingTitle || c.groundingBody) tags.push('grounding');
+  return tags;
+}
 
 /**
  * Pause V2 manual-trigger hook. Writes every generated pause straight
@@ -113,6 +133,8 @@ export function useHolzen() {
         holzenLog.manual('generateMessage: skipped (no user)');
         return;
       }
+      markReflectionStartedHomeOnce();
+      const t0 = Date.now();
       holzenLog.manual('generateMessage: start', {
         btcChangePct: data.changePercent,
         silentMode,
@@ -155,6 +177,18 @@ export function useHolzen() {
           });
           if (!res.instance_id) return;
           setLastPauseInstanceId(res.instance_id);
+          if (res.created) {
+            try {
+              trackEvent('pause_instance_created', {
+                pause_instance_id: res.instance_id,
+                template_slug: 'volatility_v1',
+                source: 'manual',
+                severity: severityBand,
+              });
+            } catch {
+              /* no-op */
+            }
+          }
           await supabase.from('pause_ai_artifacts' as never).upsert(
             {
               pause_instance_id: res.instance_id,
@@ -177,6 +211,15 @@ export function useHolzen() {
             { onConflict: 'user_id,pause_instance_id,source_type', ignoreDuplicates: true } as never,
           );
           setLastTriggerAt(new Date().toISOString());
+          try {
+            trackEvent('reflection.completed', {
+              duration_s: Math.round((Date.now() - t0) / 1000),
+              had_bitcoin_context: Boolean(ctx),
+              companion_types: [],
+            });
+          } catch {
+            /* no-op */
+          }
         } catch (e: unknown) {
           holzenLog.manual('generateMessage: silent pause create failed', {
             message: e instanceof Error ? e.message : String(e),
@@ -236,14 +279,24 @@ export function useHolzen() {
 
         if (!res.instance_id) {
           holzenLog.manual('generateMessage: reuse/skip', { reason: res.reused_reason });
-          if (res.reused_reason === 'fingerprint_match' && res.instance_id) {
-            setLastPauseInstanceId(res.instance_id);
-          }
           setMessage(msg);
           setContext(ctx);
           setCompanions(companionData);
           setNewPauseArrival(true);
           return;
+        }
+
+        if (res.created) {
+          try {
+            trackEvent('pause_instance_created', {
+              pause_instance_id: res.instance_id,
+              template_slug: 'volatility_v1',
+              source: 'manual',
+              severity: severityBand,
+            });
+          } catch {
+            /* no-op */
+          }
         }
 
         setLastPauseInstanceId(res.instance_id);
@@ -307,6 +360,15 @@ export function useHolzen() {
         );
 
         setLastTriggerAt(new Date().toISOString());
+        try {
+          trackEvent('reflection.completed', {
+            duration_s: Math.round((Date.now() - t0) / 1000),
+            had_bitcoin_context: Boolean(ctx),
+            companion_types: previewCompanionTypeTags(companionData),
+          });
+        } catch {
+          /* no-op */
+        }
       } catch (e: unknown) {
         const raw = e instanceof Error ? e.message : String(e);
         holzenLog.manual('generateMessage: error', { message: raw });

@@ -8,7 +8,7 @@ import { toast } from 'sonner';
 import { enqueueAction } from '@/lib/offline-queue';
 import { useTranslation } from 'react-i18next';
 import { getCid } from '@/lib/cid';
-import { getPostHog } from '@/lib/posthog';
+import { getPostHog, trackEvent } from '@/lib/posthog';
 import type { OpenFeedbackDetail } from '@/components/ErrorBoundary';
 
 type Category = 'bug' | 'feature' | 'question';
@@ -150,6 +150,11 @@ export function FeedbackWidget() {
     if (error) {
       toast.error(t('feedback.failedToSend'), { description: t('feedback.tryAgainLater') });
       return;
+    }
+    try {
+      trackEvent('feedback.submitted', { category });
+    } catch {
+      /* no-op */
     }
     toast.success(t('feedback.sent'), { description: t('feedback.sentDesc') });
     reset();

@@ -16,6 +16,7 @@ import { parseGroundLocationState } from '@/lib/router-location-state';
 import { TOOLS } from '@/lib/app-routes';
 import { Textarea } from '@/components/ui/textarea';
 import { parseEdgeFunctionError, toUserFacingAiErrorMessage } from '@/lib/edge-function-error';
+import { trackEvent } from '@/lib/posthog';
 
 type Phase = 'idle' | 'suggestion' | 'timer' | 'checkin' | 'reflect' | 'done';
 
@@ -50,6 +51,7 @@ export default function Ground() {
   const [suggestionError, setSuggestionError] = useState<string | null>(null);
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const fetchedRef = useRef(false);
+  const ritualSuggestedTracked = useRef(false);
   const strictNoFallback = companionFallbacksDisabledClient();
 
   // Entrance delay
@@ -57,6 +59,17 @@ export default function Ground() {
     const timer = setTimeout(() => setReady(true), 400);
     return () => clearTimeout(timer);
   }, []);
+
+  useEffect(() => {
+    if (phase !== 'suggestion' || !suggestion || suggestionError) return;
+    if (ritualSuggestedTracked.current) return;
+    ritualSuggestedTracked.current = true;
+    try {
+      trackEvent('ritual.suggested', { ritual_key: 'ground' });
+    } catch {
+      /* no-op */
+    }
+  }, [phase, suggestion, suggestionError]);
 
   // Fetch AI suggestion — skip if pre-generated data was passed from Home
   useEffect(() => {
@@ -200,6 +213,11 @@ export default function Ground() {
 
   const startTimer = useCallback((minutes: number) => {
     hapticFeedback('light');
+    try {
+      trackEvent('ritual.accepted', { ritual_key: 'ground' });
+    } catch {
+      /* no-op */
+    }
     setSelectedDuration(minutes);
     setTimeLeft(minutes * 60);
     setIsRunning(true);
@@ -213,6 +231,11 @@ export default function Ground() {
 
   const skipTimer = useCallback(() => {
     hapticFeedback('light');
+    try {
+      trackEvent('ritual.declined', { ritual_key: 'ground' });
+    } catch {
+      /* no-op */
+    }
     setIsRunning(false);
     playGroundingChime();
     setPhase('checkin');
