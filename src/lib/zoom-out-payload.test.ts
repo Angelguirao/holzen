@@ -1,5 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import {
+  ZOOM_OUT_DEFAULT_BODY_PLACEHOLDER,
+  ZOOM_OUT_DEFAULT_LABEL,
   toZoomOutDisplayData,
   zoomOutBodyPreviewFromJsonString,
   zoomOutLibraryAutosaveFromDisplayData,
@@ -32,9 +34,13 @@ describe('zoom-out-payload', () => {
   it('zoomOutLibraryAutosaveFromDisplayData uses fallbacks', () => {
     const d = toZoomOutDisplayData({});
     expect(zoomOutLibraryAutosaveFromDisplayData(d)).toEqual({
-      title: 'Zoom Out',
-      body: 'Zoom Out perspective',
+      title: ZOOM_OUT_DEFAULT_LABEL,
+      body: ZOOM_OUT_DEFAULT_BODY_PLACEHOLDER,
     });
+  });
+
+  it('zoomOutBodyPreviewFromJsonString returns default label when payload is empty', () => {
+    expect(zoomOutBodyPreviewFromJsonString('{}')).toBe(ZOOM_OUT_DEFAULT_LABEL);
   });
 
   it('zoomOutTotalCharsForReadTime sums title, body, echo.message', () => {

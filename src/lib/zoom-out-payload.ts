@@ -1,8 +1,9 @@
 import type { EchoUserWord, ZoomOutData, ZoomOutEchoData } from '@/components/ZoomOutDisplay';
 
-/** Default short label + placeholder body (library autosave, list preview). */
-const ZOOM_OUT_DEFAULT_LABEL = 'Zoom Out';
-const ZOOM_OUT_DEFAULT_BODY_PLACEHOLDER = 'Zoom Out perspective';
+/** Default short label (empty preview line, library bookmark title when no deep-time title). */
+export const ZOOM_OUT_DEFAULT_LABEL = 'Zoom Out';
+/** Default body when the model returns no deep-time or echo text (library autosave). */
+export const ZOOM_OUT_DEFAULT_BODY_PLACEHOLDER = 'Zoom Out perspective';
 
 function parseEchoUserWords(raw: unknown): EchoUserWord[] | undefined {
   if (!Array.isArray(raw)) return undefined;
