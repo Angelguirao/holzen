@@ -11,7 +11,7 @@ interface Props {
 
 /**
  * Shared immersive full-screen shell for practice pages.
- * Provides dark-curtain entrance, ambient orbs, and close button — matching /pause and /breathe.
+ * Provides dark-curtain entrance, ambient orbs, and close button — matching /pause and /tools/breathe.
  */
 export function ImmersivePracticeShell({ children, title, onClose }: Props) {
   const navigate = useNavigate();

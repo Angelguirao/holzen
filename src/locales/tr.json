@@ -3,6 +3,7 @@
     "home": "Ana Sayfa",
     "history": "Geçmiş",
     "library": "Kütüphane",
+    "journey": "Yolculuk",
     "profile": "Profil",
     "settings": "Ayarlar"
   },
@@ -91,7 +92,8 @@
       "checkConnection": "İnternet bağlantınızı kontrol edin. Fiyat verileri CoinGecko'dan gelir ve geçici olarak kullanılamayabilir.",
       "aiTemporarilyUnavailable": "Yapay zeka hizmeti geçici olarak kullanılamıyor. Ayarlarınız ve verileriniz güvende — birazdan tekrar deneyin.",
       "unexpectedError": "Beklenmeyen bir hata oluştu. Verileriniz güvende."
-    }
+    },
+    "browseAllTools": "Tüm araçlara göz at"
   },
   "history": {
     "recent": "Son",
@@ -124,6 +126,23 @@
     "parallel": "paralel",
     "reflectionUnpinned": "Düşünce sabitleme kaldırıldı",
     "reflectionPinned": "Düşünce Ana Sayfaya sabitlendi"
+  },
+  "journey": {
+    "pageSubtitle": "Uzun vadeli ilerleme ve notlar — hesap ayarları değil (Ayarlar’da).",
+    "documentTitle": "Holzen — Yolculuk",
+    "activityExplainer": "Duraklamaların kronolojik kaydı. Kayıtlı içerik: Kütüphane’de arayın."
+  },
+  "tools": {
+    "title": "Araçlar",
+    "subtitle": "Düzenleme, topraklama, pratik — Ana Sayfa’dakiler, tek listede.",
+    "breathe": "Sükûnet (nefes)",
+    "breatheDesc": "Hedefsiz nefes alanı.",
+    "ambient": "Ortam modu",
+    "ambientDesc": "Yumuşak ses ve renk.",
+    "ground": "Topraklama",
+    "groundDesc": "Bağlamınıza göre rehberli topraklama.",
+    "groundHistory": "Topraklama günlüğü",
+    "groundHistoryDesc": "Önceki topraklama oturumları."
   },
   "profile": {
     "stats": "İstatistikler",
@@ -601,7 +620,7 @@
   "badges": { "earned": "kazanılan", "earnedCheck": "Kazanıldı ✓", "next": "Sonraki", "categories": { "streak": "Tutarlılık", "volume": "Düşünce Sayısı", "composure": "Sükunet", "companions": "Araç Kullanımı", "engagement": "Katılım" }, "streak3": "İlk Adımlar", "streak3Desc": "3 günlük seri", "streak7": "Hafta Gözcüsü", "streak7Desc": "7 günlük seri", "streak14": "İki Hafta Odağı", "streak14Desc": "14 günlük seri", "streak30": "Ay Zihni", "streak30Desc": "30 günlük seri", "streak60": "Sağlam El", "streak60Desc": "60 günlük seri", "streak100": "Yüzyıl Stoacısı", "streak100Desc": "100 günlük seri", "streak365": "Sükunet Yılı", "streak365Desc": "365 günlük seri", "reflect10": "İlk Adımlar", "reflect10Desc": "10 düşünce", "reflect50": "Adanmış Gözlemci", "reflect50Desc": "50 düşünce", "reflect100": "Derin Pratik", "reflect100Desc": "100 düşünce", "reflect500": "Üstün Sabır", "reflect500Desc": "500 düşünce", "calm10": "Durgun Sular", "calm10Desc": "10 sakin ruh hali", "calm50": "Sarsılmaz", "calm50Desc": "50 sakin ruh hali", "held10": "Elmas Eller", "held10Desc": "10× sağlam tuttu", "held50": "Demir İrade", "held50Desc": "50× sağlam tuttu", "breathe5": "İlk Nefesler", "breathe5Desc": "5× nefes tamamlandı", "breathe25": "Nefes Ustası", "breathe25Desc": "25× nefes tamamlandı", "breathe100": "Zen Akciğerler", "breathe100Desc": "100× nefes tamamlandı", "haiku10": "Şiir Okuyucu", "haiku10Desc": "10 haiku okundu", "haiku50": "Mısra Tutkunu", "haiku50Desc": "50 haiku okundu", "learn10": "Topraklanmış Zihin", "learn10Desc": "10× topraklanma kullanıldı", "learn50": "Sükunet Bilgini", "learn50Desc": "50× topraklanma kullanıldı", "signal10": "Sinyal Okuyucu", "signal10Desc": "10 sinyal okundu", "signal50": "Derin Dinleyici", "signal50Desc": "50 sinyal okundu", "zoom5": "Uzun Bakış", "zoom5Desc": "5× uzaklaşma kullanıldı", "zoom25": "Makro Düşünür", "zoom25Desc": "25× uzaklaşma kullanıldı", "history5": "Tarih Öğrencisi", "history5Desc": "5 tarihsel bakış", "history25": "Döngü Bilgesi", "history25Desc": "25 tarihsel bakış", "allSix5": "Tam Pratik", "allSix5Desc": "6 aracın tümü 5 düşüncede", "allSix25": "Tam Disiplin", "allSix25Desc": "6 aracın tümü 25 düşüncede", "fav5": "Küratör", "fav5Desc": "5 favori düşünce", "fav25": "Arşivci", "fav25Desc": "25 favori düşünce", "notes10": "Günlükçü", "notes10Desc": "10 kişisel not", "notes50": "Derin Kroniker", "notes50Desc": "50 kişisel not", "activeStreak7": "Alevlerde", "activeStreak7Desc": "Aktif 7+ günlük seri", "activeStreak30": "Durdurulamaz", "activeStreak30Desc": "Aktif 30+ günlük seri", "units": { "days": "gün", "reflections": "düşünce", "calmMoods": "sakin ruh halleri", "holds": "tutma", "sessions": "oturum", "haiku": "haiku", "signals": "sinyal", "insights": "bakış", "fullSessions": "tam oturum", "favorites": "favori", "notes": "not", "dayStreak": "günlük seri" } },
   "stats": { "reflections": "Düşünceler", "outcomeStreak": "Sonuç serisi", "bestStreak": "En iyi seri", "useStreakFreeze": "Seri dondurma kullan — serinizi bugün koruyun", "activating": "Etkinleştiriliyor…", "streakFreezeActivated": "Seri dondurma bugün için etkinleştirildi", "failedFreeze": "Dondurma etkinleştirilemedi", "freezeAvailable": "1 seri dondurma mevcut · haftalık yenileme", "nextFreeze": "Sonraki dondurma {{time}}", "used": "Kullanılan", "more": "+{{count}} daha" },
   "myWhy": { "title": "Benim Nedenim" },
-  "library": { "title": "Kütüphane", "pageTitle": "Kütüphane — Holzen", "pageDescription": "Aktiviteniz, yer işaretleriniz, notlarınız ve koleksiyonlarınız", "tabItems": "Öğeler", "tabArchive": "Arşiv", "viewList": "Liste", "viewGraph": "Graf", "graphEmpty": "Henüz veri yok.", "searchPlaceholder": "Öğe ara…", "tabAll": "Tümü", "tabFavorites": "Favoriler", "tabBookmarks": "Kaydedilenler", "tabNotes": "Notlar", "newNote": "Yeni not", "noteTitlePlaceholder": "Başlık (isteğe bağlı)", "noteBodyPlaceholder": "Bir not yaz…", "save": "Kaydet", "itemCount_one": "{{count}} öğe", "itemCount_other": "{{count}} öğe", "emptyState": "Kütüphaneniz boş.", "noResults": "Sonuç yok.", "noBookmarks": "Henüz yer işareti yok.", "noNotes": "Henüz not yok.", "noCollections": "Henüz koleksiyon yok.", "savedToLibrary": "Kütüphaneye kaydedildi", "newCollection": "Yeni koleksiyon", "collectionNamePlaceholder": "Koleksiyon adı", "collectionDescPlaceholder": "Açıklama (isteğe bağlı)", "create": "Oluştur", "addToCollection": "Koleksiyona ekle", "addedToCollection": "Koleksiyona eklendi", "emptyCollection": "Henüz öğe yok.", "allCollections": "Tümü", "renameCollection": "Yeniden adlandır", "deleteCollection": "Sil", "deleteCollectionConfirm": "Bu koleksiyonu silmek mi? İçindeki öğeler kalmaya devam eder.", "collectionRenamed": "Koleksiyon yeniden adlandırıldı", "collectionDeleted": "Koleksiyon silindi" },
+  "library": { "title": "Kütüphane", "pageTitle": "Kütüphane — Holzen", "pageDescription": "Aktiviteniz, yer işaretleriniz, notlarınız ve koleksiyonlarınız", "iaClarifier": "Kayıtlı ve aranabilir içerik. Kronolojik akış: Yolculuk → Etkinlik.", "tabItems": "Öğeler", "tabArchive": "Arşiv", "viewList": "Liste", "viewGraph": "Graf", "graphEmpty": "Henüz veri yok.", "searchPlaceholder": "Öğe ara…", "tabAll": "Tümü", "tabFavorites": "Favoriler", "tabBookmarks": "Kaydedilenler", "tabNotes": "Notlar", "newNote": "Yeni not", "noteTitlePlaceholder": "Başlık (isteğe bağlı)", "noteBodyPlaceholder": "Bir not yaz…", "save": "Kaydet", "itemCount_one": "{{count}} öğe", "itemCount_other": "{{count}} öğe", "emptyState": "Kütüphaneniz boş.", "noResults": "Sonuç yok.", "noBookmarks": "Henüz yer işareti yok.", "noNotes": "Henüz not yok.", "noCollections": "Henüz koleksiyon yok.", "savedToLibrary": "Kütüphaneye kaydedildi", "newCollection": "Yeni koleksiyon", "collectionNamePlaceholder": "Koleksiyon adı", "collectionDescPlaceholder": "Açıklama (isteğe bağlı)", "create": "Oluştur", "addToCollection": "Koleksiyona ekle", "addedToCollection": "Koleksiyona eklendi", "emptyCollection": "Henüz öğe yok.", "allCollections": "Tümü", "renameCollection": "Yeniden adlandır", "deleteCollection": "Sil", "deleteCollectionConfirm": "Bu koleksiyonu silmek mi? İçindeki öğeler kalmaya devam eder.", "collectionRenamed": "Koleksiyon yeniden adlandırıldı", "collectionDeleted": "Koleksiyon silindi" },
   "pause": { "youPaused": "Durdunuz. En zor kısım bu.", "startRitual": "Bir ritüel başlat", "orDecideNow": "veya ritüelsiz karar vermek için kaydırın", "whatWillYouDo": "Ne yapacaksınız?", "youChose": "Bilinçli olarak seçtiniz.", "return": "Geri dön", "noReflection": "Aktif düşünce yok. Birini tetiklemek için geri dönün." },
   "breathing": { "trigger": "Bununla nefes al →", "choosePattern": "Bir desen seç", "suggestedForVolatility": "Mevcut volatilite için önerilen", "begin": "Başla", "settled": "Huzura kavuştun.", "settledDesc": "Kendine bir an verdin. Bu yeterli.", "return": "Geri dön", "patterns": { "box": "Kutu", "boxDesc": "4-4-4-4 · Topraklama", "calming": "Sakinleştirici", "calmingDesc": "4-7-8 · Derin huzur", "sigh": "İç çekiş", "sighDesc": "Fizyolojik iç çekiş" }, "phases": { "inhale": "Nefes al", "hold": "Tut", "exhale": "Nefes ver", "sip": "Yudum" } },
   "volatility": { "title": "Volatilite Toleransı", "grades": { "ironHands": "Demir eller", "steady": "Kararlı", "shaky": "Sallantılı", "paperHands": "Kağıt eller" }, "descriptions": { "high": "Düşüşlerde olağanüstü sakin kalıyorsunuz — ağır olanlarda bile.", "moderate": "Çoğu düşüşü iyi yönetiyorsunuz, ancak büyük dalgalanmalar sükunetinizi test ediyor.", "low": "Düşüşler sizi sarsmaya eğilimli. Harekete geçmeden önce nefes almak yardımcı olabilir.", "veryLow": "Düşüşler sizi duygusal olarak sert vuruyor. Ritüel en iyi savunmanız." }, "basedOnDrops": "{{count}} düşüş düşüncesine dayalı", "basedOnDrops_other": "{{count}} düşüş düşüncesine dayalı", "buckets": { "mild": "Hafif düşüşler", "moderate": "Orta düşüşler", "heavy": "Ağır düşüşler" }, "composure": { "reactive": "Reaktif", "mixed": "Karışık", "composed": "Sakin" }, "held": "%{{percent}} tutuldu" },

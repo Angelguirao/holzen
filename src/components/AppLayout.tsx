@@ -47,6 +47,7 @@ function useTabChunkPrefetch() {
       void import('@/pages/Library').catch(() => {});
       void import('@/pages/Profile').catch(() => {});
       void import('@/pages/Settings').catch(() => {});
+      void import('@/pages/ToolsHub').catch(() => {});
     };
     const ric = (window as Window & {
       requestIdleCallback?: (cb: () => void, opts?: { timeout: number }) => number;

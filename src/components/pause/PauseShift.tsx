@@ -5,6 +5,7 @@ import { useNavigate } from 'react-router-dom';
 import { MoodCheck, type MoodValue } from '@/components/MoodCheck';
 import { MoodIcon } from '@/components/icons/MoodIcon';
 import { pauseStepLayout } from '@/components/pause/pause-step-layout';
+import { TOOLS } from '@/lib/app-routes';
 
 interface Props {
   onMoodAfterSelect: (mood: MoodValue) => void;
@@ -113,7 +114,7 @@ export function PauseShift({ onMoodAfterSelect, onMoodAfterSkip, onMoodAfterRese
               </p>
               <button
                 type="button"
-                onClick={() => navigate('/ground')}
+                onClick={() => navigate(TOOLS.ground)}
                 className="inline-flex items-center gap-1.5 text-sm font-medium text-primary underline-offset-4 hover:underline"
               >
                 <Anchor className="h-2.5 w-2.5" />

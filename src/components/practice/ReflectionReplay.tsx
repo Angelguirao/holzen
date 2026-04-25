@@ -4,7 +4,7 @@
  * The original "replay a past reflection" practice relied on the legacy
  * `reflections` table and `usePastReflection`. With the V2 cutover the
  * feature needs rebuilding around `v_pause_full` + `pause_ai_artifacts`
- * — tracked as a follow-up. This placeholder keeps the `/practice/replay`
+ * — tracked as a follow-up. This placeholder keeps the `/tools/practice/replay`
  * route rendering so users land on a clear empty state rather than a
  * 500.
  */

@@ -15,6 +15,8 @@ import { CookieConsent } from "./components/CookieConsent";
 import AuthLoading from "./components/AuthLoading";
 import { AppLayout } from "./components/AppLayout";
 import { FeedbackWidget } from "./components/FeedbackWidget";
+import { ProfileLegacyRedirect } from "./components/ProfileLegacyRedirect";
+import { PreserveStateRedirect } from "./components/PreserveStateRedirect";
 
 const Home = lazy(() => import("./pages/Home"));
 const Library = lazy(() => import("./pages/Library"));
@@ -50,6 +52,7 @@ const SentryAlerts = lazy(() => import("./pages/SentryAlerts"));
 const EdgeCoverage = lazy(() => import("./pages/EdgeCoverage"));
 const Unsubscribe = lazy(() => import("./pages/Unsubscribe"));
 const BillingHistory = lazy(() => import("./pages/BillingHistory"));
+const ToolsHub = lazy(() => import("./pages/ToolsHub"));
 
 const queryClient = createHolzenQueryClient();
 
@@ -152,10 +155,20 @@ const App = () => (
                   <Route path="/" element={<Home />} />
                   <Route path="/index" element={<Navigate to="/" replace />} />
                   <Route path="/library" element={<Library />} />
-                  <Route path="/profile" element={<Profile />} />
+                  <Route path="/journey" element={<Navigate to="/journey/stats" replace />} />
+                  <Route path="/journey/:tab" element={<Profile />} />
                   <Route path="/settings" element={<Settings />} />
                   <Route path="/settings/billing-history" element={<BillingHistory />} />
+                  <Route path="/tools" element={<ToolsHub />} />
                 </Route>
+                <Route
+                  path="/profile"
+                  element={
+                    <ProtectedRoute>
+                      <ProfileLegacyRedirect />
+                    </ProtectedRoute>
+                  }
+                />
                 {/* Immersive full-screen experiences — no nav bar */}
                 <Route path="/pause" element={<ProtectedRoute><PauseSession /></ProtectedRoute>} />
                 <Route
@@ -174,14 +187,23 @@ const App = () => (
                   path="/companion/grounding/:pauseInstanceId"
                   element={<ProtectedRoute><CompanionGroundingPage /></ProtectedRoute>}
                 />
-                <Route path="/breathe" element={<ProtectedRoute><Breathe /></ProtectedRoute>} />
-                <Route path="/ground" element={<ProtectedRoute><Ground /></ProtectedRoute>} />
-                <Route path="/ground/history" element={<ProtectedRoute><GroundHistory /></ProtectedRoute>} />
-                <Route path="/ambient" element={<ProtectedRoute><Ambient /></ProtectedRoute>} />
-                <Route path="/practice/checkin" element={<ProtectedRoute><PracticeCheckIn /></ProtectedRoute>} />
-                <Route path="/practice/journal" element={<ProtectedRoute><PracticeJournal /></ProtectedRoute>} />
-                <Route path="/practice/bodyscan" element={<ProtectedRoute><PracticeBodyScan /></ProtectedRoute>} />
-                <Route path="/practice/replay" element={<ProtectedRoute><PracticeReplay /></ProtectedRoute>} />
+                <Route path="/tools/breathe" element={<ProtectedRoute><Breathe /></ProtectedRoute>} />
+                <Route path="/tools/ground" element={<ProtectedRoute><Ground /></ProtectedRoute>} />
+                <Route path="/tools/ground/history" element={<ProtectedRoute><GroundHistory /></ProtectedRoute>} />
+                <Route path="/tools/ambient" element={<ProtectedRoute><Ambient /></ProtectedRoute>} />
+                <Route path="/tools/practice/checkin" element={<ProtectedRoute><PracticeCheckIn /></ProtectedRoute>} />
+                <Route path="/tools/practice/journal" element={<ProtectedRoute><PracticeJournal /></ProtectedRoute>} />
+                <Route path="/tools/practice/bodyscan" element={<ProtectedRoute><PracticeBodyScan /></ProtectedRoute>} />
+                <Route path="/tools/practice/replay" element={<ProtectedRoute><PracticeReplay /></ProtectedRoute>} />
+                {/* Legacy tool URLs (pre /tools/* namespace); preserve router state for grounding + replay. */}
+                <Route path="/breathe" element={<ProtectedRoute><Navigate to="/tools/breathe" replace /></ProtectedRoute>} />
+                <Route path="/ground" element={<ProtectedRoute><PreserveStateRedirect to="/tools/ground" /></ProtectedRoute>} />
+                <Route path="/ground/history" element={<ProtectedRoute><PreserveStateRedirect to="/tools/ground/history" /></ProtectedRoute>} />
+                <Route path="/ambient" element={<ProtectedRoute><Navigate to="/tools/ambient" replace /></ProtectedRoute>} />
+                <Route path="/practice/checkin" element={<ProtectedRoute><Navigate to="/tools/practice/checkin" replace /></ProtectedRoute>} />
+                <Route path="/practice/journal" element={<ProtectedRoute><Navigate to="/tools/practice/journal" replace /></ProtectedRoute>} />
+                <Route path="/practice/bodyscan" element={<ProtectedRoute><Navigate to="/tools/practice/bodyscan" replace /></ProtectedRoute>} />
+                <Route path="/practice/replay" element={<ProtectedRoute><PreserveStateRedirect to="/tools/practice/replay" /></ProtectedRoute>} />
                 <Route path="/admin" element={<ProtectedRoute><Admin /></ProtectedRoute>} />
                 <Route path="/admin/smoke-test" element={<ProtectedRoute><SmokeTest /></ProtectedRoute>} />
                 <Route path="/admin/sentry-alerts" element={<ProtectedRoute><SentryAlerts /></ProtectedRoute>} />
