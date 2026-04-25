@@ -12,7 +12,7 @@ Before you **finish a task**, **suggest pushing**, or **confirm a branch is read
 Run and address failures before push:
 
 - `npm run test`
-- `npm run build`
+- `npm run build` (runs `check:version-sync` via `prebuild` — keep `package.json` version aligned with `changelog_entries`)
 - `npm run lint` on touched files (whole-repo lint has known noise)
 - `npm run check:view-migrations` when migrations add or change `CREATE OR REPLACE VIEW`
 - `npm run check:edge` when Deno is available (edge TS changes)

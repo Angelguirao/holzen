@@ -90,7 +90,7 @@ Frontend is safe — it only goes live when you click **Publish → Update** in 
 
 ```
 □ Local tests pass                          npm run test
-□ Production build succeeds                 npm run build
+□ Production build succeeds                 npm run build (runs **`check:version-sync`** via **`prebuild`**)
 □ Lint is clean on changed files            npm run lint
 □ View migrations safe (OR REPLACE VIEW)   npm run check:view-migrations
 □ Edge functions type-check                 npm run check:edge

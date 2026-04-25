@@ -16,6 +16,7 @@ This folder contains human-readable notes that complement the source code and in
 | Kind of information | Authoritative place | Notes |
 |---------------------|---------------------|--------|
 | Commands, env vars, “where to edit” table | [AGENTS.md](../AGENTS.md) | Keep tables here; link out for narratives. |
+| Supabase **`Database` types** (`src/integrations/supabase/types.ts`) | [AGENTS.md](../AGENTS.md) (`npm run gen:types`) | Regenerate after migrations; if types lag, use `as unknown as T` per [deployment-sync-guide.md](ops/deployment-sync-guide.md). |
 | Boot sequence, repo tour, Lovable vs local | [fundamentals/navigating-the-codebase.md](fundamentals/navigating-the-codebase.md) | Do not duplicate long boot narratives in AGENTS. |
 | Pause lifecycle (instances, events, artifacts, state machine) | [systems/pause-system.md](systems/pause-system.md) | Canonical **data model** and invariants (Pause V2). |
 | Pause AI pipeline (triggers, edge functions, generators, storage, hooks) | [systems/pause/ai-powered-pause-system.md](systems/pause/ai-powered-pause-system.md) | **Current** Pause V2 pipeline narrative; complements `pause-system.md` (starts with a V2 banner — not a pre‑V2 archive). |
