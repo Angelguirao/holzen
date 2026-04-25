@@ -3,6 +3,7 @@
     "home": "Accueil",
     "history": "Historique",
     "library": "Bibliothèque",
+    "journey": "Parcours",
     "profile": "Profil",
     "settings": "Paramètres"
   },
@@ -91,7 +92,8 @@
       "checkConnection": "Vérifiez votre connexion internet. Les données de prix proviennent de CoinGecko et peuvent être temporairement indisponibles.",
       "aiTemporarilyUnavailable": "Le service IA est temporairement indisponible. Vos paramètres et données sont en sécurité — réessayez dans un instant.",
       "unexpectedError": "Une erreur inattendue s'est produite. Vos données sont en sécurité."
-    }
+    },
+    "browseAllTools": "Tous les outils"
   },
   "history": {
     "recent": "Récent",
@@ -124,6 +126,23 @@
     "parallel": "parallèle",
     "reflectionUnpinned": "Réflexion désépinglée",
     "reflectionPinned": "Réflexion épinglée sur l'accueil"
+  },
+  "journey": {
+    "pageSubtitle": "Vos progrès et écrits — pas le compte (voir Paramètres).",
+    "documentTitle": "Holzen — Parcours",
+    "activityExplainer": "Journal chronologique des pauses. Contenu enregistré : Bibliothèque — recherchez et parcourez-y."
+  },
+  "tools": {
+    "title": "Outils",
+    "subtitle": "Régulation, ancrage, pratique : comme sur l’accueil, en une liste.",
+    "breathe": "Calme (respiration)",
+    "breatheDesc": "Espace de respiration sans objectif.",
+    "ambient": "Mode ambiance",
+    "ambientDesc": "Ambiance sonore et visuelle douce.",
+    "ground": "Ancrage",
+    "groundDesc": "Ancrage guidé selon ton contexte.",
+    "groundHistory": "Journal d’ancrage",
+    "groundHistoryDesc": "Historique des sessions d’ancrage."
   },
   "profile": {
     "stats": "Statistiques",
@@ -600,7 +619,7 @@
   "badges": { "earned": "obtenu", "earnedCheck": "Obtenu ✓", "next": "Suivant", "categories": { "streak": "Constance", "volume": "Nombre de Réflexions", "composure": "Sérénité", "companions": "Utilisation des Outils", "engagement": "Engagement" }, "streak3": "Premiers Pas", "streak3Desc": "Série de 3 jours", "streak7": "Sentinelle Hebdo", "streak7Desc": "Série de 7 jours", "streak14": "Focus Bimensuel", "streak14Desc": "Série de 14 jours", "streak30": "Esprit Mensuel", "streak30Desc": "Série de 30 jours", "streak60": "Main Ferme", "streak60Desc": "Série de 60 jours", "streak100": "Stoïcien du Siècle", "streak100Desc": "Série de 100 jours", "streak365": "Année de Sérénité", "streak365Desc": "Série de 365 jours", "reflect10": "Premiers Pas", "reflect10Desc": "10 réflexions", "reflect50": "Observateur Dévoué", "reflect50Desc": "50 réflexions", "reflect100": "Pratique Profonde", "reflect100Desc": "100 réflexions", "reflect500": "Patience Magistrale", "reflect500Desc": "500 réflexions", "calm10": "Eaux Calmes", "calm10Desc": "10 humeurs calmes", "calm50": "Inébranlable", "calm50Desc": "50 humeurs calmes", "held10": "Mains de Diamant", "held10Desc": "Tenu 10 fois", "held50": "Volonté de Fer", "held50Desc": "Tenu 50 fois", "breathe5": "Premiers Souffles", "breathe5Desc": "5 respirations complétées", "breathe25": "Maître du Souffle", "breathe25Desc": "25 respirations complétées", "breathe100": "Poumons Zen", "breathe100Desc": "100 respirations complétées", "haiku10": "Lecteur de Poésie", "haiku10Desc": "10 haïku lus", "haiku50": "Dévot des Vers", "haiku50Desc": "50 haïku lus", "learn10": "Esprit Ancré", "learn10Desc": "10× ancrage utilisé", "learn50": "Érudit du Calme", "learn50Desc": "50× ancrage utilisé", "signal10": "Lecteur de Signal", "signal10Desc": "10 signaux lus", "signal50": "Auditeur Profond", "signal50Desc": "50 signaux lus", "zoom5": "Vue Longue", "zoom5Desc": "5× recul utilisé", "zoom25": "Penseur Macro", "zoom25Desc": "25× recul utilisé", "history5": "Étudiant d'Histoire", "history5Desc": "5 perspectives historiques", "history25": "Sage des Cycles", "history25Desc": "25 perspectives historiques", "allSix5": "Pratique Complète", "allSix5Desc": "6 outils dans 5 réflexions", "allSix25": "Discipline Totale", "allSix25Desc": "6 outils dans 25 réflexions", "fav5": "Curateur", "fav5Desc": "5 réflexions favorites", "fav25": "Archiviste", "fav25Desc": "25 réflexions favorites", "notes10": "Journaliste", "notes10Desc": "10 notes personnelles", "notes50": "Chroniqueur Profond", "notes50Desc": "50 notes personnelles", "activeStreak7": "En Feu", "activeStreak7Desc": "Série active de 7+ jours", "activeStreak30": "Imparable", "activeStreak30Desc": "Série active de 30+ jours", "units": { "days": "jours", "reflections": "réflexions", "calmMoods": "humeurs calmes", "holds": "holds", "sessions": "sessions", "haiku": "haïku", "signals": "signaux", "insights": "perspectives", "fullSessions": "sessions complètes", "favorites": "favoris", "notes": "notes", "dayStreak": "jours de série" } },
   "stats": { "reflections": "Réflexions", "outcomeStreak": "Série de résultats", "bestStreak": "Meilleure série", "useStreakFreeze": "Utiliser le gel de série — protège ta série aujourd'hui", "activating": "Activation…", "streakFreezeActivated": "Gel de série activé pour aujourd'hui", "failedFreeze": "Échec de l'activation du gel", "freezeAvailable": "1 gel de série disponible · renouvellement hebdomadaire", "nextFreeze": "Prochain gel {{time}}", "used": "Utilisé", "more": "+{{count}} de plus" },
   "myWhy": { "title": "Mon Pourquoi" },
-  "library": { "title": "Bibliothèque", "pageTitle": "Bibliothèque — Holzen", "pageDescription": "Ton activité, signets, notes et collections", "tabItems": "Éléments", "tabArchive": "Archive", "viewList": "Liste", "viewGraph": "Graphe", "graphEmpty": "Pas encore de données.", "searchPlaceholder": "Rechercher…", "tabAll": "Tout", "tabFavorites": "Favoris", "tabBookmarks": "Sauvegardés", "tabNotes": "Notes", "newNote": "Nouvelle note", "noteTitlePlaceholder": "Titre (optionnel)", "noteBodyPlaceholder": "Écris une note…", "save": "Sauvegarder", "itemCount_one": "{{count}} élément", "itemCount_other": "{{count}} éléments", "emptyState": "Ta bibliothèque est vide.", "noResults": "Aucun résultat.", "noBookmarks": "Pas encore de signets.", "noNotes": "Pas encore de notes.", "noCollections": "Pas encore de collections.", "savedToLibrary": "Sauvegardé dans la bibliothèque", "newCollection": "Nouvelle collection", "collectionNamePlaceholder": "Nom de la collection", "collectionDescPlaceholder": "Description (optionnel)", "create": "Créer", "addToCollection": "Ajouter à la collection", "addedToCollection": "Ajouté à la collection", "emptyCollection": "Pas encore d'éléments.", "allCollections": "Toutes", "renameCollection": "Renommer", "deleteCollection": "Supprimer", "deleteCollectionConfirm": "Supprimer cette collection ? Les éléments restent.", "collectionRenamed": "Collection renommée", "collectionDeleted": "Collection supprimée" },
+  "library": { "title": "Bibliothèque", "pageTitle": "Bibliothèque — Holzen", "pageDescription": "Ton activité, signets, notes et collections", "iaClarifier": "Ici : contenu sauvegardé et recherchable. Le fil chronologique : Parcours → Activité.", "tabItems": "Éléments", "tabArchive": "Archive", "viewList": "Liste", "viewGraph": "Graphe", "graphEmpty": "Pas encore de données.", "searchPlaceholder": "Rechercher…", "tabAll": "Tout", "tabFavorites": "Favoris", "tabBookmarks": "Sauvegardés", "tabNotes": "Notes", "newNote": "Nouvelle note", "noteTitlePlaceholder": "Titre (optionnel)", "noteBodyPlaceholder": "Écris une note…", "save": "Sauvegarder", "itemCount_one": "{{count}} élément", "itemCount_other": "{{count}} éléments", "emptyState": "Ta bibliothèque est vide.", "noResults": "Aucun résultat.", "noBookmarks": "Pas encore de signets.", "noNotes": "Pas encore de notes.", "noCollections": "Pas encore de collections.", "savedToLibrary": "Sauvegardé dans la bibliothèque", "newCollection": "Nouvelle collection", "collectionNamePlaceholder": "Nom de la collection", "collectionDescPlaceholder": "Description (optionnel)", "create": "Créer", "addToCollection": "Ajouter à la collection", "addedToCollection": "Ajouté à la collection", "emptyCollection": "Pas encore d'éléments.", "allCollections": "Toutes", "renameCollection": "Renommer", "deleteCollection": "Supprimer", "deleteCollectionConfirm": "Supprimer cette collection ? Les éléments restent.", "collectionRenamed": "Collection renommée", "collectionDeleted": "Collection supprimée" },
   "pause": { "youPaused": "Tu as fait une pause. C'est la partie la plus difficile.", "startRitual": "Démarrer un rituel", "orDecideNow": "ou fais défiler pour décider sans rituel", "whatWillYouDo": "Que vas-tu faire ?", "youChose": "Tu as choisi délibérément.", "return": "Retour", "noReflection": "Pas de réflexion active. Retourne en déclencher une." },
   "breathing": { "trigger": "Respire avec ceci →", "choosePattern": "Choisis un rythme", "suggestedForVolatility": "Recommandé pour la volatilité actuelle", "begin": "Commencer", "settled": "Apaisé.", "settledDesc": "Tu t'es accordé un moment. C'est suffisant.", "return": "Retour", "patterns": { "box": "Carré", "boxDesc": "4-4-4-4 · Ancrage", "calming": "Apaisant", "calmingDesc": "4-7-8 · Calme profond", "sigh": "Soupir", "sighDesc": "Soupir physiologique" }, "phases": { "inhale": "Inspire", "hold": "Retiens", "exhale": "Expire", "sip": "Gorgée" } },
   "volatility": { "title": "Tolérance à la Volatilité", "grades": { "ironHands": "Mains de fer", "steady": "Stable", "shaky": "Instable", "paperHands": "Mains de papier" }, "descriptions": { "high": "Tu restes remarquablement serein pendant les baisses — même les fortes.", "moderate": "Tu gères bien la plupart des baisses, même si les grandes oscillations testent ta sérénité.", "low": "Les baisses ont tendance à te perturber. Respirer avant d'agir pourrait aider.", "veryLow": "Les baisses te frappent fort émotionnellement. Le rituel est ta meilleure défense." }, "basedOnDrops": "Basé sur {{count}} réflexion de baisse", "basedOnDrops_other": "Basé sur {{count}} réflexions de baisse", "buckets": { "mild": "Baisses légères", "moderate": "Baisses modérées", "heavy": "Baisses fortes" }, "composure": { "reactive": "Réactif", "mixed": "Mixte", "composed": "Serein" }, "held": "{{percent}}% tenu" },

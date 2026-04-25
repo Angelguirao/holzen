@@ -3,6 +3,7 @@
     "home": "Home",
     "history": "Geschiedenis",
     "library": "Bibliotheek",
+    "journey": "Reis",
     "profile": "Profiel",
     "settings": "Instellingen"
   },
@@ -91,7 +92,8 @@
       "checkConnection": "Controleer je internetverbinding. Prijsgegevens komen van CoinGecko en zijn mogelijk tijdelijk niet beschikbaar.",
       "aiTemporarilyUnavailable": "De AI-service is tijdelijk niet beschikbaar. Je instellingen en gegevens zijn veilig — probeer het zo opnieuw.",
       "unexpectedError": "Er is een onverwachte fout opgetreden. Je gegevens zijn veilig."
-    }
+    },
+    "browseAllTools": "Alle tools bekijken"
   },
   "history": {
     "recent": "Recent",
@@ -124,6 +126,23 @@
     "parallel": "parallel",
     "reflectionUnpinned": "Reflectie losgemaakt",
     "reflectionPinned": "Reflectie vastgezet op Home"
+  },
+  "journey": {
+    "pageSubtitle": "Je voortgang en notities — niet je account (dat staat onder Instellingen).",
+    "documentTitle": "Holzen — Reis",
+    "activityExplainer": "Chronologisch overzicht van pauzes. Opgeslagen inhoud: Bibliotheek — zoek en blader daar."
+  },
+  "tools": {
+    "title": "Tools",
+    "subtitle": "Regulatie, gronden, oefening — hetzelfde als op Home, in één lijst.",
+    "breathe": "Stilte (ademen)",
+    "breatheDesc": "Rustige ademruimte zonder doelen.",
+    "ambient": "Ambient-modus",
+    "ambientDesc": "Zachte geluiden en kleuren.",
+    "ground": "Gronden",
+    "groundDesc": "Begeleid gronden met jouw context.",
+    "groundHistory": "Grond-dagboek",
+    "groundHistoryDesc": "Eerdere grond-sessies."
   },
   "profile": {
     "stats": "Statistieken",
@@ -601,7 +620,7 @@
   "badges": { "earned": "verdiend", "earnedCheck": "Verdiend ✓", "next": "Volgende", "categories": { "streak": "Consistentie", "volume": "Aantal Reflecties", "composure": "Kalmte", "companions": "Begeleider-gebruik", "engagement": "Betrokkenheid" }, "streak3": "Eerste Stappen", "streak3Desc": "3-daagse reeks", "streak7": "Weekwachter", "streak7Desc": "7-daagse reeks", "streak14": "Tweewekenfocus", "streak14Desc": "14-daagse reeks", "streak30": "Maandgeest", "streak30Desc": "30-daagse reeks", "streak60": "Vaste Hand", "streak60Desc": "60-daagse reeks", "streak100": "Stoïcijn van de Eeuw", "streak100Desc": "100-daagse reeks", "streak365": "Jaar van Kalmte", "streak365Desc": "365-daagse reeks", "reflect10": "Eerste Stappen", "reflect10Desc": "10 reflecties", "reflect50": "Toegewijd Waarnemer", "reflect50Desc": "50 reflecties", "reflect100": "Diepe Praktijk", "reflect100Desc": "100 reflecties", "reflect500": "Meesterlijk Geduld", "reflect500Desc": "500 reflecties", "calm10": "Stil Water", "calm10Desc": "10 kalme stemmingschecks", "calm50": "Onwankelbaar", "calm50Desc": "50 kalme stemmingschecks", "held10": "Diamanten Handen", "held10Desc": "10× standvastig", "held50": "IJzeren Wil", "held50Desc": "50× standvastig", "breathe5": "Eerste Ademhalingen", "breathe5Desc": "5× ademhaling voltooid", "breathe25": "Ademmeester", "breathe25Desc": "25× ademhaling voltooid", "breathe100": "Zen Longen", "breathe100Desc": "100× ademhaling voltooid", "haiku10": "Poëzielezer", "haiku10Desc": "10 haiku's gelezen", "haiku50": "Versliefhebber", "haiku50Desc": "50 haiku's gelezen", "learn10": "Geaarde Geest", "learn10Desc": "10× aarding gebruikt", "learn50": "Geleerde van Kalmte", "learn50Desc": "50× aarding gebruikt", "signal10": "Signaallezer", "signal10Desc": "10 signalen gelezen", "signal50": "Diepe Luisteraar", "signal50Desc": "50 signalen gelezen", "zoom5": "Lang Zicht", "zoom5Desc": "5× uitzoom gebruikt", "zoom25": "Macrodenker", "zoom25Desc": "25× uitzoom gebruikt", "history5": "Geschiedenisstudent", "history5Desc": "5 historische inzichten", "history25": "Cycluswijze", "history25Desc": "25 historische inzichten", "allSix5": "Volledige Praktijk", "allSix5Desc": "Alle 6 begeleiders in 5 reflecties", "allSix25": "Volledige Discipline", "allSix25Desc": "Alle 6 begeleiders in 25 reflecties", "fav5": "Curator", "fav5Desc": "5 favoriete reflecties", "fav25": "Archivaris", "fav25Desc": "25 favoriete reflecties", "notes10": "Dagboekschrijver", "notes10Desc": "10 persoonlijke notities", "notes50": "Diepe Kroniekschrijver", "notes50Desc": "50 persoonlijke notities", "activeStreak7": "In Vuur", "activeStreak7Desc": "Actieve 7+ dagen reeks", "activeStreak30": "Onstopbaar", "activeStreak30Desc": "Actieve 30+ dagen reeks", "units": { "days": "dagen", "reflections": "reflecties", "calmMoods": "kalme stemmingen", "holds": "hodls", "sessions": "sessies", "haiku": "haiku's", "signals": "signalen", "insights": "inzichten", "fullSessions": "volledige sessies", "favorites": "favorieten", "notes": "notities", "dayStreak": "dagen reeks" } },
   "stats": { "reflections": "Reflecties", "outcomeStreak": "Resultaatreeks", "bestStreak": "Beste reeks", "useStreakFreeze": "Gebruik reeks-freeze — bescherm je reeks vandaag", "activating": "Activeren…", "streakFreezeActivated": "Reeks-freeze geactiveerd voor vandaag", "failedFreeze": "Freeze activering mislukt", "freezeAvailable": "1 reeks-freeze beschikbaar · wekelijkse vernieuwing", "nextFreeze": "Volgende freeze {{time}}", "used": "Gebruikt", "more": "+{{count}} meer" },
   "myWhy": { "title": "Mijn Waarom" },
-  "library": { "title": "Bibliotheek", "pageTitle": "Bibliotheek — Holzen", "pageDescription": "Je activiteit, bladwijzers, notities en verzamelingen", "tabItems": "Items", "tabArchive": "Archief", "viewList": "Lijst", "viewGraph": "Grafiek", "graphEmpty": "Nog geen data. Rond reflecties af en sla items op.", "searchPlaceholder": "Items zoeken…", "tabAll": "Alle", "tabFavorites": "Favorieten", "tabBookmarks": "Opgeslagen", "tabNotes": "Notities", "newNote": "Nieuwe notitie", "noteTitlePlaceholder": "Titel (optioneel)", "noteBodyPlaceholder": "Schrijf een notitie…", "save": "Opslaan", "itemCount_one": "{{count}} item", "itemCount_other": "{{count}} items", "emptyState": "Je bibliotheek is leeg.", "noResults": "Geen resultaten.", "noBookmarks": "Nog geen bladwijzers.", "noNotes": "Nog geen notities.", "noCollections": "Nog geen verzamelingen.", "savedToLibrary": "Opgeslagen in bibliotheek", "newCollection": "Nieuwe verzameling", "collectionNamePlaceholder": "Naam verzameling", "collectionDescPlaceholder": "Beschrijving (optioneel)", "create": "Aanmaken", "addToCollection": "Toevoegen aan verzameling", "addedToCollection": "Toegevoegd aan verzameling", "emptyCollection": "Nog geen items.", "allCollections": "Alle", "renameCollection": "Hernoemen", "deleteCollection": "Verwijderen", "deleteCollectionConfirm": "Verzameling verwijderen? Items blijven behouden.", "collectionRenamed": "Verzameling hernoemd", "collectionDeleted": "Verzameling verwijderd" },
+  "library": { "title": "Bibliotheek", "pageTitle": "Bibliotheek — Holzen", "pageDescription": "Je activiteit, bladwijzers, notities en verzamelingen", "iaClarifier": "Opgeslagen, doorzoekbare inhoud. Tijdlijn: Reis → Activiteit.", "tabItems": "Items", "tabArchive": "Archief", "viewList": "Lijst", "viewGraph": "Grafiek", "graphEmpty": "Nog geen data. Rond reflecties af en sla items op.", "searchPlaceholder": "Items zoeken…", "tabAll": "Alle", "tabFavorites": "Favorieten", "tabBookmarks": "Opgeslagen", "tabNotes": "Notities", "newNote": "Nieuwe notitie", "noteTitlePlaceholder": "Titel (optioneel)", "noteBodyPlaceholder": "Schrijf een notitie…", "save": "Opslaan", "itemCount_one": "{{count}} item", "itemCount_other": "{{count}} items", "emptyState": "Je bibliotheek is leeg.", "noResults": "Geen resultaten.", "noBookmarks": "Nog geen bladwijzers.", "noNotes": "Nog geen notities.", "noCollections": "Nog geen verzamelingen.", "savedToLibrary": "Opgeslagen in bibliotheek", "newCollection": "Nieuwe verzameling", "collectionNamePlaceholder": "Naam verzameling", "collectionDescPlaceholder": "Beschrijving (optioneel)", "create": "Aanmaken", "addToCollection": "Toevoegen aan verzameling", "addedToCollection": "Toegevoegd aan verzameling", "emptyCollection": "Nog geen items.", "allCollections": "Alle", "renameCollection": "Hernoemen", "deleteCollection": "Verwijderen", "deleteCollectionConfirm": "Verzameling verwijderen? Items blijven behouden.", "collectionRenamed": "Verzameling hernoemd", "collectionDeleted": "Verzameling verwijderd" },
   "pause": { "youPaused": "Je hebt gepauzeerd. Dat is het moeilijkste deel.", "startRitual": "Start een ritueel", "orDecideNow": "of scroll om zonder ritueel te beslissen", "whatWillYouDo": "Wat ga je doen?", "youChose": "Je hebt bewust gekozen.", "return": "Terug", "noReflection": "Geen actieve reflectie. Ga terug om er een te starten." },
   "breathing": { "trigger": "Adem hiermee →", "choosePattern": "Kies een patroon", "suggestedForVolatility": "Aanbevolen voor huidige volatiliteit", "begin": "Beginnen", "settled": "Tot rust gekomen.", "settledDesc": "Je gaf jezelf een moment. Dat is genoeg.", "return": "Terug", "patterns": { "box": "Box", "boxDesc": "4-4-4-4 · Aarding", "calming": "Kalmerend", "calmingDesc": "4-7-8 · Diepe rust", "sigh": "Zucht", "sighDesc": "Fysiologische zucht" }, "phases": { "inhale": "Inademen", "hold": "Vasthouden", "exhale": "Uitademen", "sip": "Teug" } },
   "volatility": { "title": "Volatiliteitstolerantie", "grades": { "ironHands": "IJzeren handen", "steady": "Stabiel", "shaky": "Wankel", "paperHands": "Papieren handen" }, "descriptions": { "high": "Je blijft opmerkelijk kalm tijdens dalingen — zelfs zware.", "moderate": "Je gaat goed om met de meeste dalingen, hoewel grotere schommelingen je kalmte testen.", "low": "Dalingen maken je onrustig. Ademen voor je handelt kan helpen.", "veryLow": "Dalingen raken je emotioneel hard. Het ritueel is je beste verdediging." }, "basedOnDrops": "Gebaseerd op {{count}} dalingsreflectie", "basedOnDrops_other": "Gebaseerd op {{count}} dalingsreflecties", "buckets": { "mild": "Milde dalingen", "moderate": "Matige dalingen", "heavy": "Zware dalingen" }, "composure": { "reactive": "Reactief", "mixed": "Gemengd", "composed": "Kalm" }, "held": "{{percent}}% gehouden" },

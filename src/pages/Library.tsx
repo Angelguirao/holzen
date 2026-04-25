@@ -126,6 +126,7 @@ export default function Library() {
       <div className="space-y-6 pb-24">
         <PageMeta title={t('library.pageTitle')} description={t('library.pageDescription')} />
         <NoxHeaderMain title={t('library.title')} subtitle={t('library.pageDescription')} />
+        <p className="text-xs text-muted-foreground/90 leading-relaxed -mt-2 mb-1">{t('library.iaClarifier')}</p>
         <SubscriptionSkeleton variant="inline" />
       </div>
     );
@@ -136,6 +137,7 @@ export default function Library() {
       <div className="space-y-6 pb-24">
         <PageMeta title={t('library.pageTitle')} description={t('library.pageDescription')} />
         <NoxHeaderMain title={t('library.title')} subtitle={t('library.pageDescription')} />
+        <p className="text-xs text-muted-foreground/90 leading-relaxed -mt-2 mb-1">{t('library.iaClarifier')}</p>
         <div className="flex flex-col items-center justify-center min-h-[40vh] gap-4 text-center px-6">
           <Lock className="h-6 w-6 text-[#dbb266]" />
           <h2 className="text-sm font-semibold text-foreground">{t('pro.featureLocked')}</h2>
@@ -172,6 +174,7 @@ export default function Library() {
     <div className="space-y-6 pb-24" {...handlers}>
       <PageMeta title={t('library.pageTitle')} description={t('library.pageDescription')} />
       <NoxHeaderMain title={t('library.title')} subtitle={t('library.pageDescription')} />
+      <p className="text-xs text-muted-foreground/90 leading-relaxed -mt-2 mb-1">{t('library.iaClarifier')}</p>
 
       {/* Current pause card (Pause V2). Hidden when the user has no open pause. */}
       <CurrentPauseCard />

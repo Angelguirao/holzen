@@ -48,7 +48,7 @@ Routes are declared in one file. **Page components** under `src/pages/` are **`R
 - **`ProtectedRoute`** — If auth is still loading, show `AuthLoading`. If no user, redirect to `/welcome`. Otherwise render children.
 - **`PublicOnlyRoute`** — Logged-in users are redirected to `/`.
 
-**Main shell:** routes under `/`, `/library`, `/profile`, `/settings` use **`AppLayout`**: max-width column, **`<header>`** (“Holzen” + `NotificationBell`), **`<main id="main-content">`** around **`Outlet`**, and **`BottomNav`**. `AppLayout` also wires `useHolzen`, `useLanguageSync`, and `useAutoTrigger` (pause-ready banner on non-home routes).
+**Main shell:** routes under `/`, `/library`, `/journey` (Journey, `/journey/stats` default), `/settings`, and `/tools` (tools index) use **`AppLayout`**: max-width column, **`<header>`** (“Holzen” + `NotificationBell`), **`<main id="main-content">`** around **`Outlet`**, and **`BottomNav`**. `AppLayout` also wires `useHolzen`, `useLanguageSync`, and `useAutoTrigger` (pause-ready banner on non-home routes).
 
 **Full-screen / immersive routes** (no bottom nav): `/pause`, `/breathe`, `/ground`, `/ground/history`, `/ambient`, `/practice/*`, `/admin`. (`/breathe` → `Breathe.tsx`; `/ambient` → `Ambient.tsx`.)
 
@@ -102,7 +102,7 @@ Do **not** add global **`QueryClient` defaultOptions** lightly: they affect ever
 
 ## 7. Pages (`src/pages/`) — grouped by domain
 
-- **Core app:** `Home`, `Library`, `Profile`, `Settings`.
+- **Core app:** `Home`, `Library`, `Profile` (route `/journey/*`), `Settings`, `ToolsHub` (`/tools`).
 - **Auth / legal / marketing:** `Landing`, `Auth`, `ResetPassword`, `Terms`, `Privacy`, `About`, `Blog`, `BlogPost`, `Roadmap`, `Reserve`.
 - **Practices:** `PauseSession`, `Breathe`, `Ground`, `GroundHistory`, `PracticeCheckIn`, `PracticeJournal`, `PracticeBodyScan`, `PracticeReplay`, `Ambient`.
 - **`/ambient` vs `/breathe`:** `Ambient.tsx` is the full-screen volatility-gradient breathing screen; **`App.tsx` routes `/ambient` to `<Ambient />`**. `/breathe` uses `Breathe.tsx` (a different flow).
@@ -272,7 +272,7 @@ Goal: **map** the rest of the surface area without drowning in files. Use **§4*
 
 | Step | What to do |
 |------|------------|
-| 1. **Route map** | Re-read **§4** above — list every **main** route (`/`, `/library`, `/profile`, `/settings`, `/pause`, practices, `/admin`, public routes). For each **bucket**, note the **page file** under `src/pages/`. |
+| 1. **Route map** | Re-read **§4** above — list every **main** route (`/`, `/library`, `/journey/*`, `/settings`, `/tools`, `/pause`, immersive `/tools/*` practices, `/admin`, public routes; legacy `/profile` redirects). For each **bucket**, note the **page file** under `src/pages/`. |
 | 2. **Auth shell** | **§5** — `use-auth`, `ProtectedRoute` / `PublicOnlyRoute`. Trace **`/welcome`** vs **`/`** once in `App.tsx`. Optional: [route-gating-system.md](../systems/routing/route-gating-system.md). |
 | 3. **Feature hooks** | **§6** table — for each row you care about, open the hook and **one** page that uses it (`use-library` + `Library`, `use-subscription` + billing/settings, `use-push-notifications`, etc.). |
 | 4. **Components** | **§8** — skim `src/components/ui/` (primitives) vs feature folders (`pause/`, `practice/`, …). |

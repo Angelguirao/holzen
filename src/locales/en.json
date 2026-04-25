@@ -3,6 +3,7 @@
     "home": "Home",
     "history": "History",
     "library": "Library",
+    "journey": "Journey",
     "profile": "Profile",
     "settings": "Settings",
     "breathe": "Breathe"
@@ -100,7 +101,8 @@
       "checkConnection": "Check your internet connection. Price data comes from CoinGecko and may be temporarily unavailable.",
       "aiTemporarilyUnavailable": "The AI service is temporarily unavailable. Your settings and data are safe — try again in a moment.",
       "unexpectedError": "An unexpected error occurred. Your data is safe."
-    }
+    },
+    "browseAllTools": "Browse all tools & experiences"
   },
   "history": {
     "recent": "Recent",
@@ -133,6 +135,23 @@
     "parallel": "parallel",
     "reflectionUnpinned": "Pause unpinned",
     "reflectionPinned": "Pause pinned to Home"
+  },
+  "journey": {
+    "pageSubtitle": "Long-term progress, insights, and saved writing — not account settings (those live under Settings).",
+    "documentTitle": "Holzen — Journey",
+    "activityExplainer": "A chronological log of pauses and practices. Your saved reflection cards and collections live in Library — browse and search there."
+  },
+  "tools": {
+    "title": "Tools",
+    "subtitle": "Regulation, grounding, and practice — the same activities as on Home, listed in one place.",
+    "breathe": "Stillness (breathe)",
+    "breatheDesc": "A quiet, goal-free breathing space.",
+    "ambient": "Ambient mode",
+    "ambientDesc": "Gentle sound and color for a calmer state.",
+    "ground": "Ground",
+    "groundDesc": "Guided grounding from your activity tags and context.",
+    "groundHistory": "Ground journal",
+    "groundHistoryDesc": "History of past grounding sessions."
   },
   "profile": {
     "pageSubtitle": "Your streak, charts, letters, and journey — in one place.",
@@ -833,6 +852,7 @@
     "title": "Library",
     "pageTitle": "Library — Holzen",
     "pageDescription": "Your activity, bookmarks, notes, and collections",
+    "iaClarifier": "This is for saved and browsable content (cards, notes, collections). A chronological log of activity lives under Journey → Activity.",
     "tabItems": "Items",
     "tabArchive": "Archive",
     "viewList": "List",

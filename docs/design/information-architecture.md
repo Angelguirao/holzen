@@ -8,6 +8,8 @@
 
 ## 1. Current model (as shipped)
 
+**Route constants and helpers:** `src/lib/app-routes.ts` (`journeyPath`, `TOOLS`, `JOURNEY_PREFIX`).
+
 ### 1.1 Primary navigation (authenticated shell)
 
 Four bottom tabs, all wrapped in `AppLayout` (header + `Outlet` + bottom nav, max width ~24rem mobile-first):
@@ -16,18 +18,18 @@ Four bottom tabs, all wrapped in `AppLayout` (header + `Outlet` + bottom nav, ma
 |------------|---------------|------|
 | Home       | `/`           | Hub: widgets (market, hold goal, reflection, ground entry, night, letter, practice, breathe), pause triggers, onboarding. |
 | Library    | `/library`    | Saved pause artifacts, collections, search, source filters. |
-| Profile    | `/profile`    | **Container for “me” content:** internal tabs (see below) — not separate routes. |
-| Settings   | `/settings`   | Preferences, Pro/checkout, notifications, quiet windows, thresholds, sources, account actions, etc. |
+| Journey    | `/journey/:tab` | Longitudinal “you” content: **stats, insights, badges, letters, activity** — each tab is a **path segment** (default `/journey/stats`). Letter deep links use `?letter=<id>`. |
+| Settings   | `/settings`   | Preferences, Pro/checkout, notifications, quiet hours, thresholds, sources, account actions, etc. |
+
+**Deprecated path:** `/profile` redirects to the equivalent Journey URL (and maps old `location.state` via `ProfileLegacyRedirect`). Notification rows in Postgres use `/journey/...` paths (see migration `20260425200000_journey_routes_notification_paths.sql`).
 
 Billing history is nested: `/settings/billing-history` (still under the authenticated shell with bottom nav).
 
-### 1.2 Profile: secondary IA (in-page tabs)
-
-`Profile` uses **location state** for tab selection (`parseProfileLocationState` in `src/lib/router-location-state.ts`), not path segments. Tabs: **stats, insights, badges, letters, activity**. Default when opening Profile is **stats** (see `Profile.tsx`).
+**In-app index for immersive tools:** `/tools` lists breathe, ambient, ground, ground history, and practice — same destinations as the `/tools/...` URLs below. Linked from Home (Practice + Breathe widgets).
 
 This matches the “skills-first” stats organization documented in `docs/decisions/2026-04-23-skills-first-stats-ia.md` and implemented in `StatsContentV2`.
 
-### 1.3 Full-screen / immersive routes (no bottom nav)
+### 1.2 Full-screen / immersive routes (no bottom nav)
 
 These are `ProtectedRoute` but **not** under `AppLayout` — no persistent primary nav; user returns via back, in-flow CTAs, or home widgets.
 
@@ -35,9 +37,8 @@ These are `ProtectedRoute` but **not** under `AppLayout` — no persistent prima
 |------|--------|--------|
 | Pause session | `/pause` | Core guided pause flow. |
 | Companions | `/companion/zoom-out/:pauseInstanceId`, `/companion/history/...`, `/companion/signal/...`, `/companion/grounding/...` | Deep-linked to a pause instance. |
-| Regulation / body | `/breathe`, `/ambient` | Calming / sound-style experiences. |
-| Grounding | `/ground`, `/ground/history` | Distinct from “Ground” widget on Home that routes here. |
-| Practice | `/practice/checkin`, `/practice/journal`, `/practice/bodyscan`, `/practice/replay` | Named “practice” in URL; overlaps semantically with Profile “activity” and Home “practice” widget. |
+| Tools (canonical) | `/tools/breathe`, `/tools/ambient`, `/tools/ground`, `/tools/ground/history`, `/tools/practice/*` | Single URL family for regulation / grounding / practice. |
+| **Legacy redirects** | `/breathe` → `/tools/breathe`, `/ground` → `/tools/ground`, etc. | Preserves `location.state` for grounding and replay where needed (`PreserveStateRedirect`). |
 
 ### 1.4 Public and semi-public marketing / legal
 
@@ -57,7 +58,7 @@ Under `/admin` and children (`/admin/smoke-test`, `/admin/sentry-alerts`, `/admi
 ### 1.6 Cross-cutting behaviors
 
 - **Global chrome:** `NotificationBell` (header), `FeedbackWidget` (signed-in), `CheckoutConfirmation`, `PauseReadyBanner` on non-Home when auto-trigger fires.
-- **Library vs Profile:** Library is the **canonical browse/search** of saved items; Profile tab **activity** and embedded **History** patterns can feel adjacent to Library — see gaps below.
+- **Library vs Journey → Activity:** Copy on Library clarifies “saved, browsable” vs chronological log under **Journey → Activity**; product copy lives in i18n (`library.iaClarifier`, `journey.activityExplainer`).
 
 ---
 
@@ -66,7 +67,7 @@ Under `/admin` and children (`/admin/smoke-test`, `/admin/sentry-alerts`, `/admi
 1. **Clear hub:** Home as the main entry for daily use fits a mindfulness + BTC-volatility product.
 2. **Immersive separation:** Full-screen routes protect focus (pause, breathe, ground, practice) without fighting the four-tab model.
 3. **Deep links for companions:** Instance-scoped URLs are the right pattern for resuming or sharing a specific pause outcome.
-4. **Stats skills-first:** Profile’s default-to-stats and skills-first structure is coherent once users land there (see decision doc).
+4. **Stats skills-first:** Journey’s default-to-stats and skills-first structure is coherent once users land there (see decision doc).
 5. **Settings depth:** Accordion / long-page settings is common on mobile; billing as a sub-route is reasonable.
 
 ---
@@ -152,5 +153,6 @@ These are **directional** improvements; any change should be paired with nav aff
 | Date | Author | Change |
 |------|--------|--------|
 | 2026-04-25 | — | Initial inventory from `App.tsx` + nav components; gap analysis and recommendations. |
+| 2026-04-25 | — | Shipped: `/journey/*` tabs, `/tools/*` + hub, legacy `/profile` and old tool paths redirect; notifications migration; in-app copy for Library vs Activity. |
 
 When routes or bottom-nav items change, update **Section 1** and the **Changelog** row in the same PR.

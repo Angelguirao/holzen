@@ -3,6 +3,7 @@
     "home": "Inicio",
     "history": "Historial",
     "library": "Biblioteca",
+    "journey": "Camino",
     "profile": "Perfil",
     "settings": "Ajustes"
   },
@@ -91,7 +92,8 @@
       "checkConnection": "Verifica tu conexión a internet. Los datos de precios provienen de CoinGecko y pueden no estar disponibles temporalmente.",
       "aiTemporarilyUnavailable": "El servicio de IA no está disponible temporalmente. Tus ajustes y datos están seguros — intenta de nuevo en un momento.",
       "unexpectedError": "Ocurrió un error inesperado. Tus datos están seguros."
-    }
+    },
+    "browseAllTools": "Ver todas las herramientas"
   },
   "history": {
     "recent": "Recientes",
@@ -124,6 +126,23 @@
     "parallel": "paralelo",
     "reflectionUnpinned": "Reflexión desfijada",
     "reflectionPinned": "Reflexión fijada en Inicio"
+  },
+  "journey": {
+    "pageSubtitle": "Progreso, análisis y escritos — no la cuenta (eso está en Ajustes).",
+    "documentTitle": "Holzen — Camino",
+    "activityExplainer": "Registro cronológico de pausas y prácticas. Contenido guardado: Biblioteca — explora y busca ahí."
+  },
+  "tools": {
+    "title": "Herramientas",
+    "subtitle": "Regulación, conexión a tierra y práctica: lo mismo que en Inicio, en una sola lista.",
+    "breathe": "Calma (respirar)",
+    "breatheDesc": "Espacio de respiración sin objetivos.",
+    "ambient": "Modo ambiente",
+    "ambientDesc": "Sonido y color suaves.",
+    "ground": "Conexión a tierra",
+    "groundDesc": "Conexión guiada según tu contexto.",
+    "groundHistory": "Diario de conexión",
+    "groundHistoryDesc": "Historial de sesiones de conexión."
   },
   "profile": {
     "stats": "Estadísticas",
@@ -791,6 +810,7 @@
     "title": "Biblioteca",
     "pageTitle": "Biblioteca — Holzen",
     "pageDescription": "Tu actividad, marcadores, notas y colecciones",
+    "iaClarifier": "Contenido guardado y buscable (tarjetas, notas, colecciones). El registro en orden cronológico está en Camino → Actividad.",
     "tabItems": "Elementos",
     "tabArchive": "Archivo",
     "viewList": "Lista",

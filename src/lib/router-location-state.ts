@@ -80,7 +80,7 @@ export function parsePauseSessionLocationState(state: unknown): PauseSessionNavP
   };
 }
 
-/** Pre-generated grounding card from Home → `/ground`. */
+/** Pre-generated grounding card from Home → `/tools/ground` (legacy `/ground` redirects, state preserved). */
 export interface GroundPreGenerated {
   activity: string;
   suggestion: string;
