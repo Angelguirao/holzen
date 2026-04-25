@@ -77,9 +77,7 @@ export default function PauseSession() {
     if (!saved?.message) return null;
     if (navPauseInstanceId && saved.pauseInstanceId && saved.pauseInstanceId !== navPauseInstanceId) return null;
     return saved;
-    // `loadSession` is a stable module import; `location.key` resets on navigation without
-    // changing `location` identity — both are intentionally omitted from deps (see rule text).
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- keyed on location.key + navPauseInstanceId; loadSession is a stable module import
   }, [location.key, navPauseInstanceId]);
 
   const holzenAligned =
