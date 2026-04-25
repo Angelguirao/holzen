@@ -16,22 +16,34 @@ declare namespace Deno {
   export function readFile(path: string | URL): Promise<Uint8Array>;
 }
 
-// Allow `import ... from "https://esm.sh/..."` and other URL imports
-// (npm:, jsr:, deno.land, etc.) without TS2307. The wildcard form is what
-// the TypeScript compiler actually honors for arbitrary specifier prefixes.
+// Allow `import ... from "https://esm.sh/..."` and other URL/specifier
+// imports (npm:, jsr:, https:, http:) without TS2307. TypeScript's module
+// wildcard matching accepts any literal prefix followed by `*`, so these
+// declarations cover every remote specifier shape used by Deno edge code.
 declare module "https://*" {
+  // deno-lint-ignore no-explicit-any
   const value: any;
   export = value;
 }
 declare module "http://*" {
+  // deno-lint-ignore no-explicit-any
   const value: any;
   export = value;
 }
 declare module "npm:*" {
+  // deno-lint-ignore no-explicit-any
   const value: any;
   export = value;
 }
 declare module "jsr:*" {
+  // deno-lint-ignore no-explicit-any
   const value: any;
   export = value;
+}
+// Final catch-all so any other unknown specifier (e.g. `deno.land/...`)
+// also resolves to a permissive `any` shape rather than TS2307.
+declare module "*" {
+  // deno-lint-ignore no-explicit-any
+  const value: any;
+  export default value;
 }
