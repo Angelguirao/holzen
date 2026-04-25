@@ -64,17 +64,17 @@ USING (auth.role() = 'service_role');
 
 If you want to keep consistent style with existing “service_role full access” policies, we should mirror that format exactly.
 
-## Concrete per-table suggestions
+## Concrete per-table suggestions *(historical — pre–Pause V2 targets)*
 
-### `pause_notifications`
-- Implement: `FOR INSERT` for `service_role`
-- Optional: `FOR UPDATE` if you ever mutate notifications post-creation (current flow doesn’t).
+The subsections through **`generation_attempts`** describe the **2026-04-02** migration’s intent. **`pause_notifications`** and **`reflections`** (and companion join rows on **`reflection_companions`**) were **dropped** in Pause V2 — do **not** add new RLS policies on those names; audit **`notifications`**, **`pause_instances`**, **`pause_ai_artifacts`**, etc. instead.
 
-### `reflections`
-- Implement: `FOR INSERT` and (if needed) `FOR UPDATE` for `service_role`
-- Current flows:
-  - cron inserts reflections and then orchestrator writes companion join rows
-  - client inserts reflections via authenticated user (already allowed)
+### `pause_notifications` *(removed)*
+- **Was:** `FOR INSERT` for `service_role` on cron-created rows.
+- **Now:** unified **`notifications`** table; see migrations after `20260423202000_pause_v2_destructive_cutover.sql`.
+
+### `reflections` *(removed)*
+- **Was:** `FOR INSERT` / `FOR UPDATE` for `service_role` + authenticated client inserts.
+- **Now:** **`pause_instances`** + **`pause_ai_artifacts`**; cron uses `pause_create_or_reuse_as` + artifact upserts.
 
 ### `profiles`
 - Implement: `FOR UPDATE` for `service_role`
@@ -110,7 +110,7 @@ If you approve, I’ll generate one or more new SQL migration files under `supab
 
 Before writing migrations, I’ll also:
 - check for any existing `service_role` policies already present for each target table (avoid duplicates)
-- match the exact policy syntax/style currently used in `reflection_companions` and `user_companion_serves`
+- match the exact policy syntax/style currently used in `user_companion_serves` (and other live companion tables)
 
 Applied in this branch:
 
