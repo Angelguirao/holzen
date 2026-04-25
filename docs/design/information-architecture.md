@@ -151,11 +151,12 @@ This section captures the **current state** and what we may reconsider next.
 
 - **Shipped:** task-oriented section headers (Account & profile, Pause behavior, App behavior, Content & data, Notifications & quiet hours, Subscription & Pro, Account & security).
 - **Shipped:** `/settings/about` — changelog, version, feedback (linked from the bottom of Settings; “new” badge when an unseen changelog version exists); **Jump to** on the main page opens the right accordion section and scrolls to it.
-- **Further improvement:** consider splitting Settings into 2-level IA (overview + detail pages) if the accordion grows.
+- **Shipped:** **Shareable** section entry: `settingsSectionPath(id)` in `app-routes.ts` → `/settings/section/<id>` (redirects to `/settings#settings-section-<id>`) plus hash-based jump links; same page, less hunting.
+- **Further improvement:** if the accordion is still too long, add **true** per-section sub-routes with dedicated screens (larger product + layout pass).
 
 ### 4.6 Admin IA
 
-- **Shipped:** admin remains isolated under `/admin`* and excluded from consumer navigation.
+- **Shipped:** admin remains isolated under `/admin*` and excluded from consumer navigation.
 - **Shipped:** `AdminSubNav` (horizontal links) on `/admin`, `/admin/smoke-test`, `/admin/sentry-alerts`, `/admin/edge-coverage` for quick movement between allowlisted admin screens.
 - **Further improvement:** if the admin surface grows, extend the same pattern (or a small layout wrapper) for new `/admin/...` routes.
 
@@ -166,12 +167,12 @@ Use this as a **checklist** when planning research or another IA pass. Detailed 
 
 | Theme                    | Shipped guardrails                                                   | Alternatives / improvements to consider                                                                     |
 | ------------------------ | -------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------- |
-| **Tools & shell**        | Canonical `/tools/`*, Tools hub tab, `navigation.primary_tab_opened` | Reorder tabs; drop back to four tabs and surface Tools only from Home; A/B or cohort review of tab events   |
+| **Tools & shell**        | Canonical `/tools/*`, Tools hub tab, `navigation.primary_tab_opened` | Reorder tabs; drop back to four tabs and surface Tools only from Home; A/B or cohort review of tab events   |
 | **Journey vs “profile”** | `/journey/:tab`, skills-first stats; **Home** shows score preview    | Heavier Home module or a **dedicated Stats tab** if interviews + metrics justify it                         |
 | **Journey scope**        | One hub: stats, insights, badges, activity; letters under Tools      | Further **split tabs or routes** if one area dominates support load (product call)                          |
 | **Library vs Activity**  | Copy + `HistoryCrossLinks`                                           | **Single screen** with `saved` / `timeline` modes if users still mix them up                                |
-| **Settings**             | Task sections + `/settings/about`                                    | **Two-level IA** (overview → detail routes) if accordion length hurts completion                            |
-| **Admin**                | Isolated `/admin`* + in-page `AdminSubNav` between admin routes      | Deeper **grouping** or layout wrapper if more tools ship there                                              |
+| **Settings**             | Task sections, `/settings/about`, `/settings/section/*` + hash jumps     | **Dedicated sub-pages** (one screen per group) if completion still drops                                    |
+| **Admin**                | Isolated `/admin*` + in-page `AdminSubNav` between admin routes        | Deeper **grouping** or layout wrapper if more tools ship there                                              |
 | **Companions vs tools**  | `/companion/...` vs `/tools/...`                                     | Keep two families; only consolidate if a future design unifies “instance” vs “tool” mentally                |
 | **Research**             | PostHog tab events                                                   | Short **hallway tests** or interviews for naming, tab crowding, “where is my past?” — complements analytics |
 
@@ -201,13 +202,14 @@ Use this as a **checklist** when planning research or another IA pass. Detailed 
 | Date       | Author | Change                                                                                                                                                                                      |
 | ---------- | ------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | 2026-04-25 | —      | Initial inventory from `App.tsx` + nav components; gap analysis and recommendations.                                                                                                        |
-| 2026-04-25 | —      | Shipped: `/journey/`* (no state-based tabs), `/tools/*` + hub, notifications migration, Library/Activity copy; no legacy profile or pre-`/tools` routes.                                    |
+| 2026-04-25 | —      | Shipped: `/journey/*` (no state-based tabs), `/tools/*` + hub, notifications migration, Library/Activity copy; no legacy profile or pre-`/tools` routes.                                    |
 | 2026-04-25 | —      | Updated to a “decision status + alternatives” format to capture current IA, reconsideration options, and further improvements.                                                              |
 | 2026-04-25 | —      | Acted on IA: Tools bottom tab; `/settings/about`; `HistoryCrossLinks` across Library / Journey Activity / Grounding history; `/roadmap` stub page.                                          |
 | 2026-04-26 | —      | Document **§1.7** nav analytics (`navigation.primary_tab_opened`); fix five-tab wording in **§2**; add **§4.7** consolidated alternatives; link event taxonomy; clarify doc vs app version. |
 | 2026-04-26 | —      | Letters moved to `/tools/letters` (not Journey); Home letter widget removed; DB notification paths + redirect from `/journey/letters`.                                                      |
-| 2026-04-26 | —      | Doc cleanup: shell vs immersive `/tools/`*; `ToolsHub` journey block; Home `JourneyHomeCard`; Library activity tab; Settings jump nav; `AdminSubNav`.                                       |
+| 2026-04-26 | —      | Doc cleanup: shell vs immersive `/tools/*`; `ToolsHub` journey block; Home `JourneyHomeCard`; Library activity tab; Settings jump nav; `AdminSubNav`.                                      |
 | 2026-04-26 | —      | **Code:** `usePauseStatsData` via TanStack Query; `useHoldGoalProfile`; Home `JourneyHomeCard` shows Holzen score + ring when ≥1 completed pause; `COMPANION_PREFIX` in `app-routes`.       |
+| 2026-04-27 | —      | Invalidate pause stats cache on pause `completed`; register global `QueryClient`; Settings hash + `/settings/section/:section`; `settingsSectionPath` in `app-routes`.                       |
 
 
 When routes, bottom-nav items, or nav-related analytics change, update **§1**, **§1.7**, **§4.1**, **§4.7**, **event-taxonomy.md** (if applicable), and a **Changelog** row in the same PR.

@@ -44,3 +44,11 @@ export const TOOLS = {
 export function isProfileTab(s: string | undefined): s is ProfileTab {
   return s === 'stats' || s === 'insights' || s === 'badges' || s === 'activity';
 }
+
+/**
+ * Shallow “section” path for settings (serves shareable URL → `/settings` + hash in-app).
+ * Valid ids: you, reflection, experience, companions, notifications, subscription, account.
+ */
+export function settingsSectionPath(section: string): string {
+  return `/settings/section/${encodeURIComponent(section)}`;
+}

@@ -1,5 +1,5 @@
 import { useAuth } from '@/hooks/use-auth';
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import { QuietWindowsManager } from '@/components/QuietWindowsManager';
 import { SourceManagement } from '@/components/SourceManagement';
 import { ProLock } from '@/components/ProLock';
@@ -369,6 +369,15 @@ const Settings = forwardRef<HTMLDivElement>(function Settings(_props, ref) {
     });
   }, []);
 
+  const location = useLocation();
+  useEffect(() => {
+    if (!profileLoaded) return;
+    const raw = location.hash.replace(/^#/, '');
+    if (!raw.startsWith('settings-section-')) return;
+    const value = raw.slice('settings-section-'.length);
+    if (value) settingsJump(value);
+  }, [location.hash, location.pathname, profileLoaded, settingsJump]);
+
   if (!profileLoaded) {
     return (
       <div className="space-y-6">
@@ -405,14 +414,13 @@ const Settings = forwardRef<HTMLDivElement>(function Settings(_props, ref) {
             ['account', 'settings.accountSecurity', { defaultValue: 'Account & security' }],
           ] as const
         ).map(([value, key, opts]) => (
-          <button
+          <Link
             key={value}
-            type="button"
-            onClick={() => settingsJump(value)}
+            to={{ pathname: '/settings', hash: `settings-section-${value}` }}
             className="text-[10px] font-mono text-primary/90 underline-offset-2 hover:underline"
           >
             {t(key, opts)}
-          </button>
+          </Link>
         ))}
       </div>
 
