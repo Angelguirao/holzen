@@ -184,7 +184,7 @@ const Settings = forwardRef<HTMLDivElement>(function Settings(_props, ref) {
       toast(t('settings.saved', { defaultValue: 'Saved' }), { duration: 1200, id: 'auto-save' });
     }, 400);
     return () => clearTimeout(saveTimeoutRef.current);
-  }, [threshold, thresholdDown, cumulativeThreshold, emailNotifications, reflectionTone, reflectionStyle, silentMode, cooldownHours, digestFrequency, customPrompt, quietHoursStart, quietHoursEnd, firstName, nightReflectionHour, aiInsightsEnabled, notifyBadges, mantra, currency, language, groundingActivities, companionPrefs]);
+  }, [threshold, thresholdDown, cumulativeThreshold, emailNotifications, reflectionTone, reflectionStyle, silentMode, cooldownHours, digestFrequency, customPrompt, quietHoursStart, quietHoursEnd, firstName, nightReflectionHour, aiInsightsEnabled, notifyBadges, mantra, currency, language, groundingActivities, companionPrefs, profileLoaded, t]);
 
 
   useEffect(() => {

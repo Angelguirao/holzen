@@ -187,7 +187,7 @@ const Profile = () => {
     loadLetters();
     loadPractice();
     loadProfile();
-  }, [user]);
+  }, [letterIdForOpen, user]);
 
   const deleteLetter = useCallback(async (id: string) => {
     const { error } = await supabase.from('future_letters').delete().eq('id', id);
