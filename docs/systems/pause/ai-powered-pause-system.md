@@ -284,7 +284,7 @@ This section is **client-centric**: `**use-holzen`** and `**use-companion-data`*
 
 - **Files:** `supabase/functions/companion-orchestrate/index.ts` (HTTP handler) and `**_shared/companion-orchestrate-*.ts`** (types, body parsing, logging, skip-cache, **parallel generator tasks**, **settled-result fold + background writes**).
 - **Role:** Auth → rate limit → daily budget → parse body → `**determineSessionIntent`** → `**selectIntervention`** (when `**useIntervention`** is true **and** `**pauseInstanceId`** is present) → `**Promise.all`** of `**generateQuestion`** (question mode only) **and** enabled generator tasks → assemble `**intervention`** + companion results → `companion_serves` inserts → `**writeCompanionData`** (upserts **`pause_ai_artifacts`** per slot; legacy `**reflection_companions**` / `**reflections**` storage was **dropped** in Pause V2).
-- **Invocation modes (client):** The SPA usually sends **narrow** requests: (1) intervention-only (all `enable*` false, `holzenInvokeSource: 'browser_pause_intervention'`), (2) single-slot lazy fetch (`holzenInvokeSource: 'browser_lazy_fetch'`), (3) regenerate (`regenerateOnly`). Cron and pregenerate may enable multiple slots in one request.
+- **Invocation modes (client):** The SPA usually sends **narrow** requests: (1) intervention-only (all `enable*` false, `holzenInvokeSource: 'browser_pause_intervention'`), (2) single-slot lazy fetch (`holzenInvokeSource: 'browser_lazy_fetch'`), (3) regenerate (`regenerateOnly`). Some **server-side** calls (e.g. **cron** / automatic flows that invoke `companion-orchestrate`) may set several `enable*` flags and run **multiple** generator tasks in **one** HTTP invoke. The **`pregenerate-companions`** edge function is **separate** — it does **not** call `companion-orchestrate`; it writes rows into `companion_cache` only (see [pregenerate.md](companions/pregenerate.md)).
 - **Typical JSON body:** `**pauseInstanceId**` (UUID of the row in **`pause_instances`**), `**context`**, `**reflectionMessage**` (AI reflect-step text), `**language**`, `**mood**`, numeric `**severity**` (absolute % move → `**bucketSeverity**` in `intervention-selector.ts`), `**moodHistory**`, `**signalSources**` / `**groundingSources**` (merged catalog URLs when Signal/Ground are on), recency arrays (`**recentNudgeTopics**`, `**recentGroundingSources**`, `**recentSignalSources**`, …), `**enableSignal` / `enableGrounding` / `enableHistory` / `enableZoomOut**`, `**useIntervention**` (default true). If `**pauseInstanceId**` is missing or `**useIntervention: false**`, no intervention is selected (`**response.intervention**` omitted); generators still run per `**enable***`.
 
 ### Diagram — inside `companion-orchestrate`
@@ -303,7 +303,7 @@ flowchart TD
 
 
 
-**Parallelism:** Within a single invoke, `**generateQuestion`** (if question mode) and any enabled generator tasks run **concurrently** (`Promise.all` + `Promise.allSettled`). Generators are **in-process** imports. The **SPA** typically sends **one slot per request** (lazy loading on tap), so concurrency is most relevant for **cron** and **pregenerate** invocations that enable multiple slots.
+**Parallelism:** Within a single **companion-orchestrate** invoke, `**generateQuestion**` (if question mode) and any enabled generator tasks run **concurrently** (`Promise.all` + `Promise.allSettled`). Generators are **in-process** imports. The **SPA** usually sends **one slot per request** (lazy on tap), so **multi-generator concurrency** mostly shows up for **broad** server calls (e.g. cron) — **not** for the separate **`pregenerate-companions`** function, which does not go through this handler.
 
 **Intervention vs generators:** `**intervention.primary`** for **trap** / **pattern** and `**intervention.secondary`** for **zoom_out** are filled from the **same** generator runs as the cards. The orchestrator **forces** Grounding / History / Zoom Out when the selected intervention **requires** that output, even if the user turned the matching companion pref **off** (extra model cost vs empty headline). If `**groundingSources`** was omitted (pref off), the orchestrator loads the grounding catalog via `**fetchGroundingSourcesForOrchestrate`**. **Signal** is still prefs-only — not used as a headline type. See **§11.3** for broader cost notes.
 
@@ -656,7 +656,7 @@ Exact SQL lives in **[cron-setup.md](../../ops/cron-setup.md)**. Typical schedul
 | ------------------------ | ---------------------------------------------------------------- |
 | `check-volatility`       | Eligibility + reflection + orchestrator dispatch + notifications |
 | `refresh-btc-prices`     | Feeds zoom-out generator                                         |
-| `pregenerate-companions` | Cache lifecycle + warming                                        |
+| `pregenerate-companions` | `companion_cache` lifecycle + need-based pool warming (does **not** call `companion-orchestrate`; see [pregenerate.md](companions/pregenerate.md)) |
 | `fetch-source-feeds`     | Fills `content_library` for fallbacks                            |
 | `night-reflection`       | Separate end-of-day message path                                 |
 
@@ -671,7 +671,7 @@ Exact SQL lives in **[cron-setup.md](../../ops/cron-setup.md)**. Typical schedul
 
 **What the user sees** is one pause surface: reflection copy, an intervention (mirror / trap / pattern / question / default), and optional companion cards driven by preferences.
 
-**What the server does** is split across phases: (1) **reflect-step** — `holzen-reflect` or `check-volatility` calling `generateUnifiedReflection` (the model output is **message + haiku**; `**holzen-reflect**` may echo `**grounding_***` keys for API stability, but `**generateUnifiedReflection**` often returns them as **null** — companion slots fill those via orchestration); (2) **orchestration** — `companion-orchestrate` may run model-backed generators (one per lazy request, or multiple in cron/pregenerate) (Signal, Grounding, History, Zoom Out, and question mode when selected), then write results to **`pause_ai_artifacts`**, `**companion_serves**`, and analytics.
+**What the server does** is split across phases: (1) **reflect-step** — `holzen-reflect` or `check-volatility` calling `generateUnifiedReflection` (the model output is **message + haiku**; `**holzen-reflect**` may echo `**grounding_***` keys for API stability, but `**generateUnifiedReflection**` often returns them as **null** — companion slots fill those via orchestration); (2) **orchestration** — `companion-orchestrate` may run model-backed generators (one per typical **client** lazy request, or **several in one** invoke when a **server** caller sets multiple `**enable*`** flags) (Signal, Grounding, History, Zoom Out, and question mode when selected), then write results to **`pause_ai_artifacts`**, `**companion_serves**`, and analytics. The **`pregenerate-companions`** job does **not** use this path: it only pre-fills **`companion_cache`** (see [pregenerate.md](companions/pregenerate.md)).
 
 **Rate limits and budgets** do not line up 1:1 with that UX split:
 
