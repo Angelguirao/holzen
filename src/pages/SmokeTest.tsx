@@ -9,6 +9,7 @@ import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import { ChevronDown, ExternalLink, CreditCard, ListChecks, Wallet, FileText, RotateCw } from 'lucide-react';
+import { AdminSubNav } from '@/components/admin/AdminSubNav';
 
 function useIsAdmin() {
   const { user, loading } = useAuth();
@@ -121,6 +122,7 @@ export default function SmokeTest() {
 
   return (
     <div className="container max-w-3xl py-8 space-y-6">
+      <AdminSubNav />
       <header className="space-y-2">
         <div className="flex items-center gap-2 text-muted-foreground text-sm">
           <ListChecks className="h-4 w-4" />

@@ -7,14 +7,15 @@ import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { useNavigate } from 'react-router-dom';
 import { homeInWidget } from '@/components/home/home-widget-styles';
+import { TOOLS } from '@/lib/app-routes';
 
 type PracticeId = 'checkin' | 'journal' | 'bodyscan' | 'replay';
 
 const PRACTICES = [
-  { id: 'checkin' as const, icon: Waves, labelKey: 'practice.checkinLabel', descKey: 'practice.checkinDesc', free: true, route: '/practice/checkin' },
-  { id: 'journal' as const, icon: PenLine, labelKey: 'practice.journalLabel', descKey: 'practice.journalDesc', free: false, route: '/practice/journal' },
-  { id: 'bodyscan' as const, icon: Activity, labelKey: 'practice.bodyscanLabel', descKey: 'practice.bodyscanDesc', free: false, route: '/practice/bodyscan' },
-  { id: 'replay' as const, icon: History, labelKey: 'practice.replayLabel', descKey: 'practice.replayDesc', free: false, route: '/practice/replay' },
+  { id: 'checkin' as const, icon: Waves, labelKey: 'practice.checkinLabel', descKey: 'practice.checkinDesc', free: true, route: TOOLS.practice.checkin },
+  { id: 'journal' as const, icon: PenLine, labelKey: 'practice.journalLabel', descKey: 'practice.journalDesc', free: false, route: TOOLS.practice.journal },
+  { id: 'bodyscan' as const, icon: Activity, labelKey: 'practice.bodyscanLabel', descKey: 'practice.bodyscanDesc', free: false, route: TOOLS.practice.bodyscan },
+  { id: 'replay' as const, icon: History, labelKey: 'practice.replayLabel', descKey: 'practice.replayDesc', free: false, route: TOOLS.practice.replay },
 ] as const;
 
 function useSuggestion(userId: string | undefined) {
@@ -34,7 +35,10 @@ function useSuggestion(userId: string | undefined) {
         .limit(50);
 
       if (!entries || entries.length === 0) {
-        setSuggestion({ id: 'checkin', reason: t('practice.suggestFirstCheckin', 'Start with a quick emotional check-in') });
+        setSuggestion({
+          id: 'checkin',
+          reason: t('practice.suggestFirstCheckin', { defaultValue: 'Start with a quick emotional check-in' }),
+        });
         return;
       }
 
@@ -50,13 +54,25 @@ function useSuggestion(userId: string | undefined) {
       const recentMoods = entries.filter(e => e.mood && reactiveMoods.includes(e.mood));
 
       if (daysSinceCheckin >= 3) {
-        setSuggestion({ id: 'checkin', reason: t('practice.suggestCheckin', "It's been a few days — how are you feeling?") });
+        setSuggestion({
+          id: 'checkin',
+          reason: t('practice.suggestCheckin', { defaultValue: "It's been a few days — how are you feeling?" }),
+        });
       } else if (recentMoods.length >= 2) {
-        setSuggestion({ id: 'bodyscan', reason: t('practice.suggestBodyscan', "You've been reactive — try grounding yourself") });
+        setSuggestion({
+          id: 'bodyscan',
+          reason: t('practice.suggestBodyscan', { defaultValue: "You've been reactive — try grounding yourself" }),
+        });
       } else if (!counts['journal'] || counts['journal'] < 2) {
-        setSuggestion({ id: 'journal', reason: t('practice.suggestJournal', 'A guided journal might surface new patterns') });
+        setSuggestion({
+          id: 'journal',
+          reason: t('practice.suggestJournal', { defaultValue: 'A guided journal might surface new patterns' }),
+        });
       } else {
-        setSuggestion({ id: 'replay', reason: t('practice.suggestReplay', 'Revisit a past reflection with fresh eyes') });
+        setSuggestion({
+          id: 'replay',
+          reason: t('practice.suggestReplay', { defaultValue: 'Revisit a past reflection with fresh eyes' }),
+        });
       }
     })();
   }, [userId, t]);
@@ -139,7 +155,9 @@ export function PracticeWidget() {
         >
           <Sparkles className="h-3.5 w-3.5 shrink-0 mt-[6px] text-secondary-foreground" />
           <div className="min-w-0 flex-1 text-left">
-            <span className={`${homeInWidget.kicker} text-primary`}>{t('practice.suggested', 'Suggested')}</span>
+            <span className={`${homeInWidget.kicker} text-primary`}>
+              {t('practice.suggested', { defaultValue: 'Suggested' })}
+            </span>
             <span className={`mt-1 block ${homeInWidget.bodyMuted} leading-snug`}>
               {suggestion.reason}
             </span>

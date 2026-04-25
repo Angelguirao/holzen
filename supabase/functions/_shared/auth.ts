@@ -3,6 +3,8 @@
  * Provides consistent JWT verification and service role validation.
  */
 
+import type { User } from "https://esm.sh/@supabase/supabase-js@2.57.2";
+
 /** Create a Supabase client with the user's auth header */
 export async function createAuthenticatedClient(authHeader: string) {
   const { createClient } = await import("https://esm.sh/@supabase/supabase-js@2.57.2");
@@ -25,7 +27,7 @@ export async function createServiceClient() {
  * Verify user JWT from the Authorization header.
  * Returns the authenticated user or null.
  */
-export async function verifyUserAuth(req: Request): Promise<{ user: any; authHeader: string } | null> {
+export async function verifyUserAuth(req: Request): Promise<{ user: User; authHeader: string } | null> {
   const authHeader = req.headers.get("Authorization");
   if (!authHeader?.startsWith("Bearer ")) return null;
 

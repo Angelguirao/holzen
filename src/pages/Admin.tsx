@@ -17,6 +17,7 @@ import { HardcodedFallbacksManager } from '@/components/admin/HardcodedFallbacks
 import { SourceCatalogViewer } from '@/components/admin/SourceCatalogViewer';
 import { SourceSuggestionsPanel } from '@/components/admin/SourceSuggestionsPanel';
 import { ContentLibraryViewer } from '@/components/admin/ContentLibraryViewer';
+import { AdminSubNav } from '@/components/admin/AdminSubNav';
 import { AppConfigTools } from '@/components/admin/AppConfigTools';
 import { CostAnalytics } from '@/components/admin/CostAnalytics';
 import { adminDeleteRowsByIds } from '@/lib/admin-delete';
@@ -173,7 +174,9 @@ export default function Admin() {
   const [expandedSessionId, setExpandedSessionId] = useState<string | null>(null);
 
   const sessionMoodOptions = useMemo(() => {
-    const moods = Array.from(new Set(sessions.map(s => s.mood).filter(Boolean) as string[])).sort();
+    const moods = Array.from(
+      new Set(sessions.map(s => s.initial_mood).filter(Boolean) as string[]),
+    ).sort();
     return [{ value: 'all', label: 'All' }, ...moods.map(m => ({ value: m, label: m }))];
   }, [sessions]);
 
@@ -191,13 +194,14 @@ export default function Admin() {
   ];
 
   const filteredSessions = useMemo(() => sessions.filter(s => {
-    if (sessionMoodFilter !== 'all' && s.mood !== sessionMoodFilter) return false;
+    if (sessionMoodFilter !== 'all' && s.initial_mood !== sessionMoodFilter) return false;
     if (sessionOutcomeFilter !== 'all') {
       if (sessionOutcomeFilter === 'pending') { if (s.outcome) return false; }
       else if (s.outcome !== sessionOutcomeFilter) return false;
     }
     if (sessionCompanionFilter === 'missing') {
-      const allLoaded = !!s.signal_title && !!s.grounding_title && !!s.history_insight_data && !!s.zoom_out_data && !!s.haiku;
+      const counted = (s.counted_companion_types ?? []).length;
+      const allLoaded = counted >= 5 && !!s.haiku_text;
       if (allLoaded) return false;
     }
     return true;
@@ -381,6 +385,7 @@ export default function Admin() {
 
   return (
     <div className="space-y-6 animate-in fade-in">
+      <AdminSubNav />
       {/* Header */}
       <div className="flex items-center justify-between">
         <h2 className="text-xs font-mono tracking-widest uppercase text-muted-foreground/80">System Monitor</h2>
@@ -403,7 +408,7 @@ export default function Admin() {
         </TabsList>
         <p className="text-[9px] font-mono text-muted-foreground/45 leading-relaxed max-w-3xl">
           Tab order matches the pipeline: <span className="text-muted-foreground/55">Monitor</span> (telemetry + generation failures).
-          <span className="text-muted-foreground/55"> Activity</span> — user reflections and newest cache writes.
+          <span className="text-muted-foreground/55"> Activity</span> — pause sessions and newest cache writes.
           <span className="text-muted-foreground/55"> Sources</span> — live-search catalog + pending AI-suggested rows (approve/reject).
           <span className="text-muted-foreground/55"> Library</span> — curated essays/papers/events used when live generation falls back.
           <span className="text-muted-foreground/55"> Cache</span> — pregen pool in <code className="text-muted-foreground/50">companion_cache</code> (promote/demote/delete).
@@ -717,13 +722,13 @@ export default function Admin() {
 
         <TabsContent value="activity" className="space-y-8 mt-0">
           <p className="text-[9px] font-mono text-muted-foreground/45 leading-relaxed max-w-3xl">
-            <span className="text-muted-foreground/55">Reflections</span> below are saved user sessions (<code className="text-muted-foreground/50">reflections</code>). <span className="text-muted-foreground/55">Latest cache writes</span> are new rows in <code className="text-muted-foreground/50">companion_cache</code> (cron + live writes) — same pool you manage under the Cache tab, shown here chronologically for a quick audit.
+            <span className="text-muted-foreground/55">Pauses</span> below are rows from <code className="text-muted-foreground/50">v_pause_full</code> (completed / in-progress read model). <span className="text-muted-foreground/55">Latest cache writes</span> are new rows in <code className="text-muted-foreground/50">companion_cache</code> (cron + live writes) — same pool you manage under the Cache tab, shown here chronologically for a quick audit.
           </p>
 
           <div className="space-y-2">
-            <p className="text-[10px] font-mono uppercase tracking-wider text-muted-foreground/60">Recent reflections</p>
+            <p className="text-[10px] font-mono uppercase tracking-wider text-muted-foreground/60">Recent pauses</p>
             <p className="text-[9px] font-mono text-muted-foreground/45 leading-relaxed">
-              Green chips mean that companion row exists on the reflection. Expand for <strong className="font-normal text-muted-foreground/55">live</strong> / <strong className="font-normal text-muted-foreground/55">library</strong> / <strong className="font-normal text-muted-foreground/55">cache</strong> / <strong className="font-normal text-muted-foreground/55">curated</strong> / <strong className="font-normal text-muted-foreground/55">empty</strong> from <code className="text-muted-foreground/55">companion_serves</code> (library = curated <code className="text-muted-foreground/55">content_library</code> hit; cache = runtime <code className="text-muted-foreground/55">companion_cache</code>; n/a = no log row, e.g. older sessions).
+              Green chips mean that companion slot counted for this pause. Expand for <strong className="font-normal text-muted-foreground/55">live</strong> / <strong className="font-normal text-muted-foreground/55">library</strong> / <strong className="font-normal text-muted-foreground/55">cache</strong> / <strong className="font-normal text-muted-foreground/55">curated</strong> / <strong className="font-normal text-muted-foreground/55">empty</strong> from <code className="text-muted-foreground/55">companion_serves</code> (library = curated <code className="text-muted-foreground/55">content_library</code> hit; cache = runtime <code className="text-muted-foreground/55">companion_cache</code>; n/a = no log row, e.g. older sessions).
             </p>
             <div className="space-y-1.5">
               <FilterRow label="Mood" options={sessionMoodOptions} value={sessionMoodFilter} onChange={setSessionMoodFilter} />
@@ -735,11 +740,11 @@ export default function Admin() {
             </div>
             <div className="space-y-1">
               {filteredSessions.map(s => {
-                const theme = inferTheme(s.context, s.mood);
                 const expanded = expandedSessionId === s.id;
-                const historyTitle = historyInsightTitleFromData(s.history_insight_data);
-                const zoomTitle = zoomOutDeepTimeTitleFromData(s.zoom_out_data);
-                const signalSource = s.signal_source;
+                const contextText = typeof s.context_snapshot?.context_text === 'string'
+                  ? (s.context_snapshot.context_text as string)
+                  : null;
+                const counted = s.counted_companion_types ?? [];
                 return (
                 <div key={s.id} className="rounded-lg border border-border/20 bg-card/10 px-3 py-2 space-y-1.5">
                   <button
@@ -756,12 +761,12 @@ export default function Admin() {
                       <span className="text-[9px] font-mono text-muted-foreground/50 flex-shrink-0">
                         {new Date(s.created_at).toLocaleString(undefined, { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })}
                       </span>
-                      {s.mood && (
+                      <span className="text-[8px] font-mono px-1.5 py-0.5 rounded-full bg-muted/30 text-muted-foreground/60">{s.state}</span>
+                      {s.initial_mood && (
                         <span className="text-[9px] font-mono px-1.5 py-0.5 rounded-full bg-primary/15 text-primary flex-shrink-0">
-                          {s.mood}
+                          {s.initial_mood}
                         </span>
                       )}
-                      {theme && <span className="text-[8px] font-mono px-1.5 py-0.5 rounded-full bg-muted/30 text-muted-foreground/60">{theme}</span>}
                       {s.outcome && (
                         <span className={`text-[9px] font-mono px-1.5 py-0.5 rounded-full flex-shrink-0 ${
                           s.outcome === 'held' ? 'bg-primary/15 text-primary'
@@ -773,15 +778,15 @@ export default function Admin() {
                       )}
                     </div>
                     <p className="text-[9px] font-mono text-foreground/70 leading-relaxed pl-4">
-                      {s.message?.slice(0, 100)}{(s.message?.length ?? 0) > 100 ? '…' : ''}
+                      {s.reflection_text?.slice(0, 100)}{(s.reflection_text?.length ?? 0) > 100 ? '…' : ''}
                     </p>
                     <div className="flex items-center gap-1.5 flex-wrap pl-4">
                       {[
-                        { loaded: !!s.signal_title, name: 'Signal' },
-                        { loaded: !!s.grounding_title, name: 'Ground' },
-                        { loaded: !!s.history_insight_data, name: 'History' },
-                        { loaded: !!s.zoom_out_data, name: 'Zoom' },
-                        { loaded: !!s.haiku, name: 'Haiku' },
+                        { loaded: counted.includes('signal'), name: 'Signal' },
+                        { loaded: counted.includes('ground_nudge'), name: 'Ground' },
+                        { loaded: counted.includes('historical_insight'), name: 'History' },
+                        { loaded: counted.includes('zoom_out') || counted.includes('zoom_out_deep_time'), name: 'Zoom' },
+                        { loaded: !!s.haiku_text, name: 'Haiku' },
                       ].map(c => (
                         <span key={c.name} className={`text-[8px] font-mono px-1.5 py-0.5 rounded ${
                           c.loaded ? 'bg-primary/15 text-primary' : 'bg-muted/30 text-muted-foreground/40'
@@ -794,58 +799,22 @@ export default function Admin() {
                   {expanded && (
                     <div className="mt-1.5 space-y-2 rounded border border-border/20 bg-card/10 px-3 py-2 text-[9px] font-mono">
                       <div className="space-y-0.5">
-                        <p className="text-muted-foreground/50 uppercase tracking-wider">Reflection</p>
-                        <p className="text-foreground/70 whitespace-pre-wrap break-words leading-relaxed">{s.message ?? '—'}</p>
+                        <p className="text-muted-foreground/50 uppercase tracking-wider">Reflection text</p>
+                        <p className="text-foreground/70 whitespace-pre-wrap break-words leading-relaxed">{s.reflection_text ?? '—'}</p>
                       </div>
                       <div className="space-y-1.5 border-t border-border/10 pt-2">
-                        <p className="text-muted-foreground/50 uppercase tracking-wider">Companions</p>
-                        {s.signal_title && (
-                          <div className="space-y-0.5">
-                            <p className="text-muted-foreground/40 flex items-center gap-2 flex-wrap">
-                              Signal
-                              <ServeSourceTag source={s.serve_source_signal} />
-                            </p>
-                            <p className="text-foreground/70">{s.signal_title}</p>
-                            {signalSource ? <p className="text-muted-foreground/60">source · {signalSource}</p> : null}
-                          </div>
-                        )}
-                        {s.grounding_title && (
-                          <div className="space-y-0.5">
-                            <p className="text-muted-foreground/40 flex items-center gap-2 flex-wrap">
-                              Grounding
-                              <ServeSourceTag source={s.serve_source_ground_nudge} />
-                            </p>
-                            <p className="text-foreground/70">{s.grounding_title}</p>
-                          </div>
-                        )}
-                        {s.history_insight_data && (
-                          <div className="space-y-0.5">
-                            <p className="text-muted-foreground/40 flex items-center gap-2 flex-wrap">
-                              History
-                              <ServeSourceTag source={s.serve_source_historical_insight} />
-                            </p>
-                            <p className="text-foreground/70">{historyTitle ?? '—'}</p>
-                          </div>
-                        )}
-                        {s.zoom_out_data && (
-                          <div className="space-y-0.5">
-                            <p className="text-muted-foreground/40 flex items-center gap-2 flex-wrap">
-                              Zoom Out
-                              <ServeSourceTag source={s.serve_source_zoom_out} />
-                            </p>
-                            <p className="text-foreground/70">{zoomTitle ?? '—'}</p>
-                          </div>
-                        )}
-                        {s.haiku && (
-                          <div className="space-y-0.5">
-                            <p className="text-muted-foreground/40">Haiku</p>
-                            <p className="text-foreground/70 whitespace-pre-wrap break-words leading-relaxed">{s.haiku}</p>
-                          </div>
-                        )}
+                        <p className="text-muted-foreground/50 uppercase tracking-wider">Counted companions</p>
+                        <p className="text-foreground/70">{counted.length > 0 ? counted.join(', ') : '—'}</p>
                       </div>
+                      {s.haiku_text && (
+                        <div className="space-y-0.5 border-t border-border/10 pt-2">
+                          <p className="text-muted-foreground/40">Haiku</p>
+                          <p className="text-foreground/70 whitespace-pre-wrap break-words leading-relaxed">{s.haiku_text}</p>
+                        </div>
+                      )}
                       <div className="space-y-0.5 border-t border-border/10 pt-2">
                         <p className="text-muted-foreground/50 uppercase tracking-wider">Context</p>
-                        <p className="text-foreground/70 whitespace-pre-wrap break-words leading-relaxed">{s.context ?? '—'}</p>
+                        <p className="text-foreground/70 whitespace-pre-wrap break-words leading-relaxed">{contextText ?? '—'}</p>
                       </div>
                     </div>
                   )}

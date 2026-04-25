@@ -1,3 +1,5 @@
+import type { SupabaseClient } from "https://esm.sh/@supabase/supabase-js@2.57.2";
+
 /**
  * Last-resort fallback pools when live generation and cache miss.
  * Canonical seed: ./fallback-seed.json (also seeded into companion_fallbacks).
@@ -42,7 +44,7 @@ const SEED_BY_POOL: Record<FallbackPoolType, unknown[]> = {
  * Active pool for generation: DB rows when present, else bundled seed JSON.
  */
 export async function loadFallbackPool<T>(
-  svcClient: any,
+  svcClient: SupabaseClient,
   poolType: FallbackPoolType,
 ): Promise<T[]> {
   try {
@@ -75,7 +77,7 @@ export function pickRandom<T>(pool: T[]): T {
 export const ENV_DISABLE_COMPANION_FALLBACKS = "DISABLE_COMPANION_FALLBACKS";
 
 export function companionFallbacksDisabled(): boolean {
-  const v = (globalThis as any).Deno?.env?.get(ENV_DISABLE_COMPANION_FALLBACKS);
+  const v = typeof Deno !== "undefined" ? Deno.env.get(ENV_DISABLE_COMPANION_FALLBACKS) : undefined;
   return v === "1" || v === "true" || v === "yes";
 }
 

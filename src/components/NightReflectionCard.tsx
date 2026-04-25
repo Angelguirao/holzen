@@ -78,7 +78,7 @@ export function useNightReflection() {
 
     await supabase
       .from('night_reflections')
-      .update({ dismissed: true } as any)
+      .update({ dismissed: true })
       .eq('user_id', user.id)
       .eq('dismissed', false);
   };

@@ -26,7 +26,6 @@ Wrapped:
 - `supabase/functions/fetch-source-feeds/index.ts`
 - `supabase/functions/pregenerate-companions/index.ts`
 - `supabase/functions/check-volatility/index.ts`
-- `supabase/functions/check-followups/index.ts`
 - `supabase/functions/night-reflection/index.ts`
 - `supabase/functions/process-referral-pending/index.ts`
 - `supabase/functions/suggest-ritual/index.ts`
@@ -74,7 +73,7 @@ List is deliberately open-ended here rather than enumerated — run `ls supabase
 ## Order suggestion (highest value first)
 
 1. **Companion-serving functions** — `companion-orchestrate`, `generate-reflection`, generators under `_shared/generators/` — highest invocation volume, highest cost, already log some state but inconsistently.
-2. **Cron-driven functions** — anything invoked from `pg_cron` (refresh-btc-prices, fetch-source-feeds, pregenerate-companions, check-volatility, check-followups, night-reflection, process-referral-pending, process-email-queue). These pair with [pg-cron-heartbeat-wiring.md](pg-cron-heartbeat-wiring.md); together they close the reliability loop.
+2. **Cron-driven functions** — anything invoked from `pg_cron` (refresh-btc-prices, fetch-source-feeds, pregenerate-companions, check-volatility, night-reflection, process-referral-pending, process-email-queue). These pair with [pg-cron-heartbeat-wiring.md](pg-cron-heartbeat-wiring.md); together they close the reliability loop. (`check-followups` was removed in Pause V2.)
 3. **Admin / one-off** — admin-library-preview, monthly-report, weekly-digest, generate-wallpaper, etc. Lower volume but still benefit from a unified error envelope.
 4. **Billing / auth** — Stripe webhooks, subscription checks. Lower noise, but Sentry coverage matters for money flows.
 

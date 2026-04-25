@@ -8,6 +8,7 @@
  * API keys are read from Deno.env directly (same as the original function).
  */
 
+import type { SupabaseClient } from "https://esm.sh/@supabase/supabase-js@2.57.2";
 import {
   qualityGate,
   BANNED_PHRASES,
@@ -26,6 +27,7 @@ import { createAttemptLogger, trackEvent } from "../observe.ts";
 import { callPerplexityChat, type PerplexityUsage } from "../perplexity-client.ts";
 import { searchLibrary, eventToHistory, recordLibraryServe } from "../content-library.ts";
 import { getPhaseConfig } from "../phase-config.ts";
+import { type CompanionCacheTitleRow } from "../companion-cache-dedup.ts";
 import { type HistoricalEra, pickEra } from "../history-util.ts";
 
 /** Bump when the search query, structuring prompt, or quality rules change. */
@@ -44,7 +46,7 @@ export interface HistoryResult {
 }
 
 export interface GenerateHistoryParams {
-  svcClient: any;
+  svcClient: SupabaseClient;
   context?: string;
   language?: string;
   mood?: string;
@@ -65,7 +67,7 @@ export interface GenerateHistoryParams {
 
 /** Try content_library (events) for history. */
 async function tryLibrary(
-  svcClient: any,
+  svcClient: SupabaseClient,
   userId?: string,
   moodTag?: string,
 ): Promise<HistoryResult | null> {
@@ -93,16 +95,24 @@ async function tryLibrary(
  * (used by `serveFallback` after live failure) keeps pass-3 as a last-resort serve.
  */
 async function tryCache(
-  svcClient: any,
+  svcClient: SupabaseClient,
   userId?: string,
   marketDirection?: "up" | "down" | "neutral",
   excludeIds?: string[],
   strict = false,
+  structuredLog?: GenerateHistoryParams["log"],
 ): Promise<HistoryResult | null> {
-  const cached = await serveFromCache(svcClient, "historical_insight", "en", { userId, marketDirection, excludeIds, strict, promptVersion: PROMPT_VERSION });
+  const cached = await serveFromCache(svcClient, "historical_insight", "en", {
+    userId,
+    marketDirection,
+    excludeIds,
+    strict,
+    promptVersion: PROMPT_VERSION,
+    structuredLog,
+  });
   if (cached) {
     return {
-      data: cached.data,
+      data: cached.data as HistoryResult["data"],
       source: "cache",
       cacheId: cached.cacheId,
       cacheRelaxation: cached.relaxation,
@@ -112,18 +122,19 @@ async function tryCache(
 }
 
 /** Last-resort curated fallback pool. */
-async function serveCurated(svcClient: any): Promise<HistoryResult> {
+async function serveCurated(svcClient: SupabaseClient): Promise<HistoryResult> {
   const pool = await loadFallbackPool<NonNullable<HistoryResult["data"]>>(svcClient, "history");
   return { data: pickRandom(pool), source: "curated", cacheId: null };
 }
 
 /** Resolve from non-live phases in order (library → cache → curated). */
 async function serveFallback(
-  svcClient: any,
+  svcClient: SupabaseClient,
   userId?: string,
   marketDirection?: "up" | "down" | "neutral",
   excludeIds?: string[],
   moodTag?: string,
+  structuredLog?: GenerateHistoryParams["log"],
 ): Promise<HistoryResult> {
   if (companionFallbacksDisabled()) {
     return { data: null, source: "empty", cacheId: null, error: COMPANION_FALLBACKS_DISABLED_MESSAGE };
@@ -134,7 +145,7 @@ async function serveFallback(
     if (lib) return lib;
   }
   if (phases.cache) {
-    const cached = await tryCache(svcClient, userId, marketDirection, excludeIds);
+    const cached = await tryCache(svcClient, userId, marketDirection, excludeIds, false, structuredLog);
     if (cached) return cached;
   }
   return serveCurated(svcClient);
@@ -168,7 +179,7 @@ export async function generateHistory(params: GenerateHistoryParams): Promise<Hi
 
   // ── Phase 2: Cache (strict — no pass-3 repeats; fall through to live if strict pool empty) ──
   if (phases.cache) {
-    const cached = await tryCache(svcClient, userId, marketDirection, undefined, true);
+    const cached = await tryCache(svcClient, userId, marketDirection, undefined, true, log);
     if (cached) {
       log("history resolved from cache (phase 2)");
       return cached;
@@ -195,7 +206,7 @@ export async function generateHistory(params: GenerateHistoryParams): Promise<Hi
   const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
   if (!PERPLEXITY_API_KEY || !LOVABLE_API_KEY) {
     log("missing API keys, serving fallback");
-    return serveFallback(svcClient, userId, marketDirection);
+    return serveFallback(svcClient, userId, marketDirection, undefined, undefined, log);
   }
 
   const marketContext = context || "Bitcoin market movement";
@@ -241,7 +252,7 @@ export async function generateHistory(params: GenerateHistoryParams): Promise<Hi
       error_message: String(e),
       api_requests: 1,
     });
-    return serveFallback(svcClient, userId, marketDirection, undefined, historyMoodTag);
+    return serveFallback(svcClient, userId, marketDirection, undefined, historyMoodTag, log);
   }
 
   if (!searchContent) {
@@ -256,7 +267,7 @@ export async function generateHistory(params: GenerateHistoryParams): Promise<Hi
       output_tokens: perplexityMerged?.completion_tokens,
       api_requests: 1,
     });
-    return serveFallback(svcClient, userId, marketDirection, undefined, historyMoodTag);
+    return serveFallback(svcClient, userId, marketDirection, undefined, historyMoodTag, log);
   }
 
   logAttempt({
@@ -310,7 +321,8 @@ BANNED PHRASES — NEVER use any of these: ${BANNED_PHRASES.join(", ")}${mood ? 
   };
 
   const models = ["google/gemini-2.5-flash", "google/gemini-2.5-flash-lite"];
-  let insight: any = null;
+  type HistoryLiveData = NonNullable<HistoryResult["data"]>;
+  let insight: HistoryLiveData | null = null;
   let lastLovableModel: string | undefined;
 
   const AI_TIMEOUTS = [10000, 8000];
@@ -339,10 +351,10 @@ BANNED PHRASES — NEVER use any of these: ${BANNED_PHRASES.join(", ")}${mood ? 
       const usage = data.usage;
       const raw = data.choices?.[0]?.message?.content || "";
       try {
-        insight = JSON.parse(raw);
+        insight = JSON.parse(raw) as HistoryLiveData;
       } catch {
         const m = raw.match(/\{[\s\S]*\}/);
-        if (m) insight = JSON.parse(m[0]);
+        if (m) insight = JSON.parse(m[0]) as HistoryLiveData;
         else {
           logAttempt({ companion_type: "historical_insight", provider: "lovable", model, status: "error", latency_ms: Date.now() - attemptT0, error_message: "json_parse_failed", input_tokens: usage?.prompt_tokens, output_tokens: usage?.completion_tokens });
           if (model !== models[models.length - 1]) continue; else break;
@@ -375,11 +387,11 @@ BANNED PHRASES — NEVER use any of these: ${BANNED_PHRASES.join(", ")}${mood ? 
         quality_gate_reason: qg.reason ?? "unknown",
       });
     }
-    return serveFallback(svcClient, userId, marketDirection, undefined, historyMoodTag);
+    return serveFallback(svcClient, userId, marketDirection, undefined, historyMoodTag, log);
   }
 
   // ── Step 4: URL post-processing ──
-  if (citations.length > 0 && !citations.includes(insight.url)) {
+  if (citations.length > 0 && (insight.url == null || !citations.includes(insight.url))) {
     insight.url = citations[0];
   }
 
@@ -390,7 +402,7 @@ BANNED PHRASES — NEVER use any of these: ${BANNED_PHRASES.join(", ")}${mood ? 
       const { data: existing } = await svcClient.from("companion_cache").select("content").eq("companion_type", "historical_insight").eq("language", "en").limit(30);
       const norm = (s: string) => s.toLowerCase().replace(/[^a-z0-9 ]/g, "").trim();
       const newNorm = norm(insight.title);
-      const isDup = existing?.some((e: any) => {
+      const isDup = existing?.some((e: CompanionCacheTitleRow) => {
         const t = norm(e.content?.title || "");
         return t === newNorm || t.includes(newNorm) || newNorm.includes(t);
       });

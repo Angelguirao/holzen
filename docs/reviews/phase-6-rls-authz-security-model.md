@@ -4,9 +4,9 @@
 
 Verify the security posture for the tables involved in the pause + companion pipeline:
 
-- `pause_notifications` (cron-side inserts, client-side reads)
-- `reflections` (client-side inserts, cron-side inserts, client-side reads)
-- `reflection_companions` (client-side reads + read-flag updates, orchestrator writes)
+- `notifications` (cron-side inserts, client-side reads)
+- `pause_instances` (client-side inserts via RPCs, cron-side inserts, client-side reads)
+- `pause_ai_artifacts` (client-side reads, orchestrator writes)
 - `analytics_events` (client inserts for its own events; edge/orchestrator writes for allowlisted telemetry)
 - Companion/caching tables:
   - `companion_cache` (cron/worker inserts; client reads)
@@ -29,67 +29,58 @@ This is normal in Supabase setups, but it is worth making explicit because it’
 
 ## Table-by-table findings
 
-### `pause_notifications`
+### `notifications`
 
-Migration: `supabase/migrations/20260327000001_pause_notifications.sql`
+Migration: `supabase/migrations/20260422181000_notifications_feed_unification.sql`
 
 - Enables RLS.
-- Policy: **`Users can view their own pause notifications`** for `FOR SELECT` on `pause_notifications` when `auth.uid() = user_id`.
+- Policy: `**Users can view their own notifications`** for `FOR SELECT` on `notifications` when `auth.uid() = user_id`.
 - **No explicit `INSERT`/`UPDATE`/`DELETE` policies** exist for `authenticated` or `service_role`.
 
 Runtime impact:
 
-- `NotificationBell` reads `pause_notifications` with the browser client (authenticated), which should work due to the SELECT policy.
-- `check-volatility` inserts into `pause_notifications` (service role).
+- `NotificationBell` reads `notifications` with the browser client (authenticated), which should work due to the SELECT policy.
+- `check-volatility` inserts into `notifications` (service role).
 
 Risk / assumption:
 
 - Cron inserts rely on the service-role key bypassing RLS. If bypass were ever disabled/misconfigured, the notification pipeline would fail at the write step.
 
-### `reflections`
+### `pause_instances`
 
-Migration: `supabase/migrations/20260305210513_table_reflections.sql`
+Migration: `supabase/migrations/20260423200700_pause_types_and_instances.sql`
 
 - Enables RLS.
 - Policies:
   - **SELECT** for authenticated where `auth.uid() = user_id`
-  - **INSERT** for authenticated where `WITH CHECK (auth.uid() = user_id)`
-- The base migration does not define explicit `service_role` policies.
+  - **service_role** `FOR ALL` policy for edge writes.
+- Client inserts go through RPCs (`pause_create_or_reuse`, `pause_create_or_reuse_as`), so direct authenticated INSERT is intentionally not allowed.
 
 Runtime impact:
 
-- Browser client (`useHolzen`) inserts reflections and uses the user JWT, so RLS INSERT applies.
-- Cron (`check-volatility`) inserts reflections using service role.
+- Browser client uses RPCs for manual pause creation.
+- Cron (`check-volatility`) inserts pauses using service role.
 
 Risk / assumption:
 
-- Cron inserts rely on service-role bypass behavior.
-- If the code ever changes to use an authenticated client for cron inserts, it would fail RLS unless new policies are added.
+- Cron inserts rely on service-role bypass (or explicit service role policy above).
+The RPCs should be the only authenticated insert path; direct INSERTs are not allowed.
 
-### `reflection_companions`
+### `pause_ai_artifacts`
 
-Migration: `supabase/migrations/20260321000005_normalize_companion_data.sql`
+Migration: `supabase/migrations/20260423200720_pause_ai_artifacts.sql`
 
 - Enables RLS.
 - Policies:
-  - **SELECT** for authenticated: allowed when `reflection_id IN (SELECT id FROM reflections WHERE user_id = auth.uid())`
-  - **UPDATE** for authenticated: same `USING (...)` condition
+  - **SELECT** for authenticated where `auth.uid() = user_id`
   - **Service role full access**: `FOR ALL` when `auth.role() = 'service_role'`
-- `v_reflection_with_companions` has invoker security set via `supabase/migrations/20260329190000_v_reflection_with_companions_security_invoker.sql` (good: it doesn’t accidentally bypass RLS through view ownership).
+  - **Owner INSERT/UPDATE** policy added in `20260423201500_pause_ai_artifacts_owner_write.sql`
 
 Runtime impact:
 
-- Browser reads reflection companion content and updates `read` flags (client uses browser client).
-- Orchestrator writes companion payloads and intervention payloads via `writeCompanionData` using a service-role client.
-
-Notable nuance:
-
-- The authenticated `FOR UPDATE` policy specifies `USING(...)` but does not explicitly define a `WITH CHECK(...)`.
-- In this particular app, updates appear to only toggle `read` boolean (no changes to `reflection_id`), so it’s likely safe in practice.
-
-Hardening candidate:
-
-- Add `WITH CHECK` mirroring the same `reflection_id IN (SELECT ...)` condition to make the policy fully explicit and robust against future update shapes.
+- Browser reads artifacts to hydrate Pause UI.
+- Orchestrator writes companion/intervention payloads via service role.
+- Manual path can upsert reflection_text/haiku with owner policies.
 
 ### `analytics_events`
 
@@ -218,36 +209,34 @@ Risk / assumption:
 
 Solid (explicit policies):
 
-- `reflection_companions` has explicit service-role full access policy.
+- `pause_ai_artifacts` has explicit service-role full access policy.
 - `user_companion_serves` has explicit service-role full access policy.
-- User isolation for reads/updates is explicit for the above and for `pause_notifications` SELECT.
+- User isolation for reads/updates is explicit for the above and for `notifications` SELECT.
 
 Assumption-heavy (no explicit service-role insert/update policies observed in the inspected migrations):
 
-- `pause_notifications` INSERT (cron)
+- `notifications` INSERT (cron)
 - `companion_cache` INSERT (cron)
 - `companion_serves` INSERT (orchestrator)
 - `generation_attempts` INSERT (orchestrator)
-- `reflections` INSERT/UPDATE (cron)
+- `pause_instances` INSERT/UPDATE (cron)
 - `profiles` UPDATE (cron)
 - `analytics_events` INSERT (edge/orchestrator)
 
 In all these cases, correctness depends on Supabase service-role key bypassing RLS.
 
-Additional mitigation: `companion-orchestrate` now explicitly checks `reflections.user_id === userId` for any provided `reflectionId` (returns `403` otherwise), so cross-user writes are blocked even though the service-role client bypasses RLS.
+Additional mitigation: `companion-orchestrate` explicitly checks `pause_instances.user_id === userId` for any provided `pauseInstanceId` (returns `403` otherwise), so cross-user writes are blocked even though the service-role client bypasses RLS.
 
 ## Recommended validation & hardening options
 
 1. Validation (in Supabase SQL editor / dashboard):
-   - Run a service-role authenticated INSERT against each “assumption-heavy” table and confirm it succeeds.
-   - Optionally, run the same INSERT with an authenticated user to confirm it fails where expected.
-
+  - Run a service-role authenticated INSERT against each “assumption-heavy” table and confirm it succeeds.
+  - Optionally, run the same INSERT with an authenticated user to confirm it fails where expected.
 2. Hardening (if you want defense-in-depth):
-   - Add explicit `service_role` `FOR INSERT` and `FOR UPDATE` policies for the tables the edge functions write to:
-     - `pause_notifications`, `reflections`, `profiles`, `analytics_events`, `companion_cache`, `companion_serves`, `generation_attempts`
-   - This makes the security model self-documenting and reduces reliance on service-role bypass semantics.
+  - Add explicit `service_role` `FOR INSERT` and `FOR UPDATE` policies for the tables the edge functions write to:
+    - `notifications`, `pause_instances`, `profiles`, `analytics_events`, `companion_cache`, `companion_serves`, `generation_attempts`
+  - This makes the security model self-documenting and reduces reliance on service-role bypass semantics.
 
 ## Open question
 
 Do you prefer we keep the “service-role bypass is the invariant” model (simpler migrations), or should we harden by adding explicit `service_role` policies for every edge-write table (more migrations, clearer intent)?
-

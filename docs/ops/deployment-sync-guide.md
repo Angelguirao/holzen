@@ -90,9 +90,12 @@ Frontend is safe — it only goes live when you click **Publish → Update** in 
 
 ```
 □ Local tests pass                          npm run test
-□ Production build succeeds                 npm run build
+□ Production build succeeds                 npm run build (runs **`check:version-sync`** via **`prebuild`**)
 □ Lint is clean on changed files            npm run lint
+□ View migrations safe (OR REPLACE VIEW)   npm run check:view-migrations
 □ Edge functions type-check                 npm run check:edge
+□ Edge handlers wrapped for logging         npm run check:edge-logging
+□ EdgeCoverage manifest matches config      npm run check:edge-coverage-manifest
 □ New migrations tested locally             npm run supabase:reset
 □ New edge functions have config.toml entry
 □ New secrets documented / already added
@@ -101,6 +104,12 @@ Frontend is safe — it only goes live when you click **Publish → Update** in 
 □ **New DB columns used by code** — use `as unknown as T` pattern (see below)
 □ **AI provider pricing** — if the last entry in `docs/systems/costs/ai-cost-model.md` §10 is **> 90 days old**, re-verify Perplexity + Google Gemini list prices via Context7, update `DEFAULT_COST_MAP` in `supabase/functions/_shared/observe.ts`, and add a changelog entry. See §1.3 of the cost doc for the drift policy.
 ```
+
+### Combined local gate (`npm run check:prepush`)
+
+`npm run check:prepush` runs `scripts/pre-push-check.sh`: edge release stamp (**`node scripts/stamp-edge-release.mjs`**, same effect as **`npm run stamp:release`**), **`npm run check:view-migrations`** (unsafe `CREATE OR REPLACE VIEW` patterns), every `supabase/functions/<name>/` has a matching `[functions.<name>]` in `config.toml`, **`npm run check:edge`** (skips if Deno missing), **`npm run check:edge-logging`**, **`npm run check:edge-coverage-manifest`**, **`npm run test`**, **`npm run build`** (which runs **`prebuild`** → **`npm run check:version-sync`**), and (when Docker + Supabase CLI are available) a local **`supabase db reset`**. **Requires `bash`** — on Windows use **Git Bash** or **WSL** (PowerShell alone will not run this script).
+
+**Optional deeper probe** after changing request logging / `x-cid` behavior: **`npm run smoke:edge-logging`** — OPTIONS each HTTP edge URL and assert `x-cid` round-trip (and optionally BetterStack query when `LOG_DRAIN_QUERY_*` are set). See **`supabase/functions/README.md`**.
 
 ### TypeScript types lag behind migrations (build-breaking chicken-and-egg)
 
@@ -125,6 +134,7 @@ Define your own interface for the expected shape and cast through `unknown`. The
 1. **Same-commit migrations + code:** Always use `as unknown as T` for queries touching new columns.
 2. **Two-commit approach (safest):** Push the migration first, wait for Lovable to sync and regenerate types, then push the code that uses the new columns.
 3. **Wrap in try/catch** when the table or column genuinely might not exist yet (pre-migration graceful degradation).
+4. **`npm run gen:types`** — Regenerates `src/integrations/supabase/types.ts` from the **linked** project (`supabase login` or `SUPABASE_ACCESS_TOKEN`). Run after schema-changing migrations so the repo matches production.
 
 ### Migrations that unlock Edge code (same push)
 
@@ -137,6 +147,16 @@ Some Edge functions assume columns already exist — e.g. **`fetch-source-feeds`
 3. **Optional Edge secrets** (no deploy blocker if unset): `FETCH_FEEDS_MAX_SOURCES`, `FETCH_FEEDS_MAX_ARTICLES_PER_SOURCE`, `FETCH_FEEDS_ARTICLE_DELAY_MS` — defaults apply; add in **Cloud → Secrets** only for launch backfills.
 
 **`npm run check:edge`:** Runs `scripts/check-edge.mjs` (`deno check` on every `supabase/functions/*/index.ts` except `_shared`). It resolves the Deno binary from PATH, then `DENO_INSTALL/bin`, then `~/.deno/bin` (official installer default). Uses `--no-lock` so it does not write a root `deno.lock`. If Deno is missing entirely, the script exits 0 with a skip message.
+
+**`npm run check:edge-logging`:** Runs `scripts/check-edge-logging.mjs` — a fast regex guard that HTTP-serving edge entrypoints wrap handlers in `withRequestLogging` (BetterStack + Sentry path). CI runs it via `npm run test:ci`; **`npm run check:prepush`** runs it too.
+
+**`npm run check:view-migrations`:** Runs `scripts/lint-view-migrations.mjs` — fails when a migration would break Postgres by renaming/dropping columns on `CREATE OR REPLACE VIEW` without a prior `DROP VIEW`. **`npm run check:prepush`** runs it first (after the edge release stamp).
+
+**`npm run check:edge-coverage-manifest`:** Runs `scripts/verify-edge-coverage-manifest.mjs` — every `[functions.<name>]` in `supabase/config.toml` must appear in `src/pages/EdgeCoverage.tsx` `COVERAGE` (and extras are forbidden). CI runs this via `npm run test:ci`. It is also included in **`npm run check:prepush`** (see **Combined local gate** above). Update the `COVERAGE` row flags when you change observability patterns in a function's `index.ts`.
+
+**`npm run check:version-sync`:** Runs `scripts/check-version-sync.mjs` — compares **`package.json` `version`** to the latest **`changelog_entries`** row (PostgREST). **`npm run build`** runs it automatically via the **`prebuild`** hook.
+
+**`npm run stamp:release` / `npm run check:release-stamp`:** `scripts/stamp-edge-release.mjs` keeps **`EDGE_RELEASE`** in **`supabase/functions/_shared/release.ts`** aligned with **`git rev-parse --short=12 HEAD`** for edge Sentry/BetterStack release tags. **`npm run check:release-stamp`** fails if that file is stale (read-only). **`npm run check:prepush`** runs the stamp step first (warns if the file changed so you can commit).
 
 ## Troubleshooting
 

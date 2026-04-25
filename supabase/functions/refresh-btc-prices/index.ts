@@ -1,6 +1,6 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.57.2";
-import { holzenEdgeError, holzenEdgeRun, holzenEdgeWarn } from "../_shared/holzen-edge-log.ts";
+import { unknownErrorForLog } from "../_shared/log-unknown-error.ts";
 import { btcOnThisDayYearOffsets } from "../_shared/btc-on-this-day-config.ts";
 import { coingeckoHeaders } from "../_shared/coingecko.ts";
 import { warmMissingBtcPrices } from "../_shared/btc-price-warm.ts";
@@ -42,17 +42,22 @@ const corsHeaders = {
  */
 
 serve(
-  withRequestLogging("refresh-btc-prices", async ({ req }) => {
+  withRequestLogging("refresh-btc-prices", async ({ req, log }) => {
   const t0 = Date.now();
 
   try {
-    holzenEdgeRun("refresh-btc", "request", { method: req.method });
     const { verifyServiceAuth } = await import("../_shared/auth.ts");
     if (!verifyServiceAuth(req)) {
-      holzenEdgeRun("refresh-btc", "auth rejected");
+      log.warn("refresh_btc_phase", {
+        holzen_event: "refresh_btc_cron",
+        phase: "service_auth_rejected",
+      });
       return new Response(JSON.stringify({ error: "Unauthorized" }), { status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" } });
     }
-    holzenEdgeRun("refresh-btc", "auth ok");
+    log("refresh_btc_phase", {
+      holzen_event: "refresh_btc_cron",
+      phase: "service_auth_ok",
+    });
 
     const serviceRoleKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? "";
     const supabase = createClient(
@@ -79,17 +84,27 @@ serve(
             fetched_at: new Date().toISOString(),
           });
           if (upErr) {
-            holzenEdgeError("refresh-btc", "current price upsert failed", upErr);
+            log.error("refresh_btc_current", {
+              holzen_event: "refresh_btc_cron",
+              phase: "current_upsert_failed",
+              ...unknownErrorForLog(upErr),
+            });
             results.push("current: upsert failed");
           } else {
             results.push(`current: $${Math.round(price)}`);
           }
         } else {
-          holzenEdgeWarn("refresh-btc", "current price: OK response but missing bitcoin.usd");
+          log.warn("refresh_btc_current", {
+            holzen_event: "refresh_btc_cron",
+            phase: "current_missing_bitcoin_usd",
+          });
           results.push("current: no price in JSON");
         }
       } else if (res.status === 429) {
-        holzenEdgeWarn("refresh-btc", "CoinGecko rate limited for current price");
+        log.warn("refresh_btc_current", {
+          holzen_event: "refresh_btc_cron",
+          phase: "coingecko_rate_limited_current",
+        });
         coingeckoInterCallMs = 12000; // reduce immediate second 429 on market_chart/range
         // Try backup: Blockchain.info
         try {
@@ -105,7 +120,11 @@ serve(
                 fetched_at: new Date().toISOString(),
               });
               if (upErr) {
-                holzenEdgeError("refresh-btc", "current price (backup) upsert failed", upErr);
+                log.error("refresh_btc_current", {
+                  holzen_event: "refresh_btc_cron",
+                  phase: "current_backup_upsert_failed",
+                  ...unknownErrorForLog(upErr),
+                });
                 results.push("current (backup): upsert failed");
               } else {
                 results.push(`current (backup): $${Math.round(price)}`);
@@ -116,11 +135,19 @@ serve(
           }
         } catch { /* backup also failed */ }
       } else {
-        holzenEdgeWarn("refresh-btc", "current price: CoinGecko non-OK", { status: res.status });
+        log.warn("refresh_btc_current", {
+          holzen_event: "refresh_btc_cron",
+          phase: "coingecko_non_ok",
+          http_status: res.status,
+        });
         results.push(`current: HTTP ${res.status}`);
       }
     } catch (e) {
-      holzenEdgeError("refresh-btc", "current price fetch error", e);
+      log.error("refresh_btc_current", {
+        holzen_event: "refresh_btc_cron",
+        phase: "current_fetch_error",
+        ...unknownErrorForLog(e),
+      });
     }
 
     await new Promise((r) => setTimeout(r, coingeckoInterCallMs));
@@ -151,7 +178,8 @@ serve(
       .from("btc_price_cache")
       .select("date")
       .in("date", dateKeys);
-    const alreadyCached = new Set((cached ?? []).map((r: any) => r.date));
+    const cachedRows = (cached ?? []) as { date: string }[];
+    const alreadyCached = new Set(cachedRows.map((r) => r.date));
     const missingTargets = yearTargets.filter((t) => !alreadyCached.has(t.dateKey));
 
     if (missingTargets.length > 0) {
@@ -170,7 +198,9 @@ serve(
         } else if (warm.skippedRecent === missingTargets.length) {
           results.push(`historical: all ${missingTargets.length} fetched <15min ago (skipped)`);
         } else {
-          holzenEdgeWarn("refresh-btc", "historical: no dates resolved via /history", {
+          log.warn("refresh_btc_historical", {
+            holzen_event: "refresh_btc_cron",
+            phase: "historical_no_dates_resolved",
             missing: missingTargets.length,
             rate_limited: warm.rateLimited,
             other_failures: warm.other,
@@ -182,7 +212,11 @@ serve(
           );
         }
       } catch (e) {
-        holzenEdgeError("refresh-btc", "historical warm failed", e);
+        log.error("refresh_btc_historical", {
+          holzen_event: "refresh_btc_cron",
+          phase: "historical_warm_failed",
+          ...unknownErrorForLog(e),
+        });
         results.push("historical: warm helper failed");
       }
     } else {
@@ -190,13 +224,21 @@ serve(
     }
 
     const summary = results.length > 0 ? results.join("; ").slice(0, 500) : "no steps recorded";
-    // Always emit completion so operators see current vs historical outcome when HOLZEN_EDGE_LOG=0.
-    holzenEdgeRun("refresh-btc", "run complete", { ms: Date.now() - t0, summary });
+    log("refresh_btc_complete", {
+      holzen_event: "refresh_btc_cron",
+      phase: "run_complete",
+      ms: Date.now() - t0,
+      summary,
+    });
     return new Response(JSON.stringify({ success: true, results }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
   } catch (e) {
-    holzenEdgeError("refresh-btc", "uncaught error", e);
+    log.error("refresh_btc_uncaught", {
+      holzen_event: "refresh_btc_cron",
+      phase: "uncaught",
+      ...unknownErrorForLog(e),
+    });
     return new Response(JSON.stringify({ error: String(e) }), {
       status: 500,
       headers: { ...corsHeaders, "Content-Type": "application/json" },

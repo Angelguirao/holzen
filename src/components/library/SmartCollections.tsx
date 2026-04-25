@@ -40,7 +40,7 @@ export function SmartCollections({ items, onSelect, isReflectionIncomplete }: Pr
           name: t('library.smartNoOutcome', { defaultValue: 'No outcome yet' }),
           emoji: '⏳',
           description: t('library.smartNoOutcomeDesc', {
-            defaultValue: `${noOutcome.length} reflections awaiting a decision`,
+            defaultValue: `${noOutcome.length} pauses awaiting a decision`,
             count: noOutcome.length,
           }),
           items: noOutcome,

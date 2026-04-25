@@ -4,6 +4,7 @@ import { BottomNav } from './BottomNav';
 import { NotificationBell } from './NotificationBell';
 import { PauseReadyBanner } from './PauseReadyBanner';
 import { CheckoutConfirmation } from './CheckoutConfirmation';
+import { PaywallSubscribedTracker } from './PaywallSubscribedTracker';
 import { useHolzen } from '@/hooks/use-holzen';
 import { useLanguageSync } from '@/hooks/use-language-sync';
 import { useAutoTrigger } from '@/hooks/use-auto-trigger';
@@ -37,7 +38,7 @@ function PageChunkFallback() {
 /**
  * Warm up the main-tab route chunks so switching tabs feels instant the first
  * time. Runs once when the authenticated shell mounts, on an idle callback so
- * it never competes with critical rendering.
+ * it never competes with critical rendering (Home, Library, Journey, Settings, Tools).
  */
 function useTabChunkPrefetch() {
   useEffect(() => {
@@ -47,6 +48,7 @@ function useTabChunkPrefetch() {
       void import('@/pages/Library').catch(() => {});
       void import('@/pages/Profile').catch(() => {});
       void import('@/pages/Settings').catch(() => {});
+      void import('@/pages/ToolsHub').catch(() => {});
     };
     const ric = (window as Window & {
       requestIdleCallback?: (cb: () => void, opts?: { timeout: number }) => number;
@@ -76,6 +78,7 @@ export function AppLayout() {
       {/* Show banner on non-Home pages when auto-trigger fires */}
       {!isHome && <PauseReadyBanner visible={pauseReady} onDismiss={dismiss} />}
       <CheckoutConfirmation />
+      <PaywallSubscribedTracker />
       <div className="w-full max-w-sm pt-4">
         <header className="mb-10 flex items-center justify-between">
           <h1 className="text-sm font-mono tracking-[0.25em] uppercase" style={{ color: '#DBB366' }}>

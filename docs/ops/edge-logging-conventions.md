@@ -52,7 +52,7 @@ Edge function
 ## PII rules (see [pii-masking-review.md](pii-masking-review.md) for the PR checklist)
 
 - Never pass `prompt`, `reflection`, `content`, `message`, `body`, `input` as keys in `log()` extra.
-- Pass IDs (`reflection_id`, `companion_id`) and stable codes.
+- Pass IDs (`pause_instance_id`, `companion_id`) and stable codes.
 - Don't log full emails; use `user_id`.
 - Don't log full URLs with query strings that include identifying data. The BetterStack forwarder includes the path, not the full URL, for `request.start`.
 
@@ -152,4 +152,4 @@ Wrapper outputs:
 ## Local dev
 
 - Without `LOG_DRAIN_URL` / `SENTRY_DSN_EDGES`, the forwarder + Sentry both no-op. You still get JSON log lines in `supabase functions serve` stdout.
-- Set `HOLZEN_EDGE_LOG=0` to quiet gated `holzenEdgeLog` lines (errors + `holzenEdgeRun` always shown).
+- Edge handlers use the bound **`log`** from **`withRequestLogging`** only — no separate “quiet mode” env for stdout; adjust verbosity in code (fewer hot-path **`log`** calls) or filter in the log UI.

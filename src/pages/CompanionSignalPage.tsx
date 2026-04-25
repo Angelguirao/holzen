@@ -1,15 +1,10 @@
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { useNavigate, useParams, useLocation, Navigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { supabase } from '@/integrations/supabase/client';
 import { useHolzen } from '@/hooks/use-holzen';
 import { useCompanionData } from '@/hooks/use-companion-data';
-import {
-  DEFAULT_COMPANIONS,
-  DEFAULT_PREFS,
-  viewRowToCompanionData,
-  type FetchedReflectionRow,
-} from '@/lib/pause-session-storage';
+import { DEFAULT_COMPANIONS, DEFAULT_PREFS } from '@/lib/pause-session-storage';
+import { loadPauseSessionSnapshot, type PauseSessionSnapshot } from '@/lib/pause-page-loader';
 import { CompanionFeedback } from '@/components/CompanionFeedback';
 import { CompanionFocusLayout } from '@/components/companion/CompanionFocusLayout';
 import { SignalFullView } from '@/components/companion/SignalFullView';
@@ -28,7 +23,6 @@ const SEVERITY_NUMBER: Record<string, number> = { mild: 3, moderate: 6, high: 10
  */
 const BREATHING_ROOM_MS = 8000;
 
-type Row = FetchedReflectionRow & { mood?: string | null };
 
 /**
  * Full-screen Signal chapter — dedicated route opened via the "Open full view"
@@ -37,43 +31,39 @@ type Row = FetchedReflectionRow & { mood?: string | null };
  * breathing-room, cross-reference badge, Pro-gated save-this-moment).
  */
 export default function CompanionSignalPage() {
-  const { reflectionId: rid } = useParams<{ reflectionId: string }>();
+  const { pauseInstanceId: rid } = useParams<{ pauseInstanceId: string }>();
   const navigate = useNavigate();
   const location = useLocation();
   const { t } = useTranslation();
   const { companionPrefs, severity } = useHolzen();
 
-  const [row, setRow] = useState<Row | null>(null);
+  const [snapshot, setSnapshot] = useState<PauseSessionSnapshot | null>(null);
   const [loadError, setLoadError] = useState(false);
 
   useEffect(() => {
     if (!rid) return;
     let cancelled = false;
-    setRow(null);
+    setSnapshot(null);
     setLoadError(false);
     void (async () => {
-      const { data, error } = await supabase
-        .from('v_reflection_with_companions')
-        .select('id, message, context, mood, haiku, grounding_title, grounding_body')
-        .eq('id', rid)
-        .maybeSingle();
+      const s = await loadPauseSessionSnapshot(rid);
       if (cancelled) return;
-      if (error || !data?.message) {
+      if (!s) {
         setLoadError(true);
         return;
       }
-      setRow(data as Row);
+      setSnapshot(s);
     })();
     return () => {
       cancelled = true;
     };
   }, [rid]);
 
-  const reflectionId = row?.id ?? null;
-  const reflectionMessage = row?.message ?? '';
-  const context = row?.context ?? null;
-  const mood = row?.mood ?? null;
-  const companions = useMemo(() => (row ? viewRowToCompanionData(row) : DEFAULT_COMPANIONS), [row]);
+  const pauseInstanceId = snapshot?.id ?? null;
+  const reflectionMessage = snapshot?.reflectionMessage ?? '';
+  const context = snapshot?.context ?? null;
+  const mood = snapshot?.mood ?? null;
+  const companions = snapshot?.companions ?? DEFAULT_COMPANIONS;
   const prefs = companionPrefs ?? DEFAULT_PREFS;
   const severityNumber = SEVERITY_NUMBER[severity] ?? 6;
 
@@ -91,7 +81,7 @@ export default function CompanionSignalPage() {
   } = useCompanionData({
     companions,
     prefs: { ...prefs, signal: true },
-    reflectionId,
+    pauseInstanceId,
     context,
     reflectionMessage,
     mood,
@@ -99,12 +89,12 @@ export default function CompanionSignalPage() {
   });
 
   useEffect(() => {
-    if (!reflectionId || !reflectionMessage) return;
+    if (!pauseInstanceId || !reflectionMessage) return;
     if (interventionLoading) return;
     if (signal || signalLoading || signalError) return;
     void fetchCompanion('signal');
   }, [
-    reflectionId,
+    pauseInstanceId,
     reflectionMessage,
     interventionLoading,
     signal,
@@ -114,7 +104,7 @@ export default function CompanionSignalPage() {
   ]);
 
   const revealed = useStaggeredReveal(BREATHING_ROOM_MS);
-  useFullviewTelemetry('signal', reflectionId);
+  useFullviewTelemetry('signal', pauseInstanceId);
 
   const handleBack = useCallback(() => {
     const st = location.state as { from?: string } | undefined;
@@ -137,7 +127,7 @@ export default function CompanionSignalPage() {
     );
   }
 
-  if (!row) {
+  if (!snapshot) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-background" role="status" aria-busy="true">
         <div className="h-8 w-8 rounded-full border-2 border-primary/20 border-t-primary/60 animate-spin" />
@@ -175,10 +165,10 @@ export default function CompanionSignalPage() {
               seedTitle={signal.title}
               seedContext={signal.body}
               companion="signal"
-              reflectionId={reflectionId}
+              pauseInstanceId={pauseInstanceId}
             />
             <CompanionFeedback
-              reflectionId={reflectionId}
+              pauseInstanceId={pauseInstanceId}
               companionType="signal"
               cacheId={cacheIds.signal}
               regenerateSlot="signal"
@@ -188,7 +178,7 @@ export default function CompanionSignalPage() {
           </div>
         )}
 
-        <HistoryThread companion="signal" currentReflectionId={reflectionId} />
+        <HistoryThread companion="signal" currentPauseInstanceId={pauseInstanceId} />
       </div>
     </CompanionFocusLayout>
   );

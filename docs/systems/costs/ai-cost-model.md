@@ -92,7 +92,7 @@ spent — a row without logging still runs but cannot be capped per-user.
 | `monthly-report`                                  | cron                             | Lovable `gemini-2.5-flash-lite`                            | ✓                          | Report email sent **without** AI paragraph |
 | `grounding-enrich`                                | user                             | Lovable `gemini-2.5-flash` (cache hits skip)               | (via `createLogger`)       | 503                                        |
 | `admin-library-preview`                           | admin                            | Lovable `gemini-2.5-flash-lite`                            | ✓                          | 503                                        |
-| `pregenerate-companions`                          | cron                             | Perplexity + Lovable (same as orchestrate)                 | ✓                          | Skip run                                   |
+| `pregenerate-companions`                          | cron                             | Fills `companion_cache` only (not `companion-orchestrate`); need-based top-up; Perplexity + Lovable per step when below target | ✓                   | Skip run                                   |
 | `fetch-source-feeds`                              | cron                             | Lovable + optional Perplexity                              | ✓                          | Skip run                                   |
 | `personalized-nudge`                              | cron                             | **none** — CoinGecko + Lovable Email only                  | N/A                        | N/A                                        |
 | `deliver-letters`                                 | cron                             | **none** — stored letters + push                           | N/A                        | N/A                                        |
@@ -144,7 +144,7 @@ sessions incur retries, larger contexts, or heavier prompt payloads.
 
 Each scenario assumes Pro users (who consume AI) and excludes free-tier users
 past their 3-pause/month cap. These are stress figures; the cache warmer, the
-reflection_companions skip-cache path, and user behavior all cut real numbers
+`pause_ai_artifacts` / companion-cache skip paths, and user behavior all cut real numbers
 below them.
 
 ### 4.0 Shared assumptions
@@ -242,7 +242,7 @@ health issue — a prompt regression shouldn't trip the breaker).
 | `lovable` | Signal, Grounding, History, Zoom-Out, Intervention, Reflection, + all non-companion AI features | Same: skip live phase; cache/library/fallback still serve. Reflection falls back to the curated pool. |
 
 **Cached serves are completely unaffected.** Rows already written to
-`reflection_companions`, `companion_cache` hits, and `content_library` hits
+`pause_ai_artifacts`, `companion_cache` hits, and `content_library` hits
 all keep serving. Only *new* live generation is skipped for the duration
 of the trip.
 

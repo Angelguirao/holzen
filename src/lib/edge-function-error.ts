@@ -14,9 +14,20 @@ export type ParsedEdgeFunctionError = {
   details: Record<string, unknown> | null;
 };
 
+async function readInvokePayloadFromError(error: unknown): Promise<EdgeInvokePayload | undefined> {
+  if (!error || typeof error !== "object") return undefined;
+  const ctx = (error as { context?: unknown }).context;
+  if (!ctx || typeof ctx !== "object") return undefined;
+  const json = (ctx as { json?: unknown }).json;
+  if (typeof json !== "function") return undefined;
+  const raw = await (json as () => Promise<unknown>)();
+  if (!raw || typeof raw !== "object") return undefined;
+  return raw as EdgeInvokePayload;
+}
+
 export async function parseEdgeFunctionError(error: unknown): Promise<ParsedEdgeFunctionError> {
   try {
-    const payload = await (error as any)?.context?.json?.() as EdgeInvokePayload | undefined;
+    const payload = await readInvokePayloadFromError(error);
     if (!payload) return { message: null, code: null, details: null };
     if (typeof payload.error === "string") {
       return {

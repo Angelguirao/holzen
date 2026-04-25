@@ -1,5 +1,11 @@
 # Grounding companion (end-to-end)
 
+> **Pause V2:** This doc reflects the current model. Companion payloads
+> are stored in `pause_ai_artifacts` (one row per `pause_instance_id` + `kind`);
+> the legacy `reflection_companions` / `reflections.grounding_*` storage paths
+> were removed in the V2 cutover.
+
+
 **Grounding** (also called **Ground** in the UI) is the pause **card** that surfaces a short **behavioral finance nudge**: a research-grounded insight about a cognitive bias relevant to the current market situation, with an academic citation.
 
 This page is the **companion-level** view. For **manual vs automatic pause**, **interventions**, **cost limits**, and the full **orchestrator** contract, see the system doc: **[AI-powered pause system](../ai-powered-pause-system.md)** (especially **§5** `companion-orchestrate`, **§6** generators, **§7.7** Grounding reference table).
@@ -8,9 +14,9 @@ This page is the **companion-level** view. For **manual vs automatic pause**, **
 
 ## 1. Where Grounding sits in the pipeline
 
-1. User completes reflection; when the user **taps the Ground card**, **`use-companion-data`** invokes **`companion-orchestrate`** with `enableGrounding: true` (lazy loading). If Grounding data is already cached in `reflection_companions`, it is hydrated from DB without a network call.
+1. User completes reflection; when the user **taps the Ground card**, **`use-companion-data`** invokes **`companion-orchestrate`** with `enableGrounding: true` (lazy loading). If Grounding data is already cached in `pause_ai_artifacts`, it is hydrated from DB without a network call.
 2. **`companion-orchestrate`** runs **`generateGrounding`** in `_shared/generators/grounding.ts` when **`enableGrounding`** is true (or when the intervention **requires** it — trap type), passing **context**, **session intent** (`preferredBias`), **grounding source catalog**, and **recency dedup** fields.
-3. **`generateGrounding`** returns structured Grounding payload; the orchestrator **writes** **`reflection_companions`** (canonical), **`companion_serves`**, and **`reflections.grounding_*`** (denormalized for Home page display — Grounding is the **only** companion that still denormalizes to the base `reflections` table).
+3. **`generateGrounding`** returns structured Grounding payload; the orchestrator **writes** **`pause_ai_artifacts`** (canonical) and **`companion_serves`** for analytics.
 
 Grounding also serves as the **data source for trap interventions**: when `selectIntervention` picks trap, the orchestrator copies the grounding task result into `intervention.primary`.
 
@@ -22,7 +28,7 @@ Grounding also serves as the **data source for trap interventions**: when `selec
 |--------|--------|------|
 | **`groundingSources`** | `grounding_sources` + user prefs (`loadActiveOrchestrateSources('grounding')` in `companion-orchestrate-sources.ts`) | Optional **catalog**: names + URLs → hostnames for Perplexity **domain filter**. |
 | **`recentGroundingSources`** | `localStorage` keys + DB merge | Dedup: avoid repeating same sources across recent pauses. |
-| **`recentNudgeTopics`** | Recent grounding titles from `reflection_companions` | Dedup: avoid repeating same bias topics. |
+| **`recentNudgeTopics`** | Recent grounding titles from `pause_ai_artifacts` | Dedup: avoid repeating same bias topics. |
 | **`context`** | BTC + Fear & Greed + on-chain line | Grounds the bias selection in the current market move. |
 | **`preferredBias`** | `determineSessionIntent()` → **`groundingBias`** (`session-intent.ts`) | Aligns Grounding thematically with the rest of the pause session. |
 
@@ -93,8 +99,7 @@ When `selectIntervention` picks **trap** as the primary intervention:
 
 | Target | What | Why |
 |--------|------|-----|
-| **`reflection_companions`** | Full JSON payload (title, body, citation, url) | Canonical normalized store; used by lazy hydration on card tap. |
-| **`reflections.grounding_*`** | Denormalized title, body, citation, url columns | **Home page** reads grounding from the base table for performance. Grounding is the **only** companion that still denormalizes. |
+| **`pause_ai_artifacts`** | Full JSON payload (title, body, citation, url) | Canonical normalized store; used by lazy hydration on card tap. |
 | **`companion_serves`** | Source (`live`/`cache`/`curated`), latency, fingerprint | Analytics and monitoring. |
 | **`companion_cache`** | Cached payload with dedup fingerprint | Pool for future serves to same or other users. |
 
@@ -127,7 +132,7 @@ When `selectIntervention` picks **trap** as the primary intervention:
 | Content library | `supabase/functions/_shared/content-library.ts` |
 | Client invoke | `src/hooks/use-companion-data.ts` |
 | UI | `src/components/CompanionSection.tsx` (Ground card via `LearningInput`) |
-| Full View page | `src/pages/CompanionGroundingPage.tsx` (route `/companion/grounding/:reflectionId`) |
+| Full View page | `src/pages/CompanionGroundingPage.tsx` (route `/companion/grounding/:pauseInstanceId`) |
 | Full View presentation | `src/components/companion/GroundingFullView.tsx` |
 | Enrichment edge fn | `supabase/functions/grounding-enrich/index.ts` |
 | Enrichment helpers | `supabase/functions/_shared/grounding-enrichment-util.ts` |
@@ -141,14 +146,14 @@ When `selectIntervention` picks **trap** as the primary intervention:
 
 ## 9. Full View (reflect-step deep read)
 
-The inline Ground card in `CompanionSection` has an **"Open full view"** button that routes to **`/companion/grounding/:reflectionId`** (lazy-loaded in `src/App.tsx`). The Full View keeps the generated body verbatim and surrounds it with affordances that don't fit in the inline card:
+The inline Ground card in `CompanionSection` has an **"Open full view"** button that routes to **`/companion/grounding/:pauseInstanceId`** (lazy-loaded in `src/App.tsx`). The Full View keeps the generated body verbatim and surrounds it with affordances that don't fit in the inline card:
 
 - **Promoted citation CTA** — the tiny `ExternalLink` footnote in `LearningInput` becomes a proper **"Read the paper →"** link sitting directly under the citation text.
 - **Enrichment slot** — the `GroundingFullView` accepts an `enrichmentSlot` ReactNode where `CompanionGroundingPage` renders abstract preview + 1–2 sentence researcher bios + Semantic Scholar citation count from the `grounding-enrich` edge function (see §10). Missing fields hide silently — we never show a "couldn't enrich" banner.
 - **Read-time indicator** + **"Why this card now?"** disclosure with mood / market direction / session-intent transparency (explains why *this* bias was picked today).
 - **Cross-reference badge** — when the session's primary intervention was a `trap` that used this same Ground payload, a subtle **"This was also today's headline"** badge sits above the card so the repetition is acknowledged rather than confusing.
 - **Breathing-room pacing** (8 s) before feedback + save CTAs fade in.
-- **Per-user history thread** — the last 5 Ground cards for this user from `reflection_companions`, deep-linked to their own Full Views so the Full View doubles as a small personal archive of biases surfaced.
+- **Per-user history thread** — the last 5 Ground cards for this user from `pause_ai_artifacts`, deep-linked to their own Full Views so the Full View doubles as a small personal archive of biases surfaced.
 - **Related biases this month** — a distinct-by-normalized-title chip rail drawn from the last 30 days of the user's Ground cards. Complements the chronological history thread by showing *breadth* of biases surfaced rather than raw recency. Dedupe is title-based (titles are short bias labels per the structuring prompt), cap 8 chips.
 - **Pro-gated "Save this moment"** — captures the user's own reflection triggered by the card as a `library_items` note (`source_type: companion_moment`). Free users get a locked state with an upgrade toast.
 

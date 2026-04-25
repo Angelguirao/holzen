@@ -30,7 +30,7 @@ Use this for every PR that changes: user-facing components, Sentry wiring, PostH
 
 ## Edge logs
 
-- [ ] No `log()` or `logger.info/warn/error` call in a new code path passes a key matching `prompt|reflection|content|message|body|input` in `extra`. Use an ID (`reflection_id`, `companion_id`) and/or a short stable hash.
+- [ ] No `log()` or `logger.info/warn/error` call in a new code path passes a key matching `prompt|reflection|content|message|body|input` in `extra`. Use an ID (`pause_instance_id`, `companion_id`) and/or a short stable hash.
 - [ ] `logDependencyCall` does not log full request/response bodies for LLM calls. Spec-only (`service`, `op`, `model`, `tokens`, `duration_ms`, `cost_usd`).
 - [ ] `EdgeError.context` does not include PII. It can include IDs and stable codes.
 - [ ] `observe.ts` forwarder still drops content fields before HTTP-POSTing to BetterStack (no overrides that add new fields to the serialized entry without running them through the same filter).

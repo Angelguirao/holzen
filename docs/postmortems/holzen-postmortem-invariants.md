@@ -21,9 +21,9 @@ re-deriving the same mental model from scattered files.
    - Deep links (like `/pause` from notifications) may pass incomplete `location.state`.
    - The UI must fall back to `useHolzen()`’s loaded reflection fields rather than showing a permanent “no reflection” dead-end.
 
-3. **Any service-role write that uses `reflectionId` must validate ownership**
+3. **Any service-role write that uses `pauseInstanceId` must validate ownership**
    - Service-role clients bypass RLS.
-   - If user input can influence which rows are written, the edge function must explicitly check `reflections.user_id === userId`.
+   - If user input can influence which rows are written, the edge function must explicitly check `pause_instances.user_id === userId`.
 
 4. **Edge/cron pipelines are eventually consistent**
    - Cron/edge workers may create a “pause ready” record before companion rows are fully generated.
@@ -44,20 +44,20 @@ re-deriving the same mental model from scattered files.
 
 ### 2. Pause deep-link hydration & session restoration (Phase 2)
 
-- Root cause: `/pause` deep links (notably from the notification bell) may provide only `reflectionId` without `reflectionMessage/context`.
+- Root cause: `/pause` deep links (notably from the notification bell) may provide only `pauseInstanceId` without `reflectionMessage/context`.
   Meanwhile, `PauseSession.tsx` could discard/restore local session state in a way that left `message` empty temporarily, showing the wrong UI state.
 - Impact: notification-driven entry into the pause flow could land in the “no reflection” overlay or otherwise fail to render featured content.
 - Fix applied:
   - hydrate message/context/featured companions/prefs from `useHolzen()` when `location.state` is incomplete,
-  - tighten the session mismatch guard to discard saved session whenever `reflectionId` differs,
+  - tighten the session mismatch guard to discard saved session whenever `pauseInstanceId` differs,
   - avoid showing the “no reflection” screen while `useHolzen` is still hydrating.
 - Phase doc: `docs/reviews/phase-2-manual-pause-pipeline.md`
 
-### 3. Cross-user reflection write hardening (Phase 7)
+### 3. Cross-user pause write hardening (Phase 7)
 
-- Root cause: `companion-orchestrate` uses a service-role Supabase client for writes (RLS bypass). Without an explicit ownership check, a malicious caller could potentially write companion/intervention data to a reflection they don’t own (by supplying another user’s `reflectionId`).
+- Root cause: `companion-orchestrate` uses a service-role Supabase client for writes (RLS bypass). Without an explicit ownership check, a malicious caller could potentially write companion/intervention data to a pause they don’t own (by supplying another user’s `pauseInstanceId`).
 - Impact: cross-user data integrity risk.
 - Fix applied:
-  - `companion-orchestrate` now checks that the provided `reflectionId` belongs to `userId` (403 if not).
+  - `companion-orchestrate` now checks that the provided `pauseInstanceId` belongs to `userId` (403 if not).
 - Phase doc: `docs/reviews/phase-7-edge-function-auth-correctness.md`
 

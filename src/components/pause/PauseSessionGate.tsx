@@ -34,7 +34,9 @@ export function PauseSessionGate({
       return (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-background">
           <div className="text-center space-y-4">
-            <p className="text-sm font-mono text-muted-foreground">{t('common.loading', 'Loading...')}</p>
+            <p className="text-sm font-mono text-muted-foreground">
+              {t('common.loading', { defaultValue: 'Loading...' })}
+            </p>
           </div>
         </div>
       );
@@ -45,10 +47,10 @@ export function PauseSessionGate({
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-background">
           <div className="text-center space-y-4 max-w-sm px-4">
             <p className="text-sm font-mono text-muted-foreground">
-              {t(
-                'pause.couldNotLoadPause',
-                'We could not load this pause. It may have been removed or you may need to sign in again.',
-              )}
+              {t('pause.couldNotLoadPause', {
+                defaultValue:
+                  'We could not load this pause. It may have been removed or you may need to sign in again.',
+              })}
             </p>
             <button type="button" onClick={onReturn} className="text-xs font-mono text-primary underline">
               {t('pause.return')}
@@ -62,7 +64,9 @@ export function PauseSessionGate({
       return (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-background">
           <div className="text-center space-y-4">
-            <p className="text-sm font-mono text-muted-foreground">{t('common.loading', 'Loading...')}</p>
+            <p className="text-sm font-mono text-muted-foreground">
+              {t('common.loading', { defaultValue: 'Loading...' })}
+            </p>
           </div>
         </div>
       );

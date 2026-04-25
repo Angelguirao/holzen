@@ -98,7 +98,7 @@ export function GuidedJournal({ onComplete, textColor, ringColor }: Props) {
     setSaving(true);
     try {
       // Save practice entry
-      await supabase.from('practice_entries' as any).insert({
+      await supabase.from('practice_entries').insert({
         user_id: user.id,
         type: 'journal',
         body: body.trim(),

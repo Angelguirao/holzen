@@ -5,6 +5,7 @@ import { useNavigate } from 'react-router-dom';
 import { MoodCheck, type MoodValue } from '@/components/MoodCheck';
 import { MoodIcon } from '@/components/icons/MoodIcon';
 import { pauseStepLayout } from '@/components/pause/pause-step-layout';
+import { TOOLS } from '@/lib/app-routes';
 
 interface Props {
   onMoodAfterSelect: (mood: MoodValue) => void;
@@ -47,10 +48,10 @@ export function PauseShift({ onMoodAfterSelect, onMoodAfterSkip, onMoodAfterRese
             transition={{ delay: 0.2, duration: 0.6 }}
           >
             <p className={pauseStepLayout.screenTitle}>
-              {t('pause.didAnythingShift', 'Did anything shift?')}
+              {t('pause.didAnythingShift', { defaultValue: 'Did anything shift?' })}
             </p>
             <p className={`${pauseStepLayout.screenSubtitle} max-w-xs`}>
-              {t('moodCheck.afterDesc', 'After reflecting and grounding, check in again.')}
+              {t('moodCheck.afterDesc', { defaultValue: 'After reflecting and grounding, check in again.' })}
             </p>
           </motion.div>
 
@@ -80,7 +81,7 @@ export function PauseShift({ onMoodAfterSelect, onMoodAfterSkip, onMoodAfterRese
                 {t(`moodCheck.moods.${selectedMoodAfter}`)}
               </p>
               <p className="text-xs text-muted-foreground transition-colors group-hover:text-foreground/80">
-                {t('pause.tapToChange', 'tap to change')}
+                {t('pause.tapToChange', { defaultValue: 'tap to change' })}
               </p>
             </button>
           ) : (
@@ -89,10 +90,10 @@ export function PauseShift({ onMoodAfterSelect, onMoodAfterSkip, onMoodAfterRese
               className="group flex flex-col items-center gap-1"
             >
               <p className="text-sm font-medium text-muted-foreground transition-colors group-hover:text-foreground">
-                {t('common.skipped', 'Skipped')}
+                {t('common.skipped', { defaultValue: 'Skipped' })}
               </p>
               <p className="text-xs text-muted-foreground transition-colors group-hover:text-foreground/80">
-                {t('pause.tapToChange', 'tap to change')}
+                {t('pause.tapToChange', { defaultValue: 'tap to change' })}
               </p>
             </button>
           )}
@@ -106,15 +107,18 @@ export function PauseShift({ onMoodAfterSelect, onMoodAfterSkip, onMoodAfterRese
               transition={{ delay: 0.3, duration: 0.5 }}
             >
               <p className="text-sm leading-relaxed text-muted-foreground">
-                {t('pause.groundingNudge', 'Still feeling it? Maybe step away and try {{activity}} for a few minutes.', { activity: suggestedActivity })}
+                {t('pause.groundingNudge', {
+                  defaultValue: 'Still feeling it? Maybe step away and try {{activity}} for a few minutes.',
+                  activity: suggestedActivity,
+                })}
               </p>
               <button
                 type="button"
-                onClick={() => navigate('/ground')}
+                onClick={() => navigate(TOOLS.ground)}
                 className="inline-flex items-center gap-1.5 text-sm font-medium text-primary underline-offset-4 hover:underline"
               >
                 <Anchor className="h-2.5 w-2.5" />
-                {t('pause.goGround', 'Ground yourself')}
+                {t('pause.goGround', { defaultValue: 'Ground yourself' })}
               </button>
             </motion.div>
           )}
@@ -124,7 +128,7 @@ export function PauseShift({ onMoodAfterSelect, onMoodAfterSkip, onMoodAfterRese
             onClick={onContinue}
             className={pauseStepLayout.textContinue}
           >
-            {t('pause.steps.continue', 'Continue')}
+            {t('pause.steps.continue', { defaultValue: 'Continue' })}
           </button>
         </motion.div>
       )}
@@ -143,7 +147,7 @@ export function PauseShift({ onMoodAfterSelect, onMoodAfterSkip, onMoodAfterRese
             className={pauseStepLayout.backButton}
           >
             <ChevronLeft className="h-3 w-3" />
-            {t('pause.steps.back', 'Back')}
+            {t('pause.steps.back', { defaultValue: 'Back' })}
           </button>
         </motion.div>
       )}

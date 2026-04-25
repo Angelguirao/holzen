@@ -1,6 +1,7 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import { render, screen, cleanup, act, fireEvent, waitFor } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
+import { reactRouterFutureFlags } from '@/lib/router-future';
 
 /**
  * Verifies the wallet-refresh lifecycle in `CheckoutConfirmation` for
@@ -58,7 +59,7 @@ import { CheckoutConfirmation } from '@/components/CheckoutConfirmation';
 
 function renderAt(path: string) {
   return render(
-    <MemoryRouter initialEntries={[path]}>
+    <MemoryRouter future={reactRouterFutureFlags} initialEntries={[path]}>
       <CheckoutConfirmation />
     </MemoryRouter>,
   );

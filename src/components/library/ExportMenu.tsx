@@ -33,7 +33,7 @@ export function ExportMenu({ items, label }: Props) {
       <PopoverTrigger asChild>
         <button className="flex items-center gap-1 transition-colors ml-auto text-sm font-sans text-cyan-700">
           <Download className="h-2.5 w-2.5" />
-          {t('library.export', { defaultValue: 'Export' })}
+          {t('library.export')}
         </button>
       </PopoverTrigger>
       <PopoverContent align="end" className="w-40 p-1.5 space-y-0.5">
@@ -41,16 +41,16 @@ export function ExportMenu({ items, label }: Props) {
           onClick={handleCSV}
           className="w-full text-left text-[10px] font-mono px-2 py-1.5 rounded hover:bg-accent transition-colors text-foreground/80"
         >
-          CSV (.csv)
+          {t('library.exportCsv')}
         </button>
         <button
           onClick={handleMarkdown}
           className="w-full text-left text-[10px] font-mono px-2 py-1.5 rounded hover:bg-accent transition-colors text-foreground/80"
         >
-          Markdown (.md)
+          {t('library.exportMarkdown')}
         </button>
         <p className="text-[8px] font-mono text-muted-foreground/30 px-2 pt-1">
-          {items.length} {items.length === 1 ? 'item' : 'items'}
+          {t('library.itemCount', { count: items.length })}
         </p>
       </PopoverContent>
     </Popover>

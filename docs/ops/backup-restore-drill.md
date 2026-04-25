@@ -28,13 +28,13 @@ Frontend static assets are reproducible from Git; no backup needed.
 2. **Request a PITR restore** to a staging project. If dashboard access is available, Supabase Dashboard → Database → Backups → Point in Time → choose timestamp → restore to a **new** project. If not, open a support ticket with Lovable (include: project ID, target restore time UTC, reason "quarterly drill").
 3. **Verify row counts** on the restored project against expected:
    - `auth.users` count stable (grew since the restore point should reflect).
-   - `reflections` count.
+   - `pause_instances` count (Pause V2 canonical pause rows).
    - `companion_serves` count.
    - `generation_attempts` count (last 24h).
    - `audit_log` count (last 7 days).
 4. **Sanity check a user journey**:
    - Pick a recent `user_id` from `audit_log`.
-   - `SELECT * FROM reflections WHERE user_id = '<id>' ORDER BY created_at DESC LIMIT 5;` — rows exist.
+   - `SELECT * FROM pause_instances WHERE user_id = '<id>' ORDER BY created_at DESC LIMIT 5;` — rows exist.
    - `SELECT * FROM companion_serves WHERE user_id = '<id>' ORDER BY created_at DESC LIMIT 5;` — rows exist.
 5. **Tear down the staging project** (or let it auto-expire if Lovable trial).
 6. **Record the drill** in the log at the bottom of this doc.

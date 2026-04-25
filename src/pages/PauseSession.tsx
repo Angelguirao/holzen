@@ -24,24 +24,25 @@ import { parsePauseSessionLocationState } from '@/lib/router-location-state';
 import {
   DEFAULT_COMPANIONS,
   DEFAULT_PREFS,
-  type FetchedReflectionRow,
+  type FetchedPauseInstance,
   saveSession,
   loadSession,
   clearSession,
-  viewRowToCompanionData,
+  companionDataFromArtifacts,
 } from '@/lib/pause-session-storage';
+import { pauseLogStep } from '@/lib/pause-api';
 
 type HydrationReady = {
   status: 'ready';
   message: string;
   context: string | null;
-  reflectionId: string | null;
+  pauseInstanceId: string | null;
   companions: CompanionData;
   companionPrefs: CompanionPrefs;
   severity: 'mild' | 'moderate' | 'high';
 };
 
-type HydrationState = HydrationReady | { status: 'fetch'; reflectionId: string } | { status: 'empty' };
+type HydrationState = HydrationReady | { status: 'fetch'; pauseInstanceId: string } | { status: 'empty' };
 
 export default function PauseSession() {
   const { t } = useTranslation();
@@ -55,7 +56,7 @@ export default function PauseSession() {
     message: holzenMessage,
     context: holzenContext,
     companions: holzenCompanions,
-    lastReflectionId: holzenLastReflectionId,
+    lastPauseInstanceId: holzenLastPauseInstanceId,
     companionPrefs: holzenCompanionPrefs,
     severity: holzenSeverity,
     profileLoaded,
@@ -63,7 +64,7 @@ export default function PauseSession() {
   const { subscribed, refresh: refreshSubscription } = useSubscription();
 
   const {
-    reflectionId: navReflectionId,
+    pauseInstanceId: navPauseInstanceId,
     reflectionMessage: navReflectionMessage,
     context: navContext,
     companions: navCompanions,
@@ -74,12 +75,13 @@ export default function PauseSession() {
   const restored = useMemo(() => {
     const saved = loadSession();
     if (!saved?.message) return null;
-    if (navReflectionId && saved.reflectionId && saved.reflectionId !== navReflectionId) return null;
+    if (navPauseInstanceId && saved.pauseInstanceId && saved.pauseInstanceId !== navPauseInstanceId) return null;
     return saved;
-  }, [location.key, navReflectionId]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- keyed on location.key + navPauseInstanceId; loadSession is a stable module import
+  }, [location.key, navPauseInstanceId]);
 
   const holzenAligned =
-    !navReflectionId || (holzenLastReflectionId != null && holzenLastReflectionId === navReflectionId);
+    !navPauseInstanceId || (holzenLastPauseInstanceId != null && holzenLastPauseInstanceId === navPauseInstanceId);
 
   const hydration = useMemo((): HydrationState => {
     if (restored?.message) {
@@ -87,20 +89,19 @@ export default function PauseSession() {
         status: 'ready',
         message: restored.message,
         context: restored.context ?? null,
-        reflectionId: restored.reflectionId ?? navReflectionId ?? holzenLastReflectionId,
+        pauseInstanceId: restored.pauseInstanceId ?? navPauseInstanceId ?? holzenLastPauseInstanceId,
         companions: restored.companions ?? holzenCompanions ?? DEFAULT_COMPANIONS,
         companionPrefs: restored.companionPrefs ?? holzenCompanionPrefs ?? DEFAULT_PREFS,
         severity: restored.severity ?? holzenSeverity,
       };
     }
 
-    // Profile-backed hook: same reflection as router target (or no id in nav) — avoids stale nav text
     if (holzenMessage && holzenAligned) {
       return {
         status: 'ready',
         message: holzenMessage,
         context: holzenContext,
-        reflectionId: holzenLastReflectionId,
+        pauseInstanceId: holzenLastPauseInstanceId,
         companions: holzenCompanions ?? DEFAULT_COMPANIONS,
         companionPrefs: holzenCompanionPrefs ?? DEFAULT_PREFS,
         severity: holzenSeverity,
@@ -112,15 +113,15 @@ export default function PauseSession() {
         status: 'ready',
         message: navReflectionMessage,
         context: navContext ?? holzenContext,
-        reflectionId: navReflectionId ?? holzenLastReflectionId,
+        pauseInstanceId: navPauseInstanceId ?? holzenLastPauseInstanceId,
         companions: navCompanions ?? holzenCompanions ?? DEFAULT_COMPANIONS,
         companionPrefs: navCompanionPrefs ?? holzenCompanionPrefs ?? DEFAULT_PREFS,
         severity: navSeverity ?? holzenSeverity,
       };
     }
 
-    if (navReflectionId) {
-      return { status: 'fetch', reflectionId: navReflectionId };
+    if (navPauseInstanceId) {
+      return { status: 'fetch', pauseInstanceId: navPauseInstanceId };
     }
 
     if (holzenMessage) {
@@ -128,7 +129,7 @@ export default function PauseSession() {
         status: 'ready',
         message: holzenMessage,
         context: holzenContext,
-        reflectionId: holzenLastReflectionId,
+        pauseInstanceId: holzenLastPauseInstanceId,
         companions: holzenCompanions ?? DEFAULT_COMPANIONS,
         companionPrefs: holzenCompanionPrefs ?? DEFAULT_PREFS,
         severity: holzenSeverity,
@@ -140,12 +141,12 @@ export default function PauseSession() {
     restored,
     holzenMessage,
     holzenContext,
-    holzenLastReflectionId,
+    holzenLastPauseInstanceId,
     holzenCompanions,
     holzenCompanionPrefs,
     holzenSeverity,
     holzenAligned,
-    navReflectionId,
+    navPauseInstanceId,
     navReflectionMessage,
     navContext,
     navCompanions,
@@ -153,74 +154,96 @@ export default function PauseSession() {
     navSeverity,
   ]);
 
-  const [fetchedRow, setFetchedRow] = useState<FetchedReflectionRow | null>(null);
+  const [fetchedInstance, setFetchedInstance] = useState<FetchedPauseInstance | null>(null);
   const [fetchFailed, setFetchFailed] = useState(false);
 
-  const fetchReflectionId = hydration.status === 'fetch' ? hydration.reflectionId : null;
+  const fetchPauseInstanceId = hydration.status === 'fetch' ? hydration.pauseInstanceId : null;
 
   useEffect(() => {
-    if (!fetchReflectionId) {
-      setFetchedRow(null);
+    if (!fetchPauseInstanceId) {
+      setFetchedInstance(null);
       setFetchFailed(false);
       return;
     }
     let cancelled = false;
-    setFetchedRow(null);
+    setFetchedInstance(null);
     setFetchFailed(false);
     void (async () => {
-      const { data, error } = await supabase
-        .from('v_reflection_with_companions')
-        .select('id, message, context, haiku, grounding_title, grounding_body')
-        .eq('id', fetchReflectionId)
+      const { data: inst } = await supabase
+        .from('pause_instances' as never)
+        .select('id, context_snapshot')
+        .eq('id', fetchPauseInstanceId)
         .maybeSingle();
       if (cancelled) return;
-      if (error || !data?.message) {
+      if (!inst) {
         setFetchFailed(true);
         return;
       }
-      setFetchedRow(data as FetchedReflectionRow);
+      const { data: artifacts } = await supabase
+        .from('pause_ai_artifacts' as never)
+        .select('kind, content')
+        .eq('pause_instance_id', fetchPauseInstanceId);
+      if (cancelled) return;
+      const artifactRows = ((artifacts ?? []) as Array<{ kind: string; content: Record<string, unknown> }>);
+      const companionData = companionDataFromArtifacts(artifactRows);
+      const reflectionArt = artifactRows.find((a) => a.kind === 'reflection_text');
+      const msg = typeof reflectionArt?.content?.message === 'string' ? (reflectionArt.content.message as string) : '';
+      const ctxSnap = (inst as { context_snapshot: Record<string, unknown> | null }).context_snapshot ?? {};
+      const ctx = typeof ctxSnap.context_text === 'string' ? (ctxSnap.context_text as string) : null;
+      setFetchedInstance({
+        id: fetchPauseInstanceId,
+        reflection_message: msg,
+        context: ctx,
+        haiku: companionData.haiku,
+        grounding_title: companionData.groundingTitle,
+        grounding_body: companionData.groundingBody,
+      });
     })();
     return () => {
       cancelled = true;
     };
-  }, [fetchReflectionId]);
+  }, [fetchPauseInstanceId]);
 
   const resolved: HydrationReady | null = useMemo(() => {
     if (hydration.status === 'ready') return hydration;
-    if (hydration.status === 'fetch' && fetchedRow?.message) {
+    if (hydration.status === 'fetch' && fetchedInstance?.reflection_message) {
       return {
         status: 'ready',
-        message: fetchedRow.message,
-        context: fetchedRow.context ?? null,
-        reflectionId: fetchedRow.id,
-        companions: viewRowToCompanionData(fetchedRow),
+        message: fetchedInstance.reflection_message,
+        context: fetchedInstance.context ?? null,
+        pauseInstanceId: fetchedInstance.id,
+        companions: {
+          haiku: fetchedInstance.haiku,
+          groundingTitle: fetchedInstance.grounding_title,
+          groundingBody: fetchedInstance.grounding_body,
+        },
         companionPrefs: navCompanionPrefs ?? holzenCompanionPrefs ?? DEFAULT_PREFS,
         severity: navSeverity ?? holzenSeverity,
       };
     }
     return null;
-  }, [hydration, fetchedRow, navCompanionPrefs, holzenCompanionPrefs, navSeverity, holzenSeverity]);
+  }, [hydration, fetchedInstance, navCompanionPrefs, holzenCompanionPrefs, navSeverity, holzenSeverity]);
 
   useEffect(() => {
     holzenLog.pause('mount', {
-      reflectionIdPrefix: (fetchReflectionId ?? navReflectionId)?.slice(0, 8) ?? null,
+      pauseInstanceIdPrefix: (fetchPauseInstanceId ?? navPauseInstanceId)?.slice(0, 8) ?? null,
       hasNavMessage: navReflectionMessage.length > 0,
       restoredFromStorage: restored !== null,
       hydrationStatus: hydration.status,
     });
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- first paint of /pause only
+    // Intentional mount-only snapshot; listing deps would re-log on every navigation/hydration change.
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- mount-once diagnostic
   }, []);
 
   const message = resolved?.message ?? '';
   const context = resolved?.context ?? null;
-  const reflectionId = resolved?.reflectionId ?? null;
+  const pauseInstanceId = resolved?.pauseInstanceId ?? null;
   const companions = resolved?.companions ?? DEFAULT_COMPANIONS;
   const companionPrefs = resolved?.companionPrefs ?? DEFAULT_PREFS;
   const severity = resolved?.severity ?? holzenSeverity;
 
-  const waitingForFetch = hydration.status === 'fetch' && !fetchFailed && !fetchedRow;
+  const waitingForFetch = hydration.status === 'fetch' && !fetchFailed && !fetchedInstance;
 
-  // Map old step names to new ones for session restoration
   const mapStep = (s: string): PauseStep => {
     if (s === 'pause') return 'breathe';
     if (s === 'ground') return 'reflect';
@@ -239,19 +262,38 @@ export default function PauseSession() {
   const [breathingCompleted, setBreathingCompleted] = useState<boolean>(restored?.breathingCompleted ?? false);
   const [curtainLifted, setCurtainLifted] = useState(false);
   const [pauseImpactData, setPauseImpactData] = useState<{
-    mood: string | null; moodAfter: string | null; breathingCompleted: boolean;
-    decision: string | null; context: string | null; engagedTools: number;
-    wroteNote: boolean; usedTags: boolean;
+    mood: string | null;
+    moodAfter: string | null;
+    breathingCompleted: boolean;
+    decision: string | null;
+    context: string | null;
+    engagedTools: number;
+    wroteNote: boolean;
+    usedTags: boolean;
   } | null>(null);
 
-  // Persist session
   useEffect(() => {
     if (!message) return;
-    saveSession({ message, context, reflectionId, companions, companionPrefs, severity, moodDone, moodAfterDone, selectedMood, selectedMoodAfter, phase, decision, step, breathingCompleted });
+    saveSession({
+      message,
+      context,
+      pauseInstanceId,
+      companions,
+      companionPrefs,
+      severity,
+      moodDone,
+      moodAfterDone,
+      selectedMood,
+      selectedMoodAfter,
+      phase,
+      decision,
+      step,
+      breathingCompleted,
+    });
   }, [
     message,
     context,
-    reflectionId,
+    pauseInstanceId,
     companions,
     companionPrefs,
     severity,
@@ -265,22 +307,23 @@ export default function PauseSession() {
     breathingCompleted,
   ]);
 
-  // Cinematic entrance
   useEffect(() => {
     const timer = setTimeout(() => setCurtainLifted(true), 100);
     return () => clearTimeout(timer);
   }, []);
 
-  // Track swipe direction for animation
   const [swipeDirection, setSwipeDirection] = useState<'forward' | 'back'>('forward');
 
-  const goToStep = useCallback((next: PauseStep) => {
-    const currentIndex = STEPS.indexOf(step);
-    const nextIndex = STEPS.indexOf(next);
-    setSwipeDirection(nextIndex >= currentIndex ? 'forward' : 'back');
-    hapticFeedback('light');
-    setStep(next);
-  }, [step]);
+  const goToStep = useCallback(
+    (next: PauseStep) => {
+      const currentIndex = STEPS.indexOf(step);
+      const nextIndex = STEPS.indexOf(next);
+      setSwipeDirection(nextIndex >= currentIndex ? 'forward' : 'back');
+      hapticFeedback('light');
+      setStep(next);
+    },
+    [step],
+  );
 
   const goBack = useCallback(() => {
     const currentIndex = STEPS.indexOf(step);
@@ -300,25 +343,34 @@ export default function PauseSession() {
     }
   }, [step]);
 
-  // Swipe handler
-  const handleDragEnd = useCallback((_: any, info: { offset: { x: number }; velocity: { x: number } }) => {
-    const threshold = 50;
-    const velocityThreshold = 300;
-    if (info.offset.x < -threshold || info.velocity.x < -velocityThreshold) {
-      goForward();
-    } else if (info.offset.x > threshold || info.velocity.x > velocityThreshold) {
-      goBack();
-    }
-  }, [goForward, goBack]);
+  const handleDragEnd = useCallback(
+    (_: unknown, info: { offset: { x: number }; velocity: { x: number } }) => {
+      const threshold = 50;
+      const velocityThreshold = 300;
+      if (info.offset.x < -threshold || info.velocity.x < -velocityThreshold) {
+        goForward();
+      } else if (info.offset.x > threshold || info.velocity.x > velocityThreshold) {
+        goBack();
+      }
+    },
+    [goForward, goBack],
+  );
 
-  const handleMoodSelect = useCallback(async (mood: MoodValue) => {
-    hapticFeedback('light');
-    setMoodDone(true);
-    setSelectedMood(mood);
-    if (reflectionId) {
-      await supabase.from('reflections').update({ mood } as any).eq('id', reflectionId);
-    }
-  }, [reflectionId]);
+  const handleMoodSelect = useCallback(
+    async (mood: MoodValue) => {
+      hapticFeedback('light');
+      setMoodDone(true);
+      setSelectedMood(mood);
+      if (pauseInstanceId) {
+        await pauseLogStep({
+          instanceId: pauseInstanceId,
+          stepType: 'initial_emotion_logged',
+          payload: { mood },
+        }).catch(() => {});
+      }
+    },
+    [pauseInstanceId],
+  );
 
   const handleMoodSkip = useCallback(() => {
     setMoodDone(true);
@@ -329,14 +381,21 @@ export default function PauseSession() {
     setSelectedMood(null);
   }, []);
 
-  const handleMoodAfterSelect = useCallback(async (mood: MoodValue) => {
-    hapticFeedback('light');
-    setMoodAfterDone(true);
-    setSelectedMoodAfter(mood);
-    if (reflectionId) {
-      await supabase.from('reflections').update({ mood_after: mood } as any).eq('id', reflectionId);
-    }
-  }, [reflectionId]);
+  const handleMoodAfterSelect = useCallback(
+    async (mood: MoodValue) => {
+      hapticFeedback('light');
+      setMoodAfterDone(true);
+      setSelectedMoodAfter(mood);
+      if (pauseInstanceId) {
+        await pauseLogStep({
+          instanceId: pauseInstanceId,
+          stepType: 'shift_emotion_logged',
+          payload: { mood },
+        }).catch(() => {});
+      }
+    },
+    [pauseInstanceId],
+  );
 
   const handleMoodAfterSkip = useCallback(() => {
     setMoodAfterDone(true);
@@ -348,25 +407,30 @@ export default function PauseSession() {
   }, []);
 
   const toggleFavorite = useCallback(async () => {
-    if (!reflectionId) return;
+    if (!pauseInstanceId) return;
     const newVal = !isFavorite;
     setIsFavorite(newVal);
     hapticFeedback('light');
-    const [r1, r2] = await Promise.all([
-      supabase.from('reflections').update({ is_favorite: newVal }).eq('id', reflectionId),
-      supabase.from('library_items').update({ is_favorite: newVal }).eq('reflection_id', reflectionId).eq('source_type', 'reflection'),
-    ]);
-    if (r1.error || r2.error) {
-      setIsFavorite(!newVal); // roll back optimistic update
-      return;
+    await pauseLogStep({
+      instanceId: pauseInstanceId,
+      stepType: 'favorite_toggled',
+      payload: { is_favorite: newVal },
+    }).catch(() => setIsFavorite(!newVal));
+    try {
+      await supabase
+        .from('library_items')
+        .update({ is_favorite: newVal })
+        .eq('pause_instance_id', pauseInstanceId)
+        .eq('source_type', 'reflection');
+    } catch {
+      /* non-fatal */
     }
     if (newVal && !subscribed) {
       toast(t('pause.favoriteProHint'), { duration: 4000 });
     }
-  }, [reflectionId, isFavorite, subscribed, t]);
+  }, [pauseInstanceId, isFavorite, subscribed, t]);
 
   const handleClose = useCallback(() => {
-    // Preserve session so user can resume later
     navigate('/', { replace: true });
   }, [navigate]);
 
@@ -375,51 +439,45 @@ export default function PauseSession() {
     navigate('/', { replace: true });
   }, [navigate]);
 
-  const handleDecide = useCallback(async (d: string) => {
-    hapticFeedback('medium');
-    setDecision(d);
-    dismissMessage();
-    if (reflectionId) {
-      await supabase.from('reflections').update({ outcome: d }).eq('id', reflectionId);
-      // Outcome just flipped this row to an "engaged pause" — force a quota refetch so
-      // PauseDone sees the up-to-date monthlyUsed and can render the `justHitLimit` upsell
-      // for the pause that just crossed the free-tier threshold (instead of waiting for
-      // the 5-min staleTime or window focus).
-      void refreshSubscription();
-    }
-    // Fetch final reflection state for score impact
-    if (reflectionId) {
-      const { data: ref } = await (supabase
-        .from('v_reflection_with_companions')
-        .select('zoom_out_read, history_read, signal_read, grounding_read, note, tags')
-        .eq('id', reflectionId)
-        .single() as any);
-      if (ref) {
-        const r = ref as { zoom_out_read?: boolean; history_read?: boolean; signal_read?: boolean; grounding_read?: boolean; note?: string | null; tags?: string[] | null };
-        const tools = [r.zoom_out_read, r.history_read, r.signal_read, r.grounding_read].filter(Boolean).length;
-        setPauseImpactData({
-          mood: selectedMood,
-          moodAfter: selectedMoodAfter,
-          breathingCompleted,
-          decision: d,
-          context,
-          engagedTools: tools,
-          wroteNote: !!(r.note && r.note.length > 10),
-          usedTags: !!(r.tags && r.tags.length > 0),
-        });
+  const handleDecide = useCallback(
+    async (d: string) => {
+      hapticFeedback('medium');
+      setDecision(d);
+      dismissMessage();
+      if (pauseInstanceId) {
+        await pauseLogStep({
+          instanceId: pauseInstanceId,
+          stepType: 'outcome_logged',
+          payload: { outcome: d },
+        }).catch(() => {});
+        void refreshSubscription();
       }
-    }
-    hapticFeedback('success');
-    setPhase('done');
-    clearSession();
-  }, [dismissMessage, reflectionId, selectedMood, selectedMoodAfter, context, breathingCompleted, refreshSubscription]);
+      setPauseImpactData({
+        mood: selectedMood,
+        moodAfter: selectedMoodAfter,
+        breathingCompleted,
+        decision: d,
+        context,
+        engagedTools: 0,
+        wroteNote: false,
+        usedTags: false,
+      });
+      hapticFeedback('success');
+      setPhase('done');
+      clearSession();
+    },
+    [dismissMessage, pauseInstanceId, selectedMood, selectedMoodAfter, context, breathingCompleted, refreshSubscription],
+  );
 
   const slideX = prefersReducedMotion ? 0 : 80;
   const stepTransition = {
     initial: { opacity: 0, x: swipeDirection === 'forward' ? slideX : -slideX },
     animate: { opacity: 1, x: 0 },
     exit: { opacity: 0, x: swipeDirection === 'forward' ? -slideX : slideX },
-    transition: { duration: prefersReducedMotion ? 0.1 : 0.35, ease: [0.25, 0.1, 0.25, 1] as [number, number, number, number] },
+    transition: {
+      duration: prefersReducedMotion ? 0.1 : 0.35,
+      ease: [0.25, 0.1, 0.25, 1] as [number, number, number, number],
+    },
   };
 
   const dragProps = {
@@ -456,7 +514,15 @@ export default function PauseSession() {
                   mantra={mantra}
                   severity={severity}
                   completed={breathingCompleted}
-                  onComplete={() => setBreathingCompleted(true)}
+                  onComplete={() => {
+                    setBreathingCompleted(true);
+                    if (pauseInstanceId) {
+                      void pauseLogStep({
+                        instanceId: pauseInstanceId,
+                        stepType: 'breath_completed',
+                      });
+                    }
+                  }}
                   onContinue={() => goToStep('feel')}
                 />
               </motion.div>
@@ -482,7 +548,7 @@ export default function PauseSession() {
                   companions={companions}
                   companionPrefs={companionPrefs}
                   severity={severity}
-                  reflectionId={reflectionId}
+                  pauseInstanceId={pauseInstanceId}
                   context={context}
                   reflectionMessage={message}
                   isFavorite={isFavorite}

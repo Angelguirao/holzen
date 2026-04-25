@@ -2,10 +2,13 @@ import type {
   CompanionOrchestrateSlotResult,
   RegenerateCompanionSlot,
 } from '@/lib/companion-orchestrate-types';
-import type { CachedHistoricalInsightShape } from '@/lib/companion-reflection-cache';
+import type { CachedHistoricalInsightShape } from '@/components/HistoricalInsightDisplay';
+import type { ZoomOutData } from '@/components/ZoomOutDisplay';
 import type { CompanionLibraryBookmarkParams } from '@/lib/companion-library-autosave';
+import { toZoomOutDisplayData, zoomOutLibraryAutosaveFromDisplayData } from '@/lib/zoom-out-payload';
 import { updateRecencyHints } from '@/lib/companion-recency-hints';
 import { hostnameFromUrl } from '@/lib/companion-url';
+import { trackCompanionServed } from '@/lib/companion-analytics';
 
 export type CompanionSlotCacheIds = {
   nudge: string | null;
@@ -52,7 +55,7 @@ export type CompanionSlotCommitters = {
   }) => void;
   setNudge: (v: { title: string; body: string; citation: string; url: string }) => void;
   setHistoryInsight: (v: CachedHistoricalInsightShape) => void;
-  setZoomOut: (v: unknown) => void;
+  setZoomOut: (v: ZoomOutData | null) => void;
   autoSaveToLibrary: (p: CompanionLibraryBookmarkParams) => void | Promise<void>;
 };
 
@@ -105,17 +108,10 @@ function commitOrchestrateSlotData(
       break;
     }
     case 'zoomOut': {
-      const d = data as {
-        deepTime?: { title?: string; body?: string };
-        echo?: { message?: string };
-      };
+      const d = toZoomOutDisplayData(data);
       c.setZoomOut(d);
-      const zoomBody = d?.deepTime?.body || d?.echo?.message || 'Zoom Out perspective';
-      void c.autoSaveToLibrary({
-        title: d?.deepTime?.title || 'Zoom Out',
-        body: zoomBody,
-        sourceType: 'zoom_out',
-      });
+      const { title, body } = zoomOutLibraryAutosaveFromDisplayData(d);
+      void c.autoSaveToLibrary({ title, body, sourceType: 'zoom_out' });
       break;
     }
   }
@@ -143,7 +139,7 @@ function pushRecencyForOrchestrateSlot(slot: RegenerateCompanionSlot, data: unkn
       break;
     }
     case 'zoomOut': {
-      const t = (data as { deepTime?: { title?: string } })?.deepTime?.title;
+      const t = toZoomOutDisplayData(data).deepTime?.title;
       if (t) updateRecencyHints('zoomOut', t);
       break;
     }
@@ -161,6 +157,7 @@ export function hydrateOrchestrateSlotIfNew(
   if (!isFilledOrchestrateSlot(r) || fetchedSlots.has(slot)) return;
   fetchedSlots.add(slot);
   commitOrchestrateSlotData(slot, r.data, c);
+  trackCompanionServed(slot, r.source);
   if (setCacheRelaxations) {
     const field = SLOT_CACHE_KEY[slot];
     setCacheRelaxations((prev) => ({ ...prev, [field]: toSlotRelaxationUi(r.cacheRelaxation) }));
@@ -176,6 +173,7 @@ export function applyOrchestrateSlotLazyOrRegenerate(
   setCacheRelaxations?: (fn: (prev: CompanionSlotRelaxations) => CompanionSlotRelaxations) => void,
 ): void {
   commitOrchestrateSlotData(slot, r.data, c);
+  trackCompanionServed(slot, r.source);
   if (r.cacheId) {
     const field = SLOT_CACHE_KEY[slot];
     setCacheIds((prev) => ({ ...prev, [field]: r.cacheId }));

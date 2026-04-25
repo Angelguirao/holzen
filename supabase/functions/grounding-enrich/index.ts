@@ -1,4 +1,3 @@
-// deno-lint-ignore-file no-explicit-any
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.57.2";
 import { extractDoi, normalizeCitation } from "../_shared/grounding-enrichment-util.ts";
@@ -25,9 +24,9 @@ import { withRequestLogging } from "../_shared/with-request-logging.ts";
  * cache are open to any authenticated user; writes use the service role so
  * clients can't spoof enrichment content.
  *
- * Logging: `createLogger("grounding-enrich")` + `holzen_event` markers for
+ * Logging: request `log` from `withRequestLogging` / `createLogger` — `holzen_event` in `extra` for
  *   - `grounding_enrich_hit`     (cache hit, no upstream calls)
- *   - `grounding_enrich_miss`    (cache miss, all 3 upstreams called)
+ *   - `grounding_enrich_miss`    (cache miss, upstreams called)
  *   - `grounding_enrich_failed`  (partial or total upstream failure)
  */
 
@@ -119,14 +118,17 @@ serve(
       .maybeSingle();
 
     if (existing) {
-      console.log(JSON.stringify({
-        holzen_event: "grounding_enrich_hit",
-        citation_hash: hash,
-        has_doi: Boolean(existing.doi),
-        has_abstract: Boolean(existing.abstract),
-        researcher_count: Array.isArray(existing.researchers) ? existing.researchers.length : 0,
-        ts: nowIso,
-      }));
+      try {
+        log("grounding_enrich_hit", {
+          holzen_event: "grounding_enrich_hit",
+          citation_hash: hash,
+          has_doi: Boolean(existing.doi),
+          has_abstract: Boolean(existing.abstract),
+          researcher_count: Array.isArray(existing.researchers) ? existing.researchers.length : 0,
+        });
+      } catch {
+        /* non-fatal */
+      }
       log("cache hit", { hash });
       return new Response(
         JSON.stringify({
@@ -170,23 +172,25 @@ serve(
     };
 
     const anyUpstreamFailed = !crossref && !semanticScholar && bios.length === 0;
-    if (anyUpstreamFailed) {
-      console.warn(JSON.stringify({
-        holzen_event: "grounding_enrich_failed",
-        citation_hash: hash,
-        has_doi: Boolean(doiHint),
-        ts: new Date().toISOString(),
-      }));
-    } else {
-      console.log(JSON.stringify({
-        holzen_event: "grounding_enrich_miss",
-        citation_hash: hash,
-        has_doi: Boolean(resolvedDoi),
-        has_abstract: Boolean(abstract),
-        researcher_count: researchers.length,
-        citation_count: semanticScholar?.citationCount ?? null,
-        ts: new Date().toISOString(),
-      }));
+    try {
+      if (anyUpstreamFailed) {
+        log.warn("grounding_enrich_failed", {
+          holzen_event: "grounding_enrich_failed",
+          citation_hash: hash,
+          has_doi: Boolean(doiHint),
+        });
+      } else {
+        log("grounding_enrich_miss", {
+          holzen_event: "grounding_enrich_miss",
+          citation_hash: hash,
+          has_doi: Boolean(resolvedDoi),
+          has_abstract: Boolean(abstract),
+          researcher_count: researchers.length,
+          citation_count: semanticScholar?.citationCount ?? null,
+        });
+      }
+    } catch {
+      /* non-fatal */
     }
 
     const enrichment: EnrichmentResponse = {
@@ -278,7 +282,9 @@ async function fetchCrossref(doiHint: string | null, citation: string): Promise<
 
     const authors = Array.isArray(item.author)
       ? item.author
-          .map((a: any) => [a.given, a.family].filter(Boolean).join(" ").trim())
+          .map((a: { given?: string; family?: string }) =>
+            [a.given, a.family].filter(Boolean).join(" ").trim()
+          )
           .filter(Boolean)
           .slice(0, 5)
       : [];

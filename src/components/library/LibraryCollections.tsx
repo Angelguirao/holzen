@@ -25,7 +25,7 @@ export function LibraryCollections({ library }: Props) {
   }, [addCollection]);
 
   const handleStatusChange = useCallback(async (id: string, status: 'unread' | 'read' | 'archived') => {
-    await updateItem(id, { status } as any);
+    await updateItem(id, { status });
   }, [updateItem]);
 
   if (selectedCollection) {

@@ -35,7 +35,7 @@ interface Props {
   companions: CompanionData;
   prefs: CompanionPrefs;
   severity?: 'mild' | 'moderate' | 'high';
-  reflectionId?: string | null;
+  pauseInstanceId?: string | null;
   context?: string | null;
   reflectionMessage?: string | null;
   /** Current user mood — drives intervention selection */
@@ -154,7 +154,7 @@ function CompanionCard({
 }
 
 export const CompanionSection = forwardRef<HTMLDivElement, Props>(function CompanionSection(
-  { companions, prefs, severity = 'mild', reflectionId, context, reflectionMessage, mood, sectionLead },
+  { companions, prefs, severity = 'mild', pauseInstanceId, context, reflectionMessage, mood, sectionLead },
   ref,
 ) {
   const { isPro } = useProGate();
@@ -173,7 +173,7 @@ export const CompanionSection = forwardRef<HTMLDivElement, Props>(function Compa
     regenerateCompanion,
     canAccessCompanion,
     fetchCompanion,
-  } = useCompanionData({ companions, prefs, reflectionId, context, reflectionMessage, mood, severityNumber: SEVERITY_NUMBER[severity] ?? 3 });
+  } = useCompanionData({ companions, prefs, pauseInstanceId, context, reflectionMessage, mood, severityNumber: SEVERITY_NUMBER[severity] ?? 3 });
 
   const labels = {
     pause: i18nT('companions.pause'),
@@ -194,9 +194,9 @@ export const CompanionSection = forwardRef<HTMLDivElement, Props>(function Compa
   const hasHaiku = prefs.haiku && companions.haiku;
   /** Intervention still runs in `useCompanionData` for hydration/cache — not shown as its own block (less visual noise). */
   const hasGrounding = prefs.grounding;
-  const hasSignal = prefs.signal && !!reflectionId;
-  const hasZoomOut = prefs.zoomOut && !!reflectionId;
-  const hasHistory = prefs.history && !!reflectionId;
+  const hasSignal = prefs.signal && !!pauseInstanceId;
+  const hasZoomOut = prefs.zoomOut && !!pauseInstanceId;
+  const hasHistory = prefs.history && !!pauseInstanceId;
 
   if (!hasHaiku && !hasGrounding && !hasSignal && !hasZoomOut && !hasHistory) return null;
 
@@ -259,7 +259,7 @@ export const CompanionSection = forwardRef<HTMLDivElement, Props>(function Compa
           )}
           {signal && (
             <CompanionFeedback
-              reflectionId={reflectionId}
+              pauseInstanceId={pauseInstanceId}
               companionType="signal"
               cacheId={cacheIds.signal}
               regenerateSlot="signal"
@@ -267,12 +267,12 @@ export const CompanionSection = forwardRef<HTMLDivElement, Props>(function Compa
               regenerating={signalLoading}
             />
           )}
-          {reflectionId && (signal || signalLoading) && (
+          {pauseInstanceId && (signal || signalLoading) && (
             <div className="pt-2" onClick={(e) => e.stopPropagation()}>
               <button
                 type="button"
                 onClick={() =>
-                  navigate(`/companion/signal/${reflectionId}`, { state: { from: 'pause' } })
+                  navigate(`/companion/signal/${pauseInstanceId}`, { state: { from: 'pause' } })
                 }
                 className="inline-flex w-full items-center justify-center gap-2 rounded-lg border border-border/40 bg-muted/20 py-2.5 text-xs font-medium text-foreground/80 transition-colors hover:bg-muted/35"
               >
@@ -321,7 +321,7 @@ export const CompanionSection = forwardRef<HTMLDivElement, Props>(function Compa
           )}
           {nudge && (
             <CompanionFeedback
-              reflectionId={reflectionId}
+              pauseInstanceId={pauseInstanceId}
               companionType="grounding"
               cacheId={cacheIds.nudge}
               regenerateSlot="grounding"
@@ -329,12 +329,12 @@ export const CompanionSection = forwardRef<HTMLDivElement, Props>(function Compa
               regenerating={nudgeLoading}
             />
           )}
-          {reflectionId && (nudge || nudgeLoading) && (
+          {pauseInstanceId && (nudge || nudgeLoading) && (
             <div className="pt-2" onClick={(e) => e.stopPropagation()}>
               <button
                 type="button"
                 onClick={() =>
-                  navigate(`/companion/grounding/${reflectionId}`, { state: { from: 'pause' } })
+                  navigate(`/companion/grounding/${pauseInstanceId}`, { state: { from: 'pause' } })
                 }
                 className="inline-flex w-full items-center justify-center gap-2 rounded-lg border border-border/40 bg-muted/20 py-2.5 text-xs font-medium text-foreground/80 transition-colors hover:bg-muted/35"
               >
@@ -381,7 +381,7 @@ export const CompanionSection = forwardRef<HTMLDivElement, Props>(function Compa
           )}
           {zoomOut && (
             <CompanionFeedback
-              reflectionId={reflectionId}
+              pauseInstanceId={pauseInstanceId}
               companionType="zoom_out"
               cacheId={cacheIds.zoomOut}
               regenerateSlot="zoomOut"
@@ -389,12 +389,12 @@ export const CompanionSection = forwardRef<HTMLDivElement, Props>(function Compa
               regenerating={zoomOutLoading}
             />
           )}
-          {reflectionId && (zoomOut || zoomOutLoading) && (
+          {pauseInstanceId && (zoomOut || zoomOutLoading) && (
             <div className="pt-2" onClick={(e) => e.stopPropagation()}>
               <button
                 type="button"
                 onClick={() =>
-                  navigate(`/companion/zoom-out/${reflectionId}`, { state: { from: 'pause' } })
+                  navigate(`/companion/zoom-out/${pauseInstanceId}`, { state: { from: 'pause' } })
                 }
                 className="inline-flex w-full items-center justify-center gap-2 rounded-lg border border-border/40 bg-muted/20 py-2.5 text-xs font-medium text-foreground/80 transition-colors hover:bg-muted/35"
               >
@@ -441,7 +441,7 @@ export const CompanionSection = forwardRef<HTMLDivElement, Props>(function Compa
           )}
           {historyInsight && (
             <CompanionFeedback
-              reflectionId={reflectionId}
+              pauseInstanceId={pauseInstanceId}
               companionType="history_insight"
               cacheId={cacheIds.history}
               regenerateSlot="history"
@@ -449,12 +449,12 @@ export const CompanionSection = forwardRef<HTMLDivElement, Props>(function Compa
               regenerating={historyLoading}
             />
           )}
-          {reflectionId && (historyInsight || historyLoading) && (
+          {pauseInstanceId && (historyInsight || historyLoading) && (
             <div className="pt-2" onClick={(e) => e.stopPropagation()}>
               <button
                 type="button"
                 onClick={() =>
-                  navigate(`/companion/history/${reflectionId}`, { state: { from: 'pause' } })
+                  navigate(`/companion/history/${pauseInstanceId}`, { state: { from: 'pause' } })
                 }
                 className="inline-flex w-full items-center justify-center gap-2 rounded-lg border border-border/40 bg-muted/20 py-2.5 text-xs font-medium text-foreground/80 transition-colors hover:bg-muted/35"
               >

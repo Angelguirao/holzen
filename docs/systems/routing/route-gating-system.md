@@ -39,8 +39,8 @@ return <>{children}</>;
 
 | Pattern | Example paths | Behavior |
 |--------|-----------------|----------|
-| Protected + shell | `/`, `/library`, `/profile`, `/settings` | `ProtectedRoute` -> `AppLayout` -> nested `Outlet` routes |
-| Protected, full-screen | `/pause`, `/breathe`, `/admin`, practice routes, etc. | `ProtectedRoute` wraps page only (no `AppLayout` nav chrome) |
+| Protected + shell | `/`, `/library`, `/journey/*`, `/settings`, `/tools` (hub) | `ProtectedRoute` -> `AppLayout` -> nested `Outlet` routes |
+| Protected, full-screen | `/pause`, `/tools/*` (breathe, ground, practice, ambient, …), `/companion/*`, `/admin/*` | `ProtectedRoute` wraps page only (no `AppLayout` nav chrome). Legacy `/breathe`, `/ground`, `/practice/*`, etc. redirect into `/tools/*`. |
 | Public-only | `/welcome`, `/auth` | `PublicOnlyRoute` |
 | Ungated | `/terms`, `/privacy`, `/about`, `/blog`, `/roadmap`, `/reserve`, `/reset-password`, `*` | No wrapper; available without login |
 

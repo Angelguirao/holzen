@@ -1,5 +1,10 @@
 # Pause session API cost estimates
 
+> **Pause V2:** This doc reflects the current model. Pause sessions are
+> anchored to `pause_instances`; AI payloads live in `pause_ai_artifacts`.
+> Legacy reflection tables are removed.
+
+
 > **Canonical source:** [`docs/systems/costs/ai-cost-model.md`](../costs/ai-cost-model.md).
 > That doc covers **all** AI-powered features + the guardrail architecture
 > + runbooks + auto top-up recommendations. This file is now a narrow
@@ -26,7 +31,7 @@ Models tried (in order): `google/gemini-3-flash-preview`, then `google/gemini-2.
 ### 1.2 Companion step (Signal, Grounding, History, Zoom Out)
 
 - **Client:** `use-companion-data` invokes `companion-orchestrate` when the user reaches the reflect/companion UI and cached rows are missing.
-- **Automatic pause:** `check-volatility` POSTs `companion-orchestrate` with service auth after inserting the reflection row.
+- **Automatic pause:** `check-volatility` POSTs `companion-orchestrate` with service auth after inserting the pause instance.
 
 Generators (in `supabase/functions/_shared/generators/`):
 

@@ -11,12 +11,24 @@ Instructions for AI assistants and automation working in this repository (e.g. C
 | Command | Use |
 |--------|-----|
 | `npm run dev` | Vite dev server on **port 8080** |
-| `npm run build` | Production build |
+| `npm run build` | Production build (**`prebuild`** → **`npm run check:version-sync`**) |
 | `npm run preview` | Serve built output locally |
 | `npm run test` | Vitest (jsdom), single run |
+| `npm run test:ci` | CI gate: `check:edge-logging`, `check:edge-coverage-manifest`, Vitest with coverage + JUnit |
 | `npm run test:watch` | Vitest watch mode |
 | `npm run lint` | ESLint across the repo |
+| `npm run check:view-migrations` | Fail on unsafe `CREATE OR REPLACE VIEW` column renames in `supabase/migrations/` (runs in **`check:prepush`**). |
 | `npm run check:edge` | Optional: `deno check` on all `supabase/functions/*/index.ts`; **skips** if Deno is missing. Resolves `deno` from PATH, then `DENO_INSTALL/bin`, then `~/.deno/bin` (official installer default). |
+| `npm run check:edge-logging` | Regex guardrail: HTTP-serving edge `index.ts` files must wrap handlers in `withRequestLogging` (BetterStack + Sentry). Runs in **`test:ci`** and **`check:prepush`**. |
+| `npm run check:edge-coverage-manifest` | Ensures `EdgeCoverage.tsx` lists every `supabase/config.toml` `[functions.*]` name (and no extras). Run when adding/removing edge functions. |
+| `npm run check:prepush` | Full scripted preflight (`scripts/pre-push-check.sh`). **Requires `bash`** (Git Bash / WSL on Windows). |
+| `npm run smoke:edge-logging` | Optional: HTTP smoke against deployed edges — verifies `x-cid` round-trip through `withRequestLogging` (see `supabase/functions/README.md`). |
+| `npm run gen:types` | Regenerate `src/integrations/supabase/types.ts` from the **linked** Supabase project (`supabase login` or `SUPABASE_ACCESS_TOKEN`). Run after DB migrations. |
+| `npm run test:coverage` | Vitest with coverage reports only (no JUnit; use **`test:ci`** for the full CI gate). |
+| `npm run check:version-sync` | Ensures `package.json` **version** matches the latest **`changelog_entries`** row (REST); runs automatically as **`prebuild`** before **`npm run build`**. |
+| `npm run stamp:release` | Writes **`git rev-parse --short=12 HEAD`** into **`supabase/functions/_shared/release.ts`** (`EDGE_RELEASE`) for edge Sentry/BetterStack **`SENTRY_RELEASE`**. Idempotent. |
+| `npm run check:release-stamp` | Exits non-zero if **`EDGE_RELEASE`** in **`release.ts`** ≠ current **`git rev-parse --short=12 HEAD`** (read-only; same comparison the stamper uses). |
+| `npm run dev:hosted` / `npm run dev:local` · `npm run build:dev` · `supabase:*` | Hosted vs localstack Vite modes and Docker Supabase CLI wrappers — see [README.md](README.md) npm scripts. |
 
 **Linting:** There are many **pre-existing** ESLint issues (~300). Do not treat cleaning the whole tree as part of a small task; avoid introducing *new* problems in files you touch.
 
@@ -24,8 +36,11 @@ Instructions for AI assistants and automation working in this repository (e.g. C
 
 | Area | Location |
 |------|----------|
-| Routes | `src/App.tsx` — `ProtectedRoute` / `PublicOnlyRoute`, layout vs full-screen routes |
+| Routes | `src/App.tsx` — `ProtectedRoute` / `PublicOnlyRoute`, shell vs full-screen; helpers in `src/lib/app-routes.ts` (`/journey/*`, `/tools/*`, `TOOLS_PREFIX`); no `/profile` routes |
 | Page screens | `src/pages/` |
+| Pause lifecycle | `src/lib/pause-state.ts` (state machine helpers), `src/lib/pause-api.ts` (typed RPC wrappers), `src/lib/pause-quality.ts` (quality score), `src/lib/pause-fingerprint.ts`, `src/lib/pause-artifact-cache.ts`. Canonical model: [docs/systems/pause-system.md](docs/systems/pause-system.md). Schema + RPCs (ordered in `supabase/migrations/`): `202604232007*_pause_*.sql`, `20260423201000_pause_rpc_functions.sql`, `20260423201100_pause_log_companion_race_fix.sql`, `20260423201200_pause_create_or_reuse_service.sql`, `20260423201300_companion_serves_pause_instance_id.sql`, `20260423201400_pause_v2_notifications_trigger.sql`, `20260423201500_pause_ai_artifacts_owner_write.sql`, `20260423202000_pause_v2_destructive_cutover.sql`. |
+| Stats | `src/components/stats/` (skills-first IA post-Pause-V2). Hero: `SkillOverviewCard.tsx`. Deep dives under `src/components/stats/{regulation,tolerance,alignment,reappraisal,awareness}/`. Journey under `src/components/stats/journey/`. Advanced under `src/components/stats/advanced/`. Score: `src/lib/stats/pause-score.ts`. Confidence: `src/lib/stats/confidence.ts`. Loader: `src/hooks/use-pause-stats-data.ts`. |
+| Badges | `src/components/BadgesPanelV2.tsx` (4-family / 14-active). Definitions: `src/lib/badges/definitions.ts`. Computation: `src/lib/badges/compute.ts`. Sync + celebration + silent-seed: `src/hooks/use-badge-sync.ts`. |
 | Shared UI | `src/components/`; primitives in `src/components/ui/` (shadcn / Radix patterns) |
 | Auth state | `src/hooks/use-auth.tsx` + `AuthProvider` in `App.tsx` |
 | Supabase browser client | `src/integrations/supabase/client.ts` |
@@ -70,6 +85,7 @@ Never commit `.env` or service role keys.
 
 ## Git
 
+- **Pause V2 / information-architecture work** that touches Journey, Tools, Home, or app routes: use branch **`cursor/pause-v2-final`** (not `main`) as the integration line unless you are told otherwise.
 - **Commit as you go** when a logical chunk of work is done (e.g. one fix, one migration, one doc update)—do not leave the tree dirty at the end of a task unless the user asked for WIP only.
 - Use clear commit messages (what changed and why). Prefer `git` from the system install if it is not on `PATH` (e.g. `C:\Program Files\Git\bin\git.exe` on Windows).
 
@@ -77,7 +93,7 @@ Never commit `.env` or service role keys.
 
 Pushing triggers **automatic** DB migrations and edge function deploys to the linked project; the **frontend** still needs a manual **Publish → Update** in Lovable.
 
-**Run the pre-push checklist** in [docs/ops/deployment-sync-guide.md](docs/ops/deployment-sync-guide.md) (tests, `npm run build`, lint on changed files, `npm run check:edge`, new `config.toml` entries, secrets, migration order, `as unknown as T` for new columns). Cursor loads the same expectations via `.cursor/rules/deployment-sync.mdc`.
+**Run the pre-push checklist** in [docs/ops/deployment-sync-guide.md](docs/ops/deployment-sync-guide.md) (boxed list + **`npm run check:prepush`** bash gate). Day-to-day minimum: **`npm run test`**, **`npm run build`** (**`prebuild`** → **`check:version-sync`**), lint on touched files. When edge code or **`config.toml`** / **`EdgeCoverage.tsx`** changes: also **`npm run check:edge`** (if Deno is installed), **`npm run check:edge-logging`**, **`npm run check:edge-coverage-manifest`**. After schema changes: **`npm run gen:types`** when you can authenticate to Supabase, and **`as unknown as T`** for new columns until types catch up. Cursor loads the same expectations via `.cursor/rules/deployment-sync.mdc`.
 
 ## Observability
 

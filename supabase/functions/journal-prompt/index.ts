@@ -109,9 +109,9 @@ serve(
     const LANG_NAMES: Record<string, string> = { en: "English", es: "Spanish", pt: "Portuguese", de: "German", nl: "Dutch", fr: "French", tr: "Turkish" };
     const langName = LANG_NAMES[langCode] || "English";
 
-    const { data: reflections } = await sb
-      .from("reflections")
-      .select("message, context, mood, outcome, created_at")
+    const { data: recentPauses } = await sb
+      .from("v_pause_full")
+      .select("reflection_text, context_snapshot, initial_mood, outcome, created_at")
       .eq("user_id", user.id)
       .order("created_at", { ascending: false })
       .limit(5);
@@ -124,12 +124,15 @@ serve(
       .order("created_at", { ascending: false })
       .limit(3);
 
-    const contextBlock = reflections?.length
-      ? `Recent reflections:\n${reflections.map((r: any) => `- [${r.context ?? "no context"}] ${r.message} (mood: ${r.mood ?? "unknown"}, outcome: ${r.outcome ?? "pending"})`).join("\n")}`
-      : "No recent reflections available.";
+    const contextBlock = recentPauses?.length
+      ? `Recent pause sessions:\n${recentPauses.map((r: { context_snapshot?: { context_text?: string }; reflection_text?: string; initial_mood?: string; outcome?: string }) => {
+          const ctx = r.context_snapshot?.context_text ?? "no context";
+          return `- [${ctx}] ${r.reflection_text ?? ""} (mood: ${r.initial_mood ?? "unknown"}, outcome: ${r.outcome ?? "pending"})`;
+        }).join("\n")}`
+      : "No recent pause sessions available.";
 
     const recentPromptsBlock = recentJournals?.length
-      ? `\n\nRecent journal prompts (DO NOT repeat these):\n${recentJournals.map((j: any) => `- ${j.prompt}`).join("\n")}`
+      ? `\n\nRecent journal prompts (DO NOT repeat these):\n${recentJournals.map((j: { prompt: string }) => `- ${j.prompt}`).join("\n")}`
       : "";
 
     const langInstruction =
@@ -141,11 +144,11 @@ serve(
 
 Rules:
 - Each prompt should be 1 sentence, open-ended, and introspective
-- Draw from the user's recent reflections when available — reference patterns, moods, or decisions you notice
+- Draw from the user's recent pause sessions when available — reference patterns, moods, or decisions you notice
 - Vary the angle: one about emotions, one about patterns/behavior, one about future intention
 - Be warm but not patronizing. Speak like a wise friend, not a therapist
-- Do NOT reference specific prices, percentages, or trading terms unless they appear in the user's reflections
-- Do NOT fabricate patterns — if only 1-2 reflections exist, keep prompts more general
+- Do NOT reference specific prices, percentages, or trading terms unless they appear in the user's pause context or notes
+- Do NOT fabricate patterns — if only 1-2 pauses exist, keep prompts more general
 
 Return a JSON object with key "prompts" containing an array of 3 strings.
 

@@ -1,3 +1,4 @@
+import type { SupabaseClient } from "https://esm.sh/@supabase/supabase-js@2.57.2";
 import { generateSignal, PROMPT_VERSION as SIGNAL_VERSION } from "./generators/signal.ts";
 import { generateGrounding, PROMPT_VERSION as GROUNDING_VERSION } from "./generators/grounding.ts";
 import { generateHistory, PROMPT_VERSION as HISTORY_VERSION } from "./generators/history.ts";
@@ -14,11 +15,11 @@ export type OrchestrateTasksLog = {
 };
 
 export interface BuildOrchestrateCompanionTasksParams {
-  svcClient: any;
+  svcClient: SupabaseClient;
   log: OrchestrateTasksLog;
   userId: string;
   body: Record<string, unknown>;
-  reflectionId: unknown;
+  pauseInstanceId: string | null;
   contextValue?: string;
   languageValue: string;
   reflectionMessageValue?: string;
@@ -51,7 +52,7 @@ export function buildOrchestrateCompanionTasks(
   p: BuildOrchestrateCompanionTasksParams,
 ): Record<string, Promise<CompanionResult>> {
   const tasks: Record<string, Promise<CompanionResult>> = {};
-  const rid = typeof p.reflectionId === "string" ? p.reflectionId : null;
+  const pid = p.pauseInstanceId;
 
   // Perplexity-backed generators: signal, grounding, history. Lovable-backed:
   // all four (structuring step on signal/grounding/history + zoom-out deep-time).
@@ -74,16 +75,16 @@ export function buildOrchestrateCompanionTasks(
         recentGroundingSources: p.recentGroundingSourcesValue,
         recentGroundingTitles: p.recentNudgeTopicsValue,
         userId: p.userId,
-        reflectionId: rid,
+        pauseInstanceId: pid,
         log: p.log,
         preferredBias: p.intent.groundingBias,
         skipLive: skipLiveGrounding,
       });
       const latencyMs = Date.now() - t;
-      logCompanionSlotResolved({
+      logCompanionSlotResolved(p.log, {
         companion_type: ORCHESTRATOR_KEY_MAP.grounding,
         orchestrator_slot: "grounding",
-        reflection_prefix: rid ? rid.slice(0, 8) : null,
+        pause_prefix: pid ? pid.slice(0, 8) : null,
         source: result.source,
         cache_relaxation: result.cacheRelaxation ?? null,
         latency_ms: latencyMs,
@@ -117,10 +118,10 @@ export function buildOrchestrateCompanionTasks(
         skipLive: skipLiveHistory,
       });
       const latencyMs = Date.now() - t;
-      logCompanionSlotResolved({
+      logCompanionSlotResolved(p.log, {
         companion_type: ORCHESTRATOR_KEY_MAP.history,
         orchestrator_slot: "history",
-        reflection_prefix: rid ? rid.slice(0, 8) : null,
+        pause_prefix: pid ? pid.slice(0, 8) : null,
         source: result.source,
         cache_relaxation: result.cacheRelaxation ?? null,
         latency_ms: latencyMs,
@@ -155,10 +156,10 @@ export function buildOrchestrateCompanionTasks(
         skipLive: skipLiveZoomOut,
       });
       const latencyMs = Date.now() - t;
-      logCompanionSlotResolved({
+      logCompanionSlotResolved(p.log, {
         companion_type: ORCHESTRATOR_KEY_MAP.zoomOut,
         orchestrator_slot: "zoomOut",
-        reflection_prefix: rid ? rid.slice(0, 8) : null,
+        pause_prefix: pid ? pid.slice(0, 8) : null,
         source: result.source,
         cache_relaxation: result.cacheRelaxation ?? null,
         latency_ms: latencyMs,
@@ -188,7 +189,7 @@ export function buildOrchestrateCompanionTasks(
       if (p.userId) {
         try {
           const fromDb = await fetchRecentSignalCitationUrls(p.svcClient, p.userId, {
-            excludeReflectionId: typeof p.reflectionId === "string" ? p.reflectionId : undefined,
+            excludePauseInstanceId: typeof p.pauseInstanceId === "string" ? p.pauseInstanceId : undefined,
             limit: 24,
           });
           mergedRecentSignalUrls = mergeRecentSignalUrls(fromDb, clientSignalUrls, 24);
@@ -211,16 +212,16 @@ export function buildOrchestrateCompanionTasks(
         recentSignalTitles: p.recentSignalTitlesValue,
         recentSignalUrls: mergedRecentSignalUrls,
         userId: p.userId,
-        reflectionId: rid,
+        pauseInstanceId: pid,
         log: p.log,
         searchAngle: p.intent.signalAngle,
         skipLive: skipLiveSignal,
       });
       const latencyMs = Date.now() - t;
-      logCompanionSlotResolved({
+      logCompanionSlotResolved(p.log, {
         companion_type: ORCHESTRATOR_KEY_MAP.signal,
         orchestrator_slot: "signal",
-        reflection_prefix: rid ? rid.slice(0, 8) : null,
+        pause_prefix: pid ? pid.slice(0, 8) : null,
         source: result.source,
         cache_relaxation: result.cacheRelaxation ?? null,
         latency_ms: latencyMs,

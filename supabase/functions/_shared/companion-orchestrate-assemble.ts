@@ -1,3 +1,4 @@
+import type { SupabaseClient } from "https://esm.sh/@supabase/supabase-js@2.57.2";
 import { writeCompanionData } from "./companion-data.ts";
 import { isCompanionContent } from "./companion-orchestrate-parse.ts";
 import type {
@@ -10,6 +11,18 @@ import { ORCHESTRATOR_KEY_MAP } from "./companion-types.ts";
 
 const companionTypeMap = ORCHESTRATOR_KEY_MAP;
 
+function contentTitleFromSlotData(data: unknown): string | null {
+  if (!data || typeof data !== "object") return null;
+  const o = data as Record<string, unknown>;
+  if (typeof o.title === "string" && o.title.length > 0) return o.title;
+  const dt = o.deepTime;
+  if (dt && typeof dt === "object") {
+    const t = (dt as Record<string, unknown>).title;
+    if (typeof t === "string" && t.length > 0) return t;
+  }
+  return null;
+}
+
 export type OrchestrateAssembleLog = {
   (msg: string, extra?: Record<string, unknown>): void;
   error: (msg: string, extra?: Record<string, unknown>) => void;
@@ -17,17 +30,17 @@ export type OrchestrateAssembleLog = {
 
 /** Fold `Promise.allSettled` generator results into JSON response + serve rows + companion writes. */
 export function foldOrchestrateSettledTasks(params: {
-  svcClient: any;
+  svcClient: SupabaseClient;
   keys: string[];
   settled: PromiseSettledResult<CompanionResult>[];
   selection: InterventionSelection | null;
   interventionPayload: InterventionPayload;
   userId: string;
-  reflectionId: unknown;
+  pauseInstanceId: string | null;
   t0: number;
 }): {
   response: OrchestrateResponse;
-  serveInserts: any[];
+  serveInserts: Record<string, unknown>[];
   companionWritePromises: Promise<void>[];
 } {
   const response: OrchestrateResponse = {
@@ -37,7 +50,7 @@ export function foldOrchestrateSettledTasks(params: {
     zoomOut: null,
     intervention: null,
   };
-  const serveInserts: any[] = [];
+  const serveInserts: Record<string, unknown>[] = [];
   const companionWritePromises: Promise<void>[] = [];
 
   for (let i = 0; i < params.keys.length; i++) {
@@ -59,25 +72,31 @@ export function foldOrchestrateSettledTasks(params: {
 
       serveInserts.push({
         user_id: params.userId,
-        reflection_id: (params.reflectionId as string) || null,
+        pause_instance_id: params.pauseInstanceId,
         companion_type: companionTypeMap[key],
         serve_source: result.value.source,
         cache_entry_id: result.value.cacheId || null,
         cache_relaxation: result.value.cacheRelaxation ?? null,
-        content_title: result.value.data?.title || result.value.data?.deepTime?.title || null,
+        content_title: contentTitleFromSlotData(result.value.data),
         content_fingerprint: result.value.promptVersion ?? null,
         latency_ms: result.value.latencyMs,
       });
 
       if (
         isCompanionContent(result.value.data) &&
-        typeof params.reflectionId === "string" &&
-        params.reflectionId.length > 0
+        typeof params.pauseInstanceId === "string" &&
+        params.pauseInstanceId.length > 0
       ) {
         const cType = companionTypeMap[key];
         if (cType) {
           companionWritePromises.push(
-            writeCompanionData(params.svcClient, params.reflectionId, cType, result.value.data),
+            writeCompanionData(
+              params.svcClient,
+              params.pauseInstanceId,
+              params.userId,
+              cType,
+              result.value.data,
+            ),
           );
         }
       }
@@ -92,7 +111,7 @@ export function foldOrchestrateSettledTasks(params: {
       };
       serveInserts.push({
         user_id: params.userId,
-        reflection_id: (params.reflectionId as string) || null,
+        pause_instance_id: params.pauseInstanceId,
         companion_type: companionTypeMap[key],
         serve_source: "empty",
         cache_entry_id: null,
@@ -109,24 +128,26 @@ export function foldOrchestrateSettledTasks(params: {
 
 /** Queue intervention row, `companion_serves` batch, and fire `writeCompanionData` in the background. */
 export function scheduleOrchestrateBackgroundWrites(params: {
-  svcClient: any;
+  svcClient: SupabaseClient;
   selection: InterventionSelection | null;
   interventionPayload: InterventionPayload;
   response: OrchestrateResponse;
-  serveInserts: any[];
+  serveInserts: Record<string, unknown>[];
   companionWritePromises: Promise<void>[];
-  reflectionId: unknown;
+  pauseInstanceId: string | null;
+  userId: string;
   log: OrchestrateAssembleLog;
 }): void {
   const writePromises = [...params.companionWritePromises];
 
   if (params.selection) {
     params.response.intervention = params.interventionPayload;
-    if (typeof params.reflectionId === "string" && params.reflectionId.length > 0) {
+    if (typeof params.pauseInstanceId === "string" && params.pauseInstanceId.length > 0) {
       writePromises.push(
         writeCompanionData(
           params.svcClient,
-          params.reflectionId,
+          params.pauseInstanceId,
+          params.userId,
           "intervention",
           params.interventionPayload as unknown as Record<string, unknown>,
         ),

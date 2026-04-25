@@ -1,6 +1,7 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import { render, screen, cleanup } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
+import { reactRouterFutureFlags } from '@/lib/router-future';
 
 /**
  * Verifies the persistent guard in `CheckoutConfirmation`: once a checkout
@@ -58,7 +59,7 @@ const CHECKOUT_STARTED_KEY = 'holzen_checkout_started_at';
 
 function renderAt(path: string) {
   return render(
-    <MemoryRouter initialEntries={[path]}>
+    <MemoryRouter future={reactRouterFutureFlags} initialEntries={[path]}>
       <CheckoutConfirmation />
     </MemoryRouter>,
   );
@@ -333,7 +334,7 @@ describe('CheckoutConfirmation 30-minute guard', () => {
       );
 
       const { rerender } = render(
-        <MemoryRouter initialEntries={['/?subscribed=true']}>
+        <MemoryRouter future={reactRouterFutureFlags} initialEntries={['/?subscribed=true']}>
           <CheckoutConfirmation />
         </MemoryRouter>,
       );
@@ -344,7 +345,7 @@ describe('CheckoutConfirmation 30-minute guard', () => {
       // confirmation route.
       for (let i = 0; i < 5; i += 1) {
         rerender(
-          <MemoryRouter initialEntries={['/?subscribed=true']}>
+          <MemoryRouter future={reactRouterFutureFlags} initialEntries={['/?subscribed=true']}>
             <CheckoutConfirmation />
           </MemoryRouter>,
         );

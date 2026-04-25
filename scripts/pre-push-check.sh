@@ -4,14 +4,11 @@
 # Pre-push checklist for Holzen.
 #
 # Run this BEFORE `git push` to catch the things Lovable's GitHub sync
-# can't catch for you:
-#   1. Migrations that fail on a fresh `supabase db reset`
-#      (the silent-failure mode that desyncs repo from live DB).
-#   2. View migrations using the unsafe `CREATE OR REPLACE VIEW`
-#      column-rename pattern.
-#   3. Edge functions registered in supabase/config.toml.
-#   4. Edge function Deno typecheck.
-#   5. Frontend build + tests.
+# can't catch for you (ordered roughly as executed below):
+#   - Edge release stamp; view-migration safety; every function folder has
+#     a [functions.*] block; Deno typecheck (optional); edge logging regex;
+#     EdgeCoverage.tsx manifest vs config.toml; vitest + vite build; optional
+#     local `supabase db reset` when Docker + CLI are available.
 #
 # Usage:
 #   npm run check:prepush
@@ -51,7 +48,7 @@ echo "Repo: $ROOT"
 # Refresh `supabase/functions/_shared/release.ts` so edge-deployed Sentry events
 # (and BetterStack log lines) report a real Git SHA instead of "unknown". The
 # script is idempotent: no write, no warning if the stamp is already current.
-step "0/5  Edge release stamp"
+step "0/6  Edge release stamp"
 
 if node scripts/stamp-edge-release.mjs; then
   if ! git diff --quiet -- supabase/functions/_shared/release.ts 2>/dev/null; then
@@ -64,7 +61,7 @@ else
 fi
 
 # ---- 1. View safety lint -----------------------------------------------------
-step "1/5  View safety lint (CREATE OR REPLACE VIEW)"
+step "1/6  View safety lint (CREATE OR REPLACE VIEW)"
 
 # Delegate to the dedicated Node linter. It parses each migration's column list
 # and only fails when a CREATE OR REPLACE VIEW would actually break Postgres
@@ -76,7 +73,7 @@ else
 fi
 
 # ---- 2. config.toml coverage -------------------------------------------------
-step "2/5  Edge functions registered in supabase/config.toml"
+step "2/6  Edge functions registered in supabase/config.toml"
 
 if [ ! -f supabase/config.toml ]; then
   warn_check "supabase/config.toml not found"
@@ -95,7 +92,7 @@ else
 fi
 
 # ---- 3. Edge function typecheck ---------------------------------------------
-step "3/5  Edge function typecheck (npm run check:edge)"
+step "3/6  Edge function typecheck (npm run check:edge)"
 
 if npm run | grep -qE "^\s+check:edge"; then
   if npm run check:edge --silent 2>&1 | tee /tmp/.check-edge.log | tail -20; then
@@ -119,10 +116,19 @@ if npm run | grep -qE "^\s+check:edge-logging"; then
   fi
 fi
 
-# ---- 4. Frontend build + tests ----------------------------------------------
-step "4/5  Frontend tests + build"
+# ---- 3c. EdgeCoverage manifest vs config.toml -------------------------------
+if npm run | grep -qE "^\s+check:edge-coverage-manifest"; then
+  if npm run check:edge-coverage-manifest --silent; then
+    ok "EdgeCoverage.tsx lists every config.toml edge function"
+  else
+    fail_check "npm run check:edge-coverage-manifest failed — sync src/pages/EdgeCoverage.tsx with supabase/config.toml"
+  fi
+fi
 
-if npm run test --silent -- --run 2>&1 | tail -30; then
+# ---- 4. Frontend build + tests ----------------------------------------------
+step "4/6  Frontend tests + build"
+
+if npm run test --silent 2>&1 | tail -30; then
   ok "vitest passed"
 else
   fail_check "npm run test failed"
@@ -135,7 +141,7 @@ else
 fi
 
 # ---- 5. Local supabase db reset ---------------------------------------------
-step "5/5  supabase db reset (local stack)"
+step "5/6  supabase db reset (local stack)"
 
 if ! command -v supabase >/dev/null 2>&1; then
   skip "supabase CLI not installed — install from https://supabase.com/docs/guides/local-development"

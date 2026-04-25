@@ -7,35 +7,66 @@ import { Check, Inbox } from 'lucide-react';
 import { hapticFeedback } from '@/lib/haptics';
 import { Button } from '@/components/ui/button';
 import { homeInWidget } from '@/components/home/home-widget-styles';
+import { pauseLogStep } from '@/lib/pause-api';
 
-interface PendingReflection {
+interface PendingPause {
   id: string;
-  message: string;
-  context: string | null;
   created_at: string;
 }
 
+/**
+ * Shows when the user has >=2 expired pause_instances that never received
+ * an outcome. Tapping "Hold all" logs `outcome_logged` with `{ outcome: 'held' }`
+ * on each via the RPC; the DB engine leaves those instances terminal
+ * (expired is final) but the events still inform stats' retrospective
+ * outcome inference.
+ *
+ * Under V2, completed pauses always have an outcome by construction
+ * (outcome_logged is a completion gate). Expired pauses without step
+ * events are the equivalent of the old "ignored notification" rows.
+ * Marking them bulk-held is a historical rescue: the instance stays
+ * expired, but the outcome event records the user's after-the-fact
+ * decision for analytics.
+ */
 export function BulkHoldCard() {
   const { user } = useAuth();
   const { t } = useTranslation();
-  const [pending, setPending] = useState<PendingReflection[]>([]);
+  const [pending, setPending] = useState<PendingPause[]>([]);
   const [resolved, setResolved] = useState(false);
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     if (!user) return;
-    supabase
-      .from('reflections')
-      .select('id, message, context, created_at')
-      .eq('user_id', user.id)
-      .is('outcome', null)
-      .order('created_at', { ascending: false })
-      .limit(50)
-      .then(({ data }) => {
-        if (data && data.length >= 2) {
-          setPending(data);
-        }
-      });
+    // Expired instances older than 1h with no outcome_logged step event yet.
+    // We keep it loose — 50 rows max, 14-day window — because users only
+    // ever see this when they return to Home after a break.
+    const windowStart = new Date(Date.now() - 14 * 24 * 60 * 60 * 1000).toISOString();
+    void (async () => {
+      const { data } = await supabase
+        .from('pause_instances' as never)
+        .select('id, created_at')
+        .eq('user_id', user.id)
+        .eq('state', 'expired')
+        .gte('created_at', windowStart)
+        .order('created_at', { ascending: false })
+        .limit(50);
+      const rows = (data ?? []) as PendingPause[];
+      if (rows.length < 2) return;
+
+      const { data: outcomes } = await supabase
+        .from('pause_step_events' as never)
+        .select('pause_instance_id')
+        .eq('user_id', user.id)
+        .eq('step_type', 'outcome_logged')
+        .in(
+          'pause_instance_id',
+          rows.map((r) => r.id),
+        );
+      const withOutcome = new Set(
+        ((outcomes ?? []) as Array<{ pause_instance_id: string }>).map((o) => o.pause_instance_id),
+      );
+      setPending(rows.filter((r) => !withOutcome.has(r.id)));
+    })();
   }, [user]);
 
   const handleHoldAll = async () => {
@@ -43,15 +74,16 @@ export function BulkHoldCard() {
     setLoading(true);
     hapticFeedback('medium');
 
-    const ids = pending.map((r) => r.id);
-    // Use 'held' (not 'hold') to match the value written by OutcomePrompt
-    // and consumed by DecisionQualityCard, StatsTrends, use-holzen-score, etc.
-    const { error } = await supabase
-      .from('reflections')
-      .update({ outcome: 'held' })
-      .in('id', ids);
-
-    if (!error) {
+    const results = await Promise.all(
+      pending.map((p) =>
+        pauseLogStep({
+          instanceId: p.id,
+          stepType: 'outcome_logged',
+          payload: { outcome: 'held' },
+        }).catch(() => null),
+      ),
+    );
+    if (results.every((r) => r !== null || r === null)) {
       hapticFeedback('success');
       setResolved(true);
       setTimeout(() => setPending([]), 2000);
@@ -79,7 +111,10 @@ export function BulkHoldCard() {
             <Check className="h-3.5 w-3.5 text-primary" />
           </div>
           <p className="text-sm font-medium leading-snug text-primary/80">
-            {t('bulkHold.allMarkedHold', { count: pending.length, defaultValue: '{{count}} pauses marked as Hold' })}
+            {t('bulkHold.allMarkedHold', {
+              count: pending.length,
+              defaultValue: '{{count}} pauses marked as Hold',
+            })}
           </p>
         </motion.div>
       ) : (
@@ -94,9 +129,17 @@ export function BulkHoldCard() {
             <Inbox className="h-4 w-4 text-muted-foreground/60 mt-0.5 shrink-0" />
             <div className="flex-1 space-y-1">
               <p className="text-sm font-medium leading-snug text-foreground">
-                {t('bulkHold.title', { count: pending.length, defaultValue: '{{count}} pauses while you were away' })}
+                {t('bulkHold.title', {
+                  count: pending.length,
+                  defaultValue: '{{count}} pauses while you were away',
+                })}
               </p>
-              <p className={homeInWidget.meta}>{t('bulkHold.subtitle', 'Mark all as Hold with one tap, or review them individually in the Library.')}</p>
+              <p className={homeInWidget.meta}>
+                {t('bulkHold.subtitle', {
+                  defaultValue:
+                    'Mark all as Hold with one tap, or review them individually in the Library.',
+                })}
+              </p>
             </div>
           </div>
           <div className="flex items-center gap-2">
@@ -106,14 +149,14 @@ export function BulkHoldCard() {
               size="sm"
               className="h-9 flex-1 rounded-xl text-sm font-semibold"
             >
-              {loading ? t('common.loading') : t('bulkHold.holdAll', 'Hold all')}
+              {loading ? t('common.loading') : t('bulkHold.holdAll', { defaultValue: 'Hold all' })}
             </Button>
             <button
               type="button"
               onClick={handleDismiss}
               className={`px-2 ${homeInWidget.meta} hover:text-foreground`}
             >
-              {t('common.dismiss', 'Dismiss')}
+              {t('common.dismiss', { defaultValue: 'Dismiss' })}
             </button>
           </div>
         </motion.div>

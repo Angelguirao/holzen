@@ -45,7 +45,7 @@ async function firecrawlMarkdown(url: string, apiKey: string): Promise<string | 
 }
 
 serve(
-  withRequestLogging("admin-library-preview", async ({ req }) => {
+  withRequestLogging("admin-library-preview", async ({ req, log }) => {
   if (req.method !== "POST") {
     return new Response(JSON.stringify({ error: "Method not allowed" }), {
       status: 405,
@@ -243,7 +243,14 @@ serve(
       { headers: { ...corsHeaders, "Content-Type": "application/json" } },
     );
   } catch (e) {
-    console.error("admin-library-preview:", e);
+    try {
+      log.error("admin_library_preview_uncaught", {
+        holzen_event: "admin_library_preview_uncaught",
+        detail: e instanceof Error ? e.message : String(e),
+      });
+    } catch {
+      /* non-fatal */
+    }
     return new Response(JSON.stringify({ error: String(e) }), {
       status: 500,
       headers: { ...corsHeaders, "Content-Type": "application/json" },

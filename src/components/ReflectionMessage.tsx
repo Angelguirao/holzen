@@ -1,8 +1,8 @@
 import { forwardRef } from 'react';
 import { Button } from '@/components/ui/button';
 import { ShareReflection } from './ShareReflection';
-import { ReflectionNote } from './ReflectionNote';
-import { ReflectionTags } from './ReflectionTags';
+import { PauseNote } from '@/components/pause/PauseNote';
+import { PauseTags } from '@/components/pause/PauseTags';
 import { ReflectionWallpaper } from './ReflectionWallpaper';
 import { CompanionFeedback } from './CompanionFeedback';
 import { CompanionSection, type CompanionData, type CompanionPrefs } from './CompanionSection';
@@ -15,17 +15,20 @@ interface Props {
   companions?: CompanionData;
   companionPrefs?: CompanionPrefs;
   severity?: 'mild' | 'moderate' | 'high';
-  reflectionId?: string | null;
+  pauseInstanceId?: string | null;
 }
 
-export const ReflectionMessage = forwardRef<HTMLDivElement, Props>(function ReflectionMessage({ message, context, onDismiss, companions, companionPrefs, severity, reflectionId }, ref) {
+export const ReflectionMessage = forwardRef<HTMLDivElement, Props>(function ReflectionMessage(
+  { message, context, onDismiss, companions, companionPrefs, severity, pauseInstanceId },
+  ref,
+) {
   const { t } = useTranslation();
 
   return (
     <div ref={ref} className="space-y-6">
       <p className="text-lg leading-relaxed">{message}</p>
-      {reflectionId && (
-        <CompanionFeedback reflectionId={reflectionId} companionType="reflection" compact />
+      {pauseInstanceId && (
+        <CompanionFeedback pauseInstanceId={pauseInstanceId} companionType="reflection" compact />
       )}
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-1">
@@ -42,15 +45,15 @@ export const ReflectionMessage = forwardRef<HTMLDivElement, Props>(function Refl
         </Button>
       </div>
 
-      {reflectionId && <ReflectionNote reflectionId={reflectionId} initialNote={null} />}
-      {reflectionId && <ReflectionTags reflectionId={reflectionId} initialTags={[]} />}
+      {pauseInstanceId && <PauseNote pauseInstanceId={pauseInstanceId} />}
+      {pauseInstanceId && <PauseTags pauseInstanceId={pauseInstanceId} />}
 
       {companions && companionPrefs && (
         <CompanionSection
           companions={companions}
           prefs={companionPrefs}
           severity={severity}
-          reflectionId={reflectionId}
+          pauseInstanceId={pauseInstanceId}
           context={context}
           reflectionMessage={message}
         />

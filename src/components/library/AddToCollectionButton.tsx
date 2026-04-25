@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { FolderPlus, Check } from 'lucide-react';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
-import type { Collection } from '@/hooks/use-library';
+import type { Collection, CollectionItem } from '@/hooks/use-library';
 import { toast } from 'sonner';
 import { useTranslation } from 'react-i18next';
 
@@ -9,7 +9,7 @@ interface Props {
   itemId: string;
   collections: Collection[];
   itemCollections: Collection[];
-  onAdd: (collectionId: string, itemId: string) => Promise<any>;
+  onAdd: (collectionId: string, itemId: string) => Promise<CollectionItem | null>;
   onRemove: (collectionId: string, itemId: string) => Promise<void>;
 }
 

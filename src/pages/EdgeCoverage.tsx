@@ -6,31 +6,33 @@ import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { ShieldCheck, ShieldAlert, Search, FileWarning, HeartPulse } from "lucide-react";
+import { AdminSubNav } from "@/components/admin/AdminSubNav";
 
 // Static manifest of edge-function error-reporting coverage.
-// Generated from `supabase/functions/*/index.ts` source by scanning for:
+// Curated from `supabase/functions/*/index.ts` by scanning for:
 //   - withRequestLogging  → request/response + Sentry capture in catch
 //   - EdgeError           → standardized errors that beforeSend() can filter
 //   - createLogger        → structured BetterStack logs (.error path forwards to Sentry)
 //   - logAudit            → security-sensitive ops written to audit_log
 //
-// Regenerate with: scripts/scan-edge-coverage.sh (see SentryAlerts runbook)
+// **Names** must match every `[functions.<name>]` in `supabase/config.toml`.
+// Validate with: `npm run check:edge-coverage-manifest`
 type Row = { name: string; wrl: boolean; edgeError: boolean; logger: boolean; audit: boolean };
 
 const COVERAGE: Row[] = [
+  { name: "admin-check-stripe-prices", wrl: true, edgeError: false, logger: false, audit: false },
   { name: "admin-library-preview", wrl: true, edgeError: false, logger: true, audit: false },
-  { name: "ai-cost-alert", wrl: true, edgeError: false, logger: false, audit: false },
+  { name: "ai-cost-alert", wrl: true, edgeError: false, logger: true, audit: false },
   { name: "auth-email-hook", wrl: true, edgeError: false, logger: false, audit: false },
-  { name: "backfill-btc-prices", wrl: true, edgeError: false, logger: false, audit: false },
+  { name: "backfill-btc-prices", wrl: true, edgeError: false, logger: true, audit: false },
   { name: "badge-notify", wrl: true, edgeError: false, logger: false, audit: false },
-  { name: "check-followups", wrl: true, edgeError: false, logger: false, audit: false },
   { name: "check-subscription", wrl: true, edgeError: false, logger: false, audit: false },
-  { name: "check-volatility", wrl: true, edgeError: false, logger: false, audit: false },
+  { name: "check-volatility", wrl: true, edgeError: false, logger: true, audit: false },
   { name: "companion-orchestrate", wrl: true, edgeError: false, logger: true, audit: false },
   { name: "create-checkout", wrl: true, edgeError: false, logger: false, audit: false },
   { name: "customer-portal", wrl: true, edgeError: false, logger: false, audit: false },
   { name: "delete-account", wrl: true, edgeError: true, logger: false, audit: true },
-  { name: "deliver-letters", wrl: true, edgeError: false, logger: false, audit: false },
+  { name: "deliver-letters", wrl: true, edgeError: false, logger: true, audit: false },
   { name: "fetch-source-feeds", wrl: true, edgeError: false, logger: true, audit: false },
   { name: "generate-wallpaper", wrl: true, edgeError: false, logger: true, audit: false },
   { name: "grounding-enrich", wrl: true, edgeError: false, logger: true, audit: false },
@@ -44,17 +46,17 @@ const COVERAGE: Row[] = [
   { name: "monthly-report", wrl: true, edgeError: false, logger: true, audit: false },
   { name: "night-reflection", wrl: true, edgeError: false, logger: true, audit: false },
   { name: "notify-checkout-confirmation", wrl: false, edgeError: false, logger: false, audit: false },
-  { name: "personalized-nudge", wrl: true, edgeError: false, logger: false, audit: false },
+  { name: "personalized-nudge", wrl: true, edgeError: false, logger: true, audit: false },
   { name: "pregenerate-companions", wrl: true, edgeError: false, logger: true, audit: false },
   { name: "preview-transactional-email", wrl: true, edgeError: false, logger: false, audit: false },
   { name: "process-email-queue", wrl: true, edgeError: false, logger: false, audit: false },
-  { name: "process-referral-pending", wrl: true, edgeError: false, logger: false, audit: false },
+  { name: "process-referral-pending", wrl: true, edgeError: false, logger: true, audit: false },
   { name: "record-referral", wrl: true, edgeError: false, logger: false, audit: false },
-  { name: "reflection-insights", wrl: true, edgeError: false, logger: false, audit: false },
-  { name: "refresh-btc-prices", wrl: true, edgeError: false, logger: false, audit: false },
+  { name: "reflection-insights", wrl: true, edgeError: false, logger: true, audit: false },
+  { name: "refresh-btc-prices", wrl: true, edgeError: false, logger: true, audit: false },
   { name: "register-push", wrl: true, edgeError: false, logger: false, audit: false },
   { name: "retry-flex-credit", wrl: true, edgeError: false, logger: false, audit: false },
-  { name: "seed-btc-history", wrl: true, edgeError: false, logger: false, audit: false },
+  { name: "seed-btc-history", wrl: true, edgeError: false, logger: true, audit: false },
   { name: "send-feedback", wrl: true, edgeError: true, logger: false, audit: false },
   { name: "send-transactional-email", wrl: true, edgeError: false, logger: false, audit: false },
   { name: "stripe-webhook", wrl: true, edgeError: false, logger: false, audit: false },
@@ -154,6 +156,7 @@ export default function EdgeCoverage() {
 
   return (
     <div className="container max-w-4xl py-8 space-y-6">
+      <AdminSubNav />
       <header className="space-y-2">
         <div className="flex items-center gap-2 text-muted-foreground text-sm">
           <ShieldCheck className="h-4 w-4" />

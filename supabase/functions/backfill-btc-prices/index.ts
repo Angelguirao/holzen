@@ -1,6 +1,6 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.57.2";
-import { holzenEdgeError, holzenEdgeRun, holzenEdgeWarn } from "../_shared/holzen-edge-log.ts";
+import { unknownErrorForLog } from "../_shared/log-unknown-error.ts";
 import { coingeckoHeaders, fetchCoinGeckoHistoryPrice } from "../_shared/coingecko.ts";
 import { withRequestLogging } from "../_shared/with-request-logging.ts";
 
@@ -96,20 +96,25 @@ function closestPriceForTarget(
  */
 
 serve(
-  withRequestLogging("backfill-btc-prices", async ({ req }) => {
+  withRequestLogging("backfill-btc-prices", async ({ req, log }) => {
   const t0 = Date.now();
 
   try {
-    holzenEdgeRun("backfill-btc", "request", { method: req.method });
     const { verifyServiceAuth } = await import("../_shared/auth.ts");
     if (!verifyServiceAuth(req)) {
-      holzenEdgeRun("backfill-btc", "auth rejected");
+      log.warn("backfill_btc_phase", {
+        holzen_event: "backfill_btc_cron",
+        phase: "service_auth_rejected",
+      });
       return new Response(JSON.stringify({ error: "Unauthorized" }), {
         status: 401,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
-    holzenEdgeRun("backfill-btc", "auth ok");
+    log("backfill_btc_phase", {
+      holzen_event: "backfill_btc_cron",
+      phase: "service_auth_ok",
+    });
 
     if (req.method !== "POST") {
       return new Response(JSON.stringify({ error: "POST required" }), {
@@ -190,7 +195,11 @@ serve(
         .gte("date", fromRaw)
         .lte("date", toRaw);
       if (selErr) {
-        holzenEdgeError("backfill-btc", "select existing dates failed", selErr);
+        log.error("backfill_btc_select", {
+          holzen_event: "backfill_btc_cron",
+          phase: "select_existing_failed",
+          ...unknownErrorForLog(selErr),
+        });
         return new Response(JSON.stringify({ error: "Failed to read existing cache rows" }), {
           status: 500,
           headers: { ...corsHeaders, "Content-Type": "application/json" },
@@ -201,7 +210,9 @@ serve(
     }
 
     if (allKeys.length === 0) {
-      holzenEdgeRun("backfill-btc", "run complete", {
+      log("backfill_btc_complete", {
+        holzen_event: "backfill_btc_cron",
+        phase: "run_complete",
         ms: Date.now() - t0,
         summary: "nothing to do (all dates present or empty range)",
       });
@@ -253,7 +264,11 @@ serve(
       if (!dryRun && inserts.length > 0) {
         const { error: upErr } = await supabase.from("btc_price_cache").upsert(inserts);
         if (upErr) {
-          holzenEdgeError("backfill-btc", "upsert failed (per_date)", upErr);
+          log.error("backfill_btc_upsert", {
+            holzen_event: "backfill_btc_cron",
+            phase: "upsert_failed_per_date",
+            ...unknownErrorForLog(upErr),
+          });
           return new Response(JSON.stringify({ error: "Upsert failed", detail: String(upErr) }), {
             status: 500,
             headers: { ...corsHeaders, "Content-Type": "application/json" },
@@ -271,7 +286,12 @@ serve(
         : resumeFrom
         ? `per_date partial: ${daysUpserted} rows, ${chunks} calls, resumeFrom=${resumeFrom}`
         : `per_date: upserted ${daysUpserted} rows, ${chunks} calls${dryRun ? " (dryRun)" : ""}`;
-      holzenEdgeRun("backfill-btc", "run complete", { ms: Date.now() - t0, summary });
+      log("backfill_btc_complete", {
+        holzen_event: "backfill_btc_cron",
+        phase: "run_complete",
+        ms: Date.now() - t0,
+        summary,
+      });
 
       return new Response(
         JSON.stringify({
@@ -315,12 +335,21 @@ serve(
       const res = await fetch(url, { headers: coingeckoHeaders() });
 
       if (res.status === 429) {
-        holzenEdgeWarn("backfill-btc", "CoinGecko rate limited", { chunk: chunks });
+        log.warn("backfill_btc_coingecko", {
+          holzen_event: "backfill_btc_cron",
+          phase: "coingecko_rate_limited",
+          chunk: chunks,
+        });
         abortReason = "rate_limited";
         break;
       }
       if (!res.ok) {
-        holzenEdgeWarn("backfill-btc", "CoinGecko non-OK", { status: res.status, chunk: chunks });
+        log.warn("backfill_btc_coingecko", {
+          holzen_event: "backfill_btc_cron",
+          phase: "coingecko_non_ok",
+          http_status: res.status,
+          chunk: chunks,
+        });
         abortReason = `coingecko_http_${res.status}`;
         break;
       }
@@ -328,7 +357,11 @@ serve(
       const data = await res.json();
       const prices: [number, number][] = data?.prices || [];
       if (prices.length === 0) {
-        holzenEdgeWarn("backfill-btc", "empty prices array", { chunk: chunks });
+        log.warn("backfill_btc_coingecko", {
+          holzen_event: "backfill_btc_cron",
+          phase: "empty_prices_array",
+          chunk: chunks,
+        });
         abortReason = "empty_prices";
         break;
       }
@@ -346,7 +379,11 @@ serve(
       if (!dryRun && inserts.length > 0) {
         const { error: upErr } = await supabase.from("btc_price_cache").upsert(inserts);
         if (upErr) {
-          holzenEdgeError("backfill-btc", "upsert failed", upErr);
+          log.error("backfill_btc_upsert", {
+            holzen_event: "backfill_btc_cron",
+            phase: "upsert_failed",
+            ...unknownErrorForLog(upErr),
+          });
           return new Response(JSON.stringify({ error: "Upsert failed", detail: String(upErr) }), {
             status: 500,
             headers: { ...corsHeaders, "Content-Type": "application/json" },
@@ -362,7 +399,12 @@ serve(
       : resumeFrom
       ? `partial: ${daysUpserted} rows, ${chunks} chunks, resumeFrom=${resumeFrom}`
       : `upserted ${daysUpserted} rows, ${chunks} chunks${dryRun ? " (dryRun)" : ""}`;
-    holzenEdgeRun("backfill-btc", "run complete", { ms: Date.now() - t0, summary });
+    log("backfill_btc_complete", {
+      holzen_event: "backfill_btc_cron",
+      phase: "run_complete",
+      ms: Date.now() - t0,
+      summary,
+    });
 
     return new Response(
       JSON.stringify({
@@ -383,7 +425,11 @@ serve(
       { headers: { ...corsHeaders, "Content-Type": "application/json" } },
     );
   } catch (e) {
-    holzenEdgeError("backfill-btc", "uncaught error", e);
+    log.error("backfill_btc_uncaught", {
+      holzen_event: "backfill_btc_cron",
+      phase: "uncaught",
+      ...unknownErrorForLog(e),
+    });
     return new Response(JSON.stringify({ error: String(e) }), {
       status: 500,
       headers: { ...corsHeaders, "Content-Type": "application/json" },

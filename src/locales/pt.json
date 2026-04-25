@@ -3,8 +3,30 @@
     "home": "Início",
     "history": "Histórico",
     "library": "Biblioteca",
+    "tools": "Ferramentas",
+    "journey": "Jornada",
     "profile": "Perfil",
     "settings": "Configurações"
+  },
+  "ia": {
+    "crossLinkIntro": "Ver também:",
+    "crossLinkLibrary": "Biblioteca",
+    "crossLinkJourneyActivity": "Jornada — Atividade",
+    "crossLinkGroundHistory": "Histórico de grounding"
+  },
+  "settingsAbout": {
+    "back": "Configurações",
+    "title": "Sobre, changelog e feedback",
+    "subtitle": "Novidades, versão do app e contacto com a equipa — separado das tuas preferências do dia a dia."
+  },
+  "roadmap": {
+    "pageTitle": "Roteiro — Holzen",
+    "pageDescription": "Planos e atualizações do produto",
+    "title": "Roteiro",
+    "body": "Não temos um roteiro em tempo real na app por agora. Segue o blog para notas de versão, ou lê porquê criámos a Holzen.",
+    "linkBlog": "Blog",
+    "linkAbout": "Sobre a Holzen",
+    "linkHome": "Iniciar sessão"
   },
   "common": {
     "back": "Voltar",
@@ -91,7 +113,8 @@
       "checkConnection": "Verifique sua conexão com a internet. Os dados de preço vêm do CoinGecko e podem estar temporariamente indisponíveis.",
       "aiTemporarilyUnavailable": "O serviço de IA está temporariamente indisponível. Suas configurações e dados estão seguros — tente novamente em um momento.",
       "unexpectedError": "Ocorreu um erro inesperado. Seus dados estão seguros."
-    }
+    },
+    "browseAllTools": "Ver todas as ferramentas"
   },
   "history": {
     "recent": "Recentes",
@@ -124,6 +147,23 @@
     "parallel": "paralelo",
     "reflectionUnpinned": "Reflexão desfixada",
     "reflectionPinned": "Reflexão fixada no Início"
+  },
+  "journey": {
+    "pageSubtitle": "Seu progresso e anotações — não a conta (isso fica em Configurações).",
+    "documentTitle": "Holzen — Jornada",
+    "activityExplainer": "Registro em ordem de pausas. Conteúdo salvo: na Biblioteca — busque e navegue lá."
+  },
+  "tools": {
+    "title": "Ferramentas",
+    "subtitle": "Regulação, aterramento, prática — o mesmo que no Início, em uma lista.",
+    "breathe": "Parada (respirar)",
+    "breatheDesc": "Espaço de respiração sem metas.",
+    "ambient": "Modo ambiente",
+    "ambientDesc": "Som e cor suaves.",
+    "ground": "Aterramento",
+    "groundDesc": "Aterramento guiado com seu contexto.",
+    "groundHistory": "Diário de aterramento",
+    "groundHistoryDesc": "Sessões anteriores de aterramento."
   },
   "profile": {
     "stats": "Estatísticas",
@@ -601,7 +641,7 @@
   "badges": { "earned": "obtidas", "earnedCheck": "Obtida ✓", "next": "Próxima", "categories": { "streak": "Consistência", "volume": "Quantidade de Reflexões", "composure": "Compostura", "companions": "Uso de Ferramentas", "engagement": "Engajamento" }, "streak3": "Primeiros Passos", "streak3Desc": "Sequência de 3 dias", "streak7": "Vigilante Semanal", "streak7Desc": "Sequência de 7 dias", "streak14": "Foco Quinzenal", "streak14Desc": "Sequência de 14 dias", "streak30": "Mente Mensal", "streak30Desc": "Sequência de 30 dias", "streak60": "Mão Firme", "streak60Desc": "Sequência de 60 dias", "streak100": "Estoico do Século", "streak100Desc": "Sequência de 100 dias", "streak365": "Ano de Compostura", "streak365Desc": "Sequência de 365 dias", "reflect10": "Primeiros Passos", "reflect10Desc": "10 reflexões registradas", "reflect50": "Observador Devoto", "reflect50Desc": "50 reflexões registradas", "reflect100": "Prática Profunda", "reflect100Desc": "100 reflexões registradas", "reflect500": "Paciência Magistral", "reflect500Desc": "500 reflexões registradas", "calm10": "Águas Tranquilas", "calm10Desc": "10 checks de humor calmo", "calm50": "Inabalável", "calm50Desc": "50 checks de humor calmo", "held10": "Mãos de Diamante", "held10Desc": "Segurou firme 10 vezes", "held50": "Vontade de Ferro", "held50Desc": "Segurou firme 50 vezes", "breathe5": "Primeiras Respirações", "breathe5Desc": "Completou respiração 5 vezes", "breathe25": "Mestre da Respiração", "breathe25Desc": "Completou respiração 25 vezes", "breathe100": "Pulmões Zen", "breathe100Desc": "Completou respiração 100 vezes", "haiku10": "Leitor de Poesia", "haiku10Desc": "Leu 10 haiku", "haiku50": "Devoto dos Versos", "haiku50Desc": "Leu 50 haiku", "learn10": "Mente Centrada", "learn10Desc": "Usou Conecte-se 10 vezes", "learn50": "Erudito da Calma", "learn50Desc": "Usou Conecte-se 50 vezes", "signal10": "Leitor de Sinais", "signal10Desc": "Leu 10 sinais", "signal50": "Ouvinte Profundo", "signal50Desc": "Leu 50 sinais", "zoom5": "Visão Longa", "zoom5Desc": "Usou Ampliar 5 vezes", "zoom25": "Pensador Macro", "zoom25Desc": "Usou Ampliar 25 vezes", "history5": "Estudante de História", "history5Desc": "Leu 5 perspectivas históricas", "history25": "Sábio dos Ciclos", "history25Desc": "Leu 25 perspectivas históricas", "allSix5": "Prática Completa", "allSix5Desc": "Usou as 6 ferramentas em 5 reflexões", "allSix25": "Disciplina Total", "allSix25Desc": "Usou as 6 ferramentas em 25 reflexões", "fav5": "Curador", "fav5Desc": "5 reflexões favoritas", "fav25": "Arquivista", "fav25Desc": "25 reflexões favoritas", "notes10": "Escritor", "notes10Desc": "10 notas pessoais", "notes50": "Diarista Profundo", "notes50Desc": "50 notas pessoais", "activeStreak7": "Em Chamas", "activeStreak7Desc": "Sequência ativa de 7+ dias", "activeStreak30": "Imparável", "activeStreak30Desc": "Sequência ativa de 30+ dias", "units": { "days": "dias", "reflections": "reflexões", "calmMoods": "humores calmos", "holds": "holds", "sessions": "sessões", "haiku": "haiku", "signals": "sinais", "insights": "perspectivas", "fullSessions": "sessões completas", "favorites": "favoritas", "notes": "notas", "dayStreak": "dias de sequência" } },
   "stats": { "reflections": "Reflexões", "outcomeStreak": "Sequência de resultados", "bestStreak": "Melhor sequência", "useStreakFreeze": "Usar congelamento — proteja sua sequência hoje", "activating": "Ativando…", "streakFreezeActivated": "Congelamento ativado para hoje", "failedFreeze": "Falha ao ativar congelamento", "freezeAvailable": "1 congelamento disponível · renova semanalmente", "nextFreeze": "Próximo congelamento {{time}}", "used": "Usados", "more": "+{{count}} mais" },
   "myWhy": { "title": "Meu Porquê" },
-  "library": { "title": "Biblioteca", "pageTitle": "Biblioteca — Holzen", "pageDescription": "Sua atividade, marcadores, notas e coleções", "tabItems": "Itens", "tabArchive": "Arquivo", "viewList": "Lista", "viewGraph": "Grafo", "graphEmpty": "Sem dados ainda. Complete reflexões e salve itens para construir seu grafo.", "searchPlaceholder": "Buscar itens…", "tabAll": "Todos", "tabFavorites": "Favoritos", "tabBookmarks": "Salvos", "tabNotes": "Notas", "newNote": "Nova nota", "noteTitlePlaceholder": "Título (opcional)", "noteBodyPlaceholder": "Escreva uma nota…", "save": "Salvar", "itemCount_one": "{{count}} item", "itemCount_other": "{{count}} itens", "emptyState": "Sua biblioteca está vazia. Salve insights ou escreva notas aqui.", "noResults": "Nenhum item corresponde à sua busca.", "noBookmarks": "Sem marcadores ainda. Salve saídas de ferramentas das reflexões.", "noNotes": "Sem notas ainda. Comece a escrever.", "noCollections": "Sem coleções ainda. Crie uma para organizar seus itens.", "savedToLibrary": "Salvo na biblioteca", "newCollection": "Nova coleção", "collectionNamePlaceholder": "Nome da coleção", "collectionDescPlaceholder": "Descrição (opcional)", "create": "Criar", "addToCollection": "Adicionar à coleção", "addedToCollection": "Adicionado à coleção", "emptyCollection": "Sem itens nesta coleção ainda.", "allCollections": "Todas", "renameCollection": "Renomear", "deleteCollection": "Excluir", "deleteCollectionConfirm": "Excluir esta coleção? Os itens dentro não serão removidos.", "collectionRenamed": "Coleção renomeada", "collectionDeleted": "Coleção excluída" },
+  "library": { "title": "Biblioteca", "pageTitle": "Biblioteca — Holzen", "pageDescription": "Sua atividade, marcadores, notas e coleções", "iaClarifier": "Conteúdo salvo e pesquisável. Linha do tempo: Jornada → Atividade.", "tabItems": "Itens", "tabArchive": "Arquivo", "viewList": "Lista", "viewGraph": "Grafo", "graphEmpty": "Sem dados ainda. Complete reflexões e salve itens para construir seu grafo.", "searchPlaceholder": "Buscar itens…", "tabAll": "Todos", "tabFavorites": "Favoritos", "tabBookmarks": "Salvos", "tabNotes": "Notas", "newNote": "Nova nota", "noteTitlePlaceholder": "Título (opcional)", "noteBodyPlaceholder": "Escreva uma nota…", "save": "Salvar", "itemCount_one": "{{count}} item", "itemCount_other": "{{count}} itens", "emptyState": "Sua biblioteca está vazia. Salve insights ou escreva notas aqui.", "noResults": "Nenhum item corresponde à sua busca.", "noBookmarks": "Sem marcadores ainda. Salve saídas de ferramentas das reflexões.", "noNotes": "Sem notas ainda. Comece a escrever.", "noCollections": "Sem coleções ainda. Crie uma para organizar seus itens.", "savedToLibrary": "Salvo na biblioteca", "newCollection": "Nova coleção", "collectionNamePlaceholder": "Nome da coleção", "collectionDescPlaceholder": "Descrição (opcional)", "create": "Criar", "addToCollection": "Adicionar à coleção", "addedToCollection": "Adicionado à coleção", "emptyCollection": "Sem itens nesta coleção ainda.", "allCollections": "Todas", "renameCollection": "Renomear", "deleteCollection": "Excluir", "deleteCollectionConfirm": "Excluir esta coleção? Os itens dentro não serão removidos.", "collectionRenamed": "Coleção renomeada", "collectionDeleted": "Coleção excluída" },
   "pause": { "youPaused": "Você pausou. Essa é a parte mais difícil.", "startRitual": "Iniciar um ritual", "orDecideNow": "ou role para decidir sem ritual", "whatWillYouDo": "O que você vai fazer?", "youChose": "Você escolheu deliberadamente.", "return": "Voltar", "noReflection": "Sem reflexão ativa. Volte para ativar uma." },
   "breathing": { "trigger": "Respire com isso →", "choosePattern": "Escolha um padrão", "suggestedForVolatility": "Sugerido para a volatilidade atual", "begin": "Começar", "settled": "Assentado.", "settledDesc": "Você se deu um momento. Isso é suficiente.", "return": "Voltar", "patterns": { "box": "Caixa", "boxDesc": "4-4-4-4 · Aterramento", "calming": "Calmante", "calmingDesc": "4-7-8 · Calma profunda", "sigh": "Suspiro", "sighDesc": "Suspiro fisiológico" }, "phases": { "inhale": "Inspire", "hold": "Segure", "exhale": "Expire", "sip": "Gole" } },
   "volatility": { "title": "Tolerância à Volatilidade", "grades": { "ironHands": "Mãos de ferro", "steady": "Firme", "shaky": "Instável", "paperHands": "Mãos de papel" }, "descriptions": { "high": "Você se mantém notavelmente composto durante quedas — mesmo as pesadas.", "moderate": "Você lida bem com a maioria das quedas, embora oscilações maiores testem sua compostura.", "low": "Quedas tendem a te abalar. Respirar antes de agir pode ajudar.", "veryLow": "Quedas atingem forte emocionalmente. O ritual é sua melhor defesa." }, "basedOnDrops": "Baseado em {{count}} reflexão de queda", "basedOnDrops_other": "Baseado em {{count}} reflexões de queda", "buckets": { "mild": "Quedas leves", "moderate": "Quedas moderadas", "heavy": "Quedas pesadas" }, "composure": { "reactive": "Reativo", "mixed": "Misto", "composed": "Composto" }, "held": "{{percent}}% manteve" },
@@ -634,7 +674,7 @@
   "aiInsights": { "title": "Análise de padrões IA", "analyzing": "Analisando…", "refresh": "Atualizar", "generate": "Gerar", "generated": "Análises geradas", "failedToGenerate": "Falha ao gerar análises", "needMinReflections": "Necessário pelo menos 5 reflexões. Você tem {{count}}.", "noInsightsYet": "Sem análises ainda. Clique \"Gerar\" para analisar seus padrões.", "analyzingCount": "Analisando {{count}} reflexões…", "refreshRecommended": "Atualização recomendada", "reflectionsCount": "{{count}} reflexões" },
   "wallpaper": { "generating": "Gerando wallpaper…", "carry": "Leve sua reflexão com você.", "wallpaper": "Wallpaper", "generateTitle": "Gerar wallpaper", "generateFromReflection": "Gerar wallpaper desta reflexão", "reflectionWallpaper": "Wallpaper da reflexão", "download": "Baixar", "downloaded": "Wallpaper baixado", "regenerate": "Regenerar", "failedToGenerate": "Falha ao gerar wallpaper" },
   "calendar": { "su": "Do", "mo": "Se", "tu": "Te", "we": "Qu", "th": "Qi", "fr": "Se", "sa": "Sá", "noActivity": "Sem atividade.", "reflectionCount": "{{count}} reflexão(ões)", "ritualCount": "{{count}} ritual(is)", "letterCount": "{{count}} carta(s)", "badgeCount": "{{count}} insígnia(s)", "ritual": "Ritual", "badge": "Insígnia" },
-  "librarySources": { "reflection": "Reflexão", "reflection_note": "Nota", "signal": "Sinal", "grounding": "Ancoragem", "learning": "Ancoragem", "haiku": "Haiku", "zoom_out": "Ampliar", "history_insight": "História", "external": "Externo" },
+  "librarySources": { "reflection": "Reflexão", "reflection_note": "Nota", "signal": "Sinal", "grounding": "Ancoragem", "ground": "Ancoragem", "learning": "Ancoragem", "haiku": "Haiku", "zoom_out": "Ampliar", "history_insight": "História", "external": "Externo", "practice": "Prática" },
   "itemDetail": { "onThisDay": "Neste dia", "yearsAgo": "há {{count}}a", "echo": "Eco", "deepTime": "Tempo profundo", "viewSource": "Ver fonte", "source": "fonte", "companions": "Companheiros", "relatedItems": "Itens relacionados", "historicalDataPoints": "{{count}} pontos de dados históricos" },
   "libraryCard": { "removeFavorite": "Remover dos favoritos", "addFavorite": "Adicionar aos favoritos", "markRead": "Marcar como lido", "markUnread": "Marcar como não lido", "archive": "Arquivar", "unread": "não lido", "archived": "arquivado", "link": "link", "tag": "tag", "tagPlaceholder": "Digite tag + Enter…", "save": "Salvar", "saved": "Salvo", "saveToLibrary": "Salvar na biblioteca", "addTagsPlaceholder": "Adicionar tags…", "enterToCreate": "Enter para criar \"{{tag}}\"" },
   "pro": { "featureLocked": "Recurso Pro", "upgradeDesc": "Comece seu teste gratuito de {{trialDays}} dias — companheiros IA, análises, biblioteca e mais.", "upgradeCta": "Teste grátis", "upgradeCtaShort": "Testar Pro grátis", "badge": "PRO" },

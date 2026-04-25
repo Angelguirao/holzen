@@ -8,6 +8,7 @@
  * API keys are read from Deno.env directly (same as the original function).
  */
 
+import type { SupabaseClient } from "https://esm.sh/@supabase/supabase-js@2.57.2";
 import {
   qualityGate,
   containsSlop,
@@ -27,6 +28,7 @@ import { enqueueCatalogSourceSuggestion } from "../source-suggestions.ts";
 import { callPerplexityChat, mergePerplexityUsage } from "../perplexity-client.ts";
 import { searchLibrary, paperToGrounding, recordLibraryServe } from "../content-library.ts";
 import { getPhaseConfig } from "../phase-config.ts";
+import { type CompanionCacheTitleRow } from "../companion-cache-dedup.ts";
 
 /** Bump when the search query, structuring prompt, or quality rules change. */
 export const PROMPT_VERSION = "v4";
@@ -59,7 +61,7 @@ export interface GroundingResult {
 }
 
 export interface GenerateGroundingParams {
-  svcClient: any;
+  svcClient: SupabaseClient;
   context?: string;
   language?: string;
   recentTopics?: string[];
@@ -70,7 +72,7 @@ export interface GenerateGroundingParams {
   /** Past nudge titles to avoid duplicating angles (typically `recentNudgeTopics` from orchestrator). */
   recentGroundingTitles?: string[];
   userId?: string;
-  reflectionId?: string | null;
+  pauseInstanceId?: string | null;
   preferredBias?: string;
   /** Skip library/cache phases and go straight to live (used by regenerate). */
   forceLive?: boolean;
@@ -126,7 +128,7 @@ function findMatchingBiasTopic(preferredBias: string | undefined): (typeof BIAS_
 
 /** Try content_library (papers) for grounding. */
 async function tryLibrary(
-  svcClient: any,
+  svcClient: SupabaseClient,
   userId?: string,
 ): Promise<GroundingResult | null> {
   const libraryRows = await searchLibrary(svcClient, {
@@ -152,16 +154,23 @@ async function tryLibrary(
  * (used by `serveFallback` after live failure) keeps pass-3 as a last-resort serve.
  */
 async function tryCache(
-  svcClient: any,
+  svcClient: SupabaseClient,
   userId?: string,
   marketDirection?: "up" | "down" | "neutral",
   excludeIds?: string[],
   strict = false,
+  structuredLog?: GenerateGroundingParams["log"],
 ): Promise<GroundingResult | null> {
-  const cached = await serveFromCache(svcClient, "ground_nudge", "en", { userId, marketDirection, excludeIds, strict });
+  const cached = await serveFromCache(svcClient, "ground_nudge", "en", {
+    userId,
+    marketDirection,
+    excludeIds,
+    strict,
+    structuredLog,
+  });
   if (cached) {
     return {
-      data: cached.data,
+      data: cached.data as GroundingResult["data"],
       source: "cache",
       cacheId: cached.cacheId,
       cacheRelaxation: cached.relaxation,
@@ -171,17 +180,18 @@ async function tryCache(
 }
 
 /** Last-resort curated fallback pool. */
-async function serveCurated(svcClient: any): Promise<GroundingResult> {
+async function serveCurated(svcClient: SupabaseClient): Promise<GroundingResult> {
   const pool = await loadFallbackPool<{ title: string; body: string; citation: string; url: string }>(svcClient, "grounding");
   return { data: pickRandom(pool), source: "curated", cacheId: null };
 }
 
 /** Resolve from non-live phases in order (library → cache → curated). */
 async function serveFallback(
-  svcClient: any,
+  svcClient: SupabaseClient,
   userId?: string,
   marketDirection?: "up" | "down" | "neutral",
   excludeIds?: string[],
+  structuredLog?: GenerateGroundingParams["log"],
 ): Promise<GroundingResult> {
   if (companionFallbacksDisabled()) {
     return { data: null, source: "empty", cacheId: null, error: COMPANION_FALLBACKS_DISABLED_MESSAGE };
@@ -192,7 +202,7 @@ async function serveFallback(
     if (lib) return lib;
   }
   if (phases.cache) {
-    const cached = await tryCache(svcClient, userId, marketDirection, excludeIds);
+    const cached = await tryCache(svcClient, userId, marketDirection, excludeIds, false, structuredLog);
     if (cached) return cached;
   }
   return serveCurated(svcClient);
@@ -209,7 +219,7 @@ export async function generateGrounding(params: GenerateGroundingParams): Promis
     recentGroundingSources,
     recentGroundingTitles,
     userId,
-    reflectionId,
+    pauseInstanceId,
     preferredBias,
     forceLive,
     skipLive,
@@ -231,7 +241,7 @@ export async function generateGrounding(params: GenerateGroundingParams): Promis
 
   // ── Phase 2: Cache (strict — no pass-3 repeats; fall through to live if strict pool empty) ──
   if (phases.cache) {
-    const cached = await tryCache(svcClient, userId, marketDirectionForCache, undefined, true);
+    const cached = await tryCache(svcClient, userId, marketDirectionForCache, undefined, true, log);
     if (cached) {
       log("grounding resolved from cache (phase 2)");
       return cached;
@@ -258,7 +268,7 @@ export async function generateGrounding(params: GenerateGroundingParams): Promis
   const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
   if (!PERPLEXITY_API_KEY || !LOVABLE_API_KEY) {
     log("missing API keys, serving fallback");
-    return serveFallback(svcClient, userId, marketDirectionForCache);
+    return serveFallback(svcClient, userId, marketDirectionForCache, undefined, log);
   }
 
   // ── Bias topic selection, matching market direction and avoiding recently used ones ──
@@ -303,7 +313,7 @@ export async function generateGrounding(params: GenerateGroundingParams): Promis
   let searchContent = "";
   let citations: string[] = [];
 
-  const perplexityBody: any = {
+  const perplexityBody: Record<string, unknown> = {
     model: "sonar-pro",
     messages: [
       {
@@ -327,7 +337,7 @@ DIVERSITY: Use a different journal/venue angle when possible. Do not recycle the
     let apiCalls = 0;
     let mergedUsage = undefined as ReturnType<typeof mergePerplexityUsage>;
 
-    let result = await callPerplexityChat(perplexityBody, PERPLEXITY_API_KEY, (m) => log(m));
+    const result = await callPerplexityChat(perplexityBody, PERPLEXITY_API_KEY, (m) => log(m));
     apiCalls++;
     mergedUsage = result.usage;
     searchContent = result.content;
@@ -363,7 +373,7 @@ DIVERSITY: Use a different journal/venue angle when possible. Do not recycle the
       error_message: String(e),
       api_requests: 1,
     });
-    return serveFallback(svcClient, userId, marketDirectionForCache);
+    return serveFallback(svcClient, userId, marketDirectionForCache, undefined, log);
   }
 
   if (!searchContent) {
@@ -378,7 +388,7 @@ DIVERSITY: Use a different journal/venue angle when possible. Do not recycle the
       output_tokens: perplexityMerged?.completion_tokens,
       api_requests: perplexityApiCalls || 1,
     });
-    return serveFallback(svcClient, userId, marketDirectionForCache);
+    return serveFallback(svcClient, userId, marketDirectionForCache, undefined, log);
   }
 
   logAttempt({
@@ -451,7 +461,8 @@ BANNED PHRASES — NEVER use any of these: dive into, game-changer, paradigm shi
   };
 
   const models = ["google/gemini-2.5-flash", "google/gemini-2.5-flash-lite"];
-  let nudge: any = null;
+  type GroundingLiveData = NonNullable<GroundingResult["data"]>;
+  let nudge: GroundingLiveData | null = null;
   let lastLovableModel: string | undefined;
 
   const AI_TIMEOUTS = [8000, 6000];
@@ -486,10 +497,10 @@ BANNED PHRASES — NEVER use any of these: dive into, game-changer, paradigm shi
       }
 
       try {
-        nudge = typeof content === "string" ? JSON.parse(content) : content;
+        nudge = (typeof content === "string" ? JSON.parse(content) : content) as GroundingLiveData;
       } catch {
         const m = (typeof content === "string" ? content : "").match(/\{[\s\S]*\}/);
-        if (m) nudge = JSON.parse(m[0]);
+        if (m) nudge = JSON.parse(m[0]) as GroundingLiveData;
         else {
           logAttempt({ companion_type: "ground_nudge", provider: "lovable", model, status: "error", latency_ms: Date.now() - attemptT0, error_message: "json_parse_failed", input_tokens: usage?.prompt_tokens, output_tokens: usage?.completion_tokens });
           if (model !== models[models.length - 1]) continue; else break;
@@ -524,7 +535,7 @@ BANNED PHRASES — NEVER use any of these: dive into, game-changer, paradigm shi
         quality_gate_reason: qg.reason ?? "unknown",
       });
     }
-    return serveFallback(svcClient, userId, marketDirectionForCache);
+    return serveFallback(svcClient, userId, marketDirectionForCache, undefined, log);
   }
 
   // ── Step 4: URL post-processing ──
@@ -533,14 +544,14 @@ BANNED PHRASES — NEVER use any of these: dive into, game-changer, paradigm shi
   }
 
   // ── Step 5: Cache write ──
-  let qualityScore = 1;
+  const qualityScore = 1;
   const cacheQg = qualityGate("ground_nudge", nudge);
   if (nudge.title && nudge.body && nudge.citation && qualityScore > 0 && cacheQg.pass) {
     try {
       const { data: existing } = await svcClient.from("companion_cache").select("content").eq("companion_type", "ground_nudge").eq("language", "en").limit(30);
       const norm = (s: string) => s.toLowerCase().replace(/[^a-z0-9 ]/g, "").trim();
       const newNorm = norm(nudge.title);
-      const isDup = existing?.some((e: any) => {
+      const isDup = existing?.some((e: CompanionCacheTitleRow) => {
         const t = norm(e.content?.title || "");
         return t === newNorm || t.includes(newNorm) || newNorm.includes(t);
       });
@@ -583,7 +594,7 @@ BANNED PHRASES — NEVER use any of these: dive into, game-changer, paradigm shi
     category: "grounding",
     name: suggestName,
     url: nudge.url,
-    reflectionId,
+    pauseInstanceId,
   });
 
   // ── Step 6: Background URL validation (fire-and-forget) ──

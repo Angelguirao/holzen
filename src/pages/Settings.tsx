@@ -1,5 +1,5 @@
 import { useAuth } from '@/hooks/use-auth';
-import { AppVersionBadge } from '@/components/AppVersionBadge';
+import { Link, useLocation } from 'react-router-dom';
 import { QuietWindowsManager } from '@/components/QuietWindowsManager';
 import { SourceManagement } from '@/components/SourceManagement';
 import { ProLock } from '@/components/ProLock';
@@ -12,8 +12,7 @@ import { PRICING } from '@/lib/pricing';
 import { ThresholdSetting } from '@/components/ThresholdSetting';
 import { ReferralSection } from '@/components/ReferralSection';
 import { CreditsDashboard } from '@/components/CreditsDashboard';
-import { Changelog } from '@/components/Changelog';
-import { FeedbackForm } from '@/components/FeedbackForm';
+import { useLatestChangelogVersion } from '@/hooks/use-latest-changelog-version';
 import { InstallHolzenCard } from '@/components/InstallHolzenCard';
 import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
@@ -21,6 +20,7 @@ import { Button } from '@/components/ui/button';
 import { LoadingButton } from '@/components/ui/loading-button';
 import { Info, Loader2 } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
+import { trackEvent } from '@/lib/posthog';
 import { toast } from 'sonner';
 import { useState, useEffect, useCallback, forwardRef, useRef } from 'react';
 import { Input } from '@/components/ui/input';
@@ -52,7 +52,14 @@ import {
 import { NoxHeaderMain } from '@/components/ui/nox-header';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 
-const LAST_SEEN_VERSION_KEY = 'holzen_last_seen_version';
+function readThrownMessage(e: unknown, fallback: string): string {
+  if (e instanceof Error && e.message) return e.message;
+  if (e && typeof e === 'object' && 'message' in e) {
+    const m = (e as { message: unknown }).message;
+    if (typeof m === 'string' && m.length > 0) return m;
+  }
+  return fallback;
+}
 
 function GroundingTagInput({ activities, onChange }: { activities: string[]; onChange: (v: string[]) => void }) {
   const { t } = useTranslation();
@@ -100,7 +107,7 @@ function GroundingTagInput({ activities, onChange }: { activities: string[]; onC
         value={inputValue}
         onChange={(e) => setInputValue(e.target.value)}
         onKeyDown={handleKeyDown}
-        placeholder={t('onboarding.groundingPlaceholder', 'e.g. running, cooking, guitar...')}
+        placeholder={t('onboarding.groundingPlaceholder', { defaultValue: 'e.g. running, cooking, guitar...' })}
         className="w-full bg-transparent border-b border-border/40 focus:border-foreground/30 outline-none text-sm font-mono py-2 text-foreground placeholder:text-muted-foreground/30 transition-colors"
       />
     </div>
@@ -121,6 +128,13 @@ const Settings = forwardRef<HTMLDivElement>(function Settings(_props, ref) {
     monthlyRemaining,
     tier,
   } = useSubscription();
+  const startCheckoutFromSettings = useCallback(
+    (target: 'pro' | 'pro_plus' | 'flex_pack_s' | 'flex_pack_m' = 'pro') => {
+      trackEvent('paywall.viewed', { source: 'settings' });
+      return startCheckout(target);
+    },
+    [startCheckout],
+  );
   const { canInstall, install } = useInstallPrompt();
   const {
     isSupported: pushSupported,
@@ -158,8 +172,7 @@ const Settings = forwardRef<HTMLDivElement>(function Settings(_props, ref) {
     [checkoutWindowMinutes],
   );
   const [btcMode, setBtcMode] = useState(() => localStorage.getItem('holzen_btc_mode') === 'true');
-  const [latestVersion, setLatestVersion] = useState<string | null>(null);
-  const [hasNewVersion, setHasNewVersion] = useState(false);
+  const { hasNewVersion: hasUnseenChangelog } = useLatestChangelogVersion();
   const initialLoadRef = useRef(true);
   const saveTimeoutRef = useRef<ReturnType<typeof setTimeout>>();
 
@@ -172,28 +185,11 @@ const Settings = forwardRef<HTMLDivElement>(function Settings(_props, ref) {
     }
     clearTimeout(saveTimeoutRef.current);
     saveTimeoutRef.current = setTimeout(() => {
-      toast(t('settings.saved', 'Saved'), { duration: 1200, id: 'auto-save' });
+      toast(t('settings.saved', { defaultValue: 'Saved' }), { duration: 1200, id: 'auto-save' });
     }, 400);
     return () => clearTimeout(saveTimeoutRef.current);
-  }, [threshold, thresholdDown, cumulativeThreshold, emailNotifications, reflectionTone, reflectionStyle, silentMode, cooldownHours, digestFrequency, customPrompt, quietHoursStart, quietHoursEnd, firstName, nightReflectionHour, aiInsightsEnabled, notifyBadges, mantra, currency, language, groundingActivities, companionPrefs]);
+  }, [threshold, thresholdDown, cumulativeThreshold, emailNotifications, reflectionTone, reflectionStyle, silentMode, cooldownHours, digestFrequency, customPrompt, quietHoursStart, quietHoursEnd, firstName, nightReflectionHour, aiInsightsEnabled, notifyBadges, mantra, currency, language, groundingActivities, companionPrefs, profileLoaded, t]);
 
-
-  useEffect(() => {
-    supabase
-      .from('changelog_entries')
-      .select('version')
-      .order('created_at', { ascending: false })
-      .limit(1)
-      .maybeSingle()
-      .then(({ data }) => {
-        if (data?.version) {
-          const v = data.version;
-          setLatestVersion(v);
-          const lastSeen = localStorage.getItem(LAST_SEEN_VERSION_KEY);
-          setHasNewVersion(lastSeen !== v);
-        }
-      });
-  }, []);
 
   const changePassword = useCallback(async () => {
     if (newPassword.length < 6) {
@@ -211,9 +207,8 @@ const Settings = forwardRef<HTMLDivElement>(function Settings(_props, ref) {
       toast.success(t('auth.passwordUpdated'));
       setNewPassword('');
       setConfirmPassword('');
-    } catch (e: any) {
-      const msg = e?.message || 'Something went wrong';
-      toast.error(msg);
+    } catch (e: unknown) {
+      toast.error(readThrownMessage(e, 'Something went wrong'));
     } finally {
       setChangingPassword(false);
     }
@@ -228,57 +223,104 @@ const Settings = forwardRef<HTMLDivElement>(function Settings(_props, ref) {
     if (!user) return;
     setExporting(true);
     try {
-      const [{ data: profile }, { data: reflections }] = await Promise.all([
+      // Pull V2 rows: instance + hydrated fields from v_pause_full,
+      // step events, companion events, artifacts. The CSV is
+      // instance-level (flat); the JSON includes everything.
+      const [
+        { data: profile },
+        { data: pauses },
+        { data: stepEvents },
+        { data: companionEvents },
+        { data: artifacts },
+      ] = await Promise.all([
         supabase.from('profiles').select('*').eq('user_id', user.id).single(),
-        (supabase.from('v_reflection_with_companions').select('*').eq('user_id', user.id).order('created_at', { ascending: false }) as any),
+        supabase
+          .from('v_pause_full' as never)
+          .select('*')
+          .eq('user_id', user.id)
+          .order('created_at', { ascending: false }),
+        supabase
+          .from('pause_step_events' as never)
+          .select('pause_instance_id, step_type, payload, created_at')
+          .eq('user_id', user.id),
+        supabase
+          .from('pause_companion_events' as never)
+          .select(
+            'pause_instance_id, companion_type, action, counts_for_pause, non_counting_reason, entry_point, created_at',
+          )
+          .eq('user_id', user.id),
+        supabase
+          .from('pause_ai_artifacts' as never)
+          .select('pause_instance_id, kind, content, created_at')
+          .eq('user_id', user.id),
       ]);
 
+      const pauseRows = (pauses ?? []) as Record<string, unknown>[];
       const dateStr = new Date().toISOString().slice(0, 10);
 
       if (format === 'csv') {
-        const refHeaders = ['created_at', 'message', 'context', 'mood', 'outcome', 'note', 'tags', 'haiku', 'is_favorite'];
-        const refRows = (reflections ?? []).map((r: any) =>
-          refHeaders.map(h => {
-            const val = h === 'tags' ? (r[h] ?? []).join('; ') : (r[h] ?? '');
-            return `"${String(val).replace(/"/g, '""')}"`;
-          }).join(',')
+        const refHeaders = [
+          'created_at',
+          'state',
+          'initial_mood',
+          'shift_mood',
+          'outcome',
+          'note_text',
+          'tags',
+          'is_favorite',
+          'counted_companion_types',
+          'reflection_text',
+        ];
+        const refRows = pauseRows.map((r) =>
+          refHeaders
+            .map((h) => {
+              const val = Array.isArray(r[h]) ? r[h].join('; ') : r[h] ?? '';
+              return `"${String(val).replace(/"/g, '""')}"`;
+            })
+            .join(','),
         );
         const refCsv = [refHeaders.join(','), ...refRows].join('\n');
 
         const refBlob = new Blob([refCsv], { type: 'text/csv' });
         const refUrl = URL.createObjectURL(refBlob);
         const a1 = document.createElement('a');
-        a1.href = refUrl; a1.download = `holzen-reflections-${dateStr}.csv`; a1.click();
+        a1.href = refUrl;
+        a1.download = `holzen-pauses-${dateStr}.csv`;
+        a1.click();
         URL.revokeObjectURL(refUrl);
 
-        toast.success('CSV exported', { description: `${reflections?.length ?? 0} pauses.` });
+        toast.success('CSV exported', { description: `${pauseRows.length} pauses.` });
       } else {
         const exportPayload = {
           exported_at: new Date().toISOString(),
-          profile: profile ? {
-            threshold: profile.threshold,
-            threshold_down: profile.threshold_down,
-            cooldown_hours: profile.cooldown_hours,
-            reflection_tone: profile.reflection_tone,
-            reflection_style: profile.reflection_style,
-            language: profile.language,
-            email_notifications: profile.email_notifications,
-            created_at: profile.created_at,
-          } : null,
-          reflections: (reflections ?? []).map((r: any) => ({
-            message: r.message, context: r.context, mood: r.mood, outcome: r.outcome,
-            note: r.note, tags: r.tags, haiku: r.haiku, is_favorite: r.is_favorite,
-            grounding_title: r.grounding_title, grounding_body: r.grounding_body,
-            signal_title: r.signal_title, signal_body: r.signal_body, created_at: r.created_at,
-          })),
+          profile: profile
+            ? {
+                threshold: profile.threshold,
+                threshold_down: profile.threshold_down,
+                cooldown_hours: profile.cooldown_hours,
+                reflection_tone: profile.reflection_tone,
+                reflection_style: profile.reflection_style,
+                language: profile.language,
+                email_notifications: profile.email_notifications,
+                created_at: profile.created_at,
+              }
+            : null,
+          pauses: pauseRows,
+          step_events: stepEvents ?? [],
+          companion_events: companionEvents ?? [],
+          ai_artifacts: artifacts ?? [],
         };
 
-        const blob = new Blob([JSON.stringify(exportPayload, null, 2)], { type: 'application/json' });
+        const blob = new Blob([JSON.stringify(exportPayload, null, 2)], {
+          type: 'application/json',
+        });
         const url = URL.createObjectURL(blob);
         const a = document.createElement('a');
-        a.href = url; a.download = `holzen-export-${dateStr}.json`; a.click();
+        a.href = url;
+        a.download = `holzen-export-${dateStr}.json`;
+        a.click();
         URL.revokeObjectURL(url);
-        toast.success('Data exported', { description: `${reflections?.length ?? 0} pauses.` });
+        toast.success('Data exported', { description: `${pauseRows.length} pauses.` });
       }
     } catch {
       toast.error('Export failed');
@@ -301,6 +343,41 @@ const Settings = forwardRef<HTMLDivElement>(function Settings(_props, ref) {
     }
   };
 
+  const [openSettingsSections, setOpenSettingsSections] = useState<string[]>([]);
+
+  const settingsJump = useCallback((value: string) => {
+    setOpenSettingsSections((prev) => {
+      if (prev.includes(value)) {
+        setTimeout(
+          () =>
+            document
+              .getElementById(`settings-section-${value}`)
+              ?.scrollIntoView({ behavior: 'smooth', block: 'start' }),
+          0,
+        );
+        return prev;
+      }
+      const next = [...prev, value];
+      setTimeout(
+        () =>
+          document
+            .getElementById(`settings-section-${value}`)
+            ?.scrollIntoView({ behavior: 'smooth', block: 'start' }),
+        80,
+      );
+      return next;
+    });
+  }, []);
+
+  const location = useLocation();
+  useEffect(() => {
+    if (!profileLoaded) return;
+    const raw = location.hash.replace(/^#/, '');
+    if (!raw.startsWith('settings-section-')) return;
+    const value = raw.slice('settings-section-'.length);
+    if (value) settingsJump(value);
+  }, [location.hash, location.pathname, profileLoaded, settingsJump]);
+
   if (!profileLoaded) {
     return (
       <div className="space-y-6">
@@ -322,12 +399,46 @@ const Settings = forwardRef<HTMLDivElement>(function Settings(_props, ref) {
     <div ref={ref} className="space-y-6">
       <NoxHeaderMain title={t('settings.title')} subtitle={t('settings.pageSubtitle')} />
 
-      <Accordion type="multiple" className="space-y-4">
+      <p className="text-[10px] font-mono text-muted-foreground/80 uppercase tracking-wider">
+        {t('settings.jumpNavIntro')}
+      </p>
+      <div className="flex flex-wrap gap-x-2 gap-y-1.5 -mt-1">
+        {(
+          [
+            ['you', 'settings.accountProfile', { defaultValue: 'Account & profile' }],
+            ['reflection', 'settings.pauseBehavior', { defaultValue: 'Pause behavior' }],
+            ['experience', 'settings.appBehavior', { defaultValue: 'App behavior' }],
+            ['companions', 'settings.contentData', { defaultValue: 'Content & data' }],
+            ['notifications', 'settings.notificationsQuietHours', { defaultValue: 'Notifications & quiet hours' }],
+            ['subscription', 'settings.subscriptionPro', { defaultValue: 'Subscription & Pro' }],
+            ['account', 'settings.accountSecurity', { defaultValue: 'Account & security' }],
+          ] as const
+        ).map(([value, key, opts]) => (
+          <Link
+            key={value}
+            to={{ pathname: '/settings', hash: `settings-section-${value}` }}
+            className="text-[10px] font-mono text-primary/90 underline-offset-2 hover:underline"
+          >
+            {t(key, opts)}
+          </Link>
+        ))}
+      </div>
+
+      <Accordion
+        type="multiple"
+        value={openSettingsSections}
+        onValueChange={setOpenSettingsSections}
+        className="space-y-4"
+      >
 
         {/* 1. You */}
-        <AccordionItem value="you" className="border border-border/40 rounded-md px-4 mb-[16px]">
+        <AccordionItem
+          value="you"
+          id="settings-section-you"
+          className="border border-border/40 rounded-md px-4 mb-[16px]"
+        >
           <AccordionTrigger className="text-xs font-mono uppercase tracking-wider text-muted-foreground hover:text-foreground py-3 hover:no-underline">
-            {t('settings.you')}
+            {t('settings.accountProfile', { defaultValue: 'Account & profile' })}
           </AccordionTrigger>
           <AccordionContent className="space-y-5 pb-4">
             <div className="space-y-3">
@@ -410,9 +521,13 @@ const Settings = forwardRef<HTMLDivElement>(function Settings(_props, ref) {
         </AccordionItem>
 
         {/* 2. Reflection */}
-        <AccordionItem value="reflection" className="border border-border/40 rounded-md px-4 mb-[16px]">
+        <AccordionItem
+          value="reflection"
+          id="settings-section-reflection"
+          className="border border-border/40 rounded-md px-4 mb-[16px]"
+        >
           <AccordionTrigger className="text-xs font-mono uppercase tracking-wider text-muted-foreground hover:text-foreground py-3 hover:no-underline">
-            {t('settings.reflection')}
+            {t('settings.pauseBehavior', { defaultValue: 'Pause behavior' })}
           </AccordionTrigger>
           <AccordionContent className="space-y-6 pb-4">
             {profileLoaded ? (
@@ -440,7 +555,7 @@ const Settings = forwardRef<HTMLDivElement>(function Settings(_props, ref) {
                 className="space-y-1 rounded-md border border-border/50 bg-muted/20 px-3 py-2"
               >
                 <h3 id="settings-cooldown-help-title" className="text-sm font-medium text-secondary-foreground">
-                  {t('settings.cooldownHelpTitle', 'Cooldown help')}
+                  {t('settings.cooldownHelpTitle', { defaultValue: 'Cooldown help' })}
                 </h3>
                 <p id="settings-cooldown-help-body" className="text-sm leading-relaxed text-muted-foreground">
                   {t(
@@ -554,9 +669,13 @@ const Settings = forwardRef<HTMLDivElement>(function Settings(_props, ref) {
         </AccordionItem>
 
         {/* 3. Experience */}
-        <AccordionItem value="experience" className="border border-border/40 rounded-md px-4 mb-[16px]">
+        <AccordionItem
+          value="experience"
+          id="settings-section-experience"
+          className="border border-border/40 rounded-md px-4 mb-[16px]"
+        >
           <AccordionTrigger className="text-xs font-mono uppercase tracking-wider text-muted-foreground hover:text-foreground py-3 hover:no-underline">
-            {t('settings.experience', 'Experience')}
+            {t('settings.appBehavior', { defaultValue: 'App behavior' })}
           </AccordionTrigger>
           <AccordionContent className="space-y-6 pb-4 text-muted-foreground">
             {/* 1 BTC = 1 BTC mode */}
@@ -637,7 +756,7 @@ const Settings = forwardRef<HTMLDivElement>(function Settings(_props, ref) {
             {/* Checkout-confirmed suppression window */}
             <div className="space-y-3">
               <p className="text-muted-foreground/60 uppercase tracking-wider text-sm font-sans">
-                {t('settings.checkoutWindow', 'Checkout-confirmed window')}
+                {t('settings.checkoutWindow', { defaultValue: 'Checkout-confirmed window' })}
               </p>
               <p className="leading-relaxed text-primary text-sm">
                 {t(
@@ -651,7 +770,7 @@ const Settings = forwardRef<HTMLDivElement>(function Settings(_props, ref) {
                   htmlFor="checkout-window-minutes"
                   className="text-muted-foreground text-base font-sans"
                 >
-                  {t('settings.checkoutWindowLabel', 'Window (minutes)')}
+                  {t('settings.checkoutWindowLabel', { defaultValue: 'Window (minutes)' })}
                 </Label>
                 <Input
                   id="checkout-window-minutes"
@@ -701,13 +820,13 @@ const Settings = forwardRef<HTMLDivElement>(function Settings(_props, ref) {
 
             {/* Notification Sound */}
             <div className="space-y-3">
-              <p className="text-muted-foreground/60 uppercase tracking-wider text-sm font-sans">{t('settings.notificationSound', 'Notification sound')}</p>
+              <p className="text-muted-foreground/60 uppercase tracking-wider text-sm font-sans">{t('settings.notificationSound')}</p>
               <p className="leading-relaxed text-primary text-sm">
-                {t('settings.notificationSoundDesc', 'Play a singing-bowl chime when a new reflection arrives.')}
+                {t('settings.notificationSoundDesc')}
               </p>
               <div className="flex items-center justify-between">
                 <Label htmlFor="sound-toggle" className="text-xs font-mono text-muted-foreground">
-                  {t('settings.enableSound', 'Enable sound')}
+                  {t('settings.enableSound')}
                 </Label>
                 <Switch id="sound-toggle" checked={soundEnabled} onCheckedChange={(val) => { setSoundEnabled(val); localStorage.setItem('holzen_sound_enabled', String(val)); }} />
               </div>
@@ -730,9 +849,13 @@ const Settings = forwardRef<HTMLDivElement>(function Settings(_props, ref) {
         </AccordionItem>
 
         {/* 4. Companions & AI */}
-        <AccordionItem value="companions" className="border border-border/40 rounded-md px-4 mb-[16px]">
+        <AccordionItem
+          value="companions"
+          id="settings-section-companions"
+          className="border border-border/40 rounded-md px-4 mb-[16px]"
+        >
           <AccordionTrigger className="text-xs font-mono uppercase tracking-wider text-muted-foreground hover:text-foreground py-3 hover:no-underline">
-            {t('settings.companionsAi', 'Companions & AI')}
+            {t('settings.contentData', { defaultValue: 'Content & data' })}
           </AccordionTrigger>
           <AccordionContent className="space-y-6 pb-4">
             <ProLock feature="companions" hideContent>
@@ -777,9 +900,13 @@ const Settings = forwardRef<HTMLDivElement>(function Settings(_props, ref) {
   
 
         {/* 5. Notifications & Schedule */}
-        <AccordionItem value="notifications" className="border border-border/40 rounded-md px-4 mb-[16px]">
+        <AccordionItem
+          value="notifications"
+          id="settings-section-notifications"
+          className="border border-border/40 rounded-md px-4 mb-[16px]"
+        >
           <AccordionTrigger className="text-xs font-mono uppercase tracking-wider text-muted-foreground hover:text-foreground py-3 hover:no-underline">
-            {t('settings.notificationsSchedule')}
+            {t('settings.notificationsQuietHours', { defaultValue: 'Notifications & quiet hours' })}
           </AccordionTrigger>
           <AccordionContent className="space-y-6 pb-4">
             <div className="space-y-3">
@@ -793,7 +920,7 @@ const Settings = forwardRef<HTMLDivElement>(function Settings(_props, ref) {
                 <Alert className="border-primary/30 bg-primary/5">
                   <Info className="h-4 w-4 text-primary" />
                   <AlertTitle className="text-sm">
-                    {t('settings.pushFinishBannerTitle', 'Finish enabling push in Settings')}
+                    {t('settings.pushFinishBannerTitle', { defaultValue: 'Finish enabling push in Settings' })}
                   </AlertTitle>
                   <AlertDescription className="mt-2 space-y-3 text-xs leading-relaxed text-muted-foreground">
                     <p>
@@ -810,7 +937,7 @@ const Settings = forwardRef<HTMLDivElement>(function Settings(_props, ref) {
                       loading={pushLoading}
                       onClick={() => void pushSubscribe()}
                     >
-                      {t('settings.pushFinishBannerAction', 'Enable push on this device')}
+                      {t('settings.pushFinishBannerAction', { defaultValue: 'Enable push on this device' })}
                     </LoadingButton>
                   </AlertDescription>
                 </Alert>
@@ -977,9 +1104,13 @@ const Settings = forwardRef<HTMLDivElement>(function Settings(_props, ref) {
         </AccordionItem>
 
         {/* 6. Subscription & Referrals */}
-        <AccordionItem value="subscription" className="border border-border/40 rounded-md px-4 mb-[16px]">
+        <AccordionItem
+          value="subscription"
+          id="settings-section-subscription"
+          className="border border-border/40 rounded-md px-4 mb-[16px]"
+        >
           <AccordionTrigger className="text-xs font-mono uppercase tracking-wider text-muted-foreground hover:text-foreground py-3 hover:no-underline">
-            {t('settings.subscriptionReferrals')}
+            {t('settings.subscriptionPro', { defaultValue: 'Subscription & Pro' })}
           </AccordionTrigger>
           <AccordionContent className="space-y-6 pb-4">
             <div className="space-y-3">
@@ -990,16 +1121,16 @@ const Settings = forwardRef<HTMLDivElement>(function Settings(_props, ref) {
                 <div className="space-y-3">
                   <p className="text-sm font-sans text-primary">
                     {tier === 'pro_plus'
-                      ? t('settings.planProPlus', 'Pro+ plan')
+                      ? t('settings.planProPlus', { defaultValue: 'Pro+ plan' })
                       : tier === 'lifetime'
-                      ? t('settings.planLifetime', 'Lifetime plan')
-                      : t('settings.planPro', 'Pro plan')}
+                        ? t('settings.planLifetime', { defaultValue: 'Lifetime plan' })
+                        : t('settings.planPro', { defaultValue: 'Pro plan' })}
                   </p>
                   {tier !== 'lifetime' && (
                     <div className="grid grid-cols-1 gap-2">
                       {tier === 'pro' && (
                         <LoadingButton
-                          onClick={() => startCheckout('pro_plus')}
+                          onClick={() => startCheckoutFromSettings('pro_plus')}
                           loading={checkoutLoading && checkoutLoadingTarget === 'pro_plus'}
                           disabled={checkoutLoading && checkoutLoadingTarget !== 'pro_plus'}
                           loadingText={t('settings.openingCheckout')}
@@ -1013,7 +1144,7 @@ const Settings = forwardRef<HTMLDivElement>(function Settings(_props, ref) {
                         </LoadingButton>
                       )}
                       <LoadingButton
-                        onClick={() => startCheckout('flex_pack_s')}
+                        onClick={() => startCheckoutFromSettings('flex_pack_s')}
                         loading={checkoutLoading && checkoutLoadingTarget === 'flex_pack_s'}
                         disabled={checkoutLoading && checkoutLoadingTarget !== 'flex_pack_s'}
                         loadingText={t('settings.openingCheckout')}
@@ -1028,7 +1159,7 @@ const Settings = forwardRef<HTMLDivElement>(function Settings(_props, ref) {
                         })}
                       </LoadingButton>
                       <LoadingButton
-                        onClick={() => startCheckout('flex_pack_m')}
+                        onClick={() => startCheckoutFromSettings('flex_pack_m')}
                         loading={checkoutLoading && checkoutLoadingTarget === 'flex_pack_m'}
                         disabled={checkoutLoading && checkoutLoadingTarget !== 'flex_pack_m'}
                         loadingText={t('settings.openingCheckout')}
@@ -1074,11 +1205,11 @@ const Settings = forwardRef<HTMLDivElement>(function Settings(_props, ref) {
                     </p>
                   )}
                   <p className="text-sm font-sans text-muted-foreground">
-                    {t('settings.choosePlan', 'Choose your plan')}
+                    {t('settings.choosePlan', { defaultValue: 'Choose your plan' })}
                   </p>
                   <div className="grid grid-cols-1 gap-2">
                     <LoadingButton
-                      onClick={() => startCheckout('pro')}
+                      onClick={() => startCheckoutFromSettings('pro')}
                       loading={checkoutLoading}
                       loadingText={t('settings.openingCheckout')}
                       className="w-full text-base font-sans"
@@ -1090,7 +1221,7 @@ const Settings = forwardRef<HTMLDivElement>(function Settings(_props, ref) {
                       })}
                     </LoadingButton>
                     <LoadingButton
-                      onClick={() => startCheckout('pro_plus')}
+                      onClick={() => startCheckoutFromSettings('pro_plus')}
                       loading={checkoutLoading}
                       loadingText={t('settings.openingCheckout')}
                       variant="outline"
@@ -1114,9 +1245,13 @@ const Settings = forwardRef<HTMLDivElement>(function Settings(_props, ref) {
         </AccordionItem>
 
         {/* 7. Account */}
-        <AccordionItem value="account" className="border border-border/40 rounded-md px-4 mb-[16px]">
+        <AccordionItem
+          value="account"
+          id="settings-section-account"
+          className="border border-border/40 rounded-md px-4 mb-[16px]"
+        >
           <AccordionTrigger className="text-xs font-mono uppercase tracking-wider text-muted-foreground hover:text-foreground py-3 hover:no-underline">
-            {t('settings.account')}
+            {t('settings.accountSecurity', { defaultValue: 'Account & security' })}
           </AccordionTrigger>
           <AccordionContent className="space-y-6 pb-4">
               <p className="truncate font-sans text-primary text-sm">{user.email}</p>
@@ -1250,35 +1385,29 @@ const Settings = forwardRef<HTMLDivElement>(function Settings(_props, ref) {
           </AccordionContent>
         </AccordionItem>
 
-        {/* 8. About */}
-        <AccordionItem value="about" className="border border-border/40 rounded-md px-4 mb-[16px]">
-          <AccordionTrigger className="text-xs font-mono uppercase tracking-wider text-muted-foreground hover:text-foreground py-3 hover:no-underline">
-            <span className="flex items-center gap-4 flex-1">
-              {t('settings.about')}
-              {hasNewVersion && (
-                <span className="text-[10px] font-mono bg-primary/10 text-primary px-1.5 py-0.5 rounded-full">
-                  {t('common.new')}
-                </span>
-              )}
-            </span>
-          </AccordionTrigger>
-          <AccordionContent className="space-y-5 pb-4">
-            <FeedbackForm />
-            <div className="border-t border-border/30 pt-4 space-y-3">
-              <div className="flex items-center gap-3">
-                <Changelog
-                  onWhatsNewOpen={() => {
-                    if (latestVersion) {
-                      localStorage.setItem(LAST_SEEN_VERSION_KEY, latestVersion);
-                      setHasNewVersion(false);
-                    }
-                  }}
-                />
-              </div>
-              <AppVersionBadge changelogVersion={latestVersion} />
+        {/* 8. About (sub-route — keeps main Settings action-first) */}
+        <div className="border border-border/40 rounded-md px-4 py-3 mb-[16px]">
+          <Link
+            to="/settings/about"
+            className="flex items-center justify-between gap-3 -mx-1 rounded-md px-1 py-0.5 outline-none focus-visible:ring-2 focus-visible:ring-primary/30"
+          >
+            <div className="min-w-0 text-left">
+              <p className="text-xs font-mono uppercase tracking-wider text-muted-foreground">
+                {t('settings.aboutFeedback', { defaultValue: 'About & feedback' })}
+              </p>
+              <p className="text-xs text-muted-foreground/80 leading-relaxed mt-1">
+                {t('settings.aboutSubpageHint', {
+                  defaultValue: "What's new, version, and feedback — in one place",
+                })}
+              </p>
             </div>
-          </AccordionContent>
-        </AccordionItem>
+            {hasUnseenChangelog ? (
+              <span className="shrink-0 text-[10px] font-mono bg-primary/10 text-primary px-1.5 py-0.5 rounded-full">
+                {t('common.new')}
+              </span>
+            ) : null}
+          </Link>
+        </div>
 
       </Accordion>
     </div>
@@ -1301,8 +1430,8 @@ function ChangeEmailSection() {
       if (error) throw error;
       toast.success('Confirmation sent');
       setNewEmail('');
-    } catch (e: any) {
-      toast.error(e?.message || 'Something went wrong');
+    } catch (e: unknown) {
+      toast.error(readThrownMessage(e, 'Something went wrong'));
     } finally {
       setChanging(false);
     }

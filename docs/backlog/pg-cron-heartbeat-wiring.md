@@ -14,7 +14,7 @@ Storing UUIDs in `public.app_config` avoids the problem: the table is already ad
 
 ## What needs to happen
 
-### Part A — BetterStack Heartbeats (≈ 8 min)
+### Part A — BetterStack Heartbeats (≈ 7 min)
 
 BetterStack → **Uptime** product (not Logs) → **Heartbeats** → **Create heartbeat** for each row below. Use **exactly** the period and grace shown — these are the contract that downstream alerting is tuned against.
 
@@ -37,8 +37,9 @@ BetterStack → **Uptime** product (not Logs) → **Heartbeats** → **Create he
 | `holzen-cron-check-volatility` | 15 min | 5 min | Same cadence as price refresh; grace matches so they alert in lockstep when pg_cron itself is down. | `heartbeat.check_volatility` |
 | `holzen-cron-night-reflection` | 1 hr | 10 min | Fans out per-user AI generation; p95 runtime ~3-5 min, grace covers slow batches without paging. | `heartbeat.night_reflection` |
 | `holzen-cron-pregenerate-companions` | 6 hr | 30 min | Long-running batch (Lovable AI); 30 min absolute grace, not proportional — anything later is a real stall. | `heartbeat.pregenerate_companions` |
-| `holzen-cron-check-followups` | 6 hr | 30 min | Read-mostly sweep; same 30 min absolute grace as other multi-hour jobs. | `heartbeat.check_followups` |
 | `holzen-cron-fetch-source-feeds` | 12 hr | 30 min | External RSS/Firecrawl fetches with internal per-source throttling; runtime variance is bounded, so absolute grace is appropriate. | `heartbeat.fetch_source_feeds` |
+
+**Pause V2:** the `holzen-cron-check-followups` row was removed — the `follow_ups` table and `check-followups` function were dropped in `20260423202000_pause_v2_destructive_cutover.sql`. Remove any existing BetterStack heartbeat + `app_config` `heartbeat.check_followups` entry + pg_cron schedule if still present.
 
 If you add a new cron job, **pick its row from the tuning rule above** before creating the BetterStack heartbeat — don't eyeball it. If a job ends up paging for transient reasons (single-slot miss, expected upstream slowness), revisit the rule rather than silently bumping grace in the BetterStack UI; update the table here in the same PR so future-you knows why.
 
@@ -48,19 +49,21 @@ Then: BetterStack Uptime → **Integrations → Slack** → same `#holzen-alerts
 
 ### Part B — populate `app_config` (≈ 2 min)
 
-Supabase dashboard → **SQL Editor** → new query → fill in the 8 UUIDs and run:
+Supabase dashboard → **SQL Editor** → new query → fill in the 7 UUIDs and run:
 
 ```sql
 UPDATE public.app_config SET value = to_jsonb('<uuid-refresh-btc-prices>'::text)       WHERE key = 'heartbeat.refresh_btc_prices';
 UPDATE public.app_config SET value = to_jsonb('<uuid-fetch-source-feeds>'::text)       WHERE key = 'heartbeat.fetch_source_feeds';
 UPDATE public.app_config SET value = to_jsonb('<uuid-pregenerate-companions>'::text)   WHERE key = 'heartbeat.pregenerate_companions';
 UPDATE public.app_config SET value = to_jsonb('<uuid-check-volatility>'::text)         WHERE key = 'heartbeat.check_volatility';
-UPDATE public.app_config SET value = to_jsonb('<uuid-check-followups>'::text)          WHERE key = 'heartbeat.check_followups';
 UPDATE public.app_config SET value = to_jsonb('<uuid-process-referral-pending>'::text) WHERE key = 'heartbeat.process_referral_pending';
 UPDATE public.app_config SET value = to_jsonb('<uuid-night-reflection>'::text)         WHERE key = 'heartbeat.night_reflection';
 UPDATE public.app_config SET value = to_jsonb('<uuid-process-email-queue>'::text)      WHERE key = 'heartbeat.process_email_queue';
 
--- Verify: 8 rows, UUID column non-empty.
+-- Optional: remove stale Pause V1 key if migrations left it behind.
+-- DELETE FROM public.app_config WHERE key = 'heartbeat.check_followups';
+
+-- Verify: one row per active job above; UUID column non-empty.
 SELECT key, value #>> '{}' AS uuid
 FROM public.app_config
 WHERE key LIKE 'heartbeat.%' AND key <> 'heartbeat._base_url'
@@ -69,7 +72,7 @@ ORDER BY key;
 
 No `ALTER DATABASE` — no superuser needed. Rows are visible/editable in the `/admin` Tools tab once it's wired for `heartbeat.*` keys.
 
-### Part C — append heartbeat calls to each cron job (≈ 2 min × 8 = 16 min)
+### Part C — append heartbeat calls to each cron job (≈ 2 min × N jobs)
 
 For each existing cron job: fetch the current command, unschedule, re-schedule with a `PERFORM public.emit_job_heartbeat(...)` call **after** the real work (so a failure short-circuits before the heartbeat fires).
 

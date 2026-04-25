@@ -125,8 +125,8 @@ Do **not** create events in the PostHog UI. Events are emitted from the app per 
 
 ### 3.3 First insights (optional; nice-to-have)
 
-- Funnel: `auth.signed_up` → `reflection.completed` → `paywall.subscribed`
-- Trend: `reflection.completed` count by day, breakdown by `had_bitcoin_context`
+- Funnel: `auth.signed_up` → `pause.manual_completed` → `paywall.subscribed`
+- Trend: `pause.manual_completed` count by day, breakdown by `had_bitcoin_context`
 - Retention: `auth.signed_in` cohort weekly
 
 ## 4. BetterStack (Logtail)
@@ -153,7 +153,6 @@ Each targets source `holzen-edges`:
 | Heartbeat miss: refresh-btc-prices | See §6 below | Slack, paging |
 | Heartbeat miss: pregenerate-companions | See §6 | Slack, paging |
 | Heartbeat miss: check-volatility | See §6 | Slack, paging |
-| Heartbeat miss: check-followups | See §6 | Slack, paging |
 | Heartbeat miss: night-reflection | See §6 | Slack, paging |
 | Heartbeat miss: fetch-source-feeds | See §6 | Slack, paging |
 | Heartbeat miss: process-referral-pending | See §6 | Slack, warning |
@@ -189,7 +188,7 @@ Short version:
 
 #### Heartbeat windows (canonical)
 
-Mirror of the table in [pg-cron-heartbeat-wiring.md §Part A](../backlog/pg-cron-heartbeat-wiring.md#part-a--betterstack-heartbeats--8-min). If you change a value, change it in **both** places in the same PR — the backlog ticket owns the *why* (per-job rationale + tuning rule), this runbook is the *what* (the values to type into BetterStack).
+Mirror of the **Part A** table in [pg-cron-heartbeat-wiring.md](../backlog/pg-cron-heartbeat-wiring.md) (heartbeat periods + grace; row count shrank after Pause V2 removed `check-followups`). If you change a value, change it in **both** places in the same PR — the backlog ticket owns the *why* (per-job rationale + tuning rule), this runbook is the *what* (the values to type into BetterStack).
 
 | Cron job | Schedule | Period | Grace | `app_config` key |
 |---|---|---|---|---|
@@ -199,8 +198,9 @@ Mirror of the table in [pg-cron-heartbeat-wiring.md §Part A](../backlog/pg-cron
 | `check-volatility` | `*/15 * * * *` | 15 min | 5 min | `heartbeat.check_volatility` |
 | `night-reflection` | `0 * * * *` | 1 hr | 10 min | `heartbeat.night_reflection` |
 | `pregenerate-companions` | `0 */6 * * *` | 6 hr | 30 min | `heartbeat.pregenerate_companions` |
-| `check-followups` | `0 */6 * * *` | 6 hr | 30 min | `heartbeat.check_followups` |
 | `fetch-source-feeds` | `0 6,18 * * *` | 12 hr | 30 min | `heartbeat.fetch_source_feeds` |
+
+**Pause V2:** `check-followups` / `heartbeat.check_followups` were removed with `follow_ups` — delete any stale BetterStack heartbeat and `app_config` row if they still exist.
 
 **Tuning rule (one-liner):** sub-hourly → grace = period; hourly → grace = 10 min; multi-hour/daily → grace = 30 min absolute. Floor 2 min; never exceed 1× period for sub-hourly. Full rationale + per-job justification in the backlog ticket.
 

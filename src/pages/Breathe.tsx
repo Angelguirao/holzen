@@ -71,7 +71,9 @@ async function fetchBlockData(): Promise<BlockData | null> {
       if (Array.isArray(blocks) && blocks.length > 0) {
         lastBlockTime = blocks[0].timestamp;
       }
-    } catch {}
+    } catch {
+      /* ignore mempool blocks parse failures — tip height / fees still render */
+    }
 
     const h = typeof height === 'number' ? height : parseInt(height);
     const epochProgress = (h % 2016) / 2016;
@@ -486,61 +488,81 @@ export default function Breathe() {
             <button
               className="absolute top-6 left-6 flex items-center gap-1.5 px-3 py-2 rounded-full border border-border/20 bg-background/10 backdrop-blur-sm transition-opacity hover:opacity-90 z-[120]"
               style={{ color: textColors[level] }}
-              aria-label={t('void.infoLabel', 'About this experience')}
+              aria-label={t('void.infoLabel', { defaultValue: 'About this experience' })}
               onClick={(e) => e.stopPropagation()}
             >
               <Info className="h-3.5 w-3.5" />
               <span className="font-mono text-[9px] tracking-[0.12em] uppercase">
-                {t('void.infoButton', 'what is this?')}
+                {t('void.infoButton', { defaultValue: 'what is this?' })}
               </span>
             </button>
           </SheetTrigger>
           <SheetContent side="bottom" className="bg-background/95 backdrop-blur-md border-border/30 z-[200] max-h-[75vh]">
             <div className="max-w-md mx-auto py-4 space-y-5 overflow-y-auto max-h-[calc(75vh-3rem)] pb-10">
               <p className="font-mono text-[11px] tracking-[0.2em] uppercase text-foreground/60">
-                {t('void.guideTitle', 'Enter the stillness')}
+                {t('void.guideTitle', { defaultValue: 'Enter the stillness' })}
               </p>
               <div className="space-y-4">
                 <div className="space-y-1.5">
                   <p className="font-mono text-sm text-foreground/80 font-medium">
-                    {t('void.infoSurfaceTitle', 'Surface')}
+                    {t('void.infoSurfaceTitle', { defaultValue: 'Surface' })}
                   </p>
                   <p className="font-mono text-xs text-foreground/50 leading-relaxed">
-                    {t('void.guideSurface', 'Breathe with the Bitcoin network. Block height, mempool, the rhythm of proof-of-work.')}
+                    {t('void.guideSurface', {
+                      defaultValue:
+                        'Breathe with the Bitcoin network. Block height, mempool, the rhythm of proof-of-work.',
+                    })}
                   </p>
                 </div>
                 <div className="space-y-1.5">
                   <p className="font-mono text-sm text-foreground/80 font-medium">
-                    {t('void.infoDeepTitle', 'Deeper')}
+                    {t('void.infoDeepTitle', { defaultValue: 'Deeper' })}
                   </p>
                   <p className="font-mono text-xs text-foreground/50 leading-relaxed">
-                    {t('void.guideDeep', 'Sit with the blockchain clock. Time since the last block. Contemplations. A singing bowl when a new block is found.')}
+                    {t('void.guideDeep', {
+                      defaultValue:
+                        'Sit with the blockchain clock. Time since the last block. Contemplations. A singing bowl when a new block is found.',
+                    })}
                   </p>
                 </div>
                 <div className="border-t border-border/30 pt-3 space-y-2.5">
                   <p className="font-mono text-[11px] text-foreground/50 uppercase tracking-wider">
-                    {t('void.infoDataTitle', 'What you see')}
+                    {t('void.infoDataTitle', { defaultValue: 'What you see' })}
                   </p>
                   <ul className="space-y-2.5 text-xs font-mono text-foreground/50">
                     <li className="flex gap-2">
                       <span className="text-primary/60 shrink-0">·</span>
-                      {t('void.infoBlockHeight', 'Block height — the latest confirmed block on the Bitcoin blockchain')}
+                      {t('void.infoBlockHeight', {
+                        defaultValue:
+                          'Block height — the latest confirmed block on the Bitcoin blockchain',
+                      })}
                     </li>
                     <li className="flex gap-2">
                       <span className="text-primary/60 shrink-0">·</span>
-                      {t('void.infoMempool', 'Pending transactions — unconfirmed transactions waiting in the mempool')}
+                      {t('void.infoMempool', {
+                        defaultValue:
+                          'Pending transactions — unconfirmed transactions waiting in the mempool',
+                      })}
                     </li>
                     <li className="flex gap-2">
                       <span className="text-primary/60 shrink-0">·</span>
-                      {t('void.infoEpoch', 'Epoch arc — progress through the 2,016-block difficulty adjustment cycle')}
+                      {t('void.infoEpoch', {
+                        defaultValue:
+                          'Epoch arc — progress through the 2,016-block difficulty adjustment cycle',
+                      })}
                     </li>
                     <li className="flex gap-2">
                       <span className="text-primary/60 shrink-0">·</span>
-                      {t('void.infoFee', 'Fee pressure — current network demand in sat/vB')}
+                      {t('void.infoFee', {
+                        defaultValue: 'Fee pressure — current network demand in sat/vB',
+                      })}
                     </li>
                     <li className="flex gap-2">
                       <span className="text-primary/60 shrink-0">·</span>
-                      {t('void.infoTimeSince', 'Time since last block — how long since the network found the latest block (~10 min average)')}
+                      {t('void.infoTimeSince', {
+                        defaultValue:
+                          'Time since last block — how long since the network found the latest block (~10 min average)',
+                      })}
                     </li>
                   </ul>
                 </div>
@@ -554,7 +576,11 @@ export default function Breathe() {
           onClick={toggleDepth}
           className="relative z-[105] flex flex-col items-center justify-center focus:outline-none"
           style={{ width: '100%', maxWidth: 400, minHeight: 400 }}
-          aria-label={depth === 0 ? t('void.enter', 'Enter the void') : t('void.return', 'Return')}
+          aria-label={
+            depth === 0
+              ? t('void.enter', { defaultValue: 'Enter the void' })
+              : t('void.return', { defaultValue: 'Return' })
+          }
         >
           {/* ====== BREATHING CIRCLES — always present, shrink when deep ====== */}
           <motion.div
@@ -641,7 +667,10 @@ export default function Breathe() {
                 animate={{ opacity: surfaceOpacity * 0.5 }}
                 transition={{ delay: 2, duration: 1.5 }}
               >
-                {t('breathe.blockGrounding', 'Block {{height}}. Immutable. Like this moment.', { height: blockData.height.toLocaleString() })}
+                {t('breathe.blockGrounding', {
+                  defaultValue: 'Block {{height}}. Immutable. Like this moment.',
+                  height: blockData.height.toLocaleString(),
+                })}
               </motion.p>
             )}
 
@@ -653,7 +682,8 @@ export default function Breathe() {
                 animate={{ opacity: surfaceOpacity * 0.35 }}
                 transition={{ delay: 3.5, duration: 1.5 }}
               >
-                {formatNumber(blockData.mempoolPending)} {t('breathe.pendingTx', 'transactions waiting to confirm')}
+                {formatNumber(blockData.mempoolPending)}{' '}
+                {t('breathe.pendingTx', { defaultValue: 'transactions waiting to confirm' })}
               </motion.p>
             )}
 
@@ -665,7 +695,7 @@ export default function Breathe() {
               animate={{ opacity: 0.35 }}
               transition={{ delay: 5, duration: 2 }}
             >
-              {t('void.tapToDescend', 'tap to go deeper')}
+              {t('void.tapToDescend', { defaultValue: 'tap to go deeper' })}
             </motion.p>
           </motion.div>
 
@@ -697,7 +727,7 @@ export default function Breathe() {
                   className="font-mono text-[9px] tracking-[0.2em] uppercase"
                   style={{ color: textColors[level], opacity: 0.3 }}
                 >
-                  {t('void.sinceLastBlock', 'since last block')}
+                  {t('void.sinceLastBlock', { defaultValue: 'since last block' })}
                 </p>
                 <motion.p
                   className="font-mono text-[8px] tracking-[0.15em] italic"
@@ -707,10 +737,10 @@ export default function Breathe() {
                   transition={{ delay: 3, duration: 1.5 }}
                 >
                   {timeSinceBlock > 1200
-                    ? t('void.longWait', 'patience — the network is searching')
+                    ? t('void.longWait', { defaultValue: 'patience — the network is searching' })
                     : timeSinceBlock > 900
-                      ? t('void.searching', 'the network is searching')
-                      : t('void.typical', 'typical: ~10 min')}
+                      ? t('void.searching', { defaultValue: 'the network is searching' })
+                      : t('void.typical', { defaultValue: 'typical: ~10 min' })}
                 </motion.p>
               </motion.div>
             )}
@@ -724,7 +754,10 @@ export default function Breathe() {
                 animate={{ opacity: 0.2 }}
                 transition={{ delay: 8, duration: 2 }}
               >
-                {t('void.feePressure', 'fee pressure: {{fee}} sat/vB', { fee: blockData?.fastestFee })}
+                {t('void.feePressure', {
+                  defaultValue: 'fee pressure: {{fee}} sat/vB',
+                  fee: blockData?.fastestFee,
+                })}
               </motion.p>
             )}
 
@@ -748,7 +781,10 @@ export default function Breathe() {
                     className="font-mono text-[11px] tracking-[0.2em] text-center max-w-[240px] leading-relaxed"
                     style={{ color: textColors[level], opacity: 0.6 }}
                   >
-                    {t('void.blockMined', 'A new block was found. {{height}}. Time moved forward.', { height: newBlockHeight.toLocaleString() })}
+                    {t('void.blockMined', {
+                      defaultValue: 'A new block was found. {{height}}. Time moved forward.',
+                      height: newBlockHeight.toLocaleString(),
+                    })}
                   </p>
                 </motion.div>
               )}
@@ -780,7 +816,10 @@ export default function Breathe() {
                 animate={{ opacity: 0.25 }}
                 transition={{ delay: 10, duration: 3 }}
               >
-                {t('void.epoch', 'epoch {{pct}}%', { pct: Math.round(blockData.difficultyEpochProgress * 100) })}
+                {t('void.epoch', {
+                  defaultValue: 'epoch {{pct}}%',
+                  pct: Math.round(blockData.difficultyEpochProgress * 100),
+                })}
               </motion.p>
             )}
 
@@ -792,7 +831,7 @@ export default function Breathe() {
               animate={{ opacity: 0.2 }}
               transition={{ delay: 6, duration: 2 }}
             >
-              {t('void.tapToSurface', 'tap to surface')}
+              {t('void.tapToSurface', { defaultValue: 'tap to surface' })}
             </motion.p>
           </motion.div>
         </button>

@@ -1,3 +1,5 @@
+import type { SupabaseClient } from "https://esm.sh/@supabase/supabase-js@2.57.2";
+
 /**
  * Per-provider circuit breakers for AI spend protection.
  *
@@ -8,7 +10,7 @@
  *
  * Important scope:
  *   - Breakers only affect **live** generation. Cached serves
- *     (`reflection_companions`, `companion_cache`, `content_library`) are
+ *     (`pause_ai_artifacts`, `companion_cache`, `content_library`) are
  *     unaffected. Cache + library + curated fallback continue to serve.
  *   - Recovery is automatic. Every time `getProviderHealth` is called (after
  *     the per-instance TTL expires) it re-computes from the latest window;
@@ -76,7 +78,7 @@ const ERROR_STATUSES: ReadonlySet<string> = new Set([
 ]);
 
 export async function getProviderHealth(
-  svcClient: any,
+  svcClient: SupabaseClient,
   options?: BreakerOptions & { force?: boolean },
 ): Promise<ProviderHealth> {
   const opts = { ...DEFAULTS, ...options };
@@ -155,7 +157,7 @@ function buildState(
  * Useful at guard-call sites that only care about a boolean gate.
  */
 export async function degradedProviders(
-  svcClient: any,
+  svcClient: SupabaseClient,
   providers: Provider[],
   options?: BreakerOptions,
 ): Promise<Provider[]> {

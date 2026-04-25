@@ -8,7 +8,7 @@ import {
   urlDedupCandidates,
 } from "../_shared/content-dedup.ts";
 import { callPerplexityChat, type PerplexityUsage } from "../_shared/perplexity-client.ts";
-import { holzenEdgeError, holzenEdgeLog, holzenEdgeRun, holzenEdgeWarn } from "../_shared/holzen-edge-log.ts";
+import { unknownErrorForLog } from "../_shared/log-unknown-error.ts";
 import { withRequestLogging } from "../_shared/with-request-logging.ts";
 import {
   fetchFeedXmlIfApplicable,
@@ -188,18 +188,29 @@ type SourceRow = { id: string; name: string; type: string; url: string; category
 // ── Main handler ──
 
 serve(
-  withRequestLogging("fetch-source-feeds", async ({ req }) => {
+  withRequestLogging("fetch-source-feeds", async ({ req, log }) => {
   const t0 = Date.now();
-  const hzLog = (msg: string) => holzenEdgeLog("fetch-feeds", msg, { ms: Date.now() - t0 });
+  const hzLog = (msg: string) =>
+    log("fetch_feeds_progress", {
+      holzen_event: "fetch_feeds_cron",
+      phase: "progress",
+      message: msg,
+      ms: Date.now() - t0,
+    });
 
   try {
-    holzenEdgeRun("fetch-feeds", "request", { method: req.method });
     const { verifyServiceAuth } = await import("../_shared/auth.ts");
     if (!verifyServiceAuth(req)) {
-      holzenEdgeRun("fetch-feeds", "auth rejected");
+      log.warn("fetch_feeds_phase", {
+        holzen_event: "fetch_feeds_cron",
+        phase: "service_auth_rejected",
+      });
       return new Response(JSON.stringify({ error: "Unauthorized" }), { status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" } });
     }
-    holzenEdgeRun("fetch-feeds", "auth ok");
+    log("fetch_feeds_phase", {
+      holzen_event: "fetch_feeds_cron",
+      phase: "service_auth_ok",
+    });
 
     const serviceRoleKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? "";
     const supabase = createClient(Deno.env.get("SUPABASE_URL") ?? "", serviceRoleKey, { auth: { persistSession: false } });
@@ -224,11 +235,17 @@ serve(
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
 
     if (!LOVABLE_API_KEY) {
-      holzenEdgeError("fetch-feeds", "Missing LOVABLE_API_KEY");
+      log.error("fetch_feeds_config", {
+        holzen_event: "fetch_feeds_cron",
+        phase: "missing_lovable_api_key",
+      });
       return new Response(JSON.stringify({ error: "Missing LOVABLE_API_KEY" }), { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } });
     }
     if (!FIRECRAWL_API_KEY && !PERPLEXITY_API_KEY) {
-      holzenEdgeError("fetch-feeds", "Need FIRECRAWL_API_KEY or PERPLEXITY_API_KEY");
+      log.error("fetch_feeds_config", {
+        holzen_event: "fetch_feeds_cron",
+        phase: "missing_scrape_keys",
+      });
       return new Response(JSON.stringify({ error: "Need either FIRECRAWL_API_KEY or PERPLEXITY_API_KEY" }), { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } });
     }
 
@@ -247,7 +264,13 @@ serve(
       .order("last_fetch_feeds_at", { ascending: true, nullsFirst: true });
 
     if (!sources || sources.length === 0) {
-      holzenEdgeRun("fetch-feeds", "fetch_feeds_batch", { sourcesTotal: 0, toProcess: 0, mode: scrapeMode });
+      log("fetch_feeds_batch", {
+        holzen_event: "fetch_feeds_cron",
+        phase: "fetch_feeds_batch",
+        sources_total: 0,
+        to_process: 0,
+        mode: scrapeMode,
+      });
       hzLog("no sources with URLs");
       return new Response(JSON.stringify({ fetched: 0, mode: scrapeMode }), { headers: { ...corsHeaders, "Content-Type": "application/json" } });
     }
@@ -608,7 +631,8 @@ serve(
           .limit(1);
         if (existingPre && existingPre.length > 0) {
           results.push(`${source.name}: URL already in library (skipped before scrape)`);
-          holzenEdgeLog("fetch-feeds", "fetch_feeds_article", {
+          log("fetch_feeds_article", {
+          holzen_event: "fetch_feeds_cron",
             ms: Date.now() - t0,
             outcome: "skipped",
             reason: "dedup_url_pre_scrape",
@@ -639,7 +663,8 @@ serve(
               try { return new URL(l).hostname.replace(/^www\./, "").toLowerCase() !== articleHost; }
               catch { return false; }
             });
-            holzenEdgeLog("fetch-feeds", "fetch_feeds_scrape_payload", {
+            log("fetch_feeds_scrape_payload", {
+              holzen_event: "fetch_feeds_cron",
               ms: Date.now() - t0,
               urlHost: articleHost,
               mdChars: fc.markdown.length,
@@ -680,7 +705,8 @@ serve(
 
       if (!scrapedContent) {
         results.push(`${source.name} (${articleUrl.slice(0, 48)}…): no content`);
-        holzenEdgeLog("fetch-feeds", "fetch_feeds_article", {
+        log("fetch_feeds_article", {
+          holzen_event: "fetch_feeds_cron",
           ms: Date.now() - t0,
           outcome: "failed",
           phase: "scrape",
@@ -729,7 +755,8 @@ Return JSON with:
 
       if (!structureRes.ok) {
         results.push(`${source.name}: structure error ${structureRes.status}`);
-        holzenEdgeLog("fetch-feeds", "fetch_feeds_article", {
+        log("fetch_feeds_article", {
+          holzen_event: "fetch_feeds_cron",
           ms: Date.now() - t0,
           outcome: "failed",
           phase: "structure",
@@ -755,7 +782,8 @@ Return JSON with:
       const raw = structureData.choices?.[0]?.message?.content;
       if (!raw) {
         results.push(`${source.name}: empty structure`);
-        holzenEdgeLog("fetch-feeds", "fetch_feeds_article", {
+        log("fetch_feeds_article", {
+          holzen_event: "fetch_feeds_cron",
           ms: Date.now() - t0,
           outcome: "failed",
           phase: "structure_empty",
@@ -771,7 +799,8 @@ Return JSON with:
         entry = JSON.parse(raw) as Record<string, unknown>;
       } catch {
         results.push(`${source.name}: JSON parse error`);
-        holzenEdgeLog("fetch-feeds", "fetch_feeds_article", {
+        log("fetch_feeds_article", {
+          holzen_event: "fetch_feeds_cron",
           ms: Date.now() - t0,
           outcome: "failed",
           phase: "json_parse",
@@ -783,7 +812,8 @@ Return JSON with:
       }
       if (typeof entry.title !== "string" || typeof entry.summary !== "string") {
         results.push(`${source.name}: invalid structure`);
-        holzenEdgeLog("fetch-feeds", "fetch_feeds_article", {
+        log("fetch_feeds_article", {
+          holzen_event: "fetch_feeds_cron",
           ms: Date.now() - t0,
           outcome: "failed",
           phase: "invalid_fields",
@@ -806,7 +836,8 @@ Return JSON with:
           .limit(1);
         if (byUrl && byUrl.length > 0) {
           results.push(`${source.name}: URL already in content_library`);
-          holzenEdgeLog("fetch-feeds", "fetch_feeds_article", {
+          log("fetch_feeds_article", {
+          holzen_event: "fetch_feeds_cron",
             ms: Date.now() - t0,
             outcome: "skipped",
             reason: "dedup_url",
@@ -829,7 +860,8 @@ Return JSON with:
         .limit(1);
       if (byNorm && byNorm.length > 0) {
         results.push(`${source.name}: same normalized title already in content_library`);
-        holzenEdgeLog("fetch-feeds", "fetch_feeds_article", {
+        log("fetch_feeds_article", {
+          holzen_event: "fetch_feeds_cron",
           ms: Date.now() - t0,
           outcome: "skipped",
           reason: "dedup_title_norm",
@@ -856,7 +888,8 @@ Return JSON with:
         /** Phrase-based URL from full markdown — deterministic for “First published on …” bylines; prefer over LLM (excerpt can confuse citations vs syndication). */
         const inferred = inferOriginalUrlFromAttributionFooter(scrapedContent, articleUrl);
         if (logOriginalResolution && inferred.debug) {
-          holzenEdgeLog("fetch-feeds", "fetch_feeds_original_infer", {
+          log("fetch_feeds_original_infer", {
+              holzen_event: "fetch_feeds_cron",
             ms: Date.now() - t0,
             urlHost: safeUrlHost(articleUrl),
             title: String(entry.title).slice(0, 80),
@@ -870,7 +903,8 @@ Return JSON with:
         } else {
           originalUrl = llmOriginalSanitized;
           if (llmOriginalRaw && !originalUrl) {
-            holzenEdgeLog("fetch-feeds", "fetch_feeds_original_llm_rejected", {
+            log("fetch_feeds_original_llm_rejected", {
+              holzen_event: "fetch_feeds_cron",
               ms: Date.now() - t0,
               urlHost: safeUrlHost(articleUrl),
               title: String(entry.title).slice(0, 80),
@@ -886,7 +920,8 @@ Return JSON with:
           if (sanitized) {
             originalUrl = sanitized;
             if (logOriginalResolution) {
-              holzenEdgeLog("fetch-feeds", "fetch_feeds_original_firecrawl", {
+              log("fetch_feeds_original_firecrawl", {
+              holzen_event: "fetch_feeds_cron",
                 ms: Date.now() - t0,
                 urlHost: safeUrlHost(articleUrl),
                 title: String(entry.title).slice(0, 80),
@@ -935,7 +970,8 @@ Return JSON with:
       await supabase.from("content_library").insert(insertData);
       results.push(`${source.name}: added "${entry.title}" (via ${scrapeMode})`);
       fetched++;
-      holzenEdgeLog("fetch-feeds", "fetch_feeds_article", {
+      log("fetch_feeds_article", {
+          holzen_event: "fetch_feeds_cron",
         ms: Date.now() - t0,
         outcome: "inserted",
         source: source.name,
@@ -951,11 +987,13 @@ Return JSON with:
     }
 
     const toProcess = sources.slice(0, maxSources) as SourceRow[];
-    holzenEdgeRun("fetch-feeds", "fetch_feeds_batch", {
-      sourcesTotal: sources.length,
-      toProcess: toProcess.length,
-      maxArticlesPerSource,
-      articleDelayMs,
+    log("fetch_feeds_batch", {
+      holzen_event: "fetch_feeds_cron",
+      phase: "fetch_feeds_batch_start",
+      sources_total: sources.length,
+      to_process: toProcess.length,
+      max_articles_per_source: maxArticlesPerSource,
+      article_delay_ms: articleDelayMs,
       mode: scrapeMode,
     });
 
@@ -977,12 +1015,15 @@ Return JSON with:
           poolToIngest = sortFeedArticleRefsByPublishedAtDesc(poolToIngest);
         }
         if (!batchDedup.batchQueryOk) {
-          holzenEdgeWarn("fetch-feeds", "fetch_feeds_batch_dedup_failed", {
+          log.warn("fetch_feeds_batch", {
+            holzen_event: "fetch_feeds_cron",
+            phase: "batch_dedup_failed",
             source: sourceNorm.name,
             hint: "falling back to per-URL pre-scrape dedup",
           });
         }
-        holzenEdgeLog("fetch-feeds", "fetch_feeds_discover", {
+        log("fetch_feeds_discover", {
+          holzen_event: "fetch_feeds_cron",
           ms: Date.now() - t0,
           source: sourceNorm.name,
           sourceType: sourceNorm.type,
@@ -1022,22 +1063,33 @@ Return JSON with:
           .eq("id", sourceNorm.id);
       } catch (e) {
         results.push(`${source.name}: ${e}`);
-        holzenEdgeWarn("fetch-feeds", "fetch_feeds_source_error", { source: source.name, err: String(e) });
+        log.warn("fetch_feeds_source", {
+          holzen_event: "fetch_feeds_cron",
+          phase: "source_error",
+          source: source.name,
+          err: String(e).slice(0, 500),
+        });
       }
     }
 
-    holzenEdgeRun("fetch-feeds", "fetch_feeds_complete", {
+    log("fetch_feeds_complete", {
+      holzen_event: "fetch_feeds_cron",
+      phase: "fetch_feeds_complete",
       ms: Date.now() - t0,
       fetched,
-      sourcesTried: toProcess.length,
+      sources_tried: toProcess.length,
       mode: scrapeMode,
-      resultsLines: results.length,
+      results_lines: results.length,
     });
     return new Response(JSON.stringify({ fetched, mode: scrapeMode, results }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
   } catch (e) {
-    holzenEdgeError("fetch-feeds", "uncaught error", e);
+    log.error("fetch_feeds_uncaught", {
+      holzen_event: "fetch_feeds_cron",
+      phase: "uncaught",
+      ...unknownErrorForLog(e),
+    });
     return new Response(JSON.stringify({ error: String(e) }), {
       status: 500,
       headers: { ...corsHeaders, "Content-Type": "application/json" },

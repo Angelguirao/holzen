@@ -29,7 +29,7 @@ If rate limits fail open without matching analytics instrumentation, or quality 
 - **Policy as code**: `_shared` modules encode product rules (budget, slop, diversity) that must stay aligned with ops expectations.
 - **Telemetry coupling**: rate limits **depend on** analytics events being emitted consistently on generation paths.
 - **Fail-open vs fail-closed**: DB errors during limit checks favor **availability** (allow) over **strict cost control**.
-- **Grounding special case**: `writeCompanionData` updates both `reflection_companions` and `reflections.grounding_*` for Home display — two write surfaces for one logical companion.
+- **Grounding special case**: pre‑V2 `writeCompanionData` updated `reflection_companions` and `reflections.grounding_*` for Home display — two write surfaces for one logical companion. Pause V2 writes only to `pause_ai_artifacts`.
 
 ## CS/SE Concepts to Know (for this phase)
 
@@ -58,7 +58,7 @@ If rate limits fail open without matching analytics instrumentation, or quality 
 
 ### `supabase/functions/_shared/companion-data.ts`
 
-- **`writeCompanionData`**: upserts `reflection_companions`; for **grounding**, also updates `reflections.grounding_title` and `reflections.grounding_body`.
+- **`writeCompanionData`**: upserts `pause_ai_artifacts` only (no denormalized grounding writes in V2).
 
 ## Runtime touchpoints: endpoints, events, and side effects
 
@@ -70,8 +70,7 @@ If rate limits fail open without matching analytics instrumentation, or quality 
 
 - **`analytics_events`**: counted for sliding-window rate limit (allowlisted `event` values only).
 - **`generation_attempts`**: `estimated_cost_usd` for daily budget.
-- **`reflection_companions`**: upserts from `writeCompanionData`.
-- **`reflections`**: `grounding_title` / `grounding_body` updated for grounding companion writes.
+- **`pause_ai_artifacts`**: upserts from `writeCompanionData`.
 - **`companion_cache`**: read by `serveFromCache` (selection, quality, serve stats).
 - **`user_companion_serves`**: used to exclude repeats per user.
 
@@ -110,11 +109,11 @@ Tradeoffs / alternatives:
 - `docs/backlog/rate-budget-fail-open-observability.md` — metrics/alerts when rate or budget checks fail open.
 - `docs/backlog/quality-gates-false-positives.md` — tune regexes / localization; measure reject reasons.
 - `docs/backlog/cache-serve-relaxation-ux.md` — optional UX when `serveFromCache` relaxes to lower tier or repeats.
-- `docs/backlog/writeCompanionData-grounding-consistency.md` — keep `reflection_companions` and `reflections.grounding_*` in sync for Home vs pause.
+- `docs/backlog/writeCompanionData-grounding-consistency.md` — historical note on the pre‑V2 dual‑write.
 
 ## What to Review Next and Why
 
-**Phase 6** moves from **policy** in **shared modules** to **database security**: **RLS**, **authz**, and **service-role** assumptions for tables touched by pause, companions, notifications, analytics, and generation (`pause_notifications`, `reflections`, `reflection_companions`, `generation_attempts`, `companion_cache`, etc.). That is the natural next step because Phases 1-5 established **who** calls **what**; Phase 6 verifies **who is allowed to read/write which rows**.
+**Phase 6** moves from **policy** in **shared modules** to **database security**: **RLS**, **authz**, and **service-role** assumptions for tables touched by pause, companions, notifications, analytics, and generation (`notifications`, `pause_instances`, `pause_ai_artifacts`, `generation_attempts`, `companion_cache`, etc.). That is the natural next step because Phases 1-5 established **who** calls **what**; Phase 6 verifies **who is allowed to read/write which rows**.
 
 **Phase 6 scope (pointer):**
 

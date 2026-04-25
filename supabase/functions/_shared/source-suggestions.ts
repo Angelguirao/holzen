@@ -3,6 +3,8 @@
  * Human admins approve into signal_sources — never auto-insert from here.
  */
 
+import type { SupabaseClient } from "https://esm.sh/@supabase/supabase-js@2.57.2";
+
 function normalizeDedupeKey(rawUrl: string): string | null {
   try {
     const u = new URL(rawUrl.startsWith("http") ? rawUrl : `https://${rawUrl}`);
@@ -27,13 +29,13 @@ function shouldSkipSuggestionUrl(url: string): boolean {
 }
 
 export async function enqueueCatalogSourceSuggestion(
-  svcClient: any,
+  svcClient: SupabaseClient,
   opts: {
     category: "signal" | "grounding";
     /** Display name (author or publication) */
     name: string;
     url: string;
-    reflectionId?: string | null;
+    pauseInstanceId?: string | null;
   },
 ): Promise<void> {
   const name = opts.name?.trim();
@@ -73,7 +75,7 @@ export async function enqueueCatalogSourceSuggestion(
       status: "pending",
       metadata: {
         origin: `live_${opts.category}`,
-        reflection_id: opts.reflectionId ?? null,
+        pause_instance_id: opts.pauseInstanceId ?? null,
       },
     });
   } catch (e) {

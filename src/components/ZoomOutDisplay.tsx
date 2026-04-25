@@ -9,6 +9,7 @@ import { useHolzen } from '@/hooks/use-holzen';
 import { formatBtcPrice } from '@/lib/btc';
 import { useSubscription } from '@/hooks/use-subscription';
 import { toast } from 'sonner';
+import { TOOLS } from '@/lib/app-routes';
 
 interface OnThisDayEntry {
   yearsAgo: number;
@@ -23,8 +24,8 @@ export interface EchoUserWord {
 }
 
 /**
- * Strict Echo payload (2026-04-18): surfaces ONLY user-authored text
- * (`reflections.note` + replay `practice_entries.body`). The AI-generated
+ * Strict Echo payload (2026-04-18): surfaces ONLY user-authored text from Pause V2
+ * (notes / replays via `pause_step_events` + `practice_entries`). The AI-generated
  * reflect-step prompt is available via `aiPrompt` but is never rendered as the
  * main quote. Legacy `message` is kept for back-compat with older readers
  * (History timeline, full-view ReadTime) and equals the first userWords body
@@ -112,8 +113,8 @@ export function ZoomOutDisplay({ data, loading, error, onRetry }: Props) {
       });
       return;
     }
-    navigate('/practice/replay', {
-      state: { reflectionId: echo.id, returnTo: location.pathname + location.search },
+    navigate(TOOLS.practice.replay, {
+      state: { pauseInstanceId: echo.id, returnTo: location.pathname + location.search },
     });
   };
 
@@ -125,7 +126,7 @@ export function ZoomOutDisplay({ data, loading, error, onRetry }: Props) {
             Perspective takes time to build.
           </p>
           <p className="text-[10px] text-muted-foreground/40 leading-relaxed">
-            The more you reflect, the richer your zoom-out view becomes. Historical price data and your past reflections will appear here over time.
+            The more you pause and add notes, the richer your zoom-out view becomes. Historical price data and your own words from past pauses will appear here over time.
           </p>
         </div>
       )}
@@ -244,7 +245,9 @@ export function ZoomOutDisplay({ data, loading, error, onRetry }: Props) {
                   className="text-[9px] font-mono text-muted-foreground/50 hover:text-muted-foreground/70 flex items-center gap-1"
                 >
                   {quoteExpanded ? <ChevronUp className="h-3 w-3" /> : <ChevronDown className="h-3 w-3" />}
-                  {quoteExpanded ? t('common.showLess', 'Show less') : t('companions.echoExpandQuote')}
+                  {quoteExpanded
+                    ? t('common.showLess', { defaultValue: 'Show less' })
+                    : t('companions.echoExpandQuote')}
                 </button>
               )}
               <div className="flex gap-1.5 flex-wrap">
