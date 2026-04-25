@@ -4,6 +4,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClientProvider } from "@tanstack/react-query";
 import { createHolzenQueryClient } from "@/lib/query-client";
 import { BrowserRouter, Routes, Route, Navigate, useLocation } from "react-router-dom";
+import { reactRouterFutureFlags } from "@/lib/router-future";
 import { AuthProvider, useAuth } from "@/hooks/use-auth";
 import { holzenLog } from "@/lib/holzen-console";
 import { attachHolzenQueryLogging } from "@/lib/holzen-query-logging";
@@ -139,12 +140,7 @@ const App = () => (
       <TooltipProvider>
         <Sonner />
         <OfflineBanner />
-        <BrowserRouter
-          future={{
-            v7_startTransition: true,
-            v7_relativeSplatPath: true,
-          }}
-        >
+        <BrowserRouter future={reactRouterFutureFlags}>
           <ScrollToTop />
           <CookieConsent />
           <AuthProvider>
