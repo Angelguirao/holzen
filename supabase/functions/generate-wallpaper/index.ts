@@ -169,7 +169,15 @@ serve(
         );
       }
       const text = await response.text();
-      console.error("AI gateway error:", response.status, text);
+      try {
+        log.error("generate_wallpaper_ai_gateway_error", {
+          holzen_event: "generate_wallpaper_ai_gateway_error",
+          status: response.status,
+          response_chars: text.length,
+        });
+      } catch {
+        /* non-fatal */
+      }
       throw new Error("Failed to generate wallpaper");
     }
 
@@ -198,7 +206,14 @@ serve(
       { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } }
     );
   } catch (e) {
-    console.error("generate-wallpaper error:", e);
+    try {
+      log.error("generate_wallpaper_uncaught", {
+        holzen_event: "generate_wallpaper_uncaught",
+        detail: e instanceof Error ? e.message : String(e),
+      });
+    } catch {
+      /* non-fatal */
+    }
     return new Response(
       JSON.stringify({ error: e instanceof Error ? e.message : "Unknown error" }),
       { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }

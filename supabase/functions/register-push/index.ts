@@ -9,7 +9,7 @@ const corsHeaders = {
 };
 
 serve(
-  withRequestLogging("register-push", async ({ req }) => {
+  withRequestLogging("register-push", async ({ req, log }) => {
   try {
     const authHeader = req.headers.get("Authorization");
     if (!authHeader?.startsWith("Bearer ")) {
@@ -27,7 +27,14 @@ serve(
 
     const { data: { user }, error: userError } = await supabase.auth.getUser();
     if (userError || !user) {
-      console.error("[register-push] Auth error:", userError?.message);
+      try {
+        log.warn("register_push_auth_failed", {
+          holzen_event: "register_push_auth_failed",
+          has_auth_error: Boolean(userError),
+        });
+      } catch {
+        /* non-fatal */
+      }
       return new Response(JSON.stringify({ error: "Unauthorized" }), {
         status: 401,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
@@ -81,7 +88,14 @@ serve(
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
   } catch (e) {
-    console.error("register-push error:", e);
+    try {
+      log.error("register_push_uncaught", {
+        holzen_event: "register_push_uncaught",
+        detail: e instanceof Error ? e.message : String(e),
+      });
+    } catch {
+      /* non-fatal */
+    }
     return new Response(
       JSON.stringify({ error: e instanceof Error ? e.message : "Unknown error" }),
       { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }

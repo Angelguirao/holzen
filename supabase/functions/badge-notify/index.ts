@@ -76,7 +76,14 @@ serve(
           const jwk = await crypto.subtle.exportKey("jwk", cryptoKey);
           if (jwk.d) privateKey = jwk.d;
         } catch (e) {
-          console.error("[PUSH] Failed to extract key:", e);
+          try {
+            log.error("badge_notify_vapid_key_extract_failed", {
+              holzen_event: "badge_notify_vapid_key_extract_failed",
+              detail: e instanceof Error ? e.message : String(e),
+            });
+          } catch {
+            /* non-fatal */
+          }
         }
       }
     }
@@ -124,7 +131,14 @@ serve(
     });
   } catch (e) {
     const msg = e instanceof Error ? e.message : String(e);
-    console.error("[BADGE-NOTIFY] Error:", msg);
+    try {
+      log.error("badge_notify_uncaught", {
+        holzen_event: "badge_notify_uncaught",
+        detail: msg,
+      });
+    } catch {
+      /* non-fatal */
+    }
     return new Response(JSON.stringify({ error: msg }), {
       status: 500,
       headers: { ...corsHeaders, "Content-Type": "application/json" },

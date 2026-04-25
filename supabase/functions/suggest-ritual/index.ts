@@ -14,7 +14,7 @@ const corsHeaders = {
 };
 
 serve(
-  withRequestLogging("suggest-ritual", async ({ req }) => {
+  withRequestLogging("suggest-ritual", async ({ req, log }) => {
   try {
     const authHeader = req.headers.get("Authorization");
     if (!authHeader?.startsWith("Bearer ")) {
@@ -181,7 +181,14 @@ Respond ONLY with valid JSON.`;
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
   } catch (e) {
-    console.error("suggest-ritual error:", e);
+    try {
+      log.warn("suggest_ritual_fallback", {
+        holzen_event: "suggest_ritual_fallback",
+        detail: e instanceof Error ? e.message : String(e),
+      });
+    } catch {
+      /* non-fatal */
+    }
     // Fallback to standard template
     return new Response(JSON.stringify({
       steps: [{ type: "breathe" }, { type: "reflect" }, { type: "journal" }, { type: "decide" }],
