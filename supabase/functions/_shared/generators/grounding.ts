@@ -28,6 +28,7 @@ import { enqueueCatalogSourceSuggestion } from "../source-suggestions.ts";
 import { callPerplexityChat, mergePerplexityUsage } from "../perplexity-client.ts";
 import { searchLibrary, paperToGrounding, recordLibraryServe } from "../content-library.ts";
 import { getPhaseConfig } from "../phase-config.ts";
+import { type CompanionCacheTitleRow } from "../companion-cache-dedup.ts";
 
 /** Bump when the search query, structuring prompt, or quality rules change. */
 export const PROMPT_VERSION = "v4";
@@ -312,7 +313,7 @@ export async function generateGrounding(params: GenerateGroundingParams): Promis
   let searchContent = "";
   let citations: string[] = [];
 
-  const perplexityBody: any = {
+  const perplexityBody: Record<string, unknown> = {
     model: "sonar-pro",
     messages: [
       {
@@ -336,7 +337,7 @@ DIVERSITY: Use a different journal/venue angle when possible. Do not recycle the
     let apiCalls = 0;
     let mergedUsage = undefined as ReturnType<typeof mergePerplexityUsage>;
 
-    let result = await callPerplexityChat(perplexityBody, PERPLEXITY_API_KEY, (m) => log(m));
+    const result = await callPerplexityChat(perplexityBody, PERPLEXITY_API_KEY, (m) => log(m));
     apiCalls++;
     mergedUsage = result.usage;
     searchContent = result.content;
@@ -460,7 +461,8 @@ BANNED PHRASES — NEVER use any of these: dive into, game-changer, paradigm shi
   };
 
   const models = ["google/gemini-2.5-flash", "google/gemini-2.5-flash-lite"];
-  let nudge: any = null;
+  type GroundingLiveData = NonNullable<GroundingResult["data"]>;
+  let nudge: GroundingLiveData | null = null;
   let lastLovableModel: string | undefined;
 
   const AI_TIMEOUTS = [8000, 6000];
@@ -495,10 +497,10 @@ BANNED PHRASES — NEVER use any of these: dive into, game-changer, paradigm shi
       }
 
       try {
-        nudge = typeof content === "string" ? JSON.parse(content) : content;
+        nudge = (typeof content === "string" ? JSON.parse(content) : content) as GroundingLiveData;
       } catch {
         const m = (typeof content === "string" ? content : "").match(/\{[\s\S]*\}/);
-        if (m) nudge = JSON.parse(m[0]);
+        if (m) nudge = JSON.parse(m[0]) as GroundingLiveData;
         else {
           logAttempt({ companion_type: "ground_nudge", provider: "lovable", model, status: "error", latency_ms: Date.now() - attemptT0, error_message: "json_parse_failed", input_tokens: usage?.prompt_tokens, output_tokens: usage?.completion_tokens });
           if (model !== models[models.length - 1]) continue; else break;
@@ -542,14 +544,14 @@ BANNED PHRASES — NEVER use any of these: dive into, game-changer, paradigm shi
   }
 
   // ── Step 5: Cache write ──
-  let qualityScore = 1;
+  const qualityScore = 1;
   const cacheQg = qualityGate("ground_nudge", nudge);
   if (nudge.title && nudge.body && nudge.citation && qualityScore > 0 && cacheQg.pass) {
     try {
       const { data: existing } = await svcClient.from("companion_cache").select("content").eq("companion_type", "ground_nudge").eq("language", "en").limit(30);
       const norm = (s: string) => s.toLowerCase().replace(/[^a-z0-9 ]/g, "").trim();
       const newNorm = norm(nudge.title);
-      const isDup = existing?.some((e: any) => {
+      const isDup = existing?.some((e: CompanionCacheTitleRow) => {
         const t = norm(e.content?.title || "");
         return t === newNorm || t.includes(newNorm) || newNorm.includes(t);
       });

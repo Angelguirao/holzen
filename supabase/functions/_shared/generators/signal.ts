@@ -30,6 +30,7 @@ import { validateSource } from "../source-validation.ts";
 import { searchLibrary, essayToSignal, recordLibraryServe } from "../content-library.ts";
 import { preferNonYoutubeCitationsFirst } from "../recent-signal-urls.ts";
 import { getPhaseConfig } from "../phase-config.ts";
+import { type CompanionCacheTitleRow } from "../companion-cache-dedup.ts";
 
 /** Bump when the search query, structuring prompt, or quality rules change. */
 export const PROMPT_VERSION = "v9";
@@ -580,7 +581,8 @@ URL RULES (CRITICAL):
   };
 
   const models = ["google/gemini-2.5-flash", "google/gemini-2.5-flash-lite"];
-  let signal: any = null;
+  type SignalLiveData = NonNullable<SignalResult["data"]>;
+  let signal: SignalLiveData | null = null;
   let lastLovableModel: string | undefined;
 
   const AI_TIMEOUTS = [8000, 6000];
@@ -617,10 +619,10 @@ URL RULES (CRITICAL):
       }
 
       try {
-        signal = typeof content === "string" ? JSON.parse(content) : content;
+        signal = (typeof content === "string" ? JSON.parse(content) : content) as SignalLiveData;
       } catch {
         const m = (typeof content === "string" ? content : "").match(/\{[\s\S]*\}/);
-        if (m) signal = JSON.parse(m[0]);
+        if (m) signal = JSON.parse(m[0]) as SignalLiveData;
         else {
           logAttempt({ companion_type: "signal", provider: "lovable", model, status: "error", latency_ms: Date.now() - attemptT0, error_message: "json_parse_failed", input_tokens: usage?.prompt_tokens, output_tokens: usage?.completion_tokens });
           if (model !== models[models.length - 1]) continue; else break;
@@ -679,7 +681,7 @@ URL RULES (CRITICAL):
   // ── Step 4b: Source attribution validation ──
   // Cross-reference the AI's source against known authors and citation URLs
   const originalSource = signal.source;
-  signal.source = validateSource(signal.source, signal.url || "", citations, sources as any);
+  signal.source = validateSource(signal.source, signal.url || "", citations, sources);
   if (signal.source !== originalSource) {
     log(`source corrected: "${originalSource}" → "${signal.source}"`);
   }
@@ -696,7 +698,7 @@ URL RULES (CRITICAL):
         .limit(30);
       const norm = (s: string) => s.toLowerCase().replace(/[^a-z0-9 ]/g, "").trim();
       const newNorm = norm(signal.title);
-      const isDup = existing?.some((e: any) => {
+      const isDup = existing?.some((e: CompanionCacheTitleRow) => {
         const t = norm(e.content?.title || "");
         return t === newNorm || t.includes(newNorm) || newNorm.includes(t);
       });
