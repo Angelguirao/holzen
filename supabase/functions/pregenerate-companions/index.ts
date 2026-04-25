@@ -9,6 +9,7 @@ import {
   isCompanionCacheDuplicate,
   normalizeTitleKey,
 } from "../_shared/content-dedup.ts";
+import type { PregenerateCacheTopupKey } from "../_shared/pregenerate-cache-topup-config.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -83,6 +84,10 @@ serve(
       );
     }
 
+    const { loadAppConfig } = await import("../_shared/app-config.ts");
+    const appCfg = await loadAppConfig(svcClient);
+    const CACHE_TOPUP_TARGETS = appCfg.pregenerate_cache_topup;
+
     const results: string[] = [];
 
     // ═══════════════════════════════════════════
@@ -136,7 +141,51 @@ serve(
     hzLog("Cache lifecycle done");
 
     // ═══════════════════════════════════════════
-    // STEP 2: Generate Grounding (2 entries)
+    // STEP 1b: Need-based top-up planning
+    // ═══════════════════════════════════════════
+    const nowIso = new Date().toISOString();
+    async function getHealthyActiveCount(companionType: PregenerateCacheTopupKey): Promise<number> {
+      const { count, error } = await svcClient
+        .from("companion_cache")
+        .select("id", { count: "exact", head: true })
+        .eq("companion_type", companionType)
+        .eq("language", "en")
+        .gte("quality_score", 2)
+        .or(`expires_at.is.null,expires_at.gt.${nowIso}`);
+      if (error) throw error;
+      return count ?? 0;
+    }
+
+    const [groundCount, signalCount, historyCount, zoomCount] = await Promise.all([
+      getHealthyActiveCount("ground_nudge"),
+      getHealthyActiveCount("signal"),
+      getHealthyActiveCount("historical_insight"),
+      getHealthyActiveCount("zoom_out_deep_time"),
+    ]);
+
+    const groundToGenerate = Math.min(
+      CACHE_TOPUP_TARGETS.ground_nudge.maxGeneratePerRun,
+      Math.max(0, CACHE_TOPUP_TARGETS.ground_nudge.minHealthyRows - groundCount),
+    );
+    const signalToGenerate = Math.min(
+      CACHE_TOPUP_TARGETS.signal.maxGeneratePerRun,
+      Math.max(0, CACHE_TOPUP_TARGETS.signal.minHealthyRows - signalCount),
+    );
+    const historyToGenerate = Math.min(
+      CACHE_TOPUP_TARGETS.historical_insight.maxGeneratePerRun,
+      Math.max(0, CACHE_TOPUP_TARGETS.historical_insight.minHealthyRows - historyCount),
+    );
+    const zoomToGenerate = Math.min(
+      CACHE_TOPUP_TARGETS.zoom_out_deep_time.maxGeneratePerRun,
+      Math.max(0, CACHE_TOPUP_TARGETS.zoom_out_deep_time.minHealthyRows - zoomCount),
+    );
+
+    results.push(
+      `Top-up plan: grounding=${groundToGenerate} (healthy=${groundCount}), signal=${signalToGenerate} (healthy=${signalCount}), history=${historyToGenerate} (healthy=${historyCount}), zoom_out=${zoomToGenerate} (healthy=${zoomCount})`,
+    );
+
+    // ═══════════════════════════════════════════
+    // STEP 2: Generate Grounding (need-based, up to 2)
     // ═══════════════════════════════════════════
     const BIAS_TOPICS = [
       "loss aversion and panic selling during market drops",
@@ -151,7 +200,7 @@ serve(
       "sunk cost fallacy in declining markets",
     ];
 
-    for (let i = 0; i < 2; i++) {
+    for (let i = 0; i < groundToGenerate; i++) {
       const topic = BIAS_TOPICS[Math.floor(Math.random() * BIAS_TOPICS.length)];
       try {
         const pT0 = Date.now();
@@ -257,11 +306,11 @@ serve(
       } catch (e) {
         results.push(`ground_nudge error: ${e}`);
       }
-      await new Promise(r => setTimeout(r, 2000));
+      if (i < groundToGenerate - 1) await new Promise(r => setTimeout(r, 2000));
     }
 
     // ═══════════════════════════════════════════
-    // STEP 3: Generate Philosophy/Signal (1 entry)
+    // STEP 3: Generate Philosophy/Signal (need-based, up to 1)
     // ═══════════════════════════════════════════
     const SIGNAL_TOPICS = [
       "Bitcoin as sound money and its philosophical implications for human freedom",
@@ -275,9 +324,10 @@ serve(
     ];
     const signalTopic = SIGNAL_TOPICS[Math.floor(Math.random() * SIGNAL_TOPICS.length)];
 
-    try {
-      const sigT0 = Date.now();
-      const signalPayload = await callPerplexityChat({
+    if (signalToGenerate > 0) {
+      try {
+        const sigT0 = Date.now();
+        const signalPayload = await callPerplexityChat({
         model: "sonar-pro",
         messages: [
           { role: "system", content: "Find a profound philosophical essay, talk, or piece of writing about Bitcoin. Focus on ideas, not market data. Look for thinkers like Allen Farrington, Vijay Boyapati, Parker Lewis, Gigi, Robert Breedlove, Saifedean Ammous, Jeff Booth, Lyn Alden, or similar." },
@@ -298,9 +348,9 @@ serve(
       const searchContent = signalPayload.content;
       const citations: string[] = signalPayload.citations || [];
 
-      if (searchContent) {
-        const sigAiT0 = Date.now();
-        const aiRes = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
+        if (searchContent) {
+          const sigAiT0 = Date.now();
+          const aiRes = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
             method: "POST",
             headers: { Authorization: `Bearer ${LOVABLE_API_KEY}`, "Content-Type": "application/json" },
             body: JSON.stringify({
@@ -332,10 +382,10 @@ serve(
             }),
           });
 
-          if (aiRes.ok) {
-            const aiData = await aiRes.json();
-            const sigUsage = aiData.usage;
-            logAttempt({
+            if (aiRes.ok) {
+              const aiData = await aiRes.json();
+              const sigUsage = aiData.usage;
+              logAttempt({
               companion_type: "pregenerate",
               provider: "lovable",
               model: "google/gemini-2.5-flash",
@@ -344,43 +394,48 @@ serve(
               input_tokens: sigUsage?.prompt_tokens,
               output_tokens: sigUsage?.completion_tokens,
             });
-            const toolCall = aiData.choices?.[0]?.message?.tool_calls?.[0];
-            const content = toolCall?.function?.arguments || aiData.choices?.[0]?.message?.content;
-            if (content) {
-              const signal = typeof content === "string" ? JSON.parse(content) : content;
+              const toolCall = aiData.choices?.[0]?.message?.tool_calls?.[0];
+              const content = toolCall?.function?.arguments || aiData.choices?.[0]?.message?.content;
+              if (content) {
+                const signal = typeof content === "string" ? JSON.parse(content) : content;
 
-              if (await isCompanionCacheDuplicate(svcClient, "signal", signal.title, {
-                url: signal.url,
-                bodySnippet: signal.body,
-              })) {
-                results.push(`signal: SKIPPED duplicate "${signal.title}"`);
-              } else {
-                let qualityScore = 1;
-                if (signal.url && await isUrlReachable(signal.url)) qualityScore = 2;
-                const signalFp = await contentSnippetFingerprint(signal.body || "");
-                await svcClient.from("companion_cache").insert({
-                  companion_type: "signal",
-                  language: "en",
-                  content: signal,
-                  quality_score: qualityScore,
-                  title: signal.title,
-                  title_norm: normalizeTitleKey(signal.title),
-                  source_url: signal.url ? (canonicalContentUrl(signal.url) ?? signal.url) : null,
-                  fingerprint: signalFp,
-                });
-                results.push(`signal: ${signal.title} (q=${qualityScore})`);
+                if (await isCompanionCacheDuplicate(svcClient, "signal", signal.title, {
+                  url: signal.url,
+                  bodySnippet: signal.body,
+                })) {
+                  results.push(`signal: SKIPPED duplicate "${signal.title}"`);
+                } else {
+                  let qualityScore = 1;
+                  if (signal.url && await isUrlReachable(signal.url)) qualityScore = 2;
+                  const signalFp = await contentSnippetFingerprint(signal.body || "");
+                  await svcClient.from("companion_cache").insert({
+                    companion_type: "signal",
+                    language: "en",
+                    content: signal,
+                    quality_score: qualityScore,
+                    title: signal.title,
+                    title_norm: normalizeTitleKey(signal.title),
+                    source_url: signal.url ? (canonicalContentUrl(signal.url) ?? signal.url) : null,
+                    fingerprint: signalFp,
+                  });
+                  results.push(`signal: ${signal.title} (q=${qualityScore})`);
+                }
               }
             }
           }
-        }
-    } catch (e) {
-      results.push(`signal error: ${e}`);
+      } catch (e) {
+        results.push(`signal error: ${e}`);
+      }
+    } else {
+      results.push("signal: skipped (pool healthy)");
     }
 
-    await new Promise(r => setTimeout(r, 2000));
+    if (signalToGenerate > 0 && (historyToGenerate > 0 || zoomToGenerate > 0)) {
+      await new Promise(r => setTimeout(r, 2000));
+    }
 
     // ═══════════════════════════════════════════
-    // STEP 4: Generate History (1 entry) — NEW
+    // STEP 4: Generate History (need-based, up to 1)
     // ═══════════════════════════════════════════
     const HISTORICAL_ERAS = [
       "1637 Dutch Tulip Mania and speculative bubbles",
@@ -396,9 +451,10 @@ serve(
     ];
     const historyEra = HISTORICAL_ERAS[Math.floor(Math.random() * HISTORICAL_ERAS.length)];
 
-    try {
-      const histT0 = Date.now();
-      const histPayload = await callPerplexityChat({
+    if (historyToGenerate > 0) {
+      try {
+        const histT0 = Date.now();
+        const histPayload = await callPerplexityChat({
         model: "sonar-pro",
         messages: [
           { role: "system", content: "Find a detailed historical account of this financial event. Include specific dates, percentage changes, key figures involved, and the long-term outcome. Focus on the emotional experience of investors during the crisis." },
@@ -418,9 +474,9 @@ serve(
       const searchContent = histPayload.content;
       const citations: string[] = histPayload.citations || [];
 
-      if (searchContent) {
-        const histAiT0 = Date.now();
-        const aiRes = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
+        if (searchContent) {
+          const histAiT0 = Date.now();
+          const aiRes = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
             method: "POST",
             headers: { Authorization: `Bearer ${LOVABLE_API_KEY}`, "Content-Type": "application/json" },
             body: JSON.stringify({
@@ -434,10 +490,10 @@ serve(
             }),
           });
 
-          if (aiRes.ok) {
-            const aiData = await aiRes.json();
-            const histUsage = aiData.usage;
-            logAttempt({
+            if (aiRes.ok) {
+              const aiData = await aiRes.json();
+              const histUsage = aiData.usage;
+              logAttempt({
               companion_type: "pregenerate",
               provider: "lovable",
               model: "google/gemini-2.5-flash",
@@ -446,46 +502,51 @@ serve(
               input_tokens: histUsage?.prompt_tokens,
               output_tokens: histUsage?.completion_tokens,
             });
-            const raw = aiData.choices?.[0]?.message?.content;
-            if (raw) {
-              const insight = JSON.parse(raw);
-              if (insight.title && insight.btcInsight) {
-                // Pin URL to first citation if available
-                if (!insight.url && citations.length > 0) insight.url = citations[0];
+              const raw = aiData.choices?.[0]?.message?.content;
+              if (raw) {
+                const insight = JSON.parse(raw);
+                if (insight.title && insight.btcInsight) {
+                  // Pin URL to first citation if available
+                  if (!insight.url && citations.length > 0) insight.url = citations[0];
 
-                if (await isCompanionCacheDuplicate(svcClient, "historical_insight", insight.title, {
-                  url: insight.url,
-                  bodySnippet: insight.btcInsight,
-                })) {
-                  results.push(`history: SKIPPED duplicate "${insight.title}"`);
-                } else {
-                  let qualityScore = 1;
-                  if (insight.url && await isUrlReachable(insight.url)) qualityScore = 2;
-                  const histFp = await contentSnippetFingerprint(insight.btcInsight || "");
-                  await svcClient.from("companion_cache").insert({
-                    companion_type: "historical_insight",
-                    language: "en",
-                    content: insight,
-                    quality_score: qualityScore,
-                    title: insight.title,
-                    title_norm: normalizeTitleKey(insight.title),
-                    source_url: insight.url ? (canonicalContentUrl(insight.url) ?? insight.url) : null,
-                    fingerprint: histFp,
-                  });
-                  results.push(`history: ${insight.title} (q=${qualityScore})`);
+                  if (await isCompanionCacheDuplicate(svcClient, "historical_insight", insight.title, {
+                    url: insight.url,
+                    bodySnippet: insight.btcInsight,
+                  })) {
+                    results.push(`history: SKIPPED duplicate "${insight.title}"`);
+                  } else {
+                    let qualityScore = 1;
+                    if (insight.url && await isUrlReachable(insight.url)) qualityScore = 2;
+                    const histFp = await contentSnippetFingerprint(insight.btcInsight || "");
+                    await svcClient.from("companion_cache").insert({
+                      companion_type: "historical_insight",
+                      language: "en",
+                      content: insight,
+                      quality_score: qualityScore,
+                      title: insight.title,
+                      title_norm: normalizeTitleKey(insight.title),
+                      source_url: insight.url ? (canonicalContentUrl(insight.url) ?? insight.url) : null,
+                      fingerprint: histFp,
+                    });
+                    results.push(`history: ${insight.title} (q=${qualityScore})`);
+                  }
                 }
               }
             }
           }
-        }
-    } catch (e) {
-      results.push(`history error: ${e}`);
+      } catch (e) {
+        results.push(`history error: ${e}`);
+      }
+    } else {
+      results.push("history: skipped (pool healthy)");
     }
 
-    await new Promise(r => setTimeout(r, 2000));
+    if (historyToGenerate > 0 && zoomToGenerate > 0) {
+      await new Promise(r => setTimeout(r, 2000));
+    }
 
     // ═══════════════════════════════════════════
-    // STEP 5: Generate Zoom Out deep-time (1 entry) — NEW
+    // STEP 5: Generate Zoom Out deep-time (need-based, up to 1)
     // ═══════════════════════════════════════════
     const ZOOM_OUT_THEMES = [
       "Compare Bitcoin's 15-year existence to the 5,000-year history of money",
@@ -499,9 +560,10 @@ serve(
     ];
     const zoomTheme = ZOOM_OUT_THEMES[Math.floor(Math.random() * ZOOM_OUT_THEMES.length)];
 
-    try {
-      const zoomT0 = Date.now();
-      const aiRes = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
+    if (zoomToGenerate > 0) {
+      try {
+        const zoomT0 = Date.now();
+        const aiRes = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
         method: "POST",
         headers: { Authorization: `Bearer ${LOVABLE_API_KEY}`, "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -515,10 +577,10 @@ serve(
         }),
       });
 
-      if (aiRes.ok) {
-        const aiData = await aiRes.json();
-        const zoomUsage = aiData.usage;
-        logAttempt({
+        if (aiRes.ok) {
+          const aiData = await aiRes.json();
+          const zoomUsage = aiData.usage;
+          logAttempt({
           companion_type: "pregenerate",
           provider: "lovable",
           model: "google/gemini-2.5-flash",
@@ -527,32 +589,35 @@ serve(
           input_tokens: zoomUsage?.prompt_tokens,
           output_tokens: zoomUsage?.completion_tokens,
         });
-        const raw = aiData.choices?.[0]?.message?.content;
-        if (raw) {
-          const parsed = JSON.parse(raw);
-          if (parsed.title && parsed.body) {
-            if (await isCompanionCacheDuplicate(svcClient, "zoom_out_deep_time", parsed.title, {
-              bodySnippet: parsed.body,
-            })) {
-              results.push(`zoom_out: SKIPPED duplicate "${parsed.title}"`);
-            } else {
-              const zoomFp = await contentSnippetFingerprint(parsed.body || "");
-              await svcClient.from("companion_cache").insert({
-                companion_type: "zoom_out_deep_time",
-                language: "en",
-                content: { title: parsed.title, body: parsed.body },
-                quality_score: 2,
-                title: parsed.title,
-                title_norm: normalizeTitleKey(parsed.title),
-                fingerprint: zoomFp,
-              });
-              results.push(`zoom_out: ${parsed.title}`);
+          const raw = aiData.choices?.[0]?.message?.content;
+          if (raw) {
+            const parsed = JSON.parse(raw);
+            if (parsed.title && parsed.body) {
+              if (await isCompanionCacheDuplicate(svcClient, "zoom_out_deep_time", parsed.title, {
+                bodySnippet: parsed.body,
+              })) {
+                results.push(`zoom_out: SKIPPED duplicate "${parsed.title}"`);
+              } else {
+                const zoomFp = await contentSnippetFingerprint(parsed.body || "");
+                await svcClient.from("companion_cache").insert({
+                  companion_type: "zoom_out_deep_time",
+                  language: "en",
+                  content: { title: parsed.title, body: parsed.body },
+                  quality_score: 2,
+                  title: parsed.title,
+                  title_norm: normalizeTitleKey(parsed.title),
+                  fingerprint: zoomFp,
+                });
+                results.push(`zoom_out: ${parsed.title}`);
+              }
             }
           }
         }
+      } catch (e) {
+        results.push(`zoom_out error: ${e}`);
       }
-    } catch (e) {
-      results.push(`zoom_out error: ${e}`);
+    } else {
+      results.push("zoom_out: skipped (pool healthy)");
     }
 
     // ═══════════════════════════════════════════
