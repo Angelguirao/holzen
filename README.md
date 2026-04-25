@@ -52,7 +52,7 @@ Open [http://localhost:8080](http://localhost:8080). For hosted Supabase you do 
 | `npm run dev` | Vite dev server with HMR (default mode) |
 | `npm run dev:hosted` | Dev server using `.env.hosted` / `.env.hosted.local` (optional: hit **cloud** Supabase from your PC; not used by Lovable) |
 | `npm run dev:local` | Dev server using `.env.localstack` / `.env.localstack.local` (local Supabase only; no hosted fallback) |
-| `npm run build` | Production build |
+| `npm run build` | Production build (runs **`check:version-sync`** via **`prebuild`**) |
 | `npm run build:dev` | Build in development mode |
 | `npm run preview` | Serve the production build locally |
 | `npm run test` | Vitest (jsdom), single run |
@@ -72,8 +72,8 @@ Open [http://localhost:8080](http://localhost:8080). For hosted Supabase you do 
 | `npm run smoke:edge-logging` | Optional live HTTP probe of edge `x-cid` behavior (see `supabase/functions/README.md`) |
 | `npm run test:coverage` | Vitest with coverage (no JUnit; use **`test:ci`** for logging guards + JUnit) |
 | `npm run check:version-sync` | `package.json` version vs latest `changelog_entries` (runs automatically as **`prebuild`** on **`npm run build`**) |
-| `npm run stamp:release` | Refresh **`supabase/functions/_shared/release.ts`** with the current Git SHA for edge observability releases |
-| `npm run check:release-stamp` | Verify **`release.ts`** matches `HEAD` without writing |
+| `npm run stamp:release` | Refresh **`supabase/functions/_shared/release.ts`** (`EDGE_RELEASE` = **`git rev-parse --short=12 HEAD`**) for edge observability releases |
+| `npm run check:release-stamp` | Verify **`EDGE_RELEASE`** in **`release.ts`** matches **`git rev-parse --short=12 HEAD`** (no write) |
 
 ## Repository layout
 

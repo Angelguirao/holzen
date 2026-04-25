@@ -156,7 +156,7 @@ Some Edge functions assume columns already exist — e.g. **`fetch-source-feeds`
 
 **`npm run check:version-sync`:** Runs `scripts/check-version-sync.mjs` — compares **`package.json` `version`** to the latest **`changelog_entries`** row (PostgREST). **`npm run build`** runs it automatically via the **`prebuild`** hook.
 
-**`npm run stamp:release` / `npm run check:release-stamp`:** `scripts/stamp-edge-release.mjs` keeps **`supabase/functions/_shared/release.ts`** aligned with the current Git SHA for edge Sentry/BetterStack release tags. **`npm run check:prepush`** runs the stamp step first (warns if the file changed so you can commit).
+**`npm run stamp:release` / `npm run check:release-stamp`:** `scripts/stamp-edge-release.mjs` keeps **`EDGE_RELEASE`** in **`supabase/functions/_shared/release.ts`** aligned with **`git rev-parse --short=12 HEAD`** for edge Sentry/BetterStack release tags. **`npm run check:release-stamp`** fails if that file is stale (read-only). **`npm run check:prepush`** runs the stamp step first (warns if the file changed so you can commit).
 
 ## Troubleshooting
 
