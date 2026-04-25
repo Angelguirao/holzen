@@ -39,7 +39,7 @@ Treat Phases **1–2** as the **product spine** for pause; **3–8** as the **ba
 
 | Slice | Scope (indicative) | Est. (h) | Notes |
 |-------|---------------------|----------|--------|
-| **Home dashboard** | `Home.tsx`, widgets (market, goal, pause, at-a-glance summary, evening), onboarding, Pro gating, ordering, pull-to-refresh, query params (e.g. `subscribed`) | 8–14 | Highest coupling; consider one doc with subsections per widget |
+| **Home dashboard** | `Home.tsx`, widgets (pause-first, market, goal, journey pulse, quick capture, evening), onboarding, Pro gating, ordering, pull-to-refresh, query params (e.g. `subscribed`) | 8–14 | Highest coupling; consider one doc with subsections per widget |
 | **Global shell** | `AppLayout`, `BottomNav`, `NotificationBell`, `PauseReadyBanner`, `useLanguageSync` | 3–5 | Overlaps notifications and auto-trigger |
 | **Auto-trigger → pause** | `useAutoTrigger`, navigation to `/pause`, interaction with home chrome | 2–4 | Overlap with Phase 2 if reviewed together |
 

@@ -29,7 +29,8 @@ import { homeInWidget } from '@/components/home/home-widget-styles';
 import { cn } from '@/lib/utils';
 import { BulkHoldCard } from '@/components/BulkHoldCard';
 import { InstallHolzenCard } from '@/components/InstallHolzenCard';
-import { HomeAtAGlance } from '@/components/home/HomeAtAGlance';
+import { HomeJourneyPulse } from '@/components/home/HomeJourneyPulse';
+import { HomeQuickCapture } from '@/components/home/HomeQuickCapture';
 import { SnoozeControl } from '@/components/SnoozeControl';
 import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
 import { playNotificationTone, prefetchNotificationTone } from '@/lib/notification-tone';
@@ -53,7 +54,7 @@ import {
 import { restrictToVerticalAxis } from '@dnd-kit/modifiers';
 
 // Widget IDs
-const WIDGET_IDS = ['btc-status', 'hold-goal', 'reflection', 'home-summary', 'night'] as const;
+const WIDGET_IDS = ['reflection', 'btc-status', 'hold-goal', 'journey-pulse', 'quick-capture', 'night'] as const;
 type WidgetId = typeof WIDGET_IDS[number];
 
 interface PinnedPausePreview {
@@ -71,7 +72,8 @@ const Home = () => {
     'btc-status': t('home.widget.market'),
     'hold-goal': t('home.widget.goal'),
     'reflection': t('home.widget.reflection'),
-    'home-summary': t('home.widget.summary'),
+    'journey-pulse': t('home.widget.journeyPulse'),
+    'quick-capture': t('home.widget.quickCapture'),
     'night': t('home.widget.evening'),
   };
   const { user } = useAuth();
@@ -595,15 +597,27 @@ const Home = () => {
           </HomeWidget>
         );
 
-      case 'home-summary':
+      case 'journey-pulse':
         return (
           <HomeWidget
-            id="home-summary"
-            title={WIDGET_TITLES['home-summary']}
-            collapsed={collapsed['home-summary']}
-            onToggleCollapse={() => toggleCollapsed('home-summary')}
+            id="journey-pulse"
+            title={WIDGET_TITLES['journey-pulse']}
+            collapsed={collapsed['journey-pulse']}
+            onToggleCollapse={() => toggleCollapsed('journey-pulse')}
           >
-            <HomeAtAGlance />
+            <HomeJourneyPulse />
+          </HomeWidget>
+        );
+
+      case 'quick-capture':
+        return (
+          <HomeWidget
+            id="quick-capture"
+            title={WIDGET_TITLES['quick-capture']}
+            collapsed={collapsed['quick-capture']}
+            onToggleCollapse={() => toggleCollapsed('quick-capture')}
+          >
+            <HomeQuickCapture />
           </HomeWidget>
         );
 

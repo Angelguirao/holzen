@@ -103,12 +103,22 @@
       "market": "Market",
       "goal": "Goal",
       "reflection": "Pause",
-      "summary": "At a glance",
+      "journeyPulse": "Journey pulse",
+      "quickCapture": "Quick capture",
       "evening": "Evening",
       "letter": "Letter",
       "practice": "Practice"
     },
-    "atAGlance": {
+    "journeyPulse": {
+      "scoreLabel": "Global score",
+      "closestBadge": "Closest badge",
+      "badgeProgress": "{{current}} / {{requirement}}",
+      "openStats": "Open stats",
+      "openBadges": "Badges",
+      "openActivity": "Activity",
+      "noScore": "Complete a pause to unlock your journey pulse."
+    },
+    "quickCapture": {
       "libraryTitle": "Library",
       "libraryOpen": "Open",
       "libraryEmpty": "Nothing saved yet — pauses and moments you keep show up here.",
@@ -117,11 +127,7 @@
       "checkinPlaceholder": "Optional note (what matters right now)",
       "checkinSave": "Log",
       "checkinOpenTools": "Full check-in",
-      "checkinNeedOne": "Pick a mood or add a short note.",
-      "badgeTitle": "Closest badge",
-      "badgeProgress": "{{current}} / {{requirement}}",
-      "badgeOpen": "Badges & progress",
-      "allBadgesEarned": "Every badge earned — see Journey for the full set."
+      "checkinNeedOne": "Pick a mood or add a short note."
     },
     "subscription": {
       "monthlyLimitReached": "You've used your {{freeReflectionsPerMonth}} free pauses this month. Start your {{trialDays}}-day free trial for unlimited.",
