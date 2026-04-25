@@ -11,7 +11,7 @@ import {
   fetchParsedPauseArtifactCache,
 } from '@/lib/pause-artifact-cache';
 import type { ZoomOutData } from '@/components/ZoomOutDisplay';
-import { toZoomOutDisplayData } from '@/lib/zoom-out-payload';
+import { toZoomOutDisplayData, zoomOutLibraryAutosaveFromDisplayData } from '@/lib/zoom-out-payload';
 import type { CachedHistoricalInsightShape } from '@/components/HistoricalInsightDisplay';
 import type { CompanionUiCompletionStep } from '@/lib/companion-completion-sync';
 import {
@@ -264,10 +264,11 @@ export function useCompanionData({ companions, prefs, pauseInstanceId, context, 
           autoSaveToLibrary({ title: cached.history.title, body: cached.history.btcInsight, sourceType: 'history_insight' });
         }
         if (cached.zoomOut) {
-          setZoomOut(toZoomOutDisplayData(cached.zoomOut));
+          const z = toZoomOutDisplayData(cached.zoomOut);
+          setZoomOut(z);
           fetchedSlotsRef.current.add('zoomOut');
-          const zoomBody = cached.zoomOut?.deepTime?.body || cached.zoomOut?.echo?.message || 'Zoom Out perspective';
-          autoSaveToLibrary({ title: cached.zoomOut?.deepTime?.title || 'Zoom Out', body: zoomBody, sourceType: 'zoom_out' });
+          const { title, body } = zoomOutLibraryAutosaveFromDisplayData(z);
+          autoSaveToLibrary({ title, body, sourceType: 'zoom_out' });
         }
         if (cached.intervention) {
           setIntervention(cached.intervention);

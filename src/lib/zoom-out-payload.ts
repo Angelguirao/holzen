@@ -86,3 +86,11 @@ export function zoomOutBodyPreviewFromJsonString(raw: string): string | null {
     return null;
   }
 }
+
+/** Title + body for companion library autosave (orchestrate commit + artifact cache hydrate). */
+export function zoomOutLibraryAutosaveFromDisplayData(d: ZoomOutData): { title: string; body: string } {
+  return {
+    title: d.deepTime?.title || 'Zoom Out',
+    body: d.deepTime?.body || d.echo?.message || 'Zoom Out perspective',
+  };
+}
