@@ -8,6 +8,12 @@
 
 Focused notes on the **intervention** and **individual companion types** — how they fit into the overall pause pipeline described in [ai-powered-pause-system.md](../ai-powered-pause-system.md).
 
+## Cache warmer (background)
+
+| Doc | What |
+|-----|------|
+| [pregenerate.md](pregenerate.md) | **Pregenerate companions** — `pregenerate-companions` edge job, `companion_cache` lifecycle, how pool rows are consumed by orchestration |
+
 ## Intervention
 
 | Doc | What |

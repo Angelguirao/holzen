@@ -113,7 +113,13 @@ export function InsightsPanel({ sessions }: Props) {
         <div className="space-y-2">
           <p className="text-xs font-mono text-muted-foreground/70">{t('insightsPanel.whatYouDid')}</p>
           {(['held', 'bought', 'sold'] as const).map((o) => (
-            <Bar key={o} label={t(`outcome.${o}`, { defaultValue: o })} count={outcomeCounts[o] || 0} total={totalOutcomes} color={OUTCOME_COLORS[o]} />
+            <Bar
+              key={o}
+              label={t(`outcome.${o}`, { defaultValue: o })}
+              count={outcomeCounts[o] || 0}
+              total={totalOutcomes}
+              color={OUTCOME_COLORS[o]}
+            />
           ))}
         </div>
       )}
