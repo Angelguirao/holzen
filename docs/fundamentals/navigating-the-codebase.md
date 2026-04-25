@@ -74,9 +74,9 @@ The Supabase browser client is **`src/integrations/supabase/client.ts`** (typed 
 
 | Concern | Typical location |
 |--------|-------------------|
-| User profile, language, reflection prefs, thresholds | `use-profile.ts` + `profiles` table |
-| BTC context, manual pause, reflection + companion orchestration trigger | `use-holzen.ts` |
-| Companion payloads after a reflection | `use-companion-data.ts` |
+| User profile, language, pause AI prefs (`reflection_style` / `reflection_tone` on `profiles`), thresholds | `use-profile.ts` + `profiles` table |
+| BTC context, manual pause, companion orchestration triggers | `use-holzen.ts` |
+| Companion payloads for the active pause | `use-companion-data.ts` |
 | Subscription / Stripe checkout | `use-subscription.ts` |
 | Library content | `use-library.ts` |
 | Push (VAPID, registration) | `use-push-notifications.ts` |
@@ -205,7 +205,7 @@ Each folder under **`supabase/functions/<name>/`** is a deployable function. Sha
 
 ## 16. Related documentation in `docs/`
 
-- **[ai-powered-pause-system.md](../systems/pause/ai-powered-pause-system.md)** — Manual vs automatic pause, shared reflection AI, `companion-orchestrate`, interventions, generators, drift and ops notes.
+- **[ai-powered-pause-system.md](../systems/pause/ai-powered-pause-system.md)** — Manual vs automatic pause, shared pause-session AI, `companion-orchestrate`, interventions, generators, drift and ops notes.
 - **[cron-setup.md](../ops/cron-setup.md)** — Scheduling edge functions (BTC refresh, feeds, digests, etc.).
 
 ---
