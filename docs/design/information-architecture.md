@@ -73,28 +73,25 @@ Under `/admin` and children (`/admin/smoke-test`, `/admin/sentry-alerts`, `/admi
 
 ## 3. Gaps and pain points (IA)
 
-1. **Naming inconsistency across URL groups**  
-   `/practice/*`, `/ground/*`, `/breathe`, `/ambient`, and companion `/companion/*` don’t read as one family. New users and contributors both have to learn several top-level “buckets” that overlap emotionally (all are “ways to regulate / reflect”).
+1. **Companion URLs vs tools**  
+   Companions remain under `/companion/...` (per pause instance) while **tools** use `/tools/...` — two honest families; naming is clearer than the old scatter of top-level paths.
 
-2. **“Profile” is overloaded**  
-   The word suggests account and identity, but the tab is mostly **longitudinal self view**: stats, insights, badges, letters, activity. That mixes **outcomes** (stats/badges) with **archives** (letters, activity) under one label. Settings already holds real account and prefs — so “Profile” vs “Settings” mental model can blur.
+2. **“Journey” still bundles several intents**  
+   The tab groups stats, insights, badges, letters, and activity. Copy and the Library vs Activity explainer help; further split is a product call.
 
 3. **Progress / history split across three places**  
    - Library: saved artifacts and collections.  
-   - Profile → activity (and history-related UI).  
-   - `/ground/history` for grounding-specific history.  
-   Users asking “where is my past?” may try more than one surface.
+   - Journey → activity (chronological log).  
+   - `/tools/ground/history` for grounding-specific history.  
+   Users asking “where is my past?” may still check more than one surface.
 
-4. **Profile tabs are not URL-first**  
-   Tabs driven by `location.state` are fine for notification deep links but **not bookmarkable** and harder to reason about in analytics (“which tab?” often not in the path). Same route `/profile` for five different primary intents.
-
-5. **Settings is long and multi-purpose**  
+4. **Settings is long and multi-purpose**  
    Pro, referrals, haptics, push, quiet hours, content sources, danger zone, changelog — it’s a **catch-all** “everything else,” which is practical but can feel like the junk drawer if not grouped with strong section IA inside the page.
 
-6. **Discoverability of immersive tools**  
-   Breathe, ambient, ground, and practice are primarily reached from **Home widgets** and cross-links, not the bottom nav. That keeps the tab bar small but hides secondary modalities unless Home is configured to surface them.
+5. **Discoverability of immersive tools**  
+   Breathe, ambient, ground, and practice are primarily reached from **Home widgets** and cross-links, not the bottom nav. That keeps the tab bar small but hides secondary modalities unless Home is configured to surface them. **`/tools`** is the in-app index.
 
-7. **Marketing vs app boundary**  
+6. **Marketing vs app boundary**  
    Public pages (`/about`, `/blog`, `/reserve`) are consistent; `/roadmap` redirect suggests roadmap content may return — worth tracking so external links don’t rot.
 
 ---
@@ -105,19 +102,18 @@ These are **directional** improvements; any change should be paired with nav aff
 
 ### 4.1 Unify “modalities” under one conceptual parent
 
-**Option A — URL structure:** Introduce a single prefix, e.g. `/do/*` or `/tools/*` (`/do/breathe`, `/do/ground`, `/do/ground/history`, `/do/practice/...`), with redirects from old paths for compatibility.
+**Option A — URL structure:** A single tools prefix (shipped as **`/tools/*`**) for breathe, ground, practice, and ambient. No alternate short paths — external links and bookmarks should use these URLs.
 
 **Option B — Information-only:** Keep URLs flat but add a **single “Tools” or “Guides”** entry on Home (or a fifth tab) that lists breathe, ground, practice, ambient with one-line intent — reducing reliance on widget order.
 
 ### 4.2 Split “identity / account” from “progress & archive”
 
-- **Rename or reframe the Profile tab** in product copy: e.g. “You,” “Journey,” or “Progress,” so it doesn’t compete with Settings for “account.”  
+- The tab is now **Journey** at **`/journey/...`**. Refine in-product copy if it still blurs with Settings.
 - Alternatively, **move high-value progress** (e.g. stats summary) to Home or a dedicated top-level “Stats” tab **only if** user research shows users expect a direct tab for numbers — otherwise keep density on Profile and improve labeling.
 
-### 4.3 Make Profile secondary sections path-addressable (optional but high leverage)
+### 4.3 Path-addressable Journey (shipped)
 
-- Use nested routes: `/profile/stats`, `/profile/badges`, … or query params: `/profile?tab=stats` (shareable, analytics-friendly) instead of or in addition to `location.state`.  
-- Preserves a single “me” area while making deep links and back/forward unambiguous.
+- **`/journey/:tab`** and **`?letter=`** for letters — no `location.state` for tab/letter.
 
 ### 4.4 Clarify Library vs “activity”
 
