@@ -15,6 +15,7 @@ import {
   bucketChangePercent,
   computeContextFingerprint,
 } from '@/lib/pause-fingerprint';
+import { loadReflectRecencyHints } from '@/lib/load-reflect-recency-hints';
 
 /**
  * Pause V2 manual-trigger hook. Writes every generated pause straight
@@ -189,6 +190,7 @@ export function useHolzen() {
       setError(null);
 
       try {
+        const { moodHistory, recentMessages, recentHaikus } = await loadReflectRecencyHints();
         const { data: fnData, error: fnError } = await supabase.functions.invoke('holzen-reflect', {
           body: {
             context: ctx,
@@ -201,6 +203,9 @@ export function useHolzen() {
             groundingActivities: groundingActivities.length > 0 ? groundingActivities : undefined,
             currency,
             language,
+            ...(moodHistory && moodHistory.length > 0 ? { moodHistory } : {}),
+            ...(recentMessages && recentMessages.length > 0 ? { recentMessages } : {}),
+            ...(recentHaikus && recentHaikus.length > 0 ? { recentHaikus } : {}),
           },
         });
         if (fnError) throw fnError;

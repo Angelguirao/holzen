@@ -31,7 +31,6 @@ We **do not** accept **`x-supabase-cron: true`** without a valid Bearer on worke
 
 | File | Function |
 |------|----------|
-| `check-followups.bru` | `check-followups` |
 | `check-volatility.bru` | `check-volatility` |
 | `weekly-digest.bru` | `weekly-digest` |
 | `monthly-report.bru` | `monthly-report` |
