@@ -144,7 +144,7 @@ sessions incur retries, larger contexts, or heavier prompt payloads.
 
 Each scenario assumes Pro users (who consume AI) and excludes free-tier users
 past their 3-pause/month cap. These are stress figures; the cache warmer, the
-reflection_companions skip-cache path, and user behavior all cut real numbers
+`pause_ai_artifacts` / companion-cache skip paths, and user behavior all cut real numbers
 below them.
 
 ### 4.0 Shared assumptions
@@ -242,7 +242,7 @@ health issue — a prompt regression shouldn't trip the breaker).
 | `lovable` | Signal, Grounding, History, Zoom-Out, Intervention, Reflection, + all non-companion AI features | Same: skip live phase; cache/library/fallback still serve. Reflection falls back to the curated pool. |
 
 **Cached serves are completely unaffected.** Rows already written to
-`reflection_companions`, `companion_cache` hits, and `content_library` hits
+`pause_ai_artifacts`, `companion_cache` hits, and `content_library` hits
 all keep serving. Only *new* live generation is skipped for the duration
 of the trip.
 

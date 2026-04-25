@@ -188,7 +188,7 @@ Short version:
 
 #### Heartbeat windows (canonical)
 
-Mirror of the table in [pg-cron-heartbeat-wiring.md §Part A](../backlog/pg-cron-heartbeat-wiring.md#part-a--betterstack-heartbeats--8-min) (row count shrank after Pause V2 removed `check-followups`). If you change a value, change it in **both** places in the same PR — the backlog ticket owns the *why* (per-job rationale + tuning rule), this runbook is the *what* (the values to type into BetterStack).
+Mirror of the **Part A** table in [pg-cron-heartbeat-wiring.md](../backlog/pg-cron-heartbeat-wiring.md) (heartbeat periods + grace; row count shrank after Pause V2 removed `check-followups`). If you change a value, change it in **both** places in the same PR — the backlog ticket owns the *why* (per-job rationale + tuning rule), this runbook is the *what* (the values to type into BetterStack).
 
 | Cron job | Schedule | Period | Grace | `app_config` key |
 |---|---|---|---|---|
