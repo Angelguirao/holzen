@@ -15,7 +15,6 @@ import { HoldGoalWidget } from '@/components/HoldGoalWidget';
 import { MyWhyWidget } from '@/components/MyWhyWidget';
 import { Skeleton } from '@/components/ui/skeleton';
 import { SubscriptionSkeleton } from '@/components/SubscriptionSkeleton';
-import { Button } from '@/components/ui/button';
 import { LoadingButton } from '@/components/ui/loading-button';
 import { NoxHeaderMain } from '@/components/ui/nox-header';
 import { HomeWidget, useWidgetLayout } from '@/components/HomeWidget';
@@ -24,22 +23,18 @@ import { useSearchParams, useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/use-auth';
 import { toast } from 'sonner';
-import { AlertCircle, Loader2, Pin, Sparkles, Waves, RotateCcw, RefreshCw, X, Anchor } from 'lucide-react';
-import { AutoCooldownIndicator, NeedAMomentButton, ProLockedWidget } from '@/components/home/HomePauseChrome';
+import { AlertCircle, Loader2, Pin, Sparkles, RotateCcw, RefreshCw, X } from 'lucide-react';
+import { AutoCooldownIndicator, NeedAMomentButton } from '@/components/home/HomePauseChrome';
 import { homeInWidget } from '@/components/home/home-widget-styles';
 import { cn } from '@/lib/utils';
-import { PracticeWidget } from '@/components/PracticeWidget';
 import { BulkHoldCard } from '@/components/BulkHoldCard';
 import { InstallHolzenCard } from '@/components/InstallHolzenCard';
-import { JourneyHomeCard } from '@/components/JourneyHomeCard';
+import { HomeAtAGlance } from '@/components/home/HomeAtAGlance';
 import { SnoozeControl } from '@/components/SnoozeControl';
 import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
 import { playNotificationTone, prefetchNotificationTone } from '@/lib/notification-tone';
-import { isCumulativeMoveTriggered } from '@/lib/volatility-thresholds';
 import { holzenLog } from '@/lib/holzen-console';
-import { companionFallbacksDisabledClient } from '@/lib/companion-strict';
-import { TOOLS } from '@/lib/app-routes';
-import { type GroundPreGenerated, type PauseSessionLocationState } from '@/lib/router-location-state';
+import { type PauseSessionLocationState } from '@/lib/router-location-state';
 import {
   DndContext,
   closestCenter,
@@ -58,7 +53,7 @@ import {
 import { restrictToVerticalAxis } from '@dnd-kit/modifiers';
 
 // Widget IDs
-const WIDGET_IDS = ['btc-status', 'hold-goal', 'reflection', 'ground', 'night', 'practice', 'breathe'] as const;
+const WIDGET_IDS = ['btc-status', 'hold-goal', 'reflection', 'home-summary', 'night'] as const;
 type WidgetId = typeof WIDGET_IDS[number];
 
 interface PinnedPausePreview {
@@ -76,10 +71,8 @@ const Home = () => {
     'btc-status': t('home.widget.market'),
     'hold-goal': t('home.widget.goal'),
     'reflection': t('home.widget.reflection'),
-    'ground': t('home.widget.ground', { defaultValue: 'Ground' }),
+    'home-summary': t('home.widget.summary'),
     'night': t('home.widget.evening'),
-    'practice': t('home.widget.practice', { defaultValue: 'Practice' }),
-    'breathe': t('home.widget.breathe', { defaultValue: 'Stillness' }),
   };
   const { user } = useAuth();
   const navigate = useNavigate();
@@ -117,11 +110,6 @@ const Home = () => {
     cooldownHours,
     firstName,
     currency,
-    groundingActivities,
-    threshold,
-    thresholdDown,
-    cumulativeThreshold,
-    language,
     profileLoaded,
     refreshProfile,
   } = useHolzen();
@@ -147,25 +135,6 @@ const Home = () => {
   const [pinnedPausePreview, setPinnedPausePreview] = useState<PinnedPausePreview | null>(null);
   const prefersReducedMotion = useReducedMotion();
   const [completedPauseCount, setCompletedPauseCount] = useState(0);
-
-  // Grounding suggestion state (mirrors pause message pattern)
-  const groundStorageKey = user ? `holzen_ground_suggestion_${user.id}` : 'holzen_ground_suggestion';
-  const groundDismissedKey = user ? `holzen_ground_dismissed_${user.id}` : 'holzen_ground_dismissed';
-  const groundDismissedRef = useRef(() => {
-    try { return localStorage.getItem(groundDismissedKey) === 'true'; } catch { return false; }
-  });
-  const [groundDismissed, setGroundDismissed] = useState(() => groundDismissedRef.current());
-  const strictNoFallback = companionFallbacksDisabledClient();
-  const [groundSuggestion, setGroundSuggestion] = useState<GroundPreGenerated | null>(() => {
-    if (companionFallbacksDisabledClient()) return null;
-    try {
-      const stored = localStorage.getItem(user ? `holzen_ground_suggestion_${user.id}` : 'holzen_ground_suggestion');
-      return stored ? JSON.parse(stored) : null;
-    } catch { return null; }
-  });
-  const [groundLoading, setGroundLoading] = useState(false);
-  const groundFetchingRef = useRef(false);
-
 
   // Widget layout
   const defaultOrder = useMemo(() => [...WIDGET_IDS], []);
@@ -284,31 +253,7 @@ const Home = () => {
 
   const handleDismiss = () => {
     dismissMessage();
-    // Suppress grounding auto-generation when user explicitly dismisses a pause notification
-    setGroundDismissed(true);
-    localStorage.setItem(groundDismissedKey, 'true');
   };
-
-  const dismissGroundSuggestion = useCallback(() => {
-    setGroundSuggestion(null);
-    localStorage.removeItem(groundStorageKey);
-    setGroundDismissed(true);
-    localStorage.setItem(groundDismissedKey, 'true');
-  }, [groundStorageKey, groundDismissedKey]);
-
-  // No cached grounding card when testing strict live paths — clear persisted suggestions
-  useEffect(() => {
-    if (!strictNoFallback) return;
-    setGroundSuggestion(null);
-    try {
-      if (user?.id) localStorage.removeItem(`holzen_ground_suggestion_${user.id}`);
-      localStorage.removeItem('holzen_ground_suggestion');
-    } catch { /* ignore */ }
-  }, [strictNoFallback, user?.id]);
-
-  const handleStartGround = useCallback(() => {
-    navigate(TOOLS.ground, { state: { preGenerated: groundSuggestion } });
-  }, [navigate, groundSuggestion]);
 
   const lastToneMsgRef = useRef<string | null>(null);
   useEffect(() => {
@@ -328,57 +273,6 @@ const Home = () => {
   useEffect(() => {
     prefetchNotificationTone();
   }, []);
-
-  // Reset grounding dismissed flag when a new pause message arrives (new volatility cycle)
-  const prevMessageRef = useRef(message);
-  useEffect(() => {
-    if (message && !prevMessageRef.current) {
-      // A new pause just appeared — reset dismissed so grounding can auto-suggest after pause
-      setGroundDismissed(false);
-      localStorage.removeItem(groundDismissedKey);
-    }
-    prevMessageRef.current = message;
-  }, [message, groundDismissedKey]);
-
-  // Pre-generate grounding suggestion when thresholds are met (mirrors pause pre-generation)
-  useEffect(() => {
-    if (!user || !profileLoaded || !subscribed || !btcData || groundingActivities.length === 0) return;
-    // Don't pre-generate if there's an active pause message (pause takes priority)
-    if (message) return;
-    // Don't pre-generate if user already dismissed this session, or we already have one
-    if (groundDismissed || groundSuggestion || groundFetchingRef.current) return;
-
-    const effectiveThreshold = btcData.changePercent < 0 ? thresholdDown : threshold;
-    const dailyTriggered = Math.abs(btcData.changePercent) >= effectiveThreshold;
-    const cumulativeTriggered = isCumulativeMoveTriggered(btcData.cumulativeChangePercent, cumulativeThreshold);
-
-    if (!dailyTriggered && !cumulativeTriggered) return;
-
-    groundFetchingRef.current = true;
-    setGroundLoading(true);
-
-    const ctx = `BTC is ${btcData.direction === 'down' ? 'down' : 'up'} ${Math.abs(btcData.changePercent).toFixed(1)}% in the last 24 hours.`;
-
-    supabase.functions.invoke('suggest-grounding', {
-      body: { groundingActivities, context: ctx, severity, language, consumeQuota: false },
-    }).then(({ data, error }) => {
-      if (error || !data || data.error) return;
-      const suggestion: GroundPreGenerated = {
-        activity: data.activity,
-        suggestion: data.suggestion,
-        duration: data.duration || 10,
-        insight: data.insight || null,
-        article: data.article || null,
-      };
-      setGroundSuggestion(suggestion);
-      if (!strictNoFallback) {
-        localStorage.setItem(groundStorageKey, JSON.stringify(suggestion));
-      }
-    }).finally(() => {
-      setGroundLoading(false);
-      groundFetchingRef.current = false;
-    });
-  }, [user, profileLoaded, subscribed, btcData, message, groundDismissed, groundSuggestion, groundingActivities, threshold, thresholdDown, cumulativeThreshold, severity, language, groundStorageKey, strictNoFallback]);
 
   useEffect(() => {
     document.title = 'Holzen — Home';
@@ -701,129 +595,17 @@ const Home = () => {
           </HomeWidget>
         );
 
-      case 'ground': {
-        if (groundingActivities.length === 0) return null;
-
-        const effectiveThreshold = btcData
-          ? (btcData.changePercent < 0 ? thresholdDown : threshold)
-          : threshold;
-        const dailyTriggered = btcData ? Math.abs(btcData.changePercent) >= effectiveThreshold : false;
-        const cumulativeTriggered = btcData
-          ? isCumulativeMoveTriggered(btcData.cumulativeChangePercent, cumulativeThreshold)
-          : false;
-        const followsPauseThresholds = dailyTriggered || cumulativeTriggered;
-
-        const shouldNudgeGround = followsPauseThresholds && subscribed && !message;
-        const hasPreview = groundSuggestion !== null;
-        // Ground should NEVER glow when an active pause message exists — pause is always the hero
-        // Even without pause, grounding glow is deliberately subtle to not steal focus
-        const showGlow = !message && hasPreview;
-        const glowClass = showGlow
-          ? 'ring-1 ring-border/20'
-          : '';
-        const effectiveCollapsed = hasPreview ? false : collapsed['ground'];
-
+      case 'home-summary':
         return (
           <HomeWidget
-            id="ground"
-            title={hasPreview
-              ? `${WIDGET_TITLES['ground']} · ${groundSuggestion.activity}`
-              : shouldNudgeGround
-              ? `${WIDGET_TITLES['ground']} · ${t('home.groundNudge', { defaultValue: 'maybe now?' })}`
-              : WIDGET_TITLES['ground']}
-            collapsed={effectiveCollapsed}
-            onToggleCollapse={() => toggleCollapsed('ground')}
-            className={glowClass}
+            id="home-summary"
+            title={WIDGET_TITLES['home-summary']}
+            collapsed={collapsed['home-summary']}
+            onToggleCollapse={() => toggleCollapsed('home-summary')}
           >
-            <div className="space-y-3">
-              {/* Pre-generated suggestion preview (mirrors pause message preview) */}
-              {hasPreview ? (
-                <>
-                  <div className="relative">
-                    <button
-                      type="button"
-                      onClick={dismissGroundSuggestion}
-                      className={homeInWidget.dismissAbs}
-                      aria-label={t('common.dismiss', { defaultValue: 'Dismiss' })}
-                    >
-                      <X className="h-3.5 w-3.5" aria-hidden />
-                    </button>
-                    <p className={cn(homeInWidget.body, 'pr-5')}>
-                      {groundSuggestion.suggestion}
-                    </p>
-                    <p className={cn(homeInWidget.meta, 'mt-2')}>
-                      {groundSuggestion.duration} min · {groundSuggestion.activity}
-                    </p>
-                  </div>
-                  <button
-                    type="button"
-                    onClick={handleStartGround}
-                    className={homeInWidget.ctaSecondary}
-                  >
-                    <Anchor className="h-4 w-4 shrink-0 text-muted-foreground" />
-                    {t('home.groundYourself', { defaultValue: 'Ground yourself' })}
-                  </button>
-                </>
-              ) : groundLoading ? (
-                <div className="space-y-3">
-                  <div className={homeInWidget.loadingRow}>
-                    <Loader2 className="h-4 w-4 shrink-0 animate-spin" />
-                    <p className={homeInWidget.bodyMuted}>
-                      {t('home.groundFinding', { defaultValue: 'Finding what fits…' })}
-                    </p>
-                  </div>
-                  <Skeleton className="h-4 w-full" />
-                  <Skeleton className="h-4 w-3/4" />
-                </div>
-              ) : (
-                <>
-                  {shouldNudgeGround && (
-                    <p className={cn(homeInWidget.body, 'font-medium text-primary')}>
-                      {t('home.groundVolatileHint', {
-                        defaultValue: 'The market is moving. A good moment to ground.',
-                      })}
-                    </p>
-                  )}
-
-                  <div className="flex flex-wrap gap-2">
-                    {groundingActivities.slice(0, 4).map((activity) => (
-                      <span
-                        key={activity}
-                        className={homeInWidget.pillMuted}
-                      >
-                        {activity}
-                      </span>
-                    ))}
-                  </div>
-
-                  {subscribed ? (
-                    <button
-                      type="button"
-                      onClick={() => navigate(TOOLS.ground)}
-                      className={cn(homeInWidget.ctaPrimary, shouldNudgeGround && homeInWidget.ctaPrimaryEmphasis)}
-                    >
-                      <Anchor className="h-4 w-4 shrink-0 text-primary" />
-                      {t('home.groundYourself', { defaultValue: 'Ground yourself' })}
-                    </button>
-                  ) : (
-                    <ProLockedWidget onUpgrade={startCheckout} checkoutLoading={checkoutLoading} feature="grounding" />
-                  )}
-                </>
-              )}
-
-              {subscribed && (
-                <button
-                  type="button"
-                  onClick={() => navigate(TOOLS.groundHistory)}
-                  className="w-full pt-1 text-center text-xs font-medium text-primary underline-offset-4 transition-colors hover:underline"
-                >
-                  {t('home.groundJournal', { defaultValue: 'View journal' })}
-                </button>
-              )}
-            </div>
+            <HomeAtAGlance />
           </HomeWidget>
         );
-      }
 
       case 'night':
         if (!nightReflection || !subscribed) return null;
@@ -835,63 +617,6 @@ const Home = () => {
             onToggleCollapse={() => toggleCollapsed('night')}
           >
             <NightReflectionCard reflection={nightReflection} onDismiss={dismissNight} />
-          </HomeWidget>
-        );
-
-      case 'practice':
-        return (
-          <HomeWidget
-            id="practice"
-            title={WIDGET_TITLES['practice']}
-            collapsed={collapsed['practice']}
-            onToggleCollapse={() => toggleCollapsed('practice')}
-          >
-            <PracticeWidget />
-            <button
-              type="button"
-              onClick={() => navigate(TOOLS.hub)}
-              className="w-full text-left text-xs text-muted-foreground/80 underline-offset-4 hover:underline"
-            >
-              {t('home.browseAllTools', { defaultValue: 'Browse all tools & experiences' })}
-            </button>
-          </HomeWidget>
-        );
-
-      case 'breathe':
-        if (!subscribed) return (
-          <HomeWidget id="breathe" title={WIDGET_TITLES['breathe']} collapsed={collapsed['breathe']} onToggleCollapse={() => toggleCollapsed('breathe')}>
-            <ProLockedWidget onUpgrade={startCheckout} checkoutLoading={checkoutLoading} feature="stillness" />
-          </HomeWidget>
-        );
-        return (
-          <HomeWidget
-            id="breathe"
-            title={WIDGET_TITLES['breathe']}
-            collapsed={collapsed['breathe']}
-            onToggleCollapse={() => toggleCollapsed('breathe')}
-          >
-            <div className="space-y-3">
-              <p className={homeInWidget.bodyMuted}>
-                {t('home.breatheDesc', {
-                  defaultValue: 'A quiet space to find stillness. No goals, no tracking.',
-                })}
-              </p>
-              <button
-                type="button"
-                onClick={() => navigate(TOOLS.breathe)}
-                className={homeInWidget.ctaSecondary}
-              >
-                <Waves className="h-4 w-4 shrink-0 text-muted-foreground" />
-                {t('home.enterStillness', { defaultValue: 'Enter stillness' })}
-              </button>
-              <button
-                type="button"
-                onClick={() => navigate(TOOLS.hub)}
-                className="w-full text-left text-xs text-muted-foreground/80 underline-offset-4 hover:underline"
-              >
-                {t('home.browseAllTools', { defaultValue: 'Browse all tools & experiences' })}
-              </button>
-            </div>
           </HomeWidget>
         );
 
@@ -930,7 +655,6 @@ const Home = () => {
       </div>
       {/* Install card — first protected visit, dismissible */}
       <InstallHolzenCard />
-      <JourneyHomeCard />
       {/* Pull-to-refresh indicator */}
       {(pullDistance > 0 || pullRefreshing) && (
         <div
