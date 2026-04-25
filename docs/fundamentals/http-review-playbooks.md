@@ -7,7 +7,7 @@ For **live SPA** inspection (network, console, Lighthouse, performance traces) v
 ## When this helps
 
 - Tracing **401/403** on `invoke` (wrong `Authorization`, missing `apikey`, or function not listed in `supabase/config.toml` — see [AGENTS.md](../../AGENTS.md)).
-- Walking a **pause / reflection / companion** path call-by-call without stepping through the SPA.
+- Walking a **pause / edge AI / companion** path call-by-call without stepping through the SPA.
 - Comparing **hosted** vs **local** `supabase functions serve` behavior with the same payloads.
 
 ## When something else is better
