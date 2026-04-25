@@ -1,5 +1,5 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
-import { holzenEdgeError, holzenEdgeLog, holzenEdgeRun } from "../_shared/holzen-edge-log.ts";
+import { unknownErrorForLog } from "../_shared/log-unknown-error.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.57.2";
 import type { createLogger } from "../_shared/observe.ts";
 import { withRequestLogging } from "../_shared/with-request-logging.ts";
@@ -11,6 +11,33 @@ import {
 import { AI_TEMPORARILY_UNAVAILABLE_MESSAGE } from "../_shared/ai-user-messages.ts";
 
 type RequestLog = ReturnType<typeof createLogger>;
+
+/** Batch-mode profile row for quiet-hour gating. */
+interface InsightsEligibleProfile {
+  user_id: string;
+  quiet_hours_start?: number | null;
+  quiet_hours_end?: number | null;
+  timezone?: string | null;
+  ai_insights_enabled?: boolean | null;
+  language?: string | null;
+}
+
+/** v_pause_full projection used for skill summary. */
+interface PauseRowForInsights {
+  created_at: string;
+  context_snapshot?: { change_24h_pct?: number; change_7d_pct?: number } | null;
+  initial_mood?: string | null;
+  shift_mood?: string | null;
+  outcome?: string | null;
+  counted_companion_types?: string[] | null;
+  has_breath_completed?: boolean | null;
+  note_text?: string | null;
+  tags?: string[] | null;
+}
+
+interface LovableChatCompletion {
+  choices?: Array<{ message?: { content?: string } }>;
+}
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -26,7 +53,7 @@ async function callAIWithFallback(
   fallbackModel: string,
   timeoutMs: number,
   log: RequestLog,
-): Promise<{ data: any; status: number }> {
+): Promise<{ data: unknown; status: number }> {
   for (const model of [primaryModel, fallbackModel]) {
     const controller = new AbortController();
     const timeout = setTimeout(() => controller.abort(), timeoutMs);
@@ -122,7 +149,9 @@ serve(
       providers: ["lovable"],
     });
     if (!riGuard.allowed) {
-      holzenEdgeLog("reflection-insights", "guard blocked", {
+      log("reflection_insights_phase", {
+        holzen_event: "reflection_insights_cron",
+        phase: "guard_blocked",
         reason: riGuard.reason ?? "unknown",
         tripped: riGuard.tripped ?? null,
       });
@@ -136,7 +165,9 @@ serve(
     const singleUserId = body.user_id as string | undefined;
     const bodyLanguage = body.language as string | undefined;
 
-    holzenEdgeRun("reflection-insights", "request", {
+    log("reflection_insights_phase", {
+      holzen_event: "reflection_insights_cron",
+      phase: "request",
       method: req.method,
       mode: singleUserId ? "user" : "batch",
     });
@@ -149,7 +180,11 @@ serve(
 
     if (singleUserId) {
       if (!authHeader?.startsWith("Bearer ")) {
-        holzenEdgeRun("reflection-insights", "user auth rejected", { reason: "no_bearer" });
+        log.warn("reflection_insights_phase", {
+          holzen_event: "reflection_insights_cron",
+          phase: "user_auth_rejected",
+          reason: "no_bearer",
+        });
         return new Response(JSON.stringify({ error: "Unauthorized" }), {
           status: 401,
           headers: { ...corsHeaders, "Content-Type": "application/json" },
@@ -160,7 +195,11 @@ serve(
       });
       const { data: { user }, error: userErr } = await anonClient.auth.getUser();
       if (userErr || !user || user.id !== singleUserId) {
-        holzenEdgeRun("reflection-insights", "user auth rejected", { reason: "jwt_mismatch" });
+        log.warn("reflection_insights_phase", {
+          holzen_event: "reflection_insights_cron",
+          phase: "user_auth_rejected",
+          reason: "jwt_mismatch",
+        });
         return new Response(JSON.stringify({ error: "Unauthorized" }), {
           status: 401,
           headers: { ...corsHeaders, "Content-Type": "application/json" },
@@ -170,7 +209,10 @@ serve(
     } else {
       const { verifyServiceAuth } = await import("../_shared/auth.ts");
       if (!verifyServiceAuth(req)) {
-        holzenEdgeRun("reflection-insights", "auth rejected");
+        log.warn("reflection_insights_phase", {
+          holzen_event: "reflection_insights_cron",
+          phase: "service_auth_rejected",
+        });
         return new Response(
           JSON.stringify({
             error: "Unauthorized. Batch mode requires Authorization: Bearer with service role or CRON_SECRET.",
@@ -178,13 +220,16 @@ serve(
           { status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" } },
         );
       }
-      holzenEdgeRun("reflection-insights", "auth ok");
+      log("reflection_insights_phase", {
+        holzen_event: "reflection_insights_cron",
+        phase: "service_auth_ok",
+      });
 
       const { data: profiles } = await supabase
         .from("profiles")
         .select("user_id, quiet_hours_start, quiet_hours_end, timezone, ai_insights_enabled, language");
 
-      const eligibleProfiles = (profiles ?? []).filter((p: any) => {
+      const eligibleProfiles = ((profiles ?? []) as InsightsEligibleProfile[]).filter((p) => {
         if (p.ai_insights_enabled === false) return false;
         if (p.quiet_hours_start == null || p.quiet_hours_end == null) return true;
         const tz = p.timezone || "UTC";
@@ -203,7 +248,7 @@ serve(
         }
         return !(nowHour >= start || nowHour < end);
       });
-      userIds = eligibleProfiles.map((p: any) => p.user_id);
+      userIds = eligibleProfiles.map((p) => p.user_id);
     }
 
     let generated = 0;
@@ -212,8 +257,8 @@ serve(
       try { await supabase.from("analytics_events").insert({ user_id: userId, event: "reflection_insights_ai_call" }); } catch (_) { /* non-fatal */ }
       let userLanguage = bodyLanguage || "en";
       if (!bodyLanguage && !singleUserId) {
-        const prof = (await supabase.from("profiles").select("language").eq("user_id", userId).single()).data;
-        userLanguage = (prof as any)?.language || "en";
+        const { data: prof } = await supabase.from("profiles").select("language").eq("user_id", userId).single();
+        userLanguage = (prof as { language?: string } | null)?.language || "en";
       }
 
       const { data: pauseRows, error: pauseReadError } = await supabase
@@ -270,7 +315,7 @@ serve(
       }
 
       // Build skill-oriented summary
-      const summary = pauseRows.map((r: any) => {
+      const summary = (pauseRows as PauseRowForInsights[]).map((r) => {
         const date = new Date(r.created_at);
         const dayName = date.toLocaleDateString("en-US", { weekday: "short" });
         const hour = date.getHours();
@@ -398,11 +443,18 @@ Generate 3-5 skill development insights based on real patterns in this data. Ret
         continue;
       }
 
-      const raw = aiData.choices?.[0]?.message?.content || "";
-      let insights: any[];
+      const raw = (aiData as LovableChatCompletion).choices?.[0]?.message?.content || "";
+      let insights: unknown[] = [];
       try {
-        const parsed = typeof raw === "string" ? JSON.parse(raw) : raw;
-        insights = parsed.insights || parsed;
+        const parsed: unknown = typeof raw === "string" ? JSON.parse(raw) : raw;
+        if (parsed && typeof parsed === "object" && "insights" in parsed && Array.isArray((parsed as { insights: unknown }).insights)) {
+          insights = (parsed as { insights: unknown[] }).insights;
+        } else if (Array.isArray(parsed)) {
+          insights = parsed;
+        } else if (parsed && typeof parsed === "object" && "insights" in parsed) {
+          const ins = (parsed as { insights: unknown }).insights;
+          insights = Array.isArray(ins) ? ins : [];
+        }
       } catch {
         const m = raw.match(/\{[\s\S]*\}/);
         if (!m) {
@@ -416,8 +468,14 @@ Generate 3-5 skill development insights based on real patterns in this data. Ret
           }
           continue;
         }
-        const parsed = JSON.parse(m[0]);
-        insights = parsed.insights || parsed;
+        const parsed: unknown = JSON.parse(m[0]);
+        if (parsed && typeof parsed === "object" && "insights" in parsed && Array.isArray((parsed as { insights: unknown }).insights)) {
+          insights = (parsed as { insights: unknown[] }).insights;
+        } else if (Array.isArray(parsed)) {
+          insights = parsed;
+        } else {
+          insights = [];
+        }
       }
 
       if (!insights || !Array.isArray(insights)) continue;
@@ -435,13 +493,22 @@ Generate 3-5 skill development insights based on real patterns in this data. Ret
       generated++;
     }
 
-    holzenEdgeLog("reflection-insights", "run complete", { generated, mode: singleUserId ? "user" : "batch" });
+    log("reflection_insights_complete", {
+      holzen_event: "reflection_insights_cron",
+      phase: "run_complete",
+      generated,
+      mode: singleUserId ? "user" : "batch",
+    });
     return new Response(JSON.stringify({ generated }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
   } catch (e) {
     const msg = e instanceof Error ? e.message : String(e);
-    holzenEdgeError("reflection-insights", "uncaught error", msg);
+    log.error("reflection_insights_uncaught", {
+      holzen_event: "reflection_insights_cron",
+      phase: "uncaught",
+      ...unknownErrorForLog(e),
+    });
     return new Response(JSON.stringify({ error: msg }), {
       status: 500,
       headers: { ...corsHeaders, "Content-Type": "application/json" },

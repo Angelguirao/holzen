@@ -45,7 +45,7 @@ If these workers drift (stale prices, bad dedup, permissive auth), you get wrong
 - Scheduled (cron ~15 minutes per `docs/ops/cron-setup.md`).
 - Keeps `btc_price_cache` fresh so Zoom Out does not call CoinGecko during user sessions.
 - **Auth**: `Authorization: Bearer <service_role>` or `CRON_SECRET` ([`verifyServiceAuth`](../../supabase/functions/_shared/auth.ts)).
-- **Logs**: [`holzen-edge-log`](../../supabase/functions/_shared/holzen-edge-log.ts) tag **`refresh-btc`** — filter **`holzen:refresh-btc`** in Edge logs; set **`HOLZEN_EDGE_LOG=0`** to quiet non-error traces.
+- **Logs**: structured JSON — **`"fn":"refresh-btc-prices"`**; stable **`msg`** tokens such as **`refresh_btc_current`**, **`refresh_btc_historical`**, **`refresh_btc_complete`** (see [logging-strategy.md](../ops/logging-strategy.md)).
 - **Writes**: upsert current daily key; upsert historical "on this day" prices (1–10 years ago; `btc-on-this-day-config.ts`) when missing or older than 24h.
 - **Rate pressure**: ~2s delay between CoinGecko calls.
 
@@ -53,7 +53,7 @@ If these workers drift (stale prices, bad dedup, permissive auth), you get wrong
 
 - Reads `signal_sources.url` (and related config); scrapes via Firecrawl when configured, else Perplexity fallback; structures entries via Lovable AI gateway into `content_library`.
 - **Auth**: `SERVICE_CRON_BEARER` / `verifyServiceAuth` (service role or `CRON_SECRET`).
-- **Logs**: **`holzen:fetch-feeds`** ([`holzen-edge-log`](../../supabase/functions/_shared/holzen-edge-log.ts)).
+- **Logs**: structured JSON — **`"fn":"fetch-source-feeds"`**; grep **`fetch_feeds_`** in **`msg`** / **`holzen_event`** (see [content-library-fetch-source-feeds.md](../systems/content-library-fetch-source-feeds.md)).
 - **Inserts**: `companion_types` mapping (`signal` vs `ground_nudge`), title/summary/citation/url/tags, `quality_score: 2`.
 - **Dedup**: exact `title` match against existing `content_library` before insert.
 
@@ -61,7 +61,7 @@ If these workers drift (stale prices, bad dedup, permissive auth), you get wrong
 
 - Periodic fill of `companion_cache` with high-quality payloads; processes `companion_feedback` via `analytics_events`.
 - **Auth**: Bruno **`SERVICE_CRON_BEARER`** (service_role JWT or `CRON_SECRET`); Edge: [`verifyServiceAuth`](../../supabase/functions/_shared/auth.ts).
-- **Logs**: **`holzen:pregenerate`** ([`holzen-edge-log`](../../supabase/functions/_shared/holzen-edge-log.ts)).
+- **Logs**: structured JSON — **`"fn":"pregenerate-companions"`** (request **`log`** from **`withRequestLogging`**).
 - **Lifecycle**: promote high-quality entries to permanent (`expires_at = null`); prune low-quality after 3 days; expire medium tiers after 30 days.
 - **Generation loop**: small batch per type (grounding, signal, history, zoom-out deep time); dedup via title similarity vs existing cache rows.
 - **Feedback**: last 24h feedback events adjust `quality_score` within [0..3].

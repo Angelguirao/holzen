@@ -28,8 +28,12 @@
 
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.57.2";
-import { holzenEdgeError, holzenEdgeLog, holzenEdgeRun } from "../_shared/holzen-edge-log.ts";
-import { withRequestLogging } from "../_shared/with-request-logging.ts";
+import type { SupabaseClient } from "https://esm.sh/@supabase/supabase-js@2.57.2";
+import { unknownErrorForLog } from "../_shared/log-unknown-error.ts";
+import {
+  withRequestLogging,
+  type RequestLoggingContext,
+} from "../_shared/with-request-logging.ts";
 import {
   holzenLovableEmailLogger,
   sendLovableEmailBatch,
@@ -51,7 +55,7 @@ interface AlertConfig {
   monthlyCapUsd: number;
 }
 
-async function loadAlertConfig(sb: any): Promise<AlertConfig> {
+async function loadAlertConfig(sb: SupabaseClient): Promise<AlertConfig> {
   const { data } = await sb.from("app_config").select("key, value");
   const cfg: AlertConfig = {
     enabled: true,
@@ -104,7 +108,7 @@ interface AttemptRow {
   created_at: string;
 }
 
-async function fetchRange(sb: any, fromIso: string, toIso: string): Promise<AttemptRow[]> {
+async function fetchRange(sb: SupabaseClient, fromIso: string, toIso: string): Promise<AttemptRow[]> {
   const { data, error } = await sb
     .from("generation_attempts")
     .select("companion_type, user_id, estimated_cost_usd, created_at")
@@ -151,7 +155,7 @@ interface AlertSnapshot {
   topFeatures: Array<{ key: string; cost: number; attempts: number }>;
 }
 
-async function buildSnapshot(sb: any): Promise<AlertSnapshot> {
+async function buildSnapshot(sb: SupabaseClient): Promise<AlertSnapshot> {
   const yesterdayStart = startOfDayUtc(-1);
   const todayStart = startOfDayUtc(0);
   const sevenDayBack = startOfDayUtc(-8); // 8 days back so [-8, -1) is 7 days excluding yesterday
@@ -305,6 +309,7 @@ async function sendAlert(
   subject: string,
   lovableKey: string,
   idempotencyKey: string,
+  log: RequestLoggingContext["log"],
 ): Promise<{ sent: number; errors: number }> {
   const emails: LovableEmail[] = recipients.map((to) => ({
     from: "Holzen <notify@holzen.app>",
@@ -317,20 +322,34 @@ async function sendAlert(
     source: "ai-cost-alert",
     idempotencyKey,
     logger: holzenLovableEmailLogger(
-      (m, d) => holzenEdgeLog("ai-cost-alert", m, d),
-      (m, err) => holzenEdgeError("ai-cost-alert", m, err),
+      (m, d) =>
+        log("ai_cost_alert_lovable", {
+          holzen_event: "ai_cost_alert_cron",
+          phase: "lovable_email",
+          message: m,
+          ...(d ?? {}),
+        }),
+      (m, data) =>
+        log.error("ai_cost_alert_lovable", {
+          holzen_event: "ai_cost_alert_cron",
+          phase: "lovable_email_error",
+          message: m,
+          ...(data ?? {}),
+        }),
     ),
   });
   return { sent: batch.sent, errors: batch.failed };
 }
 
 serve(
-  withRequestLogging("ai-cost-alert", async ({ req }) => {
+  withRequestLogging("ai-cost-alert", async ({ req, log }) => {
   try {
-    holzenEdgeRun("ai-cost-alert", "request", { method: req.method });
     const { verifyServiceAuth } = await import("../_shared/auth.ts");
     if (!verifyServiceAuth(req)) {
-      holzenEdgeRun("ai-cost-alert", "auth rejected");
+      log.warn("ai_cost_alert_phase", {
+        holzen_event: "ai_cost_alert_cron",
+        phase: "service_auth_rejected",
+      });
       return new Response(JSON.stringify({ error: "Unauthorized" }), {
         status: 401,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
@@ -345,13 +364,21 @@ serve(
 
     const cfg = await loadAlertConfig(sb);
     if (!cfg.enabled) {
-      holzenEdgeLog("ai-cost-alert", "skipped", { reason: "disabled" });
+      log("ai_cost_alert_phase", {
+        holzen_event: "ai_cost_alert_cron",
+        phase: "skipped",
+        reason: "disabled",
+      });
       return new Response(JSON.stringify({ skipped: "disabled" }), {
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
     if (cfg.recipients.length === 0) {
-      holzenEdgeLog("ai-cost-alert", "skipped", { reason: "no_recipients" });
+      log("ai_cost_alert_phase", {
+        holzen_event: "ai_cost_alert_cron",
+        phase: "skipped",
+        reason: "no_recipients",
+      });
       return new Response(JSON.stringify({ skipped: "no_recipients" }), {
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
@@ -361,7 +388,9 @@ serve(
     const triggers = evaluateTriggers(snap, cfg);
 
     if (triggers.length === 0) {
-      holzenEdgeLog("ai-cost-alert", "no triggers", {
+      log("ai_cost_alert_phase", {
+        holzen_event: "ai_cost_alert_cron",
+        phase: "no_triggers",
         yesterday_usd: Number(snap.yesterdaySpend.toFixed(4)),
         avg7d_usd: Number(snap.sevenDayAvg.toFixed(4)),
         mtd_usd: Number(snap.monthToDateSpend.toFixed(4)),
@@ -381,7 +410,10 @@ serve(
 
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
     if (!LOVABLE_API_KEY) {
-      holzenEdgeError("ai-cost-alert", "LOVABLE_API_KEY missing");
+      log.error("ai_cost_alert_config", {
+        holzen_event: "ai_cost_alert_cron",
+        phase: "lovable_api_key_missing",
+      });
       return new Response(JSON.stringify({ error: "LOVABLE_API_KEY not configured" }), {
         status: 500,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
@@ -400,9 +432,12 @@ serve(
       subject,
       LOVABLE_API_KEY,
       `ai-cost-alert:${dateKey}:${triggerKinds}`,
+      log,
     );
 
-    holzenEdgeLog("ai-cost-alert", "alert sent", {
+    log("ai_cost_alert_phase", {
+      holzen_event: "ai_cost_alert_cron",
+      phase: "alert_sent",
       triggers: triggers.map((t) => t.kind),
       recipients: cfg.recipients.length,
       sent,
@@ -425,7 +460,11 @@ serve(
     );
   } catch (e) {
     const msg = e instanceof Error ? e.message : String(e);
-    holzenEdgeError("ai-cost-alert", "uncaught error", msg);
+    log.error("ai_cost_alert_uncaught", {
+      holzen_event: "ai_cost_alert_cron",
+      phase: "uncaught",
+      ...unknownErrorForLog(e),
+    });
     return new Response(JSON.stringify({ error: msg }), {
       status: 500,
       headers: { ...corsHeaders, "Content-Type": "application/json" },

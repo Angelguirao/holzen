@@ -1,7 +1,7 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createAttemptLogger } from "../_shared/observe.ts";
 import { callPerplexityChat } from "../_shared/perplexity-client.ts";
-import { holzenEdgeError, holzenEdgeLog, holzenEdgeRun } from "../_shared/holzen-edge-log.ts";
+import { unknownErrorForLog } from "../_shared/log-unknown-error.ts";
 import { withRequestLogging } from "../_shared/with-request-logging.ts";
 import {
   canonicalContentUrl,
@@ -29,21 +29,31 @@ async function isUrlReachable(url: string): Promise<boolean> {
 }
 
 serve(
-  withRequestLogging("pregenerate-companions", async ({ req }) => {
+  withRequestLogging("pregenerate-companions", async ({ req, log }) => {
   const t0 = Date.now();
-  const hzLog = (msg: string) => holzenEdgeLog("pregenerate", msg, { ms: Date.now() - t0 });
+  const hzLog = (msg: string) =>
+    log("pregenerate_progress", {
+      holzen_event: "pregenerate_companions_cron",
+      phase: msg,
+      ms: Date.now() - t0,
+    });
 
   try {
-    holzenEdgeRun("pregenerate", "request", { method: req.method });
     const { verifyServiceAuth } = await import("../_shared/auth.ts");
     if (!verifyServiceAuth(req)) {
-      holzenEdgeRun("pregenerate", "auth rejected");
+      log.warn("pregenerate_phase", {
+        holzen_event: "pregenerate_companions_cron",
+        phase: "service_auth_rejected",
+      });
       return new Response(JSON.stringify({ error: "Unauthorized. Requires service role or CRON_SECRET." }), {
         status: 401,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
-    holzenEdgeRun("pregenerate", "auth ok");
+    log("pregenerate_phase", {
+      holzen_event: "pregenerate_companions_cron",
+      phase: "service_auth_ok",
+    });
 
     const serviceRoleKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? "";
 
@@ -559,7 +569,7 @@ serve(
       if (feedback && feedback.length > 0) {
         const scoreChanges = new Map<string, number>();
         for (const f of feedback) {
-          const meta = f.metadata as any;
+          const meta = f.metadata as { cache_id?: string; vote?: string } | null;
           if (meta?.cache_id) {
             const current = scoreChanges.get(meta.cache_id) || 0;
             scoreChanges.set(meta.cache_id, current + (meta.vote === "up" ? 1 : -1));
@@ -586,12 +596,21 @@ serve(
       results.push(`Feedback processing error: ${e}`);
     }
 
-    holzenEdgeLog("pregenerate", "run complete", { ms: Date.now() - t0, resultLines: results.length });
+    log("pregenerate_complete", {
+      holzen_event: "pregenerate_companions_cron",
+      phase: "run_complete",
+      ms: Date.now() - t0,
+      result_lines: results.length,
+    });
     return new Response(JSON.stringify({ success: true, results }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
   } catch (e) {
-    holzenEdgeError("pregenerate", "uncaught error", e);
+    log.error("pregenerate_uncaught", {
+      holzen_event: "pregenerate_companions_cron",
+      phase: "uncaught",
+      ...unknownErrorForLog(e),
+    });
     return new Response(
       JSON.stringify({ error: e instanceof Error ? e.message : "Unknown error" }),
       { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }

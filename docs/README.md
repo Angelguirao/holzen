@@ -93,7 +93,7 @@ When you change behavior, update the **one** doc that owns that slice (and ADRs 
 - `systems/pause/pause-session-cost-estimates.md` — pause-flow case study. Defer to `systems/costs/ai-cost-model.md` for anything cross-feature.
 - `systems/pause/companions/` — deep dives per companion type (see [companions/signal.md](systems/pause/companions/signal.md) for Signal).
 - `systems/pause/past-reflections.md` — shared "user words" read model behind Zoom Out's Echo and Daily Practice Replay (notes + replay entries, never AI text).
-- `systems/content-library-fetch-source-feeds.md` — **`fetch-source-feeds`** pipeline: RSS/Map discovery → scrape → Gemini → `content_library`; admin setup and **`[holzen:fetch-feeds]`** log grep tokens.
+- `systems/content-library-fetch-source-feeds.md` — **`fetch-source-feeds`** pipeline: RSS/Map discovery → scrape → Gemini → `content_library`; admin setup and **JSON** log grep tokens (`fn`, **`fetch_feeds_*`** **`msg`**).
 - `systems/stats-system.md` — current Profile > Stats reference in UI order, plus a recommended skills-first target model.
 - `systems/badges-system.md` — current Profile > Badges reference in UI order, plus a recommended skills-aligned target model.
 
