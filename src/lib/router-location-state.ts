@@ -126,5 +126,5 @@ export function parseGroundLocationState(state: unknown): GroundLocationState {
 export const PROFILE_TAB_IDS = ['stats', 'insights', 'badges', 'letters', 'activity'] as const;
 export type ProfileTab = (typeof PROFILE_TAB_IDS)[number];
 
-/** Router state passed from notification actions (e.g. pause uses reflectionId in state). */
+/** Router state passed from notification actions (pause deep links use `action_state`). */
 export type NotificationNavigateState = PauseSessionLocationState;
