@@ -1,6 +1,7 @@
 import { useState, useMemo, useCallback, useEffect } from 'react';
 import { Trash2, Loader2, Globe } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
+import type { Database } from '@/integrations/supabase/types';
 import { useToast } from '@/hooks/use-toast';
 import type { LibraryEntryRow } from '@/hooks/use-admin-stats';
 import { Checkbox } from '@/components/ui/checkbox';
