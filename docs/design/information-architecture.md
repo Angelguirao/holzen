@@ -149,10 +149,10 @@ This section captures the **current state** and what we may reconsider next.
 
 ### 4.5 Settings IA by task
 
-- **Shipped:** task-oriented section headers (Account & profile, Pause behavior, App behavior, Content & data, Notifications & quiet hours, Subscription & Pro, Account & security).
-- **Shipped:** `/settings/about` — changelog, version, feedback (linked from the bottom of Settings; “new” badge when an unseen changelog version exists); **Jump to** on the main page opens the right accordion section and scrolls to it.
-- **Shipped:** **Shareable** section entry: `settingsSectionPath(id)` in `app-routes.ts` → `/settings/section/<id>` (redirects to `/settings#settings-section-<id>`) plus hash-based jump links; same page, less hunting.
-- **Further improvement:** if the accordion is still too long, add **true** per-section sub-routes with dedicated screens (larger product + layout pass).
+- **Shipped:** task-oriented section groups (Account & profile, Pause behavior, App behavior, Content & data, Notifications & quiet hours, Subscription & Pro, Account & security).
+- **Shipped:** `/settings` as a **hub** (jump links; “About & feedback” card with “new” when an unseen changelog version exists); **`settingsSectionPath(id)`** in `app-routes.ts` → `/settings/<id>` for **dedicated section screens** (shared `useSettingsModel` + context). `/settings/about` and `/settings/billing-history` stay first-class routes **without** loading the heavy settings model.
+- **Shipped (compat):** legacy `/settings/section/<id>` redirects to `/settings/<id>`; on the hub, `#settings-section-<id>` replaces into `/settings/<id>`.
+- **Further improvement:** optional polish (skeletons per section, focus/scroll), or a **layout pass** on section screen typography/spacing.
 
 ### 4.6 Admin IA
 
@@ -171,7 +171,7 @@ Use this as a **checklist** when planning research or another IA pass. Detailed 
 | **Journey vs “profile”** | `/journey/:tab`, skills-first stats; **Home** shows score preview    | Heavier Home module or a **dedicated Stats tab** if interviews + metrics justify it                         |
 | **Journey scope**        | One hub: stats, insights, badges, activity; letters under Tools      | Further **split tabs or routes** if one area dominates support load (product call)                          |
 | **Library vs Activity**  | Copy + `HistoryCrossLinks`                                           | **Single screen** with `saved` / `timeline` modes if users still mix them up                                |
-| **Settings**             | Task sections, `/settings/about`, `/settings/section/*` + hash jumps     | **Dedicated sub-pages** (one screen per group) if completion still drops                                    |
+| **Settings**             | Hub + `/settings/<section>` + `/settings/about` & `/settings/billing-history`; legacy `/settings/section/*` | Further **layout polish** on section pages if metrics still show users bail mid-task                          |
 | **Admin**                | Isolated `/admin*` + in-page `AdminSubNav` between admin routes        | Deeper **grouping** or layout wrapper if more tools ship there                                              |
 | **Companions vs tools**  | `/companion/...` vs `/tools/...`                                     | Keep two families; only consolidate if a future design unifies “instance” vs “tool” mentally                |
 | **Research**             | PostHog tab events                                                   | Short **hallway tests** or interviews for naming, tab crowding, “where is my past?” — complements analytics |
@@ -210,6 +210,7 @@ Use this as a **checklist** when planning research or another IA pass. Detailed 
 | 2026-04-26 | —      | Doc cleanup: shell vs immersive `/tools/*`; `ToolsHub` journey block; Home `JourneyHomeCard`; Library activity tab; Settings jump nav; `AdminSubNav`.                                      |
 | 2026-04-26 | —      | **Code:** `usePauseStatsData` via TanStack Query; `useHoldGoalProfile`; Home `JourneyHomeCard` shows Holzen score + ring when ≥1 completed pause; `COMPANION_PREFIX` in `app-routes`.       |
 | 2026-04-27 | —      | Invalidate pause stats cache on pause `completed`; register global `QueryClient`; Settings hash + `/settings/section/:section`; `settingsSectionPath` in `app-routes`.                       |
+| 2026-04-28 | —      | **Settings:** true per-section routes (`/settings/<id>`), hub, `useSettingsModel` + provider layout; `settingsSectionPath` points at `/settings/<id>`; legacy path + hash compat.          |
 
 
 When routes, bottom-nav items, or nav-related analytics change, update **§1**, **§1.7**, **§4.1**, **§4.7**, **event-taxonomy.md** (if applicable), and a **Changelog** row in the same PR.
