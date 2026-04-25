@@ -1,6 +1,18 @@
 import { useState, useEffect, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/use-auth';
+import type { Database } from '@/integrations/supabase/types';
+
+/** DB insert/update; `pause_instance_id` may exist in production before types.ts regen. */
+type LibraryItemsInsert = Database['public']['Tables']['library_items']['Insert'] & {
+  pause_instance_id?: string | null;
+};
+type LibraryItemsUpdate = Database['public']['Tables']['library_items']['Update'] & {
+  pause_instance_id?: string | null;
+};
+type CollectionsInsert = Database['public']['Tables']['collections']['Insert'];
+type CollectionsUpdate = Database['public']['Tables']['collections']['Update'];
+type CollectionItemsInsert = Database['public']['Tables']['collection_items']['Insert'];
 
 export interface LibraryItem {
   id: string;
@@ -58,7 +70,11 @@ function readCache<T>(key: string): T | null {
 }
 
 function writeCache<T>(key: string, data: T) {
-  try { localStorage.setItem(key, JSON.stringify(data)); } catch {}
+  try {
+    localStorage.setItem(key, JSON.stringify(data));
+  } catch {
+    /* ignore quota / private mode */
+  }
 }
 
 export function useLibrary() {
@@ -218,7 +234,7 @@ export function useLibrary() {
     if (!user) return null;
     const { data, error } = await supabase
       .from('library_items')
-      .insert({ ...item, user_id: user.id } as any)
+      .insert({ ...item, user_id: user.id } as LibraryItemsInsert)
       .select()
       .single();
     if (error) return null;
@@ -227,8 +243,8 @@ export function useLibrary() {
     return newItem;
   }, [user]);
 
-  const updateItem = useCallback(async (id: string, updates: Partial<LibraryItem>) => {
-    await supabase.from('library_items').update(updates as any).eq('id', id);
+  const updateItem = useCallback(async (id: string, updates: LibraryItemsUpdate) => {
+    await supabase.from('library_items').update(updates).eq('id', id);
     setItems((prev) => prev.map((i) => i.id === id ? { ...i, ...updates } : i));
   }, []);
 
@@ -245,7 +261,7 @@ export function useLibrary() {
         .filter((i) => i.pause_instance_id === pauseInstanceId)
         .map((i) => i.id);
 
-      await supabase.from('library_items').update({ status: 'deleted' } as any).in('id', siblingIds);
+      await supabase.from('library_items').update({ status: 'deleted' }).in('id', siblingIds);
       setItems((prev) =>
         prev.map((i) =>
           siblingIds.includes(i.id) ? { ...i, status: 'deleted' as const } : i,
@@ -261,7 +277,7 @@ export function useLibrary() {
       }
     } else if (item.pause_instance_id) {
       // Deleting a companion item: soft-delete so backfill doesn't re-import
-      await supabase.from('library_items').update({ status: 'deleted' } as any).eq('id', id);
+      await supabase.from('library_items').update({ status: 'deleted' }).eq('id', id);
       setItems((prev) => prev.map((i) => i.id === id ? { ...i, status: 'deleted' as const } : i));
       setCollectionItems((prev) => prev.filter((ci) => ci.library_item_id !== id));
     } else {
@@ -289,7 +305,7 @@ export function useLibrary() {
     if (!user) return null;
     const { data, error } = await supabase
       .from('collections')
-      .insert({ ...col, user_id: user.id } as any)
+      .insert({ ...col, user_id: user.id } as CollectionsInsert)
       .select()
       .single();
     if (error) return null;
@@ -299,7 +315,7 @@ export function useLibrary() {
   }, [user]);
 
   const updateCollection = useCallback(async (id: string, updates: Partial<Collection>) => {
-    await supabase.from('collections').update(updates as any).eq('id', id);
+    await supabase.from('collections').update(updates as CollectionsUpdate).eq('id', id);
     setCollections((prev) => prev.map((c) => c.id === id ? { ...c, ...updates } : c));
   }, []);
 
@@ -318,7 +334,11 @@ export function useLibrary() {
       .reduce((max, ci) => Math.max(max, ci.position), -1);
     const { data, error } = await supabase
       .from('collection_items')
-      .insert({ collection_id: collectionId, library_item_id: itemId, position: maxPos + 1 } as any)
+      .insert({
+        collection_id: collectionId,
+        library_item_id: itemId,
+        position: maxPos + 1,
+      } satisfies CollectionItemsInsert)
       .select()
       .single();
     if (error) return null;
@@ -405,7 +425,7 @@ export function useSaveToLibrary() {
     if (!user) return null;
     const { data, error } = await supabase
       .from('library_items')
-      .insert({ ...params, user_id: user.id } as any)
+      .insert({ ...params, user_id: user.id } as LibraryItemsInsert)
       .select()
       .single();
     if (error) return null;

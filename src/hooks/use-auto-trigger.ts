@@ -51,7 +51,8 @@ export function useAutoTrigger() {
         },
         (payload) => {
           if (!initializedRef.current) return;
-          const newMessage = (payload.new as any)?.last_message;
+          const row = payload.new as { last_message?: string | null };
+          const newMessage = row?.last_message;
           if (newMessage && newMessage !== lastMessageRef.current) {
             lastMessageRef.current = newMessage;
             setPauseReady(true);
