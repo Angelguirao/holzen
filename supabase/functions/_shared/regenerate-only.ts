@@ -202,6 +202,19 @@ export async function handleRegenerateOnly(params: {
   });
 
   const t0 = Date.now();
+
+  function contentTitleFromPayload(data: unknown): string | null {
+    if (!data || typeof data !== "object") return null;
+    const o = data as Record<string, unknown>;
+    if (typeof o.title === "string" && o.title.length > 0) return o.title;
+    const dt = o.deepTime;
+    if (dt && typeof dt === "object") {
+      const dtt = (dt as Record<string, unknown>).title;
+      if (typeof dtt === "string" && dtt.length > 0) return dtt;
+    }
+    return null;
+  }
+
   type CompanionResult = {
     data: unknown;
     source: "live" | "library" | "cache" | "curated" | "empty";
@@ -374,14 +387,20 @@ export async function handleRegenerateOnly(params: {
     serve_source: result.source,
     cache_entry_id: result.cacheId || null,
     cache_relaxation: result.cacheRelaxation ?? null,
-    content_title: result.data?.title || result.data?.deepTime?.title || null,
+    content_title: contentTitleFromPayload(result.data),
     content_fingerprint: result.promptVersion ?? null,
     latency_ms: result.latencyMs,
   };
 
   try {
-    if (result.data) {
-      await writeCompanionData(svcClient, pauseInstanceId, userId, companionType, result.data);
+    if (result.data !== null && result.data !== undefined && typeof result.data === "object") {
+      await writeCompanionData(
+        svcClient,
+        pauseInstanceId,
+        userId,
+        companionType,
+        result.data as Record<string, unknown>,
+      );
     }
     await svcClient.from("companion_serves").insert(serveRow);
     await svcClient.from("analytics_events").insert({

@@ -129,13 +129,15 @@ export function createAttemptLogger(svcClient: SupabaseClient, options?: Attempt
     });
 
     // Fire-and-forget for attempt logging (high volume, non-critical)
-    svcClient.from("generation_attempts").insert({
-      ...rowParams,
-      attempt_order: attemptOrder,
-      estimated_cost_usd: cost,
-      ...(userId ? { user_id: userId } : {}),
-      ...(pauseInstanceId ? { pause_instance_id: pauseInstanceId } : {}),
-    }).then(() => {});
+    void Promise.resolve(
+      svcClient.from("generation_attempts").insert({
+        ...rowParams,
+        attempt_order: attemptOrder,
+        estimated_cost_usd: cost,
+        ...(userId ? { user_id: userId } : {}),
+        ...(pauseInstanceId ? { pause_instance_id: pauseInstanceId } : {}),
+      }),
+    ).catch(() => {});
   };
 }
 
@@ -145,15 +147,17 @@ export function createAttemptLogger(svcClient: SupabaseClient, options?: Attempt
  */
 export function createObsTracker(svcClient: SupabaseClient, userId: string, companionType: string, t0: number) {
   return (event: string, meta?: Record<string, unknown>) => {
-    svcClient.from("analytics_events").insert({
-      user_id: userId,
-      event,
-      metadata: {
-        companion_type: companionType,
-        latency_ms: Date.now() - t0,
-        ...meta,
-      },
-    }).then(() => {});
+    void Promise.resolve(
+      svcClient.from("analytics_events").insert({
+        user_id: userId,
+        event,
+        metadata: {
+          companion_type: companionType,
+          latency_ms: Date.now() - t0,
+          ...meta,
+        },
+      }),
+    ).catch(() => {});
   };
 }
 
@@ -161,7 +165,7 @@ export function createObsTracker(svcClient: SupabaseClient, userId: string, comp
  * Track a simple analytics event (fire-and-forget).
  */
 export function trackEvent(svcClient: SupabaseClient, userId: string, event: string) {
-  svcClient.from("analytics_events").insert({ user_id: userId, event }).then(() => {});
+  void Promise.resolve(svcClient.from("analytics_events").insert({ user_id: userId, event })).catch(() => {});
 }
 
 /**
