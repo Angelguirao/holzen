@@ -1,4 +1,5 @@
 import { useMemo } from 'react';
+import { zoomOutBodyPreviewFromJsonString } from '@/lib/zoom-out-payload';
 import { Heart, Pause, Radio, Leaf, Feather, Telescope, ScrollText, Pencil, Link as LinkIcon, FileText, type LucideIcon } from 'lucide-react';
 import type { LibraryItem } from '@/hooks/use-library';
 import { useTranslation } from 'react-i18next';
@@ -49,10 +50,8 @@ export function LibraryItemCard({ item, onToggleFavorite, onClick, engaged = tru
     if (!item.body) return null;
     let text = typeof item.body === 'string' ? item.body : JSON.stringify(item.body);
     if (item.source_type === 'zoom_out' && text.startsWith('{')) {
-      try {
-        const parsed = JSON.parse(text);
-        text = parsed?.deepTime?.body || parsed?.echo?.message || parsed?.deepTime?.title || 'Zoom Out';
-      } catch {}
+      const preview = zoomOutBodyPreviewFromJsonString(text);
+      if (preview !== null) text = preview;
     }
     return text.length > 120 ? text.slice(0, 120) + '…' : text;
   }, [item.body, item.source_type]);
