@@ -133,7 +133,7 @@ const Profile = () => {
         .order('written_at', { ascending: false });
       const all = (data as unknown as Letter[]) ?? [];
       setLetters(all);
-      // Open viewer immediately if navigating from notification (?letter= or legacy state)
+      // Open viewer immediately if arriving with a ?letter= deep link
       if (letterIdForOpen) {
         const found = all.find((l) => l.id === letterIdForOpen && l.delivered);
         if (found) setViewingLetter(found);
