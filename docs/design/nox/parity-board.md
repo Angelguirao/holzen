@@ -18,7 +18,7 @@ Status keys:
 | `/settings/about` | partial | sub-settings surface; matches Settings chrome |
 | `/pause` | ready | shared controls + token bridge aligned |
 | `/tools/ground` | ready | token bridge aligned (canonical grounding URL) |
-| `/tools/ambient` | redirect → `/tools/breathe` | legacy; Ambient page removed |
+| `/tools/breathe` | Stillness (ex-Ambient) | canonical; no separate `/tools/ambient` route |
 | `/tools/practice/checkin` | ready | token bridge + form controls aligned |
 | `/tools/practice/journal` | ready | token bridge + tag/input alignment in shared flow |
 

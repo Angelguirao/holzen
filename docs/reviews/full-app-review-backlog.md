@@ -48,10 +48,9 @@ Treat Phases **1–2** as the **product spine** for pause; **3–8** as the **ba
 | Route | Est. (h) | Notes |
 |-------|----------|--------|
 | `/pause` | 6–10 | Deep UX + persistence; **Phase 2** covers pipeline—this row is extra UI/state edge cases if needed |
-| `/tools/breathe` | 2–4 | |
+| `/tools/breathe` | 2–4 | Stillness; no separate `/tools/ambient` route |
 | `/tools/ground` | 3–5 | |
 | `/tools/ground/history` | 2–3 | Pair with `/tools/ground` to save context |
-| `/tools/ambient` | — | Redirects to `/tools/breathe`; page removed |
 | `/tools/practice/checkin` | 2–4 | |
 | `/tools/practice/journal` | 3–5 | Ties to `journal-prompt` and library/Journey usage |
 | `/tools/practice/bodyscan` | 2–4 | |
@@ -64,7 +63,7 @@ Treat Phases **1–2** as the **product spine** for pause; **3–8** as the **ba
 | Route | Est. (h) | Notes |
 |-------|----------|--------|
 | `/library` | 4–7 | |
-| `/journey` | 3–5 | Journey hub (stats, insights, badges, letters, activity) |
+| `/journey` | 3–5 | Journey hub (stats, insights, badges, activity); letters live under `/tools/letters` |
 | `/tools` | 1–2 | Tools index in shell |
 | `/settings` | 5–8 | Subscription, language, notifications, account—overlaps billing edge review |
 | `/settings/about` | 0.5–1 | Changelog / feedback sub-surface |
@@ -114,8 +113,8 @@ Full name list: [bruno/functions-catalog.md](../../bruno/functions-catalog.md).
 ## Suggested sequencing
 
 1. **Tier A — daily path:** Home (and shell) → Library → Settings → subscription UX.  
-2. **Tier B — practice cluster:** Merge `/practice/*` + `/breathe` in one or two reviews (`/tools/ambient` removed; redirects to breathe).  
-3. **Tier C — ground:** `/ground` + `/ground/history`.  
+2. **Tier B — practice cluster:** `/tools/practice/*` in one or two reviews (alongside stillness at `/tools/breathe` if useful).  
+3. **Tier C — ground:** `/tools/ground` + `/tools/ground/history`.  
 4. **Tier D — public:** Landing, auth, legal/blog/roadmap.  
 5. **Tier E — admin** when ops surfaces matter.  
 6. **Edge:** Align with the tier that uses each function (e.g. journal review + `journal-prompt`).

@@ -13,7 +13,7 @@ CREATE OR REPLACE FUNCTION public.notifications_from_future_letters() RETURNS tr
 BEGIN
   IF NEW.delivered IS DISTINCT FROM TRUE OR NEW.delivered_at IS NULL THEN RETURN NEW; END IF;
   PERFORM public.notifications_upsert(NEW.user_id, 'letter', 'future_letters', NEW.id,
-    '{}'::jsonb, format('/journey/letters?letter=%s', NEW.id::text), NULL, NEW.delivered_at);
+    '{}'::jsonb, format('/tools/letters?letter=%s', NEW.id::text), NULL, NEW.delivered_at);
   RETURN NEW;
 END; $$;
 
@@ -39,6 +39,6 @@ WHERE type = 'insight' AND action_path = '/profile';
 
 UPDATE public.notifications
 SET
-  action_path = format('/journey/letters?letter=%s', source_id::text),
+  action_path = format('/tools/letters?letter=%s', source_id::text),
   action_state = NULL
 WHERE type = 'letter' AND action_path = '/profile' AND source_table = 'future_letters';
