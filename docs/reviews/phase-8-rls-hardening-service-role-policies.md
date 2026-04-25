@@ -10,11 +10,11 @@ This phase proposes defense-in-depth: add explicit `service_role` policies for t
 
 ## Target tables (based on pipeline)
 
-The following tables are part of the pause + companion pipeline and are written by edge functions/cron:
+The following tables **were** part of the pause + companion pipeline before Pause V2 (this list is frozen for historical comparison with migration `20260402093000_service_role_write_policies_pause_companions.sql`):
 
-- `public.pause_notifications` (cron inserts)
-- `public.reflections` (cron inserts; some edge functions may insert in the future)
-- `public.profiles` (cron updates `last_*` and cooldown fields)
+- `public.pause_notifications` (**dropped** — replaced by unified `notifications`)
+- `public.reflections` (**dropped** — replaced by `pause_instances` + `pause_ai_artifacts`)
+- `public.profiles` (cron still updates `last_*` and cooldown fields)
 - `public.analytics_events` (edge functions insert allowlisted telemetry)
 - `public.companion_cache` (cron inserts/updates cache warm pool)
 - `public.companion_serves` (orchestrator inserts serve rows)
@@ -22,7 +22,7 @@ The following tables are part of the pause + companion pipeline and are written 
 
 Notes on tables already handled explicitly (from earlier migration inspection):
 
-- `public.reflection_companions` already has a `service_role` “FOR ALL” style policy.
+- `public.reflection_companions` had a `service_role` “FOR ALL” style policy (**table dropped** in Pause V2).
 - `public.user_companion_serves` already has explicit `service_role` “FOR ALL”.
 
 ## Proposed policy shape
