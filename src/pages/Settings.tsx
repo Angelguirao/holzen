@@ -20,6 +20,7 @@ import { Button } from '@/components/ui/button';
 import { LoadingButton } from '@/components/ui/loading-button';
 import { Info, Loader2 } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
+import { trackEvent } from '@/lib/posthog';
 import { toast } from 'sonner';
 import { useState, useEffect, useCallback, forwardRef, useRef } from 'react';
 import { Input } from '@/components/ui/input';
@@ -127,6 +128,13 @@ const Settings = forwardRef<HTMLDivElement>(function Settings(_props, ref) {
     monthlyRemaining,
     tier,
   } = useSubscription();
+  const startCheckoutFromSettings = useCallback(
+    (target: 'pro' | 'pro_plus' | 'flex_pack_s' | 'flex_pack_m' = 'pro') => {
+      trackEvent('paywall.viewed', { source: 'settings' });
+      return startCheckout(target);
+    },
+    [startCheckout],
+  );
   const { canInstall, install } = useInstallPrompt();
   const {
     isSupported: pushSupported,
@@ -1114,7 +1122,7 @@ const Settings = forwardRef<HTMLDivElement>(function Settings(_props, ref) {
                     <div className="grid grid-cols-1 gap-2">
                       {tier === 'pro' && (
                         <LoadingButton
-                          onClick={() => startCheckout('pro_plus')}
+                          onClick={() => startCheckoutFromSettings('pro_plus')}
                           loading={checkoutLoading && checkoutLoadingTarget === 'pro_plus'}
                           disabled={checkoutLoading && checkoutLoadingTarget !== 'pro_plus'}
                           loadingText={t('settings.openingCheckout')}
@@ -1128,7 +1136,7 @@ const Settings = forwardRef<HTMLDivElement>(function Settings(_props, ref) {
                         </LoadingButton>
                       )}
                       <LoadingButton
-                        onClick={() => startCheckout('flex_pack_s')}
+                        onClick={() => startCheckoutFromSettings('flex_pack_s')}
                         loading={checkoutLoading && checkoutLoadingTarget === 'flex_pack_s'}
                         disabled={checkoutLoading && checkoutLoadingTarget !== 'flex_pack_s'}
                         loadingText={t('settings.openingCheckout')}
@@ -1143,7 +1151,7 @@ const Settings = forwardRef<HTMLDivElement>(function Settings(_props, ref) {
                         })}
                       </LoadingButton>
                       <LoadingButton
-                        onClick={() => startCheckout('flex_pack_m')}
+                        onClick={() => startCheckoutFromSettings('flex_pack_m')}
                         loading={checkoutLoading && checkoutLoadingTarget === 'flex_pack_m'}
                         disabled={checkoutLoading && checkoutLoadingTarget !== 'flex_pack_m'}
                         loadingText={t('settings.openingCheckout')}
@@ -1193,7 +1201,7 @@ const Settings = forwardRef<HTMLDivElement>(function Settings(_props, ref) {
                   </p>
                   <div className="grid grid-cols-1 gap-2">
                     <LoadingButton
-                      onClick={() => startCheckout('pro')}
+                      onClick={() => startCheckoutFromSettings('pro')}
                       loading={checkoutLoading}
                       loadingText={t('settings.openingCheckout')}
                       className="w-full text-base font-sans"
@@ -1205,7 +1213,7 @@ const Settings = forwardRef<HTMLDivElement>(function Settings(_props, ref) {
                       })}
                     </LoadingButton>
                     <LoadingButton
-                      onClick={() => startCheckout('pro_plus')}
+                      onClick={() => startCheckoutFromSettings('pro_plus')}
                       loading={checkoutLoading}
                       loadingText={t('settings.openingCheckout')}
                       variant="outline"

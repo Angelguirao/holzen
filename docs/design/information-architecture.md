@@ -17,18 +17,18 @@
 Five bottom tabs, all wrapped in `AppLayout` (header + `Outlet` + bottom nav, max width ~24rem mobile-first):
 
 
-| Tab      | Path            | Role                                                                                                                                                                                                                                              |
-| -------- | --------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Home     | `/`             | Hub: widgets (market, hold goal, reflection, ground entry, night, practice, breathe), pause triggers, onboarding; **Journey** entry card (`JourneyHomeCard`) to `/journey/stats`. *Letters are not a Home widget; they live under Tools.*       |
-| Library  | `/library`      | Saved pause artifacts, collections, search, source filters; **Activity log** tab link to `/journey/activity` (complements `HistoryCrossLinks` / copy). |
+| Tab      | Path            | Role                                                                                                                                                                                                                                                                                        |
+| -------- | --------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Home     | `/`             | Hub: widgets (market, hold goal, reflection, ground entry, night, practice, breathe), pause triggers, onboarding; **Journey** entry card (`JourneyHomeCard`) to `/journey/stats`. *Letters are not a Home widget; they live under Tools.*                                                   |
+| Library  | `/library`      | Saved pause artifacts, collections, search, source filters; **Activity log** tab link to `/journey/activity` (complements `HistoryCrossLinks` / copy).                                                                                                                                      |
 | Tools    | `/tools`        | In-app index (`ToolsHub`): a **Journey (progress & log)** block links to `/tools/letters` and `/journey/activity`, then **immersive tools** (breathe, ambient, ground, etc.). Only `/tools` and `/tools/letters` use the **shell + bottom nav**; other `/tools/...` routes are full-screen. |
-| Journey  | `/journey/:tab` | Longitudinal “you” content: **stats, insights, badges, activity** — each tab is a **path segment** (default `/journey/stats`). *Letters are not a Journey tab.*                                                                                   |
-| Settings | `/settings`     | Long accordion page with **Jump to** controls (section ids + open/scroll) for Account, Pause, App, Content, Notifications, Subscription, Security; preferences, Pro/checkout, account actions, etc. |
+| Journey  | `/journey/:tab` | Longitudinal “you” content: **stats, insights, badges, activity** — each tab is a **path segment** (default `/journey/stats`). *Letters are not a Journey tab.*                                                                                                                             |
+| Settings | `/settings`     | Long accordion page with **Jump to** controls (section ids + open/scroll) for Account, Pause, App, Content, Notifications, Subscription, Security; preferences, Pro/checkout, account actions, etc.                                                                                         |
 
 
 **Letters (Pro):** canonical route `/tools/letters`. Optional query `?letter=<id>` scrolls to that delivered letter. Legacy `/journey/letters?...` redirects to `/tools/letters?...` (query preserved).
 
-Notification `action_path` for letter delivery uses `/tools/letters?letter=<id>` (see migrations `20260426010000_letters_tools_action_path.sql` and `20260425200000_journey_routes_notification_paths.sql`). The app does not register `/profile` or pre-`/tools/*` paths.
+Notification `action_path` for letter delivery uses `/tools/letters?letter=<id>` (see migrations `20260426010000_letters_tools_action_path.sql` and `20260425200000_journey_routes_notification_paths.sql`). The app does not register `/profile` or alternate pre-`/tools/*` path families.
 
 **Settings sub-routes (still in shell + bottom nav):** `/settings/billing-history`, `/settings/about` (changelog, version, feedback — split out so the main Settings page stays action-first).
 
@@ -40,16 +40,19 @@ This matches the “skills-first” stats organization documented in `docs/decis
 
 **A. Full-screen / immersive (no bottom nav)** — `ProtectedRoute` but **not** under `AppLayout`; user returns via back, in-flow CTAs, or home widgets.
 
-| Area              | Routes                                                                                                                | Notes                                                                         |
-| ----------------- | --------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------- |
-| Pause session     | `/pause`                                                                                                              | Core guided pause flow.                                                       |
-| Companions        | `/companion/zoom-out/:pauseInstanceId`, `/companion/history/...`, `/companion/signal/...`, `/companion/grounding/...` | Deep-linked to a pause instance.                                              |
-| Tools (immersive) | `/tools/breathe`, `/tools/ambient`, `/tools/ground`, `/tools/ground/history`, `/tools/practice/*`                 | Regulation / grounding / practice — no bottom nav. |
+
+| Area              | Routes                                                                                                                | Notes                                              |
+| ----------------- | --------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------- |
+| Pause session     | `/pause`                                                                                                              | Core guided pause flow.                            |
+| Companions        | `/companion/zoom-out/:pauseInstanceId`, `/companion/history/...`, `/companion/signal/...`, `/companion/grounding/...` | Deep-linked to a pause instance.                   |
+| Tools (immersive) | `/tools/breathe`, `/tools/ambient`, `/tools/ground`, `/tools/ground/history`, `/tools/practice/*` | Regulation / grounding / practice — no bottom nav. |
+
 
 **B. Same shell as primary tabs (not listed in §1.1 table)** — still `AppLayout` + bottom nav:
 
-| Area | Routes | Notes |
-| ---- | ------ | ----- |
+
+| Area             | Routes                     | Notes                                                                 |
+| ---------------- | -------------------------- | --------------------------------------------------------------------- |
 | Tools (in shell) | `/tools`, `/tools/letters` | `ToolsHub` and **Letters**; bottom **Tools** tab highlights for both. |
 
 
@@ -179,14 +182,14 @@ Use this as a **checklist** when planning research or another IA pass. Detailed 
 ## 5. Related docs
 
 
-| Doc                                                  | Relevance                                                                              |
-| ---------------------------------------------------- | -------------------------------------------------------------------------------------- |
-| `docs/decisions/2026-04-23-skills-first-stats-ia.md` | Stats organization inside **Journey** (was profile-tab era).                           |
-| `docs/systems/pause-system.md`                       | Pause lifecycle; informs companion and `/pause` placement.                             |
-| `docs/systems/stats-system.md`                       | Skills-first metrics model.                                                            |
-| `docs/design/nox/README.md`                          | Visual system; IA changes should still follow Nox patterns for nav/components.         |
-| `AGENTS.md`                                          | Route registration and `App.tsx` conventions.                                          |
-| `docs/ops/event-taxonomy.md`                         | `navigation.primary_tab_opened` and other PostHog events (IA-relevant: §1.7 here).        |
+| Doc                                                  | Relevance                                                                          |
+| ---------------------------------------------------- | ---------------------------------------------------------------------------------- |
+| `docs/decisions/2026-04-23-skills-first-stats-ia.md` | Stats organization inside **Journey** (was profile-tab era).                       |
+| `docs/systems/pause-system.md`                       | Pause lifecycle; informs companion and `/pause` placement.                         |
+| `docs/systems/stats-system.md`                       | Skills-first metrics model.                                                        |
+| `docs/design/nox/README.md`                          | Visual system; IA changes should still follow Nox patterns for nav/components.     |
+| `AGENTS.md`                                          | Route registration and `App.tsx` conventions.                                      |
+| `docs/ops/event-taxonomy.md`                         | `navigation.primary_tab_opened` and other PostHog events (IA-relevant: §1.7 here). |
 
 
 ---
@@ -201,8 +204,8 @@ Use this as a **checklist** when planning research or another IA pass. Detailed 
 | 2026-04-25 | —      | Updated to a “decision status + alternatives” format to capture current IA, reconsideration options, and further improvements.                                                              |
 | 2026-04-25 | —      | Acted on IA: Tools bottom tab; `/settings/about`; `HistoryCrossLinks` across Library / Journey Activity / Grounding history; `/roadmap` stub page.                                          |
 | 2026-04-26 | —      | Document **§1.7** nav analytics (`navigation.primary_tab_opened`); fix five-tab wording in **§2**; add **§4.7** consolidated alternatives; link event taxonomy; clarify doc vs app version. |
-| 2026-04-26 | —      | Letters moved to `/tools/letters` (not Journey); Home letter widget removed; DB notification paths + redirect from `/journey/letters`.                        |
-| 2026-04-26 | —      | Doc cleanup: shell vs immersive `/tools/*`; `ToolsHub` journey block; Home `JourneyHomeCard`; Library activity tab; Settings jump nav; `AdminSubNav`.        |
+| 2026-04-26 | —      | Letters moved to `/tools/letters` (not Journey); Home letter widget removed; DB notification paths + redirect from `/journey/letters`.                                                      |
+| 2026-04-26 | —      | Doc cleanup: shell vs immersive `/tools/*`; `ToolsHub` journey block; Home `JourneyHomeCard`; Library activity tab; Settings jump nav; `AdminSubNav`.                                       |
 
 
 When routes, bottom-nav items, or nav-related analytics change, update **§1**, **§1.7**, **§4.1**, **§4.7**, **event-taxonomy.md** (if applicable), and a **Changelog** row in the same PR.
