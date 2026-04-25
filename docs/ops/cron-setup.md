@@ -42,9 +42,9 @@ jsonb_build_object(
 
 **Bruno** (`bruno/service-cron/*.bru`): **`401`** usually means **`SERVICE_CRON_BEARER`** is wrong — it must match the project’s **service_role** JWT or **`CRON_SECRET`** (see [`bruno/service-cron/README.md`](../../bruno/service-cron/README.md)). Redeploying the function does not fix a bad client secret.
 
-**Edge logs:** Cron workers emit **`[holzen:<tag>]`** (see [holzen-edge-log](../../supabase/functions/_shared/holzen-edge-log.ts)). **`holzenEdgeRun`** (request / auth) always appears; set secret **`HOLZEN_EDGE_LOG=0`** on the project to quiet other traces; **errors** still log.
+**Edge logs:** Cron workers use **`withRequestLogging`** + **`createLogger`** — **JSON** lines with **`fn`**, **`cid`**, **`msg`**, and often **`extra.holzen_event`**. Filter in Supabase **Edge Functions → Logs** by function name or stable **`msg`** tokens (see [logging-strategy.md](logging-strategy.md)).
 
-**Stale Edge deploy:** If keys are correct but behavior is wrong, redeploy the function and confirm **Edge Functions → Logs** show the expected **`holzen:`** lines (see [browser-360-mcp-playbook.md](../fundamentals/browser-360-mcp-playbook.md)).
+**Stale Edge deploy:** If keys are correct but behavior is wrong, redeploy the function and confirm **Edge Functions → Logs** show the expected JSON lines for that function (see [browser-360-mcp-playbook.md](../fundamentals/browser-360-mcp-playbook.md)).
 
 The SQL below uses **Vault** (`holzen_cron_service_role`) for the Bearer token so the JWT is not embedded in `cron.job`. For a disposable one-off test only, you may temporarily use a literal `'Bearer …'` header — do not schedule that.
 

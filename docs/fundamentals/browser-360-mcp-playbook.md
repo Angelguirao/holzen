@@ -54,7 +54,7 @@ The SPA can emit **`[holzen:boot]`**, **`[holzen:auth]`**, **`[holzen:profile]`*
 
 **Query cache:** Same gate as **`isHolzenDebugEnabled()`** (verbose builds + dev).
 
-**Edge (cron / workers):** `supabase/functions/_shared/holzen-edge-log.ts` emits **`[holzen:<tag>]`** — e.g. **`volatility`**, **`volatility-email`**, **`volatility-push`**, **`refresh-btc`**, **`backfill-btc`**, **`fetch-feeds`**, **`pregenerate`**, **`followups`**, **`night-reflection`**, **`weekly-digest`**, **`monthly-report`**, **`personalized-nudge`**, **`deliver-letters`**, **`reflection-insights`**. Filter **`holzen:`** in Edge Function logs. **`holzenEdgeRun`** (request + auth) always prints; **`holzenEdgeLog` / `holzenEdgeWarn`** honor **`HOLZEN_EDGE_LOG=0`**; **`holzenEdgeError`** always prints.
+**Edge (cron / workers):** Handlers log **structured JSON** via **`withRequestLogging`** and **`createLogger`** (`observe.ts`) — grep **`fn`** (matches the function folder name, e.g. **`fetch-source-feeds`**, **`refresh-btc-prices`**) and stable **`msg`** / **`extra.holzen_event`** tokens. This is **not** the same as the browser **`[holzen:*]`** lines (those come from `holzen-console.ts` only). See [logging-strategy.md](../ops/logging-strategy.md).
 
 ## Related backlog
 
