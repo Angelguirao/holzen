@@ -15,6 +15,17 @@ import {
 
 const DIGEST_MODEL = "google/gemini-2.5-flash-lite";
 
+/** Subset of `profiles` selected for the digest loop. */
+interface DigestProfile {
+  user_id: string;
+  email_notifications?: boolean | null;
+  digest_frequency?: string | null;
+  threshold?: number | null;
+  threshold_down?: number | null;
+  hold_goal_currency?: string | null;
+  language?: string | null;
+}
+
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Headers":
@@ -238,8 +249,9 @@ serve(
     if (profilesError) throw profilesError;
 
     const now = new Date();
-    const eligible = (profiles ?? []).filter(
-      (p) => p.email_notifications && shouldSendDigest(p.digest_frequency ?? "weekly", now)
+    const profileRows = (profiles ?? []) as DigestProfile[];
+    const eligible = profileRows.filter(
+      (p) => p.email_notifications && shouldSendDigest(p.digest_frequency ?? "weekly", now),
     );
     log("weekly_digest_phase", {
       holzen_event: "weekly_digest_cron",
@@ -255,7 +267,7 @@ serve(
     const weekAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString();
 
     for (const profile of eligible) {
-      const currency = (profile as any).hold_goal_currency || "USD";
+      const currency = profile.hold_goal_currency || "USD";
       const btc = await fetchBtcWeekData(currency);
 
       const weekDir = btc.weekChange >= 0 ? "up" : "down";
@@ -303,7 +315,7 @@ serve(
           weekDir,
           absWeekChange,
           LOVABLE_API_KEY,
-          (profile as any).language,
+          profile.language ?? undefined,
           logAttempt,
           log,
         );
