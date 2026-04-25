@@ -8,6 +8,7 @@
  * API keys are read from Deno.env directly (same as the original function).
  */
 
+import type { SupabaseClient } from "https://esm.sh/@supabase/supabase-js@2.57.2";
 import {
   qualityGate,
   BANNED_PHRASES,
@@ -44,7 +45,7 @@ export interface HistoryResult {
 }
 
 export interface GenerateHistoryParams {
-  svcClient: any;
+  svcClient: SupabaseClient;
   context?: string;
   language?: string;
   mood?: string;
@@ -65,7 +66,7 @@ export interface GenerateHistoryParams {
 
 /** Try content_library (events) for history. */
 async function tryLibrary(
-  svcClient: any,
+  svcClient: SupabaseClient,
   userId?: string,
   moodTag?: string,
 ): Promise<HistoryResult | null> {
@@ -93,7 +94,7 @@ async function tryLibrary(
  * (used by `serveFallback` after live failure) keeps pass-3 as a last-resort serve.
  */
 async function tryCache(
-  svcClient: any,
+  svcClient: SupabaseClient,
   userId?: string,
   marketDirection?: "up" | "down" | "neutral",
   excludeIds?: string[],
@@ -110,7 +111,7 @@ async function tryCache(
   });
   if (cached) {
     return {
-      data: cached.data,
+      data: cached.data as HistoryResult["data"],
       source: "cache",
       cacheId: cached.cacheId,
       cacheRelaxation: cached.relaxation,
@@ -120,14 +121,14 @@ async function tryCache(
 }
 
 /** Last-resort curated fallback pool. */
-async function serveCurated(svcClient: any): Promise<HistoryResult> {
+async function serveCurated(svcClient: SupabaseClient): Promise<HistoryResult> {
   const pool = await loadFallbackPool<NonNullable<HistoryResult["data"]>>(svcClient, "history");
   return { data: pickRandom(pool), source: "curated", cacheId: null };
 }
 
 /** Resolve from non-live phases in order (library → cache → curated). */
 async function serveFallback(
-  svcClient: any,
+  svcClient: SupabaseClient,
   userId?: string,
   marketDirection?: "up" | "down" | "neutral",
   excludeIds?: string[],

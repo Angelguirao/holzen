@@ -3,6 +3,7 @@
  * Centralises the cache fallback chain logic used by all companion functions.
  */
 
+import type { SupabaseClient } from "https://esm.sh/@supabase/supabase-js@2.57.2";
 import { COMPANION_SERVE_FRESHNESS_DAYS } from "./companion-serve-freshness.ts";
 
 /** `companion_cache.companion_type` for zoom-out deep-time entries */
@@ -124,11 +125,11 @@ export interface ServeFromCacheOptions {
  * 5. Returns null if all (enabled) passes fail.
  */
 export async function serveFromCache(
-  svcClient: any,
+  svcClient: SupabaseClient,
   companionType: string,
   language = "en",
   excludeIdsOrOptions?: string[] | ServeFromCacheOptions,
-): Promise<{ data: any; cacheId: string; relaxation: CacheServeRelaxation } | null> {
+): Promise<{ data: unknown; cacheId: string; relaxation: CacheServeRelaxation } | null> {
   // Parse options (backward compatible with old string[] signature)
   let options: ServeFromCacheOptions;
   if (Array.isArray(excludeIdsOrOptions)) {
@@ -154,7 +155,9 @@ export async function serveFromCache(
         .eq("companion_type", companionType)
         .gte("served_at", windowStart);
       if (seen) {
-        userSeenIds = new Set(seen.map((r: any) => r.cache_entry_id));
+        userSeenIds = new Set(
+          seen.map((r: { cache_entry_id?: string | null }) => r.cache_entry_id).filter((id): id is string => typeof id === "string"),
+        );
       }
     } catch {
       // Table may not exist yet — continue without per-user filtering
@@ -247,9 +250,9 @@ interface TryServeParams {
 }
 
 async function tryServe(
-  svcClient: any,
+  svcClient: SupabaseClient,
   params: TryServeParams,
-): Promise<{ data: any; cacheId: string } | null> {
+): Promise<{ data: unknown; cacheId: string } | null> {
   try {
     let query = svcClient
       .from("companion_cache")
@@ -279,19 +282,26 @@ async function tryServe(
     if (!data || data.length === 0) return null;
 
     // Filter out excluded IDs client-side (more flexible than SQL NOT IN)
+    type CacheRow = {
+      id: string;
+      content: unknown;
+      used_count: number | null;
+      source_untrusted?: boolean | null;
+    };
+    const rows = data as CacheRow[];
     const pool = params.excludeIds.size > 0
-      ? data.filter((d: any) => !params.excludeIds.has(d.id))
-      : data;
+      ? rows.filter((d) => !params.excludeIds.has(d.id))
+      : rows;
 
     if (pool.length === 0) return null;
 
     // Prefer rows not marked source_untrusted (admin can keep body but deprioritize attribution)
-    const trusted = pool.filter((d: any) => !d.source_untrusted);
+    const trusted = pool.filter((d) => !d.source_untrusted);
     const pickPool = trusted.length > 0 ? trusted : pool;
 
     const cap = params.randomPickCap ?? 3;
     const pick = pickPool[Math.floor(Math.random() * Math.min(pickPool.length, cap))];
-    updateServeStats(svcClient, pick.id, pick.used_count, params.now);
+    updateServeStats(svcClient, pick.id, pick.used_count ?? 0, params.now);
     return { data: pick.content, cacheId: pick.id };
   } catch {
     return null;
@@ -307,26 +317,26 @@ function logCacheSideEffect(op: string, err: unknown): void {
   }));
 }
 
-function updateServeStats(svcClient: any, id: string, currentCount: number, now: string) {
-  svcClient
-    .from("companion_cache")
-    .update({ used_count: (currentCount || 0) + 1, last_served_at: now })
-    .eq("id", id)
-    .then(() => {})
-    .catch((e: unknown) => logCacheSideEffect("updateServeStats", e));
+function updateServeStats(svcClient: SupabaseClient, id: string, currentCount: number, now: string) {
+  void Promise.resolve(
+    svcClient
+      .from("companion_cache")
+      .update({ used_count: (currentCount || 0) + 1, last_served_at: now })
+      .eq("id", id),
+  ).catch((e: unknown) => logCacheSideEffect("updateServeStats", e));
 }
 
-function recordUserServe(svcClient: any, userId: string | undefined, cacheId: string, companionType: string) {
+function recordUserServe(svcClient: SupabaseClient, userId: string | undefined, cacheId: string, companionType: string) {
   if (!userId) return;
   // Fire-and-forget: record that this user saw this cache entry
-  svcClient
-    .from("user_companion_serves")
-    .upsert(
-      { user_id: userId, cache_entry_id: cacheId, companion_type: companionType, served_at: new Date().toISOString() },
-      { onConflict: "user_id,cache_entry_id" },
-    )
-    .then(() => {})
-    .catch((e: unknown) => logCacheSideEffect("recordUserServe", e));
+  void Promise.resolve(
+    svcClient
+      .from("user_companion_serves")
+      .upsert(
+        { user_id: userId, cache_entry_id: cacheId, companion_type: companionType, served_at: new Date().toISOString() },
+        { onConflict: "user_id,cache_entry_id" },
+      ),
+  ).catch((e: unknown) => logCacheSideEffect("recordUserServe", e));
 }
 
 /**

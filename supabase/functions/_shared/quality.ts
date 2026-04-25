@@ -7,6 +7,8 @@
  * on `generation_attempts.quality_gate_reason` and Edge logs (`quality_gate_reject`).
  */
 
+import type { SupabaseClient } from "https://esm.sh/@supabase/supabase-js@2.57.2";
+
 // ── Banned AI-slop phrases ──
 // If any of these appear in generated text, it fails the quality gate.
 export const BANNED_PHRASES = [
@@ -377,7 +379,7 @@ export function normalizeTitle(s: string): string {
  * Uses exact match, substring containment, and word overlap.
  */
 export async function isDuplicateTitle(
-  svcClient: any,
+  svcClient: SupabaseClient,
   companionType: string,
   newTitle: string,
   language = "en",
@@ -397,7 +399,8 @@ export async function isDuplicateTitle(
   const newWords = new Set(newNorm.split(/\s+/).filter((w: string) => w.length > 3));
 
   for (const entry of data) {
-    const existingTitle = (entry.content as any)?.title;
+    const content = entry.content as Record<string, unknown> | null | undefined;
+    const existingTitle = typeof content?.title === "string" ? content.title : undefined;
     if (!existingTitle) continue;
     const existNorm = normalizeTitle(existingTitle);
 

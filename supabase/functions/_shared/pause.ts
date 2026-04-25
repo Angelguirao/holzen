@@ -11,8 +11,8 @@
 
 // Intentionally minimal type surface — edge functions construct their own
 // Supabase service-role clients via `_shared/cid-clients.ts`.
-// deno-lint-ignore-file no-explicit-any
 
+import type { SupabaseClient } from "https://esm.sh/@supabase/supabase-js@2.57.2";
 import { encodeHex } from "https://deno.land/std@0.224.0/encoding/hex.ts";
 
 export type PauseState =
@@ -107,7 +107,7 @@ export function bucketChangePercent(pct: number): number {
  * style. Returns the RPC envelope verbatim.
  */
 export async function pauseCreateOrReuse(
-  svc: any,
+  svc: SupabaseClient,
   params: {
     templateSlug: string;
     source: string;
@@ -139,7 +139,7 @@ export async function pauseCreateOrReuse(
  * Insert a pause_ai_artifact for this instance. One row per (instance, kind).
  */
 export async function upsertPauseAiArtifact(
-  svc: any,
+  svc: SupabaseClient,
   params: {
     instanceId: string;
     userId: string;
@@ -169,7 +169,7 @@ export async function upsertPauseAiArtifact(
  * Append a companion event via the Phase B RPC.
  */
 export async function pauseLogCompanion(
-  svc: any,
+  svc: SupabaseClient,
   params: {
     instanceId: string | null;
     companionType: string;
