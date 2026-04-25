@@ -245,7 +245,7 @@ export function useLibrary() {
 
   const updateItem = useCallback(async (id: string, updates: LibraryItemsUpdate) => {
     await supabase.from('library_items').update(updates).eq('id', id);
-    setItems((prev) => prev.map((i) => i.id === id ? { ...i, ...updates } : i));
+    setItems((prev) => prev.map((i) => i.id === id ? { ...i, ...updates } as LibraryItem : i));
   }, []);
 
   const deleteItem = useCallback(async (id: string) => {
