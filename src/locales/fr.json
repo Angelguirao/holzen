@@ -156,14 +156,11 @@
   "tools": {
     "title": "Outils",
     "subtitle": "Régulation, ancrage, pratique : comme sur l’accueil, en une liste.",
-    "breathe": "Calme (respiration)",
+    "listIntro": "Ouvre un outil ci-dessous. Le plein écran masque la barre d’onglets : utilise Retour ou les actions du parcours.",
+    "breathe": "Calme",
     "breatheDesc": "Espace de respiration sans objectif.",
-    "ambient": "Mode ambiance",
-    "ambientDesc": "Ambiance sonore et visuelle douce.",
     "ground": "Ancrage",
-    "groundDesc": "Ancrage guidé selon ton contexte.",
-    "groundHistory": "Journal d’ancrage",
-    "groundHistoryDesc": "Historique des sessions d’ancrage."
+    "groundDesc": "Séance guidée ; le journal est dans le deuxième onglet de la même expérience."
   },
   "profile": {
     "stats": "Statistiques",

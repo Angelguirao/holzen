@@ -156,14 +156,11 @@
   "tools": {
     "title": "Herramientas",
     "subtitle": "Regulación, conexión a tierra y práctica: lo mismo que en Inicio, en una sola lista.",
-    "breathe": "Calma (respirar)",
+    "listIntro": "Abre una herramienta abajo. Las de pantalla completa ocultan la barra; usa Atrás o las acciones del flujo.",
+    "breathe": "Calma",
     "breatheDesc": "Espacio de respiración sin objetivos.",
-    "ambient": "Modo ambiente",
-    "ambientDesc": "Sonido y color suaves.",
     "ground": "Conexión a tierra",
-    "groundDesc": "Conexión guiada según tu contexto.",
-    "groundHistory": "Diario de conexión",
-    "groundHistoryDesc": "Historial de sesiones de conexión."
+    "groundDesc": "Sesión guiada; tu diario está en la segunda pestaña de la misma experiencia."
   },
   "profile": {
     "stats": "Estadísticas",

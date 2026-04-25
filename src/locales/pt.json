@@ -156,14 +156,11 @@
   "tools": {
     "title": "Ferramentas",
     "subtitle": "Regulação, aterramento, prática — o mesmo que no Início, em uma lista.",
-    "breathe": "Parada (respirar)",
+    "listIntro": "Abra uma ferramenta abaixo. Tela cheia esconde a barra; use Voltar ou as ações do fluxo.",
+    "breathe": "Parada",
     "breatheDesc": "Espaço de respiração sem metas.",
-    "ambient": "Modo ambiente",
-    "ambientDesc": "Som e cor suaves.",
     "ground": "Aterramento",
-    "groundDesc": "Aterramento guiado com seu contexto.",
-    "groundHistory": "Diário de aterramento",
-    "groundHistoryDesc": "Sessões anteriores de aterramento."
+    "groundDesc": "Sessão guiada; o diário fica no segundo separador da mesma experiência."
   },
   "profile": {
     "stats": "Estatísticas",

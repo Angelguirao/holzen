@@ -50,7 +50,7 @@ Routes are declared in one file. **Page components** under `src/pages/` are **`R
 
 **Main shell:** routes under `/`, `/library`, `/tools` (tools index / `ToolsHub`), `/journey/*` (Journey hub; `/journey` redirects to `/journey/stats`), `/settings` (plus `/settings/about`, `/settings/billing-history`) use **`AppLayout`**: max-width column, **`<header>`** (“Holzen” + `NotificationBell`), **`<main id="main-content">`** around **`Outlet`**, and **`BottomNav`** (five tabs: Home, Library, Tools, Journey, Settings). `AppLayout` also wires `useHolzen`, `useLanguageSync`, and `useAutoTrigger` (pause-ready banner on non-home routes).
 
-**Full-screen / immersive routes** (no `AppLayout`): `/pause`, the **`/tools/*`** tree (`/tools/breathe`, `/tools/ground`, `/tools/ground/history`, `/tools/ambient`, `/tools/practice/*`), full-view companion pages under `/companion/...`, and `/admin*`. There are no alternate short paths for the same screens — bookmark **`/tools/...`**.
+**Full-screen tool routes** (no `AppLayout`): `/pause`, the **`/tools/*`** tree (`/tools/breathe`, `/tools/ground` with nested `history` for the grounding journal via `ToolsGroundLayout`, `/tools/practice/*`; legacy `/tools/ambient` redirects to `/tools/breathe`), full-view companion pages under `/companion/...`, and `/admin*`. There are no alternate short paths for the same screens — bookmark **`/tools/...`**.
 
 **Journey** lives only at **`/journey/:tab`** (and `/journey` → `/journey/stats`); use **`?letter=`** for letter deep links from notifications.
 
@@ -106,8 +106,7 @@ Do **not** add global **`QueryClient` defaultOptions** lightly: they affect ever
 
 - **Core app:** `Home`, `Library`, `Profile` (Journey UI at `/journey/*`), `Settings`, `ToolsHub` (`/tools`).
 - **Auth / legal / marketing:** `Landing`, `Auth`, `ResetPassword`, `Terms`, `Privacy`, `About`, `Blog`, `BlogPost`, `Roadmap`, `Reserve`.
-- **Immersive tools:** `PauseSession`, `Breathe`, `Ground`, `GroundHistory`, `PracticeCheckIn`, `PracticeJournal`, `PracticeBodyScan`, `PracticeReplay`, `Ambient` — mounted at **`/tools/...`** in `App.tsx` (see **`src/lib/app-routes.ts`**).
-- **`/tools/ambient` vs `/tools/breathe`:** `Ambient.tsx` is the full-screen volatility-gradient breathing screen. `Breathe.tsx` is a different “stillness / void” flow.
+- **Full-screen tools:** `PauseSession`, `Breathe`, `Ground` + `GroundHistory` (nested under `ToolsGroundLayout`), `PracticeCheckIn`, `PracticeJournal`, `PracticeBodyScan`, `PracticeReplay` — mounted at **`/tools/...`** in `App.tsx` (see **`src/lib/app-routes.ts`**). The old `Ambient` page was removed; **`/tools/ambient`** redirects to **`/tools/breathe`**.
 - **Ops:** `Admin` (see below).
 - **Errors:** `NotFound`.
 

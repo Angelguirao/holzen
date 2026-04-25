@@ -176,21 +176,13 @@
   "tools": {
     "title": "Tools",
     "subtitle": "Regulation, grounding, and practice — the same activities as on Home, listed in one place.",
-    "journeySectionTitle": "Journey (progress & log)",
-    "journeySectionSubtitle": "Long-term path and chronological activity. Letters live under Tools; the activity log is also on Journey → Activity.",
-    "activityJourneyLink": "Activity log",
-    "activityJourneyLinkDesc": "Chronological pauses and practices (same as Journey → Activity).",
-    "sessionToolsHeading": "Immersive tools",
+    "listIntro": "Open any tool below. Full-screen tools leave the tab bar; use Back or the in-flow actions to return.",
     "letters": "Letters to your future self",
     "lettersDesc": "Sealed in calm or storm, opened when the market flips. Pro feature.",
-    "breathe": "Stillness (breathe)",
+    "breathe": "Stillness",
     "breatheDesc": "A quiet, goal-free breathing space.",
-    "ambient": "Ambient mode",
-    "ambientDesc": "Gentle sound and color for a calmer state.",
     "ground": "Ground",
-    "groundDesc": "Guided grounding from your activity tags and context.",
-    "groundHistory": "Ground journal",
-    "groundHistoryDesc": "History of past grounding sessions."
+    "groundDesc": "Guided session from your activity tags; your journal lives on the second tab in the same experience."
   },
   "profile": {
     "pageSubtitle": "Your streak, charts, and journey — in one place. (Letters are under Tools.)",
@@ -1169,6 +1161,9 @@
     "title": "My Why"
   },
   "ground": {
+    "tabSession": "Session",
+    "tabJournal": "Journal",
+    "groundToolLabel": "Ground",
     "title": "Ground yourself",
     "finding": "Finding what fits…",
     "suggestionFailed": "Could not load a grounding suggestion right now.",

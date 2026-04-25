@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
-import { X, Play, Pause, Anchor, Loader2, ExternalLink, Eye, EyeOff } from 'lucide-react';
+import { Play, Pause, Anchor, Loader2, ExternalLink, Eye, EyeOff } from 'lucide-react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { supabase } from '@/integrations/supabase/client';
@@ -44,7 +44,7 @@ export default function Ground() {
   const [selectedDuration, setSelectedDuration] = useState<number | null>(null);
   const [timeLeft, setTimeLeft] = useState(0);
   const [isRunning, setIsRunning] = useState(false);
-  const [ambientMode, setAmbientMode] = useState(false);
+  const [hideTimeDisplay, setHideTimeDisplay] = useState(false);
   const [ready, setReady] = useState(false);
   const [selectedMood, setSelectedMood] = useState<MoodValue | null>(null);
   const [reflectionText, setReflectionText] = useState('');
@@ -289,7 +289,7 @@ export default function Ground() {
   // Loading
   if (isPending || !ready) {
     return (
-      <div className="fixed inset-0 z-50 bg-background flex items-center justify-center">
+      <div className="flex h-full w-full items-center justify-center bg-background">
         <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.3 }}>
           <Loader2 className="h-4 w-4 text-muted-foreground/30 animate-spin" />
         </motion.div>
@@ -300,10 +300,7 @@ export default function Ground() {
   // Non-Pro
   if (!isPro) {
     return (
-      <div className="fixed inset-0 z-50 bg-background flex items-center justify-center">
-        <button onClick={handleReturn} className="fixed top-5 right-5 p-3 rounded-full bg-muted/40 text-muted-foreground/40 hover:text-foreground/60 transition-all z-[60]" aria-label="Close">
-          <X className="h-4 w-4" />
-        </button>
+      <div className="flex h-full w-full items-center justify-center bg-background">
         <motion.div className="text-center space-y-5 px-8 max-w-xs" initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6, ease }}>
           <Anchor className="h-5 w-5 text-muted-foreground/30 mx-auto" />
           <p className="text-sm text-muted-foreground/60 leading-relaxed">
@@ -321,10 +318,7 @@ export default function Ground() {
   // No activities
   if (groundingActivities.length === 0) {
     return (
-      <div className="fixed inset-0 z-50 bg-background flex items-center justify-center">
-        <button onClick={handleReturn} className="fixed top-5 right-5 p-3 rounded-full bg-muted/40 text-muted-foreground/40 hover:text-foreground/60 transition-all z-[60]" aria-label="Close">
-          <X className="h-4 w-4" />
-        </button>
+      <div className="flex h-full w-full items-center justify-center bg-background">
         <motion.div className="text-center space-y-4 px-8 max-w-xs" initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6, ease }}>
           <Anchor className="h-5 w-5 text-muted-foreground/30 mx-auto" />
           <p className="text-sm font-mono text-muted-foreground">{t('ground.noActivities')}</p>
@@ -339,26 +333,21 @@ export default function Ground() {
 
   return (
     <motion.div
-      className="fixed inset-0 z-50 overflow-y-auto"
+      className="relative h-full w-full min-h-0 overflow-y-auto"
       initial={prefersReducedMotion ? { opacity: 1 } : { opacity: 0 }}
       animate={{ opacity: 1 }}
       transition={{ duration: 0.8, ease }}
       style={{ background: 'linear-gradient(160deg, hsl(var(--background)) 0%, hsl(var(--muted)) 50%, hsl(var(--background)) 100%)' }}
     >
-      {/* Ambient orb */}
+      {/* Soft background orb */}
       <motion.div
-        className="fixed top-1/3 left-1/2 -translate-x-1/2 w-[300px] h-[300px] rounded-full pointer-events-none"
+        className="pointer-events-none fixed top-1/3 left-1/2 h-[300px] w-[300px] -translate-x-1/2 rounded-full"
         style={{ background: 'radial-gradient(circle, hsl(var(--primary) / 0.04) 0%, transparent 70%)', filter: 'blur(60px)' }}
         animate={prefersReducedMotion ? {} : { scale: [1, 1.08, 1], opacity: [0.4, 0.7, 0.4] }}
         transition={{ duration: 10, repeat: Infinity, ease: 'easeInOut' }}
       />
 
-      {/* Close */}
-      <button onClick={handleReturn} className="fixed top-5 right-5 z-[60] rounded-full border border-border/20 bg-muted/50 p-3 text-muted-foreground backdrop-blur-sm transition-all duration-300 hover:bg-muted/70 hover:text-foreground" aria-label="Close">
-        <X className="h-4 w-4" />
-      </button>
-
-      <div className="relative z-10 mx-auto flex min-h-screen max-w-md flex-col items-center justify-center px-5 py-12 sm:px-8">
+      <div className="relative z-10 mx-auto flex min-h-full max-w-md flex-col items-center justify-center px-5 py-12 sm:px-8">
         <AnimatePresence mode="wait">
           {/* Loading */}
           {phase === 'idle' && (
@@ -472,7 +461,7 @@ export default function Ground() {
           {phase === 'timer' && (
             <motion.div key="timer" initial={{ opacity: 0, scale: 0.96 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.96 }} transition={{ duration: 0.5, ease }} className="text-center space-y-10 w-full">
               {/* Activity label */}
-              {!ambientMode && (
+              {!hideTimeDisplay && (
                 <motion.p className="text-center text-sm font-medium text-muted-foreground" initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
                   {activity}
                 </motion.p>
@@ -530,8 +519,8 @@ export default function Ground() {
                   />
                 )}
 
-                {/* Time display — hidden in ambient mode */}
-                {!ambientMode && (
+                {/* Time display — optional hide for a calmer view */}
+                {!hideTimeDisplay && (
                   <div className="absolute inset-0 flex flex-col items-center justify-center">
                     <p className="font-mono text-4xl tabular-nums text-foreground">{formatTime(timeLeft)}</p>
                   </div>
@@ -541,11 +530,12 @@ export default function Ground() {
               {/* Controls */}
               <div className="flex items-center justify-center gap-5">
                 <button
-                  onClick={() => setAmbientMode(!ambientMode)}
+                  type="button"
+                  onClick={() => setHideTimeDisplay(!hideTimeDisplay)}
                   className="rounded-full border border-border bg-muted/20 p-3 text-muted-foreground transition-colors hover:bg-muted/40 hover:text-foreground"
-                  aria-label={ambientMode ? 'Show time' : 'Hide time'}
+                  aria-label={hideTimeDisplay ? 'Show time' : 'Hide time'}
                 >
-                  {ambientMode ? <Eye className="h-3.5 w-3.5" /> : <EyeOff className="h-3.5 w-3.5" />}
+                  {hideTimeDisplay ? <Eye className="h-3.5 w-3.5" /> : <EyeOff className="h-3.5 w-3.5" />}
                 </button>
 
                 <button type="button" onClick={togglePause} className="rounded-full border border-border bg-muted/30 p-4 transition-colors hover:bg-muted/50">
