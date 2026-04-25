@@ -1,6 +1,6 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.57.2";
-import { holzenEdgeError, holzenEdgeLog, holzenEdgeRun } from "../_shared/holzen-edge-log.ts";
+import { unknownErrorForLog } from "../_shared/log-unknown-error.ts";
 import { coingeckoHeaders } from "../_shared/coingecko.ts";
 import { withRequestLogging } from "../_shared/with-request-logging.ts";
 import {
@@ -16,18 +16,23 @@ const corsHeaders = {
 };
 
 serve(
-  withRequestLogging("personalized-nudge", async ({ req }) => {
+  withRequestLogging("personalized-nudge", async ({ req, log }) => {
   try {
-    holzenEdgeRun("personalized-nudge", "request", { method: req.method });
     const { verifyServiceAuth } = await import("../_shared/auth.ts");
     if (!verifyServiceAuth(req)) {
-      holzenEdgeRun("personalized-nudge", "auth rejected");
+      log.warn("personalized_nudge_phase", {
+        holzen_event: "personalized_nudge_cron",
+        phase: "service_auth_rejected",
+      });
       return new Response(JSON.stringify({ error: "Unauthorized" }), {
         status: 401,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
-    holzenEdgeRun("personalized-nudge", "auth ok");
+    log("personalized_nudge_phase", {
+      holzen_event: "personalized_nudge_cron",
+      phase: "service_auth_ok",
+    });
     const supabase = createClient(
       Deno.env.get("SUPABASE_URL") ?? "",
       Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? "",
@@ -47,7 +52,13 @@ serve(
 
     // Only nudge during high volatility (≥3% daily move)
     if (change24h < 3) {
-      holzenEdgeLog("personalized-nudge", "run complete", { nudged: 0, reason: "low_volatility", change24h: Number(change24h.toFixed(1)) });
+      log("personalized_nudge_complete", {
+        holzen_event: "personalized_nudge_cron",
+        phase: "run_complete",
+        nudged: 0,
+        reason: "low_volatility",
+        change24h: Number(change24h.toFixed(1)),
+      });
       return new Response(JSON.stringify({ nudged: 0, reason: "low_volatility" }), {
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
@@ -203,12 +214,26 @@ serve(
       source: "personalized-nudge",
       idempotencyKey: `personalized-nudge:${dateKey}:${runDirection}`,
       logger: holzenLovableEmailLogger(
-        (m, d) => holzenEdgeLog("personalized-nudge", m, d),
-        (m, err) => holzenEdgeError("personalized-nudge", m, err),
+        (m, d) =>
+          log("lovable_email_dep", {
+            holzen_event: "personalized_nudge_cron",
+            phase: "lovable_email",
+            message: m,
+            ...(d ?? {}),
+          }),
+        (m, data) =>
+          log.error("lovable_email_dep", {
+            holzen_event: "personalized_nudge_cron",
+            phase: "lovable_email_error",
+            message: m,
+            ...(data ?? {}),
+          }),
       ),
     });
 
-    holzenEdgeLog("personalized-nudge", "run complete", {
+    log("personalized_nudge_complete", {
+      holzen_event: "personalized_nudge_cron",
+      phase: "run_complete",
       nudged: batch.sent,
       failed: batch.failed,
       chunks: batch.chunks,
@@ -222,7 +247,11 @@ serve(
     );
   } catch (e) {
     const msg = e instanceof Error ? e.message : String(e);
-    holzenEdgeError("personalized-nudge", "uncaught error", msg);
+    log.error("personalized_nudge_uncaught", {
+      holzen_event: "personalized_nudge_cron",
+      phase: "uncaught",
+      ...unknownErrorForLog(e),
+    });
     return new Response(JSON.stringify({ error: msg }), {
       status: 500,
       headers: { ...corsHeaders, "Content-Type": "application/json" },

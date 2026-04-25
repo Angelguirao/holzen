@@ -1,9 +1,12 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.57.2";
-import { holzenEdgeError, holzenEdgeLog, holzenEdgeRun } from "../_shared/holzen-edge-log.ts";
+import { unknownErrorForLog } from "../_shared/log-unknown-error.ts";
 import { createAttemptLogger } from "../_shared/observe.ts";
 import { coingeckoHeaders } from "../_shared/coingecko.ts";
-import { withRequestLogging } from "../_shared/with-request-logging.ts";
+import {
+  withRequestLogging,
+  type RequestLoggingContext,
+} from "../_shared/with-request-logging.ts";
 import {
   holzenLovableEmailLogger,
   sendLovableEmailBatch,
@@ -102,7 +105,8 @@ async function generateAIInsight(
   absWeekChange: string,
   LOVABLE_API_KEY: string,
   language: string | undefined,
-  logAttempt: (params: Parameters<ReturnType<typeof createAttemptLogger>>[0]) => void
+  logAttempt: (params: Parameters<ReturnType<typeof createAttemptLogger>>[0]) => void,
+  log: RequestLoggingContext["log"],
 ): Promise<string | null> {
   if (pauseCount === 0) return null;
 
@@ -137,7 +141,11 @@ Be observational, not prescriptive. No advice, no exclamation marks. Calm and gr
     });
 
     if (!response.ok) {
-      holzenEdgeError("weekly-digest", `AI insight HTTP ${response.status}`);
+      log.error("weekly_digest_ai", {
+        holzen_event: "weekly_digest_cron",
+        phase: "ai_insight_http_error",
+        http_status: response.status,
+      });
       logAttempt({
         companion_type: "digest",
         provider: "lovable",
@@ -161,7 +169,11 @@ Be observational, not prescriptive. No advice, no exclamation marks. Calm and gr
     });
     return data.choices?.[0]?.message?.content?.trim() || null;
   } catch (e) {
-    holzenEdgeError("weekly-digest", "AI insight failed", e);
+    log.error("weekly_digest_ai", {
+      holzen_event: "weekly_digest_cron",
+      phase: "ai_insight_failed",
+      ...unknownErrorForLog(e),
+    });
     logAttempt({
       companion_type: "digest",
       provider: "lovable",
@@ -175,18 +187,23 @@ Be observational, not prescriptive. No advice, no exclamation marks. Calm and gr
 }
 
 serve(
-  withRequestLogging("weekly-digest", async ({ req }) => {
+  withRequestLogging("weekly-digest", async ({ req, log }) => {
   try {
-    holzenEdgeRun("weekly-digest", "request", { method: req.method });
     const { verifyServiceAuth } = await import("../_shared/auth.ts");
     if (!verifyServiceAuth(req)) {
-      holzenEdgeRun("weekly-digest", "auth rejected");
+      log.warn("weekly_digest_phase", {
+        holzen_event: "weekly_digest_cron",
+        phase: "service_auth_rejected",
+      });
       return new Response(JSON.stringify({ error: "Unauthorized" }), {
         status: 401,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
-    holzenEdgeRun("weekly-digest", "auth ok");
+    log("weekly_digest_phase", {
+      holzen_event: "weekly_digest_cron",
+      phase: "service_auth_ok",
+    });
     const supabase = createClient(
       Deno.env.get("SUPABASE_URL") ?? "",
       Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? "",
@@ -205,7 +222,11 @@ serve(
       providers: ["lovable"],
     });
     if (!digestAiGuard.allowed) {
-      holzenEdgeLog("weekly-digest", "ai insight skipped", { reason: digestAiGuard.reason });
+      log("weekly_digest_phase", {
+        holzen_event: "weekly_digest_cron",
+        phase: "ai_insight_skipped",
+        reason: digestAiGuard.reason,
+      });
       LOVABLE_API_KEY = undefined;
     }
 
@@ -220,7 +241,11 @@ serve(
     const eligible = (profiles ?? []).filter(
       (p) => p.email_notifications && shouldSendDigest(p.digest_frequency ?? "weekly", now)
     );
-    holzenEdgeLog("weekly-digest", "eligible users", { count: eligible.length });
+    log("weekly_digest_phase", {
+      holzen_event: "weekly_digest_cron",
+      phase: "eligible_users",
+      count: eligible.length,
+    });
 
     // We collect all rendered emails and send them in a single batch request
     // at the end (≤100 per chunk). That's one Lovable Email round trip instead of N
@@ -272,8 +297,15 @@ serve(
       if (LOVABLE_API_KEY && pauseCount > 0) {
         const logAttempt = createAttemptLogger(supabase, { userId: profile.user_id });
         aiInsight = await generateAIInsight(
-          pauseCount, topMood, steadyCount, weekDir, absWeekChange, LOVABLE_API_KEY, (profile as any).language,
+          pauseCount,
+          topMood,
+          steadyCount,
+          weekDir,
+          absWeekChange,
+          LOVABLE_API_KEY,
+          (profile as any).language,
           logAttempt,
+          log,
         );
       }
 
@@ -359,12 +391,26 @@ serve(
       source: "weekly-digest",
       idempotencyKey: `weekly-digest:${idempotencyDate}`,
       logger: holzenLovableEmailLogger(
-        (m, d) => holzenEdgeLog("weekly-digest", m, d),
-        (m, err) => holzenEdgeError("weekly-digest", m, err),
+        (m, d) =>
+          log("lovable_email_dep", {
+            holzen_event: "weekly_digest_cron",
+            phase: "lovable_email",
+            message: m,
+            ...(d ?? {}),
+          }),
+        (m, data) =>
+          log.error("lovable_email_dep", {
+            holzen_event: "weekly_digest_cron",
+            phase: "lovable_email_error",
+            message: m,
+            ...(data ?? {}),
+          }),
       ),
     });
 
-    holzenEdgeLog("weekly-digest", "run complete", {
+    log("weekly_digest_complete", {
+      holzen_event: "weekly_digest_cron",
+      phase: "run_complete",
       sent: batch.sent,
       failed: batch.failed,
       chunks: batch.chunks,
@@ -377,7 +423,11 @@ serve(
     );
   } catch (e) {
     const msg = e instanceof Error ? e.message : String(e);
-    holzenEdgeError("weekly-digest", "uncaught error", msg);
+    log.error("weekly_digest_uncaught", {
+      holzen_event: "weekly_digest_cron",
+      phase: "uncaught",
+      ...unknownErrorForLog(e),
+    });
     return new Response(JSON.stringify({ error: msg }), {
       status: 500,
       headers: { ...corsHeaders, "Content-Type": "application/json" },
