@@ -152,4 +152,4 @@ Wrapper outputs:
 ## Local dev
 
 - Without `LOG_DRAIN_URL` / `SENTRY_DSN_EDGES`, the forwarder + Sentry both no-op. You still get JSON log lines in `supabase functions serve` stdout.
-- Set `HOLZEN_EDGE_LOG=0` to quiet gated `holzenEdgeLog` lines (errors + `holzenEdgeRun` always shown).
+- Edge handlers use the bound **`log`** from **`withRequestLogging`** only — no separate “quiet mode” env for stdout; adjust verbosity in code (fewer hot-path **`log`** calls) or filter in the log UI.
