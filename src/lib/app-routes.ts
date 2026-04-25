@@ -46,9 +46,9 @@ export function isProfileTab(s: string | undefined): s is ProfileTab {
 }
 
 /**
- * Shallow “section” path for settings (serves shareable URL → `/settings` + hash in-app).
+ * Bookmarkable settings section URL (`/settings/<id>`).
  * Valid ids: you, reflection, experience, companions, notifications, subscription, account.
  */
 export function settingsSectionPath(section: string): string {
-  return `/settings/section/${encodeURIComponent(section)}`;
+  return `/settings/${encodeURIComponent(section)}`;
 }

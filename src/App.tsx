@@ -21,7 +21,10 @@ import { FeedbackWidget } from "./components/FeedbackWidget";
 const Home = lazy(() => import("./pages/Home"));
 const Library = lazy(() => import("./pages/Library"));
 const Profile = lazy(() => import("./pages/Profile"));
-const Settings = lazy(() => import("./pages/Settings"));
+const SettingsRoot = lazy(() => import("./pages/settings/SettingsRoot"));
+const SettingsStateLayout = lazy(() => import("./pages/settings/SettingsStateLayout"));
+const SettingsHub = lazy(() => import("./pages/settings/SettingsHub"));
+const SettingsSectionPage = lazy(() => import("./pages/settings/SettingsSectionPage"));
 const Auth = lazy(() => import("./pages/Auth"));
 const Landing = lazy(() => import("./pages/Landing"));
 const Terms = lazy(() => import("./pages/Terms"));
@@ -177,9 +180,14 @@ const App = () => (
                   <Route path="/journey/letters" element={<JourneyLettersRedirect />} />
                   <Route path="/journey/:tab" element={<Profile />} />
                   <Route path="/settings/section/:section" element={<SettingsSectionRedirect />} />
-                  <Route path="/settings" element={<Settings />} />
-                  <Route path="/settings/about" element={<SettingsAbout />} />
-                  <Route path="/settings/billing-history" element={<BillingHistory />} />
+                  <Route path="/settings" element={<SettingsRoot />}>
+                    <Route path="about" element={<SettingsAbout />} />
+                    <Route path="billing-history" element={<BillingHistory />} />
+                    <Route element={<SettingsStateLayout />}>
+                      <Route index element={<SettingsHub />} />
+                      <Route path=":section" element={<SettingsSectionPage />} />
+                    </Route>
+                  </Route>
                   <Route path="/tools" element={<ToolsHub />} />
                   <Route path="/tools/letters" element={<ToolsLetters />} />
                 </Route>

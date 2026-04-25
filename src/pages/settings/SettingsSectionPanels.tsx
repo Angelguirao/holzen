@@ -1,43 +1,24 @@
-import { useAuth } from '@/hooks/use-auth';
-import { Link, useLocation } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { QuietWindowsManager } from '@/components/QuietWindowsManager';
 import { SourceManagement } from '@/components/SourceManagement';
 import { ProLock } from '@/components/ProLock';
-import { isHapticEnabled, setHapticEnabled } from '@/lib/haptics';
-import { useHolzen } from '@/hooks/use-holzen';
-import { useSubscription } from '@/hooks/use-subscription';
-import { useInstallPrompt } from '@/hooks/use-install-prompt';
-import { usePushNotifications } from '@/hooks/use-push-notifications';
 import { PRICING } from '@/lib/pricing';
 import { ThresholdSetting } from '@/components/ThresholdSetting';
 import { ReferralSection } from '@/components/ReferralSection';
 import { CreditsDashboard } from '@/components/CreditsDashboard';
-import { useLatestChangelogVersion } from '@/hooks/use-latest-changelog-version';
 import { InstallHolzenCard } from '@/components/InstallHolzenCard';
 import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
 import { LoadingButton } from '@/components/ui/loading-button';
 import { Info, Loader2 } from 'lucide-react';
-import { supabase } from '@/integrations/supabase/client';
-import { trackEvent } from '@/lib/posthog';
-import { toast } from 'sonner';
-import { useState, useEffect, useCallback, forwardRef, useRef } from 'react';
 import { Input } from '@/components/ui/input';
-import { useTranslation } from 'react-i18next';
 import {
-  getCheckoutSuppressionWindowMinutes,
-  setCheckoutSuppressionWindowMinutes,
   CHECKOUT_SUPPRESSION_WINDOW_DEFAULT_MINUTES,
   CHECKOUT_SUPPRESSION_WINDOW_MIN_MINUTES,
   CHECKOUT_SUPPRESSION_WINDOW_MAX_MINUTES,
 } from '@/lib/checkout-suppression-window';
-import {
-  Accordion,
-  AccordionContent,
-  AccordionItem,
-  AccordionTrigger,
-} from '@/components/ui/accordion';
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -49,398 +30,25 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from '@/components/ui/alert-dialog';
-import { NoxHeaderMain } from '@/components/ui/nox-header';
-import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
+import { useSettingsState } from '@/pages/settings/use-settings-state';
+import { GroundingTagInput } from '@/pages/settings/GroundingTagInput';
+import { ChangeEmailSection } from '@/pages/settings/ChangeEmailSection';
 
-function readThrownMessage(e: unknown, fallback: string): string {
-  if (e instanceof Error && e.message) return e.message;
-  if (e && typeof e === 'object' && 'message' in e) {
-    const m = (e as { message: unknown }).message;
-    if (typeof m === 'string' && m.length > 0) return m;
-  }
-  return fallback;
-}
-
-function GroundingTagInput({ activities, onChange }: { activities: string[]; onChange: (v: string[]) => void }) {
-  const { t } = useTranslation();
-  const [inputValue, setInputValue] = useState('');
-
-  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if ((e.key === 'Enter' || e.key === ',') && inputValue.trim()) {
-      e.preventDefault();
-      const tag = inputValue.trim().toLowerCase();
-      if (!activities.includes(tag)) {
-        onChange([...activities, tag]);
-      }
-      setInputValue('');
-    }
-    if (e.key === 'Backspace' && !inputValue && activities.length > 0) {
-      onChange(activities.slice(0, -1));
-    }
-  };
-
-  return (
-    <div className="space-y-3">
-      <p className="text-muted-foreground/60 uppercase tracking-wider text-sm font-sans">{t('settings.groundingTitle')}</p>
-      <p className="leading-relaxed text-primary text-sm">
-        {t('settings.groundingDesc')}
-      </p>
-      <div className="flex flex-wrap gap-1.5 min-h-[2rem]">
-        {activities.map((tag) => (
-          <span
-            key={tag}
-            className="inline-flex items-center gap-1 text-xs font-mono px-2.5 py-1 rounded-full border border-primary/20 bg-primary/5 text-foreground/80"
-          >
-            {tag}
-            <button
-              onClick={() => onChange(activities.filter((a) => a !== tag))}
-              className="hover:text-foreground transition-colors"
-              style={{ color: '#7B8A9E' }}
-            >
-              ×
-            </button>
-          </span>
-        ))}
-      </div>
-      <input
-        type="text"
-        value={inputValue}
-        onChange={(e) => setInputValue(e.target.value)}
-        onKeyDown={handleKeyDown}
-        placeholder={t('onboarding.groundingPlaceholder', { defaultValue: 'e.g. running, cooking, guitar...' })}
-        className="w-full bg-transparent border-b border-border/40 focus:border-foreground/30 outline-none text-sm font-mono py-2 text-foreground placeholder:text-muted-foreground/30 transition-colors"
-      />
-    </div>
-  );
-}
-
-const Settings = forwardRef<HTMLDivElement>(function Settings(_props, ref) {
-  const { t } = useTranslation();
-  const { user, signOut } = useAuth();
-  const { threshold, setThreshold, thresholdDown, setThresholdDown, cumulativeThreshold, setCumulativeThreshold, emailNotifications, setEmailNotifications, companionPrefs, setCompanionPref, reflectionTone, setReflectionTone, reflectionStyle, setReflectionStyle, silentMode, setSilentMode, cooldownHours, setCooldownHours, digestFrequency, setDigestFrequency, customPrompt, setCustomPrompt, quietHoursStart, quietHoursEnd, setQuietHours, streakFreezeDates, useStreakFreeze, firstName, setFirstName, nightReflectionHour, setNightReflectionHour, aiInsightsEnabled, setAiInsightsEnabled, notifyBadges, setNotifyBadges, motivations, setMotivations, mantra, setMantra, currency, setCurrency, language, setLanguage, groundingActivities, setGroundingActivities, profileLoaded } = useHolzen();
+export function SettingsYouPanel() {
   const {
-    subscribed,
-    loading: subLoading,
-    checkoutLoading,
-    checkoutLoadingTarget,
-    startCheckout,
-    openPortal,
-    monthlyRemaining,
-    tier,
-  } = useSubscription();
-  const startCheckoutFromSettings = useCallback(
-    (target: 'pro' | 'pro_plus' | 'flex_pack_s' | 'flex_pack_m' = 'pro') => {
-      trackEvent('paywall.viewed', { source: 'settings' });
-      return startCheckout(target);
-    },
-    [startCheckout],
-  );
-  const { canInstall, install } = useInstallPrompt();
-  const {
-    isSupported: pushSupported,
-    isSubscribed: pushSubscribed,
-    loading: pushLoading,
-    subscribe: pushSubscribe,
-    unsubscribe: pushUnsubscribe,
-    permissionGrantedNotSubscribed: pushPermissionGrantedIncomplete,
-  } = usePushNotifications();
-  const [deleting, setDeleting] = useState(false);
-  const [exporting, setExporting] = useState(false);
-  const [newPassword, setNewPassword] = useState('');
-  const [confirmPassword, setConfirmPassword] = useState('');
-  const [changingPassword, setChangingPassword] = useState(false);
-  const [zenMode, setZenMode] = useState(() => localStorage.getItem('holzen_zen_mode') === 'true');
-  const [hapticEnabled, setHapticEnabledState] = useState(isHapticEnabled);
-  const [soundEnabled, setSoundEnabled] = useState(() => localStorage.getItem('holzen_sound_enabled') !== 'false');
-  const [checkoutWindowMinutes, setCheckoutWindowMinutesState] = useState<number>(() =>
-    getCheckoutSuppressionWindowMinutes(),
-  );
-  const [checkoutWindowDraft, setCheckoutWindowDraft] = useState<string>(() =>
-    String(getCheckoutSuppressionWindowMinutes()),
-  );
-  const commitCheckoutWindow = useCallback(
-    (raw: string) => {
-      const parsed = Number(raw);
-      if (!Number.isFinite(parsed)) {
-        setCheckoutWindowDraft(String(checkoutWindowMinutes));
-        return;
-      }
-      const stored = setCheckoutSuppressionWindowMinutes(parsed);
-      setCheckoutWindowMinutesState(stored);
-      setCheckoutWindowDraft(String(stored));
-    },
-    [checkoutWindowMinutes],
-  );
-  const [btcMode, setBtcMode] = useState(() => localStorage.getItem('holzen_btc_mode') === 'true');
-  const { hasNewVersion: hasUnseenChangelog } = useLatestChangelogVersion();
-  const initialLoadRef = useRef(true);
-  const saveTimeoutRef = useRef<ReturnType<typeof setTimeout>>();
-
-  // Track profile-level setting changes to show auto-save toast
-  useEffect(() => {
-    if (!profileLoaded) return;
-    if (initialLoadRef.current) {
-      initialLoadRef.current = false;
-      return;
-    }
-    clearTimeout(saveTimeoutRef.current);
-    saveTimeoutRef.current = setTimeout(() => {
-      toast(t('settings.saved', { defaultValue: 'Saved' }), { duration: 1200, id: 'auto-save' });
-    }, 400);
-    return () => clearTimeout(saveTimeoutRef.current);
-  }, [threshold, thresholdDown, cumulativeThreshold, emailNotifications, reflectionTone, reflectionStyle, silentMode, cooldownHours, digestFrequency, customPrompt, quietHoursStart, quietHoursEnd, firstName, nightReflectionHour, aiInsightsEnabled, notifyBadges, mantra, currency, language, groundingActivities, companionPrefs, profileLoaded, t]);
-
-
-  const changePassword = useCallback(async () => {
-    if (newPassword.length < 6) {
-      toast.error(t('auth.passwordTooShort'));
-      return;
-    }
-    if (newPassword !== confirmPassword) {
-      toast.error(t('auth.passwordsDoNotMatch'));
-      return;
-    }
-    setChangingPassword(true);
-    try {
-      const { error } = await supabase.auth.updateUser({ password: newPassword });
-      if (error) throw error;
-      toast.success(t('auth.passwordUpdated'));
-      setNewPassword('');
-      setConfirmPassword('');
-    } catch (e: unknown) {
-      toast.error(readThrownMessage(e, 'Something went wrong'));
-    } finally {
-      setChangingPassword(false);
-    }
-  }, [newPassword, confirmPassword, t]);
-
-  useEffect(() => {
-    document.title = 'Holzen — Settings';
-    return () => { document.title = 'Holzen — Pause before you act'; };
-  }, []);
-
-  const exportData = async (format: 'json' | 'csv' = 'json') => {
-    if (!user) return;
-    setExporting(true);
-    try {
-      // Pull V2 rows: instance + hydrated fields from v_pause_full,
-      // step events, companion events, artifacts. The CSV is
-      // instance-level (flat); the JSON includes everything.
-      const [
-        { data: profile },
-        { data: pauses },
-        { data: stepEvents },
-        { data: companionEvents },
-        { data: artifacts },
-      ] = await Promise.all([
-        supabase.from('profiles').select('*').eq('user_id', user.id).single(),
-        supabase
-          .from('v_pause_full' as never)
-          .select('*')
-          .eq('user_id', user.id)
-          .order('created_at', { ascending: false }),
-        supabase
-          .from('pause_step_events' as never)
-          .select('pause_instance_id, step_type, payload, created_at')
-          .eq('user_id', user.id),
-        supabase
-          .from('pause_companion_events' as never)
-          .select(
-            'pause_instance_id, companion_type, action, counts_for_pause, non_counting_reason, entry_point, created_at',
-          )
-          .eq('user_id', user.id),
-        supabase
-          .from('pause_ai_artifacts' as never)
-          .select('pause_instance_id, kind, content, created_at')
-          .eq('user_id', user.id),
-      ]);
-
-      const pauseRows = (pauses ?? []) as Record<string, unknown>[];
-      const dateStr = new Date().toISOString().slice(0, 10);
-
-      if (format === 'csv') {
-        const refHeaders = [
-          'created_at',
-          'state',
-          'initial_mood',
-          'shift_mood',
-          'outcome',
-          'note_text',
-          'tags',
-          'is_favorite',
-          'counted_companion_types',
-          'reflection_text',
-        ];
-        const refRows = pauseRows.map((r) =>
-          refHeaders
-            .map((h) => {
-              const val = Array.isArray(r[h]) ? r[h].join('; ') : r[h] ?? '';
-              return `"${String(val).replace(/"/g, '""')}"`;
-            })
-            .join(','),
-        );
-        const refCsv = [refHeaders.join(','), ...refRows].join('\n');
-
-        const refBlob = new Blob([refCsv], { type: 'text/csv' });
-        const refUrl = URL.createObjectURL(refBlob);
-        const a1 = document.createElement('a');
-        a1.href = refUrl;
-        a1.download = `holzen-pauses-${dateStr}.csv`;
-        a1.click();
-        URL.revokeObjectURL(refUrl);
-
-        toast.success('CSV exported', { description: `${pauseRows.length} pauses.` });
-      } else {
-        const exportPayload = {
-          exported_at: new Date().toISOString(),
-          profile: profile
-            ? {
-                threshold: profile.threshold,
-                threshold_down: profile.threshold_down,
-                cooldown_hours: profile.cooldown_hours,
-                reflection_tone: profile.reflection_tone,
-                reflection_style: profile.reflection_style,
-                language: profile.language,
-                email_notifications: profile.email_notifications,
-                created_at: profile.created_at,
-              }
-            : null,
-          pauses: pauseRows,
-          step_events: stepEvents ?? [],
-          companion_events: companionEvents ?? [],
-          ai_artifacts: artifacts ?? [],
-        };
-
-        const blob = new Blob([JSON.stringify(exportPayload, null, 2)], {
-          type: 'application/json',
-        });
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = `holzen-export-${dateStr}.json`;
-        a.click();
-        URL.revokeObjectURL(url);
-        toast.success('Data exported', { description: `${pauseRows.length} pauses.` });
-      }
-    } catch {
-      toast.error('Export failed');
-    } finally {
-      setExporting(false);
-    }
-  };
-
-  const deleteAccount = async () => {
-    if (!user) return;
-    setDeleting(true);
-    try {
-      const { error } = await supabase.functions.invoke('delete-account');
-      if (error) throw error;
-      toast.success('Account deleted');
-      await signOut();
-    } catch {
-      toast.error('Failed to delete account');
-      setDeleting(false);
-    }
-  };
-
-  const [openSettingsSections, setOpenSettingsSections] = useState<string[]>([]);
-
-  const settingsJump = useCallback((value: string) => {
-    setOpenSettingsSections((prev) => {
-      if (prev.includes(value)) {
-        setTimeout(
-          () =>
-            document
-              .getElementById(`settings-section-${value}`)
-              ?.scrollIntoView({ behavior: 'smooth', block: 'start' }),
-          0,
-        );
-        return prev;
-      }
-      const next = [...prev, value];
-      setTimeout(
-        () =>
-          document
-            .getElementById(`settings-section-${value}`)
-            ?.scrollIntoView({ behavior: 'smooth', block: 'start' }),
-        80,
-      );
-      return next;
-    });
-  }, []);
-
-  const location = useLocation();
-  useEffect(() => {
-    if (!profileLoaded) return;
-    const raw = location.hash.replace(/^#/, '');
-    if (!raw.startsWith('settings-section-')) return;
-    const value = raw.slice('settings-section-'.length);
-    if (value) settingsJump(value);
-  }, [location.hash, location.pathname, profileLoaded, settingsJump]);
-
-  if (!profileLoaded) {
-    return (
-      <div className="space-y-6">
-        <NoxHeaderMain title={t('settings.title')} subtitle={t('settings.pageSubtitle')} />
-        <div className="space-y-3 animate-pulse">
-          {[1, 2, 3].map((i) => (
-            <div key={i} className="border border-border/40 rounded-md px-4 py-4 space-y-2">
-              <div className="h-3 w-24 bg-muted rounded" />
-              <div className="h-2 w-full bg-muted/60 rounded" />
-              <div className="h-2 w-3/4 bg-muted/40 rounded" />
-            </div>
-          ))}
-        </div>
-      </div>
-    );
-  }
-
+    t,
+    firstName,
+    setFirstName,
+    motivations,
+    setMotivations,
+    mantra,
+    setMantra,
+    groundingActivities,
+    setGroundingActivities,
+  } = useSettingsState();
   return (
-    <div ref={ref} className="space-y-6">
-      <NoxHeaderMain title={t('settings.title')} subtitle={t('settings.pageSubtitle')} />
+    <>
 
-      <p className="text-[10px] font-mono text-muted-foreground/80 uppercase tracking-wider">
-        {t('settings.jumpNavIntro')}
-      </p>
-      <div className="flex flex-wrap gap-x-2 gap-y-1.5 -mt-1">
-        {(
-          [
-            ['you', 'settings.accountProfile', { defaultValue: 'Account & profile' }],
-            ['reflection', 'settings.pauseBehavior', { defaultValue: 'Pause behavior' }],
-            ['experience', 'settings.appBehavior', { defaultValue: 'App behavior' }],
-            ['companions', 'settings.contentData', { defaultValue: 'Content & data' }],
-            ['notifications', 'settings.notificationsQuietHours', { defaultValue: 'Notifications & quiet hours' }],
-            ['subscription', 'settings.subscriptionPro', { defaultValue: 'Subscription & Pro' }],
-            ['account', 'settings.accountSecurity', { defaultValue: 'Account & security' }],
-          ] as const
-        ).map(([value, key, opts]) => (
-          <Link
-            key={value}
-            to={{ pathname: '/settings', hash: `settings-section-${value}` }}
-            className="text-[10px] font-mono text-primary/90 underline-offset-2 hover:underline"
-          >
-            {t(key, opts)}
-          </Link>
-        ))}
-      </div>
-
-      <Accordion
-        type="multiple"
-        value={openSettingsSections}
-        onValueChange={setOpenSettingsSections}
-        className="space-y-4"
-      >
-
-        {/* 1. You */}
-        <AccordionItem
-          value="you"
-          id="settings-section-you"
-          className="border border-border/40 rounded-md px-4 mb-[16px]"
-        >
-          <AccordionTrigger className="text-xs font-mono uppercase tracking-wider text-muted-foreground hover:text-foreground py-3 hover:no-underline">
-            {t('settings.accountProfile', { defaultValue: 'Account & profile' })}
-          </AccordionTrigger>
-          <AccordionContent className="space-y-5 pb-4">
             <div className="space-y-3">
               <p className="text-muted-foreground/60 uppercase tracking-wider text-sm font-sans">{t('settings.firstName')}</p>
               <p className="leading-relaxed text-primary text-sm">
@@ -517,28 +125,40 @@ const Settings = forwardRef<HTMLDivElement>(function Settings(_props, ref) {
 
 
             {/* Language — disabled, English only for now */}
-          </AccordionContent>
-        </AccordionItem>
+    </>
+  );
+}
 
-        {/* 2. Reflection */}
-        <AccordionItem
-          value="reflection"
-          id="settings-section-reflection"
-          className="border border-border/40 rounded-md px-4 mb-[16px]"
-        >
-          <AccordionTrigger className="text-xs font-mono uppercase tracking-wider text-muted-foreground hover:text-foreground py-3 hover:no-underline">
-            {t('settings.pauseBehavior', { defaultValue: 'Pause behavior' })}
-          </AccordionTrigger>
-          <AccordionContent className="space-y-6 pb-4">
-            {profileLoaded ? (
-              <ThresholdSetting thresholdUp={threshold} onSetUp={setThreshold} thresholdDown={thresholdDown} onSetDown={setThresholdDown} cumulativeThreshold={cumulativeThreshold} onSetCumulative={setCumulativeThreshold} cooldownHours={cooldownHours} />
-            ) : (
-              <div className="space-y-4 animate-pulse">
-                <div className="h-4 w-40 bg-muted rounded" />
-                <div className="h-8 w-24 bg-muted rounded" />
-                <div className="h-2 w-full bg-muted rounded" />
-              </div>
-            )}
+export function SettingsReflectionPanel() {
+  const {
+    t,
+    threshold,
+    setThreshold,
+    thresholdDown,
+    setThresholdDown,
+    cumulativeThreshold,
+    setCumulativeThreshold,
+    cooldownHours,
+    setCooldownHours,
+    reflectionTone,
+    setReflectionTone,
+    reflectionStyle,
+    setReflectionStyle,
+    customPrompt,
+    setCustomPrompt,
+  } = useSettingsState();
+  return (
+    <>
+
+            <ThresholdSetting
+              thresholdUp={threshold}
+              onSetUp={setThreshold}
+              thresholdDown={thresholdDown}
+              onSetDown={setThresholdDown}
+              cumulativeThreshold={cumulativeThreshold}
+              onSetCumulative={setCumulativeThreshold}
+              cooldownHours={cooldownHours}
+            />
 
             {/* Cooldown */}
             <div className="space-y-3 text-sm font-sans">
@@ -664,20 +284,32 @@ const Settings = forwardRef<HTMLDivElement>(function Settings(_props, ref) {
               </p>
             </div>
             </ProLock>
+    </>
+  );
+}
 
-          </AccordionContent>
-        </AccordionItem>
+export function SettingsExperiencePanel() {
+  const {
+    t,
+    btcMode,
+    setBtcMode,
+    currency,
+    setCurrency,
+    zenMode,
+    setZenMode,
+    checkoutWindowDraft,
+    setCheckoutWindowDraft,
+    commitCheckoutWindow,
+    silentMode,
+    setSilentMode,
+    soundEnabled,
+    setSoundEnabled,
+    hapticEnabled,
+    setHapticEnabled,
+  } = useSettingsState();
+  return (
+    <>
 
-        {/* 3. Experience */}
-        <AccordionItem
-          value="experience"
-          id="settings-section-experience"
-          className="border border-border/40 rounded-md px-4 mb-[16px]"
-        >
-          <AccordionTrigger className="text-xs font-mono uppercase tracking-wider text-muted-foreground hover:text-foreground py-3 hover:no-underline">
-            {t('settings.appBehavior', { defaultValue: 'App behavior' })}
-          </AccordionTrigger>
-          <AccordionContent className="space-y-6 pb-4 text-muted-foreground">
             {/* 1 BTC = 1 BTC mode */}
             <div className="space-y-3">
               <p className="uppercase tracking-wider text-base font-sans font-semibold text-[#dbb266]">{t('settings.btcMode')}</p>
@@ -842,22 +474,24 @@ const Settings = forwardRef<HTMLDivElement>(function Settings(_props, ref) {
                 <Label htmlFor="haptic-toggle" className="text-xs font-mono text-muted-foreground">
                   {t('settings.enableHaptics')}
                 </Label>
-                <Switch id="haptic-toggle" checked={hapticEnabled} onCheckedChange={(val) => { setHapticEnabledState(val); setHapticEnabled(val); }} />
+                <Switch id="haptic-toggle" checked={hapticEnabled} onCheckedChange={setHapticEnabled} />
               </div>
             </div>
-          </AccordionContent>
-        </AccordionItem>
+    </>
+  );
+}
 
-        {/* 4. Companions & AI */}
-        <AccordionItem
-          value="companions"
-          id="settings-section-companions"
-          className="border border-border/40 rounded-md px-4 mb-[16px]"
-        >
-          <AccordionTrigger className="text-xs font-mono uppercase tracking-wider text-muted-foreground hover:text-foreground py-3 hover:no-underline">
-            {t('settings.contentData', { defaultValue: 'Content & data' })}
-          </AccordionTrigger>
-          <AccordionContent className="space-y-6 pb-4">
+export function SettingsCompanionsPanel() {
+  const {
+    t,
+    companionPrefs,
+    setCompanionPref,
+    aiInsightsEnabled,
+    setAiInsightsEnabled,
+  } = useSettingsState();
+  return (
+    <>
+
             <ProLock feature="companions" hideContent>
             <div className="space-y-6">
               <div className="space-y-3">
@@ -895,20 +529,35 @@ const Settings = forwardRef<HTMLDivElement>(function Settings(_props, ref) {
               </div>
             </div>
             </ProLock>
-          </AccordionContent>
-        </AccordionItem>
-  
+    </>
+  );
+}
 
-        {/* 5. Notifications & Schedule */}
-        <AccordionItem
-          value="notifications"
-          id="settings-section-notifications"
-          className="border border-border/40 rounded-md px-4 mb-[16px]"
-        >
-          <AccordionTrigger className="text-xs font-mono uppercase tracking-wider text-muted-foreground hover:text-foreground py-3 hover:no-underline">
-            {t('settings.notificationsQuietHours', { defaultValue: 'Notifications & quiet hours' })}
-          </AccordionTrigger>
-          <AccordionContent className="space-y-6 pb-4">
+export function SettingsNotificationsPanel() {
+  const {
+    t,
+    user,
+    emailNotifications,
+    setEmailNotifications,
+    pushSupported,
+    pushSubscribed,
+    pushLoading,
+    pushPermissionGrantedIncomplete,
+    pushSubscribe,
+    pushUnsubscribe,
+    notifyBadges,
+    setNotifyBadges,
+    digestFrequency,
+    setDigestFrequency,
+    nightReflectionHour,
+    setNightReflectionHour,
+    quietHoursStart,
+    quietHoursEnd,
+    setQuietHours,
+  } = useSettingsState();
+  return (
+    <>
+
             <div className="space-y-3">
               <div className="flex items-center justify-between">
                 <Label htmlFor="email-notif" className="font-sans text-base font-medium text-primary">
@@ -1100,19 +749,25 @@ const Settings = forwardRef<HTMLDivElement>(function Settings(_props, ref) {
               </div>
             </div>
             </ProLock>
-          </AccordionContent>
-        </AccordionItem>
+    </>
+  );
+}
 
-        {/* 6. Subscription & Referrals */}
-        <AccordionItem
-          value="subscription"
-          id="settings-section-subscription"
-          className="border border-border/40 rounded-md px-4 mb-[16px]"
-        >
-          <AccordionTrigger className="text-xs font-mono uppercase tracking-wider text-muted-foreground hover:text-foreground py-3 hover:no-underline">
-            {t('settings.subscriptionPro', { defaultValue: 'Subscription & Pro' })}
-          </AccordionTrigger>
-          <AccordionContent className="space-y-6 pb-4">
+export function SettingsSubscriptionPanel() {
+  const {
+    t,
+    subLoading,
+    subscribed,
+    tier,
+    monthlyRemaining,
+    checkoutLoading,
+    checkoutLoadingTarget,
+    startCheckoutFromSettings,
+    openPortal,
+  } = useSettingsState();
+  return (
+    <>
+
             <div className="space-y-3">
               <p className="text-muted-foreground/60 uppercase tracking-wider text-sm font-sans">{t('settings.plan')}</p>
               {subLoading ? (
@@ -1184,12 +839,7 @@ const Settings = forwardRef<HTMLDivElement>(function Settings(_props, ref) {
                     {t('settings.manageSubscription')}
                   </Button>
                   <div>
-                    <a
-                      href="/settings/billing-history"
-                      className="text-xs font-mono text-muted-foreground underline"
-                    >
-                      View checkout history
-                    </a>
+                    <Link to="/settings/billing-history" className="text-xs font-mono text-muted-foreground underline">View checkout history</Link>
                   </div>
                 </div>
               ) : (
@@ -1241,19 +891,31 @@ const Settings = forwardRef<HTMLDivElement>(function Settings(_props, ref) {
             <CreditsDashboard />
 
             <ReferralSection />
-          </AccordionContent>
-        </AccordionItem>
+    </>
+  );
+}
 
-        {/* 7. Account */}
-        <AccordionItem
-          value="account"
-          id="settings-section-account"
-          className="border border-border/40 rounded-md px-4 mb-[16px]"
-        >
-          <AccordionTrigger className="text-xs font-mono uppercase tracking-wider text-muted-foreground hover:text-foreground py-3 hover:no-underline">
-            {t('settings.accountSecurity', { defaultValue: 'Account & security' })}
-          </AccordionTrigger>
-          <AccordionContent className="space-y-6 pb-4">
+export function SettingsAccountPanel() {
+  const {
+    t,
+    user,
+    signOut,
+    newPassword,
+    setNewPassword,
+    confirmPassword,
+    setConfirmPassword,
+    changePassword,
+    changingPassword,
+    exporting,
+    exportData,
+    deleteAccount,
+    deleting,
+    canInstall,
+    install,
+  } = useSettingsState();
+  return (
+    <>
+
               <p className="truncate font-sans text-primary text-sm">{user.email}</p>
 
             <ChangeEmailSection />
@@ -1382,87 +1044,7 @@ const Settings = forwardRef<HTMLDivElement>(function Settings(_props, ref) {
                 </AlertDialogFooter>
               </AlertDialogContent>
             </AlertDialog>
-          </AccordionContent>
-        </AccordionItem>
-
-        {/* 8. About (sub-route — keeps main Settings action-first) */}
-        <div className="border border-border/40 rounded-md px-4 py-3 mb-[16px]">
-          <Link
-            to="/settings/about"
-            className="flex items-center justify-between gap-3 -mx-1 rounded-md px-1 py-0.5 outline-none focus-visible:ring-2 focus-visible:ring-primary/30"
-          >
-            <div className="min-w-0 text-left">
-              <p className="text-xs font-mono uppercase tracking-wider text-muted-foreground">
-                {t('settings.aboutFeedback', { defaultValue: 'About & feedback' })}
-              </p>
-              <p className="text-xs text-muted-foreground/80 leading-relaxed mt-1">
-                {t('settings.aboutSubpageHint', {
-                  defaultValue: "What's new, version, and feedback — in one place",
-                })}
-              </p>
-            </div>
-            {hasUnseenChangelog ? (
-              <span className="shrink-0 text-[10px] font-mono bg-primary/10 text-primary px-1.5 py-0.5 rounded-full">
-                {t('common.new')}
-              </span>
-            ) : null}
-          </Link>
-        </div>
-
-      </Accordion>
-    </div>
-  );
-});
-
-function ChangeEmailSection() {
-  const { t } = useTranslation();
-  const [newEmail, setNewEmail] = useState('');
-  const [changing, setChanging] = useState(false);
-
-  const changeEmail = useCallback(async () => {
-    if (!newEmail || !newEmail.includes('@')) {
-      toast.error('Invalid email');
-      return;
-    }
-    setChanging(true);
-    try {
-      const { error } = await supabase.auth.updateUser({ email: newEmail });
-      if (error) throw error;
-      toast.success('Confirmation sent');
-      setNewEmail('');
-    } catch (e: unknown) {
-      toast.error(readThrownMessage(e, 'Something went wrong'));
-    } finally {
-      setChanging(false);
-    }
-  }, [newEmail]);
-
-  return (
-    <div className="space-y-3">
-      <p className="text-muted-foreground/60 uppercase tracking-wider text-sm font-sans">{t('settings.emailLabel')}</p>
-      <Input
-        id="settings-new-email"
-        name="email"
-        type="email"
-        autoComplete="email"
-        placeholder={t('settings.newEmailPlaceholder')}
-        value={newEmail}
-        onChange={(e) => setNewEmail(e.target.value)}
-        className="text-xs font-mono"
-      />
-      <Button
-        onClick={changeEmail}
-        disabled={changing || !newEmail}
-        size="sm"
-        className="w-full font-mono text-xs !mt-4"
-      >
-        {changing ? t('settings.sendingConfirmation') : t('settings.changeEmail')}
-      </Button>
-      <p className="leading-relaxed text-[#7b8a9d] text-sm">
-        {t('settings.emailConfirmNote')}
-      </p>
-    </div>
+    </>
   );
 }
 
-export default Settings;

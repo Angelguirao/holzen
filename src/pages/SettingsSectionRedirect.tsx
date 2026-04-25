@@ -10,16 +10,11 @@ const VALID = new Set([
   'account',
 ]);
 
-/** Resolves to `/settings#…` so the main Settings page opens the right accordion. */
+/** Legacy `/settings/section/:id` → `/settings/:id`. */
 export default function SettingsSectionRedirect() {
   const { section = '' } = useParams();
   if (!VALID.has(section)) {
     return <Navigate to="/settings" replace />;
   }
-  return (
-    <Navigate
-      to={{ pathname: '/settings', hash: `settings-section-${section}` }}
-      replace
-    />
-  );
+  return <Navigate to={`/settings/${encodeURIComponent(section)}`} replace />;
 }

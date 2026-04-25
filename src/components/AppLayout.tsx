@@ -47,7 +47,7 @@ function useTabChunkPrefetch() {
       void import('@/pages/Home').catch(() => {});
       void import('@/pages/Library').catch(() => {});
       void import('@/pages/Profile').catch(() => {});
-      void import('@/pages/Settings').catch(() => {});
+      void import('@/pages/settings/SettingsHub').catch(() => {});
       void import('@/pages/ToolsHub').catch(() => {});
     };
     const ric = (window as Window & {
