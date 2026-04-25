@@ -11,7 +11,7 @@ Instructions for AI assistants and automation working in this repository (e.g. C
 | Command | Use |
 |--------|-----|
 | `npm run dev` | Vite dev server on **port 8080** |
-| `npm run build` | Production build |
+| `npm run build` | Production build (**`prebuild`** → **`npm run check:version-sync`**) |
 | `npm run preview` | Serve built output locally |
 | `npm run test` | Vitest (jsdom), single run |
 | `npm run test:ci` | CI gate: `check:edge-logging`, `check:edge-coverage-manifest`, Vitest with coverage + JUnit |
@@ -26,8 +26,9 @@ Instructions for AI assistants and automation working in this repository (e.g. C
 | `npm run gen:types` | Regenerate `src/integrations/supabase/types.ts` from the **linked** Supabase project (`supabase login` or `SUPABASE_ACCESS_TOKEN`). Run after DB migrations. |
 | `npm run test:coverage` | Vitest with coverage reports only (no JUnit; use **`test:ci`** for the full CI gate). |
 | `npm run check:version-sync` | Ensures `package.json` **version** matches the latest **`changelog_entries`** row (REST); runs automatically as **`prebuild`** before **`npm run build`**. |
-| `npm run stamp:release` | Writes the current Git SHA into **`supabase/functions/_shared/release.ts`** for edge Sentry/BetterStack **`SENTRY_RELEASE`**. Idempotent. |
-| `npm run check:release-stamp` | Exits non-zero if **`release.ts`** does not match **`git rev-parse HEAD`** (read-only). |
+| `npm run stamp:release` | Writes **`git rev-parse --short=12 HEAD`** into **`supabase/functions/_shared/release.ts`** (`EDGE_RELEASE`) for edge Sentry/BetterStack **`SENTRY_RELEASE`**. Idempotent. |
+| `npm run check:release-stamp` | Exits non-zero if **`EDGE_RELEASE`** in **`release.ts`** ≠ current **`git rev-parse --short=12 HEAD`** (read-only; same comparison the stamper uses). |
+| `npm run dev:hosted` / `npm run dev:local` · `npm run build:dev` · `supabase:*` | Hosted vs localstack Vite modes and Docker Supabase CLI wrappers — see [README.md](README.md) npm scripts. |
 
 **Linting:** There are many **pre-existing** ESLint issues (~300). Do not treat cleaning the whole tree as part of a small task; avoid introducing *new* problems in files you touch.
 
