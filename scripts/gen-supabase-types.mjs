@@ -20,7 +20,9 @@ const banner = `/**
  * Regenerate after migrations: \`npm run gen:types\`
  * (requires \`supabase login\` or \`SUPABASE_ACCESS_TOKEN\`; uses \`--linked\` + \`supabase/config.toml\`).
  *
- * Application code targets Pause V2 (\`pause_instances\`, \`v_pause_full\`, \`pause_ai_artifacts\`, …).
+ * If this file drifts from production, dropped tables/columns may still appear
+ * until you re-run the generator. Application code targets Pause V2
+ * (\`pause_instances\`, \`v_pause_full\`, \`pause_ai_artifacts\`, …).
  */
 
 `;
