@@ -93,6 +93,7 @@ Frontend is safe — it only goes live when you click **Publish → Update** in 
 □ Production build succeeds                 npm run build
 □ Lint is clean on changed files            npm run lint
 □ Edge functions type-check                 npm run check:edge
+□ Edge handlers wrapped for logging         npm run check:edge-logging
 □ EdgeCoverage manifest matches config      npm run check:edge-coverage-manifest
 □ New migrations tested locally             npm run supabase:reset
 □ New edge functions have config.toml entry
