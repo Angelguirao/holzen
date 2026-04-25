@@ -4,7 +4,9 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { useLibrary } from '@/hooks/use-library';
 import { useInfiniteScroll } from '@/hooks/use-infinite-scroll';
 import { PageMeta } from '@/components/PageMeta';
-import { Heart, Search, X, Lock, ArrowUpDown, RefreshCw, ArrowRight, Pause, Radio, Leaf, Feather, Telescope, ScrollText, Pencil, Link as LinkIcon, Loader2, type LucideIcon } from 'lucide-react';
+import { Link } from 'react-router-dom';
+import { Heart, Search, X, Lock, ArrowUpDown, RefreshCw, ArrowRight, Pause, Radio, Leaf, Feather, Telescope, ScrollText, Pencil, Link as LinkIcon, Loader2, Clock, type LucideIcon } from 'lucide-react';
+import { journeyPath } from '@/lib/app-routes';
 import { ExportMenu } from '@/components/library/ExportMenu';
 import { SubscriptionSkeleton } from '@/components/SubscriptionSkeleton';
 import { LibraryItems } from '@/components/library/LibraryItems';
@@ -244,6 +246,13 @@ export default function Library() {
             <span className="ml-1.5 text-[9px] text-muted-foreground/40">{collections.length}</span>
           )}
         </button>
+        <Link
+          to={journeyPath('activity')}
+          className="flex items-center gap-1.5 border-b-2 border-transparent px-3 py-2 text-xs font-semibold uppercase tracking-wide text-muted-foreground/50 transition-colors whitespace-nowrap hover:text-muted-foreground"
+        >
+          <Clock className="h-3 w-3" />
+          {t('library.linkActivityLog')}
+        </Link>
       </div>
 
       {/* Collections tab */}

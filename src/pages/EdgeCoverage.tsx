@@ -6,6 +6,7 @@ import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { ShieldCheck, ShieldAlert, Search, FileWarning, HeartPulse } from "lucide-react";
+import { AdminSubNav } from "@/components/admin/AdminSubNav";
 
 // Static manifest of edge-function error-reporting coverage.
 // Curated from `supabase/functions/*/index.ts` by scanning for:
@@ -155,6 +156,7 @@ export default function EdgeCoverage() {
 
   return (
     <div className="container max-w-4xl py-8 space-y-6">
+      <AdminSubNav />
       <header className="space-y-2">
         <div className="flex items-center gap-2 text-muted-foreground text-sm">
           <ShieldCheck className="h-4 w-4" />
