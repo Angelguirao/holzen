@@ -138,6 +138,21 @@ export async function pauseLogCompanion(params: {
     }
   }
 
+  // Completion can be reached by the *last* counted companion (template requires ≥1) after all
+  // step events — that transition is visible only on `pause_log_companion`’s `resulting_state`.
+  if (
+    params.instanceId &&
+    result.resulting_state === 'completed' &&
+    !phPauseCompletedSent.has(params.instanceId)
+  ) {
+    phPauseCompletedSent.add(params.instanceId);
+    try {
+      trackEvent('pause_completed', { pause_instance_id: params.instanceId });
+    } catch {
+      /* no-op */
+    }
+  }
+
   return result;
 }
 
