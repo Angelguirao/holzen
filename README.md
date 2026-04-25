@@ -56,6 +56,7 @@ Open [http://localhost:8080](http://localhost:8080). For hosted Supabase you do 
 | `npm run build:dev` | Build in development mode |
 | `npm run preview` | Serve the production build locally |
 | `npm run test` | Vitest (jsdom), single run |
+| `npm run test:ci` | `check:edge-logging` + `check:edge-coverage-manifest` + Vitest with coverage and JUnit output (CI-style gate) |
 | `npm run test:watch` | Vitest in watch mode |
 | `npm run lint` | ESLint |
 | `npm run supabase:start` | Local Supabase stack (Docker); same as `npx supabase start` |
@@ -63,7 +64,8 @@ Open [http://localhost:8080](http://localhost:8080). For hosted Supabase you do 
 | `npm run supabase:stop` | Stop local stack |
 | `npm run supabase:reset` | Reapply `supabase/migrations/` on local DB |
 | `npm run gen:types` | Regenerate `src/integrations/supabase/types.ts` from the **linked** project (`supabase login` or `SUPABASE_ACCESS_TOKEN`) |
-| `npm run check:edge-coverage-manifest` | Fail if `EdgeCoverage.tsx` is missing any `supabase/config.toml` edge function name (CI uses this via `test:ci`) |
+| `npm run check:edge-logging` | Fail if an edge function serves HTTP without `withRequestLogging` (runs in `test:ci` / `check:prepush`) |
+| `npm run check:edge-coverage-manifest` | Fail if `EdgeCoverage.tsx` is missing any `supabase/config.toml` edge function name (runs in `test:ci` / `check:prepush`) |
 | `npm run check:edge` | Optional **Deno** typecheck of every `supabase/functions/*/index.ts`; **no-op** if `deno` is not installed |
 
 ## Repository layout
