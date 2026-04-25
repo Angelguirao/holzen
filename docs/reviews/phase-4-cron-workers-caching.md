@@ -63,7 +63,7 @@ If these workers drift (stale prices, bad dedup, permissive auth), you get wrong
 - **Auth**: Bruno **`SERVICE_CRON_BEARER`** (service_role JWT or `CRON_SECRET`); Edge: [`verifyServiceAuth`](../../supabase/functions/_shared/auth.ts).
 - **Logs**: structured JSON — **`"fn":"pregenerate-companions"`** (request **`log`** from **`withRequestLogging`**).
 - **Lifecycle**: promote high-quality entries to permanent (`expires_at = null`); prune low-quality after 3 days; expire medium tiers after 30 days.
-- **Generation loop**: small batch per type (grounding, signal, history, zoom-out deep time); dedup via title similarity vs existing cache rows.
+- **Generation loop**: **need-based** top-up per type (targets in `app_config.pregenerate_cache_topup`); when below target, may run Perplexity + Lovable (or Lovable-only for deep-time zoom) to insert into `companion_cache` — this path does **not** call `companion-orchestrate`; dedup via title/URL/body vs existing cache rows. See [pregenerate.md](../systems/pause/companions/pregenerate.md).
 - **Feedback**: last 24h feedback events adjust `quality_score` within [0..3].
 
 ### `docs/ops/cron-setup.md`
