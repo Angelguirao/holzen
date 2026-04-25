@@ -17,6 +17,7 @@ import { HardcodedFallbacksManager } from '@/components/admin/HardcodedFallbacks
 import { SourceCatalogViewer } from '@/components/admin/SourceCatalogViewer';
 import { SourceSuggestionsPanel } from '@/components/admin/SourceSuggestionsPanel';
 import { ContentLibraryViewer } from '@/components/admin/ContentLibraryViewer';
+import { AdminSubNav } from '@/components/admin/AdminSubNav';
 import { AppConfigTools } from '@/components/admin/AppConfigTools';
 import { CostAnalytics } from '@/components/admin/CostAnalytics';
 import { adminDeleteRowsByIds } from '@/lib/admin-delete';
@@ -384,6 +385,7 @@ export default function Admin() {
 
   return (
     <div className="space-y-6 animate-in fade-in">
+      <AdminSubNav />
       {/* Header */}
       <div className="flex items-center justify-between">
         <h2 className="text-xs font-mono tracking-widest uppercase text-muted-foreground/80">System Monitor</h2>

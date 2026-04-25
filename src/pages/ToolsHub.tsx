@@ -1,12 +1,11 @@
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { NoxHeaderMain } from '@/components/ui/nox-header';
-import { TOOLS } from '@/lib/app-routes';
-import { Wind, Ear, Leaf, History, Waves, PenLine, Activity, RotateCcw, ChevronRight, Mail } from 'lucide-react';
+import { TOOLS, journeyPath } from '@/lib/app-routes';
+import { Wind, Ear, Leaf, History, Waves, PenLine, Activity, RotateCcw, ChevronRight, Mail, Clock } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
 
 const LINKS: { to: string; labelKey: string; descKey: string; icon: LucideIcon }[] = [
-  { to: TOOLS.letters, labelKey: 'tools.letters', descKey: 'tools.lettersDesc', icon: Mail },
   { to: TOOLS.breathe, labelKey: 'tools.breathe', descKey: 'tools.breatheDesc', icon: Wind },
   { to: TOOLS.ambient, labelKey: 'tools.ambient', descKey: 'tools.ambientDesc', icon: Ear },
   { to: TOOLS.ground, labelKey: 'tools.ground', descKey: 'tools.groundDesc', icon: Leaf },
@@ -27,6 +26,46 @@ export default function ToolsHub() {
   return (
     <div className="space-y-6 pb-8">
       <NoxHeaderMain title={t('tools.title')} subtitle={t('tools.subtitle')} />
+      <div className="space-y-2">
+        <h2 className="text-[10px] font-mono uppercase tracking-wider text-muted-foreground">
+          {t('tools.journeySectionTitle')}
+        </h2>
+        <p className="text-xs text-muted-foreground/90 leading-relaxed">{t('tools.journeySectionSubtitle')}</p>
+        <ul className="space-y-1.5">
+          <li>
+            <Link
+              to={TOOLS.letters}
+              className="flex w-full items-start gap-3 rounded-xl border border-border/40 bg-muted/10 px-3 py-3 transition-colors hover:bg-muted/25"
+            >
+              <Mail className="h-4 w-4 shrink-0 mt-0.5 text-secondary-foreground" />
+              <div className="min-w-0 flex-1 text-left">
+                <span className="text-sm font-medium text-foreground">{t('tools.letters')}</span>
+                <span className="mt-0.5 block text-sm leading-snug text-muted-foreground">{t('tools.lettersDesc')}</span>
+              </div>
+              <ChevronRight className="h-3.5 w-3.5 shrink-0 text-muted-foreground/50 mt-1" />
+            </Link>
+          </li>
+          <li>
+            <Link
+              to={journeyPath('activity')}
+              className="flex w-full items-start gap-3 rounded-xl border border-border/40 bg-muted/10 px-3 py-3 transition-colors hover:bg-muted/25"
+            >
+              <Clock className="h-4 w-4 shrink-0 mt-0.5 text-secondary-foreground" />
+              <div className="min-w-0 flex-1 text-left">
+                <span className="text-sm font-medium text-foreground">{t('tools.activityJourneyLink')}</span>
+                <span className="mt-0.5 block text-sm leading-snug text-muted-foreground">
+                  {t('tools.activityJourneyLinkDesc')}
+                </span>
+              </div>
+              <ChevronRight className="h-3.5 w-3.5 shrink-0 text-muted-foreground/50 mt-1" />
+            </Link>
+          </li>
+        </ul>
+      </div>
+
+      <h2 className="text-[10px] font-mono uppercase tracking-wider text-muted-foreground pt-1">
+        {t('tools.sessionToolsHeading')}
+      </h2>
       <ul className="space-y-1.5">
         {LINKS.map(({ to, labelKey, descKey, icon: Icon }) => (
           <li key={to}>

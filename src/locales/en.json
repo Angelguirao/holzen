@@ -160,11 +160,27 @@
   "journey": {
     "pageSubtitle": "Long-term progress, insights, and activity — not account settings (those live under Settings). Letters to your future self are under Tools.",
     "documentTitle": "Holzen — Journey",
-    "activityExplainer": "A chronological log of pauses and practices. Your saved reflection cards and collections live in Library — browse and search there."
+    "activityExplainer": "A chronological log of pauses and practices. Your saved reflection cards and collections live in Library — browse and search there.",
+    "homeCardTitle": "Your journey",
+    "homeCardSubtitle": "Stats, insights, badges, and activity"
+  },
+  "admin": {
+    "subNavAria": "Admin sections",
+    "subNav": {
+      "overview": "Overview",
+      "smoke": "Edge smoke",
+      "sentry": "Sentry",
+      "edge": "Edge coverage"
+    }
   },
   "tools": {
     "title": "Tools",
     "subtitle": "Regulation, grounding, and practice — the same activities as on Home, listed in one place.",
+    "journeySectionTitle": "Journey (progress & log)",
+    "journeySectionSubtitle": "Long-term path and chronological activity. Letters live under Tools; the activity log is also on Journey → Activity.",
+    "activityJourneyLink": "Activity log",
+    "activityJourneyLinkDesc": "Chronological pauses and practices (same as Journey → Activity).",
+    "sessionToolsHeading": "Immersive tools",
     "letters": "Letters to your future self",
     "lettersDesc": "Sealed in calm or storm, opened when the market flips. Pro feature.",
     "breathe": "Stillness (breathe)",
@@ -214,6 +230,7 @@
     }
   },
   "settings": {
+    "jumpNavIntro": "Jump to",
     "pageSubtitle": "Thresholds, companions, notifications, and your account.",
     "title": "Settings",
     "you": "You",
@@ -876,6 +893,7 @@
     "pageTitle": "Library — Holzen",
     "pageDescription": "Your activity, bookmarks, notes, and collections",
     "iaClarifier": "This is for saved and browsable content (cards, notes, collections). A chronological log of activity lives under Journey → Activity.",
+    "linkActivityLog": "Activity log",
     "tabItems": "Items",
     "tabArchive": "Archive",
     "viewList": "List",

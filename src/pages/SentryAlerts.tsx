@@ -7,6 +7,7 @@ import { Separator } from '@/components/ui/separator';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Button } from '@/components/ui/button';
 import { AlertTriangle, Bell, ExternalLink, Slack, Mail, ListChecks, RotateCw } from 'lucide-react';
+import { AdminSubNav } from '@/components/admin/AdminSubNav';
 
 function useIsAdmin() {
   const { user, loading } = useAuth();
@@ -111,6 +112,7 @@ export default function SentryAlerts() {
 
   return (
     <div className="container max-w-3xl py-8 space-y-6">
+      <AdminSubNav />
       <header className="space-y-2">
         <div className="flex items-center gap-2 text-muted-foreground text-sm">
           <Bell className="h-4 w-4" />

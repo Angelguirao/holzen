@@ -32,6 +32,7 @@ import { cn } from '@/lib/utils';
 import { PracticeWidget } from '@/components/PracticeWidget';
 import { BulkHoldCard } from '@/components/BulkHoldCard';
 import { InstallHolzenCard } from '@/components/InstallHolzenCard';
+import { JourneyHomeCard } from '@/components/JourneyHomeCard';
 import { SnoozeControl } from '@/components/SnoozeControl';
 import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
 import { playNotificationTone, prefetchNotificationTone } from '@/lib/notification-tone';
@@ -945,6 +946,7 @@ const Home = () => {
       </div>
       {/* Install card — first protected visit, dismissible */}
       <InstallHolzenCard />
+      <JourneyHomeCard />
       {/* Pull-to-refresh indicator */}
       {(pullDistance > 0 || pullRefreshing) && (
         <div
