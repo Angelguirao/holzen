@@ -8,6 +8,7 @@ import { useAuth } from '@/hooks/use-auth';
 import { MoodIcon } from '@/components/icons/MoodIcon';
 import { NoxHeaderMain } from '@/components/ui/nox-header';
 import { Button } from '@/components/ui/button';
+import { TOOLS } from '@/lib/app-routes';
 
 interface GroundingEntry {
   id: string;
@@ -122,8 +123,8 @@ export default function GroundHistory() {
           <div className="min-w-0 flex-1">
             <NoxHeaderMain
               className="border-0 pb-0"
-              title={t('ground.historyTitle', 'Grounding Journal')}
-              subtitle={t('ground.historySubtitle', 'Your grounding sessions and notes')}
+              title={t('ground.historyTitle', { defaultValue: 'Grounding Journal' })}
+              subtitle={t('ground.historySubtitle', { defaultValue: 'Your grounding sessions and notes' })}
             />
           </div>
         </div>
@@ -141,14 +142,14 @@ export default function GroundHistory() {
             <div className="space-y-1 text-center">
               <p className="font-editorial text-3xl text-foreground">{totalSessions}</p>
               <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
-                {t('ground.sessions', 'Sessions')}
+                {t('ground.sessions', { defaultValue: 'Sessions' })}
               </p>
             </div>
             <div className="w-px bg-border/40" />
             <div className="space-y-1 text-center">
               <p className="font-editorial text-3xl text-foreground">{totalMinutes}</p>
               <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
-                {t('ground.minutesGrounded', 'Minutes')}
+                {t('ground.minutesGrounded', { defaultValue: 'Minutes' })}
               </p>
             </div>
           </motion.div>
@@ -164,15 +165,15 @@ export default function GroundHistory() {
           >
             <Anchor className="mx-auto h-6 w-6 text-muted-foreground" />
             <p className="text-center text-base text-muted-foreground">
-              {t('ground.noHistory', 'No grounding sessions yet')}
+              {t('ground.noHistory', { defaultValue: 'No grounding sessions yet' })}
             </p>
             <Button
               variant="tertiary"
               size="sm"
-              onClick={() => navigate('/ground', { replace: true })}
+              onClick={() => navigate(TOOLS.ground, { replace: true })}
               className="mx-auto font-mono"
             >
-              {t('ground.startFirst', 'Start your first session')}
+              {t('ground.startFirst', { defaultValue: 'Start your first session' })}
             </Button>
           </motion.div>
         )}
@@ -222,7 +223,7 @@ export default function GroundHistory() {
                           <div className="flex shrink-0 items-center gap-2">
                             <MoodIcon mood={entry.mood} size={18} className="text-muted-foreground" />
                             <span className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
-                              {t(`moodCheck.moods.${entry.mood}`, entry.mood)}
+                              {t(`moodCheck.moods.${entry.mood}`, { defaultValue: entry.mood })}
                             </span>
                           </div>
                         )}
@@ -256,7 +257,7 @@ export default function GroundHistory() {
                   onClick={loadMore}
                   className="text-sm font-medium text-primary underline-offset-4 hover:underline"
                 >
-                  {t('common.loadMore', 'Load more')}
+                  {t('common.loadMore', { defaultValue: 'Load more' })}
                 </button>
               </motion.div>
             )}

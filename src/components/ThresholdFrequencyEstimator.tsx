@@ -246,22 +246,26 @@ export function ThresholdFrequencyEstimator({
         <Activity className="h-3 w-3 mt-0.5 shrink-0 text-secondary-foreground" />
         <div className="space-y-0.5">
           <p className="leading-snug pb-2 font-sans text-sm font-normal text-secondary-foreground">
-            {t('threshold.estimator.result', 'You\'d have paused ~{{count}} times last month', {
+            {t('threshold.estimator.result', {
               count: stats.crossings30d,
+              defaultValue: "You'd have paused ~{{count}} times last month",
             })}
           </p>
           {stats.rawSignals30d > stats.crossings30d && (
             <p className="leading-snug text-sm font-sans text-muted-foreground">
-              {t('threshold.estimator.raw', '{{raw}} signals detected · {{filtered}} filtered by {{cooldown}}h cooldown', {
+              {t('threshold.estimator.raw', {
                 raw: stats.rawSignals30d,
                 filtered: stats.rawSignals30d - stats.crossings30d,
                 cooldown: cooldownHours ?? 24,
+                defaultValue:
+                  '{{raw}} signals detected · {{filtered}} filtered by {{cooldown}}h cooldown',
               })}
             </p>
           )}
           <p className="leading-snug text-sm font-sans text-muted-foreground">
-            {t('threshold.estimator.avg', 'avg daily move: {{avg}}%', {
+            {t('threshold.estimator.avg', {
               avg: stats.avgDailyMove.toFixed(1),
+              defaultValue: 'avg daily move: {{avg}}%',
             })}
           </p>
         </div>

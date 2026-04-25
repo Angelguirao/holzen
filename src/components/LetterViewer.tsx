@@ -211,8 +211,8 @@ export function LetterViewer({ letter, onClose }: Props) {
                     className="text-[10px] font-mono text-muted-foreground/50 uppercase tracking-[0.25em]"
                   >
                     {phase === 'seal'
-                      ? t('letter.aLetterFromYourPast', 'A letter from your past self')
-                      : t('letter.breakingSeal', 'Breaking the seal…')}
+                      ? t('letter.aLetterFromYourPast', { defaultValue: 'A letter from your past self' })
+                      : t('letter.breakingSeal', { defaultValue: 'Breaking the seal…' })}
                   </motion.p>
                 </motion.div>
               ) : (

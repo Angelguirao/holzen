@@ -24,15 +24,15 @@ function featureLabel(feature: LimitFeature): string {
   const t = i18n.t.bind(i18n);
   switch (feature) {
     case 'wallpaper':
-      return t('settings.allowanceWallpapers', 'Wallpapers');
+      return t('settings.allowanceWallpapers', { defaultValue: 'Wallpapers' });
     case 'insight':
-      return t('settings.allowanceInsights', 'Insights');
+      return t('settings.allowanceInsights', { defaultValue: 'Insights' });
     case 'free_pause':
-      return t('settings.allowanceFreePauses', 'Free pauses');
+      return t('settings.allowanceFreePauses', { defaultValue: 'Free pauses' });
     case 'regenerate':
     case 'companion':
     default:
-      return t('settings.allowanceCompanions', 'Companions & guidance');
+      return t('settings.allowanceCompanions', { defaultValue: 'Companions & guidance' });
   }
 }
 
@@ -58,13 +58,12 @@ export function showLimitReachedToast(opts: {
     });
 
   toast.message(
-    t('limits.reachedTitle', '{{feature}} limit reached', { feature: label }),
+    t('limits.reachedTitle', { feature: label, defaultValue: '{{feature}} limit reached' }),
     {
-      description: t(
-        'limits.reachedDesc',
-        'Top up with {{count}} flex credits to continue this month.',
-        { count: PRICING.flexPackSCredits },
-      ),
+      description: t('limits.reachedDesc', {
+        count: PRICING.flexPackSCredits,
+        defaultValue: 'Top up with {{count}} flex credits to continue this month.',
+      }),
       action: {
         label: action,
         onClick: () => {

@@ -38,7 +38,7 @@ export function PauseReadyBanner({ visible, onDismiss }: Props) {
               <span className="absolute -top-0.5 -right-0.5 h-1.5 w-1.5 rounded-full bg-primary animate-pulse" />
             </div>
             <span className="text-xs font-mono text-primary/80 tracking-wider truncate">
-              {t('home.pauseReady', 'A pause is ready for you')}
+              {t('home.pauseReady', { defaultValue: 'A pause is ready for you' })}
             </span>
           </button>
           <button
@@ -47,7 +47,7 @@ export function PauseReadyBanner({ visible, onDismiss }: Props) {
               onDismiss();
             }}
             className="flex-shrink-0 p-1 rounded-full text-primary/40 hover:text-primary/70 transition-colors"
-            aria-label={t('common.dismiss', 'Dismiss')}
+            aria-label={t('common.dismiss', { defaultValue: 'Dismiss' })}
           >
             <X className="h-3 w-3" />
           </button>
