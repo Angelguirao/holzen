@@ -57,10 +57,8 @@ const Unsubscribe = lazy(() => import("./pages/Unsubscribe"));
 const BillingHistory = lazy(() => import("./pages/BillingHistory"));
 const ToolsHub = lazy(() => import("./pages/ToolsHub"));
 const ToolsLetters = lazy(() => import("./pages/ToolsLetters"));
-const JourneyLettersRedirect = lazy(() => import("./pages/JourneyLettersRedirect"));
 const SettingsAbout = lazy(() => import("./pages/SettingsAbout"));
 const RoadmapStub = lazy(() => import("./pages/RoadmapStub"));
-const SettingsSectionRedirect = lazy(() => import("./pages/SettingsSectionRedirect"));
 
 const queryClient = createHolzenQueryClient();
 
@@ -177,9 +175,7 @@ const App = () => (
                   <Route path="/index" element={<Navigate to="/" replace />} />
                   <Route path="/library" element={<Library />} />
                   <Route path="/journey" element={<Navigate to="/journey/stats" replace />} />
-                  <Route path="/journey/letters" element={<JourneyLettersRedirect />} />
                   <Route path="/journey/:tab" element={<Profile />} />
-                  <Route path="/settings/section/:section" element={<SettingsSectionRedirect />} />
                   <Route path="/settings" element={<SettingsRoot />}>
                     <Route path="about" element={<SettingsAbout />} />
                     <Route path="billing-history" element={<BillingHistory />} />
@@ -210,7 +206,6 @@ const App = () => (
                   element={<ProtectedRoute><CompanionGroundingPage /></ProtectedRoute>}
                 />
                 <Route path="/tools/breathe" element={<ProtectedRoute><Breathe /></ProtectedRoute>} />
-                <Route path="/tools/ambient" element={<Navigate to="/tools/breathe" replace />} />
                 <Route path="/tools/ground" element={<ProtectedRoute><ToolsGroundLayout /></ProtectedRoute>}>
                   <Route index element={<Ground />} />
                   <Route path="history" element={<GroundHistory />} />

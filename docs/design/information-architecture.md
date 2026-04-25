@@ -26,13 +26,13 @@ Five bottom tabs, all wrapped in `AppLayout` (header + `Outlet` + bottom nav, ma
 | Settings | `/settings`     | **Hub** at `/settings` with links to per-section screens (`/settings/<section>`), plus `/settings/about` and `/settings/billing-history`; `useSettingsModel` only loads for hub and section routes.                                                                                               |
 
 
-**Letters (Pro):** canonical route `/tools/letters`. Optional query `?letter=<id>` scrolls to that delivered letter. Legacy `/journey/letters?...` redirects to `/tools/letters?...` (query preserved).
+**Letters (Pro):** canonical route `/tools/letters`. Optional query `?letter=<id>` scrolls to that delivered letter.
 
 Notification `action_path` for letter delivery uses `/tools/letters?letter=<id>` (see migrations `20260426010000_letters_tools_action_path.sql` and `20260425200000_journey_routes_notification_paths.sql`). The app does not register `/profile` or alternate pre-`/tools/`* path families.
 
 **Settings sub-routes (still in shell + bottom nav):** `/settings/billing-history`, `/settings/about` (changelog, version, feedback — split out so the main Settings page stays action-first).
 
-**In-app index for tools:** `/tools` lists letters, stillness, ground (journal is the second tab in that flow, not a separate hub row), and practice. Legacy `/tools/ambient` **redirects** to `/tools/breathe`. Home keeps only **Quick capture** as a minimal check-in entry; full tools are reached from the Tools tab.
+**In-app index for tools:** `/tools` lists letters, stillness, ground (journal is the second tab in that flow, not a separate hub row), and practice. Stillness is **`/tools/breathe`**. Home keeps only **Quick capture** as a minimal check-in entry; full tools are reached from the Tools tab.
 
 This matches the “skills-first” stats organization documented in `docs/decisions/2026-04-23-skills-first-stats-ia.md` and implemented in `StatsContentV2`.
 
@@ -45,7 +45,7 @@ This matches the “skills-first” stats organization documented in `docs/decis
 | ----------------- | --------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------- |
 | Pause session     | `/pause`                                                                                                              | Core guided pause flow.                            |
 | Companions        | `/companion/zoom-out/:pauseInstanceId`, `/companion/history/...`, `/companion/signal/...`, `/companion/grounding/...` | Deep-linked to a pause instance.                   |
-| Tools (full-screen) | `/tools/breathe`, `/tools/ground` (nested: index + `history` for the grounding journal; shared `ToolsGroundLayout` chrome), `/tools/practice/`*, legacy `/tools/ambient` → **redirect** to `/tools/breathe` | Regulation / grounding / practice — no bottom nav. |
+| Tools (full-screen) | `/tools/breathe`, `/tools/ground` (nested: index + `history` for the grounding journal; shared `ToolsGroundLayout` chrome), `/tools/practice/*` | Regulation / grounding / practice — no bottom nav. |
 
 
 **B. Same shell as primary tabs (not listed in §1.1 table)** — still `AppLayout` + bottom nav:
@@ -122,7 +122,7 @@ This section captures the **current state** and what we may reconsider next.
 
 ### 4.1 Unify modalities under one parent
 
-- **Shipped:** canonical `/tools/*` URL family for letters (future self), stillness, ground (with nested `history` for the grounding journal), practice; legacy `/tools/ambient` redirects to `/tools/breathe` (old Ambient page removed).
+- **Shipped:** canonical `/tools/*` URL family for letters (future self), stillness (`/tools/breathe`), ground (with nested `history` for the grounding journal), practice.
 - **Shipped:** no alternate short routes; external links/bookmarks should use `/tools/...`.
 - **Shipped:** information entry point via `/tools` (`ToolsHub`: **single** list — no “Journey vs immersive” split on that screen) plus Home links.
 - **Shipped:** **Tools** as a **primary bottom tab** (five tabs total) for `/tools` and `/tools/letters` (shell); other full-screen `/tools/...` routes hide the tab bar.
@@ -140,7 +140,7 @@ This section captures the **current state** and what we may reconsider next.
 ### 4.3 Path-addressable Journey
 
 - **Shipped:** `/journey/:tab` for stats/insights/badges/activity.
-- **Shipped:** letters at `/tools/letters` with optional `?letter=<id>` (delivered letter scroll / notification); legacy `/journey/letters` redirects.
+- **Shipped:** letters at `/tools/letters` with optional `?letter=<id>` (delivered letter scroll / notification).
 - **Shipped:** no `location.state` fallback for tab selection.
 
 ### 4.4 Clarify Library vs Activity
@@ -152,7 +152,7 @@ This section captures the **current state** and what we may reconsider next.
 
 - **Shipped:** task-oriented section groups (Account & profile, Pause behavior, App behavior, Content & data, Notifications & quiet hours, Subscription & Pro, Account & security).
 - **Shipped:** `/settings` as a **hub** (jump links; “About & feedback” card with “new” when an unseen changelog version exists); **`settingsSectionPath(id)`** in `app-routes.ts` → `/settings/<id>` for **dedicated section screens** (shared `useSettingsModel` + context). `/settings/about` and `/settings/billing-history` stay first-class routes **without** loading the heavy settings model.
-- **Shipped (compat):** legacy `/settings/section/<id>` redirects to `/settings/<id>`; on the hub, `#settings-section-<id>` replaces into `/settings/<id>`.
+- **Shipped:** on the hub, `#settings-section-<id>` replaces into `/settings/<id>` for deep links from in-page jump links.
 - **Further improvement:** optional polish (skeletons per section, focus/scroll), or a **layout pass** on section screen typography/spacing.
 
 ### 4.6 Admin IA
@@ -168,11 +168,11 @@ Use this as a **checklist** when planning research or another IA pass. Detailed 
 
 | Theme                    | Shipped guardrails                                                   | Alternatives / improvements to consider                                                                     |
 | ------------------------ | -------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------- |
-| **Tools & shell**        | Canonical `/tools/*`, single `ToolsHub` list, Ground session+journal in `ToolsGroundLayout`, `/tools/ambient` → breathe; `navigation.primary_tab_opened` | Reorder tabs; further merge practice routes if the list still feels long                                  |
+| **Tools & shell**        | Canonical `/tools/*`, single `ToolsHub` list, Ground session+journal in `ToolsGroundLayout`, stillness at `/tools/breathe`; `navigation.primary_tab_opened` | Reorder tabs; further merge practice routes if the list still feels long                                  |
 | **Journey vs “profile”** | `/journey/:tab`, skills-first stats; **Home** shows Journey pulse + quick capture | Heavier Home module or a **dedicated Stats tab** if interviews + metrics justify it                         |
 | **Journey scope**        | One hub: stats, insights, badges, activity; letters under Tools      | Further **split tabs or routes** if one area dominates support load (product call)                          |
 | **Library vs Activity**  | Copy + `HistoryCrossLinks`                                           | **Single screen** with `saved` / `timeline` modes if users still mix them up                                |
-| **Settings**             | Hub + `/settings/<section>` + `/settings/about` & `/settings/billing-history`; legacy `/settings/section/*` | Further **layout polish** on section pages if metrics still show users bail mid-task                          |
+| **Settings**             | Hub + `/settings/<section>` + `/settings/about` & `/settings/billing-history` | Further **layout polish** on section pages if metrics still show users bail mid-task                          |
 | **Admin**                | Isolated `/admin*` + in-page `AdminSubNav` between admin routes        | Deeper **grouping** or layout wrapper if more tools ship there                                              |
 | **Companions vs tools**  | `/companion/...` vs `/tools/...`                                     | Keep two families; only consolidate if a future design unifies “instance” vs “tool” mentally                |
 | **Research**             | PostHog tab events                                                   | Short **hallway tests** or interviews for naming, tab crowding, “where is my past?” — complements analytics |
@@ -207,12 +207,13 @@ Use this as a **checklist** when planning research or another IA pass. Detailed 
 | 2026-04-25 | —      | Updated to a “decision status + alternatives” format to capture current IA, reconsideration options, and further improvements.                                                              |
 | 2026-04-25 | —      | Acted on IA: Tools bottom tab; `/settings/about`; `HistoryCrossLinks` across Library / Journey Activity / Grounding history; `/roadmap` stub page.                                          |
 | 2026-04-26 | —      | Document **§1.7** nav analytics (`navigation.primary_tab_opened`); fix five-tab wording in **§2**; add **§4.7** consolidated alternatives; link event taxonomy; clarify doc vs app version. |
-| 2026-04-26 | —      | Letters moved to `/tools/letters` (not Journey); Home letter widget removed; DB notification paths + redirect from `/journey/letters`.                                                      |
+| 2026-04-26 | —      | Letters moved to `/tools/letters` (not Journey); Home letter widget removed; DB notification paths use `/tools/letters`.                                                      |
 | 2026-04-26 | —      | Doc cleanup: shell vs immersive `/tools/*`; `ToolsHub` journey block; Home `JourneyHomeCard`; Library activity tab; Settings jump nav; `AdminSubNav`.                                      |
 | 2026-04-26 | —      | **Code:** `usePauseStatsData` via TanStack Query; `useHoldGoalProfile`; Home `JourneyHomeCard` shows Holzen score + ring when ≥1 completed pause; `COMPANION_PREFIX` in `app-routes`.       |
-| 2026-04-27 | —      | Invalidate pause stats cache on pause `completed`; register global `QueryClient`; Settings hash + `/settings/section/:section`; `settingsSectionPath` in `app-routes`.                       |
-| 2026-04-28 | —      | **Settings:** true per-section routes (`/settings/<id>`), hub, `useSettingsModel` + provider layout; `settingsSectionPath` points at `/settings/<id>`; legacy path + hash compat.          |
-| 2026-04-28 | —      | **Tools:** unified `ToolsHub` list (no Journey/activity on hub); **Ground** `ToolsGroundLayout` with Session + Journal; remove Ambient page (redirect to Stillness); i18n “Stillness” no parenthetical. |
+| 2026-04-27 | —      | Invalidate pause stats cache on pause `completed`; register global `QueryClient`; Settings hash deep links; `settingsSectionPath` in `app-routes`.                       |
+| 2026-04-28 | —      | **Settings:** true per-section routes (`/settings/<id>`), hub, `useSettingsModel` + provider layout; `settingsSectionPath` points at `/settings/<id>`; hub hash → section route.          |
+| 2026-04-28 | —      | **Tools:** unified `ToolsHub` list (no Journey/activity on hub); **Ground** `ToolsGroundLayout` with Session + Journal; Ambient folded into Stillness at `/tools/breathe`; i18n “Stillness” no parenthetical. |
+| 2026-04-29 | —      | Removed legacy client URL aliases (`/journey/letters`, `/settings/section/*`, `/tools/ambient`); letter notifications and docs use **`/tools/letters`** only. |
 
 
 When routes, bottom-nav items, or nav-related analytics change, update **§1**, **§1.7**, **§4.1**, **§4.7**, **event-taxonomy.md** (if applicable), and a **Changelog** row in the same PR.
