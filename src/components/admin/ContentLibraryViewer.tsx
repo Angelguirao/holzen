@@ -80,8 +80,7 @@ export function ContentLibraryViewer({ entries, onRefresh }: { entries: LibraryE
   const deleteEntry = useCallback(async (id: string, title: string) => {
     if (!window.confirm(`Remove "${title}" from library?`)) return;
     setDeleting(id);
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any -- Supabase typed update payload
-    const { error } = await supabase.from('content_library').update({ active: false } as any).eq('id', id);
+    const { error } = await supabase.from('content_library').update({ active: false }).eq('id', id);
     setDeleting(null);
     if (error) { toast({ title: 'Remove entry failed', description: error.message, variant: 'destructive' }); return; }
     setSelectedIds((prev) => { const n = new Set(prev); n.delete(id); return n; });
@@ -96,8 +95,7 @@ export function ContentLibraryViewer({ entries, onRefresh }: { entries: LibraryE
     try {
       for (let i = 0; i < ids.length; i += UPDATE_CHUNK) {
         const slice = ids.slice(i, i + UPDATE_CHUNK);
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any -- Supabase typed update payload
-        const { error } = await supabase.from('content_library').update({ active: false } as any).in('id', slice);
+        const { error } = await supabase.from('content_library').update({ active: false }).in('id', slice);
         if (error) {
           toast({ title: 'Bulk deactivate failed', description: error.message, variant: 'destructive' });
           setBulkBusy(false);
@@ -237,8 +235,7 @@ export function ContentLibraryViewer({ entries, onRefresh }: { entries: LibraryE
     };
 
     setSaving(true);
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any -- Supabase typed insert payload
-    const { error } = await supabase.from('content_library').insert(payload as any);
+    const { error } = await supabase.from('content_library').insert(payload);
     setSaving(false);
     if (error) {
       toast({ title: 'Add library item failed', description: error.message, variant: 'destructive' });

@@ -39,8 +39,8 @@ describe('containsSlop', () => {
   });
 
   it('handles null/undefined gracefully', () => {
-    expect(containsSlop(null as any)).toBe(false);
-    expect(containsSlop(undefined as any)).toBe(false);
+    expect(containsSlop(null as unknown as string)).toBe(false);
+    expect(containsSlop(undefined as unknown as string)).toBe(false);
   });
 });
 
@@ -62,8 +62,8 @@ describe('containsCryptoLanguage', () => {
   });
 
   it('handles null/undefined', () => {
-    expect(containsCryptoLanguage(null as any)).toBe(false);
-    expect(containsCryptoLanguage(undefined as any)).toBe(false);
+    expect(containsCryptoLanguage(null as unknown as string)).toBe(false);
+    expect(containsCryptoLanguage(undefined as unknown as string)).toBe(false);
   });
 });
 

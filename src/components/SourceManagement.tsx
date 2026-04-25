@@ -84,7 +84,7 @@ export function SourceManagement() {
       const cat = catalog.find((s) => s.id === sourceId)?.category || activeTab;
       const { data } = await supabase
         .from('user_signal_preferences')
-        .insert({ user_id: user.id, source_id: sourceId, active: false, category: cat } as any)
+        .insert({ user_id: user.id, source_id: sourceId, active: false, category: cat })
         .select()
         .single();
       if (data) setPrefs((prev) => [...prev, data as unknown as UserPref]);
@@ -112,7 +112,7 @@ export function SourceManagement() {
         custom_type: customType,
         active: true,
         category: activeTab,
-      } as any)
+      })
       .select()
       .single();
     if (error) {
