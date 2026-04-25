@@ -14,12 +14,13 @@ The authoritative list of PostHog events Holzen emits. Deliberate events only �
 
 `<domain>.<action>` in lowercase snake-case. Past-tense verbs for completed actions, present-tense for initiations.
 
-- ✅ `reflection.completed`, `generation.initiated`, `paywall.viewed`
-- ❌ `reflectionDone`, `PaywallView`, `trackGeneration`
+- ✅ `pause.manual_completed`, `generation.initiated`, `paywall.viewed`
+- ❌ `reflectionCompleted`, `PaywallView`, `trackGeneration`
 
 ## Instrumentation status
 
-- **Wired (PostHog):** `auth.*`, `navigation.primary_tab_opened`, `reflection.started` / `reflection.completed` (home manual pause + holzen-reflect), `pause_instance_created` (manual new instance), `pause_engaged`, `pause_completed`, `pause_companion_counted` / `pause_companion_not_counted` (from `pause_log_step` / `pause_log_companion` RPCs), `generation.initiated`, `companion.served`, `paywall.viewed` (Pro toast + limit toast), `paywall.subscribed` ( checkout return; plan defaults to `monthly` until API exposes interval), `feedback.submitted` (after `send-feedback` success), `performance.web_vital`, `ritual.suggested` / `ritual.accepted` / `ritual.declined` (Ground), plus **companion idempotency diagnostics** below.
+- **Wired (PostHog):** `auth.*`, `navigation.primary_tab_opened`, `pause.manual_started` / `pause.manual_completed` (Home “Need a moment” + `holzen-reflect` + V2 instance — not pre–Pause-V2 “reflections”), `pause_instance_created` (manual new instance), `pause_engaged`, `pause_completed`, `pause_companion_counted` / `pause_companion_not_counted` (from `pause_log_step` / `pause_log_companion` RPCs), `generation.initiated`, `companion.served`, `paywall.viewed` (Pro toast + limit toast), `paywall.subscribed` (checkout return; plan defaults to `monthly` until API exposes interval), `feedback.submitted` (after `send-feedback` success), `performance.web_vital`, `ritual.suggested` / `ritual.accepted` / `ritual.declined` (Ground), plus **companion idempotency diagnostics** below.
+- **Deprecated (do not emit):** `reflection.started`, `reflection.completed` — legacy names from pre–Pause-V2 copy; use `pause.manual_*` for new data.
 - **Postgres (not PostHog):** PWA install prompts (`InstallHolzenCard` → `analytics_events`), edge `trackEvent` AI call counters, etc.
 - **Convention:** every new event adds a row below AND a `trackEvent` call in source — never define events only in the PostHog UI.
 
@@ -49,14 +50,16 @@ Does not fire when re-tapping the active tab or when navigation is not from the 
 | `auth.signed_in` | Every successful sign-in (not on session refresh) | `{ provider }` | @holzen |
 | `auth.signed_out` | Explicit sign-out action (not session expiry) | `{}` | @holzen |
 
-### reflection
+### pause — Home manual message (AI)
+
+Pause V2: user taps through Home to generate the pause message via `holzen-reflect` and persist it (silent or full). This replaces the old “reflections” product naming.
 
 | Event | When | Properties | Owner |
 |---|---|---|---|
-| `reflection.started` | User opens the reflection flow (first keystroke or first view of the input, once per session) | `{ source: 'home' \| 'pause' \| 'journal' }` | @holzen |
-| `reflection.completed` | User submits a reflection successfully | `{ duration_s: number; had_bitcoin_context: boolean; companion_types: string[] }` | @holzen |
+| `pause.manual_started` | User starts a manual home pause (first time per **browser tab** session) | `{ surface: 'home' }` | @holzen |
+| `pause.manual_completed` | `holzen-reflect` + library / artifacts succeeded for that run | `{ duration_s: number; had_bitcoin_context: boolean; companion_types: string[] }` — `companion_types` lists preview add-ons only, e.g. `haiku`, `grounding` (no user text) | @holzen |
 
-Note: never send the message text, prompt text, or companion content.
+Note: never send the AI message text, prompt text, or full companion bodies.
 
 ### pause (V2 lifecycle)
 
@@ -71,7 +74,7 @@ Include `pause_instance_id` on each event so journeys line up with Sentry + Bett
 | `pause_companion_counted` | Companion complete event with `counts_for_pause=true`. | `{ pause_instance_id; companion_type; entry_point: 'pause_flow' \| 'library' \| 'bell' \| 'admin_preview' }` | @holzen |
 | `pause_companion_not_counted` | Companion complete event with `counts_for_pause=false`. | `{ pause_instance_id?: string; companion_type; reason: 'no_active_pause' \| 'outside_window' \| 'context_lost' \| 'not_allowed_for_template' \| 'already_counted'; entry_point }` | @holzen |
 
-PII stance unchanged: no reflection text, no companion content, no mood/outcome payload values — just ids, types, and numeric metadata.
+PII stance unchanged: no generated pause message text, no companion content, no mood/outcome payload values — just ids, types, and numeric metadata.
 
 ### generation
 

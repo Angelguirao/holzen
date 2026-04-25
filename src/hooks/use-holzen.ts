@@ -18,13 +18,14 @@ import {
 import { loadReflectRecencyHints } from '@/lib/load-reflect-recency-hints';
 import { trackEvent } from '@/lib/posthog';
 
-const REFLECT_START_HOME = 'holzen_sess_reflection_started_home';
+const PAUSE_MANUAL_START_HOME = 'holzen_sess_pause_manual_started_home';
 
-function markReflectionStartedHomeOnce(): void {
+/** Once per tab session: user kicked off a manual “Need a moment” / holzen-reflect flow from Home. */
+function markPauseManualStartedHomeOnce(): void {
   try {
-    if (sessionStorage.getItem(REFLECT_START_HOME)) return;
-    sessionStorage.setItem(REFLECT_START_HOME, '1');
-    trackEvent('reflection.started', { source: 'home' });
+    if (sessionStorage.getItem(PAUSE_MANUAL_START_HOME)) return;
+    sessionStorage.setItem(PAUSE_MANUAL_START_HOME, '1');
+    trackEvent('pause.manual_started', { surface: 'home' });
   } catch {
     /* sessionStorage */
   }
@@ -133,7 +134,7 @@ export function useHolzen() {
         holzenLog.manual('generateMessage: skipped (no user)');
         return;
       }
-      markReflectionStartedHomeOnce();
+      markPauseManualStartedHomeOnce();
       const t0 = Date.now();
       holzenLog.manual('generateMessage: start', {
         btcChangePct: data.changePercent,
@@ -212,7 +213,7 @@ export function useHolzen() {
           );
           setLastTriggerAt(new Date().toISOString());
           try {
-            trackEvent('reflection.completed', {
+            trackEvent('pause.manual_completed', {
               duration_s: Math.round((Date.now() - t0) / 1000),
               had_bitcoin_context: Boolean(ctx),
               companion_types: [],
@@ -361,7 +362,7 @@ export function useHolzen() {
 
         setLastTriggerAt(new Date().toISOString());
         try {
-          trackEvent('reflection.completed', {
+          trackEvent('pause.manual_completed', {
             duration_s: Math.round((Date.now() - t0) / 1000),
             had_bitcoin_context: Boolean(ctx),
             companion_types: previewCompanionTypeTags(companionData),

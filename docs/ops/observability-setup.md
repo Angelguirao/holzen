@@ -125,8 +125,8 @@ Do **not** create events in the PostHog UI. Events are emitted from the app per 
 
 ### 3.3 First insights (optional; nice-to-have)
 
-- Funnel: `auth.signed_up` → `reflection.completed` → `paywall.subscribed`
-- Trend: `reflection.completed` count by day, breakdown by `had_bitcoin_context`
+- Funnel: `auth.signed_up` → `pause.manual_completed` → `paywall.subscribed`
+- Trend: `pause.manual_completed` count by day, breakdown by `had_bitcoin_context`
 - Retention: `auth.signed_in` cohort weekly
 
 ## 4. BetterStack (Logtail)
