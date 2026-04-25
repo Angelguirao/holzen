@@ -8,16 +8,18 @@ import { Button } from "@/components/ui/button";
 import { ShieldCheck, ShieldAlert, Search, FileWarning, HeartPulse } from "lucide-react";
 
 // Static manifest of edge-function error-reporting coverage.
-// Generated from `supabase/functions/*/index.ts` source by scanning for:
+// Curated from `supabase/functions/*/index.ts` by scanning for:
 //   - withRequestLogging  → request/response + Sentry capture in catch
 //   - EdgeError           → standardized errors that beforeSend() can filter
 //   - createLogger        → structured BetterStack logs (.error path forwards to Sentry)
 //   - logAudit            → security-sensitive ops written to audit_log
 //
-// Regenerate with: scripts/scan-edge-coverage.sh (see SentryAlerts runbook)
+// **Names** must match every `[functions.<name>]` in `supabase/config.toml`.
+// Validate with: `npm run check:edge-coverage-manifest`
 type Row = { name: string; wrl: boolean; edgeError: boolean; logger: boolean; audit: boolean };
 
 const COVERAGE: Row[] = [
+  { name: "admin-check-stripe-prices", wrl: true, edgeError: false, logger: false, audit: false },
   { name: "admin-library-preview", wrl: true, edgeError: false, logger: true, audit: false },
   { name: "ai-cost-alert", wrl: true, edgeError: false, logger: false, audit: false },
   { name: "auth-email-hook", wrl: true, edgeError: false, logger: false, audit: false },

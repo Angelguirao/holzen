@@ -15,6 +15,7 @@ Run and address failures before push:
 - `npm run build`
 - `npm run lint` on touched files (whole-repo lint has known noise)
 - `npm run check:edge` when Deno is available (edge TS changes)
+- `npm run check:edge-coverage-manifest` when adding/removing `supabase/functions/*` or editing `[functions.*]` / `EdgeCoverage.tsx`
 
 ## Always remember
 

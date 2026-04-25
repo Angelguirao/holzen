@@ -93,6 +93,7 @@ Frontend is safe — it only goes live when you click **Publish → Update** in 
 □ Production build succeeds                 npm run build
 □ Lint is clean on changed files            npm run lint
 □ Edge functions type-check                 npm run check:edge
+□ EdgeCoverage manifest matches config      npm run check:edge-coverage-manifest
 □ New migrations tested locally             npm run supabase:reset
 □ New edge functions have config.toml entry
 □ New secrets documented / already added
@@ -138,6 +139,8 @@ Some Edge functions assume columns already exist — e.g. **`fetch-source-feeds`
 3. **Optional Edge secrets** (no deploy blocker if unset): `FETCH_FEEDS_MAX_SOURCES`, `FETCH_FEEDS_MAX_ARTICLES_PER_SOURCE`, `FETCH_FEEDS_ARTICLE_DELAY_MS` — defaults apply; add in **Cloud → Secrets** only for launch backfills.
 
 **`npm run check:edge`:** Runs `scripts/check-edge.mjs` (`deno check` on every `supabase/functions/*/index.ts` except `_shared`). It resolves the Deno binary from PATH, then `DENO_INSTALL/bin`, then `~/.deno/bin` (official installer default). Uses `--no-lock` so it does not write a root `deno.lock`. If Deno is missing entirely, the script exits 0 with a skip message.
+
+**`npm run check:edge-coverage-manifest`:** Runs `scripts/verify-edge-coverage-manifest.mjs` — every `[functions.<name>]` in `supabase/config.toml` must appear in `src/pages/EdgeCoverage.tsx` `COVERAGE` (and extras are forbidden). CI runs this via `npm run test:ci`. Update the `COVERAGE` row flags when you change observability patterns in a function's `index.ts`.
 
 ## Troubleshooting
 
