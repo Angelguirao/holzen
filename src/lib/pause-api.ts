@@ -6,11 +6,10 @@
  * `pause_companion_events` are rejected by RLS — the RPCs are the only
  * front door.
  *
- * Note on typing: the generated `types.ts` does not know about these
- * functions until the next regeneration after Phase A + B land. Until then
- * we cast the RPC name with `as any`, matching the pattern already used by
- * `use-admin-stats.ts` for `get_admin_stats`. Arguments and return values
- * are still strongly typed at the call-site boundary.
+ * Note on typing: the generated `types.ts` may not list these RPCs until
+ * `npm run gen:types` is re-run. Until then we cast the function name with
+ * `as never` (same pattern as admin-only RPCs). Arguments and return values
+ * stay typed at this module boundary.
  *
  * See: `supabase/migrations/20260423201000_pause_rpc_functions.sql`,
  *      `docs/systems/pause-system.md`.
@@ -38,15 +37,13 @@ export async function pauseCreateOrReuse(params: {
   contextRuleResult: Record<string, unknown>;
   contextFingerprint: string;
 }): Promise<PauseCreateOrReuseResult> {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const { data, error } = await supabase.rpc('pause_create_or_reuse' as any, {
+  const { data, error } = await supabase.rpc('pause_create_or_reuse' as never, {
     p_template_slug: params.templateSlug,
     p_source: params.source,
     p_context_snapshot: params.contextSnapshot,
     p_context_rule_result: params.contextRuleResult,
     p_context_fingerprint: params.contextFingerprint,
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  } as any);
+  } as never);
   if (error) throw error;
   return (data ?? { instance_id: null, created: false, reused_reason: null }) as PauseCreateOrReuseResult;
 }
@@ -56,13 +53,11 @@ export async function pauseLogStep(params: {
   stepType: PauseStepType;
   payload?: Record<string, unknown>;
 }): Promise<PauseState | null> {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const { data, error } = await supabase.rpc('pause_log_step' as any, {
+  const { data, error } = await supabase.rpc('pause_log_step' as never, {
     p_instance_id: params.instanceId,
     p_step_type: params.stepType,
     p_payload: params.payload ?? {},
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  } as any);
+  } as never);
   if (error) throw error;
   return (data as PauseState | null) ?? null;
 }
@@ -79,14 +74,12 @@ export async function pauseLogCompanion(params: {
   action: PauseCompanionAction;
   entryPoint: string;
 }): Promise<PauseLogCompanionResult> {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const { data, error } = await supabase.rpc('pause_log_companion' as any, {
+  const { data, error } = await supabase.rpc('pause_log_companion' as never, {
     p_instance_id: params.instanceId,
     p_companion_type: params.companionType,
     p_action: params.action,
     p_entry_point: params.entryPoint,
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  } as any);
+  } as never);
   if (error) throw error;
   return (data ?? {
     counts_for_pause: false,
@@ -96,8 +89,7 @@ export async function pauseLogCompanion(params: {
 }
 
 export async function pauseDismissCurrent(): Promise<PauseState | null> {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const { data, error } = await supabase.rpc('pause_dismiss_current' as any);
+  const { data, error } = await supabase.rpc('pause_dismiss_current' as never);
   if (error) throw error;
   return (data as PauseState | null) ?? null;
 }

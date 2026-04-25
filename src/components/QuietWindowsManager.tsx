@@ -1,5 +1,8 @@
 import { useState, useEffect, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
+import type { Database } from '@/integrations/supabase/types';
+
+type QuietWindowUpdate = Database['public']['Tables']['quiet_windows']['Update'];
 import { useTranslation } from 'react-i18next';
 import { Switch } from '@/components/ui/switch';
 import { Button } from '@/components/ui/button';
@@ -29,7 +32,7 @@ export function QuietWindowsManager({ userId }: { userId?: string }) {
       .select('*')
       .eq('user_id', userId)
       .order('created_at');
-    if (data) setWindows(data as any);
+    if (data) setWindows(data as QuietWindow[]);
   }, [userId]);
 
   useEffect(() => { load(); }, [load]);
@@ -43,7 +46,7 @@ export function QuietWindowsManager({ userId }: { userId?: string }) {
       end_hour: 17,
       days: [1, 2, 3, 4, 5],
       active: true,
-    } as any);
+    });
     if (!error) {
       await load();
       toast(t('quietWindows.added', 'Quiet window added'));
@@ -51,7 +54,7 @@ export function QuietWindowsManager({ userId }: { userId?: string }) {
   };
 
   const updateWindow = async (id: string, updates: Partial<QuietWindow>) => {
-    await supabase.from('quiet_windows').update(updates as any).eq('id', id);
+    await supabase.from('quiet_windows').update(updates as QuietWindowUpdate).eq('id', id);
     setWindows((prev) => prev.map((w) => (w.id === id ? { ...w, ...updates } : w)));
   };
 

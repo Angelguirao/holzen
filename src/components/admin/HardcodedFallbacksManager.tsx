@@ -1,6 +1,7 @@
 import { useState, useCallback, useEffect, useMemo } from 'react';
 import { ChevronDown, ChevronRight, Pencil, Trash2, Loader2, Plus, ArrowUp, ArrowDown, Eye, EyeOff } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
+import type { Json } from '@/integrations/supabase/types';
 import { useToast } from '@/hooks/use-toast';
 const POOL_LABELS: Record<FallbackPoolType, string> = {
   signal: 'Signal',
@@ -59,7 +60,7 @@ export function HardcodedFallbacksManager({ onRefresh }: { onRefresh?: () => voi
 
   const fetchRows = useCallback(async () => {
     setLoading(true);
-    const { data, error } = await (supabase as any)
+    const { data, error } = await supabase
       .from('companion_fallbacks')
       .select('id, pool_type, sort_order, payload, is_active, created_at, updated_at')
       .order('pool_type', { ascending: true })
@@ -86,9 +87,9 @@ export function HardcodedFallbacksManager({ onRefresh }: { onRefresh?: () => voi
 
   const savePayload = async (row: CompanionFallbackRow, payload: Record<string, unknown>) => {
     setActing(row.id);
-    const { error } = await (supabase as any)
+    const { error } = await supabase
       .from('companion_fallbacks')
-      .update({ payload: payload as any, updated_at: new Date().toISOString() })
+      .update({ payload: payload as Json, updated_at: new Date().toISOString() })
       .eq('id', row.id);
     setActing(null);
     if (error) {
@@ -102,7 +103,7 @@ export function HardcodedFallbacksManager({ onRefresh }: { onRefresh?: () => voi
 
   const toggleActive = async (row: CompanionFallbackRow) => {
     setActing(row.id);
-    const { error } = await (supabase as any)
+    const { error } = await supabase
       .from('companion_fallbacks')
       .update({ is_active: !row.is_active, updated_at: new Date().toISOString() })
       .eq('id', row.id);
@@ -118,7 +119,7 @@ export function HardcodedFallbacksManager({ onRefresh }: { onRefresh?: () => voi
   const remove = async (row: CompanionFallbackRow) => {
     if (!window.confirm('Delete this fallback entry? Generation will use bundled file seed if the pool becomes empty.')) return;
     setActing(row.id);
-    const { error } = await (supabase as any).from('companion_fallbacks').delete().eq('id', row.id);
+    const { error } = await supabase.from('companion_fallbacks').delete().eq('id', row.id);
     setActing(null);
     if (error) {
       toast({ title: 'Delete failed', description: error.message, variant: 'destructive' });
@@ -136,8 +137,8 @@ export function HardcodedFallbacksManager({ onRefresh }: { onRefresh?: () => voi
     const a = list[index];
     const b = list[j];
     setActing('reorder');
-    const { error: e1 } = await (supabase as any).from('companion_fallbacks').update({ sort_order: b.sort_order }).eq('id', a.id);
-    const { error: e2 } = await (supabase as any).from('companion_fallbacks').update({ sort_order: a.sort_order }).eq('id', b.id);
+    const { error: e1 } = await supabase.from('companion_fallbacks').update({ sort_order: b.sort_order }).eq('id', a.id);
+    const { error: e2 } = await supabase.from('companion_fallbacks').update({ sort_order: a.sort_order }).eq('id', b.id);
     setActing(null);
     if (e1 || e2) {
       toast({ title: 'Reorder failed', description: (e1 ?? e2)?.message ?? 'Unknown', variant: 'destructive' });
@@ -158,12 +159,12 @@ export function HardcodedFallbacksManager({ onRefresh }: { onRefresh?: () => voi
       reflection: { message: '', haiku: '' },
     };
     setActing('new');
-    const { error } = await (supabase as any).from('companion_fallbacks').insert({
+    const { error } = await supabase.from('companion_fallbacks').insert({
       pool_type: pool,
       sort_order: nextOrder,
-      payload: templates[pool],
+      payload: templates[pool] as Json,
       is_active: true,
-    } as any);
+    });
     setActing(null);
     if (error) {
       toast({ title: 'Add failed', description: error.message, variant: 'destructive' });
