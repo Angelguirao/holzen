@@ -17,8 +17,8 @@ This folder contains human-readable notes that complement the source code and in
 |---------------------|---------------------|--------|
 | Commands, env vars, “where to edit” table | [AGENTS.md](../AGENTS.md) | Keep tables here; link out for narratives. |
 | Boot sequence, repo tour, Lovable vs local | [fundamentals/navigating-the-codebase.md](fundamentals/navigating-the-codebase.md) | Do not duplicate long boot narratives in AGENTS. |
-| Pause lifecycle (instances, events, artifacts) | [systems/pause-system.md](systems/pause-system.md) | Post-Pause-V2 canonical doc. |
-| Pause pipeline (legacy, pre‑V2) | [systems/pause/ai-powered-pause-system.md](systems/pause/ai-powered-pause-system.md) | Historical only; see pause-system.md for current model. |
+| Pause lifecycle (instances, events, artifacts, state machine) | [systems/pause-system.md](systems/pause-system.md) | Canonical **data model** and invariants (Pause V2). |
+| Pause AI pipeline (triggers, edge functions, generators, storage, hooks) | [systems/pause/ai-powered-pause-system.md](systems/pause/ai-powered-pause-system.md) | **Current** Pause V2 pipeline narrative; complements `pause-system.md` (starts with a V2 banner — not a pre‑V2 archive). |
 | How a subsystem behaves (contracts, flows) | [systems/](systems/) | One primary doc per concern; cross-link related systems. |
 | Irreversible or costly-to-reverse choices | [decisions/](decisions/) | Short ADR-style notes; see [decisions/README.md](decisions/README.md). |
 | Incidents, invariants, “why we hardened X” | [postmortems/](postmortems/) | |
@@ -87,7 +87,7 @@ When you change behavior, update the **one** doc that owns that slice (and ADRs 
 - `systems/auth/auth-and-referral-system.md` — Auth system (Supabase) + optional referral side-effect
 - `systems/routing/route-gating-system.md` — protected vs public-only vs ungated routes; `ProtectedRoute` / `PublicOnlyRoute` contracts
 - `systems/pause-system.md` — end-to-end architecture of the Pause V2 lifecycle (instances, events, artifacts, stats, badges).
-- `systems/pause/ai-powered-pause-system.md` — **legacy (pre‑V2)** manual vs automatic pause pipeline; kept for historical reference only.
+- `systems/pause/ai-powered-pause-system.md` — Pause V2 **AI and edge** pipeline (triggers, `holzen-reflect`, `companion-orchestrate`, generators, cron); narrative companion to `pause-system.md`.
 - `systems/costs/ai-cost-model.md` — **canonical** cost + guardrail reference. All AI-powered edge functions, cost ceilings, panic mode, feature flags, scenario modeling, runbooks, auto-top-up.
 - `systems/pause/pause-session-cost-estimates.md` — pause-flow case study. Defer to `systems/costs/ai-cost-model.md` for anything cross-feature.
 - `systems/pause/companions/` — deep dives per companion type (see [companions/signal.md](systems/pause/companions/signal.md) for Signal).
