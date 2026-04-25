@@ -1,3 +1,4 @@
+/// <reference path="./deno-shim.d.ts" />
 /**
  * Shared dedup helpers for content_library inserts and companion_cache pregeneration.
  * Keep normalization aligned with DB generated columns where applicable.
