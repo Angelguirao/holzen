@@ -1,5 +1,9 @@
 import type { EchoUserWord, ZoomOutData, ZoomOutEchoData } from '@/components/ZoomOutDisplay';
 
+/** Default short label + placeholder body (library autosave, list preview). */
+const ZOOM_OUT_DEFAULT_LABEL = 'Zoom Out';
+const ZOOM_OUT_DEFAULT_BODY_PLACEHOLDER = 'Zoom Out perspective';
+
 function parseEchoUserWords(raw: unknown): EchoUserWord[] | undefined {
   if (!Array.isArray(raw)) return undefined;
   const out: EchoUserWord[] = [];
@@ -81,7 +85,7 @@ export function zoomOutBodyPreviewFromJsonString(raw: string): string | null {
   try {
     const d = toZoomOutDisplayData(JSON.parse(raw));
     const line = d.deepTime?.body || d.echo?.message || d.deepTime?.title;
-    return line || 'Zoom Out';
+    return line || ZOOM_OUT_DEFAULT_LABEL;
   } catch {
     return null;
   }
@@ -90,8 +94,8 @@ export function zoomOutBodyPreviewFromJsonString(raw: string): string | null {
 /** Title + body for companion library autosave (orchestrate commit + artifact cache hydrate). */
 export function zoomOutLibraryAutosaveFromDisplayData(d: ZoomOutData): { title: string; body: string } {
   return {
-    title: d.deepTime?.title || 'Zoom Out',
-    body: d.deepTime?.body || d.echo?.message || 'Zoom Out perspective',
+    title: d.deepTime?.title || ZOOM_OUT_DEFAULT_LABEL,
+    body: d.deepTime?.body || d.echo?.message || ZOOM_OUT_DEFAULT_BODY_PLACEHOLDER,
   };
 }
 
