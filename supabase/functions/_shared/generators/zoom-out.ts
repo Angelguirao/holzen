@@ -458,7 +458,12 @@ FORMAT: JSON with "title" (3-8 word evocative phrase) and "body" (1-2 poetic but
       return { deepTime: null, source: "empty", error: COMPANION_FALLBACKS_DISABLED_MESSAGE };
     }
     const marketDirection = parseMarketDirection(context);
-    const cached = await serveFromCache(svcClient, COMPANION_ZOOM_OUT_DEEP_TIME, "en", { userId, marketDirection, promptVersion: PROMPT_VERSION });
+    const cached = await serveFromCache(svcClient, COMPANION_ZOOM_OUT_DEEP_TIME, "en", {
+      userId,
+      marketDirection,
+      promptVersion: PROMPT_VERSION,
+      structuredLog: log,
+    });
     if (cached) {
       return {
         deepTime: cached.data as { title: string; body: string },
@@ -485,7 +490,13 @@ export async function generateZoomOut(params: GenerateZoomOutParams): Promise<Zo
   // ── Phase 2: Cache (no library type for zoom-out; strict — fall through to live if no fresh row) ──
   if (phases.cache && !forceLive) {
     const marketDirection = parseMarketDirection(context);
-    const cached = await serveFromCache(svcClient, COMPANION_ZOOM_OUT_DEEP_TIME, "en", { userId, marketDirection, strict: true, promptVersion: PROMPT_VERSION });
+    const cached = await serveFromCache(svcClient, COMPANION_ZOOM_OUT_DEEP_TIME, "en", {
+      userId,
+      marketDirection,
+      strict: true,
+      promptVersion: PROMPT_VERSION,
+      structuredLog: log,
+    });
     if (cached) {
       log("zoomOut resolved from cache (phase 2)");
       const prices = await fetchHistoricalAndCurrentPrices(svcClient, context, log);

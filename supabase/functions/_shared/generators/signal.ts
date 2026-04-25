@@ -199,8 +199,15 @@ async function tryCache(
   marketDirection?: "up" | "down" | "neutral",
   excludeIds?: string[],
   strict = false,
+  structuredLog?: GenerateSignalParams["log"],
 ): Promise<SignalResult | null> {
-  const cached = await serveFromCache(svcClient, "signal", "en", { userId, marketDirection, excludeIds, strict });
+  const cached = await serveFromCache(svcClient, "signal", "en", {
+    userId,
+    marketDirection,
+    excludeIds,
+    strict,
+    structuredLog,
+  });
   if (cached) {
     return {
       data: cached.data,
@@ -224,6 +231,7 @@ async function serveFallback(
   userId?: string,
   marketDirection?: "up" | "down" | "neutral",
   excludeIds?: string[],
+  structuredLog?: GenerateSignalParams["log"],
 ): Promise<SignalResult> {
   if (companionFallbacksDisabled()) {
     return { data: null, source: "empty", cacheId: null, error: COMPANION_FALLBACKS_DISABLED_MESSAGE };
@@ -234,7 +242,7 @@ async function serveFallback(
     if (lib) return lib;
   }
   if (phases.cache) {
-    const cached = await tryCache(svcClient, userId, marketDirection, excludeIds);
+    const cached = await tryCache(svcClient, userId, marketDirection, excludeIds, false, structuredLog);
     if (cached) return cached;
   }
   return serveCurated(svcClient);
@@ -291,7 +299,7 @@ export async function generateSignal(params: GenerateSignalParams): Promise<Sign
 
   // ── Phase 2: Cache (strict — no pass-3 repeats; fall through to live if strict pool empty) ──
   if (phases.cache) {
-    const cached = await tryCache(svcClient, userId, marketDirection, undefined, true);
+    const cached = await tryCache(svcClient, userId, marketDirection, undefined, true, log);
     if (cached) {
       log("signal resolved from cache (phase 2)");
       return cached;
@@ -320,7 +328,7 @@ export async function generateSignal(params: GenerateSignalParams): Promise<Sign
   const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
   if (!PERPLEXITY_API_KEY || !LOVABLE_API_KEY) {
     log("missing API keys, serving fallback");
-    return serveFallback(svcClient, userId, marketDirection);
+    return serveFallback(svcClient, userId, marketDirection, undefined, log);
   }
 
   const trimmedSearchAngle = searchAngle?.trim();
@@ -453,7 +461,7 @@ export async function generateSignal(params: GenerateSignalParams): Promise<Sign
       error_message: String(e),
       api_requests: 1,
     });
-    return serveFallback(svcClient, userId, marketDirection);
+    return serveFallback(svcClient, userId, marketDirection, undefined, log);
   }
 
   citations = preferNonYoutubeCitationsFirst(citations);
@@ -470,7 +478,7 @@ export async function generateSignal(params: GenerateSignalParams): Promise<Sign
       output_tokens: perplexityMerged?.completion_tokens,
       api_requests: perplexityApiCalls || 1,
     });
-    return serveFallback(svcClient, userId, marketDirection);
+    return serveFallback(svcClient, userId, marketDirection, undefined, log);
   }
 
   logAttempt({
@@ -497,7 +505,7 @@ export async function generateSignal(params: GenerateSignalParams): Promise<Sign
       output_tokens: perplexityMerged?.completion_tokens,
       api_requests: perplexityApiCalls,
     });
-    return serveFallback(svcClient, userId, marketDirection);
+    return serveFallback(svcClient, userId, marketDirection, undefined, log);
   }
 
   // ── Step 2: AI structuring ──
@@ -644,7 +652,7 @@ URL RULES (CRITICAL):
         quality_gate_reason: qg.reason ?? "unknown",
       });
     }
-    return serveFallback(svcClient, userId, marketDirection);
+    return serveFallback(svcClient, userId, marketDirection, undefined, log);
   }
 
   // ── Step 4: URL post-processing ──

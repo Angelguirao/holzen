@@ -157,8 +157,15 @@ async function tryCache(
   marketDirection?: "up" | "down" | "neutral",
   excludeIds?: string[],
   strict = false,
+  structuredLog?: GenerateGroundingParams["log"],
 ): Promise<GroundingResult | null> {
-  const cached = await serveFromCache(svcClient, "ground_nudge", "en", { userId, marketDirection, excludeIds, strict });
+  const cached = await serveFromCache(svcClient, "ground_nudge", "en", {
+    userId,
+    marketDirection,
+    excludeIds,
+    strict,
+    structuredLog,
+  });
   if (cached) {
     return {
       data: cached.data,
@@ -182,6 +189,7 @@ async function serveFallback(
   userId?: string,
   marketDirection?: "up" | "down" | "neutral",
   excludeIds?: string[],
+  structuredLog?: GenerateGroundingParams["log"],
 ): Promise<GroundingResult> {
   if (companionFallbacksDisabled()) {
     return { data: null, source: "empty", cacheId: null, error: COMPANION_FALLBACKS_DISABLED_MESSAGE };
@@ -192,7 +200,7 @@ async function serveFallback(
     if (lib) return lib;
   }
   if (phases.cache) {
-    const cached = await tryCache(svcClient, userId, marketDirection, excludeIds);
+    const cached = await tryCache(svcClient, userId, marketDirection, excludeIds, false, structuredLog);
     if (cached) return cached;
   }
   return serveCurated(svcClient);
@@ -231,7 +239,7 @@ export async function generateGrounding(params: GenerateGroundingParams): Promis
 
   // ── Phase 2: Cache (strict — no pass-3 repeats; fall through to live if strict pool empty) ──
   if (phases.cache) {
-    const cached = await tryCache(svcClient, userId, marketDirectionForCache, undefined, true);
+    const cached = await tryCache(svcClient, userId, marketDirectionForCache, undefined, true, log);
     if (cached) {
       log("grounding resolved from cache (phase 2)");
       return cached;
@@ -258,7 +266,7 @@ export async function generateGrounding(params: GenerateGroundingParams): Promis
   const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
   if (!PERPLEXITY_API_KEY || !LOVABLE_API_KEY) {
     log("missing API keys, serving fallback");
-    return serveFallback(svcClient, userId, marketDirectionForCache);
+    return serveFallback(svcClient, userId, marketDirectionForCache, undefined, log);
   }
 
   // ── Bias topic selection, matching market direction and avoiding recently used ones ──
@@ -363,7 +371,7 @@ DIVERSITY: Use a different journal/venue angle when possible. Do not recycle the
       error_message: String(e),
       api_requests: 1,
     });
-    return serveFallback(svcClient, userId, marketDirectionForCache);
+    return serveFallback(svcClient, userId, marketDirectionForCache, undefined, log);
   }
 
   if (!searchContent) {
@@ -378,7 +386,7 @@ DIVERSITY: Use a different journal/venue angle when possible. Do not recycle the
       output_tokens: perplexityMerged?.completion_tokens,
       api_requests: perplexityApiCalls || 1,
     });
-    return serveFallback(svcClient, userId, marketDirectionForCache);
+    return serveFallback(svcClient, userId, marketDirectionForCache, undefined, log);
   }
 
   logAttempt({
@@ -524,7 +532,7 @@ BANNED PHRASES — NEVER use any of these: dive into, game-changer, paradigm shi
         quality_gate_reason: qg.reason ?? "unknown",
       });
     }
-    return serveFallback(svcClient, userId, marketDirectionForCache);
+    return serveFallback(svcClient, userId, marketDirectionForCache, undefined, log);
   }
 
   // ── Step 4: URL post-processing ──

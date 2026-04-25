@@ -98,8 +98,16 @@ async function tryCache(
   marketDirection?: "up" | "down" | "neutral",
   excludeIds?: string[],
   strict = false,
+  structuredLog?: GenerateHistoryParams["log"],
 ): Promise<HistoryResult | null> {
-  const cached = await serveFromCache(svcClient, "historical_insight", "en", { userId, marketDirection, excludeIds, strict, promptVersion: PROMPT_VERSION });
+  const cached = await serveFromCache(svcClient, "historical_insight", "en", {
+    userId,
+    marketDirection,
+    excludeIds,
+    strict,
+    promptVersion: PROMPT_VERSION,
+    structuredLog,
+  });
   if (cached) {
     return {
       data: cached.data,
@@ -124,6 +132,7 @@ async function serveFallback(
   marketDirection?: "up" | "down" | "neutral",
   excludeIds?: string[],
   moodTag?: string,
+  structuredLog?: GenerateHistoryParams["log"],
 ): Promise<HistoryResult> {
   if (companionFallbacksDisabled()) {
     return { data: null, source: "empty", cacheId: null, error: COMPANION_FALLBACKS_DISABLED_MESSAGE };
@@ -134,7 +143,7 @@ async function serveFallback(
     if (lib) return lib;
   }
   if (phases.cache) {
-    const cached = await tryCache(svcClient, userId, marketDirection, excludeIds);
+    const cached = await tryCache(svcClient, userId, marketDirection, excludeIds, false, structuredLog);
     if (cached) return cached;
   }
   return serveCurated(svcClient);
@@ -168,7 +177,7 @@ export async function generateHistory(params: GenerateHistoryParams): Promise<Hi
 
   // ── Phase 2: Cache (strict — no pass-3 repeats; fall through to live if strict pool empty) ──
   if (phases.cache) {
-    const cached = await tryCache(svcClient, userId, marketDirection, undefined, true);
+    const cached = await tryCache(svcClient, userId, marketDirection, undefined, true, log);
     if (cached) {
       log("history resolved from cache (phase 2)");
       return cached;
@@ -195,7 +204,7 @@ export async function generateHistory(params: GenerateHistoryParams): Promise<Hi
   const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
   if (!PERPLEXITY_API_KEY || !LOVABLE_API_KEY) {
     log("missing API keys, serving fallback");
-    return serveFallback(svcClient, userId, marketDirection);
+    return serveFallback(svcClient, userId, marketDirection, undefined, undefined, log);
   }
 
   const marketContext = context || "Bitcoin market movement";
@@ -241,7 +250,7 @@ export async function generateHistory(params: GenerateHistoryParams): Promise<Hi
       error_message: String(e),
       api_requests: 1,
     });
-    return serveFallback(svcClient, userId, marketDirection, undefined, historyMoodTag);
+    return serveFallback(svcClient, userId, marketDirection, undefined, historyMoodTag, log);
   }
 
   if (!searchContent) {
@@ -256,7 +265,7 @@ export async function generateHistory(params: GenerateHistoryParams): Promise<Hi
       output_tokens: perplexityMerged?.completion_tokens,
       api_requests: 1,
     });
-    return serveFallback(svcClient, userId, marketDirection, undefined, historyMoodTag);
+    return serveFallback(svcClient, userId, marketDirection, undefined, historyMoodTag, log);
   }
 
   logAttempt({
@@ -375,7 +384,7 @@ BANNED PHRASES — NEVER use any of these: ${BANNED_PHRASES.join(", ")}${mood ? 
         quality_gate_reason: qg.reason ?? "unknown",
       });
     }
-    return serveFallback(svcClient, userId, marketDirection, undefined, historyMoodTag);
+    return serveFallback(svcClient, userId, marketDirection, undefined, historyMoodTag, log);
   }
 
   // ── Step 4: URL post-processing ──
