@@ -1,3 +1,5 @@
+import type { SupabaseClient } from "https://esm.sh/@supabase/supabase-js@2.57.2";
+
 export type SubscriptionTier = "free" | "pro" | "pro_plus" | "lifetime";
 export type MeteredFeature = "premium_companion" | "wallpaper" | "reflection_insights";
 
@@ -79,7 +81,7 @@ export function tierFromStripePriceId(args: {
 }
 
 export async function getMonthlyFeatureUsage(
-  svcClient: any,
+  svcClient: SupabaseClient,
   userId: string,
   feature: MeteredFeature,
   monthStart = startOfUtcMonthDate(),
@@ -96,7 +98,7 @@ export async function getMonthlyFeatureUsage(
 }
 
 export async function consumeMonthlyFeatureQuota(
-  svcClient: any,
+  svcClient: SupabaseClient,
   userId: string,
   feature: MeteredFeature,
   limit: number,
@@ -128,7 +130,7 @@ export async function consumeMonthlyFeatureQuota(
   return { allowed, used, remaining, limit: limitOut };
 }
 
-export async function getFlexCreditBalance(svcClient: any, userId: string): Promise<number> {
+export async function getFlexCreditBalance(svcClient: SupabaseClient, userId: string): Promise<number> {
   const { data, error } = await svcClient
     .from("credit_wallets")
     .select("balance_credits")
@@ -139,7 +141,7 @@ export async function getFlexCreditBalance(svcClient: any, userId: string): Prom
 }
 
 export async function consumeAllowanceOrCredits(
-  svcClient: any,
+  svcClient: SupabaseClient,
   args: {
     userId: string;
     feature: MeteredFeature;
@@ -209,7 +211,7 @@ export async function consumeAllowanceOrCredits(
 }
 
 export async function grantFlexCredits(
-  svcClient: any,
+  svcClient: SupabaseClient,
   args: {
     userId: string;
     credits: number;

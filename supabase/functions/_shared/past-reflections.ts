@@ -9,6 +9,7 @@
  * Used by Zoom Out (`generators/zoom-out.ts` — Echo rail). Returns null
  * when the user has no qualifying past pause.
  */
+import type { SupabaseClient } from "https://esm.sh/@supabase/supabase-js@2.57.2";
 import {
   parseDirectionFromContext,
   pickPastReflection,
@@ -48,7 +49,7 @@ function contextTextOf(r: PauseFullRow): string | null {
 }
 
 export async function fetchPastReflectionWithWords(
-  svcClient: any,
+  svcClient: SupabaseClient,
   userId: string,
   opts: FetchPastReflectionOpts = {},
   log?: (msg: string, extra?: Record<string, unknown>) => void,
