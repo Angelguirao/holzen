@@ -16,12 +16,17 @@
  */
 
 import { supabase } from '@/integrations/supabase/client';
+import { trackEvent } from '@/lib/posthog';
 import type {
   PauseState,
   PauseStepType,
   PauseCompanionAction,
   PauseCompanionNonCountingReason,
 } from '@/lib/pause-state';
+
+/** Dedupe PostHog pause lifecycle events (RPC can return the same state repeatedly). */
+const phPauseEngagedSent = new Set<string>();
+const phPauseCompletedSent = new Set<string>();
 
 /** Shape of the JSONB envelope returned by `pause_create_or_reuse`. */
 export interface PauseCreateOrReuseResult {
@@ -59,7 +64,24 @@ export async function pauseLogStep(params: {
     p_payload: params.payload ?? {},
   } as never);
   if (error) throw error;
-  return (data as PauseState | null) ?? null;
+  const state = (data as PauseState | null) ?? null;
+  if (state === 'engaged' && !phPauseEngagedSent.has(params.instanceId)) {
+    phPauseEngagedSent.add(params.instanceId);
+    try {
+      trackEvent('pause_engaged', { pause_instance_id: params.instanceId });
+    } catch {
+      /* no-op */
+    }
+  }
+  if (state === 'completed' && !phPauseCompletedSent.has(params.instanceId)) {
+    phPauseCompletedSent.add(params.instanceId);
+    try {
+      trackEvent('pause_completed', { pause_instance_id: params.instanceId });
+    } catch {
+      /* no-op */
+    }
+  }
+  return state;
 }
 
 export interface PauseLogCompanionResult {
@@ -81,11 +103,42 @@ export async function pauseLogCompanion(params: {
     p_entry_point: params.entryPoint,
   } as never);
   if (error) throw error;
-  return (data ?? {
+  const result = (data ?? {
     counts_for_pause: false,
     non_counting_reason: null,
     resulting_state: null,
   }) as PauseLogCompanionResult;
+
+  if (params.action === 'complete') {
+    try {
+      if (params.instanceId) {
+        if (result.counts_for_pause) {
+          trackEvent('pause_companion_counted', {
+            pause_instance_id: params.instanceId,
+            companion_type: params.companionType,
+            entry_point: params.entryPoint,
+          });
+        } else {
+          trackEvent('pause_companion_not_counted', {
+            pause_instance_id: params.instanceId,
+            companion_type: params.companionType,
+            reason: result.non_counting_reason ?? 'no_active_pause',
+            entry_point: params.entryPoint,
+          });
+        }
+      } else {
+        trackEvent('pause_companion_not_counted', {
+          companion_type: params.companionType,
+          reason: result.non_counting_reason ?? 'no_active_pause',
+          entry_point: params.entryPoint,
+        });
+      }
+    } catch {
+      /* no-op */
+    }
+  }
+
+  return result;
 }
 
 export async function pauseDismissCurrent(): Promise<PauseState | null> {

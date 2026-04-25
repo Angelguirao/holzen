@@ -3,6 +3,7 @@ import { useSubscription } from './use-subscription';
 import { useTranslation } from 'react-i18next';
 import { toast } from 'sonner';
 import type { ProFeature } from '@/lib/pricing';
+import { trackEvent } from '@/lib/posthog';
 
 /**
  * Hook for gating Pro-only features.
@@ -22,6 +23,11 @@ export function useProGate() {
   const requirePro = useCallback(
     (feature?: ProFeature | string): boolean => {
       if (subscribed) return true;
+      try {
+        trackEvent('paywall.viewed', { source: 'feature-gate' });
+      } catch {
+        /* no-op */
+      }
       const descKey = feature ? `pro.desc_${feature}` : '';
       const description = feature && t(descKey) !== descKey
         ? t(descKey)

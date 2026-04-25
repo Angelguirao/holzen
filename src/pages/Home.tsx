@@ -4,7 +4,6 @@ import { useOutletContext } from 'react-router-dom';
 import { useHolzen } from '@/hooks/use-holzen';
 import { isPausePersistError } from '@/lib/reflection-persist-error';
 import { TestimonialRequest } from '@/components/TestimonialRequest';
-import { LetterToFutureSelf } from '@/components/LetterToFutureSelf';
 import AuthLoading from '@/components/AuthLoading';
 import { useSubscription } from '@/hooks/use-subscription';
 import { BtcStatus } from '@/components/BtcStatus';
@@ -21,6 +20,7 @@ import { LoadingButton } from '@/components/ui/loading-button';
 import { NoxHeaderMain } from '@/components/ui/nox-header';
 import { HomeWidget, useWidgetLayout } from '@/components/HomeWidget';
 import { useCallback, useEffect, useState, useMemo, useRef } from 'react';
+import { trackEvent } from '@/lib/posthog';
 import { useSearchParams, useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/use-auth';
@@ -58,7 +58,7 @@ import {
 import { restrictToVerticalAxis } from '@dnd-kit/modifiers';
 
 // Widget IDs
-const WIDGET_IDS = ['btc-status', 'hold-goal', 'reflection', 'ground', 'night', 'letter', 'practice', 'breathe'] as const;
+const WIDGET_IDS = ['btc-status', 'hold-goal', 'reflection', 'ground', 'night', 'practice', 'breathe'] as const;
 type WidgetId = typeof WIDGET_IDS[number];
 
 interface PinnedPausePreview {
@@ -78,7 +78,6 @@ const Home = () => {
     'reflection': t('home.widget.reflection'),
     'ground': t('home.widget.ground', { defaultValue: 'Ground' }),
     'night': t('home.widget.evening'),
-    'letter': t('home.widget.letter'),
     'practice': t('home.widget.practice', { defaultValue: 'Practice' }),
     'breathe': t('home.widget.breathe', { defaultValue: 'Stillness' }),
   };
@@ -86,6 +85,7 @@ const Home = () => {
   const navigate = useNavigate();
   const { subscribed, loading: subLoading, monthlyRemaining, checkoutLoading, startCheckout, refresh } = useSubscription();
   const [searchParams] = useSearchParams();
+  const paywallSubscribedTracked = useRef(false);
 
   useEffect(() => {
     if (searchParams.get('subscribed') === 'true') {
@@ -95,6 +95,20 @@ const Home = () => {
       );
     }
   }, [searchParams, refresh, t]);
+
+  useEffect(() => {
+    if (searchParams.get('subscribed') !== 'true' || !user) return;
+    if (subLoading) return;
+    if (!subscribed) return;
+    if (paywallSubscribedTracked.current) return;
+    paywallSubscribedTracked.current = true;
+    try {
+      // Client does not yet receive billing interval; default until check-subscription exposes it.
+      trackEvent('paywall.subscribed', { plan: 'monthly' });
+    } catch {
+      /* no-op */
+    }
+  }, [searchParams, user, subLoading, subscribed]);
 
   const {
     btcData,
@@ -839,24 +853,6 @@ const Home = () => {
           </HomeWidget>
         );
 
-      case 'letter':
-        if (!btcData) return null;
-        if (!subscribed) return (
-          <HomeWidget id="letter" title={WIDGET_TITLES['letter']} collapsed={collapsed['letter']} onToggleCollapse={() => toggleCollapsed('letter')}>
-            <ProLockedWidget onUpgrade={startCheckout} checkoutLoading={checkoutLoading} feature="letters" />
-          </HomeWidget>
-        );
-        return (
-          <HomeWidget
-            id="letter"
-            title={WIDGET_TITLES['letter']}
-            collapsed={collapsed['letter']}
-            onToggleCollapse={() => toggleCollapsed('letter')}
-          >
-            <LetterToFutureSelf currentPrice={btcData.currentPrice} changePercent={btcData.changePercent} />
-          </HomeWidget>
-        );
-
       case 'practice':
         return (
           <HomeWidget
@@ -974,7 +970,7 @@ const Home = () => {
           <div className="space-y-4">
             {order.map((widgetId) => {
               const content = renderWidget(widgetId);
-              // Don't render null widgets (e.g. letter when no access)
+              // Don't render null widgets
               if (content === null) return null;
               return <div key={widgetId}>{content}</div>;
             })}

@@ -8,6 +8,7 @@ import type { CompanionLibraryBookmarkParams } from '@/lib/companion-library-aut
 import { toZoomOutDisplayData, zoomOutLibraryAutosaveFromDisplayData } from '@/lib/zoom-out-payload';
 import { updateRecencyHints } from '@/lib/companion-recency-hints';
 import { hostnameFromUrl } from '@/lib/companion-url';
+import { trackCompanionServed } from '@/lib/companion-analytics';
 
 export type CompanionSlotCacheIds = {
   nudge: string | null;
@@ -156,6 +157,7 @@ export function hydrateOrchestrateSlotIfNew(
   if (!isFilledOrchestrateSlot(r) || fetchedSlots.has(slot)) return;
   fetchedSlots.add(slot);
   commitOrchestrateSlotData(slot, r.data, c);
+  trackCompanionServed(slot, r.source);
   if (setCacheRelaxations) {
     const field = SLOT_CACHE_KEY[slot];
     setCacheRelaxations((prev) => ({ ...prev, [field]: toSlotRelaxationUi(r.cacheRelaxation) }));
@@ -171,6 +173,7 @@ export function applyOrchestrateSlotLazyOrRegenerate(
   setCacheRelaxations?: (fn: (prev: CompanionSlotRelaxations) => CompanionSlotRelaxations) => void,
 ): void {
   commitOrchestrateSlotData(slot, r.data, c);
+  trackCompanionServed(slot, r.source);
   if (r.cacheId) {
     const field = SLOT_CACHE_KEY[slot];
     setCacheIds((prev) => ({ ...prev, [field]: r.cacheId }));

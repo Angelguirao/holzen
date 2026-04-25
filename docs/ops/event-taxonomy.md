@@ -8,7 +8,7 @@ The authoritative list of PostHog events Holzen emits. Deliberate events only �
 2. **Backend telemetry → Postgres** (`analytics_events`, `generation_attempts`, `companion_serves`, `audit_log`). Anything needing SQL joins, RLS, billing integrity stays here.
 3. **Errors → Sentry**, not PostHog.
 4. **No PII in properties.** See [pii-masking-review.md](pii-masking-review.md).
-5. **User join key = `user_id`.** PostHog registers it as `distinct_id` on identify. Super-properties: `cid`, `app_version`.
+5. **User join key = `user_id`.** PostHog registers it as `distinct_id` on identify. Super-properties: `cid`, `environment`, `$app_version` (see `src/lib/posthog.ts`).
 
 ## Naming convention
 
@@ -19,9 +19,17 @@ The authoritative list of PostHog events Holzen emits. Deliberate events only �
 
 ## Instrumentation status
 
-- **Wired** (emission live in code): `auth.signed_up`, `auth.signed_in`, `auth.signed_out`, `navigation.primary_tab_opened`.
-- **Planned, next PR:** `reflection.completed`, `generation.initiated`, `companion.served`, `paywall.viewed`, `paywall.subscribed`, `feedback.submitted`, `performance.web_vital`, `ritual.*`.
-- **Convention:** every new event adds a row below AND a call to `trackEvent('name', props)` in the feature's source — never add events in the PostHog UI first.
+- **Wired (PostHog):** `auth.*`, `navigation.primary_tab_opened`, `reflection.started` / `reflection.completed` (home manual pause + holzen-reflect), `pause_instance_created` (manual new instance), `pause_engaged`, `pause_completed`, `pause_companion_counted` / `pause_companion_not_counted` (from `pause_log_step` / `pause_log_companion` RPCs), `generation.initiated`, `companion.served`, `paywall.viewed` (Pro toast + limit toast), `paywall.subscribed` ( checkout return; plan defaults to `monthly` until API exposes interval), `feedback.submitted` (after `send-feedback` success), `performance.web_vital`, `ritual.suggested` / `ritual.accepted` / `ritual.declined` (Ground), plus **companion idempotency diagnostics** below.
+- **Postgres (not PostHog):** PWA install prompts (`InstallHolzenCard` → `analytics_events`), edge `trackEvent` AI call counters, etc.
+- **Convention:** every new event adds a row below AND a `trackEvent` call in source — never define events only in the PostHog UI.
+
+### companion idempotency (PostHog diagnostics)
+
+| Event | When | Properties |
+|------|------|------------|
+| `intervention_idempotency_skip` | Idempotency layer skips a duplicate `companion-orchestrate` intervention call | `{ pause_instance_id, layer }` |
+| `intervention_idempotency_dedup` | Two callers joined the in-flight request | `{ pause_instance_id, … }` |
+| `intervention_idempotency_storage_error` / `intervention_idempotency_fallback_used` / `intervention_first_call_latency` | Storage / latency instrumentation | (see `src/lib/orchestrate-intervention-idempotency.ts`) |
 
 ## Active events
 
@@ -52,16 +60,14 @@ Note: never send the message text, prompt text, or companion content.
 
 ### pause (V2 lifecycle)
 
-All six events share a `pause_instance_id` super-property so PostHog can
-stitch a user journey across creation → engagement → completion / expiry,
-and pivot against Sentry + BetterStack using the same id.
+Include `pause_instance_id` on each event so journeys line up with Sentry + BetterStack.
 
 | Event | When | Properties | Owner |
 |---|---|---|---|
 | `pause_instance_created` | A `pause_instances` row lands in state `active` (manual hook or cron). | `{ pause_instance_id; template_slug; source: 'manual' \| 'cron_volatility' \| …; severity: 'mild' \| 'moderate' \| 'high' }` | @holzen |
-| `pause_engaged` | Transition `active → engaged` (both start gates met). | `{ pause_instance_id; ms_since_created: number }` | @holzen |
-| `pause_completed` | Transition to `completed` (strict gates met, ≥1 counted companion). | `{ pause_instance_id; ms_since_created: number; counted_companion_count: number }` | @holzen |
-| `pause_expired` | Sweeper or explicit expire. | `{ pause_instance_id; reason: 'context_lost' \| 'window_elapsed' \| 'superseded' \| 'ineligible_user_state' \| 'system_cancelled' }` | @holzen |
+| `pause_engaged` | `pause_log_step` returns `engaged` (first time per instance in-tab). | `{ pause_instance_id }` (optional: extend with `ms_since_created` when cheap) | @holzen |
+| `pause_completed` | `pause_log_step` returns `completed` (first time per instance in-tab). | `{ pause_instance_id }` | @holzen |
+| `pause_expired` | Sweeper or explicit expire. | *Not emitted from the React app today* — server-side if added later. | @holzen |
 | `pause_companion_counted` | Companion complete event with `counts_for_pause=true`. | `{ pause_instance_id; companion_type; entry_point: 'pause_flow' \| 'library' \| 'bell' \| 'admin_preview' }` | @holzen |
 | `pause_companion_not_counted` | Companion complete event with `counts_for_pause=false`. | `{ pause_instance_id?: string; companion_type; reason: 'no_active_pause' \| 'outside_window' \| 'context_lost' \| 'not_allowed_for_template' \| 'already_counted'; entry_point }` | @holzen |
 
@@ -71,15 +77,15 @@ PII stance unchanged: no reflection text, no companion content, no mood/outcome 
 
 | Event | When | Properties | Owner |
 |---|---|---|---|
-| `generation.initiated` | Frontend sends a companion generation request (one per card tap) | `{ companion_type: 'signal' \| 'grounding' \| 'history' \| 'zoom_out'; source: 'pause' \| 'lazy' \| 'regenerate' }` | @holzen |
-| `companion.served` | Frontend renders a companion card for the first time | `{ companion_type; source: 'live' \| 'library' \| 'cache' \| 'curated' \| 'empty'; slot: string }` | @holzen |
+| `generation.initiated` | `companion-orchestrate` invoked for a card (lazy first fetch or regenerate) | `{ companion_type: 'signal' \| 'grounding' \| 'history' \| 'zoom_out'; source: 'lazy' \| 'regenerate' }` | @holzen |
+| `companion.served` | First fill for a slot (cache hydrate, lazy fetch, regenerate, or intervention sidecar) | `{ companion_type; source: 'live' \| 'library' \| 'cache' \| 'curated' \| 'empty'; slot: 'signal' \| 'grounding' \| 'history' \| 'zoomOut' }` | @holzen |
 
 ### paywall
 
 | Event | When | Properties | Owner |
 |---|---|---|---|
 | `paywall.viewed` | Paywall UI impression | `{ source: 'feature-gate' \| 'limit-hit' \| 'settings' }` | @holzen |
-| `paywall.subscribed` | Successful subscription (post Stripe checkout return) | `{ plan: 'monthly' \| 'yearly' }` | @holzen |
+| `paywall.subscribed` | After `?subscribed=true` and subscription refresh confirms Pro | `{ plan: 'monthly' \| 'yearly' }` (currently defaults to `monthly` until `check-subscription` exposes billing interval) | @holzen |
 
 ### ritual
 
@@ -108,7 +114,8 @@ Web Vitals are also forwarded to Sentry metrics. PostHog copy supports cohort/fu
 ## Super-properties (registered once per session)
 
 - `cid` — per-tab correlation ID (`src/lib/cid.ts`)
-- `app_version` — `__APP_VERSION__` from the Vite build
+- `environment` — Vite `import.meta.env.MODE`
+- `$app_version` — `__APP_VERSION__` from the Vite build (PostHog reserved property)
 
 ## Adding an event
 

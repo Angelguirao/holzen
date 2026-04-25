@@ -43,6 +43,15 @@ import {
 import { useSubscription } from '@/hooks/use-subscription';
 import { useProGate } from '@/hooks/use-pro-gate';
 import { showLimitReachedToast, isPaidLimitReached } from '@/lib/limit-upsell';
+import { trackEvent } from '@/lib/posthog';
+import { trackCompanionServed } from '@/lib/companion-analytics';
+
+const GEN_TYPE_BY_SLOT: Record<RegenerateCompanionSlot, 'signal' | 'grounding' | 'history' | 'zoom_out'> = {
+  signal: 'signal',
+  grounding: 'grounding',
+  history: 'history',
+  zoomOut: 'zoom_out',
+};
 
 export type {
   RegenerateCompanionSlot,
@@ -251,22 +260,26 @@ export function useCompanionData({ companions, prefs, pauseInstanceId, context, 
         if (cached.signal) {
           setSignal(cached.signal);
           fetchedSlotsRef.current.add('signal');
+          trackCompanionServed('signal', 'cache');
           autoSaveToLibrary({ title: cached.signal.title, body: cached.signal.body, sourceType: 'signal', sourceUrl: cached.signal.url });
         }
         if (cached.grounding) {
           setNudge(cached.grounding);
           fetchedSlotsRef.current.add('grounding');
+          trackCompanionServed('grounding', 'cache');
           autoSaveToLibrary({ title: cached.grounding.title, body: cached.grounding.body, sourceType: 'grounding', sourceUrl: cached.grounding.url });
         }
         if (cached.history) {
           setHistoryInsight(cached.history);
           fetchedSlotsRef.current.add('history');
+          trackCompanionServed('history', 'cache');
           autoSaveToLibrary({ title: cached.history.title, body: cached.history.btcInsight, sourceType: 'history_insight' });
         }
         if (cached.zoomOut) {
           const z = toZoomOutDisplayData(cached.zoomOut);
           setZoomOut(z);
           fetchedSlotsRef.current.add('zoomOut');
+          trackCompanionServed('zoomOut', 'cache');
           const { title, body } = zoomOutLibraryAutosaveFromDisplayData(z);
           autoSaveToLibrary({ title, body, sourceType: 'zoom_out' });
         }
@@ -457,6 +470,11 @@ export function useCompanionData({ companions, prefs, pauseInstanceId, context, 
         pause_instance_prefix: pauseInstanceId.slice(0, 8),
       });
 
+      trackEvent('generation.initiated', {
+        companion_type: GEN_TYPE_BY_SLOT[slot],
+        source: 'lazy',
+      });
+
       const { data, error: fnError } = await supabase.functions.invoke('companion-orchestrate', {
         body: {
           holzenInvokeSource: 'browser_lazy_fetch',
@@ -632,6 +650,11 @@ export function useCompanionData({ companions, prefs, pauseInstanceId, context, 
         slot,
         holzenInvokeSource: 'browser_regenerate',
         pause_instance_prefix: pauseInstanceId.slice(0, 8),
+      });
+
+      trackEvent('generation.initiated', {
+        companion_type: GEN_TYPE_BY_SLOT[slot],
+        source: 'regenerate',
       });
 
       const { data, error: fnError } = await supabase.functions.invoke('companion-orchestrate', {
