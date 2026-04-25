@@ -27,7 +27,7 @@ export interface PhaseConfig {
 }
 
 function readBoolEnv(key: string, defaultValue: boolean): boolean {
-  const v = (globalThis as any).Deno?.env?.get(key);
+  const v = typeof Deno !== "undefined" ? Deno.env.get(key) : undefined;
   if (v === undefined || v === null || v === "") return defaultValue;
   return !(v === "0" || v === "false" || v === "no");
 }

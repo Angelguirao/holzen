@@ -11,6 +11,18 @@ import { ORCHESTRATOR_KEY_MAP } from "./companion-types.ts";
 
 const companionTypeMap = ORCHESTRATOR_KEY_MAP;
 
+function contentTitleFromSlotData(data: unknown): string | null {
+  if (!data || typeof data !== "object") return null;
+  const o = data as Record<string, unknown>;
+  if (typeof o.title === "string" && o.title.length > 0) return o.title;
+  const dt = o.deepTime;
+  if (dt && typeof dt === "object") {
+    const t = (dt as Record<string, unknown>).title;
+    if (typeof t === "string" && t.length > 0) return t;
+  }
+  return null;
+}
+
 export type OrchestrateAssembleLog = {
   (msg: string, extra?: Record<string, unknown>): void;
   error: (msg: string, extra?: Record<string, unknown>) => void;
@@ -65,7 +77,7 @@ export function foldOrchestrateSettledTasks(params: {
         serve_source: result.value.source,
         cache_entry_id: result.value.cacheId || null,
         cache_relaxation: result.value.cacheRelaxation ?? null,
-        content_title: result.value.data?.title || result.value.data?.deepTime?.title || null,
+        content_title: contentTitleFromSlotData(result.value.data),
         content_fingerprint: result.value.promptVersion ?? null,
         latency_ms: result.value.latencyMs,
       });
