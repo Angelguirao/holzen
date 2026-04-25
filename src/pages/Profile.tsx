@@ -446,29 +446,48 @@ function ScoreExplainerSheet({ open, onOpenChange, hasHoldGoal }: { open: boolea
 
   const components = [
     {
-      label: t('holzenScore.emotionalRegulation', 'Regulation'),
+      label: t('holzenScore.emotionalRegulation', { defaultValue: 'Regulation' }),
       weight: hasHoldGoal ? '30%' : '37%',
-      desc: t('scoreExplainer.regulation', 'Measures mood improvement between the Feel and Shift steps of each pause. Breathing completion adds a bonus.'),
+      desc: t('scoreExplainer.regulation', {
+        defaultValue:
+          'Measures mood improvement between the Feel and Shift steps of each pause. Breathing completion adds a bonus.',
+      }),
     },
     {
-      label: t('holzenScore.distressTolerance', 'Tolerance'),
+      label: t('holzenScore.distressTolerance', { defaultValue: 'Tolerance' }),
       weight: hasHoldGoal ? '25%' : '31%',
-      desc: t('scoreExplainer.tolerance', 'Rewards holding or doing nothing during high volatility. Selling during volatile moments lowers this score.'),
+      desc: t('scoreExplainer.tolerance', {
+        defaultValue:
+          'Rewards holding or doing nothing during high volatility. Selling during volatile moments lowers this score.',
+      }),
     },
-    ...(hasHoldGoal ? [{
-      label: t('holzenScore.decisionAlignment', 'Alignment'),
-      weight: '20%',
-      desc: t('scoreExplainer.alignment', 'How well your actions align with your hold goal. Holding scores highest, selling scores lowest.'),
-    }] : []),
+    ...(hasHoldGoal
+      ? [
+          {
+            label: t('holzenScore.decisionAlignment', { defaultValue: 'Alignment' }),
+            weight: '20%',
+            desc: t('scoreExplainer.alignment', {
+              defaultValue:
+                'How well your actions align with your hold goal. Holding scores highest, selling scores lowest.',
+            }),
+          },
+        ]
+      : []),
     {
-      label: t('holzenScore.cognitiveReappraisal', 'Reappraisal'),
+      label: t('holzenScore.cognitiveReappraisal', { defaultValue: 'Reappraisal' }),
       weight: hasHoldGoal ? '15%' : '19%',
-      desc: t('scoreExplainer.reappraisal', 'Engaging with perspective tools (Zoom Out, History, Signal, Learning) during a pause. Extra credit during volatile moments.'),
+      desc: t('scoreExplainer.reappraisal', {
+        defaultValue:
+          'Engaging with perspective tools (Zoom Out, History, Signal, Learning) during a pause. Extra credit during volatile moments.',
+      }),
     },
     {
-      label: t('holzenScore.selfAwareness', 'Awareness'),
+      label: t('holzenScore.selfAwareness', { defaultValue: 'Awareness' }),
       weight: hasHoldGoal ? '10%' : '13%',
-      desc: t('scoreExplainer.awareness', 'Depth of reflection: writing notes, adding tags, marking favorites, and completing the full pause flow.'),
+      desc: t('scoreExplainer.awareness', {
+        defaultValue:
+          'Depth of reflection: writing notes, adding tags, marking favorites, and completing the full pause flow.',
+      }),
     },
   ];
 
@@ -477,12 +496,15 @@ function ScoreExplainerSheet({ open, onOpenChange, hasHoldGoal }: { open: boolea
       <SheetContent side="bottom" className="max-h-[85vh] overflow-y-auto rounded-t-xl">
         <SheetHeader className="pb-2">
           <SheetTitle className="text-sm font-mono tracking-wider uppercase">
-            {t('scoreExplainer.title', 'How your score works')}
+            {t('scoreExplainer.title', { defaultValue: 'How your score works' })}
           </SheetTitle>
         </SheetHeader>
 
         <p className="text-xs text-muted-foreground leading-relaxed mb-4">
-          {t('scoreExplainer.intro', 'Your composure score (0–100) is calculated from your last 30 pauses. It measures skills, not feelings — how well you regulate emotions and make aligned decisions under pressure.')}
+          {t('scoreExplainer.intro', {
+            defaultValue:
+              'Your composure score (0–100) is calculated from your last 30 pauses. It measures skills, not feelings — how well you regulate emotions and make aligned decisions under pressure.',
+          })}
         </p>
 
         <div className="space-y-3">
@@ -499,7 +521,9 @@ function ScoreExplainerSheet({ open, onOpenChange, hasHoldGoal }: { open: boolea
 
         {!hasHoldGoal && (
           <p className="text-[10px] text-muted-foreground/40 mt-4 leading-relaxed">
-            {t('scoreExplainer.noGoalNote', 'Set a hold goal to unlock the Alignment component and get a more complete score.')}
+            {t('scoreExplainer.noGoalNote', {
+              defaultValue: 'Set a hold goal to unlock the Alignment component and get a more complete score.',
+            })}
           </p>
         )}
       </SheetContent>

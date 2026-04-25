@@ -319,26 +319,28 @@ export function ItemDetailViewer({
                   <OutcomeIcon outcome={effectiveOutcome} size={18} className="text-primary/60" />
                   <div className="flex-1 text-left">
                     <p className="text-[9px] font-mono text-muted-foreground/40 uppercase tracking-wider">
-                      {t('library.decisionLabel', 'Decision')}
+                      {t('library.decisionLabel', { defaultValue: 'Decision' })}
                     </p>
                     <p className="text-xs font-mono text-foreground/70">
                       {t(`ritual.decide.${effectiveOutcome === 'held' ? 'hold' : effectiveOutcome === 'sold' ? 'sell' : 'buy'}`, effectiveOutcome)}
                     </p>
                   </div>
                   <span className="text-[8px] font-mono text-muted-foreground/20 group-hover:text-muted-foreground/40 uppercase tracking-wider transition-colors">
-                    {t('library.changeDecision', 'Change')}
+                    {t('library.changeDecision', { defaultValue: 'Change' })}
                   </span>
                 </button>
               ) : (
                 <div className="rounded-lg border border-border/30 bg-card/30 p-3 space-y-2.5">
                   <p className="text-[10px] font-mono text-muted-foreground/50 uppercase tracking-wider">
                     {effectiveOutcome
-                      ? t('library.changeDecisionLabel', 'Change decision')
-                      : t('library.incompleteLabel', 'No decision recorded')}
+                      ? t('library.changeDecisionLabel', { defaultValue: 'Change decision' })
+                      : t('library.incompleteLabel', { defaultValue: 'No decision recorded' })}
                   </p>
                   {!effectiveOutcome && (
                     <p className="text-xs text-muted-foreground/60 leading-relaxed">
-                      {t('library.incompleteDescription', 'What did you end up doing after this pause?')}
+                      {t('library.incompleteDescription', {
+                        defaultValue: 'What did you end up doing after this pause?',
+                      })}
                     </p>
                   )}
                   <div className="flex items-center gap-2">
@@ -354,7 +356,7 @@ export function ItemDetailViewer({
                         }`}
                       >
                         <OutcomeIcon outcome={key} size={14} />
-                        {t(labelKey, key)}
+                        {t(labelKey, { defaultValue: key })}
                       </button>
                     ))}
                   </div>
@@ -363,7 +365,7 @@ export function ItemDetailViewer({
                       onClick={() => setShowOutcomePicker(false)}
                       className="text-[9px] font-mono text-muted-foreground/30 hover:text-muted-foreground/50 transition-colors"
                     >
-                      {t('common.cancel', 'Cancel')}
+                      {t('common.cancel', { defaultValue: 'Cancel' })}
                     </button>
                   )}
                 </div>
