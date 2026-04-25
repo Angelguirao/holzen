@@ -115,7 +115,7 @@ serve(
       auth: { persistSession: false },
     });
 
-    logOrchestrateInvoke(body, token === serviceKey ? "service_role" : "user_jwt");
+    logOrchestrateInvoke(log, body, token === serviceKey ? "service_role" : "user_jwt");
 
     const { data: profile } = await svcClient
       .from("profiles")
