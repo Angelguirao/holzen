@@ -18,13 +18,14 @@ import { Input } from '@/components/ui/input';
 import { cn } from '@/lib/utils';
 import { useProGate } from '@/hooks/use-pro-gate';
 import { NoxHeaderMain } from '@/components/ui/nox-header';
+import { ZOOM_OUT_DEFAULT_LABEL } from '@/lib/zoom-out-payload';
 
 const SOURCE_CHIPS: { key: string; icon: LucideIcon; label: string }[] = [
   { key: 'reflection', icon: Pause, label: 'Pause' },
   { key: 'signal', icon: Radio, label: 'Signal' },
   { key: 'grounding', icon: Leaf, label: 'Grounding' },
   { key: 'haiku', icon: Feather, label: 'Haiku' },
-  { key: 'zoom_out', icon: Telescope, label: 'Zoom Out' },
+  { key: 'zoom_out', icon: Telescope, label: ZOOM_OUT_DEFAULT_LABEL },
   { key: 'history_insight', icon: ScrollText, label: 'History' },
   { key: 'reflection_note', icon: Pencil, label: 'Note' },
   { key: 'external', icon: LinkIcon, label: 'External' },

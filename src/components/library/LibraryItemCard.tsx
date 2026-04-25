@@ -1,5 +1,5 @@
 import { useMemo } from 'react';
-import { zoomOutBodyPreviewFromJsonString } from '@/lib/zoom-out-payload';
+import { ZOOM_OUT_DEFAULT_LABEL, zoomOutBodyPreviewFromJsonString } from '@/lib/zoom-out-payload';
 import { Heart, Pause, Radio, Leaf, Feather, Telescope, ScrollText, Pencil, Link as LinkIcon, FileText, type LucideIcon } from 'lucide-react';
 import type { LibraryItem } from '@/hooks/use-library';
 import { useTranslation } from 'react-i18next';
@@ -21,7 +21,7 @@ const SOURCE_META: Record<string, { icon: LucideIcon; label: string }> = {
   learning: { icon: Leaf, label: 'Grounding' },
   ground: { icon: Leaf, label: 'Grounding' },
   haiku: { icon: Feather, label: 'Haiku' },
-  zoom_out: { icon: Telescope, label: 'Zoom Out' },
+  zoom_out: { icon: Telescope, label: ZOOM_OUT_DEFAULT_LABEL },
   history_insight: { icon: ScrollText, label: 'History' },
   reflection_note: { icon: Pencil, label: 'Note' },
   external: { icon: LinkIcon, label: 'External' },
