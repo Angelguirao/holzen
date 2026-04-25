@@ -9,7 +9,7 @@ interface Props {
   itemId: string;
   collections: Collection[];
   itemCollections: Collection[];
-  onAdd: (collectionId: string, itemId: string) => Promise<any>;
+  onAdd: (collectionId: string, itemId: string) => Promise<void>;
   onRemove: (collectionId: string, itemId: string) => Promise<void>;
 }
 

@@ -3,7 +3,9 @@ import type {
   RegenerateCompanionSlot,
 } from '@/lib/companion-orchestrate-types';
 import type { CachedHistoricalInsightShape } from '@/components/HistoricalInsightDisplay';
+import type { ZoomOutData } from '@/components/ZoomOutDisplay';
 import type { CompanionLibraryBookmarkParams } from '@/lib/companion-library-autosave';
+import { toZoomOutDisplayData } from '@/lib/zoom-out-payload';
 import { updateRecencyHints } from '@/lib/companion-recency-hints';
 import { hostnameFromUrl } from '@/lib/companion-url';
 
@@ -52,7 +54,7 @@ export type CompanionSlotCommitters = {
   }) => void;
   setNudge: (v: { title: string; body: string; citation: string; url: string }) => void;
   setHistoryInsight: (v: CachedHistoricalInsightShape) => void;
-  setZoomOut: (v: unknown) => void;
+  setZoomOut: (v: ZoomOutData | null) => void;
   autoSaveToLibrary: (p: CompanionLibraryBookmarkParams) => void | Promise<void>;
 };
 
@@ -105,14 +107,11 @@ function commitOrchestrateSlotData(
       break;
     }
     case 'zoomOut': {
-      const d = data as {
-        deepTime?: { title?: string; body?: string };
-        echo?: { message?: string };
-      };
+      const d = toZoomOutDisplayData(data);
       c.setZoomOut(d);
-      const zoomBody = d?.deepTime?.body || d?.echo?.message || 'Zoom Out perspective';
+      const zoomBody = d.deepTime?.body || d.echo?.message || 'Zoom Out perspective';
       void c.autoSaveToLibrary({
-        title: d?.deepTime?.title || 'Zoom Out',
+        title: d.deepTime?.title || 'Zoom Out',
         body: zoomBody,
         sourceType: 'zoom_out',
       });
