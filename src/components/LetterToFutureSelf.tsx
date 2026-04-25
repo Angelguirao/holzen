@@ -268,7 +268,7 @@ export function LetterToFutureSelf({ currentPrice, changePercent }: Props) {
           deliver_during: deliverDuring,
           btc_price_at_write: currentPrice,
           delivery_threshold: letterThreshold,
-        } as any)
+        })
         .select()
         .single();
 

@@ -39,8 +39,11 @@ export function BtcChart({ hidden = false, currency = 'USD' }: Props) {
           .map(([t, p]) => ({ timestamp: t, price: p }));
         setData(sampled);
       }
-    } catch (e: any) {
-      if (e?.name !== 'AbortError') setError(true);
+    } catch (e: unknown) {
+      const aborted =
+        (e instanceof DOMException && e.name === 'AbortError') ||
+        (e instanceof Error && e.name === 'AbortError');
+      if (!aborted) setError(true);
     }
   }, [currency]);
 
