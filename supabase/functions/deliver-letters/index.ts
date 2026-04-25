@@ -168,7 +168,14 @@ serve(
                   const jwk = await crypto.subtle.exportKey("jwk", cryptoKey);
                   if (jwk.d) privateKey = jwk.d;
                 } catch (e) {
-                  console.error("[PUSH] Failed to extract key:", e);
+                  try {
+                    log.error("deliver_letters_vapid_key_extract_failed", {
+                      holzen_event: "deliver_letters_vapid_key_extract_failed",
+                      detail: e instanceof Error ? e.message : String(e),
+                    });
+                  } catch {
+                    /* non-fatal */
+                  }
                 }
               }
             }

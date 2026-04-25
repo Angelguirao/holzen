@@ -6,7 +6,7 @@
 // still result in exactly one email and one push payload per device.
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import webpush from "https://esm.sh/web-push@3.6.7";
-import { withRequestLogging } from "../_shared/with-request-logging.ts";
+import { withRequestLogging, type RequestLoggingContext } from "../_shared/with-request-logging.ts";
 import { createCidSupabaseClient, sendWebPushWithCid } from "../_shared/cid-clients.ts";
 
 const corsHeaders = {
@@ -37,7 +37,7 @@ interface Body {
 // the handler. Do not redefine a local `console.log` shim here — that
 // strips the cid and breaks BetterStack's `cid` pivot.
 
-async function resolveVapidPrivateKey(raw: string): Promise<string> {
+async function resolveVapidPrivateKey(raw: string, log: RequestLoggingContext["log"]): Promise<string> {
   try {
     const parsed = JSON.parse(raw);
     if (parsed?.d) return parsed.d;
@@ -61,7 +61,14 @@ async function resolveVapidPrivateKey(raw: string): Promise<string> {
     const jwk = await crypto.subtle.exportKey("jwk", cryptoKey);
     if (jwk.d) return jwk.d as string;
   } catch (e) {
-    console.error("[NOTIFY-CHECKOUT-CONFIRMATION] vapid parse failed:", e);
+    try {
+      log.error("notify_checkout_vapid_parse_failed", {
+        holzen_event: "notify_checkout_vapid_parse_failed",
+        detail: e instanceof Error ? e.message : String(e),
+      });
+    } catch {
+      /* non-fatal */
+    }
   }
   return raw;
 }
@@ -159,7 +166,7 @@ serve(
         .eq("user_id", user.id);
 
       if (pushSubs && pushSubs.length > 0) {
-        const privateKey = await resolveVapidPrivateKey(vapidPrivateRaw);
+        const privateKey = await resolveVapidPrivateKey(vapidPrivateRaw, log);
         webpush.setVapidDetails("mailto:noreply@holzen.app", vapidPublic, privateKey);
 
         const isSub = body.mode === "subscription";
@@ -217,7 +224,14 @@ serve(
     );
   } catch (e) {
     const msg = e instanceof Error ? e.message : String(e);
-    console.error("[NOTIFY-CHECKOUT-CONFIRMATION] fatal", msg);
+    try {
+      log.error("notify_checkout_confirmation_uncaught", {
+        holzen_event: "notify_checkout_confirmation_uncaught",
+        detail: msg,
+      });
+    } catch {
+      /* non-fatal */
+    }
     return new Response(JSON.stringify({ error: msg }), {
       status: 500,
       headers: { ...corsHeaders, "Content-Type": "application/json" },
