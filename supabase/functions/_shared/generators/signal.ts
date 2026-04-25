@@ -8,6 +8,7 @@
  * API keys are read from Deno.env directly (same as the original function).
  */
 
+import type { SupabaseClient } from "https://esm.sh/@supabase/supabase-js@2.57.2";
 import {
   qualityGate,
   normalizeUrl,
@@ -141,7 +142,7 @@ export interface SignalResult {
 }
 
 export interface GenerateSignalParams {
-  svcClient: any;
+  svcClient: SupabaseClient;
   context?: string;
   language?: string;
   sources?: Array<{ name: string; type: string; url?: string }>;
@@ -168,7 +169,7 @@ export interface GenerateSignalParams {
 
 /** Try content_library (essays) for signal. */
 async function tryLibrary(
-  svcClient: any,
+  svcClient: SupabaseClient,
   userId?: string,
 ): Promise<SignalResult | null> {
   const libraryRows = await searchLibrary(svcClient, {
@@ -194,7 +195,7 @@ async function tryLibrary(
  * (used by `serveFallback` after live failure) keeps pass-3 as a last-resort serve.
  */
 async function tryCache(
-  svcClient: any,
+  svcClient: SupabaseClient,
   userId?: string,
   marketDirection?: "up" | "down" | "neutral",
   excludeIds?: string[],
@@ -210,7 +211,7 @@ async function tryCache(
   });
   if (cached) {
     return {
-      data: cached.data,
+      data: cached.data as SignalResult["data"],
       source: "cache",
       cacheId: cached.cacheId,
       cacheRelaxation: cached.relaxation,
@@ -220,14 +221,14 @@ async function tryCache(
 }
 
 /** Last-resort curated fallback pool. */
-async function serveCurated(svcClient: any): Promise<SignalResult> {
+async function serveCurated(svcClient: SupabaseClient): Promise<SignalResult> {
   const pool = await loadFallbackPool<{ title: string; body: string; source: string; url: string }>(svcClient, "signal");
   return { data: pickRandom(pool), source: "curated", cacheId: null };
 }
 
 /** Resolve from non-live phases in order (library → cache → curated). */
 async function serveFallback(
-  svcClient: any,
+  svcClient: SupabaseClient,
   userId?: string,
   marketDirection?: "up" | "down" | "neutral",
   excludeIds?: string[],

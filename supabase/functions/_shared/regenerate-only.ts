@@ -27,6 +27,7 @@ import { PROMPT_VERSION as GROUNDING_VERSION } from "./generators/grounding.ts";
 import { PROMPT_VERSION as HISTORY_VERSION } from "./generators/history.ts";
 import { PROMPT_VERSION as ZOOM_OUT_VERSION } from "./generators/zoom-out.ts";
 import { AI_TEMPORARILY_UNAVAILABLE_MESSAGE } from "./ai-user-messages.ts";
+import type { SupabaseClient } from "https://esm.sh/@supabase/supabase-js@2.57.2";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -39,7 +40,7 @@ export type RegenerateSlot = "signal" | "grounding" | "history" | "zoomOut";
 export async function handleRegenerateOnly(params: {
   slot: RegenerateSlot;
   userId: string;
-  svcClient: any;
+  svcClient: SupabaseClient;
   body: Record<string, unknown>;
   log: ReturnType<typeof createLogger>;
 }): Promise<Response> {
@@ -202,7 +203,7 @@ export async function handleRegenerateOnly(params: {
 
   const t0 = Date.now();
   type CompanionResult = {
-    data: any;
+    data: unknown;
     source: "live" | "library" | "cache" | "curated" | "empty";
     cacheId: string | null;
     cacheRelaxation?: string | null;

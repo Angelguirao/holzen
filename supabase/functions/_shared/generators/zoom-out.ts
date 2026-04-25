@@ -10,6 +10,7 @@
  * API keys are read from Deno.env directly (same as the original function).
  */
 
+import type { SupabaseClient } from "https://esm.sh/@supabase/supabase-js@2.57.2";
 import {
   qualityGate,
   BANNED_PHRASES,
@@ -50,7 +51,7 @@ export interface ZoomOutResult {
 }
 
 export interface GenerateZoomOutParams {
-  svcClient: any;
+  svcClient: SupabaseClient;
   context?: string;
   language?: string;
   reflectionMessage?: string;
@@ -87,7 +88,7 @@ interface PriceCacheRow {
  * during user sessions.
  */
 async function fetchHistoricalAndCurrentPrices(
-  svcClient: any,
+  svcClient: SupabaseClient,
   context: string | undefined,
   log: GenerateZoomOutParams["log"],
 ): Promise<PriceFetchResult> {
@@ -199,7 +200,7 @@ function echoPayloadFromPast(p: PastReflectionWithWords | null): Record<string, 
 }
 
 async function fetchEchoReflection(
-  svcClient: any,
+  svcClient: SupabaseClient,
   userId: string,
   context: string | undefined,
   log: GenerateZoomOutParams["log"],
@@ -223,7 +224,7 @@ interface DeepTimeResult {
 }
 
 async function generateDeepTime(
-  svcClient: any,
+  svcClient: SupabaseClient,
   params: {
     context?: string;
     mood?: string;

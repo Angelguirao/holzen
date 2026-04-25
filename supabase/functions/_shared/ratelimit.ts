@@ -27,6 +27,8 @@
  * Not counted: `intervention_selected`, `reflection_generated`, `companion_fallback_*`, `companion_feedback`, etc.
  */
 
+import type { SupabaseClient } from "https://esm.sh/@supabase/supabase-js@2.57.2";
+
 /** Event names included in `checkRateLimit` sliding-window count (keep in sync with inserts). */
 export const CHECK_RATE_LIMIT_ANALYTICS_EVENTS = [
   "signal_companion_ai_call",
@@ -88,7 +90,7 @@ interface RateLimitResult {
  * @returns Whether the request is allowed
  */
 export async function checkRateLimit(
-  svcClient: any,
+  svcClient: SupabaseClient,
   userId: string,
   windowMinutes = 60,
   maxRequests = 30,
@@ -138,7 +140,7 @@ export async function checkRateLimit(
  * @returns Whether generation is within budget
  */
 export async function checkDailyBudget(
-  svcClient: any,
+  svcClient: SupabaseClient,
   dailyBudgetUsd = 10.0,
 ): Promise<{ allowed: boolean; currentSpend?: number; reason?: string }> {
   try {
@@ -157,7 +159,8 @@ export async function checkDailyBudget(
     }
 
     const totalSpend = (data ?? []).reduce(
-      (sum: number, row: any) => sum + (row.estimated_cost_usd || 0),
+      (sum: number, row: { estimated_cost_usd?: number | null }) =>
+        sum + (Number(row.estimated_cost_usd) || 0),
       0,
     );
 
@@ -200,7 +203,7 @@ export interface CostCeilingsResult {
 }
 
 export async function checkCostCeilings(
-  svcClient: any,
+  svcClient: SupabaseClient,
   opts: {
     /** Global cap per UTC day. Skipped if undefined. */
     dailyGlobalUsd?: number;
@@ -223,12 +226,13 @@ export async function checkCostCeilings(
 
     if (typeof opts.dailyGlobalUsd === "number") {
       queries.push(
-        svcClient
-          .from("generation_attempts")
-          .select("estimated_cost_usd")
-          .gte("created_at", startOfDayUtc.toISOString())
-          .not("estimated_cost_usd", "is", null)
-          .then(({ data, error }: { data: unknown; error: unknown }) => {
+        Promise.resolve(
+          svcClient
+            .from("generation_attempts")
+            .select("estimated_cost_usd")
+            .gte("created_at", startOfDayUtc.toISOString())
+            .not("estimated_cost_usd", "is", null),
+        ).then(({ data, error }: { data: unknown; error: unknown }) => {
             if (error) return null;
             const total = ((data as Array<{ estimated_cost_usd: number | null }>) ?? []).reduce(
               (s, r) => s + (Number(r.estimated_cost_usd) || 0),
@@ -241,13 +245,14 @@ export async function checkCostCeilings(
 
     if (typeof opts.dailyPerUserUsd === "number" && opts.userId) {
       queries.push(
-        svcClient
-          .from("generation_attempts")
-          .select("estimated_cost_usd")
-          .eq("user_id", opts.userId)
-          .gte("created_at", startOfDayUtc.toISOString())
-          .not("estimated_cost_usd", "is", null)
-          .then(({ data, error }: { data: unknown; error: unknown }) => {
+        Promise.resolve(
+          svcClient
+            .from("generation_attempts")
+            .select("estimated_cost_usd")
+            .eq("user_id", opts.userId)
+            .gte("created_at", startOfDayUtc.toISOString())
+            .not("estimated_cost_usd", "is", null),
+        ).then(({ data, error }: { data: unknown; error: unknown }) => {
             if (error) return null;
             const total = ((data as Array<{ estimated_cost_usd: number | null }>) ?? []).reduce(
               (s, r) => s + (Number(r.estimated_cost_usd) || 0),
@@ -260,12 +265,13 @@ export async function checkCostCeilings(
 
     if (typeof opts.monthlyGlobalUsd === "number") {
       queries.push(
-        svcClient
-          .from("generation_attempts")
-          .select("estimated_cost_usd")
-          .gte("created_at", startOfMonthUtc.toISOString())
-          .not("estimated_cost_usd", "is", null)
-          .then(({ data, error }: { data: unknown; error: unknown }) => {
+        Promise.resolve(
+          svcClient
+            .from("generation_attempts")
+            .select("estimated_cost_usd")
+            .gte("created_at", startOfMonthUtc.toISOString())
+            .not("estimated_cost_usd", "is", null),
+        ).then(({ data, error }: { data: unknown; error: unknown }) => {
             if (error) return null;
             const total = ((data as Array<{ estimated_cost_usd: number | null }>) ?? []).reduce(
               (s, r) => s + (Number(r.estimated_cost_usd) || 0),
@@ -357,7 +363,7 @@ export async function checkCostCeilings(
  * Import is lazy to keep callers from paying the cost when they don't use it.
  */
 export async function guardAiFeature(
-  svcClient: any,
+  svcClient: SupabaseClient,
   feature: string,
   options?: {
     userId?: string;
@@ -446,7 +452,7 @@ export async function guardAiFeature(
  * Counts analytics_events.companion_regenerate in the last windowHours.
  */
 export async function checkCompanionRegenerateLimit(
-  svcClient: any,
+  svcClient: SupabaseClient,
   userId: string,
   windowHours = 24,
   maxRegenerates = 12,

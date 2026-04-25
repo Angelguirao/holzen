@@ -1,3 +1,4 @@
+import type { SupabaseClient } from "https://esm.sh/@supabase/supabase-js@2.57.2";
 import { writeCompanionData } from "./companion-data.ts";
 import { isCompanionContent } from "./companion-orchestrate-parse.ts";
 import type {
@@ -17,7 +18,7 @@ export type OrchestrateAssembleLog = {
 
 /** Fold `Promise.allSettled` generator results into JSON response + serve rows + companion writes. */
 export function foldOrchestrateSettledTasks(params: {
-  svcClient: any;
+  svcClient: SupabaseClient;
   keys: string[];
   settled: PromiseSettledResult<CompanionResult>[];
   selection: InterventionSelection | null;
@@ -27,7 +28,7 @@ export function foldOrchestrateSettledTasks(params: {
   t0: number;
 }): {
   response: OrchestrateResponse;
-  serveInserts: any[];
+  serveInserts: Record<string, unknown>[];
   companionWritePromises: Promise<void>[];
 } {
   const response: OrchestrateResponse = {
@@ -37,7 +38,7 @@ export function foldOrchestrateSettledTasks(params: {
     zoomOut: null,
     intervention: null,
   };
-  const serveInserts: any[] = [];
+  const serveInserts: Record<string, unknown>[] = [];
   const companionWritePromises: Promise<void>[] = [];
 
   for (let i = 0; i < params.keys.length; i++) {
@@ -115,11 +116,11 @@ export function foldOrchestrateSettledTasks(params: {
 
 /** Queue intervention row, `companion_serves` batch, and fire `writeCompanionData` in the background. */
 export function scheduleOrchestrateBackgroundWrites(params: {
-  svcClient: any;
+  svcClient: SupabaseClient;
   selection: InterventionSelection | null;
   interventionPayload: InterventionPayload;
   response: OrchestrateResponse;
-  serveInserts: any[];
+  serveInserts: Record<string, unknown>[];
   companionWritePromises: Promise<void>[];
   pauseInstanceId: string | null;
   userId: string;

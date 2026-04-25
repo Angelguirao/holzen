@@ -8,6 +8,7 @@
  * API keys are read from Deno.env directly (same as the original function).
  */
 
+import type { SupabaseClient } from "https://esm.sh/@supabase/supabase-js@2.57.2";
 import {
   qualityGate,
   containsSlop,
@@ -59,7 +60,7 @@ export interface GroundingResult {
 }
 
 export interface GenerateGroundingParams {
-  svcClient: any;
+  svcClient: SupabaseClient;
   context?: string;
   language?: string;
   recentTopics?: string[];
@@ -126,7 +127,7 @@ function findMatchingBiasTopic(preferredBias: string | undefined): (typeof BIAS_
 
 /** Try content_library (papers) for grounding. */
 async function tryLibrary(
-  svcClient: any,
+  svcClient: SupabaseClient,
   userId?: string,
 ): Promise<GroundingResult | null> {
   const libraryRows = await searchLibrary(svcClient, {
@@ -152,7 +153,7 @@ async function tryLibrary(
  * (used by `serveFallback` after live failure) keeps pass-3 as a last-resort serve.
  */
 async function tryCache(
-  svcClient: any,
+  svcClient: SupabaseClient,
   userId?: string,
   marketDirection?: "up" | "down" | "neutral",
   excludeIds?: string[],
@@ -168,7 +169,7 @@ async function tryCache(
   });
   if (cached) {
     return {
-      data: cached.data,
+      data: cached.data as GroundingResult["data"],
       source: "cache",
       cacheId: cached.cacheId,
       cacheRelaxation: cached.relaxation,
@@ -178,14 +179,14 @@ async function tryCache(
 }
 
 /** Last-resort curated fallback pool. */
-async function serveCurated(svcClient: any): Promise<GroundingResult> {
+async function serveCurated(svcClient: SupabaseClient): Promise<GroundingResult> {
   const pool = await loadFallbackPool<{ title: string; body: string; citation: string; url: string }>(svcClient, "grounding");
   return { data: pickRandom(pool), source: "curated", cacheId: null };
 }
 
 /** Resolve from non-live phases in order (library → cache → curated). */
 async function serveFallback(
-  svcClient: any,
+  svcClient: SupabaseClient,
   userId?: string,
   marketDirection?: "up" | "down" | "neutral",
   excludeIds?: string[],
