@@ -140,7 +140,7 @@ Some Edge functions assume columns already exist — e.g. **`fetch-source-feeds`
 
 **`npm run check:edge`:** Runs `scripts/check-edge.mjs` (`deno check` on every `supabase/functions/*/index.ts` except `_shared`). It resolves the Deno binary from PATH, then `DENO_INSTALL/bin`, then `~/.deno/bin` (official installer default). Uses `--no-lock` so it does not write a root `deno.lock`. If Deno is missing entirely, the script exits 0 with a skip message.
 
-**`npm run check:edge-coverage-manifest`:** Runs `scripts/verify-edge-coverage-manifest.mjs` — every `[functions.<name>]` in `supabase/config.toml` must appear in `src/pages/EdgeCoverage.tsx` `COVERAGE` (and extras are forbidden). CI runs this via `npm run test:ci`. Update the `COVERAGE` row flags when you change observability patterns in a function's `index.ts`.
+**`npm run check:edge-coverage-manifest`:** Runs `scripts/verify-edge-coverage-manifest.mjs` — every `[functions.<name>]` in `supabase/config.toml` must appear in `src/pages/EdgeCoverage.tsx` `COVERAGE` (and extras are forbidden). CI runs this via `npm run test:ci`. **`npm run check:prepush`** (bash) runs the same check after `check:edge-logging`. Update the `COVERAGE` row flags when you change observability patterns in a function's `index.ts`.
 
 ## Troubleshooting
 
