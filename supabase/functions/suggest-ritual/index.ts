@@ -170,7 +170,9 @@ Respond ONLY with valid JSON.`;
     
     // Validate steps have valid types
     const validTypes = ['breathe', 'grounding', 'checkin', 'reflect', 'review', 'journal', 'physical', 'decide'];
-    const steps = (parsed.steps || []).filter((s: any) => validTypes.includes(s.type));
+    const steps = (parsed.steps || []).filter((s: { type?: string }) =>
+      typeof s?.type === "string" && validTypes.includes(s.type)
+    );
     
     // Ensure decide is last
     if (!steps.length || steps[steps.length - 1]?.type !== 'decide') {

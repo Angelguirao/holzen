@@ -8,6 +8,7 @@ import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import webpush from "https://esm.sh/web-push@3.6.7";
 import { withRequestLogging, type RequestLoggingContext } from "../_shared/with-request-logging.ts";
 import { createCidSupabaseClient, sendWebPushWithCid } from "../_shared/cid-clients.ts";
+import { webPushStatusCode } from "../_shared/log-unknown-error.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -200,11 +201,14 @@ serve(
               { notificationTag: idempotencyKey },
             );
             pushed++;
-          } catch (pushErr: any) {
-            if (pushErr?.statusCode === 410 || pushErr?.statusCode === 404) {
+          } catch (pushErr: unknown) {
+            const sc = webPushStatusCode(pushErr);
+            if (sc === 410 || sc === 404) {
               await supabase.from("push_subscriptions").delete().eq("endpoint", sub.endpoint);
             } else {
-              pushError = pushErr?.message ?? String(pushErr);
+              pushError = pushErr instanceof Error
+                ? pushErr.message
+                : String(pushErr);
               // The `dependency_call` log line from `sendWebPushWithCid` already
               // captured the error with cid + endpoint host; here we only need
               // the higher-level signal that the per-sub send was treated as

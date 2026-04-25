@@ -15,6 +15,16 @@ const corsHeaders = {
     "authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version",
 };
 
+/** Fields read from `profiles` for the nudge loop. */
+interface NudgeProfile {
+  user_id: string;
+  email_notifications?: boolean | null;
+  quiet_hours_start?: number | null;
+  quiet_hours_end?: number | null;
+  timezone?: string | null;
+  language?: string | null;
+}
+
 serve(
   withRequestLogging("personalized-nudge", async ({ req, log }) => {
   try {
@@ -80,7 +90,7 @@ serve(
     }
 
     // Helper: check quiet hours
-    function isInQuietHours(p: any): boolean {
+    function isInQuietHours(p: NudgeProfile): boolean {
       const start = p.quiet_hours_start;
       const end = p.quiet_hours_end;
       if (start == null || end == null) return false;
@@ -90,7 +100,9 @@ serve(
       return localHour >= start || localHour < end;
     }
 
-    const eligible = (profiles ?? []).filter((p) => p.email_notifications && !isInQuietHours(p));
+    const eligible = ((profiles ?? []) as NudgeProfile[]).filter((p) =>
+      p.email_notifications && !isInQuietHours(p)
+    );
     const cutoff = new Date(Date.now() - 48 * 60 * 60 * 1000).toISOString();
     // BTC direction is a global property of this cron run (not per-user) — we
     // compute it once so it can also feed the idempotency key below.
@@ -118,7 +130,7 @@ serve(
 
       const direction = runDirection;
       const pct = change24h.toFixed(1);
-      const userLang = (profile as any).language || "en";
+      const userLang = profile.language || "en";
 
       const NUDGE_COPY: Record<string, { subject: (d: string, p: string) => string; body: (d: string, p: string) => string; reminder: string; cta: string; footer: string }> = {
         en: {

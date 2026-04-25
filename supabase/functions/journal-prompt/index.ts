@@ -132,7 +132,7 @@ serve(
       : "No recent pause sessions available.";
 
     const recentPromptsBlock = recentJournals?.length
-      ? `\n\nRecent journal prompts (DO NOT repeat these):\n${recentJournals.map((j: any) => `- ${j.prompt}`).join("\n")}`
+      ? `\n\nRecent journal prompts (DO NOT repeat these):\n${recentJournals.map((j: { prompt: string }) => `- ${j.prompt}`).join("\n")}`
       : "";
 
     const langInstruction =

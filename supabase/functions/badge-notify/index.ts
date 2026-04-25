@@ -2,6 +2,7 @@ import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import webpush from "https://esm.sh/web-push@3.6.7";
 import { withRequestLogging } from "../_shared/with-request-logging.ts";
 import { createCidSupabaseClient, sendWebPushWithCid } from "../_shared/cid-clients.ts";
+import { webPushStatusCode } from "../_shared/log-unknown-error.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -27,7 +28,8 @@ serve(
     const { data: { user }, error: authError } = await supabase.auth.getUser(token);
     if (authError || !user) throw new Error("Unauthorized");
 
-    const { badges } = await req.json();
+    const jsonBody = await req.json() as { badges?: Array<{ id: string; label: string; description: string }> };
+    const { badges } = jsonBody;
     if (!badges || !Array.isArray(badges) || badges.length === 0) {
       return new Response(JSON.stringify({ sent: 0 }), {
         headers: { ...corsHeaders, "Content-Type": "application/json" },
@@ -90,13 +92,13 @@ serve(
 
     webpush.setVapidDetails("mailto:noreply@holzen.app", vapidPublicKey, privateKey);
 
-    const badgeNames = badges.map((b: any) => b.label).join(", ");
+    const badgeNames = badges.map((b) => b.label).join(", ");
     const title = badges.length === 1 ? "🏅 Badge unlocked!" : `🏅 ${badges.length} badges unlocked!`;
-    const body = badges.length === 1
+    const messageBody = badges.length === 1
       ? `You earned "${badges[0].label}" — ${badges[0].description}`
       : `New badges: ${badgeNames}`;
 
-    const payload = JSON.stringify({ title, body });
+    const payload = JSON.stringify({ title, body: messageBody });
     let sent = 0;
 
     for (const sub of pushSubs) {
@@ -109,8 +111,9 @@ serve(
           { notificationTag: "badge" }
         );
         sent++;
-      } catch (pushErr: any) {
-        if (pushErr.statusCode === 410 || pushErr.statusCode === 404) {
+      } catch (pushErr: unknown) {
+        const sc = webPushStatusCode(pushErr);
+        if (sc === 410 || sc === 404) {
           await supabase.from("push_subscriptions").delete().eq("endpoint", sub.endpoint);
         }
       }
@@ -118,7 +121,7 @@ serve(
 
     // Mark badges as notified
     if (sent > 0) {
-      const badgeIds = badges.map((b: any) => b.id);
+      const badgeIds = badges.map((b) => b.id);
       await supabase
         .from("user_badges")
         .update({ notified: true })
