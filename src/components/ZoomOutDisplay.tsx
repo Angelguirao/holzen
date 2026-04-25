@@ -9,6 +9,7 @@ import { useHolzen } from '@/hooks/use-holzen';
 import { formatBtcPrice } from '@/lib/btc';
 import { useSubscription } from '@/hooks/use-subscription';
 import { toast } from 'sonner';
+import { TOOLS } from '@/lib/app-routes';
 
 interface OnThisDayEntry {
   yearsAgo: number;
@@ -112,7 +113,7 @@ export function ZoomOutDisplay({ data, loading, error, onRetry }: Props) {
       });
       return;
     }
-    navigate('/practice/replay', {
+    navigate(TOOLS.practice.replay, {
       state: { pauseInstanceId: echo.id, returnTo: location.pathname + location.search },
     });
   };
@@ -244,7 +245,9 @@ export function ZoomOutDisplay({ data, loading, error, onRetry }: Props) {
                   className="text-[9px] font-mono text-muted-foreground/50 hover:text-muted-foreground/70 flex items-center gap-1"
                 >
                   {quoteExpanded ? <ChevronUp className="h-3 w-3" /> : <ChevronDown className="h-3 w-3" />}
-                  {quoteExpanded ? t('common.showLess', 'Show less') : t('companions.echoExpandQuote')}
+                  {quoteExpanded
+                    ? t('common.showLess', { defaultValue: 'Show less' })
+                    : t('companions.echoExpandQuote')}
                 </button>
               )}
               <div className="flex gap-1.5 flex-wrap">

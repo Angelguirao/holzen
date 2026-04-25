@@ -135,7 +135,10 @@ export function BulkHoldCard() {
                 })}
               </p>
               <p className={homeInWidget.meta}>
-                {t('bulkHold.subtitle', 'Mark all as Hold with one tap, or review them individually in the Library.')}
+                {t('bulkHold.subtitle', {
+                  defaultValue:
+                    'Mark all as Hold with one tap, or review them individually in the Library.',
+                })}
               </p>
             </div>
           </div>
@@ -146,14 +149,14 @@ export function BulkHoldCard() {
               size="sm"
               className="h-9 flex-1 rounded-xl text-sm font-semibold"
             >
-              {loading ? t('common.loading') : t('bulkHold.holdAll', 'Hold all')}
+              {loading ? t('common.loading') : t('bulkHold.holdAll', { defaultValue: 'Hold all' })}
             </Button>
             <button
               type="button"
               onClick={handleDismiss}
               className={`px-2 ${homeInWidget.meta} hover:text-foreground`}
             >
-              {t('common.dismiss', 'Dismiss')}
+              {t('common.dismiss', { defaultValue: 'Dismiss' })}
             </button>
           </div>
         </motion.div>

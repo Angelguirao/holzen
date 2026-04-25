@@ -72,7 +72,13 @@ vi.mock('react-router-dom', async () => {
 });
 
 vi.mock('react-i18next', () => ({
-  useTranslation: () => ({ t: (_key: string, fallback?: string) => fallback ?? _key }),
+  useTranslation: () => ({
+    t: (key: string, options?: string | { defaultValue?: string }) => {
+      if (options == null) return key;
+      if (typeof options === 'string') return options;
+      return options.defaultValue ?? key;
+    },
+  }),
 }));
 
 import { CheckoutConfirmation } from '@/components/CheckoutConfirmation';

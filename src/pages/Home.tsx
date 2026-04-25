@@ -38,6 +38,7 @@ import { playNotificationTone, prefetchNotificationTone } from '@/lib/notificati
 import { isCumulativeMoveTriggered } from '@/lib/volatility-thresholds';
 import { holzenLog } from '@/lib/holzen-console';
 import { companionFallbacksDisabledClient } from '@/lib/companion-strict';
+import { TOOLS } from '@/lib/app-routes';
 import { type GroundPreGenerated, type PauseSessionLocationState } from '@/lib/router-location-state';
 import {
   DndContext,
@@ -75,11 +76,11 @@ const Home = () => {
     'btc-status': t('home.widget.market'),
     'hold-goal': t('home.widget.goal'),
     'reflection': t('home.widget.reflection'),
-    'ground': t('home.widget.ground', 'Ground'),
+    'ground': t('home.widget.ground', { defaultValue: 'Ground' }),
     'night': t('home.widget.evening'),
     'letter': t('home.widget.letter'),
-    'practice': t('home.widget.practice', 'Practice'),
-    'breathe': t('home.widget.breathe', 'Stillness'),
+    'practice': t('home.widget.practice', { defaultValue: 'Practice' }),
+    'breathe': t('home.widget.breathe', { defaultValue: 'Stillness' }),
   };
   const { user } = useAuth();
   const navigate = useNavigate();
@@ -89,7 +90,9 @@ const Home = () => {
   useEffect(() => {
     if (searchParams.get('subscribed') === 'true') {
       refresh();
-      toast.success(t('pro.welcomeToast', '🎉 Welcome to Pro! All features are now unlocked.'));
+      toast.success(
+        t('pro.welcomeToast', { defaultValue: '🎉 Welcome to Pro! All features are now unlocked.' }),
+      );
     }
   }, [searchParams, refresh, t]);
 
@@ -305,7 +308,7 @@ const Home = () => {
   }, [strictNoFallback, user?.id]);
 
   const handleStartGround = useCallback(() => {
-    navigate('/ground', { state: { preGenerated: groundSuggestion } });
+    navigate(TOOLS.ground, { state: { preGenerated: groundSuggestion } });
   }, [navigate, groundSuggestion]);
 
   const lastToneMsgRef = useRef<string | null>(null);
@@ -476,7 +479,9 @@ const Home = () => {
               ) : (
                 <>
                   <p className="text-sm text-muted-foreground font-mono leading-relaxed">
-                    {t('home.subscription.monthlyLimitReached', 'You\'ve used your free pauses this month.')}
+                    {t('home.subscription.monthlyLimitReached', {
+                      defaultValue: "You've used your free pauses this month.",
+                    })}
                   </p>
                   <p className="text-xs text-muted-foreground/60 font-mono leading-relaxed max-w-[280px] mx-auto">
                     {t('home.subscription.upgradeToPro')}
@@ -578,7 +583,7 @@ const Home = () => {
                           type="button"
                           onClick={handleDismiss}
                           className={homeInWidget.dismissAbs}
-                          aria-label={t('common.dismiss', 'Dismiss')}
+                          aria-label={t('common.dismiss', { defaultValue: 'Dismiss' })}
                         >
                           <X className="h-3.5 w-3.5" aria-hidden />
                         </button>
@@ -725,7 +730,7 @@ const Home = () => {
             title={hasPreview
               ? `${WIDGET_TITLES['ground']} · ${groundSuggestion.activity}`
               : shouldNudgeGround
-              ? `${WIDGET_TITLES['ground']} · ${t('home.groundNudge', 'maybe now?')}`
+              ? `${WIDGET_TITLES['ground']} · ${t('home.groundNudge', { defaultValue: 'maybe now?' })}`
               : WIDGET_TITLES['ground']}
             collapsed={effectiveCollapsed}
             onToggleCollapse={() => toggleCollapsed('ground')}
@@ -740,7 +745,7 @@ const Home = () => {
                       type="button"
                       onClick={dismissGroundSuggestion}
                       className={homeInWidget.dismissAbs}
-                      aria-label={t('common.dismiss', 'Dismiss')}
+                      aria-label={t('common.dismiss', { defaultValue: 'Dismiss' })}
                     >
                       <X className="h-3.5 w-3.5" aria-hidden />
                     </button>
@@ -757,14 +762,16 @@ const Home = () => {
                     className={homeInWidget.ctaSecondary}
                   >
                     <Anchor className="h-4 w-4 shrink-0 text-muted-foreground" />
-                    {t('home.groundYourself', 'Ground yourself')}
+                    {t('home.groundYourself', { defaultValue: 'Ground yourself' })}
                   </button>
                 </>
               ) : groundLoading ? (
                 <div className="space-y-3">
                   <div className={homeInWidget.loadingRow}>
                     <Loader2 className="h-4 w-4 shrink-0 animate-spin" />
-                    <p className={homeInWidget.bodyMuted}>{t('home.groundFinding', 'Finding what fits…')}</p>
+                    <p className={homeInWidget.bodyMuted}>
+                      {t('home.groundFinding', { defaultValue: 'Finding what fits…' })}
+                    </p>
                   </div>
                   <Skeleton className="h-4 w-full" />
                   <Skeleton className="h-4 w-3/4" />
@@ -773,7 +780,9 @@ const Home = () => {
                 <>
                   {shouldNudgeGround && (
                     <p className={cn(homeInWidget.body, 'font-medium text-primary')}>
-                      {t('home.groundVolatileHint', 'The market is moving. A good moment to ground.')}
+                      {t('home.groundVolatileHint', {
+                        defaultValue: 'The market is moving. A good moment to ground.',
+                      })}
                     </p>
                   )}
 
@@ -791,11 +800,11 @@ const Home = () => {
                   {subscribed ? (
                     <button
                       type="button"
-                      onClick={() => navigate('/ground')}
+                      onClick={() => navigate(TOOLS.ground)}
                       className={cn(homeInWidget.ctaPrimary, shouldNudgeGround && homeInWidget.ctaPrimaryEmphasis)}
                     >
                       <Anchor className="h-4 w-4 shrink-0 text-primary" />
-                      {t('home.groundYourself', 'Ground yourself')}
+                      {t('home.groundYourself', { defaultValue: 'Ground yourself' })}
                     </button>
                   ) : (
                     <ProLockedWidget onUpgrade={startCheckout} checkoutLoading={checkoutLoading} feature="grounding" />
@@ -806,10 +815,10 @@ const Home = () => {
               {subscribed && (
                 <button
                   type="button"
-                  onClick={() => navigate('/ground/history')}
+                  onClick={() => navigate(TOOLS.groundHistory)}
                   className="w-full pt-1 text-center text-xs font-medium text-primary underline-offset-4 transition-colors hover:underline"
                 >
-                  {t('home.groundJournal', 'View journal')}
+                  {t('home.groundJournal', { defaultValue: 'View journal' })}
                 </button>
               )}
             </div>
@@ -857,6 +866,13 @@ const Home = () => {
             onToggleCollapse={() => toggleCollapsed('practice')}
           >
             <PracticeWidget />
+            <button
+              type="button"
+              onClick={() => navigate(TOOLS.hub)}
+              className="w-full text-left text-xs text-muted-foreground/80 underline-offset-4 hover:underline"
+            >
+              {t('home.browseAllTools', { defaultValue: 'Browse all tools & experiences' })}
+            </button>
           </HomeWidget>
         );
 
@@ -875,15 +891,24 @@ const Home = () => {
           >
             <div className="space-y-3">
               <p className={homeInWidget.bodyMuted}>
-                {t('home.breatheDesc', 'A quiet space to find stillness. No goals, no tracking.')}
+                {t('home.breatheDesc', {
+                  defaultValue: 'A quiet space to find stillness. No goals, no tracking.',
+                })}
               </p>
               <button
                 type="button"
-                onClick={() => navigate('/breathe')}
+                onClick={() => navigate(TOOLS.breathe)}
                 className={homeInWidget.ctaSecondary}
               >
                 <Waves className="h-4 w-4 shrink-0 text-muted-foreground" />
-                {t('home.enterStillness', 'Enter stillness')}
+                {t('home.enterStillness', { defaultValue: 'Enter stillness' })}
+              </button>
+              <button
+                type="button"
+                onClick={() => navigate(TOOLS.hub)}
+                className="w-full text-left text-xs text-muted-foreground/80 underline-offset-4 hover:underline"
+              >
+                {t('home.browseAllTools', { defaultValue: 'Browse all tools & experiences' })}
               </button>
             </div>
           </HomeWidget>
@@ -913,7 +938,11 @@ const Home = () => {
   return (
     <div {...pullHandlers} className="space-y-6">
       <div className="space-y-2">
-        <NoxHeaderMain title={t('home.title', 'Home')} subtitle={t('home.whenBtcMoves')} rightSlot={headerRightSlot} />
+        <NoxHeaderMain
+          title={t('home.title', { defaultValue: 'Home' })}
+          subtitle={t('home.whenBtcMoves')}
+          rightSlot={headerRightSlot}
+        />
         {firstName ? (
           <p className={cn(homeInWidget.bodyMuted, 'leading-snug')}>{t('home.greeting', { name: firstName })}</p>
         ) : null}

@@ -43,7 +43,7 @@ export function MoodCheck({ onSelect, onSkip, variant = 'before', hideHeading = 
   const { t } = useTranslation();
 
   const heading = variant === 'after'
-    ? t('moodCheck.howAreYouFeelingNow', 'How are you feeling now?')
+    ? t('moodCheck.howAreYouFeelingNow', { defaultValue: 'How are you feeling now?' })
     : t('moodCheck.howAreYouFeeling');
 
   return (
@@ -53,7 +53,7 @@ export function MoodCheck({ onSelect, onSkip, variant = 'before', hideHeading = 
           <p className="text-sm font-mono text-muted-foreground">{heading}</p>
           {variant === 'after' && (
             <p className="text-xs leading-relaxed text-muted-foreground">
-              {t('moodCheck.afterDesc', 'After reflecting and grounding, check in again.')}
+              {t('moodCheck.afterDesc', { defaultValue: 'After reflecting and grounding, check in again.' })}
             </p>
           )}
         </div>

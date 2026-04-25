@@ -179,7 +179,9 @@ const Roadmap = () => {
               );
             })}
             {filtered.length === 0 && (
-              <p className="text-xs text-muted-foreground text-center py-6 font-mono">{t('common.noResults', 'No items in this category yet.')}</p>
+              <p className="text-xs text-muted-foreground text-center py-6 font-mono">
+                {t('common.noResults', { defaultValue: 'No items in this category yet.' })}
+              </p>
             )}
             <div ref={sentinelRef} className="h-1" />
             {loadingMore && (

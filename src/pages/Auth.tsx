@@ -29,7 +29,8 @@ const Auth = () => {
   const [loading, setLoading] = useState(false);
   const [confirmSent, setConfirmSent] = useState(false);
   const [resetSent, setResetSent] = useState(false);
-  const getErrorMessage = (error: unknown) => error instanceof Error ? error.message : t('common.unexpectedError', 'Something went wrong');
+  const getErrorMessage = (error: unknown) =>
+    error instanceof Error ? error.message : t('common.unexpectedError', { defaultValue: 'Something went wrong' });
 
   const handleEmailAuth = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -45,7 +46,9 @@ const Auth = () => {
               "Today's signup limit has been reached. Please try again tomorrow.",
             ));
           } else {
-            setError(t('auth.signupsPaused', 'Signups are temporarily paused. Please try again later.'));
+            setError(
+              t('auth.signupsPaused', { defaultValue: 'Signups are temporarily paused. Please try again later.' }),
+            );
           }
           setLoading(false);
           return;

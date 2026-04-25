@@ -109,7 +109,7 @@ function GroundingTagInput({ activities, onChange }: { activities: string[]; onC
         value={inputValue}
         onChange={(e) => setInputValue(e.target.value)}
         onKeyDown={handleKeyDown}
-        placeholder={t('onboarding.groundingPlaceholder', 'e.g. running, cooking, guitar...')}
+        placeholder={t('onboarding.groundingPlaceholder', { defaultValue: 'e.g. running, cooking, guitar...' })}
         className="w-full bg-transparent border-b border-border/40 focus:border-foreground/30 outline-none text-sm font-mono py-2 text-foreground placeholder:text-muted-foreground/30 transition-colors"
       />
     </div>
@@ -181,7 +181,7 @@ const Settings = forwardRef<HTMLDivElement>(function Settings(_props, ref) {
     }
     clearTimeout(saveTimeoutRef.current);
     saveTimeoutRef.current = setTimeout(() => {
-      toast(t('settings.saved', 'Saved'), { duration: 1200, id: 'auto-save' });
+      toast(t('settings.saved', { defaultValue: 'Saved' }), { duration: 1200, id: 'auto-save' });
     }, 400);
     return () => clearTimeout(saveTimeoutRef.current);
   }, [threshold, thresholdDown, cumulativeThreshold, emailNotifications, reflectionTone, reflectionStyle, silentMode, cooldownHours, digestFrequency, customPrompt, quietHoursStart, quietHoursEnd, firstName, nightReflectionHour, aiInsightsEnabled, notifyBadges, mantra, currency, language, groundingActivities, companionPrefs]);
@@ -495,7 +495,7 @@ const Settings = forwardRef<HTMLDivElement>(function Settings(_props, ref) {
                 className="space-y-1 rounded-md border border-border/50 bg-muted/20 px-3 py-2"
               >
                 <h3 id="settings-cooldown-help-title" className="text-sm font-medium text-secondary-foreground">
-                  {t('settings.cooldownHelpTitle', 'Cooldown help')}
+                  {t('settings.cooldownHelpTitle', { defaultValue: 'Cooldown help' })}
                 </h3>
                 <p id="settings-cooldown-help-body" className="text-sm leading-relaxed text-muted-foreground">
                   {t(
@@ -611,7 +611,7 @@ const Settings = forwardRef<HTMLDivElement>(function Settings(_props, ref) {
         {/* 3. Experience */}
         <AccordionItem value="experience" className="border border-border/40 rounded-md px-4 mb-[16px]">
           <AccordionTrigger className="text-xs font-mono uppercase tracking-wider text-muted-foreground hover:text-foreground py-3 hover:no-underline">
-            {t('settings.experience', 'Experience')}
+            {t('settings.experience', { defaultValue: 'Experience' })}
           </AccordionTrigger>
           <AccordionContent className="space-y-6 pb-4 text-muted-foreground">
             {/* 1 BTC = 1 BTC mode */}
@@ -692,7 +692,7 @@ const Settings = forwardRef<HTMLDivElement>(function Settings(_props, ref) {
             {/* Checkout-confirmed suppression window */}
             <div className="space-y-3">
               <p className="text-muted-foreground/60 uppercase tracking-wider text-sm font-sans">
-                {t('settings.checkoutWindow', 'Checkout-confirmed window')}
+                {t('settings.checkoutWindow', { defaultValue: 'Checkout-confirmed window' })}
               </p>
               <p className="leading-relaxed text-primary text-sm">
                 {t(
@@ -706,7 +706,7 @@ const Settings = forwardRef<HTMLDivElement>(function Settings(_props, ref) {
                   htmlFor="checkout-window-minutes"
                   className="text-muted-foreground text-base font-sans"
                 >
-                  {t('settings.checkoutWindowLabel', 'Window (minutes)')}
+                  {t('settings.checkoutWindowLabel', { defaultValue: 'Window (minutes)' })}
                 </Label>
                 <Input
                   id="checkout-window-minutes"
@@ -787,7 +787,7 @@ const Settings = forwardRef<HTMLDivElement>(function Settings(_props, ref) {
         {/* 4. Companions & AI */}
         <AccordionItem value="companions" className="border border-border/40 rounded-md px-4 mb-[16px]">
           <AccordionTrigger className="text-xs font-mono uppercase tracking-wider text-muted-foreground hover:text-foreground py-3 hover:no-underline">
-            {t('settings.companionsAi', 'Companions & AI')}
+            {t('settings.companionsAi', { defaultValue: 'Companions & AI' })}
           </AccordionTrigger>
           <AccordionContent className="space-y-6 pb-4">
             <ProLock feature="companions" hideContent>
@@ -848,7 +848,7 @@ const Settings = forwardRef<HTMLDivElement>(function Settings(_props, ref) {
                 <Alert className="border-primary/30 bg-primary/5">
                   <Info className="h-4 w-4 text-primary" />
                   <AlertTitle className="text-sm">
-                    {t('settings.pushFinishBannerTitle', 'Finish enabling push in Settings')}
+                    {t('settings.pushFinishBannerTitle', { defaultValue: 'Finish enabling push in Settings' })}
                   </AlertTitle>
                   <AlertDescription className="mt-2 space-y-3 text-xs leading-relaxed text-muted-foreground">
                     <p>
@@ -865,7 +865,7 @@ const Settings = forwardRef<HTMLDivElement>(function Settings(_props, ref) {
                       loading={pushLoading}
                       onClick={() => void pushSubscribe()}
                     >
-                      {t('settings.pushFinishBannerAction', 'Enable push on this device')}
+                      {t('settings.pushFinishBannerAction', { defaultValue: 'Enable push on this device' })}
                     </LoadingButton>
                   </AlertDescription>
                 </Alert>
@@ -1045,10 +1045,10 @@ const Settings = forwardRef<HTMLDivElement>(function Settings(_props, ref) {
                 <div className="space-y-3">
                   <p className="text-sm font-sans text-primary">
                     {tier === 'pro_plus'
-                      ? t('settings.planProPlus', 'Pro+ plan')
+                      ? t('settings.planProPlus', { defaultValue: 'Pro+ plan' })
                       : tier === 'lifetime'
-                      ? t('settings.planLifetime', 'Lifetime plan')
-                      : t('settings.planPro', 'Pro plan')}
+                        ? t('settings.planLifetime', { defaultValue: 'Lifetime plan' })
+                        : t('settings.planPro', { defaultValue: 'Pro plan' })}
                   </p>
                   {tier !== 'lifetime' && (
                     <div className="grid grid-cols-1 gap-2">
@@ -1129,7 +1129,7 @@ const Settings = forwardRef<HTMLDivElement>(function Settings(_props, ref) {
                     </p>
                   )}
                   <p className="text-sm font-sans text-muted-foreground">
-                    {t('settings.choosePlan', 'Choose your plan')}
+                    {t('settings.choosePlan', { defaultValue: 'Choose your plan' })}
                   </p>
                   <div className="grid grid-cols-1 gap-2">
                     <LoadingButton

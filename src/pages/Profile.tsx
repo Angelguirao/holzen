@@ -1,11 +1,12 @@
 import { useTranslation } from 'react-i18next';
-import { useEffect, useState, useMemo, useCallback } from 'react';
-import { useLocation } from 'react-router-dom';
+import { useEffect, useState, useMemo, useCallback, useRef } from 'react';
+import { useLocation, useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/use-auth';
 import { useHolzen } from '@/hooks/use-holzen';
 import { useSubscription } from '@/hooks/use-subscription';
-import { parseProfileLocationState, PROFILE_TAB_IDS, type ProfileTab } from '@/lib/router-location-state';
+import { parseProfileLocationState, type ProfileTab } from '@/lib/router-location-state';
+import { journeyPath, isProfileTab } from '@/lib/app-routes';
 import { formatBtcPrice } from '@/lib/btc';
 import { format } from 'date-fns';
 import { Mail, Lock, Clock, Trash2, BarChart3, Sparkles, Award, CalendarDays, Info } from 'lucide-react';
@@ -66,7 +67,12 @@ const Profile = () => {
   const { t } = useTranslation();
   const { subscribed } = useSubscription();
   const location = useLocation();
-  const { tab: locationTab, letterId: locationLetterId } = parseProfileLocationState(location.state);
+  const navigate = useNavigate();
+  const { tab: urlTab } = useParams<{ tab: string }>();
+  const [searchParams] = useSearchParams();
+  const { tab: stateTab, letterId: stateLetterId } = parseProfileLocationState(location.state);
+  const letterFromQuery = searchParams.get('letter');
+  const letterIdForOpen = letterFromQuery ?? stateLetterId;
   const [completedPauseCount, setCompletedPauseCount] = useState(0);
   const [letters, setLetters] = useState<Letter[]>([]);
   const [practiceEntries, setPracticeEntries] = useState<PracticeEntry[]>([]);
@@ -74,28 +80,40 @@ const Profile = () => {
   const [loading, setLoading] = useState(true);
   const [lettersLoading, setLettersLoading] = useState(true);
   const [viewingLetter, setViewingLetter] = useState<Letter | null>(null);
-  const [tab, setTab] = useState<ProfileTab>(
-    locationTab && PROFILE_TAB_IDS.includes(locationTab) ? locationTab : 'stats'
-  );
 
-  // Track whether we're waiting to open a letter from a notification
-  const [letterViewerPending, setLetterViewerPending] = useState(!!locationLetterId);
+  const tab: ProfileTab = urlTab && isProfileTab(urlTab) ? urlTab : 'stats';
+  const [letterViewerPending, setLetterViewerPending] = useState(!!letterIdForOpen);
 
-  // Keep tab in sync with navigation state (important when already on /profile)
+  // Invalid /journey/:tab → /journey/stats
   useEffect(() => {
-    if (locationTab && PROFILE_TAB_IDS.includes(locationTab)) {
-      setTab(locationTab);
+    if (!urlTab || !isProfileTab(urlTab)) {
+      navigate('/journey/stats', { replace: true });
     }
-  }, [locationTab]);
+  }, [urlTab, navigate]);
 
-  // Handle opening a specific letter when navigation state changes on the same route
+  // Legacy: router state (tab, letter) → bookmarkable URL once
+  const legacyRouted = useRef(false);
   useEffect(() => {
-    if (!locationLetterId) {
+    if (legacyRouted.current) return;
+    if (stateTab == null && stateLetterId == null) return;
+    legacyRouted.current = true;
+    const nextTab: ProfileTab =
+      stateTab && isProfileTab(stateTab)
+        ? stateTab
+        : stateLetterId
+          ? 'letters'
+          : 'stats';
+    navigate(journeyPath(nextTab, stateLetterId ? { letterId: stateLetterId } : undefined), { replace: true, state: null });
+  }, [stateTab, stateLetterId, navigate]);
+
+  // Open letter from `?letter=` or one-time state
+  useEffect(() => {
+    if (!letterIdForOpen) {
       setLetterViewerPending(false);
       return;
     }
 
-    const found = letters.find((l) => l.id === locationLetterId && l.delivered);
+    const found = letters.find((l) => l.id === letterIdForOpen && l.delivered);
     if (found) {
       setViewingLetter(found);
       setLetterViewerPending(false);
@@ -107,12 +125,12 @@ const Profile = () => {
     } else {
       setLetterViewerPending(false);
     }
-  }, [locationLetterId, letters, lettersLoading]);
+  }, [letterIdForOpen, letters, lettersLoading]);
 
   useEffect(() => {
-    document.title = 'Holzen — Profile';
+    document.title = t('journey.documentTitle', { defaultValue: 'Holzen — Journey' });
     return () => { document.title = 'Holzen — Pause before you act'; };
-  }, []);
+  }, [t]);
 
   useEffect(() => {
     if (!user) return;
@@ -133,9 +151,9 @@ const Profile = () => {
         .order('written_at', { ascending: false });
       const all = (data as unknown as Letter[]) ?? [];
       setLetters(all);
-      // Open viewer immediately if navigating from notification
-      if (locationLetterId) {
-        const found = all.find((l) => l.id === locationLetterId && l.delivered);
+      // Open viewer immediately if navigating from notification (?letter= or legacy state)
+      if (letterIdForOpen) {
+        const found = all.find((l) => l.id === letterIdForOpen && l.delivered);
         if (found) setViewingLetter(found);
         setLetterViewerPending(false);
       }
@@ -197,8 +215,8 @@ const Profile = () => {
 
   return (
     <div className="space-y-6">
-      <NoxHeaderMain title={t('nav.profile')} subtitle={t('profile.pageSubtitle')} />
-      {/* Tab header */}
+      <NoxHeaderMain title={t('nav.journey')} subtitle={t('journey.pageSubtitle')} />
+      {/* Tab header — URL-driven tabs: /journey/:tab */}
       <div className="tabs-scroll -mx-1 flex gap-2 overflow-x-auto px-1 pb-4">
         {tabs.map((tabItem) => {
           const Icon = tabItem.icon;
@@ -206,7 +224,8 @@ const Profile = () => {
           return (
             <button
               key={tabItem.id}
-              onClick={() => setTab(tabItem.id)}
+              type="button"
+              onClick={() => navigate(journeyPath(tabItem.id), { replace: true })}
               className={`relative flex items-center gap-1.5 whitespace-nowrap rounded-lg px-3 py-2 font-medium text-xs uppercase tracking-wide transition-all ${
                 isActive
                   ? 'bg-primary/10 text-primary shadow-sm'
@@ -255,6 +274,7 @@ const Profile = () => {
         )
       ) : tab === 'activity' ? (
         <ProLock feature="history" hideContent>
+          <p className="text-xs text-muted-foreground leading-relaxed mb-3">{t('journey.activityExplainer')}</p>
           <HistoryContent />
         </ProLock>
       ) : (

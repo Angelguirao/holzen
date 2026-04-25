@@ -13,6 +13,7 @@ import { MoodIcon } from '@/components/icons/MoodIcon';
 import { useProGate } from '@/hooks/use-pro-gate';
 import { companionFallbacksDisabledClient } from '@/lib/companion-strict';
 import { parseGroundLocationState } from '@/lib/router-location-state';
+import { TOOLS } from '@/lib/app-routes';
 import { Textarea } from '@/components/ui/textarea';
 import { parseEdgeFunctionError, toUserFacingAiErrorMessage } from '@/lib/edge-function-error';
 
@@ -283,7 +284,10 @@ export default function Ground() {
         <motion.div className="text-center space-y-5 px-8 max-w-xs" initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6, ease }}>
           <Anchor className="h-5 w-5 text-muted-foreground/30 mx-auto" />
           <p className="text-sm text-muted-foreground/60 leading-relaxed">
-            {t('ground.proDesc', 'AI-guided grounding sessions pick the right activity for this moment and share something you didn\'t know about it.')}
+            {t('ground.proDesc', {
+              defaultValue:
+                "AI-guided grounding sessions pick the right activity for this moment and share something you didn't know about it.",
+            })}
           </p>
           <p className="text-[10px] font-mono text-muted-foreground/30 tracking-wider uppercase">{t('pro.badge')}</p>
         </motion.div>
@@ -338,7 +342,7 @@ export default function Ground() {
             <motion.div key="idle" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="text-center space-y-4">
               <Loader2 className="h-4 w-4 text-muted-foreground/30 mx-auto animate-spin" />
               <p className="text-sm text-muted-foreground">
-                {t('ground.finding', 'Finding what fits...')}
+                {t('ground.finding', { defaultValue: 'Finding what fits...' })}
               </p>
             </motion.div>
           )}
@@ -354,14 +358,14 @@ export default function Ground() {
                     onClick={handleReturn}
                     className="rounded-lg border border-border bg-muted/30 px-6 py-2.5 text-sm font-medium text-foreground transition-colors hover:bg-muted/50"
                   >
-                    {t('ground.return', 'Return home')}
+                    {t('ground.return', { defaultValue: 'Return home' })}
                   </button>
                 </div>
               ) : (
                 <>
               <motion.div className="space-y-3" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.2 }}>
                 <p className="text-center text-xs font-medium uppercase tracking-wide text-muted-foreground">
-                  {t('ground.title', 'Ground yourself')}
+                  {t('ground.title', { defaultValue: 'Ground yourself' })}
                 </p>
                 <div className="mx-auto h-px w-10 bg-border" />
               </motion.div>
@@ -379,7 +383,9 @@ export default function Ground() {
                 <motion.div className="mx-auto max-w-sm space-y-3 rounded-xl border border-border/40 bg-card/50 px-4 py-4 text-left shadow-sm backdrop-blur-sm" initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 1.0, duration: 0.5 }}>
                   {insight && (
                     <>
-                      <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">{t('ground.didYouKnow', 'Did you know?')}</p>
+                      <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
+                        {t('ground.didYouKnow', { defaultValue: 'Did you know?' })}
+                      </p>
                       <p className="text-sm leading-relaxed text-foreground/90">{insight}</p>
                     </>
                   )}
@@ -389,7 +395,7 @@ export default function Ground() {
                       {article.url && (
                         <a href={article.url} target="_blank" rel="noopener noreferrer" className="mt-1 inline-flex items-center gap-1.5 text-sm font-medium text-primary underline-offset-2 hover:underline">
                           <ExternalLink className="h-2.5 w-2.5" />
-                          {t('ground.readMore', 'Read more')}
+                          {t('ground.readMore', { defaultValue: 'Read more' })}
                         </a>
                       )}
                     </div>
@@ -400,7 +406,7 @@ export default function Ground() {
               {/* Duration slider */}
               <motion.div className="space-y-5" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 1.2 }}>
                 <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
-                  {t('ground.setTimer', 'Set a timer')}
+                  {t('ground.setTimer', { defaultValue: 'Set a timer' })}
                 </p>
 
                 <div className="mx-auto max-w-xs space-y-3">
@@ -427,11 +433,11 @@ export default function Ground() {
                   onClick={() => startTimer(customDuration)}
                   className="rounded-lg border border-primary/30 bg-primary/10 px-8 py-2.5 text-sm font-semibold text-foreground transition-colors hover:bg-primary/15"
                 >
-                  {t('ground.begin', 'Begin')}
+                  {t('ground.begin', { defaultValue: 'Begin' })}
                 </button>
 
                 <button type="button" onClick={skipTimer} className="mx-auto block text-sm text-muted-foreground underline-offset-4 transition-colors hover:text-foreground hover:underline">
-                  {t('ground.skipTimer', 'Skip timer')}
+                  {t('ground.skipTimer', { defaultValue: 'Skip timer' })}
                 </button>
               </motion.div>
                 </>
@@ -527,7 +533,7 @@ export default function Ground() {
               </div>
 
               <button type="button" onClick={skipTimer} className="text-sm text-muted-foreground underline-offset-4 transition-colors hover:text-foreground hover:underline">
-                {t('ground.imDone', 'I\'m done')}
+                {t('ground.imDone', { defaultValue: "I'm done" })}
               </button>
             </motion.div>
           )}
@@ -536,10 +542,14 @@ export default function Ground() {
           {phase === 'checkin' && (
             <motion.div key="checkin" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }} transition={{ duration: 0.8, ease }} className="text-center space-y-10 w-full">
               <div className="space-y-3">
-                <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">{t('ground.checkIn', 'Check in')}</p>
+                <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
+                  {t('ground.checkIn', { defaultValue: 'Check in' })}
+                </p>
                 <div className="mx-auto h-px w-10 bg-border" />
                 <p className="mx-auto max-w-xs text-center font-editorial text-xl leading-snug text-foreground">
-                  {t('moodCheck.howAreYouFeelingNow', 'How are you feeling now?')}
+                  {t('moodCheck.howAreYouFeelingNow', {
+                    defaultValue: 'How are you feeling now?',
+                  })}
                 </p>
               </div>
 
@@ -584,19 +594,22 @@ export default function Ground() {
             <motion.div key="reflect" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }} transition={{ duration: 0.6, ease }} className="text-center space-y-6 w-full">
               <div className="space-y-3">
                 <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
-                  {t('ground.reflectTitle', 'A brief note')}
+                  {t('ground.reflectTitle', { defaultValue: 'A brief note' })}
                 </p>
                 <div className="mx-auto h-px w-10 bg-border" />
               </div>
 
               <p className="mx-auto max-w-sm text-center text-base leading-relaxed text-muted-foreground">
-                {t('ground.reflectPrompt', 'Anything you noticed during this moment? This is just for you.')}
+                {t('ground.reflectPrompt', {
+                  defaultValue:
+                    'Anything you noticed during this moment? This is just for you.',
+                })}
               </p>
 
               <Textarea
                 value={reflectionText}
                 onChange={(e) => setReflectionText(e.target.value)}
-                placeholder={t('ground.reflectPlaceholder', 'Optional...')}
+                placeholder={t('ground.reflectPlaceholder', { defaultValue: 'Optional...' })}
                 rows={4}
                 className="mx-auto block max-w-sm min-h-[7.5rem] text-base leading-relaxed"
               />
@@ -607,14 +620,14 @@ export default function Ground() {
                   onClick={handleComplete}
                   className="rounded-lg border border-primary/30 bg-primary/10 px-8 py-2.5 text-sm font-semibold text-foreground transition-colors hover:bg-primary/15"
                 >
-                  {t('common.done', 'Done')}
+                  {t('common.done', { defaultValue: 'Done' })}
                 </button>
                 <button
                   type="button"
                   onClick={handleComplete}
                   className="text-sm text-muted-foreground underline-offset-4 transition-colors hover:text-foreground hover:underline"
                 >
-                  {t('common.skip', 'Skip')}
+                  {t('common.skip', { defaultValue: 'Skip' })}
                 </button>
               </div>
             </motion.div>
@@ -628,15 +641,17 @@ export default function Ground() {
               </motion.div>
 
               <motion.p className="mx-auto max-w-sm text-center font-editorial text-xl leading-relaxed text-foreground" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.6 }}>
-                {t('ground.doneMessage', 'You took a moment. That matters.')}
+                {t('ground.doneMessage', {
+                  defaultValue: 'You took a moment. That matters.',
+                })}
               </motion.p>
 
               <motion.div className="flex flex-col items-center gap-3" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 1 }}>
                 <button type="button" onClick={handleReturn} className="text-sm font-medium text-muted-foreground underline-offset-4 transition-colors hover:text-foreground hover:underline">
-                  {t('ground.return', 'Return')}
+                  {t('ground.return', { defaultValue: 'Return' })}
                 </button>
-                <button type="button" onClick={() => navigate('/ground/history', { replace: true })} className="text-xs font-medium uppercase tracking-wide text-primary underline-offset-4 hover:underline">
-                  {t('ground.viewHistory', 'View journal')}
+                <button type="button" onClick={() => navigate(TOOLS.groundHistory, { replace: true })} className="text-xs font-medium uppercase tracking-wide text-primary underline-offset-4 hover:underline">
+                  {t('ground.viewHistory', { defaultValue: 'View journal' })}
                 </button>
               </motion.div>
             </motion.div>
