@@ -3,6 +3,7 @@
  * Centralises cost tracking, attempt logging, and analytics events.
  */
 
+import type { SupabaseClient } from "https://esm.sh/@supabase/supabase-js@2.57.2";
 import { EDGE_RELEASE } from "./release.ts";
 
 // ── Cost estimation per 1M tokens [input, output] in USD ──
@@ -112,7 +113,7 @@ interface AttemptLoggerOptions {
  * applied yet the insert still succeeds (Supabase ignores unknown columns in
  * inserts when not using strict mode).
  */
-export function createAttemptLogger(svcClient: any, options?: AttemptLoggerOptions) {
+export function createAttemptLogger(svcClient: SupabaseClient, options?: AttemptLoggerOptions) {
   let attemptOrder = 0;
   const userId = options?.userId ?? null;
   const pauseInstanceId = options?.pauseInstanceId ?? null;
@@ -142,8 +143,8 @@ export function createAttemptLogger(svcClient: any, options?: AttemptLoggerOptio
  * Create an analytics event tracker bound to a user and service client.
  * Fire-and-forget — analytics events are non-critical.
  */
-export function createObsTracker(svcClient: any, userId: string, companionType: string, t0: number) {
-  return (event: string, meta?: Record<string, any>) => {
+export function createObsTracker(svcClient: SupabaseClient, userId: string, companionType: string, t0: number) {
+  return (event: string, meta?: Record<string, unknown>) => {
     svcClient.from("analytics_events").insert({
       user_id: userId,
       event,
@@ -159,7 +160,7 @@ export function createObsTracker(svcClient: any, userId: string, companionType: 
 /**
  * Track a simple analytics event (fire-and-forget).
  */
-export function trackEvent(svcClient: any, userId: string, event: string) {
+export function trackEvent(svcClient: SupabaseClient, userId: string, event: string) {
   svcClient.from("analytics_events").insert({ user_id: userId, event }).then(() => {});
 }
 

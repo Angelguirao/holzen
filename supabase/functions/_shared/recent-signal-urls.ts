@@ -3,8 +3,10 @@
  * client-provided localStorage hints. Source: pause_ai_artifacts (kind='signal') content.url.
  */
 
+import type { SupabaseClient } from "https://esm.sh/@supabase/supabase-js@2.57.2";
+
 export async function fetchRecentSignalCitationUrls(
-  svcClient: any,
+  svcClient: SupabaseClient,
   userId: string,
   opts: { excludePauseInstanceId?: string | null; limit?: number },
 ): Promise<string[]> {

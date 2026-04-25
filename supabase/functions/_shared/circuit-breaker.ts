@@ -1,3 +1,5 @@
+import type { SupabaseClient } from "https://esm.sh/@supabase/supabase-js@2.57.2";
+
 /**
  * Per-provider circuit breakers for AI spend protection.
  *
@@ -76,7 +78,7 @@ const ERROR_STATUSES: ReadonlySet<string> = new Set([
 ]);
 
 export async function getProviderHealth(
-  svcClient: any,
+  svcClient: SupabaseClient,
   options?: BreakerOptions & { force?: boolean },
 ): Promise<ProviderHealth> {
   const opts = { ...DEFAULTS, ...options };
@@ -155,7 +157,7 @@ function buildState(
  * Useful at guard-call sites that only care about a boolean gate.
  */
 export async function degradedProviders(
-  svcClient: any,
+  svcClient: SupabaseClient,
   providers: Provider[],
   options?: BreakerOptions,
 ): Promise<Provider[]> {

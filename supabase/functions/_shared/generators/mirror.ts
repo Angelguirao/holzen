@@ -1,3 +1,5 @@
+import type { SupabaseClient } from "https://esm.sh/@supabase/supabase-js@2.57.2";
+
 /**
  * Mirror intervention — surfaces a user's own past behavior in a similar market moment.
  *
@@ -65,7 +67,7 @@ function normalizeDirection(raw: unknown): "up" | "down" | "neutral" {
 }
 
 export async function buildMirror(
-  svcClient: any,
+  svcClient: SupabaseClient,
   userId: string,
   pauseInstanceId: string,
   log?: (msg: string, extra?: Record<string, unknown>) => void,

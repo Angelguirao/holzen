@@ -1,3 +1,4 @@
+import type { SupabaseClient } from "https://esm.sh/@supabase/supabase-js@2.57.2";
 import type { InterventionPayload, OrchestrateResponse } from "./companion-orchestrate-types.ts";
 import { contentSatisfiesCompanion } from "./companion-orchestrate-parse.ts";
 import type { createLogger } from "./observe.ts";
@@ -11,7 +12,7 @@ export type OrchestrateSkipCacheLog = ReturnType<typeof createLogger>;
  * and budget. Grep: orchestrate_skip_cached.
  */
 export async function tryOrchestrateSkipFromPauseArtifacts(params: {
-  svcClient: any;
+  svcClient: SupabaseClient;
   pauseInstanceId: string;
   useIntervention: boolean;
   needSignal: boolean;

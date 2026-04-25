@@ -13,6 +13,7 @@
  * 5. Pattern (default) — safe fallback for new users
  */
 
+import type { SupabaseClient } from "https://esm.sh/@supabase/supabase-js@2.57.2";
 import { buildMirror, type MirrorResult } from "./generators/mirror.ts";
 
 export type InterventionMode = "insight" | "question";
@@ -36,7 +37,7 @@ export interface SelectInterventionParams {
   severity: "mild" | "moderate" | "high";
   direction: "up" | "down" | "neutral";
   moodHistory?: Array<{ mood: string; outcome?: string | null }>;
-  svcClient: any;
+  svcClient: SupabaseClient;
   log?: (msg: string, extra?: Record<string, unknown>) => void;
 }
 
@@ -66,7 +67,7 @@ export function bucketSeverity(pct: number): "mild" | "moderate" | "high" {
  * Count the user's total past completed pauses. Used to gate Question Mode
  * (only shown to users with enough history to benefit from self-reflection).
  */
-async function countPastSessions(svcClient: any, userId: string): Promise<number> {
+async function countPastSessions(svcClient: SupabaseClient, userId: string): Promise<number> {
   try {
     const { count, error } = await svcClient
       .from("pause_instances")

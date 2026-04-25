@@ -1,3 +1,5 @@
+import type { SupabaseClient } from "https://esm.sh/@supabase/supabase-js@2.57.2";
+
 /**
  * Runtime config loader for AI cost guardrails + feature flags + signup gate.
  *
@@ -80,7 +82,7 @@ function coerceBoolean(v: unknown, fallback: boolean): boolean {
 }
 
 export async function loadAppConfig(
-  svcClient: any,
+  svcClient: SupabaseClient,
   options?: { force?: boolean },
 ): Promise<AppConfig> {
   const now = Date.now();
