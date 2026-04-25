@@ -1,6 +1,6 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.57.2";
-import { holzenEdgeError, holzenEdgeLog, holzenEdgeRun } from "../_shared/holzen-edge-log.ts";
+import { unknownErrorForLog } from "../_shared/log-unknown-error.ts";
 import { createAttemptLogger } from "../_shared/observe.ts";
 import { coingeckoHeaders } from "../_shared/coingecko.ts";
 import { withRequestLogging } from "../_shared/with-request-logging.ts";
@@ -75,18 +75,23 @@ async function fetchBtcMonthData(currency: string): Promise<BtcMonthData> {
 }
 
 serve(
-  withRequestLogging("monthly-report", async ({ req }) => {
+  withRequestLogging("monthly-report", async ({ req, log }) => {
   try {
-    holzenEdgeRun("monthly-report", "request", { method: req.method });
     const { verifyServiceAuth } = await import("../_shared/auth.ts");
     if (!verifyServiceAuth(req)) {
-      holzenEdgeRun("monthly-report", "auth rejected");
+      log.warn("monthly_report_phase", {
+        holzen_event: "monthly_report_cron",
+        phase: "service_auth_rejected",
+      });
       return new Response(JSON.stringify({ error: "Unauthorized" }), {
         status: 401,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
-    holzenEdgeRun("monthly-report", "auth ok");
+    log("monthly_report_phase", {
+      holzen_event: "monthly_report_cron",
+      phase: "service_auth_ok",
+    });
     const supabase = createClient(
       Deno.env.get("SUPABASE_URL") ?? "",
       Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? "",
@@ -105,14 +110,23 @@ serve(
       providers: ["lovable"],
     });
     if (!reportsAiGuard.allowed) {
-      holzenEdgeLog("monthly-report", "ai summary skipped", { reason: reportsAiGuard.reason });
+      log("monthly_report_phase", {
+        holzen_event: "monthly_report_cron",
+        phase: "ai_summary_skipped",
+        reason: reportsAiGuard.reason,
+      });
       LOVABLE_API_KEY = undefined;
     }
 
     // Only run on the 1st of the month
     const now = new Date();
     if (now.getUTCDate() !== 1) {
-      holzenEdgeLog("monthly-report", "run complete", { skipped: true, reason: "not_first_of_month" });
+      log("monthly_report_complete", {
+        holzen_event: "monthly_report_cron",
+        phase: "run_complete",
+        skipped: true,
+        reason: "not_first_of_month",
+      });
       return new Response(JSON.stringify({ skipped: true, reason: "not_first_of_month" }), {
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
@@ -130,7 +144,11 @@ serve(
     if (profilesError) throw profilesError;
 
     const eligible = (profiles ?? []).filter((p) => p.email_notifications);
-    holzenEdgeLog("monthly-report", "eligible users", { count: eligible.length });
+    log("monthly_report_phase", {
+      holzen_event: "monthly_report_cron",
+      phase: "eligible_users",
+      count: eligible.length,
+    });
 
     // Collect all rendered emails and ship them in one batched Lovable Email call at
     // the end (one HTTP round trip per 100 recipients, with retry/backoff).
@@ -235,7 +253,11 @@ Be observational, calm. No advice, no exclamation marks.${langInstruction}`;
             });
           }
         } catch (e) {
-          holzenEdgeError("monthly-report", "AI insight failed", e);
+          log.error("monthly_report_ai", {
+            holzen_event: "monthly_report_cron",
+            phase: "per_user_ai_failed",
+            ...unknownErrorForLog(e),
+          });
           logAttempt({
             companion_type: "reports",
             provider: "lovable",
@@ -332,12 +354,26 @@ Be observational, calm. No advice, no exclamation marks.${langInstruction}`;
       source: "monthly-report",
       idempotencyKey: `monthly-report:${idempotencyMonth}`,
       logger: holzenLovableEmailLogger(
-        (m, d) => holzenEdgeLog("monthly-report", m, d),
-        (m, err) => holzenEdgeError("monthly-report", m, err),
+        (m, d) =>
+          log("lovable_email_dep", {
+            holzen_event: "monthly_report_cron",
+            phase: "lovable_email",
+            message: m,
+            ...(d ?? {}),
+          }),
+        (m, data) =>
+          log.error("lovable_email_dep", {
+            holzen_event: "monthly_report_cron",
+            phase: "lovable_email_error",
+            message: m,
+            ...(data ?? {}),
+          }),
       ),
     });
 
-    holzenEdgeLog("monthly-report", "run complete", {
+    log("monthly_report_complete", {
+      holzen_event: "monthly_report_cron",
+      phase: "run_complete",
       sent: batch.sent,
       failed: batch.failed,
       chunks: batch.chunks,
@@ -350,7 +386,11 @@ Be observational, calm. No advice, no exclamation marks.${langInstruction}`;
     );
   } catch (e) {
     const msg = e instanceof Error ? e.message : String(e);
-    holzenEdgeError("monthly-report", "uncaught error", msg);
+    log.error("monthly_report_uncaught", {
+      holzen_event: "monthly_report_cron",
+      phase: "uncaught",
+      ...unknownErrorForLog(e),
+    });
     return new Response(JSON.stringify({ error: msg }), {
       status: 500,
       headers: { ...corsHeaders, "Content-Type": "application/json" },

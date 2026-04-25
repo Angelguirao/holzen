@@ -11,6 +11,8 @@
  *
  * - **Info / warn (`holzenEdgeLog`, `holzenEdgeWarn`):** gated by the above.
  * - **Errors (`holzenEdgeError`):** always emitted.
+ *
+ * Prefer **`log` from `withRequestLogging`** for handlers already wrapped there — it forwards to the log drain with `cid`. (Referral queue + digest/report crons were migrated off this module for that reason.)
  */
 
 /** One tag per Edge surface — filter Supabase logs with `holzen:`. */
@@ -29,7 +31,6 @@ export type HolzenEdgeTag =
   | "personalized-nudge"
   | "deliver-letters"
   | "reflection-insights"
-  | "referral-pending"
   | "ai-cost-alert";
 
 function tracesEnabled(): boolean {
