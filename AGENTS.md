@@ -14,6 +14,7 @@ Instructions for AI assistants and automation working in this repository (e.g. C
 | `npm run build` | Production build |
 | `npm run preview` | Serve built output locally |
 | `npm run test` | Vitest (jsdom), single run |
+| `npm run test:ci` | CI gate: `check:edge-logging`, `check:edge-coverage-manifest`, Vitest with coverage + JUnit |
 | `npm run test:watch` | Vitest watch mode |
 | `npm run lint` | ESLint across the repo |
 | `npm run check:edge` | Optional: `deno check` on all `supabase/functions/*/index.ts`; **skips** if Deno is missing. Resolves `deno` from PATH, then `DENO_INSTALL/bin`, then `~/.deno/bin` (official installer default). |
