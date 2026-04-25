@@ -19,7 +19,7 @@ Five bottom tabs, all wrapped in `AppLayout` (header + `Outlet` + bottom nav, ma
 
 | Tab      | Path            | Role                                                                                                                                                                                                                                                                                        |
 | -------- | --------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Home     | `/`             | Hub: widgets (market, hold goal, pause/reflection, **At a glance** summary — recent library saves, quick emotional check-in, closest badge progress — evening card when applicable), pause triggers, onboarding. Immersive tools (ground, stillness, full practice) live under **Tools**, not as Home widgets. *Letters are not a Home widget.* |
+| Home     | `/`             | Hub: widgets (pause/reflection **first**, then market, goal, **Journey pulse** for score/progress links, **Quick capture** for check-in + recent library, plus evening card when applicable), pause triggers, onboarding. Immersive tools (ground, stillness, full practice) live under **Tools**, not as Home widgets. *Letters are not a Home widget.* |
 | Library  | `/library`      | Saved pause artifacts, collections, search, source filters; **Activity** tab links to `/journey/activity` for the consolidated log.                                                                                                                                                         |
 | Tools    | `/tools`        | In-app index (`ToolsHub`): **one** list to letters, stillness, ground, practice, etc. (no separate “Journey block” on this screen; progress stays under **Journey**). **Ground** opens a full-screen shell with **Session** and **Journal** tabs (`/tools/ground` and `/tools/ground/history`). Only `/tools` and `/tools/letters` use the **shell + bottom nav**; other `/tools/...` routes are full-screen. |
 | Journey  | `/journey/:tab` | Longitudinal “you” content: **stats, insights, badges, activity** — each tab is a **path segment** (default `/journey/stats`). *Letters are not a Journey tab.*                                                                                                                             |
@@ -32,7 +32,7 @@ Notification `action_path` for letter delivery uses `/tools/letters?letter=<id>`
 
 **Settings sub-routes (still in shell + bottom nav):** `/settings/billing-history`, `/settings/about` (changelog, version, feedback — split out so the main Settings page stays action-first).
 
-**In-app index for tools:** `/tools` lists letters, stillness, ground (journal is the second tab in that flow, not a separate hub row), and practice. Legacy `/tools/ambient` **redirects** to `/tools/breathe`. Home surfaces a compact check-in in **At a glance**; full tools are reached from the Tools tab.
+**In-app index for tools:** `/tools` lists letters, stillness, ground (journal is the second tab in that flow, not a separate hub row), and practice. Legacy `/tools/ambient` **redirects** to `/tools/breathe`. Home keeps only **Quick capture** as a minimal check-in entry; full tools are reached from the Tools tab.
 
 This matches the “skills-first” stats organization documented in `docs/decisions/2026-04-23-skills-first-stats-ia.md` and implemented in `StatsContentV2`.
 
@@ -133,7 +133,8 @@ This section captures the **current state** and what we may reconsider next.
 
 - **Shipped:** progress area is **Journey** at `/journey/...` (not “Profile” in primary IA).
 - **Shipped:** Settings section labels now use task-oriented wording.
-- **Shipped:** **At a glance** on Home (`HomeAtAGlance`) — library preview, quick check-in (`practice_entries`), and closest badge progress (same badge snapshots as Journey → Badges), without duplicating the full Holzen score card.
+- **Shipped:** Home summary split into two lighter cards: **Journey pulse** (`HomeJourneyPulse`) and **Quick capture** (`HomeQuickCapture`), to keep a feeling-first home while still surfacing score/progress context and recent capture actions.
+- **Rationale:** one large summary card became dense. Splitting preserves quick scanability: `Pause` stays the hero, `Journey pulse` answers “how am I doing?”, and `Quick capture` answers “what can I log now?”.
 - **Alternative to revisit:** a **dedicated Stats tab** or heavier Home module only if analytics/interviews show demand; full skills-first **Stats** remains the Journey → **Stats** sub-tab.
 
 ### 4.3 Path-addressable Journey
@@ -168,7 +169,7 @@ Use this as a **checklist** when planning research or another IA pass. Detailed 
 | Theme                    | Shipped guardrails                                                   | Alternatives / improvements to consider                                                                     |
 | ------------------------ | -------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------- |
 | **Tools & shell**        | Canonical `/tools/*`, single `ToolsHub` list, Ground session+journal in `ToolsGroundLayout`, `/tools/ambient` → breathe; `navigation.primary_tab_opened` | Reorder tabs; further merge practice routes if the list still feels long                                  |
-| **Journey vs “profile”** | `/journey/:tab`, skills-first stats; **Home** shows score preview    | Heavier Home module or a **dedicated Stats tab** if interviews + metrics justify it                         |
+| **Journey vs “profile”** | `/journey/:tab`, skills-first stats; **Home** shows Journey pulse + quick capture | Heavier Home module or a **dedicated Stats tab** if interviews + metrics justify it                         |
 | **Journey scope**        | One hub: stats, insights, badges, activity; letters under Tools      | Further **split tabs or routes** if one area dominates support load (product call)                          |
 | **Library vs Activity**  | Copy + `HistoryCrossLinks`                                           | **Single screen** with `saved` / `timeline` modes if users still mix them up                                |
 | **Settings**             | Hub + `/settings/<section>` + `/settings/about` & `/settings/billing-history`; legacy `/settings/section/*` | Further **layout polish** on section pages if metrics still show users bail mid-task                          |
