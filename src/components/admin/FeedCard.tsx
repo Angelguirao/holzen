@@ -14,11 +14,12 @@ type FeedCardProps = {
 
 export function FeedCard({ item, selected, onToggleSelect, selectDisabled }: FeedCardProps) {
   const [expanded, setExpanded] = useState(false);
-  const body = typeof item.content === 'string'
-    ? item.content
-    : typeof item.content?.body === 'string'
-      ? item.content.body
-      : JSON.stringify(item.content);
+  const content = item.content as unknown;
+  const body = typeof content === 'string'
+    ? content
+    : (content && typeof content === 'object' && typeof (content as { body?: unknown }).body === 'string')
+      ? (content as { body: string }).body
+      : JSON.stringify(content);
 
   const showSelect = Boolean(onToggleSelect);
 
