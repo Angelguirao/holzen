@@ -107,7 +107,7 @@ Frontend is safe — it only goes live when you click **Publish → Update** in 
 
 ### Combined local gate (`npm run check:prepush`)
 
-`npm run check:prepush` runs `scripts/pre-push-check.sh`: edge release stamp, **`npm run check:view-migrations`** (unsafe `CREATE OR REPLACE VIEW` patterns), every `supabase/functions/<name>/` has a matching `[functions.<name>]` in `config.toml`, **`npm run check:edge`** (skips if Deno missing), **`npm run check:edge-logging`**, **`npm run check:edge-coverage-manifest`**, **`npm run test`**, **`npm run build`**, and (when Docker + Supabase CLI are available) a local **`supabase db reset`**. **Requires `bash`** — on Windows use **Git Bash** or **WSL** (PowerShell alone will not run this script).
+`npm run check:prepush` runs `scripts/pre-push-check.sh`: edge release stamp (**`node scripts/stamp-edge-release.mjs`**, same effect as **`npm run stamp:release`**), **`npm run check:view-migrations`** (unsafe `CREATE OR REPLACE VIEW` patterns), every `supabase/functions/<name>/` has a matching `[functions.<name>]` in `config.toml`, **`npm run check:edge`** (skips if Deno missing), **`npm run check:edge-logging`**, **`npm run check:edge-coverage-manifest`**, **`npm run test`**, **`npm run build`** (which runs **`prebuild`** → **`npm run check:version-sync`**), and (when Docker + Supabase CLI are available) a local **`supabase db reset`**. **Requires `bash`** — on Windows use **Git Bash** or **WSL** (PowerShell alone will not run this script).
 
 **Optional deeper probe** after changing request logging / `x-cid` behavior: **`npm run smoke:edge-logging`** — OPTIONS each HTTP edge URL and assert `x-cid` round-trip (and optionally BetterStack query when `LOG_DRAIN_QUERY_*` are set). See **`supabase/functions/README.md`**.
 

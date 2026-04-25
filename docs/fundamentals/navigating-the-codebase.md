@@ -190,6 +190,8 @@ Each folder under **`supabase/functions/<name>/`** is a deployable function. Sha
 - **`npm run test:ci`** — Runs **`check:edge-logging`**, **`check:edge-coverage-manifest`**, then Vitest with coverage + JUnit output (matches typical CI expectations).
 - **`npm run check:prepush`** — Full bash preflight in **`scripts/pre-push-check.sh`** (tests, build, **`check:view-migrations`**, edge checks, optional local `supabase db reset`). **Requires `bash`** — on Windows use **Git Bash** or **WSL**. Narrative checklist: [deployment-sync-guide.md](../ops/deployment-sync-guide.md).
 - **`npm run check:view-migrations`** — Blocks unsafe `CREATE OR REPLACE VIEW` column renames in **`supabase/migrations/`** (also run from **`check:prepush`**).
+- **`npm run build`** — Runs **`npm run check:version-sync`** first (`prebuild`): **`package.json` `version`** must match the latest **`changelog_entries`** row for the configured Supabase project.
+- **`npm run stamp:release`** — Writes the current Git SHA into **`supabase/functions/_shared/release.ts`** for edge Sentry/BetterStack releases (also invoked at the start of **`check:prepush`**). See [AGENTS.md](../AGENTS.md) for the full script table.
 - **`src/test/`** — `setup.ts` plus tests for sanitization, fallbacks, companion types, etc.
 - **`npm run lint`** — ESLint; the repo may have many pre-existing warnings/errors — avoid adding new ones in touched files ([AGENTS.md](../AGENTS.md)).
 
