@@ -384,7 +384,7 @@ export type Database = {
           created_at: string
           id: string
           latency_ms: number | null
-          reflection_id: string | null
+          pause_instance_id: string | null
           serve_source: string
           user_id: string
         }
@@ -397,7 +397,7 @@ export type Database = {
           created_at?: string
           id?: string
           latency_ms?: number | null
-          reflection_id?: string | null
+          pause_instance_id?: string | null
           serve_source: string
           user_id: string
         }
@@ -410,7 +410,7 @@ export type Database = {
           created_at?: string
           id?: string
           latency_ms?: number | null
-          reflection_id?: string | null
+          pause_instance_id?: string | null
           serve_source?: string
           user_id?: string
         }
@@ -423,31 +423,31 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
-            foreignKeyName: "companion_serves_reflection_id_fkey"
-            columns: ["reflection_id"]
+            foreignKeyName: "companion_serves_pause_instance_id_fkey"
+            columns: ["pause_instance_id"]
             isOneToOne: false
-            referencedRelation: "reflections"
+            referencedRelation: "pause_instances"
             referencedColumns: ["id"]
           },
           {
-            foreignKeyName: "companion_serves_reflection_id_fkey"
-            columns: ["reflection_id"]
+            foreignKeyName: "companion_serves_pause_instance_id_fkey"
+            columns: ["pause_instance_id"]
             isOneToOne: false
-            referencedRelation: "v_reflection_with_companions"
+            referencedRelation: "v_pause_completed"
             referencedColumns: ["id"]
           },
           {
-            foreignKeyName: "companion_serves_reflection_id_fkey"
-            columns: ["reflection_id"]
+            foreignKeyName: "companion_serves_pause_instance_id_fkey"
+            columns: ["pause_instance_id"]
             isOneToOne: false
-            referencedRelation: "v_reflections_completed"
+            referencedRelation: "v_pause_current"
             referencedColumns: ["id"]
           },
           {
-            foreignKeyName: "companion_serves_reflection_id_fkey"
-            columns: ["reflection_id"]
+            foreignKeyName: "companion_serves_pause_instance_id_fkey"
+            columns: ["pause_instance_id"]
             isOneToOne: false
-            referencedRelation: "v_reflections_engaged"
+            referencedRelation: "v_pause_full"
             referencedColumns: ["id"]
           },
         ]
@@ -722,65 +722,6 @@ export type Database = {
         }
         Relationships: []
       }
-      follow_ups: {
-        Row: {
-          created_at: string
-          decision_held: boolean | null
-          id: string
-          original_decision: string
-          reflection_id: string
-          responded_at: string | null
-          user_id: string
-        }
-        Insert: {
-          created_at?: string
-          decision_held?: boolean | null
-          id?: string
-          original_decision: string
-          reflection_id: string
-          responded_at?: string | null
-          user_id: string
-        }
-        Update: {
-          created_at?: string
-          decision_held?: boolean | null
-          id?: string
-          original_decision?: string
-          reflection_id?: string
-          responded_at?: string | null
-          user_id?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "follow_ups_reflection_id_fkey"
-            columns: ["reflection_id"]
-            isOneToOne: true
-            referencedRelation: "reflections"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "follow_ups_reflection_id_fkey"
-            columns: ["reflection_id"]
-            isOneToOne: true
-            referencedRelation: "v_reflection_with_companions"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "follow_ups_reflection_id_fkey"
-            columns: ["reflection_id"]
-            isOneToOne: true
-            referencedRelation: "v_reflections_completed"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "follow_ups_reflection_id_fkey"
-            columns: ["reflection_id"]
-            isOneToOne: true
-            referencedRelation: "v_reflections_engaged"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
       future_letters: {
         Row: {
           body: string
@@ -835,9 +776,9 @@ export type Database = {
           latency_ms: number | null
           model: string
           output_tokens: number | null
+          pause_instance_id: string | null
           provider: string
           quality_gate_reason: string | null
-          reflection_id: string | null
           status: string
           user_id: string | null
         }
@@ -852,9 +793,9 @@ export type Database = {
           latency_ms?: number | null
           model: string
           output_tokens?: number | null
+          pause_instance_id?: string | null
           provider: string
           quality_gate_reason?: string | null
-          reflection_id?: string | null
           status: string
           user_id?: string | null
         }
@@ -869,42 +810,13 @@ export type Database = {
           latency_ms?: number | null
           model?: string
           output_tokens?: number | null
+          pause_instance_id?: string | null
           provider?: string
           quality_gate_reason?: string | null
-          reflection_id?: string | null
           status?: string
           user_id?: string | null
         }
-        Relationships: [
-          {
-            foreignKeyName: "generation_attempts_reflection_id_fkey"
-            columns: ["reflection_id"]
-            isOneToOne: false
-            referencedRelation: "reflections"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "generation_attempts_reflection_id_fkey"
-            columns: ["reflection_id"]
-            isOneToOne: false
-            referencedRelation: "v_reflection_with_companions"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "generation_attempts_reflection_id_fkey"
-            columns: ["reflection_id"]
-            isOneToOne: false
-            referencedRelation: "v_reflections_completed"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "generation_attempts_reflection_id_fkey"
-            columns: ["reflection_id"]
-            isOneToOne: false
-            referencedRelation: "v_reflections_engaged"
-            referencedColumns: ["id"]
-          },
-        ]
+        Relationships: []
       }
       graph_edges: {
         Row: {
@@ -987,8 +899,8 @@ export type Database = {
           created_at: string
           id: string
           is_favorite: boolean
+          pause_instance_id: string | null
           pinned: boolean
-          reflection_id: string | null
           source_type: string | null
           source_url: string | null
           status: string
@@ -1002,8 +914,8 @@ export type Database = {
           created_at?: string
           id?: string
           is_favorite?: boolean
+          pause_instance_id?: string | null
           pinned?: boolean
-          reflection_id?: string | null
           source_type?: string | null
           source_url?: string | null
           status?: string
@@ -1017,8 +929,8 @@ export type Database = {
           created_at?: string
           id?: string
           is_favorite?: boolean
+          pause_instance_id?: string | null
           pinned?: boolean
-          reflection_id?: string | null
           source_type?: string | null
           source_url?: string | null
           status?: string
@@ -1029,31 +941,31 @@ export type Database = {
         }
         Relationships: [
           {
-            foreignKeyName: "library_items_reflection_id_fkey"
-            columns: ["reflection_id"]
+            foreignKeyName: "library_items_pause_instance_id_fkey"
+            columns: ["pause_instance_id"]
             isOneToOne: false
-            referencedRelation: "reflections"
+            referencedRelation: "pause_instances"
             referencedColumns: ["id"]
           },
           {
-            foreignKeyName: "library_items_reflection_id_fkey"
-            columns: ["reflection_id"]
+            foreignKeyName: "library_items_pause_instance_id_fkey"
+            columns: ["pause_instance_id"]
             isOneToOne: false
-            referencedRelation: "v_reflection_with_companions"
+            referencedRelation: "v_pause_completed"
             referencedColumns: ["id"]
           },
           {
-            foreignKeyName: "library_items_reflection_id_fkey"
-            columns: ["reflection_id"]
+            foreignKeyName: "library_items_pause_instance_id_fkey"
+            columns: ["pause_instance_id"]
             isOneToOne: false
-            referencedRelation: "v_reflections_completed"
+            referencedRelation: "v_pause_current"
             referencedColumns: ["id"]
           },
           {
-            foreignKeyName: "library_items_reflection_id_fkey"
-            columns: ["reflection_id"]
+            foreignKeyName: "library_items_pause_instance_id_fkey"
+            columns: ["pause_instance_id"]
             isOneToOne: false
-            referencedRelation: "v_reflections_engaged"
+            referencedRelation: "v_pause_full"
             referencedColumns: ["id"]
           },
         ]
@@ -1166,61 +1078,345 @@ export type Database = {
         }
         Relationships: []
       }
-      pause_notifications: {
+      pause_ai_artifacts: {
         Row: {
-          context: string | null
+          cache_entry_id: string | null
+          content: Json
           created_at: string
           id: string
-          message: string
-          reflection_id: string | null
+          kind: string
+          model: string | null
+          pause_instance_id: string
+          prompt_version: string | null
           user_id: string
         }
         Insert: {
-          context?: string | null
+          cache_entry_id?: string | null
+          content: Json
           created_at?: string
           id?: string
-          message: string
-          reflection_id?: string | null
+          kind: string
+          model?: string | null
+          pause_instance_id: string
+          prompt_version?: string | null
           user_id: string
         }
         Update: {
-          context?: string | null
+          cache_entry_id?: string | null
+          content?: Json
           created_at?: string
           id?: string
-          message?: string
-          reflection_id?: string | null
+          kind?: string
+          model?: string | null
+          pause_instance_id?: string
+          prompt_version?: string | null
           user_id?: string
         }
         Relationships: [
           {
-            foreignKeyName: "pause_notifications_reflection_id_fkey"
-            columns: ["reflection_id"]
+            foreignKeyName: "pause_ai_artifacts_cache_entry_id_fkey"
+            columns: ["cache_entry_id"]
             isOneToOne: false
-            referencedRelation: "reflections"
+            referencedRelation: "companion_cache"
             referencedColumns: ["id"]
           },
           {
-            foreignKeyName: "pause_notifications_reflection_id_fkey"
-            columns: ["reflection_id"]
+            foreignKeyName: "pause_ai_artifacts_pause_instance_id_fkey"
+            columns: ["pause_instance_id"]
             isOneToOne: false
-            referencedRelation: "v_reflection_with_companions"
+            referencedRelation: "pause_instances"
             referencedColumns: ["id"]
           },
           {
-            foreignKeyName: "pause_notifications_reflection_id_fkey"
-            columns: ["reflection_id"]
+            foreignKeyName: "pause_ai_artifacts_pause_instance_id_fkey"
+            columns: ["pause_instance_id"]
             isOneToOne: false
-            referencedRelation: "v_reflections_completed"
+            referencedRelation: "v_pause_completed"
             referencedColumns: ["id"]
           },
           {
-            foreignKeyName: "pause_notifications_reflection_id_fkey"
-            columns: ["reflection_id"]
+            foreignKeyName: "pause_ai_artifacts_pause_instance_id_fkey"
+            columns: ["pause_instance_id"]
             isOneToOne: false
-            referencedRelation: "v_reflections_engaged"
+            referencedRelation: "v_pause_current"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "pause_ai_artifacts_pause_instance_id_fkey"
+            columns: ["pause_instance_id"]
+            isOneToOne: false
+            referencedRelation: "v_pause_full"
             referencedColumns: ["id"]
           },
         ]
+      }
+      pause_companion_events: {
+        Row: {
+          action: Database["public"]["Enums"]["pause_companion_action"]
+          companion_type: string
+          counts_for_pause: boolean
+          created_at: string
+          entry_point: string
+          id: string
+          non_counting_reason: string | null
+          pause_instance_id: string | null
+          user_id: string
+        }
+        Insert: {
+          action: Database["public"]["Enums"]["pause_companion_action"]
+          companion_type: string
+          counts_for_pause?: boolean
+          created_at?: string
+          entry_point: string
+          id?: string
+          non_counting_reason?: string | null
+          pause_instance_id?: string | null
+          user_id: string
+        }
+        Update: {
+          action?: Database["public"]["Enums"]["pause_companion_action"]
+          companion_type?: string
+          counts_for_pause?: boolean
+          created_at?: string
+          entry_point?: string
+          id?: string
+          non_counting_reason?: string | null
+          pause_instance_id?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "pause_companion_events_pause_instance_id_fkey"
+            columns: ["pause_instance_id"]
+            isOneToOne: false
+            referencedRelation: "pause_instances"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "pause_companion_events_pause_instance_id_fkey"
+            columns: ["pause_instance_id"]
+            isOneToOne: false
+            referencedRelation: "v_pause_completed"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "pause_companion_events_pause_instance_id_fkey"
+            columns: ["pause_instance_id"]
+            isOneToOne: false
+            referencedRelation: "v_pause_current"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "pause_companion_events_pause_instance_id_fkey"
+            columns: ["pause_instance_id"]
+            isOneToOne: false
+            referencedRelation: "v_pause_full"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      pause_instances: {
+        Row: {
+          completed_at: string | null
+          context_fingerprint: string
+          context_rule_result: Json
+          context_snapshot: Json
+          created_at: string
+          dismissed_by_user: boolean
+          engaged_at: string | null
+          expired_reason:
+            | Database["public"]["Enums"]["pause_expired_reason"]
+            | null
+          id: string
+          metadata: Json
+          source: string
+          state: Database["public"]["Enums"]["pause_state"]
+          superseded_by: string | null
+          template_id: string
+          terminal_at: string | null
+          user_id: string
+          window_ends_at: string
+          window_starts_at: string
+        }
+        Insert: {
+          completed_at?: string | null
+          context_fingerprint: string
+          context_rule_result?: Json
+          context_snapshot?: Json
+          created_at?: string
+          dismissed_by_user?: boolean
+          engaged_at?: string | null
+          expired_reason?:
+            | Database["public"]["Enums"]["pause_expired_reason"]
+            | null
+          id?: string
+          metadata?: Json
+          source: string
+          state?: Database["public"]["Enums"]["pause_state"]
+          superseded_by?: string | null
+          template_id: string
+          terminal_at?: string | null
+          user_id: string
+          window_ends_at: string
+          window_starts_at?: string
+        }
+        Update: {
+          completed_at?: string | null
+          context_fingerprint?: string
+          context_rule_result?: Json
+          context_snapshot?: Json
+          created_at?: string
+          dismissed_by_user?: boolean
+          engaged_at?: string | null
+          expired_reason?:
+            | Database["public"]["Enums"]["pause_expired_reason"]
+            | null
+          id?: string
+          metadata?: Json
+          source?: string
+          state?: Database["public"]["Enums"]["pause_state"]
+          superseded_by?: string | null
+          template_id?: string
+          terminal_at?: string | null
+          user_id?: string
+          window_ends_at?: string
+          window_starts_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "pause_instances_superseded_by_fkey"
+            columns: ["superseded_by"]
+            isOneToOne: false
+            referencedRelation: "pause_instances"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "pause_instances_superseded_by_fkey"
+            columns: ["superseded_by"]
+            isOneToOne: false
+            referencedRelation: "v_pause_completed"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "pause_instances_superseded_by_fkey"
+            columns: ["superseded_by"]
+            isOneToOne: false
+            referencedRelation: "v_pause_current"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "pause_instances_superseded_by_fkey"
+            columns: ["superseded_by"]
+            isOneToOne: false
+            referencedRelation: "v_pause_full"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "pause_instances_template_id_fkey"
+            columns: ["template_id"]
+            isOneToOne: false
+            referencedRelation: "pause_templates"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      pause_step_events: {
+        Row: {
+          created_at: string
+          id: string
+          pause_instance_id: string
+          payload: Json
+          step_type: Database["public"]["Enums"]["pause_step_type"]
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          pause_instance_id: string
+          payload?: Json
+          step_type: Database["public"]["Enums"]["pause_step_type"]
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          pause_instance_id?: string
+          payload?: Json
+          step_type?: Database["public"]["Enums"]["pause_step_type"]
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "pause_step_events_pause_instance_id_fkey"
+            columns: ["pause_instance_id"]
+            isOneToOne: false
+            referencedRelation: "pause_instances"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "pause_step_events_pause_instance_id_fkey"
+            columns: ["pause_instance_id"]
+            isOneToOne: false
+            referencedRelation: "v_pause_completed"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "pause_step_events_pause_instance_id_fkey"
+            columns: ["pause_instance_id"]
+            isOneToOne: false
+            referencedRelation: "v_pause_current"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "pause_step_events_pause_instance_id_fkey"
+            columns: ["pause_instance_id"]
+            isOneToOne: false
+            referencedRelation: "v_pause_full"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      pause_templates: {
+        Row: {
+          active: boolean
+          allowed_companion_types: string[]
+          config: Json
+          created_at: string
+          id: string
+          required_companion_count: number
+          required_for_completed: string[]
+          required_for_engaged: string[]
+          slug: string
+          version: number
+          window_ms: number
+        }
+        Insert: {
+          active?: boolean
+          allowed_companion_types: string[]
+          config?: Json
+          created_at?: string
+          id?: string
+          required_companion_count?: number
+          required_for_completed: string[]
+          required_for_engaged: string[]
+          slug: string
+          version?: number
+          window_ms: number
+        }
+        Update: {
+          active?: boolean
+          allowed_companion_types?: string[]
+          config?: Json
+          created_at?: string
+          id?: string
+          required_companion_count?: number
+          required_for_completed?: string[]
+          required_for_engaged?: string[]
+          slug?: string
+          version?: number
+          window_ms?: number
+        }
+        Relationships: []
       }
       practice_entries: {
         Row: {
@@ -1231,7 +1427,6 @@ export type Database = {
           intensity: number | null
           mood: string | null
           prompt: string | null
-          source_reflection_id: string | null
           trigger_text: string | null
           type: string
           user_id: string
@@ -1244,7 +1439,6 @@ export type Database = {
           intensity?: number | null
           mood?: string | null
           prompt?: string | null
-          source_reflection_id?: string | null
           trigger_text?: string | null
           type?: string
           user_id: string
@@ -1257,41 +1451,11 @@ export type Database = {
           intensity?: number | null
           mood?: string | null
           prompt?: string | null
-          source_reflection_id?: string | null
           trigger_text?: string | null
           type?: string
           user_id?: string
         }
-        Relationships: [
-          {
-            foreignKeyName: "practice_entries_source_reflection_id_fkey"
-            columns: ["source_reflection_id"]
-            isOneToOne: false
-            referencedRelation: "reflections"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "practice_entries_source_reflection_id_fkey"
-            columns: ["source_reflection_id"]
-            isOneToOne: false
-            referencedRelation: "v_reflection_with_companions"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "practice_entries_source_reflection_id_fkey"
-            columns: ["source_reflection_id"]
-            isOneToOne: false
-            referencedRelation: "v_reflections_completed"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "practice_entries_source_reflection_id_fkey"
-            columns: ["source_reflection_id"]
-            isOneToOne: false
-            referencedRelation: "v_reflections_engaged"
-            referencedColumns: ["id"]
-          },
-        ]
+        Relationships: []
       }
       profiles: {
         Row: {
@@ -1599,72 +1763,6 @@ export type Database = {
         }
         Relationships: []
       }
-      reflection_companions: {
-        Row: {
-          cache_entry_id: string | null
-          companion_type: string
-          content: Json
-          created_at: string | null
-          id: string
-          read: boolean | null
-          reflection_id: string
-        }
-        Insert: {
-          cache_entry_id?: string | null
-          companion_type: string
-          content: Json
-          created_at?: string | null
-          id?: string
-          read?: boolean | null
-          reflection_id: string
-        }
-        Update: {
-          cache_entry_id?: string | null
-          companion_type?: string
-          content?: Json
-          created_at?: string | null
-          id?: string
-          read?: boolean | null
-          reflection_id?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "reflection_companions_cache_entry_id_fkey"
-            columns: ["cache_entry_id"]
-            isOneToOne: false
-            referencedRelation: "companion_cache"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "reflection_companions_reflection_id_fkey"
-            columns: ["reflection_id"]
-            isOneToOne: false
-            referencedRelation: "reflections"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "reflection_companions_reflection_id_fkey"
-            columns: ["reflection_id"]
-            isOneToOne: false
-            referencedRelation: "v_reflection_with_companions"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "reflection_companions_reflection_id_fkey"
-            columns: ["reflection_id"]
-            isOneToOne: false
-            referencedRelation: "v_reflections_completed"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "reflection_companions_reflection_id_fkey"
-            columns: ["reflection_id"]
-            isOneToOne: false
-            referencedRelation: "v_reflections_engaged"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
       reflection_insights: {
         Row: {
           created_at: string
@@ -1701,72 +1799,6 @@ export type Database = {
         }
         Relationships: []
       }
-      reflections: {
-        Row: {
-          breathing_completed: boolean
-          context: string | null
-          created_at: string
-          engaged_at: string | null
-          grounding_body: string | null
-          grounding_read: boolean
-          grounding_title: string | null
-          haiku: string | null
-          haiku_read: boolean
-          id: string
-          is_favorite: boolean
-          message: string
-          mood: string | null
-          mood_after: string | null
-          note: string | null
-          outcome: string | null
-          source: string | null
-          tags: string[] | null
-          user_id: string
-        }
-        Insert: {
-          breathing_completed?: boolean
-          context?: string | null
-          created_at?: string
-          engaged_at?: string | null
-          grounding_body?: string | null
-          grounding_read?: boolean
-          grounding_title?: string | null
-          haiku?: string | null
-          haiku_read?: boolean
-          id?: string
-          is_favorite?: boolean
-          message: string
-          mood?: string | null
-          mood_after?: string | null
-          note?: string | null
-          outcome?: string | null
-          source?: string | null
-          tags?: string[] | null
-          user_id: string
-        }
-        Update: {
-          breathing_completed?: boolean
-          context?: string | null
-          created_at?: string
-          engaged_at?: string | null
-          grounding_body?: string | null
-          grounding_read?: boolean
-          grounding_title?: string | null
-          haiku?: string | null
-          haiku_read?: boolean
-          id?: string
-          is_favorite?: boolean
-          message?: string
-          mood?: string | null
-          mood_after?: string | null
-          note?: string | null
-          outcome?: string | null
-          source?: string | null
-          tags?: string[] | null
-          user_id?: string
-        }
-        Relationships: []
-      }
       ritual_completions: {
         Row: {
           created_at: string
@@ -1775,7 +1807,6 @@ export type Database = {
           duration_seconds: number | null
           id: string
           journal_text: string | null
-          reflection_id: string | null
           steps_completed: Json | null
           template: string
           user_id: string
@@ -1787,7 +1818,6 @@ export type Database = {
           duration_seconds?: number | null
           id?: string
           journal_text?: string | null
-          reflection_id?: string | null
           steps_completed?: Json | null
           template?: string
           user_id: string
@@ -1799,7 +1829,6 @@ export type Database = {
           duration_seconds?: number | null
           id?: string
           journal_text?: string | null
-          reflection_id?: string | null
           steps_completed?: Json | null
           template?: string
           user_id?: string
@@ -1810,34 +1839,6 @@ export type Database = {
             columns: ["custom_template_id"]
             isOneToOne: false
             referencedRelation: "ritual_templates"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "ritual_completions_reflection_id_fkey"
-            columns: ["reflection_id"]
-            isOneToOne: false
-            referencedRelation: "reflections"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "ritual_completions_reflection_id_fkey"
-            columns: ["reflection_id"]
-            isOneToOne: false
-            referencedRelation: "v_reflection_with_companions"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "ritual_completions_reflection_id_fkey"
-            columns: ["reflection_id"]
-            isOneToOne: false
-            referencedRelation: "v_reflections_completed"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "ritual_completions_reflection_id_fkey"
-            columns: ["reflection_id"]
-            isOneToOne: false
-            referencedRelation: "v_reflections_engaged"
             referencedColumns: ["id"]
           },
         ]
@@ -2262,197 +2263,377 @@ export type Database = {
         }
         Relationships: []
       }
-      v_notification_response_rate: {
+      v_pause_completed: {
+        Row: {
+          completed_at: string | null
+          context_fingerprint: string | null
+          context_rule_result: Json | null
+          context_snapshot: Json | null
+          created_at: string | null
+          dismissed_by_user: boolean | null
+          engaged_at: string | null
+          expired_reason:
+            | Database["public"]["Enums"]["pause_expired_reason"]
+            | null
+          id: string | null
+          metadata: Json | null
+          source: string | null
+          state: Database["public"]["Enums"]["pause_state"] | null
+          superseded_by: string | null
+          template_id: string | null
+          terminal_at: string | null
+          user_id: string | null
+          window_ends_at: string | null
+          window_starts_at: string | null
+        }
+        Insert: {
+          completed_at?: string | null
+          context_fingerprint?: string | null
+          context_rule_result?: Json | null
+          context_snapshot?: Json | null
+          created_at?: string | null
+          dismissed_by_user?: boolean | null
+          engaged_at?: string | null
+          expired_reason?:
+            | Database["public"]["Enums"]["pause_expired_reason"]
+            | null
+          id?: string | null
+          metadata?: Json | null
+          source?: string | null
+          state?: Database["public"]["Enums"]["pause_state"] | null
+          superseded_by?: string | null
+          template_id?: string | null
+          terminal_at?: string | null
+          user_id?: string | null
+          window_ends_at?: string | null
+          window_starts_at?: string | null
+        }
+        Update: {
+          completed_at?: string | null
+          context_fingerprint?: string | null
+          context_rule_result?: Json | null
+          context_snapshot?: Json | null
+          created_at?: string | null
+          dismissed_by_user?: boolean | null
+          engaged_at?: string | null
+          expired_reason?:
+            | Database["public"]["Enums"]["pause_expired_reason"]
+            | null
+          id?: string | null
+          metadata?: Json | null
+          source?: string | null
+          state?: Database["public"]["Enums"]["pause_state"] | null
+          superseded_by?: string | null
+          template_id?: string | null
+          terminal_at?: string | null
+          user_id?: string | null
+          window_ends_at?: string | null
+          window_starts_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "pause_instances_superseded_by_fkey"
+            columns: ["superseded_by"]
+            isOneToOne: false
+            referencedRelation: "pause_instances"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "pause_instances_superseded_by_fkey"
+            columns: ["superseded_by"]
+            isOneToOne: false
+            referencedRelation: "v_pause_completed"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "pause_instances_superseded_by_fkey"
+            columns: ["superseded_by"]
+            isOneToOne: false
+            referencedRelation: "v_pause_current"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "pause_instances_superseded_by_fkey"
+            columns: ["superseded_by"]
+            isOneToOne: false
+            referencedRelation: "v_pause_full"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "pause_instances_template_id_fkey"
+            columns: ["template_id"]
+            isOneToOne: false
+            referencedRelation: "pause_templates"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      v_pause_current: {
+        Row: {
+          completed_at: string | null
+          context_fingerprint: string | null
+          context_rule_result: Json | null
+          context_snapshot: Json | null
+          created_at: string | null
+          dismissed_by_user: boolean | null
+          engaged_at: string | null
+          expired_reason:
+            | Database["public"]["Enums"]["pause_expired_reason"]
+            | null
+          id: string | null
+          metadata: Json | null
+          source: string | null
+          state: Database["public"]["Enums"]["pause_state"] | null
+          superseded_by: string | null
+          template_id: string | null
+          terminal_at: string | null
+          user_id: string | null
+          window_ends_at: string | null
+          window_starts_at: string | null
+        }
+        Insert: {
+          completed_at?: string | null
+          context_fingerprint?: string | null
+          context_rule_result?: Json | null
+          context_snapshot?: Json | null
+          created_at?: string | null
+          dismissed_by_user?: boolean | null
+          engaged_at?: string | null
+          expired_reason?:
+            | Database["public"]["Enums"]["pause_expired_reason"]
+            | null
+          id?: string | null
+          metadata?: Json | null
+          source?: string | null
+          state?: Database["public"]["Enums"]["pause_state"] | null
+          superseded_by?: string | null
+          template_id?: string | null
+          terminal_at?: string | null
+          user_id?: string | null
+          window_ends_at?: string | null
+          window_starts_at?: string | null
+        }
+        Update: {
+          completed_at?: string | null
+          context_fingerprint?: string | null
+          context_rule_result?: Json | null
+          context_snapshot?: Json | null
+          created_at?: string | null
+          dismissed_by_user?: boolean | null
+          engaged_at?: string | null
+          expired_reason?:
+            | Database["public"]["Enums"]["pause_expired_reason"]
+            | null
+          id?: string | null
+          metadata?: Json | null
+          source?: string | null
+          state?: Database["public"]["Enums"]["pause_state"] | null
+          superseded_by?: string | null
+          template_id?: string | null
+          terminal_at?: string | null
+          user_id?: string | null
+          window_ends_at?: string | null
+          window_starts_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "pause_instances_superseded_by_fkey"
+            columns: ["superseded_by"]
+            isOneToOne: false
+            referencedRelation: "pause_instances"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "pause_instances_superseded_by_fkey"
+            columns: ["superseded_by"]
+            isOneToOne: false
+            referencedRelation: "v_pause_completed"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "pause_instances_superseded_by_fkey"
+            columns: ["superseded_by"]
+            isOneToOne: false
+            referencedRelation: "v_pause_current"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "pause_instances_superseded_by_fkey"
+            columns: ["superseded_by"]
+            isOneToOne: false
+            referencedRelation: "v_pause_full"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "pause_instances_template_id_fkey"
+            columns: ["template_id"]
+            isOneToOne: false
+            referencedRelation: "pause_templates"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      v_pause_full: {
+        Row: {
+          completed_at: string | null
+          context_fingerprint: string | null
+          context_rule_result: Json | null
+          context_snapshot: Json | null
+          counted_companion_count: number | null
+          counted_companion_types: string[] | null
+          created_at: string | null
+          dismissed_by_user: boolean | null
+          engaged_at: string | null
+          expired_reason:
+            | Database["public"]["Enums"]["pause_expired_reason"]
+            | null
+          haiku_text: string | null
+          has_breath_completed: boolean | null
+          has_initial_emotion_logged: boolean | null
+          has_outcome_logged: boolean | null
+          has_shift_emotion_logged: boolean | null
+          id: string | null
+          initial_mood: string | null
+          is_favorite: boolean | null
+          metadata: Json | null
+          note_text: string | null
+          outcome: string | null
+          reflection_text: string | null
+          shift_mood: string | null
+          source: string | null
+          state: Database["public"]["Enums"]["pause_state"] | null
+          superseded_by: string | null
+          tags: string[] | null
+          template_id: string | null
+          terminal_at: string | null
+          user_id: string | null
+          window_ends_at: string | null
+          window_starts_at: string | null
+        }
+        Insert: {
+          completed_at?: string | null
+          context_fingerprint?: string | null
+          context_rule_result?: Json | null
+          context_snapshot?: Json | null
+          counted_companion_count?: never
+          counted_companion_types?: never
+          created_at?: string | null
+          dismissed_by_user?: boolean | null
+          engaged_at?: string | null
+          expired_reason?:
+            | Database["public"]["Enums"]["pause_expired_reason"]
+            | null
+          haiku_text?: never
+          has_breath_completed?: never
+          has_initial_emotion_logged?: never
+          has_outcome_logged?: never
+          has_shift_emotion_logged?: never
+          id?: string | null
+          initial_mood?: never
+          is_favorite?: never
+          metadata?: Json | null
+          note_text?: never
+          outcome?: never
+          reflection_text?: never
+          shift_mood?: never
+          source?: string | null
+          state?: Database["public"]["Enums"]["pause_state"] | null
+          superseded_by?: string | null
+          tags?: never
+          template_id?: string | null
+          terminal_at?: string | null
+          user_id?: string | null
+          window_ends_at?: string | null
+          window_starts_at?: string | null
+        }
+        Update: {
+          completed_at?: string | null
+          context_fingerprint?: string | null
+          context_rule_result?: Json | null
+          context_snapshot?: Json | null
+          counted_companion_count?: never
+          counted_companion_types?: never
+          created_at?: string | null
+          dismissed_by_user?: boolean | null
+          engaged_at?: string | null
+          expired_reason?:
+            | Database["public"]["Enums"]["pause_expired_reason"]
+            | null
+          haiku_text?: never
+          has_breath_completed?: never
+          has_initial_emotion_logged?: never
+          has_outcome_logged?: never
+          has_shift_emotion_logged?: never
+          id?: string | null
+          initial_mood?: never
+          is_favorite?: never
+          metadata?: Json | null
+          note_text?: never
+          outcome?: never
+          reflection_text?: never
+          shift_mood?: never
+          source?: string | null
+          state?: Database["public"]["Enums"]["pause_state"] | null
+          superseded_by?: string | null
+          tags?: never
+          template_id?: string | null
+          terminal_at?: string | null
+          user_id?: string | null
+          window_ends_at?: string | null
+          window_starts_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "pause_instances_superseded_by_fkey"
+            columns: ["superseded_by"]
+            isOneToOne: false
+            referencedRelation: "pause_instances"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "pause_instances_superseded_by_fkey"
+            columns: ["superseded_by"]
+            isOneToOne: false
+            referencedRelation: "v_pause_completed"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "pause_instances_superseded_by_fkey"
+            columns: ["superseded_by"]
+            isOneToOne: false
+            referencedRelation: "v_pause_current"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "pause_instances_superseded_by_fkey"
+            columns: ["superseded_by"]
+            isOneToOne: false
+            referencedRelation: "v_pause_full"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "pause_instances_template_id_fkey"
+            columns: ["template_id"]
+            isOneToOne: false
+            referencedRelation: "pause_templates"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      v_pause_metrics_daily: {
         Row: {
           completed: number | null
+          created: number | null
           day: string | null
+          dismissed: number | null
           engaged: number | null
-          ignored: number | null
-          notifications: number | null
-          pct_completed: number | null
-          pct_engaged: number | null
-        }
-        Relationships: []
-      }
-      v_reflection_with_companions: {
-        Row: {
-          breathing_completed: boolean | null
-          companion_grounding_body: string | null
-          companion_grounding_citation: string | null
-          companion_grounding_read: boolean | null
-          companion_grounding_title: string | null
-          companion_grounding_url: string | null
-          companion_history_data: Json | null
-          companion_history_read: boolean | null
-          companion_signal_body: string | null
-          companion_signal_read: boolean | null
-          companion_signal_source: string | null
-          companion_signal_title: string | null
-          companion_signal_url: string | null
-          companion_zoom_out_data: Json | null
-          companion_zoom_out_read: boolean | null
-          context: string | null
-          created_at: string | null
-          engaged_at: string | null
-          grounding_body: string | null
-          grounding_read: boolean | null
-          grounding_title: string | null
-          haiku: string | null
-          haiku_read: boolean | null
-          history_insight_data: Json | null
-          history_read: boolean | null
-          id: string | null
-          is_favorite: boolean | null
-          message: string | null
-          mood: string | null
-          mood_after: string | null
-          note: string | null
-          outcome: string | null
-          serve_source_ground_nudge: string | null
-          serve_source_historical_insight: string | null
-          serve_source_signal: string | null
-          serve_source_zoom_out: string | null
-          signal_body: string | null
-          signal_read: boolean | null
-          signal_source: string | null
-          signal_title: string | null
-          signal_url: string | null
-          tags: string[] | null
+          expired: number | null
+          expired_context_lost: number | null
+          expired_ineligible: number | null
+          expired_superseded: number | null
+          expired_system_cancelled: number | null
+          expired_window_elapsed: number | null
           user_id: string | null
-          zoom_out_data: Json | null
-          zoom_out_read: boolean | null
-        }
-        Relationships: []
-      }
-      v_reflections_completed: {
-        Row: {
-          breathing_completed: boolean | null
-          context: string | null
-          created_at: string | null
-          engaged_at: string | null
-          grounding_body: string | null
-          grounding_read: boolean | null
-          grounding_title: string | null
-          haiku: string | null
-          haiku_read: boolean | null
-          id: string | null
-          is_favorite: boolean | null
-          message: string | null
-          mood: string | null
-          mood_after: string | null
-          note: string | null
-          outcome: string | null
-          source: string | null
-          tags: string[] | null
-          user_id: string | null
-        }
-        Insert: {
-          breathing_completed?: boolean | null
-          context?: string | null
-          created_at?: string | null
-          engaged_at?: string | null
-          grounding_body?: string | null
-          grounding_read?: boolean | null
-          grounding_title?: string | null
-          haiku?: string | null
-          haiku_read?: boolean | null
-          id?: string | null
-          is_favorite?: boolean | null
-          message?: string | null
-          mood?: string | null
-          mood_after?: string | null
-          note?: string | null
-          outcome?: string | null
-          source?: string | null
-          tags?: string[] | null
-          user_id?: string | null
-        }
-        Update: {
-          breathing_completed?: boolean | null
-          context?: string | null
-          created_at?: string | null
-          engaged_at?: string | null
-          grounding_body?: string | null
-          grounding_read?: boolean | null
-          grounding_title?: string | null
-          haiku?: string | null
-          haiku_read?: boolean | null
-          id?: string | null
-          is_favorite?: boolean | null
-          message?: string | null
-          mood?: string | null
-          mood_after?: string | null
-          note?: string | null
-          outcome?: string | null
-          source?: string | null
-          tags?: string[] | null
-          user_id?: string | null
-        }
-        Relationships: []
-      }
-      v_reflections_engaged: {
-        Row: {
-          breathing_completed: boolean | null
-          context: string | null
-          created_at: string | null
-          engaged_at: string | null
-          grounding_body: string | null
-          grounding_read: boolean | null
-          grounding_title: string | null
-          haiku: string | null
-          haiku_read: boolean | null
-          id: string | null
-          is_favorite: boolean | null
-          message: string | null
-          mood: string | null
-          mood_after: string | null
-          note: string | null
-          outcome: string | null
-          source: string | null
-          tags: string[] | null
-          user_id: string | null
-        }
-        Insert: {
-          breathing_completed?: boolean | null
-          context?: string | null
-          created_at?: string | null
-          engaged_at?: string | null
-          grounding_body?: string | null
-          grounding_read?: boolean | null
-          grounding_title?: string | null
-          haiku?: string | null
-          haiku_read?: boolean | null
-          id?: string | null
-          is_favorite?: boolean | null
-          message?: string | null
-          mood?: string | null
-          mood_after?: string | null
-          note?: string | null
-          outcome?: string | null
-          source?: string | null
-          tags?: string[] | null
-          user_id?: string | null
-        }
-        Update: {
-          breathing_completed?: boolean | null
-          context?: string | null
-          created_at?: string | null
-          engaged_at?: string | null
-          grounding_body?: string | null
-          grounding_read?: boolean | null
-          grounding_title?: string | null
-          haiku?: string | null
-          haiku_read?: boolean | null
-          id?: string | null
-          is_favorite?: boolean | null
-          message?: string | null
-          mood?: string | null
-          mood_after?: string | null
-          note?: string | null
-          outcome?: string | null
-          source?: string | null
-          tags?: string[] | null
-          user_id?: string | null
         }
         Relationships: []
       }
@@ -2528,23 +2709,6 @@ export type Database = {
         Args: { payload: Json; queue_name: string }
         Returns: number
       }
-      find_similar_reflection: {
-        Args: {
-          _min_age_days?: number
-          _reflection_id: string
-          _user_id: string
-        }
-        Returns: {
-          context: string
-          created_at: string
-          id: string
-          message: string
-          mood: string
-          note: string
-          outcome: string
-          tags: string[]
-        }[]
-      }
       get_admin_stats: { Args: never; Returns: Json }
       get_holzen_number: { Args: never; Returns: Json }
       get_signup_gate: { Args: never; Returns: Json }
@@ -2575,10 +2739,60 @@ export type Database = {
         Args: { _collection_id: string; _user_id: string }
         Returns: boolean
       }
-      purge_orphan_notification_reflections: {
-        Args: { cutoff_days?: number }
-        Returns: number
+      pause_create_or_reuse: {
+        Args: {
+          p_context_fingerprint: string
+          p_context_rule_result: Json
+          p_context_snapshot: Json
+          p_source: string
+          p_template_slug: string
+        }
+        Returns: Json
       }
+      pause_create_or_reuse_as: {
+        Args: {
+          p_context_fingerprint: string
+          p_context_rule_result: Json
+          p_context_snapshot: Json
+          p_source: string
+          p_template_slug: string
+          p_user_id: string
+        }
+        Returns: Json
+      }
+      pause_dismiss: {
+        Args: { p_instance_id: string; p_reason?: string }
+        Returns: Database["public"]["Enums"]["pause_state"]
+      }
+      pause_evaluate_transitions: {
+        Args: { p_instance_id: string }
+        Returns: Database["public"]["Enums"]["pause_state"]
+      }
+      pause_expire: {
+        Args: {
+          p_instance_id: string
+          p_reason: Database["public"]["Enums"]["pause_expired_reason"]
+        }
+        Returns: Database["public"]["Enums"]["pause_state"]
+      }
+      pause_log_companion: {
+        Args: {
+          p_action: Database["public"]["Enums"]["pause_companion_action"]
+          p_companion_type: string
+          p_entry_point: string
+          p_instance_id: string
+        }
+        Returns: Json
+      }
+      pause_log_step: {
+        Args: {
+          p_instance_id: string
+          p_payload?: Json
+          p_step_type: Database["public"]["Enums"]["pause_step_type"]
+        }
+        Returns: Database["public"]["Enums"]["pause_state"]
+      }
+      pause_sweep_window_elapsed: { Args: never; Returns: number }
       read_email_batch: {
         Args: { batch_size: number; queue_name: string; vt: number }
         Returns: {
@@ -2593,7 +2807,23 @@ export type Database = {
       }
     }
     Enums: {
-      [_ in never]: never
+      pause_companion_action: "open" | "complete"
+      pause_expired_reason:
+        | "context_lost"
+        | "window_elapsed"
+        | "superseded"
+        | "ineligible_user_state"
+        | "system_cancelled"
+      pause_state: "active" | "engaged" | "completed" | "dismissed" | "expired"
+      pause_step_type:
+        | "breath_completed"
+        | "initial_emotion_logged"
+        | "reflection_step"
+        | "shift_emotion_logged"
+        | "outcome_logged"
+        | "note_updated"
+        | "tag_updated"
+        | "favorite_toggled"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -2720,6 +2950,26 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      pause_companion_action: ["open", "complete"],
+      pause_expired_reason: [
+        "context_lost",
+        "window_elapsed",
+        "superseded",
+        "ineligible_user_state",
+        "system_cancelled",
+      ],
+      pause_state: ["active", "engaged", "completed", "dismissed", "expired"],
+      pause_step_type: [
+        "breath_completed",
+        "initial_emotion_logged",
+        "reflection_step",
+        "shift_emotion_logged",
+        "outcome_logged",
+        "note_updated",
+        "tag_updated",
+        "favorite_toggled",
+      ],
+    },
   },
 } as const

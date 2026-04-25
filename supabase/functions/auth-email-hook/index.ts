@@ -8,7 +8,25 @@ import { MagicLinkEmail } from '../_shared/email-templates/magic-link.tsx'
 import { RecoveryEmail } from '../_shared/email-templates/recovery.tsx'
 import { EmailChangeEmail } from '../_shared/email-templates/email-change.tsx'
 import { ReauthenticationEmail } from '../_shared/email-templates/reauthentication.tsx'
-import { withRequestLogging } from "../_shared/with-request-logging.ts";
+import { redactEmailForLog } from "../_shared/email-log-helpers.ts";
+import { withRequestLogging, type RequestLoggingContext } from "../_shared/with-request-logging.ts";
+
+/** Props passed to Lovable auth email React templates (each template narrows its own fields). */
+type AuthEmailTemplateProps = Record<string, unknown>
+
+/** Webhook body after `verifyWebhookRequest` + `parseEmailWebhookPayload` (Lovable v1). */
+type AuthEmailWebhookPayload = {
+  version: string
+  run_id: string
+  data: {
+    action_type: string
+    email?: string
+    url?: string
+    token?: string
+    new_email?: string
+    callback_url?: string
+  }
+}
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -25,14 +43,14 @@ const EMAIL_SUBJECTS: Record<string, string> = {
   reauthentication: 'Your verification code',
 }
 
-// Template mapping
-const EMAIL_TEMPLATES: Record<string, React.ComponentType<any>> = {
-  signup: SignupEmail,
-  invite: InviteEmail,
-  magiclink: MagicLinkEmail,
-  recovery: RecoveryEmail,
-  email_change: EmailChangeEmail,
-  reauthentication: ReauthenticationEmail,
+// Template mapping (per-template strict props; webhooks pass a record-shaped object)
+const EMAIL_TEMPLATES: Record<string, React.ComponentType<AuthEmailTemplateProps>> = {
+  signup: SignupEmail as unknown as React.ComponentType<AuthEmailTemplateProps>,
+  invite: InviteEmail as unknown as React.ComponentType<AuthEmailTemplateProps>,
+  magiclink: MagicLinkEmail as unknown as React.ComponentType<AuthEmailTemplateProps>,
+  recovery: RecoveryEmail as unknown as React.ComponentType<AuthEmailTemplateProps>,
+  email_change: EmailChangeEmail as unknown as React.ComponentType<AuthEmailTemplateProps>,
+  reauthentication: ReauthenticationEmail as unknown as React.ComponentType<AuthEmailTemplateProps>,
 }
 
 // Configuration
@@ -120,7 +138,7 @@ async function handlePreview(req: Request): Promise<Response> {
     })
   }
 
-  const sampleData = SAMPLE_DATA[type] || {}
+  const sampleData = (SAMPLE_DATA[type] || {}) as AuthEmailTemplateProps
   const html = await renderAsync(React.createElement(EmailTemplate, sampleData))
 
   return new Response(html, {
@@ -130,11 +148,17 @@ async function handlePreview(req: Request): Promise<Response> {
 }
 
 // Webhook handler - verifies signature and sends email
-async function handleWebhook(req: Request): Promise<Response> {
+async function handleWebhook(req: Request, log: RequestLoggingContext["log"]): Promise<Response> {
   const apiKey = Deno.env.get('LOVABLE_API_KEY')
 
   if (!apiKey) {
-    console.error('LOVABLE_API_KEY not configured')
+    try {
+      log.error("auth_email_hook_missing_api_key", {
+        holzen_event: "auth_email_hook_missing_api_key",
+      });
+    } catch {
+      /* non-fatal */
+    }
     return new Response(
       JSON.stringify({ error: 'Server configuration error' }),
       { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
@@ -142,7 +166,7 @@ async function handleWebhook(req: Request): Promise<Response> {
   }
 
   // Verify signature + timestamp, then parse payload.
-  let payload: any
+  let payload: AuthEmailWebhookPayload
   let run_id = ''
   try {
     const verified = await verifyWebhookRequest({
@@ -150,7 +174,7 @@ async function handleWebhook(req: Request): Promise<Response> {
       secret: apiKey,
       parser: parseEmailWebhookPayload,
     })
-    payload = verified.payload
+    payload = verified.payload as AuthEmailWebhookPayload
     run_id = payload.run_id
   } catch (error) {
     if (error instanceof WebhookError) {
@@ -159,14 +183,30 @@ async function handleWebhook(req: Request): Promise<Response> {
         case 'missing_timestamp':
         case 'invalid_timestamp':
         case 'stale_timestamp':
-          console.error('Invalid webhook signature', { error: error.message })
+          try {
+            log.warn("auth_email_hook_signature_invalid", {
+              holzen_event: "auth_email_hook_signature_invalid",
+              code: error.code,
+              detail: error.message,
+            });
+          } catch {
+            /* non-fatal */
+          }
           return new Response(JSON.stringify({ error: 'Invalid signature' }), {
             status: 401,
             headers: { ...corsHeaders, 'Content-Type': 'application/json' },
           })
         case 'invalid_payload':
         case 'invalid_json':
-          console.error('Invalid webhook payload', { error: error.message })
+          try {
+            log.warn("auth_email_hook_payload_invalid", {
+              holzen_event: "auth_email_hook_payload_invalid",
+              code: error.code,
+              detail: error.message,
+            });
+          } catch {
+            /* non-fatal */
+          }
           return new Response(
             JSON.stringify({ error: 'Invalid webhook payload' }),
             { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
@@ -174,7 +214,14 @@ async function handleWebhook(req: Request): Promise<Response> {
       }
     }
 
-    console.error('Webhook verification failed', { error })
+    try {
+      log.error("auth_email_hook_verify_failed", {
+        holzen_event: "auth_email_hook_verify_failed",
+        detail: error instanceof Error ? error.message : String(error),
+      });
+    } catch {
+      /* non-fatal */
+    }
     return new Response(
       JSON.stringify({ error: 'Invalid webhook payload' }),
       { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
@@ -182,7 +229,13 @@ async function handleWebhook(req: Request): Promise<Response> {
   }
 
   if (!run_id) {
-    console.error('Webhook payload missing run_id')
+    try {
+      log.error("auth_email_hook_missing_run_id", {
+        holzen_event: "auth_email_hook_missing_run_id",
+      });
+    } catch {
+      /* non-fatal */
+    }
     return new Response(
       JSON.stringify({ error: 'Invalid webhook payload' }),
       {
@@ -193,7 +246,15 @@ async function handleWebhook(req: Request): Promise<Response> {
   }
 
   if (payload.version !== '1') {
-    console.error('Unsupported payload version', { version: payload.version, run_id })
+    try {
+      log.error("auth_email_hook_bad_version", {
+        holzen_event: "auth_email_hook_bad_version",
+        version: payload.version,
+        run_id,
+      });
+    } catch {
+      /* non-fatal */
+    }
     return new Response(
       JSON.stringify({ error: `Unsupported payload version: ${payload.version}` }),
       {
@@ -206,11 +267,28 @@ async function handleWebhook(req: Request): Promise<Response> {
   // The email action type is in payload.data.action_type (e.g., "signup", "recovery")
   // payload.type is the hook event type ("auth")
   const emailType = payload.data.action_type
-  console.log('Received auth event', { emailType, email: payload.data.email, run_id })
+  try {
+    log("auth_email_hook_received", {
+      holzen_event: "auth_email_hook_received",
+      email_type: emailType,
+      recipient_redacted: redactEmailForLog(String(payload.data.email ?? "")),
+      run_id,
+    });
+  } catch {
+    /* non-fatal */
+  }
 
   const EmailTemplate = EMAIL_TEMPLATES[emailType]
   if (!EmailTemplate) {
-    console.error('Unknown email type', { emailType, run_id })
+    try {
+      log.error("auth_email_hook_unknown_type", {
+        holzen_event: "auth_email_hook_unknown_type",
+        email_type: emailType,
+        run_id,
+      });
+    } catch {
+      /* non-fatal */
+    }
     return new Response(
       JSON.stringify({ error: `Unknown email type: ${emailType}` }),
       { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
@@ -218,7 +296,7 @@ async function handleWebhook(req: Request): Promise<Response> {
   }
 
   // Build template props from payload.data (HookData structure)
-  const templateProps = {
+  const templateProps: AuthEmailTemplateProps = {
     siteName: SITE_NAME,
     siteUrl: `https://${ROOT_DOMAIN}`,
     recipient: payload.data.email,
@@ -239,11 +317,34 @@ async function handleWebhook(req: Request): Promise<Response> {
   // for both production and local development
   const callbackUrl = payload.data.callback_url
   if (!callbackUrl) {
-    console.error('No callback_url in payload', { run_id })
+    try {
+      log.error("auth_email_hook_missing_callback_url", {
+        holzen_event: "auth_email_hook_missing_callback_url",
+        run_id,
+      });
+    } catch {
+      /* non-fatal */
+    }
     return new Response(JSON.stringify({ error: 'Missing callback_url in payload' }), {
       status: 400,
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
     })
+  }
+
+  const toEmail = typeof payload.data.email === "string" ? payload.data.email.trim() : "";
+  if (!toEmail) {
+    try {
+      log.error("auth_email_hook_missing_recipient", {
+        holzen_event: "auth_email_hook_missing_recipient",
+        run_id,
+      });
+    } catch {
+      /* non-fatal */
+    }
+    return new Response(JSON.stringify({ error: "Missing email in payload" }), {
+      status: 400,
+      headers: { ...corsHeaders, "Content-Type": "application/json" },
+    });
   }
 
   let result: { message_id?: string }
@@ -251,7 +352,7 @@ async function handleWebhook(req: Request): Promise<Response> {
     result = await sendLovableEmail(
       {
         run_id,
-        to: payload.data.email,
+        to: toEmail,
         from: `${SITE_NAME} <noreply@${FROM_DOMAIN}>`,
         sender_domain: SENDER_DOMAIN,
         subject: EMAIL_SUBJECTS[emailType] || 'Notification',
@@ -263,14 +364,30 @@ async function handleWebhook(req: Request): Promise<Response> {
     )
   } catch (error) {
     const message = error instanceof Error ? error.message : 'Failed to send email'
-    console.error('Email API error', { error: message, run_id })
+    try {
+      log.error("auth_email_hook_send_api_failed", {
+        holzen_event: "auth_email_hook_send_api_failed",
+        run_id,
+        detail: message.slice(0, 500),
+      });
+    } catch {
+      /* non-fatal */
+    }
     return new Response(JSON.stringify({ error: 'Failed to send email' }), {
       status: 500,
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
     })
   }
 
-  console.log('Email sent successfully', { message_id: result.message_id, run_id })
+  try {
+    log("auth_email_hook_sent", {
+      holzen_event: "auth_email_hook_sent",
+      message_id: result.message_id,
+      run_id,
+    });
+  } catch {
+    /* non-fatal */
+  }
 
   return new Response(
     JSON.stringify({ success: true, message_id: result.message_id }),
@@ -278,7 +395,7 @@ async function handleWebhook(req: Request): Promise<Response> {
   )
 }
 
-Deno.serve(withRequestLogging("auth-email-hook", async ({ req }) => {
+Deno.serve(withRequestLogging("auth-email-hook", async ({ req, log }) => {
   const url = new URL(req.url)
 
   // Handle CORS preflight for main endpoint
@@ -293,9 +410,16 @@ Deno.serve(withRequestLogging("auth-email-hook", async ({ req }) => {
 
   // Main webhook handler
   try {
-    return await handleWebhook(req)
+    return await handleWebhook(req, log)
   } catch (error) {
-    console.error('Webhook handler error:', error)
+    try {
+      log.error("auth_email_hook_uncaught", {
+        holzen_event: "auth_email_hook_uncaught",
+        detail: error instanceof Error ? error.message : String(error),
+      });
+    } catch {
+      /* non-fatal */
+    }
     const message = error instanceof Error ? error.message : 'Unknown error'
     return new Response(JSON.stringify({ error: message }), {
       status: 500,

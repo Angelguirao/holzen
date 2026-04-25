@@ -1,8 +1,6 @@
 import { supabase } from '@/integrations/supabase/client';
-import {
-  COMPANION_STEP_TO_REFLECTION_COLUMN,
-  COMPANION_STEP_TO_READ_TYPE,
-} from '@/lib/companion-completion-maps';
+import { pauseLogStep, pauseLogCompanion } from '@/lib/pause-api';
+import type { PauseStepType } from '@/lib/pause-state';
 
 export type CompanionUiCompletionStep =
   | 'breathing'
@@ -21,75 +19,100 @@ export interface CompanionUiCompletionState {
   history: boolean;
 }
 
-type ReflectionReadSlice = {
-  breathing_completed?: boolean | null;
-  haiku_read?: boolean | null;
-  grounding_read?: boolean | null;
+/** Map a UI step key to the V2 companion_type persisted on pause_companion_events. */
+const STEP_TO_COMPANION_TYPE: Record<CompanionUiCompletionStep, string | null> = {
+  breathing: null, // breath is a step event, not a companion
+  haiku: 'haiku',
+  grounding: 'ground_nudge',
+  signal: 'signal',
+  zoomOut: 'zoom_out',
+  history: 'historical_insight',
 };
 
-type CompanionReadRow = { companion_type: string; read: boolean | null };
+/** UI-step tag used in the set returned by collectStepTypes. */
+const STEP_TO_STEP_TYPE: Record<CompanionUiCompletionStep, PauseStepType | null> = {
+  breathing: 'breath_completed',
+  haiku: null,
+  grounding: null,
+  signal: null,
+  zoomOut: null,
+  history: null,
+};
 
 /**
- * Merge `reflections` ritual flags with `reflection_companions.read` (ground_nudge canonical for grounding).
+ * Hydrate "completed / read" UI state for one pause from the V2 tables.
+ * Breathing reads pause_step_events(step_type='breath_completed');
+ * every companion reads pause_companion_events with
+ * counts_for_pause=true (i.e. the completion that actually counted
+ * toward the pause).
  */
 export async function loadCompanionUiCompletionState(
-  reflectionId: string,
+  pauseInstanceId: string,
 ): Promise<CompanionUiCompletionState> {
-  const [{ data: refData }, { data: companions }] = await Promise.all([
+  const [{ data: stepRows }, { data: companionRows }] = await Promise.all([
     supabase
-      .from('reflections')
-      .select('breathing_completed, haiku_read, grounding_read')
-      .eq('id', reflectionId)
-      .single(),
+      .from('pause_step_events' as never)
+      .select('step_type')
+      .eq('pause_instance_id', pauseInstanceId)
+      .eq('step_type', 'breath_completed')
+      .limit(1),
     supabase
-      .from('reflection_companions')
-      .select('companion_type, read')
-      .eq('reflection_id', reflectionId),
+      .from('pause_companion_events' as never)
+      .select('companion_type, counts_for_pause')
+      .eq('pause_instance_id', pauseInstanceId)
+      .eq('action', 'complete'),
   ]);
 
-  const ref = (refData ?? {}) as ReflectionReadSlice;
-  const companionReadMap: Record<string, boolean> = {};
-  for (const c of (companions ?? []) as CompanionReadRow[]) {
-    companionReadMap[c.companion_type] = c.read ?? false;
+  const breathing =
+    Array.isArray(stepRows) && (stepRows as Array<{ step_type: string }>).length > 0;
+  const companionCompleted = new Set<string>();
+  for (const c of ((companionRows ?? []) as Array<{
+    companion_type: string;
+    counts_for_pause: boolean;
+  }>)) {
+    companionCompleted.add(c.companion_type);
   }
 
   return {
-    breathing: ref.breathing_completed ?? false,
-    haiku: ref.haiku_read ?? false,
-    grounding: companionReadMap['ground_nudge'] ?? ref.grounding_read ?? false,
-    signal: companionReadMap['signal'] ?? false,
-    zoomOut: companionReadMap['zoom_out'] ?? companionReadMap['zoom_out_deep_time'] ?? false,
-    history: companionReadMap['historical_insight'] ?? false,
+    breathing,
+    haiku: companionCompleted.has('haiku'),
+    grounding: companionCompleted.has('ground_nudge'),
+    signal: companionCompleted.has('signal'),
+    zoomOut:
+      companionCompleted.has('zoom_out') || companionCompleted.has('zoom_out_deep_time'),
+    history: companionCompleted.has('historical_insight'),
   };
 }
 
-/** Persist “completed / read” for one pause step to `reflections` and/or `reflection_companions`. */
+/**
+ * Persist "completed" for one pause step via the Phase B RPCs.
+ * - breathing  -> pause_log_step(breath_completed, {})
+ * - companions -> pause_log_companion(complete, entry_point='pause_flow')
+ *
+ * The RPC decides counts_for_pause server-side based on template +
+ * window + existing events. Callers don't pass that flag.
+ */
 export async function persistCompanionUiStepCompletion(
-  reflectionId: string,
+  pauseInstanceId: string,
   step: CompanionUiCompletionStep,
+  options?: { entryPoint?: string },
 ): Promise<void> {
-  const reflectionKey = COMPANION_STEP_TO_REFLECTION_COLUMN[step];
-  if (reflectionKey) {
-    await supabase
-      .from('reflections')
-      .update({ [reflectionKey]: true } as Record<string, boolean>)
-      .eq('id', reflectionId);
+  const stepType = STEP_TO_STEP_TYPE[step];
+  if (stepType) {
+    await pauseLogStep({
+      instanceId: pauseInstanceId,
+      stepType,
+    }).catch(() => undefined);
+    return;
   }
 
-  const companionType = COMPANION_STEP_TO_READ_TYPE[step];
-  if (companionType) {
-    if (step === 'zoomOut') {
-      await supabase
-        .from('reflection_companions')
-        .update({ read: true })
-        .eq('reflection_id', reflectionId)
-        .in('companion_type', ['zoom_out', 'zoom_out_deep_time']);
-    } else {
-      await supabase
-        .from('reflection_companions')
-        .update({ read: true })
-        .eq('reflection_id', reflectionId)
-        .eq('companion_type', companionType);
-    }
-  }
+  const companionType = STEP_TO_COMPANION_TYPE[step];
+  if (!companionType) return;
+
+  await pauseLogCompanion({
+    instanceId: pauseInstanceId,
+    companionType,
+    action: 'complete',
+    entryPoint: options?.entryPoint ?? 'pause_flow',
+  }).catch(() => undefined);
 }

@@ -1,3 +1,12 @@
+import type { SupabaseClient } from "https://esm.sh/@supabase/supabase-js@2.57.2";
+import {
+  type PregenerateCacheTopupConfig,
+  mergePregenerateCacheTopup,
+} from "./pregenerate-cache-topup-config.ts";
+
+export type { PregenerateCacheTopupConfig, PregenerateCacheTopupKey, PregenerateCacheTopupTypeConfig } from "./pregenerate-cache-topup-config.ts";
+export { DEFAULT_PREGENERATE_CACHE_TOPUP, mergePregenerateCacheTopup } from "./pregenerate-cache-topup-config.ts";
+
 /**
  * Runtime config loader for AI cost guardrails + feature flags + signup gate.
  *
@@ -50,6 +59,8 @@ export interface AppConfig {
   budget_monthly_usd_global: number;
   panic_mode: boolean;
   feature_flags: Record<string, boolean>;
+  /** Pregenerate-companions need-based top-up; see `app_config.pregenerate_cache_topup`. */
+  pregenerate_cache_topup: PregenerateCacheTopupConfig;
 }
 
 const DEFAULTS: AppConfig = {
@@ -60,6 +71,7 @@ const DEFAULTS: AppConfig = {
   budget_monthly_usd_global: 1800.0,
   panic_mode: false,
   feature_flags: {},
+  pregenerate_cache_topup: mergePregenerateCacheTopup(null),
 };
 
 let cache: { loadedAt: number; config: AppConfig } | null = null;
@@ -80,7 +92,7 @@ function coerceBoolean(v: unknown, fallback: boolean): boolean {
 }
 
 export async function loadAppConfig(
-  svcClient: any,
+  svcClient: SupabaseClient,
   options?: { force?: boolean },
 ): Promise<AppConfig> {
   const now = Date.now();
@@ -129,6 +141,9 @@ export async function loadAppConfig(
           if (row.value && typeof row.value === "object" && !Array.isArray(row.value)) {
             merged.feature_flags = row.value as Record<string, boolean>;
           }
+          break;
+        case "pregenerate_cache_topup":
+          merged.pregenerate_cache_topup = mergePregenerateCacheTopup(row.value);
           break;
       }
     }

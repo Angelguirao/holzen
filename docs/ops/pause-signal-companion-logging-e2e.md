@@ -10,24 +10,24 @@ Use this when you want to **trace one full path** from landing on **`/pause`** t
 | 2 | **Request is attributed** | Edge line **`orchestrate_invoke`** includes **`invoke_source`** (`browser_lazy_fetch` for tap-to-open Signal; `browser_pause_intervention` for first intervention load). |
 | 3 | **Slot outcome is explicit** | Edge line **`holzen_event":"companion_slot_resolved"`** with **`orchestrator_slot":"signal"`**, **`source`** (`cache` / `live` / `curated` / `empty`), **`filled`**, optional **`cache_relaxation`**. |
 | 4 | **Cache tier visible (if cache path)** | If Signal came from **`companion_cache`**, you may also see **`cache_serve`** with **`cache_relaxation`**; should be consistent with **`companion_slot_resolved.cache_relaxation`**. |
-| 5 | **Live path failures visible** | If live generation fails quality gate: **`quality_gate_reject`** with **`companion_type":"signal"`**; check **`generation_attempts`** for the same reflection. |
-| 6 | **Client and Edge line up** | **`lazy fetch slot filled`** (client) **`source`** matches Edge **`companion_slot_resolved`** **`source`** for the same request (same wall-clock window, same **`reflection_prefix`**). |
+| 5 | **Live path failures visible** | If live generation fails quality gate: **`quality_gate_reject`** with **`companion_type":"signal"`**; check **`generation_attempts`** for the same **pause instance**. |
+| 6 | **Client and Edge line up** | **`lazy fetch slot filled`** (client) **`source`** matches Edge **`companion_slot_resolved`** **`source`** for the same request (same wall-clock window; client logs **`pause_instance_prefix`**, Edge slot line uses **`pause_prefix`** — both are the first 8 chars of the same **`pause_instance_id`**). |
 
 ## Preconditions
 
 1. **Browser:** enable debug — any of: local **`npm run dev`**, **`localStorage.setItem('holzen:debug','1')`** + reload, **`?holzenDebug=1`**, or **`VITE_HOLZEN_DEBUG=1`** for hosted dev build.
-2. **Edge (optional, full trace):** leave **`HOLZEN_EDGE_LOG`** unset or `1` on the project while testing; use **`=0`** in prod to reduce noise (you still get **`orchestrate_invoke`**, **`companion_slot_resolved`**, errors — confirm in code if those are gated; structured JSON lines from `console.log` are not gated by `holzen-edge-log`).
+2. **Edge:** filter **JSON** lines with **`"fn":"companion-orchestrate"`** (or your **`x-cid`**). **`orchestrate_invoke`**, **`orchestrate_skip_cached`**, **`companion_slot_resolved`**, and errors all come from the request **`log`** (**`withRequestLogging`** / **`createLogger`** — stdout + optional BetterStack drain), not ad-hoc `console.log`.
 
 ## Happy-path steps (manual)
 
-1. From **Home**, complete **Need a moment** (or equivalent) so you navigate to **`/pause?reflection=…`** with a real reflection id.
+1. From **Home**, complete **Need a moment** (or equivalent) so you land on **`/pause`** with **`pauseInstanceId`** in **router location state** (same shape as **`navigate('/pause', { state: { pauseInstanceId, … } })`** — see **`parsePauseSessionLocationState`**).
 2. Wait for intervention / shell to load (first **`companion-orchestrate`** may be intervention-only).
 3. Expand **Read the signal →** (Signal companion card).
 4. **Client:** Confirm lines similar to:
-   - **`[holzen:companion] lazy fetch orchestrate invoke`** — `slot: signal`, `holzenInvokeSource: browser_lazy_fetch`, `reflection_prefix`.
+   - **`[holzen:companion] lazy fetch orchestrate invoke`** — `slot: signal`, `holzenInvokeSource: browser_lazy_fetch`, `pause_instance_prefix`.
    - **`[holzen:companion] lazy fetch slot filled`** — `source`, `latencyMs`, optional `cacheRelaxation`.
 5. **Supabase → Edge Functions → Logs** (same time window):
-   - **`orchestrate_invoke`** — `invoke_source` / `reflection_prefix`.
+   - **`orchestrate_invoke`** — `invoke_source` / `pause_instance_prefix`.
    - **`companion_slot_resolved`** — `orchestrator_slot: signal`, `filled: true`, `source` as expected.
 
 ## Variants to exercise

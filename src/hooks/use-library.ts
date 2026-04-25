@@ -1,6 +1,18 @@
 import { useState, useEffect, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/use-auth';
+import type { Database } from '@/integrations/supabase/types';
+
+/** DB insert/update; `pause_instance_id` may exist in production before types.ts regen. */
+type LibraryItemsInsert = Database['public']['Tables']['library_items']['Insert'] & {
+  pause_instance_id?: string | null;
+};
+type LibraryItemsUpdate = Database['public']['Tables']['library_items']['Update'] & {
+  pause_instance_id?: string | null;
+};
+type CollectionsInsert = Database['public']['Tables']['collections']['Insert'];
+type CollectionsUpdate = Database['public']['Tables']['collections']['Update'];
+type CollectionItemsInsert = Database['public']['Tables']['collection_items']['Insert'];
 
 export interface LibraryItem {
   id: string;
@@ -10,7 +22,7 @@ export interface LibraryItem {
   body: string | null;
   source_type: string | null;
   source_url: string | null;
-  reflection_id: string | null;
+  pause_instance_id: string | null;
   tags: string[];
   pinned: boolean;
   is_favorite: boolean;
@@ -58,7 +70,11 @@ function readCache<T>(key: string): T | null {
 }
 
 function writeCache<T>(key: string, data: T) {
-  try { localStorage.setItem(key, JSON.stringify(data)); } catch {}
+  try {
+    localStorage.setItem(key, JSON.stringify(data));
+  } catch {
+    /* ignore quota / private mode */
+  }
 }
 
 export function useLibrary() {
@@ -75,37 +91,46 @@ export function useLibrary() {
   const [incompleteReflections, setIncompleteReflections] = useState<Set<string>>(new Set());
   const [reflectionOutcomes, setReflectionOutcomes] = useState<Record<string, string>>({});
 
-  const hydrateReflectionMeta = useCallback(async (libItems: LibraryItem[]) => {
-    const reflectionIds = Array.from(
-      new Set(libItems.map((i) => i.reflection_id).filter((x): x is string => !!x)),
+  const hydratePauseMeta = useCallback(async (libItems: LibraryItem[]) => {
+    const pauseInstanceIds = Array.from(
+      new Set(libItems.map((i) => i.pause_instance_id).filter((x): x is string => !!x)),
     );
-    if (reflectionIds.length === 0) return;
+    if (pauseInstanceIds.length === 0) return;
 
-    const [{ data: reflRows }, { data: companionRows }] = await Promise.all([
+    const [{ data: instRows }, { data: companionRows }] = await Promise.all([
       supabase
-        .from('reflections')
-        .select('id, outcome, haiku_read, grounding_read')
-        .in('id', reflectionIds),
+        .from('v_pause_full' as never)
+        .select('id, state, outcome, has_breath_completed, counted_companion_types')
+        .in('id', pauseInstanceIds),
       supabase
-        .from('reflection_companions')
-        .select('reflection_id, companion_type, read')
-        .in('reflection_id', reflectionIds),
+        .from('pause_companion_events' as never)
+        .select('pause_instance_id, companion_type, action, counts_for_pause')
+        .in('pause_instance_id', pauseInstanceIds)
+        .eq('action', 'complete'),
     ]);
 
-    const companionReadByReflection = new Map<string, Record<string, boolean>>();
-    for (const c of (companionRows ?? []) as any[]) {
-      const map = companionReadByReflection.get(c.reflection_id) ?? {};
-      map[c.companion_type] = c.read ?? false;
-      companionReadByReflection.set(c.reflection_id, map);
+    const companionReadByInstance = new Map<string, Record<string, boolean>>();
+    for (const c of (companionRows ?? []) as Array<{
+      pause_instance_id: string;
+      companion_type: string;
+      counts_for_pause: boolean;
+    }>) {
+      const map = companionReadByInstance.get(c.pause_instance_id) ?? {};
+      map[c.companion_type] = true;
+      companionReadByInstance.set(c.pause_instance_id, map);
     }
 
     setReadFlagsMap((prev) => {
       const next = { ...prev };
-      for (const r of (reflRows ?? []) as any[]) {
-        const cMap = companionReadByReflection.get(r.id) ?? {};
+      for (const r of ((instRows ?? []) as Array<{
+        id: string;
+        has_breath_completed: boolean;
+        counted_companion_types: string[] | null;
+      }>)) {
+        const cMap = companionReadByInstance.get(r.id) ?? {};
         next[r.id] = {
-          haiku_read: !!r.haiku_read,
-          grounding_read: cMap['ground_nudge'] ?? !!r.grounding_read,
+          haiku_read: cMap['haiku'] ?? false,
+          grounding_read: cMap['ground_nudge'] ?? false,
           signal_read: cMap['signal'] ?? false,
           zoom_out_read: cMap['zoom_out'] ?? cMap['zoom_out_deep_time'] ?? false,
           history_read: cMap['historical_insight'] ?? false,
@@ -115,14 +140,15 @@ export function useLibrary() {
     });
     setIncompleteReflections((prev) => {
       const next = new Set(prev);
-      for (const r of (reflRows ?? []) as any[]) {
-        if (!r.outcome) next.add(r.id); else next.delete(r.id);
+      for (const r of ((instRows ?? []) as Array<{ id: string; outcome: string | null }>)) {
+        if (!r.outcome) next.add(r.id);
+        else next.delete(r.id);
       }
       return next;
     });
     setReflectionOutcomes((prev) => {
       const next = { ...prev };
-      for (const r of (reflRows ?? []) as any[]) {
+      for (const r of ((instRows ?? []) as Array<{ id: string; outcome: string | null }>)) {
         if (r.outcome) next[r.id] = r.outcome;
       }
       return next;
@@ -167,8 +193,8 @@ export function useLibrary() {
     setReadFlagsMap({});
     setIncompleteReflections(new Set());
     setReflectionOutcomes({});
-    await hydrateReflectionMeta(libItems);
-  }, [user, hydrateReflectionMeta]);
+    await hydratePauseMeta(libItems);
+  }, [user, hydratePauseMeta]);
 
   const loadMore = useCallback(async () => {
     if (!user || loadingMore || !hasMore) return;
@@ -189,11 +215,11 @@ export function useLibrary() {
         writeCache(CACHE_KEY_ITEMS, merged);
         return merged;
       });
-      await hydrateReflectionMeta(newItems);
+      await hydratePauseMeta(newItems);
     }
     setHasMore(newItems.length === PAGE_SIZE);
     setLoadingMore(false);
-  }, [user, loadingMore, hasMore, items.length, hydrateReflectionMeta]);
+  }, [user, loadingMore, hasMore, items.length, hydratePauseMeta]);
 
 
   useEffect(() => { fetchAll(); }, [fetchAll]);
@@ -208,7 +234,7 @@ export function useLibrary() {
     if (!user) return null;
     const { data, error } = await supabase
       .from('library_items')
-      .insert({ ...item, user_id: user.id } as any)
+      .insert({ ...item, user_id: user.id } as LibraryItemsInsert)
       .select()
       .single();
     if (error) return null;
@@ -217,41 +243,41 @@ export function useLibrary() {
     return newItem;
   }, [user]);
 
-  const updateItem = useCallback(async (id: string, updates: Partial<LibraryItem>) => {
-    await supabase.from('library_items').update(updates as any).eq('id', id);
-    setItems((prev) => prev.map((i) => i.id === id ? { ...i, ...updates } : i));
+  const updateItem = useCallback(async (id: string, updates: LibraryItemsUpdate) => {
+    await supabase.from('library_items').update(updates).eq('id', id);
+    setItems((prev) => prev.map((i) => i.id === id ? { ...i, ...updates } as LibraryItem : i));
   }, []);
 
   const deleteItem = useCallback(async (id: string) => {
     const item = items.find((i) => i.id === id);
     if (!item) return;
 
-    if (item.reflection_id && item.source_type === 'reflection') {
-      // Deleting a reflection: soft-delete ALL library items sharing this reflection_id,
-      // then delete the underlying reflection record so it disappears from Home too.
-      const reflectionId = item.reflection_id;
-      const siblingIds = items.filter((i) => i.reflection_id === reflectionId).map((i) => i.id);
+    if (item.pause_instance_id && item.source_type === 'reflection') {
+      // Deleting a reflection-type library item: soft-delete all library
+      // items that share the pause_instance_id, then dismiss the
+      // underlying pause.
+      const pauseInstanceId = item.pause_instance_id;
+      const siblingIds = items
+        .filter((i) => i.pause_instance_id === pauseInstanceId)
+        .map((i) => i.id);
 
-      await supabase.from('library_items').update({ status: 'deleted' } as any).in('id', siblingIds);
-      setItems((prev) => prev.map((i) => siblingIds.includes(i.id) ? { ...i, status: 'deleted' as const } : i));
+      await supabase.from('library_items').update({ status: 'deleted' }).in('id', siblingIds);
+      setItems((prev) =>
+        prev.map((i) =>
+          siblingIds.includes(i.id) ? { ...i, status: 'deleted' as const } : i,
+        ),
+      );
       setCollectionItems((prev) => prev.filter((ci) => !siblingIds.includes(ci.library_item_id)));
 
-      // Delete the actual reflection
-      await supabase.from('reflections').delete().eq('id', reflectionId);
-
-      // Clear active pause if it matches this reflection
-      if (user) {
-        const { data: profile } = await supabase.from('profiles').select('last_message').eq('user_id', user.id).single();
-        if (profile?.last_message === item.body) {
-          await supabase.rpc('update_profile_safe', {
-            _user_id: user.id,
-            _updates: { last_message: null, last_context: null },
-          });
-        }
+      // Dismiss the paired pause so the trigger clears its notification.
+      try {
+        await supabase.rpc('pause_dismiss_current' as never);
+      } catch {
+        /* non-fatal */
       }
-    } else if (item.reflection_id) {
+    } else if (item.pause_instance_id) {
       // Deleting a companion item: soft-delete so backfill doesn't re-import
-      await supabase.from('library_items').update({ status: 'deleted' } as any).eq('id', id);
+      await supabase.from('library_items').update({ status: 'deleted' }).eq('id', id);
       setItems((prev) => prev.map((i) => i.id === id ? { ...i, status: 'deleted' as const } : i));
       setCollectionItems((prev) => prev.filter((ci) => ci.library_item_id !== id));
     } else {
@@ -279,7 +305,7 @@ export function useLibrary() {
     if (!user) return null;
     const { data, error } = await supabase
       .from('collections')
-      .insert({ ...col, user_id: user.id } as any)
+      .insert({ ...col, user_id: user.id } as CollectionsInsert)
       .select()
       .single();
     if (error) return null;
@@ -289,7 +315,7 @@ export function useLibrary() {
   }, [user]);
 
   const updateCollection = useCallback(async (id: string, updates: Partial<Collection>) => {
-    await supabase.from('collections').update(updates as any).eq('id', id);
+    await supabase.from('collections').update(updates as CollectionsUpdate).eq('id', id);
     setCollections((prev) => prev.map((c) => c.id === id ? { ...c, ...updates } : c));
   }, []);
 
@@ -308,7 +334,11 @@ export function useLibrary() {
       .reduce((max, ci) => Math.max(max, ci.position), -1);
     const { data, error } = await supabase
       .from('collection_items')
-      .insert({ collection_id: collectionId, library_item_id: itemId, position: maxPos + 1 } as any)
+      .insert({
+        collection_id: collectionId,
+        library_item_id: itemId,
+        position: maxPos + 1,
+      } satisfies CollectionItemsInsert)
       .select()
       .single();
     if (error) return null;
@@ -343,9 +373,9 @@ export function useLibrary() {
   }, [collectionItems, collections]);
 
   const isCompanionEngaged = useCallback((item: LibraryItem): boolean => {
-    if (!item.reflection_id || !item.source_type) return true;
+    if (!item.pause_instance_id || !item.source_type) return true;
     if (item.source_type === 'reflection' || item.source_type === 'reflection_note') return true;
-    const flags = readFlagsMap[item.reflection_id];
+    const flags = readFlagsMap[item.pause_instance_id];
     if (!flags) return true; // no data, assume engaged
     const sourceToFlag: Record<string, keyof ReflectionReadFlags> = {
       haiku: 'haiku_read',
@@ -359,13 +389,13 @@ export function useLibrary() {
   }, [readFlagsMap]);
 
   const isReflectionIncomplete = useCallback((item: LibraryItem): boolean => {
-    if (item.source_type !== 'reflection' || !item.reflection_id) return false;
-    return incompleteReflections.has(item.reflection_id);
+    if (item.source_type !== 'reflection' || !item.pause_instance_id) return false;
+    return incompleteReflections.has(item.pause_instance_id);
   }, [incompleteReflections]);
 
   const getReflectionOutcome = useCallback((item: LibraryItem): string | null => {
-    if (item.source_type !== 'reflection' || !item.reflection_id) return null;
-    return reflectionOutcomes[item.reflection_id] ?? null;
+    if (item.source_type !== 'reflection' || !item.pause_instance_id) return null;
+    return reflectionOutcomes[item.pause_instance_id] ?? null;
   }, [reflectionOutcomes]);
 
   return {
@@ -389,13 +419,13 @@ export function useSaveToLibrary() {
     body?: string;
     source_type?: string;
     source_url?: string;
-    reflection_id?: string;
+    pause_instance_id?: string;
     tags?: string[];
   }) => {
     if (!user) return null;
     const { data, error } = await supabase
       .from('library_items')
-      .insert({ ...params, user_id: user.id } as any)
+      .insert({ ...params, user_id: user.id } as LibraryItemsInsert)
       .select()
       .single();
     if (error) return null;

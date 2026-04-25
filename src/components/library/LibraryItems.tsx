@@ -107,7 +107,7 @@ export function LibraryItems({ library, filtered }: Props) {
     if (selectedIds.size === 0) return;
     setBulkLoading(true);
     await Promise.all(
-      Array.from(selectedIds).map((id) => updateItem(id, { status: 'archived' } as any))
+      Array.from(selectedIds).map((id) => updateItem(id, { status: 'archived' }))
     );
     setBulkLoading(false);
     exitSelectMode();
@@ -117,27 +117,27 @@ export function LibraryItems({ library, filtered }: Props) {
     if (selectedIds.size === 0) return;
     setBulkLoading(true);
     await Promise.all(
-      Array.from(selectedIds).map((id) => updateItem(id, { is_favorite: true } as any))
+      Array.from(selectedIds).map((id) => updateItem(id, { is_favorite: true }))
     );
     setBulkLoading(false);
     exitSelectMode();
   }, [selectedIds, updateItem, exitSelectMode]);
 
   const handleStatusChange = async (id: string, status: 'unread' | 'read' | 'archived') => {
-    await updateItem(id, { status } as any);
+    await updateItem(id, { status });
   };
 
   const handleUpdateTags = async (id: string, tags: string[]) => {
-    await updateItem(id, { tags } as any);
+    await updateItem(id, { tags });
   };
 
   const linkedMap = useMemo(() => {
     const map = new Map<string, LibraryItem[]>();
     items.forEach((i) => {
-      if (i.reflection_id && i.source_type !== 'reflection' && i.status !== 'deleted') {
-        const arr = map.get(i.reflection_id) ?? [];
+      if (i.pause_instance_id && i.source_type !== 'reflection' && i.status !== 'deleted') {
+        const arr = map.get(i.pause_instance_id) ?? [];
         arr.push(i);
-        map.set(i.reflection_id, arr);
+        map.set(i.pause_instance_id, arr);
       }
     });
     return map;
@@ -149,8 +149,8 @@ export function LibraryItems({ library, filtered }: Props) {
   }, [selectedItem, items]);
 
   const selectedLinkedItems = useMemo(() => {
-    if (!currentSelectedItem?.reflection_id || currentSelectedItem.source_type !== 'reflection') return undefined;
-    return linkedMap.get(currentSelectedItem.reflection_id);
+    if (!currentSelectedItem?.pause_instance_id || currentSelectedItem.source_type !== 'reflection') return undefined;
+    return linkedMap.get(currentSelectedItem.pause_instance_id);
   }, [currentSelectedItem, linkedMap]);
 
   const handleSelectFromViewer = useCallback((item: LibraryItem) => {
@@ -298,7 +298,7 @@ export function LibraryItems({ library, filtered }: Props) {
             <div className="text-center py-12 space-y-3">
               <p className="text-2xl">📚</p>
               <p className="text-xs text-muted-foreground/60 font-mono max-w-[240px] mx-auto">
-                {t('library.emptyStateAction', { defaultValue: 'Complete a pause session to see your reflections, companions, and insights here.' })}
+                {t('library.emptyStateAction', { defaultValue: 'Complete a pause session to see saved companions, notes, and insights here.' })}
               </p>
               <p className="text-[9px] text-muted-foreground/30 font-mono">
                 {t('library.emptyStateHint', { defaultValue: 'Swipe cards left to delete, right to favorite' })}

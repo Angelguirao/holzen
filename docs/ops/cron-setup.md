@@ -42,9 +42,9 @@ jsonb_build_object(
 
 **Bruno** (`bruno/service-cron/*.bru`): **`401`** usually means **`SERVICE_CRON_BEARER`** is wrong — it must match the project’s **service_role** JWT or **`CRON_SECRET`** (see [`bruno/service-cron/README.md`](../../bruno/service-cron/README.md)). Redeploying the function does not fix a bad client secret.
 
-**Edge logs:** Cron workers emit **`[holzen:<tag>]`** (see [holzen-edge-log](../../supabase/functions/_shared/holzen-edge-log.ts)). **`holzenEdgeRun`** (request / auth) always appears; set secret **`HOLZEN_EDGE_LOG=0`** on the project to quiet other traces; **errors** still log.
+**Edge logs:** Cron workers use **`withRequestLogging`** + **`createLogger`** — **JSON** lines with **`fn`**, **`cid`**, **`msg`**, and often **`extra.holzen_event`**. Filter in Supabase **Edge Functions → Logs** by function name or stable **`msg`** tokens (see [logging-strategy.md](logging-strategy.md)).
 
-**Stale Edge deploy:** If keys are correct but behavior is wrong, redeploy the function and confirm **Edge Functions → Logs** show the expected **`holzen:`** lines (see [browser-360-mcp-playbook.md](../fundamentals/browser-360-mcp-playbook.md)).
+**Stale Edge deploy:** If keys are correct but behavior is wrong, redeploy the function and confirm **Edge Functions → Logs** show the expected JSON lines for that function (see [browser-360-mcp-playbook.md](../fundamentals/browser-360-mcp-playbook.md)).
 
 The SQL below uses **Vault** (`holzen_cron_service_role`) for the Bearer token so the JWT is not embedded in `cron.job`. For a disposable one-off test only, you may temporarily use a literal `'Bearer …'` header — do not schedule that.
 
@@ -218,29 +218,23 @@ SELECT cron.schedule(
 );
 ```
 
-## Follow-up Check (check-followups)
+## Follow-up Check (`check-followups`) — **removed (Pause V2)**
 
-Creates 24-48h follow-up entries for reflections where the user sold or bought. This feeds outcome data back into the Mirror intervention — without it, Mirror has no outcome history to surface.
+> **Pause V2:** the `follow_ups` table, the `check-followups` edge function, and the `check-followups-hourly` pg_cron job were removed in [`20260423202000_pause_v2_destructive_cutover.sql`](../../supabase/migrations/20260423202000_pause_v2_destructive_cutover.sql). Mirror outcomes now come from **`pause_step_events`** / **`v_pause_full`** (see `buildMirror` in `_shared/generators/mirror.ts`). **Do not** re-schedule the SQL below.
 
-**Required for Mirror to work correctly.**
+<details>
+<summary>Historical snippet (pre–V2 only)</summary>
 
 ```sql
--- Run every 6 hours
+-- OBSOLETE — follow_ups + check-followups dropped
 SELECT cron.schedule(
   'check-followups',
   '0 */6 * * *',
-  $$
-  SELECT net.http_post(
-    url := 'https://<YOUR_SUPABASE_PROJECT_ID>.supabase.co/functions/v1/check-followups',
-    headers := jsonb_build_object(
-      'Content-Type', 'application/json',
-      'Authorization', 'Bearer ' || (SELECT decrypted_secret FROM vault.decrypted_secrets WHERE name = 'holzen_cron_service_role' LIMIT 1)
-    ),
-    body := '{}'::jsonb
-  );
-  $$
+  $$ /* … */ $$
 );
 ```
+
+</details>
 
 ## Referral pending queue (process-referral-pending)
 
@@ -288,71 +282,21 @@ SELECT cron.schedule(
 );
 ```
 
-## Purge Orphan Notification Reflections
+## Purge Orphan Notification Reflections (deprecated)
 
-Every cron-generated reflection that a user never engaged with (no outcome, no
-`mood_after`, no `breathing_completed`) is an **ignored notification**. These
-rows are already excluded from every metric via `src/lib/engaged-pause.ts`
-(`isCompletedPause` / `isFullRitualPause`) and the server-side `v_reflections_*`
-views — but they still accumulate in `public.reflections`.
+> **Pause V2 note:** the destructive cutover drops `reflections` and
+> `pause_notifications`, and the purge function
+> `purge_orphan_notification_reflections` is removed. This section is retained
+> for historical context only and should **not** be re-scheduled in a V2
+> environment.
 
-This cron deletes them after a TTL to keep the table lean. Because
-`pause_notifications.reflection_id` is `ON DELETE SET NULL`, the bell history
-stays intact; only the dangling reflection row is removed. The purge function
-lives in migration `20260420220000_reflection_source_and_engagement_views.sql`.
+Legacy background job that used to delete unengaged, cron-generated reflection
+rows after a TTL so the `reflections` table stayed lean. With Pause V2, the
+canonical model is `pause_instances` + events; orphaned reflections no longer
+exist, so the job is obsolete.
 
-**Before scheduling:** confirm `v_notification_response_rate` (Admin → Monitor
-→ Notification Response) looks reasonable — that view counts these rows, so a
-too-short TTL shrinks its window.
+### Historical reference only
 
-Predicate (enforced inside the function):
-
-```sql
-source IS NOT NULL
-AND source <> 'manual'
-AND outcome IS NULL
-AND mood_after IS NULL
-AND (breathing_completed IS NULL OR breathing_completed = false)
-AND created_at < now() - make_interval(days => <cutoff_days>)
-```
-
-### Schedule (daily at 03:15 UTC, 30-day TTL)
-
-```sql
-SELECT cron.schedule(
-  'purge-orphan-notification-reflections',
-  '15 3 * * *',
-  $$
-  SELECT public.purge_orphan_notification_reflections(30);
-  $$
-);
-```
-
-### Dry-run / one-off
-
-```sql
--- How many rows would be purged at the current TTL (read-only probe).
-SELECT count(*) AS candidates
-FROM public.reflections
-WHERE source IS NOT NULL
-  AND source <> 'manual'
-  AND outcome IS NULL
-  AND mood_after IS NULL
-  AND (breathing_completed IS NULL OR breathing_completed = false)
-  AND created_at < now() - interval '30 days';
-
--- Run once manually (returns the actual deleted count).
-SELECT public.purge_orphan_notification_reflections(30);
-```
-
-### Tuning the TTL
-
-- **Shorter TTL** (7–14 days): leaner table, but the admin Notification
-  Response card only sees the last N days of history.
-- **Longer TTL** (60–90 days): more historical context for pipeline analysis at
-  the cost of extra rows that the `idx_reflections_orphan_notifications`
-  partial index already keeps cheap to scan.
-
-Adjust with `cron.alter_job('purge-orphan-notification-reflections', schedule :=
-'…')` and pass a different `cutoff_days` arg by updating the command body
-(`SELECT public.purge_orphan_notification_reflections(<N>);`).
+The original cron SQL, TTL tuning, and probe queries have been removed from
+this doc to avoid accidental reuse after the V2 cutover. If you need to review
+the legacy job, consult the 2026-04-22/23 migrations in git history.

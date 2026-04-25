@@ -27,14 +27,14 @@ Rule of thumb used here:
 | 2026-04 | [cron-worker-auth-consistency.md](cron-worker-auth-consistency.md) | `verifyServiceAuth` + Bruno `SERVICE_CRON_BEARER`; no `x-supabase-cron` bypass. |
 | 2026-04 | [pwa-mobile-web-app-meta.md](pwa-mobile-web-app-meta.md) | `mobile-web-app-capable` in `index.html`. |
 | 2026-04 | [cache-async-error-handling.md](cache-async-error-handling.md) | `.catch` + structured log on cache side-effect Supabase calls. |
-| 2026-04 | [reflection-insert-partial-failure.md](reflection-insert-partial-failure.md) | Revert optimistic UI + `isReflectionPersistError` on Home when `reflections` insert fails after generate. |
-| 2026-04 | [writeCompanionData-grounding-consistency.md](writeCompanionData-grounding-consistency.md) | Grounding only in `ground_nudge`; view COALESCE; no `reflections.grounding_*` writes. |
+| 2026-04 | [reflection-insert-partial-failure.md](reflection-insert-partial-failure.md) | Revert optimistic UI + `isPausePersistError` on Home when pause instance creation fails after generate. |
+| 2026-04 | [writeCompanionData-grounding-consistency.md](writeCompanionData-grounding-consistency.md) | Superseded by Pause V2; grounding lives in `pause_ai_artifacts`. |
 | 2026-04 | [react-router-v7-future-flags.md](react-router-v7-future-flags.md) | `BrowserRouter` `future`: `v7_startTransition`, `v7_relativeSplatPath`. |
 | 2026-04 | [pause-session-hydration.md](pause-session-hydration.md) | Coherent `/pause` hydration: storage → aligned hook → nav → fetch by id; loading/error UI. |
 | 2026-04 | [home-fetch-deduplication.md](home-fetch-deduplication.md) | `useQuery` for `check-subscription`; `fetchBtcData` per-currency in-flight coalescing. |
 | 2026-04 | [service-worker-registration-dev.md](service-worker-registration-dev.md) | Skip SW registration when `import.meta.env.DEV`. |
 | 2026-04 | [route-gating.md](route-gating.md) | `AuthLoading`: visible **`auth.restoringSession`** copy, **`role="status"`** / **`aria-live`**. |
-| 2026-04 | [typed-navigation-state.md](typed-navigation-state.md) | `src/lib/router-location-state.ts` parsers + types for **`/pause`**, **`/ground`**, **`/profile`**, notifications. |
+| 2026-04 | [typed-navigation-state.md](typed-navigation-state.md) | `src/lib/router-location-state.ts` parsers + types for **`/pause`**, **`/tools/ground`**, **`/journey/*`**, notifications. |
 | 2026-04 | [form-field-name-id-a11y.md](form-field-name-id-a11y.md) | Auth, reset password, settings, library search, hold goal, onboarding welcome: **`name`** / **`id`** / **`autoComplete`**. |
 | 2026-04 | *(home-fetch follow-up)* | **`navigating-the-codebase.md`** §6 documents subscription + BTC dedupe + profile note — [home-fetch-deduplication.md](home-fetch-deduplication.md). |
 | 2026-04 | [route-level-code-splitting.md](route-level-code-splitting.md) | **`React.lazy`** for all **`src/pages`** routes; **`Suspense`** + **`RouteChunkFallback`** in **`App.tsx`**. |
@@ -47,9 +47,9 @@ Rule of thumb used here:
 | 2026-04 | [rate-budget-fail-open-observability.md](rate-budget-fail-open-observability.md) | Structured **`limit_check_fail_open`** JSON logs (`scope` / `phase`) on rate, budget, regenerate fail-open. |
 | 2026-04 | [quality-gates-false-positives.md](quality-gates-false-positives.md) | **`quality_gate_reject`** logs + **`generation_attempts`** on post-AI gate fail; DOI / et al. / Unicode names; numeric dates for history. |
 | 2026-04 | [btc-price-cache-freshness.md](btc-price-cache-freshness.md) | **Doc:** Zoom Out **`btc_price_cache`** contract — 24h historical TTL, UTC, cron ~15m; `cron-setup` + `refresh-btc-prices` header. |
-| 2026-04 | [orchestrate-client-cron.md](orchestrate-client-cron.md) | **`orchestrate_invoke`** + **`orchestrate_skip_cached`** (`reflection_companions`); **`holzenInvokeSource`** on client/cron. |
+| 2026-04 | [orchestrate-client-cron.md](orchestrate-client-cron.md) | **`orchestrate_invoke`** + **`orchestrate_skip_cached`** (`pause_ai_artifacts`); **`holzenInvokeSource`** on client/cron. |
 | 2026-04 | [automatic-pause-notification-timing.md](automatic-pause-notification-timing.md) | **Doc:** keep **fire-and-forget** notify vs orchestrate; alternatives recorded in ticket. |
-| 2026-04 | [cron-pause-featured-parity.md](cron-pause-featured-parity.md) | **`useLayoutEffect`** in **`use-companion-data`** primes intervention + companion loaders on **`reflectionId`** (no silent empty first paint). |
+| 2026-04 | [cron-pause-featured-parity.md](cron-pause-featured-parity.md) | **`useLayoutEffect`** in **`use-companion-data`** primes intervention + companion loaders on **`pauseInstanceId`** (no silent empty first paint). |
 | 2026-04 | [cache-dedup-near-duplicates.md](cache-dedup-near-duplicates.md) | **`content-dedup`**: URL + **`title_norm`** for **`content_library`**; **`title_norm`** / **`source_url`** / **`fingerprint`** + indexed checks for **`companion_cache`**. |
 
 ---
@@ -79,6 +79,7 @@ Use this when you are **choosing what to work on next**. Items are **not** stric
 | Medium | [pg-cron-heartbeat-wiring.md](pg-cron-heartbeat-wiring.md) | **Open.** Create 8 BetterStack heartbeats, populate `app_config.heartbeat.*` UUIDs, append `emit_job_heartbeat(...)` to each cron body. Code-side ready; manual wiring pending. |
 | Medium | [edge-functions-request-logging-migration.md](edge-functions-request-logging-migration.md) | **Open.** Migrate remaining ~35 edge functions to `withRequestLogging` so every invocation gets structured logs + Sentry capture + unified error envelope. |
 | Medium | [posthog-ui-privacy-hardening.md](posthog-ui-privacy-hardening.md) | **Open.** UI-level defense-in-depth: disable autocapture / session recording / heatmaps, enable anonymize IPs, set Authorized URLs. |
+| Low | [posthog-legacy-reflection-events-cleanup.md](posthog-legacy-reflection-events-cleanup.md) | **Open.** In PostHog (not git): archive/delete old `reflection.*` event data if desired; update insights/dashboards to `pause.manual_started` / `pause.manual_completed`. |
 | Medium | [sentry-allowed-domains.md](sentry-allowed-domains.md) | **Open.** Restrict the public frontend DSN to `holzen.lovable.app`, `holzen.app`, `*.lovable.app`. |
 
 ### Cost & duplicate work (same user/session doing redundant orchestration or cache churn)
@@ -94,7 +95,7 @@ Use this when you are **choosing what to work on next**. Items are **not** stric
 | Priority hint | Ticket | Summary |
 |---------------|--------|---------|
 | — | [automatic-pause-notification-timing.md](automatic-pause-notification-timing.md) | **Done (2026-04).** Fire-and-forget policy documented — see ticket. |
-| — | [cron-pause-featured-parity.md](cron-pause-featured-parity.md) | **Done (2026-04).** Loader priming on **`reflectionId`** — see ticket. |
+| — | [cron-pause-featured-parity.md](cron-pause-featured-parity.md) | **Done (2026-04).** Loader priming on **`pauseInstanceId`** — see ticket. |
 | — | [route-gating.md](route-gating.md) | **Done (2026-04).** Explicit session-restore copy on `AuthLoading` — see ticket. |
 | — | [cache-serve-relaxation-ux.md](cache-serve-relaxation-ux.md) | **Done (2026-04).** Telemetry + UI hint + **`companion_serves.cache_relaxation`** — see ticket. |
 | — | [form-field-name-id-a11y.md](form-field-name-id-a11y.md) | **Done (2026-04).** Auth, settings, library, hold goal, onboarding — see ticket. |
@@ -154,6 +155,7 @@ Sortable mentally by **Work type** column; links go to the full ticket.
 | Observability | [pg-cron-heartbeat-wiring.md](pg-cron-heartbeat-wiring.md) | **Open.** BetterStack heartbeats + `app_config` UUIDs + cron body wiring |
 | Observability | [edge-functions-request-logging-migration.md](edge-functions-request-logging-migration.md) | **Open.** Migrate ~35 remaining edge functions to `withRequestLogging` |
 | Ops / security | [posthog-ui-privacy-hardening.md](posthog-ui-privacy-hardening.md) | **Open.** UI toggles + Authorized URLs — defense-in-depth for code-side privacy flags |
+| Ops / security | [posthog-legacy-reflection-events-cleanup.md](posthog-legacy-reflection-events-cleanup.md) | **Open.** PostHog UI: drop or archive `reflection.*` data; point insights at `pause.manual_*` |
 | Ops / security | [sentry-allowed-domains.md](sentry-allowed-domains.md) | **Open.** Restrict public DSN to Holzen origins |
 | Cost / efficiency | [orchestrate-client-cron.md](orchestrate-client-cron.md) | **Done (2026-04).** **`orchestrate_skip_cached`** + invoke logging — see ticket |
 | Cost / efficiency | [cache-dedup-near-duplicates.md](cache-dedup-near-duplicates.md) | **Done (2026-04).** Indexed dedup keys — see ticket |
@@ -193,7 +195,7 @@ Sortable mentally by **Work type** column; links go to the full ticket.
 | **Pause pipeline & client–server boundaries** | ~~[orchestrate-client-cron.md](orchestrate-client-cron.md)~~ **done**, ~~[automatic-pause-notification-timing.md](automatic-pause-notification-timing.md)~~ **done**, ~~[cron-pause-featured-parity.md](cron-pause-featured-parity.md)~~ **done** |
 | **Cost & duplicate work (client + server)** | ~~[orchestrate-client-cron.md](orchestrate-client-cron.md)~~ **done**, ~~[cache-dedup-near-duplicates.md](cache-dedup-near-duplicates.md)~~ **done**, [home-fetch-deduplication.md](home-fetch-deduplication.md) |
 | **Cache, library & market data** | ~~[cache-dedup-near-duplicates.md](cache-dedup-near-duplicates.md)~~ **done**, ~~[btc-price-cache-freshness.md](btc-price-cache-freshness.md)~~ **done**, ~~[cache-serve-relaxation-ux.md](cache-serve-relaxation-ux.md)~~ **done 2026-04** |
-| **Rate limits, quality & observability** | ~~[rate-limit-analytics-allowlist.md](rate-limit-analytics-allowlist.md)~~ **done**, ~~[rate-budget-fail-open-observability.md](rate-budget-fail-open-observability.md)~~ **done**, [quality-gates-false-positives.md](quality-gates-false-positives.md), [pg-cron-heartbeat-wiring.md](pg-cron-heartbeat-wiring.md), [edge-functions-request-logging-migration.md](edge-functions-request-logging-migration.md), [posthog-ui-privacy-hardening.md](posthog-ui-privacy-hardening.md), [sentry-allowed-domains.md](sentry-allowed-domains.md) |
+| **Rate limits, quality & observability** | ~~[rate-limit-analytics-allowlist.md](rate-limit-analytics-allowlist.md)~~ **done**, ~~[rate-budget-fail-open-observability.md](rate-budget-fail-open-observability.md)~~ **done**, [quality-gates-false-positives.md](quality-gates-false-positives.md), [pg-cron-heartbeat-wiring.md](pg-cron-heartbeat-wiring.md), [edge-functions-request-logging-migration.md](edge-functions-request-logging-migration.md), [posthog-legacy-reflection-events-cleanup.md](posthog-legacy-reflection-events-cleanup.md), [posthog-ui-privacy-hardening.md](posthog-ui-privacy-hardening.md), [sentry-allowed-domains.md](sentry-allowed-domains.md) |
 | **Data consistency** | *(none pending — grounding dual-write shipped 2026-04)* |
 
 ---
@@ -225,6 +227,7 @@ Sortable mentally by **Work type** column; links go to the full ticket.
 | [orchestrate-client-cron.md](orchestrate-client-cron.md) | **Done (2026-04).** Skip-if-served + **`orchestrate_invoke`** — see ticket |
 | [pause-session-hydration.md](pause-session-hydration.md) | **Done (2026-04).** `/pause` hydration — see ticket. |
 | [pg-cron-heartbeat-wiring.md](pg-cron-heartbeat-wiring.md) | **Open.** BetterStack heartbeats + `app_config` UUIDs + cron body wiring |
+| [posthog-legacy-reflection-events-cleanup.md](posthog-legacy-reflection-events-cleanup.md) | **Open.** PostHog UI: `reflection.*` → `pause.manual_*` insights; optional data cleanup |
 | [posthog-ui-privacy-hardening.md](posthog-ui-privacy-hardening.md) | **Open.** PostHog project-level privacy toggles + Authorized URLs |
 | [pwa-mobile-web-app-meta.md](pwa-mobile-web-app-meta.md) | **Done (2026-04).** **`mobile-web-app-capable`** in `index.html` — see ticket. |
 | [quality-gates-false-positives.md](quality-gates-false-positives.md) | **Partial (2026-04).** Observability + specificity; locale-aware gates TBD — see ticket |

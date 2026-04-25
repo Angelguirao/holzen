@@ -1,9 +1,12 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.57.2";
-import { holzenEdgeError, holzenEdgeLog, holzenEdgeRun } from "../_shared/holzen-edge-log.ts";
+import { unknownErrorForLog } from "../_shared/log-unknown-error.ts";
 import { createAttemptLogger } from "../_shared/observe.ts";
 import { coingeckoHeaders } from "../_shared/coingecko.ts";
-import { withRequestLogging } from "../_shared/with-request-logging.ts";
+import {
+  withRequestLogging,
+  type RequestLoggingContext,
+} from "../_shared/with-request-logging.ts";
 import {
   holzenLovableEmailLogger,
   sendLovableEmailBatch,
@@ -11,6 +14,17 @@ import {
 } from "../_shared/lovable-email.ts";
 
 const DIGEST_MODEL = "google/gemini-2.5-flash-lite";
+
+/** Subset of `profiles` selected for the digest loop. */
+interface DigestProfile {
+  user_id: string;
+  email_notifications?: boolean | null;
+  digest_frequency?: string | null;
+  threshold?: number | null;
+  threshold_down?: number | null;
+  hold_goal_currency?: string | null;
+  language?: string | null;
+}
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -95,16 +109,17 @@ async function fetchBtcWeekData(currency: string): Promise<BtcWeekData> {
 }
 
 async function generateAIInsight(
-  reflectionCount: number,
+  pauseCount: number,
   topMood: string | undefined,
   steadyCount: number,
   weekDir: string,
   absWeekChange: string,
   LOVABLE_API_KEY: string,
   language: string | undefined,
-  logAttempt: (params: Parameters<ReturnType<typeof createAttemptLogger>>[0]) => void
+  logAttempt: (params: Parameters<ReturnType<typeof createAttemptLogger>>[0]) => void,
+  log: RequestLoggingContext["log"],
 ): Promise<string | null> {
-  if (reflectionCount === 0) return null;
+  if (pauseCount === 0) return null;
 
   const t0 = Date.now();
   try {
@@ -113,15 +128,15 @@ async function generateAIInsight(
     const langName = LANG_NAMES[langCode] || "English";
     const langInstruction = langCode !== "en" ? `\nWrite in ${langName}.` : "";
 
-    const prompt = `You are Holzen, a mindful Bitcoin reflection app. Generate ONE short behavioral observation (1-2 sentences max) based on this user's week:
+    const prompt = `You are Holzen, a mindful Bitcoin pause app. Generate ONE short behavioral observation (1-2 sentences max) based on this user's week:
 - BTC moved ${weekDir} ${absWeekChange}% this week
-- They reflected ${reflectionCount} time(s)
+- They completed ${pauseCount} pause session(s)
 - Most common mood: ${topMood || "unknown"}
 - Stayed steady (held/did nothing): ${steadyCount} time(s)
 
 Be observational, not prescriptive. No advice, no exclamation marks. Calm and grounded. Examples:
 - "You noticed the dip but didn't flinch. That pattern is strengthening."
-- "Three reflections during a quiet week — you're building awareness beyond volatility."
+- "Three pauses during a quiet week — you're building awareness beyond volatility."
 - "Anxiety appeared twice this week, both during drops. The pattern is worth noticing."${langInstruction}`;
 
     const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
@@ -137,7 +152,11 @@ Be observational, not prescriptive. No advice, no exclamation marks. Calm and gr
     });
 
     if (!response.ok) {
-      holzenEdgeError("weekly-digest", `AI insight HTTP ${response.status}`);
+      log.error("weekly_digest_ai", {
+        holzen_event: "weekly_digest_cron",
+        phase: "ai_insight_http_error",
+        http_status: response.status,
+      });
       logAttempt({
         companion_type: "digest",
         provider: "lovable",
@@ -161,7 +180,11 @@ Be observational, not prescriptive. No advice, no exclamation marks. Calm and gr
     });
     return data.choices?.[0]?.message?.content?.trim() || null;
   } catch (e) {
-    holzenEdgeError("weekly-digest", "AI insight failed", e);
+    log.error("weekly_digest_ai", {
+      holzen_event: "weekly_digest_cron",
+      phase: "ai_insight_failed",
+      ...unknownErrorForLog(e),
+    });
     logAttempt({
       companion_type: "digest",
       provider: "lovable",
@@ -175,18 +198,23 @@ Be observational, not prescriptive. No advice, no exclamation marks. Calm and gr
 }
 
 serve(
-  withRequestLogging("weekly-digest", async ({ req }) => {
+  withRequestLogging("weekly-digest", async ({ req, log }) => {
   try {
-    holzenEdgeRun("weekly-digest", "request", { method: req.method });
     const { verifyServiceAuth } = await import("../_shared/auth.ts");
     if (!verifyServiceAuth(req)) {
-      holzenEdgeRun("weekly-digest", "auth rejected");
+      log.warn("weekly_digest_phase", {
+        holzen_event: "weekly_digest_cron",
+        phase: "service_auth_rejected",
+      });
       return new Response(JSON.stringify({ error: "Unauthorized" }), {
         status: 401,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
-    holzenEdgeRun("weekly-digest", "auth ok");
+    log("weekly_digest_phase", {
+      holzen_event: "weekly_digest_cron",
+      phase: "service_auth_ok",
+    });
     const supabase = createClient(
       Deno.env.get("SUPABASE_URL") ?? "",
       Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? "",
@@ -205,7 +233,11 @@ serve(
       providers: ["lovable"],
     });
     if (!digestAiGuard.allowed) {
-      holzenEdgeLog("weekly-digest", "ai insight skipped", { reason: digestAiGuard.reason });
+      log("weekly_digest_phase", {
+        holzen_event: "weekly_digest_cron",
+        phase: "ai_insight_skipped",
+        reason: digestAiGuard.reason,
+      });
       LOVABLE_API_KEY = undefined;
     }
 
@@ -217,10 +249,15 @@ serve(
     if (profilesError) throw profilesError;
 
     const now = new Date();
-    const eligible = (profiles ?? []).filter(
-      (p) => p.email_notifications && shouldSendDigest(p.digest_frequency ?? "weekly", now)
+    const profileRows = (profiles ?? []) as DigestProfile[];
+    const eligible = profileRows.filter(
+      (p) => p.email_notifications && shouldSendDigest(p.digest_frequency ?? "weekly", now),
     );
-    holzenEdgeLog("weekly-digest", "eligible users", { count: eligible.length });
+    log("weekly_digest_phase", {
+      holzen_event: "weekly_digest_cron",
+      phase: "eligible_users",
+      count: eligible.length,
+    });
 
     // We collect all rendered emails and send them in a single batch request
     // at the end (≤100 per chunk). That's one Lovable Email round trip instead of N
@@ -230,25 +267,28 @@ serve(
     const weekAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString();
 
     for (const profile of eligible) {
-      const currency = (profile as any).hold_goal_currency || "USD";
+      const currency = profile.hold_goal_currency || "USD";
       const btc = await fetchBtcWeekData(currency);
 
       const weekDir = btc.weekChange >= 0 ? "up" : "down";
       const absWeekChange = Math.abs(btc.weekChange).toFixed(1);
 
-      const { data: reflections } = await supabase
-        .from("reflections")
-        .select("message, mood, outcome, created_at")
+      const { data: pauseRows } = await supabase
+        .from("v_pause_full")
+        .select("reflection_text, initial_mood, outcome, created_at")
         .eq("user_id", profile.user_id)
         .gte("created_at", weekAgo)
         .order("created_at", { ascending: true });
 
-      const reflectionCount = reflections?.length ?? 0;
+      const pauseCount = pauseRows?.length ?? 0;
 
       const moods: Record<string, number> = {};
       const outcomes: Record<string, number> = {};
-      for (const r of reflections ?? []) {
-        if (r.mood) moods[r.mood] = (moods[r.mood] || 0) + 1;
+      for (const r of (pauseRows ?? []) as Array<{
+        initial_mood: string | null;
+        outcome: string | null;
+      }>) {
+        if (r.initial_mood) moods[r.initial_mood] = (moods[r.initial_mood] || 0) + 1;
         if (r.outcome) outcomes[r.outcome] = (outcomes[r.outcome] || 0) + 1;
       }
 
@@ -266,19 +306,26 @@ serve(
 
       // Generate AI insight
       let aiInsight: string | null = null;
-      if (LOVABLE_API_KEY && reflectionCount > 0) {
+      if (LOVABLE_API_KEY && pauseCount > 0) {
         const logAttempt = createAttemptLogger(supabase, { userId: profile.user_id });
         aiInsight = await generateAIInsight(
-          reflectionCount, topMood, steadyCount, weekDir, absWeekChange, LOVABLE_API_KEY, (profile as any).language,
+          pauseCount,
+          topMood,
+          steadyCount,
+          weekDir,
+          absWeekChange,
+          LOVABLE_API_KEY,
+          profile.language ?? undefined,
           logAttempt,
+          log,
         );
       }
 
-      const reflectionsList =
-        reflectionCount === 0
-          ? `<p style="font-size: 13px; color: #737373; line-height: 1.6;">No reflections this week. Sometimes the best move is no move at all.</p>`
+      const pauseSummaryHtml =
+        pauseCount === 0
+          ? `<p style="font-size: 13px; color: #737373; line-height: 1.6;">No pause sessions this week. Sometimes the best move is no move at all.</p>`
           : `<p style="font-size: 13px; color: #737373; line-height: 1.6;">
-              You reflected <strong style="color: #2a2a2a;">${reflectionCount} time${reflectionCount !== 1 ? "s" : ""}</strong> this week.${
+              You took <strong style="color: #2a2a2a;">${pauseCount} pause${pauseCount !== 1 ? "s" : ""}</strong> this week.${
                 topMood ? ` Your most common mood was <strong style="color: #2a2a2a;">${topMood}</strong>.` : ""
               }${
                 steadyCount > 0
@@ -326,7 +373,7 @@ serve(
     </tr>
   </table>
 
-  ${reflectionsList}
+  ${pauseSummaryHtml}
 
   ${aiInsightHtml}
 
@@ -356,12 +403,26 @@ serve(
       source: "weekly-digest",
       idempotencyKey: `weekly-digest:${idempotencyDate}`,
       logger: holzenLovableEmailLogger(
-        (m, d) => holzenEdgeLog("weekly-digest", m, d),
-        (m, err) => holzenEdgeError("weekly-digest", m, err),
+        (m, d) =>
+          log("lovable_email_dep", {
+            holzen_event: "weekly_digest_cron",
+            phase: "lovable_email",
+            message: m,
+            ...(d ?? {}),
+          }),
+        (m, data) =>
+          log.error("lovable_email_dep", {
+            holzen_event: "weekly_digest_cron",
+            phase: "lovable_email_error",
+            message: m,
+            ...(data ?? {}),
+          }),
       ),
     });
 
-    holzenEdgeLog("weekly-digest", "run complete", {
+    log("weekly_digest_complete", {
+      holzen_event: "weekly_digest_cron",
+      phase: "run_complete",
       sent: batch.sent,
       failed: batch.failed,
       chunks: batch.chunks,
@@ -374,7 +435,11 @@ serve(
     );
   } catch (e) {
     const msg = e instanceof Error ? e.message : String(e);
-    holzenEdgeError("weekly-digest", "uncaught error", msg);
+    log.error("weekly_digest_uncaught", {
+      holzen_event: "weekly_digest_cron",
+      phase: "uncaught",
+      ...unknownErrorForLog(e),
+    });
     return new Response(JSON.stringify({ error: msg }), {
       status: 500,
       headers: { ...corsHeaders, "Content-Type": "application/json" },

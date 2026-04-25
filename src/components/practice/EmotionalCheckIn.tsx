@@ -31,7 +31,7 @@ export function EmotionalCheckIn({ onComplete, textColor, ringColor }: Props) {
     if (!user) return;
     setSaving(true);
     try {
-      await supabase.from('practice_entries' as any).insert({
+      await supabase.from('practice_entries').insert({
         user_id: user.id,
         type: 'checkin',
         mood,

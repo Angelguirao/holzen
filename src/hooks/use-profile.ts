@@ -3,6 +3,10 @@ import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/use-auth';
 import { holzenLog } from '@/lib/holzen-console';
 import type { CompanionPrefs } from '@/components/CompanionSection';
+import type { Database } from '@/integrations/supabase/types';
+
+type ProfileRow = Database['public']['Tables']['profiles']['Row'];
+type ProfileUpdate = Database['public']['Tables']['profiles']['Update'];
 
 export interface ProfileLoadReflectionData {
   lastMessage: string | null;
@@ -51,18 +55,20 @@ export function useProfile() {
 
     const load = async () => {
       holzenLog.profile('fetch profiles', { userIdPrefix: user.id.slice(0, 8) });
-      let { data, error: selErr } = await supabase
+      const initial = await supabase
         .from('profiles')
         .select(selectCols)
         .eq('user_id', user.id)
         .maybeSingle();
 
-      if (selErr) {
-        console.error('[useProfile] profiles select failed:', selErr.message);
-        holzenLog.profile('select failed', { message: selErr.message });
+      if (initial.error) {
+        console.error('[useProfile] profiles select failed:', initial.error.message);
+        holzenLog.profile('select failed', { message: initial.error.message });
         setProfileLoaded(true);
         return;
       }
+
+      let data = initial.data;
 
       // No row: local reset / missing trigger — create profile (RLS allows insert for own user_id)
       if (!data) {
@@ -77,48 +83,49 @@ export function useProfile() {
       }
 
       if (data) {
-        setThresholdState(data.threshold);
-        setThresholdDownState((data as any).threshold_down ?? data.threshold);
-        setCumulativeThresholdState(data.cumulative_threshold ?? 15);
-        setStreakFreezeDatesState((data as any).streak_freeze_dates ?? []);
-        setEmailNotificationsState(data.email_notifications ?? true);
-        setReflectionToneState((data as any).reflection_tone ?? 'stoic');
-        setCooldownHoursState((data as any).cooldown_hours ?? 6);
-        setSilentModeState((data as any).silent_mode ?? false);
-        setDigestFrequencyState((data as any).digest_frequency ?? 'weekly');
-        setCustomPromptState((data as any).custom_prompt ?? null);
-        setReflectionStyleState((data as any).reflection_style ?? 'standard');
-        setQuietHoursStartState((data as any).quiet_hours_start ?? null);
-        setQuietHoursEndState((data as any).quiet_hours_end ?? null);
-        setFirstNameState((data as any).first_name ?? null);
-        setNightReflectionHourState((data as any).night_reflection_hour ?? 21);
-        setAiInsightsEnabledState((data as any).ai_insights_enabled ?? true);
-        setNotifyBadgesState((data as any).notify_badges ?? true);
-        setMotivationsState((data as any).motivations ?? []);
-        setMantraState((data as any).mantra ?? null);
-        setCurrencyState((data as any).hold_goal_currency ?? 'USD');
-        setLanguageState((data as any).language ?? 'en');
-        setGroundingActivitiesState((data as any).grounding_activities ?? []);
-        setHasOnboarded(data.has_onboarded ?? false);
+        const row = data as ProfileRow;
+        setThresholdState(row.threshold);
+        setThresholdDownState(row.threshold_down ?? row.threshold);
+        setCumulativeThresholdState(row.cumulative_threshold ?? 15);
+        setStreakFreezeDatesState(row.streak_freeze_dates ?? []);
+        setEmailNotificationsState(row.email_notifications ?? true);
+        setReflectionToneState(row.reflection_tone ?? 'stoic');
+        setCooldownHoursState(row.cooldown_hours ?? 6);
+        setSilentModeState(row.silent_mode ?? false);
+        setDigestFrequencyState(row.digest_frequency ?? 'weekly');
+        setCustomPromptState(row.custom_prompt ?? null);
+        setReflectionStyleState(row.reflection_style ?? 'standard');
+        setQuietHoursStartState(row.quiet_hours_start ?? null);
+        setQuietHoursEndState(row.quiet_hours_end ?? null);
+        setFirstNameState(row.first_name ?? null);
+        setNightReflectionHourState(row.night_reflection_hour ?? 21);
+        setAiInsightsEnabledState(row.ai_insights_enabled ?? true);
+        setNotifyBadgesState(row.notify_badges ?? true);
+        setMotivationsState(row.motivations ?? []);
+        setMantraState(row.mantra ?? null);
+        setCurrencyState(row.hold_goal_currency ?? 'USD');
+        setLanguageState(row.language ?? 'en');
+        setGroundingActivitiesState(row.grounding_activities ?? []);
+        setHasOnboarded(row.has_onboarded ?? false);
         setCompanionPrefsState({
-          breathing: data.companion_breathing ?? true,
-          haiku: data.companion_haiku ?? true,
-          grounding: data.companion_grounding ?? true,
-          signal: (data as any).companion_signal ?? true,
-          zoomOut: (data as any).companion_zoom_out ?? true,
-          history: (data as any).companion_history ?? true,
+          breathing: row.companion_breathing ?? true,
+          haiku: row.companion_haiku ?? true,
+          grounding: row.companion_grounding ?? true,
+          signal: row.companion_signal ?? true,
+          zoomOut: row.companion_zoom_out ?? true,
+          history: row.companion_history ?? true,
         });
 
         setProfileLoadReflectionData({
-          lastMessage: data.last_message ?? null,
-          lastContext: data.last_context ?? null,
-          lastTriggerAt: (data as any).last_trigger_at ?? null,
+          lastMessage: row.last_message ?? null,
+          lastContext: row.last_context ?? null,
+          lastTriggerAt: row.last_trigger_at ?? null,
         });
       }
       holzenLog.profile('ready', {
         hasRow: !!data,
         hasOnboarded: data?.has_onboarded ?? null,
-        silentMode: data ? !!(data as { silent_mode?: boolean }).silent_mode : null,
+        silentMode: data ? !!(data as ProfileRow).silent_mode : null,
         hasLastMessage: !!(data?.last_message),
       });
       setProfileLoaded(true);
@@ -141,7 +148,7 @@ export function useProfile() {
     if (!user) return;
     await supabase
       .from('profiles')
-      .update({ threshold_down: val } as any)
+      .update({ threshold_down: val })
       .eq('user_id', user.id);
   }, [user]);
 
@@ -167,7 +174,7 @@ export function useProfile() {
     setStreakFreezeDatesState(updated);
     await supabase
       .from('profiles')
-      .update({ streak_freeze_dates: updated } as any)
+      .update({ streak_freeze_dates: updated })
       .eq('user_id', user.id);
   }, [user, streakFreezeDates]);
 
@@ -185,7 +192,7 @@ export function useProfile() {
     if (!user) return;
     await supabase
       .from('profiles')
-      .update({ reflection_tone: val } as any)
+      .update({ reflection_tone: val })
       .eq('user_id', user.id);
   }, [user]);
 
@@ -194,7 +201,7 @@ export function useProfile() {
     if (!user) return;
     await supabase
       .from('profiles')
-      .update({ silent_mode: val } as any)
+      .update({ silent_mode: val })
       .eq('user_id', user.id);
   }, [user]);
 
@@ -203,7 +210,7 @@ export function useProfile() {
     if (!user) return;
     await supabase
       .from('profiles')
-      .update({ digest_frequency: val } as any)
+      .update({ digest_frequency: val })
       .eq('user_id', user.id);
   }, [user]);
 
@@ -214,7 +221,7 @@ export function useProfile() {
     const dbKey = `companion_${snakeKey}` as string;
     await supabase
       .from('profiles')
-      .update({ [dbKey]: val } as Record<string, boolean>)
+      .update({ [dbKey]: val } as ProfileUpdate)
       .eq('user_id', user.id);
   }, [user]);
 
@@ -244,7 +251,7 @@ export function useProfile() {
         timezone: result.timezone,
         motivations: result.motivations.length > 0 ? result.motivations : null,
         grounding_activities: result.groundingActivities.length > 0 ? result.groundingActivities : [],
-      } as any)
+      })
       .eq('user_id', user.id);
   }, [user]);
 
@@ -275,7 +282,7 @@ export function useProfile() {
     if (!user) return;
     await supabase
       .from('profiles')
-      .update({ cooldown_hours: val } as any)
+      .update({ cooldown_hours: val })
       .eq('user_id', user.id);
   }, [user]);
 
@@ -302,13 +309,13 @@ export function useProfile() {
     setCustomPrompt: async (val: string | null) => {
       setCustomPromptState(val);
       if (!user) return;
-      await supabase.from('profiles').update({ custom_prompt: val } as any).eq('user_id', user.id);
+      await supabase.from('profiles').update({ custom_prompt: val }).eq('user_id', user.id);
     },
     reflectionStyle,
     setReflectionStyle: async (val: string) => {
       setReflectionStyleState(val);
       if (!user) return;
-      await supabase.from('profiles').update({ reflection_style: val } as any).eq('user_id', user.id);
+      await supabase.from('profiles').update({ reflection_style: val }).eq('user_id', user.id);
     },
     quietHoursStart,
     quietHoursEnd,
@@ -316,49 +323,49 @@ export function useProfile() {
       setQuietHoursStartState(start);
       setQuietHoursEndState(end);
       if (!user) return;
-      await supabase.from('profiles').update({ quiet_hours_start: start, quiet_hours_end: end } as any).eq('user_id', user.id);
+      await supabase.from('profiles').update({ quiet_hours_start: start, quiet_hours_end: end }).eq('user_id', user.id);
     },
     nightReflectionHour,
     setNightReflectionHour: async (val: number | null) => {
       setNightReflectionHourState(val);
       if (!user) return;
-      await supabase.from('profiles').update({ night_reflection_hour: val } as any).eq('user_id', user.id);
+      await supabase.from('profiles').update({ night_reflection_hour: val }).eq('user_id', user.id);
     },
     firstName,
     setFirstName: async (val: string | null) => {
       setFirstNameState(val);
       if (!user) return;
-      await supabase.from('profiles').update({ first_name: val } as any).eq('user_id', user.id);
+      await supabase.from('profiles').update({ first_name: val }).eq('user_id', user.id);
     },
     aiInsightsEnabled,
     setAiInsightsEnabled: async (val: boolean) => {
       setAiInsightsEnabledState(val);
       if (!user) return;
-      await supabase.from('profiles').update({ ai_insights_enabled: val } as any).eq('user_id', user.id);
+      await supabase.from('profiles').update({ ai_insights_enabled: val }).eq('user_id', user.id);
     },
     notifyBadges,
     setNotifyBadges: async (val: boolean) => {
       setNotifyBadgesState(val);
       if (!user) return;
-      await supabase.from('profiles').update({ notify_badges: val } as any).eq('user_id', user.id);
+      await supabase.from('profiles').update({ notify_badges: val }).eq('user_id', user.id);
     },
     motivations,
     setMotivations: async (val: string[]) => {
       setMotivationsState(val);
       if (!user) return;
-      await supabase.from('profiles').update({ motivations: val } as any).eq('user_id', user.id);
+      await supabase.from('profiles').update({ motivations: val }).eq('user_id', user.id);
     },
     groundingActivities,
     setGroundingActivities: async (val: string[]) => {
       setGroundingActivitiesState(val);
       if (!user) return;
-      await supabase.from('profiles').update({ grounding_activities: val } as any).eq('user_id', user.id);
+      await supabase.from('profiles').update({ grounding_activities: val }).eq('user_id', user.id);
     },
     mantra,
     setMantra: async (val: string | null) => {
       setMantraState(val);
       if (!user) return;
-      await supabase.from('profiles').update({ mantra: val } as any).eq('user_id', user.id);
+      await supabase.from('profiles').update({ mantra: val }).eq('user_id', user.id);
     },
     currency,
     setCurrency: async (val: string) => {
@@ -370,7 +377,7 @@ export function useProfile() {
     setLanguage: async (val: string) => {
       setLanguageState(val);
       if (!user) return;
-      await supabase.from('profiles').update({ language: val } as any).eq('user_id', user.id);
+      await supabase.from('profiles').update({ language: val }).eq('user_id', user.id);
     },
     companionPrefs,
     setCompanionPref,

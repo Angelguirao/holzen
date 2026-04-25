@@ -2,17 +2,14 @@ import { useTranslation } from 'react-i18next';
 import { usePullToRefresh } from '@/hooks/use-pull-to-refresh';
 import { useOutletContext } from 'react-router-dom';
 import { useHolzen } from '@/hooks/use-holzen';
-import { isReflectionPersistError } from '@/lib/reflection-persist-error';
+import { isPausePersistError } from '@/lib/reflection-persist-error';
 import { TestimonialRequest } from '@/components/TestimonialRequest';
-import { LetterToFutureSelf } from '@/components/LetterToFutureSelf';
 import AuthLoading from '@/components/AuthLoading';
 import { useSubscription } from '@/hooks/use-subscription';
 import { BtcStatus } from '@/components/BtcStatus';
 import { NightReflectionCard, useNightReflection } from '@/components/NightReflectionCard';
-import { FollowUpCard } from '@/components/FollowUpCard';
 import { ReflectionMessage } from '@/components/ReflectionMessage';
 import { HolzenNumber } from '@/components/HolzenNumber';
-import { ReflectionComparison } from '@/components/ReflectionComparison';
 import { Onboarding } from '@/components/Onboarding';
 import { HoldGoalWidget } from '@/components/HoldGoalWidget';
 import { MyWhyWidget } from '@/components/MyWhyWidget';
@@ -34,12 +31,14 @@ import { cn } from '@/lib/utils';
 import { PracticeWidget } from '@/components/PracticeWidget';
 import { BulkHoldCard } from '@/components/BulkHoldCard';
 import { InstallHolzenCard } from '@/components/InstallHolzenCard';
+import { JourneyHomeCard } from '@/components/JourneyHomeCard';
 import { SnoozeControl } from '@/components/SnoozeControl';
 import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
 import { playNotificationTone, prefetchNotificationTone } from '@/lib/notification-tone';
 import { isCumulativeMoveTriggered } from '@/lib/volatility-thresholds';
 import { holzenLog } from '@/lib/holzen-console';
 import { companionFallbacksDisabledClient } from '@/lib/companion-strict';
+import { TOOLS } from '@/lib/app-routes';
 import { type GroundPreGenerated, type PauseSessionLocationState } from '@/lib/router-location-state';
 import {
   DndContext,
@@ -59,10 +58,10 @@ import {
 import { restrictToVerticalAxis } from '@dnd-kit/modifiers';
 
 // Widget IDs
-const WIDGET_IDS = ['btc-status', 'hold-goal', 'reflection', 'ground', 'night', 'letter', 'practice', 'breathe'] as const;
+const WIDGET_IDS = ['btc-status', 'hold-goal', 'reflection', 'ground', 'night', 'practice', 'breathe'] as const;
 type WidgetId = typeof WIDGET_IDS[number];
 
-interface PinnedReflection {
+interface PinnedPausePreview {
   id: string;
   message: string;
   context: string | null;
@@ -77,11 +76,10 @@ const Home = () => {
     'btc-status': t('home.widget.market'),
     'hold-goal': t('home.widget.goal'),
     'reflection': t('home.widget.reflection'),
-    'ground': t('home.widget.ground', 'Ground'),
+    'ground': t('home.widget.ground', { defaultValue: 'Ground' }),
     'night': t('home.widget.evening'),
-    'letter': t('home.widget.letter'),
-    'practice': t('home.widget.practice', 'Practice'),
-    'breathe': t('home.widget.breathe', 'Stillness'),
+    'practice': t('home.widget.practice', { defaultValue: 'Practice' }),
+    'breathe': t('home.widget.breathe', { defaultValue: 'Stillness' }),
   };
   const { user } = useAuth();
   const navigate = useNavigate();
@@ -91,7 +89,9 @@ const Home = () => {
   useEffect(() => {
     if (searchParams.get('subscribed') === 'true') {
       refresh();
-      toast.success(t('pro.welcomeToast', '🎉 Welcome to Pro! All features are now unlocked.'));
+      toast.success(
+        t('pro.welcomeToast', { defaultValue: '🎉 Welcome to Pro! All features are now unlocked.' }),
+      );
     }
   }, [searchParams, refresh, t]);
 
@@ -102,11 +102,11 @@ const Home = () => {
     companions,
     companionPrefs,
     severity,
-    lastReflectionId,
+    lastPauseInstanceId,
     loading,
     error,
-    newReflection,
-    clearNewReflection,
+    newPauseArrival,
+    clearNewPauseArrival,
     dismissMessage,
     hasOnboarded,
     completeOnboarding,
@@ -144,9 +144,9 @@ const Home = () => {
   const [priceHidden, setPriceHidden] = useState(() => localStorage.getItem('holzen_hide_price') === 'true');
   const [btcMode, setBtcMode] = useState(() => localStorage.getItem('holzen_btc_mode') === 'true');
   const [zenMode] = useState(() => localStorage.getItem('holzen_zen_mode') === 'true');
-  const [pinnedReflection, setPinnedReflection] = useState<PinnedReflection | null>(null);
+  const [pinnedPausePreview, setPinnedPausePreview] = useState<PinnedPausePreview | null>(null);
   const prefersReducedMotion = useReducedMotion();
-  const [reflectionCount, setReflectionCount] = useState(0);
+  const [completedPauseCount, setCompletedPauseCount] = useState(0);
 
   // Grounding suggestion state (mirrors pause message pattern)
   const groundStorageKey = user ? `holzen_ground_suggestion_${user.id}` : 'holzen_ground_suggestion';
@@ -190,28 +190,70 @@ const Home = () => {
     [order, reorder],
   );
 
-  // Load pinned reflection
+  // Load pinned pause (legacy key name retained for localStorage back-compat).
   useEffect(() => {
     if (!user) return;
     const pinnedId = localStorage.getItem('holzen_pinned_reflection');
     if (!pinnedId) return;
-    supabase
-      .from('v_reflection_with_companions')
-      .select('id, message, context, haiku, grounding_title, grounding_body')
-      .eq('id', pinnedId)
-      .eq('user_id', user.id)
-      .single()
-      .then(({ data }) => {
-        if (data) setPinnedReflection(data as unknown as PinnedReflection);
-        else localStorage.removeItem('holzen_pinned_reflection');
+    let cancelled = false;
+    void (async () => {
+      const { data: inst } = await supabase
+        .from('pause_instances' as never)
+        .select('id, context_snapshot')
+        .eq('id', pinnedId)
+        .eq('user_id', user.id)
+        .maybeSingle();
+      if (cancelled) return;
+      if (!inst) {
+        localStorage.removeItem('holzen_pinned_reflection');
+        return;
+      }
+      const { data: artifacts } = await supabase
+        .from('pause_ai_artifacts' as never)
+        .select('kind, content')
+        .eq('pause_instance_id', pinnedId);
+      if (cancelled) return;
+      let message = '';
+      let haiku: string | null = null;
+      let groundingTitle: string | null = null;
+      let groundingBody: string | null = null;
+      for (const a of ((artifacts ?? []) as Array<{ kind: string; content: Record<string, unknown> }>)) {
+        if (a.kind === 'reflection_text' && typeof a.content?.message === 'string') {
+          message = a.content.message as string;
+        } else if (a.kind === 'haiku' && typeof a.content?.haiku === 'string') {
+          haiku = a.content.haiku as string;
+        } else if (a.kind === 'ground_nudge') {
+          if (typeof a.content?.title === 'string') groundingTitle = a.content.title as string;
+          if (typeof a.content?.body === 'string') groundingBody = a.content.body as string;
+        }
+      }
+      const ctxSnap = ((inst as { context_snapshot: Record<string, unknown> | null }).context_snapshot ?? {}) as Record<string, unknown>;
+      const context = typeof ctxSnap.context_text === 'string' ? (ctxSnap.context_text as string) : null;
+      setPinnedPausePreview({
+        id: pinnedId,
+        message,
+        context,
+        haiku,
+        grounding_title: groundingTitle,
+        grounding_body: groundingBody,
       });
+    })();
+    return () => {
+      cancelled = true;
+    };
   }, [user]);
 
-  // Fetch reflection count for testimonial prompt
+  // Fetch completed-pause count for testimonial prompt.
   useEffect(() => {
     if (!user) return;
-    supabase.from('reflections').select('id', { count: 'exact', head: true }).eq('user_id', user.id)
-      .then(({ count }) => { if (count != null) setReflectionCount(count); });
+    supabase
+      .from('pause_instances' as never)
+      .select('id', { count: 'exact', head: true })
+      .eq('user_id', user.id)
+      .eq('state', 'completed')
+      .then(({ count }: { count: number | null }) => {
+        if (count != null) setCompletedPauseCount(count);
+      });
   }, [user]);
 
   const togglePriceHidden = useCallback(() => {
@@ -265,12 +307,12 @@ const Home = () => {
   }, [strictNoFallback, user?.id]);
 
   const handleStartGround = useCallback(() => {
-    navigate('/ground', { state: { preGenerated: groundSuggestion } });
+    navigate(TOOLS.ground, { state: { preGenerated: groundSuggestion } });
   }, [navigate, groundSuggestion]);
 
   const lastToneMsgRef = useRef<string | null>(null);
   useEffect(() => {
-    if (newReflection && message) {
+    if (newPauseArrival && message) {
       // Only play tone once per unique message to prevent double-play
       if (message !== lastToneMsgRef.current) {
         lastToneMsgRef.current = message;
@@ -279,9 +321,9 @@ const Home = () => {
           playNotificationTone();
         }
       }
-      clearNewReflection();
+      clearNewPauseArrival();
     }
-  }, [newReflection, message, clearNewReflection]);
+  }, [newPauseArrival, message, clearNewPauseArrival]);
 
   useEffect(() => {
     prefetchNotificationTone();
@@ -343,9 +385,9 @@ const Home = () => {
     return () => { document.title = 'Holzen — Pause before you act'; };
   }, []);
 
-  const unpinReflection = useCallback(() => {
+  const unpinPausePreview = useCallback(() => {
     localStorage.removeItem('holzen_pinned_reflection');
-    setPinnedReflection(null);
+    setPinnedPausePreview(null);
   }, []);
 
   const handlePullRefresh = useCallback(async () => {
@@ -386,19 +428,19 @@ const Home = () => {
                 message={message} context={context} onDismiss={handleDismiss}
                 companions={companions}
                 companionPrefs={{ breathing: companionPrefs.breathing, haiku: false, grounding: false, signal: false, zoomOut: false, history: false }}
-                severity={severity} reflectionId={lastReflectionId}
+                severity={severity} pauseInstanceId={lastPauseInstanceId}
               />
             </motion.div>
           ) : loading ? (
             <motion.div key="zen-loading" variants={zenVariants} initial="hidden" animate="visible" exit="hidden" className="space-y-4">
               <div className="flex items-center gap-2 text-muted-foreground">
                 <Loader2 className="h-3 w-3 animate-spin" />
-                <p className="text-xs font-mono">Generating reflection…</p>
+                <p className="text-xs font-mono">{t('home.generatingReflection')}</p>
               </div>
               <Skeleton className="h-4 w-full" />
               <Skeleton className="h-4 w-3/4" />
             </motion.div>
-          ) : isReflectionPersistError(error) ? (
+          ) : isPausePersistError(error) ? (
             <motion.div
               key="zen-reflection-save-error"
               variants={zenVariants}
@@ -414,7 +456,7 @@ const Home = () => {
               <button
                 type="button"
                 onClick={() => {
-                  holzenLog.home('Try again after reflection save error: manualTrigger');
+                  holzenLog.home('Try again after pause persist error: manualTrigger');
                   manualTrigger();
                 }}
                 className="text-xs font-mono text-primary underline"
@@ -436,7 +478,9 @@ const Home = () => {
               ) : (
                 <>
                   <p className="text-sm text-muted-foreground font-mono leading-relaxed">
-                    {t('home.subscription.monthlyLimitReached', 'You\'ve used your free pauses this month.')}
+                    {t('home.subscription.monthlyLimitReached', {
+                      defaultValue: "You've used your free pauses this month.",
+                    })}
                   </p>
                   <p className="text-xs text-muted-foreground/60 font-mono leading-relaxed max-w-[280px] mx-auto">
                     {t('home.subscription.upgradeToPro')}
@@ -502,7 +546,6 @@ const Home = () => {
               <BulkHoldCard />
 
               {/* 24h follow-up check-in */}
-              <FollowUpCard />
 
               {!subLoading && !hasAccess ? (
                 <div className="space-y-3">
@@ -539,7 +582,7 @@ const Home = () => {
                           type="button"
                           onClick={handleDismiss}
                           className={homeInWidget.dismissAbs}
-                          aria-label={t('common.dismiss', 'Dismiss')}
+                          aria-label={t('common.dismiss', { defaultValue: 'Dismiss' })}
                         >
                           <X className="h-3.5 w-3.5" aria-hidden />
                         </button>
@@ -557,13 +600,13 @@ const Home = () => {
                           const navState: PauseSessionLocationState = {
                             reflectionMessage: message,
                             context,
-                            reflectionId: lastReflectionId ?? undefined,
+                            pauseInstanceId: lastPauseInstanceId ?? undefined,
                             companions,
                             companionPrefs,
                             severity,
                           };
                           holzenLog.home('Navigate to /pause (pause with this message)', {
-                            reflectionId: lastReflectionId,
+                            pauseInstanceId: lastPauseInstanceId,
                             severity,
                             messageLen: message?.length ?? 0,
                             hasContext: !!context,
@@ -593,12 +636,12 @@ const Home = () => {
                           <Skeleton className="h-4 w-3/4" />
                           <Skeleton className="h-4 w-1/2" />
                         </div>
-                      ) : (error && !btcData) || isReflectionPersistError(error) ? (
+                      ) : (error && !btcData) || isPausePersistError(error) ? (
                         <div className={homeInWidget.errorPanel}>
                           <div className="flex items-center gap-2 text-destructive">
                             <AlertCircle className="h-4 w-4 shrink-0" />
                             <p className="text-sm font-medium leading-snug">
-                              {isReflectionPersistError(error)
+                              {isPausePersistError(error)
                                 ? error
                                 : error.includes('fetch') || error.includes('network') || error.includes('Failed to fetch')
                                 ? t('home.errors.couldNotReachPrice')
@@ -607,7 +650,7 @@ const Home = () => {
                                 : t('home.errors.somethingWentWrong')}
                             </p>
                           </div>
-                          {!isReflectionPersistError(error) && (
+                          {!isPausePersistError(error) && (
                             <p className={homeInWidget.meta}>
                               {error.includes('fetch') || error.includes('network') || error.includes('Failed to fetch')
                                 ? t('home.errors.checkConnection')
@@ -629,7 +672,7 @@ const Home = () => {
                         </div>
                       ) : (
                         <div className="space-y-6">
-                          {pinnedReflection && (
+                          {pinnedPausePreview && (
                             <div className={cn(homeInWidget.inset, 'space-y-3')}>
                               <div className="flex items-center justify-between gap-2">
                                 <div className="flex items-center gap-2 text-muted-foreground">
@@ -638,13 +681,13 @@ const Home = () => {
                                 </div>
                                 <button
                                   type="button"
-                                  onClick={unpinReflection}
+                                  onClick={unpinPausePreview}
                                   className="text-xs font-medium text-muted-foreground transition-colors hover:text-foreground"
                                 >
                                   {t('common.unpin')}
                                 </button>
                               </div>
-                              <p className={homeInWidget.body}>{pinnedReflection.message}</p>
+                              <p className={homeInWidget.body}>{pinnedPausePreview.message}</p>
                             </div>
                           )}
                           <NeedAMomentButton onTrigger={handleNeedAPause} cooldownRemaining={manualCooldownRemaining} loading={loading} />
@@ -686,7 +729,7 @@ const Home = () => {
             title={hasPreview
               ? `${WIDGET_TITLES['ground']} · ${groundSuggestion.activity}`
               : shouldNudgeGround
-              ? `${WIDGET_TITLES['ground']} · ${t('home.groundNudge', 'maybe now?')}`
+              ? `${WIDGET_TITLES['ground']} · ${t('home.groundNudge', { defaultValue: 'maybe now?' })}`
               : WIDGET_TITLES['ground']}
             collapsed={effectiveCollapsed}
             onToggleCollapse={() => toggleCollapsed('ground')}
@@ -701,7 +744,7 @@ const Home = () => {
                       type="button"
                       onClick={dismissGroundSuggestion}
                       className={homeInWidget.dismissAbs}
-                      aria-label={t('common.dismiss', 'Dismiss')}
+                      aria-label={t('common.dismiss', { defaultValue: 'Dismiss' })}
                     >
                       <X className="h-3.5 w-3.5" aria-hidden />
                     </button>
@@ -718,14 +761,16 @@ const Home = () => {
                     className={homeInWidget.ctaSecondary}
                   >
                     <Anchor className="h-4 w-4 shrink-0 text-muted-foreground" />
-                    {t('home.groundYourself', 'Ground yourself')}
+                    {t('home.groundYourself', { defaultValue: 'Ground yourself' })}
                   </button>
                 </>
               ) : groundLoading ? (
                 <div className="space-y-3">
                   <div className={homeInWidget.loadingRow}>
                     <Loader2 className="h-4 w-4 shrink-0 animate-spin" />
-                    <p className={homeInWidget.bodyMuted}>{t('home.groundFinding', 'Finding what fits…')}</p>
+                    <p className={homeInWidget.bodyMuted}>
+                      {t('home.groundFinding', { defaultValue: 'Finding what fits…' })}
+                    </p>
                   </div>
                   <Skeleton className="h-4 w-full" />
                   <Skeleton className="h-4 w-3/4" />
@@ -734,7 +779,9 @@ const Home = () => {
                 <>
                   {shouldNudgeGround && (
                     <p className={cn(homeInWidget.body, 'font-medium text-primary')}>
-                      {t('home.groundVolatileHint', 'The market is moving. A good moment to ground.')}
+                      {t('home.groundVolatileHint', {
+                        defaultValue: 'The market is moving. A good moment to ground.',
+                      })}
                     </p>
                   )}
 
@@ -752,11 +799,11 @@ const Home = () => {
                   {subscribed ? (
                     <button
                       type="button"
-                      onClick={() => navigate('/ground')}
+                      onClick={() => navigate(TOOLS.ground)}
                       className={cn(homeInWidget.ctaPrimary, shouldNudgeGround && homeInWidget.ctaPrimaryEmphasis)}
                     >
                       <Anchor className="h-4 w-4 shrink-0 text-primary" />
-                      {t('home.groundYourself', 'Ground yourself')}
+                      {t('home.groundYourself', { defaultValue: 'Ground yourself' })}
                     </button>
                   ) : (
                     <ProLockedWidget onUpgrade={startCheckout} checkoutLoading={checkoutLoading} feature="grounding" />
@@ -767,10 +814,10 @@ const Home = () => {
               {subscribed && (
                 <button
                   type="button"
-                  onClick={() => navigate('/ground/history')}
+                  onClick={() => navigate(TOOLS.groundHistory)}
                   className="w-full pt-1 text-center text-xs font-medium text-primary underline-offset-4 transition-colors hover:underline"
                 >
-                  {t('home.groundJournal', 'View journal')}
+                  {t('home.groundJournal', { defaultValue: 'View journal' })}
                 </button>
               )}
             </div>
@@ -791,24 +838,6 @@ const Home = () => {
           </HomeWidget>
         );
 
-      case 'letter':
-        if (!btcData) return null;
-        if (!subscribed) return (
-          <HomeWidget id="letter" title={WIDGET_TITLES['letter']} collapsed={collapsed['letter']} onToggleCollapse={() => toggleCollapsed('letter')}>
-            <ProLockedWidget onUpgrade={startCheckout} checkoutLoading={checkoutLoading} feature="letters" />
-          </HomeWidget>
-        );
-        return (
-          <HomeWidget
-            id="letter"
-            title={WIDGET_TITLES['letter']}
-            collapsed={collapsed['letter']}
-            onToggleCollapse={() => toggleCollapsed('letter')}
-          >
-            <LetterToFutureSelf currentPrice={btcData.currentPrice} changePercent={btcData.changePercent} />
-          </HomeWidget>
-        );
-
       case 'practice':
         return (
           <HomeWidget
@@ -818,6 +847,13 @@ const Home = () => {
             onToggleCollapse={() => toggleCollapsed('practice')}
           >
             <PracticeWidget />
+            <button
+              type="button"
+              onClick={() => navigate(TOOLS.hub)}
+              className="w-full text-left text-xs text-muted-foreground/80 underline-offset-4 hover:underline"
+            >
+              {t('home.browseAllTools', { defaultValue: 'Browse all tools & experiences' })}
+            </button>
           </HomeWidget>
         );
 
@@ -836,15 +872,24 @@ const Home = () => {
           >
             <div className="space-y-3">
               <p className={homeInWidget.bodyMuted}>
-                {t('home.breatheDesc', 'A quiet space to find stillness. No goals, no tracking.')}
+                {t('home.breatheDesc', {
+                  defaultValue: 'A quiet space to find stillness. No goals, no tracking.',
+                })}
               </p>
               <button
                 type="button"
-                onClick={() => navigate('/breathe')}
+                onClick={() => navigate(TOOLS.breathe)}
                 className={homeInWidget.ctaSecondary}
               >
                 <Waves className="h-4 w-4 shrink-0 text-muted-foreground" />
-                {t('home.enterStillness', 'Enter stillness')}
+                {t('home.enterStillness', { defaultValue: 'Enter stillness' })}
+              </button>
+              <button
+                type="button"
+                onClick={() => navigate(TOOLS.hub)}
+                className="w-full text-left text-xs text-muted-foreground/80 underline-offset-4 hover:underline"
+              >
+                {t('home.browseAllTools', { defaultValue: 'Browse all tools & experiences' })}
               </button>
             </div>
           </HomeWidget>
@@ -874,13 +919,18 @@ const Home = () => {
   return (
     <div {...pullHandlers} className="space-y-6">
       <div className="space-y-2">
-        <NoxHeaderMain title={t('home.title', 'Home')} subtitle={t('home.whenBtcMoves')} rightSlot={headerRightSlot} />
+        <NoxHeaderMain
+          title={t('home.title', { defaultValue: 'Home' })}
+          subtitle={t('home.whenBtcMoves')}
+          rightSlot={headerRightSlot}
+        />
         {firstName ? (
           <p className={cn(homeInWidget.bodyMuted, 'leading-snug')}>{t('home.greeting', { name: firstName })}</p>
         ) : null}
       </div>
       {/* Install card — first protected visit, dismissible */}
       <InstallHolzenCard />
+      <JourneyHomeCard />
       {/* Pull-to-refresh indicator */}
       {(pullDistance > 0 || pullRefreshing) && (
         <div
@@ -906,7 +956,7 @@ const Home = () => {
           <div className="space-y-4">
             {order.map((widgetId) => {
               const content = renderWidget(widgetId);
-              // Don't render null widgets (e.g. letter when no access)
+              // Don't render null widgets
               if (content === null) return null;
               return <div key={widgetId}>{content}</div>;
             })}
@@ -917,7 +967,7 @@ const Home = () => {
       {/* Modals (outside widget flow) */}
 
       {/* Testimonial request */}
-      <TestimonialRequest reflectionCount={reflectionCount} />
+      <TestimonialRequest completedPauseCount={completedPauseCount} />
     </div>
   );
 };

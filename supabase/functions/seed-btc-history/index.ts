@@ -1,6 +1,6 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.57.2";
-import { holzenEdgeError, holzenEdgeRun, holzenEdgeWarn } from "../_shared/holzen-edge-log.ts";
+import { unknownErrorForLog } from "../_shared/log-unknown-error.ts";
 import { withRequestLogging } from "../_shared/with-request-logging.ts";
 
 const corsHeaders = {
@@ -108,20 +108,25 @@ async function fetchCryptoCompareHistoDay(
 }
 
 serve(
-  withRequestLogging("seed-btc-history", async ({ req }) => {
+  withRequestLogging("seed-btc-history", async ({ req, log }) => {
   const t0 = Date.now();
 
   try {
-    holzenEdgeRun("seed-btc-history", "request", { method: req.method });
     const { verifyServiceAuth } = await import("../_shared/auth.ts");
     if (!verifyServiceAuth(req)) {
-      holzenEdgeRun("seed-btc-history", "auth rejected");
+      log.warn("seed_btc_history_phase", {
+        holzen_event: "seed_btc_history_cron",
+        phase: "service_auth_rejected",
+      });
       return new Response(JSON.stringify({ error: "Unauthorized" }), {
         status: 401,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
-    holzenEdgeRun("seed-btc-history", "auth ok");
+    log("seed_btc_history_phase", {
+      holzen_event: "seed_btc_history_cron",
+      phase: "service_auth_ok",
+    });
 
     if (req.method !== "POST") {
       return new Response(JSON.stringify({ error: "POST required" }), {
@@ -188,7 +193,11 @@ serve(
         .gte("date", fromRaw)
         .lte("date", toRaw);
       if (selErr) {
-        holzenEdgeError("seed-btc-history", "select existing dates failed", selErr);
+        log.error("seed_btc_history_select", {
+          holzen_event: "seed_btc_history_cron",
+          phase: "select_existing_failed",
+          ...unknownErrorForLog(selErr),
+        });
         return new Response(
           JSON.stringify({ error: "Failed to read existing cache rows" }),
           { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } },
@@ -218,16 +227,20 @@ serve(
       pagesFetched++;
       if (rl) {
         rateLimited = true;
-        holzenEdgeWarn("seed-btc-history", "cryptocompare rate limited", {
+        log.warn("seed_btc_history_cryptocompare", {
+          holzen_event: "seed_btc_history_cron",
+          phase: "cryptocompare_rate_limited",
           page: pagesFetched,
         });
         break;
       }
       if (rows.length === 0) {
         lastHttpError = httpStatus;
-        holzenEdgeWarn("seed-btc-history", "cryptocompare empty / non-success", {
+        log.warn("seed_btc_history_cryptocompare", {
+          holzen_event: "seed_btc_history_cron",
+          phase: "cryptocompare_empty_or_non_success",
           page: pagesFetched,
-          httpStatus,
+          http_status: httpStatus,
         });
         break;
       }
@@ -252,7 +265,11 @@ serve(
       // Hard safety: never more than ~20 pages per invocation (20 * 2001 rows
       // covers ~110 years of daily data — generous headroom, bounded wall-clock).
       if (pagesFetched >= 20) {
-        holzenEdgeWarn("seed-btc-history", "page cap reached", { pagesFetched });
+        log.warn("seed_btc_history_pages", {
+          holzen_event: "seed_btc_history_cron",
+          phase: "page_cap_reached",
+          pages_fetched: pagesFetched,
+        });
         break;
       }
     }
@@ -271,7 +288,11 @@ serve(
         const chunk = finalInserts.slice(i, i + CHUNK);
         const { error: upErr } = await supabase.from("btc_price_cache").upsert(chunk);
         if (upErr) {
-          holzenEdgeError("seed-btc-history", "upsert failed", upErr);
+          log.error("seed_btc_history_upsert", {
+            holzen_event: "seed_btc_history_cron",
+            phase: "upsert_failed",
+            ...unknownErrorForLog(upErr),
+          });
           return new Response(
             JSON.stringify({
               error: "Upsert failed",
@@ -293,7 +314,9 @@ serve(
       : `seed: upserted ${upserted} rows, ${pagesFetched} pages, ${rowsReceived} received` +
         (rateLimited ? " (rate limited)" : "") +
         (lastHttpError ? ` (last http=${lastHttpError})` : "");
-    holzenEdgeRun("seed-btc-history", "run complete", {
+    log("seed_btc_history_complete", {
+      holzen_event: "seed_btc_history_cron",
+      phase: "run_complete",
       ms: Date.now() - t0,
       summary,
     });
@@ -316,7 +339,11 @@ serve(
       { headers: { ...corsHeaders, "Content-Type": "application/json" } },
     );
   } catch (e) {
-    holzenEdgeError("seed-btc-history", "uncaught error", e);
+    log.error("seed_btc_history_uncaught", {
+      holzen_event: "seed_btc_history_cron",
+      phase: "uncaught",
+      ...unknownErrorForLog(e),
+    });
     return new Response(JSON.stringify({ error: String(e) }), {
       status: 500,
       headers: { ...corsHeaders, "Content-Type": "application/json" },

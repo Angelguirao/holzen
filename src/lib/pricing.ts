@@ -7,7 +7,7 @@ export const PRICING = {
   monthlyPrice: 4.99,
   /** Pro+ monthly price in USD */
   proPlusMonthlyPrice: 9.99,
-  /** Number of free reflections per month */
+  /** Number of free pauses per month (interpolation key in i18n remains `freeReflectionsPerMonth`) */
   freeReflectionsPerMonth: 3,
   /** Free trial duration in days */
   trialDays: 7,

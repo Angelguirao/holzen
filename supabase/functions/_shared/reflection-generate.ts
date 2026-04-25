@@ -143,16 +143,16 @@ function buildAdaptiveContext(
 
     if (recentAllAnxious) {
       adaptiveContext +=
-        "\nADAPTIVE CONTEXT: The user has been anxious in their last 3 reflections. Be extra gentle and grounding. Prioritize calm and spaciousness over challenge.";
+        "\nADAPTIVE CONTEXT: The user has been anxious in their last 3 pause check-ins. Be extra gentle and grounding. Prioritize calm and spaciousness over challenge.";
     } else if (anxiousRate > 0.5) {
       adaptiveContext +=
-        "\nADAPTIVE CONTEXT: The user tends toward anxiety in their reflections. Lean toward warmth and reassurance without being patronizing.";
+        "\nADAPTIVE CONTEXT: The user tends toward anxiety across recent pauses. Lean toward warmth and reassurance without being patronizing.";
     } else if (recentAllCalm) {
       adaptiveContext +=
         "\nADAPTIVE CONTEXT: The user has been consistently calm recently. You can be slightly more thought-provoking or philosophical — they can handle depth.";
     } else if (calmRate > 0.6) {
       adaptiveContext +=
-        "\nADAPTIVE CONTEXT: The user is generally composed. Offer reflections that reward their steadiness with deeper insight.";
+        "\nADAPTIVE CONTEXT: The user is generally composed. Offer copy that rewards their steadiness with deeper insight.";
     }
 
     if (soldRate > 0.4 && outcomes.length >= 3) {
@@ -232,7 +232,7 @@ function buildMessageDedup(recentMessages: string[] | undefined): string {
   const overusedWords = Object.entries(wordCounts).filter(([_, c]) => c >= 3).map(([w]) => w);
 
   let messageDedup =
-    `\n\nMESSAGE DEDUPLICATION: The user has recently received these reflections. You MUST write something structurally DIFFERENT — different opening, different metaphor, different sentence structure:\n${
+    `\n\nMESSAGE DEDUPLICATION: The user has recently received these pause messages. You MUST write something structurally DIFFERENT — different opening, different metaphor, different sentence structure:\n${
       recentMessages.slice(0, 5).map((m, i) => `${i + 1}. "${m}"`).join("\n")
     }`;
   if (openingPhrases.length > 0) {

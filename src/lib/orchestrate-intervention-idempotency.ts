@@ -2,12 +2,12 @@
  * Per-trigger idempotency for the AI intervention call.
  *
  * The AI "intervention" recommendation served on the pause screen is keyed
- * one-to-one against a `reflectionId` (each volatility trigger or manual
- * pause inserts exactly one reflection row). Once that recommendation has
- * been requested for a given reflection we never need to call
+ * one-to-one against a `pauseInstanceId` (each volatility trigger or manual
+ * pause creates exactly one `pause_instances` row). Once that recommendation
+ * has been requested for a given pause we never need to call
  * `companion-orchestrate` again for the same id — the persisted result
- * lives in `reflection_companions` and is hydrated via
- * `fetchParsedReflectionCompanionCache`.
+ * lives in `pause_ai_artifacts` and is hydrated via
+ * `fetchParsedPauseArtifactCache`.
  *
  * In practice though, the network call could still fire multiple times
  * within a single tab session even when the user has not opened a brand
@@ -18,7 +18,7 @@
  *    + close, mood change re-renders) re-run the effect before the server
  *    has had time to commit the row that the cache lookup reads.
  *  - The user comes back to the Pause screen *during* the cooldown window
- *    while the same reflection is still active.
+ *    while the same pause instance is still active.
  *
  * We absorb all three cases with two layered guards:
  *
@@ -32,7 +32,7 @@
  *     duplicate call once it returns).
  *
  * The combination guarantees: **at most one `companion-orchestrate`
- * intervention invocation per `reflectionId` per tab session**, regardless
+ * intervention invocation per pause instance id per tab session**, regardless
  * of remount frequency.
  */
 const STORAGE_PREFIX = 'holzen.orchestrate.intervention.invoked:';
@@ -48,12 +48,12 @@ const inFlight = new Map<string, Promise<unknown>>();
  * the marker. The single-flight `inFlight` Map clears as soon as the
  * promise settles, so a subsequent remount (StrictMode's second pass, a
  * route bounce) would re-fire `companion-orchestrate` for the same
- * `reflectionId` — exactly the duplicate-call regression this module
+ * pause instance id — exactly the duplicate-call regression this module
  * exists to prevent.
  *
  * The set is per tab (module-scoped, lost on full reload) which mirrors
  * `sessionStorage` semantics closely enough for the intervention contract:
- * "at most one call per reflectionId per tab session".
+ * "at most one call per pause instance id per tab session".
  */
 const memoryMarkers = new Set<string>();
 
@@ -65,7 +65,7 @@ const memoryMarkers = new Set<string>();
 //  - `intervention_idempotency_dedup` — concurrent caller joined the in-flight
 //    Promise (StrictMode double-invoke, fast remounts).
 //  - `intervention_first_call_latency` — wall-clock latency of the *first*
-//    real invocation per `reflectionId`, captured on success or failure.
+//    real invocation per pause instance id, captured on success or failure.
 //
 // Events are forwarded to PostHog via `trackEvent` (no-op when PostHog is
 // disabled) and mirrored to the `[holzen:companion]` console channel so
@@ -86,17 +86,17 @@ function emit(event: string, props: Record<string, unknown>): void {
   }
 }
 
-function reflectionPrefix(id: string): string {
+function pauseInstancePrefix(id: string): string {
   return id.slice(0, 8);
 }
 
-function storageKey(reflectionId: string): string {
-  return `${STORAGE_PREFIX}${reflectionId}`;
+function storageKey(pauseInstanceId: string): string {
+  return `${STORAGE_PREFIX}${pauseInstanceId}`;
 }
 
 /**
- * Canonical form of a `reflectionId` used for every map / storage / Set
- * lookup in this module. Reflection IDs are UUIDs minted by Postgres and
+ * Canonical form of a pause instance id used for every map / storage / Set
+ * lookup in this module. Pause instance ids are UUIDs minted by Postgres and
  * are already lowercase in the happy path, but they can reach the
  * idempotency layer via:
  *
@@ -110,22 +110,22 @@ function storageKey(reflectionId: string): string {
  * silently break across remounts that disagree on case. Trim guards
  * against accidental whitespace from query-string parsing.
  */
-function normalizeReflectionId(reflectionId: string): string {
-  return reflectionId.trim().toLowerCase();
+function normalizePauseInstanceId(pauseInstanceId: string): string {
+  return pauseInstanceId.trim().toLowerCase();
 }
 
 /**
  * Returns true iff the intervention call has already been issued in this
- * tab session for the given reflection. Safe to call from SSR — degrades
+ * tab session for the given pause instance. Safe to call from SSR — degrades
  * to "not yet invoked" when `sessionStorage` is unavailable.
  */
-export function hasInvokedIntervention(reflectionId: string): boolean {
-  if (!reflectionId) return false;
-  const id = normalizeReflectionId(reflectionId);
+export function hasInvokedIntervention(pauseInstanceId: string): boolean {
+  if (!pauseInstanceId) return false;
+  const id = normalizePauseInstanceId(pauseInstanceId);
   if (!id) return false;
   if (inFlight.has(id)) {
     emit('intervention_idempotency_skip', {
-      reflection_prefix: reflectionPrefix(id),
+      pause_instance_prefix: pauseInstancePrefix(id),
       layer: 'in_flight',
     });
     return true;
@@ -134,14 +134,14 @@ export function hasInvokedIntervention(reflectionId: string): boolean {
     const hit = sessionStorage.getItem(storageKey(id)) === '1';
     if (hit) {
       emit('intervention_idempotency_skip', {
-        reflection_prefix: reflectionPrefix(id),
+        pause_instance_prefix: pauseInstancePrefix(id),
         layer: 'session_storage',
       });
       return true;
     }
   } catch (err) {
     emit('intervention_idempotency_storage_error', {
-      reflection_prefix: reflectionPrefix(id),
+      pause_instance_prefix: pauseInstancePrefix(id),
       op: 'getItem',
       error_name: (err as { name?: string } | null)?.name ?? 'unknown',
     });
@@ -149,11 +149,11 @@ export function hasInvokedIntervention(reflectionId: string): boolean {
   }
   if (memoryMarkers.has(id)) {
     emit('intervention_idempotency_skip', {
-      reflection_prefix: reflectionPrefix(id),
+      pause_instance_prefix: pauseInstancePrefix(id),
       layer: 'memory_fallback',
     });
     emit('intervention_idempotency_fallback_used', {
-      reflection_prefix: reflectionPrefix(id),
+      pause_instance_prefix: pauseInstancePrefix(id),
       phase: 'read',
     });
     return true;
@@ -162,7 +162,7 @@ export function hasInvokedIntervention(reflectionId: string): boolean {
 }
 
 /**
- * Single-flight wrapper. Concurrent callers with the same `reflectionId`
+ * Single-flight wrapper. Concurrent callers with the same pause instance id
  * share the same Promise; subsequent callers (after resolution) read the
  * sessionStorage marker via `hasInvokedIntervention` and should bail
  * before reaching this function.
@@ -172,14 +172,14 @@ export function hasInvokedIntervention(reflectionId: string): boolean {
  * idempotency guard wedging them out.
  */
 export async function runOnceIntervention<T>(
-  reflectionId: string,
+  pauseInstanceId: string,
   factory: () => Promise<T>,
 ): Promise<T> {
-  const key = normalizeReflectionId(reflectionId);
+  const key = normalizePauseInstanceId(pauseInstanceId);
   const existing = inFlight.get(key) as Promise<T> | undefined;
   if (existing) {
     emit('intervention_idempotency_dedup', {
-      reflection_prefix: reflectionPrefix(key),
+      pause_instance_prefix: pauseInstancePrefix(key),
     });
     return existing;
   }
@@ -199,18 +199,18 @@ export async function runOnceIntervention<T>(
         sessionStorage.setItem(storageKey(key), '1');
       } catch (err) {
         emit('intervention_idempotency_storage_error', {
-          reflection_prefix: reflectionPrefix(key),
+          pause_instance_prefix: pauseInstancePrefix(key),
           op: 'setItem',
           error_name: (err as { name?: string } | null)?.name ?? 'unknown',
         });
         emit('intervention_idempotency_fallback_used', {
-          reflection_prefix: reflectionPrefix(key),
+          pause_instance_prefix: pauseInstancePrefix(key),
           phase: 'write',
         });
         /* private mode / storage full — best-effort */
       }
       emit('intervention_first_call_latency', {
-        reflection_prefix: reflectionPrefix(key),
+        pause_instance_prefix: pauseInstancePrefix(key),
         latency_ms: Math.round(
           (typeof performance !== 'undefined' && typeof performance.now === 'function'
             ? performance.now()
@@ -227,13 +227,13 @@ export async function runOnceIntervention<T>(
         sessionStorage.removeItem(storageKey(key));
       } catch (err) {
         emit('intervention_idempotency_storage_error', {
-          reflection_prefix: reflectionPrefix(key),
+          pause_instance_prefix: pauseInstancePrefix(key),
           op: 'removeItem',
           error_name: (err as { name?: string } | null)?.name ?? 'unknown',
         });
       }
       emit('intervention_first_call_latency', {
-        reflection_prefix: reflectionPrefix(key),
+        pause_instance_prefix: pauseInstancePrefix(key),
         latency_ms: Math.round(
           (typeof performance !== 'undefined' && typeof performance.now === 'function'
             ? performance.now()
@@ -256,9 +256,9 @@ export async function runOnceIntervention<T>(
  * again" after a failed intervention). Clears both layers so the next
  * call falls through cleanly.
  */
-export function resetInterventionIdempotency(reflectionId: string): void {
-  if (!reflectionId) return;
-  const id = normalizeReflectionId(reflectionId);
+export function resetInterventionIdempotency(pauseInstanceId: string): void {
+  if (!pauseInstanceId) return;
+  const id = normalizePauseInstanceId(pauseInstanceId);
   if (!id) return;
   inFlight.delete(id);
   memoryMarkers.delete(id);
@@ -270,7 +270,7 @@ export function resetInterventionIdempotency(reflectionId: string): void {
 }
 
 /**
- * Idempotency decision for a given `reflectionId`. UI layers (e.g. the
+ * Idempotency decision for a given pause instance id. UI layers (e.g. the
  * retry affordance on the Pause screen) use this to render an accurate
  * skip message instead of guessing from the boolean `hasInvokedIntervention`.
  *
@@ -295,10 +295,10 @@ export type InterventionIdempotencyDecision =
  *   in-flight Map → sessionStorage → in-memory fallback Set.
  */
 export function getInterventionIdempotencyDecision(
-  reflectionId: string,
+  pauseInstanceId: string,
 ): InterventionIdempotencyDecision {
-  if (!reflectionId) return 'none';
-  const id = normalizeReflectionId(reflectionId);
+  if (!pauseInstanceId) return 'none';
+  const id = normalizePauseInstanceId(pauseInstanceId);
   if (!id) return 'none';
   if (inFlight.has(id)) return 'inFlight';
   try {

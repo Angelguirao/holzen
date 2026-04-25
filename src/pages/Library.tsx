@@ -4,12 +4,15 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { useLibrary } from '@/hooks/use-library';
 import { useInfiniteScroll } from '@/hooks/use-infinite-scroll';
 import { PageMeta } from '@/components/PageMeta';
-import { Heart, Search, X, Lock, ArrowUpDown, RefreshCw, ArrowRight, Pause, Radio, Leaf, Feather, Telescope, ScrollText, Pencil, Link as LinkIcon, Loader2, type LucideIcon } from 'lucide-react';
+import { Link } from 'react-router-dom';
+import { Heart, Search, X, Lock, ArrowUpDown, RefreshCw, ArrowRight, Pause, Radio, Leaf, Feather, Telescope, ScrollText, Pencil, Link as LinkIcon, Loader2, Clock, type LucideIcon } from 'lucide-react';
+import { journeyPath } from '@/lib/app-routes';
 import { ExportMenu } from '@/components/library/ExportMenu';
 import { SubscriptionSkeleton } from '@/components/SubscriptionSkeleton';
 import { LibraryItems } from '@/components/library/LibraryItems';
 import { LibraryCollections } from '@/components/library/LibraryCollections';
 import { SmartCollections } from '@/components/library/SmartCollections';
+import { CurrentPauseCard } from '@/components/library/CurrentPauseCard';
 import { usePullToRefresh } from '@/hooks/use-pull-to-refresh';
 import { DuplicateBanner } from '@/components/library/DuplicateBanner';
 
@@ -17,16 +20,18 @@ import { Input } from '@/components/ui/input';
 import { cn } from '@/lib/utils';
 import { useProGate } from '@/hooks/use-pro-gate';
 import { NoxHeaderMain } from '@/components/ui/nox-header';
+import { librarySourceLabel } from '@/lib/library-source-label';
+import { HistoryCrossLinks } from '@/components/HistoryCrossLinks';
 
-const SOURCE_CHIPS: { key: string; icon: LucideIcon; label: string }[] = [
-  { key: 'reflection', icon: Pause, label: 'Pause' },
-  { key: 'signal', icon: Radio, label: 'Signal' },
-  { key: 'grounding', icon: Leaf, label: 'Grounding' },
-  { key: 'haiku', icon: Feather, label: 'Haiku' },
-  { key: 'zoom_out', icon: Telescope, label: 'Zoom Out' },
-  { key: 'history_insight', icon: ScrollText, label: 'History' },
-  { key: 'reflection_note', icon: Pencil, label: 'Note' },
-  { key: 'external', icon: LinkIcon, label: 'External' },
+const SOURCE_CHIPS: { key: string; icon: LucideIcon }[] = [
+  { key: 'reflection', icon: Pause },
+  { key: 'signal', icon: Radio },
+  { key: 'grounding', icon: Leaf },
+  { key: 'haiku', icon: Feather },
+  { key: 'zoom_out', icon: Telescope },
+  { key: 'history_insight', icon: ScrollText },
+  { key: 'reflection_note', icon: Pencil },
+  { key: 'external', icon: LinkIcon },
 ];
 
 
@@ -61,11 +66,16 @@ export default function Library() {
 
   const { items, collections } = library;
 
+  const sourceChips = useMemo(
+    () => SOURCE_CHIPS.map((c) => ({ ...c, label: librarySourceLabel(c.key, t, c.key) })),
+    [t]
+  );
+
   // Available source types from actual data
   const availableSources = useMemo(() => {
     const existing = new Set(items.map((i) => i.source_type).filter(Boolean));
-    return SOURCE_CHIPS.filter((f) => existing.has(f.key));
-  }, [items]);
+    return sourceChips.filter((f) => existing.has(f.key));
+  }, [items, sourceChips]);
 
   // Available tags from actual data (sorted by frequency)
   const availableTags = useMemo(() => {
@@ -119,6 +129,8 @@ export default function Library() {
       <div className="space-y-6 pb-24">
         <PageMeta title={t('library.pageTitle')} description={t('library.pageDescription')} />
         <NoxHeaderMain title={t('library.title')} subtitle={t('library.pageDescription')} />
+        <p className="text-xs text-muted-foreground/90 leading-relaxed -mt-2 mb-1">{t('library.iaClarifier')}</p>
+        <HistoryCrossLinks links={['journeyActivity', 'groundHistory']} />
         <SubscriptionSkeleton variant="inline" />
       </div>
     );
@@ -129,6 +141,8 @@ export default function Library() {
       <div className="space-y-6 pb-24">
         <PageMeta title={t('library.pageTitle')} description={t('library.pageDescription')} />
         <NoxHeaderMain title={t('library.title')} subtitle={t('library.pageDescription')} />
+        <p className="text-xs text-muted-foreground/90 leading-relaxed -mt-2 mb-1">{t('library.iaClarifier')}</p>
+        <HistoryCrossLinks links={['journeyActivity', 'groundHistory']} />
         <div className="flex flex-col items-center justify-center min-h-[40vh] gap-4 text-center px-6">
           <Lock className="h-6 w-6 text-[#dbb266]" />
           <h2 className="text-sm font-semibold text-foreground">{t('pro.featureLocked')}</h2>
@@ -165,6 +179,11 @@ export default function Library() {
     <div className="space-y-6 pb-24" {...handlers}>
       <PageMeta title={t('library.pageTitle')} description={t('library.pageDescription')} />
       <NoxHeaderMain title={t('library.title')} subtitle={t('library.pageDescription')} />
+      <p className="text-xs text-muted-foreground/90 leading-relaxed -mt-2 mb-1">{t('library.iaClarifier')}</p>
+      <HistoryCrossLinks links={['journeyActivity', 'groundHistory']} />
+
+      {/* Current pause card (Pause V2). Hidden when the user has no open pause. */}
+      <CurrentPauseCard />
 
       {/* Pull-to-refresh indicator */}
       <AnimatePresence>
@@ -227,6 +246,13 @@ export default function Library() {
             <span className="ml-1.5 text-[9px] text-muted-foreground/40">{collections.length}</span>
           )}
         </button>
+        <Link
+          to={journeyPath('activity')}
+          className="flex items-center gap-1.5 border-b-2 border-transparent px-3 py-2 text-xs font-semibold uppercase tracking-wide text-muted-foreground/50 transition-colors whitespace-nowrap hover:text-muted-foreground"
+        >
+          <Clock className="h-3 w-3" />
+          {t('library.linkActivityLog')}
+        </Link>
       </div>
 
       {/* Collections tab */}

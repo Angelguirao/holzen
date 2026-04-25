@@ -1,6 +1,6 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.57.2";
-import { holzenEdgeError, holzenEdgeLog, holzenEdgeRun } from "../_shared/holzen-edge-log.ts";
+import { unknownErrorForLog } from "../_shared/log-unknown-error.ts";
 import { createAttemptLogger } from "../_shared/observe.ts";
 import { coingeckoHeaders } from "../_shared/coingecko.ts";
 import { withRequestLogging } from "../_shared/with-request-logging.ts";
@@ -11,6 +11,14 @@ import {
 } from "../_shared/lovable-email.ts";
 
 const REPORT_MODEL = "google/gemini-2.5-flash-lite";
+
+/** Subset of `profiles` selected for the monthly report loop. */
+interface MonthlyReportProfile {
+  user_id: string;
+  email_notifications?: boolean | null;
+  hold_goal_currency?: string | null;
+  language?: string | null;
+}
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -75,18 +83,23 @@ async function fetchBtcMonthData(currency: string): Promise<BtcMonthData> {
 }
 
 serve(
-  withRequestLogging("monthly-report", async ({ req }) => {
+  withRequestLogging("monthly-report", async ({ req, log }) => {
   try {
-    holzenEdgeRun("monthly-report", "request", { method: req.method });
     const { verifyServiceAuth } = await import("../_shared/auth.ts");
     if (!verifyServiceAuth(req)) {
-      holzenEdgeRun("monthly-report", "auth rejected");
+      log.warn("monthly_report_phase", {
+        holzen_event: "monthly_report_cron",
+        phase: "service_auth_rejected",
+      });
       return new Response(JSON.stringify({ error: "Unauthorized" }), {
         status: 401,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
-    holzenEdgeRun("monthly-report", "auth ok");
+    log("monthly_report_phase", {
+      holzen_event: "monthly_report_cron",
+      phase: "service_auth_ok",
+    });
     const supabase = createClient(
       Deno.env.get("SUPABASE_URL") ?? "",
       Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? "",
@@ -105,14 +118,23 @@ serve(
       providers: ["lovable"],
     });
     if (!reportsAiGuard.allowed) {
-      holzenEdgeLog("monthly-report", "ai summary skipped", { reason: reportsAiGuard.reason });
+      log("monthly_report_phase", {
+        holzen_event: "monthly_report_cron",
+        phase: "ai_summary_skipped",
+        reason: reportsAiGuard.reason,
+      });
       LOVABLE_API_KEY = undefined;
     }
 
     // Only run on the 1st of the month
     const now = new Date();
     if (now.getUTCDate() !== 1) {
-      holzenEdgeLog("monthly-report", "run complete", { skipped: true, reason: "not_first_of_month" });
+      log("monthly_report_complete", {
+        holzen_event: "monthly_report_cron",
+        phase: "run_complete",
+        skipped: true,
+        reason: "not_first_of_month",
+      });
       return new Response(JSON.stringify({ skipped: true, reason: "not_first_of_month" }), {
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
@@ -129,8 +151,13 @@ serve(
 
     if (profilesError) throw profilesError;
 
-    const eligible = (profiles ?? []).filter((p) => p.email_notifications);
-    holzenEdgeLog("monthly-report", "eligible users", { count: eligible.length });
+    const profileRows = (profiles ?? []) as MonthlyReportProfile[];
+    const eligible = profileRows.filter((p) => p.email_notifications);
+    log("monthly_report_phase", {
+      holzen_event: "monthly_report_cron",
+      phase: "eligible_users",
+      count: eligible.length,
+    });
 
     // Collect all rendered emails and ship them in one batched Lovable Email call at
     // the end (one HTTP round trip per 100 recipients, with retry/backoff).
@@ -138,26 +165,30 @@ serve(
     const monthAgo = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString();
 
     for (const profile of eligible) {
-      const currency = (profile as any).hold_goal_currency || "USD";
+      const currency = profile.hold_goal_currency || "USD";
       const btc = await fetchBtcMonthData(currency);
 
       const monthDir = btc.monthChange >= 0 ? "up" : "down";
       const absMonthChange = Math.abs(btc.monthChange).toFixed(1);
 
-      const { data: reflections } = await supabase
-        .from("reflections")
-        .select("message, mood, outcome, tags, created_at")
+      const { data: pauseRows } = await supabase
+        .from("v_pause_full")
+        .select("reflection_text, initial_mood, outcome, tags, created_at")
         .eq("user_id", profile.user_id)
         .gte("created_at", monthAgo)
         .order("created_at", { ascending: true });
 
-      const reflectionCount = reflections?.length ?? 0;
+      const pauseCount = pauseRows?.length ?? 0;
 
       const moods: Record<string, number> = {};
       const outcomes: Record<string, number> = {};
       const tags: Record<string, number> = {};
-      for (const r of reflections ?? []) {
-        if (r.mood) moods[r.mood] = (moods[r.mood] || 0) + 1;
+      for (const r of (pauseRows ?? []) as Array<{
+        initial_mood: string | null;
+        outcome: string | null;
+        tags: string[] | null;
+      }>) {
+        if (r.initial_mood) moods[r.initial_mood] = (moods[r.initial_mood] || 0) + 1;
         if (r.outcome) outcomes[r.outcome] = (outcomes[r.outcome] || 0) + 1;
         if (r.tags) for (const t of r.tags) tags[t] = (tags[t] || 0) + 1;
       }
@@ -176,18 +207,18 @@ serve(
 
       // AI monthly insight
       let aiInsight = "";
-      if (LOVABLE_API_KEY && reflectionCount > 0) {
+      if (LOVABLE_API_KEY && pauseCount > 0) {
         const logAttempt = createAttemptLogger(supabase, { userId: profile.user_id });
         const t0 = Date.now();
         try {
           const LANG_NAMES: Record<string, string> = { en: "English", es: "Spanish", pt: "Portuguese", de: "German", nl: "Dutch", fr: "French", tr: "Turkish" };
-          const langCode = (profile as any).language || "en";
+          const langCode = profile.language || "en";
           const langName = LANG_NAMES[langCode] || "English";
           const langInstruction = langCode !== "en" ? `\nWrite in ${langName}.` : "";
 
           const prompt = `You are Holzen. Write ONE short behavioral observation (1-2 sentences) for a monthly report:
 - BTC moved ${monthDir} ${absMonthChange}% last month
-- User reflected ${reflectionCount} times
+- User completed ${pauseCount} pause session(s)
 - Top mood: ${topMood?.[0] || "unknown"} (${topMood?.[1] || 0} times)
 - Held steady: ${steadyCount}, bought: ${boughtCount}, sold: ${soldCount}
 - Top tags: ${topTags.map(([t, c]) => `${t}(${c})`).join(", ") || "none"}
@@ -231,7 +262,11 @@ Be observational, calm. No advice, no exclamation marks.${langInstruction}`;
             });
           }
         } catch (e) {
-          holzenEdgeError("monthly-report", "AI insight failed", e);
+          log.error("monthly_report_ai", {
+            holzen_event: "monthly_report_cron",
+            phase: "per_user_ai_failed",
+            ...unknownErrorForLog(e),
+          });
           logAttempt({
             companion_type: "reports",
             provider: "lovable",
@@ -282,7 +317,7 @@ Be observational, calm. No advice, no exclamation marks.${langInstruction}`;
   <hr style="border: none; border-top: 1px solid #e5e2dc; margin: 24px 0;">
 
   <p style="font-size: 13px; color: #737373; line-height: 1.6;">
-    You reflected <strong style="color: #2a2a2a;">${reflectionCount} time${reflectionCount !== 1 ? "s" : ""}</strong> in ${lastMonth}.${
+    You took <strong style="color: #2a2a2a;">${pauseCount} pause${pauseCount !== 1 ? "s" : ""}</strong> in ${lastMonth}.${
       topMood ? ` Your most common mood was <strong style="color: #2a2a2a;">${topMood[0]}</strong>.` : ""
     }
   </p>
@@ -328,12 +363,26 @@ Be observational, calm. No advice, no exclamation marks.${langInstruction}`;
       source: "monthly-report",
       idempotencyKey: `monthly-report:${idempotencyMonth}`,
       logger: holzenLovableEmailLogger(
-        (m, d) => holzenEdgeLog("monthly-report", m, d),
-        (m, err) => holzenEdgeError("monthly-report", m, err),
+        (m, d) =>
+          log("lovable_email_dep", {
+            holzen_event: "monthly_report_cron",
+            phase: "lovable_email",
+            message: m,
+            ...(d ?? {}),
+          }),
+        (m, data) =>
+          log.error("lovable_email_dep", {
+            holzen_event: "monthly_report_cron",
+            phase: "lovable_email_error",
+            message: m,
+            ...(data ?? {}),
+          }),
       ),
     });
 
-    holzenEdgeLog("monthly-report", "run complete", {
+    log("monthly_report_complete", {
+      holzen_event: "monthly_report_cron",
+      phase: "run_complete",
       sent: batch.sent,
       failed: batch.failed,
       chunks: batch.chunks,
@@ -346,7 +395,11 @@ Be observational, calm. No advice, no exclamation marks.${langInstruction}`;
     );
   } catch (e) {
     const msg = e instanceof Error ? e.message : String(e);
-    holzenEdgeError("monthly-report", "uncaught error", msg);
+    log.error("monthly_report_uncaught", {
+      holzen_event: "monthly_report_cron",
+      phase: "uncaught",
+      ...unknownErrorForLog(e),
+    });
     return new Response(JSON.stringify({ error: msg }), {
       status: 500,
       headers: { ...corsHeaders, "Content-Type": "application/json" },

@@ -8,6 +8,7 @@
  * API keys are read from Deno.env directly (same as the original function).
  */
 
+import type { SupabaseClient } from "https://esm.sh/@supabase/supabase-js@2.57.2";
 import {
   qualityGate,
   normalizeUrl,
@@ -29,6 +30,7 @@ import { validateSource } from "../source-validation.ts";
 import { searchLibrary, essayToSignal, recordLibraryServe } from "../content-library.ts";
 import { preferNonYoutubeCitationsFirst } from "../recent-signal-urls.ts";
 import { getPhaseConfig } from "../phase-config.ts";
+import { type CompanionCacheTitleRow } from "../companion-cache-dedup.ts";
 
 /** Bump when the search query, structuring prompt, or quality rules change. */
 export const PROMPT_VERSION = "v9";
@@ -141,7 +143,7 @@ export interface SignalResult {
 }
 
 export interface GenerateSignalParams {
-  svcClient: any;
+  svcClient: SupabaseClient;
   context?: string;
   language?: string;
   sources?: Array<{ name: string; type: string; url?: string }>;
@@ -150,7 +152,7 @@ export interface GenerateSignalParams {
   /** Citation URLs already shown recently — exclude from new search (Perplexity prompt). */
   recentSignalUrls?: string[];
   userId?: string;
-  reflectionId?: string | null;
+  pauseInstanceId?: string | null;
   searchAngle?: string;
   /** Skip library/cache phases and go straight to live (used by regenerate). */
   forceLive?: boolean;
@@ -168,7 +170,7 @@ export interface GenerateSignalParams {
 
 /** Try content_library (essays) for signal. */
 async function tryLibrary(
-  svcClient: any,
+  svcClient: SupabaseClient,
   userId?: string,
 ): Promise<SignalResult | null> {
   const libraryRows = await searchLibrary(svcClient, {
@@ -194,16 +196,23 @@ async function tryLibrary(
  * (used by `serveFallback` after live failure) keeps pass-3 as a last-resort serve.
  */
 async function tryCache(
-  svcClient: any,
+  svcClient: SupabaseClient,
   userId?: string,
   marketDirection?: "up" | "down" | "neutral",
   excludeIds?: string[],
   strict = false,
+  structuredLog?: GenerateSignalParams["log"],
 ): Promise<SignalResult | null> {
-  const cached = await serveFromCache(svcClient, "signal", "en", { userId, marketDirection, excludeIds, strict });
+  const cached = await serveFromCache(svcClient, "signal", "en", {
+    userId,
+    marketDirection,
+    excludeIds,
+    strict,
+    structuredLog,
+  });
   if (cached) {
     return {
-      data: cached.data,
+      data: cached.data as SignalResult["data"],
       source: "cache",
       cacheId: cached.cacheId,
       cacheRelaxation: cached.relaxation,
@@ -213,17 +222,18 @@ async function tryCache(
 }
 
 /** Last-resort curated fallback pool. */
-async function serveCurated(svcClient: any): Promise<SignalResult> {
+async function serveCurated(svcClient: SupabaseClient): Promise<SignalResult> {
   const pool = await loadFallbackPool<{ title: string; body: string; source: string; url: string }>(svcClient, "signal");
   return { data: pickRandom(pool), source: "curated", cacheId: null };
 }
 
 /** Resolve from non-live phases in order (library → cache → curated). */
 async function serveFallback(
-  svcClient: any,
+  svcClient: SupabaseClient,
   userId?: string,
   marketDirection?: "up" | "down" | "neutral",
   excludeIds?: string[],
+  structuredLog?: GenerateSignalParams["log"],
 ): Promise<SignalResult> {
   if (companionFallbacksDisabled()) {
     return { data: null, source: "empty", cacheId: null, error: COMPANION_FALLBACKS_DISABLED_MESSAGE };
@@ -234,7 +244,7 @@ async function serveFallback(
     if (lib) return lib;
   }
   if (phases.cache) {
-    const cached = await tryCache(svcClient, userId, marketDirection, excludeIds);
+    const cached = await tryCache(svcClient, userId, marketDirection, excludeIds, false, structuredLog);
     if (cached) return cached;
   }
   return serveCurated(svcClient);
@@ -269,7 +279,7 @@ export async function generateSignal(params: GenerateSignalParams): Promise<Sign
     recentSignalTitles,
     recentSignalUrls,
     userId,
-    reflectionId,
+    pauseInstanceId,
     searchAngle,
     forceLive,
     skipLive,
@@ -291,7 +301,7 @@ export async function generateSignal(params: GenerateSignalParams): Promise<Sign
 
   // ── Phase 2: Cache (strict — no pass-3 repeats; fall through to live if strict pool empty) ──
   if (phases.cache) {
-    const cached = await tryCache(svcClient, userId, marketDirection, undefined, true);
+    const cached = await tryCache(svcClient, userId, marketDirection, undefined, true, log);
     if (cached) {
       log("signal resolved from cache (phase 2)");
       return cached;
@@ -320,7 +330,7 @@ export async function generateSignal(params: GenerateSignalParams): Promise<Sign
   const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
   if (!PERPLEXITY_API_KEY || !LOVABLE_API_KEY) {
     log("missing API keys, serving fallback");
-    return serveFallback(svcClient, userId, marketDirection);
+    return serveFallback(svcClient, userId, marketDirection, undefined, log);
   }
 
   const trimmedSearchAngle = searchAngle?.trim();
@@ -453,7 +463,7 @@ export async function generateSignal(params: GenerateSignalParams): Promise<Sign
       error_message: String(e),
       api_requests: 1,
     });
-    return serveFallback(svcClient, userId, marketDirection);
+    return serveFallback(svcClient, userId, marketDirection, undefined, log);
   }
 
   citations = preferNonYoutubeCitationsFirst(citations);
@@ -470,7 +480,7 @@ export async function generateSignal(params: GenerateSignalParams): Promise<Sign
       output_tokens: perplexityMerged?.completion_tokens,
       api_requests: perplexityApiCalls || 1,
     });
-    return serveFallback(svcClient, userId, marketDirection);
+    return serveFallback(svcClient, userId, marketDirection, undefined, log);
   }
 
   logAttempt({
@@ -497,7 +507,7 @@ export async function generateSignal(params: GenerateSignalParams): Promise<Sign
       output_tokens: perplexityMerged?.completion_tokens,
       api_requests: perplexityApiCalls,
     });
-    return serveFallback(svcClient, userId, marketDirection);
+    return serveFallback(svcClient, userId, marketDirection, undefined, log);
   }
 
   // ── Step 2: AI structuring ──
@@ -571,7 +581,8 @@ URL RULES (CRITICAL):
   };
 
   const models = ["google/gemini-2.5-flash", "google/gemini-2.5-flash-lite"];
-  let signal: any = null;
+  type SignalLiveData = NonNullable<SignalResult["data"]>;
+  let signal: SignalLiveData | null = null;
   let lastLovableModel: string | undefined;
 
   const AI_TIMEOUTS = [8000, 6000];
@@ -608,10 +619,10 @@ URL RULES (CRITICAL):
       }
 
       try {
-        signal = typeof content === "string" ? JSON.parse(content) : content;
+        signal = (typeof content === "string" ? JSON.parse(content) : content) as SignalLiveData;
       } catch {
         const m = (typeof content === "string" ? content : "").match(/\{[\s\S]*\}/);
-        if (m) signal = JSON.parse(m[0]);
+        if (m) signal = JSON.parse(m[0]) as SignalLiveData;
         else {
           logAttempt({ companion_type: "signal", provider: "lovable", model, status: "error", latency_ms: Date.now() - attemptT0, error_message: "json_parse_failed", input_tokens: usage?.prompt_tokens, output_tokens: usage?.completion_tokens });
           if (model !== models[models.length - 1]) continue; else break;
@@ -644,7 +655,7 @@ URL RULES (CRITICAL):
         quality_gate_reason: qg.reason ?? "unknown",
       });
     }
-    return serveFallback(svcClient, userId, marketDirection);
+    return serveFallback(svcClient, userId, marketDirection, undefined, log);
   }
 
   // ── Step 4: URL post-processing ──
@@ -670,7 +681,7 @@ URL RULES (CRITICAL):
   // ── Step 4b: Source attribution validation ──
   // Cross-reference the AI's source against known authors and citation URLs
   const originalSource = signal.source;
-  signal.source = validateSource(signal.source, signal.url || "", citations, sources as any);
+  signal.source = validateSource(signal.source, signal.url || "", citations, sources);
   if (signal.source !== originalSource) {
     log(`source corrected: "${originalSource}" → "${signal.source}"`);
   }
@@ -687,7 +698,7 @@ URL RULES (CRITICAL):
         .limit(30);
       const norm = (s: string) => s.toLowerCase().replace(/[^a-z0-9 ]/g, "").trim();
       const newNorm = norm(signal.title);
-      const isDup = existing?.some((e: any) => {
+      const isDup = existing?.some((e: CompanionCacheTitleRow) => {
         const t = norm(e.content?.title || "");
         return t === newNorm || t.includes(newNorm) || newNorm.includes(t);
       });
@@ -731,7 +742,7 @@ URL RULES (CRITICAL):
     category: "signal",
     name: signal.source,
     url: signal.url,
-    reflectionId,
+    pauseInstanceId,
   });
 
   // ── Step 6: Background URL validation (fire-and-forget) ──

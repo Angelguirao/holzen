@@ -14,7 +14,7 @@ const corsHeaders = {
 };
 
 serve(
-  withRequestLogging("suggest-ritual", async ({ req }) => {
+  withRequestLogging("suggest-ritual", async ({ req, log }) => {
   try {
     const authHeader = req.headers.get("Authorization");
     if (!authHeader?.startsWith("Bearer ")) {
@@ -170,7 +170,9 @@ Respond ONLY with valid JSON.`;
     
     // Validate steps have valid types
     const validTypes = ['breathe', 'grounding', 'checkin', 'reflect', 'review', 'journal', 'physical', 'decide'];
-    const steps = (parsed.steps || []).filter((s: any) => validTypes.includes(s.type));
+    const steps = (parsed.steps || []).filter((s: { type?: string }) =>
+      typeof s?.type === "string" && validTypes.includes(s.type)
+    );
     
     // Ensure decide is last
     if (!steps.length || steps[steps.length - 1]?.type !== 'decide') {
@@ -181,7 +183,14 @@ Respond ONLY with valid JSON.`;
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
   } catch (e) {
-    console.error("suggest-ritual error:", e);
+    try {
+      log.warn("suggest_ritual_fallback", {
+        holzen_event: "suggest_ritual_fallback",
+        detail: e instanceof Error ? e.message : String(e),
+      });
+    } catch {
+      /* non-fatal */
+    }
     // Fallback to standard template
     return new Response(JSON.stringify({
       steps: [{ type: "breathe" }, { type: "reflect" }, { type: "journal" }, { type: "decide" }],

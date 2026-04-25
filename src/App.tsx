@@ -1,9 +1,12 @@
 import { lazy, Suspense, useEffect } from "react";
+import { useQueryClient } from "@tanstack/react-query";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClientProvider } from "@tanstack/react-query";
 import { createHolzenQueryClient } from "@/lib/query-client";
+import { setHolzenQueryClient } from "@/lib/holzen-query-client-ref";
 import { BrowserRouter, Routes, Route, Navigate, useLocation } from "react-router-dom";
+import { reactRouterFutureFlags } from "@/lib/router-future";
 import { AuthProvider, useAuth } from "@/hooks/use-auth";
 import { holzenLog } from "@/lib/holzen-console";
 import { attachHolzenQueryLogging } from "@/lib/holzen-query-logging";
@@ -28,7 +31,7 @@ const NotFound = lazy(() => import("./pages/NotFound"));
 const About = lazy(() => import("./pages/About"));
 const Blog = lazy(() => import("./pages/Blog"));
 const BlogPost = lazy(() => import("./pages/BlogPost"));
-// Roadmap page kept in repo; re-add lazy + route element when making it public again.
+// Roadmap: public stub page (`RoadmapStub`) — not a full product roadmap inside the shell.
 const Breathe = lazy(() => import("./pages/Breathe"));
 const Ambient = lazy(() => import("./pages/Ambient"));
 const Reserve = lazy(() => import("./pages/Reserve"));
@@ -49,6 +52,12 @@ const SentryAlerts = lazy(() => import("./pages/SentryAlerts"));
 const EdgeCoverage = lazy(() => import("./pages/EdgeCoverage"));
 const Unsubscribe = lazy(() => import("./pages/Unsubscribe"));
 const BillingHistory = lazy(() => import("./pages/BillingHistory"));
+const ToolsHub = lazy(() => import("./pages/ToolsHub"));
+const ToolsLetters = lazy(() => import("./pages/ToolsLetters"));
+const JourneyLettersRedirect = lazy(() => import("./pages/JourneyLettersRedirect"));
+const SettingsAbout = lazy(() => import("./pages/SettingsAbout"));
+const RoadmapStub = lazy(() => import("./pages/RoadmapStub"));
+const SettingsSectionRedirect = lazy(() => import("./pages/SettingsSectionRedirect"));
 
 const queryClient = createHolzenQueryClient();
 
@@ -96,6 +105,18 @@ function HolzenQueryLogging() {
   return null;
 }
 
+/** Exposes the same QueryClient instance to `pause-api` (invalidate after pause completes). */
+function HolzenQueryClientRegister() {
+  const qc = useQueryClient();
+  useEffect(() => {
+    setHolzenQueryClient(qc);
+    return () => {
+      setHolzenQueryClient(null);
+    };
+  }, [qc]);
+  return null;
+}
+
 /**
  * Periodically evict expired checkout-guard entries from local/session
  * storage so they never grow unbounded across long-lived tabs.
@@ -134,17 +155,13 @@ function RouterLocationLog() {
 const App = () => (
   <ErrorBoundary>
     <QueryClientProvider client={queryClient}>
+      <HolzenQueryClientRegister />
       <HolzenQueryLogging />
       <CheckoutGuardCleanup />
       <TooltipProvider>
         <Sonner />
         <OfflineBanner />
-        <BrowserRouter
-          future={{
-            v7_startTransition: true,
-            v7_relativeSplatPath: true,
-          }}
-        >
+        <BrowserRouter future={reactRouterFutureFlags}>
           <ScrollToTop />
           <CookieConsent />
           <AuthProvider>
@@ -156,37 +173,42 @@ const App = () => (
                   <Route path="/" element={<Home />} />
                   <Route path="/index" element={<Navigate to="/" replace />} />
                   <Route path="/library" element={<Library />} />
-                  <Route path="/history" element={<Navigate to="/library" replace />} />
-                  <Route path="/profile" element={<Profile />} />
+                  <Route path="/journey" element={<Navigate to="/journey/stats" replace />} />
+                  <Route path="/journey/letters" element={<JourneyLettersRedirect />} />
+                  <Route path="/journey/:tab" element={<Profile />} />
+                  <Route path="/settings/section/:section" element={<SettingsSectionRedirect />} />
                   <Route path="/settings" element={<Settings />} />
+                  <Route path="/settings/about" element={<SettingsAbout />} />
                   <Route path="/settings/billing-history" element={<BillingHistory />} />
+                  <Route path="/tools" element={<ToolsHub />} />
+                  <Route path="/tools/letters" element={<ToolsLetters />} />
                 </Route>
                 {/* Immersive full-screen experiences — no nav bar */}
                 <Route path="/pause" element={<ProtectedRoute><PauseSession /></ProtectedRoute>} />
                 <Route
-                  path="/companion/zoom-out/:reflectionId"
+                  path="/companion/zoom-out/:pauseInstanceId"
                   element={<ProtectedRoute><CompanionZoomOutPage /></ProtectedRoute>}
                 />
                 <Route
-                  path="/companion/history/:reflectionId"
+                  path="/companion/history/:pauseInstanceId"
                   element={<ProtectedRoute><CompanionHistoryPage /></ProtectedRoute>}
                 />
                 <Route
-                  path="/companion/signal/:reflectionId"
+                  path="/companion/signal/:pauseInstanceId"
                   element={<ProtectedRoute><CompanionSignalPage /></ProtectedRoute>}
                 />
                 <Route
-                  path="/companion/grounding/:reflectionId"
+                  path="/companion/grounding/:pauseInstanceId"
                   element={<ProtectedRoute><CompanionGroundingPage /></ProtectedRoute>}
                 />
-                <Route path="/breathe" element={<ProtectedRoute><Breathe /></ProtectedRoute>} />
-                <Route path="/ground" element={<ProtectedRoute><Ground /></ProtectedRoute>} />
-                <Route path="/ground/history" element={<ProtectedRoute><GroundHistory /></ProtectedRoute>} />
-                <Route path="/ambient" element={<ProtectedRoute><Ambient /></ProtectedRoute>} />
-                <Route path="/practice/checkin" element={<ProtectedRoute><PracticeCheckIn /></ProtectedRoute>} />
-                <Route path="/practice/journal" element={<ProtectedRoute><PracticeJournal /></ProtectedRoute>} />
-                <Route path="/practice/bodyscan" element={<ProtectedRoute><PracticeBodyScan /></ProtectedRoute>} />
-                <Route path="/practice/replay" element={<ProtectedRoute><PracticeReplay /></ProtectedRoute>} />
+                <Route path="/tools/breathe" element={<ProtectedRoute><Breathe /></ProtectedRoute>} />
+                <Route path="/tools/ground" element={<ProtectedRoute><Ground /></ProtectedRoute>} />
+                <Route path="/tools/ground/history" element={<ProtectedRoute><GroundHistory /></ProtectedRoute>} />
+                <Route path="/tools/ambient" element={<ProtectedRoute><Ambient /></ProtectedRoute>} />
+                <Route path="/tools/practice/checkin" element={<ProtectedRoute><PracticeCheckIn /></ProtectedRoute>} />
+                <Route path="/tools/practice/journal" element={<ProtectedRoute><PracticeJournal /></ProtectedRoute>} />
+                <Route path="/tools/practice/bodyscan" element={<ProtectedRoute><PracticeBodyScan /></ProtectedRoute>} />
+                <Route path="/tools/practice/replay" element={<ProtectedRoute><PracticeReplay /></ProtectedRoute>} />
                 <Route path="/admin" element={<ProtectedRoute><Admin /></ProtectedRoute>} />
                 <Route path="/admin/smoke-test" element={<ProtectedRoute><SmokeTest /></ProtectedRoute>} />
                 <Route path="/admin/sentry-alerts" element={<ProtectedRoute><SentryAlerts /></ProtectedRoute>} />
@@ -199,7 +221,7 @@ const App = () => (
                 <Route path="/about" element={<About />} />
                 <Route path="/blog" element={<Blog />} />
                 <Route path="/blog/:slug" element={<BlogPost />} />
-                <Route path="/roadmap" element={<Navigate to="/welcome" replace />} />
+                <Route path="/roadmap" element={<RoadmapStub />} />
                 <Route path="/reserve" element={<Reserve />} />
                 <Route path="/unsubscribe" element={<Unsubscribe />} />
                 <Route path="*" element={<NotFound />} />

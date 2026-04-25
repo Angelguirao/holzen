@@ -1,5 +1,7 @@
 # Phase 8: RLS hardening (explicit service-role write policies)
 
+> **Pause V2 (2026-04):** `public.reflections`, `public.reflection_companions`, and `public.pause_notifications` were **dropped** in `supabase/migrations/20260423202000_pause_v2_destructive_cutover.sql`. Companion + pause writes now target **`pause_instances`**, **`pause_ai_artifacts`**, **`companion_serves`**, **`notifications`**, etc. Treat the **target tables** section below as **historical audit context** for the migrations that existed before cutover — not the live schema checklist.
+
 ## Why this exists
 
 Even though Supabase’s service-role key bypasses RLS, that bypass is an important implicit invariant. The earlier audits found that some edge/cron write paths rely on this bypass without explicit `service_role` `INSERT`/`UPDATE` policies.
@@ -8,11 +10,11 @@ This phase proposes defense-in-depth: add explicit `service_role` policies for t
 
 ## Target tables (based on pipeline)
 
-The following tables are part of the pause + companion pipeline and are written by edge functions/cron:
+The following tables **were** part of the pause + companion pipeline before Pause V2 (this list is frozen for historical comparison with migration `20260402093000_service_role_write_policies_pause_companions.sql`):
 
-- `public.pause_notifications` (cron inserts)
-- `public.reflections` (cron inserts; some edge functions may insert in the future)
-- `public.profiles` (cron updates `last_*` and cooldown fields)
+- `public.pause_notifications` (**dropped** — replaced by unified `notifications`)
+- `public.reflections` (**dropped** — replaced by `pause_instances` + `pause_ai_artifacts`)
+- `public.profiles` (cron still updates `last_*` and cooldown fields)
 - `public.analytics_events` (edge functions insert allowlisted telemetry)
 - `public.companion_cache` (cron inserts/updates cache warm pool)
 - `public.companion_serves` (orchestrator inserts serve rows)
@@ -20,7 +22,7 @@ The following tables are part of the pause + companion pipeline and are written 
 
 Notes on tables already handled explicitly (from earlier migration inspection):
 
-- `public.reflection_companions` already has a `service_role` “FOR ALL” style policy.
+- `public.reflection_companions` had a `service_role` “FOR ALL” style policy (**table dropped** in Pause V2).
 - `public.user_companion_serves` already has explicit `service_role` “FOR ALL”.
 
 ## Proposed policy shape
@@ -62,17 +64,17 @@ USING (auth.role() = 'service_role');
 
 If you want to keep consistent style with existing “service_role full access” policies, we should mirror that format exactly.
 
-## Concrete per-table suggestions
+## Concrete per-table suggestions *(historical — pre–Pause V2 targets)*
 
-### `pause_notifications`
-- Implement: `FOR INSERT` for `service_role`
-- Optional: `FOR UPDATE` if you ever mutate notifications post-creation (current flow doesn’t).
+The subsections through **`generation_attempts`** describe the **2026-04-02** migration’s intent. **`pause_notifications`** and **`reflections`** (and companion join rows on **`reflection_companions`**) were **dropped** in Pause V2 — do **not** add new RLS policies on those names; audit **`notifications`**, **`pause_instances`**, **`pause_ai_artifacts`**, etc. instead.
 
-### `reflections`
-- Implement: `FOR INSERT` and (if needed) `FOR UPDATE` for `service_role`
-- Current flows:
-  - cron inserts reflections and then orchestrator writes companion join rows
-  - client inserts reflections via authenticated user (already allowed)
+### `pause_notifications` *(removed)*
+- **Was:** `FOR INSERT` for `service_role` on cron-created rows.
+- **Now:** unified **`notifications`** table; see migrations after `20260423202000_pause_v2_destructive_cutover.sql`.
+
+### `reflections` *(removed)*
+- **Was:** `FOR INSERT` / `FOR UPDATE` for `service_role` + authenticated client inserts.
+- **Now:** **`pause_instances`** + **`pause_ai_artifacts`**; cron uses `pause_create_or_reuse_as` + artifact upserts.
 
 ### `profiles`
 - Implement: `FOR UPDATE` for `service_role`
@@ -108,7 +110,7 @@ If you approve, I’ll generate one or more new SQL migration files under `supab
 
 Before writing migrations, I’ll also:
 - check for any existing `service_role` policies already present for each target table (avoid duplicates)
-- match the exact policy syntax/style currently used in `reflection_companions` and `user_companion_serves`
+- match the exact policy syntax/style currently used in `user_companion_serves` (and other live companion tables)
 
 Applied in this branch:
 

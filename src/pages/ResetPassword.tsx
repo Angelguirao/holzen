@@ -16,7 +16,8 @@ const ResetPassword = () => {
   const [success, setSuccess] = useState(false);
   const [ready, setReady] = useState(false);
   const navigate = useNavigate();
-  const getErrorMessage = (error: unknown) => error instanceof Error ? error.message : t('common.unexpectedError', 'Something went wrong');
+  const getErrorMessage = (error: unknown) =>
+    error instanceof Error ? error.message : t('common.unexpectedError', { defaultValue: 'Something went wrong' });
 
   useEffect(() => {
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event) => {

@@ -21,6 +21,7 @@
  *   exit early when they see the 15-min-fresh row.
  * - Idempotent via `upsert` on `btc_price_cache (date)`.
  */
+import type { SupabaseClient } from "https://esm.sh/@supabase/supabase-js@2.57.2";
 import { fetchCoinGeckoHistoryPrice } from "./coingecko.ts";
 
 const DEFAULT_CONCURRENCY = 5;
@@ -43,7 +44,7 @@ export interface WarmResult {
  * anniversaries for zoom-out). Returns counts for operator logging.
  */
 export async function warmMissingBtcPrices(
-  svcClient: any,
+  svcClient: SupabaseClient,
   dateKeys: string[],
   opts: { concurrency?: number } = {},
 ): Promise<WarmResult> {
@@ -61,10 +62,12 @@ export async function warmMissingBtcPrices(
       .from("btc_price_cache")
       .select("date, fetched_at")
       .in("date", unique);
+    type BtcFreshRow = { date?: string | null; fetched_at?: string | null };
     const recent = new Set(
       (existing ?? [])
-        .filter((r: any) => r?.fetched_at && r.fetched_at > freshCutoff)
-        .map((r: any) => r.date),
+        .filter((r: BtcFreshRow) => Boolean(r?.fetched_at && r.fetched_at > freshCutoff))
+        .map((r: BtcFreshRow) => r.date)
+        .filter((d): d is string => typeof d === "string"),
     );
     skippedRecent = recent.size;
     toFetch = unique.filter((k) => !recent.has(k));

@@ -1,13 +1,14 @@
-import { useMemo, useState, useRef, useEffect, useCallback } from 'react';
+import { useMemo, useState, useRef, useEffect, useCallback, useLayoutEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sheet';
 import { Heart, ExternalLink, Tag, Link2, Clock, Pin, PinOff, Trash2, Archive, X, FolderPlus, Check, Maximize2 } from 'lucide-react';
 import { format } from 'date-fns';
-import type { LibraryItem, Collection } from '@/hooks/use-library';
+import type { LibraryItem, Collection, CollectionItem } from '@/hooks/use-library';
 import { supabase } from '@/integrations/supabase/client';
 import { OutcomeIcon } from '@/components/icons/OutcomeIcon';
 import { CompanionFeedback } from '@/components/CompanionFeedback';
+import { librarySourceLabel } from '@/lib/library-source-label';
 
 const TYPE_EMOJIS: Record<string, string> = {
   bookmark: '🔖',
@@ -35,6 +36,13 @@ const OUTCOME_OPTIONS = [
   { key: 'bought', labelKey: 'ritual.decide.buy' },
 ] as const;
 
+type ZoomOutOnThisDayEntry = { yearsAgo: number; price?: number; date?: string };
+type ZoomOutParsedBody = {
+  onThisDay?: ZoomOutOnThisDayEntry[];
+  echo?: { message?: string };
+  deepTime?: string | { title?: string; body?: string };
+};
+
 interface Props {
   item: LibraryItem | null;
   linkedItems?: LibraryItem[];
@@ -49,7 +57,7 @@ interface Props {
   onSelectItem?: (item: LibraryItem) => void;
   collections?: Collection[];
   getItemCollections?: (itemId: string) => Collection[];
-  onAddToCollection?: (collectionId: string, itemId: string) => Promise<any>;
+  onAddToCollection?: (collectionId: string, itemId: string) => Promise<CollectionItem | null>;
   onRemoveFromCollection?: (collectionId: string, itemId: string) => Promise<void>;
   isIncomplete?: boolean;
   onOutcomeRecorded?: () => void;
@@ -58,7 +66,7 @@ interface Props {
 
 function CompanionCard({ item, onSelect }: { item: LibraryItem; onSelect?: (item: LibraryItem) => void }) {
   const { t } = useTranslation();
-  const sourceLabel = t(`librarySources.${item.source_type}`, item.source_type ?? 'Item');
+  const sourceLabel = librarySourceLabel(item.source_type, t, item.source_type ?? 'Item');
   const bodyText = typeof item.body === 'string' ? item.body : item.body ? JSON.stringify(item.body) : null;
 
   return (
@@ -91,6 +99,10 @@ export function ItemDetailViewer({
   isIncomplete, onOutcomeRecorded, currentOutcome,
 }: Props) {
   const { t } = useTranslation();
+  const onStatusChangeRef = useRef(onStatusChange);
+  useLayoutEffect(() => {
+    onStatusChangeRef.current = onStatusChange;
+  }, [onStatusChange]);
   const navigate = useNavigate();
   const [editingTags, setEditingTags] = useState(false);
   const [tagInput, setTagInput] = useState('');
@@ -113,21 +125,25 @@ export function ItemDetailViewer({
     setShowOutcomePicker(false);
   }, [item?.id]);
 
-  // Auto-mark as read when opened
+  // Auto-mark as read when opened (callback via ref so parent identity changes do not re-trigger).
   useEffect(() => {
     if (open && item && item.status === 'unread') {
-      onStatusChange(item.id, 'read');
+      onStatusChangeRef.current(item.id, 'read');
     }
-  }, [open, item?.id]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [open, item]);
 
   const siblings = useMemo(() => {
-    if (!item?.reflection_id || !allItems) return [];
-    return allItems.filter((i) => i.reflection_id === item.reflection_id && i.id !== item.id && i.status !== 'deleted');
+    if (!item?.pause_instance_id || !allItems) return [];
+    return allItems.filter((i) => i.pause_instance_id === item.pause_instance_id && i.id !== item.id && i.status !== 'deleted');
   }, [item, allItems]);
 
-  const zoomOutData = useMemo(() => {
+  const zoomOutData = useMemo((): ZoomOutParsedBody | null => {
     if (item?.source_type !== 'zoom_out' || !item?.body) return null;
-    try { return JSON.parse(item.body); } catch { return null; }
+    try {
+      return JSON.parse(item.body) as ZoomOutParsedBody;
+    } catch {
+      return null;
+    }
   }, [item?.source_type, item?.body]);
 
   const itemCollections = useMemo(() => {
@@ -148,29 +164,34 @@ export function ItemDetailViewer({
   }, [item, onUpdateTags]);
 
   const handleRecordOutcome = useCallback(async (outcome: string) => {
-    if (!item?.reflection_id || outcomeLoading) return;
+    if (!item?.pause_instance_id || outcomeLoading) return;
     setOutcomeLoading(true);
-    await supabase
-      .from('reflections')
-      .update({ outcome })
-      .eq('id', item.reflection_id);
+    // Log outcome_logged step event via the RPC. The instance may already
+    // be terminal (expired) — the RPC silently no-ops in that case but
+    // leaves a record we can use for retrospective analytics.
+    const { pauseLogStep } = await import('@/lib/pause-api');
+    await pauseLogStep({
+      instanceId: item.pause_instance_id,
+      stepType: 'outcome_logged',
+      payload: { outcome },
+    }).catch(() => undefined);
     setOutcomeLoading(false);
     setRecordedOutcome(outcome);
     setShowOutcomePicker(false);
     onOutcomeRecorded?.();
-  }, [item?.reflection_id, outcomeLoading, onOutcomeRecorded]);
+  }, [item?.pause_instance_id, outcomeLoading, onOutcomeRecorded]);
 
   if (!item) return null;
 
   const companions = linkedItems && linkedItems.length > 0 ? linkedItems : siblings;
   const isReflection = item.source_type === 'reflection';
-  const sourceLabel = t(`librarySources.${item.source_type}`, item.source_type ?? 'Item');
+  const sourceLabel = librarySourceLabel(item.source_type, t, item.source_type ?? 'Item');
   const emoji = SOURCE_EMOJIS[item.source_type ?? ''] ?? TYPE_EMOJIS[item.type] ?? '📄';
 
   // Determine the effective outcome: freshly recorded > current from DB
   const effectiveOutcome = recordedOutcome ?? currentOutcome;
-  // Show the outcome section for reflections: either incomplete or has an outcome to display
-  const showOutcomeSection = isReflection && item.reflection_id;
+  // Show the outcome section for pause-linked library bookmarks (source_type reflection): incomplete or recorded outcome
+  const showOutcomeSection = isReflection && item.pause_instance_id;
 
   const handleDelete = () => {
     onDelete(item.id);
@@ -224,7 +245,7 @@ export function ItemDetailViewer({
                   {zoomOutData.onThisDay?.length > 0 && (
                     <div className="space-y-1.5">
                       <p className="text-[9px] font-mono text-muted-foreground/50 uppercase tracking-wider">{t('itemDetail.onThisDay')}</p>
-                      {[...zoomOutData.onThisDay].reverse().map((entry: any) => (
+                      {[...zoomOutData.onThisDay].reverse().map((entry: ZoomOutOnThisDayEntry) => (
                         <div key={entry.yearsAgo} className="flex items-center justify-between gap-2 text-xs font-mono">
                           <span className="text-muted-foreground/60 w-14 shrink-0">{t('itemDetail.yearsAgo', { count: entry.yearsAgo })}</span>
                           <span className="text-muted-foreground tabular-nums">${entry.price?.toLocaleString()}</span>
@@ -260,15 +281,15 @@ export function ItemDetailViewer({
             return null;
           })()}
 
-          {item.reflection_id &&
+          {item.pause_instance_id &&
             (item.source_type === 'zoom_out' || item.source_type === 'history_insight') && (
               <button
                 type="button"
                 onClick={() => {
                   const path =
                     item.source_type === 'zoom_out'
-                      ? `/companion/zoom-out/${item.reflection_id}`
-                      : `/companion/history/${item.reflection_id}`;
+                      ? `/companion/zoom-out/${item.pause_instance_id}`
+                      : `/companion/history/${item.pause_instance_id}`;
                   navigate(path, { state: { from: 'library' } });
                   onClose();
                 }}
@@ -280,9 +301,9 @@ export function ItemDetailViewer({
             )}
 
           {/* Companion feedback — for companion-type library items */}
-          {item.source_type && ['signal', 'grounding', 'learning', 'zoom_out', 'history_insight', 'haiku'].includes(item.source_type) && item.reflection_id && (
+          {item.source_type && ['signal', 'grounding', 'learning', 'zoom_out', 'history_insight', 'haiku'].includes(item.source_type) && item.pause_instance_id && (
             <CompanionFeedback
-              reflectionId={item.reflection_id}
+              pauseInstanceId={item.pause_instance_id}
               companionType={item.source_type}
             />
           )}
@@ -298,26 +319,28 @@ export function ItemDetailViewer({
                   <OutcomeIcon outcome={effectiveOutcome} size={18} className="text-primary/60" />
                   <div className="flex-1 text-left">
                     <p className="text-[9px] font-mono text-muted-foreground/40 uppercase tracking-wider">
-                      {t('library.decisionLabel', 'Decision')}
+                      {t('library.decisionLabel', { defaultValue: 'Decision' })}
                     </p>
                     <p className="text-xs font-mono text-foreground/70">
                       {t(`ritual.decide.${effectiveOutcome === 'held' ? 'hold' : effectiveOutcome === 'sold' ? 'sell' : 'buy'}`, effectiveOutcome)}
                     </p>
                   </div>
                   <span className="text-[8px] font-mono text-muted-foreground/20 group-hover:text-muted-foreground/40 uppercase tracking-wider transition-colors">
-                    {t('library.changeDecision', 'Change')}
+                    {t('library.changeDecision', { defaultValue: 'Change' })}
                   </span>
                 </button>
               ) : (
                 <div className="rounded-lg border border-border/30 bg-card/30 p-3 space-y-2.5">
                   <p className="text-[10px] font-mono text-muted-foreground/50 uppercase tracking-wider">
                     {effectiveOutcome
-                      ? t('library.changeDecisionLabel', 'Change decision')
-                      : t('library.incompleteLabel', 'No decision recorded')}
+                      ? t('library.changeDecisionLabel', { defaultValue: 'Change decision' })
+                      : t('library.incompleteLabel', { defaultValue: 'No decision recorded' })}
                   </p>
                   {!effectiveOutcome && (
                     <p className="text-xs text-muted-foreground/60 leading-relaxed">
-                      {t('library.incompleteDescription', 'What did you end up doing after this pause?')}
+                      {t('library.incompleteDescription', {
+                        defaultValue: 'What did you end up doing after this pause?',
+                      })}
                     </p>
                   )}
                   <div className="flex items-center gap-2">
@@ -333,7 +356,7 @@ export function ItemDetailViewer({
                         }`}
                       >
                         <OutcomeIcon outcome={key} size={14} />
-                        {t(labelKey, key)}
+                        {t(labelKey, { defaultValue: key })}
                       </button>
                     ))}
                   </div>
@@ -342,7 +365,7 @@ export function ItemDetailViewer({
                       onClick={() => setShowOutcomePicker(false)}
                       className="text-[9px] font-mono text-muted-foreground/30 hover:text-muted-foreground/50 transition-colors"
                     >
-                      {t('common.cancel', 'Cancel')}
+                      {t('common.cancel', { defaultValue: 'Cancel' })}
                     </button>
                   )}
                 </div>

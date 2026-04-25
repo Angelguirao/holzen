@@ -5,22 +5,17 @@ export type FullviewCompanion = 'signal' | 'grounding' | 'history' | 'zoomOut';
 
 /**
  * Fires a single `companion_fullview_opened` analytics event per
- * (user, reflectionId, companion) mount. Used to measure adoption of the
- * Full View surfaces independently of the inline card telemetry.
- *
- * Deliberately best-effort: errors are swallowed because this is an
- * observation hook, never a gate. The `once` ref prevents double-fires
- * under React 18 StrictMode.
+ * (user, pauseInstanceId, companion) mount.
  */
 export function useFullviewTelemetry(
   companion: FullviewCompanion,
-  reflectionId: string | null | undefined,
+  pauseInstanceId: string | null | undefined,
 ) {
   const firedRef = useRef<string | null>(null);
 
   useEffect(() => {
-    if (!reflectionId) return;
-    const key = `${companion}:${reflectionId}`;
+    if (!pauseInstanceId) return;
+    const key = `${companion}:${pauseInstanceId}`;
     if (firedRef.current === key) return;
     firedRef.current = key;
 
@@ -33,7 +28,7 @@ export function useFullviewTelemetry(
           event: 'companion_fullview_opened',
           metadata: {
             companion,
-            reflection_id: reflectionId,
+            pause_instance_id: pauseInstanceId,
             ts: new Date().toISOString(),
           },
         });
@@ -41,5 +36,5 @@ export function useFullviewTelemetry(
         // observation only
       }
     })();
-  }, [companion, reflectionId]);
+  }, [companion, pauseInstanceId]);
 }

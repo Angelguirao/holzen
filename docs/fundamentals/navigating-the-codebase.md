@@ -48,13 +48,15 @@ Routes are declared in one file. **Page components** under `src/pages/` are **`R
 - **`ProtectedRoute`** — If auth is still loading, show `AuthLoading`. If no user, redirect to `/welcome`. Otherwise render children.
 - **`PublicOnlyRoute`** — Logged-in users are redirected to `/`.
 
-**Main shell:** routes under `/`, `/library`, `/profile`, `/settings` use **`AppLayout`**: max-width column, **`<header>`** (“Holzen” + `NotificationBell`), **`<main id="main-content">`** around **`Outlet`**, and **`BottomNav`**. `AppLayout` also wires `useHolzen`, `useLanguageSync`, and `useAutoTrigger` (pause-ready banner on non-home routes).
+**Main shell:** routes under `/`, `/library`, `/tools` (tools index / `ToolsHub`), `/journey/*` (Journey hub; `/journey` redirects to `/journey/stats`), `/settings` (plus `/settings/about`, `/settings/billing-history`) use **`AppLayout`**: max-width column, **`<header>`** (“Holzen” + `NotificationBell`), **`<main id="main-content">`** around **`Outlet`**, and **`BottomNav`** (five tabs: Home, Library, Tools, Journey, Settings). `AppLayout` also wires `useHolzen`, `useLanguageSync`, and `useAutoTrigger` (pause-ready banner on non-home routes).
 
-**Full-screen / immersive routes** (no bottom nav): `/pause`, `/breathe`, `/ground`, `/ground/history`, `/ambient`, `/practice/*`, `/admin`. (`/breathe` → `Breathe.tsx`; `/ambient` → `Ambient.tsx`.)
+**Full-screen / immersive routes** (no `AppLayout`): `/pause`, the **`/tools/*`** tree (`/tools/breathe`, `/tools/ground`, `/tools/ground/history`, `/tools/ambient`, `/tools/practice/*`), full-view companion pages under `/companion/...`, and `/admin*`. There are no alternate short paths for the same screens — bookmark **`/tools/...`**.
 
-**Redirects:** `/index` → `/`, `/history` → `/library`.
+**Journey** lives only at **`/journey/:tab`** (and `/journey` → `/journey/stats`); use **`?letter=`** for letter deep links from notifications.
 
-**Public pages:** `/welcome` (landing), `/auth`, `/reset-password`, `/terms`, `/privacy`, `/about`, `/blog`, `/blog/:slug`, `/roadmap`, `/reserve`.
+**Redirects:** `/index` → `/`, `/journey` → `/journey/stats`.
+
+**Public pages:** `/welcome` (landing), `/auth`, `/reset-password`, `/terms`, `/privacy`, `/about`, `/blog`, `/blog/:slug`, `/roadmap` (stub: no in-app roadmap yet; links to blog/about), `/reserve`.
 
 **Catch-all:** `*` → `NotFound`.
 
@@ -74,9 +76,9 @@ The Supabase browser client is **`src/integrations/supabase/client.ts`** (typed 
 
 | Concern | Typical location |
 |--------|-------------------|
-| User profile, language, reflection prefs, thresholds | `use-profile.ts` + `profiles` table |
-| BTC context, manual pause, reflection + companion orchestration trigger | `use-holzen.ts` |
-| Companion payloads after a reflection | `use-companion-data.ts` |
+| User profile, language, pause AI prefs (`reflection_style` / `reflection_tone` on `profiles`), thresholds | `use-profile.ts` + `profiles` table |
+| BTC context, manual pause, companion orchestration triggers | `use-holzen.ts` |
+| Companion payloads for the active pause | `use-companion-data.ts` |
 | Subscription / Stripe checkout | `use-subscription.ts` |
 | Library content | `use-library.ts` |
 | Push (VAPID, registration) | `use-push-notifications.ts` |
@@ -102,10 +104,10 @@ Do **not** add global **`QueryClient` defaultOptions** lightly: they affect ever
 
 ## 7. Pages (`src/pages/`) — grouped by domain
 
-- **Core app:** `Home`, `Library`, `Profile`, `Settings`.
+- **Core app:** `Home`, `Library`, `Profile` (Journey UI at `/journey/*`), `Settings`, `ToolsHub` (`/tools`).
 - **Auth / legal / marketing:** `Landing`, `Auth`, `ResetPassword`, `Terms`, `Privacy`, `About`, `Blog`, `BlogPost`, `Roadmap`, `Reserve`.
-- **Practices:** `PauseSession`, `Breathe`, `Ground`, `GroundHistory`, `PracticeCheckIn`, `PracticeJournal`, `PracticeBodyScan`, `PracticeReplay`, `Ambient`.
-- **`/ambient` vs `/breathe`:** `Ambient.tsx` is the full-screen volatility-gradient breathing screen; **`App.tsx` routes `/ambient` to `<Ambient />`**. `/breathe` uses `Breathe.tsx` (a different flow).
+- **Immersive tools:** `PauseSession`, `Breathe`, `Ground`, `GroundHistory`, `PracticeCheckIn`, `PracticeJournal`, `PracticeBodyScan`, `PracticeReplay`, `Ambient` — mounted at **`/tools/...`** in `App.tsx` (see **`src/lib/app-routes.ts`**).
+- **`/tools/ambient` vs `/tools/breathe`:** `Ambient.tsx` is the full-screen volatility-gradient breathing screen. `Breathe.tsx` is a different “stillness / void” flow.
 - **Ops:** `Admin` (see below).
 - **Errors:** `NotFound`.
 
@@ -138,7 +140,7 @@ Do **not** add global **`QueryClient` defaultOptions** lightly: they affect ever
 ## 11. Supabase: migrations
 
 - Files in **`supabase/migrations/`** are ordered SQL changes. Apply them via your team’s workflow (CLI `db push`, dashboard, or local `npm run supabase:reset` for Docker).
-- **`src/integrations/supabase/types.ts`** should stay aligned with the schema (regenerate when the schema changes, per your usual Supabase typing workflow).
+- **`src/integrations/supabase/types.ts`** should stay aligned with the schema — **`npm run gen:types`** (requires Supabase CLI + `supabase login` or `SUPABASE_ACCESS_TOKEN`).
 
 ---
 
@@ -187,6 +189,11 @@ Each folder under **`supabase/functions/<name>/`** is a deployable function. Sha
 ## 14. Tests and quality gates
 
 - **`npm run test`** — Vitest, files matching `src/**/*.{test,spec}.{ts,tsx}`.
+- **`npm run test:ci`** — Runs **`check:edge-logging`**, **`check:edge-coverage-manifest`**, then Vitest with coverage + JUnit output (matches typical CI expectations).
+- **`npm run check:prepush`** — Full bash preflight in **`scripts/pre-push-check.sh`** (tests, build, **`check:view-migrations`**, edge checks, optional local `supabase db reset`). **Requires `bash`** — on Windows use **Git Bash** or **WSL**. Narrative checklist: [deployment-sync-guide.md](../ops/deployment-sync-guide.md).
+- **`npm run check:view-migrations`** — Blocks unsafe `CREATE OR REPLACE VIEW` column renames in **`supabase/migrations/`** (also run from **`check:prepush`**).
+- **`npm run build`** — Runs **`npm run check:version-sync`** first (`prebuild`): **`package.json` `version`** must match the latest **`changelog_entries`** row for the configured Supabase project.
+- **`npm run stamp:release`** — Writes the current **12-character** Git commit id into **`supabase/functions/_shared/release.ts`** (`EDGE_RELEASE`) for edge Sentry/BetterStack releases (also invoked at the start of **`check:prepush`**). See [AGENTS.md](../AGENTS.md) for the full script table.
 - **`src/test/`** — `setup.ts` plus tests for sanitization, fallbacks, companion types, etc.
 - **`npm run lint`** — ESLint; the repo may have many pre-existing warnings/errors — avoid adding new ones in touched files ([AGENTS.md](../AGENTS.md)).
 
@@ -205,14 +212,15 @@ Each folder under **`supabase/functions/<name>/`** is a deployable function. Sha
 
 ## 16. Related documentation in `docs/`
 
-- **[ai-powered-pause-system.md](../systems/pause/ai-powered-pause-system.md)** — Manual vs automatic pause, shared reflection AI, `companion-orchestrate`, interventions, generators, drift and ops notes.
+- **[ai-powered-pause-system.md](../systems/pause/ai-powered-pause-system.md)** — Manual vs automatic pause, shared pause-session AI, `companion-orchestrate`, interventions, generators, drift and ops notes.
 - **[cron-setup.md](../ops/cron-setup.md)** — Scheduling edge functions (BTC refresh, feeds, digests, etc.).
+- **[deployment-sync-guide.md](../ops/deployment-sync-guide.md)** — GitHub ↔ Lovable sync, pre-push checklist, **`npm run check:prepush`**, and migration/edge troubleshooting.
 
 ---
 
 ## 17. Lovable Cloud: what deploys when
 
-If you use [Lovable](https://lovable.dev) with GitHub sync to a linked Supabase project (see [README.md](../README.md#Lovable)):
+If you use [Lovable](https://lovable.dev) with GitHub sync to a linked Supabase project (see [README.md](../README.md#lovable)):
 
 | Change in repo | Typical effect on live users |
 |----------------|------------------------------|
@@ -253,7 +261,7 @@ Goal: one **vertical slice** you can trace in **docs → code → Network tab** 
 | 3. **Hooks** | Read in order: `src/hooks/use-holzen.ts` (`manualTrigger` → `generateMessage`) → `src/hooks/use-companion-data.ts` (orchestrator invoke). Bounded **`use-holzen`** helpers live in **`src/lib/`**: `reflection-persist-error`, `holzen-manual-cooldown`, `pause-context-from-btc`, `btc-move-severity`, `next-cron-quarter`. **`use-companion-data`** pulls types/cache/mood/source-catalog/recency/library-autosave/completion helpers from **`companion-orchestrate-types`**, **`companion-reflection-cache`**, **`companion-mood-history`**, **`companion-orchestrate-sources`**, **`companion-recency-hints`**, **`companion-library-autosave`**, **`companion-completion-sync`**, **`companion-completion-maps`**, **`companion-orchestrate-slot-apply`**, **`companion-url`**. Open `src/pages/PauseSession.tsx` (hydration + steps); persistence in `pause-session-storage.ts`, gates in `PauseSessionGate`, shell in `PauseSessionScaffold`. Companion **`library_items`** favorites: `use-companion-library-favorites.ts`. |
 | 4. **Edge** | In this doc **§12**, confirm **`holzen-reflect`** and **`companion-orchestrate`** invoke map. Optionally open `supabase/functions/holzen-reflect/index.ts` and `companion-orchestrate/index.ts` **headers only** (auth, entry). |
 | 5. **Click + Network** | With the app running, go to **`/pause`**, run a **non-silent** manual pause. In DevTools **Network**, filter for **`holzen-reflect`** and **`companion-orchestrate`** — order should match **§4.1** in the pause system doc. |
-| 6. **DB** | Skim **`supabase/migrations/`** for `profiles`, `reflections`, `reflection_companions` — name recognition only. |
+| 6. **DB** | Skim **`supabase/migrations/`** for `profiles`, `pause_instances`, `pause_ai_artifacts` — name recognition only. |
 | 7. **HTTP-only** (optional) | [bruno/README.md](../../bruno/README.md) `pause-pipeline/`: same functions in isolation; **not** a full UI substitute. |
 
 Stop when you can explain **in one sentence** each: what **`use-holzen`** does vs what **`use-companion-data`** does, and **where** `holzen-reflect` vs `companion-orchestrate` run.
@@ -266,7 +274,7 @@ Goal: **map** the rest of the surface area without drowning in files. Use **§4*
 
 | Step | What to do |
 |------|------------|
-| 1. **Route map** | Re-read **§4** above — list every **main** route (`/`, `/library`, `/profile`, `/settings`, `/pause`, practices, `/admin`, public routes). For each **bucket**, note the **page file** under `src/pages/`. |
+| 1. **Route map** | Re-read **§4** above — list every **main** route (`/`, `/library`, `/journey/*`, `/settings`, `/tools`, `/pause`, immersive `/tools/*` practices, `/admin`, public routes). For each **bucket**, note the **page file** under `src/pages/`. |
 | 2. **Auth shell** | **§5** — `use-auth`, `ProtectedRoute` / `PublicOnlyRoute`. Trace **`/welcome`** vs **`/`** once in `App.tsx`. Optional: [route-gating-system.md](../systems/routing/route-gating-system.md). |
 | 3. **Feature hooks** | **§6** table — for each row you care about, open the hook and **one** page that uses it (`use-library` + `Library`, `use-subscription` + billing/settings, `use-push-notifications`, etc.). |
 | 4. **Components** | **§8** — skim `src/components/ui/` (primitives) vs feature folders (`pause/`, `practice/`, …). |

@@ -13,6 +13,7 @@
  * 5. Pattern (default) — safe fallback for new users
  */
 
+import type { SupabaseClient } from "https://esm.sh/@supabase/supabase-js@2.57.2";
 import { buildMirror, type MirrorResult } from "./generators/mirror.ts";
 
 export type InterventionMode = "insight" | "question";
@@ -31,12 +32,12 @@ export interface InterventionSelection {
 
 export interface SelectInterventionParams {
   userId: string;
-  reflectionId: string;
+  pauseInstanceId: string;
   mood?: string;
   severity: "mild" | "moderate" | "high";
   direction: "up" | "down" | "neutral";
   moodHistory?: Array<{ mood: string; outcome?: string | null }>;
-  svcClient: any;
+  svcClient: SupabaseClient;
   log?: (msg: string, extra?: Record<string, unknown>) => void;
 }
 
@@ -63,15 +64,16 @@ export function bucketSeverity(pct: number): "mild" | "moderate" | "high" {
 }
 
 /**
- * Count the user's total past reflections. Used to gate Question Mode
+ * Count the user's total past completed pauses. Used to gate Question Mode
  * (only shown to users with enough history to benefit from self-reflection).
  */
-async function countPastSessions(svcClient: any, userId: string): Promise<number> {
+async function countPastSessions(svcClient: SupabaseClient, userId: string): Promise<number> {
   try {
     const { count, error } = await svcClient
-      .from("reflections")
+      .from("pause_instances")
       .select("id", { count: "exact", head: true })
-      .eq("user_id", userId);
+      .eq("user_id", userId)
+      .eq("state", "completed");
     if (error) return 0;
     return count ?? 0;
   } catch {
@@ -82,11 +84,11 @@ async function countPastSessions(svcClient: any, userId: string): Promise<number
 export async function selectIntervention(
   params: SelectInterventionParams,
 ): Promise<InterventionSelection> {
-  const { userId, reflectionId, mood, severity, direction, moodHistory, svcClient, log } = params;
+  const { userId, pauseInstanceId, mood, severity, direction, moodHistory, svcClient, log } = params;
+  void moodHistory; // reserved for future heuristics
 
   // ── 1. Mirror check (highest priority) ──
-  // We fetch Mirror data here so the orchestrator can return it without a second DB call.
-  const mirrorData = await buildMirror(svcClient, userId, reflectionId, log);
+  const mirrorData = await buildMirror(svcClient, userId, pauseInstanceId, log);
   if (mirrorData) {
     log?.("mirror: eligible — past session found");
     return {
@@ -96,16 +98,14 @@ export async function selectIntervention(
     };
   }
 
-  // Mirror not eligible — log which case so we can track eligibility rate
   const sessionCount = await countPastSessions(svcClient, userId);
   if (sessionCount <= 1) {
     log?.(`mirror: ineligible — new user (${sessionCount} sessions)`);
   } else {
-    log?.(`mirror: ineligible — ${sessionCount} sessions but no qualifying match (need same direction + recorded outcome ≥30 days ago)`);
+    log?.(`mirror: ineligible — ${sessionCount} sessions but no qualifying match`);
   }
 
   // ── 2. Trap — emotionally activated states ──
-  // Fear/anxiety during a down move → name the loss aversion / panic bias
   const fearMoods = ["fearful", "anxious"];
   const fomoMoods = ["fomo", "greedy", "excited"];
 
@@ -117,7 +117,6 @@ export async function selectIntervention(
     };
   }
 
-  // FOMO/greed during an up move → name the herding / overconfidence bias
   if (fomoMoods.includes(mood ?? "") && direction === "up") {
     return {
       mode: "insight",
@@ -126,7 +125,6 @@ export async function selectIntervention(
     };
   }
 
-  // FOMO/greed during a down move → capitulation fear (also trap)
   if (["fomo", "greedy"].includes(mood ?? "") && direction === "down") {
     return {
       mode: "insight",
@@ -144,16 +142,15 @@ export async function selectIntervention(
     };
   }
 
-  // ── 4. Question Mode — experienced user, mild move ──
-  // Only show Question Mode to users with enough history to have something to reflect on.
+  // ── 4. Question Mode ──
   if (severity === "mild") {
-    const sessionCount = await countPastSessions(svcClient, userId);
-    if (sessionCount >= 20) {
+    const sc = await countPastSessions(svcClient, userId);
+    if (sc >= 20) {
       return { mode: "question" };
     }
   }
 
-  // ── 5. Default — pattern with optional secondary ──
+  // ── 5. Default ──
   return {
     mode: "insight",
     primary: "pattern",

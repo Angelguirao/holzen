@@ -2,7 +2,7 @@
 //
 // Sends CLS, INP, LCP, FCP, TTFB as Sentry measurements tagged with rating (good/needs-
 // improvement/poor). No PII. Also mirrors to console in dev so designers can eyeball
-// regressions locally. PostHog capture is optional and is added later in the analytics task.
+// regressions locally. The same samples are also sent to PostHog as `performance.web_vital`.
 //
 // Implementation notes:
 //   - `web-vitals` reports a final value per metric per page; we do not need to batch.
@@ -13,6 +13,7 @@
 
 import type { Metric } from "web-vitals";
 import { Sentry } from "./sentry";
+import { trackEvent } from "./posthog";
 
 function reportMetric(metric: Metric) {
   const { name, value, rating, id } = metric;
@@ -35,6 +36,17 @@ function reportMetric(metric: Metric) {
     });
   } catch {
     /* Sentry might not be initialized — fine, reportMetric is best-effort. */
+  }
+
+  try {
+    const route = typeof window !== "undefined" ? window.location.pathname : "";
+    trackEvent("performance.web_vital", {
+      vital: name as "CLS" | "INP" | "LCP" | "FCP" | "TTFB",
+      value: roundedValue,
+      route,
+    });
+  } catch {
+    /* posthog optional */
   }
 }
 

@@ -516,7 +516,7 @@ export function CheckoutConfirmation() {
     if (guardTs !== null && claimRefreshSlot(guardTs, detected, 'mount')) {
       void sub.refresh();
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- checkout query + localStorage guard; listing sub/navigate would re-run and duplicate side effects
   }, [location.search]);
 
   const open = mode !== null;
@@ -1043,7 +1043,7 @@ export function CheckoutConfirmation() {
         notifySentRef.current = null;
       }
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- notify idempotency + cleanup vs full subscription object / formatter deps
   }, [mode, sub.loading, sub.subscriptionStatus, sub.tier, currentBalance, creditsAdded, projectedBalance]);
 
   const handleManageSubscription = () => {
@@ -1165,7 +1165,6 @@ export function CheckoutConfirmation() {
         }
       }
       if (violations.length > 0) {
-        // eslint-disable-next-line no-console
         console.warn(
           '[CheckoutConfirmation] QUIET_STATE_CHECKLIST violations:\n  • ' +
             violations.join('\n  • '),

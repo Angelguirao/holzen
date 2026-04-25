@@ -1,6 +1,7 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import { render, screen, cleanup, fireEvent, act } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
+import { reactRouterFutureFlags } from '@/lib/router-future';
 
 /**
  * Regression test for the user-reported invariant:
@@ -71,7 +72,13 @@ vi.mock('react-router-dom', async () => {
 });
 
 vi.mock('react-i18next', () => ({
-  useTranslation: () => ({ t: (_key: string, fallback?: string) => fallback ?? _key }),
+  useTranslation: () => ({
+    t: (key: string, options?: string | { defaultValue?: string }) => {
+      if (options == null) return key;
+      if (typeof options === 'string') return options;
+      return options.defaultValue ?? key;
+    },
+  }),
 }));
 
 import { CheckoutConfirmation } from '@/components/CheckoutConfirmation';
@@ -82,7 +89,7 @@ const CHECKOUT_REFRESH_IDEMPOTENCY_KEY = 'holzen_checkout_refresh_idempotency';
 
 function renderConfirmationAt(path: string) {
   return render(
-    <MemoryRouter initialEntries={[path]}>
+    <MemoryRouter future={reactRouterFutureFlags} initialEntries={[path]}>
       <CheckoutConfirmation />
     </MemoryRouter>,
   );

@@ -10,6 +10,7 @@
  * API keys are read from Deno.env directly (same as the original function).
  */
 
+import type { SupabaseClient } from "https://esm.sh/@supabase/supabase-js@2.57.2";
 import {
   qualityGate,
   BANNED_PHRASES,
@@ -34,14 +35,25 @@ import { getPhaseConfig } from "../phase-config.ts";
 import { BTC_ON_THIS_DAY_YEARS_BACK, btcOnThisDayYearOffsets } from "../btc-on-this-day-config.ts";
 import { warmMissingBtcPrices } from "../btc-price-warm.ts";
 import { fetchPastReflectionWithWords, type PastReflectionWithWords } from "../past-reflections.ts";
+import { type CompanionCacheTitleRow } from "../companion-cache-dedup.ts";
+import { errorMessageFromUnknown, getEdgeRuntime } from "../edge-runtime.ts";
 
 /** Bump when the deep-time prompt, seed pool, or quality rules change. */
 export const PROMPT_VERSION = "v4";
 
 // ── Public types ──
 
+/** Composite zoom-out payload returned to orchestrate / clients. */
+export interface ZoomOutCompositeData {
+  onThisDay: { yearsAgo: number; price: number; date: string }[];
+  currentPrice: number | null;
+  echo: Record<string, unknown> | null;
+  deepTime: { title: string; body: string } | null;
+  partial: boolean;
+}
+
 export interface ZoomOutResult {
-  data: any | null;  // { onThisDay, currentPrice, echo, deepTime, partial }
+  data: ZoomOutCompositeData | null;
   source: "live" | "cache" | "curated" | "empty";
   cacheId: string | null;
   /** Set when deep-time text came from `serveFromCache`. */
@@ -50,7 +62,7 @@ export interface ZoomOutResult {
 }
 
 export interface GenerateZoomOutParams {
-  svcClient: any;
+  svcClient: SupabaseClient;
   context?: string;
   language?: string;
   reflectionMessage?: string;
@@ -87,7 +99,7 @@ interface PriceCacheRow {
  * during user sessions.
  */
 async function fetchHistoricalAndCurrentPrices(
-  svcClient: any,
+  svcClient: SupabaseClient,
   context: string | undefined,
   log: GenerateZoomOutParams["log"],
 ): Promise<PriceFetchResult> {
@@ -137,8 +149,8 @@ async function fetchHistoricalAndCurrentPrices(
   const missingDateKeys = yearTargets
     .filter((t) => !priceMap.has(t.dateKey))
     .map((t) => t.dateKey);
-  const rt = (globalThis as any).EdgeRuntime;
-  if (missingDateKeys.length > 0 && rt && typeof rt.waitUntil === "function") {
+  const rt = getEdgeRuntime();
+  if (missingDateKeys.length > 0 && rt) {
     try {
       rt.waitUntil(
         warmMissingBtcPrices(svcClient, missingDateKeys)
@@ -149,11 +161,11 @@ async function fetchHistoricalAndCurrentPrices(
             );
           })
           .catch((e) => {
-            log(`btc warm-on-read failed: ${e?.message ?? String(e)}`);
+            log(`btc warm-on-read failed: ${errorMessageFromUnknown(e)}`);
           }),
       );
     } catch (e) {
-      log(`btc warm-on-read scheduling failed: ${(e as any)?.message ?? String(e)}`);
+      log(`btc warm-on-read scheduling failed: ${errorMessageFromUnknown(e)}`);
     }
   }
 
@@ -165,14 +177,15 @@ async function fetchHistoricalAndCurrentPrices(
   };
 }
 
-// ── Internals: Echo reflection fetch (strict user-words-only) ──
+// ── Internals: Echo (past pause user words) fetch — strict user-words-only ──
 
 /**
  * Build the `echo` slot for the zoom-out composite payload.
  *
- * Strict policy (2026-04-18): Echo surfaces ONLY user-authored text —
- * `reflections.note` and `practice_entries.body` (replays). It NEVER surfaces
- * `reflections.message` (the AI-generated reflect-step prompt), which was the
+ * Strict policy (2026-04-18): Echo surfaces ONLY user-authored text from the
+ * Pause V2 read model — notes / replays via `pause_step_events` and
+ * `practice_entries.body` (see `_shared/past-reflections.ts`). It NEVER surfaces
+ * `v_pause_full.reflection_text` (the AI-generated reflect-step prompt), which was the
  * previous behaviour behind the misleading "your own words from another day"
  * UI label. If the user has never left a note or replay on a past pause,
  * `echo` is `null` and the card renders a truthful empty state.
@@ -198,7 +211,7 @@ function echoPayloadFromPast(p: PastReflectionWithWords | null): Record<string, 
 }
 
 async function fetchEchoReflection(
-  svcClient: any,
+  svcClient: SupabaseClient,
   userId: string,
   context: string | undefined,
   log: GenerateZoomOutParams["log"],
@@ -222,7 +235,7 @@ interface DeepTimeResult {
 }
 
 async function generateDeepTime(
-  svcClient: any,
+  svcClient: SupabaseClient,
   params: {
     context?: string;
     mood?: string;
@@ -394,7 +407,10 @@ FORMAT: JSON with "title" (3-8 word evocative phrase) and "body" (1-2 poetic but
                 const { data: existing } = await svcClient.from("companion_cache").select("content").eq("companion_type", COMPANION_ZOOM_OUT_DEEP_TIME).eq("language", "en").limit(30);
                 const norm = (s: string) => s.toLowerCase().replace(/[^a-z0-9 ]/g, "").trim();
                 const newNorm = norm(parsed.title);
-                const isDup = existing?.some((e: any) => { const t = norm(e.content?.title || ""); return t === newNorm || t.includes(newNorm) || newNorm.includes(t); });
+                const isDup = existing?.some((e: CompanionCacheTitleRow) => {
+                  const t = norm(e.content?.title || "");
+                  return t === newNorm || t.includes(newNorm) || newNorm.includes(t);
+                });
                 if (!isDup) {
                   const fingerprint = await contentFingerprint(newNorm);
                   const { error: cacheErr } = await svcClient.from("companion_cache").insert({
@@ -457,7 +473,12 @@ FORMAT: JSON with "title" (3-8 word evocative phrase) and "body" (1-2 poetic but
       return { deepTime: null, source: "empty", error: COMPANION_FALLBACKS_DISABLED_MESSAGE };
     }
     const marketDirection = parseMarketDirection(context);
-    const cached = await serveFromCache(svcClient, COMPANION_ZOOM_OUT_DEEP_TIME, "en", { userId, marketDirection, promptVersion: PROMPT_VERSION });
+    const cached = await serveFromCache(svcClient, COMPANION_ZOOM_OUT_DEEP_TIME, "en", {
+      userId,
+      marketDirection,
+      promptVersion: PROMPT_VERSION,
+      structuredLog: log,
+    });
     if (cached) {
       return {
         deepTime: cached.data as { title: string; body: string },
@@ -484,7 +505,13 @@ export async function generateZoomOut(params: GenerateZoomOutParams): Promise<Zo
   // ── Phase 2: Cache (no library type for zoom-out; strict — fall through to live if no fresh row) ──
   if (phases.cache && !forceLive) {
     const marketDirection = parseMarketDirection(context);
-    const cached = await serveFromCache(svcClient, COMPANION_ZOOM_OUT_DEEP_TIME, "en", { userId, marketDirection, strict: true, promptVersion: PROMPT_VERSION });
+    const cached = await serveFromCache(svcClient, COMPANION_ZOOM_OUT_DEEP_TIME, "en", {
+      userId,
+      marketDirection,
+      strict: true,
+      promptVersion: PROMPT_VERSION,
+      structuredLog: log,
+    });
     if (cached) {
       log("zoomOut resolved from cache (phase 2)");
       const prices = await fetchHistoricalAndCurrentPrices(svcClient, context, log);
@@ -494,7 +521,7 @@ export async function generateZoomOut(params: GenerateZoomOutParams): Promise<Zo
         data: {
           onThisDay: prices.onThisDay,
           currentPrice: prices.currentPrice,
-          echo: echoPayloadFromPast(echoPast) as any,
+          echo: echoPayloadFromPast(echoPast),
           deepTime: cached.data as { title: string; body: string },
           partial: prices.isPartial,
         },
@@ -558,7 +585,7 @@ export async function generateZoomOut(params: GenerateZoomOutParams): Promise<Zo
   const result = {
     onThisDay: prices.onThisDay,
     currentPrice: prices.currentPrice,
-    echo: echoPayloadFromPast(echoPast) as any,
+    echo: echoPayloadFromPast(echoPast),
     deepTime: deepTimeResult.deepTime,
     partial: prices.isPartial,
   };

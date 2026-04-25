@@ -1,10 +1,13 @@
 import { useState, useEffect, useCallback } from 'react';
-import { supabase } from '@/integrations/supabase/client';
 import { useTranslation } from 'react-i18next';
+import { supabase } from '@/integrations/supabase/client';
+import type { Database } from '@/integrations/supabase/types';
 import { Switch } from '@/components/ui/switch';
 import { Button } from '@/components/ui/button';
 import { Plus, Trash2 } from 'lucide-react';
 import { toast } from 'sonner';
+
+type QuietWindowUpdate = Database['public']['Tables']['quiet_windows']['Update'];
 
 const DAY_LABELS = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 
@@ -20,7 +23,6 @@ interface QuietWindow {
 export function QuietWindowsManager({ userId }: { userId?: string }) {
   const { t } = useTranslation();
   const [windows, setWindows] = useState<QuietWindow[]>([]);
-  const [loading, setLoading] = useState(false);
 
   const load = useCallback(async () => {
     if (!userId) return;
@@ -29,7 +31,7 @@ export function QuietWindowsManager({ userId }: { userId?: string }) {
       .select('*')
       .eq('user_id', userId)
       .order('created_at');
-    if (data) setWindows(data as any);
+    if (data) setWindows(data as QuietWindow[]);
   }, [userId]);
 
   useEffect(() => { load(); }, [load]);
@@ -38,27 +40,27 @@ export function QuietWindowsManager({ userId }: { userId?: string }) {
     if (!userId) return;
     const { error } = await supabase.from('quiet_windows').insert({
       user_id: userId,
-      label: t('quietWindows.newLabel', 'Work hours'),
+      label: t('quietWindows.newLabel', { defaultValue: 'Work hours' }),
       start_hour: 9,
       end_hour: 17,
       days: [1, 2, 3, 4, 5],
       active: true,
-    } as any);
+    });
     if (!error) {
       await load();
-      toast(t('quietWindows.added', 'Quiet window added'));
+      toast(t('quietWindows.added', { defaultValue: 'Quiet window added' }));
     }
   };
 
   const updateWindow = async (id: string, updates: Partial<QuietWindow>) => {
-    await supabase.from('quiet_windows').update(updates as any).eq('id', id);
+    await supabase.from('quiet_windows').update(updates as QuietWindowUpdate).eq('id', id);
     setWindows((prev) => prev.map((w) => (w.id === id ? { ...w, ...updates } : w)));
   };
 
   const deleteWindow = async (id: string) => {
     await supabase.from('quiet_windows').delete().eq('id', id);
     setWindows((prev) => prev.filter((w) => w.id !== id));
-    toast(t('quietWindows.removed', 'Quiet window removed'));
+    toast(t('quietWindows.removed', { defaultValue: 'Quiet window removed' }));
   };
 
   const toggleDay = (window: QuietWindow, day: number) => {
@@ -72,7 +74,7 @@ export function QuietWindowsManager({ userId }: { userId?: string }) {
     <div className="space-y-3 pt-2">
       <div className="flex items-center justify-between">
         <p className="text-[10px] font-mono text-muted-foreground/60 uppercase tracking-wider">
-          {t('quietWindows.title', 'Extended schedules')}
+          {t('quietWindows.title', { defaultValue: 'Extended schedules' })}
         </p>
         <Button
           variant="ghost"
@@ -81,13 +83,15 @@ export function QuietWindowsManager({ userId }: { userId?: string }) {
           className="h-6 px-2 text-[10px] font-mono text-primary/60 hover:text-primary"
         >
           <Plus className="h-3 w-3 mr-1" />
-          {t('quietWindows.add', 'Add window')}
+          {t('quietWindows.add', { defaultValue: 'Add window' })}
         </Button>
       </div>
 
       {windows.length === 0 && (
         <p className="text-[10px] font-mono text-muted-foreground/30 italic">
-          {t('quietWindows.empty', 'Add extra quiet windows for work, focus, or other schedules.')}
+          {t('quietWindows.empty', {
+            defaultValue: 'Add extra quiet windows for work, focus, or other schedules.',
+          })}
         </p>
       )}
 
@@ -101,7 +105,7 @@ export function QuietWindowsManager({ userId }: { userId?: string }) {
               type="text"
               value={w.label}
               onChange={(e) => updateWindow(w.id, { label: e.target.value })}
-              placeholder={t('quietWindows.labelPlaceholder', 'Label (e.g. Work hours)')}
+              placeholder={t('quietWindows.labelPlaceholder', { defaultValue: 'Label (e.g. Work hours)' })}
               className="flex-1 bg-transparent border-none outline-none text-xs font-mono text-foreground/80 placeholder:text-muted-foreground/30"
             />
             <Switch

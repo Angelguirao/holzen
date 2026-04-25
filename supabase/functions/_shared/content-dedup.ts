@@ -3,6 +3,7 @@
  * Keep normalization aligned with DB generated columns where applicable.
  */
 
+import type { SupabaseClient } from "https://esm.sh/@supabase/supabase-js@2.57.2";
 import type { FeedArticleRef } from "./feed-ingest.ts";
 
 /** Trim, lowercase, collapse internal whitespace — matches content_library.title_norm in SQL. */
@@ -74,9 +75,7 @@ export function partitionArticleRefsByUrlInDb(
 const CONTENT_LIBRARY_URL_IN_CHUNK = 120;
 
 export async function filterArticleRefsNotInLibrary(
-  // Supabase client — use `any` so Deno/PostgREST builder chains type-check.
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  svcClient: any,
+  svcClient: SupabaseClient,
   contentType: "essay" | "paper",
   refs: FeedArticleRef[],
 ): Promise<{ pending: FeedArticleRef[]; skippedKnown: number; batchQueryOk: boolean }> {
@@ -148,9 +147,7 @@ export interface CompanionCacheDedupOpts {
  * content fingerprint, or (legacy) fuzzy title similarity among recent entries.
  */
 export async function isCompanionCacheDuplicate(
-  // Supabase client — typed loosely to avoid coupling this helper to generated DB types.
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any -- query builder chain
-  svcClient: any,
+  svcClient: SupabaseClient,
   companionType: string,
   newTitle: string,
   opts?: CompanionCacheDedupOpts,

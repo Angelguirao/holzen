@@ -3,8 +3,30 @@
     "home": "Inicio",
     "history": "Historial",
     "library": "Biblioteca",
+    "tools": "Herramientas",
+    "journey": "Camino",
     "profile": "Perfil",
     "settings": "Ajustes"
+  },
+  "ia": {
+    "crossLinkIntro": "Ver también:",
+    "crossLinkLibrary": "Biblioteca",
+    "crossLinkJourneyActivity": "Camino — Actividad",
+    "crossLinkGroundHistory": "Historial de grounding"
+  },
+  "settingsAbout": {
+    "back": "Ajustes",
+    "title": "Info, novedades y comentarios",
+    "subtitle": "Novedades, versión de la app y contacto con el equipo, aparte de tus preferencias diarias."
+  },
+  "roadmap": {
+    "pageTitle": "Hoja de ruta — Holzen",
+    "pageDescription": "Planes y novedades del producto",
+    "title": "Hoja de ruta",
+    "body": "Ahora no hay una hoja de ruta viva en la app. Sigue el blog para notas de versión y dirección, o lee por qué creamos Holzen.",
+    "linkBlog": "Blog",
+    "linkAbout": "Sobre Holzen",
+    "linkHome": "Iniciar sesión"
   },
   "common": {
     "back": "Volver",
@@ -91,7 +113,8 @@
       "checkConnection": "Verifica tu conexión a internet. Los datos de precios provienen de CoinGecko y pueden no estar disponibles temporalmente.",
       "aiTemporarilyUnavailable": "El servicio de IA no está disponible temporalmente. Tus ajustes y datos están seguros — intenta de nuevo en un momento.",
       "unexpectedError": "Ocurrió un error inesperado. Tus datos están seguros."
-    }
+    },
+    "browseAllTools": "Ver todas las herramientas"
   },
   "history": {
     "recent": "Recientes",
@@ -124,6 +147,23 @@
     "parallel": "paralelo",
     "reflectionUnpinned": "Reflexión desfijada",
     "reflectionPinned": "Reflexión fijada en Inicio"
+  },
+  "journey": {
+    "pageSubtitle": "Progreso, análisis y escritos — no la cuenta (eso está en Ajustes).",
+    "documentTitle": "Holzen — Camino",
+    "activityExplainer": "Registro cronológico de pausas y prácticas. Contenido guardado: Biblioteca — explora y busca ahí."
+  },
+  "tools": {
+    "title": "Herramientas",
+    "subtitle": "Regulación, conexión a tierra y práctica: lo mismo que en Inicio, en una sola lista.",
+    "breathe": "Calma (respirar)",
+    "breatheDesc": "Espacio de respiración sin objetivos.",
+    "ambient": "Modo ambiente",
+    "ambientDesc": "Sonido y color suaves.",
+    "ground": "Conexión a tierra",
+    "groundDesc": "Conexión guiada según tu contexto.",
+    "groundHistory": "Diario de conexión",
+    "groundHistoryDesc": "Historial de sesiones de conexión."
   },
   "profile": {
     "stats": "Estadísticas",
@@ -791,6 +831,7 @@
     "title": "Biblioteca",
     "pageTitle": "Biblioteca — Holzen",
     "pageDescription": "Tu actividad, marcadores, notas y colecciones",
+    "iaClarifier": "Contenido guardado y buscable (tarjetas, notas, colecciones). El registro en orden cronológico está en Camino → Actividad.",
     "tabItems": "Elementos",
     "tabArchive": "Archivo",
     "viewList": "Lista",
@@ -867,7 +908,7 @@
   "aiInsights": { "title": "Análisis de patrones IA", "analyzing": "Analizando…", "refresh": "Actualizar", "generate": "Generar", "generated": "Análisis generado", "failedToGenerate": "Error al generar análisis", "needMinReflections": "Se necesitan al menos 5 reflexiones. Tienes {{count}}.", "noInsightsYet": "Sin análisis aún. Pulsa \"Generar\" para analizar tus patrones.", "analyzingCount": "Analizando {{count}} reflexiones…", "refreshRecommended": "Actualización recomendada", "reflectionsCount": "{{count}} reflexiones" },
   "wallpaper": { "generating": "Generando fondo…", "carry": "Lleva tu reflexión contigo.", "wallpaper": "Fondo", "generateTitle": "Generar fondo", "generateFromReflection": "Generar fondo de esta reflexión", "reflectionWallpaper": "Fondo de reflexión", "download": "Descargar", "downloaded": "Fondo descargado", "regenerate": "Regenerar", "failedToGenerate": "Error al generar fondo" },
   "calendar": { "su": "Do", "mo": "Lu", "tu": "Ma", "we": "Mi", "th": "Ju", "fr": "Vi", "sa": "Sa", "noActivity": "Sin actividad.", "reflectionCount": "{{count}} reflexión(es)", "ritualCount": "{{count}} ritual(es)", "letterCount": "{{count}} carta(s)", "badgeCount": "{{count}} insignia(s)", "ritual": "Ritual", "badge": "Insignia" },
-  "librarySources": { "reflection": "Reflexión", "reflection_note": "Nota", "signal": "Señal", "grounding": "Anclaje", "learning": "Anclaje", "haiku": "Haiku", "zoom_out": "Zoom Out", "history_insight": "Historia", "external": "Externo" },
+  "librarySources": { "reflection": "Reflexión", "reflection_note": "Nota", "signal": "Señal", "grounding": "Anclaje", "ground": "Anclaje", "learning": "Anclaje", "haiku": "Haiku", "zoom_out": "Zoom Out", "history_insight": "Historia", "external": "Externo", "practice": "Práctica" },
   "itemDetail": { "onThisDay": "En este día", "yearsAgo": "hace {{count}}a", "echo": "Eco", "deepTime": "Tiempo profundo", "viewSource": "Ver fuente", "source": "fuente", "companions": "Compañeros", "relatedItems": "Elementos relacionados", "historicalDataPoints": "{{count}} datos históricos" },
   "libraryCard": { "removeFavorite": "Quitar de favoritos", "addFavorite": "Añadir a favoritos", "markRead": "Marcar leído", "markUnread": "Marcar no leído", "archive": "Archivar", "unread": "no leído", "archived": "archivado", "link": "enlace", "tag": "etiqueta", "tagPlaceholder": "Escribe etiqueta + Enter…", "save": "Guardar", "saved": "Guardado", "saveToLibrary": "Guardar en biblioteca", "addTagsPlaceholder": "Añadir etiquetas…", "enterToCreate": "Enter para crear \"{{tag}}\"" },
   "pro": { "featureLocked": "Función Pro", "upgradeDesc": "Empieza tu prueba gratuita de {{trialDays}} días — compañeros IA, análisis, biblioteca y más.", "upgradeCta": "Prueba gratis", "upgradeCtaShort": "Probar Pro gratis", "badge": "PRO" },

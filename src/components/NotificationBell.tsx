@@ -209,10 +209,10 @@ export function NotificationBell() {
       subtitle = t('notifications.basedOnReflections', { count: reflectionCount });
       actionLabel = t('notifications.viewInsights');
     } else if (row.type === 'pause') {
-      title = t('notifications.pauseReady', 'Pause ready');
+      title = t('notifications.pauseReady', { defaultValue: 'Pause ready' });
       const message = getString(metadata.message) ?? '';
       subtitle = message.slice(0, 80) + (message.length > 80 ? '…' : '');
-      actionLabel = t('notifications.openPause', 'Open pause');
+      actionLabel = t('notifications.openPause', { defaultValue: 'Open pause' });
     } else {
       return null;
     }
@@ -261,7 +261,7 @@ export function NotificationBell() {
     if (showLoading) setLoading(true);
 
     try {
-      const { data } = await (supabase as any)
+      const { data } = await supabase
         .from('notifications')
         .select('id, type, metadata, action_path, action_state, created_at, dismissed_at')
         .eq('user_id', user.id)
@@ -428,7 +428,7 @@ export function NotificationBell() {
   const displayCount = unreadCount > 9 ? '9+' : unreadCount;
   const bellAriaLabel =
     unreadCount > 0
-      ? `${t('notifications.title')}, ${displayCount} ${t('notifications.unread', 'unread')}`
+      ? `${t('notifications.title')}, ${displayCount} ${t('notifications.unread', { defaultValue: 'unread' })}`
       : t('notifications.title');
 
   return (

@@ -3,6 +3,7 @@
  * Centralises cost tracking, attempt logging, and analytics events.
  */
 
+import type { SupabaseClient } from "https://esm.sh/@supabase/supabase-js@2.57.2";
 import { EDGE_RELEASE } from "./release.ts";
 
 // ── Cost estimation per 1M tokens [input, output] in USD ──
@@ -98,31 +99,24 @@ interface AttemptParams {
 interface AttemptLoggerOptions {
   /** User ID to associate with all attempts (for cost attribution) */
   userId?: string;
-  /** Reflection ID to associate with all attempts (for session correlation) */
-  reflectionId?: string;
+  /** Pause instance ID to associate with all attempts (for session correlation) */
+  pauseInstanceId?: string;
 }
 
 /**
  * Create an attempt logger bound to a service client.
  * Returns a function that logs generation attempts with cost estimation.
  *
- * Pass userId and reflectionId in options to enable per-user cost attribution
- * and per-session debugging. These columns are nullable in generation_attempts —
- * if the DB doesn't have them yet, the insert still succeeds (Supabase ignores
- * unknown columns in inserts when not using strict mode).
- *
- * SQL migration to add these columns:
- * ```sql
- * ALTER TABLE generation_attempts ADD COLUMN IF NOT EXISTS user_id uuid REFERENCES auth.users(id);
- * ALTER TABLE generation_attempts ADD COLUMN IF NOT EXISTS reflection_id uuid REFERENCES reflections(id);
- * CREATE INDEX IF NOT EXISTS idx_generation_attempts_user_id ON generation_attempts(user_id);
- * CREATE INDEX IF NOT EXISTS idx_generation_attempts_reflection_id ON generation_attempts(reflection_id);
- * ```
+ * Pass `userId` and (optionally) `pauseInstanceId` via the caller's payload
+ * when building `AttemptLoggerOptions`. `generation_attempts.pause_instance_id`
+ * is added in migration 20260423201300. Nullable; if the column hasn't been
+ * applied yet the insert still succeeds (Supabase ignores unknown columns in
+ * inserts when not using strict mode).
  */
-export function createAttemptLogger(svcClient: any, options?: AttemptLoggerOptions) {
+export function createAttemptLogger(svcClient: SupabaseClient, options?: AttemptLoggerOptions) {
   let attemptOrder = 0;
   const userId = options?.userId ?? null;
-  const reflectionId = options?.reflectionId ?? null;
+  const pauseInstanceId = options?.pauseInstanceId ?? null;
 
   return (params: AttemptParams) => {
     attemptOrder++;
@@ -135,13 +129,15 @@ export function createAttemptLogger(svcClient: any, options?: AttemptLoggerOptio
     });
 
     // Fire-and-forget for attempt logging (high volume, non-critical)
-    svcClient.from("generation_attempts").insert({
-      ...rowParams,
-      attempt_order: attemptOrder,
-      estimated_cost_usd: cost,
-      ...(userId ? { user_id: userId } : {}),
-      ...(reflectionId ? { reflection_id: reflectionId } : {}),
-    }).then(() => {});
+    void Promise.resolve(
+      svcClient.from("generation_attempts").insert({
+        ...rowParams,
+        attempt_order: attemptOrder,
+        estimated_cost_usd: cost,
+        ...(userId ? { user_id: userId } : {}),
+        ...(pauseInstanceId ? { pause_instance_id: pauseInstanceId } : {}),
+      }),
+    ).catch(() => {});
   };
 }
 
@@ -149,25 +145,27 @@ export function createAttemptLogger(svcClient: any, options?: AttemptLoggerOptio
  * Create an analytics event tracker bound to a user and service client.
  * Fire-and-forget — analytics events are non-critical.
  */
-export function createObsTracker(svcClient: any, userId: string, companionType: string, t0: number) {
-  return (event: string, meta?: Record<string, any>) => {
-    svcClient.from("analytics_events").insert({
-      user_id: userId,
-      event,
-      metadata: {
-        companion_type: companionType,
-        latency_ms: Date.now() - t0,
-        ...meta,
-      },
-    }).then(() => {});
+export function createObsTracker(svcClient: SupabaseClient, userId: string, companionType: string, t0: number) {
+  return (event: string, meta?: Record<string, unknown>) => {
+    void Promise.resolve(
+      svcClient.from("analytics_events").insert({
+        user_id: userId,
+        event,
+        metadata: {
+          companion_type: companionType,
+          latency_ms: Date.now() - t0,
+          ...meta,
+        },
+      }),
+    ).catch(() => {});
   };
 }
 
 /**
  * Track a simple analytics event (fire-and-forget).
  */
-export function trackEvent(svcClient: any, userId: string, event: string) {
-  svcClient.from("analytics_events").insert({ user_id: userId, event }).then(() => {});
+export function trackEvent(svcClient: SupabaseClient, userId: string, event: string) {
+  void Promise.resolve(svcClient.from("analytics_events").insert({ user_id: userId, event })).catch(() => {});
 }
 
 /**

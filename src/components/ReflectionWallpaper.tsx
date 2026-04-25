@@ -165,8 +165,9 @@ export function ReflectionWallpaper({ message, mood, context, haiku, variant = '
 
       const finalUrl = await compositeWallpaper(data.image, message, haiku);
       setCompositeUrl(finalUrl);
-    } catch (e: any) {
-      toast.error(e.message || t('wallpaper.failedToGenerate'));
+    } catch (e: unknown) {
+      const msg = e instanceof Error ? e.message : t('wallpaper.failedToGenerate');
+      toast.error(msg);
       setOpen(false);
     } finally {
       setGenerating(false);

@@ -12,22 +12,28 @@ import {
   fetchOnChainSnapshot,
   fetchGroundingSourcesForOrchestrate,
   fetchSignalSourcesForOrchestrate,
-  recencyHintsFromReflectionRows,
+  pauseRecencyInputs,
+  recencyHintsFromPauseArtifacts,
 } from "../_shared/pause-cron-parity.ts";
 import { sanitizePromptInput, sanitizePromptArray } from "../_shared/sanitize.ts";
 import { isCumulativeMoveTriggered } from "../_shared/volatility-thresholds.ts";
+import { unknownErrorForLog, webPushStatusCode } from "../_shared/log-unknown-error.ts";
 import {
-  holzenEdgeError,
-  holzenEdgeLog,
-  holzenEdgeRun,
-  holzenEdgeWarn,
-} from "../_shared/holzen-edge-log.ts";
-import { withRequestLogging } from "../_shared/with-request-logging.ts";
+  withRequestLogging,
+  type RequestLoggingContext,
+} from "../_shared/with-request-logging.ts";
+
+type VolatilityFnLog = RequestLoggingContext["log"];
 import { coingeckoHeaders } from "../_shared/coingecko.ts";
 import {
   holzenLovableEmailLogger,
   sendLovableEmailMessage,
 } from "../_shared/lovable-email.ts";
+import {
+  bucketChangePercent,
+  computeContextFingerprint,
+  upsertPauseAiArtifact,
+} from "../_shared/pause.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -37,14 +43,21 @@ const corsHeaders = {
 
 const DEFAULT_COOLDOWN_MS = 6 * 60 * 60 * 1000; // 6 hours fallback
 
-async function fetchWithRetry(url: string, retries = 3, delayMs = 2000): Promise<Response> {
+async function fetchWithRetry(
+  url: string,
+  log: VolatilityFnLog,
+  retries = 3,
+  delayMs = 2000,
+): Promise<Response> {
   for (let i = 0; i < retries; i++) {
     const res = await fetch(url, { headers: coingeckoHeaders() });
     if (res.ok) return res;
-    holzenEdgeWarn("volatility", "CoinGecko HTTP retry", {
+    log.warn("check_volatility_coingecko", {
+      holzen_event: "check_volatility_cron",
+      phase: "coingecko_http_retry",
       attempt: i + 1,
       status: res.status,
-      willRetry: i < retries - 1,
+      will_retry: i < retries - 1,
     });
     await res.text(); // consume body
     if (i < retries - 1) await new Promise((r) => setTimeout(r, delayMs * (i + 1)));
@@ -65,11 +78,48 @@ type BtcVolatilityMetrics = {
   cumulativeDirection: string;
 };
 
-async function fetchBtcVolatilityForCurrency(vsCurrency: string): Promise<BtcVolatilityMetrics> {
+/** Row shape from the `profiles` select in this handler. */
+interface VolatilityProfile {
+  user_id: string;
+  threshold?: number | null;
+  threshold_down?: number | null;
+  cumulative_threshold?: number | null;
+  hold_goal_currency?: string | null;
+  email_notifications?: boolean | null;
+  last_trigger_at?: string | null;
+  cooldown_hours?: number | null;
+  reflection_tone?: string | null;
+  companion_haiku?: boolean | null;
+  companion_grounding?: boolean | null;
+  companion_signal?: boolean | null;
+  companion_zoom_out?: boolean | null;
+  companion_history?: boolean | null;
+  quiet_hours_start?: number | null;
+  quiet_hours_end?: number | null;
+  timezone?: string | null;
+  language?: string | null;
+  snoozed_until?: string | null;
+  custom_prompt?: string | null;
+  reflection_style?: string | null;
+  motivations?: unknown;
+  mantra?: string | null;
+  grounding_activities?: unknown;
+}
+
+async function fetchBtcVolatilityForCurrency(
+  vsCurrency: string,
+  log: VolatilityFnLog,
+): Promise<BtcVolatilityMetrics> {
   const cur = vsCurrency.toLowerCase();
   const [res1d, res7d] = await Promise.all([
-    fetchWithRetry(`https://api.coingecko.com/api/v3/coins/bitcoin/market_chart?vs_currency=${cur}&days=1`),
-    fetchWithRetry(`https://api.coingecko.com/api/v3/coins/bitcoin/market_chart?vs_currency=${cur}&days=7`),
+    fetchWithRetry(
+      `https://api.coingecko.com/api/v3/coins/bitcoin/market_chart?vs_currency=${cur}&days=1`,
+      log,
+    ),
+    fetchWithRetry(
+      `https://api.coingecko.com/api/v3/coins/bitcoin/market_chart?vs_currency=${cur}&days=7`,
+      log,
+    ),
   ]);
 
   const data1d = await res1d.json();
@@ -100,10 +150,14 @@ async function sendNotificationEmail(
   email: string,
   reflection: string,
   context: string,
-  reflectionId: string | null,
+  pauseInstanceId: string | null,
+  log: VolatilityFnLog,
 ): Promise<boolean> {
   if (!Deno.env.get("LOVABLE_API_KEY")) {
-    holzenEdgeError("volatility-email", "LOVABLE_API_KEY not configured");
+    log.error("check_volatility_email", {
+      holzen_event: "check_volatility_cron",
+      phase: "lovable_api_key_not_configured",
+    });
     return false;
   }
 
@@ -121,7 +175,7 @@ async function sendNotificationEmail(
     </html>
   `;
 
-  // Each reflection has a unique UUID — perfect idempotency key. A retry of
+  // Each pause instance has a unique UUID — perfect idempotency key. A retry of
   // the same volatility cron (or a double-fire from pg_cron) never produces
   // a duplicate email within Lovable Email's idempotency window.
   const result = await sendLovableEmailMessage(
@@ -133,17 +187,31 @@ async function sendNotificationEmail(
     },
     {
       source: "volatility-email",
-      idempotencyKey: reflectionId ? `volatility:${reflectionId}` : undefined,
+      idempotencyKey: pauseInstanceId ? `volatility:${pauseInstanceId}` : undefined,
       logger: holzenLovableEmailLogger(
-        (m, d) => holzenEdgeLog("volatility-email", m, d),
-        (m, err) => holzenEdgeError("volatility-email", m, err),
+        (m, d) =>
+          log("check_volatility_email_dep", {
+            holzen_event: "check_volatility_cron",
+            phase: "volatility_email_dep",
+            message: m,
+            ...(d ?? {}),
+          }),
+        (m, data) =>
+          log.error("check_volatility_email_dep", {
+            holzen_event: "check_volatility_cron",
+            phase: "volatility_email_dep_error",
+            message: m,
+            ...(data ?? {}),
+          }),
       ),
     },
   );
 
   if (result.ok) {
-    holzenEdgeLog("volatility-email", "sent", {
-      toDomain: email.includes("@") ? email.split("@")[1] : "?",
+    log("check_volatility_email_sent", {
+      holzen_event: "check_volatility_cron",
+      phase: "volatility_email_sent",
+      recipient_host: email.includes("@") ? email.split("@")[1]!.toLowerCase() : "?",
       attempts: result.attempts,
     });
     return true;
@@ -153,19 +221,29 @@ async function sendNotificationEmail(
 
 serve(
   withRequestLogging("check-volatility", async ({ req, log, cid }) => {
-  holzenEdgeRun("volatility", "request", { method: req.method });
+  log("check_volatility_phase", {
+    holzen_event: "check_volatility_cron",
+    phase: "handler_enter",
+    method: req.method,
+  });
 
   // Auth: require service role key or cron secret
   const { verifyServiceAuth } = await import("../_shared/auth.ts");
   if (!verifyServiceAuth(req)) {
-    holzenEdgeRun("volatility", "auth rejected — use Bearer service_role or CRON_SECRET");
+    log.warn("check_volatility_phase", {
+      holzen_event: "check_volatility_cron",
+      phase: "service_auth_rejected",
+    });
     return new Response(JSON.stringify({ error: "Unauthorized" }), {
       status: 401,
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
   }
 
-  holzenEdgeRun("volatility", "auth ok");
+  log("check_volatility_phase", {
+    holzen_event: "check_volatility_cron",
+    phase: "service_auth_ok",
+  });
 
   try {
     const supabase = createCidSupabaseClient(
@@ -186,15 +264,20 @@ serve(
 
     if (profilesError) throw profilesError;
     if (!profiles || profiles.length === 0) {
-      holzenEdgeLog("volatility", "no profiles");
+      log("check_volatility_phase", {
+        holzen_event: "check_volatility_cron",
+        phase: "no_profiles",
+      });
       return new Response(JSON.stringify({ triggered: 0 }), {
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
 
+    const profileRows = profiles as VolatilityProfile[];
+
     const currencyCodes = new Set<string>();
-    for (const p of profiles) {
-      currencyCodes.add(normalizeHoldGoalCurrency((p as { hold_goal_currency?: string }).hold_goal_currency));
+    for (const p of profileRows) {
+      currencyCodes.add(normalizeHoldGoalCurrency(p.hold_goal_currency));
     }
     if (!currencyCodes.has("usd")) currencyCodes.add("usd");
 
@@ -202,10 +285,15 @@ serve(
       Promise.all(
         [...currencyCodes].map(async (c) => {
           try {
-            const m = await fetchBtcVolatilityForCurrency(c);
+            const m = await fetchBtcVolatilityForCurrency(c, log);
             return [c, m] as const;
           } catch (e) {
-            holzenEdgeError("volatility", `CoinGecko failed vs_currency=${c}`, e);
+            log.error("check_volatility_btc_fetch", {
+              holzen_event: "check_volatility_cron",
+              phase: "coingecko_failed",
+              vs_currency: c,
+              ...unknownErrorForLog(e),
+            });
             return [c, null] as const;
           }
         }),
@@ -219,7 +307,10 @@ serve(
       if (m) btcByCur.set(c, m);
     }
     if (!btcByCur.has("usd")) {
-      holzenEdgeError("volatility", "could not load USD BTC metrics");
+      log.error("check_volatility_btc_fetch", {
+        holzen_event: "check_volatility_cron",
+        phase: "usd_metrics_missing",
+      });
       return new Response(JSON.stringify({ error: "btc_fetch_failed" }), {
         status: 500,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
@@ -232,10 +323,12 @@ serve(
     }
 
     const usdPeek = btcByCur.get("usd")!;
-    holzenEdgeLog("volatility", "BTC sample + market context loaded", {
-      change24hPct: Number(usdPeek.changePercent.toFixed(2)),
-      change7dPct: Number(usdPeek.cumulativeChangePercent.toFixed(2)),
-      quoteCurrencies: btcByCur.size,
+    log("check_volatility_phase", {
+      holzen_event: "check_volatility_cron",
+      phase: "btc_sample_loaded",
+      change24h_pct: Number(usdPeek.changePercent.toFixed(2)),
+      change7d_pct: Number(usdPeek.cumulativeChangePercent.toFixed(2)),
+      quote_currencies: btcByCur.size,
     });
 
     // Helper: get user's local hour
@@ -259,7 +352,7 @@ serve(
       quietWindowsByUser.get(w.user_id)!.push(w);
     }
 
-    function isInQuietHours(p: any): boolean {
+    function isInQuietHours(p: VolatilityProfile): boolean {
       const tz = p.timezone || "UTC";
       const localHour = getUserLocalHour(tz);
 
@@ -299,34 +392,36 @@ serve(
 
     // Filter: must exceed at least one threshold AND not in cooldown AND not in quiet hours
     // Helper: check if user has an active snooze
-    function isSnoozed(p: any): boolean {
+    function isSnoozed(p: VolatilityProfile): boolean {
       const snoozedUntil = p.snoozed_until;
       if (!snoozedUntil) return false;
       return new Date(snoozedUntil).getTime() > Date.now();
     }
 
-    const eligible = profiles.filter((p) => {
-      const b = metricsForProfile(p as { hold_goal_currency?: string | null });
+    const eligible = profileRows.filter((p) => {
+      const b = metricsForProfile(p);
       const absChange = Math.abs(b.changePercent);
       const effectiveThreshold = b.direction === "down"
-        ? ((p as any).threshold_down ?? p.threshold ?? 5)
+        ? (p.threshold_down ?? p.threshold ?? 5)
         : (p.threshold ?? 5);
       const dailyTriggered = absChange >= effectiveThreshold;
       const cumulativeTriggered = isCumulativeMoveTriggered(
         b.cumulativeChangePercent,
-        (p as any).cumulative_threshold,
+        p.cumulative_threshold,
       );
       if (!dailyTriggered && !cumulativeTriggered) return false;
       if (isInQuietHours(p)) return false;
       if (isSnoozed(p)) return false;
       if (!p.last_trigger_at) return true;
-      const cooldownMs = ((p as any).cooldown_hours ?? 6) * 60 * 60 * 1000;
+      const cooldownMs = (p.cooldown_hours ?? 6) * 60 * 60 * 1000;
       return new Date(p.last_trigger_at).getTime() < Date.now() - cooldownMs;
     });
 
-    holzenEdgeLog("volatility", "eligible users", {
+    log("check_volatility_phase", {
+      holzen_event: "check_volatility_cron",
+      phase: "eligible_users",
       eligible: eligible.length,
-      totalProfiles: profiles.length,
+      total_profiles: profileRows.length,
     });
 
     // Parse and configure VAPID once — all users share the same keys
@@ -353,14 +448,22 @@ serve(
               const jwk = await crypto.subtle.exportKey("jwk", cryptoKey);
               if (jwk.d) privateKey = jwk.d;
             } catch (decodeErr) {
-              holzenEdgeError("volatility-push", "VAPID PKCS8 decode failed", decodeErr);
+              log.error("check_volatility_push", {
+                holzen_event: "check_volatility_cron",
+                phase: "vapid_pkcs8_decode_failed",
+                ...unknownErrorForLog(decodeErr),
+              });
             }
           }
         }
         webpush.setVapidDetails("mailto:noreply@holzen.app", vapidPublicKey, privateKey);
         vapidReady = true;
       } catch (vapidErr) {
-        holzenEdgeError("volatility-push", "VAPID setup error", vapidErr);
+        log.error("check_volatility_push", {
+          holzen_event: "check_volatility_cron",
+          phase: "vapid_setup_error",
+          ...unknownErrorForLog(vapidErr),
+        });
       }
     }
 
@@ -376,90 +479,71 @@ serve(
       // within the cooldown window — every concurrent or duplicated tick
       // (pg_cron retry, manual invoke, overlapping schedule) is rejected
       // before any LLM call is made.
-      const cooldownHours = (profile as any).cooldown_hours ?? 6;
+      const cooldownHours = profile.cooldown_hours ?? 6;
       const { data: claimed, error: claimError } = await supabase.rpc(
         "claim_trigger_slot",
         { _user_id: profile.user_id, _cooldown_hours: cooldownHours },
       );
       if (claimError) {
-        holzenEdgeError("volatility", "claim_trigger_slot failed", claimError);
+        log.error("check_volatility_claim", {
+          holzen_event: "check_volatility_cron",
+          phase: "claim_trigger_slot_failed",
+          ...unknownErrorForLog(claimError),
+        });
         return false;
       }
       if (claimed !== true) {
-        holzenEdgeLog("volatility", "skip — cooldown slot already claimed", {
-          userIdPrefix: String(profile.user_id).slice(0, 8),
-          cooldownHours,
+        log("check_volatility_skip", {
+          holzen_event: "check_volatility_cron",
+          phase: "cooldown_slot_already_claimed",
+          user_id_prefix: String(profile.user_id).slice(0, 8),
+          cooldown_hours: cooldownHours,
         });
         return false;
       }
 
-      const userBtc = metricsForProfile(profile as { hold_goal_currency?: string | null });
+      const userBtc = metricsForProfile(profile);
       const absChange = Math.abs(userBtc.changePercent);
       const dir = userBtc.direction === "down" ? "down" : "up";
       const pct = absChange.toFixed(1);
       let ctx = `BTC is ${dir} ${pct}% in the last 24 hours.`;
-      if (isCumulativeMoveTriggered(userBtc.cumulativeChangePercent, (profile as any).cumulative_threshold)) {
+      if (isCumulativeMoveTriggered(userBtc.cumulativeChangePercent, profile.cumulative_threshold)) {
         const cumDir = userBtc.cumulativeDirection === "down" ? "down" : "up";
         const absCum = Math.abs(userBtc.cumulativeChangePercent);
         ctx += ` Over 7 days, it's ${cumDir} ${absCum.toFixed(1)}%.`;
       }
       ctx = enrichAutomaticPauseContext(ctx, fearGreedSnapshot, onChainSnapshot);
 
-      const p = profile as Record<string, unknown>;
-      const tone = (p.reflection_tone as string) || "stoic";
-      const userLang = (p.language as string) || "en";
+      const tone = profile.reflection_tone || "stoic";
+      const userLang = profile.language || "en";
       const style =
-        typeof p.reflection_style === "string" && p.reflection_style.length > 0
-          ? p.reflection_style
+        typeof profile.reflection_style === "string" && profile.reflection_style.length > 0
+          ? profile.reflection_style
           : "standard";
-      const customPrompt = sanitizePromptInput(p.custom_prompt as string | null | undefined, 500);
-      const motivations = sanitizePromptArray(p.motivations as string[] | null | undefined, 10, 100);
-      const mantra = sanitizePromptInput(p.mantra as string | null | undefined, 200);
+      const customPrompt = sanitizePromptInput(profile.custom_prompt ?? undefined, 500);
+      const motivations = sanitizePromptArray(
+        Array.isArray(profile.motivations) ? (profile.motivations as string[]) : undefined,
+        10,
+        100,
+      );
+      const mantra = sanitizePromptInput(profile.mantra ?? undefined, 200);
       const groundingActivities = sanitizePromptArray(
-        p.grounding_activities as string[] | null | undefined,
+        Array.isArray(profile.grounding_activities) ? (profile.grounding_activities as string[]) : undefined,
         10,
         100,
       );
 
-      let moodHistory: MoodHistoryEntry[] | undefined;
-      let recentMessages: string[] | undefined;
-      let recentHaikus: string[] | undefined;
-      let rowsForRecency: Parameters<typeof recencyHintsFromReflectionRows>[0] = [];
-      try {
-        const { data: recentRows } = await supabase
-          .from("v_reflection_with_companions")
-          .select(
-            "mood, outcome, created_at, message, haiku, signal_title, signal_source, grounding_title, companion_grounding_url, zoom_out_data, history_insight_data",
-          )
-          .eq("user_id", profile.user_id)
-          .order("created_at", { ascending: false })
-          .limit(20);
-        if (recentRows?.length) {
-          rowsForRecency = recentRows as Parameters<typeof recencyHintsFromReflectionRows>[0];
-          const rows = recentRows as Array<{
-            mood?: string | null;
-            outcome?: string | null;
-            created_at?: string;
-            message?: string | null;
-            haiku?: string | null;
-          }>;
-          const withMood = rows.filter((r) => r.mood);
-          if (withMood.length > 0) {
-            moodHistory = withMood.map((r) => ({
-              mood: r.mood as string,
-              outcome: r.outcome ?? null,
-              created_at: r.created_at,
-            }));
-          }
-          const msgs = rows.filter((r) => r.message).map((r) => r.message as string);
-          if (msgs.length > 0) recentMessages = msgs.slice(0, 5);
-          const haikus = rows.filter((r) => r.haiku).map((r) => r.haiku as string);
-          if (haikus.length > 0) recentHaikus = haikus.slice(0, 5);
-        }
-      } catch { /* non-fatal */ }
-
-      const recency = recencyHintsFromReflectionRows(rowsForRecency);
+      // Pause V2: pull mood history + reflection/haiku pools from the
+      // new tables, and companion recency hints from pause_ai_artifacts.
+      const [{ moodHistory, recentMessages, recentHaikus }, recency] = await Promise.all([
+        pauseRecencyInputs(supabase, profile.user_id),
+        recencyHintsFromPauseArtifacts(supabase, profile.user_id),
+      ]);
       const lastReportedMood = moodHistory?.[0]?.mood;
+      // Keep MoodHistoryEntry shape for the AI call below.
+      const moodHistoryForAi: MoodHistoryEntry[] | undefined = moodHistory
+        ? moodHistory.map((m) => ({ mood: m.mood, outcome: m.outcome, created_at: m.created_at }))
+        : undefined;
 
       // Parity with holzen-reflect: same allowlisted event before reflection AI so per-user
       // throttle (companion-orchestrate checkRateLimit) sees a consistent signal for manual vs cron.
@@ -478,11 +562,11 @@ serve(
         tone,
         style,
         language: userLang,
-        currency: typeof p.hold_goal_currency === "string" && p.hold_goal_currency.trim()
-          ? p.hold_goal_currency.trim().toUpperCase()
+        currency: typeof profile.hold_goal_currency === "string" && profile.hold_goal_currency.trim()
+          ? profile.hold_goal_currency.trim().toUpperCase()
           : "USD",
         severity: absChange,
-        moodHistory,
+        moodHistory: moodHistoryForAi,
         recentHaikus,
         recentMessages,
         customPrompt: customPrompt || undefined,
@@ -491,8 +575,10 @@ serve(
         groundingActivities: groundingActivities.length > 0 ? groundingActivities : undefined,
       });
       if (!result?.message) {
-        holzenEdgeLog("volatility", "reflection generation returned empty", {
-          userIdPrefix: String(profile.user_id).slice(0, 8),
+        log("check_volatility_skip", {
+          holzen_event: "check_volatility_cron",
+          phase: "reflection_generation_empty",
+          user_id_prefix: String(profile.user_id).slice(0, 8),
         });
         return false;
       }
@@ -510,40 +596,147 @@ serve(
         },
       }).then(() => {});
 
-      const haiku = (profile as any).companion_haiku ? result.haiku : null;
+      const haiku = profile.companion_haiku ? result.haiku : null;
 
-      const { data: insertedReflection } = await supabase
-        .from("reflections")
-        .insert({
-          user_id: profile.user_id,
-          message: result.message,
-          context: ctx,
-          haiku,
-          // Tag provenance so admin analytics can distinguish cron-generated
-          // rows and the purge job can safely sweep ignored-notification
-          // orphans (see 20260420220000 migration + docs/ops/cron-setup.md).
-          source: "cron_volatility",
-          ...(lastReportedMood ? { mood: lastReportedMood } : {}),
+      // Pause V2: create (or reuse) the pause instance via the
+      // service-role RPC, which serializes per-user with an advisory
+      // lock and implements the fingerprint idempotency rule
+      // (matching fingerprint -> reuse; differing -> expire old with
+      // context_lost + supersede; recent-dismissal match -> skip).
+      const directionBucket = userBtc.direction === "down" ? "down" : "up";
+      const severityBand = absChange >= 10 ? "high" : absChange >= 5 ? "moderate" : "mild";
+      const fingerprint = await computeContextFingerprint({
+        templateSlug: "volatility_v1",
+        directionBucket,
+        severityBand,
+        dailyBucketPct: bucketChangePercent(userBtc.changePercent),
+        cumulativeBucketPct: bucketChangePercent(userBtc.cumulativeChangePercent),
+        fearGreedBand: fearGreedSnapshot?.label ?? null,
+        onChainBand: onChainSnapshot
+          ? ([onChainSnapshot.mempoolSize, onChainSnapshot.fastestFee, onChainSnapshot.medianFee].filter(
+              (x) => typeof x === "number" && Number.isFinite(x),
+            ) as number[]).join(":") || null
+          : null,
+      });
+
+      const { data: createRes, error: createErr } = await supabase.rpc(
+        "pause_create_or_reuse_as",
+        {
+          p_user_id: profile.user_id,
+          p_template_slug: "volatility_v1",
+          p_source: "cron_volatility",
+          p_context_snapshot: {
+            change_24h_pct: userBtc.changePercent,
+            change_7d_pct: userBtc.cumulativeChangePercent,
+            direction: userBtc.direction,
+            severity: severityBand,
+            context_text: ctx,
+            fear_greed: fearGreedSnapshot ?? null,
+            on_chain: onChainSnapshot ?? null,
+            last_reported_mood: lastReportedMood ?? null,
+          },
+          p_context_rule_result: {
+            triggered: [
+              Math.abs(userBtc.changePercent) >= (profile.threshold ?? 5)
+                ? "daily"
+                : null,
+              isCumulativeMoveTriggered(
+                userBtc.cumulativeChangePercent,
+                profile.cumulative_threshold,
+              )
+                ? "cumulative"
+                : null,
+            ].filter(Boolean),
+          },
+          p_context_fingerprint: fingerprint,
+        },
+      );
+      if (createErr) {
+        log.error("check_volatility_pause_create", {
+          holzen_event: "check_volatility_cron",
+          phase: "pause_create_or_reuse_as_failed",
+          ...unknownErrorForLog(createErr),
+        });
+        return false;
+      }
+
+      const pauseInstanceId: string | null = createRes?.instance_id ?? null;
+      const wasCreated: boolean = createRes?.created === true;
+      const reusedReason: string | null = createRes?.reused_reason ?? null;
+
+      if (!pauseInstanceId) {
+        // Recent-dismissal match: user already walked away from this
+        // context; don't re-push.
+        log("check_volatility_skip", {
+          holzen_event: "check_volatility_cron",
+          phase: "recent_dismissal_same_fingerprint",
+          user_id_prefix: String(profile.user_id).slice(0, 8),
+          reused_reason: reusedReason,
+        });
+        return false;
+      }
+
+      if (!wasCreated) {
+        // Fingerprint match with an already-open pause: reuse, don't
+        // re-dispatch a push.
+        log("check_volatility_skip", {
+          holzen_event: "check_volatility_cron",
+          phase: "open_pause_covers_context",
+          user_id_prefix: String(profile.user_id).slice(0, 8),
+          instance_id_prefix: String(pauseInstanceId).slice(0, 8),
+          reused_reason: reusedReason,
+        });
+        return false;
+      }
+
+      // Write the reflection_text + (optional) haiku artifacts now that
+      // the instance exists.
+      await upsertPauseAiArtifact(supabase, {
+        instanceId: pauseInstanceId,
+        userId: profile.user_id,
+        kind: "reflection_text",
+        content: { message: result.message, context: ctx },
+        model: "lovable",
+        promptVersion: REFLECTION_PROMPT_VERSION,
+      }).catch((e) =>
+        log.error("check_volatility_artifact", {
+          holzen_event: "check_volatility_cron",
+          phase: "reflection_text_upsert_failed",
+          ...unknownErrorForLog(e),
         })
-        .select("id")
-        .single();
+      );
+      if (haiku) {
+        await upsertPauseAiArtifact(supabase, {
+          instanceId: pauseInstanceId,
+          userId: profile.user_id,
+          kind: "haiku",
+          content: { haiku },
+          model: "lovable",
+          promptVersion: REFLECTION_PROMPT_VERSION,
+        }).catch((e) =>
+          log.error("check_volatility_artifact", {
+            holzen_event: "check_volatility_cron",
+            phase: "haiku_upsert_failed",
+            ...unknownErrorForLog(e),
+          })
+        );
+      }
 
-      // Keep Library parity with manual pauses: every generated reflection
-      // gets a `source_type='reflection'` bookmark row.
-      const libraryUpsert = insertedReflection?.id
-        ? supabase.from("library_items").upsert(
-            {
-              user_id: profile.user_id,
-              type: "bookmark",
-              title: "Reflection",
-              body: result.message,
-              source_type: "reflection",
-              reflection_id: insertedReflection.id,
-              tags: ["reflection"],
-            },
-            { onConflict: "user_id,reflection_id,source_type", ignoreDuplicates: true },
-          )
-        : Promise.resolve({ error: null });
+      // Keep Library parity with manual pauses: every generated pause
+      // gets a `source_type='reflection'` bookmark row keyed on
+      // pause_instance_id.
+      const libraryUpsert = supabase.from("library_items").upsert(
+        {
+          user_id: profile.user_id,
+          type: "bookmark",
+          title: "Pause",
+          body: result.message,
+          source_type: "reflection",
+          pause_instance_id: pauseInstanceId,
+          tags: ["reflection"],
+        },
+        { onConflict: "user_id,pause_instance_id,source_type", ignoreDuplicates: true },
+      );
 
       // Profile update and orchestrator dispatch can run in parallel
       const profileUpdate = supabase
@@ -551,12 +744,11 @@ serve(
         .update({ last_message: result.message, last_context: ctx })
         .eq("user_id", profile.user_id);
 
-      if (insertedReflection?.id) {
-        const reflectionId = insertedReflection.id;
-        const enableSignal = (p.companion_signal as boolean | undefined) ?? true;
-        const enableGrounding = (p.companion_grounding as boolean | undefined) ?? true;
-        const enableHistory = (p.companion_history as boolean | undefined) ?? true;
-        const enableZoomOut = (p.companion_zoom_out as boolean | undefined) ?? true;
+      {
+        const enableSignal = profile.companion_signal ?? true;
+        const enableGrounding = profile.companion_grounding ?? true;
+        const enableHistory = profile.companion_history ?? true;
+        const enableZoomOut = profile.companion_zoom_out ?? true;
 
         const signalSources = enableSignal
           ? await fetchSignalSourcesForOrchestrate(supabase, profile.user_id)
@@ -565,7 +757,7 @@ serve(
           ? await fetchGroundingSourcesForOrchestrate(supabase, profile.user_id)
           : undefined;
 
-        // Fire-and-forget orchestrator — same payload shape as manual pause (use-companion-data + holzen-reflect parity).
+        // Fire-and-forget orchestrator — same payload shape as manual pause.
         fetch(`${supabaseUrl}/functions/v1/companion-orchestrate`, {
           method: "POST",
           headers: {
@@ -576,13 +768,13 @@ serve(
           body: JSON.stringify({
             holzenInvokeSource: "cron_check_volatility",
             userId: profile.user_id,
-            reflectionId,
+            pauseInstanceId,
             context: ctx,
             language: userLang,
             reflectionMessage: result.message,
             severity: absChange,
             mood: lastReportedMood ?? null,
-            moodHistory: moodHistory ?? [],
+            moodHistory: moodHistoryForAi ?? [],
             signalSources,
             groundingSources,
             recentSignalSources: recency.recentSignalSources,
@@ -600,12 +792,27 @@ serve(
         }).then((res) => {
           if (!res.ok) {
             res.text().then((t) =>
-              holzenEdgeError("volatility", `orchestrator HTTP ${res.status}`, t.slice(0, 300))
+              log.error("check_volatility_orchestrator", {
+                holzen_event: "check_volatility_cron",
+                phase: "orchestrator_http_error",
+                http_status: res.status,
+                response_prefix: t.slice(0, 300),
+              })
             );
           } else {
-            holzenEdgeLog("volatility", "orchestrator dispatched", { reflectionIdPrefix: reflectionId.slice(0, 8) });
+            log("check_volatility_orchestrator", {
+              holzen_event: "check_volatility_cron",
+              phase: "orchestrator_dispatched",
+              pause_instance_id_prefix: pauseInstanceId.slice(0, 8),
+            });
           }
-        }).catch((e) => holzenEdgeError("volatility", "orchestrator fetch error", e));
+        }).catch((e) =>
+          log.error("check_volatility_orchestrator", {
+            holzen_event: "check_volatility_cron",
+            phase: "orchestrator_fetch_error",
+            ...unknownErrorForLog(e),
+          })
+        );
       }
 
       const [{ error: profileUpdateErr }, { error: libraryUpsertErr }] = await Promise.all([
@@ -613,14 +820,24 @@ serve(
         libraryUpsert,
       ]);
       if (profileUpdateErr) {
-        holzenEdgeError("volatility", "profile update failed", profileUpdateErr.message);
+        log.error("check_volatility_profile", {
+          holzen_event: "check_volatility_cron",
+          phase: "profile_update_failed",
+          ...unknownErrorForLog(profileUpdateErr),
+        });
         return false;
       }
       if (libraryUpsertErr) {
-        holzenEdgeError("volatility", "library reflection upsert failed", libraryUpsertErr.message);
+        log.error("check_volatility_library", {
+          holzen_event: "check_volatility_cron",
+          phase: "library_reflection_upsert_failed",
+          ...unknownErrorForLog(libraryUpsertErr),
+        });
       }
 
-      // Email + push + in-app bell notification in parallel
+      // Email + push. In-app bell is emitted by the
+      // notifications_from_pause_instances trigger when the instance was
+      // created above — no explicit insert needed here.
       await Promise.all([
         // Email
         (async () => {
@@ -632,7 +849,8 @@ serve(
               email,
               result.message,
               ctx,
-              insertedReflection?.id ?? null,
+              pauseInstanceId,
+              log,
             );
           }
         })(),
@@ -648,7 +866,7 @@ serve(
           const payload = JSON.stringify({
             title: "Holzen",
             body: result.message.slice(0, 120),
-            reflectionId: insertedReflection?.id ?? null,
+            pauseInstanceId,
             action: "pause_ready",
           });
           await Promise.all(pushSubs.map(async (sub) => {
@@ -660,33 +878,32 @@ serve(
                 payload,
                 { notificationTag: "volatility" }
               );
-            } catch (pushErr: any) {
-              holzenEdgeError("volatility-push", "send failed", {
-                message: pushErr?.message,
-                statusCode: pushErr?.statusCode,
+            } catch (pushErr: unknown) {
+              const sc = webPushStatusCode(pushErr);
+              log.error("check_volatility_push", {
+                holzen_event: "check_volatility_cron",
+                phase: "push_send_failed",
+                status_code: sc,
                 cid,
+                ...unknownErrorForLog(pushErr),
               });
-              if (pushErr.statusCode === 410 || pushErr.statusCode === 404) {
+              if (sc === 410 || sc === 404) {
                 await supabase.from("push_subscriptions").delete().eq("endpoint", sub.endpoint);
               }
             }
           }));
         })(),
-        // In-app bell record
-        supabase.from("pause_notifications").insert({
-          user_id: profile.user_id,
-          reflection_id: insertedReflection?.id ?? null,
-          message: result.message,
-          context: ctx,
-          severity: absChange >= 10 ? "high" : absChange >= 5 ? "moderate" : "mild",
-        }),
       ]);
 
       return true;
     }));
 
     const triggered = results.filter(Boolean).length;
-    holzenEdgeLog("volatility", "run complete", { triggered });
+    log("check_volatility_complete", {
+      holzen_event: "check_volatility_cron",
+      phase: "run_complete",
+      triggered,
+    });
 
     return new Response(
       JSON.stringify({ triggered, btcChangeUsd: usdPeek.changePercent, quoteCurrenciesLoaded: btcByCur.size }),
@@ -696,7 +913,11 @@ serve(
     );
   } catch (e) {
     const msg = e instanceof Error ? e.message : String(e);
-    holzenEdgeError("volatility", "uncaught error", msg);
+    log.error("check_volatility_uncaught", {
+      holzen_event: "check_volatility_cron",
+      phase: "uncaught",
+      ...unknownErrorForLog(e),
+    });
     return new Response(JSON.stringify({ error: msg }), {
       status: 500,
       headers: { ...corsHeaders, "Content-Type": "application/json" },

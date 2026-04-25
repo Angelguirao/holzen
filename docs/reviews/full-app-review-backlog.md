@@ -48,14 +48,14 @@ Treat Phases **1–2** as the **product spine** for pause; **3–8** as the **ba
 | Route | Est. (h) | Notes |
 |-------|----------|--------|
 | `/pause` | 6–10 | Deep UX + persistence; **Phase 2** covers pipeline—this row is extra UI/state edge cases if needed |
-| `/breathe` | 2–4 | |
-| `/ground` | 3–5 | |
-| `/ground/history` | 2–3 | Pair with `/ground` to save context |
-| `/ambient` | 2–4 | |
-| `/practice/checkin` | 2–4 | |
-| `/practice/journal` | 3–5 | Ties to `journal-prompt` and library/profile usage |
-| `/practice/bodyscan` | 2–4 | |
-| `/practice/replay` | 2–4 | |
+| `/tools/breathe` | 2–4 | |
+| `/tools/ground` | 3–5 | |
+| `/tools/ground/history` | 2–3 | Pair with `/tools/ground` to save context |
+| `/tools/ambient` | 2–4 | |
+| `/tools/practice/checkin` | 2–4 | |
+| `/tools/practice/journal` | 3–5 | Ties to `journal-prompt` and library/Journey usage |
+| `/tools/practice/bodyscan` | 2–4 | |
+| `/tools/practice/replay` | 2–4 | |
 
 **Subtotal (immersive + practice, separate passes):** roughly **24–40** hours.
 
@@ -64,8 +64,10 @@ Treat Phases **1–2** as the **product spine** for pause; **3–8** as the **ba
 | Route | Est. (h) | Notes |
 |-------|----------|--------|
 | `/library` | 4–7 | |
-| `/profile` | 3–5 | |
+| `/journey` | 3–5 | Journey hub (stats, insights, badges, letters, activity) |
+| `/tools` | 1–2 | Tools index in shell |
 | `/settings` | 5–8 | Subscription, language, notifications, account—overlaps billing edge review |
+| `/settings/about` | 0.5–1 | Changelog / feedback sub-surface |
 | `/admin` | 4–8 | Curated content and ops; depends on `VITE_ADMIN_USER_IDS` |
 
 ## Public and marketing
@@ -96,7 +98,7 @@ Assume **Phases 3–8** cover security and cron **once**. Use this table for **f
 | **Journal / grounding / ritual** | `journal-prompt`, `suggest-grounding`, `suggest-ritual` | 3–5 |
 | **Reflection / number** | `reflection-insights`, `holzen-number` | 2–4 |
 | **Letters / digests / nudges** | `deliver-letters`, `weekly-digest`, `monthly-report`, `personalized-nudge`, `night-reflection` | 5–10 |
-| **Ops / cron / data** | `check-followups`, `check-volatility`, `fetch-source-feeds`, `refresh-btc-prices`, `badge-notify`, … | 6–12 |
+| **Ops / cron / data** | `check-volatility`, `fetch-source-feeds`, `refresh-btc-prices`, `badge-notify`, … | 6–12 |
 | **Account / trust** | `delete-account`, `send-feedback`, `record-referral`, `auth-email-hook`, `process-referral-pending` | 3–6 |
 
 Full name list: [bruno/functions-catalog.md](../../bruno/functions-catalog.md).

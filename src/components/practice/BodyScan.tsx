@@ -48,7 +48,7 @@ export function BodyScan({ onComplete, textColor, ringColor, glowColor }: Props)
         hapticFeedback('success');
         const duration = Math.round((Date.now() - startTime.current) / 1000);
         if (user) {
-          supabase.from('practice_entries' as any).insert({
+          supabase.from('practice_entries').insert({
             user_id: user.id,
             type: 'bodyscan',
             duration_seconds: duration,

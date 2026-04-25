@@ -11,6 +11,7 @@
  * regardless of recency.
  */
 
+import type { SupabaseClient } from "https://esm.sh/@supabase/supabase-js@2.57.2";
 import { COMPANION_SERVE_FRESHNESS_DAYS } from "./companion-serve-freshness.ts";
 
 export interface LibraryEntry {
@@ -142,7 +143,7 @@ const LIBRARY_FRESHNESS_OVERSAMPLE = 5;
 const LIBRARY_MIN_CANDIDATE_POOL = 100;
 
 export async function searchLibrary(
-  svcClient: any,
+  svcClient: SupabaseClient,
   options: LibrarySearchOptions,
 ): Promise<LibraryEntry[]> {
   const returnLimit = options.limit ?? 20;
@@ -248,26 +249,26 @@ export async function searchLibrary(
  * Uses the same user_companion_serves table as cache tracking.
  */
 export function recordLibraryServe(
-  svcClient: any,
+  svcClient: SupabaseClient,
   userId: string | undefined,
   libraryEntryId: string,
   companionType: string,
 ) {
   if (!userId) return;
   // Use library entry ID in the cache_entry_id column (repurposed for both cache and library)
-  svcClient
-    .from("user_companion_serves")
-    .upsert(
-      {
-        user_id: userId,
-        cache_entry_id: libraryEntryId,
-        companion_type: companionType,
-        served_at: new Date().toISOString(),
-      },
-      { onConflict: "user_id,cache_entry_id" },
-    )
-    .then(() => {})
-    .catch((err: unknown) => {
+  void Promise.resolve(
+    svcClient
+      .from("user_companion_serves")
+      .upsert(
+        {
+          user_id: userId,
+          cache_entry_id: libraryEntryId,
+          companion_type: companionType,
+          served_at: new Date().toISOString(),
+        },
+        { onConflict: "user_id,cache_entry_id" },
+      ),
+  ).catch((err: unknown) => {
       try {
         console.warn(
           JSON.stringify({
@@ -297,7 +298,7 @@ export function recordLibraryServe(
  * starve library entirely on a transient failure.
  */
 async function getRecentlySeenLibraryIds(
-  svcClient: any,
+  svcClient: SupabaseClient,
   userId: string,
   companionType?: string,
 ): Promise<Set<string>> {
@@ -323,7 +324,9 @@ async function getRecentlySeenLibraryIds(
       return new Set();
     }
     if (!data) return new Set();
-    return new Set(data.map((r: any) => r.cache_entry_id));
+    return new Set(
+      data.map((r: { cache_entry_id?: string | null }) => r.cache_entry_id).filter((id): id is string => typeof id === "string"),
+    );
   } catch (e) {
     logLibraryRecentServesError("threw", {
       companion_type: companionType ?? null,

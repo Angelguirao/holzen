@@ -2,7 +2,21 @@ import { useTranslation } from 'react-i18next';
 import { motion } from 'framer-motion';
 import { Button } from '@/components/ui/button';
 import { LoadingButton } from '@/components/ui/loading-button';
-import { Sparkles, Wind, Brain, Infinity, Anchor, Lightbulb, BookOpen, Moon, Image, Mail, MessageSquare, Zap, Coins } from 'lucide-react';
+import {
+  Sparkles,
+  Wind,
+  Brain,
+  Infinity as InfinityIcon,
+  Anchor,
+  Lightbulb,
+  BookOpen,
+  Moon,
+  Image,
+  Mail,
+  MessageSquare,
+  Zap,
+  Coins,
+} from 'lucide-react';
 import { PRICING } from '@/lib/pricing';
 
 interface Props {
@@ -28,15 +42,15 @@ export function OnboardingReady({
 
   const recapItems = [
     motivations.length > 0 && {
-      label: t('onboarding.ready.recapWhy', 'Your why'),
-      value: motivations.map((m) => t(`settings.motivations.${m}`, m)).join(', '),
+      label: t('onboarding.ready.recapWhy', { defaultValue: 'Your why' }),
+      value: motivations.map((m) => t(`settings.motivations.${m}`, { defaultValue: m })).join(', '),
     },
     groundingActivities.length > 0 && {
-      label: t('onboarding.ready.recapGrounding', 'Grounds you'),
+      label: t('onboarding.ready.recapGrounding', { defaultValue: 'Grounds you' }),
       value: groundingActivities.slice(0, 3).join(', ') + (groundingActivities.length > 3 ? '…' : ''),
     },
     {
-      label: t('onboarding.ready.recapThreshold', 'Threshold'),
+      label: t('onboarding.ready.recapThreshold', { defaultValue: 'Threshold' }),
       value: `${threshold.toFixed(1)}%`,
     },
   ].filter(Boolean) as { label: string; value: string }[];
@@ -45,7 +59,7 @@ export function OnboardingReady({
     <div className="space-y-6">
       <motion.div className="space-y-2" {...stagger(0.1)}>
         <p className="text-xs font-mono tracking-[0.25em] uppercase text-muted-foreground">
-          {t('onboarding.ready.title', "You're set")}
+          {t('onboarding.ready.title', { defaultValue: "You're set" })}
         </p>
         <div className="h-px w-8 bg-foreground/20" />
       </motion.div>
@@ -70,11 +84,17 @@ export function OnboardingReady({
       <motion.div className="space-y-4" {...stagger(0.25)}>
         <div className="space-y-2">
           <p className="text-[10px] font-mono tracking-[0.2em] uppercase text-muted-foreground/40">
-            {t('onboarding.ready.freePlan', 'Free')}
+            {t('onboarding.ready.freePlan', { defaultValue: 'Free' })}
           </p>
           {[
-            { icon: Wind, text: t('onboarding.ready.featurePauses', '{{count}} pauses per month', { count: PRICING.freeReflectionsPerMonth }) },
-            { icon: Brain, text: t('onboarding.ready.featureAI', 'AI companions in every pause') },
+            {
+              icon: Wind,
+              text: t('onboarding.ready.featurePauses', {
+                count: PRICING.freeReflectionsPerMonth,
+                defaultValue: '{{count}} pauses per month',
+              }),
+            },
+            { icon: Brain, text: t('onboarding.ready.featureAI', { defaultValue: 'AI companions in every pause' }) },
           ].map(({ icon: Icon, text }, i) => (
             <div key={i} className="flex items-center gap-2.5">
               <Icon className="h-3 w-3 text-muted-foreground/40 shrink-0" />
@@ -85,17 +105,35 @@ export function OnboardingReady({
 
         <div className="space-y-2">
           <p className="text-[10px] font-mono tracking-[0.2em] uppercase text-foreground/60">
-            {t('onboarding.ready.proPlan', 'Pro · ${{price}}/mo', { price: PRICING.monthlyPrice })}
+            {t('onboarding.ready.proPlan', { price: PRICING.monthlyPrice, defaultValue: 'Pro · ${{price}}/mo' })}
           </p>
           {[
-            { icon: Infinity, text: t('onboarding.ready.proUnlimited', 'Unlimited pauses') },
-            { icon: Anchor, text: t('onboarding.ready.proGrounding', 'AI-guided grounding & stillness') },
-            { icon: Lightbulb, text: t('onboarding.ready.proInsights', 'AI pattern insights across pauses') },
-            { icon: Moon, text: t('onboarding.ready.proNight', 'Evening reflection prompts') },
-            { icon: BookOpen, text: t('onboarding.ready.proLibrary', 'Personal library & collections') },
-            { icon: Mail, text: t('onboarding.ready.proLetters', 'Letters to your future self') },
-            { icon: MessageSquare, text: t('onboarding.ready.proCompanions', '{{count}} companion deep-dives included / month', { count: PRICING.proCompanionUnlocks }) },
-            { icon: Image, text: t('onboarding.ready.proWallpapers', '{{count}} AI wallpapers included / month', { count: PRICING.proWallpapers }) },
+            { icon: InfinityIcon, text: t('onboarding.ready.proUnlimited', { defaultValue: 'Unlimited pauses' }) },
+            {
+              icon: Anchor,
+              text: t('onboarding.ready.proGrounding', { defaultValue: 'AI-guided grounding & stillness' }),
+            },
+            {
+              icon: Lightbulb,
+              text: t('onboarding.ready.proInsights', { defaultValue: 'AI pattern insights across pauses' }),
+            },
+            { icon: Moon, text: t('onboarding.ready.proNight', { defaultValue: 'Evening reflection prompts' }) },
+            { icon: BookOpen, text: t('onboarding.ready.proLibrary', { defaultValue: 'Personal library & collections' }) },
+            { icon: Mail, text: t('onboarding.ready.proLetters', { defaultValue: 'Letters to your future self' }) },
+            {
+              icon: MessageSquare,
+              text: t('onboarding.ready.proCompanions', {
+                count: PRICING.proCompanionUnlocks,
+                defaultValue: '{{count}} companion deep-dives included / month',
+              }),
+            },
+            {
+              icon: Image,
+              text: t('onboarding.ready.proWallpapers', {
+                count: PRICING.proWallpapers,
+                defaultValue: '{{count}} AI wallpapers included / month',
+              }),
+            },
           ].map(({ icon: Icon, text }, i) => (
             <div key={i} className="flex items-center gap-2.5">
               <Icon className="h-3 w-3 text-foreground/50 shrink-0" />
@@ -110,19 +148,20 @@ export function OnboardingReady({
             power users. */}
         <div className="space-y-2 pt-1">
           <p className="text-[10px] font-mono tracking-[0.2em] uppercase text-foreground/60">
-            {t('onboarding.ready.proPlusPlan', 'Pro+ · ${{price}}/mo', { price: PRICING.proPlusMonthlyPrice })}
+            {t('onboarding.ready.proPlusPlan', {
+              price: PRICING.proPlusMonthlyPrice,
+              defaultValue: 'Pro+ · ${{price}}/mo',
+            })}
           </p>
           <div className="flex items-start gap-2.5">
             <Zap className="h-3 w-3 text-foreground/50 shrink-0 mt-0.5" />
             <span className="text-xs text-foreground/70 leading-snug">
-              {t(
-                'onboarding.ready.proPlusSummary',
-                'Everything in Pro, with {{companions}} companion deep-dives & {{wallpapers}} AI wallpapers included / month',
-                {
-                  companions: PRICING.proPlusCompanionUnlocks,
-                  wallpapers: PRICING.proPlusWallpapers,
-                },
-              )}
+              {t('onboarding.ready.proPlusSummary', {
+                companions: PRICING.proPlusCompanionUnlocks,
+                wallpapers: PRICING.proPlusWallpapers,
+                defaultValue:
+                  'Everything in Pro, with {{companions}} companion deep-dives & {{wallpapers}} AI wallpapers included / month',
+              })}
             </span>
           </div>
         </div>
@@ -133,16 +172,14 @@ export function OnboardingReady({
         <div className="flex items-start gap-2.5 pt-1">
           <Coins className="h-3 w-3 text-muted-foreground/40 shrink-0 mt-0.5" />
           <span className="text-[11px] text-muted-foreground/60 leading-snug">
-            {t(
-              'onboarding.ready.flexPacksHint',
-              'Top up anytime · Flex S: {{sCredits}} credits / ${{sPrice}} · Flex M: {{mCredits}} credits / ${{mPrice}}',
-              {
-                sCredits: PRICING.flexPackSCredits,
-                sPrice: PRICING.flexPackSPrice,
-                mCredits: PRICING.flexPackMCredits,
-                mPrice: PRICING.flexPackMPrice,
-              },
-            )}
+            {t('onboarding.ready.flexPacksHint', {
+              sCredits: PRICING.flexPackSCredits,
+              sPrice: PRICING.flexPackSPrice,
+              mCredits: PRICING.flexPackMCredits,
+              mPrice: PRICING.flexPackMPrice,
+              defaultValue:
+                'Top up anytime · Flex S: {{sCredits}} credits / ${{sPrice}} · Flex M: {{mCredits}} credits / ${{mPrice}}',
+            })}
           </span>
         </div>
       </motion.div>
@@ -152,20 +189,27 @@ export function OnboardingReady({
         <LoadingButton
           onClick={onStartTrial}
           loading={checkoutLoading}
-          loadingText={t('onboarding.ready.redirecting', 'Redirecting to checkout…')}
+          loadingText={t('onboarding.ready.redirecting', { defaultValue: 'Redirecting to checkout…' })}
           className="w-full font-mono text-xs h-10 gap-2"
         >
           <Sparkles className="h-3 w-3" />
-          {t('onboarding.ready.startTrial', 'Start {{days}}-day free trial · then ${{price}}/mo', { days: PRICING.trialDays, price: PRICING.monthlyPrice })}
+          {t('onboarding.ready.startTrial', {
+            days: PRICING.trialDays,
+            price: PRICING.monthlyPrice,
+            defaultValue: 'Start {{days}}-day free trial · then ${{price}}/mo',
+          })}
         </LoadingButton>
         <p className="text-center text-[10px] font-mono text-muted-foreground/40 -mt-1">
-          {t('onboarding.ready.trialFinePrint', 'Then ${{price}}/mo · Cancel anytime', { price: PRICING.monthlyPrice })}
+          {t('onboarding.ready.trialFinePrint', {
+            price: PRICING.monthlyPrice,
+            defaultValue: 'Then ${{price}}/mo · Cancel anytime',
+          })}
         </p>
         <button
           onClick={onBeginFree}
           className="w-full text-center text-[10px] font-mono text-muted-foreground/40 hover:text-foreground transition-colors py-2"
         >
-          {t('onboarding.ready.beginFree', 'Continue with free plan →')}
+          {t('onboarding.ready.beginFree', { defaultValue: 'Continue with free plan →' })}
         </button>
       </motion.div>
     </div>

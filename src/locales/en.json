@@ -3,9 +3,31 @@
     "home": "Home",
     "history": "History",
     "library": "Library",
+    "tools": "Tools",
+    "journey": "Journey",
     "profile": "Profile",
     "settings": "Settings",
     "breathe": "Breathe"
+  },
+  "ia": {
+    "crossLinkIntro": "See also:",
+    "crossLinkLibrary": "Library",
+    "crossLinkJourneyActivity": "Journey — Activity",
+    "crossLinkGroundHistory": "Grounding history"
+  },
+  "settingsAbout": {
+    "back": "Settings",
+    "title": "About, changelog & feedback",
+    "subtitle": "What’s new, app version, and a direct line to the team — separate from day-to-day preferences."
+  },
+  "roadmap": {
+    "pageTitle": "Roadmap — Holzen",
+    "pageDescription": "Product plans and updates",
+    "title": "Roadmap",
+    "body": "We do not host a live roadmap in the app right now. Follow the blog for release notes and direction, or read about why we built Holzen.",
+    "linkBlog": "Blog",
+    "linkAbout": "About Holzen",
+    "linkHome": "Sign in"
   },
   "common": {
     "back": "Back",
@@ -100,7 +122,8 @@
       "checkConnection": "Check your internet connection. Price data comes from CoinGecko and may be temporarily unavailable.",
       "aiTemporarilyUnavailable": "The AI service is temporarily unavailable. Your settings and data are safe — try again in a moment.",
       "unexpectedError": "An unexpected error occurred. Your data is safe."
-    }
+    },
+    "browseAllTools": "Browse all tools & experiences"
   },
   "history": {
     "recent": "Recent",
@@ -134,8 +157,43 @@
     "reflectionUnpinned": "Pause unpinned",
     "reflectionPinned": "Pause pinned to Home"
   },
+  "journey": {
+    "pageSubtitle": "Long-term progress, insights, and activity — not account settings (those live under Settings). Letters to your future self are under Tools.",
+    "documentTitle": "Holzen — Journey",
+    "activityExplainer": "A chronological log of pauses and practices. Your saved reflection cards and collections live in Library — browse and search there.",
+    "homeCardTitle": "Your journey",
+    "homeCardSubtitle": "Stats, insights, badges, and activity"
+  },
+  "admin": {
+    "subNavAria": "Admin sections",
+    "subNav": {
+      "overview": "Overview",
+      "smoke": "Edge smoke",
+      "sentry": "Sentry",
+      "edge": "Edge coverage"
+    }
+  },
+  "tools": {
+    "title": "Tools",
+    "subtitle": "Regulation, grounding, and practice — the same activities as on Home, listed in one place.",
+    "journeySectionTitle": "Journey (progress & log)",
+    "journeySectionSubtitle": "Long-term path and chronological activity. Letters live under Tools; the activity log is also on Journey → Activity.",
+    "activityJourneyLink": "Activity log",
+    "activityJourneyLinkDesc": "Chronological pauses and practices (same as Journey → Activity).",
+    "sessionToolsHeading": "Immersive tools",
+    "letters": "Letters to your future self",
+    "lettersDesc": "Sealed in calm or storm, opened when the market flips. Pro feature.",
+    "breathe": "Stillness (breathe)",
+    "breatheDesc": "A quiet, goal-free breathing space.",
+    "ambient": "Ambient mode",
+    "ambientDesc": "Gentle sound and color for a calmer state.",
+    "ground": "Ground",
+    "groundDesc": "Guided grounding from your activity tags and context.",
+    "groundHistory": "Ground journal",
+    "groundHistoryDesc": "History of past grounding sessions."
+  },
   "profile": {
-    "pageSubtitle": "Your streak, charts, letters, and journey — in one place.",
+    "pageSubtitle": "Your streak, charts, and journey — in one place. (Letters are under Tools.)",
     "stats": "Stats",
     "insights": "Insights",
     "badges": "Badges",
@@ -155,7 +213,7 @@
     "completeMoreReflections_other": "Complete {{count}} more pauses to unlock trend charts, mood analysis, and scatter plots.",
     "sealed": "Sealed",
     "delivered": "Delivered",
-    "noLettersYet": "No letters yet. Write one from the home page — your future self will thank you.",
+    "noLettersYet": "No letters yet. Open Tools → Letters to write one — your future self will thank you.",
     "deleteSealedLetter": "Delete sealed letter",
     "deleteDeliveredLetter": "Delete delivered letter",
     "deleteLetterDesc": "This will permanently delete this letter.",
@@ -172,6 +230,7 @@
     }
   },
   "settings": {
+    "jumpNavIntro": "Jump to",
     "pageSubtitle": "Thresholds, companions, notifications, and your account.",
     "title": "Settings",
     "you": "You",
@@ -209,7 +268,7 @@
       "curiosityDesc": "Learning about money"
     },
     "personalMantra": "Personal mantra",
-    "mantraDesc": "Optional. Your own words — shown during pauses and woven into AI reflections.",
+    "mantraDesc": "Optional. Your own words — shown during pauses and woven into AI pause copy.",
     "mantraPlaceholder": "e.g. I hold because time is on my side…",
     "btcMode": "1 BTC = 1 BTC",
     "btcModeDesc": "Strip away fiat noise. No prices, no percentages, no red or green. Just Bitcoin.",
@@ -217,11 +276,11 @@
     "displayCurrency": "Display currency",
     "displayCurrencyDesc": "Choose how BTC prices are displayed throughout the app.",
     "reflectionLanguage": "Language",
-    "reflectionLanguageDesc": "Choose the language for the entire app, including AI-generated reflections, haikus, and insights.",
+    "reflectionLanguageDesc": "Choose the language for the entire app, including AI pause prompts, haikus, and insights.",
     "cooldown": "Cooldown",
     "cooldownDesc": "Minimum time between automatic pauses.",
     "tone": "Tone",
-    "toneDesc": "Choose the voice of your pause reflections.",
+    "toneDesc": "Choose the voice of your AI pause copy.",
     "tones": {
       "stoic": "Stoic",
       "stoicDesc": "Grounded, like Marcus Aurelius",
@@ -233,10 +292,10 @@
       "bluntDesc": "Direct, no fluff"
     },
     "style": "Style",
-    "styleDesc": "Choose how your pause reflections are structured.",
+    "styleDesc": "Choose how your AI pause copy is structured.",
     "styles": {
       "standard": "Standard",
-      "standardDesc": "1-3 sentence reflection",
+      "standardDesc": "1-3 sentences for the reflect step",
       "oneLiner": "One-liner",
       "oneLinerDesc": "Single impactful sentence",
       "question": "Question",
@@ -247,10 +306,10 @@
       "koanDesc": "A zen paradox to sit with"
     },
     "customPrompt": "Custom prompt",
-    "customPromptDesc": "Add personal guidance the AI will weave into every pause reflection.",
+    "customPromptDesc": "Add personal guidance the AI will weave into every pause’s reflect step.",
     "customPromptPlaceholder": "Your personal reflection guidance…",
     "silentMode": "Silent mode",
-    "silentModeDesc": "Just \"BTC moved.\" — no reflection text.",
+    "silentModeDesc": "Just \"BTC moved.\" — no AI reflect-step text.",
     "enableSilentMode": "Enable silent mode",
     "hapticFeedback": "Haptic feedback",
     "hapticDesc": "Vibration feedback on interactions (mobile only).",
@@ -258,7 +317,10 @@
     "zenMode": "Zen mode",
     "zenModeDesc": "Strips the home screen to just the pause and breathing exercise.",
     "enableZenMode": "Enable zen mode",
-    "companionsDesc": "Choose which companion cards appear below your reflection. Turning one off hides that card only — the featured pause above may still include a similar insight when it fits.",
+    "notificationSound": "Notification sound",
+    "notificationSoundDesc": "Play a singing-bowl chime when a new pause message arrives.",
+    "enableSound": "Enable sound",
+    "companionsDesc": "Choose which companion cards appear below your featured pause. Turning one off hides that card only — the headline pause may still include a similar insight when it fits.",
     "companionLabels": {
       "breathing": "Breathing exercise",
       "haiku": "Haiku",
@@ -274,7 +336,7 @@
     "pushFinishBannerBody": "Your browser already allows notifications for this site, but this device is not registered for Holzen push yet. Use the button below to complete setup (same as turning push on).",
     "pushFinishBannerAction": "Enable push on this device",
     "digestFrequency": "Digest frequency",
-    "digestDesc": "How often you receive your reflection digest email.",
+    "digestDesc": "How often you receive your pause digest email.",
     "digestOptions": {
       "daily": "Daily",
       "weekly": "Weekly",
@@ -283,7 +345,7 @@
       "off": "Off"
     },
     "nightReflection": "Night reflection",
-    "nightReflectionDesc": "A nightly summary of your day's BTC movement and whether you reflected.",
+    "nightReflectionDesc": "A nightly summary of your day's BTC movement and whether you paused.",
     "enableNightReflection": "Enable night reflection",
     "deliveryTime": "Delivery time (local)",
     "quietHours": "Quiet hours",
@@ -351,9 +413,9 @@
     "firstNameOptional": "First name (optional)",
     "timezone": "Timezone: {{tz}}",
     "yourCompanions": "Your companions",
-    "companionIntro": "Each pause can include five companion tools below your reflection — tap to explore. You can hide any card in Settings; the headline pause may still surface that type of insight when it fits.",
+    "companionIntro": "Each pause can include five companion tools below your featured pause — tap to explore. You can hide any card in Settings; the headline pause may still surface that type of insight when it fits.",
     "yourWhy": "Why do you hold?",
-    "whyIntro": "Select what resonates. This shapes your reflections — grounding them in what actually matters to you.",
+    "whyIntro": "Select what resonates. This shapes your pause copy — grounding it in what actually matters to you.",
     "whyHint": "You can change this anytime in Settings.",
     "yourGrounding": "What grounds you?",
     "groundingIntro": "When volatility hits, what brings you back to center? The AI will suggest these during your pauses.",
@@ -594,7 +656,7 @@
       "grounding": "Ground Yourself",
       "groundingDesc": "Behavioral finance research in context",
       "zoomOut": "Zoom Out",
-      "zoomOutDesc": "BTC prices 1–5 years ago, your past reflections & deep-time perspective",
+      "zoomOutDesc": "BTC prices 1–5 years ago, your past pauses & deep-time perspective",
       "history": "Historical Echo",
       "historyDesc": "Financial history parallels & cross-asset analogies via research"
     },
@@ -830,6 +892,8 @@
     "title": "Library",
     "pageTitle": "Library — Holzen",
     "pageDescription": "Your activity, bookmarks, notes, and collections",
+    "iaClarifier": "This is for saved and browsable content (cards, notes, collections). A chronological log of activity lives under Journey → Activity.",
+    "linkActivityLog": "Activity log",
     "tabItems": "Items",
     "tabArchive": "Archive",
     "viewList": "List",
@@ -875,7 +939,15 @@
     "dateYesterday": "Yesterday",
     "dateThisWeek": "This week",
     "dateThisMonth": "This month",
-    "dateEarlier": "Earlier"
+    "dateEarlier": "Earlier",
+    "export": "Export",
+    "exportCsv": "CSV (.csv)",
+    "exportMarkdown": "Markdown (.md)",
+    "decisionLabel": "Decision",
+    "changeDecision": "Change",
+    "changeDecisionLabel": "Change decision",
+    "incompleteLabel": "No decision recorded",
+    "incompleteDescription": "What did you end up doing after this pause?"
   },
   "pause": {
     "youPaused": "You paused. That's the hardest part.",
@@ -1499,15 +1571,16 @@
     "noInsightsYet": "No insights generated yet. Click \"Generate\" to analyze your pause patterns.",
     "analyzingCount": "Analyzing {{count}} pauses…",
     "refreshRecommended": "Refresh recommended",
-    "reflectionsCount": "{{count}} pauses"
+    "reflectionsCount": "{{count}} pauses",
+    "pauseSessionsCount": "{{count}} pauses"
   },
   "wallpaper": {
     "generating": "Generating wallpaper…",
     "carry": "Carry your pause with you.",
     "wallpaper": "Wallpaper",
     "generateTitle": "Generate wallpaper",
-    "generateFromReflection": "Generate wallpaper from this reflection",
-    "reflectionWallpaper": "Reflection Wallpaper",
+    "generateFromReflection": "Generate wallpaper from this pause",
+    "reflectionWallpaper": "Pause wallpaper",
     "download": "Download",
     "downloaded": "Wallpaper downloaded",
     "regenerate": "Regenerate",
@@ -1536,11 +1609,13 @@
     "reflection_note": "Note",
     "signal": "Signal",
     "grounding": "Grounding",
+    "ground": "Grounding",
     "learning": "Grounding",
     "haiku": "Haiku",
     "zoom_out": "Zoom Out",
     "history_insight": "History",
-    "external": "External"
+    "external": "External",
+    "practice": "Practice"
   },
   "itemDetail": {
     "onThisDay": "On this day",
@@ -1687,7 +1762,7 @@
     },
     "review": {
       "last30Days": "Your last 30 days",
-      "reflections": "Reflections",
+      "reflections": "Pauses",
       "holdRate": "Hold rate",
       "dominantMood": "Dominant mood",
       "lastMarket": "Last market",

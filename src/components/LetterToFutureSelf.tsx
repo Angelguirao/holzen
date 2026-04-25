@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo, useCallback } from 'react';
+import { useState, useEffect, useMemo, useCallback, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/use-auth';
@@ -72,6 +72,8 @@ const WRITING_PROMPTS = {
 interface Props {
   currentPrice: number | null;
   changePercent: number | null;
+  /** From `?letter=` (e.g. notification deep link) — scroll that delivered letter into view once. */
+  scrollToLetterId?: string | null;
 }
 
 /**
@@ -157,7 +159,7 @@ function SealCracks() {
   );
 }
 
-export function LetterToFutureSelf({ currentPrice, changePercent }: Props) {
+export function LetterToFutureSelf({ currentPrice, changePercent, scrollToLetterId }: Props) {
   const { t } = useTranslation();
   const { user } = useAuth();
   const { currency, threshold, thresholdDown } = useHolzen();
@@ -172,6 +174,10 @@ export function LetterToFutureSelf({ currentPrice, changePercent }: Props) {
   const [composerOpen, setComposerOpen] = useState(false);
   // Calm-mode recipient: who should receive this letter?
   const [calmTarget, setCalmTarget] = useState<'crash' | 'surge'>('crash');
+  const didScrollToLetter = useRef(false);
+  useEffect(() => {
+    didScrollToLetter.current = false;
+  }, [scrollToLetterId]);
 
   const isCrash = changePercent !== null && changePercent <= -thresholdDown;
   const isSurge = changePercent !== null && changePercent >= threshold;
@@ -184,19 +190,21 @@ export function LetterToFutureSelf({ currentPrice, changePercent }: Props) {
   const writtenDuring = effectiveMode === 'calm' ? 'calm' : isCrash ? 'crash' : 'surge';
   const deliverDuring = effectiveMode === 'calm' ? calmTarget : isCrash ? 'surge' : 'crash';
 
-  const prompts =
-    effectiveMode === 'calm'
-      ? calmTarget === 'crash'
-        ? WRITING_PROMPTS.calm
-        : WRITING_PROMPTS.crash
-      : isCrash
-        ? WRITING_PROMPTS.crash
-        : WRITING_PROMPTS.surge;
+  const prompts = useMemo(
+    () =>
+      effectiveMode === 'calm'
+        ? calmTarget === 'crash'
+          ? WRITING_PROMPTS.calm
+          : WRITING_PROMPTS.crash
+        : isCrash
+          ? WRITING_PROMPTS.crash
+          : WRITING_PROMPTS.surge,
+    [effectiveMode, isCrash, calmTarget],
+  );
   // Pick a stable prompt for the current mode/target so it doesn't flicker while typing.
   const randomPrompt = useMemo(
     () => prompts[Math.floor(Math.random() * prompts.length)],
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [effectiveMode, isCrash, calmTarget],
+    [prompts],
   );
   const letterValidation = useMemo(() => validateFutureLetterBody(body), [body]);
 
@@ -214,6 +222,18 @@ export function LetterToFutureSelf({ currentPrice, changePercent }: Props) {
         setLoaded(true);
       });
   }, [user]);
+
+  useEffect(() => {
+    if (!scrollToLetterId || !loaded || didScrollToLetter.current) return;
+    const raf = requestAnimationFrame(() => {
+      const el = document.getElementById(`letter-${scrollToLetterId}`);
+      if (el) {
+        didScrollToLetter.current = true;
+        el.scrollIntoView({ behavior: prefersReducedMotion ? 'auto' : 'smooth', block: 'center' });
+      }
+    });
+    return () => cancelAnimationFrame(raf);
+  }, [scrollToLetterId, loaded, deliveredLetters, prefersReducedMotion]);
 
   // Discard any draft when the composer closes without sealing.
   useEffect(() => {
@@ -268,7 +288,7 @@ export function LetterToFutureSelf({ currentPrice, changePercent }: Props) {
           deliver_during: deliverDuring,
           btc_price_at_write: currentPrice,
           delivery_threshold: letterThreshold,
-        } as any)
+        })
         .select()
         .single();
 
@@ -346,23 +366,23 @@ export function LetterToFutureSelf({ currentPrice, changePercent }: Props) {
   const composerTitle =
     effectiveMode === 'calm'
       ? calmTarget === 'crash'
-        ? t('letter.titleToPanicSelf', 'A letter to your panicking self')
-        : t('letter.titleToEuphoricSelf', 'A letter to your euphoric self')
+        ? t('letter.titleToPanicSelf', { defaultValue: 'A letter to your panicking self' })
+        : t('letter.titleToEuphoricSelf', { defaultValue: 'A letter to your euphoric self' })
       : isCrash
-        ? t('letter.titleFromTheDrop', 'A letter from the drop')
-        : t('letter.titleFromTheSurge', 'A letter from the surge');
+        ? t('letter.titleFromTheDrop', { defaultValue: 'A letter from the drop' })
+        : t('letter.titleFromTheSurge', { defaultValue: 'A letter from the surge' });
 
   const composerDescription =
     effectiveMode === 'calm'
       ? calmTarget === 'crash'
-        ? t(
-            'letter.calmDescCrash',
-            'Write to the version of you that panics during a drop. This letter opens when fear hits.',
-          )
-        : t(
-            'letter.calmDescSurge',
-            'Write to the version of you that gets carried away during a surge. This letter opens when euphoria strikes.',
-          )
+        ? t('letter.calmDescCrash', {
+            defaultValue:
+              'Write to the version of you that panics during a drop. This letter opens when fear hits.',
+          })
+        : t('letter.calmDescSurge', {
+            defaultValue:
+              'Write to the version of you that gets carried away during a surge. This letter opens when euphoria strikes.',
+          })
       : isCrash
         ? t('letter.crashDesc')
         : t('letter.surgeDesc');
@@ -370,23 +390,26 @@ export function LetterToFutureSelf({ currentPrice, changePercent }: Props) {
   const deliveryHint =
     effectiveMode === 'calm'
       ? calmTarget === 'crash'
-        ? t(
-            'letter.deliveryHintCalmCrash',
-            `When BTC drops ${thresholdDown}%+, this letter will be opened for you.`,
-          )
-        : t(
-            'letter.deliveryHintCalmSurge',
-            `When BTC surges ${threshold}%+, this letter will be opened for you.`,
-          )
+        ? t('letter.deliveryHintCalmCrash', {
+            defaultValue:
+              'When BTC drops {{thresholdDown}}%+, this letter will be opened for you.',
+            thresholdDown,
+          })
+        : t('letter.deliveryHintCalmSurge', {
+            defaultValue: 'When BTC surges {{threshold}}%+, this letter will be opened for you.',
+            threshold,
+          })
       : isCrash
-        ? t(
-            'letter.deliveryHintCrash',
-            `When the market recovers and surges ${threshold}%+, this letter will be opened for you.`,
-          )
-        : t(
-            'letter.deliveryHintSurge',
-            `When the market drops ${thresholdDown}%+, this letter will be opened for you.`,
-          );
+        ? t('letter.deliveryHintCrash', {
+            defaultValue:
+              'When the market recovers and surges {{threshold}}%+, this letter will be opened for you.',
+            threshold,
+          })
+        : t('letter.deliveryHintSurge', {
+            defaultValue:
+              'When the market drops {{thresholdDown}}%+, this letter will be opened for you.',
+            thresholdDown,
+          });
 
   return (
     <div className="space-y-5">
@@ -469,18 +492,18 @@ export function LetterToFutureSelf({ currentPrice, changePercent }: Props) {
           <div className="min-w-0 space-y-1">
             <h3 className="font-editorial text-lg leading-tight">
               {effectiveMode === 'calm'
-                ? t('letter.calmHeading', 'Write to your future self')
+                ? t('letter.calmHeading', { defaultValue: 'Write to your future self' })
                 : isCrash
-                  ? t('letter.stormHeadingCrash', 'Write from the drop')
-                  : t('letter.stormHeadingSurge', 'Write from the surge')}
+                  ? t('letter.stormHeadingCrash', { defaultValue: 'Write from the drop' })
+                  : t('letter.stormHeadingSurge', { defaultValue: 'Write from the surge' })}
             </h3>
             <p className="text-sm leading-relaxed text-muted-foreground">
               {canWrite
                 ? effectiveMode === 'calm'
-                  ? t(
-                      'letter.introCalm',
-                      'A short note, sealed today, delivered when the market flips.',
-                    )
+                  ? t('letter.introCalm', {
+                      defaultValue:
+                        'A short note, sealed today, delivered when the market flips.',
+                    })
                   : isCrash
                     ? t('letter.crashDesc')
                     : t('letter.surgeDesc')
@@ -498,7 +521,9 @@ export function LetterToFutureSelf({ currentPrice, changePercent }: Props) {
             className="flex w-full items-center gap-3 rounded-lg border border-primary/15 bg-primary/[0.03] px-3 py-3 text-left transition-colors hover:bg-primary/[0.06]"
           >
             <Mail className="h-3.5 w-3.5 shrink-0 text-primary/50" />
-            <span className="flex-1 text-sm font-medium text-foreground">{t('letter.writeCta', 'Write a letter')}</span>
+            <span className="flex-1 text-sm font-medium text-foreground">
+              {t('letter.writeCta', { defaultValue: 'Write a letter' })}
+            </span>
             <ChevronRight className="h-3 w-3 shrink-0 text-primary/30" />
           </button>
         )}
@@ -542,6 +567,7 @@ export function LetterToFutureSelf({ currentPrice, changePercent }: Props) {
 
             return (
               <motion.article
+                id={`letter-${l.id}`}
                 key={l.id}
                 initial={{ opacity: 0, y: 6 }}
                 animate={{ opacity: 1, y: 0 }}
@@ -657,13 +683,19 @@ export function LetterToFutureSelf({ currentPrice, changePercent }: Props) {
             {effectiveMode === 'calm' && (
               <div
                 role="radiogroup"
-                aria-label={t('letter.recipientLabel', 'Recipient')}
+                aria-label={t('letter.recipientLabel', { defaultValue: 'Recipient' })}
                 className="inline-flex w-full rounded-md border border-border bg-background p-1"
               >
                 {(
                   [
-                    { key: 'crash', label: t('letter.forPanicSelf', 'For my panicking self') },
-                    { key: 'surge', label: t('letter.forEuphoricSelf', 'For my euphoric self') },
+                    {
+                      key: 'crash',
+                      label: t('letter.forPanicSelf', { defaultValue: 'For my panicking self' }),
+                    },
+                    {
+                      key: 'surge',
+                      label: t('letter.forEuphoricSelf', { defaultValue: 'For my euphoric self' }),
+                    },
                   ] as const
                 ).map((opt) => {
                   const selected = calmTarget === opt.key;
@@ -728,7 +760,7 @@ export function LetterToFutureSelf({ currentPrice, changePercent }: Props) {
                     className="inline-flex items-center gap-1 rounded-sm px-1.5 py-0.5 transition-colors hover:text-foreground"
                   >
                     <Info className="h-3.5 w-3.5" />
-                    {t('letter.deliveryInfo', 'When does this open?')}
+                    {t('letter.deliveryInfo', { defaultValue: 'When does this open?' })}
                   </button>
                 </PopoverTrigger>
                 <PopoverContent side="top" align="end" className="max-w-[260px] text-sm leading-relaxed">

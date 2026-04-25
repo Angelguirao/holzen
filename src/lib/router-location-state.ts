@@ -7,7 +7,8 @@ const PAUSE_SEVERITIES: readonly PauseSeverity[] = ['mild', 'moderate', 'high'];
 
 /** Payload for `navigate('/pause', { state })` — all fields optional at the wire. */
 export interface PauseSessionLocationState {
-  reflectionId?: string;
+  /** Pause V2 instance id. Set by Bell + Library current-pause card. */
+  pauseInstanceId?: string;
   reflectionMessage?: string;
   context?: string | null;
   companions?: CompanionData;
@@ -16,7 +17,7 @@ export interface PauseSessionLocationState {
 }
 
 export interface PauseSessionNavParsed {
-  reflectionId: string | null;
+  pauseInstanceId: string | null;
   reflectionMessage: string;
   context: string | null;
   companions: CompanionData | undefined;
@@ -46,7 +47,7 @@ function isCompanionPrefs(v: unknown): v is CompanionPrefs {
 
 export function parsePauseSessionLocationState(state: unknown): PauseSessionNavParsed {
   const empty: PauseSessionNavParsed = {
-    reflectionId: null,
+    pauseInstanceId: null,
     reflectionMessage: '',
     context: null,
     companions: undefined,
@@ -56,7 +57,8 @@ export function parsePauseSessionLocationState(state: unknown): PauseSessionNavP
   if (!state || typeof state !== 'object') return empty;
   const o = state as Record<string, unknown>;
 
-  const reflectionId = typeof o.reflectionId === 'string' ? o.reflectionId : null;
+  const pauseInstanceId =
+    typeof o.pauseInstanceId === 'string' ? o.pauseInstanceId : null;
   const reflectionMessage =
     typeof o.reflectionMessage === 'string' ? o.reflectionMessage.trim() : '';
   const context = typeof o.context === 'string' ? o.context : null;
@@ -69,7 +71,7 @@ export function parsePauseSessionLocationState(state: unknown): PauseSessionNavP
       : undefined;
 
   return {
-    reflectionId,
+    pauseInstanceId,
     reflectionMessage,
     context,
     companions,
@@ -78,7 +80,7 @@ export function parsePauseSessionLocationState(state: unknown): PauseSessionNavP
   };
 }
 
-/** Pre-generated grounding card from Home → `/ground`. */
+/** Pre-generated grounding card from Home → `/tools/ground`. */
 export interface GroundPreGenerated {
   activity: string;
   suggestion: string;
@@ -121,27 +123,8 @@ export function parseGroundLocationState(state: unknown): GroundLocationState {
   };
 }
 
-export const PROFILE_TAB_IDS = ['stats', 'insights', 'badges', 'letters', 'activity'] as const;
+export const PROFILE_TAB_IDS = ['stats', 'insights', 'badges', 'activity'] as const;
 export type ProfileTab = (typeof PROFILE_TAB_IDS)[number];
 
-export interface ProfileLocationState {
-  tab?: ProfileTab;
-  letterId?: string;
-}
-
-export function parseProfileLocationState(state: unknown): ProfileLocationState {
-  if (!state || typeof state !== 'object') return {};
-  const o = state as Record<string, unknown>;
-  const tab = o.tab;
-  const letterId = o.letterId;
-  return {
-    tab:
-      typeof tab === 'string' && (PROFILE_TAB_IDS as readonly string[]).includes(tab)
-        ? (tab as ProfileTab)
-        : undefined,
-    letterId: typeof letterId === 'string' ? letterId : undefined,
-  };
-}
-
-/** Router state passed from notification actions (profile + pause deep links). */
-export type NotificationNavigateState = ProfileLocationState | PauseSessionLocationState;
+/** Router state passed from notification actions (pause deep links use `action_state`). */
+export type NotificationNavigateState = PauseSessionLocationState;

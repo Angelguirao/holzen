@@ -8,6 +8,8 @@ import { getCheckoutSuppressionWindowMs } from '@/lib/checkout-suppression-windo
 
 const FREE_MONTHLY_LIMIT = PRICING.freeReflectionsPerMonth;
 const CHECKOUT_RETURN_KEY = 'holzen_checkout_started_at';
+/** Set when a checkout return includes `?subscribed=true` (timestamp for PaywallSubscribedTracker TTL) */
+export const POST_CHECKOUT_SUBSCRIBE_FLAG = 'holzen_post_checkout_subscribe';
 const SUB_CACHE_KEY = 'holzen_sub_cache';
 
 /** Next fetch uses `{ force: true }` on check-subscription (window focus, refresh(), etc.). */
@@ -65,6 +67,13 @@ function checkoutReturnWantsForce(): boolean {
   const returnedFromRecentCheckout =
     checkoutStartedAt > 0 && Date.now() - checkoutStartedAt < getCheckoutSuppressionWindowMs();
   if (hasCheckoutQuery || returnedFromRecentCheckout) {
+    if (hasCheckoutQuery) {
+      try {
+        sessionStorage.setItem(POST_CHECKOUT_SUBSCRIBE_FLAG, String(Date.now()));
+      } catch {
+        /* ignore */
+      }
+    }
     sessionStorage.removeItem(CHECKOUT_RETURN_KEY);
     return true;
   }
@@ -79,6 +88,8 @@ function consumeInitialCheckoutForce(userId: string): boolean {
   checkoutSweepDoneForUser.add(userId);
   return checkoutReturnWantsForce();
 }
+
+export type SubscriptionBillingInterval = 'month' | 'year' | 'day' | 'week';
 
 type SubscriptionSnapshot = {
   subscribed: boolean;
@@ -99,6 +110,8 @@ type SubscriptionSnapshot = {
   subscriptionEnd: string | null;
   trialStart: string | null;
   trialEnd: string | null;
+  /** From Stripe `price.recurring.interval` (fresh `check-subscription` only) */
+  subscriptionBillingInterval: SubscriptionBillingInterval | null;
 };
 
 async function fetchSubscriptionSnapshot(userId: string, force: boolean): Promise<SubscriptionSnapshot> {
@@ -124,6 +137,9 @@ async function fetchSubscriptionSnapshot(userId: string, force: boolean): Promis
     const subscriptionEnd = (data.subscription_end as string) ?? null;
     const trialStart = (data.trial_start as string) ?? null;
     const trialEnd = (data.trial_end as string) ?? null;
+    const bi = (data as { subscription_billing_interval?: unknown }).subscription_billing_interval;
+    const subscriptionBillingInterval: SubscriptionBillingInterval | null =
+      bi === 'month' || bi === 'year' || bi === 'day' || bi === 'week' ? bi : null;
     writeSubCache({
       subscribed: true,
       tier,
@@ -160,23 +176,23 @@ async function fetchSubscriptionSnapshot(userId: string, force: boolean): Promis
       subscriptionEnd,
       trialStart,
       trialEnd,
+      subscriptionBillingInterval,
     };
   }
 
   const now = new Date();
   const monthStart = new Date(now.getFullYear(), now.getMonth(), 1).toISOString();
-  // Only full-ritual pauses count toward the free-tier monthly quota:
-  // breathing completed AND mood/mood_after/outcome set. Ignored notifications
-  // (rows that were merely generated) don't burn quota, and neither do
-  // quick decision-only taps — this is the anti-gaming quota gate.
+  // Free-tier monthly quota: count completed pauses in the current month.
+  // Completion requires strict full ritual (breath + initial/shift mood +
+  // outcome + counted companion) — enforced by the pause state machine.
   const { data: rows } = await supabase
-    .from('reflections')
-    .select('breathing_completed, mood, mood_after, outcome')
+    .from('pause_instances' as never)
+    .select('id')
     .eq('user_id', userId)
+    .eq('state', 'completed')
     .gte('created_at', monthStart);
 
-  const { isFullRitualPause } = await import('@/lib/engaged-pause');
-  const used = (rows ?? []).filter(isFullRitualPause).length;
+  const used = (rows ?? []).length;
   const remaining = Math.max(0, FREE_MONTHLY_LIMIT - used);
   writeSubCache({
     subscribed: false,
@@ -214,6 +230,7 @@ async function fetchSubscriptionSnapshot(userId: string, force: boolean): Promis
     subscriptionEnd: null,
     trialStart: null,
     trialEnd: null,
+    subscriptionBillingInterval: null,
   };
 }
 
@@ -279,6 +296,7 @@ export function useSubscription() {
           subscriptionEnd: null,
           trialStart: null,
           trialEnd: null,
+          subscriptionBillingInterval: null,
         }
       : undefined);
 
@@ -311,6 +329,7 @@ export function useSubscription() {
   const subscriptionEnd = effectiveSnapshot?.subscriptionEnd ?? null;
   const trialStart = effectiveSnapshot?.trialStart ?? null;
   const trialEnd = effectiveSnapshot?.trialEnd ?? null;
+  const subscriptionBillingInterval = effectiveSnapshot?.subscriptionBillingInterval ?? null;
   const loading = !!userId && query.isLoading && !query.data;
 
   useEffect(() => {
@@ -477,6 +496,7 @@ export function useSubscription() {
       subscriptionEnd: null,
       trialStart: null,
       trialEnd: null,
+      subscriptionBillingInterval: null,
     };
   }
 
@@ -508,5 +528,6 @@ export function useSubscription() {
     subscriptionEnd,
     trialStart,
     trialEnd,
+    subscriptionBillingInterval,
   };
 }

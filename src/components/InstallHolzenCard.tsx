@@ -17,7 +17,7 @@ interface Props {
   className?: string;
 }
 
-function trackEvent(userId: string | undefined, event: string, metadata?: Record<string, unknown>) {
+function insertPwaInstallAnalyticsEvent(userId: string | undefined, event: string, metadata?: Record<string, unknown>) {
   if (!userId) return;
   void supabase.from('analytics_events').insert([{ user_id: userId, event, metadata: (metadata ?? {}) as never }]);
 }
@@ -49,14 +49,14 @@ export function InstallHolzenCard({ alwaysShow = false, compact = false, classNa
   useEffect(() => {
     if (isInstalled || (!alwaysShow && dismissed) || shownRef.current) return;
     shownRef.current = true;
-    trackEvent(user?.id, 'pwa_install_prompt_shown', { surface: compact ? 'settings' : 'home' });
+    insertPwaInstallAnalyticsEvent(user?.id, 'pwa_install_prompt_shown', { surface: compact ? 'settings' : 'home' });
   }, [isInstalled, dismissed, alwaysShow, compact, user?.id]);
 
   if (isInstalled) return null;
   if (!alwaysShow && dismissed) return null;
 
   const handleInstall = async () => {
-    trackEvent(user?.id, 'pwa_install_prompt_accepted', { surface: compact ? 'settings' : 'home', native: canInstall });
+    insertPwaInstallAnalyticsEvent(user?.id, 'pwa_install_prompt_accepted', { surface: compact ? 'settings' : 'home', native: canInstall });
     if (canInstall) {
       // Native Android/Desktop Chrome path — use the captured beforeinstallprompt
       await install();
@@ -69,7 +69,7 @@ export function InstallHolzenCard({ alwaysShow = false, compact = false, classNa
   const handleDismiss = () => {
     try { localStorage.setItem(DISMISS_KEY, '1'); } catch { /* ignore */ }
     setDismissed(true);
-    trackEvent(user?.id, 'pwa_install_prompt_dismissed', { surface: 'home' });
+    insertPwaInstallAnalyticsEvent(user?.id, 'pwa_install_prompt_dismissed', { surface: 'home' });
   };
 
   return (
@@ -123,7 +123,7 @@ export function InstallHolzenCard({ alwaysShow = false, compact = false, classNa
           manifest-url="/manifest.json"
           icon="/icon-512.png"
           name="Holzen"
-          description="Pause before you act. Bitcoin volatility reflections."
+          description="Pause before you act. Bitcoin volatility check-ins."
           manual-chrome="true"
         />
       )}

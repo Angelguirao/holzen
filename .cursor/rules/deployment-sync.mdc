@@ -12,9 +12,13 @@ Before you **finish a task**, **suggest pushing**, or **confirm a branch is read
 Run and address failures before push:
 
 - `npm run test`
-- `npm run build`
+- `npm run build` (runs `check:version-sync` via `prebuild` — keep `package.json` version aligned with `changelog_entries`)
 - `npm run lint` on touched files (whole-repo lint has known noise)
+- `npm run check:view-migrations` when migrations add or change `CREATE OR REPLACE VIEW`
 - `npm run check:edge` when Deno is available (edge TS changes)
+- `npm run check:edge-logging` when adding or editing edge function HTTP entrypoints (`supabase/functions/*/index.ts`)
+- `npm run check:edge-coverage-manifest` when adding/removing `supabase/functions/*` or editing `[functions.*]` / `EdgeCoverage.tsx`
+- `npm run check:prepush` when `bash` is available (Git Bash / WSL / Unix) for the full scripted gate before a high-stakes push
 
 ## Always remember
 

@@ -7,8 +7,7 @@
 //     (keeps MTU count + costs down).
 //   - `sanitize_properties` strips anything that looks like free-text user content before it
 //     leaves the browser. Backstop to `event-taxonomy.md` discipline, not a replacement.
-//   - `capture_pageview: false` — pageviews are emitted explicitly on route change (see
-//     `useTrackPageview` later) so we can include our own properties (surface, flag, cid).
+//   - `capture_pageview: false` — no automatic pageviews; add route-level events explicitly if needed.
 
 import posthog, { type PostHog, type Properties } from "posthog-js";
 

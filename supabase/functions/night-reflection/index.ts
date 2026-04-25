@@ -1,10 +1,13 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import webpush from "https://esm.sh/web-push@3.6.7";
 import { createCidSupabaseClient, sendWebPushWithCid } from "../_shared/cid-clients.ts";
-import { holzenEdgeError, holzenEdgeLog, holzenEdgeRun } from "../_shared/holzen-edge-log.ts";
+import { unknownErrorForLog, webPushStatusCode } from "../_shared/log-unknown-error.ts";
 import { createAttemptLogger } from "../_shared/observe.ts";
 import { coingeckoHeaders } from "../_shared/coingecko.ts";
-import { withRequestLogging } from "../_shared/with-request-logging.ts";
+import {
+  withRequestLogging,
+  type RequestLoggingContext,
+} from "../_shared/with-request-logging.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -98,25 +101,49 @@ const LANG_NAMES: Record<string, string> = {
   de: "German", fr: "French", nl: "Dutch", tr: "Turkish",
 };
 
+/** Fields selected from `profiles` for the night loop. */
+interface NightProfileRow {
+  user_id: string;
+  reflection_tone?: string | null;
+  timezone?: string | null;
+  night_reflection_hour?: number | null;
+  hold_goal_currency?: string | null;
+  language?: string | null;
+}
+
+/** v_pause_full row shape for the AI day summary. */
+interface TodayPauseSummaryRow {
+  context_snapshot?: { context_text?: string } | null;
+  context?: string | null;
+  initial_mood?: string | null;
+  shift_mood?: string | null;
+  outcome?: string | null;
+  reflection_text?: string | null;
+}
+
 async function generateAIMessage(
   apiKey: string,
   lang: string,
   btcPct: string,
   btcDirection: string,
   hadReflection: boolean,
-  recentReflections: any[],
+  recentReflections: TodayPauseSummaryRow[],
   recentMoods: string[],
   streakDays: number,
   tone: string,
   logAttempt: (p: Parameters<ReturnType<typeof createAttemptLogger>>[0]) => void,
+  log: RequestLoggingContext["log"],
 ): Promise<string | null> {
   const moodSummary = recentMoods.length > 0
     ? `Recent moods (last 7 days): ${recentMoods.join(", ")}`
     : "No mood data this week.";
 
   const reflectionSummary = recentReflections.length > 0
-    ? recentReflections.map((r, i) => `${i + 1}. Context: "${r.context || 'none'}" | Mood: ${r.mood || 'unknown'} → ${r.mood_after || '?'} | Decision: ${r.outcome || 'pending'}`).join("\n")
-    : "No reflections today.";
+    ? recentReflections.map((r, i) => {
+        const ctx = (r.context_snapshot?.context_text as string | undefined) || r.context || 'none';
+        return `${i + 1}. Context: "${ctx}" | Mood: ${r.initial_mood || 'unknown'} → ${r.shift_mood || '?'} | Decision: ${r.outcome || 'pending'}`;
+      }).join("\n")
+    : "No pauses today.";
 
   const systemPrompt = `You are Holzen's night reflection companion — a calm, wise presence that helps Bitcoin holders build emotional composure.
 
@@ -167,7 +194,12 @@ Write one personalized night reflection message.`;
       clearTimeout(timeout);
 
       if (!response.ok) {
-        holzenEdgeError("night-reflection", `AI ${model} HTTP ${response.status}`);
+        log.error("night_reflection_ai", {
+          holzen_event: "night_reflection_cron",
+          phase: "ai_http_error",
+          model,
+          http_status: response.status,
+        });
         logAttempt({
           companion_type: "night_reflection",
           provider: "lovable",
@@ -209,7 +241,12 @@ Write one personalized night reflection message.`;
       // Strip any surrounding quotes the model might add
       return content.replace(/^["']|["']$/g, "").trim();
     } catch (e) {
-      holzenEdgeError("night-reflection", `AI ${model} error`, e);
+      log.error("night_reflection_ai", {
+        holzen_event: "night_reflection_cron",
+        phase: "ai_error",
+        model,
+        ...unknownErrorForLog(e),
+      });
       const isAbort = e instanceof DOMException && e.name === "AbortError";
       logAttempt({
         companion_type: "night_reflection",
@@ -229,16 +266,21 @@ Write one personalized night reflection message.`;
 serve(
   withRequestLogging("night-reflection", async ({ req, log, cid }) => {
   try {
-    holzenEdgeRun("night-reflection", "request", { method: req.method });
     const { verifyServiceAuth } = await import("../_shared/auth.ts");
     if (!verifyServiceAuth(req)) {
-      holzenEdgeRun("night-reflection", "auth rejected");
+      log.warn("night_reflection_phase", {
+        holzen_event: "night_reflection_cron",
+        phase: "service_auth_rejected",
+      });
       return new Response(JSON.stringify({ error: "Unauthorized" }), {
         status: 401,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
-    holzenEdgeRun("night-reflection", "auth ok");
+    log("night_reflection_phase", {
+      holzen_event: "night_reflection_cron",
+      phase: "service_auth_ok",
+    });
     const supabase = createCidSupabaseClient(
       Deno.env.get("SUPABASE_URL") ?? "",
       Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? "",
@@ -255,12 +297,20 @@ serve(
       providers: ["lovable"],
     });
     if (!nightGuard.allowed) {
-      holzenEdgeLog("night-reflection", "ai skipped", { reason: nightGuard.reason });
+      log("night_reflection_phase", {
+        holzen_event: "night_reflection_cron",
+        phase: "ai_skipped",
+        reason: nightGuard.reason,
+      });
       LOVABLE_API_KEY = undefined;
     }
 
     const usdData = await fetchBtc1dData("USD");
-    holzenEdgeLog("night-reflection", "BTC 24h context", { changePct: Number(usdData.changePercent.toFixed(2)) });
+    log("night_reflection_phase", {
+      holzen_event: "night_reflection_cron",
+      phase: "btc_24h_context",
+      change_pct: Number(usdData.changePercent.toFixed(2)),
+    });
 
     const { data: profiles, error: profilesError } = await supabase
       .from("profiles")
@@ -268,7 +318,12 @@ serve(
 
     if (profilesError) throw profilesError;
     if (!profiles || profiles.length === 0) {
-      holzenEdgeLog("night-reflection", "run complete", { sent: 0, reason: "no_profiles" });
+      log("night_reflection_complete", {
+        holzen_event: "night_reflection_cron",
+        phase: "run_complete",
+        sent: 0,
+        reason: "no_profiles",
+      });
       return new Response(JSON.stringify({ sent: 0 }), {
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
@@ -276,58 +331,62 @@ serve(
 
     let sent = 0;
 
-    for (const profile of profiles) {
-      const tz = (profile as any).timezone || "UTC";
+    const nightProfiles = profiles as NightProfileRow[];
+
+    for (const profile of nightProfiles) {
+      const tz = profile.timezone || "UTC";
       const localHour = getUserLocalHour(tz);
-      const targetHour = (profile as any).night_reflection_hour;
+      const targetHour = profile.night_reflection_hour;
       if (targetHour === null || targetHour === undefined) continue;
       if (localHour !== targetHour) continue;
 
-      const currency = (profile as any).hold_goal_currency || "USD";
+      const currency = profile.hold_goal_currency || "USD";
       const btc = await fetchBtc1dData(currency);
-      const userLang = (profile as any).language || "en";
-      const tone = (profile as any).reflection_tone || "stoic";
+      const userLang = profile.language || "en";
+      const tone = profile.reflection_tone || "stoic";
 
-      // Fetch today's reflections for this user
+      // Fetch today's pause sessions for this user (read model)
       const todayStart = new Date();
       todayStart.setHours(0, 0, 0, 0);
 
       const [
-        { data: todayReflections },
-        { data: recentMoodEntries },
-        { data: streakReflections },
+        { data: todayPauses },
+        { data: recentMoodEvents },
+        { data: streakPauses },
       ] = await Promise.all([
         supabase
-          .from("reflections")
-          .select("context, mood, mood_after, outcome, message")
+          .from("v_pause_full")
+          .select("context_snapshot, initial_mood, shift_mood, outcome, reflection_text")
           .eq("user_id", profile.user_id)
           .gte("created_at", todayStart.toISOString())
           .order("created_at", { ascending: false })
           .limit(5),
         supabase
-          .from("reflections")
-          .select("mood")
+          .from("pause_step_events")
+          .select("payload")
           .eq("user_id", profile.user_id)
+          .eq("step_type", "initial_emotion_logged")
           .gte("created_at", new Date(Date.now() - 7 * 86400000).toISOString())
-          .not("mood", "is", null)
           .order("created_at", { ascending: false })
           .limit(20),
         supabase
-          .from("reflections")
+          .from("pause_instances")
           .select("created_at")
           .eq("user_id", profile.user_id)
           .gte("created_at", new Date(Date.now() - 30 * 86400000).toISOString())
           .order("created_at", { ascending: false }),
       ]);
 
-      const hadReflection = (todayReflections?.length ?? 0) > 0;
-      const recentMoods = (recentMoodEntries ?? []).map((r: any) => r.mood).filter(Boolean);
+      const hadReflection = (todayPauses?.length ?? 0) > 0;
+      const recentMoods = (recentMoodEvents ?? [])
+        .map((r) => (r as { payload?: { mood?: string } }).payload?.mood)
+        .filter((m: unknown): m is string => typeof m === "string");
 
-      // Calculate streak (consecutive days with at least one reflection)
+      // Calculate streak (consecutive days with at least one pause)
       let streakDays = 0;
-      if (streakReflections && streakReflections.length > 0) {
+      if (streakPauses && streakPauses.length > 0) {
         const daySet = new Set(
-          streakReflections.map((r: any) => new Date(r.created_at).toISOString().slice(0, 10))
+          streakPauses.map((r) => new Date((r as { created_at: string }).created_at).toISOString().slice(0, 10))
         );
         const today = new Date();
         for (let i = 0; i < 30; i++) {
@@ -351,11 +410,12 @@ serve(
           btc.absChange,
           btc.direction,
           hadReflection,
-          todayReflections ?? [],
+          (todayPauses ?? []) as TodayPauseSummaryRow[],
           recentMoods,
           streakDays,
           tone,
           logAttempt,
+          log,
         );
         if (aiMessage) {
           message = aiMessage;
@@ -409,7 +469,11 @@ serve(
                   const jwk = await crypto.subtle.exportKey("jwk", cryptoKey);
                   if (jwk.d) privateKey = jwk.d;
                 } catch (e) {
-                  holzenEdgeError("night-reflection", "push: extract subscription key failed", e);
+                  log.error("night_reflection_push", {
+                    holzen_event: "night_reflection_cron",
+                    phase: "vapid_key_extract_failed",
+                    ...unknownErrorForLog(e),
+                  });
                 }
               }
             }
@@ -430,15 +494,25 @@ serve(
                   payload,
                   { notificationTag: "night_reflection" }
                 );
-              } catch (pushErr: any) {
-                holzenEdgeError("night-reflection", "push send failed", { message: pushErr?.message, cid });
-                if (pushErr.statusCode === 410 || pushErr.statusCode === 404) {
+              } catch (pushErr: unknown) {
+                const sc = webPushStatusCode(pushErr);
+                log.error("night_reflection_push", {
+                  holzen_event: "night_reflection_cron",
+                  phase: "push_send_failed",
+                  status_code: sc,
+                  ...unknownErrorForLog(pushErr),
+                });
+                if (sc === 410 || sc === 404) {
                   await supabase.from("push_subscriptions").delete().eq("endpoint", sub.endpoint);
                 }
               }
             }
           } catch (vapidErr) {
-            holzenEdgeError("night-reflection", "push VAPID setup error", vapidErr);
+            log.error("night_reflection_push", {
+              holzen_event: "night_reflection_cron",
+              phase: "push_vapid_setup_error",
+              ...unknownErrorForLog(vapidErr),
+            });
           }
         }
       }
@@ -446,13 +520,21 @@ serve(
       sent++;
     }
 
-    holzenEdgeLog("night-reflection", "run complete", { sent });
+    log("night_reflection_complete", {
+      holzen_event: "night_reflection_cron",
+      phase: "run_complete",
+      sent,
+    });
     return new Response(JSON.stringify({ sent }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
   } catch (e) {
     const msg = e instanceof Error ? e.message : String(e);
-    holzenEdgeError("night-reflection", "uncaught error", msg);
+    log.error("night_reflection_uncaught", {
+      holzen_event: "night_reflection_cron",
+      phase: "uncaught",
+      ...unknownErrorForLog(e),
+    });
     return new Response(JSON.stringify({ error: msg }), {
       status: 500,
       headers: { ...corsHeaders, "Content-Type": "application/json" },

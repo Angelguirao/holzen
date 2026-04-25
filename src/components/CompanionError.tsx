@@ -20,7 +20,7 @@ const COMPANION_EMPTY_STATES: Record<string, { icon: React.ElementType; message:
   zoomOut: {
     icon: Mountain,
     message: 'Zoom out view couldn\'t load.',
-    hint: 'Perspective needs a moment to gather — your past reflections and prices will appear here.',
+    hint: 'Perspective needs a moment to gather — your past pauses and prices will appear here.',
   },
   haiku: {
     icon: Feather,
@@ -57,7 +57,9 @@ export function CompanionError({ message, companionType, onRetry }: Props) {
       <div className="flex items-center gap-2">
         {Icon && <Icon className="h-3.5 w-3.5 text-muted-foreground/30 shrink-0" />}
         <p className="text-xs text-muted-foreground/60">
-          {message ?? empty?.message ?? t('companions.loadError', 'Couldn\'t load right now.')}
+          {message ??
+            empty?.message ??
+            t('companions.loadError', { defaultValue: "Couldn't load right now." })}
         </p>
       </div>
       {empty?.hint && (
@@ -71,7 +73,7 @@ export function CompanionError({ message, companionType, onRetry }: Props) {
           className="flex items-center gap-1.5 text-[10px] font-mono text-primary/60 hover:text-primary transition-colors active:scale-[0.97]"
         >
           <RefreshCw className="h-3 w-3" />
-          {t('common.retry', 'Try again')}
+          {t('common.retry', { defaultValue: 'Try again' })}
         </button>
       )}
     </div>

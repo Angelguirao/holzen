@@ -20,7 +20,7 @@ const CACHE_TTL_MS = 5 * 60 * 1000; // 5 minutes
 const SUBSCRIBED_STATUSES = new Set(["active", "trialing"]);
 
 serve(
-  withRequestLogging("check-subscription", async ({ req }) => {
+  withRequestLogging("check-subscription", async ({ req, log }) => {
   const authHeader = req.headers.get("Authorization");
   if (!authHeader?.startsWith("Bearer ")) {
     return new Response(JSON.stringify({ error: "Unauthorized" }), {
@@ -99,6 +99,7 @@ serve(
         monthly_insights_used: insights.used,
         monthly_insights_remaining: insights.remaining,
         flex_credits_balance: flexCreditsBalance,
+        subscription_billing_interval: null,
       }), {
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
@@ -148,6 +149,7 @@ serve(
           monthly_insights_used: insights.used,
           monthly_insights_remaining: insights.remaining,
           flex_credits_balance: flexCreditsBalance,
+          subscription_billing_interval: null,
         }), {
           headers: { ...corsHeaders, "Content-Type": "application/json" },
         });
@@ -163,6 +165,8 @@ serve(
     let subscriptionStatus = "free";
     let subscriptionTier: "free" | "pro" | "pro_plus" | "lifetime" = "free";
     let activePriceId: string | null = null;
+    /** `price.recurring.interval` from the active line item, when set */
+    let subscriptionBillingInterval: string | null = null;
     let trialStart: string | null = null;
     let trialEnd: string | null = null;
 
@@ -176,12 +180,19 @@ serve(
         limit: 10,
       });
 
-      const eligibleSub = subscriptions.data.find((sub: any) => SUBSCRIBED_STATUSES.has(sub.status));
+      const eligibleSub = subscriptions.data.find((sub: Stripe.Subscription) =>
+        SUBSCRIBED_STATUSES.has(sub.status)
+      );
       hasActive = Boolean(eligibleSub);
 
       if (eligibleSub) {
         subscriptionStatus = eligibleSub.status;
-        activePriceId = eligibleSub.items?.data?.[0]?.price?.id ?? null;
+        const firstPrice = eligibleSub.items?.data?.[0]?.price;
+        activePriceId = firstPrice?.id ?? null;
+        const interval = (firstPrice as { recurring?: { interval?: string } } | null)?.recurring?.interval;
+        if (interval === "month" || interval === "year" || interval === "day" || interval === "week") {
+          subscriptionBillingInterval = interval;
+        }
         subscriptionTier = tierFromStripePriceId({
           hasActive: true,
           priceId: activePriceId,
@@ -189,7 +200,7 @@ serve(
           proPlusPriceId,
         });
         const itemEnd = eligibleSub.items?.data?.[0]?.current_period_end;
-        const raw = itemEnd ?? (eligibleSub as any).current_period_end ?? eligibleSub.billing_cycle_anchor;
+        const raw = itemEnd ?? eligibleSub.current_period_end ?? eligibleSub.billing_cycle_anchor;
         try {
           if (typeof raw === "number") {
             subscriptionEnd = new Date(raw * 1000).toISOString();
@@ -197,10 +208,18 @@ serve(
             subscriptionEnd = new Date(raw).toISOString();
           }
         } catch (e) {
-          console.log("Could not parse subscription end date:", raw, e);
+          try {
+            log.warn("check_subscription_end_parse_failed", {
+              holzen_event: "check_subscription_end_parse_failed",
+              raw_type: typeof raw,
+              detail: e instanceof Error ? e.message : String(e),
+            });
+          } catch {
+            /* non-fatal */
+          }
         }
-        const ts = (eligibleSub as any).trial_start;
-        const te = (eligibleSub as any).trial_end;
+        const ts = eligibleSub.trial_start;
+        const te = eligibleSub.trial_end;
         try {
           if (typeof ts === "number") trialStart = new Date(ts * 1000).toISOString();
         } catch { /* ignore */ }
@@ -253,6 +272,7 @@ serve(
       monthly_insights_used: insights.used,
       monthly_insights_remaining: insights.remaining,
       flex_credits_balance: flexCreditsBalance,
+      subscription_billing_interval: subscriptionBillingInterval,
     }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });

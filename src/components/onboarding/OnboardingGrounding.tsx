@@ -97,8 +97,8 @@ export function OnboardingGrounding({ selected, onToggle, stagger }: Props) {
             onKeyDown={handleKeyDown}
             onBlur={handleBlur}
             placeholder={selected.length === 0
-              ? t('onboarding.groundingPlaceholder', 'e.g. running, cooking, guitar...')
-              : t('onboarding.groundingAddMore', 'Add another...')
+              ? t('onboarding.groundingPlaceholder', { defaultValue: 'e.g. running, cooking, guitar...' })
+              : t('onboarding.groundingAddMore', { defaultValue: 'Add another...' })
             }
             className="flex-1 bg-transparent border-b border-border/40 focus:border-foreground/30 outline-none text-sm font-mono py-2 text-foreground placeholder:text-muted-foreground/30 transition-colors"
           />
@@ -117,7 +117,7 @@ export function OnboardingGrounding({ selected, onToggle, stagger }: Props) {
         {selected.length < 3 && availableSuggestions.length > 0 && (
           <div className="space-y-1.5">
             <p className="text-[9px] font-mono text-muted-foreground/30 tracking-[0.15em] uppercase">
-              {t('onboarding.groundingSuggestions', 'Suggestions')}
+              {t('onboarding.groundingSuggestions', { defaultValue: 'Suggestions' })}
             </p>
             <div className="flex flex-wrap gap-1.5">
               {availableSuggestions.slice(0, 6).map((suggestion) => (

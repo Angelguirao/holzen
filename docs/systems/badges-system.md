@@ -1,21 +1,38 @@
-# Badges System (Current App Order)
+# Badges System
 
-This document explains the badge system exactly as it works **today** in `Profile > Badges`, in the same order users see it.
+> **Status:** the "Recommended target model (skills-aligned badges)" at the
+> bottom of this doc is **shipped** as the 4-family / 14-active model.
+> `Profile > Badges` renders
+> [`BadgesPanelV2`](../../src/components/BadgesPanelV2.tsx), definitions in
+> [`src/lib/badges/definitions.ts`](../../src/lib/badges/definitions.ts),
+> computation in [`src/lib/badges/compute.ts`](../../src/lib/badges/compute.ts).
+> See [`pause-system.md`](pause-system.md) §10.
+>
+> The "Current App Order" section below is retained as historical context —
+> it describes the legacy panel that was removed in the Pause V2 cutover.
+
+## Current App Order (legacy, removed in Pause V2)
+
+This document explains the badge system exactly as it worked **before the Pause V2 cutover** in `Profile > Badges`, in the same order users saw it.
 
 ## Data and counting rules used today
 
-Badges are computed client-side from the `reflections` array passed into `BadgesPanel`.
+Badges are computed client-side from Pause V2 sources:
+`v_pause_full`, `pause_step_events`, `pause_companion_events`, and
+`practice_entries`, assembled in `use-badges.ts` before calling
+`computeBadges`.
 
-Current counting bases:
+Current counting bases (see `src/lib/badges/compute.ts`):
 
-1. **Any reflection row**: most badge counters.
-2. **Full ritual reflection**: used only for pause-volume badges via `filterFullRitual`:
-   - `breathing_completed === true`
-   - `mood` exists
-   - `mood_after` exists
-   - `outcome` exists
+1. **Any pause instance**: most badge counters use `v_pause_full` rows.
+2. **Completed pause**: for “full ritual” requirements (breath + initial
+   emotion + shift emotion + outcome + counted companion).
+3. **Companion engagement**: `pause_companion_events.counts_for_pause`.
+4. **Practice activity**: `practice_entries` for streak + practice-linked
+   badges.
 
-Important: only the Volume family uses strict full-ritual counting; many other badges count broader events.
+Important: all badge families now flow from Pause V2 events; the legacy
+reflection-derived counters were removed at cutover.
 
 ---
 
@@ -93,7 +110,8 @@ All are non-Pro.
 
 ## 4) Category 2: Pause Count
 
-All are non-Pro and use **full-ritual pause count** (`total = filterFullRitual(reflections).length`).
+All are non-Pro and use **full-ritual pause count** (`completedRows` where
+`counted_companion_count >= required_companion_count` in `computeBadges`).
 
 ## 4.1 `reflect-10`
 
@@ -115,11 +133,12 @@ All are non-Pro and use **full-ritual pause count** (`total = filterFullRitual(r
 
 ## 5) Category 3: Composure
 
-All are non-Pro.
+All are non-Pro and derived from completed pause rows in `v_pause_full`
+(initial mood + outcome + context snapshot).
 
 ## 5.1 `calm-10`
 
-- Counter: `calmCount = reflections where mood === "calm"`.
+- Counter: `calmCount = completed pauses where initial_mood === "calm"`.
 - Requirement: `calmCount >= 10`.
 
 ## 5.2 `calm-50`
@@ -128,7 +147,7 @@ All are non-Pro.
 
 ## 5.3 `held-10`
 
-- Counter: `heldCount = reflections where outcome is "held" or "nothing"`.
+- Counter: `heldCount = completed pauses where outcome is "held" or "nothing"`.
 - Requirement: `heldCount >= 10`.
 
 ## 5.4 `held-50`
@@ -159,7 +178,8 @@ All badges in this category are `proOnly`.
 
 ## 6.4 Signal track
 
-- `signal-10`: reflections with `signal_source` present >= 10
+- `signal-10`: completed pauses where a counted companion event for `signal`
+  occurred (counts from `pause_companion_events`) >= 10
 - `signal-50`: count >= 50
 
 ## 6.5 Zoom Out track
@@ -174,7 +194,9 @@ All badges in this category are `proOnly`.
 
 ## 6.7 All companions in one pause track
 
-- `all-6-5`: count of reflections where all companion flags are true >= 5
+- `all-6-5`: count of completed pauses where **all** counted companion types
+  in the template are present (`counted_companion_count` >= `required_companion_count`
+  and `counted_companion_types` covers the canonical companion list) >= 5
 - `all-6-25`: same all-companions counter >= 25
 
 Current all-companions condition checks:
@@ -199,7 +221,8 @@ All badges in this category are `proOnly`.
 
 ## 7.2 Notes track
 
-- `notes-10`: reflections with `note` present >= 10
+- `notes-10`: pauses with a note step (`pause_step_events.step_type = 'note_updated'`,
+  `note_text` in `v_pause_full`) >= 10
 - `notes-50`: count >= 50
 
 ---

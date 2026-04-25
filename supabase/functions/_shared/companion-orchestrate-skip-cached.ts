@@ -1,20 +1,19 @@
+import type { SupabaseClient } from "https://esm.sh/@supabase/supabase-js@2.57.2";
 import type { InterventionPayload, OrchestrateResponse } from "./companion-orchestrate-types.ts";
 import { contentSatisfiesCompanion } from "./companion-orchestrate-parse.ts";
+import type { createLogger } from "./observe.ts";
 
-/** Logger from `createLogger("orchestrate")` — minimal surface for skip-cache path. */
-export type OrchestrateSkipCacheLog = {
-  (msg: string, extra?: Record<string, unknown>): void;
-  error: (msg: string, extra?: Record<string, unknown>) => void;
-};
+/** Request logger from `withRequestLogging` / `createLogger`. */
+export type OrchestrateSkipCacheLog = ReturnType<typeof createLogger>;
 
 /**
- * If reflection_companions already has every slot this invoke would generate, return a
- * response assembled from DB rows (source "cache") and skip AI, rate limit, and budget.
- * Grep: orchestrate_skip_cached
+ * If pause_ai_artifacts already has every slot this invoke would generate, return a
+ * response assembled from the existing rows (source "cache") and skip AI, rate limit,
+ * and budget. Grep: orchestrate_skip_cached.
  */
-export async function tryOrchestrateSkipFromReflectionCompanions(params: {
-  svcClient: any;
-  reflectionId: string;
+export async function tryOrchestrateSkipFromPauseArtifacts(params: {
+  svcClient: SupabaseClient;
+  pauseInstanceId: string;
   useIntervention: boolean;
   needSignal: boolean;
   needGrounding: boolean;
@@ -23,14 +22,14 @@ export async function tryOrchestrateSkipFromReflectionCompanions(params: {
   log: OrchestrateSkipCacheLog;
 }): Promise<OrchestrateResponse | null> {
   const { data: rows, error } = await params.svcClient
-    .from("reflection_companions")
-    .select("companion_type, content")
-    .eq("reflection_id", params.reflectionId);
+    .from("pause_ai_artifacts")
+    .select("kind, content")
+    .eq("pause_instance_id", params.pauseInstanceId);
   if (error || !rows?.length) return null;
 
   const byType = new Map<string, unknown>();
   for (const r of rows) {
-    byType.set(r.companion_type as string, r.content);
+    byType.set(r.kind as string, r.content);
   }
 
   const hasSignal = () => contentSatisfiesCompanion("signal", byType.get("signal"));
@@ -67,19 +66,20 @@ export async function tryOrchestrateSkipFromReflectionCompanions(params: {
       : null,
   };
 
-  params.log("skip: all requested companion rows already on reflection_companions");
+  params.log("skip: all requested companion rows already on pause_ai_artifacts");
   try {
-    console.log(JSON.stringify({
+    params.log("orchestrate_skip_cached", {
       holzen_event: "orchestrate_skip_cached",
-      reflection_prefix: params.reflectionId.slice(0, 8),
+      pause_prefix: params.pauseInstanceId.slice(0, 8),
       need_signal: params.needSignal,
       need_grounding: params.needGrounding,
       need_history: params.needHistory,
       need_zoom: params.needZoomOut,
       need_intervention: params.useIntervention,
-      ts: new Date().toISOString(),
-    }));
-  } catch { /* ignore */ }
+    });
+  } catch {
+    /* non-fatal */
+  }
 
   return response;
 }

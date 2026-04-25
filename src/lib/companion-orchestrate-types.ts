@@ -5,12 +5,13 @@ export type CompanionCacheRelaxation = 'none' | 'market' | 'repeat_or_lower_qual
 
 export interface InterventionPrimary {
   type: 'mirror' | 'pattern' | 'trap';
-  data: any;
+  /** Wire payload from orchestrate — narrow at UI / apply sites. */
+  data: unknown;
 }
 
 export interface InterventionSecondary {
   type: 'zoom_out';
-  data: any;
+  data: unknown;
 }
 
 export interface InterventionState {
@@ -26,7 +27,8 @@ export type CompanionSlotSource = 'live' | 'library' | 'cache' | 'curated' | 'em
 
 /** Slot payload shape returned by `companion-orchestrate` for each companion key. */
 export interface CompanionOrchestrateSlotResult {
-  data: any | null;
+  /** Wire payload from orchestrate — narrow when rendering a slot. */
+  data: unknown | null;
   source: CompanionSlotSource;
   cacheId: string | null;
   /** From `serveFromCache` — `none` is a strict companion_cache hit. */

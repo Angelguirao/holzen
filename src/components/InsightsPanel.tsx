@@ -3,13 +3,14 @@ import { useTranslation } from 'react-i18next';
 import { ChartEmptyState } from './ChartEmptyState';
 import { MOOD_GLYPHS } from '@/components/icons/MoodIcon';
 
-interface ReflectionStats {
+interface PauseStatRow {
   mood: string | null;
   outcome: string | null;
 }
 
 interface Props {
-  reflections: ReflectionStats[];
+  /** Mood/outcome rows from recent pause sessions (legacy prop name was `reflections`). */
+  sessions: PauseStatRow[];
 }
 
 const MOOD_META: Record<string, { glyph: string; color: string; energy: 'high' | 'low' }> = {
@@ -50,7 +51,7 @@ function Bar({ label, count, total, color }: { label: string; count: number; tot
   );
 }
 
-export function InsightsPanel({ reflections }: Props) {
+export function InsightsPanel({ sessions }: Props) {
   const { t } = useTranslation();
 
   const { moodCounts, outcomeCounts, totalMoods, totalOutcomes } = useMemo(() => {
@@ -59,7 +60,7 @@ export function InsightsPanel({ reflections }: Props) {
     let tm = 0;
     let to = 0;
 
-    for (const r of reflections) {
+    for (const r of sessions) {
       if (r.mood) { moods[r.mood] = (moods[r.mood] || 0) + 1; tm++; }
       if (r.outcome) {
         // Merge legacy 'nothing' into 'held'
@@ -69,14 +70,17 @@ export function InsightsPanel({ reflections }: Props) {
     }
 
     return { moodCounts: moods, outcomeCounts: outcomes, totalMoods: tm, totalOutcomes: to };
-  }, [reflections]);
+  }, [sessions]);
 
   if (totalMoods === 0 && totalOutcomes === 0) {
     return (
       <ChartEmptyState
         title={t('insightsPanel.title')}
-        message={t('insightsPanel.emptyMessage', 'Log a mood or outcome during a pause to see your patterns. Emotional check-ins also contribute.')}
-        current={reflections.length}
+        message={t('insightsPanel.emptyMessage', {
+          defaultValue:
+            'Log a mood or outcome during a pause to see your patterns. Emotional check-ins also contribute.',
+        })}
+        current={sessions.length}
         needed={1}
       />
     );
@@ -95,7 +99,7 @@ export function InsightsPanel({ reflections }: Props) {
             return (
               <Bar
                 key={m}
-                label={`${meta.glyph} ${t(`moodCheck.moods.${m}`, m)}`}
+                label={`${meta.glyph} ${t(`moodCheck.moods.${m}`, { defaultValue: m })}`}
                 count={moodCounts[m]}
                 total={totalMoods}
                 color={meta.color}
@@ -109,13 +113,19 @@ export function InsightsPanel({ reflections }: Props) {
         <div className="space-y-2">
           <p className="text-xs font-mono text-muted-foreground/70">{t('insightsPanel.whatYouDid')}</p>
           {(['held', 'bought', 'sold'] as const).map((o) => (
-            <Bar key={o} label={t(`outcome.${o}`, o)} count={outcomeCounts[o] || 0} total={totalOutcomes} color={OUTCOME_COLORS[o]} />
+            <Bar
+              key={o}
+              label={t(`outcome.${o}`, { defaultValue: o })}
+              count={outcomeCounts[o] || 0}
+              total={totalOutcomes}
+              color={OUTCOME_COLORS[o]}
+            />
           ))}
         </div>
       )}
 
       <p className="text-[10px] text-muted-foreground/40 leading-relaxed">
-        {t('insightsPanel.basedOn', { count: reflections.length })}
+        {t('insightsPanel.basedOn', { count: sessions.length })}
       </p>
     </div>
   );

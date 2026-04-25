@@ -12,6 +12,11 @@ import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { DevModeToggle } from '@/components/admin/DevModeToggle';
 import { StripePriceCheck } from '@/components/admin/StripePriceCheck';
+import {
+  mergePregenerateCacheTopup,
+  type PregenerateCacheTopupConfig,
+  type PregenerateCacheTopupKey,
+} from '../../../supabase/functions/_shared/pregenerate-cache-topup-config.ts';
 
 const FEATURE_KEYS = [
   'wallpaper',
@@ -32,6 +37,20 @@ const FEATURE_KEYS = [
 
 type FeatureKey = typeof FEATURE_KEYS[number];
 
+const PREGENERATE_TOPUP_KEYS: PregenerateCacheTopupKey[] = [
+  'ground_nudge',
+  'signal',
+  'historical_insight',
+  'zoom_out_deep_time',
+];
+
+const PREGENERATE_TOPUP_LABELS: Record<PregenerateCacheTopupKey, string> = {
+  ground_nudge: 'Grounding',
+  signal: 'Signal',
+  historical_insight: 'History',
+  zoom_out_deep_time: 'Zoom out (deep time)',
+};
+
 type ConfigState = {
   signups_enabled: boolean;
   signups_max_per_day: number | null;
@@ -40,6 +59,7 @@ type ConfigState = {
   budget_monthly_usd_global: number;
   panic_mode: boolean;
   feature_flags: Record<string, boolean>;
+  pregenerate_cache_topup: PregenerateCacheTopupConfig;
   ai_cost_alert_enabled: boolean;
   ai_cost_alert_recipients: string[];
   ai_cost_alert_daily_threshold_pct: number;
@@ -54,6 +74,7 @@ const DEFAULTS: ConfigState = {
   budget_monthly_usd_global: 1800,
   panic_mode: false,
   feature_flags: Object.fromEntries(FEATURE_KEYS.map((k) => [k, true])),
+  pregenerate_cache_topup: mergePregenerateCacheTopup(null),
   ai_cost_alert_enabled: true,
   ai_cost_alert_recipients: [],
   ai_cost_alert_daily_threshold_pct: 70,
@@ -120,6 +141,9 @@ async function loadConfig(): Promise<ConfigState> {
       case 'ai_cost_alert_wow_multiplier':
         next.ai_cost_alert_wow_multiplier =
           Number(row.value) || DEFAULTS.ai_cost_alert_wow_multiplier;
+        break;
+      case 'pregenerate_cache_topup':
+        next.pregenerate_cache_topup = mergePregenerateCacheTopup(row.value);
         break;
     }
   }
@@ -205,6 +229,8 @@ export function AppConfigTools() {
     || state.ai_cost_alert_recipients.join(',') !== initial.ai_cost_alert_recipients.join(',')
     || state.ai_cost_alert_daily_threshold_pct !== initial.ai_cost_alert_daily_threshold_pct
     || state.ai_cost_alert_wow_multiplier !== initial.ai_cost_alert_wow_multiplier;
+  const pregenerateTopupDirty =
+    JSON.stringify(state.pregenerate_cache_topup) !== JSON.stringify(initial.pregenerate_cache_topup);
 
   const dailyPct = useMemo(() => {
     if (spend.dailyGlobal === null) return null;
@@ -385,6 +411,74 @@ export function AppConfigTools() {
                 persist('budget_daily_usd_per_user', state.budget_daily_usd_per_user, snapshot),
                 persist('budget_monthly_usd_global', state.budget_monthly_usd_global, snapshot),
               ]);
+            }}
+          />
+        </div>
+      </section>
+
+      {/* ── Pregenerate cache top-up (pregenerate-companions cron) ── */}
+      <section className="space-y-2">
+        <p className="text-[10px] font-mono uppercase tracking-wider text-muted-foreground/60">
+          Pregenerate cache top-up
+        </p>
+        <p className="text-[9px] font-mono text-muted-foreground/45 leading-relaxed">
+          Targets for the scheduled <code className="text-muted-foreground/55">pregenerate-companions</code> job.
+          Each type: minimum &quot;healthy&quot; rows (quality ≥ 2, not expired) before the cron skips generation;
+          max rows to add per run caps API spend. Picked up by edge within ~30s. Set max to 0 to disable top-up for that type.
+        </p>
+        <div className="rounded-xl border border-border/20 bg-card/10 p-4 space-y-4">
+          {PREGENERATE_TOPUP_KEYS.map((key) => (
+            <div key={key} className="space-y-2 pb-3 border-b border-border/10 last:border-0 last:pb-0">
+              <p className="text-[10px] font-mono text-foreground/70">{PREGENERATE_TOPUP_LABELS[key]}</p>
+              <p className="text-[9px] font-mono text-muted-foreground/35 -mt-0.5">{key}</p>
+              <NumberRow
+                label="Min healthy rows"
+                description="Count en rows with quality ≥ 2 and not expired. Below this, cron may add up to max per run."
+                value={state.pregenerate_cache_topup[key].minHealthyRows}
+                onChange={(v) =>
+                  setState((s) => ({
+                    ...s,
+                    pregenerate_cache_topup: {
+                      ...s.pregenerate_cache_topup,
+                      [key]: {
+                        ...s.pregenerate_cache_topup[key],
+                        minHealthyRows: v === null || v === undefined ? 0 : Math.max(0, v),
+                      },
+                    },
+                  }))
+                }
+                min={0}
+                step={1}
+              />
+              <NumberRow
+                label="Max per cron run"
+                description="Cap new rows per invocation for this type (0 = never generate)."
+                value={state.pregenerate_cache_topup[key].maxGeneratePerRun}
+                onChange={(v) =>
+                  setState((s) => ({
+                    ...s,
+                    pregenerate_cache_topup: {
+                      ...s.pregenerate_cache_topup,
+                      [key]: {
+                        ...s.pregenerate_cache_topup[key],
+                        maxGeneratePerRun: v === null || v === undefined ? 0 : Math.max(0, v),
+                      },
+                    },
+                  }))
+                }
+                min={0}
+                step={1}
+              />
+            </div>
+          ))}
+          <SaveRow
+            dirty={pregenerateTopupDirty}
+            busy={saving.has('pregenerate_cache_topup')}
+            onSave={async () => {
+              const merged = mergePregenerateCacheTopup(state.pregenerate_cache_topup);
+              const snapshot = { ...state, pregenerate_cache_topup: merged };
+              setState(snapshot);
+              await persist('pregenerate_cache_topup', merged, snapshot);
             }}
           />
         </div>

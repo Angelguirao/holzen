@@ -1,6 +1,11 @@
 # Zoom Out companion (end-to-end)
 
-**Zoom Out** is the pause **card** that provides **temporal perspective**: historical BTC prices on this day in past years, an optional echo from the user's own past reflections, and a **deep-time** narrative that places the current moment against geological, civilizational, or technological timescales.
+> **Pause V2:** This doc reflects the current model. Companion payloads
+> are stored in `pause_ai_artifacts` (one row per `pause_instance_id` + `kind`).
+> Legacy reflection tables were removed.
+
+
+**Zoom Out** is the pause **card** that provides **temporal perspective**: historical BTC prices on this day in past years, an optional echo from the user's own past pauses, and a **deep-time** narrative that places the current moment against geological, civilizational, or technological timescales.
 
 This page is the **companion-level** view. For **manual vs automatic pause**, **interventions**, **cost limits**, and the full **orchestrator** contract, see the system doc: **[AI-powered pause system](../ai-powered-pause-system.md)** (especially **§5** `companion-orchestrate`, **§6** generators, **§7.9** Zoom Out reference table).
 
@@ -8,9 +13,9 @@ This page is the **companion-level** view. For **manual vs automatic pause**, **
 
 ## 1. Where Zoom Out sits in the pipeline
 
-1. User completes reflection; when the user **taps the Zoom Out card**, **`use-companion-data`** invokes **`companion-orchestrate`** with `enableZoomOut: true` (lazy loading). If Zoom Out data is already cached in `reflection_companions`, it is hydrated from DB without a network call.
+1. User completes reflection; when the user **taps the Zoom Out card**, **`use-companion-data`** invokes **`companion-orchestrate`** with `enableZoomOut: true` (lazy loading). If Zoom Out data is already cached in `pause_ai_artifacts`, it is hydrated from DB without a network call.
 2. **`companion-orchestrate`** runs **`generateZoomOut`** in `_shared/generators/zoom-out.ts` when **`enableZoomOut`** is true (or when the intervention **requires** it — `secondary: "zoom_out"`), passing **context**, **session intent** (`zoomOutAngle`), and recency dedup fields.
-3. **`generateZoomOut`** returns a **composite** payload (price history + echo + deep-time); the orchestrator **writes** **`reflection_companions`** (type `zoom_out_deep_time`) and **`companion_serves`**.
+3. **`generateZoomOut`** returns a **composite** payload (price history + echo + deep-time); the orchestrator **writes** **`pause_ai_artifacts`** (kind `zoom_out_deep_time`) and **`companion_serves`**.
 
 Zoom Out also serves as the **data source for intervention secondaries**: when `selectIntervention` attaches `secondary: "zoom_out"`, the orchestrator copies the zoom result into `intervention.secondary`.
 
@@ -35,7 +40,7 @@ Zoom Out appears in **two places** depending on intervention selection:
 |--------|--------|------|
 | **`context`** | BTC + Fear & Greed + on-chain line | Grounds the zoom narrative in the current market move. |
 | **`zoomOutAngle`** | `determineSessionIntent()` → **`zoomOutAngle`** (`session-intent.ts`) | Biases deep-time seed selection toward the session theme. |
-| **`recentNudgeTopics`** | Recent zoom-out titles from `reflection_companions` | Dedup: avoid repeating same deep-time perspectives. |
+| **`recentNudgeTopics`** | Recent zoom-out titles from `pause_ai_artifacts` | Dedup: avoid repeating same deep-time perspectives. |
 
 ---
 
@@ -53,7 +58,7 @@ High-level order (source of truth: **`supabase/functions/_shared/generators/zoom
 
 **Gotcha (2026-04-19):** Since mid-2026 CoinGecko's demo tier also returns 401 for `/coins/bitcoin/history` on dates >365 days back — not just `/market_chart/range` — so the 2y–10y anniversaries **cannot be resolved via CoinGecko on the free plan** regardless of endpoint. Two follow-on changes pinned the behaviour: (a) **`refresh-btc-prices` now skips historical rows that already exist in `btc_price_cache`** (closing prices for past dates are immutable), so the cron stops burning quota re-fetching rows it can't change anyway and logs stay clean; (b) a new ops function **`seed-btc-history`** populates the table once from **CryptoCompare**'s free `histoday` endpoint (no auth, no year cap). Run `seed-btc-history` once after deployment / DB restore to fill 2014→today; after that the cron only needs to fill the 1y anniversary as it rolls forward each day. See [docs/ops/cron-setup.md](../../../ops/cron-setup.md#bulk-historical-seed-seed-btc-history).
 
-**Step 2: Echo reflection (strict user-words-only — 2026-04-18)** — Fetches a past reflection from the same user ≥3 days old **that has at least one user-authored entry** (`reflections.note` OR a `practice_entries.body` row with `type="replay"` pointing at it). Never surfaces `reflections.message` (the AI-generated reflect-step prompt) — the old implementation did, which made the "your own words from another day" UI copy factually wrong for any user who hadn't also typed a note. Selection is biased by current market direction (`is up` / `is down` in `context`) with full-pool fallback when no direction-matching row exists. Shared read model with Daily Practice Replay — see [past-reflections.md](../past-reflections.md). When the user has zero past pauses with words yet, `echo` is `null` and `ZoomOutDisplay` renders a truthful empty state ("You haven't left notes on past pauses yet…"). The AI prompt that started the echoed pause is still available to the UI as `echo.aiPrompt` — shown as context ("Holzen asked…") in Replay's thread view, never as the main quote.
+**Step 2: Echo pause (strict user-words-only — 2026-04-18)** — Fetches a past pause from the same user ≥3 days old **that has at least one user-authored entry** (latest note text from `pause_step_events` where `step_type='note_updated'`). Never surfaces the AI prompt as the headline. Selection is biased by current market direction (`is up` / `is down` in `context`) with full-pool fallback when no direction-matching row exists. Shared read model with Daily Practice Replay — see [past-reflections.md](../past-reflections.md). When the user has zero past pauses with words yet, `echo` is `null` and `ZoomOutDisplay` renders a truthful empty state ("You haven't left notes on past pauses yet…"). The AI prompt that started the echoed pause is still available to the UI as `echo.aiPrompt` — shown as context ("Holzen asked…") in Replay's thread view, never as the main quote.
 
 **Phase 2: Cache (strict + prompt-version-pinned)** — `serveFromCache` with `strict: true` **and** `promptVersion: "v4"` checks `companion_cache` for fresh, quality-≥-2 rows that were **also written under the current prompt**, with per-user dedup and market direction awareness. If found, returns composite (cached deep-time + fresh prices + echo). If the strict pool is empty it returns `null` and emits `cache_strict_miss` (Edge log) so the flow falls through to Phase 3 instead of recycling seen or pre-v4 rows. Rows inserted before the `prompt_version` column existed have `NULL` and are ignored (effectively a hard invalidation every time `PROMPT_VERSION` bumps).
 
@@ -98,11 +103,11 @@ Unlike other generators that return a single card, Zoom Out assembles a **compos
 {
   onThisDay: [{ year, price, change }],  // 1–10 years of "on this day" prices (see btc-on-this-day-config)
   currentPrice: number,                   // today's BTC price from cache
-  echo: {                                // past reflection with user words (null if none)
+  echo: {                                // past pause with user words (null if none)
     id, created_at, mood, outcome, context,
-    aiPrompt,                             // reflections.message (AI-generated; shown as context only)
+    aiPrompt,                             // reflection_text artifact (AI-generated; shown as context only)
     userWords: [{ kind: "note"|"replay", body, created_at }],
-    message                               // legacy mirror = userWords[0].body (back-compat)
+    message                               // first user word for lightweight previews
   } | null,
   deepTime: { title, body },             // AI-generated deep-time narrative
   partial: boolean                       // true if some sub-components failed
@@ -117,8 +122,7 @@ The `partial` flag allows the card to render with whatever data succeeded (e.g.,
 
 | Target | What | Why |
 |--------|------|-----|
-| **`reflection_companions`** | Full composite JSON as type `zoom_out_deep_time` | Canonical normalized store. |
-| **`reflections.zoom_out_data`** | *(deprecated — legacy column exists but is no longer populated by the orchestrator)* | Legacy storage; new reads use `reflection_companions`. |
+| **`pause_ai_artifacts`** | Full composite JSON as kind `zoom_out_deep_time` | Canonical normalized store. |
 | **`companion_serves`** | Source, latency, fingerprint | Analytics and monitoring. |
 | **`companion_cache`** | Cached deep-time payload (prices are always fresh, not cached) | Pool for future serves. |
 | **`btc_price_cache`** | Historical BTC prices | Fed by `refresh-btc-prices` cron; read at generation time. |
@@ -140,7 +144,7 @@ The `partial` flag allows the card to render with whatever data succeeded (e.g.,
 |------|------|
 | Generator | `supabase/functions/_shared/generators/zoom-out.ts` |
 | Echo read model (edge) | `supabase/functions/_shared/past-reflections.ts` + pure helpers in `_shared/past-reflection-util.ts` |
-| Echo read model (client, shared with Replay) | `src/hooks/use-past-reflection.ts` |
+| Replay placeholder UI | `src/components/practice/ReflectionReplay.tsx` — V2 rebuild notice (no data fetch yet) |
 | Orchestrator | `supabase/functions/companion-orchestrate/index.ts` |
 | Session intent | `supabase/functions/_shared/session-intent.ts` |
 | Quality gate | `supabase/functions/_shared/quality.ts` |
@@ -150,7 +154,7 @@ The `partial` flag allows the card to render with whatever data succeeded (e.g.,
 | BTC cache fill helper | `supabase/functions/_shared/btc-price-warm.ts` — shared by cron + zoom-out warm-on-read (bounded parallelism, 15-min dedupe) |
 | BTC cache backfill (ops) | `supabase/functions/backfill-btc-prices/index.ts` — manual range fill; chain **`resumeFrom`** or `scripts/backfill-btc-chain.mjs` for multi-year gaps |
 | Client invoke | `src/hooks/use-companion-data.ts` |
-| Full-screen view | `src/pages/CompanionZoomOutPage.tsx` — route `/companion/zoom-out/:reflectionId` |
+| Full-screen view | `src/pages/CompanionZoomOutPage.tsx` — route `/companion/zoom-out/:pauseInstanceId` |
 | UI | `src/components/CompanionSection.tsx` (`ZoomOutDisplay`) |
 
 ---

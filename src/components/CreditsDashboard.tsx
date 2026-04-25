@@ -45,7 +45,7 @@ export function CreditsDashboard() {
   if (loading) {
     return (
       <p className="text-xs font-mono text-muted-foreground">
-        {t('common.loading', 'Loading…')}
+        {t('common.loading', { defaultValue: 'Loading…' })}
       </p>
     );
   }
@@ -62,19 +62,19 @@ export function CreditsDashboard() {
   const rows: Row[] = subscribed
     ? [
         {
-          label: t('settings.allowanceCompanions', 'Companions & guidance'),
+          label: t('settings.allowanceCompanions', { defaultValue: 'Companions & guidance' }),
           used: companionUsed,
           limit: companionLimit,
           remaining: companionRemaining,
         },
         {
-          label: t('settings.allowanceWallpapers', 'Wallpapers'),
+          label: t('settings.allowanceWallpapers', { defaultValue: 'Wallpapers' }),
           used: wallpaperUsed,
           limit: wallpaperLimit,
           remaining: wallpaperRemaining,
         },
         {
-          label: t('settings.allowanceInsights', 'Insights'),
+          label: t('settings.allowanceInsights', { defaultValue: 'Insights' }),
           used: insightsUsed,
           limit: insightsLimit,
           remaining: insightsRemaining,
@@ -82,7 +82,7 @@ export function CreditsDashboard() {
       ]
     : [
         {
-          label: t('settings.allowanceFreePauses', 'Free pauses'),
+          label: t('settings.allowanceFreePauses', { defaultValue: 'Free pauses' }),
           used: monthlyUsed,
           limit: monthlyUsed + (monthlyRemaining ?? 0),
           remaining: monthlyRemaining ?? 0,
@@ -96,11 +96,12 @@ export function CreditsDashboard() {
     <div className="space-y-3">
       <div className="flex items-baseline justify-between">
         <p className="text-muted-foreground/60 uppercase tracking-wider text-sm font-sans">
-          {t('settings.creditsDashboard', 'Credits dashboard')}
+          {t('settings.creditsDashboard', { defaultValue: 'Credits dashboard' })}
         </p>
         <div className="flex items-center gap-2">
           <p className="text-xs font-mono text-muted-foreground">
-            {t('settings.flexBalanceShort', 'Balance')}: <span className="text-foreground">{flexCreditsBalance}</span>
+            {t('settings.flexBalanceShort', { defaultValue: 'Balance' })}:{' '}
+            <span className="text-foreground">{flexCreditsBalance}</span>
           </p>
           <LoadingButton
             type="button"
@@ -108,8 +109,8 @@ export function CreditsDashboard() {
             size="sm"
             onClick={handleRefresh}
             loading={refreshing}
-            aria-label={t('common.refresh', 'Refresh')}
-            title={t('common.refresh', 'Refresh')}
+            aria-label={t('common.refresh', { defaultValue: 'Refresh' })}
+            title={t('common.refresh', { defaultValue: 'Refresh' })}
             className="h-7 w-7 p-0 text-muted-foreground"
           >
             {!refreshing && <RefreshCw className="h-3.5 w-3.5" />}
@@ -139,7 +140,7 @@ export function CreditsDashboard() {
               )}
               {depleted && !isLifetime && (
                 <p className="text-[11px] font-mono text-muted-foreground">
-                  {t('settings.nextEligibleAt', 'Next available')}: {nextResetLabel}
+                  {t('settings.nextEligibleAt', { defaultValue: 'Next available' })}: {nextResetLabel}
                 </p>
               )}
             </div>
@@ -150,8 +151,14 @@ export function CreditsDashboard() {
       {!isLifetime && (
         <p className="text-[11px] font-mono text-muted-foreground">
           {anyDepleted
-            ? t('settings.allowanceResetsOn', 'Monthly allowances reset on {{date}}.', { date: nextResetLabel })
-            : t('settings.allowanceNextReset', 'Allowances reset {{date}}.', { date: nextResetLabel })}
+            ? t('settings.allowanceResetsOn', {
+                date: nextResetLabel,
+                defaultValue: 'Monthly allowances reset on {{date}}.',
+              })
+            : t('settings.allowanceNextReset', {
+                date: nextResetLabel,
+                defaultValue: 'Allowances reset {{date}}.',
+              })}
         </p>
       )}
     </div>

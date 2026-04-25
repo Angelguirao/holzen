@@ -16,7 +16,7 @@ const corsHeaders = {
 };
 
 serve(
-  withRequestLogging("generate-wallpaper", async ({ req }) => {
+  withRequestLogging("generate-wallpaper", async ({ req, log }) => {
   try {
     const authHeader = req.headers.get("Authorization");
     if (!authHeader) throw new Error("Missing authorization");
@@ -87,7 +87,15 @@ serve(
       providers: ["lovable"],
     });
     if (!guard.allowed) {
-      console.warn(`[generate-wallpaper] guard blocked: ${guard.reason ?? "unknown"}`);
+      try {
+        log.warn("generate_wallpaper_guard_blocked", {
+          holzen_event: "generate_wallpaper_guard_blocked",
+          reason: guard.reason ?? "unknown",
+          status: guard.status ?? null,
+        });
+      } catch {
+        /* non-fatal */
+      }
       return new Response(JSON.stringify({ error: AI_TEMPORARILY_UNAVAILABLE_MESSAGE }), {
         status: guard.status ?? 503,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
@@ -161,7 +169,15 @@ serve(
         );
       }
       const text = await response.text();
-      console.error("AI gateway error:", response.status, text);
+      try {
+        log.error("generate_wallpaper_ai_gateway_error", {
+          holzen_event: "generate_wallpaper_ai_gateway_error",
+          status: response.status,
+          response_chars: text.length,
+        });
+      } catch {
+        /* non-fatal */
+      }
       throw new Error("Failed to generate wallpaper");
     }
 
@@ -190,7 +206,14 @@ serve(
       { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } }
     );
   } catch (e) {
-    console.error("generate-wallpaper error:", e);
+    try {
+      log.error("generate_wallpaper_uncaught", {
+        holzen_event: "generate_wallpaper_uncaught",
+        detail: e instanceof Error ? e.message : String(e),
+      });
+    } catch {
+      /* non-fatal */
+    }
     return new Response(
       JSON.stringify({ error: e instanceof Error ? e.message : "Unknown error" }),
       { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }

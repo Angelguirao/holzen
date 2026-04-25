@@ -1,6 +1,6 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.57.2";
-import { holzenEdgeError, holzenEdgeLog, holzenEdgeRun } from "../_shared/holzen-edge-log.ts";
+import { unknownErrorForLog } from "../_shared/log-unknown-error.ts";
 import { coingeckoHeaders } from "../_shared/coingecko.ts";
 import { withRequestLogging } from "../_shared/with-request-logging.ts";
 import {
@@ -15,19 +15,34 @@ const corsHeaders = {
     "authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version",
 };
 
+/** Fields read from `profiles` for the nudge loop. */
+interface NudgeProfile {
+  user_id: string;
+  email_notifications?: boolean | null;
+  quiet_hours_start?: number | null;
+  quiet_hours_end?: number | null;
+  timezone?: string | null;
+  language?: string | null;
+}
+
 serve(
-  withRequestLogging("personalized-nudge", async ({ req }) => {
+  withRequestLogging("personalized-nudge", async ({ req, log }) => {
   try {
-    holzenEdgeRun("personalized-nudge", "request", { method: req.method });
     const { verifyServiceAuth } = await import("../_shared/auth.ts");
     if (!verifyServiceAuth(req)) {
-      holzenEdgeRun("personalized-nudge", "auth rejected");
+      log.warn("personalized_nudge_phase", {
+        holzen_event: "personalized_nudge_cron",
+        phase: "service_auth_rejected",
+      });
       return new Response(JSON.stringify({ error: "Unauthorized" }), {
         status: 401,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
-    holzenEdgeRun("personalized-nudge", "auth ok");
+    log("personalized_nudge_phase", {
+      holzen_event: "personalized_nudge_cron",
+      phase: "service_auth_ok",
+    });
     const supabase = createClient(
       Deno.env.get("SUPABASE_URL") ?? "",
       Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? "",
@@ -47,7 +62,13 @@ serve(
 
     // Only nudge during high volatility (≥3% daily move)
     if (change24h < 3) {
-      holzenEdgeLog("personalized-nudge", "run complete", { nudged: 0, reason: "low_volatility", change24h: Number(change24h.toFixed(1)) });
+      log("personalized_nudge_complete", {
+        holzen_event: "personalized_nudge_cron",
+        phase: "run_complete",
+        nudged: 0,
+        reason: "low_volatility",
+        change24h: Number(change24h.toFixed(1)),
+      });
       return new Response(JSON.stringify({ nudged: 0, reason: "low_volatility" }), {
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
@@ -69,7 +90,7 @@ serve(
     }
 
     // Helper: check quiet hours
-    function isInQuietHours(p: any): boolean {
+    function isInQuietHours(p: NudgeProfile): boolean {
       const start = p.quiet_hours_start;
       const end = p.quiet_hours_end;
       if (start == null || end == null) return false;
@@ -79,7 +100,9 @@ serve(
       return localHour >= start || localHour < end;
     }
 
-    const eligible = (profiles ?? []).filter((p) => p.email_notifications && !isInQuietHours(p));
+    const eligible = ((profiles ?? []) as NudgeProfile[]).filter((p) =>
+      p.email_notifications && !isInQuietHours(p)
+    );
     const cutoff = new Date(Date.now() - 48 * 60 * 60 * 1000).toISOString();
     // BTC direction is a global property of this cron run (not per-user) — we
     // compute it once so it can also feed the idempotency key below.
@@ -89,15 +112,15 @@ serve(
     const queued: LovableEmail[] = [];
 
     for (const profile of eligible) {
-      // Check if user has reflected in the last 48 hours
+      // Check if user has a pause in the last 48 hours
       const { data: recentReflections } = await supabase
-        .from("reflections")
+        .from("pause_instances")
         .select("id")
         .eq("user_id", profile.user_id)
         .gte("created_at", cutoff)
         .limit(1);
 
-      // If they have recent reflections, skip
+      // If they have a recent pause, skip
       if (recentReflections && recentReflections.length > 0) continue;
 
       // Get user email
@@ -107,7 +130,7 @@ serve(
 
       const direction = runDirection;
       const pct = change24h.toFixed(1);
-      const userLang = (profile as any).language || "en";
+      const userLang = profile.language || "en";
 
       const NUDGE_COPY: Record<string, { subject: (d: string, p: string) => string; body: (d: string, p: string) => string; reminder: string; cta: string; footer: string }> = {
         en: {
@@ -203,12 +226,26 @@ serve(
       source: "personalized-nudge",
       idempotencyKey: `personalized-nudge:${dateKey}:${runDirection}`,
       logger: holzenLovableEmailLogger(
-        (m, d) => holzenEdgeLog("personalized-nudge", m, d),
-        (m, err) => holzenEdgeError("personalized-nudge", m, err),
+        (m, d) =>
+          log("lovable_email_dep", {
+            holzen_event: "personalized_nudge_cron",
+            phase: "lovable_email",
+            message: m,
+            ...(d ?? {}),
+          }),
+        (m, data) =>
+          log.error("lovable_email_dep", {
+            holzen_event: "personalized_nudge_cron",
+            phase: "lovable_email_error",
+            message: m,
+            ...(data ?? {}),
+          }),
       ),
     });
 
-    holzenEdgeLog("personalized-nudge", "run complete", {
+    log("personalized_nudge_complete", {
+      holzen_event: "personalized_nudge_cron",
+      phase: "run_complete",
       nudged: batch.sent,
       failed: batch.failed,
       chunks: batch.chunks,
@@ -222,7 +259,11 @@ serve(
     );
   } catch (e) {
     const msg = e instanceof Error ? e.message : String(e);
-    holzenEdgeError("personalized-nudge", "uncaught error", msg);
+    log.error("personalized_nudge_uncaught", {
+      holzen_event: "personalized_nudge_cron",
+      phase: "uncaught",
+      ...unknownErrorForLog(e),
+    });
     return new Response(JSON.stringify({ error: msg }), {
       status: 500,
       headers: { ...corsHeaders, "Content-Type": "application/json" },

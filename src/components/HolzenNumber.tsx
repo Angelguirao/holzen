@@ -37,7 +37,7 @@ export function HolzenNumber({ variant = 'default' }: { variant?: 'default' | 'c
     return () => clearInterval(interval);
   }, []);
 
-  // Don't render if no data or no reflections today
+  // Don't render if no data or no users in today's aggregate sample
   if (loading || !data || data.total === 0) return null;
 
   const motionProps = prefersReduced
