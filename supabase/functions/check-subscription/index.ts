@@ -176,7 +176,9 @@ serve(
         limit: 10,
       });
 
-      const eligibleSub = subscriptions.data.find((sub: any) => SUBSCRIBED_STATUSES.has(sub.status));
+      const eligibleSub = subscriptions.data.find((sub: Stripe.Subscription) =>
+        SUBSCRIBED_STATUSES.has(sub.status)
+      );
       hasActive = Boolean(eligibleSub);
 
       if (eligibleSub) {
@@ -189,7 +191,7 @@ serve(
           proPlusPriceId,
         });
         const itemEnd = eligibleSub.items?.data?.[0]?.current_period_end;
-        const raw = itemEnd ?? (eligibleSub as any).current_period_end ?? eligibleSub.billing_cycle_anchor;
+        const raw = itemEnd ?? eligibleSub.current_period_end ?? eligibleSub.billing_cycle_anchor;
         try {
           if (typeof raw === "number") {
             subscriptionEnd = new Date(raw * 1000).toISOString();
@@ -207,8 +209,8 @@ serve(
             /* non-fatal */
           }
         }
-        const ts = (eligibleSub as any).trial_start;
-        const te = (eligibleSub as any).trial_end;
+        const ts = eligibleSub.trial_start;
+        const te = eligibleSub.trial_end;
         try {
           if (typeof ts === "number") trialStart = new Date(ts * 1000).toISOString();
         } catch { /* ignore */ }

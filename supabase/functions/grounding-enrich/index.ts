@@ -283,7 +283,9 @@ async function fetchCrossref(doiHint: string | null, citation: string): Promise<
 
     const authors = Array.isArray(item.author)
       ? item.author
-          .map((a: any) => [a.given, a.family].filter(Boolean).join(" ").trim())
+          .map((a: { given?: string; family?: string }) =>
+            [a.given, a.family].filter(Boolean).join(" ").trim()
+          )
           .filter(Boolean)
           .slice(0, 5)
       : [];
