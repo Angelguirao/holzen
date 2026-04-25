@@ -1,6 +1,7 @@
 import { sendLovableEmail } from 'npm:@lovable.dev/email-js'
 import { createClient } from 'npm:@supabase/supabase-js@2'
-import { withRequestLogging } from "../_shared/with-request-logging.ts";
+import { recipientHostFromEmail } from "../_shared/email-log-helpers.ts";
+import { withRequestLogging, type RequestLoggingContext } from "../_shared/with-request-logging.ts";
 
 const MAX_RETRIES = 5
 const DEFAULT_BATCH_SIZE = 10
@@ -59,7 +60,8 @@ async function moveToDlq(
   supabase: any,
   queue: string,
   msg: { msg_id: number; message: Record<string, any> },
-  reason: string
+  reason: string,
+  log: RequestLoggingContext["log"],
 ): Promise<void> {
   const payload = msg.message
   await supabase.from('email_send_log').insert({
@@ -76,17 +78,34 @@ async function moveToDlq(
     payload,
   })
   if (error) {
-    console.error('Failed to move message to DLQ', { queue, msg_id: msg.msg_id, reason, error })
+    try {
+      log.error("process_email_queue_dlq_move_failed", {
+        holzen_event: "process_email_queue_dlq_move_failed",
+        queue,
+        msg_id: msg.msg_id,
+        reason,
+        detail: error.message,
+        recipient_host: typeof payload.to === "string" ? recipientHostFromEmail(payload.to) : null,
+      });
+    } catch {
+      /* non-fatal */
+    }
   }
 }
 
-Deno.serve(withRequestLogging("process-email-queue", async ({ req }) => {
+Deno.serve(withRequestLogging("process-email-queue", async ({ req, log }) => {
   const apiKey = Deno.env.get('LOVABLE_API_KEY')
   const supabaseUrl = Deno.env.get('SUPABASE_URL')
   const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')
 
   if (!apiKey || !supabaseUrl || !supabaseServiceKey) {
-    console.error('Missing required environment variables')
+    try {
+      log.error("process_email_queue_missing_env", {
+        holzen_event: "process_email_queue_missing_env",
+      });
+    } catch {
+      /* non-fatal */
+    }
     return new Response(
       JSON.stringify({ error: 'Server configuration error' }),
       { status: 500, headers: { 'Content-Type': 'application/json' } }
@@ -146,7 +165,15 @@ Deno.serve(withRequestLogging("process-email-queue", async ({ req }) => {
     })
 
     if (readError) {
-      console.error('Failed to read email batch', { queue, error: readError })
+      try {
+        log.error("process_email_queue_read_batch_failed", {
+          holzen_event: "process_email_queue_read_batch_failed",
+          queue,
+          detail: readError.message,
+        });
+      } catch {
+        /* non-fatal */
+      }
       continue
     }
 
@@ -175,10 +202,15 @@ Deno.serve(withRequestLogging("process-email-queue", async ({ req }) => {
         .eq('status', 'failed')
 
       if (failedRowsError) {
-        console.error('Failed to load failed-attempt counters', {
-          queue,
-          error: failedRowsError,
-        })
+        try {
+          log.error("process_email_queue_failed_counters_failed", {
+            holzen_event: "process_email_queue_failed_counters_failed",
+            queue,
+            detail: failedRowsError.message,
+          });
+        } catch {
+          /* non-fatal */
+        }
       } else {
         for (const row of failedRows ?? []) {
           const messageId = row?.message_id
@@ -207,20 +239,30 @@ Deno.serve(withRequestLogging("process-email-queue", async ({ req }) => {
         const ageMs = Date.now() - new Date(queuedAt).getTime()
         const maxAgeMs = ttlMinutes[queue] * 60 * 1000
         if (ageMs > maxAgeMs) {
-          console.warn('Email expired (TTL exceeded)', {
-            queue,
-            msg_id: msg.msg_id,
-            queued_at: queuedAt,
-            ttl_minutes: ttlMinutes[queue],
-          })
-          await moveToDlq(supabase, queue, msg, `TTL exceeded (${ttlMinutes[queue]} minutes)`)
+          try {
+            log.warn("process_email_queue_ttl_expired", {
+              holzen_event: "process_email_queue_ttl_expired",
+              queue,
+              msg_id: msg.msg_id,
+              ttl_minutes: ttlMinutes[queue],
+            });
+          } catch {
+            /* non-fatal */
+          }
+          await moveToDlq(supabase, queue, msg, `TTL exceeded (${ttlMinutes[queue]} minutes)`, log)
           continue
         }
       }
 
       // Move to DLQ if max failed send attempts reached.
       if (failedAttempts >= MAX_RETRIES) {
-        await moveToDlq(supabase, queue, msg, `Max retries (${MAX_RETRIES}) exceeded (attempted ${failedAttempts} times)`)
+        await moveToDlq(
+          supabase,
+          queue,
+          msg,
+          `Max retries (${MAX_RETRIES}) exceeded (attempted ${failedAttempts} times)`,
+          log,
+        )
         continue
       }
 
@@ -234,17 +276,31 @@ Deno.serve(withRequestLogging("process-email-queue", async ({ req }) => {
           .maybeSingle()
 
         if (alreadySent) {
-          console.warn('Skipping duplicate send (already sent)', {
-            queue,
-            msg_id: msg.msg_id,
-            message_id: payload.message_id,
-          })
+          try {
+            log.warn("process_email_queue_duplicate_skip", {
+              holzen_event: "process_email_queue_duplicate_skip",
+              queue,
+              msg_id: msg.msg_id,
+              message_id: payload.message_id,
+            });
+          } catch {
+            /* non-fatal */
+          }
           const { error: dupDelError } = await supabase.rpc('delete_email', {
             queue_name: queue,
             message_id: msg.msg_id,
           })
           if (dupDelError) {
-            console.error('Failed to delete duplicate message from queue', { queue, msg_id: msg.msg_id, error: dupDelError })
+            try {
+              log.error("process_email_queue_dup_delete_failed", {
+                holzen_event: "process_email_queue_dup_delete_failed",
+                queue,
+                msg_id: msg.msg_id,
+                detail: dupDelError.message,
+              });
+            } catch {
+              /* non-fatal */
+            }
           }
           continue
         }
@@ -286,18 +342,33 @@ Deno.serve(withRequestLogging("process-email-queue", async ({ req }) => {
           message_id: msg.msg_id,
         })
         if (delError) {
-          console.error('Failed to delete sent message from queue', { queue, msg_id: msg.msg_id, error: delError })
+          try {
+            log.error("process_email_queue_delete_after_send_failed", {
+              holzen_event: "process_email_queue_delete_after_send_failed",
+              queue,
+              msg_id: msg.msg_id,
+              detail: delError.message,
+            });
+          } catch {
+            /* non-fatal */
+          }
         }
         totalProcessed++
       } catch (error) {
         const errorMsg = error instanceof Error ? error.message : String(error)
-        console.error('Email send failed', {
-          queue,
-          msg_id: msg.msg_id,
-          read_ct: msg.read_ct,
-          failed_attempts: failedAttempts,
-          error: errorMsg,
-        })
+        try {
+          log.error("process_email_queue_send_failed", {
+            holzen_event: "process_email_queue_send_failed",
+            queue,
+            msg_id: msg.msg_id,
+            read_ct: msg.read_ct,
+            failed_attempts: failedAttempts,
+            recipient_host: typeof payload.to === "string" ? recipientHostFromEmail(payload.to) : null,
+            detail: errorMsg.slice(0, 500),
+          });
+        } catch {
+          /* non-fatal */
+        }
 
         if (isRateLimited(error)) {
           await supabase.from('email_send_log').insert({
@@ -329,7 +400,7 @@ Deno.serve(withRequestLogging("process-email-queue", async ({ req }) => {
         // 403 means emails are disabled for this project — retrying won't help.
         // Move straight to DLQ and stop processing the rest of the batch.
         if (isForbidden(error)) {
-          await moveToDlq(supabase, queue, msg, 'Emails disabled for this project')
+          await moveToDlq(supabase, queue, msg, "Emails disabled for this project", log)
           return new Response(
             JSON.stringify({ processed: totalProcessed, stopped: 'emails_disabled' }),
             { headers: { 'Content-Type': 'application/json' } }
