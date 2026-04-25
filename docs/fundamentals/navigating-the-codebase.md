@@ -209,12 +209,13 @@ Each folder under **`supabase/functions/<name>/`** is a deployable function. Sha
 
 - **[ai-powered-pause-system.md](../systems/pause/ai-powered-pause-system.md)** — Manual vs automatic pause, shared pause-session AI, `companion-orchestrate`, interventions, generators, drift and ops notes.
 - **[cron-setup.md](../ops/cron-setup.md)** — Scheduling edge functions (BTC refresh, feeds, digests, etc.).
+- **[deployment-sync-guide.md](../ops/deployment-sync-guide.md)** — GitHub ↔ Lovable sync, pre-push checklist, **`npm run check:prepush`**, and migration/edge troubleshooting.
 
 ---
 
 ## 17. Lovable Cloud: what deploys when
 
-If you use [Lovable](https://lovable.dev) with GitHub sync to a linked Supabase project (see [README.md](../README.md#Lovable)):
+If you use [Lovable](https://lovable.dev) with GitHub sync to a linked Supabase project (see [README.md](../README.md#lovable)):
 
 | Change in repo | Typical effect on live users |
 |----------------|------------------------------|
