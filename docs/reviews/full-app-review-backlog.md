@@ -51,7 +51,7 @@ Treat Phases **1–2** as the **product spine** for pause; **3–8** as the **ba
 | `/tools/breathe` | 2–4 | |
 | `/tools/ground` | 3–5 | |
 | `/tools/ground/history` | 2–3 | Pair with `/tools/ground` to save context |
-| `/tools/ambient` | 2–4 | |
+| `/tools/ambient` | — | Redirects to `/tools/breathe`; page removed |
 | `/tools/practice/checkin` | 2–4 | |
 | `/tools/practice/journal` | 3–5 | Ties to `journal-prompt` and library/Journey usage |
 | `/tools/practice/bodyscan` | 2–4 | |
@@ -114,7 +114,7 @@ Full name list: [bruno/functions-catalog.md](../../bruno/functions-catalog.md).
 ## Suggested sequencing
 
 1. **Tier A — daily path:** Home (and shell) → Library → Settings → subscription UX.  
-2. **Tier B — practice cluster:** Merge `/practice/*` + `/breathe` + `/ambient` in one or two reviews.  
+2. **Tier B — practice cluster:** Merge `/practice/*` + `/breathe` in one or two reviews (`/tools/ambient` removed; redirects to breathe).  
 3. **Tier C — ground:** `/ground` + `/ground/history`.  
 4. **Tier D — public:** Landing, auth, legal/blog/roadmap.  
 5. **Tier E — admin** when ops surfaces matter.  

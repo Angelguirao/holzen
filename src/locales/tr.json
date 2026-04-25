@@ -156,14 +156,11 @@
   "tools": {
     "title": "Araçlar",
     "subtitle": "Düzenleme, topraklama, pratik — Ana Sayfa’dakiler, tek listede.",
-    "breathe": "Sükûnet (nefes)",
+    "listIntro": "Aşağıdaki araçlardan birini açın. Tam ekranda sekmeler gizlenir; Geri veya akıştaki eylemleri kullanın.",
+    "breathe": "Sükûnet",
     "breatheDesc": "Hedefsiz nefes alanı.",
-    "ambient": "Ortam modu",
-    "ambientDesc": "Yumuşak ses ve renk.",
     "ground": "Topraklama",
-    "groundDesc": "Bağlamınıza göre rehberli topraklama.",
-    "groundHistory": "Topraklama günlüğü",
-    "groundHistoryDesc": "Önceki topraklama oturumları."
+    "groundDesc": "Rehberli oturum; günlük aynı deneyimdeki ikinci sekmede."
   },
   "profile": {
     "stats": "İstatistikler",

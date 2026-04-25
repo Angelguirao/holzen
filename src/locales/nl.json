@@ -156,14 +156,11 @@
   "tools": {
     "title": "Tools",
     "subtitle": "Regulatie, gronden, oefening — hetzelfde als op Home, in één lijst.",
-    "breathe": "Stilte (ademen)",
+    "listIntro": "Open een tool hieronder. Volledig scherm verbergt de tabbalk; gebruik Terug of de acties in de flow.",
+    "breathe": "Stilte",
     "breatheDesc": "Rustige ademruimte zonder doelen.",
-    "ambient": "Ambient-modus",
-    "ambientDesc": "Zachte geluiden en kleuren.",
     "ground": "Gronden",
-    "groundDesc": "Begeleid gronden met jouw context.",
-    "groundHistory": "Grond-dagboek",
-    "groundHistoryDesc": "Eerdere grond-sessies."
+    "groundDesc": "Begeleide sessie; je dagboek staat op het tweede tabblad in dezelfde ervaring."
   },
   "profile": {
     "stats": "Statistieken",

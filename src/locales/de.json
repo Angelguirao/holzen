@@ -156,14 +156,11 @@
   "tools": {
     "title": "Tools",
     "subtitle": "Regulation, Erden, Übungen — dieselben Aktivitäten wie auf der Startseite, in einer Liste.",
-    "breathe": "Stille (Atmen)",
+    "listIntro": "Öffne ein Tool unten. Vollbild-Tools blenden die Tab-Leiste aus; nutze Zurück oder die Aktionen im Flow.",
+    "breathe": "Stille",
     "breatheDesc": "Ruhiger Atemraum ohne Ziele.",
-    "ambient": "Ambient-Modus",
-    "ambientDesc": "Sanfte Klang- und Farbwelt.",
     "ground": "Erden",
-    "groundDesc": "Geführtes Erden mit deinen Themen und Kontext.",
-    "groundHistory": "Erde-Tagebuch",
-    "groundHistoryDesc": "Verlauf früherer Erde-Sessions."
+    "groundDesc": "Geführte Session; dein Tagebuch liegt im zweiten Tab derselben Ansicht."
   },
   "profile": {
     "stats": "Statistiken",

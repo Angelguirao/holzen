@@ -21,9 +21,9 @@ Five bottom tabs, all wrapped in `AppLayout` (header + `Outlet` + bottom nav, ma
 | -------- | --------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | Home     | `/`             | Hub: widgets (market, hold goal, reflection, ground entry, night, practice, breathe), pause triggers, onboarding; **Journey** entry card (`JourneyHomeCard`) to `/journey/stats`. *Letters are not a Home widget; they live under Tools.*                                                   |
 | Library  | `/library`      | Saved pause artifacts, collections, search, source filters; **Activity log** tab link to `/journey/activity` (complements `HistoryCrossLinks` / copy).                                                                                                                                      |
-| Tools    | `/tools`        | In-app index (`ToolsHub`): a **Journey (progress & log)** block links to `/tools/letters` and `/journey/activity`, then **immersive tools** (breathe, ambient, ground, etc.). Only `/tools` and `/tools/letters` use the **shell + bottom nav**; other `/tools/...` routes are full-screen. |
+| Tools    | `/tools`        | In-app index (`ToolsHub`): **one** list to letters, stillness, ground, practice, etc. (no separate “Journey block” on this screen; progress stays under **Journey**). **Ground** opens a full-screen shell with **Session** and **Journal** tabs (`/tools/ground` and `/tools/ground/history`). Only `/tools` and `/tools/letters` use the **shell + bottom nav**; other `/tools/...` routes are full-screen. |
 | Journey  | `/journey/:tab` | Longitudinal “you” content: **stats, insights, badges, activity** — each tab is a **path segment** (default `/journey/stats`). *Letters are not a Journey tab.*                                                                                                                             |
-| Settings | `/settings`     | Long accordion page with **Jump to** controls (section ids + open/scroll) for Account, Pause, App, Content, Notifications, Subscription, Security; preferences, Pro/checkout, account actions, etc.                                                                                         |
+| Settings | `/settings`     | **Hub** at `/settings` with links to per-section screens (`/settings/<section>`), plus `/settings/about` and `/settings/billing-history`; `useSettingsModel` only loads for hub and section routes.                                                                                               |
 
 
 **Letters (Pro):** canonical route `/tools/letters`. Optional query `?letter=<id>` scrolls to that delivered letter. Legacy `/journey/letters?...` redirects to `/tools/letters?...` (query preserved).
@@ -32,7 +32,7 @@ Notification `action_path` for letter delivery uses `/tools/letters?letter=<id>`
 
 **Settings sub-routes (still in shell + bottom nav):** `/settings/billing-history`, `/settings/about` (changelog, version, feedback — split out so the main Settings page stays action-first).
 
-**In-app index for tools:** `/tools` lists letters, breathe, ambient, ground, ground history, and practice — same destinations as the listed `/tools/...` URLs. Linked from Home (Practice + Breathe widgets).
+**In-app index for tools:** `/tools` lists letters, stillness, ground (journal is the second tab in that flow, not a separate hub row), and practice. Legacy `/tools/ambient` **redirects** to `/tools/breathe`. Linked from Home (Practice + Breathe widgets).
 
 This matches the “skills-first” stats organization documented in `docs/decisions/2026-04-23-skills-first-stats-ia.md` and implemented in `StatsContentV2`.
 
@@ -45,7 +45,7 @@ This matches the “skills-first” stats organization documented in `docs/decis
 | ----------------- | --------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------- |
 | Pause session     | `/pause`                                                                                                              | Core guided pause flow.                            |
 | Companions        | `/companion/zoom-out/:pauseInstanceId`, `/companion/history/...`, `/companion/signal/...`, `/companion/grounding/...` | Deep-linked to a pause instance.                   |
-| Tools (immersive) | `/tools/breathe`, `/tools/ambient`, `/tools/ground`, `/tools/ground/history`, `/tools/practice/`*                     | Regulation / grounding / practice — no bottom nav. |
+| Tools (full-screen) | `/tools/breathe`, `/tools/ground` (nested: index + `history` for the grounding journal; shared `ToolsGroundLayout` chrome), `/tools/practice/`*, legacy `/tools/ambient` → **redirect** to `/tools/breathe` | Regulation / grounding / practice — no bottom nav. |
 
 
 **B. Same shell as primary tabs (not listed in §1.1 table)** — still `AppLayout` + bottom nav:
@@ -89,7 +89,7 @@ Under `/admin` and children (`/admin/smoke-test`, `/admin/sentry-alerts`, `/admi
 ## 2. Assessment: what works
 
 1. **Clear hub:** Home as the main entry for daily use fits a mindfulness + BTC-volatility product.
-2. **Immersive separation:** Full-screen routes protect focus (pause, breathe, ground, practice) without fighting the **five-tab** shell.
+2. **Full-screen tool separation:** Full-screen routes protect focus (pause, breathe, ground, practice) without fighting the **five-tab** shell.
 3. **Deep links for companions:** Instance-scoped URLs are the right pattern for resuming or sharing a specific pause outcome.
 4. **Stats skills-first:** Journey’s default-to-stats and skills-first structure is coherent once users land there (see decision doc).
 5. **Settings depth:** Accordion / long-page settings is common on mobile; billing as a sub-route is reasonable.
@@ -105,11 +105,11 @@ Under `/admin` and children (`/admin/smoke-test`, `/admin/sentry-alerts`, `/admi
 3. **Progress / history split across three places**
   - Library: saved artifacts and collections.  
   - Journey → activity (chronological log).  
-  - `/tools/ground/history` for grounding-specific history.  
+  - Grounding-specific history: **`/tools/ground/history`**, reached from the **Journal** tab inside the Ground full-screen experience (grouped with the session, not a separate “mode” in the tools list).  
    **Mitigation shipped:** cross-links (`HistoryCrossLinks`) on Library, Journey → Activity, and Grounding history; the underlying three-surface model remains intentional.
-4. **Settings is long and multi-purpose**
-  Pro, referrals, haptics, push, quiet hours, content sources, danger zone — still a lot on one page, but low-frequency **changelog / version / feedback** moved to `/settings/about` with task-oriented grouping on the main page, plus a **Jump to** control row for the accordion sections.
-5. **Discoverability of immersive tools**
+4. **Settings is multi-purpose**
+  Pro, referrals, haptics, push, quiet hours, content sources, danger zone — still a lot to cover, but low-frequency **changelog / version / feedback** is on `/settings/about`, and the main settings experience is a **hub** plus **per-section routes** under `/settings/<section>`.
+5. **Discoverability of full-screen tools**
   **Mitigation shipped:** **Tools** is a **bottom tab** pointing at `/tools` (`ToolsHub`). Home widgets and deep links remain; full-screen tool routes still hide the shell; `/tools/letters` stays in the shell.
 6. **Marketing vs app boundary**
   Public pages (`/about`, `/blog`, `/reserve`) are consistent; `/roadmap` is a small stub page so inbound links don’t rot or drop users on welcome with no explanation.
@@ -122,10 +122,10 @@ This section captures the **current state** and what we may reconsider next.
 
 ### 4.1 Unify modalities under one parent
 
-- **Shipped:** canonical `/tools/*` URL family for letters (future self), breathe, ambient, ground, ground history, and practice.
+- **Shipped:** canonical `/tools/*` URL family for letters (future self), stillness, ground (with nested `history` for the grounding journal), practice; legacy `/tools/ambient` redirects to `/tools/breathe` (old Ambient page removed).
 - **Shipped:** no alternate short routes; external links/bookmarks should use `/tools/...`.
-- **Shipped:** information entry point via `/tools` (`ToolsHub`: Journey block + immersive list) plus Home links (“Browse all tools & experiences”).
-- **Shipped:** **Tools** as a **primary bottom tab** (five tabs total) for `/tools` and `/tools/letters` (shell); other immersive `/tools/...` stays full-screen.
+- **Shipped:** information entry point via `/tools` (`ToolsHub`: **single** list — no “Journey vs immersive” split on that screen) plus Home links.
+- **Shipped:** **Tools** as a **primary bottom tab** (five tabs total) for `/tools` and `/tools/letters` (shell); other full-screen `/tools/...` routes hide the tab bar.
 - **Shipped (measurement):** PostHog `navigation.primary_tab_opened` (see **§1.7**) so tab mix and Tools adoption are quantifiable.
 - **Alternative to revisit:** if five tabs feel crowded on small devices, revisit order/labeling or promote tools from Home only — use `navigation.primary_tab_opened` + qualitative feedback (e.g. short hallway tests).
 
@@ -167,7 +167,7 @@ Use this as a **checklist** when planning research or another IA pass. Detailed 
 
 | Theme                    | Shipped guardrails                                                   | Alternatives / improvements to consider                                                                     |
 | ------------------------ | -------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------- |
-| **Tools & shell**        | Canonical `/tools/*`, Tools hub tab, `navigation.primary_tab_opened` | Reorder tabs; drop back to four tabs and surface Tools only from Home; A/B or cohort review of tab events   |
+| **Tools & shell**        | Canonical `/tools/*`, single `ToolsHub` list, Ground session+journal in `ToolsGroundLayout`, `/tools/ambient` → breathe; `navigation.primary_tab_opened` | Reorder tabs; further merge practice routes if the list still feels long                                  |
 | **Journey vs “profile”** | `/journey/:tab`, skills-first stats; **Home** shows score preview    | Heavier Home module or a **dedicated Stats tab** if interviews + metrics justify it                         |
 | **Journey scope**        | One hub: stats, insights, badges, activity; letters under Tools      | Further **split tabs or routes** if one area dominates support load (product call)                          |
 | **Library vs Activity**  | Copy + `HistoryCrossLinks`                                           | **Single screen** with `saved` / `timeline` modes if users still mix them up                                |
@@ -211,6 +211,7 @@ Use this as a **checklist** when planning research or another IA pass. Detailed 
 | 2026-04-26 | —      | **Code:** `usePauseStatsData` via TanStack Query; `useHoldGoalProfile`; Home `JourneyHomeCard` shows Holzen score + ring when ≥1 completed pause; `COMPANION_PREFIX` in `app-routes`.       |
 | 2026-04-27 | —      | Invalidate pause stats cache on pause `completed`; register global `QueryClient`; Settings hash + `/settings/section/:section`; `settingsSectionPath` in `app-routes`.                       |
 | 2026-04-28 | —      | **Settings:** true per-section routes (`/settings/<id>`), hub, `useSettingsModel` + provider layout; `settingsSectionPath` points at `/settings/<id>`; legacy path + hash compat.          |
+| 2026-04-28 | —      | **Tools:** unified `ToolsHub` list (no Journey/activity on hub); **Ground** `ToolsGroundLayout` with Session + Journal; remove Ambient page (redirect to Stillness); i18n “Stillness” no parenthetical. |
 
 
 When routes, bottom-nav items, or nav-related analytics change, update **§1**, **§1.7**, **§4.1**, **§4.7**, **event-taxonomy.md** (if applicable), and a **Changelog** row in the same PR.

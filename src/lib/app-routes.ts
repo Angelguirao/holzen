@@ -32,7 +32,6 @@ export const TOOLS = {
   breathe: '/tools/breathe',
   ground: '/tools/ground',
   groundHistory: '/tools/ground/history',
-  ambient: '/tools/ambient',
   practice: {
     checkin: '/tools/practice/checkin',
     journal: '/tools/practice/journal',

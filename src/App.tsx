@@ -36,7 +36,7 @@ const Blog = lazy(() => import("./pages/Blog"));
 const BlogPost = lazy(() => import("./pages/BlogPost"));
 // Roadmap: public stub page (`RoadmapStub`) — not a full product roadmap inside the shell.
 const Breathe = lazy(() => import("./pages/Breathe"));
-const Ambient = lazy(() => import("./pages/Ambient"));
+const ToolsGroundLayout = lazy(() => import("./pages/ToolsGroundLayout"));
 const Reserve = lazy(() => import("./pages/Reserve"));
 const PracticeCheckIn = lazy(() => import("./pages/PracticeCheckIn"));
 const PracticeJournal = lazy(() => import("./pages/PracticeJournal"));
@@ -210,9 +210,11 @@ const App = () => (
                   element={<ProtectedRoute><CompanionGroundingPage /></ProtectedRoute>}
                 />
                 <Route path="/tools/breathe" element={<ProtectedRoute><Breathe /></ProtectedRoute>} />
-                <Route path="/tools/ground" element={<ProtectedRoute><Ground /></ProtectedRoute>} />
-                <Route path="/tools/ground/history" element={<ProtectedRoute><GroundHistory /></ProtectedRoute>} />
-                <Route path="/tools/ambient" element={<ProtectedRoute><Ambient /></ProtectedRoute>} />
+                <Route path="/tools/ambient" element={<Navigate to="/tools/breathe" replace />} />
+                <Route path="/tools/ground" element={<ProtectedRoute><ToolsGroundLayout /></ProtectedRoute>}>
+                  <Route index element={<Ground />} />
+                  <Route path="history" element={<GroundHistory />} />
+                </Route>
                 <Route path="/tools/practice/checkin" element={<ProtectedRoute><PracticeCheckIn /></ProtectedRoute>} />
                 <Route path="/tools/practice/journal" element={<ProtectedRoute><PracticeJournal /></ProtectedRoute>} />
                 <Route path="/tools/practice/bodyscan" element={<ProtectedRoute><PracticeBodyScan /></ProtectedRoute>} />

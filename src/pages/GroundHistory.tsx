@@ -1,12 +1,11 @@
 import { useState, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ArrowLeft, Anchor, Clock, Calendar } from 'lucide-react';
+import { Anchor, Clock, Calendar } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/use-auth';
 import { MoodIcon } from '@/components/icons/MoodIcon';
-import { NoxHeaderMain } from '@/components/ui/nox-header';
 import { Button } from '@/components/ui/button';
 import { TOOLS } from '@/lib/app-routes';
 import { HistoryCrossLinks } from '@/components/HistoryCrossLinks';
@@ -105,33 +104,17 @@ export default function GroundHistory() {
 
   return (
     <motion.div
-      className="fixed inset-0 z-50 overflow-y-auto"
+      className="flex h-full min-h-0 flex-col overflow-y-auto"
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       transition={{ duration: 0.5, ease }}
       style={{ background: 'linear-gradient(160deg, hsl(var(--background)) 0%, hsl(var(--muted)) 50%, hsl(var(--background)) 100%)' }}
     >
-      {/* Header */}
-      <div className="sticky top-0 z-20 border-b border-border/30 bg-background/85 backdrop-blur-md">
-        <div className="mx-auto flex max-w-md items-center gap-3 px-5 py-4 sm:px-8">
-          <button
-            type="button"
-            onClick={() => navigate(-1)}
-            className="-ml-2 rounded-full p-2 text-muted-foreground transition-colors hover:bg-muted/50 hover:text-foreground"
-          >
-            <ArrowLeft className="h-5 w-5" />
-          </button>
-          <div className="min-w-0 flex-1">
-            <NoxHeaderMain
-              className="border-0 pb-0"
-              title={t('ground.historyTitle', { defaultValue: 'Grounding Journal' })}
-              subtitle={t('ground.historySubtitle', { defaultValue: 'Your grounding sessions and notes' })}
-            />
-          </div>
+      <div className="mx-auto w-full max-w-md space-y-6 px-5 pb-10 pt-4 sm:px-8">
+        <div className="space-y-1 border-b border-border/20 pb-4">
+          <p className="font-editorial text-lg text-foreground">{t('ground.historyTitle', { defaultValue: 'Grounding Journal' })}</p>
+          <p className="text-sm text-muted-foreground">{t('ground.historySubtitle', { defaultValue: 'Your grounding sessions and notes' })}</p>
         </div>
-      </div>
-
-      <div className="mx-auto max-w-md space-y-8 px-5 py-8 sm:px-8">
         <HistoryCrossLinks links={['library', 'journeyActivity']} />
 
         {/* Stats summary */}
