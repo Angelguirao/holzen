@@ -7,7 +7,6 @@ import { useSubscription } from '@/hooks/use-subscription';
 import { useHoldGoalProfile } from '@/hooks/use-hold-goal';
 import { type ProfileTab } from '@/lib/router-location-state';
 import { journeyPath, isProfileTab } from '@/lib/app-routes';
-import { HistoryCrossLinks } from '@/components/HistoryCrossLinks';
 import { BarChart3, Sparkles, Award, CalendarDays } from 'lucide-react';
 import HistoryContent from '@/components/library/HistoryContent';
 import { StatsContentV2 } from '@/components/stats/StatsContentV2';
@@ -119,10 +118,6 @@ const Profile = () => {
         )
       ) : (
         <>
-          <p className="text-xs text-muted-foreground leading-relaxed mb-2">{t('journey.activityExplainer')}</p>
-          <div className="mb-3">
-            <HistoryCrossLinks links={['library', 'groundHistory']} />
-          </div>
           <ProLock feature="history" hideContent>
             <HistoryContent />
           </ProLock>

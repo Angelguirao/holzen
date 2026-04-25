@@ -8,7 +8,6 @@ import { useAuth } from '@/hooks/use-auth';
 import { MoodIcon } from '@/components/icons/MoodIcon';
 import { Button } from '@/components/ui/button';
 import { TOOLS } from '@/lib/app-routes';
-import { HistoryCrossLinks } from '@/components/HistoryCrossLinks';
 
 interface GroundingEntry {
   id: string;
@@ -115,8 +114,6 @@ export default function GroundHistory() {
           <p className="font-editorial text-lg text-foreground">{t('ground.historyTitle', { defaultValue: 'Grounding Journal' })}</p>
           <p className="text-sm text-muted-foreground">{t('ground.historySubtitle', { defaultValue: 'Your grounding sessions and notes' })}</p>
         </div>
-        <HistoryCrossLinks links={['library', 'journeyActivity']} />
-
         {/* Stats summary */}
         {!loading && totalSessions > 0 && (
           <motion.div

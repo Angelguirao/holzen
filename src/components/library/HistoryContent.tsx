@@ -15,7 +15,7 @@ const HistoryContent = () => {
   useEffect(() => {
     if (!user) return;
     const load = async () => {
-      const [{ data: pauses }, { data: lets }, { data: bads }, { data: pracs }] = await Promise.all([
+      const [{ data: pauses }, { data: lets }, { data: bads }, { data: pracs }, { data: libItems }] = await Promise.all([
         supabase
           .from('v_pause_full' as never)
           .select('id, created_at, completed_at, engaged_at, initial_mood, shift_mood, outcome, state, has_breath_completed')
@@ -24,6 +24,11 @@ const HistoryContent = () => {
         supabase.from('future_letters').select('id, written_at, deliver_during').eq('user_id', user.id),
         supabase.from('user_badges').select('id, earned_at, badge_id').eq('user_id', user.id),
         supabase.from('practice_entries').select('id, created_at, type, mood, prompt').eq('user_id', user.id),
+        supabase
+          .from('library_items')
+          .select('id, created_at, title, source_type, status')
+          .eq('user_id', user.id)
+          .neq('status', 'deleted'),
       ]);
 
       const PRACTICE_LABELS: Record<string, string> = {
@@ -70,6 +75,15 @@ const HistoryContent = () => {
           mood: p.mood,
           practiceType: p.type,
         }),
+      );
+      (libItems ?? []).forEach(
+        (i: { id: string; created_at: string; title: string | null; source_type: string | null; status: string | null }) =>
+          items.push({
+            date: i.created_at,
+            type: 'library',
+            id: i.id,
+            label: i.title?.trim() || i.source_type || 'Saved to library',
+          }),
       );
       setActivities(items);
       setLoading(false);
