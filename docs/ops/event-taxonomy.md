@@ -19,11 +19,19 @@ The authoritative list of PostHog events Holzen emits. Deliberate events only â€
 
 ## Instrumentation status
 
-- **Wired** (emission live in code): `auth.signed_up`, `auth.signed_in`, `auth.signed_out`.
+- **Wired** (emission live in code): `auth.signed_up`, `auth.signed_in`, `auth.signed_out`, `navigation.primary_tab_opened`.
 - **Planned, next PR:** `reflection.completed`, `generation.initiated`, `companion.served`, `paywall.viewed`, `paywall.subscribed`, `feedback.submitted`, `performance.web_vital`, `ritual.*`.
 - **Convention:** every new event adds a row below AND a call to `trackEvent('name', props)` in the feature's source â€” never add events in the PostHog UI first.
 
 ## Active events
+
+### navigation
+
+| Event | When | Properties | Owner |
+|---|---|---|---|
+| `navigation.primary_tab_opened` | User taps a **different** primary bottom tab (shell) than the current one | `{ tab: 'home' \| 'library' \| 'tools' \| 'journey' \| 'settings' }` | @holzen |
+
+Does not fire when re-tapping the active tab or when navigation is not from the bottom bar (e.g. deep link, back button).
 
 ### auth
 
