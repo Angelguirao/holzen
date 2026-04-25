@@ -72,3 +72,17 @@ export function toZoomOutDisplayData(raw: unknown): ZoomOutData {
 
   return { onThisDay, currentPrice, echo, deepTime, partial };
 }
+
+/**
+ * One-line preview for library list cards from a stored `zoom_out` JSON `body`.
+ * Returns `null` when JSON is invalid so callers can keep the raw string (truncated elsewhere).
+ */
+export function zoomOutBodyPreviewFromJsonString(raw: string): string | null {
+  try {
+    const d = toZoomOutDisplayData(JSON.parse(raw));
+    const line = d.deepTime?.body || d.echo?.message || d.deepTime?.title;
+    return line || 'Zoom Out';
+  } catch {
+    return null;
+  }
+}
