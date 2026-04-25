@@ -1502,15 +1502,16 @@
     "noInsightsYet": "No insights generated yet. Click \"Generate\" to analyze your pause patterns.",
     "analyzingCount": "Analyzing {{count}} pauses…",
     "refreshRecommended": "Refresh recommended",
-    "reflectionsCount": "{{count}} pauses"
+    "reflectionsCount": "{{count}} pauses",
+    "pauseSessionsCount": "{{count}} pauses"
   },
   "wallpaper": {
     "generating": "Generating wallpaper…",
     "carry": "Carry your pause with you.",
     "wallpaper": "Wallpaper",
     "generateTitle": "Generate wallpaper",
-    "generateFromReflection": "Generate wallpaper from this reflection",
-    "reflectionWallpaper": "Reflection Wallpaper",
+    "generateFromReflection": "Generate wallpaper from this pause",
+    "reflectionWallpaper": "Pause wallpaper",
     "download": "Download",
     "downloaded": "Wallpaper downloaded",
     "regenerate": "Regenerate",

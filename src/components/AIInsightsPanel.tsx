@@ -278,7 +278,10 @@ export function AIInsightsPanel({ completedPauseCount }: Props) {
                 </span>
               )}
               <p className="text-[9px] font-mono text-muted-foreground/30">
-                {t('aiInsights.reflectionsCount', { count: row.reflection_count })}
+                {t('aiInsights.pauseSessionsCount', {
+                  count: row.reflection_count,
+                  defaultValue: '{{count}} pauses',
+                })}
               </p>
             </div>
           </div>

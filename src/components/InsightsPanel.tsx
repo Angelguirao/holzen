@@ -3,13 +3,14 @@ import { useTranslation } from 'react-i18next';
 import { ChartEmptyState } from './ChartEmptyState';
 import { MOOD_GLYPHS } from '@/components/icons/MoodIcon';
 
-interface ReflectionStats {
+interface PauseStatRow {
   mood: string | null;
   outcome: string | null;
 }
 
 interface Props {
-  reflections: ReflectionStats[];
+  /** Mood/outcome rows from recent pause sessions (legacy prop name was `reflections`). */
+  sessions: PauseStatRow[];
 }
 
 const MOOD_META: Record<string, { glyph: string; color: string; energy: 'high' | 'low' }> = {
@@ -50,7 +51,7 @@ function Bar({ label, count, total, color }: { label: string; count: number; tot
   );
 }
 
-export function InsightsPanel({ reflections }: Props) {
+export function InsightsPanel({ sessions }: Props) {
   const { t } = useTranslation();
 
   const { moodCounts, outcomeCounts, totalMoods, totalOutcomes } = useMemo(() => {
@@ -59,7 +60,7 @@ export function InsightsPanel({ reflections }: Props) {
     let tm = 0;
     let to = 0;
 
-    for (const r of reflections) {
+    for (const r of sessions) {
       if (r.mood) { moods[r.mood] = (moods[r.mood] || 0) + 1; tm++; }
       if (r.outcome) {
         // Merge legacy 'nothing' into 'held'
@@ -69,14 +70,14 @@ export function InsightsPanel({ reflections }: Props) {
     }
 
     return { moodCounts: moods, outcomeCounts: outcomes, totalMoods: tm, totalOutcomes: to };
-  }, [reflections]);
+  }, [sessions]);
 
   if (totalMoods === 0 && totalOutcomes === 0) {
     return (
       <ChartEmptyState
         title={t('insightsPanel.title')}
         message={t('insightsPanel.emptyMessage', 'Log a mood or outcome during a pause to see your patterns. Emotional check-ins also contribute.')}
-        current={reflections.length}
+        current={sessions.length}
         needed={1}
       />
     );
@@ -115,7 +116,7 @@ export function InsightsPanel({ reflections }: Props) {
       )}
 
       <p className="text-[10px] text-muted-foreground/40 leading-relaxed">
-        {t('insightsPanel.basedOn', { count: reflections.length })}
+        {t('insightsPanel.basedOn', { count: sessions.length })}
       </p>
     </div>
   );

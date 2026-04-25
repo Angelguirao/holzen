@@ -29,14 +29,14 @@ const Privacy = () => {
         <section className="space-y-3">
           <h2 className="text-sm font-medium text-foreground">1. What We Collect</h2>
           <p className="text-xs text-muted-foreground leading-relaxed">
-            We collect only what is necessary to operate the Service: your email address (for authentication and optional email notifications), your volatility threshold preference, and push notification tokens if you enable browser notifications. We also store reflections generated for you so you can review them later.
+            We collect only what is necessary to operate the Service: your email address (for authentication and optional email notifications), your volatility threshold preference, and push notification tokens if you enable browser notifications. We also store pause sessions and related AI copy generated for you so you can review them later.
           </p>
         </section>
 
         <section className="space-y-3">
           <h2 className="text-sm font-medium text-foreground">2. How We Use Your Data</h2>
           <p className="text-xs text-muted-foreground leading-relaxed">
-            Your data is used solely to deliver the Service — monitoring volatility against your threshold, generating and delivering reflections, and managing your subscription. We do not use your data for advertising, profiling, or any purpose unrelated to the Service.
+            Your data is used solely to deliver the Service — monitoring volatility against your threshold, generating and delivering pause experiences, and managing your subscription. We do not use your data for advertising, profiling, or any purpose unrelated to the Service.
           </p>
         </section>
 
@@ -54,7 +54,7 @@ const Privacy = () => {
           </p>
           <ul className="space-y-2 text-xs text-muted-foreground leading-relaxed list-disc list-inside">
             <li><span className="text-foreground">Stripe</span> — for payment processing. Stripe handles your payment information directly; we never store your card details.</li>
-            <li><span className="text-foreground">AI providers</span> — for generating reflections. Only market context (not personal data) is sent to generate your reflection.</li>
+            <li><span className="text-foreground">AI providers</span> — for generating pause prompts. Only market context (not personal data) is sent to produce your reflect-step copy.</li>
             <li><span className="text-foreground">CoinGecko</span> — for Bitcoin price and volatility data. No user data is shared with this service.</li>
           </ul>
         </section>
@@ -75,7 +75,7 @@ const Privacy = () => {
             <li>Access the personal data we hold about you</li>
             <li>Request correction of inaccurate data</li>
             <li>Request deletion of your account and all associated data</li>
-            <li>Export your reflection history</li>
+            <li>Export your pause history</li>
             <li>Withdraw consent for optional notifications at any time</li>
           </ul>
           <p className="text-xs text-muted-foreground leading-relaxed">
@@ -86,7 +86,7 @@ const Privacy = () => {
         <section className="space-y-3">
           <h2 className="text-sm font-medium text-foreground">7. Data Deletion</h2>
           <p className="text-xs text-muted-foreground leading-relaxed">
-            When you cancel your subscription and request account deletion, all your personal data — including your profile, preferences, reflections, and notification tokens — will be permanently deleted within 30 days.
+            When you cancel your subscription and request account deletion, all your personal data — including your profile, preferences, pause history, and notification tokens — will be permanently deleted within 30 days.
           </p>
         </section>
 
