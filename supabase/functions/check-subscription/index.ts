@@ -99,6 +99,7 @@ serve(
         monthly_insights_used: insights.used,
         monthly_insights_remaining: insights.remaining,
         flex_credits_balance: flexCreditsBalance,
+        subscription_billing_interval: null,
       }), {
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
@@ -148,6 +149,7 @@ serve(
           monthly_insights_used: insights.used,
           monthly_insights_remaining: insights.remaining,
           flex_credits_balance: flexCreditsBalance,
+          subscription_billing_interval: null,
         }), {
           headers: { ...corsHeaders, "Content-Type": "application/json" },
         });
@@ -163,6 +165,8 @@ serve(
     let subscriptionStatus = "free";
     let subscriptionTier: "free" | "pro" | "pro_plus" | "lifetime" = "free";
     let activePriceId: string | null = null;
+    /** `price.recurring.interval` from the active line item, when set */
+    let subscriptionBillingInterval: string | null = null;
     let trialStart: string | null = null;
     let trialEnd: string | null = null;
 
@@ -183,7 +187,12 @@ serve(
 
       if (eligibleSub) {
         subscriptionStatus = eligibleSub.status;
-        activePriceId = eligibleSub.items?.data?.[0]?.price?.id ?? null;
+        const firstPrice = eligibleSub.items?.data?.[0]?.price;
+        activePriceId = firstPrice?.id ?? null;
+        const interval = (firstPrice as { recurring?: { interval?: string } } | null)?.recurring?.interval;
+        if (interval === "month" || interval === "year" || interval === "day" || interval === "week") {
+          subscriptionBillingInterval = interval;
+        }
         subscriptionTier = tierFromStripePriceId({
           hasActive: true,
           priceId: activePriceId,
@@ -263,6 +272,7 @@ serve(
       monthly_insights_used: insights.used,
       monthly_insights_remaining: insights.remaining,
       flex_credits_balance: flexCreditsBalance,
+      subscription_billing_interval: subscriptionBillingInterval,
     }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });

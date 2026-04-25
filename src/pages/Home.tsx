@@ -20,7 +20,6 @@ import { LoadingButton } from '@/components/ui/loading-button';
 import { NoxHeaderMain } from '@/components/ui/nox-header';
 import { HomeWidget, useWidgetLayout } from '@/components/HomeWidget';
 import { useCallback, useEffect, useState, useMemo, useRef } from 'react';
-import { trackEvent } from '@/lib/posthog';
 import { useSearchParams, useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/use-auth';
@@ -86,7 +85,6 @@ const Home = () => {
   const navigate = useNavigate();
   const { subscribed, loading: subLoading, monthlyRemaining, checkoutLoading, startCheckout, refresh } = useSubscription();
   const [searchParams] = useSearchParams();
-  const paywallSubscribedTracked = useRef(false);
 
   useEffect(() => {
     if (searchParams.get('subscribed') === 'true') {
@@ -96,20 +94,6 @@ const Home = () => {
       );
     }
   }, [searchParams, refresh, t]);
-
-  useEffect(() => {
-    if (searchParams.get('subscribed') !== 'true' || !user) return;
-    if (subLoading) return;
-    if (!subscribed) return;
-    if (paywallSubscribedTracked.current) return;
-    paywallSubscribedTracked.current = true;
-    try {
-      // Client does not yet receive billing interval; default until check-subscription exposes it.
-      trackEvent('paywall.subscribed', { plan: 'monthly' });
-    } catch {
-      /* no-op */
-    }
-  }, [searchParams, user, subLoading, subscribed]);
 
   const {
     btcData,
