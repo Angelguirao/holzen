@@ -138,7 +138,7 @@ function pushRecencyForOrchestrateSlot(slot: RegenerateCompanionSlot, data: unkn
       break;
     }
     case 'zoomOut': {
-      const t = (data as { deepTime?: { title?: string } })?.deepTime?.title;
+      const t = toZoomOutDisplayData(data).deepTime?.title;
       if (t) updateRecencyHints('zoomOut', t);
       break;
     }
