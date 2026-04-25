@@ -1,6 +1,7 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import { render, screen, cleanup, act, waitFor } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
+import { reactRouterFutureFlags } from '@/lib/router-future';
 
 /**
  * UI-level cross-tab guard verification.
@@ -57,7 +58,7 @@ const REFRESH_IDEMPOTENCY_KEY = 'holzen_checkout_refresh_idempotency';
 
 function renderAt(path: string) {
   return render(
-    <MemoryRouter initialEntries={[path]}>
+    <MemoryRouter future={reactRouterFutureFlags} initialEntries={[path]}>
       <CheckoutConfirmation />
     </MemoryRouter>,
   );

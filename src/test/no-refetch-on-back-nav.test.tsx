@@ -1,6 +1,7 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import { render, screen, cleanup, fireEvent, act } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
+import { reactRouterFutureFlags } from '@/lib/router-future';
 
 /**
  * Regression test for the user-reported invariant:
@@ -82,7 +83,7 @@ const CHECKOUT_REFRESH_IDEMPOTENCY_KEY = 'holzen_checkout_refresh_idempotency';
 
 function renderConfirmationAt(path: string) {
   return render(
-    <MemoryRouter initialEntries={[path]}>
+    <MemoryRouter future={reactRouterFutureFlags} initialEntries={[path]}>
       <CheckoutConfirmation />
     </MemoryRouter>,
   );
