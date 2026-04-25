@@ -11,7 +11,7 @@ Use this when you want to **trace one full path** from landing on **`/pause`** t
 | 3 | **Slot outcome is explicit** | Edge line **`holzen_event":"companion_slot_resolved"`** with **`orchestrator_slot":"signal"`**, **`source`** (`cache` / `live` / `curated` / `empty`), **`filled`**, optional **`cache_relaxation`**. |
 | 4 | **Cache tier visible (if cache path)** | If Signal came from **`companion_cache`**, you may also see **`cache_serve`** with **`cache_relaxation`**; should be consistent with **`companion_slot_resolved.cache_relaxation`**. |
 | 5 | **Live path failures visible** | If live generation fails quality gate: **`quality_gate_reject`** with **`companion_type":"signal"`**; check **`generation_attempts`** for the same reflection. |
-| 6 | **Client and Edge line up** | **`lazy fetch slot filled`** (client) **`source`** matches Edge **`companion_slot_resolved`** **`source`** for the same request (same wall-clock window, same **`pause_instance_prefix`**). |
+| 6 | **Client and Edge line up** | **`lazy fetch slot filled`** (client) **`source`** matches Edge **`companion_slot_resolved`** **`source`** for the same request (same wall-clock window; client logs **`pause_instance_prefix`**, Edge slot line uses **`pause_prefix`** — both are the first 8 chars of the same **`pause_instance_id`**). |
 
 ## Preconditions
 

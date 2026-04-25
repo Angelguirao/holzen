@@ -11,16 +11,31 @@ export const COMPANION_ZOOM_OUT_DEEP_TIME = "zoom_out_deep_time";
 /** Which `serveFromCache` pass produced the row (telemetry + optional UI transparency). */
 export type CacheServeRelaxation = "none" | "market" | "repeat_or_lower_quality";
 
-function logCacheServeTelemetry(companionType: string, relaxation: CacheServeRelaxation): void {
+/** When passed from generators, `cache_serve` / `cache_strict_miss` use request correlation (cid, fn, drain). */
+export type CacheTelemetryLog = (msg: string, extra?: Record<string, unknown>) => void;
+
+function logCacheServeTelemetry(
+  companionType: string,
+  relaxation: CacheServeRelaxation,
+  structuredLog?: CacheTelemetryLog,
+): void {
   try {
-    console.log(
-      JSON.stringify({
+    if (structuredLog) {
+      structuredLog("cache_serve", {
         holzen_event: "cache_serve",
         companion_type: companionType,
         cache_relaxation: relaxation,
-        ts: new Date().toISOString(),
-      }),
-    );
+      });
+    } else {
+      console.log(
+        JSON.stringify({
+          holzen_event: "cache_serve",
+          companion_type: companionType,
+          cache_relaxation: relaxation,
+          ts: new Date().toISOString(),
+        }),
+      );
+    }
   } catch {
     /* ignore */
   }
@@ -35,15 +50,22 @@ function logCacheServeTelemetry(companionType: string, relaxation: CacheServeRel
  * total absence of them combined with many `cache_serve relaxation:"repeat_or_lower_quality"`
  * events means the strict-mode plumbing is not being exercised.
  */
-function logCacheStrictMiss(companionType: string): void {
+function logCacheStrictMiss(companionType: string, structuredLog?: CacheTelemetryLog): void {
   try {
-    console.log(
-      JSON.stringify({
+    if (structuredLog) {
+      structuredLog("cache_strict_miss", {
         holzen_event: "cache_strict_miss",
         companion_type: companionType,
-        ts: new Date().toISOString(),
-      }),
-    );
+      });
+    } else {
+      console.log(
+        JSON.stringify({
+          holzen_event: "cache_strict_miss",
+          companion_type: companionType,
+          ts: new Date().toISOString(),
+        }),
+      );
+    }
   } catch {
     /* ignore */
   }
@@ -82,6 +104,11 @@ export interface ServeFromCacheOptions {
    * See migration `20260418180000_companion_cache_prompt_version.sql`.
    */
   promptVersion?: string;
+  /**
+   * When set (companion generators pass the orchestrate request `log`), cache hit/miss
+   * telemetry uses `createLogger` JSON shape — grep `cache_serve` / `cache_strict_miss`.
+   */
+  structuredLog?: CacheTelemetryLog;
 }
 
 /**
@@ -110,7 +137,7 @@ export async function serveFromCache(
     options = excludeIdsOrOptions ?? {};
   }
 
-  const { userId, marketDirection, excludeIds, strict, promptVersion } = options;
+  const { userId, marketDirection, excludeIds, strict, promptVersion, structuredLog } = options;
   const now = new Date().toISOString();
 
   // Step 1: Get per-user seen entries (if userId provided)
@@ -153,7 +180,7 @@ export async function serveFromCache(
     promptVersion,
   });
   if (picked) {
-    logCacheServeTelemetry(companionType, "none");
+    logCacheServeTelemetry(companionType, "none", structuredLog);
     recordUserServe(svcClient, userId, picked.cacheId, companionType);
     return { ...picked, relaxation: "none" };
   }
@@ -171,7 +198,7 @@ export async function serveFromCache(
       promptVersion,
     });
     if (picked2) {
-      logCacheServeTelemetry(companionType, "market");
+      logCacheServeTelemetry(companionType, "market", structuredLog);
       recordUserServe(svcClient, userId, picked2.cacheId, companionType);
       return { ...picked2, relaxation: "market" };
     }
@@ -181,7 +208,7 @@ export async function serveFromCache(
   // Skipped in strict mode so the caller (Phase-2 main flow) can fall through to live
   // instead of being pre-empted by a seen/low-quality row.
   if (strict) {
-    logCacheStrictMiss(companionType);
+    logCacheStrictMiss(companionType, structuredLog);
     return null;
   }
   const picked3 = await tryServe(svcClient, {
@@ -195,7 +222,7 @@ export async function serveFromCache(
     promptVersion,
   });
   if (picked3) {
-    logCacheServeTelemetry(companionType, "repeat_or_lower_quality");
+    logCacheServeTelemetry(companionType, "repeat_or_lower_quality", structuredLog);
     recordUserServe(svcClient, userId, picked3.cacheId, companionType);
     return { ...picked3, relaxation: "repeat_or_lower_quality" };
   }
