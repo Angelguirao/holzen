@@ -158,7 +158,7 @@ export function PauseBreathing({ mantra, severity = 'mild', onContinue, complete
             onClick={() => { hapticFeedback('light'); setStarted(true); }}
             className={pauseStepLayout.textContinue}
           >
-            {t('breathing.begin', 'Begin breathing')}
+            {t('breathing.begin', { defaultValue: 'Begin breathing' })}
           </motion.button>
         </>
       ) : !completed ? (
@@ -204,7 +204,7 @@ export function PauseBreathing({ mantra, severity = 'mild', onContinue, complete
         >
           <div className="w-20 h-20 rounded-full border border-primary/15 bg-primary/5" />
           <p className="text-center font-editorial text-2xl text-foreground sm:text-3xl">
-            {t('breathing.settled', 'Settled')}
+            {t('breathing.settled', { defaultValue: 'Settled' })}
           </p>
           <motion.button
             initial={{ opacity: 0 }}
@@ -213,7 +213,7 @@ export function PauseBreathing({ mantra, severity = 'mild', onContinue, complete
             onClick={() => { hapticFeedback('light'); onContinue(); }}
             className={pauseStepLayout.textContinue}
           >
-            {t('pause.steps.continue', 'Continue')}
+            {t('pause.steps.continue', { defaultValue: 'Continue' })}
           </motion.button>
         </motion.div>
       )}

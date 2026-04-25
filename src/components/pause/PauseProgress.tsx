@@ -11,11 +11,11 @@ interface Props {
 export function PauseProgress({ currentStep, onStepClick }: Props) {
   const { t } = useTranslation();
   const stepLabels: Record<PauseStep, string> = {
-    feel: t('pause.steps.feel', 'Feel'),
-    breathe: t('pause.steps.breathe', 'Breathe'),
-    reflect: t('pause.steps.reflect', 'Reflect'),
-    shift: t('pause.steps.shift', 'Shift'),
-    decide: t('pause.steps.decide', 'Decide'),
+    feel: t('pause.steps.feel', { defaultValue: 'Feel' }),
+    breathe: t('pause.steps.breathe', { defaultValue: 'Breathe' }),
+    reflect: t('pause.steps.reflect', { defaultValue: 'Reflect' }),
+    shift: t('pause.steps.shift', { defaultValue: 'Shift' }),
+    decide: t('pause.steps.decide', { defaultValue: 'Decide' }),
   };
 
   const currentIndex = STEPS.indexOf(currentStep);

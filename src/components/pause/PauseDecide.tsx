@@ -74,7 +74,7 @@ export function PauseDecide({ onDecide, onBack }: Props) {
                 <OutcomeIcon outcome="held" size={18} className="text-primary/60" />
               </div>
               <span className="text-sm font-semibold tracking-wide text-foreground">
-                {t('ritual.decide.hold', 'I\'m holding')}
+                {t('ritual.decide.hold', { defaultValue: "I'm holding" })}
               </span>
             </motion.button>
 
@@ -86,7 +86,7 @@ export function PauseDecide({ onDecide, onBack }: Props) {
                 className="flex items-center gap-1.5 text-xs font-medium text-muted-foreground transition-colors hover:text-foreground"
               >
                 <OutcomeIcon outcome="sold" size={14} className="text-muted-foreground" />
-                {t('ritual.decide.sell', 'I sold')}
+                {t('ritual.decide.sell', { defaultValue: 'I sold' })}
               </button>
               <span className="text-muted-foreground/40" aria-hidden>
                 ·
@@ -97,7 +97,7 @@ export function PauseDecide({ onDecide, onBack }: Props) {
                 className="flex items-center gap-1.5 text-xs font-medium text-muted-foreground transition-colors hover:text-foreground"
               >
                 <OutcomeIcon outcome="bought" size={14} className="text-muted-foreground" />
-                {t('ritual.decide.buy', 'I bought')}
+                {t('ritual.decide.buy', { defaultValue: 'I bought' })}
               </button>
             </div>
           </motion.div>
@@ -111,7 +111,7 @@ export function PauseDecide({ onDecide, onBack }: Props) {
             transition={{ duration: 0.5 }}
           >
             <p className="text-center font-editorial text-xl text-foreground sm:text-2xl">
-              {t('mirror.title', 'Decision Mirror')}
+              {t('mirror.title', { defaultValue: 'Decision Mirror' })}
             </p>
 
             <div className="w-full space-y-4">
@@ -139,14 +139,16 @@ export function PauseDecide({ onDecide, onBack }: Props) {
                 onClick={confirmMirror}
                 className={pauseStepLayout.textContinue}
               >
-                {t(`mirror.confirm.${mirrorKey}`, mirrorKey === 'sell' ? 'I still want to sell' : 'I still want to buy')}
+                {t(`mirror.confirm.${mirrorKey}`, {
+                  defaultValue: mirrorKey === 'sell' ? 'I still want to sell' : 'I still want to buy',
+                })}
               </button>
               <button
                 type="button"
                 onClick={cancelMirror}
                 className="text-xs text-muted-foreground transition-colors hover:text-foreground"
               >
-                {t('mirror.reconsider', 'Let me reconsider')}
+                {t('mirror.reconsider', { defaultValue: 'Let me reconsider' })}
               </button>
             </motion.div>
           </motion.div>
@@ -167,7 +169,7 @@ export function PauseDecide({ onDecide, onBack }: Props) {
             className={pauseStepLayout.backButton}
           >
             <ChevronLeft className="h-3 w-3" />
-            {t('pause.steps.back', 'Back')}
+            {t('pause.steps.back', { defaultValue: 'Back' })}
           </button>
         </motion.div>
       )}
