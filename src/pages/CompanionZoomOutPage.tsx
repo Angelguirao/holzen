@@ -16,6 +16,7 @@ import { SaveThisMomentButton } from '@/components/companion/SaveThisMomentButto
 import { useStaggeredReveal } from '@/components/companion/use-staggered-reveal';
 import { useFullviewTelemetry } from '@/hooks/use-fullview-telemetry';
 import { PageMeta } from '@/components/PageMeta';
+import { zoomOutSaveThisMomentSeed, zoomOutTotalCharsForReadTime } from '@/lib/zoom-out-payload';
 
 const SEVERITY_NUMBER: Record<string, number> = { mild: 3, moderate: 6, high: 10 };
 const BREATHING_ROOM_MS = 8000;
@@ -97,6 +98,11 @@ export default function CompanionZoomOutPage() {
   const revealed = useStaggeredReveal(BREATHING_ROOM_MS);
   useFullviewTelemetry('zoomOut', pauseInstanceId);
 
+  const zoomOutSaveSeed = useMemo(
+    () => (zoomOut ? zoomOutSaveThisMomentSeed(zoomOut) : null),
+    [zoomOut],
+  );
+
   const handleBack = useCallback(() => {
     const st = location.state as { from?: string } | undefined;
     if (st?.from === 'library') navigate('/library');
@@ -138,13 +144,7 @@ export default function CompanionZoomOutPage() {
 
         {zoomOut && (
           <div className="flex items-center gap-2 flex-wrap">
-            <ReadTime
-              chars={
-                (zoomOut?.deepTime?.title?.length ?? 0) +
-                (zoomOut?.deepTime?.body?.length ?? 0) +
-                (zoomOut?.echo?.message?.length ?? 0)
-              }
-            />
+            <ReadTime chars={zoomOutTotalCharsForReadTime(zoomOut)} />
             <WhyThisCard companion="zoomOut" mood={mood} className="ml-auto" />
           </div>
         )}
@@ -163,8 +163,8 @@ export default function CompanionZoomOutPage() {
         {zoomOut && revealed && (
           <div className="space-y-4 border-t border-border/20 pt-5 animate-in fade-in duration-500">
             <SaveThisMomentButton
-              seedTitle={zoomOut?.deepTime?.title ?? t('companions.zoomOut')}
-              seedContext={zoomOut?.deepTime?.body ?? zoomOut?.echo?.message ?? ''}
+              seedTitle={zoomOutSaveSeed?.deepTimeTitle ?? t('companions.zoomOut')}
+              seedContext={zoomOutSaveSeed?.context ?? ''}
               companion="zoomOut"
               pauseInstanceId={pauseInstanceId}
             />

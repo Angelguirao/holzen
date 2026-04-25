@@ -94,3 +94,20 @@ export function zoomOutLibraryAutosaveFromDisplayData(d: ZoomOutData): { title: 
     body: d.deepTime?.body || d.echo?.message || 'Zoom Out perspective',
   };
 }
+
+/** Character count for ReadTime-style estimates on the zoom-out full view. */
+export function zoomOutTotalCharsForReadTime(d: ZoomOutData | null | undefined): number {
+  if (!d) return 0;
+  return (d.deepTime?.title?.length ?? 0) + (d.deepTime?.body?.length ?? 0) + (d.echo?.message?.length ?? 0);
+}
+
+/** Seeds for SaveThisMoment — caller supplies i18n default when `deepTimeTitle` is missing. */
+export function zoomOutSaveThisMomentSeed(d: ZoomOutData): {
+  deepTimeTitle: string | undefined;
+  context: string;
+} {
+  return {
+    deepTimeTitle: d.deepTime?.title,
+    context: d.deepTime?.body ?? d.echo?.message ?? '',
+  };
+}
