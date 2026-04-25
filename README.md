@@ -59,6 +59,7 @@ Open [http://localhost:8080](http://localhost:8080). For hosted Supabase you do 
 | `npm run test:ci` | `check:edge-logging` + `check:edge-coverage-manifest` + Vitest with coverage and JUnit output (CI-style gate) |
 | `npm run test:watch` | Vitest in watch mode |
 | `npm run lint` | ESLint |
+| `npm run check:view-migrations` | Fail if a migration uses unsafe `CREATE OR REPLACE VIEW` renames (also run from `check:prepush`) |
 | `npm run supabase:start` | Local Supabase stack (Docker); same as `npx supabase start` |
 | `npm run supabase:status` | Print local API URL and anon key |
 | `npm run supabase:stop` | Stop local stack |
