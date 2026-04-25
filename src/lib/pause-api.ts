@@ -16,6 +16,7 @@
  */
 
 import { supabase } from '@/integrations/supabase/client';
+import { invalidatePauseStatsDataForUser } from '@/lib/pause-stats-invalidate';
 import { trackEvent } from '@/lib/posthog';
 import type {
   PauseState,
@@ -27,6 +28,12 @@ import type {
 /** Dedupe PostHog pause lifecycle events (RPC can return the same state repeatedly). */
 const phPauseEngagedSent = new Set<string>();
 const phPauseCompletedSent = new Set<string>();
+
+function scheduleInvalidatePauseStatsOnCompleted() {
+  void supabase.auth.getUser().then(({ data: { user } }) => {
+    invalidatePauseStatsDataForUser(user?.id);
+  });
+}
 
 /** Shape of the JSONB envelope returned by `pause_create_or_reuse`. */
 export interface PauseCreateOrReuseResult {
@@ -80,6 +87,7 @@ export async function pauseLogStep(params: {
     } catch {
       /* no-op */
     }
+    scheduleInvalidatePauseStatsOnCompleted();
   }
   return state;
 }
@@ -151,6 +159,7 @@ export async function pauseLogCompanion(params: {
     } catch {
       /* no-op */
     }
+    scheduleInvalidatePauseStatsOnCompleted();
   }
 
   return result;

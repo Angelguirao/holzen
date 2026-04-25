@@ -1,8 +1,10 @@
 import { lazy, Suspense, useEffect } from "react";
+import { useQueryClient } from "@tanstack/react-query";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClientProvider } from "@tanstack/react-query";
 import { createHolzenQueryClient } from "@/lib/query-client";
+import { setHolzenQueryClient } from "@/lib/holzen-query-client-ref";
 import { BrowserRouter, Routes, Route, Navigate, useLocation } from "react-router-dom";
 import { reactRouterFutureFlags } from "@/lib/router-future";
 import { AuthProvider, useAuth } from "@/hooks/use-auth";
@@ -55,6 +57,7 @@ const ToolsLetters = lazy(() => import("./pages/ToolsLetters"));
 const JourneyLettersRedirect = lazy(() => import("./pages/JourneyLettersRedirect"));
 const SettingsAbout = lazy(() => import("./pages/SettingsAbout"));
 const RoadmapStub = lazy(() => import("./pages/RoadmapStub"));
+const SettingsSectionRedirect = lazy(() => import("./pages/SettingsSectionRedirect"));
 
 const queryClient = createHolzenQueryClient();
 
@@ -102,6 +105,18 @@ function HolzenQueryLogging() {
   return null;
 }
 
+/** Exposes the same QueryClient instance to `pause-api` (invalidate after pause completes). */
+function HolzenQueryClientRegister() {
+  const qc = useQueryClient();
+  useEffect(() => {
+    setHolzenQueryClient(qc);
+    return () => {
+      setHolzenQueryClient(null);
+    };
+  }, [qc]);
+  return null;
+}
+
 /**
  * Periodically evict expired checkout-guard entries from local/session
  * storage so they never grow unbounded across long-lived tabs.
@@ -140,6 +155,7 @@ function RouterLocationLog() {
 const App = () => (
   <ErrorBoundary>
     <QueryClientProvider client={queryClient}>
+      <HolzenQueryClientRegister />
       <HolzenQueryLogging />
       <CheckoutGuardCleanup />
       <TooltipProvider>
@@ -160,6 +176,7 @@ const App = () => (
                   <Route path="/journey" element={<Navigate to="/journey/stats" replace />} />
                   <Route path="/journey/letters" element={<JourneyLettersRedirect />} />
                   <Route path="/journey/:tab" element={<Profile />} />
+                  <Route path="/settings/section/:section" element={<SettingsSectionRedirect />} />
                   <Route path="/settings" element={<Settings />} />
                   <Route path="/settings/about" element={<SettingsAbout />} />
                   <Route path="/settings/billing-history" element={<BillingHistory />} />
