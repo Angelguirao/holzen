@@ -133,7 +133,20 @@ const Home = () => {
 
   const [priceHidden, setPriceHidden] = useState(() => localStorage.getItem('holzen_hide_price') === 'true');
   const [btcMode, setBtcMode] = useState(() => localStorage.getItem('holzen_btc_mode') === 'true');
-  const [zenMode] = useState(() => localStorage.getItem('holzen_zen_mode') === 'true');
+  // One-time reset: Zen Mode previously defaulted on for some users via a stale
+  // localStorage flag, which silently replaced the full Home (widgets) with a
+  // minimal ReflectionMessage view that looked like "the end of a pause flow."
+  // Clear the flag once per browser; users can re-enable Zen Mode explicitly
+  // from Settings → Appearance.
+  const [zenMode] = useState(() => {
+    const RESET_KEY = 'holzen_zen_mode_reset_v1';
+    if (typeof window !== 'undefined' && !localStorage.getItem(RESET_KEY)) {
+      localStorage.removeItem('holzen_zen_mode');
+      localStorage.setItem(RESET_KEY, '1');
+      return false;
+    }
+    return localStorage.getItem('holzen_zen_mode') === 'true';
+  });
   const [pinnedPausePreview, setPinnedPausePreview] = useState<PinnedPausePreview | null>(null);
   const prefersReducedMotion = useReducedMotion();
   const [completedPauseCount, setCompletedPauseCount] = useState(0);
