@@ -23,10 +23,15 @@ describe('zoom-out-payload', () => {
     expect(zoomOutBodyPreviewFromJsonString('not json')).toBeNull();
   });
 
-  it('zoomOutBodyPreviewFromJsonString prefers deepTime body then echo message', () => {
+  it('zoomOutBodyPreviewFromJsonString prefers deepTime body then first echo user word', () => {
     const raw = JSON.stringify({
       deepTime: { title: 'T', body: 'B' },
-      echo: { message: 'E', created_at: '' },
+      echo: {
+        created_at: '2020-01-01',
+        mood: null,
+        outcome: null,
+        userWords: [{ kind: 'note', body: 'E', created_at: '2020-01-01' }],
+      },
     });
     expect(zoomOutBodyPreviewFromJsonString(raw)).toBe('B');
   });
@@ -43,18 +48,31 @@ describe('zoom-out-payload', () => {
     expect(zoomOutBodyPreviewFromJsonString('{}')).toBe(ZOOM_OUT_DEFAULT_LABEL);
   });
 
-  it('zoomOutTotalCharsForReadTime sums title, body, echo.message', () => {
+  it('zoomOutTotalCharsForReadTime sums title, body, and echo user word bodies', () => {
     const d = toZoomOutDisplayData({
       deepTime: { title: 'ab', body: 'cdef' },
-      echo: { message: 'gh', created_at: '' },
+      echo: {
+        created_at: '',
+        mood: null,
+        outcome: null,
+        userWords: [
+          { kind: 'note', body: 'gh', created_at: '2020-01-01' },
+          { kind: 'replay', body: 'ij', created_at: '2020-01-02' },
+        ],
+      },
     });
-    expect(zoomOutTotalCharsForReadTime(d)).toBe(2 + 4 + 2);
+    expect(zoomOutTotalCharsForReadTime(d)).toBe(2 + 4 + 2 + 2);
   });
 
-  it('zoomOutSaveThisMomentSeed uses body then echo message', () => {
+  it('zoomOutSaveThisMomentSeed uses deepTime body when present', () => {
     const d = toZoomOutDisplayData({
       deepTime: { title: 'T', body: 'B' },
-      echo: { message: 'E', created_at: '' },
+      echo: {
+        created_at: '',
+        mood: null,
+        outcome: null,
+        userWords: [{ kind: 'note', body: 'E', created_at: '2020-01-01' }],
+      },
     });
     expect(zoomOutSaveThisMomentSeed(d)).toEqual({
       deepTimeTitle: 'T',
@@ -62,9 +80,14 @@ describe('zoom-out-payload', () => {
     });
   });
 
-  it('zoomOutSaveThisMomentSeed falls back echo when no deepTime body', () => {
+  it('zoomOutSaveThisMomentSeed falls back to first echo user word when no deepTime body', () => {
     const d = toZoomOutDisplayData({
-      echo: { message: 'only echo', created_at: '' },
+      echo: {
+        created_at: '',
+        mood: null,
+        outcome: null,
+        userWords: [{ kind: 'note', body: 'only echo', created_at: '2020-01-01' }],
+      },
     });
     expect(zoomOutSaveThisMomentSeed(d)).toEqual({
       deepTimeTitle: undefined,

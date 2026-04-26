@@ -24,17 +24,13 @@ export interface EchoUserWord {
 }
 
 /**
- * Strict Echo payload (2026-04-18): surfaces ONLY user-authored text from Pause V2
- * (notes / replays via `pause_step_events` + `practice_entries`). The AI-generated
+ * Strict Echo payload (Pause V2): surfaces ONLY user-authored text
+ * (`pause_step_events` notes + `practice_entries` replay lines). The AI-generated
  * reflect-step prompt is available via `aiPrompt` but is never rendered as the
- * main quote. Legacy `message` is kept for back-compat with older readers
- * (History timeline, full-view ReadTime) and equals the first userWords body
- * when present. See `supabase/functions/_shared/past-reflection-util.ts`.
+ * main quote. See `supabase/functions/_shared/past-reflection-util.ts`.
  */
 export interface ZoomOutEchoData {
   id?: string;
-  /** Legacy mirror of `userWords[0].body` — kept for older consumers. */
-  message?: string;
   created_at: string;
   mood: string | null;
   outcome: string | null;
@@ -94,8 +90,6 @@ export function ZoomOutDisplay({ data, loading, error, onRetry }: Props) {
   const { onThisDay, currentPrice, echo, deepTime } = data;
 
   // Show deep time or echo even without price data — the companion is still valuable.
-  // `hasEcho` is strict about user-authored words: legacy payloads with only
-  // `message` (the AI prompt) don't count, matching the strict Echo policy below.
   const hasPrices = currentPrice && onThisDay.length > 0;
   const hasEcho = !!echo && (echo.userWords?.length ?? 0) > 0;
   const hasContent = !!deepTime || hasEcho;

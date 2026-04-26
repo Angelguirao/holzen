@@ -27,7 +27,6 @@ function parseEcho(raw: unknown): ZoomOutEchoData | null {
   const userWords = parseEchoUserWords(e.userWords);
   return {
     id: typeof e.id === 'string' ? e.id : undefined,
-    message: typeof e.message === 'string' ? e.message : undefined,
     created_at,
     mood,
     outcome,
@@ -35,6 +34,12 @@ function parseEcho(raw: unknown): ZoomOutEchoData | null {
     aiPrompt: typeof e.aiPrompt === 'string' || e.aiPrompt === null ? (e.aiPrompt as string | null) : undefined,
     userWords,
   };
+}
+
+/** First echo user line for previews when deep-time body is absent. */
+export function echoPrimaryUserText(echo: ZoomOutEchoData | null | undefined): string {
+  const w = echo?.userWords?.[0]?.body;
+  return typeof w === 'string' ? w : '';
 }
 
 /**
@@ -85,7 +90,7 @@ export function toZoomOutDisplayData(raw: unknown): ZoomOutData {
 export function zoomOutBodyPreviewFromJsonString(raw: string): string | null {
   try {
     const d = toZoomOutDisplayData(JSON.parse(raw));
-    const line = d.deepTime?.body || d.echo?.message || d.deepTime?.title;
+    const line = d.deepTime?.body || echoPrimaryUserText(d.echo) || d.deepTime?.title;
     return line || ZOOM_OUT_DEFAULT_LABEL;
   } catch {
     return null;
@@ -96,14 +101,15 @@ export function zoomOutBodyPreviewFromJsonString(raw: string): string | null {
 export function zoomOutLibraryAutosaveFromDisplayData(d: ZoomOutData): { title: string; body: string } {
   return {
     title: d.deepTime?.title || ZOOM_OUT_DEFAULT_LABEL,
-    body: d.deepTime?.body || d.echo?.message || ZOOM_OUT_DEFAULT_BODY_PLACEHOLDER,
+    body: d.deepTime?.body || echoPrimaryUserText(d.echo) || ZOOM_OUT_DEFAULT_BODY_PLACEHOLDER,
   };
 }
 
 /** Character count for ReadTime-style estimates on the zoom-out full view. */
 export function zoomOutTotalCharsForReadTime(d: ZoomOutData | null | undefined): number {
   if (!d) return 0;
-  return (d.deepTime?.title?.length ?? 0) + (d.deepTime?.body?.length ?? 0) + (d.echo?.message?.length ?? 0);
+  const echoChars = (d.echo?.userWords ?? []).reduce((acc, w) => acc + w.body.length, 0);
+  return (d.deepTime?.title?.length ?? 0) + (d.deepTime?.body?.length ?? 0) + echoChars;
 }
 
 /** Seeds for SaveThisMoment — caller supplies i18n default when `deepTimeTitle` is missing. */
@@ -113,6 +119,6 @@ export function zoomOutSaveThisMomentSeed(d: ZoomOutData): {
 } {
   return {
     deepTimeTitle: d.deepTime?.title,
-    context: d.deepTime?.body ?? d.echo?.message ?? '',
+    context: d.deepTime?.body ?? echoPrimaryUserText(d.echo) ?? '',
   };
 }

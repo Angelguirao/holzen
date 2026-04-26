@@ -1426,6 +1426,7 @@ export type Database = {
           id: string
           intensity: number | null
           mood: string | null
+          pause_instance_id: string | null
           prompt: string | null
           trigger_text: string | null
           type: string
@@ -1438,6 +1439,7 @@ export type Database = {
           id?: string
           intensity?: number | null
           mood?: string | null
+          pause_instance_id?: string | null
           prompt?: string | null
           trigger_text?: string | null
           type?: string
@@ -1450,6 +1452,7 @@ export type Database = {
           id?: string
           intensity?: number | null
           mood?: string | null
+          pause_instance_id?: string | null
           prompt?: string | null
           trigger_text?: string | null
           type?: string

@@ -2,15 +2,17 @@
  * Edge-side read model for the "past pause with user words" (Echo) feature.
  *
  * Reads `v_pause_full` for completed pauses older than `cutoffDays` and
- * joins them with `pause_step_events(step_type='note_updated')` entries
- * to produce the user-authored words. Projects into the same
- * `PastReflectionWithWords` shape that the pure util already owns.
+ * joins `pause_step_events(step_type='note_updated')` and
+ * `practice_entries` (`type = 'replay'`, `pause_instance_id`) into one
+ * chronological `userWords` list per pause. Projects into the same
+ * `PastReflectionWithWords` shape as `past-reflection-util.ts`.
  *
  * Used by Zoom Out (`generators/zoom-out.ts` — Echo rail). Returns null
  * when the user has no qualifying past pause.
  */
 import type { SupabaseClient } from "https://esm.sh/@supabase/supabase-js@2.57.2";
 import {
+  combineNoteAndReplayWords,
   parseDirectionFromContext,
   pickPastReflection,
   type PastReflectionWithWords,
@@ -107,17 +109,39 @@ export async function fetchPastReflectionWithWords(
     notesByPause.set(e.pause_instance_id, list);
   }
 
+  type ReplayRow = { pause_instance_id: string | null; body: string | null; created_at: string };
+  let replayRows: ReplayRow[] = [];
+  try {
+    const { data, error } = await svcClient
+      .from("practice_entries")
+      .select("pause_instance_id, body, created_at")
+      .eq("user_id", userId)
+      .eq("type", "replay")
+      .in("pause_instance_id", ids);
+    if (error) throw error;
+    replayRows = (data ?? []) as ReplayRow[];
+  } catch (e) {
+    log?.("past-reflection: practice_entries replay query failed", { error: String(e) });
+    replayRows = [];
+  }
+
+  const replaysByPause = new Map<string, { body: string; created_at: string }[]>();
+  for (const r of replayRows) {
+    if (!r.pause_instance_id || typeof r.body !== "string") continue;
+    const list = replaysByPause.get(r.pause_instance_id) ?? [];
+    list.push({ body: r.body, created_at: r.created_at });
+    replaysByPause.set(r.pause_instance_id, list);
+  }
+
   const pool: PastReflectionWithWords[] = [];
   for (const p of pauses) {
-    const eventWords = (notesByPause.get(p.id) ?? []).sort((a, b) =>
+    const rawNotes = notesByPause.get(p.id) ?? [];
+    const noteWords = [...rawNotes].sort((a, b) =>
       a.created_at === b.created_at ? 0 : a.created_at < b.created_at ? -1 : 1,
     );
-    // If the latest note_text on v_pause_full isn't represented by an event
-    // row (shouldn't happen in V2, but defensive), add it in.
-    if (eventWords.length === 0 && typeof p.note_text === "string" && p.note_text.trim().length > 0) {
-      eventWords.push({ kind: "note", body: p.note_text.trim(), created_at: p.created_at });
-    }
-    if (eventWords.length === 0) continue;
+    const replayList = replaysByPause.get(p.id) ?? [];
+    const merged = combineNoteAndReplayWords(noteWords, replayList);
+    if (merged.length === 0) continue;
     pool.push({
       id: p.id,
       created_at: p.created_at,
@@ -125,7 +149,7 @@ export async function fetchPastReflectionWithWords(
       outcome: p.outcome,
       context: contextTextOf(p),
       aiPrompt: p.reflection_text,
-      userWords: eventWords,
+      userWords: merged,
     });
   }
 

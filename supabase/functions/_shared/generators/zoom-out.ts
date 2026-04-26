@@ -184,20 +184,14 @@ async function fetchHistoricalAndCurrentPrices(
  *
  * Strict policy (2026-04-18): Echo surfaces ONLY user-authored text from the
  * Pause V2 read model — notes / replays via `pause_step_events` and
- * `practice_entries.body` (see `_shared/past-reflections.ts`). It NEVER surfaces
+ * `practice_entries` (`_shared/past-reflections.ts`). It NEVER surfaces
  * `v_pause_full.reflection_text` (the AI-generated reflect-step prompt), which was the
  * previous behaviour behind the misleading "your own words from another day"
  * UI label. If the user has never left a note or replay on a past pause,
  * `echo` is `null` and the card renders a truthful empty state.
- *
- * Includes a legacy `message` field (= the first user-words entry, or empty
- * string) so older downstream readers that grab `echo.message` directly
- * (`History.tsx`, `CompanionZoomOutPage`'s ReadTime / seed fallback) continue
- * to show user text rather than nothing.
  */
 function echoPayloadFromPast(p: PastReflectionWithWords | null): Record<string, unknown> | null {
   if (!p) return null;
-  const firstBody = p.userWords[0]?.body ?? "";
   return {
     id: p.id,
     created_at: p.created_at,
@@ -206,7 +200,6 @@ function echoPayloadFromPast(p: PastReflectionWithWords | null): Record<string, 
     context: p.context,
     aiPrompt: p.aiPrompt,
     userWords: p.userWords,
-    message: firstBody,
   };
 }
 

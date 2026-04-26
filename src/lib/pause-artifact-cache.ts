@@ -20,10 +20,10 @@ export interface CachedZoomOutShape {
   deepTime?: { title?: string; body?: string };
   echo?: {
     id?: string;
-    message?: string;
     created_at?: string;
     mood?: string | null;
     outcome?: string | null;
+    userWords?: { kind: string; body: string; created_at: string }[];
   };
 }
 

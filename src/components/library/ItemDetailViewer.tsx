@@ -9,6 +9,8 @@ import { supabase } from '@/integrations/supabase/client';
 import { OutcomeIcon } from '@/components/icons/OutcomeIcon';
 import { CompanionFeedback } from '@/components/CompanionFeedback';
 import { librarySourceLabel } from '@/lib/library-source-label';
+import { toZoomOutDisplayData } from '@/lib/zoom-out-payload';
+import type { ZoomOutData } from '@/components/ZoomOutDisplay';
 
 const TYPE_EMOJIS: Record<string, string> = {
   bookmark: '🔖',
@@ -37,11 +39,6 @@ const OUTCOME_OPTIONS = [
 ] as const;
 
 type ZoomOutOnThisDayEntry = { yearsAgo: number; price?: number; date?: string };
-type ZoomOutParsedBody = {
-  onThisDay?: ZoomOutOnThisDayEntry[];
-  echo?: { message?: string };
-  deepTime?: string | { title?: string; body?: string };
-};
 
 interface Props {
   item: LibraryItem | null;
@@ -137,10 +134,10 @@ export function ItemDetailViewer({
     return allItems.filter((i) => i.pause_instance_id === item.pause_instance_id && i.id !== item.id && i.status !== 'deleted');
   }, [item, allItems]);
 
-  const zoomOutData = useMemo((): ZoomOutParsedBody | null => {
+  const zoomOutData = useMemo((): ZoomOutData | null => {
     if (item?.source_type !== 'zoom_out' || !item?.body) return null;
     try {
-      return JSON.parse(item.body) as ZoomOutParsedBody;
+      return toZoomOutDisplayData(JSON.parse(item.body as string));
     } catch {
       return null;
     }
@@ -253,10 +250,14 @@ export function ItemDetailViewer({
                       ))}
                     </div>
                   )}
-                  {zoomOutData.echo?.message && (
+                  {zoomOutData.echo?.userWords && zoomOutData.echo.userWords.length > 0 && (
                     <div className="space-y-1 border-l-2 border-border/40 pl-3">
                       <p className="text-[9px] font-mono text-muted-foreground/50 uppercase tracking-wider">{t('itemDetail.echo')}</p>
-                      <p className="text-xs text-muted-foreground leading-relaxed italic">"{zoomOutData.echo.message}"</p>
+                      {zoomOutData.echo.userWords.map((w, i) => (
+                        <p key={`${w.created_at}-${i}`} className="text-xs text-muted-foreground leading-relaxed italic">
+                          “{w.body}”
+                        </p>
+                      ))}
                     </div>
                   )}
                   {zoomOutData.deepTime && (
