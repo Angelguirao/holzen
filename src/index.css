@@ -6,29 +6,31 @@
 
 @layer base {
   :root {
-    /* Nox v1.0.0 semantic tokens (single appearance) */
-    --nox-color-background-primary: 222 47% 11%;
-    --nox-color-background-secondary: 218 32% 15%;
-    --nox-color-background-accent: 216 33% 25%;
-    --nox-color-background-inverse: 214 30% 95%;
-    --nox-color-background-overlay: 222 47% 11% / 0.9;
-    --nox-color-text-primary: 214 30% 95%;
+    /* Nox v1.1.0 — Calm palette (desaturated, lighter backgrounds) */
+    --nox-color-background-primary: 219 38% 13%;     /* #151E30 */
+    --nox-color-background-secondary: 218 35% 19%;   /* #1F2B40 */
+    --nox-color-background-accent: 218 35% 28%;      /* #2E4060 */
+    --nox-color-background-deep: 219 45% 10%;        /* #0E1524 */
+    --nox-color-background-inverse: 217 22% 89%;     /* #DDE3EC */
+    --nox-color-background-overlay: 219 38% 13% / 0.9;
+    --nox-color-text-primary: 217 22% 89%;           /* #DDE3EC — body */
     --nox-color-text-secondary: 213 22% 80%;
     --nox-color-text-muted: 214 15% 55%;
-    --nox-color-text-contrast: 0 0% 100%;
-    --nox-color-text-link: 188 86% 53%;
+    --nox-color-text-contrast: 0 0% 100%;            /* RESERVED for primary CTAs */
+    --nox-color-text-link: 213 53% 67%;              /* #7FA9D9 — calm blue */
     --nox-color-text-highlight: 36 58% 63%;
-    --nox-color-text-inverse-contrast: 221 44% 7%;
-    --nox-color-state-success: 155 39% 64%;
-    --nox-color-state-error: 0 72% 51%;
-    --nox-color-state-warning: 32 95% 44%;
-    --nox-color-accent-cyan: 188 86% 53%;
-    --nox-color-accent-green: 156 72% 67%;
-    --nox-color-accent-violet: 255 92% 76%;
-    --nox-color-accent-magenta: 291 85% 61%;
-    --nox-color-accent-mustard: 43 96% 56%;
-    --nox-color-border-default: 216 33% 25%;
-    --nox-color-border-focus: 214 15% 55%;
+    --nox-color-text-inverse-contrast: 219 45% 10%;
+    --nox-color-state-success: 152 41% 51%;          /* #4EB587 */
+    --nox-color-state-error: 0 53% 57%;              /* #C95959 */
+    --nox-color-state-warning: 38 65% 62%;           /* #E0B05A */
+    --nox-color-accent-cyan: 188 41% 60%;            /* #6BB8C7 */
+    --nox-color-accent-cyan-strong: 189 59% 41%;     /* #2B93A8 — punch only */
+    --nox-color-accent-green: 152 41% 51%;
+    --nox-color-accent-violet: 252 32% 67%;          /* #9A8FC9 */
+    --nox-color-accent-magenta: 290 44% 62%;         /* #BC6FCC */
+    --nox-color-accent-mustard: 38 65% 62%;
+    --nox-color-border-default: 218 35% 28%;         /* #2E4060 */
+    --nox-color-border-focus: 213 53% 67%;
     --nox-radius-m: 0.75rem;
 
     /* Legacy semantic vars mapped to Nox aliases */
