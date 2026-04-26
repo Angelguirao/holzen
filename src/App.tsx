@@ -59,6 +59,8 @@ const ToolsHub = lazy(() => import("./pages/ToolsHub"));
 const ToolsLetters = lazy(() => import("./pages/ToolsLetters"));
 const SettingsAbout = lazy(() => import("./pages/SettingsAbout"));
 const RoadmapStub = lazy(() => import("./pages/RoadmapStub"));
+const Practice = lazy(() => import("./pages/Practice"));
+const Calendar = lazy(() => import("./pages/Calendar"));
 
 const queryClient = createHolzenQueryClient();
 
@@ -186,6 +188,8 @@ const App = () => (
                   </Route>
                   <Route path="/tools" element={<ToolsHub />} />
                   <Route path="/tools/letters" element={<ToolsLetters />} />
+                  <Route path="/practice" element={<Practice />} />
+                  <Route path="/calendar" element={<Calendar />} />
                 </Route>
                 {/* Immersive full-screen experiences — no nav bar */}
                 <Route path="/pause" element={<ProtectedRoute><PauseSession /></ProtectedRoute>} />
