@@ -1,4 +1,5 @@
 import { Link, Navigate, useParams } from 'react-router-dom';
+import { ArrowLeft } from 'lucide-react';
 import { NoxHeaderMain } from '@/components/ui/nox-header';
 import { isSettingsSectionId, type SettingsSectionId } from '@/pages/settings/sectionIds';
 import { useSettingsState } from '@/pages/settings/use-settings-state';
@@ -33,6 +34,16 @@ const HEADER: Record<SettingsSectionId, readonly [string, { defaultValue: string
   account: ['settings.accountSecurity', { defaultValue: 'Account & security' }],
 };
 
+const SECTION_SUBTITLE: Record<SettingsSectionId, string> = {
+  you: 'settings.sectionPageSubtitleYou',
+  reflection: 'settings.sectionPageSubtitleReflection',
+  experience: 'settings.sectionPageSubtitleExperience',
+  companions: 'settings.sectionPageSubtitleCompanions',
+  notifications: 'settings.sectionPageSubtitleNotifications',
+  subscription: 'settings.sectionPageSubtitleSubscription',
+  account: 'settings.sectionPageSubtitleAccount',
+};
+
 export default function SettingsSectionPage() {
   const m = useSettingsState();
   const { section = '' } = useParams();
@@ -41,18 +52,18 @@ export default function SettingsSectionPage() {
   }
   const Panel = PANEL[section];
   const [titleKey, titleOpts] = HEADER[section];
+  const subtitleKey = SECTION_SUBTITLE[section];
   return (
-    <div className="space-y-6">
-      <p>
-        <Link
-          to="/settings"
-          className="text-[10px] font-mono text-primary/90 underline-offset-2 hover:underline"
-        >
-          {m.t('settings.backToAll', { defaultValue: '← All settings' })}
-        </Link>
-      </p>
-      <NoxHeaderMain title={m.t(titleKey, titleOpts)} subtitle={m.t('settings.pageSubtitle')} />
-      <div className="border border-border/40 rounded-md px-4 py-4">
+    <div className="space-y-6 pb-8">
+      <Link
+        to="/settings"
+        className="inline-flex items-center gap-2 rounded-lg px-1 py-1 -ml-1 text-sm font-medium text-muted-foreground transition-colors hover:text-foreground outline-none focus-visible:ring-2 focus-visible:ring-primary/30"
+      >
+        <ArrowLeft className="h-4 w-4 shrink-0" aria-hidden />
+        {m.t('settings.backToAll')}
+      </Link>
+      <NoxHeaderMain title={m.t(titleKey, titleOpts)} subtitle={m.t(subtitleKey)} />
+      <div className="rounded-xl border border-border/40 bg-muted/15 px-4 py-4">
         <Panel />
       </div>
     </div>
