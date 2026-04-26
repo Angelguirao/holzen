@@ -10,7 +10,7 @@ A **shared read model** for surfacing a user's **own words from a past pause**. 
 | Surface | Where | Uses |
 |---------|-------|------|
 | **Zoom Out · Echo** | Pause flow, reflect step | Picks one past pause with user words and shows it as "your words from {date}". |
-| **Daily Practice · Replay** | `/practice/replay` | Loads a specific past pause and renders its **thread** (AI prompt → user notes/replays → new reply). |
+| **Daily Practice · Replay** | `/tools/practice/replay` | Loads a specific past pause and renders its **thread** (AI prompt → user notes/replays → new reply). |
 
 Introduced 2026-04-18 to fix a long-standing honesty bug: Zoom Out's Echo card rendered the **AI-generated** prompt under the UI label "This is your own words from another day — not a new AI take." For users who had never typed a note or completed a Replay, Echo was 100% AI text behind a "your words" label.
 
@@ -25,7 +25,7 @@ The model surfaces content from exactly **two** sources — never the AI prompt 
 | **`pause_step_events`** (`step_type = 'note_updated'`) | `note` | User types a free-text note on the reflect step (`PauseNote.tsx`). |
 | **`practice_entries.body`** where `type = 'replay'` and `pause_instance_id = pause.id` | `replay` | User writes a reply in Daily Practice's Replay flow (`ReflectionReplay.tsx`). |
 
-Both are trimmed; blank / whitespace-only entries are dropped. A reflection with zero qualifying entries is excluded from the pool.
+Both are trimmed; blank / whitespace-only entries are dropped. A pause with zero qualifying entries is excluded from the pool.
 
 The AI prompt (`pause_ai_artifacts.kind = 'reflection_text'`) is kept **alongside** as `aiPrompt` — rendered as **context only** ("Holzen asked…") in Replay's thread view, never as the headline quote.
 
@@ -37,10 +37,10 @@ The AI prompt (`pause_ai_artifacts.kind = 'reflection_text'`) is kept **alongsid
 interface UserWord {
   kind: "note" | "replay";
   body: string;
-  created_at: string;   // the reflection's created_at for notes; the entry's for replays
+  created_at: string;   // the pause's `created_at` for notes; the practice entry's for replays
 }
 
-interface PastPauseWithWords {
+interface PastReflectionWithWords {
   id: string;
   created_at: string;
   mood: string | null;
@@ -60,9 +60,9 @@ Pure helpers live in [`supabase/functions/_shared/past-reflection-util.ts`](../.
 | Caller | Entry point | Notes |
 |--------|-------------|-------|
 | **Zoom Out (edge)** | `fetchPastReflectionWithWords` in `supabase/functions/_shared/past-reflections.ts`; invoked from `generators/zoom-out.ts` | Strict — returns `null` if the user has no past pauses with words ≥3 days old. |
-| **Replay (client)** | `usePastReflection(pauseInstanceId)` in `src/hooks/use-past-reflection.ts` | Soft — when the pause exists but has no words yet, returns a stub with `userWords: []` and `existsWithoutWords: true` so the UI can still render the AI prompt and invite a first entry. |
+| **Replay (client)** | `ReflectionReplay.tsx` (placeholder) | V2 rebuild pending: no `usePastReflection` hook yet; route stays on **`/tools/practice/replay`** with an empty state until the thread is wired to `v_pause_full` + `practice_entries`. |
 
-Both paths compose the same pure helpers so the shape is identical across surfaces.
+The edge path builds `PastReflectionWithWords` using the same types and selection helpers as `past-reflection-util.ts`. The client replay placeholder does not call those helpers yet; when replay is rebuilt, it should reuse the same shape for a single read model.
 
 ---
 
@@ -83,7 +83,7 @@ When the pool is empty, Echo returns `null` and the card renders an honest empty
 
 ## 5. Replay thread view
 
-**Today:** `/practice/replay` renders a placeholder empty state (see `ReflectionReplay.tsx`) while the V2 replay experience is rebuilt. The end-state UX below is the target once the feature is restored.
+**Today:** `/tools/practice/replay` renders a placeholder empty state (see `ReflectionReplay.tsx`) while the V2 replay experience is rebuilt. The end-state UX below is the target once the feature is restored.
 
 Planned behavior once rebuilt:
 
@@ -96,11 +96,9 @@ When reopened without an id, Replay should select a random pause ≥7 days old t
 
 ---
 
-## 6. Backwards compatibility
+## 6. Pause V2 scope
 
-Pause V2 removed all legacy reflection-based consumers, so there is no
-compatibility shim here. Echo cards always render from the new pause-based
-read model.
+Echo uses `v_pause_full` + `pause_step_events` / `practice_entries` only. There is no parallel read path through the legacy `reflections` table.
 
 ---
 
@@ -108,14 +106,13 @@ read model.
 
 | File | Role |
 |------|------|
-| `supabase/functions/_shared/past-reflection-util.ts` | Pure helpers (`buildUserWordsForReflection`, `assemblePastReflectionPool`, `parseDirectionFromContext`, `pickPastReflection`). |
-| `supabase/functions/_shared/past-reflections.ts` | Edge DB helper (`fetchPastReflectionWithWords`). |
+| `supabase/functions/_shared/past-reflection-util.ts` | Types (`PastReflectionWithWords`, `UserWord`) and pure helpers `parseDirectionFromContext`, `pickPastReflection`. |
+| `supabase/functions/_shared/past-reflections.ts` | Edge DB helper `fetchPastReflectionWithWords`. |
 | `supabase/functions/_shared/generators/zoom-out.ts` | Calls the edge helper; projects into the Echo payload. |
-| `src/hooks/use-past-reflection.ts` | Client hook for a specific pause instance id (planned for V2 rebuild). |
-| `src/components/practice/ReflectionReplay.tsx` | Replay thread view UI (currently placeholder during V2 rebuild). |
+| `src/components/practice/ReflectionReplay.tsx` | Replay surface (placeholder until wired to the read model). |
 | `src/components/ZoomOutDisplay.tsx` | Echo card with strict user-words policy + honest empty state. |
 | `src/locales/en.json` | `companions.echo*` + `practice.replay*` strings (see `echoEmptyBody`, `echoHolzenAsked`, `replayNoWordsYet`). |
-| `src/test/past-reflection-util.test.ts` | 13 tests covering the pure helpers. |
+| `src/test/past-reflection-util.test.ts` | Tests for `parseDirectionFromContext` and `pickPastReflection`. |
 
 ---
 
