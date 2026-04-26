@@ -1426,6 +1426,7 @@ export type Database = {
           id: string
           intensity: number | null
           mood: string | null
+          pause_instance_id: string | null
           prompt: string | null
           trigger_text: string | null
           type: string
@@ -1438,6 +1439,7 @@ export type Database = {
           id?: string
           intensity?: number | null
           mood?: string | null
+          pause_instance_id?: string | null
           prompt?: string | null
           trigger_text?: string | null
           type?: string
@@ -1450,12 +1452,42 @@ export type Database = {
           id?: string
           intensity?: number | null
           mood?: string | null
+          pause_instance_id?: string | null
           prompt?: string | null
           trigger_text?: string | null
           type?: string
           user_id?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "practice_entries_pause_instance_id_fkey"
+            columns: ["pause_instance_id"]
+            isOneToOne: false
+            referencedRelation: "pause_instances"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "practice_entries_pause_instance_id_fkey"
+            columns: ["pause_instance_id"]
+            isOneToOne: false
+            referencedRelation: "v_pause_completed"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "practice_entries_pause_instance_id_fkey"
+            columns: ["pause_instance_id"]
+            isOneToOne: false
+            referencedRelation: "v_pause_current"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "practice_entries_pause_instance_id_fkey"
+            columns: ["pause_instance_id"]
+            isOneToOne: false
+            referencedRelation: "v_pause_full"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       profiles: {
         Row: {
