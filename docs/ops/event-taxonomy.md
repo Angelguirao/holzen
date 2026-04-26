@@ -19,7 +19,7 @@ The authoritative list of PostHog events Holzen emits. Deliberate events only �
 
 ## Instrumentation status
 
-- **Wired (PostHog):** `auth.*`, `navigation.primary_tab_opened`, `pause.manual_started` / `pause.manual_completed` (Home “Need a moment” + `holzen-reflect` + V2 instance), `pause_instance_created` (manual new instance), `pause_engaged`, `pause_completed`, `pause_companion_counted` / `pause_companion_not_counted` (from `pause_log_step` / `pause_log_companion` RPCs), `generation.initiated`, `companion.served`, `paywall.viewed` (feature-gate, limit hit, upgrade buttons in Settings), `paywall.subscribed` (subscription checkout return; `plan` from `check-subscription` `subscription_billing_interval` when a fresh Stripe read is available, else `unknown`), `feedback.submitted` (after `send-feedback` success), `performance.web_vital`, `ritual.suggested` / `ritual.accepted` / `ritual.declined` (Ground), plus **companion idempotency diagnostics** below.
+- **Wired (PostHog):** `auth.*`, `navigation.primary_tab_opened`, `pause.manual_started` / `pause.manual_completed` (Home “Need a moment” + `holzen-reflect` + V2 instance), `pause_instance_created` (manual new instance), `pause_engaged`, `pause_completed`, `pause_companion_counted` / `pause_companion_not_counted` (from `pause_log_step` / `pause_log_companion` RPCs), `generation.initiated`, `companion.served`, `paywall.viewed` (feature-gate, limit hit, upgrade buttons in Settings), `paywall.subscribed` (subscription checkout return; `plan` from `check-subscription` `subscription_billing_interval` when a fresh Stripe read is available, else `unknown`), `feedback.submitted` (after `send-feedback` success), `performance.web_vital`, `ritual.suggested` / `ritual.suggestion_refreshed` / `ritual.accepted` / `ritual.declined` (Ground), plus **companion idempotency diagnostics** below.
 - **Postgres (not PostHog):** PWA install prompts (`InstallHolzenCard` → `analytics_events`), edge `trackEvent` AI call counters, etc.
 - **Convention:** every new event adds a row below AND a `trackEvent` call in source — never define events only in the PostHog UI.
 
@@ -94,6 +94,7 @@ PII stance unchanged: no generated pause message text, no companion content, no 
 | Event | When | Properties | Owner |
 |---|---|---|---|
 | `ritual.suggested` | Ritual suggestion surfaces | `{ ritual_key: string }` | @holzen |
+| `ritual.suggestion_refreshed` | User confirms a new AI suggestion for Ground (allowance use) | `{ ritual_key: string }` | @holzen |
 | `ritual.accepted` | User starts a suggested ritual | `{ ritual_key }` | @holzen |
 | `ritual.declined` | User dismisses a suggested ritual | `{ ritual_key }` | @holzen |
 

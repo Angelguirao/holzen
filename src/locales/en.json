@@ -205,7 +205,8 @@
     "breathe": "Stillness",
     "breatheDesc": "A quiet, goal-free breathing space.",
     "ground": "Ground",
-    "groundDesc": "Guided session from your activity tags; your journal lives on the second tab in the same experience."
+    "groundDesc": "Guided session from your activity tags; your journal lives on the second tab in the same experience.",
+    "proShortBadge": "Pro"
   },
   "profile": {
     "pageSubtitle": "Your streak, charts, and journey — in one place. (Letters are under Tools.)",
@@ -488,6 +489,7 @@
     }
   },
   "moodCheck": {
+    "howAreYouFeelingNow": "How are you feeling now?",
     "howAreYouFeeling": "How are you feeling right now?",
     "highEnergy": "High energy",
     "lowEnergy": "Low energy",
@@ -1204,10 +1206,11 @@
     "groundToolLabel": "Ground",
     "title": "Ground yourself",
     "finding": "Finding what fits…",
+    "begin": "Begin",
     "suggestionFailed": "Could not load a grounding suggestion right now.",
     "fallbackSuggestion": "Take a moment with {{activity}}. Sometimes the simplest thing is the most grounding.",
     "noActivities": "No grounding activities set up yet.",
-    "noActivitiesHint": "Tell us what grounds you — running, music, cooking — so the AI can suggest what fits each moment.",
+    "noActivitiesHint": "Tell us what grounds you — running, music, cooking — so Holzen can tailor Ground. Holzen Pro adds an AI pick for each visit.",
     "goToSettings": "Set up in Settings",
     "setTimer": "Set a timer",
     "skipTimer": "Skip timer",
@@ -1215,8 +1218,27 @@
     "imDone": "I'm done",
     "checkIn": "Check in",
     "howDoYouFeel": "How do you feel now?",
+    "didYouKnow": "Did you know?",
+    "readMore": "Read more",
+    "reflectTitle": "A brief note",
+    "reflectPrompt": "Anything you noticed during this moment? This is just for you.",
+    "reflectPlaceholder": "Optional…",
+    "viewHistory": "View journal",
     "doneMessage": "You chose to ground yourself. That's the kind of awareness that compounds.",
-    "return": "Return home"
+    "return": "Return home",
+    "returnToTools": "Back to Tools",
+    "sessionOneIdeaHintFree": "One gentle focus for this visit. Tap Back and open Ground again anytime to choose another activity.",
+    "sessionOneIdeaHintPro": "One AI-guided focus for this visit. New suggestion uses another guidance allowance, same as leaving and returning.",
+    "newSuggestion": "New suggestion",
+    "newSuggestionTitle": "Get a different idea?",
+    "newSuggestionDescription": "This uses one AI guidance allowance from your Holzen Pro plan, the same as opening Ground again from Tools.",
+    "newSuggestionConfirm": "Use allowance",
+    "newSuggestionCancel": "Keep this one",
+    "freePickTitle": "What do you want to lean on?",
+    "freeSessionIntro": "You’re on the manual path: pick one of your grounding activities. Holzen Pro adds an AI-timed suggestion for the moment and the market.",
+    "freeLeadIn": "Take your time with {{activity}}. Stay with the sensation instead of the chart.",
+    "freeSurprise": "Surprise me",
+    "upgradeForAi": "Upgrade for AI picks"
   },
   "breathing": {
     "trigger": "Breathe with this →",
