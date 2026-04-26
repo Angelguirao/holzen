@@ -19,8 +19,8 @@ Five bottom tabs, all wrapped in `AppLayout` (header + `Outlet` + bottom nav, ma
 
 | Tab      | Path            | Role                                                                                                                                                                                                                                                                                        |
 | -------- | --------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Home     | `/`             | Hub: widgets (pause/reflection **first**, then market, goal, **Journey pulse** for score/progress links, **Quick capture** for check-in + recent library, plus evening card when applicable), pause triggers, onboarding. Immersive tools (ground, stillness, full practice) live under **Tools**, not as Home widgets. *Letters are not a Home widget.* |
-| Library  | `/library`      | Saved pause artifacts, collections, search, source filters; **Activity** tab links to `/journey/activity` for the consolidated log.                                                                                                                                                         |
+| Home     | `/`             | Hub: draggable widgets (default order **Pause** → **Market** → **Goal** → **Journey pulse** → **Quick capture** → **Evening** when applicable). **Journey pulse** (`HomeJourneyPulse`) surfaces Holzen score + trend, closest badge progress, and links into Journey (stats / badges / activity). **Quick capture** (`HomeQuickCapture`) is a short emotional check-in + optional note (writes `practice_entries`) and a one-line preview of the latest saved library item. Pause triggers, onboarding, pull-to-refresh. Full-screen tools (ground, stillness, practice) live under **Tools** — not duplicated as large Home tiles. *Letters are not a Home widget.* |
+| Library  | `/library`      | Saved **`library_items`**, collections, search, source filters. In-app tabs: **All**, **Favorites**, **Collections** (no separate “Activity” tab on this screen). The **chronological activity log** lives under **Journey → Activity** (`/journey/activity`), which merges pauses, letters, badges, practice entries, and **library saves** in one calendar (`HistoryContent` + `HistoryCalendar`, including activity type **`library`**).                                                                                                                                                         |
 | Tools    | `/tools`        | In-app index (`ToolsHub`): **one** list to letters, stillness, ground, practice, etc. (no separate “Journey block” on this screen; progress stays under **Journey**). **Ground** opens a full-screen shell with **Session** and **Journal** tabs (`/tools/ground` and `/tools/ground/history`). Only `/tools` and `/tools/letters` use the **shell + bottom nav**; other `/tools/...` routes are full-screen. |
 | Journey  | `/journey/:tab` | Longitudinal “you” content: **stats, insights, badges, activity** — each tab is a **path segment** (default `/journey/stats`). *Letters are not a Journey tab.*                                                                                                                             |
 | Settings | `/settings`     | **Hub** at `/settings` with links to per-section screens (`/settings/<section>`), plus `/settings/about` and `/settings/billing-history`; `useSettingsModel` only loads for hub and section routes.                                                                                               |
@@ -32,7 +32,7 @@ Notification `action_path` for letter delivery uses `/tools/letters?letter=<id>`
 
 **Settings sub-routes (still in shell + bottom nav):** `/settings/billing-history`, `/settings/about` (changelog, version, feedback — split out so the main Settings page stays action-first).
 
-**In-app index for tools:** `/tools` lists letters, stillness, ground (journal is the second tab in that flow, not a separate hub row), and practice. Stillness is **`/tools/breathe`**. Home keeps only **Quick capture** as a minimal check-in entry; full tools are reached from the Tools tab.
+**In-app index for tools:** `/tools` lists letters, stillness, ground (journal is the **Journal** tab under `/tools/ground/history`, not a separate hub row), and practice. Stillness is **`/tools/breathe`**. Home exposes **Quick capture** for a minimal check-in; full tools open from the **Tools** tab.
 
 This matches the “skills-first” stats organization documented in `docs/decisions/2026-04-23-skills-first-stats-ia.md` and implemented in `StatsContentV2`.
 
@@ -76,7 +76,7 @@ Under `/admin` and children (`/admin/smoke-test`, `/admin/sentry-alerts`, `/admi
 ### 1.6 Cross-cutting behaviors
 
 - **Global chrome:** `NotificationBell` (header), `FeedbackWidget` (signed-in), `CheckoutConfirmation`, `PauseReadyBanner` on non-Home when auto-trigger fires.
-- **Library vs Journey → Activity:** Copy on Library clarifies “saved, browsable” vs chronological log under **Journey → Activity**; product copy lives in i18n (`library.iaClarifier`, `journey.activityExplainer`). A tab-row link (`library.linkActivityLog`) also jumps to **Journey → Activity**. `HistoryCrossLinks` adds “See also” links between Library, Journey → Activity, and `/tools/ground/history` so “where is my past?” routes are one tap apart.
+- **Library vs Journey → Activity:** **Library** is the browsable, filterable collection of saved items. **Journey → Activity** is the unified chronological log (pauses, letters, badges, practice, **and library saves**) rendered by `HistoryContent` / `HistoryCalendar`. There is **no** `HistoryCrossLinks` strip anymore — navigation is primary tabs + in-page links (e.g. Home **Journey pulse** → Activity).
 
 ### 1.7 Primary navigation (product analytics)
 
@@ -92,7 +92,7 @@ Under `/admin` and children (`/admin/smoke-test`, `/admin/sentry-alerts`, `/admi
 2. **Full-screen tool separation:** Full-screen routes protect focus (pause, breathe, ground, practice) without fighting the **five-tab** shell.
 3. **Deep links for companions:** Instance-scoped URLs are the right pattern for resuming or sharing a specific pause outcome.
 4. **Stats skills-first:** Journey’s default-to-stats and skills-first structure is coherent once users land there (see decision doc).
-5. **Settings depth:** Accordion / long-page settings is common on mobile; billing as a sub-route is reasonable.
+5. **Settings depth:** Hub (`/settings`) plus **per-section routes** (`/settings/<section>`) keeps infrequent tasks out of the daily path; `/settings/about` and `/settings/billing-history` stay first-class without loading the heavy settings model.
 
 ---
 
@@ -101,16 +101,16 @@ Under `/admin` and children (`/admin/smoke-test`, `/admin/sentry-alerts`, `/admi
 1. **Companion URLs vs tools (intentional)**
   Companions use instance-scoped routes under `COMPANION_PREFIX` in `app-routes.ts` (e.g. `/companion/...` per pause) while the regulation / practice / letters namespace is `TOOLS_PREFIX` (`/tools/...`). Two URL families, one mental model each — not a bug to “merge.”
 2. **“Journey” still bundles several intents**
-  The tab groups stats, insights, badges, and activity. Copy and the Library vs Activity explainer help; further split is a product call.
+  The tab groups stats, insights, badges, and activity. The Activity tab is the single “timeline” surface; further split is a product call.
 3. **Progress / history split across three places**
   - Library: saved artifacts and collections.  
   - Journey → activity (chronological log).  
   - Grounding-specific history: **`/tools/ground/history`**, reached from the **Journal** tab inside the Ground full-screen experience (grouped with the session, not a separate “mode” in the tools list).  
-   **Mitigation shipped:** cross-links (`HistoryCrossLinks`) on Library, Journey → Activity, and Grounding history; the underlying three-surface model remains intentional.
+   **Mitigation shipped:** **Journey → Activity** calendar now includes **library saves** alongside pauses/practice/badges/letters so “what happened when?” has fewer blind spots. Grounding session history remains under **Tools → Ground → Journal** (`/tools/ground/history`); the underlying three-surface model (Library saved vs Activity timeline vs Ground journal) remains intentional.
 4. **Settings is multi-purpose**
   Pro, referrals, haptics, push, quiet hours, content sources, danger zone — still a lot to cover, but low-frequency **changelog / version / feedback** is on `/settings/about`, and the main settings experience is a **hub** plus **per-section routes** under `/settings/<section>`.
 5. **Discoverability of full-screen tools**
-  **Mitigation shipped:** **Tools** is a **bottom tab** pointing at `/tools` (`ToolsHub`). Home widgets and deep links remain; full-screen tool routes still hide the shell; `/tools/letters` stays in the shell.
+  **Mitigation shipped:** **Tools** is a **bottom tab** pointing at `/tools` (`ToolsHub`). Home draggable widgets + deep links remain; full-screen tool routes still hide the shell; `/tools/letters` stays in the shell.
 6. **Marketing vs app boundary**
   Public pages (`/about`, `/blog`, `/reserve`) are consistent; `/roadmap` is a small stub page so inbound links don’t rot or drop users on welcome with no explanation.
 
@@ -124,7 +124,7 @@ This section captures the **current state** and what we may reconsider next.
 
 - **Shipped:** canonical `/tools/*` URL family for letters (future self), stillness (`/tools/breathe`), ground (with nested `history` for the grounding journal), practice.
 - **Shipped:** no alternate short routes; external links/bookmarks should use `/tools/...`.
-- **Shipped:** information entry point via `/tools` (`ToolsHub`: **single** list — no “Journey vs immersive” split on that screen) plus Home links.
+- **Shipped:** information entry point via `/tools` (`ToolsHub`: **single** list — no “Journey vs immersive” split on that screen) plus Home **Journey pulse** / **Quick capture** entry points.
 - **Shipped:** **Tools** as a **primary bottom tab** (five tabs total) for `/tools` and `/tools/letters` (shell); other full-screen `/tools/...` routes hide the tab bar.
 - **Shipped (measurement):** PostHog `navigation.primary_tab_opened` (see **§1.7**) so tab mix and Tools adoption are quantifiable.
 - **Alternative to revisit:** if five tabs feel crowded on small devices, revisit order/labeling or promote tools from Home only — use `navigation.primary_tab_opened` + qualitative feedback (e.g. short hallway tests).
@@ -145,7 +145,7 @@ This section captures the **current state** and what we may reconsider next.
 
 ### 4.4 Clarify Library vs Activity
 
-- **Shipped:** in-product explainer copy distinguishes Library (saved/browsable artifacts) vs Journey Activity (chronological log).
+- **Shipped:** **Library** = saved, filterable **`library_items`**. **Journey → Activity** = unified chronological log (pauses, practice, badges, letters, **library saves**) in `HistoryCalendar`.
 - **Alternative to revisit:** if users still confuse surfaces, merge into one screen with view modes (`saved` / `timeline`) behind one information object.
 
 ### 4.5 Settings IA by task
@@ -171,7 +171,7 @@ Use this as a **checklist** when planning research or another IA pass. Detailed 
 | **Tools & shell**        | Canonical `/tools/*`, single `ToolsHub` list, Ground session+journal in `ToolsGroundLayout`, stillness at `/tools/breathe`; `navigation.primary_tab_opened` | Reorder tabs; further merge practice routes if the list still feels long                                  |
 | **Journey vs “profile”** | `/journey/:tab`, skills-first stats; **Home** shows Journey pulse + quick capture | Heavier Home module or a **dedicated Stats tab** if interviews + metrics justify it                         |
 | **Journey scope**        | One hub: stats, insights, badges, activity; letters under Tools      | Further **split tabs or routes** if one area dominates support load (product call)                          |
-| **Library vs Activity**  | Copy + `HistoryCrossLinks`                                           | **Single screen** with `saved` / `timeline` modes if users still mix them up                                |
+| **Library vs Activity**  | Library tabs vs Journey → Activity calendar (includes **`library`** events) | **Single screen** with `saved` / `timeline` modes if users still mix them up                                |
 | **Settings**             | Hub + `/settings/<section>` + `/settings/about` & `/settings/billing-history` | Further **layout polish** on section pages if metrics still show users bail mid-task                          |
 | **Admin**                | Isolated `/admin*` + in-page `AdminSubNav` between admin routes        | Deeper **grouping** or layout wrapper if more tools ship there                                              |
 | **Companions vs tools**  | `/companion/...` vs `/tools/...`                                     | Keep two families; only consolidate if a future design unifies “instance” vs “tool” mentally                |
@@ -214,6 +214,7 @@ Use this as a **checklist** when planning research or another IA pass. Detailed 
 | 2026-04-28 | —      | **Settings:** true per-section routes (`/settings/<id>`), hub, `useSettingsModel` + provider layout; `settingsSectionPath` points at `/settings/<id>`; hub hash → section route.          |
 | 2026-04-28 | —      | **Tools:** unified `ToolsHub` list (no Journey/activity on hub); **Ground** `ToolsGroundLayout` with Session + Journal; Ambient folded into Stillness at `/tools/breathe`; i18n “Stillness” no parenthetical. |
 | 2026-04-29 | —      | Removed legacy client URL aliases (`/journey/letters`, `/settings/section/*`, `/tools/ambient`); letter notifications and docs use **`/tools/letters`** only. |
+| 2026-04-30 | —      | **IA doc sync:** Home default widget order + `HomeJourneyPulse` / `HomeQuickCapture`; Library vs Activity wording matches shipped UI (no Library “Activity” tab, no `HistoryCrossLinks`); Activity log includes **`library`** events. |
 
 
 When routes, bottom-nav items, or nav-related analytics change, update **§1**, **§1.7**, **§4.1**, **§4.7**, **event-taxonomy.md** (if applicable), and a **Changelog** row in the same PR.
