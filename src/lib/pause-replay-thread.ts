@@ -53,12 +53,16 @@ export async function loadPauseReplayThread(pauseInstanceId: string): Promise<
     notes.push({ kind: 'note', body: text, created_at: e.created_at });
   }
 
-  const { data: replays, error: rErr } = await supabase
+  const replayQuery = await (supabase
     .from('practice_entries')
     .select('body, created_at')
-    .eq('pause_instance_id', pauseInstanceId)
+    .eq('pause_instance_id' as never, pauseInstanceId as never)
     .eq('type', 'replay')
-    .order('created_at', { ascending: true });
+    .order('created_at', { ascending: true }) as unknown as Promise<{
+      data: Array<{ body: string | null; created_at: string }> | null;
+      error: { message: string } | null;
+    }>);
+  const { data: replays, error: rErr } = replayQuery;
 
   if (rErr) {
     return { ok: false, code: 'load_error', message: rErr.message };
