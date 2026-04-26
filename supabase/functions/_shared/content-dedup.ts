@@ -3,8 +3,12 @@
  * Keep normalization aligned with DB generated columns where applicable.
  */
 
-import type { SupabaseClient } from "@supabase/supabase-js";
 import type { FeedArticleRef } from "./feed-ingest.ts";
+
+// Structural type to avoid pulling in @supabase/supabase-js (which has divergent
+// resolution paths in Vite/tsc vs Deno). Both real clients satisfy this shape.
+// deno-lint-ignore no-explicit-any
+type SupabaseClient = any;
 
 /** Trim, lowercase, collapse internal whitespace — matches content_library.title_norm in SQL. */
 export function normalizeTitleKey(s: string): string {
