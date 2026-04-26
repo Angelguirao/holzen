@@ -7,7 +7,10 @@
  * on `generation_attempts.quality_gate_reason` and Edge logs (`quality_gate_reject`).
  */
 
-import type { SupabaseClient } from "https://esm.sh/@supabase/supabase-js@2.57.2";
+// Structural type to avoid pulling in @supabase/supabase-js (which has divergent
+// resolution paths in Vite/tsc vs Deno). Both real clients satisfy this shape.
+// deno-lint-ignore no-explicit-any
+type SupabaseClient = any;
 
 // ── Banned AI-slop phrases ──
 // If any of these appear in generated text, it fails the quality gate.
