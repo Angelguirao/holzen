@@ -36,13 +36,13 @@ export interface DuplicateGroup {
 const SIMILARITY_THRESHOLD = 0.6;
 
 /**
- * Detect near-duplicate pause bookmarks in the library (`source_type === 'reflection'`).
+ * Detect near-duplicate pause bookmarks in the library (`source_type === 'pause'`).
  * Groups items by text similarity using Jaccard index on word tokens.
  * Only considers items with a body.
  */
 export function detectDuplicates(items: LibraryItem[]): DuplicateGroup[] {
   const reflectionBookmarks = items.filter(
-    (i) => i.source_type === 'reflection' && i.body && i.body.length > 20 && i.status !== 'deleted'
+    (i) => i.source_type === 'pause' && i.body && i.body.length > 20 && i.status !== 'deleted'
   );
 
   if (reflectionBookmarks.length < 2) return [];
