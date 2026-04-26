@@ -1,4 +1,5 @@
 import type { TFunction } from 'i18next';
+import { normalizeLibrarySourceType } from '@/lib/normalize-library-source-type';
 
 /**
  * Localized label for a library item `source_type` (keys under `librarySources` in i18n).
@@ -8,6 +9,7 @@ export function librarySourceLabel(
   t: TFunction,
   whenMissing: string
 ): string {
-  if (!sourceType) return whenMissing;
-  return t(`librarySources.${sourceType}`, { defaultValue: whenMissing });
+  const key = normalizeLibrarySourceType(sourceType);
+  if (!key) return whenMissing;
+  return t(`librarySources.${key}`, { defaultValue: whenMissing });
 }

@@ -26,7 +26,7 @@ const DAY_TINT: Record<string, string> = {
   uncertain: 'bg-secondary/40',
 };
 
-export type ActivityType = 'reflection' | 'letter' | 'badge' | 'practice' | 'library';
+export type ActivityType = 'pause' | 'letter' | 'badge' | 'practice' | 'library';
 
 export interface CalendarActivity {
   date: string;
@@ -44,7 +44,7 @@ interface Props {
 }
 
 function getDominantMood(activities: CalendarActivity[]): string | null {
-  const moods = activities.filter((a) => a.type === 'reflection' && a.mood).map((a) => a.mood!);
+  const moods = activities.filter((a) => a.type === 'pause' && a.mood).map((a) => a.mood!);
   if (moods.length === 0) return null;
   const counts: Record<string, number> = {};
   for (const m of moods) counts[m] = (counts[m] || 0) + 1;
@@ -166,8 +166,7 @@ export function HistoryCalendar({ activities, selectedDate, onSelectDate }: Prop
           );
         }
 
-        // Activity feed type remains `reflection` (pause session marker in calendar model).
-        const pauseDayMarkers = dayItems.filter((a) => a.type === 'reflection');
+        const pauseDayMarkers = dayItems.filter((a) => a.type === 'pause');
         const lettersList = dayItems.filter((a) => a.type === 'letter');
         const badgesList = dayItems.filter((a) => a.type === 'badge');
         const practiceList = dayItems.filter((a) => a.type === 'practice');
@@ -190,7 +189,7 @@ export function HistoryCalendar({ activities, selectedDate, onSelectDate }: Prop
             <div className="flex items-center gap-3">
               {pauseDayMarkers.length > 0 && (
                 <span className="text-[10px] font-mono text-muted-foreground">
-                  {t('calendar.reflectionCount', { count: pauseDayMarkers.length })}
+                  {t('calendar.pauseCount', { count: pauseDayMarkers.length })}
                 </span>
               )}
               {lettersList.length > 0 && (

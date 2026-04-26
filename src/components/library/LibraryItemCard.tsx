@@ -6,6 +6,7 @@ import type { LibraryItem } from '@/hooks/use-library';
 import { useTranslation } from 'react-i18next';
 import { formatDistanceToNow, differenceInHours } from 'date-fns';
 import { cn } from '@/lib/utils';
+import { normalizeLibrarySourceType } from '@/lib/normalize-library-source-type';
 
 interface Props {
   item: LibraryItem;
@@ -73,18 +74,19 @@ export function LibraryItemCard({ item, onToggleFavorite, onClick, engaged = tru
     }
   }, [item.created_at, item.status]);
 
-  const st = item.source_type ?? '';
+  const st = normalizeLibrarySourceType(item.source_type) ?? '';
   const CategoryIcon = SOURCE_ICONS[st] ?? FileText;
   const sourceBadgeLabel = librarySourceLabel(
     st || undefined,
     t,
     item.type ?? 'Item'
   );
-  const isCompanion = item.source_type && !['pause', 'pause_note', 'ground', 'practice', 'external'].includes(item.source_type);
+  const isCompanion =
+    st && !['pause', 'pause_note', 'ground', 'practice', 'external'].includes(st);
   // Only show as skipped if the pause is complete (has outcome) and user didn't engage
   const dimmed = isCompanion && !engaged && !incomplete;
 
-  const sourceColor = SOURCE_COLORS[item.source_type ?? ''] ?? 'border-l-transparent';
+  const sourceColor = SOURCE_COLORS[st] ?? 'border-l-transparent';
 
   return (
     <div

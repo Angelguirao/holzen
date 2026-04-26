@@ -4,6 +4,7 @@
 > (`pause_step_events`) + `practice_entries`. There is no legacy
 > `reflections` table post-cutover.
 
+> **`library_items`:** the main pause bookmark uses `source_type = 'pause'`. Echo and Replay below read **`pause_step_events`** / **`practice_entries`**, not library rows.
 
 A **shared read model** for surfacing a user's **own words from a past pause**. Used by two surfaces:
 

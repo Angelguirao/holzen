@@ -13,7 +13,7 @@ This page is the **companion-level** view. For **manual vs automatic pause**, **
 
 ## 1. Where History sits in the pipeline
 
-1. User completes reflection; when the user **taps the Look Back card**, **`use-companion-data`** invokes **`companion-orchestrate`** with `enableHistory: true` (lazy loading). If History data is already cached in `pause_ai_artifacts`, it is hydrated from DB without a network call.
+1. User completes a pause; when the user **taps the Look Back card**, **`use-companion-data`** invokes **`companion-orchestrate`** with `enableHistory: true` (lazy loading). If History data is already cached in `pause_ai_artifacts`, it is hydrated from DB without a network call.
 2. **`companion-orchestrate`** runs **`generateHistory`** in `_shared/generators/history.ts` when **`enableHistory`** is true (or when the intervention **requires** it — pattern type), passing **context**, **session intent** (`preferredMood`), and **recency dedup** fields.
 3. **`generateHistory`** returns structured History payload; the orchestrator **writes** **`pause_ai_artifacts`** (kind `historical_insight`) and **`companion_serves`**.
 

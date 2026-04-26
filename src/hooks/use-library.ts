@@ -2,6 +2,10 @@ import { useState, useEffect, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/use-auth';
 import type { Database } from '@/integrations/supabase/types';
+import {
+  isMainPauseLibraryBookmark,
+  normalizeLibrarySourceType,
+} from '@/lib/normalize-library-source-type';
 
 /** DB insert/update; `pause_instance_id` may exist in production before types.ts regen. */
 type LibraryItemsInsert = Database['public']['Tables']['library_items']['Insert'] & {
@@ -252,8 +256,8 @@ export function useLibrary() {
     const item = items.find((i) => i.id === id);
     if (!item) return;
 
-    if (item.pause_instance_id && item.source_type === 'pause') {
-      // Deleting the main pause bookmark (`source_type === 'pause'`): soft-delete all library
+    if (item.pause_instance_id && isMainPauseLibraryBookmark(item.source_type)) {
+      // Deleting the main pause bookmark: soft-delete all library
       // items that share the pause_instance_id, then dismiss the
       // underlying pause.
       const pauseInstanceId = item.pause_instance_id;
@@ -286,7 +290,7 @@ export function useLibrary() {
       setItems((prev) => prev.filter((i) => i.id !== id));
       setCollectionItems((prev) => prev.filter((ci) => ci.library_item_id !== id));
     }
-  }, [items, user]);
+  }, [items]);
 
   const togglePin = useCallback(async (id: string) => {
     const item = items.find((i) => i.id === id);
@@ -374,7 +378,8 @@ export function useLibrary() {
 
   const isCompanionEngaged = useCallback((item: LibraryItem): boolean => {
     if (!item.pause_instance_id || !item.source_type) return true;
-    if (item.source_type === 'pause' || item.source_type === 'pause_note') return true;
+    const st = normalizeLibrarySourceType(item.source_type);
+    if (st === 'pause' || st === 'pause_note') return true;
     const flags = readFlagsMap[item.pause_instance_id];
     if (!flags) return true; // no data, assume engaged
     const sourceToFlag: Record<string, keyof ReflectionReadFlags> = {
@@ -389,12 +394,12 @@ export function useLibrary() {
   }, [readFlagsMap]);
 
   const isReflectionIncomplete = useCallback((item: LibraryItem): boolean => {
-    if (item.source_type !== 'pause' || !item.pause_instance_id) return false;
+    if (!isMainPauseLibraryBookmark(item.source_type) || !item.pause_instance_id) return false;
     return incompleteReflections.has(item.pause_instance_id);
   }, [incompleteReflections]);
 
   const getReflectionOutcome = useCallback((item: LibraryItem): string | null => {
-    if (item.source_type !== 'pause' || !item.pause_instance_id) return null;
+    if (!isMainPauseLibraryBookmark(item.source_type) || !item.pause_instance_id) return null;
     return reflectionOutcomes[item.pause_instance_id] ?? null;
   }, [reflectionOutcomes]);
 
