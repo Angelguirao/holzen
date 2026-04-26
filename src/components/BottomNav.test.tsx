@@ -6,17 +6,19 @@ describe('isPrimaryTabActive', () => {
     expect(isPrimaryTabActive('/', 'home')).toBe(true);
     expect(isPrimaryTabActive('/library', 'home')).toBe(false);
     expect(isPrimaryTabActive('/library', 'library')).toBe(true);
+    expect(isPrimaryTabActive('/library/abc', 'library')).toBe(true);
   });
 
-  it('matches tools hub and shell letters (not immersive /tools/*)', () => {
-    expect(isPrimaryTabActive('/tools', 'tools')).toBe(true);
-    expect(isPrimaryTabActive('/tools/letters', 'tools')).toBe(true);
-    expect(isPrimaryTabActive('/tools/breathe', 'tools')).toBe(false);
+  it('matches the new Practice and Calendar tabs', () => {
+    expect(isPrimaryTabActive('/practice', 'practice')).toBe(true);
+    expect(isPrimaryTabActive('/practice/anything', 'practice')).toBe(true);
+    expect(isPrimaryTabActive('/calendar', 'calendar')).toBe(true);
+    expect(isPrimaryTabActive('/', 'practice')).toBe(false);
   });
 
-  it('matches journey prefix and settings subtree', () => {
-    expect(isPrimaryTabActive('/journey/stats', 'journey')).toBe(true);
-    expect(isPrimaryTabActive('/settings', 'settings')).toBe(true);
-    expect(isPrimaryTabActive('/settings/about', 'settings')).toBe(true);
+  it('matches journey prefix (Profile tab)', () => {
+    expect(isPrimaryTabActive('/journey/stats', 'profile')).toBe(true);
+    expect(isPrimaryTabActive('/journey/badges', 'profile')).toBe(true);
+    expect(isPrimaryTabActive('/settings', 'profile')).toBe(false);
   });
 });
