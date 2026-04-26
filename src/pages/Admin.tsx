@@ -902,7 +902,10 @@ export default function Admin() {
         </TabsContent>
 
         <TabsContent value="tools" className="mt-0">
-          <AppConfigTools />
+          <div className="space-y-3">
+            <MigrationStatus />
+            <AppConfigTools />
+          </div>
         </TabsContent>
       </Tabs>
 
