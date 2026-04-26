@@ -27,6 +27,7 @@ export default function ToolsLetters() {
             currentPrice={btcData.currentPrice}
             changePercent={btcData.changePercent}
             scrollToLetterId={letterId}
+            autoOpenComposer={!letterId}
           />
         </ProLock>
       ) : (
