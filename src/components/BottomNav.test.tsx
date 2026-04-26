@@ -9,16 +9,21 @@ describe('isPrimaryTabActive', () => {
     expect(isPrimaryTabActive('/library/abc', 'library')).toBe(true);
   });
 
-  it('matches the new Practice and Calendar tabs', () => {
-    expect(isPrimaryTabActive('/practice', 'practice')).toBe(true);
-    expect(isPrimaryTabActive('/practice/anything', 'practice')).toBe(true);
-    expect(isPrimaryTabActive('/calendar', 'calendar')).toBe(true);
-    expect(isPrimaryTabActive('/', 'practice')).toBe(false);
+  it('matches the tools tab on the hub and nested tools routes', () => {
+    expect(isPrimaryTabActive('/tools', 'tools')).toBe(true);
+    expect(isPrimaryTabActive('/tools/letters', 'tools')).toBe(true);
+    expect(isPrimaryTabActive('/', 'tools')).toBe(false);
   });
 
-  it('matches journey prefix (Profile tab)', () => {
-    expect(isPrimaryTabActive('/journey/stats', 'profile')).toBe(true);
-    expect(isPrimaryTabActive('/journey/badges', 'profile')).toBe(true);
-    expect(isPrimaryTabActive('/settings', 'profile')).toBe(false);
+  it('matches the journey tab on any /journey/* route', () => {
+    expect(isPrimaryTabActive('/journey/stats', 'journey')).toBe(true);
+    expect(isPrimaryTabActive('/journey/badges', 'journey')).toBe(true);
+    expect(isPrimaryTabActive('/settings', 'journey')).toBe(false);
+  });
+
+  it('matches the settings tab on any /settings/* route', () => {
+    expect(isPrimaryTabActive('/settings', 'settings')).toBe(true);
+    expect(isPrimaryTabActive('/settings/account', 'settings')).toBe(true);
+    expect(isPrimaryTabActive('/journey/stats', 'settings')).toBe(false);
   });
 });

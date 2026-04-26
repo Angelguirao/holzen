@@ -6,10 +6,6 @@ export const JOURNEY_PREFIX = '/journey';
 /** In-app tools hub in the shell; immersive `/tools/...` routes are full-screen (no bottom nav). */
 export const TOOLS_PREFIX = '/tools';
 
-/** New top-level tabs introduced in the IA refactor. */
-export const PRACTICE_PREFIX = '/practice' as const;
-export const CALENDAR_PREFIX = '/calendar' as const;
-
 /**
  * Instance-scoped companion flows (orchestrated from `/pause`). Not under `/tools/*`;
  * that namespace is for regulation / practice / letters.
