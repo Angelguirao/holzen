@@ -3,7 +3,7 @@
  * Keep normalization aligned with DB generated columns where applicable.
  */
 
-import type { SupabaseClient } from "https://esm.sh/@supabase/supabase-js@2.57.2";
+import type { SupabaseClient } from "@supabase/supabase-js";
 import type { FeedArticleRef } from "./feed-ingest.ts";
 
 /** Trim, lowercase, collapse internal whitespace — matches content_library.title_norm in SQL. */
