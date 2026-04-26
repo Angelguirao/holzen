@@ -1,4 +1,7 @@
-import type { SupabaseClient } from "https://esm.sh/@supabase/supabase-js@2.57.2";
+// Structural type to avoid pulling in @supabase/supabase-js (which has divergent
+// resolution paths in Vite/tsc vs Deno). Both real clients satisfy this shape.
+// deno-lint-ignore no-explicit-any
+type SupabaseClient = any;
 
 /**
  * Last-resort fallback pools when live generation and cache miss.
@@ -77,7 +80,10 @@ export function pickRandom<T>(pool: T[]): T {
 export const ENV_DISABLE_COMPANION_FALLBACKS = "DISABLE_COMPANION_FALLBACKS";
 
 export function companionFallbacksDisabled(): boolean {
-  const v = typeof Deno !== "undefined" ? Deno.env.get(ENV_DISABLE_COMPANION_FALLBACKS) : undefined;
+  // Use globalThis to keep Vite/tsc happy (no Deno global in browser typecheck).
+  // deno-lint-ignore no-explicit-any
+  const denoGlobal = (globalThis as any).Deno;
+  const v = denoGlobal?.env?.get?.(ENV_DISABLE_COMPANION_FALLBACKS);
   return v === "1" || v === "true" || v === "yes";
 }
 
