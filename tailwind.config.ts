@@ -20,6 +20,10 @@ export default {
         mono: ['var(--font-mono)'],
       },
       colors: {
+        // Cyan is retired from the Holzen palette. Use `text-nox-text-link`
+        // (calm blue #7FA9D9) for links, or `nox.accent.cyan` /
+        // `nox.accent.cyan-strong` for the desaturated brand cyan when needed.
+        cyan: undefined,
         border: "hsl(var(--border))",
         input: "hsl(var(--input))",
         ring: "hsl(var(--ring))",
