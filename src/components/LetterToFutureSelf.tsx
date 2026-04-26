@@ -74,6 +74,11 @@ interface Props {
   changePercent: number | null;
   /** From `?letter=` (e.g. notification deep link) — scroll that delivered letter into view once. */
   scrollToLetterId?: string | null;
+  /**
+   * When true (e.g. user opened Tools → Letters), open the composer as soon as writing is allowed
+   * so they land on the panicking/euphoric self flow without an extra tap.
+   */
+  autoOpenComposer?: boolean;
 }
 
 /**
@@ -159,7 +164,12 @@ function SealCracks() {
   );
 }
 
-export function LetterToFutureSelf({ currentPrice, changePercent, scrollToLetterId }: Props) {
+export function LetterToFutureSelf({
+  currentPrice,
+  changePercent,
+  scrollToLetterId,
+  autoOpenComposer = false,
+}: Props) {
   const { t } = useTranslation();
   const { user } = useAuth();
   const { currency, threshold, thresholdDown } = useHolzen();
@@ -175,6 +185,7 @@ export function LetterToFutureSelf({ currentPrice, changePercent, scrollToLetter
   // Calm-mode recipient: who should receive this letter?
   const [calmTarget, setCalmTarget] = useState<'crash' | 'surge'>('crash');
   const didScrollToLetter = useRef(false);
+  const didAutoOpenComposer = useRef(false);
   useEffect(() => {
     didScrollToLetter.current = false;
   }, [scrollToLetterId]);
@@ -234,6 +245,21 @@ export function LetterToFutureSelf({ currentPrice, changePercent, scrollToLetter
     });
     return () => cancelAnimationFrame(raf);
   }, [scrollToLetterId, loaded, deliveredLetters, prefersReducedMotion]);
+
+  useEffect(() => {
+    if (
+      !autoOpenComposer ||
+      !loaded ||
+      !user ||
+      !canWrite ||
+      scrollToLetterId ||
+      didAutoOpenComposer.current
+    ) {
+      return;
+    }
+    didAutoOpenComposer.current = true;
+    setComposerOpen(true);
+  }, [autoOpenComposer, loaded, user, canWrite, scrollToLetterId]);
 
   // Discard any draft when the composer closes without sealing.
   useEffect(() => {
