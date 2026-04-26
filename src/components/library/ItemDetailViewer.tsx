@@ -224,7 +224,7 @@ export function ItemDetailViewer({
           </div>
 
           {/* Title */}
-          {item.title && !(isReflection && item.title === 'Reflection') && (
+          {item.title && !(isPauseBookmark && item.title === 'Reflection') && (
             <p className="text-sm font-medium text-foreground leading-snug">{item.title}</p>
           )}
 
@@ -447,7 +447,7 @@ export function ItemDetailViewer({
               <div className="flex items-center gap-1.5">
                 <Link2 className="h-3 w-3 text-muted-foreground/40" />
                 <p className="text-[10px] font-mono text-muted-foreground/50 uppercase tracking-wider">
-                  {isReflection ? t('itemDetail.companions') : t('itemDetail.relatedItems')}
+                  {isPauseBookmark ? t('itemDetail.companions') : t('itemDetail.relatedItems')}
                 </p>
               </div>
               <div className="space-y-1.5">
