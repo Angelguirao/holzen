@@ -1,5 +1,7 @@
 import { describe, it, expect } from "vitest";
 import {
+  combineNoteAndReplayWords,
+  mergeUserWordsChronological,
   parseDirectionFromContext,
   pickPastReflection,
 } from "../../supabase/functions/_shared/past-reflection-util";
@@ -10,6 +12,36 @@ describe("parseDirectionFromContext", () => {
     expect(parseDirectionFromContext("btc IS UP today")).toBe("up");
     expect(parseDirectionFromContext(null)).toBeNull();
     expect(parseDirectionFromContext("sideways week")).toBeNull();
+  });
+});
+
+describe("mergeUserWordsChronological", () => {
+  it("orders by created_at with note before replay on timestamp ties", () => {
+    const merged = mergeUserWordsChronological([
+      { kind: "replay", body: "r", created_at: "2026-04-02T12:00:00Z" },
+      { kind: "note", body: "n", created_at: "2026-04-02T12:00:00Z" },
+    ]);
+    expect(merged[0].kind).toBe("note");
+    expect(merged[1].kind).toBe("replay");
+  });
+});
+
+describe("combineNoteAndReplayWords", () => {
+  it("merges and sorts notes with replay rows", () => {
+    const notes = [{ kind: "note" as const, body: "a", created_at: "2026-04-02T10:00:00Z" }];
+    const replays = [{ body: "  b  ", created_at: "2026-04-01T10:00:00Z" }];
+    const out = combineNoteAndReplayWords(notes, replays);
+    expect(out.map((w) => w.kind)).toEqual(["replay", "note"]);
+    expect(out[0].body).toBe("b");
+  });
+
+  it("drops blank replay bodies", () => {
+    const out = combineNoteAndReplayWords(
+      [{ kind: "note" as const, body: "x", created_at: "2026-04-01T10:00:00Z" }],
+      [{ body: "   ", created_at: "2026-04-02T10:00:00Z" }],
+    );
+    expect(out).toHaveLength(1);
+    expect(out[0].kind).toBe("note");
   });
 });
 

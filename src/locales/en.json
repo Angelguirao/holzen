@@ -34,6 +34,7 @@
     "cancel": "Cancel",
     "delete": "Delete",
     "done": "Done",
+    "save": "Save",
     "skip": "Skip",
     "continue": "Continue",
     "begin": "Begin",
@@ -1849,7 +1850,12 @@
     "replayYourReplay": "Your replay",
     "replayNoWordsYet": "You haven’t written anything on this pause yet. Start the thread below.",
     "replayNewEntry": "Your reply",
-    "replayThreadRefresh": "Load another pause"
+    "replayThreadRefresh": "Load another pause",
+    "replayLoadFailed": "Could not load this pause.",
+    "replayNoPauses": "No completed pauses yet. Finish a pause, then open Replay again.",
+    "replaySelectPause": "Choose a pause to revisit",
+    "replayChangePause": "Change pause",
+    "replayUntitled": "Pause"
   },
   "mirror": {
     "title": "Decision Mirror",

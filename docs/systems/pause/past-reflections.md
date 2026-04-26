@@ -60,9 +60,9 @@ Pure helpers live in [`supabase/functions/_shared/past-reflection-util.ts`](../.
 | Caller | Entry point | Notes |
 |--------|-------------|-------|
 | **Zoom Out (edge)** | `fetchPastReflectionWithWords` in `supabase/functions/_shared/past-reflections.ts`; invoked from `generators/zoom-out.ts` | Strict — returns `null` if the user has no past pauses with words ≥3 days old. |
-| **Replay (client)** | `ReflectionReplay.tsx` (placeholder) | V2 rebuild pending: no `usePastReflection` hook yet; route stays on **`/tools/practice/replay`** with an empty state until the thread is wired to `v_pause_full` + `practice_entries`. |
+| **Replay (client)** | `ReflectionReplay.tsx` + `loadPauseReplayThread` | Full thread on **`/tools/practice/replay`**: picker or deep link from Echo; loads `v_pause_full` + events + `practice_entries`; saves new replay rows with `pause_instance_id`. |
 
-The edge path builds `PastReflectionWithWords` using the same types and selection helpers as `past-reflection-util.ts`. The client replay placeholder does not call those helpers yet; when replay is rebuilt, it should reuse the same shape for a single read model.
+The edge path (`fetchPastReflectionWithWords`) and the replay screen (`loadPauseReplayThread` in `src/lib/pause-replay-thread.ts`) both build `PastReflectionWithWords`: notes from `pause_step_events`, replay lines from `practice_entries` (`type = 'replay'`, `pause_instance_id`), merged via `combineNoteAndReplayWords` in `past-reflection-util.ts`.
 
 ---
 
@@ -83,16 +83,7 @@ When the pool is empty, Echo returns `null` and the card renders an honest empty
 
 ## 5. Replay thread view
 
-**Today:** `/tools/practice/replay` renders a placeholder empty state (see `ReflectionReplay.tsx`) while the V2 replay experience is rebuilt. The end-state UX below is the target once the feature is restored.
-
-Planned behavior once rebuilt:
-
-1. **Date header** + optional `context` row.
-2. **`Holzen asked`** block with the AI prompt (`aiPrompt`).
-3. **User words thread** — each `note` / `replay` in chronological order, labeled `Your note` or `Your replay` with its own date.
-4. **Textarea + Done button** — the new entry is written to `practice_entries` with `type = 'replay'` and `pause_instance_id` = this pause's id, so it becomes the *next* entry in the thread on the next visit.
-
-When reopened without an id, Replay should select a random pause ≥7 days old that **has a non-blank note** (preferring a thread-ready pause), falling back to the full pool and rendering the "you haven't written anything on this pause yet" line.
+**Shipped:** `/tools/practice/replay` shows a **pause picker** (recent completed pauses) or opens a specific pause from Echo (`navigate` state). UI: date + context, **`Holzen asked`** (`aiPrompt`), chronological **notes and replays**, textarea to append a **`practice_entries`** row (`type = 'replay'`, `pause_instance_id` set). Empty user-word threads still show the prompt and invite a first replay line.
 
 ---
 
@@ -106,13 +97,14 @@ Echo uses `v_pause_full` + `pause_step_events` / `practice_entries` only. There 
 
 | File | Role |
 |------|------|
-| `supabase/functions/_shared/past-reflection-util.ts` | Types (`PastReflectionWithWords`, `UserWord`) and pure helpers `parseDirectionFromContext`, `pickPastReflection`. |
+| `supabase/functions/_shared/past-reflection-util.ts` | Types (`PastReflectionWithWords`, `UserWord`); `combineNoteAndReplayWords`, `mergeUserWordsChronological`, `parseDirectionFromContext`, `pickPastReflection`. |
 | `supabase/functions/_shared/past-reflections.ts` | Edge DB helper `fetchPastReflectionWithWords`. |
 | `supabase/functions/_shared/generators/zoom-out.ts` | Calls the edge helper; projects into the Echo payload. |
-| `src/components/practice/ReflectionReplay.tsx` | Replay surface (placeholder until wired to the read model). |
+| `src/lib/pause-replay-thread.ts` | Client loader `loadPauseReplayThread` + pause picker query. |
+| `src/components/practice/ReflectionReplay.tsx` | Replay UI (thread + save). |
 | `src/components/ZoomOutDisplay.tsx` | Echo card with strict user-words policy + honest empty state. |
 | `src/locales/en.json` | `companions.echo*` + `practice.replay*` strings (see `echoEmptyBody`, `echoHolzenAsked`, `replayNoWordsYet`). |
-| `src/test/past-reflection-util.test.ts` | Tests for `parseDirectionFromContext` and `pickPastReflection`. |
+| `src/test/past-reflection-util.test.ts` | Tests for merge helpers, `parseDirectionFromContext`, and `pickPastReflection`. |
 
 ---
 
