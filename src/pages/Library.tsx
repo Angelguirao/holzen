@@ -20,6 +20,7 @@ import { useProGate } from '@/hooks/use-pro-gate';
 import { NoxHeaderMain } from '@/components/ui/nox-header';
 import { librarySourceLabel } from '@/lib/library-source-label';
 
+// Keys match `library_items.source_type` in Postgres (legacy string for the main pause bookmark).
 const SOURCE_CHIPS: { key: string; icon: LucideIcon }[] = [
   { key: 'reflection', icon: Pause },
   { key: 'signal', icon: Radio },
