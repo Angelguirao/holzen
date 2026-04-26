@@ -20,15 +20,15 @@ import { useProGate } from '@/hooks/use-pro-gate';
 import { NoxHeaderMain } from '@/components/ui/nox-header';
 import { librarySourceLabel } from '@/lib/library-source-label';
 
-// Keys match `library_items.source_type` in Postgres (legacy string for the main pause bookmark).
+// Keys match `library_items.source_type` in Postgres (row-kind discriminator for filters + UI).
 const SOURCE_CHIPS: { key: string; icon: LucideIcon }[] = [
-  { key: 'reflection', icon: Pause },
+  { key: 'pause', icon: Pause },
   { key: 'signal', icon: Radio },
   { key: 'grounding', icon: Leaf },
   { key: 'haiku', icon: Feather },
   { key: 'zoom_out', icon: Telescope },
   { key: 'history_insight', icon: ScrollText },
-  { key: 'reflection_note', icon: Pencil },
+  { key: 'pause_note', icon: Pencil },
   { key: 'external', icon: LinkIcon },
 ];
 
@@ -42,7 +42,7 @@ export default function Library() {
   const library = useLibrary();
   const [tab, setTab] = useState<Tab>('all');
   const [search, setSearch] = useState('');
-  const [sourceFilter, setSourceFilter] = useState<string | null>('reflection');
+  const [sourceFilter, setSourceFilter] = useState<string | null>('pause');
   const [tagFilter, setTagFilter] = useState<string | null>(null);
   const [sortMode, setSortMode] = useState<SortMode>('newest');
   const [smartFilter, setSmartFilter] = useState<{ name: string; itemIds: Set<string> } | null>(null);

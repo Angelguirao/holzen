@@ -16,7 +16,7 @@ interface Props {
 }
 
 const SOURCE_ICONS: Record<string, LucideIcon> = {
-  reflection: Pause,
+  pause: Pause,
   signal: Radio,
   grounding: Leaf,
   learning: Leaf,
@@ -24,21 +24,21 @@ const SOURCE_ICONS: Record<string, LucideIcon> = {
   haiku: Feather,
   zoom_out: Telescope,
   history_insight: ScrollText,
-  reflection_note: Pencil,
+  pause_note: Pencil,
   external: LinkIcon,
   practice: Pencil,
 };
 
 // HSL-based color accents per source type (uses design system hues)
 const SOURCE_COLORS: Record<string, string> = {
-  reflection: 'border-l-primary/40',
+  pause: 'border-l-primary/40',
   signal: 'border-l-[hsl(200,50%,50%)]/40',
   grounding: 'border-l-[hsl(150,40%,45%)]/40',
   learning: 'border-l-[hsl(150,40%,45%)]/40',
   haiku: 'border-l-[hsl(280,40%,55%)]/40',
   zoom_out: 'border-l-[hsl(30,50%,50%)]/40',
   history_insight: 'border-l-[hsl(45,60%,50%)]/40',
-  reflection_note: 'border-l-muted-foreground/30',
+  pause_note: 'border-l-muted-foreground/30',
   external: 'border-l-[hsl(210,30%,50%)]/40',
   ground: 'border-l-[hsl(140,40%,40%)]/40',
   practice: 'border-l-[hsl(260,40%,50%)]/40',
@@ -80,7 +80,7 @@ export function LibraryItemCard({ item, onToggleFavorite, onClick, engaged = tru
     t,
     item.type ?? 'Item'
   );
-  const isCompanion = item.source_type && !['reflection', 'reflection_note', 'ground', 'practice', 'external'].includes(item.source_type);
+  const isCompanion = item.source_type && !['pause', 'pause_note', 'ground', 'practice', 'external'].includes(item.source_type);
   // Only show as skipped if the pause is complete (has outcome) and user didn't engage
   const dimmed = isCompanion && !engaged && !incomplete;
 

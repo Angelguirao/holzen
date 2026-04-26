@@ -723,15 +723,14 @@ serve(
       }
 
       // Keep Library parity with manual pauses: every generated pause
-      // gets a `source_type='reflection'` bookmark row keyed on
-      // pause_instance_id (legacy discriminator; UI label is “Pause” via i18n).
+      // gets a `source_type='pause'` bookmark row keyed on pause_instance_id.
       const libraryUpsert = supabase.from("library_items").upsert(
         {
           user_id: profile.user_id,
           type: "bookmark",
           title: "Pause",
           body: result.message,
-          source_type: "reflection",
+          source_type: "pause",
           pause_instance_id: pauseInstanceId,
           tags: [],
         },

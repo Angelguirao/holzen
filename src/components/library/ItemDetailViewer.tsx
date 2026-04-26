@@ -19,14 +19,14 @@ const TYPE_EMOJIS: Record<string, string> = {
 };
 
 const SOURCE_EMOJIS: Record<string, string> = {
-  reflection: '⏸',
+  pause: '⏸',
   signal: '📡',
   grounding: '🌿',
   learning: '🌿',
   haiku: '🍃',
   zoom_out: '🔭',
   history_insight: '📜',
-  reflection_note: '✏️',
+  pause_note: '✏️',
   external: '🔗',
   ground: '🌿',
   practice: '🧘',
@@ -181,14 +181,14 @@ export function ItemDetailViewer({
   if (!item) return null;
 
   const companions = linkedItems && linkedItems.length > 0 ? linkedItems : siblings;
-  const isReflection = item.source_type === 'reflection';
+  const isPauseBookmark = item.source_type === 'pause';
   const sourceLabel = librarySourceLabel(item.source_type, t, item.source_type ?? 'Item');
   const emoji = SOURCE_EMOJIS[item.source_type ?? ''] ?? TYPE_EMOJIS[item.type] ?? '📄';
 
   // Determine the effective outcome: freshly recorded > current from DB
   const effectiveOutcome = recordedOutcome ?? currentOutcome;
-  // Show the outcome section for pause-linked library bookmarks (source_type reflection): incomplete or recorded outcome
-  const showOutcomeSection = isReflection && item.pause_instance_id;
+  // Main pause bookmark row: outcome picker for incomplete / recorded outcome
+  const showOutcomeSection = isPauseBookmark && item.pause_instance_id;
 
   const handleDelete = () => {
     onDelete(item.id);
@@ -202,7 +202,7 @@ export function ItemDetailViewer({
           <div className="flex items-center gap-2">
             <span className="text-base">{emoji}</span>
             <SheetTitle className="text-sm font-mono flex-1">
-              {isReflection ? t('librarySources.reflection') : sourceLabel}
+              {sourceLabel}
             </SheetTitle>
           </div>
         </SheetHeader>

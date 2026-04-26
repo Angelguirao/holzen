@@ -11,7 +11,7 @@ describe('librarySourceLabel', () => {
 
   it('resolves an i18n key when present', () => {
     const t = vi.fn().mockReturnValue('Pause') as unknown as TFunction;
-    expect(librarySourceLabel('reflection', t, 'fallback')).toBe('Pause');
-    expect(t).toHaveBeenCalledWith('librarySources.reflection', { defaultValue: 'fallback' });
+    expect(librarySourceLabel('pause', t, 'fallback')).toBe('Pause');
+    expect(t).toHaveBeenCalledWith('librarySources.pause', { defaultValue: 'fallback' });
   });
 });

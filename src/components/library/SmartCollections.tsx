@@ -32,7 +32,7 @@ export function SmartCollections({ items, onSelect, isReflectionIncomplete }: Pr
     // Decisions without outcome — actually checks reflection completeness
     if (isReflectionIncomplete) {
       const noOutcome = activeItems.filter(
-        (i) => i.source_type === 'reflection' && isReflectionIncomplete(i)
+        (i) => i.source_type === 'pause' && isReflectionIncomplete(i)
       );
       if (noOutcome.length > 0) {
         collections.push({

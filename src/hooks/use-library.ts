@@ -252,8 +252,8 @@ export function useLibrary() {
     const item = items.find((i) => i.id === id);
     if (!item) return;
 
-    if (item.pause_instance_id && item.source_type === 'reflection') {
-      // Deleting a reflection-type library item: soft-delete all library
+    if (item.pause_instance_id && item.source_type === 'pause') {
+      // Deleting the main pause bookmark (`source_type === 'pause'`): soft-delete all library
       // items that share the pause_instance_id, then dismiss the
       // underlying pause.
       const pauseInstanceId = item.pause_instance_id;
@@ -374,7 +374,7 @@ export function useLibrary() {
 
   const isCompanionEngaged = useCallback((item: LibraryItem): boolean => {
     if (!item.pause_instance_id || !item.source_type) return true;
-    if (item.source_type === 'reflection' || item.source_type === 'reflection_note') return true;
+    if (item.source_type === 'pause' || item.source_type === 'pause_note') return true;
     const flags = readFlagsMap[item.pause_instance_id];
     if (!flags) return true; // no data, assume engaged
     const sourceToFlag: Record<string, keyof ReflectionReadFlags> = {
@@ -389,12 +389,12 @@ export function useLibrary() {
   }, [readFlagsMap]);
 
   const isReflectionIncomplete = useCallback((item: LibraryItem): boolean => {
-    if (item.source_type !== 'reflection' || !item.pause_instance_id) return false;
+    if (item.source_type !== 'pause' || !item.pause_instance_id) return false;
     return incompleteReflections.has(item.pause_instance_id);
   }, [incompleteReflections]);
 
   const getReflectionOutcome = useCallback((item: LibraryItem): string | null => {
-    if (item.source_type !== 'reflection' || !item.pause_instance_id) return null;
+    if (item.source_type !== 'pause' || !item.pause_instance_id) return null;
     return reflectionOutcomes[item.pause_instance_id] ?? null;
   }, [reflectionOutcomes]);
 

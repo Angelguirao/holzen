@@ -1638,8 +1638,8 @@
     "practice": "Practice"
   },
   "librarySources": {
-    "reflection": "Pause",
-    "reflection_note": "Note",
+    "pause": "Pause",
+    "pause_note": "Note",
     "signal": "Signal",
     "grounding": "Grounding",
     "ground": "Grounding",
