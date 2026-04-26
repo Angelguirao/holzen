@@ -13,7 +13,7 @@ This page is the **companion-level** view. For **manual vs automatic pause**, **
 
 ## 1. Where Zoom Out sits in the pipeline
 
-1. User completes reflection; when the user **taps the Zoom Out card**, **`use-companion-data`** invokes **`companion-orchestrate`** with `enableZoomOut: true` (lazy loading). If Zoom Out data is already cached in `pause_ai_artifacts`, it is hydrated from DB without a network call.
+1. User completes a pause; when the user **taps the Zoom Out card**, **`use-companion-data`** invokes **`companion-orchestrate`** with `enableZoomOut: true` (lazy loading). If Zoom Out data is already cached in `pause_ai_artifacts`, it is hydrated from DB without a network call.
 2. **`companion-orchestrate`** runs **`generateZoomOut`** in `_shared/generators/zoom-out.ts` when **`enableZoomOut`** is true (or when the intervention **requires** it — `secondary: "zoom_out"`), passing **context**, **session intent** (`zoomOutAngle`), and recency dedup fields.
 3. **`generateZoomOut`** returns a **composite** payload (price history + echo + deep-time); the orchestrator **writes** **`pause_ai_artifacts`** (kind `zoom_out_deep_time`) and **`companion_serves`**.
 

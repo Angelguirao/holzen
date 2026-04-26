@@ -84,7 +84,7 @@ This phase is the second "mental model pass": after Phase 1 (who can reach `/pau
 - **Direct Supabase client writes (browser)**:
   - `pause_instances` insert via RPC + `pause_ai_artifacts` upserts
   - `profiles` update (`last_message`, `last_context`, `last_trigger_at` in some paths)
-  - `library_items` upsert (bookmarks for reflection / haiku)
+  - `library_items` upsert (main pause bookmark + optional haiku, `source_type` per row)
 - **Local**:
   - `localStorage` key `holzen_pause_session` for pause step persistence
   - Manual cooldown key `holzen_last_manual_at_*`
@@ -93,7 +93,7 @@ This phase is the second "mental model pass": after Phase 1 (who can reach `/pau
 
 - **`pause_instances`**: inserted on manual generate; `PauseSession` logs step events for mood/outcome/note/etc.
 - **`profiles`**: `last_message`, `last_context`, `last_trigger_at` updated after reflection generation.
-- **`library_items`**: bookmarks linked to `pause_instance_id` for reflection and optional haiku.
+- **`library_items`**: bookmarks linked to `pause_instance_id` (main row `source_type = 'pause'`, companion rows use their slot types, optional `haiku`).
 - **Companion-related tables** (server-side via orchestrate): `pause_ai_artifacts`, `companion_cache`, `companion_serves`, etc.
 
 ## Systems that emerge from this review

@@ -101,7 +101,7 @@ export function PauseDone({ decision, onReturn, pauseData }: Props) {
           </div>
           <p className="text-center text-sm leading-relaxed text-muted-foreground">
             {t('pause.upsellBody', {
-              defaultValue: 'Unlock unlimited pauses, AI companions, and your full reflection library.',
+              defaultValue: 'Unlock unlimited pauses, AI companions, and your full library.',
             })}
           </p>
           <button

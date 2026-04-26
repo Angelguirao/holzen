@@ -10,6 +10,7 @@ import type { useLibrary } from '@/hooks/use-library';
 import type { LibraryItem } from '@/hooks/use-library';
 import { Trash2, Archive, Heart, X, CheckSquare, Download } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { isMainPauseLibraryBookmark } from '@/lib/normalize-library-source-type';
 import {
   isToday,
   isYesterday,
@@ -134,7 +135,7 @@ export function LibraryItems({ library, filtered }: Props) {
   const linkedMap = useMemo(() => {
     const map = new Map<string, LibraryItem[]>();
     items.forEach((i) => {
-      if (i.pause_instance_id && i.source_type !== 'pause' && i.status !== 'deleted') {
+      if (i.pause_instance_id && !isMainPauseLibraryBookmark(i.source_type) && i.status !== 'deleted') {
         const arr = map.get(i.pause_instance_id) ?? [];
         arr.push(i);
         map.set(i.pause_instance_id, arr);
@@ -149,7 +150,8 @@ export function LibraryItems({ library, filtered }: Props) {
   }, [selectedItem, items]);
 
   const selectedLinkedItems = useMemo(() => {
-    if (!currentSelectedItem?.pause_instance_id || currentSelectedItem.source_type !== 'pause') return undefined;
+    if (!currentSelectedItem?.pause_instance_id || !isMainPauseLibraryBookmark(currentSelectedItem.source_type))
+      return undefined;
     return linkedMap.get(currentSelectedItem.pause_instance_id);
   }, [currentSelectedItem, linkedMap]);
 

@@ -14,7 +14,7 @@ This page is the **companion-level** view. For **manual vs automatic pause**, **
 
 ## 1. Where Grounding sits in the pipeline
 
-1. User completes reflection; when the user **taps the Ground card**, **`use-companion-data`** invokes **`companion-orchestrate`** with `enableGrounding: true` (lazy loading). If Grounding data is already cached in `pause_ai_artifacts`, it is hydrated from DB without a network call.
+1. User completes a pause; when the user **taps the Ground card**, **`use-companion-data`** invokes **`companion-orchestrate`** with `enableGrounding: true` (lazy loading). If Grounding data is already cached in `pause_ai_artifacts`, it is hydrated from DB without a network call.
 2. **`companion-orchestrate`** runs **`generateGrounding`** in `_shared/generators/grounding.ts` when **`enableGrounding`** is true (or when the intervention **requires** it — trap type), passing **context**, **session intent** (`preferredBias`), **grounding source catalog**, and **recency dedup** fields.
 3. **`generateGrounding`** returns structured Grounding payload; the orchestrator **writes** **`pause_ai_artifacts`** (canonical) and **`companion_serves`** for analytics.
 
@@ -155,7 +155,7 @@ The inline Ground card in `CompanionSection` has an **"Open full view"** button 
 - **Breathing-room pacing** (8 s) before feedback + save CTAs fade in.
 - **Per-user history thread** — the last 5 Ground cards for this user from `pause_ai_artifacts`, deep-linked to their own Full Views so the Full View doubles as a small personal archive of biases surfaced.
 - **Related biases this month** — a distinct-by-normalized-title chip rail drawn from the last 30 days of the user's Ground cards. Complements the chronological history thread by showing *breadth* of biases surfaced rather than raw recency. Dedupe is title-based (titles are short bias labels per the structuring prompt), cap 8 chips.
-- **Pro-gated "Save this moment"** — captures the user's own reflection triggered by the card as a `library_items` note (`source_type: companion_moment`). Free users get a locked state with an upgrade toast.
+- **Pro-gated "Save this moment"** — captures the user's own note triggered by the card as a `library_items` row (`source_type: companion_moment`). Free users get a locked state with an upgrade toast.
 
 The "Open full view" navigation is free; only the **Save this moment** action is gated.
 

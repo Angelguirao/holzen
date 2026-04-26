@@ -1,4 +1,5 @@
 import type { LibraryItem } from '@/hooks/use-library';
+import { isMainPauseLibraryBookmark } from '@/lib/normalize-library-source-type';
 
 /** Tokenize a string into lowercase word set */
 function tokenize(text: string): Set<string> {
@@ -41,14 +42,14 @@ const SIMILARITY_THRESHOLD = 0.6;
  * Only considers items with a body.
  */
 export function detectDuplicates(items: LibraryItem[]): DuplicateGroup[] {
-  const reflectionBookmarks = items.filter(
-    (i) => i.source_type === 'pause' && i.body && i.body.length > 20 && i.status !== 'deleted'
+  const pauseBookmarks = items.filter(
+    (i) => isMainPauseLibraryBookmark(i.source_type) && i.body && i.body.length > 20 && i.status !== 'deleted'
   );
 
-  if (reflectionBookmarks.length < 2) return [];
+  if (pauseBookmarks.length < 2) return [];
 
   // Sort oldest first so the "primary" is the original
-  const sorted = [...reflectionBookmarks].sort(
+  const sorted = [...pauseBookmarks].sort(
     (a, b) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime()
   );
 

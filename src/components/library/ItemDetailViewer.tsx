@@ -9,6 +9,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { OutcomeIcon } from '@/components/icons/OutcomeIcon';
 import { CompanionFeedback } from '@/components/CompanionFeedback';
 import { librarySourceLabel } from '@/lib/library-source-label';
+import { isMainPauseLibraryBookmark, normalizeLibrarySourceType } from '@/lib/normalize-library-source-type';
 import { toZoomOutDisplayData } from '@/lib/zoom-out-payload';
 import type { ZoomOutData } from '@/components/ZoomOutDisplay';
 
@@ -73,11 +74,11 @@ function CompanionCard({ item, onSelect }: { item: LibraryItem; onSelect?: (item
     >
       <div className="flex items-center justify-between gap-2">
         <span className="text-[10px] font-mono text-muted-foreground/60 uppercase tracking-wider">
-          {SOURCE_EMOJIS[item.source_type ?? ''] ?? '📄'} {sourceLabel}
+          {SOURCE_EMOJIS[normalizeLibrarySourceType(item.source_type) ?? ''] ?? '📄'} {sourceLabel}
         </span>
         {item.is_favorite && <Heart className="h-2.5 w-2.5 text-destructive fill-current" />}
       </div>
-      {item.title && item.title !== 'Reflection' && (
+      {item.title && item.title !== 'Reflection' && item.title !== 'Pause' && (
         <p className="text-xs font-medium text-foreground leading-snug">{item.title}</p>
       )}
       {bodyText && (
@@ -181,9 +182,10 @@ export function ItemDetailViewer({
   if (!item) return null;
 
   const companions = linkedItems && linkedItems.length > 0 ? linkedItems : siblings;
-  const isPauseBookmark = item.source_type === 'pause';
+  const isPauseBookmark = isMainPauseLibraryBookmark(item.source_type);
   const sourceLabel = librarySourceLabel(item.source_type, t, item.source_type ?? 'Item');
-  const emoji = SOURCE_EMOJIS[item.source_type ?? ''] ?? TYPE_EMOJIS[item.type] ?? '📄';
+  const emoji =
+    SOURCE_EMOJIS[normalizeLibrarySourceType(item.source_type) ?? ''] ?? TYPE_EMOJIS[item.type] ?? '📄';
 
   // Determine the effective outcome: freshly recorded > current from DB
   const effectiveOutcome = recordedOutcome ?? currentOutcome;

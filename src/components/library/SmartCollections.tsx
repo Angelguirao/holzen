@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next';
 import type { LibraryItem } from '@/hooks/use-library';
 import { isThisWeek } from 'date-fns';
 import { cn } from '@/lib/utils';
+import { isMainPauseLibraryBookmark } from '@/lib/normalize-library-source-type';
 
 interface SmartCollection {
   id: string;
@@ -29,10 +30,10 @@ export function SmartCollections({ items, onSelect, isReflectionIncomplete }: Pr
   const smartCollections = useMemo<SmartCollection[]>(() => {
     const collections: SmartCollection[] = [];
 
-    // Decisions without outcome — actually checks reflection completeness
+    // Main pause bookmarks missing an outcome (via `isReflectionIncomplete` from use-library)
     if (isReflectionIncomplete) {
       const noOutcome = activeItems.filter(
-        (i) => i.source_type === 'pause' && isReflectionIncomplete(i)
+        (i) => isMainPauseLibraryBookmark(i.source_type) && isReflectionIncomplete(i)
       );
       if (noOutcome.length > 0) {
         collections.push({

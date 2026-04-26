@@ -13,7 +13,7 @@ This page is the **companion-level** view. For **manual vs automatic pause**, **
 
 ## 1. Where Signal sits in the pipeline
 
-1. User completes reflection; when the user **taps the Signal card**, **`use-companion-data`** invokes **`companion-orchestrate`** with `enableSignal: true` (lazy loading). If Signal data is already cached in `pause_ai_artifacts`, it is hydrated from DB without a network call.
+1. User completes a pause; when the user **taps the Signal card**, **`use-companion-data`** invokes **`companion-orchestrate`** with `enableSignal: true` (lazy loading). If Signal data is already cached in `pause_ai_artifacts`, it is hydrated from DB without a network call.
 2. **`companion-orchestrate`** runs **`generateSignal`** in `_shared/generators/signal.ts` when **`enableSignal`** is true, passing **context**, **session intent** (`searchAngle`), **signal source catalog** hints, and **recency dedup** fields from the client.
 3. **`generateSignal`** returns structured Signal payload; the orchestrator **writes** **`pause_ai_artifacts`** (canonical) and **`companion_serves`** for analytics.
 

@@ -35,7 +35,7 @@ const HistoryContent = () => {
         checkin: 'Emotional check-in',
         journal: 'Guided journal',
         bodyscan: 'Body scan',
-        replay: 'Reflection replay',
+        replay: 'Pause replay',
       };
 
       const items: CalendarActivity[] = [];
@@ -50,7 +50,7 @@ const HistoryContent = () => {
       }>).forEach((p) => {
         items.push({
           date: p.completed_at ?? p.engaged_at ?? p.created_at,
-          type: 'reflection',
+          type: 'pause',
           mood: p.initial_mood ?? undefined,
           id: p.id,
         });
