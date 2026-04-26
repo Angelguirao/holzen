@@ -334,7 +334,8 @@ export function AutoCooldownIndicator({
   const cooldownAria = t('home.cooldownAria', {
     hours: cooldownHours,
     time: readyClock,
-    defaultValue: 'Resting between checks. The next reflection can arrive after {{time}} (a {{hours}}-hour cooldown is in place).',
+    defaultValue:
+      'Resting between checks. The next pause can arrive after {{time}} (a {{hours}}-hour cooldown is in place).',
   });
   return (
     <div

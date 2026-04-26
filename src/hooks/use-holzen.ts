@@ -207,7 +207,7 @@ export function useHolzen() {
               body: silentMsg,
               source_type: 'reflection',
               pause_instance_id: res.instance_id,
-              tags: ['reflection'],
+              tags: [],
             } as never,
             { onConflict: 'user_id,pause_instance_id,source_type', ignoreDuplicates: true } as never,
           );
@@ -352,7 +352,7 @@ export function useHolzen() {
             body: msg,
             source_type: 'reflection',
             pause_instance_id: res.instance_id,
-            tags: ['reflection'],
+            tags: [],
           } as never,
           {
             onConflict: 'user_id,pause_instance_id,source_type',
