@@ -2710,6 +2710,14 @@ export type Database = {
         Returns: number
       }
       get_admin_stats: { Args: never; Returns: Json }
+      get_applied_migrations: {
+        Args: { p_limit?: number }
+        Returns: {
+          name: string
+          statements_count: number
+          version: string
+        }[]
+      }
       get_holzen_number: { Args: never; Returns: Json }
       get_signup_gate: { Args: never; Returns: Json }
       is_admin: { Args: never; Returns: boolean }
