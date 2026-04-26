@@ -17,8 +17,8 @@ describe('isPrimaryTabActive', () => {
   });
 
   it('matches journey prefix (Profile tab)', () => {
-    expect(isPrimaryTabActive('/journey/stats', 'journey')).toBe(true);
-    expect(isPrimaryTabActive('/journey/badges', 'journey')).toBe(true);
-    expect(isPrimaryTabActive('/settings', 'journey')).toBe(false);
+    expect(isPrimaryTabActive('/journey/stats', 'profile')).toBe(true);
+    expect(isPrimaryTabActive('/journey/badges', 'profile')).toBe(true);
+    expect(isPrimaryTabActive('/settings', 'profile')).toBe(false);
   });
 });
