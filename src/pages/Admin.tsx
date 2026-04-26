@@ -19,6 +19,7 @@ import { SourceSuggestionsPanel } from '@/components/admin/SourceSuggestionsPane
 import { ContentLibraryViewer } from '@/components/admin/ContentLibraryViewer';
 import { AdminSubNav } from '@/components/admin/AdminSubNav';
 import { AppConfigTools } from '@/components/admin/AppConfigTools';
+import { MigrationStatus } from '@/components/admin/MigrationStatus';
 import { CostAnalytics } from '@/components/admin/CostAnalytics';
 import { adminDeleteRowsByIds } from '@/lib/admin-delete';
 
@@ -901,7 +902,10 @@ export default function Admin() {
         </TabsContent>
 
         <TabsContent value="tools" className="mt-0">
-          <AppConfigTools />
+          <div className="space-y-3">
+            <MigrationStatus />
+            <AppConfigTools />
+          </div>
         </TabsContent>
       </Tabs>
 
