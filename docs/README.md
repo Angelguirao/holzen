@@ -74,6 +74,7 @@ When you change behavior, update the **one** doc that owns that slice (and ADRs 
 
 ## Reviews
 
+- `reviews/react-spa-review-template.md` — **flow-first** PR checklist + deeper audit template; pairs with the backlog and phased phase docs (Cursor wrapper: `.cursor/skills/holzen-flow-review/SKILL.md`)
 - `reviews/full-app-review-backlog.md` — **inventory of all flows** with hour estimates and sequencing (beyond pause-first phases)
 - `reviews/phase-1-frontend-routing-auth.md` — onboarding review for frontend auth + routing contracts
 - `reviews/phase-2-manual-pause-pipeline.md` — manual pause producer/client processing review
