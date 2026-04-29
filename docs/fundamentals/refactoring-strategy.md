@@ -2,6 +2,7 @@
 
 This document is the **canonical description** of how Holzen approaches **incremental** front-end refactors—especially splitting large pages and heavy hooks. It complements:
 
+- **[`docs/reviews/react-spa-review-template.md`](../reviews/react-spa-review-template.md)** — flow-first **review** checklist (PR + audit); use before deciding *what* to extract.
 - **[`docs/backlog/react-page-and-hook-splitting.md`](../backlog/react-page-and-hook-splitting.md)** — living checklist of **slices shipped** and remaining opportunities.
 - **[`docs/fundamentals/navigating-the-codebase.md`](navigating-the-codebase.md)** — where state and data patterns live today.
 - **[`docs/fundamentals/mental-models-for-contributors.md`](mental-models-for-contributors.md)** — SPA / hooks mental model.
