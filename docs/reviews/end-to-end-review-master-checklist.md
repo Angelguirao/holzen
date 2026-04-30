@@ -67,7 +67,7 @@
 ### Tools index (shell)
 
 - [x] `/tools` — `ToolsHub` — *L15 2026-04-30: Static **`TOOL_LINKS`** from **`TOOLS`** (`app-routes`); **`useProGate`** only gates **Pro** pill on **letters** + **ground** (`!isPending && !isPro`). No remote fetch; no error/empty states. **`isPending`**: badges hidden; links still shown (destination routes own gates).*
-- [ ] `/tools/letters` — `ToolsLetters` (deep link `?letter=` if product uses it)
+- [x] `/tools/letters` — `ToolsLetters` (deep link `?letter=` if product uses it) — *L16 2026-04-30: **`useHolzen().btcData`** — skeleton until present (no explicit **error** if BTC never loads). **`?letter=`** → **`scrollToLetterId`**; **`autoOpenComposer={!letterId}`**. **`ProLock` `hideContent`** → **`LetterToFutureSelf`** only mounts for **Pro** (free users: CTA only, no deep-link scroll). Child: **`future_letters`** `select` (**.then** without **`error`** branch — failed fetch looks like **empty** + **`loaded`**).*
 
 ---
 
