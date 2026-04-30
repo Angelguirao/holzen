@@ -204,6 +204,15 @@ Alphabetical per `supabase/config.toml` (each row: contract, auth, errors, loggi
 
 ---
 
+## 10a — Maintenance (optional re-passes)
+
+Use when **§0–§10** are fully **`[x]`** but you still want a **flow-first** anchor after shell/routing/auth changes.
+
+- [x] Tier A global shell — baseline re-trace — *L104 2026-04-30: **`App.tsx`** — **`ErrorBoundary`** → **`QueryClientProvider`** (**`HolzenQueryClientRegister`**, **`HolzenQueryLogging`**, **`CheckoutGuardCleanup`**) → **`TooltipProvider`** + **`Sonner`** + **`OfflineBanner`** → **`BrowserRouter`** → **`ScrollToTop`**, **`CookieConsent`**, **`AuthProvider`** → **`RouterLocationLog`** (pathname + **`authLoading`** + **`user?.id` 8-char prefix** only) + **`FeedbackWidgetGate`** (**requires `user`**) → outer **`Suspense`** **`RouteChunkFallback`** wraps **all** **`Routes`** (**first** lazy chunk for **any** route uses this full-screen fallback). **`ProtectedRoute`**: **`loading` → `AuthLoading`**; **`!user` → `/welcome`**. **Shell branch** — **`ProtectedRoute` → `AppLayout`**: **`useHolzen().language`** + **`useLanguageSync`**; **`useTabChunkPrefetch`** (idle/timeout **`import()`** for Home/Library/Profile/SettingsHub/ToolsHub — **errors swallowed**); **`useAutoTrigger`** → **`PauseReadyBanner`** when **`!isHome`**; **`CheckoutConfirmation`**, **`PaywallSubscribedTracker`**; **`NotificationBell`**; inner **`Suspense`** + **`PageChunkFallback`** (skeleton, **a11y** **`role="status"`**) around **`Outlet`** (**`pauseReady` / `dismissPauseReady`** context); **`BottomNav`**. **Immersive** routes (**`/pause`**, **`/companion/*`**, **`/tools/*`** except shell-backed **`/tools`**, **`/tools/letters`**) — **`ProtectedRoute`** **without** **`AppLayout`** (no bottom nav by design). **Loading/error:** shell does **not** own **`useHolzen`** / profile fetch errors globally (**pages** do); **`AuthLoading`** is the only shell-wide auth wait. **Supabase/edge:** none in layout itself; **`FeedbackWidget`** / **`CheckoutConfirmation`** invoke downstream (covered in tier/settings notes).*
+- [ ] Tier A global shell — **next** re-pass when **`App.tsx`**, **`AppLayout`**, **`BottomNav`**, **`use-auth`**, or **`client.ts`** **`invoke`** patching changes materially — append dated delta to **L1** / **L104** (or new **L105+**).
+
+---
+
 ## Related
 
 | Doc | Role |
