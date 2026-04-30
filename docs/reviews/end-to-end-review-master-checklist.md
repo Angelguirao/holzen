@@ -120,7 +120,7 @@
 
 ## 6 — Tier F — Catch-all and negatives
 
-- [ ] Unknown path → `NotFound` (`*` route)
+- [x] Unknown path → `NotFound` (`*` route) — *L44 2026-04-30: **`App.tsx`** — **`<Route path="*" element={<NotFound />} />`** is **last** among **`Routes`** (correct **catch-all**). **Lazy** chunk + **`Suspense`** uses **`RouteChunkFallback`** while loading. **`NotFound`** — **`useTranslation`**; **`useEffect`** **`console.error`** with **`location.pathname`** (no **Sentry** / **PostHog** hook here). **Home CTA** — **`<a href="/">`** full navigation (**not** **`Link`/`navigate`** — **hard reload** vs SPA). **No `PageMeta`** → **document title** may stay **stale** from prior route. **No shell** — **outside** **`AppLayout`** (minimal **404** for unknown paths). **No Supabase / edge**.*
 
 ---
 
