@@ -22,6 +22,7 @@ import { AppConfigTools } from '@/components/admin/AppConfigTools';
 import { MigrationStatus } from '@/components/admin/MigrationStatus';
 import { CostAnalytics } from '@/components/admin/CostAnalytics';
 import { DemoModeToggle } from '@/components/admin/DemoModeToggle';
+import { BadgeDebug } from '@/components/admin/BadgeDebug';
 import { adminDeleteRowsByIds } from '@/lib/admin-delete';
 
 /**
