@@ -66,7 +66,7 @@
 
 ### Tools index (shell)
 
-- [ ] `/tools` — `ToolsHub`
+- [x] `/tools` — `ToolsHub` — *L15 2026-04-30: Static **`TOOL_LINKS`** from **`TOOLS`** (`app-routes`); **`useProGate`** only gates **Pro** pill on **letters** + **ground** (`!isPending && !isPro`). No remote fetch; no error/empty states. **`isPending`**: badges hidden; links still shown (destination routes own gates).*
 - [ ] `/tools/letters` — `ToolsLetters` (deep link `?letter=` if product uses it)
 
 ---
