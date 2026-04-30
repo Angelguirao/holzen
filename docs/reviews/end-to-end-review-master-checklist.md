@@ -54,7 +54,7 @@
 ### Settings tree
 
 - [x] `/settings` — hub (`SettingsHub` index) — *L5 2026-04-30: `SettingsRoot` → pathless `SettingsStateLayout` (`useSettingsModel` = `useHolzen` + `useSubscription` + push/install/changelog, etc.) → skeleton until `profileLoaded` → `SettingsStateProvider` → index `SettingsHub`. Hub: `SECTION_ROWS` links to `/settings/:section`, hash `#settings-section-*` → `replace` navigate; secondary link to `/settings/about` + unseen changelog dot via model. No hub-level fetch; errors/empty are inherited from `useHolzen` loading gate.*
-- [ ] `/settings/you`
+- [x] `/settings/you` — *L6 2026-04-30: `SettingsSectionPage` validates `:section` → else `Navigate` to `/settings`; renders `SettingsYouPanel` under `useSettingsState`. Panel: `firstName`, `motivations`, `mantra`, `GroundingTagInput` → setters from model (`useHolzen` profile fields). `useSettingsModel` debounced “Saved” toast tracks many profile fields but **omits `motivations`** in its dependency list (toast may not fire when only motivations change; persistence still via `useHolzen`). Language row commented out in panel.*
 - [ ] `/settings/reflection`
 - [ ] `/settings/experience`
 - [ ] `/settings/companions`
