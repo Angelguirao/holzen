@@ -40,7 +40,7 @@
 
 ### Library
 
-- [ ] `/library` — `Library`
+- [x] `/library` — `Library` — *L3 2026-04-30: `useProGate` → pending skeleton / non-Pro lock + checkout; Pro path uses `useLibrary` (Supabase `library_items` + `collections` + `collection_items`, cache hydrate, `hydratePauseMeta` on `v_pause_full` + `pause_companion_events`). Page: tabs, client filters/sort, `CurrentPauseCard`, PTR → `refetch`, infinite scroll → `loadMore`. `LibraryItems` empty state + virtuoso lists. Gap: `fetchAll` does not surface Supabase errors; `library.loading` is exposed but unused on page (cache-first OK; failed fetch may look like empty).*
 
 ### Journey (hub tabs)
 
