@@ -6,7 +6,7 @@
 
 **Holzen-specific:** The app is not “React only”—it is **React + Supabase (RLS, migrations) + Deno edge functions**. For production readiness, pair flow tracing with [fundamentals/http-review-playbooks.md](../fundamentals/http-review-playbooks.md), `bruno/SCOPE.md`, and Phases **3–8** in this folder. Size and automation context: [fundamentals/codebase-size-and-review-practices.md](../fundamentals/codebase-size-and-review-practices.md).
 
-**After review drives refactors:** Follow [fundamentals/refactoring-strategy.md](../fundamentals/refactoring-strategy.md) and the living checklist [backlog/react-page-and-hook-splitting.md](../backlog/react-page-and-hook-splitting.md)—incremental slices, behavior parity, no tree-wide rewrites.
+**After review drives refactors:** Follow [fundamentals/refactoring-strategy.md](../fundamentals/refactoring-strategy.md) (React **and** backend-adjacent principles) and the living checklist [backlog/react-page-and-hook-splitting.md](../backlog/react-page-and-hook-splitting.md) for UI extraction—incremental slices, behavior parity, no tree-wide rewrites. SQL/RLS/edge contract changes follow the same incremental rule but use [ops/migration-security-conventions.md](../ops/migration-security-conventions.md) and [ops/deployment-sync-guide.md](../ops/deployment-sync-guide.md).
 
 ---
 

@@ -41,7 +41,7 @@ When you change behavior, update the **one** doc that owns that slice (and ADRs 
 ## Fundamentals
 
 - `fundamentals/navigating-the-codebase.md` — repo tour: boot flow, routing, auth, hooks, Supabase basics.
-- `fundamentals/refactoring-strategy.md` — incremental split of large pages/hooks (`src/lib` vs components); pairs with [backlog/react-page-and-hook-splitting.md](backlog/react-page-and-hook-splitting.md).
+- `fundamentals/refactoring-strategy.md` — incremental refactors: **React** pages/hooks (`src/lib` vs components) plus **full-stack touchpoints** (migrations, RLS, edges); pairs with [backlog/react-page-and-hook-splitting.md](backlog/react-page-and-hook-splitting.md).
 - `fundamentals/mental-models-for-contributors.md` — glossary + vocabulary for SPAs, React, TypeScript, Vite, Supabase (RLS, edge functions); links to official docs and learning resources.
 - `fundamentals/codebase-size-and-review-practices.md` — codebase size snapshot and review best-practices.
 - `fundamentals/http-review-playbooks.md` — step-by-step Postman/Bruno flows, Supabase `invoke` headers, pairing with Edge logs; [bruno/](../bruno/) collection, [bruno/SCOPE.md](../bruno/SCOPE.md) (HTTP vs full app), [bruno/functions-catalog.md](../bruno/functions-catalog.md) (full **`config.toml`** name list + Bruno smoke subset).

@@ -1,8 +1,10 @@
-# Refactoring strategy (React pages & hooks)
+# Refactoring strategy (React pages & hooks — plus full-stack touchpoints)
 
-This document is the **canonical description** of how Holzen approaches **incremental** front-end refactors—especially splitting large pages and heavy hooks. It complements:
+This document is the **canonical description** of how Holzen approaches **incremental** refactors on the **client**: splitting large pages and heavy hooks. **Backend work** (Postgres, RLS, edge functions) uses the **same incremental spirit** but different mechanics—see [§ Full-stack and backend-adjacent refactors](#full-stack-and-backend-adjacent-refactors) below.
 
-- **[`docs/reviews/react-spa-review-template.md`](../reviews/react-spa-review-template.md)** — flow-first **review** checklist (PR + audit); use before deciding *what* to extract.
+It complements:
+
+- **[`docs/reviews/react-spa-review-template.md`](../reviews/react-spa-review-template.md)** — flow-first **review** checklist (PR + audit); use before deciding *what* to extract (includes Supabase / edge context).
 - **[`docs/backlog/react-page-and-hook-splitting.md`](../backlog/react-page-and-hook-splitting.md)** — living checklist of **slices shipped** and remaining opportunities.
 - **[`docs/fundamentals/navigating-the-codebase.md`](navigating-the-codebase.md)** — where state and data patterns live today.
 - **[`docs/fundamentals/mental-models-for-contributors.md`](mental-models-for-contributors.md)** — SPA / hooks mental model.
@@ -96,8 +98,32 @@ This aligns with **navigating-the-codebase §6.1**: not every concern needs `use
 
 ---
 
+## Full-stack and backend-adjacent refactors
+
+The React-focused sections above do **not** imply that all refactors are UI-only. Many “refactors” are really **contract changes**: API shapes, RLS visibility, edge handler structure. Treat those as **ordered, reversible steps** (schema ↔ client ↔ types), not as drive-by edits.
+
+| Area | What “incremental refactor” usually means | Canonical docs |
+|------|-------------------------------------------|------------------|
+| **SQL / RLS / views** | One migration (or small series) per concern; respect `search_path`, `SECURITY DEFINER` rules, view column safety | [ops/migration-security-conventions.md](../ops/migration-security-conventions.md), [ops/migration-view-safety.md](../ops/migration-view-safety.md) |
+| **Edge functions** | Extract shared logic into `supabase/functions/_shared/`; keep HTTP entrypoints thin; preserve `withRequestLogging` | [AGENTS.md](../../AGENTS.md), [ops/edge-logging-conventions.md](../ops/edge-logging-conventions.md); `npm run check:edge` / `check:edge-logging` when you touch edges |
+| **Client after schema** | Regenerate or cast types (`npm run gen:types`, `as unknown as T` until caught up) | [ops/deployment-sync-guide.md](../ops/deployment-sync-guide.md) |
+| **Security / authz baselines** | Prefer phased review docs before large policy reshuffles | [reviews/phase-6-rls-authz-security-model.md](../reviews/phase-6-rls-authz-security-model.md) through [phase-8-rls-hardening-service-role-policies.md](../reviews/phase-8-rls-hardening-service-role-policies.md) |
+
+**Principle (same as frontend):** one **vertical slice** or one **clear layer** per PR—e.g. “extract helper used by two edges” or “add column + RLS + read path in client,” not “rewrite all policies” in a single change unless you have a dedicated migration plan.
+
+**Living backlog:** UI extraction progress lives in [`react-page-and-hook-splitting.md`](../backlog/react-page-and-hook-splitting.md). **SQL/edge** refactors usually deserve their own backlog row or ADR when they change production contracts; do not fold them silently into a React-only ticket.
+
+---
+
+## Are we “following best practices everywhere”?
+
+**No** — and no mature repo does in every dimension at once. Holzen encodes **non-negotiables** in ops docs and CI gates (migrations, edge logging manifest, version sync, etc.) and **preferences** in this file and AGENTS. Gaps are normal: close them by **priority** (auth, billing, RLS, user data) using the review master checklist and phased reviews, not by expecting a single strategy doc to cover every language and subsystem in equal depth.
+
+---
+
 ## When you’re done reading this
 
 - For **what’s already done**, see the progress table in [`react-page-and-hook-splitting.md`](../backlog/react-page-and-hook-splitting.md).
 - For **where code lives**, see [`navigating-the-codebase.md`](navigating-the-codebase.md) §6–8.
 - For **automation conventions**, see [`AGENTS.md`](../../AGENTS.md).
+- For **ship order** when migrations or edges change, see [`docs/ops/deployment-sync-guide.md`](../ops/deployment-sync-guide.md).
