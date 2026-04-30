@@ -111,7 +111,7 @@
 
 ## 5 — Tier E — Admin (only if `VITE_ADMIN_USER_IDS` includes your test user)
 
-- [ ] `/admin` — `Admin`
+- [x] `/admin` — `Admin` — *L40 2026-04-30: **`ProtectedRoute`** (any signed-in user hits URL; **UI gate**). **`useIsAdmin`** — **`profiles`** **`is_admin`**; on miss/error → **`VITE_ADMIN_USER_IDS`** CSV allowlist (**no** explicit **query `error`** toast — silent **deny** path). **`!isAdmin`** → **`ShieldX`** “Admin access required”. **`useAdminStats`** (when admin) — **many parallel `supabase` reads** on **views/tables** (costs, failures, cache, sessions, etc.); **`loading` / `error` + Retry**; **no `invokeEdge`**. **Tabs** — Monitor, Cost, Activity, Sources, Library, Cache, Fallbacks, Tools + **`AdminSubNav`** to other **`/admin/*`** routes; **bulk deletes** via **`adminDeleteRowsByIds`**. **Deep child tools** (migrations, app config, etc.) — **separate slices** if re-reviewed.*
 - [ ] `/admin/smoke-test` — `SmokeTest`
 - [ ] `/admin/sentry-alerts` — `SentryAlerts`
 - [ ] `/admin/edge-coverage` — `EdgeCoverage`
