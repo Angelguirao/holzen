@@ -53,7 +53,7 @@
 
 ### Settings tree
 
-- [ ] `/settings` — hub (`SettingsHub` index)
+- [x] `/settings` — hub (`SettingsHub` index) — *L5 2026-04-30: `SettingsRoot` → pathless `SettingsStateLayout` (`useSettingsModel` = `useHolzen` + `useSubscription` + push/install/changelog, etc.) → skeleton until `profileLoaded` → `SettingsStateProvider` → index `SettingsHub`. Hub: `SECTION_ROWS` links to `/settings/:section`, hash `#settings-section-*` → `replace` navigate; secondary link to `/settings/about` + unseen changelog dot via model. No hub-level fetch; errors/empty are inherited from `useHolzen` loading gate.*
 - [ ] `/settings/you`
 - [ ] `/settings/reflection`
 - [ ] `/settings/experience`
