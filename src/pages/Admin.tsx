@@ -21,6 +21,7 @@ import { AdminSubNav } from '@/components/admin/AdminSubNav';
 import { AppConfigTools } from '@/components/admin/AppConfigTools';
 import { MigrationStatus } from '@/components/admin/MigrationStatus';
 import { CostAnalytics } from '@/components/admin/CostAnalytics';
+import { DemoModeToggle } from '@/components/admin/DemoModeToggle';
 import { adminDeleteRowsByIds } from '@/lib/admin-delete';
 
 /**
@@ -905,6 +906,7 @@ export default function Admin() {
           <div className="space-y-3">
             <MigrationStatus />
             <AppConfigTools />
+            <DemoModeToggle />
           </div>
         </TabsContent>
       </Tabs>
