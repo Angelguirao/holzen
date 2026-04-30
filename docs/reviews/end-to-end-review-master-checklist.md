@@ -112,7 +112,7 @@
 ## 5 — Tier E — Admin (only if `VITE_ADMIN_USER_IDS` includes your test user)
 
 - [x] `/admin` — `Admin` — *L40 2026-04-30: **`ProtectedRoute`** (any signed-in user hits URL; **UI gate**). **`useIsAdmin`** — **`profiles`** **`is_admin`**; on miss/error → **`VITE_ADMIN_USER_IDS`** CSV allowlist (**no** explicit **query `error`** toast — silent **deny** path). **`!isAdmin`** → **`ShieldX`** “Admin access required”. **`useAdminStats`** (when admin) — **many parallel `supabase` reads** on **views/tables** (costs, failures, cache, sessions, etc.); **`loading` / `error` + Retry**; **no `invokeEdge`**. **Tabs** — Monitor, Cost, Activity, Sources, Library, Cache, Fallbacks, Tools + **`AdminSubNav`** to other **`/admin/*`** routes; **bulk deletes** via **`adminDeleteRowsByIds`**. **Deep child tools** (migrations, app config, etc.) — **separate slices** if re-reviewed.*
-- [ ] `/admin/smoke-test` — `SmokeTest`
+- [x] `/admin/smoke-test` — `SmokeTest` — *L41 2026-04-30: **`ProtectedRoute`**. **Local `useIsAdmin`** duplicates **`Admin`** logic but misuses **`useState(() => {…})`** as a one-shot initializer (**not `useEffect`**): **`!user` on first paint** sets **`isAdmin` false** and **skips** **`profiles`** fetch; **no re-run when `user` hydrates** → **false “Admin only”** risk + **`.then` ignores `error`**. **Page** — static **Stripe QA** checklist (**scenarios A–D**), **local-only `checked` state** (no persistence). **`AdminSubNav`**. **No edge `invoke`** on this screen (manual runs elsewhere).*
 - [ ] `/admin/sentry-alerts` — `SentryAlerts`
 - [ ] `/admin/edge-coverage` — `EdgeCoverage`
 
