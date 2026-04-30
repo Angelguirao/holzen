@@ -21,6 +21,7 @@ import { FeedbackWidget } from "./components/FeedbackWidget";
 const Home = lazy(() => import("./pages/Home"));
 const Library = lazy(() => import("./pages/Library"));
 const Profile = lazy(() => import("./pages/Profile"));
+const BadgeGuide = lazy(() => import("./pages/BadgeGuide"));
 const SettingsRoot = lazy(() => import("./pages/settings/SettingsRoot"));
 const SettingsStateLayout = lazy(() => import("./pages/settings/SettingsStateLayout"));
 const SettingsHub = lazy(() => import("./pages/settings/SettingsHub"));
@@ -176,6 +177,7 @@ const App = () => (
                   <Route path="/library" element={<Library />} />
                   <Route path="/journey" element={<Navigate to="/journey/stats" replace />} />
                   <Route path="/journey/:tab" element={<Profile />} />
+                  <Route path="/journey/badges/guide" element={<BadgeGuide />} />
                   <Route path="/settings" element={<SettingsRoot />}>
                     <Route path="about" element={<SettingsAbout />} />
                     <Route path="billing-history" element={<BillingHistory />} />
