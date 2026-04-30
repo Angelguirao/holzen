@@ -6,17 +6,24 @@ describe('isPrimaryTabActive', () => {
     expect(isPrimaryTabActive('/', 'home')).toBe(true);
     expect(isPrimaryTabActive('/library', 'home')).toBe(false);
     expect(isPrimaryTabActive('/library', 'library')).toBe(true);
+    expect(isPrimaryTabActive('/library/abc', 'library')).toBe(true);
   });
 
-  it('matches tools hub and shell letters (not immersive /tools/*)', () => {
+  it('matches the tools tab on the hub and nested tools routes', () => {
     expect(isPrimaryTabActive('/tools', 'tools')).toBe(true);
     expect(isPrimaryTabActive('/tools/letters', 'tools')).toBe(true);
-    expect(isPrimaryTabActive('/tools/breathe', 'tools')).toBe(false);
+    expect(isPrimaryTabActive('/', 'tools')).toBe(false);
   });
 
-  it('matches journey prefix and settings subtree', () => {
+  it('matches the journey tab on any /journey/* route', () => {
     expect(isPrimaryTabActive('/journey/stats', 'journey')).toBe(true);
+    expect(isPrimaryTabActive('/journey/badges', 'journey')).toBe(true);
+    expect(isPrimaryTabActive('/settings', 'journey')).toBe(false);
+  });
+
+  it('matches the settings tab on any /settings/* route', () => {
     expect(isPrimaryTabActive('/settings', 'settings')).toBe(true);
-    expect(isPrimaryTabActive('/settings/about', 'settings')).toBe(true);
+    expect(isPrimaryTabActive('/settings/account', 'settings')).toBe(true);
+    expect(isPrimaryTabActive('/journey/stats', 'settings')).toBe(false);
   });
 });

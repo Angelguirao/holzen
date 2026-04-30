@@ -20,6 +20,10 @@ export default {
         mono: ['var(--font-mono)'],
       },
       colors: {
+        // Cyan is retired from the Holzen palette. Use `text-nox-text-link`
+        // (calm blue #7FA9D9) for links, or `nox.accent.cyan` /
+        // `nox.accent.cyan-strong` for the desaturated brand cyan when needed.
+        cyan: undefined,
         border: "hsl(var(--border))",
         input: "hsl(var(--input))",
         ring: "hsl(var(--ring))",
@@ -68,6 +72,7 @@ export default {
             primary: "hsl(var(--nox-color-background-primary))",
             secondary: "hsl(var(--nox-color-background-secondary))",
             accent: "hsl(var(--nox-color-background-accent))",
+            deep: "hsl(var(--nox-color-background-deep))",
           },
           text: {
             primary: "hsl(var(--nox-color-text-primary))",
@@ -75,9 +80,11 @@ export default {
             muted: "hsl(var(--nox-color-text-muted))",
             contrast: "hsl(var(--nox-color-text-contrast))",
             highlight: "hsl(var(--nox-color-text-highlight))",
+            link: "hsl(var(--nox-color-text-link))",
           },
           accent: {
             cyan: "hsl(var(--nox-color-accent-cyan))",
+            "cyan-strong": "hsl(var(--nox-color-accent-cyan-strong))",
             green: "hsl(var(--nox-color-accent-green))",
             violet: "hsl(var(--nox-color-accent-violet))",
             magenta: "hsl(var(--nox-color-accent-magenta))",

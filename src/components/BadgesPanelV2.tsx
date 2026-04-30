@@ -1,7 +1,8 @@
 import { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Award, Lock, Sparkles } from 'lucide-react';
+import { Award, Lock, Sparkles, HelpCircle } from 'lucide-react';
 import { motion } from 'framer-motion';
+import { Link } from 'react-router-dom';
 import { BadgeCelebration } from './BadgeCelebration';
 import { useBadgeSync } from '@/hooks/use-badge-sync';
 import { useBadges } from '@/hooks/use-badges';
@@ -107,6 +108,13 @@ export function BadgesPanelV2({ subscribed, holdGoal, notifyBadges = true }: Pro
               />
             </div>
           </div>
+          <Link
+            to="/journey/badges/guide"
+            className="inline-flex items-center gap-1.5 text-xs text-muted-foreground hover:text-foreground transition-colors"
+          >
+            <HelpCircle className="h-3 w-3" aria-hidden />
+            {t('badges.howItWorks', { defaultValue: 'How badges work' })}
+          </Link>
         </div>
 
         {FAMILY_ORDER.map((family) => {

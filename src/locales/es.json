@@ -20,13 +20,9 @@
     "subtitle": "Novedades, versión de la app y contacto con el equipo, aparte de tus preferencias diarias."
   },
   "roadmap": {
-    "pageTitle": "Hoja de ruta — Holzen",
-    "pageDescription": "Planes y novedades del producto",
     "title": "Hoja de ruta",
-    "body": "Ahora no hay una hoja de ruta viva en la app. Sigue el blog para notas de versión y dirección, o lee por qué creamos Holzen.",
-    "linkBlog": "Blog",
-    "linkAbout": "Sobre Holzen",
-    "linkHome": "Iniciar sesión"
+    "voteOnNext": "Vota por lo que construimos a continuación.",
+    "signInToVote": "Inicia sesión para votar."
   },
   "common": {
     "back": "Volver",
@@ -394,8 +390,14 @@
     "nothing": "Nada"
   },
   "btcStatus": {
-    "unableToFetch": "No se pudieron obtener los datos de precio",
-    "checkConnection": "Verifica tu conexión e intenta de nuevo",
+    "unableToFetch": "No se pudo obtener el precio",
+    "checkConnection": "Revisa tu conexión e intenta de nuevo",
+    "exitBtcMode": "Salir del modo 1 BTC = 1 BTC",
+    "enterBtcMode": "Entrar en modo 1 BTC = 1 BTC",
+    "show": "Mostrar",
+    "hide": "Ocultar",
+    "showPrice": "Mostrar precio",
+    "hidePrice": "Ocultar precio",
     "priceIsNoise": "El precio es ruido. El valor es constante.",
     "in24h": "en 24h"
   },
@@ -578,11 +580,6 @@
     "postNotFound": "Entrada no encontrada.",
     "read": "Leer"
   },
-  "roadmap": {
-    "title": "Hoja de ruta",
-    "voteOnNext": "Vota por lo que construimos a continuación.",
-    "signInToVote": "Inicia sesión para votar."
-  },
   "reserve": {
     "title": "Estrategia de Reserva BTC",
     "subtitle": "Holdeamos lo que ayudamos a otros a holdear.",
@@ -613,7 +610,14 @@
     "title": "Fuentes de señal",
     "description": "Elige qué fuentes de Bitcoin informan tu compañero de señal. Las fuentes activas se priorizan al generar insights.",
     "activeCount": "{{active}} de {{total}} activas",
-    "types": { "analyst": "Analistas", "podcast": "Podcasts", "newsletter": "Newsletters", "blog": "Blogs", "dashboard": "Dashboards", "youtube": "YouTube" },
+    "types": {
+      "analyst": "Analistas",
+      "podcast": "Podcasts",
+      "newsletter": "Newsletters",
+      "blog": "Blogs",
+      "dashboard": "Dashboards",
+      "youtube": "YouTube"
+    },
     "custom": "Fuentes personalizadas",
     "addCustom": "Añadir fuente personalizada",
     "customNamePlaceholder": "Nombre de la fuente",
@@ -622,9 +626,17 @@
     "addFailed": "Error al añadir fuente",
     "sourceAdded": "Fuente añadida"
   },
-  "notFound": { "title": "404", "message": "¡Oops! Página no encontrada", "returnHome": "Volver al Inicio" },
-  "terms": { "title": "Términos de Servicio" },
-  "privacy": { "title": "Política de Privacidad" },
+  "notFound": {
+    "title": "404",
+    "message": "¡Oops! Página no encontrada",
+    "returnHome": "Volver al Inicio"
+  },
+  "terms": {
+    "title": "Términos de Servicio"
+  },
+  "privacy": {
+    "title": "Política de Privacidad"
+  },
   "companions": {
     "pause": "Pausa con esto",
     "breathe": "Respira con esto →",
@@ -684,8 +696,16 @@
     "failed": "Error al enviar"
   },
   "wallpaper": {
-    "generating": "Generando tu fondo de pantalla…",
-    "carry": "Lleva tu compostura contigo"
+    "generating": "Generando fondo…",
+    "carry": "Lleva tu reflexión contigo.",
+    "wallpaper": "Fondo",
+    "generateTitle": "Generar fondo",
+    "generateFromReflection": "Generar fondo de esta reflexión",
+    "reflectionWallpaper": "Fondo de reflexión",
+    "download": "Descargar",
+    "downloaded": "Fondo descargado",
+    "regenerate": "Regenerar",
+    "failedToGenerate": "Error al generar fondo"
   },
   "ambient": {
     "calm": "Los mercados están tranquilos",
@@ -758,42 +778,78 @@
       "companions": "Uso de Herramientas",
       "engagement": "Participación"
     },
-    "streak3": "Primeros Pasos", "streak3Desc": "Racha de 3 días",
-    "streak7": "Vigilante Semanal", "streak7Desc": "Racha de 7 días",
-    "streak14": "Enfoque Quincenal", "streak14Desc": "Racha de 14 días",
-    "streak30": "Mente Mensual", "streak30Desc": "Racha de 30 días",
-    "streak60": "Mano Firme", "streak60Desc": "Racha de 60 días",
-    "streak100": "Estoico del Siglo", "streak100Desc": "Racha de 100 días",
-    "streak365": "Año de Compostura", "streak365Desc": "Racha de 365 días",
-    "reflect10": "Primeros Pasos", "reflect10Desc": "10 reflexiones registradas",
-    "reflect50": "Observador Devoto", "reflect50Desc": "50 reflexiones registradas",
-    "reflect100": "Práctica Profunda", "reflect100Desc": "100 reflexiones registradas",
-    "reflect500": "Paciencia Magistral", "reflect500Desc": "500 reflexiones registradas",
-    "calm10": "Aguas Tranquilas", "calm10Desc": "10 chequeos de ánimo calmo",
-    "calm50": "Inquebrantable", "calm50Desc": "50 chequeos de ánimo calmo",
-    "held10": "Manos de Diamante", "held10Desc": "Mantuvo firme 10 veces",
-    "held50": "Voluntad de Hierro", "held50Desc": "Mantuvo firme 50 veces",
-    "breathe5": "Primeras Respiraciones", "breathe5Desc": "Completó respiración 5 veces",
-    "breathe25": "Maestro del Aliento", "breathe25Desc": "Completó respiración 25 veces",
-    "breathe100": "Pulmones Zen", "breathe100Desc": "Completó respiración 100 veces",
-    "haiku10": "Lector de Poesía", "haiku10Desc": "Leyó 10 haiku",
-    "haiku50": "Devoto del Verso", "haiku50Desc": "Leyó 50 haiku",
-    "learn10": "Mente Centrada", "learn10Desc": "Usó Conéctate Contigo 10 veces",
-    "learn50": "Erudito de la Calma", "learn50Desc": "Usó Conéctate Contigo 50 veces",
-    "signal10": "Lector de Señales", "signal10Desc": "Leyó 10 señales",
-    "signal50": "Oyente Profundo", "signal50Desc": "Leyó 50 señales",
-    "zoom5": "Vista Larga", "zoom5Desc": "Usó Perspectiva Amplia 5 veces",
-    "zoom25": "Pensador Macro", "zoom25Desc": "Usó Perspectiva Amplia 25 veces",
-    "history5": "Estudiante de Historia", "history5Desc": "Leyó 5 perspectivas históricas",
-    "history25": "Sabio de los Ciclos", "history25Desc": "Leyó 25 perspectivas históricas",
-    "allSix5": "Práctica Completa", "allSix5Desc": "Usó las 6 herramientas en 5 reflexiones",
-    "allSix25": "Disciplina Total", "allSix25Desc": "Usó las 6 herramientas en 25 reflexiones",
-    "fav5": "Curador", "fav5Desc": "5 reflexiones favoritas",
-    "fav25": "Archivista", "fav25Desc": "25 reflexiones favoritas",
-    "notes10": "Escritor", "notes10Desc": "10 notas personales",
-    "notes50": "Diarista Profundo", "notes50Desc": "50 notas personales",
-    "activeStreak7": "En Llamas", "activeStreak7Desc": "Racha activa de 7+ días",
-    "activeStreak30": "Imparable", "activeStreak30Desc": "Racha activa de 30+ días",
+    "streak3": "Primeros Pasos",
+    "streak3Desc": "Racha de 3 días",
+    "streak7": "Vigilante Semanal",
+    "streak7Desc": "Racha de 7 días",
+    "streak14": "Enfoque Quincenal",
+    "streak14Desc": "Racha de 14 días",
+    "streak30": "Mente Mensual",
+    "streak30Desc": "Racha de 30 días",
+    "streak60": "Mano Firme",
+    "streak60Desc": "Racha de 60 días",
+    "streak100": "Estoico del Siglo",
+    "streak100Desc": "Racha de 100 días",
+    "streak365": "Año de Compostura",
+    "streak365Desc": "Racha de 365 días",
+    "reflect10": "Primeros Pasos",
+    "reflect10Desc": "10 reflexiones registradas",
+    "reflect50": "Observador Devoto",
+    "reflect50Desc": "50 reflexiones registradas",
+    "reflect100": "Práctica Profunda",
+    "reflect100Desc": "100 reflexiones registradas",
+    "reflect500": "Paciencia Magistral",
+    "reflect500Desc": "500 reflexiones registradas",
+    "calm10": "Aguas Tranquilas",
+    "calm10Desc": "10 chequeos de ánimo calmo",
+    "calm50": "Inquebrantable",
+    "calm50Desc": "50 chequeos de ánimo calmo",
+    "held10": "Manos de Diamante",
+    "held10Desc": "Mantuvo firme 10 veces",
+    "held50": "Voluntad de Hierro",
+    "held50Desc": "Mantuvo firme 50 veces",
+    "breathe5": "Primeras Respiraciones",
+    "breathe5Desc": "Completó respiración 5 veces",
+    "breathe25": "Maestro del Aliento",
+    "breathe25Desc": "Completó respiración 25 veces",
+    "breathe100": "Pulmones Zen",
+    "breathe100Desc": "Completó respiración 100 veces",
+    "haiku10": "Lector de Poesía",
+    "haiku10Desc": "Leyó 10 haiku",
+    "haiku50": "Devoto del Verso",
+    "haiku50Desc": "Leyó 50 haiku",
+    "learn10": "Mente Centrada",
+    "learn10Desc": "Usó Conéctate Contigo 10 veces",
+    "learn50": "Erudito de la Calma",
+    "learn50Desc": "Usó Conéctate Contigo 50 veces",
+    "signal10": "Lector de Señales",
+    "signal10Desc": "Leyó 10 señales",
+    "signal50": "Oyente Profundo",
+    "signal50Desc": "Leyó 50 señales",
+    "zoom5": "Vista Larga",
+    "zoom5Desc": "Usó Perspectiva Amplia 5 veces",
+    "zoom25": "Pensador Macro",
+    "zoom25Desc": "Usó Perspectiva Amplia 25 veces",
+    "history5": "Estudiante de Historia",
+    "history5Desc": "Leyó 5 perspectivas históricas",
+    "history25": "Sabio de los Ciclos",
+    "history25Desc": "Leyó 25 perspectivas históricas",
+    "allSix5": "Práctica Completa",
+    "allSix5Desc": "Usó las 6 herramientas en 5 reflexiones",
+    "allSix25": "Disciplina Total",
+    "allSix25Desc": "Usó las 6 herramientas en 25 reflexiones",
+    "fav5": "Curador",
+    "fav5Desc": "5 reflexiones favoritas",
+    "fav25": "Archivista",
+    "fav25Desc": "25 reflexiones favoritas",
+    "notes10": "Escritor",
+    "notes10Desc": "10 notas personales",
+    "notes50": "Diarista Profundo",
+    "notes50Desc": "50 notas personales",
+    "activeStreak7": "En Llamas",
+    "activeStreak7Desc": "Racha activa de 7+ días",
+    "activeStreak30": "Imparable",
+    "activeStreak30Desc": "Racha activa de 30+ días",
     "units": {
       "days": "días",
       "reflections": "reflexiones",
@@ -875,40 +931,446 @@
     "return": "Volver",
     "noReflection": "Sin reflexión activa. Vuelve para activar una."
   },
-  "breathing": { "trigger": "Respira con esto →", "choosePattern": "Elige un patrón", "suggestedForVolatility": "Sugerido para la volatilidad actual", "begin": "Empezar", "settled": "Asentado.", "settledDesc": "Te diste un momento. Eso es suficiente.", "return": "Volver", "patterns": { "box": "Cuadrado", "boxDesc": "4-4-4-4 · Anclaje", "calming": "Calmante", "calmingDesc": "4-7-8 · Calma profunda", "sigh": "Suspiro", "sighDesc": "Suspiro fisiológico" }, "phases": { "inhale": "Inhala", "hold": "Retén", "exhale": "Exhala", "sip": "Sorbito" } },
-  "volatility": { "title": "Tolerancia a la Volatilidad", "grades": { "ironHands": "Manos de hierro", "steady": "Estable", "shaky": "Inestable", "paperHands": "Manos de papel" }, "descriptions": { "high": "Te mantienes notablemente sereno durante las caídas — incluso las fuertes.", "moderate": "Manejas bien la mayoría de las caídas, aunque los movimientos grandes ponen a prueba tu compostura.", "low": "Las caídas tienden a alterarte. Respirar antes de actuar podría ayudar.", "veryLow": "Las caídas te golpean emocionalmente. El ritual es tu mejor defensa." }, "basedOnDrops": "Basado en {{count}} reflexión de caída", "basedOnDrops_other": "Basado en {{count}} reflexiones de caída", "buckets": { "mild": "Caídas leves", "moderate": "Caídas moderadas", "heavy": "Caídas fuertes" }, "composure": { "reactive": "Reactivo", "mixed": "Mixto", "composed": "Sereno" }, "held": "{{percent}}% mantuvo" },
-  "insightsPanel": { "title": "Ánimo y Acciones", "howYouFelt": "Cómo te sentiste antes de reflexionar", "whatYouDid": "Qué hiciste después", "basedOn": "Basado en {{count}} reflexión", "basedOn_other": "Basado en {{count}} reflexiones" },
-  "decisionQuality": { "title": "Calidad de Decisión", "improving": "Mejorando", "stable": "Estable", "declining": "Declinando", "withPause": "Con pausa", "withoutPause": "Sin pausa", "companionBreakdown": "Desglose por herramienta", "comparedToBaseline": "Comparado con {{percent}}% base (sin herramientas)", "basedOnDecisions": "Basado en {{count}} decisiones con resultados registrados", "pauseHigher": "Cuando pausas antes de actuar, tu tasa de hold es {{delta}}pp mayor.", "pauseSame": "Tu tasa de hold es la misma pausando o no — sigue reflexionando.", "pauseSimilar": "Interesante — tu tasa de hold es similar independientemente de pausar. La práctica puede estar ayudando de formas que van más allá de los resultados.", "keepReflecting": "Sigue reflexionando para ver cómo pausar afecta tus decisiones.", "held": "{{percent}}% mantuvo", "companionLabels": { "breathing": "Respiración", "haiku": "Haiku", "grounding": "Anclaje", "signal": "Señal", "zoomOut": "Perspectiva", "history": "Historia" } },
-  "holzenScore": { "title": "Puntuación Holzen", "improving": "Mejorando", "declining": "Declinando", "stable": "Estable", "emotionalRegulation": "Regulación", "distressTolerance": "Tolerancia", "decisionAlignment": "Alineación", "cognitiveReappraisal": "Reevaluación", "selfAwareness": "Conciencia", "basedOnSkills": "Basado en tus últimas 30 pausas. Mide habilidades de compostura, no sentimientos." },
-  "ritualFlow": { "rememberWhy": "Recuerda por qué holdeas", "ritualComplete": "Ritual completado", "decision": "Decisión", "return": "Volver", "skip": "Saltar" },
-  "ritualBreathing": { "description": "3 ciclos de respiración cuadrada. 4 segundos cada fase.", "beginBreathing": "Empezar respiración", "inhale": "Inhala", "hold": "Retén", "exhale": "Exhala" },
-  "ritualJournal": { "writeItOut": "Escríbelo antes de actuar", "placeholder": "¿Qué impulsa esto? ¿Qué pensaría tu yo futuro?", "doneWriting": "Listo" },
-  "void": { "begin": "Empezar", "youStayed": "Te quedaste", "return": "Volver" },
-  "nightReflection": { "title": "Reflexión nocturna" },
-  "cooldownBanner": { "youDecidedTo": "Decidiste {{decision}} — quédate con ello.", "decisions": { "held": "holdear", "sold": "vender", "bought": "comprar", "nothing": "no hacer nada" } },
-  "onboardingSample": { "context": "BTC ha bajado 7.2% en las últimas 24 horas. Sentimiento del mercado: Miedo Extremo (18/100).", "message": "Un movimiento brusco invita a la reacción. Este es un momento para observar el impulso antes de seguirlo.", "haiku": "Los números caen\nEl impulso de actuar sube\nRespira primero", "groundingTitle": "Venta por pánico y recuperación", "groundingBody": "Después de la caída del 30% de Bitcoin en mayo de 2021, se recuperó en tres meses. Históricamente, las caídas bruscas suelen preceder períodos de consolidación." },
-  "periodComparison": { "title": "Comparación de períodos", "thisWeek": "Esta semana", "lastWeek": "Semana pasada", "reflections": "Reflexiones", "holdRate": "Tasa de hold", "composure": "Compostura", "companionUse": "Uso de herramientas", "noDataPrevious": "Sin datos para {{period}} — las comparaciones aparecerán la próxima {{next}}.", "week": "semana", "month": "mes" },
-  "streakTimeline": { "title": "Últimos 28 días", "daysToMilestone": "{{days}}d para hito de {{milestone}} días", "beforeSignup": "antes del registro", "streakDays": "{{days}}d racha", "milestoneDays": "{{days}}d hito", "status": { "outcome": "resultado registrado", "reflection": "reflexión", "freeze": "pausa de racha", "empty": "sin actividad" }, "legend": { "outcomeLogged": "resultado registrado", "reflectedNoOutcome": "reflexión (sin resultado)", "streakFreeze": "pausa de racha", "noActivity": "sin actividad" } },
-  "statsTrends": { "weeklyTrends": "Tendencias semanales", "emptyMessage": "Reflexiona en 3+ semanas diferentes para desbloquear gráficos de tendencia.", "scoreOverTime": "Puntuación en el tiempo", "stable": "estable", "score": "Puntuación", "weeklyComposureScore": "Puntuación semanal de compostura en {{count}} reflexiones", "moodDistribution": "Distribución del ánimo", "composed": "Sereno", "mixed": "Mixto", "reactive": "Reactivo", "holdRate": "Tasa de hold", "holdRateDescription": "% de semanas donde holdeaste o no hiciste nada después de reflexionar" },
-  "volatilityTimeline": { "title": "Línea de volatilidad", "all": "Todo", "unableToLoad": "No se pudieron cargar los datos de precio.", "legendCalm": "Calma", "legendAnxious": "Ansiedad", "legendNeutral": "Neutro", "reflections": "Reflexiones ({{count}})", "context": "Contexto", "outcome": "Resultado", "ritual": "Ritual", "decision": "Decisión" },
-  "ritualStats": { "title": "Estadísticas de ritual", "completed": "Completados", "avgDuration": "Duración media", "mostUsed": "Más usado", "decisionBreakdown": "Desglose de decisiones", "bestTemplateInsight": "Tu ritual {{template}} tiene la mayor tasa de hold con {{rate}}%", "avgSuffix": "media {{seconds}}s", "templateEffectiveness": "Efectividad por plantilla", "held": "holdeó", "templates": { "quick": "Rápido", "standard": "Estándar", "deep": "Profundo" } },
-  "reflectionNote": { "addNote": "Añadir nota", "editNote": "Editar nota", "placeholder": "¿Cómo te hizo sentir esto?", "save": "Guardar", "saved": "Guardado", "autosaveHint": "Tu nota también se guarda automáticamente poco después de dejar de escribir." },
-  "reflectionTags": { "addTags": "Añadir etiquetas", "typeTag": "Escribe una etiqueta…", "pressEnterToCreate": "Pulsa Enter para crear \"{{tag}}\"" },
-  "reflectionComparison": { "similarMoment": "Momento similar · hace {{time}}", "then": "Entonces", "now": "Ahora", "insightCalmer": "Estuviste más tranquilo esta vez ante condiciones similares.", "insightHeldSteady": "Holdeaste esta vez — la última vez actuaste por impulso.", "insightConsistent": "Compostura consistente — holdeaste ambas veces.", "insightSimilar": "Respuesta emocional similar — tus patrones son consistentes." },
-  "moodCharts": { "reactive": "Reactivo", "neutral": "Neutro", "composed": "Sereno", "mixed": "Mixto", "moodOverTime": "Ánimo en el tiempo", "moodOverTimeEmpty": "Registra estados de ánimo en 3+ semanas para ver tu tendencia.", "avgComposure": "Compostura media", "weeklyAverageMoodChecks": "Promedio semanal de tus chequeos de ánimo", "moodTrend": "Tendencia de ánimo", "moodTrendEmpty": "Registra ánimos en 3+ semanas para ver una línea de tendencia.", "stable": "estable", "improving": "mejorando", "declining": "declinando", "day": "día", "week": "semana", "weekOf": "Semana de", "averageMoodPer": "Ánimo medio por {{period}} en {{count}} reflexiones", "moodPriceScatter": "Ánimo × Precio", "moodPriceScatterEmpty": "Necesitas 8+ reflexiones con ánimo y precio para revelar patrones.", "mood": "Ánimo", "reflections": "Reflexiones", "scatterInsightDifferent": "Tiendes a sentirte {{negLabel}} en caídas y {{posLabel}} en subidas.", "scatterInsightSame": "Tiendes a sentirte {{label}} sin importar la dirección.", "scatterFooter": "Cada punto es una reflexión · {{count}} datos", "moodPriceChange": "Ánimo × Cambio de precio", "moodPriceChangeEmpty": "Registra 3+ reflexiones con ánimo para comparar.", "entries": "{{count}} entradas", "avgBtcChange": "Cambio promedio de BTC 24h por ánimo", "weak": "débil", "moderate": "moderada", "strong": "fuerte" },
-  "threshold": { "priceRises": "Umbral de subida", "triggerRises": "activar cuando BTC suba esto en 24h", "priceDrops": "Umbral de bajada", "triggerDrops": "activar cuando BTC baje esto en 24h", "cumulative": "Umbral acumulativo 7 días", "rolling7day": "ventana móvil de 7 días", "confirm": "Confirmar" },
-  "changelog": { "whatsNew": "Novedades", "title": "Registro de cambios", "versionHistory": "Historial de versiones", "close": "Cerrar" },
-  "btcStatus": { "unableToFetch": "No se pudo obtener el precio", "checkConnection": "Revisa tu conexión e intenta de nuevo", "exitBtcMode": "Salir del modo 1 BTC = 1 BTC", "enterBtcMode": "Entrar en modo 1 BTC = 1 BTC", "show": "Mostrar", "hide": "Ocultar", "showPrice": "Mostrar precio", "hidePrice": "Ocultar precio", "priceIsNoise": "El precio es ruido. El valor es constante.", "in24h": "en 24h" },
-  "grounding": { "findingResearch": "Buscando investigación…", "viewResearch": "Ver investigación", "researchGrounded": "Ciencia conductual · Basado en investigación" },
-  "feedback": { "bug": "Error", "bugDesc": "Algo roto", "feature": "Función", "featureDesc": "Una idea", "question": "Pregunta", "questionDesc": "Necesito ayuda", "getInTouch": "Contáctanos", "description": "Reporta un error, sugiere una función o haz una pregunta. Leemos cada mensaje.", "placeholder": "Cuéntanos qué piensas…", "sending": "Enviando…", "send": "Enviar", "savedOffline": "Guardado sin conexión", "savedOfflineDesc": "Tu mensaje se enviará cuando vuelvas a estar en línea.", "failedToSend": "Error al enviar", "tryAgainLater": "Intenta de nuevo más tarde.", "sent": "Mensaje enviado", "sentDesc": "¡Gracias! Te responderemos pronto." },
-  "referral": { "milestone1": "1 referido", "milestone3": "3 referidos", "milestone5": "5 referidos", "reward1": "1 semana gratis añadida", "reward3": "1 mes gratis añadido", "reward5": "Acceso de por vida desbloqueado", "linkCopied": "Enlace de referido copiado", "hideLink": "Ocultar enlace", "inviteFriends": "Invitar amigos", "shareDescription": "Comparte Holzen con alguien que necesite un momento de pausa.", "referrals": "referidos", "allEarned": "Todas las recompensas ganadas", "earned": "Ganado", "moreUntil": "{{count}} más hasta: {{reward}}" },
-  "notifications": { "title": "Notificaciones", "clearAll": "Limpiar todo", "dismissAll": "Descartar todo", "allCaughtUp": "Todo al día", "badgeEarned": "Insignia ganada", "viewBadges": "Ver insignias", "nightReflection": "Reflexión nocturna", "letterDelivered": "Carta entregada", "letterFromPast": "Llegó una carta de tu yo del pasado", "readLetter": "Leer carta", "reflectionTriggered": "Reflexión activada", "pauseWithThis": "Pausar con esto", "ritualCompleted": "Ritual completado", "decision": "Decisión", "decisions": { "held": "holdear", "sold": "vender", "bought": "comprar", "nothing": "no hacer nada" }, "viewHistory": "Ver historial", "aiInsightsReady": "Análisis IA listo", "basedOnReflections": "Basado en {{count}} reflexiones", "viewInsights": "Ver análisis" },
-  "aiInsights": { "title": "Análisis de patrones IA", "analyzing": "Analizando…", "refresh": "Actualizar", "generate": "Generar", "generated": "Análisis generado", "failedToGenerate": "Error al generar análisis", "needMinReflections": "Se necesitan al menos 5 reflexiones. Tienes {{count}}.", "noInsightsYet": "Sin análisis aún. Pulsa \"Generar\" para analizar tus patrones.", "analyzingCount": "Analizando {{count}} reflexiones…", "refreshRecommended": "Actualización recomendada", "reflectionsCount": "{{count}} reflexiones" },
-  "wallpaper": { "generating": "Generando fondo…", "carry": "Lleva tu reflexión contigo.", "wallpaper": "Fondo", "generateTitle": "Generar fondo", "generateFromReflection": "Generar fondo de esta reflexión", "reflectionWallpaper": "Fondo de reflexión", "download": "Descargar", "downloaded": "Fondo descargado", "regenerate": "Regenerar", "failedToGenerate": "Error al generar fondo" },
-  "calendar": { "su": "Do", "mo": "Lu", "tu": "Ma", "we": "Mi", "th": "Ju", "fr": "Vi", "sa": "Sa", "noActivity": "Sin actividad.", "pauseCount": "{{count}} pausa(s)", "ritualCount": "{{count}} ritual(es)", "letterCount": "{{count}} carta(s)", "badgeCount": "{{count}} insignia(s)", "ritual": "Ritual", "badge": "Insignia" },
-  "librarySources": { "pause": "Pausa", "pause_note": "Nota", "signal": "Señal", "grounding": "Anclaje", "ground": "Anclaje", "learning": "Anclaje", "haiku": "Haiku", "zoom_out": "Zoom Out", "history_insight": "Historia", "external": "Externo", "practice": "Práctica" },
-  "itemDetail": { "onThisDay": "En este día", "yearsAgo": "hace {{count}}a", "echo": "Eco", "deepTime": "Tiempo profundo", "viewSource": "Ver fuente", "source": "fuente", "companions": "Compañeros", "relatedItems": "Elementos relacionados", "historicalDataPoints": "{{count}} datos históricos" },
-  "libraryCard": { "removeFavorite": "Quitar de favoritos", "addFavorite": "Añadir a favoritos", "markRead": "Marcar leído", "markUnread": "Marcar no leído", "archive": "Archivar", "unread": "no leído", "archived": "archivado", "link": "enlace", "tag": "etiqueta", "tagPlaceholder": "Escribe etiqueta + Enter…", "save": "Guardar", "saved": "Guardado", "saveToLibrary": "Guardar en biblioteca", "addTagsPlaceholder": "Añadir etiquetas…", "enterToCreate": "Enter para crear \"{{tag}}\"" },
-  "pro": { "featureLocked": "Función Pro", "upgradeDesc": "Empieza tu prueba gratuita de {{trialDays}} días — compañeros IA, análisis, biblioteca y más.", "upgradeCta": "Prueba gratis", "upgradeCtaShort": "Probar Pro gratis", "badge": "PRO" },
-  "mirror": { "title": "Espejo de decisión", "sell": { "q1": "¿Esta decisión es parte de tu plan a largo plazo — o la impulsa el precio de hoy?", "q2": "Si el precio se recupera la semana que viene, ¿te arrepentirás?", "q3": "¿Estás vendiendo por datos — o por un sentimiento?" }, "buy": { "q1": "¿Esta compra es parte de tu estrategia — o estás persiguiendo el momentum?", "q2": "Si el precio cae 20% mañana, ¿seguirás sintiéndote bien?", "q3": "¿Compras por convicción — o por FOMO?" }, "confirm": { "sell": "Aún quiero vender", "buy": "Aún quiero comprar" }, "reconsider": "Déjame reconsiderar" }
+  "breathing": {
+    "trigger": "Respira con esto →",
+    "choosePattern": "Elige un patrón",
+    "suggestedForVolatility": "Sugerido para la volatilidad actual",
+    "begin": "Empezar",
+    "settled": "Asentado.",
+    "settledDesc": "Te diste un momento. Eso es suficiente.",
+    "return": "Volver",
+    "patterns": {
+      "box": "Cuadrado",
+      "boxDesc": "4-4-4-4 · Anclaje",
+      "calming": "Calmante",
+      "calmingDesc": "4-7-8 · Calma profunda",
+      "sigh": "Suspiro",
+      "sighDesc": "Suspiro fisiológico"
+    },
+    "phases": {
+      "inhale": "Inhala",
+      "hold": "Retén",
+      "exhale": "Exhala",
+      "sip": "Sorbito"
+    }
+  },
+  "volatility": {
+    "title": "Tolerancia a la Volatilidad",
+    "grades": {
+      "ironHands": "Manos de hierro",
+      "steady": "Estable",
+      "shaky": "Inestable",
+      "paperHands": "Manos de papel"
+    },
+    "descriptions": {
+      "high": "Te mantienes notablemente sereno durante las caídas — incluso las fuertes.",
+      "moderate": "Manejas bien la mayoría de las caídas, aunque los movimientos grandes ponen a prueba tu compostura.",
+      "low": "Las caídas tienden a alterarte. Respirar antes de actuar podría ayudar.",
+      "veryLow": "Las caídas te golpean emocionalmente. El ritual es tu mejor defensa."
+    },
+    "basedOnDrops": "Basado en {{count}} reflexión de caída",
+    "basedOnDrops_other": "Basado en {{count}} reflexiones de caída",
+    "buckets": {
+      "mild": "Caídas leves",
+      "moderate": "Caídas moderadas",
+      "heavy": "Caídas fuertes"
+    },
+    "composure": {
+      "reactive": "Reactivo",
+      "mixed": "Mixto",
+      "composed": "Sereno"
+    },
+    "held": "{{percent}}% mantuvo"
+  },
+  "insightsPanel": {
+    "title": "Ánimo y Acciones",
+    "howYouFelt": "Cómo te sentiste antes de reflexionar",
+    "whatYouDid": "Qué hiciste después",
+    "basedOn": "Basado en {{count}} reflexión",
+    "basedOn_other": "Basado en {{count}} reflexiones"
+  },
+  "decisionQuality": {
+    "title": "Calidad de Decisión",
+    "improving": "Mejorando",
+    "stable": "Estable",
+    "declining": "Declinando",
+    "withPause": "Con pausa",
+    "withoutPause": "Sin pausa",
+    "companionBreakdown": "Desglose por herramienta",
+    "comparedToBaseline": "Comparado con {{percent}}% base (sin herramientas)",
+    "basedOnDecisions": "Basado en {{count}} decisiones con resultados registrados",
+    "pauseHigher": "Cuando pausas antes de actuar, tu tasa de hold es {{delta}}pp mayor.",
+    "pauseSame": "Tu tasa de hold es la misma pausando o no — sigue reflexionando.",
+    "pauseSimilar": "Interesante — tu tasa de hold es similar independientemente de pausar. La práctica puede estar ayudando de formas que van más allá de los resultados.",
+    "keepReflecting": "Sigue reflexionando para ver cómo pausar afecta tus decisiones.",
+    "held": "{{percent}}% mantuvo",
+    "companionLabels": {
+      "breathing": "Respiración",
+      "haiku": "Haiku",
+      "grounding": "Anclaje",
+      "signal": "Señal",
+      "zoomOut": "Perspectiva",
+      "history": "Historia"
+    }
+  },
+  "holzenScore": {
+    "title": "Puntuación Holzen",
+    "improving": "Mejorando",
+    "declining": "Declinando",
+    "stable": "Estable",
+    "emotionalRegulation": "Regulación",
+    "distressTolerance": "Tolerancia",
+    "decisionAlignment": "Alineación",
+    "cognitiveReappraisal": "Reevaluación",
+    "selfAwareness": "Conciencia",
+    "basedOnSkills": "Basado en tus últimas 30 pausas. Mide habilidades de compostura, no sentimientos."
+  },
+  "ritualFlow": {
+    "rememberWhy": "Recuerda por qué holdeas",
+    "ritualComplete": "Ritual completado",
+    "decision": "Decisión",
+    "return": "Volver",
+    "skip": "Saltar"
+  },
+  "ritualBreathing": {
+    "description": "3 ciclos de respiración cuadrada. 4 segundos cada fase.",
+    "beginBreathing": "Empezar respiración",
+    "inhale": "Inhala",
+    "hold": "Retén",
+    "exhale": "Exhala"
+  },
+  "ritualJournal": {
+    "writeItOut": "Escríbelo antes de actuar",
+    "placeholder": "¿Qué impulsa esto? ¿Qué pensaría tu yo futuro?",
+    "doneWriting": "Listo"
+  },
+  "void": {
+    "begin": "Empezar",
+    "youStayed": "Te quedaste",
+    "return": "Volver"
+  },
+  "nightReflection": {
+    "title": "Reflexión nocturna"
+  },
+  "cooldownBanner": {
+    "youDecidedTo": "Decidiste {{decision}} — quédate con ello.",
+    "decisions": {
+      "held": "holdear",
+      "sold": "vender",
+      "bought": "comprar",
+      "nothing": "no hacer nada"
+    }
+  },
+  "onboardingSample": {
+    "context": "BTC ha bajado 7.2% en las últimas 24 horas. Sentimiento del mercado: Miedo Extremo (18/100).",
+    "message": "Un movimiento brusco invita a la reacción. Este es un momento para observar el impulso antes de seguirlo.",
+    "haiku": "Los números caen\nEl impulso de actuar sube\nRespira primero",
+    "groundingTitle": "Venta por pánico y recuperación",
+    "groundingBody": "Después de la caída del 30% de Bitcoin en mayo de 2021, se recuperó en tres meses. Históricamente, las caídas bruscas suelen preceder períodos de consolidación."
+  },
+  "periodComparison": {
+    "title": "Comparación de períodos",
+    "thisWeek": "Esta semana",
+    "lastWeek": "Semana pasada",
+    "reflections": "Reflexiones",
+    "holdRate": "Tasa de hold",
+    "composure": "Compostura",
+    "companionUse": "Uso de herramientas",
+    "noDataPrevious": "Sin datos para {{period}} — las comparaciones aparecerán la próxima {{next}}.",
+    "week": "semana",
+    "month": "mes"
+  },
+  "streakTimeline": {
+    "title": "Últimos 28 días",
+    "daysToMilestone": "{{days}}d para hito de {{milestone}} días",
+    "beforeSignup": "antes del registro",
+    "streakDays": "{{days}}d racha",
+    "milestoneDays": "{{days}}d hito",
+    "status": {
+      "outcome": "resultado registrado",
+      "reflection": "reflexión",
+      "freeze": "pausa de racha",
+      "empty": "sin actividad"
+    },
+    "legend": {
+      "outcomeLogged": "resultado registrado",
+      "reflectedNoOutcome": "reflexión (sin resultado)",
+      "streakFreeze": "pausa de racha",
+      "noActivity": "sin actividad"
+    }
+  },
+  "statsTrends": {
+    "weeklyTrends": "Tendencias semanales",
+    "emptyMessage": "Reflexiona en 3+ semanas diferentes para desbloquear gráficos de tendencia.",
+    "scoreOverTime": "Puntuación en el tiempo",
+    "stable": "estable",
+    "score": "Puntuación",
+    "weeklyComposureScore": "Puntuación semanal de compostura en {{count}} reflexiones",
+    "moodDistribution": "Distribución del ánimo",
+    "composed": "Sereno",
+    "mixed": "Mixto",
+    "reactive": "Reactivo",
+    "holdRate": "Tasa de hold",
+    "holdRateDescription": "% de semanas donde holdeaste o no hiciste nada después de reflexionar"
+  },
+  "volatilityTimeline": {
+    "title": "Línea de volatilidad",
+    "all": "Todo",
+    "unableToLoad": "No se pudieron cargar los datos de precio.",
+    "legendCalm": "Calma",
+    "legendAnxious": "Ansiedad",
+    "legendNeutral": "Neutro",
+    "reflections": "Reflexiones ({{count}})",
+    "context": "Contexto",
+    "outcome": "Resultado",
+    "ritual": "Ritual",
+    "decision": "Decisión"
+  },
+  "ritualStats": {
+    "title": "Estadísticas de ritual",
+    "completed": "Completados",
+    "avgDuration": "Duración media",
+    "mostUsed": "Más usado",
+    "decisionBreakdown": "Desglose de decisiones",
+    "bestTemplateInsight": "Tu ritual {{template}} tiene la mayor tasa de hold con {{rate}}%",
+    "avgSuffix": "media {{seconds}}s",
+    "templateEffectiveness": "Efectividad por plantilla",
+    "held": "holdeó",
+    "templates": {
+      "quick": "Rápido",
+      "standard": "Estándar",
+      "deep": "Profundo"
+    }
+  },
+  "reflectionNote": {
+    "addNote": "Añadir nota",
+    "editNote": "Editar nota",
+    "placeholder": "¿Cómo te hizo sentir esto?",
+    "save": "Guardar",
+    "saved": "Guardado",
+    "autosaveHint": "Tu nota también se guarda automáticamente poco después de dejar de escribir."
+  },
+  "reflectionTags": {
+    "addTags": "Añadir etiquetas",
+    "typeTag": "Escribe una etiqueta…",
+    "pressEnterToCreate": "Pulsa Enter para crear \"{{tag}}\""
+  },
+  "reflectionComparison": {
+    "similarMoment": "Momento similar · hace {{time}}",
+    "then": "Entonces",
+    "now": "Ahora",
+    "insightCalmer": "Estuviste más tranquilo esta vez ante condiciones similares.",
+    "insightHeldSteady": "Holdeaste esta vez — la última vez actuaste por impulso.",
+    "insightConsistent": "Compostura consistente — holdeaste ambas veces.",
+    "insightSimilar": "Respuesta emocional similar — tus patrones son consistentes."
+  },
+  "moodCharts": {
+    "reactive": "Reactivo",
+    "neutral": "Neutro",
+    "composed": "Sereno",
+    "mixed": "Mixto",
+    "moodOverTime": "Ánimo en el tiempo",
+    "moodOverTimeEmpty": "Registra estados de ánimo en 3+ semanas para ver tu tendencia.",
+    "avgComposure": "Compostura media",
+    "weeklyAverageMoodChecks": "Promedio semanal de tus chequeos de ánimo",
+    "moodTrend": "Tendencia de ánimo",
+    "moodTrendEmpty": "Registra ánimos en 3+ semanas para ver una línea de tendencia.",
+    "stable": "estable",
+    "improving": "mejorando",
+    "declining": "declinando",
+    "day": "día",
+    "week": "semana",
+    "weekOf": "Semana de",
+    "averageMoodPer": "Ánimo medio por {{period}} en {{count}} reflexiones",
+    "moodPriceScatter": "Ánimo × Precio",
+    "moodPriceScatterEmpty": "Necesitas 8+ reflexiones con ánimo y precio para revelar patrones.",
+    "mood": "Ánimo",
+    "reflections": "Reflexiones",
+    "scatterInsightDifferent": "Tiendes a sentirte {{negLabel}} en caídas y {{posLabel}} en subidas.",
+    "scatterInsightSame": "Tiendes a sentirte {{label}} sin importar la dirección.",
+    "scatterFooter": "Cada punto es una reflexión · {{count}} datos",
+    "moodPriceChange": "Ánimo × Cambio de precio",
+    "moodPriceChangeEmpty": "Registra 3+ reflexiones con ánimo para comparar.",
+    "entries": "{{count}} entradas",
+    "avgBtcChange": "Cambio promedio de BTC 24h por ánimo",
+    "weak": "débil",
+    "moderate": "moderada",
+    "strong": "fuerte"
+  },
+  "threshold": {
+    "priceRises": "Umbral de subida",
+    "triggerRises": "activar cuando BTC suba esto en 24h",
+    "priceDrops": "Umbral de bajada",
+    "triggerDrops": "activar cuando BTC baje esto en 24h",
+    "cumulative": "Umbral acumulativo 7 días",
+    "rolling7day": "ventana móvil de 7 días",
+    "confirm": "Confirmar"
+  },
+  "changelog": {
+    "whatsNew": "Novedades",
+    "title": "Registro de cambios",
+    "versionHistory": "Historial de versiones",
+    "close": "Cerrar"
+  },
+  "grounding": {
+    "findingResearch": "Buscando investigación…",
+    "viewResearch": "Ver investigación",
+    "researchGrounded": "Ciencia conductual · Basado en investigación"
+  },
+  "feedback": {
+    "bug": "Error",
+    "bugDesc": "Algo roto",
+    "feature": "Función",
+    "featureDesc": "Una idea",
+    "question": "Pregunta",
+    "questionDesc": "Necesito ayuda",
+    "getInTouch": "Contáctanos",
+    "description": "Reporta un error, sugiere una función o haz una pregunta. Leemos cada mensaje.",
+    "placeholder": "Cuéntanos qué piensas…",
+    "sending": "Enviando…",
+    "send": "Enviar",
+    "savedOffline": "Guardado sin conexión",
+    "savedOfflineDesc": "Tu mensaje se enviará cuando vuelvas a estar en línea.",
+    "failedToSend": "Error al enviar",
+    "tryAgainLater": "Intenta de nuevo más tarde.",
+    "sent": "Mensaje enviado",
+    "sentDesc": "¡Gracias! Te responderemos pronto."
+  },
+  "referral": {
+    "milestone1": "1 referido",
+    "milestone3": "3 referidos",
+    "milestone5": "5 referidos",
+    "reward1": "1 semana gratis añadida",
+    "reward3": "1 mes gratis añadido",
+    "reward5": "Acceso de por vida desbloqueado",
+    "linkCopied": "Enlace de referido copiado",
+    "hideLink": "Ocultar enlace",
+    "inviteFriends": "Invitar amigos",
+    "shareDescription": "Comparte Holzen con alguien que necesite un momento de pausa.",
+    "referrals": "referidos",
+    "allEarned": "Todas las recompensas ganadas",
+    "earned": "Ganado",
+    "moreUntil": "{{count}} más hasta: {{reward}}"
+  },
+  "notifications": {
+    "title": "Notificaciones",
+    "clearAll": "Limpiar todo",
+    "dismissAll": "Descartar todo",
+    "allCaughtUp": "Todo al día",
+    "badgeEarned": "Insignia ganada",
+    "viewBadges": "Ver insignias",
+    "nightReflection": "Reflexión nocturna",
+    "letterDelivered": "Carta entregada",
+    "letterFromPast": "Llegó una carta de tu yo del pasado",
+    "readLetter": "Leer carta",
+    "reflectionTriggered": "Reflexión activada",
+    "pauseWithThis": "Pausar con esto",
+    "ritualCompleted": "Ritual completado",
+    "decision": "Decisión",
+    "decisions": {
+      "held": "holdear",
+      "sold": "vender",
+      "bought": "comprar",
+      "nothing": "no hacer nada"
+    },
+    "viewHistory": "Ver historial",
+    "aiInsightsReady": "Análisis IA listo",
+    "basedOnReflections": "Basado en {{count}} reflexiones",
+    "viewInsights": "Ver análisis"
+  },
+  "aiInsights": {
+    "title": "Análisis de patrones IA",
+    "analyzing": "Analizando…",
+    "refresh": "Actualizar",
+    "generate": "Generar",
+    "generated": "Análisis generado",
+    "failedToGenerate": "Error al generar análisis",
+    "needMinReflections": "Se necesitan al menos 5 reflexiones. Tienes {{count}}.",
+    "noInsightsYet": "Sin análisis aún. Pulsa \"Generar\" para analizar tus patrones.",
+    "analyzingCount": "Analizando {{count}} reflexiones…",
+    "refreshRecommended": "Actualización recomendada",
+    "reflectionsCount": "{{count}} reflexiones"
+  },
+  "calendar": {
+    "su": "Do",
+    "mo": "Lu",
+    "tu": "Ma",
+    "we": "Mi",
+    "th": "Ju",
+    "fr": "Vi",
+    "sa": "Sa",
+    "noActivity": "Sin actividad.",
+    "pauseCount": "{{count}} pausa(s)",
+    "ritualCount": "{{count}} ritual(es)",
+    "letterCount": "{{count}} carta(s)",
+    "badgeCount": "{{count}} insignia(s)",
+    "ritual": "Ritual",
+    "badge": "Insignia"
+  },
+  "librarySources": {
+    "pause": "Pausa",
+    "pause_note": "Nota",
+    "signal": "Señal",
+    "grounding": "Anclaje",
+    "ground": "Anclaje",
+    "learning": "Anclaje",
+    "haiku": "Haiku",
+    "zoom_out": "Zoom Out",
+    "history_insight": "Historia",
+    "external": "Externo",
+    "practice": "Práctica"
+  },
+  "itemDetail": {
+    "onThisDay": "En este día",
+    "yearsAgo": "hace {{count}}a",
+    "echo": "Eco",
+    "deepTime": "Tiempo profundo",
+    "viewSource": "Ver fuente",
+    "source": "fuente",
+    "companions": "Compañeros",
+    "relatedItems": "Elementos relacionados",
+    "historicalDataPoints": "{{count}} datos históricos"
+  },
+  "libraryCard": {
+    "removeFavorite": "Quitar de favoritos",
+    "addFavorite": "Añadir a favoritos",
+    "markRead": "Marcar leído",
+    "markUnread": "Marcar no leído",
+    "archive": "Archivar",
+    "unread": "no leído",
+    "archived": "archivado",
+    "link": "enlace",
+    "tag": "etiqueta",
+    "tagPlaceholder": "Escribe etiqueta + Enter…",
+    "save": "Guardar",
+    "saved": "Guardado",
+    "saveToLibrary": "Guardar en biblioteca",
+    "addTagsPlaceholder": "Añadir etiquetas…",
+    "enterToCreate": "Enter para crear \"{{tag}}\""
+  },
+  "pro": {
+    "featureLocked": "Función Pro",
+    "upgradeDesc": "Empieza tu prueba gratuita de {{trialDays}} días — compañeros IA, análisis, biblioteca y más.",
+    "upgradeCta": "Prueba gratis",
+    "upgradeCtaShort": "Probar Pro gratis",
+    "badge": "PRO"
+  },
+  "mirror": {
+    "title": "Espejo de decisión",
+    "sell": {
+      "q1": "¿Esta decisión es parte de tu plan a largo plazo — o la impulsa el precio de hoy?",
+      "q2": "Si el precio se recupera la semana que viene, ¿te arrepentirás?",
+      "q3": "¿Estás vendiendo por datos — o por un sentimiento?"
+    },
+    "buy": {
+      "q1": "¿Esta compra es parte de tu estrategia — o estás persiguiendo el momentum?",
+      "q2": "Si el precio cae 20% mañana, ¿seguirás sintiéndote bien?",
+      "q3": "¿Compras por convicción — o por FOMO?"
+    },
+    "confirm": {
+      "sell": "Aún quiero vender",
+      "buy": "Aún quiero comprar"
+    },
+    "reconsider": "Déjame reconsiderar"
+  }
 }

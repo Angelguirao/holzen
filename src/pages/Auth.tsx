@@ -227,7 +227,7 @@ const Auth = () => {
           </p>
         )}
 
-        <button onClick={() => { setView(view === 'sign-up' ? 'sign-in' : 'sign-up'); setError(null); }} className="underline w-full text-center text-base font-sans text-[#24b1c6]">
+        <button onClick={() => { setView(view === 'sign-up' ? 'sign-in' : 'sign-up'); setError(null); }} className="underline w-full text-center text-base font-sans text-nox-text-link hover:text-nox-text-link/80">
           {view === 'sign-up' ? t('auth.alreadyHaveAccount') : t('auth.createAnAccount')}
         </button>
       </div>

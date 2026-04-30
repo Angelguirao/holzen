@@ -344,7 +344,7 @@ export default function Library() {
           {hasActiveFilters && !smartFilter && (
             <button
               onClick={clearAllFilters}
-              className="flex items-center gap-1 transition-colors text-cyan-600 text-sm font-sans"
+              className="flex items-center gap-1 transition-colors text-nox-text-link hover:text-nox-text-link/80 text-sm font-sans"
             >
               <X className="h-2.5 w-2.5" /> {t('library.clearAll')}
             </button>
@@ -359,7 +359,7 @@ export default function Library() {
               <ExportMenu items={filtered} />
               <button
                 onClick={cycleSortMode}
-                className="flex items-center gap-1 transition-colors text-cyan-700 text-sm font-sans"
+                className="flex items-center gap-1 transition-colors text-nox-text-link hover:text-nox-text-link/80 text-sm font-sans"
               >
                 <ArrowUpDown className="h-2.5 w-2.5" />
                 {sortLabel}

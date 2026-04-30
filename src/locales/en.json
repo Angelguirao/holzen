@@ -21,13 +21,14 @@
     "subtitle": "What’s new, app version, and a direct line to the team — separate from day-to-day preferences."
   },
   "roadmap": {
-    "pageTitle": "Roadmap — Holzen",
-    "pageDescription": "Product plans and updates",
     "title": "Roadmap",
-    "body": "We do not host a live roadmap in the app right now. Follow the blog for release notes and direction, or read about why we built Holzen.",
-    "linkBlog": "Blog",
-    "linkAbout": "About Holzen",
-    "linkHome": "Sign in"
+    "voteOnNext": "Vote on what we build next.",
+    "signInToVote": "Sign in to vote.",
+    "all": "All",
+    "self": "Self",
+    "together": "Together",
+    "intelligence": "Intelligence",
+    "reach": "Reach"
   },
   "common": {
     "back": "Back",
@@ -517,6 +518,12 @@
   "btcStatus": {
     "unableToFetch": "Unable to fetch price data",
     "checkConnection": "Check your connection and try again",
+    "exitBtcMode": "Exit 1 BTC = 1 BTC mode",
+    "enterBtcMode": "Enter 1 BTC = 1 BTC mode",
+    "show": "Show",
+    "hide": "Hide",
+    "showPrice": "Show price",
+    "hidePrice": "Hide price",
     "priceIsNoise": "Price is noise. Value is constant.",
     "in24h": "in 24h"
   },
@@ -527,16 +534,85 @@
     "reflectionsRecorded_other": "of users held steady today · {{count}} pauses recorded"
   },
   "ritual": {
+    "selectTemplate": "Choose your ritual",
+    "intro": "Rituals are guided sequences that slow you down before a financial decision. Pick a preset, build your own, or let AI suggest one — so your choices come from clarity, not impulse.",
+    "yourTemplates": "Your rituals",
+    "buildYourOwn": "Build your own",
+    "aiSuggest": "AI suggest",
+    "aiGenerating": "Crafting your ritual…",
+    "steps": {
+      "breathe": "Breathe",
+      "breatheDesc": "3 guided breathing cycles to calm your nervous system",
+      "grounding": "Grounding",
+      "groundingDesc": "5-4-3-2-1 sensory exercise to anchor you in the present",
+      "checkin": "Check-in",
+      "checkinDesc": "Name your current emotional state honestly",
+      "reflect": "Reflect",
+      "reflectDesc": "Sit with a reflection message and notice what arises",
+      "review": "Self-review",
+      "reviewDesc": "Look at your personal stats — hold rate, mood patterns",
+      "journal": "Journal",
+      "journalDesc": "Free-form writing to process thoughts before deciding",
+      "physical": "Physical action",
+      "physicalDesc": "Movement or physical activity to release tension",
+      "decide": "Decide",
+      "decideDesc": "Make your final choice: hold, buy, sell, or do nothing"
+    },
+    "categories": {
+      "mindfulness": "Mindfulness",
+      "reflection": "Reflection",
+      "journaling": "Journaling",
+      "physical": "Physical",
+      "decision": "Decision"
+    },
+    "presets": {
+      "quick": "Quick",
+      "quickDesc": "Breathe → Decide",
+      "standard": "Standard",
+      "standardDesc": "Breathe → Reflect → Journal → Decide",
+      "deep": "Deep",
+      "deepDesc": "Breathe → Review → Reflect → Journal → Decide",
+      "body": "Body first",
+      "bodyDesc": "Ground → Move → Check-in → Decide"
+    },
+    "builder": {
+      "title": "Build your ritual",
+      "intro": "Design your own grounding sequence. Pick the steps that work for you — from breathing and journaling to physical movement — and save it as a reusable template.",
+      "namePlaceholder": "Ritual name…",
+      "addStep": "Add a step",
+      "empty": "Add steps to build your ritual",
+      "customAction": "Physical action",
+      "actionPlaceholder": "Go for a run, stretch…",
+      "actionHint": "Duration in minutes",
+      "saveTemplate": "Save",
+      "startRitual": "Start",
+      "saved": "Ritual saved"
+    },
+    "physical": {
+      "completed": "Done! Nice work.",
+      "finishEarly": "Finish early"
+    },
+    "review": {
+      "last30Days": "Your last 30 days",
+      "reflections": "Pauses",
+      "holdRate": "Hold rate",
+      "dominantMood": "Dominant mood",
+      "lastMarket": "Last market",
+      "acknowledged": "I see my patterns"
+    },
+    "grounding": {
+      "intro": "Notice 5 things you see, 4 you hear, 3 you feel, 2 you smell, 1 you taste."
+    },
+    "reflect": {
+      "prompt": "Sit with what you're feeling. No judgment.",
+      "iveReflected": "I've reflected"
+    },
     "decide": {
-      "prompt": "You've paused. You've reflected. Now decide intentionally.",
+      "prompt": "What will you do?",
       "hold": "Hold",
       "sell": "Sell",
       "buy": "Buy",
       "nothing": "Nothing"
-    },
-    "reflect": {
-      "prompt": "Sit with the moment. Notice your impulses without acting on them. What is the market making you feel?",
-      "iveReflected": "I've reflected"
     }
   },
   "companions": {
@@ -847,16 +923,6 @@
     "postNotFound": "Post not found.",
     "read": "Read"
   },
-  "roadmap": {
-    "title": "Roadmap",
-    "voteOnNext": "Vote on what we build next.",
-    "signInToVote": "Sign in to vote.",
-    "all": "All",
-    "self": "Self",
-    "together": "Together",
-    "intelligence": "Intelligence",
-    "reach": "Reach"
-  },
   "reserve": {
     "title": "BTC Reserve Strategy",
     "subtitle": "We hold what we help others hold.",
@@ -1063,8 +1129,16 @@
     "failed": "Failed to submit"
   },
   "wallpaper": {
-    "generating": "Generating your wallpaper…",
-    "carry": "Carry your composure with you"
+    "generating": "Generating wallpaper…",
+    "carry": "Carry your pause with you.",
+    "wallpaper": "Wallpaper",
+    "generateTitle": "Generate wallpaper",
+    "generateFromReflection": "Generate wallpaper from this pause",
+    "reflectionWallpaper": "Pause wallpaper",
+    "download": "Download",
+    "downloaded": "Wallpaper downloaded",
+    "regenerate": "Regenerate",
+    "failedToGenerate": "Failed to generate wallpaper"
   },
   "ambient": {
     "calm": "Markets are quiet",
@@ -1138,38 +1212,70 @@
       "companions": "Companion Engagement",
       "engagement": "Engagement"
     },
-    "genesis": "Genesis Block", "genesisDesc": "Paused on January 3rd — Genesis Block anniversary",
-    "birthday": "Bitcoin Birthday", "birthdayDesc": "Paused on January 9th — first Bitcoin software release",
-    "pizza": "Pizza Day", "pizzaDesc": "Paused on May 22nd — Bitcoin Pizza Day",
-    "whitepaper": "Whitepaper Day", "whitepaperDesc": "Paused on October 31st — Satoshi's whitepaper",
-    "halving": "Halving Witness", "halvingDesc": "Paused during a Bitcoin halving event",
-    "reflect10": "First Steps", "reflect10Desc": "10 pauses logged",
-    "reflect50": "Devoted Observer", "reflect50Desc": "50 pauses logged",
-    "reflect100": "Deep Practice", "reflect100Desc": "100 pauses logged",
-    "reflect500": "Masterful Patience", "reflect500Desc": "500 pauses logged",
-    "calm10": "Still Waters", "calm10Desc": "10 calm mood checks",
-    "calm50": "Unshakeable", "calm50Desc": "50 calm mood checks",
-    "held10": "Diamond Hands", "held10Desc": "Held steady 10 times",
-    "held50": "Iron Will", "held50Desc": "Held steady 50 times",
-    "breathe5": "First Breaths", "breathe5Desc": "Completed breathing 5 times",
-    "breathe25": "Breath Master", "breathe25Desc": "Completed breathing 25 times",
-    "breathe100": "Zen Lungs", "breathe100Desc": "Completed breathing 100 times",
-    "haiku10": "Poetry Reader", "haiku10Desc": "Read 10 haiku",
-    "haiku50": "Verse Devotee", "haiku50Desc": "Read 50 haiku",
-    "learn10": "Grounded Mind", "learn10Desc": "Used Ground Yourself 10 times",
-    "learn50": "Scholar of Calm", "learn50Desc": "Used Ground Yourself 50 times",
-    "signal10": "Philosopher", "signal10Desc": "Read 10 signal insights",
-    "signal50": "Deep Thinker", "signal50Desc": "Read 50 signal insights",
-    "zoom5": "Long View", "zoom5Desc": "Used Zoom Out 5 times",
-    "zoom25": "Macro Thinker", "zoom25Desc": "Used Zoom Out 25 times",
-    "history5": "History Student", "history5Desc": "Read 5 historical insights",
-    "history25": "Cycle Sage", "history25Desc": "Read 25 historical insights",
-    "allSix5": "Full Practice", "allSix5Desc": "Used all 5 companions in 5 pauses",
-    "allSix25": "Complete Discipline", "allSix25Desc": "Used all 5 companions in 25 pauses",
-    "fav5": "Curator", "fav5Desc": "5 favorited pauses",
-    "fav25": "Archivist", "fav25Desc": "25 favorited pauses",
-    "notes10": "Journaler", "notes10Desc": "10 personal notes",
-    "notes50": "Deep Diarist", "notes50Desc": "50 personal notes",
+    "genesis": "Genesis Block",
+    "genesisDesc": "Paused on January 3rd — Genesis Block anniversary",
+    "birthday": "Bitcoin Birthday",
+    "birthdayDesc": "Paused on January 9th — first Bitcoin software release",
+    "pizza": "Pizza Day",
+    "pizzaDesc": "Paused on May 22nd — Bitcoin Pizza Day",
+    "whitepaper": "Whitepaper Day",
+    "whitepaperDesc": "Paused on October 31st — Satoshi's whitepaper",
+    "halving": "Halving Witness",
+    "halvingDesc": "Paused during a Bitcoin halving event",
+    "reflect10": "First Steps",
+    "reflect10Desc": "10 pauses logged",
+    "reflect50": "Devoted Observer",
+    "reflect50Desc": "50 pauses logged",
+    "reflect100": "Deep Practice",
+    "reflect100Desc": "100 pauses logged",
+    "reflect500": "Masterful Patience",
+    "reflect500Desc": "500 pauses logged",
+    "calm10": "Still Waters",
+    "calm10Desc": "10 calm mood checks",
+    "calm50": "Unshakeable",
+    "calm50Desc": "50 calm mood checks",
+    "held10": "Diamond Hands",
+    "held10Desc": "Held steady 10 times",
+    "held50": "Iron Will",
+    "held50Desc": "Held steady 50 times",
+    "breathe5": "First Breaths",
+    "breathe5Desc": "Completed breathing 5 times",
+    "breathe25": "Breath Master",
+    "breathe25Desc": "Completed breathing 25 times",
+    "breathe100": "Zen Lungs",
+    "breathe100Desc": "Completed breathing 100 times",
+    "haiku10": "Poetry Reader",
+    "haiku10Desc": "Read 10 haiku",
+    "haiku50": "Verse Devotee",
+    "haiku50Desc": "Read 50 haiku",
+    "learn10": "Grounded Mind",
+    "learn10Desc": "Used Ground Yourself 10 times",
+    "learn50": "Scholar of Calm",
+    "learn50Desc": "Used Ground Yourself 50 times",
+    "signal10": "Philosopher",
+    "signal10Desc": "Read 10 signal insights",
+    "signal50": "Deep Thinker",
+    "signal50Desc": "Read 50 signal insights",
+    "zoom5": "Long View",
+    "zoom5Desc": "Used Zoom Out 5 times",
+    "zoom25": "Macro Thinker",
+    "zoom25Desc": "Used Zoom Out 25 times",
+    "history5": "History Student",
+    "history5Desc": "Read 5 historical insights",
+    "history25": "Cycle Sage",
+    "history25Desc": "Read 25 historical insights",
+    "allSix5": "Full Practice",
+    "allSix5Desc": "Used all 5 companions in 5 pauses",
+    "allSix25": "Complete Discipline",
+    "allSix25Desc": "Used all 5 companions in 25 pauses",
+    "fav5": "Curator",
+    "fav5Desc": "5 favorited pauses",
+    "fav25": "Archivist",
+    "fav25Desc": "25 favorited pauses",
+    "notes10": "Journaler",
+    "notes10Desc": "10 personal notes",
+    "notes50": "Deep Diarist",
+    "notes50Desc": "50 personal notes",
     "units": {
       "pauses": "pauses",
       "calmMoods": "calm moods",
@@ -1534,18 +1640,6 @@
     "versionHistory": "Version history",
     "close": "Close"
   },
-  "btcStatus": {
-    "unableToFetch": "Unable to fetch price data",
-    "checkConnection": "Check your connection and try again",
-    "exitBtcMode": "Exit 1 BTC = 1 BTC mode",
-    "enterBtcMode": "Enter 1 BTC = 1 BTC mode",
-    "show": "Show",
-    "hide": "Hide",
-    "showPrice": "Show price",
-    "hidePrice": "Hide price",
-    "priceIsNoise": "Price is noise. Value is constant.",
-    "in24h": "in 24h"
-  },
   "grounding": {
     "findingResearch": "Finding research…",
     "viewResearch": "View research",
@@ -1600,7 +1694,6 @@
     "readLetter": "Read letter",
     "reflectionTriggered": "Pause triggered",
     "pauseWithThis": "Pause with this",
-    
     "decision": "Decision",
     "decisions": {
       "held": "hold",
@@ -1628,18 +1721,6 @@
     "refreshRecommended": "Refresh recommended",
     "reflectionsCount": "{{count}} pauses",
     "pauseSessionsCount": "{{count}} pauses"
-  },
-  "wallpaper": {
-    "generating": "Generating wallpaper…",
-    "carry": "Carry your pause with you.",
-    "wallpaper": "Wallpaper",
-    "generateTitle": "Generate wallpaper",
-    "generateFromReflection": "Generate wallpaper from this pause",
-    "reflectionWallpaper": "Pause wallpaper",
-    "download": "Download",
-    "downloaded": "Wallpaper downloaded",
-    "regenerate": "Regenerate",
-    "failedToGenerate": "Failed to generate wallpaper"
   },
   "calendar": {
     "su": "Su",
@@ -1755,88 +1836,6 @@
     "shiftDesc": "Checking in again builds metacognitive awareness — observing your own thinking. (Flavell, 1979)",
     "decide": "Decide",
     "decideDesc": "System 2 is now online. You can act from intention, not impulse. (Kahneman, 2011)"
-  },
-  "ritual": {
-    "selectTemplate": "Choose your ritual",
-    "intro": "Rituals are guided sequences that slow you down before a financial decision. Pick a preset, build your own, or let AI suggest one — so your choices come from clarity, not impulse.",
-    "yourTemplates": "Your rituals",
-    "buildYourOwn": "Build your own",
-    "aiSuggest": "AI suggest",
-    "aiGenerating": "Crafting your ritual…",
-    "steps": {
-      "breathe": "Breathe",
-      "breatheDesc": "3 guided breathing cycles to calm your nervous system",
-      "grounding": "Grounding",
-      "groundingDesc": "5-4-3-2-1 sensory exercise to anchor you in the present",
-      "checkin": "Check-in",
-      "checkinDesc": "Name your current emotional state honestly",
-      "reflect": "Reflect",
-      "reflectDesc": "Sit with a reflection message and notice what arises",
-      "review": "Self-review",
-      "reviewDesc": "Look at your personal stats — hold rate, mood patterns",
-      "journal": "Journal",
-      "journalDesc": "Free-form writing to process thoughts before deciding",
-      "physical": "Physical action",
-      "physicalDesc": "Movement or physical activity to release tension",
-      "decide": "Decide",
-      "decideDesc": "Make your final choice: hold, buy, sell, or do nothing"
-    },
-    "categories": {
-      "mindfulness": "Mindfulness",
-      "reflection": "Reflection",
-      "journaling": "Journaling",
-      "physical": "Physical",
-      "decision": "Decision"
-    },
-    "presets": {
-      "quick": "Quick",
-      "quickDesc": "Breathe → Decide",
-      "standard": "Standard",
-      "standardDesc": "Breathe → Reflect → Journal → Decide",
-      "deep": "Deep",
-      "deepDesc": "Breathe → Review → Reflect → Journal → Decide",
-      "body": "Body first",
-      "bodyDesc": "Ground → Move → Check-in → Decide"
-    },
-    "builder": {
-      "title": "Build your ritual",
-      "intro": "Design your own grounding sequence. Pick the steps that work for you — from breathing and journaling to physical movement — and save it as a reusable template.",
-      "namePlaceholder": "Ritual name…",
-      "addStep": "Add a step",
-      "empty": "Add steps to build your ritual",
-      "customAction": "Physical action",
-      "actionPlaceholder": "Go for a run, stretch…",
-      "actionHint": "Duration in minutes",
-      "saveTemplate": "Save",
-      "startRitual": "Start",
-      "saved": "Ritual saved"
-    },
-    "physical": {
-      "completed": "Done! Nice work.",
-      "finishEarly": "Finish early"
-    },
-    "review": {
-      "last30Days": "Your last 30 days",
-      "reflections": "Pauses",
-      "holdRate": "Hold rate",
-      "dominantMood": "Dominant mood",
-      "lastMarket": "Last market",
-      "acknowledged": "I see my patterns"
-    },
-    "grounding": {
-      "intro": "Notice 5 things you see, 4 you hear, 3 you feel, 2 you smell, 1 you taste."
-    },
-    "reflect": {
-      "prompt": "Sit with what you're feeling. No judgment.",
-      "iveReflected": "I've reflected"
-    },
-    "decide": {
-      "prompt": "What will you do?",
-      "hold": "Hold",
-      "sell": "Sell",
-      "buy": "Buy",
-      "nothing": "Nothing"
-    }
   },
   "breathe": {
     "startTimer": "Start a 60s timer"
