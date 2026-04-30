@@ -35,8 +35,8 @@
 
 ### Home
 
-- [ ] `/` — `Home` (widgets: pause-first, market, goal, journey pulse, quick capture, evening, onboarding, ordering, pull-to-refresh, query params e.g. `subscribed`)
-- [ ] `/index` → redirect to `/` (smoke)
+- [x] `/` — `Home` (widgets: pause-first, market, goal, journey pulse, quick capture, evening, onboarding, ordering, pull-to-refresh, query params e.g. `subscribed`) — *L2 2026-04-30: `profileLoaded` → `AuthLoading`; onboarding gate; `useHolzen` + `useSubscription` + outlet `pauseReady` → `refreshProfile`; `?subscribed=true` → `refresh` + toast; zen branch mirrors loading/error/limit UI; widget mode has DnD layout + reflection/BTC/journey-pulse/quick-capture/night widgets + categorized `error` / `isPausePersistError` + navigate `/pause` with location state; pull-to-refresh = full `reload`; local-only `supabase` reads for pinned preview + completed count (extra coupling vs central hook).*
+- [x] `/index` → redirect to `/` (smoke) — *L2: `App.tsx` `<Navigate to="/" replace />`.*
 
 ### Library
 
