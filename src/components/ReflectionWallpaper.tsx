@@ -149,12 +149,12 @@ export function ReflectionWallpaper({ message, mood, context, haiku, variant = '
 
       if (error) {
         const parsed = await parseEdgeFunctionError(error);
-        if (parsed.code === 'companions_upgrade_required') {
+        if (parsed.code === 'companions_upgrade_required' || parsed.code === 'wallpaper_upgrade_required') {
           requirePro('wallpapers');
           setOpen(false);
           return;
         }
-        if (parsed.code === 'companions_quota_exceeded' || parsed.code === 'wallpapers_quota_exceeded') {
+        if (parsed.code === 'companions_quota_exceeded' || parsed.code === 'wallpaper_quota_exceeded') {
           showLimitReachedToast({ feature: 'wallpaper', startCheckout });
           setOpen(false);
           return;
