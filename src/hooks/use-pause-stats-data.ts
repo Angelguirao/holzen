@@ -24,6 +24,7 @@ import type {
   PauseCompanionEventRow,
   PauseExpiredReason,
 } from '@/lib/pause-state';
+import { buildDemoFixture, isDemoModeActive } from '@/lib/stats/demo-fixture';
 
 export interface PauseFullRow {
   id: string;
@@ -85,6 +86,9 @@ export function usePauseStatsData(): UsePauseStatsData {
     queryFn: async (): Promise<PauseStatsQueryPayload> => {
       if (!user) {
         return { rows: [], stepEvents: [], companionEvents: [] };
+      }
+      if (isDemoModeActive()) {
+        return buildDemoFixture(user.id);
       }
       const [{ data: rowData }, { data: stepData }, { data: companionData }] =
         await Promise.all([
