@@ -73,7 +73,7 @@
 
 ## 2 — Tier B — Immersive: pause + companion surfaces
 
-- [ ] `/pause` — `PauseSession` (pipeline per Phase 2; add UI/state edge cases here)
+- [x] `/pause` — `PauseSession` (pipeline per Phase 2; add UI/state edge cases here) — *L17 2026-04-30: **Hydration** — `loadSession` → **`parsePauseSessionLocationState`** → `useHolzen` vs **`navPauseInstanceId`** fetch (`pause_instances` + `pause_ai_artifacts`; **`fetchFailed`** only if row missing). **`PauseSessionGate`**: loading / could-not-load / profile loading / **no reflection**. **`saveSession`** syncs progress. **Steps** through **`PauseReflect`** (edge pipeline in children per Phase 2). **`pauseLogStep`**, favorite **`library_items`** update, **`handleDecide`** clears session + home. **Nit:** Supabase **errors** on fetch queries do not set **`fetchFailed`** (only missing instance).*
 - [ ] `/companion/zoom-out/:pauseInstanceId` — `CompanionZoomOutPage`
 - [ ] `/companion/history/:pauseInstanceId` — `CompanionHistoryPage`
 - [ ] `/companion/signal/:pauseInstanceId` — `CompanionSignalPage`
