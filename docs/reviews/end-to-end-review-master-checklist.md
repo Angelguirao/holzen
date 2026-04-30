@@ -44,12 +44,12 @@
 
 ### Journey (hub tabs)
 
-- [ ] `/journey` → redirect to `/journey/stats`
-- [ ] `/journey/stats`
-- [ ] `/journey/insights`
-- [ ] `/journey/badges`
-- [ ] `/journey/activity`
-- [ ] Invalid `/journey/:tab` → normalizes to `stats` (behavior check)
+- [x] `/journey` → redirect to `/journey/stats` — *L4 2026-04-30: `App.tsx` `<Navigate to="/journey/stats" replace />`.*
+- [x] `/journey/stats` — *L4: `Profile` tab `stats` → skeleton until `pause_instances` count query completes → `StatsContentV2` + `useHoldGoalProfile`; no error surface on count failure.*
+- [x] `/journey/insights` — *L4: `ProLock` feature `ai_insights`; skeleton then `AIInsightsPanel` with `completedPauseCount`.*
+- [x] `/journey/badges` — *L4: skeleton then `BadgesPanelV2` (`subscribed`, `holdGoal`). Sibling static route `/journey/badges/guide` → `BadgeGuide` (does not collide with `:tab`).*
+- [x] `/journey/activity` — *L4: `ProLock` feature `history`; `HistoryContent`.*
+- [x] Invalid `/journey/:tab` → normalizes to `stats` (behavior check) — *L4: `isProfileTab` false → `useEffect` `navigate('/journey/stats', { replace: true })`; local `tab` defaults to `'stats'` until redirect.*
 
 ### Settings tree
 
