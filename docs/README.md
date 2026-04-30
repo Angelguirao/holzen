@@ -74,6 +74,7 @@ When you change behavior, update the **one** doc that owns that slice (and ADRs 
 
 ## Reviews
 
+- `reviews/end-to-end-review-master-checklist.md` — **tick-through master list** (every route, settings section, journey tab, edge function, cross-cutting); pair with the skill + template below
 - `reviews/react-spa-review-template.md` — **flow-first** PR checklist + deeper audit template; pairs with the backlog and phased phase docs (Cursor wrapper: `.cursor/skills/holzen-flow-review/SKILL.md`)
 - `reviews/full-app-review-backlog.md` — **inventory of all flows** with hour estimates and sequencing (beyond pause-first phases)
 - `reviews/phase-1-frontend-routing-auth.md` — onboarding review for frontend auth + routing contracts
