@@ -908,6 +908,7 @@ export default function Admin() {
             <MigrationStatus />
             <AppConfigTools />
             <DemoModeToggle />
+            <BadgeDebug />
           </div>
         </TabsContent>
       </Tabs>
