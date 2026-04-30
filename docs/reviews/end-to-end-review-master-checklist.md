@@ -140,7 +140,7 @@
 
 Alphabetical per `supabase/config.toml` (each row: contract, auth, errors, logging).
 
-- [ ] `admin-check-stripe-prices`
+- [x] `admin-check-stripe-prices` — *L55 2026-04-30: **UI** — **`/admin`** → **`AppConfigTools`** → **`StripePriceCheck`**: button **`Run check`** → **`supabase.functions.invoke('admin-check-stripe-prices', { body: {} })`**; **loading** spinner; **toast** on success/failure; **per-row** results (**`maskId`**). **Edge** — **`withRequestLogging`**; **JWT** + **`profiles.is_admin`** else **403**; **`STRIPE_SECRET_KEY`** missing → **200** **`{ ok: false, error, results: [] }`** (UI **`data.error`** strip). Read-only **`stripe.prices.retrieve`** for four env price IDs (**recurring** vs **one_time**). **`config.toml`** **`verify_jwt = true`**. Gap: **no auto-run** on mount — empty until admin clicks.*
 - [ ] `admin-library-preview`
 - [ ] `ai-cost-alert`
 - [ ] `auth-email-hook`
