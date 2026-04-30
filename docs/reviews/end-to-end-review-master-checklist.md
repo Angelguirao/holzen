@@ -126,7 +126,7 @@
 
 ## 7 — Cross-cutting (can overlap with tiers; dedicate at least one pass each)
 
-- [ ] **i18n** — keys, fallbacks, language switch + persistence ([docs/design/information-architecture.md](../design/information-architecture.md) alignment where relevant)
+- [x] **i18n** — keys, fallbacks, language switch + persistence ([docs/design/information-architecture.md](../design/information-architecture.md) alignment where relevant) — *L48 2026-04-30: **`src/i18n.ts`** — **`initReactI18next`**, **`resources` only `en`**, **`fallbackLng: 'en'`**, **`defaultVariables`** (pricing). **`es/pt/de/nl/fr/tr`** JSON files exist under **`src/locales/`** but are **not imported** (comment: disabled). **`AppLayout`** → **`useLanguageSync(language)`** from **`useHolzen`/`useProfile`**: **`changeLanguage`** only if **`language`** is in **`i18n.options.resources`** — **DB `profiles.language` ≠ `en`** (e.g. legacy **`es`**) **does not switch UI** (no error). **Persistence**: **`useProfile.setLanguage`** → **`profiles.language`** update (**no surfaced write error**). **Settings UI**: language control **removed/disabled** (**`SettingsSectionPanels`** comment *English only for now*; **`useSettingsModel`** **`void _language`**). **`t(..., { defaultValue })`** used in spots for **missing-key resilience**. **Edge**: **`useHolzen`** passes **`language`** into **`holzen-reflect`** body.*
 - [ ] **PWA / SW** — `src/sw.ts`, update prompts, offline ([AGENTS.md](../../AGENTS.md))
 - [ ] **Push + in-app notifications** — `register-push`, bell UI, cron-driven surfaces
 - [ ] **Subscription UX** — `useSubscription`, success/cancel return, portal, billing history
