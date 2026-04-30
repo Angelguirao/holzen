@@ -83,7 +83,7 @@
 
 ## 3 — Tier C — Regulation + practice (full-screen)
 
-- [ ] `/tools/breathe` — `Breathe`
+- [x] `/tools/breathe` — `Breathe` — *L22 2026-04-30: **`ProtectedRoute`**, lazy **`/tools/breathe`**. **`useProGate`**: **`isPending`** → full-screen spinner; **`!isPro`** → **`ProLock` `feature="stillness"`** + back (**`navigate(-1)`**). **Pro path**: **`loadData`** every **30s** — **`fetchBtcData`** (`@/lib/btc`, external **CoinGecko / mempool / FNG**-style fetches, **`.catch(() => null)`**) + **`fetchBlockData`** (direct **`mempool.space`** `fetch`); failures → **`null`** (**no** toast / error banner; volatility **`level`** stays default **calm** if no BTC; block height / mempool UI **omitted** when **`blockData`** null). **Deep mode**: timers, **`fetchBlockData`** poll **15s**, haptics + tone on new block; **`document.body`** **`ambient-active`** + **`overflow: hidden`**. **`VOID_CONTEMPLATIONS`** hardcoded **English** (not **`t()`**). **No Holzen DB / edge** on this page.*
 - [ ] `/tools/ground` — `Ground` (index)
 - [ ] `/tools/ground/history` — `GroundHistory`
 - [ ] `/tools/practice/checkin` — `PracticeCheckIn`
