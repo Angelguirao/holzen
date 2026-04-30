@@ -1,6 +1,6 @@
 # React SPA review template (flow-first)
 
-**Purpose:** Repeatable **how** to review a React SPA—especially when you already know **what** to cover from [full-app-review-backlog.md](full-app-review-backlog.md) and the phased [phase-1-frontend-routing-auth.md](phase-1-frontend-routing-auth.md) … [phase-8-rls-hardening-service-role-policies.md](phase-8-rls-hardening-service-role-policies.md) series.
+**Purpose:** Repeatable **how** to review a React SPA—especially when you already know **what** to cover from [full-app-review-backlog.md](full-app-review-backlog.md) and the phased [phase-1-frontend-routing-auth.md](phase-1-frontend-routing-auth.md) … [phase-8-rls-hardening-service-role-policies.md](phase-8-rls-hardening-service-role-policies.md) series. For an **exhaustive checkbox inventory**, use [end-to-end-review-master-checklist.md](end-to-end-review-master-checklist.md).
 
 **Philosophy (short):** Neither “frontend-first” nor “backend-first” alone is enough. A SPA is **user journeys → state → side effects → state → UI**. Trace **flows** first; use **screen/component** passes second, to judge local quality after the system makes sense.
 
@@ -121,6 +121,7 @@ A short wrapper lives at **`.cursor/skills/holzen-flow-review/SKILL.md`** so age
 
 ## Related
 
+- [end-to-end-review-master-checklist.md](end-to-end-review-master-checklist.md) — **exhaustive** route / edge / cross-cutting checkboxes for a full pass
 - [full-app-review-backlog.md](full-app-review-backlog.md) — **inventory and sequencing** of Holzen flows
 - [fundamentals/refactoring-strategy.md](../fundamentals/refactoring-strategy.md) — **how to refactor** after review without big-bang rewrites
 - [fundamentals/navigating-the-codebase.md](../fundamentals/navigating-the-codebase.md) — **where** code and patterns live
