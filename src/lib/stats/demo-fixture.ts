@@ -13,9 +13,13 @@ import type {
   PauseCompanionEventRow,
 } from '@/lib/pause-state';
 
-const MOODS_INITIAL = ['anxious', 'reactive', 'tense', 'restless', 'fearful', 'uncertain'];
-const MOODS_SHIFT = ['calm', 'composed', 'steady', 'grounded', 'clear', 'patient'];
-const OUTCOMES = ['hold', 'hold', 'hold', 'hold', 'buy', 'sell']; // weighted toward hold
+// Must match the moods/outcomes the Stats cards know about.
+// Composure map (regulation/mood-shift): calm/detached/uncertain/excited/anxious/fearful/greedy/fomo
+const MOODS_INITIAL = ['anxious', 'fearful', 'fomo', 'greedy', 'excited', 'uncertain'];
+const MOODS_SHIFT = ['calm', 'detached', 'uncertain', 'calm', 'detached', 'calm'];
+// Hold-rate metrics expect 'held' / 'nothing' / 'bought' / 'sold'.
+const OUTCOMES = ['held', 'held', 'held', 'nothing', 'held', 'bought', 'sold'];
+const SEVERITIES = ['mild', 'mild', 'moderate', 'moderate', 'high'] as const;
 const COMPANIONS = ['signal', 'grounding', 'zoom_out', 'history', 'haiku'];
 
 function seeded(seed: number) {
@@ -50,18 +54,28 @@ export function buildDemoFixture(userId: string): DemoFixture {
     const initialMood = MOODS_INITIAL[Math.floor(rand() * MOODS_INITIAL.length)];
     const shiftMood = MOODS_SHIFT[Math.floor(rand() * MOODS_SHIFT.length)];
     const outcome = OUTCOMES[Math.floor(rand() * OUTCOMES.length)];
-    const companionCount = 1 + Math.floor(rand() * 3);
+    // ~35% of completed pauses use no companions so the "without" bucket
+    // in PerspectiveToolsImpactCard has ≥5 samples.
+    const noCompanions = rand() < 0.35;
+    const companionCount = noCompanions ? 0 : 1 + Math.floor(rand() * 3);
     const usedCompanions = COMPANIONS
       .slice()
       .sort(() => rand() - 0.5)
       .slice(0, companionCount);
+    const severity = SEVERITIES[Math.floor(rand() * SEVERITIES.length)];
+    const change24h = (rand() - 0.45) * (severity === 'high' ? 14 : severity === 'moderate' ? 7 : 3);
 
     rows.push({
       id,
       user_id: userId,
       state: isCompleted ? 'completed' : (rand() > 0.5 ? 'expired' : 'dismissed'),
       source: 'demo',
-      context_snapshot: { btc_change_percent: (rand() - 0.5) * 12, btc_direction: rand() > 0.5 ? 'up' : 'down' },
+      context_snapshot: {
+        btc_change_percent: change24h,
+        change_24h_pct: change24h,
+        btc_direction: change24h >= 0 ? 'up' : 'down',
+        severity,
+      },
       context_fingerprint: `demo-fp-${i}`,
       window_starts_at: created.toISOString(),
       window_ends_at: new Date(created.getTime() + 30 * 60 * 1000).toISOString(),
@@ -81,7 +95,7 @@ export function buildDemoFixture(userId: string): DemoFixture {
       tags: isCompleted && rand() > 0.5 ? ['demo', rand() > 0.5 ? 'volatility' : 'patience'] : null,
       is_favorite: rand() > 0.85,
       counted_companion_count: isCompleted ? companionCount : 0,
-      counted_companion_types: isCompleted ? usedCompanions : null,
+      counted_companion_types: isCompleted && companionCount > 0 ? usedCompanions : null,
       reflection_text: isCompleted ? 'Markets move. You stayed with your breath.' : null,
       haiku_text: isCompleted && rand() > 0.7 ? 'Charts rise and fall slow / a single satoshi waits / breath returns to breath' : null,
     });
