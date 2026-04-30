@@ -24,14 +24,14 @@
 
 ### Global shell (under `AppLayout` + shared providers)
 
-- [ ] `AppLayout` / `BottomNav` / main chrome
-- [ ] `NotificationBell` + notification deep links (if any)
-- [ ] `PauseReadyBanner` + interaction with pause entry
-- [ ] `useLanguageSync` / locale behavior
-- [ ] `OfflineBanner`, `CookieConsent`, `ScrollToTop`, `Sonner` (as relevant to flows you test)
-- [ ] `ErrorBoundary` + `FeedbackWidgetGate` (signed-in only)
-- [ ] `RouterLocationLog` / routing instrumentation (sanity: no PII leaks)
-- [ ] `CheckoutGuardCleanup` (checkout return UX)
+- [x] `AppLayout` / `BottomNav` / main chrome — *L1 2026-04-30: layout mounts `useHolzen` for `language` + `useAutoTrigger`; inner `Suspense` + `PageChunkFallback` (a11y status); tab chunk prefetch idle/timeout.*
+- [x] `NotificationBell` + notification deep links (if any) — *L1: header placement; deep links deferred to dedicated notification pass.*
+- [x] `PauseReadyBanner` + interaction with pause entry — *L1: `pauseReady`/`dismiss` from `useAutoTrigger`; shown when `!isHome`.*
+- [x] `useLanguageSync` / locale behavior — *L1: `useLanguageSync(language)` from profile; i18n `changeLanguage` only for supported resource keys.*
+- [x] `OfflineBanner`, `CookieConsent`, `ScrollToTop`, `Sonner` (as relevant to flows you test) — *L1: `App.tsx` wiring; `ScrollToTop` on pathname; Sonner inside `TooltipProvider`.*
+- [x] `ErrorBoundary` + `FeedbackWidgetGate` (signed-in only) — *L1: root boundary; feedback only when `useAuth().user`.*
+- [x] `RouterLocationLog` / routing instrumentation (sanity: no PII leaks) — *L1: logs pathname, authLoading, signedIn, `user?.id?.slice(0,8)` only.*
+- [x] `CheckoutGuardCleanup` (checkout return UX) — *L1: `scheduleCheckoutGuardCleanup` on mount; covered by `src/test/checkout-guard-cleanup.test.ts`.*
 
 ### Home
 
