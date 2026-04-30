@@ -199,7 +199,7 @@ Alphabetical per `supabase/config.toml` (each row: contract, auth, errors, loggi
 ## 10 — After review
 
 - [ ] File tickets / backlog entries for findings ([backlog/backlog.md](../backlog/backlog.md) or new `backlog/*.md` rows)
-- [ ] Refactors: [fundamentals/refactoring-strategy.md](../fundamentals/refactoring-strategy.md) + [backlog/react-page-and-hook-splitting.md](../backlog/react-page-and-hook-splitting.md)
+- [ ] Refactors: [fundamentals/refactoring-strategy.md](../fundamentals/refactoring-strategy.md) (includes **full-stack** touchpoints) + [backlog/react-page-and-hook-splitting.md](../backlog/react-page-and-hook-splitting.md) for UI extraction backlog
 - [ ] If shipping: [ops/deployment-sync-guide.md](../ops/deployment-sync-guide.md)
 
 ---
