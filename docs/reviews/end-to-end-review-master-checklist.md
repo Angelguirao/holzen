@@ -190,7 +190,7 @@ Alphabetical per `supabase/config.toml` (each row: contract, auth, errors, loggi
 
 ## 9 — Optional deep passes (not every route)
 
-- [ ] **Browser 360°** — [fundamentals/browser-360-mcp-playbook.md](../fundamentals/browser-360-mcp-playbook.md) on `/` and one heavy route
+- [x] **Browser 360°** — *L98 2026-04-30: **Playbook** — [browser-360-mcp-playbook.md](../fundamentals/browser-360-mcp-playbook.md): order (navigate → network → console → Lighthouse → performance trace → insights); **Chrome DevTools MCP** in doc vs **Cursor `cursor-ide-browser`** (snapshot/console/network only). **Targets**: **`/`** on **`http://localhost:8080`** + heavy second pass (**`/journey/stats`** or **`/tools/ground`**). **This session**: MCP navigate to **`/`** → host error (dev server not running). **Prior run**: [reports/2026-04-03-home-localhost-360-analysis.md](../reports/2026-04-03-home-localhost-360-analysis.md). **Follow-up**: full pass with dev + Chrome DevTools MCP; **`[holzen:*]`** (`holzen-console.ts`); backlog **lighthouse-a11y-home**, **service-worker-registration-dev**.*
 - [ ] **E2E automation gap** — [backlog/e2e-browser-automation.md](../backlog/e2e-browser-automation.md) (plan tests for flows you care most about)
 - [ ] **Repo size / review throughput** — [fundamentals/codebase-size-and-review-practices.md](../fundamentals/codebase-size-and-review-practices.md)
 
