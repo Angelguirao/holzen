@@ -211,3 +211,31 @@ Alphabetical per `supabase/config.toml` (each row: contract, auth, errors, loggi
 | [full-app-review-backlog.md](full-app-review-backlog.md) | Hour estimates, sequencing narrative, dependencies |
 | [react-spa-review-template.md](react-spa-review-template.md) | PR + audit questions per slice |
 | [design/information-architecture.md](../design/information-architecture.md) | Product IA vs routes |
+
+---
+
+## 11 — Appendix: prompt for an agent review loop (copy-paste)
+
+Use this (or shorten it) when you want the agent to **review one slice per loop**, optionally **fix** small issues in the same loop, **update this checklist** (`[ ]` → `[x]` for completed items), and **`git commit`** before stopping.
+
+```text
+Holzen review loop — follow the repo workflow:
+
+1. Read `.cursor/skills/holzen-flow-review/SKILL.md` and use `docs/reviews/end-to-end-review-master-checklist.md` + `docs/reviews/react-spa-review-template.md`.
+
+2. One loop = ONE scope from the master checklist (e.g. next unchecked item in §1 Tier A shell, OR one route, OR one edge function together with its UI caller). Trace flow-first: UI → state → Supabase / invokeEdge → state → UI. Note loading/error/empty gaps.
+
+3. Outcomes this loop (pick what applies):
+   - If only analysis: short written findings (bullets) and mark the checklist item [x] in `docs/reviews/end-to-end-review-master-checklist.md`.
+   - If you fix bugs or small refactors: minimal diff, match `docs/fundamentals/refactoring-strategy.md`; do not widen scope.
+
+4. At end of loop: `git add` relevant files and commit with a message like `review: tier A shell — notes` or `fix: <area> <what>` (one logical commit per loop).
+
+5. Stop after the commit and tell me what you checked and what’s next unchecked.
+
+Resume hint: start from §<N> first unchecked `[ ]` unless I specify otherwise below.
+
+[Optional: “Focus only on …” or “Do not change code this loop, checklist + notes only.”]
+```
+
+**Tips:** Narrow scope per loop (half a day max of surface area). If a loop finds large work, **ticket it** and still commit checklist progress + backlog stub rather than a huge refactor in one commit.
