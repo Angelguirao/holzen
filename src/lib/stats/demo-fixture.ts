@@ -145,3 +145,21 @@ export function isDemoModeActive(): boolean {
     return false;
   }
 }
+
+export const DEMO_MODE_STORAGE_KEY = 'holzen_demo';
+export const DEMO_MODE_EVENT = 'holzen:demo-mode-changed';
+
+export function setDemoMode(enabled: boolean): void {
+  if (typeof window === 'undefined') return;
+  try {
+    if (enabled) {
+      window.localStorage.setItem(DEMO_MODE_STORAGE_KEY, '1');
+    } else {
+      window.localStorage.removeItem(DEMO_MODE_STORAGE_KEY);
+    }
+    window.dispatchEvent(new CustomEvent(DEMO_MODE_EVENT, { detail: { enabled } }));
+  } catch {
+    /* ignore */
+  }
+}
+
