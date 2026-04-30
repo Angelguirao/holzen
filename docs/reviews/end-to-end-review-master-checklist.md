@@ -95,7 +95,7 @@
 
 ## 4 — Tier D — Public, marketing, account recovery
 
-- [ ] `/welcome` — `Landing` (`PublicOnlyRoute`)
+- [x] `/welcome` — `Landing` (`PublicOnlyRoute`) — *L29 2026-04-30: **`PublicOnlyRoute`** — **`AuthLoading`** while session resolves; **signed-in** → **`Navigate` `/` replace**. **Page** — lazy **`Landing`**, marketing sections + **`navigate('/auth')`** / **`/auth?view=sign-up`**; **`?ref=`** → **`localStorage`** **`holzen_ref`**. **`PageMeta`** title/description **hardcoded English** (not **`t()`**). **`PRICING`** in FAQ. **`LandingTestimonials`** — **`supabase.from('testimonials')`** approved rows (**.then** only; **`error` ignored** — section **hidden** on failure / empty). **No `invokeEdge`**. **Rest** — static **`LandingComparison`**, i18n-driven copy, Framer scroll animations.*
 - [ ] `/auth` — `Auth` (`PublicOnlyRoute`)
 - [ ] `/reset-password` — `ResetPassword`
 - [ ] `/terms` — `Terms`
