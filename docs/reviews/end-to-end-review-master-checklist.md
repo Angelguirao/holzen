@@ -198,7 +198,7 @@ Alphabetical per `supabase/config.toml` (each row: contract, auth, errors, loggi
 
 ## 10 — After review
 
-- [ ] File tickets / backlog entries for findings ([backlog/backlog.md](../backlog/backlog.md) or new `backlog/*.md` rows)
+- [x] File tickets / backlog entries for findings ([backlog/backlog.md](../backlog/backlog.md) or new `backlog/*.md` rows) — *L101 2026-04-30: **Indexed in checklist** — detailed gaps live in **this file** (**§8** edges **L59–L97**, **§9** **L98–L100**) vs duplicating dozens of new tickets. **`backlog/backlog.md`**: added **“End-to-end review (indexed findings)”** pointer table + **Master table** row linking here; **next** when scheduling: promote specific gaps (e.g. **`suggest-ritual`** no SPA, **`EdgeCoverage`** logger drift, **`holzen-reflect`** client error mapping) into existing or new **`backlog/*.md`** rows.*
 - [ ] Refactors: [fundamentals/refactoring-strategy.md](../fundamentals/refactoring-strategy.md) (includes **full-stack** touchpoints) + [backlog/react-page-and-hook-splitting.md](../backlog/react-page-and-hook-splitting.md) for UI extraction backlog
 - [ ] If shipping: [ops/deployment-sync-guide.md](../ops/deployment-sync-guide.md)
 

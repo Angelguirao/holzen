@@ -18,6 +18,12 @@ Rule of thumb used here:
 | **Look up a file name** | [Alphabetical index](#alphabetical-index-file-name--one-line). |
 | **See every ticket in one table** | [Master table (all items)](#master-table-all-items). |
 
+### End-to-end review (indexed findings)
+
+| When | Index | Notes |
+|------|--------|-------|
+| 2026-04-30 | [end-to-end-review-master-checklist.md](../reviews/end-to-end-review-master-checklist.md) | Flow-first notes: **§8** alphabetical edges (**L59–L97**), **§9** browser / E2E / repo-size (**L98–L100**). Use as the **source list**; open or extend **`backlog/*.md`** tickets when you schedule fixes — avoid one-off duplicates. |
+
 **Companion / Signal design** (narrative + tables, not a one-off ticket): [systems/pause/companions/signal.md §5](../systems/pause/companions/signal.md).
 
 ### Recently shipped (detail still in ticket files)
@@ -173,6 +179,7 @@ Sortable mentally by **Work type** column; links go to the full ticket.
 | Ops / security | [hosting-production-compression.md](hosting-production-compression.md) | **Done (2026-04).** Prod HTML compression verify — see ticket |
 | Quality | [quality-gates-false-positives.md](quality-gates-false-positives.md) | **Partial (2026-04).** `quality_gate_reject` + DB rows + regex tune — see ticket |
 | Testing | [e2e-browser-automation.md](e2e-browser-automation.md) | UI journeys (E2E) vs Bruno API review |
+| Review | [end-to-end-review-master-checklist.md](../reviews/end-to-end-review-master-checklist.md) | **2026-04-30.** Annotated gap index (§8 edges **L59–L97**, §9 **L98–L100**); promote items here when owning work |
 | Frontend | [typed-navigation-state.md](typed-navigation-state.md) | **Done (2026-04).** Parsers in `router-location-state.ts` — see ticket |
 | Frontend | [route-level-code-splitting.md](route-level-code-splitting.md) | **Done (2026-04).** **`React.lazy`** in `App.tsx` — see ticket |
 | Frontend | [react-page-and-hook-splitting.md](react-page-and-hook-splitting.md) | **Partial (2026-04).** Pages + **`use-holzen`** lib helpers — see ticket |
