@@ -98,6 +98,22 @@ This aligns with **navigating-the-codebase §6.1**: not every concern needs `use
 
 ---
 
+## Frontend: scope of this strategy
+
+This document is **comprehensive for structural client refactors**: extraction order (UI → pure `lib` → glue), hook vs `src/lib` boundaries, colocation, and explicit anti-patterns. It is **not** a full playbook for every frontend concern—pair refactors with the right doc when you touch that surface:
+
+| Concern | Where to look |
+|---------|----------------|
+| **Design system / IA** | [design/nox/README.md](../design/nox/README.md), [design/information-architecture.md](../design/information-architecture.md) |
+| **Accessibility** | Acceptance criteria on changed UI; systemic passes (e.g. [backlog/lighthouse-a11y-home.md](../backlog/lighthouse-a11y-home.md)) |
+| **i18n** | Match existing `useTranslation` / key patterns in the same feature |
+| **Analytics & flags** | [ops/event-taxonomy.md](../ops/event-taxonomy.md), [ops/feature-flags.md](../ops/feature-flags.md) when moving or renaming instrumented UI |
+| **Routing & guards** | [systems/routing/route-gating-system.md](../systems/routing/route-gating-system.md), `src/App.tsx` |
+| **Runtime / E2E QA** | [browser-360-mcp-playbook.md](browser-360-mcp-playbook.md), [e2e-browser-automation.md](../backlog/e2e-browser-automation.md) |
+| **Bundle / lazy routes** | [route-level-code-splitting.md](../backlog/route-level-code-splitting.md) (already linked above) |
+
+---
+
 ## Full-stack and backend-adjacent refactors
 
 The React-focused sections above do **not** imply that all refactors are UI-only. Many “refactors” are really **contract changes**: API shapes, RLS visibility, edge handler structure. Treat those as **ordered, reversible steps** (schema ↔ client ↔ types), not as drive-by edits.
@@ -115,15 +131,10 @@ The React-focused sections above do **not** imply that all refactors are UI-only
 
 ---
 
-## Are we “following best practices everywhere”?
-
-**No** — and no mature repo does in every dimension at once. Holzen encodes **non-negotiables** in ops docs and CI gates (migrations, edge logging manifest, version sync, etc.) and **preferences** in this file and AGENTS. Gaps are normal: close them by **priority** (auth, billing, RLS, user data) using the review master checklist and phased reviews, not by expecting a single strategy doc to cover every language and subsystem in equal depth.
-
----
-
 ## When you’re done reading this
 
 - For **what’s already done**, see the progress table in [`react-page-and-hook-splitting.md`](../backlog/react-page-and-hook-splitting.md).
 - For **where code lives**, see [`navigating-the-codebase.md`](navigating-the-codebase.md) §6–8.
 - For **automation conventions**, see [`AGENTS.md`](../../AGENTS.md).
 - For **ship order** when migrations or edges change, see [`docs/ops/deployment-sync-guide.md`](../ops/deployment-sync-guide.md).
+- For **flow-first review** before refactors, see [`docs/reviews/react-spa-review-template.md`](../reviews/react-spa-review-template.md) and [`docs/reviews/end-to-end-review-master-checklist.md`](../reviews/end-to-end-review-master-checklist.md).
