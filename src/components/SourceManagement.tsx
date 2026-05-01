@@ -49,6 +49,8 @@ export function SourceManagement() {
   const [catalog, setCatalog] = useState<CatalogSource[]>([]);
   const [prefs, setPrefs] = useState<UserPref[]>([]);
   const [loading, setLoading] = useState(true);
+  const [loadFailed, setLoadFailed] = useState(false);
+  const [reloadNonce, setReloadNonce] = useState(0);
   const [activeTab, setActiveTab] = useState('signal');
   const [addingCustom, setAddingCustom] = useState(false);
   const [customName, setCustomName] = useState('');

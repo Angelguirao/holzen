@@ -241,6 +241,8 @@ export function useHolzen() {
           haiku?: CompanionData['haiku'];
           grounding_title?: string | null;
           grounding_body?: string | null;
+          grounding_citation?: string | null;
+          grounding_url?: string | null;
         }>('holzen-reflect', {
           body: {
             context: ctx,
