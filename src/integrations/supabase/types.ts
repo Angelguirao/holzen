@@ -2193,14 +2193,6 @@ export type Database = {
       }
     }
     Views: {
-      library_archive_echo_items: {
-        Row: Database["public"]["Tables"]["library_items"]["Row"]
-        Relationships: []
-      },
-      library_archive_pauses_tab_items: {
-        Row: Database["public"]["Tables"]["library_items"]["Row"]
-        Relationships: []
-      },
       v_ai_spend_month_global: {
         Row: {
           total_usd: number | null
@@ -2539,14 +2531,12 @@ export type Database = {
           has_outcome_logged: boolean | null
           has_shift_emotion_logged: boolean | null
           id: string | null
-          initial_emotion_intensity: number | null
           initial_mood: string | null
           is_favorite: boolean | null
           metadata: Json | null
           note_text: string | null
           outcome: string | null
           reflection_text: string | null
-          shift_emotion_intensity: number | null
           shift_mood: string | null
           source: string | null
           state: Database["public"]["Enums"]["pause_state"] | null
@@ -2577,14 +2567,12 @@ export type Database = {
           has_outcome_logged?: never
           has_shift_emotion_logged?: never
           id?: string | null
-          initial_emotion_intensity?: never
           initial_mood?: never
           is_favorite?: never
           metadata?: Json | null
           note_text?: never
           outcome?: never
           reflection_text?: never
-          shift_emotion_intensity?: never
           shift_mood?: never
           source?: string | null
           state?: Database["public"]["Enums"]["pause_state"] | null
@@ -2615,14 +2603,12 @@ export type Database = {
           has_outcome_logged?: never
           has_shift_emotion_logged?: never
           id?: string | null
-          initial_emotion_intensity?: never
           initial_mood?: never
           is_favorite?: never
           metadata?: Json | null
           note_text?: never
           outcome?: never
           reflection_text?: never
-          shift_emotion_intensity?: never
           shift_mood?: never
           source?: string | null
           state?: Database["public"]["Enums"]["pause_state"] | null
@@ -2682,7 +2668,6 @@ export type Database = {
           expired: number | null
           expired_context_lost: number | null
           expired_ineligible: number | null
-          expired_open_max_age: number | null
           expired_superseded: number | null
           expired_system_cancelled: number | null
           expired_window_elapsed: number | null
@@ -2774,21 +2759,6 @@ export type Database = {
       get_holzen_number: { Args: never; Returns: Json }
       get_signup_gate: { Args: never; Returns: Json }
       is_admin: { Args: never; Returns: boolean }
-      library_archive_list_page: {
-        Args: {
-          p_favorites_only?: boolean
-          p_limit?: number
-          p_main_pause_only?: boolean
-          p_offset?: number
-          p_search?: string | null
-          p_segment: string
-          p_smart_ids?: string[] | null
-          p_sort?: string
-          p_source_types?: string[] | null
-          p_tag?: string | null
-        }
-        Returns: Database["public"]["Tables"]["library_items"]["Row"][]
-      }
       move_to_dlq: {
         Args: {
           dlq_name: string
@@ -2815,8 +2785,6 @@ export type Database = {
         Args: { _collection_id: string; _user_id: string }
         Returns: boolean
       }
-      pause_adopt_pending_offer: { Args: never; Returns: Json }
-      pause_decline_pending_offer: { Args: never; Returns: Json }
       pause_create_or_reuse: {
         Args: {
           p_context_fingerprint: string
@@ -2889,17 +2857,10 @@ export type Database = {
       pause_expired_reason:
         | "context_lost"
         | "window_elapsed"
-        | "open_max_age"
         | "superseded"
         | "ineligible_user_state"
         | "system_cancelled"
-      pause_state:
-        | "active"
-        | "engaged"
-        | "pending"
-        | "completed"
-        | "dismissed"
-        | "expired"
+      pause_state: "active" | "engaged" | "completed" | "dismissed" | "expired"
       pause_step_type:
         | "breath_completed"
         | "initial_emotion_logged"
@@ -3040,12 +3001,11 @@ export const Constants = {
       pause_expired_reason: [
         "context_lost",
         "window_elapsed",
-        "open_max_age",
         "superseded",
         "ineligible_user_state",
         "system_cancelled",
       ],
-      pause_state: ["active", "engaged", "pending", "completed", "dismissed", "expired"],
+      pause_state: ["active", "engaged", "completed", "dismissed", "expired"],
       pause_step_type: [
         "breath_completed",
         "initial_emotion_logged",
