@@ -1,4 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
+import { useTranslation } from 'react-i18next';
+import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/use-auth';
 import { holzenLog } from '@/lib/holzen-console';
@@ -16,6 +18,7 @@ export interface ProfileLoadReflectionData {
 
 export function useProfile() {
   const { user } = useAuth();
+  const { t } = useTranslation();
 
   const [threshold, setThresholdState] = useState(5);
   const [thresholdDown, setThresholdDownState] = useState(5);
@@ -404,9 +407,18 @@ export function useProfile() {
     },
     language,
     setLanguage: async (val: string) => {
+      if (!user) {
+        setLanguageState(val);
+        return;
+      }
+      const prev = language;
       setLanguageState(val);
-      if (!user) return;
-      await supabase.from('profiles').update({ language: val }).eq('user_id', user.id);
+      const { error } = await supabase.from('profiles').update({ language: val }).eq('user_id', user.id);
+      if (error) {
+        holzenLog.error('profile language update failed', error);
+        setLanguageState(prev);
+        toast.error(t('common.profileWriteFailed'));
+      }
     },
     companionPrefs,
     setCompanionPref,

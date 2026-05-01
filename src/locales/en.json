@@ -56,7 +56,8 @@
     "until": "Until",
     "offlineBanner": "You're offline",
     "connectivityDegraded": "Can't reach Holzen right now — check your connection or try again shortly.",
-    "profileLoadFailed": "We couldn't load your profile from the server. Some settings may be out of date until this succeeds."
+    "profileLoadFailed": "We couldn't load your profile from the server. Some settings may be out of date until this succeeds.",
+    "profileWriteFailed": "We couldn't save that change. Please try again."
   },
   "auth": {
     "restoringSession": "Restoring your session…",
