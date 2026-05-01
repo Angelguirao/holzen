@@ -149,10 +149,12 @@ export default function Library() {
     threshold: 70,
   });
 
+  const loadMoreRootMargin = mainSegment === 'echoes' ? '80px' : '200px';
   const loadMoreRef = useInfiniteScroll({
     hasMore: library.hasMore,
     loading: library.loadingMore,
     onLoadMore: library.loadMore,
+    rootMargin: loadMoreRootMargin,
   });
 
   const { items, collections, getPauseArchiveMeta } = library;
@@ -286,7 +288,8 @@ export default function Library() {
       if (!hasAnyEchoesContent) {
         return {
           emptyStateMessage: t('library.emptyEchoesNone', {
-            defaultValue: 'Longer companion reads will appear here when they are saved to your archive.',
+            defaultValue:
+              'No echoes yet. They appear when a pause ends before Reflect and reads are saved to your archive.',
           }),
           emptyStateHint: '',
           emptyCtaLabel: undefined as string | undefined,
@@ -298,7 +301,7 @@ export default function Library() {
       if (!hasAnyPauseArchiveContent && pausesScope === 'all' && !hasActiveFilters) {
         return {
           emptyStateMessage: t('library.emptyPauseFirst', {
-            defaultValue: 'Your content will appear here after your first pause.',
+            defaultValue: 'After your first pause, saved cards and notes show up here.',
           }),
           emptyStateHint: '',
           emptyCtaLabel: t('library.emptyPauseFirstCta', { defaultValue: 'Start a pause' }),
@@ -308,7 +311,7 @@ export default function Library() {
       if (pausesScope === 'favorites' && filtered.length === 0 && hasAnyPauseArchiveContent) {
         return {
           emptyStateMessage: t('library.emptyFavs', {
-            defaultValue: 'Nothing saved yet. Keep what matters.',
+            defaultValue: 'No favorites yet. Tap the heart on a card to save it here.',
           }),
           emptyStateHint: '',
           emptyCtaLabel: undefined as string | undefined,
@@ -457,10 +460,11 @@ export default function Library() {
             {mainSegment === 'pauses'
               ? t('library.archiveIntroPauses', {
                   defaultValue:
-                    'See content from your recent pauses and favourites. Save what matters. Explore with filters.',
+                    'Pauses you finished in Holzen. Open a row for details; use filters to narrow by type or tag.',
                 })
               : t('library.archiveIntroEchoes', {
-                  defaultValue: 'Reflections from pauses you missed. Read at your own pace. Save what speaks to you.',
+                  defaultValue:
+                    'Pauses that ended before Reflect. Save companion reads to your line here — anything you opened in Reflect stays under Pauses.',
                 })}
           </p>
 
@@ -485,7 +489,7 @@ export default function Library() {
                     pausesScope === 'favorites' ? 'bg-foreground text-background' : 'border border-foreground/80 bg-transparent text-foreground',
                   )}
                 >
-                  {t('library.pillFavs', { defaultValue: 'Favs' })}
+                  {t('library.pillFavs', { defaultValue: 'Favorites' })}
                 </button>
                 <div className="flex-1" />
                 <DropdownMenu>
@@ -645,8 +649,20 @@ export default function Library() {
           />
 
           {library.hasMore && (
-            <div ref={loadMoreRef} className="flex items-center justify-center py-6">
-              {library.loadingMore && <Loader2 className="h-4 w-4 animate-spin text-muted-foreground/40" />}
+            <div className="space-y-2">
+              {mainSegment === 'echoes' && (
+                <p className="px-1 text-center text-[11px] leading-snug text-muted-foreground/70">
+                  {t('library.echoesLoadMoreHint', {
+                    defaultValue:
+                      'We load your archive in order. Keep scrolling to reach older pauses — Echoes may appear in later batches.',
+                  })}
+                </p>
+              )}
+              <div ref={loadMoreRef} className="flex min-h-10 items-center justify-center py-4">
+                {library.loadingMore && (
+                  <Loader2 className="h-4 w-4 animate-spin text-muted-foreground/40" aria-hidden />
+                )}
+              </div>
             </div>
           )}
         </div>

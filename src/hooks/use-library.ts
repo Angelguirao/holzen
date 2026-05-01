@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback, useRef } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
@@ -236,7 +236,11 @@ export function useLibrary(options?: UseLibraryOptions) {
       setListLoadFailed(false);
       return;
     }
-    setLoading(true);
+    // Swap list to this mode’s cache immediately so Pauses/Favs never briefly shows the wrong query’s rows.
+    const cached = readCache<LibraryItem[]>(itemsCacheKey) ?? [];
+    setItems(cached);
+    setLoading(cached.length === 0);
+
     let itemsQuery = supabase
       .from('library_items')
       .select('*')
@@ -322,15 +326,6 @@ export function useLibrary(options?: UseLibraryOptions) {
     setHasMore(newItems.length === PAGE_SIZE);
     setLoadingMore(false);
   }, [user, loadingMore, hasMore, items.length, hydratePauseMeta, t, favoritesOnly, itemsCacheKey]);
-
-  const itemsCacheKeyRef = useRef(itemsCacheKey);
-  useEffect(() => {
-    if (itemsCacheKeyRef.current === itemsCacheKey) return;
-    itemsCacheKeyRef.current = itemsCacheKey;
-    if (!user) return;
-    setItems(readCache<LibraryItem[]>(itemsCacheKey) ?? []);
-    setHasMore(true);
-  }, [user, itemsCacheKey]);
 
   useEffect(() => { fetchAll(); }, [fetchAll]);
 
