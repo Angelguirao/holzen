@@ -20,7 +20,14 @@ export function isPrimaryTabActive(pathname: string, key: PrimaryTabKey): boolea
   if (key === 'home') return pathname === '/';
   if (key === 'tools') return pathname === TOOLS_PREFIX || pathname.startsWith(`${TOOLS_PREFIX}/`);
   if (key === 'journey') return pathname.startsWith(JOURNEY_PREFIX);
-  if (key === 'library') return pathname === '/library' || pathname.startsWith('/library/');
+  if (key === 'library') {
+    return (
+      pathname === '/library' ||
+      pathname.startsWith('/library/') ||
+      pathname === '/archive' ||
+      pathname.startsWith('/archive/')
+    );
+  }
   if (key === 'settings') return pathname === '/settings' || pathname.startsWith('/settings/');
   return false;
 }

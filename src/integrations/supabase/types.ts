@@ -2539,12 +2539,14 @@ export type Database = {
           has_outcome_logged: boolean | null
           has_shift_emotion_logged: boolean | null
           id: string | null
+          initial_emotion_intensity: number | null
           initial_mood: string | null
           is_favorite: boolean | null
           metadata: Json | null
           note_text: string | null
           outcome: string | null
           reflection_text: string | null
+          shift_emotion_intensity: number | null
           shift_mood: string | null
           source: string | null
           state: Database["public"]["Enums"]["pause_state"] | null
@@ -2575,12 +2577,14 @@ export type Database = {
           has_outcome_logged?: never
           has_shift_emotion_logged?: never
           id?: string | null
+          initial_emotion_intensity?: never
           initial_mood?: never
           is_favorite?: never
           metadata?: Json | null
           note_text?: never
           outcome?: never
           reflection_text?: never
+          shift_emotion_intensity?: never
           shift_mood?: never
           source?: string | null
           state?: Database["public"]["Enums"]["pause_state"] | null
@@ -2611,12 +2615,14 @@ export type Database = {
           has_outcome_logged?: never
           has_shift_emotion_logged?: never
           id?: string | null
+          initial_emotion_intensity?: never
           initial_mood?: never
           is_favorite?: never
           metadata?: Json | null
           note_text?: never
           outcome?: never
           reflection_text?: never
+          shift_emotion_intensity?: never
           shift_mood?: never
           source?: string | null
           state?: Database["public"]["Enums"]["pause_state"] | null

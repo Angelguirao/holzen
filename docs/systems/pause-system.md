@@ -120,7 +120,9 @@ AI-generated content attached to an instance. One row per
 - `v_pause_current` — the single open pause per user (if any).
 - `v_pause_completed` — `state='completed'` only.
 - `v_pause_full` — instance + step presence booleans + counted
-  companion count/types + artifact text. Row shape is 1:1 with
+  companion count/types + artifact text + latest `initial_mood` /
+  `shift_mood` and optional 1–5 scales `initial_emotion_intensity` /
+  `shift_emotion_intensity` from step payloads. Row shape is 1:1 with
   `pause_instances.id`. Use this for hydration and stats.
 - `v_pause_metrics_daily` — daily aggregates by user (created /
   engaged / completed / dismissed / expired split by reason).
