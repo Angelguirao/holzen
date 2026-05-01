@@ -8,7 +8,8 @@ import { SwipeableCard } from './SwipeableCard';
 import { ExportMenu } from './ExportMenu';
 import type { useLibrary } from '@/hooks/use-library';
 import type { LibraryItem } from '@/hooks/use-library';
-import { Trash2, Archive, Heart, X, CheckSquare, Download, Loader2 } from 'lucide-react';
+import { Link } from 'react-router-dom';
+import { Trash2, Archive, Heart, X, CheckSquare, Loader2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { isMainPauseLibraryBookmark } from '@/lib/normalize-library-source-type';
 import {
@@ -16,11 +17,23 @@ import {
   isYesterday,
   isThisWeek,
   isThisMonth,
+  format,
+  startOfDay,
 } from 'date-fns';
+
+export type LibraryDateGroupStyle = 'relativeBuckets' | 'calendarDay';
 
 interface Props {
   library: ReturnType<typeof useLibrary>;
   filtered: LibraryItem[];
+  /** Default `calendarDay` matches Archive wireframes (Today + dd/MM/yy). */
+  dateGroupStyle?: LibraryDateGroupStyle;
+  /** Echoes tab: simpler “Reflection” labeling on cards. */
+  echoesPresentation?: boolean;
+  emptyStateMessage?: string;
+  emptyStateHint?: string;
+  emptyCtaLabel?: string;
+  emptyCtaTo?: string;
 }
 
 interface DateGroup {
@@ -60,7 +73,32 @@ function groupByDate(items: LibraryItem[], t: (k: string) => string): DateGroup[
     .map(([key, items]) => ({ key, label: labels[key], items }));
 }
 
-export function LibraryItems({ library, filtered }: Props) {
+function groupByCalendarDay(items: LibraryItem[], t: (k: string) => string): DateGroup[] {
+  const buckets = new Map<number, LibraryItem[]>();
+  items.forEach((item) => {
+    const day = startOfDay(new Date(item.created_at)).getTime();
+    const arr = buckets.get(day) ?? [];
+    arr.push(item);
+    buckets.set(day, arr);
+  });
+  const keys = [...buckets.keys()].sort((a, b) => b - a);
+  return keys.map((ts) => {
+    const d = new Date(ts);
+    const label = isToday(d) ? t('library.dateToday') : format(d, 'dd/MM/yy');
+    return { key: String(ts), label, items: buckets.get(ts)! };
+  });
+}
+
+export function LibraryItems({
+  library,
+  filtered,
+  dateGroupStyle = 'calendarDay',
+  echoesPresentation = false,
+  emptyStateMessage,
+  emptyStateHint,
+  emptyCtaLabel,
+  emptyCtaTo,
+}: Props) {
   const { t } = useTranslation();
   const {
     items, collections, updateItem, deleteItem, togglePin, toggleFavorite,
@@ -161,7 +199,13 @@ export function LibraryItems({ library, filtered }: Props) {
 
   const pinnedItems = filtered.filter((i) => i.pinned);
   const unpinnedFiltered = filtered.filter((i) => !i.pinned);
-  const unpinnedGroups = useMemo(() => groupByDate(unpinnedFiltered, t), [unpinnedFiltered, t]);
+  const unpinnedGroups = useMemo(
+    () =>
+      dateGroupStyle === 'calendarDay'
+        ? groupByCalendarDay(unpinnedFiltered, t)
+        : groupByDate(unpinnedFiltered, t),
+    [unpinnedFiltered, t, dateGroupStyle],
+  );
 
   // Build flat list with group info for virtuoso
   const { flatItems, groupCounts, groupLabels } = useMemo(() => {
@@ -211,6 +255,7 @@ export function LibraryItems({ library, filtered }: Props) {
         >
           <LibraryItemCard
             item={item}
+            echoesPresentation={echoesPresentation}
             onToggleFavorite={selectMode ? () => toggleSelect(item.id) : toggleFavorite}
             engaged={isCompanionEngaged(item)}
             incomplete={isReflectionIncomplete(item)}
@@ -225,7 +270,7 @@ export function LibraryItems({ library, filtered }: Props) {
         </SwipeableCard>
       </div>
     </div>
-  ), [selectMode, selectedIds, toggleSelect, toggleFavorite, deleteItem, isCompanionEngaged, isReflectionIncomplete, t]);
+  ), [selectMode, selectedIds, toggleSelect, toggleFavorite, deleteItem, isCompanionEngaged, isReflectionIncomplete, echoesPresentation, t]);
 
   // Use virtual scrolling only when the list is large enough to benefit
   const useVirtual = flatItems.length > 30;
@@ -301,14 +346,30 @@ export function LibraryItems({ library, filtered }: Props) {
               <Loader2 className="h-6 w-6 animate-spin text-muted-foreground/40" />
             </div>
           ) : listLoadFailed && filtered.length === 0 ? null : filtered.length === 0 ? (
-            <div className="text-center py-12 space-y-3">
-              <p className="text-2xl">📚</p>
-              <p className="text-xs text-muted-foreground/60 font-mono max-w-[240px] mx-auto">
-                {t('library.emptyStateAction', { defaultValue: 'Complete a pause session to see saved companions, notes, and insights here.' })}
+            <div className="text-center py-12 space-y-3 px-2">
+              <p className="text-sm text-muted-foreground max-w-sm mx-auto leading-relaxed">
+                {emptyStateMessage ??
+                  t('library.emptyStateAction', {
+                    defaultValue: 'Complete a pause session to see saved companions, notes, and insights here.',
+                  })}
               </p>
-              <p className="text-[9px] text-muted-foreground/30 font-mono">
-                {t('library.emptyStateHint', { defaultValue: 'Swipe cards left to delete, right to favorite' })}
-              </p>
+              {(() => {
+                const hint =
+                  emptyStateHint === undefined
+                    ? t('library.emptyStateHint', { defaultValue: 'Swipe cards left to delete, right to favorite' })
+                    : emptyStateHint;
+                return hint ? (
+                  <p className="text-xs text-muted-foreground/50">{hint}</p>
+                ) : null;
+              })()}
+              {emptyCtaLabel && emptyCtaTo ? (
+                <Link
+                  to={emptyCtaTo}
+                  className="inline-block text-sm font-semibold text-foreground underline-offset-4 hover:underline"
+                >
+                  {emptyCtaLabel}
+                </Link>
+              ) : null}
             </div>
           ) : (
             <div className="space-y-4">

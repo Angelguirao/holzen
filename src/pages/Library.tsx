@@ -1,10 +1,30 @@
-import { useState, useMemo, useCallback } from 'react';
+import { useState, useMemo, useCallback, useEffect } from 'react';
+import { Link, useSearchParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useLibrary } from '@/hooks/use-library';
 import { useInfiniteScroll } from '@/hooks/use-infinite-scroll';
 import { PageMeta } from '@/components/PageMeta';
-import { Heart, Search, X, Lock, ArrowUpDown, RefreshCw, ArrowRight, Pause, Radio, Leaf, Feather, Telescope, ScrollText, Pencil, Link as LinkIcon, Loader2, type LucideIcon } from 'lucide-react';
+import {
+  Search,
+  X,
+  Lock,
+  ArrowUpDown,
+  RefreshCw,
+  ArrowRight,
+  Pause,
+  Radio,
+  Leaf,
+  Feather,
+  Telescope,
+  ScrollText,
+  Pencil,
+  Link as LinkIcon,
+  Loader2,
+  Bell,
+  Filter,
+  type LucideIcon,
+} from 'lucide-react';
 import { ExportMenu } from '@/components/library/ExportMenu';
 import { SubscriptionSkeleton } from '@/components/SubscriptionSkeleton';
 import { LibraryItems } from '@/components/library/LibraryItems';
@@ -19,10 +39,22 @@ import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import { useProGate } from '@/hooks/use-pro-gate';
-import { PageHeading } from '@/components/PageHeading';
 import { librarySourceLabel } from '@/lib/library-source-label';
+import {
+  itemBelongsToEchoesTab,
+  itemBelongsToPausesTab,
+  librarySourceForSegment,
+  type ArchiveMainSegment,
+} from '@/lib/archive-segment';
+import {
+  DropdownMenu,
+  DropdownMenuCheckboxItem,
+  DropdownMenuContent,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
 
-// Keys match `library_items.source_type` in Postgres (row-kind discriminator for filters + UI).
 const SOURCE_CHIPS: { key: string; icon: LucideIcon }[] = [
   { key: 'pause', icon: Pause },
   { key: 'signal', icon: Radio },
@@ -34,20 +66,76 @@ const SOURCE_CHIPS: { key: string; icon: LucideIcon }[] = [
   { key: 'external', icon: LinkIcon },
 ];
 
-
-type Tab = 'all' | 'favorites' | 'collections';
 type SortMode = 'newest' | 'oldest' | 'alphabetical';
+
+function readSegment(params: URLSearchParams): ArchiveMainSegment {
+  const s = params.get('seg');
+  if (s === 'echoes' || s === 'collections') return s;
+  return 'pauses';
+}
+
+function readPausesScope(params: URLSearchParams): 'all' | 'favorites' {
+  return params.get('scope') === 'favs' ? 'favorites' : 'all';
+}
 
 export default function Library() {
   const { t } = useTranslation();
   const { isPro, isPending, startCheckout, checkoutLoading } = useProGate();
   const library = useLibrary();
-  const [tab, setTab] = useState<Tab>('all');
+  const [searchParams, setSearchParams] = useSearchParams();
+  const mainSegment = useMemo(() => readSegment(searchParams), [searchParams]);
+  const pausesScope = useMemo(() => readPausesScope(searchParams), [searchParams]);
+
   const [search, setSearch] = useState('');
-  const [sourceFilter, setSourceFilter] = useState<string | null>('pause');
+  const [selectedSourceTypes, setSelectedSourceTypes] = useState<string[]>([]);
   const [tagFilter, setTagFilter] = useState<string | null>(null);
   const [sortMode, setSortMode] = useState<SortMode>('newest');
   const [smartFilter, setSmartFilter] = useState<{ name: string; itemIds: Set<string> } | null>(null);
+
+  const setMainSegment = useCallback(
+    (seg: ArchiveMainSegment) => {
+      setSelectedSourceTypes([]);
+      setSearchParams(
+        (prev) => {
+          const n = new URLSearchParams(prev);
+          if (seg === 'pauses') n.delete('seg');
+          else n.set('seg', seg);
+          if (seg !== 'pauses') n.delete('scope');
+          return n;
+        },
+        { replace: true },
+      );
+    },
+    [setSearchParams],
+  );
+
+  const setPausesScope = useCallback(
+    (scope: 'all' | 'favorites') => {
+      setSearchParams(
+        (prev) => {
+          const n = new URLSearchParams(prev);
+          if (scope === 'favorites') n.set('scope', 'favs');
+          else n.delete('scope');
+          return n;
+        },
+        { replace: true },
+      );
+    },
+    [setSearchParams],
+  );
+
+  useEffect(() => {
+    if (mainSegment !== 'pauses' && pausesScope === 'favorites') {
+      setSearchParams(
+        (prev) => {
+          const n = new URLSearchParams(prev);
+          n.delete('scope');
+          return n;
+        },
+        { replace: true },
+      );
+    }
+  }, [mainSegment, pausesScope, setSearchParams]);
 
   const handleRefresh = useCallback(async () => {
     await library.refetch();
@@ -68,19 +156,35 @@ export default function Library() {
 
   const sourceChips = useMemo(
     () => SOURCE_CHIPS.map((c) => ({ ...c, label: librarySourceLabel(c.key, t, c.key) })),
-    [t]
+    [t],
   );
 
-  // Available source types from actual data
-  const availableSources = useMemo(() => {
-    const existing = new Set(items.map((i) => i.source_type).filter(Boolean));
-    return sourceChips.filter((f) => existing.has(f.key));
-  }, [items, sourceChips]);
+  const segmentBase = useMemo(() => {
+    let r = items.filter((i) => i.status !== 'deleted' && i.status !== 'archived');
+    if (mainSegment === 'pauses') r = r.filter(itemBelongsToPausesTab);
+    else if (mainSegment === 'echoes') r = r.filter(itemBelongsToEchoesTab);
+    return r;
+  }, [items, mainSegment]);
 
-  // Available tags from actual data (sorted by frequency)
+  const hasAnyPauseArchiveContent = useMemo(
+    () => items.some((i) => i.status !== 'deleted' && i.status !== 'archived' && itemBelongsToPausesTab(i)),
+    [items],
+  );
+
+  const hasAnyEchoesContent = useMemo(
+    () => items.some((i) => i.status !== 'deleted' && i.status !== 'archived' && itemBelongsToEchoesTab(i)),
+    [items],
+  );
+
+  const availableSources = useMemo(() => {
+    if (mainSegment !== 'pauses') return [];
+    const existing = new Set(segmentBase.map((i) => librarySourceForSegment(i)).filter(Boolean));
+    return sourceChips.filter((f) => existing.has(f.key));
+  }, [segmentBase, sourceChips, mainSegment]);
+
   const availableTags = useMemo(() => {
     const tagCount = new Map<string, number>();
-    items.forEach((i) => {
+    segmentBase.forEach((i) => {
       i.tags?.forEach((tag) => {
         tagCount.set(tag, (tagCount.get(tag) ?? 0) + 1);
       });
@@ -88,47 +192,125 @@ export default function Library() {
     return Array.from(tagCount.entries())
       .sort((a, b) => b[1] - a[1])
       .map(([tag]) => tag);
-  }, [items]);
+  }, [segmentBase]);
 
-  const hasActiveFilters = !!sourceFilter || !!tagFilter || !!smartFilter;
+  const hasActiveFilters =
+    selectedSourceTypes.length > 0 || !!tagFilter || !!smartFilter || !!search.trim();
 
-  // Filtering
   const filtered = useMemo(() => {
-    let result = items;
-    // Tab
-    if (tab === 'favorites') result = result.filter((i) => i.is_favorite);
-    // Always hide deleted and archived
-    result = result.filter((i) => i.status !== 'deleted' && i.status !== 'archived');
-    // Smart filter
+    if (mainSegment === 'collections') return [];
+    let result = segmentBase;
+    if (mainSegment === 'pauses' && pausesScope === 'favorites') {
+      result = result.filter((i) => i.is_favorite);
+    }
+    if (mainSegment === 'pauses' && selectedSourceTypes.length > 0) {
+      result = result.filter((i) => selectedSourceTypes.includes(librarySourceForSegment(i)));
+    }
     if (smartFilter) result = result.filter((i) => smartFilter.itemIds.has(i.id));
-    // Source type
-    if (sourceFilter) result = result.filter((i) => i.source_type === sourceFilter);
-    // Tag
     if (tagFilter) result = result.filter((i) => i.tags?.includes(tagFilter));
-    // Search
     if (search.trim()) {
       const q = search.toLowerCase();
-      result = result.filter((i) =>
-        i.title?.toLowerCase().includes(q) ||
-        i.body?.toLowerCase().includes(q) ||
-        i.tags?.some((t) => t.includes(q))
+      result = result.filter(
+        (i) =>
+          i.title?.toLowerCase().includes(q) ||
+          i.body?.toLowerCase().includes(q) ||
+          i.tags?.some((tg) => tg.includes(q)),
       );
     }
-    // Sort
     if (sortMode === 'oldest') {
       result = [...result].sort((a, b) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime());
     } else if (sortMode === 'alphabetical') {
       result = [...result].sort((a, b) => (a.title ?? '').localeCompare(b.title ?? ''));
     }
-    // newest is the default order from the hook
     return result;
-  }, [items, tab, sourceFilter, tagFilter, search, sortMode, smartFilter]);
+  }, [segmentBase, mainSegment, pausesScope, selectedSourceTypes, smartFilter, tagFilter, search, sortMode]);
+
+  const clearAllFilters = () => {
+    setSelectedSourceTypes([]);
+    setTagFilter(null);
+    setSmartFilter(null);
+    setSearch('');
+  };
+
+  const cycleSortMode = () => {
+    setSortMode((prev) => (prev === 'newest' ? 'oldest' : prev === 'oldest' ? 'alphabetical' : 'newest'));
+  };
+
+  const sortLabel =
+    sortMode === 'newest'
+      ? t('library.sortNewest', { defaultValue: 'Newest' })
+      : sortMode === 'oldest'
+        ? t('library.sortOldest', { defaultValue: 'Oldest' })
+        : t('library.sortAlpha', { defaultValue: 'A–Z' });
+
+  const toggleSourceType = (key: string) => {
+    setSelectedSourceTypes((prev) => (prev.includes(key) ? prev.filter((k) => k !== key) : [...prev, key]));
+  };
+
+  const removeSourceType = (key: string) => {
+    setSelectedSourceTypes((prev) => prev.filter((k) => k !== key));
+  };
+
+  const emptyLibraryItemsProps = useMemo(() => {
+    if (mainSegment === 'echoes') {
+      if (!hasAnyEchoesContent) {
+        return {
+          emptyStateMessage: t('library.emptyEchoesNone', {
+            defaultValue: 'Longer companion reads will appear here when they are saved to your archive.',
+          }),
+          emptyStateHint: '',
+          emptyCtaLabel: undefined as string | undefined,
+          emptyCtaTo: undefined as string | undefined,
+        };
+      }
+    }
+    if (mainSegment === 'pauses') {
+      if (!hasAnyPauseArchiveContent && pausesScope === 'all' && !hasActiveFilters) {
+        return {
+          emptyStateMessage: t('library.emptyPauseFirst', {
+            defaultValue: 'Your content will appear here after your first pause.',
+          }),
+          emptyStateHint: '',
+          emptyCtaLabel: t('library.emptyPauseFirstCta', { defaultValue: 'Start a pause' }),
+          emptyCtaTo: '/pause',
+        };
+      }
+      if (pausesScope === 'favorites' && filtered.length === 0 && hasAnyPauseArchiveContent) {
+        return {
+          emptyStateMessage: t('library.emptyFavs', {
+            defaultValue: 'Nothing saved yet. Keep what matters.',
+          }),
+          emptyStateHint: '',
+          emptyCtaLabel: undefined as string | undefined,
+          emptyCtaTo: undefined as string | undefined,
+        };
+      }
+    }
+    if (hasActiveFilters && filtered.length === 0) {
+      return {
+        emptyStateMessage: t('library.noResults', { defaultValue: 'No items match your search.' }),
+        emptyStateHint: '',
+        emptyCtaLabel: undefined as string | undefined,
+        emptyCtaTo: undefined as string | undefined,
+      };
+    }
+    return {
+      emptyStateMessage: undefined as string | undefined,
+      emptyStateHint: undefined as string | undefined,
+      emptyCtaLabel: undefined as string | undefined,
+      emptyCtaTo: undefined as string | undefined,
+    };
+  }, [mainSegment, hasAnyEchoesContent, hasAnyPauseArchiveContent, pausesScope, hasActiveFilters, filtered.length, t]);
 
   if (isPending) {
     return (
       <div className="space-y-6 pb-24">
         <PageMeta title={t('library.pageTitle')} description={t('library.pageDescription')} />
-        <PageHeading title={t('library.title')} subtitle={t('library.pageDescription')} />
+        <div className="flex items-center justify-between gap-3 border-b border-border pb-3">
+          <span className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">{t('common.holzen')}</span>
+          <h1 className="text-base font-medium text-foreground">{t('library.title')}</h1>
+          <div className="w-9" />
+        </div>
         <SubscriptionSkeleton variant="inline" />
       </div>
     );
@@ -138,12 +320,17 @@ export default function Library() {
     return (
       <div className="space-y-6 pb-24">
         <PageMeta title={t('library.pageTitle')} description={t('library.pageDescription')} />
-        <PageHeading title={t('library.title')} subtitle={t('library.pageDescription')} />
+        <div className="flex items-center justify-between gap-3 border-b border-border pb-3">
+          <span className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">{t('common.holzen')}</span>
+          <h1 className="text-base font-medium text-foreground">{t('library.title')}</h1>
+          <div className="w-9" />
+        </div>
         <div className="flex flex-col items-center justify-center min-h-[40vh] gap-4 text-center px-6">
           <Lock className="h-6 w-6 text-[#dbb266]" />
           <h2 className="text-sm font-semibold text-foreground">{t('pro.featureLocked')}</h2>
           <p className="max-w-xs text-sm leading-relaxed text-muted-foreground">{t('pro.desc_library')}</p>
           <button
+            type="button"
             onClick={() => startCheckout('pro')}
             disabled={checkoutLoading}
             className="group inline-flex items-center gap-1.5 text-sm font-medium underline-offset-4 transition-colors hover:underline disabled:opacity-50"
@@ -157,26 +344,23 @@ export default function Library() {
     );
   }
 
-  const clearAllFilters = () => {
-    setSourceFilter(null);
-    setTagFilter(null);
-    setSmartFilter(null);
-  };
-
-  const cycleSortMode = () => {
-    setSortMode((prev) =>
-      prev === 'newest' ? 'oldest' : prev === 'oldest' ? 'alphabetical' : 'newest'
-    );
-  };
-
-  const sortLabel = sortMode === 'newest' ? t('library.sortNewest', { defaultValue: 'Newest' }) : sortMode === 'oldest' ? t('library.sortOldest', { defaultValue: 'Oldest' }) : t('library.sortAlpha', { defaultValue: 'A–Z' });
+  const filterDisabled = mainSegment === 'pauses' && segmentBase.length === 0;
 
   return (
     <div className="space-y-6 pb-24" {...handlers}>
       <PageMeta title={t('library.pageTitle')} description={t('library.pageDescription')} />
-      <PageHeading title={t('library.title')} subtitle={t('library.pageDescription')} />
-      {/* Current pause card (Pause V2). Hidden when the user has no open pause. */}
-      <CurrentPauseCard />
+
+      <header className="flex items-center justify-between gap-2 border-b border-border pb-3">
+        <span className="min-w-0 text-xs font-semibold uppercase tracking-wide text-muted-foreground">{t('common.holzen')}</span>
+        <h1 className="shrink-0 text-base font-medium text-foreground">{t('library.title')}</h1>
+        <Button variant="ghost" size="icon" className="shrink-0" asChild>
+          <Link to="/settings/notifications" aria-label={t('library.notificationsAria', { defaultValue: 'Notifications' })}>
+            <Bell className="h-5 w-5" />
+          </Link>
+        </Button>
+      </header>
+
+      {mainSegment !== 'collections' && <CurrentPauseCard />}
 
       {library.listLoadFailed && (
         <Alert variant="destructive">
@@ -189,7 +373,6 @@ export default function Library() {
         </Alert>
       )}
 
-      {/* Pull-to-refresh indicator */}
       <AnimatePresence>
         {(pullDistance > 10 || refreshing) && (
           <motion.div
@@ -203,7 +386,7 @@ export default function Library() {
               className={cn(
                 'h-4 w-4 text-muted-foreground/40 transition-transform',
                 refreshing && 'animate-spin',
-                pullDistance > 70 && !refreshing && 'text-primary/60'
+                pullDistance > 70 && !refreshing && 'text-primary/60',
               )}
               style={{ transform: refreshing ? undefined : `rotate(${pullDistance * 3}deg)` }}
             />
@@ -211,125 +394,175 @@ export default function Library() {
         )}
       </AnimatePresence>
 
-      {/* Tab bar - sticky */}
-      <div className="sticky top-0 z-30 bg-background/95 backdrop-blur-sm flex items-center gap-1 border-b border-border/30 overflow-x-auto">
-        <button
-          onClick={() => setTab('all')}
-          className={cn(
-            'border-b-2 px-3 py-2 text-xs font-semibold uppercase tracking-wide transition-colors whitespace-nowrap',
-            tab === 'all'
-              ? 'border-foreground text-foreground'
-              : 'border-transparent text-muted-foreground/50 hover:text-muted-foreground'
-          )}
-        >
-          {t('library.tabAll')}
-        </button>
-        <button
-          onClick={() => setTab('favorites')}
-          className={cn(
-            'flex items-center gap-1.5 border-b-2 px-3 py-2 text-xs font-semibold uppercase tracking-wide transition-colors whitespace-nowrap',
-            tab === 'favorites'
-              ? 'border-foreground text-foreground'
-              : 'border-transparent text-muted-foreground/50 hover:text-muted-foreground'
-          )}
-        >
-          <Heart className="h-3 w-3" />
-          {t('library.tabFavorites')}
-        </button>
-        <button
-          onClick={() => setTab('collections')}
-          className={cn(
-            'border-b-2 px-3 py-2 text-xs font-semibold uppercase tracking-wide transition-colors whitespace-nowrap',
-            tab === 'collections'
-              ? 'border-foreground text-foreground'
-              : 'border-transparent text-muted-foreground/50 hover:text-muted-foreground'
-          )}
-        >
-          {t('library.tabCollections')}
-          {collections.length > 0 && (
-            <span className="ml-1.5 text-[9px] text-muted-foreground/40">{collections.length}</span>
-          )}
-        </button>
+      <div className="sticky top-0 z-30 flex gap-4 border-b border-border/30 bg-background/95 py-2 backdrop-blur-sm">
+        {(['pauses', 'echoes', 'collections'] as const).map((seg) => (
+          <button
+            key={seg}
+            type="button"
+            onClick={() => setMainSegment(seg)}
+            className={cn(
+              'border-b-2 pb-2 text-sm font-medium transition-colors',
+              mainSegment === seg
+                ? 'border-foreground font-bold text-foreground'
+                : 'border-transparent text-muted-foreground hover:text-muted-foreground/90',
+            )}
+          >
+            {seg === 'pauses'
+              ? t('library.segmentPauses', { defaultValue: 'Pauses' })
+              : seg === 'echoes'
+                ? t('library.segmentEchoes', { defaultValue: 'Echoes' })
+                : t('library.tabCollections')}
+          </button>
+        ))}
       </div>
 
-      {/* Collections tab */}
-      {tab === 'collections' && (
+      {mainSegment === 'collections' && (
         <div className="space-y-4">
+          <p className="text-sm leading-relaxed text-muted-foreground">{t('library.pageDescription')}</p>
           <SmartCollections
             items={items}
             isReflectionIncomplete={library.isReflectionIncomplete}
             onSelect={(sc) => {
               setSmartFilter({ name: sc.name, itemIds: new Set(sc.items.map((i) => i.id)) });
-              setTab('all');
+              setMainSegment('pauses');
             }}
           />
           <LibraryCollections library={library} />
         </div>
       )}
 
-      {/* All / Favorites tabs */}
-      {tab !== 'collections' && (
-        <div className="space-y-3 !mt-4">
-          {/* Sticky controls: tabs are above; here we stick search + source chips */}
-          <div className="sticky top-[36px] z-20 -mx-1 px-1 pt-4 pb-2 space-y-3 bg-background/95 backdrop-blur-sm">
-            {/* Search */}
-            <div className="relative">
-              <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-muted-foreground/40" />
-              <Input
-                id="library-search"
-                name="q"
-                type="search"
-                autoComplete="off"
-                aria-label={t('library.searchPlaceholder')}
-                value={search}
-                onChange={(e) => setSearch(e.target.value)}
-                placeholder={t('library.searchPlaceholder')}
-                className="h-8 border-border/30 pl-8 text-xs py-[16px] mb-[24px]"
-              />
-              {search && (
+      {mainSegment !== 'collections' && (
+        <div className="space-y-4">
+          <p className="text-sm leading-relaxed text-muted-foreground">
+            {mainSegment === 'pauses'
+              ? t('library.archiveIntroPauses', {
+                  defaultValue:
+                    'See content from your recent pauses and favourites. Save what matters. Explore with filters.',
+                })
+              : t('library.archiveIntroEchoes', {
+                  defaultValue: 'Reflections from pauses you missed. Read at your own pace. Save what speaks to you.',
+                })}
+          </p>
+
+          {mainSegment === 'pauses' && (
+            <div className="flex flex-col gap-3">
+              <div className="flex items-center gap-2">
                 <button
-                  onClick={() => setSearch('')}
-                  className="absolute right-2.5 top-1/2 -translate-y-1/2 text-muted-foreground/40 hover:text-muted-foreground"
+                  type="button"
+                  onClick={() => setPausesScope('all')}
+                  className={cn(
+                    'rounded-full px-3 py-1 text-sm font-semibold transition-colors',
+                    pausesScope === 'all' ? 'bg-foreground text-background' : 'border border-foreground/80 bg-transparent text-foreground',
+                  )}
                 >
-                  <X className="h-3 w-3" />
+                  {t('library.pillAll', { defaultValue: 'All' })}
                 </button>
+                <button
+                  type="button"
+                  onClick={() => setPausesScope('favorites')}
+                  className={cn(
+                    'rounded-full px-3 py-1 text-sm font-medium transition-colors',
+                    pausesScope === 'favorites' ? 'bg-foreground text-background' : 'border border-foreground/80 bg-transparent text-foreground',
+                  )}
+                >
+                  {t('library.pillFavs', { defaultValue: 'Favs' })}
+                </button>
+                <div className="flex-1" />
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="icon"
+                      disabled={filterDisabled}
+                      className={cn(filterDisabled && 'opacity-50')}
+                      aria-label={t('library.filterTypesLabel', { defaultValue: 'Filter by type' })}
+                    >
+                      <Filter className="h-5 w-5" />
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="end" className="w-56">
+                    <DropdownMenuLabel>{t('library.filterTypesLabel', { defaultValue: 'Types' })}</DropdownMenuLabel>
+                    <DropdownMenuSeparator />
+                    {availableSources.length === 0 ? (
+                      <div className="px-2 py-2 text-xs text-muted-foreground">{t('library.filterNoTypes', { defaultValue: 'No types yet' })}</div>
+                    ) : (
+                      availableSources.map(({ key, label }) => (
+                        <DropdownMenuCheckboxItem
+                          key={key}
+                          checked={selectedSourceTypes.includes(key)}
+                          onCheckedChange={() => toggleSourceType(key)}
+                        >
+                          {label}
+                        </DropdownMenuCheckboxItem>
+                      ))
+                    )}
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              </div>
+
+              {selectedSourceTypes.length > 0 && (
+                <div className="flex flex-wrap items-center gap-2">
+                  {selectedSourceTypes.map((key) => {
+                    const chip = sourceChips.find((c) => c.key === key);
+                    return (
+                      <span
+                        key={key}
+                        className="inline-flex items-center gap-1 rounded-full border border-foreground/80 px-2 py-0.5 text-xs font-medium"
+                      >
+                        {chip?.label ?? key}
+                        <button
+                          type="button"
+                          onClick={() => removeSourceType(key)}
+                          className="rounded p-0.5 text-muted-foreground hover:text-foreground"
+                          aria-label={t('library.removeFilterChip', { defaultValue: 'Remove filter' })}
+                        >
+                          <X className="h-3.5 w-3.5" />
+                        </button>
+                      </span>
+                    );
+                  })}
+                </div>
               )}
             </div>
+          )}
 
-            {/* Source type chips (horizontal scroll) */}
-            {availableSources.length > 1 && (
-              <div className="tabs-scroll gap-1.5 overflow-x-auto pb-0.5 flex items-center justify-start">
-                {availableSources.map(({ key, icon: Icon, label }) => (
-                  <button
-                    key={key}
-                    onClick={() => setSourceFilter(sourceFilter === key ? null : key)}
-                    className={cn(
-                      'px-2 py-1 rounded-full border transition-colors whitespace-nowrap flex items-center gap-1 text-sm font-sans mb-[16px]',
-                      sourceFilter === key
-                        ? 'border-foreground/20 bg-foreground/5 text-foreground'
-                        : 'border-border/30 text-muted-foreground'
-                    )}
-                  >
-                    <Icon className="h-3 w-3" />
-                    {label}
-                  </button>
-                ))}
-              </div>
-            )}
+          <div className="relative">
+            <Search className="absolute left-2.5 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-muted-foreground/40" />
+            <Input
+              id="library-search"
+              name="q"
+              type="search"
+              autoComplete="off"
+              aria-label={t('library.searchPlaceholder')}
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              placeholder={t('library.searchPlaceholder')}
+              className="h-9 border-border/30 pl-8 text-sm"
+            />
+            {search ? (
+              <button
+                type="button"
+                onClick={() => setSearch('')}
+                className="absolute right-2.5 top-1/2 -translate-y-1/2 text-muted-foreground/40 hover:text-muted-foreground"
+              >
+                <X className="h-3.5 w-3.5" />
+              </button>
+            ) : null}
           </div>
 
-          {/* Tag chips (NOT fixed) */}
           {availableTags.length > 0 && (
-            <div className="flex items-center gap-1.5 overflow-x-auto pb-0.5 -mx-1 px-1 scrollbar-none">
+            <div className="scrollbar-none -mx-1 flex items-center gap-1.5 overflow-x-auto px-1 pb-0.5">
               {availableTags.slice(0, 15).map((tag) => (
                 <button
                   key={tag}
+                  type="button"
                   onClick={() => setTagFilter(tagFilter === tag ? null : tag)}
                   className={cn(
-                    'px-2 py-1 rounded-full border transition-colors whitespace-nowrap text-sm font-sans',
+                    'whitespace-nowrap rounded-full border px-2 py-1 text-xs transition-colors',
                     tagFilter === tag
                       ? 'border-primary/30 bg-primary/10 text-primary'
-                      : 'border-border/30 text-muted-foreground/50 hover:text-muted-foreground/70'
+                      : 'border-border/30 text-muted-foreground/50 hover:text-muted-foreground/70',
                   )}
                 >
                   #{tag}
@@ -338,41 +571,39 @@ export default function Library() {
             </div>
           )}
 
-          {/* Smart filter badge */}
           {smartFilter && (
             <div className="flex items-center gap-1.5">
-              <span className="text-[10px] font-mono px-2 py-1 rounded-full border border-primary/30 bg-primary/10 text-primary">
+              <span className="rounded-full border border-primary/30 bg-primary/10 px-2 py-1 text-[10px] font-mono text-primary">
                 {smartFilter.name}
               </span>
-              <button
-                onClick={() => setSmartFilter(null)}
-                className="text-muted-foreground/40 hover:text-muted-foreground"
-              >
+              <button type="button" onClick={() => setSmartFilter(null)} className="text-muted-foreground/40 hover:text-muted-foreground">
                 <X className="h-3 w-3" />
               </button>
             </div>
           )}
 
-          {/* Active filter clear-all */}
           {hasActiveFilters && !smartFilter && (
             <button
+              type="button"
               onClick={clearAllFilters}
-              className="flex items-center gap-1 transition-colors text-nox-text-link hover:text-nox-text-link/80 text-sm font-sans"
+              className="flex items-center gap-1 text-sm text-nox-text-link transition-colors hover:text-nox-text-link/80"
             >
               <X className="h-2.5 w-2.5" /> {t('library.clearAll')}
             </button>
           )}
 
-          {/* Count + Sort */}
           <div className="flex items-center justify-between px-1">
-            <span className="text-sm font-sans text-muted-foreground">
-              {filtered.length} {filtered.length === 1 ? 'item' : 'items'}
+            <span className="text-sm text-muted-foreground">
+              {filtered.length === 1
+                ? t('library.itemCount_one', { count: filtered.length })
+                : t('library.itemCount_other', { count: filtered.length })}
             </span>
             <div className="flex items-center gap-3">
               <ExportMenu items={filtered} />
               <button
+                type="button"
                 onClick={cycleSortMode}
-                className="flex items-center gap-1 transition-colors text-nox-text-link hover:text-nox-text-link/80 text-sm font-sans"
+                className="flex items-center gap-1 text-sm text-nox-text-link transition-colors hover:text-nox-text-link/80"
               >
                 <ArrowUpDown className="h-2.5 w-2.5" />
                 {sortLabel}
@@ -380,22 +611,22 @@ export default function Library() {
             </div>
           </div>
 
-          {/* Duplicate detection banner */}
-          <DuplicateBanner
-            items={items}
-            onDeleteItem={library.deleteItem}
-            onSelectItem={() => {}}
+          <DuplicateBanner items={items} onDeleteItem={library.deleteItem} onSelectItem={() => {}} />
+
+          <LibraryItems
+            library={library}
+            filtered={filtered}
+            dateGroupStyle="calendarDay"
+            echoesPresentation={mainSegment === 'echoes'}
+            emptyStateMessage={emptyLibraryItemsProps.emptyStateMessage}
+            emptyStateHint={emptyLibraryItemsProps.emptyStateHint}
+            emptyCtaLabel={emptyLibraryItemsProps.emptyCtaLabel}
+            emptyCtaTo={emptyLibraryItemsProps.emptyCtaTo}
           />
 
-          {/* Item list - natural page scroll */}
-          <LibraryItems library={library} filtered={filtered} />
-
-          {/* Infinite scroll sentinel — only when no client-side filters reduce results */}
           {library.hasMore && (
             <div ref={loadMoreRef} className="flex items-center justify-center py-6">
-              {library.loadingMore && (
-                <Loader2 className="h-4 w-4 animate-spin text-muted-foreground/40" />
-              )}
+              {library.loadingMore && <Loader2 className="h-4 w-4 animate-spin text-muted-foreground/40" />}
             </div>
           )}
         </div>
