@@ -251,3 +251,25 @@ Resume hint: start from §<N> first unchecked `[ ]` unless I specify otherwise b
 ```
 
 **Tips:** Narrow scope per loop (half a day max of surface area). If a loop finds large work, **ticket it** and still commit checklist progress + backlog stub rather than a huge refactor in one commit.
+
+---
+
+## 12 — Appendix: prompt to fix prior review findings (copy-paste)
+
+Use this when you want the agent to **implement fixes** for gaps documented in earlier review passes (checklist **Gap** / **Gaps** bullets, §7–§8, **L104** shell notes)—**not** the §10a L215 no-churn date-only maintenance workflow.
+
+```text
+Holzen follow-up — fix checklist findings (not maintenance stamps)
+
+1. Read `.cursor/skills/holzen-flow-review/SKILL.md`, `docs/reviews/end-to-end-review-master-checklist.md` (especially §1 / **L104** Tier A shell gaps, §7 cross-cutting, §8 edge rows with explicit “Gap:” / “Gaps:” bullets), and `docs/fundamentals/refactoring-strategy.md`.
+
+2. Treat those Gap / Gaps notes and any §10 / backlog pointers as the backlog of work — not the §10a L215 date-only triage lines.
+
+3. Prioritize by user impact and risk (auth/shell, silent failures, wrong empty/error states, invoke vs invokeEdge / missing error handling where the checklist calls it out). Do not re-run the “empty diff on five files → append L107 date” workflow unless I ask.
+
+4. For each issue you tackle: minimal vertical slice (match existing patterns), one logical commit (or a small sequence if clearly separate), run `npm run test` and `npm run build` (and touched-file `npm run lint` if applicable).
+
+5. When done: short summary of what you fixed and what major gaps remain (with checklist row refs like L26, L51, etc.).
+
+Optional focus: start with [paste theme, e.g. “silent practice_entries errors on practice tools” / “subscription hook errors” / “shell global errors”].
+```
