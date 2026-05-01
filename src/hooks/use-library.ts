@@ -208,6 +208,9 @@ export function useLibrary() {
       setCollectionItems(colItems);
       writeCache(CACHE_KEY_COL_ITEMS, colItems);
     }
+    if (rCols.error || rColItems.error) {
+      toast.error(t('library.collectionsPartialLoadFailed'));
+    }
     setHasMore(libItems.length === PAGE_SIZE);
     setListLoadFailed(false);
     setLoading(false);
@@ -219,7 +222,7 @@ export function useLibrary() {
     setIncompleteReflections(new Set());
     setReflectionOutcomes({});
     await hydratePauseMeta(libItems);
-  }, [user, hydratePauseMeta]);
+  }, [user, hydratePauseMeta, t]);
 
   const loadMore = useCallback(async () => {
     if (!user || loadingMore || !hasMore) return;
