@@ -27,7 +27,7 @@ import { Link, useOutletContext, useSearchParams, useNavigate } from 'react-rout
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/use-auth';
 import { toast } from 'sonner';
-import { AlertCircle, Bitcoin, Eye, EyeOff, Image as ImageIcon, Loader2, Pin, Pencil, Sparkles, RefreshCw, X } from 'lucide-react';
+import { AlertCircle, Loader2, Pin, Pencil, Sparkles, RefreshCw, X } from 'lucide-react';
 import { AutoCooldownIndicator, NeedAMomentButton } from '@/components/home/HomePauseChrome';
 import { homeInWidget } from '@/components/home/home-widget-styles';
 import { cn } from '@/lib/utils';
@@ -157,9 +157,8 @@ const Home = () => {
   const [pinnedPausePreview, setPinnedPausePreview] = useState<PinnedPausePreview | null>(null);
   const prefersReducedMotion = useReducedMotion();
   const [completedPauseCount, setCompletedPauseCount] = useState(0);
-  const [marketCollapsed, setMarketCollapsed] = useState(false);
+  const [marketChartExpanded, setMarketChartExpanded] = useState(true);
   const [customizeOpen, setCustomizeOpen] = useState(false);
-  const btcChartSectionRef = useRef<HTMLDivElement | null>(null);
   const heroQuoteViewTracked = useRef(false);
 
   const optionalDefaultOrder = useMemo(() => [...OPTIONAL_HOME_WIDGET_IDS], []);
@@ -190,15 +189,13 @@ const Home = () => {
     setCustomizeOpen(open);
   }, []);
 
-  const scrollMarketChartIntoView = useCallback(() => {
-    trackEvent('home.market_chart_scrolled_to', {});
-    const el = btcChartSectionRef.current;
-    if (!el) return;
-    el.scrollIntoView({
-      behavior: prefersReducedMotion ? 'auto' : 'smooth',
-      block: 'nearest',
+  const toggleMarketChartExpanded = useCallback(() => {
+    setMarketChartExpanded((prev) => {
+      const next = !prev;
+      trackEvent('home.market_chart_expand_toggled', { expanded: next });
+      return next;
     });
-  }, [prefersReducedMotion]);
+  }, []);
 
   useEffect(() => {
     if (!profileLoaded || heroQuoteViewTracked.current) return;
@@ -468,6 +465,17 @@ const Home = () => {
     <div className="space-y-4">
       <BulkHoldCard />
 
+      {subscriptionReady && hasAccess ? (
+        <div className="space-y-0.5">
+          <AutoCooldownIndicator
+            cooldownRemaining={autoCooldownRemaining}
+            cooldownHours={cooldownHours}
+            nextCronCheckIn={nextCronCheckIn}
+          />
+          <SnoozeControl />
+        </div>
+      ) : null}
+
       {!subLoading && !hasAccess ? (
         <div className="space-y-3">
           <p className={homeInWidget.bodyMuted}>{t('home.subscription.monthlyLimitReached')}</p>
@@ -716,78 +724,18 @@ const Home = () => {
           {t('home.today')}
         </h2>
 
-        <HomeSectionCard
-          title={t('home.widget.market')}
-          collapsible
-          collapsed={marketCollapsed}
-          onToggleCollapse={() => setMarketCollapsed((c) => !c)}
-          footer={marketFooter}
-          headerRight={
-            <>
-              <button
-                type="button"
-                onClick={scrollMarketChartIntoView}
-                className={homeInWidget.iconBtn}
-                aria-label={t('home.market.focusChart')}
-                title={t('home.market.chartPreview')}
-              >
-                <ImageIcon className="h-3.5 w-3.5 text-secondary-foreground" aria-hidden />
-              </button>
-              <button
-                type="button"
-                onClick={toggleBtcMode}
-                className={`${homeInWidget.iconBtn} ${btcMode ? 'text-primary/60 hover:text-primary' : 'text-muted-foreground/40 hover:text-primary'}`}
-                aria-label={btcMode ? t('btcStatus.exitBtcMode') : t('btcStatus.enterBtcMode')}
-                title={btcMode ? t('btcStatus.exitBtcMode') : t('btcStatus.enterBtcMode')}
-              >
-                <Bitcoin className="h-3.5 w-3.5 text-secondary-foreground" aria-hidden />
-              </button>
-              <button
-                type="button"
-                onClick={togglePriceHidden}
-                className={homeInWidget.iconBtn}
-                aria-label={
-                  btcMode
-                    ? priceHidden
-                      ? t('btcStatus.show')
-                      : t('btcStatus.hide')
-                    : priceHidden
-                      ? t('btcStatus.showPrice')
-                      : t('btcStatus.hidePrice')
-                }
-              >
-                {priceHidden ? (
-                  <EyeOff className="h-3.5 w-3.5 text-secondary-foreground" aria-hidden />
-                ) : (
-                  <Eye className="h-3.5 w-3.5 text-secondary-foreground" aria-hidden />
-                )}
-              </button>
-            </>
-          }
-        >
-          <div className="space-y-4">
-            <BtcStatus
-              data={btcData}
-              error={error}
-              hidden={priceHidden}
-              onToggleHidden={togglePriceHidden}
-              currency={currency}
-              btcMode={btcMode}
-              onToggleBtcMode={toggleBtcMode}
-              suppressToolbar
-              chartWrapperRef={btcChartSectionRef}
-            />
-            {!marketCollapsed ? (
-              <div className="space-y-0.5">
-                <AutoCooldownIndicator
-                  cooldownRemaining={autoCooldownRemaining}
-                  cooldownHours={cooldownHours}
-                  nextCronCheckIn={nextCronCheckIn}
-                />
-                <SnoozeControl />
-              </div>
-            ) : null}
-          </div>
+        <HomeSectionCard title={t('home.widget.market')} footer={marketFooter}>
+          <BtcStatus
+            data={btcData}
+            error={error}
+            hidden={priceHidden}
+            onToggleHidden={togglePriceHidden}
+            currency={currency}
+            btcMode={btcMode}
+            onToggleBtcMode={toggleBtcMode}
+            chartExpanded={marketChartExpanded}
+            onToggleChartExpanded={toggleMarketChartExpanded}
+          />
         </HomeSectionCard>
 
         <HomeSectionCard title={t('home.widget.yourPause')}>{pauseCardBody}</HomeSectionCard>
