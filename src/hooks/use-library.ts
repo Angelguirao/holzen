@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
@@ -64,10 +64,18 @@ export interface ReflectionReadFlags {
 }
 
 const CACHE_KEY_ITEMS = 'holzen_library_items';
+const CACHE_KEY_ITEMS_FAVS = 'holzen_library_items_favs';
 const CACHE_KEY_COLLECTIONS = 'holzen_library_collections';
 const CACHE_KEY_COL_ITEMS = 'holzen_library_col_items';
 const PAGE_SIZE = 50;
 
+export type UseLibraryOptions = {
+  /**
+   * When true, `library_items` queries are restricted to favorites so pagination
+   * matches the Favs tab (avoids client-filtering the first page only).
+   */
+  favoritesOnly?: boolean;
+};
 
 function readCache<T>(key: string): T | null {
   try {
@@ -84,12 +92,14 @@ function writeCache<T>(key: string, data: T) {
   }
 }
 
-export function useLibrary() {
+export function useLibrary(options?: UseLibraryOptions) {
   const { t } = useTranslation();
   const { user } = useAuth();
+  const favoritesOnly = options?.favoritesOnly ?? false;
+  const itemsCacheKey = favoritesOnly ? CACHE_KEY_ITEMS_FAVS : CACHE_KEY_ITEMS;
 
   // Initialize state from cache for instant render
-  const [items, setItems] = useState<LibraryItem[]>(() => readCache<LibraryItem[]>(CACHE_KEY_ITEMS) ?? []);
+  const [items, setItems] = useState<LibraryItem[]>(() => readCache<LibraryItem[]>(itemsCacheKey) ?? []);
   const [collections, setCollections] = useState<Collection[]>(() => readCache<Collection[]>(CACHE_KEY_COLLECTIONS) ?? []);
   const [collectionItems, setCollectionItems] = useState<CollectionItem[]>(() => readCache<CollectionItem[]>(CACHE_KEY_COL_ITEMS) ?? []);
   const [loading, setLoading] = useState(true);
@@ -157,8 +167,15 @@ export function useLibrary() {
         id: string;
         state: string;
         engaged_at: string | null;
+        has_breath_completed: boolean;
+        counted_companion_types: string[] | null;
       }>) {
-        next[r.id] = { state: r.state, engaged_at: r.engaged_at ?? null };
+        next[r.id] = {
+          state: r.state,
+          engaged_at: r.engaged_at ?? null,
+          has_breath_completed: r.has_breath_completed,
+          counted_companion_types: r.counted_companion_types,
+        };
       }
       return next;
     });
@@ -179,6 +196,40 @@ export function useLibrary() {
     });
   }, []);
 
+  const prunePauseDerivedState = useCallback((libItems: LibraryItem[]) => {
+    const keepPauseIds = new Set(
+      libItems.map((i) => i.pause_instance_id).filter((x): x is string => !!x),
+    );
+    setReadFlagsMap((prev) => {
+      const next = { ...prev };
+      for (const k of Object.keys(next)) {
+        if (!keepPauseIds.has(k)) delete next[k];
+      }
+      return next;
+    });
+    setPauseInstanceArchiveMetaById((prev) => {
+      const next = { ...prev };
+      for (const k of Object.keys(next)) {
+        if (!keepPauseIds.has(k)) delete next[k];
+      }
+      return next;
+    });
+    setIncompleteReflections((prev) => {
+      const next = new Set(prev);
+      for (const id of [...next]) {
+        if (!keepPauseIds.has(id)) next.delete(id);
+      }
+      return next;
+    });
+    setReflectionOutcomes((prev) => {
+      const next = { ...prev };
+      for (const k of Object.keys(next)) {
+        if (!keepPauseIds.has(k)) delete next[k];
+      }
+      return next;
+    });
+  }, []);
+
   const fetchAll = useCallback(async () => {
     if (!user) {
       setLoading(false);
@@ -186,14 +237,18 @@ export function useLibrary() {
       return;
     }
     setLoading(true);
+    let itemsQuery = supabase
+      .from('library_items')
+      .select('*')
+      .eq('user_id', user.id);
+    if (favoritesOnly) itemsQuery = itemsQuery.eq('is_favorite', true);
+    itemsQuery = itemsQuery
+      .order('pinned', { ascending: false })
+      .order('created_at', { ascending: false })
+      .range(0, PAGE_SIZE - 1);
+
     const [rItems, rCols, rColItems] = await Promise.all([
-      supabase
-        .from('library_items')
-        .select('*')
-        .eq('user_id', user.id)
-        .order('pinned', { ascending: false })
-        .order('created_at', { ascending: false })
-        .range(0, PAGE_SIZE - 1),
+      itemsQuery,
       supabase
         .from('collections')
         .select('*')
@@ -230,27 +285,24 @@ export function useLibrary() {
     setListLoadFailed(false);
     setLoading(false);
 
-    writeCache(CACHE_KEY_ITEMS, libItems);
+    writeCache(itemsCacheKey, libItems);
 
-    // Reset reflection-derived state, then hydrate for the loaded page.
-    setReadFlagsMap({});
-    setPauseInstanceArchiveMetaById({});
-    setIncompleteReflections(new Set());
-    setReflectionOutcomes({});
+    // Keep prior pause meta until hydration completes (avoids tab/list flicker).
     await hydratePauseMeta(libItems);
-  }, [user, hydratePauseMeta, t]);
+    prunePauseDerivedState(libItems);
+  }, [user, hydratePauseMeta, t, favoritesOnly, itemsCacheKey, prunePauseDerivedState]);
 
   const loadMore = useCallback(async () => {
     if (!user || loadingMore || !hasMore) return;
     setLoadingMore(true);
     const offset = items.length;
-    const { data, error } = await supabase
-      .from('library_items')
-      .select('*')
-      .eq('user_id', user.id)
+    let moreQuery = supabase.from('library_items').select('*').eq('user_id', user.id);
+    if (favoritesOnly) moreQuery = moreQuery.eq('is_favorite', true);
+    moreQuery = moreQuery
       .order('pinned', { ascending: false })
       .order('created_at', { ascending: false })
       .range(offset, offset + PAGE_SIZE - 1);
+    const { data, error } = await moreQuery;
     if (error) {
       toast.error(t('library.loadMoreFailed'));
       setHasMore(false);
@@ -262,20 +314,30 @@ export function useLibrary() {
       setItems((prev) => {
         const seen = new Set(prev.map((i) => i.id));
         const merged = [...prev, ...newItems.filter((i) => !seen.has(i.id))];
-        writeCache(CACHE_KEY_ITEMS, merged);
+        writeCache(itemsCacheKey, merged);
         return merged;
       });
       await hydratePauseMeta(newItems);
     }
     setHasMore(newItems.length === PAGE_SIZE);
     setLoadingMore(false);
-  }, [user, loadingMore, hasMore, items.length, hydratePauseMeta, t]);
+  }, [user, loadingMore, hasMore, items.length, hydratePauseMeta, t, favoritesOnly, itemsCacheKey]);
 
+  const itemsCacheKeyRef = useRef(itemsCacheKey);
+  useEffect(() => {
+    if (itemsCacheKeyRef.current === itemsCacheKey) return;
+    itemsCacheKeyRef.current = itemsCacheKey;
+    if (!user) return;
+    setItems(readCache<LibraryItem[]>(itemsCacheKey) ?? []);
+    setHasMore(true);
+  }, [user, itemsCacheKey]);
 
   useEffect(() => { fetchAll(); }, [fetchAll]);
 
   // Sync state to localStorage cache on every change
-  useEffect(() => { if (items.length > 0) writeCache(CACHE_KEY_ITEMS, items); }, [items]);
+  useEffect(() => {
+    if (items.length > 0) writeCache(itemsCacheKey, items);
+  }, [items, itemsCacheKey]);
   useEffect(() => { writeCache(CACHE_KEY_COLLECTIONS, collections); }, [collections]);
   useEffect(() => { writeCache(CACHE_KEY_COL_ITEMS, collectionItems); }, [collectionItems]);
 
@@ -295,8 +357,14 @@ export function useLibrary() {
 
   const updateItem = useCallback(async (id: string, updates: LibraryItemsUpdate) => {
     await supabase.from('library_items').update(updates).eq('id', id);
-    setItems((prev) => prev.map((i) => i.id === id ? { ...i, ...updates } as LibraryItem : i));
-  }, []);
+    setItems((prev) => {
+      const mapped = prev.map((i) => (i.id === id ? { ...i, ...updates } as LibraryItem : i));
+      if (favoritesOnly && updates.is_favorite === false) {
+        return mapped.filter((i) => i.id !== id);
+      }
+      return mapped;
+    });
+  }, [favoritesOnly]);
 
   const deleteItem = useCallback(async (id: string) => {
     const item = items.find((i) => i.id === id);

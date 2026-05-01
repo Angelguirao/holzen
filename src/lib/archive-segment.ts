@@ -9,6 +9,10 @@ export type PauseInstanceArchiveMeta = {
   state: string;
   /** ISO timestamp from `pause_instances.engaged_at`; null = user never entered Reflect for this pause. */
   engaged_at: string | null;
+  /** From `v_pause_full` — used for archive card summaries. */
+  has_breath_completed?: boolean;
+  /** Companion types that counted toward this pause (from `v_pause_full`). */
+  counted_companion_types?: string[] | null;
 };
 
 export type PauseInstanceArchiveMetaGetter = (

@@ -7,6 +7,8 @@ import { useTranslation } from 'react-i18next';
 import { formatDistanceToNow, differenceInHours } from 'date-fns';
 import { cn } from '@/lib/utils';
 import { normalizeLibrarySourceType } from '@/lib/normalize-library-source-type';
+import type { PauseInstanceArchiveMeta } from '@/lib/archive-segment';
+import { OutcomeIcon } from '@/components/icons/OutcomeIcon';
 
 interface Props {
   item: LibraryItem;
@@ -16,6 +18,18 @@ interface Props {
   incomplete?: boolean;
   /** Echoes tab: unify card kind label (“Reflection”). */
   echoesPresentation?: boolean;
+  /** Main pause row: optional session summary from `v_pause_full` + reflection outcome. */
+  showPauseSessionSummary?: boolean;
+  pauseArchiveMeta?: PauseInstanceArchiveMeta;
+  reflectionOutcome?: string | null;
+}
+
+/** Map `pause_companion_events.companion_type` / DB array values to `librarySources` keys. */
+function countedCompanionTypeToSourceKey(ct: string): string {
+  if (ct === 'ground_nudge') return 'grounding';
+  if (ct === 'zoom_out_deep_time') return 'zoom_out';
+  if (ct === 'historical_insight') return 'history_insight';
+  return ct;
 }
 
 const SOURCE_ICONS: Record<string, LucideIcon> = {
@@ -54,6 +68,9 @@ export function LibraryItemCard({
   engaged = true,
   incomplete = false,
   echoesPresentation = false,
+  showPauseSessionSummary = false,
+  pauseArchiveMeta,
+  reflectionOutcome = null,
 }: Props) {
   const { t } = useTranslation();
 
@@ -82,6 +99,31 @@ export function LibraryItemCard({
       return false;
     }
   }, [item.created_at, item.status]);
+
+  const engagedSummary = useMemo(() => {
+    if (!showPauseSessionSummary || !pauseArchiveMeta) return null;
+    if (pauseArchiveMeta.engaged_at) {
+      try {
+        return t('library.pauseCardReflectOpened', {
+          defaultValue: 'Reflect opened {{when}}',
+          when: formatDistanceToNow(new Date(pauseArchiveMeta.engaged_at), { addSuffix: true }),
+        });
+      } catch {
+        return null;
+      }
+    }
+    return t('library.pauseCardReflectNotOpened', { defaultValue: 'Reflect not opened yet' });
+  }, [showPauseSessionSummary, pauseArchiveMeta, t]);
+
+  const companionTypeChips = useMemo(() => {
+    if (!showPauseSessionSummary || !pauseArchiveMeta?.counted_companion_types?.length) return [];
+    const raw = pauseArchiveMeta.counted_companion_types;
+    const max = 4;
+    return raw.slice(0, max).map((ct) => ({
+      key: ct,
+      label: librarySourceLabel(countedCompanionTypeToSourceKey(ct), t, ct),
+    }));
+  }, [showPauseSessionSummary, pauseArchiveMeta, t]);
 
   const st = normalizeLibrarySourceType(item.source_type) ?? '';
   const CategoryIcon = SOURCE_ICONS[st] ?? FileText;
@@ -132,6 +174,50 @@ export function LibraryItemCard({
               <span className="italic">{preview}</span>
             ) : preview}
           </p>
+        )}
+        {showPauseSessionSummary && (
+          <div className="flex flex-col gap-1.5 pt-1">
+            {reflectionOutcome ? (
+              <span className="inline-flex w-fit max-w-full items-center gap-1.5 rounded-md border border-border/40 bg-muted/30 px-2 py-1 text-xs text-foreground">
+                <OutcomeIcon outcome={reflectionOutcome} size={14} className="shrink-0 text-primary/70" />
+                <span className="truncate font-medium">
+                  {t(`outcome.${reflectionOutcome}`, { defaultValue: reflectionOutcome })}
+                </span>
+              </span>
+            ) : incomplete ? (
+              <span className="text-xs text-muted-foreground">
+                {t('library.pauseCardOutcomePending', { defaultValue: 'Outcome not recorded' })}
+              </span>
+            ) : null}
+            {engagedSummary ? (
+              <span className="text-xs text-muted-foreground leading-snug">{engagedSummary}</span>
+            ) : null}
+            {pauseArchiveMeta?.has_breath_completed ? (
+              <span className="inline-flex w-fit rounded-md border border-border/30 bg-background/60 px-2 py-0.5 text-[11px] font-medium text-muted-foreground">
+                {t('library.pauseCardBreathDone', { defaultValue: 'Breathing completed' })}
+              </span>
+            ) : null}
+            {companionTypeChips.length > 0 ? (
+              <div className="flex flex-wrap gap-1">
+                <span className="w-full text-[10px] font-medium uppercase tracking-wide text-muted-foreground/70">
+                  {t('library.pauseCardEngagementTypes', { defaultValue: 'Engagement' })}
+                </span>
+                {companionTypeChips.map(({ key, label }) => (
+                  <span
+                    key={key}
+                    className="inline-flex max-w-[9rem] truncate rounded-full border border-border/35 bg-foreground/[0.04] px-2 py-0.5 text-[11px] text-secondary-foreground"
+                  >
+                    {label}
+                  </span>
+                ))}
+                {(pauseArchiveMeta?.counted_companion_types?.length ?? 0) > 4 ? (
+                  <span className="text-[11px] text-muted-foreground">
+                    {t('library.pauseCardMoreTypes', { defaultValue: '+ more' })}
+                  </span>
+                ) : null}
+              </div>
+            ) : null}
+          </div>
         )}
         <p className="text-muted-foreground/35 pt-0.5 text-sm font-sans">{timeAgo}</p>
       </div>
