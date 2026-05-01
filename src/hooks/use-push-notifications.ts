@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback, useMemo } from "react";
 import { useTranslation } from "react-i18next";
 import { toast } from "sonner";
-import { supabase } from "@/integrations/supabase/client";
+import { invokeEdge } from "@/lib/invoke-edge";
 import { useAuth } from "@/hooks/use-auth";
 
 export function usePushNotifications() {
@@ -56,9 +56,9 @@ export function usePushNotifications() {
     setLoading(true);
     try {
       // Get VAPID public key from edge function
-      const { data: keyData, error: keyError } = await supabase.functions.invoke(
+      const { data: keyData, error: keyError } = await invokeEdge<{ publicKey?: string }>(
         "register-push",
-        { body: { action: "get-vapid-key" } }
+        { body: { action: "get-vapid-key" } },
       );
       if (keyError || !keyData?.publicKey) throw new Error("Failed to get VAPID key");
 
@@ -74,7 +74,7 @@ export function usePushNotifications() {
       const subJson = subscription.toJSON();
 
       // Save to backend
-      const { error } = await supabase.functions.invoke("register-push", {
+      const { error } = await invokeEdge("register-push", {
         body: {
           action: "subscribe",
           subscription: {
@@ -103,7 +103,7 @@ export function usePushNotifications() {
       if (subscription) {
         const subJson = subscription.toJSON();
 
-        const { error: unsubErr } = await supabase.functions.invoke("register-push", {
+        const { error: unsubErr } = await invokeEdge("register-push", {
           body: {
             action: "unsubscribe",
             subscription: { endpoint: subJson.endpoint },
