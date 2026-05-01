@@ -33,8 +33,8 @@ export function BtcStatus({
   const { t } = useTranslation();
   const toggle = onToggleHidden;
 
-  const leadingToolbar = (
-    <div className="flex items-center gap-1">
+  const btcEyeToolbar = (
+    <div className="flex shrink-0 items-center justify-end gap-1">
       {onToggleBtcMode ? (
         <button
           type="button"
@@ -87,14 +87,16 @@ export function BtcStatus({
   if (!data) {
     return (
       <div className="space-y-3">
-        <div className="flex items-center gap-1">
-          <Skeleton className="h-9 w-9 shrink-0 rounded-lg" />
-          <Skeleton className="h-9 w-9 shrink-0 rounded-lg" />
-        </div>
-        <div className="space-y-2">
-          <Skeleton className="h-3 w-20" />
-          <Skeleton className="h-7 w-32" />
-          <Skeleton className="h-4 w-24" />
+        <div className="flex items-center justify-between gap-2">
+          <div className="min-w-0 flex-1 space-y-2">
+            <Skeleton className="h-3 w-20" />
+            <Skeleton className="h-7 w-32" />
+            <Skeleton className="h-4 w-24" />
+          </div>
+          <div className="flex shrink-0 gap-1">
+            <Skeleton className="h-9 w-9 rounded-lg" />
+            <Skeleton className="h-9 w-9 rounded-lg" />
+          </div>
         </div>
       </div>
     );
@@ -103,20 +105,22 @@ export function BtcStatus({
   if (btcMode) {
     return (
       <div className="space-y-3">
-        {leadingToolbar}
-        <div className="space-y-1">
-          <p className={homeInWidget.kicker}>BTC / BTC</p>
-          {hidden ? (
-            <>
-              <p className={homeInWidget.priceHidden}>••••••</p>
-              <p className={homeInWidget.subPriceHidden}>••••</p>
-            </>
-          ) : (
-            <>
-              <p className={`${homeInWidget.price} text-foreground/90`}>1 BTC = 1 BTC</p>
-              <p className="leading-snug text-sm text-[#dbb266]">{t('btcStatus.priceIsNoise')}</p>
-            </>
-          )}
+        <div className="flex items-start justify-between gap-2">
+          <div className="min-w-0 flex-1 space-y-1">
+            <p className={homeInWidget.kicker}>BTC / BTC</p>
+            {hidden ? (
+              <>
+                <p className={homeInWidget.priceHidden}>••••••</p>
+                <p className={homeInWidget.subPriceHidden}>••••</p>
+              </>
+            ) : (
+              <>
+                <p className={`${homeInWidget.price} text-foreground/90`}>1 BTC = 1 BTC</p>
+                <p className="leading-snug text-sm text-[#dbb266]">{t('btcStatus.priceIsNoise')}</p>
+              </>
+            )}
+          </div>
+          {btcEyeToolbar}
         </div>
       </div>
     );
@@ -160,16 +164,18 @@ export function BtcStatus({
 
   return (
     <div className="space-y-3">
-      {leadingToolbar}
       <div className="space-y-1">
-        <div className="flex flex-wrap items-center gap-2">
-          <p className={homeInWidget.kicker}>BTC / {cur}</p>
-          {data._stale && (
-            <span className={`flex items-center gap-1 ${homeInWidget.metaFaint}`} title="Using cached data — live APIs unavailable">
-              <Clock className="h-2.5 w-2.5" />
-              cached
-            </span>
-          )}
+        <div className="flex items-center justify-between gap-2">
+          <div className="flex min-w-0 flex-1 flex-wrap items-center gap-2">
+            <p className={homeInWidget.kicker}>BTC / {cur}</p>
+            {data._stale && (
+              <span className={`flex items-center gap-1 ${homeInWidget.metaFaint}`} title="Using cached data — live APIs unavailable">
+                <Clock className="h-2.5 w-2.5" />
+                cached
+              </span>
+            )}
+          </div>
+          {btcEyeToolbar}
         </div>
         <div className="flex items-center justify-between gap-2">
           <div className="min-w-0 flex-1">
