@@ -1,4 +1,4 @@
-import { useState, useCallback, useEffect, useMemo } from 'react';
+import { useState, useCallback, useEffect, useMemo, useRef } from 'react';
 import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
@@ -14,7 +14,7 @@ import { type PauseStep, STEPS } from '@/components/pause/PauseProgress';
 import { PauseSessionGate } from '@/components/pause/PauseSessionGate';
 import { PauseSessionScaffold } from '@/components/pause/PauseSessionScaffold';
 import { PauseFeel } from '@/components/pause/PauseFeel';
-import { PauseBreathing } from '@/components/pause/PauseBreathing';
+import { PauseBreathing, type PauseBreathingHandle } from '@/components/pause/PauseBreathing';
 import { PauseReflect } from '@/components/pause/PauseReflect';
 import { PauseShift } from '@/components/pause/PauseShift';
 import { PauseDecide } from '@/components/pause/PauseDecide';
@@ -342,6 +342,24 @@ export default function PauseSession() {
     }
   }, [step]);
 
+  const breathingRef = useRef<PauseBreathingHandle>(null);
+  const [breathTimedActive, setBreathTimedActive] = useState(false);
+
+  useEffect(() => {
+    if (step !== 'breathe') setBreathTimedActive(false);
+  }, [step]);
+
+  const handlePauseHeaderBack = useCallback(() => {
+    if (step === 'breathe' && breathTimedActive) {
+      breathingRef.current?.resetToIntro();
+      return;
+    }
+    goBack();
+  }, [step, breathTimedActive, goBack]);
+
+  const showPauseHeaderBack =
+    phase === 'session' && (STEPS.indexOf(step) > 0 || (step === 'breathe' && breathTimedActive));
+
   const goForward = useCallback(() => {
     const currentIndex = STEPS.indexOf(step);
     if (currentIndex < STEPS.length - 1) {
@@ -528,15 +546,19 @@ export default function PauseSession() {
         phase={phase}
         step={step}
         goToStep={goToStep}
+        onHeaderBack={handlePauseHeaderBack}
+        showHeaderBack={showPauseHeaderBack}
       >
         {phase === 'session' && (
           <AnimatePresence mode="wait" initial={false}>
             {step === 'breathe' && (
               <motion.div key="breathe" {...stepTransition} {...dragProps}>
                 <PauseBreathing
+                  ref={breathingRef}
                   mantra={mantra}
                   severity={severity}
                   completed={breathingCompleted}
+                  onTimedBreathingChange={setBreathTimedActive}
                   onComplete={() => {
                     setBreathingCompleted(true);
                     if (pauseInstanceId) {
@@ -560,7 +582,6 @@ export default function PauseSession() {
                   moodDone={moodDone}
                   selectedMood={selectedMood}
                   onContinue={() => goToStep('reflect')}
-                  onBack={goBack}
                 />
               </motion.div>
             )}
@@ -578,7 +599,6 @@ export default function PauseSession() {
                   onToggleFavorite={toggleFavorite}
                   subscribed={subscribed}
                   onContinue={() => goToStep('shift')}
-                  onBack={goBack}
                   mood={selectedMood}
                 />
               </motion.div>
@@ -593,7 +613,6 @@ export default function PauseSession() {
                   moodAfterDone={moodAfterDone}
                   selectedMoodAfter={selectedMoodAfter}
                   onContinue={() => goToStep('decide')}
-                  onBack={goBack}
                   groundingActivities={groundingActivities}
                 />
               </motion.div>
@@ -601,7 +620,7 @@ export default function PauseSession() {
 
             {step === 'decide' && (
               <motion.div key="decide" {...stepTransition} {...dragProps}>
-                <PauseDecide onDecide={handleDecide} onBack={goBack} />
+                <PauseDecide onDecide={handleDecide} />
               </motion.div>
             )}
           </AnimatePresence>

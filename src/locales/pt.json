@@ -27,6 +27,7 @@
   },
   "common": {
     "back": "Voltar",
+    "close": "Fechar",
     "cancel": "Cancelar",
     "delete": "Excluir",
     "done": "Pronto",
@@ -945,6 +946,8 @@
     "whatWillYouDo": "O que você vai fazer?",
     "youChose": "Você escolheu deliberadamente.",
     "return": "Voltar",
+    "sessionTitle": "A tua pausa",
+    "scienceInfoAria": "A ciência por detrás desta pausa",
     "noReflection": "Sem reflexão ativa. Volte para ativar uma.",
     "outcomeSaveFailed": "Não foi possível guardar a tua escolha. Tenta novamente."
   },

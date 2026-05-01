@@ -27,6 +27,7 @@
   },
   "common": {
     "back": "Retour",
+    "close": "Fermer",
     "cancel": "Annuler",
     "delete": "Supprimer",
     "done": "Terminé",
@@ -944,6 +945,8 @@
     "whatWillYouDo": "Que vas-tu faire ?",
     "youChose": "Tu as choisi délibérément.",
     "return": "Retour",
+    "sessionTitle": "Ta pause",
+    "scienceInfoAria": "La science derrière cette pause",
     "noReflection": "Pas de réflexion active. Retourne en déclencher une.",
     "outcomeSaveFailed": "Impossible d’enregistrer ton choix. Réessaie."
   },
