@@ -52,6 +52,40 @@ interface PinnedPausePreview {
   grounding_body: string | null;
 }
 
+const HOME_TODAY_SECTION_IDS = new Set(['market', 'your-pause']);
+
+type HomeRenderableSegment =
+  | { type: 'plain'; id: string }
+  | { type: 'todayBlock'; ids: string[] };
+
+/** When Market and Your pause are adjacent in the saved order, group them under "Today" with stat tiles (wireframe IA). */
+function buildHomeRenderableSegments(orderedIds: string[]): HomeRenderableSegment[] {
+  const todayInOrder = orderedIds.filter((id) => HOME_TODAY_SECTION_IDS.has(id));
+  const result: HomeRenderableSegment[] = [];
+  let i = 0;
+  while (i < orderedIds.length) {
+    const id = orderedIds[i];
+    if (!HOME_TODAY_SECTION_IDS.has(id)) {
+      result.push({ type: 'plain', id });
+      i++;
+      continue;
+    }
+    const chunk: string[] = [];
+    while (i < orderedIds.length && HOME_TODAY_SECTION_IDS.has(orderedIds[i])) {
+      chunk.push(orderedIds[i]);
+      i++;
+    }
+    if (chunk.length === todayInOrder.length) {
+      result.push({ type: 'todayBlock', ids: chunk });
+    } else {
+      for (const cid of chunk) {
+        result.push({ type: 'plain', id: cid });
+      }
+    }
+  }
+  return result;
+}
+
 const Home = () => {
   const { t } = useTranslation();
   const { user } = useAuth();
@@ -166,6 +200,16 @@ const Home = () => {
         return true;
       }),
     [order, sectionVisible, subscribed, nightReflection],
+  );
+
+  const homeSegments = useMemo(
+    () => buildHomeRenderableSegments(visibleOrderedSectionIds),
+    [visibleOrderedSectionIds],
+  );
+
+  const statTilesInsideToday = useMemo(
+    () => homeSegments.some((s) => s.type === 'todayBlock'),
+    [homeSegments],
   );
 
   const handleSetSectionVisible = useCallback(
@@ -393,6 +437,7 @@ const Home = () => {
   /** Hide server scheduling row while a reflection is showing or generating — keeps focus on the pause. */
   const showPauseScheduling = subscriptionReady && hasAccess && !message && !loading;
 
+  // Wireframe kit shows a generic "star" in the YOUR PAUSE header; Holzen maps that slot to Snooze (pause scheduling), not a second decorative icon.
   const pauseSectionHeaderRight = subscriptionReady && hasAccess ? <SnoozeToolbarControl /> : undefined;
 
   // Zen mode — unchanged
@@ -665,7 +710,13 @@ const Home = () => {
 
       case 'market':
         return (
-          <HomeSectionCard title={t('home.widget.market')} footer={marketFooter}>
+          <HomeSectionCard
+            title={t('home.widget.market')}
+            footer={marketFooter}
+            collapsible
+            collapsed={!!collapsed.market}
+            onToggleCollapse={() => toggleCollapsed('market')}
+          >
             <BtcStatus
               data={btcData}
               error={error}
@@ -759,14 +810,37 @@ const Home = () => {
       )}
 
       <div className="space-y-4">
-        {visibleOrderedSectionIds.map((sectionId) => {
-          const node = renderHomeSection(sectionId);
-          if (node == null) return null;
-          return <div key={sectionId}>{node}</div>;
+        {homeSegments.map((seg, segIdx) => {
+          if (seg.type === 'plain') {
+            const node = renderHomeSection(seg.id);
+            if (node == null) return null;
+            return (
+              <div key={`${seg.type}-${seg.id}-${segIdx}`}>{node}</div>
+            );
+          }
+          return (
+            <section
+              key={`today-${segIdx}`}
+              aria-labelledby="home-today-heading"
+              className="space-y-3"
+            >
+              <h2 id="home-today-heading" className="text-base font-medium text-foreground">
+                {t('home.today')}
+              </h2>
+              <div className="space-y-4">
+                {seg.ids.map((sectionId) => {
+                  const node = renderHomeSection(sectionId);
+                  if (node == null) return null;
+                  return <div key={sectionId}>{node}</div>;
+                })}
+              </div>
+              <HomeStatTiles />
+            </section>
+          );
         })}
       </div>
 
-      <HomeStatTiles />
+      {!statTilesInsideToday ? <HomeStatTiles /> : null}
 
       <HomeCustomizeSheet
         open={customizeOpen}

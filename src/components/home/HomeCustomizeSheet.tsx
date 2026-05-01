@@ -134,11 +134,13 @@ export function HomeCustomizeSheet({
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
       <SheetContent side="bottom" className="max-h-[88vh] overflow-y-auto rounded-t-2xl pb-8 pt-6">
-        <SheetHeader className="space-y-2 pr-10 text-left">
+        <SheetHeader className="space-y-2 px-1 pr-10 text-center sm:text-center">
           <SheetTitle className="text-base font-semibold sm:text-lg">
             {t('home.customizeSheet.title')}
           </SheetTitle>
-          <SheetDescription>{t('home.customizeSheet.description')}</SheetDescription>
+          <SheetDescription className="text-balance">
+            {t('home.customizeSheet.description')}
+          </SheetDescription>
         </SheetHeader>
 
         <div className="mt-6 space-y-6">
