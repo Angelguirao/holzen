@@ -2193,6 +2193,14 @@ export type Database = {
       }
     }
     Views: {
+      library_archive_echo_items: {
+        Row: Database["public"]["Tables"]["library_items"]["Row"]
+        Relationships: []
+      },
+      library_archive_pauses_tab_items: {
+        Row: Database["public"]["Tables"]["library_items"]["Row"]
+        Relationships: []
+      },
       v_ai_spend_month_global: {
         Row: {
           total_usd: number | null
@@ -2785,6 +2793,8 @@ export type Database = {
         Args: { _collection_id: string; _user_id: string }
         Returns: boolean
       }
+      pause_adopt_pending_offer: { Args: never; Returns: Json }
+      pause_decline_pending_offer: { Args: never; Returns: Json }
       pause_create_or_reuse: {
         Args: {
           p_context_fingerprint: string
@@ -2860,7 +2870,13 @@ export type Database = {
         | "superseded"
         | "ineligible_user_state"
         | "system_cancelled"
-      pause_state: "active" | "engaged" | "completed" | "dismissed" | "expired"
+      pause_state:
+        | "active"
+        | "engaged"
+        | "pending"
+        | "completed"
+        | "dismissed"
+        | "expired"
       pause_step_type:
         | "breath_completed"
         | "initial_emotion_logged"
@@ -3005,7 +3021,7 @@ export const Constants = {
         "ineligible_user_state",
         "system_cancelled",
       ],
-      pause_state: ["active", "engaged", "completed", "dismissed", "expired"],
+      pause_state: ["active", "engaged", "pending", "completed", "dismissed", "expired"],
       pause_step_type: [
         "breath_completed",
         "initial_emotion_logged",

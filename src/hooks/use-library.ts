@@ -66,25 +66,46 @@ export interface ReflectionReadFlags {
 const CACHE_KEY_ITEMS = 'holzen_library_items';
 const CACHE_KEY_ITEMS_FAVS = 'holzen_library_items_favs';
 const CACHE_KEY_ITEMS_ECHO = 'holzen_library_items_echo';
+const CACHE_KEY_ITEMS_Pauses_SEG = 'holzen_library_items_pauses_seg';
 const CACHE_KEY_COLLECTIONS = 'holzen_library_collections';
 const CACHE_KEY_COL_ITEMS = 'holzen_library_col_items';
 const PAGE_SIZE = 50;
 
+/** Which PostgREST relation backs the infinite list (see `supabase/migrations/*library_archive*.sql`). */
+export type LibraryArchiveListKind = 'default' | 'echo' | 'pauses';
+
+/** Server-side ordering for the active list (client may still re-sort after local filters). */
+export type LibraryListSortMode = 'newest' | 'oldest' | 'alphabetical';
+
 export type UseLibraryOptions = {
+  archiveListKind?: LibraryArchiveListKind;
   /**
-   * When true, `library_items` queries are restricted to favorites so pagination
-   * matches the Favs tab (avoids client-filtering the first page only).
+   * When true, restrict to favorites (`is_favorite`). Used with Pauses Favs pill
+   * against `library_archive_pauses_tab_items` or legacy `library_items`.
    */
   favoritesOnly?: boolean;
-  /**
-   * When true, list rows come from `library_archive_echo_items` (join-filtered)
-   * so Echoes-tab pagination matches echo-eligible rows only. Mutually exclusive
-   * with `favoritesOnly` in normal UI (Library passes only one at a time).
-   */
-  echoArchiveOnly?: boolean;
+  listSort?: LibraryListSortMode;
 };
 
-const LIBRARY_ARCHIVE_ECHO_ITEMS = 'library_archive_echo_items' as const;
+type LibraryItemsRelation = 'library_items' | 'library_archive_echo_items' | 'library_archive_pauses_tab_items';
+
+function libraryTableForKind(kind: LibraryArchiveListKind): LibraryItemsRelation {
+  if (kind === 'echo') return 'library_archive_echo_items';
+  if (kind === 'pauses') return 'library_archive_pauses_tab_items';
+  return 'library_items';
+}
+
+function buildItemsCacheKey(
+  kind: LibraryArchiveListKind,
+  favoritesOnly: boolean,
+  listSort: LibraryListSortMode,
+): string {
+  const sort = listSort;
+  if (kind === 'echo') return `${CACHE_KEY_ITEMS_ECHO}:${sort}`;
+  if (kind === 'pauses') return `${CACHE_KEY_ITEMS_Pauses_SEG}:${favoritesOnly ? 'fav' : 'all'}:${sort}`;
+  if (favoritesOnly) return `${CACHE_KEY_ITEMS_FAVS}:${sort}`;
+  return `${CACHE_KEY_ITEMS}:${sort}`;
+}
 
 function readCache<T>(key: string): T | null {
   try {
@@ -105,14 +126,10 @@ export function useLibrary(options?: UseLibraryOptions) {
   const { t } = useTranslation();
   const { user } = useAuth();
   const favoritesOnly = options?.favoritesOnly ?? false;
-  const echoArchiveOnly = options?.echoArchiveOnly ?? false;
-  const itemsCacheKey = echoArchiveOnly
-    ? CACHE_KEY_ITEMS_ECHO
-    : favoritesOnly
-      ? CACHE_KEY_ITEMS_FAVS
-      : CACHE_KEY_ITEMS;
-
-  const libraryItemsFrom = (echoArchiveOnly ? LIBRARY_ARCHIVE_ECHO_ITEMS : 'library_items') as never;
+  const archiveListKind: LibraryArchiveListKind = options?.archiveListKind ?? 'default';
+  const listSort: LibraryListSortMode = options?.listSort ?? 'newest';
+  const itemsCacheKey = buildItemsCacheKey(archiveListKind, favoritesOnly, listSort);
+  const libraryItemsTable = libraryTableForKind(archiveListKind);
 
   // Initialize state from cache for instant render
   const [items, setItems] = useState<LibraryItem[]>(() => readCache<LibraryItem[]>(itemsCacheKey) ?? []);
@@ -257,12 +274,18 @@ export function useLibrary(options?: UseLibraryOptions) {
     setItems(cached);
     setLoading(cached.length === 0);
 
-    let itemsQuery = supabase.from(libraryItemsFrom).select('*').eq('user_id', user.id);
+    let itemsQuery = supabase.from(libraryItemsTable).select('*').eq('user_id', user.id);
     if (favoritesOnly) itemsQuery = itemsQuery.eq('is_favorite', true);
-    itemsQuery = itemsQuery
-      .order('pinned', { ascending: false })
-      .order('created_at', { ascending: false })
-      .range(0, PAGE_SIZE - 1);
+    if (listSort === 'alphabetical') {
+      itemsQuery = itemsQuery
+        .order('pinned', { ascending: false })
+        .order('title', { ascending: true, nullsFirst: false });
+    } else if (listSort === 'oldest') {
+      itemsQuery = itemsQuery.order('pinned', { ascending: false }).order('created_at', { ascending: true });
+    } else {
+      itemsQuery = itemsQuery.order('pinned', { ascending: false }).order('created_at', { ascending: false });
+    }
+    itemsQuery = itemsQuery.range(0, PAGE_SIZE - 1);
 
     const [rItems, rCols, rColItems] = await Promise.all([
       itemsQuery,
@@ -307,18 +330,24 @@ export function useLibrary(options?: UseLibraryOptions) {
     // Keep prior pause meta until hydration completes (avoids tab/list flicker).
     await hydratePauseMeta(libItems);
     prunePauseDerivedState(libItems);
-  }, [user, hydratePauseMeta, t, favoritesOnly, itemsCacheKey, prunePauseDerivedState, libraryItemsFrom]);
+  }, [user, hydratePauseMeta, t, favoritesOnly, itemsCacheKey, prunePauseDerivedState, libraryItemsTable, listSort]);
 
   const loadMore = useCallback(async () => {
     if (!user || loadingMore || !hasMore) return;
     setLoadingMore(true);
     const offset = items.length;
-    let moreQuery = supabase.from(libraryItemsFrom).select('*').eq('user_id', user.id);
+    let moreQuery = supabase.from(libraryItemsTable).select('*').eq('user_id', user.id);
     if (favoritesOnly) moreQuery = moreQuery.eq('is_favorite', true);
-    moreQuery = moreQuery
-      .order('pinned', { ascending: false })
-      .order('created_at', { ascending: false })
-      .range(offset, offset + PAGE_SIZE - 1);
+    if (listSort === 'alphabetical') {
+      moreQuery = moreQuery
+        .order('pinned', { ascending: false })
+        .order('title', { ascending: true, nullsFirst: false });
+    } else if (listSort === 'oldest') {
+      moreQuery = moreQuery.order('pinned', { ascending: false }).order('created_at', { ascending: true });
+    } else {
+      moreQuery = moreQuery.order('pinned', { ascending: false }).order('created_at', { ascending: false });
+    }
+    moreQuery = moreQuery.range(offset, offset + PAGE_SIZE - 1);
     const { data, error } = await moreQuery;
     if (error) {
       toast.error(t('library.loadMoreFailed'));
@@ -338,7 +367,7 @@ export function useLibrary(options?: UseLibraryOptions) {
     }
     setHasMore(newItems.length === PAGE_SIZE);
     setLoadingMore(false);
-  }, [user, loadingMore, hasMore, items.length, hydratePauseMeta, t, favoritesOnly, itemsCacheKey, libraryItemsFrom]);
+  }, [user, loadingMore, hasMore, items.length, hydratePauseMeta, t, favoritesOnly, itemsCacheKey, libraryItemsTable, listSort]);
 
   useEffect(() => { fetchAll(); }, [fetchAll]);
 
