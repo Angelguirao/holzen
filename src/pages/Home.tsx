@@ -437,7 +437,7 @@ const Home = () => {
   /** Hide server scheduling row while a reflection is showing or generating — keeps focus on the pause. */
   const showPauseScheduling = subscriptionReady && hasAccess && !message && !loading;
 
-  // Wireframe kit shows a generic "star" in the YOUR PAUSE header; Holzen maps that slot to Snooze (pause scheduling), not a second decorative icon.
+  // Your pause: header right is Snooze (scheduling). Section expand/collapse uses the card chevron, not an extra icon in that cluster.
   const pauseSectionHeaderRight = subscriptionReady && hasAccess ? <SnoozeToolbarControl /> : undefined;
 
   // Zen mode — unchanged
