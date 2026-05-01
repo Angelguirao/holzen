@@ -14,6 +14,8 @@ interface Props {
   onClick?: () => void;
   engaged?: boolean;
   incomplete?: boolean;
+  /** Echoes tab: unify card kind label (“Reflection”). */
+  echoesPresentation?: boolean;
 }
 
 const SOURCE_ICONS: Record<string, LucideIcon> = {
@@ -45,7 +47,14 @@ const SOURCE_COLORS: Record<string, string> = {
   practice: 'border-l-[hsl(260,40%,50%)]/40',
 };
 
-export function LibraryItemCard({ item, onToggleFavorite, onClick, engaged = true, incomplete = false }: Props) {
+export function LibraryItemCard({
+  item,
+  onToggleFavorite,
+  onClick,
+  engaged = true,
+  incomplete = false,
+  echoesPresentation = false,
+}: Props) {
   const { t } = useTranslation();
 
   const preview = useMemo(() => {
@@ -76,11 +85,9 @@ export function LibraryItemCard({ item, onToggleFavorite, onClick, engaged = tru
 
   const st = normalizeLibrarySourceType(item.source_type) ?? '';
   const CategoryIcon = SOURCE_ICONS[st] ?? FileText;
-  const sourceBadgeLabel = librarySourceLabel(
-    st || undefined,
-    t,
-    item.type ?? 'Item'
-  );
+  const sourceBadgeLabel = echoesPresentation
+    ? t('library.echoesCardKind', { defaultValue: 'Reflection' })
+    : librarySourceLabel(st || undefined, t, item.type ?? 'Item');
   const isCompanion =
     st && !['pause', 'pause_note', 'ground', 'practice', 'external'].includes(st);
   // Only show as skipped if the pause is complete (has outcome) and user didn't engage
