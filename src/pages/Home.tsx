@@ -818,13 +818,7 @@ const Home = () => {
 
       case 'market':
         return (
-          <HomeSectionCard
-            title={t('home.widget.market')}
-            footer={marketFooter}
-            collapsible
-            collapsed={!!collapsed.market}
-            onToggleCollapse={() => toggleCollapsed('market')}
-          >
+          <HomeSectionCard title={t('home.widget.market')} footer={marketFooter}>
             <BtcStatus
               data={btcData}
               error={error}
@@ -841,13 +835,7 @@ const Home = () => {
 
       case 'your-pause':
         return (
-          <HomeSectionCard
-            title={t('home.widget.yourPause')}
-            headerRight={pauseSectionHeaderRight}
-            collapsible
-            collapsed={!!collapsed['your-pause']}
-            onToggleCollapse={() => toggleCollapsed('your-pause')}
-          >
+          <HomeSectionCard title={t('home.widget.yourPause')} headerRight={pauseSectionHeaderRight}>
             {pauseCardBody}
           </HomeSectionCard>
         );
