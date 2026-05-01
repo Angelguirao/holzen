@@ -1,7 +1,7 @@
 import { useState, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Sparkles, Download, Loader2 } from 'lucide-react';
-import { supabase } from '@/integrations/supabase/client';
+import { invokeEdge } from '@/lib/invoke-edge';
 import { toast } from 'sonner';
 import { parseEdgeFunctionError, toUserFacingAiErrorMessage } from '@/lib/edge-function-error';
 import { useSubscription } from '@/hooks/use-subscription';
@@ -143,7 +143,7 @@ export function ReflectionWallpaper({ message, mood, context, haiku, variant = '
     // Reflect the wallpaper spend instantly; refresh below reconciles.
     applyOptimisticDecrement('wallpaper');
     try {
-      const { data, error } = await supabase.functions.invoke('generate-wallpaper', {
+      const { data, error } = await invokeEdge<{ image?: string; error?: string }>('generate-wallpaper', {
         body: { message, mood, context },
       });
 
