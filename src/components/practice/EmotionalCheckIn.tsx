@@ -31,13 +31,14 @@ export function EmotionalCheckIn({ onComplete, textColor, ringColor }: Props) {
     if (!user) return;
     setSaving(true);
     try {
-      await supabase.from('practice_entries').insert({
+      const { error } = await supabase.from('practice_entries').insert({
         user_id: user.id,
         type: 'checkin',
         mood,
         intensity,
         trigger_text: trigger || null,
       });
+      if (error) throw error;
       hapticFeedback('success');
       setStep('done');
       setTimeout(onComplete, 1500);

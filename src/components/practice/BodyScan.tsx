@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/use-auth';
+import { toast } from 'sonner';
 import { hapticFeedback } from '@/lib/haptics';
 import { Check } from 'lucide-react';
 
@@ -48,11 +49,18 @@ export function BodyScan({ onComplete, textColor, ringColor, glowColor }: Props)
         hapticFeedback('success');
         const duration = Math.round((Date.now() - startTime.current) / 1000);
         if (user) {
-          supabase.from('practice_entries').insert({
-            user_id: user.id,
-            type: 'bodyscan',
-            duration_seconds: duration,
-          }).then();
+          void supabase
+            .from('practice_entries')
+            .insert({
+              user_id: user.id,
+              type: 'bodyscan',
+              duration_seconds: duration,
+            })
+            .then(({ error }) => {
+              if (error) {
+                toast.error(t('common.tryAgain', { defaultValue: 'Try again' }));
+              }
+            });
         }
         setTimeout(onComplete, 2000);
       } else {
@@ -62,7 +70,7 @@ export function BodyScan({ onComplete, textColor, ringColor, glowColor }: Props)
     } else {
       setAcknowledged(next);
     }
-  }, [acknowledged, currentStep, stepIndex, onComplete, user]);
+  }, [acknowledged, currentStep, stepIndex, onComplete, user, t]);
 
   const progress = STEPS.slice(0, stepIndex).reduce((sum, s) => sum + s.count, 0) + acknowledged;
   const total = STEPS.reduce((sum, s) => sum + s.count, 0);
