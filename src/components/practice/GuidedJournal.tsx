@@ -2,6 +2,7 @@ import { useState, useCallback, useEffect, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { motion, AnimatePresence } from 'framer-motion';
 import { supabase } from '@/integrations/supabase/client';
+import { invokeEdge } from '@/lib/invoke-edge';
 import { useAuth } from '@/hooks/use-auth';
 import { useHolzen } from '@/hooks/use-holzen';
 import { hapticFeedback } from '@/lib/haptics';
@@ -47,7 +48,7 @@ export function GuidedJournal({ onComplete, textColor, ringColor }: Props) {
 
     async function fetchAIPrompts() {
       try {
-        const { data, error } = await supabase.functions.invoke('journal-prompt', {
+        const { data, error } = await invokeEdge<{ prompts?: string[] }>('journal-prompt', {
           body: { language },
         });
         if (error) throw error;
