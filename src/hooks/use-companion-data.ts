@@ -355,8 +355,8 @@ export function useCompanionData({ companions, prefs, pauseInstanceId, context, 
           return;
         }
 
-        if (data.intervention) {
-          setIntervention(data.intervention as InterventionState);
+        if (body.intervention) {
+          setIntervention(body.intervention as InterventionState);
         } else {
           setInterventionError(true);
         }
@@ -364,7 +364,7 @@ export function useCompanionData({ companions, prefs, pauseInstanceId, context, 
 
         holzenLog.companion('orchestrate intervention ok', {
           pause_instance_prefix: pauseInstanceId.slice(0, 8),
-          hasIntervention: Boolean(data.intervention),
+          hasIntervention: Boolean(body.intervention),
         });
 
         // Hydrate any companion data the server returned alongside intervention
