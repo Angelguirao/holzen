@@ -1114,6 +1114,7 @@
     "duringSurge": "During a surge",
     "daysLater": "{{count}} day later",
     "daysLater_other": "{{count}} days later",
+    "loadFailed": "Could not load your letters. Check your connection and try again.",
     "letterNotSaved": "Letter not saved",
     "letterNotSavedDesc": "Something went wrong. Your words are not lost — try sealing again.",
     "letterSealed": "Letter sealed",
