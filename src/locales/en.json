@@ -978,6 +978,7 @@
     "customUrlPlaceholder": "URL (optional)",
     "add": "Add",
     "addFailed": "Failed to add source",
+    "loadFailed": "Could not load sources. Check your connection and try again.",
     "sourceAdded": "Source added",
     "showRemoved": "{{count}} removed sources",
     "restore": "Restore"
