@@ -27,7 +27,7 @@ import { Link, useOutletContext, useSearchParams, useNavigate } from 'react-rout
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/use-auth';
 import { toast } from 'sonner';
-import { AlertCircle, Loader2, Pin, Pencil, Sparkles, RefreshCw, X } from 'lucide-react';
+import { AlertCircle, Loader2, Pin, Pencil, Sparkles, RefreshCw } from 'lucide-react';
 import { AutoCooldownIndicator, NeedAMomentButton } from '@/components/home/HomePauseChrome';
 import { homeInWidget } from '@/components/home/home-widget-styles';
 import { cn } from '@/lib/utils';
@@ -376,22 +376,7 @@ const Home = () => {
   /** Hide server scheduling row while a reflection is showing or generating — keeps focus on the pause. */
   const showPauseScheduling = subscriptionReady && hasAccess && !message && !loading;
 
-  const pauseSectionHeaderRight =
-    subscriptionReady && hasAccess ? (
-      <div className="flex shrink-0 items-center gap-1">
-        <SnoozeToolbarControl />
-        {message ? (
-          <button
-            type="button"
-            onClick={handleDismiss}
-            className={homeInWidget.iconBtn}
-            aria-label={t('home.pauseDismissAria', { defaultValue: 'Dismiss this pause on Home' })}
-          >
-            <X className="h-3.5 w-3.5 shrink-0" aria-hidden />
-          </button>
-        ) : null}
-      </div>
-    ) : undefined;
+  const pauseSectionHeaderRight = subscriptionReady && hasAccess ? <SnoozeToolbarControl /> : undefined;
 
   // Zen mode — unchanged
   if (zenMode) {
