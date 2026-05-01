@@ -13,7 +13,6 @@ import { Button } from '@/components/ui/button';
 import { LoadingSpinner } from '@/components/ui/loading-spinner';
 import { useSubscription } from '@/hooks/use-subscription';
 import { PRICING } from '@/lib/pricing';
-import { supabase } from '@/integrations/supabase/client';
 import { invokeEdge } from '@/lib/invoke-edge';
 import { toast } from 'sonner';
 import {
@@ -994,8 +993,11 @@ export function CheckoutConfirmation() {
             newBalance: projectedBalance,
           };
 
-    void supabase.functions
-      .invoke('notify-checkout-confirmation', { body: payload })
+    void invokeEdge<{
+      emailed?: boolean;
+      pushed?: number;
+      skipped?: string | null;
+    }>('notify-checkout-confirmation', { body: payload })
       .then(({ data, error }) => {
         if (cancelled) return;
         settled = true;
@@ -1009,9 +1011,9 @@ export function CheckoutConfirmation() {
           });
           return;
         }
-        const emailed = Boolean((data as { emailed?: boolean } | null)?.emailed);
-        const pushed = Number((data as { pushed?: number } | null)?.pushed ?? 0);
-        const skipped = (data as { skipped?: string | null } | null)?.skipped ?? null;
+        const emailed = Boolean(data?.emailed);
+        const pushed = Number(data?.pushed ?? 0);
+        const skipped = data?.skipped ?? null;
         setNotifyStatus({ emailed, pushed, skipped, failed: false, errorMessage: null });
       })
       .catch((e) => {
