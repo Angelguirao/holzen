@@ -418,6 +418,28 @@ describe('decideCronFire', () => {
     ).toEqual({ action: 'pending_offer', openInstanceId: 'p1' });
   });
 
+  it('auto_supersede_open when active open pause is untouched (explicit mirror of DB)', () => {
+    expect(
+      decideCronFire({
+        openInstance: makeInstance({ state: 'active', context_fingerprint: 'fp-A' }),
+        recentTerminalMatch: null,
+        newFingerprint: 'fp-B',
+        openPauseTouched: false,
+      }),
+    ).toEqual({ action: 'auto_supersede_open', openInstanceId: 'p1' });
+  });
+
+  it('still pending_offer when engaged even if openPauseTouched false is passed', () => {
+    expect(
+      decideCronFire({
+        openInstance: makeInstance({ state: 'engaged', context_fingerprint: 'fp-A' }),
+        recentTerminalMatch: null,
+        newFingerprint: 'fp-B',
+        openPauseTouched: false,
+      }),
+    ).toEqual({ action: 'pending_offer', openInstanceId: 'p1' });
+  });
+
   it('rejects with recent_dismissal when no open pause but recent terminal fingerprint matches', () => {
     expect(
       decideCronFire({

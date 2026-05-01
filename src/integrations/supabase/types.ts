@@ -2676,6 +2676,7 @@ export type Database = {
           expired: number | null
           expired_context_lost: number | null
           expired_ineligible: number | null
+          expired_open_max_age: number | null
           expired_superseded: number | null
           expired_system_cancelled: number | null
           expired_window_elapsed: number | null
@@ -2767,6 +2768,21 @@ export type Database = {
       get_holzen_number: { Args: never; Returns: Json }
       get_signup_gate: { Args: never; Returns: Json }
       is_admin: { Args: never; Returns: boolean }
+      library_archive_list_page: {
+        Args: {
+          p_favorites_only?: boolean
+          p_limit?: number
+          p_main_pause_only?: boolean
+          p_offset?: number
+          p_search?: string | null
+          p_segment: string
+          p_smart_ids?: string[] | null
+          p_sort?: string
+          p_source_types?: string[] | null
+          p_tag?: string | null
+        }
+        Returns: Database["public"]["Tables"]["library_items"]["Row"][]
+      }
       move_to_dlq: {
         Args: {
           dlq_name: string
@@ -2867,6 +2883,7 @@ export type Database = {
       pause_expired_reason:
         | "context_lost"
         | "window_elapsed"
+        | "open_max_age"
         | "superseded"
         | "ineligible_user_state"
         | "system_cancelled"
@@ -3017,6 +3034,7 @@ export const Constants = {
       pause_expired_reason: [
         "context_lost",
         "window_elapsed",
+        "open_max_age",
         "superseded",
         "ineligible_user_state",
         "system_cancelled",

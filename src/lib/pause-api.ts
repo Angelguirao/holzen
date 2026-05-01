@@ -42,6 +42,10 @@ export interface PauseCreateOrReuseResult {
   reused_reason: 'fingerprint_match' | 'recent_dismissal' | null;
   /** When true, `instance_id` is a `pending` offer; open pause stays on `v_pause_current`. */
   pending_offer?: boolean;
+  /**
+   * When the prior open pause was superseded: user-facing adopt flow (`pending_offer`) or
+   * auto-replacement (`pending_offer` false, prior row expired as untouched).
+   */
   prior_open_instance_id?: string | null;
 }
 
