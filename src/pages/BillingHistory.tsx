@@ -1,7 +1,7 @@
 import { useEffect, useState, useCallback } from 'react';
 import { Link } from 'react-router-dom';
 import { ArrowLeft, RefreshCw, Check, Clock, Minus } from 'lucide-react';
-import { supabase } from '@/integrations/supabase/client';
+import { invokeEdge } from '@/lib/invoke-edge';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
 import { toast } from 'sonner';
@@ -116,11 +116,11 @@ export default function BillingHistory() {
     else setRefreshing(true);
     setError(null);
     try {
-      const { data, error } = await supabase.functions.invoke('list-checkout-events', {
+      const { data, error } = await invokeEdge<{ events?: CheckoutEvent[] }>('list-checkout-events', {
         body: {},
       });
       if (error) throw error;
-      const list = (data as { events?: CheckoutEvent[] } | null)?.events ?? [];
+      const list = data?.events ?? [];
       setEvents(list);
     } catch (e) {
       const msg = e instanceof Error ? e.message : 'Failed to load checkout history';

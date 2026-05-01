@@ -14,6 +14,7 @@ import { LoadingSpinner } from '@/components/ui/loading-spinner';
 import { useSubscription } from '@/hooks/use-subscription';
 import { PRICING } from '@/lib/pricing';
 import { supabase } from '@/integrations/supabase/client';
+import { invokeEdge } from '@/lib/invoke-edge';
 import { toast } from 'sonner';
 import {
   getCheckoutSuppressionWindowMs,
@@ -605,9 +606,9 @@ export function CheckoutConfirmation() {
     const tick = async () => {
       attempt += 1;
       try {
-        const { data, error } = await supabase.functions.invoke('list-checkout-events');
+        const { data, error } = await invokeEdge<{ events?: CheckoutEventLite[] }>('list-checkout-events');
         if (error) throw error;
-        const events = (data?.events ?? []) as CheckoutEventLite[];
+        const events = data?.events ?? [];
         // Most recent paid session for this pack type, by created desc.
         const match = events
           .filter(
@@ -1068,7 +1069,7 @@ export function CheckoutConfirmation() {
     //                     / server call itself rejected. User-facing
     //                     "nothing to do" responses are NOT errors.
     try {
-      const { data, error } = await supabase.functions.invoke('retry-flex-credit');
+      const { data, error } = await invokeEdge<{ applied?: unknown; scanned?: unknown }>('retry-flex-credit');
       if (error) throw error;
       const applied = Number(data?.applied) || 0;
       const scanned = Number(data?.scanned) || 0;
