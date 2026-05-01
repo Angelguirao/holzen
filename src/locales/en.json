@@ -372,6 +372,8 @@
     "pushFinishBannerTitle": "Finish enabling push in Settings",
     "pushFinishBannerBody": "Your browser already allows notifications for this site, but this device is not registered for Holzen push yet. Use the button below to complete setup (same as turning push on).",
     "pushFinishBannerAction": "Enable push on this device",
+    "pushSubscribeFailed": "Push notifications could not be enabled. Check your connection and notification permission, then try again.",
+    "pushUnsubscribeFailed": "Push notifications could not be turned off on this device. Check your connection and try again.",
     "digestFrequency": "Digest frequency",
     "digestDesc": "How often you receive your pause digest email.",
     "digestOptions": {

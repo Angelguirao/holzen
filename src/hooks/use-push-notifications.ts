@@ -1,8 +1,11 @@
 import { useState, useEffect, useCallback, useMemo } from "react";
+import { useTranslation } from "react-i18next";
+import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/use-auth";
 
 export function usePushNotifications() {
+  const { t } = useTranslation();
   const { user } = useAuth();
   const [isSubscribed, setIsSubscribed] = useState(false);
   const [isSupported, setIsSupported] = useState(false);
@@ -85,10 +88,11 @@ export function usePushNotifications() {
       setIsSubscribed(true);
     } catch (e) {
       console.error("Push subscribe error:", e);
+      toast.error(t("settings.pushSubscribeFailed"));
     } finally {
       setLoading(false);
     }
-  }, [user, isSupported]);
+  }, [user, isSupported, t]);
 
   const unsubscribe = useCallback(async () => {
     if (!user || !isSupported) return;
@@ -99,22 +103,24 @@ export function usePushNotifications() {
       if (subscription) {
         const subJson = subscription.toJSON();
 
-        await supabase.functions.invoke("register-push", {
+        const { error: unsubErr } = await supabase.functions.invoke("register-push", {
           body: {
             action: "unsubscribe",
             subscription: { endpoint: subJson.endpoint },
           },
         });
+        if (unsubErr) throw unsubErr;
 
         await subscription.unsubscribe();
       }
       setIsSubscribed(false);
     } catch (e) {
       console.error("Push unsubscribe error:", e);
+      toast.error(t("settings.pushUnsubscribeFailed"));
     } finally {
       setLoading(false);
     }
-  }, [user, isSupported]);
+  }, [user, isSupported, t]);
 
   const permissionGrantedNotSubscribed = useMemo(() => {
     if (typeof window === "undefined" || typeof Notification === "undefined") return false;
