@@ -893,7 +893,12 @@
     "freezeAvailable": "1 seri dondurma mevcut · haftalık yenileme",
     "nextFreeze": "Sonraki dondurma {{time}}",
     "used": "Kullanılan",
-    "more": "+{{count}} daha"
+    "more": "+{{count}} daha",
+    "regulation": {
+      "moodShift": {
+        "intensityFootnote": "Bu örnekteki {{sample}} molanın {{feel}} / {{shift}} tanesinde his/kayma 1–5 ölçeği kaydedildi."
+      }
+    }
   },
   "myWhy": {
     "title": "Benim Nedenim"
@@ -980,6 +985,8 @@
     "pendingDeclineFailed": "Teklif reddedilemedi. Tekrar dene.",
     "breathYouAreHere": "Buradasınız",
     "breathIntroKicker": "Adım 1 · Nefes",
+    "decideIntroKicker": "Adım 5 · Karar ver",
+    "decideMirrorKicker": "Onaylamadan önce",
     "breathInterstitialTitle": "Dayandınız",
     "breathInterstitialBody": "Hazır olduğunuzda bu anın nasıl hissettirdiğine geçin.",
     "feelIntensityTitle": "Bu duygu ne kadar güçlü?",

@@ -893,7 +893,12 @@
     "freezeAvailable": "1 reeks-freeze beschikbaar · wekelijkse vernieuwing",
     "nextFreeze": "Volgende freeze {{time}}",
     "used": "Gebruikt",
-    "more": "+{{count}} meer"
+    "more": "+{{count}} meer",
+    "regulation": {
+      "moodShift": {
+        "intensityFootnote": "Voel-/verschuivingschaal 1–5 gelogd bij {{feel}} / {{shift}} van {{sample}} pauzes in deze steekproef."
+      }
+    }
   },
   "myWhy": {
     "title": "Mijn Waarom"
@@ -958,6 +963,8 @@
     "pendingDeclineFailed": "Aanbod afwijzen mislukt. Probeer opnieuw.",
     "breathYouAreHere": "Je bent hier",
     "breathIntroKicker": "Stap 1 · Ademen",
+    "decideIntroKicker": "Stap 5 · Beslissen",
+    "decideMirrorKicker": "Voordat je bevestigt",
     "breathInterstitialTitle": "Je bleef erbij",
     "breathInterstitialBody": "Ga verder naar hoe dit moment voelt wanneer je er klaar voor bent.",
     "feelIntensityTitle": "Hoe sterk is dit gevoel?",

@@ -23,7 +23,7 @@ interface Props {
 export function MoodShiftChart({ rows }: Props) {
   const { t } = useTranslation();
 
-  const { weekly, sample } = useMemo(() => {
+  const { weekly, sample, feelIntensityLogged, shiftIntensityLogged } = useMemo(() => {
     const withPair = rows.filter(
       (r) =>
         r.initial_mood != null &&
@@ -49,7 +49,10 @@ export function MoodShiftChart({ rows }: Props) {
         avg: Math.round(e.sum / e.n),
         count: e.n,
       }));
-    return { weekly, sample: withPair.length };
+    const isIntensity = (v: unknown) => typeof v === 'number' && Number.isFinite(v);
+    const feelIntensityLogged = withPair.filter((r) => isIntensity(r.initial_emotion_intensity)).length;
+    const shiftIntensityLogged = withPair.filter((r) => isIntensity(r.shift_emotion_intensity)).length;
+    return { weekly, sample: withPair.length, feelIntensityLogged, shiftIntensityLogged };
   }, [rows]);
 
   return (
@@ -93,6 +96,17 @@ export function MoodShiftChart({ rows }: Props) {
           defaultValue: 'Formula: avg(composure(shift_mood) − composure(initial_mood)) per week.',
         })}
       </p>
+      {sample > 0 && (feelIntensityLogged > 0 || shiftIntensityLogged > 0) ? (
+        <p className="pt-1 text-[10px] text-muted-foreground/90">
+          {t('stats.regulation.moodShift.intensityFootnote', {
+            feel: feelIntensityLogged,
+            shift: shiftIntensityLogged,
+            sample,
+            defaultValue:
+              'Feel / shift 1–5 scales logged on {{feel}} / {{shift}} of {{sample}} pauses in this sample.',
+          })}
+        </p>
+      ) : null}
     </div>
   );
 }

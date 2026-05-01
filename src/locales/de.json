@@ -892,7 +892,12 @@
     "freezeAvailable": "1 Serien-Freeze verfügbar · wöchentliche Erneuerung",
     "nextFreeze": "Nächster Freeze {{time}}",
     "used": "Genutzt",
-    "more": "+{{count}} mehr"
+    "more": "+{{count}} mehr",
+    "regulation": {
+      "moodShift": {
+        "intensityFootnote": "Fühl-/Wandel-Skala (1–5) bei {{feel}} / {{shift}} von {{sample}} Pausen in dieser Stichprobe protokolliert."
+      }
+    }
   },
   "myWhy": {
     "title": "Mein Warum"
@@ -957,6 +962,8 @@
     "pendingDeclineFailed": "Angebot konnte nicht abgelehnt werden. Bitte erneut versuchen.",
     "breathYouAreHere": "Du bist hier",
     "breathIntroKicker": "Schritt 1 · Atmen",
+    "decideIntroKicker": "Schritt 5 · Entscheiden",
+    "decideMirrorKicker": "Bevor du bestätigst",
     "breathInterstitialTitle": "Du bist dabei geblieben",
     "breathInterstitialBody": "Wenn du soweit bist, geh weiter zu dem, wie sich dieser Moment anfühlt.",
     "feelIntensityTitle": "Wie stark ist dieses Gefühl?",

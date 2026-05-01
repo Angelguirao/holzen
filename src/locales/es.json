@@ -878,7 +878,12 @@
     "freezeAvailable": "1 congelamiento disponible · se renueva semanalmente",
     "nextFreeze": "Próximo congelamiento {{time}}",
     "used": "Usados",
-    "more": "+{{count}} más"
+    "more": "+{{count}} más",
+    "regulation": {
+      "moodShift": {
+        "intensityFootnote": "Escalas 1–5 de sentir/cambio registradas en {{feel}} / {{shift}} de {{sample}} pausas en esta muestra."
+      }
+    }
   },
   "myWhy": {
     "title": "Mi Por Qué"
@@ -943,6 +948,8 @@
     "pendingDeclineFailed": "No se pudo descartar la oferta. Inténtalo de nuevo.",
     "breathYouAreHere": "Estás aquí",
     "breathIntroKicker": "Paso 1 · Respirar",
+    "decideIntroKicker": "Paso 5 · Decidir",
+    "decideMirrorKicker": "Antes de confirmar",
     "breathInterstitialTitle": "Te quedaste con ello",
     "breathInterstitialBody": "Cuando estés listo, continúa hacia cómo se siente este momento.",
     "feelIntensityTitle": "¿Qué tan fuerte es esta emoción?",

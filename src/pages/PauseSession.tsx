@@ -682,7 +682,7 @@ export default function PauseSession() {
 
             {step === 'decide' && (
               <motion.div key="decide" {...stepTransition} {...dragProps}>
-                <PauseDecide onDecide={handleDecide} />
+                <PauseDecide onDecide={handleDecide} onBack={() => goToStep('shift')} />
               </motion.div>
             )}
           </AnimatePresence>
