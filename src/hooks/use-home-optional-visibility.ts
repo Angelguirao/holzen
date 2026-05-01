@@ -6,17 +6,25 @@ const STORAGE_KEY = 'holzen_home_optional_visible';
 export const CORE_HOME_SECTION_IDS = ['goal-why', 'market', 'your-pause'] as const;
 export type CoreHomeSectionId = (typeof CORE_HOME_SECTION_IDS)[number];
 
-export const OPTIONAL_HOME_WIDGET_IDS = ['journey-pulse', 'quick-capture', 'night'] as const;
+export const OPTIONAL_HOME_WIDGET_IDS = ['quick-capture', 'night'] as const;
 export type OptionalHomeWidgetId = (typeof OPTIONAL_HOME_WIDGET_IDS)[number];
 
 export const ALL_HOME_SECTION_IDS = [...CORE_HOME_SECTION_IDS, ...OPTIONAL_HOME_WIDGET_IDS] as const;
 export type AllHomeSectionId = (typeof ALL_HOME_SECTION_IDS)[number];
 
+/**
+ * Customize toggle id for the Holzen score + In motion row (`HomeStatTiles`).
+ * Not a draggable Home section — only visibility.
+ */
+export const JOURNEY_STAT_TILES_VISIBILITY_ID = 'journey-pulse' as const;
+
+const VISIBILITY_KEYS = [...ALL_HOME_SECTION_IDS, JOURNEY_STAT_TILES_VISIBILITY_ID] as const;
+
 const defaultVisible: Record<string, boolean> = {
   'goal-why': true,
   market: true,
   'your-pause': true,
-  'journey-pulse': false,
+  [JOURNEY_STAT_TILES_VISIBILITY_ID]: true,
   'quick-capture': false,
   night: false,
 };
@@ -27,7 +35,7 @@ function load(): Record<string, boolean> {
     if (!raw) return { ...defaultVisible };
     const parsed = JSON.parse(raw) as Record<string, boolean>;
     const next = { ...defaultVisible };
-    for (const id of ALL_HOME_SECTION_IDS) {
+    for (const id of VISIBILITY_KEYS) {
       if (typeof parsed[id] === 'boolean') next[id] = parsed[id];
     }
     return next;
