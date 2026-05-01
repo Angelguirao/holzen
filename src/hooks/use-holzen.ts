@@ -201,10 +201,6 @@ export function useHolzen() {
       if (silentMode) {
         holzenLog.manual('generateMessage: silent mode');
         const silentMsg = 'BTC moved.';
-        setMessage(silentMsg);
-        setContext(ctx);
-        setCompanions({ haiku: null, groundingTitle: null, groundingBody: null });
-        setNewPauseArrival(true);
 
         try {
           const res = await pauseCreateOrReuse({
@@ -222,7 +218,10 @@ export function useHolzen() {
             contextFingerprint: fingerprint,
           });
           if (!res.instance_id) return;
-          setLastPauseInstanceId(res.instance_id);
+          const isPendingOffer = res.pending_offer === true;
+          if (!isPendingOffer) {
+            setLastPauseInstanceId(res.instance_id);
+          }
           if (res.created) {
             try {
               trackEvent('pause_instance_created', {
@@ -230,6 +229,7 @@ export function useHolzen() {
                 template_slug: 'volatility_v1',
                 source: 'manual',
                 severity: severityBand,
+                pending_offer: isPendingOffer,
               });
             } catch {
               /* no-op */
@@ -244,27 +244,33 @@ export function useHolzen() {
             } as never,
             { onConflict: 'pause_instance_id,kind' } as never,
           );
-          await supabase.from('library_items').upsert(
-            {
-              user_id: user.id,
-              type: 'bookmark',
-              title: 'Pause',
-              body: silentMsg,
-              source_type: 'pause',
-              pause_instance_id: res.instance_id,
-              tags: [],
-            } as never,
-            { onConflict: 'user_id,pause_instance_id,source_type', ignoreDuplicates: true } as never,
-          );
-          setLastTriggerAt(new Date().toISOString());
-          try {
-            trackEvent('pause.manual_completed', {
-              duration_s: Math.round((Date.now() - t0) / 1000),
-              had_bitcoin_context: Boolean(ctx),
-              companion_types: [],
-            });
-          } catch {
-            /* no-op */
+          if (!isPendingOffer) {
+            setMessage(silentMsg);
+            setContext(ctx);
+            setCompanions({ haiku: null, groundingTitle: null, groundingBody: null });
+            setNewPauseArrival(true);
+            await supabase.from('library_items').upsert(
+              {
+                user_id: user.id,
+                type: 'bookmark',
+                title: 'Pause',
+                body: silentMsg,
+                source_type: 'pause',
+                pause_instance_id: res.instance_id,
+                tags: [],
+              } as never,
+              { onConflict: 'user_id,pause_instance_id,source_type', ignoreDuplicates: true } as never,
+            );
+            setLastTriggerAt(new Date().toISOString());
+            try {
+              trackEvent('pause.manual_completed', {
+                duration_s: Math.round((Date.now() - t0) / 1000),
+                had_bitcoin_context: Boolean(ctx),
+                companion_types: [],
+              });
+            } catch {
+              /* no-op */
+            }
           }
         } catch (e: unknown) {
           holzenLog.manual('generateMessage: silent pause create failed', {
@@ -339,6 +345,8 @@ export function useHolzen() {
           return;
         }
 
+        const isPendingOffer = res.pending_offer === true;
+
         if (res.created) {
           try {
             trackEvent('pause_instance_created', {
@@ -346,17 +354,20 @@ export function useHolzen() {
               template_slug: 'volatility_v1',
               source: 'manual',
               severity: severityBand,
+              pending_offer: isPendingOffer,
             });
           } catch {
             /* no-op */
           }
         }
 
-        setLastPauseInstanceId(res.instance_id);
-        setMessage(msg);
-        setContext(ctx);
-        setCompanions(companionData);
-        setNewPauseArrival(true);
+        if (!isPendingOffer) {
+          setLastPauseInstanceId(res.instance_id);
+          setMessage(msg);
+          setContext(ctx);
+          setCompanions(companionData);
+          setNewPauseArrival(true);
+        }
 
         const artifacts: Array<{
           pause_instance_id: string;
@@ -388,31 +399,33 @@ export function useHolzen() {
           .from('pause_ai_artifacts' as never)
           .upsert(artifacts as never, { onConflict: 'pause_instance_id,kind' } as never);
 
-        await supabase.from('library_items').upsert(
-          {
-            user_id: user.id,
-            type: 'bookmark',
-            title: 'Pause',
-            body: msg,
-            source_type: 'pause',
-            pause_instance_id: res.instance_id,
-            tags: [],
-          } as never,
-          {
-            onConflict: 'user_id,pause_instance_id,source_type',
-            ignoreDuplicates: true,
-          } as never,
-        );
+        if (!isPendingOffer) {
+          await supabase.from('library_items').upsert(
+            {
+              user_id: user.id,
+              type: 'bookmark',
+              title: 'Pause',
+              body: msg,
+              source_type: 'pause',
+              pause_instance_id: res.instance_id,
+              tags: [],
+            } as never,
+            {
+              onConflict: 'user_id,pause_instance_id,source_type',
+              ignoreDuplicates: true,
+            } as never,
+          );
 
-        setLastTriggerAt(new Date().toISOString());
-        try {
-          trackEvent('pause.manual_completed', {
-            duration_s: Math.round((Date.now() - t0) / 1000),
-            had_bitcoin_context: Boolean(ctx),
-            companion_types: previewCompanionTypeTags(companionData),
-          });
-        } catch {
-          /* no-op */
+          setLastTriggerAt(new Date().toISOString());
+          try {
+            trackEvent('pause.manual_completed', {
+              duration_s: Math.round((Date.now() - t0) / 1000),
+              had_bitcoin_context: Boolean(ctx),
+              companion_types: previewCompanionTypeTags(companionData),
+            });
+          } catch {
+            /* no-op */
+          }
         }
       } catch (e: unknown) {
         const raw = e instanceof Error ? e.message : String(e);
@@ -570,5 +583,7 @@ export function useHolzen() {
     nextCronCheckIn,
     profileLoaded,
     refreshProfile,
+    /** After `pause_adopt_pending_offer`, refresh Home open-pause preview from `v_pause_current`. */
+    resyncOpenPauseFromDb: syncOpenPauseFromDb,
   };
 }

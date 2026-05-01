@@ -7,6 +7,7 @@ import { PauseReadyBanner } from './PauseReadyBanner';
 import { CheckoutConfirmation } from './CheckoutConfirmation';
 import { PaywallSubscribedTracker } from './PaywallSubscribedTracker';
 import { useHolzen } from '@/hooks/use-holzen';
+import { PendingPauseOfferShell } from '@/components/pause/PendingPauseOfferShell';
 import { useLanguageSync } from '@/hooks/use-language-sync';
 import { useAutoTrigger } from '@/hooks/use-auto-trigger';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -80,7 +81,7 @@ function shellCenterNavLabel(pathname: string, t: (key: string) => string): stri
 
 export function AppLayout() {
   const { t } = useTranslation();
-  const { language, profileLoadError, retryProfileLoad } = useHolzen();
+  const { language, profileLoadError, retryProfileLoad, resyncOpenPauseFromDb } = useHolzen();
   useLanguageSync(language);
   useTabChunkPrefetch();
   const { pauseReady, dismiss } = useAutoTrigger();
@@ -90,6 +91,7 @@ export function AppLayout() {
 
   return (
     <div className="min-h-screen flex items-start justify-center p-6 pb-20">
+      <PendingPauseOfferShell onAfterMutation={() => void resyncOpenPauseFromDb()} />
       {/* Show banner on non-Home pages when auto-trigger fires */}
       {!isHome && <PauseReadyBanner visible={pauseReady} onDismiss={dismiss} />}
       <CheckoutConfirmation />

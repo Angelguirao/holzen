@@ -13,6 +13,7 @@ import { type CompanionData, type CompanionPrefs } from '@/components/CompanionS
 import { type PauseStep, STEPS } from '@/components/pause/PauseProgress';
 import { PauseSessionGate } from '@/components/pause/PauseSessionGate';
 import { PauseSessionScaffold } from '@/components/pause/PauseSessionScaffold';
+import { PendingPauseOfferShell } from '@/components/pause/PendingPauseOfferShell';
 import { PauseFeel } from '@/components/pause/PauseFeel';
 import { PauseBreathing, type PauseBreathingHandle } from '@/components/pause/PauseBreathing';
 import { PauseReflect } from '@/components/pause/PauseReflect';
@@ -60,6 +61,7 @@ export default function PauseSession() {
     companionPrefs: holzenCompanionPrefs,
     severity: holzenSeverity,
     profileLoaded,
+    resyncOpenPauseFromDb,
   } = useHolzen();
   const { subscribed, refresh: refreshSubscription } = useSubscription();
 
@@ -539,7 +541,15 @@ export default function PauseSession() {
       profileLoaded={profileLoaded}
       onReturn={handleReturn}
     >
-      <PauseSessionScaffold
+      <>
+        <PendingPauseOfferShell
+          onAfterMutation={() => void resyncOpenPauseFromDb()}
+          navigateAfterAdopt={(instanceId) => {
+            clearSession();
+            navigate('/pause', { state: { pauseInstanceId: instanceId }, replace: true });
+          }}
+        />
+        <PauseSessionScaffold
         curtainLifted={curtainLifted}
         prefersReducedMotion={!!prefersReducedMotion}
         onClose={handleClose}
@@ -630,6 +640,7 @@ export default function PauseSession() {
           <PauseDone decision={decision} onReturn={handleReturn} pauseData={pauseImpactData} />
         )}
       </PauseSessionScaffold>
+      </>
     </PauseSessionGate>
   );
 }

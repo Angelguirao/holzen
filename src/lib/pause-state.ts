@@ -23,6 +23,8 @@
 export type PauseState =
   | 'active'
   | 'engaged'
+  /** New market context row waiting for user adopt (not in `v_pause_current`). */
+  | 'pending'
   | 'completed'
   | 'dismissed'
   | 'expired';
@@ -178,6 +180,10 @@ export function computePauseState(params: {
     return instance.state;
   }
 
+  if (instance.state === 'pending') {
+    return 'pending';
+  }
+
   if (
     template.action_window_ms != null &&
     new Date(instance.window_ends_at).getTime() <= now.getTime()
@@ -221,6 +227,9 @@ export function shouldCountCompanion(params: {
       openInstance.state === 'dismissed') {
     return { counts: false, reason: 'no_active_pause' };
   }
+  if (openInstance.state === 'pending') {
+    return { counts: false, reason: 'no_active_pause' };
+  }
   if (openInstance.state === 'expired') {
     return {
       counts: false,
@@ -257,8 +266,8 @@ export function shouldCountCompanion(params: {
 /**
  * Cron-fire decision. Given the user's latest open pause (if any) + the new
  * fingerprint, tell the caller whether to create, reject (matching
- * fingerprint), or supersede (differing fingerprint). See
- * `docs/systems/pause-system.md` §6 and `PLAN.md` §2.9.
+ * fingerprint), or queue a pending offer (differing fingerprint while an
+ * open pause exists). See `docs/systems/pause-system.md` §6 and `PLAN.md` §2.9.
  *
  * Does *not* mutate anything — callers invoke `pause_create_or_reuse` in the
  * DB to do the actual work. This helper is useful for edge-function logs
@@ -267,7 +276,7 @@ export function shouldCountCompanion(params: {
 export type CronFireDecision =
   | { action: 'create' }
   | { action: 'reject'; reason: 'fingerprint_match' | 'recent_dismissal' }
-  | { action: 'supersede'; oldInstanceId: string };
+  | { action: 'pending_offer'; openInstanceId: string };
 
 export function decideCronFire(params: {
   openInstance: PauseInstanceRow | null;
@@ -280,7 +289,7 @@ export function decideCronFire(params: {
     if (openInstance.context_fingerprint === newFingerprint) {
       return { action: 'reject', reason: 'fingerprint_match' };
     }
-    return { action: 'supersede', oldInstanceId: openInstance.id };
+    return { action: 'pending_offer', openInstanceId: openInstance.id };
   }
 
   if (recentTerminalMatch && recentTerminalMatch.context_fingerprint === newFingerprint) {
