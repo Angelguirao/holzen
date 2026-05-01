@@ -1,5 +1,5 @@
 import { useQuery } from '@tanstack/react-query';
-import { supabase } from '@/integrations/supabase/client';
+import { invokeEdge } from '@/lib/invoke-edge';
 
 /**
  * Shape returned by the `grounding-enrich` edge function. All fields are
@@ -29,7 +29,7 @@ interface EnrichmentInput {
 }
 
 async function fetchEnrichment(input: Required<Pick<EnrichmentInput, 'citation'>> & EnrichmentInput): Promise<GroundingEnrichment | null> {
-  const { data, error } = await supabase.functions.invoke<GroundingEnrichment>('grounding-enrich', {
+  const { data, error } = await invokeEdge<GroundingEnrichment>('grounding-enrich', {
     body: {
       citation: input.citation,
       url: input.url ?? null,
