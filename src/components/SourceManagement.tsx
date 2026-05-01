@@ -9,6 +9,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Plus, X, Rss, Mic, BookOpen, User, BarChart3, Youtube, Mail } from 'lucide-react';
 import { toast } from 'sonner';
 import { Skeleton } from '@/components/ui/skeleton';
+import { Alert, AlertDescription } from '@/components/ui/alert';
 
 interface CatalogSource {
   id: string;
@@ -55,18 +56,39 @@ export function SourceManagement() {
   const [customType, setCustomType] = useState('blog');
 
   useEffect(() => {
-    if (!user) return;
-    const load = async () => {
-      const [{ data: sources }, { data: userPrefs }] = await Promise.all([
-        supabase.from('signal_sources').select('*').order('name'),
-        supabase.from('user_signal_preferences').select('*').eq('user_id', user.id),
-      ]);
-      setCatalog((sources as unknown as CatalogSource[]) ?? []);
-      setPrefs((userPrefs as unknown as UserPref[]) ?? []);
+    if (!user) {
       setLoading(false);
+      setLoadFailed(false);
+      return;
+    }
+    let cancelled = false;
+    setLoading(true);
+    setLoadFailed(false);
+    const load = async () => {
+      try {
+        const [rSources, rPrefs] = await Promise.all([
+          supabase.from('signal_sources').select('*').order('name'),
+          supabase.from('user_signal_preferences').select('*').eq('user_id', user.id),
+        ]);
+        if (cancelled) return;
+        if (rSources.error || rPrefs.error) {
+          setLoadFailed(true);
+          return;
+        }
+        setCatalog((rSources.data as unknown as CatalogSource[]) ?? []);
+        setPrefs((rPrefs.data as unknown as UserPref[]) ?? []);
+        setLoadFailed(false);
+      } catch {
+        if (!cancelled) setLoadFailed(true);
+      } finally {
+        if (!cancelled) setLoading(false);
+      }
     };
-    load();
-  }, [user]);
+    void load();
+    return () => {
+      cancelled = true;
+    };
+  }, [user, reloadNonce]);
 
   const isActive = useCallback((sourceId: string) => {
     const pref = prefs.find((p) => p.source_id === sourceId);
@@ -144,6 +166,21 @@ export function SourceManagement() {
         <Skeleton className="h-4 w-40" />
         <Skeleton className="h-8 w-full" />
         <Skeleton className="h-8 w-full" />
+      </div>
+    );
+  }
+
+  if (loadFailed) {
+    return (
+      <div className="space-y-3">
+        <Alert variant="destructive">
+          <AlertDescription className="flex flex-col gap-3 text-left">
+            <p>{t('sources.loadFailed')}</p>
+            <Button type="button" variant="outline" size="sm" className="self-start" onClick={() => setReloadNonce((n) => n + 1)}>
+              {t('common.tryAgain')}
+            </Button>
+          </AlertDescription>
+        </Alert>
       </div>
     );
   }
