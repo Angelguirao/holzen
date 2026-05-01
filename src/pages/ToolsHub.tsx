@@ -1,6 +1,6 @@
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { NoxHeaderMain } from '@/components/ui/nox-header';
+import { PageHeading } from '@/components/PageHeading';
 import { TOOLS } from '@/lib/app-routes';
 import { Wind, Leaf, History, Waves, PenLine, Activity, RotateCcw, Mail, ChevronRight } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
@@ -28,7 +28,7 @@ export default function ToolsHub() {
 
   return (
     <div className="space-y-6 pb-8">
-      <NoxHeaderMain title={t('tools.title')} subtitle={t('tools.subtitle')} />
+      <PageHeading title={t('tools.title')} subtitle={t('tools.subtitle')} />
       <p className="text-xs text-muted-foreground/90 leading-relaxed">{t('tools.listIntro')}</p>
       <ul className="space-y-1.5">
         {TOOL_LINKS.map(({ to, labelKey, descKey, icon: Icon, proHighlight }) => (

@@ -1,6 +1,5 @@
 import { useTranslation } from 'react-i18next';
 import { usePullToRefresh } from '@/hooks/use-pull-to-refresh';
-import { useOutletContext } from 'react-router-dom';
 import { useHolzen } from '@/hooks/use-holzen';
 import { isPausePersistError } from '@/lib/reflection-persist-error';
 import { TestimonialRequest } from '@/components/TestimonialRequest';
@@ -16,14 +15,19 @@ import { MyWhyWidget } from '@/components/MyWhyWidget';
 import { Skeleton } from '@/components/ui/skeleton';
 import { SubscriptionSkeleton } from '@/components/SubscriptionSkeleton';
 import { LoadingButton } from '@/components/ui/loading-button';
-import { NoxHeaderMain } from '@/components/ui/nox-header';
 import { HomeWidget, useWidgetLayout } from '@/components/HomeWidget';
+import { HomeSectionCard } from '@/components/home/HomeSectionCard';
+import { HomeStatTiles } from '@/components/home/HomeStatTiles';
+import { HomeHeroQuote } from '@/components/home/HomeHeroQuote';
+import { HomeCustomizeSheet } from '@/components/home/HomeCustomizeSheet';
+import { useHomeOptionalVisibility, OPTIONAL_HOME_WIDGET_IDS } from '@/hooks/use-home-optional-visibility';
+import { settingsSectionPath } from '@/lib/app-routes';
 import { useCallback, useEffect, useState, useMemo, useRef } from 'react';
-import { useSearchParams, useNavigate } from 'react-router-dom';
+import { Link, useOutletContext, useSearchParams, useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/use-auth';
 import { toast } from 'sonner';
-import { AlertCircle, Loader2, Pin, Sparkles, RotateCcw, RefreshCw, X } from 'lucide-react';
+import { AlertCircle, Loader2, Pin, Pencil, Sparkles, RefreshCw, X } from 'lucide-react';
 import { AutoCooldownIndicator, NeedAMomentButton } from '@/components/home/HomePauseChrome';
 import { homeInWidget } from '@/components/home/home-widget-styles';
 import { cn } from '@/lib/utils';
@@ -53,9 +57,7 @@ import {
 } from '@dnd-kit/sortable';
 import { restrictToVerticalAxis } from '@dnd-kit/modifiers';
 
-// Widget IDs
-const WIDGET_IDS = ['reflection', 'btc-status', 'hold-goal', 'journey-pulse', 'quick-capture', 'night'] as const;
-type WidgetId = typeof WIDGET_IDS[number];
+type OptionalWidgetId = (typeof OPTIONAL_HOME_WIDGET_IDS)[number];
 
 interface PinnedPausePreview {
   id: string;
@@ -68,14 +70,17 @@ interface PinnedPausePreview {
 
 const Home = () => {
   const { t } = useTranslation();
-  const WIDGET_TITLES: Record<WidgetId, string> = {
-    'btc-status': t('home.widget.market'),
-    'hold-goal': t('home.widget.goal'),
-    'reflection': t('home.widget.reflection'),
-    'journey-pulse': t('home.widget.journeyPulse'),
-    'quick-capture': t('home.widget.quickCapture'),
-    'night': t('home.widget.evening'),
-  };
+  const optionalWidgetTitle = useCallback(
+    (id: string) => {
+      const titles: Record<OptionalWidgetId, string> = {
+        'journey-pulse': t('home.widget.journeyPulse'),
+        'quick-capture': t('home.widget.quickCapture'),
+        night: t('home.widget.evening'),
+      };
+      return titles[id as OptionalWidgetId] ?? id;
+    },
+    [t],
+  );
   const { user } = useAuth();
   const navigate = useNavigate();
   const { subscribed, loading: subLoading, monthlyRemaining, checkoutLoading, startCheckout, refresh } = useSubscription();
@@ -150,10 +155,24 @@ const Home = () => {
   const [pinnedPausePreview, setPinnedPausePreview] = useState<PinnedPausePreview | null>(null);
   const prefersReducedMotion = useReducedMotion();
   const [completedPauseCount, setCompletedPauseCount] = useState(0);
+  const [marketCollapsed, setMarketCollapsed] = useState(false);
+  const [customizeOpen, setCustomizeOpen] = useState(false);
 
-  // Widget layout
-  const defaultOrder = useMemo(() => [...WIDGET_IDS], []);
-  const { order, collapsed, reorder, toggleCollapsed, resetLayout } = useWidgetLayout(defaultOrder);
+  const optionalDefaultOrder = useMemo(() => [...OPTIONAL_HOME_WIDGET_IDS], []);
+  const { order, collapsed, reorder, toggleCollapsed, resetLayout } = useWidgetLayout(optionalDefaultOrder);
+  const { visible: optionalVisible, setVisible, resetVisibility: resetOptionalVisibility } = useHomeOptionalVisibility();
+
+  const handleSetOptionalVisible = useCallback(
+    (id: string, value: boolean) => {
+      setVisible(id, value);
+      if (value) {
+        if (!order.includes(id)) reorder([...order, id]);
+      } else {
+        reorder(order.filter((x) => x !== id));
+      }
+    },
+    [setVisible, order, reorder],
+  );
 
   // DnD sensors with activation constraints to prevent accidental drags
   const sensors = useSensors(
@@ -162,16 +181,19 @@ const Home = () => {
     useSensor(KeyboardSensor),
   );
 
+  const sortableOptionalIds = useMemo(() => order.filter((id) => optionalVisible[id]), [order, optionalVisible]);
+
   const handleDragEnd = useCallback(
     (event: DragEndEvent) => {
       const { active, over } = event;
-      if (over && active.id !== over.id) {
-        const oldIndex = order.indexOf(active.id as string);
-        const newIndex = order.indexOf(over.id as string);
-        reorder(arrayMove(order, oldIndex, newIndex));
-      }
+      if (!over || active.id === over.id) return;
+      const ids = order.filter((id) => optionalVisible[id]);
+      const oldIndex = ids.indexOf(active.id as string);
+      const newIndex = ids.indexOf(over.id as string);
+      if (oldIndex < 0 || newIndex < 0) return;
+      reorder(arrayMove(ids, oldIndex, newIndex));
     },
-    [order, reorder],
+    [order, optionalVisible, reorder],
   );
 
   // Load pinned pause (legacy key name retained for localStorage back-compat).
@@ -406,215 +428,167 @@ const Home = () => {
     );
   }
 
-  // --- Widget content renderers ---
-  const renderWidget = (widgetId: string) => {
-    switch (widgetId as WidgetId) {
-      case 'btc-status':
-        return (
-          <HomeWidget
-            id="btc-status"
-            title={WIDGET_TITLES['btc-status']}
-            collapsed={collapsed['btc-status']}
-            onToggleCollapse={() => toggleCollapsed('btc-status')}
+  const pauseCardBody = (
+    <div className="space-y-4">
+      <BulkHoldCard />
+
+      {!subLoading && !hasAccess ? (
+        <div className="space-y-3">
+          <p className={homeInWidget.bodyMuted}>{t('home.subscription.monthlyLimitReached')}</p>
+          <p className={`${homeInWidget.meta} mb-[16px]`}>{t('home.subscription.upgradeToPro')}</p>
+          <LoadingButton
+            onClick={() => startCheckout('pro')}
+            loading={checkoutLoading}
+            loadingText={t('home.subscription.openingCheckout')}
+            className="w-full text-sm font-medium mt-4"
           >
+            {t('pro.upgradeCta')}
+          </LoadingButton>
+        </div>
+      ) : subLoading ? (
+        <SubscriptionSkeleton variant="inline" />
+      ) : (
+        <>
+          {!subscribed && monthlyRemaining !== undefined && monthlyRemaining > 0 && (
+            <p className={homeInWidget.meta}>{t('home.subscription.freeRemaining', { count: monthlyRemaining })}</p>
+          )}
+
+          {message ? (
             <div className="space-y-4">
-              <BtcStatus data={btcData} error={error} hidden={priceHidden} onToggleHidden={togglePriceHidden} currency={currency} btcMode={btcMode} onToggleBtcMode={toggleBtcMode} />
-              <div className="space-y-0.5">
-                <HolzenNumber variant="compact" />
-                <AutoCooldownIndicator cooldownRemaining={autoCooldownRemaining} cooldownHours={cooldownHours} nextCronCheckIn={nextCronCheckIn} />
-                <SnoozeControl />
+              <div className="relative">
+                <button
+                  type="button"
+                  onClick={handleDismiss}
+                  className={homeInWidget.dismissAbs}
+                  aria-label={t('common.dismiss', { defaultValue: 'Dismiss' })}
+                >
+                  <X className="h-3.5 w-3.5" aria-hidden />
+                </button>
+                <p className={cn(homeInWidget.bodyLead, 'pr-5')}>
+                  {message.split(/[.!?]\s/)[0]}
+                  {message.split(/[.!?]\s/).length > 1 ? '…' : ''}
+                </p>
+                {context && (
+                  <p className={cn(homeInWidget.meta, 'mt-2')}>
+                    {context.slice(0, 120)}
+                    {context.length > 120 ? '…' : ''}
+                  </p>
+                )}
               </div>
+              <button
+                type="button"
+                onClick={() => {
+                  const navState: PauseSessionLocationState = {
+                    reflectionMessage: message,
+                    context,
+                    pauseInstanceId: lastPauseInstanceId ?? undefined,
+                    companions,
+                    companionPrefs,
+                    severity,
+                  };
+                  holzenLog.home('Navigate to /pause (pause with this message)', {
+                    pauseInstanceId: lastPauseInstanceId,
+                    severity,
+                    messageLen: message?.length ?? 0,
+                    hasContext: !!context,
+                    companionKeys: companions
+                      ? Object.entries(companions)
+                          .filter(([, v]) => v != null)
+                          .map(([k]) => k)
+                      : [],
+                  });
+                  navigate('/pause', { state: navState });
+                }}
+                className={cn(homeInWidget.ctaPrimary, 'bg-foreground text-background hover:bg-foreground/90')}
+              >
+                <Sparkles className="h-4 w-4 shrink-0 text-background" />
+                {t('onboarding.pauseWithThis')}
+              </button>
             </div>
-          </HomeWidget>
-        );
-
-      case 'hold-goal':
-        return (
-          <HomeWidget
-            id="hold-goal"
-            title={WIDGET_TITLES['hold-goal']}
-            collapsed={collapsed['hold-goal']}
-            onToggleCollapse={() => toggleCollapsed('hold-goal')}
-          >
-            <div className="space-y-3">
-              <HoldGoalWidget currentPrice={btcData?.currentPrice} />
-              <MyWhyWidget />
-            </div>
-          </HomeWidget>
-        );
-
-      case 'reflection':
-        return (
-          <HomeWidget
-            id="reflection"
-            title={WIDGET_TITLES['reflection']}
-            alwaysOpen
-          >
-            <div className="space-y-4">
-              {/* Bulk hold for accumulated pauses */}
-              <BulkHoldCard />
-
-              {/* 24h follow-up check-in */}
-
-              {!subLoading && !hasAccess ? (
-                <div className="space-y-3">
-                  <p className={homeInWidget.bodyMuted}>
-                    {t('home.subscription.monthlyLimitReached')}
-                  </p>
-                  <p className={`${homeInWidget.meta} mb-[16px]`}>
-                    {t('home.subscription.upgradeToPro')}
-                  </p>
-                  <LoadingButton
-                    onClick={() => startCheckout('pro')}
-                    loading={checkoutLoading}
-                    loadingText={t('home.subscription.openingCheckout')}
-                    className="w-full text-sm font-medium mt-4"
-                  >
-                    {t('pro.upgradeCta')}
-                  </LoadingButton>
+          ) : (
+            <>
+              {loading ? (
+                <div className="space-y-4">
+                  <div className={homeInWidget.loadingRow}>
+                    <Loader2 className="h-4 w-4 shrink-0 animate-spin" />
+                    <p className={homeInWidget.bodyMuted}>{t('home.generatingReflection')}</p>
+                  </div>
+                  <Skeleton className="h-4 w-full" />
+                  <Skeleton className="h-4 w-3/4" />
+                  <Skeleton className="h-4 w-1/2" />
                 </div>
-              ) : subLoading ? (
-                <SubscriptionSkeleton variant="inline" />
-              ) : (
-                <>
-                  {!subscribed && monthlyRemaining !== undefined && monthlyRemaining > 0 && (
+              ) : (error && !btcData) || isPausePersistError(error) ? (
+                <div className={homeInWidget.errorPanel}>
+                  <div className="flex items-center gap-2 text-destructive">
+                    <AlertCircle className="h-4 w-4 shrink-0" />
+                    <p className="text-sm font-medium leading-snug">
+                      {isPausePersistError(error)
+                        ? error
+                        : error.includes('fetch') || error.includes('network') || error.includes('Failed to fetch')
+                          ? t('home.errors.couldNotReachPrice')
+                          : error.includes('generate') || error.includes('reflect')
+                            ? t('home.errors.aiUnavailable')
+                            : t('home.errors.somethingWentWrong')}
+                    </p>
+                  </div>
+                  {!isPausePersistError(error) && (
                     <p className={homeInWidget.meta}>
-                      {t('home.subscription.freeRemaining', { count: monthlyRemaining })}
+                      {error.includes('fetch') || error.includes('network') || error.includes('Failed to fetch')
+                        ? t('home.errors.checkConnection')
+                        : error.includes('generate') || error.includes('reflect')
+                          ? t('home.errors.aiTemporarilyUnavailable')
+                          : t('home.errors.unexpectedError')}
                     </p>
                   )}
-
-                  {message ? (
-                    <div className="space-y-4">
-                      {/* Reflection teaser with dismiss X */}
-                      <div className="relative">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      holzenLog.home('Try again: manualTrigger');
+                      manualTrigger();
+                    }}
+                    className="text-sm font-medium text-primary underline-offset-4 hover:underline"
+                  >
+                    {t('common.tryAgain')}
+                  </button>
+                </div>
+              ) : (
+                <div className="space-y-6">
+                  {pinnedPausePreview && (
+                    <div className={cn(homeInWidget.inset, 'space-y-3')}>
+                      <div className="flex items-center justify-between gap-2">
+                        <div className="flex items-center gap-2 text-muted-foreground">
+                          <Pin className="h-3.5 w-3.5 shrink-0" />
+                          <span className={homeInWidget.kicker}>{t('common.pinned')}</span>
+                        </div>
                         <button
                           type="button"
-                          onClick={handleDismiss}
-                          className={homeInWidget.dismissAbs}
-                          aria-label={t('common.dismiss', { defaultValue: 'Dismiss' })}
+                          onClick={unpinPausePreview}
+                          className="text-xs font-medium text-muted-foreground transition-colors hover:text-foreground"
                         >
-                          <X className="h-3.5 w-3.5" aria-hidden />
+                          {t('common.unpin')}
                         </button>
-                        <p className={cn(homeInWidget.bodyLead, 'pr-5')}>
-                          {message.split(/[.!?]\s/)[0]}{message.split(/[.!?]\s/).length > 1 ? '…' : ''}
-                        </p>
-                        {context && (
-                          <p className={cn(homeInWidget.meta, 'mt-2')}>
-                            {context.slice(0, 72)}{context.length > 72 ? '…' : ''}
-                          </p>
-                        )}
                       </div>
-                      <button
-                        onClick={() => {
-                          const navState: PauseSessionLocationState = {
-                            reflectionMessage: message,
-                            context,
-                            pauseInstanceId: lastPauseInstanceId ?? undefined,
-                            companions,
-                            companionPrefs,
-                            severity,
-                          };
-                          holzenLog.home('Navigate to /pause (pause with this message)', {
-                            pauseInstanceId: lastPauseInstanceId,
-                            severity,
-                            messageLen: message?.length ?? 0,
-                            hasContext: !!context,
-                            companionKeys: companions
-                              ? Object.entries(companions)
-                                  .filter(([, v]) => v != null)
-                                  .map(([k]) => k)
-                              : [],
-                          });
-                          navigate('/pause', { state: navState });
-                        }}
-                        className={homeInWidget.ctaPrimary}
-                      >
-                        <Sparkles className="h-4 w-4 shrink-0 text-primary" />
-                        {t('onboarding.pauseWithThis')}
-                      </button>
+                      <p className={homeInWidget.body}>{pinnedPausePreview.message}</p>
                     </div>
-                  ) : (
-                    <>
-                      {loading ? (
-                        <div className="space-y-4">
-                          <div className={homeInWidget.loadingRow}>
-                            <Loader2 className="h-4 w-4 shrink-0 animate-spin" />
-                            <p className={homeInWidget.bodyMuted}>{t('home.generatingReflection')}</p>
-                          </div>
-                          <Skeleton className="h-4 w-full" />
-                          <Skeleton className="h-4 w-3/4" />
-                          <Skeleton className="h-4 w-1/2" />
-                        </div>
-                      ) : (error && !btcData) || isPausePersistError(error) ? (
-                        <div className={homeInWidget.errorPanel}>
-                          <div className="flex items-center gap-2 text-destructive">
-                            <AlertCircle className="h-4 w-4 shrink-0" />
-                            <p className="text-sm font-medium leading-snug">
-                              {isPausePersistError(error)
-                                ? error
-                                : error.includes('fetch') || error.includes('network') || error.includes('Failed to fetch')
-                                ? t('home.errors.couldNotReachPrice')
-                                : error.includes('generate') || error.includes('reflect')
-                                ? t('home.errors.aiUnavailable')
-                                : t('home.errors.somethingWentWrong')}
-                            </p>
-                          </div>
-                          {!isPausePersistError(error) && (
-                            <p className={homeInWidget.meta}>
-                              {error.includes('fetch') || error.includes('network') || error.includes('Failed to fetch')
-                                ? t('home.errors.checkConnection')
-                                : error.includes('generate') || error.includes('reflect')
-                                ? t('home.errors.aiTemporarilyUnavailable')
-                                : t('home.errors.unexpectedError')}
-                            </p>
-                          )}
-                          <button
-                            type="button"
-                            onClick={() => {
-                              holzenLog.home('Try again: manualTrigger');
-                              manualTrigger();
-                            }}
-                            className="text-sm font-medium text-primary underline-offset-4 hover:underline"
-                          >
-                            {t('common.tryAgain')}
-                          </button>
-                        </div>
-                      ) : (
-                        <div className="space-y-6">
-                          {pinnedPausePreview && (
-                            <div className={cn(homeInWidget.inset, 'space-y-3')}>
-                              <div className="flex items-center justify-between gap-2">
-                                <div className="flex items-center gap-2 text-muted-foreground">
-                                  <Pin className="h-3.5 w-3.5 shrink-0" />
-                                  <span className={homeInWidget.kicker}>{t('common.pinned')}</span>
-                                </div>
-                                <button
-                                  type="button"
-                                  onClick={unpinPausePreview}
-                                  className="text-xs font-medium text-muted-foreground transition-colors hover:text-foreground"
-                                >
-                                  {t('common.unpin')}
-                                </button>
-                              </div>
-                              <p className={homeInWidget.body}>{pinnedPausePreview.message}</p>
-                            </div>
-                          )}
-                          <NeedAMomentButton onTrigger={handleNeedAPause} cooldownRemaining={manualCooldownRemaining} loading={loading} />
-                        </div>
-                      )}
-                    </>
                   )}
-                </>
+                  <NeedAMomentButton onTrigger={handleNeedAPause} cooldownRemaining={manualCooldownRemaining} loading={loading} />
+                </div>
               )}
-            </div>
-          </HomeWidget>
-        );
+            </>
+          )}
+        </>
+      )}
+    </div>
+  );
 
+  // --- Optional draggable widgets (Customize) ---
+  const renderOptionalWidget = (widgetId: string) => {
+    switch (widgetId as OptionalWidgetId) {
       case 'journey-pulse':
         return (
           <HomeWidget
             id="journey-pulse"
-            title={WIDGET_TITLES['journey-pulse']}
+            title={optionalWidgetTitle('journey-pulse')}
             collapsed={collapsed['journey-pulse']}
             onToggleCollapse={() => toggleCollapsed('journey-pulse')}
           >
@@ -626,7 +600,7 @@ const Home = () => {
         return (
           <HomeWidget
             id="quick-capture"
-            title={WIDGET_TITLES['quick-capture']}
+            title={optionalWidgetTitle('quick-capture')}
             collapsed={collapsed['quick-capture']}
             onToggleCollapse={() => toggleCollapsed('quick-capture')}
           >
@@ -639,7 +613,7 @@ const Home = () => {
         return (
           <HomeWidget
             id="night"
-            title={WIDGET_TITLES['night']}
+            title={optionalWidgetTitle('night')}
             collapsed={collapsed['night']}
             onToggleCollapse={() => toggleCollapsed('night')}
           >
@@ -652,37 +626,23 @@ const Home = () => {
     }
   };
 
-  const isDefaultOrder = order.every((id, i) => id === defaultOrder[i]);
-  const hasCollapsed = Object.values(collapsed).some(Boolean);
-
-  const headerRightSlot =
-    !isDefaultOrder || hasCollapsed ? (
-      <button
-        type="button"
-        onClick={resetLayout}
-        className="flex shrink-0 items-center gap-1.5 text-xs font-medium text-muted-foreground transition-colors hover:text-foreground"
-        aria-label="Reset widget layout"
-      >
-        <RotateCcw className="h-3 w-3" />
-        {t('common.reset')}
-      </button>
-    ) : undefined;
+  const marketFooter = <HolzenNumber variant="compact" />;
 
   return (
     <div {...pullHandlers} className="space-y-6">
-      <div className="space-y-2">
-        <NoxHeaderMain
-          title={t('home.title', { defaultValue: 'Home' })}
-          subtitle={t('home.whenBtcMoves')}
-          rightSlot={headerRightSlot}
-        />
-        {firstName ? (
-          <p className={cn(homeInWidget.bodyMuted, 'leading-snug')}>{t('home.greeting', { name: firstName })}</p>
-        ) : null}
+      <div className="relative">
+        <HomeHeroQuote userId={user?.id} firstName={firstName} />
+        <button
+          type="button"
+          onClick={() => setCustomizeOpen(true)}
+          className="absolute right-0 top-0 text-sm font-medium text-primary underline underline-offset-4"
+        >
+          {t('home.customize')}
+        </button>
       </div>
-      {/* Install card — first protected visit, dismissible */}
+
       <InstallHolzenCard />
-      {/* Pull-to-refresh indicator */}
+
       {(pullDistance > 0 || pullRefreshing) && (
         <div
           className="flex items-center justify-center transition-all overflow-hidden"
@@ -696,28 +656,94 @@ const Home = () => {
           />
         </div>
       )}
-      {/* Draggable widgets */}
-      <DndContext
-        sensors={sensors}
-        collisionDetection={closestCenter}
-        onDragEnd={handleDragEnd}
-        modifiers={[restrictToVerticalAxis]}
+
+      <HomeSectionCard
+        title={t('home.widget.goalWhy')}
+        headerRight={
+          <Link
+            to={settingsSectionPath('you')}
+            className="inline-flex h-9 w-9 items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-muted/50 hover:text-foreground"
+            aria-label={t('home.editGoalWhy')}
+          >
+            <Pencil className="h-4 w-4" aria-hidden />
+          </Link>
+        }
       >
-        <SortableContext items={order} strategy={verticalListSortingStrategy}>
+        <div className="space-y-3">
+          <HoldGoalWidget currentPrice={btcData?.currentPrice} />
+          <MyWhyWidget />
+        </div>
+      </HomeSectionCard>
+
+      <section aria-labelledby="home-today-heading" className="space-y-3">
+        <h2 id="home-today-heading" className="text-base font-medium text-foreground">
+          {t('home.today')}
+        </h2>
+
+        <HomeSectionCard
+          title={t('home.widget.market')}
+          collapsible
+          collapsed={marketCollapsed}
+          onToggleCollapse={() => setMarketCollapsed((c) => !c)}
+          footer={marketFooter}
+        >
           <div className="space-y-4">
-            {order.map((widgetId) => {
-              const content = renderWidget(widgetId);
-              // Don't render null widgets
-              if (content === null) return null;
-              return <div key={widgetId}>{content}</div>;
-            })}
+            <BtcStatus
+              data={btcData}
+              error={error}
+              hidden={priceHidden}
+              onToggleHidden={togglePriceHidden}
+              currency={currency}
+              btcMode={btcMode}
+              onToggleBtcMode={toggleBtcMode}
+            />
+            {!marketCollapsed ? (
+              <div className="space-y-0.5">
+                <AutoCooldownIndicator
+                  cooldownRemaining={autoCooldownRemaining}
+                  cooldownHours={cooldownHours}
+                  nextCronCheckIn={nextCronCheckIn}
+                />
+                <SnoozeControl />
+              </div>
+            ) : null}
           </div>
-        </SortableContext>
-      </DndContext>
+        </HomeSectionCard>
 
-      {/* Modals (outside widget flow) */}
+        <HomeSectionCard title={t('home.widget.yourPause')}>{pauseCardBody}</HomeSectionCard>
+      </section>
 
-      {/* Testimonial request */}
+      <HomeStatTiles />
+
+      {sortableOptionalIds.length > 0 ? (
+        <DndContext
+          sensors={sensors}
+          collisionDetection={closestCenter}
+          onDragEnd={handleDragEnd}
+          modifiers={[restrictToVerticalAxis]}
+        >
+          <SortableContext items={sortableOptionalIds} strategy={verticalListSortingStrategy}>
+            <div className="space-y-4">
+              {sortableOptionalIds.map((widgetId) => {
+                const content = renderOptionalWidget(widgetId);
+                if (content === null) return null;
+                return <div key={widgetId}>{content}</div>;
+              })}
+            </div>
+          </SortableContext>
+        </DndContext>
+      ) : null}
+
+      <HomeCustomizeSheet
+        open={customizeOpen}
+        onOpenChange={setCustomizeOpen}
+        visible={optionalVisible}
+        onSetVisible={handleSetOptionalVisible}
+        widgetTitle={optionalWidgetTitle}
+        onResetLayout={resetLayout}
+        onResetOptionalVisibility={resetOptionalVisibility}
+      />
+
       <TestimonialRequest completedPauseCount={completedPauseCount} />
     </div>
   );
