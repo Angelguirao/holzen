@@ -7,6 +7,8 @@ describe('isPrimaryTabActive', () => {
     expect(isPrimaryTabActive('/library', 'home')).toBe(false);
     expect(isPrimaryTabActive('/library', 'library')).toBe(true);
     expect(isPrimaryTabActive('/library/abc', 'library')).toBe(true);
+    expect(isPrimaryTabActive('/archive', 'library')).toBe(true);
+    expect(isPrimaryTabActive('/archive/segment', 'library')).toBe(true);
   });
 
   it('matches the tools tab on the hub and nested tools routes', () => {

@@ -104,9 +104,42 @@
     "editGoalWhy": "Edit goal and why",
     "customize": "Customize",
     "customizeSheet": {
-      "title": "Customize home",
-      "description": "Turn optional modules on or off and reset their order on Home.",
-      "resetLayout": "Reset layout & widgets"
+      "title": "Customize your Home",
+      "description": "Choose Hold or Zen, show or hide sections, drag to reorder on Home, or reset everything to defaults.",
+      "resetLayout": "Reset layout & widgets",
+      "modeHeading": "Home experience",
+      "holdModeTitle": "Hold",
+      "holdModeDesc": "Full Home — goal, market, pause, and any widgets you turn on.",
+      "zenModeTitle": "Zen",
+      "zenModeDesc": "A calmer screen focused on your reflection and breathing.",
+      "widgetsHeading": "Widgets",
+      "resetLink": "Reset to defaults",
+      "sections": {
+        "goalWhy": {
+          "title": "Goal & why",
+          "desc": "Your Bitcoin goal and the reason you are holding."
+        },
+        "market": {
+          "title": "Market",
+          "desc": "Price context and optional chart details."
+        },
+        "yourPause": {
+          "title": "Your pause",
+          "desc": "Reflection, limits, and starting a pause from Home."
+        },
+        "journeyPulse": {
+          "title": "Journey pulse",
+          "desc": "A compact read on your journey progress."
+        },
+        "quickCapture": {
+          "title": "Quick capture",
+          "desc": "Jot a thought without leaving Home."
+        },
+        "night": {
+          "title": "Evening reflection",
+          "desc": "End-of-day check-in when available (Pro)."
+        }
+      }
     },
     "statTiles": {
       "holzenScore": "Holzen score",
@@ -1150,6 +1183,8 @@
     "pendingDeclineFailed": "Could not dismiss the offer. Try again.",
     "breathYouAreHere": "You're here",
     "breathIntroKicker": "Step 1 · Breath",
+    "decideIntroKicker": "Step 5 · Decide",
+    "decideMirrorKicker": "Before you confirm",
     "breathInterstitialTitle": "You stayed with it",
     "breathInterstitialBody": "When you are ready, continue into how this moment feels.",
     "feelIntensityTitle": "How strong is this feeling?",
@@ -1422,7 +1457,12 @@
     "freezeAvailable": "1 streak freeze available · resets weekly",
     "nextFreeze": "Next freeze {{time}}",
     "used": "Used",
-    "more": "+{{count}} more"
+    "more": "+{{count}} more",
+    "regulation": {
+      "moodShift": {
+        "intensityFootnote": "Feel / shift 1–5 scales logged on {{feel}} / {{shift}} of {{sample}} pauses in this sample."
+      }
+    }
   },
   "myWhy": {
     "title": "My Why"

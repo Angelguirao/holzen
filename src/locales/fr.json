@@ -892,7 +892,12 @@
     "freezeAvailable": "1 gel de série disponible · renouvellement hebdomadaire",
     "nextFreeze": "Prochain gel {{time}}",
     "used": "Utilisé",
-    "more": "+{{count}} de plus"
+    "more": "+{{count}} de plus",
+    "regulation": {
+      "moodShift": {
+        "intensityFootnote": "Échelles 1–5 ressenti/changement enregistrées pour {{feel}} / {{shift}} pauses sur {{sample}} dans cet échantillon."
+      }
+    }
   },
   "myWhy": {
     "title": "Mon Pourquoi"
@@ -957,6 +962,8 @@
     "pendingDeclineFailed": "Impossible de refuser l’offre. Réessaie.",
     "breathYouAreHere": "Tu es ici",
     "breathIntroKicker": "Étape 1 · Respirer",
+    "decideIntroKicker": "Étape 5 · Décider",
+    "decideMirrorKicker": "Avant de confirmer",
     "breathInterstitialTitle": "Tu es resté·e avec",
     "breathInterstitialBody": "Quand tu es prêt·e, continue vers ce que ressent ce moment.",
     "feelIntensityTitle": "Quelle est l’intensité de ce ressenti ?",
