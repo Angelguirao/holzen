@@ -77,56 +77,100 @@ export function useHolzen() {
   const [lastPauseInstanceId, setLastPauseInstanceId] = useState<string | null>(null);
   const [lastTriggerAt, setLastTriggerAt] = useState<string | null>(null);
 
-  // Hydrate "open pause" state on mount.
+  const clearOpenPausePreview = useCallback(() => {
+    setLastPauseInstanceId(null);
+    setLastTriggerAt(null);
+    setMessage(null);
+    setContext(null);
+    setCompanions({ haiku: null, groundingTitle: null, groundingBody: null });
+  }, []);
+
+  /** Re-read v_pause_current + artifacts so Home matches Library after completes / dismissals. */
+  const syncOpenPauseFromDb = useCallback(async (signal?: AbortSignal) => {
+    const dead = () => signal?.aborted ?? false;
+    if (!user) {
+      clearOpenPausePreview();
+      return;
+    }
+    const { data } = await supabase
+      .from('v_pause_current' as never)
+      .select('id, created_at, context_snapshot')
+      .eq('user_id', user.id)
+      .maybeSingle();
+
+    if (dead()) return;
+
+    if (!data) {
+      clearOpenPausePreview();
+      return;
+    }
+
+    const row = data as {
+      id: string;
+      created_at: string;
+      context_snapshot: Record<string, unknown> | null;
+    };
+    setLastPauseInstanceId(row.id);
+    setLastTriggerAt(row.created_at);
+    const ctxText = typeof row.context_snapshot?.context_text === 'string'
+      ? (row.context_snapshot.context_text as string)
+      : null;
+    setContext(ctxText);
+
+    const { data: artifacts } = await supabase
+      .from('pause_ai_artifacts' as never)
+      .select('kind, content')
+      .eq('pause_instance_id', row.id);
+
+    if (dead()) return;
+
+    let msg: string | null = null;
+    let haiku: string | null = null;
+    let groundingTitle: string | null = null;
+    let groundingBody: string | null = null;
+    for (const a of ((artifacts ?? []) as Array<{ kind: string; content: Record<string, unknown> }>)) {
+      if (a.kind === 'reflection_text' && typeof a.content?.message === 'string') {
+        msg = a.content.message as string;
+      } else if (a.kind === 'haiku' && typeof a.content?.haiku === 'string') {
+        haiku = a.content.haiku as string;
+      } else if (a.kind === 'ground_nudge') {
+        if (typeof a.content?.title === 'string') groundingTitle = a.content.title as string;
+        if (typeof a.content?.body === 'string') groundingBody = a.content.body as string;
+      }
+    }
+    setMessage(msg);
+    setCompanions({ haiku, groundingTitle, groundingBody });
+  }, [user, clearOpenPausePreview]);
+
+  // Hydrate open pause on login; keep in sync when pause_instances changes (complete / dismiss / cron).
+  useEffect(() => {
+    const ac = new AbortController();
+    void syncOpenPauseFromDb(ac.signal);
+    return () => ac.abort();
+  }, [syncOpenPauseFromDb]);
+
   useEffect(() => {
     if (!user) return;
-    let cancelled = false;
-    void (async () => {
-      const { data } = await supabase
-        .from('v_pause_current' as never)
-        .select('id, created_at, context_snapshot')
-        .eq('user_id', user.id)
-        .maybeSingle();
-      if (cancelled || !data) return;
-      const row = data as {
-        id: string;
-        created_at: string;
-        context_snapshot: Record<string, unknown> | null;
-      };
-      setLastPauseInstanceId(row.id);
-      setLastTriggerAt(row.created_at);
-      const ctxText = typeof row.context_snapshot?.context_text === 'string'
-        ? (row.context_snapshot.context_text as string)
-        : null;
-      setContext(ctxText);
+    const channel = supabase
+      .channel(`holzen-open-pause-${user.id}`)
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'pause_instances',
+          filter: `user_id=eq.${user.id}`,
+        },
+        () => {
+          void syncOpenPauseFromDb();
+        },
+      )
+      .subscribe();
 
-      // Pull reflection_text + companion artifacts for preview.
-      const { data: artifacts } = await supabase
-        .from('pause_ai_artifacts' as never)
-        .select('kind, content')
-        .eq('pause_instance_id', row.id);
-      if (cancelled) return;
-      let msg: string | null = null;
-      let haiku: string | null = null;
-      let groundingTitle: string | null = null;
-      let groundingBody: string | null = null;
-      for (const a of ((artifacts ?? []) as Array<{ kind: string; content: Record<string, unknown> }>)) {
-        if (a.kind === 'reflection_text' && typeof a.content?.message === 'string') {
-          msg = a.content.message as string;
-        } else if (a.kind === 'haiku' && typeof a.content?.haiku === 'string') {
-          haiku = a.content.haiku as string;
-        } else if (a.kind === 'ground_nudge') {
-          if (typeof a.content?.title === 'string') groundingTitle = a.content.title as string;
-          if (typeof a.content?.body === 'string') groundingBody = a.content.body as string;
-        }
-      }
-      setMessage(msg);
-      setCompanions({ haiku, groundingTitle, groundingBody });
-    })();
     return () => {
-      cancelled = true;
+      supabase.removeChannel(channel);
     };
-  }, [user]);
+  }, [user, syncOpenPauseFromDb]);
 
   /** Generate reflect-step text (holzen-reflect) and create the V2 pause instance + artifacts. */
   const generateMessage = useCallback(
