@@ -182,9 +182,9 @@ With **1%** daily and **3%** cumulative, users enter the eligible pool **often**
 
 Use these as **stress bounds**, not typical behavior.
 
-### 6.3 “Manual every 15 minutes” vs BTC refresh
+### 6.3 Manual repeat taps vs BTC refresh
 
-The **15-minute** cadence in ops docs is the **volatility cron** schedule and aligns with how often **eligibility** is re-checked. It is **not** the same as a user tapping “pause” every 15 minutes. **BTC spot prices** for Zoom Out are maintained on a separate schedule (`refresh-btc-prices`; comments in `zoom-out.ts` refer to ~15 minute freshness).
+The **15-minute** cadence in ops docs is the **volatility cron** schedule and aligns with how often **eligibility** is re-checked. It is **not** the same as the **Home** client cooldown between successful manual “Need a moment” runs (**1 hour** in production; see `src/lib/holzen-manual-cooldown.ts`). **BTC spot prices** for Zoom Out are maintained on a separate schedule (`refresh-btc-prices`; comments in `zoom-out.ts` refer to ~15 minute freshness).
 
 ---
 
