@@ -415,7 +415,7 @@ export function useProfile() {
       setLanguageState(val);
       const { error } = await supabase.from('profiles').update({ language: val }).eq('user_id', user.id);
       if (error) {
-        holzenLog.error('profile language update failed', error);
+        holzenLog.profile('language update failed', { error: error.message });
         setLanguageState(prev);
         toast.error(t('common.profileWriteFailed'));
       }
