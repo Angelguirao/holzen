@@ -1344,7 +1344,8 @@
     "freeSessionIntro": "You’re on the manual path: pick one of your grounding activities. Holzen Pro adds an AI-timed suggestion for the moment and the market.",
     "freeLeadIn": "Take your time with {{activity}}. Stay with the sensation instead of the chart.",
     "freeSurprise": "Surprise me",
-    "upgradeForAi": "Upgrade for AI picks"
+    "upgradeForAi": "Upgrade for AI picks",
+    "historyLoadFailed": "Could not load your grounding journal. Check your connection and try again."
   },
   "breathing": {
     "trigger": "Breathe with this →",
