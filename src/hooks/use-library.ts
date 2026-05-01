@@ -65,6 +65,7 @@ export interface ReflectionReadFlags {
 
 const CACHE_KEY_ITEMS = 'holzen_library_items';
 const CACHE_KEY_ITEMS_FAVS = 'holzen_library_items_favs';
+const CACHE_KEY_ITEMS_ECHO = 'holzen_library_items_echo';
 const CACHE_KEY_COLLECTIONS = 'holzen_library_collections';
 const CACHE_KEY_COL_ITEMS = 'holzen_library_col_items';
 const PAGE_SIZE = 50;
@@ -75,7 +76,15 @@ export type UseLibraryOptions = {
    * matches the Favs tab (avoids client-filtering the first page only).
    */
   favoritesOnly?: boolean;
+  /**
+   * When true, list rows come from `library_archive_echo_items` (join-filtered)
+   * so Echoes-tab pagination matches echo-eligible rows only. Mutually exclusive
+   * with `favoritesOnly` in normal UI (Library passes only one at a time).
+   */
+  echoArchiveOnly?: boolean;
 };
+
+const LIBRARY_ARCHIVE_ECHO_ITEMS = 'library_archive_echo_items' as const;
 
 function readCache<T>(key: string): T | null {
   try {
@@ -96,7 +105,14 @@ export function useLibrary(options?: UseLibraryOptions) {
   const { t } = useTranslation();
   const { user } = useAuth();
   const favoritesOnly = options?.favoritesOnly ?? false;
-  const itemsCacheKey = favoritesOnly ? CACHE_KEY_ITEMS_FAVS : CACHE_KEY_ITEMS;
+  const echoArchiveOnly = options?.echoArchiveOnly ?? false;
+  const itemsCacheKey = echoArchiveOnly
+    ? CACHE_KEY_ITEMS_ECHO
+    : favoritesOnly
+      ? CACHE_KEY_ITEMS_FAVS
+      : CACHE_KEY_ITEMS;
+
+  const libraryItemsFrom = (echoArchiveOnly ? LIBRARY_ARCHIVE_ECHO_ITEMS : 'library_items') as never;
 
   // Initialize state from cache for instant render
   const [items, setItems] = useState<LibraryItem[]>(() => readCache<LibraryItem[]>(itemsCacheKey) ?? []);
@@ -241,10 +257,7 @@ export function useLibrary(options?: UseLibraryOptions) {
     setItems(cached);
     setLoading(cached.length === 0);
 
-    let itemsQuery = supabase
-      .from('library_items')
-      .select('*')
-      .eq('user_id', user.id);
+    let itemsQuery = supabase.from(libraryItemsFrom).select('*').eq('user_id', user.id);
     if (favoritesOnly) itemsQuery = itemsQuery.eq('is_favorite', true);
     itemsQuery = itemsQuery
       .order('pinned', { ascending: false })
@@ -294,13 +307,13 @@ export function useLibrary(options?: UseLibraryOptions) {
     // Keep prior pause meta until hydration completes (avoids tab/list flicker).
     await hydratePauseMeta(libItems);
     prunePauseDerivedState(libItems);
-  }, [user, hydratePauseMeta, t, favoritesOnly, itemsCacheKey, prunePauseDerivedState]);
+  }, [user, hydratePauseMeta, t, favoritesOnly, itemsCacheKey, prunePauseDerivedState, libraryItemsFrom]);
 
   const loadMore = useCallback(async () => {
     if (!user || loadingMore || !hasMore) return;
     setLoadingMore(true);
     const offset = items.length;
-    let moreQuery = supabase.from('library_items').select('*').eq('user_id', user.id);
+    let moreQuery = supabase.from(libraryItemsFrom).select('*').eq('user_id', user.id);
     if (favoritesOnly) moreQuery = moreQuery.eq('is_favorite', true);
     moreQuery = moreQuery
       .order('pinned', { ascending: false })
@@ -325,7 +338,7 @@ export function useLibrary(options?: UseLibraryOptions) {
     }
     setHasMore(newItems.length === PAGE_SIZE);
     setLoadingMore(false);
-  }, [user, loadingMore, hasMore, items.length, hydratePauseMeta, t, favoritesOnly, itemsCacheKey]);
+  }, [user, loadingMore, hasMore, items.length, hydratePauseMeta, t, favoritesOnly, itemsCacheKey, libraryItemsFrom]);
 
   useEffect(() => { fetchAll(); }, [fetchAll]);
 
