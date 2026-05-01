@@ -592,8 +592,8 @@ serve(
       // Pause V2: create (or reuse) the pause instance via the
       // service-role RPC, which serializes per-user with an advisory
       // lock and implements the fingerprint idempotency rule
-      // (matching fingerprint -> reuse; differing -> expire old with
-      // context_lost + supersede; recent-dismissal match -> skip).
+      // (matching fingerprint -> reuse; differing fingerprint while open
+      // -> `pending` offer; recent-dismissal match -> skip).
       const directionBucket = userBtc.direction === "down" ? "down" : "up";
       const severityBand = absChange >= 10 ? "high" : absChange >= 5 ? "moderate" : "mild";
       const fingerprint = await computeContextFingerprint({
@@ -654,6 +654,7 @@ serve(
       const pauseInstanceId: string | null = createRes?.instance_id ?? null;
       const wasCreated: boolean = createRes?.created === true;
       const reusedReason: string | null = createRes?.reused_reason ?? null;
+      const pendingOffer: boolean = createRes?.pending_offer === true;
 
       if (!pauseInstanceId) {
         // Recent-dismissal match: user already walked away from this
@@ -699,26 +700,31 @@ serve(
 
       // Keep Library parity with manual pauses: every generated pause
       // gets a `source_type='pause'` bookmark row keyed on pause_instance_id.
-      const libraryUpsert = supabase.from("library_items").upsert(
-        {
-          user_id: profile.user_id,
-          type: "bookmark",
-          title: "Pause",
-          body: result.message,
-          source_type: "pause",
-          pause_instance_id: pauseInstanceId,
-          tags: [],
-        },
-        { onConflict: "user_id,pause_instance_id,source_type", ignoreDuplicates: true },
-      );
+      const libraryUpsert = pendingOffer
+        ? Promise.resolve({ error: null })
+        : supabase.from("library_items").upsert(
+          {
+            user_id: profile.user_id,
+            type: "bookmark",
+            title: "Pause",
+            body: result.message,
+            source_type: "pause",
+            pause_instance_id: pauseInstanceId,
+            tags: [],
+          },
+          { onConflict: "user_id,pause_instance_id,source_type", ignoreDuplicates: true },
+        );
 
       // Profile update only — companion-orchestrate runs from the client on
       // first Reflect open (intervention-only) and on card taps (lazy slots),
-      // same as manual volatility pauses.
-      const profileUpdate = supabase
-        .from("profiles")
-        .update({ last_message: result.message, last_context: ctx })
-        .eq("user_id", profile.user_id);
+      // same as manual volatility pauses. Skip while a pending context offer
+      // is queued so Home still reflects the current open pause.
+      const profileUpdate = pendingOffer
+        ? Promise.resolve({ error: null })
+        : supabase
+          .from("profiles")
+          .update({ last_message: result.message, last_context: ctx })
+          .eq("user_id", profile.user_id);
 
       const [{ error: profileUpdateErr }, { error: libraryUpsertErr }] = await Promise.all([
         profileUpdate,
@@ -737,6 +743,15 @@ serve(
           holzen_event: "check_volatility_cron",
           phase: "library_reflection_upsert_failed",
           ...unknownErrorForLog(libraryUpsertErr),
+        });
+      }
+
+      if (pendingOffer) {
+        log("check_volatility_pause_pending", {
+          holzen_event: "check_volatility_cron",
+          phase: "pause_pending_context_offer",
+          user_id_prefix: String(profile.user_id).slice(0, 8),
+          instance_id_prefix: String(pauseInstanceId).slice(0, 8),
         });
       }
 

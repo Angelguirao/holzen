@@ -40,6 +40,9 @@ export interface PauseCreateOrReuseResult {
   instance_id: string | null;
   created: boolean;
   reused_reason: 'fingerprint_match' | 'recent_dismissal' | null;
+  /** When true, `instance_id` is a `pending` offer; open pause stays on `v_pause_current`. */
+  pending_offer?: boolean;
+  prior_open_instance_id?: string | null;
 }
 
 export async function pauseCreateOrReuse(params: {
@@ -57,7 +60,31 @@ export async function pauseCreateOrReuse(params: {
     p_context_fingerprint: params.contextFingerprint,
   } as never);
   if (error) throw error;
-  return (data ?? { instance_id: null, created: false, reused_reason: null }) as PauseCreateOrReuseResult;
+  return (data ?? {
+    instance_id: null,
+    created: false,
+    reused_reason: null,
+    pending_offer: false,
+    prior_open_instance_id: null,
+  }) as PauseCreateOrReuseResult;
+}
+
+export interface PauseAdoptPendingResult {
+  ok: boolean;
+  instance_id?: string;
+  error?: string;
+}
+
+export async function pauseAdoptPendingOffer(): Promise<PauseAdoptPendingResult> {
+  const { data, error } = await supabase.rpc('pause_adopt_pending_offer' as never);
+  if (error) throw error;
+  return (data ?? { ok: false }) as PauseAdoptPendingResult;
+}
+
+export async function pauseDeclinePendingOffer(): Promise<{ ok: boolean; cleared: number }> {
+  const { data, error } = await supabase.rpc('pause_decline_pending_offer' as never);
+  if (error) throw error;
+  return (data ?? { ok: false, cleared: 0 }) as { ok: boolean; cleared: number };
 }
 
 export async function pauseLogStep(params: {

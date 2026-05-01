@@ -78,7 +78,9 @@ Include `pause_instance_id` on each event so journeys line up with Sentry + Bett
 
 | Event | When | Properties | Owner |
 |---|---|---|---|
-| `pause_instance_created` | A `pause_instances` row lands in state `active` (manual hook or cron). | `{ pause_instance_id; template_slug; source: 'manual' \| 'cron_volatility' \| …; severity: 'mild' \| 'moderate' \| 'high' }` | @holzen |
+| `pause_instance_created` | A new `pause_instances` row is created (manual hook or cron): `active` or `pending` when a new context is queued behind an open pause. | `{ pause_instance_id; template_slug; source: 'manual' \| 'cron_volatility' \| …; severity: 'mild' \| 'moderate' \| 'high'; pending_offer?: boolean }` | @holzen |
+| `pause_pending_adopted` | User confirms switching from the modal; prior open pause is expired `superseded`. | `{ pause_instance_id }` (the newly active instance) | @holzen |
+| `pause_pending_declined` | User keeps the current pause; pending row expired `system_cancelled`. | `{ pause_instance_id }` (the declined pending row) | @holzen |
 | `pause_engaged` | `pause_log_step` returns `engaged` (first time per instance in-tab). | `{ pause_instance_id }` (optional: extend with `ms_since_created` when cheap) | @holzen |
 | `pause_completed` | `pause_log_step` returns `completed` (first time per instance in-tab). | `{ pause_instance_id }` | @holzen |
 | `pause_expired` | Sweeper or explicit expire. | *Not emitted from the React app today* — server-side if added later. | @holzen |

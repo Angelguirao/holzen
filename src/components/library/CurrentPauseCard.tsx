@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { ArrowRight, Pause } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { useCurrentPause } from '@/hooks/use-current-pause';
+import { usePendingPauseOffer } from '@/hooks/use-pending-pause-offer';
 import { pauseWindowShowsClockCountdown } from '@/lib/pause-state';
 
 /**
@@ -18,6 +19,7 @@ import { pauseWindowShowsClockCountdown } from '@/lib/pause-state';
  */
 export function CurrentPauseCard() {
   const { loaded, current } = useCurrentPause();
+  const { pending } = usePendingPauseOffer();
   const navigate = useNavigate();
   const { t } = useTranslation();
 
@@ -40,7 +42,15 @@ export function CurrentPauseCard() {
   });
 
   return (
-    <motion.button
+    <div className="w-full space-y-2">
+      {pending ? (
+        <p className="rounded-lg border border-amber-500/25 bg-amber-500/5 px-3 py-2 text-center text-[11px] leading-snug text-foreground/90">
+          {t('library.pendingPauseHint', {
+            defaultValue: 'New market context is queued — use the prompt on Home or here to switch or keep your current pause.',
+          })}
+        </p>
+      ) : null}
+      <motion.button
       type="button"
       initial={{ opacity: 0, y: -4 }}
       animate={{ opacity: 1, y: 0 }}
@@ -88,5 +98,6 @@ export function CurrentPauseCard() {
         </div>
       </div>
     </motion.button>
+    </div>
   );
 }

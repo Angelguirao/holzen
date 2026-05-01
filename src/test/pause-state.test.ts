@@ -275,9 +275,33 @@ describe('computePauseState', () => {
       }),
     ).toBe('completed');
   });
+
+  it('keeps pending without evaluating engagement gates', () => {
+    expect(
+      computePauseState({
+        instance: makeInstance({ state: 'pending' }),
+        template: volatilityTemplate,
+        stepEvents: [],
+        companionEvents: [],
+        now: NOW,
+      }),
+    ).toBe('pending');
+  });
 });
 
 describe('shouldCountCompanion', () => {
+  it('rejects pending instances', () => {
+    expect(
+      shouldCountCompanion({
+        openInstance: makeInstance({ state: 'pending' }),
+        template: volatilityTemplate,
+        companionEvents: [],
+        companionType: 'signal',
+        now: NOW,
+      }),
+    ).toEqual({ counts: false, reason: 'no_active_pause' });
+  });
+
   it('rejects with no_active_pause when no instance is open', () => {
     expect(
       shouldCountCompanion({
@@ -384,14 +408,14 @@ describe('decideCronFire', () => {
     ).toEqual({ action: 'reject', reason: 'fingerprint_match' });
   });
 
-  it('supersedes when open pause has different fingerprint', () => {
+  it('queues pending_offer when open pause has different fingerprint', () => {
     expect(
       decideCronFire({
         openInstance: makeInstance({ context_fingerprint: 'fp-A' }),
         recentTerminalMatch: null,
         newFingerprint: 'fp-B',
       }),
-    ).toEqual({ action: 'supersede', oldInstanceId: 'p1' });
+    ).toEqual({ action: 'pending_offer', openInstanceId: 'p1' });
   });
 
   it('rejects with recent_dismissal when no open pause but recent terminal fingerprint matches', () => {
