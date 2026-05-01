@@ -15,6 +15,9 @@ interface PauseData {
   engagedTools: number;
   wroteNote: boolean;
   usedTags: boolean;
+  feelIntensity?: number | null;
+  shiftIntensity?: number | null;
+  reinforcementQuote?: string | null;
 }
 
 interface Props {
@@ -78,6 +81,22 @@ export function PauseDone({ decision, onReturn, pauseData }: Props) {
         <p className="text-sm text-muted-foreground">{t('pause.youChose')}</p>
         <p className="font-editorial text-2xl capitalize text-foreground">{decision}</p>
       </div>
+
+      {pauseData?.reinforcementQuote && (
+        <motion.div
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.55, duration: 0.7 }}
+          className="w-full max-w-md rounded-2xl border border-primary/15 bg-primary/[0.04] px-5 py-6 text-center shadow-sm"
+        >
+          <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-primary/70">
+            {t('pause.done.reinforcementKicker', { defaultValue: 'Carry this with you' })}
+          </p>
+          <p className="mt-3 font-editorial text-lg leading-snug text-foreground sm:text-xl">
+            {pauseData.reinforcementQuote}
+          </p>
+        </motion.div>
+      )}
 
       {/* Score impact summary */}
       {pauseData && <ScoreImpact data={pauseData} />}

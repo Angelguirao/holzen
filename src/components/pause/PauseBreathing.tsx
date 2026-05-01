@@ -86,10 +86,10 @@ export const PauseBreathing = forwardRef<PauseBreathingHandle, Props>(function P
         setPhaseIndex(0);
         setElapsed(0);
         setCycle(0);
-        if (!completedProp) setCompletedLocal(false);
+        setCompletedLocal(false);
       },
     }),
-    [completedProp],
+    [],
   );
 
   const inTimedLoop = started && !completed;
