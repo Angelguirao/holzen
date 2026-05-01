@@ -77,6 +77,24 @@ export type LibraryArchiveListKind = 'default' | 'echo' | 'pauses';
 /** Server-side ordering for the active list (client may still re-sort after local filters). */
 export type LibraryListSortMode = 'newest' | 'oldest' | 'alphabetical';
 
+/** Filters applied in `library_archive_list_page` when listing Pauses / Echo segments. */
+export type LibraryArchiveRpcFilters = {
+  search: string;
+  sourceTypes: string[];
+  tag: string | null;
+  smartIds: string[];
+  /** Pauses “All” default: one main bookmark row per pause session (no active filters). */
+  mainPauseBookmarkOnly: boolean;
+};
+
+const EMPTY_ARCHIVE_RPC_FILTERS: LibraryArchiveRpcFilters = {
+  search: '',
+  sourceTypes: [],
+  tag: null,
+  smartIds: [],
+  mainPauseBookmarkOnly: false,
+};
+
 export type UseLibraryOptions = {
   archiveListKind?: LibraryArchiveListKind;
   /**
@@ -85,6 +103,8 @@ export type UseLibraryOptions = {
    */
   favoritesOnly?: boolean;
   listSort?: LibraryListSortMode;
+  /** When `archiveListKind` is `pauses` or `echo`, passed to `library_archive_list_page`. */
+  archiveRpcFilters?: LibraryArchiveRpcFilters;
 };
 
 type LibraryItemsRelation = 'library_items' | 'library_archive_echo_items' | 'library_archive_pauses_tab_items';
@@ -99,12 +119,27 @@ function buildItemsCacheKey(
   kind: LibraryArchiveListKind,
   favoritesOnly: boolean,
   listSort: LibraryListSortMode,
+  usesArchiveRpc: boolean,
+  rpcFilterKey: string,
 ): string {
   const sort = listSort;
-  if (kind === 'echo') return `${CACHE_KEY_ITEMS_ECHO}:${sort}`;
-  if (kind === 'pauses') return `${CACHE_KEY_ITEMS_Pauses_SEG}:${favoritesOnly ? 'fav' : 'all'}:${sort}`;
+  const rpc = usesArchiveRpc ? `:${rpcFilterKey}` : '';
+  if (kind === 'echo') return `${CACHE_KEY_ITEMS_ECHO}:${sort}${rpc}`;
+  if (kind === 'pauses') return `${CACHE_KEY_ITEMS_Pauses_SEG}:${favoritesOnly ? 'fav' : 'all'}:${sort}${rpc}`;
   if (favoritesOnly) return `${CACHE_KEY_ITEMS_FAVS}:${sort}`;
   return `${CACHE_KEY_ITEMS}:${sort}`;
+}
+
+function buildRpcFilterKey(f?: LibraryArchiveRpcFilters): string {
+  const st = [...(f?.sourceTypes ?? [])].sort().join('\u0001');
+  const sm = [...(f?.smartIds ?? [])].sort().join('\u0001');
+  return JSON.stringify({
+    s: f?.search ?? '',
+    st,
+    tag: f?.tag ?? '',
+    sm,
+    mp: f?.mainPauseBookmarkOnly ?? false,
+  });
 }
 
 function readCache<T>(key: string): T | null {
@@ -128,7 +163,16 @@ export function useLibrary(options?: UseLibraryOptions) {
   const favoritesOnly = options?.favoritesOnly ?? false;
   const archiveListKind: LibraryArchiveListKind = options?.archiveListKind ?? 'default';
   const listSort: LibraryListSortMode = options?.listSort ?? 'newest';
-  const itemsCacheKey = buildItemsCacheKey(archiveListKind, favoritesOnly, listSort);
+  const usesArchiveRpcList = archiveListKind === 'pauses' || archiveListKind === 'echo';
+  const rpcFilters: LibraryArchiveRpcFilters = options?.archiveRpcFilters ?? EMPTY_ARCHIVE_RPC_FILTERS;
+  const rpcFilterKey = buildRpcFilterKey(options?.archiveRpcFilters);
+  const itemsCacheKey = buildItemsCacheKey(
+    archiveListKind,
+    favoritesOnly,
+    listSort,
+    usesArchiveRpcList,
+    rpcFilterKey,
+  );
   const libraryItemsTable = libraryTableForKind(archiveListKind);
 
   // Initialize state from cache for instant render
@@ -274,21 +318,42 @@ export function useLibrary(options?: UseLibraryOptions) {
     setItems(cached);
     setLoading(cached.length === 0);
 
-    let itemsQuery = supabase.from(libraryItemsTable).select('*').eq('user_id', user.id);
-    if (favoritesOnly) itemsQuery = itemsQuery.eq('is_favorite', true);
-    if (listSort === 'alphabetical') {
-      itemsQuery = itemsQuery
-        .order('pinned', { ascending: false })
-        .order('title', { ascending: true, nullsFirst: false });
-    } else if (listSort === 'oldest') {
-      itemsQuery = itemsQuery.order('pinned', { ascending: false }).order('created_at', { ascending: true });
-    } else {
-      itemsQuery = itemsQuery.order('pinned', { ascending: false }).order('created_at', { ascending: false });
-    }
-    itemsQuery = itemsQuery.range(0, PAGE_SIZE - 1);
+    const searchTrim = rpcFilters.search?.trim() ?? '';
+    const tagTrim = rpcFilters.tag?.trim() ?? '';
+    const segment = archiveListKind === 'echo' ? 'echo' : 'pauses';
+    const rpcPayload = {
+      p_segment: segment,
+      p_favorites_only: favoritesOnly,
+      p_search: searchTrim === '' ? null : searchTrim,
+      p_tag: tagTrim === '' ? null : tagTrim,
+      p_source_types:
+        segment === 'pauses' && rpcFilters.sourceTypes.length > 0 ? rpcFilters.sourceTypes : null,
+      p_smart_ids: rpcFilters.smartIds.length > 0 ? rpcFilters.smartIds : null,
+      p_sort: listSort,
+      p_main_pause_only: segment === 'pauses' && rpcFilters.mainPauseBookmarkOnly,
+      p_limit: PAGE_SIZE,
+      p_offset: 0,
+    } satisfies Database['public']['Functions']['library_archive_list_page']['Args'];
+
+    const itemsPromise = usesArchiveRpcList
+      ? supabase.rpc('library_archive_list_page', rpcPayload)
+      : (() => {
+          let itemsQuery = supabase.from(libraryItemsTable).select('*').eq('user_id', user.id);
+          if (favoritesOnly) itemsQuery = itemsQuery.eq('is_favorite', true);
+          if (listSort === 'alphabetical') {
+            itemsQuery = itemsQuery
+              .order('pinned', { ascending: false })
+              .order('title', { ascending: true, nullsFirst: false });
+          } else if (listSort === 'oldest') {
+            itemsQuery = itemsQuery.order('pinned', { ascending: false }).order('created_at', { ascending: true });
+          } else {
+            itemsQuery = itemsQuery.order('pinned', { ascending: false }).order('created_at', { ascending: false });
+          }
+          return itemsQuery.range(0, PAGE_SIZE - 1);
+        })();
 
     const [rItems, rCols, rColItems] = await Promise.all([
-      itemsQuery,
+      itemsPromise,
       supabase
         .from('collections')
         .select('*')
@@ -330,25 +395,58 @@ export function useLibrary(options?: UseLibraryOptions) {
     // Keep prior pause meta until hydration completes (avoids tab/list flicker).
     await hydratePauseMeta(libItems);
     prunePauseDerivedState(libItems);
-  }, [user, hydratePauseMeta, t, favoritesOnly, itemsCacheKey, prunePauseDerivedState, libraryItemsTable, listSort]);
+  }, [
+    user,
+    hydratePauseMeta,
+    t,
+    favoritesOnly,
+    itemsCacheKey,
+    prunePauseDerivedState,
+    libraryItemsTable,
+    listSort,
+    usesArchiveRpcList,
+    archiveListKind,
+    rpcFilters,
+  ]);
 
   const loadMore = useCallback(async () => {
     if (!user || loadingMore || !hasMore) return;
     setLoadingMore(true);
     const offset = items.length;
-    let moreQuery = supabase.from(libraryItemsTable).select('*').eq('user_id', user.id);
-    if (favoritesOnly) moreQuery = moreQuery.eq('is_favorite', true);
-    if (listSort === 'alphabetical') {
-      moreQuery = moreQuery
-        .order('pinned', { ascending: false })
-        .order('title', { ascending: true, nullsFirst: false });
-    } else if (listSort === 'oldest') {
-      moreQuery = moreQuery.order('pinned', { ascending: false }).order('created_at', { ascending: true });
-    } else {
-      moreQuery = moreQuery.order('pinned', { ascending: false }).order('created_at', { ascending: false });
-    }
-    moreQuery = moreQuery.range(offset, offset + PAGE_SIZE - 1);
-    const { data, error } = await moreQuery;
+
+    const searchTrim = rpcFilters.search?.trim() ?? '';
+    const tagTrim = rpcFilters.tag?.trim() ?? '';
+    const segment = archiveListKind === 'echo' ? 'echo' : 'pauses';
+    const rpcPayload = {
+      p_segment: segment,
+      p_favorites_only: favoritesOnly,
+      p_search: searchTrim === '' ? null : searchTrim,
+      p_tag: tagTrim === '' ? null : tagTrim,
+      p_source_types:
+        segment === 'pauses' && rpcFilters.sourceTypes.length > 0 ? rpcFilters.sourceTypes : null,
+      p_smart_ids: rpcFilters.smartIds.length > 0 ? rpcFilters.smartIds : null,
+      p_sort: listSort,
+      p_main_pause_only: segment === 'pauses' && rpcFilters.mainPauseBookmarkOnly,
+      p_limit: PAGE_SIZE,
+      p_offset: offset,
+    } satisfies Database['public']['Functions']['library_archive_list_page']['Args'];
+
+    const { data, error } = usesArchiveRpcList
+      ? await supabase.rpc('library_archive_list_page', rpcPayload)
+      : await (() => {
+          let moreQuery = supabase.from(libraryItemsTable).select('*').eq('user_id', user.id);
+          if (favoritesOnly) moreQuery = moreQuery.eq('is_favorite', true);
+          if (listSort === 'alphabetical') {
+            moreQuery = moreQuery
+              .order('pinned', { ascending: false })
+              .order('title', { ascending: true, nullsFirst: false });
+          } else if (listSort === 'oldest') {
+            moreQuery = moreQuery.order('pinned', { ascending: false }).order('created_at', { ascending: true });
+          } else {
+            moreQuery = moreQuery.order('pinned', { ascending: false }).order('created_at', { ascending: false });
+          }
+          return moreQuery.range(offset, offset + PAGE_SIZE - 1);
+        })();
     if (error) {
       toast.error(t('library.loadMoreFailed'));
       setHasMore(false);
@@ -367,7 +465,21 @@ export function useLibrary(options?: UseLibraryOptions) {
     }
     setHasMore(newItems.length === PAGE_SIZE);
     setLoadingMore(false);
-  }, [user, loadingMore, hasMore, items.length, hydratePauseMeta, t, favoritesOnly, itemsCacheKey, libraryItemsTable, listSort]);
+  }, [
+    user,
+    loadingMore,
+    hasMore,
+    items.length,
+    hydratePauseMeta,
+    t,
+    favoritesOnly,
+    itemsCacheKey,
+    libraryItemsTable,
+    listSort,
+    usesArchiveRpcList,
+    archiveListKind,
+    rpcFilters,
+  ]);
 
   useEffect(() => { fetchAll(); }, [fetchAll]);
 
