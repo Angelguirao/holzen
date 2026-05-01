@@ -83,7 +83,8 @@ Payload shapes:
 | Step type | Payload |
 |---|---|
 | `breath_completed` | `{}` |
-| `initial_emotion_logged` / `shift_emotion_logged` | `{ "mood": "calm" }` |
+| `initial_emotion_logged` | `{ "mood": "calm", "intensity"?: 1–5 }` (intensity optional; Feel step). |
+| `shift_emotion_logged` | `{ "mood": "calm", "shift_intensity"?: 1–5 }` (shift scale optional; Shift step). |
 | `outcome_logged` | `{ "outcome": "held" \| "nothing" \| "sold" \| "bought" }` |
 | `note_updated` | `{ "text": "..." }` |
 | `tag_updated` | `{ "tags": ["..."] }` |

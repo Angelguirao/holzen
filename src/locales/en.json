@@ -1150,6 +1150,19 @@
     "pendingAdoptFailed": "Could not switch to the new pause. Try again.",
     "pendingDeclineFailed": "Could not dismiss the offer. Try again.",
     "breathYouAreHere": "You're here",
+    "breathIntroKicker": "Step 1 · Breath",
+    "breathInterstitialTitle": "You stayed with it",
+    "breathInterstitialBody": "When you are ready, continue into how this moment feels.",
+    "feelIntensityTitle": "How strong is this feeling?",
+    "feelIntensityLow": "Light",
+    "feelIntensityHigh": "Strong",
+    "feelIntensitySummary": "Intensity {{n}} / 5",
+    "shiftSubcopy": "Notice what changed after reflecting — there is no wrong answer.",
+    "shiftPriorLabel": "Earlier",
+    "shiftIntensityTitle": "How much did it shift?",
+    "shiftIntensityLow": "Barely",
+    "shiftIntensityHigh": "A lot",
+    "shiftIntensitySummary": "Shift {{n}} / 5",
     "favoriteProHint": "Your favorites will be waiting in your Library with Pro ✨",
     "steps": {
       "breathe": "Breathe",
@@ -1162,11 +1175,24 @@
     },
     "reflect": {
       "heading": "Sit with this reflection",
-      "subcopy": "Read at your own pace. Notes and tags are optional; open a companion card only when you want another angle.",
+      "subcopy": "Read at your own pace. Notes and tags are optional; open a companion when you want another angle.",
+      "block1Title": "The reflection",
+      "block2Title": "Take what you need",
       "proTools": "Your note & tags",
       "freeHint": "Holzen Pro adds an optional private note and tags on each pause — useful when you look back in your Library.",
-      "companionsLead": "When you are ready, open a card — one at a time is enough.",
-      "continueHint": "There is no \"right\" amount of time — continue when you feel done."
+      "companionsLead": "Open one angle at a time — each card expands below.",
+      "continueHint": "There is no \"right\" amount of time — continue when you feel done.",
+      "shareCta": "Share",
+      "wallpaperCta": "Wallpaper",
+      "shareTitle": "Reflection from Holzen",
+      "shareCopied": "Reflection copied to clipboard.",
+      "shareCopyFailed": "Could not copy. Try again.",
+      "shareEmpty": "Nothing to share yet.",
+      "wallpaperCopied": "Copied. Paste into your wallpaper or lock-screen widget when you edit it.",
+      "wallpaperHint": "Copy your reflection and paste it into a wallpaper or lock-screen quote widget."
+    },
+    "done": {
+      "reinforcementKicker": "Carry this with you"
     }
   },
   "letter": {
