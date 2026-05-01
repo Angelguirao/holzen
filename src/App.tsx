@@ -129,9 +129,8 @@ function CheckoutGuardCleanup() {
 }
 
 /**
- * Floating feedback button — only shown for authenticated users.
- * `send-feedback` requires an auth'd session, and the ErrorBoundary listener on the widget
- * also needs the auth context in case the user wants to reach support from the error screen.
+ * Mounts the error-report feedback sheet listener for signed-in users only (`send-feedback` needs a session).
+ * Voluntary contact is Settings → About (`FeedbackForm`). `ErrorBoundary` opens the sheet via `holzen:open-feedback`.
  */
 function FeedbackWidgetGate() {
   const { user } = useAuth();

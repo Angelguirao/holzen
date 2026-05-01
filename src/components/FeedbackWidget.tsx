@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Bug, Lightbulb, HelpCircle, MessageSquareText, Send, X } from 'lucide-react';
+import { Bug, Lightbulb, HelpCircle, Send, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetDescription } from '@/components/ui/sheet';
@@ -41,13 +41,11 @@ function getPostHogSessionId(): string | undefined {
 }
 
 /**
- * Floating feedback button + sheet.
+ * Hidden feedback sheet — no global chrome. Manual contact lives in Settings → About (`FeedbackForm`).
  *
- * Two entry points:
- *   1. The user clicks the floating button and fills in a freeform report.
- *   2. The root `ErrorBoundary` dispatches `holzen:open-feedback` with the Sentry event id
- *      and error stack. The widget opens pre-filled, defaults the category to `bug`, and
- *      forwards the diagnostic context to `send-feedback`.
+ * Entry point: the root `ErrorBoundary` dispatches `holzen:open-feedback` with the Sentry event id
+ * and error stack. The sheet opens pre-filled, defaults the category to `bug`, and forwards
+ * diagnostic context to `send-feedback`.
  *
  * Observability context attached to every submission:
  *   - `cid` — per-tab correlation id (canonical pivot)
@@ -57,21 +55,12 @@ function getPostHogSessionId(): string | undefined {
  *   - `sentry_event_id`, `error_stack` — only when arriving from the error boundary
  *   - `posthog_session_id` — UX replay anchor (session replay itself stays disabled)
  */
-const DISMISSED_KEY = 'holzen:feedback-widget-dismissed';
-
 export function FeedbackWidget() {
   const { t } = useTranslation();
   const [open, setOpen] = useState(false);
   const [category, setCategory] = useState<Category>('question');
   const [message, setMessage] = useState('');
   const [submitting, setSubmitting] = useState(false);
-  const [dismissed, setDismissed] = useState<boolean>(() => {
-    try {
-      return localStorage.getItem(DISMISSED_KEY) === '1';
-    } catch {
-      return false;
-    }
-  });
   const [errorContext, setErrorContext] = useState<{
     sentryEventId?: string;
     errorStack?: string;
@@ -92,27 +81,13 @@ export function FeedbackWidget() {
           })}`
         : '';
       setMessage(prefix);
-      // Errors from the boundary always force the widget to surface, even if dismissed.
-      setDismissed(false);
-      try { localStorage.removeItem(DISMISSED_KEY); } catch { /* no-op */ }
       setOpen(true);
     };
-    const restoreHandler = () => {
-      try { localStorage.removeItem(DISMISSED_KEY); } catch { /* no-op */ }
-      setDismissed(false);
-    };
     window.addEventListener('holzen:open-feedback', handler);
-    window.addEventListener('holzen:restore-feedback-widget', restoreHandler);
     return () => {
       window.removeEventListener('holzen:open-feedback', handler);
-      window.removeEventListener('holzen:restore-feedback-widget', restoreHandler);
     };
   }, [t]);
-
-  const dismissWidget = () => {
-    try { localStorage.setItem(DISMISSED_KEY, '1'); } catch { /* no-op */ }
-    setDismissed(true);
-  };
 
   const reset = () => {
     setMessage('');
@@ -162,29 +137,7 @@ export function FeedbackWidget() {
   };
 
   return (
-    <>
-      {!open && !dismissed && (
-      <div className="fixed bottom-32 right-4 z-[60] group">
-        <button
-          type="button"
-          aria-label={t('feedback.openButton', { defaultValue: 'Send feedback' })}
-          onClick={() => setOpen(true)}
-          className="h-10 w-10 rounded-full bg-primary text-primary-foreground shadow-lg shadow-black/10 hover:opacity-90 flex items-center justify-center"
-        >
-          <MessageSquareText className="h-4 w-4" />
-        </button>
-        <button
-          type="button"
-          aria-label={t('feedback.dismissWidget', { defaultValue: 'Hide feedback button' })}
-          onClick={dismissWidget}
-          className="absolute -top-1.5 -right-1.5 h-5 w-5 rounded-full bg-background border border-border text-muted-foreground hover:text-foreground hover:bg-muted flex items-center justify-center opacity-0 group-hover:opacity-100 focus:opacity-100 transition-opacity"
-        >
-          <X className="h-3 w-3" />
-        </button>
-      </div>
-      )}
-
-      <Sheet open={open} onOpenChange={setOpen}>
+    <Sheet open={open} onOpenChange={setOpen}>
         <SheetContent side="right" className="w-full sm:max-w-md flex flex-col gap-4">
           <SheetHeader className="relative pr-8">
             <SheetTitle className="font-semibold tracking-wider uppercase text-base font-sans text-[#dbb266]">
@@ -262,6 +215,5 @@ export function FeedbackWidget() {
           </div>
         </SheetContent>
       </Sheet>
-    </>
   );
 }
