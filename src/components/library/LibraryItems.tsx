@@ -12,6 +12,7 @@ import { Link } from 'react-router-dom';
 import { Trash2, Archive, Heart, X, CheckSquare, Loader2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { isMainPauseLibraryBookmark } from '@/lib/normalize-library-source-type';
+import type { PauseInstanceArchiveMeta } from '@/lib/archive-segment';
 import {
   isToday,
   isYesterday,
@@ -103,7 +104,11 @@ export function LibraryItems({
   const {
     items, collections, updateItem, deleteItem, togglePin, toggleFavorite,
     addToCollection, removeFromCollection, getItemCollections, isCompanionEngaged, isReflectionIncomplete,
-    getReflectionOutcome, refetch, loading, listLoadFailed,
+    getReflectionOutcome,
+    getPauseArchiveMeta,
+    refetch,
+    loading,
+    listLoadFailed,
   } = library;
 
   const [selectedItem, setSelectedItem] = useState<LibraryItem | null>(null);
@@ -228,49 +233,87 @@ export function LibraryItems({
     return { flatItems: flat, groupCounts: counts, groupLabels: labels };
   }, [pinnedItems, unpinnedGroups, t]);
 
-  const renderCard = useCallback((index: number, item: LibraryItem) => (
-    <div className="flex items-center border-b border-border/20">
-      {selectMode && (
-        <button
-          onClick={() => toggleSelect(item.id)}
-          className={cn(
-            'shrink-0 w-5 h-5 rounded border flex items-center justify-center ml-2 mr-0.5 transition-colors',
-            selectedIds.has(item.id)
-              ? 'bg-primary border-primary text-primary-foreground'
-              : 'border-border/60 text-transparent hover:border-muted-foreground/40'
+  const renderCard = useCallback(
+    (index: number, item: LibraryItem) => {
+      const pauseMeta: PauseInstanceArchiveMeta | undefined = item.pause_instance_id
+        ? getPauseArchiveMeta(item.pause_instance_id)
+        : undefined;
+      const showPauseSummary =
+        !echoesPresentation && isMainPauseLibraryBookmark(item.source_type) && !!item.pause_instance_id;
+      return (
+        <div className="flex items-center border-b border-border/20">
+          {selectMode && (
+            <button
+              onClick={() => toggleSelect(item.id)}
+              className={cn(
+                'shrink-0 w-5 h-5 rounded border flex items-center justify-center ml-2 mr-0.5 transition-colors',
+                selectedIds.has(item.id)
+                  ? 'bg-primary border-primary text-primary-foreground'
+                  : 'border-border/60 text-transparent hover:border-muted-foreground/40',
+              )}
+            >
+              {selectedIds.has(item.id) && (
+                <svg viewBox="0 0 12 12" className="h-3 w-3">
+                  <path
+                    d="M10 3L4.5 8.5 2 6"
+                    stroke="currentColor"
+                    strokeWidth="1.5"
+                    fill="none"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  />
+                </svg>
+              )}
+            </button>
           )}
-        >
-          {selectedIds.has(item.id) && (
-            <svg viewBox="0 0 12 12" className="h-3 w-3"><path d="M10 3L4.5 8.5 2 6" stroke="currentColor" strokeWidth="1.5" fill="none" strokeLinecap="round" strokeLinejoin="round" /></svg>
-          )}
-        </button>
-      )}
-      <div className="flex-1 min-w-0">
-        <SwipeableCard
-          disabled={selectMode}
-          onSwipeRight={() => toggleFavorite(item.id)}
-          onSwipeLeft={() => deleteItem(item.id)}
-          leftLabel={t('common.delete')}
-          rightLabel={item.is_favorite ? t('libraryCard.removeFavorite', { defaultValue: 'Unfavorite' }) : t('libraryCard.addFavorite', { defaultValue: 'Favorite' })}
-        >
-          <LibraryItemCard
-            item={item}
-            echoesPresentation={echoesPresentation}
-            onToggleFavorite={selectMode ? () => toggleSelect(item.id) : toggleFavorite}
-            engaged={isCompanionEngaged(item)}
-            incomplete={isReflectionIncomplete(item)}
-            onClick={() => {
-              if (selectMode) {
-                toggleSelect(item.id);
-              } else {
-                setSelectedItem(item);
+          <div className="flex-1 min-w-0">
+            <SwipeableCard
+              disabled={selectMode}
+              onSwipeRight={() => toggleFavorite(item.id)}
+              onSwipeLeft={() => deleteItem(item.id)}
+              leftLabel={t('common.delete')}
+              rightLabel={
+                item.is_favorite
+                  ? t('libraryCard.removeFavorite', { defaultValue: 'Unfavorite' })
+                  : t('libraryCard.addFavorite', { defaultValue: 'Favorite' })
               }
-            }}
-          />
-        </SwipeableCard>
-      </div>
-    </div>
-  ), [selectMode, selectedIds, toggleSelect, toggleFavorite, deleteItem, isCompanionEngaged, isReflectionIncomplete, echoesPresentation, t]);
+            >
+              <LibraryItemCard
+                item={item}
+                echoesPresentation={echoesPresentation}
+                onToggleFavorite={selectMode ? () => toggleSelect(item.id) : toggleFavorite}
+                engaged={isCompanionEngaged(item)}
+                incomplete={isReflectionIncomplete(item)}
+                pauseArchiveMeta={showPauseSummary ? pauseMeta : undefined}
+                reflectionOutcome={showPauseSummary ? getReflectionOutcome(item) : null}
+                showPauseSessionSummary={showPauseSummary}
+                onClick={() => {
+                  if (selectMode) {
+                    toggleSelect(item.id);
+                  } else {
+                    setSelectedItem(item);
+                  }
+                }}
+              />
+            </SwipeableCard>
+          </div>
+        </div>
+      );
+    },
+    [
+      selectMode,
+      selectedIds,
+      toggleSelect,
+      toggleFavorite,
+      deleteItem,
+      isCompanionEngaged,
+      isReflectionIncomplete,
+      echoesPresentation,
+      getPauseArchiveMeta,
+      getReflectionOutcome,
+      t,
+    ],
+  );
 
   // Use virtual scrolling only when the list is large enough to benefit
   const useVirtual = flatItems.length > 30;
@@ -383,9 +426,9 @@ export function LibraryItems({
                       i < 10 ? (
                         <motion.div
                           key={item.id}
-                          initial={{ opacity: 0, y: 6 }}
+                          initial={false}
                           animate={{ opacity: 1, y: 0 }}
-                          transition={{ duration: 0.2, delay: Math.min(i * 0.03, 0.3) }}
+                          transition={{ duration: 0.15 }}
                         >
                           {renderCard(i, item)}
                         </motion.div>
@@ -407,9 +450,9 @@ export function LibraryItems({
                       i < 10 ? (
                         <motion.div
                           key={item.id}
-                          initial={{ opacity: 0, y: 6 }}
+                          initial={false}
                           animate={{ opacity: 1, y: 0 }}
-                          transition={{ duration: 0.2, delay: Math.min(i * 0.03, 0.3) }}
+                          transition={{ duration: 0.15 }}
                         >
                           {renderCard(i, item)}
                         </motion.div>

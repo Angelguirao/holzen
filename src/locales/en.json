@@ -1122,7 +1122,13 @@
     "changeDecision": "Change",
     "changeDecisionLabel": "Change decision",
     "incompleteLabel": "No decision recorded",
-    "incompleteDescription": "What did you end up doing after this pause?"
+    "incompleteDescription": "What did you end up doing after this pause?",
+    "pauseCardReflectOpened": "Reflect opened {{when}}",
+    "pauseCardReflectNotOpened": "Reflect not opened yet",
+    "pauseCardOutcomePending": "Outcome not recorded",
+    "pauseCardBreathDone": "Breathing completed",
+    "pauseCardEngagementTypes": "Engagement",
+    "pauseCardMoreTypes": "+ more"
   },
   "pause": {
     "youPaused": "You paused. That's the hardest part.",

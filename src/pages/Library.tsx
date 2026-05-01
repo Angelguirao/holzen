@@ -44,7 +44,10 @@ import {
   itemBelongsToPausesTab,
   type ArchiveMainSegment,
 } from '@/lib/archive-segment';
-import { normalizeLibrarySourceType } from '@/lib/normalize-library-source-type';
+import {
+  normalizeLibrarySourceType,
+  isMainPauseLibraryBookmark,
+} from '@/lib/normalize-library-source-type';
 import {
   DropdownMenu,
   DropdownMenuCheckboxItem,
@@ -80,10 +83,11 @@ function readPausesScope(params: URLSearchParams): 'all' | 'favorites' {
 export default function Library() {
   const { t } = useTranslation();
   const { isPro, isPending, startCheckout, checkoutLoading } = useProGate();
-  const library = useLibrary();
   const [searchParams, setSearchParams] = useSearchParams();
   const mainSegment = useMemo(() => readSegment(searchParams), [searchParams]);
   const pausesScope = useMemo(() => readPausesScope(searchParams), [searchParams]);
+  const libraryListFavoritesOnly = mainSegment === 'pauses' && pausesScope === 'favorites';
+  const library = useLibrary({ favoritesOnly: libraryListFavoritesOnly });
 
   const [search, setSearch] = useState('');
   const [selectedSourceTypes, setSelectedSourceTypes] = useState<string[]>([]);
@@ -209,9 +213,6 @@ export default function Library() {
   const filtered = useMemo(() => {
     if (mainSegment === 'collections') return [];
     let result = segmentBase;
-    if (mainSegment === 'pauses' && pausesScope === 'favorites') {
-      result = result.filter((i) => i.is_favorite);
-    }
     if (mainSegment === 'pauses' && selectedSourceTypes.length > 0) {
       result = result.filter((i) =>
         selectedSourceTypes.includes(normalizeLibrarySourceType(i.source_type) ?? i.source_type ?? ''),
@@ -233,8 +234,26 @@ export default function Library() {
     } else if (sortMode === 'alphabetical') {
       result = [...result].sort((a, b) => (a.title ?? '').localeCompare(b.title ?? ''));
     }
+    // Default Pauses / All (no search, tags, smart collection, or type filters): one row per pause session.
+    if (
+      mainSegment === 'pauses' &&
+      pausesScope === 'all' &&
+      !hasActiveFilters
+    ) {
+      result = result.filter((i) => isMainPauseLibraryBookmark(i.source_type));
+    }
     return result;
-  }, [segmentBase, mainSegment, pausesScope, selectedSourceTypes, smartFilter, tagFilter, search, sortMode]);
+  }, [
+    segmentBase,
+    mainSegment,
+    pausesScope,
+    selectedSourceTypes,
+    smartFilter,
+    tagFilter,
+    search,
+    sortMode,
+    hasActiveFilters,
+  ]);
 
   const clearAllFilters = () => {
     setSelectedSourceTypes([]);

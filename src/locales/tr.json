@@ -952,7 +952,13 @@
     "deleteCollection": "Sil",
     "deleteCollectionConfirm": "Bu koleksiyonu silmek mi? İçindeki öğeler kalmaya devam eder.",
     "collectionRenamed": "Koleksiyon yeniden adlandırıldı",
-    "collectionDeleted": "Koleksiyon silindi"
+    "collectionDeleted": "Koleksiyon silindi",
+    "pauseCardReflectOpened": "Reflect açıldı {{when}}",
+    "pauseCardReflectNotOpened": "Reflect henüz açılmadı",
+    "pauseCardOutcomePending": "Sonuç kaydedilmedi",
+    "pauseCardBreathDone": "Nefes tamamlandı",
+    "pauseCardEngagementTypes": "Etkileşim",
+    "pauseCardMoreTypes": "+ daha fazla"
   },
   "pause": {
     "youPaused": "Durdunuz. En zor kısım bu.",
