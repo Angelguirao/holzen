@@ -94,7 +94,11 @@ export function GuidedJournal({ onComplete, textColor, ringColor }: Props) {
   }, [prompts.length]);
 
   const save = useCallback(async () => {
-    if (!user || !body.trim()) return;
+    if (!user) {
+      toast.error(t('auth.signInToContinue'));
+      return;
+    }
+    if (!body.trim()) return;
     setSaving(true);
     try {
       const { data: inserted, error: practiceError } = await supabase
