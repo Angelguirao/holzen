@@ -97,15 +97,19 @@ export function GuidedJournal({ onComplete, textColor, ringColor }: Props) {
     if (!user || !body.trim()) return;
     setSaving(true);
     try {
-      // Save practice entry
-      await supabase.from('practice_entries').insert({
-        user_id: user.id,
-        type: 'journal',
-        body: body.trim(),
-        prompt,
-      });
-      // Also save to library as a note
-      await supabase.from('library_items').insert({
+      const { data: inserted, error: practiceError } = await supabase
+        .from('practice_entries')
+        .insert({
+          user_id: user.id,
+          type: 'journal',
+          body: body.trim(),
+          prompt,
+        })
+        .select('id')
+        .single();
+      if (practiceError) throw practiceError;
+
+      const { error: libraryError } = await supabase.from('library_items').insert({
         user_id: user.id,
         type: 'note',
         title: prompt.slice(0, 80),
@@ -113,6 +117,12 @@ export function GuidedJournal({ onComplete, textColor, ringColor }: Props) {
         source_type: 'practice_journal',
         tags: ['journal', 'practice'],
       });
+      if (libraryError) {
+        if (inserted?.id) {
+          await supabase.from('practice_entries').delete().eq('id', inserted.id);
+        }
+        throw libraryError;
+      }
       hapticFeedback('success');
       setDone(true);
       setTimeout(onComplete, 1500);
