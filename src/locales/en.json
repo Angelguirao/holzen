@@ -1,8 +1,9 @@
-{
+﻿{
   "nav": {
     "home": "Home",
     "history": "History",
     "library": "Library",
+    "archive": "Archive",
     "tools": "Tools",
     "journey": "Journey",
     "profile": "Profile",
@@ -98,6 +99,41 @@
     "ritualHint": "Feeling reactive? Ground yourself first.",
     "ambientMode": "Ambient mode",
     "whenBtcMoves": "When Bitcoin moves, we'll help you pause before you act.",
+    "today": "Today",
+    "editGoalWhy": "Edit goal and why",
+    "customize": "Customize",
+    "customizeSheet": {
+      "title": "Customize home",
+      "description": "Turn optional modules on or off and reset their order on Home.",
+      "resetLayout": "Reset layout & widgets"
+    },
+    "statTiles": {
+      "holzenScore": "Holzen score",
+      "inMotion": "In motion",
+      "noBadgeProgress": "You're caught up — open badges to see what's next."
+    },
+    "market": {
+      "focusChart": "Scroll to price chart",
+      "chartPreview": "Chart"
+    },
+    "heroQuote": {
+      "lineWithName": "{{name}}, {{line}}",
+      "direct": {
+        "q1": "Remember why you started.",
+        "q2": "This is bigger than today.",
+        "q3": "You already decided. Don't renegotiate.",
+        "q4": "Your goal hasn't changed. Your emotions have.",
+        "q5": "Don't trade your future for a moment."
+      },
+      "behavioral": {
+        "q1": "Short-term noise. Long-term decision.",
+        "q2": "This moment will pass. Your strategy shouldn't.",
+        "q3a": "You don't need to act.",
+        "q3b": "You need to remember.",
+        "q4": "Zoom out. Then decide.",
+        "q5": "Clarity over urgency."
+      }
+    },
     "nextAutoCheck": "Next auto-check · {{time}}",
     "cooldownHeadline": "{{hours}}h cooldown · {{time}} left",
     "nextScanLine": "Next scan · {{scan}}",
@@ -106,6 +142,8 @@
     "widget": {
       "market": "Market",
       "goal": "Goal",
+      "goalWhy": "Goal & why",
+      "yourPause": "Your pause",
       "reflection": "Pause",
       "journeyPulse": "Journey pulse",
       "quickCapture": "Quick capture",

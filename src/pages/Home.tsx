@@ -27,7 +27,7 @@ import { Link, useOutletContext, useSearchParams, useNavigate } from 'react-rout
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/use-auth';
 import { toast } from 'sonner';
-import { AlertCircle, Loader2, Pin, Pencil, Sparkles, RefreshCw, X } from 'lucide-react';
+import { AlertCircle, Bitcoin, Eye, EyeOff, Image as ImageIcon, Loader2, Pin, Pencil, Sparkles, RefreshCw, X } from 'lucide-react';
 import { AutoCooldownIndicator, NeedAMomentButton } from '@/components/home/HomePauseChrome';
 import { homeInWidget } from '@/components/home/home-widget-styles';
 import { cn } from '@/lib/utils';
@@ -39,6 +39,8 @@ import { SnoozeControl } from '@/components/SnoozeControl';
 import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
 import { playNotificationTone, prefetchNotificationTone } from '@/lib/notification-tone';
 import { holzenLog } from '@/lib/holzen-console';
+import { trackEvent } from '@/lib/posthog';
+import { heroQuoteIndexForDay, utcYmd } from '@/lib/home-hero-quote';
 import { type PauseSessionLocationState } from '@/lib/router-location-state';
 import {
   DndContext,
@@ -157,6 +159,8 @@ const Home = () => {
   const [completedPauseCount, setCompletedPauseCount] = useState(0);
   const [marketCollapsed, setMarketCollapsed] = useState(false);
   const [customizeOpen, setCustomizeOpen] = useState(false);
+  const btcChartSectionRef = useRef<HTMLDivElement | null>(null);
+  const heroQuoteViewTracked = useRef(false);
 
   const optionalDefaultOrder = useMemo(() => [...OPTIONAL_HOME_WIDGET_IDS], []);
   const { order, collapsed, reorder, toggleCollapsed, resetLayout } = useWidgetLayout(optionalDefaultOrder);
@@ -164,6 +168,7 @@ const Home = () => {
 
   const handleSetOptionalVisible = useCallback(
     (id: string, value: boolean) => {
+      trackEvent('home.optional_widget_toggled', { widget_id: id, visible: value });
       setVisible(id, value);
       if (value) {
         if (!order.includes(id)) reorder([...order, id]);
@@ -173,6 +178,37 @@ const Home = () => {
     },
     [setVisible, order, reorder],
   );
+
+  const handleCustomizeResetAll = useCallback(() => {
+    trackEvent('home.customize_reset_layout', {});
+    resetLayout();
+    resetOptionalVisibility();
+  }, [resetLayout, resetOptionalVisibility]);
+
+  const handleCustomizeOpenChange = useCallback((open: boolean) => {
+    if (open) trackEvent('home.customize_opened', {});
+    setCustomizeOpen(open);
+  }, []);
+
+  const scrollMarketChartIntoView = useCallback(() => {
+    trackEvent('home.market_chart_scrolled_to', {});
+    const el = btcChartSectionRef.current;
+    if (!el) return;
+    el.scrollIntoView({
+      behavior: prefersReducedMotion ? 'auto' : 'smooth',
+      block: 'nearest',
+    });
+  }, [prefersReducedMotion]);
+
+  useEffect(() => {
+    if (!profileLoaded || heroQuoteViewTracked.current) return;
+    heroQuoteViewTracked.current = true;
+    const ymd = utcYmd();
+    trackEvent('home.hero_quote_viewed', {
+      quote_index: heroQuoteIndexForDay(user?.id, ymd),
+      utc_ymd: ymd,
+    });
+  }, [profileLoaded, user?.id]);
 
   // DnD sensors with activation constraints to prevent accidental drags
   const sensors = useSensors(
@@ -634,7 +670,7 @@ const Home = () => {
         <HomeHeroQuote userId={user?.id} firstName={firstName} />
         <button
           type="button"
-          onClick={() => setCustomizeOpen(true)}
+          onClick={() => handleCustomizeOpenChange(true)}
           className="absolute right-0 top-0 text-sm font-medium text-primary underline underline-offset-4"
         >
           {t('home.customize')}
@@ -686,6 +722,48 @@ const Home = () => {
           collapsed={marketCollapsed}
           onToggleCollapse={() => setMarketCollapsed((c) => !c)}
           footer={marketFooter}
+          headerRight={
+            <>
+              <button
+                type="button"
+                onClick={scrollMarketChartIntoView}
+                className={homeInWidget.iconBtn}
+                aria-label={t('home.market.focusChart')}
+                title={t('home.market.chartPreview')}
+              >
+                <ImageIcon className="h-3.5 w-3.5 text-secondary-foreground" aria-hidden />
+              </button>
+              <button
+                type="button"
+                onClick={toggleBtcMode}
+                className={`${homeInWidget.iconBtn} ${btcMode ? 'text-primary/60 hover:text-primary' : 'text-muted-foreground/40 hover:text-primary'}`}
+                aria-label={btcMode ? t('btcStatus.exitBtcMode') : t('btcStatus.enterBtcMode')}
+                title={btcMode ? t('btcStatus.exitBtcMode') : t('btcStatus.enterBtcMode')}
+              >
+                <Bitcoin className="h-3.5 w-3.5 text-secondary-foreground" aria-hidden />
+              </button>
+              <button
+                type="button"
+                onClick={togglePriceHidden}
+                className={homeInWidget.iconBtn}
+                aria-label={
+                  btcMode
+                    ? priceHidden
+                      ? t('btcStatus.show')
+                      : t('btcStatus.hide')
+                    : priceHidden
+                      ? t('btcStatus.showPrice')
+                      : t('btcStatus.hidePrice')
+                }
+              >
+                {priceHidden ? (
+                  <EyeOff className="h-3.5 w-3.5 text-secondary-foreground" aria-hidden />
+                ) : (
+                  <Eye className="h-3.5 w-3.5 text-secondary-foreground" aria-hidden />
+                )}
+              </button>
+            </>
+          }
         >
           <div className="space-y-4">
             <BtcStatus
@@ -696,6 +774,8 @@ const Home = () => {
               currency={currency}
               btcMode={btcMode}
               onToggleBtcMode={toggleBtcMode}
+              suppressToolbar
+              chartWrapperRef={btcChartSectionRef}
             />
             {!marketCollapsed ? (
               <div className="space-y-0.5">
@@ -736,12 +816,11 @@ const Home = () => {
 
       <HomeCustomizeSheet
         open={customizeOpen}
-        onOpenChange={setCustomizeOpen}
+        onOpenChange={handleCustomizeOpenChange}
         visible={optionalVisible}
         onSetVisible={handleSetOptionalVisible}
         widgetTitle={optionalWidgetTitle}
-        onResetLayout={resetLayout}
-        onResetOptionalVisibility={resetOptionalVisibility}
+        onResetAll={handleCustomizeResetAll}
       />
 
       <TestimonialRequest completedPauseCount={completedPauseCount} />

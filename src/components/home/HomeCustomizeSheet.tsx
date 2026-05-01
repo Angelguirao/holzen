@@ -12,8 +12,8 @@ export interface HomeCustomizeSheetProps {
   visible: Record<string, boolean>;
   onSetVisible: (id: string, value: boolean) => void;
   widgetTitle: (id: string) => string;
-  onResetLayout: () => void;
-  onResetOptionalVisibility: () => void;
+  /** Clears optional widget visibility + DnD order/collapsed state for optional widgets. */
+  onResetAll: () => void;
 }
 
 export function HomeCustomizeSheet({
@@ -22,15 +22,9 @@ export function HomeCustomizeSheet({
   visible,
   onSetVisible,
   widgetTitle,
-  onResetLayout,
-  onResetOptionalVisibility,
+  onResetAll,
 }: HomeCustomizeSheetProps) {
   const { t } = useTranslation();
-
-  const handleResetAll = () => {
-    onResetLayout();
-    onResetOptionalVisibility();
-  };
 
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
@@ -52,7 +46,7 @@ export function HomeCustomizeSheet({
               />
             </div>
           ))}
-          <Button type="button" variant="outline" className="w-full gap-2" onClick={handleResetAll}>
+          <Button type="button" variant="outline" className="w-full gap-2" onClick={onResetAll}>
             <RotateCcw className="h-4 w-4" aria-hidden />
             {t('home.customizeSheet.resetLayout')}
           </Button>
