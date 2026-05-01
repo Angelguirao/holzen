@@ -1,4 +1,5 @@
 import { Suspense, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Outlet, useLocation } from 'react-router-dom';
 import { BottomNav } from './BottomNav';
 import { NotificationBell } from './NotificationBell';
@@ -9,6 +10,8 @@ import { useHolzen } from '@/hooks/use-holzen';
 import { useLanguageSync } from '@/hooks/use-language-sync';
 import { useAutoTrigger } from '@/hooks/use-auto-trigger';
 import { Skeleton } from '@/components/ui/skeleton';
+import { Alert, AlertDescription } from '@/components/ui/alert';
+import { Button } from '@/components/ui/button';
 
 /**
  * Lightweight fallback shown while a lazy page chunk downloads *within*
@@ -66,7 +69,8 @@ function useTabChunkPrefetch() {
 }
 
 export function AppLayout() {
-  const { language } = useHolzen();
+  const { t } = useTranslation();
+  const { language, profileLoadError, retryProfileLoad } = useHolzen();
   useLanguageSync(language);
   useTabChunkPrefetch();
   const { pauseReady, dismiss } = useAutoTrigger();
@@ -80,6 +84,16 @@ export function AppLayout() {
       <CheckoutConfirmation />
       <PaywallSubscribedTracker />
       <div className="w-full max-w-sm pt-4">
+        {profileLoadError ? (
+          <Alert variant="destructive" className="mb-6">
+            <AlertDescription className="flex flex-col gap-3 text-left">
+              <p>{t('common.profileLoadFailed')}</p>
+              <Button type="button" variant="outline" size="sm" className="self-start" onClick={retryProfileLoad}>
+                {t('common.tryAgain')}
+              </Button>
+            </AlertDescription>
+          </Alert>
+        ) : null}
         <header className="mb-10 flex items-center justify-between">
           <h1 className="text-sm font-mono tracking-[0.25em] uppercase" style={{ color: '#DBB366' }}>
             Holzen

@@ -55,7 +55,8 @@
     "from": "From",
     "until": "Until",
     "offlineBanner": "You're offline",
-    "connectivityDegraded": "Can't reach Holzen right now — check your connection or try again shortly."
+    "connectivityDegraded": "Can't reach Holzen right now — check your connection or try again shortly.",
+    "profileLoadFailed": "We couldn't load your profile from the server. Some settings may be out of date until this succeeds."
   },
   "auth": {
     "restoringSession": "Restoring your session…",
@@ -136,6 +137,10 @@
       "upgradeToPro": "{{trialDays}}-day free trial · ${{price}}/month after · Cancel anytime",
       "pricePerMonth": "${{price}} per month · Cancel anytime",
       "openingCheckout": "Opening checkout…",
+      "checkoutFailed": "Checkout could not be started. Check your connection and try again.",
+      "checkoutNoUrl": "Checkout did not return a link. Please try again or contact support.",
+      "portalFailed": "Billing portal could not be opened. Check your connection and try again.",
+      "portalNoUrl": "Billing portal did not return a link. Please try again.",
       "freeRemaining": "{{count}} free pause remaining this month",
       "freeRemaining_other": "{{count}} free pauses remaining this month"
     },
