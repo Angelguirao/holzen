@@ -151,6 +151,7 @@ export function useSettingsModel() {
     nightReflectionHour,
     aiInsightsEnabled,
     notifyBadges,
+    motivations,
     mantra,
     currency,
     groundingActivities,
