@@ -15,15 +15,15 @@ import { MyWhyWidget } from '@/components/MyWhyWidget';
 import { Skeleton } from '@/components/ui/skeleton';
 import { SubscriptionSkeleton } from '@/components/SubscriptionSkeleton';
 import { LoadingButton } from '@/components/ui/loading-button';
-import { HomeWidget, useWidgetLayout } from '@/components/HomeWidget';
+import { useWidgetLayout } from '@/components/HomeWidget';
 import { HomeSectionCard } from '@/components/home/HomeSectionCard';
 import { HomeStatTiles } from '@/components/home/HomeStatTiles';
 import { HomeHeroQuote } from '@/components/home/HomeHeroQuote';
 import { HomeCustomizeSheet } from '@/components/home/HomeCustomizeSheet';
-import { useHomeOptionalVisibility, OPTIONAL_HOME_WIDGET_IDS } from '@/hooks/use-home-optional-visibility';
+import { useHomeOptionalVisibility, ALL_HOME_SECTION_IDS } from '@/hooks/use-home-optional-visibility';
 import { settingsSectionPath } from '@/lib/app-routes';
-import { useCallback, useEffect, useState, useMemo, useRef } from 'react';
-import { Link, useOutletContext, useSearchParams, useNavigate } from 'react-router-dom';
+import { useCallback, useEffect, useState, useMemo, useRef, type ReactNode } from 'react';
+import { Link, useOutletContext, useSearchParams, useNavigate, useLocation } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/use-auth';
 import { toast } from 'sonner';
@@ -42,24 +42,6 @@ import { holzenLog } from '@/lib/holzen-console';
 import { trackEvent } from '@/lib/posthog';
 import { heroQuoteIndexForDay, utcYmd } from '@/lib/home-hero-quote';
 import { type PauseSessionLocationState } from '@/lib/router-location-state';
-import {
-  DndContext,
-  closestCenter,
-  KeyboardSensor,
-  PointerSensor,
-  TouchSensor,
-  useSensor,
-  useSensors,
-  type DragEndEvent,
-} from '@dnd-kit/core';
-import {
-  SortableContext,
-  verticalListSortingStrategy,
-  arrayMove,
-} from '@dnd-kit/sortable';
-import { restrictToVerticalAxis } from '@dnd-kit/modifiers';
-
-type OptionalWidgetId = (typeof OPTIONAL_HOME_WIDGET_IDS)[number];
 
 interface PinnedPausePreview {
   id: string;
@@ -72,19 +54,9 @@ interface PinnedPausePreview {
 
 const Home = () => {
   const { t } = useTranslation();
-  const optionalWidgetTitle = useCallback(
-    (id: string) => {
-      const titles: Record<OptionalWidgetId, string> = {
-        'journey-pulse': t('home.widget.journeyPulse'),
-        'quick-capture': t('home.widget.quickCapture'),
-        night: t('home.widget.evening'),
-      };
-      return titles[id as OptionalWidgetId] ?? id;
-    },
-    [t],
-  );
   const { user } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
   const { subscribed, loading: subLoading, monthlyRemaining, checkoutLoading, startCheckout, refresh } = useSubscription();
   const [searchParams] = useSearchParams();
 
@@ -145,7 +117,7 @@ const Home = () => {
   // minimal ReflectionMessage view that looked like "the end of a pause flow."
   // Clear the flag once per browser; users can re-enable Zen Mode explicitly
   // from Settings → Appearance.
-  const [zenMode] = useState(() => {
+  const [zenMode, setZenModeState] = useState(() => {
     const RESET_KEY = 'holzen_zen_mode_reset_v1';
     if (typeof window !== 'undefined' && !localStorage.getItem(RESET_KEY)) {
       localStorage.removeItem('holzen_zen_mode');
@@ -154,6 +126,27 @@ const Home = () => {
     }
     return localStorage.getItem('holzen_zen_mode') === 'true';
   });
+
+  const setZenModePersist = useCallback((zen: boolean) => {
+    setZenModeState(zen);
+    localStorage.setItem('holzen_zen_mode', String(zen));
+  }, []);
+
+  useEffect(() => {
+    const onStorage = (e: StorageEvent) => {
+      if (e.key === 'holzen_zen_mode' && e.newValue != null) {
+        setZenModeState(e.newValue === 'true');
+      }
+    };
+    window.addEventListener('storage', onStorage);
+    return () => window.removeEventListener('storage', onStorage);
+  }, []);
+
+  useEffect(() => {
+    if (location.pathname === '/') {
+      setZenModeState(localStorage.getItem('holzen_zen_mode') === 'true');
+    }
+  }, [location.pathname]);
   const [pinnedPausePreview, setPinnedPausePreview] = useState<PinnedPausePreview | null>(null);
   const prefersReducedMotion = useReducedMotion();
   const [completedPauseCount, setCompletedPauseCount] = useState(0);
@@ -161,18 +154,26 @@ const Home = () => {
   const [customizeOpen, setCustomizeOpen] = useState(false);
   const heroQuoteViewTracked = useRef(false);
 
-  const optionalDefaultOrder = useMemo(() => [...OPTIONAL_HOME_WIDGET_IDS], []);
-  const { order, collapsed, reorder, toggleCollapsed, resetLayout } = useWidgetLayout(optionalDefaultOrder);
-  const { visible: optionalVisible, setVisible, resetVisibility: resetOptionalVisibility } = useHomeOptionalVisibility();
+  const sectionDefaultOrder = useMemo(() => [...ALL_HOME_SECTION_IDS], []);
+  const { order, collapsed, reorder, toggleCollapsed, resetLayout } = useWidgetLayout(sectionDefaultOrder);
+  const { visible: sectionVisible, setVisible, resetVisibility: resetSectionVisibility } = useHomeOptionalVisibility();
 
-  const handleSetOptionalVisible = useCallback(
+  const visibleOrderedSectionIds = useMemo(
+    () =>
+      order.filter((id) => {
+        if (!sectionVisible[id]) return false;
+        if (id === 'night' && (!subscribed || !nightReflection)) return false;
+        return true;
+      }),
+    [order, sectionVisible, subscribed, nightReflection],
+  );
+
+  const handleSetSectionVisible = useCallback(
     (id: string, value: boolean) => {
       trackEvent('home.optional_widget_toggled', { widget_id: id, visible: value });
       setVisible(id, value);
-      if (value) {
-        if (!order.includes(id)) reorder([...order, id]);
-      } else {
-        reorder(order.filter((x) => x !== id));
+      if (value && !order.includes(id)) {
+        reorder([...order, id]);
       }
     },
     [setVisible, order, reorder],
@@ -181,8 +182,46 @@ const Home = () => {
   const handleCustomizeResetAll = useCallback(() => {
     trackEvent('home.customize_reset_layout', {});
     resetLayout();
-    resetOptionalVisibility();
-  }, [resetLayout, resetOptionalVisibility]);
+    resetSectionVisibility();
+    setZenModePersist(false);
+  }, [resetLayout, resetSectionVisibility, setZenModePersist]);
+
+  const homeCustomizeSectionTitle = useCallback(
+    (id: string) => {
+      const titles: Record<string, string> = {
+        'goal-why': t('home.customizeSheet.sections.goalWhy.title'),
+        market: t('home.customizeSheet.sections.market.title'),
+        'your-pause': t('home.customizeSheet.sections.yourPause.title'),
+        'journey-pulse': t('home.customizeSheet.sections.journeyPulse.title'),
+        'quick-capture': t('home.customizeSheet.sections.quickCapture.title'),
+        night: t('home.customizeSheet.sections.night.title'),
+      };
+      return titles[id] ?? id;
+    },
+    [t],
+  );
+
+  const homeCustomizeSectionDescription = useCallback(
+    (id: string) => {
+      const descs: Record<string, string> = {
+        'goal-why': t('home.customizeSheet.sections.goalWhy.desc'),
+        market: t('home.customizeSheet.sections.market.desc'),
+        'your-pause': t('home.customizeSheet.sections.yourPause.desc'),
+        'journey-pulse': t('home.customizeSheet.sections.journeyPulse.desc'),
+        'quick-capture': t('home.customizeSheet.sections.quickCapture.desc'),
+        night: t('home.customizeSheet.sections.night.desc'),
+      };
+      return descs[id] ?? '';
+    },
+    [t],
+  );
+
+  const handleZenModeFromCustomize = useCallback(
+    (zen: boolean) => {
+      setZenModePersist(zen);
+    },
+    [setZenModePersist],
+  );
 
   const handleCustomizeOpenChange = useCallback((open: boolean) => {
     if (open) trackEvent('home.customize_opened', {});
@@ -206,28 +245,6 @@ const Home = () => {
       utc_ymd: ymd,
     });
   }, [profileLoaded, user?.id]);
-
-  // DnD sensors with activation constraints to prevent accidental drags
-  const sensors = useSensors(
-    useSensor(PointerSensor, { activationConstraint: { distance: 4 } }),
-    useSensor(TouchSensor, { activationConstraint: { delay: 150, tolerance: 8 } }),
-    useSensor(KeyboardSensor),
-  );
-
-  const sortableOptionalIds = useMemo(() => order.filter((id) => optionalVisible[id]), [order, optionalVisible]);
-
-  const handleDragEnd = useCallback(
-    (event: DragEndEvent) => {
-      const { active, over } = event;
-      if (!over || active.id === over.id) return;
-      const ids = order.filter((id) => optionalVisible[id]);
-      const oldIndex = ids.indexOf(active.id as string);
-      const newIndex = ids.indexOf(over.id as string);
-      if (oldIndex < 0 || newIndex < 0) return;
-      reorder(arrayMove(ids, oldIndex, newIndex));
-    },
-    [order, optionalVisible, reorder],
-  );
 
   // Load pinned pause (legacy key name retained for localStorage back-compat).
   useEffect(() => {
@@ -621,52 +638,96 @@ const Home = () => {
     </div>
   );
 
-  // --- Optional draggable widgets (Customize) ---
-  const renderOptionalWidget = (widgetId: string) => {
-    switch (widgetId as OptionalWidgetId) {
+  const marketFooter = <HolzenNumber variant="compact" />;
+
+  const renderHomeSection = (sectionId: string): ReactNode => {
+    switch (sectionId) {
+      case 'goal-why':
+        return (
+          <HomeSectionCard
+            title={t('home.widget.goalWhy')}
+            headerRight={
+              <Link
+                to={settingsSectionPath('you')}
+                className="inline-flex h-9 w-9 items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-muted/50 hover:text-foreground"
+                aria-label={t('home.editGoalWhy')}
+              >
+                <Pencil className="h-4 w-4" aria-hidden />
+              </Link>
+            }
+          >
+            <div className="space-y-3">
+              <HoldGoalWidget currentPrice={btcData?.currentPrice} />
+              <MyWhyWidget />
+            </div>
+          </HomeSectionCard>
+        );
+
+      case 'market':
+        return (
+          <HomeSectionCard title={t('home.widget.market')} footer={marketFooter}>
+            <BtcStatus
+              data={btcData}
+              error={error}
+              hidden={priceHidden}
+              onToggleHidden={togglePriceHidden}
+              currency={currency}
+              btcMode={btcMode}
+              onToggleBtcMode={toggleBtcMode}
+              chartExpanded={marketChartExpanded}
+              onToggleChartExpanded={toggleMarketChartExpanded}
+            />
+          </HomeSectionCard>
+        );
+
+      case 'your-pause':
+        return (
+          <HomeSectionCard title={t('home.widget.yourPause')} headerRight={pauseSectionHeaderRight}>
+            {pauseCardBody}
+          </HomeSectionCard>
+        );
+
       case 'journey-pulse':
         return (
-          <HomeWidget
-            id="journey-pulse"
-            title={optionalWidgetTitle('journey-pulse')}
-            collapsed={collapsed['journey-pulse']}
+          <HomeSectionCard
+            title={t('home.widget.journeyPulse')}
+            collapsible
+            collapsed={!!collapsed['journey-pulse']}
             onToggleCollapse={() => toggleCollapsed('journey-pulse')}
           >
             <HomeJourneyPulse />
-          </HomeWidget>
+          </HomeSectionCard>
         );
 
       case 'quick-capture':
         return (
-          <HomeWidget
-            id="quick-capture"
-            title={optionalWidgetTitle('quick-capture')}
-            collapsed={collapsed['quick-capture']}
+          <HomeSectionCard
+            title={t('home.widget.quickCapture')}
+            collapsible
+            collapsed={!!collapsed['quick-capture']}
             onToggleCollapse={() => toggleCollapsed('quick-capture')}
           >
             <HomeQuickCapture />
-          </HomeWidget>
+          </HomeSectionCard>
         );
 
       case 'night':
         if (!nightReflection || !subscribed) return null;
         return (
-          <HomeWidget
-            id="night"
-            title={optionalWidgetTitle('night')}
-            collapsed={collapsed['night']}
+          <HomeSectionCard
+            title={t('home.widget.evening')}
+            collapsible
+            collapsed={!!collapsed.night}
             onToggleCollapse={() => toggleCollapsed('night')}
           >
             <NightReflectionCard reflection={nightReflection} onDismiss={dismissNight} />
-          </HomeWidget>
+          </HomeSectionCard>
         );
 
       default:
         return null;
     }
   };
-
-  const marketFooter = <HolzenNumber variant="compact" />;
 
   return (
     <div {...pullHandlers} className="space-y-6">
@@ -697,76 +758,29 @@ const Home = () => {
         </div>
       )}
 
-      <HomeSectionCard
-        title={t('home.widget.goalWhy')}
-        headerRight={
-          <Link
-            to={settingsSectionPath('you')}
-            className="inline-flex h-9 w-9 items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-muted/50 hover:text-foreground"
-            aria-label={t('home.editGoalWhy')}
-          >
-            <Pencil className="h-4 w-4" aria-hidden />
-          </Link>
-        }
-      >
-        <div className="space-y-3">
-          <HoldGoalWidget currentPrice={btcData?.currentPrice} />
-          <MyWhyWidget />
-        </div>
-      </HomeSectionCard>
-
-      <section aria-labelledby="home-today-heading" className="space-y-3">
-        <h2 id="home-today-heading" className="text-base font-medium text-foreground">
-          {t('home.today')}
-        </h2>
-
-        <HomeSectionCard title={t('home.widget.market')} footer={marketFooter}>
-          <BtcStatus
-            data={btcData}
-            error={error}
-            hidden={priceHidden}
-            onToggleHidden={togglePriceHidden}
-            currency={currency}
-            btcMode={btcMode}
-            onToggleBtcMode={toggleBtcMode}
-            chartExpanded={marketChartExpanded}
-            onToggleChartExpanded={toggleMarketChartExpanded}
-          />
-        </HomeSectionCard>
-
-        <HomeSectionCard title={t('home.widget.yourPause')} headerRight={pauseSectionHeaderRight}>
-          {pauseCardBody}
-        </HomeSectionCard>
-      </section>
+      <div className="space-y-4">
+        {visibleOrderedSectionIds.map((sectionId) => {
+          const node = renderHomeSection(sectionId);
+          if (node == null) return null;
+          return <div key={sectionId}>{node}</div>;
+        })}
+      </div>
 
       <HomeStatTiles />
-
-      {sortableOptionalIds.length > 0 ? (
-        <DndContext
-          sensors={sensors}
-          collisionDetection={closestCenter}
-          onDragEnd={handleDragEnd}
-          modifiers={[restrictToVerticalAxis]}
-        >
-          <SortableContext items={sortableOptionalIds} strategy={verticalListSortingStrategy}>
-            <div className="space-y-4">
-              {sortableOptionalIds.map((widgetId) => {
-                const content = renderOptionalWidget(widgetId);
-                if (content === null) return null;
-                return <div key={widgetId}>{content}</div>;
-              })}
-            </div>
-          </SortableContext>
-        </DndContext>
-      ) : null}
 
       <HomeCustomizeSheet
         open={customizeOpen}
         onOpenChange={handleCustomizeOpenChange}
-        visible={optionalVisible}
-        onSetVisible={handleSetOptionalVisible}
-        widgetTitle={optionalWidgetTitle}
+        order={order}
+        onReorder={reorder}
+        visible={sectionVisible}
+        onSetVisible={handleSetSectionVisible}
+        sectionTitle={homeCustomizeSectionTitle}
+        sectionDescription={homeCustomizeSectionDescription}
+        zenMode={zenMode}
+        onZenModeChange={handleZenModeFromCustomize}
         onResetAll={handleCustomizeResetAll}
+        nightToggleDisabled={!subscribed}
       />
 
       <TestimonialRequest completedPauseCount={completedPauseCount} />

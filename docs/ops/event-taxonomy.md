@@ -56,8 +56,8 @@ The Archive tab uses route `/library` and **still reports** `tab: 'library'` in 
 | Event | When | Properties | Owner |
 |---|---|---|---|
 | `home.customize_opened` | User opens the Customize sheet (bottom sheet) | `{}` | @holzen |
-| `home.optional_widget_toggled` | User toggles an optional Home module on/off in Customize | `{ widget_id: string; visible: boolean }` — `widget_id` is one of `OPTIONAL_HOME_WIDGET_IDS` | @holzen |
-| `home.customize_reset_layout` | User taps “Reset layout & widgets” in Customize | `{}` | @holzen |
+| `home.optional_widget_toggled` | User toggles a Home section on/off in Customize (core or optional) | `{ widget_id: string; visible: boolean }` — `widget_id` is one of `ALL_HOME_SECTION_IDS` (`goal-why`, `market`, `your-pause`, plus optional widget ids) | @holzen |
+| `home.customize_reset_layout` | User taps “Reset to defaults” in Customize (section order, collapse, visibility, and Zen cleared to Hold) | `{}` | @holzen |
 | `home.hero_quote_viewed` | Once per Home mount after profile is loaded (daily hero line) | `{ quote_index: number; utc_ymd: string }` — `quote_index` is `0..9` from `heroQuoteIndexForDay`; no quote text | @holzen |
 | `home.market_chart_expand_toggled` | User toggles Market chart / 24h detail (chevron next to headline price) | `{ expanded: boolean }` | @holzen |
 

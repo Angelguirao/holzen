@@ -116,40 +116,58 @@ export function HomeWidget({
   );
 }
 
-// Hook to manage widget order and collapsed state
-const STORAGE_KEY = 'holzen_widget_order';
-const COLLAPSED_KEY = 'holzen_widget_collapsed';
+// Hook to manage Home section order (core + optional) and per-widget collapse.
+const ORDER_KEY = 'holzen_home_section_order_v1';
+const LEGACY_ORDER_KEY = 'holzen_widget_order';
+const COLLAPSED_KEY = 'holzen_home_section_collapsed_v1';
+const LEGACY_COLLAPSED_KEY = 'holzen_widget_collapsed';
+
+const CORE_PREFIX = ['goal-why', 'market', 'your-pause'] as const;
+
+function loadOrder(defaultOrder: string[]): string[] {
+  try {
+    const raw = localStorage.getItem(ORDER_KEY);
+    if (raw) {
+      const parsed = JSON.parse(raw) as string[];
+      const merged = parsed.filter((id) => defaultOrder.includes(id));
+      const missing = defaultOrder.filter((id) => !merged.includes(id));
+      return [...merged, ...missing];
+    }
+    const legacy = localStorage.getItem(LEGACY_ORDER_KEY);
+    if (legacy) {
+      const parsed = JSON.parse(legacy) as string[];
+      const core = CORE_PREFIX.filter((id) => defaultOrder.includes(id));
+      const fromLegacy = parsed.filter((id) => defaultOrder.includes(id) && !core.includes(id));
+      const base = [...core, ...fromLegacy];
+      const missing = defaultOrder.filter((id) => !base.includes(id));
+      return [...base, ...missing];
+    }
+  } catch {
+    void 0;
+  }
+  return [...defaultOrder];
+}
+
+function loadCollapsed(): Record<string, boolean> {
+  try {
+    const raw = localStorage.getItem(COLLAPSED_KEY);
+    if (raw) return JSON.parse(raw) as Record<string, boolean>;
+    const legacy = localStorage.getItem(LEGACY_COLLAPSED_KEY);
+    if (legacy) return JSON.parse(legacy) as Record<string, boolean>;
+  } catch {
+    void 0;
+  }
+  return {};
+}
 
 export function useWidgetLayout(defaultOrder: string[]) {
-  const [order, setOrder] = useState<string[]>(() => {
-    try {
-      const stored = localStorage.getItem(STORAGE_KEY);
-      if (stored) {
-        const parsed = JSON.parse(stored) as string[];
-        // Merge: keep stored order but add any new widgets
-        const merged = parsed.filter((id) => defaultOrder.includes(id));
-        const missing = defaultOrder.filter((id) => !merged.includes(id));
-        return [...merged, ...missing];
-      }
-    } catch {
-      void 0;
-    }
-    return defaultOrder;
-  });
+  const [order, setOrder] = useState<string[]>(() => loadOrder(defaultOrder));
 
-  const [collapsed, setCollapsed] = useState<Record<string, boolean>>(() => {
-    try {
-      const stored = localStorage.getItem(COLLAPSED_KEY);
-      if (stored) return JSON.parse(stored);
-    } catch {
-      void 0;
-    }
-    return {};
-  });
+  const [collapsed, setCollapsed] = useState<Record<string, boolean>>(loadCollapsed);
 
   const reorder = useCallback((newOrder: string[]) => {
     setOrder(newOrder);
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(newOrder));
+    localStorage.setItem(ORDER_KEY, JSON.stringify(newOrder));
   }, []);
 
   const toggleCollapsed = useCallback((id: string) => {
@@ -161,10 +179,12 @@ export function useWidgetLayout(defaultOrder: string[]) {
   }, []);
 
   const resetLayout = useCallback(() => {
-    setOrder(defaultOrder);
+    setOrder([...defaultOrder]);
     setCollapsed({});
-    localStorage.removeItem(STORAGE_KEY);
+    localStorage.removeItem(ORDER_KEY);
     localStorage.removeItem(COLLAPSED_KEY);
+    localStorage.removeItem(LEGACY_ORDER_KEY);
+    localStorage.removeItem(LEGACY_COLLAPSED_KEY);
   }, [defaultOrder]);
 
   return { order, collapsed, reorder, toggleCollapsed, resetLayout };

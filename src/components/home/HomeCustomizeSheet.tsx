@@ -1,55 +1,222 @@
+import { useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
-import { RotateCcw } from 'lucide-react';
-import { Button } from '@/components/ui/button';
+import { GripVertical } from 'lucide-react';
+import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle } from '@/components/ui/sheet';
 import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
-import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle } from '@/components/ui/sheet';
-import { OPTIONAL_HOME_WIDGET_IDS } from '@/hooks/use-home-optional-visibility';
+import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
+import { homeInWidget } from '@/components/home/home-widget-styles';
+import { cn } from '@/lib/utils';
+import {
+  DndContext,
+  closestCenter,
+  KeyboardSensor,
+  PointerSensor,
+  TouchSensor,
+  useSensor,
+  useSensors,
+  type DragEndEvent,
+} from '@dnd-kit/core';
+import { SortableContext, verticalListSortingStrategy, arrayMove, useSortable } from '@dnd-kit/sortable';
+import { CSS } from '@dnd-kit/utilities';
+import { restrictToVerticalAxis } from '@dnd-kit/modifiers';
 
 export interface HomeCustomizeSheetProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
+  order: string[];
+  onReorder: (next: string[]) => void;
   visible: Record<string, boolean>;
   onSetVisible: (id: string, value: boolean) => void;
-  widgetTitle: (id: string) => string;
-  /** Clears optional widget visibility + DnD order/collapsed state for optional widgets. */
+  sectionTitle: (id: string) => string;
+  sectionDescription: (id: string) => string;
+  zenMode: boolean;
+  onZenModeChange: (zen: boolean) => void;
   onResetAll: () => void;
+  /** When true, Night reflection toggle is disabled (e.g. not Pro). */
+  nightToggleDisabled?: boolean;
+}
+
+function CustomizeSortableRow({
+  id,
+  title,
+  description,
+  checked,
+  onCheckedChange,
+  switchDisabled,
+}: {
+  id: string;
+  title: string;
+  description: string;
+  checked: boolean;
+  onCheckedChange: (v: boolean) => void;
+  switchDisabled?: boolean;
+}) {
+  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id });
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+    zIndex: isDragging ? 50 : undefined,
+    opacity: isDragging ? 0.92 : 1,
+  };
+
+  return (
+    <div
+      ref={setNodeRef}
+      style={style}
+      className={cn(
+        'flex items-start gap-2 rounded-xl border border-border/50 bg-muted/20 px-3 py-3',
+        isDragging && 'shadow-md',
+      )}
+    >
+      <button
+        type="button"
+        className="touch-none cursor-grab shrink-0 rounded-md p-1.5 text-muted-foreground/50 hover:bg-muted/60 hover:text-muted-foreground active:cursor-grabbing"
+        aria-label={`Drag to reorder ${title}`}
+        {...attributes}
+        {...listeners}
+      >
+        <GripVertical className="h-4 w-4" aria-hidden />
+      </button>
+      <div className="min-w-0 flex-1 space-y-0.5">
+        <Label htmlFor={`home-section-${id}`} className="text-sm font-medium leading-snug text-foreground">
+          {title}
+        </Label>
+        <p className={cn(homeInWidget.metaFaint, 'text-[11px] leading-snug')}>{description}</p>
+      </div>
+      <Switch
+        id={`home-section-${id}`}
+        checked={!!checked}
+        disabled={switchDisabled}
+        onCheckedChange={onCheckedChange}
+        className="shrink-0"
+      />
+    </div>
+  );
 }
 
 export function HomeCustomizeSheet({
   open,
   onOpenChange,
+  order,
+  onReorder,
   visible,
   onSetVisible,
-  widgetTitle,
+  sectionTitle,
+  sectionDescription,
+  zenMode,
+  onZenModeChange,
   onResetAll,
+  nightToggleDisabled,
 }: HomeCustomizeSheetProps) {
   const { t } = useTranslation();
 
+  const sensors = useSensors(
+    useSensor(PointerSensor, { activationConstraint: { distance: 6 } }),
+    useSensor(TouchSensor, { activationConstraint: { delay: 160, tolerance: 10 } }),
+    useSensor(KeyboardSensor),
+  );
+
+  const handleDragEnd = useCallback(
+    (event: DragEndEvent) => {
+      const { active, over } = event;
+      if (!over || active.id === over.id) return;
+      const oldIndex = order.indexOf(active.id as string);
+      const newIndex = order.indexOf(over.id as string);
+      if (oldIndex < 0 || newIndex < 0) return;
+      onReorder(arrayMove(order, oldIndex, newIndex));
+    },
+    [order, onReorder],
+  );
+
+  const modeValue = zenMode ? 'zen' : 'hold';
+
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
-      <SheetContent side="bottom" className="max-h-[85vh] overflow-y-auto rounded-t-2xl">
-        <SheetHeader>
-          <SheetTitle>{t('home.customizeSheet.title')}</SheetTitle>
+      <SheetContent side="bottom" className="max-h-[88vh] overflow-y-auto rounded-t-2xl pb-8 pt-6">
+        <SheetHeader className="space-y-2 pr-10 text-left">
+          <SheetTitle className="text-base font-semibold sm:text-lg">
+            {t('home.customizeSheet.title')}
+          </SheetTitle>
           <SheetDescription>{t('home.customizeSheet.description')}</SheetDescription>
         </SheetHeader>
-        <div className="mt-6 space-y-4">
-          {OPTIONAL_HOME_WIDGET_IDS.map((id) => (
-            <div key={id} className="flex items-center justify-between gap-4 rounded-lg border border-border/50 px-3 py-2">
-              <Label htmlFor={`home-opt-${id}`} className="text-sm font-medium leading-snug">
-                {widgetTitle(id)}
-              </Label>
-              <Switch
-                id={`home-opt-${id}`}
-                checked={!!visible[id]}
-                onCheckedChange={(v) => onSetVisible(id, v)}
-              />
+
+        <div className="mt-6 space-y-6">
+          <section className="space-y-3" aria-labelledby="home-customize-mode">
+            <h3 id="home-customize-mode" className={cn(homeInWidget.kickerAccent, 'text-xs')}>
+              {t('home.customizeSheet.modeHeading')}
+            </h3>
+            <RadioGroup
+              value={modeValue}
+              onValueChange={(v) => onZenModeChange(v === 'zen')}
+              className="grid gap-3"
+            >
+              <label
+                htmlFor="home-mode-hold"
+                className={cn(
+                  'flex cursor-pointer gap-3 rounded-xl border border-border/60 bg-card/40 p-4 transition-colors hover:bg-muted/30',
+                  modeValue === 'hold' && 'border-primary/40 bg-primary/5',
+                )}
+              >
+                <RadioGroupItem id="home-mode-hold" value="hold" className="mt-0.5 shrink-0" />
+                <div className="min-w-0 space-y-1">
+                  <p className="text-sm font-medium text-foreground">{t('home.customizeSheet.holdModeTitle')}</p>
+                  <p className="text-xs leading-snug text-muted-foreground">{t('home.customizeSheet.holdModeDesc')}</p>
+                </div>
+              </label>
+              <label
+                htmlFor="home-mode-zen"
+                className={cn(
+                  'flex cursor-pointer gap-3 rounded-xl border border-border/60 bg-card/40 p-4 transition-colors hover:bg-muted/30',
+                  modeValue === 'zen' && 'border-primary/40 bg-primary/5',
+                )}
+              >
+                <RadioGroupItem id="home-mode-zen" value="zen" className="mt-0.5 shrink-0" />
+                <div className="min-w-0 space-y-1">
+                  <p className="text-sm font-medium text-foreground">{t('home.customizeSheet.zenModeTitle')}</p>
+                  <p className="text-xs leading-snug text-muted-foreground">{t('home.customizeSheet.zenModeDesc')}</p>
+                </div>
+              </label>
+            </RadioGroup>
+          </section>
+
+          <section className="space-y-3" aria-labelledby="home-customize-widgets">
+            <div className="flex items-center justify-between gap-3">
+              <h3 id="home-customize-widgets" className={cn(homeInWidget.kickerAccent, 'text-xs')}>
+                {t('home.customizeSheet.widgetsHeading')}
+              </h3>
+              <button
+                type="button"
+                onClick={onResetAll}
+                className="shrink-0 text-xs font-medium text-foreground underline underline-offset-4 decoration-foreground/40 hover:decoration-foreground"
+              >
+                {t('home.customizeSheet.resetLink')}
+              </button>
             </div>
-          ))}
-          <Button type="button" variant="outline" className="w-full gap-2" onClick={onResetAll}>
-            <RotateCcw className="h-4 w-4" aria-hidden />
-            {t('home.customizeSheet.resetLayout')}
-          </Button>
+
+            <DndContext
+              sensors={sensors}
+              collisionDetection={closestCenter}
+              onDragEnd={handleDragEnd}
+              modifiers={[restrictToVerticalAxis]}
+            >
+              <SortableContext items={order} strategy={verticalListSortingStrategy}>
+                <div className="flex flex-col gap-3">
+                  {order.map((id) => (
+                    <CustomizeSortableRow
+                      key={id}
+                      id={id}
+                      title={sectionTitle(id)}
+                      description={sectionDescription(id)}
+                      checked={!!visible[id]}
+                      onCheckedChange={(v) => onSetVisible(id, v)}
+                      switchDisabled={id === 'night' && nightToggleDisabled}
+                    />
+                  ))}
+                </div>
+              </SortableContext>
+            </DndContext>
+          </section>
         </div>
       </SheetContent>
     </Sheet>
