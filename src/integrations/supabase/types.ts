@@ -213,6 +213,20 @@ export type Database = {
             foreignKeyName: "collection_items_library_item_id_fkey"
             columns: ["library_item_id"]
             isOneToOne: false
+            referencedRelation: "library_archive_echo_items"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "collection_items_library_item_id_fkey"
+            columns: ["library_item_id"]
+            isOneToOne: false
+            referencedRelation: "library_archive_pauses_tab_items"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "collection_items_library_item_id_fkey"
+            columns: ["library_item_id"]
+            isOneToOne: false
             referencedRelation: "library_items"
             referencedColumns: ["id"]
           },
@@ -2194,13 +2208,99 @@ export type Database = {
     }
     Views: {
       library_archive_echo_items: {
-        Row: Database["public"]["Tables"]["library_items"]["Row"]
-        Relationships: []
-      },
+        Row: {
+          body: string | null
+          created_at: string | null
+          id: string | null
+          is_favorite: boolean | null
+          pause_instance_id: string | null
+          pinned: boolean | null
+          source_type: string | null
+          source_url: string | null
+          status: string | null
+          tags: string[] | null
+          title: string | null
+          type: string | null
+          user_id: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "library_items_pause_instance_id_fkey"
+            columns: ["pause_instance_id"]
+            isOneToOne: false
+            referencedRelation: "pause_instances"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "library_items_pause_instance_id_fkey"
+            columns: ["pause_instance_id"]
+            isOneToOne: false
+            referencedRelation: "v_pause_completed"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "library_items_pause_instance_id_fkey"
+            columns: ["pause_instance_id"]
+            isOneToOne: false
+            referencedRelation: "v_pause_current"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "library_items_pause_instance_id_fkey"
+            columns: ["pause_instance_id"]
+            isOneToOne: false
+            referencedRelation: "v_pause_full"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       library_archive_pauses_tab_items: {
-        Row: Database["public"]["Tables"]["library_items"]["Row"]
-        Relationships: []
-      },
+        Row: {
+          body: string | null
+          created_at: string | null
+          id: string | null
+          is_favorite: boolean | null
+          pause_instance_id: string | null
+          pinned: boolean | null
+          source_type: string | null
+          source_url: string | null
+          status: string | null
+          tags: string[] | null
+          title: string | null
+          type: string | null
+          user_id: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "library_items_pause_instance_id_fkey"
+            columns: ["pause_instance_id"]
+            isOneToOne: false
+            referencedRelation: "pause_instances"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "library_items_pause_instance_id_fkey"
+            columns: ["pause_instance_id"]
+            isOneToOne: false
+            referencedRelation: "v_pause_completed"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "library_items_pause_instance_id_fkey"
+            columns: ["pause_instance_id"]
+            isOneToOne: false
+            referencedRelation: "v_pause_current"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "library_items_pause_instance_id_fkey"
+            columns: ["pause_instance_id"]
+            isOneToOne: false
+            referencedRelation: "v_pause_full"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       v_ai_spend_month_global: {
         Row: {
           total_usd: number | null
@@ -2682,7 +2782,6 @@ export type Database = {
           expired: number | null
           expired_context_lost: number | null
           expired_ineligible: number | null
-          expired_open_max_age: number | null
           expired_superseded: number | null
           expired_system_cancelled: number | null
           expired_window_elapsed: number | null
@@ -2780,14 +2879,34 @@ export type Database = {
           p_limit?: number
           p_main_pause_only?: boolean
           p_offset?: number
-          p_search?: string | null
+          p_search?: string
           p_segment: string
-          p_smart_ids?: string[] | null
+          p_smart_ids?: string[]
           p_sort?: string
-          p_source_types?: string[] | null
-          p_tag?: string | null
+          p_source_types?: string[]
+          p_tag?: string
         }
-        Returns: Database["public"]["Tables"]["library_items"]["Row"][]
+        Returns: {
+          body: string | null
+          created_at: string
+          id: string
+          is_favorite: boolean
+          pause_instance_id: string | null
+          pinned: boolean
+          source_type: string | null
+          source_url: string | null
+          status: string
+          tags: string[]
+          title: string | null
+          type: string
+          user_id: string
+        }[]
+        SetofOptions: {
+          from: "*"
+          to: "library_items"
+          isOneToOne: false
+          isSetofReturn: true
+        }
       }
       move_to_dlq: {
         Args: {
@@ -2815,8 +2934,6 @@ export type Database = {
         Args: { _collection_id: string; _user_id: string }
         Returns: boolean
       }
-      pause_adopt_pending_offer: { Args: never; Returns: Json }
-      pause_decline_pending_offer: { Args: never; Returns: Json }
       pause_create_or_reuse: {
         Args: {
           p_context_fingerprint: string
@@ -2889,17 +3006,10 @@ export type Database = {
       pause_expired_reason:
         | "context_lost"
         | "window_elapsed"
-        | "open_max_age"
         | "superseded"
         | "ineligible_user_state"
         | "system_cancelled"
-      pause_state:
-        | "active"
-        | "engaged"
-        | "pending"
-        | "completed"
-        | "dismissed"
-        | "expired"
+      pause_state: "active" | "engaged" | "completed" | "dismissed" | "expired"
       pause_step_type:
         | "breath_completed"
         | "initial_emotion_logged"
@@ -3040,12 +3150,11 @@ export const Constants = {
       pause_expired_reason: [
         "context_lost",
         "window_elapsed",
-        "open_max_age",
         "superseded",
         "ineligible_user_state",
         "system_cancelled",
       ],
-      pause_state: ["active", "engaged", "pending", "completed", "dismissed", "expired"],
+      pause_state: ["active", "engaged", "completed", "dismissed", "expired"],
       pause_step_type: [
         "breath_completed",
         "initial_emotion_logged",
