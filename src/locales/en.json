@@ -1139,6 +1139,7 @@
     "youChose": "You chose deliberately.",
     "return": "Return",
     "noReflection": "No active pause. Go back to trigger one.",
+    "outcomeSaveFailed": "Could not save your choice. Try again.",
     "favoriteProHint": "Your favorites will be waiting in your Library with Pro ✨",
     "steps": {
       "breathe": "Breathe",

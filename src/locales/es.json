@@ -930,7 +930,8 @@
     "whatWillYouDo": "¿Qué harás?",
     "youChose": "Elegiste deliberadamente.",
     "return": "Volver",
-    "noReflection": "Sin reflexión activa. Vuelve para activar una."
+    "noReflection": "Sin reflexión activa. Vuelve para activar una.",
+    "outcomeSaveFailed": "No se pudo guardar tu elección. Inténtalo de nuevo."
   },
   "breathing": {
     "trigger": "Respira con esto →",

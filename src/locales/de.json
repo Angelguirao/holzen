@@ -944,7 +944,8 @@
     "whatWillYouDo": "Was wirst du tun?",
     "youChose": "Du hast bewusst gewählt.",
     "return": "Zurück",
-    "noReflection": "Keine aktive Reflexion. Geh zurück, um eine auszulösen."
+    "noReflection": "Keine aktive Reflexion. Geh zurück, um eine auszulösen.",
+    "outcomeSaveFailed": "Deine Wahl konnte nicht gespeichert werden. Bitte erneut versuchen."
   },
   "breathing": {
     "trigger": "Atme damit →",

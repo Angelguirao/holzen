@@ -945,7 +945,8 @@
     "whatWillYouDo": "Wat ga je doen?",
     "youChose": "Je hebt bewust gekozen.",
     "return": "Terug",
-    "noReflection": "Geen actieve reflectie. Ga terug om er een te starten."
+    "noReflection": "Geen actieve reflectie. Ga terug om er een te starten.",
+    "outcomeSaveFailed": "Je keuze kon niet worden opgeslagen. Probeer het opnieuw."
   },
   "breathing": {
     "trigger": "Adem hiermee →",

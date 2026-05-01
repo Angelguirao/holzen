@@ -450,16 +450,31 @@ export default function PauseSession() {
   const handleDecide = useCallback(
     async (d: string) => {
       hapticFeedback('medium');
-      setDecision(d);
-      dismissMessage();
+      // Persist outcome before clearing Home/Library preview state. Calling
+      // dismissMessage() first races pause_dismiss_current against
+      // pause_log_step: if dismiss wins, the instance becomes terminal and
+      // outcome_logged is ignored — the pause stays "wrong" in history and
+      // surfaces can disagree until reload.
       if (pauseInstanceId) {
-        await pauseLogStep({
-          instanceId: pauseInstanceId,
-          stepType: 'outcome_logged',
-          payload: { outcome: d },
-        }).catch(() => {});
-        void refreshSubscription();
+        try {
+          await pauseLogStep({
+            instanceId: pauseInstanceId,
+            stepType: 'outcome_logged',
+            payload: { outcome: d },
+          });
+          void refreshSubscription();
+        } catch {
+          toast.error(
+            t('pause.outcomeSaveFailed', {
+              defaultValue: 'Could not save your choice. Try again.',
+            }),
+            { duration: 5000 },
+          );
+          return;
+        }
       }
+      setDecision(d);
+      await dismissMessage();
       setPauseImpactData({
         mood: selectedMood,
         moodAfter: selectedMoodAfter,
@@ -474,7 +489,7 @@ export default function PauseSession() {
       setPhase('done');
       clearSession();
     },
-    [dismissMessage, pauseInstanceId, selectedMood, selectedMoodAfter, context, breathingCompleted, refreshSubscription],
+    [dismissMessage, pauseInstanceId, selectedMood, selectedMoodAfter, context, breathingCompleted, refreshSubscription, t],
   );
 
   const slideX = prefersReducedMotion ? 0 : 80;

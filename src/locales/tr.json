@@ -968,7 +968,8 @@
     "whatWillYouDo": "Ne yapacaksınız?",
     "youChose": "Bilinçli olarak seçtiniz.",
     "return": "Geri dön",
-    "noReflection": "Aktif düşünce yok. Birini tetiklemek için geri dönün."
+    "noReflection": "Aktif düşünce yok. Birini tetiklemek için geri dönün.",
+    "outcomeSaveFailed": "Seçimin kaydedilemedi. Tekrar dene."
   },
   "breathing": {
     "trigger": "Bununla nefes al →",
