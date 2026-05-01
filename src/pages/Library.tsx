@@ -2,7 +2,7 @@ import { useState, useMemo, useCallback, useEffect } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { motion, AnimatePresence } from 'framer-motion';
-import { useLibrary } from '@/hooks/use-library';
+import { useLibrary, type LibraryItem } from '@/hooks/use-library';
 import { useInfiniteScroll } from '@/hooks/use-infinite-scroll';
 import { PageMeta } from '@/components/PageMeta';
 import {
@@ -42,10 +42,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useProGate } from '@/hooks/use-pro-gate';
 import { librarySourceLabel } from '@/lib/library-source-label';
 import type { ArchiveMainSegment } from '@/lib/archive-segment';
-import {
-  normalizeLibrarySourceType,
-  isMainPauseLibraryBookmark,
-} from '@/lib/normalize-library-source-type';
+import { normalizeLibrarySourceType } from '@/lib/normalize-library-source-type';
 import {
   DropdownMenu,
   DropdownMenuCheckboxItem,
@@ -88,12 +85,36 @@ export default function Library() {
   const libraryListFavoritesOnly = mainSegment === 'pauses' && pausesScope === 'favorites';
   const [pausesTabHasArchiveRows, setPausesTabHasArchiveRows] = useState<boolean | null>(null);
   const [pausesArchiveCountNonce, setPausesArchiveCountNonce] = useState(0);
+  const [pauseDupScanItems, setPauseDupScanItems] = useState<LibraryItem[]>([]);
 
   const [search, setSearch] = useState('');
   const [selectedSourceTypes, setSelectedSourceTypes] = useState<string[]>([]);
   const [tagFilter, setTagFilter] = useState<string | null>(null);
   const [sortMode, setSortMode] = useState<SortMode>('newest');
   const [smartFilter, setSmartFilter] = useState<{ name: string; itemIds: Set<string> } | null>(null);
+
+  const hasActiveFilters =
+    selectedSourceTypes.length > 0 || !!tagFilter || !!smartFilter || !!search.trim();
+
+  const archiveRpcFilters = useMemo(
+    () => ({
+      search,
+      sourceTypes: mainSegment === 'pauses' ? selectedSourceTypes : [],
+      tag: tagFilter,
+      smartIds: smartFilter ? [...smartFilter.itemIds] : [],
+      mainPauseBookmarkOnly:
+        mainSegment === 'pauses' && pausesScope === 'all' && !hasActiveFilters,
+    }),
+    [
+      search,
+      mainSegment,
+      selectedSourceTypes,
+      tagFilter,
+      smartFilter,
+      pausesScope,
+      hasActiveFilters,
+    ],
+  );
 
   const archiveListKind =
     mainSegment === 'echoes' ? 'echo' : mainSegment === 'pauses' ? 'pauses' : 'default';
@@ -102,6 +123,7 @@ export default function Library() {
     archiveListKind,
     favoritesOnly: libraryListFavoritesOnly,
     listSort: sortMode,
+    archiveRpcFilters,
   });
 
   const setMainSegment = useCallback(
@@ -163,6 +185,31 @@ export default function Library() {
       if (!cancelled) {
         if (!error) setPausesTabHasArchiveRows((count ?? 0) > 0);
         else setPausesTabHasArchiveRows(null);
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, [user?.id, mainSegment, pausesArchiveCountNonce]);
+
+  useEffect(() => {
+    if (!user?.id || mainSegment !== 'pauses') {
+      setPauseDupScanItems([]);
+      return;
+    }
+    let cancelled = false;
+    void (async () => {
+      const { data, error } = await supabase
+        .from('library_archive_pauses_tab_items')
+        .select('*')
+        .eq('user_id', user.id)
+        .eq('source_type', 'pause')
+        .not('body', 'is', null)
+        .order('created_at', { ascending: true })
+        .limit(500);
+      if (!cancelled) {
+        if (!error && data) setPauseDupScanItems(data as unknown as LibraryItem[]);
+        else setPauseDupScanItems([]);
       }
     })();
     return () => {
@@ -235,53 +282,11 @@ export default function Library() {
       .map(([tag]) => tag);
   }, [segmentBase]);
 
-  const hasActiveFilters =
-    selectedSourceTypes.length > 0 || !!tagFilter || !!smartFilter || !!search.trim();
-
   const filtered = useMemo(() => {
     if (mainSegment === 'collections') return [];
-    let result = segmentBase;
-    if (mainSegment === 'pauses' && selectedSourceTypes.length > 0) {
-      result = result.filter((i) =>
-        selectedSourceTypes.includes(normalizeLibrarySourceType(i.source_type) ?? i.source_type ?? ''),
-      );
-    }
-    if (smartFilter) result = result.filter((i) => smartFilter.itemIds.has(i.id));
-    if (tagFilter) result = result.filter((i) => i.tags?.includes(tagFilter));
-    if (search.trim()) {
-      const q = search.toLowerCase();
-      result = result.filter(
-        (i) =>
-          i.title?.toLowerCase().includes(q) ||
-          i.body?.toLowerCase().includes(q) ||
-          i.tags?.some((tg) => tg.includes(q)),
-      );
-    }
-    if (sortMode === 'oldest') {
-      result = [...result].sort((a, b) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime());
-    } else if (sortMode === 'alphabetical') {
-      result = [...result].sort((a, b) => (a.title ?? '').localeCompare(b.title ?? ''));
-    }
-    // Default Pauses / All (no search, tags, smart collection, or type filters): one row per pause session.
-    if (
-      mainSegment === 'pauses' &&
-      pausesScope === 'all' &&
-      !hasActiveFilters
-    ) {
-      result = result.filter((i) => isMainPauseLibraryBookmark(i.source_type));
-    }
-    return result;
-  }, [
-    segmentBase,
-    mainSegment,
-    pausesScope,
-    selectedSourceTypes,
-    smartFilter,
-    tagFilter,
-    search,
-    sortMode,
-    hasActiveFilters,
-  ]);
+    // Pauses / Echoes: `library_archive_list_page` applies filters, sort, and main-pause bookmark mode.
+    return segmentBase;
+  }, [segmentBase, mainSegment]);
 
   const clearAllFilters = () => {
     setSelectedSourceTypes([]);
@@ -661,7 +666,11 @@ export default function Library() {
             </div>
           </div>
 
-          <DuplicateBanner items={items} onDeleteItem={library.deleteItem} onSelectItem={() => {}} />
+          <DuplicateBanner
+            items={pauseDupScanItems.length > 0 ? pauseDupScanItems : items}
+            onDeleteItem={library.deleteItem}
+            onSelectItem={() => {}}
+          />
 
           <LibraryItems
             library={library}
