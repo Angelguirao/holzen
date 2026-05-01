@@ -307,51 +307,57 @@ export function AutoCooldownIndicator({
 
   if (snapshot.remaining <= 0) {
     const nextScanClock = fmtClock(snapshot.nextScanAt);
-    const nextScanAria = t('home.nextScanAria', {
+    const nextScanAria = t('home.autoCooldown.nextScanAria', {
       time: nextScanClock,
-      defaultValue: 'All quiet. The next automatic check is scheduled for {{time}}.',
+      defaultValue:
+        'Holzen rechecks market conditions on a quarter-hour schedule. The next server tick is around {{time}}. A new automatic pause only happens when rules and your settings say so — this is only the schedule.',
     });
     return (
       <div
-        className="flex items-center gap-2 py-1 text-base font-sans"
-        title={t('nextScanIdleTitle', { defaultValue: 'Next automatic scan' })}
+        className="space-y-0.5 py-1 text-base font-sans"
+        title={t('home.nextScanIdleTitle', { defaultValue: 'Countdown until the server runs the next price check' })}
         role="status"
         aria-live="polite"
         aria-label={nextScanAria}
       >
-        <p className={cn(homeInWidget.nextScanCountdown, 'tabular-nums')} aria-hidden="true">
-          {t('home.nextScanAtClock', {
-            time: nextScanClock,
-            defaultValue: 'Next scan at {{time}}',
-          })}
+        <p className={cn(homeInWidget.metaFaint, 'text-[11px] uppercase tracking-wide')} aria-hidden="true">
+          {t('home.autoCooldown.serverChecksKicker', { defaultValue: 'Background price checks' })}
         </p>
-        <span className="h-1.5 w-1.5 rounded-full bg-primary/40 shrink-0" aria-hidden="true" />
+        <div className="flex items-center gap-2">
+          <p className={cn(homeInWidget.nextScanCountdown, 'tabular-nums')} aria-hidden="true">
+            {t('home.autoCooldown.nextScanAtClock', {
+              time: nextScanClock,
+              defaultValue: 'Next server check · {{time}}',
+            })}
+          </p>
+          <span className="h-1.5 w-1.5 rounded-full bg-primary/40 shrink-0" aria-hidden="true" />
+        </div>
       </div>
     );
   }
 
   const readyClock = fmtClock(snapshot.readyAt);
-  const cooldownAria = t('home.cooldownAria', {
+  const cooldownAria = t('home.autoCooldown.cooldownAria', {
     hours: cooldownHours,
     time: readyClock,
     defaultValue:
-      'Resting between checks. The next pause can arrive after {{time}} (a {{hours}}-hour cooldown is in place).',
+      'You are in the rest period that starts when a pause is created. It is not the same timer as the Need a moment button. This rest window ends at {{time}} ({{hours}} hours from that pause).',
   });
   return (
-    <div
-      className="flex items-center gap-2 py-1 text-base font-sans"
-      role="status"
-      aria-live="polite"
-      aria-label={cooldownAria}
-    >
-      <Timer className="h-3.5 w-3.5 text-muted-foreground shrink-0" aria-hidden="true" />
-      <p className={cn(homeInWidget.nextScanCountdown, 'tabular-nums')} aria-hidden="true">
-        {t('home.cooldownReadyAt', {
-          hours: cooldownHours,
-          time: readyClock,
-          defaultValue: '{{hours}}h cooldown · ready at {{time}}',
-        })}
+    <div className="space-y-0.5 py-1 text-base font-sans" role="status" aria-live="polite" aria-label={cooldownAria}>
+      <p className={cn(homeInWidget.metaFaint, 'text-[11px] uppercase tracking-wide')} aria-hidden="true">
+        {t('home.autoCooldown.afterPauseKicker', { defaultValue: 'Rest window after your last pause' })}
       </p>
+      <div className="flex items-center gap-2">
+        <Timer className="h-3.5 w-3.5 text-muted-foreground shrink-0" aria-hidden="true" />
+        <p className={cn(homeInWidget.nextScanCountdown, 'tabular-nums')} aria-hidden="true">
+          {t('home.autoCooldown.cooldownReadyAt', {
+            hours: cooldownHours,
+            time: readyClock,
+            defaultValue: '{{hours}}h rest · until {{time}}',
+          })}
+        </p>
+      </div>
     </div>
   );
 }

@@ -81,8 +81,8 @@ describe('HomePauseChrome scheduling helpers', () => {
       />,
     );
 
-    expect(screen.getByText('home.nextScanAtClock')).toBeInTheDocument();
-    expect(screen.queryByText('home.cooldownReadyAt')).not.toBeInTheDocument();
+    expect(screen.getByText('home.autoCooldown.nextScanAtClock')).toBeInTheDocument();
+    expect(screen.queryByText('home.autoCooldown.cooldownReadyAt')).not.toBeInTheDocument();
   });
 });
 
@@ -105,7 +105,7 @@ describe('AutoCooldownIndicator cross-tab sync', () => {
       />,
     );
 
-    expect(screen.getByText('home.nextScanAtClock')).toBeInTheDocument();
+    expect(screen.getByText('home.autoCooldown.nextScanAtClock')).toBeInTheDocument();
 
     act(() => {
       window.dispatchEvent(
@@ -120,7 +120,7 @@ describe('AutoCooldownIndicator cross-tab sync', () => {
       );
     });
 
-    expect(screen.getByText('home.cooldownReadyAt')).toBeInTheDocument();
-    expect(screen.queryByText('home.nextScanAtClock')).not.toBeInTheDocument();
+    expect(screen.getByText('home.autoCooldown.cooldownReadyAt')).toBeInTheDocument();
+    expect(screen.queryByText('home.autoCooldown.nextScanAtClock')).not.toBeInTheDocument();
   });
 });
