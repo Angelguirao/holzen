@@ -1,3 +1,4 @@
+import type { RefObject } from 'react';
 import { Eye, EyeOff, WifiOff, Bitcoin, Clock } from 'lucide-react';
 import { BtcChartLazyGate } from '@/components/BtcChartLazyGate';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -13,9 +14,23 @@ interface Props {
   currency?: string;
   btcMode?: boolean;
   onToggleBtcMode?: () => void;
+  /** When true, price row omits inline toolbar (parent renders duplicate controls in card header). */
+  suppressToolbar?: boolean;
+  /** Attach to the chart wrapper for scroll-into-view from the parent header. */
+  chartWrapperRef?: RefObject<HTMLDivElement | null>;
 }
 
-export function BtcStatus({ data, error, hidden, onToggleHidden, currency = 'USD', btcMode = false, onToggleBtcMode }: Props) {
+export function BtcStatus({
+  data,
+  error,
+  hidden,
+  onToggleHidden,
+  currency = 'USD',
+  btcMode = false,
+  onToggleBtcMode,
+  suppressToolbar = false,
+  chartWrapperRef,
+}: Props) {
   const { t } = useTranslation();
   const toggle = onToggleHidden;
 
@@ -48,29 +63,31 @@ export function BtcStatus({ data, error, hidden, onToggleHidden, currency = 'USD
     return (
       <div className="space-y-3">
         <div className="space-y-1">
-          <div className="flex items-center justify-between">
+          <div className={suppressToolbar ? 'space-y-0' : 'flex items-center justify-between'}>
             <p className={homeInWidget.kicker}>BTC / BTC</p>
-            <div className="flex items-center gap-1">
-              {onToggleBtcMode && (
+            {!suppressToolbar ? (
+              <div className="flex items-center gap-1">
+                {onToggleBtcMode && (
+                  <button
+                    type="button"
+                    onClick={onToggleBtcMode}
+                    className={`${homeInWidget.iconBtn} text-primary/60 hover:text-primary`}
+                    aria-label={t('btcStatus.exitBtcMode')}
+                    title={t('btcStatus.exitBtcMode')}
+                  >
+                    <Bitcoin className="h-3.5 w-3.5 text-secondary-foreground" aria-hidden />
+                  </button>
+                )}
                 <button
                   type="button"
-                  onClick={onToggleBtcMode}
-                  className={`${homeInWidget.iconBtn} text-primary/60 hover:text-primary`}
-                  aria-label={t('btcStatus.exitBtcMode')}
-                  title={t('btcStatus.exitBtcMode')}
+                  onClick={toggle}
+                  className={homeInWidget.iconBtn}
+                  aria-label={hidden ? t('btcStatus.show') : t('btcStatus.hide')}
                 >
-                  <Bitcoin className="h-3.5 w-3.5 text-secondary-foreground" aria-hidden />
+                  {hidden ? <EyeOff className="h-3.5 w-3.5 text-secondary-foreground" aria-hidden /> : <Eye className="h-3.5 w-3.5 text-secondary-foreground" aria-hidden />}
                 </button>
-              )}
-              <button
-                type="button"
-                onClick={toggle}
-                className={homeInWidget.iconBtn}
-                aria-label={hidden ? t('btcStatus.show') : t('btcStatus.hide')}
-              >
-                {hidden ? <EyeOff className="h-3.5 w-3.5 text-secondary-foreground" aria-hidden /> : <Eye className="h-3.5 w-3.5 text-secondary-foreground" aria-hidden />}
-              </button>
-            </div>
+              </div>
+            ) : null}
           </div>
           {hidden ? (
             <>
@@ -104,8 +121,8 @@ export function BtcStatus({ data, error, hidden, onToggleHidden, currency = 'USD
   return (
     <div className="space-y-3">
       <div className="space-y-1">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-2">
+        {suppressToolbar ? (
+          <div className="flex flex-wrap items-center gap-2">
             <p className={homeInWidget.kicker}>BTC / {cur}</p>
             {data._stale && (
               <span className={`flex items-center gap-1 ${homeInWidget.metaFaint}`} title="Using cached data — live APIs unavailable">
@@ -114,28 +131,40 @@ export function BtcStatus({ data, error, hidden, onToggleHidden, currency = 'USD
               </span>
             )}
           </div>
-          <div className="flex items-center gap-1">
-            {onToggleBtcMode && (
+        ) : (
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <p className={homeInWidget.kicker}>BTC / {cur}</p>
+              {data._stale && (
+                <span className={`flex items-center gap-1 ${homeInWidget.metaFaint}`} title="Using cached data — live APIs unavailable">
+                  <Clock className="h-2.5 w-2.5" />
+                  cached
+                </span>
+              )}
+            </div>
+            <div className="flex items-center gap-1">
+              {onToggleBtcMode && (
+                <button
+                  type="button"
+                  onClick={onToggleBtcMode}
+                  className={`${homeInWidget.iconBtn} text-muted-foreground/40 hover:text-primary`}
+                  aria-label={t('btcStatus.enterBtcMode')}
+                  title="1 BTC = 1 BTC"
+                >
+                  <Bitcoin className="h-3.5 w-3.5 text-secondary-foreground" aria-hidden />
+                </button>
+              )}
               <button
                 type="button"
-                onClick={onToggleBtcMode}
-                className={`${homeInWidget.iconBtn} text-muted-foreground/40 hover:text-primary`}
-                aria-label={t('btcStatus.enterBtcMode')}
-                title="1 BTC = 1 BTC"
+                onClick={toggle}
+                className={homeInWidget.iconBtn}
+                aria-label={hidden ? t('btcStatus.showPrice') : t('btcStatus.hidePrice')}
               >
-                <Bitcoin className="h-3.5 w-3.5 text-secondary-foreground" aria-hidden />
+                {hidden ? <EyeOff className="h-3.5 w-3.5 text-secondary-foreground" aria-hidden /> : <Eye className="h-3.5 w-3.5 text-secondary-foreground" aria-hidden />}
               </button>
-            )}
-            <button
-              type="button"
-              onClick={toggle}
-              className={homeInWidget.iconBtn}
-              aria-label={hidden ? t('btcStatus.showPrice') : t('btcStatus.hidePrice')}
-            >
-              {hidden ? <EyeOff className="h-3.5 w-3.5 text-secondary-foreground" aria-hidden /> : <Eye className="h-3.5 w-3.5 text-secondary-foreground" aria-hidden />}
-            </button>
+            </div>
           </div>
-        </div>
+        )}
         {hidden ? (
           <>
             <p className={homeInWidget.priceHidden}>••••••</p>
@@ -157,7 +186,9 @@ export function BtcStatus({ data, error, hidden, onToggleHidden, currency = 'USD
           </>
         )}
       </div>
-      <BtcChartLazyGate hidden={hidden} currency={cur} />
+      <div ref={chartWrapperRef ?? undefined}>
+        <BtcChartLazyGate hidden={hidden} currency={cur} />
+      </div>
     </div>
   );
 }
