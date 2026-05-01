@@ -1,5 +1,5 @@
 import { NavLink, useLocation } from 'react-router-dom';
-import { Home, BookOpen, Wrench, Compass, Settings as SettingsIcon } from 'lucide-react';
+import { Home, Folder, Wrench, Compass, Settings as SettingsIcon } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useTranslation } from 'react-i18next';
 import { JOURNEY_PREFIX, TOOLS_PREFIX } from '@/lib/app-routes';
@@ -8,8 +8,8 @@ import { trackEvent } from '@/lib/posthog';
 const tabs = [
   { to: '/', icon: Home, key: 'home' },
   { to: TOOLS_PREFIX, icon: Wrench, key: 'tools' },
+  { to: '/library', icon: Folder, key: 'library' },
   { to: '/journey/stats', icon: Compass, key: 'journey' },
-  { to: '/library', icon: BookOpen, key: 'library' },
   { to: '/settings', icon: SettingsIcon, key: 'settings' },
 ] as const;
 
@@ -51,7 +51,9 @@ export function BottomNav() {
               }
             >
               <Icon className="h-4 w-4" />
-              <span className="text-sm font-sans">{t(`nav.${key}`)}</span>
+              <span className="text-sm font-sans">
+                {key === 'library' ? t('nav.archive') : t(`nav.${key}`)}
+              </span>
             </NavLink>
           );
         })}

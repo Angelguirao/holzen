@@ -19,7 +19,7 @@ import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import { useProGate } from '@/hooks/use-pro-gate';
-import { NoxHeaderMain } from '@/components/ui/nox-header';
+import { PageHeading } from '@/components/PageHeading';
 import { librarySourceLabel } from '@/lib/library-source-label';
 
 // Keys match `library_items.source_type` in Postgres (row-kind discriminator for filters + UI).
@@ -128,7 +128,7 @@ export default function Library() {
     return (
       <div className="space-y-6 pb-24">
         <PageMeta title={t('library.pageTitle')} description={t('library.pageDescription')} />
-        <NoxHeaderMain title={t('library.title')} subtitle={t('library.pageDescription')} />
+        <PageHeading title={t('library.title')} subtitle={t('library.pageDescription')} />
         <SubscriptionSkeleton variant="inline" />
       </div>
     );
@@ -138,7 +138,7 @@ export default function Library() {
     return (
       <div className="space-y-6 pb-24">
         <PageMeta title={t('library.pageTitle')} description={t('library.pageDescription')} />
-        <NoxHeaderMain title={t('library.title')} subtitle={t('library.pageDescription')} />
+        <PageHeading title={t('library.title')} subtitle={t('library.pageDescription')} />
         <div className="flex flex-col items-center justify-center min-h-[40vh] gap-4 text-center px-6">
           <Lock className="h-6 w-6 text-[#dbb266]" />
           <h2 className="text-sm font-semibold text-foreground">{t('pro.featureLocked')}</h2>
@@ -174,7 +174,7 @@ export default function Library() {
   return (
     <div className="space-y-6 pb-24" {...handlers}>
       <PageMeta title={t('library.pageTitle')} description={t('library.pageDescription')} />
-      <NoxHeaderMain title={t('library.title')} subtitle={t('library.pageDescription')} />
+      <PageHeading title={t('library.title')} subtitle={t('library.pageDescription')} />
       {/* Current pause card (Pause V2). Hidden when the user has no open pause. */}
       <CurrentPauseCard />
 
