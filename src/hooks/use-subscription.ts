@@ -1,4 +1,6 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
+import { useTranslation } from 'react-i18next';
+import { toast } from 'sonner';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/use-auth';
@@ -235,6 +237,7 @@ async function fetchSubscriptionSnapshot(userId: string, force: boolean): Promis
 }
 
 export function useSubscription() {
+  const { t } = useTranslation();
   const { user } = useAuth();
   const queryClient = useQueryClient();
   const userId = user?.id ?? null;
@@ -379,14 +382,16 @@ export function useSubscription() {
         return;
       }
 
+      toast.error(t('home.subscription.checkoutNoUrl'));
       setCheckoutLoading(false);
       setCheckoutLoadingTarget(null);
     } catch (e) {
       console.error('Checkout error:', e);
+      toast.error(t('home.subscription.checkoutFailed'));
       setCheckoutLoading(false);
       setCheckoutLoadingTarget(null);
     }
-  }, []);
+  }, [t]);
 
   const openPortal = useCallback(async () => {
     holzenLog.subscription('portal', { action: 'open' });
@@ -395,11 +400,14 @@ export function useSubscription() {
       if (error) throw error;
       if (data?.url) {
         window.open(data.url, '_blank');
+        return;
       }
+      toast.error(t('home.subscription.portalNoUrl'));
     } catch (e) {
       console.error('Portal error:', e);
+      toast.error(t('home.subscription.portalFailed'));
     }
-  }, []);
+  }, [t]);
 
   /**
    * Programmatic invalidation used by code paths *other* than the user's
