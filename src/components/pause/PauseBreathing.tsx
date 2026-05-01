@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback, useMemo } from 'react';
+import { useState, useEffect, useMemo, useImperativeHandle, forwardRef } from 'react';
 import { motion, useReducedMotion } from 'framer-motion';
 import { useTranslation } from 'react-i18next';
 import { hapticFeedback } from '@/lib/haptics';
@@ -39,15 +39,25 @@ const EXPAND_KEYS = ['breathing.phases.inhale', 'breathing.phases.sip'];
 const CONTRACT_KEYS = ['breathing.phases.exhale'];
 const TOTAL_CYCLES = 3;
 
+export type PauseBreathingHandle = {
+  /** Return from the timed breathing loop to the pre-start intro (same step). */
+  resetToIntro: () => void;
+};
+
 interface Props {
   mantra: string | null;
   severity?: 'mild' | 'moderate' | 'high';
   onContinue: () => void;
   completed?: boolean;
   onComplete?: () => void;
+  /** True while the countdown / phase loop is running (not intro, not completion card). */
+  onTimedBreathingChange?: (active: boolean) => void;
 }
 
-export function PauseBreathing({ mantra, severity = 'mild', onContinue, completed: completedProp, onComplete }: Props) {
+export const PauseBreathing = forwardRef<PauseBreathingHandle, Props>(function PauseBreathing(
+  { mantra, severity = 'mild', onContinue, completed: completedProp, onComplete, onTimedBreathingChange },
+  ref,
+) {
   const { t } = useTranslation();
   const prefersReduced = useReducedMotion();
   const quote = useMemo(() => getSessionQuote(), []);
@@ -63,6 +73,25 @@ export function PauseBreathing({ mantra, severity = 'mild', onContinue, complete
 
   const completed = completedProp ?? completedLocal;
   const currentPhase = pattern.phases[phaseIndex];
+
+  useImperativeHandle(
+    ref,
+    () => ({
+      resetToIntro: () => {
+        setStarted(false);
+        setPhaseIndex(0);
+        setElapsed(0);
+        setCycle(0);
+        if (!completedProp) setCompletedLocal(false);
+      },
+    }),
+    [completedProp],
+  );
+
+  const inTimedLoop = started && !completed;
+  useEffect(() => {
+    onTimedBreathingChange?.(inTimedLoop);
+  }, [inTimedLoop, onTimedBreathingChange]);
 
   // Timer
   useEffect(() => {
@@ -232,4 +261,4 @@ export function PauseBreathing({ mantra, severity = 'mild', onContinue, complete
       )}
     </motion.div>
   );
-}
+});

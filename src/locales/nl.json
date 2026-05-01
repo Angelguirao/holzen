@@ -27,6 +27,7 @@
   },
   "common": {
     "back": "Terug",
+    "close": "Sluiten",
     "cancel": "Annuleren",
     "delete": "Verwijderen",
     "done": "Klaar",
@@ -945,6 +946,8 @@
     "whatWillYouDo": "Wat ga je doen?",
     "youChose": "Je hebt bewust gekozen.",
     "return": "Terug",
+    "sessionTitle": "Je pauze",
+    "scienceInfoAria": "De wetenschap achter deze pauze",
     "noReflection": "Geen actieve reflectie. Ga terug om er een te starten.",
     "outcomeSaveFailed": "Je keuze kon niet worden opgeslagen. Probeer het opnieuw."
   },

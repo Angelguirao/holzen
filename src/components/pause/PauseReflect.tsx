@@ -41,7 +41,7 @@ export function PauseReflect({
 
   return (
     <motion.div
-      className={`${pauseStepLayout.columnFlow} scroll-mt-28 pt-6 sm:scroll-mt-32 sm:pt-10`}
+      className={`${pauseStepLayout.columnFlow} scroll-mt-36 pt-6 sm:scroll-mt-40 sm:pt-10`}
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, y: -20 }}
