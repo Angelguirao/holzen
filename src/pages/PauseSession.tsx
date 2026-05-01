@@ -429,7 +429,7 @@ export default function PauseSession() {
         .from('library_items')
         .update({ is_favorite: newVal })
         .eq('pause_instance_id', pauseInstanceId)
-        .in('source_type', ['pause', 'reflection']);
+        .eq('source_type', 'pause');
     } catch {
       /* non-fatal */
     }

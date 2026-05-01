@@ -325,14 +325,6 @@ export function useHolzen() {
             content: { message: msg, context: ctx },
           },
         ];
-        if (companionData.haiku) {
-          artifacts.push({
-            pause_instance_id: res.instance_id,
-            user_id: user.id,
-            kind: 'haiku',
-            content: { haiku: companionData.haiku },
-          });
-        }
         if (companionData.groundingTitle || companionData.groundingBody) {
           artifacts.push({
             pause_instance_id: res.instance_id,
