@@ -1,42 +1,20 @@
-import { useState, useCallback } from 'react';
+import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { Pencil } from 'lucide-react';
-import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import type { ToolCatalogId } from '@/lib/tools-catalog';
-import { getToolCatalogEntry } from '@/lib/tools-catalog';
-import { ToolsActivitiesEditSheet } from '@/components/tools/ToolsActivitiesEditSheet';
+import { Skeleton } from '@/components/ui/skeleton';
+import { useHolzen } from '@/hooks/use-holzen';
+import { settingsSectionPath, TOOLS } from '@/lib/app-routes';
+import { groundingActivityLabel } from '@/lib/grounding-activity-label';
 
-type Props = {
-  favoriteIds: ToolCatalogId[];
-  allSelectableIds: readonly ToolCatalogId[];
-  onSaveFavorites: (ids: ToolCatalogId[]) => void;
-};
-
-export function ToolsYourActivitiesSection({ favoriteIds, allSelectableIds, onSaveFavorites }: Props) {
+/**
+ * “So you” — shows **grounding activities** from `profiles.grounding_activities`
+ * (same list as Settings → You and the Ground tool). Edit only in Settings.
+ */
+export function ToolsYourActivitiesSection() {
   const { t } = useTranslation();
-  const [sheetOpen, setSheetOpen] = useState(false);
-  const [draftIds, setDraftIds] = useState<ToolCatalogId[]>(favoriteIds);
-
-  const openSheet = useCallback(() => {
-    setDraftIds(favoriteIds);
-    setSheetOpen(true);
-  }, [favoriteIds]);
-
-  const onToggle = useCallback((id: ToolCatalogId, checked: boolean) => {
-    setDraftIds((prev) => {
-      if (checked) {
-        if (prev.includes(id)) return prev;
-        return [...prev, id].slice(0, 8);
-      }
-      return prev.filter((x) => x !== id);
-    });
-  }, []);
-
-  const onSave = useCallback(() => {
-    onSaveFavorites(draftIds);
-    setSheetOpen(false);
-  }, [draftIds, onSaveFavorites]);
+  const { groundingActivities, profileLoaded } = useHolzen();
+  const settingsYou = settingsSectionPath('you');
 
   return (
     <section className="space-y-3">
@@ -45,39 +23,55 @@ export function ToolsYourActivitiesSection({ favoriteIds, allSelectableIds, onSa
       <div className="rounded-xl border border-border/50 bg-muted/15 p-4">
         <div className="flex items-center justify-between gap-2">
           <p className="text-[10px] font-mono uppercase tracking-wider text-muted-foreground">
-            {t('tools.hub.yourActivities')}
+            {t('tools.hub.yourGroundingActivities')}
           </p>
-          <Button type="button" variant="ghost" size="icon" className="h-8 w-8 shrink-0" onClick={openSheet} aria-label={t('tools.hub.editActivities')}>
-            <Pencil className="h-4 w-4 text-muted-foreground" />
-          </Button>
+          <Link
+            to={settingsYou}
+            className="flex h-8 w-8 shrink-0 items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-muted/50 hover:text-foreground"
+            aria-label={t('tools.hub.editGroundingInSettings')}
+          >
+            <Pencil className="h-4 w-4" />
+          </Link>
         </div>
 
-        <p className="mt-2 text-sm leading-snug text-muted-foreground">{t('tools.hub.yourActivitiesBody')}</p>
+        <p className="mt-2 text-sm leading-snug text-muted-foreground">{t('tools.hub.groundingActivitiesIntro')}</p>
 
-        {favoriteIds.length === 0 ? (
-          <p className="mt-3 text-xs text-muted-foreground/90">{t('tools.hub.activitiesHint')}</p>
+        {!profileLoaded ? (
+          <div className="mt-3 space-y-2">
+            <Skeleton className="h-6 w-24 rounded-full" />
+            <Skeleton className="h-6 w-32 rounded-full" />
+          </div>
+        ) : groundingActivities.length === 0 ? (
+          <div className="mt-3 space-y-2">
+            <p className="text-xs text-muted-foreground/90 leading-relaxed">{t('tools.hub.noGroundingActivities')}</p>
+            <Link
+              to={settingsYou}
+              className="inline-flex text-sm font-medium text-primary underline-offset-4 hover:underline"
+            >
+              {t('tools.hub.addGroundingInSettings')}
+            </Link>
+          </div>
         ) : (
           <div className="mt-3 flex flex-wrap gap-2">
-            {favoriteIds.map((id) => {
-              const entry = getToolCatalogEntry(id);
-              return (
-                <Badge key={id} variant="default" className="rounded-full px-3 py-1 font-normal">
-                  {t(entry.hubTitleKey ?? entry.labelKey)}
-                </Badge>
-              );
-            })}
+            {groundingActivities.map((tag) => (
+              <Badge key={tag} variant="secondary" className="rounded-full px-3 py-1 font-normal">
+                {groundingActivityLabel(tag, t)}
+              </Badge>
+            ))}
           </div>
         )}
-      </div>
 
-      <ToolsActivitiesEditSheet
-        open={sheetOpen}
-        onOpenChange={setSheetOpen}
-        selectableIds={allSelectableIds}
-        draftIds={draftIds}
-        onToggle={onToggle}
-        onSave={onSave}
-      />
+        {profileLoaded && groundingActivities.length > 0 ? (
+          <div className="mt-4 border-t border-border/40 pt-3">
+            <Link
+              to={TOOLS.ground}
+              className="text-sm font-medium text-primary underline-offset-4 hover:underline"
+            >
+              {t('tools.hub.openGround')}
+            </Link>
+          </div>
+        ) : null}
+      </div>
     </section>
   );
 }
