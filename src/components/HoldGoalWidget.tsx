@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, type ReactNode } from 'react';
 
 import { useTranslation } from 'react-i18next';
 import { supabase } from '@/integrations/supabase/client';
@@ -49,10 +49,20 @@ const MAX_MONTHS = 1200;
 const MAX_PRICE = 100_000_000;
 const MIN_PRICE = 1;
 
-export function HoldGoalWidget({ currentPrice }: { currentPrice?: number }) {
+export function HoldGoalWidget({
+  currentPrice,
+  variant = 'default',
+  wireframeAccessoryRight,
+}: {
+  currentPrice?: number;
+  /** Composed Home card: wireframe-style goal header row + optional accessory (e.g. why chevron). */
+  variant?: 'default' | 'wireframe';
+  wireframeAccessoryRight?: ReactNode;
+}) {
   const { t } = useTranslation();
   const { currency } = useHolzen();
   const { user } = useAuth();
+  const isWire = variant === 'wireframe';
   const [goal, setGoal] = useState<HoldGoal | null>(null);
   const [loading, setLoading] = useState(true);
   const [setting, setSetting] = useState(false);
@@ -201,6 +211,8 @@ export function HoldGoalWidget({ currentPrice }: { currentPrice?: number }) {
 
   if (loading) return null;
 
+  const goalEditorShell = isWire ? 'space-y-3 py-1' : `${homeInWidget.insetMuted} space-y-3 py-4`;
+
   // Setup mode
   if (setting || !goal) {
     if (!setting && !goal) {
@@ -217,7 +229,7 @@ export function HoldGoalWidget({ currentPrice }: { currentPrice?: number }) {
     }
 
     return (
-      <div className={`${homeInWidget.insetMuted} space-y-3 py-4`}>
+      <div className={goalEditorShell}>
         <div className="flex items-center justify-between">
           <p className={homeInWidget.kicker}>{t('holdGoal.setYourGoal')}</p>
           <button onClick={() => { setSetting(false); setValidationError(null); setStartDate(new Date()); }} className="text-muted-foreground/40 hover:text-foreground">
@@ -378,13 +390,20 @@ export function HoldGoalWidget({ currentPrice }: { currentPrice?: number }) {
 
   // Action buttons (edit + clear)
   const goalActions = (
-    <div className="flex items-center gap-2">
+    <div className={`flex items-center ${isWire ? 'gap-0.5' : 'gap-2'}`}>
       <button type="button" onClick={editGoal} className={`${homeInWidget.iconBtn} text-muted-foreground/50`} aria-label="Edit goal">
         <Pencil className="h-3.5 w-3.5 text-secondary-foreground" />
       </button>
       <AlertDialog>
         <AlertDialogTrigger asChild>
-          <button type="button" className="font-medium transition-colors text-sm text-secondary-foreground">
+          <button
+            type="button"
+            className={
+              isWire
+                ? 'rounded-md px-2 py-1.5 text-xs font-medium text-muted-foreground transition-colors hover:bg-muted/40 hover:text-foreground'
+                : 'font-medium transition-colors text-sm text-secondary-foreground'
+            }
+          >
             {t('holdGoal.clear')}
           </button>
         </AlertDialogTrigger>
@@ -408,6 +427,35 @@ export function HoldGoalWidget({ currentPrice }: { currentPrice?: number }) {
     const elapsed = differenceInDays(new Date(), start);
     const years = Math.floor(elapsed / 365);
     const days = elapsed % 365;
+
+    if (isWire) {
+      return (
+        <div className="space-y-2.5">
+          <div className="flex items-start justify-between gap-2">
+            <div className="min-w-0 flex-1 space-y-1">
+              <p className="flex flex-wrap items-baseline gap-x-2 gap-y-0.5 text-[13px] font-medium leading-snug text-muted-foreground">
+                <span className="tracking-wide">{t('home.goalWhy.goalTag')}</span>
+                <span className="text-muted-foreground/45" aria-hidden>
+                  ·
+                </span>
+                <span className="text-sm font-semibold tabular-nums text-foreground">
+                  {years > 0 ? `${years}y ${days}d` : `${elapsed} day${elapsed !== 1 ? 's' : ''}`}{' '}
+                  {t('holdGoal.andCounting')}
+                </span>
+              </p>
+              <p className={homeInWidget.metaFaint}>
+                {t('holdGoal.since', { date: format(start, 'MMM d, yyyy') })}
+                {elapsed > 0 ? ` · ${t('holdGoal.daysHeld', { count: elapsed })}` : ''} · {t('holdGoal.noEndDate')}
+              </p>
+            </div>
+            <div className="flex shrink-0 items-center gap-0.5">
+              {goalActions}
+              {wireframeAccessoryRight}
+            </div>
+          </div>
+        </div>
+      );
+    }
 
     return (
       <div className={`${homeInWidget.insetMuted} mb-0 pb-[16px]`}>
@@ -442,6 +490,41 @@ export function HoldGoalWidget({ currentPrice }: { currentPrice?: number }) {
     const displayTarget = goal.targetMonths >= 12
       ? `${(goal.targetMonths / 12).toFixed(goal.targetMonths % 12 === 0 ? 0 : 1)}y ${t('holdGoal.commitment')}`
       : `${goal.targetMonths}mo ${t('holdGoal.commitment')}`;
+
+    if (isWire) {
+      return (
+        <div className="space-y-2.5">
+          <div className="flex items-start justify-between gap-2">
+            <div className="min-w-0 flex-1 space-y-1">
+              <p className="flex flex-wrap items-baseline gap-x-2 gap-y-0.5 text-[13px] font-medium leading-snug text-muted-foreground">
+                <span className="tracking-wide">{t('home.goalWhy.goalTag')}</span>
+                <span className="text-muted-foreground/45" aria-hidden>
+                  ·
+                </span>
+                <span className="text-sm font-semibold tabular-nums text-foreground">
+                  {completed ? t('holdGoal.goalReached') : t('holdGoal.daysToGo', { count: remaining })}
+                </span>
+              </p>
+              <p className={homeInWidget.metaFaint}>
+                {t('holdGoal.started', { date: format(start, 'MMM d, yyyy') })} · {t('holdGoal.daysHeld', { count: elapsed })}
+                {' · '}
+                {displayTarget}
+              </p>
+            </div>
+            <div className="flex shrink-0 items-center gap-0.5">
+              {goalActions}
+              {wireframeAccessoryRight}
+            </div>
+          </div>
+          <div className="h-1.5 w-full overflow-hidden rounded-full bg-muted/50">
+            <div
+              className={`h-full rounded-full transition-all duration-700 ${completed ? 'bg-primary' : 'bg-primary/50'}`}
+              style={{ width: `${progress}%` }}
+            />
+          </div>
+        </div>
+      );
+    }
 
     return (
       <div className={`${homeInWidget.insetMuted} space-y-2.5`}>
@@ -481,6 +564,43 @@ export function HoldGoalWidget({ currentPrice }: { currentPrice?: number }) {
     const progress = price > 0 ? Math.min((price / target) * 100, 100) : 0;
     const reached = price >= target;
     const diff = target - price;
+    const elapsedDays = differenceInDays(new Date(), start);
+
+    if (isWire) {
+      return (
+        <div className="space-y-2.5">
+          <div className="flex items-start justify-between gap-2">
+            <div className="min-w-0 flex-1 space-y-1">
+              <p className="flex flex-wrap items-baseline gap-x-2 gap-y-0.5 text-[13px] font-medium leading-snug text-muted-foreground">
+                <span className="tracking-wide">{t('home.goalWhy.goalTag')}</span>
+                <span className="text-muted-foreground/45" aria-hidden>
+                  ·
+                </span>
+                <span className="text-sm font-semibold tabular-nums text-foreground">
+                  {reached ? t('holdGoal.targetReached') : `${formatBtcPrice(diff, currency)} ${t('holdGoal.toGo')}`}
+                </span>
+              </p>
+              <p className={homeInWidget.metaFaint}>
+                {t('holdGoal.started', { date: format(start, 'MMM d, yyyy') })} · {t('holdGoal.daysHeld', { count: elapsedDays })} ·{' '}
+                {t('holdGoal.target')}: {formatBtcPrice(target, currency)}
+                {' · '}
+                {t('holdGoal.current')}: {formatBtcPrice(price, currency)}
+              </p>
+            </div>
+            <div className="flex shrink-0 items-center gap-0.5">
+              {goalActions}
+              {wireframeAccessoryRight}
+            </div>
+          </div>
+          <div className="h-1.5 w-full overflow-hidden rounded-full bg-muted/50">
+            <div
+              className={`h-full rounded-full transition-all duration-700 ${reached ? 'bg-primary' : 'bg-primary/50'}`}
+              style={{ width: `${progress}%` }}
+            />
+          </div>
+        </div>
+      );
+    }
 
     return (
       <div className={`${homeInWidget.insetMuted} space-y-2.5`}>
@@ -508,7 +628,7 @@ export function HoldGoalWidget({ currentPrice }: { currentPrice?: number }) {
             />
           </div>
           <p className={homeInWidget.metaFaint}>
-            {t('holdGoal.started', { date: format(start, 'MMM d, yyyy') })} · {t('holdGoal.daysHeld', { count: differenceInDays(new Date(), start) })} · {t('holdGoal.current')}: {formatBtcPrice(price, currency)}
+            {t('holdGoal.started', { date: format(start, 'MMM d, yyyy') })} · {t('holdGoal.daysHeld', { count: elapsedDays })} · {t('holdGoal.current')}: {formatBtcPrice(price, currency)}
           </p>
         </div>
       </div>
