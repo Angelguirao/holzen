@@ -1,4 +1,4 @@
-import { Eye, EyeOff, WifiOff, Bitcoin, Clock, ChevronDown } from 'lucide-react';
+import { Eye, EyeOff, WifiOff, Bitcoin, Clock, Star } from 'lucide-react';
 import { BtcChartLazyGate } from '@/components/BtcChartLazyGate';
 import { Skeleton } from '@/components/ui/skeleton';
 import { formatBtcPrice, type BtcPriceData } from '@/lib/btc';
@@ -14,7 +14,7 @@ interface Props {
   currency?: string;
   btcMode?: boolean;
   onToggleBtcMode?: () => void;
-  /** When set, price row shows a chevron to show/hide chart + 24h detail below the headline price. */
+  /** When set, price row shows a star control to show/hide chart + 24h detail below the headline price. */
   chartExpanded?: boolean;
   onToggleChartExpanded?: () => void;
 }
@@ -33,42 +33,49 @@ export function BtcStatus({
   const { t } = useTranslation();
   const toggle = onToggleHidden;
 
+  const bitcoinToggleBtn = onToggleBtcMode ? (
+    <button
+      type="button"
+      onClick={onToggleBtcMode}
+      className={cn(
+        homeInWidget.iconBtn,
+        btcMode ? 'text-primary/60 hover:text-primary' : 'text-muted-foreground/40 hover:text-primary',
+      )}
+      aria-label={btcMode ? t('btcStatus.exitBtcMode') : t('btcStatus.enterBtcMode')}
+      title={btcMode ? t('btcStatus.exitBtcMode') : t('btcStatus.enterBtcMode')}
+    >
+      <Bitcoin className="h-3.5 w-3.5 text-secondary-foreground" aria-hidden />
+    </button>
+  ) : null;
+
+  const eyeToggleBtn = (
+    <button
+      type="button"
+      onClick={toggle}
+      className={homeInWidget.iconBtn}
+      aria-label={
+        btcMode
+          ? hidden
+            ? t('btcStatus.show')
+            : t('btcStatus.hide')
+          : hidden
+            ? t('btcStatus.showPrice')
+            : t('btcStatus.hidePrice')
+      }
+    >
+      {hidden ? (
+        <EyeOff className="h-3.5 w-3.5 text-secondary-foreground" aria-hidden />
+      ) : (
+        <Eye className="h-3.5 w-3.5 text-secondary-foreground" aria-hidden />
+      )}
+    </button>
+  );
+
+  /** Wireframe parity: star + hide on the headline price row; star toggles chart / 24h detail. */
   const btcEyeToolbar = (
     <div className="flex shrink-0 items-center justify-end gap-1">
-      {onToggleBtcMode ? (
-        <button
-          type="button"
-          onClick={onToggleBtcMode}
-          className={cn(
-            homeInWidget.iconBtn,
-            btcMode ? 'text-primary/60 hover:text-primary' : 'text-muted-foreground/40 hover:text-primary',
-          )}
-          aria-label={btcMode ? t('btcStatus.exitBtcMode') : t('btcStatus.enterBtcMode')}
-          title={btcMode ? t('btcStatus.exitBtcMode') : t('btcStatus.enterBtcMode')}
-        >
-          <Bitcoin className="h-3.5 w-3.5 text-secondary-foreground" aria-hidden />
-        </button>
-      ) : null}
-      <button
-        type="button"
-        onClick={toggle}
-        className={homeInWidget.iconBtn}
-        aria-label={
-          btcMode
-            ? hidden
-              ? t('btcStatus.show')
-              : t('btcStatus.hide')
-            : hidden
-              ? t('btcStatus.showPrice')
-              : t('btcStatus.hidePrice')
-        }
-      >
-        {hidden ? (
-          <EyeOff className="h-3.5 w-3.5 text-secondary-foreground" aria-hidden />
-        ) : (
-          <Eye className="h-3.5 w-3.5 text-secondary-foreground" aria-hidden />
-        )}
-      </button>
+      {bitcoinToggleBtn}
+      {eyeToggleBtn}
     </div>
   );
 
@@ -144,7 +151,7 @@ export function BtcStatus({
     : '';
 
   const showChartBlock = !hidden && chartExpanded;
-  const chartToggle = onToggleChartExpanded ? (
+  const chartStarToggle = onToggleChartExpanded ? (
     <button
       type="button"
       onClick={onToggleChartExpanded}
@@ -152,15 +159,22 @@ export function BtcStatus({
       aria-expanded={chartExpanded}
       aria-label={chartExpanded ? t('home.market.collapseDetails') : t('home.market.expandDetails')}
     >
-      <ChevronDown
+      <Star
         className={cn(
-          'h-4 w-4 text-secondary-foreground transition-transform duration-200',
-          !chartExpanded && '-rotate-90',
+          'h-4 w-4 text-secondary-foreground transition-colors',
+          chartExpanded && 'fill-primary/25 text-primary',
         )}
         aria-hidden
       />
     </button>
   ) : null;
+
+  const priceRowToolbar = (
+    <div className="flex shrink-0 items-center justify-end gap-1">
+      {chartStarToggle}
+      {eyeToggleBtn}
+    </div>
+  );
 
   return (
     <div className="space-y-3">
@@ -175,7 +189,7 @@ export function BtcStatus({
               </span>
             )}
           </div>
-          {btcEyeToolbar}
+          <div className="flex shrink-0 items-center justify-end gap-1">{bitcoinToggleBtn}</div>
         </div>
         <div className="flex items-center justify-between gap-2">
           <div className="min-w-0 flex-1">
@@ -188,7 +202,7 @@ export function BtcStatus({
               <p className={homeInWidget.price}>{price}</p>
             )}
           </div>
-          {chartToggle}
+          {priceRowToolbar}
         </div>
         {showChartBlock ? (
           <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
