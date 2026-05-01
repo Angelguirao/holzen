@@ -101,6 +101,8 @@
     "ambientMode": "Ambient mode",
     "whenBtcMoves": "When Bitcoin moves, we'll help you pause before you act.",
     "today": "Today",
+    "regenerateReflectionAria": "Regenerate reflection",
+    "regenerateReflectionTitle": "Generate a fresh take for this moment (same cooldown as “Need a moment”)",
     "editGoalWhy": "Edit goal and why",
     "customize": "Customize",
     "customizeSheet": {
@@ -309,13 +311,12 @@
       "pickIntro": "Each card opens the full experience. Pro tools show a small badge until you upgrade.",
       "moreTools": "More practices",
       "soYou": "So you",
-      "yourActivities": "Your activities",
-      "yourActivitiesBody": "Pin the tools you actually enjoy — a lightweight anchor for your week (saved on this device).",
-      "activitiesHint": "Tap the pencil to pick practices you want front-of-mind.",
-      "editActivities": "Edit activities",
-      "editActivitiesTitle": "Your activities",
-      "editActivitiesDesc": "Choose up to eight. These chips appear on your Tools hub.",
-      "editActivitiesSave": "Save",
+      "yourGroundingActivities": "Your grounding activities",
+      "groundingActivitiesIntro": "These are the activities Holzen uses in Ground and can reference during pauses. They live on your profile — same list as Settings → You.",
+      "noGroundingActivities": "You have not added any yet.",
+      "addGroundingInSettings": "Add grounding activities in Settings",
+      "editGroundingInSettings": "Edit grounding activities in Settings",
+      "openGround": "Open Ground",
       "tile": {
         "grounding": "Grounding",
         "capsule": "Send a capsule"
@@ -2119,7 +2120,7 @@
   },
   "bulkHold": {
     "title": "{{count}} pauses while you were away",
-    "subtitle": "Mark all as Hold with one tap, or review them individually in the Library.",
+    "subtitle": "Mark all as Hold with one tap, or review them individually. Per-pause review is still rolling out — the Library lists each pause for now.",
     "holdAll": "Hold all",
     "allMarkedHold": "{{count}} pauses marked as Hold"
   },
