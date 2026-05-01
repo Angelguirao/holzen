@@ -169,35 +169,43 @@ export default function PauseSession() {
     setFetchedInstance(null);
     setFetchFailed(false);
     void (async () => {
-      const { data: inst } = await supabase
-        .from('pause_instances' as never)
-        .select('id, context_snapshot')
-        .eq('id', fetchPauseInstanceId)
-        .maybeSingle();
-      if (cancelled) return;
-      if (!inst) {
-        setFetchFailed(true);
-        return;
+      try {
+        const { data: inst, error: instError } = await supabase
+          .from('pause_instances' as never)
+          .select('id, context_snapshot')
+          .eq('id', fetchPauseInstanceId)
+          .maybeSingle();
+        if (cancelled) return;
+        if (instError || !inst) {
+          setFetchFailed(true);
+          return;
+        }
+        const { data: artifacts, error: artifactsError } = await supabase
+          .from('pause_ai_artifacts' as never)
+          .select('kind, content')
+          .eq('pause_instance_id', fetchPauseInstanceId);
+        if (cancelled) return;
+        if (artifactsError) {
+          setFetchFailed(true);
+          return;
+        }
+        const artifactRows = ((artifacts ?? []) as Array<{ kind: string; content: Record<string, unknown> }>);
+        const companionData = companionDataFromArtifacts(artifactRows);
+        const reflectionArt = artifactRows.find((a) => a.kind === 'reflection_text');
+        const msg = typeof reflectionArt?.content?.message === 'string' ? (reflectionArt.content.message as string) : '';
+        const ctxSnap = (inst as { context_snapshot: Record<string, unknown> | null }).context_snapshot ?? {};
+        const ctx = typeof ctxSnap.context_text === 'string' ? (ctxSnap.context_text as string) : null;
+        setFetchedInstance({
+          id: fetchPauseInstanceId,
+          reflection_message: msg,
+          context: ctx,
+          haiku: companionData.haiku,
+          grounding_title: companionData.groundingTitle,
+          grounding_body: companionData.groundingBody,
+        });
+      } catch {
+        if (!cancelled) setFetchFailed(true);
       }
-      const { data: artifacts } = await supabase
-        .from('pause_ai_artifacts' as never)
-        .select('kind, content')
-        .eq('pause_instance_id', fetchPauseInstanceId);
-      if (cancelled) return;
-      const artifactRows = ((artifacts ?? []) as Array<{ kind: string; content: Record<string, unknown> }>);
-      const companionData = companionDataFromArtifacts(artifactRows);
-      const reflectionArt = artifactRows.find((a) => a.kind === 'reflection_text');
-      const msg = typeof reflectionArt?.content?.message === 'string' ? (reflectionArt.content.message as string) : '';
-      const ctxSnap = (inst as { context_snapshot: Record<string, unknown> | null }).context_snapshot ?? {};
-      const ctx = typeof ctxSnap.context_text === 'string' ? (ctxSnap.context_text as string) : null;
-      setFetchedInstance({
-        id: fetchPauseInstanceId,
-        reflection_message: msg,
-        context: ctx,
-        haiku: companionData.haiku,
-        grounding_title: companionData.groundingTitle,
-        grounding_body: companionData.groundingBody,
-      });
     })();
     return () => {
       cancelled = true;
