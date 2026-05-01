@@ -8,6 +8,7 @@ import {
   isMainPauseLibraryBookmark,
   normalizeLibrarySourceType,
 } from '@/lib/normalize-library-source-type';
+import type { PauseInstanceArchiveMeta } from '@/lib/archive-segment';
 
 /** DB insert/update; `pause_instance_id` may exist in production before types.ts regen. */
 type LibraryItemsInsert = Database['public']['Tables']['library_items']['Insert'] & {
@@ -97,6 +98,9 @@ export function useLibrary() {
   const [loadingMore, setLoadingMore] = useState(false);
   const [hasMore, setHasMore] = useState(true);
   const [readFlagsMap, setReadFlagsMap] = useState<Record<string, ReflectionReadFlags>>({});
+  const [pauseInstanceArchiveMetaById, setPauseInstanceArchiveMetaById] = useState<
+    Record<string, PauseInstanceArchiveMeta>
+  >({});
   const [incompleteReflections, setIncompleteReflections] = useState<Set<string>>(new Set());
   const [reflectionOutcomes, setReflectionOutcomes] = useState<Record<string, string>>({});
 
@@ -109,7 +113,7 @@ export function useLibrary() {
     const [{ data: instRows }, { data: companionRows }] = await Promise.all([
       supabase
         .from('v_pause_full' as never)
-        .select('id, state, outcome, has_breath_completed, counted_companion_types')
+        .select('id, state, engaged_at, outcome, has_breath_completed, counted_companion_types')
         .in('id', pauseInstanceIds),
       supabase
         .from('pause_companion_events' as never)
@@ -144,6 +148,17 @@ export function useLibrary() {
           zoom_out_read: cMap['zoom_out'] ?? cMap['zoom_out_deep_time'] ?? false,
           history_read: cMap['historical_insight'] ?? false,
         };
+      }
+      return next;
+    });
+    setPauseInstanceArchiveMetaById((prev) => {
+      const next = { ...prev };
+      for (const r of (instRows ?? []) as Array<{
+        id: string;
+        state: string;
+        engaged_at: string | null;
+      }>) {
+        next[r.id] = { state: r.state, engaged_at: r.engaged_at ?? null };
       }
       return next;
     });
@@ -219,6 +234,7 @@ export function useLibrary() {
 
     // Reset reflection-derived state, then hydrate for the loaded page.
     setReadFlagsMap({});
+    setPauseInstanceArchiveMetaById({});
     setIncompleteReflections(new Set());
     setReflectionOutcomes({});
     await hydratePauseMeta(libItems);
@@ -406,12 +422,15 @@ export function useLibrary() {
     return collections.filter((c) => colIds.includes(c.id));
   }, [collectionItems, collections]);
 
+  const getPauseArchiveMeta = useCallback(
+    (pauseId: string | null) => (pauseId ? pauseInstanceArchiveMetaById[pauseId] : undefined),
+    [pauseInstanceArchiveMetaById],
+  );
+
   const isCompanionEngaged = useCallback((item: LibraryItem): boolean => {
     if (!item.pause_instance_id || !item.source_type) return true;
     const st = normalizeLibrarySourceType(item.source_type);
     if (st === 'pause' || st === 'pause_note') return true;
-    const flags = readFlagsMap[item.pause_instance_id];
-    if (!flags) return true; // no data, assume engaged
     const sourceToFlag: Record<string, keyof ReflectionReadFlags> = {
       haiku: 'haiku_read',
       grounding: 'grounding_read',
@@ -420,7 +439,10 @@ export function useLibrary() {
       history_insight: 'history_read',
     };
     const flagKey = sourceToFlag[item.source_type];
-    return flagKey ? flags[flagKey] : true;
+    if (!flagKey) return true;
+    const flags = readFlagsMap[item.pause_instance_id];
+    if (!flags) return false;
+    return Boolean(flags[flagKey]);
   }, [readFlagsMap]);
 
   const isReflectionIncomplete = useCallback((item: LibraryItem): boolean => {
@@ -441,6 +463,7 @@ export function useLibrary() {
     addToCollection, removeFromCollection,
     getCollectionItemIds, getCollectionItemCount, getItemCollections,
     isCompanionEngaged, isReflectionIncomplete, getReflectionOutcome,
+    getPauseArchiveMeta,
     refetch: fetchAll,
   };
 }
