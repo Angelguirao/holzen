@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { toast } from 'sonner';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
+import { invokeEdge } from '@/lib/invoke-edge';
 import { useAuth } from '@/hooks/use-auth';
 import { PRICING } from '@/lib/pricing';
 import { holzenLog } from '@/lib/holzen-console';
@@ -117,7 +118,7 @@ type SubscriptionSnapshot = {
 };
 
 async function fetchSubscriptionSnapshot(userId: string, force: boolean): Promise<SubscriptionSnapshot> {
-  const { data, error } = await supabase.functions.invoke('check-subscription', {
+  const { data, error } = await invokeEdge<Record<string, unknown>>('check-subscription', {
     body: force ? { force: true } : undefined,
   });
   if (error) throw error;
@@ -360,7 +361,7 @@ export function useSubscription() {
     try {
       sessionStorage.setItem(CHECKOUT_RETURN_KEY, String(Date.now()));
       const isPack = target === 'flex_pack_s' || target === 'flex_pack_m';
-      const { data, error } = await supabase.functions.invoke('create-checkout', {
+      const { data, error } = await invokeEdge<{ url?: string }>('create-checkout', {
         body: isPack
           ? { checkoutKind: target }
           : { checkoutKind: 'subscription', planTier: target },
@@ -396,7 +397,7 @@ export function useSubscription() {
   const openPortal = useCallback(async () => {
     holzenLog.subscription('portal', { action: 'open' });
     try {
-      const { data, error } = await supabase.functions.invoke('customer-portal');
+      const { data, error } = await invokeEdge<{ url?: string }>('customer-portal');
       if (error) throw error;
       if (data?.url) {
         window.open(data.url, '_blank');
