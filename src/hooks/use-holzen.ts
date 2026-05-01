@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { fetchBtcData, type BtcPriceData } from '@/lib/btc';
 import { supabase } from '@/integrations/supabase/client';
+import { invokeEdge } from '@/lib/invoke-edge';
 import { useAuth } from '@/hooks/use-auth';
 import { useProfile } from '@/hooks/use-profile';
 import type { CompanionData } from '@/components/CompanionSection';
@@ -235,7 +236,12 @@ export function useHolzen() {
 
       try {
         const { moodHistory, recentMessages, recentHaikus } = await loadReflectRecencyHints();
-        const { data: fnData, error: fnError } = await supabase.functions.invoke('holzen-reflect', {
+        const { data: fnData, error: fnError } = await invokeEdge<{
+          message?: string;
+          haiku?: CompanionData['haiku'];
+          grounding_title?: string | null;
+          grounding_body?: string | null;
+        }>('holzen-reflect', {
           body: {
             context: ctx,
             tone: reflectionTone,
