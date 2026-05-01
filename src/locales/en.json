@@ -105,13 +105,13 @@
     "customize": "Customize",
     "customizeSheet": {
       "title": "Customize your Home",
-      "description": "Choose Hold or Zen, show or hide sections, drag to reorder on Home, or reset everything to defaults.",
+      "description": "Choose what you see on Home. Toggle widgets on or off. Drag to reorder.",
       "resetLayout": "Reset layout & widgets",
-      "modeHeading": "Home experience",
-      "holdModeTitle": "Hold",
-      "holdModeDesc": "Full Home — goal, market, pause, and any widgets you turn on.",
-      "zenModeTitle": "Zen",
-      "zenModeDesc": "A calmer screen focused on your reflection and breathing.",
+      "modeHeading": "Mode",
+      "holdModeTitle": "Hold mode",
+      "holdModeDesc": "See everything, prices & signals.",
+      "zenModeTitle": "Zen mode",
+      "zenModeDesc": "Hide prices and market noise.",
       "widgetsHeading": "Widgets",
       "resetLink": "Reset to defaults",
       "sections": {
@@ -294,7 +294,42 @@
     "breatheDesc": "A quiet, goal-free breathing space.",
     "ground": "Ground",
     "groundDesc": "Guided session from your activity tags; your journal lives on the second tab in the same experience.",
-    "proShortBadge": "Pro"
+    "proShortBadge": "Pro",
+    "hub": {
+      "shellNote": "Full-screen tools hide the bottom tab bar until you leave the flow (Back or Done).",
+      "goodNextStep": "A good next step",
+      "suggestedPill": "Suggested",
+      "lastCheckIn": "Last check-in",
+      "checkinNoMood": "Mood not recorded",
+      "intensityShort": "Intensity {{n}} / 5",
+      "checkinTapToUpdate": "Tap to log a fresh check-in or continue the full flow.",
+      "noCheckInYet": "No check-in yet. A quick mood log helps Holzen suggest what fits this week.",
+      "logCheckInCta": "Start emotional check-in",
+      "orPick": "Or pick what you need",
+      "pickIntro": "Each card opens the full experience. Pro tools show a small badge until you upgrade.",
+      "moreTools": "More practices",
+      "soYou": "So you",
+      "yourActivities": "Your activities",
+      "yourActivitiesBody": "Pin the tools you actually enjoy — a lightweight anchor for your week (saved on this device).",
+      "activitiesHint": "Tap the pencil to pick practices you want front-of-mind.",
+      "editActivities": "Edit activities",
+      "editActivitiesTitle": "Your activities",
+      "editActivitiesDesc": "Choose up to eight. These chips appear on your Tools hub.",
+      "editActivitiesSave": "Save",
+      "tile": {
+        "grounding": "Grounding",
+        "capsule": "Send a capsule"
+      },
+      "blurb": {
+        "ground": "Pick a grounding activity and settle your body before decisions. Your notes stay on the Journal tab in the same flow.",
+        "letters": "Write to your future self and choose when it arrives — calm, surge, or dip. A sealed ritual for long conviction.",
+        "breathe": "Goal-free breathing room when you do not need a full pause. Quiet timer, no scores, just space.",
+        "replay": "Revisit a finished pause with a short note. Compare how you feel now to what you captured then.",
+        "checkin": "Name the mood, intensity, and trigger in under a minute. The fastest way to stay honest with yourself.",
+        "journal": "AI-chosen prompts to loosen a stuck story. Best when you have ten quiet minutes and a keyboard.",
+        "bodyscan": "5-4-3-2-1 sensory scan when your mind is racing. Short, structured, and easy to repeat."
+      }
+    }
   },
   "profile": {
     "pageSubtitle": "Your streak, charts, and journey — in one place. (Letters are under Tools.)",
@@ -2057,6 +2092,11 @@
     "replayNoPauses": "No completed pauses yet. Finish a pause, then open Replay again.",
     "replaySelectPause": "Choose a pause to revisit",
     "replayChangePause": "Change pause",
+    "suggestFirstCheckin": "Start with a quick emotional check-in",
+    "suggestCheckin": "It's been a few days — how are you feeling?",
+    "suggestBodyscan": "You've been reactive — try grounding yourself",
+    "suggestJournal": "A guided journal might surface new patterns",
+    "suggestReplay": "Revisit a past reflection with fresh eyes",
     "replayUntitled": "Pause"
   },
   "mirror": {
