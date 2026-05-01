@@ -1,4 +1,4 @@
-import { useCallback } from 'react';
+import { useCallback, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { useTranslation } from 'react-i18next';
 import { ChevronLeft, Share2, ImageIcon } from 'lucide-react';
@@ -10,6 +10,7 @@ import { PauseTags } from '@/components/pause/PauseTags';
 import { pauseStepLayout } from '@/components/pause/pause-step-layout';
 import { Button } from '@/components/ui/button';
 import { trackEvent } from '@/lib/posthog';
+import { pauseLogStep } from '@/lib/pause-api';
 
 interface Props {
   companions: CompanionData;
@@ -42,6 +43,37 @@ export function PauseReflect({
   mood,
 }: Props) {
   const { t } = useTranslation();
+
+  /** Records that the user reached Reflect so Home can show regenerate (see `pauseHasReflectStep`). */
+  useEffect(() => {
+    if (!pauseInstanceId) return;
+    const storageKey = `holzen_reflect_step_logged:${pauseInstanceId}`;
+    try {
+      if (sessionStorage.getItem(storageKey)) return;
+    } catch {
+      return;
+    }
+    let cancelled = false;
+    void pauseLogStep({
+      instanceId: pauseInstanceId,
+      stepType: 'reflection_step',
+      payload: { surface: 'pause_reflect' },
+    })
+      .then(() => {
+        if (cancelled) return;
+        try {
+          sessionStorage.setItem(storageKey, '1');
+        } catch {
+          /* no-op */
+        }
+      })
+      .catch(() => {
+        /* non-fatal — user can revisit Reflect to retry */
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [pauseInstanceId]);
 
   const buildShareText = useCallback(() => {
     const parts = [reflectionMessage.trim()];
