@@ -10,8 +10,7 @@ import { NightReflectionCard, useNightReflection } from '@/components/NightRefle
 import { ReflectionMessage } from '@/components/ReflectionMessage';
 import { HolzenNumber } from '@/components/HolzenNumber';
 import { Onboarding } from '@/components/Onboarding';
-import { HoldGoalWidget } from '@/components/HoldGoalWidget';
-import { MyWhyWidget } from '@/components/MyWhyWidget';
+import { HomeGoalWhyCard } from '@/components/home/HomeGoalWhyCard';
 import { Skeleton } from '@/components/ui/skeleton';
 import { SubscriptionSkeleton } from '@/components/SubscriptionSkeleton';
 import { LoadingButton } from '@/components/ui/loading-button';
@@ -804,10 +803,7 @@ const Home = () => {
               </Link>
             }
           >
-            <div className="space-y-3">
-              <HoldGoalWidget currentPrice={btcData?.currentPrice} />
-              <MyWhyWidget />
-            </div>
+            <HomeGoalWhyCard currentPrice={btcData?.currentPrice} />
           </HomeSectionCard>
         );
 

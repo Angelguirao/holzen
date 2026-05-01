@@ -119,7 +119,7 @@
       "sections": {
         "goalWhy": {
           "title": "Goal & why",
-          "desc": "Your Bitcoin goal and the reason you are holding."
+          "desc": "Hold goal, mantra, and motivations in one summary card."
         },
         "market": {
           "title": "Market",
@@ -142,6 +142,11 @@
           "desc": "End-of-day check-in when available (Pro)."
         }
       }
+    },
+    "goalWhy": {
+      "goalTag": "[GOAL]",
+      "collapseWhyAria": "Collapse why you hold",
+      "expandWhyAria": "Expand why you hold"
     },
     "statTiles": {
       "holzenScore": "Holzen score",
