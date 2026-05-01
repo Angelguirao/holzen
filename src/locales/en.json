@@ -131,7 +131,7 @@
         },
         "journeyPulse": {
           "title": "Journey pulse",
-          "desc": "A compact read on your journey progress."
+          "desc": "Holzen score and In motion under Today — same row as Market and Your pause when they are grouped."
         },
         "quickCapture": {
           "title": "Quick capture",
@@ -189,7 +189,6 @@
       "goalWhy": "Goal & why",
       "yourPause": "Your pause",
       "reflection": "Pause",
-      "journeyPulse": "Journey pulse",
       "quickCapture": "Quick capture",
       "evening": "Evening",
       "letter": "Letter",

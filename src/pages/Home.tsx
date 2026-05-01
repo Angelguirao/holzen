@@ -20,7 +20,11 @@ import { HomeSectionCard } from '@/components/home/HomeSectionCard';
 import { HomeStatTiles } from '@/components/home/HomeStatTiles';
 import { HomeHeroQuote } from '@/components/home/HomeHeroQuote';
 import { HomeCustomizeSheet } from '@/components/home/HomeCustomizeSheet';
-import { useHomeOptionalVisibility, ALL_HOME_SECTION_IDS } from '@/hooks/use-home-optional-visibility';
+import {
+  useHomeOptionalVisibility,
+  ALL_HOME_SECTION_IDS,
+  JOURNEY_STAT_TILES_VISIBILITY_ID,
+} from '@/hooks/use-home-optional-visibility';
 import { settingsSectionPath } from '@/lib/app-routes';
 import { useCallback, useEffect, useState, useMemo, useRef, type ReactNode } from 'react';
 import { Link, useOutletContext, useSearchParams, useNavigate, useLocation } from 'react-router-dom';
@@ -33,7 +37,6 @@ import { homeInWidget } from '@/components/home/home-widget-styles';
 import { cn } from '@/lib/utils';
 import { BulkHoldCard } from '@/components/BulkHoldCard';
 import { InstallHolzenCard } from '@/components/InstallHolzenCard';
-import { HomeJourneyPulse } from '@/components/home/HomeJourneyPulse';
 import { HomeQuickCapture } from '@/components/home/HomeQuickCapture';
 import { SnoozeToolbarControl } from '@/components/SnoozeControl';
 import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
@@ -214,11 +217,24 @@ const Home = () => {
     [homeSegments],
   );
 
+  const showJourneyStatTiles = !!sectionVisible[JOURNEY_STAT_TILES_VISIBILITY_ID];
+
+  const journeyPulseCustomizeToggle = useMemo(
+    () => [
+      {
+        id: JOURNEY_STAT_TILES_VISIBILITY_ID,
+        title: t('home.customizeSheet.sections.journeyPulse.title'),
+        description: t('home.customizeSheet.sections.journeyPulse.desc'),
+      },
+    ],
+    [t],
+  );
+
   const handleSetSectionVisible = useCallback(
     (id: string, value: boolean) => {
       trackEvent('home.optional_widget_toggled', { widget_id: id, visible: value });
       setVisible(id, value);
-      if (value && !order.includes(id)) {
+      if (value && !order.includes(id) && id !== JOURNEY_STAT_TILES_VISIBILITY_ID) {
         reorder([...order, id]);
       }
     },
@@ -238,7 +254,6 @@ const Home = () => {
         'goal-why': t('home.customizeSheet.sections.goalWhy.title'),
         market: t('home.customizeSheet.sections.market.title'),
         'your-pause': t('home.customizeSheet.sections.yourPause.title'),
-        'journey-pulse': t('home.customizeSheet.sections.journeyPulse.title'),
         'quick-capture': t('home.customizeSheet.sections.quickCapture.title'),
         night: t('home.customizeSheet.sections.night.title'),
       };
@@ -253,7 +268,6 @@ const Home = () => {
         'goal-why': t('home.customizeSheet.sections.goalWhy.desc'),
         market: t('home.customizeSheet.sections.market.desc'),
         'your-pause': t('home.customizeSheet.sections.yourPause.desc'),
-        'journey-pulse': t('home.customizeSheet.sections.journeyPulse.desc'),
         'quick-capture': t('home.customizeSheet.sections.quickCapture.desc'),
         night: t('home.customizeSheet.sections.night.desc'),
       };
@@ -833,18 +847,6 @@ const Home = () => {
           </HomeSectionCard>
         );
 
-      case 'journey-pulse':
-        return (
-          <HomeSectionCard
-            title={t('home.widget.journeyPulse')}
-            collapsible
-            collapsed={!!collapsed['journey-pulse']}
-            onToggleCollapse={() => toggleCollapsed('journey-pulse')}
-          >
-            <HomeJourneyPulse />
-          </HomeSectionCard>
-        );
-
       case 'quick-capture':
         return (
           <HomeSectionCard
@@ -929,13 +931,13 @@ const Home = () => {
                   return <div key={sectionId}>{node}</div>;
                 })}
               </div>
-              <HomeStatTiles />
+              {showJourneyStatTiles ? <HomeStatTiles /> : null}
             </section>
           );
         })}
       </div>
 
-      {!statTilesInsideToday ? <HomeStatTiles /> : null}
+      {!statTilesInsideToday && showJourneyStatTiles ? <HomeStatTiles /> : null}
 
       <HomeCustomizeSheet
         open={customizeOpen}
@@ -950,6 +952,7 @@ const Home = () => {
         onZenModeChange={handleZenModeFromCustomize}
         onResetAll={handleCustomizeResetAll}
         nightToggleDisabled={!subscribed}
+        extraVisibilityToggles={journeyPulseCustomizeToggle}
       />
 
       <TestimonialRequest completedPauseCount={completedPauseCount} />

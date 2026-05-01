@@ -21,6 +21,12 @@ import { SortableContext, verticalListSortingStrategy, arrayMove, useSortable } 
 import { CSS } from '@dnd-kit/utilities';
 import { restrictToVerticalAxis } from '@dnd-kit/modifiers';
 
+export interface HomeCustomizeExtraToggle {
+  id: string;
+  title: string;
+  description: string;
+}
+
 export interface HomeCustomizeSheetProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
@@ -35,6 +41,8 @@ export interface HomeCustomizeSheetProps {
   onResetAll: () => void;
   /** When true, Night reflection toggle is disabled (e.g. not Pro). */
   nightToggleDisabled?: boolean;
+  /** Toggles that are not part of drag-and-reorder (e.g. Today stat tiles). */
+  extraVisibilityToggles?: HomeCustomizeExtraToggle[];
 }
 
 function CustomizeSortableRow({
@@ -95,6 +103,42 @@ function CustomizeSortableRow({
   );
 }
 
+function CustomizeStaticToggleRow({
+  id,
+  title,
+  description,
+  checked,
+  onCheckedChange,
+}: {
+  id: string;
+  title: string;
+  description: string;
+  checked: boolean;
+  onCheckedChange: (v: boolean) => void;
+}) {
+  return (
+    <div
+      className={cn(
+        'flex items-start gap-2 rounded-xl border border-border/50 bg-muted/20 px-3 py-3',
+      )}
+    >
+      <div className="w-9 shrink-0" aria-hidden />
+      <div className="min-w-0 flex-1 space-y-0.5">
+        <Label htmlFor={`home-section-${id}`} className="text-sm font-medium leading-snug text-foreground">
+          {title}
+        </Label>
+        <p className={cn(homeInWidget.metaFaint, 'text-[11px] leading-snug')}>{description}</p>
+      </div>
+      <Switch
+        id={`home-section-${id}`}
+        checked={!!checked}
+        onCheckedChange={onCheckedChange}
+        className="shrink-0"
+      />
+    </div>
+  );
+}
+
 export function HomeCustomizeSheet({
   open,
   onOpenChange,
@@ -108,6 +152,7 @@ export function HomeCustomizeSheet({
   onZenModeChange,
   onResetAll,
   nightToggleDisabled,
+  extraVisibilityToggles,
 }: HomeCustomizeSheetProps) {
   const { t } = useTranslation();
 
@@ -218,6 +263,21 @@ export function HomeCustomizeSheet({
                 </div>
               </SortableContext>
             </DndContext>
+
+            {extraVisibilityToggles?.length ? (
+              <div className="flex flex-col gap-3">
+                {extraVisibilityToggles.map((row) => (
+                  <CustomizeStaticToggleRow
+                    key={row.id}
+                    id={row.id}
+                    title={row.title}
+                    description={row.description}
+                    checked={!!visible[row.id]}
+                    onCheckedChange={(v) => onSetVisible(row.id, v)}
+                  />
+                ))}
+              </div>
+            ) : null}
           </section>
         </div>
       </SheetContent>
