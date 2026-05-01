@@ -174,6 +174,7 @@ const App = () => (
                   <Route path="/" element={<Home />} />
                   <Route path="/index" element={<Navigate to="/" replace />} />
                   <Route path="/library" element={<Library />} />
+                  <Route path="/archive" element={<Library />} />
                   <Route path="/journey" element={<Navigate to="/journey/stats" replace />} />
                   <Route path="/journey/:tab" element={<Profile />} />
                   <Route path="/journey/badges/guide" element={<BadgeGuide />} />

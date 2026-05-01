@@ -46,7 +46,11 @@ export interface PauseFullRow {
   has_shift_emotion_logged: boolean;
   has_outcome_logged: boolean;
   initial_mood: string | null;
+  /** Latest `initial_emotion_logged` payload `intensity` (1–5), when logged. */
+  initial_emotion_intensity: number | null;
   shift_mood: string | null;
+  /** Latest `shift_emotion_logged` payload `shift_intensity` (1–5), when logged. */
+  shift_emotion_intensity: number | null;
   outcome: string | null;
   note_text: string | null;
   tags: string[] | null;
