@@ -35,7 +35,7 @@ import { BulkHoldCard } from '@/components/BulkHoldCard';
 import { InstallHolzenCard } from '@/components/InstallHolzenCard';
 import { HomeJourneyPulse } from '@/components/home/HomeJourneyPulse';
 import { HomeQuickCapture } from '@/components/home/HomeQuickCapture';
-import { SnoozeControl } from '@/components/SnoozeControl';
+import { SnoozeToolbarControl } from '@/components/SnoozeControl';
 import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
 import { playNotificationTone, prefetchNotificationTone } from '@/lib/notification-tone';
 import { holzenLog } from '@/lib/holzen-console';
@@ -373,6 +373,26 @@ const Home = () => {
   const hasAccess = subscribed || ((monthlyRemaining ?? 0) > 0);
   const subscriptionReady = !subLoading && (subscribed || monthlyRemaining !== undefined);
   const showLimitUpsell = subscriptionReady && !subscribed && monthlyRemaining === 0;
+  /** Hide server scheduling row while a reflection is showing or generating — keeps focus on the pause. */
+  const showPauseScheduling = subscriptionReady && hasAccess && !message && !loading;
+
+  const pauseSectionHeaderRight =
+    subscriptionReady && hasAccess ? (
+      <div className="flex shrink-0 items-center gap-1">
+        <SnoozeToolbarControl />
+        {message ? (
+          <button
+            type="button"
+            onClick={handleDismiss}
+            className={homeInWidget.iconBtn}
+            aria-label={t('home.pauseDismissAria', { defaultValue: 'Dismiss this pause on Home' })}
+          >
+            <X className="h-3.5 w-3.5 shrink-0" aria-hidden />
+          </button>
+        ) : null}
+      </div>
+    ) : undefined;
+
   // Zen mode — unchanged
   if (zenMode) {
     const zenTransition = { duration: 0.8, ease: "easeOut" as const };
@@ -465,14 +485,13 @@ const Home = () => {
     <div className="space-y-4">
       <BulkHoldCard />
 
-      {subscriptionReady && hasAccess ? (
+      {showPauseScheduling ? (
         <div className="space-y-0.5">
           <AutoCooldownIndicator
             cooldownRemaining={autoCooldownRemaining}
             cooldownHours={cooldownHours}
             nextCronCheckIn={nextCronCheckIn}
           />
-          <SnoozeControl />
         </div>
       ) : null}
 
@@ -499,16 +518,8 @@ const Home = () => {
 
           {message ? (
             <div className="space-y-4">
-              <div className="relative">
-                <button
-                  type="button"
-                  onClick={handleDismiss}
-                  className={homeInWidget.dismissAbs}
-                  aria-label={t('common.dismiss', { defaultValue: 'Dismiss' })}
-                >
-                  <X className="h-3.5 w-3.5" aria-hidden />
-                </button>
-                <p className={cn(homeInWidget.bodyLead, 'pr-5')}>
+              <div className="space-y-2">
+                <p className={homeInWidget.bodyLead}>
                   {message.split(/[.!?]\s/)[0]}
                   {message.split(/[.!?]\s/).length > 1 ? '…' : ''}
                 </p>
@@ -738,7 +749,9 @@ const Home = () => {
           />
         </HomeSectionCard>
 
-        <HomeSectionCard title={t('home.widget.yourPause')}>{pauseCardBody}</HomeSectionCard>
+        <HomeSectionCard title={t('home.widget.yourPause')} headerRight={pauseSectionHeaderRight}>
+          {pauseCardBody}
+        </HomeSectionCard>
       </section>
 
       <HomeStatTiles />

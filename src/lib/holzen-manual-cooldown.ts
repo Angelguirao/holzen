@@ -1,4 +1,4 @@
-const MANUAL_COOLDOWN_MS = 15 * 60 * 1000; // 15 minutes for on-demand
+const MANUAL_COOLDOWN_MS = 60 * 60 * 1000; // 1 hour for on-demand manual pauses
 const DEV_COOLDOWN_MS = 5 * 1000; // 5 seconds in dev mode
 
 /** localStorage flag synced from DB via Admin page */

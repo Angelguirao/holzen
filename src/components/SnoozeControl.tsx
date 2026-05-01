@@ -12,6 +12,7 @@ import {
   PopoverTrigger,
 } from '@/components/ui/popover';
 import { homeInWidget } from '@/components/home/home-widget-styles';
+import { cn } from '@/lib/utils';
 
 const SNOOZE_OPTIONS = [
   { hours: 2, labelKey: 'snooze.2h' },
@@ -64,6 +65,7 @@ export function useSnooze() {
   return { snoozedUntil, isActive, snooze, cancelSnooze };
 }
 
+/** Full-width link + popover (legacy Home layout). Prefer {@link SnoozeToolbarControl} in section headers. */
 export function SnoozeControl() {
   const { t } = useTranslation();
   const { snoozedUntil, isActive, snooze, cancelSnooze } = useSnooze();
@@ -158,6 +160,114 @@ export function SnoozeControl() {
             {t('snooze.untilTomorrow', { defaultValue: 'Until tomorrow (8am)' })}
           </span>
         </button>
+      </PopoverContent>
+    </Popover>
+  );
+}
+
+/** Icon + popover for Home section headers (matches Market/BtcStatus hit targets). */
+export function SnoozeToolbarControl() {
+  const { t } = useTranslation();
+  const { snoozedUntil, isActive, snooze, cancelSnooze } = useSnooze();
+  const [open, setOpen] = useState(false);
+
+  const handleSnooze = async (hours: number) => {
+    hapticFeedback('light');
+    await snooze(hours);
+    setOpen(false);
+    toast(t('snooze.activated', { hours, defaultValue: `Pauses snoozed for ${hours}h` }), { duration: 3000 });
+  };
+
+  const handleSnoozeUntilTomorrow = async () => {
+    hapticFeedback('light');
+    const now = new Date();
+    const tomorrow = new Date(now);
+    tomorrow.setDate(tomorrow.getDate() + 1);
+    tomorrow.setHours(8, 0, 0, 0);
+    const hours = (tomorrow.getTime() - now.getTime()) / (60 * 60 * 1000);
+    await snooze(hours);
+    setOpen(false);
+    toast(t('snooze.untilTomorrowActivated', { defaultValue: 'Snoozed until tomorrow 8am' }), {
+      duration: 3000,
+    });
+  };
+
+  const handleCancel = async () => {
+    hapticFeedback('light');
+    await cancelSnooze();
+    setOpen(false);
+    toast(t('snooze.cancelled', { defaultValue: 'Snooze cancelled' }), { duration: 2000 });
+  };
+
+  const activeTimeLabel =
+    isActive && snoozedUntil
+      ? (() => {
+          const remaining = Math.max(0, snoozedUntil.getTime() - Date.now());
+          const hours = Math.floor(remaining / 3600000);
+          const minutes = Math.floor((remaining % 3600000) / 60000);
+          return hours > 0 ? `${hours}h ${minutes}m` : `${minutes}m`;
+        })()
+      : '';
+
+  return (
+    <Popover open={open} onOpenChange={setOpen}>
+      <PopoverTrigger asChild>
+        <button
+          type="button"
+          className={cn(
+            homeInWidget.iconBtn,
+            isActive && 'text-primary hover:text-primary',
+          )}
+          aria-label={t('snooze.toolbarAria', { defaultValue: 'Snooze automatic pauses' })}
+          aria-expanded={open}
+        >
+          <Moon className="h-3.5 w-3.5 shrink-0" aria-hidden />
+        </button>
+      </PopoverTrigger>
+      <PopoverContent align="end" className="w-52 p-2 space-y-1">
+        {isActive && snoozedUntil ? (
+          <>
+            <p className={`px-2 pb-1 ${homeInWidget.meta}`}>
+              {t('snooze.activeLabel', { time: activeTimeLabel, defaultValue: `Snoozed · {{time}} left` })}
+            </p>
+            <button
+              type="button"
+              onClick={handleCancel}
+              className="flex w-full items-center justify-center rounded-lg border border-border/50 px-3 py-2 text-sm font-medium text-primary transition-colors hover:bg-muted/40"
+            >
+              {t('snooze.wake', { defaultValue: 'Wake' })}
+            </button>
+          </>
+        ) : (
+          <>
+            <p className={`px-2 pb-1 ${homeInWidget.kicker}`}>
+              {t('snooze.snoozeFor', { defaultValue: 'Snooze for' })}
+            </p>
+            {SNOOZE_OPTIONS.map(({ hours, labelKey }) => (
+              <button
+                key={hours}
+                type="button"
+                onClick={() => handleSnooze(hours)}
+                className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-left transition-colors hover:bg-muted/50"
+              >
+                <Clock className="h-3 w-3 text-muted-foreground/40" />
+                <span className="text-sm font-medium text-foreground/80">
+                  {t(labelKey, { defaultValue: `${hours} hours` })}
+                </span>
+              </button>
+            ))}
+            <button
+              type="button"
+              onClick={handleSnoozeUntilTomorrow}
+              className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-left transition-colors hover:bg-muted/50"
+            >
+              <Clock className="h-3 w-3 text-muted-foreground/40" />
+              <span className="text-sm font-medium text-foreground/80">
+                {t('snooze.untilTomorrow', { defaultValue: 'Until tomorrow (8am)' })}
+              </span>
+            </button>
+          </>
+        )}
       </PopoverContent>
     </Popover>
   );

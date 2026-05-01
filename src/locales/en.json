@@ -138,6 +138,7 @@
     "cooldownHeadline": "{{hours}}h cooldown · {{time}} left",
     "nextScanLine": "Next scan · {{scan}}",
     "nextScanIdleTitle": "Countdown until the server runs the next price check",
+    "pauseDismissAria": "Dismiss this pause on Home",
     "autoCooldown": {
       "afterPauseKicker": "Rest window after your last pause",
       "serverChecksKicker": "Background price checks",
@@ -1985,6 +1986,7 @@
     "allMarkedHold": "{{count}} pauses marked as Hold"
   },
   "snooze": {
+    "toolbarAria": "Snooze automatic pauses",
     "pausePauses": "Snooze pauses",
     "snoozeFor": "Snooze for",
     "2h": "2 hours",
@@ -1994,6 +1996,8 @@
     "activated": "Pauses snoozed for {{hours}}h",
     "cancelled": "Snooze cancelled",
     "activeLabel": "Snoozed · {{time}} left",
-    "wake": "Wake"
+    "wake": "Wake",
+    "untilTomorrow": "Until tomorrow (8am)",
+    "untilTomorrowActivated": "Snoozed until tomorrow 8am"
   }
 }

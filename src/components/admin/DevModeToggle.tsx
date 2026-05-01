@@ -73,7 +73,7 @@ export function DevModeToggle() {
             Rapid Testing Mode {syncing && '…'}
           </p>
           <p className="text-[9px] text-muted-foreground/40">
-            {devMode ? '5s cooldown between pauses (active)' : '15min cooldown between pauses (normal)'}
+            {devMode ? '5s cooldown between pauses (active)' : '1h cooldown between manual pauses (normal)'}
           </p>
         </div>
         <span className={`text-[9px] font-mono ${devMode ? 'text-secondary-foreground/80' : 'text-muted-foreground/30'}`}>
