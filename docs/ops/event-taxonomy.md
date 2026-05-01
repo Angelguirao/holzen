@@ -19,7 +19,7 @@ The authoritative list of PostHog events Holzen emits. Deliberate events only �
 
 ## Instrumentation status
 
-- **Wired (PostHog):** `auth.*`, `navigation.primary_tab_opened`, `home.customize_opened`, `home.optional_widget_toggled`, `home.customize_reset_layout`, `home.hero_quote_viewed`, `home.market_chart_scrolled_to`, `pause.manual_started` / `pause.manual_completed` (Home “Need a moment” + `holzen-reflect` + V2 instance), `pause_instance_created` (manual new instance), `pause_engaged`, `pause_completed`, `pause_companion_counted` / `pause_companion_not_counted` (from `pause_log_step` / `pause_log_companion` RPCs), `generation.initiated`, `companion.served`, `paywall.viewed` (feature-gate, limit hit, upgrade buttons in Settings), `paywall.subscribed` (subscription checkout return; `plan` from `check-subscription` `subscription_billing_interval` when a fresh Stripe read is available, else `unknown`), `feedback.submitted` (after `send-feedback` success), `performance.web_vital`, `ritual.suggested` / `ritual.suggestion_refreshed` / `ritual.accepted` / `ritual.declined` (Ground), plus **companion idempotency diagnostics** below.
+- **Wired (PostHog):** `auth.*`, `navigation.primary_tab_opened`, `home.customize_opened`, `home.optional_widget_toggled`, `home.customize_reset_layout`, `home.hero_quote_viewed`, `home.market_chart_expand_toggled`, `pause.manual_started` / `pause.manual_completed` (Home “Need a moment” + `holzen-reflect` + V2 instance), `pause_instance_created` (manual new instance), `pause_engaged`, `pause_completed`, `pause_companion_counted` / `pause_companion_not_counted` (from `pause_log_step` / `pause_log_companion` RPCs), `generation.initiated`, `companion.served`, `paywall.viewed` (feature-gate, limit hit, upgrade buttons in Settings), `paywall.subscribed` (subscription checkout return; `plan` from `check-subscription` `subscription_billing_interval` when a fresh Stripe read is available, else `unknown`), `feedback.submitted` (after `send-feedback` success), `performance.web_vital`, `ritual.suggested` / `ritual.suggestion_refreshed` / `ritual.accepted` / `ritual.declined` (Ground), plus **companion idempotency diagnostics** below.
 - **Postgres (not PostHog):** PWA install prompts (`InstallHolzenCard` → `analytics_events`), edge `trackEvent` AI call counters, etc.
 - **Convention:** every new event adds a row below AND a `trackEvent` call in source — never define events only in the PostHog UI.
 
@@ -59,7 +59,7 @@ The Archive tab uses route `/library` and **still reports** `tab: 'library'` in 
 | `home.optional_widget_toggled` | User toggles an optional Home module on/off in Customize | `{ widget_id: string; visible: boolean }` — `widget_id` is one of `OPTIONAL_HOME_WIDGET_IDS` | @holzen |
 | `home.customize_reset_layout` | User taps “Reset layout & widgets” in Customize | `{}` | @holzen |
 | `home.hero_quote_viewed` | Once per Home mount after profile is loaded (daily hero line) | `{ quote_index: number; utc_ymd: string }` — `quote_index` is `0..9` from `heroQuoteIndexForDay`; no quote text | @holzen |
-| `home.market_chart_scrolled_to` | User taps the Market card header “scroll to chart” control | `{}` | @holzen |
+| `home.market_chart_expand_toggled` | User toggles Market chart / 24h detail (chevron next to headline price) | `{ expanded: boolean }` | @holzen |
 
 ### pause — Home manual message (AI)
 

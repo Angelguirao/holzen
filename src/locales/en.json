@@ -113,8 +113,8 @@
       "noBadgeProgress": "You're caught up — open badges to see what's next."
     },
     "market": {
-      "focusChart": "Scroll to price chart",
-      "chartPreview": "Chart"
+      "expandDetails": "Show chart and 24h details",
+      "collapseDetails": "Hide chart and 24h details"
     },
     "heroQuote": {
       "lineWithName": "{{name}}, {{line}}",
