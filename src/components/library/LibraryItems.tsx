@@ -8,7 +8,7 @@ import { SwipeableCard } from './SwipeableCard';
 import { ExportMenu } from './ExportMenu';
 import type { useLibrary } from '@/hooks/use-library';
 import type { LibraryItem } from '@/hooks/use-library';
-import { Trash2, Archive, Heart, X, CheckSquare, Download } from 'lucide-react';
+import { Trash2, Archive, Heart, X, CheckSquare, Download, Loader2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { isMainPauseLibraryBookmark } from '@/lib/normalize-library-source-type';
 import {
@@ -65,7 +65,7 @@ export function LibraryItems({ library, filtered }: Props) {
   const {
     items, collections, updateItem, deleteItem, togglePin, toggleFavorite,
     addToCollection, removeFromCollection, getItemCollections, isCompanionEngaged, isReflectionIncomplete,
-    getReflectionOutcome, refetch,
+    getReflectionOutcome, refetch, loading, listLoadFailed,
   } = library;
 
   const [selectedItem, setSelectedItem] = useState<LibraryItem | null>(null);
@@ -296,7 +296,11 @@ export function LibraryItems({ library, filtered }: Props) {
         </div>
 
         <div>
-          {filtered.length === 0 ? (
+          {loading && filtered.length === 0 && !listLoadFailed ? (
+            <div className="flex justify-center py-16" role="status" aria-busy="true" aria-label={t('common.loading')}>
+              <Loader2 className="h-6 w-6 animate-spin text-muted-foreground/40" />
+            </div>
+          ) : listLoadFailed && filtered.length === 0 ? null : filtered.length === 0 ? (
             <div className="text-center py-12 space-y-3">
               <p className="text-2xl">📚</p>
               <p className="text-xs text-muted-foreground/60 font-mono max-w-[240px] mx-auto">

@@ -15,6 +15,8 @@ import { usePullToRefresh } from '@/hooks/use-pull-to-refresh';
 import { DuplicateBanner } from '@/components/library/DuplicateBanner';
 
 import { Input } from '@/components/ui/input';
+import { Alert, AlertDescription } from '@/components/ui/alert';
+import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import { useProGate } from '@/hooks/use-pro-gate';
 import { NoxHeaderMain } from '@/components/ui/nox-header';
@@ -175,6 +177,17 @@ export default function Library() {
       <NoxHeaderMain title={t('library.title')} subtitle={t('library.pageDescription')} />
       {/* Current pause card (Pause V2). Hidden when the user has no open pause. */}
       <CurrentPauseCard />
+
+      {library.listLoadFailed && (
+        <Alert variant="destructive">
+          <AlertDescription className="flex flex-col gap-3 text-left">
+            <p>{t('library.loadFailed')}</p>
+            <Button type="button" variant="outline" size="sm" className="self-start" onClick={() => void library.refetch()}>
+              {t('common.tryAgain')}
+            </Button>
+          </AlertDescription>
+        </Alert>
+      )}
 
       {/* Pull-to-refresh indicator */}
       <AnimatePresence>

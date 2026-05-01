@@ -1,4 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
+import { useTranslation } from 'react-i18next';
+import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/use-auth';
 import type { Database } from '@/integrations/supabase/types';
@@ -82,6 +84,7 @@ function writeCache<T>(key: string, data: T) {
 }
 
 export function useLibrary() {
+  const { t } = useTranslation();
   const { user } = useAuth();
 
   // Initialize state from cache for instant render
@@ -89,6 +92,8 @@ export function useLibrary() {
   const [collections, setCollections] = useState<Collection[]>(() => readCache<Collection[]>(CACHE_KEY_COLLECTIONS) ?? []);
   const [collectionItems, setCollectionItems] = useState<CollectionItem[]>(() => readCache<CollectionItem[]>(CACHE_KEY_COL_ITEMS) ?? []);
   const [loading, setLoading] = useState(true);
+  /** True when the primary `library_items` page query failed (avoid false “empty library”). */
+  const [listLoadFailed, setListLoadFailed] = useState(false);
   const [loadingMore, setLoadingMore] = useState(false);
   const [hasMore, setHasMore] = useState(true);
   const [readFlagsMap, setReadFlagsMap] = useState<Record<string, ReflectionReadFlags>>({});
@@ -160,9 +165,13 @@ export function useLibrary() {
   }, []);
 
   const fetchAll = useCallback(async () => {
-    if (!user) return;
+    if (!user) {
+      setLoading(false);
+      setListLoadFailed(false);
+      return;
+    }
     setLoading(true);
-    const [{ data: itemsData }, { data: collectionsData }, { data: colItemsData }] = await Promise.all([
+    const [rItems, rCols, rColItems] = await Promise.all([
       supabase
         .from('library_items')
         .select('*')
@@ -180,18 +189,30 @@ export function useLibrary() {
         .select('*')
         .order('position', { ascending: true }),
     ]);
-    const libItems = (itemsData as unknown as LibraryItem[]) ?? [];
-    const cols = (collectionsData as unknown as Collection[]) ?? [];
-    const colItems = (colItemsData as unknown as CollectionItem[]) ?? [];
+
+    if (rItems.error) {
+      setListLoadFailed(true);
+      setLoading(false);
+      return;
+    }
+
+    const libItems = (rItems.data as unknown as LibraryItem[]) ?? [];
     setItems(libItems);
-    setCollections(cols);
-    setCollectionItems(colItems);
+    if (!rCols.error) {
+      const cols = (rCols.data as unknown as Collection[]) ?? [];
+      setCollections(cols);
+      writeCache(CACHE_KEY_COLLECTIONS, cols);
+    }
+    if (!rColItems.error) {
+      const colItems = (rColItems.data as unknown as CollectionItem[]) ?? [];
+      setCollectionItems(colItems);
+      writeCache(CACHE_KEY_COL_ITEMS, colItems);
+    }
     setHasMore(libItems.length === PAGE_SIZE);
+    setListLoadFailed(false);
     setLoading(false);
 
     writeCache(CACHE_KEY_ITEMS, libItems);
-    writeCache(CACHE_KEY_COLLECTIONS, cols);
-    writeCache(CACHE_KEY_COL_ITEMS, colItems);
 
     // Reset reflection-derived state, then hydrate for the loaded page.
     setReadFlagsMap({});
@@ -204,13 +225,19 @@ export function useLibrary() {
     if (!user || loadingMore || !hasMore) return;
     setLoadingMore(true);
     const offset = items.length;
-    const { data } = await supabase
+    const { data, error } = await supabase
       .from('library_items')
       .select('*')
       .eq('user_id', user.id)
       .order('pinned', { ascending: false })
       .order('created_at', { ascending: false })
       .range(offset, offset + PAGE_SIZE - 1);
+    if (error) {
+      toast.error(t('library.loadMoreFailed'));
+      setHasMore(false);
+      setLoadingMore(false);
+      return;
+    }
     const newItems = (data as unknown as LibraryItem[]) ?? [];
     if (newItems.length > 0) {
       setItems((prev) => {
@@ -223,7 +250,7 @@ export function useLibrary() {
     }
     setHasMore(newItems.length === PAGE_SIZE);
     setLoadingMore(false);
-  }, [user, loadingMore, hasMore, items.length, hydratePauseMeta]);
+  }, [user, loadingMore, hasMore, items.length, hydratePauseMeta, t]);
 
 
   useEffect(() => { fetchAll(); }, [fetchAll]);
@@ -404,7 +431,7 @@ export function useLibrary() {
   }, [reflectionOutcomes]);
 
   return {
-    items, collections, collectionItems, loading,
+    items, collections, collectionItems, loading, listLoadFailed,
     loadingMore, hasMore, loadMore,
     addItem, updateItem, deleteItem, togglePin, toggleFavorite,
     addCollection, updateCollection, deleteCollection,
