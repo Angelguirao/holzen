@@ -157,7 +157,7 @@ const Home = () => {
   const [pinnedPausePreview, setPinnedPausePreview] = useState<PinnedPausePreview | null>(null);
   const prefersReducedMotion = useReducedMotion();
   const [completedPauseCount, setCompletedPauseCount] = useState(0);
-  const [marketChartExpanded, setMarketChartExpanded] = useState(true);
+  const [marketChartExpanded, setMarketChartExpanded] = useState(false);
   const [customizeOpen, setCustomizeOpen] = useState(false);
   const heroQuoteViewTracked = useRef(false);
 
