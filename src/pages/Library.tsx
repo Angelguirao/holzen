@@ -43,9 +43,9 @@ import { librarySourceLabel } from '@/lib/library-source-label';
 import {
   itemBelongsToEchoesTab,
   itemBelongsToPausesTab,
-  librarySourceForSegment,
   type ArchiveMainSegment,
 } from '@/lib/archive-segment';
+import { normalizeLibrarySourceType } from '@/lib/normalize-library-source-type';
 import {
   DropdownMenu,
   DropdownMenuCheckboxItem,
@@ -152,7 +152,7 @@ export default function Library() {
     onLoadMore: library.loadMore,
   });
 
-  const { items, collections } = library;
+  const { items, collections, getPauseArchiveMeta } = library;
 
   const sourceChips = useMemo(
     () => SOURCE_CHIPS.map((c) => ({ ...c, label: librarySourceLabel(c.key, t, c.key) })),
@@ -161,24 +161,34 @@ export default function Library() {
 
   const segmentBase = useMemo(() => {
     let r = items.filter((i) => i.status !== 'deleted' && i.status !== 'archived');
-    if (mainSegment === 'pauses') r = r.filter(itemBelongsToPausesTab);
-    else if (mainSegment === 'echoes') r = r.filter(itemBelongsToEchoesTab);
+    if (mainSegment === 'pauses') r = r.filter((i) => itemBelongsToPausesTab(i, getPauseArchiveMeta));
+    else if (mainSegment === 'echoes') r = r.filter((i) => itemBelongsToEchoesTab(i, getPauseArchiveMeta));
     return r;
-  }, [items, mainSegment]);
+  }, [items, mainSegment, getPauseArchiveMeta]);
 
   const hasAnyPauseArchiveContent = useMemo(
-    () => items.some((i) => i.status !== 'deleted' && i.status !== 'archived' && itemBelongsToPausesTab(i)),
-    [items],
+    () =>
+      items.some(
+        (i) =>
+          i.status !== 'deleted' && i.status !== 'archived' && itemBelongsToPausesTab(i, getPauseArchiveMeta),
+      ),
+    [items, getPauseArchiveMeta],
   );
 
   const hasAnyEchoesContent = useMemo(
-    () => items.some((i) => i.status !== 'deleted' && i.status !== 'archived' && itemBelongsToEchoesTab(i)),
-    [items],
+    () =>
+      items.some(
+        (i) =>
+          i.status !== 'deleted' && i.status !== 'archived' && itemBelongsToEchoesTab(i, getPauseArchiveMeta),
+      ),
+    [items, getPauseArchiveMeta],
   );
 
   const availableSources = useMemo(() => {
     if (mainSegment !== 'pauses') return [];
-    const existing = new Set(segmentBase.map((i) => librarySourceForSegment(i)).filter(Boolean));
+    const existing = new Set(
+      segmentBase.map((i) => normalizeLibrarySourceType(i.source_type) ?? i.source_type ?? '').filter(Boolean),
+    );
     return sourceChips.filter((f) => existing.has(f.key));
   }, [segmentBase, sourceChips, mainSegment]);
 
@@ -204,7 +214,9 @@ export default function Library() {
       result = result.filter((i) => i.is_favorite);
     }
     if (mainSegment === 'pauses' && selectedSourceTypes.length > 0) {
-      result = result.filter((i) => selectedSourceTypes.includes(librarySourceForSegment(i)));
+      result = result.filter((i) =>
+        selectedSourceTypes.includes(normalizeLibrarySourceType(i.source_type) ?? i.source_type ?? ''),
+      );
     }
     if (smartFilter) result = result.filter((i) => smartFilter.itemIds.has(i.id));
     if (tagFilter) result = result.filter((i) => i.tags?.includes(tagFilter));
