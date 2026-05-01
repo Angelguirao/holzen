@@ -191,7 +191,8 @@
     "documentTitle": "Holzen — Journey",
     "activityExplainer": "A chronological log of pauses and practices. Your saved reflection cards and collections live in Library — browse and search there.",
     "homeCardTitle": "Your journey",
-    "homeCardSubtitle": "Stats, insights, badges, and activity"
+    "homeCardSubtitle": "Stats, insights, badges, and activity",
+    "activityLoadFailed": "Could not load your activity timeline. Check your connection and try again."
   },
   "admin": {
     "subNavAria": "Admin sections",
