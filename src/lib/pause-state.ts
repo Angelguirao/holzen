@@ -56,7 +56,14 @@ export type PauseCompanionNonCountingReason =
 /** Shape of `pause_templates` rows used by the transition rules. */
 export interface PauseTemplateRow {
   slug: string;
+  /** Legacy column; server RPCs use `action_window_ms` + `dismissal_suppression_ms` for new behavior. */
   window_ms: number;
+  /**
+   * When non-null, `window_ends_at` is meaningful and clock expiry applies (mirrors Postgres).
+   * When null, only context / dismiss / complete paths end the pause (volatility_v1 default).
+   */
+  action_window_ms?: number | null;
+  dismissal_suppression_ms?: number;
   required_for_engaged: PauseStepType[];
   required_for_completed: PauseStepType[];
   allowed_companion_types: string[];
@@ -97,6 +104,17 @@ export interface PauseCompanionEventRow {
 }
 
 /** Distinct step types present in an event list for a given instance. */
+/**
+ * True when `window_ends_at` is near enough that the UI should show a clock
+ * (templates with no clock-bound action use a far-future `window_ends_at`).
+ */
+export function pauseWindowShowsClockCountdown(windowEndsAt: string, now: Date = new Date()): boolean {
+  const end = new Date(windowEndsAt).getTime();
+  if (!Number.isFinite(end)) return false;
+  const fiveYearsMs = 5 * 365.25 * 24 * 60 * 60 * 1000;
+  return end < now.getTime() + fiveYearsMs;
+}
+
 export function collectStepTypes(
   events: readonly PauseStepEventRow[],
   instanceId: string,
@@ -135,9 +153,8 @@ function allIn<T>(required: readonly T[], present: Set<T>): boolean {
  * Rules (in order — first match wins):
  *   1. Instance already terminal → return as-is.
  *   2. Window elapsed (`now > window_ends_at`) → `expired` (reason
- *      `window_elapsed`). We don't mutate here; the caller would act on the
- *      returned state to show "expired" in the UI. The DB sweeper writes the
- *      authoritative row later.
+ *      `window_elapsed`) **only when** `template.action_window_ms` is set.
+ *      When it is null, clock-only expiry is skipped (matches Postgres).
  *   3. `required_for_completed` all present AND
  *      `countedCompanionCount >= required_companion_count` → `completed`.
  *   4. `required_for_engaged` all present → `engaged` (only from `active`).
@@ -161,7 +178,10 @@ export function computePauseState(params: {
     return instance.state;
   }
 
-  if (new Date(instance.window_ends_at).getTime() <= now.getTime()) {
+  if (
+    template.action_window_ms != null &&
+    new Date(instance.window_ends_at).getTime() <= now.getTime()
+  ) {
     return 'expired';
   }
 
@@ -209,12 +229,15 @@ export function shouldCountCompanion(params: {
               'no_active_pause',
     };
   }
-  if (new Date(openInstance.window_ends_at).getTime() <= now.getTime()) {
-    return { counts: false, reason: 'outside_window' };
-  }
   if (!template) {
     // Defensive: without a template we can't evaluate; treat as no_active_pause.
     return { counts: false, reason: 'no_active_pause' };
+  }
+  if (
+    template.action_window_ms != null &&
+    new Date(openInstance.window_ends_at).getTime() <= now.getTime()
+  ) {
+    return { counts: false, reason: 'outside_window' };
   }
   if (!template.allowed_companion_types.includes(companionType)) {
     return { counts: false, reason: 'not_allowed_for_template' };

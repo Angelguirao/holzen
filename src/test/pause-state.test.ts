@@ -5,6 +5,7 @@ import {
   decideCronFire,
   collectStepTypes,
   countedCompanionCount,
+  pauseWindowShowsClockCountdown,
   type PauseInstanceRow,
   type PauseTemplateRow,
   type PauseStepEventRow,
@@ -13,9 +14,12 @@ import {
 
 const NOW = new Date('2026-04-23T20:00:00.000Z');
 
+/** Mirrors production volatility_v1 after optional action window: no clock-only expiry. */
 const volatilityTemplate: PauseTemplateRow = {
   slug: 'volatility_v1',
   window_ms: 6 * 60 * 60 * 1000,
+  action_window_ms: null,
+  dismissal_suppression_ms: 6 * 60 * 60 * 1000,
   required_for_engaged: ['breath_completed', 'initial_emotion_logged'],
   required_for_completed: [
     'breath_completed',
@@ -25,6 +29,11 @@ const volatilityTemplate: PauseTemplateRow = {
   ],
   allowed_companion_types: ['signal', 'ground_nudge', 'historical_insight', 'zoom_out', 'haiku'],
   required_companion_count: 1,
+};
+
+const clockBoundedVolatility: PauseTemplateRow = {
+  ...volatilityTemplate,
+  action_window_ms: 6 * 60 * 60 * 1000,
 };
 
 function makeInstance(overrides: Partial<PauseInstanceRow> = {}): PauseInstanceRow {
@@ -68,6 +77,15 @@ function makeCompanion(
     ...overrides,
   };
 }
+
+describe('pauseWindowShowsClockCountdown', () => {
+  it('is false for far-future window ends', () => {
+    expect(pauseWindowShowsClockCountdown('2126-01-01T00:00:00.000Z', NOW)).toBe(false);
+  });
+  it('is true for windows within a few years', () => {
+    expect(pauseWindowShowsClockCountdown('2026-04-24T00:00:00.000Z', NOW)).toBe(true);
+  });
+});
 
 describe('collectStepTypes', () => {
   it('returns only distinct step types for the matching instance', () => {
@@ -119,7 +137,19 @@ describe('computePauseState', () => {
     }
   });
 
-  it('expires when window elapsed even before any events', () => {
+  it('expires when window elapsed only if template has a clock-bound action_window_ms', () => {
+    expect(
+      computePauseState({
+        instance: makeInstance({ window_ends_at: '2026-04-23T19:00:00.000Z' }),
+        template: clockBoundedVolatility,
+        stepEvents: [],
+        companionEvents: [],
+        now: NOW,
+      }),
+    ).toBe('expired');
+  });
+
+  it('does not clock-expire when action_window_ms is null even if window_ends_at is in the past', () => {
     expect(
       computePauseState({
         instance: makeInstance({ window_ends_at: '2026-04-23T19:00:00.000Z' }),
@@ -128,7 +158,7 @@ describe('computePauseState', () => {
         companionEvents: [],
         now: NOW,
       }),
-    ).toBe('expired');
+    ).toBe('active');
   });
 
   it('stays active while gates unmet', () => {
@@ -260,7 +290,19 @@ describe('shouldCountCompanion', () => {
     ).toEqual({ counts: false, reason: 'no_active_pause' });
   });
 
-  it('rejects with outside_window when window has elapsed', () => {
+  it('rejects with outside_window when window has elapsed and template is clock-bound', () => {
+    expect(
+      shouldCountCompanion({
+        openInstance: makeInstance({ window_ends_at: '2026-04-23T19:00:00.000Z' }),
+        template: clockBoundedVolatility,
+        companionEvents: [],
+        companionType: 'signal',
+        now: NOW,
+      }),
+    ).toEqual({ counts: false, reason: 'outside_window' });
+  });
+
+  it('does not reject for elapsed window when action_window_ms is null', () => {
     expect(
       shouldCountCompanion({
         openInstance: makeInstance({ window_ends_at: '2026-04-23T19:00:00.000Z' }),
@@ -269,7 +311,7 @@ describe('shouldCountCompanion', () => {
         companionType: 'signal',
         now: NOW,
       }),
-    ).toEqual({ counts: false, reason: 'outside_window' });
+    ).toEqual({ counts: true });
   });
 
   it('rejects with context_lost when instance is expired for context_lost', () => {

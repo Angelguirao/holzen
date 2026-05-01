@@ -13,6 +13,8 @@ import type {
 const tpl: PauseTemplateRow = {
   slug: 'volatility_v1',
   window_ms: 21600000,
+  action_window_ms: null,
+  dismissal_suppression_ms: 21600000,
   required_for_engaged: ['breath_completed', 'initial_emotion_logged'],
   required_for_completed: [
     'breath_completed',
