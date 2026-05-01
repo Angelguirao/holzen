@@ -92,6 +92,8 @@ const Home = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const { subscribed, loading: subLoading, monthlyRemaining, checkoutLoading, startCheckout, refresh } = useSubscription();
+  const subscriptionReady = !subLoading && (subscribed || monthlyRemaining !== undefined);
+  const hasAccess = subscribed || ((monthlyRemaining ?? 0) > 0);
   const [searchParams] = useSearchParams();
 
   useEffect(() => {
@@ -423,6 +425,98 @@ const Home = () => {
     onRefresh: handlePullRefresh,
   });
 
+  const [pauseHasReflectStep, setPauseHasReflectStep] = useState(false);
+
+  useEffect(() => {
+    if (!user || !lastPauseInstanceId) {
+      setPauseHasReflectStep(false);
+      return;
+    }
+    let cancelled = false;
+
+    const refetchReflectStep = async () => {
+      const { data } = await supabase
+        .from('pause_step_events' as never)
+        .select('id')
+        .eq('pause_instance_id', lastPauseInstanceId)
+        .eq('step_type', 'reflection_step')
+        .limit(1)
+        .maybeSingle();
+      if (!cancelled) setPauseHasReflectStep(!!data);
+    };
+
+    void refetchReflectStep();
+
+    const channel = supabase
+      .channel(`home-pause-step-${user.id}`)
+      .on(
+        'postgres_changes',
+        {
+          event: 'INSERT',
+          schema: 'public',
+          table: 'pause_step_events',
+          filter: `user_id=eq.${user.id}`,
+        },
+        (payload) => {
+          const row = payload.new as { pause_instance_id?: string; step_type?: string };
+          if (row.pause_instance_id === lastPauseInstanceId && row.step_type === 'reflection_step') {
+            setPauseHasReflectStep(true);
+          }
+        },
+      )
+      .subscribe();
+
+    return () => {
+      cancelled = true;
+      void supabase.removeChannel(channel);
+    };
+  }, [user, lastPauseInstanceId, location.pathname]);
+
+  const pauseSectionHeaderRight = useMemo(() => {
+    if (!subscriptionReady || !hasAccess) return undefined;
+    const showRegenerate = Boolean(message && lastPauseInstanceId && pauseHasReflectStep);
+
+    return (
+      <div className="flex items-center gap-0.5">
+        <SnoozeToolbarControl />
+        {showRegenerate ? (
+          <button
+            type="button"
+            onClick={() => {
+              const remaining = manualCooldownRemaining();
+              if (remaining > 0) {
+                holzenLog.home('Regenerate reflection: ignored (cooldown)', { remainingMs: remaining });
+                return;
+              }
+              holzenLog.home('Regenerate reflection from Home header: manualTrigger');
+              void manualTrigger();
+            }}
+            disabled={loading}
+            className={homeInWidget.iconBtn}
+            aria-label={t('home.regenerateReflectionAria')}
+            title={t('home.regenerateReflectionTitle', { defaultValue: 'Generate a fresh take for this moment' })}
+          >
+            {loading ? (
+              <Loader2 className="h-4 w-4 shrink-0 animate-spin text-secondary-foreground" aria-hidden />
+            ) : (
+              <RefreshCw className="h-4 w-4 shrink-0 text-secondary-foreground" aria-hidden />
+            )}
+          </button>
+        ) : null}
+      </div>
+    );
+  }, [
+    subscriptionReady,
+    hasAccess,
+    message,
+    lastPauseInstanceId,
+    pauseHasReflectStep,
+    loading,
+    manualCooldownRemaining,
+    manualTrigger,
+    t,
+  ]);
+
   if (!profileLoaded) {
     return <AuthLoading />;
   }
@@ -431,14 +525,9 @@ const Home = () => {
     return <Onboarding onComplete={completeOnboarding} />;
   }
 
-  const hasAccess = subscribed || ((monthlyRemaining ?? 0) > 0);
-  const subscriptionReady = !subLoading && (subscribed || monthlyRemaining !== undefined);
   const showLimitUpsell = subscriptionReady && !subscribed && monthlyRemaining === 0;
   /** Hide server scheduling row while a reflection is showing or generating — keeps focus on the pause. */
   const showPauseScheduling = subscriptionReady && hasAccess && !message && !loading;
-
-  // Your pause: header right is Snooze (scheduling). Section expand/collapse uses the card chevron, not an extra icon in that cluster.
-  const pauseSectionHeaderRight = subscriptionReady && hasAccess ? <SnoozeToolbarControl /> : undefined;
 
   // Zen mode — unchanged
   if (zenMode) {
@@ -733,7 +822,13 @@ const Home = () => {
 
       case 'your-pause':
         return (
-          <HomeSectionCard title={t('home.widget.yourPause')} headerRight={pauseSectionHeaderRight}>
+          <HomeSectionCard
+            title={t('home.widget.yourPause')}
+            headerRight={pauseSectionHeaderRight}
+            collapsible
+            collapsed={!!collapsed['your-pause']}
+            onToggleCollapse={() => toggleCollapsed('your-pause')}
+          >
             {pauseCardBody}
           </HomeSectionCard>
         );
