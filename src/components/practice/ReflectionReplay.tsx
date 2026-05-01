@@ -191,25 +191,22 @@ export function ReflectionReplay({ onComplete, initialPauseInstanceId }: Props) 
             >
               {t('common.tryAgain', { defaultValue: 'Try again' })}
             </Button>
-            {!initialPauseInstanceId ? (
-              <Button
-                type="button"
-                variant="outline"
-                size="sm"
-                onClick={() => {
-                  setSelectedId(null);
-                  setThread(null);
-                  setThreadLoadError(false);
-                }}
-              >
-                {t('practice.replayChangePause', { defaultValue: 'Change pause' })}
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              onClick={() => {
+                setSelectedId(null);
+                setThread(null);
+                setThreadLoadError(false);
+              }}
+            >
+              {t('practice.replayChangePause', { defaultValue: 'Change pause' })}
+            </Button>
+            {onComplete && (
+              <Button type="button" variant="outline" size="sm" onClick={onComplete}>
+                {t('common.done', { defaultValue: 'Done' })}
               </Button>
-            ) : (
-              onComplete && (
-                <Button type="button" variant="outline" size="sm" onClick={onComplete}>
-                  {t('common.done', { defaultValue: 'Done' })}
-                </Button>
-              )
             )}
           </div>
         </div>
@@ -224,7 +221,12 @@ export function ReflectionReplay({ onComplete, initialPauseInstanceId }: Props) 
 
   return (
     <div className="flex flex-col gap-4 w-full max-w-md mx-auto px-1 pb-8">
-      {!initialPauseInstanceId && (
+      <div className="flex flex-col gap-2 self-start w-full">
+        {initialPauseInstanceId && (
+          <p className="text-[10px] text-muted-foreground/80 leading-relaxed">
+            {t('practice.replayFromEchoHint')}
+          </p>
+        )}
         <button
           type="button"
           onClick={() => {
@@ -236,13 +238,7 @@ export function ReflectionReplay({ onComplete, initialPauseInstanceId }: Props) 
         >
           {t('practice.replayChangePause', { defaultValue: '← Change pause' })}
         </button>
-      )}
-
-      {initialPauseInstanceId && (
-        <p className="text-[10px] text-muted-foreground/80 leading-relaxed">
-          {t('practice.replayFromEchoHint')}
-        </p>
-      )}
+      </div>
 
       <div className="text-center space-y-1">
         <p className="text-[10px] font-mono text-muted-foreground/60 uppercase tracking-wider">

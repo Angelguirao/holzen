@@ -922,6 +922,8 @@
   },
   "blog": {
     "title": "Blog",
+    "loadFailed": "We couldn't load posts. Check your connection and try again.",
+    "loadMoreFailed": "Couldn't load more posts. Try again in a moment.",
     "nothingYet": "Nothing here yet.",
     "nothingDesc": "We're working on our first posts about behavioral finance, Bitcoin conviction, and the art of doing nothing. Check back soon.",
     "home": "Home",
