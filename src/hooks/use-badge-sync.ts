@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
+import { invokeEdge } from '@/lib/invoke-edge';
 import { useAuth } from '@/hooks/use-auth';
 import type { NewBadge } from '@/components/BadgeCelebration';
 
@@ -115,7 +116,7 @@ export function useBadgeSync(
                   session = refreshed.session ?? session;
                 }
                 if (!session?.access_token) return;
-                await supabase.functions.invoke('badge-notify', {
+                await invokeEdge('badge-notify', {
                   body: { badges: newBadgeData },
                   headers: { Authorization: `Bearer ${session.access_token}` },
                 }).catch(() => {});

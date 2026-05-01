@@ -1,5 +1,6 @@
 import { createContext, useContext, useEffect, useState, type ReactNode } from 'react';
 import { supabase } from '@/integrations/supabase/client';
+import { invokeEdge } from '@/lib/invoke-edge';
 import type { PostgrestError, User } from '@supabase/supabase-js';
 import { holzenLog } from '@/lib/holzen-console';
 import { setSentryUser } from '@/lib/sentry';
@@ -96,7 +97,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
             (session.user.user_metadata?.first_name as string | undefined) ??
             (session.user.user_metadata?.full_name as string | undefined)?.split(' ')[0] ??
             null;
-          const { error: weErr } = await supabase.functions.invoke('send-transactional-email', {
+          const { error: weErr } = await invokeEdge('send-transactional-email', {
             body: {
               templateName: 'welcome',
               recipientEmail: email,
@@ -120,7 +121,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
               holzenLog.auth('referral_pending_jobs insert', { code: qErr.code, message: qErr.message });
             }
 
-            const { data, error: fnErr } = await supabase.functions.invoke('record-referral', {
+            const { data, error: fnErr } = await invokeEdge('record-referral', {
               body: { referral_code: refCode },
             });
 

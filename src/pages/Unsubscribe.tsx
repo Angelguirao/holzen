@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
-import { supabase } from '@/integrations/supabase/client';
+import { invokeEdge } from '@/lib/invoke-edge';
 
 type State =
   | { kind: 'loading' }
@@ -40,7 +40,7 @@ export default function Unsubscribe() {
   const onConfirm = async () => {
     if (!token) return;
     setState({ kind: 'submitting' });
-    const { data, error } = await supabase.functions.invoke('handle-email-unsubscribe', {
+    const { data, error } = await invokeEdge<{ success?: boolean; reason?: string }>('handle-email-unsubscribe', {
       body: { token },
     });
     if (error) {
