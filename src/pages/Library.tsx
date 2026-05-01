@@ -87,7 +87,10 @@ export default function Library() {
   const mainSegment = useMemo(() => readSegment(searchParams), [searchParams]);
   const pausesScope = useMemo(() => readPausesScope(searchParams), [searchParams]);
   const libraryListFavoritesOnly = mainSegment === 'pauses' && pausesScope === 'favorites';
-  const library = useLibrary({ favoritesOnly: libraryListFavoritesOnly });
+  const library = useLibrary({
+    favoritesOnly: libraryListFavoritesOnly,
+    echoArchiveOnly: mainSegment === 'echoes',
+  });
 
   const [search, setSearch] = useState('');
   const [selectedSourceTypes, setSelectedSourceTypes] = useState<string[]>([]);
@@ -167,7 +170,7 @@ export default function Library() {
   const segmentBase = useMemo(() => {
     let r = items.filter((i) => i.status !== 'deleted' && i.status !== 'archived');
     if (mainSegment === 'pauses') r = r.filter((i) => itemBelongsToPausesTab(i, getPauseArchiveMeta));
-    else if (mainSegment === 'echoes') r = r.filter((i) => itemBelongsToEchoesTab(i, getPauseArchiveMeta));
+    // Echoes: items are loaded from library_archive_echo_items (server-filtered).
     return r;
   }, [items, mainSegment, getPauseArchiveMeta]);
 
@@ -180,14 +183,15 @@ export default function Library() {
     [items, getPauseArchiveMeta],
   );
 
-  const hasAnyEchoesContent = useMemo(
-    () =>
-      items.some(
-        (i) =>
-          i.status !== 'deleted' && i.status !== 'archived' && itemBelongsToEchoesTab(i, getPauseArchiveMeta),
-      ),
-    [items, getPauseArchiveMeta],
-  );
+  const hasAnyEchoesContent = useMemo(() => {
+    if (mainSegment === 'echoes') {
+      return items.some((i) => i.status !== 'deleted' && i.status !== 'archived');
+    }
+    return items.some(
+      (i) =>
+        i.status !== 'deleted' && i.status !== 'archived' && itemBelongsToEchoesTab(i, getPauseArchiveMeta),
+    );
+  }, [mainSegment, items, getPauseArchiveMeta]);
 
   const availableSources = useMemo(() => {
     if (mainSegment !== 'pauses') return [];
@@ -289,7 +293,7 @@ export default function Library() {
         return {
           emptyStateMessage: t('library.emptyEchoesNone', {
             defaultValue:
-              'No echoes yet. They appear when a pause ends before Reflect and reads are saved to your archive.',
+              'Nothing here yet. Reflections you save from echo pauses will appear in this list.',
           }),
           emptyStateHint: '',
           emptyCtaLabel: undefined as string | undefined,
@@ -301,7 +305,7 @@ export default function Library() {
       if (!hasAnyPauseArchiveContent && pausesScope === 'all' && !hasActiveFilters) {
         return {
           emptyStateMessage: t('library.emptyPauseFirst', {
-            defaultValue: 'After your first pause, saved cards and notes show up here.',
+            defaultValue: 'Your content will appear here after your first pause.',
           }),
           emptyStateHint: '',
           emptyCtaLabel: t('library.emptyPauseFirstCta', { defaultValue: 'Start a pause' }),
@@ -311,7 +315,7 @@ export default function Library() {
       if (pausesScope === 'favorites' && filtered.length === 0 && hasAnyPauseArchiveContent) {
         return {
           emptyStateMessage: t('library.emptyFavs', {
-            defaultValue: 'No favorites yet. Tap the heart on a card to save it here.',
+            defaultValue: 'Nothing saved yet. Keep what matters.',
           }),
           emptyStateHint: '',
           emptyCtaLabel: undefined as string | undefined,
@@ -460,11 +464,11 @@ export default function Library() {
             {mainSegment === 'pauses'
               ? t('library.archiveIntroPauses', {
                   defaultValue:
-                    'Pauses you finished in Holzen. Open a row for details; use filters to narrow by type or tag.',
+                    'See content from your recent pauses and favourites. Save what matters. Explore with filters.',
                 })
               : t('library.archiveIntroEchoes', {
                   defaultValue:
-                    'Pauses that ended before Reflect. Save companion reads to your line here — anything you opened in Reflect stays under Pauses.',
+                    'Reflections from pauses you missed. Read at your own pace. Save what speaks to you.',
                 })}
           </p>
 
@@ -489,7 +493,7 @@ export default function Library() {
                     pausesScope === 'favorites' ? 'bg-foreground text-background' : 'border border-foreground/80 bg-transparent text-foreground',
                   )}
                 >
-                  {t('library.pillFavs', { defaultValue: 'Favorites' })}
+                  {t('library.pillFavs', { defaultValue: 'Favs' })}
                 </button>
                 <div className="flex-1" />
                 <DropdownMenu>
@@ -649,20 +653,10 @@ export default function Library() {
           />
 
           {library.hasMore && (
-            <div className="space-y-2">
-              {mainSegment === 'echoes' && (
-                <p className="px-1 text-center text-[11px] leading-snug text-muted-foreground/70">
-                  {t('library.echoesLoadMoreHint', {
-                    defaultValue:
-                      'We load your archive in order. Keep scrolling to reach older pauses — Echoes may appear in later batches.',
-                  })}
-                </p>
+            <div ref={loadMoreRef} className="flex min-h-10 items-center justify-center py-4">
+              {library.loadingMore && (
+                <Loader2 className="h-4 w-4 animate-spin text-muted-foreground/40" aria-hidden />
               )}
-              <div ref={loadMoreRef} className="flex min-h-10 items-center justify-center py-4">
-                {library.loadingMore && (
-                  <Loader2 className="h-4 w-4 animate-spin text-muted-foreground/40" aria-hidden />
-                )}
-              </div>
             </div>
           )}
         </div>

@@ -23,6 +23,8 @@ export type PauseInstanceArchiveMetaGetter = (
  * Archive “echo”: main pause row for an instance that ended dismissed/expired
  * without `engaged_at` (never opened Reflect). `completed` always implies
  * engagement in the DB and never counts as an echo.
+ *
+ * Server mirror: `public.library_archive_echo_items` (Echo tab list + pagination).
  */
 export function isArchiveEchoPause(meta: PauseInstanceArchiveMeta): boolean {
   if (!ECHO_ELIGIBLE_STATES.has(meta.state)) return false;
