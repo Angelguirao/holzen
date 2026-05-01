@@ -43,6 +43,7 @@ import { playNotificationTone, prefetchNotificationTone } from '@/lib/notificati
 import { holzenLog } from '@/lib/holzen-console';
 import { trackEvent } from '@/lib/posthog';
 import { heroQuoteIndexForDay, utcYmd } from '@/lib/home-hero-quote';
+import { parsePauseContextForHomePreview } from '@/lib/pause-context-home-preview';
 import { type PauseSessionLocationState } from '@/lib/router-location-state';
 
 interface PinnedPausePreview {
@@ -132,6 +133,8 @@ const Home = () => {
     profileLoaded,
     refreshProfile,
   } = useHolzen();
+
+  const pauseContextHomePreview = useMemo(() => parsePauseContextForHomePreview(context), [context]);
 
   // Consume auto-trigger context from AppLayout
   const outletCtx = useOutletContext<{ pauseReady?: boolean; dismissPauseReady?: () => void }>();
@@ -667,17 +670,23 @@ const Home = () => {
 
           {message ? (
             <div className="space-y-4">
-              <div className="space-y-2">
-                <p className={homeInWidget.bodyLead}>
-                  {message.split(/[.!?]\s/)[0]}
-                  {message.split(/[.!?]\s/).length > 1 ? '…' : ''}
+              <div className="space-y-2 min-w-0">
+                <p
+                  className={cn(homeInWidget.bodyLead, 'truncate')}
+                  title={message}
+                >
+                  {message}
                 </p>
-                {context && (
-                  <p className={cn(homeInWidget.meta, 'mt-2')}>
-                    {context.slice(0, 120)}
-                    {context.length > 120 ? '…' : ''}
-                  </p>
-                )}
+                {(pauseContextHomePreview.btc24h || pauseContextHomePreview.marketSentiment) ? (
+                  <div className={cn(homeInWidget.meta, 'mt-2 space-y-1')}>
+                    {pauseContextHomePreview.btc24h ? (
+                      <p className="leading-snug">{pauseContextHomePreview.btc24h}</p>
+                    ) : null}
+                    {pauseContextHomePreview.marketSentiment ? (
+                      <p className="leading-snug">{pauseContextHomePreview.marketSentiment}</p>
+                    ) : null}
+                  </div>
+                ) : null}
               </div>
               <button
                 type="button"
