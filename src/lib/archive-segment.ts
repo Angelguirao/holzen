@@ -24,7 +24,9 @@ export type PauseInstanceArchiveMetaGetter = (
  * without `engaged_at` (never opened Reflect). `completed` always implies
  * engagement in the DB and never counts as an echo.
  *
- * Server mirror: `public.library_archive_echo_items` (Echo tab list + pagination).
+ * Server mirrors: `public.library_archive_echo_items` (Echo tab list + pagination),
+ * `public.library_archive_pauses_tab_items` (Pauses tab list + pagination; excludes
+ * echo-only instances).
  */
 export function isArchiveEchoPause(meta: PauseInstanceArchiveMeta): boolean {
   if (!ECHO_ELIGIBLE_STATES.has(meta.state)) return false;

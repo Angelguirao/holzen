@@ -37,13 +37,11 @@ import { Input } from '@/components/ui/input';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
+import { useAuth } from '@/hooks/use-auth';
+import { supabase } from '@/integrations/supabase/client';
 import { useProGate } from '@/hooks/use-pro-gate';
 import { librarySourceLabel } from '@/lib/library-source-label';
-import {
-  itemBelongsToEchoesTab,
-  itemBelongsToPausesTab,
-  type ArchiveMainSegment,
-} from '@/lib/archive-segment';
+import type { ArchiveMainSegment } from '@/lib/archive-segment';
 import {
   normalizeLibrarySourceType,
   isMainPauseLibraryBookmark,
@@ -82,21 +80,29 @@ function readPausesScope(params: URLSearchParams): 'all' | 'favorites' {
 
 export default function Library() {
   const { t } = useTranslation();
+  const { user } = useAuth();
   const { isPro, isPending, startCheckout, checkoutLoading } = useProGate();
   const [searchParams, setSearchParams] = useSearchParams();
   const mainSegment = useMemo(() => readSegment(searchParams), [searchParams]);
   const pausesScope = useMemo(() => readPausesScope(searchParams), [searchParams]);
   const libraryListFavoritesOnly = mainSegment === 'pauses' && pausesScope === 'favorites';
-  const library = useLibrary({
-    favoritesOnly: libraryListFavoritesOnly,
-    echoArchiveOnly: mainSegment === 'echoes',
-  });
+  const [pausesTabHasArchiveRows, setPausesTabHasArchiveRows] = useState<boolean | null>(null);
+  const [pausesArchiveCountNonce, setPausesArchiveCountNonce] = useState(0);
 
   const [search, setSearch] = useState('');
   const [selectedSourceTypes, setSelectedSourceTypes] = useState<string[]>([]);
   const [tagFilter, setTagFilter] = useState<string | null>(null);
   const [sortMode, setSortMode] = useState<SortMode>('newest');
   const [smartFilter, setSmartFilter] = useState<{ name: string; itemIds: Set<string> } | null>(null);
+
+  const archiveListKind =
+    mainSegment === 'echoes' ? 'echo' : mainSegment === 'pauses' ? 'pauses' : 'default';
+
+  const library = useLibrary({
+    archiveListKind,
+    favoritesOnly: libraryListFavoritesOnly,
+    listSort: sortMode,
+  });
 
   const setMainSegment = useCallback(
     (seg: ArchiveMainSegment) => {
@@ -143,9 +149,33 @@ export default function Library() {
     }
   }, [mainSegment, pausesScope, setSearchParams]);
 
+  useEffect(() => {
+    if (!user?.id || mainSegment !== 'pauses') {
+      setPausesTabHasArchiveRows(mainSegment !== 'pauses' ? false : null);
+      return;
+    }
+    let cancelled = false;
+    void (async () => {
+      const { count, error } = await supabase
+        .from('library_archive_pauses_tab_items')
+        .select('*', { count: 'exact', head: true })
+        .eq('user_id', user.id);
+      if (!cancelled) {
+        if (!error) setPausesTabHasArchiveRows((count ?? 0) > 0);
+        else setPausesTabHasArchiveRows(null);
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, [user?.id, mainSegment, pausesArchiveCountNonce]);
+
   const handleRefresh = useCallback(async () => {
+    if (mainSegment === 'pauses') {
+      setPausesArchiveCountNonce((n) => n + 1);
+    }
     await library.refetch();
-  }, [library]);
+  }, [library, mainSegment]);
 
   const { pullDistance, refreshing, handlers } = usePullToRefresh({
     onRefresh: handleRefresh,
@@ -160,38 +190,30 @@ export default function Library() {
     rootMargin: loadMoreRootMargin,
   });
 
-  const { items, collections, getPauseArchiveMeta } = library;
+  const { items, collections } = library;
 
   const sourceChips = useMemo(
     () => SOURCE_CHIPS.map((c) => ({ ...c, label: librarySourceLabel(c.key, t, c.key) })),
     [t],
   );
 
-  const segmentBase = useMemo(() => {
-    let r = items.filter((i) => i.status !== 'deleted' && i.status !== 'archived');
-    if (mainSegment === 'pauses') r = r.filter((i) => itemBelongsToPausesTab(i, getPauseArchiveMeta));
-    // Echoes: items are loaded from library_archive_echo_items (server-filtered).
-    return r;
-  }, [items, mainSegment, getPauseArchiveMeta]);
-
-  const hasAnyPauseArchiveContent = useMemo(
-    () =>
-      items.some(
-        (i) =>
-          i.status !== 'deleted' && i.status !== 'archived' && itemBelongsToPausesTab(i, getPauseArchiveMeta),
-      ),
-    [items, getPauseArchiveMeta],
+  const segmentBase = useMemo(
+    () => items.filter((i) => i.status !== 'deleted' && i.status !== 'archived'),
+    [items],
   );
 
-  const hasAnyEchoesContent = useMemo(() => {
-    if (mainSegment === 'echoes') {
-      return items.some((i) => i.status !== 'deleted' && i.status !== 'archived');
-    }
-    return items.some(
-      (i) =>
-        i.status !== 'deleted' && i.status !== 'archived' && itemBelongsToEchoesTab(i, getPauseArchiveMeta),
+  const hasAnyPauseArchiveContent = useMemo(() => {
+    if (mainSegment !== 'pauses') return false;
+    return (
+      pausesTabHasArchiveRows ??
+      items.some((i) => i.status !== 'deleted' && i.status !== 'archived')
     );
-  }, [mainSegment, items, getPauseArchiveMeta]);
+  }, [mainSegment, pausesTabHasArchiveRows, items]);
+
+  const hasAnyEchoesContent = useMemo(() => {
+    if (mainSegment !== 'echoes') return false;
+    return items.some((i) => i.status !== 'deleted' && i.status !== 'archived');
+  }, [mainSegment, items]);
 
   const availableSources = useMemo(() => {
     if (mainSegment !== 'pauses') return [];
