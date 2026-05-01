@@ -10,10 +10,7 @@ import {
   enrichAutomaticPauseContext,
   fetchFearGreedSnapshot,
   fetchOnChainSnapshot,
-  fetchGroundingSourcesForOrchestrate,
-  fetchSignalSourcesForOrchestrate,
   pauseRecencyInputs,
-  recencyHintsFromPauseArtifacts,
 } from "../_shared/pause-cron-parity.ts";
 import { sanitizePromptInput, sanitizePromptArray } from "../_shared/sanitize.ts";
 import { isCumulativeMoveTriggered } from "../_shared/volatility-thresholds.ts";
@@ -467,10 +464,6 @@ serve(
       }
     }
 
-    const supabaseUrl = Deno.env.get("SUPABASE_URL") ?? "";
-    const svcKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? "";
-    const anonKey = Deno.env.get("SUPABASE_ANON_KEY") ?? "";
-
     // Process all eligible users in parallel
     const results = await Promise.all(eligible.map(async (profile) => {
       // Server-side idempotency: a single atomic UPDATE acts as the per-user
@@ -533,12 +526,11 @@ serve(
         100,
       );
 
-      // Pause V2: pull mood history + reflection/haiku pools from the
-      // new tables, and companion recency hints from pause_ai_artifacts.
-      const [{ moodHistory, recentMessages, recentHaikus }, recency] = await Promise.all([
-        pauseRecencyInputs(supabase, profile.user_id),
-        recencyHintsFromPauseArtifacts(supabase, profile.user_id),
-      ]);
+      // Pause V2: pull mood history + reflection/haiku pools from the new tables.
+      const { moodHistory, recentMessages, recentHaikus } = await pauseRecencyInputs(
+        supabase,
+        profile.user_id,
+      );
       const lastReportedMood = moodHistory?.[0]?.mood;
       // Keep MoodHistoryEntry shape for the AI call below.
       const moodHistoryForAi: MoodHistoryEntry[] | undefined = moodHistory
@@ -546,7 +538,7 @@ serve(
         : undefined;
 
       // Parity with holzen-reflect: same allowlisted event before reflection AI so per-user
-      // throttle (companion-orchestrate checkRateLimit) sees a consistent signal for manual vs cron.
+      // throttles and dashboards see a consistent signal for manual vs cron.
       try {
         await supabase.from("analytics_events").insert({
           user_id: profile.user_id,
@@ -596,7 +588,6 @@ serve(
         },
       }).then(() => {});
 
-      const haiku = profile.companion_haiku ? result.haiku : null;
 
       // Pause V2: create (or reuse) the pause instance via the
       // service-role RPC, which serializes per-user with an advisory
@@ -689,8 +680,8 @@ serve(
         return false;
       }
 
-      // Write the reflection_text + (optional) haiku artifacts now that
-      // the instance exists.
+      // Reflection text only; haiku and other companions are created when
+      // the user opens them in the reflect step (same as manual pauses).
       await upsertPauseAiArtifact(supabase, {
         instanceId: pauseInstanceId,
         userId: profile.user_id,
@@ -705,22 +696,6 @@ serve(
           ...unknownErrorForLog(e),
         })
       );
-      if (haiku) {
-        await upsertPauseAiArtifact(supabase, {
-          instanceId: pauseInstanceId,
-          userId: profile.user_id,
-          kind: "haiku",
-          content: { haiku },
-          model: "lovable",
-          promptVersion: REFLECTION_PROMPT_VERSION,
-        }).catch((e) =>
-          log.error("check_volatility_artifact", {
-            holzen_event: "check_volatility_cron",
-            phase: "haiku_upsert_failed",
-            ...unknownErrorForLog(e),
-          })
-        );
-      }
 
       // Keep Library parity with manual pauses: every generated pause
       // gets a `source_type='pause'` bookmark row keyed on pause_instance_id.
@@ -737,82 +712,13 @@ serve(
         { onConflict: "user_id,pause_instance_id,source_type", ignoreDuplicates: true },
       );
 
-      // Profile update and orchestrator dispatch can run in parallel
+      // Profile update only — companion-orchestrate runs from the client on
+      // first Reflect open (intervention-only) and on card taps (lazy slots),
+      // same as manual volatility pauses.
       const profileUpdate = supabase
         .from("profiles")
         .update({ last_message: result.message, last_context: ctx })
         .eq("user_id", profile.user_id);
-
-      {
-        const enableSignal = profile.companion_signal ?? true;
-        const enableGrounding = profile.companion_grounding ?? true;
-        const enableHistory = profile.companion_history ?? true;
-        const enableZoomOut = profile.companion_zoom_out ?? true;
-
-        const signalSources = enableSignal
-          ? await fetchSignalSourcesForOrchestrate(supabase, profile.user_id)
-          : undefined;
-        const groundingSources = enableGrounding
-          ? await fetchGroundingSourcesForOrchestrate(supabase, profile.user_id)
-          : undefined;
-
-        // Fire-and-forget orchestrator — same payload shape as manual pause.
-        fetch(`${supabaseUrl}/functions/v1/companion-orchestrate`, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            "Authorization": `Bearer ${svcKey}`,
-            "apikey": anonKey,
-          },
-          body: JSON.stringify({
-            holzenInvokeSource: "cron_check_volatility",
-            userId: profile.user_id,
-            pauseInstanceId,
-            context: ctx,
-            language: userLang,
-            reflectionMessage: result.message,
-            severity: absChange,
-            mood: lastReportedMood ?? null,
-            moodHistory: moodHistoryForAi ?? [],
-            signalSources,
-            groundingSources,
-            recentSignalSources: recency.recentSignalSources,
-            recentSignalTitles: recency.recentSignalTitles,
-            recentNudgeTopics: recency.recentNudgeTopics,
-            recentGroundingSources: recency.recentGroundingSources,
-            recentHistoryTitles: recency.recentHistoryTitles,
-            recentZoomOutTitles: recency.recentZoomOutTitles,
-            enableSignal,
-            enableGrounding,
-            enableHistory,
-            enableZoomOut,
-            useIntervention: true,
-          }),
-        }).then((res) => {
-          if (!res.ok) {
-            res.text().then((t) =>
-              log.error("check_volatility_orchestrator", {
-                holzen_event: "check_volatility_cron",
-                phase: "orchestrator_http_error",
-                http_status: res.status,
-                response_prefix: t.slice(0, 300),
-              })
-            );
-          } else {
-            log("check_volatility_orchestrator", {
-              holzen_event: "check_volatility_cron",
-              phase: "orchestrator_dispatched",
-              pause_instance_id_prefix: pauseInstanceId.slice(0, 8),
-            });
-          }
-        }).catch((e) =>
-          log.error("check_volatility_orchestrator", {
-            holzen_event: "check_volatility_cron",
-            phase: "orchestrator_fetch_error",
-            ...unknownErrorForLog(e),
-          })
-        );
-      }
 
       const [{ error: profileUpdateErr }, { error: libraryUpsertErr }] = await Promise.all([
         profileUpdate,
