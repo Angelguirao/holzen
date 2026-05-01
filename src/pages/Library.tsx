@@ -1,5 +1,5 @@
 import { useState, useMemo, useCallback, useEffect } from 'react';
-import { Link, useSearchParams } from 'react-router-dom';
+import { useSearchParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useLibrary } from '@/hooks/use-library';
@@ -21,7 +21,6 @@ import {
   Pencil,
   Link as LinkIcon,
   Loader2,
-  Bell,
   Filter,
   type LucideIcon,
 } from 'lucide-react';
@@ -361,16 +360,6 @@ export default function Library() {
   return (
     <div className="space-y-6 pb-24" {...handlers}>
       <PageMeta title={t('library.pageTitle')} description={t('library.pageDescription')} />
-
-      <header className="flex items-center justify-between gap-2 border-b border-border pb-3">
-        <span className="min-w-0 text-xs font-semibold uppercase tracking-wide text-muted-foreground">{t('common.holzen')}</span>
-        <h1 className="shrink-0 text-base font-medium text-foreground">{t('library.title')}</h1>
-        <Button variant="ghost" size="icon" className="shrink-0" asChild>
-          <Link to="/settings/notifications" aria-label={t('library.notificationsAria', { defaultValue: 'Notifications' })}>
-            <Bell className="h-5 w-5" />
-          </Link>
-        </Button>
-      </header>
 
       {mainSegment !== 'collections' && <CurrentPauseCard />}
 
