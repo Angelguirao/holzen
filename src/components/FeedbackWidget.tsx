@@ -3,7 +3,7 @@ import { Bug, Lightbulb, HelpCircle, MessageSquareText, Send, X } from 'lucide-r
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetDescription } from '@/components/ui/sheet';
-import { supabase } from '@/integrations/supabase/client';
+import { invokeEdge } from '@/lib/invoke-edge';
 import { toast } from 'sonner';
 import { enqueueAction } from '@/lib/offline-queue';
 import { useTranslation } from 'react-i18next';
@@ -144,7 +144,7 @@ export function FeedbackWidget() {
     }
 
     setSubmitting(true);
-    const { error } = await supabase.functions.invoke('send-feedback', { body: payload });
+    const { error } = await invokeEdge('send-feedback', { body: payload });
     setSubmitting(false);
 
     if (error) {

@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { Send, Bug, Lightbulb, HelpCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
-import { supabase } from '@/integrations/supabase/client';
+import { invokeEdge } from '@/lib/invoke-edge';
 import { toast } from 'sonner';
 import { enqueueAction } from '@/lib/offline-queue';
 import { useTranslation } from 'react-i18next';
@@ -42,7 +42,7 @@ export function FeedbackForm() {
     }
 
     setSubmitting(true);
-    const { error } = await supabase.functions.invoke('send-feedback', {
+    const { error } = await invokeEdge('send-feedback', {
       body: payload,
     });
     setSubmitting(false);
