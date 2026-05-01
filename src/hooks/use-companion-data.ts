@@ -1,5 +1,5 @@
 import { useState, useCallback, useEffect, useLayoutEffect, useRef } from 'react';
-import { supabase } from '@/integrations/supabase/client';
+import { invokeEdge } from '@/lib/invoke-edge';
 import { toast as sonnerToast } from 'sonner';
 import { hapticFeedback } from '@/lib/haptics';
 import { useHolzen } from '@/hooks/use-holzen';
@@ -322,7 +322,7 @@ export function useCompanionData({ companions, prefs, pauseInstanceId, context, 
         const { data, error: fnError } = await runOnceIntervention(
           pauseInstanceId,
           () =>
-            supabase.functions.invoke('companion-orchestrate', {
+            invokeEdge('companion-orchestrate', {
               body: {
                 holzenInvokeSource: 'browser_pause_intervention',
                 pauseInstanceId,
@@ -475,7 +475,7 @@ export function useCompanionData({ companions, prefs, pauseInstanceId, context, 
         source: 'lazy',
       });
 
-      const { data, error: fnError } = await supabase.functions.invoke('companion-orchestrate', {
+      const { data, error: fnError } = await invokeEdge('companion-orchestrate', {
         body: {
           holzenInvokeSource: 'browser_lazy_fetch',
           pauseInstanceId,
@@ -657,7 +657,7 @@ export function useCompanionData({ companions, prefs, pauseInstanceId, context, 
         source: 'regenerate',
       });
 
-      const { data, error: fnError } = await supabase.functions.invoke('companion-orchestrate', {
+      const { data, error: fnError } = await invokeEdge('companion-orchestrate', {
         body: {
           holzenInvokeSource: 'browser_regenerate',
           pauseInstanceId,
