@@ -139,7 +139,6 @@
     "cooldownHeadline": "{{hours}}h cooldown · {{time}} left",
     "nextScanLine": "Next scan · {{scan}}",
     "nextScanIdleTitle": "Countdown until the server runs the next price check",
-    "pauseDismissAria": "Dismiss this pause on Home",
     "autoCooldown": {
       "afterPauseKicker": "Rest window after your last pause",
       "serverChecksKicker": "Background price checks",
