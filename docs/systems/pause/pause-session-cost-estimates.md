@@ -30,8 +30,8 @@ Models tried (in order): `google/gemini-3-flash-preview`, then `google/gemini-2.
 
 ### 1.2 Companion step (Signal, Grounding, History, Zoom Out)
 
-- **Client:** `use-companion-data` invokes `companion-orchestrate` when the user reaches the reflect/companion UI and cached rows are missing.
-- **Automatic pause:** `check-volatility` POSTs `companion-orchestrate` with service auth after inserting the pause instance.
+- **Client:** `use-companion-data` invokes `companion-orchestrate` when the user reaches the reflect/companion UI and cached rows are missing (intervention-only on mount, then one slot per card tap).
+- **Automatic pause:** `check-volatility` does **not** call `companion-orchestrate`; companions run only through the same client paths as manual pauses once the user opens Reflect.
 
 Generators (in `supabase/functions/_shared/generators/`):
 
