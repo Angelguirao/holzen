@@ -1,6 +1,5 @@
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { PageHeading } from '@/components/PageHeading';
 import { TOOLS } from '@/lib/app-routes';
 import { Wind, Leaf, History, Waves, PenLine, Activity, RotateCcw, Mail, ChevronRight } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
@@ -28,7 +27,9 @@ export default function ToolsHub() {
 
   return (
     <div className="space-y-6 pb-8">
-      <PageHeading title={t('tools.title')} subtitle={t('tools.subtitle')} />
+      <div className="border-b border-border pb-4">
+        <p className="text-base leading-relaxed text-muted-foreground">{t('tools.subtitle')}</p>
+      </div>
       <p className="text-xs text-muted-foreground/90 leading-relaxed">{t('tools.listIntro')}</p>
       <ul className="space-y-1.5">
         {TOOL_LINKS.map(({ to, labelKey, descKey, icon: Icon, proHighlight }) => (
