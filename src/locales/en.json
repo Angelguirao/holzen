@@ -1016,6 +1016,8 @@
     "itemCount_one": "{{count}} item",
     "itemCount_other": "{{count}} items",
     "emptyState": "Nothing here yet. Save pauses, companion outputs, or write notes to build your personal library.",
+    "loadFailed": "Could not load your library. Check your connection and try again.",
+    "loadMoreFailed": "Could not load more items. Pull to refresh or try again in a moment.",
     "noResults": "No items match your search.",
     "noBookmarks": "No bookmarks yet. Tap the save icon on companion outputs during a pause.",
     "noNotes": "No notes yet. Start writing.",
