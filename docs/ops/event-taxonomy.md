@@ -83,7 +83,7 @@ Include `pause_instance_id` on each event so journeys line up with Sentry + Bett
 | `pause_pending_declined` | User keeps the current pause; pending row expired `system_cancelled`. | `{ pause_instance_id }` (the declined pending row) | @holzen |
 | `pause_engaged` | `pause_log_step` returns `engaged` (first time per instance in-tab). | `{ pause_instance_id }` (optional: extend with `ms_since_created` when cheap) | @holzen |
 | `pause_completed` | `pause_log_step` returns `completed` (first time per instance in-tab). | `{ pause_instance_id }` | @holzen |
-| `pause_expired` | Sweeper or explicit expire. | *Not emitted from the React app today* — server-side if added later. | @holzen |
+| `pause_expired` | Sweeper or explicit expire (reasons include `window_elapsed`, `open_max_age`, `superseded`, …). | *Not emitted from the React app today* — server-side if added later. | @holzen |
 | `pause_companion_counted` | Companion complete event with `counts_for_pause=true`. | `{ pause_instance_id; companion_type; entry_point: 'pause_flow' \| 'library' \| 'bell' \| 'admin_preview' }` | @holzen |
 | `pause_companion_not_counted` | Companion complete event with `counts_for_pause=false`. | `{ pause_instance_id?: string; companion_type; reason: 'no_active_pause' \| 'outside_window' \| 'context_lost' \| 'not_allowed_for_template' \| 'already_counted'; entry_point }` | @holzen |
 

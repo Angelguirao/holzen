@@ -32,6 +32,7 @@ export type PauseState =
 export type PauseExpiredReason =
   | 'context_lost'
   | 'window_elapsed'
+  | 'open_max_age'
   | 'superseded'
   | 'ineligible_user_state'
   | 'system_cancelled';
@@ -235,6 +236,7 @@ export function shouldCountCompanion(params: {
       counts: false,
       reason: openInstance.expired_reason === 'context_lost' ? 'context_lost' :
               openInstance.expired_reason === 'window_elapsed' ? 'outside_window' :
+              openInstance.expired_reason === 'open_max_age' ? 'outside_window' :
               'no_active_pause',
     };
   }
@@ -276,18 +278,35 @@ export function shouldCountCompanion(params: {
 export type CronFireDecision =
   | { action: 'create' }
   | { action: 'reject'; reason: 'fingerprint_match' | 'recent_dismissal' }
-  | { action: 'pending_offer'; openInstanceId: string };
+  /** User has touched the open pause; new regime is a `pending` row until adopt/decline. */
+  | { action: 'pending_offer'; openInstanceId: string }
+  /**
+   * Open pause is still `active` and has no steps/companion rows (DB truth); new row is created `active` immediately.
+   * Pass `openPauseTouched: false` when mirroring the server after loading event absence.
+   */
+  | { action: 'auto_supersede_open'; openInstanceId: string };
 
 export function decideCronFire(params: {
   openInstance: PauseInstanceRow | null;
   recentTerminalMatch: PauseInstanceRow | null;
   newFingerprint: string;
+  /**
+   * When `false` and the open row is `active`, mirrors Postgres auto-supersede (new `active` instance).
+   * When omitted and state is `active`, returns `pending_offer` (conservative — caller may not have loaded events yet).
+   * `engaged` always implies touched → `pending_offer`.
+   */
+  openPauseTouched?: boolean;
 }): CronFireDecision {
   const { openInstance, recentTerminalMatch, newFingerprint } = params;
 
   if (openInstance) {
     if (openInstance.context_fingerprint === newFingerprint) {
       return { action: 'reject', reason: 'fingerprint_match' };
+    }
+    const touched =
+      openInstance.state === 'engaged' || params.openPauseTouched === true;
+    if (!touched && params.openPauseTouched === false && openInstance.state === 'active') {
+      return { action: 'auto_supersede_open', openInstanceId: openInstance.id };
     }
     return { action: 'pending_offer', openInstanceId: openInstance.id };
   }

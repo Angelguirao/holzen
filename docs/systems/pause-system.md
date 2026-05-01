@@ -52,14 +52,16 @@ Seed row: `volatility_v1` (see §4).
 ### 2.2 `pause_instances`
 
 The state-machine row. Holds snapshot, timestamps, terminal reason.
-The invariant "exactly one open pause per user" is enforced by a
-partial unique index: `(user_id) WHERE state IN ('active','engaged')`.
+The invariant "exactly one **current** pause per user" (`active` or
+`engaged`) is enforced by a partial unique index:
+`(user_id) WHERE state IN ('active','engaged')`. A user may also have
+at most one `pending` offer (separate partial unique index).
 
 Key columns:
 
 | Column | Purpose |
 |---|---|
-| `state` | `active \| engaged \| completed \| dismissed \| expired`. |
+| `state` | `active \| engaged \| pending \| completed \| dismissed \| expired`. |
 | `source` | `manual`, `cron_volatility`, `admin_seed`, … |
 | `context_snapshot` | jsonb — market context at creation. |
 | `context_rule_result` | jsonb — which rules fired (daily/cumulative). |
@@ -126,7 +128,10 @@ All views are `security_invoker = true`.
 
 ## 3. State machine
 
-Five states, two open, three terminal.
+Six states: three non-terminal (`active`, `engaged`, `pending`) and
+three terminal (`completed`, `dismissed`, `expired`). `v_pause_current`
+only surfaces `active|engaged` — `pending` is a **context offer** row
+waiting for adopt/decline (or TTL / replacement).
 
 ```
             +-----------+    breath+initial_emotion      +-----------+
@@ -151,6 +156,14 @@ Five states, two open, three terminal.
                                                                 +-----------+
 ```
 
+**`pending` (context offer)** — not shown as the “current” pause on Home
+until the user adopts it (`pause_adopt_pending_offer`) or declines
+(`pause_decline_pending_offer`). At most **one** `pending` row per user
+(partial unique index). When the market fingerprint changes again
+before adopt, the older `pending` row is expired (`system_cancelled`)
+and replaced by a new `pending` (or by a new `active` if the auto rule
+below applies) — pendings **do not accumulate**.
+
 Transitions:
 
 1. **`active → engaged`**: first time `required_for_engaged` step
@@ -159,13 +172,24 @@ Transitions:
    types all present AND `counted_companion_count >= required_companion_count`.
 3. **`active|engaged → dismissed`**: user explicitly ends
    (`pause_dismiss` RPC).
-4. **`active|engaged → expired`**: `pause_expire` RPC with one of:
-   - `context_lost` — fingerprint no longer matches current regime.
-   - `window_elapsed` — `now() > window_ends_at`.
-   - `superseded` — reserved.
+4. **`active|engaged → expired`**: `pause_expire` RPC, batch sweep, or
+   transition engine, with one of:
+   - `context_lost` — fingerprint no longer matches current regime (legacy paths).
+   - `window_elapsed` — `now() > window_ends_at` (template action window).
+   - `open_max_age` — `active|engaged` row is older than **12 hours**
+     wall-clock from `created_at` (cap so an open pause cannot last
+     indefinitely when the template window is unbounded).
+   - `superseded` — replaced by a newer instance (user adopt or
+     auto-supersede of an untouched open pause).
    - `ineligible_user_state` — snoozed / deleted / suspended.
-   - `system_cancelled` — admin override.
-5. **Terminal states are final**: completed / dismissed / expired
+   - `system_cancelled` — admin override, declined `pending`, cleared
+     stale `pending`, etc.
+5. **`pending`**: no step logging until adopt; no transition-engine
+   progression; expires after **12 hours** from `created_at` via
+   `pause_sweep_window_elapsed` (`system_cancelled`, notification
+   dismissed). Newer fingerprint from `pause_create_or_reuse*` replaces
+   an existing `pending` immediately.
+6. **Terminal states are final**: completed / dismissed / expired
    pauses do not transition further. Re-engaging the same context
    requires a **new** instance.
 
@@ -175,15 +199,19 @@ automatically so state always reflects the append-only log.
 
 Service-role helpers:
 
-- `pause_sweep_window_elapsed()` — batch `active|engaged → expired`
-  for rows past `window_ends_at`. Runs on pg_cron (minute cadence).
+- `pause_sweep_window_elapsed()` — batch expiry: (1) `active|engaged`
+  past `window_ends_at` → `window_elapsed`; (2) `active|engaged` with
+  `created_at <= now() - 12h` → `open_max_age`; (3) `pending` with
+  `created_at <= now() - 12h` → `system_cancelled` (`metadata.pending_stale_ttl`).
+  Intended pg_cron cadence: **at least hourly** (minute-level is fine).
 - `pause_expire(id, reason)` — explicit expiry.
 
 User-callable (RPCs):
 
 - `pause_create_or_reuse(template_slug, source, context_snapshot,
   context_rule_result, context_fingerprint)` — fingerprint-
-  idempotent create. Returns `{ instance_id, created, reused_reason }`.
+  idempotent create. Returns JSON including `instance_id`, `created`,
+  `reused_reason`, `pending_offer`, `prior_open_instance_id` (see §5–§6).
 - `pause_create_or_reuse_as(user_id, …)` — service-role variant.
   Used by edge crons that run without a user JWT.
 - `pause_log_step(instance_id, step_type, payload)` — append a step
@@ -212,7 +240,7 @@ Completion means: breath done, mood at the start, mood at the end,
 outcome recorded, at least one companion completed **inside the
 pause** (not an idle browse later in the library).
 
-## 5. Context validity
+## 5. Context validity and pending offers
 
 Every pause carries a `context_fingerprint` — a deterministic SHA-256
 of the regime-relevant parts of its `context_snapshot`: the BTC
@@ -224,15 +252,34 @@ on-chain state band. Helpers:
 - `src/lib/pause-fingerprint.ts#computeContextFingerprint` (browser —
   bit-for-bit equivalent).
 
-Two consequences for the cron path:
+**While `active|engaged` is open and the new fingerprint differs:**
 
-1. **Matching fingerprint while a pause is open → reject**. The
-   current pause still covers this regime; no new pause, no push.
-2. **Differing fingerprint (regime changed) → expire the old with
-   `context_lost` + `superseded_by=<new>`; create the new `active`**.
+1. **Matching fingerprint → reject** (`reused_reason=fingerprint_match`).
+   No new row; no push.
 
-The window (`window_ms`) is an upper bound: once it elapses, the
-pause expires with `window_elapsed` regardless of context.
+2. **User has not touched the open pause** — no rows in
+   `pause_step_events` or `pause_companion_events` for that instance,
+   and state is still `active` (not `engaged`) — then the open row is
+   expired (`superseded`, `metadata.auto_superseded_untouched_open`) and
+   the new snapshot is inserted as **`active`** immediately
+   (`pending_offer=false`). Home and cron behave like a normal new pause;
+   no adopt modal.
+
+3. **Otherwise** (user has logged at least one step or companion event,
+   or is already `engaged`) — insert **`pending`** (`pending_offer=true`).
+   The existing open pause stays on `v_pause_current` until the user
+   adopts (`pause_adopt_pending_offer`) or declines
+   (`pause_decline_pending_offer`). Edge/cron must **not** overwrite Home
+   preview with the pending instance until adopt (see `check-volatility`).
+
+**Stale pendings:** only one pending per user. A newer differing
+fingerprint expires the previous pending (`system_cancelled`,
+`pending_offer_replaced`) before inserting the new pending. Pendings
+also expire after **12h** from `created_at` via the sweep (see §3).
+
+The template `window_ends_at` / `window_elapsed` is separate from the
+12h **open_max_age** cap (the latter applies even when the action window
+is unbounded).
 
 ## 6. Cron-fire rules (`check-volatility`)
 
@@ -244,9 +291,14 @@ Per eligible user per tick:
    the same user with `pg_advisory_xact_lock(hashtextextended(user_id::text, 0))`,
    closing the read-then-insert race.
 3. Branch on the RPC return:
-   - `created=true` — new `active` instance. Write reflection_text +
-     haiku artifacts; dispatch push + email; fire-and-forget the
-     orchestrator to generate the rest of the companions.
+   - `created=true`, `pending_offer=false` — new **`active`** instance
+     (either no open pause, or auto-supersede of an untouched open pause).
+     Write reflection_text + haiku artifacts; dispatch push + email;
+     fire-and-forget the orchestrator to generate the rest of the companions.
+   - `created=true`, `pending_offer=true` — new **`pending`** instance;
+     keep writing AI artifacts to `instance_id`, but **do not** swap Home /
+     `profiles.last_message` to that id until adopt (current open pause
+     remains the ritual surface).
    - `created=false, reused_reason='fingerprint_match'` — reuse open
      instance. No push.
    - `instance_id=null, reused_reason='recent_dismissal'` — user
@@ -267,7 +319,9 @@ helper). The RPC applies the same rules as the cron path:
 
 - Open pause with matching fingerprint → reuse. `lastPauseInstanceId`
   points at the existing row, no artifact is rewritten.
-- Open pause with differing fingerprint → old expires; new is created.
+- Open pause with differing fingerprint → same branching as cron: **pending
+  offer** if the user has touched the open pause; otherwise **auto
+  supersede** to a new `active` row (see §5).
 - No open pause + recent-dismissal with matching fingerprint → null
   instance id; UI shows the reflection text but does not create a V2
   row (respects the user's just-now walk-away).
@@ -302,7 +356,7 @@ is one of:
 |---|---|
 | `no_active_pause` | No instance, or instance is dismissed / completed / expired for a non-context reason. |
 | `context_lost` | Instance was expired because the market regime changed. |
-| `outside_window` | Instance is live but `window_ends_at` has passed, or was expired by `window_elapsed`. |
+| `outside_window` | Instance is live but `window_ends_at` has passed, or was expired by `window_elapsed` / `open_max_age`. |
 | `not_allowed_for_template` | Companion type isn't in `allowed_companion_types`. |
 | `already_counted` | Same companion type already counted for this instance. |
 
@@ -393,7 +447,7 @@ SELECT user_id, count(*)
 -- Force-expire a pause (system_cancelled).
 SELECT public.pause_expire('<uuid>', 'system_cancelled');
 
--- Sweep stale windows manually.
+-- Sweep: template window elapsed, 12h open_max_age, 12h stale pending.
 SELECT public.pause_sweep_window_elapsed();
 
 -- Per-day lifecycle aggregate for a user.
