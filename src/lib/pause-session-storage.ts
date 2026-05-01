@@ -15,6 +15,9 @@ export interface PersistedSession {
   moodAfterDone: boolean;
   selectedMood?: MoodValue | null;
   selectedMoodAfter?: MoodValue | null;
+  /** 1–5 from Feel intensity step (optional for older saved sessions). */
+  feelIntensity?: number | null;
+  shiftIntensity?: number | null;
   phase: 'session' | 'done';
   decision: string | null;
   step: PauseStep;

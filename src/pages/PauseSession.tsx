@@ -32,6 +32,7 @@ import {
   companionDataFromArtifacts,
 } from '@/lib/pause-session-storage';
 import { pauseLogStep } from '@/lib/pause-api';
+import { getSessionQuote } from '@/lib/wisdom-quotes';
 
 type HydrationReady = {
   status: 'ready';
@@ -269,6 +270,8 @@ export default function PauseSession() {
   const [moodAfterDone, setMoodAfterDone] = useState(restored?.moodAfterDone ?? false);
   const [selectedMood, setSelectedMood] = useState<MoodValue | null>(restored?.selectedMood ?? null);
   const [selectedMoodAfter, setSelectedMoodAfter] = useState<MoodValue | null>(restored?.selectedMoodAfter ?? null);
+  const [feelIntensity, setFeelIntensity] = useState<number | null>(restored?.feelIntensity ?? null);
+  const [shiftIntensity, setShiftIntensity] = useState<number | null>(restored?.shiftIntensity ?? null);
   const [breathingCompleted, setBreathingCompleted] = useState<boolean>(restored?.breathingCompleted ?? false);
   const [curtainLifted, setCurtainLifted] = useState(false);
   const [pauseImpactData, setPauseImpactData] = useState<{
@@ -280,6 +283,9 @@ export default function PauseSession() {
     engagedTools: number;
     wroteNote: boolean;
     usedTags: boolean;
+    feelIntensity?: number | null;
+    shiftIntensity?: number | null;
+    reinforcementQuote?: string | null;
   } | null>(null);
 
   useEffect(() => {
@@ -295,6 +301,8 @@ export default function PauseSession() {
       moodAfterDone,
       selectedMood,
       selectedMoodAfter,
+      feelIntensity,
+      shiftIntensity,
       phase,
       decision,
       step,
@@ -311,6 +319,8 @@ export default function PauseSession() {
     moodAfterDone,
     selectedMood,
     selectedMoodAfter,
+    feelIntensity,
+    shiftIntensity,
     phase,
     decision,
     step,
@@ -356,11 +366,32 @@ export default function PauseSession() {
       breathingRef.current?.resetToIntro();
       return;
     }
+    if (step === 'breathe' && breathingCompleted) {
+      breathingRef.current?.resetToIntro();
+      setBreathingCompleted(false);
+      return;
+    }
     goBack();
-  }, [step, breathTimedActive, goBack]);
+  }, [step, breathTimedActive, breathingCompleted, goBack]);
 
   const showPauseHeaderBack =
-    phase === 'session' && (STEPS.indexOf(step) > 0 || (step === 'breathe' && breathTimedActive));
+    phase === 'session' &&
+    (STEPS.indexOf(step) > 0 || (step === 'breathe' && breathTimedActive) || (step === 'breathe' && breathingCompleted));
+
+  const handleBreathContinueToFeel = useCallback(async () => {
+    if (pauseInstanceId) {
+      await pauseLogStep({
+        instanceId: pauseInstanceId,
+        stepType: 'breath_completed',
+      }).catch(() => {});
+    }
+    goToStep('feel');
+  }, [pauseInstanceId, goToStep]);
+
+  const handleSkipBreath = useCallback(() => {
+    setBreathingCompleted(false);
+    goToStep('feel');
+  }, [goToStep]);
 
   const goForward = useCallback(() => {
     const currentIndex = STEPS.indexOf(step);
@@ -385,15 +416,18 @@ export default function PauseSession() {
   );
 
   const handleMoodSelect = useCallback(
-    async (mood: MoodValue) => {
+    async (mood: MoodValue, intensity?: number) => {
       hapticFeedback('light');
       setMoodDone(true);
       setSelectedMood(mood);
+      setFeelIntensity(typeof intensity === 'number' ? intensity : null);
       if (pauseInstanceId) {
+        const payload =
+          typeof intensity === 'number' ? { mood, intensity } : { mood };
         await pauseLogStep({
           instanceId: pauseInstanceId,
           stepType: 'initial_emotion_logged',
-          payload: { mood },
+          payload,
         }).catch(() => {});
       }
     },
@@ -402,23 +436,28 @@ export default function PauseSession() {
 
   const handleMoodSkip = useCallback(() => {
     setMoodDone(true);
+    setFeelIntensity(null);
   }, []);
 
   const handleMoodReset = useCallback(() => {
     setMoodDone(false);
     setSelectedMood(null);
+    setFeelIntensity(null);
   }, []);
 
   const handleMoodAfterSelect = useCallback(
-    async (mood: MoodValue) => {
+    async (mood: MoodValue, intensity?: number) => {
       hapticFeedback('light');
       setMoodAfterDone(true);
       setSelectedMoodAfter(mood);
+      setShiftIntensity(typeof intensity === 'number' ? intensity : null);
       if (pauseInstanceId) {
+        const payload =
+          typeof intensity === 'number' ? { mood, shift_intensity: intensity } : { mood };
         await pauseLogStep({
           instanceId: pauseInstanceId,
           stepType: 'shift_emotion_logged',
-          payload: { mood },
+          payload,
         }).catch(() => {});
       }
     },
@@ -427,11 +466,13 @@ export default function PauseSession() {
 
   const handleMoodAfterSkip = useCallback(() => {
     setMoodAfterDone(true);
+    setShiftIntensity(null);
   }, []);
 
   const handleMoodAfterReset = useCallback(() => {
     setMoodAfterDone(false);
     setSelectedMoodAfter(null);
+    setShiftIntensity(null);
   }, []);
 
   const toggleFavorite = useCallback(async () => {
@@ -495,6 +536,7 @@ export default function PauseSession() {
       }
       setDecision(d);
       await dismissMessage();
+      const q = getSessionQuote();
       setPauseImpactData({
         mood: selectedMood,
         moodAfter: selectedMoodAfter,
@@ -504,12 +546,26 @@ export default function PauseSession() {
         engagedTools: 0,
         wroteNote: false,
         usedTags: false,
+        feelIntensity,
+        shiftIntensity,
+        reinforcementQuote: `"${q.text}" — ${q.author}`,
       });
       hapticFeedback('success');
       setPhase('done');
       clearSession();
     },
-    [dismissMessage, pauseInstanceId, selectedMood, selectedMoodAfter, context, breathingCompleted, refreshSubscription, t],
+    [
+      dismissMessage,
+      pauseInstanceId,
+      selectedMood,
+      selectedMoodAfter,
+      context,
+      breathingCompleted,
+      feelIntensity,
+      shiftIntensity,
+      refreshSubscription,
+      t,
+    ],
   );
 
   const slideX = prefersReducedMotion ? 0 : 80;
@@ -569,16 +625,9 @@ export default function PauseSession() {
                   severity={severity}
                   completed={breathingCompleted}
                   onTimedBreathingChange={setBreathTimedActive}
-                  onComplete={() => {
-                    setBreathingCompleted(true);
-                    if (pauseInstanceId) {
-                      void pauseLogStep({
-                        instanceId: pauseInstanceId,
-                        stepType: 'breath_completed',
-                      });
-                    }
-                  }}
-                  onContinue={() => goToStep('feel')}
+                  onPatternComplete={() => setBreathingCompleted(true)}
+                  onContinueToFeel={() => void handleBreathContinueToFeel()}
+                  onSkipBreath={handleSkipBreath}
                 />
               </motion.div>
             )}
@@ -591,6 +640,7 @@ export default function PauseSession() {
                   onMoodReset={handleMoodReset}
                   moodDone={moodDone}
                   selectedMood={selectedMood}
+                  feelIntensity={feelIntensity}
                   onContinue={() => goToStep('reflect')}
                 />
               </motion.div>
@@ -622,6 +672,8 @@ export default function PauseSession() {
                   onMoodAfterReset={handleMoodAfterReset}
                   moodAfterDone={moodAfterDone}
                   selectedMoodAfter={selectedMoodAfter}
+                  priorMood={selectedMood}
+                  shiftIntensity={shiftIntensity}
                   onContinue={() => goToStep('decide')}
                   groundingActivities={groundingActivities}
                 />
