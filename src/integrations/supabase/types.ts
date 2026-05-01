@@ -213,6 +213,20 @@ export type Database = {
             foreignKeyName: "collection_items_library_item_id_fkey"
             columns: ["library_item_id"]
             isOneToOne: false
+            referencedRelation: "library_archive_echo_items"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "collection_items_library_item_id_fkey"
+            columns: ["library_item_id"]
+            isOneToOne: false
+            referencedRelation: "library_archive_pauses_tab_items"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "collection_items_library_item_id_fkey"
+            columns: ["library_item_id"]
+            isOneToOne: false
             referencedRelation: "library_items"
             referencedColumns: ["id"]
           },
@@ -2193,6 +2207,100 @@ export type Database = {
       }
     }
     Views: {
+      library_archive_echo_items: {
+        Row: {
+          body: string | null
+          created_at: string | null
+          id: string | null
+          is_favorite: boolean | null
+          pause_instance_id: string | null
+          pinned: boolean | null
+          source_type: string | null
+          source_url: string | null
+          status: string | null
+          tags: string[] | null
+          title: string | null
+          type: string | null
+          user_id: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "library_items_pause_instance_id_fkey"
+            columns: ["pause_instance_id"]
+            isOneToOne: false
+            referencedRelation: "pause_instances"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "library_items_pause_instance_id_fkey"
+            columns: ["pause_instance_id"]
+            isOneToOne: false
+            referencedRelation: "v_pause_completed"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "library_items_pause_instance_id_fkey"
+            columns: ["pause_instance_id"]
+            isOneToOne: false
+            referencedRelation: "v_pause_current"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "library_items_pause_instance_id_fkey"
+            columns: ["pause_instance_id"]
+            isOneToOne: false
+            referencedRelation: "v_pause_full"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      library_archive_pauses_tab_items: {
+        Row: {
+          body: string | null
+          created_at: string | null
+          id: string | null
+          is_favorite: boolean | null
+          pause_instance_id: string | null
+          pinned: boolean | null
+          source_type: string | null
+          source_url: string | null
+          status: string | null
+          tags: string[] | null
+          title: string | null
+          type: string | null
+          user_id: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "library_items_pause_instance_id_fkey"
+            columns: ["pause_instance_id"]
+            isOneToOne: false
+            referencedRelation: "pause_instances"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "library_items_pause_instance_id_fkey"
+            columns: ["pause_instance_id"]
+            isOneToOne: false
+            referencedRelation: "v_pause_completed"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "library_items_pause_instance_id_fkey"
+            columns: ["pause_instance_id"]
+            isOneToOne: false
+            referencedRelation: "v_pause_current"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "library_items_pause_instance_id_fkey"
+            columns: ["pause_instance_id"]
+            isOneToOne: false
+            referencedRelation: "v_pause_full"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       v_ai_spend_month_global: {
         Row: {
           total_usd: number | null
