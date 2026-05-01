@@ -1378,10 +1378,12 @@ export type Database = {
       }
       pause_templates: {
         Row: {
+          action_window_ms: number | null
           active: boolean
           allowed_companion_types: string[]
           config: Json
           created_at: string
+          dismissal_suppression_ms: number
           id: string
           required_companion_count: number
           required_for_completed: string[]
@@ -1391,10 +1393,12 @@ export type Database = {
           window_ms: number
         }
         Insert: {
+          action_window_ms?: number | null
           active?: boolean
           allowed_companion_types: string[]
           config?: Json
           created_at?: string
+          dismissal_suppression_ms?: number
           id?: string
           required_companion_count?: number
           required_for_completed: string[]
@@ -1404,10 +1408,12 @@ export type Database = {
           window_ms: number
         }
         Update: {
+          action_window_ms?: number | null
           active?: boolean
           allowed_companion_types?: string[]
           config?: Json
           created_at?: string
+          dismissal_suppression_ms?: number
           id?: string
           required_companion_count?: number
           required_for_completed?: string[]
