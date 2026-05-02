@@ -148,14 +148,26 @@ Defined as **`STEPS`** in `src/components/pause/PauseProgress.tsx` and used by *
 
 Horizontal drag calls **`goForward`** / **`goBack`**. **Forward** swipes are gated with **`canAdvanceFromPauseStep`** in `src/lib/pause-session-navigation.ts` so they match the same preconditions as each step’s **Continue** (e.g. cannot swipe from Breathe to Feel until **`breathingCompleted`** is true).
 
-### 7.5 Decide and the Done screen
+### 7.5 Decide and the Done screen (why we wait for `completed`)
 
-When **`pauseInstanceId`** is present, after **`outcome_logged`** the client checks the RPC return value:
+Think of two separate questions:
 
-- If the instance is **`completed`**, proceed: **`dismissMessage`**, Done phase, **`clearSession`**, impact payload for **`PauseDone`**.
-- If the instance is still **`engaged`** (common case: **`required_companion_count`** not met), show **`pause.outcomeNotCompleted`**, **stay on Decide**, and refresh subscription/hooks so the user can return to **Reflect**, complete a counting companion, and choose again.
+1. **“Did we record what the user chose?”** — That is the **`outcome_logged`** row (held / sold / bought / nothing). The RPC **`pause_log_step`** almost always **appends** that row when Decide succeeds.
+2. **“Is this pause row officially finished in the database?”** — That is the instance **`state`**. For **`volatility_v1`**, Postgres only flips to **`completed`** when **every** step type in **`required_for_completed`** exists **and** the user has at least **`required_companion_count`** companion completions that **`counts_for_pause`**. So you can have **outcome saved** while the row is still **`engaged`** (for example: user never finished a counting companion on Reflect).
 
-**Note:** A first attempt may still append **`outcome_logged`** while not yet **`completed`**; retries may append additional outcome rows; **`v_pause_full`** reads the **latest** outcome.
+**What `pause_log_step` returns:** After inserting the step event, the function returns the instance’s **current `pause_state`** (`engaged`, `completed`, etc.). That return value is the client’s cheap signal for “did this pause **fully** close?”
+
+**What the client waits for:** When there is a real **`pauseInstanceId`**, **`PauseSession`** waits for that return value to be **`completed`** before it:
+
+- calls **`dismissMessage()`** (clears the “current pause” banner / home payload so the app does not think an old pause is still open),
+- switches to the **Done** phase and builds **`PauseDone`** data, and
+- **`clearSession()`** (drops the in-browser ritual snapshot).
+
+If the return value is **`engaged`** (or anything other than **`completed`**), the client **does not** do those three things. Instead it shows **`pause.outcomeNotCompleted`**, keeps you on **Decide**, and refreshes data so you can go back to **Reflect**, complete a companion that **counts**, and tap your outcome again. That way the **celebration Done UI** only appears when the **same pause row** is **`completed`** in Postgres (stats, badges, Library, and “pause completed” analytics stay aligned).
+
+**Why `dismissMessage` runs only after a successful RPC:** If we dismissed the open pause **before** the outcome RPC finished, another code path could **expire or dismiss** the instance first; then **`outcome_logged`** might fail or attach to the wrong lifecycle. Ordering avoids that race.
+
+**Append-only caveat:** If the first Decide attempt logged **`outcome_logged`** but the instance stayed **`engaged`**, a later successful attempt may add **another** outcome row. **`v_pause_full`** uses the **latest** outcome text; duplicate rows are a known tradeoff until a stricter idempotency rule exists server-side.
 
 ### 7.6 Idempotence hints (client)
 
