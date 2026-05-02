@@ -47,11 +47,7 @@ import { parsePauseContextForHomePreview } from '@/lib/pause-context-home-previe
 import { type PauseSessionLocationState } from '@/lib/router-location-state';
 interface PinnedPausePreview {
   id: string;
-  message: string;
   context: string | null;
-  haiku: string | null;
-  grounding_title: string | null;
-  grounding_body: string | null;
 }
 
 const Home = () => {
@@ -154,6 +150,10 @@ const Home = () => {
     }
   }, [location.pathname]);
   const [pinnedPausePreview, setPinnedPausePreview] = useState<PinnedPausePreview | null>(null);
+  const pinnedContextHomePreview = useMemo(
+    () => parsePauseContextForHomePreview(pinnedPausePreview?.context ?? null),
+    [pinnedPausePreview?.context],
+  );
   const prefersReducedMotion = useReducedMotion();
   const [completedPauseCount, setCompletedPauseCount] = useState(0);
   const [marketChartExpanded, setMarketChartExpanded] = useState(false);
@@ -338,34 +338,11 @@ const Home = () => {
         localStorage.removeItem('holzen_pinned_reflection');
         return;
       }
-      const { data: artifacts } = await supabase
-        .from('pause_ai_artifacts' as never)
-        .select('kind, content')
-        .eq('pause_instance_id', pinnedId);
-      if (cancelled) return;
-      let message = '';
-      let haiku: string | null = null;
-      let groundingTitle: string | null = null;
-      let groundingBody: string | null = null;
-      for (const a of ((artifacts ?? []) as Array<{ kind: string; content: Record<string, unknown> }>)) {
-        if (a.kind === 'reflection_text' && typeof a.content?.message === 'string') {
-          message = a.content.message as string;
-        } else if (a.kind === 'haiku' && typeof a.content?.haiku === 'string') {
-          haiku = a.content.haiku as string;
-        } else if (a.kind === 'ground_nudge') {
-          if (typeof a.content?.title === 'string') groundingTitle = a.content.title as string;
-          if (typeof a.content?.body === 'string') groundingBody = a.content.body as string;
-        }
-      }
       const ctxSnap = ((inst as { context_snapshot: Record<string, unknown> | null }).context_snapshot ?? {}) as Record<string, unknown>;
       const context = typeof ctxSnap.context_text === 'string' ? (ctxSnap.context_text as string) : null;
       setPinnedPausePreview({
         id: pinnedId,
-        message,
         context,
-        haiku,
-        grounding_title: groundingTitle,
-        grounding_body: groundingBody,
       });
     })();
     return () => {
@@ -683,14 +660,8 @@ const Home = () => {
           {message ? (
             <div className="space-y-4">
               <div className="space-y-2 min-w-0">
-                <p
-                  className={cn(homeInWidget.bodyLead, 'truncate')}
-                  title={message}
-                >
-                  {message}
-                </p>
                 {(pauseContextHomePreview.btc24h || pauseContextHomePreview.marketSentiment) ? (
-                  <div className={cn(homeInWidget.meta, 'mt-2 space-y-1')}>
+                  <div className={cn(homeInWidget.meta, 'space-y-1')}>
                     {pauseContextHomePreview.btc24h ? (
                       <p className="leading-snug">{pauseContextHomePreview.btc24h}</p>
                     ) : null}
@@ -699,6 +670,7 @@ const Home = () => {
                     ) : null}
                   </div>
                 ) : null}
+                <p className={homeInWidget.metaFaint}>{t('home.yourPauseCard.reflectionOpensInPause')}</p>
               </div>
               <button
                 type="button"
@@ -793,7 +765,18 @@ const Home = () => {
                           {t('common.unpin')}
                         </button>
                       </div>
-                      <p className={homeInWidget.body}>{pinnedPausePreview.message}</p>
+                      {(pinnedContextHomePreview.btc24h || pinnedContextHomePreview.marketSentiment) ? (
+                        <div className={cn(homeInWidget.meta, 'space-y-1')}>
+                          {pinnedContextHomePreview.btc24h ? (
+                            <p className="leading-snug">{pinnedContextHomePreview.btc24h}</p>
+                          ) : null}
+                          {pinnedContextHomePreview.marketSentiment ? (
+                            <p className="leading-snug">{pinnedContextHomePreview.marketSentiment}</p>
+                          ) : null}
+                        </div>
+                      ) : (
+                        <p className={homeInWidget.metaFaint}>{t('home.yourPauseCard.pinnedNoContext')}</p>
+                      )}
                     </div>
                   )}
                   <NeedAMomentButton onTrigger={handleNeedAPause} cooldownRemaining={manualCooldownRemaining} loading={loading} />
