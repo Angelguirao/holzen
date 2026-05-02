@@ -152,7 +152,7 @@ export function useLibrary(options?: UseLibraryOptions) {
     const [{ data: instRows }, { data: companionRows }] = await Promise.all([
       supabase
         .from('v_pause_full' as never)
-        .select('id, state, engaged_at, outcome, has_breath_completed, counted_companion_types')
+        .select('id, state, engaged_at, expired_reason, outcome, has_breath_completed, counted_companion_types')
         .in('id', pauseInstanceIds),
       supabase
         .from('pause_companion_events' as never)
@@ -196,12 +196,14 @@ export function useLibrary(options?: UseLibraryOptions) {
         id: string;
         state: string;
         engaged_at: string | null;
+        expired_reason: string | null;
         has_breath_completed: boolean;
         counted_companion_types: string[] | null;
       }>) {
         next[r.id] = {
           state: r.state,
           engaged_at: r.engaged_at ?? null,
+          expired_reason: r.expired_reason ?? null,
           has_breath_completed: r.has_breath_completed,
           counted_companion_types: r.counted_companion_types,
         };
