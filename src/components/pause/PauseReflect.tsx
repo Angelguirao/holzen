@@ -44,7 +44,7 @@ export function PauseReflect({
 }: Props) {
   const { t } = useTranslation();
 
-  /** Records that the user reached Reflect so Home can show regenerate (see `pauseHasReflectStep`). */
+  /** Records that the user reached Reflect (analytics / progression). */
   useEffect(() => {
     if (!pauseInstanceId) return;
     const storageKey = `holzen_reflect_step_logged:${pauseInstanceId}`;
