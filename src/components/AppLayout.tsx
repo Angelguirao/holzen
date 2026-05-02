@@ -69,7 +69,7 @@ function useTabChunkPrefetch() {
   }, []);
 }
 
-/** Primary-tab label for the shell header center (Home has none). */
+/** Primary-tab label for the shell header center (Home intentionally has none). */
 function shellCenterNavLabel(pathname: string, t: (key: string) => string): string | null {
   if (pathname === '/' || pathname === '/index') return null;
   if (isPrimaryTabActive(pathname, 'library')) return t('nav.archive');
@@ -96,7 +96,7 @@ export function AppLayout() {
       {!isHome && <PauseReadyBanner visible={pauseReady} onDismiss={dismiss} />}
       <CheckoutConfirmation />
       <PaywallSubscribedTracker />
-      <div className="w-full max-w-sm pt-4">
+      <div className="w-full max-w-sm">
         {profileLoadError ? (
           <Alert variant="destructive" className="mb-6">
             <AlertDescription className="flex flex-col gap-3 text-left">
@@ -107,7 +107,7 @@ export function AppLayout() {
             </AlertDescription>
           </Alert>
         ) : null}
-        <header className="mb-10 grid grid-cols-[1fr_auto_1fr] items-center gap-x-2">
+        <header className="sticky top-0 z-40 -mx-6 mb-10 grid grid-cols-[1fr_auto_1fr] items-center gap-x-2 border-b border-border bg-background/95 px-6 pt-4 pb-3 backdrop-blur-sm supports-[backdrop-filter]:bg-background/85">
           <h1 className="justify-self-start text-sm font-mono tracking-[0.25em] uppercase" style={{ color: '#DBB366' }}>
             Holzen
           </h1>
