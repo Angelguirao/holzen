@@ -131,7 +131,7 @@ export function BulkHoldCard() {
     setHeldCount(0);
   };
 
-  const goLibraryPauses = () => {
+  const goArchivePauses = () => {
     navigate('/library?seg=pauses');
     setSheetOpen(false);
     setSheetMode('prompt');
@@ -202,7 +202,7 @@ export function BulkHoldCard() {
               </p>
               <p className={cn(homeInWidget.meta, 'mt-1')}>
                 {t('bulkHold.teaserHint', {
-                  defaultValue: 'Tap to hold all, review dates, or open the Library.',
+                  defaultValue: 'Tap to hold all, review dates, or open your Archive.',
                 })}
               </p>
             </div>
@@ -242,11 +242,11 @@ export function BulkHoldCard() {
                     })
                   : sheetMode === 'review'
                     ? t('bulkHold.reviewSub', {
-                        defaultValue: 'These expired without an outcome. Open the Library for full detail on each pause.',
+                        defaultValue: 'These expired without an outcome. Open your Archive for full detail on each pause.',
                       })
                     : t('bulkHold.subtitle', {
                         defaultValue:
-                          'Mark all as Hold with one tap, or review them individually. The Library lists each pause.',
+                          'Mark all as Hold with one tap, or review them individually. Your Archive lists each pause.',
                       })}
               </SheetDescription>
             </SheetHeader>
@@ -372,8 +372,8 @@ export function BulkHoldCard() {
                 >
                   {t('bulkHold.back', { defaultValue: 'Back' })}
                 </Button>
-                <Button type="button" className="h-11 rounded-xl sm:min-w-[160px]" onClick={goLibraryPauses}>
-                  {t('bulkHold.openLibrary', { defaultValue: 'Open Library' })}
+                <Button type="button" className="h-11 rounded-xl sm:min-w-[160px]" onClick={goArchivePauses}>
+                  {t('bulkHold.openArchive', { defaultValue: 'Open Archive' })}
                 </Button>
               </div>
             ) : (
