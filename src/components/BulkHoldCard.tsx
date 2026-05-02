@@ -80,7 +80,7 @@ export function BulkHoldCard() {
       const result = await applyBulkHoldOutcomes(rows, resolver);
 
       if (result.status === 'failed') {
-        hapticFeedback('error');
+        hapticFeedback('warning');
         setApplyError(t('bulkHold.applyFailed'));
         setRefetchNonce((n) => n + 1);
         setLoading(false);
@@ -88,7 +88,7 @@ export function BulkHoldCard() {
       }
 
       if (result.status === 'partial') {
-        hapticFeedback('error');
+        hapticFeedback('warning');
         setPending(result.failedRows);
         setDraftOutcomes((prev) => {
           const next: Record<string, BulkHoldOutcomeChoice> = {};
