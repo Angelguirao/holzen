@@ -32,8 +32,8 @@ import {
   type CompanionSlotCacheIds,
   type CompanionSlotCommitters,
   type CompanionSlotRelaxations,
+  type CompanionSlotAutosaveParams,
 } from '@/lib/companion-orchestrate-slot-apply';
-import { saveCompanionLibraryBookmarkOnce } from '@/lib/companion-library-autosave';
 import { holzenLog } from '@/lib/holzen-console';
 import {
   hasInvokedIntervention,
@@ -112,14 +112,8 @@ export function useCompanionData({ companions, prefs, pauseInstanceId, context, 
     startCheckout,
   ]);
 
-  // ── Auto-save to library ──
-  const libraryAutosaveDedupRef = useRef<Set<string>>(new Set());
-  const autoSaveToLibrary = useCallback(
-    async (params: { title: string; body: string; sourceType: string; sourceUrl?: string }) => {
-      await saveCompanionLibraryBookmarkOnce(pauseInstanceId, params, libraryAutosaveDedupRef.current);
-    },
-    [pauseInstanceId],
-  );
+  /** No-op: companion output is persisted in `pause_ai_artifacts` only. */
+  const autoSaveToLibrary = useCallback(async (_params: CompanionSlotAutosaveParams) => {}, []);
 
   // ── Completion state ──
   const [completion, setCompletion] = useState<CompanionUiCompletionState>({

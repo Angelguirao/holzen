@@ -698,23 +698,6 @@ serve(
         })
       );
 
-      // Keep Library parity with manual pauses: every generated pause
-      // gets a `source_type='pause'` bookmark row keyed on pause_instance_id.
-      const libraryUpsert = pendingOffer
-        ? Promise.resolve({ error: null })
-        : supabase.from("library_items").upsert(
-          {
-            user_id: profile.user_id,
-            type: "bookmark",
-            title: "Pause",
-            body: result.message,
-            source_type: "pause",
-            pause_instance_id: pauseInstanceId,
-            tags: [],
-          },
-          { onConflict: "user_id,pause_instance_id,source_type", ignoreDuplicates: true },
-        );
-
       // Profile update only — companion-orchestrate runs from the client on
       // first Reflect open (intervention-only) and on card taps (lazy slots),
       // same as manual volatility pauses. Skip while a pending context offer
@@ -726,10 +709,7 @@ serve(
           .update({ last_message: result.message, last_context: ctx })
           .eq("user_id", profile.user_id);
 
-      const [{ error: profileUpdateErr }, { error: libraryUpsertErr }] = await Promise.all([
-        profileUpdate,
-        libraryUpsert,
-      ]);
+      const { error: profileUpdateErr } = await profileUpdate;
       if (profileUpdateErr) {
         log.error("check_volatility_profile", {
           holzen_event: "check_volatility_cron",
@@ -737,13 +717,6 @@ serve(
           ...unknownErrorForLog(profileUpdateErr),
         });
         return false;
-      }
-      if (libraryUpsertErr) {
-        log.error("check_volatility_library", {
-          holzen_event: "check_volatility_cron",
-          phase: "library_reflection_upsert_failed",
-          ...unknownErrorForLog(libraryUpsertErr),
-        });
       }
 
       if (pendingOffer) {

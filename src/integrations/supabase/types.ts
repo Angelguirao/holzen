@@ -184,21 +184,21 @@ export type Database = {
           added_at: string
           collection_id: string
           id: string
-          library_item_id: string
+          pause_instance_id: string
           position: number
         }
         Insert: {
           added_at?: string
           collection_id: string
           id?: string
-          library_item_id: string
+          pause_instance_id: string
           position?: number
         }
         Update: {
           added_at?: string
           collection_id?: string
           id?: string
-          library_item_id?: string
+          pause_instance_id?: string
           position?: number
         }
         Relationships: [
@@ -210,24 +210,31 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
-            foreignKeyName: "collection_items_library_item_id_fkey"
-            columns: ["library_item_id"]
+            foreignKeyName: "collection_items_pause_instance_id_fkey"
+            columns: ["pause_instance_id"]
             isOneToOne: false
-            referencedRelation: "library_archive_echo_items"
+            referencedRelation: "pause_instances"
             referencedColumns: ["id"]
           },
           {
-            foreignKeyName: "collection_items_library_item_id_fkey"
-            columns: ["library_item_id"]
+            foreignKeyName: "collection_items_pause_instance_id_fkey"
+            columns: ["pause_instance_id"]
             isOneToOne: false
-            referencedRelation: "library_archive_pauses_tab_items"
+            referencedRelation: "v_pause_completed"
             referencedColumns: ["id"]
           },
           {
-            foreignKeyName: "collection_items_library_item_id_fkey"
-            columns: ["library_item_id"]
+            foreignKeyName: "collection_items_pause_instance_id_fkey"
+            columns: ["pause_instance_id"]
             isOneToOne: false
-            referencedRelation: "library_items"
+            referencedRelation: "v_pause_current"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "collection_items_pause_instance_id_fkey"
+            columns: ["pause_instance_id"]
+            isOneToOne: false
+            referencedRelation: "v_pause_full"
             referencedColumns: ["id"]
           },
         ]
@@ -906,83 +913,6 @@ export type Database = {
           url?: string | null
         }
         Relationships: []
-      }
-      library_items: {
-        Row: {
-          body: string | null
-          created_at: string
-          id: string
-          is_favorite: boolean
-          pause_instance_id: string | null
-          pinned: boolean
-          source_type: string | null
-          source_url: string | null
-          status: string
-          tags: string[]
-          title: string | null
-          type: string
-          user_id: string
-        }
-        Insert: {
-          body?: string | null
-          created_at?: string
-          id?: string
-          is_favorite?: boolean
-          pause_instance_id?: string | null
-          pinned?: boolean
-          source_type?: string | null
-          source_url?: string | null
-          status?: string
-          tags?: string[]
-          title?: string | null
-          type?: string
-          user_id: string
-        }
-        Update: {
-          body?: string | null
-          created_at?: string
-          id?: string
-          is_favorite?: boolean
-          pause_instance_id?: string | null
-          pinned?: boolean
-          source_type?: string | null
-          source_url?: string | null
-          status?: string
-          tags?: string[]
-          title?: string | null
-          type?: string
-          user_id?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "library_items_pause_instance_id_fkey"
-            columns: ["pause_instance_id"]
-            isOneToOne: false
-            referencedRelation: "pause_instances"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "library_items_pause_instance_id_fkey"
-            columns: ["pause_instance_id"]
-            isOneToOne: false
-            referencedRelation: "v_pause_completed"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "library_items_pause_instance_id_fkey"
-            columns: ["pause_instance_id"]
-            isOneToOne: false
-            referencedRelation: "v_pause_current"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "library_items_pause_instance_id_fkey"
-            columns: ["pause_instance_id"]
-            isOneToOne: false
-            referencedRelation: "v_pause_full"
-            referencedColumns: ["id"]
-          },
-        ]
       }
       monthly_feature_usage: {
         Row: {

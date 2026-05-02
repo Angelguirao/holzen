@@ -1,5 +1,5 @@
 /**
- * `library_items.source_type` is stored as canonical strings (`pause`, `pause_note`, …).
+ * Canonical `source_type` strings for pause-linked archive rows (`pause`, `pause_note`, …).
  * This helper only normalizes null/undefined; legacy discriminator rewrites were removed.
  */
 export function normalizeLibrarySourceType(sourceType: string | null | undefined): string | undefined {

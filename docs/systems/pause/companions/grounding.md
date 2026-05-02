@@ -155,7 +155,7 @@ The inline Ground card in `CompanionSection` has an **"Open full view"** button 
 - **Breathing-room pacing** (8 s) before feedback + save CTAs fade in.
 - **Per-user history thread** — the last 5 Ground cards for this user from `pause_ai_artifacts`, deep-linked to their own Full Views so the Full View doubles as a small personal archive of biases surfaced.
 - **Related biases this month** — a distinct-by-normalized-title chip rail drawn from the last 30 days of the user's Ground cards. Complements the chronological history thread by showing *breadth* of biases surfaced rather than raw recency. Dedupe is title-based (titles are short bias labels per the structuring prompt), cap 8 chips.
-- **Pro-gated "Save this moment"** — captures the user's own note triggered by the card as a `library_items` row (`source_type: companion_moment`). Free users get a locked state with an upgrade toast.
+- **Full View** — optional deep read of the same grounding payload; companion text lives in **`pause_ai_artifacts`**. Users can capture longer notes via **Journey → tools** (e.g. journal) if they want a separate artifact.
 
 The "Open full view" navigation is free; only the **Save this moment** action is gated.
 

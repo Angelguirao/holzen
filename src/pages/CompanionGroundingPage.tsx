@@ -14,7 +14,6 @@ import { RelatedBiasesThisMonth } from '@/components/companion/RelatedBiasesThis
 import { useGroundingEnrichment } from '@/hooks/use-grounding-enrichment';
 import { useFullviewTelemetry } from '@/hooks/use-fullview-telemetry';
 import { InterventionCrossRefBadge } from '@/components/companion/InterventionCrossRefBadge';
-import { SaveThisMomentButton } from '@/components/companion/SaveThisMomentButton';
 import { useStaggeredReveal } from '@/components/companion/use-staggered-reveal';
 import { PageMeta } from '@/components/PageMeta';
 
@@ -172,12 +171,6 @@ export default function CompanionGroundingPage() {
 
         {nudge && revealed && (
           <div className="space-y-4 border-t border-border/20 pt-5 animate-in fade-in duration-500">
-            <SaveThisMomentButton
-              seedTitle={nudge.title}
-              seedContext={nudge.body}
-              companion="grounding"
-              pauseInstanceId={pauseInstanceId}
-            />
             <CompanionFeedback
               pauseInstanceId={pauseInstanceId}
               companionType="grounding"

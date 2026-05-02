@@ -249,18 +249,6 @@ export function useHolzen() {
             setContext(ctx);
             setCompanions({ haiku: null, groundingTitle: null, groundingBody: null });
             setNewPauseArrival(true);
-            await supabase.from('library_items').upsert(
-              {
-                user_id: user.id,
-                type: 'bookmark',
-                title: 'Pause',
-                body: silentMsg,
-                source_type: 'pause',
-                pause_instance_id: res.instance_id,
-                tags: [],
-              } as never,
-              { onConflict: 'user_id,pause_instance_id,source_type', ignoreDuplicates: true } as never,
-            );
             setLastTriggerAt(new Date().toISOString());
             try {
               trackEvent('pause.manual_completed', {
@@ -400,22 +388,6 @@ export function useHolzen() {
           .upsert(artifacts as never, { onConflict: 'pause_instance_id,kind' } as never);
 
         if (!isPendingOffer) {
-          await supabase.from('library_items').upsert(
-            {
-              user_id: user.id,
-              type: 'bookmark',
-              title: 'Pause',
-              body: msg,
-              source_type: 'pause',
-              pause_instance_id: res.instance_id,
-              tags: [],
-            } as never,
-            {
-              onConflict: 'user_id,pause_instance_id,source_type',
-              ignoreDuplicates: true,
-            } as never,
-          );
-
           setLastTriggerAt(new Date().toISOString());
           try {
             trackEvent('pause.manual_completed', {

@@ -602,15 +602,6 @@ export default function PauseSession() {
       stepType: 'favorite_toggled',
       payload: { is_favorite: newVal },
     }).catch(() => setIsFavorite(!newVal));
-    try {
-      await supabase
-        .from('library_items')
-        .update({ is_favorite: newVal })
-        .eq('pause_instance_id', pauseInstanceId)
-        .eq('source_type', 'pause');
-    } catch {
-      /* non-fatal */
-    }
     if (newVal && !subscribed) {
       toast(t('pause.favoriteProHint'), { duration: 4000 });
     }

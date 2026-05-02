@@ -4,8 +4,15 @@ import type {
 } from '@/lib/companion-orchestrate-types';
 import type { CachedHistoricalInsightShape } from '@/components/HistoricalInsightDisplay';
 import type { ZoomOutData } from '@/components/ZoomOutDisplay';
-import type { CompanionLibraryBookmarkParams } from '@/lib/companion-library-autosave';
 import { toZoomOutDisplayData, zoomOutLibraryAutosaveFromDisplayData } from '@/lib/zoom-out-payload';
+
+/** Legacy hook name: companion slots no longer mirror rows into a bookmark table. */
+export type CompanionSlotAutosaveParams = {
+  title: string;
+  body: string;
+  sourceType: string;
+  sourceUrl?: string;
+};
 import { updateRecencyHints } from '@/lib/companion-recency-hints';
 import { hostnameFromUrl } from '@/lib/companion-url';
 import { trackCompanionServed } from '@/lib/companion-analytics';
@@ -56,7 +63,7 @@ export type CompanionSlotCommitters = {
   setNudge: (v: { title: string; body: string; citation: string; url: string }) => void;
   setHistoryInsight: (v: CachedHistoricalInsightShape) => void;
   setZoomOut: (v: ZoomOutData | null) => void;
-  autoSaveToLibrary: (p: CompanionLibraryBookmarkParams) => void | Promise<void>;
+  autoSaveToLibrary: (p: CompanionSlotAutosaveParams) => void | Promise<void>;
 };
 
 export function readOrchestrateSlotBody(
@@ -164,7 +171,7 @@ export function hydrateOrchestrateSlotIfNew(
   }
 }
 
-/** After lazy fetch or regenerate — state, library, optional cache row id, recency. */
+/** After lazy fetch or regenerate — state, optional cache row id, recency. */
 export function applyOrchestrateSlotLazyOrRegenerate(
   slot: RegenerateCompanionSlot,
   r: CompanionOrchestrateSlotResult & { data: NonNullable<CompanionOrchestrateSlotResult['data']> },

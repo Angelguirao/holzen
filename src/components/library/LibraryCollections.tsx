@@ -11,22 +11,18 @@ interface Props {
 
 export function LibraryCollections({ library }: Props) {
   const { t } = useTranslation();
-  const {
-    items, collections, addCollection, deleteCollection, updateItem,
-    getCollectionItemIds, getCollectionItemCount, removeFromCollection,
-    togglePin, toggleFavorite, deleteItem,
-  } = library;
+  const { collections, addCollection, deleteCollection, getCollectionItemIds, getCollectionItemCount, removeFromCollection, items } =
+    library;
   const [selectedId, setSelectedId] = useState<string | null>(null);
 
   const selectedCollection = collections.find((c) => c.id === selectedId);
 
-  const handleCreate = useCallback(async (name: string, description: string, icon: string) => {
-    await addCollection({ name, description: description || null, icon });
-  }, [addCollection]);
-
-  const handleStatusChange = useCallback(async (id: string, status: 'unread' | 'read' | 'archived') => {
-    await updateItem(id, { status });
-  }, [updateItem]);
+  const handleCreate = useCallback(
+    async (name: string, description: string, icon: string) => {
+      await addCollection({ name, description: description || null, icon });
+    },
+    [addCollection],
+  );
 
   if (selectedCollection) {
     return (
@@ -37,10 +33,6 @@ export function LibraryCollections({ library }: Props) {
         onBack={() => setSelectedId(null)}
         onDeleteCollection={deleteCollection}
         onRemoveItem={removeFromCollection}
-        onTogglePin={togglePin}
-        onToggleFavorite={toggleFavorite}
-        onDeleteItem={deleteItem}
-        onStatusChange={handleStatusChange}
       />
     );
   }
@@ -49,18 +41,10 @@ export function LibraryCollections({ library }: Props) {
     <div className="space-y-3">
       <NewCollectionForm onSave={handleCreate} />
       {collections.map((col) => (
-        <CollectionCard
-          key={col.id}
-          collection={col}
-          itemCount={getCollectionItemCount(col.id)}
-          onDelete={deleteCollection}
-          onSelect={setSelectedId}
-        />
+        <CollectionCard key={col.id} collection={col} itemCount={getCollectionItemCount(col.id)} onDelete={deleteCollection} onSelect={setSelectedId} />
       ))}
       {collections.length === 0 && (
-        <p className="text-xs text-muted-foreground/40 text-center py-8 font-mono">
-          {t('library.noCollections')}
-        </p>
+        <p className="text-xs text-muted-foreground/40 text-center py-8 font-mono">{t('library.noCollections')}</p>
       )}
     </div>
   );

@@ -12,7 +12,6 @@ import { ReadTime } from '@/components/companion/ReadTime';
 import { WhyThisCard } from '@/components/companion/WhyThisCard';
 import { HistoryThread } from '@/components/companion/HistoryThread';
 import { InterventionCrossRefBadge } from '@/components/companion/InterventionCrossRefBadge';
-import { SaveThisMomentButton } from '@/components/companion/SaveThisMomentButton';
 import { useStaggeredReveal } from '@/components/companion/use-staggered-reveal';
 import { useFullviewTelemetry } from '@/hooks/use-fullview-telemetry';
 import { PageMeta } from '@/components/PageMeta';
@@ -162,12 +161,6 @@ export default function CompanionHistoryPage() {
         )}
         {historyInsight && revealed && (
           <div className="space-y-4 border-t border-border/20 pt-5 animate-in fade-in duration-500">
-            <SaveThisMomentButton
-              seedTitle={historyInsight.title ?? ''}
-              seedContext={historyInsight.btcInsight ?? ''}
-              companion="history"
-              pauseInstanceId={pauseInstanceId}
-            />
             <CompanionFeedback
               pauseInstanceId={pauseInstanceId}
               companionType="history_insight"

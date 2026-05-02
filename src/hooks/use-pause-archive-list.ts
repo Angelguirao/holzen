@@ -8,7 +8,8 @@ export type PauseArchiveSegment = 'pauses' | 'echoes';
 
 export type PauseArchiveListSort = 'newest' | 'oldest' | 'alphabetical';
 
-export type PauseArchiveRow = Database['public']['Views']['v_pause_archive_pauses']['Row'];
+/** Archive list views and collection members both expose `v_pause_full`-shaped rows. */
+export type PauseArchiveRow = Database['public']['Views']['v_pause_full']['Row'];
 
 const PAGE_SIZE = 50;
 
