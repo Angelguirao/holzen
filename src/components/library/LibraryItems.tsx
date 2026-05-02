@@ -10,6 +10,7 @@ import type { useLibrary } from '@/hooks/use-library';
 import type { LibraryItem } from '@/hooks/use-library';
 import { Link } from 'react-router-dom';
 import { Trash2, Archive, Heart, X, CheckSquare, Loader2 } from 'lucide-react';
+import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import { isMainPauseLibraryBookmark } from '@/lib/normalize-library-source-type';
 import type { PauseInstanceArchiveMeta } from '@/lib/archive-segment';
@@ -388,7 +389,18 @@ export function LibraryItems({
             <div className="flex justify-center py-16" role="status" aria-busy="true" aria-label={t('common.loading')}>
               <Loader2 className="h-6 w-6 animate-spin text-muted-foreground/40" />
             </div>
-          ) : listLoadFailed && filtered.length === 0 ? null : filtered.length === 0 ? (
+          ) : listLoadFailed && filtered.length === 0 ? (
+            <div className="flex flex-col items-center gap-4 py-12 px-4 text-center">
+              <p className="text-sm text-muted-foreground max-w-sm leading-relaxed">
+                {t('library.listLoadFailed', {
+                  defaultValue: 'Could not load your library list. Check your connection and try again.',
+                })}
+              </p>
+              <Button type="button" variant="secondary" size="sm" onClick={() => void refetch()}>
+                {t('common.retry', { defaultValue: 'Retry' })}
+              </Button>
+            </div>
+          ) : filtered.length === 0 ? (
             <div className="text-center py-12 space-y-3 px-2">
               <p className="text-sm text-muted-foreground max-w-sm mx-auto leading-relaxed">
                 {emptyStateMessage ??
