@@ -1,5 +1,6 @@
 import { useState, useCallback, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
+import type { Json } from '@/integrations/supabase/types';
 
 const FAVORITES_KEY = 'companion_slot_favorites';
 
@@ -55,7 +56,10 @@ export function useCompanionLibraryFavorites(pauseInstanceId: string | null | un
       const bucket = { ...prevBucket, [sourceType]: newVal };
       meta[FAVORITES_KEY] = bucket;
       setFavorites(bucket);
-      await supabase.from('pause_instances').update({ metadata: meta }).eq('id', pauseInstanceId);
+      await supabase
+        .from('pause_instances')
+        .update({ metadata: meta as unknown as Json })
+        .eq('id', pauseInstanceId);
     },
     [pauseInstanceId],
   );
