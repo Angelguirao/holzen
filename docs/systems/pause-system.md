@@ -16,7 +16,8 @@ For **how reflection and companions are produced** (edge functions, orchestrator
 6. [Pause step payloads](#6-pause-step-payloads)
 7. [The `/pause` session ritual (client)](#7-the-pause-session-ritual-client)
 8. [Views and stats](#8-views-and-stats)
-9. [Related docs and code](#9-related-docs-and-code)
+9. [Library archive: Echoes vs Pauses (semantics)](#9-library-archive-echoes-vs-pauses-semantics)
+10. [Related docs and code](#10-related-docs-and-code)
 
 ---
 
@@ -186,7 +187,27 @@ Stats, badges, and journey surfaces should prefer **`v_pause_full`** + batched s
 
 ---
 
-## 9. Related docs and code
+## 9. Library archive: Echoes vs Pauses (semantics)
+
+The Library **Echoes** tab is **not** a separate database entity. It is a **derived UX segment** over the same **`pause_instances`** row you already have. Keep three ideas separate; mixing them is what feels like “exceptions.”
+
+| Idea | Meaning |
+|------|--------|
+| **`state = completed`** | The ritual closed under template rules (required steps + counting companions + outcome where applicable). **`completed` implies the user reached `engaged`** (Reflect path); see **`pause_instances.engaged_at`**. |
+| **Echoes tab (archive “echo”)** | A **terminal** instance (**`expired`** or **`dismissed`**) that **never opened Reflect**: **`engaged_at` IS NULL**. **`completed` never appears here** by product definition: a finished ritual is a **Pause**, not an archive echo. **`expired_reason = superseded`** (prior row when adopting a pending offer) is **excluded** from Echoes and stays on the **Pauses** tab. |
+| **Retrospective `outcome_logged` on `expired`** | **`pause_log_step`** may still accept an **`outcome_logged`** row after **`expired`** for analytics / copy (see §4 and migration `20260505120000_pause_log_step_expired_outcome_rescue.sql`). That records a choice; it does **not** reclassify the row as **`completed`**. An echo can therefore show **outcome text** in synthetic archive cards without ever having been a full ritual completion. |
+
+**Predicate (canonical):** matches **`isArchiveEchoPause`** in `src/lib/archive-segment.ts` and the **`library_archive_echo_items`** / **`library_archive_pauses_tab_items`** view definitions in `supabase/migrations/` (search those view names). When you change echo vs Pauses rules, update **SQL and TS together** (comments in migrations call this out).
+
+### Why there is usually no separate “echo” table
+
+Echoes are **“this pause ended without Reflect”**, not a second lifecycle. A dedicated **`echoes`** table (or parallel entity) would still need **`pause_instance_id`**, backfill, and guards against **drift** (stored segment disagrees with `state` / `engaged_at`). The existing model already matches the product: **one row per pause**, classified at read time (or, if duplication hurts, **materialize once** at terminal transition, e.g. an **`archive_segment`** enum on **`pause_instances`** written by the same code path that sets **`state`** — still one row, not a new domain object).
+
+**Naming note:** **Zoom Out’s “echo”** slot (past user words on the Reflect card) is unrelated to the **Library Echoes tab**. The latter is archive segmentation; the former is **[pause/past-reflections.md](pause/past-reflections.md)** and companion docs under **`docs/systems/pause/companions/`**.
+
+---
+
+## 10. Related docs and code
 
 | Topic | Where |
 |--------|--------|
@@ -198,5 +219,6 @@ Stats, badges, and journey surfaces should prefer **`v_pause_full`** + batched s
 | Step types and helpers | `src/lib/pause-state.ts` |
 | Ritual UI | `src/pages/PauseSession.tsx`, `src/components/pause/Pause*.tsx` |
 | Swipe gate helper | `src/lib/pause-session-navigation.ts` |
+| Archive Echoes vs Pauses tab | `src/lib/archive-segment.ts`; views **`library_archive_echo_items`**, **`library_archive_pauses_tab_items`** |
 
-When you change **template semantics**, **RPC behavior**, or **ritual ordering**, update **this file** and the **AI pause doc** where overlap exists, then run the repo’s migration / deployment checks per **`docs/ops/deployment-sync-guide.md`**.
+When you change **template semantics**, **RPC behavior**, **ritual ordering**, or **archive echo / Pauses predicates**, update **this file** and the **AI pause doc** where overlap exists, then run the repo’s migration / deployment checks per **`docs/ops/deployment-sync-guide.md`**.
