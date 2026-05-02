@@ -293,7 +293,7 @@ export function ItemDetailViewer({
                     item.source_type === 'zoom_out'
                       ? `/companion/zoom-out/${item.pause_instance_id}`
                       : `/companion/history/${item.pause_instance_id}`;
-                  navigate(path, { state: { from: 'library' } });
+                  navigate(path, { state: { from: 'archive' } });
                   onClose();
                 }}
                 className="inline-flex w-full items-center justify-center gap-2 rounded-lg border border-border/40 bg-muted/20 py-2.5 text-xs font-medium text-foreground/80 transition-colors hover:bg-muted/35"

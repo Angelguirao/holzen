@@ -163,13 +163,13 @@ export function BulkHoldCard() {
   );
 
   const goArchivePauses = useCallback(() => {
-    navigate('/library?seg=pauses');
+    navigate('/archive?seg=pauses');
     setSheetOpen(false);
     resetSheetUi();
   }, [navigate, resetSheetUi]);
 
   const goEchoes = useCallback(() => {
-    navigate('/library?seg=echoes');
+    navigate('/archive?seg=echoes');
     setSheetOpen(false);
     resetSheetUi();
   }, [navigate, resetSheetUi]);

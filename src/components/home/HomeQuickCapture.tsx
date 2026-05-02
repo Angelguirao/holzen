@@ -146,7 +146,7 @@ export function HomeQuickCapture() {
       <div className="space-y-2">
         <div className="flex items-center justify-between gap-2">
           <p className={homeInWidget.kicker}>{t('home.quickCapture.libraryTitle')}</p>
-          <Link to="/library" className="text-[10px] font-mono uppercase tracking-wider text-primary hover:underline">
+          <Link to="/archive" className="text-[10px] font-mono uppercase tracking-wider text-primary hover:underline">
             {t('home.quickCapture.libraryOpen')}
           </Link>
         </div>

@@ -105,7 +105,7 @@ export default function CompanionZoomOutPage() {
 
   const handleBack = useCallback(() => {
     const st = location.state as { from?: string } | undefined;
-    if (st?.from === 'library') navigate('/library');
+    if (st?.from === 'archive') navigate('/archive');
     else navigate(-1);
   }, [location.state, navigate]);
 

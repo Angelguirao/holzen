@@ -37,11 +37,11 @@ The authoritative list of PostHog events Holzen emits. Deliberate events only �
 
 | Event | When | Properties | Owner |
 |---|---|---|---|
-| `navigation.primary_tab_opened` | User taps a **different** primary bottom tab (shell) than the current one | `{ tab: 'home' \| 'library' \| 'tools' \| 'journey' \| 'settings' }` | @holzen |
+| `navigation.primary_tab_opened` | User taps a **different** primary bottom tab (shell) than the current one | `{ tab: 'home' \| 'archive' \| 'tools' \| 'journey' \| 'settings' }` | @holzen |
 
 Does not fire when re-tapping the active tab or when navigation is not from the bottom bar (e.g. deep link, back button).
 
-The Archive tab uses route `/library` and **still reports** `tab: 'library'` in this event (label in UI is “Archive”; property unchanged for funnel continuity).
+The Archive tab uses route `/archive` and reports `tab: 'archive'`.
 
 ### auth
 
