@@ -1,8 +1,8 @@
 import { describe, expect, it } from 'vitest';
 import {
-  computeBlockInsertRank,
   mergeOrderWithDefaults,
   normalizeHomeSectionOrder,
+  normalizeTailMarketPauseAdjacent,
 } from './home-section-order-normalize';
 import { ALL_HOME_SECTION_IDS } from '@/hooks/use-home-optional-visibility';
 import { buildHomeRenderableSegments } from './home-renderable-segments';
@@ -22,17 +22,29 @@ describe('mergeOrderWithDefaults', () => {
   });
 });
 
+describe('normalizeTailMarketPauseAdjacent', () => {
+  it('moves ids between market and your-pause to after the pair', () => {
+    expect(normalizeTailMarketPauseAdjacent(['night', 'market', 'journey-pulse', 'your-pause', 'quick-capture'])).toEqual([
+      'night',
+      'market',
+      'your-pause',
+      'journey-pulse',
+      'quick-capture',
+    ]);
+  });
+});
+
 describe('normalizeHomeSectionOrder', () => {
-  it('defaults to canonical wireframe order', () => {
+  it('defaults to canonical order with goal-why first', () => {
     expect(normalizeHomeSectionOrder([], DEFAULT)).toEqual(DEFAULT);
   });
 
-  it('places goal-why immediately before market and your-pause when journey was between', () => {
+  it('prepends goal-why and pulls sections between market and your-pause after the pair', () => {
     const broken = ['night', 'market', 'journey-pulse', 'your-pause', 'goal-why', 'quick-capture'];
     const out = normalizeHomeSectionOrder(broken, DEFAULT);
     expect(out).toEqual([
-      'night',
       'goal-why',
+      'night',
       'market',
       'your-pause',
       'journey-pulse',
@@ -50,24 +62,34 @@ describe('normalizeHomeSectionOrder', () => {
     expect(normalizeHomeSectionOrder(once, DEFAULT)).toEqual(once);
   });
 
-  it('preserves movable relative order while fixing anchors', () => {
+  it('preserves tail relative order when market and your-pause stay adjacent', () => {
     const out = normalizeHomeSectionOrder(
       ['journey-pulse', 'night', 'quick-capture', 'goal-why', 'market', 'your-pause'],
       DEFAULT,
     );
     expect(out).toEqual([
+      'goal-why',
       'journey-pulse',
       'night',
       'quick-capture',
-      'goal-why',
       'market',
       'your-pause',
     ]);
   });
-});
 
-describe('computeBlockInsertRank', () => {
-  it('counts movables before the earliest anchor', () => {
-    expect(computeBlockInsertRank(DEFAULT)).toBe(1);
+  it('forces goal-why to index 0 even when persisted order had it elsewhere', () => {
+    const out = normalizeHomeSectionOrder(
+      ['night', 'market', 'your-pause', 'goal-why', 'journey-pulse', 'quick-capture'],
+      DEFAULT,
+    );
+    expect(out[0]).toBe('goal-why');
+    expect(out).toEqual([
+      'goal-why',
+      'night',
+      'market',
+      'your-pause',
+      'journey-pulse',
+      'quick-capture',
+    ]);
   });
 });
