@@ -126,7 +126,6 @@ export function BtcStatus({
             </div>
             <div className="flex shrink-0 items-center justify-end gap-1">
               {bitcoinToggleBtn}
-              {eyeToggleBtn}
             </div>
           </div>
         </div>

@@ -151,7 +151,8 @@
     },
     "market": {
       "expandDetails": "Show chart and 24h details",
-      "collapseDetails": "Hide chart and 24h details"
+      "collapseDetails": "Hide chart and 24h details",
+      "chartExpandDisabled": "Chart and 24h details need a visible fiat price (not BTC-only or hidden price)."
     },
     "heroQuote": {
       "lineWithName": "{{name}}, {{line}}",

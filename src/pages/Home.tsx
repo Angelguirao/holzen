@@ -264,15 +264,35 @@ const Home = () => {
     });
   }, []);
 
+  const marketChartExpandBlocked = btcMode || priceHidden;
+
+  useEffect(() => {
+    if (btcMode || priceHidden) {
+      setMarketChartExpanded(false);
+    }
+  }, [btcMode, priceHidden]);
+
   const marketHeaderRight = useMemo(
     () => (
       <button
         type="button"
         onClick={toggleMarketChartExpanded}
-        className={homeInWidget.iconBtn}
-        aria-expanded={marketChartExpanded}
+        disabled={marketChartExpandBlocked}
+        className={cn(homeInWidget.iconBtn, 'disabled:cursor-not-allowed disabled:opacity-40')}
+        aria-expanded={marketChartExpandBlocked ? false : marketChartExpanded}
         aria-label={
-          marketChartExpanded ? t('home.market.collapseDetails') : t('home.market.expandDetails')
+          marketChartExpandBlocked
+            ? t('home.market.chartExpandDisabled')
+            : marketChartExpanded
+              ? t('home.market.collapseDetails')
+              : t('home.market.expandDetails')
+        }
+        title={
+          marketChartExpandBlocked
+            ? t('home.market.chartExpandDisabled')
+            : marketChartExpanded
+              ? t('home.market.collapseDetails')
+              : t('home.market.expandDetails')
         }
       >
         <ChevronDown
@@ -284,7 +304,7 @@ const Home = () => {
         />
       </button>
     ),
-    [marketChartExpanded, toggleMarketChartExpanded, t],
+    [marketChartExpanded, marketChartExpandBlocked, toggleMarketChartExpanded, t],
   );
 
   const goalWhyHeaderRight = useMemo(
