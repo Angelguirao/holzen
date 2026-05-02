@@ -103,7 +103,6 @@
     "today": "Today",
     "regenerateReflectionAria": "Regenerate reflection",
     "regenerateReflectionTitle": "Generate a fresh take for this moment (same cooldown as “Need a moment”)",
-    "editGoalWhy": "Edit goal and why",
     "customize": "Customize",
     "customizeSheet": {
       "title": "Customize your Home",
@@ -118,8 +117,8 @@
       "resetLink": "Reset to defaults",
       "sections": {
         "goalWhy": {
-          "title": "Goal & why",
-          "desc": "Hold goal, mantra, and motivations in one summary card."
+          "title": "Why you stay",
+          "desc": "Hold goal headline on Home; expand for details, mantra, and motivations. Edit your goal and mantra in Settings."
         },
         "market": {
           "title": "Market",
@@ -144,9 +143,8 @@
       }
     },
     "goalWhy": {
-      "goalTag": "[GOAL]",
-      "collapseWhyAria": "Collapse why you hold",
-      "expandWhyAria": "Expand why you hold"
+      "expandHoldDetails": "Show hold goal details and why you stay",
+      "collapseHoldDetails": "Hide hold goal details and why you stay"
     },
     "statTiles": {
       "holzenScore": "Holzen score",
@@ -191,7 +189,7 @@
     "widget": {
       "market": "Market",
       "goal": "Goal",
-      "goalWhy": "Goal & why",
+      "whyYouStay": "Why you stay",
       "yourPause": "Your pause",
       "reflection": "Pause",
       "quickCapture": "Quick capture",

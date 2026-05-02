@@ -24,13 +24,12 @@ import {
   ALL_HOME_SECTION_IDS,
   JOURNEY_STAT_TILES_VISIBILITY_ID,
 } from '@/hooks/use-home-optional-visibility';
-import { settingsSectionPath } from '@/lib/app-routes';
 import { useCallback, useEffect, useState, useMemo, useRef, type ReactNode } from 'react';
-import { Link, useOutletContext, useSearchParams, useNavigate, useLocation } from 'react-router-dom';
+import { useOutletContext, useSearchParams, useNavigate, useLocation } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/use-auth';
 import { toast } from 'sonner';
-import { AlertCircle, ChevronDown, Loader2, Pin, Pencil, Sparkles, RefreshCw } from 'lucide-react';
+import { AlertCircle, ChevronDown, Loader2, Pin, Sparkles, RefreshCw } from 'lucide-react';
 import { AutoCooldownIndicator, NeedAMomentButton } from '@/components/home/HomePauseChrome';
 import { homeInWidget } from '@/components/home/home-widget-styles';
 import { cn } from '@/lib/utils';
@@ -192,6 +191,7 @@ const Home = () => {
   const prefersReducedMotion = useReducedMotion();
   const [completedPauseCount, setCompletedPauseCount] = useState(0);
   const [marketChartExpanded, setMarketChartExpanded] = useState(false);
+  const [goalWhyExpanded, setGoalWhyExpanded] = useState(false);
   const [customizeOpen, setCustomizeOpen] = useState(false);
   const heroQuoteViewTracked = useRef(false);
 
@@ -253,7 +253,7 @@ const Home = () => {
   const homeCustomizeSectionTitle = useCallback(
     (id: string) => {
       const titles: Record<string, string> = {
-        'goal-why': t('home.customizeSheet.sections.goalWhy.title'),
+        'goal-why': t('home.widget.whyYouStay'),
         market: t('home.customizeSheet.sections.market.title'),
         'your-pause': t('home.customizeSheet.sections.yourPause.title'),
         'quick-capture': t('home.customizeSheet.sections.quickCapture.title'),
@@ -298,6 +298,14 @@ const Home = () => {
     });
   }, []);
 
+  const toggleGoalWhyExpanded = useCallback(() => {
+    setGoalWhyExpanded((prev) => {
+      const next = !prev;
+      trackEvent('home.goal_why_expand_toggled', { expanded: next });
+      return next;
+    });
+  }, []);
+
   const marketHeaderRight = useMemo(
     () => (
       <button
@@ -319,6 +327,29 @@ const Home = () => {
       </button>
     ),
     [marketChartExpanded, toggleMarketChartExpanded, t],
+  );
+
+  const goalWhyHeaderRight = useMemo(
+    () => (
+      <button
+        type="button"
+        onClick={toggleGoalWhyExpanded}
+        className={homeInWidget.iconBtn}
+        aria-expanded={goalWhyExpanded}
+        aria-label={
+          goalWhyExpanded ? t('home.goalWhy.collapseHoldDetails') : t('home.goalWhy.expandHoldDetails')
+        }
+      >
+        <ChevronDown
+          className={cn(
+            'h-4 w-4 text-secondary-foreground transition-transform duration-200',
+            !goalWhyExpanded && '-rotate-90',
+          )}
+          aria-hidden
+        />
+      </button>
+    ),
+    [goalWhyExpanded, toggleGoalWhyExpanded, t],
   );
 
   useEffect(() => {
@@ -823,19 +854,8 @@ const Home = () => {
     switch (sectionId) {
       case 'goal-why':
         return (
-          <HomeSectionCard
-            title={t('home.widget.goalWhy')}
-            headerRight={
-              <Link
-                to={settingsSectionPath('you')}
-                className="inline-flex h-9 w-9 items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-muted/50 hover:text-foreground"
-                aria-label={t('home.editGoalWhy')}
-              >
-                <Pencil className="h-4 w-4" aria-hidden />
-              </Link>
-            }
-          >
-            <HomeGoalWhyCard currentPrice={btcData?.currentPrice} />
+          <HomeSectionCard title={t('home.widget.whyYouStay')} headerRight={goalWhyHeaderRight}>
+            <HomeGoalWhyCard currentPrice={btcData?.currentPrice} detailsExpanded={goalWhyExpanded} />
           </HomeSectionCard>
         );
 

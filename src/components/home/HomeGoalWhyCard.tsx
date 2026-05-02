@@ -1,21 +1,25 @@
-import { useMemo, useState } from 'react';
+import { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { AnimatePresence, motion, useReducedMotion } from 'framer-motion';
-import { ChevronDown } from 'lucide-react';
 import { HoldGoalWidget } from '@/components/HoldGoalWidget';
 import { useHolzen } from '@/hooks/use-holzen';
 import { homeInWidget } from '@/components/home/home-widget-styles';
 import { cn } from '@/lib/utils';
 
 /**
- * Home-only composed “Goal & why” block: wireframe-style goal row + optional mantra
- * and motivations as a middle-dot line (not chips). Chevron collapses the why block only.
+ * Home “Why you stay” block: wireframe hold row + mantra / motivations when the section is expanded.
+ * Section chevron lives on `HomeSectionCard` (same pattern as Market).
  */
-export function HomeGoalWhyCard({ currentPrice }: { currentPrice?: number }) {
+export function HomeGoalWhyCard({
+  currentPrice,
+  detailsExpanded,
+}: {
+  currentPrice?: number;
+  detailsExpanded: boolean;
+}) {
   const { t } = useTranslation();
   const { motivations, mantra } = useHolzen();
   const prefersReduced = useReducedMotion();
-  const [whyExpanded, setWhyExpanded] = useState(true);
 
   const motivationLine = useMemo(
     () => motivations.map((m) => t(`settings.motivations.${m}`, m)).join(' \u00B7 '),
@@ -30,26 +34,11 @@ export function HomeGoalWhyCard({ currentPrice }: { currentPrice?: number }) {
       <HoldGoalWidget
         currentPrice={currentPrice}
         variant="wireframe"
-        wireframeAccessoryRight={
-          hasWhy ? (
-            <button
-              type="button"
-              className={cn(homeInWidget.iconBtn, 'text-muted-foreground/50')}
-              aria-expanded={whyExpanded}
-              aria-label={whyExpanded ? t('home.goalWhy.collapseWhyAria') : t('home.goalWhy.expandWhyAria')}
-              onClick={() => setWhyExpanded((v) => !v)}
-            >
-              <ChevronDown
-                className={cn('h-4 w-4 text-secondary-foreground transition-transform', !whyExpanded && '-rotate-90')}
-                aria-hidden
-              />
-            </button>
-          ) : null
-        }
+        wireframeDetailsExpanded={detailsExpanded}
       />
 
       <AnimatePresence initial={false}>
-        {hasWhy && whyExpanded ? (
+        {detailsExpanded && hasWhy ? (
           <motion.div
             key="goal-why-body"
             initial={prefersReduced ? false : { height: 0, opacity: 0 }}
@@ -58,7 +47,6 @@ export function HomeGoalWhyCard({ currentPrice }: { currentPrice?: number }) {
             transition={{ duration: 0.22, ease: 'easeInOut' }}
             className="overflow-hidden"
           >
-            {/* Wireframe kit: mantra + motivations stack with gap only (no rule). */}
             <div className="space-y-2 pt-3">
               {mantraTrim ? (
                 <p className="text-base font-medium leading-6 tracking-wide text-foreground">
@@ -66,7 +54,7 @@ export function HomeGoalWhyCard({ currentPrice }: { currentPrice?: number }) {
                 </p>
               ) : null}
               {motivationLine ? (
-                <p className="text-xs font-medium italic leading-4 tracking-wide text-muted-foreground">
+                <p className={cn(homeInWidget.metaFaint, 'font-medium italic tracking-wide')}>
                   {motivationLine}
                 </p>
               ) : null}
