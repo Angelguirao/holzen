@@ -10,7 +10,6 @@ import { CompanionFocusLayout } from '@/components/companion/CompanionFocusLayou
 import { SignalFullView } from '@/components/companion/SignalFullView';
 import { HistoryThread } from '@/components/companion/HistoryThread';
 import { InterventionCrossRefBadge } from '@/components/companion/InterventionCrossRefBadge';
-import { SaveThisMomentButton } from '@/components/companion/SaveThisMomentButton';
 import { useStaggeredReveal } from '@/components/companion/use-staggered-reveal';
 import { useFullviewTelemetry } from '@/hooks/use-fullview-telemetry';
 import { PageMeta } from '@/components/PageMeta';
@@ -161,12 +160,6 @@ export default function CompanionSignalPage() {
 
         {signal && revealed && (
           <div className="space-y-4 border-t border-border/20 pt-5 animate-in fade-in duration-500">
-            <SaveThisMomentButton
-              seedTitle={signal.title}
-              seedContext={signal.body}
-              companion="signal"
-              pauseInstanceId={pauseInstanceId}
-            />
             <CompanionFeedback
               pauseInstanceId={pauseInstanceId}
               companionType="signal"

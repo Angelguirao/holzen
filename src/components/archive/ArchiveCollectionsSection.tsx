@@ -6,8 +6,8 @@ type Props = {
 };
 
 /**
- * Collections use `library_items` + `collection_items`. Isolated in a child so the
- * Archive shell can use pause-instance lists for Pauses/Echoes without mixing hooks.
+ * Collections tab: `useLibrary` loads `collection_items` + `v_pause_full` rows for members.
+ * Pause lists use `usePauseArchiveList` (`v_pause_archive_*`).
  */
 export function ArchiveCollectionsSection({ listSort }: Props) {
   const library = useLibrary({ listSort });

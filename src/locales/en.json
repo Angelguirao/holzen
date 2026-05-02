@@ -205,10 +205,10 @@
       "noScore": "Complete a pause to unlock your journey pulse."
     },
     "quickCapture": {
-      "libraryTitle": "Library",
+      "recentPauseTitle": "Recent pause",
+      "recentPauseBlurb": "Your pauses live in Archive.",
       "libraryOpen": "Open",
-      "libraryEmpty": "Nothing saved yet — pauses and moments you keep show up here.",
-      "libraryUntitled": "Saved item",
+      "libraryEmpty": "No pauses yet — complete a pause to see it here.",
       "checkinTitle": "Quick check-in",
       "checkinPlaceholder": "Optional note (what matters right now)",
       "checkinSave": "Log",

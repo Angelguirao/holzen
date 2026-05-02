@@ -48,24 +48,22 @@ GRANT SELECT ON public.<view_name> TO authenticated;
 
 ## Known landmines in this repo
 
-These migrations *did* successfully apply once on the live DB (likely
-because the prior view didn't exist yet at the time, or was dropped via
-another path), but they would **fail on a fresh `supabase db reset`**:
+1. **`20260329000001_fix_admin_generation_and_cache_hit_views.sql`** — was
+   historically an unsafe `CREATE OR REPLACE VIEW` on
+   `v_companion_cache_hit_rate` (column reorder vs
+   `20260320205315_view_v_companion_cache_hit_rate.sql`). **Patched in-repo**
+   to `DROP VIEW IF EXISTS` + `CREATE VIEW … WITH (security_barrier = true)`
+   + re-`GRANT` for `service_role`.
 
-1. `20260329000001_fix_admin_generation_and_cache_hit_views.sql`
-   — redefines `v_companion_cache_hit_rate` with a different column
-   order than `20260320205315_view_v_companion_cache_hit_rate.sql`.
+2. **`20260418120000_companion_serves_allow_library_source.sql`** — inserts
+   `library_hits` mid-list. **This one already failed on sync** and was
+   repaired in production via a corrective migration on 2026-04-18 that
+   uses `DROP VIEW IF EXISTS`.
 
-2. `20260418120000_companion_serves_allow_library_source.sql`
-   — inserts `library_hits` mid-list. **This one already failed on
-   sync** and was repaired in production via a corrective migration on
-   2026-04-18 that uses `DROP VIEW IF EXISTS`.
-
-If you ever need to rebuild the database from scratch (CI, local
-`supabase db reset`, restoring to a fresh project), patch these two
-migrations to use `DROP VIEW IF EXISTS … CREATE VIEW …` first. They
-cannot be patched in place from the Lovable agent because
-`supabase/migrations/` is read-only there.
+If you add a new migration that changes a view’s column list in a non-append-only
+way, use `DROP VIEW IF EXISTS … CREATE VIEW …` (and re-apply `ALTER VIEW` /
+`GRANT`s) from the start. Lovable’s migration runner cannot edit
+`supabase/migrations/` in place for you — fix belongs in Git.
 
 ## Pre-push checklist
 
