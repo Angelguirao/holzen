@@ -45,8 +45,6 @@ import { trackEvent } from '@/lib/posthog';
 import { heroQuoteIndexForDay, utcYmd } from '@/lib/home-hero-quote';
 import { parsePauseContextForHomePreview } from '@/lib/pause-context-home-preview';
 import { type PauseSessionLocationState } from '@/lib/router-location-state';
-import { buildHomeRenderableSegments } from '@/lib/home-renderable-segments';
-
 interface PinnedPausePreview {
   id: string;
   message: string;
@@ -180,19 +178,10 @@ const Home = () => {
     [order, sectionVisible, subscribed, nightReflection],
   );
 
-  const homeSegments = useMemo(
-    () => buildHomeRenderableSegments(visibleOrderedSectionIds),
+  /** Tail inside "Today" — `goal-why` is pinned first in layout order and rendered above Today. */
+  const todaySectionIds = useMemo(
+    () => visibleOrderedSectionIds.filter((id) => id !== 'goal-why'),
     [visibleOrderedSectionIds],
-  );
-
-  const hasTodaySegment = useMemo(
-    () => homeSegments.some((s) => s.type === 'todayBlock'),
-    [homeSegments],
-  );
-
-  const firstTodaySegmentIndex = useMemo(
-    () => homeSegments.findIndex((s) => s.type === 'todayBlock'),
-    [homeSegments],
   );
 
   const showJourneyStatTiles = !!sectionVisible[JOURNEY_STAT_TILES_VISIBILITY_ID];
@@ -896,6 +885,8 @@ const Home = () => {
     }
   };
 
+  const goalWhyBlock = visibleOrderedSectionIds.includes('goal-why') ? renderHomeSection('goal-why') : null;
+
   return (
     <div {...pullHandlers} className="space-y-6">
       <HomeHeroQuote userId={user?.id} firstName={firstName} />
@@ -917,7 +908,7 @@ const Home = () => {
       )}
 
       <div className="space-y-4">
-        {!hasTodaySegment ? (
+        {todaySectionIds.length === 0 ? (
           <div className="flex justify-end">
             <button
               type="button"
@@ -928,60 +919,38 @@ const Home = () => {
             </button>
           </div>
         ) : null}
-        {homeSegments.map((seg, segIdx) => {
-          if (seg.type === 'plain') {
-            if (seg.id === JOURNEY_STAT_TILES_VISIBILITY_ID) {
-              if (!showJourneyStatTiles) return null;
-              return (
-                <div key={`${seg.type}-${seg.id}-${segIdx}`}>
-                  <HomeStatTiles />
-                </div>
-              );
-            }
-            const node = renderHomeSection(seg.id);
-            if (node == null) return null;
-            return (
-              <div key={`${seg.type}-${seg.id}-${segIdx}`}>{node}</div>
-            );
-          }
-          return (
-            <section
-              key={`today-${segIdx}`}
-              aria-labelledby={`home-today-heading-${segIdx}`}
-              className="space-y-3"
-            >
-              <div className="flex items-center justify-between gap-3">
-                <h2 id={`home-today-heading-${segIdx}`} className="text-base font-medium text-foreground">
-                  {t('home.today')}
-                </h2>
-                {firstTodaySegmentIndex === segIdx ? (
-                  <button
-                    type="button"
-                    onClick={() => handleCustomizeOpenChange(true)}
-                    className="shrink-0 text-sm font-medium text-primary underline underline-offset-4"
-                  >
-                    {t('home.customize')}
-                  </button>
-                ) : null}
-              </div>
-              <div className="space-y-4">
-                {seg.ids.map((sectionId) => {
-                  if (sectionId === JOURNEY_STAT_TILES_VISIBILITY_ID) {
-                    if (!showJourneyStatTiles) return null;
-                    return (
-                      <div key={sectionId}>
-                        <HomeStatTiles />
-                      </div>
-                    );
-                  }
-                  const node = renderHomeSection(sectionId);
-                  if (node == null) return null;
-                  return <div key={sectionId}>{node}</div>;
-                })}
-              </div>
-            </section>
-          );
-        })}
+        {goalWhyBlock ? <div key="goal-why">{goalWhyBlock}</div> : null}
+        {todaySectionIds.length > 0 ? (
+          <section aria-labelledby="home-today-heading" className="space-y-3">
+            <div className="flex items-center justify-between gap-3">
+              <h2 id="home-today-heading" className="text-base font-medium text-foreground">
+                {t('home.today')}
+              </h2>
+              <button
+                type="button"
+                onClick={() => handleCustomizeOpenChange(true)}
+                className="shrink-0 text-sm font-medium text-primary underline underline-offset-4"
+              >
+                {t('home.customize')}
+              </button>
+            </div>
+            <div className="space-y-4">
+              {todaySectionIds.map((sectionId) => {
+                if (sectionId === JOURNEY_STAT_TILES_VISIBILITY_ID) {
+                  if (!showJourneyStatTiles) return null;
+                  return (
+                    <div key={sectionId}>
+                      <HomeStatTiles />
+                    </div>
+                  );
+                }
+                const node = renderHomeSection(sectionId);
+                if (node == null) return null;
+                return <div key={sectionId}>{node}</div>;
+              })}
+            </div>
+          </section>
+        ) : null}
       </div>
 
       <HomeCustomizeSheet

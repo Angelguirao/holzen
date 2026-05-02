@@ -11,9 +11,8 @@ export type HomeSectionIdWithoutVisibilityToggle =
   (typeof HOME_SECTION_IDS_WITHOUT_VISIBILITY_TOGGLE)[number];
 
 /**
- * Default Home section order (Hold mode + Customize). "Why you stay" is always first;
- * remaining sections reorder in Customize (DnD). `normalizeHomeSectionOrder` merges defaults,
- * pins `goal-why` first, and keeps `market` / `your-pause` adjacent in the tail.
+ * Default Home section order (Hold mode + Customize). `goal-why` is pinned first; the rest
+ * reorder in Customize (DnD). `normalizeHomeSectionOrder` merges defaults and keeps tail order.
  * `journey-pulse` is the Holzen score / In motion row (`HomeStatTiles`).
  */
 export const ALL_HOME_SECTION_IDS = [
