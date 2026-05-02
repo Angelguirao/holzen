@@ -1,15 +1,15 @@
-import { useState, useEffect, useMemo, useRef, useCallback } from 'react';
+import { useState, useMemo, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/use-auth';
+import { useBulkHoldPending } from '@/hooks/use-bulk-hold-pending';
 import { useTranslation } from 'react-i18next';
-import type { TFunction } from 'i18next';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ChevronDown, ChevronRight, Folder, Inbox, List, Sparkles, X } from 'lucide-react';
+import { ChevronRight, Folder, List, X } from 'lucide-react';
 import { hapticFeedback } from '@/lib/haptics';
+import { applyBulkHoldOutcomes } from '@/lib/apply-bulk-hold-outcomes';
+import { groupBulkHoldByLocalDay, type BulkHoldOutcomeChoice, type BulkHoldPendingPause } from '@/lib/bulk-hold';
 import { Button } from '@/components/ui/button';
 import { homeInWidget } from '@/components/home/home-widget-styles';
-import { pauseLogStep } from '@/lib/pause-api';
 import {
   Sheet,
   SheetContent,
@@ -17,171 +17,49 @@ import {
   SheetHeader,
   SheetTitle,
 } from '@/components/ui/sheet';
-import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
-import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
+import { BulkHoldReviewBody } from '@/components/bulk-hold/BulkHoldReviewBody';
+import { BulkHoldSuccessBody } from '@/components/bulk-hold/BulkHoldSuccessBody';
 import { cn } from '@/lib/utils';
-
-interface PendingPause {
-  id: string;
-  created_at: string;
-  context_snapshot: Record<string, unknown> | null;
-}
+import { useLatestRef } from '@/hooks/use-latest-ref';
 
 type SheetMode = 'prompt' | 'review' | 'success';
-type OutcomeChoice = 'held' | 'bought' | 'sold';
-
-function localDayKey(iso: string): string {
-  const d = new Date(iso);
-  const y = d.getFullYear();
-  const m = String(d.getMonth() + 1).padStart(2, '0');
-  const day = String(d.getDate()).padStart(2, '0');
-  return `${y}-${m}-${day}`;
-}
-
-function formatDaySectionLabel(iso: string, language: string, t: TFunction): string {
-  const d = new Date(iso);
-  const today = new Date();
-  if (
-    d.getFullYear() === today.getFullYear() &&
-    d.getMonth() === today.getMonth() &&
-    d.getDate() === today.getDate()
-  ) {
-    return t('bulkHold.sectionToday', { defaultValue: 'Today' });
-  }
-  return d.toLocaleDateString(language, { day: '2-digit', month: '2-digit', year: '2-digit' });
-}
-
-function groupByLocalDay(items: PendingPause[], language: string, t: TFunction): { label: string; items: PendingPause[] }[] {
-  const map = new Map<string, PendingPause[]>();
-  for (const p of items) {
-    const key = localDayKey(p.created_at);
-    if (!map.has(key)) map.set(key, []);
-    map.get(key)!.push(p);
-  }
-  const keys = [...map.keys()].sort((a, b) => (a < b ? 1 : a > b ? -1 : 0));
-  return keys.map((key) => {
-    const list = map.get(key)!;
-    const first = list[0];
-    return { label: formatDaySectionLabel(first.created_at, language, t), items: list };
-  });
-}
-
-function parseChange24hPct(snapshot: Record<string, unknown> | null | undefined): number | null {
-  if (!snapshot) return null;
-  const v = snapshot.change_24h_pct;
-  if (typeof v === 'number' && Number.isFinite(v)) return v;
-  if (typeof v === 'string') {
-    const n = parseFloat(v);
-    return Number.isFinite(n) ? n : null;
-  }
-  return null;
-}
-
-function contextQuote(snapshot: Record<string, unknown> | null | undefined, max = 80): string | null {
-  const text = snapshot && typeof snapshot.context_text === 'string' ? snapshot.context_text.trim() : '';
-  if (!text) return null;
-  const ellip = text.length > max ? `${text.slice(0, max - 1)}…` : text;
-  return `“${ellip}”`;
-}
-
-function formatLocalTime(iso: string, language: string): string {
-  return new Date(iso).toLocaleTimeString(language, { hour: '2-digit', minute: '2-digit' });
-}
 
 /**
- * Shows when the user has >=2 expired pause_instances that never received
- * an outcome. Tapping "Hold all" logs `outcome_logged` with `{ outcome: 'held' }`
- * on each via the RPC; the DB engine leaves those instances terminal
- * (expired is final) but the events still inform stats' retrospective
- * outcome inference.
- *
- * Requires DB support: `pause_log_step` must accept `outcome_logged` on
- * `expired` rows (see migration `20260505120000_pause_log_step_expired_outcome_rescue.sql`).
+ * Home surface for ≥2 expired pauses without `outcome_logged`. See `docs/systems/pause-system.md`
+ * and migration `20260505120000_pause_log_step_expired_outcome_rescue.sql`.
  */
 export function BulkHoldCard() {
   const { user } = useAuth();
   const { t, i18n } = useTranslation();
   const navigate = useNavigate();
-  const [pending, setPending] = useState<PendingPause[]>([]);
+
   const [dismissed, setDismissed] = useState(false);
   const [sheetOpen, setSheetOpen] = useState(false);
   const [sheetMode, setSheetMode] = useState<SheetMode>('prompt');
   const [heldCount, setHeldCount] = useState(0);
   const [loading, setLoading] = useState(false);
-  const [draftOutcomes, setDraftOutcomes] = useState<Record<string, OutcomeChoice>>({});
+  const [draftOutcomes, setDraftOutcomes] = useState<Record<string, BulkHoldOutcomeChoice>>({});
   const [applyError, setApplyError] = useState<string | null>(null);
   const [refetchNonce, setRefetchNonce] = useState(0);
 
-  const pendingRef = useRef(pending);
-  const draftRef = useRef(draftOutcomes);
-  const sheetModeRef = useRef(sheetMode);
-  const loadingRef = useRef(loading);
+  const fetchEnabled = Boolean(user) && !dismissed && sheetMode !== 'success';
+  const { pending, setPending } = useBulkHoldPending({
+    userId: user?.id,
+    fetchEnabled,
+    refetchNonce,
+  });
 
-  useEffect(() => {
-    pendingRef.current = pending;
-  }, [pending]);
-  useEffect(() => {
-    draftRef.current = draftOutcomes;
-  }, [draftOutcomes]);
-  useEffect(() => {
-    sheetModeRef.current = sheetMode;
-  }, [sheetMode]);
-  useEffect(() => {
-    loadingRef.current = loading;
-  }, [loading]);
+  const sheetModeRef = useLatestRef(sheetMode);
+  const loadingRef = useLatestRef(loading);
+  const pendingRef = useLatestRef(pending);
+  const draftRef = useLatestRef(draftOutcomes);
 
   const groupedReview = useMemo(
-    () => groupByLocalDay(pending, i18n.language, t),
+    () => groupBulkHoldByLocalDay(pending, i18n.language, t),
     [pending, i18n.language, t],
   );
 
   const hasAnyDraft = Object.keys(draftOutcomes).length > 0;
-
-  const loadPending = useCallback(async () => {
-    if (!user) return;
-    if (sheetModeRef.current === 'success') {
-      return;
-    }
-    const windowStart = new Date(Date.now() - 14 * 24 * 60 * 60 * 1000).toISOString();
-    const { data } = await supabase
-      .from('pause_instances' as never)
-      .select('id, created_at, context_snapshot')
-      .eq('user_id', user.id)
-      .eq('state', 'expired')
-      .gte('created_at', windowStart)
-      .order('created_at', { ascending: false })
-      .limit(50);
-    const rows = (data ?? []) as PendingPause[];
-    if (rows.length < 2) {
-      setPending([]);
-      return;
-    }
-
-    const { data: outcomes } = await supabase
-      .from('pause_step_events' as never)
-      .select('pause_instance_id')
-      .eq('user_id', user.id)
-      .eq('step_type', 'outcome_logged')
-      .in(
-        'pause_instance_id',
-        rows.map((r) => r.id),
-      );
-    const withOutcome = new Set(
-      ((outcomes ?? []) as Array<{ pause_instance_id: string }>).map((o) => o.pause_instance_id),
-    );
-    setPending(
-      rows
-        .filter((r) => !withOutcome.has(r.id))
-        .map((r) => ({
-          ...r,
-          context_snapshot: (r as { context_snapshot?: Record<string, unknown> | null }).context_snapshot ?? null,
-        })),
-    );
-  }, [user]);
-
-  useEffect(() => {
-    void loadPending();
-  }, [user, refetchNonce, loadPending]);
 
   const resetSheetUi = useCallback(() => {
     setSheetMode('prompt');
@@ -190,153 +68,141 @@ export function BulkHoldCard() {
     setApplyError(null);
   }, []);
 
-  /**
-   * Logs outcome_logged per row. On full success clears pending and shows the success step in-sheet.
-   * On partial failure keeps remaining rows and surfaces applyError.
-   */
-  const applyOutcomesAndFinish = async (resolver: (p: PendingPause) => OutcomeChoice) => {
-    const rows = [...pendingRef.current];
-    if (!user || rows.length === 0) return;
-    setLoading(true);
-    setApplyError(null);
-    hapticFeedback('medium');
+  const applyOutcomesAndFinish = useCallback(
+    async (resolver: (p: BulkHoldPendingPause) => BulkHoldOutcomeChoice) => {
+      const rows = [...pendingRef.current];
+      if (!user || rows.length === 0) return;
 
-    const settled = await Promise.allSettled(
-      rows.map((p) =>
-        pauseLogStep({
-          instanceId: p.id,
-          stepType: 'outcome_logged',
-          payload: { outcome: resolver(p) },
-        }),
-      ),
-    );
+      setLoading(true);
+      setApplyError(null);
+      hapticFeedback('medium');
 
-    const failedRows: PendingPause[] = [];
-    settled.forEach((r, i) => {
-      if (r.status === 'rejected') {
-        failedRows.push(rows[i]);
+      const result = await applyBulkHoldOutcomes(rows, resolver);
+
+      if (result.status === 'failed') {
+        hapticFeedback('error');
+        setApplyError(t('bulkHold.applyFailed'));
+        setRefetchNonce((n) => n + 1);
+        setLoading(false);
         return;
       }
-      if (r.value === null || r.value === undefined) {
-        failedRows.push(rows[i]);
+
+      if (result.status === 'partial') {
+        hapticFeedback('error');
+        setPending(result.failedRows);
+        setDraftOutcomes((prev) => {
+          const next: Record<string, BulkHoldOutcomeChoice> = {};
+          for (const p of result.failedRows) {
+            if (prev[p.id]) next[p.id] = prev[p.id];
+          }
+          return next;
+        });
+        setApplyError(t('bulkHold.applyPartialFailed', { count: result.failedRows.length }));
+        setLoading(false);
+        return;
       }
-    });
 
-    if (failedRows.length === rows.length) {
-      hapticFeedback('error');
-      setApplyError(t('bulkHold.applyFailed'));
-      setRefetchNonce((n) => n + 1);
+      hapticFeedback('success');
+      setHeldCount(result.count);
+      setPending([]);
+      setDraftOutcomes({});
+      setApplyError(null);
+      setSheetMode('success');
       setLoading(false);
-      return;
-    }
+    },
+    [user, t, setPending, pendingRef],
+  );
 
-    if (failedRows.length > 0) {
-      hapticFeedback('error');
-      setPending(failedRows);
-      setDraftOutcomes((prev) => {
-        const next: Record<string, OutcomeChoice> = {};
-        for (const p of failedRows) {
-          if (prev[p.id]) next[p.id] = prev[p.id];
-        }
-        return next;
-      });
-      setApplyError(t('bulkHold.applyPartialFailed', { count: failedRows.length }));
-      setLoading(false);
-      return;
-    }
+  const handleSheetOpenChange = useCallback(
+    (open: boolean) => {
+      if (open) {
+        setSheetOpen(true);
+        return;
+      }
+      if (loadingRef.current) return;
 
-    hapticFeedback('success');
-    setHeldCount(rows.length);
-    setPending([]);
-    setDraftOutcomes({});
-    setApplyError(null);
-    setSheetMode('success');
-    setLoading(false);
-  };
+      const drafts = draftRef.current;
+      const pend = pendingRef.current;
+      const draftKeys = Object.keys(drafts);
 
-  const handleSheetOpenChange = (open: boolean) => {
-    if (open) {
-      setSheetOpen(true);
-      return;
-    }
+      if (sheetModeRef.current === 'review' && pend.length > 0 && draftKeys.length > 0) {
+        void (async () => {
+          setApplyError(null);
+          await applyOutcomesAndFinish((p) => drafts[p.id] ?? 'held');
+        })();
+        return;
+      }
 
-    if (loadingRef.current) {
-      return;
-    }
+      setSheetOpen(false);
+      resetSheetUi();
+    },
+    [applyOutcomesAndFinish, resetSheetUi, draftRef, loadingRef, pendingRef, sheetModeRef],
+  );
 
-    const mode = sheetModeRef.current;
-    const drafts = draftRef.current;
-    const pend = pendingRef.current;
-    const draftKeys = Object.keys(drafts);
+  const handleHoldAll = useCallback(() => applyOutcomesAndFinish(() => 'held'), [applyOutcomesAndFinish]);
 
-    if (mode === 'review' && pend.length > 0 && draftKeys.length > 0) {
-      void (async () => {
-        setApplyError(null);
-        await applyOutcomesAndFinish((p) => drafts[p.id] ?? 'held');
-      })();
-      return;
-    }
-
-    setSheetOpen(false);
-    resetSheetUi();
-  };
-
-  const handleHoldAll = () => applyOutcomesAndFinish(() => 'held');
-
-  const handleReviewHeldAll = () => {
+  const handleReviewHeldAll = useCallback(() => {
     setDraftOutcomes({});
     return applyOutcomesAndFinish(() => 'held');
-  };
+  }, [applyOutcomesAndFinish]);
 
-  const handleReviewHeldRest = () => applyOutcomesAndFinish((p) => draftRef.current[p.id] ?? 'held');
+  const handleReviewHeldRest = useCallback(
+    () => applyOutcomesAndFinish((p) => draftRef.current[p.id] ?? 'held'),
+    [applyOutcomesAndFinish, draftRef],
+  );
 
-  const handleDismissTeaser = (e: React.MouseEvent) => {
-    e.stopPropagation();
-    setDismissed(true);
-    setPending([]);
-    setSheetOpen(false);
-    resetSheetUi();
-  };
+  const handleDismissTeaser = useCallback(
+    (e: React.MouseEvent) => {
+      e.stopPropagation();
+      setDismissed(true);
+      setPending([]);
+      setSheetOpen(false);
+      resetSheetUi();
+    },
+    [resetSheetUi, setPending],
+  );
 
-  const goArchivePauses = () => {
+  const goArchivePauses = useCallback(() => {
     navigate('/library?seg=pauses');
     setSheetOpen(false);
     resetSheetUi();
-  };
+  }, [navigate, resetSheetUi]);
 
-  const goEchoes = () => {
+  const goEchoes = useCallback(() => {
     navigate('/library?seg=echoes');
     setSheetOpen(false);
     resetSheetUi();
-    setHeldCount(0);
-  };
+  }, [navigate, resetSheetUi]);
 
-  const doneAfterSuccess = () => {
+  const doneAfterSuccess = useCallback(() => {
     setSheetOpen(false);
     resetSheetUi();
-    setHeldCount(0);
-  };
+  }, [resetSheetUi]);
 
-  const enterReview = () => {
+  const enterReview = useCallback(() => {
     hapticFeedback('light');
     setApplyError(null);
     setDraftOutcomes({});
     setSheetMode('review');
-  };
+  }, []);
 
-  const exitReviewToPrompt = () => {
+  const exitReviewToPrompt = useCallback(() => {
     hapticFeedback('light');
     setSheetMode('prompt');
     setDraftOutcomes({});
     setApplyError(null);
-  };
+  }, []);
 
-  const handleDoneInReview = () => {
-    if (hasAnyDraft) {
+  const handleDoneInReview = useCallback(() => {
+    if (Object.keys(draftRef.current).length > 0) {
       return applyOutcomesAndFinish((p) => draftRef.current[p.id] ?? 'held');
     }
     exitReviewToPrompt();
-  };
+  }, [applyOutcomesAndFinish, exitReviewToPrompt, draftRef]);
+
+  const onOutcomeChange = useCallback((pauseId: string, outcome: BulkHoldOutcomeChoice) => {
+    setDraftOutcomes((prev) => ({ ...prev, [pauseId]: outcome }));
+  }, []);
 
   if (dismissed || (pending.length < 2 && !sheetOpen)) return null;
 
@@ -450,159 +316,14 @@ export function BulkHoldCard() {
             ) : null}
             <AnimatePresence mode="wait">
               {sheetMode === 'success' ? (
-                <motion.div
-                  key="success"
-                  initial={{ opacity: 0, y: 6 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -6 }}
-                  className="space-y-5 pt-2"
-                >
-                  <div className="flex justify-center">
-                    <div className="flex h-14 w-14 items-center justify-center rounded-full bg-primary/10">
-                      <Sparkles className="h-7 w-7 text-primary" aria-hidden />
-                    </div>
-                  </div>
-                  <div className="space-y-1 text-center">
-                    <p className="text-sm font-semibold text-foreground">
-                      {t('bulkHold.successChosen', { defaultValue: 'You chose deliberately' })}
-                    </p>
-                    <p className="text-sm text-muted-foreground">
-                      {t('bulkHold.successHeldLine', {
-                        count: heldCount,
-                        defaultValue: 'Held through {{count}} pauses',
-                      })}
-                    </p>
-                    <p className="text-sm font-medium text-primary">
-                      {t('bulkHold.successConviction', {
-                        count: heldCount,
-                        defaultValue: '+{{count}} conviction',
-                      })}
-                    </p>
-                  </div>
-                  <div className={cn(homeInWidget.inset, 'space-y-3')}>
-                    <div className="flex items-start gap-2">
-                      <Inbox className="mt-0.5 h-4 w-4 shrink-0 text-muted-foreground" aria-hidden />
-                      <div className="min-w-0 flex-1 space-y-0.5">
-                        <p className="text-sm font-medium text-foreground">
-                          {t('bulkHold.echoesCardTitle', { defaultValue: 'Echoes' })}
-                        </p>
-                        <p className={homeInWidget.metaFaint}>
-                          {t('bulkHold.echoesCardBody', {
-                            defaultValue: 'Revisit reflections and artifacts from these pauses in Echoes.',
-                          })}
-                        </p>
-                      </div>
-                    </div>
-                    <Button
-                      type="button"
-                      variant="outline"
-                      className="h-10 w-full justify-between rounded-xl border-primary/25 font-medium text-foreground"
-                      onClick={() => {
-                        hapticFeedback('light');
-                        goEchoes();
-                      }}
-                    >
-                      {t('bulkHold.viewEchoes', { defaultValue: 'View Echoes' })}
-                      <ChevronRight className="h-4 w-4 shrink-0 text-muted-foreground" aria-hidden />
-                    </Button>
-                  </div>
-                </motion.div>
+                <BulkHoldSuccessBody heldCount={heldCount} onViewEchoes={goEchoes} />
               ) : sheetMode === 'review' ? (
-                <motion.div
-                  key="review"
-                  initial={{ opacity: 0, y: 6 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -6 }}
-                  className="space-y-6 pt-2"
-                >
-                  {groupedReview.map((section) => (
-                    <div key={section.label} className="space-y-3">
-                      <p className="text-base font-medium text-foreground">{section.label}</p>
-                      <div className="flex flex-col gap-4">
-                        {section.items.map((p) => {
-                          const snap = p.context_snapshot;
-                          const pct = parseChange24hPct(snap);
-                          const quote = contextQuote(snap);
-                          const timeLine = formatLocalTime(p.created_at, i18n.language);
-                          return (
-                            <Collapsible key={p.id} defaultOpen className="group rounded-lg border-2 border-border/60 bg-muted/25">
-                              <CollapsibleTrigger className="flex w-full items-center justify-between gap-2 px-4 py-3 text-left">
-                                <div className="min-w-0 text-base font-medium tabular-nums text-muted-foreground">
-                                  <span className="text-foreground">{timeLine}</span>
-                                  {pct != null ? (
-                                    <>
-                                      <span className="mx-1.5 text-muted-foreground/50">·</span>
-                                      <span>BTC </span>
-                                      <span className={cn(pct >= 0 ? 'text-emerald-600' : 'text-red-600')}>
-                                        {pct >= 0 ? '+' : ''}
-                                        {pct.toFixed(1)}%
-                                      </span>
-                                    </>
-                                  ) : null}
-                                </div>
-                                <ChevronDown
-                                  className="h-5 w-5 shrink-0 text-muted-foreground transition-transform duration-200 group-data-[state=open]:rotate-180"
-                                  aria-hidden
-                                />
-                              </CollapsibleTrigger>
-                              <CollapsibleContent>
-                                <div className="space-y-3 border-t border-border/40 px-4 pb-4 pt-2">
-                                  {quote ? (
-                                    <p className="text-sm font-medium italic leading-snug text-foreground">{quote}</p>
-                                  ) : (
-                                    <p className="text-sm text-muted-foreground">
-                                      {t('bulkHold.reviewNoContext', { defaultValue: 'No reflection line was saved for this pause.' })}
-                                    </p>
-                                  )}
-                                  <RadioGroup
-                                    className="flex flex-row flex-wrap gap-x-4 gap-y-2"
-                                    value={draftOutcomes[p.id]}
-                                    onValueChange={(v) => {
-                                      setDraftOutcomes((prev) => ({
-                                        ...prev,
-                                        [p.id]: v as OutcomeChoice,
-                                      }));
-                                    }}
-                                    aria-label={t('bulkHold.outcomeGroupAria')}
-                                  >
-                                    <label
-                                      htmlFor={`${p.id}-held`}
-                                      className="flex cursor-pointer items-center gap-2 rounded-md py-1 pr-2 text-sm font-medium text-foreground"
-                                    >
-                                      <RadioGroupItem value="held" id={`${p.id}-held`} className="border-muted-foreground/50" />
-                                      {t('bulkHold.outcomeHeld', { defaultValue: 'I held' })}
-                                    </label>
-                                    <label
-                                      htmlFor={`${p.id}-bought`}
-                                      className="flex cursor-pointer items-center gap-2 rounded-md py-1 pr-2 text-sm font-medium text-foreground"
-                                    >
-                                      <RadioGroupItem value="bought" id={`${p.id}-bought`} className="border-muted-foreground/50" />
-                                      {t('bulkHold.outcomeBought', { defaultValue: 'I bought' })}
-                                    </label>
-                                    <label
-                                      htmlFor={`${p.id}-sold`}
-                                      className="flex cursor-pointer items-center gap-2 rounded-md py-1 pr-2 text-sm font-medium text-foreground"
-                                    >
-                                      <RadioGroupItem value="sold" id={`${p.id}-sold`} className="border-muted-foreground/50" />
-                                      {t('bulkHold.outcomeSold', { defaultValue: 'I sold' })}
-                                    </label>
-                                  </RadioGroup>
-                                </div>
-                              </CollapsibleContent>
-                            </Collapsible>
-                          );
-                        })}
-                      </div>
-                    </div>
-                  ))}
-                  <button
-                    type="button"
-                    onClick={goArchivePauses}
-                    className="text-xs font-medium text-primary underline underline-offset-4"
-                  >
-                    {t('bulkHold.openArchiveFullDetail', { defaultValue: 'Open Archive for full detail' })}
-                  </button>
-                </motion.div>
+                <BulkHoldReviewBody
+                  sections={groupedReview}
+                  draftOutcomes={draftOutcomes}
+                  onOutcomeChange={onOutcomeChange}
+                  onOpenArchive={goArchivePauses}
+                />
               ) : null}
             </AnimatePresence>
           </div>
