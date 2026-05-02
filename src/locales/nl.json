@@ -394,7 +394,7 @@
   "btcStatus": {
     "unableToFetch": "Prijsgegevens konden niet worden opgehaald",
     "checkConnection": "Controleer je verbinding en probeer opnieuw",
-    "exitBtcMode": "1 BTC = 1 BTC modus verlaten",
+    "exitBtcMode": "Terug naar prijs in {{currency}}",
     "enterBtcMode": "1 BTC = 1 BTC modus inschakelen",
     "show": "Tonen",
     "hide": "Verbergen",
