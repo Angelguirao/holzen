@@ -2782,6 +2782,7 @@ export type Database = {
           expired: number | null
           expired_context_lost: number | null
           expired_ineligible: number | null
+          expired_open_max_age: number | null
           expired_superseded: number | null
           expired_system_cancelled: number | null
           expired_window_elapsed: number | null
@@ -2934,6 +2935,7 @@ export type Database = {
         Args: { _collection_id: string; _user_id: string }
         Returns: boolean
       }
+      pause_adopt_pending_offer: { Args: never; Returns: Json }
       pause_create_or_reuse: {
         Args: {
           p_context_fingerprint: string
@@ -2955,8 +2957,13 @@ export type Database = {
         }
         Returns: Json
       }
+      pause_decline_pending_offer: { Args: never; Returns: Json }
       pause_dismiss: {
         Args: { p_instance_id: string; p_reason?: string }
+        Returns: Database["public"]["Enums"]["pause_state"]
+      }
+      pause_dismiss_current: {
+        Args: never
         Returns: Database["public"]["Enums"]["pause_state"]
       }
       pause_evaluate_transitions: {
@@ -3009,7 +3016,14 @@ export type Database = {
         | "superseded"
         | "ineligible_user_state"
         | "system_cancelled"
-      pause_state: "active" | "engaged" | "completed" | "dismissed" | "expired"
+        | "open_max_age"
+      pause_state:
+        | "active"
+        | "engaged"
+        | "completed"
+        | "dismissed"
+        | "expired"
+        | "pending"
       pause_step_type:
         | "breath_completed"
         | "initial_emotion_logged"
@@ -3153,8 +3167,16 @@ export const Constants = {
         "superseded",
         "ineligible_user_state",
         "system_cancelled",
+        "open_max_age",
       ],
-      pause_state: ["active", "engaged", "completed", "dismissed", "expired"],
+      pause_state: [
+        "active",
+        "engaged",
+        "completed",
+        "dismissed",
+        "expired",
+        "pending",
+      ],
       pause_step_type: [
         "breath_completed",
         "initial_emotion_logged",

@@ -338,7 +338,8 @@ export function useLibrary(options?: UseLibraryOptions) {
     const itemsPromise = usesArchiveRpcList
       ? supabase.rpc('library_archive_list_page', rpcPayload)
       : (() => {
-          let itemsQuery = supabase.from(libraryItemsTable).select('*').eq('user_id', user.id);
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          let itemsQuery: any = (supabase as any).from(libraryItemsTable).select('*').eq('user_id', user.id);
           if (favoritesOnly) itemsQuery = itemsQuery.eq('is_favorite', true);
           if (listSort === 'alphabetical') {
             itemsQuery = itemsQuery
@@ -434,7 +435,8 @@ export function useLibrary(options?: UseLibraryOptions) {
     const { data, error } = usesArchiveRpcList
       ? await supabase.rpc('library_archive_list_page', rpcPayload)
       : await (() => {
-          let moreQuery = supabase.from(libraryItemsTable).select('*').eq('user_id', user.id);
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          let moreQuery: any = (supabase as any).from(libraryItemsTable).select('*').eq('user_id', user.id);
           if (favoritesOnly) moreQuery = moreQuery.eq('is_favorite', true);
           if (listSort === 'alphabetical') {
             moreQuery = moreQuery

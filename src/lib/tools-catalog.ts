@@ -1,6 +1,7 @@
 import type { LucideIcon } from 'lucide-react';
 import { Wind, Leaf, Mail, Waves, PenLine, Activity, RotateCcw } from 'lucide-react';
 import { TOOLS } from '@/lib/app-routes';
+import type { ProFeature } from '@/lib/pricing';
 export type ToolCatalogId =
   | 'letters'
   | 'breathe'
