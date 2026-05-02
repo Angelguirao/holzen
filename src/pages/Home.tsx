@@ -160,6 +160,7 @@ const Home = () => {
   const [completedPauseCount, setCompletedPauseCount] = useState(0);
   const [marketChartExpanded, setMarketChartExpanded] = useState(false);
   const [goalWhyExpanded, setGoalWhyExpanded] = useState(false);
+  const [goalWhyHoldHeadline, setGoalWhyHoldHeadline] = useState<string | null>(null);
   const [customizeOpen, setCustomizeOpen] = useState(false);
   const heroQuoteViewTracked = useRef(false);
 
@@ -260,6 +261,10 @@ const Home = () => {
       trackEvent('home.goal_why_expand_toggled', { expanded: next });
       return next;
     });
+  }, []);
+
+  const onGoalWhyHoldHeadlineChange = useCallback((headline: string | null) => {
+    setGoalWhyHoldHeadline(headline);
   }, []);
 
   const marketHeaderRight = useMemo(
@@ -810,8 +815,17 @@ const Home = () => {
     switch (sectionId) {
       case 'goal-why':
         return (
-          <HomeSectionCard title={t('home.widget.whyYouStay')} headerRight={goalWhyHeaderRight}>
-            <HomeGoalWhyCard currentPrice={btcData?.currentPrice} detailsExpanded={goalWhyExpanded} />
+          <HomeSectionCard
+            className="rounded-lg"
+            title={t('home.widget.whyYouStay')}
+            headerSubtitle={goalWhyHoldHeadline ?? undefined}
+            headerRight={goalWhyHeaderRight}
+          >
+            <HomeGoalWhyCard
+              currentPrice={btcData?.currentPrice}
+              detailsExpanded={goalWhyExpanded}
+              onHoldGoalCompactHeadlineChange={onGoalWhyHoldHeadlineChange}
+            />
           </HomeSectionCard>
         );
 
