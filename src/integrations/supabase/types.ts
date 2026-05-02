@@ -2782,6 +2782,7 @@ export type Database = {
           expired: number | null
           expired_context_lost: number | null
           expired_ineligible: number | null
+          expired_open_max_age: number | null
           expired_superseded: number | null
           expired_system_cancelled: number | null
           expired_window_elapsed: number | null
