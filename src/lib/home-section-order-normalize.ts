@@ -1,23 +1,17 @@
 /**
  * Home section order normalization (Customize sheet + persisted layout).
  *
- * **Rule (wireframe):** `goal-why` sits immediately before the Today pair. The pair
- * `market` → `your-pause` must stay consecutive so `buildHomeRenderableSegments` can emit
- * a single `todayBlock`. Nothing (including `journey-pulse`) may sit between `market` and
- * `your-pause`, or between `goal-why` and `market`.
+ * **Pinned head:** `goal-why` ("Why you stay") is always index 0 — not part of the DnD pool.
  *
- * **Algorithm:** Take merged full layout order, find the minimum index among the three
- * anchor ids, count how many *movable* ids appear before that index — that is the insert
- * rank for the contiguous block `[goal-why, market, your-pause]`. Movable ids preserve
- * their relative order from the merged list; the anchor block is spliced at `rank`.
+ * **Tail (everything after `goal-why`):** `night`, `market`, `your-pause`, `journey-pulse`,
+ * `quick-capture` may reorder freely, except `market` and `your-pause` must stay adjacent so
+ * `buildHomeRenderableSegments` can emit one `todayBlock` when both are visible. If any
+ * other id sits between them, those in-between ids are moved to immediately after the pair,
+ * preserving their relative order (and preserving whether `market` or `your-pause` comes
+ * first in the pair, as in the merged tail).
  */
 
-export const HOME_LAYOUT_BLOCK_TRIPLE = ['goal-why', 'market', 'your-pause'] as const;
-
-/** Sections the user may reorder in Customize (Hold mode); anchors stay fixed as a group. */
-export const HOME_MOVABLE_SECTION_IDS = ['night', 'journey-pulse', 'quick-capture'] as const;
-
-const MOVABLE_SET = new Set<string>(HOME_MOVABLE_SECTION_IDS);
+export const GOAL_WHY_SECTION_ID = 'goal-why' as const;
 
 export function mergeOrderWithDefaults(parsed: string[], defaultOrder: readonly string[]): string[] {
   const merged = parsed.filter((id) => defaultOrder.includes(id));
@@ -25,20 +19,22 @@ export function mergeOrderWithDefaults(parsed: string[], defaultOrder: readonly 
   return [...merged, ...missing];
 }
 
-/** How many movable sections appear before the earliest anchor (`goal-why`|`market`|`your-pause`). */
-export function computeBlockInsertRank(ordered: string[]): number {
-  const indices: number[] = [];
-  for (const id of HOME_LAYOUT_BLOCK_TRIPLE) {
-    const i = ordered.indexOf(id);
-    if (i >= 0) indices.push(i);
-  }
-  if (indices.length === 0) return 0;
-  const minIdx = Math.min(...indices);
-  let rank = 0;
-  for (let i = 0; i < minIdx; i++) {
-    if (MOVABLE_SET.has(ordered[i])) rank++;
-  }
-  return rank;
+/**
+ * Ensures `market` and `your-pause` are consecutive in the tail. Any sections strictly
+ * between them are relocated after the pair; relative order of those displaced ids is kept.
+ */
+export function normalizeTailMarketPauseAdjacent(tail: string[]): string[] {
+  const iM = tail.indexOf('market');
+  const iY = tail.indexOf('your-pause');
+  if (iM < 0 || iY < 0) return [...tail];
+  const lo = Math.min(iM, iY);
+  const hi = Math.max(iM, iY);
+  if (hi - lo <= 1) return [...tail];
+  const between = tail.slice(lo + 1, hi);
+  const pair: [string, string] = [tail[lo], tail[hi]];
+  const before = tail.slice(0, lo);
+  const after = tail.slice(hi + 1);
+  return [...before, ...pair, ...between, ...after];
 }
 
 export function normalizeHomeSectionOrder(
@@ -46,8 +42,11 @@ export function normalizeHomeSectionOrder(
   defaultOrder: readonly string[],
 ): string[] {
   const merged = mergeOrderWithDefaults([...input], defaultOrder);
-  const onlyMovables = merged.filter((id) => MOVABLE_SET.has(id));
-  const rank = computeBlockInsertRank(merged);
-  const block = [...HOME_LAYOUT_BLOCK_TRIPLE];
-  return [...onlyMovables.slice(0, rank), ...block, ...onlyMovables.slice(rank)];
+  const tailDefault = defaultOrder.filter((id) => id !== GOAL_WHY_SECTION_ID);
+  const tailMerged = mergeOrderWithDefaults(
+    merged.filter((id) => id !== GOAL_WHY_SECTION_ID),
+    tailDefault,
+  );
+  const tailNorm = normalizeTailMarketPauseAdjacent(tailMerged);
+  return [GOAL_WHY_SECTION_ID, ...tailNorm];
 }

@@ -186,6 +186,13 @@ const Home = () => {
 
   const showJourneyStatTiles = !!sectionVisible[JOURNEY_STAT_TILES_VISIBILITY_ID];
 
+  const showHomeStatTilesAtTopOfToday = useCallback(
+    (todayIds: readonly string[]) =>
+      todayIds.length > 0 &&
+      (showJourneyStatTiles || todayIds.includes('market') || todayIds.includes('your-pause')),
+    [showJourneyStatTiles],
+  );
+
   const handleSetSectionVisible = useCallback(
     (id: string, value: boolean) => {
       if (isHomeSectionAlwaysVisibleInLayout(id)) return;
@@ -934,6 +941,7 @@ const Home = () => {
               <div key={`${seg.type}-${seg.id}-${segIdx}`}>{node}</div>
             );
           }
+          const tilesAtTop = showHomeStatTilesAtTopOfToday(seg.ids);
           return (
             <section
               key={`today-${segIdx}`}
@@ -944,7 +952,23 @@ const Home = () => {
                 {t('home.today')}
               </h2>
               <div className="space-y-4">
-                {seg.ids.map((sectionId) => {
+                {tilesAtTop ? (
+                  <div key={`today-stat-tiles-${segIdx}`}>
+                    <HomeStatTiles />
+                  </div>
+                ) : null}
+                {(tilesAtTop
+                  ? seg.ids.filter((id) => id !== JOURNEY_STAT_TILES_VISIBILITY_ID)
+                  : seg.ids
+                ).map((sectionId) => {
+                  if (sectionId === JOURNEY_STAT_TILES_VISIBILITY_ID) {
+                    if (!showJourneyStatTiles) return null;
+                    return (
+                      <div key={sectionId}>
+                        <HomeStatTiles />
+                      </div>
+                    );
+                  }
                   const node = renderHomeSection(sectionId);
                   if (node == null) return null;
                   return <div key={sectionId}>{node}</div>;

@@ -6,8 +6,8 @@ export type HomeRenderableSegment =
 
 /**
  * When Market and Your pause are **consecutive** in the saved order, group them under "Today".
- * `journey-pulse` and other ids break adjacency, so a Today shell is not formed until those two
- * are next to each other again.
+ * Other ids (including `goal-why` and `journey-pulse`) are plain segments unless they sit in a
+ * contiguous run with only those two ids — normalization keeps `market` and `your-pause` adjacent.
  */
 export function buildHomeRenderableSegments(orderedIds: string[]): HomeRenderableSegment[] {
   const todayInOrder = orderedIds.filter((id) => HOME_TODAY_SECTION_IDS.has(id));

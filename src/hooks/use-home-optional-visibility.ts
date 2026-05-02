@@ -11,13 +11,14 @@ export type HomeSectionIdWithoutVisibilityToggle =
   (typeof HOME_SECTION_IDS_WITHOUT_VISIBILITY_TOGGLE)[number];
 
 /**
- * Default draggable Home section order (Hold mode + Customize).
- * Wireframe baseline: Night → Goal & Why → Market → Your pause → Journey pulse → Quick capture.
- * `journey-pulse` is the Holzen score / In motion row (`HomeStatTiles`); order is persisted like other sections.
+ * Default Home section order (Hold mode + Customize). "Why you stay" is always first;
+ * remaining sections reorder in Customize (DnD). `normalizeHomeSectionOrder` merges defaults,
+ * pins `goal-why` first, and keeps `market` / `your-pause` adjacent in the tail.
+ * `journey-pulse` is the Holzen score / In motion row (`HomeStatTiles`).
  */
 export const ALL_HOME_SECTION_IDS = [
-  'night',
   'goal-why',
+  'night',
   'market',
   'your-pause',
   'journey-pulse',
