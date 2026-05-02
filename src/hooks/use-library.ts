@@ -142,6 +142,16 @@ function buildRpcFilterKey(f?: LibraryArchiveRpcFilters): string {
   });
 }
 
+/** When false, `library_archive_*` views do not match `library_archive_list_page` (filters / main row mode). */
+function archiveListSupportsPlainViewFallback(f: LibraryArchiveRpcFilters): boolean {
+  if ((f.search?.trim() ?? '') !== '') return false;
+  if ((f.tag?.trim() ?? '') !== '') return false;
+  if (f.sourceTypes.length > 0) return false;
+  if (f.smartIds.length > 0) return false;
+  if (f.mainPauseBookmarkOnly) return false;
+  return true;
+}
+
 function readCache<T>(key: string): T | null {
   try {
     const raw = localStorage.getItem(key);
@@ -307,6 +317,29 @@ export function useLibrary(options?: UseLibraryOptions) {
     });
   }, []);
 
+  /** One page from the active PostgREST relation (`library_items` or archive views). */
+  const fetchItemsPageFromTable = useCallback(
+    async (offset: number) => {
+      if (!user) {
+        return { data: null, error: { message: 'no user' } as { message: string } };
+      }
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      let itemsQuery: any = (supabase as any).from(libraryItemsTable).select('*').eq('user_id', user.id);
+      if (favoritesOnly) itemsQuery = itemsQuery.eq('is_favorite', true);
+      if (listSort === 'alphabetical') {
+        itemsQuery = itemsQuery
+          .order('pinned', { ascending: false })
+          .order('title', { ascending: true, nullsFirst: false });
+      } else if (listSort === 'oldest') {
+        itemsQuery = itemsQuery.order('pinned', { ascending: false }).order('created_at', { ascending: true });
+      } else {
+        itemsQuery = itemsQuery.order('pinned', { ascending: false }).order('created_at', { ascending: false });
+      }
+      return itemsQuery.range(offset, offset + PAGE_SIZE - 1);
+    },
+    [user, libraryItemsTable, favoritesOnly, listSort],
+  );
+
   const fetchAll = useCallback(async () => {
     if (!user) {
       setLoading(false);
@@ -315,8 +348,16 @@ export function useLibrary(options?: UseLibraryOptions) {
     }
     // Swap list to this mode’s cache immediately so Pauses/Favs never briefly shows the wrong query’s rows.
     const cached = readCache<LibraryItem[]>(itemsCacheKey) ?? [];
-    setItems(cached);
-    setLoading(cached.length === 0);
+    if (usesArchiveRpcList) {
+      // RPC only ever returns one page; showing a multi-page cache then replacing it caused a visible
+      // shrink and “missing” rows until the user scrolled load-more again.
+      const optimistic = cached.length > PAGE_SIZE ? cached.slice(0, PAGE_SIZE) : cached;
+      setItems(optimistic);
+      setLoading(optimistic.length === 0);
+    } else {
+      setItems(cached);
+      setLoading(cached.length === 0);
+    }
 
     const searchTrim = rpcFilters.search?.trim() ?? '';
     const tagTrim = rpcFilters.tag?.trim() ?? '';
@@ -335,23 +376,15 @@ export function useLibrary(options?: UseLibraryOptions) {
       p_offset: 0,
     } satisfies Database['public']['Functions']['library_archive_list_page']['Args'];
 
-    const itemsPromise = usesArchiveRpcList
-      ? supabase.rpc('library_archive_list_page', rpcPayload)
-      : (() => {
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          let itemsQuery: any = (supabase as any).from(libraryItemsTable).select('*').eq('user_id', user.id);
-          if (favoritesOnly) itemsQuery = itemsQuery.eq('is_favorite', true);
-          if (listSort === 'alphabetical') {
-            itemsQuery = itemsQuery
-              .order('pinned', { ascending: false })
-              .order('title', { ascending: true, nullsFirst: false });
-          } else if (listSort === 'oldest') {
-            itemsQuery = itemsQuery.order('pinned', { ascending: false }).order('created_at', { ascending: true });
-          } else {
-            itemsQuery = itemsQuery.order('pinned', { ascending: false }).order('created_at', { ascending: false });
-          }
-          return itemsQuery.range(0, PAGE_SIZE - 1);
-        })();
+    const itemsPromise = (async () => {
+      if (usesArchiveRpcList) {
+        const rpcRes = await supabase.rpc('library_archive_list_page', rpcPayload);
+        if (!rpcRes.error) return rpcRes;
+        if (archiveListSupportsPlainViewFallback(rpcFilters)) return fetchItemsPageFromTable(0);
+        return rpcRes;
+      }
+      return fetchItemsPageFromTable(0);
+    })();
 
     const [rItems, rCols, rColItems] = await Promise.all([
       itemsPromise,
@@ -408,6 +441,7 @@ export function useLibrary(options?: UseLibraryOptions) {
     usesArchiveRpcList,
     archiveListKind,
     rpcFilters,
+    fetchItemsPageFromTable,
   ]);
 
   const loadMore = useCallback(async () => {
@@ -433,22 +467,13 @@ export function useLibrary(options?: UseLibraryOptions) {
     } satisfies Database['public']['Functions']['library_archive_list_page']['Args'];
 
     const { data, error } = usesArchiveRpcList
-      ? await supabase.rpc('library_archive_list_page', rpcPayload)
-      : await (() => {
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          let moreQuery: any = (supabase as any).from(libraryItemsTable).select('*').eq('user_id', user.id);
-          if (favoritesOnly) moreQuery = moreQuery.eq('is_favorite', true);
-          if (listSort === 'alphabetical') {
-            moreQuery = moreQuery
-              .order('pinned', { ascending: false })
-              .order('title', { ascending: true, nullsFirst: false });
-          } else if (listSort === 'oldest') {
-            moreQuery = moreQuery.order('pinned', { ascending: false }).order('created_at', { ascending: true });
-          } else {
-            moreQuery = moreQuery.order('pinned', { ascending: false }).order('created_at', { ascending: false });
-          }
-          return moreQuery.range(offset, offset + PAGE_SIZE - 1);
-        })();
+      ? await (async () => {
+          const rpcRes = await supabase.rpc('library_archive_list_page', rpcPayload);
+          if (!rpcRes.error) return rpcRes;
+          if (archiveListSupportsPlainViewFallback(rpcFilters)) return fetchItemsPageFromTable(offset);
+          return rpcRes;
+        })()
+      : await fetchItemsPageFromTable(offset);
     if (error) {
       toast.error(t('library.loadMoreFailed'));
       setHasMore(false);
@@ -481,6 +506,7 @@ export function useLibrary(options?: UseLibraryOptions) {
     usesArchiveRpcList,
     archiveListKind,
     rpcFilters,
+    fetchItemsPageFromTable,
   ]);
 
   useEffect(() => { fetchAll(); }, [fetchAll]);
