@@ -476,7 +476,7 @@ export function HoldGoalWidget({
         <div className="flex gap-3">
           <InfinityIcon className="h-6 w-6 shrink-0 text-muted-foreground" aria-hidden />
           <div className="min-w-0 flex-1 space-y-2">
-            {headline ? (
+            {headline && !wireCompact ? (
               <p className="text-[13px] font-medium leading-snug text-foreground">{headline}</p>
             ) : null}
             {!wireCompact ? (
@@ -539,7 +539,7 @@ export function HoldGoalWidget({
         <div className="flex gap-3">
           <Target className="h-6 w-6 shrink-0 text-muted-foreground" aria-hidden />
           <div className="min-w-0 flex-1 space-y-2">
-            {headline ? (
+            {headline && !wireCompact ? (
               <p className="text-[13px] font-medium leading-snug text-foreground">{headline}</p>
             ) : null}
             {!wireCompact ? (
@@ -623,7 +623,7 @@ export function HoldGoalWidget({
         <div className="flex gap-3">
           <Coins className="h-6 w-6 shrink-0 text-muted-foreground" aria-hidden />
           <div className="min-w-0 flex-1 space-y-2">
-            {headline ? (
+            {headline && !wireCompact ? (
               <p className="text-[13px] font-medium leading-snug text-foreground">{headline}</p>
             ) : null}
             {!wireCompact ? (
