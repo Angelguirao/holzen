@@ -1,4 +1,4 @@
-import { Eye, EyeOff, WifiOff, Bitcoin, Clock, ChevronDown } from 'lucide-react';
+import { Eye, EyeOff, WifiOff, Bitcoin, CircleDollarSign, Clock, ChevronDown } from 'lucide-react';
 import { BtcChartLazyGate } from '@/components/BtcChartLazyGate';
 import { Skeleton } from '@/components/ui/skeleton';
 import { formatBtcPrice, type BtcPriceData } from '@/lib/btc';
@@ -36,35 +36,42 @@ export function BtcStatus({
   const { t } = useTranslation();
   const toggle = onToggleHidden;
 
-  const bitcoinToggleBtn = onToggleBtcMode ? (
-    <button
-      type="button"
-      onClick={onToggleBtcMode}
-      className={cn(
-        homeInWidget.iconBtn,
-        btcMode ? 'text-primary/60 hover:text-primary' : 'text-muted-foreground/40 hover:text-primary',
-      )}
-      aria-label={btcMode ? t('btcStatus.exitBtcMode') : t('btcStatus.enterBtcMode')}
-      title={btcMode ? t('btcStatus.exitBtcMode') : t('btcStatus.enterBtcMode')}
-    >
-      <Bitcoin className="h-3.5 w-3.5 text-secondary-foreground" aria-hidden />
-    </button>
-  ) : null;
+  const fiatLabelCurrency = (data?.currency ?? currency).toUpperCase();
+
+  /** Fiat row only — hidden price + “1 BTC” mode would be incoherent. */
+  const enterBtcToolbarBtn =
+    onToggleBtcMode && !btcMode && !hidden ? (
+      <button
+        type="button"
+        onClick={onToggleBtcMode}
+        className={cn(homeInWidget.iconBtn, 'text-muted-foreground/40 hover:text-primary')}
+        aria-label={t('btcStatus.enterBtcMode')}
+        title={t('btcStatus.enterBtcMode')}
+      >
+        <Bitcoin className="h-3.5 w-3.5 text-secondary-foreground" aria-hidden />
+      </button>
+    ) : null;
+
+  /** BTC / BTC row — always offer a way back to fiat quote. */
+  const exitBtcToolbarBtn =
+    onToggleBtcMode && btcMode ? (
+      <button
+        type="button"
+        onClick={onToggleBtcMode}
+        className={cn(homeInWidget.iconBtn, 'text-primary/60 hover:text-primary')}
+        aria-label={t('btcStatus.exitBtcMode', { currency: fiatLabelCurrency })}
+        title={t('btcStatus.exitBtcMode', { currency: fiatLabelCurrency })}
+      >
+        <CircleDollarSign className="h-3.5 w-3.5 text-secondary-foreground" aria-hidden />
+      </button>
+    ) : null;
 
   const eyeToggleBtn = (
     <button
       type="button"
       onClick={toggle}
       className={homeInWidget.iconBtn}
-      aria-label={
-        btcMode
-          ? hidden
-            ? t('btcStatus.show')
-            : t('btcStatus.hide')
-          : hidden
-            ? t('btcStatus.showPrice')
-            : t('btcStatus.hidePrice')
-      }
+      aria-label={hidden ? t('btcStatus.showPrice') : t('btcStatus.hidePrice')}
     >
       {hidden ? (
         <EyeOff className="h-3.5 w-3.5 text-secondary-foreground" aria-hidden />
@@ -125,7 +132,7 @@ export function BtcStatus({
               )}
             </div>
             <div className="flex shrink-0 items-center justify-end gap-1">
-              {bitcoinToggleBtn}
+              {exitBtcToolbarBtn}
             </div>
           </div>
         </div>
@@ -172,7 +179,7 @@ export function BtcStatus({
 
   const priceRowToolbar = (
     <div className="flex shrink-0 items-center justify-end gap-1">
-      {bitcoinToggleBtn}
+      {enterBtcToolbarBtn}
       {eyeToggleBtn}
       {chartChevronToggle}
     </div>

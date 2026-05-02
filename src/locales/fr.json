@@ -393,7 +393,7 @@
   "btcStatus": {
     "unableToFetch": "Impossible de récupérer le prix",
     "checkConnection": "Vérifie ta connexion et réessaie",
-    "exitBtcMode": "Quitter le mode 1 BTC = 1 BTC",
+    "exitBtcMode": "Retour au cours en {{currency}}",
     "enterBtcMode": "Entrer en mode 1 BTC = 1 BTC",
     "show": "Afficher",
     "hide": "Masquer",

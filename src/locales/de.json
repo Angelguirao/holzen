@@ -393,7 +393,7 @@
   "btcStatus": {
     "unableToFetch": "Preisdaten konnten nicht abgerufen werden",
     "checkConnection": "Überprüfe deine Verbindung und versuche es erneut",
-    "exitBtcMode": "1 BTC = 1 BTC Modus verlassen",
+    "exitBtcMode": "Zurück zur {{currency}}-Kursansicht",
     "enterBtcMode": "1 BTC = 1 BTC Modus aktivieren",
     "show": "Anzeigen",
     "hide": "Verbergen",

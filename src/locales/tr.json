@@ -394,7 +394,7 @@
   "btcStatus": {
     "unableToFetch": "Fiyat verileri alınamadı",
     "checkConnection": "Bağlantınızı kontrol edin ve tekrar deneyin",
-    "exitBtcMode": "1 BTC = 1 BTC modundan çık",
+    "exitBtcMode": "{{currency}} fiyat görünümüne dön",
     "enterBtcMode": "1 BTC = 1 BTC moduna gir",
     "show": "Göster",
     "hide": "Gizle",

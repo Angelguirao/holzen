@@ -661,7 +661,7 @@
   "btcStatus": {
     "unableToFetch": "Unable to fetch price data",
     "checkConnection": "Check your connection and try again",
-    "exitBtcMode": "Exit 1 BTC = 1 BTC mode",
+    "exitBtcMode": "Back to {{currency}} price view",
     "enterBtcMode": "Enter 1 BTC = 1 BTC mode",
     "show": "Show",
     "hide": "Hide",
