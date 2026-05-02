@@ -106,7 +106,7 @@
     "customize": "Customize",
     "customizeSheet": {
       "title": "Customize your Home",
-      "description": "Decide what appears on Home and in what order—so your first screen matches how you want to show up today.",
+      "description": "Shape what you see first and how it is ordered—so Home meets you where you are and supports the mindset you want to carry into the rest of the app.",
       "resetLayout": "Reset layout & widgets",
       "modeHeading": "Mode",
       "holdModeTitle": "Hold mode",
@@ -118,33 +118,33 @@
       "sections": {
         "goalWhy": {
           "title": "Why you stay",
-          "desc": "Your reason for holding, right where you’ll see it—expand for mantra and the motivations behind your goal. Edit details anytime in Settings."
+          "desc": "Surfaces your motivations and a compact hold-goal snapshot on Home. Personal mantra for breathing lives under Settings → You, not here."
         },
         "market": {
           "title": "Market",
-          "desc": "Bitcoin price context when you want it—stay oriented without opening another app or tab."
+          "desc": "Optional wider-world context on the same screen when you want it—so you can stay oriented without leaving your flow."
         },
         "yourPause": {
           "title": "Your pause",
-          "desc": "Your reflection, limits, and a one-tap way to start a pause—an anchor when the chart gets loud."
+          "desc": "Brings your pause practice into view on Home—so regulation and boundaries stay within reach when intensity rises."
         },
         "journeyPulse": {
           "title": "Journey pulse",
-          "desc": "Your Holzen score and what’s in motion at a glance—so you feel progress without opening full stats."
+          "desc": "A light snapshot of how your practice is moving—so you sense continuity and direction without wading through every detail."
         },
         "quickCapture": {
           "title": "Quick capture",
-          "desc": "Capture a thought or feeling in the moment so nothing important slips away while you’re here."
+          "desc": "Space to register what shows up in the moment—so meaning you notice here is less likely to evaporate when you move on."
         },
         "night": {
           "title": "Evening reflection",
-          "desc": "A short wind-down to notice how the day landed and reset before tomorrow—available on Pro plans."
+          "desc": "A gentle close to the day—room to notice how things landed and leave today with a little more clarity before what comes next."
         }
       }
     },
     "goalWhy": {
-      "expandHoldDetails": "Show hold goal details and why you stay",
-      "collapseHoldDetails": "Hide hold goal details and why you stay"
+      "expandHoldDetails": "Show hold goal details and motivations",
+      "collapseHoldDetails": "Hide hold goal details and motivations"
     },
     "statTiles": {
       "holzenScore": "Holzen score",
@@ -319,6 +319,9 @@
       "addGroundingInSettings": "Add grounding activities in Settings",
       "editGroundingInSettings": "Edit grounding activities in Settings",
       "openGround": "Open Ground",
+      "mantraEmptyTitle": "Set a breathing mantra",
+      "mantraEmptyBody": "A short optional line can anchor you during breathwork. It is not shown on Home.",
+      "mantraEmptyCta": "Open Settings → You",
       "tile": {
         "grounding": "Grounding",
         "capsule": "Send a capsule"
@@ -373,7 +376,7 @@
   },
   "settings": {
     "hubIntro": "Pick a category to change how Holzen fits you — same layout as Tools for consistency.",
-    "hubDescYou": "Name, hold goal, motivations, mantra, and how you show up on Home.",
+    "hubDescYou": "Name, hold goal, motivations, optional mantra for breathing pauses, and how Home greets you.",
     "hubDescReflection": "Cooldown, tone, style, custom prompt, and silent mode for pauses.",
     "hubDescExperience": "Conviction mode, currency, language, haptics, zen mode, and sounds.",
     "hubDescCompanions": "Which companion cards appear with your pause.",
@@ -407,7 +410,7 @@
     "holdGoalTitle": "Hold goal",
     "holdGoalDesc": "Time-bound, price target, or forever. Home shows a compact “Why you stay” summary — edit the full commitment here.",
     "myWhy": "My Why",
-    "myWhyDesc": "Why do you hold? Select what resonates. This anchors your pauses and appears as a mantra during breathing.",
+    "myWhyDesc": "Why do you hold? Select what resonates. This anchors your pause experience and companion tone.",
     "motivations": {
       "freedom": "Financial freedom",
       "freedomDesc": "Building independence",
@@ -618,9 +621,8 @@
       "historySample": "When gold dropped 26% in 2013, panic sellers locked in losses. Within 2 years, it consolidated and began a new ascent."
     },
     "commitmentKicker": "Your commitment",
-    "commitmentTitle": "Hold goal & mantra",
-    "commitmentIntro": "Lock what you are holding for — and a short line you can repeat when the market pulls at you. Both show up on Home (summary) and in pauses; you can refine anytime in Settings.",
-    "commitmentMantraHint": "Optional. Shown during breathing and woven into pause copy.",
+    "commitmentTitle": "Hold goal",
+    "commitmentIntro": "Set the commitment you are holding for. You can refine it anytime in Settings → You. Optional breathing mantra is also there after you have used pauses.",
     "commitmentFooterHint": "Skip if you prefer — you can set this later under Settings → You.",
     "commitmentHoldLabel": "Hold goal",
     "ready": {
@@ -628,7 +630,6 @@
       "recapHoldGoal": "Hold goal",
       "recapHoldGoalSet": "Saved",
       "recapHoldGoalUnset": "Not set yet",
-      "recapMantra": "Mantra",
       "recapGrounding": "Grounds you",
       "recapThreshold": "Threshold"
     }

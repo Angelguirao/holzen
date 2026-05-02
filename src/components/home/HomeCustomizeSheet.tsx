@@ -24,12 +24,7 @@ import {
   ALL_HOME_SECTION_IDS,
   isHomeSectionAlwaysVisibleInLayout,
 } from '@/hooks/use-home-optional-visibility';
-import {
-  HOME_LAYOUT_BLOCK_TRIPLE,
-  HOME_MOVABLE_SECTION_IDS,
-  computeBlockInsertRank,
-  normalizeHomeSectionOrder,
-} from '@/lib/home-section-order-normalize';
+import { GOAL_WHY_SECTION_ID, normalizeHomeSectionOrder } from '@/lib/home-section-order-normalize';
 
 export interface HomeCustomizeSheetProps {
   open: boolean;
@@ -47,8 +42,36 @@ export interface HomeCustomizeSheetProps {
   nightToggleDisabled?: boolean;
 }
 
-function isMovableHomeSectionId(id: string): boolean {
-  return (HOME_MOVABLE_SECTION_IDS as readonly string[]).includes(id);
+function isDraggableTailHomeSectionId(id: string): boolean {
+  return id !== GOAL_WHY_SECTION_ID && (ALL_HOME_SECTION_IDS as readonly string[]).includes(id);
+}
+
+/** Pinned first row — not registered with @dnd-kit/sortable (lives outside `SortableContext`). */
+function CustomizePinnedRow({
+  id,
+  title,
+  description,
+}: {
+  id: string;
+  title: string;
+  description: string;
+}) {
+  return (
+    <div
+      className={cn(
+        'flex items-start gap-2 rounded-xl border border-border/50 bg-muted/20 px-3 py-3',
+      )}
+    >
+      <div className="h-9 w-10 shrink-0" aria-hidden />
+      <div className="min-w-0 flex-1 space-y-0.5">
+        <Label htmlFor={`home-section-${id}`} className="text-sm font-medium leading-snug text-foreground">
+          {title}
+        </Label>
+        <p className={cn(homeInWidget.metaFaint, 'text-[11px] leading-snug')}>{description}</p>
+      </div>
+      <div className="h-6 w-10 shrink-0" aria-hidden />
+    </div>
+  );
 }
 
 function CustomizeSortableRow({
@@ -68,7 +91,7 @@ function CustomizeSortableRow({
   onCheckedChange: (v: boolean) => void;
   switchDisabled?: boolean;
   showSwitch: boolean;
-  /** Goal & Why + Today pair: always on, no drag handle (wireframe). */
+  /** When true, `useSortable` is disabled (no transform from DnD). */
   disableSortable: boolean;
 }) {
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
@@ -154,20 +177,19 @@ export function HomeCustomizeSheet({
       if (!over || active.id === over.id) return;
       const activeId = String(active.id);
       const overId = String(over.id);
-      if (!isMovableHomeSectionId(activeId) || !isMovableHomeSectionId(overId)) return;
+      if (!isDraggableTailHomeSectionId(activeId) || !isDraggableTailHomeSectionId(overId)) return;
       const norm = normalizeHomeSectionOrder(order, ALL_HOME_SECTION_IDS);
-      const movableIds = norm.filter(isMovableHomeSectionId);
-      const oldIndex = movableIds.indexOf(activeId);
-      const newIndex = movableIds.indexOf(overId);
+      const tailIds = norm.filter((id) => id !== GOAL_WHY_SECTION_ID);
+      const oldIndex = tailIds.indexOf(activeId);
+      const newIndex = tailIds.indexOf(overId);
       if (oldIndex < 0 || newIndex < 0) return;
-      const newMovable = arrayMove(movableIds, oldIndex, newIndex);
-      const rank = computeBlockInsertRank(norm);
-      const block = [...HOME_LAYOUT_BLOCK_TRIPLE];
-      const candidate = [...newMovable.slice(0, rank), ...block, ...newMovable.slice(rank)];
-      onReorder(normalizeHomeSectionOrder(candidate, ALL_HOME_SECTION_IDS));
+      const newTail = arrayMove(tailIds, oldIndex, newIndex);
+      onReorder(normalizeHomeSectionOrder([GOAL_WHY_SECTION_ID, ...newTail], ALL_HOME_SECTION_IDS));
     },
     [order, onReorder],
   );
+
+  const tailOrder = order.filter((id) => id !== GOAL_WHY_SECTION_ID);
 
   const modeValue = zenMode ? 'zen' : 'hold';
 
@@ -242,26 +264,34 @@ export function HomeCustomizeSheet({
               onDragEnd={handleDragEnd}
               modifiers={[restrictToVerticalAxis]}
             >
-              <SortableContext items={order} strategy={verticalListSortingStrategy}>
-                <div className="flex flex-col gap-3">
-                  {order.map((id) => {
-                    const fixedRow = isHomeSectionAlwaysVisibleInLayout(id);
-                    return (
-                      <CustomizeSortableRow
-                        key={id}
-                        id={id}
-                        title={sectionTitle(id)}
-                        description={sectionDescription(id)}
-                        checked={!!visible[id]}
-                        onCheckedChange={(v) => onSetVisible(id, v)}
-                        switchDisabled={id === 'night' && nightToggleDisabled}
-                        showSwitch={!fixedRow}
-                        disableSortable={fixedRow}
-                      />
-                    );
-                  })}
-                </div>
-              </SortableContext>
+              <div className="flex flex-col gap-3">
+                <CustomizePinnedRow
+                  key={GOAL_WHY_SECTION_ID}
+                  id={GOAL_WHY_SECTION_ID}
+                  title={sectionTitle(GOAL_WHY_SECTION_ID)}
+                  description={sectionDescription(GOAL_WHY_SECTION_ID)}
+                />
+                <SortableContext items={tailOrder} strategy={verticalListSortingStrategy}>
+                  <div className="flex flex-col gap-3">
+                    {tailOrder.map((id) => {
+                      const noVisibilityToggle = isHomeSectionAlwaysVisibleInLayout(id);
+                      return (
+                        <CustomizeSortableRow
+                          key={id}
+                          id={id}
+                          title={sectionTitle(id)}
+                          description={sectionDescription(id)}
+                          checked={!!visible[id]}
+                          onCheckedChange={(v) => onSetVisible(id, v)}
+                          switchDisabled={id === 'night' && nightToggleDisabled}
+                          showSwitch={!noVisibilityToggle}
+                          disableSortable={false}
+                        />
+                      );
+                    })}
+                  </div>
+                </SortableContext>
+              </div>
             </DndContext>
           </section>
         </div>

@@ -1,9 +1,10 @@
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { Pencil } from 'lucide-react';
+import { Pencil, Sparkles } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useHolzen } from '@/hooks/use-holzen';
+import { useCompletedPauseCount } from '@/hooks/use-completed-pause-count';
 import { settingsSectionPath, TOOLS } from '@/lib/app-routes';
 import { groundingActivityLabel } from '@/lib/grounding-activity-label';
 
@@ -13,12 +14,38 @@ import { groundingActivityLabel } from '@/lib/grounding-activity-label';
  */
 export function ToolsYourActivitiesSection() {
   const { t } = useTranslation();
-  const { groundingActivities, profileLoaded } = useHolzen();
+  const { groundingActivities, profileLoaded, mantra } = useHolzen();
+  const completedPauseCount = useCompletedPauseCount();
   const settingsYou = settingsSectionPath('you');
+  const mantraEmpty = !mantra?.trim();
+  const showMantraSuggestion =
+    profileLoaded &&
+    mantraEmpty &&
+    completedPauseCount !== null &&
+    completedPauseCount >= 1;
 
   return (
     <section className="space-y-3">
       <h2 className="text-base font-medium text-foreground">{t('tools.hub.soYou')}</h2>
+
+      {showMantraSuggestion ? (
+        <div className="flex items-start gap-3 rounded-xl border border-primary/20 bg-primary/5 p-3">
+          <Sparkles className="mt-0.5 h-4 w-4 shrink-0 text-primary/70" aria-hidden />
+          <div className="min-w-0 flex-1 space-y-1">
+            <p className="text-[10px] font-mono uppercase tracking-wide text-muted-foreground">
+              {t('tools.hub.goodNextStep')}
+            </p>
+            <p className="text-sm leading-snug text-foreground">{t('tools.hub.mantraEmptyTitle')}</p>
+            <p className="text-xs leading-relaxed text-muted-foreground">{t('tools.hub.mantraEmptyBody')}</p>
+            <Link
+              to={settingsYou}
+              className="inline-flex pt-1 text-sm font-medium text-primary underline-offset-4 hover:underline"
+            >
+              {t('tools.hub.mantraEmptyCta')}
+            </Link>
+          </div>
+        </div>
+      ) : null}
 
       <div className="rounded-xl border border-border/50 bg-muted/15 p-4">
         <div className="flex items-center justify-between gap-2">

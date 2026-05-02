@@ -7,7 +7,7 @@ import { cn } from '@/lib/utils';
 
 /**
  * Home “Why you stay” block: single surface with section chrome on `HomeSectionCard`.
- * Expanded: motivations → mantra → rule → hold goal (wireframe). Collapsed: hold summary only.
+ * Expanded: motivations, then hold goal (wireframe). Personal mantra is edited in Settings → You, not here.
  */
 export function HomeGoalWhyCard({
   currentPrice,
@@ -19,7 +19,7 @@ export function HomeGoalWhyCard({
   onHoldGoalCompactHeadlineChange?: (headline: string | null) => void;
 }) {
   const { t } = useTranslation();
-  const { motivations, mantra } = useHolzen();
+  const { motivations } = useHolzen();
   const prefersReduced = useReducedMotion();
 
   const motivationLine = useMemo(
@@ -27,13 +27,12 @@ export function HomeGoalWhyCard({
     [motivations, t],
   );
 
-  const hasWhy = Boolean(mantra?.trim()) || motivations.length > 0;
-  const mantraTrim = mantra?.trim() ?? '';
+  const hasMotivationsExpanded = motivations.length > 0;
 
   return (
     <div>
       <AnimatePresence initial={false}>
-        {detailsExpanded && hasWhy ? (
+        {detailsExpanded && hasMotivationsExpanded ? (
           <motion.div
             key="goal-why-qualitative"
             initial={prefersReduced ? false : { height: 0, opacity: 0 }}
@@ -46,17 +45,12 @@ export function HomeGoalWhyCard({
               {motivationLine ? (
                 <p className="text-xs font-medium italic tracking-wide text-muted-foreground">{motivationLine}</p>
               ) : null}
-              {mantraTrim ? (
-                <p className="text-base font-medium leading-relaxed text-foreground">
-                  &ldquo;{mantraTrim}&rdquo;
-                </p>
-              ) : null}
             </div>
           </motion.div>
         ) : null}
       </AnimatePresence>
 
-      <div className={cn(detailsExpanded && hasWhy && 'border-t border-border/30 pt-4')}>
+      <div className={cn(detailsExpanded && hasMotivationsExpanded && 'border-t border-border/30 pt-4')}>
         <HoldGoalWidget
           currentPrice={currentPrice}
           variant="wireframe"

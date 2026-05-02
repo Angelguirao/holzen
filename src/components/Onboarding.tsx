@@ -14,7 +14,6 @@ interface OnboardingResult {
   timezone: string;
   motivations: string[];
   groundingActivities: string[];
-  mantra: string | null;
 }
 
 interface OnboardingCompleteOptions {
@@ -36,7 +35,6 @@ export function Onboarding({ onComplete }: Props) {
   const [threshold, setThreshold] = useState(5);
   const [motivations, setMotivations] = useState<string[]>([]);
   const [groundingActivities, setGroundingActivities] = useState<string[]>([]);
-  const [mantraDraft, setMantraDraft] = useState('');
   const [hasHoldGoal, setHasHoldGoal] = useState(false);
   const [direction, setDirection] = useState(1);
   const [startingTrial, setStartingTrial] = useState(false);
@@ -87,9 +85,8 @@ export function Onboarding({ onComplete }: Props) {
       timezone,
       motivations,
       groundingActivities,
-      mantra: mantraDraft.trim() ? mantraDraft.trim() : null,
     }),
-    [threshold, timezone, motivations, groundingActivities, mantraDraft],
+    [threshold, timezone, motivations, groundingActivities],
   );
 
   return (
@@ -116,8 +113,6 @@ export function Onboarding({ onComplete }: Props) {
 
               {step === 1 && (
                 <OnboardingCommitment
-                  mantra={mantraDraft}
-                  onMantraChange={setMantraDraft}
                   onHoldGoalPresenceChange={handleHoldGoalPresence}
                   stagger={stagger}
                 />
@@ -144,7 +139,6 @@ export function Onboarding({ onComplete }: Props) {
                   motivations={motivations}
                   groundingActivities={groundingActivities}
                   threshold={threshold}
-                  mantra={mantraDraft}
                   hasHoldGoal={hasHoldGoal}
                   onBeginFree={() => onComplete(buildResult())}
                   onStartTrial={() => {
