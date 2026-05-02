@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 
 import { useTranslation } from 'react-i18next';
 import { supabase } from '@/integrations/supabase/client';
@@ -60,10 +60,13 @@ export function HoldGoalWidget({
   variant = 'default',
   /** When `variant` is wireframe and user has a goal: false shows only goal type · primary status. */
   wireframeDetailsExpanded = true,
+  /** Fires after initial load and whenever a goal is saved or cleared (not during `loading`). */
+  onHoldGoalPresenceChange,
 }: {
   currentPrice?: number;
   variant?: 'default' | 'wireframe';
   wireframeDetailsExpanded?: boolean;
+  onHoldGoalPresenceChange?: (hasGoal: boolean) => void;
 }) {
   const { t } = useTranslation();
   const { currency } = useHolzen();
@@ -78,6 +81,8 @@ export function HoldGoalWidget({
   const [inputValue, setInputValue] = useState('');
   const [validationError, setValidationError] = useState<string | null>(null);
   const [startDate, setStartDate] = useState<Date>(new Date());
+  const presenceCb = useRef(onHoldGoalPresenceChange);
+  presenceCb.current = onHoldGoalPresenceChange;
 
   const loadGoal = useCallback(async () => {
     if (!user) return;
@@ -100,6 +105,11 @@ export function HoldGoalWidget({
   }, [user]);
 
   useEffect(() => { loadGoal(); }, [loadGoal]);
+
+  useEffect(() => {
+    if (loading) return;
+    presenceCb.current?.(goal !== null);
+  }, [loading, goal]);
 
   const validate = (type: GoalType, value: string, unit: TimeUnit): string | null => {
     if (type === 'forever') return null;

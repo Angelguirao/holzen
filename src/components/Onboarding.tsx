@@ -1,8 +1,8 @@
 import { useTranslation } from 'react-i18next';
 import { useState, useCallback } from 'react';
-import { Button } from '@/components/ui/button';
 import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
 import { OnboardingWhy } from '@/components/onboarding/OnboardingWhy';
+import { OnboardingCommitment } from '@/components/onboarding/OnboardingCommitment';
 import { OnboardingGrounding } from '@/components/onboarding/OnboardingGrounding';
 import { OnboardingThreshold } from '@/components/onboarding/OnboardingThreshold';
 import { OnboardingReady } from '@/components/onboarding/OnboardingReady';
@@ -14,6 +14,7 @@ interface OnboardingResult {
   timezone: string;
   motivations: string[];
   groundingActivities: string[];
+  mantra: string | null;
 }
 
 interface OnboardingCompleteOptions {
@@ -25,7 +26,7 @@ interface Props {
 }
 
 const detectedTimezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
-const TOTAL_STEPS = 4;
+const TOTAL_STEPS = 5;
 
 export function Onboarding({ onComplete }: Props) {
   const { t } = useTranslation();
@@ -35,6 +36,8 @@ export function Onboarding({ onComplete }: Props) {
   const [threshold, setThreshold] = useState(5);
   const [motivations, setMotivations] = useState<string[]>([]);
   const [groundingActivities, setGroundingActivities] = useState<string[]>([]);
+  const [mantraDraft, setMantraDraft] = useState('');
+  const [hasHoldGoal, setHasHoldGoal] = useState(false);
   const [direction, setDirection] = useState(1);
   const [startingTrial, setStartingTrial] = useState(false);
   const prefersReduced = useReducedMotion();
@@ -73,10 +76,26 @@ export function Onboarding({ onComplete }: Props) {
     );
   }, []);
 
+  const handleHoldGoalPresence = useCallback((has: boolean) => {
+    setHasHoldGoal(has);
+  }, []);
+
+  const buildResult = useCallback(
+    (): OnboardingResult => ({
+      threshold,
+      firstName: null,
+      timezone,
+      motivations,
+      groundingActivities,
+      mantra: mantraDraft.trim() ? mantraDraft.trim() : null,
+    }),
+    [threshold, timezone, motivations, groundingActivities, mantraDraft],
+  );
+
   return (
     <div className="fixed inset-0 z-[60] bg-background flex items-center justify-center p-6">
       <div className="w-full max-w-sm">
-        <div className="min-h-[440px] relative">
+        <div className="min-h-[460px] relative">
           <AnimatePresence mode="wait" custom={direction}>
             <motion.div
               key={step}
@@ -96,6 +115,15 @@ export function Onboarding({ onComplete }: Props) {
               )}
 
               {step === 1 && (
+                <OnboardingCommitment
+                  mantra={mantraDraft}
+                  onMantraChange={setMantraDraft}
+                  onHoldGoalPresenceChange={handleHoldGoalPresence}
+                  stagger={stagger}
+                />
+              )}
+
+              {step === 2 && (
                 <OnboardingGrounding
                   selected={groundingActivities}
                   onToggle={toggleGrounding}
@@ -103,7 +131,7 @@ export function Onboarding({ onComplete }: Props) {
                 />
               )}
 
-              {step === 2 && (
+              {step === 3 && (
                 <OnboardingThreshold
                   threshold={threshold}
                   onThresholdChange={setThreshold}
@@ -111,30 +139,20 @@ export function Onboarding({ onComplete }: Props) {
                 />
               )}
 
-              {step === 3 && (
+              {step === 4 && (
                 <OnboardingReady
                   motivations={motivations}
                   groundingActivities={groundingActivities}
                   threshold={threshold}
-                  onBeginFree={() => onComplete({
-                    threshold,
-                    firstName: null,
-                    timezone,
-                    motivations,
-                    groundingActivities,
-                  })}
+                  mantra={mantraDraft}
+                  hasHoldGoal={hasHoldGoal}
+                  onBeginFree={() => onComplete(buildResult())}
                   onStartTrial={() => {
                     void (async () => {
                       setStartingTrial(true);
                       try {
                         // Save onboarding first, but keep onboarding visible until redirect starts
-                        await onComplete({
-                          threshold,
-                          firstName: null,
-                          timezone,
-                          motivations,
-                          groundingActivities,
-                        }, { setLocalOnboarded: false });
+                        await onComplete(buildResult(), { setLocalOnboarded: false });
                         await startCheckout();
                       } finally {
                         setStartingTrial(false);
@@ -174,7 +192,10 @@ export function Onboarding({ onComplete }: Props) {
           </div>
 
           <div className="flex items-center gap-3">
-            {step < TOTAL_STEPS - 1 && ((step === 0 && motivations.length === 0) || (step === 1 && groundingActivities.length === 0)) ? (
+            {step < TOTAL_STEPS - 1 &&
+            ((step === 0 && motivations.length === 0) ||
+              step === 1 ||
+              (step === 2 && groundingActivities.length === 0)) ? (
               <button
                 onClick={() => goTo(step + 1)}
                 className="text-[10px] font-mono text-muted-foreground/40 hover:text-foreground transition-colors"
