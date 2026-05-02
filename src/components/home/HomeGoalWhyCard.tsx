@@ -26,7 +26,7 @@ export function HomeGoalWhyCard({ currentPrice }: { currentPrice?: number }) {
   const mantraTrim = mantra?.trim() ?? '';
 
   return (
-    <div className="space-y-0">
+    <div className="rounded-lg border-2 border-border/60 bg-muted/25 p-4">
       <HoldGoalWidget
         currentPrice={currentPrice}
         variant="wireframe"
@@ -58,15 +58,17 @@ export function HomeGoalWhyCard({ currentPrice }: { currentPrice?: number }) {
             transition={{ duration: 0.22, ease: 'easeInOut' }}
             className="overflow-hidden"
           >
-            <div className="mt-4 h-px w-full bg-border/50" />
-            <div className="pt-4 space-y-2">
+            {/* Wireframe kit: mantra + motivations stack with gap only (no rule). */}
+            <div className="space-y-2 pt-3">
               {mantraTrim ? (
-                <p className="text-base font-medium leading-snug text-foreground">
+                <p className="text-base font-medium leading-6 tracking-wide text-foreground">
                   &ldquo;{mantraTrim}&rdquo;
                 </p>
               ) : null}
               {motivationLine ? (
-                <p className="text-xs font-medium italic leading-relaxed text-muted-foreground">{motivationLine}</p>
+                <p className="text-xs font-medium italic leading-4 tracking-wide text-muted-foreground">
+                  {motivationLine}
+                </p>
               ) : null}
             </div>
           </motion.div>
