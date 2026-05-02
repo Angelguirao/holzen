@@ -2215,6 +2215,7 @@ export type Database = {
           is_favorite: boolean | null
           pause_instance_id: string | null
           pinned: boolean | null
+          source_library_item_id: string | null
           source_type: string | null
           source_url: string | null
           status: string | null
@@ -2262,6 +2263,7 @@ export type Database = {
           is_favorite: boolean | null
           pause_instance_id: string | null
           pinned: boolean | null
+          source_library_item_id: string | null
           source_type: string | null
           source_url: string | null
           status: string | null
