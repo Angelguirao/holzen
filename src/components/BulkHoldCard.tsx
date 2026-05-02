@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo, useRef, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/use-auth';
@@ -95,12 +95,8 @@ function formatLocalTime(iso: string, language: string): string {
  * (expired is final) but the events still inform stats' retrospective
  * outcome inference.
  *
- * Under V2, completed pauses always have an outcome by construction
- * (outcome_logged is a completion gate). Expired pauses without step
- * events are the equivalent of the old "ignored notification" rows.
- * Marking them bulk-held is a historical rescue: the instance stays
- * expired, but the outcome event records the user's after-the-fact
- * decision for analytics.
+ * Requires DB support: `pause_log_step` must accept `outcome_logged` on
+ * `expired` rows (see migration `20260505120000_pause_log_step_expired_outcome_rescue.sql`).
  */
 export function BulkHoldCard() {
   const { user } = useAuth();
@@ -113,6 +109,26 @@ export function BulkHoldCard() {
   const [heldCount, setHeldCount] = useState(0);
   const [loading, setLoading] = useState(false);
   const [draftOutcomes, setDraftOutcomes] = useState<Record<string, OutcomeChoice>>({});
+  const [applyError, setApplyError] = useState<string | null>(null);
+  const [refetchNonce, setRefetchNonce] = useState(0);
+
+  const pendingRef = useRef(pending);
+  const draftRef = useRef(draftOutcomes);
+  const sheetModeRef = useRef(sheetMode);
+  const loadingRef = useRef(loading);
+
+  useEffect(() => {
+    pendingRef.current = pending;
+  }, [pending]);
+  useEffect(() => {
+    draftRef.current = draftOutcomes;
+  }, [draftOutcomes]);
+  useEffect(() => {
+    sheetModeRef.current = sheetMode;
+  }, [sheetMode]);
+  useEffect(() => {
+    loadingRef.current = loading;
+  }, [loading]);
 
   const groupedReview = useMemo(
     () => groupByLocalDay(pending, i18n.language, t),
@@ -121,115 +137,189 @@ export function BulkHoldCard() {
 
   const hasAnyDraft = Object.keys(draftOutcomes).length > 0;
 
-  useEffect(() => {
+  const loadPending = useCallback(async () => {
     if (!user) return;
+    if (sheetModeRef.current === 'success') {
+      return;
+    }
     const windowStart = new Date(Date.now() - 14 * 24 * 60 * 60 * 1000).toISOString();
-    void (async () => {
-      const { data } = await supabase
-        .from('pause_instances' as never)
-        .select('id, created_at, context_snapshot')
-        .eq('user_id', user.id)
-        .eq('state', 'expired')
-        .gte('created_at', windowStart)
-        .order('created_at', { ascending: false })
-        .limit(50);
-      const rows = (data ?? []) as PendingPause[];
-      if (rows.length < 2) return;
+    const { data } = await supabase
+      .from('pause_instances' as never)
+      .select('id, created_at, context_snapshot')
+      .eq('user_id', user.id)
+      .eq('state', 'expired')
+      .gte('created_at', windowStart)
+      .order('created_at', { ascending: false })
+      .limit(50);
+    const rows = (data ?? []) as PendingPause[];
+    if (rows.length < 2) {
+      setPending([]);
+      return;
+    }
 
-      const { data: outcomes } = await supabase
-        .from('pause_step_events' as never)
-        .select('pause_instance_id')
-        .eq('user_id', user.id)
-        .eq('step_type', 'outcome_logged')
-        .in(
-          'pause_instance_id',
-          rows.map((r) => r.id),
-        );
-      const withOutcome = new Set(
-        ((outcomes ?? []) as Array<{ pause_instance_id: string }>).map((o) => o.pause_instance_id),
+    const { data: outcomes } = await supabase
+      .from('pause_step_events' as never)
+      .select('pause_instance_id')
+      .eq('user_id', user.id)
+      .eq('step_type', 'outcome_logged')
+      .in(
+        'pause_instance_id',
+        rows.map((r) => r.id),
       );
-      setPending(
-        rows
-          .filter((r) => !withOutcome.has(r.id))
-          .map((r) => ({
-            ...r,
-            context_snapshot: (r as { context_snapshot?: Record<string, unknown> | null }).context_snapshot ?? null,
-          })),
-      );
-    })();
+    const withOutcome = new Set(
+      ((outcomes ?? []) as Array<{ pause_instance_id: string }>).map((o) => o.pause_instance_id),
+    );
+    setPending(
+      rows
+        .filter((r) => !withOutcome.has(r.id))
+        .map((r) => ({
+          ...r,
+          context_snapshot: (r as { context_snapshot?: Record<string, unknown> | null }).context_snapshot ?? null,
+        })),
+    );
   }, [user]);
 
-  const handleSheetOpenChange = (open: boolean) => {
-    setSheetOpen(open);
-    if (!open) {
-      setSheetMode('prompt');
-      setHeldCount(0);
-      setDraftOutcomes({});
-    }
-  };
+  useEffect(() => {
+    void loadPending();
+  }, [user, refetchNonce, loadPending]);
 
+  const resetSheetUi = useCallback(() => {
+    setSheetMode('prompt');
+    setHeldCount(0);
+    setDraftOutcomes({});
+    setApplyError(null);
+  }, []);
+
+  /**
+   * Logs outcome_logged per row. On full success clears pending and shows the success step in-sheet.
+   * On partial failure keeps remaining rows and surfaces applyError.
+   */
   const applyOutcomesAndFinish = async (resolver: (p: PendingPause) => OutcomeChoice) => {
-    if (!user || pending.length === 0) return;
+    const rows = [...pendingRef.current];
+    if (!user || rows.length === 0) return;
     setLoading(true);
+    setApplyError(null);
     hapticFeedback('medium');
-    const results = await Promise.all(
-      pending.map((p) =>
+
+    const settled = await Promise.allSettled(
+      rows.map((p) =>
         pauseLogStep({
           instanceId: p.id,
           stepType: 'outcome_logged',
           payload: { outcome: resolver(p) },
-        }).catch(() => null),
+        }),
       ),
     );
-    const ok = results.every((r) => r !== null);
-    if (ok) {
-      hapticFeedback('success');
-      setHeldCount(pending.length);
-      setPending([]);
-      setDraftOutcomes({});
-      setSheetMode('success');
+
+    const failedRows: PendingPause[] = [];
+    settled.forEach((r, i) => {
+      if (r.status === 'rejected') {
+        failedRows.push(rows[i]);
+        return;
+      }
+      if (r.value === null || r.value === undefined) {
+        failedRows.push(rows[i]);
+      }
+    });
+
+    if (failedRows.length === rows.length) {
+      hapticFeedback('error');
+      setApplyError(t('bulkHold.applyFailed'));
+      setRefetchNonce((n) => n + 1);
+      setLoading(false);
+      return;
     }
+
+    if (failedRows.length > 0) {
+      hapticFeedback('error');
+      setPending(failedRows);
+      setDraftOutcomes((prev) => {
+        const next: Record<string, OutcomeChoice> = {};
+        for (const p of failedRows) {
+          if (prev[p.id]) next[p.id] = prev[p.id];
+        }
+        return next;
+      });
+      setApplyError(t('bulkHold.applyPartialFailed', { count: failedRows.length }));
+      setLoading(false);
+      return;
+    }
+
+    hapticFeedback('success');
+    setHeldCount(rows.length);
+    setPending([]);
+    setDraftOutcomes({});
+    setApplyError(null);
+    setSheetMode('success');
     setLoading(false);
+  };
+
+  const handleSheetOpenChange = (open: boolean) => {
+    if (open) {
+      setSheetOpen(true);
+      return;
+    }
+
+    if (loadingRef.current) {
+      return;
+    }
+
+    const mode = sheetModeRef.current;
+    const drafts = draftRef.current;
+    const pend = pendingRef.current;
+    const draftKeys = Object.keys(drafts);
+
+    if (mode === 'review' && pend.length > 0 && draftKeys.length > 0) {
+      void (async () => {
+        setApplyError(null);
+        await applyOutcomesAndFinish((p) => drafts[p.id] ?? 'held');
+      })();
+      return;
+    }
+
+    setSheetOpen(false);
+    resetSheetUi();
   };
 
   const handleHoldAll = () => applyOutcomesAndFinish(() => 'held');
 
-  const handleReviewHeldAll = () => applyOutcomesAndFinish(() => 'held');
+  const handleReviewHeldAll = () => {
+    setDraftOutcomes({});
+    return applyOutcomesAndFinish(() => 'held');
+  };
 
-  const handleReviewHeldRest = () =>
-    applyOutcomesAndFinish((p) => draftOutcomes[p.id] ?? 'held');
+  const handleReviewHeldRest = () => applyOutcomesAndFinish((p) => draftRef.current[p.id] ?? 'held');
 
   const handleDismissTeaser = (e: React.MouseEvent) => {
     e.stopPropagation();
     setDismissed(true);
     setPending([]);
     setSheetOpen(false);
-    setSheetMode('prompt');
-    setHeldCount(0);
-    setDraftOutcomes({});
+    resetSheetUi();
   };
 
   const goArchivePauses = () => {
     navigate('/library?seg=pauses');
     setSheetOpen(false);
-    setSheetMode('prompt');
+    resetSheetUi();
   };
 
   const goEchoes = () => {
     navigate('/library?seg=echoes');
     setSheetOpen(false);
-    setSheetMode('prompt');
+    resetSheetUi();
     setHeldCount(0);
   };
 
   const doneAfterSuccess = () => {
     setSheetOpen(false);
-    setSheetMode('prompt');
+    resetSheetUi();
     setHeldCount(0);
   };
 
   const enterReview = () => {
     hapticFeedback('light');
+    setApplyError(null);
     setDraftOutcomes({});
     setSheetMode('review');
   };
@@ -238,6 +328,14 @@ export function BulkHoldCard() {
     hapticFeedback('light');
     setSheetMode('prompt');
     setDraftOutcomes({});
+    setApplyError(null);
+  };
+
+  const handleDoneInReview = () => {
+    if (hasAnyDraft) {
+      return applyOutcomesAndFinish((p) => draftRef.current[p.id] ?? 'held');
+    }
+    exitReviewToPrompt();
   };
 
   if (dismissed || (pending.length < 2 && !sheetOpen)) return null;
@@ -345,6 +443,11 @@ export function BulkHoldCard() {
           </div>
 
           <div className="min-h-0 flex-1 overflow-y-auto px-6 pb-4">
+            {applyError ? (
+              <p className="mb-3 rounded-lg border border-destructive/25 bg-destructive/5 px-3 py-2 text-sm text-destructive">
+                {applyError}
+              </p>
+            ) : null}
             <AnimatePresence mode="wait">
               {sheetMode === 'success' ? (
                 <motion.div
@@ -550,7 +653,7 @@ export function BulkHoldCard() {
                   variant="outline"
                   disabled={loading}
                   className="h-11 rounded-full border-foreground/80 bg-primary/[0.06] font-semibold text-primary hover:bg-primary/10"
-                  onClick={exitReviewToPrompt}
+                  onClick={handleDoneInReview}
                 >
                   {t('bulkHold.done', { defaultValue: 'Done' })}
                 </Button>
