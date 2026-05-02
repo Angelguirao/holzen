@@ -3,19 +3,20 @@ import { useTranslation } from 'react-i18next';
 import { AnimatePresence, motion, useReducedMotion } from 'framer-motion';
 import { HoldGoalWidget } from '@/components/HoldGoalWidget';
 import { useHolzen } from '@/hooks/use-holzen';
-import { homeInWidget } from '@/components/home/home-widget-styles';
 import { cn } from '@/lib/utils';
 
 /**
- * Home “Why you stay” block: wireframe hold row + mantra / motivations when the section is expanded.
- * Section chevron lives on `HomeSectionCard` (same pattern as Market).
+ * Home “Why you stay” block: single surface with section chrome on `HomeSectionCard`.
+ * Expanded: motivations → mantra → rule → hold goal (wireframe). Collapsed: hold summary only.
  */
 export function HomeGoalWhyCard({
   currentPrice,
   detailsExpanded,
+  onHoldGoalCompactHeadlineChange,
 }: {
   currentPrice?: number;
   detailsExpanded: boolean;
+  onHoldGoalCompactHeadlineChange?: (headline: string | null) => void;
 }) {
   const { t } = useTranslation();
   const { motivations, mantra } = useHolzen();
@@ -30,38 +31,39 @@ export function HomeGoalWhyCard({
   const mantraTrim = mantra?.trim() ?? '';
 
   return (
-    <div className="rounded-lg border-2 border-border/60 bg-muted/25 p-4">
-      <HoldGoalWidget
-        currentPrice={currentPrice}
-        variant="wireframe"
-        wireframeDetailsExpanded={detailsExpanded}
-      />
-
+    <div>
       <AnimatePresence initial={false}>
         {detailsExpanded && hasWhy ? (
           <motion.div
-            key="goal-why-body"
+            key="goal-why-qualitative"
             initial={prefersReduced ? false : { height: 0, opacity: 0 }}
             animate={{ height: 'auto', opacity: 1 }}
             exit={prefersReduced ? undefined : { height: 0, opacity: 0 }}
             transition={{ duration: 0.22, ease: 'easeInOut' }}
             className="overflow-hidden"
           >
-            <div className="space-y-2 pt-3">
-              {mantraTrim ? (
-                <p className="text-base font-medium leading-6 tracking-wide text-foreground">
-                  &ldquo;{mantraTrim}&rdquo;
-                </p>
-              ) : null}
+            <div className="space-y-2 pb-4">
               {motivationLine ? (
-                <p className={cn(homeInWidget.metaFaint, 'font-medium italic tracking-wide')}>
-                  {motivationLine}
+                <p className="text-xs font-medium italic tracking-wide text-muted-foreground">{motivationLine}</p>
+              ) : null}
+              {mantraTrim ? (
+                <p className="text-base font-medium leading-relaxed text-foreground">
+                  &ldquo;{mantraTrim}&rdquo;
                 </p>
               ) : null}
             </div>
           </motion.div>
         ) : null}
       </AnimatePresence>
+
+      <div className={cn(detailsExpanded && hasWhy && 'border-t border-border/30 pt-4')}>
+        <HoldGoalWidget
+          currentPrice={currentPrice}
+          variant="wireframe"
+          wireframeDetailsExpanded={detailsExpanded}
+          onCompactHeadlineChange={onHoldGoalCompactHeadlineChange}
+        />
+      </div>
     </div>
   );
 }

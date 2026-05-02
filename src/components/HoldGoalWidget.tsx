@@ -5,6 +5,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/use-auth';
 import { useHolzen } from '@/hooks/use-holzen';
 import { formatBtcPrice, SUPPORTED_CURRENCIES } from '@/lib/btc';
+import { computeHoldGoalCompactHeadline } from '@/lib/hold-goal-headline';
 import { Target, Calendar, Coins, Infinity as InfinityIcon, X, Check, Pencil } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -37,12 +38,6 @@ import {
 type GoalType = 'time' | 'price' | 'forever';
 type TimeUnit = 'months' | 'years';
 
-function wireframeKindLabel(goalType: GoalType, t: (key: string) => string): string {
-  if (goalType === 'forever') return t('holdGoal.forever');
-  if (goalType === 'time') return t('holdGoal.time');
-  return t('holdGoal.price');
-}
-
 interface HoldGoal {
   type: GoalType;
   start: string;
@@ -62,11 +57,14 @@ export function HoldGoalWidget({
   wireframeDetailsExpanded = true,
   /** Fires after initial load and whenever a goal is saved or cleared (not during `loading`). */
   onHoldGoalPresenceChange,
+  /** Wireframe Home: compact headline for section header (`Kind · metric`). */
+  onCompactHeadlineChange,
 }: {
   currentPrice?: number;
   variant?: 'default' | 'wireframe';
   wireframeDetailsExpanded?: boolean;
   onHoldGoalPresenceChange?: (hasGoal: boolean) => void;
+  onCompactHeadlineChange?: (headline: string | null) => void;
 }) {
   const { t } = useTranslation();
   const { currency } = useHolzen();
@@ -83,6 +81,8 @@ export function HoldGoalWidget({
   const [startDate, setStartDate] = useState<Date>(new Date());
   const presenceCb = useRef(onHoldGoalPresenceChange);
   presenceCb.current = onHoldGoalPresenceChange;
+  const headlineCb = useRef(onCompactHeadlineChange);
+  headlineCb.current = onCompactHeadlineChange;
 
   const loadGoal = useCallback(async () => {
     if (!user) return;
@@ -110,6 +110,29 @@ export function HoldGoalWidget({
     if (loading) return;
     presenceCb.current?.(goal !== null);
   }, [loading, goal]);
+
+  useEffect(() => {
+    if (!isWire) return;
+    if (loading) return;
+    if (setting) {
+      headlineCb.current?.(null);
+      return;
+    }
+    const h =
+      goal !== null
+        ? computeHoldGoalCompactHeadline(
+            {
+              type: goal.type,
+              start: goal.start,
+              targetMonths: goal.targetMonths,
+              targetPrice: goal.targetPrice,
+              currency: goal.currency,
+            },
+            { currentPrice, t },
+          )
+        : null;
+    headlineCb.current?.(h);
+  }, [isWire, loading, setting, goal, currentPrice, t]);
 
   const validate = (type: GoalType, value: string, unit: TimeUnit): string | null => {
     if (type === 'forever') return null;
@@ -439,20 +462,23 @@ export function HoldGoalWidget({
     const days = elapsed % 365;
 
     if (isWire) {
-      const kindLabel = wireframeKindLabel('forever', t);
+      const headline = computeHoldGoalCompactHeadline(
+        {
+          type: goal.type,
+          start: goal.start,
+          targetMonths: goal.targetMonths,
+          targetPrice: goal.targetPrice,
+          currency: goal.currency,
+        },
+        { currentPrice, t },
+      );
       return (
-        <div className="space-y-2.5">
-          <div className="min-w-0 space-y-1">
-            <p className="flex flex-wrap items-baseline gap-x-2 gap-y-0.5 text-[13px] font-medium leading-snug">
-              <span className="text-foreground">{kindLabel}</span>
-              <span className="text-muted-foreground/45" aria-hidden>
-                ·
-              </span>
-              <span className="text-sm font-semibold tabular-nums text-foreground">
-                {years > 0 ? `${years}y ${days}d` : `${elapsed} day${elapsed !== 1 ? 's' : ''}`}{' '}
-                {t('holdGoal.andCounting')}
-              </span>
-            </p>
+        <div className="flex gap-3">
+          <InfinityIcon className="h-6 w-6 shrink-0 text-muted-foreground" aria-hidden />
+          <div className="min-w-0 flex-1 space-y-2">
+            {headline ? (
+              <p className="text-[13px] font-medium leading-snug text-foreground">{headline}</p>
+            ) : null}
             {!wireCompact ? (
               <p className={homeInWidget.metaFaint}>
                 {t('holdGoal.since', { date: format(start, 'MMM d, yyyy') })}
@@ -499,35 +525,45 @@ export function HoldGoalWidget({
       : `${goal.targetMonths}mo ${t('holdGoal.commitment')}`;
 
     if (isWire) {
-      const kindLabel = wireframeKindLabel('time', t);
+      const headline = computeHoldGoalCompactHeadline(
+        {
+          type: goal.type,
+          start: goal.start,
+          targetMonths: goal.targetMonths,
+          targetPrice: goal.targetPrice,
+          currency: goal.currency,
+        },
+        { currentPrice, t },
+      );
       return (
-        <div className="space-y-2.5">
-          <div className="min-w-0 space-y-1">
-            <p className="flex flex-wrap items-baseline gap-x-2 gap-y-0.5 text-[13px] font-medium leading-snug">
-              <span className="text-foreground">{kindLabel}</span>
-              <span className="text-muted-foreground/45" aria-hidden>
-                ·
-              </span>
-              <span className="text-sm font-semibold tabular-nums text-foreground">
-                {completed ? t('holdGoal.goalReached') : t('holdGoal.daysToGo', { count: remaining })}
-              </span>
-            </p>
+        <div className="flex gap-3">
+          <Target className="h-6 w-6 shrink-0 text-muted-foreground" aria-hidden />
+          <div className="min-w-0 flex-1 space-y-2">
+            {headline ? (
+              <p className="text-[13px] font-medium leading-snug text-foreground">{headline}</p>
+            ) : null}
             {!wireCompact ? (
-              <p className={homeInWidget.metaFaint}>
-                {t('holdGoal.started', { date: format(start, 'MMM d, yyyy') })} · {t('holdGoal.daysHeld', { count: elapsed })}
-                {' · '}
-                {displayTarget}
-              </p>
+              <>
+                <p className={homeInWidget.metaFaint}>
+                  {t('holdGoal.started', { date: format(start, 'MMM d, yyyy') })} ·{' '}
+                  {t('holdGoal.daysHeld', { count: elapsed })}
+                  {' · '}
+                  {displayTarget}
+                </p>
+                <div className="flex items-center gap-2.5">
+                  <div className="h-[7px] min-w-0 flex-1 overflow-hidden rounded-full bg-muted">
+                    <div
+                      className="h-full rounded-full bg-foreground/90 transition-all duration-700"
+                      style={{ width: `${progress}%` }}
+                    />
+                  </div>
+                  <span className="shrink-0 text-xs font-medium tabular-nums text-muted-foreground">
+                    {Math.round(progress)}%
+                  </span>
+                </div>
+              </>
             ) : null}
           </div>
-          {!wireCompact ? (
-            <div className="h-1.5 w-full overflow-hidden rounded-full bg-muted/50">
-              <div
-                className={`h-full rounded-full transition-all duration-700 ${completed ? 'bg-primary' : 'bg-primary/50'}`}
-                style={{ width: `${progress}%` }}
-              />
-            </div>
-          ) : null}
         </div>
       );
     }
@@ -573,36 +609,46 @@ export function HoldGoalWidget({
     const elapsedDays = differenceInDays(new Date(), start);
 
     if (isWire) {
-      const kindLabel = wireframeKindLabel('price', t);
+      const headline = computeHoldGoalCompactHeadline(
+        {
+          type: goal.type,
+          start: goal.start,
+          targetMonths: goal.targetMonths,
+          targetPrice: goal.targetPrice,
+          currency: goal.currency,
+        },
+        { currentPrice, t },
+      );
       return (
-        <div className="space-y-2.5">
-          <div className="min-w-0 space-y-1">
-            <p className="flex flex-wrap items-baseline gap-x-2 gap-y-0.5 text-[13px] font-medium leading-snug">
-              <span className="text-foreground">{kindLabel}</span>
-              <span className="text-muted-foreground/45" aria-hidden>
-                ·
-              </span>
-              <span className="text-sm font-semibold tabular-nums text-foreground">
-                {reached ? t('holdGoal.targetReached') : `${formatBtcPrice(diff, currency)} ${t('holdGoal.toGo')}`}
-              </span>
-            </p>
+        <div className="flex gap-3">
+          <Coins className="h-6 w-6 shrink-0 text-muted-foreground" aria-hidden />
+          <div className="min-w-0 flex-1 space-y-2">
+            {headline ? (
+              <p className="text-[13px] font-medium leading-snug text-foreground">{headline}</p>
+            ) : null}
             {!wireCompact ? (
-              <p className={homeInWidget.metaFaint}>
-                {t('holdGoal.started', { date: format(start, 'MMM d, yyyy') })} · {t('holdGoal.daysHeld', { count: elapsedDays })} ·{' '}
-                {t('holdGoal.target')}: {formatBtcPrice(target, currency)}
-                {' · '}
-                {t('holdGoal.current')}: {formatBtcPrice(price, currency)}
-              </p>
+              <>
+                <p className={homeInWidget.metaFaint}>
+                  {t('holdGoal.started', { date: format(start, 'MMM d, yyyy') })} ·{' '}
+                  {t('holdGoal.daysHeld', { count: elapsedDays })} · {t('holdGoal.target')}:{' '}
+                  {formatBtcPrice(target, goal.currency)}
+                  {' · '}
+                  {t('holdGoal.current')}: {formatBtcPrice(price, goal.currency)}
+                </p>
+                <div className="flex items-center gap-2.5">
+                  <div className="h-[7px] min-w-0 flex-1 overflow-hidden rounded-full bg-muted">
+                    <div
+                      className="h-full rounded-full bg-foreground/90 transition-all duration-700"
+                      style={{ width: `${progress}%` }}
+                    />
+                  </div>
+                  <span className="max-w-[45%] shrink-0 truncate text-right text-xs font-medium tabular-nums text-muted-foreground">
+                    {formatBtcPrice(price, goal.currency)}
+                  </span>
+                </div>
+              </>
             ) : null}
           </div>
-          {!wireCompact ? (
-            <div className="h-1.5 w-full overflow-hidden rounded-full bg-muted/50">
-              <div
-                className={`h-full rounded-full transition-all duration-700 ${reached ? 'bg-primary' : 'bg-primary/50'}`}
-                style={{ width: `${progress}%` }}
-              />
-            </div>
-          ) : null}
         </div>
       );
     }
