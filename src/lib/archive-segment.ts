@@ -29,9 +29,9 @@ export type PauseInstanceArchiveMetaGetter = (
  * `completed` always implies engagement in the DB and never counts as an echo.
  *
  * Server mirrors: `public.library_archive_echo_items` (Echo tab list + pagination),
- * `public.library_archive_pauses_tab_items` (Pauses tab list + pagination; excludes
- * echo-only instances). Both views may include synthetic `pause` rows when a terminal
- * instance has no `library_items` rows (`source_library_item_id` is null in SQL).
+ * `public.library_archive_pauses_tab_items` (Pauses tab backing view; excludes
+ * echo-only instances). The Pauses **UI list** defaults to `source_type = pause` only
+ * (plus synthetic rows); companion rows are fetched via type filters in `useLibrary`.
  */
 export function isArchiveEchoPause(meta: PauseInstanceArchiveMeta): boolean {
   if (!ECHO_ELIGIBLE_STATES.has(meta.state)) return false;

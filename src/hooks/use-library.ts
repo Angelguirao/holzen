@@ -90,6 +90,12 @@ export type UseLibraryOptions = {
    */
   favoritesOnly?: boolean;
   listSort?: LibraryListSortMode;
+  /**
+   * Pauses archive only: when empty/omitted, the list query is restricted to main
+   * `source_type = pause` rows (plus synthetic instance rows). When set, PostgREST
+   * uses `.in('source_type', …)` so companion artifacts are listable via filters only.
+   */
+  pausesArchiveSourceTypes?: readonly string[];
 };
 
 type LibraryItemsRelation = 'library_items' | 'library_archive_echo_items' | 'library_archive_pauses_tab_items';
@@ -109,10 +115,21 @@ function mapLibraryTableRow(table: LibraryItemsRelation, row: unknown): LibraryI
   return base;
 }
 
-function buildItemsCacheKey(kind: LibraryArchiveListKind, favoritesOnly: boolean, listSort: LibraryListSortMode): string {
+function buildItemsCacheKey(
+  kind: LibraryArchiveListKind,
+  favoritesOnly: boolean,
+  listSort: LibraryListSortMode,
+  pausesArchiveSourceTypes?: readonly string[],
+): string {
   const sort = listSort;
   if (kind === 'echo') return `${CACHE_KEY_ITEMS_ECHO}:${sort}`;
-  if (kind === 'pauses') return `${CACHE_KEY_ITEMS_Pauses_SEG}:${favoritesOnly ? 'fav' : 'all'}:${sort}`;
+  if (kind === 'pauses') {
+    const srcKey =
+      pausesArchiveSourceTypes && pausesArchiveSourceTypes.length > 0
+        ? [...pausesArchiveSourceTypes].sort().join(',')
+        : 'pause_main';
+    return `${CACHE_KEY_ITEMS_Pauses_SEG}:${favoritesOnly ? 'fav' : 'all'}:${sort}:${srcKey}`;
+  }
   if (favoritesOnly) return `${CACHE_KEY_ITEMS_FAVS}:${sort}`;
   return `${CACHE_KEY_ITEMS}:${sort}`;
 }
@@ -138,7 +155,8 @@ export function useLibrary(options?: UseLibraryOptions) {
   const favoritesOnly = options?.favoritesOnly ?? false;
   const archiveListKind: LibraryArchiveListKind = options?.archiveListKind ?? 'default';
   const listSort: LibraryListSortMode = options?.listSort ?? 'newest';
-  const itemsCacheKey = buildItemsCacheKey(archiveListKind, favoritesOnly, listSort);
+  const pausesArchiveSourceTypes = options?.pausesArchiveSourceTypes;
+  const itemsCacheKey = buildItemsCacheKey(archiveListKind, favoritesOnly, listSort, pausesArchiveSourceTypes);
   const libraryItemsTable = libraryTableForKind(archiveListKind);
 
   // Initialize state from cache for instant render
@@ -322,6 +340,13 @@ export function useLibrary(options?: UseLibraryOptions) {
       }
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       let itemsQuery: any = (supabase as any).from(libraryItemsTable).select('*').eq('user_id', user.id);
+      if (archiveListKind === 'pauses') {
+        if (pausesArchiveSourceTypes && pausesArchiveSourceTypes.length > 0) {
+          itemsQuery = itemsQuery.in('source_type', [...pausesArchiveSourceTypes]);
+        } else {
+          itemsQuery = itemsQuery.eq('source_type', 'pause');
+        }
+      }
       if (favoritesOnly) itemsQuery = itemsQuery.eq('is_favorite', true);
       if (listSort === 'alphabetical') {
         itemsQuery = itemsQuery
@@ -334,7 +359,7 @@ export function useLibrary(options?: UseLibraryOptions) {
       }
       return itemsQuery.range(offset, offset + PAGE_SIZE - 1);
     },
-    [user, libraryItemsTable, favoritesOnly, listSort],
+    [user, libraryItemsTable, favoritesOnly, listSort, archiveListKind, pausesArchiveSourceTypes],
   );
 
   const fetchAll = useCallback(async () => {
