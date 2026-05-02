@@ -6,7 +6,7 @@ export const OPTIONAL_HOME_WIDGET_IDS = ['quick-capture', 'night'] as const;
 export type OptionalHomeWidgetId = (typeof OPTIONAL_HOME_WIDGET_IDS)[number];
 
 /** Shown on Home whenever present in layout order; Customize sheet has no on/off row (wireframe). */
-export const HOME_SECTION_IDS_WITHOUT_VISIBILITY_TOGGLE = ['market', 'your-pause'] as const;
+export const HOME_SECTION_IDS_WITHOUT_VISIBILITY_TOGGLE = ['market', 'your-pause', 'goal-why'] as const;
 export type HomeSectionIdWithoutVisibilityToggle =
   (typeof HOME_SECTION_IDS_WITHOUT_VISIBILITY_TOGGLE)[number];
 
@@ -28,14 +28,9 @@ export type AllHomeSectionId = (typeof ALL_HOME_SECTION_IDS)[number];
 /** Layout + visibility id for the Holzen score + In motion row (`HomeStatTiles`). */
 export const JOURNEY_STAT_TILES_VISIBILITY_ID = 'journey-pulse' as const;
 
-const VISIBILITY_KEYS = [
-  'goal-why',
-  ...OPTIONAL_HOME_WIDGET_IDS,
-  JOURNEY_STAT_TILES_VISIBILITY_ID,
-] as const;
+const VISIBILITY_KEYS = [...OPTIONAL_HOME_WIDGET_IDS, JOURNEY_STAT_TILES_VISIBILITY_ID] as const;
 
 const defaultVisible: Record<string, boolean> = {
-  'goal-why': true,
   [JOURNEY_STAT_TILES_VISIBILITY_ID]: true,
   'quick-capture': false,
   night: false,

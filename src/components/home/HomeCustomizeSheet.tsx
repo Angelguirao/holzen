@@ -20,7 +20,16 @@ import {
 import { SortableContext, verticalListSortingStrategy, arrayMove, useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 import { restrictToVerticalAxis } from '@dnd-kit/modifiers';
-import { HOME_SECTION_IDS_WITHOUT_VISIBILITY_TOGGLE } from '@/hooks/use-home-optional-visibility';
+import {
+  ALL_HOME_SECTION_IDS,
+  isHomeSectionAlwaysVisibleInLayout,
+} from '@/hooks/use-home-optional-visibility';
+import {
+  HOME_LAYOUT_BLOCK_TRIPLE,
+  HOME_MOVABLE_SECTION_IDS,
+  computeBlockInsertRank,
+  normalizeHomeSectionOrder,
+} from '@/lib/home-section-order-normalize';
 
 export interface HomeCustomizeSheetProps {
   open: boolean;
@@ -38,6 +47,10 @@ export interface HomeCustomizeSheetProps {
   nightToggleDisabled?: boolean;
 }
 
+function isMovableHomeSectionId(id: string): boolean {
+  return (HOME_MOVABLE_SECTION_IDS as readonly string[]).includes(id);
+}
+
 function CustomizeSortableRow({
   id,
   title,
@@ -46,6 +59,7 @@ function CustomizeSortableRow({
   onCheckedChange,
   switchDisabled,
   showSwitch,
+  disableSortable,
 }: {
   id: string;
   title: string;
@@ -53,10 +67,14 @@ function CustomizeSortableRow({
   checked: boolean;
   onCheckedChange: (v: boolean) => void;
   switchDisabled?: boolean;
-  /** When false, row is reorder-only (wireframe: Market, Your pause). */
   showSwitch: boolean;
+  /** Goal & Why + Today pair: always on, no drag handle (wireframe). */
+  disableSortable: boolean;
 }) {
-  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id });
+  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
+    id,
+    disabled: disableSortable,
+  });
   const style = {
     transform: CSS.Transform.toString(transform),
     transition,
@@ -68,20 +86,25 @@ function CustomizeSortableRow({
     <div
       ref={setNodeRef}
       style={style}
+      {...(disableSortable ? attributes : {})}
       className={cn(
         'flex items-start gap-2 rounded-xl border border-border/50 bg-muted/20 px-3 py-3',
         isDragging && 'shadow-md',
       )}
     >
-      <button
-        type="button"
-        className="touch-none cursor-grab shrink-0 rounded-md p-1.5 text-muted-foreground/50 hover:bg-muted/60 hover:text-muted-foreground active:cursor-grabbing"
-        aria-label={`Drag to reorder ${title}`}
-        {...attributes}
-        {...listeners}
-      >
-        <GripVertical className="h-4 w-4" aria-hidden />
-      </button>
+      {disableSortable ? (
+        <div className="h-9 w-10 shrink-0" aria-hidden />
+      ) : (
+        <button
+          type="button"
+          className="touch-none cursor-grab shrink-0 rounded-md p-1.5 text-muted-foreground/50 hover:bg-muted/60 hover:text-muted-foreground active:cursor-grabbing"
+          aria-label={`Drag to reorder ${title}`}
+          {...attributes}
+          {...listeners}
+        >
+          <GripVertical className="h-4 w-4" aria-hidden />
+        </button>
+      )}
       <div className="min-w-0 flex-1 space-y-0.5">
         <Label htmlFor={`home-section-${id}`} className="text-sm font-medium leading-snug text-foreground">
           {title}
@@ -129,10 +152,19 @@ export function HomeCustomizeSheet({
     (event: DragEndEvent) => {
       const { active, over } = event;
       if (!over || active.id === over.id) return;
-      const oldIndex = order.indexOf(active.id as string);
-      const newIndex = order.indexOf(over.id as string);
+      const activeId = String(active.id);
+      const overId = String(over.id);
+      if (!isMovableHomeSectionId(activeId) || !isMovableHomeSectionId(overId)) return;
+      const norm = normalizeHomeSectionOrder(order, ALL_HOME_SECTION_IDS);
+      const movableIds = norm.filter(isMovableHomeSectionId);
+      const oldIndex = movableIds.indexOf(activeId);
+      const newIndex = movableIds.indexOf(overId);
       if (oldIndex < 0 || newIndex < 0) return;
-      onReorder(arrayMove(order, oldIndex, newIndex));
+      const newMovable = arrayMove(movableIds, oldIndex, newIndex);
+      const rank = computeBlockInsertRank(norm);
+      const block = [...HOME_LAYOUT_BLOCK_TRIPLE];
+      const candidate = [...newMovable.slice(0, rank), ...block, ...newMovable.slice(rank)];
+      onReorder(normalizeHomeSectionOrder(candidate, ALL_HOME_SECTION_IDS));
     },
     [order, onReorder],
   );
@@ -213,9 +245,7 @@ export function HomeCustomizeSheet({
               <SortableContext items={order} strategy={verticalListSortingStrategy}>
                 <div className="flex flex-col gap-3">
                   {order.map((id) => {
-                    const noToggle = (HOME_SECTION_IDS_WITHOUT_VISIBILITY_TOGGLE as readonly string[]).includes(
-                      id,
-                    );
+                    const fixedRow = isHomeSectionAlwaysVisibleInLayout(id);
                     return (
                       <CustomizeSortableRow
                         key={id}
@@ -225,7 +255,8 @@ export function HomeCustomizeSheet({
                         checked={!!visible[id]}
                         onCheckedChange={(v) => onSetVisible(id, v)}
                         switchDisabled={id === 'night' && nightToggleDisabled}
-                        showSwitch={!noToggle}
+                        showSwitch={!fixedRow}
+                        disableSortable={fixedRow}
                       />
                     );
                   })}
