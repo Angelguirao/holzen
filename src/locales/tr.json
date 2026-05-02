@@ -977,6 +977,8 @@
     "scienceInfoAria": "Bu molanın arkasındaki bilim",
     "noReflection": "Aktif düşünce yok. Birini tetiklemek için geri dönün.",
     "outcomeSaveFailed": "Seçimin kaydedilemedi. Tekrar dene.",
+    "outcomeNotCompleted": "Seçimin kaydedildi ama bu mola henüz tamamlanmadı — Düşün’ü aç, bir refakat kartını bitir ve yeniden seç.",
+    "stepSyncFailed": "Bu adım eşitlenemedi. Bağlantını kontrol edip tekrar dene.",
     "pendingContextTitle": "Piyasa bağlamı değişti",
     "pendingContextBody": "Son hareket için yeni bir mola var. Mevcut molanızı tutabilir veya geçiş yapabilirsiniz — geçiş yapınca bu an için mevcut ritüel biter ve yenisi açılır.",
     "pendingAdoptCta": "Yeni molaya geç",

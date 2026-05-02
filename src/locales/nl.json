@@ -955,6 +955,8 @@
     "scienceInfoAria": "De wetenschap achter deze pauze",
     "noReflection": "Geen actieve reflectie. Ga terug om er een te starten.",
     "outcomeSaveFailed": "Je keuze kon niet worden opgeslagen. Probeer het opnieuw.",
+    "outcomeNotCompleted": "Je keuze is opgeslagen, maar deze pauze is nog niet af — open Reflecteren, rond een metgezelkaart af en kies opnieuw.",
+    "stepSyncFailed": "Deze stap kon niet worden gesynchroniseerd. Controleer je verbinding en probeer opnieuw.",
     "pendingContextTitle": "Marktcontext is veranderd",
     "pendingContextBody": "Er is een nieuwe pauze voor de laatste beweging. Je kunt je huidige pauze houden of wisselen — bij wisselen eindigt het huidige ritueel voor dit moment en opent de nieuwe.",
     "pendingAdoptCta": "Wissel naar nieuwe pauze",

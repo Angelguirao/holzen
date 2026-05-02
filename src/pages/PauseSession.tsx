@@ -32,6 +32,8 @@ import {
   companionDataFromArtifacts,
 } from '@/lib/pause-session-storage';
 import { pauseLogStep } from '@/lib/pause-api';
+import { canAdvanceFromPauseStep } from '@/lib/pause-session-navigation';
+import type { PauseState } from '@/lib/pause-state';
 import { getSessionQuote } from '@/lib/wisdom-quotes';
 
 type HydrationReady = {
@@ -332,6 +334,11 @@ export default function PauseSession() {
     return () => clearTimeout(timer);
   }, []);
 
+  useEffect(() => {
+    lastFeelLogKeyRef.current = null;
+    lastShiftLogKeyRef.current = null;
+  }, [pauseInstanceId]);
+
   const [swipeDirection, setSwipeDirection] = useState<'forward' | 'back'>('forward');
 
   const goToStep = useCallback(
@@ -355,6 +362,9 @@ export default function PauseSession() {
   }, [step]);
 
   const breathingRef = useRef<PauseBreathingHandle>(null);
+  const decidingRef = useRef(false);
+  const lastFeelLogKeyRef = useRef<string | null>(null);
+  const lastShiftLogKeyRef = useRef<string | null>(null);
   const [breathTimedActive, setBreathTimedActive] = useState(false);
 
   useEffect(() => {
@@ -388,19 +398,46 @@ export default function PauseSession() {
     goToStep('feel');
   }, [pauseInstanceId, goToStep]);
 
-  const handleSkipBreath = useCallback(() => {
+  const handleSkipBreath = useCallback(async () => {
     setBreathingCompleted(false);
+    if (pauseInstanceId) {
+      try {
+        await pauseLogStep({
+          instanceId: pauseInstanceId,
+          stepType: 'breath_completed',
+          payload: { skipped: true },
+        });
+      } catch {
+        toast.error(
+          t('pause.stepSyncFailed', {
+            defaultValue: 'Could not sync this step. Check your connection and try again.',
+          }),
+          { duration: 5000 },
+        );
+        return;
+      }
+    }
     goToStep('feel');
-  }, [goToStep]);
+  }, [pauseInstanceId, goToStep, t]);
 
   const goForward = useCallback(() => {
+    if (
+      !canAdvanceFromPauseStep({
+        step,
+        breathingCompleted,
+        moodDone,
+        moodAfterDone,
+      })
+    ) {
+      return;
+    }
     const currentIndex = STEPS.indexOf(step);
     if (currentIndex < STEPS.length - 1) {
       setSwipeDirection('forward');
       hapticFeedback('light');
       setStep(STEPS[currentIndex + 1]);
     }
-  }, [step]);
+  }, [step, breathingCompleted, moodDone, moodAfterDone]);
 
   const handleDragEnd = useCallback(
     (_: unknown, info: { offset: { x: number }; velocity: { x: number } }) => {
@@ -418,28 +455,68 @@ export default function PauseSession() {
   const handleMoodSelect = useCallback(
     async (mood: MoodValue, intensity?: number) => {
       hapticFeedback('light');
+      const payload =
+        typeof intensity === 'number' ? { mood, intensity } : { mood };
+      const logKey = JSON.stringify(payload);
+      if (pauseInstanceId && lastFeelLogKeyRef.current === logKey) {
+        setMoodDone(true);
+        setSelectedMood(mood);
+        setFeelIntensity(typeof intensity === 'number' ? intensity : null);
+        return;
+      }
       setMoodDone(true);
       setSelectedMood(mood);
       setFeelIntensity(typeof intensity === 'number' ? intensity : null);
       if (pauseInstanceId) {
-        const payload =
-          typeof intensity === 'number' ? { mood, intensity } : { mood };
+        try {
+          await pauseLogStep({
+            instanceId: pauseInstanceId,
+            stepType: 'initial_emotion_logged',
+            payload,
+          });
+          lastFeelLogKeyRef.current = logKey;
+        } catch {
+          lastFeelLogKeyRef.current = null;
+          setMoodDone(false);
+          setSelectedMood(null);
+          setFeelIntensity(null);
+          toast.error(
+            t('pause.stepSyncFailed', {
+              defaultValue: 'Could not sync this step. Check your connection and try again.',
+            }),
+            { duration: 5000 },
+          );
+        }
+      }
+    },
+    [pauseInstanceId, t],
+  );
+
+  const handleMoodSkip = useCallback(async () => {
+    setFeelIntensity(null);
+    if (pauseInstanceId) {
+      try {
         await pauseLogStep({
           instanceId: pauseInstanceId,
           stepType: 'initial_emotion_logged',
-          payload,
-        }).catch(() => {});
+          payload: { skipped: true },
+        });
+        lastFeelLogKeyRef.current = JSON.stringify({ skipped: true });
+      } catch {
+        toast.error(
+          t('pause.stepSyncFailed', {
+            defaultValue: 'Could not sync this step. Check your connection and try again.',
+          }),
+          { duration: 5000 },
+        );
+        return;
       }
-    },
-    [pauseInstanceId],
-  );
-
-  const handleMoodSkip = useCallback(() => {
+    }
     setMoodDone(true);
-    setFeelIntensity(null);
-  }, []);
+  }, [pauseInstanceId, t]);
 
   const handleMoodReset = useCallback(() => {
+    lastFeelLogKeyRef.current = null;
     setMoodDone(false);
     setSelectedMood(null);
     setFeelIntensity(null);
@@ -448,28 +525,68 @@ export default function PauseSession() {
   const handleMoodAfterSelect = useCallback(
     async (mood: MoodValue, intensity?: number) => {
       hapticFeedback('light');
+      const payload =
+        typeof intensity === 'number' ? { mood, shift_intensity: intensity } : { mood };
+      const logKey = JSON.stringify(payload);
+      if (pauseInstanceId && lastShiftLogKeyRef.current === logKey) {
+        setMoodAfterDone(true);
+        setSelectedMoodAfter(mood);
+        setShiftIntensity(typeof intensity === 'number' ? intensity : null);
+        return;
+      }
       setMoodAfterDone(true);
       setSelectedMoodAfter(mood);
       setShiftIntensity(typeof intensity === 'number' ? intensity : null);
       if (pauseInstanceId) {
-        const payload =
-          typeof intensity === 'number' ? { mood, shift_intensity: intensity } : { mood };
+        try {
+          await pauseLogStep({
+            instanceId: pauseInstanceId,
+            stepType: 'shift_emotion_logged',
+            payload,
+          });
+          lastShiftLogKeyRef.current = logKey;
+        } catch {
+          lastShiftLogKeyRef.current = null;
+          setMoodAfterDone(false);
+          setSelectedMoodAfter(null);
+          setShiftIntensity(null);
+          toast.error(
+            t('pause.stepSyncFailed', {
+              defaultValue: 'Could not sync this step. Check your connection and try again.',
+            }),
+            { duration: 5000 },
+          );
+        }
+      }
+    },
+    [pauseInstanceId, t],
+  );
+
+  const handleMoodAfterSkip = useCallback(async () => {
+    setShiftIntensity(null);
+    if (pauseInstanceId) {
+      try {
         await pauseLogStep({
           instanceId: pauseInstanceId,
           stepType: 'shift_emotion_logged',
-          payload,
-        }).catch(() => {});
+          payload: { skipped: true },
+        });
+        lastShiftLogKeyRef.current = JSON.stringify({ skipped: true });
+      } catch {
+        toast.error(
+          t('pause.stepSyncFailed', {
+            defaultValue: 'Could not sync this step. Check your connection and try again.',
+          }),
+          { duration: 5000 },
+        );
+        return;
       }
-    },
-    [pauseInstanceId],
-  );
-
-  const handleMoodAfterSkip = useCallback(() => {
+    }
     setMoodAfterDone(true);
-    setShiftIntensity(null);
-  }, []);
+  }, [pauseInstanceId, t]);
 
   const handleMoodAfterReset = useCallback(() => {
+    lastShiftLogKeyRef.current = null;
     setMoodAfterDone(false);
     setSelectedMoodAfter(null);
     setShiftIntensity(null);
@@ -510,49 +627,67 @@ export default function PauseSession() {
 
   const handleDecide = useCallback(
     async (d: string) => {
-      hapticFeedback('medium');
-      // Persist outcome before clearing Home/Library preview state. Calling
-      // dismissMessage() first races pause_dismiss_current against
-      // pause_log_step: if dismiss wins, the instance becomes terminal and
-      // outcome_logged is ignored — the pause stays "wrong" in history and
-      // surfaces can disagree until reload.
-      if (pauseInstanceId) {
-        try {
-          await pauseLogStep({
-            instanceId: pauseInstanceId,
-            stepType: 'outcome_logged',
-            payload: { outcome: d },
-          });
+      if (decidingRef.current) return;
+      decidingRef.current = true;
+      try {
+        hapticFeedback('medium');
+        // Persist outcome before clearing Home/Library preview state. Calling
+        // dismissMessage() first races pause_dismiss_current against
+        // pause_log_step: if dismiss wins, the instance becomes terminal and
+        // outcome_logged is ignored — the pause stays "wrong" in history and
+        // surfaces can disagree until reload.
+        let outcomeState: PauseState | null = null;
+        if (pauseInstanceId) {
+          try {
+            outcomeState = await pauseLogStep({
+              instanceId: pauseInstanceId,
+              stepType: 'outcome_logged',
+              payload: { outcome: d },
+            });
+          } catch {
+            toast.error(
+              t('pause.outcomeSaveFailed', {
+                defaultValue: 'Could not save your choice. Try again.',
+              }),
+              { duration: 5000 },
+            );
+            return;
+          }
+          if (outcomeState !== 'completed') {
+            toast.error(
+              t('pause.outcomeNotCompleted', {
+                defaultValue:
+                  'Your choice was saved, but this pause is not complete yet — open Reflect and finish a companion card, then choose again.',
+              }),
+              { duration: 8000 },
+            );
+            void refreshSubscription();
+            return;
+          }
           void refreshSubscription();
-        } catch {
-          toast.error(
-            t('pause.outcomeSaveFailed', {
-              defaultValue: 'Could not save your choice. Try again.',
-            }),
-            { duration: 5000 },
-          );
-          return;
         }
+        setDecision(d);
+        await dismissMessage();
+        const q = getSessionQuote();
+        setPauseImpactData({
+          mood: selectedMood,
+          moodAfter: selectedMoodAfter,
+          breathingCompleted,
+          decision: d,
+          context,
+          engagedTools: 0,
+          wroteNote: false,
+          usedTags: false,
+          feelIntensity,
+          shiftIntensity,
+          reinforcementQuote: `"${q.text}" — ${q.author}`,
+        });
+        hapticFeedback('success');
+        setPhase('done');
+        clearSession();
+      } finally {
+        decidingRef.current = false;
       }
-      setDecision(d);
-      await dismissMessage();
-      const q = getSessionQuote();
-      setPauseImpactData({
-        mood: selectedMood,
-        moodAfter: selectedMoodAfter,
-        breathingCompleted,
-        decision: d,
-        context,
-        engagedTools: 0,
-        wroteNote: false,
-        usedTags: false,
-        feelIntensity,
-        shiftIntensity,
-        reinforcementQuote: `"${q.text}" — ${q.author}`,
-      });
-      hapticFeedback('success');
-      setPhase('done');
-      clearSession();
     },
     [
       dismissMessage,
