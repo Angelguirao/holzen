@@ -1,4 +1,5 @@
 import { useState, useCallback, type ReactNode } from 'react';
+import { mergeOrderWithDefaults, normalizeHomeSectionOrder } from '@/lib/home-section-order-normalize';
 import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
 import { GripVertical, ChevronDown } from 'lucide-react';
 import { useSortable } from '@dnd-kit/sortable';
@@ -122,28 +123,22 @@ const LEGACY_ORDER_KEY = 'holzen_widget_order';
 const COLLAPSED_KEY = 'holzen_home_section_collapsed_v1';
 const LEGACY_COLLAPSED_KEY = 'holzen_widget_collapsed';
 
-function mergeOrderWithDefaults(parsed: string[], defaultOrder: string[]): string[] {
-  const merged = parsed.filter((id) => defaultOrder.includes(id));
-  const missing = defaultOrder.filter((id) => !merged.includes(id));
-  return [...merged, ...missing];
-}
-
 function loadOrder(defaultOrder: string[]): string[] {
   try {
     const raw = localStorage.getItem(ORDER_KEY);
     if (raw) {
       const parsed = JSON.parse(raw) as string[];
-      return mergeOrderWithDefaults(parsed, defaultOrder);
+      return normalizeHomeSectionOrder(mergeOrderWithDefaults(parsed, defaultOrder), defaultOrder);
     }
     const legacy = localStorage.getItem(LEGACY_ORDER_KEY);
     if (legacy) {
       const parsed = JSON.parse(legacy) as string[];
-      return mergeOrderWithDefaults(parsed, defaultOrder);
+      return normalizeHomeSectionOrder(mergeOrderWithDefaults(parsed, defaultOrder), defaultOrder);
     }
   } catch {
     void 0;
   }
-  return [...defaultOrder];
+  return normalizeHomeSectionOrder([...defaultOrder], defaultOrder);
 }
 
 function loadCollapsed(): Record<string, boolean> {
@@ -163,10 +158,14 @@ export function useWidgetLayout(defaultOrder: string[]) {
 
   const [collapsed, setCollapsed] = useState<Record<string, boolean>>(loadCollapsed);
 
-  const reorder = useCallback((newOrder: string[]) => {
-    setOrder(newOrder);
-    localStorage.setItem(ORDER_KEY, JSON.stringify(newOrder));
-  }, []);
+  const reorder = useCallback(
+    (newOrder: string[]) => {
+      const normalized = normalizeHomeSectionOrder(newOrder, defaultOrder);
+      setOrder(normalized);
+      localStorage.setItem(ORDER_KEY, JSON.stringify(normalized));
+    },
+    [defaultOrder],
+  );
 
   const toggleCollapsed = useCallback((id: string) => {
     setCollapsed((prev) => {
@@ -177,7 +176,7 @@ export function useWidgetLayout(defaultOrder: string[]) {
   }, []);
 
   const resetLayout = useCallback(() => {
-    setOrder([...defaultOrder]);
+    setOrder(normalizeHomeSectionOrder([...defaultOrder], defaultOrder));
     setCollapsed({});
     localStorage.removeItem(ORDER_KEY);
     localStorage.removeItem(COLLAPSED_KEY);
