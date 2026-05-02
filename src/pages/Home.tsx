@@ -659,19 +659,16 @@ const Home = () => {
 
           {message ? (
             <div className="space-y-4">
-              <div className="space-y-2 min-w-0">
-                {(pauseContextHomePreview.btc24h || pauseContextHomePreview.marketSentiment) ? (
-                  <div className={cn(homeInWidget.meta, 'space-y-1')}>
-                    {pauseContextHomePreview.btc24h ? (
-                      <p className="leading-snug">{pauseContextHomePreview.btc24h}</p>
-                    ) : null}
-                    {pauseContextHomePreview.marketSentiment ? (
-                      <p className="leading-snug">{pauseContextHomePreview.marketSentiment}</p>
-                    ) : null}
-                  </div>
-                ) : null}
-                <p className={homeInWidget.metaFaint}>{t('home.yourPauseCard.reflectionOpensInPause')}</p>
-              </div>
+              {(pauseContextHomePreview.btc24h || pauseContextHomePreview.marketSentiment) ? (
+                <div className={cn(homeInWidget.meta, 'min-w-0 space-y-1')}>
+                  {pauseContextHomePreview.btc24h ? (
+                    <p className="leading-snug">{pauseContextHomePreview.btc24h}</p>
+                  ) : null}
+                  {pauseContextHomePreview.marketSentiment ? (
+                    <p className="leading-snug">{pauseContextHomePreview.marketSentiment}</p>
+                  ) : null}
+                </div>
+              ) : null}
               <button
                 type="button"
                 onClick={() => {
@@ -774,9 +771,7 @@ const Home = () => {
                             <p className="leading-snug">{pinnedContextHomePreview.marketSentiment}</p>
                           ) : null}
                         </div>
-                      ) : (
-                        <p className={homeInWidget.metaFaint}>{t('home.yourPauseCard.pinnedNoContext')}</p>
-                      )}
+                      ) : null}
                     </div>
                   )}
                   <NeedAMomentButton onTrigger={handleNeedAPause} cooldownRemaining={manualCooldownRemaining} loading={loading} />
