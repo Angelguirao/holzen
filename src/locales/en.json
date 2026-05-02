@@ -2158,6 +2158,8 @@
     "openArchiveFullDetail": "Open Archive for full detail",
     "heldAllPill": "Held all",
     "heldRest": "Held rest",
+    "applyFailed": "Could not save outcomes. Check your connection and try again.",
+    "applyPartialFailed": "{{count}} pause(s) could not be saved. Fix your connection or try again.",
     "reviewTitle": "Pauses to review",
     "reviewSub": "These expired without an outcome. Open your Archive for full detail on each pause.",
     "successHeadline": "Held through your stack",

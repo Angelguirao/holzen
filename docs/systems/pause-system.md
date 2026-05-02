@@ -91,6 +91,8 @@ Payload shapes:
 | `favorite_toggled` | `{ "is_favorite": true }` |
 | `reflection_step` | Free-form breadcrumb for the Reflect screen. |
 
+After `expired`, the row stays terminal, but `pause_log_step` may still append **one** `outcome_logged` event (Home bulk-hold / review rescue) so stats can infer a retrospective outcome. Other step types on `expired` still no-op.
+
 ### 2.4 `pause_companion_events`
 
 Append-only log of companion open/complete events. Crucially records
