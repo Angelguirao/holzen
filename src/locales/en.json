@@ -146,6 +146,10 @@
       "expandHoldDetails": "Show hold goal details and motivations",
       "collapseHoldDetails": "Hide hold goal details and motivations"
     },
+    "yourPauseCard": {
+      "reflectionOpensInPause": "Your full reflection appears after you start this pause below.",
+      "pinnedNoContext": "No snapshot lines for this pin — open Archive or a recent pause for the full reflection."
+    },
     "statTiles": {
       "holzenScore": "Holzen score",
       "inMotion": "In motion",
