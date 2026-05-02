@@ -96,26 +96,6 @@ export default function Library() {
   const hasActiveFilters =
     selectedSourceTypes.length > 0 || !!tagFilter || !!smartFilter || !!search.trim();
 
-  const archiveRpcFilters = useMemo(
-    () => ({
-      search,
-      sourceTypes: mainSegment === 'pauses' ? selectedSourceTypes : [],
-      tag: tagFilter,
-      smartIds: smartFilter ? [...smartFilter.itemIds] : [],
-      mainPauseBookmarkOnly:
-        mainSegment === 'pauses' && pausesScope === 'all' && !hasActiveFilters,
-    }),
-    [
-      search,
-      mainSegment,
-      selectedSourceTypes,
-      tagFilter,
-      smartFilter,
-      pausesScope,
-      hasActiveFilters,
-    ],
-  );
-
   const archiveListKind =
     mainSegment === 'echoes' ? 'echo' : mainSegment === 'pauses' ? 'pauses' : 'default';
 
@@ -123,7 +103,6 @@ export default function Library() {
     archiveListKind,
     favoritesOnly: libraryListFavoritesOnly,
     listSort: sortMode,
-    archiveRpcFilters,
   });
 
   const setMainSegment = useCallback(
@@ -284,9 +263,40 @@ export default function Library() {
 
   const filtered = useMemo(() => {
     if (mainSegment === 'collections') return [];
-    // Pauses / Echoes: `library_archive_list_page` applies filters, sort, and main-pause bookmark mode.
-    return segmentBase;
-  }, [segmentBase, mainSegment]);
+    let result = segmentBase;
+    // Pauses / Echoes: rows already come from `library_archive_*` views (membership in SQL).
+    // Search, tags, types, and smart lists filter client-side over loaded pages.
+    if (mainSegment === 'pauses' && selectedSourceTypes.length > 0) {
+      result = result.filter((i) =>
+        selectedSourceTypes.includes(normalizeLibrarySourceType(i.source_type) ?? i.source_type ?? ''),
+      );
+    }
+    if (smartFilter) result = result.filter((i) => smartFilter.itemIds.has(i.id));
+    if (tagFilter) result = result.filter((i) => i.tags?.includes(tagFilter));
+    if (search.trim()) {
+      const q = search.toLowerCase();
+      result = result.filter(
+        (i) =>
+          i.title?.toLowerCase().includes(q) ||
+          i.body?.toLowerCase().includes(q) ||
+          i.tags?.some((tg) => tg.toLowerCase().includes(q)),
+      );
+    }
+    if (sortMode === 'oldest') {
+      result = [...result].sort((a, b) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime());
+    } else if (sortMode === 'alphabetical') {
+      result = [...result].sort((a, b) => (a.title ?? '').localeCompare(b.title ?? ''));
+    }
+    return result;
+  }, [
+    segmentBase,
+    mainSegment,
+    selectedSourceTypes,
+    smartFilter,
+    tagFilter,
+    search,
+    sortMode,
+  ]);
 
   const clearAllFilters = () => {
     setSelectedSourceTypes([]);

@@ -77,24 +77,6 @@ export type LibraryArchiveListKind = 'default' | 'echo' | 'pauses';
 /** Server-side ordering for the active list (client may still re-sort after local filters). */
 export type LibraryListSortMode = 'newest' | 'oldest' | 'alphabetical';
 
-/** Filters applied in `library_archive_list_page` when listing Pauses / Echo segments. */
-export type LibraryArchiveRpcFilters = {
-  search: string;
-  sourceTypes: string[];
-  tag: string | null;
-  smartIds: string[];
-  /** Pauses “All” default: one main bookmark row per pause session (no active filters). */
-  mainPauseBookmarkOnly: boolean;
-};
-
-const EMPTY_ARCHIVE_RPC_FILTERS: LibraryArchiveRpcFilters = {
-  search: '',
-  sourceTypes: [],
-  tag: null,
-  smartIds: [],
-  mainPauseBookmarkOnly: false,
-};
-
 export type UseLibraryOptions = {
   archiveListKind?: LibraryArchiveListKind;
   /**
@@ -103,8 +85,6 @@ export type UseLibraryOptions = {
    */
   favoritesOnly?: boolean;
   listSort?: LibraryListSortMode;
-  /** When `archiveListKind` is `pauses` or `echo`, passed to `library_archive_list_page`. */
-  archiveRpcFilters?: LibraryArchiveRpcFilters;
 };
 
 type LibraryItemsRelation = 'library_items' | 'library_archive_echo_items' | 'library_archive_pauses_tab_items';
@@ -115,41 +95,12 @@ function libraryTableForKind(kind: LibraryArchiveListKind): LibraryItemsRelation
   return 'library_items';
 }
 
-function buildItemsCacheKey(
-  kind: LibraryArchiveListKind,
-  favoritesOnly: boolean,
-  listSort: LibraryListSortMode,
-  usesArchiveRpc: boolean,
-  rpcFilterKey: string,
-): string {
+function buildItemsCacheKey(kind: LibraryArchiveListKind, favoritesOnly: boolean, listSort: LibraryListSortMode): string {
   const sort = listSort;
-  const rpc = usesArchiveRpc ? `:${rpcFilterKey}` : '';
-  if (kind === 'echo') return `${CACHE_KEY_ITEMS_ECHO}:${sort}${rpc}`;
-  if (kind === 'pauses') return `${CACHE_KEY_ITEMS_Pauses_SEG}:${favoritesOnly ? 'fav' : 'all'}:${sort}${rpc}`;
+  if (kind === 'echo') return `${CACHE_KEY_ITEMS_ECHO}:${sort}`;
+  if (kind === 'pauses') return `${CACHE_KEY_ITEMS_Pauses_SEG}:${favoritesOnly ? 'fav' : 'all'}:${sort}`;
   if (favoritesOnly) return `${CACHE_KEY_ITEMS_FAVS}:${sort}`;
   return `${CACHE_KEY_ITEMS}:${sort}`;
-}
-
-function buildRpcFilterKey(f?: LibraryArchiveRpcFilters): string {
-  const st = [...(f?.sourceTypes ?? [])].sort().join('\u0001');
-  const sm = [...(f?.smartIds ?? [])].sort().join('\u0001');
-  return JSON.stringify({
-    s: f?.search ?? '',
-    st,
-    tag: f?.tag ?? '',
-    sm,
-    mp: f?.mainPauseBookmarkOnly ?? false,
-  });
-}
-
-/** When false, `library_archive_*` views do not match `library_archive_list_page` (filters / main row mode). */
-function archiveListSupportsPlainViewFallback(f: LibraryArchiveRpcFilters): boolean {
-  if ((f.search?.trim() ?? '') !== '') return false;
-  if ((f.tag?.trim() ?? '') !== '') return false;
-  if (f.sourceTypes.length > 0) return false;
-  if (f.smartIds.length > 0) return false;
-  if (f.mainPauseBookmarkOnly) return false;
-  return true;
 }
 
 function readCache<T>(key: string): T | null {
@@ -173,16 +124,7 @@ export function useLibrary(options?: UseLibraryOptions) {
   const favoritesOnly = options?.favoritesOnly ?? false;
   const archiveListKind: LibraryArchiveListKind = options?.archiveListKind ?? 'default';
   const listSort: LibraryListSortMode = options?.listSort ?? 'newest';
-  const usesArchiveRpcList = archiveListKind === 'pauses' || archiveListKind === 'echo';
-  const rpcFilters: LibraryArchiveRpcFilters = options?.archiveRpcFilters ?? EMPTY_ARCHIVE_RPC_FILTERS;
-  const rpcFilterKey = buildRpcFilterKey(options?.archiveRpcFilters);
-  const itemsCacheKey = buildItemsCacheKey(
-    archiveListKind,
-    favoritesOnly,
-    listSort,
-    usesArchiveRpcList,
-    rpcFilterKey,
-  );
+  const itemsCacheKey = buildItemsCacheKey(archiveListKind, favoritesOnly, listSort);
   const libraryItemsTable = libraryTableForKind(archiveListKind);
 
   // Initialize state from cache for instant render
@@ -348,43 +290,12 @@ export function useLibrary(options?: UseLibraryOptions) {
     }
     // Swap list to this mode’s cache immediately so Pauses/Favs never briefly shows the wrong query’s rows.
     const cached = readCache<LibraryItem[]>(itemsCacheKey) ?? [];
-    if (usesArchiveRpcList) {
-      // RPC only ever returns one page; showing a multi-page cache then replacing it caused a visible
-      // shrink and “missing” rows until the user scrolled load-more again.
-      const optimistic = cached.length > PAGE_SIZE ? cached.slice(0, PAGE_SIZE) : cached;
-      setItems(optimistic);
-      setLoading(optimistic.length === 0);
-    } else {
-      setItems(cached);
-      setLoading(cached.length === 0);
-    }
+    // Lists are paginated in pages of PAGE_SIZE; never show a longer cached list before the first fetch completes.
+    const optimistic = cached.length > PAGE_SIZE ? cached.slice(0, PAGE_SIZE) : cached;
+    setItems(optimistic);
+    setLoading(optimistic.length === 0);
 
-    const searchTrim = rpcFilters.search?.trim() ?? '';
-    const tagTrim = rpcFilters.tag?.trim() ?? '';
-    const segment = archiveListKind === 'echo' ? 'echo' : 'pauses';
-    const rpcPayload = {
-      p_segment: segment,
-      p_favorites_only: favoritesOnly,
-      p_search: searchTrim === '' ? null : searchTrim,
-      p_tag: tagTrim === '' ? null : tagTrim,
-      p_source_types:
-        segment === 'pauses' && rpcFilters.sourceTypes.length > 0 ? rpcFilters.sourceTypes : null,
-      p_smart_ids: rpcFilters.smartIds.length > 0 ? rpcFilters.smartIds : null,
-      p_sort: listSort,
-      p_main_pause_only: segment === 'pauses' && rpcFilters.mainPauseBookmarkOnly,
-      p_limit: PAGE_SIZE,
-      p_offset: 0,
-    } satisfies Database['public']['Functions']['library_archive_list_page']['Args'];
-
-    const itemsPromise = (async () => {
-      if (usesArchiveRpcList) {
-        const rpcRes = await supabase.rpc('library_archive_list_page', rpcPayload);
-        if (!rpcRes.error) return rpcRes;
-        if (archiveListSupportsPlainViewFallback(rpcFilters)) return fetchItemsPageFromTable(0);
-        return rpcRes;
-      }
-      return fetchItemsPageFromTable(0);
-    })();
+    const itemsPromise = fetchItemsPageFromTable(0);
 
     const [rItems, rCols, rColItems] = await Promise.all([
       itemsPromise,
@@ -429,51 +340,14 @@ export function useLibrary(options?: UseLibraryOptions) {
     // Keep prior pause meta until hydration completes (avoids tab/list flicker).
     await hydratePauseMeta(libItems);
     prunePauseDerivedState(libItems);
-  }, [
-    user,
-    hydratePauseMeta,
-    t,
-    favoritesOnly,
-    itemsCacheKey,
-    prunePauseDerivedState,
-    libraryItemsTable,
-    listSort,
-    usesArchiveRpcList,
-    archiveListKind,
-    rpcFilters,
-    fetchItemsPageFromTable,
-  ]);
+  }, [user, hydratePauseMeta, t, favoritesOnly, itemsCacheKey, prunePauseDerivedState, libraryItemsTable, listSort, fetchItemsPageFromTable]);
 
   const loadMore = useCallback(async () => {
     if (!user || loadingMore || !hasMore) return;
     setLoadingMore(true);
     const offset = items.length;
 
-    const searchTrim = rpcFilters.search?.trim() ?? '';
-    const tagTrim = rpcFilters.tag?.trim() ?? '';
-    const segment = archiveListKind === 'echo' ? 'echo' : 'pauses';
-    const rpcPayload = {
-      p_segment: segment,
-      p_favorites_only: favoritesOnly,
-      p_search: searchTrim === '' ? null : searchTrim,
-      p_tag: tagTrim === '' ? null : tagTrim,
-      p_source_types:
-        segment === 'pauses' && rpcFilters.sourceTypes.length > 0 ? rpcFilters.sourceTypes : null,
-      p_smart_ids: rpcFilters.smartIds.length > 0 ? rpcFilters.smartIds : null,
-      p_sort: listSort,
-      p_main_pause_only: segment === 'pauses' && rpcFilters.mainPauseBookmarkOnly,
-      p_limit: PAGE_SIZE,
-      p_offset: offset,
-    } satisfies Database['public']['Functions']['library_archive_list_page']['Args'];
-
-    const { data, error } = usesArchiveRpcList
-      ? await (async () => {
-          const rpcRes = await supabase.rpc('library_archive_list_page', rpcPayload);
-          if (!rpcRes.error) return rpcRes;
-          if (archiveListSupportsPlainViewFallback(rpcFilters)) return fetchItemsPageFromTable(offset);
-          return rpcRes;
-        })()
-      : await fetchItemsPageFromTable(offset);
+    const { data, error } = await fetchItemsPageFromTable(offset);
     if (error) {
       toast.error(t('library.loadMoreFailed'));
       setHasMore(false);
@@ -503,9 +377,6 @@ export function useLibrary(options?: UseLibraryOptions) {
     itemsCacheKey,
     libraryItemsTable,
     listSort,
-    usesArchiveRpcList,
-    archiveListKind,
-    rpcFilters,
     fetchItemsPageFromTable,
   ]);
 
