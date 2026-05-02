@@ -103,6 +103,7 @@ export default function Library() {
     archiveListKind,
     favoritesOnly: libraryListFavoritesOnly,
     listSort: sortMode,
+    pausesArchiveSourceTypes: mainSegment === 'pauses' ? selectedSourceTypes : undefined,
   });
 
   const setMainSegment = useCallback(
@@ -160,7 +161,8 @@ export default function Library() {
       const { count, error } = await supabase
         .from('library_archive_pauses_tab_items')
         .select('*', { count: 'exact', head: true })
-        .eq('user_id', user.id);
+        .eq('user_id', user.id)
+        .eq('source_type', 'pause');
       if (!cancelled) {
         if (!error) setPausesTabHasArchiveRows((count ?? 0) > 0);
         else setPausesTabHasArchiveRows(null);
@@ -241,13 +243,11 @@ export default function Library() {
     return items.some((i) => i.status !== 'deleted' && i.status !== 'archived');
   }, [mainSegment, items]);
 
+  /** Pauses list defaults to `pause` only; chips still list every filterable type. */
   const availableSources = useMemo(() => {
     if (mainSegment !== 'pauses') return [];
-    const existing = new Set(
-      segmentBase.map((i) => normalizeLibrarySourceType(i.source_type) ?? i.source_type ?? '').filter(Boolean),
-    );
-    return sourceChips.filter((f) => existing.has(f.key));
-  }, [segmentBase, sourceChips, mainSegment]);
+    return sourceChips;
+  }, [mainSegment, sourceChips]);
 
   const availableTags = useMemo(() => {
     const tagCount = new Map<string, number>();
@@ -264,13 +264,8 @@ export default function Library() {
   const filtered = useMemo(() => {
     if (mainSegment === 'collections') return [];
     let result = segmentBase;
-    // Pauses / Echoes: rows already come from `library_archive_*` views (membership in SQL).
-    // Search, tags, types, and smart lists filter client-side over loaded pages.
-    if (mainSegment === 'pauses' && selectedSourceTypes.length > 0) {
-      result = result.filter((i) =>
-        selectedSourceTypes.includes(normalizeLibrarySourceType(i.source_type) ?? i.source_type ?? ''),
-      );
-    }
+    // Pauses: `source_type` is applied server-side (`useLibrary`); Echoes: view membership only.
+    // Search, tags, and smart lists filter client-side over loaded pages.
     if (smartFilter) result = result.filter((i) => smartFilter.itemIds.has(i.id));
     if (tagFilter) result = result.filter((i) => i.tags?.includes(tagFilter));
     if (search.trim()) {
@@ -288,15 +283,7 @@ export default function Library() {
       result = [...result].sort((a, b) => (a.title ?? '').localeCompare(b.title ?? ''));
     }
     return result;
-  }, [
-    segmentBase,
-    mainSegment,
-    selectedSourceTypes,
-    smartFilter,
-    tagFilter,
-    search,
-    sortMode,
-  ]);
+  }, [segmentBase, mainSegment, smartFilter, tagFilter, search, sortMode]);
 
   const clearAllFilters = () => {
     setSelectedSourceTypes([]);
