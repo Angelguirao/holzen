@@ -196,7 +196,6 @@
       "practice": "Practice"
     },
     "journeyPulse": {
-      "scoreLabel": "Global score",
       "closestBadge": "Closest badge",
       "badgeProgress": "{{current}} / {{requirement}}",
       "openStats": "Open stats",
