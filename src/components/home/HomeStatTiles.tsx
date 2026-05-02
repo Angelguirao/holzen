@@ -1,7 +1,7 @@
 import { useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { Hand } from 'lucide-react';
+import { ChevronRight, Hand } from 'lucide-react';
 import { usePauseStatsData, type PauseFullRow } from '@/hooks/use-pause-stats-data';
 import { useHoldGoalProfile } from '@/hooks/use-hold-goal';
 import { useBadges } from '@/hooks/use-badges';
@@ -11,6 +11,7 @@ import { journeyPath } from '@/lib/app-routes';
 import { Skeleton } from '@/components/ui/skeleton';
 import type { BadgeSnapshot } from '@/lib/badges/compute';
 import { cn } from '@/lib/utils';
+import { homeInWidget } from '@/components/home/home-widget-styles';
 
 function pickClosestUnearned(snapshots: BadgeSnapshot[], subscribed: boolean): BadgeSnapshot | null {
   const candidates = snapshots.filter((s) => !s.earned && s.requirement > 0 && (!s.proOnly || subscribed));
@@ -64,20 +65,38 @@ export function HomeStatTiles() {
       <Link
         to={journeyPath('stats')}
         className={cn(
-          'rounded-xl border border-border/40 bg-card/40 p-3 transition-colors hover:bg-card/60',
-          'flex flex-col justify-between min-h-[128px]',
+          'group relative flex min-h-[128px] flex-col overflow-hidden rounded-xl border border-border/40 p-3',
+          'bg-gradient-to-b from-primary/[0.08] via-card/45 to-card/40',
+          'transition-colors hover:border-primary/30 hover:from-primary/[0.11] hover:via-card/55 hover:to-card/50',
         )}
       >
-        <p className="text-[10px] font-medium uppercase tracking-widest text-muted-foreground">
-          {t('home.statTiles.holzenScore')}
-        </p>
+        <div className="pointer-events-none absolute inset-y-3 left-0 w-px bg-gradient-to-b from-primary/50 via-primary/25 to-transparent" aria-hidden />
+        <div className="flex items-start justify-between gap-2 pl-2">
+          <p className={cn(homeInWidget.kicker, 'text-[10px] tracking-widest')}>{t('home.statTiles.holzenScore')}</p>
+          <ChevronRight
+            className="mt-0.5 h-4 w-4 shrink-0 text-muted-foreground/45 transition-transform group-hover:translate-x-0.5 group-hover:text-muted-foreground/70"
+            aria-hidden
+          />
+        </div>
         {scoreData ? (
-          <div className="mt-2">
-            <p className="text-4xl font-normal tabular-nums leading-none tracking-tight text-foreground">{scoreData.score}</p>
-            <p className="mt-1 text-xs text-muted-foreground">{t('home.journeyPulse.scoreLabel')}</p>
+          <div className="mt-3 flex flex-1 flex-col justify-between pl-2">
+            <div>
+              <p className="text-[2.65rem] font-semibold tabular-nums leading-none tracking-tight text-foreground">
+                {scoreData.score}
+              </p>
+              <p className={cn(homeInWidget.metaFaint, 'mt-2 max-w-[11rem] leading-snug')}>
+                {t('home.journeyPulse.scoreLabel')}
+              </p>
+            </div>
+            <div className="mt-4 h-1 w-full overflow-hidden rounded-full bg-muted/70" aria-hidden>
+              <div
+                className="h-full rounded-full bg-primary/55 transition-[width] duration-300 ease-out"
+                style={{ width: `${scoreData.score}%` }}
+              />
+            </div>
           </div>
         ) : (
-          <p className="mt-2 text-sm text-muted-foreground">{t('home.journeyPulse.noScore')}</p>
+          <p className={cn(homeInWidget.meta, 'mt-3 flex-1 pl-2 leading-snug')}>{t('home.journeyPulse.noScore')}</p>
         )}
       </Link>
 
