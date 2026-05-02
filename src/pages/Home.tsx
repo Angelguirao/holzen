@@ -23,6 +23,7 @@ import {
   useHomeOptionalVisibility,
   ALL_HOME_SECTION_IDS,
   JOURNEY_STAT_TILES_VISIBILITY_ID,
+  isHomeSectionAlwaysVisibleInLayout,
 } from '@/hooks/use-home-optional-visibility';
 import { useCallback, useEffect, useState, useMemo, useRef, type ReactNode } from 'react';
 import { useOutletContext, useSearchParams, useNavigate, useLocation } from 'react-router-dom';
@@ -44,6 +45,7 @@ import { trackEvent } from '@/lib/posthog';
 import { heroQuoteIndexForDay, utcYmd } from '@/lib/home-hero-quote';
 import { parsePauseContextForHomePreview } from '@/lib/pause-context-home-preview';
 import { type PauseSessionLocationState } from '@/lib/router-location-state';
+import { buildHomeRenderableSegments } from '@/lib/home-renderable-segments';
 
 interface PinnedPausePreview {
   id: string;
@@ -52,40 +54,6 @@ interface PinnedPausePreview {
   haiku: string | null;
   grounding_title: string | null;
   grounding_body: string | null;
-}
-
-const HOME_TODAY_SECTION_IDS = new Set(['market', 'your-pause']);
-
-type HomeRenderableSegment =
-  | { type: 'plain'; id: string }
-  | { type: 'todayBlock'; ids: string[] };
-
-/** When Market and Your pause are adjacent in the saved order, group them under "Today" with stat tiles (wireframe IA). */
-function buildHomeRenderableSegments(orderedIds: string[]): HomeRenderableSegment[] {
-  const todayInOrder = orderedIds.filter((id) => HOME_TODAY_SECTION_IDS.has(id));
-  const result: HomeRenderableSegment[] = [];
-  let i = 0;
-  while (i < orderedIds.length) {
-    const id = orderedIds[i];
-    if (!HOME_TODAY_SECTION_IDS.has(id)) {
-      result.push({ type: 'plain', id });
-      i++;
-      continue;
-    }
-    const chunk: string[] = [];
-    while (i < orderedIds.length && HOME_TODAY_SECTION_IDS.has(orderedIds[i])) {
-      chunk.push(orderedIds[i]);
-      i++;
-    }
-    if (chunk.length === todayInOrder.length) {
-      result.push({ type: 'todayBlock', ids: chunk });
-    } else {
-      for (const cid of chunk) {
-        result.push({ type: 'plain', id: cid });
-      }
-    }
-  }
-  return result;
 }
 
 const Home = () => {
@@ -202,6 +170,7 @@ const Home = () => {
   const visibleOrderedSectionIds = useMemo(
     () =>
       order.filter((id) => {
+        if (isHomeSectionAlwaysVisibleInLayout(id)) return true;
         if (!sectionVisible[id]) return false;
         if (id === 'night' && (!subscribed || !nightReflection)) return false;
         return true;
@@ -214,29 +183,14 @@ const Home = () => {
     [visibleOrderedSectionIds],
   );
 
-  const statTilesInsideToday = useMemo(
-    () => homeSegments.some((s) => s.type === 'todayBlock'),
-    [homeSegments],
-  );
-
   const showJourneyStatTiles = !!sectionVisible[JOURNEY_STAT_TILES_VISIBILITY_ID];
-
-  const journeyPulseCustomizeToggle = useMemo(
-    () => [
-      {
-        id: JOURNEY_STAT_TILES_VISIBILITY_ID,
-        title: t('home.customizeSheet.sections.journeyPulse.title'),
-        description: t('home.customizeSheet.sections.journeyPulse.desc'),
-      },
-    ],
-    [t],
-  );
 
   const handleSetSectionVisible = useCallback(
     (id: string, value: boolean) => {
+      if (isHomeSectionAlwaysVisibleInLayout(id)) return;
       trackEvent('home.optional_widget_toggled', { widget_id: id, visible: value });
       setVisible(id, value);
-      if (value && !order.includes(id) && id !== JOURNEY_STAT_TILES_VISIBILITY_ID) {
+      if (value && !order.includes(id)) {
         reorder([...order, id]);
       }
     },
@@ -258,6 +212,7 @@ const Home = () => {
         'your-pause': t('home.customizeSheet.sections.yourPause.title'),
         'quick-capture': t('home.customizeSheet.sections.quickCapture.title'),
         night: t('home.customizeSheet.sections.night.title'),
+        [JOURNEY_STAT_TILES_VISIBILITY_ID]: t('home.customizeSheet.sections.journeyPulse.title'),
       };
       return titles[id] ?? id;
     },
@@ -272,6 +227,7 @@ const Home = () => {
         'your-pause': t('home.customizeSheet.sections.yourPause.desc'),
         'quick-capture': t('home.customizeSheet.sections.quickCapture.desc'),
         night: t('home.customizeSheet.sections.night.desc'),
+        [JOURNEY_STAT_TILES_VISIBILITY_ID]: t('home.customizeSheet.sections.journeyPulse.desc'),
       };
       return descs[id] ?? '';
     },
@@ -950,6 +906,14 @@ const Home = () => {
       <div className="space-y-4">
         {homeSegments.map((seg, segIdx) => {
           if (seg.type === 'plain') {
+            if (seg.id === JOURNEY_STAT_TILES_VISIBILITY_ID) {
+              if (!showJourneyStatTiles) return null;
+              return (
+                <div key={`${seg.type}-${seg.id}-${segIdx}`}>
+                  <HomeStatTiles />
+                </div>
+              );
+            }
             const node = renderHomeSection(seg.id);
             if (node == null) return null;
             return (
@@ -972,13 +936,10 @@ const Home = () => {
                   return <div key={sectionId}>{node}</div>;
                 })}
               </div>
-              {showJourneyStatTiles ? <HomeStatTiles /> : null}
             </section>
           );
         })}
       </div>
-
-      {!statTilesInsideToday && showJourneyStatTiles ? <HomeStatTiles /> : null}
 
       <HomeCustomizeSheet
         open={customizeOpen}
@@ -993,7 +954,6 @@ const Home = () => {
         onZenModeChange={handleZenModeFromCustomize}
         onResetAll={handleCustomizeResetAll}
         nightToggleDisabled={!subscribed}
-        extraVisibilityToggles={journeyPulseCustomizeToggle}
       />
 
       <TestimonialRequest completedPauseCount={completedPauseCount} />
