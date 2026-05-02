@@ -2934,6 +2934,7 @@ export type Database = {
         Args: { _collection_id: string; _user_id: string }
         Returns: boolean
       }
+      pause_adopt_pending_offer: { Args: never; Returns: Json }
       pause_create_or_reuse: {
         Args: {
           p_context_fingerprint: string
@@ -2955,8 +2956,13 @@ export type Database = {
         }
         Returns: Json
       }
+      pause_decline_pending_offer: { Args: never; Returns: Json }
       pause_dismiss: {
         Args: { p_instance_id: string; p_reason?: string }
+        Returns: Database["public"]["Enums"]["pause_state"]
+      }
+      pause_dismiss_current: {
+        Args: never
         Returns: Database["public"]["Enums"]["pause_state"]
       }
       pause_evaluate_transitions: {
