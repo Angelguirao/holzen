@@ -17,6 +17,8 @@ interface Props {
   /** When set, headline price row includes a chevron to show/hide chart + 24h detail below the price. */
   chartExpanded?: boolean;
   onToggleChartExpanded?: () => void;
+  /** When false, omit the price-row chevron (e.g. Home puts the control in `HomeSectionCard` header). */
+  chartChevronInPriceRow?: boolean;
 }
 
 export function BtcStatus({
@@ -29,6 +31,7 @@ export function BtcStatus({
   onToggleBtcMode,
   chartExpanded = true,
   onToggleChartExpanded,
+  chartChevronInPriceRow = true,
 }: Props) {
   const { t } = useTranslation();
   const toggle = onToggleHidden;
@@ -149,23 +152,24 @@ export function BtcStatus({
     : '';
 
   const showChartBlock = !hidden && chartExpanded;
-  const chartChevronToggle = onToggleChartExpanded ? (
-    <button
-      type="button"
-      onClick={onToggleChartExpanded}
-      className={homeInWidget.iconBtn}
-      aria-expanded={chartExpanded}
-      aria-label={chartExpanded ? t('home.market.collapseDetails') : t('home.market.expandDetails')}
-    >
-      <ChevronDown
-        className={cn(
-          'h-4 w-4 text-secondary-foreground transition-transform duration-200',
-          !chartExpanded && '-rotate-90',
-        )}
-        aria-hidden
-      />
-    </button>
-  ) : null;
+  const chartChevronToggle =
+    chartChevronInPriceRow && onToggleChartExpanded ? (
+      <button
+        type="button"
+        onClick={onToggleChartExpanded}
+        className={homeInWidget.iconBtn}
+        aria-expanded={chartExpanded}
+        aria-label={chartExpanded ? t('home.market.collapseDetails') : t('home.market.expandDetails')}
+      >
+        <ChevronDown
+          className={cn(
+            'h-4 w-4 text-secondary-foreground transition-transform duration-200',
+            !chartExpanded && '-rotate-90',
+          )}
+          aria-hidden
+        />
+      </button>
+    ) : null;
 
   const priceRowToolbar = (
     <div className="flex shrink-0 items-center justify-end gap-1">

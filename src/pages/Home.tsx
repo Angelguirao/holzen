@@ -30,7 +30,7 @@ import { Link, useOutletContext, useSearchParams, useNavigate, useLocation } fro
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/use-auth';
 import { toast } from 'sonner';
-import { AlertCircle, Loader2, Pin, Pencil, Sparkles, RefreshCw } from 'lucide-react';
+import { AlertCircle, ChevronDown, Loader2, Pin, Pencil, Sparkles, RefreshCw } from 'lucide-react';
 import { AutoCooldownIndicator, NeedAMomentButton } from '@/components/home/HomePauseChrome';
 import { homeInWidget } from '@/components/home/home-widget-styles';
 import { cn } from '@/lib/utils';
@@ -297,6 +297,29 @@ const Home = () => {
       return next;
     });
   }, []);
+
+  const marketHeaderRight = useMemo(
+    () => (
+      <button
+        type="button"
+        onClick={toggleMarketChartExpanded}
+        className={homeInWidget.iconBtn}
+        aria-expanded={marketChartExpanded}
+        aria-label={
+          marketChartExpanded ? t('home.market.collapseDetails') : t('home.market.expandDetails')
+        }
+      >
+        <ChevronDown
+          className={cn(
+            'h-4 w-4 text-secondary-foreground transition-transform duration-200',
+            !marketChartExpanded && '-rotate-90',
+          )}
+          aria-hidden
+        />
+      </button>
+    ),
+    [marketChartExpanded, toggleMarketChartExpanded, t],
+  );
 
   useEffect(() => {
     if (!profileLoaded || heroQuoteViewTracked.current) return;
@@ -818,7 +841,11 @@ const Home = () => {
 
       case 'market':
         return (
-          <HomeSectionCard title={t('home.widget.market')} footer={marketFooter}>
+          <HomeSectionCard
+            title={t('home.widget.market')}
+            headerRight={error ? undefined : marketHeaderRight}
+            footer={marketFooter}
+          >
             <BtcStatus
               data={btcData}
               error={error}
@@ -829,6 +856,7 @@ const Home = () => {
               onToggleBtcMode={toggleBtcMode}
               chartExpanded={marketChartExpanded}
               onToggleChartExpanded={toggleMarketChartExpanded}
+              chartChevronInPriceRow={false}
             />
           </HomeSectionCard>
         );
