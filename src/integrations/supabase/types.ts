@@ -3015,6 +3015,7 @@ export type Database = {
         | "superseded"
         | "ineligible_user_state"
         | "system_cancelled"
+        | "open_max_age"
       pause_state:
         | "active"
         | "engaged"
@@ -3165,6 +3166,7 @@ export const Constants = {
         "superseded",
         "ineligible_user_state",
         "system_cancelled",
+        "open_max_age",
       ],
       pause_state: [
         "active",
