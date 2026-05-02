@@ -3009,7 +3009,13 @@ export type Database = {
         | "superseded"
         | "ineligible_user_state"
         | "system_cancelled"
-      pause_state: "active" | "engaged" | "completed" | "dismissed" | "expired"
+      pause_state:
+        | "active"
+        | "engaged"
+        | "completed"
+        | "dismissed"
+        | "expired"
+        | "pending"
       pause_step_type:
         | "breath_completed"
         | "initial_emotion_logged"
@@ -3154,7 +3160,14 @@ export const Constants = {
         "ineligible_user_state",
         "system_cancelled",
       ],
-      pause_state: ["active", "engaged", "completed", "dismissed", "expired"],
+      pause_state: [
+        "active",
+        "engaged",
+        "completed",
+        "dismissed",
+        "expired",
+        "pending",
+      ],
       pause_step_type: [
         "breath_completed",
         "initial_emotion_logged",
