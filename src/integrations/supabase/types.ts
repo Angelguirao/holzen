@@ -213,20 +213,6 @@ export type Database = {
             foreignKeyName: "collection_items_library_item_id_fkey"
             columns: ["library_item_id"]
             isOneToOne: false
-            referencedRelation: "library_archive_echo_items"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "collection_items_library_item_id_fkey"
-            columns: ["library_item_id"]
-            isOneToOne: false
-            referencedRelation: "library_archive_pauses_tab_items"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "collection_items_library_item_id_fkey"
-            columns: ["library_item_id"]
-            isOneToOne: false
             referencedRelation: "library_items"
             referencedColumns: ["id"]
           },
@@ -2207,96 +2193,308 @@ export type Database = {
       }
     }
     Views: {
-      library_archive_echo_items: {
+      v_pause_archive_pauses: {
         Row: {
-          body: string | null
+          completed_at: string | null
+          context_fingerprint: string | null
+          context_rule_result: Json | null
+          context_snapshot: Json | null
+          counted_companion_count: number | null
+          counted_companion_types: string[] | null
           created_at: string | null
+          dismissed_by_user: boolean | null
+          engaged_at: string | null
+          expired_reason:
+            | Database["public"]["Enums"]["pause_expired_reason"]
+            | null
+          haiku_text: string | null
+          has_breath_completed: boolean | null
+          has_initial_emotion_logged: boolean | null
+          has_outcome_logged: boolean | null
+          has_shift_emotion_logged: boolean | null
           id: string | null
+          initial_emotion_intensity: number | null
+          initial_mood: string | null
           is_favorite: boolean | null
-          pause_instance_id: string | null
-          pinned: boolean | null
-          source_type: string | null
-          source_url: string | null
-          status: string | null
+          metadata: Json | null
+          note_text: string | null
+          outcome: string | null
+          reflection_text: string | null
+          shift_emotion_intensity: number | null
+          shift_mood: string | null
+          source: string | null
+          state: Database["public"]["Enums"]["pause_state"] | null
+          superseded_by: string | null
           tags: string[] | null
-          title: string | null
-          type: string | null
+          template_id: string | null
+          terminal_at: string | null
           user_id: string | null
+          window_ends_at: string | null
+          window_starts_at: string | null
+        }
+        Insert: {
+          completed_at?: string | null
+          context_fingerprint?: string | null
+          context_rule_result?: Json | null
+          context_snapshot?: Json | null
+          counted_companion_count?: never
+          counted_companion_types?: never
+          created_at?: string | null
+          dismissed_by_user?: boolean | null
+          engaged_at?: string | null
+          expired_reason?:
+            | Database["public"]["Enums"]["pause_expired_reason"]
+            | null
+          haiku_text?: never
+          has_breath_completed?: never
+          has_initial_emotion_logged?: never
+          has_outcome_logged?: never
+          has_shift_emotion_logged?: never
+          id?: string | null
+          initial_emotion_intensity?: never
+          initial_mood?: never
+          is_favorite?: never
+          metadata?: Json | null
+          note_text?: never
+          outcome?: never
+          reflection_text?: never
+          shift_emotion_intensity?: never
+          shift_mood?: never
+          source?: string | null
+          state?: Database["public"]["Enums"]["pause_state"] | null
+          superseded_by?: string | null
+          tags?: never
+          template_id?: string | null
+          terminal_at?: string | null
+          user_id?: string | null
+          window_ends_at?: string | null
+          window_starts_at?: string | null
+        }
+        Update: {
+          completed_at?: string | null
+          context_fingerprint?: string | null
+          context_rule_result?: Json | null
+          context_snapshot?: Json | null
+          counted_companion_count?: never
+          counted_companion_types?: never
+          created_at?: string | null
+          dismissed_by_user?: boolean | null
+          engaged_at?: string | null
+          expired_reason?:
+            | Database["public"]["Enums"]["pause_expired_reason"]
+            | null
+          haiku_text?: never
+          has_breath_completed?: never
+          has_initial_emotion_logged?: never
+          has_outcome_logged?: never
+          has_shift_emotion_logged?: never
+          id?: string | null
+          initial_emotion_intensity?: never
+          initial_mood?: never
+          is_favorite?: never
+          metadata?: Json | null
+          note_text?: never
+          outcome?: never
+          reflection_text?: never
+          shift_emotion_intensity?: never
+          shift_mood?: never
+          source?: string | null
+          state?: Database["public"]["Enums"]["pause_state"] | null
+          superseded_by?: string | null
+          tags?: never
+          template_id?: string | null
+          terminal_at?: string | null
+          user_id?: string | null
+          window_ends_at?: string | null
+          window_starts_at?: string | null
         }
         Relationships: [
           {
-            foreignKeyName: "library_items_pause_instance_id_fkey"
-            columns: ["pause_instance_id"]
+            foreignKeyName: "pause_instances_superseded_by_fkey"
+            columns: ["superseded_by"]
             isOneToOne: false
             referencedRelation: "pause_instances"
             referencedColumns: ["id"]
           },
           {
-            foreignKeyName: "library_items_pause_instance_id_fkey"
-            columns: ["pause_instance_id"]
+            foreignKeyName: "pause_instances_superseded_by_fkey"
+            columns: ["superseded_by"]
             isOneToOne: false
             referencedRelation: "v_pause_completed"
             referencedColumns: ["id"]
           },
           {
-            foreignKeyName: "library_items_pause_instance_id_fkey"
-            columns: ["pause_instance_id"]
+            foreignKeyName: "pause_instances_superseded_by_fkey"
+            columns: ["superseded_by"]
             isOneToOne: false
             referencedRelation: "v_pause_current"
             referencedColumns: ["id"]
           },
           {
-            foreignKeyName: "library_items_pause_instance_id_fkey"
-            columns: ["pause_instance_id"]
+            foreignKeyName: "pause_instances_superseded_by_fkey"
+            columns: ["superseded_by"]
             isOneToOne: false
             referencedRelation: "v_pause_full"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "pause_instances_template_id_fkey"
+            columns: ["template_id"]
+            isOneToOne: false
+            referencedRelation: "pause_templates"
             referencedColumns: ["id"]
           },
         ]
       }
-      library_archive_pauses_tab_items: {
+      v_pause_archive_echoes: {
         Row: {
-          body: string | null
+          completed_at: string | null
+          context_fingerprint: string | null
+          context_rule_result: Json | null
+          context_snapshot: Json | null
+          counted_companion_count: number | null
+          counted_companion_types: string[] | null
           created_at: string | null
+          dismissed_by_user: boolean | null
+          engaged_at: string | null
+          expired_reason:
+            | Database["public"]["Enums"]["pause_expired_reason"]
+            | null
+          haiku_text: string | null
+          has_breath_completed: boolean | null
+          has_initial_emotion_logged: boolean | null
+          has_outcome_logged: boolean | null
+          has_shift_emotion_logged: boolean | null
           id: string | null
+          initial_emotion_intensity: number | null
+          initial_mood: string | null
           is_favorite: boolean | null
-          pause_instance_id: string | null
-          pinned: boolean | null
-          source_type: string | null
-          source_url: string | null
-          status: string | null
+          metadata: Json | null
+          note_text: string | null
+          outcome: string | null
+          reflection_text: string | null
+          shift_emotion_intensity: number | null
+          shift_mood: string | null
+          source: string | null
+          state: Database["public"]["Enums"]["pause_state"] | null
+          superseded_by: string | null
           tags: string[] | null
-          title: string | null
-          type: string | null
+          template_id: string | null
+          terminal_at: string | null
           user_id: string | null
+          window_ends_at: string | null
+          window_starts_at: string | null
+        }
+        Insert: {
+          completed_at?: string | null
+          context_fingerprint?: string | null
+          context_rule_result?: Json | null
+          context_snapshot?: Json | null
+          counted_companion_count?: never
+          counted_companion_types?: never
+          created_at?: string | null
+          dismissed_by_user?: boolean | null
+          engaged_at?: string | null
+          expired_reason?:
+            | Database["public"]["Enums"]["pause_expired_reason"]
+            | null
+          haiku_text?: never
+          has_breath_completed?: never
+          has_initial_emotion_logged?: never
+          has_outcome_logged?: never
+          has_shift_emotion_logged?: never
+          id?: string | null
+          initial_emotion_intensity?: never
+          initial_mood?: never
+          is_favorite?: never
+          metadata?: Json | null
+          note_text?: never
+          outcome?: never
+          reflection_text?: never
+          shift_emotion_intensity?: never
+          shift_mood?: never
+          source?: string | null
+          state?: Database["public"]["Enums"]["pause_state"] | null
+          superseded_by?: string | null
+          tags?: never
+          template_id?: string | null
+          terminal_at?: string | null
+          user_id?: string | null
+          window_ends_at?: string | null
+          window_starts_at?: string | null
+        }
+        Update: {
+          completed_at?: string | null
+          context_fingerprint?: string | null
+          context_rule_result?: Json | null
+          context_snapshot?: Json | null
+          counted_companion_count?: never
+          counted_companion_types?: never
+          created_at?: string | null
+          dismissed_by_user?: boolean | null
+          engaged_at?: string | null
+          expired_reason?:
+            | Database["public"]["Enums"]["pause_expired_reason"]
+            | null
+          haiku_text?: never
+          has_breath_completed?: never
+          has_initial_emotion_logged?: never
+          has_outcome_logged?: never
+          has_shift_emotion_logged?: never
+          id?: string | null
+          initial_emotion_intensity?: never
+          initial_mood?: never
+          is_favorite?: never
+          metadata?: Json | null
+          note_text?: never
+          outcome?: never
+          reflection_text?: never
+          shift_emotion_intensity?: never
+          shift_mood?: never
+          source?: string | null
+          state?: Database["public"]["Enums"]["pause_state"] | null
+          superseded_by?: string | null
+          tags?: never
+          template_id?: string | null
+          terminal_at?: string | null
+          user_id?: string | null
+          window_ends_at?: string | null
+          window_starts_at?: string | null
         }
         Relationships: [
           {
-            foreignKeyName: "library_items_pause_instance_id_fkey"
-            columns: ["pause_instance_id"]
+            foreignKeyName: "pause_instances_superseded_by_fkey"
+            columns: ["superseded_by"]
             isOneToOne: false
             referencedRelation: "pause_instances"
             referencedColumns: ["id"]
           },
           {
-            foreignKeyName: "library_items_pause_instance_id_fkey"
-            columns: ["pause_instance_id"]
+            foreignKeyName: "pause_instances_superseded_by_fkey"
+            columns: ["superseded_by"]
             isOneToOne: false
             referencedRelation: "v_pause_completed"
             referencedColumns: ["id"]
           },
           {
-            foreignKeyName: "library_items_pause_instance_id_fkey"
-            columns: ["pause_instance_id"]
+            foreignKeyName: "pause_instances_superseded_by_fkey"
+            columns: ["superseded_by"]
             isOneToOne: false
             referencedRelation: "v_pause_current"
             referencedColumns: ["id"]
           },
           {
-            foreignKeyName: "library_items_pause_instance_id_fkey"
-            columns: ["pause_instance_id"]
+            foreignKeyName: "pause_instances_superseded_by_fkey"
+            columns: ["superseded_by"]
             isOneToOne: false
             referencedRelation: "v_pause_full"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "pause_instances_template_id_fkey"
+            columns: ["template_id"]
+            isOneToOne: false
+            referencedRelation: "pause_templates"
             referencedColumns: ["id"]
           },
         ]
@@ -2874,41 +3072,6 @@ export type Database = {
       get_holzen_number: { Args: never; Returns: Json }
       get_signup_gate: { Args: never; Returns: Json }
       is_admin: { Args: never; Returns: boolean }
-      library_archive_list_page: {
-        Args: {
-          p_favorites_only?: boolean
-          p_limit?: number
-          p_main_pause_only?: boolean
-          p_offset?: number
-          p_search?: string
-          p_segment: string
-          p_smart_ids?: string[]
-          p_sort?: string
-          p_source_types?: string[]
-          p_tag?: string
-        }
-        Returns: {
-          body: string | null
-          created_at: string
-          id: string
-          is_favorite: boolean
-          pause_instance_id: string | null
-          pinned: boolean
-          source_type: string | null
-          source_url: string | null
-          status: string
-          tags: string[]
-          title: string | null
-          type: string
-          user_id: string
-        }[]
-        SetofOptions: {
-          from: "*"
-          to: "library_items"
-          isOneToOne: false
-          isSetofReturn: true
-        }
-      }
       move_to_dlq: {
         Args: {
           dlq_name: string

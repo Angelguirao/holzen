@@ -28,10 +28,8 @@ export type PauseInstanceArchiveMetaGetter = (
  * pending, auto-supersede, etc.) — same “echo” bucket as other unengaged terminals.
  * `completed` always implies engagement in the DB and never counts as an echo.
  *
- * Server mirrors: `public.library_archive_echo_items` (Echo tab list + pagination),
- * `public.library_archive_pauses_tab_items` (Pauses tab backing view; excludes
- * echo-only instances). The Pauses **UI list** defaults to `source_type = pause` only
- * (plus synthetic rows); companion rows are fetched via type filters in `useLibrary`.
+ * Pause archive lists are backed by `public.v_pause_archive_echoes` and
+ * `public.v_pause_archive_pauses` (see migrations), not `library_items`.
  */
 export function isArchiveEchoPause(meta: PauseInstanceArchiveMeta): boolean {
   if (!ECHO_ELIGIBLE_STATES.has(meta.state)) return false;

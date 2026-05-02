@@ -8,7 +8,7 @@ import { trackEvent } from '@/lib/posthog';
 const tabs = [
   { to: '/', icon: Home, key: 'home' },
   { to: TOOLS_PREFIX, icon: Wrench, key: 'tools' },
-  { to: '/library', icon: Folder, key: 'library' },
+  { to: '/archive', icon: Folder, key: 'archive' },
   { to: '/journey/stats', icon: Compass, key: 'journey' },
   { to: '/settings', icon: SettingsIcon, key: 'settings' },
 ] as const;
@@ -20,13 +20,8 @@ export function isPrimaryTabActive(pathname: string, key: PrimaryTabKey): boolea
   if (key === 'home') return pathname === '/';
   if (key === 'tools') return pathname === TOOLS_PREFIX || pathname.startsWith(`${TOOLS_PREFIX}/`);
   if (key === 'journey') return pathname.startsWith(JOURNEY_PREFIX);
-  if (key === 'library') {
-    return (
-      pathname === '/library' ||
-      pathname.startsWith('/library/') ||
-      pathname === '/archive' ||
-      pathname.startsWith('/archive/')
-    );
+  if (key === 'archive') {
+    return pathname === '/archive' || pathname.startsWith('/archive/');
   }
   if (key === 'settings') return pathname === '/settings' || pathname.startsWith('/settings/');
   return false;
@@ -59,7 +54,7 @@ export function BottomNav() {
             >
               <Icon className="h-4 w-4" />
               <span className="text-sm font-sans">
-                {key === 'library' ? t('nav.archive') : t(`nav.${key}`)}
+                {t(`nav.${key}`)}
               </span>
             </NavLink>
           );

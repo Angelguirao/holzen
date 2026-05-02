@@ -35,11 +35,6 @@ export interface LibraryItem {
   is_favorite: boolean;
   status: 'unread' | 'read' | 'archived' | 'deleted';
   created_at: string;
-  /**
-   * Archive views (`library_archive_*`): underlying `library_items.id` when the list row
-   * is backed by a real bookmark. Omitted for synthetic instance-only rows (`source_library_item_id` is null).
-   */
-  archiveMainLibraryItemId?: string;
 }
 
 export interface Collection {
@@ -70,68 +65,21 @@ export interface ReflectionReadFlags {
 
 const CACHE_KEY_ITEMS = 'holzen_library_items';
 const CACHE_KEY_ITEMS_FAVS = 'holzen_library_items_favs';
-const CACHE_KEY_ITEMS_ECHO = 'holzen_library_items_echo';
-const CACHE_KEY_ITEMS_Pauses_SEG = 'holzen_library_items_pauses_seg';
 const CACHE_KEY_COLLECTIONS = 'holzen_library_collections';
 const CACHE_KEY_COL_ITEMS = 'holzen_library_col_items';
 const PAGE_SIZE = 50;
-
-/** Which PostgREST relation backs the infinite list (see `supabase/migrations/*library_archive*.sql`). */
-export type LibraryArchiveListKind = 'default' | 'echo' | 'pauses';
 
 /** Server-side ordering for the active list (client may still re-sort after local filters). */
 export type LibraryListSortMode = 'newest' | 'oldest' | 'alphabetical';
 
 export type UseLibraryOptions = {
-  archiveListKind?: LibraryArchiveListKind;
-  /**
-   * When true, restrict to favorites (`is_favorite`). Used with Pauses Favs pill
-   * against `library_archive_pauses_tab_items` or legacy `library_items`.
-   */
   favoritesOnly?: boolean;
   listSort?: LibraryListSortMode;
-  /**
-   * Pauses archive only: when empty/omitted, the list query is restricted to main
-   * `source_type = pause` rows (plus synthetic instance rows). When set, PostgREST
-   * uses `.in('source_type', …)` so companion artifacts are listable via filters only.
-   */
-  pausesArchiveSourceTypes?: readonly string[];
 };
 
-type LibraryItemsRelation = 'library_items' | 'library_archive_echo_items' | 'library_archive_pauses_tab_items';
-
-function libraryTableForKind(kind: LibraryArchiveListKind): LibraryItemsRelation {
-  if (kind === 'echo') return 'library_archive_echo_items';
-  if (kind === 'pauses') return 'library_archive_pauses_tab_items';
-  return 'library_items';
-}
-
-function mapLibraryTableRow(table: LibraryItemsRelation, row: unknown): LibraryItem {
-  if (table === 'library_items') return row as LibraryItem;
-  const r = row as LibraryItem & { source_library_item_id?: string | null };
-  const { source_library_item_id: srcLib, ...rest } = r;
-  const base = rest as LibraryItem;
-  if (srcLib) return { ...base, archiveMainLibraryItemId: srcLib };
-  return base;
-}
-
-function buildItemsCacheKey(
-  kind: LibraryArchiveListKind,
-  favoritesOnly: boolean,
-  listSort: LibraryListSortMode,
-  pausesArchiveSourceTypes?: readonly string[],
-): string {
-  const sort = listSort;
-  if (kind === 'echo') return `${CACHE_KEY_ITEMS_ECHO}:${sort}`;
-  if (kind === 'pauses') {
-    const srcKey =
-      pausesArchiveSourceTypes && pausesArchiveSourceTypes.length > 0
-        ? [...pausesArchiveSourceTypes].sort().join(',')
-        : 'pause_main';
-    return `${CACHE_KEY_ITEMS_Pauses_SEG}:${favoritesOnly ? 'fav' : 'all'}:${sort}:${srcKey}`;
-  }
-  if (favoritesOnly) return `${CACHE_KEY_ITEMS_FAVS}:${sort}`;
-  return `${CACHE_KEY_ITEMS}:${sort}`;
+function buildItemsCacheKey(favoritesOnly: boolean, listSort: LibraryListSortMode): string {
+  if (favoritesOnly) return `${CACHE_KEY_ITEMS_FAVS}:${listSort}`;
+  return `${CACHE_KEY_ITEMS}:${listSort}`;
 }
 
 function readCache<T>(key: string): T | null {
@@ -153,11 +101,8 @@ export function useLibrary(options?: UseLibraryOptions) {
   const { t } = useTranslation();
   const { user } = useAuth();
   const favoritesOnly = options?.favoritesOnly ?? false;
-  const archiveListKind: LibraryArchiveListKind = options?.archiveListKind ?? 'default';
   const listSort: LibraryListSortMode = options?.listSort ?? 'newest';
-  const pausesArchiveSourceTypes = options?.pausesArchiveSourceTypes;
-  const itemsCacheKey = buildItemsCacheKey(archiveListKind, favoritesOnly, listSort, pausesArchiveSourceTypes);
-  const libraryItemsTable = libraryTableForKind(archiveListKind);
+  const itemsCacheKey = buildItemsCacheKey(favoritesOnly, listSort);
 
   // Initialize state from cache for instant render
   const [items, setItems] = useState<LibraryItem[]>(() => readCache<LibraryItem[]>(itemsCacheKey) ?? []);
@@ -259,45 +204,6 @@ export function useLibrary(options?: UseLibraryOptions) {
     });
   }, []);
 
-  const ensureMainPauseLibraryBookmark = useCallback(
-    async (item: LibraryItem): Promise<string | null> => {
-      if (!user || !item.pause_instance_id || !isMainPauseLibraryBookmark(item.source_type)) return null;
-
-      const { data: preRows, error: preErr } = await supabase
-        .from('library_items')
-        .select('id')
-        .eq('user_id', user.id)
-        .eq('pause_instance_id', item.pause_instance_id)
-        .eq('source_type', 'pause')
-        .neq('status', 'deleted')
-        .order('created_at', { ascending: true })
-        .limit(1);
-      if (preErr) return null;
-      const pre0 = preRows?.[0] as { id: string } | undefined;
-      if (pre0?.id) return pre0.id;
-
-      const { data, error } = await supabase
-        .from('library_items')
-        .insert({
-          user_id: user.id,
-          pause_instance_id: item.pause_instance_id,
-          source_type: 'pause',
-          type: item.type || 'pause',
-          title: item.title,
-          body: item.body,
-          status: 'read',
-          tags: item.tags ?? [],
-          pinned: item.pinned ?? false,
-          is_favorite: item.is_favorite ?? false,
-        } as LibraryItemsInsert)
-        .select('id')
-        .single();
-      if (error) return null;
-      return (data as { id: string }).id;
-    },
-    [user],
-  );
-
   const prunePauseDerivedState = useCallback((libItems: LibraryItem[]) => {
     const keepPauseIds = new Set(
       libItems.map((i) => i.pause_instance_id).filter((x): x is string => !!x),
@@ -332,21 +238,14 @@ export function useLibrary(options?: UseLibraryOptions) {
     });
   }, []);
 
-  /** One page from the active PostgREST relation (`library_items` or archive views). */
+  /** One page of `library_items` (collections / bookmarks — not pause archive lists). */
   const fetchItemsPageFromTable = useCallback(
     async (offset: number) => {
       if (!user) {
         return { data: null, error: { message: 'no user' } as { message: string } };
       }
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      let itemsQuery: any = (supabase as any).from(libraryItemsTable).select('*').eq('user_id', user.id);
-      if (archiveListKind === 'pauses') {
-        if (pausesArchiveSourceTypes && pausesArchiveSourceTypes.length > 0) {
-          itemsQuery = itemsQuery.in('source_type', [...pausesArchiveSourceTypes]);
-        } else {
-          itemsQuery = itemsQuery.eq('source_type', 'pause');
-        }
-      }
+      let itemsQuery: any = (supabase as any).from('library_items').select('*').eq('user_id', user.id);
       if (favoritesOnly) itemsQuery = itemsQuery.eq('is_favorite', true);
       if (listSort === 'alphabetical') {
         itemsQuery = itemsQuery
@@ -359,7 +258,7 @@ export function useLibrary(options?: UseLibraryOptions) {
       }
       return itemsQuery.range(offset, offset + PAGE_SIZE - 1);
     },
-    [user, libraryItemsTable, favoritesOnly, listSort, archiveListKind, pausesArchiveSourceTypes],
+    [user, favoritesOnly, listSort],
   );
 
   const fetchAll = useCallback(async () => {
@@ -396,9 +295,7 @@ export function useLibrary(options?: UseLibraryOptions) {
       return;
     }
 
-    const libItems = ((rItems.data as unknown[]) ?? []).map((row) =>
-      mapLibraryTableRow(libraryItemsTable, row),
-    );
+    const libItems = ((rItems.data as unknown[]) ?? []) as LibraryItem[];
     setItems(libItems);
     if (!rCols.error) {
       const cols = (rCols.data as unknown as Collection[]) ?? [];
@@ -422,7 +319,7 @@ export function useLibrary(options?: UseLibraryOptions) {
     // Keep prior pause meta until hydration completes (avoids tab/list flicker).
     await hydratePauseMeta(libItems);
     prunePauseDerivedState(libItems);
-  }, [user, hydratePauseMeta, t, itemsCacheKey, prunePauseDerivedState, libraryItemsTable, fetchItemsPageFromTable]);
+  }, [user, hydratePauseMeta, t, itemsCacheKey, prunePauseDerivedState, fetchItemsPageFromTable]);
 
   const loadMore = useCallback(async () => {
     if (!user || loadingMore || !hasMore) return;
@@ -436,9 +333,7 @@ export function useLibrary(options?: UseLibraryOptions) {
       setLoadingMore(false);
       return;
     }
-    const newItems = ((data as unknown[]) ?? []).map((row) =>
-      mapLibraryTableRow(libraryItemsTable, row),
-    );
+    const newItems = ((data as unknown[]) ?? []) as LibraryItem[];
     if (newItems.length > 0) {
       setItems((prev) => {
         const seen = new Set(prev.map((i) => i.id));
@@ -458,7 +353,6 @@ export function useLibrary(options?: UseLibraryOptions) {
     hydratePauseMeta,
     t,
     itemsCacheKey,
-    libraryItemsTable,
     fetchItemsPageFromTable,
   ]);
 
@@ -490,34 +384,16 @@ export function useLibrary(options?: UseLibraryOptions) {
       const item = items.find((i) => i.id === id);
       if (!item) return;
 
-      let rowId = item.archiveMainLibraryItemId ?? item.id;
-      if (
-        item.pause_instance_id
-        && isMainPauseLibraryBookmark(item.source_type)
-        && item.archiveMainLibraryItemId == null
-      ) {
-        const ensured = await ensureMainPauseLibraryBookmark(item);
-        if (!ensured) return;
-        rowId = ensured;
-      }
-
-      await supabase.from('library_items').update(updates).eq('id', rowId);
+      await supabase.from('library_items').update(updates).eq('id', id);
       setItems((prev) => {
-        const mapped = prev.map((i) => {
-          if (i.id !== id) return i;
-          let next = { ...i, ...updates } as LibraryItem;
-          if (rowId !== i.id) {
-            next = { ...next, id: rowId, archiveMainLibraryItemId: rowId };
-          }
-          return next;
-        });
+        const mapped = prev.map((i) => (i.id === id ? ({ ...i, ...updates } as LibraryItem) : i));
         if (favoritesOnly && updates.is_favorite === false) {
-          return mapped.filter((i) => i.id !== id && i.id !== rowId);
+          return mapped.filter((i) => i.id !== id);
         }
         return mapped;
       });
     },
-    [items, favoritesOnly, ensureMainPauseLibraryBookmark],
+    [items, favoritesOnly],
   );
 
   const deleteItem = useCallback(
@@ -553,10 +429,9 @@ export function useLibrary(options?: UseLibraryOptions) {
           /* non-fatal */
         }
       } else if (item.pause_instance_id) {
-        const rowId = item.archiveMainLibraryItemId ?? item.id;
-        await supabase.from('library_items').update({ status: 'deleted' }).eq('id', rowId);
+        await supabase.from('library_items').update({ status: 'deleted' }).eq('id', item.id);
         setItems((prev) => prev.map((i) => (i.id === id ? { ...i, status: 'deleted' as const } : i)));
-        setCollectionItems((prev) => prev.filter((ci) => ci.library_item_id !== rowId));
+        setCollectionItems((prev) => prev.filter((ci) => ci.library_item_id !== item.id));
       } else {
         await supabase.from('library_items').delete().eq('id', id);
         setItems((prev) => prev.filter((i) => i.id !== id));
