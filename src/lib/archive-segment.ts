@@ -23,11 +23,10 @@ export type PauseInstanceArchiveMetaGetter = (
 
 /**
  * Archive “echo”: main pause row for an instance that ended dismissed/expired
- * without `engaged_at` (never opened Reflect). `completed` always implies
- * engagement in the DB and never counts as an echo.
- *
- * `expired_reason = superseded` (prior open pause when adopting pending) is **not**
- * an echo — it stays on the Pauses archive tab per `library_archive_pauses_tab_items`.
+ * without `engaged_at` (never opened Reflect). That includes **`expired_reason =
+ * superseded`** when the user never reached Reflect on the prior row (adopted
+ * pending, auto-supersede, etc.) — same “echo” bucket as other unengaged terminals.
+ * `completed` always implies engagement in the DB and never counts as an echo.
  *
  * Server mirrors: `public.library_archive_echo_items` (Echo tab list + pagination),
  * `public.library_archive_pauses_tab_items` (Pauses tab list + pagination; excludes
@@ -37,7 +36,6 @@ export type PauseInstanceArchiveMetaGetter = (
 export function isArchiveEchoPause(meta: PauseInstanceArchiveMeta): boolean {
   if (!ECHO_ELIGIBLE_STATES.has(meta.state)) return false;
   if (meta.engaged_at != null) return false;
-  if (meta.expired_reason === 'superseded') return false;
   return true;
 }
 
