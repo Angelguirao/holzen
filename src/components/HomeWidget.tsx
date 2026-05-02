@@ -176,13 +176,14 @@ export function useWidgetLayout(defaultOrder: string[]) {
   }, []);
 
   const resetLayout = useCallback(() => {
-    setOrder(normalizeHomeSectionOrder([...defaultOrder], defaultOrder));
+    // Use `reorder` so defaults are persisted like drag updates; otherwise only `setOrder`
+    // runs and dnd-kit can keep a stale visual order until the sheet remounts.
+    reorder(normalizeHomeSectionOrder([...defaultOrder], defaultOrder));
     setCollapsed({});
-    localStorage.removeItem(ORDER_KEY);
     localStorage.removeItem(COLLAPSED_KEY);
     localStorage.removeItem(LEGACY_ORDER_KEY);
     localStorage.removeItem(LEGACY_COLLAPSED_KEY);
-  }, [defaultOrder]);
+  }, [defaultOrder, reorder]);
 
   return { order, collapsed, reorder, toggleCollapsed, resetLayout };
 }
