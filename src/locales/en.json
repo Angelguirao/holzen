@@ -2137,9 +2137,26 @@
     "reconsider": "Let me reconsider"
   },
   "bulkHold": {
+    "kicker": "Waiting for you",
     "title": "{{count}} pauses while you were away",
-    "subtitle": "Mark all as Hold with one tap, or review them individually. Per-pause review is still rolling out — the Library lists each pause for now.",
+    "subtitle": "Mark all as Hold with one tap, or open Review to see dates. The Library has full detail on each pause.",
+    "teaserHint": "Tap to hold all, review dates, or open the Library.",
+    "openSheet": "Manage",
     "holdAll": "Hold all",
+    "review": "Review",
+    "back": "Back",
+    "openLibrary": "Open Library",
+    "done": "Done",
+    "reviewTitle": "Pauses to review",
+    "reviewSub": "These expired without an outcome. Open the Library for full detail on each pause.",
+    "successHeadline": "Held through your stack",
+    "successSub": "Your outcomes are logged. Echoes capture what surfaced during each pause.",
+    "successChosen": "You chose deliberately",
+    "successHeldLine": "Held through {{count}} pauses",
+    "successConviction": "+{{count}} conviction",
+    "echoesCardTitle": "Echoes",
+    "echoesCardBody": "Revisit reflections and artifacts from these pauses in Echoes.",
+    "viewEchoes": "View Echoes",
     "allMarkedHold": "{{count}} pauses marked as Hold"
   },
   "snooze": {
