@@ -35,6 +35,11 @@ export interface LibraryItem {
   is_favorite: boolean;
   status: 'unread' | 'read' | 'archived' | 'deleted';
   created_at: string;
+  /**
+   * Archive views (`library_archive_*`): underlying `library_items.id` when the list row
+   * is backed by a real bookmark. Omitted for synthetic instance-only rows (`source_library_item_id` is null).
+   */
+  archiveMainLibraryItemId?: string;
 }
 
 export interface Collection {
@@ -93,6 +98,15 @@ function libraryTableForKind(kind: LibraryArchiveListKind): LibraryItemsRelation
   if (kind === 'echo') return 'library_archive_echo_items';
   if (kind === 'pauses') return 'library_archive_pauses_tab_items';
   return 'library_items';
+}
+
+function mapLibraryTableRow(table: LibraryItemsRelation, row: unknown): LibraryItem {
+  if (table === 'library_items') return row as LibraryItem;
+  const r = row as LibraryItem & { source_library_item_id?: string | null };
+  const { source_library_item_id: srcLib, ...rest } = r;
+  const base = rest as LibraryItem;
+  if (srcLib) return { ...base, archiveMainLibraryItemId: srcLib };
+  return base;
 }
 
 function buildItemsCacheKey(kind: LibraryArchiveListKind, favoritesOnly: boolean, listSort: LibraryListSortMode): string {
@@ -227,6 +241,45 @@ export function useLibrary(options?: UseLibraryOptions) {
     });
   }, []);
 
+  const ensureMainPauseLibraryBookmark = useCallback(
+    async (item: LibraryItem): Promise<string | null> => {
+      if (!user || !item.pause_instance_id || !isMainPauseLibraryBookmark(item.source_type)) return null;
+
+      const { data: preRows, error: preErr } = await supabase
+        .from('library_items')
+        .select('id')
+        .eq('user_id', user.id)
+        .eq('pause_instance_id', item.pause_instance_id)
+        .eq('source_type', 'pause')
+        .neq('status', 'deleted')
+        .order('created_at', { ascending: true })
+        .limit(1);
+      if (preErr) return null;
+      const pre0 = preRows?.[0] as { id: string } | undefined;
+      if (pre0?.id) return pre0.id;
+
+      const { data, error } = await supabase
+        .from('library_items')
+        .insert({
+          user_id: user.id,
+          pause_instance_id: item.pause_instance_id,
+          source_type: 'pause',
+          type: item.type || 'pause',
+          title: item.title,
+          body: item.body,
+          status: 'read',
+          tags: item.tags ?? [],
+          pinned: item.pinned ?? false,
+          is_favorite: item.is_favorite ?? false,
+        } as LibraryItemsInsert)
+        .select('id')
+        .single();
+      if (error) return null;
+      return (data as { id: string }).id;
+    },
+    [user],
+  );
+
   const prunePauseDerivedState = useCallback((libItems: LibraryItem[]) => {
     const keepPauseIds = new Set(
       libItems.map((i) => i.pause_instance_id).filter((x): x is string => !!x),
@@ -318,7 +371,9 @@ export function useLibrary(options?: UseLibraryOptions) {
       return;
     }
 
-    const libItems = (rItems.data as unknown as LibraryItem[]) ?? [];
+    const libItems = ((rItems.data as unknown[]) ?? []).map((row) =>
+      mapLibraryTableRow(libraryItemsTable, row),
+    );
     setItems(libItems);
     if (!rCols.error) {
       const cols = (rCols.data as unknown as Collection[]) ?? [];
@@ -342,7 +397,7 @@ export function useLibrary(options?: UseLibraryOptions) {
     // Keep prior pause meta until hydration completes (avoids tab/list flicker).
     await hydratePauseMeta(libItems);
     prunePauseDerivedState(libItems);
-  }, [user, hydratePauseMeta, t, favoritesOnly, itemsCacheKey, prunePauseDerivedState, libraryItemsTable, listSort, fetchItemsPageFromTable]);
+  }, [user, hydratePauseMeta, t, itemsCacheKey, prunePauseDerivedState, libraryItemsTable, fetchItemsPageFromTable]);
 
   const loadMore = useCallback(async () => {
     if (!user || loadingMore || !hasMore) return;
@@ -356,7 +411,9 @@ export function useLibrary(options?: UseLibraryOptions) {
       setLoadingMore(false);
       return;
     }
-    const newItems = (data as unknown as LibraryItem[]) ?? [];
+    const newItems = ((data as unknown[]) ?? []).map((row) =>
+      mapLibraryTableRow(libraryItemsTable, row),
+    );
     if (newItems.length > 0) {
       setItems((prev) => {
         const seen = new Set(prev.map((i) => i.id));
@@ -375,10 +432,8 @@ export function useLibrary(options?: UseLibraryOptions) {
     items.length,
     hydratePauseMeta,
     t,
-    favoritesOnly,
     itemsCacheKey,
     libraryItemsTable,
-    listSort,
     fetchItemsPageFromTable,
   ]);
 
@@ -405,56 +460,86 @@ export function useLibrary(options?: UseLibraryOptions) {
     return newItem;
   }, [user]);
 
-  const updateItem = useCallback(async (id: string, updates: LibraryItemsUpdate) => {
-    await supabase.from('library_items').update(updates).eq('id', id);
-    setItems((prev) => {
-      const mapped = prev.map((i) => (i.id === id ? { ...i, ...updates } as LibraryItem : i));
-      if (favoritesOnly && updates.is_favorite === false) {
-        return mapped.filter((i) => i.id !== id);
+  const updateItem = useCallback(
+    async (id: string, updates: LibraryItemsUpdate) => {
+      const item = items.find((i) => i.id === id);
+      if (!item) return;
+
+      let rowId = item.archiveMainLibraryItemId ?? item.id;
+      if (
+        item.pause_instance_id
+        && isMainPauseLibraryBookmark(item.source_type)
+        && item.archiveMainLibraryItemId == null
+      ) {
+        const ensured = await ensureMainPauseLibraryBookmark(item);
+        if (!ensured) return;
+        rowId = ensured;
       }
-      return mapped;
-    });
-  }, [favoritesOnly]);
 
-  const deleteItem = useCallback(async (id: string) => {
-    const item = items.find((i) => i.id === id);
-    if (!item) return;
+      await supabase.from('library_items').update(updates).eq('id', rowId);
+      setItems((prev) => {
+        const mapped = prev.map((i) => {
+          if (i.id !== id) return i;
+          let next = { ...i, ...updates } as LibraryItem;
+          if (rowId !== i.id) {
+            next = { ...next, id: rowId, archiveMainLibraryItemId: rowId };
+          }
+          return next;
+        });
+        if (favoritesOnly && updates.is_favorite === false) {
+          return mapped.filter((i) => i.id !== id && i.id !== rowId);
+        }
+        return mapped;
+      });
+    },
+    [items, favoritesOnly, ensureMainPauseLibraryBookmark],
+  );
 
-    if (item.pause_instance_id && isMainPauseLibraryBookmark(item.source_type)) {
-      // Deleting the main pause bookmark: soft-delete all library
-      // items that share the pause_instance_id, then dismiss the
-      // underlying pause.
-      const pauseInstanceId = item.pause_instance_id;
-      const siblingIds = items
-        .filter((i) => i.pause_instance_id === pauseInstanceId)
-        .map((i) => i.id);
+  const deleteItem = useCallback(
+    async (id: string) => {
+      const item = items.find((i) => i.id === id);
+      if (!item) return;
 
-      await supabase.from('library_items').update({ status: 'deleted' }).in('id', siblingIds);
-      setItems((prev) =>
-        prev.map((i) =>
-          siblingIds.includes(i.id) ? { ...i, status: 'deleted' as const } : i,
-        ),
-      );
-      setCollectionItems((prev) => prev.filter((ci) => !siblingIds.includes(ci.library_item_id)));
+      if (item.pause_instance_id && isMainPauseLibraryBookmark(item.source_type)) {
+        const pauseInstanceId = item.pause_instance_id;
 
-      // Dismiss the paired pause so the trigger clears its notification.
-      try {
-        await supabase.rpc('pause_dismiss_current' as never);
-      } catch {
-        /* non-fatal */
+        const { data: siblingRows } = await supabase
+          .from('library_items')
+          .select('id')
+          .eq('pause_instance_id', pauseInstanceId)
+          .neq('status', 'deleted');
+
+        const siblingIds = (siblingRows ?? []).map((r) => (r as { id: string }).id);
+
+        await supabase
+          .from('library_items')
+          .update({ status: 'deleted' })
+          .eq('pause_instance_id', pauseInstanceId);
+
+        if (siblingIds.length > 0) {
+          await supabase.from('collection_items').delete().in('library_item_id', siblingIds);
+        }
+
+        setItems((prev) => prev.filter((i) => i.pause_instance_id !== pauseInstanceId));
+
+        try {
+          await supabase.rpc('pause_dismiss_current' as never);
+        } catch {
+          /* non-fatal */
+        }
+      } else if (item.pause_instance_id) {
+        const rowId = item.archiveMainLibraryItemId ?? item.id;
+        await supabase.from('library_items').update({ status: 'deleted' }).eq('id', rowId);
+        setItems((prev) => prev.map((i) => (i.id === id ? { ...i, status: 'deleted' as const } : i)));
+        setCollectionItems((prev) => prev.filter((ci) => ci.library_item_id !== rowId));
+      } else {
+        await supabase.from('library_items').delete().eq('id', id);
+        setItems((prev) => prev.filter((i) => i.id !== id));
+        setCollectionItems((prev) => prev.filter((ci) => ci.library_item_id !== id));
       }
-    } else if (item.pause_instance_id) {
-      // Deleting a companion item: soft-delete so backfill doesn't re-import
-      await supabase.from('library_items').update({ status: 'deleted' }).eq('id', id);
-      setItems((prev) => prev.map((i) => i.id === id ? { ...i, status: 'deleted' as const } : i));
-      setCollectionItems((prev) => prev.filter((ci) => ci.library_item_id !== id));
-    } else {
-      // Standalone item: hard delete
-      await supabase.from('library_items').delete().eq('id', id);
-      setItems((prev) => prev.filter((i) => i.id !== id));
-      setCollectionItems((prev) => prev.filter((ci) => ci.library_item_id !== id));
-    }
-  }, [items]);
+    },
+    [items],
+  );
 
   const togglePin = useCallback(async (id: string) => {
     const item = items.find((i) => i.id === id);

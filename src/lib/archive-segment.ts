@@ -31,7 +31,8 @@ export type PauseInstanceArchiveMetaGetter = (
  *
  * Server mirrors: `public.library_archive_echo_items` (Echo tab list + pagination),
  * `public.library_archive_pauses_tab_items` (Pauses tab list + pagination; excludes
- * echo-only instances).
+ * echo-only instances). Both views may include synthetic `pause` rows when a terminal
+ * instance has no `library_items` rows (`source_library_item_id` is null in SQL).
  */
 export function isArchiveEchoPause(meta: PauseInstanceArchiveMeta): boolean {
   if (!ECHO_ELIGIBLE_STATES.has(meta.state)) return false;
