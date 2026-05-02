@@ -2,28 +2,40 @@ import { useCallback, useState } from 'react';
 
 const STORAGE_KEY = 'holzen_home_optional_visible';
 
-/** Fixed Home modules that can be hidden from Home (Customize sheet). */
-export const CORE_HOME_SECTION_IDS = ['goal-why', 'market', 'your-pause'] as const;
-export type CoreHomeSectionId = (typeof CORE_HOME_SECTION_IDS)[number];
-
 export const OPTIONAL_HOME_WIDGET_IDS = ['quick-capture', 'night'] as const;
 export type OptionalHomeWidgetId = (typeof OPTIONAL_HOME_WIDGET_IDS)[number];
 
-export const ALL_HOME_SECTION_IDS = [...CORE_HOME_SECTION_IDS, ...OPTIONAL_HOME_WIDGET_IDS] as const;
-export type AllHomeSectionId = (typeof ALL_HOME_SECTION_IDS)[number];
+/** Shown on Home whenever present in layout order; Customize sheet has no on/off row (wireframe). */
+export const HOME_SECTION_IDS_WITHOUT_VISIBILITY_TOGGLE = ['market', 'your-pause'] as const;
+export type HomeSectionIdWithoutVisibilityToggle =
+  (typeof HOME_SECTION_IDS_WITHOUT_VISIBILITY_TOGGLE)[number];
 
 /**
- * Customize toggle id for the Holzen score + In motion row (`HomeStatTiles`).
- * Not a draggable Home section — only visibility.
+ * Default draggable Home section order (Hold mode + Customize).
+ * Wireframe baseline: Night → Goal & Why → Market → Your pause → Journey pulse → Quick capture.
+ * `journey-pulse` is the Holzen score / In motion row (`HomeStatTiles`); order is persisted like other sections.
  */
+export const ALL_HOME_SECTION_IDS = [
+  'night',
+  'goal-why',
+  'market',
+  'your-pause',
+  'journey-pulse',
+  'quick-capture',
+] as const;
+export type AllHomeSectionId = (typeof ALL_HOME_SECTION_IDS)[number];
+
+/** Layout + visibility id for the Holzen score + In motion row (`HomeStatTiles`). */
 export const JOURNEY_STAT_TILES_VISIBILITY_ID = 'journey-pulse' as const;
 
-const VISIBILITY_KEYS = [...ALL_HOME_SECTION_IDS, JOURNEY_STAT_TILES_VISIBILITY_ID] as const;
+const VISIBILITY_KEYS = [
+  'goal-why',
+  ...OPTIONAL_HOME_WIDGET_IDS,
+  JOURNEY_STAT_TILES_VISIBILITY_ID,
+] as const;
 
 const defaultVisible: Record<string, boolean> = {
   'goal-why': true,
-  market: true,
-  'your-pause': true,
   [JOURNEY_STAT_TILES_VISIBILITY_ID]: true,
   'quick-capture': false,
   night: false,
@@ -42,6 +54,10 @@ function load(): Record<string, boolean> {
   } catch {
     return { ...defaultVisible };
   }
+}
+
+export function isHomeSectionAlwaysVisibleInLayout(id: string): boolean {
+  return (HOME_SECTION_IDS_WITHOUT_VISIBILITY_TOGGLE as readonly string[]).includes(id);
 }
 
 export function useHomeOptionalVisibility() {

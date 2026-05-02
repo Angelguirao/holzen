@@ -122,25 +122,23 @@ const LEGACY_ORDER_KEY = 'holzen_widget_order';
 const COLLAPSED_KEY = 'holzen_home_section_collapsed_v1';
 const LEGACY_COLLAPSED_KEY = 'holzen_widget_collapsed';
 
-const CORE_PREFIX = ['goal-why', 'market', 'your-pause'] as const;
+function mergeOrderWithDefaults(parsed: string[], defaultOrder: string[]): string[] {
+  const merged = parsed.filter((id) => defaultOrder.includes(id));
+  const missing = defaultOrder.filter((id) => !merged.includes(id));
+  return [...merged, ...missing];
+}
 
 function loadOrder(defaultOrder: string[]): string[] {
   try {
     const raw = localStorage.getItem(ORDER_KEY);
     if (raw) {
       const parsed = JSON.parse(raw) as string[];
-      const merged = parsed.filter((id) => defaultOrder.includes(id));
-      const missing = defaultOrder.filter((id) => !merged.includes(id));
-      return [...merged, ...missing];
+      return mergeOrderWithDefaults(parsed, defaultOrder);
     }
     const legacy = localStorage.getItem(LEGACY_ORDER_KEY);
     if (legacy) {
       const parsed = JSON.parse(legacy) as string[];
-      const core = CORE_PREFIX.filter((id) => defaultOrder.includes(id));
-      const fromLegacy = parsed.filter((id) => defaultOrder.includes(id) && !core.includes(id));
-      const base = [...core, ...fromLegacy];
-      const missing = defaultOrder.filter((id) => !base.includes(id));
-      return [...base, ...missing];
+      return mergeOrderWithDefaults(parsed, defaultOrder);
     }
   } catch {
     void 0;
