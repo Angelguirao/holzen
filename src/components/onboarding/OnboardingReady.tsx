@@ -23,7 +23,6 @@ interface Props {
   motivations: string[];
   groundingActivities: string[];
   threshold: number;
-  mantra: string;
   hasHoldGoal: boolean;
   onBeginFree: () => void;
   onStartTrial: () => void;
@@ -31,17 +30,10 @@ interface Props {
   stagger: (delay: number) => object;
 }
 
-function truncateRecap(text: string, max = 72): string {
-  const trimmed = text.trim();
-  if (trimmed.length <= max) return trimmed;
-  return `${trimmed.slice(0, max)}…`;
-}
-
 export function OnboardingReady({
   motivations,
   groundingActivities,
   threshold,
-  mantra,
   hasHoldGoal,
   onBeginFree,
   onStartTrial,
@@ -49,8 +41,6 @@ export function OnboardingReady({
   stagger,
 }: Props) {
   const { t } = useTranslation();
-
-  const mantraTrim = mantra.trim();
 
   const recapItems = [
     motivations.length > 0 && {
@@ -62,10 +52,6 @@ export function OnboardingReady({
       value: hasHoldGoal
         ? t('onboarding.ready.recapHoldGoalSet', { defaultValue: 'Saved' })
         : t('onboarding.ready.recapHoldGoalUnset', { defaultValue: 'Not set yet' }),
-    },
-    mantraTrim.length > 0 && {
-      label: t('onboarding.ready.recapMantra', { defaultValue: 'Mantra' }),
-      value: truncateRecap(mantraTrim),
     },
     groundingActivities.length > 0 && {
       label: t('onboarding.ready.recapGrounding', { defaultValue: 'Grounds you' }),

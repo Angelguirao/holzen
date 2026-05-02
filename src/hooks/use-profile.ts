@@ -264,12 +264,10 @@ export function useProfile() {
       timezone: string;
       motivations: string[];
       groundingActivities: string[];
-      mantra?: string | null;
     },
     options?: { setLocalOnboarded?: boolean },
   ) => {
     const setLocalOnboarded = options?.setLocalOnboarded ?? true;
-    const mantraNorm = result.mantra?.trim() ? result.mantra.trim() : null;
 
     if (setLocalOnboarded) {
       setHasOnboarded(true);
@@ -279,7 +277,6 @@ export function useProfile() {
     if (result.firstName) setFirstNameState(result.firstName);
     setMotivationsState(result.motivations);
     setGroundingActivitiesState(result.groundingActivities);
-    setMantraState(mantraNorm);
 
     if (!user) return;
 
@@ -292,7 +289,6 @@ export function useProfile() {
         timezone: result.timezone,
         motivations: result.motivations.length > 0 ? result.motivations : null,
         grounding_activities: result.groundingActivities.length > 0 ? result.groundingActivities : [],
-        mantra: mantraNorm,
       })
       .eq('user_id', user.id);
   }, [user]);
