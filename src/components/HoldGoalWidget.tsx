@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback, type ReactNode } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 
 import { useTranslation } from 'react-i18next';
 import { supabase } from '@/integrations/supabase/client';
@@ -37,6 +37,12 @@ import {
 type GoalType = 'time' | 'price' | 'forever';
 type TimeUnit = 'months' | 'years';
 
+function wireframeKindLabel(goalType: GoalType, t: (key: string) => string): string {
+  if (goalType === 'forever') return t('holdGoal.forever');
+  if (goalType === 'time') return t('holdGoal.time');
+  return t('holdGoal.price');
+}
+
 interface HoldGoal {
   type: GoalType;
   start: string;
@@ -52,17 +58,18 @@ const MIN_PRICE = 1;
 export function HoldGoalWidget({
   currentPrice,
   variant = 'default',
-  wireframeAccessoryRight,
+  /** When `variant` is wireframe and user has a goal: false shows only goal type · primary status. */
+  wireframeDetailsExpanded = true,
 }: {
   currentPrice?: number;
-  /** Composed Home card: wireframe-style goal header row + optional accessory (e.g. why chevron). */
   variant?: 'default' | 'wireframe';
-  wireframeAccessoryRight?: ReactNode;
+  wireframeDetailsExpanded?: boolean;
 }) {
   const { t } = useTranslation();
   const { currency } = useHolzen();
   const { user } = useAuth();
   const isWire = variant === 'wireframe';
+  const wireCompact = isWire && !wireframeDetailsExpanded;
   const [goal, setGoal] = useState<HoldGoal | null>(null);
   const [loading, setLoading] = useState(true);
   const [setting, setSetting] = useState(false);
@@ -390,20 +397,13 @@ export function HoldGoalWidget({
 
   // Action buttons (edit + clear)
   const goalActions = (
-    <div className={`flex items-center ${isWire ? 'gap-0.5' : 'gap-2'}`}>
+    <div className="flex items-center gap-2">
       <button type="button" onClick={editGoal} className={`${homeInWidget.iconBtn} text-muted-foreground/50`} aria-label="Edit goal">
         <Pencil className="h-3.5 w-3.5 text-secondary-foreground" />
       </button>
       <AlertDialog>
         <AlertDialogTrigger asChild>
-          <button
-            type="button"
-            className={
-              isWire
-                ? 'rounded-md px-2 py-1.5 text-xs font-medium text-muted-foreground transition-colors hover:bg-muted/40 hover:text-foreground'
-                : 'font-medium transition-colors text-sm text-secondary-foreground'
-            }
-          >
+          <button type="button" className="font-medium transition-colors text-sm text-secondary-foreground">
             {t('holdGoal.clear')}
           </button>
         </AlertDialogTrigger>
@@ -429,29 +429,26 @@ export function HoldGoalWidget({
     const days = elapsed % 365;
 
     if (isWire) {
+      const kindLabel = wireframeKindLabel('forever', t);
       return (
         <div className="space-y-2.5">
-          <div className="flex items-start justify-between gap-2">
-            <div className="min-w-0 flex-1 space-y-1">
-              <p className="flex flex-wrap items-baseline gap-x-2 gap-y-0.5 text-[13px] font-medium leading-snug text-muted-foreground">
-                <span className="tracking-wide">{t('home.goalWhy.goalTag')}</span>
-                <span className="text-muted-foreground/45" aria-hidden>
-                  ·
-                </span>
-                <span className="text-sm font-semibold tabular-nums text-foreground">
-                  {years > 0 ? `${years}y ${days}d` : `${elapsed} day${elapsed !== 1 ? 's' : ''}`}{' '}
-                  {t('holdGoal.andCounting')}
-                </span>
-              </p>
+          <div className="min-w-0 space-y-1">
+            <p className="flex flex-wrap items-baseline gap-x-2 gap-y-0.5 text-[13px] font-medium leading-snug">
+              <span className="text-foreground">{kindLabel}</span>
+              <span className="text-muted-foreground/45" aria-hidden>
+                ·
+              </span>
+              <span className="text-sm font-semibold tabular-nums text-foreground">
+                {years > 0 ? `${years}y ${days}d` : `${elapsed} day${elapsed !== 1 ? 's' : ''}`}{' '}
+                {t('holdGoal.andCounting')}
+              </span>
+            </p>
+            {!wireCompact ? (
               <p className={homeInWidget.metaFaint}>
                 {t('holdGoal.since', { date: format(start, 'MMM d, yyyy') })}
                 {elapsed > 0 ? ` · ${t('holdGoal.daysHeld', { count: elapsed })}` : ''} · {t('holdGoal.noEndDate')}
               </p>
-            </div>
-            <div className="flex shrink-0 items-center gap-0.5">
-              {goalActions}
-              {wireframeAccessoryRight}
-            </div>
+            ) : null}
           </div>
         </div>
       );
@@ -492,36 +489,35 @@ export function HoldGoalWidget({
       : `${goal.targetMonths}mo ${t('holdGoal.commitment')}`;
 
     if (isWire) {
+      const kindLabel = wireframeKindLabel('time', t);
       return (
         <div className="space-y-2.5">
-          <div className="flex items-start justify-between gap-2">
-            <div className="min-w-0 flex-1 space-y-1">
-              <p className="flex flex-wrap items-baseline gap-x-2 gap-y-0.5 text-[13px] font-medium leading-snug text-muted-foreground">
-                <span className="tracking-wide">{t('home.goalWhy.goalTag')}</span>
-                <span className="text-muted-foreground/45" aria-hidden>
-                  ·
-                </span>
-                <span className="text-sm font-semibold tabular-nums text-foreground">
-                  {completed ? t('holdGoal.goalReached') : t('holdGoal.daysToGo', { count: remaining })}
-                </span>
-              </p>
+          <div className="min-w-0 space-y-1">
+            <p className="flex flex-wrap items-baseline gap-x-2 gap-y-0.5 text-[13px] font-medium leading-snug">
+              <span className="text-foreground">{kindLabel}</span>
+              <span className="text-muted-foreground/45" aria-hidden>
+                ·
+              </span>
+              <span className="text-sm font-semibold tabular-nums text-foreground">
+                {completed ? t('holdGoal.goalReached') : t('holdGoal.daysToGo', { count: remaining })}
+              </span>
+            </p>
+            {!wireCompact ? (
               <p className={homeInWidget.metaFaint}>
                 {t('holdGoal.started', { date: format(start, 'MMM d, yyyy') })} · {t('holdGoal.daysHeld', { count: elapsed })}
                 {' · '}
                 {displayTarget}
               </p>
-            </div>
-            <div className="flex shrink-0 items-center gap-0.5">
-              {goalActions}
-              {wireframeAccessoryRight}
-            </div>
+            ) : null}
           </div>
-          <div className="h-1.5 w-full overflow-hidden rounded-full bg-muted/50">
-            <div
-              className={`h-full rounded-full transition-all duration-700 ${completed ? 'bg-primary' : 'bg-primary/50'}`}
-              style={{ width: `${progress}%` }}
-            />
-          </div>
+          {!wireCompact ? (
+            <div className="h-1.5 w-full overflow-hidden rounded-full bg-muted/50">
+              <div
+                className={`h-full rounded-full transition-all duration-700 ${completed ? 'bg-primary' : 'bg-primary/50'}`}
+                style={{ width: `${progress}%` }}
+              />
+            </div>
+          ) : null}
         </div>
       );
     }
@@ -567,37 +563,36 @@ export function HoldGoalWidget({
     const elapsedDays = differenceInDays(new Date(), start);
 
     if (isWire) {
+      const kindLabel = wireframeKindLabel('price', t);
       return (
         <div className="space-y-2.5">
-          <div className="flex items-start justify-between gap-2">
-            <div className="min-w-0 flex-1 space-y-1">
-              <p className="flex flex-wrap items-baseline gap-x-2 gap-y-0.5 text-[13px] font-medium leading-snug text-muted-foreground">
-                <span className="tracking-wide">{t('home.goalWhy.goalTag')}</span>
-                <span className="text-muted-foreground/45" aria-hidden>
-                  ·
-                </span>
-                <span className="text-sm font-semibold tabular-nums text-foreground">
-                  {reached ? t('holdGoal.targetReached') : `${formatBtcPrice(diff, currency)} ${t('holdGoal.toGo')}`}
-                </span>
-              </p>
+          <div className="min-w-0 space-y-1">
+            <p className="flex flex-wrap items-baseline gap-x-2 gap-y-0.5 text-[13px] font-medium leading-snug">
+              <span className="text-foreground">{kindLabel}</span>
+              <span className="text-muted-foreground/45" aria-hidden>
+                ·
+              </span>
+              <span className="text-sm font-semibold tabular-nums text-foreground">
+                {reached ? t('holdGoal.targetReached') : `${formatBtcPrice(diff, currency)} ${t('holdGoal.toGo')}`}
+              </span>
+            </p>
+            {!wireCompact ? (
               <p className={homeInWidget.metaFaint}>
                 {t('holdGoal.started', { date: format(start, 'MMM d, yyyy') })} · {t('holdGoal.daysHeld', { count: elapsedDays })} ·{' '}
                 {t('holdGoal.target')}: {formatBtcPrice(target, currency)}
                 {' · '}
                 {t('holdGoal.current')}: {formatBtcPrice(price, currency)}
               </p>
-            </div>
-            <div className="flex shrink-0 items-center gap-0.5">
-              {goalActions}
-              {wireframeAccessoryRight}
-            </div>
+            ) : null}
           </div>
-          <div className="h-1.5 w-full overflow-hidden rounded-full bg-muted/50">
-            <div
-              className={`h-full rounded-full transition-all duration-700 ${reached ? 'bg-primary' : 'bg-primary/50'}`}
-              style={{ width: `${progress}%` }}
-            />
-          </div>
+          {!wireCompact ? (
+            <div className="h-1.5 w-full overflow-hidden rounded-full bg-muted/50">
+              <div
+                className={`h-full rounded-full transition-all duration-700 ${reached ? 'bg-primary' : 'bg-primary/50'}`}
+                style={{ width: `${progress}%` }}
+              />
+            </div>
+          ) : null}
         </div>
       );
     }
