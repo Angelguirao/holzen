@@ -1229,6 +1229,8 @@
     "scienceInfoAria": "The science behind this pause",
     "noReflection": "No active pause. Go back to trigger one.",
     "outcomeSaveFailed": "Could not save your choice. Try again.",
+    "outcomeNotCompleted": "Your choice was saved, but this pause is not complete yet — open Reflect and finish a companion card, then choose again.",
+    "stepSyncFailed": "Could not sync this step. Check your connection and try again.",
     "pendingContextTitle": "Market context changed",
     "pendingContextBody": "There is a new pause for the latest move. You can keep your current pause or switch — switching ends the current ritual for this moment and opens the new one.",
     "pendingAdoptCta": "Switch to new pause",

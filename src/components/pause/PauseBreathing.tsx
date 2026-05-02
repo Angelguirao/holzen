@@ -50,7 +50,7 @@ interface Props {
   /** After full breath cycles: interstitial → parent logs `breath_completed` then navigates to Feel. */
   onContinueToFeel: () => void;
   /** Intro or mid-pattern skip: leave breath without logging completion. */
-  onSkipBreath: () => void;
+  onSkipBreath: () => void | Promise<void>;
   completed?: boolean;
   /** Fires when timed cycles finish — parent may mark session “past pattern” for header chrome (no DB log yet). */
   onPatternComplete?: () => void;

@@ -11,7 +11,7 @@ type LocalPhase = 'pick' | 'intensity';
 
 interface Props {
   onMoodSelect: (mood: MoodValue, intensity?: number) => void;
-  onMoodSkip: () => void;
+  onMoodSkip: () => void | Promise<void>;
   onMoodReset: () => void;
   moodDone: boolean;
   selectedMood?: MoodValue | null;

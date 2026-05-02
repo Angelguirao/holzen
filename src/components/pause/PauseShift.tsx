@@ -13,7 +13,7 @@ type LocalPhase = 'pick' | 'intensity';
 
 interface Props {
   onMoodAfterSelect: (mood: MoodValue, shiftIntensity?: number) => void;
-  onMoodAfterSkip: () => void;
+  onMoodAfterSkip: () => void | Promise<void>;
   onMoodAfterReset: () => void;
   moodAfterDone: boolean;
   selectedMoodAfter?: MoodValue | null;

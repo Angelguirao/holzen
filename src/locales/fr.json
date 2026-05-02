@@ -954,6 +954,8 @@
     "scienceInfoAria": "La science derrière cette pause",
     "noReflection": "Pas de réflexion active. Retourne en déclencher une.",
     "outcomeSaveFailed": "Impossible d’enregistrer ton choix. Réessaie.",
+    "outcomeNotCompleted": "Ton choix est enregistré, mais cette pause n’est pas encore terminée — ouvre Réfléchir, termine une carte compagnon, puis choisis à nouveau.",
+    "stepSyncFailed": "Impossible de synchroniser cette étape. Vérifie ta connexion et réessaie.",
     "pendingContextTitle": "Le contexte du marché a changé",
     "pendingContextBody": "Il y a une nouvelle pause pour le dernier mouvement. Tu peux garder ta pause actuelle ou basculer — en basculant, le rituel en cours se termine pour cet instant et la nouvelle s’ouvre.",
     "pendingAdoptCta": "Passer à la nouvelle pause",

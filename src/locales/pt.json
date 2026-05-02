@@ -955,6 +955,8 @@
     "scienceInfoAria": "A ciência por detrás desta pausa",
     "noReflection": "Sem reflexão ativa. Volte para ativar uma.",
     "outcomeSaveFailed": "Não foi possível guardar a tua escolha. Tenta novamente.",
+    "outcomeNotCompleted": "A tua escolha foi guardada, mas esta pausa ainda não está completa — abre Reflectir, conclui um cartão companheiro e escolhe de novo.",
+    "stepSyncFailed": "Não foi possível sincronizar este passo. Verifica a ligação e tenta novamente.",
     "pendingContextTitle": "O contexto de mercado mudou",
     "pendingContextBody": "Há uma nova pausa para o movimento mais recente. Podes manter a pausa atual ou mudar — ao mudar, o ritual atual termina para este momento e abre-se a nova.",
     "pendingAdoptCta": "Mudar para a nova pausa",
