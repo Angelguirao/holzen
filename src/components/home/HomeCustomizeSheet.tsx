@@ -40,6 +40,8 @@ export interface HomeCustomizeSheetProps {
   onResetAll: () => void;
   /** When true, Night reflection toggle is disabled (e.g. not Pro). */
   nightToggleDisabled?: boolean;
+  /** Bump after reset-to-defaults so @dnd-kit remounts and matches parent `order`. */
+  dndRemountKey?: number;
 }
 
 function isDraggableTailHomeSectionId(id: string): boolean {
@@ -162,6 +164,7 @@ export function HomeCustomizeSheet({
   onZenModeChange,
   onResetAll,
   nightToggleDisabled,
+  dndRemountKey = 0,
 }: HomeCustomizeSheetProps) {
   const { t } = useTranslation();
 
@@ -259,6 +262,7 @@ export function HomeCustomizeSheet({
             </div>
 
             <DndContext
+              key={dndRemountKey}
               sensors={sensors}
               collisionDetection={closestCenter}
               onDragEnd={handleDragEnd}

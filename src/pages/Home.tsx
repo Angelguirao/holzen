@@ -162,6 +162,7 @@ const Home = () => {
   const [goalWhyExpanded, setGoalWhyExpanded] = useState(false);
   const [goalWhyHoldSummary, setGoalWhyHoldSummary] = useState<string | null>(null);
   const [customizeOpen, setCustomizeOpen] = useState(false);
+  const [customizeDndEpoch, setCustomizeDndEpoch] = useState(0);
   const heroQuoteViewTracked = useRef(false);
 
   const sectionDefaultOrder = useMemo(() => [...ALL_HOME_SECTION_IDS], []);
@@ -220,6 +221,7 @@ const Home = () => {
     resetLayout();
     resetSectionVisibility();
     setZenModePersist(false);
+    setCustomizeDndEpoch((n) => n + 1);
   }, [resetLayout, resetSectionVisibility, setZenModePersist]);
 
   const homeCustomizeSectionTitle = useCallback(
@@ -1011,6 +1013,7 @@ const Home = () => {
         onZenModeChange={handleZenModeFromCustomize}
         onResetAll={handleCustomizeResetAll}
         nightToggleDisabled={!subscribed}
+        dndRemountKey={customizeDndEpoch}
       />
 
       <TestimonialRequest completedPauseCount={completedPauseCount} />
