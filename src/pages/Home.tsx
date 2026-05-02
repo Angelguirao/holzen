@@ -160,7 +160,7 @@ const Home = () => {
   const [completedPauseCount, setCompletedPauseCount] = useState(0);
   const [marketChartExpanded, setMarketChartExpanded] = useState(false);
   const [goalWhyExpanded, setGoalWhyExpanded] = useState(false);
-  const [goalWhyHoldHeadline, setGoalWhyHoldHeadline] = useState<string | null>(null);
+  const [goalWhyHoldSummary, setGoalWhyHoldSummary] = useState<string | null>(null);
   const [customizeOpen, setCustomizeOpen] = useState(false);
   const heroQuoteViewTracked = useRef(false);
 
@@ -182,6 +182,16 @@ const Home = () => {
   const homeSegments = useMemo(
     () => buildHomeRenderableSegments(visibleOrderedSectionIds),
     [visibleOrderedSectionIds],
+  );
+
+  const hasTodaySegment = useMemo(
+    () => homeSegments.some((s) => s.type === 'todayBlock'),
+    [homeSegments],
+  );
+
+  const firstTodaySegmentIndex = useMemo(
+    () => homeSegments.findIndex((s) => s.type === 'todayBlock'),
+    [homeSegments],
   );
 
   const showJourneyStatTiles = !!sectionVisible[JOURNEY_STAT_TILES_VISIBILITY_ID];
@@ -215,7 +225,7 @@ const Home = () => {
   const homeCustomizeSectionTitle = useCallback(
     (id: string) => {
       const titles: Record<string, string> = {
-        'goal-why': t('home.widget.whyYouStay'),
+        'goal-why': t('home.widget.whyHoldTitle'),
         market: t('home.customizeSheet.sections.market.title'),
         'your-pause': t('home.customizeSheet.sections.yourPause.title'),
         'quick-capture': t('home.customizeSheet.sections.quickCapture.title'),
@@ -268,10 +278,6 @@ const Home = () => {
       trackEvent('home.goal_why_expand_toggled', { expanded: next });
       return next;
     });
-  }, []);
-
-  const onGoalWhyHoldHeadlineChange = useCallback((headline: string | null) => {
-    setGoalWhyHoldHeadline(headline);
   }, []);
 
   const marketHeaderRight = useMemo(
@@ -824,14 +830,14 @@ const Home = () => {
         return (
           <HomeSectionCard
             className="rounded-lg"
-            title={t('home.widget.whyYouStay')}
-            headerSubtitle={goalWhyHoldHeadline ?? undefined}
+            title={t('home.widget.whyHoldTitle')}
+            headerSubtitle={goalWhyHoldSummary ?? undefined}
             headerRight={goalWhyHeaderRight}
           >
             <HomeGoalWhyCard
               currentPrice={btcData?.currentPrice}
               detailsExpanded={goalWhyExpanded}
-              onHoldGoalCompactHeadlineChange={onGoalWhyHoldHeadlineChange}
+              onHoldGoalSummaryChange={setGoalWhyHoldSummary}
             />
           </HomeSectionCard>
         );
@@ -897,16 +903,7 @@ const Home = () => {
 
   return (
     <div {...pullHandlers} className="space-y-6">
-      <div className="relative">
-        <HomeHeroQuote userId={user?.id} firstName={firstName} />
-        <button
-          type="button"
-          onClick={() => handleCustomizeOpenChange(true)}
-          className="absolute right-0 top-0 text-sm font-medium text-primary underline underline-offset-4"
-        >
-          {t('home.customize')}
-        </button>
-      </div>
+      <HomeHeroQuote userId={user?.id} firstName={firstName} />
 
       <InstallHolzenCard />
 
@@ -925,6 +922,17 @@ const Home = () => {
       )}
 
       <div className="space-y-4">
+        {!hasTodaySegment ? (
+          <div className="flex justify-end">
+            <button
+              type="button"
+              onClick={() => handleCustomizeOpenChange(true)}
+              className="text-sm font-medium text-primary underline underline-offset-4"
+            >
+              {t('home.customize')}
+            </button>
+          </div>
+        ) : null}
         {homeSegments.map((seg, segIdx) => {
           if (seg.type === 'plain') {
             if (seg.id === JOURNEY_STAT_TILES_VISIBILITY_ID) {
@@ -945,12 +953,23 @@ const Home = () => {
           return (
             <section
               key={`today-${segIdx}`}
-              aria-labelledby="home-today-heading"
+              aria-labelledby={`home-today-heading-${segIdx}`}
               className="space-y-3"
             >
-              <h2 id="home-today-heading" className="text-base font-medium text-foreground">
-                {t('home.today')}
-              </h2>
+              <div className="flex items-center justify-between gap-3">
+                <h2 id={`home-today-heading-${segIdx}`} className="text-base font-medium text-foreground">
+                  {t('home.today')}
+                </h2>
+                {firstTodaySegmentIndex === segIdx ? (
+                  <button
+                    type="button"
+                    onClick={() => handleCustomizeOpenChange(true)}
+                    className="shrink-0 text-sm font-medium text-primary underline underline-offset-4"
+                  >
+                    {t('home.customize')}
+                  </button>
+                ) : null}
+              </div>
               <div className="space-y-4">
                 {tilesAtTop ? (
                   <div key={`today-stat-tiles-${segIdx}`}>
