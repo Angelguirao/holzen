@@ -338,7 +338,8 @@ export function useLibrary(options?: UseLibraryOptions) {
     const itemsPromise = usesArchiveRpcList
       ? supabase.rpc('library_archive_list_page', rpcPayload)
       : (() => {
-          let itemsQuery = (supabase.from(libraryItemsTable as never) as ReturnType<typeof supabase.from>).select('*').eq('user_id', user.id);
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          let itemsQuery: any = (supabase as any).from(libraryItemsTable).select('*').eq('user_id', user.id);
           if (favoritesOnly) itemsQuery = itemsQuery.eq('is_favorite', true);
           if (listSort === 'alphabetical') {
             itemsQuery = itemsQuery
