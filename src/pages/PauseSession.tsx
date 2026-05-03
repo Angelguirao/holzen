@@ -2,7 +2,6 @@ import { useState, useCallback, useEffect, useMemo, useRef } from 'react';
 import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { supabase } from '@/integrations/supabase/client';
 import { useHolzen } from '@/hooks/use-holzen';
 import { useSubscription } from '@/hooks/use-subscription';
 import { toast } from 'sonner';
@@ -45,15 +44,11 @@ import { useFeatureFlag } from '@/hooks/use-feature-flag';
 import {
   DEFAULT_COMPANIONS,
   DEFAULT_PREFS,
-  type FetchedPauseInstance,
   saveSession,
   loadSession,
   clearSession,
 } from '@/lib/pause-session-storage';
-import {
-  buildFetchedPauseInstanceFromFetch,
-  type PauseInstanceContextSnapshotRow,
-} from '@/lib/pause-session-fetched-instance';
+import { usePauseSessionFetch } from '@/hooks/use-pause-session-fetch';
 import { pauseLogStep } from '@/lib/pause-api';
 import type { PauseState } from '@/lib/pause-state';
 import { getSessionQuote } from '@/lib/wisdom-quotes';
@@ -149,57 +144,8 @@ export default function PauseSession() {
     navSeverity,
   ]);
 
-  const [fetchedInstance, setFetchedInstance] = useState<FetchedPauseInstance | null>(null);
-  const [fetchFailed, setFetchFailed] = useState(false);
-
   const fetchPauseInstanceId = hydration.status === 'fetch' ? hydration.pauseInstanceId : null;
-
-  useEffect(() => {
-    if (!fetchPauseInstanceId) {
-      setFetchedInstance(null);
-      setFetchFailed(false);
-      return;
-    }
-    let cancelled = false;
-    setFetchedInstance(null);
-    setFetchFailed(false);
-    void (async () => {
-      try {
-        const { data: inst, error: instError } = await supabase
-          .from('pause_instances' as never)
-          .select('id, context_snapshot')
-          .eq('id', fetchPauseInstanceId)
-          .maybeSingle();
-        if (cancelled) return;
-        if (instError || !inst) {
-          setFetchFailed(true);
-          return;
-        }
-        const { data: artifacts, error: artifactsError } = await supabase
-          .from('pause_ai_artifacts' as never)
-          .select('kind, content')
-          .eq('pause_instance_id', fetchPauseInstanceId);
-        if (cancelled) return;
-        if (artifactsError) {
-          setFetchFailed(true);
-          return;
-        }
-        const artifactRows = (artifacts ?? []) as Array<{ kind: string; content: Record<string, unknown> }>;
-        setFetchedInstance(
-          buildFetchedPauseInstanceFromFetch(
-            fetchPauseInstanceId,
-            inst as PauseInstanceContextSnapshotRow,
-            artifactRows,
-          ),
-        );
-      } catch {
-        if (!cancelled) setFetchFailed(true);
-      }
-    })();
-    return () => {
-      cancelled = true;
-    };
-  }, [fetchPauseInstanceId]);
+  const { fetchedInstance, fetchFailed } = usePauseSessionFetch(fetchPauseInstanceId);
 
   const resolved: PauseSessionHydrationReady | null = useMemo(
     () =>
