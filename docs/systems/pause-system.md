@@ -330,6 +330,8 @@ Echoes are **“this pause ended before the `engaged` milestone”** (`**engaged
 | Step types and helpers                                        | `src/lib/pause-state.ts`                                                                                          |
 | Ritual UI                                                     | `src/pages/PauseSession.tsx`, `src/components/pause/Pause*.tsx`                                                   |
 | Local hydrate (`PauseStep`, brief sub-step, phase from storage) | `src/lib/pause-session-step-map.ts`                                                                               |
+| Coalesced shell fields for route (`resolved` → message, id, companions, severity) | `src/lib/pause-session-shell-view-model.ts`                                                                       |
+| Gate UI predicates (instance fetch wait, depth picker)         | `src/lib/pause-session-gate-flags.ts`                                                                             |
 | Scaffold brief/deep body props (orchestrator → shell)         | `src/lib/pause-session-scaffold-ritual-payloads.ts`                                                               |
 | `/pause` mount dev log (`[holzen:pause]` when browser debug on) | `src/lib/pause-session-mount-log-params.ts`, `src/hooks/use-pause-session-mount-log.ts`                             |
 | Step advance gates (Continue CTAs, etc.)                    | `src/lib/pause-session-navigation.ts`                                                                             |
