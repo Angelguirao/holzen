@@ -1,10 +1,9 @@
-import { useState, useCallback, useRef } from 'react';
+import { useState, useRef } from 'react';
 import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useHolzen } from '@/hooks/use-holzen';
 import { useSubscription } from '@/hooks/use-subscription';
-import { hapticFeedback } from '@/lib/haptics';
 import { type MoodValue } from '@/components/MoodCheck';
 import { type CompanionData, type CompanionPrefs } from '@/components/CompanionSection';
 
@@ -26,7 +25,6 @@ import { PauseDecide } from '@/components/pause/PauseDecide';
 import { PauseDone } from '@/components/pause/PauseDone';
 import { PauseDepthPicker } from '@/components/pause/PauseDepthPicker';
 import { PauseBriefProgress } from '@/components/pause/PauseBriefProgress';
-import { pauseStepSwipeDirection } from '@/lib/pause-step-swipe-direction';
 import { isPauseSessionHeaderBackVisible } from '@/lib/pause-session-header-back';
 import { PauseBriefFeel, type BriefFeelTile } from '@/components/pause/PauseBriefFeel';
 import { PauseBriefIntegrate } from '@/components/pause/PauseBriefIntegrate';
@@ -68,6 +66,7 @@ import { usePauseSessionShell } from '@/hooks/use-pause-session-shell';
 import { usePauseSessionMountLog } from '@/hooks/use-pause-session-mount-log';
 import { usePauseSessionBriefPastStep } from '@/hooks/use-pause-session-brief-past-step';
 import { usePauseSessionGoBack } from '@/hooks/use-pause-session-go-back';
+import { usePauseSessionGoToStep } from '@/hooks/use-pause-session-go-to-step';
 
 export default function PauseSession() {
   const { t } = useTranslation();
@@ -234,14 +233,11 @@ export default function PauseSession() {
 
   const [swipeDirection, setSwipeDirection] = useState<'forward' | 'back'>('forward');
 
-  const goToStep = useCallback(
-    (next: PauseStep) => {
-      setSwipeDirection(pauseStepSwipeDirection(step, next));
-      hapticFeedback('light');
-      setStep(next);
-    },
-    [step],
-  );
+  const { goToStep } = usePauseSessionGoToStep({
+    step,
+    setSwipeDirection,
+    setStep,
+  });
 
   const { handleFrameImDone } = usePauseShiftFrameDoneHandler({
     pauseInstanceId,
