@@ -50,14 +50,15 @@ States include: `**active**`, `**engaged**`, `**pending**` (context offer), `**c
 High-level transitions:
 
 - `**active**` → `**engaged**`: for `**volatility_v1**`, after each qualifying insert: **brief** instances (`**brief_ritual**` on `**initial_emotion_logged**`) flip when `**initial_emotion_logged**` exists; **deep** instances flip when both `**breath_completed**` and `**initial_emotion_logged**` exist. Other template slugs still use `**required_for_engaged**` from the template row (see `**pause_evaluate_transitions**`).
-- `**engaged**` → `**completed**`: for `**volatility_v1**`, **brief** completes when `**breath_completed**`, `**initial_emotion_logged**`, and `**outcome_logged**` all exist; **deep** completes when those three plus `**shift_emotion_logged**` exist. Companion completions do **not** gate `**completed**` for this slug. Other slugs still use `**required_for_completed**` plus `**required_companion_count**` counting completes.
+- `**active**` or `**engaged**` → `**completed**`: for `**volatility_v1**`, as soon as **any** `**outcome_logged**` step event exists — **no** separate “full ritual” requirement in Postgres (the `/pause` UI still walks users through prior beats). Companion completions do **not** gate `**completed**`. Other slugs still use `**required_for_completed**` plus `**required_companion_count**` counting completes.
 - `**pending**`: separate offer row when market context changes; user **adopts** or **declines** via dedicated RPCs (see AI pause doc). `**pause_log_step`** refuses steps on `**pending**` instances until adopted.
 
 ```mermaid
 stateDiagram-v2
   [*] --> active: instance created
-  active --> engaged: required_for_engaged satisfied
-  engaged --> completed: volatility_v1 step sets (see §5); other slugs + companions
+  active --> engaged: volatility_v1 brief/deep engaged gates (§5.1)
+  active --> completed: volatility_v1 outcome_logged only
+  engaged --> completed: outcome_logged (v1) or other slug rules
   active --> expired: window / rules
   engaged --> expired: window / rules
   active --> dismissed: user dismiss
@@ -65,7 +66,7 @@ stateDiagram-v2
   pending --> active: adopt offer
 ```
 
-**Brief vs deep:** `**volatility_v1**` uses different step subsets for **engaged** and **completed** depending on whether `**brief_ritual**` was set on `**initial_emotion_logged**` (see §5.1). Neither path uses companion count for completion.
+**Brief vs deep (`volatility_v1`):** only **`active` → `engaged`** depends on `**brief_ritual**` (initial-only vs breath+initial). **`completed`** is the same for both: **`outcome_logged`** present. Companion count is not used for completion on this slug.
 
 Exact rules (open max age, supersede, window elapsed) live in `**pause_evaluate_transitions**` in `supabase/migrations/` (search that function name for the latest definition).
 
@@ -77,12 +78,12 @@ Holzen stores **one `pause_instances` row per pause**. Product language below ma
 | ------------------------------ | -------------------------- |
 | **Pending / queued** — new volatility was detected while a pause was already open; the user must **adopt** or **decline** the offer. | `**state = pending**`. Does not appear in `**v_pause_current**` until adopted. Expires under staleness policy (e.g. 12h in recent migrations). |
 | **Active, not yet engaged** — pause open on Home / notification; the user has not yet satisfied the minimum steps in `**required_for_engaged**`. | **`state = active`**, **`engaged_at` IS NULL**. |
-| **In progress (ritual underway)** — at least breathing + initial emotion logged per template. | `**state = engaged**`, `**engaged_at**` set when entering `engaged`. |
+| **In progress (ritual underway)** — `**volatility_v1`**: deep = breath + initial logged; brief = initial only (`**brief_ritual**`). Other templates use `**required_for_engaged**`. | `**state = engaged**`, `**engaged_at**` set when entering `engaged`. |
 | **Superseded** — the prior row was invalidated when adopting another pending pause or by auto-supersede. | `**state = expired**` with `**expired_reason = superseded**` (or other replacement rules documented in migrations). |
 | **Discarded by the user** — they closed the pause without completing the template. | `**state = dismissed**`. If there was never `engaged_at`, the row may surface as an **echo** in Library (see §9). |
 | **Declined from the offer** (without starting the ritual) — decline the pending offer or close without step events. | Outcome: `**pending**` row cleared / expired by policy, or `**dismissed**` / `**expired**` without step events — there is no separate `rejected` state. |
 | **Expired** — context window, time open, policy, etc. | `**state = expired**` + `**expired_reason**` (`context_lost`, `window_elapsed`, `open_max_age`, `superseded`, `ineligible_user_state`, `system_cancelled`, …). |
-| **Completed** — the pause row reached the terminal **done** contract for its template (`**volatility_v1**`: step-type subsets in §5.1; no companion quota). | `**state = completed**`. |
+| **Completed** — terminal “choice recorded” for `**volatility_v1**`: any `**outcome_logged**` row (§5.1). Other templates use their row’s `**required_for_completed**` + companion rules. | `**state = completed**`. |
 
 **Note:** the column **`engaged_at`** means **“the row reached the `engaged` milestone in the state machine”**, not literally “opened Reflect.” In the Feel→Breathe→… flow, reaching `engaged` implies early ritual progress; the **Echoes** tab treats **`engaged_at IS NULL`** on terminal `expired` / `dismissed` rows as a proxy for **“ended before that milestone”** (see `**src/lib/archive-segment.ts**`).
 
@@ -107,13 +108,13 @@ Holzen stores **one `pause_instances` row per pause**. Product language below ma
 
 ## 5. Default template `volatility_v1`
 
-Seeded in migrations (e.g. `20260425121348_8c37e44c-f886-4a86-ae4e-e480a8064766.sql`); the live **`volatility_v1`** contract row is updated in place by `**20260506200000_pause_volatility_v1_contract_and_transitions.sql**` (template **`version`** stays **`1`**).
+Seeded in migrations (e.g. `20260425121348_8c37e44c-f886-4a86-ae4e-e480a8064766.sql`); the live **`volatility_v1`** row is updated in place by `**20260506200000_pause_volatility_v1_contract_and_transitions.sql**` and `**20260510120000_pause_volatility_v1_completed_outcome_only.sql**` (template **`version`** stays **`1`**).
 
 
 | Field                          | Value (current `**volatility_v1**` row)                                                                                                                                 |
 | ------------------------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `**required_for_engaged**`     | `breath_completed`, `initial_emotion_logged` — documents the **deep** engaged gate; Postgres still applies a **brief** override (initial only) when `**brief_ritual**` is set (§5.1). |
-| `**required_for_completed**`   | `outcome_logged` only — a **documentation / minimal key** column; **do not** infer the full deep contract from this array alone. Actual completion uses the step subsets in §5.1 (deep still needs breath, initial, shift, and outcome). |
+| `**required_for_completed**`   | `outcome_logged` only — matches runtime: **`completed`** is set when this step type appears (see §5.1). |
 | `**required_companion_count**` | `**0**` — companions are **not** required for `**engaged**` or `**completed**` on this slug.                                                                 |
 | `**allowed_companion_types`**  | `signal`, `ground_nudge`, `historical_insight`, `zoom_out`, `zoom_out_deep_time`, `haiku`                                                                               |
 
@@ -126,20 +127,22 @@ The **brief** path (~2 min) is a product-only shortening of the ritual UI in `**
 
 **How Postgres knows it is brief:** any `**initial_emotion_logged**` row carries `**payload.brief_ritual**` as boolean `**true**` or string `**"true"**` / `**"t"**` / `**"1"**` (same predicate as `**pause_evaluate_transitions**`). See the client mood log path when the user chooses **Brief pause** from the depth picker.
 
-**Authoritative rules** (migration `**20260506200000_pause_volatility_v1_contract_and_transitions.sql**` — supersedes the older brief-only patch files for this slug):
+**Authoritative rules** (latest: `**20260510120000_pause_volatility_v1_completed_outcome_only.sql**` on top of `**20260506200000_pause_volatility_v1_contract_and_transitions.sql**`):
 
-| Mode   | `**active**` → `**engaged**` (step types must all exist) | `**engaged**` → `**completed**` (step types must all exist) |
-| ------ | --------------------------------------------------------- | ------------------------------------------------------------ |
-| Brief  | `**initial_emotion_logged**` only                        | `**breath_completed**`, `**initial_emotion_logged**`, `**outcome_logged**` |
-| Deep   | `**breath_completed**`, `**initial_emotion_logged**`       | brief set **plus** `**shift_emotion_logged**`               |
+| Mode   | `**active**` → `**engaged**` (all listed step types must exist) | `**active**` or `**engaged**` → `**completed**` |
+| ------ | ---------------------------------------------------------------- | ------------------------------------------------ |
+| Brief  | `**initial_emotion_logged**` only                               | **Any** `**outcome_logged**` row (same as deep) |
+| Deep   | `**breath_completed**`, `**initial_emotion_logged**`             | **Any** `**outcome_logged**` row                 |
+
+There is **no** separate echo table: echo-like rows stay `**expired**` / `**dismissed**` until cleared, but **`completed`** for `**volatility_v1**` always means “we have a recorded outcome” on that pause row. Retrospective `**outcome_logged**` on **`expired`** (rescue RPC) still leaves `**state = expired**` — see §4.
 
 Companion `**counts_for_pause**` is **not** read for completion on `**volatility_v1**`. Other template slugs still use `**required_for_*`** arrays and `**required_companion_count**` in the same function.
 
-**`engaged_at`:** on the **first** transition to `**completed**`, Postgres `**COALESCE**`s `**engaged_at**` so brief rows that never opened Reflect still carry a coherent engaged timestamp.
+**`engaged_at`:** on the **first** transition to `**completed**`, Postgres `**COALESCE**`s `**engaged_at**` so rows that never hit `**engaged**` (e.g. outcome-only edge case) still get a sensible timestamp for analytics.
 
 **Breath payload:** the client logs a **single** first-segment completion (and optional skip) with `**breath_segment: 1**` and `**brief_ritual: true**` on the `**breath_completed**` payload for traceability (see `**ensureBreathSegment1Logged**` / brief skip handlers in `**PauseSession.tsx**`).
 
-**Client mirror:** `**src/lib/pause-state.ts**` `**computePauseState**` follows the same `**volatility_v1**` brief/deep split (and the 12h `**open_max_age**` rule) so the UI can optimistically match Postgres before the RPC returns.
+**Client mirror:** `**src/lib/pause-state.ts**` `**computePauseState**` follows the same `**volatility_v1**` rules (brief/deep for **engaged** only; **completed** = `**outcome_logged**`; 12h `**open_max_age**`) so the UI can optimistically match Postgres before the RPC returns.
 
 ---
 
@@ -231,7 +234,7 @@ The `/pause` ritual **does not** use horizontal swipe to change steps. Navigatio
 Think of two separate questions:
 
 1. **“Did we record what the user chose?”** — That is the `**outcome_logged`** row (held / sold / bought / nothing). The RPC `**pause_log_step**` almost always **appends** that row when Decide succeeds.
-2. **“Is this pause row officially finished in the database?”** — That is the instance `**state`**. For `**volatility_v1**`, Postgres flips to `**completed**` only when the **full** step set for that mode exists (§5.1): **deep** still needs shift (and prior beats) even after outcome is appended, so you can briefly have `**outcome_logged**` while the row stays `**engaged**` if an earlier beat was skipped out of order. **Brief** completes on breath + initial + outcome only.
+2. **“Is this pause row officially finished in the database?”** — That is the instance `**state`**. For `**volatility_v1**`, Postgres flips to `**completed**` as soon as `**outcome_logged**` is appended (§5.1). The ritual UI still expects prior beats before Decide in normal use; `**pause.outcomeNotCompleted**` is mainly for races, RPC errors, or non–`volatility_v1` templates.
 
 **What `pause_log_step` returns:** After inserting the step event, the function returns the instance’s **current `pause_state`** (`engaged`, `completed`, etc.). That return value is the client’s cheap signal for “did this pause **fully** close?”
 
@@ -241,7 +244,7 @@ Think of two separate questions:
 - switches to the **Done** phase and builds `**PauseDone`** data, and
 - `**clearSession()**` (drops the in-browser ritual snapshot).
 
-If the return value is `**engaged**` (or anything other than `**completed**`), the client **does not** do those three things. Instead it shows `**pause.outcomeNotCompleted`**, keeps you on **Decide**, and refreshes data so you can finish any **missing ritual beats** (e.g. Frame / second breath on deep) and tap your outcome again if the row is still not `**completed**`. That way the **celebration Done UI** only appears when the **same pause row** is `**completed`** in Postgres (stats, badges, Library, and “pause completed” analytics stay aligned).
+If the return value is `**engaged**` (or anything other than `**completed**`), the client **does not** do those three things. Instead it shows `**pause.outcomeNotCompleted`**, keeps you on **Decide**, and refreshes so you can retry (for `**volatility_v1**`, a successful outcome log should normally return `**completed**` immediately). That way the **celebration Done UI** only appears when the **same pause row** is `**completed`** in Postgres (stats, badges, Library, and “pause completed” analytics stay aligned).
 
 **Why `dismissMessage` runs only after a successful RPC:** If we dismissed the open pause **before** the outcome RPC finished, another code path could **expire or dismiss** the instance first; then `**outcome_logged`** might fail or attach to the wrong lifecycle. Ordering avoids that race.
 
@@ -273,7 +276,7 @@ The Library **Echoes** tab is **not** a separate database entity. It is a **deri
 
 | Idea                                            | Meaning                                                                                                                                                                                                                                                                                                                                                                                                                                  |
 | ----------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `**state = completed**`                         | The ritual closed under template rules (`**volatility_v1**`: §5.1 step subsets; companions optional). **`completed`** implies the user reached **`engaged`**; see **`pause_instances.engaged_at`**.                                                                                                                                                                                                                       |
+| `**state = completed**`                         | Terminal row with a recorded choice for `**volatility_v1**`: **`outcome_logged`** triggered `**completed**` (§5.1). **`engaged_at`** is `**COALESCE**`d at that transition, so it may be set when the outcome lands even if the row never visited **`engaged`** first.                                                                                                                                                                                                                       |
 | **Echoes tab (archive “echo”)**                 | A **terminal** instance (`**expired`** or `**dismissed**`) with `**engaged_at` IS NULL** — the row **never reached the `engaged` lifecycle milestone** (early ritual gates not satisfied). Includes `**expired_reason = superseded**` when the prior open pause was replaced before that milestone. `**completed` never appears here** — a finished ritual is a **Pause**, not an archive echo. |
 | **Echo “complete” vs “incomplete” (UX)**         | **Not** a second DB state. Use **`has_outcome_logged`** from `**v_pause_full**`: incomplete = terminal echo without an outcome row; “with recorded choice” = a retrospective `**outcome_logged**` row may exist **without** `state` becoming `**completed**`. |
 | **Retrospective `outcome_logged` on `expired`** | `**pause_log_step**` may still accept an `**outcome_logged**` row after `**expired**` for analytics / copy (see §4 and migration `20260505120000_pause_log_step_expired_outcome_rescue.sql`). That records a choice; it does **not** reclassify the row as `**completed`**. An echo can therefore show **outcome text** in synthetic archive cards without ever having been a full ritual completion.                                    |

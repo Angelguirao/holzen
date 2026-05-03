@@ -229,24 +229,31 @@ describe('computePauseState', () => {
     ).toBe('active');
   });
 
-  it('completes deep volatility_v1 when all step types exist without companions', () => {
+  it('completes volatility_v1 when only outcome_logged exists (from active)', () => {
     expect(
       computePauseState({
-        instance: makeInstance({ state: 'engaged' }),
+        instance: makeInstance(),
         template: volatilityTemplate,
-        stepEvents: [
-          makeStep({ step_type: 'breath_completed' }),
-          makeStep({ step_type: 'initial_emotion_logged' }),
-          makeStep({ step_type: 'shift_emotion_logged' }),
-          makeStep({ step_type: 'outcome_logged' }),
-        ],
+        stepEvents: [makeStep({ step_type: 'outcome_logged', payload: { outcome: 'held' } })],
         companionEvents: [],
         now: NOW,
       }),
     ).toBe('completed');
   });
 
-  it('completes deep volatility_v1 with step gates met even if only non-counting companion completes exist', () => {
+  it('completes volatility_v1 when only outcome_logged exists (from engaged)', () => {
+    expect(
+      computePauseState({
+        instance: makeInstance({ state: 'engaged' }),
+        template: volatilityTemplate,
+        stepEvents: [makeStep({ step_type: 'outcome_logged', payload: { outcome: 'nothing' } })],
+        companionEvents: [],
+        now: NOW,
+      }),
+    ).toBe('completed');
+  });
+
+  it('still completes volatility_v1 when full deep ritual steps exist without companions', () => {
     expect(
       computePauseState({
         instance: makeInstance({ state: 'engaged' }),
@@ -260,25 +267,6 @@ describe('computePauseState', () => {
         companionEvents: [
           makeCompanion({ counts_for_pause: false, non_counting_reason: 'outside_window' }),
         ],
-        now: NOW,
-      }),
-    ).toBe('completed');
-  });
-
-  it('completes brief ritual without shift or companions when initial_emotion marks brief_ritual', () => {
-    expect(
-      computePauseState({
-        instance: makeInstance({ state: 'engaged' }),
-        template: volatilityTemplate,
-        stepEvents: [
-          makeStep({ step_type: 'breath_completed' }),
-          makeStep({
-            step_type: 'initial_emotion_logged',
-            payload: { mood: 'anxious', intensity: 3, brief_ritual: true },
-          }),
-          makeStep({ step_type: 'outcome_logged' }),
-        ],
-        companionEvents: [],
         now: NOW,
       }),
     ).toBe('completed');
