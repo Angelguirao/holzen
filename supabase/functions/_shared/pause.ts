@@ -62,6 +62,8 @@ export async function computeContextFingerprint(parts: {
   severityBand: string;         // 'mild' | 'moderate' | 'high'
   dailyBucketPct: number;       // rounded to the nearest whole %
   cumulativeBucketPct: number;  // rounded to the nearest whole %
+  /** CoinGecko coin id — keeps fingerprints distinct across assets. */
+  trackedAssetId?: string;
   fearGreedBand?: string | null;
   onChainBand?: string | null;
 }): Promise<string> {
@@ -71,6 +73,7 @@ export async function computeContextFingerprint(parts: {
     s: parts.severityBand,
     db: parts.dailyBucketPct,
     cb: parts.cumulativeBucketPct,
+    a: parts.trackedAssetId ?? "bitcoin",
     fg: parts.fearGreedBand ?? null,
     oc: parts.onChainBand ?? null,
   });

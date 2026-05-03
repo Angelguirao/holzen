@@ -1560,6 +1560,7 @@ export type Database = {
           hold_goal_target_months: number | null
           hold_goal_target_price: number | null
           hold_goal_type: string | null
+          tracked_asset_id: string
           id: string
           is_admin: boolean | null
           language: string
@@ -1613,6 +1614,7 @@ export type Database = {
           hold_goal_target_months?: number | null
           hold_goal_target_price?: number | null
           hold_goal_type?: string | null
+          tracked_asset_id?: string
           id?: string
           is_admin?: boolean | null
           language?: string
@@ -1666,6 +1668,7 @@ export type Database = {
           hold_goal_target_months?: number | null
           hold_goal_target_price?: number | null
           hold_goal_type?: string | null
+          tracked_asset_id?: string
           id?: string
           is_admin?: boolean | null
           language?: string

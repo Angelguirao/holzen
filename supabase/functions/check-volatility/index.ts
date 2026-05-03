@@ -31,6 +31,7 @@ import {
   computeContextFingerprint,
   upsertPauseAiArtifact,
 } from "../_shared/pause.ts";
+import { normalizeTrackedAssetId, trackedAssetSymbol } from "../_shared/tracked-assets.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -59,7 +60,7 @@ async function fetchWithRetry(
     await res.text(); // consume body
     if (i < retries - 1) await new Promise((r) => setTimeout(r, delayMs * (i + 1)));
   }
-  throw new Error("Failed to fetch BTC data after retries");
+  throw new Error("Failed to fetch market data after retries");
 }
 
 /** CoinGecko quote currency — matches `use-holzen` / `fetchBtcData(currency)` (`profiles.hold_goal_currency`). */
@@ -68,7 +69,7 @@ function normalizeHoldGoalCurrency(raw: unknown): string {
   return "usd";
 }
 
-type BtcVolatilityMetrics = {
+type AssetVolatilityMetrics = {
   changePercent: number;
   direction: string;
   cumulativeChangePercent: number;
@@ -101,20 +102,23 @@ interface VolatilityProfile {
   motivations?: unknown;
   mantra?: string | null;
   grounding_activities?: unknown;
+  tracked_asset_id?: string | null;
 }
 
-async function fetchBtcVolatilityForCurrency(
+async function fetchAssetVolatilityForCurrency(
+  coinId: string,
   vsCurrency: string,
   log: VolatilityFnLog,
-): Promise<BtcVolatilityMetrics> {
+): Promise<AssetVolatilityMetrics> {
   const cur = vsCurrency.toLowerCase();
+  const id = encodeURIComponent(coinId);
   const [res1d, res7d] = await Promise.all([
     fetchWithRetry(
-      `https://api.coingecko.com/api/v3/coins/bitcoin/market_chart?vs_currency=${cur}&days=1`,
+      `https://api.coingecko.com/api/v3/coins/${id}/market_chart?vs_currency=${cur}&days=1`,
       log,
     ),
     fetchWithRetry(
-      `https://api.coingecko.com/api/v3/coins/bitcoin/market_chart?vs_currency=${cur}&days=7`,
+      `https://api.coingecko.com/api/v3/coins/${id}/market_chart?vs_currency=${cur}&days=7`,
       log,
     ),
   ]);
@@ -256,7 +260,7 @@ serve(
     const { data: profiles, error: profilesError } = await supabase
       .from("profiles")
       .select(
-        "user_id, threshold, threshold_down, cumulative_threshold, hold_goal_currency, email_notifications, last_trigger_at, cooldown_hours, reflection_tone, companion_haiku, companion_grounding, companion_signal, companion_zoom_out, companion_history, quiet_hours_start, quiet_hours_end, timezone, language, snoozed_until, custom_prompt, reflection_style, motivations, mantra, grounding_activities",
+        "user_id, threshold, threshold_down, cumulative_threshold, hold_goal_currency, tracked_asset_id, email_notifications, last_trigger_at, cooldown_hours, reflection_tone, companion_haiku, companion_grounding, companion_signal, companion_zoom_out, companion_history, quiet_hours_start, quiet_hours_end, timezone, language, snoozed_until, custom_prompt, reflection_style, motivations, mantra, grounding_activities",
       );
 
     if (profilesError) throw profilesError;
@@ -272,60 +276,77 @@ serve(
 
     const profileRows = profiles as VolatilityProfile[];
 
-    const currencyCodes = new Set<string>();
+    const assetToCurrencies = new Map<string, Set<string>>();
     for (const p of profileRows) {
-      currencyCodes.add(normalizeHoldGoalCurrency(p.hold_goal_currency));
+      const aid = normalizeTrackedAssetId(p.tracked_asset_id);
+      const c = normalizeHoldGoalCurrency(p.hold_goal_currency);
+      if (!assetToCurrencies.has(aid)) assetToCurrencies.set(aid, new Set());
+      assetToCurrencies.get(aid)!.add(c);
     }
-    if (!currencyCodes.has("usd")) currencyCodes.add("usd");
+    for (const [, curs] of assetToCurrencies) {
+      if (!curs.has("usd")) curs.add("usd");
+    }
 
-    const [btcEntries, fearGreedSnapshot, onChainSnapshot] = await Promise.all([
+    const [pairRows, fearGreedSnapshot, onChainSnapshot] = await Promise.all([
       Promise.all(
-        [...currencyCodes].map(async (c) => {
-          try {
-            const m = await fetchBtcVolatilityForCurrency(c, log);
-            return [c, m] as const;
-          } catch (e) {
-            log.error("check_volatility_btc_fetch", {
-              holzen_event: "check_volatility_cron",
-              phase: "coingecko_failed",
-              vs_currency: c,
-              ...unknownErrorForLog(e),
-            });
-            return [c, null] as const;
-          }
-        }),
+        [...assetToCurrencies.entries()].flatMap(([asset, curs]) =>
+          [...curs].map(async (c) => {
+            try {
+              const m = await fetchAssetVolatilityForCurrency(asset, c, log);
+              return { asset, c, m };
+            } catch (e) {
+              log.error("check_volatility_asset_fetch", {
+                holzen_event: "check_volatility_cron",
+                phase: "coingecko_failed",
+                coin_id: asset,
+                vs_currency: c,
+                ...unknownErrorForLog(e),
+              });
+              return { asset, c, m: null as AssetVolatilityMetrics | null };
+            }
+          }),
+        ),
       ),
       fetchFearGreedSnapshot(),
       fetchOnChainSnapshot(),
     ]);
 
-    const btcByCur = new Map<string, BtcVolatilityMetrics>();
-    for (const [c, m] of btcEntries) {
-      if (m) btcByCur.set(c, m);
+    const metricsByAssetCur = new Map<string, Map<string, AssetVolatilityMetrics>>();
+    for (const row of pairRows) {
+      if (!row.m) continue;
+      if (!metricsByAssetCur.has(row.asset)) metricsByAssetCur.set(row.asset, new Map());
+      metricsByAssetCur.get(row.asset)!.set(row.c, row.m);
     }
-    if (!btcByCur.has("usd")) {
-      log.error("check_volatility_btc_fetch", {
+
+    const usdPeek =
+      metricsByAssetCur.get("bitcoin")?.get("usd") ??
+      [...metricsByAssetCur.values()].find((m) => m.has("usd"))?.get("usd");
+    if (!usdPeek) {
+      log.error("check_volatility_asset_fetch", {
         holzen_event: "check_volatility_cron",
         phase: "usd_metrics_missing",
       });
-      return new Response(JSON.stringify({ error: "btc_fetch_failed" }), {
+      return new Response(JSON.stringify({ error: "market_fetch_failed" }), {
         status: 500,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
 
-    function metricsForProfile(p: { hold_goal_currency?: string | null }): BtcVolatilityMetrics {
+    function metricsForProfile(p: VolatilityProfile): AssetVolatilityMetrics {
+      const aid = normalizeTrackedAssetId(p.tracked_asset_id);
       const c = normalizeHoldGoalCurrency(p.hold_goal_currency);
-      return btcByCur.get(c) ?? btcByCur.get("usd")!;
+      return metricsByAssetCur.get(aid)?.get(c) ??
+        metricsByAssetCur.get(aid)?.get("usd") ??
+        metricsByAssetCur.get("bitcoin")?.get(c) ??
+        usdPeek;
     }
 
-    const usdPeek = btcByCur.get("usd")!;
     log("check_volatility_phase", {
       holzen_event: "check_volatility_cron",
-      phase: "btc_sample_loaded",
+      phase: "market_sample_loaded",
       change24h_pct: Number(usdPeek.changePercent.toFixed(2)),
       change7d_pct: Number(usdPeek.cumulativeChangePercent.toFixed(2)),
-      quote_currencies: btcByCur.size,
+      asset_currency_pairs: pairRows.filter((r) => r.m).length,
     });
 
     // Helper: get user's local hour
@@ -495,17 +516,20 @@ serve(
         return false;
       }
 
-      const userBtc = metricsForProfile(profile);
-      const absChange = Math.abs(userBtc.changePercent);
-      const dir = userBtc.direction === "down" ? "down" : "up";
+      const userM = metricsForProfile(profile);
+      const absChange = Math.abs(userM.changePercent);
+      const dir = userM.direction === "down" ? "down" : "up";
       const pct = absChange.toFixed(1);
-      let ctx = `BTC is ${dir} ${pct}% in the last 24 hours.`;
-      if (isCumulativeMoveTriggered(userBtc.cumulativeChangePercent, profile.cumulative_threshold)) {
-        const cumDir = userBtc.cumulativeDirection === "down" ? "down" : "up";
-        const absCum = Math.abs(userBtc.cumulativeChangePercent);
+      const assetId = normalizeTrackedAssetId(profile.tracked_asset_id);
+      const sym = trackedAssetSymbol(assetId);
+      let ctx = `${sym} is ${dir} ${pct}% in the last 24 hours.`;
+      if (isCumulativeMoveTriggered(userM.cumulativeChangePercent, profile.cumulative_threshold)) {
+        const cumDir = userM.cumulativeDirection === "down" ? "down" : "up";
+        const absCum = Math.abs(userM.cumulativeChangePercent);
         ctx += ` Over 7 days, it's ${cumDir} ${absCum.toFixed(1)}%.`;
       }
-      ctx = enrichAutomaticPauseContext(ctx, fearGreedSnapshot, onChainSnapshot);
+      const onChainForUser = assetId === "bitcoin" ? onChainSnapshot : null;
+      ctx = enrichAutomaticPauseContext(ctx, fearGreedSnapshot, onChainForUser);
 
       const tone = profile.reflection_tone || "stoic";
       const userLang = profile.language || "en";
@@ -594,17 +618,18 @@ serve(
       // lock and implements the fingerprint idempotency rule
       // (matching fingerprint -> reuse; differing fingerprint while open
       // -> `pending` offer; recent-dismissal match -> skip).
-      const directionBucket = userBtc.direction === "down" ? "down" : "up";
+      const directionBucket = userM.direction === "down" ? "down" : "up";
       const severityBand = absChange >= 10 ? "high" : absChange >= 5 ? "moderate" : "mild";
       const fingerprint = await computeContextFingerprint({
         templateSlug: "volatility_v1",
         directionBucket,
         severityBand,
-        dailyBucketPct: bucketChangePercent(userBtc.changePercent),
-        cumulativeBucketPct: bucketChangePercent(userBtc.cumulativeChangePercent),
+        dailyBucketPct: bucketChangePercent(userM.changePercent),
+        cumulativeBucketPct: bucketChangePercent(userM.cumulativeChangePercent),
+        trackedAssetId: assetId,
         fearGreedBand: fearGreedSnapshot?.label ?? null,
-        onChainBand: onChainSnapshot
-          ? ([onChainSnapshot.mempoolSize, onChainSnapshot.fastestFee, onChainSnapshot.medianFee].filter(
+        onChainBand: onChainForUser
+          ? ([onChainForUser.mempoolSize, onChainForUser.fastestFee, onChainForUser.medianFee].filter(
               (x) => typeof x === "number" && Number.isFinite(x),
             ) as number[]).join(":") || null
           : null,
@@ -617,22 +642,23 @@ serve(
           p_template_slug: "volatility_v1",
           p_source: "cron_volatility",
           p_context_snapshot: {
-            change_24h_pct: userBtc.changePercent,
-            change_7d_pct: userBtc.cumulativeChangePercent,
-            direction: userBtc.direction,
+            change_24h_pct: userM.changePercent,
+            change_7d_pct: userM.cumulativeChangePercent,
+            direction: userM.direction,
             severity: severityBand,
             context_text: ctx,
             fear_greed: fearGreedSnapshot ?? null,
-            on_chain: onChainSnapshot ?? null,
+            on_chain: onChainForUser ?? null,
             last_reported_mood: lastReportedMood ?? null,
+            tracked_asset_id: assetId,
           },
           p_context_rule_result: {
             triggered: [
-              Math.abs(userBtc.changePercent) >= (profile.threshold ?? 5)
+              Math.abs(userM.changePercent) >= (profile.threshold ?? 5)
                 ? "daily"
                 : null,
               isCumulativeMoveTriggered(
-                userBtc.cumulativeChangePercent,
+                userM.cumulativeChangePercent,
                 profile.cumulative_threshold,
               )
                 ? "cumulative"
@@ -799,7 +825,11 @@ serve(
     });
 
     return new Response(
-      JSON.stringify({ triggered, btcChangeUsd: usdPeek.changePercent, quoteCurrenciesLoaded: btcByCur.size }),
+      JSON.stringify({
+        triggered,
+        btcChangeUsd: usdPeek.changePercent,
+        marketPairsLoaded: pairRows.filter((r) => r.m).length,
+      }),
       {
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       },

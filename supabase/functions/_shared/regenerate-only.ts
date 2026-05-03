@@ -57,10 +57,14 @@ export async function handleRegenerateOnly(params: {
   const appConfig = await loadAppConfig(svcClient);
   const { data: profile } = await svcClient
     .from("profiles")
-    .select("lifetime_access, subscription_status, subscription_tier")
+    .select("lifetime_access, subscription_status, subscription_tier, tracked_asset_id")
     .eq("user_id", userId)
     .maybeSingle();
   const tier = resolveTierFromProfile(profile);
+  const trackedAssetId =
+    typeof profile?.tracked_asset_id === "string" && profile.tracked_asset_id.trim().length > 0
+      ? profile.tracked_asset_id
+      : "bitcoin";
   const limits = tierLimits(tier);
 
   if (appConfig.panic_mode && PANIC_MODE_FEATURES.has("companion_signal")) {
@@ -333,6 +337,7 @@ export async function handleRegenerateOnly(params: {
         log,
         zoomOutAngle: intent.zoomOutAngle,
         forceLive: true,
+        trackedAssetId,
       });
       result = {
         data: z.data,

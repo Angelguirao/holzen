@@ -12,7 +12,7 @@ import { cn } from '@/lib/utils';
 
 interface Props {
   subscribed: boolean;
-  holdGoal?: { type: string | null } | null;
+  holdGoal?: { type: string | null; trackedAssetId?: string } | null;
   notifyBadges?: boolean;
 }
 
@@ -49,6 +49,7 @@ export function BadgesPanelV2({ subscribed, holdGoal, notifyBadges = true }: Pro
     stepEvents,
     companionEvents,
     holdGoal,
+    trackedAssetId: holdGoal?.trackedAssetId,
   });
 
   const { newBadges, dismissCelebration } = useBadgeSync(earnedIds, badgeMeta, notifyBadges);

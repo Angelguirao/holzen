@@ -119,10 +119,14 @@ serve(
 
     const { data: profile } = await svcClient
       .from("profiles")
-      .select("lifetime_access, subscription_status, subscription_tier")
+      .select("lifetime_access, subscription_status, subscription_tier, tracked_asset_id")
       .eq("user_id", userId)
       .maybeSingle();
     const tier = resolveTierFromProfile(profile);
+    const trackedAssetId =
+      typeof profile?.tracked_asset_id === "string" && profile.tracked_asset_id.trim().length > 0
+        ? profile.tracked_asset_id
+        : "bitcoin";
     const tierQuotaLimits = tierLimits(tier);
 
     const regenerateOnly = body.regenerateOnly as string | undefined;
@@ -461,6 +465,7 @@ serve(
       recentZoomOutTitlesValue,
       skipLivePerplexity,
       skipLiveLovable,
+      trackedAssetId,
     });
 
     const keys = Object.keys(tasks);

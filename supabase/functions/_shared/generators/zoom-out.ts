@@ -37,6 +37,7 @@ import { warmMissingBtcPrices } from "../btc-price-warm.ts";
 import { fetchPastReflectionWithWords, type PastReflectionWithWords } from "../past-reflections.ts";
 import { type CompanionCacheTitleRow } from "../companion-cache-dedup.ts";
 import { errorMessageFromUnknown, getEdgeRuntime } from "../edge-runtime.ts";
+import { normalizeTrackedAssetId } from "../tracked-assets.ts";
 
 /** Bump when the deep-time prompt, seed pool, or quality rules change. */
 export const PROMPT_VERSION = "v4";
@@ -74,6 +75,8 @@ export interface GenerateZoomOutParams {
   forceLive?: boolean;
   /** Skip the live phase only — cache still serves. Used by circuit breaker. */
   skipLive?: boolean;
+  /** When not bitcoin, skip BTC anniversary cache pipeline and serve curated deep-time only. */
+  trackedAssetId?: string | null;
   log: (msg: string, extra?: Record<string, unknown>) => void;
 }
 
@@ -492,6 +495,28 @@ FORMAT: JSON with "title" (3-8 word evocative phrase) and "body" (1-2 poetic but
 
 export async function generateZoomOut(params: GenerateZoomOutParams): Promise<ZoomOutResult> {
   const { svcClient, context, mood, recentTitles, userId, zoomOutAngle, forceLive, skipLive, log } = params;
+  const tracked = normalizeTrackedAssetId(params.trackedAssetId);
+  if (tracked !== "bitcoin") {
+    log(`zoomOut: tracked asset ${tracked} — BTC anniversary pipeline skipped`);
+    if (companionFallbacksDisabled()) {
+      return { data: null, source: "empty", cacheId: null, error: COMPANION_FALLBACKS_DISABLED_MESSAGE };
+    }
+    const pool = await loadFallbackPool<{ title: string; body: string }>(svcClient, "zoom_out");
+    let echoPast: PastReflectionWithWords | null = null;
+    if (userId) echoPast = await fetchEchoReflection(svcClient, userId, context, log);
+    return {
+      data: {
+        onThisDay: [],
+        currentPrice: null,
+        echo: echoPayloadFromPast(echoPast),
+        deepTime: pickRandom(pool),
+        partial: true,
+      },
+      source: "curated",
+      cacheId: null,
+    };
+  }
+
   const phases = getPhaseConfig();
   const liveEnabled = phases.live && !skipLive;
 
