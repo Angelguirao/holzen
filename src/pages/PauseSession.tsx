@@ -64,7 +64,7 @@ import { usePauseBreathSegmentRpcLoggers } from '@/hooks/use-pause-breath-segmen
 import { usePauseFeelShiftLogDedupeRefs } from '@/hooks/use-pause-feel-shift-log-dedupe-refs';
 import { usePauseFavoriteToggle } from '@/hooks/use-pause-favorite-toggle';
 import { usePauseSessionInitialMoodHandlers } from '@/hooks/use-pause-session-initial-mood-handlers';
-import { buildShiftEmotionFrameHubLogBundle } from '@/lib/pause-shift-emotion-log';
+import { usePauseShiftFrameDoneHandler } from '@/hooks/use-pause-shift-frame-done-handler';
 import { buildPauseImpactDataOnComplete, type PauseImpactData } from '@/lib/pause-impact-data';
 import { buildOutcomeLoggedPayload } from '@/lib/pause-outcome-log-payload';
 import { showPauseOutcomeNotCompletedToast, showPauseOutcomeSaveFailedToast } from '@/lib/pause-outcome-toast';
@@ -289,6 +289,15 @@ export default function PauseSession() {
     [step],
   );
 
+  const { handleFrameImDone } = usePauseShiftFrameDoneHandler({
+    pauseInstanceId,
+    t,
+    lastShiftLogKeyRef,
+    setFrameDone,
+    setMoodAfterDone,
+    goToStep,
+  });
+
   const goBack = useCallback(() => {
     const plan = computePauseGoBackPlan(ritualEntry, briefStep, step);
     if (plan.kind === 'none') return;
@@ -423,30 +432,6 @@ export default function PauseSession() {
     setBriefIntegrateDone(true);
     setBriefStep('decide');
   }, []);
-
-  const handleFrameImDone = useCallback(async () => {
-    const { payload: shiftFramePayload, logKey } = buildShiftEmotionFrameHubLogBundle();
-    if (pauseInstanceId) {
-      if (lastShiftLogKeyRef.current !== logKey) {
-        try {
-          await pauseLogStep({
-            instanceId: pauseInstanceId,
-            stepType: 'shift_emotion_logged',
-            payload: shiftFramePayload,
-          });
-          lastShiftLogKeyRef.current = logKey;
-        } catch {
-          showPauseStepSyncFailedToast(t);
-          return;
-        }
-      }
-    } else {
-      lastShiftLogKeyRef.current = logKey;
-    }
-    setFrameDone(true);
-    setMoodAfterDone(true);
-    goToStep('breath2');
-  }, [pauseInstanceId, goToStep, t, lastShiftLogKeyRef]);
 
   const handleClose = useCallback(() => {
     navigate('/', { replace: true });
