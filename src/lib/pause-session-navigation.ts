@@ -1,8 +1,8 @@
 import type { PauseStep } from '@/components/pause/PauseProgress';
 
 /**
- * Whether a left-swipe / “next step” gesture may leave the current pause step.
- * Mirrors the same gates as each step’s primary Continue affordance.
+ * Whether an implicit “advance to next step” gesture may leave the current pause step.
+ * Mirrors the same gates as each step’s primary Continue affordance (the `/pause` ritual does not use horizontal swipe).
  */
 export function canAdvanceFromPauseStep(params: {
   step: PauseStep;

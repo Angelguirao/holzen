@@ -10,7 +10,12 @@ import { hapticFeedback } from '@/lib/haptics';
 import { type MoodValue } from '@/components/MoodCheck';
 import { type CompanionData, type CompanionPrefs } from '@/components/CompanionSection';
 
-import { type PauseStep, STEPS } from '@/components/pause/PauseProgress';
+import {
+  type PauseStep,
+  STEPS,
+  pauseDeepMacroStepNumber,
+  PAUSE_DEEP_DISPLAY_STEP_COUNT,
+} from '@/components/pause/PauseProgress';
 import { PauseSessionGate } from '@/components/pause/PauseSessionGate';
 import { PauseSessionScaffold } from '@/components/pause/PauseSessionScaffold';
 import { PendingPauseOfferShell } from '@/components/pause/PendingPauseOfferShell';
@@ -996,8 +1001,8 @@ export default function PauseSession() {
             goToStep={goToStep}
             onHeaderBack={handlePauseHeaderBack}
             showHeaderBack={showPauseHeaderBack}
-            macroStepIndex={ritualEntry === 'brief' ? undefined : STEPS.indexOf(step) + 1}
-            macroStepTotal={ritualEntry === 'brief' ? undefined : STEPS.length}
+            macroStepIndex={ritualEntry === 'brief' ? undefined : pauseDeepMacroStepNumber(step)}
+            macroStepTotal={ritualEntry === 'brief' ? undefined : PAUSE_DEEP_DISPLAY_STEP_COUNT}
             macroProgressLine={briefMacroLine}
             sessionTitle={ritualEntry === 'brief' ? t('pause.brief.sessionTitle') : undefined}
             stepperSlot={
