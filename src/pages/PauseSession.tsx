@@ -689,10 +689,14 @@ export default function PauseSession() {
     [briefStep],
   );
 
-  const stepTransition = buildPauseSessionStepTransitionConfig({
-    swipeDirection,
-    prefersReducedMotion: !!prefersReducedMotion,
-  });
+  const stepTransition = useMemo(
+    () =>
+      buildPauseSessionStepTransitionConfig({
+        swipeDirection,
+        prefersReducedMotion: !!prefersReducedMotion,
+      }),
+    [swipeDirection, prefersReducedMotion],
+  );
 
   const sessionOnPicker = phase === 'session' && ritualEntry === 'picker' && !!message;
 
