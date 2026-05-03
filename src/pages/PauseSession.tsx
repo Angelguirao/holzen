@@ -56,6 +56,7 @@ import {
 } from '@/lib/pause-session-storage';
 import { pauseLogStep } from '@/lib/pause-api';
 import { breathCompletedSegment1Payload, breathCompletedSegment2Payload } from '@/lib/pause-breath-completed-payload';
+import { showPauseStepSyncFailedToast } from '@/lib/pause-step-sync-toast';
 import type { PauseState } from '@/lib/pause-state';
 import { getSessionQuote } from '@/lib/wisdom-quotes';
 import { usePauseSessionShell } from '@/hooks/use-pause-session-shell';
@@ -320,12 +321,7 @@ export default function PauseSession() {
       breath1RpcDoneRef.current = true;
       return true;
     } catch {
-      toast.error(
-        t('pause.stepSyncFailed', {
-          defaultValue: 'Could not sync this step. Check your connection and try again.',
-        }),
-        { duration: 5000 },
-      );
+      showPauseStepSyncFailedToast(t);
       return false;
     }
   }, [pauseInstanceId, t]);
@@ -342,12 +338,7 @@ export default function PauseSession() {
       breath2RpcDoneRef.current = true;
       return true;
     } catch {
-      toast.error(
-        t('pause.stepSyncFailed', {
-          defaultValue: 'Could not sync this step. Check your connection and try again.',
-        }),
-        { duration: 5000 },
-      );
+      showPauseStepSyncFailedToast(t);
       return false;
     }
   }, [pauseInstanceId, t]);
@@ -426,12 +417,7 @@ export default function PauseSession() {
         });
         breath1RpcDoneRef.current = true;
       } catch {
-        toast.error(
-          t('pause.stepSyncFailed', {
-            defaultValue: 'Could not sync this step. Check your connection and try again.',
-          }),
-          { duration: 5000 },
-        );
+        showPauseStepSyncFailedToast(t);
         return;
       }
     }
@@ -451,12 +437,7 @@ export default function PauseSession() {
         });
         breath2RpcDoneRef.current = true;
       } catch {
-        toast.error(
-          t('pause.stepSyncFailed', {
-            defaultValue: 'Could not sync this step. Check your connection and try again.',
-          }),
-          { duration: 5000 },
-        );
+        showPauseStepSyncFailedToast(t);
         return;
       }
     }
@@ -486,12 +467,7 @@ export default function PauseSession() {
         });
         breath1RpcDoneRef.current = true;
       } catch {
-        toast.error(
-          t('pause.stepSyncFailed', {
-            defaultValue: 'Could not sync this step. Check your connection and try again.',
-          }),
-          { duration: 5000 },
-        );
+        showPauseStepSyncFailedToast(t);
         return;
       }
     }
@@ -518,12 +494,7 @@ export default function PauseSession() {
           });
           lastShiftLogKeyRef.current = logKey;
         } catch {
-          toast.error(
-            t('pause.stepSyncFailed', {
-              defaultValue: 'Could not sync this step. Check your connection and try again.',
-            }),
-            { duration: 5000 },
-          );
+          showPauseStepSyncFailedToast(t);
           return;
         }
       }
@@ -571,12 +542,7 @@ export default function PauseSession() {
           setMoodDone(false);
           setSelectedMood(null);
           setFeelIntensity(null);
-          toast.error(
-            t('pause.stepSyncFailed', {
-              defaultValue: 'Could not sync this step. Check your connection and try again.',
-            }),
-            { duration: 5000 },
-          );
+          showPauseStepSyncFailedToast(t);
         }
       }
     },
@@ -594,12 +560,7 @@ export default function PauseSession() {
         });
         lastFeelLogKeyRef.current = JSON.stringify({ skipped: true });
       } catch {
-        toast.error(
-          t('pause.stepSyncFailed', {
-            defaultValue: 'Could not sync this step. Check your connection and try again.',
-          }),
-          { duration: 5000 },
-        );
+        showPauseStepSyncFailedToast(t);
         return;
       }
     }
