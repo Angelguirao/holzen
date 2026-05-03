@@ -1,4 +1,5 @@
 import type { HTMLAttributes, ReactNode } from 'react';
+import { memo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { HomeHeroQuote } from '@/components/home/HomeHeroQuote';
 import { HomeCustomizeSheet } from '@/components/home/HomeCustomizeSheet';
@@ -46,7 +47,7 @@ export interface HomeDashboardLayoutProps {
 }
 
 /** Full Home dashboard shell: hero, widgets, customize sheet, testimonial (non-zen). */
-export function HomeDashboardLayout({
+export const HomeDashboardLayout = memo(function HomeDashboardLayout({
   pullHandlers,
   pullDistance,
   pullRefreshing,
@@ -127,4 +128,4 @@ export function HomeDashboardLayout({
       <TestimonialRequest completedPauseCount={completedPauseCount} />
     </div>
   );
-}
+});

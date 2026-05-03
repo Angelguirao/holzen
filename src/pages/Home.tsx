@@ -35,7 +35,6 @@ import { useHomePullFullReload } from '@/hooks/use-home-pull-full-reload';
 import { useHomeZenModeRouteProps } from '@/hooks/use-home-zen-route-props';
 import { useHomeDashboardLayoutProps } from '@/hooks/use-home-dashboard-layout-props';
 import type { HomeAppLayoutOutletContext } from '@/lib/home-app-layout-outlet';
-import type { TrackedAssetId } from '@/lib/tracked-assets';
 
 const Home = () => {
   const { t } = useTranslation();
@@ -198,7 +197,7 @@ const Home = () => {
       priceHidden,
       togglePriceHidden,
       currency,
-      trackedAssetId: trackedAssetId as TrackedAssetId,
+      trackedAssetId,
       unitBasisModeSupported,
       btcMode,
       toggleBtcMode,
