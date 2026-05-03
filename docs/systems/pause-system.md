@@ -11,7 +11,7 @@ For **how reflection and companions are produced** (edge functions, orchestrator
 1. [What a pause is](#1-what-a-pause-is)
 2. [Core tables](#2-core-tables)
 3. [State machine](#3-state-machine)
-4. [RPCs and transitions](#4-rpcs-and-transitions)
+4. [RPCs and transitions](#4-rpcs-and-transitions) · [§4.1 Observability](#41-observability)
 5. [Default template `volatility_v1`](#5-default-template-volatility_v1)
 6. [Pause step payloads](#6-pause-step-payloads)
 7. [The `/pause` session ritual (client)](#7-the-pause-session-ritual-client)
@@ -105,6 +105,21 @@ Holzen stores **one `pause_instances` row per pause**. Product language below ma
 **Client entrypoint:** `src/lib/pause-api.ts` wraps these RPCs. Direct inserts into the append-only tables are not the supported pattern (RLS is built around the RPCs).
 
 **Retrospective outcome:** For `**expired`** instances, `**pause_log_step**` may still accept a single `**outcome_logged**` row for analytics (see migration `20260505120000_pause_log_step_expired_outcome_rescue.sql`). Other step types on `**expired**` generally no-op.
+
+### 4.1 Observability — Postgres vs PostHog vs edge
+
+The volatility **`/pause`** ritual is the core product loop; observability is **split on purpose** between a **full append-only trail** in the database and **sparse, PII-safe** client events in PostHog.
+
+| Layer | What it captures | Use it for |
+| ----- | ---------------- | ---------- |
+| **Postgres** | Every successful **`pause_log_step`** → **`pause_step_events`** (`step_type`, `payload`, `created_at`). Every **`pause_log_companion`** → **`pause_companion_events`**. **`pause_instances`** rows and state transitions (via triggers + **`pause_evaluate_transitions**`). | **Canonical funnels** (“dropped after Feel?”, “two-segment breath completion”, outcome rates), quality, badges, Library, joins on **`pause_instance_id`**. This is the **complete** interaction trail for the ritual. |
+| **PostHog** | Deliberate events only (**autocapture is off** — see **`src/lib/posthog.ts`**). Emitted from **`src/lib/pause-api.ts`** (e.g. **`pause_engaged`**, **`pause_completed`** when RPC return state first hits that value per tab; **`pause_companion_counted`** / **`pause_companion_not_counted`** on companion complete), **`src/hooks/use-holzen.ts`** (**`pause_instance_created`**), **`PendingPauseOfferShell`** (**`pause_pending_adopted`** / **`pause_pending_declined`**), **`PauseReflect`** (share / wallpaper taps). **Not** one PostHog event per step row — avoids noise and keeps properties to ids/types only (see **`docs/ops/event-taxonomy.md`** § pause + PII rules). | **Journey and retention** in the product analytics tool; correlate with **`pause_instance_id`** where emitted. |
+| **Dismiss / expire / supersede** | Mostly **no dedicated PostHog** from the client today; truth is **`pause_instances.state`** + **`expired_reason`** (and step/companion tables). Cron / edge paths (e.g. **`check-volatility`**) log to **BetterStack** via shared edge logging; **`pause_expired`** in the taxonomy is reserved for future client emission if needed. | Ops dashboards, incident triage, cron health. |
+| **Errors** | **Sentry** in the browser (and edges where wired); not a substitute for step-level product funnels. | Regressions, RPC failures, UI exceptions. |
+
+**Practical rule:** if the question is “**what did this user do inside this pause?**”, query **`pause_step_events`** / **`pause_companion_events`** (or **`v_pause_full`**). If the question is “**how many pauses reached engaged this week?**”, use PostHog’s **`pause_engaged`** (and cross-check counts against SQL if definitions change).
+
+Adding a new PostHog event for **every** step type is possible (e.g. a single **`pause_step_logged`** with `{ pause_instance_id, step_type }` only, no mood/outcome payload) but must go through **`docs/ops/event-taxonomy.md`** in the same change — default remains **SQL-first** for step granularity.
 
 ---
 
@@ -302,7 +317,7 @@ Echoes are **“this pause ended before the `engaged` milestone”** (`**engaged
 | Topic                                                         | Where                                                                                                             |
 | ------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------- |
 | AI pipeline, cron, `holzen-reflect`, `companion-orchestrate`  | [pause/ai-powered-pause-system.md](pause/ai-powered-pause-system.md)                                              |
-| PostHog: `pause_engaged`, `pause_completed`, companion events | [ops/event-taxonomy.md](ops/event-taxonomy.md)                                                                    |
+| PostHog + pause lifecycle events (see also §4.1)               | [ops/event-taxonomy.md](ops/event-taxonomy.md)                                                                    |
 | Commands, migration list pointers                             | [AGENTS.md](../../AGENTS.md)                                                                                      |
 | RPC SQL source of truth                                       | `supabase/migrations/` — search `**pause_log_step**`, `**pause_evaluate_transitions**`, `**pause_log_companion**` |
 | Client RPC wrappers                                           | `src/lib/pause-api.ts`                                                                                            |
