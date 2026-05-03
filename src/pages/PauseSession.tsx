@@ -31,7 +31,7 @@ import { BRIEF_PAUSE_ORDER } from '@/lib/brief-pause-order';
 import { computeBriefPastStepClick } from '@/lib/brief-pause-past-step-click';
 import { computePauseGoBackPlan } from '@/lib/pause-go-back-plan';
 import { pauseStepSwipeDirection } from '@/lib/pause-step-swipe-direction';
-import { isPauseSessionHeaderBackVisible } from '@/lib/pause-session-header-back';
+import { computePauseHeaderBackIntent, isPauseSessionHeaderBackVisible } from '@/lib/pause-session-header-back';
 import { PauseBriefFeel, type BriefFeelTile } from '@/components/pause/PauseBriefFeel';
 import { PauseBriefIntegrate } from '@/components/pause/PauseBriefIntegrate';
 import { PauseAboutPausesBody } from '@/components/pause/PauseAboutPausesBody';
@@ -352,34 +352,36 @@ export default function PauseSession() {
   }, [pauseInstanceId, t]);
 
   const handlePauseHeaderBack = useCallback(() => {
-    if (ritualEntry === 'brief') {
-      if (briefStep === 'breath' && breathTimedActive) {
+    const intent = computePauseHeaderBackIntent({
+      ritualEntry,
+      briefStep,
+      step,
+      breathTimedActive,
+      breathingFirstCompleted,
+      breathingSecondCompleted,
+    });
+    switch (intent.kind) {
+      case 'brief_breath_reset_intro':
         breathingRef.current?.resetToIntro();
         return;
-      }
-      if (briefStep === 'breath' && breathingFirstCompleted) {
+      case 'brief_breath_reset_intro_clear_first':
         breathingRef.current?.resetToIntro();
         setBreathingFirstCompleted(false);
         return;
-      }
-      goBack();
-      return;
+      case 'deep_breath_reset_intro':
+        breathingRef.current?.resetToIntro();
+        return;
+      case 'deep_breathe_reset_intro_clear_first':
+        breathingRef.current?.resetToIntro();
+        setBreathingFirstCompleted(false);
+        return;
+      case 'deep_breath2_reset_intro_clear_second':
+        breathingRef.current?.resetToIntro();
+        setBreathingSecondCompleted(false);
+        return;
+      case 'go_back':
+        goBack();
     }
-    if ((step === 'breathe' || step === 'breath2') && breathTimedActive) {
-      breathingRef.current?.resetToIntro();
-      return;
-    }
-    if (step === 'breathe' && breathingFirstCompleted) {
-      breathingRef.current?.resetToIntro();
-      setBreathingFirstCompleted(false);
-      return;
-    }
-    if (step === 'breath2' && breathingSecondCompleted) {
-      breathingRef.current?.resetToIntro();
-      setBreathingSecondCompleted(false);
-      return;
-    }
-    goBack();
   }, [
     ritualEntry,
     briefStep,

@@ -32,3 +32,37 @@ export function isPauseSessionHeaderBackVisible(p: PauseSessionHeaderBackInput):
       (p.step === 'breathe' ? p.breathingFirstCompleted : p.breathingSecondCompleted))
   );
 }
+
+/** Inputs for header back press (no `phase` — visibility is handled separately). */
+export type PauseHeaderBackIntentInput = {
+  ritualEntry: RitualDepth | 'picker';
+  briefStep: BriefPauseStep;
+  step: PauseStep;
+  breathTimedActive: boolean;
+  breathingFirstCompleted: boolean;
+  breathingSecondCompleted: boolean;
+};
+
+export type PauseHeaderBackIntent =
+  | { kind: 'brief_breath_reset_intro' }
+  | { kind: 'brief_breath_reset_intro_clear_first' }
+  | { kind: 'deep_breath_reset_intro' }
+  | { kind: 'deep_breathe_reset_intro_clear_first' }
+  | { kind: 'deep_breath2_reset_intro_clear_second' }
+  | { kind: 'go_back' };
+
+/**
+ * What the pause shell should do when the header back control is pressed
+ * (breath intro resets vs ritual `goBack`). Mirrors `handlePauseHeaderBack` in `PauseSession`.
+ */
+export function computePauseHeaderBackIntent(p: PauseHeaderBackIntentInput): PauseHeaderBackIntent {
+  if (p.ritualEntry === 'brief') {
+    if (p.briefStep === 'breath' && p.breathTimedActive) return { kind: 'brief_breath_reset_intro' };
+    if (p.briefStep === 'breath' && p.breathingFirstCompleted) return { kind: 'brief_breath_reset_intro_clear_first' };
+    return { kind: 'go_back' };
+  }
+  if ((p.step === 'breathe' || p.step === 'breath2') && p.breathTimedActive) return { kind: 'deep_breath_reset_intro' };
+  if (p.step === 'breathe' && p.breathingFirstCompleted) return { kind: 'deep_breathe_reset_intro_clear_first' };
+  if (p.step === 'breath2' && p.breathingSecondCompleted) return { kind: 'deep_breath2_reset_intro_clear_second' };
+  return { kind: 'go_back' };
+}
