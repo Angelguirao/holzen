@@ -1,4 +1,4 @@
-import { useCallback, useState, useEffect } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Waves, PenLine, Activity, History, Lock, ChevronRight, Sparkles } from 'lucide-react';
 import { useSubscription } from '@/hooks/use-subscription';
@@ -8,7 +8,8 @@ import { toast } from 'sonner';
 import { useNavigate } from 'react-router-dom';
 import { homeInWidget } from '@/components/home/home-widget-styles';
 import { TOOLS } from '@/lib/app-routes';
-import { fetchPracticeSuggestions, type SuggestedPracticeId } from '@/lib/practice-suggestion';
+import { usePracticeSuggestion } from '@/hooks/use-practice-suggestion';
+import type { SuggestedPracticeId } from '@/lib/practice-suggestion';
 
 type PracticeId = SuggestedPracticeId;
 
@@ -18,26 +19,6 @@ const PRACTICES = [
   { id: 'bodyscan' as const, icon: Activity, labelKey: 'practice.bodyscanLabel', descKey: 'practice.bodyscanDesc', free: false, route: TOOLS.practice.bodyscan },
   { id: 'replay' as const, icon: History, labelKey: 'practice.replayLabel', descKey: 'practice.replayDesc', free: false, route: TOOLS.practice.replay },
 ] as const;
-
-function useSuggestion(userId: string | undefined) {
-  const [suggestion, setSuggestion] = useState<{ id: PracticeId; reason: string } | null>(null);
-  const { t } = useTranslation();
-
-  useEffect(() => {
-    if (!userId) return;
-    void (async () => {
-      const list = await fetchPracticeSuggestions(userId, 1);
-      const first = list[0];
-      if (!first) {
-        setSuggestion(null);
-        return;
-      }
-      setSuggestion({ id: first.id, reason: t(first.reasonKey) });
-    })();
-  }, [userId, t]);
-
-  return suggestion;
-}
 
 function useWeeklyProgress(userId: string | undefined) {
   const [count, setCount] = useState(0);
@@ -63,7 +44,7 @@ export function PracticeWidget() {
   const { subscribed, startCheckout } = useSubscription();
   const { user } = useAuth();
   const navigate = useNavigate();
-  const rawSuggestion = useSuggestion(user?.id);
+  const rawSuggestion = usePracticeSuggestion(user?.id);
   const weeklyCount = useWeeklyProgress(user?.id);
 
   // Only show AI suggestion for Pro users, or if it suggests a free practice
