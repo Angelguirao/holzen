@@ -54,6 +54,7 @@ import { usePauseSessionGoBack } from '@/hooks/use-pause-session-go-back';
 import { usePauseSessionGoToStep } from '@/hooks/use-pause-session-go-to-step';
 import { buildPauseSessionScaffoldRitualDerived } from '@/lib/pause-session-scaffold-ritual-props';
 import { buildPauseSessionScaffoldRitualPayloads } from '@/lib/pause-session-scaffold-ritual-payloads';
+import { buildPauseSessionMountLogParams } from '@/lib/pause-session-mount-log-params';
 import { usePauseSessionPendingPauseOfferNavigation } from '@/hooks/use-pause-session-pending-pause-offer-navigation';
 import { usePauseSessionDepthPickerHandlers } from '@/hooks/use-pause-session-depth-picker-handlers';
 import { usePauseSessionDeepChooseBridgeHandler } from '@/hooks/use-pause-session-deep-choose-bridge-handler';
@@ -119,15 +120,15 @@ export default function PauseSession() {
     },
   });
 
-  usePauseSessionMountLog({
-    pauseInstanceIdPrefix: (fetchPauseInstanceId ?? navPauseInstanceId)?.slice(0, 8) ?? null,
-    hasNavMessage: navReflectionMessage.length > 0,
-    restoredFromStorage: restored !== null,
-    hydrationStatus: hydration.status,
-    ritualEntryInitial: initialRitualEntry(restored),
-    briefStepInitial: initialBriefPauseStepFromRestored(restored),
-    phaseInitial: initialPhaseFromRestored(restored),
-  });
+  usePauseSessionMountLog(
+    buildPauseSessionMountLogParams({
+      restored,
+      fetchPauseInstanceId,
+      navPauseInstanceId,
+      navReflectionMessage,
+      hydrationStatus: hydration.status,
+    }),
+  );
 
   const { message, context, pauseInstanceId, companions, companionPrefs, severity } =
     coalescePauseSessionShellViewModel(resolved, holzenSeverity);
