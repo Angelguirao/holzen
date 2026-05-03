@@ -168,7 +168,9 @@ describe('initialBreathSegmentRpcLoggedFlagsFromRestored', () => {
   });
 
   it('matches legacy persisted step mapping before comparing indices', () => {
-    expect(initialBreathSegmentRpcLoggedFlagsFromRestored(baseSession({ step: 'ground' }))).toEqual({
+    expect(
+      initialBreathSegmentRpcLoggedFlagsFromRestored(baseSession({ step: 'ground' as unknown as PersistedSession['step'] })),
+    ).toEqual({
       segment1Logged: true,
       segment2Logged: false,
     });
