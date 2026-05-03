@@ -1262,6 +1262,94 @@
     "youChose": "You chose deliberately.",
     "return": "Return",
     "sessionTitle": "Your pause",
+    "brief": {
+      "sessionTitle": "Your brief pause",
+      "macroProgress": "Step {{n}} of {{total}} · ~2 min",
+      "steps": {
+        "feel": "Feel",
+        "breath": "Breath",
+        "integrate": "Integrate",
+        "decide": "Decide"
+      },
+      "feel": {
+        "title": "What's here?",
+        "subtitle": "No need to be sure — pick what is closest.",
+        "tiles": {
+          "fomo": "FOMO",
+          "fearful": "Fearful",
+          "anxious": "Anxious",
+          "uncertain": "Uncertain",
+          "calm": "Calm",
+          "other": "Other"
+        },
+        "intensityTitle": "How strong?",
+        "intensity": {
+          "faint": "Faint",
+          "light": "Light",
+          "clear": "Clear",
+          "strong": "Strong",
+          "heavy": "Heavy"
+        }
+      },
+      "integrate": {
+        "title": "Integrate",
+        "line1": "Sit, and quiet your mind.",
+        "line2": "Do nothing — just be here.",
+        "hint": "When the timer ends, you'll move on — or continue early."
+      },
+      "decideKicker": "Step 4 · Decide",
+      "breathIntroKicker": "Step 2 · Breath"
+    },
+    "depthPicker": {
+      "contextMoved": "{{sym}} moved {{pct}}% in the last 24 hours.",
+      "kicker": "What do you need?",
+      "brief": {
+        "label": "Brief pause",
+        "desc": "Steady yourself, then decide."
+      },
+      "deep": {
+        "label": "Deep pause",
+        "desc": "Sit with it. Reflect. Decide from your center."
+      }
+    },
+    "aboutPauses": {
+      "openAria": "About pauses — why this ritual",
+      "link": "About pauses",
+      "sheetTitle": "Why pause — the science behind it",
+      "title": "Why pause?",
+      "subtitle": "The science behind it",
+      "sections": {
+        "holzen": {
+          "title": "Holzen, in one breath",
+          "body": "Holzen is a structured pause for Bitcoin holders: you name what you feel, slow your body with breath, then decide from a steadier state. It is not price advice — it is a regulation ritual so impulses have less room to steer."
+        },
+        "challenge": {
+          "title": "The challenge you are in",
+          "body": "Markets compress time. A chart can feel like a verdict on your judgment, your security, your future. Volatility pulls attention toward threat and reward at once — a recipe for reactive trades. Pausing widens the gap between stimulus and response."
+        },
+        "ninety": {
+          "title": "The 90-second window",
+          "body": "Strong emotional surges often crest within roughly 90 seconds if you do not feed them with new stories or new clicks. A short breathing sequence can help your nervous system shift out of emergency pacing so your prefrontal cortex can come back online for a deliberate choice."
+        },
+        "mechanisms": {
+          "title": "Three proven mechanisms",
+          "body": "Putting feelings into words (affect labeling) can blunt amygdala drive. Slow exhales lean on the parasympathetic side of regulation. Stepping back to reappraise — “what story am I believing?” — creates distance between you and the urge to act immediately."
+        },
+        "sixSteps": {
+          "title": "The six steps (deep pause)",
+          "body": "Feel, breathe, reflect, frame, breathe again, then decide. Each step maps to skills psychologists study: interoception, autonomic settling, perspective-taking, metacognition, re-centering, and values-aligned action."
+        },
+        "ritual": {
+          "title": "Not a remedy — a ritual",
+          "body": "A ritual is not a guarantee of profit. It is a repeatable way to practice composure under uncertainty. Over time, the win is fewer decisions made in the red zone of panic or euphoria — and more that match who you want to be across cycles."
+        }
+      }
+    },
+    "scienceSheet": {
+      "sheetTitle": "Pause information",
+      "tabAbout": "About pauses",
+      "tabSteps": "Step science"
+    },
     "scienceInfoAria": "The science behind this pause",
     "noReflection": "No active pause. Go back to trigger one.",
     "outcomeSaveFailed": "Could not save your choice. Try again.",
@@ -1648,6 +1736,44 @@
       "hold": "Hold",
       "exhale": "Exhale",
       "sip": "Sip"
+    },
+    "phaseHints": {
+      "box": {
+        "h0_0": "Arrive into this inhale — no rush.",
+        "h0_1": "Let the shoulders drop a millimeter.",
+        "h0_2": "Let the jaw soften on the way out.",
+        "h0_3": "Rest in this quiet pocket.",
+        "h1_0": "Fill slowly; you can take up space here.",
+        "h1_1": "Nothing to fix — only notice.",
+        "h1_2": "Release the story about what happens next.",
+        "h1_3": "Stillness belongs to you here.",
+        "h2_0": "One steady inhale for your nervous system.",
+        "h2_1": "Hold attention lightly, not tightly.",
+        "h2_2": "Exhale like you're turning down the noise.",
+        "h2_3": "You're widening the gap between impulse and choice."
+      },
+      "calming": {
+        "h0_0": "Let this inhale start without forcing depth.",
+        "h0_1": "Soft belly, soft shoulders through the long hold.",
+        "h0_2": "Slow exhale — let the edge come down a notch.",
+        "h1_0": "Second round: a little less commentary in your head.",
+        "h1_1": "Your body can settle before the story does.",
+        "h1_2": "Exhale past where you usually want to rush.",
+        "h2_0": "Last full round — same rhythm, gentler effort.",
+        "h2_1": "Nothing to prove in this hold; only support.",
+        "h2_2": "Finish the exhale like you're closing a tab you don't need."
+      },
+      "sigh": {
+        "h0_0": "Ease in first — then invite a little more air on top.",
+        "h0_1": "Tiny top-up sip — light, quick.",
+        "h0_2": "Long exhale; let the shoulders melt down the back.",
+        "h1_0": "Second round: same two-part inhale, less commentary.",
+        "h1_1": "Sip is a wink, not a gulp — no forcing.",
+        "h1_2": "Slow empty; imagine unclenching from the inside.",
+        "h2_0": "Last round — same shape, even gentler effort.",
+        "h2_1": "Add the sip only if it still feels kind.",
+        "h2_2": "Finish soft — you're allowed to be quieter here."
+      }
     }
   },
   "volatility": {

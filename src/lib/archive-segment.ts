@@ -2,7 +2,7 @@ import { isMainPauseLibraryBookmark } from '@/lib/normalize-library-source-type'
 
 export type ArchiveMainSegment = 'pauses' | 'echoes' | 'collections';
 
-/** Terminal outcomes that can happen without ever entering Reflect (`engaged_at` still null). */
+/** Terminal rows that never reached DB `engaged` (`engaged_at` still null — early ritual gates not met). */
 const ECHO_ELIGIBLE_STATES = new Set(['expired', 'dismissed']);
 
 export type PauseInstanceArchiveMeta = {
@@ -23,8 +23,8 @@ export type PauseInstanceArchiveMetaGetter = (
 
 /**
  * Archive “echo”: main pause row for an instance that ended dismissed/expired
- * without `engaged_at` (never opened Reflect). That includes **`expired_reason =
- * superseded`** when the user never reached Reflect on the prior row (adopted
+ * with `engaged_at` still null (never reached the `engaged` state milestone). That includes **`expired_reason =
+ * superseded`** when the prior row was replaced before that milestone (adopted
  * pending, auto-supersede, etc.) — same “echo” bucket as other unengaged terminals.
  * `completed` always implies engagement in the DB and never counts as an echo.
  *

@@ -241,6 +241,25 @@ describe('computePauseState', () => {
     ).toBe('completed');
   });
 
+  it('completes brief ritual without shift or companions when initial_emotion marks brief_ritual', () => {
+    expect(
+      computePauseState({
+        instance: makeInstance({ state: 'engaged' }),
+        template: volatilityTemplate,
+        stepEvents: [
+          makeStep({ step_type: 'breath_completed' }),
+          makeStep({
+            step_type: 'initial_emotion_logged',
+            payload: { mood: 'anxious', intensity: 3, brief_ritual: true },
+          }),
+          makeStep({ step_type: 'outcome_logged' }),
+        ],
+        companionEvents: [],
+        now: NOW,
+      }),
+    ).toBe('completed');
+  });
+
   it('treats required_companion_count > 1 strictly', () => {
     const tpl: PauseTemplateRow = { ...volatilityTemplate, required_companion_count: 2 };
     expect(

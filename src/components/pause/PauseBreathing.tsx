@@ -41,6 +41,19 @@ const PATTERNS = [
 const EXPAND_KEYS = ['breathing.phases.inhale', 'breathing.phases.sip'];
 const CONTRACT_KEYS = ['breathing.phases.exhale'];
 
+type PhaseHintFamily = 'box' | 'calming' | 'sigh';
+
+function phaseHintFamily(patternIndex: number): PhaseHintFamily {
+  if (patternIndex === 1) return 'calming';
+  if (patternIndex === 2) return 'sigh';
+  return 'box';
+}
+
+/** Shared micro-copy for pause ritual breathing (aligned with `PATTERNS` indices). */
+function phaseHintTranslationKey(patternIndex: number, cycle: number, phaseIndex: number): string {
+  return `breathing.phaseHints.${phaseHintFamily(patternIndex)}.h${cycle}_${phaseIndex}`;
+}
+
 export type PauseBreathingHandle = {
   /** Return from the timed breathing loop to the pre-start intro (same step). */
   resetToIntro: () => void;
@@ -51,6 +64,11 @@ export type PauseBreathSegment = 'first' | 'second';
 interface Props {
   mantra: string | null;
   severity?: 'mild' | 'moderate' | 'high';
+  /**
+   * `brief` — brief intro kicker + phase hints; **always uses the box breath pattern** (ignores high-severity calming).
+   * `deep` — deep intro kickers + hints; pattern from severity (box vs calming); `breathing.phaseHints.sigh` if pattern index 2.
+   */
+  ritualVariant?: 'brief' | 'deep';
   /** First segment after Feel; second after Frame (Figma deep pause). */
   breathSegment?: PauseBreathSegment;
   /** After full breath cycles: interstitial → parent logs `breath_completed` then navigates onward. */
@@ -70,6 +88,7 @@ export const PauseBreathing = forwardRef<PauseBreathingHandle, Props>(function P
   {
     mantra,
     severity = 'mild',
+    ritualVariant,
     breathSegment = 'first',
     onContinueAfterBreath,
     onSkipBreath,
@@ -88,9 +107,11 @@ export const PauseBreathing = forwardRef<PauseBreathingHandle, Props>(function P
     cueOptsRef.current = { muted: ritualSoundMuted, prefersReduced: !!prefersReduced };
   }, [ritualSoundMuted, prefersReduced]);
 
-  const patternIndex = severity === 'high' ? 1 : 0;
+  /** Brief ritual stays on the box pattern so timers, phase labels, and hints stay aligned (~2 min path). */
+  const patternIndex = ritualVariant === 'brief' ? 0 : severity === 'high' ? 1 : 0;
   const pattern = PATTERNS[patternIndex];
   const totalCycles = breathSegment === 'second' ? 2 : 3;
+  const showPhaseHints = ritualVariant === 'brief' || ritualVariant === 'deep';
 
   const [started, setStarted] = useState(!!completedProp);
   const [phaseIndex, setPhaseIndex] = useState(0);
@@ -173,9 +194,11 @@ export const PauseBreathing = forwardRef<PauseBreathingHandle, Props>(function P
   const scale = isExpand ? 0.5 + progress * 0.5 : isContract ? 1 - progress * 0.5 : 1;
 
   const introKicker =
-    breathSegment === 'second'
-      ? t('pause.breathIntroKickerSecond', { defaultValue: 'Step 5 · Breath' })
-      : t('pause.breathIntroKickerFirst', { defaultValue: 'Step 2 · Breath' });
+    ritualVariant === 'brief'
+      ? t('pause.brief.breathIntroKicker', { defaultValue: 'Step 2 · Breath' })
+      : breathSegment === 'second'
+        ? t('pause.breathIntroKickerSecond', { defaultValue: 'Step 5 · Breath' })
+        : t('pause.breathIntroKickerFirst', { defaultValue: 'Step 2 · Breath' });
 
   const interstitialTitle =
     breathSegment === 'second'
@@ -297,6 +320,17 @@ export const PauseBreathing = forwardRef<PauseBreathingHandle, Props>(function P
           <p className="font-mono text-3xl tabular-nums text-muted-foreground">
             {currentPhase.duration - elapsed}
           </p>
+          {showPhaseHints ? (
+            <motion.p
+              key={`phase-hint-${patternIndex}-${cycle}-${phaseIndex}`}
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ duration: 0.35 }}
+              className="max-w-xs px-2 text-center text-xs italic leading-snug text-muted-foreground"
+            >
+              {t(phaseHintTranslationKey(patternIndex, cycle, phaseIndex), { defaultValue: '' })}
+            </motion.p>
+          ) : null}
           <p className="text-xs font-medium text-muted-foreground">
             {cycle + 1} / {totalCycles}
           </p>

@@ -1017,6 +1017,44 @@
       "hold": "Retén",
       "exhale": "Exhala",
       "sip": "Sorbito"
+    },
+    "phaseHints": {
+      "box": {
+        "h0_0": "Arrive into this inhale — no rush.",
+        "h0_1": "Let the shoulders drop a millimeter.",
+        "h0_2": "Let the jaw soften on the way out.",
+        "h0_3": "Rest in this quiet pocket.",
+        "h1_0": "Fill slowly; you can take up space here.",
+        "h1_1": "Nothing to fix — only notice.",
+        "h1_2": "Release the story about what happens next.",
+        "h1_3": "Stillness belongs to you here.",
+        "h2_0": "One steady inhale for your nervous system.",
+        "h2_1": "Hold attention lightly, not tightly.",
+        "h2_2": "Exhale like you're turning down the noise.",
+        "h2_3": "You're widening the gap between impulse and choice."
+      },
+      "calming": {
+        "h0_0": "Let this inhale start without forcing depth.",
+        "h0_1": "Soft belly, soft shoulders through the long hold.",
+        "h0_2": "Slow exhale — let the edge come down a notch.",
+        "h1_0": "Second round: a little less commentary in your head.",
+        "h1_1": "Your body can settle before the story does.",
+        "h1_2": "Exhale past where you usually want to rush.",
+        "h2_0": "Last full round — same rhythm, gentler effort.",
+        "h2_1": "Nothing to prove in this hold; only support.",
+        "h2_2": "Finish the exhale like you're closing a tab you don't need."
+      },
+      "sigh": {
+        "h0_0": "Ease in first — then invite a little more air on top.",
+        "h0_1": "Tiny top-up sip — light, quick.",
+        "h0_2": "Long exhale; let the shoulders melt down the back.",
+        "h1_0": "Second round: same two-part inhale, less commentary.",
+        "h1_1": "Sip is a wink, not a gulp — no forcing.",
+        "h1_2": "Slow empty; imagine unclenching from the inside.",
+        "h2_0": "Last round — same shape, even gentler effort.",
+        "h2_1": "Add the sip only if it still feels kind.",
+        "h2_2": "Finish soft — you're allowed to be quieter here."
+      }
     }
   },
   "volatility": {
