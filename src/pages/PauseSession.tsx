@@ -38,6 +38,7 @@ import {
   initialRitualEntry,
   briefStepToPauseScienceStep,
 } from '@/lib/pause-session-step-map';
+import { computePauseStorageRitualSyncPatch } from '@/lib/pause-session-storage-ritual-sync';
 import { parsePauseSessionLocationState } from '@/lib/router-location-state';
 import { useFeatureFlag } from '@/hooks/use-feature-flag';
 import {
@@ -173,13 +174,12 @@ export default function PauseSession() {
 
   useEffect(() => {
     if (!pauseInstanceId) return;
-    const saved = loadSession();
-    if (saved?.pauseInstanceId && saved.pauseInstanceId !== pauseInstanceId) return;
-    setRitualEntry(initialRitualEntry(saved));
-    if (saved?.ritualDepth === 'brief' && saved.briefStep) setBriefStep(saved.briefStep);
-    else if (saved?.ritualDepth !== 'brief') setBriefStep('feel');
-    setBriefIntegrateDone(saved?.briefIntegrateDone ?? false);
-    setSelectedBriefFace((saved?.briefFace as BriefFeelTile | null) ?? null);
+    const patch = computePauseStorageRitualSyncPatch(pauseInstanceId, loadSession());
+    if (!patch) return;
+    setRitualEntry(patch.ritualEntry);
+    if (patch.briefStep !== undefined) setBriefStep(patch.briefStep);
+    setBriefIntegrateDone(patch.briefIntegrateDone);
+    setSelectedBriefFace(patch.selectedBriefFace);
   }, [pauseInstanceId]);
 
   useEffect(() => {
