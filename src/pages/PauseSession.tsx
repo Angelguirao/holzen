@@ -66,8 +66,9 @@ import { usePauseSessionBriefFeelSelect } from '@/hooks/use-pause-session-brief-
  *
  * **Product / data model:** brief vs deep flows, RPCs, and SQL-first ratios on `v_pause_full` /
  * `pause_step_events` — `docs/systems/pause-system.md`.
- * **Supporting modules:** hydrate (`pause-session-step-map`), scaffold ritual payloads, mount log
- * snapshot — see **section 10 (Related docs and code)** in `docs/systems/pause-system.md`.
+ * **Supporting modules:** hydrate (`pause-session-step-map`), coalesced shell (`pause-session-shell-view-model`),
+ * gate predicates (`pause-session-gate-flags`), scaffold ritual payloads, mount log snapshot — see
+ * **section 10 (Related docs and code)** in `docs/systems/pause-system.md`.
  * **Structure:** thin page + named hooks + `src/lib` — `docs/fundamentals/react-screen-orchestration.md`.
  */
 export default function PauseSession() {
