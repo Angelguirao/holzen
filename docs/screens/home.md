@@ -36,6 +36,10 @@ Home is the signed-in landing surface after onboarding: hero quote, optional ins
 | Shell | [`AppLayout`](../../src/components/AppLayout.tsx) outlet context | `pauseReady` / `dismissPauseReady` — refresh path when server pushes a pause |
 | Checkout UX | [`CheckoutConfirmation`](../../src/components/CheckoutConfirmation.tsx) | Owns stripping `?subscribed=true` / credits params and the confirmation dialog; Home may still run a lightweight refresh + welcome toast with a **stable Sonner id** so dev Strict Mode does not duplicate toasts |
 
+## Rendering and hooks
+
+`Home.tsx` calls **all** hooks (subscription gate, Today wiring, Zen props, dashboard layout props, and so on) **before** the `profileLoaded` / `hasOnboarded` / `zenMode` returns. That matches the **Rules of Hooks** and avoids subtle ordering bugs. Tradeoff: when Zen is on, the non-Zen dashboard hooks still run (cheap compared to reflection/market work); `HomeDashboardLayout` is **`React.memo`**, and `useHomeDashboardLayoutProps` memoizes props so the shell usually **skips re-render** when only Zen toggles.
+
 ## User-visible modes
 
 1. **Loading** — `!profileLoaded` → `AuthLoading`.
