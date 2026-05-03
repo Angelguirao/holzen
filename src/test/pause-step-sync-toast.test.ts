@@ -15,7 +15,7 @@ describe('showPauseStepSyncFailedToast', () => {
   });
 
   it('uses pause.stepSyncFailed with fixed duration', () => {
-    const t = vi.fn((key: string, opts?: { defaultValue?: string }) => opts?.defaultValue ?? key) as TFunction;
+    const t = vi.fn((key: string, opts?: { defaultValue?: string }) => opts?.defaultValue ?? key) as unknown as TFunction;
     showPauseStepSyncFailedToast(t);
     expect(t).toHaveBeenCalledWith(
       'pause.stepSyncFailed',
