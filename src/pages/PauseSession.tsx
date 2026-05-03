@@ -10,7 +10,7 @@ import { type CompanionData, type CompanionPrefs } from '@/components/CompanionS
 import { type PauseStep, STEPS } from '@/components/pause/PauseProgress';
 import { PauseSessionGate } from '@/components/pause/PauseSessionGate';
 import { PauseSessionScaffoldShell } from '@/components/pause/PauseSessionScaffoldShell';
-import { PendingPauseOfferShell } from '@/components/pause/PendingPauseOfferShell';
+import { PauseSessionGateContent } from '@/components/pause/PauseSessionGateContent';
 import { type PauseBreathingHandle } from '@/components/pause/PauseBreathing';
 import { PauseSessionDepthPickerStack } from '@/components/pause/PauseSessionDepthPickerStack';
 import { PauseBriefProgress } from '@/components/pause/PauseBriefProgress';
@@ -452,12 +452,11 @@ export default function PauseSession() {
       profileLoaded={profileLoaded}
       onReturn={handleReturn}
     >
-      <>
-        <PendingPauseOfferShell
-          onAfterMutation={pendingOfferAfterMutation}
-          navigateAfterAdopt={pendingOfferNavigateAfterAdopt}
-        />
-        {sessionOnPicker ? (
+      <PauseSessionGateContent
+        onPendingAfterMutation={pendingOfferAfterMutation}
+        onPendingNavigateAfterAdopt={pendingOfferNavigateAfterAdopt}
+        sessionOnPicker={sessionOnPicker}
+        depthPickerSlot={
           <PauseSessionDepthPickerStack
             contextLine={depthContextLine}
             onBrief={depthPickerOnBrief}
@@ -468,7 +467,8 @@ export default function PauseSession() {
             onAboutSheetOpenChange={setPickerAboutOpen}
             aboutSheetTitle={t('pause.aboutPauses.sheetTitle')}
           />
-        ) : (
+        }
+        scaffoldSlot={
           <PauseSessionScaffoldShell
             {...scaffoldRitualDerived}
             curtainLifted={curtainLifted}
@@ -491,8 +491,8 @@ export default function PauseSession() {
             onDoneReturn={handleReturn}
             pauseImpactData={pauseImpactData}
           />
-        )}
-      </>
+        }
+      />
     </PauseSessionGate>
   );
 }
