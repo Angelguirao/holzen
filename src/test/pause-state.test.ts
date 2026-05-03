@@ -20,7 +20,7 @@ const volatilityTemplate: PauseTemplateRow = {
   window_ms: 6 * 60 * 60 * 1000,
   action_window_ms: null,
   dismissal_suppression_ms: 6 * 60 * 60 * 1000,
-  required_for_engaged: ['breath_completed', 'initial_emotion_logged'],
+  required_for_engaged: ['initial_emotion_logged', 'breath_completed'],
   required_for_completed: ['outcome_logged'],
   allowed_companion_types: ['signal', 'ground_nudge', 'historical_insight', 'zoom_out', 'haiku'],
   required_companion_count: 0,
@@ -32,7 +32,7 @@ const legacyCompanionTemplate: PauseTemplateRow = {
   window_ms: 6 * 60 * 60 * 1000,
   action_window_ms: null,
   dismissal_suppression_ms: 6 * 60 * 60 * 1000,
-  required_for_engaged: ['breath_completed', 'initial_emotion_logged'],
+  required_for_engaged: ['initial_emotion_logged', 'breath_completed'],
   required_for_completed: [
     'breath_completed',
     'initial_emotion_logged',

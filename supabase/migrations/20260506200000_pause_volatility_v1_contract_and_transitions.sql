@@ -12,7 +12,7 @@
 
 UPDATE public.pause_templates
 SET
-  required_for_engaged = ARRAY['breath_completed', 'initial_emotion_logged']::text[],
+  required_for_engaged = ARRAY['initial_emotion_logged', 'breath_completed']::text[],
   required_for_completed = ARRAY['outcome_logged']::text[],
   required_companion_count = 0
 WHERE slug = 'volatility_v1';
@@ -84,7 +84,7 @@ BEGIN
       v_engaged_ok := ARRAY['initial_emotion_logged']::text[] <@ v_step_types;
     ELSE
       v_engaged_ok :=
-        ARRAY['breath_completed', 'initial_emotion_logged']::text[] <@ v_step_types;
+        ARRAY['initial_emotion_logged', 'breath_completed']::text[] <@ v_step_types;
     END IF;
 
     IF v_brief_mode THEN
@@ -125,7 +125,6 @@ $$;
 
 COMMENT ON FUNCTION public.pause_evaluate_transitions(uuid) IS
   'Evaluates pause_instances.state from step/companion events + template. '
-  'For volatility_v1: brief (brief_ritual on initial_emotion_logged) engages after '
-  'initial only; completes on breath+initial+outcome. Deep engages after breath+initial; '
-  'completes on breath+initial+shift+outcome (no companion quota). Other slugs use '
-  'required_for_* arrays and required_companion_count.';
+  'volatility_v1 engaged: brief initial only; deep initial+breath (set). '
+  'volatility_v1 completion in this revision superseded by 20260510120000. '
+  'Other slugs use required_for_* and required_companion_count.';

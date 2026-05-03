@@ -36,7 +36,7 @@ Everything the user does inside the ritual is appended as `**pause_step_events`*
 | ---------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------- |
 | `**pause_templates`**        | Per-type contract: `required_for_engaged`, `required_for_completed`, `allowed_companion_types`, `required_companion_count`, `window_ms`, etc. |
 | `**pause_instances**`        | One row per pause; `state`, timestamps, `context_snapshot`, `expired_reason`, `superseded_by`, …                                              |
-| `**pause_step_events**`      | Append-only user steps (`breath_completed`, `initial_emotion_logged`, …) with `jsonb` **payload**.                                            |
+| `**pause_step_events**`      | Append-only user steps (`initial_emotion_logged`, `breath_completed`, …) with `jsonb` **payload**.                                            |
 | `**pause_companion_events`** | Append-only companion `open` / `complete`; `**counts_for_pause**` is still written for analytics and quality scoring. For `**volatility_v1**`, completion is **not** gated on companion count (see §5). |
 | `**pause_ai_artifacts**`     | Reflection text, haiku, per-slot companion payloads, etc. (kinds vary by generator).                                                          |
 
@@ -45,11 +45,13 @@ Everything the user does inside the ritual is appended as `**pause_step_events`*
 
 ## 3. State machine
 
+**Ritual order vs. `engaged` gates:** The **client ritual** follows a fixed **screen order** (§7.1): **Feel** (mood / `**initial_emotion_logged**`) comes **before** the first **Breathe** (`**breath_completed**` segment 1), then Reflect → … Postgres **`pause_evaluate_transitions`** does **not** re-sort events by time to match that story: **`engaged`** is a **subset check** on **distinct `step_type` values** present for the instance (every required type must appear **at least once**; append order is irrelevant). In normal use, deep **`volatility_v1`** still reaches **`engaged`** right after the user finishes the first Breathe RPC, because Feel already ran. Wording below uses **Feel + first Breathe** for deep engaged; template arrays that list `breath_completed` before `initial_emotion_logged` are the same gate.
+
 States include: `**active**`, `**engaged**`, `**pending**` (context offer), `**completed**`, `**dismissed**`, `**expired**`.
 
 High-level transitions:
 
-- `**active**` → `**engaged**`: for `**volatility_v1**`, after each qualifying insert: **brief** instances (`**brief_ritual**` on `**initial_emotion_logged**`) flip when `**initial_emotion_logged**` exists; **deep** instances flip when both `**breath_completed**` and `**initial_emotion_logged**` exist. Other template slugs still use `**required_for_engaged**` from the template row (see `**pause_evaluate_transitions**`).
+- `**active**` → `**engaged**`: for `**volatility_v1**`, after each qualifying insert: **brief** (`**brief_ritual**` on `**initial_emotion_logged**`) flips when **Feel** has been logged (`**initial_emotion_logged**` exists). **Deep** flips when **Feel and first Breathe** are both logged (`**initial_emotion_logged**` and `**breath_completed**` both exist — order-agnostic in the table). Other template slugs still use `**required_for_engaged**` from the template row (see `**pause_evaluate_transitions**`).
 - `**active**` or `**engaged**` → `**completed**`: for `**volatility_v1**`, as soon as **any** `**outcome_logged**` step event exists — **no** separate “full ritual” requirement in Postgres (the `/pause` UI still walks users through prior beats). Companion completions do **not** gate `**completed**`. Other slugs still use `**required_for_completed**` plus `**required_companion_count**` counting completes.
 - `**pending**`: separate offer row when market context changes; user **adopts** or **declines** via dedicated RPCs (see AI pause doc). `**pause_log_step`** refuses steps on `**pending**` instances until adopted.
 
@@ -66,7 +68,7 @@ stateDiagram-v2
   pending --> active: adopt offer
 ```
 
-**Brief vs deep (`volatility_v1`):** only **`active` → `engaged`** depends on `**brief_ritual**` (initial-only vs breath+initial). **`completed`** is the same for both: **`outcome_logged`** present. Companion count is not used for completion on this slug.
+**Brief vs deep (`volatility_v1`):** only **`active` → `engaged`** depends on `**brief_ritual**` (**Feel-only** gate vs **Feel + first Breathe** gate — see above). **`completed`** is the same for both: **`outcome_logged`** present. Companion count is not used for completion on this slug.
 
 Exact rules (open max age, supersede, window elapsed) live in `**pause_evaluate_transitions**` in `supabase/migrations/` (search that function name for the latest definition).
 
@@ -78,14 +80,14 @@ Holzen stores **one `pause_instances` row per pause**. Product language below ma
 | ------------------------------ | -------------------------- |
 | **Pending / queued** — new volatility was detected while a pause was already open; the user must **adopt** or **decline** the offer. | `**state = pending**`. Does not appear in `**v_pause_current**` until adopted. Expires under staleness policy (e.g. 12h in recent migrations). |
 | **Active, not yet engaged** — pause open on Home / notification; the user has not yet satisfied the minimum steps in `**required_for_engaged**`. | **`state = active`**, **`engaged_at` IS NULL**. |
-| **In progress (ritual underway)** — `**volatility_v1`**: deep = breath + initial logged; brief = initial only (`**brief_ritual**`). Other templates use `**required_for_engaged**`. | `**state = engaged**`, `**engaged_at**` set when entering `engaged`. |
+| **In progress (ritual underway)** — `**volatility_v1`**: **deep** = Feel + first Breathe logged (`**initial_emotion_logged**` + `**breath_completed**`, set semantics); **brief** = Feel logged only (`**brief_ritual**`). Other templates use `**required_for_engaged**`. | `**state = engaged**`, `**engaged_at**` set when entering `engaged`. |
 | **Superseded** — the prior row was invalidated when adopting another pending pause or by auto-supersede. | `**state = expired**` with `**expired_reason = superseded**` (or other replacement rules documented in migrations). |
 | **Discarded by the user** — they closed the pause without completing the template. | `**state = dismissed**`. If there was never `engaged_at`, the row may surface as an **echo** in Library (see §9). |
 | **Declined from the offer** (without starting the ritual) — decline the pending offer or close without step events. | Outcome: `**pending**` row cleared / expired by policy, or `**dismissed**` / `**expired**` without step events — there is no separate `rejected` state. |
 | **Expired** — context window, time open, policy, etc. | `**state = expired**` + `**expired_reason**` (`context_lost`, `window_elapsed`, `open_max_age`, `superseded`, `ineligible_user_state`, `system_cancelled`, …). |
 | **Completed** — terminal “choice recorded” for `**volatility_v1**`: any `**outcome_logged**` row (§5.1). Other templates use their row’s `**required_for_completed**` + companion rules. | `**state = completed**`. |
 
-**Note:** the column **`engaged_at`** means **“the row reached the `engaged` milestone in the state machine”**, not literally “opened Reflect.” In the Feel→Breathe→… flow, reaching `engaged` implies early ritual progress; the **Echoes** tab treats **`engaged_at IS NULL`** on terminal `expired` / `dismissed` rows as a proxy for **“ended before that milestone”** (see `**src/lib/archive-segment.ts**`).
+**Note:** the column **`engaged_at`** means **“the row reached the `engaged` milestone in the state machine”**, not literally “opened Reflect.” For **deep**, that milestone is normally hit **after** first Breathe (Feel already done); the **Echoes** tab treats **`engaged_at IS NULL`** on terminal `expired` / `dismissed` rows as a proxy for **“ended before that milestone”** (see `**src/lib/archive-segment.ts**`).
 
 ---
 
@@ -113,7 +115,7 @@ Seeded in migrations (e.g. `20260425121348_8c37e44c-f886-4a86-ae4e-e480a8064766.
 
 | Field                          | Value (current `**volatility_v1**` row)                                                                                                                                 |
 | ------------------------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `**required_for_engaged**`     | `breath_completed`, `initial_emotion_logged` — documents the **deep** engaged gate; Postgres still applies a **brief** override (initial only) when `**brief_ritual**` is set (§5.1). |
+| `**required_for_engaged**`     | `initial_emotion_logged`, `breath_completed` — **deep** engaged gate (**both** types must exist; listing matches **Feel → first Breathe**; evaluation is still a **set** check — §3). **Brief** override: Feel only when `**brief_ritual**` is set (§5.1). |
 | `**required_for_completed**`   | `outcome_logged` only — matches runtime: **`completed`** is set when this step type appears (see §5.1). |
 | `**required_companion_count**` | `**0**` — companions are **not** required for `**engaged**` or `**completed**` on this slug.                                                                 |
 | `**allowed_companion_types`**  | `signal`, `ground_nudge`, `historical_insight`, `zoom_out`, `zoom_out_deep_time`, `haiku`                                                                               |
@@ -129,10 +131,10 @@ The **brief** path (~2 min) is a product-only shortening of the ritual UI in `**
 
 **Authoritative rules** (latest: `**20260510120000_pause_volatility_v1_completed_outcome_only.sql**` on top of `**20260506200000_pause_volatility_v1_contract_and_transitions.sql**`):
 
-| Mode   | `**active**` → `**engaged**` (all listed step types must exist) | `**active**` or `**engaged**` → `**completed**` |
-| ------ | ---------------------------------------------------------------- | ------------------------------------------------ |
-| Brief  | `**initial_emotion_logged**` only                               | **Any** `**outcome_logged**` row (same as deep) |
-| Deep   | `**breath_completed**`, `**initial_emotion_logged**`             | **Any** `**outcome_logged**` row                 |
+| Mode   | `**active**` → `**engaged**` (**set** of `step_type` values; append order ignored) | `**active**` or `**engaged**` → `**completed**` |
+| ------ | ---------------------------------------------------------------------------------- | ------------------------------------------------ |
+| Brief  | `**initial_emotion_logged**` only (Feel)                                         | **Any** `**outcome_logged**` row (same as deep) |
+| Deep   | `**initial_emotion_logged**` **and** `**breath_completed**` (Feel + first Breathe) | **Any** `**outcome_logged**` row                 |
 
 There is **no** separate echo table: echo-like rows stay `**expired**` / `**dismissed**` until cleared, but **`completed`** for `**volatility_v1**` always means “we have a recorded outcome” on that pause row. Retrospective `**outcome_logged**` on **`expired`** (rescue RPC) still leaves `**state = expired**` — see §4.
 
@@ -154,7 +156,7 @@ Payloads are `**jsonb**` on `**pause_step_events**`. Common shapes:
 | `step_type`                  | Payload                                                                                                                                                                                                       |
 | ---------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `**breath_completed**`       | Usually `**{ "breath_segment": 1 }**` or `**{ "breath_segment": 2 }**` after each breathing segment’s timed pattern + interstitial **Continue** (two segments in the Figma-aligned ritual). `**{ "skipped": true, "breath_segment"?: 1 \| 2 }**` when the user skips that segment’s intro without finishing cycles. Legacy rows may be `{}` or `{ "skipped": true }` only — `**v_pause_full.has_breath_completed**` is still “any `breath_completed` row exists”. **Brief** ritual: one segment is used; payloads typically include `**{ "breath_segment": 1, "brief_ritual": true }**` (or the same with `**skipped**`) so rows are easy to grep apart from deep two-segment logs. |
-| `**initial_emotion_logged`** | `**{ "mood": "<MoodValue>", "intensity"?: 1–5 }**`, or `**{ "skipped": true }**` when the user skips the Feel grid. **`brief_ritual: true**` tags the instance for the brief completion branch in `**pause_evaluate_transitions**` (§5.1). Optional `**brief_face**` may be present for the brief Feel tile UX.                                                                                           |
+| `**initial_emotion_logged`** | `**{ "mood": "<MoodValue>", "intensity"?: 1–5 }**`, or `**{ "skipped": true }**` when the user skips the Feel grid. **`brief_ritual: true**` selects the **brief** `**engaged**` gate (Feel-only) in `**pause_evaluate_transitions**` (§5.1). Optional `**brief_face**` may be present for the brief Feel tile UX.                                                                                           |
 | `**shift_emotion_logged**`   | `**{ "mood": "<MoodValue>", "shift_intensity"?: 1–5 }**`, or `**{ "skipped": true }**`, or `**{ "from_frame_hub": true }**` when the user leaves the **Frame** hub with **I'm done** (no mirror mood).                                                                                                                       |
 | `**outcome_logged**`         | `**{ "outcome": "held" | "nothing" | "sold" | "bought" }**` (and retrospective paths for expired; see migration comments).                                                                                    |
 | `**note_updated**`           | `**{ "text": "..." }**`                                                                                                                                                                                       |
@@ -178,11 +180,13 @@ Routing still uses a dedicated **`choose`** step between **`breath2`** and **`de
 
 **`feel` → `breathe` → `reflect` → `frame` → `breath2` → `choose` → `decide`**
 
+**Gates (§3):** deep **`volatility_v1` `engaged`** requires **`initial_emotion_logged`** and first-segment **`breath_completed`** (Feel, then first Breathe — the same order as this list). Postgres checks those as a **set**, not by comparing row timestamps.
+
 Optional PostHog flag `**pause.step5_breath_label_shift**` renames the second-breath bar to **Shift** (wireframe variant B).
 
 **Product defaults (Figma alignment):** macro step 4 is labeled **Frame** (not the wireframe **Explore** title variant). **`choose`** is a **client-only** interstitial after the second breath (no `**pause_step_events**` row); it shares the **sixth** stepper segment with **Decide**. Skipping the second breath still jumps straight to **Decide** (interstitial skipped; back navigation can return to `**breath2**` via `**decideOnBackStep**`).
 
-**Brief pause (quick ritual)** — four product steps, separate UI state (`**BriefPauseStep**` in `**src/lib/pause-session-storage.ts**`): **Feel → Breath → Integrate → Decide**. There is no Reflect/Frame/second breath/Choose; **Integrate** is a client-only quiet window (no companion RPC). The same `**pause_instances**` row still receives `**initial_emotion_logged**` (with `**brief_ritual**`), one `**breath_completed**`, and `**outcome_logged**` (see §5.1, §7.3.1).
+**Brief pause (quick ritual)** — four product steps, separate UI state (`**BriefPauseStep**` in `**src/lib/pause-session-storage.ts**`): **Feel → Breath → Integrate → Decide**. There is no Reflect/Frame/second breath/Choose; **Integrate** is a client-only quiet window (no companion RPC). In the **happy path**, RPCs follow that order: `**initial_emotion_logged**` (with `**brief_ritual**`), then one `**breath_completed**`, then `**outcome_logged**` on Decide (§7.3.1). Postgres **`completed`** still keys only off `**outcome_logged**` (§5.1).
 
 **Ritual audio:** the pause shell mute controls Web Audio cues in `**PauseBreathing**` (soft phase ticks + a short completion swell). Cues are suppressed when muted or when the user prefers reduced motion.
 
@@ -221,7 +225,7 @@ UI order: **Feel** → **Breath** → **Integrate** (client-only quiet window; *
 | **Breath** — Continue after interstitial | `**breath_completed**` with `**{ "breath_segment": 1, "brief_ritual": true }**`, then Integrate. |
 | **Breath** — Skip from intro | `**breath_completed**` with `**{ "skipped": true, "breath_segment": 1, "brief_ritual": true }**`, then Integrate. |
 | **Integrate** | Timer / early continue — **no** `**pause_step_events**` row; advances client-only to Decide. |
-| **Decide** | Same as deep: `**outcome_logged**` + same client wait for `**completed**` before Done / dismiss (§7.5). For brief, `**pause_evaluate_transitions**` already treats the instance as complete once breath + initial + outcome exist (§5.1), so the first successful outcome log typically returns `**completed**` immediately. |
+| **Decide** | Same as deep: `**outcome_logged**` + same client wait for `**completed**` before Done / dismiss (§7.5). For `**volatility_v1**`, the first successful `**outcome_logged**` insert sets **`completed`** in Postgres (§5.1), so the RPC return is usually `**completed**` immediately. |
 
 ### 7.4 Step navigation (explicit only)
 
