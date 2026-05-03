@@ -4,7 +4,7 @@ Authoritative orchestration: [`src/pages/Home.tsx`](../../src/pages/Home.tsx).
 
 | Piece | File |
 |-------|------|
-| Dashboard shell (non-Zen) | [`HomeDashboardLayout.tsx`](../../src/components/home/HomeDashboardLayout.tsx) |
+| Dashboard shell (non-Zen) | [`HomeDashboardLayout.tsx`](../../src/components/home/HomeDashboardLayout.tsx) (`React.memo`) |
 | Section switch + deps type | [`render-home-dashboard-section.tsx`](../../src/components/home/render-home-dashboard-section.tsx) |
 | Pull-to-refresh row | [`HomePullRefreshIndicator.tsx`](../../src/components/home/HomePullRefreshIndicator.tsx) |
 | Customize link button | [`HomeCustomizeLinkButton.tsx`](../../src/components/home/HomeCustomizeLinkButton.tsx) |
@@ -29,7 +29,7 @@ Home is the signed-in landing surface after onboarding: hero quote, optional ins
 
 | Area | Source | Notes |
 |------|--------|--------|
-| Profile + reflection + BTC context | [`useHolzen`](../../src/hooks/use-holzen.ts) | `message`, `loading`, `error`, `btcData`, `manualTrigger`, cooldown helpers, companions |
+| Profile + reflection + BTC context | [`useHolzen`](../../src/hooks/use-holzen.ts) | `message`, `loading`, `error`, `btcData`, `manualTrigger`, cooldown helpers, companions; **`trackedAssetId`** is re-exported as `normalizeTrackedAssetId(profile.trackedAssetId)` (`TrackedAssetId`) |
 | Subscription / Pro | [`useSubscription`](../../src/hooks/use-subscription.ts) | `subscribed`, `monthlyRemaining`, `startCheckout`, `refresh` |
 | Layout + DnD order | [`useWidgetLayout`](../../src/components/HomeWidget.tsx) | Section order persisted per user expectations |
 | Optional widgets | [`useHomeOptionalVisibility`](../../src/hooks/use-home-optional-visibility.ts) | Toggles + `JOURNEY_STAT_TILES_VISIBILITY_ID` + `HOME_WIDGET_DEFAULT_ORDER` for layout |

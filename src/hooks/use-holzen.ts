@@ -552,6 +552,8 @@ export function useHolzen() {
 
   return {
     ...profile,
+    /** CoinGecko id allowlist — normalized so consumers see `TrackedAssetId`, not raw profile strings. */
+    trackedAssetId: normalizeTrackedAssetId(profile.trackedAssetId),
     setCurrency: async (val: string) => {
       setBtcData(null);
       await profile.setCurrency(val);
