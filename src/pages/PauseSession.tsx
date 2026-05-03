@@ -13,14 +13,12 @@ import { PauseSessionScaffold } from '@/components/pause/PauseSessionScaffold';
 import { PendingPauseOfferShell } from '@/components/pause/PendingPauseOfferShell';
 import { type PauseBreathingHandle } from '@/components/pause/PauseBreathing';
 import { PauseDone } from '@/components/pause/PauseDone';
-import { PauseDepthPicker } from '@/components/pause/PauseDepthPicker';
+import { PauseSessionDepthPickerStack } from '@/components/pause/PauseSessionDepthPickerStack';
 import { PauseBriefProgress } from '@/components/pause/PauseBriefProgress';
 import { isPauseSessionHeaderBackVisible } from '@/lib/pause-session-header-back';
 import type { BriefFeelTile } from '@/components/pause/PauseBriefFeel';
 import { PauseSessionBriefRitualBody } from '@/components/pause/PauseSessionBriefRitualBody';
 import { PauseSessionDeepRitualBody } from '@/components/pause/PauseSessionDeepRitualBody';
-import { PauseAboutPausesBody } from '@/components/pause/PauseAboutPausesBody';
-import { Sheet, SheetContent, SheetTitle } from '@/components/ui/sheet';
 import type { BriefPauseStep, RitualDepth } from '@/lib/pause-session-storage';
 import { mapPersistedStep, initialRitualEntry } from '@/lib/pause-session-step-map';
 import { initialDecideOnBackStepFromPersisted } from '@/lib/pause-session-initial-decide-on-back-step';
@@ -400,24 +398,16 @@ export default function PauseSession() {
           navigateAfterAdopt={pendingOfferNavigateAfterAdopt}
         />
         {sessionOnPicker ? (
-          <>
-            <PauseDepthPicker
-              contextLine={depthContextLine}
-              onBrief={depthPickerOnBrief}
-              onDeep={depthPickerOnDeep}
-              onAboutPauses={depthPickerOnAboutPauses}
-              onClose={handleClose}
-            />
-            <Sheet open={pickerAboutOpen} onOpenChange={setPickerAboutOpen}>
-              <SheetContent
-                side="bottom"
-                className="z-[120] max-h-[88vh] overflow-y-auto rounded-t-2xl border-t p-6 sm:p-8"
-              >
-                <SheetTitle className="sr-only">{t('pause.aboutPauses.sheetTitle')}</SheetTitle>
-                <PauseAboutPausesBody />
-              </SheetContent>
-            </Sheet>
-          </>
+          <PauseSessionDepthPickerStack
+            contextLine={depthContextLine}
+            onBrief={depthPickerOnBrief}
+            onDeep={depthPickerOnDeep}
+            onAboutPauses={depthPickerOnAboutPauses}
+            onClose={handleClose}
+            aboutSheetOpen={pickerAboutOpen}
+            onAboutSheetOpenChange={setPickerAboutOpen}
+            aboutSheetTitle={t('pause.aboutPauses.sheetTitle')}
+          />
         ) : (
           <PauseSessionScaffold
             {...scaffoldRitualDerived}
