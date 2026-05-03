@@ -42,7 +42,8 @@ import {
 } from '@/lib/pause-session-step-map';
 import { initialDecideOnBackStepFromPersisted } from '@/lib/pause-session-initial-decide-on-back-step';
 import { parsePauseSessionLocationState } from '@/lib/router-location-state';
-import { DEFAULT_COMPANIONS, DEFAULT_PREFS, clearSession } from '@/lib/pause-session-storage';
+import { clearSession } from '@/lib/pause-session-storage';
+import { coalescePauseSessionShellViewModel } from '@/lib/pause-session-shell-view-model';
 import { usePauseSessionStepTransition } from '@/hooks/use-pause-session-step-transition';
 import { usePauseBreathSegmentRpcLoggers } from '@/hooks/use-pause-breath-segment-rpc-loggers';
 import { usePauseFeelShiftLogDedupeRefs } from '@/hooks/use-pause-feel-shift-log-dedupe-refs';
@@ -117,12 +118,8 @@ export default function PauseSession() {
     hydrationStatus: hydration.status,
   });
 
-  const message = resolved?.message ?? '';
-  const context = resolved?.context ?? null;
-  const pauseInstanceId = resolved?.pauseInstanceId ?? null;
-  const companions = resolved?.companions ?? DEFAULT_COMPANIONS;
-  const companionPrefs = resolved?.companionPrefs ?? DEFAULT_PREFS;
-  const severity = resolved?.severity ?? holzenSeverity;
+  const { message, context, pauseInstanceId, companions, companionPrefs, severity } =
+    coalescePauseSessionShellViewModel(resolved, holzenSeverity);
 
   const waitingForFetch = hydration.status === 'fetch' && !fetchFailed && !fetchedInstance;
 
