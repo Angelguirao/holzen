@@ -91,7 +91,7 @@
     "greeting": "Welcome back, {{name}}",
     "noActiveReflection": "No active pause.",
     "pauseEmpty": {
-      "toolsHint": "Tools between pauses"
+      "statusLine": "No active pause right now. Try the next step below between checks — or request a manual pause anytime."
     },
     "generatingReflection": "Preparing your pause…",
     "needAMoment": "I need a pause",
