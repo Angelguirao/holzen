@@ -55,6 +55,7 @@ import {
 } from '@/lib/pause-session-storage';
 import { pauseLogStep } from '@/lib/pause-api';
 import { breathCompletedSegment1Payload, breathCompletedSegment2Payload } from '@/lib/pause-breath-completed-payload';
+import { buildPauseImpactDataOnComplete, type PauseImpactData } from '@/lib/pause-impact-data';
 import { showPauseFavoriteProHintToast } from '@/lib/pause-favorite-toast';
 import { showPauseOutcomeNotCompletedToast, showPauseOutcomeSaveFailedToast } from '@/lib/pause-outcome-toast';
 import { showPauseStepSyncFailedToast } from '@/lib/pause-step-sync-toast';
@@ -152,19 +153,7 @@ export default function PauseSession() {
   const [breathingSecondCompleted, setBreathingSecondCompleted] = useState(restored?.breathingSecondCompleted ?? false);
   const [frameDone, setFrameDone] = useState(restored?.frameDone ?? false);
   const [curtainLifted, setCurtainLifted] = useState(false);
-  const [pauseImpactData, setPauseImpactData] = useState<{
-    mood: string | null;
-    moodAfter: string | null;
-    breathingCompleted: boolean;
-    decision: string | null;
-    context: string | null;
-    engagedTools: number;
-    wroteNote: boolean;
-    usedTags: boolean;
-    feelIntensity?: number | null;
-    shiftIntensity?: number | null;
-    reinforcementQuote?: string | null;
-  } | null>(null);
+  const [pauseImpactData, setPauseImpactData] = useState<PauseImpactData | null>(null);
 
   const breath1RpcDoneRef = useRef(restoredIdx > STEPS.indexOf('breathe'));
   const breath2RpcDoneRef = useRef(restoredIdx > STEPS.indexOf('breath2'));
@@ -628,22 +617,20 @@ export default function PauseSession() {
         setDecision(d);
         await dismissMessage();
         const q = getSessionQuote();
-        setPauseImpactData({
-          mood: selectedMood,
-          moodAfter: selectedMoodAfter,
-          breathingCompleted:
-            ritualEntry === 'brief'
-              ? breathingFirstCompleted
-              : breathingFirstCompleted && breathingSecondCompleted,
-          decision: d,
-          context,
-          engagedTools: 0,
-          wroteNote: false,
-          usedTags: false,
-          feelIntensity,
-          shiftIntensity,
-          reinforcementQuote: `"${q.text}" — ${q.author}`,
-        });
+        setPauseImpactData(
+          buildPauseImpactDataOnComplete({
+            decision: d,
+            context,
+            selectedMood,
+            selectedMoodAfter,
+            ritualEntry,
+            breathingFirstCompleted,
+            breathingSecondCompleted,
+            feelIntensity,
+            shiftIntensity,
+            reinforcementQuote: `"${q.text}" — ${q.author}`,
+          }),
+        );
         hapticFeedback('success');
         setPhase('done');
         clearSession();
