@@ -7,12 +7,7 @@ import { useSubscription } from '@/hooks/use-subscription';
 import { type MoodValue } from '@/components/MoodCheck';
 import { type CompanionData, type CompanionPrefs } from '@/components/CompanionSection';
 
-import {
-  type PauseStep,
-  STEPS,
-  pauseDeepMacroStepNumber,
-  PAUSE_DEEP_DISPLAY_STEP_COUNT,
-} from '@/components/pause/PauseProgress';
+import { type PauseStep, STEPS } from '@/components/pause/PauseProgress';
 import { PauseSessionGate } from '@/components/pause/PauseSessionGate';
 import { PauseSessionScaffold } from '@/components/pause/PauseSessionScaffold';
 import { PendingPauseOfferShell } from '@/components/pause/PendingPauseOfferShell';
@@ -31,11 +26,7 @@ import { PauseBriefIntegrate } from '@/components/pause/PauseBriefIntegrate';
 import { PauseAboutPausesBody } from '@/components/pause/PauseAboutPausesBody';
 import { Sheet, SheetContent, SheetTitle } from '@/components/ui/sheet';
 import type { BriefPauseStep, RitualDepth } from '@/lib/pause-session-storage';
-import {
-  mapPersistedStep,
-  initialRitualEntry,
-  briefStepToPauseScienceStep,
-} from '@/lib/pause-session-step-map';
+import { mapPersistedStep, initialRitualEntry } from '@/lib/pause-session-step-map';
 import { initialDecideOnBackStepFromPersisted } from '@/lib/pause-session-initial-decide-on-back-step';
 import { parsePauseSessionLocationState } from '@/lib/router-location-state';
 import { clearSession } from '@/lib/pause-session-storage';
@@ -67,6 +58,7 @@ import { usePauseSessionMountLog } from '@/hooks/use-pause-session-mount-log';
 import { usePauseSessionBriefPastStep } from '@/hooks/use-pause-session-brief-past-step';
 import { usePauseSessionGoBack } from '@/hooks/use-pause-session-go-back';
 import { usePauseSessionGoToStep } from '@/hooks/use-pause-session-go-to-step';
+import { buildPauseSessionScaffoldRitualDerived } from '@/lib/pause-session-scaffold-ritual-props';
 
 export default function PauseSession() {
   const { t } = useTranslation();
@@ -356,6 +348,13 @@ export default function PauseSession() {
     hasShellMessage: !!message,
   });
 
+  const scaffoldRitualDerived = buildPauseSessionScaffoldRitualDerived({
+    ritualEntry,
+    step,
+    briefStep,
+    t,
+  });
+
   return (
     <PauseSessionGate
       hasMessage={!!message}
@@ -398,6 +397,7 @@ export default function PauseSession() {
           </>
         ) : (
           <PauseSessionScaffold
+            {...scaffoldRitualDerived}
             curtainLifted={curtainLifted}
             prefersReducedMotion={!!prefersReducedMotion}
             onClose={handleClose}
@@ -406,22 +406,13 @@ export default function PauseSession() {
             goToStep={goToStep}
             onHeaderBack={handlePauseHeaderBack}
             showHeaderBack={showPauseHeaderBack}
-            macroStepIndex={ritualEntry === 'brief' ? undefined : pauseDeepMacroStepNumber(step)}
-            macroStepTotal={ritualEntry === 'brief' ? undefined : PAUSE_DEEP_DISPLAY_STEP_COUNT}
             macroProgressLine={briefMacroLine}
-            sessionTitle={ritualEntry === 'brief' ? t('pause.brief.sessionTitle') : undefined}
             stepperSlot={
               ritualEntry === 'brief' ? (
                 <PauseBriefProgress currentStep={briefStep} onStepClick={goToBriefPastStep} />
               ) : undefined
             }
-            scienceCurrentStep={ritualEntry === 'brief' ? briefStepToPauseScienceStep(briefStep) : undefined}
             breathSecondLabelVariant={breathSecondLabelVariant}
-            hideScienceButton={
-              ritualEntry === 'brief'
-                ? briefStep === 'breath'
-                : step === 'breathe' || step === 'breath2'
-            }
             soundMuted={soundMuted}
             onSoundMutedChange={setSoundMuted}
           >
