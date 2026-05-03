@@ -18,7 +18,7 @@
  * the SQL wins and this file is wrong; fix this file to match.
  *
  * See: `supabase/migrations/20260423200730_pause_transition_engine.sql`,
- *      `docs/systems/pause-system.md`.
+ *      `docs/systems/pause-system.md` (section 3 — state machine; section 4 — RPCs / transitions).
  */
 
 export type PauseState =
