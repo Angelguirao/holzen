@@ -329,6 +329,7 @@ Echoes are **“this pause ended before the `engaged` milestone”** (`**engaged
 | Client RPC wrappers                                           | `src/lib/pause-api.ts`                                                                                            |
 | Step types and helpers                                        | `src/lib/pause-state.ts`                                                                                          |
 | Ritual UI                                                     | `src/pages/PauseSession.tsx`, `src/components/pause/Pause*.tsx`                                                   |
+| Shell hydration (restore, nav vs Holzen, optional fetch, `resolved`) | `src/hooks/use-pause-session-shell.ts`, `src/lib/pause-session-hydration.ts`                                      |
 | Local hydrate (`PauseStep`, brief sub-step, phase from storage) | `src/lib/pause-session-step-map.ts`                                                                               |
 | Coalesced shell fields for route (`resolved` → message, id, companions, severity) | `src/lib/pause-session-shell-view-model.ts`                                                                       |
 | Gate UI predicates (instance fetch wait, depth picker)         | `src/lib/pause-session-gate-flags.ts`                                                                             |

@@ -22,6 +22,9 @@ export type PauseSessionShellHolzen = {
 /**
  * Restore + hydration + optional id-fetch + resolved shell for `/pause`.
  * Keeps the same memo / fetch dependency behavior as the prior inline `PauseSession` block.
+ *
+ * **Contract:** `docs/systems/pause-system.md` section 7.2 (hydration); pure helpers in
+ * `src/lib/pause-session-hydration.ts`. **Code map:** same doc, section 10.
  */
 export function usePauseSessionShell(params: {
   locationKey: string;
