@@ -62,6 +62,7 @@ import { usePauseSessionBreathStepHandlers } from '@/hooks/use-pause-session-bre
 import { usePauseSessionHeaderBackHandler } from '@/hooks/use-pause-session-header-back-handler';
 import { usePauseSessionPersistToStorage } from '@/hooks/use-pause-session-persist-to-storage';
 import { usePauseSessionRitualStorageSync } from '@/hooks/use-pause-session-ritual-storage-sync';
+import { usePauseSessionEntryPresentationEffects } from '@/hooks/use-pause-session-entry-presentation-effects';
 import type { PauseImpactData } from '@/lib/pause-impact-data';
 import { showPauseStepSyncFailedToast } from '@/lib/pause-step-sync-toast';
 import { usePauseSessionShell } from '@/hooks/use-pause-session-shell';
@@ -140,6 +141,9 @@ export default function PauseSession() {
   const restoredIdx = restored ? STEPS.indexOf(restoredStep) : -1;
 
   const [step, setStep] = useState<PauseStep>(restoredStep);
+  const [decideOnBackStep, setDecideOnBackStep] = useState<'choose' | 'breath2'>(() =>
+    initialDecideOnBackStepFromPersisted(restored),
+  );
   const [phase, setPhase] = useState<'session' | 'done'>(restored?.phase ?? 'session');
   const [decision, setDecision] = useState<string | null>(restored?.decision ?? null);
   const [isFavorite, setIsFavorite] = useState(false);
@@ -163,6 +167,8 @@ export default function PauseSession() {
   const [frameDone, setFrameDone] = useState(restored?.frameDone ?? false);
   const [curtainLifted, setCurtainLifted] = useState(false);
   const [pauseImpactData, setPauseImpactData] = useState<PauseImpactData | null>(null);
+
+  usePauseSessionEntryPresentationEffects({ step, setDecideOnBackStep, setCurtainLifted });
 
   const {
     ensureBreathSegment1Logged,
@@ -232,15 +238,6 @@ export default function PauseSession() {
     selectedBriefFace,
   });
 
-  useEffect(() => {
-    if (step === 'breath2') setDecideOnBackStep('choose');
-  }, [step]);
-
-  useEffect(() => {
-    const timer = setTimeout(() => setCurtainLifted(true), 100);
-    return () => clearTimeout(timer);
-  }, []);
-
   const [swipeDirection, setSwipeDirection] = useState<'forward' | 'back'>('forward');
 
   const goToStep = useCallback(
@@ -278,9 +275,6 @@ export default function PauseSession() {
   const decidingRef = useRef(false);
   const [breathTimedActive, setBreathTimedActive] = useState(false);
   const [soundMuted, setSoundMuted] = useState(false);
-  const [decideOnBackStep, setDecideOnBackStep] = useState<'choose' | 'breath2'>(() =>
-    initialDecideOnBackStepFromPersisted(restored),
-  );
 
   useEffect(() => {
     if (ritualEntry === 'brief') {
