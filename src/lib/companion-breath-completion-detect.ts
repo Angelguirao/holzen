@@ -15,6 +15,16 @@ export function deriveBreathingUiCompleteFromPayloads(
 ): boolean {
   if (!rows.length) return false;
 
+  for (const row of rows) {
+    const p = asPayloadRecord(row.payload);
+    if (p.brief_ritual === true) {
+      const raw = p.breath_segment;
+      if (raw === undefined || raw === null || raw === '') continue;
+      const n = typeof raw === 'number' ? raw : Number(raw);
+      if (n === 1) return true;
+    }
+  }
+
   let seg1 = false;
   let seg2 = false;
   let hasSegmentedBreath = false;

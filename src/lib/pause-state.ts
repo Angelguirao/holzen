@@ -129,6 +129,22 @@ export function collectStepTypes(
   return seen;
 }
 
+/** True when any `initial_emotion_logged` marks this instance as the ~2 min brief ritual (client payload). */
+export function pauseInstanceHasBriefRitualTag(
+  stepEvents: readonly PauseStepEventRow[],
+  instanceId: string,
+): boolean {
+  for (const e of stepEvents) {
+    if (e.pause_instance_id !== instanceId) continue;
+    if (e.step_type !== 'initial_emotion_logged') continue;
+    const p = e.payload;
+    if (p && typeof p === 'object' && !Array.isArray(p) && (p as { brief_ritual?: unknown }).brief_ritual === true) {
+      return true;
+    }
+  }
+  return false;
+}
+
 /** Count of `complete` companion events for this instance where `counts_for_pause=true`. */
 export function countedCompanionCount(
   events: readonly PauseCompanionEventRow[],
@@ -158,8 +174,10 @@ function allIn<T>(required: readonly T[], present: Set<T>): boolean {
  *   2. Window elapsed (`now > window_ends_at`) → `expired` (reason
  *      `window_elapsed`) **only when** `template.action_window_ms` is set.
  *      When it is null, clock-only expiry is skipped (matches Postgres).
- *   3. `required_for_completed` all present AND
- *      `countedCompanionCount >= required_companion_count` → `completed`.
+ *   3. **Brief ritual** (`initial_emotion_logged` with `brief_ritual: true`): all of
+ *      `breath_completed`, `initial_emotion_logged`, `outcome_logged` → `completed`
+ *      (no companion quota). Else template `required_for_completed` +
+ *      `countedCompanionCount` → `completed`.
  *   4. `required_for_engaged` all present → `engaged` (only from `active`).
  *   5. Otherwise: unchanged.
  */
@@ -196,9 +214,11 @@ export function computePauseState(params: {
   const counted = countedCompanionCount(companionEvents, instance.id);
 
   const engagedOk = allIn(template.required_for_engaged, seenSteps);
-  const completedOk =
-    allIn(template.required_for_completed, seenSteps) &&
-    counted >= template.required_companion_count;
+  const briefMode = pauseInstanceHasBriefRitualTag(stepEvents, instance.id);
+  const completedOk = briefMode
+    ? allIn(['breath_completed', 'initial_emotion_logged', 'outcome_logged'] as const, seenSteps)
+    : allIn(template.required_for_completed, seenSteps) &&
+      counted >= template.required_companion_count;
 
   if (completedOk) return 'completed';
   if (engagedOk && instance.state === 'active') return 'engaged';

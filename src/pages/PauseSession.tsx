@@ -21,6 +21,14 @@ import { PauseFrame } from '@/components/pause/PauseFrame';
 import { PauseChooseBridge } from '@/components/pause/PauseChooseBridge';
 import { PauseDecide } from '@/components/pause/PauseDecide';
 import { PauseDone } from '@/components/pause/PauseDone';
+import { PauseDepthPicker } from '@/components/pause/PauseDepthPicker';
+import { PauseBriefProgress, BRIEF_PAUSE_ORDER } from '@/components/pause/PauseBriefProgress';
+import { PauseBriefFeel, type BriefFeelTile } from '@/components/pause/PauseBriefFeel';
+import { PauseBriefIntegrate } from '@/components/pause/PauseBriefIntegrate';
+import { PauseAboutPausesBody } from '@/components/pause/PauseAboutPausesBody';
+import { Sheet, SheetContent, SheetTitle } from '@/components/ui/sheet';
+import { trackedAssetSymbol } from '@/lib/tracked-assets';
+import type { BriefPauseStep, RitualDepth } from '@/lib/pause-session-storage';
 import { holzenLog } from '@/lib/holzen-console';
 import { parsePauseSessionLocationState } from '@/lib/router-location-state';
 import { useFeatureFlag } from '@/hooks/use-feature-flag';
@@ -34,7 +42,6 @@ import {
   companionDataFromArtifacts,
 } from '@/lib/pause-session-storage';
 import { pauseLogStep } from '@/lib/pause-api';
-import { canAdvanceFromPauseStep } from '@/lib/pause-session-navigation';
 import type { PauseState } from '@/lib/pause-state';
 import { getSessionQuote } from '@/lib/wisdom-quotes';
 
@@ -56,6 +63,29 @@ function mapPersistedStep(s: string | undefined): PauseStep {
   if (s === 'shift') return 'frame';
   if (STEPS.includes(s as PauseStep)) return s as PauseStep;
   return 'feel';
+}
+
+function initialRitualEntry(
+  restored: ReturnType<typeof loadSession>,
+): RitualDepth | 'picker' {
+  if (!restored?.message) return 'picker';
+  if (restored.ritualDepth === 'brief' || restored.ritualDepth === 'deep') return restored.ritualDepth;
+  if (restored.moodDone || restored.phase === 'done' || restored.step !== 'feel') return 'deep';
+  return 'picker';
+}
+
+/** Brief “Integrate” has no dedicated citations row — highlight Reflect (regulation) sources. */
+function briefStepToPauseScienceStep(brief: BriefPauseStep): PauseStep {
+  switch (brief) {
+    case 'feel':
+      return 'feel';
+    case 'breath':
+      return 'breathe';
+    case 'integrate':
+      return 'reflect';
+    case 'decide':
+      return 'decide';
+  }
 }
 
 export default function PauseSession() {
@@ -84,6 +114,8 @@ export default function PauseSession() {
     severity: holzenSeverity,
     profileLoaded,
     resyncOpenPauseFromDb,
+    btcData,
+    trackedAssetId,
   } = useHolzen();
   const { subscribed, refresh: refreshSubscription } = useSubscription();
 
@@ -314,6 +346,28 @@ export default function PauseSession() {
   const breath2RpcDoneRef = useRef(restoredIdx > STEPS.indexOf('breath2'));
   const lastShiftLogKeyRef = useRef<string | null>(null);
 
+  const [ritualEntry, setRitualEntry] = useState<RitualDepth | 'picker'>(() => initialRitualEntry(restored));
+  const [briefStep, setBriefStep] = useState<BriefPauseStep>(() => {
+    if (restored?.ritualDepth === 'brief' && restored.briefStep) return restored.briefStep;
+    return 'feel';
+  });
+  const [briefIntegrateDone, setBriefIntegrateDone] = useState(restored?.briefIntegrateDone ?? false);
+  const [selectedBriefFace, setSelectedBriefFace] = useState<BriefFeelTile | null>(
+    (restored?.briefFace as BriefFeelTile | null) ?? null,
+  );
+  const [pickerAboutOpen, setPickerAboutOpen] = useState(false);
+
+  useEffect(() => {
+    if (!pauseInstanceId) return;
+    const saved = loadSession();
+    if (saved?.pauseInstanceId && saved.pauseInstanceId !== pauseInstanceId) return;
+    setRitualEntry(initialRitualEntry(saved));
+    if (saved?.ritualDepth === 'brief' && saved.briefStep) setBriefStep(saved.briefStep);
+    else if (saved?.ritualDepth !== 'brief') setBriefStep('feel');
+    setBriefIntegrateDone(saved?.briefIntegrateDone ?? false);
+    setSelectedBriefFace((saved?.briefFace as BriefFeelTile | null) ?? null);
+  }, [pauseInstanceId]);
+
   useEffect(() => {
     if (!message) return;
     saveSession({
@@ -336,6 +390,10 @@ export default function PauseSession() {
       breathingSecondCompleted,
       frameDone,
       decideOnBackStep,
+      ritualDepth: ritualEntry === 'picker' ? undefined : ritualEntry,
+      briefStep: ritualEntry === 'brief' ? briefStep : undefined,
+      briefIntegrateDone: ritualEntry === 'brief' ? briefIntegrateDone : undefined,
+      briefFace: ritualEntry === 'brief' ? selectedBriefFace ?? undefined : undefined,
     });
   }, [
     message,
@@ -357,6 +415,10 @@ export default function PauseSession() {
     breathingSecondCompleted,
     frameDone,
     decideOnBackStep,
+    ritualEntry,
+    briefStep,
+    briefIntegrateDone,
+    selectedBriefFace,
   ]);
 
   useEffect(() => {
@@ -382,13 +444,25 @@ export default function PauseSession() {
   );
 
   const goBack = useCallback(() => {
+    if (ritualEntry === 'brief') {
+      const i = BRIEF_PAUSE_ORDER.indexOf(briefStep);
+      if (i > 0) {
+        setSwipeDirection('back');
+        hapticFeedback('light');
+        const prev = BRIEF_PAUSE_ORDER[i - 1]!;
+        if (briefStep === 'decide' && prev === 'integrate') setBriefIntegrateDone(false);
+        if (briefStep === 'integrate') setBriefIntegrateDone(false);
+        setBriefStep(prev);
+      }
+      return;
+    }
     const currentIndex = STEPS.indexOf(step);
     if (currentIndex > 0) {
       setSwipeDirection('back');
       hapticFeedback('light');
       setStep(STEPS[currentIndex - 1]);
     }
-  }, [step]);
+  }, [step, ritualEntry, briefStep]);
 
   const breathingRef = useRef<PauseBreathingHandle>(null);
   const decidingRef = useRef(false);
@@ -414,17 +488,21 @@ export default function PauseSession() {
   }, [pauseInstanceId]);
 
   useEffect(() => {
+    if (ritualEntry === 'brief') {
+      if (briefStep !== 'breath') setBreathTimedActive(false);
+      return;
+    }
     if (step !== 'breathe' && step !== 'breath2') setBreathTimedActive(false);
-  }, [step]);
+  }, [step, ritualEntry, briefStep]);
 
-  const ensureBreathSegment1Logged = useCallback(async (): Promise<boolean> => {
+  const ensureBreathSegment1Logged = useCallback(async (briefRitual?: boolean): Promise<boolean> => {
     if (!pauseInstanceId) return true;
     if (breath1RpcDoneRef.current) return true;
     try {
       await pauseLogStep({
         instanceId: pauseInstanceId,
         stepType: 'breath_completed',
-        payload: { breath_segment: 1 },
+        payload: briefRitual ? { breath_segment: 1, brief_ritual: true } : { breath_segment: 1 },
       });
       breath1RpcDoneRef.current = true;
       return true;
@@ -462,6 +540,19 @@ export default function PauseSession() {
   }, [pauseInstanceId, t]);
 
   const handlePauseHeaderBack = useCallback(() => {
+    if (ritualEntry === 'brief') {
+      if (briefStep === 'breath' && breathTimedActive) {
+        breathingRef.current?.resetToIntro();
+        return;
+      }
+      if (briefStep === 'breath' && breathingFirstCompleted) {
+        breathingRef.current?.resetToIntro();
+        setBreathingFirstCompleted(false);
+        return;
+      }
+      goBack();
+      return;
+    }
     if ((step === 'breathe' || step === 'breath2') && breathTimedActive) {
       breathingRef.current?.resetToIntro();
       return;
@@ -477,14 +568,26 @@ export default function PauseSession() {
       return;
     }
     goBack();
-  }, [step, breathTimedActive, breathingFirstCompleted, breathingSecondCompleted, goBack]);
+  }, [
+    ritualEntry,
+    briefStep,
+    step,
+    breathTimedActive,
+    breathingFirstCompleted,
+    breathingSecondCompleted,
+    goBack,
+  ]);
 
   const showPauseHeaderBack =
     phase === 'session' &&
-    (STEPS.indexOf(step) > 0 ||
-      ((step === 'breathe' || step === 'breath2') && breathTimedActive) ||
-      ((step === 'breathe' || step === 'breath2') &&
-        (step === 'breathe' ? breathingFirstCompleted : breathingSecondCompleted)));
+    (ritualEntry === 'brief'
+      ? BRIEF_PAUSE_ORDER.indexOf(briefStep) > 0 ||
+        (briefStep === 'breath' && breathTimedActive) ||
+        (briefStep === 'breath' && breathingFirstCompleted)
+      : STEPS.indexOf(step) > 0 ||
+        ((step === 'breathe' || step === 'breath2') && breathTimedActive) ||
+        ((step === 'breathe' || step === 'breath2') &&
+          (step === 'breathe' ? breathingFirstCompleted : breathingSecondCompleted)));
 
   const handleContinueAfterFirstBreath = useCallback(async () => {
     const ok = await ensureBreathSegment1Logged();
@@ -547,6 +650,48 @@ export default function PauseSession() {
     goToStep('decide');
   }, [pauseInstanceId, goToStep, t]);
 
+  const handleBriefBreathContinue = useCallback(async () => {
+    const ok = await ensureBreathSegment1Logged(true);
+    if (!ok) return;
+    setBriefStep('integrate');
+  }, [ensureBreathSegment1Logged]);
+
+  const integrateAdvanceRef = useRef(false);
+  useEffect(() => {
+    if (ritualEntry === 'brief' && briefStep === 'integrate') integrateAdvanceRef.current = false;
+  }, [ritualEntry, briefStep]);
+
+  const handleBriefSkipBreath = useCallback(async () => {
+    setBreathingFirstCompleted(false);
+    if (pauseInstanceId) {
+      try {
+        await pauseLogStep({
+          instanceId: pauseInstanceId,
+          stepType: 'breath_completed',
+          payload: { skipped: true, breath_segment: 1, brief_ritual: true },
+        });
+        breath1RpcDoneRef.current = true;
+      } catch {
+        toast.error(
+          t('pause.stepSyncFailed', {
+            defaultValue: 'Could not sync this step. Check your connection and try again.',
+          }),
+          { duration: 5000 },
+        );
+        return;
+      }
+    }
+    setBreathingFirstCompleted(true);
+    setBriefStep('integrate');
+  }, [pauseInstanceId, t]);
+
+  const handleBriefIntegrateComplete = useCallback(() => {
+    if (integrateAdvanceRef.current) return;
+    integrateAdvanceRef.current = true;
+    setBriefIntegrateDone(true);
+    setBriefStep('decide');
+  }, []);
+
   const handleFrameImDone = useCallback(async () => {
     const logKey = JSON.stringify({ from_frame_hub: true });
     if (pauseInstanceId) {
@@ -576,78 +721,29 @@ export default function PauseSession() {
     goToStep('breath2');
   }, [pauseInstanceId, goToStep, t]);
 
-  const goForward = useCallback(() => {
-    if (
-      !canAdvanceFromPauseStep({
-        step,
-        breathingFirstCompleted,
-        breathingSecondCompleted,
-        moodDone,
-        frameDone,
-      })
-    ) {
-      return;
-    }
-    const currentIndex = STEPS.indexOf(step);
-    if (currentIndex >= STEPS.length - 1) return;
-    const next = STEPS[currentIndex + 1];
-
-    const advance = () => {
-      setSwipeDirection('forward');
-      hapticFeedback('light');
-      setStep(next);
-    };
-
-    if (step === 'breathe' && next === 'reflect') {
-      void ensureBreathSegment1Logged().then((ok) => {
-        if (ok) advance();
-      });
-      return;
-    }
-    if (step === 'breath2' && next === 'choose') {
-      void ensureBreathSegment2Logged().then((ok) => {
-        if (ok) advance();
-      });
-      return;
-    }
-    advance();
-  }, [
-    step,
-    breathingFirstCompleted,
-    breathingSecondCompleted,
-    moodDone,
-    frameDone,
-    ensureBreathSegment1Logged,
-    ensureBreathSegment2Logged,
-  ]);
-
-  const handleDragEnd = useCallback(
-    (_: unknown, info: { offset: { x: number }; velocity: { x: number } }) => {
-      const threshold = 50;
-      const velocityThreshold = 300;
-      if (info.offset.x < -threshold || info.velocity.x < -velocityThreshold) {
-        goForward();
-      } else if (info.offset.x > threshold || info.velocity.x > velocityThreshold) {
-        goBack();
-      }
-    },
-    [goForward, goBack],
-  );
-
   const handleMoodSelect = useCallback(
-    async (mood: MoodValue, intensity?: number) => {
+    async (
+      mood: MoodValue,
+      intensity?: number,
+      opts?: { briefRitual?: boolean; briefFace?: BriefFeelTile },
+    ) => {
       hapticFeedback('light');
-      const payload = typeof intensity === 'number' ? { mood, intensity } : { mood };
-      const logKey = JSON.stringify(payload);
+      const payload: Record<string, unknown> =
+        typeof intensity === 'number' ? { mood, intensity } : { mood };
+      if (opts?.briefRitual) payload.brief_ritual = true;
+      if (opts?.briefFace) payload.brief_face = opts.briefFace;
+      const logKey = JSON.stringify({ ...payload, _bf: opts?.briefFace });
       if (pauseInstanceId && lastFeelLogKeyRef.current === logKey) {
         setMoodDone(true);
         setSelectedMood(mood);
         setFeelIntensity(typeof intensity === 'number' ? intensity : null);
+        if (opts?.briefFace) setSelectedBriefFace(opts.briefFace);
         return;
       }
       setMoodDone(true);
       setSelectedMood(mood);
       setFeelIntensity(typeof intensity === 'number' ? intensity : null);
+      if (opts?.briefFace) setSelectedBriefFace(opts.briefFace);
       if (pauseInstanceId) {
         try {
           await pauseLogStep({
@@ -701,6 +797,7 @@ export default function PauseSession() {
     setMoodDone(false);
     setSelectedMood(null);
     setFeelIntensity(null);
+    setSelectedBriefFace(null);
   }, []);
 
   const toggleFavorite = useCallback(async () => {
@@ -769,7 +866,10 @@ export default function PauseSession() {
         setPauseImpactData({
           mood: selectedMood,
           moodAfter: selectedMoodAfter,
-          breathingCompleted: breathingFirstCompleted && breathingSecondCompleted,
+          breathingCompleted:
+            ritualEntry === 'brief'
+              ? breathingFirstCompleted
+              : breathingFirstCompleted && breathingSecondCompleted,
           decision: d,
           context,
           engagedTools: 0,
@@ -792,6 +892,7 @@ export default function PauseSession() {
       selectedMood,
       selectedMoodAfter,
       context,
+      ritualEntry,
       breathingFirstCompleted,
       breathingSecondCompleted,
       feelIntensity,
@@ -799,6 +900,37 @@ export default function PauseSession() {
       refreshSubscription,
       t,
     ],
+  );
+
+  const depthContextLine = useMemo(() => {
+    if (!btcData) return null;
+    const sym = trackedAssetSymbol(trackedAssetId);
+    return t('pause.depthPicker.contextMoved', {
+      defaultValue: '{{sym}} moved {{pct}}% in the last 24 hours.',
+      sym,
+      pct: Math.abs(btcData.changePercent).toFixed(1),
+    });
+  }, [btcData, trackedAssetId, t]);
+
+  const briefMacroLine =
+    ritualEntry === 'brief'
+      ? t('pause.brief.macroProgress', {
+          n: BRIEF_PAUSE_ORDER.indexOf(briefStep) + 1,
+          total: BRIEF_PAUSE_ORDER.length,
+        })
+      : undefined;
+
+  const goToBriefPastStep = useCallback(
+    (target: BriefPauseStep) => {
+      const ti = BRIEF_PAUSE_ORDER.indexOf(target);
+      const ci = BRIEF_PAUSE_ORDER.indexOf(briefStep);
+      if (ti >= ci) return;
+      setSwipeDirection('back');
+      hapticFeedback('light');
+      setBriefStep(target);
+      if (target === 'breath' || target === 'feel') setBriefIntegrateDone(false);
+    },
+    [briefStep],
   );
 
   const slideX = prefersReducedMotion ? 0 : 80;
@@ -812,13 +944,7 @@ export default function PauseSession() {
     },
   };
 
-  const dragProps = {
-    drag: 'x' as const,
-    dragConstraints: { left: 0, right: 0 },
-    dragElastic: 0.15,
-    onDragEnd: handleDragEnd,
-    dragDirectionLock: true,
-  };
+  const sessionOnPicker = phase === 'session' && ritualEntry === 'picker' && !!message;
 
   return (
     <PauseSessionGate
@@ -838,126 +964,218 @@ export default function PauseSession() {
             navigate('/pause', { state: { pauseInstanceId: instanceId }, replace: true });
           }}
         />
-        <PauseSessionScaffold
-          curtainLifted={curtainLifted}
-          prefersReducedMotion={!!prefersReducedMotion}
-          onClose={handleClose}
-          phase={phase}
-          step={step}
-          goToStep={goToStep}
-          onHeaderBack={handlePauseHeaderBack}
-          showHeaderBack={showPauseHeaderBack}
-          macroStepIndex={STEPS.indexOf(step) + 1}
-          macroStepTotal={STEPS.length}
-          breathSecondLabelVariant={breathSecondLabelVariant}
-          hideScienceButton={step === 'breathe' || step === 'breath2'}
-          soundMuted={soundMuted}
-          onSoundMutedChange={setSoundMuted}
-        >
-          {phase === 'session' && (
-            <AnimatePresence mode="wait" initial={false}>
-              {step === 'feel' && (
-                <motion.div key="feel" {...stepTransition} {...dragProps}>
-                  <PauseFeel
-                    onMoodSelect={handleMoodSelect}
-                    onMoodSkip={handleMoodSkip}
-                    onMoodReset={handleMoodReset}
-                    moodDone={moodDone}
-                    selectedMood={selectedMood}
-                    feelIntensity={feelIntensity}
-                    onContinue={() => goToStep('breathe')}
-                  />
-                </motion.div>
-              )}
+        {sessionOnPicker ? (
+          <>
+            <PauseDepthPicker
+              contextLine={depthContextLine}
+              onBrief={() => {
+                setRitualEntry('brief');
+                setBriefStep('feel');
+              }}
+              onDeep={() => setRitualEntry('deep')}
+              onAboutPauses={() => setPickerAboutOpen(true)}
+              onClose={handleClose}
+            />
+            <Sheet open={pickerAboutOpen} onOpenChange={setPickerAboutOpen}>
+              <SheetContent
+                side="bottom"
+                className="z-[120] max-h-[88vh] overflow-y-auto rounded-t-2xl border-t p-6 sm:p-8"
+              >
+                <SheetTitle className="sr-only">{t('pause.aboutPauses.sheetTitle')}</SheetTitle>
+                <PauseAboutPausesBody />
+              </SheetContent>
+            </Sheet>
+          </>
+        ) : (
+          <PauseSessionScaffold
+            curtainLifted={curtainLifted}
+            prefersReducedMotion={!!prefersReducedMotion}
+            onClose={handleClose}
+            phase={phase}
+            step={step}
+            goToStep={goToStep}
+            onHeaderBack={handlePauseHeaderBack}
+            showHeaderBack={showPauseHeaderBack}
+            macroStepIndex={ritualEntry === 'brief' ? undefined : STEPS.indexOf(step) + 1}
+            macroStepTotal={ritualEntry === 'brief' ? undefined : STEPS.length}
+            macroProgressLine={briefMacroLine}
+            sessionTitle={ritualEntry === 'brief' ? t('pause.brief.sessionTitle') : undefined}
+            stepperSlot={
+              ritualEntry === 'brief' ? (
+                <PauseBriefProgress currentStep={briefStep} onStepClick={goToBriefPastStep} />
+              ) : undefined
+            }
+            scienceCurrentStep={ritualEntry === 'brief' ? briefStepToPauseScienceStep(briefStep) : undefined}
+            breathSecondLabelVariant={breathSecondLabelVariant}
+            hideScienceButton={
+              ritualEntry === 'brief'
+                ? briefStep === 'breath'
+                : step === 'breathe' || step === 'breath2'
+            }
+            soundMuted={soundMuted}
+            onSoundMutedChange={setSoundMuted}
+          >
+            {phase === 'session' && ritualEntry === 'brief' && (
+              <AnimatePresence mode="wait" initial={false}>
+                {briefStep === 'feel' && (
+                  <motion.div key="b-feel" {...stepTransition}>
+                    <PauseBriefFeel
+                      moodDone={moodDone}
+                      selectedMood={selectedMood}
+                      selectedTile={selectedBriefFace}
+                      feelIntensity={feelIntensity}
+                      onSelect={(mood, intensity, tile) =>
+                        void handleMoodSelect(mood, intensity, { briefRitual: true, briefFace: tile })
+                      }
+                      onContinue={() => setBriefStep('breath')}
+                    />
+                  </motion.div>
+                )}
 
-              {step === 'breathe' && (
-                <motion.div key="breathe" {...stepTransition} {...dragProps}>
-                  <PauseBreathing
-                    ref={breathingRef}
-                    key="breath-segment-first"
-                    breathSegment="first"
-                    mantra={mantra}
-                    severity={severity}
-                    completed={breathingFirstCompleted}
-                    onTimedBreathingChange={setBreathTimedActive}
-                    onPatternComplete={() => setBreathingFirstCompleted(true)}
-                    onContinueAfterBreath={() => void handleContinueAfterFirstBreath()}
-                    onSkipBreath={handleSkipFirstBreath}
-                    ritualSoundMuted={soundMuted}
-                  />
-                </motion.div>
-              )}
+                {briefStep === 'breath' && (
+                  <motion.div key="b-breath" {...stepTransition}>
+                    <PauseBreathing
+                      ref={breathingRef}
+                      key="breath-brief"
+                      breathSegment="first"
+                      ritualVariant="brief"
+                      mantra={mantra}
+                      severity={severity}
+                      completed={breathingFirstCompleted}
+                      onTimedBreathingChange={setBreathTimedActive}
+                      onPatternComplete={() => setBreathingFirstCompleted(true)}
+                      onContinueAfterBreath={() => void handleBriefBreathContinue()}
+                      onSkipBreath={handleBriefSkipBreath}
+                      ritualSoundMuted={soundMuted}
+                    />
+                  </motion.div>
+                )}
 
-              {step === 'reflect' && (
-                <motion.div key="reflect" {...stepTransition} {...dragProps}>
-                  <PauseReflect
-                    companions={companions}
-                    companionPrefs={companionPrefs}
-                    severity={severity}
-                    pauseInstanceId={pauseInstanceId}
-                    context={context}
-                    reflectionMessage={message}
-                    isFavorite={isFavorite}
-                    onToggleFavorite={toggleFavorite}
-                    subscribed={subscribed}
-                    onContinue={() => goToStep('frame')}
-                    mood={selectedMood}
-                  />
-                </motion.div>
-              )}
+                {briefStep === 'integrate' && (
+                  <motion.div key="b-integrate" {...stepTransition}>
+                    <PauseBriefIntegrate done={briefIntegrateDone} onComplete={handleBriefIntegrateComplete} />
+                  </motion.div>
+                )}
 
-              {step === 'frame' && (
-                <motion.div key="frame" {...stepTransition} {...dragProps}>
-                  <PauseFrame
-                    companions={companions}
-                    pauseInstanceId={pauseInstanceId}
-                    reflectionMessage={message}
-                    onImDone={() => void handleFrameImDone()}
-                  />
-                </motion.div>
-              )}
+                {briefStep === 'decide' && (
+                  <motion.div key="b-decide" {...stepTransition}>
+                    <PauseDecide
+                      onDecide={handleDecide}
+                      onBack={() => setBriefStep('integrate')}
+                      introKicker={t('pause.brief.decideKicker', { defaultValue: 'Step 4 · Decide' })}
+                    />
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            )}
 
-              {step === 'breath2' && (
-                <motion.div key="breath2" {...stepTransition} {...dragProps}>
-                  <PauseBreathing
-                    ref={breathingRef}
-                    key="breath-segment-second"
-                    breathSegment="second"
-                    mantra={mantra}
-                    severity={severity}
-                    completed={breathingSecondCompleted}
-                    onTimedBreathingChange={setBreathTimedActive}
-                    onPatternComplete={() => setBreathingSecondCompleted(true)}
-                    onContinueAfterBreath={() => void handleContinueAfterSecondBreath()}
-                    onSkipBreath={handleSkipSecondBreath}
-                    ritualSoundMuted={soundMuted}
-                  />
-                </motion.div>
-              )}
+            {phase === 'session' && ritualEntry === 'deep' && (
+              <AnimatePresence mode="wait" initial={false}>
+                {step === 'feel' && (
+                  <motion.div key="feel" {...stepTransition}>
+                    <PauseFeel
+                      onMoodSelect={handleMoodSelect}
+                      onMoodSkip={handleMoodSkip}
+                      onMoodReset={handleMoodReset}
+                      moodDone={moodDone}
+                      selectedMood={selectedMood}
+                      feelIntensity={feelIntensity}
+                      onContinue={() => goToStep('breathe')}
+                    />
+                  </motion.div>
+                )}
 
-              {step === 'choose' && (
-                <motion.div key="choose" {...stepTransition} {...dragProps}>
-                  <PauseChooseBridge
-                    onChoose={() => {
-                      setDecideOnBackStep('choose');
-                      goToStep('decide');
-                    }}
-                  />
-                </motion.div>
-              )}
+                {step === 'breathe' && (
+                  <motion.div key="breathe" {...stepTransition}>
+                    <PauseBreathing
+                      ref={breathingRef}
+                      key="breath-segment-first"
+                      breathSegment="first"
+                      ritualVariant="deep"
+                      mantra={mantra}
+                      severity={severity}
+                      completed={breathingFirstCompleted}
+                      onTimedBreathingChange={setBreathTimedActive}
+                      onPatternComplete={() => setBreathingFirstCompleted(true)}
+                      onContinueAfterBreath={() => void handleContinueAfterFirstBreath()}
+                      onSkipBreath={handleSkipFirstBreath}
+                      ritualSoundMuted={soundMuted}
+                    />
+                  </motion.div>
+                )}
 
-              {step === 'decide' && (
-                <motion.div key="decide" {...stepTransition} {...dragProps}>
-                  <PauseDecide onDecide={handleDecide} onBack={() => goToStep(decideOnBackStep)} />
-                </motion.div>
-              )}
-            </AnimatePresence>
-          )}
+                {step === 'reflect' && (
+                  <motion.div key="reflect" {...stepTransition}>
+                    <PauseReflect
+                      companions={companions}
+                      companionPrefs={companionPrefs}
+                      severity={severity}
+                      pauseInstanceId={pauseInstanceId}
+                      context={context}
+                      reflectionMessage={message}
+                      isFavorite={isFavorite}
+                      onToggleFavorite={toggleFavorite}
+                      subscribed={subscribed}
+                      onContinue={() => goToStep('frame')}
+                      mood={selectedMood}
+                    />
+                  </motion.div>
+                )}
 
-          {phase === 'done' && (
-            <PauseDone decision={decision} onReturn={handleReturn} pauseData={pauseImpactData} />
-          )}
-        </PauseSessionScaffold>
+                {step === 'frame' && (
+                  <motion.div key="frame" {...stepTransition}>
+                    <PauseFrame
+                      companions={companions}
+                      pauseInstanceId={pauseInstanceId}
+                      reflectionMessage={message}
+                      onImDone={() => void handleFrameImDone()}
+                    />
+                  </motion.div>
+                )}
+
+                {step === 'breath2' && (
+                  <motion.div key="breath2" {...stepTransition}>
+                    <PauseBreathing
+                      ref={breathingRef}
+                      key="breath-segment-second"
+                      breathSegment="second"
+                      ritualVariant="deep"
+                      mantra={mantra}
+                      severity={severity}
+                      completed={breathingSecondCompleted}
+                      onTimedBreathingChange={setBreathTimedActive}
+                      onPatternComplete={() => setBreathingSecondCompleted(true)}
+                      onContinueAfterBreath={() => void handleContinueAfterSecondBreath()}
+                      onSkipBreath={handleSkipSecondBreath}
+                      ritualSoundMuted={soundMuted}
+                    />
+                  </motion.div>
+                )}
+
+                {step === 'choose' && (
+                  <motion.div key="choose" {...stepTransition}>
+                    <PauseChooseBridge
+                      onChoose={() => {
+                        setDecideOnBackStep('choose');
+                        goToStep('decide');
+                      }}
+                    />
+                  </motion.div>
+                )}
+
+                {step === 'decide' && (
+                  <motion.div key="decide" {...stepTransition}>
+                    <PauseDecide onDecide={handleDecide} onBack={() => goToStep(decideOnBackStep)} />
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            )}
+
+            {phase === 'done' && (
+              <PauseDone decision={decision} onReturn={handleReturn} pauseData={pauseImpactData} />
+            )}
+          </PauseSessionScaffold>
+        )}
       </>
     </PauseSessionGate>
   );

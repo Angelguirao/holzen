@@ -1,10 +1,14 @@
 import type { MoodValue } from '@/components/MoodCheck';
+import type { BriefFeelTile } from '@/components/pause/PauseBriefFeel';
 import type { CompanionData, CompanionPrefs } from '@/components/CompanionSection';
 import type { PauseStep } from '@/components/pause/PauseProgress';
 
 const SESSION_KEY = 'holzen_pause_session';
-/** Bump when persisted step model changes (Choose bridge + seven macro steps). */
-export const PAUSE_RITUAL_SCHEMA_VERSION = 3 as const;
+/** Bump when persisted step model changes (v4: brief vs deep ritual). */
+export const PAUSE_RITUAL_SCHEMA_VERSION = 4 as const;
+
+export type RitualDepth = 'deep' | 'brief';
+export type BriefPauseStep = 'feel' | 'breath' | 'integrate' | 'decide';
 
 export interface PersistedSession {
   message: string;
@@ -38,6 +42,14 @@ export interface PersistedSession {
   pauseRitualSchema?: number;
   /** Decide screen back target: normal flow uses Choose; skip-second-breath jumps straight to Decide. */
   decideOnBackStep?: 'choose' | 'breath2';
+  /** v4: which ritual path; omitted in older saves → treated as deep when migrating. */
+  ritualDepth?: RitualDepth;
+  /** v4: macro position inside the four-step brief ritual. */
+  briefStep?: BriefPauseStep;
+  /** v4: user finished the 20s integrate beat (or tapped Continue early). */
+  briefIntegrateDone?: boolean;
+  /** v4: which tile was chosen on the brief Feel grid (Other maps to uncertain in RPC mood). */
+  briefFace?: BriefFeelTile | null;
 }
 
 export const DEFAULT_COMPANIONS: CompanionData = { haiku: null, groundingTitle: null, groundingBody: null };
@@ -82,11 +94,21 @@ export function migratePersistedPauseSession(raw: PersistedSession): PersistedSe
     };
   }
 
+  if (raw.pauseRitualSchema === 3) {
+    return migratePersistedPauseSession({
+      ...raw,
+      ...normalizePauseRitualFields(raw),
+      ritualDepth: 'deep',
+      pauseRitualSchema: PAUSE_RITUAL_SCHEMA_VERSION,
+    });
+  }
+
   if (raw.pauseRitualSchema === 2) {
     return {
       ...raw,
       ...normalizePauseRitualFields(raw),
       decideOnBackStep: raw.decideOnBackStep ?? (raw.step === 'decide' ? 'breath2' : undefined),
+      ritualDepth: 'deep',
       pauseRitualSchema: PAUSE_RITUAL_SCHEMA_VERSION,
     };
   }
@@ -141,6 +163,7 @@ export function migratePersistedPauseSession(raw: PersistedSession): PersistedSe
     breathingSecondCompleted,
     frameDone,
     decideOnBackStep: step === 'decide' ? 'breath2' : undefined,
+    ritualDepth: 'deep',
     pauseRitualSchema: PAUSE_RITUAL_SCHEMA_VERSION,
   };
 }
