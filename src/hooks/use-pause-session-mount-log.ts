@@ -1,23 +1,15 @@
 import { useEffect } from 'react';
 import { holzenLog } from '@/lib/holzen-console';
-import type { BriefPauseStep, RitualDepth } from '@/lib/pause-session-storage';
+import type { PauseSessionMountLogParams } from '@/lib/pause-session-mount-log-params';
 
 /**
  * One-shot dev diagnostic when `/pause` mounts. Arguments are read from the **first** render only
  * (empty dependency array); matches prior inline `PauseSession` behavior.
  *
- * `ritualEntryInitial` / `briefStepInitial` / `phaseInitial` mirror the page’s `useState` initializers
- * (no PII) so `[holzen:pause]` traces can distinguish picker vs resumed brief/deep and Done restores.
+ * Prefer `buildPauseSessionMountLogParams` at the call site so restore + nav + hydration
+ * wiring stays in one place. Fields are non-PII so `[holzen:pause]` traces can triage restores.
  */
-export function usePauseSessionMountLog(params: {
-  pauseInstanceIdPrefix: string | null;
-  hasNavMessage: boolean;
-  restoredFromStorage: boolean;
-  hydrationStatus: 'ready' | 'fetch' | 'empty';
-  ritualEntryInitial: RitualDepth | 'picker';
-  briefStepInitial: BriefPauseStep;
-  phaseInitial: 'session' | 'done';
-}): void {
+export function usePauseSessionMountLog(params: PauseSessionMountLogParams): void {
   useEffect(() => {
     holzenLog.pause('mount', {
       pauseInstanceIdPrefix: params.pauseInstanceIdPrefix,
