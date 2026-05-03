@@ -28,6 +28,7 @@ import { PauseDone } from '@/components/pause/PauseDone';
 import { PauseDepthPicker } from '@/components/pause/PauseDepthPicker';
 import { PauseBriefProgress } from '@/components/pause/PauseBriefProgress';
 import { BRIEF_PAUSE_ORDER } from '@/lib/brief-pause-order';
+import { computeBriefPastStepClick } from '@/lib/brief-pause-past-step-click';
 import { computeBriefRitualGoBack } from '@/lib/brief-pause-go-back';
 import { pauseStepSwipeDirection } from '@/lib/pause-step-swipe-direction';
 import { computeDeepRitualGoBackTarget } from '@/lib/pause-deep-go-back';
@@ -739,13 +740,12 @@ export default function PauseSession() {
 
   const goToBriefPastStep = useCallback(
     (target: BriefPauseStep) => {
-      const ti = BRIEF_PAUSE_ORDER.indexOf(target);
-      const ci = BRIEF_PAUSE_ORDER.indexOf(briefStep);
-      if (ti >= ci) return;
+      const nav = computeBriefPastStepClick(target, briefStep);
+      if (!nav) return;
       setSwipeDirection('back');
       hapticFeedback('light');
-      setBriefStep(target);
-      if (target === 'breath' || target === 'feel') setBriefIntegrateDone(false);
+      setBriefStep(nav.target);
+      if (nav.clearBriefIntegrateDone) setBriefIntegrateDone(false);
     },
     [briefStep],
   );
