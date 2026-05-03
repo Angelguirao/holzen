@@ -8,6 +8,8 @@ export const pauseStepLayout = {
   columnDone: 'flex w-full min-h-[56vh] flex-col items-center justify-center gap-10 text-center',
   /** Reflect: full-width content inside scaffold `max-w-lg`. */
   columnFlow: 'mx-auto flex w-full flex-col gap-8 pb-4',
+  /** Top-aligned column: brief Feel step. */
+  columnTop: 'flex w-full flex-col items-stretch gap-8 pt-4 pb-4',
   screenTitle: 'max-w-md text-center font-editorial text-xl leading-snug text-foreground sm:text-2xl',
   screenSubtitle: 'mx-auto max-w-sm text-center text-sm leading-relaxed text-muted-foreground',
   backRow: 'flex justify-center pt-1',
