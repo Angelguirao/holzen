@@ -55,6 +55,12 @@ import {
 } from '@/lib/pause-session-storage';
 import { pauseLogStep } from '@/lib/pause-api';
 import { breathCompletedSegment1Payload, breathCompletedSegment2Payload } from '@/lib/pause-breath-completed-payload';
+import {
+  buildInitialEmotionLoggedPayload,
+  initialEmotionLogDedupeKey,
+  initialEmotionSkippedLogDedupeKey,
+  initialEmotionSkippedLoggedPayload,
+} from '@/lib/pause-initial-emotion-log';
 import { buildPauseImpactDataOnComplete, type PauseImpactData } from '@/lib/pause-impact-data';
 import { showPauseFavoriteProHintToast } from '@/lib/pause-favorite-toast';
 import { showPauseOutcomeNotCompletedToast, showPauseOutcomeSaveFailedToast } from '@/lib/pause-outcome-toast';
@@ -503,11 +509,8 @@ export default function PauseSession() {
       opts?: { briefRitual?: boolean; briefFace?: BriefFeelTile },
     ) => {
       hapticFeedback('light');
-      const payload: Record<string, unknown> =
-        typeof intensity === 'number' ? { mood, intensity } : { mood };
-      if (opts?.briefRitual) payload.brief_ritual = true;
-      if (opts?.briefFace) payload.brief_face = opts.briefFace;
-      const logKey = JSON.stringify({ ...payload, _bf: opts?.briefFace });
+      const payload = buildInitialEmotionLoggedPayload(mood, intensity, opts);
+      const logKey = initialEmotionLogDedupeKey(payload, opts?.briefFace);
       if (pauseInstanceId && lastFeelLogKeyRef.current === logKey) {
         setMoodDone(true);
         setSelectedMood(mood);
@@ -546,9 +549,9 @@ export default function PauseSession() {
         await pauseLogStep({
           instanceId: pauseInstanceId,
           stepType: 'initial_emotion_logged',
-          payload: { skipped: true },
+          payload: initialEmotionSkippedLoggedPayload(),
         });
-        lastFeelLogKeyRef.current = JSON.stringify({ skipped: true });
+        lastFeelLogKeyRef.current = initialEmotionSkippedLogDedupeKey();
       } catch {
         showPauseStepSyncFailedToast(t);
         return;
