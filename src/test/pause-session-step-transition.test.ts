@@ -1,5 +1,14 @@
 import { describe, expect, it } from 'vitest';
-import { buildPauseSessionStepTransitionConfig } from '@/lib/pause-session-step-transition';
+import {
+  PAUSE_SESSION_STEP_SLIDE_OFFSET_PX,
+  buildPauseSessionStepTransitionConfig,
+} from '@/lib/pause-session-step-transition';
+
+describe('PAUSE_SESSION_STEP_SLIDE_OFFSET_PX', () => {
+  it('matches legacy PauseSession slide distance', () => {
+    expect(PAUSE_SESSION_STEP_SLIDE_OFFSET_PX).toBe(80);
+  });
+});
 
 describe('buildPauseSessionStepTransitionConfig', () => {
   it('uses full slide distance when motion is allowed', () => {
@@ -7,8 +16,8 @@ describe('buildPauseSessionStepTransitionConfig', () => {
       swipeDirection: 'forward',
       prefersReducedMotion: false,
     });
-    expect(fwd.initial).toEqual({ opacity: 0, x: 80 });
-    expect(fwd.exit).toEqual({ opacity: 0, x: -80 });
+    expect(fwd.initial).toEqual({ opacity: 0, x: PAUSE_SESSION_STEP_SLIDE_OFFSET_PX });
+    expect(fwd.exit).toEqual({ opacity: 0, x: -PAUSE_SESSION_STEP_SLIDE_OFFSET_PX });
     expect(fwd.transition.duration).toBe(0.35);
   });
 
@@ -17,8 +26,8 @@ describe('buildPauseSessionStepTransitionConfig', () => {
       swipeDirection: 'back',
       prefersReducedMotion: false,
     });
-    expect(back.initial).toEqual({ opacity: 0, x: -80 });
-    expect(back.exit).toEqual({ opacity: 0, x: 80 });
+    expect(back.initial).toEqual({ opacity: 0, x: -PAUSE_SESSION_STEP_SLIDE_OFFSET_PX });
+    expect(back.exit).toEqual({ opacity: 0, x: PAUSE_SESSION_STEP_SLIDE_OFFSET_PX });
   });
 
   it('zeros slide and shortens duration when reduced motion', () => {
