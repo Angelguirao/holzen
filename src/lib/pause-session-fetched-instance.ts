@@ -1,6 +1,14 @@
 import type { FetchedPauseInstance } from '@/lib/pause-session-storage';
 import { companionDataFromArtifacts } from '@/lib/pause-session-storage';
 
+/**
+ * Pure mapping from Supabase `pause_instances` + `pause_ai_artifacts` reads into `FetchedPauseInstance`
+ * for id-only `/pause` hydration.
+ *
+ * **Caller:** `src/hooks/use-pause-session-fetch.ts`. **Docs:** `docs/systems/pause-system.md` section 7.2 and
+ * section 10 (shell hydration row lists this file).
+ */
+
 /** `pause_instances` row shape used when hydrating `/pause` from id only. */
 export type PauseInstanceContextSnapshotRow = {
   context_snapshot: Record<string, unknown> | null;
@@ -11,10 +19,7 @@ export type PauseAiArtifactKindRow = {
   content: Record<string, unknown>;
 };
 
-/**
- * Pure fold of `pause_instances.context_snapshot` + `pause_ai_artifact` rows into
- * {@link FetchedPauseInstance} for the Archive/Bell deep-link fetch path in `PauseSession`.
- */
+/** Folds `context_snapshot` + artifact rows (reflection + companions) into `FetchedPauseInstance`. */
 export function buildFetchedPauseInstanceFromFetch(
   pauseInstanceId: string,
   inst: PauseInstanceContextSnapshotRow,
