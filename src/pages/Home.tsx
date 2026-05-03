@@ -31,8 +31,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/use-auth';
 import { toast } from 'sonner';
 import { AlertCircle, ChevronDown, Loader2, Pin, Sparkles, RefreshCw } from 'lucide-react';
-import { AutoCooldownIndicator, NeedAMomentButton } from '@/components/home/HomePauseChrome';
-import { HomePauseEmptyBetweenContent } from '@/components/home/HomePauseEmptyBetweenContent';
+import { HomePauseEmptyFlow } from '@/components/home/HomePauseEmptyFlow';
 import { homeInWidget } from '@/components/home/home-widget-styles';
 import { cn } from '@/lib/utils';
 import { BulkHoldCard } from '@/components/BulkHoldCard';
@@ -458,6 +457,44 @@ const Home = () => {
     return <SnoozeToolbarControl />;
   }, [subscriptionReady, hasAccess]);
 
+  const pauseEmptyPinnedPreview = useMemo(
+    () =>
+      pinnedPausePreview ? (
+        <div className={cn(homeInWidget.inset, 'space-y-3')}>
+          <div className="flex items-center justify-between gap-2">
+            <div className="flex items-center gap-2 text-muted-foreground">
+              <Pin className="h-3.5 w-3.5 shrink-0" />
+              <span className={homeInWidget.kicker}>{t('common.pinned')}</span>
+            </div>
+            <button
+              type="button"
+              onClick={unpinPausePreview}
+              className="text-xs font-medium text-muted-foreground transition-colors hover:text-foreground"
+            >
+              {t('common.unpin')}
+            </button>
+          </div>
+          {(pinnedContextHomePreview.btc24h || pinnedContextHomePreview.marketSentiment) ? (
+            <div className={cn(homeInWidget.meta, 'space-y-1')}>
+              {pinnedContextHomePreview.btc24h ? (
+                <p className="leading-snug">{pinnedContextHomePreview.btc24h}</p>
+              ) : null}
+              {pinnedContextHomePreview.marketSentiment ? (
+                <p className="leading-snug">{pinnedContextHomePreview.marketSentiment}</p>
+              ) : null}
+            </div>
+          ) : null}
+        </div>
+      ) : null,
+    [
+      pinnedPausePreview,
+      pinnedContextHomePreview.btc24h,
+      pinnedContextHomePreview.marketSentiment,
+      t,
+      unpinPausePreview,
+    ],
+  );
+
   if (!profileLoaded) {
     return <AuthLoading />;
   }
@@ -530,12 +567,19 @@ const Home = () => {
               <SubscriptionSkeleton variant="centered" />
             </motion.div>
           ) : (
-            <motion.div key="zen-empty" variants={zenVariants} initial="hidden" animate="visible" exit="hidden" className="space-y-4 text-center">
+            <motion.div key="zen-empty" variants={zenVariants} initial="hidden" animate="visible" exit="hidden" className="text-center">
               {hasAccess && !showLimitUpsell ? (
-                <>
-                  <NeedAMomentButton onTrigger={handleNeedAPause} cooldownRemaining={manualCooldownRemaining} loading={loading} />
-                  <HomePauseEmptyBetweenContent />
-                </>
+                <HomePauseEmptyFlow
+                  variant="zen"
+                  pinnedPreview={pauseEmptyPinnedPreview}
+                  showPauseScheduling={showPauseScheduling}
+                  autoCooldownRemaining={autoCooldownRemaining}
+                  cooldownHours={cooldownHours}
+                  nextCronCheckIn={nextCronCheckIn}
+                  onNeedPause={handleNeedAPause}
+                  manualCooldownRemaining={manualCooldownRemaining}
+                  pauseLoading={loading}
+                />
               ) : (
                 <>
                   <p className="text-sm text-muted-foreground font-mono leading-relaxed">
@@ -672,52 +716,21 @@ const Home = () => {
                   </button>
                 </div>
               ) : (
-                <div className="space-y-4">
-                  {pinnedPausePreview && (
-                    <div className={cn(homeInWidget.inset, 'space-y-3')}>
-                      <div className="flex items-center justify-between gap-2">
-                        <div className="flex items-center gap-2 text-muted-foreground">
-                          <Pin className="h-3.5 w-3.5 shrink-0" />
-                          <span className={homeInWidget.kicker}>{t('common.pinned')}</span>
-                        </div>
-                        <button
-                          type="button"
-                          onClick={unpinPausePreview}
-                          className="text-xs font-medium text-muted-foreground transition-colors hover:text-foreground"
-                        >
-                          {t('common.unpin')}
-                        </button>
-                      </div>
-                      {(pinnedContextHomePreview.btc24h || pinnedContextHomePreview.marketSentiment) ? (
-                        <div className={cn(homeInWidget.meta, 'space-y-1')}>
-                          {pinnedContextHomePreview.btc24h ? (
-                            <p className="leading-snug">{pinnedContextHomePreview.btc24h}</p>
-                          ) : null}
-                          {pinnedContextHomePreview.marketSentiment ? (
-                            <p className="leading-snug">{pinnedContextHomePreview.marketSentiment}</p>
-                          ) : null}
-                        </div>
-                      ) : null}
-                    </div>
-                  )}
-                  <NeedAMomentButton onTrigger={handleNeedAPause} cooldownRemaining={manualCooldownRemaining} loading={loading} />
-                  <HomePauseEmptyBetweenContent />
-                </div>
+                <HomePauseEmptyFlow
+                  pinnedPreview={pauseEmptyPinnedPreview}
+                  showPauseScheduling={showPauseScheduling}
+                  autoCooldownRemaining={autoCooldownRemaining}
+                  cooldownHours={cooldownHours}
+                  nextCronCheckIn={nextCronCheckIn}
+                  onNeedPause={handleNeedAPause}
+                  manualCooldownRemaining={manualCooldownRemaining}
+                  pauseLoading={loading}
+                />
               )}
             </>
           )}
         </>
       )}
-
-      {showPauseScheduling ? (
-        <div className="border-t border-border/40 pt-2.5">
-          <AutoCooldownIndicator
-            cooldownRemaining={autoCooldownRemaining}
-            cooldownHours={cooldownHours}
-            nextCronCheckIn={nextCronCheckIn}
-          />
-        </div>
-      ) : null}
     </div>
   );
 
