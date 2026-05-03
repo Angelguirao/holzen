@@ -55,6 +55,7 @@ import {
   clearSession,
 } from '@/lib/pause-session-storage';
 import { pauseLogStep } from '@/lib/pause-api';
+import { breathCompletedSegment1Payload, breathCompletedSegment2Payload } from '@/lib/pause-breath-completed-payload';
 import type { PauseState } from '@/lib/pause-state';
 import { getSessionQuote } from '@/lib/wisdom-quotes';
 import { usePauseSessionShell } from '@/hooks/use-pause-session-shell';
@@ -314,7 +315,7 @@ export default function PauseSession() {
       await pauseLogStep({
         instanceId: pauseInstanceId,
         stepType: 'breath_completed',
-        payload: briefRitual ? { breath_segment: 1, brief_ritual: true } : { breath_segment: 1 },
+        payload: breathCompletedSegment1Payload({ briefRitual: !!briefRitual }),
       });
       breath1RpcDoneRef.current = true;
       return true;
@@ -336,7 +337,7 @@ export default function PauseSession() {
       await pauseLogStep({
         instanceId: pauseInstanceId,
         stepType: 'breath_completed',
-        payload: { breath_segment: 2 },
+        payload: breathCompletedSegment2Payload(),
       });
       breath2RpcDoneRef.current = true;
       return true;
@@ -421,7 +422,7 @@ export default function PauseSession() {
         await pauseLogStep({
           instanceId: pauseInstanceId,
           stepType: 'breath_completed',
-          payload: { skipped: true, breath_segment: 1 },
+          payload: breathCompletedSegment1Payload({ skipped: true }),
         });
         breath1RpcDoneRef.current = true;
       } catch {
@@ -446,7 +447,7 @@ export default function PauseSession() {
         await pauseLogStep({
           instanceId: pauseInstanceId,
           stepType: 'breath_completed',
-          payload: { skipped: true, breath_segment: 2 },
+          payload: breathCompletedSegment2Payload({ skipped: true }),
         });
         breath2RpcDoneRef.current = true;
       } catch {
@@ -481,7 +482,7 @@ export default function PauseSession() {
         await pauseLogStep({
           instanceId: pauseInstanceId,
           stepType: 'breath_completed',
-          payload: { skipped: true, breath_segment: 1, brief_ritual: true },
+          payload: breathCompletedSegment1Payload({ skipped: true, briefRitual: true }),
         });
         breath1RpcDoneRef.current = true;
       } catch {
