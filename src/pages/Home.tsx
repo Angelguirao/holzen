@@ -19,22 +19,23 @@ import { useHomeDocumentTitle } from '@/hooks/use-home-document-title';
 import { useHomeHeroQuoteViewed } from '@/hooks/use-home-hero-quote-viewed';
 import { useHomePauseAudio } from '@/hooks/use-home-pause-audio';
 import { useHomeMarketDisplayPreferences } from '@/hooks/use-home-market-display-preferences';
-import { useState, useMemo } from 'react';
+import { useState } from 'react';
 import { useOutletContext, useSearchParams, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '@/hooks/use-auth';
-import { HolzenNumber } from '@/components/HolzenNumber';
 import { useNightReflection } from '@/components/NightReflectionCard';
 import { useHomeVisibleSections } from '@/hooks/use-home-visible-sections';
 import { useHomeCustomizeBridge } from '@/hooks/use-home-customize-bridge';
 import { useHomeMarketGoalHeaders } from '@/hooks/use-home-market-goal-headers';
 import { useHomePauseActions } from '@/hooks/use-home-pause-actions';
 import { useHomePauseCardProjection } from '@/hooks/use-home-pause-card-projection';
-import { useHomeDashboardSectionDeps } from '@/hooks/use-home-dashboard-section-deps';
-import { useHomeDashboardSectionRenderers } from '@/hooks/use-home-dashboard-section-renderers';
+import { useHomeDashboardTodayWiring } from '@/hooks/use-home-dashboard-today-wiring';
 import { getHomeSubscriptionGate } from '@/lib/home-subscription-gate';
 import { useHomePauseContextPreviews } from '@/hooks/use-home-pause-context-previews';
 import { useHomePullFullReload } from '@/hooks/use-home-pull-full-reload';
 import { useHomeZenModeRouteProps } from '@/hooks/use-home-zen-route-props';
+import { useHomeDashboardLayoutProps } from '@/hooks/use-home-dashboard-layout-props';
+import type { HomeAppLayoutOutletContext } from '@/lib/home-app-layout-outlet';
+import type { TrackedAssetId } from '@/lib/tracked-assets';
 
 const Home = () => {
   const { t } = useTranslation();
@@ -82,7 +83,7 @@ const Home = () => {
     loading,
   });
 
-  const outletCtx = useOutletContext<{ pauseReady?: boolean; dismissPauseReady?: () => void }>();
+  const outletCtx = useOutletContext<HomeAppLayoutOutletContext>();
   const pauseReady = outletCtx?.pauseReady ?? false;
   const dismissPauseReady = outletCtx?.dismissPauseReady;
   useHomeOutletPauseReady(pauseReady, message, loading, refreshProfile, dismissPauseReady);
@@ -184,37 +185,35 @@ const Home = () => {
 
   const { pullDistance, refreshing: pullRefreshing, handlers: pullHandlers } = useHomePullFullReload();
 
-  const marketFooter = useMemo(() => <HolzenNumber variant="compact" />, []);
-
-  const sectionDeps = useHomeDashboardSectionDeps({
-    t,
-    goalWhyHoldSummary,
-    setGoalWhyHoldSummary,
-    goalWhyHeaderRight,
-    goalWhyExpanded,
-    error,
-    marketHeaderRight,
-    marketFooter,
-    btcData,
-    priceHidden,
-    togglePriceHidden,
-    currency,
-    trackedAssetId,
-    unitBasisModeSupported,
-    btcMode,
-    toggleBtcMode,
-    marketChartExpanded,
-    toggleMarketChartExpanded,
-    pauseCardBody: pauseProjection.pauseCardBody,
-    pauseSectionHeaderRight: pauseProjection.pauseSectionHeaderRight,
-    nightReflection,
-    dismissNight,
-    subscribed,
-    collapsed,
-    toggleCollapsed,
-  });
-
-  const { renderSection, goalWhyBlock } = useHomeDashboardSectionRenderers(sectionDeps, visibleOrderedSectionIds);
+  const { renderSection, goalWhyBlock } = useHomeDashboardTodayWiring(
+    {
+      t,
+      goalWhyHoldSummary,
+      setGoalWhyHoldSummary,
+      goalWhyHeaderRight,
+      goalWhyExpanded,
+      error,
+      marketHeaderRight,
+      btcData,
+      priceHidden,
+      togglePriceHidden,
+      currency,
+      trackedAssetId: trackedAssetId as TrackedAssetId,
+      unitBasisModeSupported,
+      btcMode,
+      toggleBtcMode,
+      marketChartExpanded,
+      toggleMarketChartExpanded,
+      pauseCardBody: pauseProjection.pauseCardBody,
+      pauseSectionHeaderRight: pauseProjection.pauseSectionHeaderRight,
+      nightReflection,
+      dismissNight,
+      subscribed,
+      collapsed,
+      toggleCollapsed,
+    },
+    visibleOrderedSectionIds,
+  );
 
   const zenRouteProps = useHomeZenModeRouteProps({
     message,
@@ -242,6 +241,21 @@ const Home = () => {
     onStartCheckoutPro: pauseActions.startProCheckout,
   });
 
+  const dashboardLayout = useHomeDashboardLayoutProps({
+    pullHandlers,
+    pullDistance,
+    pullRefreshing,
+    userId: user?.id,
+    firstName,
+    todaySectionIds,
+    showJourneyStatTiles,
+    goalWhyBlock,
+    renderSection,
+    onOpenCustomize,
+    customize: customizeSheet,
+    completedPauseCount,
+  });
+
   if (!profileLoaded) {
     return <AuthLoading />;
   }
@@ -254,22 +268,7 @@ const Home = () => {
     return <HomeZenModeRoute {...zenRouteProps} />;
   }
 
-  return (
-    <HomeDashboardLayout
-      pullHandlers={pullHandlers}
-      pullDistance={pullDistance}
-      pullRefreshing={pullRefreshing}
-      userId={user?.id}
-      firstName={firstName}
-      todaySectionIds={todaySectionIds}
-      showJourneyStatTiles={showJourneyStatTiles}
-      goalWhyBlock={goalWhyBlock}
-      renderSection={renderSection}
-      onOpenCustomize={onOpenCustomize}
-      customize={customizeSheet}
-      completedPauseCount={completedPauseCount}
-    />
-  );
+  return <HomeDashboardLayout {...dashboardLayout} />;
 };
 
 export default Home;
