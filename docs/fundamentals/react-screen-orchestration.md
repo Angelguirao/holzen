@@ -54,8 +54,24 @@ It is **not** a duplicate of [screens/home.md](../screens/home.md) (that file st
 
 Home is the **reference implementation** for this playbook: see [screens/home.md](../screens/home.md) for the concrete file map and [AGENTS.md](../../AGENTS.md) for commands. When another screen reaches similar complexity, compare its `src/pages/*.tsx` to Home’s **orchestration vs. extraction** balance.
 
+## Non-React parallels (edge / server handlers)
+
+The same *shape* of thinking applies to **`supabase/functions/*/index.ts`** and other HTTP entrypoints, even though there are no React hooks:
+
+| Screen / SPA idea | Edge / handler analogue |
+|--------------------|-------------------------|
+| Page as conductor | **`index.ts` stays thin**: parse request → call small modules in `_shared/` or feature files → map result to HTTP. |
+| Named, testable behavior | **Pure parsers + validators** in `src/lib`-style modules (or `_shared/*.ts`) with unit tests where Deno/Vitest fit; keep I/O at the edges. |
+| Types at the source | **Typed request/response shapes** (and `EdgeError` codes) instead of ad-hoc `any` and stringly errors. |
+| UI boundaries / perf | **Single responsibility per function**; avoid mega-handlers; shared **`withRequestLogging`** wrapper for every HTTP-serving `index.ts`. |
+| Document tradeoffs | **Function-level README or ops doc** when auth, rate limits, or deploy order matter; keep [ops/deployment-sync-guide.md](../ops/deployment-sync-guide.md) in mind when `config.toml` or migrations move with code. |
+
+**Canonical edge conventions:** [ops/edge-logging-conventions.md](../ops/edge-logging-conventions.md) (`withRequestLogging`, `logDependencyCall`, `EdgeError`, audit). **Broader logging story:** [ops/logging-strategy.md](../ops/logging-strategy.md) (browser vs edge vs DB, correlation IDs).
+
 ## Related reading
 
 - [refactoring-strategy.md](refactoring-strategy.md) — incremental refactors and full-stack touchpoints.  
 - [navigating-the-codebase.md](navigating-the-codebase.md) — routing, auth, hooks at app level.  
-- [backlog/react-page-and-hook-splitting.md](../backlog/react-page-and-hook-splitting.md) — backlog ideas that overlap with this playbook.
+- [backlog/react-page-and-hook-splitting.md](../backlog/react-page-and-hook-splitting.md) — backlog ideas that overlap with this playbook.  
+- [ops/edge-logging-conventions.md](../ops/edge-logging-conventions.md) — edge handler structure and observability.  
+- [ops/logging-strategy.md](../ops/logging-strategy.md) — where logs live and how they relate to the SPA.
