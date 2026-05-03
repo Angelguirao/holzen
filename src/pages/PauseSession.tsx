@@ -26,7 +26,7 @@ import { PauseDecide } from '@/components/pause/PauseDecide';
 import { PauseDone } from '@/components/pause/PauseDone';
 import { PauseDepthPicker } from '@/components/pause/PauseDepthPicker';
 import { PauseBriefProgress } from '@/components/pause/PauseBriefProgress';
-import { BRIEF_PAUSE_ORDER } from '@/lib/brief-pause-order';
+import { BRIEF_PAUSE_ORDER, computeBriefMacroProgressPosition } from '@/lib/brief-pause-order';
 import { computeBriefPastStepClick } from '@/lib/brief-pause-past-step-click';
 import { computePauseGoBackPlan } from '@/lib/pause-go-back-plan';
 import { pauseStepSwipeDirection } from '@/lib/pause-step-swipe-direction';
@@ -670,13 +670,11 @@ export default function PauseSession() {
     });
   }, [btcData, trackedAssetId, t]);
 
-  const briefMacroLine =
-    ritualEntry === 'brief'
-      ? t('pause.brief.macroProgress', {
-          n: BRIEF_PAUSE_ORDER.indexOf(briefStep) + 1,
-          total: BRIEF_PAUSE_ORDER.length,
-        })
-      : undefined;
+  const briefMacroLine = useMemo(() => {
+    if (ritualEntry !== 'brief') return undefined;
+    const { n, total } = computeBriefMacroProgressPosition(briefStep);
+    return t('pause.brief.macroProgress', { n, total });
+  }, [ritualEntry, briefStep, t]);
 
   const goToBriefPastStep = useCallback(
     (target: BriefPauseStep) => {
