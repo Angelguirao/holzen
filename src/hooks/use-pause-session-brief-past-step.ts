@@ -1,0 +1,28 @@
+import { useCallback, type Dispatch, type SetStateAction } from 'react';
+import { computeBriefPastStepClick } from '@/lib/brief-pause-past-step-click';
+import { hapticFeedback } from '@/lib/haptics';
+import type { BriefPauseStep } from '@/lib/pause-session-storage';
+
+/** Brief progress bar: jump to an earlier macro (swipe + haptics + optional integrate flag clear). */
+export function usePauseSessionBriefPastStep(input: {
+  briefStep: BriefPauseStep;
+  setBriefStep: Dispatch<SetStateAction<BriefPauseStep>>;
+  setBriefIntegrateDone: Dispatch<SetStateAction<boolean>>;
+  setSwipeDirection: Dispatch<SetStateAction<'forward' | 'back'>>;
+}): { goToBriefPastStep: (target: BriefPauseStep) => void } {
+  const { briefStep, setBriefStep, setBriefIntegrateDone, setSwipeDirection } = input;
+
+  const goToBriefPastStep = useCallback(
+    (target: BriefPauseStep) => {
+      const nav = computeBriefPastStepClick(target, briefStep);
+      if (!nav) return;
+      setSwipeDirection('back');
+      hapticFeedback('light');
+      setBriefStep(nav.target);
+      if (nav.clearBriefIntegrateDone) setBriefIntegrateDone(false);
+    },
+    [briefStep, setBriefStep, setBriefIntegrateDone, setSwipeDirection],
+  );
+
+  return { goToBriefPastStep };
+}
