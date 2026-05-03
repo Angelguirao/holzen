@@ -1,6 +1,19 @@
 # Home (`/`)
 
-Authoritative orchestration: [`src/pages/Home.tsx`](../../src/pages/Home.tsx). Zen-only UI lives in [`ZenModeHome.tsx`](../../src/components/home/ZenModeHome.tsx); shared pause error chrome in [`HomePauseBlockingErrorPanel.tsx`](../../src/components/home/HomePauseBlockingErrorPanel.tsx). Small hooks under `src/hooks/use-home-*.ts` isolate checkout toast, zen `localStorage`, pinned preview fetch, and completed-pause count. Pure rules + i18n string mapping: [`home-pause-widget-error.ts`](../../src/lib/home-pause-widget-error.ts).
+Authoritative orchestration: [`src/pages/Home.tsx`](../../src/pages/Home.tsx).
+
+| Piece | File |
+|-------|------|
+| Zen layout | [`ZenModeHome.tsx`](../../src/components/home/ZenModeHome.tsx) |
+| Pause widget body | [`HomePauseCardBody.tsx`](../../src/components/home/HomePauseCardBody.tsx) |
+| Pause error panel | [`HomePauseBlockingErrorPanel.tsx`](../../src/components/home/HomePauseBlockingErrorPanel.tsx) |
+| Pinned preview inset | [`HomePinnedPauseInset.tsx`](../../src/components/home/HomePinnedPauseInset.tsx) |
+| Context meta lines | [`HomePauseContextMeta.tsx`](../../src/components/home/HomePauseContextMeta.tsx) |
+| Expand chevrons | [`HomeExpandChevronButton.tsx`](../../src/components/home/HomeExpandChevronButton.tsx) |
+| Customize copy keys | [`home-customize-section-copy.ts`](../../src/lib/home-customize-section-copy.ts) |
+| Pause error surfacing | [`home-pause-widget-error.ts`](../../src/lib/home-pause-widget-error.ts) |
+
+Hooks (`src/hooks/use-home-*.ts`): checkout welcome toast, zen mode, pinned preview, completed pause count, outlet `pauseReady`, document title, hero quote analytics, pause arrival chime + prefetch, market display preferences (price hide, BTC mode, chart expand).
 
 ## Purpose
 
