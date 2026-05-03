@@ -54,7 +54,6 @@ import {
   clearSession,
 } from '@/lib/pause-session-storage';
 import { pauseLogStep } from '@/lib/pause-api';
-import { breathCompletedSegment1Payload, breathCompletedSegment2Payload } from '@/lib/pause-breath-completed-payload';
 import {
   resolvePauseBreathSecondLabelVariant,
   viteWantsPauseBreathSecondLabelShift,
@@ -170,8 +169,8 @@ export default function PauseSession() {
   const {
     ensureBreathSegment1Logged,
     ensureBreathSegment2Logged,
-    breath1RpcDoneRef,
-    breath2RpcDoneRef,
+    logBreathSegment1Skipped,
+    logBreathSegment2Skipped,
   } = usePauseBreathSegmentRpcLoggers({
     pauseInstanceId,
     initialSegment1Logged: restoredIdx > STEPS.indexOf('breathe'),
@@ -378,42 +377,20 @@ export default function PauseSession() {
 
   const handleSkipFirstBreath = useCallback(async () => {
     setBreathingFirstCompleted(false);
-    if (pauseInstanceId) {
-      try {
-        await pauseLogStep({
-          instanceId: pauseInstanceId,
-          stepType: 'breath_completed',
-          payload: breathCompletedSegment1Payload({ skipped: true }),
-        });
-        breath1RpcDoneRef.current = true;
-      } catch {
-        showPauseStepSyncFailedToast(t);
-        return;
-      }
-    }
+    const ok = await logBreathSegment1Skipped();
+    if (!ok) return;
     setBreathingFirstCompleted(true);
     goToStep('reflect');
-  }, [pauseInstanceId, goToStep, t, breath1RpcDoneRef]);
+  }, [logBreathSegment1Skipped, goToStep]);
 
   const handleSkipSecondBreath = useCallback(async () => {
     setBreathingSecondCompleted(false);
     setDecideOnBackStep('breath2');
-    if (pauseInstanceId) {
-      try {
-        await pauseLogStep({
-          instanceId: pauseInstanceId,
-          stepType: 'breath_completed',
-          payload: breathCompletedSegment2Payload({ skipped: true }),
-        });
-        breath2RpcDoneRef.current = true;
-      } catch {
-        showPauseStepSyncFailedToast(t);
-        return;
-      }
-    }
+    const ok = await logBreathSegment2Skipped();
+    if (!ok) return;
     setBreathingSecondCompleted(true);
     goToStep('decide');
-  }, [pauseInstanceId, goToStep, t, breath2RpcDoneRef]);
+  }, [logBreathSegment2Skipped, goToStep]);
 
   const handleBriefBreathContinue = useCallback(async () => {
     const ok = await ensureBreathSegment1Logged(true);
@@ -428,22 +405,11 @@ export default function PauseSession() {
 
   const handleBriefSkipBreath = useCallback(async () => {
     setBreathingFirstCompleted(false);
-    if (pauseInstanceId) {
-      try {
-        await pauseLogStep({
-          instanceId: pauseInstanceId,
-          stepType: 'breath_completed',
-          payload: breathCompletedSegment1Payload({ skipped: true, briefRitual: true }),
-        });
-        breath1RpcDoneRef.current = true;
-      } catch {
-        showPauseStepSyncFailedToast(t);
-        return;
-      }
-    }
+    const ok = await logBreathSegment1Skipped({ briefRitual: true });
+    if (!ok) return;
     setBreathingFirstCompleted(true);
     setBriefStep('integrate');
-  }, [pauseInstanceId, t, breath1RpcDoneRef]);
+  }, [logBreathSegment1Skipped]);
 
   const handleBriefIntegrateComplete = useCallback(() => {
     if (integrateAdvanceRef.current) return;
