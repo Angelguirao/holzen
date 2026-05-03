@@ -280,11 +280,14 @@ If the return value is `**engaged**` (or anything other than `**completed**`), t
 
 | View                                           | Role                                                                                                                                                                                                                 |
 | ---------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `**v_pause_full**`                             | One logical row per instance plus booleans, latest moods, optional **feel/shift 1–5** columns from payloads, companion counts, artifact snippets — primary read model for Library cards and `**usePauseStatsData`**. |
+| `**v_pause_full**`                             | One logical row per instance plus booleans, latest moods, optional **feel/shift 1–5** columns from payloads, companion counts, artifact snippets — primary read model for Library cards and `**usePauseStatsData`**. Includes `**is_brief_ritual**`: `**EXISTS**` an `**initial_emotion_logged**` row whose payload marks brief ritual (same predicate as `**pause_evaluate_transitions**` — JSON boolean `**true**` or string `**true**` / `**t**` / `**1**`). Use it for **brief vs full (deep) pause ratios** and charts without re-scanning step payloads in app code. |
 | `**v_pause_current**`, `**v_pause_completed**` | Filtered slices for “open” vs terminal completed.                                                                                                                                                                    |
+| `**v_pause_archive_pauses**`, `**v_pause_archive_echoes**` | `**SELECT vf.* FROM v_pause_full vf**` with archive tab predicates (§9). Recreated whenever `**v_pause_full**` gains columns so Library/archive queries stay aligned. |
 
 
 Stats, badges, and journey surfaces should prefer `**v_pause_full**` + batched step/companion queries from `**src/hooks/use-pause-stats-data.ts**` rather than ad-hoc table scans.
+
+**Example (completed pauses, brief share):** `count(*) filter (where is_brief_ritual)` / `count(*)` over `**v_pause_full**` where `**state = 'completed'**` (and your date window). Rows with no qualifying `**initial_emotion_logged**` payload yield `**is_brief_ritual = false**` (deep / legacy / missing flag).
 
 ---
 
