@@ -597,4 +597,5 @@ No hooks in Deno edge functions — but the **ideas** match:
 
 - [refactoring-strategy.md](refactoring-strategy.md) — incremental refactors and full-stack touchpoints.  
 - [navigating-the-codebase.md](navigating-the-codebase.md) — routing, auth, hooks at app level.  
+- [systems/pause-system.md](../systems/pause-system.md) — **`/pause`** ritual, RPCs, **`v_pause_full`** / archive views (companion to thin **`PauseSession.tsx`** orchestration).  
 - [backlog/react-page-and-hook-splitting.md](../backlog/react-page-and-hook-splitting.md) — backlog ideas that overlap with this playbook.

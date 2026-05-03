@@ -92,6 +92,8 @@ Include `pause_instance_id` on each event so journeys line up with Sentry + Bett
 
 PII stance unchanged: no generated pause message text, no companion content, no mood/outcome payload values — just ids, types, and numeric metadata.
 
+**Brief vs deep (product analytics):** cohorts and ratios (“% brief pauses”) should use **Postgres**, not extra PostHog properties on `pause_engaged` / `pause_completed`. Query **`v_pause_full`** (or archive **`v_pause_archive_*`**) and aggregate **`is_brief_ritual`** (same predicate as `pause_evaluate_transitions` on Feel — see **`docs/systems/pause-system.md`** §5.1 and §8).
+
 ### generation
 
 | Event | When | Properties | Owner |
