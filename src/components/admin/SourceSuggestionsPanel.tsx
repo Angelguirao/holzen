@@ -101,7 +101,7 @@ export function SourceSuggestionsPanel({ onCatalogChanged }: { onCatalogChanged?
           type="button"
           onClick={() => fetchRows()}
           disabled={loading}
-          className="text-[9px] font-mono text-muted-foreground/40 hover:text-primary flex items-center gap-1 shrink-0"
+          className="text-[9px] font-sans font-medium text-muted-foreground/40 hover:text-nox-text-link flex items-center gap-1 shrink-0"
         >
           <RefreshCw className={`h-3 w-3 ${loading ? 'animate-spin' : ''}`} />
           Refresh
@@ -127,7 +127,7 @@ export function SourceSuggestionsPanel({ onCatalogChanged }: { onCatalogChanged?
               <div key={row.id} className="rounded-lg border border-border/15 bg-card/5 px-3 py-2 flex flex-col sm:flex-row sm:items-center gap-2 sm:justify-between">
                 <div className="min-w-0 flex-1">
                   <div className="flex flex-wrap items-center gap-2">
-                    <span className="text-[9px] font-mono px-1.5 py-0.5 rounded bg-primary/10 text-primary/80">{CAT_LABEL[row.category] ?? row.category}</span>
+                    <span className="text-[9px] font-mono px-1.5 py-0.5 rounded bg-muted/50 text-muted-foreground">{CAT_LABEL[row.category] ?? row.category}</span>
                     <span className="text-[10px] font-mono text-foreground/85 truncate">{row.suggested_name}</span>
                   </div>
                   {row.suggested_url && (
@@ -135,7 +135,7 @@ export function SourceSuggestionsPanel({ onCatalogChanged }: { onCatalogChanged?
                       href={row.suggested_url}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="text-[9px] text-primary/60 hover:text-primary truncate block mt-0.5"
+                      className="text-[9px] font-sans font-medium text-nox-text-link/70 hover:text-nox-text-link truncate block mt-0.5"
                     >
                       {row.suggested_url}
                     </a>
@@ -149,7 +149,7 @@ export function SourceSuggestionsPanel({ onCatalogChanged }: { onCatalogChanged?
                     type="button"
                     onClick={() => approve(row)}
                     disabled={busy}
-                    className="inline-flex items-center gap-0.5 text-[9px] font-mono text-primary/80 hover:text-primary disabled:opacity-30"
+                    className="inline-flex items-center gap-0.5 text-[9px] font-sans font-medium text-nox-text-link/80 hover:text-nox-text-link disabled:opacity-30"
                   >
                     {busy ? <Loader2 className="h-3 w-3 animate-spin" /> : <Check className="h-3 w-3" />}
                     Approve

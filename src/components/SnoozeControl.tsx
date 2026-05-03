@@ -117,7 +117,7 @@ export function SnoozeControl() {
         <button
           onClick={handleCancel}
           type="button"
-          className="text-xs font-medium text-primary/70 transition-colors hover:text-primary"
+          className="text-xs font-medium text-nox-text-link/80 transition-colors hover:text-nox-text-link"
         >
           {t('snooze.wake', { defaultValue: 'Wake' })}
         </button>
@@ -216,7 +216,7 @@ export function SnoozeToolbarControl() {
           type="button"
           className={cn(
             homeInWidget.iconBtn,
-            isActive && 'text-primary hover:text-primary',
+            isActive && 'text-nox-text-highlight hover:text-nox-text-highlight/80',
           )}
           aria-label={t('snooze.toolbarAria', { defaultValue: 'Snooze automatic pauses' })}
           aria-expanded={open}
@@ -233,7 +233,7 @@ export function SnoozeToolbarControl() {
             <button
               type="button"
               onClick={handleCancel}
-              className="flex w-full items-center justify-center rounded-lg border border-border/50 px-3 py-2 text-sm font-medium text-primary transition-colors hover:bg-muted/40"
+              className="flex w-full items-center justify-center rounded-lg border border-border/50 px-3 py-2 text-sm font-medium text-foreground transition-colors hover:bg-muted/40"
             >
               {t('snooze.wake', { defaultValue: 'Wake' })}
             </button>

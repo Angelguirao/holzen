@@ -106,7 +106,7 @@ export function OnboardingGrounding({ selected, onToggle, stagger }: Props) {
             <button
               onMouseDown={(e) => e.preventDefault()} // prevent blur before click
               onClick={addTag}
-              className="shrink-0 p-1.5 rounded-full border border-primary/30 bg-primary/10 text-primary/60 hover:bg-primary/20 transition-colors"
+              className="shrink-0 p-1.5 rounded-full border border-border/60 bg-muted/40 text-muted-foreground hover:bg-muted/60 transition-colors"
             >
               <Plus className="h-3 w-3" />
             </button>

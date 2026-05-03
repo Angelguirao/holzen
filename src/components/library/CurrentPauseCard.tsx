@@ -66,18 +66,18 @@ export function CurrentPauseCard() {
           },
         })
       }
-      className="w-full rounded-2xl border border-primary/30 bg-primary/5 px-4 py-4 text-left transition-colors hover:bg-primary/10 focus:outline-none focus:ring-2 focus:ring-primary/50"
+      className="w-full rounded-2xl border border-nox-border-default/80 bg-nox-background-accent/25 px-4 py-4 text-left transition-colors hover:bg-nox-background-accent/35 focus:outline-none focus:ring-2 focus:ring-nox-border-focus/50"
       aria-label={t('library.openCurrentPause', {
         defaultValue: 'Open your current pause',
       })}
     >
       <div className="flex items-start gap-3">
-        <div className="mt-0.5 shrink-0 rounded-full bg-primary/15 p-2 text-primary">
+        <div className="mt-0.5 shrink-0 rounded-full bg-nox-text-highlight/15 p-2 text-nox-text-highlight">
           <Pause className="h-4 w-4" aria-hidden />
         </div>
         <div className="min-w-0 flex-1 space-y-1">
           <div className="flex items-baseline justify-between gap-2">
-            <p className="text-xs font-semibold uppercase tracking-widest text-primary">
+            <p className="text-xs font-semibold uppercase tracking-widest text-nox-text-highlight">
               {t('library.currentPause', { defaultValue: 'Current pause' })}
             </p>
             {showWindowClock ? (
@@ -91,7 +91,7 @@ export function CurrentPauseCard() {
               {preview}
             </p>
           )}
-          <div className="flex items-center gap-1 text-xs font-medium text-primary">
+          <div className="flex items-center gap-1 text-xs font-medium text-nox-text-link">
             {t('library.openPauseCta', { defaultValue: 'Open pause' })}
             <ArrowRight className="h-3 w-3" aria-hidden />
           </div>

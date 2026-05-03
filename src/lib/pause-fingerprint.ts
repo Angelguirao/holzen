@@ -2,7 +2,7 @@
  * Client-side mirror of the edge-side context fingerprint helper.
  *
  * Kept in sync manually with `supabase/functions/_shared/pause.ts`:
- *   - `bucketChangePercent` rounds signed BTC percents into stable buckets.
+ *   - `bucketChangePercent` rounds signed market percents into stable buckets.
  *   - `computeContextFingerprint` hashes the regime-relevant context parts.
  *
  * Two identical implementations exist (browser + Deno) because there's no
@@ -39,6 +39,8 @@ export async function computeContextFingerprint(parts: {
   severityBand: string;
   dailyBucketPct: number;
   cumulativeBucketPct: number;
+  /** CoinGecko coin id — keeps fingerprints distinct across assets. */
+  trackedAssetId?: string;
   fearGreedBand?: string | null;
   onChainBand?: string | null;
 }): Promise<string> {
@@ -48,6 +50,7 @@ export async function computeContextFingerprint(parts: {
     s: parts.severityBand,
     db: parts.dailyBucketPct,
     cb: parts.cumulativeBucketPct,
+    a: parts.trackedAssetId ?? 'bitcoin',
     fg: parts.fearGreedBand ?? null,
     oc: parts.onChainBand ?? null,
   });

@@ -309,8 +309,7 @@ export default function Archive() {
             type="button"
             onClick={() => startCheckout('pro')}
             disabled={checkoutLoading}
-            className="group inline-flex items-center gap-1.5 text-sm font-medium underline-offset-4 transition-colors hover:underline disabled:opacity-50"
-            style={{ color: '#24B2C8' }}
+            className="group inline-flex items-center gap-1.5 text-sm font-medium text-nox-text-link underline-offset-4 transition-colors hover:text-nox-text-link/80 hover:underline disabled:opacity-50"
           >
             {t('pro.upgradeCta')}
             <ArrowRight className="h-3.5 w-3.5 transition-transform group-hover:translate-x-0.5" />
@@ -350,7 +349,7 @@ export default function Archive() {
               className={cn(
                 'h-4 w-4 text-muted-foreground/40 transition-transform',
                 refreshing && 'animate-spin',
-                pullDistance > 70 && !refreshing && 'text-primary/60',
+                pullDistance > 70 && !refreshing && 'text-nox-text-link/70',
               )}
               style={{ transform: refreshing ? undefined : `rotate(${pullDistance * 3}deg)` }}
             />
@@ -452,7 +451,7 @@ export default function Archive() {
                   className={cn(
                     'whitespace-nowrap rounded-full border px-2 py-1 text-xs transition-colors',
                     tagFilter === tag
-                      ? 'border-primary/30 bg-primary/10 text-primary'
+                      ? 'border-nox-border-focus/50 bg-nox-background-accent/40 text-nox-text-link'
                       : 'border-border/30 text-muted-foreground/50 hover:text-muted-foreground/70',
                   )}
                 >

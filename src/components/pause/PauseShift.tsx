@@ -211,7 +211,7 @@ export function PauseShift({
               <button
                 type="button"
                 onClick={() => navigate(TOOLS.ground)}
-                className="inline-flex items-center gap-1.5 text-sm font-medium text-primary underline-offset-4 hover:underline"
+                className="inline-flex items-center gap-1.5 text-sm font-medium text-nox-text-link underline-offset-4 transition-colors hover:text-nox-text-link/80 hover:underline"
               >
                 <Anchor className="h-2.5 w-2.5" />
                 {t('pause.goGround', { defaultValue: 'Ground yourself' })}

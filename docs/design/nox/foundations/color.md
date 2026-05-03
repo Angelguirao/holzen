@@ -7,6 +7,8 @@ status: draft
 
 # Color
 
+> **Implementation note (Holzen):** shipped link color is **calm blue `#7FA9D9`** (`--nox-color-text-link`), not the Figma table row below for `color/text/link` (`#22D3EE`). See **[DESIGN.md](../../../DESIGN.md)** for the agent-oriented summary. When Figma variables match production again, update this table and `src/index.css` together.
+
 ## Semantic tokens
 
 - `color/text/{primary,secondary,muted,contrast,highlight,link}`

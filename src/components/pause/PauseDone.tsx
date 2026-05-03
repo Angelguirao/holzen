@@ -47,7 +47,7 @@ export function PauseDone({ decision, onReturn, pauseData }: Props) {
           transition={{ duration: 0.6, times: [0, 0.6, 1], ease: 'easeOut' }}
           className="w-[72px] h-[72px] rounded-full bg-primary/8 flex items-center justify-center"
         >
-          <Flame className="h-7 w-7 text-primary/60" />
+          <Flame className="h-7 w-7 text-muted-foreground" />
         </motion.div>
         {[...Array(6)].map((_, i) => (
           <motion.div
@@ -71,7 +71,7 @@ export function PauseDone({ decision, onReturn, pauseData }: Props) {
         transition={{ delay: 0.4, duration: 0.6 }}
         className="flex items-center gap-2"
       >
-        <Flame className="h-4 w-4 text-primary" />
+        <Flame className="h-4 w-4 text-nox-text-highlight" />
         <p className="text-sm font-medium text-muted-foreground">
           {t('outcome.streakUpdated')}
         </p>
@@ -89,7 +89,7 @@ export function PauseDone({ decision, onReturn, pauseData }: Props) {
           transition={{ delay: 0.55, duration: 0.7 }}
           className="w-full max-w-md rounded-2xl border border-primary/15 bg-primary/[0.04] px-5 py-6 text-center shadow-sm"
         >
-          <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-primary/70">
+          <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-muted-foreground">
             {t('pause.done.reinforcementKicker', { defaultValue: 'Carry this with you' })}
           </p>
           <p className="mt-3 font-editorial text-lg leading-snug text-foreground sm:text-xl">
@@ -110,7 +110,7 @@ export function PauseDone({ decision, onReturn, pauseData }: Props) {
           className="flex max-w-[300px] flex-col items-center gap-3 rounded-2xl border border-border/30 bg-card/30 px-6 py-5 backdrop-blur-sm"
         >
           <div className="flex items-center gap-2">
-            <Sparkles className="h-3.5 w-3.5 text-primary/60" />
+            <Sparkles className="h-3.5 w-3.5 text-muted-foreground" />
             <p className="text-xs font-medium text-foreground/80">
               {t('pause.upsellTitle', {
                 defaultValue: "You've used all {{count}} free pauses this month",
@@ -127,7 +127,7 @@ export function PauseDone({ decision, onReturn, pauseData }: Props) {
             type="button"
             onClick={() => startCheckout()}
             disabled={checkoutLoading}
-            className="text-sm font-medium text-primary underline-offset-4 hover:underline disabled:opacity-50"
+            className="text-sm font-medium text-nox-text-link underline-offset-4 transition-colors hover:text-nox-text-link/80 hover:underline disabled:opacity-50"
           >
             {t('pause.upsellCta', { defaultValue: 'Start {{days}}-day free trial', days: PRICING.trialDays })}
           </button>

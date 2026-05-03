@@ -33,7 +33,7 @@ export function LandingLanguageSwitcher() {
           <DropdownMenuItem
             key={lang.code}
             onClick={() => i18n.changeLanguage(lang.code)}
-            className={`text-xs font-mono ${i18n.language === lang.code ? 'text-primary font-medium' : ''}`}
+            className={`text-xs font-mono ${i18n.language === lang.code ? 'text-nox-text-link font-medium' : ''}`}
           >
             {lang.label}
           </DropdownMenuItem>

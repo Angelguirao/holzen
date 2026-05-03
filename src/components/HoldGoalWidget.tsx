@@ -284,7 +284,7 @@ export function HoldGoalWidget({
               onClick={() => { setGoalType(tp); setInputValue(''); setValidationError(null); }}
               className={`flex flex-1 items-center justify-center gap-1.5 rounded-md px-2 py-1.5 text-xs font-semibold transition-colors ${
                 goalType === tp
-                  ? 'bg-primary/20 text-primary'
+                  ? 'bg-muted text-foreground shadow-sm'
                   : 'text-muted-foreground/50 hover:text-muted-foreground'
               }`}
             >
@@ -494,7 +494,7 @@ export function HoldGoalWidget({
       <div className={`${homeInWidget.insetMuted} mb-0 pb-[16px]`}>
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <InfinityIcon className="h-3 w-3 text-primary/60" />
+            <InfinityIcon className="h-3 w-3 text-muted-foreground" />
             <p className={homeInWidget.kicker}>{t('holdGoal.holdForever')}</p>
           </div>
           {goalActions}
@@ -572,7 +572,7 @@ export function HoldGoalWidget({
       <div className={`${homeInWidget.insetMuted} space-y-2.5`}>
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <Target className="h-3 w-3 text-primary/60" />
+            <Target className="h-3 w-3 text-muted-foreground" />
             <p className={homeInWidget.kicker}>{t('holdGoal.title')}</p>
           </div>
           {goalActions}
@@ -657,7 +657,7 @@ export function HoldGoalWidget({
       <div className={`${homeInWidget.insetMuted} space-y-2.5`}>
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <Target className="h-3 w-3 text-primary/60" />
+            <Target className="h-3 w-3 text-muted-foreground" />
             <p className={homeInWidget.kicker}>{t('holdGoal.title')}</p>
           </div>
           {goalActions}

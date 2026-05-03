@@ -282,7 +282,7 @@ export function ContentLibraryViewer({ entries, onRefresh }: { entries: LibraryE
       </div>
 
       {!adding ? (
-        <button onClick={() => setAdding(true)} className="text-[10px] font-mono text-primary/70 hover:text-primary transition-colors">
+        <button onClick={() => setAdding(true)} className="text-[10px] font-sans font-medium text-nox-text-link/80 hover:text-nox-text-link transition-colors">
           + Add library item
         </button>
       ) : (
@@ -313,7 +313,7 @@ export function ContentLibraryViewer({ entries, onRefresh }: { entries: LibraryE
               type="button"
               onClick={() => void previewFromUrl()}
               disabled={previewBusy || !newUrl.trim()}
-              className="text-[10px] font-mono text-primary/80 hover:text-primary disabled:opacity-30 shrink-0"
+              className="text-[10px] font-sans font-medium text-nox-text-link/80 hover:text-nox-text-link disabled:opacity-30 shrink-0"
             >
               {previewBusy ? 'Fetching…' : 'Fill from URL'}
             </button>
@@ -350,7 +350,7 @@ export function ContentLibraryViewer({ entries, onRefresh }: { entries: LibraryE
           )}
 
           <div className="flex gap-2">
-            <button onClick={addEntry} disabled={saving || !newTitle.trim() || !newSummary.trim()} className="text-[10px] font-mono text-primary hover:text-primary/80 disabled:opacity-30">
+            <button onClick={addEntry} disabled={saving || !newTitle.trim() || !newSummary.trim()} className="text-[10px] font-sans font-medium text-nox-text-link hover:text-nox-text-link/80 disabled:opacity-30">
               {saving ? 'Saving...' : 'Save'}
             </button>
             <button
@@ -373,7 +373,7 @@ export function ContentLibraryViewer({ entries, onRefresh }: { entries: LibraryE
           ? `${entries.length} entr${entries.length !== 1 ? 'ies' : 'y'}`
           : `Showing ${filtered.length} of ${entries.length} — `}
         {filtered.length < entries.length && (
-          <button onClick={() => setTypeFilter('all')} className="text-primary/70 hover:text-primary">clear filter</button>
+          <button onClick={() => setTypeFilter('all')} className="text-xs font-sans font-medium text-nox-text-link/80 hover:text-nox-text-link">clear filter</button>
         )}
       </p>
 
@@ -414,7 +414,7 @@ export function ContentLibraryViewer({ entries, onRefresh }: { entries: LibraryE
                   {entry.type}
                 </span>
                 <button onClick={() => setExpandedId(isExpanded ? null : entry.id)}
-                  className="text-[10px] font-mono text-foreground/80 truncate flex-1 min-w-0 text-left hover:text-primary transition-colors">
+                  className="text-[10px] font-mono text-foreground/80 truncate flex-1 min-w-0 text-left hover:text-nox-text-link transition-colors">
                   {entry.title}
                 </button>
                 <QualityBadge score={entry.quality_score} />
@@ -428,7 +428,7 @@ export function ContentLibraryViewer({ entries, onRefresh }: { entries: LibraryE
                 <span className="text-[9px] text-muted-foreground/45">{new Date(entry.created_at).toLocaleDateString()}</span>
                 {entry.url && (
                   <a href={entry.url} target="_blank" rel="noopener noreferrer"
-                    className="text-[9px] text-primary/60 hover:text-primary flex items-center gap-0.5 transition-colors">
+                    className="text-[9px] font-sans font-medium text-nox-text-link/70 hover:text-nox-text-link flex items-center gap-0.5 transition-colors">
                     <Globe className="h-2.5 w-2.5" /> link
                   </a>
                 )}
@@ -449,7 +449,7 @@ export function ContentLibraryViewer({ entries, onRefresh }: { entries: LibraryE
                   {entry.companion_types.length > 0 && (
                     <div className="flex flex-wrap gap-1">
                       {entry.companion_types.map(ct => (
-                        <span key={ct} className="text-[8px] font-mono px-1.5 py-0.5 rounded-full bg-primary/10 text-primary/60">{label(ct)}</span>
+                        <span key={ct} className="text-[8px] font-mono px-1.5 py-0.5 rounded-full bg-muted/50 text-muted-foreground">{label(ct)}</span>
                       ))}
                     </div>
                   )}

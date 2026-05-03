@@ -116,7 +116,7 @@ export function ScoreImpact({ data }: { data: PauseData }) {
         {impacts.map((imp) => (
           <div key={imp.key} className="flex items-start gap-2.5">
             {imp.direction === 'up' ? (
-              <TrendingUp className="mt-0.5 h-4 w-4 shrink-0 text-primary" />
+              <TrendingUp className="mt-0.5 h-4 w-4 shrink-0 text-nox-accent-green" />
             ) : (
               <Minus className="mt-0.5 h-4 w-4 shrink-0 text-muted-foreground" />
             )}

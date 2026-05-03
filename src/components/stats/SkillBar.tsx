@@ -29,7 +29,7 @@ export function SkillBar({ label, value, trend = null, notConfigured }: Props) {
             <button
               type="button"
               onClick={notConfigured.onCta}
-              className="text-[10px] font-medium text-primary underline-offset-2 hover:underline"
+              className="text-[10px] font-medium text-nox-text-link underline-offset-2 transition-colors hover:text-nox-text-link/80 hover:underline"
             >
               {notConfigured.ctaLabel}
             </button>

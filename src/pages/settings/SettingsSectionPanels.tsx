@@ -34,6 +34,14 @@ import { useSettingsState } from '@/pages/settings/use-settings-state';
 import { GroundingTagInput } from '@/pages/settings/GroundingTagInput';
 import { ChangeEmailSection } from '@/pages/settings/ChangeEmailSection';
 import { HoldGoalWidget } from '@/components/HoldGoalWidget';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
+import { TRACKED_ASSETS } from '@/lib/tracked-assets';
 
 export function SettingsYouPanel() {
   const {
@@ -52,7 +60,7 @@ export function SettingsYouPanel() {
 
             <div className="space-y-3">
               <p className="text-muted-foreground/60 uppercase tracking-wider text-sm font-sans">{t('settings.firstName')}</p>
-              <p className="leading-relaxed text-primary text-sm">
+              <p className="leading-relaxed text-foreground text-sm">
                 {t('settings.firstNameDesc')}
               </p>
               <Input
@@ -70,14 +78,14 @@ export function SettingsYouPanel() {
             {/* Hold goal — full editor (Home “Why you stay” is summary-only) */}
             <div className="space-y-3">
               <p className="text-muted-foreground/60 uppercase tracking-wider text-sm font-sans">{t('settings.holdGoalTitle')}</p>
-              <p className="leading-relaxed text-primary text-sm">{t('settings.holdGoalDesc')}</p>
+              <p className="leading-relaxed text-foreground text-sm">{t('settings.holdGoalDesc')}</p>
               <HoldGoalWidget />
             </div>
 
             {/* My Why — Motivations */}
             <div className="space-y-3">
               <p className="text-muted-foreground/60 uppercase tracking-wider text-sm font-sans">{t('settings.myWhy')}</p>
-              <p className="leading-relaxed text-primary text-sm">
+              <p className="leading-relaxed text-foreground text-sm">
                 {t('settings.myWhyDesc')}
               </p>
               <div className="grid grid-cols-2 gap-2">
@@ -94,7 +102,7 @@ export function SettingsYouPanel() {
                       }}
                       className={`rounded-md border px-3 py-2.5 text-left transition-colors ${
                         selected
-                          ? 'border-primary bg-primary/5 text-foreground'
+                          ? 'border-ring bg-muted/40 text-foreground'
                           : 'border-border/60 bg-muted/30 text-muted-foreground hover:text-foreground'
                       }`}
                     >
@@ -109,7 +117,7 @@ export function SettingsYouPanel() {
             {/* Mantra */}
             <div className="space-y-3">
               <p className="text-muted-foreground/60 uppercase tracking-wider text-sm font-sans">{t('settings.personalMantra')}</p>
-              <p className="leading-relaxed text-primary text-sm">
+              <p className="leading-relaxed text-foreground text-sm">
                 {t('settings.mantraDesc')}
               </p>
               <textarea
@@ -118,7 +126,7 @@ export function SettingsYouPanel() {
                 placeholder={t('settings.mantraPlaceholder')}
                 maxLength={200}
                 rows={2}
-                className="w-full text-xs font-mono px-3 py-2 rounded-md border border-border/60 bg-background text-foreground placeholder:text-muted-foreground/40 focus:outline-none focus:border-primary/40 transition-colors resize-none"
+                className="w-full text-xs font-mono px-3 py-2 rounded-md border border-border/60 bg-background text-foreground placeholder:text-muted-foreground/40 focus:outline-none focus:border-ring transition-colors resize-none"
               />
               <p className="text-[10px] font-mono text-muted-foreground/50 text-right">
                 {(mantra?.length ?? 0)}/200
@@ -154,9 +162,30 @@ export function SettingsReflectionPanel() {
     setReflectionStyle,
     customPrompt,
     setCustomPrompt,
+    trackedAssetId,
+    setTrackedAssetId,
   } = useSettingsState();
   return (
     <>
+
+            <div className="space-y-3">
+              <p className="text-muted-foreground/60 uppercase tracking-wider text-sm font-sans">
+                {t('settings.trackedAssetTitle')}
+              </p>
+              <p className="leading-relaxed text-foreground text-sm">{t('settings.trackedAssetDesc')}</p>
+              <Select value={trackedAssetId} onValueChange={(v) => void setTrackedAssetId(v)}>
+                <SelectTrigger className="max-w-md font-mono text-xs" aria-label={t('settings.trackedAssetTitle')}>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  {TRACKED_ASSETS.map((a) => (
+                    <SelectItem key={a.id} value={a.id} className="font-mono text-xs">
+                      {t(`settings.trackedAssets.${a.id}`)}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
 
             <ThresholdSetting
               thresholdUp={threshold}
@@ -166,6 +195,7 @@ export function SettingsReflectionPanel() {
               cumulativeThreshold={cumulativeThreshold}
               onSetCumulative={setCumulativeThreshold}
               cooldownHours={cooldownHours}
+              trackedAssetId={trackedAssetId}
             />
 
             {/* Cooldown */}
@@ -204,7 +234,7 @@ export function SettingsReflectionPanel() {
                     onClick={() => setCooldownHours(h)}
                     className={`rounded-md border px-3 py-2 text-center transition-colors ${
                       cooldownHours === h
-                        ? 'border-primary bg-primary/5 text-foreground'
+                        ? 'border-ring bg-muted/40 text-foreground'
                         : 'border-border/60 bg-muted/30 text-muted-foreground hover:text-foreground'
                     }`}
                   >
@@ -228,7 +258,7 @@ export function SettingsReflectionPanel() {
                     onClick={() => setReflectionTone(value)}
                     className={`rounded-md border px-3 py-2.5 text-left transition-colors ${
                       reflectionTone === value
-                        ? 'border-primary bg-primary/5 text-foreground'
+                        ? 'border-ring bg-muted/40 text-foreground'
                         : 'border-border/60 bg-muted/30 text-muted-foreground hover:text-foreground'
                     }`}
                   >
@@ -260,7 +290,7 @@ export function SettingsReflectionPanel() {
                     onClick={() => setReflectionStyle(s.value)}
                     className={`rounded-md border px-3 py-2.5 text-left transition-colors ${
                       reflectionStyle === s.value
-                        ? 'border-primary bg-primary/5 text-foreground'
+                        ? 'border-ring bg-muted/40 text-foreground'
                         : 'border-border/60 bg-muted/30 text-muted-foreground hover:text-foreground'
                     }`}
                   >
@@ -285,7 +315,7 @@ export function SettingsReflectionPanel() {
                 placeholder={t('settings.customPromptPlaceholder')}
                 maxLength={200}
                 rows={3}
-                className="w-full text-xs font-mono px-3 py-2 rounded-md border border-border/60 bg-background text-foreground placeholder:text-muted-foreground/40 focus:outline-none focus:border-primary/40 transition-colors resize-none"
+                className="w-full text-xs font-mono px-3 py-2 rounded-md border border-border/60 bg-background text-foreground placeholder:text-muted-foreground/40 focus:outline-none focus:border-ring transition-colors resize-none"
               />
               <p className="text-[10px] font-mono text-muted-foreground/50 text-right">
                 {(customPrompt?.length ?? 0)}/200
@@ -301,6 +331,7 @@ export function SettingsExperiencePanel() {
     t,
     btcMode,
     setBtcMode,
+    trackedAssetId,
     currency,
     setCurrency,
     zenMode,
@@ -318,31 +349,33 @@ export function SettingsExperiencePanel() {
   return (
     <>
 
-            {/* 1 BTC = 1 BTC mode */}
-            <div className="space-y-3">
-              <p className="uppercase tracking-wider text-base font-sans font-semibold text-[#dbb266]">{t('settings.btcMode')}</p>
-              <p className="leading-relaxed text-primary text-sm">
-                {t('settings.btcModeDesc')}
-              </p>
-              <div className="flex items-center justify-between">
-                <Label htmlFor="btc-mode" className="cursor-pointer text-base font-sans text-secondary-foreground">
-                  {t('settings.enableConvictionMode')}
-                </Label>
-                <Switch
-                  id="btc-mode"
-                  checked={btcMode}
-                  onCheckedChange={(val) => {
-                    setBtcMode(val);
-                    localStorage.setItem('holzen_btc_mode', String(val));
-                  }}
-                />
+            {/* 1 unit = 1 unit (Bitcoin-focused copy; hidden for other tracked assets). */}
+            {trackedAssetId === 'bitcoin' ? (
+              <div className="space-y-3">
+                <p className="uppercase tracking-wider text-base font-sans font-semibold text-[#dbb266]">{t('settings.btcMode')}</p>
+                <p className="leading-relaxed text-foreground text-sm">
+                  {t('settings.btcModeDesc')}
+                </p>
+                <div className="flex items-center justify-between">
+                  <Label htmlFor="btc-mode" className="cursor-pointer text-base font-sans text-secondary-foreground">
+                    {t('settings.enableConvictionMode')}
+                  </Label>
+                  <Switch
+                    id="btc-mode"
+                    checked={btcMode}
+                    onCheckedChange={(val) => {
+                      setBtcMode(val);
+                      localStorage.setItem('holzen_btc_mode', String(val));
+                    }}
+                  />
+                </div>
               </div>
-            </div>
+            ) : null}
 
             {/* Currency */}
-            <div className={`space-y-3 transition-opacity ${btcMode ? 'opacity-30 pointer-events-none' : ''}`}>
+            <div className={`space-y-3 transition-opacity ${trackedAssetId === 'bitcoin' && btcMode ? 'opacity-30 pointer-events-none' : ''}`}>
               <p className="text-muted-foreground/60 uppercase tracking-wider text-sm font-sans">{t('settings.displayCurrency')}</p>
-              <p className="leading-relaxed text-primary text-sm">
+              <p className="leading-relaxed text-foreground text-sm">
                 {t('settings.displayCurrencyDesc')}
               </p>
               <div className="grid grid-cols-2 gap-2">
@@ -361,7 +394,7 @@ export function SettingsExperiencePanel() {
                     onClick={() => setCurrency(c.code)}
                     className={`rounded-md border px-3 py-2.5 text-left transition-colors ${
                       currency === c.code
-                        ? 'border-primary bg-primary/5 text-foreground'
+                        ? 'border-ring bg-muted/40 text-foreground'
                         : 'border-border/60 bg-muted/30 text-muted-foreground hover:text-foreground'
                     }`}
                   >
@@ -375,7 +408,7 @@ export function SettingsExperiencePanel() {
             {/* Zen Mode */}
             <div className="space-y-3">
               <p className="text-muted-foreground/60 uppercase tracking-wider text-sm font-sans">{t('settings.zenMode')}</p>
-              <p className="leading-relaxed text-primary text-sm">
+              <p className="leading-relaxed text-foreground text-sm">
                 {t('settings.zenModeDesc')}
               </p>
               <div className="flex items-center justify-between">
@@ -398,7 +431,7 @@ export function SettingsExperiencePanel() {
               <p className="text-muted-foreground/60 uppercase tracking-wider text-sm font-sans">
                 {t('settings.checkoutWindow', { defaultValue: 'Checkout-confirmed window' })}
               </p>
-              <p className="leading-relaxed text-primary text-sm">
+              <p className="leading-relaxed text-foreground text-sm">
                 {t(
                   'settings.checkoutWindowDesc',
                   'After a successful purchase, the confirmation dialog and subscription re-sync are skipped if you return within this window. Default is {{default}} minutes.',
@@ -447,7 +480,7 @@ export function SettingsExperiencePanel() {
             {/* Silent Mode */}
             <div className="space-y-3">
               <p className="text-muted-foreground/60 uppercase tracking-wider text-sm font-sans">{t('settings.silentMode')}</p>
-              <p className="leading-relaxed text-primary text-sm">
+              <p className="leading-relaxed text-foreground text-sm">
                 {t('settings.silentModeDesc')}
               </p>
               <div className="flex items-center justify-between">
@@ -461,7 +494,7 @@ export function SettingsExperiencePanel() {
             {/* Notification Sound */}
             <div className="space-y-3">
               <p className="text-muted-foreground/60 uppercase tracking-wider text-sm font-sans">{t('settings.notificationSound')}</p>
-              <p className="leading-relaxed text-primary text-sm">
+              <p className="leading-relaxed text-foreground text-sm">
                 {t('settings.notificationSoundDesc')}
               </p>
               <div className="flex items-center justify-between">
@@ -475,7 +508,7 @@ export function SettingsExperiencePanel() {
             {/* Haptic Feedback */}
             <div className="space-y-3">
               <p className="text-muted-foreground/60 uppercase tracking-wider text-sm font-sans">{t('settings.hapticFeedback')}</p>
-              <p className="leading-relaxed text-primary text-sm">
+              <p className="leading-relaxed text-foreground text-sm">
                 {t('settings.hapticDesc')}
               </p>
               <div className="flex items-center justify-between">
@@ -568,14 +601,14 @@ export function SettingsNotificationsPanel() {
 
             <div className="space-y-3">
               <div className="flex items-center justify-between">
-                <Label htmlFor="email-notif" className="font-sans text-base font-medium text-primary">
+                <Label htmlFor="email-notif" className="font-sans text-base font-medium text-foreground">
                   {t('settings.emailNotifications')}
                 </Label>
                 <Switch id="email-notif" checked={emailNotifications} onCheckedChange={setEmailNotifications} />
               </div>
               {pushSupported && pushPermissionGrantedIncomplete && (
-                <Alert className="border-primary/30 bg-primary/5">
-                  <Info className="h-4 w-4 text-primary" />
+                <Alert className="border-border/60 bg-muted/30">
+                  <Info className="h-4 w-4 text-muted-foreground" />
                   <AlertTitle className="text-sm">
                     {t('settings.pushFinishBannerTitle', { defaultValue: 'Finish enabling push in Settings' })}
                   </AlertTitle>
@@ -623,7 +656,7 @@ export function SettingsNotificationsPanel() {
             {/* Badge notifications — free */}
             <div className="space-y-3">
               <p className="text-muted-foreground/60 uppercase tracking-wider text-sm font-sans">{t('settings.badgeNotifications')}</p>
-              <p className="leading-relaxed text-primary text-sm">
+              <p className="leading-relaxed text-foreground text-sm">
                 {t('settings.badgeNotifDesc')}
               </p>
               <div className="flex items-center justify-between">
@@ -650,7 +683,7 @@ export function SettingsNotificationsPanel() {
                       onClick={() => setDigestFrequency(opt)}
                       className={`rounded-md border px-3 py-2 text-center transition-colors ${
                         digestFrequency === opt
-                          ? 'border-primary bg-primary/5 text-foreground'
+                          ? 'border-ring bg-muted/40 text-foreground'
                           : 'border-border/60 bg-muted/30 text-muted-foreground hover:text-foreground'
                       }`}
                     >
@@ -665,7 +698,7 @@ export function SettingsNotificationsPanel() {
                       onClick={() => setDigestFrequency(opt)}
                       className={`rounded-md border px-3 py-2 text-center transition-colors ${
                         digestFrequency === opt
-                          ? 'border-primary bg-primary/5 text-foreground'
+                          ? 'border-ring bg-muted/40 text-foreground'
                           : 'border-border/60 bg-muted/30 text-muted-foreground hover:text-foreground'
                       }`}
                     >
@@ -782,7 +815,7 @@ export function SettingsSubscriptionPanel() {
                 <p className="text-xs font-mono text-muted-foreground">{t('common.loading')}</p>
               ) : subscribed ? (
                 <div className="space-y-3">
-                  <p className="text-sm font-sans text-primary">
+                  <p className="text-sm font-sans text-foreground">
                     {tier === 'pro_plus'
                       ? t('settings.planProPlus', { defaultValue: 'Pro+ plan' })
                       : tier === 'lifetime'
@@ -853,12 +886,12 @@ export function SettingsSubscriptionPanel() {
               ) : (
                 <div className="space-y-2">
                   {monthlyRemaining !== undefined && monthlyRemaining > 0 && (
-                    <p className="text-sm font-sans text-primary">
+                    <p className="text-sm font-sans text-foreground">
                       {t('home.subscription.freeRemaining', { count: monthlyRemaining })}
                     </p>
                   )}
                   {monthlyRemaining !== undefined && monthlyRemaining <= 0 && (
-                    <p className="text-sm font-sans text-primary">
+                    <p className="text-sm font-sans text-foreground">
                       {t('home.subscription.monthlyLimitReached')}
                     </p>
                   )}
@@ -924,7 +957,7 @@ export function SettingsAccountPanel() {
   return (
     <>
 
-              <p className="truncate font-sans text-primary text-sm">{user.email}</p>
+              <p className="truncate font-sans text-foreground text-sm">{user.email}</p>
 
             <ChangeEmailSection />
 

@@ -154,7 +154,7 @@ export function SourceCatalogViewer({ sources, onRefresh, libraryEntries = [] }:
       </div>
 
       {!adding ? (
-        <button onClick={() => setAdding(true)} className="text-[10px] font-mono text-primary/70 hover:text-primary transition-colors">
+        <button onClick={() => setAdding(true)} className="text-[10px] font-sans font-medium text-nox-text-link/75 hover:text-nox-text-link transition-colors">
           + Add source
         </button>
       ) : (
@@ -181,7 +181,7 @@ export function SourceCatalogViewer({ sources, onRefresh, libraryEntries = [] }:
             </select>
           </div>
           <div className="flex gap-2">
-            <button onClick={addSource} disabled={saving || !newName.trim()} className="text-[10px] font-mono text-primary hover:text-primary/80 disabled:opacity-30">
+            <button onClick={addSource} disabled={saving || !newName.trim()} className="text-[10px] font-sans font-medium text-nox-text-link hover:text-nox-text-link/80 disabled:opacity-30">
               {saving ? 'Saving...' : 'Save'}
             </button>
             <button onClick={() => setAdding(false)} className="text-[10px] font-mono text-muted-foreground/60 hover:text-muted-foreground">
@@ -239,7 +239,7 @@ export function SourceCatalogViewer({ sources, onRefresh, libraryEntries = [] }:
                           {src.type}
                         </span>
                         {libCount > 0 && (
-                          <span className="text-[9px] font-mono px-1.5 py-0.5 rounded-full bg-primary/10 text-primary/70">
+                          <span className="text-[9px] font-mono px-1.5 py-0.5 rounded-full bg-muted/50 text-muted-foreground">
                             <BookOpen className="h-2.5 w-2.5 inline mr-0.5" />{libCount} in library
                           </span>
                         )}
@@ -250,7 +250,7 @@ export function SourceCatalogViewer({ sources, onRefresh, libraryEntries = [] }:
                         )}
                         {src.url && (
                           <a href={src.url} target="_blank" rel="noopener noreferrer"
-                            className="text-[9px] text-primary/60 hover:text-primary flex items-center gap-0.5 truncate transition-colors">
+                            className="text-[9px] font-sans font-medium text-nox-text-link/70 hover:text-nox-text-link flex items-center gap-0.5 truncate transition-colors">
                             <Globe className="h-2.5 w-2.5 flex-shrink-0" />
                             <span className="truncate">{src.url.replace(/^https?:\/\//, '').slice(0, 40)}</span>
                           </a>

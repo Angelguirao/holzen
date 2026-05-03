@@ -142,7 +142,7 @@ export function CuratedContentManager({ entries, onRefresh }: { entries: CacheEn
         <p className="text-[10px] font-mono text-foreground/70">Lifecycle actions:</p>
         <div className="space-y-1">
           <p className="text-[9px] text-muted-foreground/60">
-            <span className="text-primary font-mono">↑ Promote</span> — quality 3, no expiry. Preferred within this pool.
+            <span className="text-nox-text-link font-mono font-semibold">↑ Promote</span> — quality 3, no expiry. Preferred within this pool.
           </p>
           <p className="text-[9px] text-muted-foreground/60">
             <span className="text-destructive font-mono">↓ Demote</span> — quality 1 and 7-day expiry.
@@ -152,7 +152,7 @@ export function CuratedContentManager({ entries, onRefresh }: { entries: CacheEn
           </p>
         </div>
         <p className="text-[9px] text-muted-foreground/50">
-          Badge <span className="text-primary">curated</span> here = score ≥3 in this table. That is unrelated to the Monitor “curated” serve counter (hardcoded fallbacks).
+          Badge <span className="text-nox-text-link font-semibold">curated</span> here = score ≥3 in this table. That is unrelated to the Monitor “curated” serve counter (hardcoded fallbacks).
         </p>
         <p className="text-[9px] text-muted-foreground/50">
           Also: <span className="text-secondary-foreground">good</span> = score 2, <span className="text-destructive">low</span> = score 1.
@@ -241,7 +241,7 @@ export function CuratedContentManager({ entries, onRefresh }: { entries: CacheEn
                     <div className="flex items-center gap-1.5 pt-0.5">
                       {!isCurated && (
                         <button onClick={() => promote(entry.id)} disabled={isActing}
-                          className="flex items-center gap-0.5 text-[9px] font-mono text-primary/70 hover:text-primary disabled:opacity-30 transition-colors">
+                          className="flex items-center gap-0.5 text-[9px] font-sans font-medium text-nox-text-link/75 hover:text-nox-text-link disabled:opacity-30 transition-colors">
                           <ArrowUp className="h-2.5 w-2.5" /> Promote
                         </button>
                       )}

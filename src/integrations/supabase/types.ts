@@ -1588,6 +1588,7 @@ export type Database = {
           threshold: number
           threshold_down: number
           timezone: string | null
+          tracked_asset_id: string
           updated_at: string
           user_id: string
         }
@@ -1641,6 +1642,7 @@ export type Database = {
           threshold?: number
           threshold_down?: number
           timezone?: string | null
+          tracked_asset_id?: string
           updated_at?: string
           user_id: string
         }
@@ -1694,6 +1696,7 @@ export type Database = {
           threshold?: number
           threshold_down?: number
           timezone?: string | null
+          tracked_asset_id?: string
           updated_at?: string
           user_id?: string
         }

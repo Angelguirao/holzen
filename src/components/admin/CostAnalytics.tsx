@@ -235,7 +235,7 @@ export function CostAnalytics() {
         </h3>
         <button
           onClick={() => void refresh()}
-          className="flex items-center gap-1 text-[10px] font-mono text-muted-foreground/50 hover:text-primary"
+          className="flex items-center gap-1 text-[10px] font-sans font-medium text-muted-foreground/50 hover:text-nox-text-link"
         >
           <RefreshCw className="h-3 w-3" />
           Refresh
@@ -251,7 +251,7 @@ export function CostAnalytics() {
               onClick={() => setPeriod(opt.value)}
               className={`text-[9px] font-mono px-2 py-0.5 rounded-full transition-colors ${
                 period === opt.value
-                  ? 'bg-primary/15 text-primary'
+                  ? 'bg-muted/60 text-foreground'
                   : 'text-muted-foreground/50 hover:text-muted-foreground/80 hover:bg-muted/20'
               } ${TAB_TRIGGER_CLASS.includes('ring') ? '' : ''}`}
             >
@@ -392,7 +392,7 @@ export function CostAnalytics() {
               <span
                 key={f}
                 className={`text-[9px] font-mono px-1.5 py-0.5 rounded ${
-                  ok ? 'bg-primary/15 text-primary' : 'bg-muted/30 text-muted-foreground/50'
+                  ok ? 'bg-muted/50 text-nox-accent-green' : 'bg-muted/30 text-muted-foreground/50'
                 }`}
               >
                 {ok ? '✓' : '·'} {f}

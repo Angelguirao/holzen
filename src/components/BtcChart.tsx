@@ -13,9 +13,11 @@ interface ChartPoint {
 interface Props {
   hidden?: boolean;
   currency?: string;
+  /** CoinGecko coin id */
+  coinId?: string;
 }
 
-export function BtcChart({ hidden = false, currency = 'USD' }: Props) {
+export function BtcChart({ hidden = false, currency = 'USD', coinId = 'bitcoin' }: Props) {
   const [data, setData] = useState<ChartPoint[] | null>(null);
   const [error, setError] = useState(false);
   const [retryKey, setRetryKey] = useState(0);
@@ -25,8 +27,9 @@ export function BtcChart({ hidden = false, currency = 'USD' }: Props) {
     setError(false);
     try {
       const cur = currency.toLowerCase();
+      const id = encodeURIComponent(coinId);
       const res = await fetch(
-        `https://api.coingecko.com/api/v3/coins/bitcoin/market_chart?vs_currency=${cur}&days=7`,
+        `https://api.coingecko.com/api/v3/coins/${id}/market_chart?vs_currency=${cur}&days=7`,
         { signal }
       );
       if (!res.ok) throw new Error();
@@ -45,7 +48,7 @@ export function BtcChart({ hidden = false, currency = 'USD' }: Props) {
         (e instanceof Error && e.name === 'AbortError');
       if (!aborted) setError(true);
     }
-  }, [currency]);
+  }, [currency, coinId]);
 
   useEffect(() => {
     const ctrl = new AbortController();

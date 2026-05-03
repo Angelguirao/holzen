@@ -75,7 +75,7 @@ export function NewNoteForm({ onSave }: Props) {
           <button
             key={tag}
             onClick={() => setTags((prev) => prev.filter((t) => t !== tag))}
-            className="text-[9px] font-mono px-1.5 py-0.5 rounded bg-primary/10 text-primary hover:bg-primary/20 transition-colors"
+            className="text-[9px] font-mono px-1.5 py-0.5 rounded bg-muted/50 text-nox-text-link hover:bg-muted transition-colors"
           >
             {tag} <X className="h-2 w-2 inline ml-0.5" />
           </button>

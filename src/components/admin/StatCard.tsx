@@ -17,7 +17,7 @@ export function StatCard({ icon: Icon, title, value, subtitle, alert, trend }: {
     ? trend.direction === 'flat'
       ? 'text-muted-foreground/40'
       : trend.direction === 'up'
-        ? 'text-primary'
+        ? 'text-nox-accent-green'
         : 'text-destructive'
     : '';
   const trendArrow = trend

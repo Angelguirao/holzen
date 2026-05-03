@@ -40,7 +40,7 @@ export function BulkHoldReviewBody({ sections, draftOutcomes, onOutcomeChange, o
       <button
         type="button"
         onClick={onOpenArchive}
-        className="text-xs font-medium text-primary underline underline-offset-4"
+        className="text-xs font-medium text-nox-text-link underline underline-offset-4 transition-colors hover:text-nox-text-link/80"
       >
         {t('bulkHold.openArchiveFullDetail', { defaultValue: 'Open Archive for full detail' })}
       </button>

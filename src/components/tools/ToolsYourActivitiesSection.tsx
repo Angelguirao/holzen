@@ -30,7 +30,7 @@ export function ToolsYourActivitiesSection() {
 
       {showMantraSuggestion ? (
         <div className="flex items-start gap-3 rounded-xl border border-primary/20 bg-primary/5 p-3">
-          <Sparkles className="mt-0.5 h-4 w-4 shrink-0 text-primary/70" aria-hidden />
+          <Sparkles className="mt-0.5 h-4 w-4 shrink-0 text-nox-text-highlight/80" aria-hidden />
           <div className="min-w-0 flex-1 space-y-1">
             <p className="text-[10px] font-mono uppercase tracking-wide text-muted-foreground">
               {t('tools.hub.goodNextStep')}
@@ -39,7 +39,7 @@ export function ToolsYourActivitiesSection() {
             <p className="text-xs leading-relaxed text-muted-foreground">{t('tools.hub.mantraEmptyBody')}</p>
             <Link
               to={settingsYou}
-              className="inline-flex pt-1 text-sm font-medium text-primary underline-offset-4 hover:underline"
+              className="inline-flex pt-1 text-sm font-medium text-nox-text-link underline-offset-4 transition-colors hover:text-nox-text-link/80 hover:underline"
             >
               {t('tools.hub.mantraEmptyCta')}
             </Link>
@@ -73,7 +73,7 @@ export function ToolsYourActivitiesSection() {
             <p className="text-xs text-muted-foreground/90 leading-relaxed">{t('tools.hub.noGroundingActivities')}</p>
             <Link
               to={settingsYou}
-              className="inline-flex text-sm font-medium text-primary underline-offset-4 hover:underline"
+              className="inline-flex text-sm font-medium text-nox-text-link underline-offset-4 transition-colors hover:text-nox-text-link/80 hover:underline"
             >
               {t('tools.hub.addGroundingInSettings')}
             </Link>
@@ -92,7 +92,7 @@ export function ToolsYourActivitiesSection() {
           <div className="mt-4 border-t border-border/40 pt-3">
             <Link
               to={TOOLS.ground}
-              className="text-sm font-medium text-primary underline-offset-4 hover:underline"
+              className="text-sm font-medium text-nox-text-link underline-offset-4 transition-colors hover:text-nox-text-link/80 hover:underline"
             >
               {t('tools.hub.openGround')}
             </Link>

@@ -43,6 +43,7 @@ This phase is the second "mental model pass": after Phase 1 (who can reach `/pau
 
 - Triggers `manualTrigger()` (with cooldown) and, when a pause is ready, navigates to `/pause` with `state`: `reflectionMessage`, `context`, `pauseInstanceId`, `companions`, `companionPrefs`, `severity`.
 - Defines the "happy path" shape that `PauseSession` expects when coming from Home.
+- Maintainer-oriented overview (widgets, zen mode, checkout params, error helpers): [screens/home.md](../screens/home.md).
 
 ### `src/hooks/use-holzen.ts` — producer for pause state
 

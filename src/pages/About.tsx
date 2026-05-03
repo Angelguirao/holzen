@@ -98,7 +98,7 @@ const About = () => {
             </p>
             <Link
               to="/welcome#science"
-              className="inline-flex items-center gap-1.5 text-xs font-mono text-primary hover:text-primary/80 transition-colors"
+              className="inline-flex items-center gap-1.5 text-xs font-sans font-medium text-nox-text-link underline-offset-4 transition-colors hover:text-nox-text-link/80"
             >
               {t('about.readFullScience')}
             </Link>
@@ -158,7 +158,7 @@ const About = () => {
             </p>
             <Link
               to="/reserve"
-              className="inline-flex items-center gap-1.5 text-xs font-mono text-primary hover:text-primary/80 transition-colors"
+              className="inline-flex items-center gap-1.5 text-xs font-sans font-medium text-nox-text-link underline-offset-4 transition-colors hover:text-nox-text-link/80"
             >
               {t('about.readReserveStrategy')}
             </Link>

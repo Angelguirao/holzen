@@ -260,7 +260,7 @@ export function BulkHoldCard() {
                 })}
               </p>
             </div>
-            <div className="flex items-center gap-1 text-xs font-medium text-primary">
+            <div className="flex items-center gap-1 text-xs font-medium text-nox-text-link">
               <span>{t('bulkHold.openSheet', { defaultValue: 'Manage' })}</span>
               <ChevronRight className="h-3.5 w-3.5" aria-hidden />
             </div>
@@ -347,7 +347,7 @@ export function BulkHoldCard() {
                   type="button"
                   variant="outline"
                   disabled={pending.length === 0}
-                  className="h-11 rounded-xl border-primary/35 font-semibold text-primary hover:bg-primary/5"
+                  className="h-11 rounded-xl border-border font-semibold text-nox-text-link hover:bg-muted/40"
                   onClick={enterReview}
                 >
                   <List className="mr-2 h-4 w-4 shrink-0" aria-hidden />
@@ -373,7 +373,7 @@ export function BulkHoldCard() {
                   type="button"
                   variant="outline"
                   disabled={loading}
-                  className="h-11 rounded-full border-foreground/80 bg-primary/[0.06] font-semibold text-primary hover:bg-primary/10"
+                  className="h-11 rounded-full border-border bg-muted/30 font-semibold text-foreground hover:bg-muted/50"
                   onClick={handleDoneInReview}
                 >
                   {t('bulkHold.done', { defaultValue: 'Done' })}

@@ -521,7 +521,7 @@ export function LetterToFutureSelf({
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
                     transition={{ delay: 0.8 }}
-                    className="text-sm font-medium text-primary"
+                    className="text-sm font-medium text-nox-text-highlight"
                   >
                     {t('letter.sealing')}
                   </motion.p>
@@ -590,13 +590,13 @@ export function LetterToFutureSelf({
           <button
             type="button"
             onClick={() => setComposerOpen(true)}
-            className="flex w-full items-center gap-3 rounded-lg border border-primary/15 bg-primary/[0.03] px-3 py-3 text-left transition-colors hover:bg-primary/[0.06]"
+            className="flex w-full items-center gap-3 rounded-lg border border-border/60 bg-muted/25 px-3 py-3 text-left transition-colors hover:bg-muted/40"
           >
-            <Mail className="h-3.5 w-3.5 shrink-0 text-primary/50" />
+            <Mail className="h-3.5 w-3.5 shrink-0 text-muted-foreground" />
             <span className="flex-1 text-sm font-medium text-foreground">
               {t('letter.writeCta', { defaultValue: 'Write a letter' })}
             </span>
-            <ChevronRight className="h-3 w-3 shrink-0 text-primary/30" />
+            <ChevronRight className="h-3 w-3 shrink-0 text-muted-foreground/50" />
           </button>
         )}
       </div>

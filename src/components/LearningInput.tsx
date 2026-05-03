@@ -67,7 +67,7 @@ export function LearningInput({ title, body, nudge, nudgeLoading = false, nudgeE
               href={nudge.url}
               target="_blank"
               rel="noopener noreferrer"
-              className="text-primary/50 hover:text-primary transition-colors"
+              className="text-nox-text-link/60 hover:text-nox-text-link transition-colors"
               aria-label={t('grounding.viewResearch')}
             >
               <ExternalLink className="h-2.5 w-2.5" />

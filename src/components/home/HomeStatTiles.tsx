@@ -63,6 +63,7 @@ export function HomeStatTiles() {
     stepEvents,
     companionEvents,
     holdGoal: holdGoal ?? null,
+    trackedAssetId: holdGoal?.trackedAssetId,
   });
   const nextBadge = useMemo(() => pickClosestUnearned(snapshots, subscribed), [snapshots, subscribed]);
 
