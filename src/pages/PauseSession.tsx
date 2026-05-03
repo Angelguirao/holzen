@@ -6,7 +6,7 @@ import { useHolzen } from '@/hooks/use-holzen';
 import { useSubscription } from '@/hooks/use-subscription';
 import { type MoodValue } from '@/components/MoodCheck';
 
-import { type PauseStep, STEPS } from '@/components/pause/PauseProgress';
+import { type PauseStep } from '@/components/pause/PauseProgress';
 import { PauseSessionGate } from '@/components/pause/PauseSessionGate';
 import { PauseSessionScaffoldShell } from '@/components/pause/PauseSessionScaffoldShell';
 import { PauseSessionGateContent } from '@/components/pause/PauseSessionGateContent';
@@ -22,6 +22,7 @@ import {
   initialBriefIntegrateDoneFromRestored,
   initialSelectedBriefFaceFromRestored,
   initialPhaseFromRestored,
+  initialBreathSegmentRpcLoggedFlagsFromRestored,
 } from '@/lib/pause-session-step-map';
 import { initialDecideOnBackStepFromPersisted } from '@/lib/pause-session-initial-decide-on-back-step';
 import { parsePauseSessionLocationState } from '@/lib/router-location-state';
@@ -64,6 +65,7 @@ import { usePauseSessionBriefFeelSelect } from '@/hooks/use-pause-session-brief-
  * `/pause` route: wires shell hydration, local ritual state, `pause-api` step handlers, and pause UI
  * (`PauseSessionGate*`, `PauseSessionScaffold*`, `PauseSession*RitualBody` under `src/components/pause/`).
  *
+ * **This screen (files + modes):** `docs/screens/pause.md`.
  * **Product / data model:** brief vs deep flows, RPCs, and SQL-first ratios on `v_pause_full` /
  * `pause_step_events` — `docs/systems/pause-system.md`.
  * **Supporting modules:** shell hydration (`use-pause-session-shell`, `use-pause-session-fetch`,
@@ -148,7 +150,8 @@ export default function PauseSession() {
   });
 
   const restoredStep = mapPersistedStep(restored?.step);
-  const restoredIdx = restored ? STEPS.indexOf(restoredStep) : -1;
+  const { segment1Logged: initialBreathSegment1Logged, segment2Logged: initialBreathSegment2Logged } =
+    initialBreathSegmentRpcLoggedFlagsFromRestored(restored);
 
   const [step, setStep] = useState<PauseStep>(restoredStep);
   const [decideOnBackStep, setDecideOnBackStep] = useState<'choose' | 'breath2'>(() =>
@@ -187,8 +190,8 @@ export default function PauseSession() {
     logBreathSegment2Skipped,
   } = usePauseBreathSegmentRpcLoggers({
     pauseInstanceId,
-    initialSegment1Logged: restoredIdx > STEPS.indexOf('breathe'),
-    initialSegment2Logged: restoredIdx > STEPS.indexOf('breath2'),
+    initialSegment1Logged: initialBreathSegment1Logged,
+    initialSegment2Logged: initialBreathSegment2Logged,
     t,
   });
   const { lastFeelLogKeyRef, lastShiftLogKeyRef } = usePauseFeelShiftLogDedupeRefs(pauseInstanceId);

@@ -1,8 +1,9 @@
 # React screen orchestration (Holzen)
 
-This guide explains **how we structure big pages** in Holzen (starting from **`/` Home**) so they stay readable, correct, and reusable. It is written so **React beginners** can follow it; you can skip the [Quick React vocabulary](#quick-react-vocabulary) section if you already know those terms.
+This guide explains **how we structure big pages** in Holzen (starting from **`/` Home** and **`/pause` Pause**) so they stay readable, correct, and reusable. It is written so **React beginners** can follow it; you can skip the [Quick React vocabulary](#quick-react-vocabulary) section if you already know those terms.
 
 - **Concrete Home map:** [screens/home.md](../screens/home.md) (files, modes, widgets).  
+- **Concrete Pause map:** [screens/pause.md](../screens/pause.md) (gate, scaffold, brief vs deep ritual, RPC wiring).  
 - **This doc:** the **ideas** you can copy on other `src/pages/*` screens.
 
 ---
@@ -551,13 +552,14 @@ const Home = () => {
 
 - Walk **`useHomeDashboardTodayWiring`** → **`useHomeDashboardSectionDeps`** → **`renderHomeDashboardSection`** to see how one **section id** becomes a card.  
 - Open [`HomeZenModeRoute`](../../src/components/home/HomeZenModeRoute.tsx) to see **`lazy` + `Suspense`** around Zen.  
-- Keep [`screens/home.md`](../screens/home.md) open for product modes and file map.
+- Keep [`screens/home.md`](../screens/home.md) open for product modes and file map.  
+- For **`/pause`**, keep [`screens/pause.md`](../screens/pause.md) open next to [`PauseSession.tsx`](../../src/pages/PauseSession.tsx).
 
 ---
 
 ## Where Home fits
 
-**[screens/home.md](../screens/home.md)** is the **worked example**: file list, modes, Zen vs dashboard, pause errors, analytics. Compare any new large page to that **shape** (thin page, fat hooks/libs). **This guided tour** is the line-by-line companion to [`src/pages/Home.tsx`](../../src/pages/Home.tsx).
+**[screens/home.md](../screens/home.md)** is the **first worked example**: file list, modes, Zen vs dashboard, pause errors, analytics. **[screens/pause.md](../screens/pause.md)** is the **second** (full-screen ritual: gate, depth picker, brief vs deep). Compare any new large page to that **shape** (thin page, fat hooks/libs). **This guided tour** is the line-by-line companion to [`src/pages/Home.tsx`](../../src/pages/Home.tsx).
 
 ### Does `Home.tsx` follow this guide *completely*?
 
@@ -575,6 +577,10 @@ const Home = () => {
 | **“Thin” = low line count** | **Partial** | `Home.tsx` is still **many lines** because listing ~15+ hooks is verbose. **Thin** here means **no business kitchen sink** — not “20 lines total.” Further collapsing into one mega-hook would save lines but **hurt** navigation and grep-ability (arguably *against* the spirit of named hooks). |
 
 **Bottom line:** Home is a **reference implementation** for the parts of the guide that matter most for correctness and reviewability (hooks order, extraction, pure gates, memo boundaries). It **does not** use every optional pattern (e.g. signed-in-only child), and that is **intentional and documented**, not an oversight.
+
+### Where Pause fits
+
+**[screens/pause.md](../screens/pause.md)** maps [`PauseSession.tsx`](../../src/pages/PauseSession.tsx): same **conductor** idea as Home (hooks first, returns at the bottom), but for a **single vertical** (volatility ritual) instead of a dashboard. Canonical **data** and RPC contracts stay in [systems/pause-system.md](../systems/pause-system.md) — especially **section 10** — while `pause.md` is the **UI + file** index for this route.
 
 ---
 
@@ -597,5 +603,6 @@ No hooks in Deno edge functions — but the **ideas** match:
 
 - [refactoring-strategy.md](refactoring-strategy.md) — incremental refactors and full-stack touchpoints.  
 - [navigating-the-codebase.md](navigating-the-codebase.md) — routing, auth, hooks at app level.  
-- [systems/pause-system.md](../systems/pause-system.md) — **`/pause`** ritual, RPCs, **`v_pause_full`** / archive views (companion to thin **`PauseSession.tsx`** orchestration).  
+- [screens/pause.md](../screens/pause.md) — **`/pause`** route: gate, scaffold, hooks + lib file map (orchestration).  
+- [systems/pause-system.md](../systems/pause-system.md) — **`/pause`** ritual **data model**, RPCs, **`v_pause_full`** / archive views (companion to thin **`PauseSession.tsx`**).  
 - [backlog/react-page-and-hook-splitting.md](../backlog/react-page-and-hook-splitting.md) — backlog ideas that overlap with this playbook.
