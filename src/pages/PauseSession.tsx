@@ -54,18 +54,11 @@ import {
 import { pauseLogStep } from '@/lib/pause-api';
 import type { PauseState } from '@/lib/pause-state';
 import { getSessionQuote } from '@/lib/wisdom-quotes';
-
-type HydrationReady = {
-  status: 'ready';
-  message: string;
-  context: string | null;
-  pauseInstanceId: string | null;
-  companions: CompanionData;
-  companionPrefs: CompanionPrefs;
-  severity: 'mild' | 'moderate' | 'high';
-};
-
-type HydrationState = HydrationReady | { status: 'fetch'; pauseInstanceId: string } | { status: 'empty' };
+import {
+  computePauseSessionHydration,
+  type PauseSessionHydrationReady,
+  type PauseSessionHydrationState,
+} from '@/lib/pause-session-hydration';
 
 export default function PauseSession() {
   const { t } = useTranslation();
@@ -118,60 +111,23 @@ export default function PauseSession() {
   const holzenAligned =
     !navPauseInstanceId || (holzenLastPauseInstanceId != null && holzenLastPauseInstanceId === navPauseInstanceId);
 
-  const hydration = useMemo((): HydrationState => {
-    if (restored?.message) {
-      return {
-        status: 'ready',
-        message: restored.message,
-        context: restored.context ?? null,
-        pauseInstanceId: restored.pauseInstanceId ?? navPauseInstanceId ?? holzenLastPauseInstanceId,
-        companions: restored.companions ?? holzenCompanions ?? DEFAULT_COMPANIONS,
-        companionPrefs: restored.companionPrefs ?? holzenCompanionPrefs ?? DEFAULT_PREFS,
-        severity: restored.severity ?? holzenSeverity,
-      };
-    }
-
-    if (holzenMessage && holzenAligned) {
-      return {
-        status: 'ready',
-        message: holzenMessage,
-        context: holzenContext,
-        pauseInstanceId: holzenLastPauseInstanceId,
-        companions: holzenCompanions ?? DEFAULT_COMPANIONS,
-        companionPrefs: holzenCompanionPrefs ?? DEFAULT_PREFS,
-        severity: holzenSeverity,
-      };
-    }
-
-    if (navReflectionMessage) {
-      return {
-        status: 'ready',
-        message: navReflectionMessage,
-        context: navContext ?? holzenContext,
-        pauseInstanceId: navPauseInstanceId ?? holzenLastPauseInstanceId,
-        companions: navCompanions ?? holzenCompanions ?? DEFAULT_COMPANIONS,
-        companionPrefs: navCompanionPrefs ?? holzenCompanionPrefs ?? DEFAULT_PREFS,
-        severity: navSeverity ?? holzenSeverity,
-      };
-    }
-
-    if (navPauseInstanceId) {
-      return { status: 'fetch', pauseInstanceId: navPauseInstanceId };
-    }
-
-    if (holzenMessage) {
-      return {
-        status: 'ready',
-        message: holzenMessage,
-        context: holzenContext,
-        pauseInstanceId: holzenLastPauseInstanceId,
-        companions: holzenCompanions ?? DEFAULT_COMPANIONS,
-        companionPrefs: holzenCompanionPrefs ?? DEFAULT_PREFS,
-        severity: holzenSeverity,
-      };
-    }
-
-    return { status: 'empty' };
+  const hydration = useMemo((): PauseSessionHydrationState => {
+    return computePauseSessionHydration({
+      restored,
+      navPauseInstanceId,
+      navReflectionMessage,
+      navContext,
+      navCompanions,
+      navCompanionPrefs,
+      navSeverity,
+      holzenMessage,
+      holzenContext,
+      holzenLastPauseInstanceId,
+      holzenCompanions,
+      holzenCompanionPrefs,
+      holzenSeverity,
+      holzenAligned,
+    });
   }, [
     restored,
     holzenMessage,
@@ -248,7 +204,7 @@ export default function PauseSession() {
     };
   }, [fetchPauseInstanceId]);
 
-  const resolved: HydrationReady | null = useMemo(() => {
+  const resolved: PauseSessionHydrationReady | null = useMemo(() => {
     if (hydration.status === 'ready') return hydration;
     if (hydration.status === 'fetch' && fetchedInstance?.reflection_message) {
       return {
