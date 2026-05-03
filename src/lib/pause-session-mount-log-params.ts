@@ -6,7 +6,14 @@ import {
   initialRitualEntry,
 } from '@/lib/pause-session-step-map';
 
-/** Payload for `[holzen:pause] mount` (see `usePauseSessionMountLog`). No message text or full ids. */
+/**
+ * First-paint snapshot for `[holzen:pause] mount` (see `usePauseSessionMountLog`).
+ *
+ * **Browser logging:** `docs/ops/logging-strategy.md` (Holzen console / flow tracing; fields here are non-PII).
+ * **Code map:** `docs/systems/pause-system.md` section 10 (Related docs and code).
+ */
+
+/** Payload for `holzenLog.pause('mount', …)` — id prefix, booleans, hydration + restore hints only. */
 export type PauseSessionMountLogParams = {
   pauseInstanceIdPrefix: string | null;
   hasNavMessage: boolean;
@@ -17,6 +24,7 @@ export type PauseSessionMountLogParams = {
   phaseInitial: 'session' | 'done';
 };
 
+/** Inputs from `PauseSession` shell + nav used once to build `PauseSessionMountLogParams`. */
 export type BuildPauseSessionMountLogParamsInput = {
   restored: PersistedSession | null;
   fetchPauseInstanceId: string | null;
@@ -25,7 +33,7 @@ export type BuildPauseSessionMountLogParamsInput = {
   hydrationStatus: PauseSessionHydrationState['status'];
 };
 
-/** Derive mount-only pause diagnostics from shell + nav (first paint). */
+/** Derive mount-only pause diagnostics from shell + nav (first committed paint). */
 export function buildPauseSessionMountLogParams(
   input: BuildPauseSessionMountLogParamsInput,
 ): PauseSessionMountLogParams {
