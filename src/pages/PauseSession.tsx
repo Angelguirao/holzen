@@ -59,16 +59,11 @@ import {
   resolvePauseBreathSecondLabelVariant,
   viteWantsPauseBreathSecondLabelShift,
 } from '@/lib/pause-breath-second-label-variant';
-import {
-  buildInitialEmotionLoggedPayload,
-  initialEmotionLogDedupeKey,
-  initialEmotionSkippedLogDedupeKey,
-  initialEmotionSkippedLoggedPayload,
-} from '@/lib/pause-initial-emotion-log';
 import { usePauseSessionStepTransition } from '@/hooks/use-pause-session-step-transition';
 import { usePauseBreathSegmentRpcLoggers } from '@/hooks/use-pause-breath-segment-rpc-loggers';
 import { usePauseFeelShiftLogDedupeRefs } from '@/hooks/use-pause-feel-shift-log-dedupe-refs';
 import { usePauseFavoriteToggle } from '@/hooks/use-pause-favorite-toggle';
+import { usePauseSessionInitialMoodHandlers } from '@/hooks/use-pause-session-initial-mood-handlers';
 import { buildShiftEmotionFrameHubLogBundle } from '@/lib/pause-shift-emotion-log';
 import { buildPauseImpactDataOnComplete, type PauseImpactData } from '@/lib/pause-impact-data';
 import { buildOutcomeLoggedPayload } from '@/lib/pause-outcome-log-payload';
@@ -198,6 +193,16 @@ export default function PauseSession() {
     (restored?.briefFace as BriefFeelTile | null) ?? null,
   );
   const [pickerAboutOpen, setPickerAboutOpen] = useState(false);
+
+  const { handleMoodSelect, handleMoodSkip, handleMoodReset } = usePauseSessionInitialMoodHandlers({
+    pauseInstanceId,
+    t,
+    lastFeelLogKeyRef,
+    setMoodDone,
+    setSelectedMood,
+    setFeelIntensity,
+    setSelectedBriefFace,
+  });
 
   useEffect(() => {
     if (!pauseInstanceId) return;
@@ -442,72 +447,6 @@ export default function PauseSession() {
     setMoodAfterDone(true);
     goToStep('breath2');
   }, [pauseInstanceId, goToStep, t, lastShiftLogKeyRef]);
-
-  const handleMoodSelect = useCallback(
-    async (
-      mood: MoodValue,
-      intensity?: number,
-      opts?: { briefRitual?: boolean; briefFace?: BriefFeelTile },
-    ) => {
-      hapticFeedback('light');
-      const payload = buildInitialEmotionLoggedPayload(mood, intensity, opts);
-      const logKey = initialEmotionLogDedupeKey(payload, opts?.briefFace);
-      if (pauseInstanceId && lastFeelLogKeyRef.current === logKey) {
-        setMoodDone(true);
-        setSelectedMood(mood);
-        setFeelIntensity(typeof intensity === 'number' ? intensity : null);
-        if (opts?.briefFace) setSelectedBriefFace(opts.briefFace);
-        return;
-      }
-      setMoodDone(true);
-      setSelectedMood(mood);
-      setFeelIntensity(typeof intensity === 'number' ? intensity : null);
-      if (opts?.briefFace) setSelectedBriefFace(opts.briefFace);
-      if (pauseInstanceId) {
-        try {
-          await pauseLogStep({
-            instanceId: pauseInstanceId,
-            stepType: 'initial_emotion_logged',
-            payload,
-          });
-          lastFeelLogKeyRef.current = logKey;
-        } catch {
-          lastFeelLogKeyRef.current = null;
-          setMoodDone(false);
-          setSelectedMood(null);
-          setFeelIntensity(null);
-          showPauseStepSyncFailedToast(t);
-        }
-      }
-    },
-    [pauseInstanceId, t, lastFeelLogKeyRef],
-  );
-
-  const handleMoodSkip = useCallback(async () => {
-    setFeelIntensity(null);
-    if (pauseInstanceId) {
-      try {
-        await pauseLogStep({
-          instanceId: pauseInstanceId,
-          stepType: 'initial_emotion_logged',
-          payload: initialEmotionSkippedLoggedPayload(),
-        });
-        lastFeelLogKeyRef.current = initialEmotionSkippedLogDedupeKey();
-      } catch {
-        showPauseStepSyncFailedToast(t);
-        return;
-      }
-    }
-    setMoodDone(true);
-  }, [pauseInstanceId, t, lastFeelLogKeyRef]);
-
-  const handleMoodReset = useCallback(() => {
-    lastFeelLogKeyRef.current = null;
-    setMoodDone(false);
-    setSelectedMood(null);
-    setFeelIntensity(null);
-    setSelectedBriefFace(null);
-  }, [lastFeelLogKeyRef]);
 
   const handleClose = useCallback(() => {
     navigate('/', { replace: true });
