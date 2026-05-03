@@ -26,7 +26,6 @@ import { PauseDecide } from '@/components/pause/PauseDecide';
 import { PauseDone } from '@/components/pause/PauseDone';
 import { PauseDepthPicker } from '@/components/pause/PauseDepthPicker';
 import { PauseBriefProgress } from '@/components/pause/PauseBriefProgress';
-import { computeBriefPastStepClick } from '@/lib/brief-pause-past-step-click';
 import { computePauseGoBackPlan } from '@/lib/pause-go-back-plan';
 import { pauseStepSwipeDirection } from '@/lib/pause-step-swipe-direction';
 import { isPauseSessionHeaderBackVisible } from '@/lib/pause-session-header-back';
@@ -68,6 +67,7 @@ import type { PauseImpactData } from '@/lib/pause-impact-data';
 import { showPauseStepSyncFailedToast } from '@/lib/pause-step-sync-toast';
 import { usePauseSessionShell } from '@/hooks/use-pause-session-shell';
 import { usePauseSessionMountLog } from '@/hooks/use-pause-session-mount-log';
+import { usePauseSessionBriefPastStep } from '@/hooks/use-pause-session-brief-past-step';
 
 export default function PauseSession() {
   const { t } = useTranslation();
@@ -345,17 +345,12 @@ export default function PauseSession() {
     briefStep,
   });
 
-  const goToBriefPastStep = useCallback(
-    (target: BriefPauseStep) => {
-      const nav = computeBriefPastStepClick(target, briefStep);
-      if (!nav) return;
-      setSwipeDirection('back');
-      hapticFeedback('light');
-      setBriefStep(nav.target);
-      if (nav.clearBriefIntegrateDone) setBriefIntegrateDone(false);
-    },
-    [briefStep],
-  );
+  const { goToBriefPastStep } = usePauseSessionBriefPastStep({
+    briefStep,
+    setBriefStep,
+    setBriefIntegrateDone,
+    setSwipeDirection,
+  });
 
   const stepTransition = usePauseSessionStepTransition({
     swipeDirection,
