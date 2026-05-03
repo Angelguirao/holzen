@@ -4,6 +4,10 @@ Authoritative orchestration: [`src/pages/Home.tsx`](../../src/pages/Home.tsx).
 
 | Piece | File |
 |-------|------|
+| Dashboard shell (non-Zen) | [`HomeDashboardLayout.tsx`](../../src/components/home/HomeDashboardLayout.tsx) |
+| Section switch + deps type | [`render-home-dashboard-section.tsx`](../../src/components/home/render-home-dashboard-section.tsx) |
+| Pull-to-refresh row | [`HomePullRefreshIndicator.tsx`](../../src/components/home/HomePullRefreshIndicator.tsx) |
+| Customize link button | [`HomeCustomizeLinkButton.tsx`](../../src/components/home/HomeCustomizeLinkButton.tsx) |
 | Zen layout | [`ZenModeHome.tsx`](../../src/components/home/ZenModeHome.tsx) |
 | Pause widget body | [`HomePauseCardBody.tsx`](../../src/components/home/HomePauseCardBody.tsx) |
 | Pause error panel | [`HomePauseBlockingErrorPanel.tsx`](../../src/components/home/HomePauseBlockingErrorPanel.tsx) |
