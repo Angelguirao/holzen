@@ -3,6 +3,15 @@ import type { PauseSeverity } from '@/lib/router-location-state';
 import type { FetchedPauseInstance, PersistedSession } from '@/lib/pause-session-storage';
 import { DEFAULT_COMPANIONS, DEFAULT_PREFS } from '@/lib/pause-session-storage';
 
+/**
+ * Pure hydration merge for `/pause`: which reflection payload wins (restore vs nav vs Holzen) and
+ * when to enter **fetch** (load instance by id) vs **empty** vs **ready**.
+ *
+ * **Orchestration:** `src/hooks/use-pause-session-shell.ts` calls these helpers; do not reorder branches
+ * in `computePauseSessionHydration` without product review (see existing note on that function).
+ * **Contract:** `docs/systems/pause-system.md` section 7.2; **code map:** same doc, section 10.
+ */
+
 /** Resolved pause shell payload (reflection + instance id + prefs) before optional DB fetch. */
 export type PauseSessionHydrationReady = {
   status: 'ready';
