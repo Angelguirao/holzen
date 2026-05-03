@@ -5,7 +5,6 @@ import { useTranslation } from 'react-i18next';
 import { useHolzen } from '@/hooks/use-holzen';
 import { useSubscription } from '@/hooks/use-subscription';
 import { type MoodValue } from '@/components/MoodCheck';
-import { type CompanionData, type CompanionPrefs } from '@/components/CompanionSection';
 
 import { type PauseStep, STEPS } from '@/components/pause/PauseProgress';
 import { PauseSessionGate } from '@/components/pause/PauseSessionGate';
@@ -43,7 +42,6 @@ import { usePauseSessionBreathTimedActiveReset } from '@/hooks/use-pause-session
 import { usePauseSessionDepthAndBriefCopy } from '@/hooks/use-pause-session-depth-and-brief-copy';
 import { usePauseSessionBreathSecondLabelVariant } from '@/hooks/use-pause-session-breath-second-label-variant';
 import type { PauseImpactData } from '@/lib/pause-impact-data';
-import { showPauseStepSyncFailedToast } from '@/lib/pause-step-sync-toast';
 import { usePauseSessionShell } from '@/hooks/use-pause-session-shell';
 import { usePauseSessionMountLog } from '@/hooks/use-pause-session-mount-log';
 import { usePauseSessionBriefPastStep } from '@/hooks/use-pause-session-brief-past-step';
@@ -116,6 +114,8 @@ export default function PauseSession() {
 
   const { message, context, pauseInstanceId, companions, companionPrefs, severity } =
     coalescePauseSessionShellViewModel(resolved, holzenSeverity);
+
+  const hasCoalescedShellMessage = message.length > 0;
 
   const waitingForFetch = isPauseSessionWaitingForInstanceFetch({
     hydrationStatus: hydration.status,
@@ -360,7 +360,7 @@ export default function PauseSession() {
   const sessionOnPicker = isPauseSessionDepthPickerActive({
     phase,
     ritualEntry,
-    hasShellMessage: !!message,
+    hasShellMessage: hasCoalescedShellMessage,
   });
 
   const scaffoldRitualDerived = buildPauseSessionScaffoldRitualDerived({
@@ -444,7 +444,7 @@ export default function PauseSession() {
 
   return (
     <PauseSessionGate
-      hasMessage={!!message}
+      hasMessage={hasCoalescedShellMessage}
       phase={phase}
       waitingForFetch={waitingForFetch}
       fetchFailed={fetchFailed}
