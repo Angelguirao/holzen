@@ -22,7 +22,7 @@ import {
   initialBriefIntegrateDoneFromRestored,
   initialSelectedBriefFaceFromRestored,
   initialPhaseFromRestored,
-  initialBreathSegmentRpcLoggedFlagsFromRestored,
+  initialBreathingFirstCompletedFromRestored,
 } from '@/lib/pause-session-step-map';
 import { initialDecideOnBackStepFromPersisted } from '@/lib/pause-session-initial-decide-on-back-step';
 import { parsePauseSessionLocationState } from '@/lib/router-location-state';
@@ -150,8 +150,6 @@ export default function PauseSession() {
   });
 
   const restoredStep = mapPersistedStep(restored?.step);
-  const { segment1Logged: initialBreathSegment1Logged, segment2Logged: initialBreathSegment2Logged } =
-    initialBreathSegmentRpcLoggedFlagsFromRestored(restored);
 
   const [step, setStep] = useState<PauseStep>(restoredStep);
   const [decideOnBackStep, setDecideOnBackStep] = useState<'choose' | 'breath2'>(() =>
@@ -173,8 +171,8 @@ export default function PauseSession() {
   const [selectedMoodAfter, setSelectedMoodAfter] = useState<MoodValue | null>(restored?.selectedMoodAfter ?? null);
   const [feelIntensity, setFeelIntensity] = useState<number | null>(restored?.feelIntensity ?? null);
   const [shiftIntensity, setShiftIntensity] = useState<number | null>(restored?.shiftIntensity ?? null);
-  const [breathingFirstCompleted, setBreathingFirstCompleted] = useState(
-    restored?.breathingFirstCompleted ?? restored?.breathingCompleted ?? false,
+  const [breathingFirstCompleted, setBreathingFirstCompleted] = useState(() =>
+    initialBreathingFirstCompletedFromRestored(restored),
   );
   const [breathingSecondCompleted, setBreathingSecondCompleted] = useState(restored?.breathingSecondCompleted ?? false);
   const [frameDone, setFrameDone] = useState(restored?.frameDone ?? false);
@@ -190,8 +188,7 @@ export default function PauseSession() {
     logBreathSegment2Skipped,
   } = usePauseBreathSegmentRpcLoggers({
     pauseInstanceId,
-    initialSegment1Logged: initialBreathSegment1Logged,
-    initialSegment2Logged: initialBreathSegment2Logged,
+    restored,
     t,
   });
   const { lastFeelLogKeyRef, lastShiftLogKeyRef } = usePauseFeelShiftLogDedupeRefs(pauseInstanceId);

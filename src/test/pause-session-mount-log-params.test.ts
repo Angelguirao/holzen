@@ -1,24 +1,14 @@
 import { describe, it, expect } from 'vitest';
 import { buildPauseSessionMountLogParams } from '@/lib/pause-session-mount-log-params';
-import { DEFAULT_COMPANIONS, DEFAULT_PREFS, type PersistedSession } from '@/lib/pause-session-storage';
+import type { PersistedSession } from '@/lib/pause-session-storage';
+import { makeTestPersistedPauseSession } from '@/test/make-test-persisted-pause-session';
 
 function restoredBrief(overrides: Partial<PersistedSession> = {}): PersistedSession {
-  return {
-    message: 'hello',
-    context: null,
-    pauseInstanceId: 'p1',
-    companions: DEFAULT_COMPANIONS,
-    companionPrefs: DEFAULT_PREFS,
-    severity: 'mild',
-    moodDone: false,
-    moodAfterDone: false,
-    phase: 'session',
-    decision: null,
-    step: 'feel',
+  return makeTestPersistedPauseSession({
     ritualDepth: 'brief',
     briefStep: 'integrate',
     ...overrides,
-  };
+  });
 }
 
 describe('buildPauseSessionMountLogParams', () => {

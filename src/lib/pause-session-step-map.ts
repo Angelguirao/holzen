@@ -60,6 +60,15 @@ export function initialPhaseFromRestored(restored: PersistedSession | null): 'se
 }
 
 /**
+ * First breath segment completion from local restore. Matches `normalizePauseRitualFields` in
+ * `pause-session-storage.ts` (legacy v1 `breathingCompleted` rolls into `breathingFirstCompleted`).
+ */
+export function initialBreathingFirstCompletedFromRestored(restored: PersistedSession | null): boolean {
+  if (!restored) return false;
+  return restored.breathingFirstCompleted ?? restored.breathingCompleted ?? false;
+}
+
+/**
  * When resuming from local storage past the first or second breath beat, `usePauseBreathSegmentRpcLoggers`
  * must treat `breath_completed` segment RPCs as already satisfied (refs start `true`).
  * Uses the same `mapPersistedStep` + `STEPS` order as initial `step` state in `PauseSession.tsx`.

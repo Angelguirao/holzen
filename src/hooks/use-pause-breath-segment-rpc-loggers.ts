@@ -2,16 +2,19 @@ import { useCallback, useEffect, useRef, type MutableRefObject } from 'react';
 import type { TFunction } from 'i18next';
 import { pauseLogStep } from '@/lib/pause-api';
 import { breathCompletedSegment1Payload, breathCompletedSegment2Payload } from '@/lib/pause-breath-completed-payload';
+import type { PersistedSession } from '@/lib/pause-session-storage';
+import { initialBreathSegmentRpcLoggedFlagsFromRestored } from '@/lib/pause-session-step-map';
 import { showPauseStepSyncFailedToast } from '@/lib/pause-step-sync-toast';
 
 /**
  * Dedupes `breath_completed` RPCs for deep + brief breath segments and resets when `pauseInstanceId` changes.
+ *
+ * **`restored`:** read on **first mount only** (via `useRef` seeds) through
+ * {@link initialBreathSegmentRpcLoggedFlagsFromRestored} — same contract as when the page passed explicit booleans.
  */
 export function usePauseBreathSegmentRpcLoggers(input: {
   pauseInstanceId: string | null;
-  /** When restoring past the first breath UI, segment 1 is already logged. */
-  initialSegment1Logged: boolean;
-  initialSegment2Logged: boolean;
+  restored: PersistedSession | null;
   t: TFunction;
 }): {
   ensureBreathSegment1Logged: (briefRitual?: boolean) => Promise<boolean>;
@@ -22,9 +25,10 @@ export function usePauseBreathSegmentRpcLoggers(input: {
   breath1RpcDoneRef: MutableRefObject<boolean>;
   breath2RpcDoneRef: MutableRefObject<boolean>;
 } {
-  const { pauseInstanceId, initialSegment1Logged, initialSegment2Logged, t } = input;
-  const breath1RpcDoneRef = useRef(initialSegment1Logged);
-  const breath2RpcDoneRef = useRef(initialSegment2Logged);
+  const { pauseInstanceId, restored, t } = input;
+  const { segment1Logged, segment2Logged } = initialBreathSegmentRpcLoggedFlagsFromRestored(restored);
+  const breath1RpcDoneRef = useRef(segment1Logged);
+  const breath2RpcDoneRef = useRef(segment2Logged);
   const prevPauseInstanceIdRef = useRef<string | null>(null);
 
   useEffect(() => {
