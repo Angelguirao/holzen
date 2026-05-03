@@ -4,7 +4,6 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useHolzen } from '@/hooks/use-holzen';
 import { useSubscription } from '@/hooks/use-subscription';
-import { toast } from 'sonner';
 import { hapticFeedback } from '@/lib/haptics';
 import { type MoodValue } from '@/components/MoodCheck';
 import { type CompanionData, type CompanionPrefs } from '@/components/CompanionSection';
@@ -56,6 +55,7 @@ import {
 } from '@/lib/pause-session-storage';
 import { pauseLogStep } from '@/lib/pause-api';
 import { breathCompletedSegment1Payload, breathCompletedSegment2Payload } from '@/lib/pause-breath-completed-payload';
+import { showPauseFavoriteProHintToast } from '@/lib/pause-favorite-toast';
 import { showPauseOutcomeNotCompletedToast, showPauseOutcomeSaveFailedToast } from '@/lib/pause-outcome-toast';
 import { showPauseStepSyncFailedToast } from '@/lib/pause-step-sync-toast';
 import type { PauseState } from '@/lib/pause-state';
@@ -587,7 +587,7 @@ export default function PauseSession() {
       payload: { is_favorite: newVal },
     }).catch(() => setIsFavorite(!newVal));
     if (newVal && !subscribed) {
-      toast(t('pause.favoriteProHint'), { duration: 4000 });
+      showPauseFavoriteProHintToast(t);
     }
   }, [pauseInstanceId, isFavorite, subscribed, t]);
 
