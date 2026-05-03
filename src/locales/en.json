@@ -91,9 +91,7 @@
     "greeting": "Welcome back, {{name}}",
     "noActiveReflection": "No active pause.",
     "pauseEmpty": {
-      "title": "You're between pauses.",
-      "subtitle": "Automatic pauses still arrive when the market and your settings line up. Until then, tools are here for regulation — or tap below anytime.",
-      "exploreTools": "Open Tools hub"
+      "toolsHint": "Tools between pauses"
     },
     "generatingReflection": "Preparing your pause…",
     "needAMoment": "I need a pause",
@@ -180,14 +178,14 @@
     "nextAutoCheck": "Next auto-check · {{time}}",
     "cooldownHeadline": "{{hours}}h cooldown · {{time}} left",
     "nextScanLine": "Next scan · {{scan}}",
-    "nextScanIdleTitle": "Roughly when Holzen next reviews market conditions against your settings (quarter-hour rhythm).",
+    "nextScanIdleTitle": "When Holzen next checks market conditions against your settings (about every 15 minutes).",
     "autoCooldown": {
       "afterPauseKicker": "Rest window after your last pause",
-      "serverChecksKicker": "Holzen keeps watch in the background.",
+      "serverChecksKicker": "Holzen is watching the market for you",
       "cooldownAria": "You are in the rest period that starts when a pause is created. It is not the same timer as the Need a moment button. This rest window ends at {{time}} ({{hours}} hours from that pause).",
-      "nextScanAria": "Holzen reviews conditions on a quarter-hour rhythm. The next review is around {{time}}. A new automatic pause only happens when your settings and the market align — this is only the schedule.",
+      "nextScanAria": "Holzen reviews conditions on a quarter-hour rhythm. The next routine check is around {{time}}. A new automatic pause only happens when your settings and the market align — this is only the schedule.",
       "cooldownReadyAt": "{{hours}}h rest · until {{time}}",
-      "nextScanAtClock": "Next quiet review · {{time}}"
+      "nextScanAtClock": "Next routine check · {{time}}"
     },
     "monitoringReady": "Monitoring · ready",
     "widget": {

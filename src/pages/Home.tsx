@@ -530,11 +530,11 @@ const Home = () => {
               <SubscriptionSkeleton variant="centered" />
             </motion.div>
           ) : (
-            <motion.div key="zen-empty" variants={zenVariants} initial="hidden" animate="visible" exit="hidden" className="space-y-6 text-center">
+            <motion.div key="zen-empty" variants={zenVariants} initial="hidden" animate="visible" exit="hidden" className="space-y-4 text-center">
               {hasAccess && !showLimitUpsell ? (
                 <>
-                  <HomePauseEmptyBetweenContent />
                   <NeedAMomentButton onTrigger={handleNeedAPause} cooldownRemaining={manualCooldownRemaining} loading={loading} />
+                  <HomePauseEmptyBetweenContent />
                 </>
               ) : (
                 <>
@@ -672,7 +672,7 @@ const Home = () => {
                   </button>
                 </div>
               ) : (
-                <div className="space-y-6">
+                <div className="space-y-4">
                   {pinnedPausePreview && (
                     <div className={cn(homeInWidget.inset, 'space-y-3')}>
                       <div className="flex items-center justify-between gap-2">
@@ -700,8 +700,8 @@ const Home = () => {
                       ) : null}
                     </div>
                   )}
-                  <HomePauseEmptyBetweenContent />
                   <NeedAMomentButton onTrigger={handleNeedAPause} cooldownRemaining={manualCooldownRemaining} loading={loading} />
+                  <HomePauseEmptyBetweenContent />
                 </div>
               )}
             </>
@@ -710,7 +710,7 @@ const Home = () => {
       )}
 
       {showPauseScheduling ? (
-        <div className="border-t border-border/50 pt-3">
+        <div className="border-t border-border/40 pt-2.5">
           <AutoCooldownIndicator
             cooldownRemaining={autoCooldownRemaining}
             cooldownHours={cooldownHours}
