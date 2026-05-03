@@ -62,7 +62,7 @@ export function PauseDecide({ onDecide, onBack, introKicker }: Props) {
           >
             <div className="flex flex-col items-center gap-3 text-center">
               <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-muted-foreground">
-                {introKicker ?? t('pause.decideIntroKicker', { defaultValue: 'Step 7 · Decide' })}
+                {introKicker ?? t('pause.decideIntroKicker', { defaultValue: 'Step 6 · Decide' })}
               </p>
               <p className={pauseStepLayout.screenTitle}>{t('pause.whatWillYouDo')}</p>
               <p className="max-w-sm text-sm leading-relaxed text-muted-foreground">

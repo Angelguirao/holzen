@@ -8,8 +8,8 @@ interface Props {
 }
 
 /**
- * Figma “bridge” between the second breathing segment and Decide: one deliberate
- * “Choose” beat so the Hold/Buy/Sell screen does not appear immediately after breath.
+ * Short settle screen after the second breath, before the outcome UI.
+ * Shares the sixth header segment with Decide (no separate “Choose” bar).
  */
 export function PauseChooseBridge({ onChoose }: Props) {
   const { t } = useTranslation();
@@ -24,7 +24,7 @@ export function PauseChooseBridge({ onChoose }: Props) {
     >
       <div className="flex max-w-md flex-col items-center gap-5 text-center">
         <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-muted-foreground">
-          {t('pause.chooseBridgeKicker', { defaultValue: 'Step 6 · Choose' })}
+          {t('pause.chooseBridgeKicker', { defaultValue: 'Step 6 · Decide' })}
         </p>
         <p className={pauseStepLayout.screenTitle}>
           {t('pause.chooseBridgeTitle', { defaultValue: 'What feels possible from here?' })}

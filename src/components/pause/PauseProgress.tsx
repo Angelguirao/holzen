@@ -1,9 +1,31 @@
 import { useTranslation } from 'react-i18next';
 import { cn } from '@/lib/utils';
 
-/** Figma-aligned deep pause: Feel → Breathe → Reflect → Frame → Breathe → Choose → Decide */
+/**
+ * Full routing order (includes `choose` between second breath and Decide).
+ * The header stepper renders `PAUSE_DEEP_DISPLAY_STEPS` — six user-facing beats;
+ * `choose` is a short interstitial before Decide, not a separate labeled segment.
+ */
 const STEPS = ['feel', 'breathe', 'reflect', 'frame', 'breath2', 'choose', 'decide'] as const;
 export type PauseStep = (typeof STEPS)[number];
+
+/** Six segments in the deep-pause shell (Choose is folded into the last “Decide” beat). */
+const PAUSE_DEEP_DISPLAY_STEPS = ['feel', 'breathe', 'reflect', 'frame', 'breath2', 'decide'] as const;
+
+export const PAUSE_DEEP_DISPLAY_STEP_COUNT = PAUSE_DEEP_DISPLAY_STEPS.length;
+
+/** 1-based “Step n of 6” for the meta line; `choose` and `decide` both count as step 6. */
+export function pauseDeepMacroStepNumber(step: PauseStep): number {
+  if (step === 'choose' || step === 'decide') return PAUSE_DEEP_DISPLAY_STEP_COUNT;
+  return STEPS.indexOf(step) + 1;
+}
+
+function pauseDeepDisplayProgressIndex(step: PauseStep): number {
+  if (step === 'choose' || step === 'decide') {
+    return PAUSE_DEEP_DISPLAY_STEPS.indexOf('decide');
+  }
+  return PAUSE_DEEP_DISPLAY_STEPS.indexOf(step as (typeof PAUSE_DEEP_DISPLAY_STEPS)[number]);
+}
 
 interface Props {
   currentStep: PauseStep;
@@ -25,22 +47,21 @@ export function PauseProgress({
     breathSecondLabelVariant === 'shift'
       ? t('pause.steps.shift', { defaultValue: 'Shift' })
       : t('pause.steps.breath2', { defaultValue: 'Breathe' });
-  const stepLabels: Record<PauseStep, string> = {
+  const displayLabels: Record<(typeof PAUSE_DEEP_DISPLAY_STEPS)[number], string> = {
     feel: t('pause.steps.feel', { defaultValue: 'Feel' }),
     breathe: t('pause.steps.breathe', { defaultValue: 'Breathe' }),
     reflect: t('pause.steps.reflect', { defaultValue: 'Reflect' }),
     frame: t('pause.steps.frame', { defaultValue: 'Frame' }),
     breath2: breath2Label,
-    choose: t('pause.steps.choose', { defaultValue: 'Choose' }),
     decide: t('pause.steps.decide', { defaultValue: 'Decide' }),
   };
 
-  const currentIndex = STEPS.indexOf(currentStep);
+  const currentIndex = pauseDeepDisplayProgressIndex(currentStep);
 
   if (variant === 'pill') {
     return (
       <div className="flex w-max min-w-full items-center justify-start gap-1 sm:gap-1.5">
-        {STEPS.map((step, i) => {
+        {PAUSE_DEEP_DISPLAY_STEPS.map((step, i) => {
           const isActive = i === currentIndex;
           const isPast = i < currentIndex;
           const canClick = isPast && onStepClick;
@@ -66,7 +87,7 @@ export function PauseProgress({
                       : 'text-muted-foreground/70'
                 }`}
               >
-                {stepLabels[step]}
+                {displayLabels[step]}
               </span>
             </button>
           );
@@ -77,7 +98,7 @@ export function PauseProgress({
 
   return (
     <div className="flex w-full items-start justify-between gap-1 sm:gap-2">
-      {STEPS.map((step, i) => {
+      {PAUSE_DEEP_DISPLAY_STEPS.map((step, i) => {
         const isActive = i === currentIndex;
         const isPast = i < currentIndex;
         const canClick = isPast && onStepClick;
@@ -105,7 +126,7 @@ export function PauseProgress({
                 canClick && 'hover:text-foreground',
               )}
             >
-              {stepLabels[step]}
+              {displayLabels[step]}
             </span>
           </button>
         );

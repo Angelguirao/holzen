@@ -20,14 +20,14 @@ interface Props {
   /** Shown under the stepper; invokes macro back or breathing intro reset from parent. */
   onHeaderBack?: () => void;
   showHeaderBack?: boolean;
-  /** 1-based index in the macro ritual (Feel → … → Decide; seven bars including Choose bridge). */
+  /** 1-based index in the macro ritual (Feel → … → Decide; six user-facing beats — Choose is folded into the last beat). */
   macroStepIndex?: number;
   macroStepTotal?: number;
   /** When set, replaces the default `pause.sessionTitle` header string. */
   sessionTitle?: string;
   /** When set, replaces `pause.macroProgress` for the meta line under the title. */
   macroProgressLine?: string;
-  /** When set, replaces the default seven-step `PauseProgress` (e.g. brief four-step bar). */
+  /** When set, replaces the default six-beat `PauseProgress` (e.g. brief four-step bar). */
   stepperSlot?: ReactNode;
   /** Which deep-pause step’s citations to emphasize in the “Step science” tab (defaults to `step`). */
   scienceCurrentStep?: PauseStep;
