@@ -48,16 +48,10 @@ import {
   loadSession,
   clearSession,
 } from '@/lib/pause-session-storage';
-import { usePauseSessionFetch } from '@/hooks/use-pause-session-fetch';
 import { pauseLogStep } from '@/lib/pause-api';
 import type { PauseState } from '@/lib/pause-state';
 import { getSessionQuote } from '@/lib/wisdom-quotes';
-import {
-  computePauseSessionHydration,
-  computePauseSessionResolved,
-  type PauseSessionHydrationReady,
-  type PauseSessionHydrationState,
-} from '@/lib/pause-session-hydration';
+import { usePauseSessionShell } from '@/hooks/use-pause-session-shell';
 
 export default function PauseSession() {
   const { t } = useTranslation();
@@ -90,6 +84,7 @@ export default function PauseSession() {
   } = useHolzen();
   const { subscribed, refresh: refreshSubscription } = useSubscription();
 
+  const nav = parsePauseSessionLocationState(location.state);
   const {
     pauseInstanceId: navPauseInstanceId,
     reflectionMessage: navReflectionMessage,
@@ -97,68 +92,20 @@ export default function PauseSession() {
     companions: navCompanions,
     companionPrefs: navCompanionPrefs,
     severity: navSeverity,
-  } = parsePauseSessionLocationState(location.state);
+  } = nav;
 
-  const restored = useMemo(() => {
-    const saved = loadSession();
-    if (!saved?.message) return null;
-    if (navPauseInstanceId && saved.pauseInstanceId && saved.pauseInstanceId !== navPauseInstanceId) return null;
-    return saved;
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- keyed on location.key + navPauseInstanceId; loadSession is a stable module import
-  }, [location.key, navPauseInstanceId]);
-
-  const holzenAligned =
-    !navPauseInstanceId || (holzenLastPauseInstanceId != null && holzenLastPauseInstanceId === navPauseInstanceId);
-
-  const hydration = useMemo((): PauseSessionHydrationState => {
-    return computePauseSessionHydration({
-      restored,
-      navPauseInstanceId,
-      navReflectionMessage,
-      navContext,
-      navCompanions,
-      navCompanionPrefs,
-      navSeverity,
-      holzenMessage,
-      holzenContext,
-      holzenLastPauseInstanceId,
-      holzenCompanions,
-      holzenCompanionPrefs,
-      holzenSeverity,
-      holzenAligned,
-    });
-  }, [
-    restored,
-    holzenMessage,
-    holzenContext,
-    holzenLastPauseInstanceId,
-    holzenCompanions,
-    holzenCompanionPrefs,
-    holzenSeverity,
-    holzenAligned,
-    navPauseInstanceId,
-    navReflectionMessage,
-    navContext,
-    navCompanions,
-    navCompanionPrefs,
-    navSeverity,
-  ]);
-
-  const fetchPauseInstanceId = hydration.status === 'fetch' ? hydration.pauseInstanceId : null;
-  const { fetchedInstance, fetchFailed } = usePauseSessionFetch(fetchPauseInstanceId);
-
-  const resolved: PauseSessionHydrationReady | null = useMemo(
-    () =>
-      computePauseSessionResolved({
-        hydration,
-        fetchedInstance,
-        navCompanionPrefs,
-        holzenCompanionPrefs,
-        navSeverity,
-        holzenSeverity,
-      }),
-    [hydration, fetchedInstance, navCompanionPrefs, holzenCompanionPrefs, navSeverity, holzenSeverity],
-  );
+  const { restored, hydration, fetchPauseInstanceId, fetchedInstance, fetchFailed, resolved } = usePauseSessionShell({
+    locationKey: location.key,
+    nav,
+    holzen: {
+      message: holzenMessage,
+      context: holzenContext,
+      lastPauseInstanceId: holzenLastPauseInstanceId,
+      companions: holzenCompanions,
+      companionPrefs: holzenCompanionPrefs,
+      severity: holzenSeverity,
+    },
+  });
 
   useEffect(() => {
     holzenLog.pause('mount', {
