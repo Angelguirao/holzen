@@ -23,6 +23,7 @@ describe('usePauseSessionMountLog', () => {
         hydrationStatus: 'ready',
         ritualEntryInitial: 'brief',
         briefStepInitial: 'integrate',
+        phaseInitial: 'done',
       }),
     );
 
@@ -36,6 +37,7 @@ describe('usePauseSessionMountLog', () => {
         hydrationStatus: 'ready',
         ritualEntryInitial: 'brief',
         briefStepInitial: 'integrate',
+        phaseInitial: 'done',
       }),
     );
   });

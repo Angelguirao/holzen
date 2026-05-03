@@ -45,6 +45,11 @@ export function initialSelectedBriefFaceFromRestored(restored: PersistedSession 
   return restored?.briefFace ?? null;
 }
 
+/** Session vs Done screen when hydrating `/pause` from local storage. */
+export function initialPhaseFromRestored(restored: PersistedSession | null): 'session' | 'done' {
+  return restored?.phase ?? 'session';
+}
+
 /** Brief “Integrate” has no dedicated citations row — highlight Reflect (regulation) sources. */
 export function briefStepToPauseScienceStep(brief: BriefPauseStep): PauseStep {
   switch (brief) {

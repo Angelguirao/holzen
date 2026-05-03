@@ -5,6 +5,7 @@ import {
   initialBriefPauseStepFromRestored,
   initialBriefIntegrateDoneFromRestored,
   initialSelectedBriefFaceFromRestored,
+  initialPhaseFromRestored,
   briefStepToPauseScienceStep,
 } from '@/lib/pause-session-step-map';
 import type { PersistedSession } from '@/lib/pause-session-storage';
@@ -119,6 +120,17 @@ describe('initialSelectedBriefFaceFromRestored', () => {
     expect(
       initialSelectedBriefFaceFromRestored(baseSession({ ritualDepth: 'brief', briefFace: 'anxious' })),
     ).toBe('anxious');
+  });
+});
+
+describe('initialPhaseFromRestored', () => {
+  it('defaults session when absent', () => {
+    expect(initialPhaseFromRestored(null)).toBe('session');
+    expect(initialPhaseFromRestored(baseSession({ phase: undefined }))).toBe('session');
+  });
+
+  it('reads stored phase', () => {
+    expect(initialPhaseFromRestored(baseSession({ phase: 'done' }))).toBe('done');
   });
 });
 
