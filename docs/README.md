@@ -48,6 +48,10 @@ When you change behavior, update the **one** doc that owns that slice (and ADRs 
 - `fundamentals/browser-360-mcp-playbook.md` — Chrome DevTools MCP: network, console, Lighthouse, performance traces; complements HTTP playbooks and source reading.
 - **UI / journeys vs API review:** full app flows (pause, journal, settings) belong in browser automation — see [backlog/e2e-browser-automation.md](backlog/e2e-browser-automation.md). Bruno/Postman stay on the HTTP side; they do not replace E2E.
 
+## Screens (in-app surfaces)
+
+- `screens/home.md` — **`/`** dashboard: modes (zen vs full), widgets, subscription/checkout interplay, pause error surfacing, analytics touchpoints.
+
 ## Reports (snapshots)
 
 - `reports/2026-04-03-home-localhost-360-analysis.md` — example **360°** capture for **`/`** on localhost (Lighthouse + trace + backlog pointers).

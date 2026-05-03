@@ -1,7 +1,6 @@
 import { useTranslation } from 'react-i18next';
 import { usePullToRefresh } from '@/hooks/use-pull-to-refresh';
 import { useHolzen } from '@/hooks/use-holzen';
-import { isPausePersistError } from '@/lib/reflection-persist-error';
 import { TestimonialRequest } from '@/components/TestimonialRequest';
 import AuthLoading from '@/components/AuthLoading';
 import { useSubscription } from '@/hooks/use-subscription';
@@ -45,6 +44,8 @@ import { trackEvent } from '@/lib/posthog';
 import { heroQuoteIndexForDay, utcYmd } from '@/lib/home-hero-quote';
 import { parsePauseContextForHomePreview } from '@/lib/pause-context-home-preview';
 import { type PauseSessionLocationState } from '@/lib/router-location-state';
+import { pauseHomeErrorKind, shouldSurfacePauseWidgetError } from '@/lib/home-pause-widget-error';
+
 interface PinnedPausePreview {
   id: string;
   context: string | null;
@@ -61,12 +62,12 @@ const Home = () => {
   const [searchParams] = useSearchParams();
 
   useEffect(() => {
-    if (searchParams.get('subscribed') === 'true') {
-      refresh();
-      toast.success(
-        t('pro.welcomeToast', { defaultValue: '🎉 Welcome to Pro! All features are now unlocked.' }),
-      );
-    }
+    if (searchParams.get('subscribed') !== 'true') return;
+    void refresh();
+    toast.success(
+      t('pro.welcomeToast', { defaultValue: '🎉 Welcome to Pro! All features are now unlocked.' }),
+      { id: 'home:pro-checkout-welcome' },
+    );
   }, [searchParams, refresh, t]);
 
   const {
@@ -123,12 +124,16 @@ const Home = () => {
   // from Settings → Appearance.
   const [zenMode, setZenModeState] = useState(() => {
     const RESET_KEY = 'holzen_zen_mode_reset_v1';
-    if (typeof window !== 'undefined' && !localStorage.getItem(RESET_KEY)) {
-      localStorage.removeItem('holzen_zen_mode');
-      localStorage.setItem(RESET_KEY, '1');
+    try {
+      if (typeof window !== 'undefined' && !localStorage.getItem(RESET_KEY)) {
+        localStorage.removeItem('holzen_zen_mode');
+        localStorage.setItem(RESET_KEY, '1');
+        return false;
+      }
+      return localStorage.getItem('holzen_zen_mode') === 'true';
+    } catch {
       return false;
     }
-    return localStorage.getItem('holzen_zen_mode') === 'true';
   });
 
   const setZenModePersist = useCallback((zen: boolean) => {
@@ -147,8 +152,11 @@ const Home = () => {
   }, []);
 
   useEffect(() => {
-    if (location.pathname === '/') {
+    if (location.pathname !== '/') return;
+    try {
       setZenModeState(localStorage.getItem('holzen_zen_mode') === 'true');
+    } catch {
+      setZenModeState(false);
     }
   }, [location.pathname]);
   const [pinnedPausePreview, setPinnedPausePreview] = useState<PinnedPausePreview | null>(null);
@@ -375,12 +383,16 @@ const Home = () => {
   // Fetch completed-pause count for testimonial prompt.
   useEffect(() => {
     if (!user) return;
-    supabase
+    void supabase
       .from('pause_instances' as never)
       .select('id', { count: 'exact', head: true })
       .eq('user_id', user.id)
       .eq('state', 'completed')
-      .then(({ count }: { count: number | null }) => {
+      .then(({ count, error: countErr }: { count: number | null; error: { message: string } | null }) => {
+        if (countErr) {
+          holzenLog.home('completed_pause_count_unavailable', { message: countErr.message });
+          return;
+        }
         if (count != null) setCompletedPauseCount(count);
       });
   }, [user]);
@@ -507,6 +519,8 @@ const Home = () => {
   /** Hide server scheduling row while a reflection is showing or generating — keeps focus on the pause. */
   const showPauseScheduling = subscriptionReady && hasAccess && !message && !loading;
 
+  const pauseWidgetErrKind = pauseHomeErrorKind(error);
+
   // Zen mode — unchanged
   if (zenMode) {
     const zenTransition = { duration: 0.8, ease: "easeOut" as const };
@@ -538,29 +552,52 @@ const Home = () => {
               <Skeleton className="h-4 w-full" />
               <Skeleton className="h-4 w-3/4" />
             </motion.div>
-          ) : isPausePersistError(error) ? (
+          ) : shouldSurfacePauseWidgetError(error, btcData) ? (
             <motion.div
-              key="zen-reflection-save-error"
+              key="zen-blocking-error"
               variants={zenVariants}
               initial="hidden"
               animate="visible"
               exit="hidden"
-              className="rounded-md border border-destructive/20 bg-destructive/5 px-4 py-3 space-y-2 max-w-md mx-auto text-left"
+              className="max-w-md mx-auto text-left"
             >
-              <div className="flex items-center gap-2 text-destructive/80">
-                <AlertCircle className="h-3.5 w-3.5 shrink-0" />
-                <p className="text-xs font-mono">{error}</p>
+              <div className={homeInWidget.errorPanel}>
+                <div className="flex items-center gap-2 text-destructive">
+                  <AlertCircle className="h-4 w-4 shrink-0" />
+                  <p className="text-sm font-medium leading-snug">
+                    {pauseWidgetErrKind === 'persist' && error
+                      ? error
+                      : pauseWidgetErrKind === 'network'
+                        ? t('home.errors.couldNotReachPrice')
+                        : pauseWidgetErrKind === 'ai'
+                          ? t('home.errors.aiUnavailable')
+                          : t('home.errors.somethingWentWrong')}
+                  </p>
+                </div>
+                {pauseWidgetErrKind && pauseWidgetErrKind !== 'persist' ? (
+                  <p className={homeInWidget.meta}>
+                    {pauseWidgetErrKind === 'network'
+                      ? t('home.errors.checkConnection')
+                      : pauseWidgetErrKind === 'ai'
+                        ? t('home.errors.aiTemporarilyUnavailable')
+                        : t('home.errors.unexpectedError')}
+                  </p>
+                ) : null}
+                <button
+                  type="button"
+                  onClick={() => {
+                    if (pauseWidgetErrKind === 'persist') {
+                      holzenLog.home('Try again after pause persist error: manualTrigger');
+                    } else {
+                      holzenLog.home('Try again: manualTrigger');
+                    }
+                    manualTrigger();
+                  }}
+                  className="text-sm font-medium text-primary underline-offset-4 hover:underline"
+                >
+                  {t('common.tryAgain')}
+                </button>
               </div>
-              <button
-                type="button"
-                onClick={() => {
-                  holzenLog.home('Try again after pause persist error: manualTrigger');
-                  manualTrigger();
-                }}
-                className="text-xs font-mono text-primary underline"
-              >
-                {t('common.tryAgain')}
-              </button>
             </motion.div>
           ) : !subscriptionReady ? (
             <motion.div key="zen-hydrating" variants={zenVariants} initial="hidden" animate="visible" exit="hidden">
@@ -681,33 +718,37 @@ const Home = () => {
                   <Skeleton className="h-4 w-3/4" />
                   <Skeleton className="h-4 w-1/2" />
                 </div>
-              ) : (error && !btcData) || isPausePersistError(error) ? (
+              ) : shouldSurfacePauseWidgetError(error, btcData) ? (
                 <div className={homeInWidget.errorPanel}>
                   <div className="flex items-center gap-2 text-destructive">
                     <AlertCircle className="h-4 w-4 shrink-0" />
                     <p className="text-sm font-medium leading-snug">
-                      {isPausePersistError(error)
+                      {pauseWidgetErrKind === 'persist' && error
                         ? error
-                        : error.includes('fetch') || error.includes('network') || error.includes('Failed to fetch')
+                        : pauseWidgetErrKind === 'network'
                           ? t('home.errors.couldNotReachPrice')
-                          : error.includes('generate') || error.includes('reflect')
+                          : pauseWidgetErrKind === 'ai'
                             ? t('home.errors.aiUnavailable')
                             : t('home.errors.somethingWentWrong')}
                     </p>
                   </div>
-                  {!isPausePersistError(error) && (
+                  {pauseWidgetErrKind && pauseWidgetErrKind !== 'persist' ? (
                     <p className={homeInWidget.meta}>
-                      {error.includes('fetch') || error.includes('network') || error.includes('Failed to fetch')
+                      {pauseWidgetErrKind === 'network'
                         ? t('home.errors.checkConnection')
-                        : error.includes('generate') || error.includes('reflect')
+                        : pauseWidgetErrKind === 'ai'
                           ? t('home.errors.aiTemporarilyUnavailable')
                           : t('home.errors.unexpectedError')}
                     </p>
-                  )}
+                  ) : null}
                   <button
                     type="button"
                     onClick={() => {
-                      holzenLog.home('Try again: manualTrigger');
+                      if (pauseWidgetErrKind === 'persist') {
+                        holzenLog.home('Try again after pause persist error: manualTrigger');
+                      } else {
+                        holzenLog.home('Try again: manualTrigger');
+                      }
                       manualTrigger();
                     }}
                     className="text-sm font-medium text-primary underline-offset-4 hover:underline"
