@@ -46,6 +46,8 @@ export interface PauseFullRow {
   has_shift_emotion_logged: boolean;
   has_outcome_logged: boolean;
   initial_mood: string | null;
+  /** True when any `initial_emotion_logged` row marks `brief_ritual` (same predicate as `pause_evaluate_transitions`). */
+  is_brief_ritual: boolean;
   /** Latest `initial_emotion_logged` payload `intensity` (1–5), when logged. */
   initial_emotion_intensity: number | null;
   shift_mood: string | null;
@@ -118,8 +120,12 @@ export function usePauseStatsData(): UsePauseStatsData {
             .limit(2000),
         ]);
 
+      const rawRows = ((rowData as unknown) as PauseFullRow[]) ?? [];
       return {
-        rows: ((rowData as unknown) as PauseFullRow[]) ?? [],
+        rows: rawRows.map((r) => ({
+          ...r,
+          is_brief_ritual: Boolean(r.is_brief_ritual),
+        })),
         stepEvents: ((stepData as unknown) as PauseStepEventRow[]) ?? [],
         companionEvents: ((companionData as unknown) as PauseCompanionEventRow[]) ?? [],
       };
