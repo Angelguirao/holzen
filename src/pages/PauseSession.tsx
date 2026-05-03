@@ -1,4 +1,4 @@
-import { useState, useCallback, useEffect, useMemo, useRef } from 'react';
+import { useState, useCallback, useMemo, useRef } from 'react';
 import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
@@ -63,6 +63,7 @@ import { usePauseSessionHeaderBackHandler } from '@/hooks/use-pause-session-head
 import { usePauseSessionPersistToStorage } from '@/hooks/use-pause-session-persist-to-storage';
 import { usePauseSessionRitualStorageSync } from '@/hooks/use-pause-session-ritual-storage-sync';
 import { usePauseSessionEntryPresentationEffects } from '@/hooks/use-pause-session-entry-presentation-effects';
+import { usePauseSessionBreathTimedActiveReset } from '@/hooks/use-pause-session-breath-timed-active-reset';
 import type { PauseImpactData } from '@/lib/pause-impact-data';
 import { showPauseStepSyncFailedToast } from '@/lib/pause-step-sync-toast';
 import { usePauseSessionShell } from '@/hooks/use-pause-session-shell';
@@ -276,13 +277,7 @@ export default function PauseSession() {
   const [breathTimedActive, setBreathTimedActive] = useState(false);
   const [soundMuted, setSoundMuted] = useState(false);
 
-  useEffect(() => {
-    if (ritualEntry === 'brief') {
-      if (briefStep !== 'breath') setBreathTimedActive(false);
-      return;
-    }
-    if (step !== 'breathe' && step !== 'breath2') setBreathTimedActive(false);
-  }, [step, ritualEntry, briefStep]);
+  usePauseSessionBreathTimedActiveReset({ step, ritualEntry, briefStep, setBreathTimedActive });
 
   const { handlePauseHeaderBack } = usePauseSessionHeaderBackHandler({
     breathingRef,
