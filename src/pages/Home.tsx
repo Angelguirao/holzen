@@ -32,6 +32,7 @@ import { useAuth } from '@/hooks/use-auth';
 import { toast } from 'sonner';
 import { AlertCircle, ChevronDown, Loader2, Pin, Sparkles, RefreshCw } from 'lucide-react';
 import { AutoCooldownIndicator, NeedAMomentButton } from '@/components/home/HomePauseChrome';
+import { HomePauseEmptyBetweenContent } from '@/components/home/HomePauseEmptyBetweenContent';
 import { homeInWidget } from '@/components/home/home-widget-styles';
 import { cn } from '@/lib/utils';
 import { BulkHoldCard } from '@/components/BulkHoldCard';
@@ -91,6 +92,7 @@ const Home = () => {
     cooldownHours,
     firstName,
     currency,
+    trackedAssetId,
     profileLoaded,
     refreshProfile,
   } = useHolzen();
@@ -114,6 +116,7 @@ const Home = () => {
 
   const [priceHidden, setPriceHidden] = useState(() => localStorage.getItem('holzen_hide_price') === 'true');
   const [btcMode, setBtcMode] = useState(() => localStorage.getItem('holzen_btc_mode') === 'true');
+  const unitBasisModeSupported = trackedAssetId === 'bitcoin';
   // One-time reset: Zen Mode previously defaulted on for some users via a stale
   // localStorage flag, which silently replaced the full Home (widgets) with a
   // minimal ReflectionMessage view that looked like "the end of a pause flow."
@@ -530,7 +533,7 @@ const Home = () => {
             <motion.div key="zen-empty" variants={zenVariants} initial="hidden" animate="visible" exit="hidden" className="space-y-6 text-center">
               {hasAccess && !showLimitUpsell ? (
                 <>
-                  <p className="text-sm text-muted-foreground font-mono leading-relaxed">{t('home.noActiveReflection')}</p>
+                  <HomePauseEmptyBetweenContent />
                   <NeedAMomentButton onTrigger={handleNeedAPause} cooldownRemaining={manualCooldownRemaining} loading={loading} />
                 </>
               ) : (
@@ -558,16 +561,6 @@ const Home = () => {
   const pauseCardBody = (
     <div className="space-y-4">
       <BulkHoldCard />
-
-      {showPauseScheduling ? (
-        <div className="space-y-0.5">
-          <AutoCooldownIndicator
-            cooldownRemaining={autoCooldownRemaining}
-            cooldownHours={cooldownHours}
-            nextCronCheckIn={nextCronCheckIn}
-          />
-        </div>
-      ) : null}
 
       {!subLoading && !hasAccess ? (
         <div className="space-y-3">
@@ -707,6 +700,7 @@ const Home = () => {
                       ) : null}
                     </div>
                   )}
+                  <HomePauseEmptyBetweenContent />
                   <NeedAMomentButton onTrigger={handleNeedAPause} cooldownRemaining={manualCooldownRemaining} loading={loading} />
                 </div>
               )}
@@ -714,6 +708,16 @@ const Home = () => {
           )}
         </>
       )}
+
+      {showPauseScheduling ? (
+        <div className="border-t border-border/50 pt-3">
+          <AutoCooldownIndicator
+            cooldownRemaining={autoCooldownRemaining}
+            cooldownHours={cooldownHours}
+            nextCronCheckIn={nextCronCheckIn}
+          />
+        </div>
+      ) : null}
     </div>
   );
 
@@ -750,8 +754,9 @@ const Home = () => {
               hidden={priceHidden}
               onToggleHidden={togglePriceHidden}
               currency={currency}
-              btcMode={btcMode}
-              onToggleBtcMode={toggleBtcMode}
+              coinId={trackedAssetId}
+              btcMode={unitBasisModeSupported && btcMode}
+              onToggleBtcMode={unitBasisModeSupported ? toggleBtcMode : undefined}
               chartExpanded={marketChartExpanded}
               onToggleChartExpanded={toggleMarketChartExpanded}
               chartChevronInPriceRow={false}
