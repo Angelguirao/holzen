@@ -6,8 +6,11 @@ import type { PauseSessionMountLogParams } from '@/lib/pause-session-mount-log-p
  * One-shot dev diagnostic when `/pause` mounts. Arguments are read from the **first** render only
  * (empty dependency array); matches prior inline `PauseSession` behavior.
  *
- * Prefer `buildPauseSessionMountLogParams` at the call site so restore + nav + hydration
- * wiring stays in one place. Fields are non-PII so `[holzen:pause]` traces can triage restores.
+ * **Call site:** pass `buildPauseSessionMountLogParams(...)` from `@/lib/pause-session-mount-log-params`
+ * so restore + nav + hydration wiring stays in one place.
+ *
+ * **Observability:** `docs/ops/logging-strategy.md` (browser Holzen console / `[holzen:pause]`). Payload
+ * fields are non-PII — see that lib module’s header and `docs/systems/pause-system.md` section 10.
  */
 export function usePauseSessionMountLog(params: PauseSessionMountLogParams): void {
   useEffect(() => {
