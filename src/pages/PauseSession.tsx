@@ -61,6 +61,7 @@ import {
   initialEmotionSkippedLogDedupeKey,
   initialEmotionSkippedLoggedPayload,
 } from '@/lib/pause-initial-emotion-log';
+import { buildShiftEmotionFrameHubLogBundle } from '@/lib/pause-shift-emotion-log';
 import { buildPauseImpactDataOnComplete, type PauseImpactData } from '@/lib/pause-impact-data';
 import { showPauseFavoriteProHintToast } from '@/lib/pause-favorite-toast';
 import { showPauseOutcomeNotCompletedToast, showPauseOutcomeSaveFailedToast } from '@/lib/pause-outcome-toast';
@@ -479,14 +480,14 @@ export default function PauseSession() {
   }, []);
 
   const handleFrameImDone = useCallback(async () => {
-    const logKey = JSON.stringify({ from_frame_hub: true });
+    const { payload: shiftFramePayload, logKey } = buildShiftEmotionFrameHubLogBundle();
     if (pauseInstanceId) {
       if (lastShiftLogKeyRef.current !== logKey) {
         try {
           await pauseLogStep({
             instanceId: pauseInstanceId,
             stepType: 'shift_emotion_logged',
-            payload: { from_frame_hub: true },
+            payload: shiftFramePayload,
           });
           lastShiftLogKeyRef.current = logKey;
         } catch {
