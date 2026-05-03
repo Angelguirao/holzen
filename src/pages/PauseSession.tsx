@@ -123,6 +123,8 @@ export default function PauseSession() {
     hasNavMessage: navReflectionMessage.length > 0,
     restoredFromStorage: restored !== null,
     hydrationStatus: hydration.status,
+    ritualEntryInitial: initialRitualEntry(restored),
+    briefStepInitial: initialBriefPauseStepFromRestored(restored),
   });
 
   const { message, context, pauseInstanceId, companions, companionPrefs, severity } =
