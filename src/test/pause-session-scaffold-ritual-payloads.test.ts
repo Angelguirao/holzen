@@ -63,7 +63,14 @@ function setup(overrides: Partial<Parameters<typeof buildPauseSessionScaffoldRit
     decideOnBackStep: 'choose' as const,
     ...overrides,
   };
-  return { params, setBriefStep, setBreathingFirstCompleted, setBreathingSecondCompleted, handleBriefBreathContinue };
+  return {
+    params,
+    setBriefStep,
+    setBreathingFirstCompleted,
+    setBreathingSecondCompleted,
+    setBreathTimedActive,
+    handleBriefBreathContinue,
+  };
 }
 
 describe('buildPauseSessionScaffoldRitualPayloads', () => {
@@ -124,5 +131,33 @@ describe('buildPauseSessionScaffoldRitualPayloads', () => {
 
     deepRitual.onDeepChooseBridgeContinue();
     expect(handleDeepChooseBridgeContinue).toHaveBeenCalled();
+  });
+
+  it('forwards timed breathing changes to setBreathTimedActive for brief and deep', () => {
+    const { params, setBreathTimedActive } = setup();
+    const { briefRitual, deepRitual } = buildPauseSessionScaffoldRitualPayloads(params);
+
+    briefRitual.onTimedBreathingChange(true);
+    expect(setBreathTimedActive).toHaveBeenLastCalledWith(true);
+
+    deepRitual.onTimedBreathingChange(false);
+    expect(setBreathTimedActive).toHaveBeenLastCalledWith(false);
+  });
+
+  it('forwards brief and deep skip breath handlers', () => {
+    const handleBriefSkipBreath = vi.fn();
+    const handleSkipFirstBreath = vi.fn();
+    const handleSkipSecondBreath = vi.fn();
+    const { params } = setup({ handleBriefSkipBreath, handleSkipFirstBreath, handleSkipSecondBreath });
+    const { briefRitual, deepRitual } = buildPauseSessionScaffoldRitualPayloads(params);
+
+    briefRitual.onSkipBriefBreath();
+    expect(handleBriefSkipBreath).toHaveBeenCalled();
+
+    deepRitual.onSkipFirstBreath();
+    expect(handleSkipFirstBreath).toHaveBeenCalled();
+
+    deepRitual.onSkipSecondBreath();
+    expect(handleSkipSecondBreath).toHaveBeenCalled();
   });
 });
