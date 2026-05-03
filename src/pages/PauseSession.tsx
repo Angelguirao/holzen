@@ -29,9 +29,8 @@ import { PauseDepthPicker } from '@/components/pause/PauseDepthPicker';
 import { PauseBriefProgress } from '@/components/pause/PauseBriefProgress';
 import { BRIEF_PAUSE_ORDER } from '@/lib/brief-pause-order';
 import { computeBriefPastStepClick } from '@/lib/brief-pause-past-step-click';
-import { computeBriefRitualGoBack } from '@/lib/brief-pause-go-back';
+import { computePauseGoBackPlan } from '@/lib/pause-go-back-plan';
 import { pauseStepSwipeDirection } from '@/lib/pause-step-swipe-direction';
-import { computeDeepRitualGoBackTarget } from '@/lib/pause-deep-go-back';
 import { isPauseSessionHeaderBackVisible } from '@/lib/pause-session-header-back';
 import { PauseBriefFeel, type BriefFeelTile } from '@/components/pause/PauseBriefFeel';
 import { PauseBriefIntegrate } from '@/components/pause/PauseBriefIntegrate';
@@ -265,21 +264,15 @@ export default function PauseSession() {
   );
 
   const goBack = useCallback(() => {
-    if (ritualEntry === 'brief') {
-      const back = computeBriefRitualGoBack(briefStep);
-      if (back) {
-        setSwipeDirection('back');
-        hapticFeedback('light');
-        if (back.clearBriefIntegrateDone) setBriefIntegrateDone(false);
-        setBriefStep(back.prev);
-      }
-      return;
-    }
-    const prevDeep = computeDeepRitualGoBackTarget(step);
-    if (prevDeep !== null) {
-      setSwipeDirection('back');
-      hapticFeedback('light');
-      setStep(prevDeep);
+    const plan = computePauseGoBackPlan(ritualEntry, briefStep, step);
+    if (plan.kind === 'none') return;
+    setSwipeDirection('back');
+    hapticFeedback('light');
+    if (plan.kind === 'brief') {
+      if (plan.clearBriefIntegrateDone) setBriefIntegrateDone(false);
+      setBriefStep(plan.prev);
+    } else {
+      setStep(plan.prev);
     }
   }, [step, ritualEntry, briefStep]);
 
