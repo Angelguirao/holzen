@@ -12,13 +12,14 @@ import { PauseSessionGate } from '@/components/pause/PauseSessionGate';
 import { PauseSessionScaffold } from '@/components/pause/PauseSessionScaffold';
 import { PendingPauseOfferShell } from '@/components/pause/PendingPauseOfferShell';
 import { type PauseBreathingHandle } from '@/components/pause/PauseBreathing';
-import { PauseDone } from '@/components/pause/PauseDone';
 import { PauseSessionDepthPickerStack } from '@/components/pause/PauseSessionDepthPickerStack';
 import { PauseBriefProgress } from '@/components/pause/PauseBriefProgress';
 import { isPauseSessionHeaderBackVisible } from '@/lib/pause-session-header-back';
 import type { BriefFeelTile } from '@/components/pause/PauseBriefFeel';
-import { PauseSessionBriefRitualBody } from '@/components/pause/PauseSessionBriefRitualBody';
-import { PauseSessionDeepRitualBody } from '@/components/pause/PauseSessionDeepRitualBody';
+import {
+  PauseSessionScaffoldBody,
+  type PauseSessionScaffoldBodyProps,
+} from '@/components/pause/PauseSessionScaffoldBody';
 import type { BriefPauseStep, RitualDepth } from '@/lib/pause-session-storage';
 import { mapPersistedStep, initialRitualEntry } from '@/lib/pause-session-step-map';
 import { initialDecideOnBackStepFromPersisted } from '@/lib/pause-session-initial-decide-on-back-step';
@@ -382,6 +383,68 @@ export default function PauseSession() {
 
   const briefDecideIntroKicker = t('pause.brief.decideKicker', { defaultValue: 'Step 4 · Decide' });
 
+  const briefRitual: PauseSessionScaffoldBodyProps['briefRitual'] = {
+    briefStep,
+    stepTransition,
+    moodDone,
+    selectedMood,
+    selectedBriefFace,
+    feelIntensity,
+    onBriefFeelSelect,
+    onBriefFeelContinueToBreath: () => setBriefStep('breath'),
+    breathingRef,
+    mantra,
+    severity,
+    breathingFirstCompleted,
+    onTimedBreathingChange: setBreathTimedActive,
+    onBriefBreathPatternComplete: () => setBreathingFirstCompleted(true),
+    onContinueAfterBriefBreath: () => void handleBriefBreathContinue(),
+    onSkipBriefBreath: handleBriefSkipBreath,
+    ritualSoundMuted: soundMuted,
+    briefIntegrateDone,
+    onBriefIntegrateComplete: handleBriefIntegrateComplete,
+    onDecide: handleDecide,
+    onBriefDecideBack: () => setBriefStep('integrate'),
+    briefDecideIntroKicker,
+  };
+
+  const deepRitual: PauseSessionScaffoldBodyProps['deepRitual'] = {
+    step,
+    stepTransition,
+    onMoodSelect: handleMoodSelect,
+    onMoodSkip: handleMoodSkip,
+    onMoodReset: handleMoodReset,
+    moodDone,
+    selectedMood,
+    feelIntensity,
+    goToStep,
+    breathingRef,
+    mantra,
+    severity,
+    breathingFirstCompleted,
+    breathingSecondCompleted,
+    onTimedBreathingChange: setBreathTimedActive,
+    onFirstBreathPatternComplete: () => setBreathingFirstCompleted(true),
+    onSecondBreathPatternComplete: () => setBreathingSecondCompleted(true),
+    onContinueAfterFirstBreath: () => void handleContinueAfterFirstBreath(),
+    onContinueAfterSecondBreath: () => void handleContinueAfterSecondBreath(),
+    onSkipFirstBreath: handleSkipFirstBreath,
+    onSkipSecondBreath: handleSkipSecondBreath,
+    ritualSoundMuted: soundMuted,
+    companions,
+    companionPrefs,
+    pauseInstanceId,
+    context,
+    reflectionMessage: message,
+    isFavorite,
+    onToggleFavorite: toggleFavorite,
+    subscribed,
+    onFrameImDone: () => void handleFrameImDone(),
+    onDeepChooseBridgeContinue: handleDeepChooseBridgeContinue,
+    onDecide: handleDecide,
+    decideOnBackStep,
+  };
+
   return (
     <PauseSessionGate
       hasMessage={!!message}
@@ -425,75 +488,15 @@ export default function PauseSession() {
             soundMuted={soundMuted}
             onSoundMutedChange={setSoundMuted}
           >
-            {phase === 'session' && ritualEntry === 'brief' && (
-              <PauseSessionBriefRitualBody
-                briefStep={briefStep}
-                stepTransition={stepTransition}
-                moodDone={moodDone}
-                selectedMood={selectedMood}
-                selectedBriefFace={selectedBriefFace}
-                feelIntensity={feelIntensity}
-                onBriefFeelSelect={onBriefFeelSelect}
-                onBriefFeelContinueToBreath={() => setBriefStep('breath')}
-                breathingRef={breathingRef}
-                mantra={mantra}
-                severity={severity}
-                breathingFirstCompleted={breathingFirstCompleted}
-                onTimedBreathingChange={setBreathTimedActive}
-                onBriefBreathPatternComplete={() => setBreathingFirstCompleted(true)}
-                onContinueAfterBriefBreath={() => void handleBriefBreathContinue()}
-                onSkipBriefBreath={handleBriefSkipBreath}
-                ritualSoundMuted={soundMuted}
-                briefIntegrateDone={briefIntegrateDone}
-                onBriefIntegrateComplete={handleBriefIntegrateComplete}
-                onDecide={handleDecide}
-                onBriefDecideBack={() => setBriefStep('integrate')}
-                briefDecideIntroKicker={briefDecideIntroKicker}
-              />
-            )}
-
-            {phase === 'session' && ritualEntry === 'deep' && (
-              <PauseSessionDeepRitualBody
-                step={step}
-                stepTransition={stepTransition}
-                onMoodSelect={handleMoodSelect}
-                onMoodSkip={handleMoodSkip}
-                onMoodReset={handleMoodReset}
-                moodDone={moodDone}
-                selectedMood={selectedMood}
-                feelIntensity={feelIntensity}
-                goToStep={goToStep}
-                breathingRef={breathingRef}
-                mantra={mantra}
-                severity={severity}
-                breathingFirstCompleted={breathingFirstCompleted}
-                breathingSecondCompleted={breathingSecondCompleted}
-                onTimedBreathingChange={setBreathTimedActive}
-                onFirstBreathPatternComplete={() => setBreathingFirstCompleted(true)}
-                onSecondBreathPatternComplete={() => setBreathingSecondCompleted(true)}
-                onContinueAfterFirstBreath={() => void handleContinueAfterFirstBreath()}
-                onContinueAfterSecondBreath={() => void handleContinueAfterSecondBreath()}
-                onSkipFirstBreath={handleSkipFirstBreath}
-                onSkipSecondBreath={handleSkipSecondBreath}
-                ritualSoundMuted={soundMuted}
-                companions={companions}
-                companionPrefs={companionPrefs}
-                pauseInstanceId={pauseInstanceId}
-                context={context}
-                reflectionMessage={message}
-                isFavorite={isFavorite}
-                onToggleFavorite={toggleFavorite}
-                subscribed={subscribed}
-                onFrameImDone={() => void handleFrameImDone()}
-                onDeepChooseBridgeContinue={handleDeepChooseBridgeContinue}
-                onDecide={handleDecide}
-                decideOnBackStep={decideOnBackStep}
-              />
-            )}
-
-            {phase === 'done' && (
-              <PauseDone decision={decision} onReturn={handleReturn} pauseData={pauseImpactData} />
-            )}
+            <PauseSessionScaffoldBody
+              phase={phase}
+              ritualEntry={ritualEntry}
+              briefRitual={briefRitual}
+              deepRitual={deepRitual}
+              decision={decision}
+              onDoneReturn={handleReturn}
+              pauseImpactData={pauseImpactData}
+            />
           </PauseSessionScaffold>
         )}
       </>
