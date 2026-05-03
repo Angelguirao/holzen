@@ -22,7 +22,10 @@ import {
   initialBriefIntegrateDoneFromRestored,
   initialSelectedBriefFaceFromRestored,
   initialPhaseFromRestored,
+  initialDecisionFromRestored,
   initialBreathingFirstCompletedFromRestored,
+  initialBreathingSecondCompletedFromRestored,
+  initialFrameDoneFromRestored,
 } from '@/lib/pause-session-step-map';
 import { initialDecideOnBackStepFromPersisted } from '@/lib/pause-session-initial-decide-on-back-step';
 import { parsePauseSessionLocationState } from '@/lib/router-location-state';
@@ -156,7 +159,7 @@ export default function PauseSession() {
     initialDecideOnBackStepFromPersisted(restored),
   );
   const [phase, setPhase] = useState<'session' | 'done'>(() => initialPhaseFromRestored(restored));
-  const [decision, setDecision] = useState<string | null>(restored?.decision ?? null);
+  const [decision, setDecision] = useState<string | null>(() => initialDecisionFromRestored(restored));
   const [isFavorite, setIsFavorite] = useState(false);
   const { toggleFavorite } = usePauseFavoriteToggle({
     pauseInstanceId,
@@ -174,8 +177,10 @@ export default function PauseSession() {
   const [breathingFirstCompleted, setBreathingFirstCompleted] = useState(() =>
     initialBreathingFirstCompletedFromRestored(restored),
   );
-  const [breathingSecondCompleted, setBreathingSecondCompleted] = useState(restored?.breathingSecondCompleted ?? false);
-  const [frameDone, setFrameDone] = useState(restored?.frameDone ?? false);
+  const [breathingSecondCompleted, setBreathingSecondCompleted] = useState(() =>
+    initialBreathingSecondCompletedFromRestored(restored),
+  );
+  const [frameDone, setFrameDone] = useState(() => initialFrameDoneFromRestored(restored));
   const [curtainLifted, setCurtainLifted] = useState(false);
   const [pauseImpactData, setPauseImpactData] = useState<PauseImpactData | null>(null);
 
