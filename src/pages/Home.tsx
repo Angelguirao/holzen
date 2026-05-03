@@ -1,5 +1,4 @@
 import { useTranslation } from 'react-i18next';
-import { usePullToRefresh } from '@/hooks/use-pull-to-refresh';
 import { useHolzen } from '@/hooks/use-holzen';
 import AuthLoading from '@/components/AuthLoading';
 import { useSubscription } from '@/hooks/use-subscription';
@@ -20,11 +19,10 @@ import { useHomeDocumentTitle } from '@/hooks/use-home-document-title';
 import { useHomeHeroQuoteViewed } from '@/hooks/use-home-hero-quote-viewed';
 import { useHomePauseAudio } from '@/hooks/use-home-pause-audio';
 import { useHomeMarketDisplayPreferences } from '@/hooks/use-home-market-display-preferences';
-import { useCallback, useState, useMemo } from 'react';
+import { useState, useMemo } from 'react';
 import { useOutletContext, useSearchParams, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '@/hooks/use-auth';
 import { HolzenNumber } from '@/components/HolzenNumber';
-import { parsePauseContextForHomePreview } from '@/lib/pause-context-home-preview';
 import { useNightReflection } from '@/components/NightReflectionCard';
 import { useHomeVisibleSections } from '@/hooks/use-home-visible-sections';
 import { useHomeCustomizeBridge } from '@/hooks/use-home-customize-bridge';
@@ -33,6 +31,10 @@ import { useHomePauseActions } from '@/hooks/use-home-pause-actions';
 import { useHomePauseCardProjection } from '@/hooks/use-home-pause-card-projection';
 import { useHomeDashboardSectionDeps } from '@/hooks/use-home-dashboard-section-deps';
 import { useHomeDashboardSectionRenderers } from '@/hooks/use-home-dashboard-section-renderers';
+import { getHomeSubscriptionGate } from '@/lib/home-subscription-gate';
+import { useHomePauseContextPreviews } from '@/hooks/use-home-pause-context-previews';
+import { useHomePullFullReload } from '@/hooks/use-home-pull-full-reload';
+import { useHomeZenModeRouteProps } from '@/hooks/use-home-zen-route-props';
 
 const Home = () => {
   const { t } = useTranslation();
@@ -41,8 +43,6 @@ const Home = () => {
   const location = useLocation();
   const { subscribed, loading: subLoading, monthlyRemaining, checkoutLoading, startCheckout, refresh } =
     useSubscription();
-  const subscriptionReady = !subLoading && (subscribed || monthlyRemaining !== undefined);
-  const hasAccess = subscribed || ((monthlyRemaining ?? 0) > 0);
   const [searchParams] = useSearchParams();
   useHomeCheckoutWelcomeToast(searchParams.get('subscribed'), refresh, t);
   useHomeDocumentTitle(true);
@@ -74,8 +74,13 @@ const Home = () => {
     refreshProfile,
   } = useHolzen();
 
-  const showLimitUpsell = subscriptionReady && !subscribed && monthlyRemaining === 0;
-  const showPauseScheduling = subscriptionReady && hasAccess && !message && !loading;
+  const { subscriptionReady, hasAccess, showLimitUpsell, showPauseScheduling } = getHomeSubscriptionGate({
+    subLoading,
+    subscribed,
+    monthlyRemaining,
+    message,
+    loading,
+  });
 
   const outletCtx = useOutletContext<{ pauseReady?: boolean; dismissPauseReady?: () => void }>();
   const pauseReady = outletCtx?.pauseReady ?? false;
@@ -83,8 +88,6 @@ const Home = () => {
   useHomeOutletPauseReady(pauseReady, message, loading, refreshProfile, dismissPauseReady);
   useHomeHeroQuoteViewed(profileLoaded, user?.id);
   useHomePauseAudio(newPauseArrival, message, clearNewPauseArrival);
-
-  const pauseContextHomePreview = useMemo(() => parsePauseContextForHomePreview(context), [context]);
 
   const { reflection: nightReflection, dismiss: dismissNight } = useNightReflection();
 
@@ -101,10 +104,12 @@ const Home = () => {
   const { zenMode, setZenModePersist } = useHomeZenMode(location.pathname);
   const { pinnedPausePreview, unpinPausePreview } = useHomePinnedPausePreview(user);
   const completedPauseCount = useHomeCompletedPauseCount(user);
-  const pinnedContextHomePreview = useMemo(
-    () => parsePauseContextForHomePreview(pinnedPausePreview?.context ?? null),
-    [pinnedPausePreview?.context],
-  );
+
+  const { pauseContextHomePreview, pinnedContextHomePreview } = useHomePauseContextPreviews({
+    context,
+    pinnedContext: pinnedPausePreview?.context ?? null,
+  });
+
   const [goalWhyHoldSummary, setGoalWhyHoldSummary] = useState<string | null>(null);
 
   const { order, collapsed, reorder, toggleCollapsed, resetLayout } = useWidgetLayout(HOME_WIDGET_DEFAULT_ORDER);
@@ -177,13 +182,7 @@ const Home = () => {
     onStartCheckoutPro: pauseActions.startProCheckout,
   });
 
-  const handlePullRefresh = useCallback(async () => {
-    window.location.reload();
-  }, []);
-
-  const { pullDistance, refreshing: pullRefreshing, handlers: pullHandlers } = usePullToRefresh({
-    onRefresh: handlePullRefresh,
-  });
+  const { pullDistance, refreshing: pullRefreshing, handlers: pullHandlers } = useHomePullFullReload();
 
   const marketFooter = useMemo(() => <HolzenNumber variant="compact" />, []);
 
@@ -217,6 +216,32 @@ const Home = () => {
 
   const { renderSection, goalWhyBlock } = useHomeDashboardSectionRenderers(sectionDeps, visibleOrderedSectionIds);
 
+  const zenRouteProps = useHomeZenModeRouteProps({
+    message,
+    context,
+    companions,
+    companionPrefs,
+    severity,
+    lastPauseInstanceId,
+    loading,
+    error,
+    btcData,
+    onDismiss: pauseActions.handleDismiss,
+    onNeedPause: pauseActions.handleNeedAPause,
+    onManualTrigger: manualTrigger,
+    subscriptionReady,
+    hasAccess,
+    showLimitUpsell,
+    showPauseScheduling,
+    pinnedPreview: pauseProjection.pauseEmptyPinnedPreview,
+    autoCooldownRemaining,
+    cooldownHours,
+    nextCronCheckIn,
+    manualCooldownRemaining,
+    checkoutLoading,
+    onStartCheckoutPro: pauseActions.startProCheckout,
+  });
+
   if (!profileLoaded) {
     return <AuthLoading />;
   }
@@ -226,33 +251,7 @@ const Home = () => {
   }
 
   if (zenMode) {
-    return (
-      <HomeZenModeRoute
-        message={message}
-        context={context}
-        companions={companions}
-        companionPrefs={companionPrefs}
-        severity={severity}
-        lastPauseInstanceId={lastPauseInstanceId}
-        loading={loading}
-        error={error}
-        btcData={btcData}
-        onDismiss={pauseActions.handleDismiss}
-        onNeedPause={pauseActions.handleNeedAPause}
-        onManualTrigger={manualTrigger}
-        subscriptionReady={subscriptionReady}
-        hasAccess={hasAccess}
-        showLimitUpsell={showLimitUpsell}
-        showPauseScheduling={showPauseScheduling}
-        pinnedPreview={pauseProjection.pauseEmptyPinnedPreview}
-        autoCooldownRemaining={autoCooldownRemaining}
-        cooldownHours={cooldownHours}
-        nextCronCheckIn={nextCronCheckIn}
-        manualCooldownRemaining={manualCooldownRemaining}
-        checkoutLoading={checkoutLoading}
-        onStartCheckoutPro={pauseActions.startProCheckout}
-      />
-    );
+    return <HomeZenModeRoute {...zenRouteProps} />;
   }
 
   return (
