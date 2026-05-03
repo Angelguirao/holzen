@@ -559,6 +559,23 @@ const Home = () => {
 
 **[screens/home.md](../screens/home.md)** is the **worked example**: file list, modes, Zen vs dashboard, pause errors, analytics. Compare any new large page to that **shape** (thin page, fat hooks/libs). **This guided tour** is the line-by-line companion to [`src/pages/Home.tsx`](../../src/pages/Home.tsx).
 
+### Does `Home.tsx` follow this guide *completely*?
+
+**No guide should be read as a 100% literal checklist** — it is a playbook with **options**. Home matches the **spirit** and most **rules**; the gaps are either **documented tradeoffs** or **diminishing returns**.
+
+| Guide theme | On Home? | Notes |
+|-------------|----------|--------|
+| **Rules of Hooks** (no hooks after conditional returns) | **Yes** | All hooks run before `if (!profileLoaded)` / onboarding / Zen / dashboard returns. |
+| **Conductor page** (no giant `switch` / logic in JSX) | **Yes** | The bottom of the file is almost only **returns**; wiring lives in hooks and `getHomeSubscriptionGate`. |
+| **Named behavior + tests** | **Yes** for gates | `getHomeSubscriptionGate` + Vitest; other hooks are named and colocated under `use-home-*`. |
+| **Types at source** | **Yes** for `trackedAssetId` | Normalized in `useHolzen`; Home does not cast. |
+| **`React.lazy` + `Suspense` for rare UI** | **Yes** (by delegation) | Lazy Zen lives in [`HomeZenModeRoute`](../../src/components/home/HomeZenModeRoute.tsx); `Home` imports that boundary, not `ZenModeHome` directly. Same idea, split file. |
+| **`React.memo` + stable props for heavy shell** | **Yes** | `HomeDashboardLayout` is memoized; `useHomeDashboardLayoutProps` stabilizes the prop object. |
+| **Child-only-signed-in pattern** | **Not used** | The guide’s **alternative** is a child that mounts only when `profileLoaded` — Home instead keeps **all signed-in hooks in the parent** so order never flips. That is the **first “correct” pattern** in [Rules of Hooks](#rules-of-hooks-why-order-matters), not the child pattern. **Tradeoff:** Zen and loading paths still **execute** dashboard-related hooks; memoization keeps the cost bounded. Same tradeoff is described in [screens/home.md](../screens/home.md) under “Rendering and hooks”. |
+| **“Thin” = low line count** | **Partial** | `Home.tsx` is still **many lines** because listing ~15+ hooks is verbose. **Thin** here means **no business kitchen sink** — not “20 lines total.” Further collapsing into one mega-hook would save lines but **hurt** navigation and grep-ability (arguably *against* the spirit of named hooks). |
+
+**Bottom line:** Home is a **reference implementation** for the parts of the guide that matter most for correctness and reviewability (hooks order, extraction, pure gates, memo boundaries). It **does not** use every optional pattern (e.g. signed-in-only child), and that is **intentional and documented**, not an oversight.
+
 ---
 
 ## Non-React parallels (edge / server handlers)
