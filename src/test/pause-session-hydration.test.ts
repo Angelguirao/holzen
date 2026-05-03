@@ -1,6 +1,9 @@
 import { describe, it, expect } from 'vitest';
-import { computePauseSessionHydration } from '@/lib/pause-session-hydration';
-import type { PersistedSession } from '@/lib/pause-session-storage';
+import {
+  computePauseSessionHydration,
+  computePauseSessionResolved,
+} from '@/lib/pause-session-hydration';
+import type { FetchedPauseInstance, PersistedSession } from '@/lib/pause-session-storage';
 import { DEFAULT_COMPANIONS, DEFAULT_PREFS } from '@/lib/pause-session-storage';
 
 const holzenBase = {
@@ -136,5 +139,118 @@ describe('computePauseSessionHydration', () => {
         ...holzenBase,
       }),
     ).toEqual({ status: 'empty' });
+  });
+});
+
+const prefsB = {
+  ...DEFAULT_PREFS,
+  signal: false,
+};
+
+describe('computePauseSessionResolved', () => {
+  const ready = computePauseSessionHydration({
+    restored: null,
+    navPauseInstanceId: null,
+    navReflectionMessage: 'x',
+    navContext: null,
+    navCompanions: undefined,
+    navCompanionPrefs: undefined,
+    navSeverity: 'high',
+    ...holzenBase,
+    holzenMessage: 'x',
+    holzenAligned: true,
+  });
+  if (ready.status !== 'ready') throw new Error('fixture');
+
+  it('passes through ready hydration', () => {
+    expect(
+      computePauseSessionResolved({
+        hydration: ready,
+        fetchedInstance: null,
+        navCompanionPrefs: undefined,
+        holzenCompanionPrefs: DEFAULT_PREFS,
+        navSeverity: undefined,
+        holzenSeverity: 'mild',
+      }),
+    ).toBe(ready);
+  });
+
+  it('returns null for fetch without reflection text', () => {
+    expect(
+      computePauseSessionResolved({
+        hydration: { status: 'fetch', pauseInstanceId: 'p' },
+        fetchedInstance: null,
+        navCompanionPrefs: undefined,
+        holzenCompanionPrefs: DEFAULT_PREFS,
+        navSeverity: undefined,
+        holzenSeverity: 'mild',
+      }),
+    ).toBeNull();
+  });
+
+  it('returns null when fetch instance has empty reflection_message', () => {
+    const inst: FetchedPauseInstance = {
+      id: 'p',
+      reflection_message: '',
+      context: null,
+      haiku: null,
+      grounding_title: null,
+      grounding_body: null,
+    };
+    expect(
+      computePauseSessionResolved({
+        hydration: { status: 'fetch', pauseInstanceId: 'p' },
+        fetchedInstance: inst,
+        navCompanionPrefs: prefsB,
+        holzenCompanionPrefs: DEFAULT_PREFS,
+        navSeverity: 'moderate',
+        holzenSeverity: 'mild',
+      }),
+    ).toBeNull();
+  });
+
+  it('returns null for empty hydration', () => {
+    expect(
+      computePauseSessionResolved({
+        hydration: { status: 'empty' },
+        fetchedInstance: null,
+        navCompanionPrefs: undefined,
+        holzenCompanionPrefs: DEFAULT_PREFS,
+        navSeverity: undefined,
+        holzenSeverity: 'mild',
+      }),
+    ).toBeNull();
+  });
+
+  it('builds ready from fetch + fetched instance', () => {
+    const inst: FetchedPauseInstance = {
+      id: 'p2',
+      reflection_message: 'hello',
+      context: 'ctx',
+      haiku: 'h',
+      grounding_title: 't',
+      grounding_body: 'b',
+    };
+    const out = computePauseSessionResolved({
+      hydration: { status: 'fetch', pauseInstanceId: 'p2' },
+      fetchedInstance: inst,
+      navCompanionPrefs: prefsB,
+      holzenCompanionPrefs: DEFAULT_PREFS,
+      navSeverity: 'moderate',
+      holzenSeverity: 'mild',
+    });
+    expect(out).toEqual({
+      status: 'ready',
+      message: 'hello',
+      context: 'ctx',
+      pauseInstanceId: 'p2',
+      companions: {
+        haiku: 'h',
+        groundingTitle: 't',
+        groundingBody: 'b',
+      },
+      companionPrefs: prefsB,
+      severity: 'moderate',
+    });
   });
 });

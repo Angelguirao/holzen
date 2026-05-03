@@ -1,6 +1,6 @@
 import type { CompanionData, CompanionPrefs } from '@/components/CompanionSection';
 import type { PauseSeverity } from '@/lib/router-location-state';
-import type { PersistedSession } from '@/lib/pause-session-storage';
+import type { FetchedPauseInstance, PersistedSession } from '@/lib/pause-session-storage';
 import { DEFAULT_COMPANIONS, DEFAULT_PREFS } from '@/lib/pause-session-storage';
 
 /** Resolved pause shell payload (reflection + instance id + prefs) before optional DB fetch. */
@@ -97,4 +97,37 @@ export function computePauseSessionHydration(p: PauseSessionHydrationInput): Pau
   }
 
   return { status: 'empty' };
+}
+
+/** After optional `pause_instances` + artifacts fetch, fold `fetchedInstance` into a ready shell. */
+export type PauseSessionResolvedInput = {
+  hydration: PauseSessionHydrationState;
+  fetchedInstance: FetchedPauseInstance | null;
+  navCompanionPrefs: CompanionPrefs | undefined;
+  holzenCompanionPrefs: CompanionPrefs;
+  navSeverity: PauseSeverity | undefined;
+  holzenSeverity: 'mild' | 'moderate' | 'high';
+};
+
+export function computePauseSessionResolved(
+  p: PauseSessionResolvedInput,
+): PauseSessionHydrationReady | null {
+  if (p.hydration.status === 'ready') return p.hydration;
+  if (p.hydration.status === 'fetch' && p.fetchedInstance?.reflection_message) {
+    const f = p.fetchedInstance;
+    return {
+      status: 'ready',
+      message: f.reflection_message,
+      context: f.context ?? null,
+      pauseInstanceId: f.id,
+      companions: {
+        haiku: f.haiku,
+        groundingTitle: f.grounding_title,
+        groundingBody: f.grounding_body,
+      },
+      companionPrefs: p.navCompanionPrefs ?? p.holzenCompanionPrefs ?? DEFAULT_PREFS,
+      severity: p.navSeverity ?? p.holzenSeverity,
+    };
+  }
+  return null;
 }
