@@ -26,6 +26,7 @@ return value ? <HomeV2 /> : <HomeClassic />;
 | Key | Type | Default | Owner | Rollout | Purpose | Sunset trigger |
 |---|---|---|---|---|---|---|
 | `ui.home_v2` | boolean | `false` | @holzen | 10% | Pipeline smoke test on a low-stakes path (new Home layout). Validates: flag read, identify, sampling, client-side gating. | When V2 ships to 100% or is retracted (whichever first); remove after 2 stable weeks post-rollout. |
+| `pause.step5_breath_label_shift` | boolean \| string | `false` | @holzen | 0% | Figma variant B: macro step 5 stepper label reads **Shift** instead of a second **Breathe**. | When design picks one variant for everyone; remove unused label branch. |
 
 Add rows as flags are introduced. Bump rollout % via PostHog UI; document changes in the table.
 

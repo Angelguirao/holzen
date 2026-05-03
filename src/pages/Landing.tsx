@@ -8,7 +8,7 @@ import { motion, useReducedMotion, useInView } from 'framer-motion';
 import {
   ArrowRight, Twitter, Instagram, Wind, Feather, BookOpen, TrendingDown, Brain,
   BarChart3, Target, Heart, Mail, Globe, Shield, Award,
-  Zap, Moon, ChevronDown, Timer, Eye, Sparkles, RefreshCw,
+  Zap, Moon, ChevronDown, Timer, Eye, Sparkles, Compass,
   Smartphone, Anchor, ExternalLink, UserCircle,
 } from 'lucide-react';
 import { PageMeta } from '@/components/PageMeta';
@@ -222,7 +222,7 @@ const Landing = () => {
         </Section>
       </div>
 
-      {/* ─── FIVE-STEP SCIENCE ─── */}
+      {/* ─── SIX-STEP SCIENCE ─── */}
       <div className="bg-muted/30">
         <div className="max-w-lg mx-auto px-6 py-16">
           <Section>
@@ -232,21 +232,24 @@ const Landing = () => {
             </p>
             <div className="space-y-3">
               {([
-                { key: 'Breathe', icon: Wind, step: 1, sources: [
+                { key: 'Feel', icon: Heart, step: 1, sources: [
+                  { label: 'Lieberman et al. (2007). Affect labeling', url: 'https://doi.org/10.1111/j.1467-9280.2007.01916.x' },
+                ]},
+                { key: 'Breathe', icon: Wind, step: 2, sources: [
                   { label: 'Porges (2011). The Polyvagal Theory', url: 'https://wwnorton.com/books/9780393707007' },
                   { label: 'Lehrer & Gevirtz (2014). HRV biofeedback', url: 'https://doi.org/10.3389/fpsyg.2014.00756' },
-                ]},
-                { key: 'Feel', icon: Heart, step: 2, sources: [
-                  { label: 'Lieberman et al. (2007). Affect labeling', url: 'https://doi.org/10.1111/j.1467-9280.2007.01916.x' },
                 ]},
                 { key: 'Reflect', icon: BookOpen, step: 3, sources: [
                   { label: 'Gross (2002). Emotion regulation', url: 'https://www.guilford.com/books/Handbook-of-Emotions/Lewis-Haviland-Jones-Barrett/9781462536368' },
                   { label: 'Gross (1998). Integrative review', url: 'https://doi.org/10.1037/1089-2680.2.3.271' },
                 ]},
-                { key: 'Shift', icon: RefreshCw, step: 4, sources: [
+                { key: 'Frame', icon: Compass, step: 4, sources: [
                   { label: 'Flavell (1979). Metacognition', url: 'https://www.researchgate.net/publication/232599909' },
                 ]},
-                { key: 'Decide', icon: Target, step: 5, sources: [
+                { key: 'BreatheAgain', icon: Wind, step: 5, sources: [
+                  { label: 'Lehrer & Gevirtz (2014). HRV biofeedback', url: 'https://doi.org/10.3389/fpsyg.2014.00756' },
+                ]},
+                { key: 'Decide', icon: Target, step: 6, sources: [
                   { label: 'Kahneman (2011). Thinking, Fast and Slow', url: 'https://us.macmillan.com/books/9780374533557/thinkingfastandslow' },
                   { label: 'Kahneman & Tversky (1974). Heuristics and biases', url: 'https://doi.org/10.1126/science.185.4157.1124' },
                 ]},

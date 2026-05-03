@@ -84,7 +84,7 @@ const About = () => {
           </div>
         </motion.div>
 
-        {/* Section: The 5-step pause — summary */}
+        {/* Section: The six-step pause — summary */}
         <motion.div {...m(0.1)}>
           <div className="space-y-4">
             <p className="text-xs font-mono tracking-widest uppercase text-muted-foreground">

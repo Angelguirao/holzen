@@ -1,6 +1,6 @@
 import { useState, type ReactNode } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ChevronLeft, Info, X } from 'lucide-react';
+import { ChevronLeft, Info, Volume2, VolumeX, X } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { PauseProgress, type PauseStep } from '@/components/pause/PauseProgress';
 import { PauseScienceScrollBody } from '@/components/pause/PauseScienceSheet';
@@ -17,6 +17,13 @@ interface Props {
   /** Shown under the stepper; invokes macro back or breathing intro reset from parent. */
   onHeaderBack?: () => void;
   showHeaderBack?: boolean;
+  /** 1-based index in the macro ritual (Figma six-step). */
+  macroStepIndex?: number;
+  macroStepTotal?: number;
+  /** PostHog flag `pause.step5_breath_label_shift`: label second breathing macro step as “Shift”. */
+  breathSecondLabelVariant?: 'breathe' | 'shift';
+  /** Breath steps use close-only chrome in wireframes — hide the science affordance. */
+  hideScienceButton?: boolean;
   children: ReactNode;
 }
 
@@ -33,10 +40,18 @@ export function PauseSessionScaffold({
   goToStep,
   onHeaderBack,
   showHeaderBack = false,
+  macroStepIndex,
+  macroStepTotal,
+  breathSecondLabelVariant = 'breathe',
+  hideScienceButton = false,
   children,
 }: Props) {
   const { t } = useTranslation();
   const [scienceOpen, setScienceOpen] = useState(false);
+  const [muted, setMuted] = useState(false);
+
+  const showMeta =
+    phase === 'session' && macroStepIndex != null && macroStepTotal != null && macroStepTotal > 0;
 
   return (
     <>
@@ -95,6 +110,22 @@ export function PauseSessionScaffold({
                     variant="ghost"
                     size="icon"
                     className="h-9 w-9 shrink-0 text-muted-foreground hover:text-foreground"
+                    onClick={() => setMuted((m) => !m)}
+                    aria-label={
+                      muted
+                        ? t('pause.muteAriaOff', { defaultValue: 'Sound off (tap to unmute)' })
+                        : t('pause.muteAriaOn', { defaultValue: 'Sound on (tap to mute)' })
+                    }
+                  >
+                    {muted ? <VolumeX className="h-4 w-4" aria-hidden /> : <Volume2 className="h-4 w-4" aria-hidden />}
+                  </Button>
+                )}
+                {phase === 'session' && !hideScienceButton && (
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="icon"
+                    className="h-9 w-9 shrink-0 text-muted-foreground hover:text-foreground"
                     onClick={() => setScienceOpen(true)}
                     aria-label={t('pause.scienceInfoAria')}
                   >
@@ -116,8 +147,22 @@ export function PauseSessionScaffold({
 
             {phase === 'session' && (
               <>
+                {showMeta && (
+                  <p className="mt-1 text-center text-[11px] font-medium uppercase tracking-[0.18em] text-muted-foreground">
+                    {t('pause.macroProgress', {
+                      defaultValue: 'Step {{n}} of {{total}} · under ~15 min',
+                      n: macroStepIndex,
+                      total: macroStepTotal,
+                    })}
+                  </p>
+                )}
                 <div className="mt-4 w-full">
-                  <PauseProgress currentStep={step} onStepClick={goToStep} variant="segment" />
+                  <PauseProgress
+                    currentStep={step}
+                    onStepClick={goToStep}
+                    variant="segment"
+                    breathSecondLabelVariant={breathSecondLabelVariant}
+                  />
                 </div>
                 {onHeaderBack && showHeaderBack && (
                   <div className="mt-2 flex w-full justify-start">

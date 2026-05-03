@@ -17,11 +17,12 @@ import { PendingPauseOfferShell } from '@/components/pause/PendingPauseOfferShel
 import { PauseFeel } from '@/components/pause/PauseFeel';
 import { PauseBreathing, type PauseBreathingHandle } from '@/components/pause/PauseBreathing';
 import { PauseReflect } from '@/components/pause/PauseReflect';
-import { PauseShift } from '@/components/pause/PauseShift';
+import { PauseFrame } from '@/components/pause/PauseFrame';
 import { PauseDecide } from '@/components/pause/PauseDecide';
 import { PauseDone } from '@/components/pause/PauseDone';
 import { holzenLog } from '@/lib/holzen-console';
 import { parsePauseSessionLocationState } from '@/lib/router-location-state';
+import { useFeatureFlag } from '@/hooks/use-feature-flag';
 import {
   DEFAULT_COMPANIONS,
   DEFAULT_PREFS,
@@ -48,15 +49,25 @@ type HydrationReady = {
 
 type HydrationState = HydrationReady | { status: 'fetch'; pauseInstanceId: string } | { status: 'empty' };
 
+function mapPersistedStep(s: string | undefined): PauseStep {
+  if (!s || s === 'pause') return 'feel';
+  if (s === 'ground') return 'reflect';
+  if (s === 'shift') return 'frame';
+  if (STEPS.includes(s as PauseStep)) return s as PauseStep;
+  return 'feel';
+}
+
 export default function PauseSession() {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const location = useLocation();
   const prefersReducedMotion = useReducedMotion();
+  const { value: step5BreathLabelRaw } = useFeatureFlag('pause.step5_breath_label_shift', false);
+  const breathSecondLabelVariant =
+    step5BreathLabelRaw === true || step5BreathLabelRaw === 'shift' ? 'shift' : 'breathe';
   const {
     mantra,
     dismissMessage,
-    groundingActivities,
     message: holzenMessage,
     context: holzenContext,
     companions: holzenCompanions,
@@ -194,10 +205,11 @@ export default function PauseSession() {
           setFetchFailed(true);
           return;
         }
-        const artifactRows = ((artifacts ?? []) as Array<{ kind: string; content: Record<string, unknown> }>);
+        const artifactRows = (artifacts ?? []) as Array<{ kind: string; content: Record<string, unknown> }>;
         const companionData = companionDataFromArtifacts(artifactRows);
         const reflectionArt = artifactRows.find((a) => a.kind === 'reflection_text');
-        const msg = typeof reflectionArt?.content?.message === 'string' ? (reflectionArt.content.message as string) : '';
+        const msg =
+          typeof reflectionArt?.content?.message === 'string' ? (reflectionArt.content.message as string) : '';
         const ctxSnap = (inst as { context_snapshot: Record<string, unknown> | null }).context_snapshot ?? {};
         const ctx = typeof ctxSnap.context_text === 'string' ? (ctxSnap.context_text as string) : null;
         setFetchedInstance({
@@ -257,14 +269,10 @@ export default function PauseSession() {
 
   const waitingForFetch = hydration.status === 'fetch' && !fetchFailed && !fetchedInstance;
 
-  const mapStep = (s: string): PauseStep => {
-    if (s === 'pause') return 'breathe';
-    if (s === 'ground') return 'reflect';
-    if (STEPS.includes(s as PauseStep)) return s as PauseStep;
-    return 'breathe';
-  };
+  const restoredStep = mapPersistedStep(restored?.step);
+  const restoredIdx = restored ? STEPS.indexOf(restoredStep) : -1;
 
-  const [step, setStep] = useState<PauseStep>(mapStep(restored?.step ?? 'breathe'));
+  const [step, setStep] = useState<PauseStep>(restoredStep);
   const [phase, setPhase] = useState<'session' | 'done'>(restored?.phase ?? 'session');
   const [decision, setDecision] = useState<string | null>(restored?.decision ?? null);
   const [isFavorite, setIsFavorite] = useState(false);
@@ -274,7 +282,11 @@ export default function PauseSession() {
   const [selectedMoodAfter, setSelectedMoodAfter] = useState<MoodValue | null>(restored?.selectedMoodAfter ?? null);
   const [feelIntensity, setFeelIntensity] = useState<number | null>(restored?.feelIntensity ?? null);
   const [shiftIntensity, setShiftIntensity] = useState<number | null>(restored?.shiftIntensity ?? null);
-  const [breathingCompleted, setBreathingCompleted] = useState<boolean>(restored?.breathingCompleted ?? false);
+  const [breathingFirstCompleted, setBreathingFirstCompleted] = useState(
+    restored?.breathingFirstCompleted ?? restored?.breathingCompleted ?? false,
+  );
+  const [breathingSecondCompleted, setBreathingSecondCompleted] = useState(restored?.breathingSecondCompleted ?? false);
+  const [frameDone, setFrameDone] = useState(restored?.frameDone ?? false);
   const [curtainLifted, setCurtainLifted] = useState(false);
   const [pauseImpactData, setPauseImpactData] = useState<{
     mood: string | null;
@@ -289,6 +301,10 @@ export default function PauseSession() {
     shiftIntensity?: number | null;
     reinforcementQuote?: string | null;
   } | null>(null);
+
+  const breath1RpcDoneRef = useRef(restoredIdx > STEPS.indexOf('breathe'));
+  const breath2RpcDoneRef = useRef(restoredIdx > STEPS.indexOf('breath2'));
+  const lastShiftLogKeyRef = useRef<string | null>(null);
 
   useEffect(() => {
     if (!message) return;
@@ -308,7 +324,9 @@ export default function PauseSession() {
       phase,
       decision,
       step,
-      breathingCompleted,
+      breathingFirstCompleted,
+      breathingSecondCompleted,
+      frameDone,
     });
   }, [
     message,
@@ -326,18 +344,15 @@ export default function PauseSession() {
     phase,
     decision,
     step,
-    breathingCompleted,
+    breathingFirstCompleted,
+    breathingSecondCompleted,
+    frameDone,
   ]);
 
   useEffect(() => {
     const timer = setTimeout(() => setCurtainLifted(true), 100);
     return () => clearTimeout(timer);
   }, []);
-
-  useEffect(() => {
-    lastFeelLogKeyRef.current = null;
-    lastShiftLogKeyRef.current = null;
-  }, [pauseInstanceId]);
 
   const [swipeDirection, setSwipeDirection] = useState<'forward' | 'back'>('forward');
 
@@ -364,49 +379,115 @@ export default function PauseSession() {
   const breathingRef = useRef<PauseBreathingHandle>(null);
   const decidingRef = useRef(false);
   const lastFeelLogKeyRef = useRef<string | null>(null);
-  const lastShiftLogKeyRef = useRef<string | null>(null);
+  const prevPauseInstanceIdRef = useRef<string | null>(null);
   const [breathTimedActive, setBreathTimedActive] = useState(false);
 
   useEffect(() => {
-    if (step !== 'breathe') setBreathTimedActive(false);
+    lastFeelLogKeyRef.current = null;
+    lastShiftLogKeyRef.current = null;
+    const prev = prevPauseInstanceIdRef.current;
+    if (prev !== null && prev !== pauseInstanceId) {
+      breath1RpcDoneRef.current = false;
+      breath2RpcDoneRef.current = false;
+    }
+    prevPauseInstanceIdRef.current = pauseInstanceId;
+  }, [pauseInstanceId]);
+
+  useEffect(() => {
+    if (step !== 'breathe' && step !== 'breath2') setBreathTimedActive(false);
   }, [step]);
 
-  const handlePauseHeaderBack = useCallback(() => {
-    if (step === 'breathe' && breathTimedActive) {
-      breathingRef.current?.resetToIntro();
-      return;
-    }
-    if (step === 'breathe' && breathingCompleted) {
-      breathingRef.current?.resetToIntro();
-      setBreathingCompleted(false);
-      return;
-    }
-    goBack();
-  }, [step, breathTimedActive, breathingCompleted, goBack]);
-
-  const showPauseHeaderBack =
-    phase === 'session' &&
-    (STEPS.indexOf(step) > 0 || (step === 'breathe' && breathTimedActive) || (step === 'breathe' && breathingCompleted));
-
-  const handleBreathContinueToFeel = useCallback(async () => {
-    if (pauseInstanceId) {
+  const ensureBreathSegment1Logged = useCallback(async (): Promise<boolean> => {
+    if (!pauseInstanceId) return true;
+    if (breath1RpcDoneRef.current) return true;
+    try {
       await pauseLogStep({
         instanceId: pauseInstanceId,
         stepType: 'breath_completed',
-      }).catch(() => {});
+        payload: { breath_segment: 1 },
+      });
+      breath1RpcDoneRef.current = true;
+      return true;
+    } catch {
+      toast.error(
+        t('pause.stepSyncFailed', {
+          defaultValue: 'Could not sync this step. Check your connection and try again.',
+        }),
+        { duration: 5000 },
+      );
+      return false;
     }
-    goToStep('feel');
-  }, [pauseInstanceId, goToStep]);
+  }, [pauseInstanceId, t]);
 
-  const handleSkipBreath = useCallback(async () => {
-    setBreathingCompleted(false);
+  const ensureBreathSegment2Logged = useCallback(async (): Promise<boolean> => {
+    if (!pauseInstanceId) return true;
+    if (breath2RpcDoneRef.current) return true;
+    try {
+      await pauseLogStep({
+        instanceId: pauseInstanceId,
+        stepType: 'breath_completed',
+        payload: { breath_segment: 2 },
+      });
+      breath2RpcDoneRef.current = true;
+      return true;
+    } catch {
+      toast.error(
+        t('pause.stepSyncFailed', {
+          defaultValue: 'Could not sync this step. Check your connection and try again.',
+        }),
+        { duration: 5000 },
+      );
+      return false;
+    }
+  }, [pauseInstanceId, t]);
+
+  const handlePauseHeaderBack = useCallback(() => {
+    if ((step === 'breathe' || step === 'breath2') && breathTimedActive) {
+      breathingRef.current?.resetToIntro();
+      return;
+    }
+    if (step === 'breathe' && breathingFirstCompleted) {
+      breathingRef.current?.resetToIntro();
+      setBreathingFirstCompleted(false);
+      return;
+    }
+    if (step === 'breath2' && breathingSecondCompleted) {
+      breathingRef.current?.resetToIntro();
+      setBreathingSecondCompleted(false);
+      return;
+    }
+    goBack();
+  }, [step, breathTimedActive, breathingFirstCompleted, breathingSecondCompleted, goBack]);
+
+  const showPauseHeaderBack =
+    phase === 'session' &&
+    (STEPS.indexOf(step) > 0 ||
+      ((step === 'breathe' || step === 'breath2') && breathTimedActive) ||
+      ((step === 'breathe' || step === 'breath2') &&
+        (step === 'breathe' ? breathingFirstCompleted : breathingSecondCompleted)));
+
+  const handleContinueAfterFirstBreath = useCallback(async () => {
+    const ok = await ensureBreathSegment1Logged();
+    if (!ok) return;
+    goToStep('reflect');
+  }, [ensureBreathSegment1Logged, goToStep]);
+
+  const handleContinueAfterSecondBreath = useCallback(async () => {
+    const ok = await ensureBreathSegment2Logged();
+    if (!ok) return;
+    goToStep('decide');
+  }, [ensureBreathSegment2Logged, goToStep]);
+
+  const handleSkipFirstBreath = useCallback(async () => {
+    setBreathingFirstCompleted(false);
     if (pauseInstanceId) {
       try {
         await pauseLogStep({
           instanceId: pauseInstanceId,
           stepType: 'breath_completed',
-          payload: { skipped: true },
+          payload: { skipped: true, breath_segment: 1 },
         });
+        breath1RpcDoneRef.current = true;
       } catch {
         toast.error(
           t('pause.stepSyncFailed', {
@@ -417,27 +498,107 @@ export default function PauseSession() {
         return;
       }
     }
-    goToStep('feel');
+    setBreathingFirstCompleted(true);
+    goToStep('reflect');
+  }, [pauseInstanceId, goToStep, t]);
+
+  const handleSkipSecondBreath = useCallback(async () => {
+    setBreathingSecondCompleted(false);
+    if (pauseInstanceId) {
+      try {
+        await pauseLogStep({
+          instanceId: pauseInstanceId,
+          stepType: 'breath_completed',
+          payload: { skipped: true, breath_segment: 2 },
+        });
+        breath2RpcDoneRef.current = true;
+      } catch {
+        toast.error(
+          t('pause.stepSyncFailed', {
+            defaultValue: 'Could not sync this step. Check your connection and try again.',
+          }),
+          { duration: 5000 },
+        );
+        return;
+      }
+    }
+    setBreathingSecondCompleted(true);
+    goToStep('decide');
+  }, [pauseInstanceId, goToStep, t]);
+
+  const handleFrameImDone = useCallback(async () => {
+    const logKey = JSON.stringify({ from_frame_hub: true });
+    if (pauseInstanceId) {
+      if (lastShiftLogKeyRef.current !== logKey) {
+        try {
+          await pauseLogStep({
+            instanceId: pauseInstanceId,
+            stepType: 'shift_emotion_logged',
+            payload: { from_frame_hub: true },
+          });
+          lastShiftLogKeyRef.current = logKey;
+        } catch {
+          toast.error(
+            t('pause.stepSyncFailed', {
+              defaultValue: 'Could not sync this step. Check your connection and try again.',
+            }),
+            { duration: 5000 },
+          );
+          return;
+        }
+      }
+    } else {
+      lastShiftLogKeyRef.current = logKey;
+    }
+    setFrameDone(true);
+    setMoodAfterDone(true);
+    goToStep('breath2');
   }, [pauseInstanceId, goToStep, t]);
 
   const goForward = useCallback(() => {
     if (
       !canAdvanceFromPauseStep({
         step,
-        breathingCompleted,
+        breathingFirstCompleted,
+        breathingSecondCompleted,
         moodDone,
-        moodAfterDone,
+        frameDone,
       })
     ) {
       return;
     }
     const currentIndex = STEPS.indexOf(step);
-    if (currentIndex < STEPS.length - 1) {
+    if (currentIndex >= STEPS.length - 1) return;
+    const next = STEPS[currentIndex + 1];
+
+    const advance = () => {
       setSwipeDirection('forward');
       hapticFeedback('light');
-      setStep(STEPS[currentIndex + 1]);
+      setStep(next);
+    };
+
+    if (step === 'breathe' && next === 'reflect') {
+      void ensureBreathSegment1Logged().then((ok) => {
+        if (ok) advance();
+      });
+      return;
     }
-  }, [step, breathingCompleted, moodDone, moodAfterDone]);
+    if (step === 'breath2' && next === 'decide') {
+      void ensureBreathSegment2Logged().then((ok) => {
+        if (ok) advance();
+      });
+      return;
+    }
+    advance();
+  }, [
+    step,
+    breathingFirstCompleted,
+    breathingSecondCompleted,
+    moodDone,
+    frameDone,
+    ensureBreathSegment1Logged,
+    ensureBreathSegment2Logged,
+  ]);
 
   const handleDragEnd = useCallback(
     (_: unknown, info: { offset: { x: number }; velocity: { x: number } }) => {
@@ -455,8 +616,7 @@ export default function PauseSession() {
   const handleMoodSelect = useCallback(
     async (mood: MoodValue, intensity?: number) => {
       hapticFeedback('light');
-      const payload =
-        typeof intensity === 'number' ? { mood, intensity } : { mood };
+      const payload = typeof intensity === 'number' ? { mood, intensity } : { mood };
       const logKey = JSON.stringify(payload);
       if (pauseInstanceId && lastFeelLogKeyRef.current === logKey) {
         setMoodDone(true);
@@ -522,76 +682,6 @@ export default function PauseSession() {
     setFeelIntensity(null);
   }, []);
 
-  const handleMoodAfterSelect = useCallback(
-    async (mood: MoodValue, intensity?: number) => {
-      hapticFeedback('light');
-      const payload =
-        typeof intensity === 'number' ? { mood, shift_intensity: intensity } : { mood };
-      const logKey = JSON.stringify(payload);
-      if (pauseInstanceId && lastShiftLogKeyRef.current === logKey) {
-        setMoodAfterDone(true);
-        setSelectedMoodAfter(mood);
-        setShiftIntensity(typeof intensity === 'number' ? intensity : null);
-        return;
-      }
-      setMoodAfterDone(true);
-      setSelectedMoodAfter(mood);
-      setShiftIntensity(typeof intensity === 'number' ? intensity : null);
-      if (pauseInstanceId) {
-        try {
-          await pauseLogStep({
-            instanceId: pauseInstanceId,
-            stepType: 'shift_emotion_logged',
-            payload,
-          });
-          lastShiftLogKeyRef.current = logKey;
-        } catch {
-          lastShiftLogKeyRef.current = null;
-          setMoodAfterDone(false);
-          setSelectedMoodAfter(null);
-          setShiftIntensity(null);
-          toast.error(
-            t('pause.stepSyncFailed', {
-              defaultValue: 'Could not sync this step. Check your connection and try again.',
-            }),
-            { duration: 5000 },
-          );
-        }
-      }
-    },
-    [pauseInstanceId, t],
-  );
-
-  const handleMoodAfterSkip = useCallback(async () => {
-    setShiftIntensity(null);
-    if (pauseInstanceId) {
-      try {
-        await pauseLogStep({
-          instanceId: pauseInstanceId,
-          stepType: 'shift_emotion_logged',
-          payload: { skipped: true },
-        });
-        lastShiftLogKeyRef.current = JSON.stringify({ skipped: true });
-      } catch {
-        toast.error(
-          t('pause.stepSyncFailed', {
-            defaultValue: 'Could not sync this step. Check your connection and try again.',
-          }),
-          { duration: 5000 },
-        );
-        return;
-      }
-    }
-    setMoodAfterDone(true);
-  }, [pauseInstanceId, t]);
-
-  const handleMoodAfterReset = useCallback(() => {
-    lastShiftLogKeyRef.current = null;
-    setMoodAfterDone(false);
-    setSelectedMoodAfter(null);
-    setShiftIntensity(null);
-  }, []);
-
   const toggleFavorite = useCallback(async () => {
     if (!pauseInstanceId) return;
     const newVal = !isFavorite;
@@ -622,11 +712,6 @@ export default function PauseSession() {
       decidingRef.current = true;
       try {
         hapticFeedback('medium');
-        // Persist outcome before clearing Home/Library preview state. Calling
-        // dismissMessage() first races pause_dismiss_current against
-        // pause_log_step: if dismiss wins, the instance becomes terminal and
-        // outcome_logged is ignored — the pause stays "wrong" in history and
-        // surfaces can disagree until reload.
         let outcomeState: PauseState | null = null;
         if (pauseInstanceId) {
           try {
@@ -663,7 +748,7 @@ export default function PauseSession() {
         setPauseImpactData({
           mood: selectedMood,
           moodAfter: selectedMoodAfter,
-          breathingCompleted,
+          breathingCompleted: breathingFirstCompleted && breathingSecondCompleted,
           decision: d,
           context,
           engagedTools: 0,
@@ -686,7 +771,8 @@ export default function PauseSession() {
       selectedMood,
       selectedMoodAfter,
       context,
-      breathingCompleted,
+      breathingFirstCompleted,
+      breathingSecondCompleted,
       feelIntensity,
       shiftIntensity,
       refreshSubscription,
@@ -732,92 +818,110 @@ export default function PauseSession() {
           }}
         />
         <PauseSessionScaffold
-        curtainLifted={curtainLifted}
-        prefersReducedMotion={!!prefersReducedMotion}
-        onClose={handleClose}
-        phase={phase}
-        step={step}
-        goToStep={goToStep}
-        onHeaderBack={handlePauseHeaderBack}
-        showHeaderBack={showPauseHeaderBack}
-      >
-        {phase === 'session' && (
-          <AnimatePresence mode="wait" initial={false}>
-            {step === 'breathe' && (
-              <motion.div key="breathe" {...stepTransition} {...dragProps}>
-                <PauseBreathing
-                  ref={breathingRef}
-                  mantra={mantra}
-                  severity={severity}
-                  completed={breathingCompleted}
-                  onTimedBreathingChange={setBreathTimedActive}
-                  onPatternComplete={() => setBreathingCompleted(true)}
-                  onContinueToFeel={() => void handleBreathContinueToFeel()}
-                  onSkipBreath={handleSkipBreath}
-                />
-              </motion.div>
-            )}
+          curtainLifted={curtainLifted}
+          prefersReducedMotion={!!prefersReducedMotion}
+          onClose={handleClose}
+          phase={phase}
+          step={step}
+          goToStep={goToStep}
+          onHeaderBack={handlePauseHeaderBack}
+          showHeaderBack={showPauseHeaderBack}
+          macroStepIndex={STEPS.indexOf(step) + 1}
+          macroStepTotal={STEPS.length}
+          breathSecondLabelVariant={breathSecondLabelVariant}
+          hideScienceButton={step === 'breathe' || step === 'breath2'}
+        >
+          {phase === 'session' && (
+            <AnimatePresence mode="wait" initial={false}>
+              {step === 'feel' && (
+                <motion.div key="feel" {...stepTransition} {...dragProps}>
+                  <PauseFeel
+                    onMoodSelect={handleMoodSelect}
+                    onMoodSkip={handleMoodSkip}
+                    onMoodReset={handleMoodReset}
+                    moodDone={moodDone}
+                    selectedMood={selectedMood}
+                    feelIntensity={feelIntensity}
+                    onContinue={() => goToStep('breathe')}
+                  />
+                </motion.div>
+              )}
 
-            {step === 'feel' && (
-              <motion.div key="feel" {...stepTransition} {...dragProps}>
-                <PauseFeel
-                  onMoodSelect={handleMoodSelect}
-                  onMoodSkip={handleMoodSkip}
-                  onMoodReset={handleMoodReset}
-                  moodDone={moodDone}
-                  selectedMood={selectedMood}
-                  feelIntensity={feelIntensity}
-                  onContinue={() => goToStep('reflect')}
-                />
-              </motion.div>
-            )}
+              {step === 'breathe' && (
+                <motion.div key="breathe" {...stepTransition} {...dragProps}>
+                  <PauseBreathing
+                    ref={breathingRef}
+                    key="breath-segment-first"
+                    breathSegment="first"
+                    mantra={mantra}
+                    severity={severity}
+                    completed={breathingFirstCompleted}
+                    onTimedBreathingChange={setBreathTimedActive}
+                    onPatternComplete={() => setBreathingFirstCompleted(true)}
+                    onContinueAfterBreath={() => void handleContinueAfterFirstBreath()}
+                    onSkipBreath={handleSkipFirstBreath}
+                  />
+                </motion.div>
+              )}
 
-            {step === 'reflect' && (
-              <motion.div key="reflect" {...stepTransition} {...dragProps}>
-                <PauseReflect
-                  companions={companions}
-                  companionPrefs={companionPrefs}
-                  severity={severity}
-                  pauseInstanceId={pauseInstanceId}
-                  context={context}
-                  reflectionMessage={message}
-                  isFavorite={isFavorite}
-                  onToggleFavorite={toggleFavorite}
-                  subscribed={subscribed}
-                  onContinue={() => goToStep('shift')}
-                  mood={selectedMood}
-                />
-              </motion.div>
-            )}
+              {step === 'reflect' && (
+                <motion.div key="reflect" {...stepTransition} {...dragProps}>
+                  <PauseReflect
+                    companions={companions}
+                    companionPrefs={companionPrefs}
+                    severity={severity}
+                    pauseInstanceId={pauseInstanceId}
+                    context={context}
+                    reflectionMessage={message}
+                    isFavorite={isFavorite}
+                    onToggleFavorite={toggleFavorite}
+                    subscribed={subscribed}
+                    onContinue={() => goToStep('frame')}
+                    mood={selectedMood}
+                  />
+                </motion.div>
+              )}
 
-            {step === 'shift' && (
-              <motion.div key="shift" {...stepTransition} {...dragProps}>
-                <PauseShift
-                  onMoodAfterSelect={handleMoodAfterSelect}
-                  onMoodAfterSkip={handleMoodAfterSkip}
-                  onMoodAfterReset={handleMoodAfterReset}
-                  moodAfterDone={moodAfterDone}
-                  selectedMoodAfter={selectedMoodAfter}
-                  priorMood={selectedMood}
-                  shiftIntensity={shiftIntensity}
-                  onContinue={() => goToStep('decide')}
-                  groundingActivities={groundingActivities}
-                />
-              </motion.div>
-            )}
+              {step === 'frame' && (
+                <motion.div key="frame" {...stepTransition} {...dragProps}>
+                  <PauseFrame
+                    companions={companions}
+                    pauseInstanceId={pauseInstanceId}
+                    reflectionMessage={message}
+                    onImDone={() => void handleFrameImDone()}
+                  />
+                </motion.div>
+              )}
 
-            {step === 'decide' && (
-              <motion.div key="decide" {...stepTransition} {...dragProps}>
-                <PauseDecide onDecide={handleDecide} onBack={() => goToStep('shift')} />
-              </motion.div>
-            )}
-          </AnimatePresence>
-        )}
+              {step === 'breath2' && (
+                <motion.div key="breath2" {...stepTransition} {...dragProps}>
+                  <PauseBreathing
+                    ref={breathingRef}
+                    key="breath-segment-second"
+                    breathSegment="second"
+                    mantra={mantra}
+                    severity={severity}
+                    completed={breathingSecondCompleted}
+                    onTimedBreathingChange={setBreathTimedActive}
+                    onPatternComplete={() => setBreathingSecondCompleted(true)}
+                    onContinueAfterBreath={() => void handleContinueAfterSecondBreath()}
+                    onSkipBreath={handleSkipSecondBreath}
+                  />
+                </motion.div>
+              )}
 
-        {phase === 'done' && (
-          <PauseDone decision={decision} onReturn={handleReturn} pauseData={pauseImpactData} />
-        )}
-      </PauseSessionScaffold>
+              {step === 'decide' && (
+                <motion.div key="decide" {...stepTransition} {...dragProps}>
+                  <PauseDecide onDecide={handleDecide} onBack={() => goToStep('breath2')} />
+                </motion.div>
+              )}
+            </AnimatePresence>
+          )}
+
+          {phase === 'done' && (
+            <PauseDone decision={decision} onReturn={handleReturn} pauseData={pauseImpactData} />
+          )}
+        </PauseSessionScaffold>
       </>
     </PauseSessionGate>
   );
