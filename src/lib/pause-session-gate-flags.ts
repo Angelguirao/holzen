@@ -1,6 +1,14 @@
 import type { FetchedPauseInstance, RitualDepth } from '@/lib/pause-session-storage';
 import type { PauseSessionHydrationState } from '@/lib/pause-session-hydration';
 
+/**
+ * Pure predicates for `/pause` gate UI: spinner while fetching instance by id, vs depth picker when
+ * the user has a shell message but has not chosen brief/deep yet.
+ *
+ * **Wiring:** `src/pages/PauseSession.tsx` → `PauseSessionGate` / `PauseSessionGateContent`.
+ * **Hydration model:** `docs/systems/pause-system.md` section 7.2; **code map:** same doc, section 10.
+ */
+
 /** True while `usePauseSessionShell` is in fetch hydration and the instance row has not arrived. */
 export function isPauseSessionWaitingForInstanceFetch(input: {
   hydrationStatus: PauseSessionHydrationState['status'];
