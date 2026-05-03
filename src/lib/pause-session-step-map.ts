@@ -22,6 +22,18 @@ export function initialRitualEntry(restored: PersistedSession | null): RitualDep
   return 'picker';
 }
 
+/**
+ * Initial brief sub-step when hydrating `/pause` from local storage.
+ * When `ritualDepth` is not `brief`, callers still mount at `'feel'` until the user picks depth.
+ *
+ * Note: `computePauseStorageRitualSyncPatch` may leave `briefStep` undefined for a brief row
+ * missing `briefStep` so React state is not clobbered — that is intentionally different.
+ */
+export function initialBriefPauseStepFromRestored(restored: PersistedSession | null): BriefPauseStep {
+  if (restored?.ritualDepth === 'brief' && restored.briefStep) return restored.briefStep;
+  return 'feel';
+}
+
 /** Brief “Integrate” has no dedicated citations row — highlight Reflect (regulation) sources. */
 export function briefStepToPauseScienceStep(brief: BriefPauseStep): PauseStep {
   switch (brief) {
