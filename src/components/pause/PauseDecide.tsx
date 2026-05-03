@@ -6,11 +6,9 @@ import { OutcomeIcon } from '@/components/icons/OutcomeIcon';
 import { hapticFeedback } from '@/lib/haptics';
 import { pauseStepLayout } from '@/components/pause/pause-step-layout';
 
-/** Decisions that trigger the mirror */
-const MIRROR_DECISIONS = ['sold', 'bought'];
-
 interface Props {
   onDecide: (decision: string) => void;
+  /** Return to Shift (clears mirror state when the step unmounts). */
   onBack?: () => void;
 }
 
@@ -60,9 +58,12 @@ export function PauseDecide({ onDecide, onBack }: Props) {
             exit={{ opacity: 0, scale: 0.95 }}
             transition={{ duration: 0.3 }}
           >
-            <p className={pauseStepLayout.screenTitle}>
-              {t('pause.whatWillYouDo')}
-            </p>
+            <div className="flex flex-col items-center gap-3 text-center">
+              <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-primary/80">
+                {t('pause.decideIntroKicker', { defaultValue: 'Step 5 · Decide' })}
+              </p>
+              <p className={pauseStepLayout.screenTitle}>{t('pause.whatWillYouDo')}</p>
+            </div>
 
             {/* Primary: Hold */}
             <motion.button
@@ -110,9 +111,14 @@ export function PauseDecide({ onDecide, onBack }: Props) {
             exit={{ opacity: 0 }}
             transition={{ duration: 0.5 }}
           >
-            <p className="text-center font-editorial text-xl text-foreground sm:text-2xl">
-              {t('mirror.title', { defaultValue: 'Decision Mirror' })}
-            </p>
+            <div className="flex flex-col items-center gap-2">
+              <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-primary/80">
+                {t('pause.decideMirrorKicker', { defaultValue: 'Before you confirm' })}
+              </p>
+              <p className="text-center font-editorial text-xl text-foreground sm:text-2xl">
+                {t('mirror.title', { defaultValue: 'Decision Mirror' })}
+              </p>
+            </div>
 
             <div className="w-full space-y-4">
               {[1, 2, 3].map((i) => (
@@ -151,28 +157,38 @@ export function PauseDecide({ onDecide, onBack }: Props) {
                 {t('mirror.reconsider', { defaultValue: 'Let me reconsider' })}
               </button>
             </motion.div>
+
+            {onBack ? (
+              <motion.div
+                className={pauseStepLayout.backRow}
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ delay: 2.6, duration: 0.8 }}
+              >
+                <button type="button" onClick={onBack} className={pauseStepLayout.backButton}>
+                  <ChevronLeft className="h-3 w-3" />
+                  {t('pause.steps.back', { defaultValue: 'Back' })}
+                </button>
+              </motion.div>
+            ) : null}
           </motion.div>
         )}
       </AnimatePresence>
 
-      {/* Back link */}
-      {onBack && !mirrorDecision && (
+      {/* Back link (choices only — mirror uses row inside mirror block) */}
+      {onBack && !mirrorDecision ? (
         <motion.div
           className={pauseStepLayout.backRow}
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.5, duration: 0.8 }}
         >
-          <button
-            type="button"
-            onClick={onBack}
-            className={pauseStepLayout.backButton}
-          >
+          <button type="button" onClick={onBack} className={pauseStepLayout.backButton}>
             <ChevronLeft className="h-3 w-3" />
             {t('pause.steps.back', { defaultValue: 'Back' })}
           </button>
         </motion.div>
-      )}
+      ) : null}
     </motion.div>
   );
 }

@@ -11,7 +11,6 @@ import { BarChart3, Sparkles, Award, CalendarDays } from 'lucide-react';
 import HistoryContent from '@/components/library/HistoryContent';
 import { StatsContentV2 } from '@/components/stats/StatsContentV2';
 import { Skeleton } from '@/components/ui/skeleton';
-import { NoxHeaderMain } from '@/components/ui/nox-header';
 import { AIInsightsPanel } from '@/components/AIInsightsPanel';
 import { ProLock } from '@/components/ProLock';
 import { BadgesPanelV2 } from '@/components/BadgesPanelV2';
@@ -65,7 +64,9 @@ const Profile = () => {
 
   return (
     <div className="space-y-6">
-      <NoxHeaderMain title={t('nav.journey')} subtitle={t('journey.pageSubtitle')} />
+      <div className="border-b border-border pb-4">
+        <p className="text-base leading-relaxed text-muted-foreground">{t('journey.pageSubtitle')}</p>
+      </div>
       <div className="tabs-scroll -mx-1 flex gap-2 overflow-x-auto px-1 pb-4">
         {tabs.map((tabItem) => {
           const Icon = tabItem.icon;

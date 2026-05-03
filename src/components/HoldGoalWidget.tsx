@@ -1,10 +1,11 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 
 import { useTranslation } from 'react-i18next';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/use-auth';
 import { useHolzen } from '@/hooks/use-holzen';
 import { formatBtcPrice, SUPPORTED_CURRENCIES } from '@/lib/btc';
+import { computeHoldGoalCompactHeadline } from '@/lib/hold-goal-headline';
 import { Target, Calendar, Coins, Infinity as InfinityIcon, X, Check, Pencil } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -49,10 +50,27 @@ const MAX_MONTHS = 1200;
 const MAX_PRICE = 100_000_000;
 const MIN_PRICE = 1;
 
-export function HoldGoalWidget({ currentPrice }: { currentPrice?: number }) {
+export function HoldGoalWidget({
+  currentPrice,
+  variant = 'default',
+  /** When `variant` is wireframe and user has a goal: false shows only goal type · primary status. */
+  wireframeDetailsExpanded = true,
+  /** Fires after initial load and whenever a goal is saved or cleared (not during `loading`). */
+  onHoldGoalPresenceChange,
+  /** Wireframe Home: compact headline for section header (`Kind · metric`). */
+  onCompactHeadlineChange,
+}: {
+  currentPrice?: number;
+  variant?: 'default' | 'wireframe';
+  wireframeDetailsExpanded?: boolean;
+  onHoldGoalPresenceChange?: (hasGoal: boolean) => void;
+  onCompactHeadlineChange?: (headline: string | null) => void;
+}) {
   const { t } = useTranslation();
   const { currency } = useHolzen();
   const { user } = useAuth();
+  const isWire = variant === 'wireframe';
+  const wireCompact = isWire && !wireframeDetailsExpanded;
   const [goal, setGoal] = useState<HoldGoal | null>(null);
   const [loading, setLoading] = useState(true);
   const [setting, setSetting] = useState(false);
@@ -61,6 +79,10 @@ export function HoldGoalWidget({ currentPrice }: { currentPrice?: number }) {
   const [inputValue, setInputValue] = useState('');
   const [validationError, setValidationError] = useState<string | null>(null);
   const [startDate, setStartDate] = useState<Date>(new Date());
+  const presenceCb = useRef(onHoldGoalPresenceChange);
+  presenceCb.current = onHoldGoalPresenceChange;
+  const headlineCb = useRef(onCompactHeadlineChange);
+  headlineCb.current = onCompactHeadlineChange;
 
   const loadGoal = useCallback(async () => {
     if (!user) return;
@@ -83,6 +105,34 @@ export function HoldGoalWidget({ currentPrice }: { currentPrice?: number }) {
   }, [user]);
 
   useEffect(() => { loadGoal(); }, [loadGoal]);
+
+  useEffect(() => {
+    if (loading) return;
+    presenceCb.current?.(goal !== null);
+  }, [loading, goal]);
+
+  useEffect(() => {
+    if (!isWire) return;
+    if (loading) return;
+    if (setting) {
+      headlineCb.current?.(null);
+      return;
+    }
+    const h =
+      goal !== null
+        ? computeHoldGoalCompactHeadline(
+            {
+              type: goal.type,
+              start: goal.start,
+              targetMonths: goal.targetMonths,
+              targetPrice: goal.targetPrice,
+              currency: goal.currency,
+            },
+            { currentPrice, t },
+          )
+        : null;
+    headlineCb.current?.(h);
+  }, [isWire, loading, setting, goal, currentPrice, t]);
 
   const validate = (type: GoalType, value: string, unit: TimeUnit): string | null => {
     if (type === 'forever') return null;
@@ -201,6 +251,8 @@ export function HoldGoalWidget({ currentPrice }: { currentPrice?: number }) {
 
   if (loading) return null;
 
+  const goalEditorShell = isWire ? 'space-y-3 py-1' : `${homeInWidget.insetMuted} space-y-3 py-4`;
+
   // Setup mode
   if (setting || !goal) {
     if (!setting && !goal) {
@@ -217,7 +269,7 @@ export function HoldGoalWidget({ currentPrice }: { currentPrice?: number }) {
     }
 
     return (
-      <div className={`${homeInWidget.insetMuted} space-y-3 py-4`}>
+      <div className={goalEditorShell}>
         <div className="flex items-center justify-between">
           <p className={homeInWidget.kicker}>{t('holdGoal.setYourGoal')}</p>
           <button onClick={() => { setSetting(false); setValidationError(null); setStartDate(new Date()); }} className="text-muted-foreground/40 hover:text-foreground">
@@ -409,6 +461,35 @@ export function HoldGoalWidget({ currentPrice }: { currentPrice?: number }) {
     const years = Math.floor(elapsed / 365);
     const days = elapsed % 365;
 
+    if (isWire) {
+      const headline = computeHoldGoalCompactHeadline(
+        {
+          type: goal.type,
+          start: goal.start,
+          targetMonths: goal.targetMonths,
+          targetPrice: goal.targetPrice,
+          currency: goal.currency,
+        },
+        { currentPrice, t },
+      );
+      return (
+        <div className="flex gap-3">
+          <InfinityIcon className="h-6 w-6 shrink-0 text-muted-foreground" aria-hidden />
+          <div className="min-w-0 flex-1 space-y-2">
+            {headline && !wireCompact ? (
+              <p className="text-[13px] font-medium leading-snug text-foreground">{headline}</p>
+            ) : null}
+            {!wireCompact ? (
+              <p className={homeInWidget.metaFaint}>
+                {t('holdGoal.since', { date: format(start, 'MMM d, yyyy') })}
+                {elapsed > 0 ? ` · ${t('holdGoal.daysHeld', { count: elapsed })}` : ''} · {t('holdGoal.noEndDate')}
+              </p>
+            ) : null}
+          </div>
+        </div>
+      );
+    }
+
     return (
       <div className={`${homeInWidget.insetMuted} mb-0 pb-[16px]`}>
         <div className="flex items-center justify-between">
@@ -442,6 +523,50 @@ export function HoldGoalWidget({ currentPrice }: { currentPrice?: number }) {
     const displayTarget = goal.targetMonths >= 12
       ? `${(goal.targetMonths / 12).toFixed(goal.targetMonths % 12 === 0 ? 0 : 1)}y ${t('holdGoal.commitment')}`
       : `${goal.targetMonths}mo ${t('holdGoal.commitment')}`;
+
+    if (isWire) {
+      const headline = computeHoldGoalCompactHeadline(
+        {
+          type: goal.type,
+          start: goal.start,
+          targetMonths: goal.targetMonths,
+          targetPrice: goal.targetPrice,
+          currency: goal.currency,
+        },
+        { currentPrice, t },
+      );
+      return (
+        <div className="flex gap-3">
+          <Target className="h-6 w-6 shrink-0 text-muted-foreground" aria-hidden />
+          <div className="min-w-0 flex-1 space-y-2">
+            {headline && !wireCompact ? (
+              <p className="text-[13px] font-medium leading-snug text-foreground">{headline}</p>
+            ) : null}
+            {!wireCompact ? (
+              <>
+                <p className={homeInWidget.metaFaint}>
+                  {t('holdGoal.started', { date: format(start, 'MMM d, yyyy') })} ·{' '}
+                  {t('holdGoal.daysHeld', { count: elapsed })}
+                  {' · '}
+                  {displayTarget}
+                </p>
+                <div className="flex items-center gap-2.5">
+                  <div className="h-[7px] min-w-0 flex-1 overflow-hidden rounded-full bg-muted">
+                    <div
+                      className="h-full rounded-full bg-foreground/90 transition-all duration-700"
+                      style={{ width: `${progress}%` }}
+                    />
+                  </div>
+                  <span className="shrink-0 text-xs font-medium tabular-nums text-muted-foreground">
+                    {Math.round(progress)}%
+                  </span>
+                </div>
+              </>
+            ) : null}
+          </div>
+        </div>
+      );
+    }
 
     return (
       <div className={`${homeInWidget.insetMuted} space-y-2.5`}>
@@ -481,6 +606,52 @@ export function HoldGoalWidget({ currentPrice }: { currentPrice?: number }) {
     const progress = price > 0 ? Math.min((price / target) * 100, 100) : 0;
     const reached = price >= target;
     const diff = target - price;
+    const elapsedDays = differenceInDays(new Date(), start);
+
+    if (isWire) {
+      const headline = computeHoldGoalCompactHeadline(
+        {
+          type: goal.type,
+          start: goal.start,
+          targetMonths: goal.targetMonths,
+          targetPrice: goal.targetPrice,
+          currency: goal.currency,
+        },
+        { currentPrice, t },
+      );
+      return (
+        <div className="flex gap-3">
+          <Coins className="h-6 w-6 shrink-0 text-muted-foreground" aria-hidden />
+          <div className="min-w-0 flex-1 space-y-2">
+            {headline && !wireCompact ? (
+              <p className="text-[13px] font-medium leading-snug text-foreground">{headline}</p>
+            ) : null}
+            {!wireCompact ? (
+              <>
+                <p className={homeInWidget.metaFaint}>
+                  {t('holdGoal.started', { date: format(start, 'MMM d, yyyy') })} ·{' '}
+                  {t('holdGoal.daysHeld', { count: elapsedDays })} · {t('holdGoal.target')}:{' '}
+                  {formatBtcPrice(target, goal.currency)}
+                  {' · '}
+                  {t('holdGoal.current')}: {formatBtcPrice(price, goal.currency)}
+                </p>
+                <div className="flex items-center gap-2.5">
+                  <div className="h-[7px] min-w-0 flex-1 overflow-hidden rounded-full bg-muted">
+                    <div
+                      className="h-full rounded-full bg-foreground/90 transition-all duration-700"
+                      style={{ width: `${progress}%` }}
+                    />
+                  </div>
+                  <span className="max-w-[45%] shrink-0 truncate text-right text-xs font-medium tabular-nums text-muted-foreground">
+                    {formatBtcPrice(price, goal.currency)}
+                  </span>
+                </div>
+              </>
+            ) : null}
+          </div>
+        </div>
+      );
+    }
 
     return (
       <div className={`${homeInWidget.insetMuted} space-y-2.5`}>
@@ -508,7 +679,7 @@ export function HoldGoalWidget({ currentPrice }: { currentPrice?: number }) {
             />
           </div>
           <p className={homeInWidget.metaFaint}>
-            {t('holdGoal.started', { date: format(start, 'MMM d, yyyy') })} · {t('holdGoal.daysHeld', { count: differenceInDays(new Date(), start) })} · {t('holdGoal.current')}: {formatBtcPrice(price, currency)}
+            {t('holdGoal.started', { date: format(start, 'MMM d, yyyy') })} · {t('holdGoal.daysHeld', { count: elapsedDays })} · {t('holdGoal.current')}: {formatBtcPrice(price, currency)}
           </p>
         </div>
       </div>

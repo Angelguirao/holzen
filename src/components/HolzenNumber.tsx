@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { motion, useReducedMotion } from 'framer-motion';
-import { supabase } from '@/integrations/supabase/client';
+import { invokeEdge } from '@/lib/invoke-edge';
 import { homeInWidget } from '@/components/home/home-widget-styles';
 
 interface HolzenNumberData {
@@ -22,7 +22,7 @@ export function HolzenNumber({ variant = 'default' }: { variant?: 'default' | 'c
   useEffect(() => {
     async function fetch() {
       try {
-        const { data: result, error } = await supabase.functions.invoke('holzen-number');
+        const { data: result, error } = await invokeEdge<HolzenNumberData>('holzen-number');
         if (!error && result) {
           setData(result as HolzenNumberData);
         }

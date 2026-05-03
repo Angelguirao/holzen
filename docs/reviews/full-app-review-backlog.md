@@ -2,6 +2,8 @@
 
 This document inventories **user-visible flows** and **cross-cutting areas** so you can review the whole product systematically, beyond the **pause-first** spine in Phase 1–2 and the **server/security** spine in Phase 3–8.
 
+**How to execute each slice:** Use [react-spa-review-template.md](react-spa-review-template.md) (flow-first PR checklist + optional audit depth). For a **single tick-through list** of every route, settings tab, journey tab, edge function, and cross-cutting area, use [end-to-end-review-master-checklist.md](end-to-end-review-master-checklist.md). After findings, align refactors with [fundamentals/refactoring-strategy.md](../fundamentals/refactoring-strategy.md).
+
 **How to read estimates:** Hours are for a **phase-style pass**: trace code, data, and edge calls; note failure modes and gaps—not a shallow skim. Treat ranges as **±30–40%** depending on depth (security vs UX-only). Merged reviews (e.g. all `/tools/practice/*` in one session) reduce wall-clock time.
 
 **Canonical route list:** `src/App.tsx`. **Edge names:** `bruno/functions-catalog.md` and `supabase/config.toml` under `[functions.<name>]`.

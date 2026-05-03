@@ -19,7 +19,7 @@ import { AppLayout } from "./components/AppLayout";
 import { FeedbackWidget } from "./components/FeedbackWidget";
 
 const Home = lazy(() => import("./pages/Home"));
-const Library = lazy(() => import("./pages/Library"));
+const Archive = lazy(() => import("./pages/Archive"));
 const Profile = lazy(() => import("./pages/Profile"));
 const BadgeGuide = lazy(() => import("./pages/BadgeGuide"));
 const SettingsRoot = lazy(() => import("./pages/settings/SettingsRoot"));
@@ -62,6 +62,11 @@ const SettingsAbout = lazy(() => import("./pages/SettingsAbout"));
 const RoadmapStub = lazy(() => import("./pages/RoadmapStub"));
 
 const queryClient = createHolzenQueryClient();
+
+function LibraryToArchiveRedirect() {
+  const { search } = useLocation();
+  return <Navigate to={`/archive${search}`} replace />;
+}
 
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
   const { user, loading } = useAuth();
@@ -129,9 +134,8 @@ function CheckoutGuardCleanup() {
 }
 
 /**
- * Floating feedback button — only shown for authenticated users.
- * `send-feedback` requires an auth'd session, and the ErrorBoundary listener on the widget
- * also needs the auth context in case the user wants to reach support from the error screen.
+ * Mounts the error-report feedback sheet listener for signed-in users only (`send-feedback` needs a session).
+ * Voluntary contact is Settings → About (`FeedbackForm`). `ErrorBoundary` opens the sheet via `holzen:open-feedback`.
  */
 function FeedbackWidgetGate() {
   const { user } = useAuth();
@@ -174,7 +178,8 @@ const App = () => (
                 <Route element={<ProtectedRoute><AppLayout /></ProtectedRoute>}>
                   <Route path="/" element={<Home />} />
                   <Route path="/index" element={<Navigate to="/" replace />} />
-                  <Route path="/library" element={<Library />} />
+                  <Route path="/archive" element={<Archive />} />
+                  <Route path="/library" element={<LibraryToArchiveRedirect />} />
                   <Route path="/journey" element={<Navigate to="/journey/stats" replace />} />
                   <Route path="/journey/:tab" element={<Profile />} />
                   <Route path="/journey/badges/guide" element={<BadgeGuide />} />

@@ -2,6 +2,7 @@ import { useState, useCallback, useEffect, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { motion, AnimatePresence } from 'framer-motion';
 import { supabase } from '@/integrations/supabase/client';
+import { invokeEdge } from '@/lib/invoke-edge';
 import { useAuth } from '@/hooks/use-auth';
 import { useHolzen } from '@/hooks/use-holzen';
 import { hapticFeedback } from '@/lib/haptics';
@@ -47,7 +48,7 @@ export function GuidedJournal({ onComplete, textColor, ringColor }: Props) {
 
     async function fetchAIPrompts() {
       try {
-        const { data, error } = await supabase.functions.invoke('journal-prompt', {
+        const { data, error } = await invokeEdge<{ prompts?: string[] }>('journal-prompt', {
           body: { language },
         });
         if (error) throw error;
@@ -94,25 +95,20 @@ export function GuidedJournal({ onComplete, textColor, ringColor }: Props) {
   }, [prompts.length]);
 
   const save = useCallback(async () => {
-    if (!user || !body.trim()) return;
+    if (!user) {
+      toast.error(t('auth.signInToContinue'));
+      return;
+    }
+    if (!body.trim()) return;
     setSaving(true);
     try {
-      // Save practice entry
-      await supabase.from('practice_entries').insert({
+      const { error: practiceError } = await supabase.from('practice_entries').insert({
         user_id: user.id,
         type: 'journal',
         body: body.trim(),
         prompt,
       });
-      // Also save to library as a note
-      await supabase.from('library_items').insert({
-        user_id: user.id,
-        type: 'note',
-        title: prompt.slice(0, 80),
-        body: body.trim(),
-        source_type: 'practice_journal',
-        tags: ['journal', 'practice'],
-      });
+      if (practiceError) throw practiceError;
       hapticFeedback('success');
       setDone(true);
       setTimeout(onComplete, 1500);

@@ -28,16 +28,20 @@ export function EmotionalCheckIn({ onComplete, textColor, ringColor }: Props) {
   const [saving, setSaving] = useState(false);
 
   const save = useCallback(async () => {
-    if (!user) return;
+    if (!user) {
+      toast.error(t('auth.signInToContinue'));
+      return;
+    }
     setSaving(true);
     try {
-      await supabase.from('practice_entries').insert({
+      const { error } = await supabase.from('practice_entries').insert({
         user_id: user.id,
         type: 'checkin',
         mood,
         intensity,
         trigger_text: trigger || null,
       });
+      if (error) throw error;
       hapticFeedback('success');
       setStep('done');
       setTimeout(onComplete, 1500);

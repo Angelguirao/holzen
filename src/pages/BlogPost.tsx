@@ -6,7 +6,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { format } from 'date-fns';
 import { PageMeta } from '@/components/PageMeta';
 import { useTranslation } from 'react-i18next';
-import { NoxHeaderMain } from '@/components/ui/nox-header';
+import { PageHeading } from '@/components/PageHeading';
 
 const fade = (delay = 0) => ({
   initial: { opacity: 0, y: 14 },
@@ -78,7 +78,7 @@ const BlogPost = () => {
                   {format(new Date(post.published_at), 'MMMM d, yyyy')}
                 </p>
               )}
-              <NoxHeaderMain title={post.title} />
+              <PageHeading title={post.title} />
               {post.excerpt && <p className="text-sm text-muted-foreground leading-relaxed">{post.excerpt}</p>}
             </motion.div>
 

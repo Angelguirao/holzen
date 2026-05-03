@@ -1,6 +1,7 @@
 import { useState, useMemo, useCallback, useEffect } from 'react';
 import { Trash2, Loader2, Globe } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
+import { invokeEdge } from '@/lib/invoke-edge';
 import type { Database } from '@/integrations/supabase/types';
 import { useToast } from '@/hooks/use-toast';
 import type { LibraryEntryRow } from '@/hooks/use-admin-stats';
@@ -144,7 +145,14 @@ export function ContentLibraryViewer({ entries, onRefresh }: { entries: LibraryE
     const normalized = normalizeLibraryItemUrl(raw);
     setNewUrl(normalized);
     setPreviewBusy(true);
-    const { data, error } = await supabase.functions.invoke('admin-library-preview', {
+    const { data, error } = await invokeEdge<{
+      error?: string;
+      title?: string;
+      author?: string | null;
+      summary?: string;
+      key_quote?: string | null;
+      hint?: string;
+    }>('admin-library-preview', {
       body: { url: normalized },
     });
     setPreviewBusy(false);
@@ -152,24 +160,16 @@ export function ContentLibraryViewer({ entries, onRefresh }: { entries: LibraryE
       toast({ title: 'Preview failed', description: error.message, variant: 'destructive' });
       return;
     }
-    const payload = data as {
-      error?: string;
-      title?: string;
-      author?: string | null;
-      summary?: string;
-      key_quote?: string | null;
-      hint?: string;
-    };
-    if (payload?.error) {
-      toast({ title: 'Preview failed', description: payload.error, variant: 'destructive' });
+    if (data?.error) {
+      toast({ title: 'Preview failed', description: data.error, variant: 'destructive' });
       return;
     }
-    if (payload.title) setNewTitle(payload.title);
-    if (payload.author !== undefined) setNewAuthor(payload.author ?? '');
-    if (payload.summary) setNewSummary(payload.summary);
-    if (payload.key_quote && newType === 'essay') setNewKeyQuote(payload.key_quote);
-    if (payload.hint) {
-      toast({ title: 'Preview (partial)', description: payload.hint });
+    if (data?.title) setNewTitle(data.title);
+    if (data?.author !== undefined) setNewAuthor(data.author ?? '');
+    if (data?.summary) setNewSummary(data.summary);
+    if (data?.key_quote && newType === 'essay') setNewKeyQuote(data.key_quote);
+    if (data?.hint) {
+      toast({ title: 'Preview (partial)', description: data.hint });
     } else {
       toast({ title: 'Filled from URL', description: 'Review title, author, and summary before saving.' });
     }

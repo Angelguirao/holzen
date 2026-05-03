@@ -9,7 +9,7 @@ import { Badge } from '@/components/ui/badge';
 import { PageMeta } from '@/components/PageMeta';
 import { PublicFooter } from '@/components/PublicFooter';
 import { useInfiniteScroll } from '@/hooks/use-infinite-scroll';
-import { NoxHeaderMain } from '@/components/ui/nox-header';
+import { PageHeading } from '@/components/PageHeading';
 
 const PAGE_SIZE = 30;
 const CATEGORIES = ['all', 'self', 'together', 'intelligence', 'reach'] as const;
@@ -110,7 +110,7 @@ const Roadmap = () => {
             <ArrowLeft className="h-3 w-3" />
             {t('common.back')}
           </Link>
-          <NoxHeaderMain
+          <PageHeading
             title={t('roadmap.title')}
             subtitle={`${t('roadmap.voteOnNext')} ${!user ? t('roadmap.signInToVote') : ''}`.trim()}
           />

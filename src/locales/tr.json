@@ -3,6 +3,7 @@
     "home": "Ana Sayfa",
     "history": "Geçmiş",
     "library": "Kütüphane",
+    "archive": "Arşiv",
     "tools": "Araçlar",
     "journey": "Yolculuk",
     "profile": "Profil",
@@ -26,6 +27,7 @@
   },
   "common": {
     "back": "Geri",
+    "close": "Kapat",
     "cancel": "İptal",
     "delete": "Sil",
     "done": "Tamam",
@@ -392,7 +394,7 @@
   "btcStatus": {
     "unableToFetch": "Fiyat verileri alınamadı",
     "checkConnection": "Bağlantınızı kontrol edin ve tekrar deneyin",
-    "exitBtcMode": "1 BTC = 1 BTC modundan çık",
+    "exitBtcMode": "{{currency}} fiyat görünümüne dön",
     "enterBtcMode": "1 BTC = 1 BTC moduna gir",
     "show": "Göster",
     "hide": "Gizle",
@@ -891,15 +893,36 @@
     "freezeAvailable": "1 seri dondurma mevcut · haftalık yenileme",
     "nextFreeze": "Sonraki dondurma {{time}}",
     "used": "Kullanılan",
-    "more": "+{{count}} daha"
+    "more": "+{{count}} daha",
+    "regulation": {
+      "moodShift": {
+        "intensityFootnote": "Bu örnekteki {{sample}} molanın {{feel}} / {{shift}} tanesinde his/kayma 1–5 ölçeği kaydedildi."
+      }
+    }
   },
   "myWhy": {
     "title": "Benim Nedenim"
   },
   "library": {
-    "title": "Kütüphane",
-    "pageTitle": "Kütüphane — Holzen",
-    "pageDescription": "Aktiviteniz, yer işaretleriniz, notlarınız ve koleksiyonlarınız",
+    "title": "Arşiv",
+    "pageTitle": "Arşiv — Holzen",
+    "pageDescription": "Yer imleriniz, notlarınız ve kaydettiğiniz duraklama anları.",
+    "archiveIntroPauses": "Son duraklamalarınızdan ve favorilerinizden içerik görün. Önemli olanları kaydedin. Filtrelerle keşfedin.",
+    "archiveIntroEchoes": "Kaçırdığınız duraklamalardan yansımalar. Kendi hızınızda okuyun. Size hitap edenleri kaydedin.",
+    "segmentPauses": "Duraklamalar",
+    "segmentEchoes": "Yankılar",
+    "pillAll": "Tümü",
+    "pillFavs": "Favoriler",
+    "filterTypesLabel": "Türe göre filtrele",
+    "filterNoTypes": "Henüz tür yok",
+    "removeFilterChip": "Filtreyi kaldır",
+    "notificationsAria": "Bildirimler",
+    "emptyPauseFirst": "İlk duraklamanızdan sonra içeriğiniz burada görünecek.",
+    "emptyPauseFirstCta": "Duraklama başlat",
+    "emptyFavs": "Henüz kayıtlı bir şey yok. Önemli olanları saklayın.",
+    "emptyEchoesNone": "Henüz burada bir şey yok. Yankı duraklamalarından kaydettiğiniz yansımalar bu listede görünür.",
+    "echoesCardKind": "Yansıma",
+    "tabCollections": "Koleksiyonlar",
     "iaClarifier": "Kayıtlı ve aranabilir içerik. Kronolojik akış: Yolculuk → Etkinlik.",
     "tabItems": "Öğeler",
     "tabArchive": "Arşiv",
@@ -935,7 +958,13 @@
     "deleteCollection": "Sil",
     "deleteCollectionConfirm": "Bu koleksiyonu silmek mi? İçindeki öğeler kalmaya devam eder.",
     "collectionRenamed": "Koleksiyon yeniden adlandırıldı",
-    "collectionDeleted": "Koleksiyon silindi"
+    "collectionDeleted": "Koleksiyon silindi",
+    "pauseCardReflectOpened": "Reflect açıldı {{when}}",
+    "pauseCardReflectNotOpened": "Reflect henüz açılmadı",
+    "pauseCardOutcomePending": "Sonuç kaydedilmedi",
+    "pauseCardBreathDone": "Nefes tamamlandı",
+    "pauseCardEngagementTypes": "Etkileşim",
+    "pauseCardMoreTypes": "+ daha fazla"
   },
   "pause": {
     "youPaused": "Durdunuz. En zor kısım bu.",
@@ -944,7 +973,65 @@
     "whatWillYouDo": "Ne yapacaksınız?",
     "youChose": "Bilinçli olarak seçtiniz.",
     "return": "Geri dön",
-    "noReflection": "Aktif düşünce yok. Birini tetiklemek için geri dönün."
+    "sessionTitle": "Molanız",
+    "scienceInfoAria": "Bu molanın arkasındaki bilim",
+    "noReflection": "Aktif düşünce yok. Birini tetiklemek için geri dönün.",
+    "outcomeSaveFailed": "Seçimin kaydedilemedi. Tekrar dene.",
+    "outcomeNotCompleted": "Seçimin kaydedildi ama bu mola henüz tamamlanmadı — Düşün’ü aç, bir refakat kartını bitir ve yeniden seç.",
+    "stepSyncFailed": "Bu adım eşitlenemedi. Bağlantını kontrol edip tekrar dene.",
+    "pendingContextTitle": "Piyasa bağlamı değişti",
+    "pendingContextBody": "Son hareket için yeni bir mola var. Mevcut molanızı tutabilir veya geçiş yapabilirsiniz — geçiş yapınca bu an için mevcut ritüel biter ve yenisi açılır.",
+    "pendingAdoptCta": "Yeni molaya geç",
+    "pendingKeepCta": "Mevcut molayı tut",
+    "pendingAdoptFailed": "Yeni molaya geçilemedi. Tekrar dene.",
+    "pendingDeclineFailed": "Teklif reddedilemedi. Tekrar dene.",
+    "breathYouAreHere": "Buradasınız",
+    "breathIntroKicker": "Adım 1 · Nefes",
+    "decideIntroKicker": "Adım 5 · Karar ver",
+    "decideMirrorKicker": "Onaylamadan önce",
+    "breathInterstitialTitle": "Dayandınız",
+    "breathInterstitialBody": "Hazır olduğunuzda bu anın nasıl hissettirdiğine geçin.",
+    "feelIntensityTitle": "Bu duygu ne kadar güçlü?",
+    "feelIntensityLow": "Hafif",
+    "feelIntensityHigh": "Güçlü",
+    "feelIntensitySummary": "Yoğunluk {{n}} / 5",
+    "shiftSubcopy": "Düşündükten sonra neyin değiştiğine bakın — yanlış cevap yok.",
+    "shiftPriorLabel": "Önce",
+    "shiftIntensityTitle": "Ne kadar kaydı?",
+    "shiftIntensityLow": "Neredeyse hiç",
+    "shiftIntensityHigh": "Çok",
+    "shiftIntensitySummary": "Kayma {{n}} / 5",
+    "favoriteProHint": "Favorileriniz Pro ile Kütüphanede sizi bekliyor ✨",
+    "steps": {
+      "breathe": "Nefes",
+      "feel": "Hisset",
+      "reflect": "Düşün",
+      "shift": "Kayma",
+      "decide": "Karar ver",
+      "continue": "Devam",
+      "back": "Geri"
+    },
+    "reflect": {
+      "heading": "Bu düşünceyle kalın",
+      "subcopy": "Kendi hızınızda okuyun. Notlar ve etiketler isteğe bağlı; farklı bir açı istediğinizde bir refakat kartı açın.",
+      "block1Title": "Düşünce",
+      "block2Title": "İhtiyacınız olanı alın",
+      "proTools": "Notunuz ve etiketleriniz",
+      "freeHint": "Holzen Pro her molaya isteğe bağlı özel not ve etiket ekler — Kütüphanede geri dönerken işe yarar.",
+      "companionsLead": "Bir seferde bir açı açın — her kart aşağıda genişler.",
+      "continueHint": "\"Doğru\" süre yok — hazır olduğunuzda devam edin.",
+      "shareCta": "Paylaş",
+      "wallpaperCta": "Duvar kağıdı",
+      "shareTitle": "Holzen'den düşünce",
+      "shareCopied": "Düşünce panoya kopyalandı.",
+      "shareCopyFailed": "Kopyalanamadı. Tekrar dene.",
+      "shareEmpty": "Henüz paylaşılacak bir şey yok.",
+      "wallpaperCopied": "Kopyalandı. Kilit ekranı veya alıntı aracına yapıştırın.",
+      "wallpaperHint": "Düşüncenizi kopyalayıp duvar kağıdı veya kilit ekranı alıntı aracına yapıştırın."
+    },
+    "done": {
+      "reinforcementKicker": "Bunu yanınıza alın"
+    }
   },
   "breathing": {
     "trigger": "Bununla nefes al →",

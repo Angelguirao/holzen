@@ -1,8 +1,11 @@
 import { useState, useEffect, useCallback, useMemo } from "react";
-import { supabase } from "@/integrations/supabase/client";
+import { useTranslation } from "react-i18next";
+import { toast } from "sonner";
+import { invokeEdge } from "@/lib/invoke-edge";
 import { useAuth } from "@/hooks/use-auth";
 
 export function usePushNotifications() {
+  const { t } = useTranslation();
   const { user } = useAuth();
   const [isSubscribed, setIsSubscribed] = useState(false);
   const [isSupported, setIsSupported] = useState(false);
@@ -53,9 +56,9 @@ export function usePushNotifications() {
     setLoading(true);
     try {
       // Get VAPID public key from edge function
-      const { data: keyData, error: keyError } = await supabase.functions.invoke(
+      const { data: keyData, error: keyError } = await invokeEdge<{ publicKey?: string }>(
         "register-push",
-        { body: { action: "get-vapid-key" } }
+        { body: { action: "get-vapid-key" } },
       );
       if (keyError || !keyData?.publicKey) throw new Error("Failed to get VAPID key");
 
@@ -71,7 +74,7 @@ export function usePushNotifications() {
       const subJson = subscription.toJSON();
 
       // Save to backend
-      const { error } = await supabase.functions.invoke("register-push", {
+      const { error } = await invokeEdge("register-push", {
         body: {
           action: "subscribe",
           subscription: {
@@ -85,10 +88,11 @@ export function usePushNotifications() {
       setIsSubscribed(true);
     } catch (e) {
       console.error("Push subscribe error:", e);
+      toast.error(t("settings.pushSubscribeFailed"));
     } finally {
       setLoading(false);
     }
-  }, [user, isSupported]);
+  }, [user, isSupported, t]);
 
   const unsubscribe = useCallback(async () => {
     if (!user || !isSupported) return;
@@ -99,22 +103,24 @@ export function usePushNotifications() {
       if (subscription) {
         const subJson = subscription.toJSON();
 
-        await supabase.functions.invoke("register-push", {
+        const { error: unsubErr } = await invokeEdge("register-push", {
           body: {
             action: "unsubscribe",
             subscription: { endpoint: subJson.endpoint },
           },
         });
+        if (unsubErr) throw unsubErr;
 
         await subscription.unsubscribe();
       }
       setIsSubscribed(false);
     } catch (e) {
       console.error("Push unsubscribe error:", e);
+      toast.error(t("settings.pushUnsubscribeFailed"));
     } finally {
       setLoading(false);
     }
-  }, [user, isSupported]);
+  }, [user, isSupported, t]);
 
   const permissionGrantedNotSubscribed = useMemo(() => {
     if (typeof window === "undefined" || typeof Notification === "undefined") return false;

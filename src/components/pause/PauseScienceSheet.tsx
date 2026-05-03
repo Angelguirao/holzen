@@ -1,12 +1,5 @@
-import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Drawer, DrawerContent, DrawerTrigger } from '@/components/ui/drawer';
 import { Wind, Heart, BookOpen, RefreshCw, Target, ExternalLink } from 'lucide-react';
-
-interface ResearchLink {
-  label: string;
-  url: string;
-}
 
 const STEPS = [
   {
@@ -73,58 +66,40 @@ const STEPS = [
   },
 ] as const;
 
-export function PauseScienceSheet() {
+/** Scrollable “science behind the pause” body for use inside a bottom sheet / drawer. */
+export function PauseScienceScrollBody() {
   const { t } = useTranslation();
-  const [open, setOpen] = useState(false);
 
   return (
-    <Drawer open={open} onOpenChange={setOpen}>
-      <DrawerTrigger asChild>
-        <button
-          type="button"
-          className="text-left text-xs text-muted-foreground underline-offset-2 transition-colors hover:text-foreground hover:underline"
-        >
-          {t('pauseScience.whyThisOrder')}
-        </button>
-      </DrawerTrigger>
-      <DrawerContent className="max-h-[85vh]">
-        <div className="px-6 pt-4 pb-8 space-y-6 overflow-y-auto">
-          <p className="text-sm font-medium text-muted-foreground">
-            {t('pauseScience.title')}
-          </p>
-          <div className="space-y-5">
-            {STEPS.map(({ key, icon: Icon, sources }) => (
-              <div key={key} className="flex gap-3">
-                <div className="mt-0.5 w-6 h-6 rounded-full bg-muted/60 flex items-center justify-center shrink-0">
-                  <Icon className="h-3 w-3 text-muted-foreground/60" />
-                </div>
-                <div className="space-y-1.5">
-                  <p className="text-xs font-medium text-foreground">
-                    {t(`pauseScience.${key}`)}
-                  </p>
-                  <p className="text-sm leading-relaxed text-muted-foreground">
-                    {t(`pauseScience.${key}Desc`)}
-                  </p>
-                  <div className="flex flex-wrap gap-x-3 gap-y-1">
-                    {sources.map((source) => (
-                      <a
-                        key={source.url}
-                        href={source.url}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="inline-flex max-w-full items-center gap-1 break-words text-xs text-primary underline-offset-2 hover:underline"
-                      >
-                        <ExternalLink className="h-2.5 w-2.5 shrink-0" />
-                        {source.label}
-                      </a>
-                    ))}
-                  </div>
-                </div>
+    <div className="space-y-6 px-1 pb-6 pt-2">
+      <p className="text-sm font-medium text-muted-foreground">{t('pauseScience.title')}</p>
+      <div className="space-y-5">
+        {STEPS.map(({ key, icon: Icon, sources }) => (
+          <div key={key} className="flex gap-3">
+            <div className="mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-muted/60">
+              <Icon className="h-3 w-3 text-muted-foreground/60" />
+            </div>
+            <div className="space-y-1.5">
+              <p className="text-xs font-medium text-foreground">{t(`pauseScience.${key}`)}</p>
+              <p className="text-sm leading-relaxed text-muted-foreground">{t(`pauseScience.${key}Desc`)}</p>
+              <div className="flex flex-wrap gap-x-3 gap-y-1">
+                {sources.map((source) => (
+                  <a
+                    key={source.url}
+                    href={source.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex max-w-full items-center gap-1 break-words text-xs text-primary underline-offset-2 hover:underline"
+                  >
+                    <ExternalLink className="h-2.5 w-2.5 shrink-0" />
+                    {source.label}
+                  </a>
+                ))}
               </div>
-            ))}
+            </div>
           </div>
-        </div>
-      </DrawerContent>
-    </Drawer>
+        ))}
+      </div>
+    </div>
   );
 }

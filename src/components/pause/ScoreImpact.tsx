@@ -12,6 +12,9 @@ interface PauseData {
   engagedTools: number; // count of perspective tools read
   wroteNote: boolean;
   usedTags: boolean;
+  feelIntensity?: number | null;
+  shiftIntensity?: number | null;
+  reinforcementQuote?: string | null;
 }
 
 const COMPOSURE: Record<string, number> = {

@@ -5,6 +5,7 @@ import { useInstallPrompt } from '@/hooks/use-install-prompt';
 import { usePushNotifications } from '@/hooks/use-push-notifications';
 import { useLatestChangelogVersion } from '@/hooks/use-latest-changelog-version';
 import { supabase } from '@/integrations/supabase/client';
+import { invokeEdge } from '@/lib/invoke-edge';
 import { trackEvent } from '@/lib/posthog';
 import { toast } from 'sonner';
 import { useState, useEffect, useCallback, useRef } from 'react';
@@ -151,6 +152,7 @@ export function useSettingsModel() {
     nightReflectionHour,
     aiInsightsEnabled,
     notifyBadges,
+    motivations,
     mantra,
     currency,
     groundingActivities,
@@ -293,7 +295,7 @@ export function useSettingsModel() {
     if (!user) return;
     setDeleting(true);
     try {
-      const { error } = await supabase.functions.invoke('delete-account');
+      const { error } = await invokeEdge('delete-account');
       if (error) throw error;
       toast.success('Account deleted');
       await signOut();

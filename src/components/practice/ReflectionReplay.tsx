@@ -50,16 +50,20 @@ export function ReflectionReplay({ onComplete, initialPauseInstanceId }: Props) 
   const [selectedId, setSelectedId] = useState<string | null>(initialPauseInstanceId ?? null);
   const [thread, setThread] = useState<PastReflectionWithWords | null>(null);
   const [loadingThread, setLoadingThread] = useState(false);
+  /** When load fails, `thread` stays null and `loadingThread` is false — without this we would spin forever (`!thread` treated as loading). */
+  const [threadLoadError, setThreadLoadError] = useState(false);
   const [loadingList, setLoadingList] = useState(!initialPauseInstanceId);
   const [draft, setDraft] = useState('');
   const [saving, setSaving] = useState(false);
 
   const loadThread = useCallback(async (pauseId: string) => {
     setLoadingThread(true);
+    setThreadLoadError(false);
     const res = await loadPauseReplayThread(pauseId);
     setLoadingThread(false);
     if (!res.ok) {
       setThread(null);
+      setThreadLoadError(true);
       toast.error(
         t('practice.replayLoadFailed', {
           defaultValue: 'Could not load this pause.',
@@ -67,6 +71,7 @@ export function ReflectionReplay({ onComplete, initialPauseInstanceId }: Props) 
       );
       return;
     }
+    setThreadLoadError(false);
     setThread(res.thread);
     setDraft('');
   }, [t]);
@@ -162,7 +167,51 @@ export function ReflectionReplay({ onComplete, initialPauseInstanceId }: Props) 
     );
   }
 
-  if (loadingThread || !thread) {
+  if (loadingThread) {
+    return (
+      <div className="flex justify-center py-12">
+        <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" aria-hidden />
+      </div>
+    );
+  }
+
+  if (!thread) {
+    if (threadLoadError) {
+      return (
+        <div className="flex flex-col items-center gap-4 px-4 py-8 max-w-md mx-auto text-center">
+          <p className="text-sm text-muted-foreground">{t('practice.replayLoadFailed')}</p>
+          <div className="flex flex-wrap gap-2 justify-center">
+            <Button
+              type="button"
+              variant="secondary"
+              size="sm"
+              onClick={() => {
+                if (selectedId) void loadThread(selectedId);
+              }}
+            >
+              {t('common.tryAgain', { defaultValue: 'Try again' })}
+            </Button>
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              onClick={() => {
+                setSelectedId(null);
+                setThread(null);
+                setThreadLoadError(false);
+              }}
+            >
+              {t('practice.replayChangePause', { defaultValue: 'Change pause' })}
+            </Button>
+            {onComplete && (
+              <Button type="button" variant="outline" size="sm" onClick={onComplete}>
+                {t('common.done', { defaultValue: 'Done' })}
+              </Button>
+            )}
+          </div>
+        </div>
+      );
+    }
     return (
       <div className="flex justify-center py-12">
         <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" aria-hidden />
@@ -172,24 +221,24 @@ export function ReflectionReplay({ onComplete, initialPauseInstanceId }: Props) 
 
   return (
     <div className="flex flex-col gap-4 w-full max-w-md mx-auto px-1 pb-8">
-      {!initialPauseInstanceId && (
+      <div className="flex flex-col gap-2 self-start w-full">
+        {initialPauseInstanceId && (
+          <p className="text-[10px] text-muted-foreground/80 leading-relaxed">
+            {t('practice.replayFromEchoHint')}
+          </p>
+        )}
         <button
           type="button"
           onClick={() => {
             setSelectedId(null);
             setThread(null);
+            setThreadLoadError(false);
           }}
           className="text-[10px] font-mono text-primary/80 hover:underline self-start"
         >
           {t('practice.replayChangePause', { defaultValue: '← Change pause' })}
         </button>
-      )}
-
-      {initialPauseInstanceId && (
-        <p className="text-[10px] text-muted-foreground/80 leading-relaxed">
-          {t('practice.replayFromEchoHint')}
-        </p>
-      )}
+      </div>
 
       <div className="text-center space-y-1">
         <p className="text-[10px] font-mono text-muted-foreground/60 uppercase tracking-wider">

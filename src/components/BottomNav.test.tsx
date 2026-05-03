@@ -2,11 +2,11 @@ import { describe, it, expect } from 'vitest';
 import { isPrimaryTabActive } from './BottomNav';
 
 describe('isPrimaryTabActive', () => {
-  it('matches home and library', () => {
+  it('matches home and archive', () => {
     expect(isPrimaryTabActive('/', 'home')).toBe(true);
-    expect(isPrimaryTabActive('/library', 'home')).toBe(false);
-    expect(isPrimaryTabActive('/library', 'library')).toBe(true);
-    expect(isPrimaryTabActive('/library/abc', 'library')).toBe(true);
+    expect(isPrimaryTabActive('/archive', 'home')).toBe(false);
+    expect(isPrimaryTabActive('/archive', 'archive')).toBe(true);
+    expect(isPrimaryTabActive('/archive/segment', 'archive')).toBe(true);
   });
 
   it('matches the tools tab on the hub and nested tools routes', () => {

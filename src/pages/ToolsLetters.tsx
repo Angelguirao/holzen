@@ -1,6 +1,6 @@
 import { useSearchParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { NoxHeaderMain } from '@/components/ui/nox-header';
+import { PageHeading } from '@/components/PageHeading';
 import { LetterToFutureSelf } from '@/components/LetterToFutureSelf';
 import { ProLock } from '@/components/ProLock';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -17,10 +17,7 @@ export default function ToolsLetters() {
 
   return (
     <div className="space-y-6 pb-8">
-      <NoxHeaderMain
-        title={t('tools.letters')}
-        subtitle={t('tools.lettersDesc')}
-      />
+      <PageHeading title={t('tools.letters')} subtitle={t('tools.lettersDesc')} />
       {btcData ? (
         <ProLock feature="letters" hideContent>
           <LetterToFutureSelf

@@ -157,7 +157,7 @@ The inline card in `CompanionSection` has an **"Open full view"** button that ro
 - **Read-time indicator** + **"Why this card now?"** collapsible disclosure (mood / market direction / session bias transparency).
 - **Breathing-room pacing** (8 s) before feedback and save CTAs fade in, so the screen doesn't demand input before the user has read.
 - **Per-user history thread** — the last 5 Signal cards for this user from `pause_ai_artifacts`, deep-linked to their own Full Views.
-- **Pro-gated "Save this moment"** — writes a `library_items` row of `type: note`, `source_type: companion_moment`, capturing the user's own thinking about the card (not the card itself, which is already autosaved as a bookmark).
+- **Full View** — optional deep read; the signal body is already stored on **`pause_ai_artifacts`**. User-authored notes belong in **practice / journal** flows if you add explicit capture there.
 
 The free "Open full view" button is visible to all users; gating only applies to the **Save this moment** action.
 

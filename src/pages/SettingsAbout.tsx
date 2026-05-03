@@ -5,7 +5,7 @@ import { AppVersionBadge } from '@/components/AppVersionBadge';
 import { Changelog } from '@/components/Changelog';
 import { FeedbackForm } from '@/components/FeedbackForm';
 import { useLatestChangelogVersion } from '@/hooks/use-latest-changelog-version';
-import { NoxHeaderMain } from '@/components/ui/nox-header';
+import { PageHeading } from '@/components/PageHeading';
 
 /**
  * Low-frequency "about" surface: feedback, what’s new, version — kept out of the main Settings accordion.
@@ -31,7 +31,7 @@ export default function SettingsAbout() {
         )}
       </div>
 
-      <NoxHeaderMain
+      <PageHeading
         className="border-0 pb-0"
         title={t('settingsAbout.title', { defaultValue: 'About, changelog & feedback' })}
         subtitle={t('settingsAbout.subtitle', {

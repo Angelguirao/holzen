@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
+import { invokeEdge } from '@/lib/invoke-edge';
 import { useAuth } from '@/hooks/use-auth';
 import { useHolzen } from '@/hooks/use-holzen';
 import { useTranslation } from 'react-i18next';
@@ -139,7 +140,7 @@ export function AIInsightsPanel({ completedPauseCount }: Props) {
     setGenerating(true);
     applyOptimisticDecrement('insight');
     try {
-      const { data, error } = await supabase.functions.invoke('reflection-insights', {
+      const { data, error } = await invokeEdge('reflection-insights', {
         body: { user_id: user.id, language },
       });
       if (error) {

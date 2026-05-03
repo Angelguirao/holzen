@@ -1,8 +1,11 @@
-import type { ReactNode } from 'react';
+import { useState, type ReactNode } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X } from 'lucide-react';
+import { ChevronLeft, Info, X } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import { PauseProgress, type PauseStep } from '@/components/pause/PauseProgress';
-import { PauseScienceSheet } from '@/components/pause/PauseScienceSheet';
+import { PauseScienceScrollBody } from '@/components/pause/PauseScienceSheet';
+import { Button } from '@/components/ui/button';
+import { Sheet, SheetContent, SheetTitle } from '@/components/ui/sheet';
 
 interface Props {
   curtainLifted: boolean;
@@ -11,11 +14,15 @@ interface Props {
   phase: 'session' | 'done';
   step: PauseStep;
   goToStep: (next: PauseStep) => void;
+  /** Shown under the stepper; invokes macro back or breathing intro reset from parent. */
+  onHeaderBack?: () => void;
+  showHeaderBack?: boolean;
   children: ReactNode;
 }
 
 /**
- * Cinematic shell for /pause: curtain, gradient, ambient orbs, close + progress chrome.
+ * Full-screen pause shell: curtain, gradient, sticky header (title · info · close),
+ * segment stepper, optional back, science bottom sheet from info.
  */
 export function PauseSessionScaffold({
   curtainLifted,
@@ -24,8 +31,13 @@ export function PauseSessionScaffold({
   phase,
   step,
   goToStep,
+  onHeaderBack,
+  showHeaderBack = false,
   children,
 }: Props) {
+  const { t } = useTranslation();
+  const [scienceOpen, setScienceOpen] = useState(false);
+
   return (
     <>
       <AnimatePresence>
@@ -44,11 +56,12 @@ export function PauseSessionScaffold({
         animate={{ opacity: 1 }}
         transition={{ duration: 1.2, delay: 0.3 }}
         style={{
-          background: 'linear-gradient(160deg, hsl(var(--background)) 0%, hsl(var(--muted)) 50%, hsl(var(--background)) 100%)',
+          background:
+            'linear-gradient(160deg, hsl(var(--background)) 0%, hsl(var(--muted)) 50%, hsl(var(--background)) 100%)',
         }}
       >
         <motion.div
-          className="fixed top-1/4 left-1/3 w-[300px] h-[300px] rounded-full pointer-events-none"
+          className="pointer-events-none fixed left-1/3 top-1/4 h-[300px] w-[300px] rounded-full"
           style={{
             background: 'radial-gradient(circle, hsl(var(--primary) / 0.04) 0%, transparent 70%)',
             filter: 'blur(80px)',
@@ -57,7 +70,7 @@ export function PauseSessionScaffold({
           transition={{ duration: 14, repeat: Infinity, ease: 'easeInOut' }}
         />
         <motion.div
-          className="fixed bottom-1/3 right-1/4 w-[250px] h-[250px] rounded-full pointer-events-none"
+          className="pointer-events-none fixed bottom-1/3 right-1/4 h-[250px] w-[250px] rounded-full"
           style={{
             background: 'radial-gradient(circle, hsl(var(--accent) / 0.03) 0%, transparent 70%)',
             filter: 'blur(60px)',
@@ -66,29 +79,73 @@ export function PauseSessionScaffold({
           transition={{ duration: 18, repeat: Infinity, ease: 'easeInOut' }}
         />
 
-        <button
-          onClick={onClose}
-          className="fixed top-5 right-5 p-3 rounded-full bg-muted/50 backdrop-blur-sm text-muted-foreground hover:text-foreground hover:bg-muted/70 transition-all duration-300 z-[60] border border-border/20"
-          aria-label="Close"
-        >
-          <X className="h-4 w-4" />
-        </button>
-
-        {phase === 'session' && (
+        <header className="sticky top-0 z-[60] border-b border-border/30 bg-background/90 backdrop-blur-md">
           <motion.div
-            className="fixed top-5 left-5 z-[55] flex max-w-[min(calc(100vw-5.5rem),20rem)] flex-col items-start gap-3"
-            initial={{ opacity: 0, y: -10 }}
+            className="mx-auto max-w-lg px-4 pb-3 pt-3 sm:px-6"
+            initial={{ opacity: 0, y: -8 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.45, duration: 0.6 }}
+            transition={{ delay: 0.45, duration: 0.5 }}
           >
-            <div className="w-full overflow-x-auto pb-1 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
-              <PauseProgress currentStep={step} onStepClick={goToStep} />
+            <div className="relative flex min-h-[2.25rem] items-center justify-center">
+              <h1 className="text-sm font-medium text-foreground">{t('pause.sessionTitle')}</h1>
+              <div className="absolute right-0 top-1/2 flex -translate-y-1/2 items-center gap-0.5">
+                {phase === 'session' && (
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="icon"
+                    className="h-9 w-9 shrink-0 text-muted-foreground hover:text-foreground"
+                    onClick={() => setScienceOpen(true)}
+                    aria-label={t('pause.scienceInfoAria')}
+                  >
+                    <Info className="h-4 w-4" aria-hidden />
+                  </Button>
+                )}
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="icon"
+                  className="h-9 w-9 shrink-0 text-muted-foreground hover:text-foreground"
+                  onClick={onClose}
+                  aria-label={t('common.close')}
+                >
+                  <X className="h-4 w-4" aria-hidden />
+                </Button>
+              </div>
             </div>
-            <PauseScienceSheet />
-          </motion.div>
-        )}
 
-        <div className="relative z-10 mx-auto max-w-lg overflow-hidden px-5 py-16 sm:px-8 sm:py-20">{children}</div>
+            {phase === 'session' && (
+              <>
+                <div className="mt-4 w-full">
+                  <PauseProgress currentStep={step} onStepClick={goToStep} variant="segment" />
+                </div>
+                {onHeaderBack && showHeaderBack && (
+                  <div className="mt-2 flex w-full justify-start">
+                    <button
+                      type="button"
+                      onClick={onHeaderBack}
+                      className="inline-flex items-center gap-1 rounded-md px-1 py-1.5 text-xs font-medium text-muted-foreground transition-colors hover:bg-muted/50 hover:text-foreground"
+                    >
+                      <ChevronLeft className="h-4 w-4 shrink-0" aria-hidden />
+                      {t('pause.steps.back', { defaultValue: 'Back' })}
+                    </button>
+                  </div>
+                )}
+              </>
+            )}
+          </motion.div>
+        </header>
+
+        <Sheet open={scienceOpen} onOpenChange={setScienceOpen}>
+          <SheetContent side="bottom" className="z-[110] max-h-[88vh] overflow-y-auto rounded-t-2xl border-t p-6 sm:p-8">
+            <SheetTitle className="sr-only">{t('pauseScience.title')}</SheetTitle>
+            <PauseScienceScrollBody />
+          </SheetContent>
+        </Sheet>
+
+        <div className="relative z-10 mx-auto max-w-lg overflow-hidden px-5 pb-16 pt-6 sm:px-8 sm:pb-20 sm:pt-8">
+          {children}
+        </div>
       </motion.div>
     </>
   );

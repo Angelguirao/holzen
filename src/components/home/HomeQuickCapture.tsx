@@ -17,10 +17,10 @@ import { cn } from '@/lib/utils';
 
 const QUICK_MOODS = ['calm', 'anxious', 'fomo', 'uncertain'] as const;
 
-interface LibraryRow {
+interface LastPauseRow {
   id: string;
-  created_at: string;
-  title: string | null;
+  created_at: string | null;
+  terminal_at: string | null;
 }
 
 function relTime(iso: string, locale: string): string {
@@ -37,7 +37,7 @@ function relTime(iso: string, locale: string): string {
 export function HomeQuickCapture() {
   const { t, i18n } = useTranslation();
   const { user } = useAuth();
-  const [libItem, setLibItem] = useState<LibraryRow | null>(null);
+  const [lastPause, setLastPause] = useState<LastPauseRow | null>(null);
   const [loadingLib, setLoadingLib] = useState(true);
   const [mood, setMood] = useState<string | null>(null);
   const [note, setNote] = useState('');
@@ -48,15 +48,15 @@ export function HomeQuickCapture() {
     let cancelled = false;
     void (async () => {
       const { data } = await supabase
-        .from('library_items')
-        .select('id, created_at, title')
+        .from('v_pause_full' as never)
+        .select('id, created_at, terminal_at')
         .eq('user_id', user.id)
-        .neq('status', 'deleted')
+        .order('terminal_at', { ascending: false, nullsFirst: false })
         .order('created_at', { ascending: false })
         .limit(1)
         .maybeSingle();
       if (!cancelled) {
-        setLibItem((data as LibraryRow | null) ?? null);
+        setLastPause((data as LastPauseRow | null) ?? null);
         setLoadingLib(false);
       }
     })();
@@ -145,19 +145,19 @@ export function HomeQuickCapture() {
 
       <div className="space-y-2">
         <div className="flex items-center justify-between gap-2">
-          <p className={homeInWidget.kicker}>{t('home.quickCapture.libraryTitle')}</p>
-          <Link to="/library" className="text-[10px] font-mono uppercase tracking-wider text-primary hover:underline">
+          <p className={homeInWidget.kicker}>{t('home.quickCapture.recentPauseTitle')}</p>
+          <Link to="/archive" className="text-[10px] font-mono uppercase tracking-wider text-primary hover:underline">
             {t('home.quickCapture.libraryOpen')}
           </Link>
         </div>
         {loadingLib ? (
           <Skeleton className="h-3 w-44" />
-        ) : libItem ? (
+        ) : lastPause?.created_at || lastPause?.terminal_at ? (
           <p className="text-sm text-foreground/90">
             <BookOpen className="mr-1.5 inline h-3.5 w-3.5 text-muted-foreground" aria-hidden />
-            {libItem.title?.trim() || t('home.quickCapture.libraryUntitled')}
+            {t('home.quickCapture.recentPauseBlurb')}
             <span className="ml-2 text-[10px] font-mono text-muted-foreground">
-              {relTime(libItem.created_at, i18n.language)}
+              {relTime(lastPause.terminal_at ?? lastPause.created_at!, i18n.language)}
             </span>
           </p>
         ) : (

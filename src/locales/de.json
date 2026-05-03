@@ -3,6 +3,7 @@
     "home": "Startseite",
     "history": "Verlauf",
     "library": "Bibliothek",
+    "archive": "Archiv",
     "tools": "Tools",
     "journey": "Reise",
     "profile": "Profil",
@@ -26,6 +27,7 @@
   },
   "common": {
     "back": "Zurück",
+    "close": "Schließen",
     "cancel": "Abbrechen",
     "delete": "Löschen",
     "done": "Fertig",
@@ -391,7 +393,7 @@
   "btcStatus": {
     "unableToFetch": "Preisdaten konnten nicht abgerufen werden",
     "checkConnection": "Überprüfe deine Verbindung und versuche es erneut",
-    "exitBtcMode": "1 BTC = 1 BTC Modus verlassen",
+    "exitBtcMode": "Zurück zur {{currency}}-Kursansicht",
     "enterBtcMode": "1 BTC = 1 BTC Modus aktivieren",
     "show": "Anzeigen",
     "hide": "Verbergen",
@@ -890,7 +892,12 @@
     "freezeAvailable": "1 Serien-Freeze verfügbar · wöchentliche Erneuerung",
     "nextFreeze": "Nächster Freeze {{time}}",
     "used": "Genutzt",
-    "more": "+{{count}} mehr"
+    "more": "+{{count}} mehr",
+    "regulation": {
+      "moodShift": {
+        "intensityFootnote": "Fühl-/Wandel-Skala (1–5) bei {{feel}} / {{shift}} von {{sample}} Pausen in dieser Stichprobe protokolliert."
+      }
+    }
   },
   "myWhy": {
     "title": "Mein Warum"
@@ -943,7 +950,65 @@
     "whatWillYouDo": "Was wirst du tun?",
     "youChose": "Du hast bewusst gewählt.",
     "return": "Zurück",
-    "noReflection": "Keine aktive Reflexion. Geh zurück, um eine auszulösen."
+    "sessionTitle": "Deine Pause",
+    "scienceInfoAria": "Die Wissenschaft hinter dieser Pause",
+    "noReflection": "Keine aktive Reflexion. Geh zurück, um eine auszulösen.",
+    "outcomeSaveFailed": "Deine Wahl konnte nicht gespeichert werden. Bitte erneut versuchen.",
+    "outcomeNotCompleted": "Deine Wahl wurde gespeichert, aber diese Pause ist noch nicht abgeschlossen — öffne Reflektieren, schließe eine Begleitkarte ab und wähle erneut.",
+    "stepSyncFailed": "Dieser Schritt konnte nicht synchronisiert werden. Prüfe deine Verbindung und versuche es erneut.",
+    "pendingContextTitle": "Marktkontext hat sich geändert",
+    "pendingContextBody": "Es gibt eine neue Pause für die jüngste Bewegung. Du kannst deine aktuelle Pause behalten oder wechseln — beim Wechsel endet das aktuelle Ritual für diesen Moment und die neue öffnet sich.",
+    "pendingAdoptCta": "Zur neuen Pause wechseln",
+    "pendingKeepCta": "Aktuelle Pause behalten",
+    "pendingAdoptFailed": "Wechsel zur neuen Pause fehlgeschlagen. Bitte erneut versuchen.",
+    "pendingDeclineFailed": "Angebot konnte nicht abgelehnt werden. Bitte erneut versuchen.",
+    "breathYouAreHere": "Du bist hier",
+    "breathIntroKicker": "Schritt 1 · Atmen",
+    "decideIntroKicker": "Schritt 5 · Entscheiden",
+    "decideMirrorKicker": "Bevor du bestätigst",
+    "breathInterstitialTitle": "Du bist dabei geblieben",
+    "breathInterstitialBody": "Wenn du soweit bist, geh weiter zu dem, wie sich dieser Moment anfühlt.",
+    "feelIntensityTitle": "Wie stark ist dieses Gefühl?",
+    "feelIntensityLow": "Leicht",
+    "feelIntensityHigh": "Stark",
+    "feelIntensitySummary": "Intensität {{n}} / 5",
+    "shiftSubcopy": "Beobachte, was sich nach dem Reflektieren verändert hat — es gibt keine falsche Antwort.",
+    "shiftPriorLabel": "Zuvor",
+    "shiftIntensityTitle": "Wie stark hat es sich verändert?",
+    "shiftIntensityLow": "Kaum",
+    "shiftIntensityHigh": "Sehr",
+    "shiftIntensitySummary": "Wandel {{n}} / 5",
+    "favoriteProHint": "Deine Favoriten warten in deiner Bibliothek mit Pro ✨",
+    "steps": {
+      "breathe": "Atmen",
+      "feel": "Fühlen",
+      "reflect": "Reflektieren",
+      "shift": "Wandel",
+      "decide": "Entscheiden",
+      "continue": "Weiter",
+      "back": "Zurück"
+    },
+    "reflect": {
+      "heading": "Bleib bei dieser Reflexion",
+      "subcopy": "Lies in deinem Tempo. Notizen und Tags sind optional; öffne eine Begleitkarte, wenn du eine andere Perspektive willst.",
+      "block1Title": "Die Reflexion",
+      "block2Title": "Nimm mit, was du brauchst",
+      "proTools": "Deine Notiz & Tags",
+      "freeHint": "Holzen Pro fügt eine optionale private Notiz und Tags zu jeder Pause hinzu — praktisch, wenn du in der Bibliothek zurückliest.",
+      "companionsLead": "Öffne eine Perspektive nach der anderen — jede Karte klappt unten auf.",
+      "continueHint": "Es gibt keine \"richtige\" Dauer — mach weiter, wenn du fertig bist.",
+      "shareCta": "Teilen",
+      "wallpaperCta": "Hintergrund",
+      "shareTitle": "Reflexion von Holzen",
+      "shareCopied": "Reflexion in die Zwischenablage kopiert.",
+      "shareCopyFailed": "Kopieren fehlgeschlagen. Bitte erneut versuchen.",
+      "shareEmpty": "Noch nichts zum Teilen.",
+      "wallpaperCopied": "Kopiert. Füge es in deinen Sperrbildschirm oder ein Zitat-Widget ein.",
+      "wallpaperHint": "Kopiere deine Reflexion und füge sie in ein Hintergrund- oder Sperrbildschirm-Zitat-Widget ein."
+    },
+    "done": {
+      "reinforcementKicker": "Nimm das mit"
+    }
   },
   "breathing": {
     "trigger": "Atme damit →",

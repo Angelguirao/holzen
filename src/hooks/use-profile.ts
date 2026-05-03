@@ -1,4 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
+import { useTranslation } from 'react-i18next';
+import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/use-auth';
 import { holzenLog } from '@/lib/holzen-console';
@@ -16,6 +18,7 @@ export interface ProfileLoadReflectionData {
 
 export function useProfile() {
   const { user } = useAuth();
+  const { t } = useTranslation();
 
   const [threshold, setThresholdState] = useState(5);
   const [thresholdDown, setThresholdDownState] = useState(5);
@@ -42,14 +45,30 @@ export function useProfile() {
   const [companionPrefs, setCompanionPrefsState] = useState<CompanionPrefs>({ breathing: true, haiku: true, grounding: true, signal: true, zoomOut: true, history: true });
   const [profileLoaded, setProfileLoaded] = useState(false);
   const [hasOnboarded, setHasOnboarded] = useState(true);
+  const [profileLoadError, setProfileLoadError] = useState<string | null>(null);
+  const [profileLoadRetryToken, setProfileLoadRetryToken] = useState(0);
 
   const [_profileLoadReflectionData, setProfileLoadReflectionData] = useState<ProfileLoadReflectionData | null>(null);
+
+  const retryProfileLoad = useCallback(() => {
+    setProfileLoadRetryToken((n) => n + 1);
+  }, []);
 
   useEffect(() => {
     if (!user) {
       holzenLog.profile('skip load (signed out)');
+      setProfileLoaded(false);
+      setProfileLoadError(null);
+      setProfileLoadRetryToken(0);
       return;
     }
+    let cancelled = false;
+    // Clear stale error only on a fresh load for this session (not on banner "Try again",
+    // where `profileLoadRetryToken` bumps and we keep showing the banner until success).
+    if (profileLoadRetryToken === 0) {
+      setProfileLoadError(null);
+    }
+
     const selectCols =
       'threshold, threshold_down, cumulative_threshold, last_message, last_context, email_notifications, has_onboarded, companion_breathing, companion_haiku, companion_grounding, companion_signal, companion_zoom_out, companion_history, reflection_tone, cooldown_hours, last_trigger_at, silent_mode, streak_freeze_dates, digest_frequency, custom_prompt, reflection_style, quiet_hours_start, quiet_hours_end, first_name, night_reflection_hour, ai_insights_enabled, ritual_template, notify_badges, motivations, mantra, hold_goal_currency, language, grounding_activities';
 
@@ -61,9 +80,15 @@ export function useProfile() {
         .eq('user_id', user.id)
         .maybeSingle();
 
+      if (cancelled) return;
+
       if (initial.error) {
         console.error('[useProfile] profiles select failed:', initial.error.message);
         holzenLog.profile('select failed', { message: initial.error.message });
+        setProfileLoadError(
+          initial.error.message ||
+            'Could not load your profile. Check your connection and try again.',
+        );
         setProfileLoaded(true);
         return;
       }
@@ -128,11 +153,18 @@ export function useProfile() {
         silentMode: data ? !!(data as ProfileRow).silent_mode : null,
         hasLastMessage: !!(data?.last_message),
       });
-      setProfileLoaded(true);
+      if (!cancelled) {
+        setProfileLoadError(null);
+        setProfileLoaded(true);
+      }
     };
-    load();
+    void load();
+    return () => {
+      cancelled = true;
+    };
     // Depend on stable id only — `user` object identity changes on TOKEN_REFRESHED etc., which would refetch unnecessarily.
-  }, [user?.id]);
+    // `profileLoadRetryToken` re-runs the fetch after a user-triggered retry (AppLayout banner).
+  }, [user?.id, profileLoadRetryToken]);
 
   const setThreshold = useCallback(async (val: number) => {
     setThresholdState(val);
@@ -226,7 +258,13 @@ export function useProfile() {
   }, [user]);
 
   const completeOnboarding = useCallback(async (
-    result: { threshold: number; firstName: string | null; timezone: string; motivations: string[]; groundingActivities: string[] },
+    result: {
+      threshold: number;
+      firstName: string | null;
+      timezone: string;
+      motivations: string[];
+      groundingActivities: string[];
+    },
     options?: { setLocalOnboarded?: boolean },
   ) => {
     const setLocalOnboarded = options?.setLocalOnboarded ?? true;
@@ -375,13 +413,24 @@ export function useProfile() {
     },
     language,
     setLanguage: async (val: string) => {
+      if (!user) {
+        setLanguageState(val);
+        return;
+      }
+      const prev = language;
       setLanguageState(val);
-      if (!user) return;
-      await supabase.from('profiles').update({ language: val }).eq('user_id', user.id);
+      const { error } = await supabase.from('profiles').update({ language: val }).eq('user_id', user.id);
+      if (error) {
+        holzenLog.profile('language update failed', { error: error.message });
+        setLanguageState(prev);
+        toast.error(t('common.profileWriteFailed'));
+      }
     },
     companionPrefs,
     setCompanionPref,
     profileLoaded,
+    profileLoadError,
+    retryProfileLoad,
     hasOnboarded,
     completeOnboarding,
     isInCooldown,

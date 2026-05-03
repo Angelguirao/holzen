@@ -1,4 +1,4 @@
-import { useState, useCallback, useEffect, useMemo } from 'react';
+import { useState, useCallback, useEffect, useMemo, useRef } from 'react';
 import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
@@ -13,8 +13,9 @@ import { type CompanionData, type CompanionPrefs } from '@/components/CompanionS
 import { type PauseStep, STEPS } from '@/components/pause/PauseProgress';
 import { PauseSessionGate } from '@/components/pause/PauseSessionGate';
 import { PauseSessionScaffold } from '@/components/pause/PauseSessionScaffold';
+import { PendingPauseOfferShell } from '@/components/pause/PendingPauseOfferShell';
 import { PauseFeel } from '@/components/pause/PauseFeel';
-import { PauseBreathing } from '@/components/pause/PauseBreathing';
+import { PauseBreathing, type PauseBreathingHandle } from '@/components/pause/PauseBreathing';
 import { PauseReflect } from '@/components/pause/PauseReflect';
 import { PauseShift } from '@/components/pause/PauseShift';
 import { PauseDecide } from '@/components/pause/PauseDecide';
@@ -31,6 +32,9 @@ import {
   companionDataFromArtifacts,
 } from '@/lib/pause-session-storage';
 import { pauseLogStep } from '@/lib/pause-api';
+import { canAdvanceFromPauseStep } from '@/lib/pause-session-navigation';
+import type { PauseState } from '@/lib/pause-state';
+import { getSessionQuote } from '@/lib/wisdom-quotes';
 
 type HydrationReady = {
   status: 'ready';
@@ -60,6 +64,7 @@ export default function PauseSession() {
     companionPrefs: holzenCompanionPrefs,
     severity: holzenSeverity,
     profileLoaded,
+    resyncOpenPauseFromDb,
   } = useHolzen();
   const { subscribed, refresh: refreshSubscription } = useSubscription();
 
@@ -169,35 +174,43 @@ export default function PauseSession() {
     setFetchedInstance(null);
     setFetchFailed(false);
     void (async () => {
-      const { data: inst } = await supabase
-        .from('pause_instances' as never)
-        .select('id, context_snapshot')
-        .eq('id', fetchPauseInstanceId)
-        .maybeSingle();
-      if (cancelled) return;
-      if (!inst) {
-        setFetchFailed(true);
-        return;
+      try {
+        const { data: inst, error: instError } = await supabase
+          .from('pause_instances' as never)
+          .select('id, context_snapshot')
+          .eq('id', fetchPauseInstanceId)
+          .maybeSingle();
+        if (cancelled) return;
+        if (instError || !inst) {
+          setFetchFailed(true);
+          return;
+        }
+        const { data: artifacts, error: artifactsError } = await supabase
+          .from('pause_ai_artifacts' as never)
+          .select('kind, content')
+          .eq('pause_instance_id', fetchPauseInstanceId);
+        if (cancelled) return;
+        if (artifactsError) {
+          setFetchFailed(true);
+          return;
+        }
+        const artifactRows = ((artifacts ?? []) as Array<{ kind: string; content: Record<string, unknown> }>);
+        const companionData = companionDataFromArtifacts(artifactRows);
+        const reflectionArt = artifactRows.find((a) => a.kind === 'reflection_text');
+        const msg = typeof reflectionArt?.content?.message === 'string' ? (reflectionArt.content.message as string) : '';
+        const ctxSnap = (inst as { context_snapshot: Record<string, unknown> | null }).context_snapshot ?? {};
+        const ctx = typeof ctxSnap.context_text === 'string' ? (ctxSnap.context_text as string) : null;
+        setFetchedInstance({
+          id: fetchPauseInstanceId,
+          reflection_message: msg,
+          context: ctx,
+          haiku: companionData.haiku,
+          grounding_title: companionData.groundingTitle,
+          grounding_body: companionData.groundingBody,
+        });
+      } catch {
+        if (!cancelled) setFetchFailed(true);
       }
-      const { data: artifacts } = await supabase
-        .from('pause_ai_artifacts' as never)
-        .select('kind, content')
-        .eq('pause_instance_id', fetchPauseInstanceId);
-      if (cancelled) return;
-      const artifactRows = ((artifacts ?? []) as Array<{ kind: string; content: Record<string, unknown> }>);
-      const companionData = companionDataFromArtifacts(artifactRows);
-      const reflectionArt = artifactRows.find((a) => a.kind === 'reflection_text');
-      const msg = typeof reflectionArt?.content?.message === 'string' ? (reflectionArt.content.message as string) : '';
-      const ctxSnap = (inst as { context_snapshot: Record<string, unknown> | null }).context_snapshot ?? {};
-      const ctx = typeof ctxSnap.context_text === 'string' ? (ctxSnap.context_text as string) : null;
-      setFetchedInstance({
-        id: fetchPauseInstanceId,
-        reflection_message: msg,
-        context: ctx,
-        haiku: companionData.haiku,
-        grounding_title: companionData.groundingTitle,
-        grounding_body: companionData.groundingBody,
-      });
     })();
     return () => {
       cancelled = true;
@@ -259,6 +272,8 @@ export default function PauseSession() {
   const [moodAfterDone, setMoodAfterDone] = useState(restored?.moodAfterDone ?? false);
   const [selectedMood, setSelectedMood] = useState<MoodValue | null>(restored?.selectedMood ?? null);
   const [selectedMoodAfter, setSelectedMoodAfter] = useState<MoodValue | null>(restored?.selectedMoodAfter ?? null);
+  const [feelIntensity, setFeelIntensity] = useState<number | null>(restored?.feelIntensity ?? null);
+  const [shiftIntensity, setShiftIntensity] = useState<number | null>(restored?.shiftIntensity ?? null);
   const [breathingCompleted, setBreathingCompleted] = useState<boolean>(restored?.breathingCompleted ?? false);
   const [curtainLifted, setCurtainLifted] = useState(false);
   const [pauseImpactData, setPauseImpactData] = useState<{
@@ -270,6 +285,9 @@ export default function PauseSession() {
     engagedTools: number;
     wroteNote: boolean;
     usedTags: boolean;
+    feelIntensity?: number | null;
+    shiftIntensity?: number | null;
+    reinforcementQuote?: string | null;
   } | null>(null);
 
   useEffect(() => {
@@ -285,6 +303,8 @@ export default function PauseSession() {
       moodAfterDone,
       selectedMood,
       selectedMoodAfter,
+      feelIntensity,
+      shiftIntensity,
       phase,
       decision,
       step,
@@ -301,6 +321,8 @@ export default function PauseSession() {
     moodAfterDone,
     selectedMood,
     selectedMoodAfter,
+    feelIntensity,
+    shiftIntensity,
     phase,
     decision,
     step,
@@ -311,6 +333,11 @@ export default function PauseSession() {
     const timer = setTimeout(() => setCurtainLifted(true), 100);
     return () => clearTimeout(timer);
   }, []);
+
+  useEffect(() => {
+    lastFeelLogKeyRef.current = null;
+    lastShiftLogKeyRef.current = null;
+  }, [pauseInstanceId]);
 
   const [swipeDirection, setSwipeDirection] = useState<'forward' | 'back'>('forward');
 
@@ -334,14 +361,83 @@ export default function PauseSession() {
     }
   }, [step]);
 
+  const breathingRef = useRef<PauseBreathingHandle>(null);
+  const decidingRef = useRef(false);
+  const lastFeelLogKeyRef = useRef<string | null>(null);
+  const lastShiftLogKeyRef = useRef<string | null>(null);
+  const [breathTimedActive, setBreathTimedActive] = useState(false);
+
+  useEffect(() => {
+    if (step !== 'breathe') setBreathTimedActive(false);
+  }, [step]);
+
+  const handlePauseHeaderBack = useCallback(() => {
+    if (step === 'breathe' && breathTimedActive) {
+      breathingRef.current?.resetToIntro();
+      return;
+    }
+    if (step === 'breathe' && breathingCompleted) {
+      breathingRef.current?.resetToIntro();
+      setBreathingCompleted(false);
+      return;
+    }
+    goBack();
+  }, [step, breathTimedActive, breathingCompleted, goBack]);
+
+  const showPauseHeaderBack =
+    phase === 'session' &&
+    (STEPS.indexOf(step) > 0 || (step === 'breathe' && breathTimedActive) || (step === 'breathe' && breathingCompleted));
+
+  const handleBreathContinueToFeel = useCallback(async () => {
+    if (pauseInstanceId) {
+      await pauseLogStep({
+        instanceId: pauseInstanceId,
+        stepType: 'breath_completed',
+      }).catch(() => {});
+    }
+    goToStep('feel');
+  }, [pauseInstanceId, goToStep]);
+
+  const handleSkipBreath = useCallback(async () => {
+    setBreathingCompleted(false);
+    if (pauseInstanceId) {
+      try {
+        await pauseLogStep({
+          instanceId: pauseInstanceId,
+          stepType: 'breath_completed',
+          payload: { skipped: true },
+        });
+      } catch {
+        toast.error(
+          t('pause.stepSyncFailed', {
+            defaultValue: 'Could not sync this step. Check your connection and try again.',
+          }),
+          { duration: 5000 },
+        );
+        return;
+      }
+    }
+    goToStep('feel');
+  }, [pauseInstanceId, goToStep, t]);
+
   const goForward = useCallback(() => {
+    if (
+      !canAdvanceFromPauseStep({
+        step,
+        breathingCompleted,
+        moodDone,
+        moodAfterDone,
+      })
+    ) {
+      return;
+    }
     const currentIndex = STEPS.indexOf(step);
     if (currentIndex < STEPS.length - 1) {
       setSwipeDirection('forward');
       hapticFeedback('light');
       setStep(STEPS[currentIndex + 1]);
     }
-  }, [step]);
+  }, [step, breathingCompleted, moodDone, moodAfterDone]);
 
   const handleDragEnd = useCallback(
     (_: unknown, info: { offset: { x: number }; velocity: { x: number } }) => {
@@ -357,53 +453,143 @@ export default function PauseSession() {
   );
 
   const handleMoodSelect = useCallback(
-    async (mood: MoodValue) => {
+    async (mood: MoodValue, intensity?: number) => {
       hapticFeedback('light');
+      const payload =
+        typeof intensity === 'number' ? { mood, intensity } : { mood };
+      const logKey = JSON.stringify(payload);
+      if (pauseInstanceId && lastFeelLogKeyRef.current === logKey) {
+        setMoodDone(true);
+        setSelectedMood(mood);
+        setFeelIntensity(typeof intensity === 'number' ? intensity : null);
+        return;
+      }
       setMoodDone(true);
       setSelectedMood(mood);
+      setFeelIntensity(typeof intensity === 'number' ? intensity : null);
       if (pauseInstanceId) {
+        try {
+          await pauseLogStep({
+            instanceId: pauseInstanceId,
+            stepType: 'initial_emotion_logged',
+            payload,
+          });
+          lastFeelLogKeyRef.current = logKey;
+        } catch {
+          lastFeelLogKeyRef.current = null;
+          setMoodDone(false);
+          setSelectedMood(null);
+          setFeelIntensity(null);
+          toast.error(
+            t('pause.stepSyncFailed', {
+              defaultValue: 'Could not sync this step. Check your connection and try again.',
+            }),
+            { duration: 5000 },
+          );
+        }
+      }
+    },
+    [pauseInstanceId, t],
+  );
+
+  const handleMoodSkip = useCallback(async () => {
+    setFeelIntensity(null);
+    if (pauseInstanceId) {
+      try {
         await pauseLogStep({
           instanceId: pauseInstanceId,
           stepType: 'initial_emotion_logged',
-          payload: { mood },
-        }).catch(() => {});
+          payload: { skipped: true },
+        });
+        lastFeelLogKeyRef.current = JSON.stringify({ skipped: true });
+      } catch {
+        toast.error(
+          t('pause.stepSyncFailed', {
+            defaultValue: 'Could not sync this step. Check your connection and try again.',
+          }),
+          { duration: 5000 },
+        );
+        return;
       }
-    },
-    [pauseInstanceId],
-  );
-
-  const handleMoodSkip = useCallback(() => {
+    }
     setMoodDone(true);
-  }, []);
+  }, [pauseInstanceId, t]);
 
   const handleMoodReset = useCallback(() => {
+    lastFeelLogKeyRef.current = null;
     setMoodDone(false);
     setSelectedMood(null);
+    setFeelIntensity(null);
   }, []);
 
   const handleMoodAfterSelect = useCallback(
-    async (mood: MoodValue) => {
+    async (mood: MoodValue, intensity?: number) => {
       hapticFeedback('light');
+      const payload =
+        typeof intensity === 'number' ? { mood, shift_intensity: intensity } : { mood };
+      const logKey = JSON.stringify(payload);
+      if (pauseInstanceId && lastShiftLogKeyRef.current === logKey) {
+        setMoodAfterDone(true);
+        setSelectedMoodAfter(mood);
+        setShiftIntensity(typeof intensity === 'number' ? intensity : null);
+        return;
+      }
       setMoodAfterDone(true);
       setSelectedMoodAfter(mood);
+      setShiftIntensity(typeof intensity === 'number' ? intensity : null);
       if (pauseInstanceId) {
+        try {
+          await pauseLogStep({
+            instanceId: pauseInstanceId,
+            stepType: 'shift_emotion_logged',
+            payload,
+          });
+          lastShiftLogKeyRef.current = logKey;
+        } catch {
+          lastShiftLogKeyRef.current = null;
+          setMoodAfterDone(false);
+          setSelectedMoodAfter(null);
+          setShiftIntensity(null);
+          toast.error(
+            t('pause.stepSyncFailed', {
+              defaultValue: 'Could not sync this step. Check your connection and try again.',
+            }),
+            { duration: 5000 },
+          );
+        }
+      }
+    },
+    [pauseInstanceId, t],
+  );
+
+  const handleMoodAfterSkip = useCallback(async () => {
+    setShiftIntensity(null);
+    if (pauseInstanceId) {
+      try {
         await pauseLogStep({
           instanceId: pauseInstanceId,
           stepType: 'shift_emotion_logged',
-          payload: { mood },
-        }).catch(() => {});
+          payload: { skipped: true },
+        });
+        lastShiftLogKeyRef.current = JSON.stringify({ skipped: true });
+      } catch {
+        toast.error(
+          t('pause.stepSyncFailed', {
+            defaultValue: 'Could not sync this step. Check your connection and try again.',
+          }),
+          { duration: 5000 },
+        );
+        return;
       }
-    },
-    [pauseInstanceId],
-  );
-
-  const handleMoodAfterSkip = useCallback(() => {
+    }
     setMoodAfterDone(true);
-  }, []);
+  }, [pauseInstanceId, t]);
 
   const handleMoodAfterReset = useCallback(() => {
+    lastShiftLogKeyRef.current = null;
     setMoodAfterDone(false);
     setSelectedMoodAfter(null);
+    setShiftIntensity(null);
   }, []);
 
   const toggleFavorite = useCallback(async () => {
@@ -416,15 +602,6 @@ export default function PauseSession() {
       stepType: 'favorite_toggled',
       payload: { is_favorite: newVal },
     }).catch(() => setIsFavorite(!newVal));
-    try {
-      await supabase
-        .from('library_items')
-        .update({ is_favorite: newVal })
-        .eq('pause_instance_id', pauseInstanceId)
-        .in('source_type', ['pause', 'reflection']);
-    } catch {
-      /* non-fatal */
-    }
     if (newVal && !subscribed) {
       toast(t('pause.favoriteProHint'), { duration: 4000 });
     }
@@ -441,32 +618,80 @@ export default function PauseSession() {
 
   const handleDecide = useCallback(
     async (d: string) => {
-      hapticFeedback('medium');
-      setDecision(d);
-      dismissMessage();
-      if (pauseInstanceId) {
-        await pauseLogStep({
-          instanceId: pauseInstanceId,
-          stepType: 'outcome_logged',
-          payload: { outcome: d },
-        }).catch(() => {});
-        void refreshSubscription();
+      if (decidingRef.current) return;
+      decidingRef.current = true;
+      try {
+        hapticFeedback('medium');
+        // Persist outcome before clearing Home/Library preview state. Calling
+        // dismissMessage() first races pause_dismiss_current against
+        // pause_log_step: if dismiss wins, the instance becomes terminal and
+        // outcome_logged is ignored — the pause stays "wrong" in history and
+        // surfaces can disagree until reload.
+        let outcomeState: PauseState | null = null;
+        if (pauseInstanceId) {
+          try {
+            outcomeState = await pauseLogStep({
+              instanceId: pauseInstanceId,
+              stepType: 'outcome_logged',
+              payload: { outcome: d },
+            });
+          } catch {
+            toast.error(
+              t('pause.outcomeSaveFailed', {
+                defaultValue: 'Could not save your choice. Try again.',
+              }),
+              { duration: 5000 },
+            );
+            return;
+          }
+          if (outcomeState !== 'completed') {
+            toast.error(
+              t('pause.outcomeNotCompleted', {
+                defaultValue:
+                  'Your choice was saved, but this pause is not complete yet — open Reflect and finish a companion card, then choose again.',
+              }),
+              { duration: 8000 },
+            );
+            void refreshSubscription();
+            return;
+          }
+          void refreshSubscription();
+        }
+        setDecision(d);
+        await dismissMessage();
+        const q = getSessionQuote();
+        setPauseImpactData({
+          mood: selectedMood,
+          moodAfter: selectedMoodAfter,
+          breathingCompleted,
+          decision: d,
+          context,
+          engagedTools: 0,
+          wroteNote: false,
+          usedTags: false,
+          feelIntensity,
+          shiftIntensity,
+          reinforcementQuote: `"${q.text}" — ${q.author}`,
+        });
+        hapticFeedback('success');
+        setPhase('done');
+        clearSession();
+      } finally {
+        decidingRef.current = false;
       }
-      setPauseImpactData({
-        mood: selectedMood,
-        moodAfter: selectedMoodAfter,
-        breathingCompleted,
-        decision: d,
-        context,
-        engagedTools: 0,
-        wroteNote: false,
-        usedTags: false,
-      });
-      hapticFeedback('success');
-      setPhase('done');
-      clearSession();
     },
-    [dismissMessage, pauseInstanceId, selectedMood, selectedMoodAfter, context, breathingCompleted, refreshSubscription],
+    [
+      dismissMessage,
+      pauseInstanceId,
+      selectedMood,
+      selectedMoodAfter,
+      context,
+      breathingCompleted,
+      feelIntensity,
+      shiftIntensity,
+      refreshSubscription,
+      t,
+    ],
   );
 
   const slideX = prefersReducedMotion ? 0 : 80;
@@ -498,32 +723,37 @@ export default function PauseSession() {
       profileLoaded={profileLoaded}
       onReturn={handleReturn}
     >
-      <PauseSessionScaffold
+      <>
+        <PendingPauseOfferShell
+          onAfterMutation={() => void resyncOpenPauseFromDb()}
+          navigateAfterAdopt={(instanceId) => {
+            clearSession();
+            navigate('/pause', { state: { pauseInstanceId: instanceId }, replace: true });
+          }}
+        />
+        <PauseSessionScaffold
         curtainLifted={curtainLifted}
         prefersReducedMotion={!!prefersReducedMotion}
         onClose={handleClose}
         phase={phase}
         step={step}
         goToStep={goToStep}
+        onHeaderBack={handlePauseHeaderBack}
+        showHeaderBack={showPauseHeaderBack}
       >
         {phase === 'session' && (
           <AnimatePresence mode="wait" initial={false}>
             {step === 'breathe' && (
               <motion.div key="breathe" {...stepTransition} {...dragProps}>
                 <PauseBreathing
+                  ref={breathingRef}
                   mantra={mantra}
                   severity={severity}
                   completed={breathingCompleted}
-                  onComplete={() => {
-                    setBreathingCompleted(true);
-                    if (pauseInstanceId) {
-                      void pauseLogStep({
-                        instanceId: pauseInstanceId,
-                        stepType: 'breath_completed',
-                      });
-                    }
-                  }}
-                  onContinue={() => goToStep('feel')}
+                  onTimedBreathingChange={setBreathTimedActive}
+                  onPatternComplete={() => setBreathingCompleted(true)}
+                  onContinueToFeel={() => void handleBreathContinueToFeel()}
+                  onSkipBreath={handleSkipBreath}
                 />
               </motion.div>
             )}
@@ -536,8 +766,8 @@ export default function PauseSession() {
                   onMoodReset={handleMoodReset}
                   moodDone={moodDone}
                   selectedMood={selectedMood}
+                  feelIntensity={feelIntensity}
                   onContinue={() => goToStep('reflect')}
-                  onBack={goBack}
                 />
               </motion.div>
             )}
@@ -555,7 +785,6 @@ export default function PauseSession() {
                   onToggleFavorite={toggleFavorite}
                   subscribed={subscribed}
                   onContinue={() => goToStep('shift')}
-                  onBack={goBack}
                   mood={selectedMood}
                 />
               </motion.div>
@@ -569,8 +798,9 @@ export default function PauseSession() {
                   onMoodAfterReset={handleMoodAfterReset}
                   moodAfterDone={moodAfterDone}
                   selectedMoodAfter={selectedMoodAfter}
+                  priorMood={selectedMood}
+                  shiftIntensity={shiftIntensity}
                   onContinue={() => goToStep('decide')}
-                  onBack={goBack}
                   groundingActivities={groundingActivities}
                 />
               </motion.div>
@@ -578,7 +808,7 @@ export default function PauseSession() {
 
             {step === 'decide' && (
               <motion.div key="decide" {...stepTransition} {...dragProps}>
-                <PauseDecide onDecide={handleDecide} onBack={goBack} />
+                <PauseDecide onDecide={handleDecide} onBack={() => goToStep('shift')} />
               </motion.div>
             )}
           </AnimatePresence>
@@ -588,6 +818,7 @@ export default function PauseSession() {
           <PauseDone decision={decision} onReturn={handleReturn} pauseData={pauseImpactData} />
         )}
       </PauseSessionScaffold>
+      </>
     </PauseSessionGate>
   );
 }

@@ -3,6 +3,7 @@
     "home": "Inicio",
     "history": "Historial",
     "library": "Biblioteca",
+    "archive": "Archivo",
     "tools": "Herramientas",
     "journey": "Camino",
     "profile": "Perfil",
@@ -26,6 +27,7 @@
   },
   "common": {
     "back": "Volver",
+    "close": "Cerrar",
     "cancel": "Cancelar",
     "delete": "Eliminar",
     "done": "Listo",
@@ -392,7 +394,7 @@
   "btcStatus": {
     "unableToFetch": "No se pudo obtener el precio",
     "checkConnection": "Revisa tu conexión e intenta de nuevo",
-    "exitBtcMode": "Salir del modo 1 BTC = 1 BTC",
+    "exitBtcMode": "Volver a la vista de precio en {{currency}}",
     "enterBtcMode": "Entrar en modo 1 BTC = 1 BTC",
     "show": "Mostrar",
     "hide": "Ocultar",
@@ -876,7 +878,12 @@
     "freezeAvailable": "1 congelamiento disponible · se renueva semanalmente",
     "nextFreeze": "Próximo congelamiento {{time}}",
     "used": "Usados",
-    "more": "+{{count}} más"
+    "more": "+{{count}} más",
+    "regulation": {
+      "moodShift": {
+        "intensityFootnote": "Escalas 1–5 de sentir/cambio registradas en {{feel}} / {{shift}} de {{sample}} pausas en esta muestra."
+      }
+    }
   },
   "myWhy": {
     "title": "Mi Por Qué"
@@ -929,7 +936,65 @@
     "whatWillYouDo": "¿Qué harás?",
     "youChose": "Elegiste deliberadamente.",
     "return": "Volver",
-    "noReflection": "Sin reflexión activa. Vuelve para activar una."
+    "sessionTitle": "Tu pausa",
+    "scienceInfoAria": "La ciencia detrás de esta pausa",
+    "noReflection": "Sin reflexión activa. Vuelve para activar una.",
+    "outcomeSaveFailed": "No se pudo guardar tu elección. Inténtalo de nuevo.",
+    "outcomeNotCompleted": "Tu elección se guardó, pero esta pausa aún no está completa — abre Reflexionar, termina una tarjeta compañera y elige de nuevo.",
+    "stepSyncFailed": "No se pudo sincronizar este paso. Comprueba tu conexión e inténtalo de nuevo.",
+    "pendingContextTitle": "El contexto del mercado cambió",
+    "pendingContextBody": "Hay una nueva pausa para el último movimiento. Puedes mantener la pausa actual o cambiar — al cambiar, el ritual actual termina para este momento y se abre la nueva.",
+    "pendingAdoptCta": "Cambiar a la nueva pausa",
+    "pendingKeepCta": "Mantener la pausa actual",
+    "pendingAdoptFailed": "No se pudo cambiar a la nueva pausa. Inténtalo de nuevo.",
+    "pendingDeclineFailed": "No se pudo descartar la oferta. Inténtalo de nuevo.",
+    "breathYouAreHere": "Estás aquí",
+    "breathIntroKicker": "Paso 1 · Respirar",
+    "decideIntroKicker": "Paso 5 · Decidir",
+    "decideMirrorKicker": "Antes de confirmar",
+    "breathInterstitialTitle": "Te quedaste con ello",
+    "breathInterstitialBody": "Cuando estés listo, continúa hacia cómo se siente este momento.",
+    "feelIntensityTitle": "¿Qué tan fuerte es esta emoción?",
+    "feelIntensityLow": "Ligera",
+    "feelIntensityHigh": "Fuerte",
+    "feelIntensitySummary": "Intensidad {{n}} / 5",
+    "shiftSubcopy": "Observa qué cambió después de reflexionar — no hay respuesta incorrecta.",
+    "shiftPriorLabel": "Antes",
+    "shiftIntensityTitle": "¿Cuánto cambió?",
+    "shiftIntensityLow": "Casi nada",
+    "shiftIntensityHigh": "Mucho",
+    "shiftIntensitySummary": "Cambio {{n}} / 5",
+    "favoriteProHint": "Tus favoritos te esperarán en tu Biblioteca con Pro ✨",
+    "steps": {
+      "breathe": "Respirar",
+      "feel": "Sentir",
+      "reflect": "Reflexionar",
+      "shift": "Cambio",
+      "decide": "Decidir",
+      "continue": "Continuar",
+      "back": "Atrás"
+    },
+    "reflect": {
+      "heading": "Quédate con esta reflexión",
+      "subcopy": "Lee a tu ritmo. Notas y etiquetas son opcionales; abre un compañero cuando quieras otro ángulo.",
+      "block1Title": "La reflexión",
+      "block2Title": "Llévate lo que necesites",
+      "proTools": "Tu nota y etiquetas",
+      "freeHint": "Holzen Pro añade una nota privada opcional y etiquetas en cada pausa — útil cuando repases en la Biblioteca.",
+      "companionsLead": "Abre un ángulo a la vez — cada tarjeta se expande abajo.",
+      "continueHint": "No hay un tiempo \"correcto\" — continúa cuando te sientas listo.",
+      "shareCta": "Compartir",
+      "wallpaperCta": "Fondo de pantalla",
+      "shareTitle": "Reflexión de Holzen",
+      "shareCopied": "Reflexión copiada al portapapeles.",
+      "shareCopyFailed": "No se pudo copiar. Inténtalo de nuevo.",
+      "shareEmpty": "Aún no hay nada que compartir.",
+      "wallpaperCopied": "Copiado. Pégalo en tu fondo o widget de cita de la pantalla de bloqueo.",
+      "wallpaperHint": "Copia tu reflexión y pégala en un fondo o widget de cita de la pantalla de bloqueo."
+    },
+    "done": {
+      "reinforcementKicker": "Llévate esto contigo"
+    }
   },
   "breathing": {
     "trigger": "Respira con esto →",

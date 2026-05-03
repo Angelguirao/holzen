@@ -1,6 +1,9 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
+import { useTranslation } from 'react-i18next';
+import { toast } from 'sonner';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
+import { invokeEdge } from '@/lib/invoke-edge';
 import { useAuth } from '@/hooks/use-auth';
 import { PRICING } from '@/lib/pricing';
 import { holzenLog } from '@/lib/holzen-console';
@@ -115,7 +118,7 @@ type SubscriptionSnapshot = {
 };
 
 async function fetchSubscriptionSnapshot(userId: string, force: boolean): Promise<SubscriptionSnapshot> {
-  const { data, error } = await supabase.functions.invoke('check-subscription', {
+  const { data, error } = await invokeEdge<Record<string, unknown>>('check-subscription', {
     body: force ? { force: true } : undefined,
   });
   if (error) throw error;
@@ -235,6 +238,7 @@ async function fetchSubscriptionSnapshot(userId: string, force: boolean): Promis
 }
 
 export function useSubscription() {
+  const { t } = useTranslation();
   const { user } = useAuth();
   const queryClient = useQueryClient();
   const userId = user?.id ?? null;
@@ -357,7 +361,7 @@ export function useSubscription() {
     try {
       sessionStorage.setItem(CHECKOUT_RETURN_KEY, String(Date.now()));
       const isPack = target === 'flex_pack_s' || target === 'flex_pack_m';
-      const { data, error } = await supabase.functions.invoke('create-checkout', {
+      const { data, error } = await invokeEdge<{ url?: string }>('create-checkout', {
         body: isPack
           ? { checkoutKind: target }
           : { checkoutKind: 'subscription', planTier: target },
@@ -379,27 +383,32 @@ export function useSubscription() {
         return;
       }
 
+      toast.error(t('home.subscription.checkoutNoUrl'));
       setCheckoutLoading(false);
       setCheckoutLoadingTarget(null);
     } catch (e) {
       console.error('Checkout error:', e);
+      toast.error(t('home.subscription.checkoutFailed'));
       setCheckoutLoading(false);
       setCheckoutLoadingTarget(null);
     }
-  }, []);
+  }, [t]);
 
   const openPortal = useCallback(async () => {
     holzenLog.subscription('portal', { action: 'open' });
     try {
-      const { data, error } = await supabase.functions.invoke('customer-portal');
+      const { data, error } = await invokeEdge<{ url?: string }>('customer-portal');
       if (error) throw error;
       if (data?.url) {
         window.open(data.url, '_blank');
+        return;
       }
+      toast.error(t('home.subscription.portalNoUrl'));
     } catch (e) {
       console.error('Portal error:', e);
+      toast.error(t('home.subscription.portalFailed'));
     }
-  }, []);
+  }, [t]);
 
   /**
    * Programmatic invalidation used by code paths *other* than the user's

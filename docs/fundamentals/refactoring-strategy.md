@@ -1,7 +1,10 @@
-# Refactoring strategy (React pages & hooks)
+# Refactoring strategy (React pages & hooks — plus full-stack touchpoints)
 
-This document is the **canonical description** of how Holzen approaches **incremental** front-end refactors—especially splitting large pages and heavy hooks. It complements:
+This document is the **canonical description** of how Holzen approaches **incremental** refactors on the **client**: splitting large pages and heavy hooks. **Backend work** (Postgres, RLS, edge functions) uses the **same incremental spirit** but different mechanics—see [§ Full-stack and backend-adjacent refactors](#full-stack-and-backend-adjacent-refactors) below.
 
+It complements:
+
+- **[`docs/reviews/react-spa-review-template.md`](../reviews/react-spa-review-template.md)** — flow-first **review** checklist (PR + audit); use before deciding *what* to extract (includes Supabase / edge context).
 - **[`docs/backlog/react-page-and-hook-splitting.md`](../backlog/react-page-and-hook-splitting.md)** — living checklist of **slices shipped** and remaining opportunities.
 - **[`docs/fundamentals/navigating-the-codebase.md`](navigating-the-codebase.md)** — where state and data patterns live today.
 - **[`docs/fundamentals/mental-models-for-contributors.md`](mental-models-for-contributors.md)** — SPA / hooks mental model.
@@ -95,8 +98,43 @@ This aligns with **navigating-the-codebase §6.1**: not every concern needs `use
 
 ---
 
+## Frontend: scope of this strategy
+
+This document is **comprehensive for structural client refactors**: extraction order (UI → pure `lib` → glue), hook vs `src/lib` boundaries, colocation, and explicit anti-patterns. It is **not** a full playbook for every frontend concern—pair refactors with the right doc when you touch that surface:
+
+| Concern | Where to look |
+|---------|----------------|
+| **Design system / IA** | [design/nox/README.md](../design/nox/README.md), [design/information-architecture.md](../design/information-architecture.md) |
+| **Accessibility** | Acceptance criteria on changed UI; systemic passes (e.g. [backlog/lighthouse-a11y-home.md](../backlog/lighthouse-a11y-home.md)) |
+| **i18n** | Match existing `useTranslation` / key patterns in the same feature |
+| **Analytics & flags** | [ops/event-taxonomy.md](../ops/event-taxonomy.md), [ops/feature-flags.md](../ops/feature-flags.md) when moving or renaming instrumented UI |
+| **Routing & guards** | [systems/routing/route-gating-system.md](../systems/routing/route-gating-system.md), `src/App.tsx` |
+| **Runtime / E2E QA** | [browser-360-mcp-playbook.md](browser-360-mcp-playbook.md), [e2e-browser-automation.md](../backlog/e2e-browser-automation.md) |
+| **Bundle / lazy routes** | [route-level-code-splitting.md](../backlog/route-level-code-splitting.md) (already linked above) |
+
+---
+
+## Full-stack and backend-adjacent refactors
+
+The React-focused sections above do **not** imply that all refactors are UI-only. Many “refactors” are really **contract changes**: API shapes, RLS visibility, edge handler structure. Treat those as **ordered, reversible steps** (schema ↔ client ↔ types), not as drive-by edits.
+
+| Area | What “incremental refactor” usually means | Canonical docs |
+|------|-------------------------------------------|------------------|
+| **SQL / RLS / views** | One migration (or small series) per concern; respect `search_path`, `SECURITY DEFINER` rules, view column safety | [ops/migration-security-conventions.md](../ops/migration-security-conventions.md), [ops/migration-view-safety.md](../ops/migration-view-safety.md) |
+| **Edge functions** | Extract shared logic into `supabase/functions/_shared/`; keep HTTP entrypoints thin; preserve `withRequestLogging` | [AGENTS.md](../../AGENTS.md), [ops/edge-logging-conventions.md](../ops/edge-logging-conventions.md); `npm run check:edge` / `check:edge-logging` when you touch edges |
+| **Client after schema** | Regenerate or cast types (`npm run gen:types`, `as unknown as T` until caught up) | [ops/deployment-sync-guide.md](../ops/deployment-sync-guide.md) |
+| **Security / authz baselines** | Prefer phased review docs before large policy reshuffles | [reviews/phase-6-rls-authz-security-model.md](../reviews/phase-6-rls-authz-security-model.md) through [phase-8-rls-hardening-service-role-policies.md](../reviews/phase-8-rls-hardening-service-role-policies.md) |
+
+**Principle (same as frontend):** one **vertical slice** or one **clear layer** per PR—e.g. “extract helper used by two edges” or “add column + RLS + read path in client,” not “rewrite all policies” in a single change unless you have a dedicated migration plan.
+
+**Living backlog:** UI extraction progress lives in [`react-page-and-hook-splitting.md`](../backlog/react-page-and-hook-splitting.md). **SQL/edge** refactors usually deserve their own backlog row or ADR when they change production contracts; do not fold them silently into a React-only ticket.
+
+---
+
 ## When you’re done reading this
 
 - For **what’s already done**, see the progress table in [`react-page-and-hook-splitting.md`](../backlog/react-page-and-hook-splitting.md).
 - For **where code lives**, see [`navigating-the-codebase.md`](navigating-the-codebase.md) §6–8.
 - For **automation conventions**, see [`AGENTS.md`](../../AGENTS.md).
+- For **ship order** when migrations or edges change, see [`docs/ops/deployment-sync-guide.md`](../ops/deployment-sync-guide.md).
+- For **flow-first review** before refactors, see [`docs/reviews/react-spa-review-template.md`](../reviews/react-spa-review-template.md) and [`docs/reviews/end-to-end-review-master-checklist.md`](../reviews/end-to-end-review-master-checklist.md).

@@ -1,166 +1,392 @@
-import { useState, useEffect } from 'react';
-import { supabase } from '@/integrations/supabase/client';
+import { useState, useMemo, useCallback } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/hooks/use-auth';
+import { useBulkHoldPending } from '@/hooks/use-bulk-hold-pending';
 import { useTranslation } from 'react-i18next';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Check, Inbox } from 'lucide-react';
+import { ChevronRight, Folder, List, X } from 'lucide-react';
 import { hapticFeedback } from '@/lib/haptics';
+import { applyBulkHoldOutcomes } from '@/lib/apply-bulk-hold-outcomes';
+import { groupBulkHoldByLocalDay, type BulkHoldOutcomeChoice, type BulkHoldPendingPause } from '@/lib/bulk-hold';
 import { Button } from '@/components/ui/button';
 import { homeInWidget } from '@/components/home/home-widget-styles';
-import { pauseLogStep } from '@/lib/pause-api';
+import {
+  Sheet,
+  SheetContent,
+  SheetDescription,
+  SheetHeader,
+  SheetTitle,
+} from '@/components/ui/sheet';
+import { BulkHoldReviewBody } from '@/components/bulk-hold/BulkHoldReviewBody';
+import { BulkHoldSuccessBody } from '@/components/bulk-hold/BulkHoldSuccessBody';
+import { cn } from '@/lib/utils';
+import { useLatestRef } from '@/hooks/use-latest-ref';
 
-interface PendingPause {
-  id: string;
-  created_at: string;
-}
+type SheetMode = 'prompt' | 'review' | 'success';
 
 /**
- * Shows when the user has >=2 expired pause_instances that never received
- * an outcome. Tapping "Hold all" logs `outcome_logged` with `{ outcome: 'held' }`
- * on each via the RPC; the DB engine leaves those instances terminal
- * (expired is final) but the events still inform stats' retrospective
- * outcome inference.
- *
- * Under V2, completed pauses always have an outcome by construction
- * (outcome_logged is a completion gate). Expired pauses without step
- * events are the equivalent of the old "ignored notification" rows.
- * Marking them bulk-held is a historical rescue: the instance stays
- * expired, but the outcome event records the user's after-the-fact
- * decision for analytics.
+ * Home surface for ≥2 expired pauses without `outcome_logged`. See `docs/systems/pause-system.md`
+ * and migration `20260505120000_pause_log_step_expired_outcome_rescue.sql`.
  */
 export function BulkHoldCard() {
   const { user } = useAuth();
-  const { t } = useTranslation();
-  const [pending, setPending] = useState<PendingPause[]>([]);
-  const [resolved, setResolved] = useState(false);
+  const { t, i18n } = useTranslation();
+  const navigate = useNavigate();
+
+  const [dismissed, setDismissed] = useState(false);
+  const [sheetOpen, setSheetOpen] = useState(false);
+  const [sheetMode, setSheetMode] = useState<SheetMode>('prompt');
+  const [heldCount, setHeldCount] = useState(0);
   const [loading, setLoading] = useState(false);
+  const [draftOutcomes, setDraftOutcomes] = useState<Record<string, BulkHoldOutcomeChoice>>({});
+  const [applyError, setApplyError] = useState<string | null>(null);
+  const [refetchNonce, setRefetchNonce] = useState(0);
 
-  useEffect(() => {
-    if (!user) return;
-    // Expired instances older than 1h with no outcome_logged step event yet.
-    // We keep it loose — 50 rows max, 14-day window — because users only
-    // ever see this when they return to Home after a break.
-    const windowStart = new Date(Date.now() - 14 * 24 * 60 * 60 * 1000).toISOString();
-    void (async () => {
-      const { data } = await supabase
-        .from('pause_instances' as never)
-        .select('id, created_at')
-        .eq('user_id', user.id)
-        .eq('state', 'expired')
-        .gte('created_at', windowStart)
-        .order('created_at', { ascending: false })
-        .limit(50);
-      const rows = (data ?? []) as PendingPause[];
-      if (rows.length < 2) return;
+  const fetchEnabled = Boolean(user) && !dismissed && sheetMode !== 'success';
+  const { pending, setPending } = useBulkHoldPending({
+    userId: user?.id,
+    fetchEnabled,
+    refetchNonce,
+  });
 
-      const { data: outcomes } = await supabase
-        .from('pause_step_events' as never)
-        .select('pause_instance_id')
-        .eq('user_id', user.id)
-        .eq('step_type', 'outcome_logged')
-        .in(
-          'pause_instance_id',
-          rows.map((r) => r.id),
-        );
-      const withOutcome = new Set(
-        ((outcomes ?? []) as Array<{ pause_instance_id: string }>).map((o) => o.pause_instance_id),
-      );
-      setPending(rows.filter((r) => !withOutcome.has(r.id)));
-    })();
-  }, [user]);
+  const sheetModeRef = useLatestRef(sheetMode);
+  const loadingRef = useLatestRef(loading);
+  const pendingRef = useLatestRef(pending);
+  const draftRef = useLatestRef(draftOutcomes);
 
-  const handleHoldAll = async () => {
-    if (!user || pending.length === 0) return;
-    setLoading(true);
-    hapticFeedback('medium');
+  const groupedReview = useMemo(
+    () => groupBulkHoldByLocalDay(pending, i18n.language, t),
+    [pending, i18n.language, t],
+  );
 
-    const results = await Promise.all(
-      pending.map((p) =>
-        pauseLogStep({
-          instanceId: p.id,
-          stepType: 'outcome_logged',
-          payload: { outcome: 'held' },
-        }).catch(() => null),
-      ),
-    );
-    if (results.every((r) => r !== null || r === null)) {
+  const hasAnyDraft = Object.keys(draftOutcomes).length > 0;
+
+  const resetSheetUi = useCallback(() => {
+    setSheetMode('prompt');
+    setHeldCount(0);
+    setDraftOutcomes({});
+    setApplyError(null);
+  }, []);
+
+  const applyOutcomesAndFinish = useCallback(
+    async (resolver: (p: BulkHoldPendingPause) => BulkHoldOutcomeChoice) => {
+      const rows = [...pendingRef.current];
+      if (!user || rows.length === 0) return;
+
+      setLoading(true);
+      setApplyError(null);
+      hapticFeedback('medium');
+
+      const result = await applyBulkHoldOutcomes(rows, resolver);
+
+      if (result.status === 'failed') {
+        hapticFeedback('warning');
+        setApplyError(t('bulkHold.applyFailed'));
+        setRefetchNonce((n) => n + 1);
+        setLoading(false);
+        return;
+      }
+
+      if (result.status === 'partial') {
+        hapticFeedback('warning');
+        setPending(result.failedRows);
+        setDraftOutcomes((prev) => {
+          const next: Record<string, BulkHoldOutcomeChoice> = {};
+          for (const p of result.failedRows) {
+            if (prev[p.id]) next[p.id] = prev[p.id];
+          }
+          return next;
+        });
+        setApplyError(t('bulkHold.applyPartialFailed', { count: result.failedRows.length }));
+        setLoading(false);
+        return;
+      }
+
       hapticFeedback('success');
-      setResolved(true);
-      setTimeout(() => setPending([]), 2000);
+      setHeldCount(result.count);
+      setPending([]);
+      setDraftOutcomes({});
+      setApplyError(null);
+      setSheetMode('success');
+      setLoading(false);
+    },
+    [user, t, setPending, pendingRef],
+  );
+
+  const handleSheetOpenChange = useCallback(
+    (open: boolean) => {
+      if (open) {
+        setSheetOpen(true);
+        return;
+      }
+      if (loadingRef.current) return;
+
+      const drafts = draftRef.current;
+      const pend = pendingRef.current;
+      const draftKeys = Object.keys(drafts);
+
+      if (sheetModeRef.current === 'review' && pend.length > 0 && draftKeys.length > 0) {
+        void (async () => {
+          setApplyError(null);
+          await applyOutcomesAndFinish((p) => drafts[p.id] ?? 'held');
+        })();
+        return;
+      }
+
+      setSheetOpen(false);
+      resetSheetUi();
+    },
+    [applyOutcomesAndFinish, resetSheetUi, draftRef, loadingRef, pendingRef, sheetModeRef],
+  );
+
+  const handleHoldAll = useCallback(() => applyOutcomesAndFinish(() => 'held'), [applyOutcomesAndFinish]);
+
+  const handleReviewHeldAll = useCallback(() => {
+    setDraftOutcomes({});
+    return applyOutcomesAndFinish(() => 'held');
+  }, [applyOutcomesAndFinish]);
+
+  const handleReviewHeldRest = useCallback(
+    () => applyOutcomesAndFinish((p) => draftRef.current[p.id] ?? 'held'),
+    [applyOutcomesAndFinish, draftRef],
+  );
+
+  const handleDismissTeaser = useCallback(
+    (e: React.MouseEvent) => {
+      e.stopPropagation();
+      setDismissed(true);
+      setPending([]);
+      setSheetOpen(false);
+      resetSheetUi();
+    },
+    [resetSheetUi, setPending],
+  );
+
+  const goArchivePauses = useCallback(() => {
+    navigate('/archive?seg=pauses');
+    setSheetOpen(false);
+    resetSheetUi();
+  }, [navigate, resetSheetUi]);
+
+  const goEchoes = useCallback(() => {
+    navigate('/archive?seg=echoes');
+    setSheetOpen(false);
+    resetSheetUi();
+  }, [navigate, resetSheetUi]);
+
+  const doneAfterSuccess = useCallback(() => {
+    setSheetOpen(false);
+    resetSheetUi();
+  }, [resetSheetUi]);
+
+  const enterReview = useCallback(() => {
+    hapticFeedback('light');
+    setApplyError(null);
+    setDraftOutcomes({});
+    setSheetMode('review');
+  }, []);
+
+  const exitReviewToPrompt = useCallback(() => {
+    hapticFeedback('light');
+    setSheetMode('prompt');
+    setDraftOutcomes({});
+    setApplyError(null);
+  }, []);
+
+  const handleDoneInReview = useCallback(() => {
+    if (Object.keys(draftRef.current).length > 0) {
+      return applyOutcomesAndFinish((p) => draftRef.current[p.id] ?? 'held');
     }
-    setLoading(false);
-  };
+    exitReviewToPrompt();
+  }, [applyOutcomesAndFinish, exitReviewToPrompt, draftRef]);
 
-  const handleDismiss = () => {
-    setPending([]);
-  };
+  const onOutcomeChange = useCallback((pauseId: string, outcome: BulkHoldOutcomeChoice) => {
+    setDraftOutcomes((prev) => ({ ...prev, [pauseId]: outcome }));
+  }, []);
 
-  if (pending.length < 2) return null;
+  if (dismissed || (pending.length < 2 && !sheetOpen)) return null;
+
+  const showTeaser = pending.length >= 2;
 
   return (
-    <AnimatePresence mode="wait">
-      {resolved ? (
-        <motion.div
-          key="resolved"
-          initial={{ opacity: 0, scale: 0.95 }}
-          animate={{ opacity: 1, scale: 1 }}
-          exit={{ opacity: 0, y: -8 }}
-          className={`${homeInWidget.stripPrimary} flex items-center gap-3`}
-        >
-          <div className="h-6 w-6 rounded-full bg-primary/10 flex items-center justify-center shrink-0">
-            <Check className="h-3.5 w-3.5 text-primary" />
-          </div>
-          <p className="text-sm font-medium leading-snug text-primary/80">
-            {t('bulkHold.allMarkedHold', {
-              count: pending.length,
-              defaultValue: '{{count}} pauses marked as Hold',
-            })}
-          </p>
-        </motion.div>
-      ) : (
-        <motion.div
-          key="prompt"
-          initial={{ opacity: 0, y: 8 }}
-          animate={{ opacity: 1, y: 0 }}
-          exit={{ opacity: 0, y: -8 }}
-          className={`${homeInWidget.strip} space-y-3 py-4`}
-        >
-          <div className="flex items-start gap-3">
-            <Inbox className="h-4 w-4 text-muted-foreground/60 mt-0.5 shrink-0" />
-            <div className="flex-1 space-y-1">
-              <p className="text-sm font-medium leading-snug text-foreground">
+    <>
+      <AnimatePresence mode="wait">
+        {showTeaser ? (
+          <motion.div
+            key="teaser"
+            role="button"
+            tabIndex={0}
+            initial={{ opacity: 0, y: 8 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -8 }}
+            onClick={() => {
+              hapticFeedback('light');
+              setSheetOpen(true);
+              setSheetMode('prompt');
+            }}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault();
+                hapticFeedback('light');
+                setSheetOpen(true);
+                setSheetMode('prompt');
+              }
+            }}
+            className={cn(
+              homeInWidget.strip,
+              'w-full cursor-pointer space-y-3 py-4 text-left transition-colors hover:bg-muted/40',
+              'relative rounded-2xl border border-border/50',
+            )}
+          >
+            <button
+              type="button"
+              onClick={handleDismissTeaser}
+              className={cn(homeInWidget.iconBtn, 'absolute right-2 top-2')}
+              aria-label={t('common.dismiss', { defaultValue: 'Dismiss' })}
+            >
+              <X className="h-4 w-4" />
+            </button>
+            <div className="pr-10">
+              <p className={homeInWidget.kicker}>{t('bulkHold.kicker', { defaultValue: 'Waiting for you' })}</p>
+              <p className="mt-1 text-sm font-semibold leading-snug text-foreground">
                 {t('bulkHold.title', {
                   count: pending.length,
                   defaultValue: '{{count}} pauses while you were away',
                 })}
               </p>
-              <p className={homeInWidget.meta}>
-                {t('bulkHold.subtitle', {
-                  defaultValue:
-                    'Mark all as Hold with one tap, or review them individually in the Library.',
+              <p className={cn(homeInWidget.meta, 'mt-1')}>
+                {t('bulkHold.teaserHint', {
+                  defaultValue: 'Tap to hold all, review dates, or open your Archive.',
                 })}
               </p>
             </div>
+            <div className="flex items-center gap-1 text-xs font-medium text-primary">
+              <span>{t('bulkHold.openSheet', { defaultValue: 'Manage' })}</span>
+              <ChevronRight className="h-3.5 w-3.5" aria-hidden />
+            </div>
+          </motion.div>
+        ) : null}
+      </AnimatePresence>
+
+      <Sheet open={sheetOpen} onOpenChange={handleSheetOpenChange}>
+        <SheetContent
+          side="bottom"
+          className={cn(
+            'flex max-h-[88vh] flex-col rounded-t-2xl border-t p-0',
+            'data-[state=open]:duration-300',
+          )}
+        >
+          <div className="shrink-0 px-6 pb-2 pt-6">
+            {sheetMode === 'review' ? (
+              <div className="space-y-2 pr-10 text-center">
+                <SheetTitle className="text-base font-semibold sm:text-lg">{t('bulkHold.reviewScreenTitle')}</SheetTitle>
+                <p className="whitespace-pre-line text-balance text-sm text-muted-foreground">{t('bulkHold.reviewLead')}</p>
+                <p className="sr-only">{t('bulkHold.reviewSub')}</p>
+              </div>
+            ) : (
+              <SheetHeader className="space-y-2 px-0 pr-10 text-left sm:text-left">
+                <p className={homeInWidget.kicker}>{t('bulkHold.kicker', { defaultValue: 'Waiting for you' })}</p>
+                <SheetTitle className="text-left text-base font-semibold leading-snug sm:text-lg">
+                  {sheetMode === 'success'
+                    ? t('bulkHold.successHeadline', { defaultValue: 'Held through your stack' })
+                    : t('bulkHold.title', {
+                        count: pending.length,
+                        defaultValue: '{{count}} pauses while you were away',
+                      })}
+                </SheetTitle>
+                <SheetDescription className="text-left text-balance">
+                  {sheetMode === 'success'
+                    ? t('bulkHold.successSub', {
+                        defaultValue: 'Your outcomes are logged. Echoes capture what surfaced during each pause.',
+                      })
+                    : t('bulkHold.subtitle', {
+                        defaultValue:
+                          'Mark all as Hold with one tap, or review them individually. Your Archive lists each pause.',
+                      })}
+                </SheetDescription>
+              </SheetHeader>
+            )}
           </div>
-          <div className="flex items-center gap-2">
-            <Button
-              onClick={handleHoldAll}
-              disabled={loading}
-              size="sm"
-              className="h-9 flex-1 rounded-xl text-sm font-semibold"
-            >
-              {loading ? t('common.loading') : t('bulkHold.holdAll', { defaultValue: 'Hold all' })}
-            </Button>
-            <button
-              type="button"
-              onClick={handleDismiss}
-              className={`px-2 ${homeInWidget.meta} hover:text-foreground`}
-            >
-              {t('common.dismiss', { defaultValue: 'Dismiss' })}
-            </button>
+
+          <div className="min-h-0 flex-1 overflow-y-auto px-6 pb-4">
+            {applyError ? (
+              <p className="mb-3 rounded-lg border border-destructive/25 bg-destructive/5 px-3 py-2 text-sm text-destructive">
+                {applyError}
+              </p>
+            ) : null}
+            <AnimatePresence mode="wait">
+              {sheetMode === 'success' ? (
+                <BulkHoldSuccessBody heldCount={heldCount} onViewEchoes={goEchoes} />
+              ) : sheetMode === 'review' ? (
+                <BulkHoldReviewBody
+                  sections={groupedReview}
+                  draftOutcomes={draftOutcomes}
+                  onOutcomeChange={onOutcomeChange}
+                  onOpenArchive={goArchivePauses}
+                />
+              ) : null}
+            </AnimatePresence>
           </div>
-        </motion.div>
-      )}
-    </AnimatePresence>
+
+          <div
+            className="shrink-0 border-t border-border/50 bg-background px-6 pt-4"
+            style={{ paddingBottom: 'max(2rem, env(safe-area-inset-bottom, 0px))' }}
+          >
+            {sheetMode === 'prompt' ? (
+              <div className="grid grid-cols-2 gap-3">
+                <Button
+                  type="button"
+                  disabled={loading || pending.length === 0}
+                  className="h-11 rounded-xl font-semibold"
+                  onClick={handleHoldAll}
+                >
+                  <Folder className="mr-2 h-4 w-4 shrink-0" aria-hidden />
+                  {loading ? t('common.loading') : t('bulkHold.holdAll', { defaultValue: 'Hold all' })}
+                </Button>
+                <Button
+                  type="button"
+                  variant="outline"
+                  disabled={pending.length === 0}
+                  className="h-11 rounded-xl border-primary/35 font-semibold text-primary hover:bg-primary/5"
+                  onClick={enterReview}
+                >
+                  <List className="mr-2 h-4 w-4 shrink-0" aria-hidden />
+                  {t('bulkHold.review', { defaultValue: 'Review' })}
+                </Button>
+              </div>
+            ) : sheetMode === 'review' ? (
+              <div className="grid grid-cols-2 gap-3">
+                <Button
+                  type="button"
+                  disabled={loading || pending.length === 0}
+                  className="h-11 rounded-full bg-foreground font-semibold text-background hover:bg-foreground/90"
+                  onClick={hasAnyDraft ? handleReviewHeldRest : handleReviewHeldAll}
+                >
+                  <Folder className="mr-2 h-4 w-4 shrink-0" aria-hidden />
+                  {loading
+                    ? t('common.loading')
+                    : hasAnyDraft
+                      ? t('bulkHold.heldRest')
+                      : t('bulkHold.heldAllPill')}
+                </Button>
+                <Button
+                  type="button"
+                  variant="outline"
+                  disabled={loading}
+                  className="h-11 rounded-full border-foreground/80 bg-primary/[0.06] font-semibold text-primary hover:bg-primary/10"
+                  onClick={handleDoneInReview}
+                >
+                  {t('bulkHold.done', { defaultValue: 'Done' })}
+                </Button>
+              </div>
+            ) : (
+              <Button type="button" className="h-11 w-full rounded-xl font-semibold" onClick={doneAfterSuccess}>
+                {t('bulkHold.done', { defaultValue: 'Done' })}
+              </Button>
+            )}
+          </div>
+        </SheetContent>
+      </Sheet>
+    </>
   );
 }

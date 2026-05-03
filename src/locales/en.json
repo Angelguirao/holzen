@@ -1,8 +1,9 @@
-{
+﻿{
   "nav": {
     "home": "Home",
     "history": "History",
     "library": "Library",
+    "archive": "Archive",
     "tools": "Tools",
     "journey": "Journey",
     "profile": "Profile",
@@ -32,6 +33,7 @@
   },
   "common": {
     "back": "Back",
+    "close": "Close",
     "cancel": "Cancel",
     "delete": "Delete",
     "done": "Done",
@@ -55,7 +57,9 @@
     "from": "From",
     "until": "Until",
     "offlineBanner": "You're offline",
-    "connectivityDegraded": "Can't reach Holzen right now — check your connection or try again shortly."
+    "connectivityDegraded": "Can't reach Holzen right now — check your connection or try again shortly.",
+    "profileLoadFailed": "We couldn't load your profile from the server. Some settings may be out of date until this succeeds.",
+    "profileWriteFailed": "We couldn't save that change. Please try again."
   },
   "auth": {
     "restoringSession": "Restoring your session…",
@@ -96,23 +100,103 @@
     "ritualHint": "Feeling reactive? Ground yourself first.",
     "ambientMode": "Ambient mode",
     "whenBtcMoves": "When Bitcoin moves, we'll help you pause before you act.",
+    "today": "Today",
+    "customize": "Customize",
+    "customizeSheet": {
+      "title": "Customize your Home",
+      "description": "Shape what you see first and how it is ordered—so Home meets you where you are and supports the mindset you want to carry into the rest of the app.",
+      "resetLayout": "Reset layout & widgets",
+      "modeHeading": "Mode",
+      "holdModeTitle": "Hold mode",
+      "holdModeDesc": "See everything, prices & signals.",
+      "zenModeTitle": "Zen mode",
+      "zenModeDesc": "Hide prices and market noise.",
+      "widgetsHeading": "Widgets",
+      "resetLink": "Reset to defaults",
+      "sections": {
+        "goalWhy": {
+          "title": "Why you stay",
+          "desc": "Surfaces your motivations and a compact hold-goal snapshot on Home. Personal mantra for breathing lives under Settings → You, not here."
+        },
+        "market": {
+          "title": "Market",
+          "desc": "Optional wider-world context on the same screen when you want it—so you can stay oriented without leaving your flow."
+        },
+        "yourPause": {
+          "title": "Your pause",
+          "desc": "Brings your pause practice into view on Home—so regulation and boundaries stay within reach when intensity rises."
+        },
+        "journeyPulse": {
+          "title": "Journey pulse",
+          "desc": "A light snapshot of how your practice is moving—so you sense continuity and direction without wading through every detail."
+        },
+        "quickCapture": {
+          "title": "Quick capture",
+          "desc": "Space to register what shows up in the moment—so meaning you notice here is less likely to evaporate when you move on."
+        },
+        "night": {
+          "title": "Evening reflection",
+          "desc": "A gentle close to the day—room to notice how things landed and leave today with a little more clarity before what comes next."
+        }
+      }
+    },
+    "goalWhy": {
+      "expandHoldDetails": "Show hold goal details and motivations",
+      "collapseHoldDetails": "Hide hold goal details and motivations"
+    },
+    "statTiles": {
+      "holzenScore": "Holzen score",
+      "inMotion": "In motion",
+      "noBadgeProgress": "You're caught up — open badges to see what's next."
+    },
+    "market": {
+      "expandDetails": "Show chart and 24h details",
+      "collapseDetails": "Hide chart and 24h details",
+      "chartExpandDisabled": "Chart and 24h details need a visible fiat price (not BTC-only or hidden price)."
+    },
+    "heroQuote": {
+      "lineWithName": "{{name}}, {{line}}",
+      "direct": {
+        "q1": "Remember why you started.",
+        "q2": "This is bigger than today.",
+        "q3": "You already decided. Don't renegotiate.",
+        "q4": "Your goal hasn't changed. Your emotions have.",
+        "q5": "Don't trade your future for a moment."
+      },
+      "behavioral": {
+        "q1": "Short-term noise. Long-term decision.",
+        "q2": "This moment will pass. Your strategy shouldn't.",
+        "q3a": "You don't need to act.",
+        "q3b": "You need to remember.",
+        "q4": "Zoom out. Then decide.",
+        "q5": "Clarity over urgency."
+      }
+    },
     "nextAutoCheck": "Next auto-check · {{time}}",
     "cooldownHeadline": "{{hours}}h cooldown · {{time}} left",
     "nextScanLine": "Next scan · {{scan}}",
     "nextScanIdleTitle": "Countdown until the server runs the next price check",
+    "autoCooldown": {
+      "afterPauseKicker": "Rest window after your last pause",
+      "serverChecksKicker": "Background price checks",
+      "cooldownAria": "You are in the rest period that starts when a pause is created. It is not the same timer as the Need a moment button. This rest window ends at {{time}} ({{hours}} hours from that pause).",
+      "nextScanAria": "Holzen rechecks market conditions on a quarter-hour schedule. The next server tick is around {{time}}. A new automatic pause only happens when rules and your settings say so — this is only the schedule.",
+      "cooldownReadyAt": "{{hours}}h rest · until {{time}}",
+      "nextScanAtClock": "Next server check · {{time}}"
+    },
     "monitoringReady": "Monitoring · ready",
     "widget": {
       "market": "Market",
       "goal": "Goal",
+      "whyHoldTitle": "Your anchor",
+      "yourPause": "Your pause",
       "reflection": "Pause",
-      "journeyPulse": "Journey pulse",
       "quickCapture": "Quick capture",
       "evening": "Evening",
       "letter": "Letter",
       "practice": "Practice"
     },
     "journeyPulse": {
-      "scoreLabel": "Global score",
       "closestBadge": "Closest badge",
       "badgeProgress": "{{current}} / {{requirement}}",
       "openStats": "Open stats",
@@ -121,10 +205,10 @@
       "noScore": "Complete a pause to unlock your journey pulse."
     },
     "quickCapture": {
-      "libraryTitle": "Library",
+      "recentPauseTitle": "Recent pause",
+      "recentPauseBlurb": "Your pauses live in Archive.",
       "libraryOpen": "Open",
-      "libraryEmpty": "Nothing saved yet — pauses and moments you keep show up here.",
-      "libraryUntitled": "Saved item",
+      "libraryEmpty": "No pauses yet — complete a pause to see it here.",
       "checkinTitle": "Quick check-in",
       "checkinPlaceholder": "Optional note (what matters right now)",
       "checkinSave": "Log",
@@ -136,6 +220,10 @@
       "upgradeToPro": "{{trialDays}}-day free trial · ${{price}}/month after · Cancel anytime",
       "pricePerMonth": "${{price}} per month · Cancel anytime",
       "openingCheckout": "Opening checkout…",
+      "checkoutFailed": "Checkout could not be started. Check your connection and try again.",
+      "checkoutNoUrl": "Checkout did not return a link. Please try again or contact support.",
+      "portalFailed": "Billing portal could not be opened. Check your connection and try again.",
+      "portalNoUrl": "Billing portal did not return a link. Please try again.",
       "freeRemaining": "{{count}} free pause remaining this month",
       "freeRemaining_other": "{{count}} free pauses remaining this month"
     },
@@ -186,7 +274,8 @@
     "documentTitle": "Holzen — Journey",
     "activityExplainer": "A chronological log of pauses and practices. Your saved reflection cards and collections live in Library — browse and search there.",
     "homeCardTitle": "Your journey",
-    "homeCardSubtitle": "Stats, insights, badges, and activity"
+    "homeCardSubtitle": "Stats, insights, badges, and activity",
+    "activityLoadFailed": "Could not load your activity timeline. Check your connection and try again."
   },
   "admin": {
     "subNavAria": "Admin sections",
@@ -207,7 +296,44 @@
     "breatheDesc": "A quiet, goal-free breathing space.",
     "ground": "Ground",
     "groundDesc": "Guided session from your activity tags; your journal lives on the second tab in the same experience.",
-    "proShortBadge": "Pro"
+    "proShortBadge": "Pro",
+    "hub": {
+      "shellNote": "Full-screen tools hide the bottom tab bar until you leave the flow (Back or Done).",
+      "goodNextStep": "A good next step",
+      "suggestedPill": "Suggested",
+      "lastCheckIn": "Last check-in",
+      "checkinNoMood": "Mood not recorded",
+      "intensityShort": "Intensity {{n}} / 5",
+      "checkinTapToUpdate": "Tap to log a fresh check-in or continue the full flow.",
+      "noCheckInYet": "No check-in yet. A quick mood log helps Holzen suggest what fits this week.",
+      "logCheckInCta": "Start emotional check-in",
+      "orPick": "Or pick what you need",
+      "pickIntro": "Each card opens the full experience. Pro tools show a small badge until you upgrade.",
+      "moreTools": "More practices",
+      "soYou": "So you",
+      "yourGroundingActivities": "Your grounding activities",
+      "groundingActivitiesIntro": "These are the activities Holzen uses in Ground and can reference during pauses. They live on your profile — same list as Settings → You.",
+      "noGroundingActivities": "You have not added any yet.",
+      "addGroundingInSettings": "Add grounding activities in Settings",
+      "editGroundingInSettings": "Edit grounding activities in Settings",
+      "openGround": "Open Ground",
+      "mantraEmptyTitle": "Set a breathing mantra",
+      "mantraEmptyBody": "A short optional line can anchor you during breathwork. It is not shown on Home.",
+      "mantraEmptyCta": "Open Settings → You",
+      "tile": {
+        "grounding": "Grounding",
+        "capsule": "Send a capsule"
+      },
+      "blurb": {
+        "ground": "Pick a grounding activity and settle your body before decisions. Your notes stay on the Journal tab in the same flow.",
+        "letters": "Write to your future self and choose when it arrives — calm, surge, or dip. A sealed ritual for long conviction.",
+        "breathe": "Goal-free breathing room when you do not need a full pause. Quiet timer, no scores, just space.",
+        "replay": "Revisit a finished pause with a short note. Compare how you feel now to what you captured then.",
+        "checkin": "Name the mood, intensity, and trigger in under a minute. The fastest way to stay honest with yourself.",
+        "journal": "AI-chosen prompts to loosen a stuck story. Best when you have ten quiet minutes and a keyboard.",
+        "bodyscan": "5-4-3-2-1 sensory scan when your mind is racing. Short, structured, and easy to repeat."
+      }
+    }
   },
   "profile": {
     "pageSubtitle": "Your streak, charts, and journey — in one place. (Letters are under Tools.)",
@@ -248,7 +374,7 @@
   },
   "settings": {
     "hubIntro": "Pick a category to change how Holzen fits you — same layout as Tools for consistency.",
-    "hubDescYou": "Name, motivations, mantra, and how you show up on Home.",
+    "hubDescYou": "Name, hold goal, motivations, optional mantra for breathing pauses, and how Home greets you.",
     "hubDescReflection": "Cooldown, tone, style, custom prompt, and silent mode for pauses.",
     "hubDescExperience": "Conviction mode, currency, language, haptics, zen mode, and sounds.",
     "hubDescCompanions": "Which companion cards appear with your pause.",
@@ -279,8 +405,10 @@
     "firstName": "First name",
     "firstNameDesc": "Optional. Shown as a short welcome line under Home.",
     "firstNamePlaceholder": "Your first name",
+    "holdGoalTitle": "Hold goal",
+    "holdGoalDesc": "Time-bound, price target, or forever. Home shows a compact “Why you stay” summary — edit the full commitment here.",
     "myWhy": "My Why",
-    "myWhyDesc": "Why do you hold? Select what resonates. This anchors your pauses and appears as a mantra during breathing.",
+    "myWhyDesc": "Why do you hold? Select what resonates. This anchors your pause experience and companion tone.",
     "motivations": {
       "freedom": "Financial freedom",
       "freedomDesc": "Building independence",
@@ -367,6 +495,8 @@
     "pushFinishBannerTitle": "Finish enabling push in Settings",
     "pushFinishBannerBody": "Your browser already allows notifications for this site, but this device is not registered for Holzen push yet. Use the button below to complete setup (same as turning push on).",
     "pushFinishBannerAction": "Enable push on this device",
+    "pushSubscribeFailed": "Push notifications could not be enabled. Check your connection and notification permission, then try again.",
+    "pushUnsubscribeFailed": "Push notifications could not be turned off on this device. Check your connection and try again.",
     "digestFrequency": "Digest frequency",
     "digestDesc": "How often you receive your pause digest email.",
     "digestOptions": {
@@ -487,6 +617,19 @@
       "historyDesc": "Parallels from financial history",
       "historySampleLabel": "Similar moment",
       "historySample": "When gold dropped 26% in 2013, panic sellers locked in losses. Within 2 years, it consolidated and began a new ascent."
+    },
+    "commitmentKicker": "Your commitment",
+    "commitmentTitle": "Hold goal",
+    "commitmentIntro": "Set the commitment you are holding for. You can refine it anytime in Settings → You. Optional breathing mantra is also there after you have used pauses.",
+    "commitmentFooterHint": "Skip if you prefer — you can set this later under Settings → You.",
+    "commitmentHoldLabel": "Hold goal",
+    "ready": {
+      "recapWhy": "Your why",
+      "recapHoldGoal": "Hold goal",
+      "recapHoldGoalSet": "Saved",
+      "recapHoldGoalUnset": "Not set yet",
+      "recapGrounding": "Grounds you",
+      "recapThreshold": "Threshold"
     }
   },
   "moodCheck": {
@@ -518,7 +661,7 @@
   "btcStatus": {
     "unableToFetch": "Unable to fetch price data",
     "checkConnection": "Check your connection and try again",
-    "exitBtcMode": "Exit 1 BTC = 1 BTC mode",
+    "exitBtcMode": "Back to {{currency}} price view",
     "enterBtcMode": "Enter 1 BTC = 1 BTC mode",
     "show": "Show",
     "hide": "Hide",
@@ -913,6 +1056,8 @@
   },
   "blog": {
     "title": "Blog",
+    "loadFailed": "We couldn't load posts. Check your connection and try again.",
+    "loadMoreFailed": "Couldn't load more posts. Try again in a moment.",
     "nothingYet": "Nothing here yet.",
     "nothingDesc": "We're working on our first posts about behavioral finance, Bitcoin conviction, and the art of doing nothing. Check back soon.",
     "home": "Home",
@@ -971,6 +1116,7 @@
     "customUrlPlaceholder": "URL (optional)",
     "add": "Add",
     "addFailed": "Failed to add source",
+    "loadFailed": "Could not load sources. Check your connection and try again.",
     "sourceAdded": "Source added",
     "showRemoved": "{{count}} removed sources",
     "restore": "Restore"
@@ -987,11 +1133,27 @@
     "title": "Privacy Policy"
   },
   "library": {
-    "title": "Library",
-    "pageTitle": "Library — Holzen",
-    "pageDescription": "Your activity, bookmarks, notes, and collections",
+    "title": "Archive",
+    "pageTitle": "Archive — Holzen",
+    "pageDescription": "Your bookmarks, notes, and saved pause moments.",
+    "archiveIntroPauses": "See content from your recent pauses and favourites. Save what matters. Explore with filters.",
+    "archiveIntroEchoes": "Reflections from pauses you missed. Read at your own pace. Save what speaks to you.",
+    "segmentPauses": "Pauses",
+    "segmentEchoes": "Echoes",
+    "pillAll": "All",
+    "pillFavs": "Favs",
+    "filterTypesLabel": "Filter by type",
+    "filterNoTypes": "No types yet",
+    "removeFilterChip": "Remove filter",
+    "notificationsAria": "Notifications",
+    "emptyPauseFirst": "Your content will appear here after your first pause.",
+    "emptyPauseFirstCta": "Start a pause",
+    "emptyFavs": "Nothing saved yet. Keep what matters.",
+    "emptyEchoesNone": "Nothing here yet. Reflections you save from echo pauses will appear in this list.",
+    "echoesCardKind": "Reflection",
     "iaClarifier": "This is for saved and browsable content (cards, notes, collections). A chronological log of activity lives under Journey → Activity.",
     "linkActivityLog": "Activity log",
+    "pendingPauseHint": "New market context is queued — use the prompt on screen to switch or keep your current pause.",
     "tabItems": "Items",
     "tabArchive": "Archive",
     "viewList": "List",
@@ -1009,6 +1171,9 @@
     "itemCount_one": "{{count}} item",
     "itemCount_other": "{{count}} items",
     "emptyState": "Nothing here yet. Save pauses, companion outputs, or write notes to build your personal library.",
+    "loadFailed": "Could not load your library. Check your connection and try again.",
+    "collectionsPartialLoadFailed": "Your items loaded, but collections could not be refreshed. Try pull to refresh.",
+    "loadMoreFailed": "Could not load more items. Pull to refresh or try again in a moment.",
     "noResults": "No items match your search.",
     "noBookmarks": "No bookmarks yet. Tap the save icon on companion outputs during a pause.",
     "noNotes": "No notes yet. Start writing.",
@@ -1045,7 +1210,34 @@
     "changeDecision": "Change",
     "changeDecisionLabel": "Change decision",
     "incompleteLabel": "No decision recorded",
-    "incompleteDescription": "What did you end up doing after this pause?"
+    "incompleteDescription": "What did you end up doing after this pause?",
+    "pauseCardReflectOpened": "Reflect opened {{when}}",
+    "pauseCardReflectNotOpened": "Reflect not opened yet",
+    "pauseCardOutcomePending": "Outcome not recorded",
+    "pauseCardBreathDone": "Breathing completed",
+    "pauseCardEngagementTypes": "Engagement",
+    "pauseCardMoreTypes": "+ more"
+  },
+  "archive": {
+    "pageTitle": "Archive — Holzen",
+    "pageDescription": "Completed pauses, echoes, and your collections.",
+    "title": "Archive",
+    "loadFailed": "Could not load your archive. Check your connection and try again.",
+    "emptyDefault": "Nothing to show here yet.",
+    "collectionsBlurb": "Group bookmarks and notes from your saved items into collections.",
+    "segmentPauses": "Pauses",
+    "segmentEchoes": "Echoes",
+    "introPauses": "See pauses you have finished or archived. Filter and sort to revisit what helped.",
+    "introEchoes": "Pauses that ended before Reflect — quick reads when you want them.",
+    "clearAll": "Clear all filters",
+    "searchPlaceholder": "Search pauses…",
+    "itemCount_one": "{{count}} pause",
+    "itemCount_other": "{{count}} pauses",
+    "emptyPauseFirst": "Your pauses will appear here after you complete or archive one.",
+    "emptyPauseFirstCta": "Start a pause",
+    "emptyFavs": "No favorites yet. Tap the heart on a pause card to save it here.",
+    "emptyEchoesNone": "Nothing here yet. Echoes appear when a pause ends before you open Reflect.",
+    "noResults": "No pauses match your filters."
   },
   "pause": {
     "youPaused": "You paused. That's the hardest part.",
@@ -1054,7 +1246,34 @@
     "whatWillYouDo": "What will you do?",
     "youChose": "You chose deliberately.",
     "return": "Return",
+    "sessionTitle": "Your pause",
+    "scienceInfoAria": "The science behind this pause",
     "noReflection": "No active pause. Go back to trigger one.",
+    "outcomeSaveFailed": "Could not save your choice. Try again.",
+    "outcomeNotCompleted": "Your choice was saved, but this pause is not complete yet — open Reflect and finish a companion card, then choose again.",
+    "stepSyncFailed": "Could not sync this step. Check your connection and try again.",
+    "pendingContextTitle": "Market context changed",
+    "pendingContextBody": "There is a new pause for the latest move. You can keep your current pause or switch — switching ends the current ritual for this moment and opens the new one.",
+    "pendingAdoptCta": "Switch to new pause",
+    "pendingKeepCta": "Keep current pause",
+    "pendingAdoptFailed": "Could not switch to the new pause. Try again.",
+    "pendingDeclineFailed": "Could not dismiss the offer. Try again.",
+    "breathYouAreHere": "You're here",
+    "breathIntroKicker": "Step 1 · Breath",
+    "decideIntroKicker": "Step 5 · Decide",
+    "decideMirrorKicker": "Before you confirm",
+    "breathInterstitialTitle": "You stayed with it",
+    "breathInterstitialBody": "When you are ready, continue into how this moment feels.",
+    "feelIntensityTitle": "How strong is this feeling?",
+    "feelIntensityLow": "Light",
+    "feelIntensityHigh": "Strong",
+    "feelIntensitySummary": "Intensity {{n}} / 5",
+    "shiftSubcopy": "Notice what changed after reflecting — there is no wrong answer.",
+    "shiftPriorLabel": "Earlier",
+    "shiftIntensityTitle": "How much did it shift?",
+    "shiftIntensityLow": "Barely",
+    "shiftIntensityHigh": "A lot",
+    "shiftIntensitySummary": "Shift {{n}} / 5",
     "favoriteProHint": "Your favorites will be waiting in your Library with Pro ✨",
     "steps": {
       "breathe": "Breathe",
@@ -1067,11 +1286,24 @@
     },
     "reflect": {
       "heading": "Sit with this reflection",
-      "subcopy": "Read at your own pace. Notes and tags are optional; open a companion card only when you want another angle.",
+      "subcopy": "Read at your own pace. Notes and tags are optional; open a companion when you want another angle.",
+      "block1Title": "The reflection",
+      "block2Title": "Take what you need",
       "proTools": "Your note & tags",
       "freeHint": "Holzen Pro adds an optional private note and tags on each pause — useful when you look back in your Library.",
-      "companionsLead": "When you are ready, open a card — one at a time is enough.",
-      "continueHint": "There is no \"right\" amount of time — continue when you feel done."
+      "companionsLead": "Open one angle at a time — each card expands below.",
+      "continueHint": "There is no \"right\" amount of time — continue when you feel done.",
+      "shareCta": "Share",
+      "wallpaperCta": "Wallpaper",
+      "shareTitle": "Reflection from Holzen",
+      "shareCopied": "Reflection copied to clipboard.",
+      "shareCopyFailed": "Could not copy. Try again.",
+      "shareEmpty": "Nothing to share yet.",
+      "wallpaperCopied": "Copied. Paste into your wallpaper or lock-screen widget when you edit it.",
+      "wallpaperHint": "Copy your reflection and paste it into a wallpaper or lock-screen quote widget."
+    },
+    "done": {
+      "reinforcementKicker": "Carry this with you"
     }
   },
   "letter": {
@@ -1104,6 +1336,7 @@
     "duringSurge": "During a surge",
     "daysLater": "{{count}} day later",
     "daysLater_other": "{{count}} days later",
+    "loadFailed": "Could not load your letters. Check your connection and try again.",
     "letterNotSaved": "Letter not saved",
     "letterNotSavedDesc": "Something went wrong. Your words are not lost — try sealing again.",
     "letterSealed": "Letter sealed",
@@ -1301,7 +1534,12 @@
     "freezeAvailable": "1 streak freeze available · resets weekly",
     "nextFreeze": "Next freeze {{time}}",
     "used": "Used",
-    "more": "+{{count}} more"
+    "more": "+{{count}} more",
+    "regulation": {
+      "moodShift": {
+        "intensityFootnote": "Feel / shift 1–5 scales logged on {{feel}} / {{shift}} of {{sample}} pauses in this sample."
+      }
+    }
   },
   "myWhy": {
     "title": "My Why"
@@ -1344,7 +1582,8 @@
     "freeSessionIntro": "You’re on the manual path: pick one of your grounding activities. Holzen Pro adds an AI-timed suggestion for the moment and the market.",
     "freeLeadIn": "Take your time with {{activity}}. Stay with the sensation instead of the chart.",
     "freeSurprise": "Surprise me",
-    "upgradeForAi": "Upgrade for AI picks"
+    "upgradeForAi": "Upgrade for AI picks",
+    "historyLoadFailed": "Could not load your grounding journal. Check your connection and try again."
   },
   "breathing": {
     "trigger": "Breathe with this →",
@@ -1795,6 +2034,7 @@
     "desc_ai_insights": "AI analyzes your reflections to reveal emotional patterns you might miss.",
     "desc_night_reflections": "Evening check-ins that help you process the day before sleep.",
     "desc_library": "Save and organize your favorite reflections, haikus, and insights.",
+    "desc_archive": "Browse completed pauses, echoes, and collections — included with Holzen Pro.",
     "desc_letters": "Write letters to your future self — delivered when the market shifts.",
     "desc_wallpapers": "Generate wallpapers from your reflections as daily reminders.",
     "desc_nudges": "Personalized nudges when the market moves and you haven't paused.",
@@ -1876,6 +2116,10 @@
     "sense_taste": "{{count}} thing you can taste",
     "tapToAck": "Tap to acknowledge",
     "grounded": "You are here",
+    "bodyScanSaveFailed": "We couldn't save this session. You can retry or continue without saving.",
+    "bodyScanRetrySave": "Retry save",
+    "bodyScanContinueWithoutSave": "Continue without saving",
+    "bodyScanNotSaved": "This session wasn't saved to your activity. Sign in to keep a record next time.",
     "needMoreReflections": "You need at least a week of pauses before replaying. Keep going.",
     "replayPrompt": "How has your perspective changed?",
     "replayPlaceholder": "Looking back now, I notice…",
@@ -1891,6 +2135,11 @@
     "replayNoPauses": "No completed pauses yet. Finish a pause, then open Replay again.",
     "replaySelectPause": "Choose a pause to revisit",
     "replayChangePause": "Change pause",
+    "suggestFirstCheckin": "Start with a quick emotional check-in",
+    "suggestCheckin": "It's been a few days — how are you feeling?",
+    "suggestBodyscan": "You've been reactive — try grounding yourself",
+    "suggestJournal": "A guided journal might surface new patterns",
+    "suggestReplay": "Revisit a past reflection with fresh eyes",
     "replayUntitled": "Pause"
   },
   "mirror": {
@@ -1912,12 +2161,43 @@
     "reconsider": "Let me reconsider"
   },
   "bulkHold": {
+    "kicker": "Waiting for you",
     "title": "{{count}} pauses while you were away",
-    "subtitle": "Mark all as Hold with one tap, or review them individually in the Library.",
+    "subtitle": "Mark all as Hold with one tap, or open Review to see dates. Your Archive has full detail on each pause.",
+    "teaserHint": "Tap to hold all, review dates, or open your Archive.",
+    "openSheet": "Manage",
     "holdAll": "Hold all",
+    "review": "Review",
+    "back": "Back",
+    "openArchive": "Open Archive",
+    "done": "Done",
+    "reviewScreenTitle": "Your pauses",
+    "reviewLead": "Look back at each moment.\nWhat did you do?",
+    "sectionToday": "Today",
+    "outcomeHeld": "I held",
+    "outcomeBought": "I bought",
+    "outcomeSold": "I sold",
+    "outcomeGroupAria": "What did you do for this pause?",
+    "reviewNoContext": "No reflection line was saved for this pause.",
+    "openArchiveFullDetail": "Open Archive for full detail",
+    "heldAllPill": "Held all",
+    "heldRest": "Held rest",
+    "applyFailed": "Could not save outcomes. Check your connection and try again.",
+    "applyPartialFailed": "{{count}} pause(s) could not be saved. Fix your connection or try again.",
+    "reviewTitle": "Pauses to review",
+    "reviewSub": "These expired without an outcome. Open your Archive for full detail on each pause.",
+    "successHeadline": "Held through your stack",
+    "successSub": "Your outcomes are logged. Echoes capture what surfaced during each pause.",
+    "successChosen": "You chose deliberately",
+    "successHeldLine": "Held through {{count}} pauses",
+    "successConviction": "+{{count}} conviction",
+    "echoesCardTitle": "Echoes",
+    "echoesCardBody": "Revisit reflections and artifacts from these pauses in Echoes.",
+    "viewEchoes": "View Echoes",
     "allMarkedHold": "{{count}} pauses marked as Hold"
   },
   "snooze": {
+    "toolbarAria": "Snooze automatic pauses",
     "pausePauses": "Snooze pauses",
     "snoozeFor": "Snooze for",
     "2h": "2 hours",
@@ -1927,6 +2207,8 @@
     "activated": "Pauses snoozed for {{hours}}h",
     "cancelled": "Snooze cancelled",
     "activeLabel": "Snoozed · {{time}} left",
-    "wake": "Wake"
+    "wake": "Wake",
+    "untilTomorrow": "Until tomorrow (8am)",
+    "untilTomorrowActivated": "Snoozed until tomorrow 8am"
   }
 }

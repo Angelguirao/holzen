@@ -19,7 +19,7 @@ The authoritative list of PostHog events Holzen emits. Deliberate events only �
 
 ## Instrumentation status
 
-- **Wired (PostHog):** `auth.*`, `navigation.primary_tab_opened`, `pause.manual_started` / `pause.manual_completed` (Home “Need a moment” + `holzen-reflect` + V2 instance), `pause_instance_created` (manual new instance), `pause_engaged`, `pause_completed`, `pause_companion_counted` / `pause_companion_not_counted` (from `pause_log_step` / `pause_log_companion` RPCs), `generation.initiated`, `companion.served`, `paywall.viewed` (feature-gate, limit hit, upgrade buttons in Settings), `paywall.subscribed` (subscription checkout return; `plan` from `check-subscription` `subscription_billing_interval` when a fresh Stripe read is available, else `unknown`), `feedback.submitted` (after `send-feedback` success), `performance.web_vital`, `ritual.suggested` / `ritual.suggestion_refreshed` / `ritual.accepted` / `ritual.declined` (Ground), plus **companion idempotency diagnostics** below.
+- **Wired (PostHog):** `auth.*`, `navigation.primary_tab_opened`, `home.customize_opened`, `home.optional_widget_toggled`, `home.customize_reset_layout`, `home.hero_quote_viewed`, `home.market_chart_expand_toggled`, `home.goal_why_expand_toggled`, `pause.manual_started` / `pause.manual_completed` (Home “Need a moment” + `holzen-reflect` + V2 instance), `pause_instance_created` (manual new instance), `pause_engaged`, `pause_completed`, `pause_companion_counted` / `pause_companion_not_counted` (from `pause_log_step` / `pause_log_companion` RPCs), `pause_reflect_share_tap` / `pause_reflect_wallpaper_tap` (Reflect step actions), `generation.initiated`, `companion.served`, `paywall.viewed` (feature-gate, limit hit, upgrade buttons in Settings), `paywall.subscribed` (subscription checkout return; `plan` from `check-subscription` `subscription_billing_interval` when a fresh Stripe read is available, else `unknown`), `feedback.submitted` (after `send-feedback` success), `performance.web_vital`, `ritual.suggested` / `ritual.suggestion_refreshed` / `ritual.accepted` / `ritual.declined` (Ground), plus **companion idempotency diagnostics** below.
 - **Postgres (not PostHog):** PWA install prompts (`InstallHolzenCard` → `analytics_events`), edge `trackEvent` AI call counters, etc.
 - **Convention:** every new event adds a row below AND a `trackEvent` call in source — never define events only in the PostHog UI.
 
@@ -37,9 +37,11 @@ The authoritative list of PostHog events Holzen emits. Deliberate events only �
 
 | Event | When | Properties | Owner |
 |---|---|---|---|
-| `navigation.primary_tab_opened` | User taps a **different** primary bottom tab (shell) than the current one | `{ tab: 'home' \| 'library' \| 'tools' \| 'journey' \| 'settings' }` | @holzen |
+| `navigation.primary_tab_opened` | User taps a **different** primary bottom tab (shell) than the current one | `{ tab: 'home' \| 'archive' \| 'tools' \| 'journey' \| 'settings' }` | @holzen |
 
 Does not fire when re-tapping the active tab or when navigation is not from the bottom bar (e.g. deep link, back button).
+
+The Archive tab uses route `/archive` and reports `tab: 'archive'`.
 
 ### auth
 
@@ -48,6 +50,17 @@ Does not fire when re-tapping the active tab or when navigation is not from the 
 | `auth.signed_up` | First successful sign-up (once per user) | `{ provider: 'email' \| 'google' \| ... }` | @holzen |
 | `auth.signed_in` | Every successful sign-in (not on session refresh) | `{ provider }` | @holzen |
 | `auth.signed_out` | Explicit sign-out action (not session expiry) | `{}` | @holzen |
+
+### home
+
+| Event | When | Properties | Owner |
+|---|---|---|---|
+| `home.customize_opened` | User opens the Customize sheet (bottom sheet) | `{}` | @holzen |
+| `home.optional_widget_toggled` | User toggles a Home section on/off in Customize | `{ widget_id: string; visible: boolean }` — `widget_id` is one of `quick-capture`, `night`, or `journey-pulse` (Holzen score + In motion). `goal-why`, `market`, and `your-pause` are always on (layout anchors) and do not emit this event. | @holzen |
+| `home.customize_reset_layout` | User taps “Reset to defaults” in Customize (section order, collapse, visibility, and Zen cleared to Hold) | `{}` | @holzen |
+| `home.hero_quote_viewed` | Once per Home mount after profile is loaded (daily hero line) | `{ quote_index: number; utc_ymd: string }` — `quote_index` is `0..9` from `heroQuoteIndexForDay`; no quote text | @holzen |
+| `home.market_chart_expand_toggled` | User toggles Market chart / 24h detail (chevron next to headline price) | `{ expanded: boolean }` | @holzen |
+| `home.goal_why_expand_toggled` | User toggles “Why you stay” (hold goal details + mantra / motivations) | `{ expanded: boolean }` | @holzen |
 
 ### pause — Home manual message (AI)
 
@@ -66,12 +79,16 @@ Include `pause_instance_id` on each event so journeys line up with Sentry + Bett
 
 | Event | When | Properties | Owner |
 |---|---|---|---|
-| `pause_instance_created` | A `pause_instances` row lands in state `active` (manual hook or cron). | `{ pause_instance_id; template_slug; source: 'manual' \| 'cron_volatility' \| …; severity: 'mild' \| 'moderate' \| 'high' }` | @holzen |
+| `pause_instance_created` | A new `pause_instances` row is created (manual hook or cron): `active` or `pending` when a new context is queued behind an open pause. | `{ pause_instance_id; template_slug; source: 'manual' \| 'cron_volatility' \| …; severity: 'mild' \| 'moderate' \| 'high'; pending_offer?: boolean }` | @holzen |
+| `pause_pending_adopted` | User confirms switching from the modal; prior open pause is expired `superseded`. | `{ pause_instance_id }` (the newly active instance) | @holzen |
+| `pause_pending_declined` | User keeps the current pause; pending row expired `system_cancelled`. | `{ pause_instance_id }` (the declined pending row) | @holzen |
 | `pause_engaged` | `pause_log_step` returns `engaged` (first time per instance in-tab). | `{ pause_instance_id }` (optional: extend with `ms_since_created` when cheap) | @holzen |
 | `pause_completed` | `pause_log_step` returns `completed` (first time per instance in-tab). | `{ pause_instance_id }` | @holzen |
-| `pause_expired` | Sweeper or explicit expire. | *Not emitted from the React app today* — server-side if added later. | @holzen |
+| `pause_expired` | Sweeper or explicit expire (reasons include `window_elapsed`, `open_max_age`, `superseded`, …). | *Not emitted from the React app today* — server-side if added later. | @holzen |
 | `pause_companion_counted` | Companion complete event with `counts_for_pause=true`. | `{ pause_instance_id; companion_type; entry_point: 'pause_flow' \| 'library' \| 'bell' \| 'admin_preview' }` | @holzen |
 | `pause_companion_not_counted` | Companion complete event with `counts_for_pause=false`. | `{ pause_instance_id?: string; companion_type; reason: 'no_active_pause' \| 'outside_window' \| 'context_lost' \| 'not_allowed_for_template' \| 'already_counted'; entry_point }` | @holzen |
+| `pause_reflect_share_tap` | User taps Share on the Reflect step (Web Share API or clipboard fallback). | `{ surface: 'pause_reflect'; has_pause_id: boolean }` | @holzen |
+| `pause_reflect_wallpaper_tap` | User taps Wallpaper (clipboard + guidance toast). | `{ surface: 'pause_reflect' }` | @holzen |
 
 PII stance unchanged: no generated pause message text, no companion content, no mood/outcome payload values — just ids, types, and numeric metadata.
 

@@ -218,6 +218,29 @@ SELECT cron.schedule(
 );
 ```
 
+## Pause TTL sweep (`pause_sweep_window_elapsed`)
+
+Runs in Postgres as **`service_role`** only. Despite the name, the
+function batches **three** expiry paths (see
+[`docs/systems/pause-system.md`](../systems/pause-system.md) §3):
+
+1. `active|engaged` past `window_ends_at` → `window_elapsed`
+2. `active|engaged` with `created_at` older than **12 hours** → `open_max_age`
+3. `pending` offers older than **12 hours** → `system_cancelled`
+
+Schedule with pg_cron at least **hourly** (minute cadence is fine). If
+this job never runs, open pauses can linger past the 12h cap until the
+next step/companion insert triggers `pause_evaluate_transitions` (which
+also enforces `open_max_age`).
+
+```sql
+SELECT cron.schedule(
+  'pause-sweep-window-elapsed',
+  '0 * * * *',
+  $$ SELECT public.pause_sweep_window_elapsed(); $$
+);
+```
+
 ## Follow-up Check (`check-followups`) — **removed (Pause V2)**
 
 > **Pause V2:** the `follow_ups` table, the `check-followups` edge function, and the `check-followups-hourly` pg_cron job were removed in [`20260423202000_pause_v2_destructive_cutover.sql`](../../supabase/migrations/20260423202000_pause_v2_destructive_cutover.sql). Mirror outcomes now come from **`pause_step_events`** / **`v_pause_full`** (see `buildMirror` in `_shared/generators/mirror.ts`). **Do not** re-schedule the SQL below.

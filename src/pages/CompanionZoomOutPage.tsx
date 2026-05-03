@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { useNavigate, useParams, useLocation, Navigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useHolzen } from '@/hooks/use-holzen';
@@ -12,11 +12,10 @@ import { ReadTime } from '@/components/companion/ReadTime';
 import { WhyThisCard } from '@/components/companion/WhyThisCard';
 import { HistoryThread } from '@/components/companion/HistoryThread';
 import { InterventionCrossRefBadge } from '@/components/companion/InterventionCrossRefBadge';
-import { SaveThisMomentButton } from '@/components/companion/SaveThisMomentButton';
 import { useStaggeredReveal } from '@/components/companion/use-staggered-reveal';
 import { useFullviewTelemetry } from '@/hooks/use-fullview-telemetry';
 import { PageMeta } from '@/components/PageMeta';
-import { zoomOutSaveThisMomentSeed, zoomOutTotalCharsForReadTime } from '@/lib/zoom-out-payload';
+import { zoomOutTotalCharsForReadTime } from '@/lib/zoom-out-payload';
 
 const SEVERITY_NUMBER: Record<string, number> = { mild: 3, moderate: 6, high: 10 };
 const BREATHING_ROOM_MS = 8000;
@@ -98,14 +97,9 @@ export default function CompanionZoomOutPage() {
   const revealed = useStaggeredReveal(BREATHING_ROOM_MS);
   useFullviewTelemetry('zoomOut', pauseInstanceId);
 
-  const zoomOutSaveSeed = useMemo(
-    () => (zoomOut ? zoomOutSaveThisMomentSeed(zoomOut) : null),
-    [zoomOut],
-  );
-
   const handleBack = useCallback(() => {
     const st = location.state as { from?: string } | undefined;
-    if (st?.from === 'library') navigate('/library');
+    if (st?.from === 'archive') navigate('/archive');
     else navigate(-1);
   }, [location.state, navigate]);
 
@@ -162,12 +156,6 @@ export default function CompanionZoomOutPage() {
         )}
         {zoomOut && revealed && (
           <div className="space-y-4 border-t border-border/20 pt-5 animate-in fade-in duration-500">
-            <SaveThisMomentButton
-              seedTitle={zoomOutSaveSeed?.deepTimeTitle ?? t('companions.zoomOut')}
-              seedContext={zoomOutSaveSeed?.context ?? ''}
-              companion="zoomOut"
-              pauseInstanceId={pauseInstanceId}
-            />
             <CompanionFeedback
               pauseInstanceId={pauseInstanceId}
               companionType="zoom_out"

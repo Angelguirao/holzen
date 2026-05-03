@@ -3,13 +3,14 @@ import { Link } from 'react-router-dom';
 import { motion, useReducedMotion } from 'framer-motion';
 import { ArrowLeft, ArrowRight } from 'lucide-react';
 import { useQuery } from '@tanstack/react-query';
+import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
 import { format } from 'date-fns';
 import { PageMeta } from '@/components/PageMeta';
 import { PublicFooter } from '@/components/PublicFooter';
 import { useInfiniteScroll } from '@/hooks/use-infinite-scroll';
 import { useTranslation } from 'react-i18next';
-import { NoxHeaderMain } from '@/components/ui/nox-header';
+import { PageHeading } from '@/components/PageHeading';
 
 const PAGE_SIZE = 20;
 
@@ -36,7 +37,7 @@ const Blog = () => {
   const [hasMore, setHasMore] = useState(true);
   const [loadingMore, setLoadingMore] = useState(false);
 
-  const { isLoading } = useQuery({
+  const { isLoading, isError, refetch, isFetching } = useQuery({
     queryKey: ['blog-posts-initial'],
     queryFn: async () => {
       const { data, error } = await supabase
@@ -58,18 +59,23 @@ const Blog = () => {
     setLoadingMore(true);
     const last = posts[posts.length - 1];
     if (!last?.published_at) { setLoadingMore(false); return; }
-    const { data } = await supabase
+    const { data, error } = await supabase
       .from('blog_posts')
       .select('id, slug, title, excerpt, published_at')
       .eq('published', true)
       .order('published_at', { ascending: false })
       .lt('published_at', last.published_at)
       .limit(PAGE_SIZE);
+    if (error) {
+      toast.error(t('blog.loadMoreFailed'));
+      setLoadingMore(false);
+      return;
+    }
     const rows = (data ?? []) as BlogPost[];
     setPosts((prev) => [...prev, ...rows]);
     setHasMore(rows.length === PAGE_SIZE);
     setLoadingMore(false);
-  }, [loadingMore, hasMore, posts]);
+  }, [loadingMore, hasMore, posts, t]);
 
   const sentinelRef = useInfiniteScroll({ hasMore, loading: loadingMore, onLoadMore: loadMore });
 
@@ -87,7 +93,7 @@ const Blog = () => {
             {t('common.back')}
           </Link>
         </motion.div>
-        <NoxHeaderMain title={t('blog.title')} />
+        <PageHeading title={t('blog.title')} />
 
         {isLoading ? (
           <div className="space-y-6">
@@ -99,6 +105,18 @@ const Blog = () => {
               </div>
             ))}
           </div>
+        ) : isError ? (
+          <motion.div {...m(0.1)} className="space-y-4 py-8">
+            <p className="text-sm text-foreground">{t('blog.loadFailed')}</p>
+            <button
+              type="button"
+              onClick={() => void refetch()}
+              disabled={isFetching}
+              className="text-xs font-mono text-primary hover:underline disabled:opacity-50"
+            >
+              {t('common.tryAgain')}
+            </button>
+          </motion.div>
         ) : posts && posts.length > 0 ? (
           <div className="space-y-8">
             {posts.map((post, i) => (

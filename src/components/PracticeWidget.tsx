@@ -8,8 +8,9 @@ import { toast } from 'sonner';
 import { useNavigate } from 'react-router-dom';
 import { homeInWidget } from '@/components/home/home-widget-styles';
 import { TOOLS } from '@/lib/app-routes';
+import { fetchPracticeSuggestions, type SuggestedPracticeId } from '@/lib/practice-suggestion';
 
-type PracticeId = 'checkin' | 'journal' | 'bodyscan' | 'replay';
+type PracticeId = SuggestedPracticeId;
 
 const PRACTICES = [
   { id: 'checkin' as const, icon: Waves, labelKey: 'practice.checkinLabel', descKey: 'practice.checkinDesc', free: true, route: TOOLS.practice.checkin },
@@ -24,56 +25,14 @@ function useSuggestion(userId: string | undefined) {
 
   useEffect(() => {
     if (!userId) return;
-    (async () => {
-      const sevenDaysAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString();
-      const { data: entries } = await supabase
-        .from('practice_entries')
-        .select('type, mood, created_at')
-        .eq('user_id', userId)
-        .gte('created_at', sevenDaysAgo)
-        .order('created_at', { ascending: false })
-        .limit(50);
-
-      if (!entries || entries.length === 0) {
-        setSuggestion({
-          id: 'checkin',
-          reason: t('practice.suggestFirstCheckin', { defaultValue: 'Start with a quick emotional check-in' }),
-        });
+    void (async () => {
+      const list = await fetchPracticeSuggestions(userId, 1);
+      const first = list[0];
+      if (!first) {
+        setSuggestion(null);
         return;
       }
-
-      const counts: Record<string, number> = {};
-      for (const e of entries) counts[e.type] = (counts[e.type] || 0) + 1;
-
-      const lastCheckin = entries.find(e => e.type === 'checkin');
-      const daysSinceCheckin = lastCheckin
-        ? Math.floor((Date.now() - new Date(lastCheckin.created_at).getTime()) / 86400000)
-        : 999;
-
-      const reactiveMoods = ['anxious', 'fearful', 'fomo'];
-      const recentMoods = entries.filter(e => e.mood && reactiveMoods.includes(e.mood));
-
-      if (daysSinceCheckin >= 3) {
-        setSuggestion({
-          id: 'checkin',
-          reason: t('practice.suggestCheckin', { defaultValue: "It's been a few days — how are you feeling?" }),
-        });
-      } else if (recentMoods.length >= 2) {
-        setSuggestion({
-          id: 'bodyscan',
-          reason: t('practice.suggestBodyscan', { defaultValue: "You've been reactive — try grounding yourself" }),
-        });
-      } else if (!counts['journal'] || counts['journal'] < 2) {
-        setSuggestion({
-          id: 'journal',
-          reason: t('practice.suggestJournal', { defaultValue: 'A guided journal might surface new patterns' }),
-        });
-      } else {
-        setSuggestion({
-          id: 'replay',
-          reason: t('practice.suggestReplay', { defaultValue: 'Revisit a past reflection with fresh eyes' }),
-        });
-      }
+      setSuggestion({ id: first.id, reason: t(first.reasonKey) });
     })();
   }, [userId, t]);
 

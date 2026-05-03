@@ -38,7 +38,7 @@ Links use explicit HTML anchors before each numbered section so jumps behave con
 
 1. **Trigger** — User opens Pause (client) *or* the `check-volatility` cron decides a user crossed thresholds.
 2. **Reflection** — Short copy (+ optional haiku) anchored to market **context** (e.g. “BTC is down 5.2%…”).
-3. **Persist** — Create or reuse a `pause_instances` row via `pause_create_or_reuse` (manual) or `pause_create_or_reuse_as` (automatic), upsert **`pause_ai_artifacts`** (`reflection_text`, optional `haiku`, later slots), and upsert the **`library_items`** bookmark where applicable. **`check-volatility`** also updates **`profiles.last_message`** / **`last_context`** for delivery/digest parity; **`use-holzen`** does **not** write those profile fields today (the pause row + artifacts are the manual source of truth). **`profiles.last_trigger_at`** advances on the **automatic** claim path; **silent** manual mode follows trigger-like rules (§2.3.B).
+3. **Persist** — Create or reuse a `pause_instances` row via `pause_create_or_reuse` (manual) or `pause_create_or_reuse_as` (automatic), upsert **`pause_ai_artifacts`** (`reflection_text`, optional `haiku`, later slots). **`check-volatility`** also updates **`profiles.last_message`** / **`last_context`** for delivery/digest parity; **`use-holzen`** does **not** write those profile fields today (the pause row + artifacts are the manual source of truth). **`profiles.last_trigger_at`** advances on the **automatic** claim path; **silent** manual mode follows trigger-like rules (§2.3.B).
 4. **Intervention** — `companion-orchestrate` (intervention-only call, no companion slots) chooses an **intervention** (mirror / trap / pattern / question) and persists it. See **§7** for a per-type reference.
 5. **Companion cards (lazy)** — When the user **taps/expands** a companion card, a **single-slot** `companion-orchestrate` call generates that companion on demand. Each generator tries **library → cache → live → curated** (phase ordering controlled by `COMPANION_PHASE_`* env vars in `_shared/phase-config.ts`).
 6. **Surface** — Client shows `InterventionSection` plus optional companion cards from user preferences.
@@ -110,7 +110,7 @@ If two rows in the reference table below look “duplicated,” check whether th
 
 **B. Guards: when a pause is allowed**
 
-- **Manual:** A **short client cooldown** (15 minutes in production, 5 seconds in dev) so repeated taps do not hammer APIs. There is **no** “market must have moved X%” rule—you already decided to pause. A **normal** manual pause does **not** advance **`profiles.last_trigger_at`** (your **automatic** cooldown is not consumed by a voluntary pause). **Silent mode** is special: it is meant to align with **trigger-like** behavior (see product rules in code). Manual path does **not** currently update **`profiles.last_message`** / **`last_context`** in the same way **`check-volatility`** does.
+- **Manual:** A **short client cooldown** (1 hour in production, 5 seconds in dev) so repeated taps do not hammer APIs. There is **no** “market must have moved X%” rule—you already decided to pause. A **normal** manual pause does **not** advance **`profiles.last_trigger_at`** (your **automatic** cooldown is not consumed by a voluntary pause). **Silent mode** is special: it is meant to align with **trigger-like** behavior (see product rules in code). Manual path does **not** currently update **`profiles.last_message`** / **`last_context`** in the same way **`check-volatility`** does.
 - **Automatic:** Per-profile **thresholds** (`threshold` / `threshold_down`, `cumulative_threshold`), `**cooldown_hours`**, quiet hours (timezone + `**quiet_windows`**), `**snoozed_until**`, plus **optimistic claiming** on `**last_trigger_at`** so two workers do not double-fire.
 
 *Why:* proactive interrupts need **strong anti-spam** rules. Voluntary pauses need a **light** throttle only. Splitting `**last_trigger_at*`* avoids punishing automatic cadence when someone reflects manually.
@@ -183,7 +183,7 @@ Up to **five** recent haikus and **five** recent reflect-step **messages** (from
 
 **H. Notifications and profile bookkeeping**
 
-- **Manual:** In-app delivery; **`use-holzen`** persists **`pause_instances`** + **`pause_ai_artifacts`** + **`library_items`** after `**holzen-reflect`** succeeds (no legacy **`reflections`** insert). **`profiles.last_message`** / **`last_context`** are **not** updated by that hook in the current code.  
+- **Manual:** In-app delivery; **`use-holzen`** persists **`pause_instances`** + **`pause_ai_artifacts`** after `**holzen-reflect`** succeeds (no legacy **`reflections`** insert). **`profiles.last_message`** / **`last_context`** are **not** updated by that hook in the current code.  
 - **Automatic:** Push / optional email / unified **`notifications`** feed (and any digest paths) as configured; `**last_trigger_at`** updated when claiming work; **`check-volatility`** updates **`profiles.last_message`** / **`last_context`** when it creates the pause message.
 
 *Why:* automatic pause must **reach** the user outside the app; manual pause already has them in-session.
@@ -220,7 +220,7 @@ flowchart TB
   subgraph MANUAL [Manual pause — client]
     BTC[fetchBtcData\ncontext string]
     HR[holzen-reflect\nuser JWT]
-    INS[Client: pauseCreateOrReuse\npause_ai_artifacts + library_items\nupdate profile]
+    INS[Client: pauseCreateOrReuse\npause_ai_artifacts]
     UCD[use-companion-data\ncompanion-orchestrate\nuser JWT]
     BTC --> HR --> INS --> UCD
   end
@@ -256,9 +256,9 @@ flowchart TB
 
 ## 4. Client flow after reflect-step (manual path, Pause V2)
 
-This section is **client-centric**: `**use-holzen`** and `**use-companion-data`** run **in the browser** (React); `**holzen-reflect`** and `**companion-orchestrate`** are **HTTP edge functions**; persistence uses **`pause_instances`**, **`pause_ai_artifacts`**, and **`library_items`** via the **Supabase client** under **RLS** (no **`profiles.last_message`** update in this hook — see §2.3.H). Canonical tables and transitions: [pause-system.md](../pause-system.md).
+This section is **client-centric**: `**use-holzen`** and `**use-companion-data`** run **in the browser** (React); `**holzen-reflect`** and `**companion-orchestrate`** are **HTTP edge functions**; persistence uses **`pause_instances`** and **`pause_ai_artifacts`** via the **Supabase client** under **RLS** (no **`profiles.last_message`** update in this hook — see §2.3.H). Canonical tables and transitions: [pause-system.md](../pause-system.md).
 
-1. `**use-holzen.ts`** — Builds context, calls `**holzen-reflect**`, then **`pauseCreateOrReuse`** (RPC). Upserts **`pause_ai_artifacts`** + **`library_items`** bookmark (`pause_instance_id`). React tracks **`lastPauseInstanceId`** (not `lastReflectionId`).
+1. `**use-holzen.ts`** — Builds context, calls `**holzen-reflect**`, then **`pauseCreateOrReuse`** (RPC). Upserts **`pause_ai_artifacts`**. React tracks **`lastPauseInstanceId`** (not `lastReflectionId`).
 2. **Pause UI** — `**use-companion-data.ts`** receives **`pauseInstanceId`**, **`context`**, **`reflectionMessage`** (prop name = AI reflect-step text), **`mood`**, **`severityNumber`**, language.
 3. `**use-companion-data**` (mount) — Hydrates companion payloads from **`pause_ai_artifacts`** where present; calls **`companion-orchestrate`** for intervention + cached reads using **`pauseInstanceId`**.
 4. `**use-companion-data`** (on tap) — `**fetchCompanion(slot)`** calls **`companion-orchestrate`** with a single **`enable*`** flag (`holzenInvokeSource: 'browser_lazy_fetch'`). Results persist via **`writeCompanionData`** into **`pause_ai_artifacts`** (library → cache → live → curated ordering unchanged).
@@ -271,7 +271,7 @@ This section is **client-centric**: `**use-holzen`** and `**use-companion-data`*
 | ---- | ----- | -------------- |
 | 1 | Browser | `**fetchBtcData**` builds **context** (24h / optional 7d, Fear & Greed / on-chain enrichment). |
 | 2 | Edge `**holzen-reflect**` | Returns **`message`** (+ optional haiku / grounding preview JSON). |
-| 3 | Browser + Postgres | **`pauseCreateOrReuse`** → **`pause_ai_artifacts`** upserts + **`library_items`** bookmark. |
+| 3 | Browser + Postgres | **`pauseCreateOrReuse`** → **`pause_ai_artifacts`** upserts. |
 | 4 | Pause UI | **`use-companion-data`** uses **`pauseInstanceId`**; intervention + lazy fetches call **`companion-orchestrate`**. |
 
 **Silent mode:** `**holzen-reflect**` is not called; client still runs **`pauseCreateOrReuse`** and writes “BTC moved.” into **`pause_ai_artifacts`**.
@@ -588,7 +588,7 @@ flowchart TB
 | `zoomOut`    | `zoom_out_deep_time`             | `zoom_out_deep_time`                                             | Zoom card **or** intervention **secondary**             |
 
 
-Reads that need hydrated pause + companion text use **`v_pause_full`** and/or **`pause_ai_artifacts`** (see **`use-companion-data`** and library/history queries) — not legacy **`v_reflection_with_companions`** / **`reflection_companions`** (removed in Pause V2).
+Reads that need hydrated pause + companion text use **`v_pause_full`** and/or **`pause_ai_artifacts`** (see **`use-companion-data`** and archive/history surfaces) — not legacy **`v_reflection_with_companions`** / **`reflection_companions`** (removed in Pause V2).
 
 ---
 
@@ -597,7 +597,6 @@ Reads that need hydrated pause + companion text use **`v_pause_full`** and/or **
 - `**pause_instances**` — Canonical pause row: state machine, `**context_snapshot**`, outcomes, timestamps (see [pause-system.md](../pause-system.md)).
 - `**pause_step_events**` — Append-only step / mood / note events for the pause lifecycle.
 - `**pause_ai_artifacts**` — One row per (`pause_instance_id`, `kind`) for reflect-step text, haiku, companions, intervention payloads (`writeCompanionData` upserts here).
-- `**library_items**` — Auto-bookmark of the reflect step (`pause_instance_id`) where applicable.
 - `**companion_serves**` — Analytics per serve (source, latency, fingerprint).
 - `**generation_attempts**` — Model attempts, tokens, estimated cost (where instrumented).
 - `**analytics_events**` — e.g. `pause_ai_call`, `intervention_selected`, `reflection_generated` (legacy event name retained for dashboards).
@@ -613,7 +612,7 @@ Reads that need hydrated pause + companion text use **`v_pause_full`** and/or **
 | Piece                        | Role                                                                                                                                                                                                      |
 | ---------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `use-holzen.ts`              | BTC context, manual cooldown, `holzen-reflect`, `pauseCreateOrReuse` + `pause_ai_artifacts` upserts, initial companion state from reflect response                                                                                       |
-| `use-companion-data.ts`      | Intervention-only orchestrate on mount, lazy per-slot `fetchCompanion` on card tap, per-companion loading/errors, recency hints, library auto-save hooks                                                  |
+| `use-companion-data.ts`      | Intervention-only orchestrate on mount, lazy per-slot `fetchCompanion` on card tap, per-companion loading/errors, recency hints; companion payloads persist in **`pause_ai_artifacts`** only                         |
 | `InterventionSection.tsx`    | Renders mirror / trap / pattern / question + optional zoom-out secondary                                                                                                                                  |
 | `CompanionSection.tsx`       | Container for companion cards and prefs; hides Zoom Out card when intervention already shows zoom-out secondary (§7.5). Each companion card has an **"Open full view"** button wired to the routes below. |
 | `src/lib/companion-types.ts` | Canonical type strings shared with tests; full intervention ↔ generator ↔ UI map in **§7**                                                                                                                |
@@ -638,10 +637,9 @@ Shared primitives reused across all four pages (in `src/components/companion/`):
 - `**WhyThisCard**` — collapsible disclosure that explains the orchestrator's pick in terms of mood + market direction + session `preferredBias`. Renders nothing if none of the three are known.
 - `**HistoryThread**` — the last 5 cards of the same companion type for this user, deep-linking to their own Full Views.
 - `**InterventionCrossRefBadge**` — small "This was also today's headline" tag for `grounding`/`history`/`zoomOut` when their payload was also the featured intervention (see §7.2 / §7.3 / §7.5).
-- `**useStaggeredReveal**` — 8 s breathing-room delay before feedback + save CTAs appear. Honors `prefers-reduced-motion` (skips the delay for accessibility).
-- `**SaveThisMomentButton**` — **Pro-gated** note capture that writes a `library_items` row of `type: note`, `source_type: companion_moment`. Distinct from the existing auto-bookmark of the card itself. Free users see a locked state with an upgrade toast.
+- `**useStaggeredReveal**` — 8 s breathing-room delay before feedback CTAs appear. Honors `prefers-reduced-motion` (skips the delay for accessibility).
 
-The "Open full view" navigation is always free. The only Full View action behind Pro today is **Save this moment**; the autosave of the card's content itself continues to work for free users (`companion-library-autosave.ts`).
+The "Open full view" navigation is always free. Companion card bodies are already persisted on **`pause_ai_artifacts`** when generated; Full View adds reading affordances and feedback, not a separate bookmark table.
 
 Page mounts fire a single `companion_fullview_opened` analytics event (user, pause instance, companion) via `useFullviewTelemetry`, so Full View adoption can be tracked independently of inline card impressions.
 
