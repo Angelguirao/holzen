@@ -30,7 +30,7 @@ import { BRIEF_PAUSE_ORDER, computeBriefMacroProgressPosition } from '@/lib/brie
 import { computeBriefPastStepClick } from '@/lib/brief-pause-past-step-click';
 import { computePauseGoBackPlan } from '@/lib/pause-go-back-plan';
 import { pauseStepSwipeDirection } from '@/lib/pause-step-swipe-direction';
-import { computePauseHeaderBackIntent, isPauseSessionHeaderBackVisible } from '@/lib/pause-session-header-back';
+import { isPauseSessionHeaderBackVisible } from '@/lib/pause-session-header-back';
 import { PauseBriefFeel, type BriefFeelTile } from '@/components/pause/PauseBriefFeel';
 import { PauseBriefIntegrate } from '@/components/pause/PauseBriefIntegrate';
 import { PauseAboutPausesBody } from '@/components/pause/PauseAboutPausesBody';
@@ -67,6 +67,7 @@ import { usePauseShiftFrameDoneHandler } from '@/hooks/use-pause-shift-frame-don
 import { usePauseSessionDecideHandler } from '@/hooks/use-pause-session-decide-handler';
 import { usePauseSessionExitNavigation } from '@/hooks/use-pause-session-exit-navigation';
 import { usePauseSessionBreathStepHandlers } from '@/hooks/use-pause-session-breath-step-handlers';
+import { usePauseSessionHeaderBackHandler } from '@/hooks/use-pause-session-header-back-handler';
 import type { PauseImpactData } from '@/lib/pause-impact-data';
 import { showPauseStepSyncFailedToast } from '@/lib/pause-step-sync-toast';
 import { usePauseSessionShell } from '@/hooks/use-pause-session-shell';
@@ -326,38 +327,8 @@ export default function PauseSession() {
     if (step !== 'breathe' && step !== 'breath2') setBreathTimedActive(false);
   }, [step, ritualEntry, briefStep]);
 
-  const handlePauseHeaderBack = useCallback(() => {
-    const intent = computePauseHeaderBackIntent({
-      ritualEntry,
-      briefStep,
-      step,
-      breathTimedActive,
-      breathingFirstCompleted,
-      breathingSecondCompleted,
-    });
-    switch (intent.kind) {
-      case 'brief_breath_reset_intro':
-        breathingRef.current?.resetToIntro();
-        return;
-      case 'brief_breath_reset_intro_clear_first':
-        breathingRef.current?.resetToIntro();
-        setBreathingFirstCompleted(false);
-        return;
-      case 'deep_breath_reset_intro':
-        breathingRef.current?.resetToIntro();
-        return;
-      case 'deep_breathe_reset_intro_clear_first':
-        breathingRef.current?.resetToIntro();
-        setBreathingFirstCompleted(false);
-        return;
-      case 'deep_breath2_reset_intro_clear_second':
-        breathingRef.current?.resetToIntro();
-        setBreathingSecondCompleted(false);
-        return;
-      case 'go_back':
-        goBack();
-    }
-  }, [
+  const { handlePauseHeaderBack } = usePauseSessionHeaderBackHandler({
+    breathingRef,
     ritualEntry,
     briefStep,
     step,
@@ -365,7 +336,9 @@ export default function PauseSession() {
     breathingFirstCompleted,
     breathingSecondCompleted,
     goBack,
-  ]);
+    setBreathingFirstCompleted,
+    setBreathingSecondCompleted,
+  });
 
   const showPauseHeaderBack = isPauseSessionHeaderBackVisible({
     phase,
