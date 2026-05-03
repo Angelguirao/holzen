@@ -27,6 +27,7 @@ This folder contains human-readable notes that complement the source code and in
 | Step-by-step HTTP review (Postman / Bruno) | [fundamentals/http-review-playbooks.md](fundamentals/http-review-playbooks.md) | Optional [bruno/](../bruno/) folder for git-friendly collections. |
 | Design system migration (Nox) | [design/nox/](design/nox/) + **[DESIGN.md](../DESIGN.md)** (root) | Figma is canonical for visual values; markdown owns migration rules, mapping, and extension policy. **DESIGN.md** is the agent-oriented token + rules file ([Google format](https://github.com/google-labs-code/design.md)); runtime CSS is still **`src/index.css`**. |
 | App information architecture (routes, primary nav) | [design/information-architecture.md](design/information-architecture.md) | Product-level map of shipped routing, bottom nav, and **§1.7** PostHog `navigation.*` events; keep aligned with `src/App.tsx`, `AGENTS.md`, and [ops/event-taxonomy.md](ops/event-taxonomy.md) when events change. |
+| **React screen composition** (orchestration, hooks, memoization, reuse) | [fundamentals/react-screen-orchestration.md](fundamentals/react-screen-orchestration.md) | Principles abstracted from Home refactor; apply to other `src/pages/*` surfaces. |
 | **Live browser 360°** (MCP: network, console, Lighthouse, performance) | [fundamentals/browser-360-mcp-playbook.md](fundamentals/browser-360-mcp-playbook.md) | Pairs with source reading; optional snapshot reports under [reports/](reports/). |
 | **UI / journeys** (click-through flows in the real app) | [backlog/e2e-browser-automation.md](backlog/e2e-browser-automation.md) | **Not** a substitute for HTTP review: use **Playwright**, **Cypress**, or **Vitest + React Testing Library** for full product flows; Bruno is for **API** review only. |
 
@@ -42,6 +43,7 @@ When you change behavior, update the **one** doc that owns that slice (and ADRs 
 
 - `fundamentals/navigating-the-codebase.md` — repo tour: boot flow, routing, auth, hooks, Supabase basics.
 - `fundamentals/refactoring-strategy.md` — incremental refactors: **React** pages/hooks (`src/lib` vs components) plus **full-stack touchpoints** (migrations, RLS, edges); pairs with [backlog/react-page-and-hook-splitting.md](backlog/react-page-and-hook-splitting.md).
+- **`fundamentals/react-screen-orchestration.md`** — **reusable playbook**: page as conductor, hook/lib splits, Rules of Hooks + early returns, lazy branches, memoized props, typing at source; distilled from [screens/home.md](screens/home.md).
 - `fundamentals/mental-models-for-contributors.md` — glossary + vocabulary for SPAs, React, TypeScript, Vite, Supabase (RLS, edge functions); links to official docs and learning resources.
 - `fundamentals/codebase-size-and-review-practices.md` — codebase size snapshot and review best-practices.
 - `fundamentals/http-review-playbooks.md` — step-by-step Postman/Bruno flows, Supabase `invoke` headers, pairing with Edge logs; [bruno/](../bruno/) collection, [bruno/SCOPE.md](../bruno/SCOPE.md) (HTTP vs full app), [bruno/functions-catalog.md](../bruno/functions-catalog.md) (full **`config.toml`** name list + Bruno smoke subset).
