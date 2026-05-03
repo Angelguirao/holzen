@@ -133,16 +133,18 @@ Payloads are `**jsonb**` on `**pause_step_events**`. Common shapes:
 
 The UI stepper order is fixed (Figma-aligned **deep pause**):
 
-`**feel` → `breathe` → `reflect` → `frame` → `breath2` → `decide`**
+`**feel` → `breathe` → `reflect` → `frame` → `breath2` → `choose` → `decide`**
 
 Defined as `**STEPS**` in `src/components/pause/PauseProgress.tsx` and used by `**PauseSessionScaffold**` for the header progress. Optional PostHog flag `**pause.step5_breath_label_shift**` renames the `**breath2**` bar to **Shift** (wireframe variant B).
 
-**Product defaults (Figma alignment):** macro step 4 is labeled **Frame** (not the wireframe **Explore** title variant). There is **no** separate post–breath **Choose** bridge screen in the client path yet (optional scope). Brief-vs-deep ritual shortening is not implemented as a separate profile in this pass.
+**Product defaults (Figma alignment):** macro step 4 is labeled **Frame** (not the wireframe **Explore** title variant). The **Choose** bridge (`**choose`**) sits between the second breathing segment and **Decide**; skipping the second breath still jumps straight to **Decide** (with back navigation returning to the breath step). **Brief-vs-deep** ritual shortening is not implemented as a separate profile yet.
+
+**Ritual audio:** the pause shell mute controls Web Audio cues in `**PauseBreathing**` (soft phase ticks + a short completion swell). Cues are suppressed when muted or when the user prefers reduced motion.
 
 ### 7.2 Hydration and local persistence
 
 - **Input:** `useHolzen()`, navigation `**location.state`**, and optional fetch-by-id when only `**pauseInstanceId**` is present.
-- **Resilience:** `src/lib/pause-session-storage.ts` `**saveSession` / `loadSession`** persist step, moods, intensities, `**breathingFirstCompleted**`, `**breathingSecondCompleted**`, `**frameDone**`, and `**pauseRitualSchema**` (v2) so a reload mid-ritual can resume. Older keys (`**breathingCompleted**`, five-step `**shift**`) are migrated on load.
+- **Resilience:** `src/lib/pause-session-storage.ts` `**saveSession` / `loadSession`** persist step, moods, intensities, `**breathingFirstCompleted**`, `**breathingSecondCompleted**`, `**frameDone**`, optional `**decideOnBackStep**` (`**choose**` vs `**breath2**` for Decide back when the second breath was skipped), and `**pauseRitualSchema**` (v3) so a reload mid-ritual can resume. Older keys (`**breathingCompleted**`, five-step `**shift**`, schema v2) are migrated on load.
 
 ### 7.3 When each RPC runs (happy path)
 
@@ -155,14 +157,15 @@ Defined as `**STEPS**` in `src/components/pause/PauseProgress.tsx` and used by `
 | **Breathe** (first) — Skip                | `**breath_completed`** with `**{ "skipped": true, "breath_segment": 1 }**`, then navigate to Reflect.                                                                                                                                     |
 | **Reflect**                               | Read-only for steps; **completion** needs `**pause_log_companion`** `**complete**` with `**counts_for_pause**` when the user finishes a counting card.                                                            |
 | **Frame** — **I'm done**                  | `**shift_emotion_logged`** with `**{ "from_frame_hub": true }**` (satisfies `**volatility_v1**` without a mirror mood), then navigate to second Breathe.                                                                                                                        |
-| **Breathe** (second segment) — Continue     | `**breath_completed**` with `**{ "breath_segment": 2 }**`, then Decide.                                                                                                                                          |
-| **Breathe** (second) — Skip               | `**breath_completed`** with `**{ "skipped": true, "breath_segment": 2 }**`, then Decide.                                                                                                                                                        |
+| **Breathe** (second segment) — Continue     | `**breath_completed**` with `**{ "breath_segment": 2 }**`, then **Choose** (not Decide).                                                                                                                                          |
+| **Choose** — primary CTA                    | Client-only transition to **Decide** (no dedicated `**pause_step_events**` type in the default path).                                                                                                                                           |
+| **Breathe** (second) — Skip               | `**breath_completed`** with `**{ "skipped": true, "breath_segment": 2 }**`, then **Decide** (bridge skipped).                                                                                                                                                        |
 | **Decide**                                | `**outcome_logged`**. The client **must not** clear home/session “done” state until the RPC succeeds; `**dismissMessage()`** runs **after** a successful outcome log to avoid racing `**pause_dismiss_current`**. |
 
 
 ### 7.4 Gesture parity (swipe)
 
-Horizontal drag calls `**goForward**` / `**goBack**`. **Forward** swipes are gated with `**canAdvanceFromPauseStep`** in `src/lib/pause-session-navigation.ts` so they match the same preconditions as each step’s **Continue** (e.g. cannot swipe from **Breathe** to **Reflect** until the first breathing segment is finished; **Frame** requires **I'm done** via `**frameDone**`).
+Horizontal drag calls `**goForward**` / `**goBack**`. **Forward** swipes are gated with `**canAdvanceFromPauseStep`** in `src/lib/pause-session-navigation.ts` so they match the same preconditions as each step’s **Continue** (e.g. cannot swipe from **Breathe** to **Reflect** until the first breathing segment is finished; **Frame** requires **I'm done** via `**frameDone**`). **Choose** does not allow forward swipe (user must tap **Choose** to reach **Decide**).
 
 **Reflect companion strip (`breathing` chip):** `**loadCompanionUiCompletionState**` (`src/lib/companion-completion-sync.ts`) reads all `**breath_completed**` payloads. If **any** row carries numeric `**breath_segment**` **1** or **2**, the UI treats breathing as complete only when **both** segments have been logged; otherwise any row counts as the legacy single-breath completion. Pure helper: `**src/lib/companion-breath-completion-detect.ts**` (Vitest in `**src/test/companion-completion-sync.test.ts**`).
 

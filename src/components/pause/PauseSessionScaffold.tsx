@@ -6,6 +6,7 @@ import { PauseProgress, type PauseStep } from '@/components/pause/PauseProgress'
 import { PauseScienceScrollBody } from '@/components/pause/PauseScienceSheet';
 import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetTitle } from '@/components/ui/sheet';
+import { resumePauseAudioContext } from '@/lib/pause-ritual-audio';
 
 interface Props {
   curtainLifted: boolean;
@@ -17,13 +18,16 @@ interface Props {
   /** Shown under the stepper; invokes macro back or breathing intro reset from parent. */
   onHeaderBack?: () => void;
   showHeaderBack?: boolean;
-  /** 1-based index in the macro ritual (Figma six-step). */
+  /** 1-based index in the macro ritual (Feel → … → Decide; seven bars including Choose bridge). */
   macroStepIndex?: number;
   macroStepTotal?: number;
   /** PostHog flag `pause.step5_breath_label_shift`: label second breathing macro step as “Shift”. */
   breathSecondLabelVariant?: 'breathe' | 'shift';
   /** Breath steps use close-only chrome in wireframes — hide the science affordance. */
   hideScienceButton?: boolean;
+  /** When set with `onSoundMutedChange`, header mute controls ritual audio (breathing cues). */
+  soundMuted?: boolean;
+  onSoundMutedChange?: (muted: boolean) => void;
   children: ReactNode;
 }
 
@@ -44,11 +48,15 @@ export function PauseSessionScaffold({
   macroStepTotal,
   breathSecondLabelVariant = 'breathe',
   hideScienceButton = false,
+  soundMuted: soundMutedControlled,
+  onSoundMutedChange,
   children,
 }: Props) {
   const { t } = useTranslation();
   const [scienceOpen, setScienceOpen] = useState(false);
-  const [muted, setMuted] = useState(false);
+  const [uncontrolledMuted, setUncontrolledMuted] = useState(false);
+  const muted = soundMutedControlled ?? uncontrolledMuted;
+  const setMuted = onSoundMutedChange ?? setUncontrolledMuted;
 
   const showMeta =
     phase === 'session' && macroStepIndex != null && macroStepTotal != null && macroStepTotal > 0;
@@ -110,7 +118,10 @@ export function PauseSessionScaffold({
                     variant="ghost"
                     size="icon"
                     className="h-9 w-9 shrink-0 text-muted-foreground hover:text-foreground"
-                    onClick={() => setMuted((m) => !m)}
+                    onClick={() => {
+                      setMuted(!muted);
+                      if (muted) void resumePauseAudioContext();
+                    }}
                     aria-label={
                       muted
                         ? t('pause.muteAriaOff', { defaultValue: 'Sound off (tap to unmute)' })

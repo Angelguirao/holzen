@@ -25,6 +25,9 @@ export function canAdvanceFromPauseStep(params: {
       return params.frameDone;
     case 'breath2':
       return params.breathingSecondCompleted;
+    /** Bridge step: advance only via primary “Choose” CTA (no swipe past). */
+    case 'choose':
+      return false;
     case 'decide':
       return false;
     default:

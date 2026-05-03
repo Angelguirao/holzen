@@ -1,8 +1,8 @@
 import { useTranslation } from 'react-i18next';
 import { cn } from '@/lib/utils';
 
-/** Figma-aligned deep pause: Feel → Breathe → Reflect → Frame → Breathe → Decide */
-const STEPS = ['feel', 'breathe', 'reflect', 'frame', 'breath2', 'decide'] as const;
+/** Figma-aligned deep pause: Feel → Breathe → Reflect → Frame → Breathe → Choose → Decide */
+const STEPS = ['feel', 'breathe', 'reflect', 'frame', 'breath2', 'choose', 'decide'] as const;
 export type PauseStep = (typeof STEPS)[number];
 
 interface Props {
@@ -31,6 +31,7 @@ export function PauseProgress({
     reflect: t('pause.steps.reflect', { defaultValue: 'Reflect' }),
     frame: t('pause.steps.frame', { defaultValue: 'Frame' }),
     breath2: breath2Label,
+    choose: t('pause.steps.choose', { defaultValue: 'Choose' }),
     decide: t('pause.steps.decide', { defaultValue: 'Decide' }),
   };
 

@@ -18,6 +18,7 @@ import { PauseFeel } from '@/components/pause/PauseFeel';
 import { PauseBreathing, type PauseBreathingHandle } from '@/components/pause/PauseBreathing';
 import { PauseReflect } from '@/components/pause/PauseReflect';
 import { PauseFrame } from '@/components/pause/PauseFrame';
+import { PauseChooseBridge } from '@/components/pause/PauseChooseBridge';
 import { PauseDecide } from '@/components/pause/PauseDecide';
 import { PauseDone } from '@/components/pause/PauseDone';
 import { holzenLog } from '@/lib/holzen-console';
@@ -62,9 +63,16 @@ export default function PauseSession() {
   const navigate = useNavigate();
   const location = useLocation();
   const prefersReducedMotion = useReducedMotion();
-  const { value: step5BreathLabelRaw } = useFeatureFlag('pause.step5_breath_label_shift', false);
+  const viteStep5Shift =
+    import.meta.env.VITE_PAUSE_STEP5_BREATH_LABEL_SHIFT === '1' ||
+    import.meta.env.VITE_PAUSE_STEP5_BREATH_LABEL_SHIFT === 'true' ||
+    import.meta.env.VITE_PAUSE_STEP5_BREATH_LABEL_SHIFT === 'shift';
+  const { value: step5BreathLabelRaw, ready: step5FlagReady } = useFeatureFlag('pause.step5_breath_label_shift', false);
   const breathSecondLabelVariant =
-    step5BreathLabelRaw === true || step5BreathLabelRaw === 'shift' ? 'shift' : 'breathe';
+    viteStep5Shift ||
+    (step5FlagReady && (step5BreathLabelRaw === true || step5BreathLabelRaw === 'shift'))
+      ? 'shift'
+      : 'breathe';
   const {
     mantra,
     dismissMessage,
@@ -327,6 +335,7 @@ export default function PauseSession() {
       breathingFirstCompleted,
       breathingSecondCompleted,
       frameDone,
+      decideOnBackStep,
     });
   }, [
     message,
@@ -347,7 +356,12 @@ export default function PauseSession() {
     breathingFirstCompleted,
     breathingSecondCompleted,
     frameDone,
+    decideOnBackStep,
   ]);
+
+  useEffect(() => {
+    if (step === 'breath2') setDecideOnBackStep('choose');
+  }, [step]);
 
   useEffect(() => {
     const timer = setTimeout(() => setCurtainLifted(true), 100);
@@ -381,6 +395,12 @@ export default function PauseSession() {
   const lastFeelLogKeyRef = useRef<string | null>(null);
   const prevPauseInstanceIdRef = useRef<string | null>(null);
   const [breathTimedActive, setBreathTimedActive] = useState(false);
+  const [soundMuted, setSoundMuted] = useState(false);
+  const [decideOnBackStep, setDecideOnBackStep] = useState<'choose' | 'breath2'>(() => {
+    if (restored?.decideOnBackStep) return restored.decideOnBackStep;
+    if (restored?.step === 'decide') return 'breath2';
+    return 'choose';
+  });
 
   useEffect(() => {
     lastFeelLogKeyRef.current = null;
@@ -475,7 +495,7 @@ export default function PauseSession() {
   const handleContinueAfterSecondBreath = useCallback(async () => {
     const ok = await ensureBreathSegment2Logged();
     if (!ok) return;
-    goToStep('decide');
+    goToStep('choose');
   }, [ensureBreathSegment2Logged, goToStep]);
 
   const handleSkipFirstBreath = useCallback(async () => {
@@ -504,6 +524,7 @@ export default function PauseSession() {
 
   const handleSkipSecondBreath = useCallback(async () => {
     setBreathingSecondCompleted(false);
+    setDecideOnBackStep('breath2');
     if (pauseInstanceId) {
       try {
         await pauseLogStep({
@@ -583,7 +604,7 @@ export default function PauseSession() {
       });
       return;
     }
-    if (step === 'breath2' && next === 'decide') {
+    if (step === 'breath2' && next === 'choose') {
       void ensureBreathSegment2Logged().then((ok) => {
         if (ok) advance();
       });
@@ -830,6 +851,8 @@ export default function PauseSession() {
           macroStepTotal={STEPS.length}
           breathSecondLabelVariant={breathSecondLabelVariant}
           hideScienceButton={step === 'breathe' || step === 'breath2'}
+          soundMuted={soundMuted}
+          onSoundMutedChange={setSoundMuted}
         >
           {phase === 'session' && (
             <AnimatePresence mode="wait" initial={false}>
@@ -860,6 +883,7 @@ export default function PauseSession() {
                     onPatternComplete={() => setBreathingFirstCompleted(true)}
                     onContinueAfterBreath={() => void handleContinueAfterFirstBreath()}
                     onSkipBreath={handleSkipFirstBreath}
+                    ritualSoundMuted={soundMuted}
                   />
                 </motion.div>
               )}
@@ -906,13 +930,25 @@ export default function PauseSession() {
                     onPatternComplete={() => setBreathingSecondCompleted(true)}
                     onContinueAfterBreath={() => void handleContinueAfterSecondBreath()}
                     onSkipBreath={handleSkipSecondBreath}
+                    ritualSoundMuted={soundMuted}
+                  />
+                </motion.div>
+              )}
+
+              {step === 'choose' && (
+                <motion.div key="choose" {...stepTransition} {...dragProps}>
+                  <PauseChooseBridge
+                    onChoose={() => {
+                      setDecideOnBackStep('choose');
+                      goToStep('decide');
+                    }}
                   />
                 </motion.div>
               )}
 
               {step === 'decide' && (
                 <motion.div key="decide" {...stepTransition} {...dragProps}>
-                  <PauseDecide onDecide={handleDecide} onBack={() => goToStep('breath2')} />
+                  <PauseDecide onDecide={handleDecide} onBack={() => goToStep(decideOnBackStep)} />
                 </motion.div>
               )}
             </AnimatePresence>
