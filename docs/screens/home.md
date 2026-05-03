@@ -2,7 +2,7 @@
 
 Authoritative orchestration: [`src/pages/Home.tsx`](../../src/pages/Home.tsx).
 
-**Cross-screen patterns:** the refactor behind this page is generalized in [**React screen orchestration**](../fundamentals/react-screen-orchestration.md) (hooks, memoization, pure gates, documentation expectations).
+**Cross-screen patterns:** the refactor behind this page is generalized in [**React screen orchestration**](../fundamentals/react-screen-orchestration.md) — written for **React beginners** (vocabulary, Rules of Hooks examples, `memo` / `lazy` toolbox) plus the same patterns for edge handlers.
 
 | Piece | File |
 |-------|------|
