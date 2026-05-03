@@ -59,6 +59,7 @@ import { usePauseSessionGoBack } from '@/hooks/use-pause-session-go-back';
 import { usePauseSessionGoToStep } from '@/hooks/use-pause-session-go-to-step';
 import { buildPauseSessionScaffoldRitualDerived } from '@/lib/pause-session-scaffold-ritual-props';
 import { usePauseSessionPendingPauseOfferNavigation } from '@/hooks/use-pause-session-pending-pause-offer-navigation';
+import { usePauseSessionDepthPickerHandlers } from '@/hooks/use-pause-session-depth-picker-handlers';
 
 export default function PauseSession() {
   const { t } = useTranslation();
@@ -184,6 +185,13 @@ export default function PauseSession() {
     (restored?.briefFace as BriefFeelTile | null) ?? null,
   );
   const [pickerAboutOpen, setPickerAboutOpen] = useState(false);
+
+  const { onBrief: depthPickerOnBrief, onDeep: depthPickerOnDeep, onAboutPauses: depthPickerOnAboutPauses } =
+    usePauseSessionDepthPickerHandlers({
+      setRitualEntry,
+      setBriefStep,
+      setPickerAboutOpen,
+    });
 
   const { handleMoodSelect, handleMoodSkip, handleMoodReset } = usePauseSessionInitialMoodHandlers({
     pauseInstanceId,
@@ -380,12 +388,9 @@ export default function PauseSession() {
           <>
             <PauseDepthPicker
               contextLine={depthContextLine}
-              onBrief={() => {
-                setRitualEntry('brief');
-                setBriefStep('feel');
-              }}
-              onDeep={() => setRitualEntry('deep')}
-              onAboutPauses={() => setPickerAboutOpen(true)}
+              onBrief={depthPickerOnBrief}
+              onDeep={depthPickerOnDeep}
+              onAboutPauses={depthPickerOnAboutPauses}
               onClose={handleClose}
             />
             <Sheet open={pickerAboutOpen} onOpenChange={setPickerAboutOpen}>
