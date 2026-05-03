@@ -6,7 +6,6 @@ import AuthLoading from '@/components/AuthLoading';
 import { useSubscription } from '@/hooks/use-subscription';
 import { BtcStatus } from '@/components/BtcStatus';
 import { NightReflectionCard, useNightReflection } from '@/components/NightReflectionCard';
-import { ReflectionMessage } from '@/components/ReflectionMessage';
 import { HolzenNumber } from '@/components/HolzenNumber';
 import { Onboarding } from '@/components/Onboarding';
 import { HomeGoalWhyCard } from '@/components/home/HomeGoalWhyCard';
@@ -18,18 +17,22 @@ import { HomeSectionCard } from '@/components/home/HomeSectionCard';
 import { HomeStatTiles } from '@/components/home/HomeStatTiles';
 import { HomeHeroQuote } from '@/components/home/HomeHeroQuote';
 import { HomeCustomizeSheet } from '@/components/home/HomeCustomizeSheet';
+import { ZenModeHome } from '@/components/home/ZenModeHome';
+import { HomePauseBlockingErrorPanel } from '@/components/home/HomePauseBlockingErrorPanel';
 import {
   useHomeOptionalVisibility,
   ALL_HOME_SECTION_IDS,
   JOURNEY_STAT_TILES_VISIBILITY_ID,
   isHomeSectionAlwaysVisibleInLayout,
 } from '@/hooks/use-home-optional-visibility';
+import { useHomeCheckoutWelcomeToast } from '@/hooks/use-home-checkout-welcome-toast';
+import { useHomeZenMode } from '@/hooks/use-home-zen-mode';
+import { useHomePinnedPausePreview } from '@/hooks/use-home-pinned-pause-preview';
+import { useHomeCompletedPauseCount } from '@/hooks/use-home-completed-pause-count';
 import { useCallback, useEffect, useState, useMemo, useRef, type ReactNode } from 'react';
 import { useOutletContext, useSearchParams, useNavigate, useLocation } from 'react-router-dom';
-import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/use-auth';
-import { toast } from 'sonner';
-import { AlertCircle, ChevronDown, Loader2, Pin, Sparkles, RefreshCw } from 'lucide-react';
+import { ChevronDown, Loader2, Pin, Sparkles, RefreshCw } from 'lucide-react';
 import { HomePauseEmptyFlow } from '@/components/home/HomePauseEmptyFlow';
 import { homeInWidget } from '@/components/home/home-widget-styles';
 import { cn } from '@/lib/utils';
@@ -37,19 +40,13 @@ import { BulkHoldCard } from '@/components/BulkHoldCard';
 import { InstallHolzenCard } from '@/components/InstallHolzenCard';
 import { HomeQuickCapture } from '@/components/home/HomeQuickCapture';
 import { SnoozeToolbarControl } from '@/components/SnoozeControl';
-import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
 import { playNotificationTone, prefetchNotificationTone } from '@/lib/notification-tone';
 import { holzenLog } from '@/lib/holzen-console';
 import { trackEvent } from '@/lib/posthog';
 import { heroQuoteIndexForDay, utcYmd } from '@/lib/home-hero-quote';
 import { parsePauseContextForHomePreview } from '@/lib/pause-context-home-preview';
 import { type PauseSessionLocationState } from '@/lib/router-location-state';
-import { pauseHomeErrorKind, shouldSurfacePauseWidgetError } from '@/lib/home-pause-widget-error';
-
-interface PinnedPausePreview {
-  id: string;
-  context: string | null;
-}
+import { shouldSurfacePauseWidgetError } from '@/lib/home-pause-widget-error';
 
 const Home = () => {
   const { t } = useTranslation();
@@ -60,15 +57,7 @@ const Home = () => {
   const subscriptionReady = !subLoading && (subscribed || monthlyRemaining !== undefined);
   const hasAccess = subscribed || ((monthlyRemaining ?? 0) > 0);
   const [searchParams] = useSearchParams();
-
-  useEffect(() => {
-    if (searchParams.get('subscribed') !== 'true') return;
-    void refresh();
-    toast.success(
-      t('pro.welcomeToast', { defaultValue: '🎉 Welcome to Pro! All features are now unlocked.' }),
-      { id: 'home:pro-checkout-welcome' },
-    );
-  }, [searchParams, refresh, t]);
+  useHomeCheckoutWelcomeToast(searchParams.get('subscribed'), refresh, t);
 
   const {
     btcData,
@@ -114,58 +103,28 @@ const Home = () => {
 
   const { reflection: nightReflection, dismiss: dismissNight } = useNightReflection();
 
-  const [priceHidden, setPriceHidden] = useState(() => localStorage.getItem('holzen_hide_price') === 'true');
-  const [btcMode, setBtcMode] = useState(() => localStorage.getItem('holzen_btc_mode') === 'true');
-  const unitBasisModeSupported = trackedAssetId === 'bitcoin';
-  // One-time reset: Zen Mode previously defaulted on for some users via a stale
-  // localStorage flag, which silently replaced the full Home (widgets) with a
-  // minimal ReflectionMessage view that looked like "the end of a pause flow."
-  // Clear the flag once per browser; users can re-enable Zen Mode explicitly
-  // from Settings → Appearance.
-  const [zenMode, setZenModeState] = useState(() => {
-    const RESET_KEY = 'holzen_zen_mode_reset_v1';
+  const [priceHidden, setPriceHidden] = useState(() => {
     try {
-      if (typeof window !== 'undefined' && !localStorage.getItem(RESET_KEY)) {
-        localStorage.removeItem('holzen_zen_mode');
-        localStorage.setItem(RESET_KEY, '1');
-        return false;
-      }
-      return localStorage.getItem('holzen_zen_mode') === 'true';
+      return localStorage.getItem('holzen_hide_price') === 'true';
     } catch {
       return false;
     }
   });
-
-  const setZenModePersist = useCallback((zen: boolean) => {
-    setZenModeState(zen);
-    localStorage.setItem('holzen_zen_mode', String(zen));
-  }, []);
-
-  useEffect(() => {
-    const onStorage = (e: StorageEvent) => {
-      if (e.key === 'holzen_zen_mode' && e.newValue != null) {
-        setZenModeState(e.newValue === 'true');
-      }
-    };
-    window.addEventListener('storage', onStorage);
-    return () => window.removeEventListener('storage', onStorage);
-  }, []);
-
-  useEffect(() => {
-    if (location.pathname !== '/') return;
+  const [btcMode, setBtcMode] = useState(() => {
     try {
-      setZenModeState(localStorage.getItem('holzen_zen_mode') === 'true');
+      return localStorage.getItem('holzen_btc_mode') === 'true';
     } catch {
-      setZenModeState(false);
+      return false;
     }
-  }, [location.pathname]);
-  const [pinnedPausePreview, setPinnedPausePreview] = useState<PinnedPausePreview | null>(null);
+  });
+  const unitBasisModeSupported = trackedAssetId === 'bitcoin';
+  const { zenMode, setZenModePersist } = useHomeZenMode(location.pathname);
+  const { pinnedPausePreview, unpinPausePreview } = useHomePinnedPausePreview(user);
+  const completedPauseCount = useHomeCompletedPauseCount(user);
   const pinnedContextHomePreview = useMemo(
     () => parsePauseContextForHomePreview(pinnedPausePreview?.context ?? null),
     [pinnedPausePreview?.context],
   );
-  const prefersReducedMotion = useReducedMotion();
-  const [completedPauseCount, setCompletedPauseCount] = useState(0);
   const [marketChartExpanded, setMarketChartExpanded] = useState(false);
   const [goalWhyExpanded, setGoalWhyExpanded] = useState(false);
   const [goalWhyHoldSummary, setGoalWhyHoldSummary] = useState<string | null>(null);
@@ -244,13 +203,6 @@ const Home = () => {
       return descs[id] ?? '';
     },
     [t],
-  );
-
-  const handleZenModeFromCustomize = useCallback(
-    (zen: boolean) => {
-      setZenModePersist(zen);
-    },
-    [setZenModePersist],
   );
 
   const handleCustomizeOpenChange = useCallback((open: boolean) => {
@@ -350,70 +302,31 @@ const Home = () => {
     });
   }, [profileLoaded, user?.id]);
 
-  // Load pinned pause (legacy key name retained for localStorage back-compat).
-  useEffect(() => {
-    if (!user) return;
-    const pinnedId = localStorage.getItem('holzen_pinned_reflection');
-    if (!pinnedId) return;
-    let cancelled = false;
-    void (async () => {
-      const { data: inst } = await supabase
-        .from('pause_instances' as never)
-        .select('id, context_snapshot')
-        .eq('id', pinnedId)
-        .eq('user_id', user.id)
-        .maybeSingle();
-      if (cancelled) return;
-      if (!inst) {
-        localStorage.removeItem('holzen_pinned_reflection');
-        return;
-      }
-      const ctxSnap = ((inst as { context_snapshot: Record<string, unknown> | null }).context_snapshot ?? {}) as Record<string, unknown>;
-      const context = typeof ctxSnap.context_text === 'string' ? (ctxSnap.context_text as string) : null;
-      setPinnedPausePreview({
-        id: pinnedId,
-        context,
-      });
-    })();
-    return () => {
-      cancelled = true;
-    };
-  }, [user]);
-
-  // Fetch completed-pause count for testimonial prompt.
-  useEffect(() => {
-    if (!user) return;
-    void supabase
-      .from('pause_instances' as never)
-      .select('id', { count: 'exact', head: true })
-      .eq('user_id', user.id)
-      .eq('state', 'completed')
-      .then(({ count, error: countErr }: { count: number | null; error: { message: string } | null }) => {
-        if (countErr) {
-          holzenLog.home('completed_pause_count_unavailable', { message: countErr.message });
-          return;
-        }
-        if (count != null) setCompletedPauseCount(count);
-      });
-  }, [user]);
-
   const togglePriceHidden = useCallback(() => {
-    setPriceHidden(prev => {
+    setPriceHidden((prev) => {
       const next = !prev;
-      localStorage.setItem('holzen_hide_price', String(next));
+      try {
+        localStorage.setItem('holzen_hide_price', String(next));
+      } catch {
+        /* ignore */
+      }
       return next;
     });
   }, []);
 
   const toggleBtcMode = useCallback(() => {
-    setBtcMode(prev => {
+    setBtcMode((prev) => {
       const next = !prev;
-      localStorage.setItem('holzen_btc_mode', String(next));
+      try {
+        localStorage.setItem('holzen_btc_mode', String(next));
+      } catch {
+        /* ignore */
+      }
       return next;
     });
   }, []);
 
-  const handleNeedAPause = () => {
+  const handleNeedAPause = useCallback(() => {
     const remaining = manualCooldownRemaining();
     if (remaining > 0) {
       holzenLog.home('Need a moment: ignored (cooldown)', { remainingMs: remaining });
@@ -421,11 +334,35 @@ const Home = () => {
     }
     holzenLog.home('Need a moment: invoking manualTrigger');
     manualTrigger();
-  };
+  }, [manualCooldownRemaining, manualTrigger]);
 
-  const handleDismiss = () => {
+  const handleDismiss = useCallback(() => {
     dismissMessage();
-  };
+  }, [dismissMessage]);
+
+  const handleNavigatePauseWithThis = useCallback(() => {
+    if (!message) return;
+    const navState: PauseSessionLocationState = {
+      reflectionMessage: message,
+      context,
+      pauseInstanceId: lastPauseInstanceId ?? undefined,
+      companions,
+      companionPrefs,
+      severity,
+    };
+    holzenLog.home('Navigate to /pause (pause with this message)', {
+      pauseInstanceId: lastPauseInstanceId,
+      severity,
+      messageLen: message.length,
+      hasContext: !!context,
+      companionKeys: companions
+        ? Object.entries(companions)
+            .filter(([, v]) => v != null)
+            .map(([k]) => k)
+        : [],
+    });
+    navigate('/pause', { state: navState });
+  }, [message, context, lastPauseInstanceId, companions, companionPrefs, severity, navigate]);
 
   const lastToneMsgRef = useRef<string | null>(null);
   useEffect(() => {
@@ -433,7 +370,12 @@ const Home = () => {
       // Only play tone once per unique message to prevent double-play
       if (message !== lastToneMsgRef.current) {
         lastToneMsgRef.current = message;
-        const soundEnabled = localStorage.getItem('holzen_sound_enabled') !== 'false';
+        let soundEnabled = true;
+        try {
+          soundEnabled = localStorage.getItem('holzen_sound_enabled') !== 'false';
+        } catch {
+          soundEnabled = true;
+        }
         if (soundEnabled) {
           playNotificationTone();
         }
@@ -449,11 +391,6 @@ const Home = () => {
   useEffect(() => {
     document.title = 'Holzen — Home';
     return () => { document.title = 'Holzen — Pause before you act'; };
-  }, []);
-
-  const unpinPausePreview = useCallback(() => {
-    localStorage.removeItem('holzen_pinned_reflection');
-    setPinnedPausePreview(null);
   }, []);
 
   const handlePullRefresh = useCallback(async () => {
@@ -519,123 +456,33 @@ const Home = () => {
   /** Hide server scheduling row while a reflection is showing or generating — keeps focus on the pause. */
   const showPauseScheduling = subscriptionReady && hasAccess && !message && !loading;
 
-  const pauseWidgetErrKind = pauseHomeErrorKind(error);
-
-  // Zen mode — unchanged
   if (zenMode) {
-    const zenTransition = { duration: 0.8, ease: "easeOut" as const };
-    const zenVariants = prefersReducedMotion
-      ? { hidden: { opacity: 1 }, visible: { opacity: 1 } }
-      : {
-          hidden: { opacity: 0, y: 12 },
-          visible: { opacity: 1, y: 0, transition: zenTransition },
-        };
-
     return (
-      <div className="min-h-[60vh] flex flex-col justify-center text-sm font-sans">
-        <AnimatePresence mode="wait">
-          {message ? (
-            <motion.div key="zen-reflection" variants={zenVariants} initial="hidden" animate="visible" exit="hidden">
-              <ReflectionMessage
-                message={message} context={context} onDismiss={handleDismiss}
-                companions={companions}
-                companionPrefs={{ breathing: companionPrefs.breathing, haiku: false, grounding: false, signal: false, zoomOut: false, history: false }}
-                severity={severity} pauseInstanceId={lastPauseInstanceId}
-              />
-            </motion.div>
-          ) : loading ? (
-            <motion.div key="zen-loading" variants={zenVariants} initial="hidden" animate="visible" exit="hidden" className="space-y-4">
-              <div className="flex items-center gap-2 text-muted-foreground">
-                <Loader2 className="h-3 w-3 animate-spin" />
-                <p className="text-xs font-mono">{t('home.generatingReflection')}</p>
-              </div>
-              <Skeleton className="h-4 w-full" />
-              <Skeleton className="h-4 w-3/4" />
-            </motion.div>
-          ) : shouldSurfacePauseWidgetError(error, btcData) ? (
-            <motion.div
-              key="zen-blocking-error"
-              variants={zenVariants}
-              initial="hidden"
-              animate="visible"
-              exit="hidden"
-              className="max-w-md mx-auto text-left"
-            >
-              <div className={homeInWidget.errorPanel}>
-                <div className="flex items-center gap-2 text-destructive">
-                  <AlertCircle className="h-4 w-4 shrink-0" />
-                  <p className="text-sm font-medium leading-snug">
-                    {pauseWidgetErrKind === 'persist' && error
-                      ? error
-                      : pauseWidgetErrKind === 'network'
-                        ? t('home.errors.couldNotReachPrice')
-                        : pauseWidgetErrKind === 'ai'
-                          ? t('home.errors.aiUnavailable')
-                          : t('home.errors.somethingWentWrong')}
-                  </p>
-                </div>
-                {pauseWidgetErrKind && pauseWidgetErrKind !== 'persist' ? (
-                  <p className={homeInWidget.meta}>
-                    {pauseWidgetErrKind === 'network'
-                      ? t('home.errors.checkConnection')
-                      : pauseWidgetErrKind === 'ai'
-                        ? t('home.errors.aiTemporarilyUnavailable')
-                        : t('home.errors.unexpectedError')}
-                  </p>
-                ) : null}
-                <button
-                  type="button"
-                  onClick={() => {
-                    if (pauseWidgetErrKind === 'persist') {
-                      holzenLog.home('Try again after pause persist error: manualTrigger');
-                    } else {
-                      holzenLog.home('Try again: manualTrigger');
-                    }
-                    manualTrigger();
-                  }}
-                  className="text-sm font-medium text-primary underline-offset-4 hover:underline"
-                >
-                  {t('common.tryAgain')}
-                </button>
-              </div>
-            </motion.div>
-          ) : !subscriptionReady ? (
-            <motion.div key="zen-hydrating" variants={zenVariants} initial="hidden" animate="visible" exit="hidden">
-              <SubscriptionSkeleton variant="centered" />
-            </motion.div>
-          ) : (
-            <motion.div key="zen-empty" variants={zenVariants} initial="hidden" animate="visible" exit="hidden" className="text-center">
-              {hasAccess && !showLimitUpsell ? (
-                <HomePauseEmptyFlow
-                  variant="zen"
-                  pinnedPreview={pauseEmptyPinnedPreview}
-                  showPauseScheduling={showPauseScheduling}
-                  autoCooldownRemaining={autoCooldownRemaining}
-                  cooldownHours={cooldownHours}
-                  nextCronCheckIn={nextCronCheckIn}
-                  onNeedPause={handleNeedAPause}
-                  manualCooldownRemaining={manualCooldownRemaining}
-                  pauseLoading={loading}
-                />
-              ) : (
-                <>
-                  <p className="text-sm text-muted-foreground font-mono leading-relaxed">
-                    {t('home.subscription.monthlyLimitReached', {
-                      defaultValue: "You've used your free pauses this month.",
-                    })}
-                  </p>
-                  <p className="text-xs text-muted-foreground/60 font-mono leading-relaxed max-w-[280px] mx-auto">
-                    {t('home.subscription.upgradeToPro')}
-                  </p>
-                  <LoadingButton onClick={() => startCheckout('pro')} loading={checkoutLoading} loadingText={t('home.subscription.openingCheckout')} size="sm" className="font-mono text-xs">
-                    {t('pro.upgradeCta')}
-                  </LoadingButton>
-                </>
-              )}
-            </motion.div>
-          )}
-        </AnimatePresence>
-      </div>
+      <ZenModeHome
+        message={message}
+        context={context}
+        companions={companions}
+        companionPrefs={companionPrefs}
+        severity={severity}
+        lastPauseInstanceId={lastPauseInstanceId}
+        loading={loading}
+        error={error}
+        btcData={btcData}
+        onDismiss={handleDismiss}
+        onNeedPause={handleNeedAPause}
+        onManualTrigger={manualTrigger}
+        subscriptionReady={subscriptionReady}
+        hasAccess={hasAccess}
+        showLimitUpsell={showLimitUpsell}
+        showPauseScheduling={showPauseScheduling}
+        pinnedPreview={pauseEmptyPinnedPreview}
+        autoCooldownRemaining={autoCooldownRemaining}
+        cooldownHours={cooldownHours}
+        nextCronCheckIn={nextCronCheckIn}
+        manualCooldownRemaining={manualCooldownRemaining}
+        checkoutLoading={checkoutLoading}
+        onStartCheckoutPro={() => startCheckout('pro')}
+      />
     );
   }
 
@@ -678,28 +525,7 @@ const Home = () => {
               ) : null}
               <button
                 type="button"
-                onClick={() => {
-                  const navState: PauseSessionLocationState = {
-                    reflectionMessage: message,
-                    context,
-                    pauseInstanceId: lastPauseInstanceId ?? undefined,
-                    companions,
-                    companionPrefs,
-                    severity,
-                  };
-                  holzenLog.home('Navigate to /pause (pause with this message)', {
-                    pauseInstanceId: lastPauseInstanceId,
-                    severity,
-                    messageLen: message?.length ?? 0,
-                    hasContext: !!context,
-                    companionKeys: companions
-                      ? Object.entries(companions)
-                          .filter(([, v]) => v != null)
-                          .map(([k]) => k)
-                      : [],
-                  });
-                  navigate('/pause', { state: navState });
-                }}
+                onClick={handleNavigatePauseWithThis}
                 className={cn(homeInWidget.ctaPrimary, 'bg-foreground text-background hover:bg-foreground/90')}
               >
                 <Sparkles className="h-4 w-4 shrink-0 text-background" />
@@ -718,44 +544,8 @@ const Home = () => {
                   <Skeleton className="h-4 w-3/4" />
                   <Skeleton className="h-4 w-1/2" />
                 </div>
-              ) : shouldSurfacePauseWidgetError(error, btcData) ? (
-                <div className={homeInWidget.errorPanel}>
-                  <div className="flex items-center gap-2 text-destructive">
-                    <AlertCircle className="h-4 w-4 shrink-0" />
-                    <p className="text-sm font-medium leading-snug">
-                      {pauseWidgetErrKind === 'persist' && error
-                        ? error
-                        : pauseWidgetErrKind === 'network'
-                          ? t('home.errors.couldNotReachPrice')
-                          : pauseWidgetErrKind === 'ai'
-                            ? t('home.errors.aiUnavailable')
-                            : t('home.errors.somethingWentWrong')}
-                    </p>
-                  </div>
-                  {pauseWidgetErrKind && pauseWidgetErrKind !== 'persist' ? (
-                    <p className={homeInWidget.meta}>
-                      {pauseWidgetErrKind === 'network'
-                        ? t('home.errors.checkConnection')
-                        : pauseWidgetErrKind === 'ai'
-                          ? t('home.errors.aiTemporarilyUnavailable')
-                          : t('home.errors.unexpectedError')}
-                    </p>
-                  ) : null}
-                  <button
-                    type="button"
-                    onClick={() => {
-                      if (pauseWidgetErrKind === 'persist') {
-                        holzenLog.home('Try again after pause persist error: manualTrigger');
-                      } else {
-                        holzenLog.home('Try again: manualTrigger');
-                      }
-                      manualTrigger();
-                    }}
-                    className="text-sm font-medium text-primary underline-offset-4 hover:underline"
-                  >
-                    {t('common.tryAgain')}
-                  </button>
-                </div>
+              ) : error && shouldSurfacePauseWidgetError(error, btcData) ? (
+                <HomePauseBlockingErrorPanel error={error} onTryAgain={manualTrigger} />
               ) : (
                 <HomePauseEmptyFlow
                   pinnedPreview={pauseEmptyPinnedPreview}
@@ -883,7 +673,7 @@ const Home = () => {
             <button
               type="button"
               onClick={() => handleCustomizeOpenChange(true)}
-              className="text-sm font-medium text-primary underline underline-offset-4"
+              className="text-sm font-medium text-nox-text-link underline underline-offset-4 transition-colors hover:text-nox-text-link/80"
             >
               {t('home.customize')}
             </button>
@@ -899,7 +689,7 @@ const Home = () => {
               <button
                 type="button"
                 onClick={() => handleCustomizeOpenChange(true)}
-                className="shrink-0 text-sm font-medium text-primary underline underline-offset-4"
+                className="shrink-0 text-sm font-medium text-nox-text-link underline underline-offset-4 transition-colors hover:text-nox-text-link/80"
               >
                 {t('home.customize')}
               </button>
@@ -933,7 +723,7 @@ const Home = () => {
         sectionTitle={homeCustomizeSectionTitle}
         sectionDescription={homeCustomizeSectionDescription}
         zenMode={zenMode}
-        onZenModeChange={handleZenModeFromCustomize}
+        onZenModeChange={setZenModePersist}
         onResetAll={handleCustomizeResetAll}
         nightToggleDisabled={!subscribed}
         dndRemountKey={customizeDndEpoch}

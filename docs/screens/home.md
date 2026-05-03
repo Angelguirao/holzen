@@ -1,6 +1,6 @@
 # Home (`/`)
 
-Authoritative code: [`src/pages/Home.tsx`](../../src/pages/Home.tsx). This doc explains how the dashboard is structured, what data it depends on, and what to watch when changing behavior.
+Authoritative orchestration: [`src/pages/Home.tsx`](../../src/pages/Home.tsx). Zen-only UI lives in [`ZenModeHome.tsx`](../../src/components/home/ZenModeHome.tsx); shared pause error chrome in [`HomePauseBlockingErrorPanel.tsx`](../../src/components/home/HomePauseBlockingErrorPanel.tsx). Small hooks under `src/hooks/use-home-*.ts` isolate checkout toast, zen `localStorage`, pinned preview fetch, and completed-pause count. Pure rules + i18n string mapping: [`home-pause-widget-error.ts`](../../src/lib/home-pause-widget-error.ts).
 
 ## Purpose
 

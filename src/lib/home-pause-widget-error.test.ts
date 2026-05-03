@@ -1,11 +1,15 @@
 import { describe, expect, it } from 'vitest';
+import type { TFunction } from 'i18next';
 import type { BtcPriceData } from '@/lib/btc';
 import { PAUSE_PERSIST_ERROR_MARKER } from '@/lib/reflection-persist-error';
 import {
   isLikelyPriceOnlyMarketError,
   pauseHomeErrorKind,
+  pauseHomeErrorStrings,
   shouldSurfacePauseWidgetError,
 } from '@/lib/home-pause-widget-error';
+
+const echoT: TFunction = ((key: string) => key) as TFunction;
 
 const sampleBtc: BtcPriceData = {
   coinId: 'bitcoin',
@@ -34,6 +38,20 @@ describe('isLikelyPriceOnlyMarketError', () => {
     expect(
       isLikelyPriceOnlyMarketError('A pause message could not be generated right now. Try again in a moment.'),
     ).toBe(false);
+  });
+});
+
+describe('pauseHomeErrorStrings', () => {
+  it('returns raw title for persist errors', () => {
+    const msg = `${PAUSE_PERSIST_ERROR_MARKER}. Try again.`;
+    expect(pauseHomeErrorStrings(echoT, msg)).toEqual({ title: msg, description: null });
+  });
+
+  it('maps network kind to i18n keys', () => {
+    expect(pauseHomeErrorStrings(echoT, 'Could not reach Holzen. Check your connection.')).toEqual({
+      title: 'home.errors.couldNotReachPrice',
+      description: 'home.errors.checkConnection',
+    });
   });
 });
 
