@@ -30,7 +30,7 @@ export type HomePullHandlers = Pick<
   'onTouchStart' | 'onTouchMove' | 'onTouchEnd'
 >;
 
-interface HomeDashboardLayoutProps {
+export interface HomeDashboardLayoutProps {
   pullHandlers: HomePullHandlers;
   pullDistance: number;
   pullRefreshing: boolean;
