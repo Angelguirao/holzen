@@ -1,3 +1,5 @@
+import { normalizeTrackedAssetId, type TrackedAssetId } from '@/lib/tracked-assets';
+
 export interface FearGreedData {
   value: number;
   label: string;
@@ -11,7 +13,10 @@ export interface OnChainData {
   blockHeight?: number;
 }
 
+/** Market quote for a single tracked asset in the user's display currency. */
 export interface BtcPriceData {
+  /** CoinGecko coin id (e.g. bitcoin, ethereum). */
+  coinId: TrackedAssetId;
   currentPrice: number;
   price24hAgo: number;
   changePercent: number;
@@ -38,17 +43,21 @@ export const SUPPORTED_CURRENCIES = [
   { code: 'KRW', symbol: '₩', label: 'South Korean Won' },
 ] as const;
 
-export type SupportedCurrency = typeof SUPPORTED_CURRENCIES[number]['code'];
+export type SupportedCurrency = (typeof SUPPORTED_CURRENCIES)[number]['code'];
+
+function marketCacheKey(coinId: string): string {
+  return `holzen_market_cache_${coinId}`;
+}
 
 async function fetchWithRetry(url: string, retries = 3, delayMs = 2000): Promise<Response> {
   for (let i = 0; i < retries; i++) {
     const res = await fetch(url);
     if (res.ok) return res;
-    console.warn(`BTC fetch attempt ${i + 1} failed (${res.status}), ${i < retries - 1 ? 'retrying...' : 'giving up'}`);
+    console.warn(`Market fetch attempt ${i + 1} failed (${res.status}), ${i < retries - 1 ? 'retrying...' : 'giving up'}`);
     await res.text();
     if (i < retries - 1) await new Promise((r) => setTimeout(r, delayMs * (i + 1)));
   }
-  throw new Error('Failed to fetch BTC data after retries');
+  throw new Error('Failed to fetch market data after retries');
 }
 
 async function fetchFearGreed(): Promise<FearGreedData | undefined> {
@@ -93,24 +102,24 @@ async function fetchOnChainData(): Promise<OnChainData | undefined> {
   }
 }
 
-const BTC_CACHE_KEY = 'holzen_btc_cache';
-
-interface CachedBtcData {
+interface CachedMarketData {
   data: BtcPriceData;
   timestamp: number;
 }
 
-function cacheBtcData(data: BtcPriceData): void {
+function cacheMarketData(coinId: string, data: BtcPriceData): void {
   try {
-    localStorage.setItem(BTC_CACHE_KEY, JSON.stringify({ data, timestamp: Date.now() }));
-  } catch { /* quota exceeded etc */ }
+    localStorage.setItem(marketCacheKey(coinId), JSON.stringify({ data, timestamp: Date.now() }));
+  } catch {
+    /* quota exceeded etc */
+  }
 }
 
-export function getCachedBtcData(): CachedBtcData | null {
+function getCachedMarketData(coinId: string): CachedMarketData | null {
   try {
-    const raw = localStorage.getItem(BTC_CACHE_KEY);
+    const raw = localStorage.getItem(marketCacheKey(coinId));
     if (!raw) return null;
-    return JSON.parse(raw) as CachedBtcData;
+    return JSON.parse(raw) as CachedMarketData;
   } catch {
     return null;
   }
@@ -125,18 +134,19 @@ export function formatBtcPrice(price: number, currency: string): string {
   });
 }
 
-/** Coalesce concurrent fetches for the same currency (e.g. interval + manual trigger on Home). */
-const btcFetchInflight = new Map<string, Promise<BtcPriceData>>();
+const marketFetchInflight = new Map<string, Promise<BtcPriceData>>();
 
-async function fetchBtcDataUncached(currency: string): Promise<BtcPriceData> {
+async function fetchMarketDataUncached(coinId: TrackedAssetId, currency: string): Promise<BtcPriceData> {
   const cur = currency.toLowerCase();
+  const id = encodeURIComponent(coinId);
 
   try {
+    const includeOnChain = coinId === 'bitcoin';
     const [res1d, res7d, fearGreed, onChain] = await Promise.all([
-      fetchWithRetry(`https://api.coingecko.com/api/v3/coins/bitcoin/market_chart?vs_currency=${cur}&days=1`),
-      fetchWithRetry(`https://api.coingecko.com/api/v3/coins/bitcoin/market_chart?vs_currency=${cur}&days=7`),
+      fetchWithRetry(`https://api.coingecko.com/api/v3/coins/${id}/market_chart?vs_currency=${cur}&days=1`),
+      fetchWithRetry(`https://api.coingecko.com/api/v3/coins/${id}/market_chart?vs_currency=${cur}&days=7`),
       fetchFearGreed(),
-      fetchOnChainData(),
+      includeOnChain ? fetchOnChainData() : Promise.resolve(undefined),
     ]);
 
     const data1d = await res1d.json();
@@ -163,6 +173,7 @@ async function fetchBtcDataUncached(currency: string): Promise<BtcPriceData> {
     }
 
     const result: BtcPriceData = {
+      coinId,
       currentPrice,
       price24hAgo,
       changePercent,
@@ -174,26 +185,34 @@ async function fetchBtcDataUncached(currency: string): Promise<BtcPriceData> {
       currency: currency.toUpperCase(),
     };
 
-    cacheBtcData(result);
+    cacheMarketData(coinId, result);
     return result;
   } catch (e) {
-    // Fallback to cached data if available
-    const cached = getCachedBtcData();
-    if (cached) {
-      console.warn('Using cached BTC data from', new Date(cached.timestamp).toISOString());
+    const cached = getCachedMarketData(coinId);
+    if (cached?.data?.currency?.toUpperCase() === currency.toUpperCase()) {
+      console.warn('Using cached market data from', new Date(cached.timestamp).toISOString());
       return { ...cached.data, _stale: true } as BtcPriceData;
     }
     throw e;
   }
 }
 
-export async function fetchBtcData(currency: string = 'USD'): Promise<BtcPriceData> {
-  const key = currency.toUpperCase();
-  const existing = btcFetchInflight.get(key);
+export async function fetchMarketData(
+  coinIdRaw: string | null | undefined,
+  currency: string = 'USD',
+): Promise<BtcPriceData> {
+  const coinId = normalizeTrackedAssetId(coinIdRaw);
+  const inflightKey = `${coinId}|${currency.toUpperCase()}`;
+  const existing = marketFetchInflight.get(inflightKey);
   if (existing) return existing;
-  const p = fetchBtcDataUncached(currency).finally(() => {
-    btcFetchInflight.delete(key);
+  const p = fetchMarketDataUncached(coinId, currency).finally(() => {
+    marketFetchInflight.delete(inflightKey);
   });
-  btcFetchInflight.set(key, p);
+  marketFetchInflight.set(inflightKey, p);
   return p;
+}
+
+/** @deprecated Prefer fetchMarketData(trackedAssetId, currency) */
+export async function fetchBtcData(currency: string = 'USD'): Promise<BtcPriceData> {
+  return fetchMarketData('bitcoin', currency);
 }

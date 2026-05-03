@@ -35,6 +35,7 @@ export function BadgeDebug() {
     stepEvents,
     companionEvents,
     holdGoal: holdGoal ?? null,
+    trackedAssetId: holdGoal?.trackedAssetId,
   });
 
   const completed = useMemo(() => rows.filter((r) => r.state === 'completed'), [rows]);

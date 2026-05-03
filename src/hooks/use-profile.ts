@@ -6,6 +6,7 @@ import { useAuth } from '@/hooks/use-auth';
 import { holzenLog } from '@/lib/holzen-console';
 import type { CompanionPrefs } from '@/components/CompanionSection';
 import type { Database } from '@/integrations/supabase/types';
+import { normalizeTrackedAssetId } from '@/lib/tracked-assets';
 
 type ProfileRow = Database['public']['Tables']['profiles']['Row'];
 type ProfileUpdate = Database['public']['Tables']['profiles']['Update'];
@@ -41,6 +42,7 @@ export function useProfile() {
   const [mantra, setMantraState] = useState<string | null>(null);
   const [groundingActivities, setGroundingActivitiesState] = useState<string[]>([]);
   const [currency, setCurrencyState] = useState<string>('USD');
+  const [trackedAssetId, setTrackedAssetIdState] = useState<string>('bitcoin');
   const [language, setLanguageState] = useState<string>('en');
   const [companionPrefs, setCompanionPrefsState] = useState<CompanionPrefs>({ breathing: true, haiku: true, grounding: true, signal: true, zoomOut: true, history: true });
   const [profileLoaded, setProfileLoaded] = useState(false);
@@ -70,7 +72,7 @@ export function useProfile() {
     }
 
     const selectCols =
-      'threshold, threshold_down, cumulative_threshold, last_message, last_context, email_notifications, has_onboarded, companion_breathing, companion_haiku, companion_grounding, companion_signal, companion_zoom_out, companion_history, reflection_tone, cooldown_hours, last_trigger_at, silent_mode, streak_freeze_dates, digest_frequency, custom_prompt, reflection_style, quiet_hours_start, quiet_hours_end, first_name, night_reflection_hour, ai_insights_enabled, ritual_template, notify_badges, motivations, mantra, hold_goal_currency, language, grounding_activities';
+      'threshold, threshold_down, cumulative_threshold, last_message, last_context, email_notifications, has_onboarded, companion_breathing, companion_haiku, companion_grounding, companion_signal, companion_zoom_out, companion_history, reflection_tone, cooldown_hours, last_trigger_at, silent_mode, streak_freeze_dates, digest_frequency, custom_prompt, reflection_style, quiet_hours_start, quiet_hours_end, first_name, night_reflection_hour, ai_insights_enabled, ritual_template, notify_badges, motivations, mantra, hold_goal_currency, tracked_asset_id, language, grounding_activities';
 
     const load = async () => {
       holzenLog.profile('fetch profiles', { userIdPrefix: user.id.slice(0, 8) });
@@ -129,6 +131,7 @@ export function useProfile() {
         setMotivationsState(row.motivations ?? []);
         setMantraState(row.mantra ?? null);
         setCurrencyState(row.hold_goal_currency ?? 'USD');
+        setTrackedAssetIdState(normalizeTrackedAssetId(row.tracked_asset_id));
         setLanguageState(row.language ?? 'en');
         setGroundingActivitiesState(row.grounding_activities ?? []);
         setHasOnboarded(row.has_onboarded ?? false);
@@ -410,6 +413,13 @@ export function useProfile() {
       setCurrencyState(val);
       if (!user) return;
       await supabase.from('profiles').update({ hold_goal_currency: val }).eq('user_id', user.id);
+    },
+    trackedAssetId,
+    setTrackedAssetId: async (val: string) => {
+      const next = normalizeTrackedAssetId(val);
+      setTrackedAssetIdState(next);
+      if (!user) return;
+      await supabase.from('profiles').update({ tracked_asset_id: next }).eq('user_id', user.id);
     },
     language,
     setLanguage: async (val: string) => {

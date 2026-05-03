@@ -9,7 +9,7 @@ const Terms = () => {
 
   return (
     <div className="min-h-screen flex flex-col items-center">
-      <PageMeta title="Terms of Service — Holzen" description="Terms of service for Holzen, the Bitcoin self-awareness app." path="/terms" />
+      <PageMeta title="Terms of Service — Holzen" description="Terms of service for Holzen, a self-awareness app for volatile asset holders." path="/terms" />
       <div className="flex-1 w-full max-w-lg px-6 py-16 space-y-10">
         <div className="space-y-4">
           <button
@@ -33,7 +33,7 @@ const Terms = () => {
         <section className="space-y-3">
           <h2 className="text-sm font-medium text-foreground">2. Description of Service</h2>
           <p className="text-xs text-muted-foreground leading-relaxed">
-            Holzen monitors Bitcoin volatility and delivers AI-generated pause prompts when market movement exceeds a user-defined threshold. Holzen is not a trading tool, financial advisor, or investment platform. Those prompts are intended solely to encourage pause and self-awareness — never to suggest, recommend, or imply any financial action.
+            Holzen monitors price volatility for a user-selected cryptocurrency (from an in-app allowlist) and delivers AI-generated pause prompts when movement exceeds a user-defined threshold. Holzen is not a trading tool, financial advisor, or investment platform. Those prompts are intended solely to encourage pause and self-awareness — never to suggest, recommend, or imply any financial action.
           </p>
         </section>
 
@@ -75,7 +75,7 @@ const Terms = () => {
         <section className="space-y-3">
           <h2 className="text-sm font-medium text-foreground">8. Disclaimer of Warranties</h2>
           <p className="text-xs text-muted-foreground leading-relaxed">
-            The Service is provided "as is" and "as available" without warranties of any kind. We do not guarantee uninterrupted access, accuracy of market data, or suitability of pause prompts for any purpose. Bitcoin price data is sourced from third-party APIs and may be delayed or inaccurate.
+            The Service is provided "as is" and "as available" without warranties of any kind. We do not guarantee uninterrupted access, accuracy of market data, or suitability of pause prompts for any purpose. Market data is sourced from third-party APIs and may be delayed or inaccurate.
           </p>
         </section>
 

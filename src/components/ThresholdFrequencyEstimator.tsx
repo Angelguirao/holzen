@@ -8,6 +8,8 @@ interface Props {
   cumulativeThreshold?: number;
   cooldownHours?: number;
   className?: string;
+  /** CoinGecko coin id for historical volatility fetch. */
+  coinId?: string;
 }
 
 interface VolatilityStats {
@@ -17,7 +19,9 @@ interface VolatilityStats {
   rawSignals30d: number;
 }
 
-const CACHE_KEY = 'holzen_btc_volatility_stats_v2';
+function volatilityCacheKey(coinId: string): string {
+  return `holzen_volatility_stats_v2_${coinId}`;
+}
 const LEGACY_CACHE_KEY = 'holzen_btc_volatility_stats';
 const CACHE_TTL = 6 * 60 * 60 * 1000;
 
@@ -41,10 +45,11 @@ function isValidCachedData(value: unknown): value is CachedData {
   return hasValidDaily && hasValidHourly;
 }
 
-async function fetchVolatilityData(): Promise<CachedData | null> {
+async function fetchVolatilityData(coinId: string): Promise<CachedData | null> {
+  const key = volatilityCacheKey(coinId);
   try {
-    const readCached = (key: string): CachedData | null => {
-      const cached = localStorage.getItem(key);
+    const readCached = (k: string): CachedData | null => {
+      const cached = localStorage.getItem(k);
       if (!cached) return null;
       const parsed: unknown = JSON.parse(cached);
       if (!isValidCachedData(parsed)) return null;
@@ -52,16 +57,22 @@ async function fetchVolatilityData(): Promise<CachedData | null> {
       return parsed;
     };
 
-    const cached = readCached(CACHE_KEY) ?? readCached(LEGACY_CACHE_KEY);
+    let cached = readCached(key);
+    if (!cached && coinId === 'bitcoin') {
+      cached = readCached(LEGACY_CACHE_KEY) ?? readCached('holzen_btc_volatility_stats_v2');
+    }
     if (cached) {
-      // Migrate legacy cache shape to the current key.
-      localStorage.setItem(CACHE_KEY, JSON.stringify(cached));
-      localStorage.removeItem(LEGACY_CACHE_KEY);
+      localStorage.setItem(key, JSON.stringify(cached));
+      if (coinId === 'bitcoin') {
+        localStorage.removeItem(LEGACY_CACHE_KEY);
+        localStorage.removeItem('holzen_btc_volatility_stats_v2');
+      }
       return cached;
     }
 
+    const id = encodeURIComponent(coinId);
     const res = await fetch(
-      'https://api.coingecko.com/api/v3/coins/bitcoin/market_chart?vs_currency=usd&days=90'
+      `https://api.coingecko.com/api/v3/coins/${id}/market_chart?vs_currency=usd&days=90`,
     );
     if (!res.ok) return null;
     const data = await res.json();
@@ -83,8 +94,7 @@ async function fetchVolatilityData(): Promise<CachedData | null> {
     }
 
     const result: CachedData = { dailyChanges, hourlyPrices: prices, timestamp: Date.now() };
-    localStorage.setItem(CACHE_KEY, JSON.stringify(result));
-    localStorage.removeItem(LEGACY_CACHE_KEY);
+    localStorage.setItem(key, JSON.stringify(result));
     return result;
   } catch {
     return null;
@@ -200,6 +210,7 @@ export function ThresholdFrequencyEstimator({
   cumulativeThreshold = 0,
   cooldownHours,
   className,
+  coinId = 'bitcoin',
 }: Props) {
   const { t } = useTranslation();
   const [stats, setStats] = useState<VolatilityStats | null>(null);
@@ -208,10 +219,11 @@ export function ThresholdFrequencyEstimator({
   const effectiveDown = thresholdDown ?? thresholdUp;
 
   useEffect(() => {
-    fetchVolatilityData().then((d) => {
+    setCachedData(null);
+    fetchVolatilityData(coinId).then((d) => {
       if (d) setCachedData(d);
     });
-  }, []);
+  }, [coinId]);
 
   useEffect(() => {
     if (!cachedData) return;

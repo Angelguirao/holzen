@@ -45,6 +45,8 @@ export interface BuildOrchestrateCompanionTasksParams {
    */
   skipLivePerplexity?: boolean;
   skipLiveLovable?: boolean;
+  /** profiles.tracked_asset_id — zoom-out BTC anniversary path only for bitcoin. */
+  trackedAssetId?: string | null;
 }
 
 /** Build parallel generator promises (grounding / history / zoomOut / signal) from orchestrate inputs. */
@@ -154,6 +156,7 @@ export function buildOrchestrateCompanionTasks(
         log: p.log,
         zoomOutAngle: p.intent.zoomOutAngle,
         skipLive: skipLiveZoomOut,
+        trackedAssetId: p.trackedAssetId,
       });
       const latencyMs = Date.now() - t;
       logCompanionSlotResolved(p.log, {

@@ -34,6 +34,14 @@ import { useSettingsState } from '@/pages/settings/use-settings-state';
 import { GroundingTagInput } from '@/pages/settings/GroundingTagInput';
 import { ChangeEmailSection } from '@/pages/settings/ChangeEmailSection';
 import { HoldGoalWidget } from '@/components/HoldGoalWidget';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
+import { TRACKED_ASSETS } from '@/lib/tracked-assets';
 
 export function SettingsYouPanel() {
   const {
@@ -154,9 +162,30 @@ export function SettingsReflectionPanel() {
     setReflectionStyle,
     customPrompt,
     setCustomPrompt,
+    trackedAssetId,
+    setTrackedAssetId,
   } = useSettingsState();
   return (
     <>
+
+            <div className="space-y-3">
+              <p className="text-muted-foreground/60 uppercase tracking-wider text-sm font-sans">
+                {t('settings.trackedAssetTitle')}
+              </p>
+              <p className="leading-relaxed text-primary text-sm">{t('settings.trackedAssetDesc')}</p>
+              <Select value={trackedAssetId} onValueChange={(v) => void setTrackedAssetId(v)}>
+                <SelectTrigger className="max-w-md font-mono text-xs" aria-label={t('settings.trackedAssetTitle')}>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  {TRACKED_ASSETS.map((a) => (
+                    <SelectItem key={a.id} value={a.id} className="font-mono text-xs">
+                      {t(`settings.trackedAssets.${a.id}`)}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
 
             <ThresholdSetting
               thresholdUp={threshold}
@@ -166,6 +195,7 @@ export function SettingsReflectionPanel() {
               cumulativeThreshold={cumulativeThreshold}
               onSetCumulative={setCumulativeThreshold}
               cooldownHours={cooldownHours}
+              trackedAssetId={trackedAssetId}
             />
 
             {/* Cooldown */}
@@ -301,6 +331,7 @@ export function SettingsExperiencePanel() {
     t,
     btcMode,
     setBtcMode,
+    trackedAssetId,
     currency,
     setCurrency,
     zenMode,
@@ -318,29 +349,31 @@ export function SettingsExperiencePanel() {
   return (
     <>
 
-            {/* 1 BTC = 1 BTC mode */}
-            <div className="space-y-3">
-              <p className="uppercase tracking-wider text-base font-sans font-semibold text-[#dbb266]">{t('settings.btcMode')}</p>
-              <p className="leading-relaxed text-primary text-sm">
-                {t('settings.btcModeDesc')}
-              </p>
-              <div className="flex items-center justify-between">
-                <Label htmlFor="btc-mode" className="cursor-pointer text-base font-sans text-secondary-foreground">
-                  {t('settings.enableConvictionMode')}
-                </Label>
-                <Switch
-                  id="btc-mode"
-                  checked={btcMode}
-                  onCheckedChange={(val) => {
-                    setBtcMode(val);
-                    localStorage.setItem('holzen_btc_mode', String(val));
-                  }}
-                />
+            {/* 1 unit = 1 unit (Bitcoin-focused copy; hidden for other tracked assets). */}
+            {trackedAssetId === 'bitcoin' ? (
+              <div className="space-y-3">
+                <p className="uppercase tracking-wider text-base font-sans font-semibold text-[#dbb266]">{t('settings.btcMode')}</p>
+                <p className="leading-relaxed text-primary text-sm">
+                  {t('settings.btcModeDesc')}
+                </p>
+                <div className="flex items-center justify-between">
+                  <Label htmlFor="btc-mode" className="cursor-pointer text-base font-sans text-secondary-foreground">
+                    {t('settings.enableConvictionMode')}
+                  </Label>
+                  <Switch
+                    id="btc-mode"
+                    checked={btcMode}
+                    onCheckedChange={(val) => {
+                      setBtcMode(val);
+                      localStorage.setItem('holzen_btc_mode', String(val));
+                    }}
+                  />
+                </div>
               </div>
-            </div>
+            ) : null}
 
             {/* Currency */}
-            <div className={`space-y-3 transition-opacity ${btcMode ? 'opacity-30 pointer-events-none' : ''}`}>
+            <div className={`space-y-3 transition-opacity ${trackedAssetId === 'bitcoin' && btcMode ? 'opacity-30 pointer-events-none' : ''}`}>
               <p className="text-muted-foreground/60 uppercase tracking-wider text-sm font-sans">{t('settings.displayCurrency')}</p>
               <p className="leading-relaxed text-primary text-sm">
                 {t('settings.displayCurrencyDesc')}
