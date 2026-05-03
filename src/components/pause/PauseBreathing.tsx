@@ -1,9 +1,14 @@
-import { useState, useEffect, useMemo, useImperativeHandle, forwardRef } from 'react';
+import { useState, useEffect, useMemo, useImperativeHandle, forwardRef, useRef } from 'react';
 import { motion, useReducedMotion } from 'framer-motion';
 import { useTranslation } from 'react-i18next';
 import { hapticFeedback } from '@/lib/haptics';
 import { getSessionQuote } from '@/lib/wisdom-quotes';
 import { pauseStepLayout } from '@/components/pause/pause-step-layout';
+import {
+  playPauseBreathPatternCompleteCue,
+  playPauseBreathPhaseCue,
+  resumePauseAudioContext,
+} from '@/lib/pause-ritual-audio';
 
 const PATTERNS = [
   {
@@ -57,6 +62,8 @@ interface Props {
   onPatternComplete?: () => void;
   /** True while the countdown / phase loop is running (not intro, not completion card). */
   onTimedBreathingChange?: (active: boolean) => void;
+  /** Header mute: when true, phase ticks and pattern-complete chime are suppressed. */
+  ritualSoundMuted?: boolean;
 }
 
 export const PauseBreathing = forwardRef<PauseBreathingHandle, Props>(function PauseBreathing(
@@ -69,12 +76,17 @@ export const PauseBreathing = forwardRef<PauseBreathingHandle, Props>(function P
     completed: completedProp,
     onPatternComplete,
     onTimedBreathingChange,
+    ritualSoundMuted = false,
   },
   ref,
 ) {
   const { t } = useTranslation();
   const prefersReduced = useReducedMotion();
   const quote = useMemo(() => getSessionQuote(), []);
+  const cueOptsRef = useRef({ muted: ritualSoundMuted, prefersReduced: !!prefersReduced });
+  useEffect(() => {
+    cueOptsRef.current = { muted: ritualSoundMuted, prefersReduced: !!prefersReduced };
+  }, [ritualSoundMuted, prefersReduced]);
 
   const patternIndex = severity === 'high' ? 1 : 0;
   const pattern = PATTERNS[patternIndex];
@@ -118,14 +130,24 @@ export const PauseBreathing = forwardRef<PauseBreathingHandle, Props>(function P
           if (nextPhase >= pattern.phases.length) {
             const nextCycle = cycle + 1;
             if (nextCycle >= totalCycles) {
+              const o = cueOptsRef.current;
+              playPauseBreathPatternCompleteCue({ muted: o.muted, prefersReducedMotion: o.prefersReduced });
               setCompletedLocal(true);
               onPatternComplete?.();
               hapticFeedback('success');
               return 0;
             }
+            {
+              const o = cueOptsRef.current;
+              playPauseBreathPhaseCue({ muted: o.muted, prefersReducedMotion: o.prefersReduced });
+            }
             setCycle(nextCycle);
             setPhaseIndex(0);
           } else {
+            {
+              const o = cueOptsRef.current;
+              playPauseBreathPhaseCue({ muted: o.muted, prefersReducedMotion: o.prefersReduced });
+            }
             setPhaseIndex(nextPhase);
           }
           return 0;
@@ -225,6 +247,7 @@ export const PauseBreathing = forwardRef<PauseBreathingHandle, Props>(function P
               transition={{ delay: 1.5, duration: 1 }}
               onClick={() => {
                 hapticFeedback('light');
+                void resumePauseAudioContext();
                 setStarted(true);
               }}
               className={pauseStepLayout.textContinue}

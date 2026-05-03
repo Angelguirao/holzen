@@ -3,8 +3,8 @@ import type { CompanionData, CompanionPrefs } from '@/components/CompanionSectio
 import type { PauseStep } from '@/components/pause/PauseProgress';
 
 const SESSION_KEY = 'holzen_pause_session';
-/** Bump when persisted step model changes (Figma six-step alignment). */
-export const PAUSE_RITUAL_SCHEMA_VERSION = 2 as const;
+/** Bump when persisted step model changes (Choose bridge + seven macro steps). */
+export const PAUSE_RITUAL_SCHEMA_VERSION = 3 as const;
 
 export interface PersistedSession {
   message: string;
@@ -36,6 +36,8 @@ export interface PersistedSession {
   breathingCompleted?: boolean;
   /** Present when `PAUSE_RITUAL_SCHEMA_VERSION` */
   pauseRitualSchema?: number;
+  /** Decide screen back target: normal flow uses Choose; skip-second-breath jumps straight to Decide. */
+  decideOnBackStep?: 'choose' | 'breath2';
 }
 
 export const DEFAULT_COMPANIONS: CompanionData = { haiku: null, groundingTitle: null, groundingBody: null };
@@ -60,14 +62,32 @@ export interface FetchedPauseInstance {
 
 type LegacyPauseStep = 'breathe' | 'feel' | 'reflect' | 'shift' | 'decide';
 
-/** Normalize localStorage from pre–six-step ritual to current `PauseStep` union. */
+/** Normalize localStorage from legacy five/six-step rituals to current `PauseStep` union. */
+function normalizePauseRitualFields(raw: PersistedSession): Pick<
+  PersistedSession,
+  'breathingFirstCompleted' | 'breathingSecondCompleted' | 'frameDone'
+> {
+  return {
+    breathingFirstCompleted: raw.breathingFirstCompleted ?? raw.breathingCompleted ?? false,
+    breathingSecondCompleted: raw.breathingSecondCompleted ?? false,
+    frameDone: raw.frameDone ?? false,
+  };
+}
+
 export function migratePersistedPauseSession(raw: PersistedSession): PersistedSession {
   if (raw.pauseRitualSchema === PAUSE_RITUAL_SCHEMA_VERSION) {
     return {
       ...raw,
-      breathingFirstCompleted: raw.breathingFirstCompleted ?? raw.breathingCompleted ?? false,
-      breathingSecondCompleted: raw.breathingSecondCompleted ?? false,
-      frameDone: raw.frameDone ?? false,
+      ...normalizePauseRitualFields(raw),
+    };
+  }
+
+  if (raw.pauseRitualSchema === 2) {
+    return {
+      ...raw,
+      ...normalizePauseRitualFields(raw),
+      decideOnBackStep: raw.decideOnBackStep ?? (raw.step === 'decide' ? 'breath2' : undefined),
+      pauseRitualSchema: PAUSE_RITUAL_SCHEMA_VERSION,
     };
   }
 
@@ -120,6 +140,7 @@ export function migratePersistedPauseSession(raw: PersistedSession): PersistedSe
     breathingFirstCompleted,
     breathingSecondCompleted,
     frameDone,
+    decideOnBackStep: step === 'decide' ? 'breath2' : undefined,
     pauseRitualSchema: PAUSE_RITUAL_SCHEMA_VERSION,
   };
 }

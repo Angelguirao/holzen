@@ -28,6 +28,8 @@ return value ? <HomeV2 /> : <HomeClassic />;
 | `ui.home_v2` | boolean | `false` | @holzen | 10% | Pipeline smoke test on a low-stakes path (new Home layout). Validates: flag read, identify, sampling, client-side gating. | When V2 ships to 100% or is retracted (whichever first); remove after 2 stable weeks post-rollout. |
 | `pause.step5_breath_label_shift` | boolean \| string | `false` | @holzen | 0% | Figma variant B: macro step 5 stepper label reads **Shift** instead of a second **Breathe**. | When design picks one variant for everyone; remove unused label branch. |
 
+**Provisioning `pause.step5_breath_label_shift`:** create a boolean (or multivariate string) flag in the PostHog project with this exact key; until it exists, `isFeatureEnabled` stays on the client default (`false`). For local/Vite builds without flipping the flag in PostHog, you can set `**VITE_PAUSE_STEP5_BREATH_LABEL_SHIFT**` to `1`, `true`, or `shift` in `.env` (see `.env.example`) — it overrides the label after PostHog is ready, or alone when PostHog is absent.
+
 Add rows as flags are introduced. Bump rollout % via PostHog UI; document changes in the table.
 
 ## Naming convention
