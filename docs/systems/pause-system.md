@@ -246,6 +246,8 @@ UI order: **Feel** → **Breath** → **Integrate** (client-only quiet window; *
 
 The `/pause` ritual **does not** use horizontal swipe to change steps. Navigation is **Continue / back header / stepper taps on past steps** only, so gestures never skip RPC gates accidentally. Shared gate logic for “may this step’s primary CTA advance?” still lives in `**canAdvanceFromPauseStep**` (`src/lib/pause-session-navigation.ts`) for reuse by step components.
 
+**Step panel motion (Framer):** beats still **animate** with a horizontal slide between screens; offset, easing, duration, and `prefers-reduced-motion` behavior live in `**buildPauseSessionStepTransitionConfig**` (`src/lib/pause-session-step-transition.ts`). That is **presentation only** — it does not advance the ritual or bypass RPC gates.
+
 **Reflect companion strip (`breathing` chip):** `**loadCompanionUiCompletionState**` (`src/lib/companion-completion-sync.ts`) reads all `**breath_completed**` payloads. If **any** row carries numeric `**breath_segment**` **1** or **2**, the UI treats breathing as complete only when **both** segments have been logged; otherwise any row counts as the legacy single-breath completion. Pure helper: `**src/lib/companion-breath-completion-detect.ts**` (Vitest in `**src/test/companion-completion-sync.test.ts**`).
 
 ### 7.5 Decide and the Done screen (why we wait for `completed`)
