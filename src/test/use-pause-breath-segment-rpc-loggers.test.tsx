@@ -3,6 +3,7 @@ import { renderHook, act } from '@testing-library/react';
 import type { TFunction } from 'i18next';
 import { usePauseBreathSegmentRpcLoggers } from '@/hooks/use-pause-breath-segment-rpc-loggers';
 import { showPauseStepSyncFailedToast } from '@/lib/pause-step-sync-toast';
+import { makeTestPersistedPauseSession } from '@/test/make-test-persisted-pause-session';
 
 const { pauseLogStepMock } = vi.hoisted(() => ({
   pauseLogStepMock: vi.fn(),
@@ -29,8 +30,7 @@ describe('usePauseBreathSegmentRpcLoggers', () => {
     const { result } = renderHook(() =>
       usePauseBreathSegmentRpcLoggers({
         pauseInstanceId: 'inst-1',
-        initialSegment1Logged: true,
-        initialSegment2Logged: false,
+        restored: makeTestPersistedPauseSession({ step: 'reflect' }),
         t,
       }),
     );
@@ -45,8 +45,7 @@ describe('usePauseBreathSegmentRpcLoggers', () => {
     const { result } = renderHook(() =>
       usePauseBreathSegmentRpcLoggers({
         pauseInstanceId: 'inst-1',
-        initialSegment1Logged: false,
-        initialSegment2Logged: false,
+        restored: null,
         t,
       }),
     );
@@ -66,8 +65,7 @@ describe('usePauseBreathSegmentRpcLoggers', () => {
       ({ id }: { id: string | null }) =>
         usePauseBreathSegmentRpcLoggers({
           pauseInstanceId: id,
-          initialSegment1Logged: false,
-          initialSegment2Logged: false,
+          restored: null,
           t,
         }),
       { initialProps: { id: 'a' as string | null } },
@@ -88,8 +86,7 @@ describe('usePauseBreathSegmentRpcLoggers', () => {
     const { result } = renderHook(() =>
       usePauseBreathSegmentRpcLoggers({
         pauseInstanceId: null,
-        initialSegment1Logged: false,
-        initialSegment2Logged: false,
+        restored: null,
         t,
       }),
     );
@@ -103,8 +100,7 @@ describe('usePauseBreathSegmentRpcLoggers', () => {
     const { result } = renderHook(() =>
       usePauseBreathSegmentRpcLoggers({
         pauseInstanceId: 'inst-1',
-        initialSegment1Logged: false,
-        initialSegment2Logged: false,
+        restored: null,
         t,
       }),
     );
@@ -123,8 +119,7 @@ describe('usePauseBreathSegmentRpcLoggers', () => {
     const { result } = renderHook(() =>
       usePauseBreathSegmentRpcLoggers({
         pauseInstanceId: 'inst-1',
-        initialSegment1Logged: false,
-        initialSegment2Logged: false,
+        restored: null,
         t,
       }),
     );
@@ -143,8 +138,7 @@ describe('usePauseBreathSegmentRpcLoggers', () => {
     const { result } = renderHook(() =>
       usePauseBreathSegmentRpcLoggers({
         pauseInstanceId: 'inst-1',
-        initialSegment1Logged: false,
-        initialSegment2Logged: false,
+        restored: null,
         t,
       }),
     );
@@ -158,8 +152,7 @@ describe('usePauseBreathSegmentRpcLoggers', () => {
     const { result } = renderHook(() =>
       usePauseBreathSegmentRpcLoggers({
         pauseInstanceId: 'inst-1',
-        initialSegment1Logged: false,
-        initialSegment2Logged: false,
+        restored: null,
         t,
       }),
     );
