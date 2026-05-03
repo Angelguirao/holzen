@@ -43,10 +43,9 @@ import {
   briefStepToPauseScienceStep,
 } from '@/lib/pause-session-step-map';
 import { initialDecideOnBackStepFromPersisted } from '@/lib/pause-session-initial-decide-on-back-step';
-import { computePauseStorageRitualSyncPatch } from '@/lib/pause-session-storage-ritual-sync';
 import { parsePauseSessionLocationState } from '@/lib/router-location-state';
 import { useFeatureFlag } from '@/hooks/use-feature-flag';
-import { DEFAULT_COMPANIONS, DEFAULT_PREFS, loadSession, clearSession } from '@/lib/pause-session-storage';
+import { DEFAULT_COMPANIONS, DEFAULT_PREFS, clearSession } from '@/lib/pause-session-storage';
 import {
   resolvePauseBreathSecondLabelVariant,
   viteWantsPauseBreathSecondLabelShift,
@@ -62,6 +61,7 @@ import { usePauseSessionExitNavigation } from '@/hooks/use-pause-session-exit-na
 import { usePauseSessionBreathStepHandlers } from '@/hooks/use-pause-session-breath-step-handlers';
 import { usePauseSessionHeaderBackHandler } from '@/hooks/use-pause-session-header-back-handler';
 import { usePauseSessionPersistToStorage } from '@/hooks/use-pause-session-persist-to-storage';
+import { usePauseSessionRitualStorageSync } from '@/hooks/use-pause-session-ritual-storage-sync';
 import type { PauseImpactData } from '@/lib/pause-impact-data';
 import { showPauseStepSyncFailedToast } from '@/lib/pause-step-sync-toast';
 import { usePauseSessionShell } from '@/hooks/use-pause-session-shell';
@@ -198,15 +198,13 @@ export default function PauseSession() {
     setSelectedBriefFace,
   });
 
-  useEffect(() => {
-    if (!pauseInstanceId) return;
-    const patch = computePauseStorageRitualSyncPatch(pauseInstanceId, loadSession());
-    if (!patch) return;
-    setRitualEntry(patch.ritualEntry);
-    if (patch.briefStep !== undefined) setBriefStep(patch.briefStep);
-    setBriefIntegrateDone(patch.briefIntegrateDone);
-    setSelectedBriefFace(patch.selectedBriefFace);
-  }, [pauseInstanceId]);
+  usePauseSessionRitualStorageSync({
+    pauseInstanceId,
+    setRitualEntry,
+    setBriefStep,
+    setBriefIntegrateDone,
+    setSelectedBriefFace,
+  });
 
   usePauseSessionPersistToStorage({
     message,
