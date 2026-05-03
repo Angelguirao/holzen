@@ -13,7 +13,7 @@ export function FilterRow({ label: filterLabel, options, value, onChange }: {
           onClick={() => onChange(opt.value)}
           className={`text-[9px] font-mono px-2 py-0.5 rounded-full transition-colors ${
             value === opt.value
-              ? 'bg-primary/15 text-primary'
+              ? 'bg-muted/60 text-foreground'
               : 'text-muted-foreground/50 hover:text-muted-foreground/80 hover:bg-muted/20'
           }`}
         >

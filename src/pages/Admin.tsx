@@ -359,7 +359,7 @@ export default function Admin() {
         <h2 className="text-xs font-mono tracking-widest uppercase text-muted-foreground/80">System Monitor</h2>
         <div className="rounded-xl border border-destructive/20 bg-destructive/5 px-4 py-3">
           <p className="text-xs text-destructive/70">{error}</p>
-          <button onClick={refresh} className="mt-2 text-[10px] font-mono text-primary/60 hover:text-primary flex items-center gap-1">
+          <button onClick={refresh} className="mt-2 text-[10px] font-sans font-medium text-nox-text-link/70 hover:text-nox-text-link flex items-center gap-1">
             <RefreshCw className="h-3 w-3" /> Retry
           </button>
         </div>
@@ -392,7 +392,7 @@ export default function Admin() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <h2 className="text-xs font-mono tracking-widest uppercase text-muted-foreground/80">System Monitor</h2>
-        <button onClick={refresh} className="flex items-center gap-1.5 text-[10px] font-mono text-muted-foreground/60 hover:text-primary transition-colors">
+        <button onClick={refresh} className="flex items-center gap-1.5 text-[10px] font-sans font-medium text-muted-foreground/60 hover:text-nox-text-link transition-colors">
           <RefreshCw className="h-3 w-3" />
           {lastUpdated && <span>{lastUpdated.toLocaleTimeString()}</span>}
         </button>
@@ -433,7 +433,7 @@ export default function Admin() {
             </div>
           ) : periodStats.serves > 0 ? (
             <div className="rounded-xl border border-primary/15 bg-primary/3 px-4 py-2.5">
-              <p className="text-[10px] font-mono text-primary/60">
+              <p className="text-[10px] font-mono text-muted-foreground">
                 ✓ System healthy — {[
                   `${failureRate}% failure rate`,
                   periodStats.cost > 0 && `$${periodStats.cost.toFixed(3)} cost`,
@@ -449,7 +449,7 @@ export default function Admin() {
             {PERIOD_OPTIONS.map(opt => (
               <button key={opt.value} onClick={() => setPeriod(opt.value)}
                 className={`text-[9px] font-mono px-2 py-0.5 rounded-full transition-colors ${
-                  period === opt.value ? 'bg-primary/15 text-primary' : 'text-muted-foreground/50 hover:text-muted-foreground/80 hover:bg-muted/20'
+                  period === opt.value ? 'bg-muted/60 text-foreground' : 'text-muted-foreground/50 hover:text-muted-foreground/80 hover:bg-muted/20'
                 }`}>
                 {opt.label}
               </button>
@@ -648,7 +648,7 @@ export default function Admin() {
                 ? `${rejections.length} row${rejections.length !== 1 ? 's' : ''}`
                 : `Showing ${filteredRejections.length} of ${rejections.length} — `}
               {filteredRejections.length < rejections.length && (
-                <button type="button" onClick={() => { setRejectionTypeFilter('all'); setRejectionStatusFilter('all'); }} className="text-primary/70 hover:text-primary">clear filters</button>
+                <button type="button" onClick={() => { setRejectionTypeFilter('all'); setRejectionStatusFilter('all'); }} className="text-xs font-sans font-medium text-nox-text-link/80 hover:text-nox-text-link">clear filters</button>
               )}
             </p>
             <AdminBulkBar
@@ -700,7 +700,7 @@ export default function Admin() {
                       <div className="flex items-center gap-2">
                         <span className="text-[9px] text-muted-foreground/50"><ThumbsUp className="h-2.5 w-2.5 inline mr-0.5" />{row.total_thumbs_up ?? 0}</span>
                         <span className="text-[9px] text-muted-foreground/50">👎 {row.total_thumbs_down ?? 0}</span>
-                        <span className={`text-[10px] font-mono ${pct >= 70 ? 'text-primary/70' : pct >= 40 ? 'text-muted-foreground/70' : 'text-destructive/70'}`}>
+                        <span className={`text-[10px] font-mono ${pct >= 70 ? 'text-foreground/75' : pct >= 40 ? 'text-muted-foreground/70' : 'text-destructive/70'}`}>
                           {pct.toFixed(0)}%
                         </span>
                       </div>
@@ -766,13 +766,13 @@ export default function Admin() {
                       </span>
                       <span className="text-[8px] font-mono px-1.5 py-0.5 rounded-full bg-muted/30 text-muted-foreground/60">{s.state}</span>
                       {s.initial_mood && (
-                        <span className="text-[9px] font-mono px-1.5 py-0.5 rounded-full bg-primary/15 text-primary flex-shrink-0">
+                        <span className="text-[9px] font-mono px-1.5 py-0.5 rounded-full bg-muted/50 text-foreground flex-shrink-0">
                           {s.initial_mood}
                         </span>
                       )}
                       {s.outcome && (
                         <span className={`text-[9px] font-mono px-1.5 py-0.5 rounded-full flex-shrink-0 ${
-                          s.outcome === 'held' ? 'bg-primary/15 text-primary'
+                          s.outcome === 'held' ? 'bg-muted/50 text-nox-accent-green'
                           : s.outcome === 'sold' ? 'bg-destructive/15 text-destructive'
                           : 'bg-secondary text-secondary-foreground'
                         }`}>
@@ -792,7 +792,7 @@ export default function Admin() {
                         { loaded: !!s.haiku_text, name: 'Haiku' },
                       ].map(c => (
                         <span key={c.name} className={`text-[8px] font-mono px-1.5 py-0.5 rounded ${
-                          c.loaded ? 'bg-primary/15 text-primary' : 'bg-muted/30 text-muted-foreground/40'
+                          c.loaded ? 'bg-muted/50 text-nox-accent-green' : 'bg-muted/30 text-muted-foreground/40'
                         }`}>
                           {c.name}
                         </span>
@@ -845,7 +845,7 @@ export default function Admin() {
                 ? `${recentContent.length} item${recentContent.length !== 1 ? 's' : ''}`
                 : `Showing ${filteredFeed.length} of ${recentContent.length} — `}
               {filteredFeed.length < recentContent.length && (
-                <button type="button" onClick={() => setFeedTypeFilter('all')} className="text-primary/70 hover:text-primary">clear filter</button>
+                <button type="button" onClick={() => setFeedTypeFilter('all')} className="text-xs font-sans font-medium text-nox-text-link/80 hover:text-nox-text-link">clear filter</button>
               )}
             </p>
             <AdminBulkBar

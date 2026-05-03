@@ -95,14 +95,14 @@ export function PracticeWidget() {
         >
           <Sparkles className="h-3.5 w-3.5 shrink-0 mt-[6px] text-secondary-foreground" />
           <div className="min-w-0 flex-1 text-left">
-            <span className={`${homeInWidget.kicker} text-primary`}>
+            <span className={`${homeInWidget.kicker} text-nox-text-highlight/90`}>
               {t('practice.suggested', { defaultValue: 'Suggested' })}
             </span>
             <span className={`mt-1 block ${homeInWidget.bodyMuted} leading-snug`}>
               {suggestion.reason}
             </span>
           </div>
-          <ChevronRight className="h-3 w-3 text-primary/30 shrink-0 mt-[5px]" />
+          <ChevronRight className="h-3 w-3 text-muted-foreground/50 shrink-0 mt-[5px]" />
         </button>
       )}
 

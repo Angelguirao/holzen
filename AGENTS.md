@@ -24,6 +24,7 @@ Instructions for AI assistants and automation working in this repository (e.g. C
 | `npm run check:prepush` | Full scripted preflight (`scripts/pre-push-check.sh`). **Requires `bash`** (Git Bash / WSL on Windows). |
 | `npm run smoke:edge-logging` | Optional: HTTP smoke against deployed edges — verifies `x-cid` round-trip through `withRequestLogging` (see `supabase/functions/README.md`). |
 | `npm run gen:types` | Regenerate `src/integrations/supabase/types.ts` from the **linked** Supabase project (`supabase login` or `SUPABASE_ACCESS_TOKEN`). Run after DB migrations. |
+| `npm run design:lint` | Optional: validate root **[DESIGN.md](DESIGN.md)** ([`@google/design.md`](https://www.npmjs.com/package/@google/design.md)); uses `npx` (network on first run). |
 | `npm run test:coverage` | Vitest with coverage reports only (no JUnit; use **`test:ci`** for the full CI gate). |
 | `npm run check:version-sync` | Ensures `package.json` **version** matches the latest **`changelog_entries`** row (REST); runs automatically as **`prebuild`** before **`npm run build`**. |
 | `npm run stamp:release` | Writes **`git rev-parse --short=12 HEAD`** into **`supabase/functions/_shared/release.ts`** (`EDGE_RELEASE`) for edge Sentry/BetterStack **`SENTRY_RELEASE`**. Idempotent. |
@@ -42,6 +43,7 @@ Instructions for AI assistants and automation working in this repository (e.g. C
 | Stats | `src/components/stats/` (skills-first IA post-Pause-V2). Hero: `SkillOverviewCard.tsx`. Deep dives under `src/components/stats/{regulation,tolerance,alignment,reappraisal,awareness}/`. Journey under `src/components/stats/journey/`. Advanced under `src/components/stats/advanced/`. Score: `src/lib/stats/pause-score.ts`. Confidence: `src/lib/stats/confidence.ts`. Loader: `src/hooks/use-pause-stats-data.ts`. |
 | Badges | `src/components/BadgesPanelV2.tsx` (4-family / 14-active). Definitions: `src/lib/badges/definitions.ts`. Computation: `src/lib/badges/compute.ts`. Sync + celebration + silent-seed: `src/hooks/use-badge-sync.ts`. |
 | Shared UI | `src/components/`; primitives in `src/components/ui/` (shadcn / Radix patterns) |
+| Visual system (Nox + tokens) | **[DESIGN.md](DESIGN.md)** (agent-oriented); `src/index.css` + `tailwind.config.ts`; deep contract `docs/design/nox/` |
 | Auth state | `src/hooks/use-auth.tsx` + `AuthProvider` in `App.tsx` |
 | Supabase browser client | `src/integrations/supabase/client.ts` |
 | i18n | `src/i18n/`; `useTranslation()` where strings are already externalized |

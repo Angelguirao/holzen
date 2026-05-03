@@ -6,7 +6,7 @@ import { TYPE_COLORS, label } from './admin-constants';
 const STATUS_COLOR: Record<string, string> = {
   error: 'bg-destructive/15 text-destructive',
   timeout: 'bg-secondary text-secondary-foreground',
-  quality_gate_failed: 'bg-primary/15 text-primary',
+  quality_gate_failed: 'bg-muted/50 text-foreground',
 };
 
 type RejectionEntryProps = {

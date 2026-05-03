@@ -120,7 +120,7 @@ export default function SettingsHub() {
             to="/settings/about"
             className="flex w-full items-start gap-3 rounded-xl border border-border/50 bg-card/30 px-3 py-3 transition-colors hover:bg-muted/30 outline-none focus-visible:ring-2 focus-visible:ring-primary/30"
           >
-            <Info className="h-4 w-4 shrink-0 mt-0.5 text-primary/80" aria-hidden />
+            <Info className="h-4 w-4 shrink-0 mt-0.5 text-muted-foreground" aria-hidden />
             <div className="min-w-0 flex-1 text-left">
               <span className="text-sm font-medium text-foreground">
                 {m.t('settings.aboutFeedback', { defaultValue: 'About & feedback' })}
@@ -133,7 +133,7 @@ export default function SettingsHub() {
             </div>
             <div className="flex shrink-0 items-center gap-2 mt-0.5">
               {m.hasUnseenChangelog ? (
-                <span className="text-[10px] font-medium bg-primary/15 text-primary px-2 py-0.5 rounded-full">
+                <span className="text-[10px] font-medium bg-muted/50 text-foreground px-2 py-0.5 rounded-full">
                   {m.t('common.new')}
                 </span>
               ) : null}

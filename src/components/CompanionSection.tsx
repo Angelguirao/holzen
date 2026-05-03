@@ -92,7 +92,7 @@ function CompanionCard({
           <Lock className="h-3.5 w-3.5" />
         </div>
         <span className="flex-1 text-sm font-medium text-muted-foreground">{label}</span>
-        <span className="text-[10px] font-semibold uppercase tracking-wide text-primary/50">{t('pro.badge')}</span>
+        <span className="text-[10px] font-semibold uppercase tracking-wide text-nox-text-highlight/75">{t('pro.badge')}</span>
       </button>
     );
   }
@@ -116,9 +116,9 @@ function CompanionCard({
           loading && !completed ? 'bg-muted/30 animate-pulse' : completed ? 'bg-primary/10' : expanded ? 'bg-primary/8' : 'bg-muted/30'
         }`}>
           {completed ? (
-            <Check className="h-3.5 w-3.5 text-primary" />
+            <Check className="h-3.5 w-3.5 text-nox-accent-green" />
           ) : (
-            <Icon className={`h-3.5 w-3.5 ${loading ? 'text-muted-foreground/30' : expanded ? 'text-primary/70' : 'text-muted-foreground/50'}`} />
+            <Icon className={`h-3.5 w-3.5 ${loading ? 'text-muted-foreground/30' : expanded ? 'text-nox-text-link/80' : 'text-muted-foreground/50'}`} />
           )}
         </div>
         <span className={`flex-1 text-sm font-medium ${completed ? 'text-muted-foreground/50' : 'text-foreground/80'}`}>

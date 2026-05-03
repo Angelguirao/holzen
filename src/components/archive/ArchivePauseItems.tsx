@@ -82,7 +82,7 @@ export function ArchivePauseItems({
             </p>
             {emptyStateHint ? <p className="text-xs text-muted-foreground/60">{emptyStateHint}</p> : null}
             {emptyCtaLabel && emptyCtaTo ? (
-              <Link to={emptyCtaTo} className="inline-block text-sm font-semibold text-foreground underline-offset-4 hover:underline">
+              <Link to={emptyCtaTo} className="inline-block text-sm font-semibold text-nox-text-link underline-offset-4 transition-colors hover:text-nox-text-link/80 hover:underline">
                 {emptyCtaLabel}
               </Link>
             ) : null}

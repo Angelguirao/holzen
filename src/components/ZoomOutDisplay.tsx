@@ -150,7 +150,7 @@ export function ZoomOutDisplay({ data, loading, error, onRetry }: Props) {
                   <span className="text-xs font-mono text-muted-foreground tabular-nums">
                     {fmtPrice(entry.price)}
                   </span>
-                  <span className={`text-[10px] font-mono tabular-nums flex items-center gap-0.5 ${isUp ? 'text-primary/70' : 'text-destructive/70'}`}>
+                  <span className={`text-[10px] font-mono tabular-nums flex items-center gap-0.5 ${isUp ? 'text-foreground/75' : 'text-destructive/70'}`}>
                     {isUp ? <TrendingUp className="h-2.5 w-2.5" /> : <TrendingDown className="h-2.5 w-2.5" />}
                     {isUp ? '+' : ''}{changePct.toFixed(0)}%
                   </span>
@@ -174,8 +174,8 @@ export function ZoomOutDisplay({ data, loading, error, onRetry }: Props) {
       {deepTime && (
         <div className="rounded-lg border border-primary/10 bg-primary/[0.03] px-4 py-3.5 space-y-2">
           <div className="flex items-center gap-1.5">
-            <Globe className="h-3 w-3 text-primary/40" />
-            <p className="text-[9px] font-mono text-primary/50 uppercase tracking-wider">
+            <Globe className="h-3 w-3 text-muted-foreground/50" />
+            <p className="text-[9px] font-mono text-muted-foreground uppercase tracking-wider">
               Deep time
             </p>
           </div>
@@ -283,8 +283,8 @@ export function ZoomOutDisplay({ data, loading, error, onRetry }: Props) {
                 onClick={goToReplay}
                 className="w-full flex items-center justify-center gap-2 py-2.5 rounded-md border border-primary/25 bg-primary/[0.06] hover:bg-primary/[0.1] transition-colors"
               >
-                <PenLine className="h-3 w-3 text-primary/60 shrink-0" />
-                <span className="text-[10px] font-mono text-primary/70 tracking-[0.12em] uppercase">
+                <PenLine className="h-3 w-3 text-muted-foreground shrink-0" />
+                <span className="text-[10px] font-mono text-muted-foreground tracking-[0.12em] uppercase">
                   {extraCount > 0
                     ? t('companions.echoContinueThreadCta')
                     : t('companions.echoRespondCta')}

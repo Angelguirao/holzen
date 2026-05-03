@@ -104,7 +104,7 @@ This document is **comprehensive for structural client refactors**: extraction o
 
 | Concern | Where to look |
 |---------|----------------|
-| **Design system / IA** | [design/nox/README.md](../design/nox/README.md), [design/information-architecture.md](../design/information-architecture.md) |
+| **Design system / IA** | [DESIGN.md](../../DESIGN.md), [design/nox/README.md](../design/nox/README.md), [design/information-architecture.md](../design/information-architecture.md) |
 | **Accessibility** | Acceptance criteria on changed UI; systemic passes (e.g. [backlog/lighthouse-a11y-home.md](../backlog/lighthouse-a11y-home.md)) |
 | **i18n** | Match existing `useTranslation` / key patterns in the same feature |
 | **Analytics & flags** | [ops/event-taxonomy.md](../ops/event-taxonomy.md), [ops/feature-flags.md](../ops/feature-flags.md) when moving or renaming instrumented UI |

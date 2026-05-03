@@ -59,7 +59,7 @@ export function PauseDecide({ onDecide, onBack }: Props) {
             transition={{ duration: 0.3 }}
           >
             <div className="flex flex-col items-center gap-3 text-center">
-              <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-primary/80">
+              <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-muted-foreground">
                 {t('pause.decideIntroKicker', { defaultValue: 'Step 5 · Decide' })}
               </p>
               <p className={pauseStepLayout.screenTitle}>{t('pause.whatWillYouDo')}</p>
@@ -72,7 +72,7 @@ export function PauseDecide({ onDecide, onBack }: Props) {
               className="flex w-full items-center justify-center gap-3 rounded-2xl border border-primary/20 bg-primary/5 py-5 transition-all duration-300 hover:border-primary/30 hover:bg-primary/10"
             >
               <div className="w-10 h-10 rounded-full bg-primary/10 border border-primary/15 flex items-center justify-center">
-                <OutcomeIcon outcome="held" size={18} className="text-primary/60" />
+                <OutcomeIcon outcome="held" size={18} className="text-muted-foreground" />
               </div>
               <span className="text-sm font-semibold tracking-wide text-foreground">
                 {t('ritual.decide.hold', { defaultValue: "I'm holding" })}
@@ -112,7 +112,7 @@ export function PauseDecide({ onDecide, onBack }: Props) {
             transition={{ duration: 0.5 }}
           >
             <div className="flex flex-col items-center gap-2">
-              <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-primary/80">
+              <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-muted-foreground">
                 {t('pause.decideMirrorKicker', { defaultValue: 'Before you confirm' })}
               </p>
               <p className="text-center font-editorial text-xl text-foreground sm:text-2xl">

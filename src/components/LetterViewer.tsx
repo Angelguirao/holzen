@@ -226,7 +226,7 @@ export function LetterViewer({ letter, onClose }: Props) {
                 >
                   {/* Header */}
                   <div className="text-center space-y-1">
-                    <p className="text-[10px] font-mono text-primary/70 uppercase tracking-[0.2em]">
+                    <p className="text-[10px] font-mono text-muted-foreground uppercase tracking-[0.2em]">
                       {t('letter.opened')}
                     </p>
                     {letter.delivered_at && (
@@ -287,7 +287,7 @@ export function LetterViewer({ letter, onClose }: Props) {
                         <p className="text-[10px] font-mono text-muted-foreground/40">
                           BTC {fmtPrice(letter.btc_price_at_delivery)}
                           {priceDeltaStr && (
-                            <span className={priceDeltaStr.startsWith('+') ? 'text-primary/60' : 'text-destructive/60'}>
+                            <span className={priceDeltaStr.startsWith('+') ? 'text-foreground/65' : 'text-destructive/60'}>
                               {' '}{priceDeltaStr}
                             </span>
                           )}

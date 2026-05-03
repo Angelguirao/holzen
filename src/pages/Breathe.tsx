@@ -531,34 +531,34 @@ export default function Breathe() {
                   </p>
                   <ul className="space-y-2.5 text-xs font-mono text-foreground/50">
                     <li className="flex gap-2">
-                      <span className="text-primary/60 shrink-0">·</span>
+                      <span className="text-muted-foreground shrink-0">·</span>
                       {t('void.infoBlockHeight', {
                         defaultValue:
                           'Block height — the latest confirmed block on the Bitcoin blockchain',
                       })}
                     </li>
                     <li className="flex gap-2">
-                      <span className="text-primary/60 shrink-0">·</span>
+                      <span className="text-muted-foreground shrink-0">·</span>
                       {t('void.infoMempool', {
                         defaultValue:
                           'Pending transactions — unconfirmed transactions waiting in the mempool',
                       })}
                     </li>
                     <li className="flex gap-2">
-                      <span className="text-primary/60 shrink-0">·</span>
+                      <span className="text-muted-foreground shrink-0">·</span>
                       {t('void.infoEpoch', {
                         defaultValue:
                           'Epoch arc — progress through the 2,016-block difficulty adjustment cycle',
                       })}
                     </li>
                     <li className="flex gap-2">
-                      <span className="text-primary/60 shrink-0">·</span>
+                      <span className="text-muted-foreground shrink-0">·</span>
                       {t('void.infoFee', {
                         defaultValue: 'Fee pressure — current network demand in sat/vB',
                       })}
                     </li>
                     <li className="flex gap-2">
-                      <span className="text-primary/60 shrink-0">·</span>
+                      <span className="text-muted-foreground shrink-0">·</span>
                       {t('void.infoTimeSince', {
                         defaultValue:
                           'Time since last block — how long since the network found the latest block (~10 min average)',

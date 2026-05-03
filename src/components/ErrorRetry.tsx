@@ -11,7 +11,7 @@ export function ErrorRetry({ message = 'Something went wrong', onRetry }: Props)
       <p className="text-xs text-muted-foreground">{message}</p>
       <button
         onClick={onRetry}
-        className="flex items-center gap-1.5 text-[10px] font-mono text-primary/70 hover:text-primary transition-colors"
+        className="flex items-center gap-1.5 text-[10px] font-sans font-medium text-nox-text-link/75 hover:text-nox-text-link transition-colors"
       >
         <RefreshCw className="h-3 w-3" />
         Retry

@@ -2,6 +2,10 @@
 
 This folder is the implementation contract for migrating Holzen to Nox.
 
+## AI / agent quick path
+
+- **[DESIGN.md](../../DESIGN.md)** (repo root) — portable [Google DESIGN.md](https://github.com/google-labs-code/design.md) summary: YAML tokens + prose, Holzen-specific rules (links, dark-first), and **marked** gaps where implementation diverges from Figma extracts. Use alongside this folder; tokens in **`src/index.css`** win at runtime.
+
 ## Canonical sources
 
 - Figma Foundations: `c6vKLjDHRKfpluorJlT90n`

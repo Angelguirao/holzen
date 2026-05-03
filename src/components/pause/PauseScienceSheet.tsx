@@ -89,7 +89,7 @@ export function PauseScienceScrollBody() {
                     href={source.url}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="inline-flex max-w-full items-center gap-1 break-words text-xs text-primary underline-offset-2 hover:underline"
+                    className="inline-flex max-w-full items-center gap-1 break-words text-xs text-nox-text-link underline-offset-2 transition-colors hover:text-nox-text-link/80 hover:underline"
                   >
                     <ExternalLink className="h-2.5 w-2.5 shrink-0" />
                     {source.label}

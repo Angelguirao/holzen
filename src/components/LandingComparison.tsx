@@ -77,15 +77,15 @@ function SideBySide({ reaction, reflection, prefersReduced, t }: VariantProps) {
         viewport={{ once: true }}
         transition={{ duration: 0.5, delay: 0.15 }}
       >
-        <p className="tracking-[0.15em] uppercase text-primary/60 mb-4 text-sm font-sans">
+        <p className="tracking-[0.15em] uppercase text-muted-foreground mb-4 text-sm font-sans">
           {t('landing.reflection.label')}
         </p>
         {reflection.map((step, i) => (
           <div key={i} className="relative flex gap-3 pb-6 last:pb-0">
             {i < reflection.length - 1 && (
-              <div className="absolute left-[11px] top-[28px] bottom-0 w-px bg-primary/15" />
+              <div className="absolute left-[11px] top-[28px] bottom-0 w-px bg-border/60" />
             )}
-            <div className="relative z-10 flex-shrink-0 w-6 h-6 rounded-full border border-primary/30 bg-primary/5 flex items-center justify-center text-primary/50">
+            <div className="relative z-10 flex-shrink-0 w-6 h-6 rounded-full border border-border/70 bg-muted/30 flex items-center justify-center text-muted-foreground">
               {step.icon}
             </div>
             <p className="text-foreground pt-1 leading-snug text-base">{step.title}</p>
@@ -123,7 +123,7 @@ function CardFlip({ reaction, reflection, prefersReduced, t }: VariantProps) {
           onClick={() => setShowReflection(true)}
           className={`flex-1 py-2.5 text-[10px] font-mono tracking-[0.15em] uppercase transition-colors ${
             showReflection
-              ? 'bg-primary/10 text-primary/80'
+              ? 'bg-muted/40 text-foreground border-r border-border/50'
               : 'text-muted-foreground/50 hover:text-muted-foreground/70'
           }`}
         >
@@ -145,11 +145,11 @@ function CardFlip({ reaction, reflection, prefersReduced, t }: VariantProps) {
             {steps.map((step, i) => (
               <div key={i} className="relative flex gap-3 pb-5 last:pb-0">
                 {i < steps.length - 1 && (
-                  <div className={`absolute left-[11px] top-[28px] bottom-0 w-px ${isCalm ? 'bg-primary/15' : 'bg-destructive/15'}`} />
+                  <div className={`absolute left-[11px] top-[28px] bottom-0 w-px ${isCalm ? 'bg-border/60' : 'bg-destructive/15'}`} />
                 )}
                 <div className={`relative z-10 flex-shrink-0 w-6 h-6 rounded-full border flex items-center justify-center ${
                   isCalm
-                    ? 'border-primary/30 bg-primary/5 text-primary/50'
+                    ? 'border-border/70 bg-muted/30 text-muted-foreground'
                     : 'border-destructive/20 bg-destructive/5 text-destructive/40'
                 }`}>
                   {step.icon}
@@ -216,8 +216,8 @@ function Stacked({ reaction, reflection, prefersReduced, t }: VariantProps) {
         viewport={{ once: true }}
         transition={{ duration: 0.3, delay: 0.2 }}
       >
-        <div className="w-8 h-8 rounded-full border border-primary/20 bg-primary/5 flex items-center justify-center">
-          <svg className="h-3.5 w-3.5 text-primary/50" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+        <div className="w-8 h-8 rounded-full border border-border/60 bg-muted/30 flex items-center justify-center">
+          <svg className="h-3.5 w-3.5 text-muted-foreground" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
             <path d="M12 5v14M5 12l7 7 7-7" />
           </svg>
         </div>
@@ -225,19 +225,19 @@ function Stacked({ reaction, reflection, prefersReduced, t }: VariantProps) {
 
       {/* Reflection — bold and clear */}
       <motion.div
-        className="rounded-lg border border-primary/15 bg-primary/[0.02] p-4"
+        className="rounded-lg border border-border/50 bg-card/40 p-4"
         initial={prefersReduced ? {} : { opacity: 0, y: 12 }}
         whileInView={{ opacity: 1, y: 0 }}
         viewport={{ once: true }}
         transition={{ duration: 0.5, delay: 0.3 }}
       >
-        <p className="text-[10px] font-mono tracking-[0.15em] uppercase text-primary/60 mb-3">
+        <p className="text-[10px] font-mono tracking-[0.15em] uppercase text-muted-foreground mb-3">
           {t('landing.reflection.label')}
         </p>
         <div className="space-y-2.5">
           {reflection.map((step, i) => (
             <div key={i} className="flex items-center gap-2.5">
-              <div className="flex-shrink-0 w-5 h-5 rounded-full border border-primary/25 bg-primary/5 flex items-center justify-center text-primary/50">
+              <div className="flex-shrink-0 w-5 h-5 rounded-full border border-border/70 bg-muted/30 flex items-center justify-center text-muted-foreground">
                 {step.icon}
               </div>
               <p className="text-xs text-foreground">{step.title}</p>

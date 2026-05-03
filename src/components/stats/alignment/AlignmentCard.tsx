@@ -73,7 +73,7 @@ export function AlignmentCard({ rows, holdGoal, onConfigureHoldGoal }: Props) {
             <button
               type="button"
               onClick={onConfigureHoldGoal}
-              className="inline-flex items-center gap-1 text-sm font-medium text-primary hover:underline"
+              className="inline-flex items-center gap-1 text-sm font-medium text-nox-text-link underline-offset-4 transition-colors hover:text-nox-text-link/80 hover:underline"
             >
               {t('stats.alignment.cta', { defaultValue: 'Set a hold goal' })}
               <ArrowRight className="h-3 w-3" aria-hidden />

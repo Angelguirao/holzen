@@ -88,7 +88,7 @@ export function HistoryCalendar({ activities, selectedDate, onSelectDate }: Prop
         <button onClick={goToPrev} className="p-1 text-muted-foreground hover:text-foreground transition-colors">
           <ChevronLeft className="h-4 w-4" />
         </button>
-        <button onClick={goToToday} className="text-xs font-mono tracking-wider text-foreground hover:text-primary transition-colors">
+        <button onClick={goToToday} className="text-xs font-sans font-medium tracking-wider text-nox-text-link/90 hover:text-nox-text-link transition-colors">
           {format(currentMonth, 'MMMM yyyy')}
         </button>
         <button onClick={goToNext} className="p-1 text-muted-foreground hover:text-foreground transition-colors">
@@ -193,7 +193,7 @@ export function HistoryCalendar({ activities, selectedDate, onSelectDate }: Prop
               )}
               {lettersList.length > 0 && (
                 <span className="flex items-center gap-1 text-[10px] font-mono text-muted-foreground">
-                  <Scroll className="h-2.5 w-2.5 text-primary/70" />
+                  <Scroll className="h-2.5 w-2.5 text-muted-foreground" />
                   {t('calendar.letterCount', { count: lettersList.length })}
                 </span>
               )}

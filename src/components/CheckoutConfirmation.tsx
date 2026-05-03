@@ -1383,7 +1383,7 @@ function SummaryRow({
       </span>
       <span
         className={
-          (highlight ? 'font-semibold text-primary' : 'font-medium text-foreground') +
+          (highlight ? 'font-semibold text-nox-text-link' : 'font-medium text-foreground') +
           ' inline-flex items-center gap-1.5'
         }
         aria-live={pending ? 'polite' : undefined}

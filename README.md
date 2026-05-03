@@ -129,6 +129,10 @@ When migrations are ready, commit the SQL files under `supabase/migrations/` and
 
 The app registers a custom service worker from `src/sw.ts` for installability and caching behavior. Behavior may differ between development and production builds.
 
+## Design system
+
+Visual work follows **Nox** (`docs/design/nox/`, Figma keys in that README). For AI-assisted UI work, the repo also keeps **[DESIGN.md](DESIGN.md)** at the root ([Google DESIGN.md](https://github.com/google-labs-code/design.md) format: YAML tokens + prose); **`src/index.css`** remains the runtime token source. Optional check: `npm run design:lint`.
+
 ## Linting & tests
 
 ESLint is enabled project-wide. The tree may report many existing issues; treat new changes as the bar for cleanliness. Tests use Vitest with Testing Library where present.
