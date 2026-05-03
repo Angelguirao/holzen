@@ -21,6 +21,7 @@ import {
   initialBriefPauseStepFromRestored,
   initialBriefIntegrateDoneFromRestored,
   initialSelectedBriefFaceFromRestored,
+  initialPhaseFromRestored,
 } from '@/lib/pause-session-step-map';
 import { initialDecideOnBackStepFromPersisted } from '@/lib/pause-session-initial-decide-on-back-step';
 import { parsePauseSessionLocationState } from '@/lib/router-location-state';
@@ -125,6 +126,7 @@ export default function PauseSession() {
     hydrationStatus: hydration.status,
     ritualEntryInitial: initialRitualEntry(restored),
     briefStepInitial: initialBriefPauseStepFromRestored(restored),
+    phaseInitial: initialPhaseFromRestored(restored),
   });
 
   const { message, context, pauseInstanceId, companions, companionPrefs, severity } =
@@ -145,7 +147,7 @@ export default function PauseSession() {
   const [decideOnBackStep, setDecideOnBackStep] = useState<'choose' | 'breath2'>(() =>
     initialDecideOnBackStepFromPersisted(restored),
   );
-  const [phase, setPhase] = useState<'session' | 'done'>(restored?.phase ?? 'session');
+  const [phase, setPhase] = useState<'session' | 'done'>(() => initialPhaseFromRestored(restored));
   const [decision, setDecision] = useState<string | null>(restored?.decision ?? null);
   const [isFavorite, setIsFavorite] = useState(false);
   const { toggleFavorite } = usePauseFavoriteToggle({
