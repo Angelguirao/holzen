@@ -65,6 +65,7 @@ import { usePauseSessionStepTransition } from '@/hooks/use-pause-session-step-tr
 import { buildShiftEmotionFrameHubLogBundle } from '@/lib/pause-shift-emotion-log';
 import { buildPauseImpactDataOnComplete, type PauseImpactData } from '@/lib/pause-impact-data';
 import { showPauseFavoriteProHintToast } from '@/lib/pause-favorite-toast';
+import { buildOutcomeLoggedPayload } from '@/lib/pause-outcome-log-payload';
 import { showPauseOutcomeNotCompletedToast, showPauseOutcomeSaveFailedToast } from '@/lib/pause-outcome-toast';
 import { showPauseStepSyncFailedToast } from '@/lib/pause-step-sync-toast';
 import type { PauseState } from '@/lib/pause-state';
@@ -606,7 +607,7 @@ export default function PauseSession() {
             outcomeState = await pauseLogStep({
               instanceId: pauseInstanceId,
               stepType: 'outcome_logged',
-              payload: { outcome: d },
+              payload: buildOutcomeLoggedPayload(d),
             });
           } catch {
             showPauseOutcomeSaveFailedToast(t);
