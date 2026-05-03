@@ -9,7 +9,7 @@ vi.mock('sonner', () => ({
   },
 }));
 
-const mockT = vi.fn((key: string, opts?: { defaultValue?: string }) => opts?.defaultValue ?? key) as TFunction;
+const mockT = vi.fn((key: string, opts?: { defaultValue?: string }) => opts?.defaultValue ?? key) as unknown as TFunction;
 
 describe('showPauseOutcomeSaveFailedToast', () => {
   beforeEach(() => vi.mocked(toast.error).mockClear());

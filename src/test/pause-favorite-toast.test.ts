@@ -13,7 +13,7 @@ describe('showPauseFavoriteProHintToast', () => {
   });
 
   it('shows favorite pro hint for 4s', () => {
-    const t = vi.fn(() => 'hint text') as TFunction;
+    const t = vi.fn(() => 'hint text') as unknown as TFunction;
     showPauseFavoriteProHintToast(t);
     expect(t).toHaveBeenCalledWith('pause.favoriteProHint');
     expect(toast).toHaveBeenCalledWith('hint text', { duration: 4000 });
