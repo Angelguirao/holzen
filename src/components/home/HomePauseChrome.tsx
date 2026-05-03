@@ -314,21 +314,21 @@ export function AutoCooldownIndicator({
     });
     return (
       <div
-        className="space-y-1 py-0.5 font-sans"
+        className="space-y-0.5 py-0.5 font-sans"
         title={t('home.nextScanIdleTitle', {
-          defaultValue: 'Roughly when Holzen next reviews market conditions against your settings (quarter-hour rhythm).',
+          defaultValue: 'When Holzen next checks market conditions against your settings (about every 15 minutes).',
         })}
         role="status"
         aria-live="polite"
         aria-label={nextScanAria}
       >
-        <p className="text-[11px] leading-snug text-muted-foreground/85" aria-hidden="true">
-          {t('home.autoCooldown.serverChecksKicker', { defaultValue: 'Holzen keeps watch in the background.' })}
+        <p className="text-xs leading-snug text-foreground/80" aria-hidden="true">
+          {t('home.autoCooldown.serverChecksKicker', { defaultValue: 'Holzen is watching the market for you' })}
         </p>
-        <p className="text-xs tabular-nums text-muted-foreground/75" aria-hidden="true">
+        <p className="text-[11px] tabular-nums leading-snug text-muted-foreground/75" aria-hidden="true">
           {t('home.autoCooldown.nextScanAtClock', {
             time: nextScanClock,
-            defaultValue: 'Next quiet review · {{time}}',
+            defaultValue: 'Next routine check · {{time}}',
           })}
         </p>
       </div>
