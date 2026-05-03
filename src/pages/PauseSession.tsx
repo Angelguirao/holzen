@@ -39,6 +39,7 @@ import {
   briefStepToPauseScienceStep,
 } from '@/lib/pause-session-step-map';
 import { computePauseStorageRitualSyncPatch } from '@/lib/pause-session-storage-ritual-sync';
+import { buildPauseSessionPersistSnapshot } from '@/lib/pause-session-persist-snapshot';
 import { parsePauseSessionLocationState } from '@/lib/router-location-state';
 import { useFeatureFlag } from '@/hooks/use-feature-flag';
 import {
@@ -184,31 +185,33 @@ export default function PauseSession() {
 
   useEffect(() => {
     if (!message) return;
-    saveSession({
-      message,
-      context,
-      pauseInstanceId,
-      companions,
-      companionPrefs,
-      severity,
-      moodDone,
-      moodAfterDone,
-      selectedMood,
-      selectedMoodAfter,
-      feelIntensity,
-      shiftIntensity,
-      phase,
-      decision,
-      step,
-      breathingFirstCompleted,
-      breathingSecondCompleted,
-      frameDone,
-      decideOnBackStep,
-      ritualDepth: ritualEntry === 'picker' ? undefined : ritualEntry,
-      briefStep: ritualEntry === 'brief' ? briefStep : undefined,
-      briefIntegrateDone: ritualEntry === 'brief' ? briefIntegrateDone : undefined,
-      briefFace: ritualEntry === 'brief' ? selectedBriefFace ?? undefined : undefined,
-    });
+    saveSession(
+      buildPauseSessionPersistSnapshot({
+        message,
+        context,
+        pauseInstanceId,
+        companions,
+        companionPrefs,
+        severity,
+        moodDone,
+        moodAfterDone,
+        selectedMood,
+        selectedMoodAfter,
+        feelIntensity,
+        shiftIntensity,
+        phase,
+        decision,
+        step,
+        breathingFirstCompleted,
+        breathingSecondCompleted,
+        frameDone,
+        decideOnBackStep,
+        ritualEntry,
+        briefStep,
+        briefIntegrateDone,
+        selectedBriefFace,
+      }),
+    );
   }, [
     message,
     context,
