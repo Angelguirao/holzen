@@ -1,0 +1,26 @@
+---
+description: >-
+  Holzen change context — classify work against AGENTS change map, canonical docs under docs/,
+  and paired artifacts (taxonomy, flags, edge manifest, migrations). Use when starting a feature,
+  refactor, or any cross-cutting change.
+alwaysApply: true
+---
+
+# Holzen — context before you change code
+
+Non-trivial work should be **classified** against the **Change map** table in [AGENTS.md](../../AGENTS.md) (section **Change map (read this before non-trivial edits)**). Open the **Read first** link for your slice before editing.
+
+## Invariants (do not drop on “small” PRs)
+
+- **Product analytics:** new or renamed PostHog events/properties → update [docs/ops/event-taxonomy.md](../../docs/ops/event-taxonomy.md) in the same PR.
+- **Feature flags:** new or materially changed flag → update [docs/ops/feature-flags.md](../../docs/ops/feature-flags.md) in the same PR.
+- **Edge HTTP surface:** new function or entrypoint → `supabase/config.toml` `[functions.*]`, `EdgeCoverage.tsx`, and logging checks per [AGENTS.md](../../AGENTS.md) commands + `.cursor/rules/deployment-sync.mdc`.
+- **DB migrations:** follow [docs/ops/migration-security-conventions.md](../../docs/ops/migration-security-conventions.md); views → [docs/ops/migration-view-safety.md](../../docs/ops/migration-view-safety.md).
+- **Correlation:** new `functions.invoke` / edge calls → keep **`x-cid`** via `invokeEdge` or `withCidHeaders()` (see AGENTS **Cross-surface correlation**).
+
+## Full index
+
+- [docs/README.md](../../docs/README.md) — start-here order and **canonical sources** (single owner per kind of information).
+- Flow-first review templates: [docs/reviews/react-spa-review-template.md](../../docs/reviews/react-spa-review-template.md), skill `holzen-flow-review`.
+
+If a doc and code disagree, **fix the doc in the same PR** when you changed behavior—or file a tiny follow-up only when scope is intentionally split.
