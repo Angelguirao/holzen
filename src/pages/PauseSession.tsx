@@ -61,7 +61,7 @@ import {
   initialEmotionSkippedLogDedupeKey,
   initialEmotionSkippedLoggedPayload,
 } from '@/lib/pause-initial-emotion-log';
-import { buildPauseSessionStepTransitionConfig } from '@/lib/pause-session-step-transition';
+import { usePauseSessionStepTransition } from '@/hooks/use-pause-session-step-transition';
 import { buildShiftEmotionFrameHubLogBundle } from '@/lib/pause-shift-emotion-log';
 import { buildPauseImpactDataOnComplete, type PauseImpactData } from '@/lib/pause-impact-data';
 import { showPauseFavoriteProHintToast } from '@/lib/pause-favorite-toast';
@@ -689,14 +689,10 @@ export default function PauseSession() {
     [briefStep],
   );
 
-  const stepTransition = useMemo(
-    () =>
-      buildPauseSessionStepTransitionConfig({
-        swipeDirection,
-        prefersReducedMotion: !!prefersReducedMotion,
-      }),
-    [swipeDirection, prefersReducedMotion],
-  );
+  const stepTransition = usePauseSessionStepTransition({
+    swipeDirection,
+    prefersReducedMotion,
+  });
 
   const sessionOnPicker = phase === 'session' && ritualEntry === 'picker' && !!message;
 
