@@ -63,7 +63,7 @@ function setup(overrides: Partial<Parameters<typeof buildPauseSessionScaffoldRit
     decideOnBackStep: 'choose' as const,
     ...overrides,
   };
-  return { params, setBriefStep, setBreathingFirstCompleted, handleBriefBreathContinue };
+  return { params, setBriefStep, setBreathingFirstCompleted, setBreathingSecondCompleted, handleBriefBreathContinue };
 }
 
 describe('buildPauseSessionScaffoldRitualPayloads', () => {
@@ -89,5 +89,40 @@ describe('buildPauseSessionScaffoldRitualPayloads', () => {
     const { params } = setup({ message: 'reflect here' });
     const { deepRitual } = buildPauseSessionScaffoldRitualPayloads(params);
     expect(deepRitual.reflectionMessage).toBe('reflect here');
+  });
+
+  it('wires deep ritual breath segments and continue handlers', () => {
+    const handleContinueAfterFirstBreath = vi.fn();
+    const handleContinueAfterSecondBreath = vi.fn();
+    const { params, setBreathingFirstCompleted, setBreathingSecondCompleted } = setup({
+      handleContinueAfterFirstBreath,
+      handleContinueAfterSecondBreath,
+    });
+    const { deepRitual } = buildPauseSessionScaffoldRitualPayloads(params);
+
+    deepRitual.onFirstBreathPatternComplete();
+    expect(setBreathingFirstCompleted).toHaveBeenCalledWith(true);
+
+    void deepRitual.onContinueAfterFirstBreath();
+    expect(handleContinueAfterFirstBreath).toHaveBeenCalled();
+
+    deepRitual.onSecondBreathPatternComplete();
+    expect(setBreathingSecondCompleted).toHaveBeenCalledWith(true);
+
+    void deepRitual.onContinueAfterSecondBreath();
+    expect(handleContinueAfterSecondBreath).toHaveBeenCalled();
+  });
+
+  it('wires deep frame done and choose-bridge', () => {
+    const handleFrameImDone = vi.fn();
+    const handleDeepChooseBridgeContinue = vi.fn();
+    const { params } = setup({ handleFrameImDone, handleDeepChooseBridgeContinue });
+    const { deepRitual } = buildPauseSessionScaffoldRitualPayloads(params);
+
+    void deepRitual.onFrameImDone();
+    expect(handleFrameImDone).toHaveBeenCalled();
+
+    deepRitual.onDeepChooseBridgeContinue();
+    expect(handleDeepChooseBridgeContinue).toHaveBeenCalled();
   });
 });
