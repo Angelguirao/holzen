@@ -29,6 +29,7 @@ import { PauseDepthPicker } from '@/components/pause/PauseDepthPicker';
 import { PauseBriefProgress } from '@/components/pause/PauseBriefProgress';
 import { BRIEF_PAUSE_ORDER } from '@/lib/brief-pause-order';
 import { computeBriefRitualGoBack } from '@/lib/brief-pause-go-back';
+import { pauseStepSwipeDirection } from '@/lib/pause-step-swipe-direction';
 import { PauseBriefFeel, type BriefFeelTile } from '@/components/pause/PauseBriefFeel';
 import { PauseBriefIntegrate } from '@/components/pause/PauseBriefIntegrate';
 import { PauseAboutPausesBody } from '@/components/pause/PauseAboutPausesBody';
@@ -253,9 +254,7 @@ export default function PauseSession() {
 
   const goToStep = useCallback(
     (next: PauseStep) => {
-      const currentIndex = STEPS.indexOf(step);
-      const nextIndex = STEPS.indexOf(next);
-      setSwipeDirection(nextIndex >= currentIndex ? 'forward' : 'back');
+      setSwipeDirection(pauseStepSwipeDirection(step, next));
       hapticFeedback('light');
       setStep(next);
     },
