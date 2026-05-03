@@ -9,7 +9,14 @@ import type { PauseStep } from '@/components/pause/PauseProgress';
 import type { BriefPauseStep } from '@/lib/pause-session-storage';
 import type { PauseSessionStepTransitionConfig } from '@/lib/pause-session-step-transition';
 
-/** Inputs for `briefRitual` / `deepRitual` props on `PauseSessionScaffoldShell` (assembled in `PauseSession`). */
+/**
+ * Assembles `briefRitual` / `deepRitual` props for `PauseSessionScaffoldShell` from the `PauseSession` route.
+ *
+ * **Ritual semantics:** `docs/systems/pause-system.md` (client ritual, sections 7–7.3; brief vs deep RPC order).
+ * **Code map:** same doc, section 10 (Related docs and code).
+ */
+
+/** Parameter bag for `buildPauseSessionScaffoldRitualPayloads`. */
 export type PauseSessionScaffoldRitualPayloadsParams = {
   briefStep: BriefPauseStep;
   step: PauseStep;
@@ -56,6 +63,7 @@ export type PauseSessionScaffoldRitualPayloadsParams = {
   decideOnBackStep: PauseSessionDeepRitualBodyProps['decideOnBackStep'];
 };
 
+/** Maps orchestrator deps to `PauseSessionBriefRitualBodyProps` and `PauseSessionDeepRitualBodyProps`. */
 export function buildPauseSessionScaffoldRitualPayloads(
   p: PauseSessionScaffoldRitualPayloadsParams,
 ): {
