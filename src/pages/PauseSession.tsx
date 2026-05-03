@@ -30,6 +30,7 @@ import { PauseBriefProgress } from '@/components/pause/PauseBriefProgress';
 import { BRIEF_PAUSE_ORDER } from '@/lib/brief-pause-order';
 import { computeBriefRitualGoBack } from '@/lib/brief-pause-go-back';
 import { pauseStepSwipeDirection } from '@/lib/pause-step-swipe-direction';
+import { computeDeepRitualGoBackTarget } from '@/lib/pause-deep-go-back';
 import { PauseBriefFeel, type BriefFeelTile } from '@/components/pause/PauseBriefFeel';
 import { PauseBriefIntegrate } from '@/components/pause/PauseBriefIntegrate';
 import { PauseAboutPausesBody } from '@/components/pause/PauseAboutPausesBody';
@@ -272,11 +273,11 @@ export default function PauseSession() {
       }
       return;
     }
-    const currentIndex = STEPS.indexOf(step);
-    if (currentIndex > 0) {
+    const prevDeep = computeDeepRitualGoBackTarget(step);
+    if (prevDeep !== null) {
       setSwipeDirection('back');
       hapticFeedback('light');
-      setStep(STEPS[currentIndex - 1]);
+      setStep(prevDeep);
     }
   }, [step, ritualEntry, briefStep]);
 
