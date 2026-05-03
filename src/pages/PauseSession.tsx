@@ -61,6 +61,7 @@ import { buildPauseSessionScaffoldRitualDerived } from '@/lib/pause-session-scaf
 import { usePauseSessionPendingPauseOfferNavigation } from '@/hooks/use-pause-session-pending-pause-offer-navigation';
 import { usePauseSessionDepthPickerHandlers } from '@/hooks/use-pause-session-depth-picker-handlers';
 import { usePauseSessionDeepChooseBridgeHandler } from '@/hooks/use-pause-session-deep-choose-bridge-handler';
+import { usePauseSessionBriefFeelSelect } from '@/hooks/use-pause-session-brief-feel-select';
 
 export default function PauseSession() {
   const { t } = useTranslation();
@@ -203,6 +204,8 @@ export default function PauseSession() {
     setFeelIntensity,
     setSelectedBriefFace,
   });
+
+  const { onBriefFeelSelect } = usePauseSessionBriefFeelSelect({ handleMoodSelect });
 
   usePauseSessionRitualStorageSync({
     pauseInstanceId,
@@ -439,9 +442,7 @@ export default function PauseSession() {
                       selectedMood={selectedMood}
                       selectedTile={selectedBriefFace}
                       feelIntensity={feelIntensity}
-                      onSelect={(mood, intensity, tile) =>
-                        void handleMoodSelect(mood, intensity, { briefRitual: true, briefFace: tile })
-                      }
+                      onSelect={onBriefFeelSelect}
                       onContinue={() => setBriefStep('breath')}
                     />
                   </motion.div>
