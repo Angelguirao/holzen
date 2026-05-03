@@ -49,8 +49,11 @@ import {
   saveSession,
   loadSession,
   clearSession,
-  companionDataFromArtifacts,
 } from '@/lib/pause-session-storage';
+import {
+  buildFetchedPauseInstanceFromFetch,
+  type PauseInstanceContextSnapshotRow,
+} from '@/lib/pause-session-fetched-instance';
 import { pauseLogStep } from '@/lib/pause-api';
 import type { PauseState } from '@/lib/pause-state';
 import { getSessionQuote } from '@/lib/wisdom-quotes';
@@ -182,20 +185,13 @@ export default function PauseSession() {
           return;
         }
         const artifactRows = (artifacts ?? []) as Array<{ kind: string; content: Record<string, unknown> }>;
-        const companionData = companionDataFromArtifacts(artifactRows);
-        const reflectionArt = artifactRows.find((a) => a.kind === 'reflection_text');
-        const msg =
-          typeof reflectionArt?.content?.message === 'string' ? (reflectionArt.content.message as string) : '';
-        const ctxSnap = (inst as { context_snapshot: Record<string, unknown> | null }).context_snapshot ?? {};
-        const ctx = typeof ctxSnap.context_text === 'string' ? (ctxSnap.context_text as string) : null;
-        setFetchedInstance({
-          id: fetchPauseInstanceId,
-          reflection_message: msg,
-          context: ctx,
-          haiku: companionData.haiku,
-          grounding_title: companionData.groundingTitle,
-          grounding_body: companionData.groundingBody,
-        });
+        setFetchedInstance(
+          buildFetchedPauseInstanceFromFetch(
+            fetchPauseInstanceId,
+            inst as PauseInstanceContextSnapshotRow,
+            artifactRows,
+          ),
+        );
       } catch {
         if (!cancelled) setFetchFailed(true);
       }
