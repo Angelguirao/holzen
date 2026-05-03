@@ -1,4 +1,4 @@
-import { useState, useCallback, useMemo, useRef } from 'react';
+import { useState, useCallback, useRef } from 'react';
 import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
@@ -26,7 +26,6 @@ import { PauseDecide } from '@/components/pause/PauseDecide';
 import { PauseDone } from '@/components/pause/PauseDone';
 import { PauseDepthPicker } from '@/components/pause/PauseDepthPicker';
 import { PauseBriefProgress } from '@/components/pause/PauseBriefProgress';
-import { BRIEF_PAUSE_ORDER, computeBriefMacroProgressPosition } from '@/lib/brief-pause-order';
 import { computeBriefPastStepClick } from '@/lib/brief-pause-past-step-click';
 import { computePauseGoBackPlan } from '@/lib/pause-go-back-plan';
 import { pauseStepSwipeDirection } from '@/lib/pause-step-swipe-direction';
@@ -35,7 +34,6 @@ import { PauseBriefFeel, type BriefFeelTile } from '@/components/pause/PauseBrie
 import { PauseBriefIntegrate } from '@/components/pause/PauseBriefIntegrate';
 import { PauseAboutPausesBody } from '@/components/pause/PauseAboutPausesBody';
 import { Sheet, SheetContent, SheetTitle } from '@/components/ui/sheet';
-import { trackedAssetSymbol } from '@/lib/tracked-assets';
 import type { BriefPauseStep, RitualDepth } from '@/lib/pause-session-storage';
 import {
   mapPersistedStep,
@@ -64,6 +62,7 @@ import { usePauseSessionPersistToStorage } from '@/hooks/use-pause-session-persi
 import { usePauseSessionRitualStorageSync } from '@/hooks/use-pause-session-ritual-storage-sync';
 import { usePauseSessionEntryPresentationEffects } from '@/hooks/use-pause-session-entry-presentation-effects';
 import { usePauseSessionBreathTimedActiveReset } from '@/hooks/use-pause-session-breath-timed-active-reset';
+import { usePauseSessionDepthAndBriefCopy } from '@/hooks/use-pause-session-depth-and-brief-copy';
 import type { PauseImpactData } from '@/lib/pause-impact-data';
 import { showPauseStepSyncFailedToast } from '@/lib/pause-step-sync-toast';
 import { usePauseSessionShell } from '@/hooks/use-pause-session-shell';
@@ -344,21 +343,13 @@ export default function PauseSession() {
     shiftIntensity,
   });
 
-  const depthContextLine = useMemo(() => {
-    if (!btcData) return null;
-    const sym = trackedAssetSymbol(trackedAssetId);
-    return t('pause.depthPicker.contextMoved', {
-      defaultValue: '{{sym}} moved {{pct}}% in the last 24 hours.',
-      sym,
-      pct: Math.abs(btcData.changePercent).toFixed(1),
-    });
-  }, [btcData, trackedAssetId, t]);
-
-  const briefMacroLine = useMemo(() => {
-    if (ritualEntry !== 'brief') return undefined;
-    const { n, total } = computeBriefMacroProgressPosition(briefStep);
-    return t('pause.brief.macroProgress', { n, total });
-  }, [ritualEntry, briefStep, t]);
+  const { depthContextLine, briefMacroLine } = usePauseSessionDepthAndBriefCopy({
+    t,
+    btcData,
+    trackedAssetId,
+    ritualEntry,
+    briefStep,
+  });
 
   const goToBriefPastStep = useCallback(
     (target: BriefPauseStep) => {
