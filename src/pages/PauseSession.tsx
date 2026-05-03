@@ -1,4 +1,4 @@
-import { useState, useRef } from 'react';
+import { useState, useRef, useMemo } from 'react';
 import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
@@ -378,6 +378,14 @@ export default function PauseSession() {
     t,
   });
 
+  const briefStepperSlot = useMemo(
+    () =>
+      ritualEntry === 'brief' ? (
+        <PauseBriefProgress currentStep={briefStep} onStepClick={goToBriefPastStep} />
+      ) : undefined,
+    [ritualEntry, briefStep, goToBriefPastStep],
+  );
+
   return (
     <PauseSessionGate
       hasMessage={!!message}
@@ -424,11 +432,7 @@ export default function PauseSession() {
             onHeaderBack={handlePauseHeaderBack}
             showHeaderBack={showPauseHeaderBack}
             macroProgressLine={briefMacroLine}
-            stepperSlot={
-              ritualEntry === 'brief' ? (
-                <PauseBriefProgress currentStep={briefStep} onStepClick={goToBriefPastStep} />
-              ) : undefined
-            }
+            stepperSlot={briefStepperSlot}
             breathSecondLabelVariant={breathSecondLabelVariant}
             soundMuted={soundMuted}
             onSoundMutedChange={setSoundMuted}
