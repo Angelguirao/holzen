@@ -112,7 +112,7 @@ const Blog = () => {
               type="button"
               onClick={() => void refetch()}
               disabled={isFetching}
-              className="text-xs font-mono text-primary hover:underline disabled:opacity-50"
+              className="text-xs font-sans font-medium text-nox-text-link underline-offset-4 transition-colors hover:text-nox-text-link/80 hover:underline disabled:opacity-50"
             >
               {t('common.tryAgain')}
             </button>
@@ -127,7 +127,7 @@ const Blog = () => {
                       {format(new Date(post.published_at), 'MMM d, yyyy')}
                     </p>
                   )}
-                  <p className="text-sm text-foreground group-hover:text-primary transition-colors leading-relaxed">{post.title}</p>
+                  <p className="text-sm text-foreground group-hover:text-nox-text-link transition-colors leading-relaxed">{post.title}</p>
                   {post.excerpt && <p className="text-xs text-muted-foreground leading-relaxed">{post.excerpt}</p>}
                   <span className="inline-flex items-center gap-1 text-[10px] font-mono text-muted-foreground group-hover:text-foreground transition-colors">
                     {t('blog.read')}

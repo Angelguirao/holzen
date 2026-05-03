@@ -58,6 +58,7 @@ import type {
   PauseCompanionEventRow,
 } from '@/lib/pause-state';
 import type { PauseFullRow } from '@/hooks/use-pause-stats-data';
+import { normalizeTrackedAssetId } from '@/lib/tracked-assets';
 
 export interface BadgeSnapshot extends BadgeDefinition {
   current: number;
@@ -147,8 +148,11 @@ export function computeBadges(params: {
   stepEvents: readonly PauseStepEventRow[];
   companionEvents: readonly PauseCompanionEventRow[];
   holdGoal?: HoldGoal | null;
+  /** Bitcoin cultural calendar badges apply only when the user tracks bitcoin. */
+  trackedAssetId?: string | null;
 }): BadgeSnapshot[] {
-  const { completedRows, companionEvents, holdGoal } = params;
+  const { completedRows, companionEvents, holdGoal, trackedAssetId } = params;
+  const assetId = normalizeTrackedAssetId(trackedAssetId);
 
   // Foundation counters
   const firstPause = completedRows.length;
@@ -216,22 +220,28 @@ export function computeBadges(params: {
 
   const fullRitual100 = completedRows.filter((r) => r.counted_companion_count >= 1).length;
 
-  // Legacy counters
-  const legacyGenesis = completedRows.some((r) =>
-    isMonthDay(r.completed_at ?? r.engaged_at ?? r.created_at, LEGACY_CALENDAR['btc-genesis'].month, LEGACY_CALENDAR['btc-genesis'].day),
-  )
-    ? 1
-    : 0;
-  const legacyPizza = completedRows.some((r) =>
-    isMonthDay(r.completed_at ?? r.engaged_at ?? r.created_at, LEGACY_CALENDAR['btc-pizza'].month, LEGACY_CALENDAR['btc-pizza'].day),
-  )
-    ? 1
-    : 0;
-  const legacyHalving = completedRows.some((r) =>
-    HALVING_DATES.some((hd) => withinDays(r.completed_at ?? r.engaged_at ?? r.created_at, hd, 3)),
-  )
-    ? 1
-    : 0;
+  // Legacy counters (Bitcoin calendar / halving — only when tracking BTC)
+  const legacyGenesis =
+    assetId === 'bitcoin' &&
+    completedRows.some((r) =>
+      isMonthDay(r.completed_at ?? r.engaged_at ?? r.created_at, LEGACY_CALENDAR['btc-genesis'].month, LEGACY_CALENDAR['btc-genesis'].day),
+    )
+      ? 1
+      : 0;
+  const legacyPizza =
+    assetId === 'bitcoin' &&
+    completedRows.some((r) =>
+      isMonthDay(r.completed_at ?? r.engaged_at ?? r.created_at, LEGACY_CALENDAR['btc-pizza'].month, LEGACY_CALENDAR['btc-pizza'].day),
+    )
+      ? 1
+      : 0;
+  const legacyHalving =
+    assetId === 'bitcoin' &&
+    completedRows.some((r) =>
+      HALVING_DATES.some((hd) => withinDays(r.completed_at ?? r.engaged_at ?? r.created_at, hd, 3)),
+    )
+      ? 1
+      : 0;
 
   const currentByBadgeId: Record<string, number> = {
     'first-pause': firstPause,

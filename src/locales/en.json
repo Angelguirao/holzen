@@ -90,6 +90,9 @@
     "title": "Home",
     "greeting": "Welcome back, {{name}}",
     "noActiveReflection": "No active pause.",
+    "pauseEmpty": {
+      "statusLine": "No active pause right now. Try the next step below between checks — or request a manual pause anytime."
+    },
     "generatingReflection": "Preparing your pause…",
     "needAMoment": "I need a pause",
     "manualReflectionIn": "Next pause in {{minutes}} min",
@@ -116,7 +119,7 @@
       "sections": {
         "goalWhy": {
           "title": "Why you stay",
-          "desc": "Surfaces your motivations and a compact hold-goal snapshot on Home. Personal mantra for breathing lives under Settings → You, not here."
+          "desc": "The thread of why you stay and what you are holding for—so Home can anchor you in meaning before the next impulse arrives."
         },
         "market": {
           "title": "Market",
@@ -175,14 +178,14 @@
     "nextAutoCheck": "Next auto-check · {{time}}",
     "cooldownHeadline": "{{hours}}h cooldown · {{time}} left",
     "nextScanLine": "Next scan · {{scan}}",
-    "nextScanIdleTitle": "Countdown until the server runs the next price check",
+    "nextScanIdleTitle": "When Holzen next checks market conditions against your settings (about every 15 minutes).",
     "autoCooldown": {
       "afterPauseKicker": "Rest window after your last pause",
-      "serverChecksKicker": "Background price checks",
+      "serverChecksKicker": "Holzen is watching the market for you",
       "cooldownAria": "You are in the rest period that starts when a pause is created. It is not the same timer as the Need a moment button. This rest window ends at {{time}} ({{hours}} hours from that pause).",
-      "nextScanAria": "Holzen rechecks market conditions on a quarter-hour schedule. The next server tick is around {{time}}. A new automatic pause only happens when rules and your settings say so — this is only the schedule.",
+      "nextScanAria": "Holzen reviews conditions on a quarter-hour rhythm. The next routine check is around {{time}}. A new automatic pause only happens when your settings and the market align — this is only the schedule.",
       "cooldownReadyAt": "{{hours}}h rest · until {{time}}",
-      "nextScanAtClock": "Next server check · {{time}}"
+      "nextScanAtClock": "Next routine check · {{time}}"
     },
     "monitoringReady": "Monitoring · ready",
     "widget": {
@@ -407,6 +410,14 @@
     "firstNamePlaceholder": "Your first name",
     "holdGoalTitle": "Hold goal",
     "holdGoalDesc": "Time-bound, price target, or forever. Home shows a compact “Why you stay” summary — edit the full commitment here.",
+    "trackedAssetTitle": "Tracked asset",
+    "trackedAssetDesc": "Volatility checks, Home market data, and pause context follow this asset. Legacy Bitcoin calendar badges apply only when Bitcoin is selected.",
+    "trackedAssets": {
+      "bitcoin": "Bitcoin (BTC)",
+      "ethereum": "Ethereum (ETH)",
+      "solana": "Solana (SOL)",
+      "monero": "Monero (XMR)"
+    },
     "myWhy": "My Why",
     "myWhyDesc": "Why do you hold? Select what resonates. This anchors your pause experience and companion tone.",
     "motivations": {

@@ -23,8 +23,8 @@ export function BulkHoldSuccessBody({ heldCount, onViewEchoes }: BulkHoldSuccess
       className="space-y-5 pt-2"
     >
       <div className="flex justify-center">
-        <div className="flex h-14 w-14 items-center justify-center rounded-full bg-primary/10">
-          <Sparkles className="h-7 w-7 text-primary" aria-hidden />
+        <div className="flex h-14 w-14 items-center justify-center rounded-full bg-nox-text-highlight/15">
+          <Sparkles className="h-7 w-7 text-nox-text-highlight" aria-hidden />
         </div>
       </div>
       <div className="space-y-1 text-center">
@@ -37,7 +37,7 @@ export function BulkHoldSuccessBody({ heldCount, onViewEchoes }: BulkHoldSuccess
             defaultValue: 'Held through {{count}} pauses',
           })}
         </p>
-        <p className="text-sm font-medium text-primary">
+        <p className="text-sm font-medium text-nox-accent-green">
           {t('bulkHold.successConviction', {
             count: heldCount,
             defaultValue: '+{{count}} conviction',

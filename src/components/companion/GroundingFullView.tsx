@@ -92,7 +92,7 @@ export function GroundingFullView({
               href={nudge.url}
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center gap-1.5 text-xs font-medium text-primary/85 hover:text-primary transition-colors"
+              className="inline-flex items-center gap-1.5 text-xs font-medium text-nox-text-link/90 hover:text-nox-text-link transition-colors"
             >
               <ExternalLink className="h-3 w-3" />
               {t('companions.fullview.grounding.readPaper')}

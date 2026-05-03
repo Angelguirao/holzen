@@ -395,7 +395,7 @@ export default function Ground() {
           <button
             type="button"
             onClick={() => navigate(settingsSectionPath('companions'), { replace: true })}
-            className="text-xs font-mono text-primary/60 hover:text-primary underline underline-offset-4 transition-colors"
+            className="text-xs font-sans font-medium text-nox-text-link/90 underline underline-offset-4 transition-colors hover:text-nox-text-link"
           >
             {t('ground.goToSettings')}
           </button>
@@ -495,7 +495,7 @@ export default function Ground() {
                 <button
                   type="button"
                   onClick={chooseFreeSurprise}
-                  className="text-sm font-medium text-primary underline-offset-4 hover:underline"
+                  className="text-sm font-medium text-nox-text-link underline-offset-4 transition-colors hover:text-nox-text-link/80 hover:underline"
                 >
                   {t('ground.freeSurprise')}
                 </button>
@@ -562,7 +562,7 @@ export default function Ground() {
                     {!isPro && (
                       <Link
                         to={settingsSectionPath('subscription')}
-                        className="inline-flex items-center justify-center gap-1.5 text-xs font-medium text-primary hover:underline"
+                        className="inline-flex items-center justify-center gap-1.5 text-xs font-medium text-nox-text-link underline-offset-4 transition-colors hover:text-nox-text-link/80 hover:underline"
                       >
                         <Sparkles className="h-3 w-3" aria-hidden />
                         {t('ground.upgradeForAi')}
@@ -600,7 +600,7 @@ export default function Ground() {
                                 href={article.url}
                                 target="_blank"
                                 rel="noopener noreferrer"
-                                className="mt-1 inline-flex items-center gap-1.5 text-sm font-medium text-primary underline-offset-2 hover:underline"
+                                className="mt-1 inline-flex items-center gap-1.5 text-sm font-medium text-nox-text-link underline-offset-2 transition-colors hover:text-nox-text-link/80 hover:underline"
                               >
                                 <ExternalLink className="h-2.5 w-2.5" />
                                 {t('ground.readMore')}
@@ -872,7 +872,7 @@ export default function Ground() {
                 className="text-center space-y-6"
               >
                 <motion.div initial={{ scale: 0.8, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} transition={{ delay: 0.3, duration: 0.5 }}>
-                  <Anchor className="h-5 w-5 text-primary/30 mx-auto" />
+                  <Anchor className="h-5 w-5 text-muted-foreground/40 mx-auto" />
                 </motion.div>
 
                 <motion.p
@@ -895,7 +895,7 @@ export default function Ground() {
                   <button
                     type="button"
                     onClick={() => navigate(TOOLS.groundHistory, { replace: true })}
-                    className="text-xs font-medium uppercase tracking-wide text-primary underline-offset-4 hover:underline"
+                    className="text-xs font-medium uppercase tracking-wide text-nox-text-link underline-offset-4 transition-colors hover:text-nox-text-link/80 hover:underline"
                   >
                     {t('ground.viewHistory')}
                   </button>

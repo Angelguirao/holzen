@@ -20,6 +20,7 @@ export interface UseBadgesParams {
   stepEvents: readonly PauseStepEventRow[];
   companionEvents: readonly PauseCompanionEventRow[];
   holdGoal?: HoldGoal | null;
+  trackedAssetId?: string | null;
 }
 
 export interface UseBadgesResult {
@@ -33,6 +34,7 @@ export function useBadges({
   stepEvents,
   companionEvents,
   holdGoal,
+  trackedAssetId,
 }: UseBadgesParams): UseBadgesResult {
   const { t } = useTranslation();
   return useMemo(() => {
@@ -42,6 +44,7 @@ export function useBadges({
       stepEvents,
       companionEvents,
       holdGoal,
+      trackedAssetId: trackedAssetId ?? 'bitcoin',
     });
     const earnedIds = snapshots.filter((s) => s.earned).map((s) => s.id);
     const badgeMeta: Record<string, { label: string; description: string; color: string }> = {};
@@ -55,5 +58,5 @@ export function useBadges({
       }
     }
     return { snapshots, earnedIds, badgeMeta };
-  }, [rows, stepEvents, companionEvents, holdGoal, t]);
+  }, [rows, stepEvents, companionEvents, holdGoal, trackedAssetId, t]);
 }

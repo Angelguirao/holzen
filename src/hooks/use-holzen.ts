@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
-import { fetchBtcData, type BtcPriceData } from '@/lib/btc';
+import { fetchMarketData, type BtcPriceData } from '@/lib/btc';
 import { supabase } from '@/integrations/supabase/client';
 import { invokeEdge } from '@/lib/invoke-edge';
 import { useAuth } from '@/hooks/use-auth';
@@ -8,7 +8,8 @@ import type { CompanionData } from '@/components/CompanionSection';
 import { holzenLog } from '@/lib/holzen-console';
 import { reflectionPersistErrorMessage } from '@/lib/reflection-persist-error';
 import { getManualReflectionCooldownMs, isHolzenDevMode } from '@/lib/holzen-manual-cooldown';
-import { buildPauseContextFromBtc } from '@/lib/pause-context-from-btc';
+import { buildPauseContextFromMarket } from '@/lib/pause-context-from-btc';
+import { normalizeTrackedAssetId, trackedAssetSymbol } from '@/lib/tracked-assets';
 import { severityFromBtcChangePercent } from '@/lib/btc-move-severity';
 import { millisecondsUntilNextQuarterHour } from '@/lib/next-cron-quarter';
 import { pauseCreateOrReuse } from '@/lib/pause-api';
@@ -57,6 +58,7 @@ export function useHolzen() {
     mantra,
     groundingActivities,
     currency,
+    trackedAssetId: profileTrackedAssetId,
     language,
     cooldownHours,
     profileLoaded,
@@ -187,20 +189,31 @@ export function useHolzen() {
         mood: mood ?? '(none)',
       });
 
-      const ctx = buildPauseContextFromBtc(data, profile.cumulativeThreshold);
+      const assetId = normalizeTrackedAssetId(profile.trackedAssetId);
+      const assetSym = trackedAssetSymbol(assetId);
+      const ctx = buildPauseContextFromMarket(data, profile.cumulativeThreshold, assetSym);
       const directionBucket = data.changePercent < 0 ? 'down' : 'up';
       const severityBand = severityFromBtcChangePercent(data.changePercent) ?? 'mild';
+      const onChainBand =
+        assetId === 'bitcoin' && data.onChain
+          ? ([data.onChain.mempoolSize, data.onChain.fastestFee, data.onChain.medianFee].filter(
+              (x) => typeof x === 'number' && Number.isFinite(x),
+            ) as number[]).join(':') || null
+          : null;
       const fingerprint = await computeContextFingerprint({
         templateSlug: 'volatility_v1',
         directionBucket,
         severityBand,
         dailyBucketPct: bucketChangePercent(data.changePercent),
         cumulativeBucketPct: bucketChangePercent(data.cumulativeChangePercent ?? 0),
+        trackedAssetId: assetId,
+        fearGreedBand: data.fearGreed?.label ?? null,
+        onChainBand,
       });
 
       if (silentMode) {
         holzenLog.manual('generateMessage: silent mode');
-        const silentMsg = 'BTC moved.';
+        const silentMsg = `${assetSym} moved.`;
 
         try {
           const res = await pauseCreateOrReuse({
@@ -213,6 +226,7 @@ export function useHolzen() {
               severity: severityBand,
               context_text: ctx,
               last_reported_mood: mood ?? null,
+              tracked_asset_id: assetId,
             },
             contextRuleResult: { triggered: ['manual'] },
             contextFingerprint: fingerprint,
@@ -253,7 +267,8 @@ export function useHolzen() {
             try {
               trackEvent('pause.manual_completed', {
                 duration_s: Math.round((Date.now() - t0) / 1000),
-                had_bitcoin_context: Boolean(ctx),
+                had_bitcoin_context: assetId === 'bitcoin',
+                tracked_asset_id: assetId,
                 companion_types: [],
               });
             } catch {
@@ -319,6 +334,7 @@ export function useHolzen() {
             severity: severityBand,
             context_text: ctx,
             last_reported_mood: mood ?? null,
+            tracked_asset_id: assetId,
           },
           contextRuleResult: { triggered: ['manual'] },
           contextFingerprint: fingerprint,
@@ -392,7 +408,8 @@ export function useHolzen() {
           try {
             trackEvent('pause.manual_completed', {
               duration_s: Math.round((Date.now() - t0) / 1000),
-              had_bitcoin_context: Boolean(ctx),
+              had_bitcoin_context: assetId === 'bitcoin',
+              tracked_asset_id: assetId,
               companion_types: previewCompanionTypeTags(companionData),
             });
           } catch {
@@ -425,12 +442,13 @@ export function useHolzen() {
       currency,
       language,
       profile.cumulativeThreshold,
+      profile.trackedAssetId,
     ],
   );
 
   const fetchBtcDisplay = useCallback(async () => {
     try {
-      const data = await fetchBtcData(currency);
+      const data = await fetchMarketData(profileTrackedAssetId, currency);
       setBtcData(data);
     } catch (e: unknown) {
       const raw = e instanceof Error ? e.message : String(e);
@@ -440,7 +458,7 @@ export function useHolzen() {
         setError('Could not check market data. Will retry automatically.');
       }
     }
-  }, [currency]);
+  }, [currency, profileTrackedAssetId]);
 
   const manualCooldownKey = user ? `holzen_last_manual_at_${user.id}` : 'holzen_last_manual_at';
   const [lastManualAt, setLastManualAt] = useState<number | null>(null);
@@ -486,7 +504,7 @@ export function useHolzen() {
       }
 
       try {
-        const data = btcData || (await fetchBtcData(currency));
+        const data = btcData || (await fetchMarketData(profileTrackedAssetId, currency));
         if (!btcData) setBtcData(data);
         await generateMessage(data, mood);
         const now = Date.now();
@@ -501,7 +519,7 @@ export function useHolzen() {
         }
       }
     },
-    [btcData, generateMessage, manualCooldownRemaining, currency, manualCooldownKey],
+    [btcData, generateMessage, manualCooldownRemaining, currency, manualCooldownKey, profileTrackedAssetId],
   );
 
   const dismissMessage = useCallback(async () => {
@@ -534,9 +552,15 @@ export function useHolzen() {
 
   return {
     ...profile,
+    /** CoinGecko id allowlist — normalized so consumers see `TrackedAssetId`, not raw profile strings. */
+    trackedAssetId: normalizeTrackedAssetId(profile.trackedAssetId),
     setCurrency: async (val: string) => {
       setBtcData(null);
       await profile.setCurrency(val);
+    },
+    setTrackedAssetId: async (val: string) => {
+      setBtcData(null);
+      await profile.setTrackedAssetId(val);
     },
     btcData,
     message,

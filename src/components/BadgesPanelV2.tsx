@@ -12,7 +12,7 @@ import { cn } from '@/lib/utils';
 
 interface Props {
   subscribed: boolean;
-  holdGoal?: { type: string | null } | null;
+  holdGoal?: { type: string | null; trackedAssetId?: string } | null;
   notifyBadges?: boolean;
 }
 
@@ -49,6 +49,7 @@ export function BadgesPanelV2({ subscribed, holdGoal, notifyBadges = true }: Pro
     stepEvents,
     companionEvents,
     holdGoal,
+    trackedAssetId: holdGoal?.trackedAssetId,
   });
 
   const { newBadges, dismissCelebration } = useBadgeSync(earnedIds, badgeMeta, notifyBadges);
@@ -92,7 +93,7 @@ export function BadgesPanelV2({ subscribed, holdGoal, notifyBadges = true }: Pro
         <div className="rounded-md border border-border/60 bg-muted/30 px-4 py-3 space-y-3">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
-              <Award className="h-4 w-4 text-primary" />
+              <Award className="h-4 w-4 text-nox-text-highlight" />
               <p className="text-muted-foreground font-sans text-sm">
                 <span className="text-foreground font-medium">{totalEarned}</span> / {totalBadges}{' '}
                 {t('badges.earned', { defaultValue: 'earned' })}
@@ -201,7 +202,7 @@ export function BadgesPanelV2({ subscribed, holdGoal, notifyBadges = true }: Pro
                               {isLocked ? (
                                 <Lock className="h-2.5 w-2.5 text-[#dbb266]" aria-hidden />
                               ) : (
-                                <Sparkles className="h-2.5 w-2.5 text-primary/50" aria-hidden />
+                                <Sparkles className="h-2.5 w-2.5 text-nox-text-highlight/70" aria-hidden />
                               )}
                             </div>
                           )}
@@ -229,7 +230,7 @@ export function BadgesPanelV2({ subscribed, holdGoal, notifyBadges = true }: Pro
                           </div>
                         )}
                         {b.earned && !isLocked && (
-                          <p className="text-[9px] font-mono text-primary/70">
+                          <p className="text-[9px] font-mono text-muted-foreground">
                             {t('badges.earnedCheck', { defaultValue: 'Earned' })}
                           </p>
                         )}

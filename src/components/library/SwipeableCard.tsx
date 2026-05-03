@@ -96,12 +96,12 @@ export function SwipeableCard({
       <div
         className={cn(
           'absolute inset-y-0 left-0 flex items-center justify-start px-5 transition-colors',
-          rightTriggered ? 'bg-primary/10' : 'bg-muted/40'
+          rightTriggered ? 'bg-muted/50' : 'bg-muted/40'
         )}
         style={{ width: '100%' }}
       >
         {rightRevealed && (
-          <div className="flex items-center gap-1.5 text-primary/70">
+          <div className="flex items-center gap-1.5 text-foreground/75">
             <Heart className="h-4 w-4" />
             <span className="text-[10px] font-mono">{rightLabel}</span>
           </div>

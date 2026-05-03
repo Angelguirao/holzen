@@ -1,6 +1,7 @@
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/use-auth';
+import { normalizeTrackedAssetId } from '@/lib/tracked-assets';
 
 export const HOLD_GOAL_QUERY_KEY = (userId: string) => ['profile-hold-goal', userId] as const;
 
@@ -9,6 +10,7 @@ export interface HoldGoalProfile {
   targetMonths: number | null;
   targetPrice: number | null;
   start: string | null;
+  trackedAssetId: string;
 }
 
 /**
@@ -26,7 +28,7 @@ export function useHoldGoalProfile() {
       if (!user) return null;
       const { data, error } = await supabase
         .from('profiles')
-        .select('hold_goal_type, hold_goal_target_months, hold_goal_target_price, hold_goal_start')
+        .select('hold_goal_type, hold_goal_target_months, hold_goal_target_price, hold_goal_start, tracked_asset_id')
         .eq('user_id', user.id)
         .maybeSingle();
       if (error) {
@@ -38,6 +40,7 @@ export function useHoldGoalProfile() {
         targetMonths: data.hold_goal_target_months,
         targetPrice: data.hold_goal_target_price,
         start: data.hold_goal_start,
+        trackedAssetId: normalizeTrackedAssetId(data.tracked_asset_id),
       };
     },
   });

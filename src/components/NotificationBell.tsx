@@ -92,7 +92,7 @@ const SwipeableNotification = forwardRef<HTMLDivElement, {
               {n.action && (
                 <button
                   onClick={() => onAction(n.action!.path, n.action!.state)}
-                  className="flex items-center gap-0.5 text-[9px] font-mono text-primary/70 hover:text-primary transition-colors"
+                  className="flex items-center gap-0.5 text-[9px] font-sans font-medium text-nox-text-link/75 hover:text-nox-text-link transition-colors"
                 >
                   {n.action.label}
                   <ArrowRight className="h-2.5 w-2.5" />

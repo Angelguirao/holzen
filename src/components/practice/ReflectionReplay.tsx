@@ -234,7 +234,7 @@ export function ReflectionReplay({ onComplete, initialPauseInstanceId }: Props) 
             setThread(null);
             setThreadLoadError(false);
           }}
-          className="text-[10px] font-mono text-primary/80 hover:underline self-start"
+          className="text-[10px] font-sans font-medium text-nox-text-link/90 underline-offset-2 transition-colors hover:text-nox-text-link hover:underline self-start"
         >
           {t('practice.replayChangePause', { defaultValue: '← Change pause' })}
         </button>

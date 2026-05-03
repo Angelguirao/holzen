@@ -44,7 +44,7 @@ export function LandingTestimonials() {
             transition={{ duration: 0.4, delay: i * 0.08 }}
           >
             <div className="flex items-start gap-2">
-              <MessageCircle className="h-3 w-3 text-primary mt-0.5 shrink-0" />
+              <MessageCircle className="h-3 w-3 text-nox-text-link mt-0.5 shrink-0" />
               <p className="text-xs text-foreground leading-relaxed italic">"{t.quote}"</p>
             </div>
             <p className="text-[10px] text-muted-foreground/70 pl-5">— {t.display_name}</p>

@@ -42,7 +42,7 @@ export function InterventionCrossRefBadge({ companion, intervention, className =
 
   return (
     <div
-      className={`inline-flex items-center gap-1.5 rounded-full border border-primary/20 bg-primary/5 px-2.5 py-1 text-[10px] font-mono text-primary/70 ${className}`}
+      className={`inline-flex items-center gap-1.5 rounded-full border border-border/60 bg-muted/30 px-2.5 py-1 text-[10px] font-mono text-muted-foreground ${className}`}
       role="status"
     >
       <Pin className="h-2.5 w-2.5" aria-hidden />

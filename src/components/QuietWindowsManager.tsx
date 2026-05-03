@@ -80,7 +80,7 @@ export function QuietWindowsManager({ userId }: { userId?: string }) {
           variant="ghost"
           size="sm"
           onClick={addWindow}
-          className="h-6 px-2 text-[10px] font-mono text-primary/60 hover:text-primary"
+          className="h-6 px-2 text-[10px] font-sans font-medium text-nox-text-link/70 hover:text-nox-text-link"
         >
           <Plus className="h-3 w-3 mr-1" />
           {t('quietWindows.add', { defaultValue: 'Add window' })}
@@ -156,7 +156,7 @@ export function QuietWindowsManager({ userId }: { userId?: string }) {
                 onClick={() => toggleDay(w, i)}
                 className={`flex-1 text-[9px] font-mono py-1 rounded-md transition-colors ${
                   w.days.includes(i)
-                    ? 'bg-primary/15 text-primary border border-primary/30'
+                    ? 'bg-muted/50 text-foreground border border-border/60'
                     : 'bg-muted/30 text-muted-foreground/40 border border-transparent hover:bg-muted/50'
                 }`}
               >

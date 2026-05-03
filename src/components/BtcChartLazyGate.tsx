@@ -18,12 +18,13 @@ function ChartSkeleton() {
 interface Props {
   hidden?: boolean;
   currency?: string;
+  coinId?: string;
 }
 
 /**
  * Defers Recharts + CoinGecko chart fetch until near viewport — cuts main-thread layout work on cold Home paint.
  */
-export function BtcChartLazyGate({ hidden = false, currency = 'USD' }: Props) {
+export function BtcChartLazyGate({ hidden = false, currency = 'USD', coinId = 'bitcoin' }: Props) {
   const containerRef = useRef<HTMLDivElement>(null);
   const [mountChart, setMountChart] = useState(false);
 
@@ -47,6 +48,10 @@ export function BtcChartLazyGate({ hidden = false, currency = 'USD' }: Props) {
     return () => observer.disconnect();
   }, [hidden, mountChart]);
 
+  useEffect(() => {
+    setMountChart(false);
+  }, [coinId]);
+
   if (hidden) return null;
 
   return (
@@ -55,7 +60,7 @@ export function BtcChartLazyGate({ hidden = false, currency = 'USD' }: Props) {
         <ChartSkeleton />
       ) : (
         <Suspense fallback={<ChartSkeleton />}>
-          <BtcChartLazy hidden={false} currency={currency} />
+          <BtcChartLazy hidden={false} currency={currency} coinId={coinId} />
         </Suspense>
       )}
     </div>

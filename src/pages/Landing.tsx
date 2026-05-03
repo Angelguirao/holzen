@@ -166,7 +166,7 @@ const Landing = () => {
           onClick={() => document.getElementById('reflection-loop')?.scrollIntoView({ behavior: 'smooth' })}
           aria-label="Scroll to content"
         >
-          <ChevronDown className="h-4 w-4 animate-bounce text-primary" />
+          <ChevronDown className="h-4 w-4 animate-bounce text-muted-foreground" />
         </motion.button>
       </div>
 
@@ -254,7 +254,7 @@ const Landing = () => {
                 <div key={key} className="rounded-lg border border-border/40 bg-background/60 p-4 space-y-2.5">
                   <div className="flex items-center gap-2.5">
                     <div className="w-7 h-7 rounded-full bg-primary/10 flex items-center justify-center shrink-0">
-                      <Icon className="h-3.5 w-3.5 text-primary/60" />
+                      <Icon className="h-3.5 w-3.5 text-muted-foreground" />
                     </div>
                     <div className="flex items-baseline gap-2">
                       <span className="text-[10px] font-mono text-muted-foreground/40">{step}</span>

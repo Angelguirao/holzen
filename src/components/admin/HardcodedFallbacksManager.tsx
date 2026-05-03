@@ -232,7 +232,7 @@ export function HardcodedFallbacksManager({ onRefresh }: { onRefresh?: () => voi
                   <button
                     type="button"
                     onClick={() => setAddPool(pool)}
-                    className="text-[9px] font-mono text-primary/70 hover:text-primary flex items-center gap-0.5"
+                    className="text-[9px] font-sans font-medium text-nox-text-link/75 hover:text-nox-text-link flex items-center gap-0.5"
                   >
                     <Plus className="h-3 w-3" /> Add
                   </button>
@@ -265,7 +265,7 @@ export function HardcodedFallbacksManager({ onRefresh }: { onRefresh?: () => voi
                           <button type="button" onClick={() => swapOrder(pool, idx, 1)} disabled={idx >= list.length - 1 || !!acting} className="p-1 text-muted-foreground/40 hover:text-foreground disabled:opacity-20" title="Move down">
                             <ArrowDown className="h-3 w-3" />
                           </button>
-                          <button type="button" onClick={() => openEdit(row)} disabled={!!acting} className="p-1 text-primary/50 hover:text-primary">
+                          <button type="button" onClick={() => openEdit(row)} disabled={!!acting} className="p-1 text-muted-foreground/50 hover:text-nox-text-link">
                             <Pencil className="h-3 w-3" />
                           </button>
                           <button type="button" onClick={() => remove(row)} disabled={!!acting} className="p-1 text-destructive/40 hover:text-destructive">

@@ -2,6 +2,7 @@ import { Eye, EyeOff, WifiOff, Bitcoin, CircleDollarSign, Clock, ChevronDown } f
 import { BtcChartLazyGate } from '@/components/BtcChartLazyGate';
 import { Skeleton } from '@/components/ui/skeleton';
 import { formatBtcPrice, type BtcPriceData } from '@/lib/btc';
+import { trackedAssetSymbol } from '@/lib/tracked-assets';
 import { useTranslation } from 'react-i18next';
 import { homeInWidget } from '@/components/home/home-widget-styles';
 import { cn } from '@/lib/utils';
@@ -19,6 +20,8 @@ interface Props {
   onToggleChartExpanded?: () => void;
   /** When false, omit the price-row chevron (e.g. Home puts the control in `HomeSectionCard` header). */
   chartChevronInPriceRow?: boolean;
+  /** CoinGecko id; used for labels when `data` is null. Defaults from `data.coinId` when present. */
+  coinId?: string;
 }
 
 export function BtcStatus({
@@ -27,6 +30,7 @@ export function BtcStatus({
   hidden,
   onToggleHidden,
   currency = 'USD',
+  coinId: coinIdProp,
   btcMode = false,
   onToggleBtcMode,
   chartExpanded = true,
@@ -35,6 +39,7 @@ export function BtcStatus({
 }: Props) {
   const { t } = useTranslation();
   const toggle = onToggleHidden;
+  const quoteSym = trackedAssetSymbol(data?.coinId ?? coinIdProp ?? 'bitcoin');
 
   const fiatLabelCurrency = (data?.currency ?? currency).toUpperCase();
 
@@ -44,7 +49,7 @@ export function BtcStatus({
       <button
         type="button"
         onClick={onToggleBtcMode}
-        className={cn(homeInWidget.iconBtn, 'text-muted-foreground/40 hover:text-primary')}
+        className={cn(homeInWidget.iconBtn, 'text-muted-foreground/40 hover:text-foreground')}
         aria-label={t('btcStatus.enterBtcMode')}
         title={t('btcStatus.enterBtcMode')}
       >
@@ -58,7 +63,7 @@ export function BtcStatus({
       <button
         type="button"
         onClick={onToggleBtcMode}
-        className={cn(homeInWidget.iconBtn, 'text-primary/60 hover:text-primary')}
+        className={cn(homeInWidget.iconBtn, 'text-foreground/50 hover:text-foreground')}
         aria-label={t('btcStatus.exitBtcMode', { currency: fiatLabelCurrency })}
         title={t('btcStatus.exitBtcMode', { currency: fiatLabelCurrency })}
       >
@@ -116,7 +121,9 @@ export function BtcStatus({
     return (
       <div className="space-y-3">
         <div className="space-y-1">
-          <p className={homeInWidget.kicker}>BTC / BTC</p>
+          <p className={homeInWidget.kicker}>
+            {quoteSym} / {quoteSym}
+          </p>
           <div className="flex items-center justify-between gap-2">
             <div className="min-w-0 flex-1 space-y-1">
               {hidden ? (
@@ -126,7 +133,9 @@ export function BtcStatus({
                 </>
               ) : (
                 <>
-                  <p className={`${homeInWidget.price} text-foreground/90`}>1 BTC = 1 BTC</p>
+                  <p className={`${homeInWidget.price} text-foreground/90`}>
+                    1 {quoteSym} = 1 {quoteSym}
+                  </p>
                   <p className="leading-snug text-sm text-[#dbb266]">{t('btcStatus.priceIsNoise')}</p>
                 </>
               )}
@@ -154,7 +163,7 @@ export function BtcStatus({
           ? 'text-muted-foreground'
           : data.fearGreed.value <= 75
             ? 'text-chart-2'
-            : 'text-primary'
+            : 'text-nox-accent-green'
     : '';
 
   const showChartBlock = !hidden && chartExpanded;
@@ -189,7 +198,9 @@ export function BtcStatus({
     <div className="space-y-3">
       <div className="space-y-1">
         <div className="flex min-w-0 flex-1 flex-wrap items-center gap-2">
-          <p className={homeInWidget.kicker}>BTC / {cur}</p>
+          <p className={homeInWidget.kicker}>
+            {quoteSym} / {cur}
+          </p>
           {data._stale && (
             <span className={`flex items-center gap-1 ${homeInWidget.metaFaint}`} title="Using cached data — live APIs unavailable">
               <Clock className="h-2.5 w-2.5" />
@@ -225,7 +236,7 @@ export function BtcStatus({
       </div>
       {showChartBlock ? (
         <div>
-          <BtcChartLazyGate hidden={hidden} currency={cur} />
+          <BtcChartLazyGate hidden={hidden} currency={cur} coinId={data?.coinId ?? coinIdProp ?? 'bitcoin'} />
         </div>
       ) : null}
     </div>

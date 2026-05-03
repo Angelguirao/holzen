@@ -269,7 +269,7 @@ export function AIInsightsPanel({ completedPauseCount }: Props) {
             <p className="text-[9px] font-mono text-muted-foreground/50">
               {format(new Date(row.generated_at), 'MMM d, yyyy · h:mm a')}
               {rowIdx === 0 && isStale && (
-                <span className="ml-2 text-primary/50">{t('aiInsights.refreshRecommended')}</span>
+                <span className="ml-2 text-muted-foreground">{t('aiInsights.refreshRecommended')}</span>
               )}
             </p>
             <div className="flex items-center gap-2">

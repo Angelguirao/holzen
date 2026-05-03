@@ -13,10 +13,12 @@ interface Props {
   cumulativeThreshold: number;
   onSetCumulative: (val: number) => void;
   cooldownHours?: number;
+  /** CoinGecko coin id for volatility frequency estimates. */
+  trackedAssetId?: string;
 }
 
 export const ThresholdSetting = forwardRef<HTMLDivElement, Props>(function ThresholdSetting(
-  { thresholdUp, onSetUp, thresholdDown, onSetDown, cumulativeThreshold, onSetCumulative, cooldownHours },
+  { thresholdUp, onSetUp, thresholdDown, onSetDown, cumulativeThreshold, onSetCumulative, cooldownHours, trackedAssetId = 'bitcoin' },
   ref
 ) {
   const { t } = useTranslation();
@@ -30,15 +32,21 @@ export const ThresholdSetting = forwardRef<HTMLDivElement, Props>(function Thres
 
   return (
     <div ref={ref} className="space-y-8">
-      <ThresholdFrequencyEstimator thresholdUp={upVal} thresholdDown={downVal} cumulativeThreshold={cumVal} cooldownHours={cooldownHours} />
+      <ThresholdFrequencyEstimator
+        thresholdUp={upVal}
+        thresholdDown={downVal}
+        cumulativeThreshold={cumVal}
+        cooldownHours={cooldownHours}
+        coinId={trackedAssetId}
+      />
 
       <div className="space-y-4">
         <div className="space-y-2">
           <div className="flex items-center gap-2">
             <ArrowUp className="h-3.5 w-3.5" style={{ color: '#22c55e' }} />
-            <p className="text-base font-sans text-primary">{t('threshold.priceRises')}</p>
+            <p className="text-base font-sans text-foreground">{t('threshold.priceRises')}</p>
           </div>
-          <p className="text-3xl tracking-tight text-primary font-sans font-semibold">{upVal.toFixed(1)}%</p>
+          <p className="text-3xl tracking-tight text-foreground font-sans font-semibold">{upVal.toFixed(1)}%</p>
           <p className="font-sans text-base text-muted-foreground">{t('threshold.triggerRises')}</p>
         </div>
 
@@ -73,9 +81,9 @@ export const ThresholdSetting = forwardRef<HTMLDivElement, Props>(function Thres
         <div className="space-y-2">
           <div className="flex items-center gap-2">
             <ArrowDown className="h-3.5 w-3.5 text-destructive" />
-            <p className="font-sans text-base text-primary">{t('threshold.priceDrops')}</p>
+            <p className="font-sans text-base text-foreground">{t('threshold.priceDrops')}</p>
           </div>
-          <p className="text-3xl tracking-tight font-sans font-semibold text-primary">{downVal.toFixed(1)}%</p>
+          <p className="text-3xl tracking-tight font-sans font-semibold text-foreground">{downVal.toFixed(1)}%</p>
           <p className="font-sans text-base text-muted-foreground">{t('threshold.triggerDrops')}</p>
         </div>
 

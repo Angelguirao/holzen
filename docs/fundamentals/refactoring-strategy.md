@@ -4,6 +4,7 @@ This document is the **canonical description** of how Holzen approaches **increm
 
 It complements:
 
+- **[`docs/fundamentals/react-screen-orchestration.md`](react-screen-orchestration.md)** — **reusable playbook** for any large screen: conductor pattern, Rules of Hooks + early returns, lazy branches, memoized props, pure gates + tests (distilled from Home).
 - **[`docs/reviews/react-spa-review-template.md`](../reviews/react-spa-review-template.md)** — flow-first **review** checklist (PR + audit); use before deciding *what* to extract (includes Supabase / edge context).
 - **[`docs/backlog/react-page-and-hook-splitting.md`](../backlog/react-page-and-hook-splitting.md)** — living checklist of **slices shipped** and remaining opportunities.
 - **[`docs/fundamentals/navigating-the-codebase.md`](navigating-the-codebase.md)** — where state and data patterns live today.
@@ -104,7 +105,7 @@ This document is **comprehensive for structural client refactors**: extraction o
 
 | Concern | Where to look |
 |---------|----------------|
-| **Design system / IA** | [design/nox/README.md](../design/nox/README.md), [design/information-architecture.md](../design/information-architecture.md) |
+| **Design system / IA** | [DESIGN.md](../../DESIGN.md), [design/nox/README.md](../design/nox/README.md), [design/information-architecture.md](../design/information-architecture.md) |
 | **Accessibility** | Acceptance criteria on changed UI; systemic passes (e.g. [backlog/lighthouse-a11y-home.md](../backlog/lighthouse-a11y-home.md)) |
 | **i18n** | Match existing `useTranslation` / key patterns in the same feature |
 | **Analytics & flags** | [ops/event-taxonomy.md](../ops/event-taxonomy.md), [ops/feature-flags.md](../ops/feature-flags.md) when moving or renaming instrumented UI |

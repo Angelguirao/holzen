@@ -7,24 +7,12 @@ import { useProGate } from '@/hooks/use-pro-gate';
 import { TOOLS } from '@/lib/app-routes';
 import type { LastCheckInRow } from '@/hooks/use-tools-hub-data';
 import type { PracticeSuggestion } from '@/lib/practice-suggestion';
-
-const SUGGESTION_ROUTE: Record<PracticeSuggestion['id'], string> = {
-  checkin: TOOLS.practice.checkin,
-  journal: TOOLS.practice.journal,
-  bodyscan: TOOLS.practice.bodyscan,
-  replay: TOOLS.practice.replay,
-};
-
-const SUGGESTION_LABEL: Record<PracticeSuggestion['id'], string> = {
-  checkin: 'practice.checkinLabel',
-  journal: 'practice.journalLabel',
-  bodyscan: 'practice.bodyscanLabel',
-  replay: 'practice.replayLabel',
-};
-
-function isPracticeFree(id: PracticeSuggestion['id']): boolean {
-  return id === 'checkin';
-}
+import {
+  TOOLS_PRACTICE_SUGGESTION_LABEL_KEY,
+  TOOLS_PRACTICE_SUGGESTION_ROUTE,
+  isToolsPracticeFree,
+  visibleToolsPracticeSuggestions,
+} from '@/lib/tools-hub-practice-suggestions';
 
 type Props = {
   loading: boolean;
@@ -36,7 +24,7 @@ export function ToolsGoodNextStepSection({ loading, lastCheckIn, suggestions }: 
   const { t } = useTranslation();
   const { isPro, requirePro } = useProGate();
 
-  const visibleSuggestions = suggestions.filter((s) => isPracticeFree(s.id) || isPro);
+  const visibleSuggestions = visibleToolsPracticeSuggestions(suggestions, isPro);
 
   const formatTrigger = (text: string | null) => {
     if (!text?.trim()) return null;
@@ -60,11 +48,11 @@ export function ToolsGoodNextStepSection({ loading, lastCheckIn, suggestions }: 
       {visibleSuggestions.length > 0 && (
         <div className="flex flex-col gap-2 sm:flex-row sm:flex-wrap">
           {visibleSuggestions.map((s) => {
-            const gated = !isPracticeFree(s.id) && !isPro;
+            const gated = !isToolsPracticeFree(s.id) && !isPro;
             return (
               <Link
                 key={s.id}
-                to={SUGGESTION_ROUTE[s.id]}
+                to={TOOLS_PRACTICE_SUGGESTION_ROUTE[s.id]}
                 onClick={(e) => {
                   if (!gated) return;
                   e.preventDefault();
@@ -72,12 +60,12 @@ export function ToolsGoodNextStepSection({ loading, lastCheckIn, suggestions }: 
                 }}
                 className="flex flex-1 min-w-0 items-start gap-2 rounded-xl border border-primary/15 bg-primary/[0.04] px-3 py-2.5 text-left transition-colors hover:bg-primary/[0.07] sm:min-w-[140px] sm:flex-initial"
               >
-                <Sparkles className="mt-0.5 h-3.5 w-3.5 shrink-0 text-primary" />
+                <Sparkles className="mt-0.5 h-3.5 w-3.5 shrink-0 text-nox-text-highlight" />
                 <div className="min-w-0 flex-1">
-                  <p className="text-[10px] font-mono uppercase tracking-wider text-primary/90">
+                  <p className="text-[10px] font-mono uppercase tracking-wider text-muted-foreground">
                     {t('tools.hub.suggestedPill')}
                   </p>
-                  <p className="text-sm font-medium text-foreground">{t(SUGGESTION_LABEL[s.id])}</p>
+                  <p className="text-sm font-medium text-foreground">{t(TOOLS_PRACTICE_SUGGESTION_LABEL_KEY[s.id])}</p>
                   <p className="mt-0.5 text-xs leading-snug text-muted-foreground">{t(s.reasonKey)}</p>
                 </div>
               </Link>
@@ -123,7 +111,7 @@ export function ToolsGoodNextStepSection({ loading, lastCheckIn, suggestions }: 
           <p className="text-sm text-muted-foreground leading-relaxed">{t('tools.hub.noCheckInYet')}</p>
           <Link
             to={TOOLS.practice.checkin}
-            className="mt-3 inline-flex text-sm font-medium text-primary underline-offset-4 hover:underline"
+            className="mt-3 inline-flex text-sm font-medium text-nox-text-link underline-offset-4 transition-colors hover:text-nox-text-link/80 hover:underline"
           >
             {t('tools.hub.logCheckInCta')}
           </Link>

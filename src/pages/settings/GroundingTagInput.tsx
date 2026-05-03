@@ -28,7 +28,7 @@ export function GroundingTagInput({
   return (
     <div className="space-y-3">
       <p className="text-muted-foreground/60 uppercase tracking-wider text-sm font-sans">{t('settings.groundingTitle')}</p>
-      <p className="leading-relaxed text-primary text-sm">
+      <p className="leading-relaxed text-foreground text-sm">
         {t('settings.groundingDesc')}
       </p>
       <div className="flex flex-wrap gap-1.5 min-h-[2rem]">

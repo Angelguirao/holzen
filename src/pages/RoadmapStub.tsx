@@ -28,17 +28,17 @@ export default function RoadmapStub() {
       </div>
       <ul className="space-y-2 text-sm">
         <li>
-          <Link to="/blog" className="text-primary underline underline-offset-2">
+          <Link to="/blog" className="text-nox-text-link underline underline-offset-2 transition-colors hover:text-nox-text-link/80">
             {t('roadmap.linkBlog', { defaultValue: 'Blog' })}
           </Link>
         </li>
         <li>
-          <Link to="/about" className="text-primary underline underline-offset-2">
+          <Link to="/about" className="text-nox-text-link underline underline-offset-2 transition-colors hover:text-nox-text-link/80">
             {t('roadmap.linkAbout', { defaultValue: 'About Holzen' })}
           </Link>
         </li>
         <li>
-          <Link to="/welcome" className="text-primary underline underline-offset-2">
+          <Link to="/welcome" className="text-nox-text-link underline underline-offset-2 transition-colors hover:text-nox-text-link/80">
             {t('roadmap.linkHome', { defaultValue: 'Sign in' })}
           </Link>
         </li>

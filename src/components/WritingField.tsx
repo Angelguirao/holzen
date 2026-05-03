@@ -202,7 +202,7 @@ export function WritingField({
                 )}
                 <button
                   onClick={closeFocusMode}
-                  className="text-[10px] font-mono text-primary/60 hover:text-primary/80 transition-colors tracking-[0.15em] uppercase"
+                  className="text-[10px] font-sans font-medium text-nox-text-link/70 hover:text-nox-text-link transition-colors tracking-wide uppercase"
                 >
                   Done
                 </button>

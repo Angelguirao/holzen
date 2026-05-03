@@ -310,28 +310,27 @@ export function AutoCooldownIndicator({
     const nextScanAria = t('home.autoCooldown.nextScanAria', {
       time: nextScanClock,
       defaultValue:
-        'Holzen rechecks market conditions on a quarter-hour schedule. The next server tick is around {{time}}. A new automatic pause only happens when rules and your settings say so — this is only the schedule.',
+        'Holzen reviews conditions on a quarter-hour rhythm. The next review is around {{time}}. A new automatic pause only happens when your settings and the market align — this is only the schedule.',
     });
     return (
       <div
-        className="space-y-0.5 py-1 text-base font-sans"
-        title={t('home.nextScanIdleTitle', { defaultValue: 'Countdown until the server runs the next price check' })}
+        className="space-y-0.5 py-0.5 font-sans"
+        title={t('home.nextScanIdleTitle', {
+          defaultValue: 'When Holzen next checks market conditions against your settings (about every 15 minutes).',
+        })}
         role="status"
         aria-live="polite"
         aria-label={nextScanAria}
       >
-        <p className={cn(homeInWidget.metaFaint, 'text-[11px] uppercase tracking-wide')} aria-hidden="true">
-          {t('home.autoCooldown.serverChecksKicker', { defaultValue: 'Background price checks' })}
+        <p className="text-xs leading-snug text-foreground/80" aria-hidden="true">
+          {t('home.autoCooldown.serverChecksKicker', { defaultValue: 'Holzen is watching the market for you' })}
         </p>
-        <div className="flex items-center gap-2">
-          <p className={cn(homeInWidget.nextScanCountdown, 'tabular-nums')} aria-hidden="true">
-            {t('home.autoCooldown.nextScanAtClock', {
-              time: nextScanClock,
-              defaultValue: 'Next server check · {{time}}',
-            })}
-          </p>
-          <span className="h-1.5 w-1.5 rounded-full bg-primary/40 shrink-0" aria-hidden="true" />
-        </div>
+        <p className="text-[11px] tabular-nums leading-snug text-muted-foreground/75" aria-hidden="true">
+          {t('home.autoCooldown.nextScanAtClock', {
+            time: nextScanClock,
+            defaultValue: 'Next routine check · {{time}}',
+          })}
+        </p>
       </div>
     );
   }
