@@ -65,6 +65,7 @@ import { usePauseFavoriteToggle } from '@/hooks/use-pause-favorite-toggle';
 import { usePauseSessionInitialMoodHandlers } from '@/hooks/use-pause-session-initial-mood-handlers';
 import { usePauseShiftFrameDoneHandler } from '@/hooks/use-pause-shift-frame-done-handler';
 import { usePauseSessionDecideHandler } from '@/hooks/use-pause-session-decide-handler';
+import { usePauseSessionExitNavigation } from '@/hooks/use-pause-session-exit-navigation';
 import type { PauseImpactData } from '@/lib/pause-impact-data';
 import { showPauseStepSyncFailedToast } from '@/lib/pause-step-sync-toast';
 import { usePauseSessionShell } from '@/hooks/use-pause-session-shell';
@@ -73,6 +74,7 @@ import { usePauseSessionMountLog } from '@/hooks/use-pause-session-mount-log';
 export default function PauseSession() {
   const { t } = useTranslation();
   const navigate = useNavigate();
+  const { handleClose, handleReturn } = usePauseSessionExitNavigation(navigate);
   const location = useLocation();
   const prefersReducedMotion = useReducedMotion();
   const { value: step5BreathLabelRaw, ready: step5FlagReady } = useFeatureFlag('pause.step5_breath_label_shift', false);
@@ -428,15 +430,6 @@ export default function PauseSession() {
     setBriefIntegrateDone(true);
     setBriefStep('decide');
   }, []);
-
-  const handleClose = useCallback(() => {
-    navigate('/', { replace: true });
-  }, [navigate]);
-
-  const handleReturn = useCallback(() => {
-    clearSession();
-    navigate('/', { replace: true });
-  }, [navigate]);
 
   const { handleDecide } = usePauseSessionDecideHandler({
     decidingRef,
