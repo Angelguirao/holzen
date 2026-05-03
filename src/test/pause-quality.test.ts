@@ -15,7 +15,7 @@ const tpl: PauseTemplateRow = {
   window_ms: 21600000,
   action_window_ms: null,
   dismissal_suppression_ms: 21600000,
-  required_for_engaged: ['breath_completed', 'initial_emotion_logged'],
+  required_for_engaged: ['initial_emotion_logged', 'breath_completed'],
   required_for_completed: ['outcome_logged'],
   allowed_companion_types: ['signal', 'ground_nudge', 'historical_insight', 'zoom_out', 'haiku'],
   required_companion_count: 0,

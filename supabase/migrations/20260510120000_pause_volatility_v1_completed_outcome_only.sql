@@ -5,7 +5,8 @@
 -- aligns with "a choice was recorded" (`outcome_logged`). The ritual UI still
 -- walks users through prior beats, but the state machine does not require them
 -- for `completed` on this slug. Brief vs deep split remains **only** for
--- `active` → `engaged` (see prior migration).
+-- `active` → `engaged`: brief = `initial_emotion_logged` only; deep = that plus
+-- `breath_completed` (Feel then first Breathe in UI; Postgres checks a type set).
 -- ============================================================================
 
 CREATE OR REPLACE FUNCTION public.pause_evaluate_transitions(p_instance_id uuid)
@@ -75,7 +76,7 @@ BEGIN
       v_engaged_ok := ARRAY['initial_emotion_logged']::text[] <@ v_step_types;
     ELSE
       v_engaged_ok :=
-        ARRAY['breath_completed', 'initial_emotion_logged']::text[] <@ v_step_types;
+        ARRAY['initial_emotion_logged', 'breath_completed']::text[] <@ v_step_types;
     END IF;
 
     v_completed_ok := ARRAY['outcome_logged']::text[] <@ v_step_types;
@@ -109,9 +110,10 @@ $$;
 
 COMMENT ON FUNCTION public.pause_evaluate_transitions(uuid) IS
   'Evaluates pause_instances.state from step/companion events + template. '
-  'For volatility_v1: brief engages after initial only; deep after breath+initial; '
-  'completed when any outcome_logged exists. Other slugs use required_for_* and '
-  'required_companion_count.';
+  'For volatility_v1: brief engaged after initial_emotion_logged only; deep engaged '
+  'when initial_emotion_logged and breath_completed both exist (set check; Feel before '
+  'Breathe in normal UI); completed when outcome_logged exists. Other slugs use '
+  'required_for_* and required_companion_count.';
 
 -- Repair rows that already have an outcome but were still active|engaged under the old rule set.
 UPDATE public.pause_instances pi
