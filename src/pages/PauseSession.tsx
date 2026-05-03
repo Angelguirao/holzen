@@ -53,6 +53,14 @@ import { usePauseSessionDepthPickerHandlers } from '@/hooks/use-pause-session-de
 import { usePauseSessionDeepChooseBridgeHandler } from '@/hooks/use-pause-session-deep-choose-bridge-handler';
 import { usePauseSessionBriefFeelSelect } from '@/hooks/use-pause-session-brief-feel-select';
 
+/**
+ * `/pause` route: wires shell hydration, local ritual state, `pause-api` step handlers, and pause UI
+ * (`PauseSessionGate*`, `PauseSessionScaffold*`, `PauseSession*RitualBody` under `src/components/pause/`).
+ *
+ * **Product / data model:** brief vs deep flows, RPCs, and SQL-first ratios on `v_pause_full` /
+ * `pause_step_events` — `docs/systems/pause-system.md`.
+ * **Structure:** thin page + named hooks + `src/lib` — `docs/fundamentals/react-screen-orchestration.md`.
+ */
 export default function PauseSession() {
   const { t } = useTranslation();
   const navigate = useNavigate();
