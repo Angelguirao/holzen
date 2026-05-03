@@ -38,7 +38,6 @@ import {
   initialRitualEntry,
   briefStepToPauseScienceStep,
 } from '@/lib/pause-session-step-map';
-import { holzenLog } from '@/lib/holzen-console';
 import { parsePauseSessionLocationState } from '@/lib/router-location-state';
 import { useFeatureFlag } from '@/hooks/use-feature-flag';
 import {
@@ -52,6 +51,7 @@ import { pauseLogStep } from '@/lib/pause-api';
 import type { PauseState } from '@/lib/pause-state';
 import { getSessionQuote } from '@/lib/wisdom-quotes';
 import { usePauseSessionShell } from '@/hooks/use-pause-session-shell';
+import { usePauseSessionMountLog } from '@/hooks/use-pause-session-mount-log';
 
 export default function PauseSession() {
   const { t } = useTranslation();
@@ -107,16 +107,12 @@ export default function PauseSession() {
     },
   });
 
-  useEffect(() => {
-    holzenLog.pause('mount', {
-      pauseInstanceIdPrefix: (fetchPauseInstanceId ?? navPauseInstanceId)?.slice(0, 8) ?? null,
-      hasNavMessage: navReflectionMessage.length > 0,
-      restoredFromStorage: restored !== null,
-      hydrationStatus: hydration.status,
-    });
-    // Intentional mount-only snapshot; listing deps would re-log on every navigation/hydration change.
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- mount-once diagnostic
-  }, []);
+  usePauseSessionMountLog({
+    pauseInstanceIdPrefix: (fetchPauseInstanceId ?? navPauseInstanceId)?.slice(0, 8) ?? null,
+    hasNavMessage: navReflectionMessage.length > 0,
+    restoredFromStorage: restored !== null,
+    hydrationStatus: hydration.status,
+  });
 
   const message = resolved?.message ?? '';
   const context = resolved?.context ?? null;
