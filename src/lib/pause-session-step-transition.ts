@@ -7,6 +7,9 @@ export const PAUSE_SESSION_STEP_TRANSITION_DURATION_S = 0.35;
 /** Framer `transition.duration` (seconds) when `prefers-reduced-motion` is on. */
 export const PAUSE_SESSION_STEP_TRANSITION_DURATION_REDUCED_S = 0.1;
 
+/** Framer `transition.ease` cubic-bezier control points (legacy PauseSession preset). */
+export const PAUSE_SESSION_STEP_TRANSITION_EASE: [number, number, number, number] = [0.25, 0.1, 0.25, 1];
+
 export type PauseSessionSwipeDirection = 'forward' | 'back';
 
 export type PauseSessionStepTransitionConfig = {
@@ -37,7 +40,7 @@ export function buildPauseSessionStepTransitionConfig(params: {
       duration: params.prefersReducedMotion
         ? PAUSE_SESSION_STEP_TRANSITION_DURATION_REDUCED_S
         : PAUSE_SESSION_STEP_TRANSITION_DURATION_S,
-      ease: [0.25, 0.1, 0.25, 1],
+      ease: PAUSE_SESSION_STEP_TRANSITION_EASE,
     },
   };
 }

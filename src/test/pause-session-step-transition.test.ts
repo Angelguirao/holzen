@@ -3,6 +3,7 @@ import {
   PAUSE_SESSION_STEP_SLIDE_OFFSET_PX,
   PAUSE_SESSION_STEP_TRANSITION_DURATION_REDUCED_S,
   PAUSE_SESSION_STEP_TRANSITION_DURATION_S,
+  PAUSE_SESSION_STEP_TRANSITION_EASE,
   buildPauseSessionStepTransitionConfig,
 } from '@/lib/pause-session-step-transition';
 
@@ -19,6 +20,12 @@ describe('pause session step transition durations', () => {
   });
 });
 
+describe('PAUSE_SESSION_STEP_TRANSITION_EASE', () => {
+  it('matches legacy cubic-bezier array', () => {
+    expect(PAUSE_SESSION_STEP_TRANSITION_EASE).toEqual([0.25, 0.1, 0.25, 1]);
+  });
+});
+
 describe('buildPauseSessionStepTransitionConfig', () => {
   it('uses full slide distance when motion is allowed', () => {
     const fwd = buildPauseSessionStepTransitionConfig({
@@ -28,6 +35,7 @@ describe('buildPauseSessionStepTransitionConfig', () => {
     expect(fwd.initial).toEqual({ opacity: 0, x: PAUSE_SESSION_STEP_SLIDE_OFFSET_PX });
     expect(fwd.exit).toEqual({ opacity: 0, x: -PAUSE_SESSION_STEP_SLIDE_OFFSET_PX });
     expect(fwd.transition.duration).toBe(PAUSE_SESSION_STEP_TRANSITION_DURATION_S);
+    expect(fwd.transition.ease).toBe(PAUSE_SESSION_STEP_TRANSITION_EASE);
   });
 
   it('inverts slide for back navigation', () => {
@@ -37,6 +45,7 @@ describe('buildPauseSessionStepTransitionConfig', () => {
     });
     expect(back.initial).toEqual({ opacity: 0, x: -PAUSE_SESSION_STEP_SLIDE_OFFSET_PX });
     expect(back.exit).toEqual({ opacity: 0, x: PAUSE_SESSION_STEP_SLIDE_OFFSET_PX });
+    expect(back.transition.ease).toBe(PAUSE_SESSION_STEP_TRANSITION_EASE);
   });
 
   it('zeros slide and shortens duration when reduced motion', () => {
@@ -47,5 +56,6 @@ describe('buildPauseSessionStepTransitionConfig', () => {
     expect(cfg.initial.x).toBe(0);
     expect(cfg.exit.x).toBe(0);
     expect(cfg.transition.duration).toBe(PAUSE_SESSION_STEP_TRANSITION_DURATION_REDUCED_S);
+    expect(cfg.transition.ease).toBe(PAUSE_SESSION_STEP_TRANSITION_EASE);
   });
 });
