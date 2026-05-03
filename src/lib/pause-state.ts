@@ -129,7 +129,19 @@ export function collectStepTypes(
   return seen;
 }
 
-/** True when any `initial_emotion_logged` marks this instance as the ~2 min brief ritual (client payload). */
+/** True when payload marks brief ritual (mirrors `pause_evaluate_transitions` EXISTS on `brief_ritual`). */
+function payloadMarksBriefRitual(payload: Record<string, unknown> | undefined): boolean {
+  if (!payload || typeof payload !== 'object' || Array.isArray(payload)) return false;
+  const v = (payload as { brief_ritual?: unknown }).brief_ritual;
+  if (v === true) return true;
+  if (typeof v === 'string') {
+    const s = v.trim().toLowerCase();
+    return s === 'true' || s === 't' || s === '1';
+  }
+  return false;
+}
+
+/** True when any `initial_emotion_logged` marks this instance as the ~2 min brief ritual. */
 export function pauseInstanceHasBriefRitualTag(
   stepEvents: readonly PauseStepEventRow[],
   instanceId: string,
@@ -137,10 +149,7 @@ export function pauseInstanceHasBriefRitualTag(
   for (const e of stepEvents) {
     if (e.pause_instance_id !== instanceId) continue;
     if (e.step_type !== 'initial_emotion_logged') continue;
-    const p = e.payload;
-    if (p && typeof p === 'object' && !Array.isArray(p) && (p as { brief_ritual?: unknown }).brief_ritual === true) {
-      return true;
-    }
+    if (payloadMarksBriefRitual(e.payload as Record<string, unknown> | undefined)) return true;
   }
   return false;
 }
@@ -171,15 +180,18 @@ function allIn<T>(required: readonly T[], present: Set<T>): boolean {
  *
  * Rules (in order — first match wins):
  *   1. Instance already terminal → return as-is.
- *   2. Window elapsed (`now > window_ends_at`) → `expired` (reason
- *      `window_elapsed`) **only when** `template.action_window_ms` is set.
- *      When it is null, clock-only expiry is skipped (matches Postgres).
- *   3. **Brief ritual** (`initial_emotion_logged` with `brief_ritual: true`): all of
- *      `breath_completed`, `initial_emotion_logged`, `outcome_logged` → `completed`
- *      (no companion quota). Else template `required_for_completed` +
- *      `countedCompanionCount` → `completed`.
- *   4. `required_for_engaged` all present → `engaged` (only from `active`).
- *   5. Otherwise: unchanged.
+ *   2. `pending` → unchanged.
+ *   3. Window elapsed (`now > window_ends_at`) → `expired` **only when**
+ *      `template.action_window_ms` is set (matches Postgres).
+ *   4. `active`/`engaged` and `created_at` + 12h ≤ `now` → `expired` (open max age;
+ *      matches Postgres `open_max_age`).
+ *   5. **`volatility_v1`:** brief (`brief_ritual` on `initial_emotion_logged`) → `engaged`
+ *      after initial only; `completed` after breath + initial + outcome. Deep →
+ *      `engaged` after breath + initial; `completed` after those plus shift + outcome.
+ *      Companion counts do **not** gate completion.
+ *   6. **Other template slugs:** `required_for_engaged` / `required_for_completed` from
+ *      the row, plus `countedCompanionCount` ≥ `required_companion_count` for completed.
+ *   7. Otherwise: unchanged.
  */
 export function computePauseState(params: {
   instance: PauseInstanceRow;
@@ -210,13 +222,37 @@ export function computePauseState(params: {
     return 'expired';
   }
 
+  const openMaxAgeMs = 12 * 60 * 60 * 1000;
+  if (
+    (instance.state === 'active' || instance.state === 'engaged') &&
+    new Date(instance.created_at).getTime() + openMaxAgeMs <= now.getTime()
+  ) {
+    return 'expired';
+  }
+
   const seenSteps = collectStepTypes(stepEvents, instance.id);
   const counted = countedCompanionCount(companionEvents, instance.id);
-
-  const engagedOk = allIn(template.required_for_engaged, seenSteps);
   const briefMode = pauseInstanceHasBriefRitualTag(stepEvents, instance.id);
-  const completedOk = briefMode
-    ? allIn(['breath_completed', 'initial_emotion_logged', 'outcome_logged'] as const, seenSteps)
+  const isVolatilityV1 = template.slug === 'volatility_v1';
+
+  const engagedOk = isVolatilityV1
+    ? briefMode
+      ? allIn(['initial_emotion_logged'] as const, seenSteps)
+      : allIn(['breath_completed', 'initial_emotion_logged'] as const, seenSteps)
+    : allIn(template.required_for_engaged, seenSteps);
+
+  const completedOk = isVolatilityV1
+    ? briefMode
+      ? allIn(['breath_completed', 'initial_emotion_logged', 'outcome_logged'] as const, seenSteps)
+      : allIn(
+          [
+            'breath_completed',
+            'initial_emotion_logged',
+            'shift_emotion_logged',
+            'outcome_logged',
+          ] as const,
+          seenSteps,
+        )
     : allIn(template.required_for_completed, seenSteps) &&
       counted >= template.required_companion_count;
 

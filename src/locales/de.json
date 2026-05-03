@@ -954,7 +954,7 @@
     "scienceInfoAria": "Die Wissenschaft hinter dieser Pause",
     "noReflection": "Keine aktive Reflexion. Geh zurück, um eine auszulösen.",
     "outcomeSaveFailed": "Deine Wahl konnte nicht gespeichert werden. Bitte erneut versuchen.",
-    "outcomeNotCompleted": "Deine Wahl wurde gespeichert, aber diese Pause ist noch nicht abgeschlossen — öffne Reflektieren, schließe eine Begleitkarte ab und wähle erneut.",
+    "outcomeNotCompleted": "Deine Wahl wurde gespeichert, aber diese Pause ist noch nicht abgeschlossen — schließe die fehlenden Ritualschritte ab und wähle erneut.",
     "stepSyncFailed": "Dieser Schritt konnte nicht synchronisiert werden. Prüfe deine Verbindung und versuche es erneut.",
     "pendingContextTitle": "Marktkontext hat sich geändert",
     "pendingContextBody": "Es gibt eine neue Pause für die jüngste Bewegung. Du kannst deine aktuelle Pause behalten oder wechseln — beim Wechsel endet das aktuelle Ritual für diesen Moment und die neue öffnet sich.",

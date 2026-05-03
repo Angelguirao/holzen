@@ -16,14 +16,9 @@ const tpl: PauseTemplateRow = {
   action_window_ms: null,
   dismissal_suppression_ms: 21600000,
   required_for_engaged: ['breath_completed', 'initial_emotion_logged'],
-  required_for_completed: [
-    'breath_completed',
-    'initial_emotion_logged',
-    'shift_emotion_logged',
-    'outcome_logged',
-  ],
+  required_for_completed: ['outcome_logged'],
   allowed_companion_types: ['signal', 'ground_nudge', 'historical_insight', 'zoom_out', 'haiku'],
-  required_companion_count: 1,
+  required_companion_count: 0,
 };
 
 const inst: PauseInstanceRow = {
@@ -121,8 +116,33 @@ describe('computePauseQualityScore', () => {
     expect(out.note).toBe(0);
   });
 
-  it('companion credit is gated by template.required_companion_count', () => {
-    const strictTpl: PauseTemplateRow = { ...tpl, required_companion_count: 2 };
+  it('with required_companion_count 0, companion quality credit requires at least one counted complete', () => {
+    const steps = [
+      step('breath_completed'),
+      step('initial_emotion_logged', { mood: 'calm' }),
+      step('shift_emotion_logged', { mood: 'calm' }),
+      step('outcome_logged', { outcome: 'held' }),
+    ];
+    expect(
+      computePauseQualityScore({
+        instance: inst,
+        template: tpl,
+        stepEvents: steps,
+        companionEvents: [],
+      }).companion,
+    ).toBe(0);
+    expect(
+      computePauseQualityScore({
+        instance: inst,
+        template: tpl,
+        stepEvents: steps,
+        companionEvents: [companion()],
+      }).companion,
+    ).toBe(PAUSE_QUALITY_WEIGHTS.companion);
+  });
+
+  it('companion credit is gated by template.required_companion_count when > 0', () => {
+    const strictTpl: PauseTemplateRow = { ...tpl, slug: 'legacy', required_companion_count: 2 };
     const events: PauseCompanionEventRow[] = [companion()];
     const out1 = computePauseQualityScore({
       instance: inst,
