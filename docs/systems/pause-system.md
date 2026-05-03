@@ -232,7 +232,7 @@ Optional PostHog flag `**pause.step5_breath_label_shift**` renames the second-br
 
 #### 7.3.1 Brief ritual (happy path)
 
-UI order: **Feel** → **Breath** → **Integrate** (client-only quiet window; **no** companion RPC) → **Decide**. `**BRIEF_PAUSE_ORDER**` in `**PauseBriefProgress.tsx**`.
+UI order: **Feel** → **Breath** → **Integrate** (client-only quiet window; **no** companion RPC) → **Decide**. Canonical sequence **`BRIEF_PAUSE_ORDER`**: `src/lib/brief-pause-order.ts` (progress UI: `src/components/pause/PauseBriefProgress.tsx`).
 
 | UI step | RPC / behavior |
 | ------- | ---------------- |
