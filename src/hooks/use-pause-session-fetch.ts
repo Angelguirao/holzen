@@ -7,8 +7,12 @@ import {
 } from '@/lib/pause-session-fetched-instance';
 
 /**
- * Loads `pause_instances` + `pause_ai_artifacts` when `/pause` opens with an id-only
- * navigation (hydration `status === 'fetch'`). Cancellation matches prior inline effect.
+ * Loads `pause_instances` + `pause_ai_artifacts` when `/pause` opens with id-only navigation
+ * (hydration `status === 'fetch'` from `computePauseSessionHydration`). Row shaping:
+ * `src/lib/pause-session-fetched-instance.ts`. Cancellation matches prior inline effect.
+ *
+ * **Caller:** `src/hooks/use-pause-session-shell.ts`. **Contract:** `docs/systems/pause-system.md`
+ * section 7.2; **code map:** same doc, section 10.
  */
 export function usePauseSessionFetch(fetchPauseInstanceId: string | null): {
   fetchedInstance: FetchedPauseInstance | null;
