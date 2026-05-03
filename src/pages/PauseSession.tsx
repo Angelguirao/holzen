@@ -44,6 +44,10 @@ import { initialDecideOnBackStepFromPersisted } from '@/lib/pause-session-initia
 import { parsePauseSessionLocationState } from '@/lib/router-location-state';
 import { clearSession } from '@/lib/pause-session-storage';
 import { coalescePauseSessionShellViewModel } from '@/lib/pause-session-shell-view-model';
+import {
+  isPauseSessionDepthPickerActive,
+  isPauseSessionWaitingForInstanceFetch,
+} from '@/lib/pause-session-gate-flags';
 import { usePauseSessionStepTransition } from '@/hooks/use-pause-session-step-transition';
 import { usePauseBreathSegmentRpcLoggers } from '@/hooks/use-pause-breath-segment-rpc-loggers';
 import { usePauseFeelShiftLogDedupeRefs } from '@/hooks/use-pause-feel-shift-log-dedupe-refs';
@@ -121,7 +125,11 @@ export default function PauseSession() {
   const { message, context, pauseInstanceId, companions, companionPrefs, severity } =
     coalescePauseSessionShellViewModel(resolved, holzenSeverity);
 
-  const waitingForFetch = hydration.status === 'fetch' && !fetchFailed && !fetchedInstance;
+  const waitingForFetch = isPauseSessionWaitingForInstanceFetch({
+    hydrationStatus: hydration.status,
+    fetchFailed,
+    fetchedInstance,
+  });
 
   const restoredStep = mapPersistedStep(restored?.step);
   const restoredIdx = restored ? STEPS.indexOf(restoredStep) : -1;
@@ -354,7 +362,11 @@ export default function PauseSession() {
     prefersReducedMotion,
   });
 
-  const sessionOnPicker = phase === 'session' && ritualEntry === 'picker' && !!message;
+  const sessionOnPicker = isPauseSessionDepthPickerActive({
+    phase,
+    ritualEntry,
+    hasShellMessage: !!message,
+  });
 
   return (
     <PauseSessionGate
