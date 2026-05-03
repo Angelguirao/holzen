@@ -56,6 +56,7 @@ import {
 } from '@/lib/pause-session-storage';
 import { pauseLogStep } from '@/lib/pause-api';
 import { breathCompletedSegment1Payload, breathCompletedSegment2Payload } from '@/lib/pause-breath-completed-payload';
+import { showPauseOutcomeNotCompletedToast, showPauseOutcomeSaveFailedToast } from '@/lib/pause-outcome-toast';
 import { showPauseStepSyncFailedToast } from '@/lib/pause-step-sync-toast';
 import type { PauseState } from '@/lib/pause-state';
 import { getSessionQuote } from '@/lib/wisdom-quotes';
@@ -614,22 +615,11 @@ export default function PauseSession() {
               payload: { outcome: d },
             });
           } catch {
-            toast.error(
-              t('pause.outcomeSaveFailed', {
-                defaultValue: 'Could not save your choice. Try again.',
-              }),
-              { duration: 5000 },
-            );
+            showPauseOutcomeSaveFailedToast(t);
             return;
           }
           if (outcomeState !== 'completed') {
-            toast.error(
-              t('pause.outcomeNotCompleted', {
-                defaultValue:
-                  'Your choice was saved, but this pause is not complete yet — open Reflect and finish a companion card, then choose again.',
-              }),
-              { duration: 8000 },
-            );
+            showPauseOutcomeNotCompletedToast(t);
             void refreshSubscription();
             return;
           }
