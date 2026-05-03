@@ -9,16 +9,15 @@ import { NightReflectionCard, useNightReflection } from '@/components/NightRefle
 import { HolzenNumber } from '@/components/HolzenNumber';
 import { Onboarding } from '@/components/Onboarding';
 import { HomeGoalWhyCard } from '@/components/home/HomeGoalWhyCard';
-import { Skeleton } from '@/components/ui/skeleton';
-import { SubscriptionSkeleton } from '@/components/SubscriptionSkeleton';
-import { LoadingButton } from '@/components/ui/loading-button';
 import { useWidgetLayout } from '@/components/HomeWidget';
 import { HomeSectionCard } from '@/components/home/HomeSectionCard';
 import { HomeStatTiles } from '@/components/home/HomeStatTiles';
 import { HomeHeroQuote } from '@/components/home/HomeHeroQuote';
 import { HomeCustomizeSheet } from '@/components/home/HomeCustomizeSheet';
 import { ZenModeHome } from '@/components/home/ZenModeHome';
-import { HomePauseBlockingErrorPanel } from '@/components/home/HomePauseBlockingErrorPanel';
+import { HomePauseCardBody } from '@/components/home/HomePauseCardBody';
+import { HomePinnedPauseInset } from '@/components/home/HomePinnedPauseInset';
+import { HomeExpandChevronButton } from '@/components/home/HomeExpandChevronButton';
 import {
   useHomeOptionalVisibility,
   ALL_HOME_SECTION_IDS,
@@ -29,24 +28,25 @@ import { useHomeCheckoutWelcomeToast } from '@/hooks/use-home-checkout-welcome-t
 import { useHomeZenMode } from '@/hooks/use-home-zen-mode';
 import { useHomePinnedPausePreview } from '@/hooks/use-home-pinned-pause-preview';
 import { useHomeCompletedPauseCount } from '@/hooks/use-home-completed-pause-count';
-import { useCallback, useEffect, useState, useMemo, useRef, type ReactNode } from 'react';
+import { useHomeOutletPauseReady } from '@/hooks/use-home-outlet-pause-ready';
+import { useHomeDocumentTitle } from '@/hooks/use-home-document-title';
+import { useHomeHeroQuoteViewed } from '@/hooks/use-home-hero-quote-viewed';
+import { useHomePauseAudio } from '@/hooks/use-home-pause-audio';
+import { useHomeMarketDisplayPreferences } from '@/hooks/use-home-market-display-preferences';
+import { useCallback, useState, useMemo, type ReactNode } from 'react';
 import { useOutletContext, useSearchParams, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '@/hooks/use-auth';
-import { ChevronDown, Loader2, Pin, Sparkles, RefreshCw } from 'lucide-react';
-import { HomePauseEmptyFlow } from '@/components/home/HomePauseEmptyFlow';
+import { RefreshCw } from 'lucide-react';
 import { homeInWidget } from '@/components/home/home-widget-styles';
 import { cn } from '@/lib/utils';
-import { BulkHoldCard } from '@/components/BulkHoldCard';
 import { InstallHolzenCard } from '@/components/InstallHolzenCard';
 import { HomeQuickCapture } from '@/components/home/HomeQuickCapture';
 import { SnoozeToolbarControl } from '@/components/SnoozeControl';
-import { playNotificationTone, prefetchNotificationTone } from '@/lib/notification-tone';
 import { holzenLog } from '@/lib/holzen-console';
 import { trackEvent } from '@/lib/posthog';
-import { heroQuoteIndexForDay, utcYmd } from '@/lib/home-hero-quote';
 import { parsePauseContextForHomePreview } from '@/lib/pause-context-home-preview';
 import { type PauseSessionLocationState } from '@/lib/router-location-state';
-import { shouldSurfacePauseWidgetError } from '@/lib/home-pause-widget-error';
+import { getHomeCustomizeSectionDescription, getHomeCustomizeSectionTitle } from '@/lib/home-customize-section-copy';
 
 const Home = () => {
   const { t } = useTranslation();
@@ -58,6 +58,7 @@ const Home = () => {
   const hasAccess = subscribed || ((monthlyRemaining ?? 0) > 0);
   const [searchParams] = useSearchParams();
   useHomeCheckoutWelcomeToast(searchParams.get('subscribed'), refresh, t);
+  useHomeDocumentTitle(true);
 
   const {
     btcData,
@@ -86,37 +87,26 @@ const Home = () => {
     refreshProfile,
   } = useHolzen();
 
-  const pauseContextHomePreview = useMemo(() => parsePauseContextForHomePreview(context), [context]);
-
-  // Consume auto-trigger context from AppLayout
   const outletCtx = useOutletContext<{ pauseReady?: boolean; dismissPauseReady?: () => void }>();
   const pauseReady = outletCtx?.pauseReady ?? false;
   const dismissPauseReady = outletCtx?.dismissPauseReady;
+  useHomeOutletPauseReady(pauseReady, message, loading, refreshProfile, dismissPauseReady);
+  useHomeHeroQuoteViewed(profileLoaded, user?.id);
+  useHomePauseAudio(newPauseArrival, message, clearNewPauseArrival);
 
-  // When realtime detects a server-side trigger, refresh profile to get new message
-  useEffect(() => {
-    if (pauseReady && !message && !loading) {
-      refreshProfile();
-      dismissPauseReady?.();
-    }
-  }, [pauseReady, message, loading, refreshProfile, dismissPauseReady]);
+  const pauseContextHomePreview = useMemo(() => parsePauseContextForHomePreview(context), [context]);
 
   const { reflection: nightReflection, dismiss: dismissNight } = useNightReflection();
 
-  const [priceHidden, setPriceHidden] = useState(() => {
-    try {
-      return localStorage.getItem('holzen_hide_price') === 'true';
-    } catch {
-      return false;
-    }
-  });
-  const [btcMode, setBtcMode] = useState(() => {
-    try {
-      return localStorage.getItem('holzen_btc_mode') === 'true';
-    } catch {
-      return false;
-    }
-  });
+  const {
+    priceHidden,
+    btcMode,
+    marketChartExpanded,
+    marketChartExpandBlocked,
+    togglePriceHidden,
+    toggleBtcMode,
+    toggleMarketChartExpanded,
+  } = useHomeMarketDisplayPreferences();
   const unitBasisModeSupported = trackedAssetId === 'bitcoin';
   const { zenMode, setZenModePersist } = useHomeZenMode(location.pathname);
   const { pinnedPausePreview, unpinPausePreview } = useHomePinnedPausePreview(user);
@@ -125,12 +115,10 @@ const Home = () => {
     () => parsePauseContextForHomePreview(pinnedPausePreview?.context ?? null),
     [pinnedPausePreview?.context],
   );
-  const [marketChartExpanded, setMarketChartExpanded] = useState(false);
   const [goalWhyExpanded, setGoalWhyExpanded] = useState(false);
   const [goalWhyHoldSummary, setGoalWhyHoldSummary] = useState<string | null>(null);
   const [customizeOpen, setCustomizeOpen] = useState(false);
   const [customizeDndEpoch, setCustomizeDndEpoch] = useState(0);
-  const heroQuoteViewTracked = useRef(false);
 
   const sectionDefaultOrder = useMemo(() => [...ALL_HOME_SECTION_IDS], []);
   const { order, collapsed, reorder, toggleCollapsed, resetLayout } = useWidgetLayout(sectionDefaultOrder);
@@ -175,47 +163,16 @@ const Home = () => {
     setCustomizeDndEpoch((n) => n + 1);
   }, [resetLayout, resetSectionVisibility, setZenModePersist]);
 
-  const homeCustomizeSectionTitle = useCallback(
-    (id: string) => {
-      const titles: Record<string, string> = {
-        'goal-why': t('home.widget.whyHoldTitle'),
-        market: t('home.customizeSheet.sections.market.title'),
-        'your-pause': t('home.customizeSheet.sections.yourPause.title'),
-        'quick-capture': t('home.customizeSheet.sections.quickCapture.title'),
-        night: t('home.customizeSheet.sections.night.title'),
-        [JOURNEY_STAT_TILES_VISIBILITY_ID]: t('home.customizeSheet.sections.journeyPulse.title'),
-      };
-      return titles[id] ?? id;
-    },
-    [t],
-  );
+  const homeCustomizeSectionTitle = useCallback((id: string) => getHomeCustomizeSectionTitle(t, id), [t]);
 
   const homeCustomizeSectionDescription = useCallback(
-    (id: string) => {
-      const descs: Record<string, string> = {
-        'goal-why': t('home.customizeSheet.sections.goalWhy.desc'),
-        market: t('home.customizeSheet.sections.market.desc'),
-        'your-pause': t('home.customizeSheet.sections.yourPause.desc'),
-        'quick-capture': t('home.customizeSheet.sections.quickCapture.desc'),
-        night: t('home.customizeSheet.sections.night.desc'),
-        [JOURNEY_STAT_TILES_VISIBILITY_ID]: t('home.customizeSheet.sections.journeyPulse.desc'),
-      };
-      return descs[id] ?? '';
-    },
+    (id: string) => getHomeCustomizeSectionDescription(t, id),
     [t],
   );
 
   const handleCustomizeOpenChange = useCallback((open: boolean) => {
     if (open) trackEvent('home.customize_opened', {});
     setCustomizeOpen(open);
-  }, []);
-
-  const toggleMarketChartExpanded = useCallback(() => {
-    setMarketChartExpanded((prev) => {
-      const next = !prev;
-      trackEvent('home.market_chart_expand_toggled', { expanded: next });
-      return next;
-    });
   }, []);
 
   const toggleGoalWhyExpanded = useCallback(() => {
@@ -226,105 +183,39 @@ const Home = () => {
     });
   }, []);
 
-  const marketChartExpandBlocked = btcMode || priceHidden;
-
-  useEffect(() => {
-    if (btcMode || priceHidden) {
-      setMarketChartExpanded(false);
-    }
-  }, [btcMode, priceHidden]);
+  const marketExpandLabel = marketChartExpandBlocked
+    ? t('home.market.chartExpandDisabled')
+    : marketChartExpanded
+      ? t('home.market.collapseDetails')
+      : t('home.market.expandDetails');
 
   const marketHeaderRight = useMemo(
     () => (
-      <button
-        type="button"
-        onClick={toggleMarketChartExpanded}
+      <HomeExpandChevronButton
+        expanded={marketChartExpanded}
+        onToggle={toggleMarketChartExpanded}
         disabled={marketChartExpandBlocked}
-        className={cn(homeInWidget.iconBtn, 'disabled:cursor-not-allowed disabled:opacity-40')}
-        aria-expanded={marketChartExpandBlocked ? false : marketChartExpanded}
-        aria-label={
-          marketChartExpandBlocked
-            ? t('home.market.chartExpandDisabled')
-            : marketChartExpanded
-              ? t('home.market.collapseDetails')
-              : t('home.market.expandDetails')
-        }
-        title={
-          marketChartExpandBlocked
-            ? t('home.market.chartExpandDisabled')
-            : marketChartExpanded
-              ? t('home.market.collapseDetails')
-              : t('home.market.expandDetails')
-        }
-      >
-        <ChevronDown
-          className={cn(
-            'h-4 w-4 text-secondary-foreground transition-transform duration-200',
-            !marketChartExpanded && '-rotate-90',
-          )}
-          aria-hidden
-        />
-      </button>
+        ariaExpandedWhenEnabled={marketChartExpanded}
+        ariaLabel={marketExpandLabel}
+        title={marketExpandLabel}
+      />
     ),
-    [marketChartExpanded, marketChartExpandBlocked, toggleMarketChartExpanded, t],
+    [marketChartExpanded, marketChartExpandBlocked, toggleMarketChartExpanded, marketExpandLabel],
   );
 
   const goalWhyHeaderRight = useMemo(
     () => (
-      <button
-        type="button"
-        onClick={toggleGoalWhyExpanded}
-        className={homeInWidget.iconBtn}
-        aria-expanded={goalWhyExpanded}
-        aria-label={
+      <HomeExpandChevronButton
+        expanded={goalWhyExpanded}
+        onToggle={toggleGoalWhyExpanded}
+        ariaExpandedWhenEnabled={goalWhyExpanded}
+        ariaLabel={
           goalWhyExpanded ? t('home.goalWhy.collapseHoldDetails') : t('home.goalWhy.expandHoldDetails')
         }
-      >
-        <ChevronDown
-          className={cn(
-            'h-4 w-4 text-secondary-foreground transition-transform duration-200',
-            !goalWhyExpanded && '-rotate-90',
-          )}
-          aria-hidden
-        />
-      </button>
+      />
     ),
     [goalWhyExpanded, toggleGoalWhyExpanded, t],
   );
-
-  useEffect(() => {
-    if (!profileLoaded || heroQuoteViewTracked.current) return;
-    heroQuoteViewTracked.current = true;
-    const ymd = utcYmd();
-    trackEvent('home.hero_quote_viewed', {
-      quote_index: heroQuoteIndexForDay(user?.id, ymd),
-      utc_ymd: ymd,
-    });
-  }, [profileLoaded, user?.id]);
-
-  const togglePriceHidden = useCallback(() => {
-    setPriceHidden((prev) => {
-      const next = !prev;
-      try {
-        localStorage.setItem('holzen_hide_price', String(next));
-      } catch {
-        /* ignore */
-      }
-      return next;
-    });
-  }, []);
-
-  const toggleBtcMode = useCallback(() => {
-    setBtcMode((prev) => {
-      const next = !prev;
-      try {
-        localStorage.setItem('holzen_btc_mode', String(next));
-      } catch {
-        /* ignore */
-      }
-      return next;
-    });
-  }, []);
 
   const handleNeedAPause = useCallback(() => {
     const remaining = manualCooldownRemaining();
@@ -364,34 +255,9 @@ const Home = () => {
     navigate('/pause', { state: navState });
   }, [message, context, lastPauseInstanceId, companions, companionPrefs, severity, navigate]);
 
-  const lastToneMsgRef = useRef<string | null>(null);
-  useEffect(() => {
-    if (newPauseArrival && message) {
-      // Only play tone once per unique message to prevent double-play
-      if (message !== lastToneMsgRef.current) {
-        lastToneMsgRef.current = message;
-        let soundEnabled = true;
-        try {
-          soundEnabled = localStorage.getItem('holzen_sound_enabled') !== 'false';
-        } catch {
-          soundEnabled = true;
-        }
-        if (soundEnabled) {
-          playNotificationTone();
-        }
-      }
-      clearNewPauseArrival();
-    }
-  }, [newPauseArrival, message, clearNewPauseArrival]);
-
-  useEffect(() => {
-    prefetchNotificationTone();
-  }, []);
-
-  useEffect(() => {
-    document.title = 'Holzen — Home';
-    return () => { document.title = 'Holzen — Pause before you act'; };
-  }, []);
+  const startProCheckout = useCallback(() => {
+    startCheckout('pro');
+  }, [startCheckout]);
 
   const handlePullRefresh = useCallback(async () => {
     window.location.reload();
@@ -409,39 +275,13 @@ const Home = () => {
   const pauseEmptyPinnedPreview = useMemo(
     () =>
       pinnedPausePreview ? (
-        <div className={cn(homeInWidget.inset, 'space-y-3')}>
-          <div className="flex items-center justify-between gap-2">
-            <div className="flex items-center gap-2 text-muted-foreground">
-              <Pin className="h-3.5 w-3.5 shrink-0" />
-              <span className={homeInWidget.kicker}>{t('common.pinned')}</span>
-            </div>
-            <button
-              type="button"
-              onClick={unpinPausePreview}
-              className="text-xs font-medium text-muted-foreground transition-colors hover:text-foreground"
-            >
-              {t('common.unpin')}
-            </button>
-          </div>
-          {(pinnedContextHomePreview.btc24h || pinnedContextHomePreview.marketSentiment) ? (
-            <div className={cn(homeInWidget.meta, 'space-y-1')}>
-              {pinnedContextHomePreview.btc24h ? (
-                <p className="leading-snug">{pinnedContextHomePreview.btc24h}</p>
-              ) : null}
-              {pinnedContextHomePreview.marketSentiment ? (
-                <p className="leading-snug">{pinnedContextHomePreview.marketSentiment}</p>
-              ) : null}
-            </div>
-          ) : null}
-        </div>
+        <HomePinnedPauseInset
+          btc24h={pinnedContextHomePreview.btc24h}
+          marketSentiment={pinnedContextHomePreview.marketSentiment}
+          onUnpin={unpinPausePreview}
+        />
       ) : null,
-    [
-      pinnedPausePreview,
-      pinnedContextHomePreview.btc24h,
-      pinnedContextHomePreview.marketSentiment,
-      t,
-      unpinPausePreview,
-    ],
+    [pinnedPausePreview, pinnedContextHomePreview.btc24h, pinnedContextHomePreview.marketSentiment, unpinPausePreview],
   );
 
   if (!profileLoaded) {
@@ -481,88 +321,34 @@ const Home = () => {
         nextCronCheckIn={nextCronCheckIn}
         manualCooldownRemaining={manualCooldownRemaining}
         checkoutLoading={checkoutLoading}
-        onStartCheckoutPro={() => startCheckout('pro')}
+        onStartCheckoutPro={startProCheckout}
       />
     );
   }
 
   const pauseCardBody = (
-    <div className="space-y-4">
-      <BulkHoldCard />
-
-      {!subLoading && !hasAccess ? (
-        <div className="space-y-3">
-          <p className={homeInWidget.bodyMuted}>{t('home.subscription.monthlyLimitReached')}</p>
-          <p className={`${homeInWidget.meta} mb-[16px]`}>{t('home.subscription.upgradeToPro')}</p>
-          <LoadingButton
-            onClick={() => startCheckout('pro')}
-            loading={checkoutLoading}
-            loadingText={t('home.subscription.openingCheckout')}
-            className="w-full text-sm font-medium mt-4"
-          >
-            {t('pro.upgradeCta')}
-          </LoadingButton>
-        </div>
-      ) : subLoading ? (
-        <SubscriptionSkeleton variant="inline" />
-      ) : (
-        <>
-          {!subscribed && monthlyRemaining !== undefined && monthlyRemaining > 0 && (
-            <p className={homeInWidget.meta}>{t('home.subscription.freeRemaining', { count: monthlyRemaining })}</p>
-          )}
-
-          {message ? (
-            <div className="space-y-4">
-              {(pauseContextHomePreview.btc24h || pauseContextHomePreview.marketSentiment) ? (
-                <div className={cn(homeInWidget.meta, 'min-w-0 space-y-1')}>
-                  {pauseContextHomePreview.btc24h ? (
-                    <p className="leading-snug">{pauseContextHomePreview.btc24h}</p>
-                  ) : null}
-                  {pauseContextHomePreview.marketSentiment ? (
-                    <p className="leading-snug">{pauseContextHomePreview.marketSentiment}</p>
-                  ) : null}
-                </div>
-              ) : null}
-              <button
-                type="button"
-                onClick={handleNavigatePauseWithThis}
-                className={cn(homeInWidget.ctaPrimary, 'bg-foreground text-background hover:bg-foreground/90')}
-              >
-                <Sparkles className="h-4 w-4 shrink-0 text-background" />
-                {t('onboarding.pauseWithThis')}
-              </button>
-            </div>
-          ) : (
-            <>
-              {loading ? (
-                <div className="space-y-4">
-                  <div className={homeInWidget.loadingRow}>
-                    <Loader2 className="h-4 w-4 shrink-0 animate-spin" />
-                    <p className={homeInWidget.bodyMuted}>{t('home.generatingReflection')}</p>
-                  </div>
-                  <Skeleton className="h-4 w-full" />
-                  <Skeleton className="h-4 w-3/4" />
-                  <Skeleton className="h-4 w-1/2" />
-                </div>
-              ) : error && shouldSurfacePauseWidgetError(error, btcData) ? (
-                <HomePauseBlockingErrorPanel error={error} onTryAgain={manualTrigger} />
-              ) : (
-                <HomePauseEmptyFlow
-                  pinnedPreview={pauseEmptyPinnedPreview}
-                  showPauseScheduling={showPauseScheduling}
-                  autoCooldownRemaining={autoCooldownRemaining}
-                  cooldownHours={cooldownHours}
-                  nextCronCheckIn={nextCronCheckIn}
-                  onNeedPause={handleNeedAPause}
-                  manualCooldownRemaining={manualCooldownRemaining}
-                  pauseLoading={loading}
-                />
-              )}
-            </>
-          )}
-        </>
-      )}
-    </div>
+    <HomePauseCardBody
+      subLoading={subLoading}
+      hasAccess={hasAccess}
+      subscribed={subscribed}
+      monthlyRemaining={monthlyRemaining}
+      checkoutLoading={checkoutLoading}
+      onStartCheckoutPro={startProCheckout}
+      message={message}
+      contextPreview={pauseContextHomePreview}
+      onPauseWithThis={handleNavigatePauseWithThis}
+      loading={loading}
+      error={error}
+      btcData={btcData}
+      onReflectionRetry={manualTrigger}
+      pinnedPreview={pauseEmptyPinnedPreview}
+      showPauseScheduling={showPauseScheduling}
+      autoCooldownRemaining={autoCooldownRemaining}
+      cooldownHours={cooldownHours}
+      nextCronCheckIn={nextCronCheckIn}
+      manualCooldownRemaining={manualCooldownRemaining}
+      onNeedPause={handleNeedAPause}
+    />
   );
 
   const marketFooter = <HolzenNumber variant="compact" />;
