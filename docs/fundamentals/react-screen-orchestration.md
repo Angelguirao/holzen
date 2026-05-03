@@ -159,9 +159,405 @@ Holzen **`Home`** keeps many hooks **above** `if (!profileLoaded)` so order neve
 
 ---
 
+## Guided tour: reading `Home.tsx` (like a walkthrough)
+
+Open [`src/pages/Home.tsx`](../../src/pages/Home.tsx) in the editor and follow **top to bottom**. The line numbers below match the file **at the time this tour was written**; if the file shifts, search for the hook or comment name.
+
+**How to use this tour:** read one **step**, glance at the cited lines in `Home.tsx`, then read the **“What to notice”** bullet. You do not need to open every linked hook file on the first pass.
+
+### Step 0 — Imports are the table of contents
+
+```1:37:src/pages/Home.tsx
+import { useTranslation } from 'react-i18next';
+import { useHolzen } from '@/hooks/use-holzen';
+// ... many use-home-* hooks and layout components ...
+import type { HomeAppLayoutOutletContext } from '@/lib/home-app-layout-outlet';
+```
+
+**What to notice:** almost everything is **imported** from hooks, components, or `src/lib/`. The page file is not where the heavy logic lives — it **orchestrates** named modules.
+
+---
+
+### Step 1 — Router, auth, subscription, tiny global effects
+
+```39:48:src/pages/Home.tsx
+const Home = () => {
+  const { t } = useTranslation();
+  const { user } = useAuth();
+  const navigate = useNavigate();
+  const { pathname } = useLocation();
+  const { subscribed, loading: subLoading, monthlyRemaining, checkoutLoading, startCheckout, refresh } =
+    useSubscription();
+  const [searchParams] = useSearchParams();
+  useHomeCheckoutWelcomeToast(searchParams.get('subscribed'), refresh, t);
+  useHomeDocumentTitle(true);
+```
+
+**What to notice:** standard **React Router** hooks (`useNavigate`, `useLocation`, `useSearchParams`) plus **subscription** state. `useHomeCheckoutWelcomeToast` and `useHomeDocumentTitle` are **side-effect hooks** (they do work when deps change); the page does not render their UI directly.
+
+---
+
+### Step 2 — `useHolzen`: the big “app context” for Home
+
+```50:75:src/pages/Home.tsx
+  const {
+    btcData,
+    message,
+    context,
+    companions,
+    companionPrefs,
+    severity,
+    lastPauseInstanceId,
+    loading,
+    error,
+    newPauseArrival,
+    clearNewPauseArrival,
+    dismissMessage,
+    hasOnboarded,
+    completeOnboarding,
+    manualTrigger,
+    manualCooldownRemaining,
+    autoCooldownRemaining,
+    nextCronCheckIn,
+    cooldownHours,
+    firstName,
+    currency,
+    trackedAssetId,
+    profileLoaded,
+    refreshProfile,
+  } = useHolzen();
+```
+
+**What to notice:** one custom hook returns **many fields** the rest of the page needs (pause message, profile, market, cooldowns). That keeps **`useHolzen`** as the owner of that domain; `Home` only **destructures** what it needs.
+
+---
+
+### Step 3 — Pure subscription flags (no hook)
+
+```76:83:src/pages/Home.tsx
+  const { subscriptionReady, hasAccess, showLimitUpsell, showPauseScheduling } = getHomeSubscriptionGate({
+    subLoading,
+    subscribed,
+    monthlyRemaining,
+    message,
+    loading,
+  });
+```
+
+**What to notice:** this is a **normal function call**, not a hook. Logic lives in [`src/lib/home-subscription-gate.ts`](../../src/lib/home-subscription-gate.ts) with tests. The page **derives** booleans from subscription + pause loading — easy to read, easy to test.
+
+---
+
+### Step 4 — Layout outlet + “always on” home behaviors
+
+```85:90:src/pages/Home.tsx
+  const outletCtx = useOutletContext<HomeAppLayoutOutletContext>();
+  const pauseReady = outletCtx?.pauseReady ?? false;
+  const dismissPauseReady = outletCtx?.dismissPauseReady;
+  useHomeOutletPauseReady(pauseReady, message, loading, refreshProfile, dismissPauseReady);
+  useHomeHeroQuoteViewed(profileLoaded, user?.id);
+  useHomePauseAudio(newPauseArrival, message, clearNewPauseArrival);
+```
+
+**What to notice:** **`useOutletContext`** reads data from a **parent route layout** ([`AppLayout`](../../src/components/AppLayout.tsx)). The typed shape lives in [`src/lib/home-app-layout-outlet.ts`](../../src/lib/home-app-layout-outlet.ts). The following lines are small **effect-style** hooks (analytics, audio).
+
+---
+
+### Step 5 — Night card, market prefs, Zen flag, pinned pause, testimonial count
+
+```92:106:src/pages/Home.tsx
+  const { reflection: nightReflection, dismiss: dismissNight } = useNightReflection();
+
+  const {
+    priceHidden,
+    btcMode,
+    marketChartExpanded,
+    marketChartExpandBlocked,
+    togglePriceHidden,
+    toggleBtcMode,
+    toggleMarketChartExpanded,
+  } = useHomeMarketDisplayPreferences();
+  const unitBasisModeSupported = trackedAssetId === 'bitcoin';
+  const { zenMode, setZenModePersist } = useHomeZenMode(pathname);
+  const { pinnedPausePreview, unpinPausePreview } = useHomePinnedPausePreview(user);
+  const completedPauseCount = useHomeCompletedPauseCount(user);
+```
+
+**What to notice:** each line group is **one concern**. `unitBasisModeSupported` is a **simple derived boolean** from `trackedAssetId` (no hook needed). `pathname` only exists to drive Zen mode persistence tied to the route.
+
+---
+
+### Step 6 — Parsed preview text for pause cards
+
+```108:111:src/pages/Home.tsx
+  const { pauseContextHomePreview, pinnedContextHomePreview } = useHomePauseContextPreviews({
+    context,
+    pinnedContext: pinnedPausePreview?.context ?? null,
+  });
+```
+
+**What to notice:** [`useHomePauseContextPreviews`](../../src/hooks/use-home-pause-context-previews.ts) wraps two **`useMemo`** parsers so `Home` does not repeat `parsePauseContextForHomePreview` boilerplate.
+
+---
+
+### Step 7 — Only local UI state left on the page
+
+```113:113:src/pages/Home.tsx
+  const [goalWhyHoldSummary, setGoalWhyHoldSummary] = useState<string | null>(null);
+```
+
+**What to notice:** this is the rare **`useState` in `Home`** — a small piece of UI state that did not deserve its own hook yet. Everything else is custom hooks or props from `useHolzen`.
+
+---
+
+### Step 8 — Widget order, visibility, derived section lists
+
+```115:123:src/pages/Home.tsx
+  const { order, collapsed, reorder, toggleCollapsed, resetLayout } = useWidgetLayout(HOME_WIDGET_DEFAULT_ORDER);
+  const { visible: sectionVisible, setVisible, resetVisibility: resetSectionVisibility } = useHomeOptionalVisibility();
+
+  const { visibleOrderedSectionIds, todaySectionIds, showJourneyStatTiles } = useHomeVisibleSections({
+    order,
+    sectionVisible,
+    subscribed,
+    hasNightReflection: !!nightReflection,
+  });
+```
+
+**What to notice:** **`HOME_WIDGET_DEFAULT_ORDER`** is a **stable default** from optional-visibility settings so `useWidgetLayout` does not see a new array every render. [`useHomeVisibleSections`](../../src/hooks/use-home-visible-sections.ts) turns order + toggles into **what to render**.
+
+---
+
+### Step 9 — Customize sheet wiring (state + analytics inside the hook)
+
+```125:136:src/pages/Home.tsx
+  const { customizeSheet, onOpenCustomize } = useHomeCustomizeBridge({
+    t,
+    order,
+    reorder,
+    sectionVisible,
+    setVisible,
+    resetLayout,
+    resetSectionVisibility,
+    setZenModePersist,
+    zenMode,
+    subscribed,
+  });
+```
+
+**What to notice:** the hook returns a **ready-made `customizeSheet` object** for the layout component and an **`onOpenCustomize`** handler. PostHog events for customize live **inside** [`useHomeCustomizeBridge`](../../src/hooks/use-home-customize-bridge.tsx), not scattered in JSX.
+
+---
+
+### Step 10 — Market / goal-why header chrome
+
+```138:143:src/pages/Home.tsx
+  const { goalWhyExpanded, goalWhyHeaderRight, marketHeaderRight } = useHomeMarketGoalHeaders({
+    t,
+    marketChartExpanded,
+    marketChartExpandBlocked,
+    toggleMarketChartExpanded,
+  });
+```
+
+**What to notice:** expand/collapse **state** and the **chevron buttons** are bundled together so the big “Today” wiring below receives **ready-made React nodes** for headers.
+
+---
+
+### Step 11 — Pause actions (navigation + checkout + cooldown)
+
+```145:157:src/pages/Home.tsx
+  const pauseActions = useHomePauseActions({
+    message,
+    context,
+    lastPauseInstanceId,
+    companions,
+    companionPrefs,
+    severity,
+    navigate,
+    dismissMessage,
+    manualTrigger,
+    manualCooldownRemaining,
+    startCheckout,
+  });
+```
+
+**What to notice:** [`useHomePauseActions`](../../src/hooks/use-home-pause-actions.ts) returns **stable callbacks** used by Zen, the pause card, etc. `pauseProjection` (next step) **consumes** those callbacks — order in the file follows **data flow** (define actions, then pass them into UI projection).
+
+---
+
+### Step 12 — Pause card body + snooze + pinned inset
+
+```159:183:src/pages/Home.tsx
+  const pauseProjection = useHomePauseCardProjection({
+    subscriptionReady,
+    hasAccess,
+    subLoading,
+    subscribed,
+    monthlyRemaining,
+    checkoutLoading,
+    message,
+    pauseContextHomePreview,
+    loading,
+    error,
+    btcData,
+    pinnedPausePreview,
+    pinnedPreviewFields: pinnedContextHomePreview,
+    unpinPausePreview,
+    showPauseScheduling,
+    autoCooldownRemaining,
+    cooldownHours,
+    nextCronCheckIn,
+    manualCooldownRemaining,
+    manualTrigger,
+    onNavigatePauseWithThis: pauseActions.handleNavigatePauseWithThis,
+    onNeedPause: pauseActions.handleNeedAPause,
+    onStartCheckoutPro: pauseActions.startProCheckout,
+  });
+```
+
+**What to notice:** this hook **assembles JSX subtrees** (`pauseCardBody`, `pauseSectionHeaderRight`, …) with **`useMemo`** inside the hook file. `Home` stays declarative: “here is the data and the callbacks.”
+
+---
+
+### Step 13 — Pull-to-refresh
+
+```185:185:src/pages/Home.tsx
+  const { pullDistance, refreshing: pullRefreshing, handlers: pullHandlers } = useHomePullFullReload();
+```
+
+**What to notice:** [`useHomePullFullReload`](../../src/hooks/use-home-pull-full-reload.ts) bundles **`usePullToRefresh`** + “reload the page” in one line here.
+
+---
+
+### Step 14 — “Today” section wiring (deps + renderers)
+
+```187:215:src/pages/Home.tsx
+  const { renderSection, goalWhyBlock } = useHomeDashboardTodayWiring(
+    {
+      t,
+      goalWhyHoldSummary,
+      setGoalWhyHoldSummary,
+      goalWhyHeaderRight,
+      goalWhyExpanded,
+      error,
+      marketHeaderRight,
+      btcData,
+      priceHidden,
+      togglePriceHidden,
+      currency,
+      trackedAssetId,
+      unitBasisModeSupported,
+      btcMode,
+      toggleBtcMode,
+      marketChartExpanded,
+      toggleMarketChartExpanded,
+      pauseCardBody: pauseProjection.pauseCardBody,
+      pauseSectionHeaderRight: pauseProjection.pauseSectionHeaderRight,
+      nightReflection,
+      dismissNight,
+      subscribed,
+      collapsed,
+      toggleCollapsed,
+    },
+    visibleOrderedSectionIds,
+  );
+```
+
+**What to notice:** one hook ([`useHomeDashboardTodayWiring`](../../src/hooks/use-home-dashboard-today-wiring.ts)) hides the **`useHomeDashboardSectionDeps` + `useHomeDashboardSectionRenderers`** pair. The big object is the **dependency bundle** for [`render-home-dashboard-section`](../../src/components/home/render-home-dashboard-section.tsx).
+
+---
+
+### Step 15 — Zen props (memo object, spread later)
+
+```217:241:src/pages/Home.tsx
+  const zenRouteProps = useHomeZenModeRouteProps({
+    message,
+    context,
+    companions,
+    companionPrefs,
+    severity,
+    lastPauseInstanceId,
+    loading,
+    error,
+    btcData,
+    onDismiss: pauseActions.handleDismiss,
+    onNeedPause: pauseActions.handleNeedAPause,
+    onManualTrigger: manualTrigger,
+    subscriptionReady,
+    hasAccess,
+    showLimitUpsell,
+    showPauseScheduling,
+    pinnedPreview: pauseProjection.pauseEmptyPinnedPreview,
+    autoCooldownRemaining,
+    cooldownHours,
+    nextCronCheckIn,
+    manualCooldownRemaining,
+    checkoutLoading,
+    onStartCheckoutPro: pauseActions.startProCheckout,
+  });
+```
+
+**What to notice:** [`useHomeZenModeRouteProps`](../../src/hooks/use-home-zen-route-props.ts) memoizes a **typed props object** for [`HomeZenModeRoute`](../../src/components/home/HomeZenModeRoute.tsx). That keeps the Zen JSX line short: `{...zenRouteProps}`.
+
+---
+
+### Step 16 — Dashboard layout props (stable object for `React.memo`)
+
+```243:256:src/pages/Home.tsx
+  const dashboardLayout = useHomeDashboardLayoutProps({
+    pullHandlers,
+    pullDistance,
+    pullRefreshing,
+    userId: user?.id,
+    firstName,
+    todaySectionIds,
+    showJourneyStatTiles,
+    goalWhyBlock,
+    renderSection,
+    onOpenCustomize,
+    customize: customizeSheet,
+    completedPauseCount,
+  });
+```
+
+**What to notice:** [`useHomeDashboardLayoutProps`](../../src/hooks/use-home-dashboard-layout-props.ts) exists so [`HomeDashboardLayout`](../../src/components/home/HomeDashboardLayout.tsx) (wrapped in **`React.memo`**) gets **referentially stable props** when nothing relevant changed.
+
+---
+
+### Step 17 — Finally: early returns (modes)
+
+```258:270:src/pages/Home.tsx
+  if (!profileLoaded) {
+    return <AuthLoading />;
+  }
+
+  if (!hasOnboarded) {
+    return <Onboarding onComplete={completeOnboarding} />;
+  }
+
+  if (zenMode) {
+    return <HomeZenModeRoute {...zenRouteProps} />;
+  }
+
+  return <HomeDashboardLayout {...dashboardLayout} />;
+```
+
+**What to notice:** **every hook above ran already**, no matter which branch you hit. That is the **Rules of Hooks** pattern this doc explained earlier. The three returns are just **different screens** for different states.
+
+---
+
+### Step 18 — Where to go next
+
+- Walk **`useHomeDashboardTodayWiring`** → **`useHomeDashboardSectionDeps`** → **`renderHomeDashboardSection`** to see how one **section id** becomes a card.  
+- Open [`HomeZenModeRoute`](../../src/components/home/HomeZenModeRoute.tsx) to see **`lazy` + `Suspense`** around Zen.  
+- Keep [`screens/home.md`](../screens/home.md) open for product modes and file map.
+
+---
+
 ## Where Home fits
 
-**[screens/home.md](../screens/home.md)** is the **worked example**: file list, modes, Zen vs dashboard, pause errors, analytics. Compare any new large page to that **shape** (thin page, fat hooks/libs).
+**[screens/home.md](../screens/home.md)** is the **worked example**: file list, modes, Zen vs dashboard, pause errors, analytics. Compare any new large page to that **shape** (thin page, fat hooks/libs). **This guided tour** is the line-by-line companion to [`src/pages/Home.tsx`](../../src/pages/Home.tsx).
 
 ---
 
