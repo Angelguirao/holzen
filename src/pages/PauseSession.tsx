@@ -66,6 +66,7 @@ import {
   initialEmotionSkippedLoggedPayload,
 } from '@/lib/pause-initial-emotion-log';
 import { usePauseSessionStepTransition } from '@/hooks/use-pause-session-step-transition';
+import { usePauseBreathSegmentRpcLoggers } from '@/hooks/use-pause-breath-segment-rpc-loggers';
 import { buildShiftEmotionFrameHubLogBundle } from '@/lib/pause-shift-emotion-log';
 import { buildPauseImpactDataOnComplete, type PauseImpactData } from '@/lib/pause-impact-data';
 import { showPauseFavoriteProHintToast } from '@/lib/pause-favorite-toast';
@@ -166,8 +167,17 @@ export default function PauseSession() {
   const [curtainLifted, setCurtainLifted] = useState(false);
   const [pauseImpactData, setPauseImpactData] = useState<PauseImpactData | null>(null);
 
-  const breath1RpcDoneRef = useRef(restoredIdx > STEPS.indexOf('breathe'));
-  const breath2RpcDoneRef = useRef(restoredIdx > STEPS.indexOf('breath2'));
+  const {
+    ensureBreathSegment1Logged,
+    ensureBreathSegment2Logged,
+    breath1RpcDoneRef,
+    breath2RpcDoneRef,
+  } = usePauseBreathSegmentRpcLoggers({
+    pauseInstanceId,
+    initialSegment1Logged: restoredIdx > STEPS.indexOf('breathe'),
+    initialSegment2Logged: restoredIdx > STEPS.indexOf('breath2'),
+    t,
+  });
   const lastShiftLogKeyRef = useRef<string | null>(null);
 
   const [ritualEntry, setRitualEntry] = useState<RitualDepth | 'picker'>(() => initialRitualEntry(restored));
@@ -282,7 +292,6 @@ export default function PauseSession() {
   const breathingRef = useRef<PauseBreathingHandle>(null);
   const decidingRef = useRef(false);
   const lastFeelLogKeyRef = useRef<string | null>(null);
-  const prevPauseInstanceIdRef = useRef<string | null>(null);
   const [breathTimedActive, setBreathTimedActive] = useState(false);
   const [soundMuted, setSoundMuted] = useState(false);
   const [decideOnBackStep, setDecideOnBackStep] = useState<'choose' | 'breath2'>(() => {
@@ -294,12 +303,6 @@ export default function PauseSession() {
   useEffect(() => {
     lastFeelLogKeyRef.current = null;
     lastShiftLogKeyRef.current = null;
-    const prev = prevPauseInstanceIdRef.current;
-    if (prev !== null && prev !== pauseInstanceId) {
-      breath1RpcDoneRef.current = false;
-      breath2RpcDoneRef.current = false;
-    }
-    prevPauseInstanceIdRef.current = pauseInstanceId;
   }, [pauseInstanceId]);
 
   useEffect(() => {
@@ -309,40 +312,6 @@ export default function PauseSession() {
     }
     if (step !== 'breathe' && step !== 'breath2') setBreathTimedActive(false);
   }, [step, ritualEntry, briefStep]);
-
-  const ensureBreathSegment1Logged = useCallback(async (briefRitual?: boolean): Promise<boolean> => {
-    if (!pauseInstanceId) return true;
-    if (breath1RpcDoneRef.current) return true;
-    try {
-      await pauseLogStep({
-        instanceId: pauseInstanceId,
-        stepType: 'breath_completed',
-        payload: breathCompletedSegment1Payload({ briefRitual: !!briefRitual }),
-      });
-      breath1RpcDoneRef.current = true;
-      return true;
-    } catch {
-      showPauseStepSyncFailedToast(t);
-      return false;
-    }
-  }, [pauseInstanceId, t]);
-
-  const ensureBreathSegment2Logged = useCallback(async (): Promise<boolean> => {
-    if (!pauseInstanceId) return true;
-    if (breath2RpcDoneRef.current) return true;
-    try {
-      await pauseLogStep({
-        instanceId: pauseInstanceId,
-        stepType: 'breath_completed',
-        payload: breathCompletedSegment2Payload(),
-      });
-      breath2RpcDoneRef.current = true;
-      return true;
-    } catch {
-      showPauseStepSyncFailedToast(t);
-      return false;
-    }
-  }, [pauseInstanceId, t]);
 
   const handlePauseHeaderBack = useCallback(() => {
     const intent = computePauseHeaderBackIntent({
@@ -424,7 +393,7 @@ export default function PauseSession() {
     }
     setBreathingFirstCompleted(true);
     goToStep('reflect');
-  }, [pauseInstanceId, goToStep, t]);
+  }, [pauseInstanceId, goToStep, t, breath1RpcDoneRef]);
 
   const handleSkipSecondBreath = useCallback(async () => {
     setBreathingSecondCompleted(false);
@@ -444,7 +413,7 @@ export default function PauseSession() {
     }
     setBreathingSecondCompleted(true);
     goToStep('decide');
-  }, [pauseInstanceId, goToStep, t]);
+  }, [pauseInstanceId, goToStep, t, breath2RpcDoneRef]);
 
   const handleBriefBreathContinue = useCallback(async () => {
     const ok = await ensureBreathSegment1Logged(true);
@@ -474,7 +443,7 @@ export default function PauseSession() {
     }
     setBreathingFirstCompleted(true);
     setBriefStep('integrate');
-  }, [pauseInstanceId, t]);
+  }, [pauseInstanceId, t, breath1RpcDoneRef]);
 
   const handleBriefIntegrateComplete = useCallback(() => {
     if (integrateAdvanceRef.current) return;
