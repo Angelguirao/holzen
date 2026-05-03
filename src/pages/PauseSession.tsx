@@ -9,17 +9,14 @@ import { type CompanionData, type CompanionPrefs } from '@/components/CompanionS
 
 import { type PauseStep, STEPS } from '@/components/pause/PauseProgress';
 import { PauseSessionGate } from '@/components/pause/PauseSessionGate';
-import { PauseSessionScaffold } from '@/components/pause/PauseSessionScaffold';
+import { PauseSessionScaffoldShell } from '@/components/pause/PauseSessionScaffoldShell';
 import { PendingPauseOfferShell } from '@/components/pause/PendingPauseOfferShell';
 import { type PauseBreathingHandle } from '@/components/pause/PauseBreathing';
 import { PauseSessionDepthPickerStack } from '@/components/pause/PauseSessionDepthPickerStack';
 import { PauseBriefProgress } from '@/components/pause/PauseBriefProgress';
 import { isPauseSessionHeaderBackVisible } from '@/lib/pause-session-header-back';
 import type { BriefFeelTile } from '@/components/pause/PauseBriefFeel';
-import {
-  PauseSessionScaffoldBody,
-  type PauseSessionScaffoldBodyProps,
-} from '@/components/pause/PauseSessionScaffoldBody';
+import type { PauseSessionScaffoldShellProps } from '@/components/pause/PauseSessionScaffoldShell';
 import type { BriefPauseStep, RitualDepth } from '@/lib/pause-session-storage';
 import { mapPersistedStep, initialRitualEntry } from '@/lib/pause-session-step-map';
 import { initialDecideOnBackStepFromPersisted } from '@/lib/pause-session-initial-decide-on-back-step';
@@ -383,7 +380,7 @@ export default function PauseSession() {
 
   const briefDecideIntroKicker = t('pause.brief.decideKicker', { defaultValue: 'Step 4 · Decide' });
 
-  const briefRitual: PauseSessionScaffoldBodyProps['briefRitual'] = {
+  const briefRitual: PauseSessionScaffoldShellProps['briefRitual'] = {
     briefStep,
     stepTransition,
     moodDone,
@@ -408,7 +405,7 @@ export default function PauseSession() {
     briefDecideIntroKicker,
   };
 
-  const deepRitual: PauseSessionScaffoldBodyProps['deepRitual'] = {
+  const deepRitual: PauseSessionScaffoldShellProps['deepRitual'] = {
     step,
     stepTransition,
     onMoodSelect: handleMoodSelect,
@@ -472,7 +469,7 @@ export default function PauseSession() {
             aboutSheetTitle={t('pause.aboutPauses.sheetTitle')}
           />
         ) : (
-          <PauseSessionScaffold
+          <PauseSessionScaffoldShell
             {...scaffoldRitualDerived}
             curtainLifted={curtainLifted}
             prefersReducedMotion={!!prefersReducedMotion}
@@ -487,17 +484,13 @@ export default function PauseSession() {
             breathSecondLabelVariant={breathSecondLabelVariant}
             soundMuted={soundMuted}
             onSoundMutedChange={setSoundMuted}
-          >
-            <PauseSessionScaffoldBody
-              phase={phase}
-              ritualEntry={ritualEntry}
-              briefRitual={briefRitual}
-              deepRitual={deepRitual}
-              decision={decision}
-              onDoneReturn={handleReturn}
-              pauseImpactData={pauseImpactData}
-            />
-          </PauseSessionScaffold>
+            ritualEntry={ritualEntry}
+            briefRitual={briefRitual}
+            deepRitual={deepRitual}
+            decision={decision}
+            onDoneReturn={handleReturn}
+            pauseImpactData={pauseImpactData}
+          />
         )}
       </>
     </PauseSessionGate>
