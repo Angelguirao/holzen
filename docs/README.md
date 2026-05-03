@@ -43,7 +43,7 @@ When you change behavior, update the **one** doc that owns that slice (and ADRs 
 
 - `fundamentals/navigating-the-codebase.md` — repo tour: boot flow, routing, auth, hooks, Supabase basics.
 - `fundamentals/refactoring-strategy.md` — incremental refactors: **React** pages/hooks (`src/lib` vs components) plus **full-stack touchpoints** (migrations, RLS, edges); pairs with [backlog/react-page-and-hook-splitting.md](backlog/react-page-and-hook-splitting.md).
-- **`fundamentals/react-screen-orchestration.md`** — **reusable playbook** (includes React beginner vocabulary + bad/good hook examples + **step-by-step `Home.tsx` walkthrough**): page as conductor, hook/lib splits, Rules of Hooks + early returns, lazy branches, memoized props, typing at source; distilled from [screens/home.md](screens/home.md).
+- **`fundamentals/react-screen-orchestration.md`** — **reusable playbook** (includes React beginner vocabulary + bad/good hook examples + **step-by-step `Home.tsx` walkthrough**): page as conductor, hook/lib splits, Rules of Hooks + early returns, lazy branches, memoized props, typing at source; concrete maps in [screens/home.md](screens/home.md) and [screens/pause.md](screens/pause.md).
 - `fundamentals/mental-models-for-contributors.md` — glossary + vocabulary for SPAs, React, TypeScript, Vite, Supabase (RLS, edge functions); links to official docs and learning resources.
 - `fundamentals/codebase-size-and-review-practices.md` — codebase size snapshot and review best-practices.
 - `fundamentals/http-review-playbooks.md` — step-by-step Postman/Bruno flows, Supabase `invoke` headers, pairing with Edge logs; [bruno/](../bruno/) collection, [bruno/SCOPE.md](../bruno/SCOPE.md) (HTTP vs full app), [bruno/functions-catalog.md](../bruno/functions-catalog.md) (full **`config.toml`** name list + Bruno smoke subset).
@@ -53,6 +53,7 @@ When you change behavior, update the **one** doc that owns that slice (and ADRs 
 ## Screens (in-app surfaces)
 
 - `screens/home.md` — **`/`** dashboard: modes (zen vs full), widgets, subscription/checkout interplay, pause error surfacing, analytics touchpoints.
+- `screens/pause.md` — **`/pause`** full-screen volatility ritual: gate, depth picker, brief vs deep scaffold, `pause-api` wiring, exit navigation, analytics notes.
 
 ## Reports (snapshots)
 

@@ -6,6 +6,7 @@ import {
   initialBriefIntegrateDoneFromRestored,
   initialSelectedBriefFaceFromRestored,
   initialPhaseFromRestored,
+  initialBreathSegmentRpcLoggedFlagsFromRestored,
   briefStepToPauseScienceStep,
 } from '@/lib/pause-session-step-map';
 import type { PersistedSession } from '@/lib/pause-session-storage';
@@ -140,5 +141,36 @@ describe('briefStepToPauseScienceStep', () => {
     expect(briefStepToPauseScienceStep('breath')).toBe('breathe');
     expect(briefStepToPauseScienceStep('integrate')).toBe('reflect');
     expect(briefStepToPauseScienceStep('decide')).toBe('decide');
+  });
+});
+
+describe('initialBreathSegmentRpcLoggedFlagsFromRestored', () => {
+  it('treats no restore as no segments logged', () => {
+    expect(initialBreathSegmentRpcLoggedFlagsFromRestored(null)).toEqual({
+      segment1Logged: false,
+      segment2Logged: false,
+    });
+  });
+
+  it('is false at feel; segment1 after breathe; both after breath2', () => {
+    expect(initialBreathSegmentRpcLoggedFlagsFromRestored(baseSession({ step: 'feel' }))).toEqual({
+      segment1Logged: false,
+      segment2Logged: false,
+    });
+    expect(initialBreathSegmentRpcLoggedFlagsFromRestored(baseSession({ step: 'reflect' }))).toEqual({
+      segment1Logged: true,
+      segment2Logged: false,
+    });
+    expect(initialBreathSegmentRpcLoggedFlagsFromRestored(baseSession({ step: 'choose' }))).toEqual({
+      segment1Logged: true,
+      segment2Logged: true,
+    });
+  });
+
+  it('matches legacy persisted step mapping before comparing indices', () => {
+    expect(initialBreathSegmentRpcLoggedFlagsFromRestored(baseSession({ step: 'ground' }))).toEqual({
+      segment1Logged: true,
+      segment2Logged: false,
+    });
   });
 });

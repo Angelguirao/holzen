@@ -59,6 +59,24 @@ export function initialPhaseFromRestored(restored: PersistedSession | null): 'se
   return restored?.phase ?? 'session';
 }
 
+/**
+ * When resuming from local storage past the first or second breath beat, `usePauseBreathSegmentRpcLoggers`
+ * must treat `breath_completed` segment RPCs as already satisfied (refs start `true`).
+ * Uses the same `mapPersistedStep` + `STEPS` order as initial `step` state in `PauseSession.tsx`.
+ */
+export function initialBreathSegmentRpcLoggedFlagsFromRestored(restored: PersistedSession | null): {
+  segment1Logged: boolean;
+  segment2Logged: boolean;
+} {
+  if (!restored) return { segment1Logged: false, segment2Logged: false };
+  const restoredStep = mapPersistedStep(restored.step);
+  const idx = STEPS.indexOf(restoredStep);
+  return {
+    segment1Logged: idx > STEPS.indexOf('breathe'),
+    segment2Logged: idx > STEPS.indexOf('breath2'),
+  };
+}
+
 /** Brief “Integrate” has no dedicated citations row — highlight Reflect (regulation) sources. */
 export function briefStepToPauseScienceStep(brief: BriefPauseStep): PauseStep {
   switch (brief) {
