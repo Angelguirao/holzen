@@ -54,7 +54,6 @@ import {
   loadSession,
   clearSession,
 } from '@/lib/pause-session-storage';
-import { pauseLogStep } from '@/lib/pause-api';
 import {
   resolvePauseBreathSecondLabelVariant,
   viteWantsPauseBreathSecondLabelShift,
@@ -65,12 +64,9 @@ import { usePauseFeelShiftLogDedupeRefs } from '@/hooks/use-pause-feel-shift-log
 import { usePauseFavoriteToggle } from '@/hooks/use-pause-favorite-toggle';
 import { usePauseSessionInitialMoodHandlers } from '@/hooks/use-pause-session-initial-mood-handlers';
 import { usePauseShiftFrameDoneHandler } from '@/hooks/use-pause-shift-frame-done-handler';
-import { buildPauseImpactDataOnComplete, type PauseImpactData } from '@/lib/pause-impact-data';
-import { buildOutcomeLoggedPayload } from '@/lib/pause-outcome-log-payload';
-import { showPauseOutcomeNotCompletedToast, showPauseOutcomeSaveFailedToast } from '@/lib/pause-outcome-toast';
+import { usePauseSessionDecideHandler } from '@/hooks/use-pause-session-decide-handler';
+import type { PauseImpactData } from '@/lib/pause-impact-data';
 import { showPauseStepSyncFailedToast } from '@/lib/pause-step-sync-toast';
-import type { PauseState } from '@/lib/pause-state';
-import { getSessionQuote } from '@/lib/wisdom-quotes';
 import { usePauseSessionShell } from '@/hooks/use-pause-session-shell';
 import { usePauseSessionMountLog } from '@/hooks/use-pause-session-mount-log';
 
@@ -442,70 +438,24 @@ export default function PauseSession() {
     navigate('/', { replace: true });
   }, [navigate]);
 
-  const handleDecide = useCallback(
-    async (d: string) => {
-      if (decidingRef.current) return;
-      decidingRef.current = true;
-      try {
-        hapticFeedback('medium');
-        let outcomeState: PauseState | null = null;
-        if (pauseInstanceId) {
-          try {
-            outcomeState = await pauseLogStep({
-              instanceId: pauseInstanceId,
-              stepType: 'outcome_logged',
-              payload: buildOutcomeLoggedPayload(d),
-            });
-          } catch {
-            showPauseOutcomeSaveFailedToast(t);
-            return;
-          }
-          if (outcomeState !== 'completed') {
-            showPauseOutcomeNotCompletedToast(t);
-            void refreshSubscription();
-            return;
-          }
-          void refreshSubscription();
-        }
-        setDecision(d);
-        await dismissMessage();
-        const q = getSessionQuote();
-        setPauseImpactData(
-          buildPauseImpactDataOnComplete({
-            decision: d,
-            context,
-            selectedMood,
-            selectedMoodAfter,
-            ritualEntry,
-            breathingFirstCompleted,
-            breathingSecondCompleted,
-            feelIntensity,
-            shiftIntensity,
-            reinforcementQuote: `"${q.text}" — ${q.author}`,
-          }),
-        );
-        hapticFeedback('success');
-        setPhase('done');
-        clearSession();
-      } finally {
-        decidingRef.current = false;
-      }
-    },
-    [
-      dismissMessage,
-      pauseInstanceId,
-      selectedMood,
-      selectedMoodAfter,
-      context,
-      ritualEntry,
-      breathingFirstCompleted,
-      breathingSecondCompleted,
-      feelIntensity,
-      shiftIntensity,
-      refreshSubscription,
-      t,
-    ],
-  );
+  const { handleDecide } = usePauseSessionDecideHandler({
+    decidingRef,
+    pauseInstanceId,
+    t,
+    refreshSubscription,
+    setDecision,
+    dismissMessage,
+    setPauseImpactData,
+    setPhase,
+    context,
+    selectedMood,
+    selectedMoodAfter,
+    ritualEntry,
+    breathingFirstCompleted,
+    breathingSecondCompleted,
+    feelIntensity,
+    shiftIntensity,
+  });
 
   const depthContextLine = useMemo(() => {
     if (!btcData) return null;
