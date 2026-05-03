@@ -6,10 +6,14 @@ import {
   initialBriefIntegrateDoneFromRestored,
   initialSelectedBriefFaceFromRestored,
   initialPhaseFromRestored,
+  initialDecisionFromRestored,
   initialBreathingFirstCompletedFromRestored,
+  initialBreathingSecondCompletedFromRestored,
+  initialFrameDoneFromRestored,
   initialBreathSegmentRpcLoggedFlagsFromRestored,
   briefStepToPauseScienceStep,
 } from '@/lib/pause-session-step-map';
+import type { PersistedSession } from '@/lib/pause-session-storage';
 import { makeTestPersistedPauseSession } from '@/test/make-test-persisted-pause-session';
 
 describe('mapPersistedStep', () => {
@@ -108,6 +112,20 @@ describe('initialPhaseFromRestored', () => {
   });
 });
 
+describe('initialDecisionFromRestored', () => {
+  it('returns null when no session', () => {
+    expect(initialDecisionFromRestored(null)).toBeNull();
+  });
+
+  it('defaults null when absent on row', () => {
+    expect(initialDecisionFromRestored(makeTestPersistedPauseSession({ decision: undefined }))).toBeNull();
+  });
+
+  it('reads stored decision', () => {
+    expect(initialDecisionFromRestored(makeTestPersistedPauseSession({ decision: 'hold' }))).toBe('hold');
+  });
+});
+
 describe('briefStepToPauseScienceStep', () => {
   it('maps brief steps to deep stepper keys for science sheet', () => {
     expect(briefStepToPauseScienceStep('feel')).toBe('feel');
@@ -141,6 +159,30 @@ describe('initialBreathingFirstCompletedFromRestored', () => {
         makeTestPersistedPauseSession({ breathingFirstCompleted: false, breathingCompleted: true }),
       ),
     ).toBe(false);
+  });
+});
+
+describe('initialBreathingSecondCompletedFromRestored', () => {
+  it('returns false when no session', () => {
+    expect(initialBreathingSecondCompletedFromRestored(null)).toBe(false);
+  });
+
+  it('reads stored flag with false default', () => {
+    expect(initialBreathingSecondCompletedFromRestored(makeTestPersistedPauseSession({}))).toBe(false);
+    expect(
+      initialBreathingSecondCompletedFromRestored(makeTestPersistedPauseSession({ breathingSecondCompleted: true })),
+    ).toBe(true);
+  });
+});
+
+describe('initialFrameDoneFromRestored', () => {
+  it('returns false when no session', () => {
+    expect(initialFrameDoneFromRestored(null)).toBe(false);
+  });
+
+  it('reads stored flag with false default', () => {
+    expect(initialFrameDoneFromRestored(makeTestPersistedPauseSession({}))).toBe(false);
+    expect(initialFrameDoneFromRestored(makeTestPersistedPauseSession({ frameDone: true }))).toBe(true);
   });
 });
 
