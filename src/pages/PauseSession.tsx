@@ -60,6 +60,7 @@ import { usePauseSessionGoToStep } from '@/hooks/use-pause-session-go-to-step';
 import { buildPauseSessionScaffoldRitualDerived } from '@/lib/pause-session-scaffold-ritual-props';
 import { usePauseSessionPendingPauseOfferNavigation } from '@/hooks/use-pause-session-pending-pause-offer-navigation';
 import { usePauseSessionDepthPickerHandlers } from '@/hooks/use-pause-session-depth-picker-handlers';
+import { usePauseSessionDeepChooseBridgeHandler } from '@/hooks/use-pause-session-deep-choose-bridge-handler';
 
 export default function PauseSession() {
   const { t } = useTranslation();
@@ -243,6 +244,11 @@ export default function PauseSession() {
     step,
     setSwipeDirection,
     setStep,
+  });
+
+  const { handleDeepChooseBridgeContinue } = usePauseSessionDeepChooseBridgeHandler({
+    setDecideOnBackStep,
+    goToStep,
   });
 
   const { handleFrameImDone } = usePauseShiftFrameDoneHandler({
@@ -563,12 +569,7 @@ export default function PauseSession() {
 
                 {step === 'choose' && (
                   <motion.div key="choose" {...stepTransition}>
-                    <PauseChooseBridge
-                      onChoose={() => {
-                        setDecideOnBackStep('choose');
-                        goToStep('decide');
-                      }}
-                    />
+                    <PauseChooseBridge onChoose={handleDeepChooseBridgeContinue} />
                   </motion.div>
                 )}
 
