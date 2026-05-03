@@ -904,7 +904,7 @@
       "03title": "You reflect",
       "03desc": "An AI-generated reflection encourages awareness, not action. Five companions offer context: a haiku, a signal, a grounding nudge, a zoom-out perspective, and a historical echo.",
       "04title": "You decide",
-      "04desc": "Choose deliberately: hold, sell, buy, or do nothing. The pause guides you through feel, breathe, reflect, frame, a second breath, and decide — so your choices come from clarity, not impulse.",
+      "04desc": "Choose deliberately: hold, sell, buy, or do nothing. The full pause guides you through feel, breathe, reflect, frame, a second breath, then a short settle before Decide — six beats in the ritual, so your choices come from clarity, not impulse.",
       "05title": "You grow",
       "05desc": "Tag emotions. Journal notes. Track outcomes. Over time, your Library, insights, and streaks reveal how your composure evolves."
     },
@@ -987,7 +987,7 @@
     "scienceStepFrame": "Choose your angle. After the reflection, open the companions and tools that help — a metacognitive pause before commitment (Flavell, 1979).",
     "scienceStepBreatheAgain": "Regulate once more before you choose. A second breathing pass lowers arousal again after reframing (Lehrer & Gevirtz, 2014).",
     "scienceStepDecide": "Act from intention, not impulse. System 2 is online: move from reactive processing to a deliberate outcome (Kahneman, 2011).",
-    "scienceStepsSummary": "Feel, breathe, reflect, frame, breathe again, then decide — each step maps to peer-reviewed work from Lieberman, Porges, Gross, Flavell, and Kahneman.",
+    "scienceStepsSummary": "Feel, breathe, reflect, frame, breathe again, then decide — six beats, with a brief settle moment on the same final segment before you record an outcome; each maps to peer-reviewed work from Lieberman, Porges, Gross, Flavell, and Kahneman.",
     "readFullResearch": "Read the full research →",
     "freeToStart": "{{trialDays}}-day free trial",
     "pricingDesc": "{{freeReflectionsPerMonth}} pauses per month — free forever, no credit card. Or start a {{trialDays}}-day free trial of Pro (${{price}}/month after): unlimited pauses, AI companions, insights, library, and more. Cancel anytime.",
@@ -1336,8 +1336,8 @@
           "body": "Putting feelings into words (affect labeling) can blunt amygdala drive. Slow exhales lean on the parasympathetic side of regulation. Stepping back to reappraise — “what story am I believing?” — creates distance between you and the urge to act immediately."
         },
         "sixSteps": {
-          "title": "The six steps (deep pause)",
-          "body": "Feel, breathe, reflect, frame, breathe again, then decide. Each step maps to skills psychologists study: interoception, autonomic settling, perspective-taking, metacognition, re-centering, and values-aligned action."
+          "title": "The deep pause (six beats)",
+          "body": "The header shows six beats: Feel, Breathe, Reflect, Frame, a second Breathe, then Decide. After that second breath, one short settle screen appears before the hold / sell / buy / nothing choice — it uses the same sixth segment as Decide, not a separate labeled step. Each beat maps to skills psychologists study: interoception, autonomic settling, perspective-taking, metacognition, re-centering, and values-aligned action."
         },
         "ritual": {
           "title": "Not a remedy — a ritual",
@@ -1353,7 +1353,7 @@
     "scienceInfoAria": "The science behind this pause",
     "noReflection": "No active pause. Go back to trigger one.",
     "outcomeSaveFailed": "Could not save your choice. Try again.",
-    "outcomeNotCompleted": "Your choice was saved, but this pause is not complete yet — open Reflect and finish a companion card, then choose again.",
+    "outcomeNotCompleted": "Your choice was saved, but this pause is not complete yet — finish the remaining ritual steps, then choose again.",
     "stepSyncFailed": "Could not sync this step. Check your connection and try again.",
     "pendingContextTitle": "Market context changed",
     "pendingContextBody": "There is a new pause for the latest move. You can keep your current pause or switch — switching ends the current ritual for this moment and opens the new one.",
@@ -1366,11 +1366,11 @@
     "macroProgress": "Step {{n}} of {{total}} · under ~15 min",
     "muteAriaOn": "Sound on (tap to mute)",
     "muteAriaOff": "Sound off (tap to unmute)",
-    "chooseBridgeKicker": "Step 6 · Choose",
+    "chooseBridgeKicker": "Step 6 · Decide",
     "chooseBridgeTitle": "What feels possible from here?",
     "chooseBridgeBody": "Take a breath, then choose how you want to move — hold, step back, or act with intention.",
     "chooseBridgeCta": "Choose",
-    "decideIntroKicker": "Step 7 · Decide",
+    "decideIntroKicker": "Step 6 · Decide",
     "decideMirrorKicker": "Before you confirm",
     "breathIntroKickerFirst": "Step 2 · Breathe",
     "breathIntroKickerSecond": "Step 5 · Breathe",
@@ -1378,7 +1378,7 @@
     "breathInterstitialTitle": "You stayed with it",
     "breathInterstitialBody": "When you are ready, continue into reflection.",
     "breathInterstitialTitleSecond": "You stayed with it",
-    "breathInterstitialBodySecond": "When you are ready, continue to the Choose step, then your decision.",
+    "breathInterstitialBodySecond": "When you are ready, continue to a short settle screen, then your decision.",
     "feelIntensityTitle": "How strong is this feeling?",
     "feelIntensityLow": "Light",
     "feelIntensityHigh": "Strong",

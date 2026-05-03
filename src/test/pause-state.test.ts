@@ -14,9 +14,21 @@ import {
 
 const NOW = new Date('2026-04-23T20:00:00.000Z');
 
-/** Mirrors production volatility_v1 after optional action window: no clock-only expiry. */
+/** Mirrors production `volatility_v1` after migration `20260506200000_pause_volatility_v1_contract_and_transitions.sql`. */
 const volatilityTemplate: PauseTemplateRow = {
   slug: 'volatility_v1',
+  window_ms: 6 * 60 * 60 * 1000,
+  action_window_ms: null,
+  dismissal_suppression_ms: 6 * 60 * 60 * 1000,
+  required_for_engaged: ['breath_completed', 'initial_emotion_logged'],
+  required_for_completed: ['outcome_logged'],
+  allowed_companion_types: ['signal', 'ground_nudge', 'historical_insight', 'zoom_out', 'haiku'],
+  required_companion_count: 0,
+};
+
+/** Non–volatility_v1 slug: `computePauseState` still uses template arrays + companion count for completion. */
+const legacyCompanionTemplate: PauseTemplateRow = {
+  slug: 'legacy_companion_gated',
   window_ms: 6 * 60 * 60 * 1000,
   action_window_ms: null,
   dismissal_suppression_ms: 6 * 60 * 60 * 1000,
@@ -27,8 +39,8 @@ const volatilityTemplate: PauseTemplateRow = {
     'shift_emotion_logged',
     'outcome_logged',
   ],
-  allowed_companion_types: ['signal', 'ground_nudge', 'historical_insight', 'zoom_out', 'haiku'],
-  required_companion_count: 1,
+  allowed_companion_types: ['signal', 'ground_nudge'],
+  required_companion_count: 2,
 };
 
 const clockBoundedVolatility: PauseTemplateRow = {
@@ -173,7 +185,7 @@ describe('computePauseState', () => {
     ).toBe('active');
   });
 
-  it('engages when breath + initial emotion are present', () => {
+  it('engages when breath + initial emotion are present (deep volatility_v1)', () => {
     expect(
       computePauseState({
         instance: makeInstance(),
@@ -188,7 +200,36 @@ describe('computePauseState', () => {
     ).toBe('engaged');
   });
 
-  it('does not complete without a counted companion, even with all step gates met', () => {
+  it('brief volatility_v1 engages after initial_emotion only when brief_ritual is set', () => {
+    expect(
+      computePauseState({
+        instance: makeInstance(),
+        template: volatilityTemplate,
+        stepEvents: [
+          makeStep({
+            step_type: 'initial_emotion_logged',
+            payload: { mood: 'calm', intensity: 2, brief_ritual: true },
+          }),
+        ],
+        companionEvents: [],
+        now: NOW,
+      }),
+    ).toBe('engaged');
+  });
+
+  it('deep volatility_v1 stays active with only initial_emotion (no breath yet)', () => {
+    expect(
+      computePauseState({
+        instance: makeInstance(),
+        template: volatilityTemplate,
+        stepEvents: [makeStep({ step_type: 'initial_emotion_logged', payload: { mood: 'calm' } })],
+        companionEvents: [],
+        now: NOW,
+      }),
+    ).toBe('active');
+  });
+
+  it('completes deep volatility_v1 when all step types exist without companions', () => {
     expect(
       computePauseState({
         instance: makeInstance({ state: 'engaged' }),
@@ -202,10 +243,10 @@ describe('computePauseState', () => {
         companionEvents: [],
         now: NOW,
       }),
-    ).toBe('engaged');
+    ).toBe('completed');
   });
 
-  it('does not complete with step gates met + non-counting companion complete', () => {
+  it('completes deep volatility_v1 with step gates met even if only non-counting companion completes exist', () => {
     expect(
       computePauseState({
         instance: makeInstance({ state: 'engaged' }),
@@ -219,23 +260,6 @@ describe('computePauseState', () => {
         companionEvents: [
           makeCompanion({ counts_for_pause: false, non_counting_reason: 'outside_window' }),
         ],
-        now: NOW,
-      }),
-    ).toBe('engaged');
-  });
-
-  it('completes when all step gates met AND >= 1 counted companion', () => {
-    expect(
-      computePauseState({
-        instance: makeInstance({ state: 'engaged' }),
-        template: volatilityTemplate,
-        stepEvents: [
-          makeStep({ step_type: 'breath_completed' }),
-          makeStep({ step_type: 'initial_emotion_logged' }),
-          makeStep({ step_type: 'shift_emotion_logged' }),
-          makeStep({ step_type: 'outcome_logged' }),
-        ],
-        companionEvents: [makeCompanion({})],
         now: NOW,
       }),
     ).toBe('completed');
@@ -260,12 +284,11 @@ describe('computePauseState', () => {
     ).toBe('completed');
   });
 
-  it('treats required_companion_count > 1 strictly', () => {
-    const tpl: PauseTemplateRow = { ...volatilityTemplate, required_companion_count: 2 };
+  it('for non-volatility templates, treats required_companion_count > 1 strictly', () => {
     expect(
       computePauseState({
         instance: makeInstance({ state: 'engaged' }),
-        template: tpl,
+        template: legacyCompanionTemplate,
         stepEvents: [
           makeStep({ step_type: 'breath_completed' }),
           makeStep({ step_type: 'initial_emotion_logged' }),
@@ -279,7 +302,7 @@ describe('computePauseState', () => {
     expect(
       computePauseState({
         instance: makeInstance({ state: 'engaged' }),
-        template: tpl,
+        template: legacyCompanionTemplate,
         stepEvents: [
           makeStep({ step_type: 'breath_completed' }),
           makeStep({ step_type: 'initial_emotion_logged' }),
@@ -293,6 +316,18 @@ describe('computePauseState', () => {
         now: NOW,
       }),
     ).toBe('completed');
+  });
+
+  it('expires active or engaged instances older than 12h from created_at (open max age)', () => {
+    expect(
+      computePauseState({
+        instance: makeInstance({ created_at: '2026-04-21T18:00:00.000Z' }),
+        template: volatilityTemplate,
+        stepEvents: [],
+        companionEvents: [],
+        now: NOW,
+      }),
+    ).toBe('expired');
   });
 
   it('keeps pending without evaluating engagement gates', () => {
