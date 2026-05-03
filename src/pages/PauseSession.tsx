@@ -26,7 +26,9 @@ import { PauseChooseBridge } from '@/components/pause/PauseChooseBridge';
 import { PauseDecide } from '@/components/pause/PauseDecide';
 import { PauseDone } from '@/components/pause/PauseDone';
 import { PauseDepthPicker } from '@/components/pause/PauseDepthPicker';
-import { PauseBriefProgress, BRIEF_PAUSE_ORDER } from '@/components/pause/PauseBriefProgress';
+import { PauseBriefProgress } from '@/components/pause/PauseBriefProgress';
+import { BRIEF_PAUSE_ORDER } from '@/lib/brief-pause-order';
+import { computeBriefRitualGoBack } from '@/lib/brief-pause-go-back';
 import { PauseBriefFeel, type BriefFeelTile } from '@/components/pause/PauseBriefFeel';
 import { PauseBriefIntegrate } from '@/components/pause/PauseBriefIntegrate';
 import { PauseAboutPausesBody } from '@/components/pause/PauseAboutPausesBody';
@@ -262,14 +264,12 @@ export default function PauseSession() {
 
   const goBack = useCallback(() => {
     if (ritualEntry === 'brief') {
-      const i = BRIEF_PAUSE_ORDER.indexOf(briefStep);
-      if (i > 0) {
+      const back = computeBriefRitualGoBack(briefStep);
+      if (back) {
         setSwipeDirection('back');
         hapticFeedback('light');
-        const prev = BRIEF_PAUSE_ORDER[i - 1]!;
-        if (briefStep === 'decide' && prev === 'integrate') setBriefIntegrateDone(false);
-        if (briefStep === 'integrate') setBriefIntegrateDone(false);
-        setBriefStep(prev);
+        if (back.clearBriefIntegrateDone) setBriefIntegrateDone(false);
+        setBriefStep(back.prev);
       }
       return;
     }
