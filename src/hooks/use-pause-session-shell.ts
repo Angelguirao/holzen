@@ -29,7 +29,6 @@ export function usePauseSessionShell(params: {
   holzen: PauseSessionShellHolzen;
 }): {
   restored: PersistedSession | null;
-  holzenAligned: boolean;
   hydration: PauseSessionHydrationState;
   fetchPauseInstanceId: string | null;
   fetchedInstance: FetchedPauseInstance | null;
@@ -104,7 +103,6 @@ export function usePauseSessionShell(params: {
 
   return {
     restored,
-    holzenAligned,
     hydration,
     fetchPauseInstanceId,
     fetchedInstance,
