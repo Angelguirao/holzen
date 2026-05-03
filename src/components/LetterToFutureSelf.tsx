@@ -15,7 +15,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
-import { Mail, Send, Info, Trash2, ChevronRight } from 'lucide-react';
+import { Mail, Send, Info, Trash2, ChevronRight, Loader2 } from 'lucide-react';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -35,6 +35,7 @@ import {
   type FutureLetterInvalidReason,
 } from '@/lib/future-letter-validation';
 import { toast } from 'sonner';
+import { Alert, AlertDescription } from '@/components/ui/alert';
 import { format } from 'date-fns';
 import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
 
@@ -181,6 +182,8 @@ export function LetterToFutureSelf({
   const [sending, setSending] = useState(false);
   const [sealPhase, setSealPhase] = useState<'idle' | 'sealing' | 'sealed'>('idle');
   const [loaded, setLoaded] = useState(false);
+  const [lettersLoadFailed, setLettersLoadFailed] = useState(false);
+  const [reloadNonce, setReloadNonce] = useState(0);
   const [composerOpen, setComposerOpen] = useState(false);
   // Calm-mode recipient: who should receive this letter?
   const [calmTarget, setCalmTarget] = useState<'crash' | 'surge'>('crash');
@@ -221,18 +224,38 @@ export function LetterToFutureSelf({
 
   useEffect(() => {
     if (!user) return;
-    supabase
-      .from('future_letters')
-      .select('*')
-      .eq('user_id', user.id)
-      .order('written_at', { ascending: false })
-      .then(({ data }) => {
+    let cancelled = false;
+    setLoaded(false);
+    setLettersLoadFailed(false);
+    void (async () => {
+      try {
+        const { data, error } = await supabase
+          .from('future_letters')
+          .select('*')
+          .eq('user_id', user.id)
+          .order('written_at', { ascending: false });
+        if (cancelled) return;
+        if (error) {
+          setLettersLoadFailed(true);
+          setLoaded(true);
+          return;
+        }
         const all = (data as unknown as Letter[]) ?? [];
         setPendingLetters(all.filter((l) => !l.delivered));
         setDeliveredLetters(all.filter((l) => l.delivered));
+        setLettersLoadFailed(false);
         setLoaded(true);
-      });
-  }, [user]);
+      } catch {
+        if (!cancelled) {
+          setLettersLoadFailed(true);
+          setLoaded(true);
+        }
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, [user, reloadNonce]);
 
   useEffect(() => {
     if (!scrollToLetterId || !loaded || didScrollToLetter.current) return;
@@ -279,7 +302,30 @@ export function LetterToFutureSelf({
     [t],
   );
 
-  if (!loaded || !user) return null;
+  if (!user) return null;
+
+  if (!loaded) {
+    return (
+      <div className="flex justify-center py-16" role="status" aria-busy="true" aria-label={t('common.loading')}>
+        <Loader2 className="h-6 w-6 animate-spin text-muted-foreground/40" />
+      </div>
+    );
+  }
+
+  if (lettersLoadFailed) {
+    return (
+      <div className="space-y-3">
+        <Alert variant="destructive">
+          <AlertDescription className="flex flex-col gap-3 text-left">
+            <p>{t('letter.loadFailed')}</p>
+            <Button type="button" variant="outline" size="sm" className="self-start" onClick={() => setReloadNonce((n) => n + 1)}>
+              {t('common.tryAgain')}
+            </Button>
+          </AlertDescription>
+        </Alert>
+      </div>
+    );
+  }
 
   const handleSend = async () => {
     if (!currentPrice || !canWrite) return;

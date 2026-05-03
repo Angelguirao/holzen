@@ -3,6 +3,8 @@ import { useTranslation } from 'react-i18next';
 import { ArrowRight, Pause } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { useCurrentPause } from '@/hooks/use-current-pause';
+import { usePendingPauseOffer } from '@/hooks/use-pending-pause-offer';
+import { pauseWindowShowsClockCountdown } from '@/lib/pause-state';
 
 /**
  * Library's "Current pause" card. Renders only while the caller has an
@@ -17,6 +19,7 @@ import { useCurrentPause } from '@/hooks/use-current-pause';
  */
 export function CurrentPauseCard() {
   const { loaded, current } = useCurrentPause();
+  const { pending } = usePendingPauseOffer();
   const navigate = useNavigate();
   const { t } = useTranslation();
 
@@ -29,6 +32,7 @@ export function CurrentPauseCard() {
       ? (current.context_snapshot.context_text as string).slice(0, 120)
       : '');
 
+  const showWindowClock = pauseWindowShowsClockCountdown(current.window_ends_at);
   const windowLabel = t('library.currentPauseWindow', {
     defaultValue: 'open until',
   });
@@ -38,7 +42,15 @@ export function CurrentPauseCard() {
   });
 
   return (
-    <motion.button
+    <div className="w-full space-y-2">
+      {pending ? (
+        <p className="rounded-lg border border-amber-500/25 bg-amber-500/5 px-3 py-2 text-center text-[11px] leading-snug text-foreground/90">
+          {t('library.pendingPauseHint', {
+            defaultValue: 'New market context is queued — use the prompt on Home or here to switch or keep your current pause.',
+          })}
+        </p>
+      ) : null}
+      <motion.button
       type="button"
       initial={{ opacity: 0, y: -4 }}
       animate={{ opacity: 1, y: 0 }}
@@ -68,9 +80,11 @@ export function CurrentPauseCard() {
             <p className="text-xs font-semibold uppercase tracking-widest text-primary">
               {t('library.currentPause', { defaultValue: 'Current pause' })}
             </p>
-            <p className="text-[10px] font-mono text-muted-foreground">
-              {windowLabel} {windowEnd}
-            </p>
+            {showWindowClock ? (
+              <p className="text-[10px] font-mono text-muted-foreground">
+                {windowLabel} {windowEnd}
+              </p>
+            ) : null}
           </div>
           {preview && (
             <p className="line-clamp-2 text-sm leading-relaxed text-foreground">
@@ -84,5 +98,6 @@ export function CurrentPauseCard() {
         </div>
       </div>
     </motion.button>
+    </div>
   );
 }

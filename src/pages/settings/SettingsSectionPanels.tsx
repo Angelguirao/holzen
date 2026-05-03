@@ -33,6 +33,7 @@ import {
 import { useSettingsState } from '@/pages/settings/use-settings-state';
 import { GroundingTagInput } from '@/pages/settings/GroundingTagInput';
 import { ChangeEmailSection } from '@/pages/settings/ChangeEmailSection';
+import { HoldGoalWidget } from '@/components/HoldGoalWidget';
 
 export function SettingsYouPanel() {
   const {
@@ -64,6 +65,13 @@ export function SettingsYouPanel() {
                 maxLength={30}
                 className="text-xs font-mono"
               />
+            </div>
+
+            {/* Hold goal — full editor (Home “Why you stay” is summary-only) */}
+            <div className="space-y-3">
+              <p className="text-muted-foreground/60 uppercase tracking-wider text-sm font-sans">{t('settings.holdGoalTitle')}</p>
+              <p className="leading-relaxed text-primary text-sm">{t('settings.holdGoalDesc')}</p>
+              <HoldGoalWidget />
             </div>
 
             {/* My Why — Motivations */}

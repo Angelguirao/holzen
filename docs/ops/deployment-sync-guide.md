@@ -15,6 +15,22 @@ How Lovable Cloud auto-deploys when you push to GitHub, and how to avoid surpris
 
 **Key insight:** Backend changes (migrations + edge functions) hit production the moment GitHub syncs. Frontend changes are staged until you explicitly publish.
 
+### When Lovable (or CI) reports a migration error (ownership / “must be owner”)
+
+GitHub → Lovable sync applies SQL using the linked Supabase project’s
+migration role. If a migration fails with **“must be owner of table …”** (for
+example `pause_instances`), the batch can **stop partway**: later migrations
+do not run, while the Git tip still moves forward. **Do not** treat edge or
+frontend deploy as success until migrations are green.
+
+**What to do:** apply the failing migration (or a corrective migration) using a
+role that **owns** the object — typically the Supabase **SQL Editor** as a
+dashboard admin, **`supabase db push`** / **`supabase migration up`** with the
+linked project and correct credentials, or a one-time
+`ALTER TABLE … OWNER TO …` / support ticket if ownership drifted after a
+restore. Re-run **`npm run supabase:reset`** locally after fixing historical
+files so `check:view-migrations` + full chain stay honest.
+
 ## Hosted env files vs Cloud secrets
 
 | What | Where it runs | Where you set it (hosted) | When changes take effect |

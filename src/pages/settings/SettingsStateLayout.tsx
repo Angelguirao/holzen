@@ -1,7 +1,7 @@
 import { useEffect } from 'react';
 import { Outlet } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { NoxHeaderMain } from '@/components/ui/nox-header';
+import { PageHeading } from '@/components/PageHeading';
 import { useSettingsModel } from '@/pages/settings/useSettingsModel';
 import { SettingsStateProvider } from '@/pages/settings/settings-context';
 
@@ -19,7 +19,7 @@ export default function SettingsStateLayout() {
   if (!model.profileLoaded) {
     return (
       <div className="space-y-6">
-        <NoxHeaderMain title={t('settings.title')} subtitle={t('settings.pageSubtitle')} />
+        <PageHeading title={t('settings.title')} subtitle={t('settings.pageSubtitle')} />
         <div className="space-y-3 animate-pulse">
           {[1, 2, 3].map((i) => (
             <div key={i} className="border border-border/40 rounded-md px-4 py-4 space-y-2">

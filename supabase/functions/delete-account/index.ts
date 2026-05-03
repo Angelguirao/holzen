@@ -125,7 +125,6 @@ serve(
     await Promise.all([
       serviceClient.from("graph_edges").delete().eq("user_id", userId),
       serviceClient.from("user_signal_preferences").delete().eq("user_id", userId),
-      serviceClient.from("library_items").delete().eq("user_id", userId),
       serviceClient.from("collections").delete().eq("user_id", userId),
       serviceClient.from("reflection_insights").delete().eq("user_id", userId),
       serviceClient.from("night_reflections").delete().eq("user_id", userId),

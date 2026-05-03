@@ -1,7 +1,7 @@
 import { useState, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Sparkles, Download, Loader2 } from 'lucide-react';
-import { supabase } from '@/integrations/supabase/client';
+import { invokeEdge } from '@/lib/invoke-edge';
 import { toast } from 'sonner';
 import { parseEdgeFunctionError, toUserFacingAiErrorMessage } from '@/lib/edge-function-error';
 import { useSubscription } from '@/hooks/use-subscription';
@@ -143,18 +143,18 @@ export function ReflectionWallpaper({ message, mood, context, haiku, variant = '
     // Reflect the wallpaper spend instantly; refresh below reconciles.
     applyOptimisticDecrement('wallpaper');
     try {
-      const { data, error } = await supabase.functions.invoke('generate-wallpaper', {
+      const { data, error } = await invokeEdge<{ image?: string; error?: string }>('generate-wallpaper', {
         body: { message, mood, context },
       });
 
       if (error) {
         const parsed = await parseEdgeFunctionError(error);
-        if (parsed.code === 'companions_upgrade_required') {
+        if (parsed.code === 'companions_upgrade_required' || parsed.code === 'wallpaper_upgrade_required') {
           requirePro('wallpapers');
           setOpen(false);
           return;
         }
-        if (parsed.code === 'companions_quota_exceeded' || parsed.code === 'wallpapers_quota_exceeded') {
+        if (parsed.code === 'companions_quota_exceeded' || parsed.code === 'wallpaper_quota_exceeded') {
           showLimitReachedToast({ feature: 'wallpaper', startCheckout });
           setOpen(false);
           return;

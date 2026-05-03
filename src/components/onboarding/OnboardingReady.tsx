@@ -23,6 +23,7 @@ interface Props {
   motivations: string[];
   groundingActivities: string[];
   threshold: number;
+  hasHoldGoal: boolean;
   onBeginFree: () => void;
   onStartTrial: () => void;
   checkoutLoading: boolean;
@@ -33,6 +34,7 @@ export function OnboardingReady({
   motivations,
   groundingActivities,
   threshold,
+  hasHoldGoal,
   onBeginFree,
   onStartTrial,
   checkoutLoading,
@@ -44,6 +46,12 @@ export function OnboardingReady({
     motivations.length > 0 && {
       label: t('onboarding.ready.recapWhy', { defaultValue: 'Your why' }),
       value: motivations.map((m) => t(`settings.motivations.${m}`, { defaultValue: m })).join(', '),
+    },
+    {
+      label: t('onboarding.ready.recapHoldGoal', { defaultValue: 'Hold goal' }),
+      value: hasHoldGoal
+        ? t('onboarding.ready.recapHoldGoalSet', { defaultValue: 'Saved' })
+        : t('onboarding.ready.recapHoldGoalUnset', { defaultValue: 'Not set yet' }),
     },
     groundingActivities.length > 0 && {
       label: t('onboarding.ready.recapGrounding', { defaultValue: 'Grounds you' }),

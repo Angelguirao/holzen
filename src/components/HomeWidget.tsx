@@ -1,4 +1,5 @@
 import { useState, useCallback, type ReactNode } from 'react';
+import { mergeOrderWithDefaults, normalizeHomeSectionOrder } from '@/lib/home-section-order-normalize';
 import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
 import { GripVertical, ChevronDown } from 'lucide-react';
 import { useSortable } from '@dnd-kit/sortable';
@@ -116,41 +117,55 @@ export function HomeWidget({
   );
 }
 
-// Hook to manage widget order and collapsed state
-const STORAGE_KEY = 'holzen_widget_order';
-const COLLAPSED_KEY = 'holzen_widget_collapsed';
+// Hook to manage Home section order (core + optional) and per-widget collapse.
+const ORDER_KEY = 'holzen_home_section_order_v1';
+const LEGACY_ORDER_KEY = 'holzen_widget_order';
+const COLLAPSED_KEY = 'holzen_home_section_collapsed_v1';
+const LEGACY_COLLAPSED_KEY = 'holzen_widget_collapsed';
+
+function loadOrder(defaultOrder: string[]): string[] {
+  try {
+    const raw = localStorage.getItem(ORDER_KEY);
+    if (raw) {
+      const parsed = JSON.parse(raw) as string[];
+      return normalizeHomeSectionOrder(mergeOrderWithDefaults(parsed, defaultOrder), defaultOrder);
+    }
+    const legacy = localStorage.getItem(LEGACY_ORDER_KEY);
+    if (legacy) {
+      const parsed = JSON.parse(legacy) as string[];
+      return normalizeHomeSectionOrder(mergeOrderWithDefaults(parsed, defaultOrder), defaultOrder);
+    }
+  } catch {
+    void 0;
+  }
+  return normalizeHomeSectionOrder([...defaultOrder], defaultOrder);
+}
+
+function loadCollapsed(): Record<string, boolean> {
+  try {
+    const raw = localStorage.getItem(COLLAPSED_KEY);
+    if (raw) return JSON.parse(raw) as Record<string, boolean>;
+    const legacy = localStorage.getItem(LEGACY_COLLAPSED_KEY);
+    if (legacy) return JSON.parse(legacy) as Record<string, boolean>;
+  } catch {
+    void 0;
+  }
+  return {};
+}
 
 export function useWidgetLayout(defaultOrder: string[]) {
-  const [order, setOrder] = useState<string[]>(() => {
-    try {
-      const stored = localStorage.getItem(STORAGE_KEY);
-      if (stored) {
-        const parsed = JSON.parse(stored) as string[];
-        // Merge: keep stored order but add any new widgets
-        const merged = parsed.filter((id) => defaultOrder.includes(id));
-        const missing = defaultOrder.filter((id) => !merged.includes(id));
-        return [...merged, ...missing];
-      }
-    } catch {
-      void 0;
-    }
-    return defaultOrder;
-  });
+  const [order, setOrder] = useState<string[]>(() => loadOrder(defaultOrder));
 
-  const [collapsed, setCollapsed] = useState<Record<string, boolean>>(() => {
-    try {
-      const stored = localStorage.getItem(COLLAPSED_KEY);
-      if (stored) return JSON.parse(stored);
-    } catch {
-      void 0;
-    }
-    return {};
-  });
+  const [collapsed, setCollapsed] = useState<Record<string, boolean>>(loadCollapsed);
 
-  const reorder = useCallback((newOrder: string[]) => {
-    setOrder(newOrder);
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(newOrder));
-  }, []);
+  const reorder = useCallback(
+    (newOrder: string[]) => {
+      const normalized = normalizeHomeSectionOrder(newOrder, defaultOrder);
+      setOrder(normalized);
+      localStorage.setItem(ORDER_KEY, JSON.stringify(normalized));
+    },
+    [defaultOrder],
+  );
 
   const toggleCollapsed = useCallback((id: string) => {
     setCollapsed((prev) => {
@@ -161,11 +176,14 @@ export function useWidgetLayout(defaultOrder: string[]) {
   }, []);
 
   const resetLayout = useCallback(() => {
-    setOrder(defaultOrder);
+    // Use `reorder` so defaults are persisted like drag updates; otherwise only `setOrder`
+    // runs and dnd-kit can keep a stale visual order until the sheet remounts.
+    reorder(normalizeHomeSectionOrder([...defaultOrder], defaultOrder));
     setCollapsed({});
-    localStorage.removeItem(STORAGE_KEY);
     localStorage.removeItem(COLLAPSED_KEY);
-  }, [defaultOrder]);
+    localStorage.removeItem(LEGACY_ORDER_KEY);
+    localStorage.removeItem(LEGACY_COLLAPSED_KEY);
+  }, [defaultOrder, reorder]);
 
   return { order, collapsed, reorder, toggleCollapsed, resetLayout };
 }

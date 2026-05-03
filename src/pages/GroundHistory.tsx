@@ -5,6 +5,7 @@ import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/use-auth';
+import { toast } from 'sonner';
 import { MoodIcon } from '@/components/icons/MoodIcon';
 import { Button } from '@/components/ui/button';
 import { TOOLS } from '@/lib/app-routes';
@@ -53,45 +54,76 @@ export default function GroundHistory() {
   const [entries, setEntries] = useState<GroundingEntry[]>([]);
   const [loading, setLoading] = useState(true);
   const [hasMore, setHasMore] = useState(true);
+  const [listFetchFailed, setListFetchFailed] = useState(false);
   const [totalMinutes, setTotalMinutes] = useState(0);
   const [totalSessions, setTotalSessions] = useState(0);
 
-  const fetchEntries = useCallback(async (offset = 0) => {
-    if (!user) return;
-    const { data } = await supabase
-      .from('practice_entries')
-      .select('id, created_at, mood, duration_seconds, body, trigger_text')
-      .eq('user_id', user.id)
-      .eq('type', 'grounding')
-      .order('created_at', { ascending: false })
-      .range(offset, offset + PAGE_SIZE - 1);
-
-    if (data) {
-      if (offset === 0) {
-        setEntries(data as GroundingEntry[]);
-      } else {
-        setEntries(prev => [...prev, ...(data as GroundingEntry[])]);
+  const fetchEntries = useCallback(
+    async (offset = 0) => {
+      if (!user) {
+        setEntries([]);
+        setLoading(false);
+        setHasMore(false);
+        setListFetchFailed(false);
+        return;
       }
-      setHasMore(data.length === PAGE_SIZE);
-    }
-    setLoading(false);
-  }, [user]);
+
+      if (offset === 0) {
+        setLoading(true);
+        setListFetchFailed(false);
+      }
+
+      const { data, error } = await supabase
+        .from('practice_entries')
+        .select('id, created_at, mood, duration_seconds, body, trigger_text')
+        .eq('user_id', user.id)
+        .eq('type', 'grounding')
+        .order('created_at', { ascending: false })
+        .range(offset, offset + PAGE_SIZE - 1);
+
+      if (error) {
+        if (offset === 0) {
+          setEntries([]);
+          setListFetchFailed(true);
+          setHasMore(false);
+        } else {
+          toast.error(t('common.tryAgain', { defaultValue: 'Try again' }));
+          setHasMore(false);
+        }
+        setLoading(false);
+        return;
+      }
+
+      const rows = (data ?? []) as GroundingEntry[];
+      if (offset === 0) {
+        setEntries(rows);
+      } else {
+        setEntries((prev) => [...prev, ...rows]);
+      }
+      setHasMore(rows.length === PAGE_SIZE);
+      setLoading(false);
+    },
+    [user, t],
+  );
 
   // Fetch stats
   useEffect(() => {
     if (!user) return;
-    (async () => {
-      const { data, count } = await supabase
+    void (async () => {
+      const { data, count, error } = await supabase
         .from('practice_entries')
         .select('duration_seconds', { count: 'exact' })
         .eq('user_id', user.id)
         .eq('type', 'grounding');
 
-      if (data) {
-        setTotalSessions(count ?? data.length);
-        const mins = data.reduce((sum, e) => sum + ((e.duration_seconds as number) || 0), 0) / 60;
-        setTotalMinutes(Math.round(mins));
+      if (error || !data) {
+        setTotalSessions(0);
+        setTotalMinutes(0);
+        return;
       }
+      setTotalSessions(count ?? data.length);
+      const mins = data.reduce((sum, e) => sum + ((e.duration_seconds as number) || 0), 0) / 60;
+      setTotalMinutes(Math.round(mins));
     })();
   }, [user]);
 
@@ -138,8 +170,23 @@ export default function GroundHistory() {
           </motion.div>
         )}
 
+        {/* List fetch error (not “no sessions”) */}
+        {!loading && listFetchFailed && entries.length === 0 && (
+          <motion.div
+            className="text-center space-y-4 py-16"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.15 }}
+          >
+            <p className="text-sm text-muted-foreground px-2">{t('ground.historyLoadFailed')}</p>
+            <Button variant="secondary" size="sm" className="mx-auto font-mono" onClick={() => void fetchEntries(0)}>
+              {t('common.tryAgain', { defaultValue: 'Try again' })}
+            </Button>
+          </motion.div>
+        )}
+
         {/* Empty state */}
-        {!loading && entries.length === 0 && (
+        {!loading && !listFetchFailed && entries.length === 0 && (
           <motion.div
             className="text-center space-y-4 py-20"
             initial={{ opacity: 0 }}

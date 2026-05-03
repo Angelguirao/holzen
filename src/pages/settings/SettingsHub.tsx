@@ -12,7 +12,6 @@ import {
   ChevronRight,
 } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
-import { NoxHeaderMain } from '@/components/ui/nox-header';
 import { useSettingsState } from '@/pages/settings/use-settings-state';
 import { settingsSectionPath } from '@/lib/app-routes';
 import { isSettingsSectionId } from '@/pages/settings/sectionIds';
@@ -91,7 +90,9 @@ export default function SettingsHub() {
 
   return (
     <div className="space-y-6 pb-8">
-      <NoxHeaderMain title={m.t('settings.title')} subtitle={m.t('settings.pageSubtitle')} />
+      <div className="border-b border-border pb-4 space-y-2">
+        <p className="text-base leading-relaxed text-muted-foreground">{m.t('settings.pageSubtitle')}</p>
+      </div>
 
       <p className="text-xs text-muted-foreground/90 leading-relaxed">{m.t('settings.hubIntro')}</p>
 

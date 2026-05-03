@@ -1,6 +1,6 @@
 import { Link, Navigate, useParams } from 'react-router-dom';
 import { ArrowLeft } from 'lucide-react';
-import { NoxHeaderMain } from '@/components/ui/nox-header';
+import { PageHeading } from '@/components/PageHeading';
 import { isSettingsSectionId, type SettingsSectionId } from '@/pages/settings/sectionIds';
 import { useSettingsState } from '@/pages/settings/use-settings-state';
 import {
@@ -62,7 +62,7 @@ export default function SettingsSectionPage() {
         <ArrowLeft className="h-4 w-4 shrink-0" aria-hidden />
         {m.t('settings.backToAll')}
       </Link>
-      <NoxHeaderMain title={m.t(titleKey, titleOpts)} subtitle={m.t(subtitleKey)} />
+      <PageHeading title={m.t(titleKey, titleOpts)} subtitle={m.t(subtitleKey)} />
       <div className="rounded-xl border border-border/40 bg-muted/15 px-4 py-4">
         <Panel />
       </div>

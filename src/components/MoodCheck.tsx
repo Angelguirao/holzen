@@ -32,7 +32,7 @@ export type MoodValue = (typeof allMoods)[number]['value'];
 
 interface Props {
   onSelect: (mood: MoodValue) => void;
-  onSkip: () => void;
+  onSkip: () => void | Promise<void>;
   /** 'before' = raw entry state, 'after' = post-grounding state */
   variant?: 'before' | 'after';
   /** Hide the heading text (when parent provides its own) */

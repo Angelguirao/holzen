@@ -8,7 +8,7 @@
  */
 import { useCallback, useState } from 'react';
 import { AlertTriangle, CheckCircle2, Loader2, RefreshCw, XCircle } from 'lucide-react';
-import { supabase } from '@/integrations/supabase/client';
+import { invokeEdge } from '@/lib/invoke-edge';
 import { useToast } from '@/hooks/use-toast';
 
 type Result = {
@@ -56,10 +56,7 @@ export function StripePriceCheck() {
   const run = useCallback(async () => {
     setLoading(true);
     try {
-      const { data: res, error } = await supabase.functions.invoke<Response>(
-        'admin-check-stripe-prices',
-        { body: {} },
-      );
+      const { data: res, error } = await invokeEdge<Response>('admin-check-stripe-prices', { body: {} });
       if (error) throw error;
       setData(res ?? null);
       if (res?.ok) {

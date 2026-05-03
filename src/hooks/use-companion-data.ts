@@ -1,5 +1,5 @@
 import { useState, useCallback, useEffect, useLayoutEffect, useRef } from 'react';
-import { supabase } from '@/integrations/supabase/client';
+import { invokeEdge } from '@/lib/invoke-edge';
 import { toast as sonnerToast } from 'sonner';
 import { hapticFeedback } from '@/lib/haptics';
 import { useHolzen } from '@/hooks/use-holzen';
@@ -32,8 +32,8 @@ import {
   type CompanionSlotCacheIds,
   type CompanionSlotCommitters,
   type CompanionSlotRelaxations,
+  type CompanionSlotAutosaveParams,
 } from '@/lib/companion-orchestrate-slot-apply';
-import { saveCompanionLibraryBookmarkOnce } from '@/lib/companion-library-autosave';
 import { holzenLog } from '@/lib/holzen-console';
 import {
   hasInvokedIntervention,
@@ -112,14 +112,8 @@ export function useCompanionData({ companions, prefs, pauseInstanceId, context, 
     startCheckout,
   ]);
 
-  // ── Auto-save to library ──
-  const libraryAutosaveDedupRef = useRef<Set<string>>(new Set());
-  const autoSaveToLibrary = useCallback(
-    async (params: { title: string; body: string; sourceType: string; sourceUrl?: string }) => {
-      await saveCompanionLibraryBookmarkOnce(pauseInstanceId, params, libraryAutosaveDedupRef.current);
-    },
-    [pauseInstanceId],
-  );
+  /** No-op: companion output is persisted in `pause_ai_artifacts` only. */
+  const autoSaveToLibrary = useCallback(async (_params: CompanionSlotAutosaveParams) => {}, []);
 
   // ── Completion state ──
   const [completion, setCompletion] = useState<CompanionUiCompletionState>({
@@ -322,7 +316,7 @@ export function useCompanionData({ companions, prefs, pauseInstanceId, context, 
         const { data, error: fnError } = await runOnceIntervention(
           pauseInstanceId,
           () =>
-            supabase.functions.invoke('companion-orchestrate', {
+            invokeEdge('companion-orchestrate', {
               body: {
                 holzenInvokeSource: 'browser_pause_intervention',
                 pauseInstanceId,
@@ -355,8 +349,8 @@ export function useCompanionData({ companions, prefs, pauseInstanceId, context, 
           return;
         }
 
-        if (data.intervention) {
-          setIntervention(data.intervention as InterventionState);
+        if (body.intervention) {
+          setIntervention(body.intervention as InterventionState);
         } else {
           setInterventionError(true);
         }
@@ -364,7 +358,7 @@ export function useCompanionData({ companions, prefs, pauseInstanceId, context, 
 
         holzenLog.companion('orchestrate intervention ok', {
           pause_instance_prefix: pauseInstanceId.slice(0, 8),
-          hasIntervention: Boolean(data.intervention),
+          hasIntervention: Boolean(body.intervention),
         });
 
         // Hydrate any companion data the server returned alongside intervention
@@ -475,7 +469,7 @@ export function useCompanionData({ companions, prefs, pauseInstanceId, context, 
         source: 'lazy',
       });
 
-      const { data, error: fnError } = await supabase.functions.invoke('companion-orchestrate', {
+      const { data, error: fnError } = await invokeEdge('companion-orchestrate', {
         body: {
           holzenInvokeSource: 'browser_lazy_fetch',
           pauseInstanceId,
@@ -657,7 +651,7 @@ export function useCompanionData({ companions, prefs, pauseInstanceId, context, 
         source: 'regenerate',
       });
 
-      const { data, error: fnError } = await supabase.functions.invoke('companion-orchestrate', {
+      const { data, error: fnError } = await invokeEdge('companion-orchestrate', {
         body: {
           holzenInvokeSource: 'browser_regenerate',
           pauseInstanceId,

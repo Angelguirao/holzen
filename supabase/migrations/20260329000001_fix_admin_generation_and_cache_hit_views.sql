@@ -24,7 +24,10 @@ FROM public.generation_attempts
 WHERE created_at >= (now() - interval '30 days')
 GROUP BY companion_type, provider, model;
 
-CREATE OR REPLACE VIEW public.v_companion_cache_hit_rate AS
+-- Column order changed vs 20260320205315; OR REPLACE is unsafe on fresh reset (see migration-view-safety.md).
+DROP VIEW IF EXISTS public.v_companion_cache_hit_rate;
+
+CREATE VIEW public.v_companion_cache_hit_rate WITH (security_barrier = true) AS
 SELECT
   companion_type,
   COUNT(*) AS total_serves,
@@ -38,3 +41,6 @@ SELECT
 FROM public.companion_serves
 WHERE created_at >= (now() - interval '30 days')
 GROUP BY companion_type;
+
+REVOKE SELECT ON public.v_companion_cache_hit_rate FROM public, authenticated, anon;
+GRANT SELECT ON public.v_companion_cache_hit_rate TO service_role;

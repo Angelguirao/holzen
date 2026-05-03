@@ -1,9 +1,10 @@
-import { Eye, EyeOff, WifiOff, Bitcoin, Clock } from 'lucide-react';
+import { Eye, EyeOff, WifiOff, Bitcoin, CircleDollarSign, Clock, ChevronDown } from 'lucide-react';
 import { BtcChartLazyGate } from '@/components/BtcChartLazyGate';
 import { Skeleton } from '@/components/ui/skeleton';
 import { formatBtcPrice, type BtcPriceData } from '@/lib/btc';
 import { useTranslation } from 'react-i18next';
 import { homeInWidget } from '@/components/home/home-widget-styles';
+import { cn } from '@/lib/utils';
 
 interface Props {
   data: BtcPriceData | null;
@@ -13,11 +14,72 @@ interface Props {
   currency?: string;
   btcMode?: boolean;
   onToggleBtcMode?: () => void;
+  /** When set, headline price row includes a chevron to show/hide chart + 24h detail below the price. */
+  chartExpanded?: boolean;
+  onToggleChartExpanded?: () => void;
+  /** When false, omit the price-row chevron (e.g. Home puts the control in `HomeSectionCard` header). */
+  chartChevronInPriceRow?: boolean;
 }
 
-export function BtcStatus({ data, error, hidden, onToggleHidden, currency = 'USD', btcMode = false, onToggleBtcMode }: Props) {
+export function BtcStatus({
+  data,
+  error,
+  hidden,
+  onToggleHidden,
+  currency = 'USD',
+  btcMode = false,
+  onToggleBtcMode,
+  chartExpanded = true,
+  onToggleChartExpanded,
+  chartChevronInPriceRow = true,
+}: Props) {
   const { t } = useTranslation();
   const toggle = onToggleHidden;
+
+  const fiatLabelCurrency = (data?.currency ?? currency).toUpperCase();
+
+  /** Fiat row only — hidden price + “1 BTC” mode would be incoherent. */
+  const enterBtcToolbarBtn =
+    onToggleBtcMode && !btcMode && !hidden ? (
+      <button
+        type="button"
+        onClick={onToggleBtcMode}
+        className={cn(homeInWidget.iconBtn, 'text-muted-foreground/40 hover:text-primary')}
+        aria-label={t('btcStatus.enterBtcMode')}
+        title={t('btcStatus.enterBtcMode')}
+      >
+        <Bitcoin className="h-3.5 w-3.5 text-secondary-foreground" aria-hidden />
+      </button>
+    ) : null;
+
+  /** BTC / BTC row — always offer a way back to fiat quote. */
+  const exitBtcToolbarBtn =
+    onToggleBtcMode && btcMode ? (
+      <button
+        type="button"
+        onClick={onToggleBtcMode}
+        className={cn(homeInWidget.iconBtn, 'text-primary/60 hover:text-primary')}
+        aria-label={t('btcStatus.exitBtcMode', { currency: fiatLabelCurrency })}
+        title={t('btcStatus.exitBtcMode', { currency: fiatLabelCurrency })}
+      >
+        <CircleDollarSign className="h-3.5 w-3.5 text-secondary-foreground" aria-hidden />
+      </button>
+    ) : null;
+
+  const eyeToggleBtn = (
+    <button
+      type="button"
+      onClick={toggle}
+      className={homeInWidget.iconBtn}
+      aria-label={hidden ? t('btcStatus.showPrice') : t('btcStatus.hidePrice')}
+    >
+      {hidden ? (
+        <EyeOff className="h-3.5 w-3.5 text-secondary-foreground" aria-hidden />
+      ) : (
+        <Eye className="h-3.5 w-3.5 text-secondary-foreground" aria-hidden />
+      )}
+    </button>
+  );
 
   if (error) {
     return (
@@ -33,13 +95,19 @@ export function BtcStatus({ data, error, hidden, onToggleHidden, currency = 'USD
 
   if (!data) {
     return (
-      <div className="space-y-2">
-        <div className="flex items-center justify-between">
-          <Skeleton className="h-3 w-16" />
-          <Skeleton className="h-3.5 w-3.5 rounded-full" />
+      <div className="space-y-3">
+        <div className="flex items-center justify-between gap-2">
+          <div className="min-w-0 flex-1 space-y-2">
+            <Skeleton className="h-3 w-20" />
+            <Skeleton className="h-7 w-32" />
+            <Skeleton className="h-4 w-24" />
+          </div>
+          <div className="flex shrink-0 gap-1">
+            <Skeleton className="h-9 w-9 rounded-lg" />
+            <Skeleton className="h-9 w-9 rounded-lg" />
+            <Skeleton className="h-9 w-9 rounded-lg" />
+          </div>
         </div>
-        <Skeleton className="h-7 w-32" />
-        <Skeleton className="h-4 w-24" />
       </div>
     );
   }
@@ -48,41 +116,25 @@ export function BtcStatus({ data, error, hidden, onToggleHidden, currency = 'USD
     return (
       <div className="space-y-3">
         <div className="space-y-1">
-          <div className="flex items-center justify-between">
-            <p className={homeInWidget.kicker}>BTC / BTC</p>
-            <div className="flex items-center gap-1">
-              {onToggleBtcMode && (
-                <button
-                  type="button"
-                  onClick={onToggleBtcMode}
-                  className={`${homeInWidget.iconBtn} text-primary/60 hover:text-primary`}
-                  aria-label={t('btcStatus.exitBtcMode')}
-                  title={t('btcStatus.exitBtcMode')}
-                >
-                  <Bitcoin className="h-3.5 w-3.5 text-secondary-foreground" aria-hidden />
-                </button>
+          <p className={homeInWidget.kicker}>BTC / BTC</p>
+          <div className="flex items-center justify-between gap-2">
+            <div className="min-w-0 flex-1 space-y-1">
+              {hidden ? (
+                <>
+                  <p className={homeInWidget.priceHidden}>••••••</p>
+                  <p className={homeInWidget.subPriceHidden}>••••</p>
+                </>
+              ) : (
+                <>
+                  <p className={`${homeInWidget.price} text-foreground/90`}>1 BTC = 1 BTC</p>
+                  <p className="leading-snug text-sm text-[#dbb266]">{t('btcStatus.priceIsNoise')}</p>
+                </>
               )}
-              <button
-                type="button"
-                onClick={toggle}
-                className={homeInWidget.iconBtn}
-                aria-label={hidden ? t('btcStatus.show') : t('btcStatus.hide')}
-              >
-                {hidden ? <EyeOff className="h-3.5 w-3.5 text-secondary-foreground" aria-hidden /> : <Eye className="h-3.5 w-3.5 text-secondary-foreground" aria-hidden />}
-              </button>
+            </div>
+            <div className="flex shrink-0 items-center justify-end gap-1">
+              {exitBtcToolbarBtn}
             </div>
           </div>
-          {hidden ? (
-            <>
-              <p className={homeInWidget.priceHidden}>••••••</p>
-              <p className={homeInWidget.subPriceHidden}>••••</p>
-            </>
-          ) : (
-            <>
-              <p className={`${homeInWidget.price} text-foreground/90`}>1 BTC = 1 BTC</p>
-              <p className="leading-snug text-sm text-[#dbb266]">{t('btcStatus.priceIsNoise')}</p>
-            </>
-          )}
         </div>
       </div>
     );
@@ -94,70 +146,88 @@ export function BtcStatus({ data, error, hidden, onToggleHidden, currency = 'USD
   const price = formatBtcPrice(data.currentPrice, cur);
 
   const fearGreedColor = data.fearGreed
-    ? data.fearGreed.value <= 25 ? 'text-destructive'
-      : data.fearGreed.value <= 45 ? 'text-secondary-foreground'
-      : data.fearGreed.value <= 55 ? 'text-muted-foreground'
-      : data.fearGreed.value <= 75 ? 'text-chart-2'
-      : 'text-primary'
+    ? data.fearGreed.value <= 25
+      ? 'text-destructive'
+      : data.fearGreed.value <= 45
+        ? 'text-secondary-foreground'
+        : data.fearGreed.value <= 55
+          ? 'text-muted-foreground'
+          : data.fearGreed.value <= 75
+            ? 'text-chart-2'
+            : 'text-primary'
     : '';
+
+  const showChartBlock = !hidden && chartExpanded;
+  const chartChevronToggle =
+    chartChevronInPriceRow && onToggleChartExpanded ? (
+      <button
+        type="button"
+        onClick={onToggleChartExpanded}
+        className={homeInWidget.iconBtn}
+        aria-expanded={chartExpanded}
+        aria-label={chartExpanded ? t('home.market.collapseDetails') : t('home.market.expandDetails')}
+      >
+        <ChevronDown
+          className={cn(
+            'h-4 w-4 text-secondary-foreground transition-transform duration-200',
+            !chartExpanded && '-rotate-90',
+          )}
+          aria-hidden
+        />
+      </button>
+    ) : null;
+
+  const priceRowToolbar = (
+    <div className="flex shrink-0 items-center justify-end gap-1">
+      {enterBtcToolbarBtn}
+      {eyeToggleBtn}
+      {chartChevronToggle}
+    </div>
+  );
 
   return (
     <div className="space-y-3">
       <div className="space-y-1">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <p className={homeInWidget.kicker}>BTC / {cur}</p>
-            {data._stale && (
-              <span className={`flex items-center gap-1 ${homeInWidget.metaFaint}`} title="Using cached data — live APIs unavailable">
-                <Clock className="h-2.5 w-2.5" />
-                cached
-              </span>
-            )}
-          </div>
-          <div className="flex items-center gap-1">
-            {onToggleBtcMode && (
-              <button
-                type="button"
-                onClick={onToggleBtcMode}
-                className={`${homeInWidget.iconBtn} text-muted-foreground/40 hover:text-primary`}
-                aria-label={t('btcStatus.enterBtcMode')}
-                title="1 BTC = 1 BTC"
-              >
-                <Bitcoin className="h-3.5 w-3.5 text-secondary-foreground" aria-hidden />
-              </button>
-            )}
-            <button
-              type="button"
-              onClick={toggle}
-              className={homeInWidget.iconBtn}
-              aria-label={hidden ? t('btcStatus.showPrice') : t('btcStatus.hidePrice')}
-            >
-              {hidden ? <EyeOff className="h-3.5 w-3.5 text-secondary-foreground" aria-hidden /> : <Eye className="h-3.5 w-3.5 text-secondary-foreground" aria-hidden />}
-            </button>
-          </div>
+        <div className="flex min-w-0 flex-1 flex-wrap items-center gap-2">
+          <p className={homeInWidget.kicker}>BTC / {cur}</p>
+          {data._stale && (
+            <span className={`flex items-center gap-1 ${homeInWidget.metaFaint}`} title="Using cached data — live APIs unavailable">
+              <Clock className="h-2.5 w-2.5" />
+              cached
+            </span>
+          )}
         </div>
-        {hidden ? (
-          <>
-            <p className={homeInWidget.priceHidden}>••••••</p>
-            <p className={homeInWidget.subPriceHidden}>••••</p>
-          </>
-        ) : (
-          <>
-            <p className={homeInWidget.price}>{price}</p>
-            <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
-              <p className={homeInWidget.subPrice}>
-                {dir}{pct}% {t('btcStatus.in24h')}
+        <div className="flex items-center justify-between gap-2">
+          <div className="min-w-0 flex-1">
+            {hidden ? (
+              <>
+                <p className={homeInWidget.priceHidden}>••••••</p>
+                <p className={homeInWidget.subPriceHidden}>••••</p>
+              </>
+            ) : (
+              <p className={homeInWidget.price}>{price}</p>
+            )}
+          </div>
+          {priceRowToolbar}
+        </div>
+        {showChartBlock ? (
+          <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
+            <p className={homeInWidget.subPrice}>
+              {dir}{pct}% {t('btcStatus.in24h')}
+            </p>
+            {data.fearGreed && (
+              <p className={`text-xs font-medium tabular-nums ${fearGreedColor}`}>
+                {data.fearGreed.value} · {data.fearGreed.label}
               </p>
-              {data.fearGreed && (
-                <p className={`text-xs font-medium tabular-nums ${fearGreedColor}`}>
-                  {data.fearGreed.value} · {data.fearGreed.label}
-                </p>
-              )}
-            </div>
-          </>
-        )}
+            )}
+          </div>
+        ) : null}
       </div>
-      <BtcChartLazyGate hidden={hidden} currency={cur} />
+      {showChartBlock ? (
+        <div>
+          <BtcChartLazyGate hidden={hidden} currency={cur} />
+        </div>
+      ) : null}
     </div>
   );
 }

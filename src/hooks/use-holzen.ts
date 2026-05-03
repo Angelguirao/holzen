@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { fetchBtcData, type BtcPriceData } from '@/lib/btc';
 import { supabase } from '@/integrations/supabase/client';
+import { invokeEdge } from '@/lib/invoke-edge';
 import { useAuth } from '@/hooks/use-auth';
 import { useProfile } from '@/hooks/use-profile';
 import type { CompanionData } from '@/components/CompanionSection';
@@ -76,56 +77,100 @@ export function useHolzen() {
   const [lastPauseInstanceId, setLastPauseInstanceId] = useState<string | null>(null);
   const [lastTriggerAt, setLastTriggerAt] = useState<string | null>(null);
 
-  // Hydrate "open pause" state on mount.
+  const clearOpenPausePreview = useCallback(() => {
+    setLastPauseInstanceId(null);
+    setLastTriggerAt(null);
+    setMessage(null);
+    setContext(null);
+    setCompanions({ haiku: null, groundingTitle: null, groundingBody: null });
+  }, []);
+
+  /** Re-read v_pause_current + artifacts so Home matches Library after completes / dismissals. */
+  const syncOpenPauseFromDb = useCallback(async (signal?: AbortSignal) => {
+    const dead = () => signal?.aborted ?? false;
+    if (!user) {
+      clearOpenPausePreview();
+      return;
+    }
+    const { data } = await supabase
+      .from('v_pause_current' as never)
+      .select('id, created_at, context_snapshot')
+      .eq('user_id', user.id)
+      .maybeSingle();
+
+    if (dead()) return;
+
+    if (!data) {
+      clearOpenPausePreview();
+      return;
+    }
+
+    const row = data as {
+      id: string;
+      created_at: string;
+      context_snapshot: Record<string, unknown> | null;
+    };
+    setLastPauseInstanceId(row.id);
+    setLastTriggerAt(row.created_at);
+    const ctxText = typeof row.context_snapshot?.context_text === 'string'
+      ? (row.context_snapshot.context_text as string)
+      : null;
+    setContext(ctxText);
+
+    const { data: artifacts } = await supabase
+      .from('pause_ai_artifacts' as never)
+      .select('kind, content')
+      .eq('pause_instance_id', row.id);
+
+    if (dead()) return;
+
+    let msg: string | null = null;
+    let haiku: string | null = null;
+    let groundingTitle: string | null = null;
+    let groundingBody: string | null = null;
+    for (const a of ((artifacts ?? []) as Array<{ kind: string; content: Record<string, unknown> }>)) {
+      if (a.kind === 'reflection_text' && typeof a.content?.message === 'string') {
+        msg = a.content.message as string;
+      } else if (a.kind === 'haiku' && typeof a.content?.haiku === 'string') {
+        haiku = a.content.haiku as string;
+      } else if (a.kind === 'ground_nudge') {
+        if (typeof a.content?.title === 'string') groundingTitle = a.content.title as string;
+        if (typeof a.content?.body === 'string') groundingBody = a.content.body as string;
+      }
+    }
+    setMessage(msg);
+    setCompanions({ haiku, groundingTitle, groundingBody });
+  }, [user, clearOpenPausePreview]);
+
+  // Hydrate open pause on login; keep in sync when pause_instances changes (complete / dismiss / cron).
+  useEffect(() => {
+    const ac = new AbortController();
+    void syncOpenPauseFromDb(ac.signal);
+    return () => ac.abort();
+  }, [syncOpenPauseFromDb]);
+
   useEffect(() => {
     if (!user) return;
-    let cancelled = false;
-    void (async () => {
-      const { data } = await supabase
-        .from('v_pause_current' as never)
-        .select('id, created_at, context_snapshot')
-        .eq('user_id', user.id)
-        .maybeSingle();
-      if (cancelled || !data) return;
-      const row = data as {
-        id: string;
-        created_at: string;
-        context_snapshot: Record<string, unknown> | null;
-      };
-      setLastPauseInstanceId(row.id);
-      setLastTriggerAt(row.created_at);
-      const ctxText = typeof row.context_snapshot?.context_text === 'string'
-        ? (row.context_snapshot.context_text as string)
-        : null;
-      setContext(ctxText);
+    const channel = supabase
+      .channel(`holzen-open-pause-${user.id}`)
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'pause_instances',
+          filter: `user_id=eq.${user.id}`,
+        },
+        () => {
+          void syncOpenPauseFromDb();
+        },
+      )
+      .subscribe();
 
-      // Pull reflection_text + companion artifacts for preview.
-      const { data: artifacts } = await supabase
-        .from('pause_ai_artifacts' as never)
-        .select('kind, content')
-        .eq('pause_instance_id', row.id);
-      if (cancelled) return;
-      let msg: string | null = null;
-      let haiku: string | null = null;
-      let groundingTitle: string | null = null;
-      let groundingBody: string | null = null;
-      for (const a of ((artifacts ?? []) as Array<{ kind: string; content: Record<string, unknown> }>)) {
-        if (a.kind === 'reflection_text' && typeof a.content?.message === 'string') {
-          msg = a.content.message as string;
-        } else if (a.kind === 'haiku' && typeof a.content?.haiku === 'string') {
-          haiku = a.content.haiku as string;
-        } else if (a.kind === 'ground_nudge') {
-          if (typeof a.content?.title === 'string') groundingTitle = a.content.title as string;
-          if (typeof a.content?.body === 'string') groundingBody = a.content.body as string;
-        }
-      }
-      setMessage(msg);
-      setCompanions({ haiku, groundingTitle, groundingBody });
-    })();
     return () => {
-      cancelled = true;
+      supabase.removeChannel(channel);
     };
-  }, [user]);
+  }, [user, syncOpenPauseFromDb]);
 
   /** Generate reflect-step text (holzen-reflect) and create the V2 pause instance + artifacts. */
   const generateMessage = useCallback(
@@ -156,10 +201,6 @@ export function useHolzen() {
       if (silentMode) {
         holzenLog.manual('generateMessage: silent mode');
         const silentMsg = 'BTC moved.';
-        setMessage(silentMsg);
-        setContext(ctx);
-        setCompanions({ haiku: null, groundingTitle: null, groundingBody: null });
-        setNewPauseArrival(true);
 
         try {
           const res = await pauseCreateOrReuse({
@@ -177,7 +218,10 @@ export function useHolzen() {
             contextFingerprint: fingerprint,
           });
           if (!res.instance_id) return;
-          setLastPauseInstanceId(res.instance_id);
+          const isPendingOffer = res.pending_offer === true;
+          if (!isPendingOffer) {
+            setLastPauseInstanceId(res.instance_id);
+          }
           if (res.created) {
             try {
               trackEvent('pause_instance_created', {
@@ -185,6 +229,7 @@ export function useHolzen() {
                 template_slug: 'volatility_v1',
                 source: 'manual',
                 severity: severityBand,
+                pending_offer: isPendingOffer,
               });
             } catch {
               /* no-op */
@@ -199,27 +244,21 @@ export function useHolzen() {
             } as never,
             { onConflict: 'pause_instance_id,kind' } as never,
           );
-          await supabase.from('library_items').upsert(
-            {
-              user_id: user.id,
-              type: 'bookmark',
-              title: 'Pause',
-              body: silentMsg,
-              source_type: 'pause',
-              pause_instance_id: res.instance_id,
-              tags: [],
-            } as never,
-            { onConflict: 'user_id,pause_instance_id,source_type', ignoreDuplicates: true } as never,
-          );
-          setLastTriggerAt(new Date().toISOString());
-          try {
-            trackEvent('pause.manual_completed', {
-              duration_s: Math.round((Date.now() - t0) / 1000),
-              had_bitcoin_context: Boolean(ctx),
-              companion_types: [],
-            });
-          } catch {
-            /* no-op */
+          if (!isPendingOffer) {
+            setMessage(silentMsg);
+            setContext(ctx);
+            setCompanions({ haiku: null, groundingTitle: null, groundingBody: null });
+            setNewPauseArrival(true);
+            setLastTriggerAt(new Date().toISOString());
+            try {
+              trackEvent('pause.manual_completed', {
+                duration_s: Math.round((Date.now() - t0) / 1000),
+                had_bitcoin_context: Boolean(ctx),
+                companion_types: [],
+              });
+            } catch {
+              /* no-op */
+            }
           }
         } catch (e: unknown) {
           holzenLog.manual('generateMessage: silent pause create failed', {
@@ -235,7 +274,14 @@ export function useHolzen() {
 
       try {
         const { moodHistory, recentMessages, recentHaikus } = await loadReflectRecencyHints();
-        const { data: fnData, error: fnError } = await supabase.functions.invoke('holzen-reflect', {
+        const { data: fnData, error: fnError } = await invokeEdge<{
+          message?: string;
+          haiku?: CompanionData['haiku'];
+          grounding_title?: string | null;
+          grounding_body?: string | null;
+          grounding_citation?: string | null;
+          grounding_url?: string | null;
+        }>('holzen-reflect', {
           body: {
             context: ctx,
             tone: reflectionTone,
@@ -287,6 +333,8 @@ export function useHolzen() {
           return;
         }
 
+        const isPendingOffer = res.pending_offer === true;
+
         if (res.created) {
           try {
             trackEvent('pause_instance_created', {
@@ -294,17 +342,20 @@ export function useHolzen() {
               template_slug: 'volatility_v1',
               source: 'manual',
               severity: severityBand,
+              pending_offer: isPendingOffer,
             });
           } catch {
             /* no-op */
           }
         }
 
-        setLastPauseInstanceId(res.instance_id);
-        setMessage(msg);
-        setContext(ctx);
-        setCompanions(companionData);
-        setNewPauseArrival(true);
+        if (!isPendingOffer) {
+          setLastPauseInstanceId(res.instance_id);
+          setMessage(msg);
+          setContext(ctx);
+          setCompanions(companionData);
+          setNewPauseArrival(true);
+        }
 
         const artifacts: Array<{
           pause_instance_id: string;
@@ -319,14 +370,6 @@ export function useHolzen() {
             content: { message: msg, context: ctx },
           },
         ];
-        if (companionData.haiku) {
-          artifacts.push({
-            pause_instance_id: res.instance_id,
-            user_id: user.id,
-            kind: 'haiku',
-            content: { haiku: companionData.haiku },
-          });
-        }
         if (companionData.groundingTitle || companionData.groundingBody) {
           artifacts.push({
             pause_instance_id: res.instance_id,
@@ -344,31 +387,17 @@ export function useHolzen() {
           .from('pause_ai_artifacts' as never)
           .upsert(artifacts as never, { onConflict: 'pause_instance_id,kind' } as never);
 
-        await supabase.from('library_items').upsert(
-          {
-            user_id: user.id,
-            type: 'bookmark',
-            title: 'Pause',
-            body: msg,
-            source_type: 'pause',
-            pause_instance_id: res.instance_id,
-            tags: [],
-          } as never,
-          {
-            onConflict: 'user_id,pause_instance_id,source_type',
-            ignoreDuplicates: true,
-          } as never,
-        );
-
-        setLastTriggerAt(new Date().toISOString());
-        try {
-          trackEvent('pause.manual_completed', {
-            duration_s: Math.round((Date.now() - t0) / 1000),
-            had_bitcoin_context: Boolean(ctx),
-            companion_types: previewCompanionTypeTags(companionData),
-          });
-        } catch {
-          /* no-op */
+        if (!isPendingOffer) {
+          setLastTriggerAt(new Date().toISOString());
+          try {
+            trackEvent('pause.manual_completed', {
+              duration_s: Math.round((Date.now() - t0) / 1000),
+              had_bitcoin_context: Boolean(ctx),
+              companion_types: previewCompanionTypeTags(companionData),
+            });
+          } catch {
+            /* no-op */
+          }
         }
       } catch (e: unknown) {
         const raw = e instanceof Error ? e.message : String(e);
@@ -526,5 +555,7 @@ export function useHolzen() {
     nextCronCheckIn,
     profileLoaded,
     refreshProfile,
+    /** After `pause_adopt_pending_offer`, refresh Home open-pause preview from `v_pause_current`. */
+    resyncOpenPauseFromDb: syncOpenPauseFromDb,
   };
 }

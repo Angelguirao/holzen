@@ -5,7 +5,7 @@ import { PageMeta } from '@/components/PageMeta';
 import { PublicFooter } from '@/components/PublicFooter';
 import { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
-import { NoxHeaderMain } from '@/components/ui/nox-header';
+import { PageHeading } from '@/components/PageHeading';
 import { StateCard } from '@/components/ui/state-card';
 
 const fade = (delay = 0) => ({
@@ -69,7 +69,7 @@ const Reserve = () => {
               <Bitcoin className="h-4 w-4 text-primary" />
             </div>
           </div>
-          <NoxHeaderMain title={t('reserve.title')} subtitle={t('reserve.subtitle')} />
+          <PageHeading title={t('reserve.title')} subtitle={t('reserve.subtitle')} />
         </motion.div>
 
         <motion.div {...m(0.1)}>

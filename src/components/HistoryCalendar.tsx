@@ -1,6 +1,6 @@
 import { useState, useMemo, useCallback } from 'react';
 import { format, startOfMonth, endOfMonth, eachDayOfInterval, getDay, isSameDay, addMonths, subMonths, isToday } from 'date-fns';
-import { ChevronLeft, ChevronRight, Sparkles, Scroll, Award, Heart, PenLine, Scan, RotateCcw, BookOpen } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Sparkles, Scroll, Award, Heart, PenLine, Scan, RotateCcw } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useTranslation } from 'react-i18next';
 
@@ -26,7 +26,7 @@ const DAY_TINT: Record<string, string> = {
   uncertain: 'bg-secondary/40',
 };
 
-export type ActivityType = 'pause' | 'letter' | 'badge' | 'practice' | 'library';
+export type ActivityType = 'pause' | 'letter' | 'badge' | 'practice';
 
 export interface CalendarActivity {
   date: string;
@@ -170,7 +170,6 @@ export function HistoryCalendar({ activities, selectedDate, onSelectDate }: Prop
         const lettersList = dayItems.filter((a) => a.type === 'letter');
         const badgesList = dayItems.filter((a) => a.type === 'badge');
         const practiceList = dayItems.filter((a) => a.type === 'practice');
-        const libraryList = dayItems.filter((a) => a.type === 'library');
 
         const moodCounts: Record<string, number> = {};
         pauseDayMarkers.forEach((r) => {
@@ -210,12 +209,6 @@ export function HistoryCalendar({ activities, selectedDate, onSelectDate }: Prop
                   {t('calendar.practiceCount', { count: practiceList.length })}
                 </span>
               )}
-              {libraryList.length > 0 && (
-                <span className="flex items-center gap-1 text-[10px] font-mono text-muted-foreground">
-                  <BookOpen className="h-2.5 w-2.5 text-primary/70" />
-                  {t('calendar.libraryCount', { count: libraryList.length, defaultValue: '{{count}} library item(s)' })}
-                </span>
-              )}
             </div>
 
             {totalMoods > 0 && (
@@ -240,7 +233,7 @@ export function HistoryCalendar({ activities, selectedDate, onSelectDate }: Prop
               </div>
             )}
 
-            {(badgesList.length > 0 || practiceList.length > 0 || libraryList.length > 0) && (
+            {(badgesList.length > 0 || practiceList.length > 0) && (
               <div className="space-y-1">
                 {badgesList.map((b) => (
                   <div key={b.id} className="flex items-center gap-2 text-xs text-muted-foreground">
@@ -257,12 +250,6 @@ export function HistoryCalendar({ activities, selectedDate, onSelectDate }: Prop
                     </div>
                   );
                 })}
-                {libraryList.map((l) => (
-                  <div key={l.id} className="flex items-center gap-2 text-xs text-muted-foreground">
-                    <BookOpen className="h-2.5 w-2.5 text-primary/70 shrink-0" />
-                    <span>{l.label || t('calendar.libraryItem', { defaultValue: 'Saved to library' })}</span>
-                  </div>
-                ))}
               </div>
             )}
           </div>

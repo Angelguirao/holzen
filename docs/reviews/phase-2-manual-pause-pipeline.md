@@ -46,7 +46,7 @@ This phase is the second "mental model pass": after Phase 1 (who can reach `/pau
 
 ### `src/hooks/use-holzen.ts` — producer for pause state
 
-- `manualTrigger` -> `generateMessage`: builds context from BTC data; invokes `holzen-reflect` (unless silent mode); creates a pause via `pause_create_or_reuse`, writes `pause_ai_artifacts`, updates `profiles` / `library_items`; sets `message`, `context`, `companions`, `lastPauseInstanceId`.
+- `manualTrigger` -> `generateMessage`: builds context from BTC data; invokes `holzen-reflect` (unless silent mode); creates a pause via `pause_create_or_reuse`, writes `pause_ai_artifacts`; sets `message`, `context`, `companions`, `lastPauseInstanceId`.
 - Cooldown: `manualCooldownRemaining` + `localStorage` key per user.
 
 ### `src/pages/PauseSession.tsx` — pause UI orchestration + restoration
@@ -82,9 +82,8 @@ This phase is the second "mental model pass": after Phase 1 (who can reach `/pau
 - **Edge function: `companion-orchestrate`**
   - Client: `supabase.functions.invoke('companion-orchestrate', ...)` from `use-companion-data.ts` (multiple call sites for load/regenerate).
 - **Direct Supabase client writes (browser)**:
-  - `pause_instances` insert via RPC + `pause_ai_artifacts` upserts
+  - `pause_instances` insert via RPC + `pause_ai_artifacts` upserts (reflect text, companions)
   - `profiles` update (`last_message`, `last_context`, `last_trigger_at` in some paths)
-  - `library_items` upsert (main pause bookmark + optional haiku, `source_type` per row)
 - **Local**:
   - `localStorage` key `holzen_pause_session` for pause step persistence
   - Manual cooldown key `holzen_last_manual_at_*`
@@ -93,7 +92,7 @@ This phase is the second "mental model pass": after Phase 1 (who can reach `/pau
 
 - **`pause_instances`**: inserted on manual generate; `PauseSession` logs step events for mood/outcome/note/etc.
 - **`profiles`**: `last_message`, `last_context`, `last_trigger_at` updated after reflection generation.
-- **`library_items`**: bookmarks linked to `pause_instance_id` (main row `source_type = 'pause'`, companion rows use their slot types, optional `haiku`).
+- **`collections` / `collection_items`**: optional user-defined groupings keyed by `pause_instance_id` (see `use-library.ts`).
 - **Companion-related tables** (server-side via orchestrate): `pause_ai_artifacts`, `companion_cache`, `companion_serves`, etc.
 
 ## Systems that emerge from this review

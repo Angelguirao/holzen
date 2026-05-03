@@ -1,7 +1,7 @@
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { ArrowLeft, Award, Flame, Shield, Target, BookOpen, Feather, Sparkles, Calendar, Mountain, Wind, Lock } from 'lucide-react';
-import { NoxHeaderMain } from '@/components/ui/nox-header';
+import { PageHeading } from '@/components/PageHeading';
 import { Button } from '@/components/ui/button';
 import {
   BADGE_DEFINITIONS,
@@ -141,7 +141,7 @@ export default function BadgeGuide() {
         {t('common.back', { defaultValue: 'Back' })}
       </button>
 
-      <NoxHeaderMain
+      <PageHeading
         title="How badges work"
         subtitle="Each badge marks a real behavioral pattern — not vanity metrics. Here's exactly what unlocks each one."
       />

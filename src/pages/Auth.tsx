@@ -12,7 +12,7 @@ import { Label } from '@/components/ui/label';
 import { Separator } from '@/components/ui/separator';
 import { useTranslation } from 'react-i18next';
 import { checkSignupGate } from '@/lib/signup-gate';
-import { NoxHeaderMain } from '@/components/ui/nox-header';
+import { PageHeading } from '@/components/PageHeading';
 
 type AuthView = 'sign-in' | 'sign-up' | 'forgot-password';
 
@@ -92,7 +92,7 @@ const Auth = () => {
     return (
       <div className="min-h-screen flex items-center justify-center p-6">
         <div className="w-full max-w-sm space-y-6">
-          <NoxHeaderMain title={t('common.holzen')} />
+          <PageHeading title={t('common.holzen')} />
           <p className="text-sm">{t('auth.checkEmailConfirm')}</p>
           <button onClick={() => setConfirmSent(false)} className="text-xs font-mono text-muted-foreground underline">{t('common.back')}</button>
         </div>
@@ -104,7 +104,7 @@ const Auth = () => {
     return (
       <div className="min-h-screen flex items-center justify-center p-6">
         <div className="w-full max-w-sm space-y-6">
-          <NoxHeaderMain title={t('common.holzen')} />
+          <PageHeading title={t('common.holzen')} />
           <p className="text-sm">{t('auth.checkEmailReset')}</p>
           <button onClick={() => { setResetSent(false); setView('sign-in'); }} className="text-muted-foreground underline text-sm font-sans">{t('auth.backToSignIn')}</button>
         </div>
@@ -116,7 +116,7 @@ const Auth = () => {
     return (
       <div className="min-h-screen flex items-center justify-center p-6">
         <div className="w-full max-w-sm space-y-8">
-          <NoxHeaderMain title={t('common.holzen')} subtitle={t('auth.resetYourPassword')} />
+          <PageHeading title={t('common.holzen')} subtitle={t('auth.resetYourPassword')} />
           <form onSubmit={handleForgotPassword} className="space-y-4">
             <div className="space-y-2">
               <Label htmlFor="auth-forgot-email" className="text-base font-sans">{t('auth.email')}</Label>

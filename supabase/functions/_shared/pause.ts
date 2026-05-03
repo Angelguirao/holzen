@@ -18,6 +18,7 @@ import { encodeHex } from "https://deno.land/std@0.224.0/encoding/hex.ts";
 export type PauseState =
   | "active"
   | "engaged"
+  | "pending"
   | "completed"
   | "dismissed"
   | "expired";
@@ -28,6 +29,8 @@ export interface PauseCreateOrReuseResult {
   instance_id: string | null;
   created: boolean;
   reused_reason: "fingerprint_match" | "recent_dismissal" | null;
+  pending_offer?: boolean;
+  prior_open_instance_id?: string | null;
 }
 
 export interface PauseLogCompanionResult {

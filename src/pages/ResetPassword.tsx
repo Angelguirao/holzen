@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useTranslation } from 'react-i18next';
-import { NoxHeaderMain } from '@/components/ui/nox-header';
+import { PageHeading } from '@/components/PageHeading';
 
 const ResetPassword = () => {
   const { t } = useTranslation();
@@ -48,7 +48,7 @@ const ResetPassword = () => {
     return (
       <div className="min-h-screen flex items-center justify-center p-6">
         <div className="w-full max-w-sm space-y-6">
-          <NoxHeaderMain title={t('common.holzen')} />
+          <PageHeading title={t('common.holzen')} />
           <p className="text-sm">{t('auth.passwordUpdated')}</p>
         </div>
       </div>
@@ -58,10 +58,7 @@ const ResetPassword = () => {
   return (
     <div className="min-h-screen flex items-center justify-center p-6">
       <div className="w-full max-w-sm space-y-8">
-        <NoxHeaderMain
-          title={t('common.holzen')}
-          subtitle={ready ? t('auth.setNewPassword') : t('auth.verifyingResetLink')}
-        />
+        <PageHeading title={t('common.holzen')} subtitle={ready ? t('auth.setNewPassword') : t('auth.verifyingResetLink')} />
         {ready && (
           <form onSubmit={handleReset} className="space-y-4">
             <div className="space-y-2">
