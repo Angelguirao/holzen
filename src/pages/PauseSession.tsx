@@ -66,6 +66,7 @@ import { usePauseSessionInitialMoodHandlers } from '@/hooks/use-pause-session-in
 import { usePauseShiftFrameDoneHandler } from '@/hooks/use-pause-shift-frame-done-handler';
 import { usePauseSessionDecideHandler } from '@/hooks/use-pause-session-decide-handler';
 import { usePauseSessionExitNavigation } from '@/hooks/use-pause-session-exit-navigation';
+import { usePauseSessionBreathStepHandlers } from '@/hooks/use-pause-session-breath-step-handlers';
 import type { PauseImpactData } from '@/lib/pause-impact-data';
 import { showPauseStepSyncFailedToast } from '@/lib/pause-step-sync-toast';
 import { usePauseSessionShell } from '@/hooks/use-pause-session-shell';
@@ -376,60 +377,28 @@ export default function PauseSession() {
     breathingSecondCompleted,
   });
 
-  const handleContinueAfterFirstBreath = useCallback(async () => {
-    const ok = await ensureBreathSegment1Logged();
-    if (!ok) return;
-    goToStep('reflect');
-  }, [ensureBreathSegment1Logged, goToStep]);
-
-  const handleContinueAfterSecondBreath = useCallback(async () => {
-    const ok = await ensureBreathSegment2Logged();
-    if (!ok) return;
-    goToStep('choose');
-  }, [ensureBreathSegment2Logged, goToStep]);
-
-  const handleSkipFirstBreath = useCallback(async () => {
-    setBreathingFirstCompleted(false);
-    const ok = await logBreathSegment1Skipped();
-    if (!ok) return;
-    setBreathingFirstCompleted(true);
-    goToStep('reflect');
-  }, [logBreathSegment1Skipped, goToStep]);
-
-  const handleSkipSecondBreath = useCallback(async () => {
-    setBreathingSecondCompleted(false);
-    setDecideOnBackStep('breath2');
-    const ok = await logBreathSegment2Skipped();
-    if (!ok) return;
-    setBreathingSecondCompleted(true);
-    goToStep('decide');
-  }, [logBreathSegment2Skipped, goToStep]);
-
-  const handleBriefBreathContinue = useCallback(async () => {
-    const ok = await ensureBreathSegment1Logged(true);
-    if (!ok) return;
-    setBriefStep('integrate');
-  }, [ensureBreathSegment1Logged]);
-
-  const integrateAdvanceRef = useRef(false);
-  useEffect(() => {
-    if (ritualEntry === 'brief' && briefStep === 'integrate') integrateAdvanceRef.current = false;
-  }, [ritualEntry, briefStep]);
-
-  const handleBriefSkipBreath = useCallback(async () => {
-    setBreathingFirstCompleted(false);
-    const ok = await logBreathSegment1Skipped({ briefRitual: true });
-    if (!ok) return;
-    setBreathingFirstCompleted(true);
-    setBriefStep('integrate');
-  }, [logBreathSegment1Skipped]);
-
-  const handleBriefIntegrateComplete = useCallback(() => {
-    if (integrateAdvanceRef.current) return;
-    integrateAdvanceRef.current = true;
-    setBriefIntegrateDone(true);
-    setBriefStep('decide');
-  }, []);
+  const {
+    handleContinueAfterFirstBreath,
+    handleContinueAfterSecondBreath,
+    handleSkipFirstBreath,
+    handleSkipSecondBreath,
+    handleBriefBreathContinue,
+    handleBriefSkipBreath,
+    handleBriefIntegrateComplete,
+  } = usePauseSessionBreathStepHandlers({
+    goToStep,
+    ritualEntry,
+    briefStep,
+    ensureBreathSegment1Logged,
+    ensureBreathSegment2Logged,
+    logBreathSegment1Skipped,
+    logBreathSegment2Skipped,
+    setBreathingFirstCompleted,
+    setBreathingSecondCompleted,
+    setDecideOnBackStep,
+    setBriefStep,
+    setBriefIntegrateDone,
+  });
 
   const { handleDecide } = usePauseSessionDecideHandler({
     decidingRef,
