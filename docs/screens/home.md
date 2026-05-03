@@ -8,6 +8,7 @@ Authoritative orchestration: [`src/pages/Home.tsx`](../../src/pages/Home.tsx).
 | Section switch + deps type | [`render-home-dashboard-section.tsx`](../../src/components/home/render-home-dashboard-section.tsx) |
 | Pull-to-refresh row | [`HomePullRefreshIndicator.tsx`](../../src/components/home/HomePullRefreshIndicator.tsx) |
 | Customize link button | [`HomeCustomizeLinkButton.tsx`](../../src/components/home/HomeCustomizeLinkButton.tsx) |
+| Zen lazy route (Suspense + `React.lazy`) | [`HomeZenModeRoute.tsx`](../../src/components/home/HomeZenModeRoute.tsx) |
 | Zen layout | [`ZenModeHome.tsx`](../../src/components/home/ZenModeHome.tsx) |
 | Pause widget body | [`HomePauseCardBody.tsx`](../../src/components/home/HomePauseCardBody.tsx) |
 | Pause error panel | [`HomePauseBlockingErrorPanel.tsx`](../../src/components/home/HomePauseBlockingErrorPanel.tsx) |
@@ -17,7 +18,7 @@ Authoritative orchestration: [`src/pages/Home.tsx`](../../src/pages/Home.tsx).
 | Customize copy keys | [`home-customize-section-copy.ts`](../../src/lib/home-customize-section-copy.ts) |
 | Pause error surfacing | [`home-pause-widget-error.ts`](../../src/lib/home-pause-widget-error.ts) |
 
-Hooks (`src/hooks/use-home-*.ts`): checkout welcome toast, zen mode, pinned preview, completed pause count, outlet `pauseReady`, document title, hero quote analytics, pause arrival chime + prefetch, market display preferences (price hide, BTC mode, chart expand).
+Hooks (`src/hooks/use-home-*.ts` / `use-home-*.tsx`): checkout welcome toast, zen mode, pinned preview, completed pause count, outlet `pauseReady`, document title, hero quote analytics, pause arrival chime + prefetch, market display preferences (price hide, BTC mode, chart expand), **visible section ids** (`useHomeVisibleSections`), **customize sheet wiring** (`useHomeCustomizeBridge`), **market + goal/why header chevrons** (`useHomeMarketGoalHeaders`), **pause navigation + checkout** (`useHomePauseActions`), **pause card projection** (`useHomePauseCardProjection`), **memoized `HomeDashboardSectionDeps`** (`useHomeDashboardSectionDeps`), **section renderers** (`useHomeDashboardSectionRenderers`). Use **`HOME_WIDGET_DEFAULT_ORDER`** from optional-visibility for a stable `useWidgetLayout` default-order reference.
 
 ## Purpose
 
@@ -30,7 +31,7 @@ Home is the signed-in landing surface after onboarding: hero quote, optional ins
 | Profile + reflection + BTC context | [`useHolzen`](../../src/hooks/use-holzen.ts) | `message`, `loading`, `error`, `btcData`, `manualTrigger`, cooldown helpers, companions |
 | Subscription / Pro | [`useSubscription`](../../src/hooks/use-subscription.ts) | `subscribed`, `monthlyRemaining`, `startCheckout`, `refresh` |
 | Layout + DnD order | [`useWidgetLayout`](../../src/components/HomeWidget.tsx) | Section order persisted per user expectations |
-| Optional widgets | [`useHomeOptionalVisibility`](../../src/hooks/use-home-optional-visibility.ts) | Toggles + `JOURNEY_STAT_TILES_VISIBILITY_ID` |
+| Optional widgets | [`useHomeOptionalVisibility`](../../src/hooks/use-home-optional-visibility.ts) | Toggles + `JOURNEY_STAT_TILES_VISIBILITY_ID` + `HOME_WIDGET_DEFAULT_ORDER` for layout |
 | Shell | [`AppLayout`](../../src/components/AppLayout.tsx) outlet context | `pauseReady` / `dismissPauseReady` — refresh path when server pushes a pause |
 | Checkout UX | [`CheckoutConfirmation`](../../src/components/CheckoutConfirmation.tsx) | Owns stripping `?subscribed=true` / credits params and the confirmation dialog; Home may still run a lightweight refresh + welcome toast with a **stable Sonner id** so dev Strict Mode does not duplicate toasts |
 

@@ -25,6 +25,12 @@ export const ALL_HOME_SECTION_IDS = [
 ] as const;
 export type AllHomeSectionId = (typeof ALL_HOME_SECTION_IDS)[number];
 
+/**
+ * Stable default order for {@link useWidgetLayout} (copy of `ALL_HOME_SECTION_IDS`).
+ * Pass this reference as `defaultOrder` so `reorder` / `resetLayout` deps stay stable.
+ */
+export const HOME_WIDGET_DEFAULT_ORDER: string[] = [...ALL_HOME_SECTION_IDS];
+
 /** Layout + visibility id for the Holzen score + In motion row (`HomeStatTiles`). */
 export const JOURNEY_STAT_TILES_VISIBILITY_ID = 'journey-pulse' as const;
 
