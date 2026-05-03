@@ -26,7 +26,6 @@ import { PauseDecide } from '@/components/pause/PauseDecide';
 import { PauseDone } from '@/components/pause/PauseDone';
 import { PauseDepthPicker } from '@/components/pause/PauseDepthPicker';
 import { PauseBriefProgress } from '@/components/pause/PauseBriefProgress';
-import { computePauseGoBackPlan } from '@/lib/pause-go-back-plan';
 import { pauseStepSwipeDirection } from '@/lib/pause-step-swipe-direction';
 import { isPauseSessionHeaderBackVisible } from '@/lib/pause-session-header-back';
 import { PauseBriefFeel, type BriefFeelTile } from '@/components/pause/PauseBriefFeel';
@@ -68,6 +67,7 @@ import { showPauseStepSyncFailedToast } from '@/lib/pause-step-sync-toast';
 import { usePauseSessionShell } from '@/hooks/use-pause-session-shell';
 import { usePauseSessionMountLog } from '@/hooks/use-pause-session-mount-log';
 import { usePauseSessionBriefPastStep } from '@/hooks/use-pause-session-brief-past-step';
+import { usePauseSessionGoBack } from '@/hooks/use-pause-session-go-back';
 
 export default function PauseSession() {
   const { t } = useTranslation();
@@ -252,18 +252,15 @@ export default function PauseSession() {
     goToStep,
   });
 
-  const goBack = useCallback(() => {
-    const plan = computePauseGoBackPlan(ritualEntry, briefStep, step);
-    if (plan.kind === 'none') return;
-    setSwipeDirection('back');
-    hapticFeedback('light');
-    if (plan.kind === 'brief') {
-      if (plan.clearBriefIntegrateDone) setBriefIntegrateDone(false);
-      setBriefStep(plan.prev);
-    } else {
-      setStep(plan.prev);
-    }
-  }, [step, ritualEntry, briefStep]);
+  const { goBack } = usePauseSessionGoBack({
+    ritualEntry,
+    briefStep,
+    step,
+    setSwipeDirection,
+    setBriefStep,
+    setBriefIntegrateDone,
+    setStep,
+  });
 
   const breathingRef = useRef<PauseBreathingHandle>(null);
   const decidingRef = useRef(false);
