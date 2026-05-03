@@ -66,6 +66,7 @@ import {
 } from '@/lib/pause-initial-emotion-log';
 import { usePauseSessionStepTransition } from '@/hooks/use-pause-session-step-transition';
 import { usePauseBreathSegmentRpcLoggers } from '@/hooks/use-pause-breath-segment-rpc-loggers';
+import { usePauseFeelShiftLogDedupeRefs } from '@/hooks/use-pause-feel-shift-log-dedupe-refs';
 import { buildShiftEmotionFrameHubLogBundle } from '@/lib/pause-shift-emotion-log';
 import { buildPauseImpactDataOnComplete, type PauseImpactData } from '@/lib/pause-impact-data';
 import { showPauseFavoriteProHintToast } from '@/lib/pause-favorite-toast';
@@ -177,7 +178,7 @@ export default function PauseSession() {
     initialSegment2Logged: restoredIdx > STEPS.indexOf('breath2'),
     t,
   });
-  const lastShiftLogKeyRef = useRef<string | null>(null);
+  const { lastFeelLogKeyRef, lastShiftLogKeyRef } = usePauseFeelShiftLogDedupeRefs(pauseInstanceId);
 
   const [ritualEntry, setRitualEntry] = useState<RitualDepth | 'picker'>(() => initialRitualEntry(restored));
   const [briefStep, setBriefStep] = useState<BriefPauseStep>(() => {
@@ -290,7 +291,6 @@ export default function PauseSession() {
 
   const breathingRef = useRef<PauseBreathingHandle>(null);
   const decidingRef = useRef(false);
-  const lastFeelLogKeyRef = useRef<string | null>(null);
   const [breathTimedActive, setBreathTimedActive] = useState(false);
   const [soundMuted, setSoundMuted] = useState(false);
   const [decideOnBackStep, setDecideOnBackStep] = useState<'choose' | 'breath2'>(() => {
@@ -298,11 +298,6 @@ export default function PauseSession() {
     if (restored?.step === 'decide') return 'breath2';
     return 'choose';
   });
-
-  useEffect(() => {
-    lastFeelLogKeyRef.current = null;
-    lastShiftLogKeyRef.current = null;
-  }, [pauseInstanceId]);
 
   useEffect(() => {
     if (ritualEntry === 'brief') {
@@ -440,7 +435,7 @@ export default function PauseSession() {
     setFrameDone(true);
     setMoodAfterDone(true);
     goToStep('breath2');
-  }, [pauseInstanceId, goToStep, t]);
+  }, [pauseInstanceId, goToStep, t, lastShiftLogKeyRef]);
 
   const handleMoodSelect = useCallback(
     async (
@@ -479,7 +474,7 @@ export default function PauseSession() {
         }
       }
     },
-    [pauseInstanceId, t],
+    [pauseInstanceId, t, lastFeelLogKeyRef],
   );
 
   const handleMoodSkip = useCallback(async () => {
@@ -498,7 +493,7 @@ export default function PauseSession() {
       }
     }
     setMoodDone(true);
-  }, [pauseInstanceId, t]);
+  }, [pauseInstanceId, t, lastFeelLogKeyRef]);
 
   const handleMoodReset = useCallback(() => {
     lastFeelLogKeyRef.current = null;
@@ -506,7 +501,7 @@ export default function PauseSession() {
     setSelectedMood(null);
     setFeelIntensity(null);
     setSelectedBriefFace(null);
-  }, []);
+  }, [lastFeelLogKeyRef]);
 
   const toggleFavorite = useCallback(async () => {
     if (!pauseInstanceId) return;
