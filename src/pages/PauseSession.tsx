@@ -68,9 +68,9 @@ import {
 import { usePauseSessionStepTransition } from '@/hooks/use-pause-session-step-transition';
 import { usePauseBreathSegmentRpcLoggers } from '@/hooks/use-pause-breath-segment-rpc-loggers';
 import { usePauseFeelShiftLogDedupeRefs } from '@/hooks/use-pause-feel-shift-log-dedupe-refs';
+import { usePauseFavoriteToggle } from '@/hooks/use-pause-favorite-toggle';
 import { buildShiftEmotionFrameHubLogBundle } from '@/lib/pause-shift-emotion-log';
 import { buildPauseImpactDataOnComplete, type PauseImpactData } from '@/lib/pause-impact-data';
-import { showPauseFavoriteProHintToast } from '@/lib/pause-favorite-toast';
 import { buildOutcomeLoggedPayload } from '@/lib/pause-outcome-log-payload';
 import { showPauseOutcomeNotCompletedToast, showPauseOutcomeSaveFailedToast } from '@/lib/pause-outcome-toast';
 import { showPauseStepSyncFailedToast } from '@/lib/pause-step-sync-toast';
@@ -154,6 +154,13 @@ export default function PauseSession() {
   const [phase, setPhase] = useState<'session' | 'done'>(restored?.phase ?? 'session');
   const [decision, setDecision] = useState<string | null>(restored?.decision ?? null);
   const [isFavorite, setIsFavorite] = useState(false);
+  const { toggleFavorite } = usePauseFavoriteToggle({
+    pauseInstanceId,
+    isFavorite,
+    setIsFavorite,
+    subscribed,
+    t,
+  });
   const [moodDone, setMoodDone] = useState(restored?.moodDone ?? false);
   const [moodAfterDone, setMoodAfterDone] = useState(restored?.moodAfterDone ?? false);
   const [selectedMood, setSelectedMood] = useState<MoodValue | null>(restored?.selectedMood ?? null);
@@ -501,21 +508,6 @@ export default function PauseSession() {
     setFeelIntensity(null);
     setSelectedBriefFace(null);
   }, [lastFeelLogKeyRef]);
-
-  const toggleFavorite = useCallback(async () => {
-    if (!pauseInstanceId) return;
-    const newVal = !isFavorite;
-    setIsFavorite(newVal);
-    hapticFeedback('light');
-    await pauseLogStep({
-      instanceId: pauseInstanceId,
-      stepType: 'favorite_toggled',
-      payload: { is_favorite: newVal },
-    }).catch(() => setIsFavorite(!newVal));
-    if (newVal && !subscribed) {
-      showPauseFavoriteProHintToast(t);
-    }
-  }, [pauseInstanceId, isFavorite, subscribed, t]);
 
   const handleClose = useCallback(() => {
     navigate('/', { replace: true });
