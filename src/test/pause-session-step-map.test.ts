@@ -3,6 +3,8 @@ import {
   mapPersistedStep,
   initialRitualEntry,
   initialBriefPauseStepFromRestored,
+  initialBriefIntegrateDoneFromRestored,
+  initialSelectedBriefFaceFromRestored,
   briefStepToPauseScienceStep,
 } from '@/lib/pause-session-step-map';
 import type { PersistedSession } from '@/lib/pause-session-storage';
@@ -91,6 +93,32 @@ describe('initialBriefPauseStepFromRestored', () => {
 
   it('falls back to feel when brief ritual has no briefStep', () => {
     expect(initialBriefPauseStepFromRestored(baseSession({ ritualDepth: 'brief' }))).toBe('feel');
+  });
+});
+
+describe('initialBriefIntegrateDoneFromRestored', () => {
+  it('defaults false when absent', () => {
+    expect(initialBriefIntegrateDoneFromRestored(null)).toBe(false);
+    expect(initialBriefIntegrateDoneFromRestored(baseSession({}))).toBe(false);
+  });
+
+  it('reads stored flag', () => {
+    expect(
+      initialBriefIntegrateDoneFromRestored(baseSession({ ritualDepth: 'brief', briefIntegrateDone: true })),
+    ).toBe(true);
+  });
+});
+
+describe('initialSelectedBriefFaceFromRestored', () => {
+  it('defaults null when absent', () => {
+    expect(initialSelectedBriefFaceFromRestored(null)).toBeNull();
+    expect(initialSelectedBriefFaceFromRestored(baseSession({}))).toBeNull();
+  });
+
+  it('reads stored briefFace', () => {
+    expect(
+      initialSelectedBriefFaceFromRestored(baseSession({ ritualDepth: 'brief', briefFace: 'anxious' })),
+    ).toBe('anxious');
   });
 });
 
