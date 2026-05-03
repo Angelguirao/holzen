@@ -31,6 +31,7 @@ import { BRIEF_PAUSE_ORDER } from '@/lib/brief-pause-order';
 import { computeBriefRitualGoBack } from '@/lib/brief-pause-go-back';
 import { pauseStepSwipeDirection } from '@/lib/pause-step-swipe-direction';
 import { computeDeepRitualGoBackTarget } from '@/lib/pause-deep-go-back';
+import { isPauseSessionHeaderBackVisible } from '@/lib/pause-session-header-back';
 import { PauseBriefFeel, type BriefFeelTile } from '@/components/pause/PauseBriefFeel';
 import { PauseBriefIntegrate } from '@/components/pause/PauseBriefIntegrate';
 import { PauseAboutPausesBody } from '@/components/pause/PauseAboutPausesBody';
@@ -395,16 +396,15 @@ export default function PauseSession() {
     goBack,
   ]);
 
-  const showPauseHeaderBack =
-    phase === 'session' &&
-    (ritualEntry === 'brief'
-      ? BRIEF_PAUSE_ORDER.indexOf(briefStep) > 0 ||
-        (briefStep === 'breath' && breathTimedActive) ||
-        (briefStep === 'breath' && breathingFirstCompleted)
-      : STEPS.indexOf(step) > 0 ||
-        ((step === 'breathe' || step === 'breath2') && breathTimedActive) ||
-        ((step === 'breathe' || step === 'breath2') &&
-          (step === 'breathe' ? breathingFirstCompleted : breathingSecondCompleted)));
+  const showPauseHeaderBack = isPauseSessionHeaderBackVisible({
+    phase,
+    ritualEntry,
+    briefStep,
+    step,
+    breathTimedActive,
+    breathingFirstCompleted,
+    breathingSecondCompleted,
+  });
 
   const handleContinueAfterFirstBreath = useCallback(async () => {
     const ok = await ensureBreathSegment1Logged();
