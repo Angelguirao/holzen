@@ -1,6 +1,12 @@
 /** Horizontal slide distance (px) between pause beat panels in `PauseSession`. */
 export const PAUSE_SESSION_STEP_SLIDE_OFFSET_PX = 80;
 
+/** Framer `transition.duration` (seconds) when full motion is allowed. */
+export const PAUSE_SESSION_STEP_TRANSITION_DURATION_S = 0.35;
+
+/** Framer `transition.duration` (seconds) when `prefers-reduced-motion` is on. */
+export const PAUSE_SESSION_STEP_TRANSITION_DURATION_REDUCED_S = 0.1;
+
 export type PauseSessionSwipeDirection = 'forward' | 'back';
 
 export type PauseSessionStepTransitionConfig = {
@@ -28,7 +34,9 @@ export function buildPauseSessionStepTransitionConfig(params: {
     animate: { opacity: 1, x: 0 },
     exit: { opacity: 0, x: slideX === 0 ? 0 : -forwardSign * slideX },
     transition: {
-      duration: params.prefersReducedMotion ? 0.1 : 0.35,
+      duration: params.prefersReducedMotion
+        ? PAUSE_SESSION_STEP_TRANSITION_DURATION_REDUCED_S
+        : PAUSE_SESSION_STEP_TRANSITION_DURATION_S,
       ease: [0.25, 0.1, 0.25, 1],
     },
   };
