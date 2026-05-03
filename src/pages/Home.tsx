@@ -40,7 +40,7 @@ const Home = () => {
   const { t } = useTranslation();
   const { user } = useAuth();
   const navigate = useNavigate();
-  const location = useLocation();
+  const { pathname } = useLocation();
   const { subscribed, loading: subLoading, monthlyRemaining, checkoutLoading, startCheckout, refresh } =
     useSubscription();
   const [searchParams] = useSearchParams();
@@ -101,7 +101,7 @@ const Home = () => {
     toggleMarketChartExpanded,
   } = useHomeMarketDisplayPreferences();
   const unitBasisModeSupported = trackedAssetId === 'bitcoin';
-  const { zenMode, setZenModePersist } = useHomeZenMode(location.pathname);
+  const { zenMode, setZenModePersist } = useHomeZenMode(pathname);
   const { pinnedPausePreview, unpinPausePreview } = useHomePinnedPausePreview(user);
   const completedPauseCount = useHomeCompletedPauseCount(user);
 
