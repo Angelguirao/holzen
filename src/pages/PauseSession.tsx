@@ -44,16 +44,9 @@ import {
 } from '@/lib/pause-session-step-map';
 import { initialDecideOnBackStepFromPersisted } from '@/lib/pause-session-initial-decide-on-back-step';
 import { computePauseStorageRitualSyncPatch } from '@/lib/pause-session-storage-ritual-sync';
-import { buildPauseSessionPersistSnapshot } from '@/lib/pause-session-persist-snapshot';
 import { parsePauseSessionLocationState } from '@/lib/router-location-state';
 import { useFeatureFlag } from '@/hooks/use-feature-flag';
-import {
-  DEFAULT_COMPANIONS,
-  DEFAULT_PREFS,
-  saveSession,
-  loadSession,
-  clearSession,
-} from '@/lib/pause-session-storage';
+import { DEFAULT_COMPANIONS, DEFAULT_PREFS, loadSession, clearSession } from '@/lib/pause-session-storage';
 import {
   resolvePauseBreathSecondLabelVariant,
   viteWantsPauseBreathSecondLabelShift,
@@ -68,6 +61,7 @@ import { usePauseSessionDecideHandler } from '@/hooks/use-pause-session-decide-h
 import { usePauseSessionExitNavigation } from '@/hooks/use-pause-session-exit-navigation';
 import { usePauseSessionBreathStepHandlers } from '@/hooks/use-pause-session-breath-step-handlers';
 import { usePauseSessionHeaderBackHandler } from '@/hooks/use-pause-session-header-back-handler';
+import { usePauseSessionPersistToStorage } from '@/hooks/use-pause-session-persist-to-storage';
 import type { PauseImpactData } from '@/lib/pause-impact-data';
 import { showPauseStepSyncFailedToast } from '@/lib/pause-step-sync-toast';
 import { usePauseSessionShell } from '@/hooks/use-pause-session-shell';
@@ -214,36 +208,7 @@ export default function PauseSession() {
     setSelectedBriefFace(patch.selectedBriefFace);
   }, [pauseInstanceId]);
 
-  useEffect(() => {
-    if (!message) return;
-    saveSession(
-      buildPauseSessionPersistSnapshot({
-        message,
-        context,
-        pauseInstanceId,
-        companions,
-        companionPrefs,
-        severity,
-        moodDone,
-        moodAfterDone,
-        selectedMood,
-        selectedMoodAfter,
-        feelIntensity,
-        shiftIntensity,
-        phase,
-        decision,
-        step,
-        breathingFirstCompleted,
-        breathingSecondCompleted,
-        frameDone,
-        decideOnBackStep,
-        ritualEntry,
-        briefStep,
-        briefIntegrateDone,
-        selectedBriefFace,
-      }),
-    );
-  }, [
+  usePauseSessionPersistToStorage({
     message,
     context,
     pauseInstanceId,
@@ -267,7 +232,7 @@ export default function PauseSession() {
     briefStep,
     briefIntegrateDone,
     selectedBriefFace,
-  ]);
+  });
 
   useEffect(() => {
     if (step === 'breath2') setDecideOnBackStep('choose');
