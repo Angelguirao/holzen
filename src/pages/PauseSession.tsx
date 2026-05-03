@@ -69,7 +69,8 @@ import { usePauseSessionBriefFeelSelect } from '@/hooks/use-pause-session-brief-
  * **Supporting modules:** shell hydration (`use-pause-session-shell`, `use-pause-session-fetch`,
  * `pause-session-hydration`, `pause-session-fetched-instance`), hydrate (`pause-session-step-map`),
  * coalesced shell (`pause-session-shell-view-model`), gate predicates
- * (`pause-session-gate-flags`), scaffold ritual payloads, mount log snapshot — see
+ * (`pause-session-gate-flags`), scaffold ritual payloads + derived shell props
+ * (`pause-session-scaffold-ritual-payloads`, `pause-session-scaffold-ritual-props`), mount log snapshot — see
  * **section 10 (Related docs and code)** in `docs/systems/pause-system.md`.
  * **Structure:** thin page + named hooks + `src/lib` — `docs/fundamentals/react-screen-orchestration.md`.
  */

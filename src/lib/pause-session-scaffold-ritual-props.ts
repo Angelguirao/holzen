@@ -4,6 +4,13 @@ import { PAUSE_DEEP_DISPLAY_STEP_COUNT, pauseDeepMacroStepNumber } from '@/compo
 import { briefStepToPauseScienceStep } from '@/lib/pause-session-step-map';
 import type { BriefPauseStep, RitualDepth } from '@/lib/pause-session-storage';
 
+/**
+ * Non-JSX scaffold props (macro index, session title, science step, science button visibility) derived
+ * from ritual depth + step. Complements `pause-session-scaffold-ritual-payloads.ts` (brief/deep body slots).
+ *
+ * **Call site:** `src/pages/PauseSession.tsx`. **Code map:** `docs/systems/pause-system.md` section 10.
+ */
+
 /** Props fragment for `PauseSessionScaffold` that depend on brief vs deep ritual (not JSX slots). */
 export type PauseSessionScaffoldRitualDerived = {
   macroStepIndex?: number;
