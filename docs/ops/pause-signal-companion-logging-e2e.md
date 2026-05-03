@@ -43,3 +43,4 @@ Use this when you want to **trace one full path** from landing on **`/pause`** t
 - Client: [`src/hooks/use-companion-data.ts`](../../src/hooks/use-companion-data.ts), [`src/lib/holzen-console.ts`](../../src/lib/holzen-console.ts)
 - Edge: [`supabase/functions/_shared/companion-orchestrate-slot-telemetry.ts`](../../supabase/functions/_shared/companion-orchestrate-slot-telemetry.ts), [`supabase/functions/_shared/companion-orchestrate-tasks.ts`](../../supabase/functions/_shared/companion-orchestrate-tasks.ts), [`supabase/functions/_shared/regenerate-only.ts`](../../supabase/functions/_shared/regenerate-only.ts)
 - Pipeline narrative: [`docs/systems/pause/ai-powered-pause-system.md`](../systems/pause/ai-powered-pause-system.md)
+- Pause **DB trail vs PostHog** (what this E2E does *not* replace): [`docs/systems/pause-system.md`](../systems/pause-system.md) §4.1
