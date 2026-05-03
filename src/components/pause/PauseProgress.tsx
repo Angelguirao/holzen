@@ -1,7 +1,8 @@
 import { useTranslation } from 'react-i18next';
 import { cn } from '@/lib/utils';
 
-const STEPS = ['breathe', 'feel', 'reflect', 'shift', 'decide'] as const;
+/** Figma-aligned deep pause: Feel → Breathe → Reflect → Frame → Breathe → Decide */
+const STEPS = ['feel', 'breathe', 'reflect', 'frame', 'breath2', 'decide'] as const;
 export type PauseStep = (typeof STEPS)[number];
 
 interface Props {
@@ -9,15 +10,27 @@ interface Props {
   onStepClick?: (step: PauseStep) => void;
   /** `segment` = full-width macro bars (pause shell); `pill` = compact dash stepper. */
   variant?: 'segment' | 'pill';
+  /** Figma variant B: macro step 5 labeled “Shift” instead of repeating “Breathe”. */
+  breathSecondLabelVariant?: 'breathe' | 'shift';
 }
 
-export function PauseProgress({ currentStep, onStepClick, variant = 'segment' }: Props) {
+export function PauseProgress({
+  currentStep,
+  onStepClick,
+  variant = 'segment',
+  breathSecondLabelVariant = 'breathe',
+}: Props) {
   const { t } = useTranslation();
+  const breath2Label =
+    breathSecondLabelVariant === 'shift'
+      ? t('pause.steps.shift', { defaultValue: 'Shift' })
+      : t('pause.steps.breath2', { defaultValue: 'Breathe' });
   const stepLabels: Record<PauseStep, string> = {
     feel: t('pause.steps.feel', { defaultValue: 'Feel' }),
     breathe: t('pause.steps.breathe', { defaultValue: 'Breathe' }),
     reflect: t('pause.steps.reflect', { defaultValue: 'Reflect' }),
-    shift: t('pause.steps.shift', { defaultValue: 'Shift' }),
+    frame: t('pause.steps.frame', { defaultValue: 'Frame' }),
+    breath2: breath2Label,
     decide: t('pause.steps.decide', { defaultValue: 'Decide' }),
   };
 
@@ -62,7 +75,7 @@ export function PauseProgress({ currentStep, onStepClick, variant = 'segment' }:
   }
 
   return (
-    <div className="flex w-full items-start justify-between gap-1.5 sm:gap-2">
+    <div className="flex w-full items-start justify-between gap-1 sm:gap-2">
       {STEPS.map((step, i) => {
         const isActive = i === currentIndex;
         const isPast = i < currentIndex;
@@ -80,13 +93,13 @@ export function PauseProgress({ currentStep, onStepClick, variant = 'segment' }:
           >
             <div
               className={cn(
-                'h-[3px] w-full max-w-[3.25rem] rounded-full transition-colors duration-300 sm:max-w-[3.75rem]',
+                'h-[3px] w-full max-w-[2.5rem] rounded-full transition-colors duration-300 sm:max-w-[3.25rem]',
                 isActive ? 'bg-foreground' : isPast ? 'bg-foreground/55' : 'bg-muted-foreground/25',
               )}
             />
             <span
               className={cn(
-                'w-full truncate text-center text-[10px] font-medium uppercase leading-tight tracking-wide sm:text-[11px]',
+                'w-full truncate text-center text-[9px] font-medium uppercase leading-tight tracking-wide sm:text-[10px]',
                 isActive ? 'text-foreground' : isPast ? 'text-foreground/80' : 'text-muted-foreground/70',
                 canClick && 'hover:text-foreground',
               )}

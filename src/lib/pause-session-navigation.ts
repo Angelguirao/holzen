@@ -6,19 +6,25 @@ import type { PauseStep } from '@/components/pause/PauseProgress';
  */
 export function canAdvanceFromPauseStep(params: {
   step: PauseStep;
-  breathingCompleted: boolean;
+  /** First breathing segment (after Feel) complete */
+  breathingFirstCompleted: boolean;
+  /** Second breathing segment (after Frame) complete */
+  breathingSecondCompleted: boolean;
   moodDone: boolean;
-  moodAfterDone: boolean;
+  /** Frame hub finished (“I'm done”) */
+  frameDone: boolean;
 }): boolean {
   switch (params.step) {
-    case 'breathe':
-      return params.breathingCompleted;
     case 'feel':
       return params.moodDone;
+    case 'breathe':
+      return params.breathingFirstCompleted;
     case 'reflect':
       return true;
-    case 'shift':
-      return params.moodAfterDone;
+    case 'frame':
+      return params.frameDone;
+    case 'breath2':
+      return params.breathingSecondCompleted;
     case 'decide':
       return false;
     default:

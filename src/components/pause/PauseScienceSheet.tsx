@@ -1,7 +1,17 @@
 import { useTranslation } from 'react-i18next';
-import { Wind, Heart, BookOpen, RefreshCw, Target, ExternalLink } from 'lucide-react';
+import { Wind, Heart, BookOpen, Compass, Target, ExternalLink } from 'lucide-react';
 
 const STEPS = [
+  {
+    key: 'feel',
+    icon: Heart,
+    sources: [
+      {
+        label: 'Lieberman, M. D. et al. (2007). Putting feelings into words. Psychological Science, 18(5), 421–428.',
+        url: 'https://doi.org/10.1111/j.1467-9280.2007.01916.x',
+      },
+    ],
+  },
   {
     key: 'breathe',
     icon: Wind,
@@ -13,16 +23,6 @@ const STEPS = [
       {
         label: 'Lehrer, P. & Gevirtz, R. (2014). Heart rate variability biofeedback. Frontiers in Psychology, 5, 756.',
         url: 'https://doi.org/10.3389/fpsyg.2014.00756',
-      },
-    ],
-  },
-  {
-    key: 'feel',
-    icon: Heart,
-    sources: [
-      {
-        label: 'Lieberman, M. D. et al. (2007). Putting feelings into words. Psychological Science, 18(5), 421–428.',
-        url: 'https://doi.org/10.1111/j.1467-9280.2007.01916.x',
       },
     ],
   },
@@ -41,12 +41,22 @@ const STEPS = [
     ],
   },
   {
-    key: 'shift',
-    icon: RefreshCw,
+    key: 'frame',
+    icon: Compass,
     sources: [
       {
         label: 'Flavell, J. H. (1979). Metacognition and cognitive monitoring. American Psychologist, 34(10), 906–911.',
         url: 'https://www.researchgate.net/publication/232599909_Metacognition_and_cognitive_monitoring_A_new_area_of_cognitive-developmental_inquiry',
+      },
+    ],
+  },
+  {
+    key: 'breath2',
+    icon: Wind,
+    sources: [
+      {
+        label: 'Lehrer, P. & Gevirtz, R. (2014). Heart rate variability biofeedback. Frontiers in Psychology, 5, 756.',
+        url: 'https://doi.org/10.3389/fpsyg.2014.00756',
       },
     ],
   },
