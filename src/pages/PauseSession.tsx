@@ -34,6 +34,11 @@ import { PauseAboutPausesBody } from '@/components/pause/PauseAboutPausesBody';
 import { Sheet, SheetContent, SheetTitle } from '@/components/ui/sheet';
 import { trackedAssetSymbol } from '@/lib/tracked-assets';
 import type { BriefPauseStep, RitualDepth } from '@/lib/pause-session-storage';
+import {
+  mapPersistedStep,
+  initialRitualEntry,
+  briefStepToPauseScienceStep,
+} from '@/lib/pause-session-step-map';
 import { holzenLog } from '@/lib/holzen-console';
 import { parsePauseSessionLocationState } from '@/lib/router-location-state';
 import { useFeatureFlag } from '@/hooks/use-feature-flag';
@@ -61,37 +66,6 @@ type HydrationReady = {
 };
 
 type HydrationState = HydrationReady | { status: 'fetch'; pauseInstanceId: string } | { status: 'empty' };
-
-function mapPersistedStep(s: string | undefined): PauseStep {
-  if (!s || s === 'pause') return 'feel';
-  if (s === 'ground') return 'reflect';
-  if (s === 'shift') return 'frame';
-  if (STEPS.includes(s as PauseStep)) return s as PauseStep;
-  return 'feel';
-}
-
-function initialRitualEntry(
-  restored: ReturnType<typeof loadSession>,
-): RitualDepth | 'picker' {
-  if (!restored?.message) return 'picker';
-  if (restored.ritualDepth === 'brief' || restored.ritualDepth === 'deep') return restored.ritualDepth;
-  if (restored.moodDone || restored.phase === 'done' || restored.step !== 'feel') return 'deep';
-  return 'picker';
-}
-
-/** Brief “Integrate” has no dedicated citations row — highlight Reflect (regulation) sources. */
-function briefStepToPauseScienceStep(brief: BriefPauseStep): PauseStep {
-  switch (brief) {
-    case 'feel':
-      return 'feel';
-    case 'breath':
-      return 'breathe';
-    case 'integrate':
-      return 'reflect';
-    case 'decide':
-      return 'decide';
-  }
-}
 
 export default function PauseSession() {
   const { t } = useTranslation();
