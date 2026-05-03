@@ -1,3 +1,4 @@
+import type { TFunction } from 'i18next';
 import type { BtcPriceData } from '@/lib/btc';
 import { isPausePersistError } from '@/lib/reflection-persist-error';
 
@@ -29,6 +30,31 @@ export function pauseHomeErrorKind(error: string | null): PauseHomeErrorKind | n
     return 'ai';
   }
   return 'generic';
+}
+
+/** User-facing title + optional subtitle for the Home pause error panel (zen + widget). */
+export function pauseHomeErrorStrings(
+  t: TFunction,
+  error: string,
+): { title: string; description: string | null } {
+  const kind = pauseHomeErrorKind(error);
+  if (kind === 'persist') return { title: error, description: null };
+  if (kind === 'network') {
+    return {
+      title: t('home.errors.couldNotReachPrice'),
+      description: t('home.errors.checkConnection'),
+    };
+  }
+  if (kind === 'ai') {
+    return {
+      title: t('home.errors.aiUnavailable'),
+      description: t('home.errors.aiTemporarilyUnavailable'),
+    };
+  }
+  return {
+    title: t('home.errors.somethingWentWrong'),
+    description: t('home.errors.unexpectedError'),
+  };
 }
 
 /**
