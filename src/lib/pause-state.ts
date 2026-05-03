@@ -186,9 +186,9 @@ function allIn<T>(required: readonly T[], present: Set<T>): boolean {
  *   4. `active`/`engaged` and `created_at` + 12h ≤ `now` → `expired` (open max age;
  *      matches Postgres `open_max_age`).
  *   5. **`volatility_v1`:** brief (`brief_ritual` on `initial_emotion_logged`) → `engaged`
- *      after initial only; `completed` after breath + initial + outcome. Deep →
- *      `engaged` after breath + initial; `completed` after those plus shift + outcome.
- *      Companion counts do **not** gate completion.
+ *      after initial only; deep → `engaged` after breath + initial. **`completed`** as soon
+ *      as **`outcome_logged`** exists (any path; ritual order is UX-only). Companion counts
+ *      do **not** gate completion.
  *   6. **Other template slugs:** `required_for_engaged` / `required_for_completed` from
  *      the row, plus `countedCompanionCount` ≥ `required_companion_count` for completed.
  *   7. Otherwise: unchanged.
@@ -242,17 +242,7 @@ export function computePauseState(params: {
     : allIn(template.required_for_engaged, seenSteps);
 
   const completedOk = isVolatilityV1
-    ? briefMode
-      ? allIn(['breath_completed', 'initial_emotion_logged', 'outcome_logged'] as const, seenSteps)
-      : allIn(
-          [
-            'breath_completed',
-            'initial_emotion_logged',
-            'shift_emotion_logged',
-            'outcome_logged',
-          ] as const,
-          seenSteps,
-        )
+    ? seenSteps.has('outcome_logged')
     : allIn(template.required_for_completed, seenSteps) &&
       counted >= template.required_companion_count;
 
