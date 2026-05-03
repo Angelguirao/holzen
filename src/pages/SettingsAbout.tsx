@@ -25,7 +25,7 @@ export default function SettingsAbout() {
           {t('settingsAbout.back', { defaultValue: 'Settings' })}
         </Link>
         {hasNewVersion && (
-          <span className="text-[10px] font-mono bg-primary/10 text-primary px-1.5 py-0.5 rounded-full">
+          <span className="text-[10px] font-mono bg-muted/50 text-muted-foreground px-1.5 py-0.5 rounded-full">
             {t('common.new')}
           </span>
         )}

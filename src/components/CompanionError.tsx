@@ -70,7 +70,7 @@ export function CompanionError({ message, companionType, onRetry }: Props) {
       {onRetry && (
         <button
           onClick={onRetry}
-          className="flex items-center gap-1.5 text-[10px] font-mono text-primary/60 hover:text-primary transition-colors active:scale-[0.97]"
+          className="flex items-center gap-1.5 text-[10px] font-sans font-medium text-nox-text-link/75 hover:text-nox-text-link transition-colors active:scale-[0.97]"
         >
           <RefreshCw className="h-3 w-3" />
           {t('common.retry', { defaultValue: 'Try again' })}

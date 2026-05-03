@@ -119,7 +119,7 @@ export function MilestoneTimeline({ rows }: Props) {
         <ul className="space-y-2">
           {milestones.map((m) => (
             <li key={m.key} className="flex items-center gap-2">
-              <m.icon className="h-3.5 w-3.5 shrink-0 text-primary" aria-hidden />
+              <m.icon className="h-3.5 w-3.5 shrink-0 text-nox-text-highlight" aria-hidden />
               <span className="flex-1 text-sm text-foreground">{m.label}</span>
               <span className="text-[10px] font-mono text-muted-foreground">
                 {format(new Date(m.at), 'MMM d, yyyy')}

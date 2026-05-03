@@ -49,7 +49,7 @@ export function BtcStatus({
       <button
         type="button"
         onClick={onToggleBtcMode}
-        className={cn(homeInWidget.iconBtn, 'text-muted-foreground/40 hover:text-primary')}
+        className={cn(homeInWidget.iconBtn, 'text-muted-foreground/40 hover:text-foreground')}
         aria-label={t('btcStatus.enterBtcMode')}
         title={t('btcStatus.enterBtcMode')}
       >
@@ -63,7 +63,7 @@ export function BtcStatus({
       <button
         type="button"
         onClick={onToggleBtcMode}
-        className={cn(homeInWidget.iconBtn, 'text-primary/60 hover:text-primary')}
+        className={cn(homeInWidget.iconBtn, 'text-foreground/50 hover:text-foreground')}
         aria-label={t('btcStatus.exitBtcMode', { currency: fiatLabelCurrency })}
         title={t('btcStatus.exitBtcMode', { currency: fiatLabelCurrency })}
       >
@@ -163,7 +163,7 @@ export function BtcStatus({
           ? 'text-muted-foreground'
           : data.fearGreed.value <= 75
             ? 'text-chart-2'
-            : 'text-primary'
+            : 'text-nox-accent-green'
     : '';
 
   const showChartBlock = !hidden && chartExpanded;

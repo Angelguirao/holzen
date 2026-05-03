@@ -82,7 +82,7 @@ export function TestimonialRequest({ completedPauseCount }: Props) {
         >
           <div className="flex items-start justify-between gap-2">
             <div className="flex items-center gap-2">
-              <MessageCircle className="h-4 w-4 text-primary shrink-0" />
+              <MessageCircle className="h-4 w-4 text-nox-text-link shrink-0" />
               <p className="text-sm text-foreground font-medium">{t('testimonial.title')}</p>
             </div>
             <button onClick={dismiss} className="text-muted-foreground hover:text-foreground transition-colors">

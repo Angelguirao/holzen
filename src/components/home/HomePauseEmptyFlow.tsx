@@ -92,13 +92,13 @@ export function HomePauseEmptyFlow({
               zen && 'mx-auto',
             )}
           >
-            <Sparkles className="mt-0.5 h-3.5 w-3.5 shrink-0 text-primary" aria-hidden />
+            <Sparkles className="mt-0.5 h-3.5 w-3.5 shrink-0 text-nox-text-highlight" aria-hidden />
             <div className="min-w-0 flex-1">
-              <p className={cn(homeInWidget.kicker, 'text-primary')}>{t('tools.hub.suggestedPill')}</p>
+              <p className={cn(homeInWidget.kicker, 'text-nox-text-highlight/90')}>{t('tools.hub.suggestedPill')}</p>
               <p className="text-sm font-medium text-foreground">{t(TOOLS_PRACTICE_SUGGESTION_LABEL_KEY[primary.id])}</p>
               <p className="mt-0.5 text-xs leading-snug text-muted-foreground">{t(primary.reasonKey)}</p>
             </div>
-            <ChevronRight className="mt-1 h-3.5 w-3.5 shrink-0 text-primary/40" aria-hidden />
+            <ChevronRight className="mt-1 h-3.5 w-3.5 shrink-0 text-muted-foreground/50" aria-hidden />
           </Link>
         ) : lastCheckIn ? (
           <Link
@@ -115,7 +115,7 @@ export function HomePauseEmptyFlow({
           <Link
             to={TOOLS.practice.checkin}
             className={cn(
-              'inline-flex items-center gap-1 text-sm font-medium text-primary underline-offset-4 hover:underline',
+              'inline-flex items-center gap-1 text-sm font-medium text-nox-text-link underline-offset-4 transition-colors hover:text-nox-text-link/80 hover:underline',
               zen && 'mx-auto',
             )}
           >

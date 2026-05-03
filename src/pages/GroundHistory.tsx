@@ -285,7 +285,7 @@ export default function GroundHistory() {
                 <button
                   type="button"
                   onClick={loadMore}
-                  className="text-sm font-medium text-primary underline-offset-4 hover:underline"
+                  className="text-sm font-medium text-nox-text-link underline-offset-4 transition-colors hover:text-nox-text-link/80 hover:underline"
                 >
                   {t('common.loadMore', { defaultValue: 'Load more' })}
                 </button>

@@ -21,7 +21,7 @@ export default function ToolsGroundLayout() {
           >
             <ArrowLeft className="h-5 w-5" />
           </Link>
-          <Anchor className="h-4 w-4 shrink-0 text-primary/40" aria-hidden />
+          <Anchor className="h-4 w-4 shrink-0 text-muted-foreground/50" aria-hidden />
           <div
             className="min-w-0 flex-1 flex justify-stretch gap-1 rounded-lg bg-muted/40 p-1"
             role="tablist"

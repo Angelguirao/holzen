@@ -259,7 +259,7 @@ export function AppConfigTools() {
           </p>
           <button
             onClick={() => void refresh()}
-            className="flex items-center gap-1 text-[10px] font-mono text-muted-foreground/50 hover:text-primary"
+            className="flex items-center gap-1 text-[10px] font-sans font-medium text-muted-foreground/50 hover:text-nox-text-link"
           >
             <RefreshCw className="h-3 w-3" />
             Refresh
@@ -689,7 +689,7 @@ function ToggleRow({
       </div>
       <span
         className={`text-[9px] font-mono flex-shrink-0 ${
-          checked ? 'text-primary' : 'text-muted-foreground/40'
+          checked ? 'text-nox-text-link' : 'text-muted-foreground/40'
         }`}
       >
         {checked ? 'ON' : 'OFF'}
@@ -758,7 +758,7 @@ function SaveRow({ dirty, busy, onSave }: { dirty: boolean; busy: boolean; onSav
         type="button"
         disabled={busy}
         onClick={() => void onSave()}
-        className="flex items-center gap-1.5 text-[10px] font-mono text-primary hover:text-primary/80 disabled:opacity-50"
+        className="flex items-center gap-1.5 text-[10px] font-sans font-medium text-nox-text-link hover:text-nox-text-link/80 disabled:opacity-50"
       >
         {busy ? <Loader2 className="h-3 w-3 animate-spin" /> : <Save className="h-3 w-3" />}
         Save changes
@@ -786,13 +786,13 @@ function FeatureFlagRow({
       className="w-full flex items-center gap-3 text-left disabled:opacity-50"
     >
       <Zap
-        className={`h-3 w-3 flex-shrink-0 ${checked ? 'text-primary/50' : 'text-muted-foreground/30'}`}
+        className={`h-3 w-3 flex-shrink-0 ${checked ? 'text-nox-text-link/60' : 'text-muted-foreground/30'}`}
       />
       <span className="flex-1 text-[10px] font-mono text-foreground/70 truncate">{featureKey}</span>
       {busy ? (
         <Loader2 className="h-3 w-3 animate-spin text-muted-foreground/40" />
       ) : checked ? (
-        <span className="flex items-center gap-1 text-[9px] font-mono text-primary">
+        <span className="flex items-center gap-1 text-[9px] font-mono text-muted-foreground">
           <Check className="h-2.5 w-2.5" /> ON
         </span>
       ) : (

@@ -73,8 +73,8 @@ function describePaymentStatus(event: CheckoutEvent): { label: string; tone: 'pa
 }
 
 const STATUS_TONE_CLASS: Record<'paid' | 'free' | 'pending' | 'failed' | 'neutral', string> = {
-  paid: 'text-primary',
-  free: 'text-primary',
+  paid: 'text-foreground',
+  free: 'text-muted-foreground',
   pending: 'text-muted-foreground',
   failed: 'text-destructive',
   neutral: 'text-muted-foreground',
@@ -83,7 +83,7 @@ const STATUS_TONE_CLASS: Record<'paid' | 'free' | 'pending' | 'failed' | 'neutra
 function GrantBadge({ event }: { event: CheckoutEvent }) {
   if (event.grant_status === 'applied') {
     return (
-      <span className="inline-flex items-center gap-1 text-xs font-mono text-primary">
+      <span className="inline-flex items-center gap-1 text-xs font-mono text-muted-foreground">
         <Check className="h-3 w-3" aria-hidden />
         +{event.granted_credits} credits applied
       </span>

@@ -375,7 +375,7 @@ export function BadgeDebug() {
                         <span
                           className={cn(
                             'text-[10px] font-mono uppercase tracking-widest',
-                            earned ? 'text-primary' : 'text-muted-foreground/60',
+                            earned ? 'text-nox-accent-green' : 'text-muted-foreground/60',
                           )}
                         >
                           {earned ? 'EARNED' : 'LOCKED'} · {snap?.current ?? 0}/{b.requirement}
@@ -388,7 +388,7 @@ export function BadgeDebug() {
                             className="flex items-start gap-2 text-[11px] font-mono leading-snug"
                           >
                             {c.pass ? (
-                              <Check className="h-3 w-3 text-primary shrink-0 mt-0.5" aria-hidden />
+                              <Check className="h-3 w-3 text-nox-accent-green shrink-0 mt-0.5" aria-hidden />
                             ) : (
                               <X className="h-3 w-3 text-destructive/70 shrink-0 mt-0.5" aria-hidden />
                             )}

@@ -155,7 +155,7 @@ export const PauseBreathing = forwardRef<PauseBreathingHandle, Props>(function P
           />
 
           <div className="flex max-w-md flex-col items-center gap-4 text-center">
-            <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-primary/80">
+            <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-muted-foreground">
               {t('pause.breathIntroKicker', { defaultValue: 'Step 1 · Breath' })}
             </p>
             <p className={pauseStepLayout.screenTitle}>
@@ -251,7 +251,7 @@ export const PauseBreathing = forwardRef<PauseBreathingHandle, Props>(function P
           className="flex flex-col items-center gap-5 text-center"
         >
           <div className="w-20 h-20 rounded-full border border-primary/15 bg-primary/5" />
-          <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-primary/80">
+          <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-muted-foreground">
             {t('pause.breathYouAreHere', { defaultValue: "You're here" })}
           </p>
           <p className="text-center font-editorial text-2xl text-foreground sm:text-3xl">

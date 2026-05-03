@@ -66,7 +66,7 @@ const Reserve = () => {
         <motion.div {...m(0.05)} className="space-y-3">
           <div className="flex items-center gap-2.5">
             <div className="h-8 w-8 rounded-full bg-primary/10 flex items-center justify-center">
-              <Bitcoin className="h-4 w-4 text-primary" />
+              <Bitcoin className="h-4 w-4 text-nox-text-highlight" />
             </div>
           </div>
           <PageHeading title={t('reserve.title')} subtitle={t('reserve.subtitle')} />
@@ -119,7 +119,7 @@ const Reserve = () => {
                       </div>
                       <div className="flex items-baseline justify-between">
                         <p className="text-[10px] font-mono text-muted-foreground/70 uppercase tracking-wider">{t('reserve.unrealisedPnl')}</p>
-                        <p className={`text-sm font-mono ${unrealisedPnl !== null && unrealisedPnl >= 0 ? 'text-primary' : 'text-destructive'}`}>
+                        <p className={`text-sm font-mono ${unrealisedPnl !== null && unrealisedPnl >= 0 ? 'text-nox-accent-green' : 'text-destructive'}`}>
                           {unrealisedPnl !== null ? `${unrealisedPnl >= 0 ? '+' : ''}${unrealisedPnl.toFixed(1)}%` : '—'}
                         </p>
                       </div>

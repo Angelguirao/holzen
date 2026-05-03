@@ -59,11 +59,11 @@ export function ArchivePauseCard({ row, echoesPresentation = false }: Props) {
       }
       className={cn(
         'w-full rounded-xl border border-border/40 bg-card/40 px-3 py-3 text-left transition-colors hover:bg-card/70',
-        echoesPresentation && 'border-dashed border-primary/25',
+        echoesPresentation && 'border-dashed border-nox-text-highlight/35',
       )}
     >
       <div className="flex items-start gap-3">
-        <div className="mt-0.5 shrink-0 rounded-full bg-primary/10 p-2 text-primary">
+        <div className="mt-0.5 shrink-0 rounded-full bg-muted/50 p-2 text-muted-foreground">
           <Pause className="h-4 w-4" aria-hidden />
         </div>
         <div className="min-w-0 flex-1 space-y-1">

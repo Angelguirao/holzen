@@ -149,7 +149,7 @@ export function CompanionFeedback({
           onClick={() => handleVote('up')}
           disabled={!!vote || loading || regenBusy}
           className={`p-0.5 rounded transition-colors ${
-            vote === 'up' ? 'text-primary/70' : vote ? 'text-muted-foreground/10' : 'text-muted-foreground/20 hover:text-primary/50'
+            vote === 'up' ? 'text-nox-text-highlight/90' : vote ? 'text-muted-foreground/10' : 'text-muted-foreground/20 hover:text-nox-text-highlight/60'
           }`}
           aria-label="Thumbs up"
         >
@@ -170,7 +170,7 @@ export function CompanionFeedback({
             type="button"
             onClick={handleRegenerate}
             disabled={regenBusy}
-            className="p-0.5 rounded transition-colors text-muted-foreground/25 hover:text-primary/50 disabled:opacity-30"
+            className="p-0.5 rounded transition-colors text-muted-foreground/25 hover:text-nox-text-link/70 disabled:opacity-30"
             aria-label={t('companions.regenerate')}
             title={t('companions.regenerate')}
           >
@@ -189,10 +189,10 @@ export function CompanionFeedback({
         disabled={!!vote || loading || regenBusy}
         className={`p-1 rounded transition-colors ${
           vote === 'up'
-            ? 'text-primary/70'
+            ? 'text-nox-text-highlight/90'
             : vote
             ? 'text-muted-foreground/10'
-            : 'text-muted-foreground/25 hover:text-primary/50'
+            : 'text-muted-foreground/25 hover:text-nox-text-highlight/60'
         }`}
         aria-label="Thumbs up"
       >
@@ -224,7 +224,7 @@ export function CompanionFeedback({
             type="button"
             onClick={handleRegenerate}
             disabled={regenBusy}
-            className="inline-flex items-center gap-1 text-[9px] font-mono text-muted-foreground/40 hover:text-primary/60 disabled:opacity-40 transition-colors"
+            className="inline-flex items-center gap-1 text-[9px] font-sans font-medium text-muted-foreground/40 hover:text-nox-text-link/80 disabled:opacity-40 transition-colors"
           >
             <RefreshCw className={`h-3 w-3 ${regenBusy ? 'animate-spin' : ''}`} />
             {regenBusy ? t('companions.regenerating') : t('companions.regenerate')}

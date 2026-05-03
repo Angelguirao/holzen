@@ -130,7 +130,7 @@ export function SignalFullView({
             <span className="text-xs font-mono text-muted-foreground/70">{host}</span>
             {isTrusted && (
               <span
-                className="inline-flex items-center gap-1 rounded-full border border-primary/20 bg-primary/5 px-1.5 py-[2px] text-[9px] font-mono text-primary/75"
+                className="inline-flex items-center gap-1 rounded-full border border-border/60 bg-muted/30 px-1.5 py-[2px] text-[9px] font-mono text-muted-foreground"
                 role="status"
               >
                 <ShieldCheck className="h-2.5 w-2.5" aria-hidden />
@@ -143,7 +143,7 @@ export function SignalFullView({
           href={signal.url}
           target="_blank"
           rel="noopener noreferrer"
-          className="inline-flex items-center gap-1.5 text-xs font-medium text-primary/85 hover:text-primary transition-colors"
+          className="inline-flex items-center gap-1.5 text-xs font-medium text-nox-text-link/90 hover:text-nox-text-link transition-colors"
         >
           <ExternalLink className="h-3 w-3" />
           {signal.source || t('companions.fullview.signal.readSource')}

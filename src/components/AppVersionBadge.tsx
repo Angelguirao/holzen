@@ -129,7 +129,7 @@ export function AppVersionBadge({ changelogVersion }: { changelogVersion?: strin
         <button
           type="button"
           onClick={applyUpdate}
-          className="inline-flex min-h-9 min-w-[11rem] items-center justify-center gap-1 rounded-sm px-2 py-2 text-left text-[10px] font-mono text-primary/80 hover:bg-primary/5 hover:text-primary active:bg-primary/10 transition-colors"
+          className="inline-flex min-h-9 min-w-[11rem] items-center justify-center gap-1 rounded-sm px-2 py-2 text-left text-[10px] font-mono text-muted-foreground hover:bg-muted/40 hover:text-foreground active:bg-muted/60 transition-colors"
         >
           <RefreshCw className="h-3 w-3" />
           Update available — tap to reload

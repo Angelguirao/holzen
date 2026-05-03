@@ -19,7 +19,7 @@ export function AutoSaveIndicator({ show }: AutoSaveIndicatorProps) {
   if (!visible) return null;
 
   return (
-    <span className="inline-flex items-center gap-1 text-[10px] font-mono text-primary/70 animate-fade-in">
+    <span className="inline-flex items-center gap-1 text-[10px] font-mono text-muted-foreground animate-fade-in">
       <Check className="w-3 h-3" />
       saved
     </span>

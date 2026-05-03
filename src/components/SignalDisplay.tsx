@@ -41,7 +41,7 @@ export function SignalDisplay({ signal, loading, error, onRetry }: SignalDisplay
         href={signal.url}
         target="_blank"
         rel="noopener noreferrer"
-        className="inline-flex items-center gap-1.5 text-[10px] font-mono text-primary/70 hover:text-primary transition-colors"
+        className="inline-flex items-center gap-1.5 text-[10px] font-sans font-medium text-nox-text-link/75 hover:text-nox-text-link transition-colors"
       >
         <ExternalLink className="h-2.5 w-2.5" />
         {signal.source}

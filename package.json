@@ -29,7 +29,8 @@
     "supabase:stop": "supabase stop",
     "supabase:status": "supabase status",
     "supabase:reset": "supabase db reset",
-    "gen:types": "node scripts/gen-supabase-types.mjs"
+    "gen:types": "node scripts/gen-supabase-types.mjs",
+    "design:lint": "npx --yes @google/design.md lint DESIGN.md"
   },
   "dependencies": {
     "@dnd-kit/core": "^6.3.1",

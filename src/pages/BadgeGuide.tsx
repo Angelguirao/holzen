@@ -169,7 +169,7 @@ export default function BadgeGuide() {
           return (
             <div key={skill} className="rounded-lg border border-border/40 bg-muted/10 px-4 py-3 space-y-3">
               <div className="flex items-start gap-2">
-                <Icon className="h-4 w-4 mt-0.5 text-primary shrink-0" aria-hidden />
+                <Icon className="h-4 w-4 mt-0.5 text-nox-text-highlight shrink-0" aria-hidden />
                 <div className="space-y-1">
                   <p className="text-sm font-sans font-medium">{meta.title}</p>
                   <p className="text-xs text-muted-foreground leading-snug">{meta.intro}</p>
@@ -215,7 +215,7 @@ export default function BadgeGuide() {
 
       <div className="rounded-md border border-border/60 bg-muted/30 px-4 py-3 space-y-2">
         <div className="flex items-center gap-2">
-          <Award className="h-4 w-4 text-primary" />
+          <Award className="h-4 w-4 text-nox-text-highlight" />
           <p className="text-sm font-sans font-medium">A note on counting</p>
         </div>
         <p className="text-xs text-muted-foreground leading-relaxed">
@@ -277,7 +277,7 @@ function BadgeRow({ title, unlock, pro }: { title: string; unlock: string; pro?:
     <div className="rounded-lg border border-border/40 bg-muted/10 px-4 py-3 space-y-1">
       <div className="flex items-center justify-between gap-2">
         <p className="text-sm font-sans font-medium">{title}</p>
-        {pro && <Sparkles className="h-3 w-3 text-primary/60" aria-hidden />}
+        {pro && <Sparkles className="h-3 w-3 text-muted-foreground" aria-hidden />}
       </div>
       <p className="text-xs text-muted-foreground leading-snug">{unlock}</p>
     </div>

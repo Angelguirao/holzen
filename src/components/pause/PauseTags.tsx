@@ -63,7 +63,7 @@ export function PauseTags({ pauseInstanceId }: Props) {
         {tags.map((tag) => (
           <span
             key={tag}
-            className="inline-flex items-center gap-1 rounded-full border border-primary/30 bg-primary/5 px-2 py-0.5 text-[10px] font-mono text-primary"
+            className="inline-flex items-center gap-1 rounded-full border border-border/60 bg-muted/30 px-2 py-0.5 text-[10px] font-mono text-muted-foreground"
           >
             #{tag}
             <button

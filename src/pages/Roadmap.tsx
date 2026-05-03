@@ -155,11 +155,11 @@ const Roadmap = () => {
                     onClick={() => toggleVote(item.id)}
                     disabled={!user}
                     className={`shrink-0 flex flex-col items-center gap-0.5 pt-0.5 transition-colors ${
-                      voted ? 'text-primary' : 'text-muted-foreground/40 hover:text-foreground'
+                      voted ? 'text-nox-text-highlight' : 'text-muted-foreground/40 hover:text-foreground'
                     } ${!user ? 'opacity-40 cursor-not-allowed' : ''}`}
                     aria-label={voted ? 'Remove vote' : 'Upvote'}
                   >
-                    <ChevronUp className={`h-3.5 w-3.5 ${voted ? 'text-primary' : ''}`} />
+                    <ChevronUp className={`h-3.5 w-3.5 ${voted ? 'text-nox-text-highlight' : ''}`} />
                     <span className="text-[10px] font-mono">{item.vote_count}</span>
                   </button>
                   <div className="space-y-1.5 min-w-0">

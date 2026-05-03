@@ -139,7 +139,7 @@ function ProviderTile({ name, stat }: { name: Provider; stat: ProviderStat | und
         ) : isInsufficient ? (
           <span className="text-[9px] font-mono text-muted-foreground/45">no signal</span>
         ) : (
-          <span className="flex items-center gap-1 text-[9px] font-mono text-primary">
+          <span className="flex items-center gap-1 text-[9px] font-mono text-muted-foreground">
             <CheckCircle2 className="h-2.5 w-2.5" /> ok
           </span>
         )}
