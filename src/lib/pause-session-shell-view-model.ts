@@ -2,6 +2,15 @@ import type { CompanionData, CompanionPrefs } from '@/components/CompanionSectio
 import type { PauseSessionHydrationReady } from '@/lib/pause-session-hydration';
 import { DEFAULT_COMPANIONS, DEFAULT_PREFS } from '@/lib/pause-session-storage';
 
+/**
+ * Normalizes `PauseSessionHydrationReady | null` into the shell fields the `/pause` route reads
+ * (message, instance id, companions, prefs, severity). When `resolved` is null, severity falls back
+ * to live Holzen; other fields use storage defaults.
+ *
+ * **Call site:** `src/pages/PauseSession.tsx` after `usePauseSessionShell`.
+ * **Hydration:** `docs/systems/pause-system.md` section 7.2; **code map:** same doc, section 10.
+ */
+
 /** Session fields `PauseSession` reads after `usePauseSessionShell` + `computePauseSessionResolved`. */
 export type PauseSessionShellViewModel = {
   message: string;
