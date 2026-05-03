@@ -29,7 +29,6 @@ import type { BriefPauseStep, RitualDepth } from '@/lib/pause-session-storage';
 import { mapPersistedStep, initialRitualEntry } from '@/lib/pause-session-step-map';
 import { initialDecideOnBackStepFromPersisted } from '@/lib/pause-session-initial-decide-on-back-step';
 import { parsePauseSessionLocationState } from '@/lib/router-location-state';
-import { clearSession } from '@/lib/pause-session-storage';
 import { coalescePauseSessionShellViewModel } from '@/lib/pause-session-shell-view-model';
 import {
   isPauseSessionDepthPickerActive,
@@ -59,6 +58,7 @@ import { usePauseSessionBriefPastStep } from '@/hooks/use-pause-session-brief-pa
 import { usePauseSessionGoBack } from '@/hooks/use-pause-session-go-back';
 import { usePauseSessionGoToStep } from '@/hooks/use-pause-session-go-to-step';
 import { buildPauseSessionScaffoldRitualDerived } from '@/lib/pause-session-scaffold-ritual-props';
+import { usePauseSessionPendingPauseOfferNavigation } from '@/hooks/use-pause-session-pending-pause-offer-navigation';
 
 export default function PauseSession() {
   const { t } = useTranslation();
@@ -82,6 +82,12 @@ export default function PauseSession() {
     trackedAssetId,
   } = useHolzen();
   const { subscribed, refresh: refreshSubscription } = useSubscription();
+
+  const { onAfterMutation: pendingOfferAfterMutation, navigateAfterAdopt: pendingOfferNavigateAfterAdopt } =
+    usePauseSessionPendingPauseOfferNavigation({
+      navigate,
+      resyncOpenPauseFromDb,
+    });
 
   const nav = parsePauseSessionLocationState(location.state);
   const {
@@ -367,11 +373,8 @@ export default function PauseSession() {
     >
       <>
         <PendingPauseOfferShell
-          onAfterMutation={() => void resyncOpenPauseFromDb()}
-          navigateAfterAdopt={(instanceId) => {
-            clearSession();
-            navigate('/pause', { state: { pauseInstanceId: instanceId }, replace: true });
-          }}
+          onAfterMutation={pendingOfferAfterMutation}
+          navigateAfterAdopt={pendingOfferNavigateAfterAdopt}
         />
         {sessionOnPicker ? (
           <>
