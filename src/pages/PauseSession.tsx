@@ -56,6 +56,7 @@ import type { PauseState } from '@/lib/pause-state';
 import { getSessionQuote } from '@/lib/wisdom-quotes';
 import {
   computePauseSessionHydration,
+  computePauseSessionResolved,
   type PauseSessionHydrationReady,
   type PauseSessionHydrationState,
 } from '@/lib/pause-session-hydration';
@@ -204,25 +205,18 @@ export default function PauseSession() {
     };
   }, [fetchPauseInstanceId]);
 
-  const resolved: PauseSessionHydrationReady | null = useMemo(() => {
-    if (hydration.status === 'ready') return hydration;
-    if (hydration.status === 'fetch' && fetchedInstance?.reflection_message) {
-      return {
-        status: 'ready',
-        message: fetchedInstance.reflection_message,
-        context: fetchedInstance.context ?? null,
-        pauseInstanceId: fetchedInstance.id,
-        companions: {
-          haiku: fetchedInstance.haiku,
-          groundingTitle: fetchedInstance.grounding_title,
-          groundingBody: fetchedInstance.grounding_body,
-        },
-        companionPrefs: navCompanionPrefs ?? holzenCompanionPrefs ?? DEFAULT_PREFS,
-        severity: navSeverity ?? holzenSeverity,
-      };
-    }
-    return null;
-  }, [hydration, fetchedInstance, navCompanionPrefs, holzenCompanionPrefs, navSeverity, holzenSeverity]);
+  const resolved: PauseSessionHydrationReady | null = useMemo(
+    () =>
+      computePauseSessionResolved({
+        hydration,
+        fetchedInstance,
+        navCompanionPrefs,
+        holzenCompanionPrefs,
+        navSeverity,
+        holzenSeverity,
+      }),
+    [hydration, fetchedInstance, navCompanionPrefs, holzenCompanionPrefs, navSeverity, holzenSeverity],
+  );
 
   useEffect(() => {
     holzenLog.pause('mount', {
