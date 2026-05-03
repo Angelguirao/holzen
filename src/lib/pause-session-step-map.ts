@@ -3,6 +3,15 @@ import type { PauseStep } from '@/components/pause/PauseProgress';
 import { STEPS } from '@/components/pause/PauseProgress';
 import type { BriefPauseStep, PersistedSession, RitualDepth } from '@/lib/pause-session-storage';
 
+/**
+ * Pause route helpers: map persisted step strings and derive initial ritual UI from `PersistedSession`.
+ *
+ * **Persistence contract:** `docs/systems/pause-system.md` section 7.2 (hydration / local snapshot).
+ * **Ritual sync caveat:** `computePauseStorageRitualSyncPatch` in `src/lib/pause-session-storage-ritual-sync.ts`
+ * may intentionally omit `briefStep` when syncing — see `initialBriefPauseStepFromRestored` note below.
+ * **Code map:** same pause doc, section 10 (Related docs and code).
+ */
+
 /** Map persisted `step` string (including legacy keys) to the current `PauseStep` union. */
 export function mapPersistedStep(s: string | undefined): PauseStep {
   if (!s || s === 'pause') return 'feel';
