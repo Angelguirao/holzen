@@ -21,8 +21,8 @@ import { PauseDone } from '@/components/pause/PauseDone';
 import { PauseDepthPicker } from '@/components/pause/PauseDepthPicker';
 import { PauseBriefProgress } from '@/components/pause/PauseBriefProgress';
 import { isPauseSessionHeaderBackVisible } from '@/lib/pause-session-header-back';
-import { PauseBriefFeel, type BriefFeelTile } from '@/components/pause/PauseBriefFeel';
-import { PauseBriefIntegrate } from '@/components/pause/PauseBriefIntegrate';
+import type { BriefFeelTile } from '@/components/pause/PauseBriefFeel';
+import { PauseSessionBriefRitualBody } from '@/components/pause/PauseSessionBriefRitualBody';
 import { PauseAboutPausesBody } from '@/components/pause/PauseAboutPausesBody';
 import { Sheet, SheetContent, SheetTitle } from '@/components/ui/sheet';
 import type { BriefPauseStep, RitualDepth } from '@/lib/pause-session-storage';
@@ -386,6 +386,8 @@ export default function PauseSession() {
     [ritualEntry, briefStep, goToBriefPastStep],
   );
 
+  const briefDecideIntroKicker = t('pause.brief.decideKicker', { defaultValue: 'Step 4 · Decide' });
+
   return (
     <PauseSessionGate
       hasMessage={!!message}
@@ -438,55 +440,30 @@ export default function PauseSession() {
             onSoundMutedChange={setSoundMuted}
           >
             {phase === 'session' && ritualEntry === 'brief' && (
-              <AnimatePresence mode="wait" initial={false}>
-                {briefStep === 'feel' && (
-                  <motion.div key="b-feel" {...stepTransition}>
-                    <PauseBriefFeel
-                      moodDone={moodDone}
-                      selectedMood={selectedMood}
-                      selectedTile={selectedBriefFace}
-                      feelIntensity={feelIntensity}
-                      onSelect={onBriefFeelSelect}
-                      onContinue={() => setBriefStep('breath')}
-                    />
-                  </motion.div>
-                )}
-
-                {briefStep === 'breath' && (
-                  <motion.div key="b-breath" {...stepTransition}>
-                    <PauseBreathing
-                      ref={breathingRef}
-                      key="breath-brief"
-                      breathSegment="first"
-                      ritualVariant="brief"
-                      mantra={mantra}
-                      severity={severity}
-                      completed={breathingFirstCompleted}
-                      onTimedBreathingChange={setBreathTimedActive}
-                      onPatternComplete={() => setBreathingFirstCompleted(true)}
-                      onContinueAfterBreath={() => void handleBriefBreathContinue()}
-                      onSkipBreath={handleBriefSkipBreath}
-                      ritualSoundMuted={soundMuted}
-                    />
-                  </motion.div>
-                )}
-
-                {briefStep === 'integrate' && (
-                  <motion.div key="b-integrate" {...stepTransition}>
-                    <PauseBriefIntegrate done={briefIntegrateDone} onComplete={handleBriefIntegrateComplete} />
-                  </motion.div>
-                )}
-
-                {briefStep === 'decide' && (
-                  <motion.div key="b-decide" {...stepTransition}>
-                    <PauseDecide
-                      onDecide={handleDecide}
-                      onBack={() => setBriefStep('integrate')}
-                      introKicker={t('pause.brief.decideKicker', { defaultValue: 'Step 4 · Decide' })}
-                    />
-                  </motion.div>
-                )}
-              </AnimatePresence>
+              <PauseSessionBriefRitualBody
+                briefStep={briefStep}
+                stepTransition={stepTransition}
+                moodDone={moodDone}
+                selectedMood={selectedMood}
+                selectedBriefFace={selectedBriefFace}
+                feelIntensity={feelIntensity}
+                onBriefFeelSelect={onBriefFeelSelect}
+                onBriefFeelContinueToBreath={() => setBriefStep('breath')}
+                breathingRef={breathingRef}
+                mantra={mantra}
+                severity={severity}
+                breathingFirstCompleted={breathingFirstCompleted}
+                onTimedBreathingChange={setBreathTimedActive}
+                onBriefBreathPatternComplete={() => setBreathingFirstCompleted(true)}
+                onContinueAfterBriefBreath={() => void handleBriefBreathContinue()}
+                onSkipBriefBreath={handleBriefSkipBreath}
+                ritualSoundMuted={soundMuted}
+                briefIntegrateDone={briefIntegrateDone}
+                onBriefIntegrateComplete={handleBriefIntegrateComplete}
+                onDecide={handleDecide}
+                onBriefDecideBack={() => setBriefStep('integrate')}
+                briefDecideIntroKicker={briefDecideIntroKicker}
+              />
             )}
 
             {phase === 'session' && ritualEntry === 'deep' && (
