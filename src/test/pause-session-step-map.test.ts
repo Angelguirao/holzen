@@ -2,6 +2,7 @@ import { describe, it, expect } from 'vitest';
 import {
   mapPersistedStep,
   initialRitualEntry,
+  initialBriefPauseStepFromRestored,
   briefStepToPauseScienceStep,
 } from '@/lib/pause-session-step-map';
 import type { PersistedSession } from '@/lib/pause-session-storage';
@@ -70,6 +71,26 @@ describe('initialRitualEntry', () => {
 
   it('returns picker at feel start with message only', () => {
     expect(initialRitualEntry(baseSession({}))).toBe('picker');
+  });
+});
+
+describe('initialBriefPauseStepFromRestored', () => {
+  it('defaults to feel when no session or not a brief ritual', () => {
+    expect(initialBriefPauseStepFromRestored(null)).toBe('feel');
+    expect(initialBriefPauseStepFromRestored(baseSession({ ritualDepth: 'deep' }))).toBe('feel');
+    expect(initialBriefPauseStepFromRestored(baseSession({}))).toBe('feel');
+  });
+
+  it('uses stored briefStep when ritual is brief', () => {
+    expect(
+      initialBriefPauseStepFromRestored(
+        baseSession({ ritualDepth: 'brief', briefStep: 'integrate' }),
+      ),
+    ).toBe('integrate');
+  });
+
+  it('falls back to feel when brief ritual has no briefStep', () => {
+    expect(initialBriefPauseStepFromRestored(baseSession({ ritualDepth: 'brief' }))).toBe('feel');
   });
 });
 

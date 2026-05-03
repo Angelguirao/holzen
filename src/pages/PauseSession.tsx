@@ -17,7 +17,7 @@ import { isPauseSessionHeaderBackVisible } from '@/lib/pause-session-header-back
 import type { BriefFeelTile } from '@/components/pause/PauseBriefFeel';
 import type { PauseSessionScaffoldShellProps } from '@/components/pause/PauseSessionScaffoldShell';
 import type { BriefPauseStep, RitualDepth } from '@/lib/pause-session-storage';
-import { mapPersistedStep, initialRitualEntry } from '@/lib/pause-session-step-map';
+import { mapPersistedStep, initialRitualEntry, initialBriefPauseStepFromRestored } from '@/lib/pause-session-step-map';
 import { initialDecideOnBackStepFromPersisted } from '@/lib/pause-session-initial-decide-on-back-step';
 import { parsePauseSessionLocationState } from '@/lib/router-location-state';
 import { coalescePauseSessionShellViewModel } from '@/lib/pause-session-shell-view-model';
@@ -178,10 +178,7 @@ export default function PauseSession() {
   const { lastFeelLogKeyRef, lastShiftLogKeyRef } = usePauseFeelShiftLogDedupeRefs(pauseInstanceId);
 
   const [ritualEntry, setRitualEntry] = useState<RitualDepth | 'picker'>(() => initialRitualEntry(restored));
-  const [briefStep, setBriefStep] = useState<BriefPauseStep>(() => {
-    if (restored?.ritualDepth === 'brief' && restored.briefStep) return restored.briefStep;
-    return 'feel';
-  });
+  const [briefStep, setBriefStep] = useState<BriefPauseStep>(() => initialBriefPauseStepFromRestored(restored));
   const [briefIntegrateDone, setBriefIntegrateDone] = useState(restored?.briefIntegrateDone ?? false);
   const [selectedBriefFace, setSelectedBriefFace] = useState<BriefFeelTile | null>(
     (restored?.briefFace as BriefFeelTile | null) ?? null,
