@@ -14,9 +14,14 @@ import { type PauseBreathingHandle } from '@/components/pause/PauseBreathing';
 import { PauseSessionDepthPickerStack } from '@/components/pause/PauseSessionDepthPickerStack';
 import { PauseBriefProgress } from '@/components/pause/PauseBriefProgress';
 import { isPauseSessionHeaderBackVisible } from '@/lib/pause-session-header-back';
-import type { PauseSessionScaffoldShellProps } from '@/components/pause/PauseSessionScaffoldShell';
 import type { BriefPauseStep, RitualDepth } from '@/lib/pause-session-storage';
-import { mapPersistedStep, initialRitualEntry, initialBriefPauseStepFromRestored } from '@/lib/pause-session-step-map';
+import {
+  mapPersistedStep,
+  initialRitualEntry,
+  initialBriefPauseStepFromRestored,
+  initialBriefIntegrateDoneFromRestored,
+  initialSelectedBriefFaceFromRestored,
+} from '@/lib/pause-session-step-map';
 import { initialDecideOnBackStepFromPersisted } from '@/lib/pause-session-initial-decide-on-back-step';
 import { parsePauseSessionLocationState } from '@/lib/router-location-state';
 import { coalescePauseSessionShellViewModel } from '@/lib/pause-session-shell-view-model';
@@ -47,6 +52,7 @@ import { usePauseSessionBriefPastStep } from '@/hooks/use-pause-session-brief-pa
 import { usePauseSessionGoBack } from '@/hooks/use-pause-session-go-back';
 import { usePauseSessionGoToStep } from '@/hooks/use-pause-session-go-to-step';
 import { buildPauseSessionScaffoldRitualDerived } from '@/lib/pause-session-scaffold-ritual-props';
+import { buildPauseSessionScaffoldRitualPayloads } from '@/lib/pause-session-scaffold-ritual-payloads';
 import { usePauseSessionPendingPauseOfferNavigation } from '@/hooks/use-pause-session-pending-pause-offer-navigation';
 import { usePauseSessionDepthPickerHandlers } from '@/hooks/use-pause-session-depth-picker-handlers';
 import { usePauseSessionDeepChooseBridgeHandler } from '@/hooks/use-pause-session-deep-choose-bridge-handler';
@@ -384,67 +390,51 @@ export default function PauseSession() {
 
   const briefDecideIntroKicker = t('pause.brief.decideKicker', { defaultValue: 'Step 4 · Decide' });
 
-  const briefRitual: PauseSessionScaffoldShellProps['briefRitual'] = {
+  const { briefRitual, deepRitual } = buildPauseSessionScaffoldRitualPayloads({
     briefStep,
+    step,
     stepTransition,
     moodDone,
     selectedMood,
     selectedBriefFace,
     feelIntensity,
     onBriefFeelSelect,
-    onBriefFeelContinueToBreath: () => setBriefStep('breath'),
-    breathingRef,
-    mantra,
-    severity,
-    breathingFirstCompleted,
-    onTimedBreathingChange: setBreathTimedActive,
-    onBriefBreathPatternComplete: () => setBreathingFirstCompleted(true),
-    onContinueAfterBriefBreath: () => void handleBriefBreathContinue(),
-    onSkipBriefBreath: handleBriefSkipBreath,
-    ritualSoundMuted: soundMuted,
-    briefIntegrateDone,
-    onBriefIntegrateComplete: handleBriefIntegrateComplete,
-    onDecide: handleDecide,
-    onBriefDecideBack: () => setBriefStep('integrate'),
-    briefDecideIntroKicker,
-  };
-
-  const deepRitual: PauseSessionScaffoldShellProps['deepRitual'] = {
-    step,
-    stepTransition,
-    onMoodSelect: handleMoodSelect,
-    onMoodSkip: handleMoodSkip,
-    onMoodReset: handleMoodReset,
-    moodDone,
-    selectedMood,
-    feelIntensity,
-    goToStep,
+    setBriefStep,
     breathingRef,
     mantra,
     severity,
     breathingFirstCompleted,
     breathingSecondCompleted,
-    onTimedBreathingChange: setBreathTimedActive,
-    onFirstBreathPatternComplete: () => setBreathingFirstCompleted(true),
-    onSecondBreathPatternComplete: () => setBreathingSecondCompleted(true),
-    onContinueAfterFirstBreath: () => void handleContinueAfterFirstBreath(),
-    onContinueAfterSecondBreath: () => void handleContinueAfterSecondBreath(),
-    onSkipFirstBreath: handleSkipFirstBreath,
-    onSkipSecondBreath: handleSkipSecondBreath,
-    ritualSoundMuted: soundMuted,
+    setBreathTimedActive,
+    setBreathingFirstCompleted,
+    setBreathingSecondCompleted,
+    handleBriefBreathContinue,
+    handleBriefSkipBreath,
+    soundMuted,
+    briefIntegrateDone,
+    handleBriefIntegrateComplete,
+    handleDecide,
+    briefDecideIntroKicker,
+    handleMoodSelect,
+    handleMoodSkip,
+    handleMoodReset,
+    goToStep,
+    handleContinueAfterFirstBreath,
+    handleContinueAfterSecondBreath,
+    handleSkipFirstBreath,
+    handleSkipSecondBreath,
     companions,
     companionPrefs,
     pauseInstanceId,
     context,
-    reflectionMessage: message,
+    message,
     isFavorite,
-    onToggleFavorite: toggleFavorite,
+    toggleFavorite,
     subscribed,
-    onFrameImDone: () => void handleFrameImDone(),
-    onDeepChooseBridgeContinue: handleDeepChooseBridgeContinue,
-    onDecide: handleDecide,
+    handleFrameImDone,
+    handleDeepChooseBridgeContinue,
     decideOnBackStep,
-  };
+  });
 
   return (
     <PauseSessionGate
