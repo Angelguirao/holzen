@@ -61,6 +61,7 @@ import {
   initialEmotionSkippedLogDedupeKey,
   initialEmotionSkippedLoggedPayload,
 } from '@/lib/pause-initial-emotion-log';
+import { buildPauseSessionStepTransitionConfig } from '@/lib/pause-session-step-transition';
 import { buildShiftEmotionFrameHubLogBundle } from '@/lib/pause-shift-emotion-log';
 import { buildPauseImpactDataOnComplete, type PauseImpactData } from '@/lib/pause-impact-data';
 import { showPauseFavoriteProHintToast } from '@/lib/pause-favorite-toast';
@@ -688,16 +689,10 @@ export default function PauseSession() {
     [briefStep],
   );
 
-  const slideX = prefersReducedMotion ? 0 : 80;
-  const stepTransition = {
-    initial: { opacity: 0, x: swipeDirection === 'forward' ? slideX : -slideX },
-    animate: { opacity: 1, x: 0 },
-    exit: { opacity: 0, x: swipeDirection === 'forward' ? -slideX : slideX },
-    transition: {
-      duration: prefersReducedMotion ? 0.1 : 0.35,
-      ease: [0.25, 0.1, 0.25, 1] as [number, number, number, number],
-    },
-  };
+  const stepTransition = buildPauseSessionStepTransitionConfig({
+    swipeDirection,
+    prefersReducedMotion: !!prefersReducedMotion,
+  });
 
   const sessionOnPicker = phase === 'session' && ritualEntry === 'picker' && !!message;
 
