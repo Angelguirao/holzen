@@ -144,7 +144,7 @@ Pushing triggers **automatic** DB migrations and edge function deploys to the li
 ## Related docs
 
 - [docs/README.md](docs/README.md) — full docs index, **start-here** reading order, and **canonical sources** (what to edit when docs drift).
-- [docs/fundamentals/react-screen-orchestration.md](docs/fundamentals/react-screen-orchestration.md) — reusable React page patterns (orchestration, hooks, memoization, tests); **beginner primer** + Rules of Hooks examples; distilled from Home.
+- [docs/fundamentals/react-screen-orchestration.md](docs/fundamentals/react-screen-orchestration.md) — reusable React page patterns (orchestration, hooks, memoization, tests); **beginner primer** + Rules of Hooks examples + **guided tour of `Home.tsx`**; distilled from Home.
 - [docs/fundamentals/http-review-playbooks.md](docs/fundamentals/http-review-playbooks.md) — Postman/Bruno step-by-step API review; [bruno/](bruno/) collection, [bruno/SCOPE.md](bruno/SCOPE.md), [bruno/functions-catalog.md](bruno/functions-catalog.md).
 - [docs/ops/logging-strategy.md](docs/ops/logging-strategy.md) — edge vs browser logging, `observe.ts`, correlation IDs.
 - [README.md](README.md) — clone/setup, scripts, high-level layout.
