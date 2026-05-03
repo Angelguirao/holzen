@@ -1,5 +1,5 @@
 import { useState, useRef, useMemo } from 'react';
-import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
+import { useReducedMotion } from 'framer-motion';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useHolzen } from '@/hooks/use-holzen';
@@ -11,18 +11,14 @@ import { type PauseStep, STEPS } from '@/components/pause/PauseProgress';
 import { PauseSessionGate } from '@/components/pause/PauseSessionGate';
 import { PauseSessionScaffold } from '@/components/pause/PauseSessionScaffold';
 import { PendingPauseOfferShell } from '@/components/pause/PendingPauseOfferShell';
-import { PauseFeel } from '@/components/pause/PauseFeel';
-import { PauseBreathing, type PauseBreathingHandle } from '@/components/pause/PauseBreathing';
-import { PauseReflect } from '@/components/pause/PauseReflect';
-import { PauseFrame } from '@/components/pause/PauseFrame';
-import { PauseChooseBridge } from '@/components/pause/PauseChooseBridge';
-import { PauseDecide } from '@/components/pause/PauseDecide';
+import { type PauseBreathingHandle } from '@/components/pause/PauseBreathing';
 import { PauseDone } from '@/components/pause/PauseDone';
 import { PauseDepthPicker } from '@/components/pause/PauseDepthPicker';
 import { PauseBriefProgress } from '@/components/pause/PauseBriefProgress';
 import { isPauseSessionHeaderBackVisible } from '@/lib/pause-session-header-back';
 import type { BriefFeelTile } from '@/components/pause/PauseBriefFeel';
 import { PauseSessionBriefRitualBody } from '@/components/pause/PauseSessionBriefRitualBody';
+import { PauseSessionDeepRitualBody } from '@/components/pause/PauseSessionDeepRitualBody';
 import { PauseAboutPausesBody } from '@/components/pause/PauseAboutPausesBody';
 import { Sheet, SheetContent, SheetTitle } from '@/components/ui/sheet';
 import type { BriefPauseStep, RitualDepth } from '@/lib/pause-session-storage';
@@ -467,100 +463,42 @@ export default function PauseSession() {
             )}
 
             {phase === 'session' && ritualEntry === 'deep' && (
-              <AnimatePresence mode="wait" initial={false}>
-                {step === 'feel' && (
-                  <motion.div key="feel" {...stepTransition}>
-                    <PauseFeel
-                      onMoodSelect={handleMoodSelect}
-                      onMoodSkip={handleMoodSkip}
-                      onMoodReset={handleMoodReset}
-                      moodDone={moodDone}
-                      selectedMood={selectedMood}
-                      feelIntensity={feelIntensity}
-                      onContinue={() => goToStep('breathe')}
-                    />
-                  </motion.div>
-                )}
-
-                {step === 'breathe' && (
-                  <motion.div key="breathe" {...stepTransition}>
-                    <PauseBreathing
-                      ref={breathingRef}
-                      key="breath-segment-first"
-                      breathSegment="first"
-                      ritualVariant="deep"
-                      mantra={mantra}
-                      severity={severity}
-                      completed={breathingFirstCompleted}
-                      onTimedBreathingChange={setBreathTimedActive}
-                      onPatternComplete={() => setBreathingFirstCompleted(true)}
-                      onContinueAfterBreath={() => void handleContinueAfterFirstBreath()}
-                      onSkipBreath={handleSkipFirstBreath}
-                      ritualSoundMuted={soundMuted}
-                    />
-                  </motion.div>
-                )}
-
-                {step === 'reflect' && (
-                  <motion.div key="reflect" {...stepTransition}>
-                    <PauseReflect
-                      companions={companions}
-                      companionPrefs={companionPrefs}
-                      severity={severity}
-                      pauseInstanceId={pauseInstanceId}
-                      context={context}
-                      reflectionMessage={message}
-                      isFavorite={isFavorite}
-                      onToggleFavorite={toggleFavorite}
-                      subscribed={subscribed}
-                      onContinue={() => goToStep('frame')}
-                      mood={selectedMood}
-                    />
-                  </motion.div>
-                )}
-
-                {step === 'frame' && (
-                  <motion.div key="frame" {...stepTransition}>
-                    <PauseFrame
-                      companions={companions}
-                      pauseInstanceId={pauseInstanceId}
-                      reflectionMessage={message}
-                      onImDone={() => void handleFrameImDone()}
-                    />
-                  </motion.div>
-                )}
-
-                {step === 'breath2' && (
-                  <motion.div key="breath2" {...stepTransition}>
-                    <PauseBreathing
-                      ref={breathingRef}
-                      key="breath-segment-second"
-                      breathSegment="second"
-                      ritualVariant="deep"
-                      mantra={mantra}
-                      severity={severity}
-                      completed={breathingSecondCompleted}
-                      onTimedBreathingChange={setBreathTimedActive}
-                      onPatternComplete={() => setBreathingSecondCompleted(true)}
-                      onContinueAfterBreath={() => void handleContinueAfterSecondBreath()}
-                      onSkipBreath={handleSkipSecondBreath}
-                      ritualSoundMuted={soundMuted}
-                    />
-                  </motion.div>
-                )}
-
-                {step === 'choose' && (
-                  <motion.div key="choose" {...stepTransition}>
-                    <PauseChooseBridge onChoose={handleDeepChooseBridgeContinue} />
-                  </motion.div>
-                )}
-
-                {step === 'decide' && (
-                  <motion.div key="decide" {...stepTransition}>
-                    <PauseDecide onDecide={handleDecide} onBack={() => goToStep(decideOnBackStep)} />
-                  </motion.div>
-                )}
-              </AnimatePresence>
+              <PauseSessionDeepRitualBody
+                step={step}
+                stepTransition={stepTransition}
+                onMoodSelect={handleMoodSelect}
+                onMoodSkip={handleMoodSkip}
+                onMoodReset={handleMoodReset}
+                moodDone={moodDone}
+                selectedMood={selectedMood}
+                feelIntensity={feelIntensity}
+                goToStep={goToStep}
+                breathingRef={breathingRef}
+                mantra={mantra}
+                severity={severity}
+                breathingFirstCompleted={breathingFirstCompleted}
+                breathingSecondCompleted={breathingSecondCompleted}
+                onTimedBreathingChange={setBreathTimedActive}
+                onFirstBreathPatternComplete={() => setBreathingFirstCompleted(true)}
+                onSecondBreathPatternComplete={() => setBreathingSecondCompleted(true)}
+                onContinueAfterFirstBreath={() => void handleContinueAfterFirstBreath()}
+                onContinueAfterSecondBreath={() => void handleContinueAfterSecondBreath()}
+                onSkipFirstBreath={handleSkipFirstBreath}
+                onSkipSecondBreath={handleSkipSecondBreath}
+                ritualSoundMuted={soundMuted}
+                companions={companions}
+                companionPrefs={companionPrefs}
+                pauseInstanceId={pauseInstanceId}
+                context={context}
+                reflectionMessage={message}
+                isFavorite={isFavorite}
+                onToggleFavorite={toggleFavorite}
+                subscribed={subscribed}
+                onFrameImDone={() => void handleFrameImDone()}
+                onDeepChooseBridgeContinue={handleDeepChooseBridgeContinue}
+                onDecide={handleDecide}
+                decideOnBackStep={decideOnBackStep}
+              />
             )}
 
             {phase === 'done' && (
