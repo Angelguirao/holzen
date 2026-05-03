@@ -14,7 +14,6 @@ import { type PauseBreathingHandle } from '@/components/pause/PauseBreathing';
 import { PauseSessionDepthPickerStack } from '@/components/pause/PauseSessionDepthPickerStack';
 import { PauseBriefProgress } from '@/components/pause/PauseBriefProgress';
 import { isPauseSessionHeaderBackVisible } from '@/lib/pause-session-header-back';
-import type { BriefFeelTile } from '@/components/pause/PauseBriefFeel';
 import type { PauseSessionScaffoldShellProps } from '@/components/pause/PauseSessionScaffoldShell';
 import type { BriefPauseStep, RitualDepth } from '@/lib/pause-session-storage';
 import { mapPersistedStep, initialRitualEntry, initialBriefPauseStepFromRestored } from '@/lib/pause-session-step-map';
@@ -179,10 +178,10 @@ export default function PauseSession() {
 
   const [ritualEntry, setRitualEntry] = useState<RitualDepth | 'picker'>(() => initialRitualEntry(restored));
   const [briefStep, setBriefStep] = useState<BriefPauseStep>(() => initialBriefPauseStepFromRestored(restored));
-  const [briefIntegrateDone, setBriefIntegrateDone] = useState(restored?.briefIntegrateDone ?? false);
-  const [selectedBriefFace, setSelectedBriefFace] = useState<BriefFeelTile | null>(
-    (restored?.briefFace as BriefFeelTile | null) ?? null,
+  const [briefIntegrateDone, setBriefIntegrateDone] = useState(() =>
+    initialBriefIntegrateDoneFromRestored(restored),
   );
+  const [selectedBriefFace, setSelectedBriefFace] = useState(() => initialSelectedBriefFaceFromRestored(restored));
   const [pickerAboutOpen, setPickerAboutOpen] = useState(false);
 
   const { onBrief: depthPickerOnBrief, onDeep: depthPickerOnDeep, onAboutPauses: depthPickerOnAboutPauses } =

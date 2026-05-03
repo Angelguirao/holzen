@@ -1,3 +1,4 @@
+import type { BriefFeelTile } from '@/components/pause/PauseBriefFeel';
 import type { PauseStep } from '@/components/pause/PauseProgress';
 import { STEPS } from '@/components/pause/PauseProgress';
 import type { BriefPauseStep, PersistedSession, RitualDepth } from '@/lib/pause-session-storage';
@@ -32,6 +33,16 @@ export function initialRitualEntry(restored: PersistedSession | null): RitualDep
 export function initialBriefPauseStepFromRestored(restored: PersistedSession | null): BriefPauseStep {
   if (restored?.ritualDepth === 'brief' && restored.briefStep) return restored.briefStep;
   return 'feel';
+}
+
+/** Hydrate brief “integrate” completion from local storage (defaults false). */
+export function initialBriefIntegrateDoneFromRestored(restored: PersistedSession | null): boolean {
+  return restored?.briefIntegrateDone ?? false;
+}
+
+/** Hydrate brief Feel tile from local storage (`PersistedSession.briefFace`). */
+export function initialSelectedBriefFaceFromRestored(restored: PersistedSession | null): BriefFeelTile | null {
+  return restored?.briefFace ?? null;
 }
 
 /** Brief “Integrate” has no dedicated citations row — highlight Reflect (regulation) sources. */
