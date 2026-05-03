@@ -42,12 +42,7 @@ import {
 } from '@/lib/pause-session-step-map';
 import { initialDecideOnBackStepFromPersisted } from '@/lib/pause-session-initial-decide-on-back-step';
 import { parsePauseSessionLocationState } from '@/lib/router-location-state';
-import { useFeatureFlag } from '@/hooks/use-feature-flag';
 import { DEFAULT_COMPANIONS, DEFAULT_PREFS, clearSession } from '@/lib/pause-session-storage';
-import {
-  resolvePauseBreathSecondLabelVariant,
-  viteWantsPauseBreathSecondLabelShift,
-} from '@/lib/pause-breath-second-label-variant';
 import { usePauseSessionStepTransition } from '@/hooks/use-pause-session-step-transition';
 import { usePauseBreathSegmentRpcLoggers } from '@/hooks/use-pause-breath-segment-rpc-loggers';
 import { usePauseFeelShiftLogDedupeRefs } from '@/hooks/use-pause-feel-shift-log-dedupe-refs';
@@ -63,6 +58,7 @@ import { usePauseSessionRitualStorageSync } from '@/hooks/use-pause-session-ritu
 import { usePauseSessionEntryPresentationEffects } from '@/hooks/use-pause-session-entry-presentation-effects';
 import { usePauseSessionBreathTimedActiveReset } from '@/hooks/use-pause-session-breath-timed-active-reset';
 import { usePauseSessionDepthAndBriefCopy } from '@/hooks/use-pause-session-depth-and-brief-copy';
+import { usePauseSessionBreathSecondLabelVariant } from '@/hooks/use-pause-session-breath-second-label-variant';
 import type { PauseImpactData } from '@/lib/pause-impact-data';
 import { showPauseStepSyncFailedToast } from '@/lib/pause-step-sync-toast';
 import { usePauseSessionShell } from '@/hooks/use-pause-session-shell';
@@ -74,14 +70,7 @@ export default function PauseSession() {
   const { handleClose, handleReturn } = usePauseSessionExitNavigation(navigate);
   const location = useLocation();
   const prefersReducedMotion = useReducedMotion();
-  const { value: step5BreathLabelRaw, ready: step5FlagReady } = useFeatureFlag('pause.step5_breath_label_shift', false);
-  const breathSecondLabelVariant = resolvePauseBreathSecondLabelVariant({
-    viteWantsShift: viteWantsPauseBreathSecondLabelShift(
-      import.meta.env.VITE_PAUSE_STEP5_BREATH_LABEL_SHIFT as string | undefined,
-    ),
-    flagReady: step5FlagReady,
-    posthogRaw: step5BreathLabelRaw,
-  });
+  const breathSecondLabelVariant = usePauseSessionBreathSecondLabelVariant();
   const {
     mantra,
     dismissMessage,
