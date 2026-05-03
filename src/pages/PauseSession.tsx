@@ -56,6 +56,10 @@ import {
 import { pauseLogStep } from '@/lib/pause-api';
 import { breathCompletedSegment1Payload, breathCompletedSegment2Payload } from '@/lib/pause-breath-completed-payload';
 import {
+  resolvePauseBreathSecondLabelVariant,
+  viteWantsPauseBreathSecondLabelShift,
+} from '@/lib/pause-breath-second-label-variant';
+import {
   buildInitialEmotionLoggedPayload,
   initialEmotionLogDedupeKey,
   initialEmotionSkippedLogDedupeKey,
@@ -78,16 +82,14 @@ export default function PauseSession() {
   const navigate = useNavigate();
   const location = useLocation();
   const prefersReducedMotion = useReducedMotion();
-  const viteStep5Shift =
-    import.meta.env.VITE_PAUSE_STEP5_BREATH_LABEL_SHIFT === '1' ||
-    import.meta.env.VITE_PAUSE_STEP5_BREATH_LABEL_SHIFT === 'true' ||
-    import.meta.env.VITE_PAUSE_STEP5_BREATH_LABEL_SHIFT === 'shift';
   const { value: step5BreathLabelRaw, ready: step5FlagReady } = useFeatureFlag('pause.step5_breath_label_shift', false);
-  const breathSecondLabelVariant =
-    viteStep5Shift ||
-    (step5FlagReady && (step5BreathLabelRaw === true || step5BreathLabelRaw === 'shift'))
-      ? 'shift'
-      : 'breathe';
+  const breathSecondLabelVariant = resolvePauseBreathSecondLabelVariant({
+    viteWantsShift: viteWantsPauseBreathSecondLabelShift(
+      import.meta.env.VITE_PAUSE_STEP5_BREATH_LABEL_SHIFT as string | undefined,
+    ),
+    flagReady: step5FlagReady,
+    posthogRaw: step5BreathLabelRaw,
+  });
   const {
     mantra,
     dismissMessage,
