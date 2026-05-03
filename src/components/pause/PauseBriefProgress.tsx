@@ -1,8 +1,7 @@
 import { useTranslation } from 'react-i18next';
+import { BRIEF_PAUSE_ORDER } from '@/lib/brief-pause-order';
 import { cn } from '@/lib/utils';
 import type { BriefPauseStep } from '@/lib/pause-session-storage';
-
-const ORDER: BriefPauseStep[] = ['feel', 'breath', 'integrate', 'decide'];
 
 interface Props {
   currentStep: BriefPauseStep;
@@ -18,11 +17,11 @@ export function PauseBriefProgress({ currentStep, onStepClick }: Props) {
     decide: t('pause.brief.steps.decide', { defaultValue: 'Decide' }),
   };
 
-  const currentIndex = ORDER.indexOf(currentStep);
+  const currentIndex = BRIEF_PAUSE_ORDER.indexOf(currentStep);
 
   return (
     <div className="flex w-full items-start justify-between gap-1 sm:gap-2">
-      {ORDER.map((step, i) => {
+      {BRIEF_PAUSE_ORDER.map((step, i) => {
         const isActive = i === currentIndex;
         const isPast = i < currentIndex;
         const canClick = isPast && onStepClick;
@@ -58,5 +57,3 @@ export function PauseBriefProgress({ currentStep, onStepClick }: Props) {
     </div>
   );
 }
-
-export { ORDER as BRIEF_PAUSE_ORDER };
