@@ -16,6 +16,9 @@ export function usePauseBreathSegmentRpcLoggers(input: {
 }): {
   ensureBreathSegment1Logged: (briefRitual?: boolean) => Promise<boolean>;
   ensureBreathSegment2Logged: () => Promise<boolean>;
+  /** `breath_completed` segment 1 with `skipped: true` (deep or brief). */
+  logBreathSegment1Skipped: (opts?: { briefRitual?: boolean }) => Promise<boolean>;
+  logBreathSegment2Skipped: () => Promise<boolean>;
   breath1RpcDoneRef: MutableRefObject<boolean>;
   breath2RpcDoneRef: MutableRefObject<boolean>;
 } {
@@ -70,5 +73,47 @@ export function usePauseBreathSegmentRpcLoggers(input: {
     }
   }, [pauseInstanceId, t]);
 
-  return { ensureBreathSegment1Logged, ensureBreathSegment2Logged, breath1RpcDoneRef, breath2RpcDoneRef };
+  const logBreathSegment1Skipped = useCallback(
+    async (opts?: { briefRitual?: boolean }): Promise<boolean> => {
+      if (!pauseInstanceId) return true;
+      try {
+        await pauseLogStep({
+          instanceId: pauseInstanceId,
+          stepType: 'breath_completed',
+          payload: breathCompletedSegment1Payload({ skipped: true, ...opts }),
+        });
+        breath1RpcDoneRef.current = true;
+        return true;
+      } catch {
+        showPauseStepSyncFailedToast(t);
+        return false;
+      }
+    },
+    [pauseInstanceId, t],
+  );
+
+  const logBreathSegment2Skipped = useCallback(async (): Promise<boolean> => {
+    if (!pauseInstanceId) return true;
+    try {
+      await pauseLogStep({
+        instanceId: pauseInstanceId,
+        stepType: 'breath_completed',
+        payload: breathCompletedSegment2Payload({ skipped: true }),
+      });
+      breath2RpcDoneRef.current = true;
+      return true;
+    } catch {
+      showPauseStepSyncFailedToast(t);
+      return false;
+    }
+  }, [pauseInstanceId, t]);
+
+  return {
+    ensureBreathSegment1Logged,
+    ensureBreathSegment2Logged,
+    logBreathSegment1Skipped,
+    logBreathSegment2Skipped,
+    breath1RpcDoneRef,
+    breath2RpcDoneRef,
+  };
 }
