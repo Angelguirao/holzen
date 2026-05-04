@@ -367,11 +367,12 @@ const Home = () => {
 
 ### Step 11 — Pause actions (navigation + checkout + cooldown)
 
-```145:157:src/pages/Home.tsx
+```146:159:src/pages/Home.tsx
   const pauseActions = useHomePauseActions({
     message,
     context,
     lastPauseInstanceId,
+    openPauseState,
     companions,
     companionPrefs,
     severity,
@@ -389,7 +390,7 @@ const Home = () => {
 
 ### Step 12 — Pause card body + snooze + pinned inset
 
-```159:183:src/pages/Home.tsx
+```161:187:src/pages/Home.tsx
   const pauseProjection = useHomePauseCardProjection({
     subscriptionReady,
     hasAccess,
@@ -398,6 +399,7 @@ const Home = () => {
     monthlyRemaining,
     checkoutLoading,
     message,
+    openPauseState,
     pauseContextHomePreview,
     loading,
     error,
@@ -412,6 +414,7 @@ const Home = () => {
     manualCooldownRemaining,
     manualTrigger,
     onNavigatePauseWithThis: pauseActions.handleNavigatePauseWithThis,
+    onNavigatePauseFromPendingBanner: pauseActions.handleNavigatePauseWithThisFromPendingBanner,
     onNeedPause: pauseActions.handleNeedAPause,
     onStartCheckoutPro: pauseActions.startProCheckout,
   });

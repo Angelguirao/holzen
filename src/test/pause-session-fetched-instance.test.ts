@@ -19,6 +19,7 @@ describe('buildFetchedPauseInstanceFromFetch', () => {
       haiku: 'line / line / line',
       grounding_title: 'G title',
       grounding_body: 'G body',
+      db_state: null,
     });
   });
 
@@ -31,6 +32,7 @@ describe('buildFetchedPauseInstanceFromFetch', () => {
       haiku: null,
       grounding_title: null,
       grounding_body: null,
+      db_state: null,
     });
   });
 

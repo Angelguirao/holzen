@@ -72,7 +72,7 @@ stateDiagram-v2
 
 **Brief vs deep (`volatility_v1`):** only `**active` → `engaged`** depends on `**brief_ritual**` (**Feel-only** gate vs **Feel + first Breathe** gate — see above). `**completed**` is the same for both: `**outcome_logged**` present. Companion count is not used for completion on this slug.
 
-Exact rules (open max age, supersede, window elapsed) live in `**pause_evaluate_transitions**` in `supabase/migrations/` (search that function name for the latest definition).
+Exact rules (open max age, supersede, window elapsed) live in `**pause_evaluate_transitions**` and the batch helper `**pause_sweep_window_elapsed**` in `supabase/migrations/` (search those names for the latest definition). **`open_max_age`:** **`active`** rows expire **12 hours** after `**created_at**`; **`engaged`** rows expire **12 hours** after `**engaged_at**` (SQL uses `**COALESCE(engaged_at, created_at)**` for anomalies). The client mirror is `**computePauseState**` / `**shouldCountCompanion**` in `**src/lib/pause-state.ts**`.
 
 ### 3.1 Product vocabulary ↔ Postgres (single row per pause)
 
@@ -150,7 +150,7 @@ The **brief** path (~2 min) is a product-only shortening of the ritual UI in `**
 
 **How Postgres knows it is brief:** any `**initial_emotion_logged**` row carries `**payload.brief_ritual**` as boolean `**true**` or string `**"true"**` / `**"t"**` / `**"1"**` (same predicate as `**pause_evaluate_transitions**`). See the client mood log path when the user chooses **Brief pause** from the depth picker.
 
-**Authoritative rules** (latest: `**20260510120000_pause_volatility_v1_completed_outcome_only.sql**` on top of `**20260506200000_pause_volatility_v1_contract_and_transitions.sql**`):
+**Authoritative rules** (latest: `**20260514160000_pause_open_max_age_from_engaged_at.sql**` for `**open_max_age**` timing; `**20260510120000_pause_volatility_v1_completed_outcome_only.sql**` on top of `**20260506200000_pause_volatility_v1_contract_and_transitions.sql**` for engaged/completed gates):
 
 
 | Mode  | `**active**` → `**engaged**` (**set** of `step_type` values; append order ignored) | `**active**` or `**engaged**` → `**completed**` |
@@ -167,7 +167,7 @@ Companion `**counts_for_pause**` is **not** read for completion on `**volatility
 
 **Breath payload:** the client logs a **single** first-segment completion (and optional skip) with `**breath_segment: 1**` and `**brief_ritual: true**` on the `**breath_completed**` payload for traceability (see `**ensureBreathSegment1Logged**` / brief skip handlers in `**PauseSession.tsx**`).
 
-**Client mirror:** `**src/lib/pause-state.ts**` `**computePauseState**` follows the same `**volatility_v1**` rules (brief/deep for **engaged** only; **completed** = `**outcome_logged**`; 12h `**open_max_age**`) so the UI can optimistically match Postgres before the RPC returns.
+**Client mirror:** `**src/lib/pause-state.ts**` `**computePauseState**` follows the same `**volatility_v1**` rules (brief/deep for **engaged** only; **completed** = `**outcome_logged**`; `**open_max_age**` as above) so the UI can optimistically match Postgres before the RPC returns.
 
 ---
 
