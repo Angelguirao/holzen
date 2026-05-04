@@ -73,6 +73,8 @@ export interface FetchedPauseInstance {
   grounding_body: string | null;
   /** Present when hydrating from `pause_instances` (id-only `/pause` navigation). */
   db_state?: PauseState | null;
+  /** ISO timestamp when the row entered `engaged` (for `open_max_age` UI countdown). */
+  engaged_at?: string | null;
 }
 
 type LegacyPauseStep = 'breathe' | 'feel' | 'reflect' | 'shift' | 'decide';

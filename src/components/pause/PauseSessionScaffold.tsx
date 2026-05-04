@@ -38,6 +38,8 @@ interface Props {
   /** When set with `onSoundMutedChange`, header mute controls ritual audio (breathing cues). */
   soundMuted?: boolean;
   onSoundMutedChange?: (muted: boolean) => void;
+  /** Shown under the session title (e.g. engaged-only `open_max_age` countdown). */
+  countdownSlot?: ReactNode;
   children: ReactNode;
 }
 
@@ -64,6 +66,7 @@ export function PauseSessionScaffold({
   hideScienceButton = false,
   soundMuted: soundMutedControlled,
   onSoundMutedChange,
+  countdownSlot,
   children,
 }: Props) {
   const { t } = useTranslation();
@@ -171,6 +174,10 @@ export function PauseSessionScaffold({
                 </Button>
               </div>
             </div>
+
+            {phase === 'session' && countdownSlot ? (
+              <div className="mt-1.5 px-1">{countdownSlot}</div>
+            ) : null}
 
             {phase === 'session' && (
               <>

@@ -296,7 +296,6 @@
   },
   "tools": {
     "title": "Tools",
-    "subtitle": "A place to enter your practices and companion tools.",
     "listIntro": "Open any tool below. Full-screen tools leave the tab bar; use Back or the in-flow actions to return.",
     "letters": "Letters to your future self",
     "lettersDesc": "Sealed in calm or storm, opened when the market flips. Pro feature.",
@@ -306,7 +305,6 @@
     "groundDesc": "Guided session from your activity tags; your journal lives on the second tab in the same experience.",
     "proShortBadge": "Pro",
     "hub": {
-      "shellNote": "Full-screen tools hide the bottom tab bar until you leave the flow (Back or Done).",
       "goodNextStep": "A good next step",
       "suggestedPill": "Suggested",
       "lastCheckIn": "Last check-in",
@@ -1173,6 +1171,12 @@
     "iaClarifier": "This is for saved and browsable content (cards, notes, collections). A chronological log of activity lives under Journey → Activity.",
     "linkActivityLog": "Activity log",
     "pendingPauseHint": "New market context is queued — your Home pause card and pause screen both show how to switch or keep your current pause.",
+    "currentPause": "Current pause",
+    "currentPauseStatusActive": "Active",
+    "currentPauseStatusEngaged": "In ritual",
+    "openCurrentPause": "Open your current pause",
+    "openPauseCta": "Open pause",
+    "currentPauseWindow": "open until",
     "tabItems": "Items",
     "tabArchive": "Archive",
     "viewList": "List",
@@ -1295,6 +1299,7 @@
     "youChose": "You chose deliberately.",
     "return": "Return",
     "sessionTitle": "Your pause",
+    "openMaxCountdown": "{{remaining}} left in this ritual window",
     "brief": {
       "sessionTitle": "Your brief pause",
       "macroProgress": "Step {{n}} of {{total}} · ~2 min",
