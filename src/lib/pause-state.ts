@@ -184,8 +184,8 @@ function allIn<T>(required: readonly T[], present: Set<T>): boolean {
  *   2. `pending` → unchanged.
  *   3. Window elapsed (`now > window_ends_at`) → `expired` **only when**
  *      `template.action_window_ms` is set (matches Postgres).
- *   4. **`open_max_age`:** `active` and `created_at` + 12h ≤ `now` → `expired`; **`engaged`**
- *      and `COALESCE(engaged_at, created_at)` + 12h ≤ `now` → `expired` (matches Postgres).
+ *   4. **`open_max_age` (engaged only):** **`engaged`** and `COALESCE(engaged_at, created_at)` + 12h ≤ `now`
+ *      → `expired`. **`active`** is not time-expired by this rule (matches Postgres).
  *   5. **`volatility_v1`:** **`engaged`** uses a **set** of step types (order not evaluated):
  *      brief → `initial_emotion_logged` only; deep → `initial_emotion_logged` and
  *      `breath_completed` (Feel + first Breathe in normal UI). **`completed`** as soon as
@@ -224,11 +224,7 @@ export function computePauseState(params: {
   }
 
   const openMaxAgeMs = 12 * 60 * 60 * 1000;
-  if (instance.state === 'active') {
-    if (new Date(instance.created_at).getTime() + openMaxAgeMs <= now.getTime()) {
-      return 'expired';
-    }
-  } else if (instance.state === 'engaged') {
+  if (instance.state === 'engaged') {
     const openMaxAnchor = instance.engaged_at ?? instance.created_at;
     if (new Date(openMaxAnchor).getTime() + openMaxAgeMs <= now.getTime()) {
       return 'expired';
@@ -302,11 +298,7 @@ export function shouldCountCompanion(params: {
     return { counts: false, reason: 'outside_window' };
   }
   const openMaxAgeMs = 12 * 60 * 60 * 1000;
-  if (openInstance.state === 'active') {
-    if (new Date(openInstance.created_at).getTime() + openMaxAgeMs <= now.getTime()) {
-      return { counts: false, reason: 'outside_window' };
-    }
-  } else if (openInstance.state === 'engaged') {
+  if (openInstance.state === 'engaged') {
     const anchor = openInstance.engaged_at ?? openInstance.created_at;
     if (new Date(anchor).getTime() + openMaxAgeMs <= now.getTime()) {
       return { counts: false, reason: 'outside_window' };
