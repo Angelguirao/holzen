@@ -306,10 +306,42 @@ describe('computePauseState', () => {
     ).toBe('completed');
   });
 
-  it('expires active or engaged instances older than 12h from created_at (open max age)', () => {
+  it('expires active instances when created_at is older than 12h (open max age)', () => {
     expect(
       computePauseState({
         instance: makeInstance({ created_at: '2026-04-21T18:00:00.000Z' }),
+        template: volatilityTemplate,
+        stepEvents: [],
+        companionEvents: [],
+        now: NOW,
+      }),
+    ).toBe('expired');
+  });
+
+  it('does not expire engaged solely because created_at is old if engaged_at is within 12h', () => {
+    expect(
+      computePauseState({
+        instance: makeInstance({
+          state: 'engaged',
+          created_at: '2026-04-21T18:00:00.000Z',
+          engaged_at: '2026-04-23T19:00:00.000Z',
+        }),
+        template: volatilityTemplate,
+        stepEvents: [],
+        companionEvents: [],
+        now: NOW,
+      }),
+    ).toBe('engaged');
+  });
+
+  it('expires engaged when engaged_at is older than 12h (open max age from engagement)', () => {
+    expect(
+      computePauseState({
+        instance: makeInstance({
+          state: 'engaged',
+          created_at: '2026-04-21T18:00:00.000Z',
+          engaged_at: '2026-04-23T07:00:00.000Z',
+        }),
         template: volatilityTemplate,
         stepEvents: [],
         companionEvents: [],
@@ -372,6 +404,53 @@ describe('shouldCountCompanion', () => {
     expect(
       shouldCountCompanion({
         openInstance: makeInstance({ window_ends_at: '2026-04-23T19:00:00.000Z' }),
+        template: volatilityTemplate,
+        companionEvents: [],
+        companionType: 'signal',
+        now: NOW,
+      }),
+    ).toEqual({ counts: true });
+  });
+
+  it('rejects active past open_max_age from created_at (outside_window)', () => {
+    expect(
+      shouldCountCompanion({
+        openInstance: makeInstance({
+          state: 'active',
+          created_at: '2026-04-21T18:00:00.000Z',
+        }),
+        template: volatilityTemplate,
+        companionEvents: [],
+        companionType: 'signal',
+        now: NOW,
+      }),
+    ).toEqual({ counts: false, reason: 'outside_window' });
+  });
+
+  it('rejects engaged past open_max_age from engaged_at (outside_window)', () => {
+    expect(
+      shouldCountCompanion({
+        openInstance: makeInstance({
+          state: 'engaged',
+          created_at: '2026-04-21T18:00:00.000Z',
+          engaged_at: '2026-04-23T07:00:00.000Z',
+        }),
+        template: volatilityTemplate,
+        companionEvents: [],
+        companionType: 'signal',
+        now: NOW,
+      }),
+    ).toEqual({ counts: false, reason: 'outside_window' });
+  });
+
+  it('allows engaged within open_max_age from engaged_at', () => {
+    expect(
+      shouldCountCompanion({
+        openInstance: makeInstance({
+          state: 'engaged',
+          created_at: '2026-04-21T18:00:00.000Z',
+          engaged_at: '2026-04-23T19:00:00.000Z',
+        }),
         template: volatilityTemplate,
         companionEvents: [],
         companionType: 'signal',

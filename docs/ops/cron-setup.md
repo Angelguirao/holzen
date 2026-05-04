@@ -225,7 +225,7 @@ function batches **three** expiry paths (see
 [`docs/systems/pause-system.md`](../systems/pause-system.md) §3):
 
 1. `active|engaged` past `window_ends_at` → `window_elapsed`
-2. `active|engaged` with `created_at` older than **12 hours** → `open_max_age`
+2. **`open_max_age`:** `active` rows with `created_at` older than **12 hours**, or `engaged` rows with `COALESCE(engaged_at, created_at)` older than **12 hours** (same anchor as `pause_evaluate_transitions`; migration `20260514160000_pause_open_max_age_from_engaged_at.sql`)
 3. `pending` offers older than **12 hours** → `system_cancelled`
 
 Schedule with pg_cron at least **hourly** (minute cadence is fine). If

@@ -19,6 +19,7 @@ export function useHomePauseCardProjection(args: {
   monthlyRemaining: number | undefined;
   checkoutLoading: boolean;
   message: string | null;
+  openPauseState: 'active' | 'engaged' | null;
   pauseContextHomePreview: PauseContextPreview;
   loading: boolean;
   error: string | null;
@@ -33,6 +34,7 @@ export function useHomePauseCardProjection(args: {
   manualCooldownRemaining: () => number;
   manualTrigger: () => void;
   onNavigatePauseWithThis: () => void;
+  onNavigatePauseFromPendingBanner: () => void;
   onNeedPause: () => void;
   onStartCheckoutPro: () => void;
 }) {
@@ -44,6 +46,7 @@ export function useHomePauseCardProjection(args: {
     monthlyRemaining,
     checkoutLoading,
     message,
+    openPauseState,
     pauseContextHomePreview,
     loading,
     error,
@@ -58,6 +61,7 @@ export function useHomePauseCardProjection(args: {
     manualCooldownRemaining,
     manualTrigger,
     onNavigatePauseWithThis,
+    onNavigatePauseFromPendingBanner,
     onNeedPause,
     onStartCheckoutPro,
   } = args;
@@ -89,8 +93,10 @@ export function useHomePauseCardProjection(args: {
         checkoutLoading={checkoutLoading}
         onStartCheckoutPro={onStartCheckoutPro}
         message={message}
+        openPauseState={openPauseState}
         contextPreview={pauseContextHomePreview}
         onPauseWithThis={onNavigatePauseWithThis}
+        onPauseWithThisFromPendingBanner={onNavigatePauseFromPendingBanner}
         loading={loading}
         error={error}
         btcData={btcData}
@@ -112,8 +118,10 @@ export function useHomePauseCardProjection(args: {
       checkoutLoading,
       onStartCheckoutPro,
       message,
+      openPauseState,
       pauseContextHomePreview,
       onNavigatePauseWithThis,
+      onNavigatePauseFromPendingBanner,
       loading,
       error,
       btcData,

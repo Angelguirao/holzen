@@ -77,10 +77,13 @@ export function useHolzen() {
   /** True briefly after a new pause message is shown — Home uses it for one-shot chime. */
   const [newPauseArrival, setNewPauseArrival] = useState(false);
   const [lastPauseInstanceId, setLastPauseInstanceId] = useState<string | null>(null);
+  /** From `v_pause_current.state` — `active` vs `engaged` for Home CTA copy. */
+  const [openPauseState, setOpenPauseState] = useState<'active' | 'engaged' | null>(null);
   const [lastTriggerAt, setLastTriggerAt] = useState<string | null>(null);
 
   const clearOpenPausePreview = useCallback(() => {
     setLastPauseInstanceId(null);
+    setOpenPauseState(null);
     setLastTriggerAt(null);
     setMessage(null);
     setContext(null);
@@ -96,7 +99,7 @@ export function useHolzen() {
     }
     const { data } = await supabase
       .from('v_pause_current' as never)
-      .select('id, created_at, context_snapshot')
+      .select('id, created_at, context_snapshot, state')
       .eq('user_id', user.id)
       .maybeSingle();
 
@@ -111,8 +114,10 @@ export function useHolzen() {
       id: string;
       created_at: string;
       context_snapshot: Record<string, unknown> | null;
+      state?: string;
     };
     setLastPauseInstanceId(row.id);
+    setOpenPauseState(row.state === 'engaged' ? 'engaged' : row.state === 'active' ? 'active' : null);
     setLastTriggerAt(row.created_at);
     const ctxText = typeof row.context_snapshot?.context_text === 'string'
       ? (row.context_snapshot.context_text as string)
@@ -527,6 +532,7 @@ export function useHolzen() {
     setContext(null);
     setCompanions({ haiku: null, groundingTitle: null, groundingBody: null });
     setLastPauseInstanceId(null);
+    setOpenPauseState(null);
     if (!user) return;
     try {
       await supabase.rpc('pause_dismiss_current' as never);
@@ -568,6 +574,7 @@ export function useHolzen() {
     companions,
     severity,
     lastPauseInstanceId,
+    openPauseState,
     loading,
     error,
     newPauseArrival,
