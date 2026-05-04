@@ -12,6 +12,7 @@ import { homeInWidget } from '@/components/home/home-widget-styles';
 import { cn } from '@/lib/utils';
 import { shouldSurfacePauseWidgetError } from '@/lib/home-pause-widget-error';
 import type { BtcPriceData } from '@/lib/btc';
+import { usePendingPauseOffer } from '@/hooks/use-pending-pause-offer';
 
 interface HomePauseCardBodyProps {
   subLoading: boolean;
@@ -21,8 +22,13 @@ interface HomePauseCardBodyProps {
   checkoutLoading: boolean;
   onStartCheckoutPro: () => void;
   message: string | null;
+  openPauseState: 'active' | 'engaged' | null;
   contextPreview: { btc24h: string | null; marketSentiment: string | null };
   onPauseWithThis: () => void;
+  /** Pending-context banner CTA (PostHog + navigate); falls back to {@link onPauseWithThis} if omitted. */
+  onPauseWithThisFromPendingBanner?: () => void;
+  /** Ends the open pause via `pause_dismiss_current` (clears pending too). Shown with reflection CTAs. */
+  onDismissOpenPause: () => void;
   loading: boolean;
   error: string | null;
   btcData: BtcPriceData | null;
@@ -45,8 +51,11 @@ export function HomePauseCardBody({
   checkoutLoading,
   onStartCheckoutPro,
   message,
+  openPauseState,
   contextPreview,
   onPauseWithThis,
+  onPauseWithThisFromPendingBanner,
+  onDismissOpenPause,
   loading,
   error,
   btcData,
@@ -60,7 +69,13 @@ export function HomePauseCardBody({
   onNeedPause,
 }: HomePauseCardBodyProps) {
   const { t } = useTranslation();
+  const { pending } = usePendingPauseOffer();
+  const onPendingBannerPause = onPauseWithThisFromPendingBanner ?? onPauseWithThis;
   const blockingError = error && shouldSurfacePauseWidgetError(error, btcData) ? error : null;
+  const pausePrimaryCta =
+    openPauseState === 'engaged'
+      ? t('home.pauseCtaEngaged')
+      : t('home.pauseCtaActive');
 
   return (
     <div className="space-y-4">
@@ -89,6 +104,22 @@ export function HomePauseCardBody({
 
           {message ? (
             <div className="space-y-4">
+              {pending ? (
+                <div
+                  className="rounded-lg border border-amber-500/30 bg-amber-500/10 px-3 py-2.5 text-[12px] leading-snug text-foreground/95"
+                  role="status"
+                >
+                  <p className="font-medium text-foreground">{t('home.pendingQueuedTitle')}</p>
+                  <p className="mt-1 text-foreground/85">{t('home.pendingQueuedBody')}</p>
+                  <button
+                    type="button"
+                    onClick={onPendingBannerPause}
+                    className="mt-2 w-full rounded-md border border-amber-600/40 bg-background/80 px-2 py-1.5 text-center text-[12px] font-medium text-foreground hover:bg-background"
+                  >
+                    {t('home.pendingQueuedCta')}
+                  </button>
+                </div>
+              ) : null}
               <HomePauseContextMeta
                 btc24h={contextPreview.btc24h}
                 marketSentiment={contextPreview.marketSentiment}
@@ -100,7 +131,17 @@ export function HomePauseCardBody({
                 className={cn(homeInWidget.ctaPrimary, 'bg-foreground text-background hover:bg-foreground/90')}
               >
                 <Sparkles className="h-4 w-4 shrink-0 text-background" aria-hidden />
-                {t('onboarding.pauseWithThis')}
+                {pausePrimaryCta}
+              </button>
+              <button
+                type="button"
+                onClick={onDismissOpenPause}
+                title={t('home.pauseDismissHint', {
+                  defaultValue: 'Ends this open pause without finishing the ritual. You can start a new one anytime.',
+                })}
+                className="w-full rounded-md border border-border/80 bg-transparent px-3 py-2 text-center text-[12px] font-medium text-muted-foreground transition-colors hover:bg-muted/30 hover:text-foreground"
+              >
+                {t('home.pauseDismissCta', { defaultValue: 'Dismiss pause' })}
               </button>
             </div>
           ) : (

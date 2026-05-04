@@ -12,7 +12,7 @@
  * stay typed at this module boundary.
  *
  * See: `supabase/migrations/20260423201000_pause_rpc_functions.sql`,
- *      `docs/systems/pause-system.md`.
+ *      `docs/systems/pause-system.md` (section 4 — RPCs and transitions; section 7 — client ritual).
  */
 
 import { supabase } from '@/integrations/supabase/client';

@@ -3,12 +3,17 @@ import type { NavigateFunction } from 'react-router-dom';
 import type { CompanionData, CompanionPrefs } from '@/components/CompanionSection';
 import type { BtcMoveSeverity } from '@/lib/btc-move-severity';
 import { holzenLog } from '@/lib/holzen-console';
+import { trackEvent } from '@/lib/posthog';
+
+export type PauseDismissAnalyticsSurface = 'home_zen_reflection' | 'home_your_pause_widget';
 import { type PauseSessionLocationState } from '@/lib/router-location-state';
 
 export function useHomePauseActions(args: {
   message: string | null;
   context: string | null;
   lastPauseInstanceId: string | null;
+  /** Current open pause row state from `v_pause_current` (for analytics on pending-banner CTA). */
+  openPauseState: 'active' | 'engaged' | null;
   companions: CompanionData;
   companionPrefs: CompanionPrefs;
   severity: BtcMoveSeverity;
@@ -17,11 +22,14 @@ export function useHomePauseActions(args: {
   manualTrigger: () => void;
   manualCooldownRemaining: () => number;
   startCheckout: (target?: 'pro' | 'pro_plus' | 'flex_pack_s' | 'flex_pack_m') => Promise<void>;
+  /** PostHog `pause_open_dismissed.surface` — Zen reflection Done vs dashboard Your pause widget. */
+  dismissAnalyticsSurface: PauseDismissAnalyticsSurface;
 }) {
   const {
     message,
     context,
     lastPauseInstanceId,
+    openPauseState,
     companions,
     companionPrefs,
     severity,
@@ -30,6 +38,7 @@ export function useHomePauseActions(args: {
     manualTrigger,
     manualCooldownRemaining,
     startCheckout,
+    dismissAnalyticsSurface,
   } = args;
 
   const handleNeedAPause = useCallback(() => {
@@ -43,13 +52,21 @@ export function useHomePauseActions(args: {
   }, [manualCooldownRemaining, manualTrigger]);
 
   const handleDismiss = useCallback(() => {
-    dismissMessage();
-  }, [dismissMessage]);
+    try {
+      trackEvent('pause_open_dismissed', {
+        surface: dismissAnalyticsSurface,
+        pause_instance_id: lastPauseInstanceId ?? undefined,
+      });
+    } catch {
+      /* no-op */
+    }
+    void dismissMessage();
+  }, [dismissMessage, dismissAnalyticsSurface, lastPauseInstanceId]);
 
   const handleNavigatePauseWithThis = useCallback(() => {
-    if (!message) return;
+    if (!message && !lastPauseInstanceId) return;
     const navState: PauseSessionLocationState = {
-      reflectionMessage: message,
+      reflectionMessage: message ?? '',
       context,
       pauseInstanceId: lastPauseInstanceId ?? undefined,
       companions,
@@ -70,9 +87,28 @@ export function useHomePauseActions(args: {
     navigate('/pause', { state: navState });
   }, [message, context, lastPauseInstanceId, companions, companionPrefs, severity, navigate]);
 
+  const handleNavigatePauseWithThisFromPendingBanner = useCallback(() => {
+    if (!message && !lastPauseInstanceId) return;
+    try {
+      trackEvent('home.pending_pause_banner_pause_opened', {
+        pause_instance_id: lastPauseInstanceId ?? undefined,
+        open_pause_state: openPauseState ?? undefined,
+      });
+    } catch {
+      /* no-op */
+    }
+    handleNavigatePauseWithThis();
+  }, [message, lastPauseInstanceId, openPauseState, handleNavigatePauseWithThis]);
+
   const startProCheckout = useCallback(() => {
     startCheckout('pro');
   }, [startCheckout]);
 
-  return { handleNeedAPause, handleDismiss, handleNavigatePauseWithThis, startProCheckout };
+  return {
+    handleNeedAPause,
+    handleDismiss,
+    handleNavigatePauseWithThis,
+    handleNavigatePauseWithThisFromPendingBanner,
+    startProCheckout,
+  };
 }

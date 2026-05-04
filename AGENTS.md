@@ -6,6 +6,31 @@ Instructions for AI assistants and automation working in this repository (e.g. C
 
 **Holzen** is a React + TypeScript SPA for Bitcoin-aware mindfulness: breathing/grounding flows, journaling, a library, and AI-style companions backed by **Supabase** (Postgres, auth, Row Level Security, Edge Functions). **Stripe** is used for subscriptions via edge functions.
 
+## Change map (read this before non-trivial edits)
+
+Use this table to pick the **canonical narrative** for the slice you are touching and the **paired artifacts** reviewers expect in the same change. The full doc tree and “who owns what” live in [docs/README.md](docs/README.md) (canonical sources table). Prefer **one owner doc per behavior change** so guidance does not drift.
+
+| If you change… | Read first (canonical) | Also update / verify in the same PR when relevant |
+|----------------|------------------------|-----------------------------------------------------|
+| App boot, routing, auth wiring, Lovable vs local | [docs/fundamentals/navigating-the-codebase.md](docs/fundamentals/navigating-the-codebase.md) | [docs/systems/routing/route-gating-system.md](docs/systems/routing/route-gating-system.md) if gates change |
+| Nav, IA, primary routes, bottom nav | [docs/design/information-architecture.md](docs/design/information-architecture.md) + `src/App.tsx` / `src/lib/app-routes.ts` | [docs/ops/event-taxonomy.md](docs/ops/event-taxonomy.md) if `navigation.*` or product surface names in analytics change |
+| Pause lifecycle, instances, events, artifacts, stats hooks | [docs/systems/pause-system.md](docs/systems/pause-system.md) | RPCs/migrations listed under **Where to change what → Pause**; keep `invokeEdge` / `x-cid` intact |
+| Pause AI, companions, edge orchestration, cron | [docs/systems/pause/ai-powered-pause-system.md](docs/systems/pause/ai-powered-pause-system.md) | [docs/systems/costs/ai-cost-model.md](docs/systems/costs/ai-cost-model.md) when limits/flags/cost paths change |
+| Profile stats UI and skills-first model | [docs/systems/stats-system.md](docs/systems/stats-system.md) | `src/components/stats/`, `src/lib/stats/`, `use-pause-stats-data` |
+| Badges (families, definitions, sync) | [docs/systems/badges-system.md](docs/systems/badges-system.md) | `src/lib/badges/`, `use-badge-sync`, `BadgesPanelV2` |
+| Postgres functions, RLS, triggers, views | [docs/ops/migration-security-conventions.md](docs/ops/migration-security-conventions.md) | [docs/ops/migration-view-safety.md](docs/ops/migration-view-safety.md) for views; `npm run gen:types` when possible |
+| New or renamed edge HTTP handler | `supabase/functions/_shared/with-request-logging.ts`, [docs/ops/edge-logging-conventions.md](docs/ops/edge-logging-conventions.md) | `[functions.*]` in `supabase/config.toml`, `EdgeCoverage.tsx`, `npm run check:edge-logging` + `check:edge-coverage-manifest` |
+| PostHog product events or properties | [docs/ops/event-taxonomy.md](docs/ops/event-taxonomy.md) | Call sites + privacy/sanitization patterns in `src/lib/posthog.ts` |
+| Feature flags (new flag or rollout change) | [docs/ops/feature-flags.md](docs/ops/feature-flags.md) | `use-feature-flag` usage; default and sunset note |
+| React pages (orchestration, hooks split, memoization) | [docs/fundamentals/react-screen-orchestration.md](docs/fundamentals/react-screen-orchestration.md) | Tests for the flow; [docs/fundamentals/refactoring-strategy.md](docs/fundamentals/refactoring-strategy.md) for larger refactors |
+| Visual tokens, Nox, component styling | [DESIGN.md](DESIGN.md), [docs/design/nox/](docs/design/nox/) | `src/index.css`, `tailwind.config.ts` — Figma owns pixel values; markdown owns migration rules |
+| Auth + referral side effects | [docs/systems/auth/auth-and-referral-system.md](docs/systems/auth/auth-and-referral-system.md) | RLS-sensitive paths per [docs/reviews/](docs/reviews/) phases when security-relevant |
+| Content library ingest / RSS / admin | [docs/systems/content-library-fetch-source-feeds.md](docs/systems/content-library-fetch-source-feeds.md) | Edge + admin docs referenced there |
+| PR / release discipline, flow-first review | [docs/reviews/react-spa-review-template.md](docs/reviews/react-spa-review-template.md), [docs/reviews/end-to-end-review-master-checklist.md](docs/reviews/end-to-end-review-master-checklist.md) | Cursor skill `.cursor/skills/holzen-flow-review/SKILL.md` |
+| Ship to GitHub / Lovable / Supabase | [docs/ops/deployment-sync-guide.md](docs/ops/deployment-sync-guide.md) | `.cursor/rules/deployment-sync.mdc` mirrors the minimum gate |
+
+**Default habit:** skim the **one** row that matches your change, open the linked doc section, then edit code. If the row’s “Also update” column applies, treat it as part of the same task—not a follow-up doc ticket.
+
 ## Commands
 
 | Command | Use |
@@ -119,7 +144,7 @@ Pushing triggers **automatic** DB migrations and edge function deploys to the li
 ## Related docs
 
 - [docs/README.md](docs/README.md) — full docs index, **start-here** reading order, and **canonical sources** (what to edit when docs drift).
-- [docs/fundamentals/react-screen-orchestration.md](docs/fundamentals/react-screen-orchestration.md) — reusable React page patterns (orchestration, hooks, memoization, tests); distilled from Home.
+- [docs/fundamentals/react-screen-orchestration.md](docs/fundamentals/react-screen-orchestration.md) — reusable React page patterns (orchestration, hooks, memoization, tests); **beginner primer** + Rules of Hooks examples + **guided tour of `Home.tsx`**; distilled from Home.
 - [docs/fundamentals/http-review-playbooks.md](docs/fundamentals/http-review-playbooks.md) — Postman/Bruno step-by-step API review; [bruno/](bruno/) collection, [bruno/SCOPE.md](bruno/SCOPE.md), [bruno/functions-catalog.md](bruno/functions-catalog.md).
 - [docs/ops/logging-strategy.md](docs/ops/logging-strategy.md) — edge vs browser logging, `observe.ts`, correlation IDs.
 - [README.md](README.md) — clone/setup, scripts, high-level layout.

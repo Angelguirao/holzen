@@ -446,6 +446,10 @@ and sustainability thresholds).
 - `[docs/systems/pause/pause-session-cost-estimates.md](../pause/pause-session-cost-estimates.md)`
 — pause-only case study. Still valid for that narrow scope; this doc is
 the superset.
+- `[docs/systems/pause-system.md](../pause-system.md)` — Pause V2 **data**
+lifecycle (RPCs, `v_pause_full`, brief vs deep engaged gates). Token costs in
+§3–§4 are about **companion/orchestrator** calls, not that contract; use both
+docs when changing ritual depth **and** spend assumptions.
 - `[docs/ops/deployment-sync-guide.md](../../ops/deployment-sync-guide.md)`
 — pre-push checklist. Add a note to re-run the cost estimates whenever
 `DEFAULT_COST_MAP` or new edge functions land.

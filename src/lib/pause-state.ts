@@ -6,8 +6,9 @@
  * in TypeScript so:
  *
  *   1. The Pause UI can render an optimistic state *before* the RPC round
- *      trip resolves (e.g. disabling the shift step until breath+initial
- *      mood events have been logged).
+ *      trip resolves (e.g. gating Frame/Reflect until deep `engaged` — both
+ *      `initial_emotion_logged` and `breath_completed` exist; in the shipped
+ *      ritual, Feel always precedes first Breathe, but Postgres checks a set, not row order).
  *   2. `src/lib/badges/compute.ts` and the Stats hooks can derive state
  *      from fixture data without round-tripping to a database.
  *   3. Unit tests pin the rules to a place humans can read (the SQL is
@@ -17,7 +18,7 @@
  * the SQL wins and this file is wrong; fix this file to match.
  *
  * See: `supabase/migrations/20260423200730_pause_transition_engine.sql`,
- *      `docs/systems/pause-system.md`.
+ *      `docs/systems/pause-system.md` (section 3 — state machine; section 4 — RPCs / transitions).
  */
 
 export type PauseState =
@@ -129,6 +130,31 @@ export function collectStepTypes(
   return seen;
 }
 
+/** True when payload marks brief ritual (mirrors `pause_evaluate_transitions` EXISTS on `brief_ritual`). */
+function payloadMarksBriefRitual(payload: Record<string, unknown> | undefined): boolean {
+  if (!payload || typeof payload !== 'object' || Array.isArray(payload)) return false;
+  const v = (payload as { brief_ritual?: unknown }).brief_ritual;
+  if (v === true) return true;
+  if (typeof v === 'string') {
+    const s = v.trim().toLowerCase();
+    return s === 'true' || s === 't' || s === '1';
+  }
+  return false;
+}
+
+/** True when any `initial_emotion_logged` marks this instance as the ~2 min brief ritual. */
+export function pauseInstanceHasBriefRitualTag(
+  stepEvents: readonly PauseStepEventRow[],
+  instanceId: string,
+): boolean {
+  for (const e of stepEvents) {
+    if (e.pause_instance_id !== instanceId) continue;
+    if (e.step_type !== 'initial_emotion_logged') continue;
+    if (payloadMarksBriefRitual(e.payload as Record<string, unknown> | undefined)) return true;
+  }
+  return false;
+}
+
 /** Count of `complete` companion events for this instance where `counts_for_pause=true`. */
 export function countedCompanionCount(
   events: readonly PauseCompanionEventRow[],
@@ -155,13 +181,18 @@ function allIn<T>(required: readonly T[], present: Set<T>): boolean {
  *
  * Rules (in order — first match wins):
  *   1. Instance already terminal → return as-is.
- *   2. Window elapsed (`now > window_ends_at`) → `expired` (reason
- *      `window_elapsed`) **only when** `template.action_window_ms` is set.
- *      When it is null, clock-only expiry is skipped (matches Postgres).
- *   3. `required_for_completed` all present AND
- *      `countedCompanionCount >= required_companion_count` → `completed`.
- *   4. `required_for_engaged` all present → `engaged` (only from `active`).
- *   5. Otherwise: unchanged.
+ *   2. `pending` → unchanged.
+ *   3. Window elapsed (`now > window_ends_at`) → `expired` **only when**
+ *      `template.action_window_ms` is set (matches Postgres).
+ *   4. **`open_max_age` (engaged only):** **`engaged`** and `COALESCE(engaged_at, created_at)` + 12h ≤ `now`
+ *      → `expired`. **`active`** is not time-expired by this rule (matches Postgres).
+ *   5. **`volatility_v1`:** **`engaged`** uses a **set** of step types (order not evaluated):
+ *      brief → `initial_emotion_logged` only; deep → `initial_emotion_logged` and
+ *      `breath_completed` (Feel + first Breathe in normal UI). **`completed`** as soon as
+ *      **`outcome_logged`** exists. Companion counts do **not** gate completion.
+ *   6. **Other template slugs:** `required_for_engaged` / `required_for_completed` from
+ *      the row, plus `countedCompanionCount` ≥ `required_companion_count` for completed.
+ *   7. Otherwise: unchanged.
  */
 export function computePauseState(params: {
   instance: PauseInstanceRow;
@@ -192,13 +223,29 @@ export function computePauseState(params: {
     return 'expired';
   }
 
+  const openMaxAgeMs = 12 * 60 * 60 * 1000;
+  if (instance.state === 'engaged') {
+    const openMaxAnchor = instance.engaged_at ?? instance.created_at;
+    if (new Date(openMaxAnchor).getTime() + openMaxAgeMs <= now.getTime()) {
+      return 'expired';
+    }
+  }
+
   const seenSteps = collectStepTypes(stepEvents, instance.id);
   const counted = countedCompanionCount(companionEvents, instance.id);
+  const briefMode = pauseInstanceHasBriefRitualTag(stepEvents, instance.id);
+  const isVolatilityV1 = template.slug === 'volatility_v1';
 
-  const engagedOk = allIn(template.required_for_engaged, seenSteps);
-  const completedOk =
-    allIn(template.required_for_completed, seenSteps) &&
-    counted >= template.required_companion_count;
+  const engagedOk = isVolatilityV1
+    ? briefMode
+      ? allIn(['initial_emotion_logged'] as const, seenSteps)
+      : allIn(['initial_emotion_logged', 'breath_completed'] as const, seenSteps)
+    : allIn(template.required_for_engaged, seenSteps);
+
+  const completedOk = isVolatilityV1
+    ? seenSteps.has('outcome_logged')
+    : allIn(template.required_for_completed, seenSteps) &&
+      counted >= template.required_companion_count;
 
   if (completedOk) return 'completed';
   if (engagedOk && instance.state === 'active') return 'engaged';
@@ -249,6 +296,13 @@ export function shouldCountCompanion(params: {
     new Date(openInstance.window_ends_at).getTime() <= now.getTime()
   ) {
     return { counts: false, reason: 'outside_window' };
+  }
+  const openMaxAgeMs = 12 * 60 * 60 * 1000;
+  if (openInstance.state === 'engaged') {
+    const anchor = openInstance.engaged_at ?? openInstance.created_at;
+    if (new Date(anchor).getTime() + openMaxAgeMs <= now.getTime()) {
+      return { counts: false, reason: 'outside_window' };
+    }
   }
   if (!template.allowed_companion_types.includes(companionType)) {
     return { counts: false, reason: 'not_allowed_for_template' };

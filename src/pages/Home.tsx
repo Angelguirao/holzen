@@ -55,6 +55,7 @@ const Home = () => {
     companionPrefs,
     severity,
     lastPauseInstanceId,
+    openPauseState,
     loading,
     error,
     newPauseArrival,
@@ -146,6 +147,7 @@ const Home = () => {
     message,
     context,
     lastPauseInstanceId,
+    openPauseState,
     companions,
     companionPrefs,
     severity,
@@ -154,6 +156,7 @@ const Home = () => {
     manualTrigger,
     manualCooldownRemaining,
     startCheckout,
+    dismissAnalyticsSurface: zenMode ? 'home_zen_reflection' : 'home_your_pause_widget',
   });
 
   const pauseProjection = useHomePauseCardProjection({
@@ -164,6 +167,7 @@ const Home = () => {
     monthlyRemaining,
     checkoutLoading,
     message,
+    openPauseState,
     pauseContextHomePreview,
     loading,
     error,
@@ -178,6 +182,8 @@ const Home = () => {
     manualCooldownRemaining,
     manualTrigger,
     onNavigatePauseWithThis: pauseActions.handleNavigatePauseWithThis,
+    onNavigatePauseFromPendingBanner: pauseActions.handleNavigatePauseWithThisFromPendingBanner,
+    onDismissOpenPause: pauseActions.handleDismiss,
     onNeedPause: pauseActions.handleNeedAPause,
     onStartCheckoutPro: pauseActions.startProCheckout,
   });

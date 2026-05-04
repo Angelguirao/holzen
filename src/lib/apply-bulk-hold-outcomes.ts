@@ -1,4 +1,5 @@
 import { pauseLogStep } from '@/lib/pause-api';
+import { buildOutcomeLoggedPayload } from '@/lib/pause-outcome-log-payload';
 import type { BulkHoldOutcomeChoice, BulkHoldPendingPause } from '@/lib/bulk-hold';
 
 export type BulkHoldApplyResult =
@@ -27,7 +28,7 @@ export async function applyBulkHoldOutcomes(
       pauseLogStep({
         instanceId: p.id,
         stepType: 'outcome_logged',
-        payload: { outcome: resolver(p) },
+        payload: buildOutcomeLoggedPayload(resolver(p)),
       }),
     ),
   );

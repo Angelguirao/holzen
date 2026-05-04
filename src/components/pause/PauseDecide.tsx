@@ -8,11 +8,13 @@ import { pauseStepLayout } from '@/components/pause/pause-step-layout';
 
 interface Props {
   onDecide: (decision: string) => void;
-  /** Return to Shift (clears mirror state when the step unmounts). */
+  /** Return to the prior macro step (second Breathe). */
   onBack?: () => void;
+  /** Optional kicker above the title (e.g. brief vs deep step label). */
+  introKicker?: string;
 }
 
-export function PauseDecide({ onDecide, onBack }: Props) {
+export function PauseDecide({ onDecide, onBack, introKicker }: Props) {
   const { t } = useTranslation();
   const [mirrorDecision, setMirrorDecision] = useState<string | null>(null);
 
@@ -60,9 +62,12 @@ export function PauseDecide({ onDecide, onBack }: Props) {
           >
             <div className="flex flex-col items-center gap-3 text-center">
               <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-muted-foreground">
-                {t('pause.decideIntroKicker', { defaultValue: 'Step 5 · Decide' })}
+                {introKicker ?? t('pause.decideIntroKicker', { defaultValue: 'Step 6 · Decide' })}
               </p>
               <p className={pauseStepLayout.screenTitle}>{t('pause.whatWillYouDo')}</p>
+              <p className="max-w-sm text-sm leading-relaxed text-muted-foreground">
+                {t('pause.decideSubcopy', { defaultValue: "You're choosing from your center." })}
+              </p>
             </div>
 
             {/* Primary: Hold */}
