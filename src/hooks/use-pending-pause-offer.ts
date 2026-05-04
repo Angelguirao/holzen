@@ -1,7 +1,6 @@
 import { useCallback, useEffect, useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/use-auth';
-import { PAUSE_PENDING_OFFER_STALE_MS } from '@/lib/pause-pending-offer-policy';
 
 export interface PendingPauseOfferRow {
   id: string;
@@ -49,16 +48,6 @@ export function usePendingPauseOffer() {
       context_snapshot: Record<string, unknown> | null;
       metadata: Record<string, unknown> | null;
     };
-
-    const createdMs = new Date(row.created_at).getTime();
-    if (
-      Number.isFinite(createdMs) &&
-      Date.now() - createdMs > PAUSE_PENDING_OFFER_STALE_MS
-    ) {
-      setPending(null);
-      setLoaded(true);
-      return;
-    }
 
     const { data: art } = await supabase
       .from('pause_ai_artifacts' as never)
