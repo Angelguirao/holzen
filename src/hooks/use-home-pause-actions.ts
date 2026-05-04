@@ -4,6 +4,8 @@ import type { CompanionData, CompanionPrefs } from '@/components/CompanionSectio
 import type { BtcMoveSeverity } from '@/lib/btc-move-severity';
 import { holzenLog } from '@/lib/holzen-console';
 import { trackEvent } from '@/lib/posthog';
+
+export type PauseDismissAnalyticsSurface = 'home_zen_reflection' | 'home_your_pause_widget';
 import { type PauseSessionLocationState } from '@/lib/router-location-state';
 
 export function useHomePauseActions(args: {
@@ -20,6 +22,8 @@ export function useHomePauseActions(args: {
   manualTrigger: () => void;
   manualCooldownRemaining: () => number;
   startCheckout: (target?: 'pro' | 'pro_plus' | 'flex_pack_s' | 'flex_pack_m') => Promise<void>;
+  /** PostHog `pause_open_dismissed.surface` — Zen reflection Done vs dashboard Your pause widget. */
+  dismissAnalyticsSurface: PauseDismissAnalyticsSurface;
 }) {
   const {
     message,
@@ -34,6 +38,7 @@ export function useHomePauseActions(args: {
     manualTrigger,
     manualCooldownRemaining,
     startCheckout,
+    dismissAnalyticsSurface,
   } = args;
 
   const handleNeedAPause = useCallback(() => {
@@ -47,8 +52,16 @@ export function useHomePauseActions(args: {
   }, [manualCooldownRemaining, manualTrigger]);
 
   const handleDismiss = useCallback(() => {
-    dismissMessage();
-  }, [dismissMessage]);
+    try {
+      trackEvent('pause_open_dismissed', {
+        surface: dismissAnalyticsSurface,
+        pause_instance_id: lastPauseInstanceId ?? undefined,
+      });
+    } catch {
+      /* no-op */
+    }
+    void dismissMessage();
+  }, [dismissMessage, dismissAnalyticsSurface, lastPauseInstanceId]);
 
   const handleNavigatePauseWithThis = useCallback(() => {
     if (!message && !lastPauseInstanceId) return;

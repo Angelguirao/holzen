@@ -104,6 +104,7 @@ Holzen stores **one `pause_instances` row per pause**. Product language below ma
 | `**pause_log_step**`             | Append one `**pause_step_events**` row; then the DB re-evaluates state.                                                    |
 | `**pause_log_companion**`        | Append companion open/complete; may set `**counts_for_pause**`.                                                            |
 | `**pause_evaluate_transitions**` | **Not called from the client**; invoked from triggers after relevant inserts so `**pause_instances.state`** stays in sync. |
+| `**pause_dismiss_current**` | Expires any `**pending**` rows for the caller (`**system_cancelled**`), then dismisses the open `**active|engaged**` instance (`**user_dismissed_current**`). Invoked from Home (Zen **Done**, dashboard **Dismiss pause**) and from `/pause` when the user closes before completing (header **Close** / depth picker **Close**). |
 
 
 **Client entrypoint:** `src/lib/pause-api.ts` wraps these RPCs. Direct inserts into the append-only tables are not the supported pattern (RLS is built around the RPCs).

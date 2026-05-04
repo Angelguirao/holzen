@@ -156,6 +156,7 @@ const Home = () => {
     manualTrigger,
     manualCooldownRemaining,
     startCheckout,
+    dismissAnalyticsSurface: zenMode ? 'home_zen_reflection' : 'home_your_pause_widget',
   });
 
   const pauseProjection = useHomePauseCardProjection({
@@ -182,6 +183,7 @@ const Home = () => {
     manualTrigger,
     onNavigatePauseWithThis: pauseActions.handleNavigatePauseWithThis,
     onNavigatePauseFromPendingBanner: pauseActions.handleNavigatePauseWithThisFromPendingBanner,
+    onDismissOpenPause: pauseActions.handleDismiss,
     onNeedPause: pauseActions.handleNeedAPause,
     onStartCheckoutPro: pauseActions.startProCheckout,
   });

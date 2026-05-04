@@ -35,6 +35,7 @@ export function useHomePauseCardProjection(args: {
   manualTrigger: () => void;
   onNavigatePauseWithThis: () => void;
   onNavigatePauseFromPendingBanner: () => void;
+  onDismissOpenPause: () => void;
   onNeedPause: () => void;
   onStartCheckoutPro: () => void;
 }) {
@@ -62,6 +63,7 @@ export function useHomePauseCardProjection(args: {
     manualTrigger,
     onNavigatePauseWithThis,
     onNavigatePauseFromPendingBanner,
+    onDismissOpenPause,
     onNeedPause,
     onStartCheckoutPro,
   } = args;
@@ -97,6 +99,7 @@ export function useHomePauseCardProjection(args: {
         contextPreview={pauseContextHomePreview}
         onPauseWithThis={onNavigatePauseWithThis}
         onPauseWithThisFromPendingBanner={onNavigatePauseFromPendingBanner}
+        onDismissOpenPause={onDismissOpenPause}
         loading={loading}
         error={error}
         btcData={btcData}
@@ -122,6 +125,7 @@ export function useHomePauseCardProjection(args: {
       pauseContextHomePreview,
       onNavigatePauseWithThis,
       onNavigatePauseFromPendingBanner,
+      onDismissOpenPause,
       loading,
       error,
       btcData,
