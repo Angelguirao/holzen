@@ -2,6 +2,7 @@ import type { MoodValue } from '@/components/MoodCheck';
 import type { BriefFeelTile } from '@/components/pause/PauseBriefFeel';
 import type { CompanionData, CompanionPrefs } from '@/components/CompanionSection';
 import type { PauseStep } from '@/components/pause/PauseProgress';
+import type { PauseState } from '@/lib/pause-state';
 
 const SESSION_KEY = 'holzen_pause_session';
 /** Bump when persisted step model changes (v4: brief vs deep ritual). */
@@ -70,6 +71,8 @@ export interface FetchedPauseInstance {
   haiku: string | null;
   grounding_title: string | null;
   grounding_body: string | null;
+  /** Present when hydrating from `pause_instances` (id-only `/pause` navigation). */
+  db_state?: PauseState | null;
 }
 
 type LegacyPauseStep = 'breathe' | 'feel' | 'reflect' | 'shift' | 'decide';

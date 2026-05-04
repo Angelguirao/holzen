@@ -34,7 +34,7 @@ export function usePauseSessionFetch(fetchPauseInstanceId: string | null): {
       try {
         const { data: inst, error: instError } = await supabase
           .from('pause_instances' as never)
-          .select('id, context_snapshot')
+          .select('id, context_snapshot, state')
           .eq('id', fetchPauseInstanceId)
           .maybeSingle();
         if (cancelled) return;
