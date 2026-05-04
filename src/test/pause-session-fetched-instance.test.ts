@@ -20,6 +20,7 @@ describe('buildFetchedPauseInstanceFromFetch', () => {
       grounding_title: 'G title',
       grounding_body: 'G body',
       db_state: null,
+      engaged_at: null,
     });
   });
 
@@ -33,6 +34,7 @@ describe('buildFetchedPauseInstanceFromFetch', () => {
       grounding_title: null,
       grounding_body: null,
       db_state: null,
+      engaged_at: null,
     });
   });
 
@@ -43,5 +45,19 @@ describe('buildFetchedPauseInstanceFromFetch', () => {
       [],
     );
     expect(out.context).toBeNull();
+  });
+
+  it('passes through engaged_at from instance row', () => {
+    const out = buildFetchedPauseInstanceFromFetch(
+      'p4',
+      {
+        context_snapshot: null,
+        state: 'engaged',
+        engaged_at: '2026-04-23T12:00:00.000Z',
+      },
+      [],
+    );
+    expect(out.engaged_at).toBe('2026-04-23T12:00:00.000Z');
+    expect(out.db_state).toBe('engaged');
   });
 });

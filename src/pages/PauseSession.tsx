@@ -9,6 +9,7 @@ import { type MoodValue } from '@/components/MoodCheck';
 import { type PauseStep } from '@/components/pause/PauseProgress';
 import { PauseSessionGate } from '@/components/pause/PauseSessionGate';
 import { PauseSessionScaffoldShell } from '@/components/pause/PauseSessionScaffoldShell';
+import { PauseEngagedOpenMaxCountdown } from '@/components/pause/PauseEngagedOpenMaxCountdown';
 import { PauseSessionGateContent } from '@/components/pause/PauseSessionGateContent';
 import { type PauseBreathingHandle } from '@/components/pause/PauseBreathing';
 import { PauseSessionDepthPickerStack } from '@/components/pause/PauseSessionDepthPickerStack';
@@ -425,6 +426,13 @@ export default function PauseSession() {
 
   const briefDecideIntroKicker = t('pause.brief.decideKicker', { defaultValue: 'Step 4 · Decide' });
 
+  const engagedOpenMaxCountdownSlot = useMemo(() => {
+    if (phase !== 'session') return undefined;
+    const ea = fetchedInstance?.engaged_at;
+    if (fetchedInstance?.db_state !== 'engaged' || !ea) return undefined;
+    return <PauseEngagedOpenMaxCountdown engagedAtIso={ea} />;
+  }, [phase, fetchedInstance?.db_state, fetchedInstance?.engaged_at]);
+
   const { briefRitual, deepRitual } = buildPauseSessionScaffoldRitualPayloads({
     briefStep,
     step,
@@ -500,6 +508,7 @@ export default function PauseSession() {
         scaffoldSlot={
           <PauseSessionScaffoldShell
             {...scaffoldRitualDerived}
+            countdownSlot={engagedOpenMaxCountdownSlot}
             curtainLifted={curtainLifted}
             prefersReducedMotion={!!prefersReducedMotion}
             onClose={handleClose}
