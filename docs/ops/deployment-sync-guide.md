@@ -62,6 +62,8 @@ psql "postgresql://postgres:postgres@127.0.0.1:54322/postgres" -f supabase/migra
 supabase/migrations/20260407120000_add_foo_column.sql
 ```
 
+**Views that wrap `v_pause_full`:** If a migration **`CREATE OR REPLACE`s `public.v_pause_full`** with **new trailing columns**, any view defined as **`SELECT vf.* FROM public.v_pause_full vf …`** (e.g. **`v_pause_archive_pauses`**, **`v_pause_archive_echoes`**) must be **recreated in the same or a follow-up migration** — PostgreSQL does not auto-expand dependent `SELECT *` view column lists. Run **`npm run check:view-migrations`** and follow **`docs/ops/migration-view-safety.md`**.
+
 **Destructive changes (DROP, ALTER TYPE, column removal):**
 - Always check that no edge function or frontend code references the removed column/type.
 - Deploy code changes **before** (or in the same commit as) the migration that removes what the code no longer uses.

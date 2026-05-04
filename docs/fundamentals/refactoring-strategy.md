@@ -110,6 +110,7 @@ This document is **comprehensive for structural client refactors**: extraction o
 | **i18n** | Match existing `useTranslation` / key patterns in the same feature |
 | **Analytics & flags** | [ops/event-taxonomy.md](../ops/event-taxonomy.md), [ops/feature-flags.md](../ops/feature-flags.md) when moving or renaming instrumented UI |
 | **Routing & guards** | [systems/routing/route-gating-system.md](../systems/routing/route-gating-system.md), `src/App.tsx` |
+| **Pause V2 lifecycle, archive views, step payloads** | [systems/pause-system.md](../systems/pause-system.md) (§3–9); archive lists: **`usePauseArchiveList`** → **`v_pause_archive_pauses`** / **`v_pause_archive_echoes`** |
 | **Runtime / E2E QA** | [browser-360-mcp-playbook.md](browser-360-mcp-playbook.md), [e2e-browser-automation.md](../backlog/e2e-browser-automation.md) |
 | **Bundle / lazy routes** | [route-level-code-splitting.md](../backlog/route-level-code-splitting.md) (already linked above) |
 

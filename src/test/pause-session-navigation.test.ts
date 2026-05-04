@@ -3,32 +3,80 @@ import { canAdvanceFromPauseStep } from '@/lib/pause-session-navigation';
 import type { PauseStep } from '@/components/pause/PauseProgress';
 
 const base = {
-  breathingCompleted: false,
+  breathingFirstCompleted: false,
+  breathingSecondCompleted: false,
   moodDone: false,
-  moodAfterDone: false,
+  frameDone: false,
 };
 
 describe('canAdvanceFromPauseStep', () => {
-  it('blocks forward from breathe until the breathing pattern is finished', () => {
-    expect(canAdvanceFromPauseStep({ ...base, step: 'breathe' as PauseStep })).toBe(false);
-    expect(
-      canAdvanceFromPauseStep({ ...base, step: 'breathe' as PauseStep, breathingCompleted: true }),
-    ).toBe(true);
-  });
-
   it('blocks forward from feel until mood (or skip) is committed', () => {
     expect(canAdvanceFromPauseStep({ ...base, step: 'feel' as PauseStep })).toBe(false);
     expect(canAdvanceFromPauseStep({ ...base, step: 'feel' as PauseStep, moodDone: true })).toBe(true);
   });
 
-  it('always allows forward from reflect', () => {
-    expect(canAdvanceFromPauseStep({ ...base, step: 'reflect' as PauseStep })).toBe(true);
+  it('blocks forward from breathe until the first breathing segment is finished', () => {
+    expect(canAdvanceFromPauseStep({ ...base, step: 'breathe' as PauseStep, moodDone: true })).toBe(false);
+    expect(
+      canAdvanceFromPauseStep({
+        ...base,
+        step: 'breathe' as PauseStep,
+        moodDone: true,
+        breathingFirstCompleted: true,
+      }),
+    ).toBe(true);
   });
 
-  it('blocks forward from shift until after-mood (or skip) is committed', () => {
-    expect(canAdvanceFromPauseStep({ ...base, step: 'shift' as PauseStep })).toBe(false);
+  it('always allows forward from reflect', () => {
     expect(
-      canAdvanceFromPauseStep({ ...base, step: 'shift' as PauseStep, moodAfterDone: true }),
+      canAdvanceFromPauseStep({
+        ...base,
+        step: 'reflect' as PauseStep,
+        moodDone: true,
+        breathingFirstCompleted: true,
+      }),
+    ).toBe(true);
+  });
+
+  it('blocks forward from frame until the hub is finished', () => {
+    expect(
+      canAdvanceFromPauseStep({
+        ...base,
+        step: 'frame' as PauseStep,
+        moodDone: true,
+        breathingFirstCompleted: true,
+      }),
+    ).toBe(false);
+    expect(
+      canAdvanceFromPauseStep({
+        ...base,
+        step: 'frame' as PauseStep,
+        moodDone: true,
+        breathingFirstCompleted: true,
+        frameDone: true,
+      }),
+    ).toBe(true);
+  });
+
+  it('blocks forward from breath2 until the second breathing segment is finished', () => {
+    expect(
+      canAdvanceFromPauseStep({
+        ...base,
+        step: 'breath2' as PauseStep,
+        moodDone: true,
+        breathingFirstCompleted: true,
+        frameDone: true,
+      }),
+    ).toBe(false);
+    expect(
+      canAdvanceFromPauseStep({
+        ...base,
+        step: 'breath2' as PauseStep,
+        moodDone: true,
+        breathingFirstCompleted: true,
+        frameDone: true,
+        breathingSecondCompleted: true,
+      }),
     ).toBe(true);
   });
 
@@ -37,9 +85,23 @@ describe('canAdvanceFromPauseStep', () => {
       canAdvanceFromPauseStep({
         ...base,
         step: 'decide' as PauseStep,
-        moodAfterDone: true,
         moodDone: true,
-        breathingCompleted: true,
+        breathingFirstCompleted: true,
+        breathingSecondCompleted: true,
+        frameDone: true,
+      }),
+    ).toBe(false);
+  });
+
+  it('blocks forward swipe on choose (CTA-only advance to Decide)', () => {
+    expect(
+      canAdvanceFromPauseStep({
+        ...base,
+        step: 'choose' as PauseStep,
+        moodDone: true,
+        breathingFirstCompleted: true,
+        breathingSecondCompleted: true,
+        frameDone: true,
       }),
     ).toBe(false);
   });

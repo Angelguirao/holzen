@@ -1,4 +1,5 @@
 import { supabase } from '@/integrations/supabase/client';
+import { deriveBreathingUiCompleteFromPayloads } from '@/lib/companion-breath-completion-detect';
 import { pauseLogStep, pauseLogCompanion } from '@/lib/pause-api';
 import type { PauseStepType } from '@/lib/pause-state';
 
@@ -41,21 +42,19 @@ const STEP_TO_STEP_TYPE: Record<CompanionUiCompletionStep, PauseStepType | null>
 
 /**
  * Hydrate "completed / read" UI state for one pause from the V2 tables.
- * Breathing reads pause_step_events(step_type='breath_completed');
- * every companion reads pause_companion_events with
- * counts_for_pause=true (i.e. the completion that actually counted
- * toward the pause).
+ * Breathing reads `pause_step_events` (`breath_completed`); dual-segment pauses need
+ * both `breath_segment` 1 and 2 in payloads (see `deriveBreathingUiCompleteFromPayloads`).
+ * Every companion reads `pause_companion_events` with `counts_for_pause=true`.
  */
 export async function loadCompanionUiCompletionState(
   pauseInstanceId: string,
 ): Promise<CompanionUiCompletionState> {
-  const [{ data: stepRows }, { data: companionRows }] = await Promise.all([
+  const [{ data: breathRows }, { data: companionRows }] = await Promise.all([
     supabase
       .from('pause_step_events' as never)
-      .select('step_type')
+      .select('payload')
       .eq('pause_instance_id', pauseInstanceId)
-      .eq('step_type', 'breath_completed')
-      .limit(1),
+      .eq('step_type', 'breath_completed'),
     supabase
       .from('pause_companion_events' as never)
       .select('companion_type, counts_for_pause')
@@ -63,8 +62,10 @@ export async function loadCompanionUiCompletionState(
       .eq('action', 'complete'),
   ]);
 
-  const breathing =
-    Array.isArray(stepRows) && (stepRows as Array<{ step_type: string }>).length > 0;
+  const breathing = deriveBreathingUiCompleteFromPayloads(
+    (breathRows ?? []) as Array<{ payload?: unknown }>,
+  );
+
   const companionCompleted = new Set<string>();
   for (const c of ((companionRows ?? []) as Array<{
     companion_type: string;

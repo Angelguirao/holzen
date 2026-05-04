@@ -224,6 +224,7 @@ export function buildDemoFixture(userId: string): DemoFixture {
       has_shift_emotion_logged: isCompleted,
       has_outcome_logged: isCompleted,
       initial_mood: isCompleted ? spec.initial : null,
+      is_brief_ritual: isCompleted && !spec.depth,
       initial_emotion_intensity: isCompleted ? ((i % 5) + 1) : null,
       shift_mood: isCompleted ? spec.shift : null,
       shift_emotion_intensity: isCompleted ? (((i + 2) % 5) + 1) : null,
@@ -258,7 +259,11 @@ export function buildDemoFixture(userId: string): DemoFixture {
       {
         pause_instance_id: id,
         step_type: 'initial_emotion_logged',
-        payload: { mood: spec.initial, intensity: (i % 5) + 1 },
+        payload: {
+          mood: spec.initial,
+          intensity: (i % 5) + 1,
+          ...(spec.depth ? {} : { brief_ritual: true }),
+        },
         created_at: createdAt.toISOString(),
       } as unknown as PauseStepEventRow,
       {

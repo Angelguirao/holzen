@@ -1,0 +1,121 @@
+import { useCallback, type Dispatch, type MutableRefObject, type SetStateAction } from 'react';
+import type { TFunction } from 'i18next';
+import type { MoodValue } from '@/components/MoodCheck';
+import type { RitualDepth } from '@/lib/pause-session-storage';
+import { clearSession } from '@/lib/pause-session-storage';
+import { hapticFeedback } from '@/lib/haptics';
+import { pauseLogStep } from '@/lib/pause-api';
+import { buildOutcomeLoggedPayload } from '@/lib/pause-outcome-log-payload';
+import { showPauseOutcomeNotCompletedToast, showPauseOutcomeSaveFailedToast } from '@/lib/pause-outcome-toast';
+import type { PauseState } from '@/lib/pause-state';
+import { buildPauseImpactDataOnComplete, type PauseImpactData } from '@/lib/pause-impact-data';
+import { getSessionQuote } from '@/lib/wisdom-quotes';
+
+export function usePauseSessionDecideHandler(input: {
+  decidingRef: MutableRefObject<boolean>;
+  pauseInstanceId: string | null;
+  t: TFunction;
+  refreshSubscription: () => void | Promise<void>;
+  setDecision: Dispatch<SetStateAction<string | null>>;
+  dismissMessage: () => void | Promise<void>;
+  setPauseImpactData: Dispatch<SetStateAction<PauseImpactData | null>>;
+  setPhase: Dispatch<SetStateAction<'session' | 'done'>>;
+  context: string | null;
+  selectedMood: MoodValue | null;
+  selectedMoodAfter: MoodValue | null;
+  ritualEntry: RitualDepth | 'picker';
+  breathingFirstCompleted: boolean;
+  breathingSecondCompleted: boolean;
+  feelIntensity: number | null;
+  shiftIntensity: number | null;
+}): { handleDecide: (d: string) => Promise<void> } {
+  const {
+    decidingRef,
+    pauseInstanceId,
+    t,
+    refreshSubscription,
+    setDecision,
+    dismissMessage,
+    setPauseImpactData,
+    setPhase,
+    context,
+    selectedMood,
+    selectedMoodAfter,
+    ritualEntry,
+    breathingFirstCompleted,
+    breathingSecondCompleted,
+    feelIntensity,
+    shiftIntensity,
+  } = input;
+
+  const handleDecide = useCallback(
+    async (d: string) => {
+      if (decidingRef.current) return;
+      decidingRef.current = true;
+      try {
+        hapticFeedback('medium');
+        let outcomeState: PauseState | null = null;
+        if (pauseInstanceId) {
+          try {
+            outcomeState = await pauseLogStep({
+              instanceId: pauseInstanceId,
+              stepType: 'outcome_logged',
+              payload: buildOutcomeLoggedPayload(d),
+            });
+          } catch {
+            showPauseOutcomeSaveFailedToast(t);
+            return;
+          }
+          if (outcomeState !== 'completed') {
+            showPauseOutcomeNotCompletedToast(t);
+            void refreshSubscription();
+            return;
+          }
+          void refreshSubscription();
+        }
+        setDecision(d);
+        await dismissMessage();
+        const q = getSessionQuote();
+        setPauseImpactData(
+          buildPauseImpactDataOnComplete({
+            decision: d,
+            context,
+            selectedMood,
+            selectedMoodAfter,
+            ritualEntry,
+            breathingFirstCompleted,
+            breathingSecondCompleted,
+            feelIntensity,
+            shiftIntensity,
+            reinforcementQuote: `"${q.text}" — ${q.author}`,
+          }),
+        );
+        hapticFeedback('success');
+        setPhase('done');
+        clearSession();
+      } finally {
+        decidingRef.current = false;
+      }
+    },
+    [
+      decidingRef,
+      dismissMessage,
+      pauseInstanceId,
+      selectedMood,
+      selectedMoodAfter,
+      context,
+      ritualEntry,
+      breathingFirstCompleted,
+      breathingSecondCompleted,
+      feelIntensity,
+      shiftIntensity,
+      refreshSubscription,
+      t,
+      setDecision,
+      setPauseImpactData,
+      setPhase,
+    ],
+  );
+
+  return { handleDecide };
+}

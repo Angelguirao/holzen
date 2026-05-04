@@ -23,6 +23,7 @@ function makeRow(overrides: Partial<PauseFullRow>): PauseFullRow {
     has_shift_emotion_logged: true,
     has_outcome_logged: true,
     initial_mood: 'fearful',
+    is_brief_ritual: false,
     initial_emotion_intensity: null,
     shift_mood: 'calm',
     shift_emotion_intensity: null,

@@ -1,32 +1,67 @@
 import { useTranslation } from 'react-i18next';
 import { cn } from '@/lib/utils';
 
-const STEPS = ['breathe', 'feel', 'reflect', 'shift', 'decide'] as const;
+/**
+ * Full routing order (includes `choose` between second breath and Decide).
+ * The header stepper renders `PAUSE_DEEP_DISPLAY_STEPS` — six user-facing beats;
+ * `choose` is a short interstitial before Decide, not a separate labeled segment.
+ */
+const STEPS = ['feel', 'breathe', 'reflect', 'frame', 'breath2', 'choose', 'decide'] as const;
 export type PauseStep = (typeof STEPS)[number];
+
+/** Six segments in the deep-pause shell (Choose is folded into the last “Decide” beat). */
+const PAUSE_DEEP_DISPLAY_STEPS = ['feel', 'breathe', 'reflect', 'frame', 'breath2', 'decide'] as const;
+
+export const PAUSE_DEEP_DISPLAY_STEP_COUNT = PAUSE_DEEP_DISPLAY_STEPS.length;
+
+/** 1-based “Step n of 6” for the meta line; `choose` and `decide` both count as step 6. */
+export function pauseDeepMacroStepNumber(step: PauseStep): number {
+  if (step === 'choose' || step === 'decide') return PAUSE_DEEP_DISPLAY_STEP_COUNT;
+  return STEPS.indexOf(step) + 1;
+}
+
+function pauseDeepDisplayProgressIndex(step: PauseStep): number {
+  if (step === 'choose' || step === 'decide') {
+    return PAUSE_DEEP_DISPLAY_STEPS.indexOf('decide');
+  }
+  return PAUSE_DEEP_DISPLAY_STEPS.indexOf(step as (typeof PAUSE_DEEP_DISPLAY_STEPS)[number]);
+}
 
 interface Props {
   currentStep: PauseStep;
   onStepClick?: (step: PauseStep) => void;
   /** `segment` = full-width macro bars (pause shell); `pill` = compact dash stepper. */
   variant?: 'segment' | 'pill';
+  /** Figma variant B: macro step 5 labeled “Shift” instead of repeating “Breathe”. */
+  breathSecondLabelVariant?: 'breathe' | 'shift';
 }
 
-export function PauseProgress({ currentStep, onStepClick, variant = 'segment' }: Props) {
+export function PauseProgress({
+  currentStep,
+  onStepClick,
+  variant = 'segment',
+  breathSecondLabelVariant = 'breathe',
+}: Props) {
   const { t } = useTranslation();
-  const stepLabels: Record<PauseStep, string> = {
+  const breath2Label =
+    breathSecondLabelVariant === 'shift'
+      ? t('pause.steps.shift', { defaultValue: 'Shift' })
+      : t('pause.steps.breath2', { defaultValue: 'Breathe' });
+  const displayLabels: Record<(typeof PAUSE_DEEP_DISPLAY_STEPS)[number], string> = {
     feel: t('pause.steps.feel', { defaultValue: 'Feel' }),
     breathe: t('pause.steps.breathe', { defaultValue: 'Breathe' }),
     reflect: t('pause.steps.reflect', { defaultValue: 'Reflect' }),
-    shift: t('pause.steps.shift', { defaultValue: 'Shift' }),
+    frame: t('pause.steps.frame', { defaultValue: 'Frame' }),
+    breath2: breath2Label,
     decide: t('pause.steps.decide', { defaultValue: 'Decide' }),
   };
 
-  const currentIndex = STEPS.indexOf(currentStep);
+  const currentIndex = pauseDeepDisplayProgressIndex(currentStep);
 
   if (variant === 'pill') {
     return (
       <div className="flex w-max min-w-full items-center justify-start gap-1 sm:gap-1.5">
-        {STEPS.map((step, i) => {
+        {PAUSE_DEEP_DISPLAY_STEPS.map((step, i) => {
           const isActive = i === currentIndex;
           const isPast = i < currentIndex;
           const canClick = isPast && onStepClick;
@@ -52,7 +87,7 @@ export function PauseProgress({ currentStep, onStepClick, variant = 'segment' }:
                       : 'text-muted-foreground/70'
                 }`}
               >
-                {stepLabels[step]}
+                {displayLabels[step]}
               </span>
             </button>
           );
@@ -62,8 +97,8 @@ export function PauseProgress({ currentStep, onStepClick, variant = 'segment' }:
   }
 
   return (
-    <div className="flex w-full items-start justify-between gap-1.5 sm:gap-2">
-      {STEPS.map((step, i) => {
+    <div className="flex w-full items-start justify-between gap-1 sm:gap-2">
+      {PAUSE_DEEP_DISPLAY_STEPS.map((step, i) => {
         const isActive = i === currentIndex;
         const isPast = i < currentIndex;
         const canClick = isPast && onStepClick;
@@ -80,18 +115,18 @@ export function PauseProgress({ currentStep, onStepClick, variant = 'segment' }:
           >
             <div
               className={cn(
-                'h-[3px] w-full max-w-[3.25rem] rounded-full transition-colors duration-300 sm:max-w-[3.75rem]',
+                'h-[3px] w-full max-w-[2.5rem] rounded-full transition-colors duration-300 sm:max-w-[3.25rem]',
                 isActive ? 'bg-foreground' : isPast ? 'bg-foreground/55' : 'bg-muted-foreground/25',
               )}
             />
             <span
               className={cn(
-                'w-full truncate text-center text-[10px] font-medium uppercase leading-tight tracking-wide sm:text-[11px]',
+                'w-full truncate text-center text-[9px] font-medium uppercase leading-tight tracking-wide sm:text-[10px]',
                 isActive ? 'text-foreground' : isPast ? 'text-foreground/80' : 'text-muted-foreground/70',
                 canClick && 'hover:text-foreground',
               )}
             >
-              {stepLabels[step]}
+              {displayLabels[step]}
             </span>
           </button>
         );

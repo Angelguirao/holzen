@@ -1,0 +1,37 @@
+import { describe, expect, it, vi, beforeEach } from 'vitest';
+import { renderHook, act } from '@testing-library/react';
+import { usePauseSessionExitNavigation } from '@/hooks/use-pause-session-exit-navigation';
+
+const { clearSessionMock } = vi.hoisted(() => ({
+  clearSessionMock: vi.fn(),
+}));
+
+vi.mock('@/lib/pause-session-storage', () => ({
+  clearSession: () => clearSessionMock(),
+}));
+
+describe('usePauseSessionExitNavigation', () => {
+  beforeEach(() => {
+    clearSessionMock.mockClear();
+  });
+
+  it('handleClose navigates home with replace', () => {
+    const navigate = vi.fn();
+    const { result } = renderHook(() => usePauseSessionExitNavigation(navigate));
+    act(() => {
+      result.current.handleClose();
+    });
+    expect(navigate).toHaveBeenCalledWith('/', { replace: true });
+    expect(clearSessionMock).not.toHaveBeenCalled();
+  });
+
+  it('handleReturn clears session then navigates home with replace', () => {
+    const navigate = vi.fn();
+    const { result } = renderHook(() => usePauseSessionExitNavigation(navigate));
+    act(() => {
+      result.current.handleReturn();
+    });
+    expect(clearSessionMock).toHaveBeenCalledTimes(1);
+    expect(navigate).toHaveBeenCalledWith('/', { replace: true });
+  });
+});

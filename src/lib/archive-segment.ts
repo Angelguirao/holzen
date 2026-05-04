@@ -2,7 +2,7 @@ import { isMainPauseLibraryBookmark } from '@/lib/normalize-library-source-type'
 
 export type ArchiveMainSegment = 'pauses' | 'echoes' | 'collections';
 
-/** Terminal outcomes that can happen without ever entering Reflect (`engaged_at` still null). */
+/** Terminal rows that never reached DB `engaged` (`engaged_at` still null — early ritual gates not met). */
 const ECHO_ELIGIBLE_STATES = new Set(['expired', 'dismissed']);
 
 export type PauseInstanceArchiveMeta = {
@@ -21,11 +21,20 @@ export type PauseInstanceArchiveMetaGetter = (
   pauseId: string | null,
 ) => PauseInstanceArchiveMeta | undefined;
 
+/** Pending offer replaced / declined / dismiss-cleared / TTL-swept — not a user ritual; hidden from archive tabs. */
+function isArchiveExcludedPendingChurn(meta: PauseInstanceArchiveMeta): boolean {
+  return (
+    meta.state === 'expired' &&
+    meta.engaged_at == null &&
+    meta.expired_reason === 'system_cancelled'
+  );
+}
+
 /**
  * Archive “echo”: main pause row for an instance that ended dismissed/expired
- * without `engaged_at` (never opened Reflect). That includes **`expired_reason =
- * superseded`** when the user never reached Reflect on the prior row (adopted
- * pending, auto-supersede, etc.) — same “echo” bucket as other unengaged terminals.
+ * with `engaged_at` still null (never reached the `engaged` state milestone). Matches
+ * `public.v_pause_archive_echoes` (superseded unengaged rows live on the Pauses tab, not
+ * Echoes). Excludes `expired` + `system_cancelled` pending-queue churn.
  * `completed` always implies engagement in the DB and never counts as an echo.
  *
  * Pause archive lists are backed by `public.v_pause_archive_echoes` and
@@ -34,6 +43,7 @@ export type PauseInstanceArchiveMetaGetter = (
 export function isArchiveEchoPause(meta: PauseInstanceArchiveMeta): boolean {
   if (!ECHO_ELIGIBLE_STATES.has(meta.state)) return false;
   if (meta.engaged_at != null) return false;
+  if (isArchiveExcludedPendingChurn(meta)) return false;
   return true;
 }
 
@@ -50,6 +60,10 @@ export function itemBelongsToPausesTab(
   item: { source_type: string | null; pause_instance_id: string | null },
   getPauseArchiveMeta: PauseInstanceArchiveMetaGetter,
 ): boolean {
+  if (item.pause_instance_id) {
+    const churn = getPauseArchiveMeta(item.pause_instance_id);
+    if (churn && isArchiveExcludedPendingChurn(churn)) return false;
+  }
   if (itemBelongsToEchoesTab(item, getPauseArchiveMeta)) return false;
   if (item.pause_instance_id && !isMainPauseLibraryBookmark(item.source_type)) {
     const meta = getPauseArchiveMeta(item.pause_instance_id);

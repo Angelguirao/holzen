@@ -16,7 +16,9 @@
  *   initial_emotion_logged         15
  *   shift_emotion_logged           20
  *   outcome_logged                 20
- *   required companion met         15  (>= template.required_companion_count)
+ *   companion depth                15  (>= `required_companion_count` when that
+ *                                      count is > 0; when it is 0, any counted
+ *                                      completion earns the points)
  *   note depth                     10  (0 / 5 / 10 by length)
  */
 
@@ -82,7 +84,13 @@ export function computePauseQualityScore(params: {
     : 0;
   const outcome = seen.has('outcome_logged') ? PAUSE_QUALITY_WEIGHTS.outcome : 0;
   const companion =
-    counted >= template.required_companion_count ? PAUSE_QUALITY_WEIGHTS.companion : 0;
+    template.required_companion_count === 0
+      ? counted > 0
+        ? PAUSE_QUALITY_WEIGHTS.companion
+        : 0
+      : counted >= template.required_companion_count
+        ? PAUSE_QUALITY_WEIGHTS.companion
+        : 0;
 
   const noteLen = longestNoteLength(stepEvents, instance.id);
   let note = 0;

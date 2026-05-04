@@ -1,7 +1,19 @@
 import { useTranslation } from 'react-i18next';
-import { Wind, Heart, BookOpen, RefreshCw, Target, ExternalLink } from 'lucide-react';
+import { Wind, Heart, BookOpen, Compass, Target, ExternalLink } from 'lucide-react';
+import { cn } from '@/lib/utils';
+import type { PauseStep } from '@/components/pause/PauseProgress';
 
 const STEPS = [
+  {
+    key: 'feel',
+    icon: Heart,
+    sources: [
+      {
+        label: 'Lieberman, M. D. et al. (2007). Putting feelings into words. Psychological Science, 18(5), 421–428.',
+        url: 'https://doi.org/10.1111/j.1467-9280.2007.01916.x',
+      },
+    ],
+  },
   {
     key: 'breathe',
     icon: Wind,
@@ -13,16 +25,6 @@ const STEPS = [
       {
         label: 'Lehrer, P. & Gevirtz, R. (2014). Heart rate variability biofeedback. Frontiers in Psychology, 5, 756.',
         url: 'https://doi.org/10.3389/fpsyg.2014.00756',
-      },
-    ],
-  },
-  {
-    key: 'feel',
-    icon: Heart,
-    sources: [
-      {
-        label: 'Lieberman, M. D. et al. (2007). Putting feelings into words. Psychological Science, 18(5), 421–428.',
-        url: 'https://doi.org/10.1111/j.1467-9280.2007.01916.x',
       },
     ],
   },
@@ -41,12 +43,22 @@ const STEPS = [
     ],
   },
   {
-    key: 'shift',
-    icon: RefreshCw,
+    key: 'frame',
+    icon: Compass,
     sources: [
       {
         label: 'Flavell, J. H. (1979). Metacognition and cognitive monitoring. American Psychologist, 34(10), 906–911.',
         url: 'https://www.researchgate.net/publication/232599909_Metacognition_and_cognitive_monitoring_A_new_area_of_cognitive-developmental_inquiry',
+      },
+    ],
+  },
+  {
+    key: 'breath2',
+    icon: Wind,
+    sources: [
+      {
+        label: 'Lehrer, P. & Gevirtz, R. (2014). Heart rate variability biofeedback. Frontiers in Psychology, 5, 756.',
+        url: 'https://doi.org/10.3389/fpsyg.2014.00756',
       },
     ],
   },
@@ -66,8 +78,22 @@ const STEPS = [
   },
 ] as const;
 
+function stepHighlightsScienceRow(current: PauseStep | undefined, rowKey: (typeof STEPS)[number]['key']): boolean {
+  if (!current) return false;
+  if (current === rowKey) return true;
+  /** Choose bridge is between second breath and Decide — surface citations on the Decide row. */
+  if (current === 'choose' && rowKey === 'decide') return true;
+  return false;
+}
+
+interface PauseScienceScrollBodyProps {
+  /** When set, the matching ritual step’s citations block is visually emphasized. */
+  currentStep?: PauseStep;
+}
+
 /** Scrollable “science behind the pause” body for use inside a bottom sheet / drawer. */
-export function PauseScienceScrollBody() {
+export function PauseScienceScrollBody(props?: PauseScienceScrollBodyProps) {
+  const { currentStep } = props ?? {};
   const { t } = useTranslation();
 
   return (
@@ -75,7 +101,13 @@ export function PauseScienceScrollBody() {
       <p className="text-sm font-medium text-muted-foreground">{t('pauseScience.title')}</p>
       <div className="space-y-5">
         {STEPS.map(({ key, icon: Icon, sources }) => (
-          <div key={key} className="flex gap-3">
+          <div
+            key={key}
+            className={cn(
+              'flex gap-3 rounded-lg border border-transparent p-2 transition-colors',
+              stepHighlightsScienceRow(currentStep, key) && 'border-primary/20 bg-primary/5',
+            )}
+          >
             <div className="mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-muted/60">
               <Icon className="h-3 w-3 text-muted-foreground/60" />
             </div>

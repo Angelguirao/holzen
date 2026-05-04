@@ -11,6 +11,8 @@ interface Props {
   onBack: () => void;
   onDeleteCollection: (id: string) => void;
   onRemoveItem: (collectionId: string, pauseInstanceId: string) => Promise<void>;
+  /** After logging a retrospective outcome on a member pause card, refresh library rows. */
+  onPauseOutcomeLogged?: () => void | Promise<void>;
 }
 
 export function CollectionDetail({
@@ -20,6 +22,7 @@ export function CollectionDetail({
   onBack,
   onDeleteCollection,
   onRemoveItem,
+  onPauseOutcomeLogged,
 }: Props) {
   const { t } = useTranslation();
 
@@ -60,7 +63,7 @@ export function CollectionDetail({
         <div className="space-y-3">
           {collectionRows.map((row) => (
             <div key={row.id ?? ''} className="relative">
-              <ArchivePauseCard row={row} echoesPresentation={false} />
+              <ArchivePauseCard row={row} echoesPresentation={false} onOutcomeLogged={onPauseOutcomeLogged} />
               <button
                 type="button"
                 onClick={() => void onRemoveItem(collection.id, row.id!)}

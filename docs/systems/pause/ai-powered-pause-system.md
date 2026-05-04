@@ -18,7 +18,7 @@ This document describes **how Holzen turns Bitcoin volatility into a pause exper
 2. [Two triggers: comparison](#toc-two-triggers)
 3. [Reflection generation](#toc-reflection-generation)
 4. [Client flow after reflection (manual path)](#toc-client-flow) — [manual pause — request order (click path)](#toc-manual-pause-request-order)
-5. `[companion-orchestrate` (single entry point)](#toc-companion-orchestrate)
+5. [companion-orchestrate (single entry point)](#toc-companion-orchestrate)
 6. [Generator family (orchestrated)](#toc-generator-family)
 7. [Interventions and companions (reference)](#toc-interventions-reference)
 8. [Data written by this system](#toc-data-written)
@@ -279,6 +279,8 @@ This section is **client-centric**: `**use-holzen`** and `**use-companion-data`*
 **Matching this without the UI:** DevTools → Network → `holzen-reflect`, `pause_create_or_reuse` (RPC) / `pause_instances`, `companion-orchestrate`. **Bruno:** test each function in isolation; pass a real **`pauseInstanceId`** into **`companion-orchestrate`** (the old `reflections` insert between reflect and orchestrate is **removed**). See [bruno/README.md](../../../bruno/README.md).
 
 ---
+
+<a id="toc-companion-orchestrate"></a>
 
 ## 5. `companion-orchestrate` (single entry point)
 

@@ -2368,6 +2368,7 @@ export type Database = {
           id: string | null
           initial_emotion_intensity: number | null
           initial_mood: string | null
+          is_brief_ritual: boolean | null
           is_favorite: boolean | null
           metadata: Json | null
           note_text: string | null
@@ -2406,6 +2407,7 @@ export type Database = {
           id?: string | null
           initial_emotion_intensity?: never
           initial_mood?: never
+          is_brief_ritual?: never
           is_favorite?: never
           metadata?: Json | null
           note_text?: never
@@ -2444,6 +2446,7 @@ export type Database = {
           id?: string | null
           initial_emotion_intensity?: never
           initial_mood?: never
+          is_brief_ritual?: never
           is_favorite?: never
           metadata?: Json | null
           note_text?: never
@@ -2535,6 +2538,7 @@ export type Database = {
           id: string | null
           initial_emotion_intensity: number | null
           initial_mood: string | null
+          is_brief_ritual: boolean | null
           is_favorite: boolean | null
           metadata: Json | null
           note_text: string | null
@@ -2573,6 +2577,7 @@ export type Database = {
           id?: string | null
           initial_emotion_intensity?: never
           initial_mood?: never
+          is_brief_ritual?: never
           is_favorite?: never
           metadata?: Json | null
           note_text?: never
@@ -2611,6 +2616,7 @@ export type Database = {
           id?: string | null
           initial_emotion_intensity?: never
           initial_mood?: never
+          is_brief_ritual?: never
           is_favorite?: never
           metadata?: Json | null
           note_text?: never
@@ -2940,6 +2946,7 @@ export type Database = {
           id: string | null
           initial_emotion_intensity: number | null
           initial_mood: string | null
+          is_brief_ritual: boolean | null
           is_favorite: boolean | null
           metadata: Json | null
           note_text: string | null
@@ -2978,6 +2985,7 @@ export type Database = {
           id?: string | null
           initial_emotion_intensity?: never
           initial_mood?: never
+          is_brief_ritual?: never
           is_favorite?: never
           metadata?: Json | null
           note_text?: never
@@ -3016,6 +3024,7 @@ export type Database = {
           id?: string | null
           initial_emotion_intensity?: never
           initial_mood?: never
+          is_brief_ritual?: never
           is_favorite?: never
           metadata?: Json | null
           note_text?: never

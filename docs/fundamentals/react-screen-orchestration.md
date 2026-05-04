@@ -1,77 +1,613 @@
 # React screen orchestration (Holzen)
 
-This document captures the **principles and patterns** we applied while refactoring **`/` Home** so we can reuse them on other pages (`src/pages/*`, large `src/components/*` surfaces).
+This guide explains **how we structure big pages** in Holzen (starting from **`/` Home** and **`/pause` Pause**) so they stay readable, correct, and reusable. It is written so **React beginners** can follow it; you can skip the [Quick React vocabulary](#quick-react-vocabulary) section if you already know those terms.
 
-It is **not** a duplicate of [screens/home.md](../screens/home.md) (that file stays the **Home-specific** map). Use this doc when you are **designing or splitting any screen**.
+- **Concrete Home map:** [screens/home.md](../screens/home.md) (files, modes, widgets).  
+- **Concrete Pause map:** [screens/pause.md](../screens/pause.md) (gate, scaffold, brief vs deep ritual, RPC wiring).  
+- **This doc:** the **ideas** you can copy on other `src/pages/*` screens.
 
-## Philosophy
+---
 
-1. **The route component is a conductor, not a junk drawer.**  
-   `Home.tsx`-style files should mostly **compose** hooks and pass results into a small number of child components. Long imperative blocks, giant `switch` trees, and dozens of `useMemo` blocks in one file are signals to extract.
+## Quick React vocabulary
 
-2. **Behavior is easier to test and review when it has a name.**  
-   Prefer **`useThing`** hooks and **`getThing` / `buildThing` pure helpers** (with Vitest) over anonymous logic embedded in JSX or effects.
+| Term | Plain meaning |
+|------|----------------|
+| **Component** | A function (or class) that returns **UI** (usually **JSX**: HTML-like syntax in JavaScript). |
+| **Props** | **Inputs** passed into a component, like function arguments: `<Button label="Save" />`. |
+| **State** | Data that **belongs to the component** and can change over time; when it changes, React **re-renders** that component (and usually its children). `useState` is the usual way to hold state. |
+| **Render** | One pass where React **runs your component function** and figures out what should appear on screen. |
+| **Hook** | A function whose name starts with **`use`** (`useState`, `useEffect`, `useHolzen`, …). Hooks let a component **subscribe to React features** (state, effects, context). **Custom hooks** are just functions you write that call other hooks — they bundle related logic. |
+| **Effect** | Code that runs **after render** to talk to the outside world (fetch data, subscriptions). `useEffect` is the usual hook. |
 
-3. **Types and invariants live next to the data they describe.**  
-   Example: subscription UX flags live in a small **`getHomeSubscriptionGate`** helper with tests; **`useHolzen`** exposes **`trackedAssetId`** as a normalized **`TrackedAssetId`** so screens do not cast.
+**Orchestration** here means: the page component **does not do every job itself**. It **calls hooks**, **reads data**, and **hands results to smaller components** — like a conductor who does not play every instrument.
 
-4. **UI boundaries carry performance and mental-load boundaries.**  
-   Heavy or rare branches (Zen, modals, admin) benefit from **`React.lazy` + `Suspense`**, **`React.memo`** on expensive presentational shells, and **stable props objects** when the parent re-renders often.
+---
 
-## React rules (non-negotiable)
+## What problem are we solving?
 
-- **Rules of Hooks:** Never call hooks after conditional `return`s. If a screen has `if (!loaded) return …`, **all** hooks for signed-in UI must still run **above** that line (or move signed-in UI into a **child component** that only mounts when ready — then hooks live *inside* the child, and the parent stays minimal).  
-- **Document the tradeoff:** If you keep hooks in the parent for simplicity, “Zen path still runs dashboard hooks” is acceptable **only** when the work is cheap or memoization prevents expensive children from re-rendering. Say so in the screen doc.
+Very large page files tend to:
+
+- mix **loading**, **errors**, **forms**, and **layout** in one place;
+- repeat the same **dependency lists** for `useMemo` / `useCallback`;
+- accidentally **break the Rules of Hooks** (see below);
+- become hard to **test** and **review**.
+
+**Screen orchestration** is the habit of keeping the **route component thin**: it **wires** things together; **named hooks and small modules** hold the real logic.
+
+---
+
+## The four big ideas (beginner-friendly)
+
+### 1. The page is a conductor, not a junk drawer
+
+- **Good:** `Home.tsx` mostly says *which* hooks run and *which* child components receive *which* props.  
+- **Bad:** hundreds of lines of `if` / `switch` / inline calculations inside one return.
+
+If the file feels like a “kitchen sink,” **extract**: move chunks into **`useHomeSomething`** hooks or **`src/lib/something.ts`** helpers.
+
+### 2. Give behavior a name
+
+When logic has a **name** (`useHomePauseActions`, `getHomeSubscriptionGate`), you can:
+
+- **find** it later;
+- **test** it (especially pure functions in `src/lib/` with Vitest);
+- **reuse** it from another screen if it fits.
+
+Anonymous logic buried in JSX is hard to test and easy to duplicate.
+
+### 3. Put types and “truth” next to the data
+
+Example: “can this user see Pro upsell?” is computed in **`getHomeSubscriptionGate`** (pure + tested), not copy-pasted in three JSX branches. **`trackedAssetId`** is normalized once in **`useHolzen`** so pages do not cast `as SomeType` everywhere.
+
+**Rule of thumb:** if the same rule appears twice, **one function or hook** should own it.
+
+### 4. Split heavy UI so the app stays fast and clear
+
+- **`React.lazy` + `Suspense`:** load a **big chunk of UI only when needed** (e.g. Zen mode). The rest of the app does not pay the download cost up front.  
+- **`React.memo`:** “**do not re-render this component** if its **props** are the same as last time.” Good for big presentational shells (e.g. dashboard layout).  
+- **Stable props:** if the parent re-renders often, **memoize the props object** (`useHomeDashboardLayoutProps`) so memoized children are not fooled by “new object, same contents.”
+
+---
+
+## Rules of Hooks (why order matters)
+
+React hooks **depend on call order**. Every render, React expects: “first `useState`, then `useEffect`, then …” in the **same order**. If you **return early** *before* some hooks run, the order **changes between renders** → bugs or React errors.
+
+### Wrong: hooks after an early return
+
+```tsx
+function BadScreen() {
+  const [data, setData] = useState(null);
+  if (!data) return <Loading />; // early exit
+
+  // Never runs on the first render — breaks hook order vs later renders
+  const subscription = useSubscription();
+  return <Main data={data} />;
+}
+```
+
+### Right: hooks first, returns last
+
+```tsx
+function GoodScreen() {
+  const subscription = useSubscription(); // always runs
+  const [data, setData] = useState(null);
+
+  if (!data) return <Loading />;
+  return <Main data={data} />;
+}
+```
+
+### Another pattern: child component
+
+If you truly want “**no** subscription logic until data exists,” move the part that needs those hooks into a **child** that only mounts when ready:
+
+```tsx
+function Parent() {
+  const [data, setData] = useState(null);
+  if (!data) return <Loading />;
+  return <SignedInMain data={data} />; // hooks inside SignedInMain always run when this mounts
+}
+```
+
+Holzen **`Home`** keeps many hooks **above** `if (!profileLoaded)` so order never flips; that means **Zen mode still runs some “dashboard” hooks** even when Zen UI is showing — we accept that tradeoff and **memoize** the dashboard so work stays cheap. The [Home screen doc](../screens/home.md) describes that.
+
+---
+
+## Toolbox: what these APIs do (short)
+
+| API | Beginner summary |
+|-----|-------------------|
+| **`useState`** | Holds one piece of state; changing it triggers a re-render. |
+| **`useMemo`** | “Remember this **computed value** until one of these **dependencies** changes.” Cuts duplicate work and can stabilize **object/array** references for children. |
+| **`useCallback`** | “Remember this **function** reference until dependencies change.” Useful when passing callbacks to **memoized** children. |
+| **`useEffect`** | Runs code **after paint**; good for sync with APIs, timers, subscriptions. Not the first tool for *deriving* UI from props — prefer normal variables or `useMemo`. |
+| **`React.memo(Component)`** | Wraps a component so it **skips re-render** if props are **shallow-equal** to last time. |
+| **`React.lazy` + `Suspense`** | Load a component’s **JavaScript bundle later**; `Suspense` shows a fallback until it arrives. |
+
+---
 
 ## Extraction heuristics (what goes where)
 
-| Symptom | Prefer |
-|--------|--------|
-| Same `useMemo` dependency list repeated for related UI | One hook that returns a **single memoized bundle** (e.g. section `deps` + renderers). |
-| Stable subtree re-rendering on unrelated parent updates | **`React.memo`** on the subtree + **memoized props** (`useMemo` object or a tiny `useXxxProps` hook). |
-| Branch-only UI (settings sheet, zen layout) | **Lazy import** + `Suspense` so the default route stays light. |
-| Booleans from props / API (`subscriptionReady`, gates) | **Pure functions** in `src/lib/` + Vitest; call them from the page or from a thin hook. |
-| `useOutletContext` / route state shapes | **Exported types** in `src/lib/*` or `src/types/*` next to the screen or layout that owns the contract. |
-| PostHog / analytics in handlers | Keep events in handlers, but **update [ops/event-taxonomy.md](../ops/event-taxonomy.md)** when events or properties change. |
+| If you notice… | Prefer… | In beginner terms |
+|----------------|---------|-------------------|
+| The same `useMemo` deps repeated for related UI | One hook returning **one bundle** (e.g. `useHomeDashboardTodayWiring`) | “One place updates when those inputs change.” |
+| A big subtree re-renders when **unrelated** parent state changes | **`React.memo`** on the subtree + **stable props** | “Child ignores parent noise when its inputs did not change.” |
+| A **rare** mode (Zen, admin modal) | **`lazy` + `Suspense`** | “Don’t load that code until we might need it.” |
+| Rules from API / subscription booleans | **Pure `src/lib/` helpers + tests** | “Spreadsheet-style logic: same inputs → same outputs; easy to test.” |
+| `useOutletContext` shapes | **Shared TypeScript type** in `src/lib/` or `src/types/` | “One type definition, many readers.” |
+| New PostHog events | **Update** [event taxonomy](../ops/event-taxonomy.md) | “Analytics is part of the contract.” |
+
+---
 
 ## Checklist for a new or growing screen
 
-1. **List modes** (loading, gated, empty, main, error) and ensure **hook order** is valid for all modes.  
-2. **Pull pure logic** into `src/lib/` with tests when the rules are stable (gates, normalization, ordering).  
-3. **Group hooks by concern** (`useScreenSubscription`, `useScreenLayout`, …) — mirror the Home `use-home-*` pattern with a **screen-specific prefix** if the logic is not reusable.  
-4. **One presentational shell per major layout** (e.g. dashboard vs zen) — props typed and exported (`*LayoutProps`).  
-5. **Memoize prop bags** passed to memoized children when profiling or when the parent is known to churn.  
-6. **Document** in `docs/screens/<name>.md`: modes, hook list, important tradeoffs, and links to libs.
+1. **Name the modes** (loading, logged-out, empty, main, error).  
+2. **All hooks above any `return`** that depends on mode — or use a **child** for the signed-in tree.  
+3. **Move stable rules** to `src/lib/` + tests when they stop changing every week.  
+4. **Group related hooks** with clear names (`useSettingsForm`, `usePauseSession…`).  
+5. **One layout component per major visual** (dashboard vs compact), with **typed props** exported.  
+6. **Write `docs/screens/<name>.md`** with modes, main hooks, and odd tradeoffs.
 
-## Anti-patterns
+---
 
-- **Giant return with 40 props** duplicated between branches — extract a **`useXxxRouteProps`** + spread, or a typed builder.  
-- **`as SomeType` casts** on domain ids — fix the **source hook** (`useProfile` / `useHolzen`) instead.  
-- **New English copy** in a screen that already uses **`t('…')`** elsewhere — stay consistent with i18n.  
-- **Silent `catch`** around product logic — prefer logging + user-visible degradation patterns already used in the app.
+## Anti-patterns (simple list)
+
+- **40 props** copy-pasted into two branches → build **one props object** (maybe with `useMemo`) and spread it.  
+- **`as MyType` everywhere** → fix the **hook or API layer** so the type is right once.  
+- **Hardcoded English** where the rest of the screen uses **`t('key')`** → use i18n.  
+- **`catch {}` that hides errors** → log and/or show something useful.
+
+---
+
+## Guided tour: reading `Home.tsx` (like a walkthrough)
+
+Open [`src/pages/Home.tsx`](../../src/pages/Home.tsx) in the editor and follow **top to bottom**. The line numbers below match the file **at the time this tour was written**; if the file shifts, search for the hook or comment name.
+
+**How to use this tour:** read one **step**, glance at the cited lines in `Home.tsx`, then read the **“What to notice”** bullet. You do not need to open every linked hook file on the first pass.
+
+### Step 0 — Imports are the table of contents
+
+```1:37:src/pages/Home.tsx
+import { useTranslation } from 'react-i18next';
+import { useHolzen } from '@/hooks/use-holzen';
+// ... many use-home-* hooks and layout components ...
+import type { HomeAppLayoutOutletContext } from '@/lib/home-app-layout-outlet';
+```
+
+**What to notice:** almost everything is **imported** from hooks, components, or `src/lib/`. The page file is not where the heavy logic lives — it **orchestrates** named modules.
+
+---
+
+### Step 1 — Router, auth, subscription, tiny global effects
+
+```39:48:src/pages/Home.tsx
+const Home = () => {
+  const { t } = useTranslation();
+  const { user } = useAuth();
+  const navigate = useNavigate();
+  const { pathname } = useLocation();
+  const { subscribed, loading: subLoading, monthlyRemaining, checkoutLoading, startCheckout, refresh } =
+    useSubscription();
+  const [searchParams] = useSearchParams();
+  useHomeCheckoutWelcomeToast(searchParams.get('subscribed'), refresh, t);
+  useHomeDocumentTitle(true);
+```
+
+**What to notice:** standard **React Router** hooks (`useNavigate`, `useLocation`, `useSearchParams`) plus **subscription** state. `useHomeCheckoutWelcomeToast` and `useHomeDocumentTitle` are **side-effect hooks** (they do work when deps change); the page does not render their UI directly.
+
+---
+
+### Step 2 — `useHolzen`: the big “app context” for Home
+
+```50:75:src/pages/Home.tsx
+  const {
+    btcData,
+    message,
+    context,
+    companions,
+    companionPrefs,
+    severity,
+    lastPauseInstanceId,
+    loading,
+    error,
+    newPauseArrival,
+    clearNewPauseArrival,
+    dismissMessage,
+    hasOnboarded,
+    completeOnboarding,
+    manualTrigger,
+    manualCooldownRemaining,
+    autoCooldownRemaining,
+    nextCronCheckIn,
+    cooldownHours,
+    firstName,
+    currency,
+    trackedAssetId,
+    profileLoaded,
+    refreshProfile,
+  } = useHolzen();
+```
+
+**What to notice:** one custom hook returns **many fields** the rest of the page needs (pause message, profile, market, cooldowns). That keeps **`useHolzen`** as the owner of that domain; `Home` only **destructures** what it needs.
+
+---
+
+### Step 3 — Pure subscription flags (no hook)
+
+```76:83:src/pages/Home.tsx
+  const { subscriptionReady, hasAccess, showLimitUpsell, showPauseScheduling } = getHomeSubscriptionGate({
+    subLoading,
+    subscribed,
+    monthlyRemaining,
+    message,
+    loading,
+  });
+```
+
+**What to notice:** this is a **normal function call**, not a hook. Logic lives in [`src/lib/home-subscription-gate.ts`](../../src/lib/home-subscription-gate.ts) with tests. The page **derives** booleans from subscription + pause loading — easy to read, easy to test.
+
+---
+
+### Step 4 — Layout outlet + “always on” home behaviors
+
+```85:90:src/pages/Home.tsx
+  const outletCtx = useOutletContext<HomeAppLayoutOutletContext>();
+  const pauseReady = outletCtx?.pauseReady ?? false;
+  const dismissPauseReady = outletCtx?.dismissPauseReady;
+  useHomeOutletPauseReady(pauseReady, message, loading, refreshProfile, dismissPauseReady);
+  useHomeHeroQuoteViewed(profileLoaded, user?.id);
+  useHomePauseAudio(newPauseArrival, message, clearNewPauseArrival);
+```
+
+**What to notice:** **`useOutletContext`** reads data from a **parent route layout** ([`AppLayout`](../../src/components/AppLayout.tsx)). The typed shape lives in [`src/lib/home-app-layout-outlet.ts`](../../src/lib/home-app-layout-outlet.ts). The following lines are small **effect-style** hooks (analytics, audio).
+
+---
+
+### Step 5 — Night card, market prefs, Zen flag, pinned pause, testimonial count
+
+```92:106:src/pages/Home.tsx
+  const { reflection: nightReflection, dismiss: dismissNight } = useNightReflection();
+
+  const {
+    priceHidden,
+    btcMode,
+    marketChartExpanded,
+    marketChartExpandBlocked,
+    togglePriceHidden,
+    toggleBtcMode,
+    toggleMarketChartExpanded,
+  } = useHomeMarketDisplayPreferences();
+  const unitBasisModeSupported = trackedAssetId === 'bitcoin';
+  const { zenMode, setZenModePersist } = useHomeZenMode(pathname);
+  const { pinnedPausePreview, unpinPausePreview } = useHomePinnedPausePreview(user);
+  const completedPauseCount = useHomeCompletedPauseCount(user);
+```
+
+**What to notice:** each line group is **one concern**. `unitBasisModeSupported` is a **simple derived boolean** from `trackedAssetId` (no hook needed). `pathname` only exists to drive Zen mode persistence tied to the route.
+
+---
+
+### Step 6 — Parsed preview text for pause cards
+
+```108:111:src/pages/Home.tsx
+  const { pauseContextHomePreview, pinnedContextHomePreview } = useHomePauseContextPreviews({
+    context,
+    pinnedContext: pinnedPausePreview?.context ?? null,
+  });
+```
+
+**What to notice:** [`useHomePauseContextPreviews`](../../src/hooks/use-home-pause-context-previews.ts) wraps two **`useMemo`** parsers so `Home` does not repeat `parsePauseContextForHomePreview` boilerplate.
+
+---
+
+### Step 7 — Only local UI state left on the page
+
+```113:113:src/pages/Home.tsx
+  const [goalWhyHoldSummary, setGoalWhyHoldSummary] = useState<string | null>(null);
+```
+
+**What to notice:** this is the rare **`useState` in `Home`** — a small piece of UI state that did not deserve its own hook yet. Everything else is custom hooks or props from `useHolzen`.
+
+---
+
+### Step 8 — Widget order, visibility, derived section lists
+
+```115:123:src/pages/Home.tsx
+  const { order, collapsed, reorder, toggleCollapsed, resetLayout } = useWidgetLayout(HOME_WIDGET_DEFAULT_ORDER);
+  const { visible: sectionVisible, setVisible, resetVisibility: resetSectionVisibility } = useHomeOptionalVisibility();
+
+  const { visibleOrderedSectionIds, todaySectionIds, showJourneyStatTiles } = useHomeVisibleSections({
+    order,
+    sectionVisible,
+    subscribed,
+    hasNightReflection: !!nightReflection,
+  });
+```
+
+**What to notice:** **`HOME_WIDGET_DEFAULT_ORDER`** is a **stable default** from optional-visibility settings so `useWidgetLayout` does not see a new array every render. [`useHomeVisibleSections`](../../src/hooks/use-home-visible-sections.ts) turns order + toggles into **what to render**.
+
+---
+
+### Step 9 — Customize sheet wiring (state + analytics inside the hook)
+
+```125:136:src/pages/Home.tsx
+  const { customizeSheet, onOpenCustomize } = useHomeCustomizeBridge({
+    t,
+    order,
+    reorder,
+    sectionVisible,
+    setVisible,
+    resetLayout,
+    resetSectionVisibility,
+    setZenModePersist,
+    zenMode,
+    subscribed,
+  });
+```
+
+**What to notice:** the hook returns a **ready-made `customizeSheet` object** for the layout component and an **`onOpenCustomize`** handler. PostHog events for customize live **inside** [`useHomeCustomizeBridge`](../../src/hooks/use-home-customize-bridge.tsx), not scattered in JSX.
+
+---
+
+### Step 10 — Market / goal-why header chrome
+
+```138:143:src/pages/Home.tsx
+  const { goalWhyExpanded, goalWhyHeaderRight, marketHeaderRight } = useHomeMarketGoalHeaders({
+    t,
+    marketChartExpanded,
+    marketChartExpandBlocked,
+    toggleMarketChartExpanded,
+  });
+```
+
+**What to notice:** expand/collapse **state** and the **chevron buttons** are bundled together so the big “Today” wiring below receives **ready-made React nodes** for headers.
+
+---
+
+### Step 11 — Pause actions (navigation + checkout + cooldown)
+
+```146:160:src/pages/Home.tsx
+  const pauseActions = useHomePauseActions({
+    message,
+    context,
+    lastPauseInstanceId,
+    openPauseState,
+    companions,
+    companionPrefs,
+    severity,
+    navigate,
+    dismissMessage,
+    manualTrigger,
+    manualCooldownRemaining,
+    startCheckout,
+    dismissAnalyticsSurface: zenMode ? 'home_zen_reflection' : 'home_your_pause_widget',
+  });
+```
+
+**What to notice:** [`useHomePauseActions`](../../src/hooks/use-home-pause-actions.ts) returns **stable callbacks** used by Zen, the pause card, etc. `pauseProjection` (next step) **consumes** those callbacks — order in the file follows **data flow** (define actions, then pass them into UI projection).
+
+---
+
+### Step 12 — Pause card body + snooze + pinned inset
+
+```162:191:src/pages/Home.tsx
+  const pauseProjection = useHomePauseCardProjection({
+    subscriptionReady,
+    hasAccess,
+    subLoading,
+    subscribed,
+    monthlyRemaining,
+    checkoutLoading,
+    message,
+    openPauseState,
+    pauseContextHomePreview,
+    loading,
+    error,
+    btcData,
+    pinnedPausePreview,
+    pinnedPreviewFields: pinnedContextHomePreview,
+    unpinPausePreview,
+    showPauseScheduling,
+    autoCooldownRemaining,
+    cooldownHours,
+    nextCronCheckIn,
+    manualCooldownRemaining,
+    manualTrigger,
+    onNavigatePauseWithThis: pauseActions.handleNavigatePauseWithThis,
+    onNavigatePauseFromPendingBanner: pauseActions.handleNavigatePauseWithThisFromPendingBanner,
+    onDismissOpenPause: pauseActions.handleDismiss,
+    onNeedPause: pauseActions.handleNeedAPause,
+    onStartCheckoutPro: pauseActions.startProCheckout,
+  });
+```
+
+**What to notice:** this hook **assembles JSX subtrees** (`pauseCardBody`, `pauseSectionHeaderRight`, …) with **`useMemo`** inside the hook file. `Home` stays declarative: “here is the data and the callbacks.”
+
+---
+
+### Step 13 — Pull-to-refresh
+
+```185:185:src/pages/Home.tsx
+  const { pullDistance, refreshing: pullRefreshing, handlers: pullHandlers } = useHomePullFullReload();
+```
+
+**What to notice:** [`useHomePullFullReload`](../../src/hooks/use-home-pull-full-reload.ts) bundles **`usePullToRefresh`** + “reload the page” in one line here.
+
+---
+
+### Step 14 — “Today” section wiring (deps + renderers)
+
+```187:215:src/pages/Home.tsx
+  const { renderSection, goalWhyBlock } = useHomeDashboardTodayWiring(
+    {
+      t,
+      goalWhyHoldSummary,
+      setGoalWhyHoldSummary,
+      goalWhyHeaderRight,
+      goalWhyExpanded,
+      error,
+      marketHeaderRight,
+      btcData,
+      priceHidden,
+      togglePriceHidden,
+      currency,
+      trackedAssetId,
+      unitBasisModeSupported,
+      btcMode,
+      toggleBtcMode,
+      marketChartExpanded,
+      toggleMarketChartExpanded,
+      pauseCardBody: pauseProjection.pauseCardBody,
+      pauseSectionHeaderRight: pauseProjection.pauseSectionHeaderRight,
+      nightReflection,
+      dismissNight,
+      subscribed,
+      collapsed,
+      toggleCollapsed,
+    },
+    visibleOrderedSectionIds,
+  );
+```
+
+**What to notice:** one hook ([`useHomeDashboardTodayWiring`](../../src/hooks/use-home-dashboard-today-wiring.ts)) hides the **`useHomeDashboardSectionDeps` + `useHomeDashboardSectionRenderers`** pair. The big object is the **dependency bundle** for [`render-home-dashboard-section`](../../src/components/home/render-home-dashboard-section.tsx).
+
+---
+
+### Step 15 — Zen props (memo object, spread later)
+
+```217:241:src/pages/Home.tsx
+  const zenRouteProps = useHomeZenModeRouteProps({
+    message,
+    context,
+    companions,
+    companionPrefs,
+    severity,
+    lastPauseInstanceId,
+    loading,
+    error,
+    btcData,
+    onDismiss: pauseActions.handleDismiss,
+    onNeedPause: pauseActions.handleNeedAPause,
+    onManualTrigger: manualTrigger,
+    subscriptionReady,
+    hasAccess,
+    showLimitUpsell,
+    showPauseScheduling,
+    pinnedPreview: pauseProjection.pauseEmptyPinnedPreview,
+    autoCooldownRemaining,
+    cooldownHours,
+    nextCronCheckIn,
+    manualCooldownRemaining,
+    checkoutLoading,
+    onStartCheckoutPro: pauseActions.startProCheckout,
+  });
+```
+
+**What to notice:** [`useHomeZenModeRouteProps`](../../src/hooks/use-home-zen-route-props.ts) memoizes a **typed props object** for [`HomeZenModeRoute`](../../src/components/home/HomeZenModeRoute.tsx). That keeps the Zen JSX line short: `{...zenRouteProps}`.
+
+---
+
+### Step 16 — Dashboard layout props (stable object for `React.memo`)
+
+```243:256:src/pages/Home.tsx
+  const dashboardLayout = useHomeDashboardLayoutProps({
+    pullHandlers,
+    pullDistance,
+    pullRefreshing,
+    userId: user?.id,
+    firstName,
+    todaySectionIds,
+    showJourneyStatTiles,
+    goalWhyBlock,
+    renderSection,
+    onOpenCustomize,
+    customize: customizeSheet,
+    completedPauseCount,
+  });
+```
+
+**What to notice:** [`useHomeDashboardLayoutProps`](../../src/hooks/use-home-dashboard-layout-props.ts) exists so [`HomeDashboardLayout`](../../src/components/home/HomeDashboardLayout.tsx) (wrapped in **`React.memo`**) gets **referentially stable props** when nothing relevant changed.
+
+---
+
+### Step 17 — Finally: early returns (modes)
+
+```258:270:src/pages/Home.tsx
+  if (!profileLoaded) {
+    return <AuthLoading />;
+  }
+
+  if (!hasOnboarded) {
+    return <Onboarding onComplete={completeOnboarding} />;
+  }
+
+  if (zenMode) {
+    return <HomeZenModeRoute {...zenRouteProps} />;
+  }
+
+  return <HomeDashboardLayout {...dashboardLayout} />;
+```
+
+**What to notice:** **every hook above ran already**, no matter which branch you hit. That is the **Rules of Hooks** pattern this doc explained earlier. The three returns are just **different screens** for different states.
+
+---
+
+### Step 18 — Where to go next
+
+- Walk **`useHomeDashboardTodayWiring`** → **`useHomeDashboardSectionDeps`** → **`renderHomeDashboardSection`** to see how one **section id** becomes a card.  
+- Open [`HomeZenModeRoute`](../../src/components/home/HomeZenModeRoute.tsx) to see **`lazy` + `Suspense`** around Zen.  
+- Keep [`screens/home.md`](../screens/home.md) open for product modes and file map.  
+- For **`/pause`**, keep [`screens/pause.md`](../screens/pause.md) open next to [`PauseSession.tsx`](../../src/pages/PauseSession.tsx).
+
+---
 
 ## Where Home fits
 
-Home is the **reference implementation** for this playbook: see [screens/home.md](../screens/home.md) for the concrete file map and [AGENTS.md](../../AGENTS.md) for commands. When another screen reaches similar complexity, compare its `src/pages/*.tsx` to Home’s **orchestration vs. extraction** balance.
+**[screens/home.md](../screens/home.md)** is the **first worked example**: file list, modes, Zen vs dashboard, pause errors, analytics. **[screens/pause.md](../screens/pause.md)** is the **second** (full-screen ritual: gate, depth picker, brief vs deep). Compare any new large page to that **shape** (thin page, fat hooks/libs). **This guided tour** is the line-by-line companion to [`src/pages/Home.tsx`](../../src/pages/Home.tsx).
+
+### Does `Home.tsx` follow this guide *completely*?
+
+**No guide should be read as a 100% literal checklist** — it is a playbook with **options**. Home matches the **spirit** and most **rules**; the gaps are either **documented tradeoffs** or **diminishing returns**.
+
+| Guide theme | On Home? | Notes |
+|-------------|----------|--------|
+| **Rules of Hooks** (no hooks after conditional returns) | **Yes** | All hooks run before `if (!profileLoaded)` / onboarding / Zen / dashboard returns. |
+| **Conductor page** (no giant `switch` / logic in JSX) | **Yes** | The bottom of the file is almost only **returns**; wiring lives in hooks and `getHomeSubscriptionGate`. |
+| **Named behavior + tests** | **Yes** for gates | `getHomeSubscriptionGate` + Vitest; other hooks are named and colocated under `use-home-*`. |
+| **Types at source** | **Yes** for `trackedAssetId` | Normalized in `useHolzen`; Home does not cast. |
+| **`React.lazy` + `Suspense` for rare UI** | **Yes** (by delegation) | Lazy Zen lives in [`HomeZenModeRoute`](../../src/components/home/HomeZenModeRoute.tsx); `Home` imports that boundary, not `ZenModeHome` directly. Same idea, split file. |
+| **`React.memo` + stable props for heavy shell** | **Yes** | `HomeDashboardLayout` is memoized; `useHomeDashboardLayoutProps` stabilizes the prop object. |
+| **Child-only-signed-in pattern** | **Not used** | The guide’s **alternative** is a child that mounts only when `profileLoaded` — Home instead keeps **all signed-in hooks in the parent** so order never flips. That is the **first “correct” pattern** in [Rules of Hooks](#rules-of-hooks-why-order-matters), not the child pattern. **Tradeoff:** Zen and loading paths still **execute** dashboard-related hooks; memoization keeps the cost bounded. Same tradeoff is described in [screens/home.md](../screens/home.md) under “Rendering and hooks”. |
+| **“Thin” = low line count** | **Partial** | `Home.tsx` is still **many lines** because listing ~15+ hooks is verbose. **Thin** here means **no business kitchen sink** — not “20 lines total.” Further collapsing into one mega-hook would save lines but **hurt** navigation and grep-ability (arguably *against* the spirit of named hooks). |
+
+**Bottom line:** Home is a **reference implementation** for the parts of the guide that matter most for correctness and reviewability (hooks order, extraction, pure gates, memo boundaries). It **does not** use every optional pattern (e.g. signed-in-only child), and that is **intentional and documented**, not an oversight.
+
+### Where Pause fits
+
+**[screens/pause.md](../screens/pause.md)** maps [`PauseSession.tsx`](../../src/pages/PauseSession.tsx): same **conductor** idea as Home (hooks first, returns at the bottom), but for a **single vertical** (volatility ritual) instead of a dashboard. Canonical **data** and RPC contracts stay in [systems/pause-system.md](../systems/pause-system.md) — especially **section 10** — while `pause.md` is the **UI + file** index for this route.
+
+---
 
 ## Non-React parallels (edge / server handlers)
 
-The same *shape* of thinking applies to **`supabase/functions/*/index.ts`** and other HTTP entrypoints, even though there are no React hooks:
+No hooks in Deno edge functions — but the **ideas** match:
 
-| Screen / SPA idea | Edge / handler analogue |
-|--------------------|-------------------------|
-| Page as conductor | **`index.ts` stays thin**: parse request → call small modules in `_shared/` or feature files → map result to HTTP. |
-| Named, testable behavior | **Pure parsers + validators** in `src/lib`-style modules (or `_shared/*.ts`) with unit tests where Deno/Vitest fit; keep I/O at the edges. |
-| Types at the source | **Typed request/response shapes** (and `EdgeError` codes) instead of ad-hoc `any` and stringly errors. |
-| UI boundaries / perf | **Single responsibility per function**; avoid mega-handlers; shared **`withRequestLogging`** wrapper for every HTTP-serving `index.ts`. |
-| Document tradeoffs | **Function-level README or ops doc** when auth, rate limits, or deploy order matter; keep [ops/deployment-sync-guide.md](../ops/deployment-sync-guide.md) in mind when `config.toml` or migrations move with code. |
+| Screen idea | Edge analogue |
+|-------------|----------------|
+| Thin page | Thin **`index.ts`**: parse → call helpers → respond. |
+| Named logic | **`_shared/*.ts`** modules + tests. |
+| Types at source | **`EdgeError` codes**, typed bodies — not `any`. |
+| Boundaries | **One job per function**; wrap HTTP handlers with **`withRequestLogging`**. |
 
-**Canonical edge conventions:** [ops/edge-logging-conventions.md](../ops/edge-logging-conventions.md) (`withRequestLogging`, `logDependencyCall`, `EdgeError`, audit). **Broader logging story:** [ops/logging-strategy.md](../ops/logging-strategy.md) (browser vs edge vs DB, correlation IDs).
+**Read next:** [ops/edge-logging-conventions.md](../ops/edge-logging-conventions.md), [ops/logging-strategy.md](../ops/logging-strategy.md). Deploy order: [ops/deployment-sync-guide.md](../ops/deployment-sync-guide.md).
+
+---
 
 ## Related reading
 
 - [refactoring-strategy.md](refactoring-strategy.md) — incremental refactors and full-stack touchpoints.  
 - [navigating-the-codebase.md](navigating-the-codebase.md) — routing, auth, hooks at app level.  
-- [backlog/react-page-and-hook-splitting.md](../backlog/react-page-and-hook-splitting.md) — backlog ideas that overlap with this playbook.  
-- [ops/edge-logging-conventions.md](../ops/edge-logging-conventions.md) — edge handler structure and observability.  
-- [ops/logging-strategy.md](../ops/logging-strategy.md) — where logs live and how they relate to the SPA.
+- [screens/pause.md](../screens/pause.md) — **`/pause`** route: gate, scaffold, hooks + lib file map (orchestration).  
+- [systems/pause-system.md](../systems/pause-system.md) — **`/pause`** ritual **data model**, RPCs, **`v_pause_full`** / archive views (companion to thin **`PauseSession.tsx`**).  
+- [backlog/react-page-and-hook-splitting.md](../backlog/react-page-and-hook-splitting.md) — backlog ideas that overlap with this playbook.
