@@ -68,6 +68,7 @@ export function useAutoTrigger() {
     // refresh / re-emission and would otherwise tear down + resubscribe the channel.
   }, [user?.id]);
 
+  /** Hide the non-Home banner only. Intentionally does **not** call `pause_dismiss_current` — same pattern as dismissing a toast (avoid accidental end-pause from Archive/Tools). */
   const dismiss = useCallback(() => setPauseReady(false), []);
 
   return { pauseReady, dismiss };
