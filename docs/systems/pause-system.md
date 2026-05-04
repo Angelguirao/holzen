@@ -108,7 +108,7 @@ Holzen stores **one `pause_instances` row per pause**. Product language below ma
 
 **Client entrypoint:** `src/lib/pause-api.ts` wraps these RPCs. Direct inserts into the append-only tables are not the supported pattern (RLS is built around the RPCs).
 
-**Retrospective outcome:** For `**expired`** instances, `**pause_log_step**` may still accept a single `**outcome_logged**` row for analytics (see migration `20260505120000_pause_log_step_expired_outcome_rescue.sql`). Other step types on `**expired**` generally no-op.
+**Retrospective outcome:** For `**expired`** and `**dismissed`** instances (no prior `**outcome_logged**` row), `**pause_log_step**` may still accept a single `**outcome_logged**` row for analytics (`held` / `bought` / `sold` / `nothing` — see `20260505120000_pause_log_step_expired_outcome_rescue.sql` and `20260512120000_pause_log_step_dismissed_retrospective_outcome.sql`). Other step types on those terminals generally no-op; `**completed**` rows still return without inserting new steps.
 
 ### 4.1 Observability — Postgres vs PostHog vs edge
 
@@ -159,7 +159,7 @@ The **brief** path (~2 min) is a product-only shortening of the ritual UI in `**
 | Deep  | `**initial_emotion_logged**` **and** `**breath_completed**` (Feel + first Breathe) | **Any** `**outcome_logged**` row                |
 
 
-There is **no** separate echo table: echo-like rows stay `**expired**` / `**dismissed**` until cleared, but `**completed**` for `**volatility_v1**` always means “we have a recorded outcome” on that pause row. Retrospective `**outcome_logged**` on `**expired**` (rescue RPC) still leaves `**state = expired**` — see §4.
+There is **no** separate echo table: echo-like rows stay `**expired**` / `**dismissed**` until cleared, but `**completed**` for `**volatility_v1**` always means “we have a recorded outcome” on that pause row. Retrospective `**outcome_logged**` on `**expired**` or `**dismissed**` (rescue RPCs) still leaves `**state**` as `**expired**` / `**dismissed**` — see §4.
 
 Companion `**counts_for_pause**` is **not** read for completion on `**volatility_v1**`. Other template slugs still use `**required_for_*`** arrays and `**required_companion_count**` in the same function.
 
@@ -313,7 +313,7 @@ The Library **Echoes** tab is **not** a separate database entity. It is a **deri
 | `**state = completed`**                         | Terminal row with a recorded choice for `**volatility_v1**`: `**outcome_logged**` triggered `**completed**` (§5.1). `**engaged_at**` is `**COALESCE**`d at that transition, so it may be set when the outcome lands even if the row never visited `**engaged**` first.                                                                                                                                |
 | **Echoes tab (archive “echo”)**                 | A **terminal** instance (`**expired`** or `**dismissed`**) with `**engaged_at` IS NULL** — the row **never reached the `engaged` lifecycle milestone** (early ritual gates not satisfied). Includes `**expired_reason = superseded`** when the prior open pause was replaced before that milestone. `**completed` never appears here** — a finished ritual is a **Pause**, not an archive echo.       |
 | **Echo “complete” vs “incomplete” (UX)**        | **Not** a second DB state. Use `**has_outcome_logged`** from `**v_pause_full**`: incomplete = terminal echo without an outcome row; “with recorded choice” = a retrospective `**outcome_logged**` row may exist **without** `state` becoming `**completed`**.                                                                                                                                         |
-| **Retrospective `outcome_logged` on `expired`** | `**pause_log_step**` may still accept an `**outcome_logged**` row after `**expired**` for analytics / copy (see §4 and migration `20260505120000_pause_log_step_expired_outcome_rescue.sql`). That records a choice; it does **not** reclassify the row as `**completed`**. An echo can therefore show **outcome text** in synthetic archive cards without ever having been a full ritual completion. |
+| **Retrospective `outcome_logged` on `expired` / `dismissed`** | `**pause_log_step**` may still accept an `**outcome_logged**` row when the instance is `**expired**` or `**dismissed**` and no outcome row exists yet (§4; migrations `20260505120000_pause_log_step_expired_outcome_rescue.sql`, `20260512120000_pause_log_step_dismissed_retrospective_outcome.sql`). That records a choice; it does **not** reclassify the row as `**completed`**. Echoes and other archive cards can therefore show **outcome text** without the row ever having been a full ritual completion. **Bulk** review for many expired-without-outcome rows remains the Home **Bulk hold** flow (`BulkHoldCard`), not the Archive list. |
 | **Brief vs deep on archive cards**              | Same row shape as `**v_pause_full`**: archive list queries use `**v_pause_archive_***` (`**SELECT vf.* …**`), so `**is_brief_ritual**` is available for badges or filters once the migration that extends `**v_pause_full**` has been applied (§8).                                                                                                                                                   |
 
 
