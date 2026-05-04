@@ -367,7 +367,7 @@ const Home = () => {
 
 ### Step 11 — Pause actions (navigation + checkout + cooldown)
 
-```146:159:src/pages/Home.tsx
+```146:160:src/pages/Home.tsx
   const pauseActions = useHomePauseActions({
     message,
     context,
@@ -381,6 +381,7 @@ const Home = () => {
     manualTrigger,
     manualCooldownRemaining,
     startCheckout,
+    dismissAnalyticsSurface: zenMode ? 'home_zen_reflection' : 'home_your_pause_widget',
   });
 ```
 
@@ -390,7 +391,7 @@ const Home = () => {
 
 ### Step 12 — Pause card body + snooze + pinned inset
 
-```161:187:src/pages/Home.tsx
+```162:191:src/pages/Home.tsx
   const pauseProjection = useHomePauseCardProjection({
     subscriptionReady,
     hasAccess,
@@ -415,6 +416,7 @@ const Home = () => {
     manualTrigger,
     onNavigatePauseWithThis: pauseActions.handleNavigatePauseWithThis,
     onNavigatePauseFromPendingBanner: pauseActions.handleNavigatePauseWithThisFromPendingBanner,
+    onDismissOpenPause: pauseActions.handleDismiss,
     onNeedPause: pauseActions.handleNeedAPause,
     onStartCheckoutPro: pauseActions.startProCheckout,
   });

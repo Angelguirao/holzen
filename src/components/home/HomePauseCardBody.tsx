@@ -27,6 +27,8 @@ interface HomePauseCardBodyProps {
   onPauseWithThis: () => void;
   /** Pending-context banner CTA (PostHog + navigate); falls back to {@link onPauseWithThis} if omitted. */
   onPauseWithThisFromPendingBanner?: () => void;
+  /** Ends the open pause via `pause_dismiss_current` (clears pending too). Shown with reflection CTAs. */
+  onDismissOpenPause: () => void;
   loading: boolean;
   error: string | null;
   btcData: BtcPriceData | null;
@@ -53,6 +55,7 @@ export function HomePauseCardBody({
   contextPreview,
   onPauseWithThis,
   onPauseWithThisFromPendingBanner,
+  onDismissOpenPause,
   loading,
   error,
   btcData,
@@ -129,6 +132,16 @@ export function HomePauseCardBody({
               >
                 <Sparkles className="h-4 w-4 shrink-0 text-background" aria-hidden />
                 {pausePrimaryCta}
+              </button>
+              <button
+                type="button"
+                onClick={onDismissOpenPause}
+                title={t('home.pauseDismissHint', {
+                  defaultValue: 'Ends this open pause without finishing the ritual. You can start a new one anytime.',
+                })}
+                className="w-full rounded-md border border-border/80 bg-transparent px-3 py-2 text-center text-[12px] font-medium text-muted-foreground transition-colors hover:bg-muted/30 hover:text-foreground"
+              >
+                {t('home.pauseDismissCta', { defaultValue: 'Dismiss pause' })}
               </button>
             </div>
           ) : (

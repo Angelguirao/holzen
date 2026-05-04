@@ -1,4 +1,4 @@
-import { useState, useRef, useMemo } from 'react';
+import { useState, useRef, useMemo, useCallback } from 'react';
 import { useReducedMotion } from 'framer-motion';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
@@ -43,6 +43,8 @@ import { usePauseSessionInitialMoodHandlers } from '@/hooks/use-pause-session-in
 import { usePauseShiftFrameDoneHandler } from '@/hooks/use-pause-shift-frame-done-handler';
 import { usePauseSessionDecideHandler } from '@/hooks/use-pause-session-decide-handler';
 import { usePauseSessionExitNavigation } from '@/hooks/use-pause-session-exit-navigation';
+import { clearSession } from '@/lib/pause-session-storage';
+import { trackEvent } from '@/lib/posthog';
 import { usePauseSessionBreathStepHandlers } from '@/hooks/use-pause-session-breath-step-handlers';
 import { usePauseSessionHeaderBackHandler } from '@/hooks/use-pause-session-header-back-handler';
 import { usePauseSessionPersistToStorage } from '@/hooks/use-pause-session-persist-to-storage';
@@ -84,7 +86,7 @@ import { usePauseSessionBriefFeelSelect } from '@/hooks/use-pause-session-brief-
 export default function PauseSession() {
   const { t } = useTranslation();
   const navigate = useNavigate();
-  const { handleClose, handleReturn } = usePauseSessionExitNavigation(navigate);
+  const { handleReturn } = usePauseSessionExitNavigation(navigate);
   const location = useLocation();
   const prefersReducedMotion = useReducedMotion();
   const breathSecondLabelVariant = usePauseSessionBreathSecondLabelVariant();
@@ -148,6 +150,19 @@ export default function PauseSession() {
 
   const pauseInstanceIdForTerminal =
     pauseInstanceId ?? navPauseInstanceId ?? fetchPauseInstanceId;
+
+  const handleAbandonClose = useCallback(async () => {
+    try {
+      trackEvent('pause_session_abandoned', {
+        pause_instance_id: pauseInstanceIdForTerminal ?? undefined,
+      });
+    } catch {
+      /* no-op */
+    }
+    await dismissMessage();
+    clearSession();
+    navigate('/', { replace: true });
+  }, [dismissMessage, navigate, pauseInstanceIdForTerminal]);
 
   const hasCoalescedShellMessage = message.length > 0;
 
@@ -499,7 +514,9 @@ export default function PauseSession() {
             onBrief={depthPickerOnBrief}
             onDeep={depthPickerOnDeep}
             onAboutPauses={depthPickerOnAboutPauses}
-            onClose={handleClose}
+            onClose={() => {
+              void handleAbandonClose();
+            }}
             aboutSheetOpen={pickerAboutOpen}
             onAboutSheetOpenChange={setPickerAboutOpen}
             aboutSheetTitle={t('pause.aboutPauses.sheetTitle')}
@@ -511,7 +528,9 @@ export default function PauseSession() {
             countdownSlot={engagedOpenMaxCountdownSlot}
             curtainLifted={curtainLifted}
             prefersReducedMotion={!!prefersReducedMotion}
-            onClose={handleClose}
+            onClose={() => {
+              void handleAbandonClose();
+            }}
             phase={phase}
             step={step}
             goToStep={goToStep}

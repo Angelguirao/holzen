@@ -99,6 +99,8 @@
     "pendingQueuedTitle": "New moment queued",
     "pendingQueuedBody": "The market moved again while this pause is open. On the pause screen you can switch to the fresh context or keep this one.",
     "pendingQueuedCta": "Open pause screen",
+    "pauseDismissCta": "Dismiss pause",
+    "pauseDismissHint": "Ends this open pause without finishing the ritual. You can start a new one anytime.",
     "needAMoment": "I need a pause",
     "manualReflectionIn": "Next pause in {{minutes}} min",
     "manualReflectionInSoon": "Next pause in {{time}}",
