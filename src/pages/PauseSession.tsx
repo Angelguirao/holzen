@@ -52,6 +52,7 @@ import { usePauseSessionDepthAndBriefCopy } from '@/hooks/use-pause-session-dept
 import { usePauseSessionBreathSecondLabelVariant } from '@/hooks/use-pause-session-breath-second-label-variant';
 import type { PauseImpactData } from '@/lib/pause-impact-data';
 import { usePauseSessionShell } from '@/hooks/use-pause-session-shell';
+import { usePauseSessionTerminalEntryRedirect } from '@/hooks/use-pause-session-terminal-entry-redirect';
 import { usePauseSessionMountLog } from '@/hooks/use-pause-session-mount-log';
 import { usePauseSessionBriefPastStep } from '@/hooks/use-pause-session-brief-past-step';
 import { usePauseSessionGoBack } from '@/hooks/use-pause-session-go-back';
@@ -144,12 +145,30 @@ export default function PauseSession() {
   const { message, context, pauseInstanceId, companions, companionPrefs, severity } =
     coalescePauseSessionShellViewModel(resolved, holzenSeverity);
 
+  const pauseInstanceIdForTerminal =
+    pauseInstanceId ?? navPauseInstanceId ?? fetchPauseInstanceId;
+
   const hasCoalescedShellMessage = message.length > 0;
 
   const waitingForFetch = isPauseSessionWaitingForInstanceFetch({
     hydrationStatus: hydration.status,
     fetchFailed,
     fetchedInstance,
+  });
+
+  usePauseSessionTerminalEntryRedirect({
+    pauseInstanceId: pauseInstanceIdForTerminal,
+    shellReady:
+      resolved != null ||
+      (hydration.status === 'fetch' &&
+        !waitingForFetch &&
+        fetchedInstance != null &&
+        pauseInstanceIdForTerminal != null),
+    waitingForFetch,
+    fetchFailed,
+    fetchPauseInstanceId,
+    fetchedInstance,
+    restored,
   });
 
   const restoredStep = mapPersistedStep(restored?.step);

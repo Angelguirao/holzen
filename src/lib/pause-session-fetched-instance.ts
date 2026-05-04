@@ -1,5 +1,6 @@
 import type { FetchedPauseInstance } from '@/lib/pause-session-storage';
 import { companionDataFromArtifacts } from '@/lib/pause-session-storage';
+import type { PauseState } from '@/lib/pause-state';
 
 /**
  * Pure mapping from Supabase `pause_instances` + `pause_ai_artifacts` reads into `FetchedPauseInstance`
@@ -12,6 +13,7 @@ import { companionDataFromArtifacts } from '@/lib/pause-session-storage';
 /** `pause_instances` row shape used when hydrating `/pause` from id only. */
 export type PauseInstanceContextSnapshotRow = {
   context_snapshot: Record<string, unknown> | null;
+  state?: PauseState | null;
 };
 
 export type PauseAiArtifactKindRow = {
@@ -38,5 +40,6 @@ export function buildFetchedPauseInstanceFromFetch(
     haiku: companionData.haiku,
     grounding_title: companionData.groundingTitle,
     grounding_body: companionData.groundingBody,
+    db_state: inst.state ?? null,
   };
 }
