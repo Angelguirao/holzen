@@ -107,7 +107,9 @@ Holzen stores **one `pause_instances` row per pause**. Product language below ma
 | `**pause_dismiss_current**` | Expires any `**pending**` rows for the caller (`**system_cancelled**`), then dismisses the open `**active|engaged**` instance (`**user_dismissed_current**`). Invoked from Home (Zen **Done**, dashboard **Dismiss pause**) and from `/pause` when the user closes before completing (header **Close** / depth picker **Close**). |
 
 
-**Client entrypoint:** `src/lib/pause-api.ts` wraps these RPCs. Direct inserts into the append-only tables are not the supported pattern (RLS is built around the RPCs).
+**Client entrypoint:** `src/lib/pause-api.ts` wraps these RPCs.
+
+**Non-Home “pause ready” banner (`PauseReadyBanner` + `useAutoTrigger`):** only toggles a **local** “show nudge” flag when `profiles.last_message` changes. **Dismiss (X) does not** call `**pause_dismiss_current**` — that matches common **toast / reminder** behavior (hide chrome without mutating the open pause). Ending the pause uses **Home** (Zen **Done**, dashboard **Dismiss pause**) or **`/pause`** header **Close** / `**pause_dismiss_current**`. Direct inserts into the append-only tables are not the supported pattern (RLS is built around the RPCs).
 
 **Retrospective outcome:** For `**expired`** and `**dismissed`** instances (no prior `**outcome_logged**` row), `**pause_log_step**` may still accept a single `**outcome_logged**` row for analytics (**`held` / `bought` / `sold` only** — see `20260505120000_pause_log_step_expired_outcome_rescue.sql`, `20260512120000_pause_log_step_dismissed_retrospective_outcome.sql`, and `20260513130000_pause_log_step_retrospective_outcomes_three.sql`). Other step types on those terminals generally no-op; `**completed**` rows still return without inserting new steps.
 

@@ -9,8 +9,9 @@ interface Props {
 }
 
 /**
- * A slide-in banner shown on non-Home pages when an auto-trigger fires.
- * Tapping navigates to Home where the pause widget is highlighted.
+ * Slide-in banner on non-Home routes when `profiles.last_message` updates (new pause reflection).
+ * Primary tap → Home. **X / `onDismiss` only clears local visibility** (`useAutoTrigger`); it does not
+ * end the open pause in Postgres — use Home “Dismiss pause” or Zen Done / `pause_dismiss_current` for that.
  */
 export function PauseReadyBanner({ visible, onDismiss }: Props) {
   const navigate = useNavigate();
@@ -38,7 +39,7 @@ export function PauseReadyBanner({ visible, onDismiss }: Props) {
               <span className="absolute -top-0.5 -right-0.5 h-1.5 w-1.5 rounded-full bg-nox-text-highlight animate-pulse" />
             </div>
             <span className="text-xs font-sans font-medium text-foreground tracking-wide truncate">
-              {t('home.pauseReady', { defaultValue: 'A pause is ready for you' })}
+              {t('home.pauseReadyBanner', { defaultValue: 'A pause is ready for you' })}
             </span>
           </button>
           <button
@@ -47,7 +48,9 @@ export function PauseReadyBanner({ visible, onDismiss }: Props) {
               onDismiss();
             }}
             className="flex-shrink-0 p-1 rounded-full text-muted-foreground hover:text-foreground transition-colors"
-            aria-label={t('common.dismiss', { defaultValue: 'Dismiss' })}
+            aria-label={t('home.pauseReadyBannerHideAria', {
+              defaultValue: 'Hide reminder — your pause stays open on Home',
+            })}
           >
             <X className="h-3 w-3" />
           </button>
