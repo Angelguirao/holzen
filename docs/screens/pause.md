@@ -70,7 +70,7 @@ Do **not** add new PostHog events here without updating `[docs/ops/event-taxonom
 
 ## Archive — retrospective decision (not `/pause`)
 
-The **Archive** Pauses and Echoes tabs use separate `**v_pause_archive_*`** lists (see [pause-system §9](../systems/pause-system.md)). For terminal rows **`expired` or `dismissed`** that still lack `**outcome_logged**`, the app offers **Log decision** on each card: it opens a sheet that calls `**pause_log_step**` with the same four outcomes as Decide / Home bulk-hold (`**src/components/archive/ArchivePauseRetrospectiveOutcomeSheet.tsx**`). That path does **not** navigate to `/pause`. For **many** expired instances at once, Home **`BulkHoldCard`** still provides the bulk review flow.
+The **Archive** Pauses and Echoes tabs use separate `**v_pause_archive_*`** lists (see [pause-system §9](../systems/pause-system.md)). For terminal rows **`expired` or `dismissed`** that still lack `**outcome_logged**`, the app offers **Log decision** on each card: it opens a sheet that calls `**pause_log_step**` with the same three retrospective outcomes as Home bulk-hold (**held / bought / sold** — `**src/components/archive/ArchivePauseRetrospectiveOutcomeSheet.tsx**` reuses **PauseDecide**). That path does **not** navigate to `/pause`. For **many** expired instances at once, Home **`BulkHoldCard`** still provides the bulk review flow.
 
 ## Related reading
 

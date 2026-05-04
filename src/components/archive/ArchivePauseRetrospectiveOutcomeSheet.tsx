@@ -9,7 +9,6 @@ import {
   SheetHeader,
   SheetTitle,
 } from '@/components/ui/sheet';
-import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import { hapticFeedback } from '@/lib/haptics';
 import { pauseLogStep } from '@/lib/pause-api';
@@ -96,7 +95,7 @@ export function ArchivePauseRetrospectiveOutcomeSheet({ row, open, onOpenChange,
           <SheetDescription className="text-left text-sm leading-relaxed">
             {t('archive.retrospectiveSheetBody', {
               defaultValue:
-                'This pause ended before you chose on the ritual screen. Your answer is saved for patterns and stats.',
+                'This pause ended (expired or dismissed) before you finished Decide on the ritual screen. Your answer is saved for patterns and stats; the row stays expired or dismissed.',
             })}
           </SheetDescription>
         </SheetHeader>
@@ -106,23 +105,6 @@ export function ArchivePauseRetrospectiveOutcomeSheet({ row, open, onOpenChange,
             onDecide={handleDecide}
             introKicker={t('archive.retrospectiveDecideKicker', { defaultValue: 'Archive' })}
           />
-          <div className="flex flex-col items-center gap-2 border-t border-border/30 pt-4">
-            <p className="text-center text-xs text-muted-foreground">
-              {t('archive.retrospectiveNothingHint', {
-                defaultValue: 'If you did not buy or sell during this window:',
-              })}
-            </p>
-            <Button
-              type="button"
-              variant="outline"
-              size="sm"
-              className="text-xs"
-              disabled={submitting}
-              onClick={() => void submit('nothing')}
-            >
-              {t('archive.retrospectiveNothingCta', { defaultValue: 'No trade / skipped' })}
-            </Button>
-          </div>
         </div>
       </SheetContent>
     </Sheet>
