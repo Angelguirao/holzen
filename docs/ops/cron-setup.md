@@ -225,13 +225,13 @@ function batches **three** expiry paths (see
 [`docs/systems/pause-system.md`](../systems/pause-system.md) §3):
 
 1. `active|engaged` past `window_ends_at` → `window_elapsed`
-2. **`open_max_age`:** `active` rows with `created_at` older than **12 hours**, or `engaged` rows with `COALESCE(engaged_at, created_at)` older than **12 hours** (same anchor as `pause_evaluate_transitions`; migration `20260514160000_pause_open_max_age_from_engaged_at.sql`)
+2. **`open_max_age` (engaged only):** `engaged` rows with `COALESCE(engaged_at, created_at)` older than **12 hours** — `active` rows are not swept on this path (same as `pause_evaluate_transitions`; migration `20260515180000_pause_open_max_age_engaged_only.sql`)
 3. `pending` offers older than **12 hours** → `system_cancelled`
 
 Schedule with pg_cron at least **hourly** (minute cadence is fine). If
-this job never runs, open pauses can linger past the 12h cap until the
+this job never runs, **`engaged`** rows can linger past the **12h** **`open_max_age`** cap until the
 next step/companion insert triggers `pause_evaluate_transitions` (which
-also enforces `open_max_age`).
+also enforces `open_max_age` for **`engaged`** only). **`active`** rows are not affected by that TTL.
 
 ```sql
 SELECT cron.schedule(

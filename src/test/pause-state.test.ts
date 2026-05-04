@@ -306,7 +306,7 @@ describe('computePauseState', () => {
     ).toBe('completed');
   });
 
-  it('expires active instances when created_at is older than 12h (open max age)', () => {
+  it('keeps active when created_at is old (open_max_age does not apply to active)', () => {
     expect(
       computePauseState({
         instance: makeInstance({ created_at: '2026-04-21T18:00:00.000Z' }),
@@ -315,7 +315,7 @@ describe('computePauseState', () => {
         companionEvents: [],
         now: NOW,
       }),
-    ).toBe('expired');
+    ).toBe('active');
   });
 
   it('does not expire engaged solely because created_at is old if engaged_at is within 12h', () => {
@@ -412,7 +412,7 @@ describe('shouldCountCompanion', () => {
     ).toEqual({ counts: true });
   });
 
-  it('rejects active past open_max_age from created_at (outside_window)', () => {
+  it('allows active with old created_at (open_max_age is engaged-only)', () => {
     expect(
       shouldCountCompanion({
         openInstance: makeInstance({
@@ -424,7 +424,7 @@ describe('shouldCountCompanion', () => {
         companionType: 'signal',
         now: NOW,
       }),
-    ).toEqual({ counts: false, reason: 'outside_window' });
+    ).toEqual({ counts: true });
   });
 
   it('rejects engaged past open_max_age from engaged_at (outside_window)', () => {
