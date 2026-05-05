@@ -97,7 +97,7 @@ export function PauseProgress({
   }
 
   return (
-    <div className="flex w-full items-start justify-between gap-1 sm:gap-2">
+    <div className="flex w-full items-start justify-between gap-[11px]">
       {PAUSE_DEEP_DISPLAY_STEPS.map((step, i) => {
         const isActive = i === currentIndex;
         const isPast = i < currentIndex;
@@ -109,20 +109,20 @@ export function PauseProgress({
             onClick={() => canClick && onStepClick(step)}
             disabled={!canClick}
             className={cn(
-              'flex min-w-0 flex-1 flex-col items-center gap-2',
+              'flex min-w-0 flex-1 flex-col items-center gap-2.5',
               canClick ? 'cursor-pointer' : 'cursor-default',
             )}
           >
             <div
               className={cn(
-                'h-[3px] w-full max-w-[2.5rem] rounded-full transition-colors duration-300 sm:max-w-[3.25rem]',
-                isActive ? 'bg-foreground' : isPast ? 'bg-foreground/55' : 'bg-muted-foreground/25',
+                'h-[3px] w-full rounded-[8px] transition-colors duration-300',
+                isActive ? 'bg-foreground' : isPast ? 'bg-foreground/55' : 'bg-muted-foreground/40',
               )}
             />
             <span
               className={cn(
-                'w-full truncate text-center text-[9px] font-medium uppercase leading-tight tracking-wide sm:text-[10px]',
-                isActive ? 'text-foreground' : isPast ? 'text-foreground/80' : 'text-muted-foreground/70',
+                'w-full truncate text-center text-xs font-medium leading-4 tracking-[0.05em]',
+                isActive ? 'text-foreground' : isPast ? 'text-foreground/85' : 'text-muted-foreground',
                 canClick && 'hover:text-foreground',
               )}
             >

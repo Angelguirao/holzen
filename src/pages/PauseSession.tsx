@@ -553,7 +553,7 @@ export default function PauseSession() {
               goToStep={goToStep}
               onHeaderBack={handlePauseHeaderBack}
               showHeaderBack={showPauseHeaderBack}
-              macroProgressLine={briefMacroLine}
+              macroProgressLine={briefMacroLine ?? scaffoldRitualDerived.macroProgressLine}
               stepperSlot={briefStepperSlot}
               breathSecondLabelVariant={breathSecondLabelVariant}
               soundMuted={soundMuted}

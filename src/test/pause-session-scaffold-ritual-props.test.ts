@@ -2,7 +2,16 @@ import { describe, expect, it } from 'vitest';
 import type { TFunction } from 'i18next';
 import { buildPauseSessionScaffoldRitualDerived } from '@/lib/pause-session-scaffold-ritual-props';
 
-const t = ((key: string) => (key === 'pause.brief.sessionTitle' ? 'Brief title' : key)) as TFunction;
+const t = ((
+  key: string,
+  opts?: { defaultValue?: string; n?: number; total?: number },
+): string => {
+  if (key === 'pause.brief.sessionTitle') return 'Brief title';
+  if (key === 'pause.deep.sessionTitle') return 'Deep title';
+  if (key === 'pause.deep.macroStepCount') return `${opts?.n ?? '?'} of ${opts?.total ?? '?'}`;
+  if (key === 'pause.deep.feelStepDurationHint') return '~ 15 sec';
+  return key;
+}) as TFunction;
 
 describe('buildPauseSessionScaffoldRitualDerived', () => {
   it('brief: no macro index, session title, science maps brief step, hide on breath', () => {
@@ -30,7 +39,7 @@ describe('buildPauseSessionScaffoldRitualDerived', () => {
     ).toBe(true);
   });
 
-  it('deep: macro from STEPS, no session title override, hide science on breath steps', () => {
+  it('deep: macro lines + session title, hide science on breath steps', () => {
     const d = buildPauseSessionScaffoldRitualDerived({
       ritualEntry: 'deep',
       step: 'breathe',
@@ -39,9 +48,22 @@ describe('buildPauseSessionScaffoldRitualDerived', () => {
     });
     expect(d.macroStepIndex).toBe(2);
     expect(d.macroStepTotal).toBeGreaterThan(0);
-    expect(d.sessionTitle).toBeUndefined();
+    expect(d.sessionTitle).toBe('Deep title');
+    expect(d.macroProgressLine).toBe('2 of 6');
+    expect(d.macroProgressSubline).toBeUndefined();
     expect(d.scienceCurrentStep).toBeUndefined();
     expect(d.hideScienceButton).toBe(true);
+  });
+
+  it('deep feel: duration hint under macro step count', () => {
+    const d = buildPauseSessionScaffoldRitualDerived({
+      ritualEntry: 'deep',
+      step: 'feel',
+      briefStep: 'feel',
+      t,
+    });
+    expect(d.macroProgressLine).toBe('1 of 6');
+    expect(d.macroProgressSubline).toBe('~ 15 sec');
   });
 
   it('picker follows deep scaffold rules (same ternary as pre-refactor PauseSession)', () => {

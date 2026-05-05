@@ -69,11 +69,11 @@ export function PauseBriefFeel({
       transition={{ duration: 0.45 }}
     >
       <div className="mx-auto flex w-full max-w-md flex-col gap-8">
-        <div className="space-y-2 text-center">
-          <h2 className={pauseStepLayout.screenTitle}>
+        <div className="flex flex-col gap-2 text-center">
+          <h2 className="text-[22px] font-normal leading-7 tracking-tight text-foreground">
             {t('pause.brief.feel.title', { defaultValue: "What's here?" })}
           </h2>
-          <p className={pauseStepLayout.screenSubtitle}>
+          <p className="text-base leading-6 text-muted-foreground">
             {t('pause.brief.feel.subtitle', { defaultValue: 'No need to be sure' })}
           </p>
         </div>
@@ -87,14 +87,14 @@ export function PauseBriefFeel({
                 type="button"
                 onClick={() => pickTile(tk, mood)}
                 className={cn(
-                  'flex flex-col items-center gap-2 rounded-lg border-2 px-3 py-4 text-center transition-colors',
+                  'flex flex-col items-center gap-2 rounded-lg border-2 p-4 text-center transition-colors',
                   active
-                    ? 'border-foreground bg-muted/50'
-                    : 'border-border/80 bg-muted/15 hover:border-border hover:bg-muted/30',
+                    ? 'border-foreground/50 bg-foreground/5'
+                    : 'border-muted-foreground/35 bg-muted/40 hover:border-muted-foreground/50 hover:bg-muted/55',
                 )}
               >
                 <MoodIcon mood={tk === 'other' ? 'uncertain' : mood} size={24} className="text-muted-foreground" />
-                <span className="text-sm font-medium leading-tight text-foreground">
+                <span className="text-sm font-medium leading-5 text-muted-foreground">
                   {t(`pause.brief.feel.tiles.${tk}`, {
                     defaultValue:
                       tk === 'fomo'

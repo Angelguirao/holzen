@@ -16,6 +16,9 @@ export type PauseSessionScaffoldRitualDerived = {
   macroStepIndex?: number;
   macroStepTotal?: number;
   sessionTitle?: string;
+  /** Deep pause: “{{n}} of {{total}}” under title; brief uses `briefMacroLine` from the page instead. */
+  macroProgressLine?: string;
+  macroProgressSubline?: string;
   scienceCurrentStep?: PauseStep;
   hideScienceButton: boolean;
 };
@@ -36,11 +39,31 @@ export function buildPauseSessionScaffoldRitualDerived(input: {
       hideScienceButton: briefStep === 'breath',
     };
   }
-  return {
-    macroStepIndex: pauseDeepMacroStepNumber(step),
-    macroStepTotal: PAUSE_DEEP_DISPLAY_STEP_COUNT,
-    sessionTitle: undefined,
+  const macroStepIndex = pauseDeepMacroStepNumber(step);
+  const macroStepTotal = PAUSE_DEEP_DISPLAY_STEP_COUNT;
+  const base = {
+    macroStepIndex,
+    macroStepTotal,
     scienceCurrentStep: undefined,
     hideScienceButton: step === 'breathe' || step === 'breath2',
+  };
+  if (ritualEntry === 'deep') {
+    return {
+      ...base,
+      sessionTitle: t('pause.deep.sessionTitle', { defaultValue: 'Your deep pause' }),
+      macroProgressLine: t('pause.deep.macroStepCount', {
+        defaultValue: '{{n}} of {{total}}',
+        n: macroStepIndex,
+        total: macroStepTotal,
+      }),
+      macroProgressSubline:
+        step === 'feel'
+          ? t('pause.deep.feelStepDurationHint', { defaultValue: '~ 15 sec' })
+          : undefined,
+    };
+  }
+  return {
+    ...base,
+    sessionTitle: undefined,
   };
 }
