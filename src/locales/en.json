@@ -1305,6 +1305,14 @@
     "leaveSessionTitle": "Leave ritual?",
     "leaveSessionDescription": "Your pause stays open. You can resume from Home when you're ready. This only leaves this screen — it does not end your pause.",
     "leaveSessionConfirm": "Leave",
+    "leaveWithPending": {
+      "sheetTitle": "Leave the pause",
+      "heading": "Leave this pause?",
+      "body": "A new pause is ready for the latest move. You can stay in this ritual, leave this screen, switch to a short brief pause, or open the new pause.",
+      "stayCta": "Stay",
+      "leaveCta": "Leave",
+      "switchBriefCta": "Or switch to brief pause (~2 min)"
+    },
     "sessionTitle": "Your pause",
     "deep": {
       "sessionTitle": "Your deep pause",

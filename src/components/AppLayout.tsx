@@ -91,7 +91,10 @@ export function AppLayout() {
 
   return (
     <div className="min-h-screen flex items-start justify-center p-6 pb-20">
-      <PendingPauseOfferShell onAfterMutation={() => void resyncOpenPauseFromDb()} />
+      <PendingPauseOfferShell
+        onAfterMutation={() => void resyncOpenPauseFromDb()}
+        autoOpen={location.pathname !== '/pause'}
+      />
       {/* Show banner on non-Home pages when auto-trigger fires */}
       {!isHome && <PauseReadyBanner visible={pauseReady} onDismiss={dismiss} />}
       <CheckoutConfirmation />
