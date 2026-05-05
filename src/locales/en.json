@@ -911,7 +911,7 @@
       "03title": "You reflect",
       "03desc": "An AI-generated reflection encourages awareness, not action. Five companions offer context: a haiku, a signal, a grounding nudge, a zoom-out perspective, and a historical echo.",
       "04title": "You decide",
-      "04desc": "Choose deliberately: hold, sell, buy, or do nothing. The full pause guides you through feel, breathe, reflect, frame, a second breath, then a short settle before Decide — six beats in the ritual, so your choices come from clarity, not impulse.",
+      "04desc": "Choose deliberately whether you held steady, sold, or bought. The full pause guides you through feel, breathe, reflect, frame, a second breath, then a short settle before Decide — six beats in the ritual, so your choices come from clarity, not impulse.",
       "05title": "You grow",
       "05desc": "Tag emotions. Journal notes. Track outcomes. Over time, your Library, insights, and streaks reveal how your composure evolves."
     },
@@ -1306,6 +1306,11 @@
     "leaveSessionDescription": "Your pause stays open. You can resume from Home when you're ready. This only leaves this screen — it does not end your pause.",
     "leaveSessionConfirm": "Leave",
     "sessionTitle": "Your pause",
+    "deep": {
+      "sessionTitle": "Your deep pause",
+      "macroStepCount": "{{n}} of {{total}}",
+      "feelStepDurationHint": "~ 15 sec"
+    },
     "openMaxCountdown": "{{remaining}} left in this ritual window",
     "brief": {
       "sessionTitle": "Your brief pause",
@@ -1386,7 +1391,7 @@
         },
         "sixSteps": {
           "title": "The deep pause (six beats)",
-          "body": "The header shows six beats: Feel, Breathe, Reflect, Frame, a second Breathe, then Decide. After that second breath, one short settle screen appears before the hold / sell / buy / nothing choice — it uses the same sixth segment as Decide, not a separate labeled step. Each beat maps to skills psychologists study: interoception, autonomic settling, perspective-taking, metacognition, re-centering, and values-aligned action."
+          "body": "The header shows six beats: Feel, Breathe, Reflect, Frame, a second Breathe, then Decide. After that second breath, one short settle screen appears before you record whether you held steady, sold, or bought — it uses the same sixth segment as Decide, not a separate labeled step. Each beat maps to skills psychologists study: interoception, autonomic settling, perspective-taking, metacognition, re-centering, and values-aligned action."
         },
         "ritual": {
           "title": "Not a remedy — a ritual",
@@ -1441,10 +1446,10 @@
     "favoriteProHint": "Your favorites will be waiting in your Library with Pro ✨",
     "steps": {
       "feel": "Feel",
-      "breathe": "Breathe",
+      "breathe": "Breath",
       "reflect": "Reflect",
       "frame": "Frame",
-      "breath2": "Breathe",
+      "breath2": "Breath",
       "choose": "Choose",
       "shift": "Shift",
       "decide": "Decide",
