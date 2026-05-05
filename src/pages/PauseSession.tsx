@@ -315,14 +315,10 @@ export default function PauseSession() {
     initialBriefIntegrateDoneFromRestored(restored),
   );
   const [selectedBriefFace, setSelectedBriefFace] = useState(() => initialSelectedBriefFaceFromRestored(restored));
-  const [pickerAboutOpen, setPickerAboutOpen] = useState(false);
-
-  const { onBrief: depthPickerOnBrief, onDeep: depthPickerOnDeep, onAboutPauses: depthPickerOnAboutPauses } =
-    usePauseSessionDepthPickerHandlers({
-      setRitualEntry,
-      setBriefStep,
-      setPickerAboutOpen,
-    });
+  const { onBrief: depthPickerOnBrief, onDeep: depthPickerOnDeep } = usePauseSessionDepthPickerHandlers({
+    setRitualEntry,
+    setBriefStep,
+  });
 
   const handleDepthPickerDeep = useCallback(() => {
     if (!requirePro('deep_pause')) return;
@@ -518,7 +514,6 @@ export default function PauseSession() {
   const scaffoldRitualDerived = buildPauseSessionScaffoldRitualDerived({
     ritualEntry,
     step,
-    briefStep,
     t,
   });
 
@@ -601,11 +596,7 @@ export default function PauseSession() {
               onBrief={depthPickerOnBrief}
               onDeep={handleDepthPickerDeep}
               deepPauseLocked={!subscribed}
-              onAboutPauses={depthPickerOnAboutPauses}
               onClose={requestExitPauseBeforeDone}
-              aboutSheetOpen={pickerAboutOpen}
-              onAboutSheetOpenChange={setPickerAboutOpen}
-              aboutSheetTitle={t('pause.aboutPauses.sheetTitle')}
             />
           }
           scaffoldSlot={
