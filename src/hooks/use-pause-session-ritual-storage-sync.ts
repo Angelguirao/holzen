@@ -1,5 +1,5 @@
 import { useEffect, type Dispatch, type SetStateAction } from 'react';
-import type { BriefFeelTile } from '@/components/pause/PauseBriefFeel';
+import type { FeelStepTile } from '@/components/pause/pause-feel-types';
 import type { BriefPauseStep, RitualDepth } from '@/lib/pause-session-storage';
 import { loadSession } from '@/lib/pause-session-storage';
 import { computePauseStorageRitualSyncPatch } from '@/lib/pause-session-storage-ritual-sync';
@@ -12,7 +12,7 @@ export function usePauseSessionRitualStorageSync(input: {
   setRitualEntry: Dispatch<SetStateAction<RitualDepth | 'picker'>>;
   setBriefStep: Dispatch<SetStateAction<BriefPauseStep>>;
   setBriefIntegrateDone: Dispatch<SetStateAction<boolean>>;
-  setSelectedBriefFace: Dispatch<SetStateAction<BriefFeelTile | null>>;
+  setSelectedBriefFace: Dispatch<SetStateAction<FeelStepTile | null>>;
 }): void {
   const { pauseInstanceId, setRitualEntry, setBriefStep, setBriefIntegrateDone, setSelectedBriefFace } = input;
 

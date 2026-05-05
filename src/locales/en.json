@@ -1311,6 +1311,26 @@
       "macroStepCount": "{{n}} of {{total}}",
       "feelStepDurationHint": "~ 15 sec"
     },
+    "feelStep": {
+      "title": "What's here?",
+      "subtitle": "No need to be sure",
+      "tiles": {
+        "fomo": "FOMO",
+        "fearful": "Fearful",
+        "anxious": "Anxious",
+        "uncertain": "Uncertain",
+        "calm": "Calm",
+        "other": "Other"
+      },
+      "intensityTitle": "How strong?",
+      "intensity": {
+        "faint": "Faint",
+        "light": "Light",
+        "clear": "Clear",
+        "strong": "Strong",
+        "heavy": "Heavy"
+      }
+    },
     "openMaxCountdown": "{{remaining}} left in this ritual window",
     "brief": {
       "sessionTitle": "Your brief pause",
@@ -1320,26 +1340,6 @@
         "breath": "Breath",
         "integrate": "Integrate",
         "decide": "Decide"
-      },
-      "feel": {
-        "title": "What's here?",
-        "subtitle": "No need to be sure",
-        "tiles": {
-          "fomo": "FOMO",
-          "fearful": "Fearful",
-          "anxious": "Anxious",
-          "uncertain": "Uncertain",
-          "calm": "Calm",
-          "other": "Other"
-        },
-        "intensityTitle": "How strong?",
-        "intensity": {
-          "faint": "Faint",
-          "light": "Light",
-          "clear": "Clear",
-          "strong": "Strong",
-          "heavy": "Heavy"
-        }
       },
       "integrate": {
         "title": "Integrate",
