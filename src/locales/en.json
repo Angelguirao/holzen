@@ -1348,12 +1348,16 @@
     "depthPicker": {
       "contextMoved": "{{sym}} moved {{pct}}% in the last 24 hours.",
       "kicker": "What do you need?",
+      "headline1": "You paused",
+      "headline2": "That's the hardest part.",
       "brief": {
         "label": "Brief pause",
+        "duration": "~ 2 min",
         "desc": "Steady yourself, then decide."
       },
       "deep": {
         "label": "Deep pause",
+        "duration": "~ 7 min",
         "desc": "Sit with it. Reflect. Decide from your center."
       }
     },
