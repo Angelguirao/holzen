@@ -3,10 +3,10 @@ import type { RefObject } from 'react';
 import type { CompanionData, CompanionPrefs } from '@/components/CompanionSection';
 import type { MoodValue } from '@/components/MoodCheck';
 import type { BriefFeelTile } from '@/components/pause/PauseBriefFeel';
+import { PauseBriefFeel } from '@/components/pause/PauseBriefFeel';
 import { PauseBreathing, type PauseBreathingHandle } from '@/components/pause/PauseBreathing';
 import { PauseChooseBridge } from '@/components/pause/PauseChooseBridge';
 import { PauseDecide } from '@/components/pause/PauseDecide';
-import { PauseFeel } from '@/components/pause/PauseFeel';
 import { PauseFrame } from '@/components/pause/PauseFrame';
 import { PauseReflect } from '@/components/pause/PauseReflect';
 import type { PauseStep } from '@/components/pause/PauseProgress';
@@ -15,16 +15,11 @@ import type { PauseSessionStepTransitionConfig } from '@/lib/pause-session-step-
 export type PauseSessionDeepRitualBodyProps = {
   step: PauseStep;
   stepTransition: PauseSessionStepTransitionConfig;
-  onMoodSelect: (
-    mood: MoodValue,
-    intensity?: number,
-    opts?: { briefRitual?: boolean; briefFace?: BriefFeelTile },
-  ) => void | Promise<void>;
-  onMoodSkip: () => void | Promise<void>;
-  onMoodReset: () => void;
   moodDone: boolean;
   selectedMood: MoodValue | null;
+  selectedBriefFace: BriefFeelTile | null;
   feelIntensity: number | null;
+  onFeelTilesSelect: (mood: MoodValue, intensity: number, tile: BriefFeelTile) => void;
   goToStep: (next: PauseStep) => void;
   breathingRef: RefObject<PauseBreathingHandle | null>;
   mantra: string | null;
@@ -58,12 +53,11 @@ export type PauseSessionDeepRitualBodyProps = {
 export function PauseSessionDeepRitualBody({
   step,
   stepTransition,
-  onMoodSelect,
-  onMoodSkip,
-  onMoodReset,
   moodDone,
   selectedMood,
+  selectedBriefFace,
   feelIntensity,
+  onFeelTilesSelect,
   goToStep,
   breathingRef,
   mantra,
@@ -95,13 +89,12 @@ export function PauseSessionDeepRitualBody({
     <AnimatePresence mode="wait" initial={false}>
       {step === 'feel' && (
         <motion.div key="feel" {...stepTransition}>
-          <PauseFeel
-            onMoodSelect={onMoodSelect}
-            onMoodSkip={onMoodSkip}
-            onMoodReset={onMoodReset}
+          <PauseBriefFeel
             moodDone={moodDone}
             selectedMood={selectedMood}
+            selectedTile={selectedBriefFace}
             feelIntensity={feelIntensity}
+            onSelect={onFeelTilesSelect}
             onContinue={() => goToStep('breathe')}
           />
         </motion.div>

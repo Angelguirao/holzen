@@ -65,7 +65,7 @@ import { buildPauseSessionMountLogParams } from '@/lib/pause-session-mount-log-p
 import { usePauseSessionPendingPauseOfferNavigation } from '@/hooks/use-pause-session-pending-pause-offer-navigation';
 import { usePauseSessionDepthPickerHandlers } from '@/hooks/use-pause-session-depth-picker-handlers';
 import { usePauseSessionDeepChooseBridgeHandler } from '@/hooks/use-pause-session-deep-choose-bridge-handler';
-import { usePauseSessionBriefFeelSelect } from '@/hooks/use-pause-session-brief-feel-select';
+import { usePauseSessionFeelTilesSelect } from '@/hooks/use-pause-session-feel-tiles-select';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -266,7 +266,7 @@ export default function PauseSession() {
       setPickerAboutOpen,
     });
 
-  const { handleMoodSelect, handleMoodSkip, handleMoodReset } = usePauseSessionInitialMoodHandlers({
+  const { handleMoodSelect } = usePauseSessionInitialMoodHandlers({
     pauseInstanceId,
     t,
     lastFeelLogKeyRef,
@@ -276,7 +276,10 @@ export default function PauseSession() {
     setSelectedBriefFace,
   });
 
-  const { onBriefFeelSelect } = usePauseSessionBriefFeelSelect({ handleMoodSelect });
+  const { onFeelTilesSelect } = usePauseSessionFeelTilesSelect({
+    handleMoodSelect,
+    isBriefRitual: ritualEntry === 'brief',
+  });
 
   usePauseSessionRitualStorageSync({
     pauseInstanceId,
@@ -474,7 +477,7 @@ export default function PauseSession() {
     selectedMood,
     selectedBriefFace,
     feelIntensity,
-    onBriefFeelSelect,
+    onFeelTilesSelect,
     setBriefStep,
     breathingRef,
     mantra,
@@ -491,9 +494,6 @@ export default function PauseSession() {
     handleBriefIntegrateComplete,
     handleDecide,
     briefDecideIntroKicker,
-    handleMoodSelect,
-    handleMoodSkip,
-    handleMoodReset,
     goToStep,
     handleContinueAfterFirstBreath,
     handleContinueAfterSecondBreath,

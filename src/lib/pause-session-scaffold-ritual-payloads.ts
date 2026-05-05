@@ -25,7 +25,7 @@ export type PauseSessionScaffoldRitualPayloadsParams = {
   selectedMood: MoodValue | null;
   selectedBriefFace: BriefFeelTile | null;
   feelIntensity: number | null;
-  onBriefFeelSelect: PauseSessionBriefRitualBodyProps['onBriefFeelSelect'];
+  onFeelTilesSelect: PauseSessionBriefRitualBodyProps['onFeelTilesSelect'];
   setBriefStep: (next: BriefPauseStep) => void;
   breathingRef: RefObject<PauseBreathingHandle | null>;
   mantra: string | null;
@@ -42,9 +42,6 @@ export type PauseSessionScaffoldRitualPayloadsParams = {
   handleBriefIntegrateComplete: PauseSessionBriefRitualBodyProps['onBriefIntegrateComplete'];
   handleDecide: PauseSessionBriefRitualBodyProps['onDecide'];
   briefDecideIntroKicker: string;
-  handleMoodSelect: PauseSessionDeepRitualBodyProps['onMoodSelect'];
-  handleMoodSkip: PauseSessionDeepRitualBodyProps['onMoodSkip'];
-  handleMoodReset: PauseSessionDeepRitualBodyProps['onMoodReset'];
   goToStep: PauseSessionDeepRitualBodyProps['goToStep'];
   handleContinueAfterFirstBreath: () => void | Promise<unknown>;
   handleContinueAfterSecondBreath: () => void | Promise<unknown>;
@@ -78,7 +75,7 @@ export function buildPauseSessionScaffoldRitualPayloads(
       selectedMood: p.selectedMood,
       selectedBriefFace: p.selectedBriefFace,
       feelIntensity: p.feelIntensity,
-      onBriefFeelSelect: p.onBriefFeelSelect,
+      onFeelTilesSelect: p.onFeelTilesSelect,
       onBriefFeelContinueToBreath: () => p.setBriefStep('breath'),
       breathingRef: p.breathingRef,
       mantra: p.mantra,
@@ -98,12 +95,11 @@ export function buildPauseSessionScaffoldRitualPayloads(
     deepRitual: {
       step: p.step,
       stepTransition: p.stepTransition,
-      onMoodSelect: p.handleMoodSelect,
-      onMoodSkip: p.handleMoodSkip,
-      onMoodReset: p.handleMoodReset,
       moodDone: p.moodDone,
       selectedMood: p.selectedMood,
+      selectedBriefFace: p.selectedBriefFace,
       feelIntensity: p.feelIntensity,
+      onFeelTilesSelect: p.onFeelTilesSelect,
       goToStep: p.goToStep,
       breathingRef: p.breathingRef,
       mantra: p.mantra,

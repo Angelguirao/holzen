@@ -9,6 +9,7 @@ import { Slider } from '@/components/ui/slider';
 import { pauseStepLayout } from '@/components/pause/pause-step-layout';
 import { cn } from '@/lib/utils';
 
+/** Tile ids for the shared brief/deep Feel step (3×2 grid + intensity). */
 export type BriefFeelTile = 'fomo' | 'fearful' | 'anxious' | 'uncertain' | 'calm' | 'other';
 
 const TILES: { tile: BriefFeelTile; mood: MoodValue }[] = [
