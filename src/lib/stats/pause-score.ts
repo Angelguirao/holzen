@@ -43,8 +43,22 @@ const COMPOSURE: Record<string, number> = {
   fomo: 10,
 };
 
-function parseVolatility(contextSnapshot: Record<string, unknown> | null): number {
-  if (!contextSnapshot) return 0;
+/**
+ * Volatility context derived from `pause_instances.context_snapshot`.
+ *
+ * `pctAbs` is the magnitude of the price move (always >= 0) used by tier and
+ * companion-engagement multipliers. `direction` exposes the sign so the
+ * scoring branches can tell a dip-buy apart from a chase-buy without scanning
+ * the raw payload again.
+ */
+type VolatilityDirection = 'up' | 'down' | 'flat';
+interface VolatilityContext {
+  pctAbs: number;
+  direction: VolatilityDirection;
+}
+
+function parseVolatility(contextSnapshot: Record<string, unknown> | null): VolatilityContext {
+  if (!contextSnapshot) return { pctAbs: 0, direction: 'flat' };
   const raw =
     contextSnapshot.change_24h_pct ??
     contextSnapshot.change_7d_pct ??
@@ -52,7 +66,9 @@ function parseVolatility(contextSnapshot: Record<string, unknown> | null): numbe
     contextSnapshot.changePercent ??
     0;
   const n = typeof raw === 'number' ? raw : Number(raw);
-  return Number.isFinite(n) ? Math.abs(n) : 0;
+  if (!Number.isFinite(n)) return { pctAbs: 0, direction: 'flat' };
+  const direction: VolatilityDirection = n > 0 ? 'up' : n < 0 ? 'down' : 'flat';
+  return { pctAbs: Math.abs(n), direction };
 }
 
 function volatilityTier(pct: number): number {
@@ -123,32 +139,45 @@ export function computePauseScore(params: {
   }
 
   // --- 2. Distress Tolerance ---
+  // Outcome scoring is intentionally context-aware for `bought`: a dip-buy
+  // (direction='down') reads as conviction-aligned with the volatility, a
+  // chase-buy (direction='up') reads as reactive. Without a clear direction
+  // we fall back to the legacy neutral 45. See docs/systems/stats-system.md
+  // "Outcome scoring matrix" for the canonical (outcome, tier, direction) map.
+  // Historical `nothing` rows (legacy alias) score as the catch-all 50; the
+  // live UI no longer emits that value (see migration
+  // 20260519120000_pause_log_step_main_outcome_validation.sql).
   const withOutcomeAndContext = recent.filter((r) => r.outcome && r.context_snapshot);
   let distressScore = 50;
   if (withOutcomeAndContext.length > 0) {
     const scores = withOutcomeAndContext.map((r) => {
-      const vol = parseVolatility(r.context_snapshot);
-      const tier = volatilityTier(vol);
+      const { pctAbs, direction } = parseVolatility(r.context_snapshot);
+      const tier = volatilityTier(pctAbs);
       const o = r.outcome!;
-      if (o === 'held' || o === 'nothing') return Math.min(100, 60 + tier * 20);
+      if (o === 'held') return Math.min(100, 60 + tier * 20);
       if (o === 'sold') return Math.max(0, 40 - tier * 15);
-      if (o === 'bought') return 45;
+      if (o === 'bought') {
+        if (direction === 'down') return Math.min(100, 50 + tier * 10);
+        if (direction === 'up') return Math.max(0, 50 - tier * 10);
+        return 45;
+      }
       return 50;
     });
     distressScore = scores.reduce((s, v) => s + v, 0) / scores.length;
   }
 
   // --- 3. Decision Alignment ---
+  // Only `held` is hold-aligned; legacy `nothing` rows fall through to 50.
   let decisionScore = 50;
   if (hasHoldGoal) {
     const withOutcome = recent.filter((r) => r.outcome);
     if (withOutcome.length > 0) {
       const scores = withOutcome.map((r) => {
         const o = r.outcome!;
-        if (holdGoal!.type === 'forever') {
-          return o === 'held' || o === 'nothing' ? 100 : o === 'bought' ? 60 : 15;
-        }
-        return o === 'held' || o === 'nothing' ? 100 : o === 'bought' ? 50 : 20;
+        if (o === 'held') return 100;
+        if (o === 'sold') return holdGoal!.type === 'forever' ? 15 : 20;
+        if (o === 'bought') return holdGoal!.type === 'forever' ? 60 : 50;
+        return 50;
       });
       decisionScore = scores.reduce((s, v) => s + v, 0) / scores.length;
     }
@@ -157,8 +186,8 @@ export function computePauseScore(params: {
   // --- 4. Cognitive Reappraisal ---
   const reappraisalScores = recent.map((r) => {
     const engaged = r.counted_companion_count;
-    const vol = parseVolatility(r.context_snapshot);
-    const volMult = vol >= 3 ? 1.5 : 1;
+    const { pctAbs } = parseVolatility(r.context_snapshot);
+    const volMult = pctAbs >= 3 ? 1.5 : 1;
     return Math.min(100, (Math.min(engaged, 4) / 4) * 100 * volMult);
   });
   const reappraisalScore =

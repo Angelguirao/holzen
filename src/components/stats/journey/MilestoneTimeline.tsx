@@ -67,7 +67,7 @@ export function MilestoneTimeline({ rows }: Props) {
     }
     const firstHold = first(
       rows,
-      (r) => r.state === 'completed' && (r.outcome === 'held' || r.outcome === 'nothing'),
+      (r) => r.state === 'completed' && r.outcome === 'held',
     );
     if (firstHold) {
       out.push({
