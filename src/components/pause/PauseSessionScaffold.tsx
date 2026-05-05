@@ -186,12 +186,12 @@ export function PauseSessionScaffold({
             {phase === 'session' && (
               <>
                 {showMeta &&
-                  (macroProgressSubline != null ||
-                  (macroProgressLine != null &&
-                    macroStepIndex != null &&
-                    macroStepTotal != null &&
-                    macroStepTotal > 0) ? (
-                    <div className="relative mt-1 flex flex-col items-center gap-0 text-center text-muted-foreground">
+                  ((macroProgressSubline != null ||
+                    (macroProgressLine != null &&
+                      macroStepIndex != null &&
+                      macroStepTotal != null &&
+                      macroStepTotal > 0)) ? (
+                    <div className="mt-1 flex flex-col items-center gap-0 text-center text-muted-foreground">
                       <p className="text-base font-medium italic leading-6">
                         {macroProgressLine ??
                           t('pause.deep.macroStepCount', {
