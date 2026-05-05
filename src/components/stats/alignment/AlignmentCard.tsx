@@ -29,11 +29,7 @@ export function AlignmentCard({ rows, holdGoal, onConfigureHoldGoal }: Props) {
   const { rate, sample } = useMemo(() => {
     if (!holdGoal?.type) return { rate: null as number | null, sample: 0 };
     const completed = rows.filter((r) => r.state === 'completed' && r.outcome);
-    const aligned = completed.filter((r) => {
-      const o = r.outcome!;
-      if (holdGoal.type === 'forever') return o === 'held' || o === 'nothing';
-      return o === 'held' || o === 'nothing';
-    });
+    const aligned = completed.filter((r) => r.outcome === 'held');
     const rate = completed.length === 0 ? null : Math.round((aligned.length / completed.length) * 100);
     return { rate, sample: completed.length };
   }, [rows, holdGoal]);

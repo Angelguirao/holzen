@@ -9,7 +9,9 @@ import {
   isWithinInterval, format,
 } from 'date-fns';
 
-const HOLD = new Set(['held', 'nothing']);
+// Live UI emits `held | bought | sold` only; legacy `nothing` rows fall through
+// (consistent with src/lib/badges/compute.ts).
+const HOLD = new Set(['held']);
 const CALM = new Set(['calm', 'detached']);
 
 interface Props {

@@ -95,4 +95,150 @@ describe('computePauseScore', () => {
     })!;
     expect(out.sampleSize).toBe(30);
   });
+
+  describe('distress tolerance: context-aware bought scoring', () => {
+    it('held score stays at 60 + tier*20 across volatility tiers', () => {
+      const mild = computePauseScore({
+        completedRows: [
+          makeRow({ outcome: 'held', context_snapshot: { change_24h_pct: -1 } }),
+        ],
+        stepEvents: [],
+        companionEvents: [],
+      })!;
+      const moderate = computePauseScore({
+        completedRows: [
+          makeRow({ outcome: 'held', context_snapshot: { change_24h_pct: -5 } }),
+        ],
+        stepEvents: [],
+        companionEvents: [],
+      })!;
+      const severe = computePauseScore({
+        completedRows: [
+          makeRow({ outcome: 'held', context_snapshot: { change_24h_pct: -10 } }),
+        ],
+        stepEvents: [],
+        companionEvents: [],
+      })!;
+      expect(mild.distressTolerance).toBe(80); // 60 + 1.0 * 20
+      expect(moderate.distressTolerance).toBe(90); // 60 + 1.5 * 20
+      expect(severe.distressTolerance).toBe(100); // 60 + 2.0 * 20 capped
+    });
+
+    it('bought during a dip (down) scores higher with tier (50 + tier*10)', () => {
+      const mildDip = computePauseScore({
+        completedRows: [
+          makeRow({ outcome: 'bought', context_snapshot: { change_24h_pct: -1 } }),
+        ],
+        stepEvents: [],
+        companionEvents: [],
+      })!;
+      const moderateDip = computePauseScore({
+        completedRows: [
+          makeRow({ outcome: 'bought', context_snapshot: { change_24h_pct: -5 } }),
+        ],
+        stepEvents: [],
+        companionEvents: [],
+      })!;
+      const severeDip = computePauseScore({
+        completedRows: [
+          makeRow({ outcome: 'bought', context_snapshot: { change_24h_pct: -10 } }),
+        ],
+        stepEvents: [],
+        companionEvents: [],
+      })!;
+      expect(mildDip.distressTolerance).toBe(60); // 50 + 1.0 * 10
+      expect(moderateDip.distressTolerance).toBe(65); // 50 + 1.5 * 10
+      expect(severeDip.distressTolerance).toBe(70); // 50 + 2.0 * 10
+    });
+
+    it('bought during a spike (up) scores lower with tier (50 - tier*10)', () => {
+      const mildSpike = computePauseScore({
+        completedRows: [
+          makeRow({ outcome: 'bought', context_snapshot: { change_24h_pct: 1 } }),
+        ],
+        stepEvents: [],
+        companionEvents: [],
+      })!;
+      const moderateSpike = computePauseScore({
+        completedRows: [
+          makeRow({ outcome: 'bought', context_snapshot: { change_24h_pct: 5 } }),
+        ],
+        stepEvents: [],
+        companionEvents: [],
+      })!;
+      const severeSpike = computePauseScore({
+        completedRows: [
+          makeRow({ outcome: 'bought', context_snapshot: { change_24h_pct: 10 } }),
+        ],
+        stepEvents: [],
+        companionEvents: [],
+      })!;
+      expect(mildSpike.distressTolerance).toBe(40); // 50 - 1.0 * 10
+      expect(moderateSpike.distressTolerance).toBe(35); // 50 - 1.5 * 10
+      expect(severeSpike.distressTolerance).toBe(30); // 50 - 2.0 * 10
+    });
+
+    it('bought with flat market (0%) falls back to neutral 45', () => {
+      const flat = computePauseScore({
+        completedRows: [
+          makeRow({ outcome: 'bought', context_snapshot: { change_24h_pct: 0 } }),
+        ],
+        stepEvents: [],
+        companionEvents: [],
+      })!;
+      expect(flat.distressTolerance).toBe(45);
+    });
+
+    it('legacy `nothing` outcome rows score as the catch-all neutral 50', () => {
+      const nothing = computePauseScore({
+        completedRows: [
+          makeRow({ outcome: 'nothing', context_snapshot: { change_24h_pct: -10 } }),
+        ],
+        stepEvents: [],
+        companionEvents: [],
+      })!;
+      expect(nothing.distressTolerance).toBe(50);
+    });
+  });
+
+  describe('decision alignment: legacy nothing no longer hold-aligned', () => {
+    it('legacy `nothing` row scores 50 (neutral) under a forever hold goal', () => {
+      const out = computePauseScore({
+        completedRows: [makeRow({ outcome: 'nothing' })],
+        stepEvents: [],
+        companionEvents: [],
+        holdGoal: {
+          type: 'forever',
+          targetMonths: null,
+          targetPrice: null,
+          start: '2026-01-01',
+        },
+      })!;
+      expect(out.decisionAlignment).toBe(50);
+    });
+
+    it('held + bought + sold scoring under forever hold goal is unchanged (100 / 60 / 15)', () => {
+      const heldOut = computePauseScore({
+        completedRows: [makeRow({ outcome: 'held' })],
+        stepEvents: [],
+        companionEvents: [],
+        holdGoal: { type: 'forever', targetMonths: null, targetPrice: null, start: null },
+      })!;
+      const boughtOut = computePauseScore({
+        completedRows: [makeRow({ outcome: 'bought' })],
+        stepEvents: [],
+        companionEvents: [],
+        holdGoal: { type: 'forever', targetMonths: null, targetPrice: null, start: null },
+      })!;
+      const soldOut = computePauseScore({
+        completedRows: [makeRow({ outcome: 'sold' })],
+        stepEvents: [],
+        companionEvents: [],
+        holdGoal: { type: 'forever', targetMonths: null, targetPrice: null, start: null },
+      })!;
+      expect(heldOut.decisionAlignment).toBe(100);
+      expect(boughtOut.decisionAlignment).toBe(60);
+      expect(soldOut.decisionAlignment).toBe(15);
+    });
+  });
 });
