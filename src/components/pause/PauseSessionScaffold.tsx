@@ -1,6 +1,6 @@
 import { useState, type ReactNode } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ChevronLeft, Info, Volume2, VolumeX, X } from 'lucide-react';
+import { ChevronLeft, Volume2, VolumeX, X } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { PauseProgress, type PauseStep } from '@/components/pause/PauseProgress';
 import { PauseAboutPausesBody } from '@/components/pause/PauseAboutPausesBody';
@@ -35,7 +35,7 @@ interface Props {
   scienceCurrentStep?: PauseStep;
   /** PostHog flag `pause.step5_breath_label_shift`: label second breathing macro step as “Shift”. */
   breathSecondLabelVariant?: 'breathe' | 'shift';
-  /** Breath steps use close-only chrome in wireframes — hide the science affordance. */
+  /** Breath steps: hide the inline “Step science” text affordance below the stepper. */
   hideScienceButton?: boolean;
   /** When set with `onSoundMutedChange`, header mute controls ritual audio (breathing cues). */
   soundMuted?: boolean;
@@ -46,8 +46,9 @@ interface Props {
 }
 
 /**
- * Full-screen pause shell: curtain, gradient, sticky header (title · info · close),
- * segment stepper, optional back, science bottom sheet from info.
+ * Full-screen pause shell: curtain, gradient, sticky header (title · close),
+ * segment stepper, macro lines + mute below the stepper, optional back,
+ * science bottom sheet from the inline “Step science” link (hidden on breath-only chrome).
  */
 export function PauseSessionScaffold({
   curtainLifted,
@@ -74,7 +75,8 @@ export function PauseSessionScaffold({
 }: Props) {
   const { t } = useTranslation();
   const [scienceOpen, setScienceOpen] = useState(false);
-  const [uncontrolledMuted, setUncontrolledMuted] = useState(false);
+  /** Ritual audio off by default (wireframe: volume “off” until the user enables it). */
+  const [uncontrolledMuted, setUncontrolledMuted] = useState(true);
   const muted = soundMutedControlled ?? uncontrolledMuted;
   const setMuted = onSoundMutedChange ?? setUncontrolledMuted;
 
@@ -134,38 +136,7 @@ export function PauseSessionScaffold({
           >
             <div className="relative flex min-h-[2.25rem] items-center justify-center">
               <h1 className="text-sm font-medium text-foreground">{sessionTitle ?? t('pause.sessionTitle')}</h1>
-              <div className="absolute right-0 top-1/2 flex -translate-y-1/2 items-center gap-0.5">
-                {phase === 'session' && (
-                  <Button
-                    type="button"
-                    variant="ghost"
-                    size="icon"
-                    className="h-9 w-9 shrink-0 text-muted-foreground hover:text-foreground"
-                    onClick={() => {
-                      setMuted(!muted);
-                      if (muted) void resumePauseAudioContext();
-                    }}
-                    aria-label={
-                      muted
-                        ? t('pause.muteAriaOff', { defaultValue: 'Sound off (tap to unmute)' })
-                        : t('pause.muteAriaOn', { defaultValue: 'Sound on (tap to mute)' })
-                    }
-                  >
-                    {muted ? <VolumeX className="h-4 w-4" aria-hidden /> : <Volume2 className="h-4 w-4" aria-hidden />}
-                  </Button>
-                )}
-                {phase === 'session' && !hideScienceButton && (
-                  <Button
-                    type="button"
-                    variant="ghost"
-                    size="icon"
-                    className="h-9 w-9 shrink-0 text-muted-foreground hover:text-foreground"
-                    onClick={() => setScienceOpen(true)}
-                    aria-label={t('pause.scienceInfoAria')}
-                  >
-                    <Info className="h-4 w-4" aria-hidden />
-                  </Button>
-                )}
+              <div className="absolute right-0 top-1/2 flex -translate-y-1/2 items-center">
                 <Button
                   type="button"
                   variant="ghost"
@@ -185,35 +156,6 @@ export function PauseSessionScaffold({
 
             {phase === 'session' && (
               <>
-                {showMeta &&
-                  ((macroProgressSubline != null ||
-                    (macroProgressLine != null &&
-                      macroStepIndex != null &&
-                      macroStepTotal != null &&
-                      macroStepTotal > 0)) ? (
-                    <div className="mt-1 flex flex-col items-center gap-0 text-center text-muted-foreground">
-                      <p className="text-base font-medium italic leading-6">
-                        {macroProgressLine ??
-                          t('pause.deep.macroStepCount', {
-                            defaultValue: '{{n}} of {{total}}',
-                            n: macroStepIndex,
-                            total: macroStepTotal,
-                          })}
-                      </p>
-                      {macroProgressSubline ? (
-                        <p className="text-base font-normal leading-6">{macroProgressSubline}</p>
-                      ) : null}
-                    </div>
-                  ) : (
-                    <p className="mt-1 text-center text-[11px] font-medium uppercase tracking-[0.18em] text-muted-foreground">
-                      {macroProgressLine ??
-                        t('pause.macroProgress', {
-                          defaultValue: 'Step {{n}} of {{total}} · under ~15 min',
-                          n: macroStepIndex,
-                          total: macroStepTotal,
-                        })}
-                    </p>
-                  ))}
                 <div className="mt-4 w-full">
                   {stepperSlot ?? (
                     <PauseProgress
@@ -224,6 +166,73 @@ export function PauseSessionScaffold({
                     />
                   )}
                 </div>
+
+                <div className="relative mt-3 w-full min-h-[2.25rem]">
+                  {showMeta &&
+                    ((macroProgressSubline != null ||
+                      (macroProgressLine != null &&
+                        macroStepIndex != null &&
+                        macroStepTotal != null &&
+                        macroStepTotal > 0)) ? (
+                      <div className="flex flex-col items-center gap-0 px-11 text-center text-muted-foreground">
+                        <p className="text-base font-medium italic leading-6">
+                          {macroProgressLine ??
+                            t('pause.deep.macroStepCount', {
+                              defaultValue: '{{n}} of {{total}}',
+                              n: macroStepIndex,
+                              total: macroStepTotal,
+                            })}
+                        </p>
+                        {macroProgressSubline ? (
+                          <p className="text-base font-normal leading-6">{macroProgressSubline}</p>
+                        ) : null}
+                      </div>
+                    ) : (
+                      <div className="flex flex-col items-center px-11 text-center">
+                        <p className="text-[11px] font-medium uppercase tracking-[0.18em] text-muted-foreground">
+                          {macroProgressLine ??
+                            t('pause.macroProgress', {
+                              defaultValue: 'Step {{n}} of {{total}} · under ~15 min',
+                              n: macroStepIndex,
+                              total: macroStepTotal,
+                            })}
+                        </p>
+                      </div>
+                    ))}
+                  {!hideScienceButton ? (
+                    <div className="flex justify-center px-11 pt-1">
+                      <button
+                        type="button"
+                        onClick={() => setScienceOpen(true)}
+                        className="text-xs font-medium text-muted-foreground underline decoration-muted-foreground/50 underline-offset-2 transition-colors hover:text-foreground"
+                      >
+                        {t('pause.scienceSheet.tabSteps')}
+                      </button>
+                    </div>
+                  ) : null}
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="icon"
+                    className={
+                      muted
+                        ? 'absolute right-0 top-0 h-9 w-9 shrink-0 text-muted-foreground/70 hover:text-foreground'
+                        : 'absolute right-0 top-0 h-9 w-9 shrink-0 text-muted-foreground hover:text-foreground'
+                    }
+                    onClick={() => {
+                      setMuted(!muted);
+                      if (muted) void resumePauseAudioContext();
+                    }}
+                    aria-label={
+                      muted
+                        ? t('pause.muteAriaOff', { defaultValue: 'Sound off (tap to unmute)' })
+                        : t('pause.muteAriaOn', { defaultValue: 'Sound on (tap to mute)' })
+                    }
+                  >
+                    {muted ? <VolumeX className="h-4 w-4" aria-hidden /> : <Volume2 className="h-4 w-4" aria-hidden />}
+                  </Button>
+                </div>
+
                 {onHeaderBack && showHeaderBack && (
                   <div className="mt-2 flex w-full justify-start">
                     <button

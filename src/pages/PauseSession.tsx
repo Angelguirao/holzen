@@ -350,7 +350,7 @@ export default function PauseSession() {
   const breathingRef = useRef<PauseBreathingHandle>(null);
   const decidingRef = useRef(false);
   const [breathTimedActive, setBreathTimedActive] = useState(false);
-  const [soundMuted, setSoundMuted] = useState(false);
+  const [soundMuted, setSoundMuted] = useState(true);
 
   usePauseSessionBreathTimedActiveReset({ step, ritualEntry, briefStep, setBreathTimedActive });
 
