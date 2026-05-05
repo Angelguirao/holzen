@@ -2,7 +2,7 @@ import { useCallback } from 'react';
 import type { NavigateFunction } from 'react-router-dom';
 import { clearSession } from '@/lib/pause-session-storage';
 
-/** Props fragment for `PendingPauseOfferShell` on `/pause` (resync + hard reset to new instance). */
+/** After adopt on `/pause`: resync Holzen + hard navigation to the new instance (`PauseLeaveWithPendingSheet`). */
 export function usePauseSessionPendingPauseOfferNavigation(input: {
   navigate: NavigateFunction;
   resyncOpenPauseFromDb: () => void | Promise<void>;

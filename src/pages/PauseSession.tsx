@@ -45,6 +45,8 @@ import { usePauseShiftFrameDoneHandler } from '@/hooks/use-pause-shift-frame-don
 import { usePauseSessionDecideHandler } from '@/hooks/use-pause-session-decide-handler';
 import { usePauseSessionExitNavigation } from '@/hooks/use-pause-session-exit-navigation';
 import { trackEvent } from '@/lib/posthog';
+import { pauseAdoptPendingOffer, pauseDeclinePendingOffer } from '@/lib/pause-api';
+import { toast } from 'sonner';
 import { usePauseSessionBreathStepHandlers } from '@/hooks/use-pause-session-breath-step-handlers';
 import { usePauseSessionHeaderBackHandler } from '@/hooks/use-pause-session-header-back-handler';
 import { usePauseSessionPersistToStorage } from '@/hooks/use-pause-session-persist-to-storage';
@@ -64,19 +66,11 @@ import { buildPauseSessionScaffoldRitualDerived } from '@/lib/pause-session-scaf
 import { buildPauseSessionScaffoldRitualPayloads } from '@/lib/pause-session-scaffold-ritual-payloads';
 import { buildPauseSessionMountLogParams } from '@/lib/pause-session-mount-log-params';
 import { usePauseSessionPendingPauseOfferNavigation } from '@/hooks/use-pause-session-pending-pause-offer-navigation';
+import { usePendingPauseOffer } from '@/hooks/use-pending-pause-offer';
 import { usePauseSessionDepthPickerHandlers } from '@/hooks/use-pause-session-depth-picker-handlers';
 import { usePauseSessionDeepChooseBridgeHandler } from '@/hooks/use-pause-session-deep-choose-bridge-handler';
 import { usePauseSessionFeelTilesSelect } from '@/hooks/use-pause-session-feel-tiles-select';
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from '@/components/ui/alert-dialog';
+import { PauseLeaveWithPendingSheet } from '@/components/pause/PauseLeaveWithPendingSheet';
 
 /**
  * `/pause` route: wires shell hydration, local ritual state, `pause-api` step handlers, and pause UI
@@ -122,6 +116,7 @@ export default function PauseSession() {
       navigate,
       resyncOpenPauseFromDb,
     });
+  const { pending, refresh: refreshPendingOffer } = usePendingPauseOffer();
 
   const nav = parsePauseSessionLocationState(location.state);
   const {
@@ -162,7 +157,8 @@ export default function PauseSession() {
   const pauseInstanceIdForTerminal =
     pauseInstanceId ?? navPauseInstanceId ?? fetchPauseInstanceId;
 
-  const [leavePauseConfirmOpen, setLeavePauseConfirmOpen] = useState(false);
+  const [leaveWithPendingOpen, setLeaveWithPendingOpen] = useState(false);
+  const [leaveSheetBusy, setLeaveSheetBusy] = useState(false);
 
   const confirmLeavePauseSession = useCallback(() => {
     try {
@@ -172,9 +168,69 @@ export default function PauseSession() {
     } catch {
       /* no-op */
     }
-    setLeavePauseConfirmOpen(false);
+    setLeaveWithPendingOpen(false);
     handleClose();
   }, [handleClose, pauseInstanceIdForTerminal]);
+
+  const requestExitPauseBeforeDone = useCallback(() => {
+    if (pending) {
+      setLeaveWithPendingOpen(true);
+      return;
+    }
+    confirmLeavePauseSession();
+  }, [pending, confirmLeavePauseSession]);
+
+  const handleDeclinePendingFromLeaveSheet = useCallback(async () => {
+    if (!pending || leaveSheetBusy) return;
+    setLeaveSheetBusy(true);
+    try {
+      await pauseDeclinePendingOffer();
+      try {
+        trackEvent('pause_pending_declined', { pause_instance_id: pending.id });
+      } catch {
+        /* no-op */
+      }
+      await Promise.resolve(pendingOfferAfterMutation());
+      setLeaveWithPendingOpen(false);
+      await refreshPendingOffer();
+    } catch {
+      toast.error(t('pause.pendingDeclineFailed', { defaultValue: 'Could not dismiss the offer. Try again.' }));
+    } finally {
+      setLeaveSheetBusy(false);
+    }
+  }, [pending, leaveSheetBusy, t, pendingOfferAfterMutation, refreshPendingOffer]);
+
+  const handlePendingAdoptFromLeaveSheet = useCallback(async () => {
+    if (!pending || leaveSheetBusy) return;
+    setLeaveSheetBusy(true);
+    try {
+      const r = await pauseAdoptPendingOffer();
+      if (!r.ok || !r.instance_id) {
+        toast.error(t('pause.pendingAdoptFailed', { defaultValue: 'Could not switch to the new pause. Try again.' }));
+        return;
+      }
+      try {
+        trackEvent('pause_pending_adopted', { pause_instance_id: r.instance_id });
+      } catch {
+        /* no-op */
+      }
+      await Promise.resolve(pendingOfferAfterMutation());
+      pendingOfferNavigateAfterAdopt(r.instance_id);
+      setLeaveWithPendingOpen(false);
+      await refreshPendingOffer();
+    } catch {
+      toast.error(t('pause.pendingAdoptFailed', { defaultValue: 'Could not switch to the new pause. Try again.' }));
+    } finally {
+      setLeaveSheetBusy(false);
+    }
+  }, [
+    pending,
+    leaveSheetBusy,
+    t,
+    pendingOfferAfterMutation,
+    pendingOfferNavigateAfterAdopt,
+    refreshPendingOffer,
+  ]);
 
   const hasCoalescedShellMessage = message.length > 0;
 
@@ -235,9 +291,9 @@ export default function PauseSession() {
     if (phase === 'done') {
       handleReturn();
     } else {
-      setLeavePauseConfirmOpen(true);
+      requestExitPauseBeforeDone();
     }
-  }, [phase, handleReturn]);
+  }, [phase, handleReturn, requestExitPauseBeforeDone]);
 
   usePauseSessionEntryPresentationEffects({ step, setDecideOnBackStep, setCurtainLifted });
 
@@ -538,8 +594,6 @@ export default function PauseSession() {
         onReturn={handleReturn}
       >
         <PauseSessionGateContent
-          onPendingAfterMutation={pendingOfferAfterMutation}
-          onPendingNavigateAfterAdopt={pendingOfferNavigateAfterAdopt}
           sessionOnPicker={sessionOnPicker}
           depthPickerSlot={
             <PauseSessionDepthPickerStack
@@ -548,9 +602,7 @@ export default function PauseSession() {
               onDeep={handleDepthPickerDeep}
               deepPauseLocked={!subscribed}
               onAboutPauses={depthPickerOnAboutPauses}
-              onClose={() => {
-                setLeavePauseConfirmOpen(true);
-              }}
+              onClose={requestExitPauseBeforeDone}
               aboutSheetOpen={pickerAboutOpen}
               onAboutSheetOpenChange={setPickerAboutOpen}
               aboutSheetTitle={t('pause.aboutPauses.sheetTitle')}
@@ -583,20 +635,24 @@ export default function PauseSession() {
           }
         />
       </PauseSessionGate>
-      <AlertDialog open={leavePauseConfirmOpen} onOpenChange={setLeavePauseConfirmOpen}>
-        <AlertDialogContent className="sm:max-w-md">
-          <AlertDialogHeader>
-            <AlertDialogTitle>{t('pause.leaveSessionTitle')}</AlertDialogTitle>
-            <AlertDialogDescription>{t('pause.leaveSessionDescription')}</AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel>{t('common.cancel')}</AlertDialogCancel>
-            <AlertDialogAction type="button" onClick={confirmLeavePauseSession}>
-              {t('pause.leaveSessionConfirm')}
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
+      <PauseLeaveWithPendingSheet
+        open={leaveWithPendingOpen}
+        onOpenChange={setLeaveWithPendingOpen}
+        pending={pending}
+        busy={leaveSheetBusy}
+        onStay={() => setLeaveWithPendingOpen(false)}
+        onLeave={() => {
+          confirmLeavePauseSession();
+        }}
+        onSwitchToBrief={() => {
+          setLeaveWithPendingOpen(false);
+          setRitualEntry('brief');
+          setBriefStep('feel');
+          setStep('feel');
+        }}
+        onAdoptNew={() => void handlePendingAdoptFromLeaveSheet()}
+        onDismissPendingOffer={() => void handleDeclinePendingFromLeaveSheet()}
+      />
     </Fragment>
   );
 }
