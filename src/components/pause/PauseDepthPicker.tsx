@@ -57,7 +57,7 @@ export function PauseDepthPicker({ contextLine, onBrief, onDeep, onAboutPauses, 
               'hover:border-foreground/30 hover:bg-muted/50',
             )}
           >
-            <span className="text-xs font-semibold uppercase tracking-wide text-primary">
+            <span className="text-xs font-semibold uppercase tracking-wide text-nox-text-highlight">
               {t('pause.depthPicker.brief.label', { defaultValue: 'Brief pause' })}
             </span>
             <span className="text-lg font-semibold text-foreground">~2 min</span>
@@ -86,7 +86,7 @@ export function PauseDepthPicker({ contextLine, onBrief, onDeep, onAboutPauses, 
           </button>
         </div>
 
-        <button type="button" onClick={onAboutPauses} className="text-center text-sm font-medium text-primary underline-offset-4 hover:underline">
+        <button type="button" onClick={onAboutPauses} className="text-center text-sm font-medium text-nox-text-link underline-offset-4 transition-colors hover:text-nox-text-link/80 hover:underline">
           {t('pause.aboutPauses.link', { defaultValue: 'About pauses' })}
         </button>
       </div>

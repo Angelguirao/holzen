@@ -300,11 +300,11 @@ export const PauseBreathing = forwardRef<PauseBreathingHandle, Props>(function P
           className="flex flex-col items-center gap-8"
         >
           <motion.div
-            className="rounded-full border-2 border-primary/20"
+            className="rounded-full border-2 border-border/50"
             style={{
               width: 140,
               height: 140,
-              background: 'radial-gradient(circle, hsl(var(--primary) / 0.08) 0%, transparent 70%)',
+              background: 'radial-gradient(circle, hsl(var(--nox-color-background-accent) / 0.45) 0%, transparent 70%)',
             }}
             animate={{ scale }}
             transition={{ duration: 1, ease: 'easeInOut' }}
@@ -342,7 +342,7 @@ export const PauseBreathing = forwardRef<PauseBreathingHandle, Props>(function P
           transition={{ duration: 0.8 }}
           className="flex flex-col items-center gap-5 text-center"
         >
-          <div className="h-20 w-20 rounded-full border border-primary/15 bg-primary/5" />
+          <div className="h-20 w-20 rounded-full border border-border/60 bg-muted/40" />
           <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-muted-foreground">
             {t('pause.breathYouAreHere', { defaultValue: "You're here" })}
           </p>

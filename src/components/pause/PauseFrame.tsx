@@ -76,7 +76,7 @@ export function PauseFrame({
         <Button
           type="button"
           variant="outline"
-          className="rounded-full border-primary/40 bg-primary/5 px-5 py-2 text-primary hover:bg-primary/10"
+          className="rounded-full border-border bg-muted/40 px-5 py-2 text-foreground hover:bg-muted/55"
           onClick={onImDone}
         >
           {t('pause.frame.imDone', { defaultValue: "I'm done" })}
@@ -96,7 +96,7 @@ function FrameRow({ label, href }: { label: string; href: string }) {
   return (
     <Link
       to={href}
-      className="flex items-center justify-between rounded-xl border-2 border-primary/35 bg-background px-4 py-3 text-left text-sm font-medium text-foreground transition-colors hover:bg-primary/5"
+      className="flex items-center justify-between rounded-xl border-2 border-border/70 bg-background px-4 py-3 text-left text-sm font-medium text-foreground transition-colors hover:bg-muted/40"
     >
       <span>{label}</span>
       <ChevronRight className="h-4 w-4 shrink-0 text-muted-foreground" aria-hidden />

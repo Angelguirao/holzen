@@ -88,7 +88,7 @@ export function PauseBriefFeel({
                   'flex flex-col items-center gap-2 rounded-2xl border px-3 py-4 text-center transition-colors',
                   active
                     ? 'border-foreground/40 bg-foreground/5'
-                    : 'border-border/60 bg-background/40 hover:border-primary/30 hover:bg-primary/5',
+                    : 'border-border/60 bg-background/40 hover:border-border hover:bg-muted/40',
                 )}
               >
                 <MoodIcon mood={tk === 'other' ? 'uncertain' : mood} size={22} className="text-muted-foreground" />
@@ -130,7 +130,7 @@ export function PauseBriefFeel({
                     'rounded-full border px-3 py-1.5 text-[11px] font-medium transition-colors',
                     active
                       ? 'border-foreground bg-foreground text-background'
-                      : 'border-border/70 text-muted-foreground hover:border-primary/40 hover:text-foreground',
+                      : 'border-border/70 text-muted-foreground hover:border-nox-border-focus/40 hover:text-foreground',
                   )}
                 >
                   {t(`pause.brief.feel.intensity.${key}`, { defaultValue: key })}

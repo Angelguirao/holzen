@@ -87,7 +87,7 @@ export function PauseDone({ decision, onReturn, pauseData }: Props) {
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.55, duration: 0.7 }}
-          className="w-full max-w-md rounded-2xl border border-primary/15 bg-primary/[0.04] px-5 py-6 text-center shadow-sm"
+          className="w-full max-w-md rounded-2xl border border-border/60 bg-card/50 px-5 py-6 text-center shadow-sm"
         >
           <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-muted-foreground">
             {t('pause.done.reinforcementKicker', { defaultValue: 'Carry this with you' })}

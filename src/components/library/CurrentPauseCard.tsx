@@ -79,7 +79,7 @@ export function CurrentPauseCard() {
                 className={cn(
                   'shrink-0 rounded-full border px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide',
                   isEngaged
-                    ? 'border-primary/35 bg-primary/10 text-primary'
+                    ? 'border-nox-border-focus/50 bg-nox-background-accent/40 text-nox-text-link'
                     : 'border-muted-foreground/30 bg-muted/30 text-muted-foreground',
                 )}
               >
