@@ -8,7 +8,13 @@ import type { RegenerateCompanionSlot } from '@/hooks/use-companion-data';
 import { useSubscription } from '@/hooks/use-subscription';
 import { useProGate } from '@/hooks/use-pro-gate';
 import { showLimitReachedToast, isPaidLimitReached } from '@/lib/limit-upsell';
+import { isHolzenDebugEnabled } from '@/lib/holzen-console';
 import type { Json } from '@/integrations/supabase/types';
+
+/** Orchestrate regenerate — dev / non-production builds, or prod + Holzen debug opt-in (see holzen-console). */
+function isCompanionRegenerateUiEnabled(): boolean {
+  return !import.meta.env.PROD || isHolzenDebugEnabled();
+}
 
 function voteFromMetadata(metadata: Json | null | undefined): 'up' | 'down' | null {
   if (!metadata || typeof metadata !== 'object' || Array.isArray(metadata)) return null;
@@ -50,7 +56,9 @@ export function CompanionFeedback({
   const { isPro, requirePro, startCheckout } = useProGate();
   const { companionRemaining, flexCreditsBalance, applyOptimisticDecrement, refresh: refreshSubscription } = useSubscription();
 
-  const canRegenerate = Boolean(pauseInstanceId && regenerateSlot && onRegenerate);
+  const canRegenerate = Boolean(
+    pauseInstanceId && regenerateSlot && onRegenerate && isCompanionRegenerateUiEnabled(),
+  );
   const regenBusy = Boolean(regenerating);
   // Pro users hit a true wall when both the monthly companion bucket AND
   // their flex credits are empty — gate the button visually then.
