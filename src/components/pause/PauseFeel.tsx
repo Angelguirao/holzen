@@ -128,8 +128,8 @@ export function PauseFeel({
                     className={cn(
                       'flex h-11 w-11 items-center justify-center rounded-full border text-sm font-semibold transition-colors',
                       intensity === n
-                        ? 'border-primary bg-primary/15 text-foreground'
-                        : 'border-border/60 bg-card/40 text-muted-foreground hover:border-primary/30',
+                        ? 'border-ring bg-muted/50 text-foreground ring-1 ring-ring/50'
+                        : 'border-border/60 bg-card/40 text-muted-foreground hover:border-nox-border-focus/40',
                     )}
                   >
                     {n}

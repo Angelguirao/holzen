@@ -74,9 +74,9 @@ export function PauseDecide({ onDecide, onBack, introKicker }: Props) {
             <motion.button
               onClick={handleHold}
               whileTap={{ scale: 0.97 }}
-              className="flex w-full items-center justify-center gap-3 rounded-2xl border border-primary/20 bg-primary/5 py-5 transition-all duration-300 hover:border-primary/30 hover:bg-primary/10"
+              className="flex w-full items-center justify-center gap-3 rounded-2xl border border-nox-border-default/60 bg-nox-background-accent/20 py-5 transition-all duration-300 hover:border-nox-border-focus/40 hover:bg-nox-background-accent/35"
             >
-              <div className="w-10 h-10 rounded-full bg-primary/10 border border-primary/15 flex items-center justify-center">
+              <div className="flex h-10 w-10 items-center justify-center rounded-full border border-border/60 bg-muted/50">
                 <OutcomeIcon outcome="held" size={18} className="text-muted-foreground" />
               </div>
               <span className="text-sm font-semibold tracking-wide text-foreground">
