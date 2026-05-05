@@ -5,13 +5,11 @@ import type { BriefPauseStep, RitualDepth } from '@/lib/pause-session-storage';
 export function usePauseSessionDepthPickerHandlers(input: {
   setRitualEntry: Dispatch<SetStateAction<RitualDepth | 'picker'>>;
   setBriefStep: Dispatch<SetStateAction<BriefPauseStep>>;
-  setPickerAboutOpen: Dispatch<SetStateAction<boolean>>;
 }): {
   onBrief: () => void;
   onDeep: () => void;
-  onAboutPauses: () => void;
 } {
-  const { setRitualEntry, setBriefStep, setPickerAboutOpen } = input;
+  const { setRitualEntry, setBriefStep } = input;
 
   const onBrief = useCallback(() => {
     setRitualEntry('brief');
@@ -22,9 +20,5 @@ export function usePauseSessionDepthPickerHandlers(input: {
     setRitualEntry('deep');
   }, [setRitualEntry]);
 
-  const onAboutPauses = useCallback(() => {
-    setPickerAboutOpen(true);
-  }, [setPickerAboutOpen]);
-
-  return { onBrief, onDeep, onAboutPauses };
+  return { onBrief, onDeep };
 }

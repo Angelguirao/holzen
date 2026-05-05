@@ -14,36 +14,24 @@ const t = ((
 }) as TFunction;
 
 describe('buildPauseSessionScaffoldRitualDerived', () => {
-  it('brief: no macro index, session title, science maps brief step, hide on breath', () => {
+  it('brief: no macro index, session title', () => {
     expect(
       buildPauseSessionScaffoldRitualDerived({
         ritualEntry: 'brief',
         step: 'feel',
-        briefStep: 'feel',
         t,
       }),
     ).toEqual({
       macroStepIndex: undefined,
       macroStepTotal: undefined,
       sessionTitle: 'Brief title',
-      scienceCurrentStep: 'feel',
-      hideScienceButton: false,
     });
-    expect(
-      buildPauseSessionScaffoldRitualDerived({
-        ritualEntry: 'brief',
-        step: 'feel',
-        briefStep: 'breath',
-        t,
-      }).hideScienceButton,
-    ).toBe(true);
   });
 
-  it('deep: macro lines + session title, hide science on breath steps', () => {
+  it('deep: macro lines + session title on breath', () => {
     const d = buildPauseSessionScaffoldRitualDerived({
       ritualEntry: 'deep',
       step: 'breathe',
-      briefStep: 'feel',
       t,
     });
     expect(d.macroStepIndex).toBe(2);
@@ -51,15 +39,12 @@ describe('buildPauseSessionScaffoldRitualDerived', () => {
     expect(d.sessionTitle).toBe('Deep title');
     expect(d.macroProgressLine).toBe('2 of 6');
     expect(d.macroProgressSubline).toBeUndefined();
-    expect(d.scienceCurrentStep).toBeUndefined();
-    expect(d.hideScienceButton).toBe(true);
   });
 
   it('deep feel: duration hint under macro step count', () => {
     const d = buildPauseSessionScaffoldRitualDerived({
       ritualEntry: 'deep',
       step: 'feel',
-      briefStep: 'feel',
       t,
     });
     expect(d.macroProgressLine).toBe('1 of 6');
@@ -70,10 +55,8 @@ describe('buildPauseSessionScaffoldRitualDerived', () => {
     const p = buildPauseSessionScaffoldRitualDerived({
       ritualEntry: 'picker',
       step: 'reflect',
-      briefStep: 'feel',
       t,
     });
     expect(p.macroStepIndex).toBe(3);
-    expect(p.hideScienceButton).toBe(false);
   });
 });

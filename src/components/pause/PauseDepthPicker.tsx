@@ -9,6 +9,8 @@ interface Props {
   onBrief: () => void;
   onDeep: () => void;
   onAboutPauses: () => void;
+  /** Opens the help sheet on the “Step science” tab (brief vs deep choice screen only). */
+  onOpenStepScience: () => void;
   onClose: () => void;
   /** When true, deep pause is visually gated; `onDeep` still runs so callers can show paywall / checkout. */
   deepPauseLocked?: boolean;
@@ -24,6 +26,7 @@ export function PauseDepthPicker({
   onBrief,
   onDeep,
   onAboutPauses,
+  onOpenStepScience,
   onClose,
   deepPauseLocked = false,
 }: Props) {
@@ -131,7 +134,7 @@ export function PauseDepthPicker({
             <p className="text-center text-base font-normal leading-6 text-muted-foreground">{contextLine}</p>
           ) : null}
 
-          <div className="flex justify-center">
+          <div className="flex flex-col items-center gap-2 sm:flex-row sm:justify-center sm:gap-8">
             <Button
               type="button"
               variant="ghost"
@@ -139,6 +142,14 @@ export function PauseDepthPicker({
               className="h-auto rounded-2xl px-3 py-2 text-xs font-medium tracking-[0.05em] text-nox-text-link hover:bg-nox-text-link/10 hover:text-nox-text-link"
             >
               {t('pause.aboutPauses.link', { defaultValue: 'About pauses' })}
+            </Button>
+            <Button
+              type="button"
+              variant="ghost"
+              onClick={onOpenStepScience}
+              className="h-auto rounded-2xl px-3 py-2 text-xs font-medium tracking-[0.05em] text-muted-foreground underline decoration-muted-foreground/50 underline-offset-2 hover:bg-muted/40 hover:text-foreground"
+            >
+              {t('pause.scienceSheet.tabSteps')}
             </Button>
           </div>
         </div>

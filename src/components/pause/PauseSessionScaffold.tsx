@@ -3,11 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { ChevronLeft, Volume2, VolumeX, X } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { PauseProgress, type PauseStep } from '@/components/pause/PauseProgress';
-import { PauseAboutPausesBody } from '@/components/pause/PauseAboutPausesBody';
-import { PauseScienceScrollBody } from '@/components/pause/PauseScienceSheet';
 import { Button } from '@/components/ui/button';
-import { Sheet, SheetContent, SheetTitle } from '@/components/ui/sheet';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { resumePauseAudioContext } from '@/lib/pause-ritual-audio';
 
 interface Props {
@@ -31,12 +27,8 @@ interface Props {
   macroProgressSubline?: string;
   /** When set, replaces the default six-beat `PauseProgress` (e.g. brief four-step bar). */
   stepperSlot?: ReactNode;
-  /** Which deep-pause step’s citations to emphasize in the “Step science” tab (defaults to `step`). */
-  scienceCurrentStep?: PauseStep;
   /** PostHog flag `pause.step5_breath_label_shift`: label second breathing macro step as “Shift”. */
   breathSecondLabelVariant?: 'breathe' | 'shift';
-  /** Breath steps: hide the inline “Step science” text affordance below the stepper. */
-  hideScienceButton?: boolean;
   /** When set with `onSoundMutedChange`, header mute controls ritual audio (breathing cues). */
   soundMuted?: boolean;
   onSoundMutedChange?: (muted: boolean) => void;
@@ -46,10 +38,10 @@ interface Props {
 }
 
 /**
- * Full-screen pause shell: curtain, gradient, sticky chrome with a minimal `<header>`
- * (session title · close · optional countdown), then segment stepper + macro lines + mute +
- * optional back **below** that header (wireframe layout), science bottom sheet from the
- * inline “Step science” link (hidden on breath-only chrome).
+ * Full-screen pause shell: curtain, gradient, **sticky** top strip (`<header>`: title · close ·
+ * optional countdown only), then a **non-sticky** band (stepper · macro lines · mute · back)
+ * in the scroll flow between that strip and the main step body. Step science / About tabs live
+ * on the **depth picker** only (`PauseSessionDepthPickerStack`), not here.
  */
 export function PauseSessionScaffold({
   curtainLifted,
@@ -66,16 +58,13 @@ export function PauseSessionScaffold({
   macroProgressLine,
   macroProgressSubline,
   stepperSlot,
-  scienceCurrentStep,
   breathSecondLabelVariant = 'breathe',
-  hideScienceButton = false,
   soundMuted: soundMutedControlled,
   onSoundMutedChange,
   countdownSlot,
   children,
 }: Props) {
   const { t } = useTranslation();
-  const [scienceOpen, setScienceOpen] = useState(false);
   /** Ritual audio off by default (wireframe: volume “off” until the user enables it). */
   const [uncontrolledMuted, setUncontrolledMuted] = useState(true);
   const muted = soundMutedControlled ?? uncontrolledMuted;
@@ -153,9 +142,11 @@ export function PauseSessionScaffold({
 
             {phase === 'session' && countdownSlot ? <div className="mt-1.5 px-1">{countdownSlot}</div> : null}
           </header>
+        </motion.div>
 
-          {phase === 'session' && (
-            <div className="mx-auto max-w-lg px-4 pb-3 pt-1 sm:px-6">
+        {phase === 'session' && (
+          <div className="relative z-[55] border-b border-border/25 bg-background/60">
+            <div className="mx-auto max-w-lg px-4 pb-3 pt-3 sm:px-6">
               <div className="w-full">
                 {stepperSlot ?? (
                   <PauseProgress
@@ -199,17 +190,6 @@ export function PauseSessionScaffold({
                       </p>
                     </div>
                   ))}
-                {!hideScienceButton ? (
-                  <div className="flex justify-center px-11 pt-1">
-                    <button
-                      type="button"
-                      onClick={() => setScienceOpen(true)}
-                      className="text-xs font-medium text-muted-foreground underline decoration-muted-foreground/50 underline-offset-2 transition-colors hover:text-foreground"
-                    >
-                      {t('pause.scienceSheet.tabSteps')}
-                    </button>
-                  </div>
-                ) : null}
                 <Button
                   type="button"
                   variant="ghost"
@@ -246,30 +226,8 @@ export function PauseSessionScaffold({
                 </div>
               )}
             </div>
-          )}
-        </motion.div>
-
-        <Sheet open={scienceOpen} onOpenChange={setScienceOpen}>
-          <SheetContent side="bottom" className="z-[110] max-h-[88vh] overflow-y-auto rounded-t-2xl border-t p-6 sm:p-8">
-            <SheetTitle className="sr-only">{t('pause.scienceSheet.sheetTitle')}</SheetTitle>
-            <Tabs defaultValue="about" className="w-full">
-              <TabsList className="mb-4 grid h-auto w-full grid-cols-2 gap-1 rounded-lg p-1 sm:mb-6">
-                <TabsTrigger value="about" className="text-xs sm:text-sm">
-                  {t('pause.scienceSheet.tabAbout')}
-                </TabsTrigger>
-                <TabsTrigger value="steps" className="text-xs sm:text-sm">
-                  {t('pause.scienceSheet.tabSteps')}
-                </TabsTrigger>
-              </TabsList>
-              <TabsContent value="about" className="mt-0 focus-visible:outline-none">
-                <PauseAboutPausesBody />
-              </TabsContent>
-              <TabsContent value="steps" className="mt-0 focus-visible:outline-none">
-                <PauseScienceScrollBody currentStep={scienceCurrentStep ?? step} />
-              </TabsContent>
-            </Tabs>
-          </SheetContent>
-        </Sheet>
+          </div>
+        )}
 
         <div className="relative z-10 mx-auto max-w-lg overflow-hidden px-5 pb-16 pt-6 sm:px-8 sm:pb-20 sm:pt-8">
           {children}
