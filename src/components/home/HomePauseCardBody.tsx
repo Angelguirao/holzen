@@ -106,7 +106,7 @@ export function HomePauseCardBody({
             <div className="space-y-4">
               {pending ? (
                 <div
-                  className="rounded-lg border border-amber-500/30 bg-amber-500/10 px-3 py-2.5 text-[12px] leading-snug text-foreground/95"
+                  className="rounded-lg border border-nox-accent-mustard/35 bg-nox-accent-mustard/10 px-3 py-2.5 text-xs leading-snug text-foreground/95"
                   role="status"
                 >
                   <p className="font-medium text-foreground">{t('home.pendingQueuedTitle')}</p>
@@ -114,7 +114,7 @@ export function HomePauseCardBody({
                   <button
                     type="button"
                     onClick={onPendingBannerPause}
-                    className="mt-2 w-full rounded-md border border-amber-600/40 bg-background/80 px-2 py-1.5 text-center text-[12px] font-medium text-foreground hover:bg-background"
+                    className="mt-2 w-full rounded-lg border border-nox-accent-mustard/45 bg-background/80 px-2 py-1.5 text-center text-xs font-medium text-foreground hover:bg-background"
                   >
                     {t('home.pendingQueuedCta')}
                   </button>
@@ -139,7 +139,7 @@ export function HomePauseCardBody({
                 title={t('home.pauseDismissHint', {
                   defaultValue: 'Ends this open pause without finishing the ritual. You can start a new one anytime.',
                 })}
-                className="w-full rounded-md border border-border/80 bg-transparent px-3 py-2 text-center text-[12px] font-medium text-muted-foreground transition-colors hover:bg-muted/30 hover:text-foreground"
+                className="w-full rounded-lg border border-border/80 bg-transparent px-3 py-2 text-center text-xs font-medium text-muted-foreground transition-colors hover:bg-muted/30 hover:text-foreground"
               >
                 {t('home.pauseDismissCta', { defaultValue: 'Dismiss pause' })}
               </button>

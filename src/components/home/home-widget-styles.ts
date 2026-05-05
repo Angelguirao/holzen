@@ -4,14 +4,15 @@
  */
 export const homeInWidget = {
   body: 'text-sm leading-relaxed text-foreground',
-  bodyMuted: 'text-base leading-relaxed text-primary',
+  /** Reassurance / secondary body — Nox text-muted, not shadcn `primary` (inverse surface token). */
+  bodyMuted: 'text-base leading-relaxed text-muted-foreground',
   meta: 'leading-snug text-muted-foreground text-sm',
   metaFaint: 'text-xs leading-snug text-muted-foreground/70',
   /** Row label — matches HomeWidget chrome (uppercase module tone) */
   kicker: 'uppercase tracking-wide font-normal text-muted-foreground text-xs',
   kickerAccent: 'text-xs font-semibold uppercase tracking-wide text-primary/80',
   /** Large price / masked price line */
-  price: 'font-semibold tabular-nums tracking-tight text-[#dbb266] text-xl',
+  price: 'font-semibold tabular-nums tracking-tight text-nox-text-highlight text-xl',
   priceHidden: 'text-2xl font-semibold tabular-nums tracking-tight text-muted-foreground/30',
   /** Secondary number under price */
   subPrice: 'text-sm font-medium tabular-nums text-muted-foreground',
