@@ -4,15 +4,13 @@ import { ChevronRight } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { MoodIcon } from '@/components/icons/MoodIcon';
 import type { MoodValue } from '@/components/MoodCheck';
+import type { FeelStepTile } from '@/components/pause/pause-feel-types';
 import { Button } from '@/components/ui/button';
 import { Slider } from '@/components/ui/slider';
 import { pauseStepLayout } from '@/components/pause/pause-step-layout';
 import { cn } from '@/lib/utils';
 
-/** Tile ids for the shared brief/deep Feel step (3×2 grid + intensity). */
-export type BriefFeelTile = 'fomo' | 'fearful' | 'anxious' | 'uncertain' | 'calm' | 'other';
-
-const TILES: { tile: BriefFeelTile; mood: MoodValue }[] = [
+const TILES: { tile: FeelStepTile; mood: MoodValue }[] = [
   { tile: 'fomo', mood: 'fomo' },
   { tile: 'fearful', mood: 'fearful' },
   { tile: 'anxious', mood: 'anxious' },
@@ -26,31 +24,32 @@ const INTENSITY_KEYS = ['faint', 'light', 'clear', 'strong', 'heavy'] as const;
 interface Props {
   moodDone: boolean;
   selectedMood: MoodValue | null;
-  selectedTile: BriefFeelTile | null;
+  selectedTile: FeelStepTile | null;
   feelIntensity: number | null;
-  onSelect: (mood: MoodValue, intensity: number, tile: BriefFeelTile) => void;
+  onSelect: (mood: MoodValue, intensity: number, tile: FeelStepTile) => void;
   onContinue: () => void;
 }
 
-export function PauseBriefFeel({
+/** Shared Feel step for brief and deep pause rituals (tile grid + intensity slider). */
+export function PauseRitualFeelStep({
   moodDone,
-  selectedMood,
+  selectedMood: _selectedMood,
   selectedTile,
   feelIntensity,
   onSelect,
   onContinue,
 }: Props) {
   const { t } = useTranslation();
-  const [localTile, setLocalTile] = useState<BriefFeelTile | null>(selectedTile);
+  const [localTile, setLocalTile] = useState<FeelStepTile | null>(selectedTile);
   const [localIntensity, setLocalIntensity] = useState(() => feelIntensity ?? 3);
 
   const tile = moodDone ? selectedTile : localTile;
   const intensity = moodDone ? (feelIntensity ?? 3) : localIntensity;
 
-  const pickTile = (briefTile: BriefFeelTile, mood: MoodValue) => {
+  const pickTile = (feelTile: FeelStepTile, mood: MoodValue) => {
     const n = moodDone ? (feelIntensity ?? 3) : localIntensity;
-    setLocalTile(briefTile);
-    onSelect(mood, n, briefTile);
+    setLocalTile(feelTile);
+    onSelect(mood, n, feelTile);
   };
 
   const setIntensityAndSync = (n: number) => {
@@ -72,10 +71,10 @@ export function PauseBriefFeel({
       <div className="mx-auto flex w-full max-w-md flex-col gap-8">
         <div className="flex flex-col gap-2 text-center">
           <h2 className="text-[22px] font-normal leading-7 tracking-tight text-foreground">
-            {t('pause.brief.feel.title', { defaultValue: "What's here?" })}
+            {t('pause.feelStep.title', { defaultValue: "What's here?" })}
           </h2>
           <p className="text-base leading-6 text-muted-foreground">
-            {t('pause.brief.feel.subtitle', { defaultValue: 'No need to be sure' })}
+            {t('pause.feelStep.subtitle', { defaultValue: 'No need to be sure' })}
           </p>
         </div>
 
@@ -96,7 +95,7 @@ export function PauseBriefFeel({
               >
                 <MoodIcon mood={tk === 'other' ? 'uncertain' : mood} size={24} className="text-muted-foreground" />
                 <span className="text-sm font-medium leading-5 text-muted-foreground">
-                  {t(`pause.brief.feel.tiles.${tk}`, {
+                  {t(`pause.feelStep.tiles.${tk}`, {
                     defaultValue:
                       tk === 'fomo'
                         ? 'FOMO'
@@ -118,11 +117,11 @@ export function PauseBriefFeel({
 
         <div className="space-y-6">
           <p className="text-center text-base text-foreground">
-            {t('pause.brief.feel.intensityTitle', { defaultValue: 'How strong?' })}
+            {t('pause.feelStep.intensityTitle', { defaultValue: 'How strong?' })}
           </p>
           <div className="space-y-2.5">
             <Slider
-              aria-label={t('pause.brief.feel.intensityTitle', { defaultValue: 'How strong?' })}
+              aria-label={t('pause.feelStep.intensityTitle', { defaultValue: 'How strong?' })}
               min={1}
               max={5}
               step={1}
@@ -139,7 +138,7 @@ export function PauseBriefFeel({
                     key === INTENSITY_KEYS[intensity - 1] && 'font-medium text-foreground',
                   )}
                 >
-                  {t(`pause.brief.feel.intensity.${key}`, { defaultValue: key })}
+                  {t(`pause.feelStep.intensity.${key}`, { defaultValue: key })}
                 </span>
               ))}
             </div>

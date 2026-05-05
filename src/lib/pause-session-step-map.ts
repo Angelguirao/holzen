@@ -1,4 +1,4 @@
-import type { BriefFeelTile } from '@/components/pause/PauseBriefFeel';
+import type { FeelStepTile } from '@/components/pause/pause-feel-types';
 import type { PauseStep } from '@/components/pause/PauseProgress';
 import { STEPS } from '@/components/pause/PauseProgress';
 import type { BriefPauseStep, PersistedSession, RitualDepth } from '@/lib/pause-session-storage';
@@ -49,8 +49,8 @@ export function initialBriefIntegrateDoneFromRestored(restored: PersistedSession
   return restored?.briefIntegrateDone ?? false;
 }
 
-/** Hydrate brief Feel tile from local storage (`PersistedSession.briefFace`). */
-export function initialSelectedBriefFaceFromRestored(restored: PersistedSession | null): BriefFeelTile | null {
+/** Hydrate Feel-step tile from local storage (`PersistedSession.briefFace`, brief ritual saves only). */
+export function initialSelectedBriefFaceFromRestored(restored: PersistedSession | null): FeelStepTile | null {
   return restored?.briefFace ?? null;
 }
 

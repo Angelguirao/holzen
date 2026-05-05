@@ -2,7 +2,8 @@ import { AnimatePresence, motion } from 'framer-motion';
 import type { RefObject } from 'react';
 import type { MoodValue } from '@/components/MoodCheck';
 import { PauseBreathing, type PauseBreathingHandle } from '@/components/pause/PauseBreathing';
-import { PauseBriefFeel, type BriefFeelTile } from '@/components/pause/PauseBriefFeel';
+import { PauseRitualFeelStep } from '@/components/pause/PauseRitualFeelStep';
+import type { FeelStepTile } from '@/components/pause/pause-feel-types';
 import { PauseBriefIntegrate } from '@/components/pause/PauseBriefIntegrate';
 import { PauseDecide } from '@/components/pause/PauseDecide';
 import type { PauseSessionStepTransitionConfig } from '@/lib/pause-session-step-transition';
@@ -13,9 +14,9 @@ export type PauseSessionBriefRitualBodyProps = {
   stepTransition: PauseSessionStepTransitionConfig;
   moodDone: boolean;
   selectedMood: MoodValue | null;
-  selectedBriefFace: BriefFeelTile | null;
+  selectedBriefFace: FeelStepTile | null;
   feelIntensity: number | null;
-  onFeelTilesSelect: (mood: MoodValue, intensity: number, tile: BriefFeelTile) => void;
+  onFeelTilesSelect: (mood: MoodValue, intensity: number, tile: FeelStepTile) => void;
   onBriefFeelContinueToBreath: () => void;
   breathingRef: RefObject<PauseBreathingHandle | null>;
   mantra: string | null;
@@ -62,7 +63,7 @@ export function PauseSessionBriefRitualBody({
     <AnimatePresence mode="wait" initial={false}>
       {briefStep === 'feel' && (
         <motion.div key="b-feel" {...stepTransition}>
-          <PauseBriefFeel
+          <PauseRitualFeelStep
             moodDone={moodDone}
             selectedMood={selectedMood}
             selectedTile={selectedBriefFace}

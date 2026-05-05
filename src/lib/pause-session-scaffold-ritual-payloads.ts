@@ -1,7 +1,7 @@
 import type { RefObject } from 'react';
 import type { CompanionData, CompanionPrefs } from '@/components/CompanionSection';
 import type { MoodValue } from '@/components/MoodCheck';
-import type { BriefFeelTile } from '@/components/pause/PauseBriefFeel';
+import type { FeelStepTile } from '@/components/pause/pause-feel-types';
 import type { PauseBreathingHandle } from '@/components/pause/PauseBreathing';
 import type { PauseSessionBriefRitualBodyProps } from '@/components/pause/PauseSessionBriefRitualBody';
 import type { PauseSessionDeepRitualBodyProps } from '@/components/pause/PauseSessionDeepRitualBody';
@@ -23,7 +23,7 @@ export type PauseSessionScaffoldRitualPayloadsParams = {
   stepTransition: PauseSessionStepTransitionConfig;
   moodDone: boolean;
   selectedMood: MoodValue | null;
-  selectedBriefFace: BriefFeelTile | null;
+  selectedBriefFace: FeelStepTile | null;
   feelIntensity: number | null;
   onFeelTilesSelect: PauseSessionBriefRitualBodyProps['onFeelTilesSelect'];
   setBriefStep: (next: BriefPauseStep) => void;
