@@ -485,7 +485,7 @@ export default function Ground() {
                       key={act}
                       type="button"
                       onClick={() => chooseFreeActivity(act)}
-                      className="rounded-full border border-border/60 bg-muted/30 px-3 py-1.5 text-sm text-foreground transition-colors hover:border-primary/40 hover:bg-primary/10"
+                      className="rounded-full border border-border/60 bg-muted/30 px-3 py-1.5 text-sm text-foreground transition-colors hover:border-nox-border-focus/40 hover:bg-muted/50"
                     >
                       {act}
                     </button>
@@ -625,7 +625,7 @@ export default function Ground() {
                           max={MAX_DURATION}
                           value={customDuration}
                           onChange={(e) => setCustomDuration(parseInt(e.target.value, 10))}
-                          className="h-2 w-full cursor-pointer appearance-none rounded-full bg-border accent-primary [&::-webkit-slider-thumb]:h-4 [&::-webkit-slider-thumb]:w-4 [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:border-0 [&::-webkit-slider-thumb]:bg-primary [&::-webkit-slider-thumb]:shadow-none"
+                          className="h-2 w-full cursor-pointer appearance-none rounded-full bg-border accent-nox-text-link [&::-webkit-slider-thumb]:h-4 [&::-webkit-slider-thumb]:w-4 [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:border-0 [&::-webkit-slider-thumb]:bg-nox-text-link [&::-webkit-slider-thumb]:shadow-none"
                         />
                         <div className="flex justify-between text-xs text-muted-foreground">
                           <span>{MIN_DURATION} min</span>
@@ -636,7 +636,7 @@ export default function Ground() {
                       <button
                         type="button"
                         onClick={() => startTimer(customDuration)}
-                        className="rounded-lg border border-primary/30 bg-primary/10 px-8 py-2.5 text-sm font-semibold text-foreground transition-colors hover:bg-primary/15"
+                        className="rounded-lg border border-nox-border-default/60 bg-nox-background-accent/25 px-8 py-2.5 text-sm font-semibold text-foreground transition-colors hover:bg-nox-background-accent/40"
                       >
                         {t('ground.begin')}
                       </button>
@@ -795,7 +795,7 @@ export default function Ground() {
                       className="group flex flex-col items-center gap-2"
                     >
                       <motion.div
-                        className="flex h-12 w-12 items-center justify-center rounded-full border border-border/60 bg-muted/40 backdrop-blur-sm transition-all duration-300 group-hover:scale-110 group-hover:border-primary/40 group-hover:bg-primary/10"
+                        className="flex h-12 w-12 items-center justify-center rounded-full border border-border/60 bg-muted/40 backdrop-blur-sm transition-all duration-300 group-hover:scale-110 group-hover:border-nox-border-focus/40 group-hover:bg-muted/55"
                         whileTap={{ scale: 0.92 }}
                       >
                         <MoodIcon mood={mood} size={22} className="text-muted-foreground transition-colors duration-300 group-hover:text-foreground" />
@@ -848,7 +848,7 @@ export default function Ground() {
                   <button
                     type="button"
                     onClick={handleComplete}
-                    className="rounded-lg border border-primary/30 bg-primary/10 px-8 py-2.5 text-sm font-semibold text-foreground transition-colors hover:bg-primary/15"
+                    className="rounded-lg border border-nox-border-default/60 bg-nox-background-accent/25 px-8 py-2.5 text-sm font-semibold text-foreground transition-colors hover:bg-nox-background-accent/40"
                   >
                     {t('common.done')}
                   </button>

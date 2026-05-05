@@ -1,9 +1,11 @@
 import { useState } from 'react';
 import { motion } from 'framer-motion';
+import { ChevronRight } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { MoodIcon } from '@/components/icons/MoodIcon';
 import type { MoodValue } from '@/components/MoodCheck';
 import { Button } from '@/components/ui/button';
+import { Slider } from '@/components/ui/slider';
 import { pauseStepLayout } from '@/components/pause/pause-step-layout';
 import { cn } from '@/lib/utils';
 
@@ -39,23 +41,23 @@ export function PauseBriefFeel({
 }: Props) {
   const { t } = useTranslation();
   const [localTile, setLocalTile] = useState<BriefFeelTile | null>(selectedTile);
-  const [localIntensity, setLocalIntensity] = useState<number | null>(feelIntensity);
+  const [localIntensity, setLocalIntensity] = useState(() => feelIntensity ?? 3);
 
   const tile = moodDone ? selectedTile : localTile;
-  const intensity = moodDone ? feelIntensity : localIntensity;
+  const intensity = moodDone ? (feelIntensity ?? 3) : localIntensity;
 
   const pickTile = (briefTile: BriefFeelTile, mood: MoodValue) => {
+    const n = moodDone ? (feelIntensity ?? 3) : localIntensity;
     setLocalTile(briefTile);
-    if (localIntensity != null) {
-      onSelect(mood, localIntensity, briefTile);
-    }
+    onSelect(mood, n, briefTile);
   };
 
-  const pickIntensity = (n: number) => {
+  const setIntensityAndSync = (n: number) => {
     setLocalIntensity(n);
-    if (localTile) {
-      const row = TILES.find((x) => x.tile === localTile);
-      if (row) onSelect(row.mood, n, localTile);
+    const activeTile = moodDone ? selectedTile : localTile;
+    if (activeTile) {
+      const row = TILES.find((x) => x.tile === activeTile);
+      if (row) onSelect(row.mood, n, activeTile);
     }
   };
 
@@ -71,12 +73,12 @@ export function PauseBriefFeel({
           <h2 className={pauseStepLayout.screenTitle}>
             {t('pause.brief.feel.title', { defaultValue: "What's here?" })}
           </h2>
-          <p className="text-sm text-muted-foreground">
-            {t('pause.brief.feel.subtitle', { defaultValue: 'No need to be sure — pick what is closest.' })}
+          <p className={pauseStepLayout.screenSubtitle}>
+            {t('pause.brief.feel.subtitle', { defaultValue: 'No need to be sure' })}
           </p>
         </div>
 
-        <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
+        <div className="grid grid-cols-3 gap-4">
           {TILES.map(({ tile: tk, mood }) => {
             const active = tile === tk;
             return (
@@ -85,14 +87,14 @@ export function PauseBriefFeel({
                 type="button"
                 onClick={() => pickTile(tk, mood)}
                 className={cn(
-                  'flex flex-col items-center gap-2 rounded-2xl border px-3 py-4 text-center transition-colors',
+                  'flex flex-col items-center gap-2 rounded-lg border-2 px-3 py-4 text-center transition-colors',
                   active
-                    ? 'border-foreground/40 bg-foreground/5'
-                    : 'border-border/60 bg-background/40 hover:border-border hover:bg-muted/40',
+                    ? 'border-foreground bg-muted/50'
+                    : 'border-border/80 bg-muted/15 hover:border-border hover:bg-muted/30',
                 )}
               >
-                <MoodIcon mood={tk === 'other' ? 'uncertain' : mood} size={22} className="text-muted-foreground" />
-                <span className="text-xs font-medium leading-tight text-foreground">
+                <MoodIcon mood={tk === 'other' ? 'uncertain' : mood} size={24} className="text-muted-foreground" />
+                <span className="text-sm font-medium leading-tight text-foreground">
                   {t(`pause.brief.feel.tiles.${tk}`, {
                     defaultValue:
                       tk === 'fomo'
@@ -113,36 +115,48 @@ export function PauseBriefFeel({
           })}
         </div>
 
-        <div className="space-y-3">
-          <p className="text-center text-xs font-medium uppercase tracking-wide text-muted-foreground">
+        <div className="space-y-6">
+          <p className="text-center text-base text-foreground">
             {t('pause.brief.feel.intensityTitle', { defaultValue: 'How strong?' })}
           </p>
-          <div className="flex flex-wrap justify-center gap-1.5">
-            {INTENSITY_KEYS.map((key, i) => {
-              const n = i + 1;
-              const active = intensity === n;
-              return (
-                <button
+          <div className="space-y-2.5">
+            <Slider
+              aria-label={t('pause.brief.feel.intensityTitle', { defaultValue: 'How strong?' })}
+              min={1}
+              max={5}
+              step={1}
+              value={[intensity]}
+              onValueChange={(v) => setIntensityAndSync(v[0] ?? 3)}
+              className="w-full py-1"
+            />
+            <div className="flex justify-between gap-1 px-0.5 text-center text-xs text-muted-foreground sm:text-sm">
+              {INTENSITY_KEYS.map((key) => (
+                <span
                   key={key}
-                  type="button"
-                  onClick={() => pickIntensity(n)}
                   className={cn(
-                    'rounded-full border px-3 py-1.5 text-[11px] font-medium transition-colors',
-                    active
-                      ? 'border-foreground bg-foreground text-background'
-                      : 'border-border/70 text-muted-foreground hover:border-nox-border-focus/40 hover:text-foreground',
+                    'min-w-0 flex-1 truncate',
+                    key === INTENSITY_KEYS[intensity - 1] && 'font-medium text-foreground',
                   )}
                 >
                   {t(`pause.brief.feel.intensity.${key}`, { defaultValue: key })}
-                </button>
-              );
-            })}
+                </span>
+              ))}
+            </div>
           </div>
         </div>
 
-        <Button type="button" className="w-full" disabled={!moodDone} onClick={onContinue}>
-          {t('pause.steps.continue', { defaultValue: 'Continue' })}
-        </Button>
+        <div className="flex justify-center pt-1">
+          <Button
+            type="button"
+            variant="outline"
+            disabled={!moodDone}
+            className="rounded-full border-primary bg-primary/5 px-5 py-2.5 font-medium text-primary hover:bg-primary/10 disabled:opacity-60"
+            onClick={onContinue}
+          >
+            {t('pause.steps.continue', { defaultValue: 'Continue' })}
+            <ChevronRight className="ml-1 h-4 w-4 shrink-0" aria-hidden />
+          </Button>
+        </div>
       </div>
     </motion.div>
   );

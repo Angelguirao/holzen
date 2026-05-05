@@ -222,7 +222,7 @@ export function HomeCustomizeSheet({
                 htmlFor="home-mode-hold"
                 className={cn(
                   'flex cursor-pointer gap-3 rounded-xl border border-border/60 bg-card/40 p-4 transition-colors hover:bg-muted/30',
-                  modeValue === 'hold' && 'border-primary/40 bg-primary/5',
+                  modeValue === 'hold' && 'border-ring bg-muted/50 ring-1 ring-ring/40',
                 )}
               >
                 <RadioGroupItem id="home-mode-hold" value="hold" className="mt-0.5 shrink-0" />
@@ -235,7 +235,7 @@ export function HomeCustomizeSheet({
                 htmlFor="home-mode-zen"
                 className={cn(
                   'flex cursor-pointer gap-3 rounded-xl border border-border/60 bg-card/40 p-4 transition-colors hover:bg-muted/30',
-                  modeValue === 'zen' && 'border-primary/40 bg-primary/5',
+                  modeValue === 'zen' && 'border-ring bg-muted/50 ring-1 ring-ring/40',
                 )}
               >
                 <RadioGroupItem id="home-mode-zen" value="zen" className="mt-0.5 shrink-0" />

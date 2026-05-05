@@ -29,7 +29,7 @@ export function ToolsYourActivitiesSection() {
       <h2 className="text-base font-medium text-foreground">{t('tools.hub.soYou')}</h2>
 
       {showMantraSuggestion ? (
-        <div className="flex items-start gap-3 rounded-xl border border-primary/20 bg-primary/5 p-3">
+        <div className="flex items-start gap-3 rounded-xl border border-border/50 bg-nox-background-accent/20 p-3">
           <Sparkles className="mt-0.5 h-4 w-4 shrink-0 text-nox-text-highlight/80" aria-hidden />
           <div className="min-w-0 flex-1 space-y-1">
             <p className="text-[10px] font-mono uppercase tracking-wide text-muted-foreground">

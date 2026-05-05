@@ -45,14 +45,14 @@ export function PauseDone({ decision, onReturn, pauseData }: Props) {
           initial={{ scale: 0, opacity: 0 }}
           animate={{ scale: [0, 1.4, 1], opacity: 1 }}
           transition={{ duration: 0.6, times: [0, 0.6, 1], ease: 'easeOut' }}
-          className="w-[72px] h-[72px] rounded-full bg-primary/8 flex items-center justify-center"
+          className="flex h-[72px] w-[72px] items-center justify-center rounded-full bg-nox-text-highlight/12"
         >
           <Flame className="h-7 w-7 text-muted-foreground" />
         </motion.div>
         {[...Array(6)].map((_, i) => (
           <motion.div
             key={i}
-            className="absolute top-1/2 left-1/2 w-1 h-1 rounded-full bg-primary/30"
+            className="absolute left-1/2 top-1/2 h-1 w-1 rounded-full bg-nox-text-highlight/35"
             initial={{ x: 0, y: 0, opacity: 1, scale: 1 }}
             animate={{
               x: Math.cos((i * Math.PI * 2) / 6) * 44,
