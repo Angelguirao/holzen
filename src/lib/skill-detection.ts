@@ -75,9 +75,9 @@ export const SKILL_LABELS: Record<SkillType, string> = {
 };
 
 export const SKILL_COLORS: Record<SkillType, string> = {
-  regulation: 'bg-primary/15 text-primary',
+  regulation: 'bg-nox-accent-violet/15 text-nox-accent-violet',
   tolerance: 'bg-accent/15 text-accent-foreground',
   alignment: 'bg-muted text-muted-foreground',
-  reappraisal: 'bg-primary/10 text-primary/80',
+  reappraisal: 'bg-nox-accent-cyan/15 text-nox-accent-cyan',
   awareness: 'bg-secondary text-secondary-foreground',
 };
