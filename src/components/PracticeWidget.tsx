@@ -91,7 +91,7 @@ export function PracticeWidget() {
       {suggestion && (
         <button
           onClick={() => handleSelect(suggestion.id)}
-          className="flex w-full items-start gap-3 rounded-xl border border-primary/15 bg-primary/[0.04] px-3 py-3 transition-colors hover:bg-primary/[0.07]"
+          className="flex w-full items-start gap-3 rounded-xl border border-border/50 bg-nox-background-accent/20 px-3 py-3 transition-colors hover:bg-nox-background-accent/35"
         >
           <Sparkles className="h-3.5 w-3.5 shrink-0 mt-[6px] text-secondary-foreground" />
           <div className="min-w-0 flex-1 text-left">

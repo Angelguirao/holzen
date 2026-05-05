@@ -121,7 +121,7 @@ export default function CompanionZoomOutPage() {
   if (!snapshot) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-background" role="status" aria-busy="true">
-        <div className="h-8 w-8 rounded-full border-2 border-primary/20 border-t-primary/60 animate-spin" />
+        <div className="h-8 w-8 animate-spin rounded-full border-2 border-border/50 border-t-nox-text-link/70" />
       </div>
     );
   }

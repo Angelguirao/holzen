@@ -108,7 +108,7 @@ export function HomeQuickCapture() {
               className={cn(
                 'inline-flex items-center gap-1 rounded-md border px-2 py-1.5 text-[10px] font-mono uppercase tracking-wide transition-colors',
                 mood === m
-                  ? 'border-primary/60 bg-primary/10 text-foreground'
+                  ? 'border-nox-border-focus/50 bg-nox-background-accent/30 text-foreground'
                   : 'border-border/50 bg-muted/20 text-muted-foreground hover:border-border',
               )}
             >

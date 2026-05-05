@@ -27,6 +27,8 @@ interface Props {
   sessionTitle?: string;
   /** When set, replaces `pause.macroProgress` for the meta line under the title. */
   macroProgressLine?: string;
+  /** Optional second line under `macroProgressLine` (deep pause wireframe: step duration hint). */
+  macroProgressSubline?: string;
   /** When set, replaces the default six-beat `PauseProgress` (e.g. brief four-step bar). */
   stepperSlot?: ReactNode;
   /** Which deep-pause step’s citations to emphasize in the “Step science” tab (defaults to `step`). */
@@ -60,6 +62,7 @@ export function PauseSessionScaffold({
   macroStepTotal,
   sessionTitle,
   macroProgressLine,
+  macroProgressSubline,
   stepperSlot,
   scienceCurrentStep,
   breathSecondLabelVariant = 'breathe',
@@ -77,7 +80,8 @@ export function PauseSessionScaffold({
 
   const showMeta =
     phase === 'session' &&
-    (macroProgressLine != null ||
+    (macroProgressSubline != null ||
+      macroProgressLine != null ||
       (macroStepIndex != null && macroStepTotal != null && macroStepTotal > 0));
 
   return (
@@ -181,16 +185,35 @@ export function PauseSessionScaffold({
 
             {phase === 'session' && (
               <>
-                {showMeta && (
-                  <p className="mt-1 text-center text-[11px] font-medium uppercase tracking-[0.18em] text-muted-foreground">
-                    {macroProgressLine ??
-                      t('pause.macroProgress', {
-                        defaultValue: 'Step {{n}} of {{total}} · under ~15 min',
-                        n: macroStepIndex,
-                        total: macroStepTotal,
-                      })}
-                  </p>
-                )}
+                {showMeta &&
+                  (macroProgressSubline != null ||
+                  (macroProgressLine != null &&
+                    macroStepIndex != null &&
+                    macroStepTotal != null &&
+                    macroStepTotal > 0) ? (
+                    <div className="relative mt-1 flex flex-col items-center gap-0 text-center text-muted-foreground">
+                      <p className="text-base font-medium italic leading-6">
+                        {macroProgressLine ??
+                          t('pause.deep.macroStepCount', {
+                            defaultValue: '{{n}} of {{total}}',
+                            n: macroStepIndex,
+                            total: macroStepTotal,
+                          })}
+                      </p>
+                      {macroProgressSubline ? (
+                        <p className="text-base font-normal leading-6">{macroProgressSubline}</p>
+                      ) : null}
+                    </div>
+                  ) : (
+                    <p className="mt-1 text-center text-[11px] font-medium uppercase tracking-[0.18em] text-muted-foreground">
+                      {macroProgressLine ??
+                        t('pause.macroProgress', {
+                          defaultValue: 'Step {{n}} of {{total}} · under ~15 min',
+                          n: macroStepIndex,
+                          total: macroStepTotal,
+                        })}
+                    </p>
+                  ))}
                 <div className="mt-4 w-full">
                   {stepperSlot ?? (
                     <PauseProgress

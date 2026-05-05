@@ -1318,7 +1318,7 @@
       },
       "feel": {
         "title": "What's here?",
-        "subtitle": "No need to be sure — pick what is closest.",
+        "subtitle": "No need to be sure",
         "tiles": {
           "fomo": "FOMO",
           "fearful": "Fearful",

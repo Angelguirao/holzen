@@ -58,7 +58,7 @@ export function ToolsGoodNextStepSection({ loading, lastCheckIn, suggestions }: 
                   e.preventDefault();
                   requirePro(s.id);
                 }}
-                className="flex flex-1 min-w-0 items-start gap-2 rounded-xl border border-primary/15 bg-primary/[0.04] px-3 py-2.5 text-left transition-colors hover:bg-primary/[0.07] sm:min-w-[140px] sm:flex-initial"
+                className="flex flex-1 min-w-0 items-start gap-2 rounded-xl border border-border/50 bg-nox-background-accent/20 px-3 py-2.5 text-left transition-colors hover:bg-nox-background-accent/35 sm:min-w-[140px] sm:flex-initial"
               >
                 <Sparkles className="mt-0.5 h-3.5 w-3.5 shrink-0 text-nox-text-highlight" />
                 <div className="min-w-0 flex-1">

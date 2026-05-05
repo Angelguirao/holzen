@@ -75,7 +75,7 @@ export function PauseProgress({
             >
               <div
                 className={`h-1 rounded-full transition-all duration-500 ${
-                  isActive ? 'w-6 bg-primary' : isPast ? 'w-4 bg-primary/40' : 'w-3 bg-border'
+                  isActive ? 'w-6 bg-nox-text-link' : isPast ? 'w-4 bg-nox-text-link/40' : 'w-3 bg-border'
                 }`}
               />
               <span
