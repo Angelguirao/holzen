@@ -1363,7 +1363,9 @@
       "deep": {
         "label": "Deep pause",
         "duration": "~ 7 min",
-        "desc": "Sit with it. Reflect. Decide from your center."
+        "desc": "Sit with it. Reflect. Decide from your center.",
+        "proRequiredHint": "Pro or free trial",
+        "ariaLocked": "Deep pause — Holzen Pro or free trial required. Tap to learn more."
       }
     },
     "aboutPauses": {
@@ -2277,7 +2279,8 @@
     "desc_badges_pro": "Unlock exclusive Pro badges and track deeper milestones.",
     "desc_grounding": "Choose personal grounding activities and get AI-powered suggestions tailored to the market moment.",
     "desc_notifications": "Smart digests, night reflections, and quiet hours to control when and how Holzen reaches you.",
-    "desc_save_moment": "Capture what a companion card surfaces for you as a journal note saved to your library."
+    "desc_save_moment": "Capture what a companion card surfaces for you as a journal note saved to your library.",
+    "desc_deep_pause": "The full ~7 min ritual — feel, breathe, reflect, frame, and decide — is included with Holzen Pro or your free trial."
   },
   "triggerOverlay": {
     "readyToPause": "You paused. That's the hardest part.",

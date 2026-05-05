@@ -7,6 +7,8 @@ export function PauseSessionDepthPickerStack(props: {
   contextLine: string | null;
   onBrief: () => void;
   onDeep: () => void;
+  /** Free users: deep card shows a Pro / trial hint; `onDeep` should still run (e.g. paywall). */
+  deepPauseLocked?: boolean;
   onAboutPauses: () => void;
   onClose: () => void;
   aboutSheetOpen: boolean;
@@ -17,6 +19,7 @@ export function PauseSessionDepthPickerStack(props: {
     contextLine,
     onBrief,
     onDeep,
+    deepPauseLocked = false,
     onAboutPauses,
     onClose,
     aboutSheetOpen,
@@ -30,6 +33,7 @@ export function PauseSessionDepthPickerStack(props: {
         contextLine={contextLine}
         onBrief={onBrief}
         onDeep={onDeep}
+        deepPauseLocked={deepPauseLocked}
         onAboutPauses={onAboutPauses}
         onClose={onClose}
       />
