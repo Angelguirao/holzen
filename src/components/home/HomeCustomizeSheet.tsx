@@ -69,7 +69,7 @@ function CustomizePinnedRow({
         <Label htmlFor={`home-section-${id}`} className="text-sm font-medium leading-snug text-foreground">
           {title}
         </Label>
-        <p className={cn(homeInWidget.metaFaint, 'text-[11px] leading-snug')}>{description}</p>
+        <p className={cn(homeInWidget.metaFaint, 'leading-snug')}>{description}</p>
       </div>
       <div className="h-6 w-10 shrink-0" aria-hidden />
     </div>
@@ -134,7 +134,7 @@ function CustomizeSortableRow({
         <Label htmlFor={`home-section-${id}`} className="text-sm font-medium leading-snug text-foreground">
           {title}
         </Label>
-        <p className={cn(homeInWidget.metaFaint, 'text-[11px] leading-snug')}>{description}</p>
+        <p className={cn(homeInWidget.metaFaint, 'leading-snug')}>{description}</p>
       </div>
       {showSwitch ? (
         <Switch

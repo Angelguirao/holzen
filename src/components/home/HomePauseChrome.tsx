@@ -325,7 +325,7 @@ export function AutoCooldownIndicator({
         <p className="text-xs leading-snug text-foreground/80" aria-hidden="true">
           {t('home.autoCooldown.serverChecksKicker', { defaultValue: 'Holzen is watching the market for you' })}
         </p>
-        <p className="text-[11px] tabular-nums leading-snug text-muted-foreground/75" aria-hidden="true">
+        <p className="text-xs tabular-nums leading-snug text-muted-foreground/75" aria-hidden="true">
           {t('home.autoCooldown.nextScanAtClock', {
             time: nextScanClock,
             defaultValue: 'Next routine check · {{time}}',
@@ -344,7 +344,7 @@ export function AutoCooldownIndicator({
   });
   return (
     <div className="space-y-0.5 py-1 text-base font-sans" role="status" aria-live="polite" aria-label={cooldownAria}>
-      <p className={cn(homeInWidget.metaFaint, 'text-[11px] uppercase tracking-wide')} aria-hidden="true">
+      <p className={cn(homeInWidget.metaFaint, 'uppercase tracking-wide')} aria-hidden="true">
         {t('home.autoCooldown.afterPauseKicker', { defaultValue: 'Rest window after your last pause' })}
       </p>
       <div className="flex items-center gap-2">
@@ -367,7 +367,7 @@ export function ProLockedWidget({ onUpgrade, checkoutLoading, feature }: { onUpg
   const description = feature && t(descKey) !== descKey ? t(descKey) : t('pro.upgradeDesc');
   return (
     <div className="flex flex-col items-center gap-3 py-4">
-      <Lock className="h-5 w-5 text-[#dbb266]" />
+      <Lock className="h-5 w-5 text-nox-text-highlight" />
       <h2 className="font-semibold text-secondary-foreground text-base">{t('pro.featureLocked')}</h2>
       <p className="w-full text-center leading-relaxed text-muted-foreground text-base">{description}</p>
       <button
