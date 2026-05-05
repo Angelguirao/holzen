@@ -1,9 +1,10 @@
-import { useState, useRef, useMemo, useCallback, Fragment } from 'react';
+import { useState, useRef, useMemo, useCallback, useEffect, Fragment } from 'react';
 import { useReducedMotion } from 'framer-motion';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useHolzen } from '@/hooks/use-holzen';
 import { useSubscription } from '@/hooks/use-subscription';
+import { useProGate } from '@/hooks/use-pro-gate';
 import { type MoodValue } from '@/components/MoodCheck';
 
 import { type PauseStep } from '@/components/pause/PauseProgress';
@@ -113,7 +114,8 @@ export default function PauseSession() {
     btcData,
     trackedAssetId,
   } = useHolzen();
-  const { subscribed, refresh: refreshSubscription } = useSubscription();
+  const { subscribed, loading: subLoading, refresh: refreshSubscription } = useSubscription();
+  const { requirePro } = useProGate();
 
   const { onAfterMutation: pendingOfferAfterMutation, navigateAfterAdopt: pendingOfferNavigateAfterAdopt } =
     usePauseSessionPendingPauseOfferNavigation({
@@ -266,6 +268,11 @@ export default function PauseSession() {
       setPickerAboutOpen,
     });
 
+  const handleDepthPickerDeep = useCallback(() => {
+    if (!requirePro('deep_pause')) return;
+    depthPickerOnDeep();
+  }, [requirePro, depthPickerOnDeep]);
+
   const { handleMoodSelect } = usePauseSessionInitialMoodHandlers({
     pauseInstanceId,
     t,
@@ -280,6 +287,13 @@ export default function PauseSession() {
     handleMoodSelect,
     isBriefRitual: ritualEntry === 'brief',
   });
+
+  useEffect(() => {
+    if (subLoading) return;
+    if (ritualEntry !== 'deep') return;
+    if (subscribed) return;
+    setRitualEntry('picker');
+  }, [subLoading, subscribed, ritualEntry]);
 
   usePauseSessionRitualStorageSync({
     pauseInstanceId,
@@ -531,7 +545,8 @@ export default function PauseSession() {
             <PauseSessionDepthPickerStack
               contextLine={depthContextLine}
               onBrief={depthPickerOnBrief}
-              onDeep={depthPickerOnDeep}
+              onDeep={handleDepthPickerDeep}
+              deepPauseLocked={!subscribed}
               onAboutPauses={depthPickerOnAboutPauses}
               onClose={() => {
                 setLeavePauseConfirmOpen(true);
