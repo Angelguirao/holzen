@@ -15,7 +15,7 @@ export type PauseSessionBriefRitualBodyProps = {
   selectedMood: MoodValue | null;
   selectedBriefFace: BriefFeelTile | null;
   feelIntensity: number | null;
-  onBriefFeelSelect: (mood: MoodValue, intensity: number, tile: BriefFeelTile) => void;
+  onFeelTilesSelect: (mood: MoodValue, intensity: number, tile: BriefFeelTile) => void;
   onBriefFeelContinueToBreath: () => void;
   breathingRef: RefObject<PauseBreathingHandle | null>;
   mantra: string | null;
@@ -41,7 +41,7 @@ export function PauseSessionBriefRitualBody({
   selectedMood,
   selectedBriefFace,
   feelIntensity,
-  onBriefFeelSelect,
+  onFeelTilesSelect,
   onBriefFeelContinueToBreath,
   breathingRef,
   mantra,
@@ -67,7 +67,7 @@ export function PauseSessionBriefRitualBody({
             selectedMood={selectedMood}
             selectedTile={selectedBriefFace}
             feelIntensity={feelIntensity}
-            onSelect={onBriefFeelSelect}
+            onSelect={onFeelTilesSelect}
             onContinue={onBriefFeelContinueToBreath}
           />
         </motion.div>
