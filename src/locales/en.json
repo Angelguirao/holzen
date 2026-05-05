@@ -1302,6 +1302,9 @@
     "decideSubcopy": "You're choosing from your center.",
     "youChose": "You chose deliberately.",
     "return": "Return",
+    "leaveSessionTitle": "Leave ritual?",
+    "leaveSessionDescription": "Your pause stays open. You can resume from Home when you're ready. This only leaves this screen — it does not end your pause.",
+    "leaveSessionConfirm": "Leave",
     "sessionTitle": "Your pause",
     "openMaxCountdown": "{{remaining}} left in this ritual window",
     "brief": {

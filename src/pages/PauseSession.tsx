@@ -1,4 +1,4 @@
-import { useState, useRef, useMemo, useCallback } from 'react';
+import { useState, useRef, useMemo, useCallback, Fragment } from 'react';
 import { useReducedMotion } from 'framer-motion';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
@@ -43,7 +43,6 @@ import { usePauseSessionInitialMoodHandlers } from '@/hooks/use-pause-session-in
 import { usePauseShiftFrameDoneHandler } from '@/hooks/use-pause-shift-frame-done-handler';
 import { usePauseSessionDecideHandler } from '@/hooks/use-pause-session-decide-handler';
 import { usePauseSessionExitNavigation } from '@/hooks/use-pause-session-exit-navigation';
-import { clearSession } from '@/lib/pause-session-storage';
 import { trackEvent } from '@/lib/posthog';
 import { usePauseSessionBreathStepHandlers } from '@/hooks/use-pause-session-breath-step-handlers';
 import { usePauseSessionHeaderBackHandler } from '@/hooks/use-pause-session-header-back-handler';
@@ -67,6 +66,16 @@ import { usePauseSessionPendingPauseOfferNavigation } from '@/hooks/use-pause-se
 import { usePauseSessionDepthPickerHandlers } from '@/hooks/use-pause-session-depth-picker-handlers';
 import { usePauseSessionDeepChooseBridgeHandler } from '@/hooks/use-pause-session-deep-choose-bridge-handler';
 import { usePauseSessionBriefFeelSelect } from '@/hooks/use-pause-session-brief-feel-select';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog';
 
 /**
  * `/pause` route: wires shell hydration, local ritual state, `pause-api` step handlers, and pause UI
@@ -86,7 +95,7 @@ import { usePauseSessionBriefFeelSelect } from '@/hooks/use-pause-session-brief-
 export default function PauseSession() {
   const { t } = useTranslation();
   const navigate = useNavigate();
-  const { handleReturn } = usePauseSessionExitNavigation(navigate);
+  const { handleReturn, handleClose } = usePauseSessionExitNavigation(navigate);
   const location = useLocation();
   const prefersReducedMotion = useReducedMotion();
   const breathSecondLabelVariant = usePauseSessionBreathSecondLabelVariant();
@@ -151,7 +160,9 @@ export default function PauseSession() {
   const pauseInstanceIdForTerminal =
     pauseInstanceId ?? navPauseInstanceId ?? fetchPauseInstanceId;
 
-  const handleAbandonClose = useCallback(async () => {
+  const [leavePauseConfirmOpen, setLeavePauseConfirmOpen] = useState(false);
+
+  const confirmLeavePauseSession = useCallback(() => {
     try {
       trackEvent('pause_session_abandoned', {
         pause_instance_id: pauseInstanceIdForTerminal ?? undefined,
@@ -159,10 +170,9 @@ export default function PauseSession() {
     } catch {
       /* no-op */
     }
-    await dismissMessage();
-    clearSession();
-    navigate('/', { replace: true });
-  }, [dismissMessage, navigate, pauseInstanceIdForTerminal]);
+    setLeavePauseConfirmOpen(false);
+    handleClose();
+  }, [handleClose, pauseInstanceIdForTerminal]);
 
   const hasCoalescedShellMessage = message.length > 0;
 
@@ -218,6 +228,14 @@ export default function PauseSession() {
   const [frameDone, setFrameDone] = useState(() => initialFrameDoneFromRestored(restored));
   const [curtainLifted, setCurtainLifted] = useState(false);
   const [pauseImpactData, setPauseImpactData] = useState<PauseImpactData | null>(null);
+
+  const handlePauseSessionChromeClose = useCallback(() => {
+    if (phase === 'done') {
+      handleReturn();
+    } else {
+      setLeavePauseConfirmOpen(true);
+    }
+  }, [phase, handleReturn]);
 
   usePauseSessionEntryPresentationEffects({ step, setDecideOnBackStep, setCurtainLifted });
 
@@ -495,61 +513,75 @@ export default function PauseSession() {
   });
 
   return (
-    <PauseSessionGate
-      hasMessage={hasCoalescedShellMessage}
-      phase={phase}
-      waitingForFetch={waitingForFetch}
-      fetchFailed={fetchFailed}
-      hydrationStatus={hydration.status}
-      profileLoaded={profileLoaded}
-      onReturn={handleReturn}
-    >
-      <PauseSessionGateContent
-        onPendingAfterMutation={pendingOfferAfterMutation}
-        onPendingNavigateAfterAdopt={pendingOfferNavigateAfterAdopt}
-        sessionOnPicker={sessionOnPicker}
-        depthPickerSlot={
-          <PauseSessionDepthPickerStack
-            contextLine={depthContextLine}
-            onBrief={depthPickerOnBrief}
-            onDeep={depthPickerOnDeep}
-            onAboutPauses={depthPickerOnAboutPauses}
-            onClose={() => {
-              void handleAbandonClose();
-            }}
-            aboutSheetOpen={pickerAboutOpen}
-            onAboutSheetOpenChange={setPickerAboutOpen}
-            aboutSheetTitle={t('pause.aboutPauses.sheetTitle')}
-          />
-        }
-        scaffoldSlot={
-          <PauseSessionScaffoldShell
-            {...scaffoldRitualDerived}
-            countdownSlot={engagedOpenMaxCountdownSlot}
-            curtainLifted={curtainLifted}
-            prefersReducedMotion={!!prefersReducedMotion}
-            onClose={() => {
-              void handleAbandonClose();
-            }}
-            phase={phase}
-            step={step}
-            goToStep={goToStep}
-            onHeaderBack={handlePauseHeaderBack}
-            showHeaderBack={showPauseHeaderBack}
-            macroProgressLine={briefMacroLine}
-            stepperSlot={briefStepperSlot}
-            breathSecondLabelVariant={breathSecondLabelVariant}
-            soundMuted={soundMuted}
-            onSoundMutedChange={setSoundMuted}
-            ritualEntry={ritualEntry}
-            briefRitual={briefRitual}
-            deepRitual={deepRitual}
-            decision={decision}
-            onDoneReturn={handleReturn}
-            pauseImpactData={pauseImpactData}
-          />
-        }
-      />
-    </PauseSessionGate>
+    <Fragment>
+      <PauseSessionGate
+        hasMessage={hasCoalescedShellMessage}
+        phase={phase}
+        waitingForFetch={waitingForFetch}
+        fetchFailed={fetchFailed}
+        hydrationStatus={hydration.status}
+        profileLoaded={profileLoaded}
+        onReturn={handleReturn}
+      >
+        <PauseSessionGateContent
+          onPendingAfterMutation={pendingOfferAfterMutation}
+          onPendingNavigateAfterAdopt={pendingOfferNavigateAfterAdopt}
+          sessionOnPicker={sessionOnPicker}
+          depthPickerSlot={
+            <PauseSessionDepthPickerStack
+              contextLine={depthContextLine}
+              onBrief={depthPickerOnBrief}
+              onDeep={depthPickerOnDeep}
+              onAboutPauses={depthPickerOnAboutPauses}
+              onClose={() => {
+                setLeavePauseConfirmOpen(true);
+              }}
+              aboutSheetOpen={pickerAboutOpen}
+              onAboutSheetOpenChange={setPickerAboutOpen}
+              aboutSheetTitle={t('pause.aboutPauses.sheetTitle')}
+            />
+          }
+          scaffoldSlot={
+            <PauseSessionScaffoldShell
+              {...scaffoldRitualDerived}
+              countdownSlot={engagedOpenMaxCountdownSlot}
+              curtainLifted={curtainLifted}
+              prefersReducedMotion={!!prefersReducedMotion}
+              onClose={handlePauseSessionChromeClose}
+              phase={phase}
+              step={step}
+              goToStep={goToStep}
+              onHeaderBack={handlePauseHeaderBack}
+              showHeaderBack={showPauseHeaderBack}
+              macroProgressLine={briefMacroLine}
+              stepperSlot={briefStepperSlot}
+              breathSecondLabelVariant={breathSecondLabelVariant}
+              soundMuted={soundMuted}
+              onSoundMutedChange={setSoundMuted}
+              ritualEntry={ritualEntry}
+              briefRitual={briefRitual}
+              deepRitual={deepRitual}
+              decision={decision}
+              onDoneReturn={handleReturn}
+              pauseImpactData={pauseImpactData}
+            />
+          }
+        />
+      </PauseSessionGate>
+      <AlertDialog open={leavePauseConfirmOpen} onOpenChange={setLeavePauseConfirmOpen}>
+        <AlertDialogContent className="sm:max-w-md">
+          <AlertDialogHeader>
+            <AlertDialogTitle>{t('pause.leaveSessionTitle')}</AlertDialogTitle>
+            <AlertDialogDescription>{t('pause.leaveSessionDescription')}</AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>{t('common.cancel')}</AlertDialogCancel>
+            <AlertDialogAction type="button" onClick={confirmLeavePauseSession}>
+              {t('pause.leaveSessionConfirm')}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+    </Fragment>
   );
 }
