@@ -10,6 +10,10 @@ export interface PauseSessionSnapshot {
   companions: CompanionData;
 }
 
+export function pauseSessionCompanionSnapshotQueryKey(pauseInstanceId: string) {
+  return ['pause', 'companion-fullview', 'snapshot', pauseInstanceId] as const;
+}
+
 /**
  * Shared loader used by the four full-view companion pages. Reads a
  * pause_instance row + its artifacts, returns an in-memory snapshot
