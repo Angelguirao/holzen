@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
 import { practiceEntriesWeeklyCountQueryKey } from '@/components/PracticeWidget';
 import { practicePrimarySuggestionQueryKey } from '@/hooks/use-practice-suggestion';
+import { toolsHubDataQueryKey } from '@/hooks/use-tools-hub-data';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/use-auth';
 import { toast } from 'sonner';
@@ -55,6 +56,7 @@ export function BodyScan({ onComplete, textColor, ringColor, glowColor }: Props)
     if (error) return { ok: false as const, error };
     void queryClient.invalidateQueries({ queryKey: practiceEntriesWeeklyCountQueryKey(user.id) });
     void queryClient.invalidateQueries({ queryKey: practicePrimarySuggestionQueryKey(user.id) });
+    void queryClient.invalidateQueries({ queryKey: toolsHubDataQueryKey(user.id) });
     return { ok: true as const };
   }, [user, queryClient]);
 
