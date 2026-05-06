@@ -1,7 +1,6 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { useAuth } from '@/hooks/use-auth';
-import { supabase } from '@/integrations/supabase/client';
+import { useIsAdmin } from '@/hooks/use-is-admin';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
@@ -10,24 +9,6 @@ import { Separator } from '@/components/ui/separator';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import { ChevronDown, ExternalLink, CreditCard, ListChecks, Wallet, FileText, RotateCw } from 'lucide-react';
 import { AdminSubNav } from '@/components/admin/AdminSubNav';
-
-function useIsAdmin() {
-  const { user, loading } = useAuth();
-  const [isAdmin, setIsAdmin] = useState<boolean | null>(null);
-  useState(() => {
-    if (!user) { setIsAdmin(false); return; }
-    supabase.from('profiles').select('is_admin').eq('user_id', user.id).single()
-      .then(({ data }) => {
-        const p = data as { is_admin?: boolean } | null;
-        if (typeof p?.is_admin === 'boolean') setIsAdmin(p.is_admin);
-        else {
-          const ids = import.meta.env.VITE_ADMIN_USER_IDS as string | undefined;
-          setIsAdmin(!!ids && ids.split(',').map(s => s.trim()).includes(user.id));
-        }
-      });
-  });
-  return { isAdmin: !!isAdmin, loading: loading || isAdmin === null };
-}
 
 const TEST_CARDS = [
   { label: 'Success', number: '4242 4242 4242 4242', note: 'Standard happy path' },

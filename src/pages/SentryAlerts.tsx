@@ -1,6 +1,5 @@
-import { useEffect, useState } from 'react';
-import { useAuth } from '@/hooks/use-auth';
-import { supabase } from '@/integrations/supabase/client';
+import { useState } from 'react';
+import { useIsAdmin } from '@/hooks/use-is-admin';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
@@ -8,24 +7,6 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { Button } from '@/components/ui/button';
 import { AlertTriangle, Bell, ExternalLink, Slack, Mail, ListChecks, RotateCw } from 'lucide-react';
 import { AdminSubNav } from '@/components/admin/AdminSubNav';
-
-function useIsAdmin() {
-  const { user, loading } = useAuth();
-  const [isAdmin, setIsAdmin] = useState<boolean | null>(null);
-  useEffect(() => {
-    if (!user) { setIsAdmin(false); return; }
-    supabase.from('profiles').select('is_admin').eq('user_id', user.id).single()
-      .then(({ data }) => {
-        const p = data as { is_admin?: boolean } | null;
-        if (typeof p?.is_admin === 'boolean') setIsAdmin(p.is_admin);
-        else {
-          const ids = import.meta.env.VITE_ADMIN_USER_IDS as string | undefined;
-          setIsAdmin(!!ids && ids.split(',').map(s => s.trim()).includes(user.id));
-        }
-      });
-  }, [user]);
-  return { isAdmin: !!isAdmin, loading: loading || isAdmin === null };
-}
 
 type AlertRule = {
   id: string;
