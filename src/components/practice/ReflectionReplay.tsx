@@ -5,7 +5,7 @@
  */
 
 import { useCallback, useEffect, useState } from 'react';
-import { useQueryClient } from '@tanstack/react-query';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
 import { format } from 'date-fns';
 import { Loader2 } from 'lucide-react';
@@ -29,6 +29,10 @@ interface Props {
   initialPauseInstanceId?: string;
 }
 
+function replayRecentPausesQueryKey(userId: string) {
+  return ['practice', 'replay', 'recent-pauses', userId] as const;
+}
+
 function ThreadLine({ word }: { word: UserWord }) {
   const { t } = useTranslation();
   const label =
@@ -49,15 +53,25 @@ export function ReflectionReplay({ onComplete, initialPauseInstanceId }: Props) 
   const { t } = useTranslation();
   const { user } = useAuth();
   const queryClient = useQueryClient();
-  const [picker, setPicker] = useState<PausePickerRow[]>([]);
   const [selectedId, setSelectedId] = useState<string | null>(initialPauseInstanceId ?? null);
   const [thread, setThread] = useState<PastReflectionWithWords | null>(null);
   const [loadingThread, setLoadingThread] = useState(false);
   /** When load fails, `thread` stays null and `loadingThread` is false — without this we would spin forever (`!thread` treated as loading). */
   const [threadLoadError, setThreadLoadError] = useState(false);
-  const [loadingList, setLoadingList] = useState(!initialPauseInstanceId);
   const [draft, setDraft] = useState('');
   const [saving, setSaving] = useState(false);
+
+  const {
+    data: picker = [],
+    isPending: loadingList,
+  } = useQuery({
+    queryKey: user ? replayRecentPausesQueryKey(user.id) : ['practice', 'replay', 'recent-pauses', '__none__'],
+    queryFn: () => loadRecentCompletedPausesForReplay(),
+    enabled: Boolean(user) && !selectedId,
+    staleTime: 60_000,
+    refetchOnWindowFocus: false,
+    retry: false,
+  });
 
   const loadThread = useCallback(async (pauseId: string) => {
     setLoadingThread(true);
@@ -80,16 +94,7 @@ export function ReflectionReplay({ onComplete, initialPauseInstanceId }: Props) 
   }, [t]);
 
   useEffect(() => {
-    if (!user) return;
-    if (!selectedId) {
-      void (async () => {
-        setLoadingList(true);
-        const rows = await loadRecentCompletedPausesForReplay();
-        setPicker(rows);
-        setLoadingList(false);
-      })();
-      return;
-    }
+    if (!user || !selectedId) return;
     void loadThread(selectedId);
   }, [user, selectedId, loadThread]);
 
