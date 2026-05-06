@@ -1,4 +1,5 @@
-import { useState, useEffect } from 'react';
+import { useMemo } from 'react';
+import { useQuery } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
 import { Activity } from 'lucide-react';
 
@@ -24,6 +25,10 @@ function volatilityCacheKey(coinId: string): string {
 }
 const LEGACY_CACHE_KEY = 'holzen_btc_volatility_stats';
 const CACHE_TTL = 6 * 60 * 60 * 1000;
+
+export function thresholdVolatilityEstimatorQueryKey(coinId: string) {
+  return ['external', 'coingecko', 'volatility_estimator', coinId] as const;
+}
 
 interface CachedData {
   dailyChanges: number[];
@@ -213,39 +218,36 @@ export function ThresholdFrequencyEstimator({
   coinId = 'bitcoin',
 }: Props) {
   const { t } = useTranslation();
-  const [stats, setStats] = useState<VolatilityStats | null>(null);
-  const [cachedData, setCachedData] = useState<CachedData | null>(null);
-
   const effectiveDown = thresholdDown ?? thresholdUp;
 
-  useEffect(() => {
-    setCachedData(null);
-    fetchVolatilityData(coinId).then((d) => {
-      if (d) setCachedData(d);
-    });
-  }, [coinId]);
+  const { data: cachedData = null } = useQuery({
+    queryKey: thresholdVolatilityEstimatorQueryKey(coinId),
+    queryFn: () => fetchVolatilityData(coinId),
+    staleTime: CACHE_TTL,
+    gcTime: CACHE_TTL * 2,
+    refetchOnWindowFocus: false,
+    retry: false,
+  });
 
-  useEffect(() => {
-    if (!cachedData) return;
+  const stats = useMemo((): VolatilityStats | null => {
+    if (!cachedData) return null;
 
-    const avgDailyMove = cachedData.dailyChanges.length > 0
-      ? cachedData.dailyChanges.reduce((s, c) => s + c, 0) / cachedData.dailyChanges.length
-      : 0;
+    const avgDailyMove =
+      cachedData.dailyChanges.length > 0
+        ? cachedData.dailyChanges.reduce((s, c) => s + c, 0) / cachedData.dailyChanges.length
+        : 0;
 
     if (cachedData.hourlyPrices?.length > 1) {
-      setStats(
-        computeStatsSimulated(
-          cachedData.hourlyPrices,
-          thresholdUp,
-          effectiveDown,
-          cumulativeThreshold,
-          cooldownHours ?? 24,
-          avgDailyMove,
-        )
+      return computeStatsSimulated(
+        cachedData.hourlyPrices,
+        thresholdUp,
+        effectiveDown,
+        cumulativeThreshold,
+        cooldownHours ?? 24,
+        avgDailyMove,
       );
-    } else {
-      setStats(computeStatsDaily(cachedData.dailyChanges, thresholdUp, effectiveDown));
     }
+    return computeStatsDaily(cachedData.dailyChanges, thresholdUp, effectiveDown);
   }, [cachedData, thresholdUp, effectiveDown, cumulativeThreshold, cooldownHours]);
 
   if (!stats) return null;
