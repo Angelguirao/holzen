@@ -195,10 +195,10 @@ export const PauseBreathing = forwardRef<PauseBreathingHandle, Props>(function P
 
   const introKicker =
     ritualVariant === 'brief'
-      ? t('pause.brief.breathIntroKicker', { defaultValue: 'Step 2 · Breath' })
+      ? t('pause.brief.breathIntroKicker', { defaultValue: 'Step 2 · Breathe' })
       : breathSegment === 'second'
-        ? t('pause.breathIntroKickerSecond', { defaultValue: 'Step 5 · Breath' })
-        : t('pause.breathIntroKickerFirst', { defaultValue: 'Step 2 · Breath' });
+        ? t('pause.breathIntroKickerSecond', { defaultValue: 'Step 5 · Breathe' })
+        : t('pause.breathIntroKickerFirst', { defaultValue: 'Step 2 · Breathe' });
 
   const interstitialTitle =
     breathSegment === 'second'

@@ -12,7 +12,7 @@ export function PauseBriefProgress({ currentStep, onStepClick }: Props) {
   const { t } = useTranslation();
   const labels: Record<BriefPauseStep, string> = {
     feel: t('pause.brief.steps.feel', { defaultValue: 'Feel' }),
-    breath: t('pause.brief.steps.breath', { defaultValue: 'Breath' }),
+    breath: t('pause.brief.steps.breath', { defaultValue: 'Breathe' }),
     integrate: t('pause.brief.steps.integrate', { defaultValue: 'Integrate' }),
     decide: t('pause.brief.steps.decide', { defaultValue: 'Decide' }),
   };
