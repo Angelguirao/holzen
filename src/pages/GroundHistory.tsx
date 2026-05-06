@@ -6,6 +6,7 @@ import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/use-auth';
+import { toast } from 'sonner';
 import { MoodIcon } from '@/components/icons/MoodIcon';
 import { Button } from '@/components/ui/button';
 import { TOOLS } from '@/lib/app-routes';
@@ -126,10 +127,17 @@ export default function GroundHistory() {
   const totalSessions = groundingStats?.totalSessions ?? 0;
   const totalMinutes = groundingStats?.totalMinutes ?? 0;
 
-  const loadMore = useCallback(() => {
+  const loadMore = useCallback(async () => {
     if (!hasNextPage || isFetchingNextPage) return;
-    void fetchNextPage();
-  }, [hasNextPage, isFetchingNextPage, fetchNextPage]);
+    try {
+      const result = await fetchNextPage();
+      if (result.isError) {
+        toast.error(t('common.tryAgain', { defaultValue: 'Try again' }));
+      }
+    } catch {
+      toast.error(t('common.tryAgain', { defaultValue: 'Try again' }));
+    }
+  }, [hasNextPage, isFetchingNextPage, fetchNextPage, t]);
 
   return (
     <motion.div
@@ -282,7 +290,7 @@ export default function GroundHistory() {
               <motion.div className="text-center pt-4" initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
                 <button
                   type="button"
-                  onClick={loadMore}
+                  onClick={() => void loadMore()}
                   disabled={isFetchingNextPage}
                   className="text-sm font-medium text-nox-text-link underline-offset-4 transition-colors hover:text-nox-text-link/80 hover:underline disabled:opacity-40"
                 >
