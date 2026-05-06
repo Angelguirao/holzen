@@ -2,6 +2,8 @@
 
 This guide explains **how we structure big pages** in Holzen (starting from **`/` Home** and **`/pause` Pause**) so they stay readable, correct, and reusable. It is written so **React beginners** can follow it; you can skip the [Quick React vocabulary](#quick-react-vocabulary) section if you already know those terms.
 
+**See also (full-stack boundaries):** [client-server-architecture-holzen.md](client-server-architecture-holzen.md) — where **business truth** lives (Postgres/RLS/edge) vs **page orchestration** here; TanStack Query vs UI-only state.
+
 - **Concrete Home map:** [screens/home.md](../screens/home.md) (files, modes, widgets).  
 - **Concrete Pause map:** [screens/pause.md](../screens/pause.md) (gate, scaffold, brief vs deep ritual, RPC wiring).  
 - **This doc:** the **ideas** you can copy on other `src/pages/*` screens.

@@ -86,6 +86,8 @@ The Supabase browser client is **`src/integrations/supabase/client.ts`** (typed 
 
 TanStack Query is available app-wide (`QueryClient` in `App.tsx`); individual hooks may use `useEffect` + Supabase directly — follow the nearest feature.
 
+**Architecture (truth vs projection):** [client-server-architecture-holzen.md](client-server-architecture-holzen.md) — how Postgres/RLS/edge relate to the SPA cache and UI-only state.
+
 **Shared client fetch patterns (dedupe):** subscription status is centralized in **`use-subscription.ts`** (`useQuery` so all consumers share one `check-subscription` request/cache). BTC / market reads go through **`fetchBtcData`** in **`src/lib/btc.ts`**, which coalesces concurrent calls per currency. Profile row loading remains **`use-profile.ts`** (stable **`user?.id`** dependency); if DevTools still shows duplicate `profiles` requests, consider a single layout-level query (see [home-fetch-deduplication.md](../backlog/home-fetch-deduplication.md)).
 
 ### 6.1 TanStack Query vs `useEffect` + Supabase
