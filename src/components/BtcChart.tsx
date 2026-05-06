@@ -1,4 +1,5 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState } from 'react';
+import { useQuery } from '@tanstack/react-query';
 import { AreaChart, Area, XAxis, YAxis, ResponsiveContainer, Tooltip } from 'recharts';
 import { Skeleton } from '@/components/ui/skeleton';
 import { TrendingDown, TrendingUp } from 'lucide-react';
@@ -17,49 +18,53 @@ interface Props {
   coinId?: string;
 }
 
+export function coingeckoMarketChartQueryKey(currency: string, coinId: string, retryNonce: number) {
+  return ['external', 'coingecko', 'market_chart', coinId, currency.toLowerCase(), retryNonce] as const;
+}
+
+async function fetchCoinGeckoMarketChart(
+  currency: string,
+  coinId: string,
+  signal: AbortSignal,
+): Promise<ChartPoint[]> {
+  const cur = currency.toLowerCase();
+  const id = encodeURIComponent(coinId);
+  const res = await fetch(
+    `https://api.coingecko.com/api/v3/coins/${id}/market_chart?vs_currency=${cur}&days=7`,
+    { signal },
+  );
+  if (!res.ok) throw new Error('fetch_failed');
+  const json = await res.json();
+  const prices: [number, number][] = json.prices;
+  if (!prices?.length || prices.length < 2) {
+    throw new Error('insufficient_points');
+  }
+  const step = Math.max(1, Math.floor(prices.length / 48));
+  return prices
+    .filter((_, i) => i % step === 0 || i === prices.length - 1)
+    .map(([t, p]) => ({ timestamp: t, price: p }));
+}
+
 export function BtcChart({ hidden = false, currency = 'USD', coinId = 'bitcoin' }: Props) {
-  const [data, setData] = useState<ChartPoint[] | null>(null);
-  const [error, setError] = useState(false);
-  const [retryKey, setRetryKey] = useState(0);
+  const [retryNonce, setRetryNonce] = useState(0);
 
-  const load = useCallback(async (signal?: AbortSignal) => {
-    setData(null);
-    setError(false);
-    try {
-      const cur = currency.toLowerCase();
-      const id = encodeURIComponent(coinId);
-      const res = await fetch(
-        `https://api.coingecko.com/api/v3/coins/${id}/market_chart?vs_currency=${cur}&days=7`,
-        { signal }
-      );
-      if (!res.ok) throw new Error();
-      const json = await res.json();
-      const prices: [number, number][] = json.prices;
-      if (prices?.length >= 2) {
-        const step = Math.max(1, Math.floor(prices.length / 48));
-        const sampled = prices
-          .filter((_, i) => i % step === 0 || i === prices.length - 1)
-          .map(([t, p]) => ({ timestamp: t, price: p }));
-        setData(sampled);
-      }
-    } catch (e: unknown) {
-      const aborted =
-        (e instanceof DOMException && e.name === 'AbortError') ||
-        (e instanceof Error && e.name === 'AbortError');
-      if (!aborted) setError(true);
-    }
-  }, [currency, coinId]);
-
-  useEffect(() => {
-    const ctrl = new AbortController();
-    load(ctrl.signal);
-    return () => ctrl.abort();
-  }, [load, retryKey]);
+  const { data, isPending, isError } = useQuery({
+    queryKey: coingeckoMarketChartQueryKey(currency, coinId, retryNonce),
+    queryFn: ({ signal }) => fetchCoinGeckoMarketChart(currency, coinId, signal),
+    enabled: !hidden,
+    staleTime: 5 * 60_000,
+    refetchOnWindowFocus: false,
+    retry: false,
+  });
 
   if (hidden) return null;
-  if (error) return <ErrorRetry message="Could not load chart data" onRetry={() => setRetryKey(k => k + 1)} />;
+  if (isError) {
+    return (
+      <ErrorRetry message="Could not load chart data" onRetry={() => setRetryNonce((k) => k + 1)} />
+    );
+  }
 
-  if (!data) {
+  if (isPending || !data) {
     return (
       <div className="space-y-2">
         <Skeleton className="h-3 w-20" />
