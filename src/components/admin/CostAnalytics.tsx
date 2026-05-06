@@ -11,9 +11,9 @@
  *     path even when it isn't.
  *
  * All queries hit `generation_attempts` directly (admin RLS allows SELECT).
- * Attempt rows reload when the period changes; refresh also invalidates the MRR snapshot query.
+ * Attempt rows use TanStack Query (per-period key + 7d when period ≠ 7d); refresh invalidates attempts + MRR snapshot.
  */
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import {
   AlertCircle,
@@ -163,6 +163,9 @@ interface MrrSnapshot {
 /** Admin Cost tab — subscriber count + MTD spend (shared cache; refresh invalidates). */
 const ADMIN_COST_MRR_SNAPSHOT_QUERY_KEY = ['admin', 'cost', 'mrr-snapshot'] as const;
 
+const ADMIN_COST_GENERATION_ATTEMPTS_QUERY_KEY = (period: TimePeriod) =>
+  ['admin', 'cost', 'generation-attempts', period] as const;
+
 async function fetchMrrSnapshot(): Promise<MrrSnapshot> {
   // Count active/trialing subscribers. Lifetime-access users are not counted
   // toward MRR (they've already paid one-off), but they still consume AI —
@@ -189,9 +192,6 @@ async function fetchMrrSnapshot(): Promise<MrrSnapshot> {
 export function CostAnalytics() {
   const queryClient = useQueryClient();
   const [period, setPeriod] = useState<TimePeriod>('7d');
-  const [rows7d, setRows7d] = useState<AttemptRow[]>([]);
-  const [rowsPeriod, setRowsPeriod] = useState<AttemptRow[]>([]);
-  const [loading, setLoading] = useState(true);
 
   const { data: mrr, isPending: mrrPending } = useQuery({
     queryKey: ADMIN_COST_MRR_SNAPSHOT_QUERY_KEY,
@@ -200,26 +200,37 @@ export function CostAnalytics() {
     refetchOnWindowFocus: false,
   });
 
-  const loadAttempts = useCallback(async () => {
-    setLoading(true);
-    try {
-      const [periodData, sevenDayData] = await Promise.all([
-        fetchAttempts(period),
-        period === '7d' ? Promise.resolve<AttemptRow[] | null>(null) : fetchAttempts('7d'),
-      ]);
-      setRowsPeriod(periodData);
-      setRows7d(sevenDayData ?? periodData);
-    } finally {
-      setLoading(false);
-    }
-  }, [period]);
+  const {
+    data: rowsPeriod = [],
+    isFetching: periodAttemptsFetching,
+  } = useQuery({
+    queryKey: ADMIN_COST_GENERATION_ATTEMPTS_QUERY_KEY(period),
+    queryFn: () => fetchAttempts(period),
+    staleTime: 60_000,
+    refetchOnWindowFocus: false,
+  });
+
+  const {
+    data: rows7dSeparate = [],
+    isFetching: sevenDayAttemptsFetching,
+  } = useQuery({
+    queryKey: ADMIN_COST_GENERATION_ATTEMPTS_QUERY_KEY('7d'),
+    queryFn: () => fetchAttempts('7d'),
+    enabled: period !== '7d',
+    staleTime: 60_000,
+    refetchOnWindowFocus: false,
+  });
+
+  const rows7d = period === '7d' ? rowsPeriod : rows7dSeparate;
+  const loading =
+    periodAttemptsFetching || (period !== '7d' && sevenDayAttemptsFetching);
 
   const refreshAll = useCallback(async () => {
-    await loadAttempts();
+    await queryClient.invalidateQueries({
+      queryKey: ['admin', 'cost', 'generation-attempts'],
+    });
     await queryClient.invalidateQueries({ queryKey: ADMIN_COST_MRR_SNAPSHOT_QUERY_KEY });
-  }, [loadAttempts, queryClient]);
-
-  useEffect(() => { void loadAttempts(); }, [loadAttempts]);
+  }, [queryClient]);
 
   const features = useMemo(() => summarizeByFeature(rowsPeriod), [rowsPeriod]);
   const topUsers = useMemo(() => summarizeByUser(rows7d), [rows7d]);
