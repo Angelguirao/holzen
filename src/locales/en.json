@@ -1345,7 +1345,7 @@
       "macroProgress": "Step {{n}} of {{total}} · ~2 min",
       "steps": {
         "feel": "Feel",
-        "breath": "Breath",
+        "breath": "Breathe",
         "integrate": "Integrate",
         "decide": "Decide"
       },
@@ -1356,7 +1356,7 @@
         "hint": "When the timer ends, you'll move on — or continue early."
       },
       "decideKicker": "Step 4 · Decide",
-      "breathIntroKicker": "Step 2 · Breath"
+      "breathIntroKicker": "Step 2 · Breathe"
     },
     "depthPicker": {
       "contextMoved": "{{sym}} moved {{pct}}% in the last 24 hours.",
@@ -1426,7 +1426,7 @@
     "pendingAdoptFailed": "Could not switch to the new pause. Try again.",
     "pendingDeclineFailed": "Could not dismiss the offer. Try again.",
     "breathYouAreHere": "You're here",
-    "breathIntroKicker": "Step 1 · Breath",
+    "breathIntroKicker": "Step 1 · Breathe",
     "macroProgress": "Step {{n}} of {{total}} · under ~15 min",
     "muteAriaOn": "Sound on (tap to mute)",
     "muteAriaOff": "Sound off (tap to unmute)",
@@ -1456,10 +1456,10 @@
     "favoriteProHint": "Your favorites will be waiting in your Library with Pro ✨",
     "steps": {
       "feel": "Feel",
-      "breathe": "Breath",
+      "breathe": "Breathe",
       "reflect": "Reflect",
       "frame": "Frame",
-      "breath2": "Breath",
+      "breath2": "Breathe",
       "choose": "Choose",
       "shift": "Shift",
       "decide": "Decide",
