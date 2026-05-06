@@ -3,9 +3,10 @@
  *
  * Read-only. Computes the same error-rate / sample math as the edge-side
  * `getProviderHealth()` so admin's view matches what the orchestrator saw
- * on its last request. Auto-refreshes every 30 s.
+ * on its last request. Auto-refreshes every 30 s via TanStack Query refetchInterval.
  */
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useMemo } from 'react';
+import { useQuery } from '@tanstack/react-query';
 import { AlertTriangle, CheckCircle2, Loader2 } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 
@@ -61,30 +62,27 @@ function summarize(rows: AttemptRow[]): Record<Provider, ProviderStat> {
   return out;
 }
 
+const ADMIN_PROVIDER_HEALTH_QUERY_KEY = ['admin', 'provider-health', WINDOW_MINUTES] as const;
+
+async function fetchProviderHealthStats(): Promise<Record<Provider, ProviderStat>> {
+  const since = new Date(Date.now() - WINDOW_MINUTES * 60_000).toISOString();
+  const { data, error } = await supabase
+    .from('generation_attempts')
+    .select('provider, status')
+    .gte('created_at', since)
+    .limit(10_000);
+  if (error || !data) return summarize([]);
+  return summarize(data as AttemptRow[]);
+}
+
 export function ProviderHealthCard() {
-  const [stats, setStats] = useState<Record<Provider, ProviderStat> | null>(null);
-  const [loading, setLoading] = useState(true);
-
-  const refresh = useCallback(async () => {
-    const since = new Date(Date.now() - WINDOW_MINUTES * 60_000).toISOString();
-    const { data, error } = await supabase
-      .from('generation_attempts')
-      .select('provider, status')
-      .gte('created_at', since)
-      .limit(10_000);
-    if (error || !data) {
-      setStats(summarize([]));
-    } else {
-      setStats(summarize(data as AttemptRow[]));
-    }
-    setLoading(false);
-  }, []);
-
-  useEffect(() => {
-    void refresh();
-    const id = window.setInterval(() => void refresh(), 30_000);
-    return () => window.clearInterval(id);
-  }, [refresh]);
+  const { data: stats, isPending: loading } = useQuery({
+    queryKey: ADMIN_PROVIDER_HEALTH_QUERY_KEY,
+    queryFn: fetchProviderHealthStats,
+    refetchInterval: 30_000,
+    staleTime: 0,
+    refetchOnWindowFocus: false,
+  });
 
   const providers: Provider[] = useMemo(() => ['perplexity', 'lovable'], []);
 
