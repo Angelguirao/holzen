@@ -1,4 +1,5 @@
-import { useEffect, useState, useCallback } from 'react';
+import { useCallback } from 'react';
+import { useQuery } from '@tanstack/react-query';
 import { Link } from 'react-router-dom';
 import { ArrowLeft, RefreshCw, Check, Clock, Minus } from 'lucide-react';
 import { invokeEdge } from '@/lib/invoke-edge';
@@ -72,6 +73,8 @@ function describePaymentStatus(event: CheckoutEvent): { label: string; tone: 'pa
   return { label: raw, tone: 'neutral' };
 }
 
+const CHECKOUT_EVENTS_QUERY_KEY = ['billing', 'checkout-events'] as const;
+
 const STATUS_TONE_CLASS: Record<'paid' | 'free' | 'pending' | 'failed' | 'neutral', string> = {
   paid: 'text-foreground',
   free: 'text-muted-foreground',
@@ -105,36 +108,44 @@ function GrantBadge({ event }: { event: CheckoutEvent }) {
   );
 }
 
+async function fetchCheckoutEvents(): Promise<CheckoutEvent[]> {
+  const { data, error } = await invokeEdge<{ events?: CheckoutEvent[] }>('list-checkout-events', {
+    body: {},
+  });
+  if (error) throw error;
+  return data?.events ?? [];
+}
+
 export default function BillingHistory() {
-  const [events, setEvents] = useState<CheckoutEvent[] | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [refreshing, setRefreshing] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const {
+    data: events,
+    isPending,
+    isFetching,
+    isError,
+    error,
+    refetch,
+  } = useQuery({
+    queryKey: CHECKOUT_EVENTS_QUERY_KEY,
+    queryFn: fetchCheckoutEvents,
+    staleTime: 60_000,
+    refetchOnWindowFocus: false,
+  });
 
-  const load = useCallback(async (silent = false) => {
-    if (!silent) setLoading(true);
-    else setRefreshing(true);
-    setError(null);
-    try {
-      const { data, error } = await invokeEdge<{ events?: CheckoutEvent[] }>('list-checkout-events', {
-        body: {},
-      });
-      if (error) throw error;
-      const list = data?.events ?? [];
-      setEvents(list);
-    } catch (e) {
-      const msg = e instanceof Error ? e.message : 'Failed to load checkout history';
-      setError(msg);
-      if (silent) toast.error(msg);
-    } finally {
-      setLoading(false);
-      setRefreshing(false);
+  const eventList = events ?? [];
+  const showSkeleton = isPending || (isFetching && eventList.length === 0);
+  const refreshing = isFetching && !isPending;
+
+  const onRefresh = useCallback(async () => {
+    const result = await refetch();
+    if (result.isError) {
+      const msg =
+        result.error instanceof Error ? result.error.message : 'Failed to load checkout history';
+      toast.error(msg);
     }
-  }, []);
+  }, [refetch]);
 
-  useEffect(() => {
-    void load(false);
-  }, [load]);
+  const errorMessage =
+    error instanceof Error ? error.message : error != null ? String(error) : 'Failed to load checkout history';
 
   return (
     <div className="space-y-6">
@@ -149,8 +160,8 @@ export default function BillingHistory() {
         <Button
           variant="ghost"
           size="sm"
-          onClick={() => void load(true)}
-          disabled={loading || refreshing}
+          onClick={() => void onRefresh()}
+          disabled={isFetching}
           className="text-xs font-mono"
         >
           <RefreshCw className={`h-3 w-3 mr-1 ${refreshing ? 'animate-spin' : ''}`} aria-hidden />
@@ -166,7 +177,7 @@ export default function BillingHistory() {
         </p>
       </div>
 
-      {loading && (
+      {showSkeleton && (
         <div className="space-y-3">
           {[0, 1, 2].map((i) => (
             <Skeleton key={i} className="h-24 w-full" />
@@ -174,17 +185,17 @@ export default function BillingHistory() {
         </div>
       )}
 
-      {!loading && error && (
+      {!showSkeleton && isError && (
         <div className="rounded-md border border-destructive/40 p-4 space-y-2">
           <p className="text-sm font-sans text-destructive">Couldn't load checkout history</p>
-          <p className="text-xs font-mono text-muted-foreground break-words">{error}</p>
-          <Button size="sm" variant="outline" onClick={() => void load(false)} className="text-xs font-mono">
+          <p className="text-xs font-mono text-muted-foreground break-words">{errorMessage}</p>
+          <Button size="sm" variant="outline" onClick={() => void refetch()} className="text-xs font-mono">
             Try again
           </Button>
         </div>
       )}
 
-      {!loading && !error && events && events.length === 0 && (
+      {!showSkeleton && !isError && eventList.length === 0 && (
         <div className="rounded-md border border-border/40 p-6 text-center">
           <p className="text-sm font-sans text-muted-foreground">
             No checkout sessions yet.
@@ -192,9 +203,9 @@ export default function BillingHistory() {
         </div>
       )}
 
-      {!loading && !error && events && events.length > 0 && (
+      {!showSkeleton && !isError && eventList.length > 0 && (
         <ul className="space-y-3">
-          {events.map((event) => (
+          {eventList.map((event) => (
             <li
               key={event.session_id}
               className="rounded-md border border-border/40 p-4 space-y-2"
