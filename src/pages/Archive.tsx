@@ -1,4 +1,5 @@
 import { useState, useMemo, useCallback, useEffect } from 'react';
+import { useQuery } from '@tanstack/react-query';
 import { useSearchParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -70,8 +71,34 @@ export default function Archive() {
     listSort: sortMode,
     enabled: mainSegment === 'pauses' || mainSegment === 'echoes',
   });
-  const [pausesTabHasArchiveRows, setPausesTabHasArchiveRows] = useState<boolean | null>(null);
   const [pausesArchiveCountNonce, setPausesArchiveCountNonce] = useState(0);
+
+  const pausesArchiveCountQuery = useQuery({
+    queryKey:
+      user?.id && mainSegment === 'pauses'
+        ? (['archive', 'pauses-tab-has-rows', user.id, pausesArchiveCountNonce] as const)
+        : (['archive', 'pauses-tab-has-rows', '__off__'] as const),
+    queryFn: async (): Promise<boolean> => {
+      const { count, error } = await supabase
+        .from('v_pause_archive_pauses')
+        .select('*', { count: 'exact', head: true })
+        .eq('user_id', user!.id);
+      if (error) throw error;
+      return (count ?? 0) > 0;
+    },
+    enabled: Boolean(user?.id && mainSegment === 'pauses'),
+    staleTime: 30_000,
+    refetchOnWindowFocus: false,
+    retry: false,
+  });
+
+  const pausesTabHasArchiveRows = useMemo((): boolean | null => {
+    if (mainSegment !== 'pauses') return false;
+    if (!user?.id) return null;
+    if (pausesArchiveCountQuery.isPending) return null;
+    if (pausesArchiveCountQuery.isError) return null;
+    return pausesArchiveCountQuery.data ?? null;
+  }, [mainSegment, user?.id, pausesArchiveCountQuery.isPending, pausesArchiveCountQuery.isError, pausesArchiveCountQuery.data]);
 
   const hasActiveFilters = !!tagFilter || !!search.trim();
 
@@ -118,27 +145,6 @@ export default function Archive() {
       );
     }
   }, [mainSegment, pausesScope, setSearchParams]);
-
-  useEffect(() => {
-    if (!user?.id || mainSegment !== 'pauses') {
-      setPausesTabHasArchiveRows(mainSegment !== 'pauses' ? false : null);
-      return;
-    }
-    let cancelled = false;
-    void (async () => {
-      const { count, error } = await supabase
-        .from('v_pause_archive_pauses')
-        .select('*', { count: 'exact', head: true })
-        .eq('user_id', user.id);
-      if (!cancelled) {
-        if (!error) setPausesTabHasArchiveRows((count ?? 0) > 0);
-        else setPausesTabHasArchiveRows(null);
-      }
-    })();
-    return () => {
-      cancelled = true;
-    };
-  }, [user?.id, mainSegment, pausesArchiveCountNonce]);
 
   const handleRefresh = useCallback(async () => {
     if (mainSegment === 'pauses' || mainSegment === 'echoes') {
