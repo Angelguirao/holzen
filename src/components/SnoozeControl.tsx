@@ -1,6 +1,8 @@
 import { useState, useEffect, useCallback } from 'react';
+import { useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/use-auth';
+import { PROFILE_QUERY_KEY } from '@/hooks/use-profile';
 import { useTranslation } from 'react-i18next';
 import { motion } from 'framer-motion';
 import { Moon, Clock } from 'lucide-react';
@@ -23,7 +25,13 @@ const SNOOZE_OPTIONS = [
 
 export function useSnooze() {
   const { user } = useAuth();
+  const queryClient = useQueryClient();
   const [snoozedUntil, setSnoozedUntil] = useState<Date | null>(null);
+
+  const bumpProfileCache = useCallback(() => {
+    if (!user?.id) return;
+    void queryClient.invalidateQueries({ queryKey: PROFILE_QUERY_KEY(user.id) });
+  }, [queryClient, user?.id]);
 
   useEffect(() => {
     if (!user) return;
@@ -45,20 +53,22 @@ export function useSnooze() {
     if (!user) return;
     const until = new Date(Date.now() + hours * 60 * 60 * 1000);
     setSnoozedUntil(until);
-    await supabase
+    const { error } = await supabase
       .from('profiles')
       .update({ snoozed_until: until.toISOString() })
       .eq('user_id', user.id);
-  }, [user]);
+    if (!error) bumpProfileCache();
+  }, [user, bumpProfileCache]);
 
   const cancelSnooze = useCallback(async () => {
     if (!user) return;
     setSnoozedUntil(null);
-    await supabase
+    const { error } = await supabase
       .from('profiles')
       .update({ snoozed_until: null })
       .eq('user_id', user.id);
-  }, [user]);
+    if (!error) bumpProfileCache();
+  }, [user, bumpProfileCache]);
 
   const isActive = snoozedUntil ? snoozedUntil > new Date() : false;
 
