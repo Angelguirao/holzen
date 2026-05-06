@@ -1,5 +1,6 @@
 import { useTranslation } from 'react-i18next';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/use-auth';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -7,106 +8,99 @@ import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
 import { HistoryCalendar, type CalendarActivity } from '@/components/HistoryCalendar';
 
+const PRACTICE_LABELS: Record<string, string> = {
+  checkin: 'Emotional check-in',
+  journal: 'Guided journal',
+  bodyscan: 'Body scan',
+  replay: 'Pause replay',
+};
+
+function historyCalendarActivitiesQueryKey(userId: string) {
+  return ['history-calendar', 'activities', userId] as const;
+}
+
+async function fetchHistoryCalendarActivities(userId: string): Promise<CalendarActivity[]> {
+  const [rP, rL, rB, rPr] = await Promise.all([
+    supabase
+      .from('v_pause_full' as never)
+      .select('id, created_at, completed_at, engaged_at, initial_mood, shift_mood, outcome, state, has_breath_completed')
+      .eq('user_id', userId)
+      .eq('state', 'completed'),
+    supabase.from('future_letters').select('id, written_at, deliver_during').eq('user_id', userId),
+    supabase.from('user_badges').select('id, earned_at, badge_id').eq('user_id', userId),
+    supabase.from('practice_entries').select('id, created_at, type, mood, prompt').eq('user_id', userId),
+  ]);
+  if (rP.error || rL.error || rB.error || rPr.error) {
+    throw new Error(
+      rP.error?.message ?? rL.error?.message ?? rB.error?.message ?? rPr.error?.message ?? 'load failed',
+    );
+  }
+  const pauses = rP.data;
+  const lets = rL.data;
+  const bads = rB.data;
+  const pracs = rPr.data;
+
+  const items: CalendarActivity[] = [];
+  ((pauses ?? []) as Array<{
+    id: string;
+    created_at: string;
+    completed_at: string | null;
+    engaged_at: string | null;
+    initial_mood: string | null;
+  }>).forEach((p) => {
+    items.push({
+      date: p.completed_at ?? p.engaged_at ?? p.created_at,
+      type: 'pause',
+      mood: p.initial_mood ?? undefined,
+      id: p.id,
+    });
+  });
+  (lets ?? []).forEach((l: { id: string; written_at: string; deliver_during: string }) =>
+    items.push({
+      date: l.written_at,
+      type: 'letter',
+      id: l.id,
+      label: `Letter → ${l.deliver_during}`,
+    }),
+  );
+  (bads ?? []).forEach((b: { id: string; earned_at: string; badge_id: string }) =>
+    items.push({ date: b.earned_at, type: 'badge', id: b.id, label: b.badge_id }),
+  );
+  (pracs ?? []).forEach((p: { id: string; created_at: string; type: string; mood: string | null; prompt: string | null }) =>
+    items.push({
+      date: p.created_at,
+      type: 'practice',
+      id: p.id,
+      label: PRACTICE_LABELS[p.type] ?? p.type,
+      mood: p.mood,
+      practiceType: p.type,
+    }),
+  );
+  return items;
+}
+
 const HistoryContent = () => {
   const { t } = useTranslation();
   const { user } = useAuth();
-  const [loading, setLoading] = useState(true);
-  const [loadFailed, setLoadFailed] = useState(false);
-  const [reloadNonce, setReloadNonce] = useState(0);
-  const [activities, setActivities] = useState<CalendarActivity[]>([]);
+  const userId = user?.id;
+  const queryClient = useQueryClient();
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
 
-  useEffect(() => {
-    if (!user) {
-      setLoading(false);
-      setLoadFailed(false);
-      return;
-    }
-    let cancelled = false;
-    setLoading(true);
-    setLoadFailed(false);
-    const load = async () => {
-      try {
-        const [rP, rL, rB, rPr] = await Promise.all([
-          supabase
-            .from('v_pause_full' as never)
-            .select('id, created_at, completed_at, engaged_at, initial_mood, shift_mood, outcome, state, has_breath_completed')
-            .eq('user_id', user.id)
-            .eq('state', 'completed'),
-          supabase.from('future_letters').select('id, written_at, deliver_during').eq('user_id', user.id),
-          supabase.from('user_badges').select('id, earned_at, badge_id').eq('user_id', user.id),
-          supabase.from('practice_entries').select('id, created_at, type, mood, prompt').eq('user_id', user.id),
-        ]);
-        if (cancelled) return;
-        if (rP.error || rL.error || rB.error || rPr.error) {
-          if (!cancelled) setLoadFailed(true);
-          return;
-        }
-        const pauses = rP.data;
-        const lets = rL.data;
-        const bads = rB.data;
-        const pracs = rPr.data;
+  const {
+    data: activities = [],
+    isPending,
+    isError,
+  } = useQuery({
+    queryKey: userId ? historyCalendarActivitiesQueryKey(userId) : ['history-calendar', 'activities', 'none'],
+    queryFn: () => fetchHistoryCalendarActivities(userId!),
+    enabled: Boolean(userId),
+    staleTime: 60_000,
+    refetchOnWindowFocus: false,
+    retry: false,
+  });
 
-        const PRACTICE_LABELS: Record<string, string> = {
-          checkin: 'Emotional check-in',
-          journal: 'Guided journal',
-          bodyscan: 'Body scan',
-          replay: 'Pause replay',
-        };
-
-        const items: CalendarActivity[] = [];
-        // Completed pauses only; use completed_at (fall back to engaged_at /
-        // created_at) to bucket into the right local day.
-        ((pauses ?? []) as Array<{
-          id: string;
-          created_at: string;
-          completed_at: string | null;
-          engaged_at: string | null;
-          initial_mood: string | null;
-        }>).forEach((p) => {
-          items.push({
-            date: p.completed_at ?? p.engaged_at ?? p.created_at,
-            type: 'pause',
-            mood: p.initial_mood ?? undefined,
-            id: p.id,
-          });
-        });
-        (lets ?? []).forEach((l: { id: string; written_at: string; deliver_during: string }) =>
-          items.push({
-            date: l.written_at,
-            type: 'letter',
-            id: l.id,
-            label: `Letter → ${l.deliver_during}`,
-          }),
-        );
-        (bads ?? []).forEach((b: { id: string; earned_at: string; badge_id: string }) =>
-          items.push({ date: b.earned_at, type: 'badge', id: b.id, label: b.badge_id }),
-        );
-        (pracs ?? []).forEach((p: { id: string; created_at: string; type: string; mood: string | null; prompt: string | null }) =>
-          items.push({
-            date: p.created_at,
-            type: 'practice',
-            id: p.id,
-            label: PRACTICE_LABELS[p.type] ?? p.type,
-            mood: p.mood,
-            practiceType: p.type,
-          }),
-        );
-        if (!cancelled) {
-          setActivities(items);
-          setLoadFailed(false);
-        }
-      } catch {
-        if (!cancelled) setLoadFailed(true);
-      } finally {
-        if (!cancelled) setLoading(false);
-      }
-    };
-    void load();
-    return () => {
-      cancelled = true;
-    };
-  }, [user, reloadNonce]);
+  const loading = Boolean(userId) && isPending;
+  const loadFailed = Boolean(userId) && isError;
 
   if (loading) {
     return (
@@ -122,7 +116,15 @@ const HistoryContent = () => {
       <Alert variant="destructive">
         <AlertDescription className="flex flex-col gap-3 text-left">
           <p>{t('journey.activityLoadFailed')}</p>
-          <Button type="button" variant="outline" size="sm" className="self-start" onClick={() => setReloadNonce((n) => n + 1)}>
+          <Button
+            type="button"
+            variant="outline"
+            size="sm"
+            className="self-start"
+            onClick={() => {
+              if (userId) void queryClient.invalidateQueries({ queryKey: historyCalendarActivitiesQueryKey(userId) });
+            }}
+          >
             {t('common.tryAgain')}
           </Button>
         </AlertDescription>
