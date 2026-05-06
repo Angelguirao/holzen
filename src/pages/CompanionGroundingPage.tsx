@@ -1,10 +1,10 @@
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo } from 'react';
 import { useNavigate, useParams, useLocation, Navigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useHolzen } from '@/hooks/use-holzen';
 import { useCompanionData } from '@/hooks/use-companion-data';
 import { DEFAULT_COMPANIONS, DEFAULT_PREFS } from '@/lib/pause-session-storage';
-import { loadPauseSessionSnapshot, type PauseSessionSnapshot } from '@/lib/pause-page-loader';
+import { usePauseSessionCompanionSnapshot } from '@/hooks/use-pause-session-companion-snapshot';
 import { CompanionFeedback } from '@/components/CompanionFeedback';
 import { CompanionFocusLayout } from '@/components/companion/CompanionFocusLayout';
 import { GroundingFullView } from '@/components/companion/GroundingFullView';
@@ -33,27 +33,7 @@ export default function CompanionGroundingPage() {
   const { t } = useTranslation();
   const { companionPrefs, severity } = useHolzen();
 
-  const [snapshot, setSnapshot] = useState<PauseSessionSnapshot | null>(null);
-  const [loadError, setLoadError] = useState(false);
-
-  useEffect(() => {
-    if (!rid) return;
-    let cancelled = false;
-    setSnapshot(null);
-    setLoadError(false);
-    void (async () => {
-      const s = await loadPauseSessionSnapshot(rid);
-      if (cancelled) return;
-      if (!s) {
-        setLoadError(true);
-        return;
-      }
-      setSnapshot(s);
-    })();
-    return () => {
-      cancelled = true;
-    };
-  }, [rid]);
+  const { snapshot, isPending: snapshotPending, loadError } = usePauseSessionCompanionSnapshot(rid);
 
   const pauseInstanceId = snapshot?.id ?? null;
   const reflectionMessage = snapshot?.reflectionMessage ?? '';
@@ -128,7 +108,7 @@ export default function CompanionGroundingPage() {
     );
   }
 
-  if (!snapshot) {
+  if (!loadError && (snapshotPending || !snapshot)) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-background" role="status" aria-busy="true">
         <div className="h-8 w-8 animate-spin rounded-full border-2 border-border/50 border-t-nox-text-link/70" />
