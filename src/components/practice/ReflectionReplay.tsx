@@ -10,6 +10,7 @@ import { useTranslation } from 'react-i18next';
 import { format } from 'date-fns';
 import { Loader2 } from 'lucide-react';
 import { practiceEntriesWeeklyCountQueryKey } from '@/components/PracticeWidget';
+import { practicePrimarySuggestionQueryKey } from '@/hooks/use-practice-suggestion';
 import { useAuth } from '@/hooks/use-auth';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
@@ -115,6 +116,7 @@ export function ReflectionReplay({ onComplete, initialPauseInstanceId }: Props) 
       });
       if (error) throw error;
       void queryClient.invalidateQueries({ queryKey: practiceEntriesWeeklyCountQueryKey(user.id) });
+      void queryClient.invalidateQueries({ queryKey: practicePrimarySuggestionQueryKey(user.id) });
       void queryClient.invalidateQueries({ queryKey: replayRecentPausesQueryKey(user.id) });
       toast.success(t('practice.replaySaved', { defaultValue: 'Replay saved' }));
       await loadThread(selectedId);
