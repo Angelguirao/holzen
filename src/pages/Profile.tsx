@@ -2,8 +2,8 @@ import { useTranslation } from 'react-i18next';
 import { useEffect } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { useNavigate, useParams } from 'react-router-dom';
-import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/use-auth';
+import { getCompletedPauseCountQueryOptions } from '@/hooks/use-completed-pause-count';
 import { useSubscription } from '@/hooks/use-subscription';
 import { useHoldGoalProfile } from '@/hooks/use-hold-goal';
 import { type ProfileTab } from '@/lib/router-location-state';
@@ -15,20 +15,6 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { AIInsightsPanel } from '@/components/AIInsightsPanel';
 import { ProLock } from '@/components/ProLock';
 import { BadgesPanelV2 } from '@/components/BadgesPanelV2';
-
-function profileCompletedPauseCountQueryKey(userId: string) {
-  return ['profile', 'completed-pause-count', userId] as const;
-}
-
-async function fetchCompletedPauseCount(userId: string): Promise<number> {
-  const { count, error } = await supabase
-    .from('pause_instances' as never)
-    .select('id', { count: 'exact', head: true })
-    .eq('user_id', userId)
-    .eq('state', 'completed');
-  if (error) throw error;
-  return count ?? 0;
-}
 
 const Profile = () => {
   const { user } = useAuth();
@@ -43,11 +29,7 @@ const Profile = () => {
     data: completedPauseCount = 0,
     isPending: completedPauseCountPending,
   } = useQuery({
-    queryKey: userId ? profileCompletedPauseCountQueryKey(userId) : ['profile', 'completed-pause-count', 'none'],
-    queryFn: () => fetchCompletedPauseCount(userId!),
-    enabled: Boolean(userId),
-    staleTime: 60_000,
-    refetchOnWindowFocus: false,
+    ...getCompletedPauseCountQueryOptions(userId),
     retry: false,
   });
 
