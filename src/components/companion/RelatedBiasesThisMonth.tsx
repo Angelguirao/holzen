@@ -1,4 +1,5 @@
-import { useEffect, useState } from 'react';
+import { useMemo } from 'react';
+import { useQuery } from '@tanstack/react-query';
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { supabase } from '@/integrations/supabase/client';
@@ -8,6 +9,24 @@ import {
   type RelatedBias,
   type RelatedBiasesRow,
 } from './related-biases-util';
+
+function relatedBiasesGroundNudgeQueryKey(userId: string) {
+  return ['related-biases-ground-nudge', userId] as const;
+}
+
+async function fetchGroundNudgeArtifactsLast30d(userId: string): Promise<RelatedBiasesRow[]> {
+  const thirtyDaysAgo = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString();
+  const { data, error } = await supabase
+    .from('pause_ai_artifacts' as never)
+    .select('pause_instance_id, created_at, content')
+    .eq('user_id', userId)
+    .eq('kind', 'ground_nudge')
+    .gte('created_at', thirtyDaysAgo)
+    .order('created_at', { ascending: false })
+    .limit(40);
+  if (error || !data) return [];
+  return data as unknown as RelatedBiasesRow[];
+}
 
 interface Props {
   /** Pause instance currently viewed — excluded from the list. */
@@ -31,43 +50,26 @@ export function RelatedBiasesThisMonth({
 }: Props) {
   const { t } = useTranslation();
   const { user } = useAuth();
-  const [biases, setBiases] = useState<RelatedBias[] | null>(null);
+  const userId = user?.id;
 
-  useEffect(() => {
-    if (!user) {
-      setBiases([]);
-      return;
-    }
-    let cancelled = false;
-    const thirtyDaysAgo = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString();
-    void (async () => {
-      const { data, error } = await supabase
-        .from('pause_ai_artifacts' as never)
-        .select('pause_instance_id, created_at, content')
-        .eq('user_id', user.id)
-        .eq('kind', 'ground_nudge')
-        .gte('created_at', thirtyDaysAgo)
-        .order('created_at', { ascending: false })
-        .limit(40);
+  const { data: rawRows } = useQuery({
+    queryKey: userId ? relatedBiasesGroundNudgeQueryKey(userId) : ['related-biases-ground-nudge', 'none'],
+    queryFn: () => fetchGroundNudgeArtifactsLast30d(userId!),
+    enabled: Boolean(userId),
+    staleTime: 60_000,
+    refetchOnWindowFocus: false,
+    retry: false,
+  });
 
-      if (cancelled) return;
-      if (error || !data) {
-        setBiases([]);
-        return;
-      }
-
-      setBiases(
-        dedupeBiases(data as unknown as RelatedBiasesRow[], {
-          currentPauseInstanceId: currentPauseInstanceId ?? null,
-          currentTitle: currentTitle ?? null,
-          limit: 8,
-        }),
-      );
-    })();
-    return () => {
-      cancelled = true;
-    };
-  }, [user, currentPauseInstanceId, currentTitle]);
+  const biases = useMemo((): RelatedBias[] | null => {
+    if (!userId) return null;
+    if (rawRows === undefined) return null;
+    return dedupeBiases(rawRows, {
+      currentPauseInstanceId: currentPauseInstanceId ?? null,
+      currentTitle: currentTitle ?? null,
+      limit: 8,
+    });
+  }, [userId, rawRows, currentPauseInstanceId, currentTitle]);
 
   if (!biases || biases.length === 0) return null;
 
