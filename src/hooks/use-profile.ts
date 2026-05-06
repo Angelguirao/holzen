@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import { toast } from 'sonner';
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/use-auth';
 import { holzenLog } from '@/lib/holzen-console';
@@ -68,7 +68,13 @@ export interface ProfileLoadReflectionData {
 export function useProfile() {
   const { user } = useAuth();
   const { t } = useTranslation();
+  const queryClient = useQueryClient();
   const userId = user?.id;
+
+  const invalidateProfileQuery = useCallback(() => {
+    if (!userId) return;
+    void queryClient.invalidateQueries({ queryKey: PROFILE_QUERY_KEY(userId) });
+  }, [queryClient, userId]);
 
   const {
     data: profileRow,
@@ -189,29 +195,32 @@ export function useProfile() {
   const setThreshold = useCallback(async (val: number) => {
     setThresholdState(val);
     if (!user) return;
-    await supabase
+    const { error } = await supabase
       .from('profiles')
       .update({ threshold: val })
       .eq('user_id', user.id);
-  }, [user]);
+    if (!error) invalidateProfileQuery();
+  }, [user, invalidateProfileQuery]);
 
   const setThresholdDown = useCallback(async (val: number) => {
     setThresholdDownState(val);
     if (!user) return;
-    await supabase
+    const { error } = await supabase
       .from('profiles')
       .update({ threshold_down: val })
       .eq('user_id', user.id);
-  }, [user]);
+    if (!error) invalidateProfileQuery();
+  }, [user, invalidateProfileQuery]);
 
   const setCumulativeThreshold = useCallback(async (val: number) => {
     setCumulativeThresholdState(val);
     if (!user) return;
-    await supabase
+    const { error } = await supabase
       .from('profiles')
       .update({ cumulative_threshold: val })
       .eq('user_id', user.id);
-  }, [user]);
+    if (!error) invalidateProfileQuery();
+  }, [user, invalidateProfileQuery]);
 
   const useStreakFreeze = useCallback(async () => {
     if (!user) return;
@@ -224,58 +233,64 @@ export function useProfile() {
     if (recent.length >= 1) return;
     const updated = [...streakFreezeDates, today];
     setStreakFreezeDatesState(updated);
-    await supabase
+    const { error } = await supabase
       .from('profiles')
       .update({ streak_freeze_dates: updated })
       .eq('user_id', user.id);
-  }, [user, streakFreezeDates]);
+    if (!error) invalidateProfileQuery();
+  }, [user, streakFreezeDates, invalidateProfileQuery]);
 
   const setEmailNotifications = useCallback(async (val: boolean) => {
     setEmailNotificationsState(val);
     if (!user) return;
-    await supabase
+    const { error } = await supabase
       .from('profiles')
       .update({ email_notifications: val })
       .eq('user_id', user.id);
-  }, [user]);
+    if (!error) invalidateProfileQuery();
+  }, [user, invalidateProfileQuery]);
 
   const setReflectionTone = useCallback(async (val: string) => {
     setReflectionToneState(val);
     if (!user) return;
-    await supabase
+    const { error } = await supabase
       .from('profiles')
       .update({ reflection_tone: val })
       .eq('user_id', user.id);
-  }, [user]);
+    if (!error) invalidateProfileQuery();
+  }, [user, invalidateProfileQuery]);
 
   const setSilentMode = useCallback(async (val: boolean) => {
     setSilentModeState(val);
     if (!user) return;
-    await supabase
+    const { error } = await supabase
       .from('profiles')
       .update({ silent_mode: val })
       .eq('user_id', user.id);
-  }, [user]);
+    if (!error) invalidateProfileQuery();
+  }, [user, invalidateProfileQuery]);
 
   const setDigestFrequency = useCallback(async (val: string) => {
     setDigestFrequencyState(val);
     if (!user) return;
-    await supabase
+    const { error } = await supabase
       .from('profiles')
       .update({ digest_frequency: val })
       .eq('user_id', user.id);
-  }, [user]);
+    if (!error) invalidateProfileQuery();
+  }, [user, invalidateProfileQuery]);
 
   const setCompanionPref = useCallback(async (key: keyof CompanionPrefs, val: boolean) => {
     setCompanionPrefsState((prev) => ({ ...prev, [key]: val }));
     if (!user) return;
     const snakeKey = key === 'zoomOut' ? 'zoom_out' : key;
     const dbKey = `companion_${snakeKey}` as string;
-    await supabase
+    const { error } = await supabase
       .from('profiles')
       .update({ [dbKey]: val } as ProfileUpdate)
       .eq('user_id', user.id);
-  }, [user]);
+    if (!error) invalidateProfileQuery();
+  }, [user, invalidateProfileQuery]);
 
   const completeOnboarding = useCallback(async (
     result: {
@@ -300,7 +315,7 @@ export function useProfile() {
 
     if (!user) return;
 
-    await supabase
+    const { error } = await supabase
       .from('profiles')
       .update({
         has_onboarded: true,
@@ -311,7 +326,8 @@ export function useProfile() {
         grounding_activities: result.groundingActivities.length > 0 ? result.groundingActivities : [],
       })
       .eq('user_id', user.id);
-  }, [user]);
+    if (!error) invalidateProfileQuery();
+  }, [user, invalidateProfileQuery]);
 
   const isInCooldown = useCallback(async () => {
     if (!user) return true;
@@ -338,11 +354,12 @@ export function useProfile() {
   const setCooldownHours = useCallback(async (val: number) => {
     setCooldownHoursState(val);
     if (!user) return;
-    await supabase
+    const { error } = await supabase
       .from('profiles')
       .update({ cooldown_hours: val })
       .eq('user_id', user.id);
-  }, [user]);
+    if (!error) invalidateProfileQuery();
+  }, [user, invalidateProfileQuery]);
 
   return {
     threshold,
@@ -367,13 +384,15 @@ export function useProfile() {
     setCustomPrompt: async (val: string | null) => {
       setCustomPromptState(val);
       if (!user) return;
-      await supabase.from('profiles').update({ custom_prompt: val }).eq('user_id', user.id);
+      const { error } = await supabase.from('profiles').update({ custom_prompt: val }).eq('user_id', user.id);
+      if (!error) invalidateProfileQuery();
     },
     reflectionStyle,
     setReflectionStyle: async (val: string) => {
       setReflectionStyleState(val);
       if (!user) return;
-      await supabase.from('profiles').update({ reflection_style: val }).eq('user_id', user.id);
+      const { error } = await supabase.from('profiles').update({ reflection_style: val }).eq('user_id', user.id);
+      if (!error) invalidateProfileQuery();
     },
     quietHoursStart,
     quietHoursEnd,
@@ -381,62 +400,75 @@ export function useProfile() {
       setQuietHoursStartState(start);
       setQuietHoursEndState(end);
       if (!user) return;
-      await supabase.from('profiles').update({ quiet_hours_start: start, quiet_hours_end: end }).eq('user_id', user.id);
+      const { error } = await supabase
+        .from('profiles')
+        .update({ quiet_hours_start: start, quiet_hours_end: end })
+        .eq('user_id', user.id);
+      if (!error) invalidateProfileQuery();
     },
     nightReflectionHour,
     setNightReflectionHour: async (val: number | null) => {
       setNightReflectionHourState(val);
       if (!user) return;
-      await supabase.from('profiles').update({ night_reflection_hour: val }).eq('user_id', user.id);
+      const { error } = await supabase.from('profiles').update({ night_reflection_hour: val }).eq('user_id', user.id);
+      if (!error) invalidateProfileQuery();
     },
     firstName,
     setFirstName: async (val: string | null) => {
       setFirstNameState(val);
       if (!user) return;
-      await supabase.from('profiles').update({ first_name: val }).eq('user_id', user.id);
+      const { error } = await supabase.from('profiles').update({ first_name: val }).eq('user_id', user.id);
+      if (!error) invalidateProfileQuery();
     },
     aiInsightsEnabled,
     setAiInsightsEnabled: async (val: boolean) => {
       setAiInsightsEnabledState(val);
       if (!user) return;
-      await supabase.from('profiles').update({ ai_insights_enabled: val }).eq('user_id', user.id);
+      const { error } = await supabase.from('profiles').update({ ai_insights_enabled: val }).eq('user_id', user.id);
+      if (!error) invalidateProfileQuery();
     },
     notifyBadges,
     setNotifyBadges: async (val: boolean) => {
       setNotifyBadgesState(val);
       if (!user) return;
-      await supabase.from('profiles').update({ notify_badges: val }).eq('user_id', user.id);
+      const { error } = await supabase.from('profiles').update({ notify_badges: val }).eq('user_id', user.id);
+      if (!error) invalidateProfileQuery();
     },
     motivations,
     setMotivations: async (val: string[]) => {
       setMotivationsState(val);
       if (!user) return;
-      await supabase.from('profiles').update({ motivations: val }).eq('user_id', user.id);
+      const { error } = await supabase.from('profiles').update({ motivations: val }).eq('user_id', user.id);
+      if (!error) invalidateProfileQuery();
     },
     groundingActivities,
     setGroundingActivities: async (val: string[]) => {
       setGroundingActivitiesState(val);
       if (!user) return;
-      await supabase.from('profiles').update({ grounding_activities: val }).eq('user_id', user.id);
+      const { error } = await supabase.from('profiles').update({ grounding_activities: val }).eq('user_id', user.id);
+      if (!error) invalidateProfileQuery();
     },
     mantra,
     setMantra: async (val: string | null) => {
       setMantraState(val);
       if (!user) return;
-      await supabase.from('profiles').update({ mantra: val }).eq('user_id', user.id);
+      const { error } = await supabase.from('profiles').update({ mantra: val }).eq('user_id', user.id);
+      if (!error) invalidateProfileQuery();
     },
     currency,
     setCurrency: async (val: string) => {
       setCurrencyState(val);
       if (!user) return;
-      await supabase.from('profiles').update({ hold_goal_currency: val }).eq('user_id', user.id);
+      const { error } = await supabase.from('profiles').update({ hold_goal_currency: val }).eq('user_id', user.id);
+      if (!error) invalidateProfileQuery();
     },
     trackedAssetId,
     setTrackedAssetId: async (val: string) => {
       const next = normalizeTrackedAssetId(val);
       setTrackedAssetIdState(next);
       if (!user) return;
-      await supabase.from('profiles').update({ tracked_asset_id: next }).eq('user_id', user.id);
+      const { error } = await supabase.from('profiles').update({ tracked_asset_id: next }).eq('user_id', user.id);
+      if (!error) invalidateProfileQuery();
     },
     language,
     setLanguage: async (val: string) => {
@@ -451,6 +483,8 @@ export function useProfile() {
         holzenLog.profile('language update failed', { error: error.message });
         setLanguageState(prev);
         toast.error(t('common.profileWriteFailed'));
+      } else {
+        invalidateProfileQuery();
       }
     },
     companionPrefs,
