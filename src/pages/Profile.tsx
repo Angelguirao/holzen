@@ -1,5 +1,6 @@
 import { useTranslation } from 'react-i18next';
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
+import { useQuery } from '@tanstack/react-query';
 import { useNavigate, useParams } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/use-auth';
@@ -15,15 +16,42 @@ import { AIInsightsPanel } from '@/components/AIInsightsPanel';
 import { ProLock } from '@/components/ProLock';
 import { BadgesPanelV2 } from '@/components/BadgesPanelV2';
 
+function profileCompletedPauseCountQueryKey(userId: string) {
+  return ['profile', 'completed-pause-count', userId] as const;
+}
+
+async function fetchCompletedPauseCount(userId: string): Promise<number> {
+  const { count, error } = await supabase
+    .from('pause_instances' as never)
+    .select('id', { count: 'exact', head: true })
+    .eq('user_id', userId)
+    .eq('state', 'completed');
+  if (error) throw error;
+  return count ?? 0;
+}
+
 const Profile = () => {
   const { user } = useAuth();
   const { t } = useTranslation();
   const { subscribed } = useSubscription();
   const navigate = useNavigate();
   const { tab: urlTab } = useParams<{ tab: string }>();
-  const [completedPauseCount, setCompletedPauseCount] = useState(0);
+  const userId = user?.id;
   const { data: holdGoal } = useHoldGoalProfile();
-  const [loading, setLoading] = useState(true);
+
+  const {
+    data: completedPauseCount = 0,
+    isPending: completedPauseCountPending,
+  } = useQuery({
+    queryKey: userId ? profileCompletedPauseCountQueryKey(userId) : ['profile', 'completed-pause-count', 'none'],
+    queryFn: () => fetchCompletedPauseCount(userId!),
+    enabled: Boolean(userId),
+    staleTime: 60_000,
+    refetchOnWindowFocus: false,
+    retry: false,
+  });
+
+  const loading = Boolean(userId) && completedPauseCountPending;
 
   const tab: ProfileTab = urlTab && isProfileTab(urlTab) ? urlTab : 'stats';
 
@@ -40,20 +68,6 @@ const Profile = () => {
       document.title = 'Holzen — Pause before you act';
     };
   }, [t]);
-
-  useEffect(() => {
-    if (!user) return;
-    const loadCompletedPauseCount = async () => {
-      const { count } = await supabase
-        .from('pause_instances' as never)
-        .select('id', { count: 'exact', head: true })
-        .eq('user_id', user.id)
-        .eq('state', 'completed');
-      setCompletedPauseCount(count ?? 0);
-      setLoading(false);
-    };
-    loadCompletedPauseCount();
-  }, [user]);
 
   const tabs = [
     { id: 'stats' as const, label: t('profile.stats'), icon: BarChart3 },
