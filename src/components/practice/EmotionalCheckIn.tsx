@@ -3,6 +3,7 @@ import { useQueryClient } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
 import { motion, AnimatePresence } from 'framer-motion';
 import { practiceEntriesWeeklyCountQueryKey } from '@/components/PracticeWidget';
+import { toolsHubDataQueryKey } from '@/hooks/use-tools-hub-data';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/use-auth';
 import { hapticFeedback } from '@/lib/haptics';
@@ -46,6 +47,7 @@ export function EmotionalCheckIn({ onComplete, textColor, ringColor }: Props) {
       });
       if (error) throw error;
       void queryClient.invalidateQueries({ queryKey: practiceEntriesWeeklyCountQueryKey(user.id) });
+      void queryClient.invalidateQueries({ queryKey: toolsHubDataQueryKey(user.id) });
       hapticFeedback('success');
       setStep('done');
       setTimeout(onComplete, 1500);

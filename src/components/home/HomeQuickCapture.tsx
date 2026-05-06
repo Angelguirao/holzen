@@ -6,6 +6,7 @@ import { BookOpen } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/use-auth';
 import { practiceEntriesWeeklyCountQueryKey } from '@/components/PracticeWidget';
+import { toolsHubDataQueryKey } from '@/hooks/use-tools-hub-data';
 import { TOOLS } from '@/lib/app-routes';
 import { MoodIcon } from '@/components/icons/MoodIcon';
 import { Textarea } from '@/components/ui/textarea';
@@ -92,6 +93,7 @@ export function HomeQuickCapture() {
         return;
       }
       void queryClient.invalidateQueries({ queryKey: practiceEntriesWeeklyCountQueryKey(user.id) });
+      void queryClient.invalidateQueries({ queryKey: toolsHubDataQueryKey(user.id) });
       hapticFeedback('success');
       setMood(null);
       setNote('');
