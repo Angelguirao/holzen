@@ -1,8 +1,11 @@
-import { useState, useEffect, useCallback } from 'react';
-import { useQueryClient } from '@tanstack/react-query';
+import { useState, useCallback, useMemo } from 'react';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/use-auth';
-import { PROFILE_QUERY_KEY } from '@/hooks/use-profile';
+import { getProfileRowQueryOptions, PROFILE_QUERY_KEY } from '@/hooks/use-profile';
+import type { Database } from '@/integrations/supabase/types';
+
+type ProfileRow = Database['public']['Tables']['profiles']['Row'];
 import { useTranslation } from 'react-i18next';
 import { motion } from 'framer-motion';
 import { Moon, Clock } from 'lucide-react';
@@ -25,50 +28,49 @@ const SNOOZE_OPTIONS = [
 
 export function useSnooze() {
   const { user } = useAuth();
+  const userId = user?.id;
   const queryClient = useQueryClient();
-  const [snoozedUntil, setSnoozedUntil] = useState<Date | null>(null);
+  const { data: profileRow } = useQuery(getProfileRowQueryOptions(userId));
+
+  const snoozedUntil = useMemo(() => {
+    const val = profileRow?.snoozed_until;
+    if (!val) return null;
+    const d = new Date(val);
+    return d > new Date() ? d : null;
+  }, [profileRow?.snoozed_until]);
 
   const bumpProfileCache = useCallback(() => {
-    if (!user?.id) return;
-    void queryClient.invalidateQueries({ queryKey: PROFILE_QUERY_KEY(user.id) });
-  }, [queryClient, user?.id]);
+    if (!userId) return;
+    void queryClient.invalidateQueries({ queryKey: PROFILE_QUERY_KEY(userId) });
+  }, [queryClient, userId]);
 
-  useEffect(() => {
-    if (!user) return;
-    supabase
-      .from('profiles')
-      .select('snoozed_until')
-      .eq('user_id', user.id)
-      .single()
-      .then(({ data }) => {
-        const val = data?.snoozed_until;
-        if (val) {
-          const d = new Date(val);
-          setSnoozedUntil(d > new Date() ? d : null);
-        }
-      });
-  }, [user]);
-
-  const snooze = useCallback(async (hours: number) => {
-    if (!user) return;
-    const until = new Date(Date.now() + hours * 60 * 60 * 1000);
-    setSnoozedUntil(until);
-    const { error } = await supabase
-      .from('profiles')
-      .update({ snoozed_until: until.toISOString() })
-      .eq('user_id', user.id);
-    if (!error) bumpProfileCache();
-  }, [user, bumpProfileCache]);
+  const snooze = useCallback(
+    async (hours: number) => {
+      if (!user || !userId) return;
+      const until = new Date(Date.now() + hours * 60 * 60 * 1000);
+      const iso = until.toISOString();
+      queryClient.setQueryData<ProfileRow | null>(PROFILE_QUERY_KEY(userId), (prev) =>
+        prev ? { ...prev, snoozed_until: iso } : prev,
+      );
+      const { error } = await supabase
+        .from('profiles')
+        .update({ snoozed_until: iso })
+        .eq('user_id', user.id);
+      if (!error) bumpProfileCache();
+      else void queryClient.invalidateQueries({ queryKey: PROFILE_QUERY_KEY(userId) });
+    },
+    [user, userId, queryClient, bumpProfileCache],
+  );
 
   const cancelSnooze = useCallback(async () => {
-    if (!user) return;
-    setSnoozedUntil(null);
-    const { error } = await supabase
-      .from('profiles')
-      .update({ snoozed_until: null })
-      .eq('user_id', user.id);
+    if (!user || !userId) return;
+    queryClient.setQueryData<ProfileRow | null>(PROFILE_QUERY_KEY(userId), (prev) =>
+      prev ? { ...prev, snoozed_until: null } : prev,
+    );
+    const { error } = await supabase.from('profiles').update({ snoozed_until: null }).eq('user_id', user.id);
     if (!error) bumpProfileCache();
-  }, [user, bumpProfileCache]);
+    else void queryClient.invalidateQueries({ queryKey: PROFILE_QUERY_KEY(userId) });
+  }, [user, userId, queryClient, bumpProfileCache]);
 
   const isActive = snoozedUntil ? snoozedUntil > new Date() : false;
 
