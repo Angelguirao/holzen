@@ -1,4 +1,5 @@
-import { useEffect, useState } from 'react';
+import { useMemo } from 'react';
+import { useQuery } from '@tanstack/react-query';
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { supabase } from '@/integrations/supabase/client';
@@ -33,6 +34,26 @@ interface ThreadRow {
   content: { title?: string; body?: string; btcInsight?: string } | null;
 }
 
+function historyThreadQueryKey(userId: string, companion: RegenerateCompanionSlot, limit: number) {
+  return ['history-thread', userId, companion, limit] as const;
+}
+
+async function fetchHistoryThreadRows(
+  userId: string,
+  companion: RegenerateCompanionSlot,
+  limit: number,
+): Promise<ThreadRow[]> {
+  const { data, error } = await supabase
+    .from('pause_ai_artifacts' as never)
+    .select('id, pause_instance_id, created_at, content')
+    .eq('user_id', userId)
+    .eq('kind', DB_TYPE[companion])
+    .order('created_at', { ascending: false })
+    .limit(limit + 1);
+  if (error || !data) return [];
+  return data as unknown as ThreadRow[];
+}
+
 interface Props {
   companion: RegenerateCompanionSlot;
   /** Pause instance currently viewed — excluded from the list. */
@@ -54,37 +75,24 @@ export function HistoryThread({
 }: Props) {
   const { t } = useTranslation();
   const { user } = useAuth();
-  const [rows, setRows] = useState<ThreadRow[] | null>(null);
+  const userId = user?.id;
 
-  useEffect(() => {
-    if (!user) {
-      setRows([]);
-      return;
-    }
-    let cancelled = false;
-    void (async () => {
-      const { data, error } = await supabase
-        .from('pause_ai_artifacts' as never)
-        .select('id, pause_instance_id, created_at, content')
-        .eq('user_id', user.id)
-        .eq('kind', DB_TYPE[companion])
-        .order('created_at', { ascending: false })
-        .limit(limit + 1);
+  const { data: rawRows } = useQuery({
+    queryKey: userId ? historyThreadQueryKey(userId, companion, limit) : ['history-thread', 'none'],
+    queryFn: () => fetchHistoryThreadRows(userId!, companion, limit),
+    enabled: Boolean(userId),
+    staleTime: 60_000,
+    refetchOnWindowFocus: false,
+    retry: false,
+  });
 
-      if (cancelled) return;
-      if (error || !data) {
-        setRows([]);
-        return;
-      }
-      const filtered = (data as unknown as ThreadRow[])
-        .filter((r) => r.pause_instance_id !== currentPauseInstanceId)
-        .slice(0, limit);
-      setRows(filtered);
-    })();
-    return () => {
-      cancelled = true;
-    };
-  }, [user, companion, currentPauseInstanceId, limit]);
+  const rows = useMemo((): ThreadRow[] | null => {
+    if (!userId) return null;
+    if (rawRows === undefined) return null;
+    return rawRows
+      .filter((r) => r.pause_instance_id !== currentPauseInstanceId)
+      .slice(0, limit);
+  }, [userId, rawRows, currentPauseInstanceId, limit]);
 
   if (!rows || rows.length === 0) return null;
 
