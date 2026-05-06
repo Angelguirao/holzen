@@ -115,6 +115,7 @@ export function ReflectionReplay({ onComplete, initialPauseInstanceId }: Props) 
       });
       if (error) throw error;
       void queryClient.invalidateQueries({ queryKey: practiceEntriesWeeklyCountQueryKey(user.id) });
+      void queryClient.invalidateQueries({ queryKey: replayRecentPausesQueryKey(user.id) });
       toast.success(t('practice.replaySaved', { defaultValue: 'Replay saved' }));
       await loadThread(selectedId);
     } catch {
