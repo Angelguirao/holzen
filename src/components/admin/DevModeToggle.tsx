@@ -1,58 +1,95 @@
 import { useState, useEffect } from 'react';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { Zap } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
+import { useAuth } from '@/hooks/use-auth';
+
+function readLocalDevMode(): boolean {
+  try {
+    return localStorage.getItem('holzen_dev_mode') === 'true';
+  } catch {
+    return false;
+  }
+}
+
+export function adminDevModeSettingQueryKey(userId: string) {
+  return ['admin', 'dev-mode-setting', userId] as const;
+}
+
+async function fetchDevModeFromAnalytics(userId: string): Promise<boolean> {
+  const { data, error } = await supabase
+    .from('analytics_events')
+    .select('metadata')
+    .eq('user_id', userId)
+    .eq('event', 'dev_mode_setting')
+    .order('created_at', { ascending: false })
+    .limit(1);
+  if (error || !data?.length) {
+    return readLocalDevMode();
+  }
+  const metadata = data[0].metadata as { enabled?: boolean } | null;
+  const dbValue = metadata?.enabled === true;
+  try {
+    if (dbValue) localStorage.setItem('holzen_dev_mode', 'true');
+    else localStorage.removeItem('holzen_dev_mode');
+  } catch {
+    /* ignore */
+  }
+  return dbValue;
+}
 
 export function DevModeToggle() {
-  const [devMode, setDevMode] = useState(false);
+  const { user } = useAuth();
+  const userId = user?.id;
+  const queryClient = useQueryClient();
   const [syncing, setSyncing] = useState(false);
+  const [localOnlyMode, setLocalOnlyMode] = useState(() => readLocalDevMode());
 
   useEffect(() => {
-    try {
-      setDevMode(localStorage.getItem('holzen_dev_mode') === 'true');
-    } catch { /* ignore */ }
+    if (!userId) {
+      setLocalOnlyMode(readLocalDevMode());
+    }
+  }, [userId]);
 
-    (async () => {
-      try {
-        const { data: { user } } = await supabase.auth.getUser();
-        if (!user) return;
-        const { data } = await supabase
-          .from('analytics_events')
-          .select('metadata')
-          .eq('user_id', user.id)
-          .eq('event', 'dev_mode_setting')
-          .order('created_at', { ascending: false })
-          .limit(1);
-        if (data && data.length > 0) {
-          const metadata = data[0].metadata as { enabled?: boolean } | null;
-          const dbValue = metadata?.enabled === true;
-          setDevMode(dbValue);
-          try {
-            if (dbValue) localStorage.setItem('holzen_dev_mode', 'true');
-            else localStorage.removeItem('holzen_dev_mode');
-          } catch { /* ignore */ }
-        }
-      } catch { /* non-critical */ }
-    })();
-  }, []);
+  const { data: queryDevMode } = useQuery({
+    queryKey: userId ? adminDevModeSettingQueryKey(userId) : ['admin', 'dev-mode-setting', 'none'],
+    queryFn: () => fetchDevModeFromAnalytics(userId!),
+    enabled: Boolean(userId),
+    staleTime: 60_000,
+    refetchOnWindowFocus: false,
+    retry: false,
+  });
+
+  const devMode = userId ? (queryDevMode ?? readLocalDevMode()) : localOnlyMode;
 
   const toggle = async () => {
     const next = !devMode;
-    setDevMode(next);
+    if (userId) {
+      queryClient.setQueryData(adminDevModeSettingQueryKey(userId), next);
+    } else {
+      setLocalOnlyMode(next);
+    }
     setSyncing(true);
     try {
       if (next) localStorage.setItem('holzen_dev_mode', 'true');
       else localStorage.removeItem('holzen_dev_mode');
-    } catch { /* ignore */ }
+    } catch {
+      /* ignore */
+    }
     try {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (user) {
+      const {
+        data: { user: u },
+      } = await supabase.auth.getUser();
+      if (u) {
         await supabase.from('analytics_events').insert({
-          user_id: user.id,
+          user_id: u.id,
           event: 'dev_mode_setting',
           metadata: { enabled: next },
         });
       }
-    } catch { /* non-critical */ }
+    } catch {
+      /* non-critical */
+    }
     setSyncing(false);
   };
 
