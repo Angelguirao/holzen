@@ -1,12 +1,11 @@
-import { useState, useEffect, useCallback } from 'react';
-import { useQuery } from '@tanstack/react-query';
+import { useMemo, useCallback } from 'react';
+import { useInfiniteQuery, useQuery } from '@tanstack/react-query';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Anchor, Clock, Calendar } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/use-auth';
-import { toast } from 'sonner';
 import { MoodIcon } from '@/components/icons/MoodIcon';
 import { Button } from '@/components/ui/button';
 import { TOOLS } from '@/lib/app-routes';
@@ -28,6 +27,10 @@ export function groundHistoryStatsQueryKey(userId: string) {
   return ['tools', 'ground-history', 'stats', userId] as const;
 }
 
+export function groundHistoryEntriesQueryKey(userId: string) {
+  return ['tools', 'ground-history', 'entries', userId] as const;
+}
+
 async function fetchGroundingHistoryStats(userId: string): Promise<{ totalSessions: number; totalMinutes: number }> {
   const { data, count, error } = await supabase
     .from('practice_entries')
@@ -41,6 +44,18 @@ async function fetchGroundingHistoryStats(userId: string): Promise<{ totalSessio
   const totalSessions = count ?? data.length;
   const mins = data.reduce((sum, e) => sum + ((e.duration_seconds as number) || 0), 0) / 60;
   return { totalSessions, totalMinutes: Math.round(mins) };
+}
+
+async function fetchGroundHistoryEntriesPage(userId: string, offset: number): Promise<GroundingEntry[]> {
+  const { data, error } = await supabase
+    .from('practice_entries')
+    .select('id, created_at, mood, duration_seconds, body, trigger_text')
+    .eq('user_id', userId)
+    .eq('type', 'grounding')
+    .order('created_at', { ascending: false })
+    .range(offset, offset + PAGE_SIZE - 1);
+  if (error) throw error;
+  return (data ?? []) as GroundingEntry[];
 }
 
 function formatDuration(seconds: number): string {
@@ -73,10 +88,32 @@ export default function GroundHistory() {
   const navigate = useNavigate();
   const { user } = useAuth();
   const userId = user?.id;
-  const [entries, setEntries] = useState<GroundingEntry[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [hasMore, setHasMore] = useState(true);
-  const [listFetchFailed, setListFetchFailed] = useState(false);
+
+  const {
+    data: entriesPages,
+    isPending,
+    isError: listFetchFailed,
+    isFetchingNextPage,
+    hasNextPage,
+    fetchNextPage,
+    refetch,
+  } = useInfiniteQuery({
+    queryKey: userId ? groundHistoryEntriesQueryKey(userId) : ['tools', 'ground-history', 'entries', 'none'],
+    queryFn: ({ pageParam }) => fetchGroundHistoryEntriesPage(userId!, pageParam),
+    initialPageParam: 0,
+    getNextPageParam: (lastPage, allPages) => {
+      if (lastPage.length < PAGE_SIZE) return undefined;
+      return allPages.reduce((sum, p) => sum + p.length, 0);
+    },
+    enabled: Boolean(userId),
+    staleTime: 60_000,
+    refetchOnWindowFocus: false,
+    retry: false,
+  });
+
+  const entries = useMemo(() => entriesPages?.pages.flat() ?? [], [entriesPages]);
+  const loading = Boolean(userId) && isPending;
+  const hasMore = Boolean(hasNextPage);
 
   const { data: groundingStats } = useQuery({
     queryKey: userId ? groundHistoryStatsQueryKey(userId) : ['tools', 'ground-history', 'stats', 'none'],
@@ -89,59 +126,10 @@ export default function GroundHistory() {
   const totalSessions = groundingStats?.totalSessions ?? 0;
   const totalMinutes = groundingStats?.totalMinutes ?? 0;
 
-  const fetchEntries = useCallback(
-    async (offset = 0) => {
-      if (!user) {
-        setEntries([]);
-        setLoading(false);
-        setHasMore(false);
-        setListFetchFailed(false);
-        return;
-      }
-
-      if (offset === 0) {
-        setLoading(true);
-        setListFetchFailed(false);
-      }
-
-      const { data, error } = await supabase
-        .from('practice_entries')
-        .select('id, created_at, mood, duration_seconds, body, trigger_text')
-        .eq('user_id', user.id)
-        .eq('type', 'grounding')
-        .order('created_at', { ascending: false })
-        .range(offset, offset + PAGE_SIZE - 1);
-
-      if (error) {
-        if (offset === 0) {
-          setEntries([]);
-          setListFetchFailed(true);
-          setHasMore(false);
-        } else {
-          toast.error(t('common.tryAgain', { defaultValue: 'Try again' }));
-          setHasMore(false);
-        }
-        setLoading(false);
-        return;
-      }
-
-      const rows = (data ?? []) as GroundingEntry[];
-      if (offset === 0) {
-        setEntries(rows);
-      } else {
-        setEntries((prev) => [...prev, ...rows]);
-      }
-      setHasMore(rows.length === PAGE_SIZE);
-      setLoading(false);
-    },
-    [user, t],
-  );
-
-  useEffect(() => {
-    fetchEntries(0);
-  }, [fetchEntries]);
-
-  const loadMore = () => fetchEntries(entries.length);
+  const loadMore = useCallback(() => {
+    if (!hasNextPage || isFetchingNextPage) return;
+    void fetchNextPage();
+  }, [hasNextPage, isFetchingNextPage, fetchNextPage]);
 
   return (
     <motion.div
@@ -189,7 +177,7 @@ export default function GroundHistory() {
             transition={{ delay: 0.15 }}
           >
             <p className="text-sm text-muted-foreground px-2">{t('ground.historyLoadFailed')}</p>
-            <Button variant="secondary" size="sm" className="mx-auto font-mono" onClick={() => void fetchEntries(0)}>
+            <Button variant="secondary" size="sm" className="mx-auto font-mono" onClick={() => void refetch()}>
               {t('common.tryAgain', { defaultValue: 'Try again' })}
             </Button>
           </motion.div>
@@ -295,9 +283,10 @@ export default function GroundHistory() {
                 <button
                   type="button"
                   onClick={loadMore}
-                  className="text-sm font-medium text-nox-text-link underline-offset-4 transition-colors hover:text-nox-text-link/80 hover:underline"
+                  disabled={isFetchingNextPage}
+                  className="text-sm font-medium text-nox-text-link underline-offset-4 transition-colors hover:text-nox-text-link/80 hover:underline disabled:opacity-40"
                 >
-                  {t('common.loadMore', { defaultValue: 'Load more' })}
+                  {isFetchingNextPage ? t('common.loadingMore', { defaultValue: 'Loading…' }) : t('common.loadMore', { defaultValue: 'Load more' })}
                 </button>
               </motion.div>
             )}
