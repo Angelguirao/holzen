@@ -5,9 +5,11 @@
  */
 
 import { useCallback, useEffect, useState } from 'react';
+import { useQueryClient } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
 import { format } from 'date-fns';
 import { Loader2 } from 'lucide-react';
+import { practiceEntriesWeeklyCountQueryKey } from '@/components/PracticeWidget';
 import { useAuth } from '@/hooks/use-auth';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
@@ -46,6 +48,7 @@ function ThreadLine({ word }: { word: UserWord }) {
 export function ReflectionReplay({ onComplete, initialPauseInstanceId }: Props) {
   const { t } = useTranslation();
   const { user } = useAuth();
+  const queryClient = useQueryClient();
   const [picker, setPicker] = useState<PausePickerRow[]>([]);
   const [selectedId, setSelectedId] = useState<string | null>(initialPauseInstanceId ?? null);
   const [thread, setThread] = useState<PastReflectionWithWords | null>(null);
@@ -106,6 +109,7 @@ export function ReflectionReplay({ onComplete, initialPauseInstanceId }: Props) 
         pause_instance_id: selectedId,
       });
       if (error) throw error;
+      void queryClient.invalidateQueries({ queryKey: practiceEntriesWeeklyCountQueryKey(user.id) });
       toast.success(t('practice.replaySaved', { defaultValue: 'Replay saved' }));
       await loadThread(selectedId);
     } catch {
@@ -113,7 +117,7 @@ export function ReflectionReplay({ onComplete, initialPauseInstanceId }: Props) 
     } finally {
       setSaving(false);
     }
-  }, [user, selectedId, draft, loadThread, t]);
+  }, [user, selectedId, draft, loadThread, t, queryClient]);
 
   if (!user) {
     return (
