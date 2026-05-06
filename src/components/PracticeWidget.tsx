@@ -21,7 +21,8 @@ const PRACTICES = [
   { id: 'replay' as const, icon: History, labelKey: 'practice.replayLabel', descKey: 'practice.replayDesc', free: false, route: TOOLS.practice.replay },
 ] as const;
 
-function practiceEntriesWeeklyCountQueryKey(userId: string) {
+/** Shared with check-in flows that should refresh the Home practice widget counter. */
+export function practiceEntriesWeeklyCountQueryKey(userId: string) {
   return ['practice-entries', 'weekly-count', userId] as const;
 }
 

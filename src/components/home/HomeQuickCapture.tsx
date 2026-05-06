@@ -1,9 +1,11 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useState } from 'react';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { BookOpen } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/use-auth';
+import { practiceEntriesWeeklyCountQueryKey } from '@/components/PracticeWidget';
 import { TOOLS } from '@/lib/app-routes';
 import { MoodIcon } from '@/components/icons/MoodIcon';
 import { Textarea } from '@/components/ui/textarea';
@@ -34,36 +36,40 @@ function relTime(iso: string, locale: string): string {
   return d.toLocaleDateString(locale, { month: 'short', day: 'numeric' });
 }
 
+function homeQuickCaptureLastPauseQueryKey(userId: string) {
+  return ['home', 'quick-capture', 'last-pause', userId] as const;
+}
+
+async function fetchLastPauseForQuickCapture(userId: string): Promise<LastPauseRow | null> {
+  const { data, error } = await supabase
+    .from('v_pause_full' as never)
+    .select('id, created_at, terminal_at')
+    .eq('user_id', userId)
+    .order('terminal_at', { ascending: false, nullsFirst: false })
+    .order('created_at', { ascending: false })
+    .limit(1)
+    .maybeSingle();
+  if (error) throw error;
+  return (data as LastPauseRow | null) ?? null;
+}
+
 export function HomeQuickCapture() {
   const { t, i18n } = useTranslation();
   const { user } = useAuth();
-  const [lastPause, setLastPause] = useState<LastPauseRow | null>(null);
-  const [loadingLib, setLoadingLib] = useState(true);
+  const userId = user?.id;
+  const queryClient = useQueryClient();
   const [mood, setMood] = useState<string | null>(null);
   const [note, setNote] = useState('');
   const [saving, setSaving] = useState(false);
 
-  useEffect(() => {
-    if (!user) return;
-    let cancelled = false;
-    void (async () => {
-      const { data } = await supabase
-        .from('v_pause_full' as never)
-        .select('id, created_at, terminal_at')
-        .eq('user_id', user.id)
-        .order('terminal_at', { ascending: false, nullsFirst: false })
-        .order('created_at', { ascending: false })
-        .limit(1)
-        .maybeSingle();
-      if (!cancelled) {
-        setLastPause((data as LastPauseRow | null) ?? null);
-        setLoadingLib(false);
-      }
-    })();
-    return () => {
-      cancelled = true;
-    };
-  }, [user]);
+  const { data: lastPause = null, isPending: loadingLib } = useQuery({
+    queryKey: userId ? homeQuickCaptureLastPauseQueryKey(userId) : ['home', 'quick-capture', 'last-pause', 'none'],
+    queryFn: () => fetchLastPauseForQuickCapture(userId!),
+    enabled: Boolean(userId),
+    staleTime: 60_000,
+    refetchOnWindowFocus: false,
+    retry: false,
+  });
 
   const saveCheckin = useCallback(async () => {
     if (!user) return;
@@ -74,13 +80,18 @@ export function HomeQuickCapture() {
     }
     setSaving(true);
     try {
-      await supabase.from('practice_entries').insert({
+      const { error } = await supabase.from('practice_entries').insert({
         user_id: user.id,
         type: 'checkin',
         mood: mood ?? 'calm',
         intensity: 3,
         trigger_text: trimmed || null,
       });
+      if (error) {
+        toast(t('common.tryAgain'));
+        return;
+      }
+      void queryClient.invalidateQueries({ queryKey: practiceEntriesWeeklyCountQueryKey(user.id) });
       hapticFeedback('success');
       setMood(null);
       setNote('');
@@ -90,7 +101,7 @@ export function HomeQuickCapture() {
     } finally {
       setSaving(false);
     }
-  }, [user, mood, note, t]);
+  }, [user, mood, note, t, queryClient]);
 
   return (
     <div className="space-y-4">
