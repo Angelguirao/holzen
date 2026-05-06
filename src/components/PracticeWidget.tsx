@@ -1,4 +1,5 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback } from 'react';
+import { useQuery } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
 import { Waves, PenLine, Activity, History, Lock, ChevronRight, Sparkles } from 'lucide-react';
 import { useSubscription } from '@/hooks/use-subscription';
@@ -20,22 +21,30 @@ const PRACTICES = [
   { id: 'replay' as const, icon: History, labelKey: 'practice.replayLabel', descKey: 'practice.replayDesc', free: false, route: TOOLS.practice.replay },
 ] as const;
 
+function practiceEntriesWeeklyCountQueryKey(userId: string) {
+  return ['practice-entries', 'weekly-count', userId] as const;
+}
+
+async function fetchWeeklyPracticeEntryCount(userId: string): Promise<number> {
+  const sevenDaysAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString();
+  const { count, error } = await supabase
+    .from('practice_entries')
+    .select('id', { count: 'exact', head: true })
+    .eq('user_id', userId)
+    .gte('created_at', sevenDaysAgo);
+  if (error) throw error;
+  return count ?? 0;
+}
+
 function useWeeklyProgress(userId: string | undefined) {
-  const [count, setCount] = useState(0);
-
-  useEffect(() => {
-    if (!userId) return;
-    (async () => {
-      const sevenDaysAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString();
-      const { count: c } = await supabase
-        .from('practice_entries')
-        .select('id', { count: 'exact', head: true })
-        .eq('user_id', userId)
-        .gte('created_at', sevenDaysAgo);
-      setCount(c ?? 0);
-    })();
-  }, [userId]);
-
+  const { data: count = 0 } = useQuery({
+    queryKey: userId ? practiceEntriesWeeklyCountQueryKey(userId) : ['practice-entries', 'weekly-count', 'none'],
+    queryFn: () => fetchWeeklyPracticeEntryCount(userId!),
+    enabled: Boolean(userId),
+    staleTime: 60_000,
+    refetchOnWindowFocus: false,
+    retry: false,
+  });
   return count;
 }
 
