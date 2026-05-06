@@ -1,6 +1,8 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useCallback } from 'react';
+import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/use-auth';
+import { getProfileRowQueryOptions } from '@/hooks/use-profile';
 import { useTranslation } from 'react-i18next';
 import { Copy, Check, Gift, Star, Crown } from 'lucide-react';
 import { toast } from 'sonner';
@@ -12,53 +14,56 @@ interface GrantedReward {
   granted_at: string;
 }
 
+const REFERRALS_COUNT_QUERY_KEY = (userId: string) => ['referrals-count', userId] as const;
+const REFERRAL_REWARDS_QUERY_KEY = (userId: string) => ['referral-rewards', userId] as const;
+
 export function ReferralSection({ defaultExpanded = false }: { defaultExpanded?: boolean }) {
   const { t } = useTranslation();
   const { user } = useAuth();
-  
+  const userId = user?.id;
+
+  const { data: profileRow } = useQuery(getProfileRowQueryOptions(userId));
+  const referralCode =
+    profileRow?.referral_code && profileRow.referral_code.length > 0
+      ? profileRow.referral_code
+      : null;
+
+  const { data: referralCount = 0 } = useQuery({
+    queryKey: userId ? REFERRALS_COUNT_QUERY_KEY(userId) : ['referrals-count', 'none'],
+    enabled: Boolean(userId),
+    staleTime: 60_000,
+    queryFn: async () => {
+      const { count, error } = await supabase
+        .from('referrals')
+        .select('*', { count: 'exact', head: true })
+        .eq('referrer_id', userId!);
+      if (error) throw error;
+      return count ?? 0;
+    },
+  });
+
+  const { data: grantedRewards = [] } = useQuery({
+    queryKey: userId ? REFERRAL_REWARDS_QUERY_KEY(userId) : ['referral-rewards', 'none'],
+    enabled: Boolean(userId),
+    staleTime: 60_000,
+    queryFn: async () => {
+      const { data: rewards, error } = await supabase
+        .from('referral_rewards')
+        .select('milestone, reward_type, granted_at')
+        .eq('user_id', userId!);
+      if (error) throw error;
+      return (rewards ?? []) as GrantedReward[];
+    },
+  });
+
   const MILESTONES = [
     { count: 1, icon: Gift, label: t('referral.milestone1'), reward: t('referral.reward1') },
     { count: 3, icon: Star, label: t('referral.milestone3'), reward: t('referral.reward3') },
     { count: 5, icon: Crown, label: t('referral.milestone5'), reward: t('referral.reward5') },
   ];
 
-  const [referralCode, setReferralCode] = useState<string | null>(null);
-  const [referralCount, setReferralCount] = useState(0);
-  const [grantedRewards, setGrantedRewards] = useState<GrantedReward[]>([]);
   const [copied, setCopied] = useState(false);
   const [expanded, setExpanded] = useState(defaultExpanded);
-
-  useEffect(() => {
-    if (!user) return;
-    const load = async () => {
-      const { data: profile } = await supabase
-        .from('profiles')
-        .select('referral_code')
-        .eq('user_id', user.id)
-        .single();
-
-      if (profile?.referral_code) {
-        setReferralCode(profile.referral_code);
-      }
-
-      const { count } = await supabase
-        .from('referrals')
-        .select('*', { count: 'exact', head: true })
-        .eq('referrer_id', user.id);
-
-      setReferralCount(count ?? 0);
-
-      const { data: rewards } = await supabase
-        .from('referral_rewards')
-        .select('milestone, reward_type, granted_at')
-        .eq('user_id', user.id);
-
-      if (rewards) {
-        setGrantedRewards(rewards as unknown as GrantedReward[]);
-      }
-    };
-    load();
-  }, [user]);
 
   const copyLink = useCallback(async () => {
     if (!referralCode) return;
@@ -119,7 +124,7 @@ export function ReferralSection({ defaultExpanded = false }: { defaultExpanded?:
               {MILESTONES.map((milestone) => {
                 const Icon = milestone.icon;
                 const reached = referralCount >= milestone.count;
-                const granted = grantedRewards.some(r => r.milestone === milestone.count);
+                const granted = grantedRewards.some((r) => r.milestone === milestone.count);
                 return (
                   <div
                     key={milestone.count}
