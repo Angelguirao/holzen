@@ -1,4 +1,5 @@
-import { useEffect, useState } from 'react';
+import { useCallback } from 'react';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/use-auth';
 import { Moon, X } from 'lucide-react';
@@ -37,51 +38,58 @@ function writeDismissedIds(userId: string, ids: string[]) {
   }
 }
 
+export const NIGHT_REFLECTION_VISIBLE_QUERY_KEY = (userId: string) =>
+  ['night-reflections', 'visible', userId] as const;
+
+async function fetchVisibleNightReflection(userId: string): Promise<NightReflection | null> {
+  const locallyDismissed = new Set(readDismissedIds(userId));
+  const { data, error } = await supabase
+    .from('night_reflections')
+    .select('id, message, btc_change_percent, btc_direction, created_at')
+    .eq('user_id', userId)
+    .eq('dismissed', false)
+    .order('created_at', { ascending: false })
+    .limit(10);
+  if (error || !data?.length) return null;
+  const firstVisible = data.find((item) => !locallyDismissed.has(item.id));
+  return firstVisible ? (firstVisible as unknown as NightReflection) : null;
+}
+
 export function useNightReflection() {
   const { user } = useAuth();
-  const [reflection, setReflection] = useState<NightReflection | null>(null);
-  const [loaded, setLoaded] = useState(false);
+  const queryClient = useQueryClient();
+  const userId = user?.id;
 
-  useEffect(() => {
-    if (!user) return;
-    const locallyDismissed = new Set(readDismissedIds(user.id));
-    supabase
-      .from('night_reflections')
-      .select('id, message, btc_change_percent, btc_direction, created_at')
-      .eq('user_id', user.id)
-      .eq('dismissed', false)
-      .order('created_at', { ascending: false })
-      .limit(10)
-      .then(({ data }) => {
-        if (data && data.length > 0) {
-          const firstVisible = data.find((item) => !locallyDismissed.has(item.id));
-          if (firstVisible) {
-            setReflection(firstVisible as unknown as NightReflection);
-          } else {
-            setReflection(null);
-          }
-        } else {
-          setReflection(null);
-        }
-        setLoaded(true);
-      });
-  }, [user]);
+  const { data: reflection = null, isFetched } = useQuery({
+    queryKey: userId ? NIGHT_REFLECTION_VISIBLE_QUERY_KEY(userId) : ['night-reflections', 'visible', 'none'],
+    queryFn: () => fetchVisibleNightReflection(userId!),
+    enabled: Boolean(userId),
+    staleTime: 60_000,
+    refetchOnWindowFocus: false,
+    retry: false,
+  });
 
-  const dismiss = async () => {
-    if (!reflection || !user) return;
+  const loaded = Boolean(userId) && isFetched;
+
+  const dismiss = useCallback(async () => {
+    if (!reflection || !userId) return;
     const id = reflection.id;
-    setReflection(null);
-    const dismissedIds = readDismissedIds(user.id);
+    queryClient.setQueryData<NightReflection | null>(NIGHT_REFLECTION_VISIBLE_QUERY_KEY(userId), null);
+    const dismissedIds = readDismissedIds(userId);
     if (!dismissedIds.includes(id)) {
-      writeDismissedIds(user.id, [...dismissedIds, id]);
+      writeDismissedIds(userId, [...dismissedIds, id]);
     }
 
-    await supabase
-      .from('night_reflections')
-      .update({ dismissed: true })
-      .eq('user_id', user.id)
-      .eq('dismissed', false);
-  };
+    try {
+      await supabase
+        .from('night_reflections')
+        .update({ dismissed: true })
+        .eq('user_id', userId)
+        .eq('dismissed', false);
+    } finally {
+      await queryClient.invalidateQueries({ queryKey: NIGHT_REFLECTION_VISIBLE_QUERY_KEY(userId) });
+    }
+  }, [reflection, userId, queryClient]);
 
   return { reflection, loaded, dismiss };
 }
