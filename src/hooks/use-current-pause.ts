@@ -9,7 +9,8 @@
  * Tools, etc.) react when state changes.
  */
 
-import { useEffect, useState, useCallback } from 'react';
+import { useCallback, useEffect } from 'react';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/use-auth';
 import type { PauseState } from '@/lib/pause-state';
@@ -25,55 +26,56 @@ export interface CurrentPauseRow {
   context_snapshot: Record<string, unknown> | null;
 }
 
-interface State {
-  loaded: boolean;
-  current: CurrentPauseRow | null;
+export function currentPauseQueryKey(userId: string) {
+  return ['pause', 'current-open', userId] as const;
+}
+
+async function fetchCurrentPause(userId: string): Promise<CurrentPauseRow | null> {
+  const { data, error } = await supabase
+    .from('v_pause_current' as never)
+    .select('id, user_id, state, source, created_at, window_ends_at, engaged_at, context_snapshot')
+    .eq('user_id', userId)
+    .maybeSingle();
+
+  if (error || !data) {
+    return null;
+  }
+  return data as unknown as CurrentPauseRow;
 }
 
 export function useCurrentPause() {
   const { user } = useAuth();
-  const [state, setState] = useState<State>({ loaded: false, current: null });
+  const queryClient = useQueryClient();
+  const userId = user?.id;
 
-  const load = useCallback(async () => {
-    if (!user) {
-      setState({ loaded: true, current: null });
-      return;
-    }
-    const { data, error } = await supabase
-      .from('v_pause_current' as never)
-      .select('id, user_id, state, source, created_at, window_ends_at, engaged_at, context_snapshot')
-      .eq('user_id', user.id)
-      .maybeSingle();
+  const query = useQuery({
+    queryKey: userId ? currentPauseQueryKey(userId) : ['pause', 'current-open', 'none'],
+    queryFn: () => fetchCurrentPause(userId!),
+    enabled: Boolean(userId),
+    staleTime: 30_000,
+    refetchOnWindowFocus: true,
+    retry: false,
+  });
 
-    if (error || !data) {
-      setState({ loaded: true, current: null });
-      return;
-    }
-
-    setState({
-      loaded: true,
-      current: data as unknown as CurrentPauseRow,
-    });
-  }, [user]);
+  const bump = useCallback(() => {
+    if (!userId) return Promise.resolve();
+    return queryClient.invalidateQueries({ queryKey: currentPauseQueryKey(userId) });
+  }, [queryClient, userId]);
 
   useEffect(() => {
-    void load();
-  }, [load]);
-
-  useEffect(() => {
-    if (!user) return;
+    if (!userId) return;
     const channel = supabase
-      .channel(`pause-instances-${user.id}`)
+      .channel(`pause-instances-${userId}`)
       .on(
         'postgres_changes',
         {
           event: '*',
           schema: 'public',
           table: 'pause_instances',
-          filter: `user_id=eq.${user.id}`,
+          filter: `user_id=eq.${userId}`,
         },
         () => {
-          void load();
+          void bump();
         },
       )
       .subscribe();
@@ -81,7 +83,11 @@ export function useCurrentPause() {
     return () => {
       supabase.removeChannel(channel);
     };
-  }, [user, load]);
+  }, [userId, bump]);
 
-  return { ...state, refresh: load };
+  return {
+    loaded: !userId || query.isFetched,
+    current: query.data ?? null,
+    refresh: bump,
+  };
 }

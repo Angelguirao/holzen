@@ -1,12 +1,14 @@
 import { COMPLETED_PAUSE_COUNT_QUERY_KEY } from '@/hooks/use-completed-pause-count';
 import { PAUSE_STATS_DATA_QUERY_KEY } from '@/hooks/use-pause-stats-data';
+import { currentPauseQueryKey } from '@/hooks/use-current-pause';
 import { pendingPauseOfferQueryKey } from '@/hooks/use-pending-pause-offer';
 import { getHolzenQueryClient } from '@/lib/holzen-query-client-ref';
 
 /**
  * Call after a pause reaches `completed` so Home (Journey card), Journey → Stats,
  * completed-pause count (Profile / AI insights gate, Tools), Archive pause-tab presence
- * probe, pending pause offer (`usePendingPauseOffer`), and badges re-read from Supabase
+ * probe, pending pause offer (`usePendingPauseOffer`), current open pause (`useCurrentPause`),
+ * and badges re-read from Supabase
  * without waiting for the stats query `staleTime` window.
  */
 export function invalidatePauseStatsDataForUser(userId: string | null | undefined): void {
@@ -17,4 +19,5 @@ export function invalidatePauseStatsDataForUser(userId: string | null | undefine
   void qc.invalidateQueries({ queryKey: COMPLETED_PAUSE_COUNT_QUERY_KEY(userId) });
   void qc.invalidateQueries({ queryKey: ['archive', 'pauses-tab-has-rows', userId] });
   void qc.invalidateQueries({ queryKey: pendingPauseOfferQueryKey(userId) });
+  void qc.invalidateQueries({ queryKey: currentPauseQueryKey(userId) });
 }
