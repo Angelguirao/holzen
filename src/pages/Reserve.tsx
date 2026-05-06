@@ -3,7 +3,7 @@ import { motion, useReducedMotion } from 'framer-motion';
 import { ArrowLeft, Bitcoin } from 'lucide-react';
 import { PageMeta } from '@/components/PageMeta';
 import { PublicFooter } from '@/components/PublicFooter';
-import { useState, useEffect } from 'react';
+import { useQuery } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
 import { PageHeading } from '@/components/PageHeading';
 import { StateCard } from '@/components/ui/state-card';
@@ -23,15 +23,29 @@ const TREASURY = {
   hasStarted: false,
 };
 
+/** Shared cache if other surfaces ever need the same spot quote. */
+export const COINGECKO_BTC_USD_QUERY_KEY = ['external', 'coingecko', 'btc-usd'] as const;
+
+async function fetchBtcUsd(): Promise<number | null> {
+  try {
+    const r = await fetch('https://api.coingecko.com/api/v3/simple/price?ids=bitcoin&vs_currencies=usd');
+    if (!r.ok) return null;
+    const d = (await r.json()) as { bitcoin?: { usd?: number } };
+    return d?.bitcoin?.usd ?? null;
+  } catch {
+    return null;
+  }
+}
+
 function useBtcPrice() {
-  const [price, setPrice] = useState<number | null>(null);
-  useEffect(() => {
-    fetch('https://api.coingecko.com/api/v3/simple/price?ids=bitcoin&vs_currencies=usd')
-      .then((r) => r.json())
-      .then((d) => setPrice(d?.bitcoin?.usd ?? null))
-      .catch(() => {});
-  }, []);
-  return price;
+  const { data } = useQuery({
+    queryKey: COINGECKO_BTC_USD_QUERY_KEY,
+    queryFn: fetchBtcUsd,
+    staleTime: 5 * 60_000,
+    refetchOnWindowFocus: false,
+    retry: false,
+  });
+  return data ?? null;
 }
 
 const Reserve = () => {
