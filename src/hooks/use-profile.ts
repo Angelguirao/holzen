@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import { toast } from 'sonner';
+import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/use-auth';
 import { holzenLog } from '@/lib/holzen-console';
@@ -11,6 +12,53 @@ import { normalizeTrackedAssetId } from '@/lib/tracked-assets';
 type ProfileRow = Database['public']['Tables']['profiles']['Row'];
 type ProfileUpdate = Database['public']['Tables']['profiles']['Update'];
 
+/** TanStack Query cache key for the signed-in user's `profiles` row (dedupes across multiple `useHolzen` trees). */
+export const PROFILE_QUERY_KEY = (userId: string) => ['profile', userId] as const;
+
+const PROFILE_SELECT_COLUMNS =
+  'threshold, threshold_down, cumulative_threshold, last_message, last_context, email_notifications, has_onboarded, companion_breathing, companion_haiku, companion_grounding, companion_signal, companion_zoom_out, companion_history, reflection_tone, cooldown_hours, last_trigger_at, silent_mode, streak_freeze_dates, digest_frequency, custom_prompt, reflection_style, quiet_hours_start, quiet_hours_end, first_name, night_reflection_hour, ai_insights_enabled, ritual_template, notify_badges, motivations, mantra, hold_goal_currency, tracked_asset_id, language, grounding_activities';
+
+/**
+ * Loads (or creates) the caller's `profiles` row. Used as a single `queryFn` so all
+ * subscribers share one in-flight request per `userId`.
+ */
+export async function fetchProfileRowForUser(userId: string): Promise<ProfileRow | null> {
+  holzenLog.profile('fetch profiles', { userIdPrefix: userId.slice(0, 8) });
+  const initial = await supabase
+    .from('profiles')
+    .select(PROFILE_SELECT_COLUMNS)
+    .eq('user_id', userId)
+    .maybeSingle();
+
+  if (initial.error) {
+    console.error('[useProfile] profiles select failed:', initial.error.message);
+    holzenLog.profile('select failed', { message: initial.error.message });
+    throw new Error(
+      initial.error.message ||
+        'Could not load your profile. Check your connection and try again.',
+    );
+  }
+
+  let data = initial.data as ProfileRow | null;
+
+  if (!data) {
+    holzenLog.profile('no row — inserting profiles');
+    const { error: insErr } = await supabase.from('profiles').insert({ user_id: userId });
+    if (insErr && !String(insErr.message).includes('duplicate') && insErr.code !== '23505') {
+      console.error('[useProfile] profiles insert failed:', insErr.message);
+    }
+    const again = await supabase
+      .from('profiles')
+      .select(PROFILE_SELECT_COLUMNS)
+      .eq('user_id', userId)
+      .maybeSingle();
+    data = again.data as ProfileRow | null;
+    if (again.error) console.error('[useProfile] profiles re-select failed:', again.error.message);
+  }
+
+  return data;
+}
+
 export interface ProfileLoadReflectionData {
   lastMessage: string | null;
   lastContext: string | null;
@@ -20,6 +68,23 @@ export interface ProfileLoadReflectionData {
 export function useProfile() {
   const { user } = useAuth();
   const { t } = useTranslation();
+  const userId = user?.id;
+
+  const {
+    data: profileRow,
+    status: profileQueryStatus,
+    error: profileQueryError,
+    refetch: refetchProfile,
+  } = useQuery({
+    queryKey: PROFILE_QUERY_KEY(userId ?? '__signed_out__'),
+    queryFn: () => fetchProfileRowForUser(userId!),
+    enabled: Boolean(userId),
+    // Fresh on remount so a newly mounted `useHolzen` tree does not hydrate from a stale
+    // cached row after another surface updated `profiles` (deduped when mounts overlap).
+    staleTime: 0,
+    refetchOnWindowFocus: false,
+    retry: false,
+  });
 
   const [threshold, setThresholdState] = useState(5);
   const [thresholdDown, setThresholdDownState] = useState(5);
@@ -45,129 +110,81 @@ export function useProfile() {
   const [trackedAssetId, setTrackedAssetIdState] = useState<string>('bitcoin');
   const [language, setLanguageState] = useState<string>('en');
   const [companionPrefs, setCompanionPrefsState] = useState<CompanionPrefs>({ breathing: true, haiku: true, grounding: true, signal: true, zoomOut: true, history: true });
-  const [profileLoaded, setProfileLoaded] = useState(false);
   const [hasOnboarded, setHasOnboarded] = useState(true);
-  const [profileLoadError, setProfileLoadError] = useState<string | null>(null);
-  const [profileLoadRetryToken, setProfileLoadRetryToken] = useState(0);
 
   const [_profileLoadReflectionData, setProfileLoadReflectionData] = useState<ProfileLoadReflectionData | null>(null);
 
   const retryProfileLoad = useCallback(() => {
-    setProfileLoadRetryToken((n) => n + 1);
-  }, []);
+    void refetchProfile();
+  }, [refetchProfile]);
+
+  const profileLoaded = Boolean(
+    userId && (profileQueryStatus === 'success' || profileQueryStatus === 'error'),
+  );
+  const profileLoadError = userId
+    ? profileQueryError instanceof Error
+      ? profileQueryError.message
+      : profileQueryError
+        ? String(profileQueryError)
+        : null
+    : null;
 
   useEffect(() => {
-    if (!user) {
+    if (!userId) {
       holzenLog.profile('skip load (signed out)');
-      setProfileLoaded(false);
-      setProfileLoadError(null);
-      setProfileLoadRetryToken(0);
       return;
     }
-    let cancelled = false;
-    // Clear stale error only on a fresh load for this session (not on banner "Try again",
-    // where `profileLoadRetryToken` bumps and we keep showing the banner until success).
-    if (profileLoadRetryToken === 0) {
-      setProfileLoadError(null);
-    }
+    if (profileQueryStatus !== 'success') return;
 
-    const selectCols =
-      'threshold, threshold_down, cumulative_threshold, last_message, last_context, email_notifications, has_onboarded, companion_breathing, companion_haiku, companion_grounding, companion_signal, companion_zoom_out, companion_history, reflection_tone, cooldown_hours, last_trigger_at, silent_mode, streak_freeze_dates, digest_frequency, custom_prompt, reflection_style, quiet_hours_start, quiet_hours_end, first_name, night_reflection_hour, ai_insights_enabled, ritual_template, notify_badges, motivations, mantra, hold_goal_currency, tracked_asset_id, language, grounding_activities';
-
-    const load = async () => {
-      holzenLog.profile('fetch profiles', { userIdPrefix: user.id.slice(0, 8) });
-      const initial = await supabase
-        .from('profiles')
-        .select(selectCols)
-        .eq('user_id', user.id)
-        .maybeSingle();
-
-      if (cancelled) return;
-
-      if (initial.error) {
-        console.error('[useProfile] profiles select failed:', initial.error.message);
-        holzenLog.profile('select failed', { message: initial.error.message });
-        setProfileLoadError(
-          initial.error.message ||
-            'Could not load your profile. Check your connection and try again.',
-        );
-        setProfileLoaded(true);
-        return;
-      }
-
-      let data = initial.data;
-
-      // No row: local reset / missing trigger — create profile (RLS allows insert for own user_id)
-      if (!data) {
-        holzenLog.profile('no row — inserting profiles');
-        const { error: insErr } = await supabase.from('profiles').insert({ user_id: user.id });
-        if (insErr && !String(insErr.message).includes('duplicate') && insErr.code !== '23505') {
-          console.error('[useProfile] profiles insert failed:', insErr.message);
-        }
-        const again = await supabase.from('profiles').select(selectCols).eq('user_id', user.id).maybeSingle();
-        data = again.data;
-        if (again.error) console.error('[useProfile] profiles re-select failed:', again.error.message);
-      }
-
-      if (data) {
-        const row = data as ProfileRow;
-        setThresholdState(row.threshold);
-        setThresholdDownState(row.threshold_down ?? row.threshold);
-        setCumulativeThresholdState(row.cumulative_threshold ?? 15);
-        setStreakFreezeDatesState(row.streak_freeze_dates ?? []);
-        setEmailNotificationsState(row.email_notifications ?? true);
-        setReflectionToneState(row.reflection_tone ?? 'stoic');
-        setCooldownHoursState(row.cooldown_hours ?? 6);
-        setSilentModeState(row.silent_mode ?? false);
-        setDigestFrequencyState(row.digest_frequency ?? 'weekly');
-        setCustomPromptState(row.custom_prompt ?? null);
-        setReflectionStyleState(row.reflection_style ?? 'standard');
-        setQuietHoursStartState(row.quiet_hours_start ?? null);
-        setQuietHoursEndState(row.quiet_hours_end ?? null);
-        setFirstNameState(row.first_name ?? null);
-        setNightReflectionHourState(row.night_reflection_hour ?? 21);
-        setAiInsightsEnabledState(row.ai_insights_enabled ?? true);
-        setNotifyBadgesState(row.notify_badges ?? true);
-        setMotivationsState(row.motivations ?? []);
-        setMantraState(row.mantra ?? null);
-        setCurrencyState(row.hold_goal_currency ?? 'USD');
-        setTrackedAssetIdState(normalizeTrackedAssetId(row.tracked_asset_id));
-        setLanguageState(row.language ?? 'en');
-        setGroundingActivitiesState(row.grounding_activities ?? []);
-        setHasOnboarded(row.has_onboarded ?? false);
-        setCompanionPrefsState({
-          breathing: row.companion_breathing ?? true,
-          haiku: row.companion_haiku ?? true,
-          grounding: row.companion_grounding ?? true,
-          signal: row.companion_signal ?? true,
-          zoomOut: row.companion_zoom_out ?? true,
-          history: row.companion_history ?? true,
-        });
-
-        setProfileLoadReflectionData({
-          lastMessage: row.last_message ?? null,
-          lastContext: row.last_context ?? null,
-          lastTriggerAt: row.last_trigger_at ?? null,
-        });
-      }
-      holzenLog.profile('ready', {
-        hasRow: !!data,
-        hasOnboarded: data?.has_onboarded ?? null,
-        silentMode: data ? !!(data as ProfileRow).silent_mode : null,
-        hasLastMessage: !!(data?.last_message),
+    const data = profileRow;
+    if (data) {
+      const row = data;
+      setThresholdState(row.threshold);
+      setThresholdDownState(row.threshold_down ?? row.threshold);
+      setCumulativeThresholdState(row.cumulative_threshold ?? 15);
+      setStreakFreezeDatesState(row.streak_freeze_dates ?? []);
+      setEmailNotificationsState(row.email_notifications ?? true);
+      setReflectionToneState(row.reflection_tone ?? 'stoic');
+      setCooldownHoursState(row.cooldown_hours ?? 6);
+      setSilentModeState(row.silent_mode ?? false);
+      setDigestFrequencyState(row.digest_frequency ?? 'weekly');
+      setCustomPromptState(row.custom_prompt ?? null);
+      setReflectionStyleState(row.reflection_style ?? 'standard');
+      setQuietHoursStartState(row.quiet_hours_start ?? null);
+      setQuietHoursEndState(row.quiet_hours_end ?? null);
+      setFirstNameState(row.first_name ?? null);
+      setNightReflectionHourState(row.night_reflection_hour ?? 21);
+      setAiInsightsEnabledState(row.ai_insights_enabled ?? true);
+      setNotifyBadgesState(row.notify_badges ?? true);
+      setMotivationsState(row.motivations ?? []);
+      setMantraState(row.mantra ?? null);
+      setCurrencyState(row.hold_goal_currency ?? 'USD');
+      setTrackedAssetIdState(normalizeTrackedAssetId(row.tracked_asset_id));
+      setLanguageState(row.language ?? 'en');
+      setGroundingActivitiesState(row.grounding_activities ?? []);
+      setHasOnboarded(row.has_onboarded ?? false);
+      setCompanionPrefsState({
+        breathing: row.companion_breathing ?? true,
+        haiku: row.companion_haiku ?? true,
+        grounding: row.companion_grounding ?? true,
+        signal: row.companion_signal ?? true,
+        zoomOut: row.companion_zoom_out ?? true,
+        history: row.companion_history ?? true,
       });
-      if (!cancelled) {
-        setProfileLoadError(null);
-        setProfileLoaded(true);
-      }
-    };
-    void load();
-    return () => {
-      cancelled = true;
-    };
-    // Depend on stable id only — `user` object identity changes on TOKEN_REFRESHED etc., which would refetch unnecessarily.
-    // `profileLoadRetryToken` re-runs the fetch after a user-triggered retry (AppLayout banner).
-  }, [user?.id, profileLoadRetryToken]);
+
+      setProfileLoadReflectionData({
+        lastMessage: row.last_message ?? null,
+        lastContext: row.last_context ?? null,
+        lastTriggerAt: row.last_trigger_at ?? null,
+      });
+    }
+    holzenLog.profile('ready', {
+      hasRow: !!data,
+      hasOnboarded: data?.has_onboarded ?? null,
+      silentMode: data ? !!data.silent_mode : null,
+      hasLastMessage: !!(data?.last_message),
+    });
+  }, [userId, profileQueryStatus, profileRow]);
 
   const setThreshold = useCallback(async (val: number) => {
     setThresholdState(val);
