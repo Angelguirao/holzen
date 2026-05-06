@@ -3,6 +3,7 @@ import { useQueryClient } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
 import { motion, AnimatePresence } from 'framer-motion';
 import { practiceEntriesWeeklyCountQueryKey } from '@/components/PracticeWidget';
+import { practicePrimarySuggestionQueryKey } from '@/hooks/use-practice-suggestion';
 import { supabase } from '@/integrations/supabase/client';
 import { invokeEdge } from '@/lib/invoke-edge';
 import { useAuth } from '@/hooks/use-auth';
@@ -113,6 +114,7 @@ export function GuidedJournal({ onComplete, textColor, ringColor }: Props) {
       });
       if (practiceError) throw practiceError;
       void queryClient.invalidateQueries({ queryKey: practiceEntriesWeeklyCountQueryKey(user.id) });
+      void queryClient.invalidateQueries({ queryKey: practicePrimarySuggestionQueryKey(user.id) });
       hapticFeedback('success');
       setDone(true);
       setTimeout(onComplete, 1500);
