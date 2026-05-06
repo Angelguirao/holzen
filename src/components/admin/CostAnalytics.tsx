@@ -11,9 +11,10 @@
  *     path even when it isn't.
  *
  * All queries hit `generation_attempts` directly (admin RLS allows SELECT).
- * Cached per mount; refresh button re-runs.
+ * Attempt rows reload when the period changes; refresh also invalidates the MRR snapshot query.
  */
 import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import {
   AlertCircle,
   DollarSign,
@@ -159,6 +160,9 @@ interface MrrSnapshot {
   ratio: number | null;
 }
 
+/** Admin Cost tab — subscriber count + MTD spend (shared cache; refresh invalidates). */
+const ADMIN_COST_MRR_SNAPSHOT_QUERY_KEY = ['admin', 'cost', 'mrr-snapshot'] as const;
+
 async function fetchMrrSnapshot(): Promise<MrrSnapshot> {
   // Count active/trialing subscribers. Lifetime-access users are not counted
   // toward MRR (they've already paid one-off), but they still consume AI —
@@ -183,29 +187,39 @@ async function fetchMrrSnapshot(): Promise<MrrSnapshot> {
 }
 
 export function CostAnalytics() {
+  const queryClient = useQueryClient();
   const [period, setPeriod] = useState<TimePeriod>('7d');
   const [rows7d, setRows7d] = useState<AttemptRow[]>([]);
   const [rowsPeriod, setRowsPeriod] = useState<AttemptRow[]>([]);
-  const [mrr, setMrr] = useState<MrrSnapshot | null>(null);
   const [loading, setLoading] = useState(true);
 
-  const refresh = useCallback(async () => {
+  const { data: mrr, isPending: mrrPending } = useQuery({
+    queryKey: ADMIN_COST_MRR_SNAPSHOT_QUERY_KEY,
+    queryFn: fetchMrrSnapshot,
+    staleTime: 60_000,
+    refetchOnWindowFocus: false,
+  });
+
+  const loadAttempts = useCallback(async () => {
     setLoading(true);
     try {
-      const [periodData, sevenDayData, mrrSnap] = await Promise.all([
+      const [periodData, sevenDayData] = await Promise.all([
         fetchAttempts(period),
         period === '7d' ? Promise.resolve<AttemptRow[] | null>(null) : fetchAttempts('7d'),
-        fetchMrrSnapshot(),
       ]);
       setRowsPeriod(periodData);
       setRows7d(sevenDayData ?? periodData);
-      setMrr(mrrSnap);
     } finally {
       setLoading(false);
     }
   }, [period]);
 
-  useEffect(() => { void refresh(); }, [refresh]);
+  const refreshAll = useCallback(async () => {
+    await loadAttempts();
+    await queryClient.invalidateQueries({ queryKey: ADMIN_COST_MRR_SNAPSHOT_QUERY_KEY });
+  }, [loadAttempts, queryClient]);
+
+  useEffect(() => { void loadAttempts(); }, [loadAttempts]);
 
   const features = useMemo(() => summarizeByFeature(rowsPeriod), [rowsPeriod]);
   const topUsers = useMemo(() => summarizeByUser(rows7d), [rows7d]);
@@ -234,7 +248,7 @@ export function CostAnalytics() {
           Cost analytics
         </h3>
         <button
-          onClick={() => void refresh()}
+          onClick={() => void refreshAll()}
           className="flex items-center gap-1 text-[10px] font-sans font-medium text-muted-foreground/50 hover:text-nox-text-link"
         >
           <RefreshCw className="h-3 w-3" />
@@ -285,7 +299,7 @@ export function CostAnalytics() {
           Ratio &gt; 25% means AI cost is eating a large slice of revenue — worth rethinking
           defaults before the hard cap fires.
         </p>
-        <MrrCard snapshot={mrr} loading={loading} />
+        <MrrCard snapshot={mrr ?? null} loading={mrrPending} />
       </section>
 
       {/* Provider health (circuit breakers) */}
