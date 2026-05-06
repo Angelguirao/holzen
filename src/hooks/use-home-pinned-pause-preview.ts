@@ -16,6 +16,11 @@ export function homePinnedPausePreviewQueryKey(userId: string, pinnedId: string)
   return ['home', 'pinned-pause-preview', userId, pinnedId] as const;
 }
 
+/** User-scoped prefix for `invalidateQueries` / `removeQueries` over every pinned-id variant. */
+export function homePinnedPausePreviewQueryPrefix(userId: string) {
+  return ['home', 'pinned-pause-preview', userId] as const;
+}
+
 function readPinnedId(): string | null {
   try {
     return localStorage.getItem(PINNED_KEY);
@@ -90,7 +95,7 @@ export function useHomePinnedPausePreview(user: User | null): {
     }
     setPinnedLocalId(null);
     if (userId) {
-      void queryClient.removeQueries({ queryKey: ['home', 'pinned-pause-preview', userId] });
+      void queryClient.removeQueries({ queryKey: homePinnedPausePreviewQueryPrefix(userId) });
     }
   }, [queryClient, userId]);
 
