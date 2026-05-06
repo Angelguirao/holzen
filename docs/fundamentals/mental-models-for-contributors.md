@@ -37,6 +37,7 @@ If you wonder **“why not Next.js / a full framework?”**, see [spa-framework-
 | **Pause flow, companions, cron** | [systems/pause/ai-powered-pause-system.md](../systems/pause/ai-powered-pause-system.md), [ops/cron-setup.md](../ops/cron-setup.md) |
 | **Auth & RLS** | [systems/auth/auth-and-referral-system.md](../systems/auth/auth-and-referral-system.md), [systems/routing/route-gating-system.md](../systems/routing/route-gating-system.md) |
 | **HTTP-only testing** (Bruno, Postman) | [http-review-playbooks.md](http-review-playbooks.md) — app behavior still needs the browser |
+| **Who enforces rules vs who projects UI** (layers, symmetry, TanStack Query vs UI state) | [client-server-architecture-holzen.md](client-server-architecture-holzen.md) |
 
 ---
 

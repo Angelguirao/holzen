@@ -9,6 +9,7 @@ It complements:
 - **[`docs/backlog/react-page-and-hook-splitting.md`](../backlog/react-page-and-hook-splitting.md)** — living checklist of **slices shipped** and remaining opportunities.
 - **[`docs/fundamentals/navigating-the-codebase.md`](navigating-the-codebase.md)** — where state and data patterns live today.
 - **[`docs/fundamentals/mental-models-for-contributors.md`](mental-models-for-contributors.md)** — SPA / hooks mental model.
+- **[`docs/fundamentals/client-server-architecture-holzen.md`](client-server-architecture-holzen.md)** — truth vs projection; how vertical slices (`UI` → `src/lib` → I/O) align with **server authority**.
 - **[`AGENTS.md`](../../AGENTS.md)** — repo conventions and ESLint baseline.
 
 ---
