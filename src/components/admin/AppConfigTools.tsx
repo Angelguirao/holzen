@@ -7,7 +7,7 @@
  * in `supabase/functions/_shared/app-config.ts`).
  */
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { AlertTriangle, Check, DollarSign, Loader2, Mail, Power, RefreshCw, Save, Users, Zap } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
@@ -182,6 +182,7 @@ async function saveRow(key: string, value: unknown): Promise<void> {
 
 export function AppConfigTools() {
   const { toast } = useToast();
+  const queryClient = useQueryClient();
   const [state, setState] = useState<ConfigState>(DEFAULTS);
   const [initial, setInitial] = useState<ConfigState>(DEFAULTS);
   const [spend, setSpend] = useState<SpendSnapshot>({ dailyGlobal: null, monthlyGlobal: null });
@@ -211,6 +212,19 @@ export function AppConfigTools() {
 
   const refresh = useCallback(() => refetch(), [refetch]);
 
+  const syncBundleQueryCache = useCallback(
+    (nextConfig: ConfigState) => {
+      queryClient.setQueryData<{ config: ConfigState; spend: SpendSnapshot }>(
+        ADMIN_APP_CONFIG_TOOLS_QUERY_KEY,
+        (prev) => ({
+          config: nextConfig,
+          spend: prev?.spend ?? { dailyGlobal: null, monthlyGlobal: null },
+        }),
+      );
+    },
+    [queryClient],
+  );
+
   const mark = (k: string, busy: boolean) =>
     setSaving((prev) => {
       const next = new Set(prev);
@@ -223,6 +237,7 @@ export function AppConfigTools() {
     try {
       await saveRow(key, value);
       setInitial(optimistic);
+      syncBundleQueryCache(optimistic);
       toast({ title: 'Saved', description: key });
     } catch (e) {
       const msg = e instanceof Error ? e.message : 'save failed';
@@ -231,7 +246,7 @@ export function AppConfigTools() {
     } finally {
       mark(key, false);
     }
-  }, [initial, toast]);
+  }, [initial, toast, syncBundleQueryCache]);
 
   const signupsDirty = state.signups_enabled !== initial.signups_enabled
     || state.signups_max_per_day !== initial.signups_max_per_day;
@@ -616,6 +631,7 @@ export function AppConfigTools() {
                 try {
                   await saveRow('feature_flags', nextFlags);
                   setInitial(optimistic);
+                  syncBundleQueryCache(optimistic);
                   toast({ title: 'Saved', description: `feature:${k}` });
                 } catch (e) {
                   const msg = e instanceof Error ? e.message : 'save failed';
