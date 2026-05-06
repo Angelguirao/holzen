@@ -21,6 +21,7 @@ import { trackEvent } from '@/lib/posthog';
 import { invokeEdge } from '@/lib/invoke-edge';
 import { practiceEntriesWeeklyCountQueryKey } from '@/components/PracticeWidget';
 import { practicePrimarySuggestionQueryKey } from '@/hooks/use-practice-suggestion';
+import { toolsHubDataQueryKey } from '@/hooks/use-tools-hub-data';
 import { groundHistoryEntriesQueryKey, groundHistoryStatsQueryKey } from '@/pages/GroundHistory';
 import {
   AlertDialog,
@@ -357,6 +358,7 @@ export default function Ground() {
       if (!error) {
         void queryClient.invalidateQueries({ queryKey: practiceEntriesWeeklyCountQueryKey(user.id) });
         void queryClient.invalidateQueries({ queryKey: practicePrimarySuggestionQueryKey(user.id) });
+        void queryClient.invalidateQueries({ queryKey: toolsHubDataQueryKey(user.id) });
         void queryClient.invalidateQueries({ queryKey: groundHistoryStatsQueryKey(user.id) });
         void queryClient.invalidateQueries({ queryKey: groundHistoryEntriesQueryKey(user.id) });
       }

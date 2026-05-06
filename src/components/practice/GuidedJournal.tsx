@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { motion, AnimatePresence } from 'framer-motion';
 import { practiceEntriesWeeklyCountQueryKey } from '@/components/PracticeWidget';
 import { practicePrimarySuggestionQueryKey } from '@/hooks/use-practice-suggestion';
+import { toolsHubDataQueryKey } from '@/hooks/use-tools-hub-data';
 import { supabase } from '@/integrations/supabase/client';
 import { invokeEdge } from '@/lib/invoke-edge';
 import { useAuth } from '@/hooks/use-auth';
@@ -115,6 +116,7 @@ export function GuidedJournal({ onComplete, textColor, ringColor }: Props) {
       if (practiceError) throw practiceError;
       void queryClient.invalidateQueries({ queryKey: practiceEntriesWeeklyCountQueryKey(user.id) });
       void queryClient.invalidateQueries({ queryKey: practicePrimarySuggestionQueryKey(user.id) });
+      void queryClient.invalidateQueries({ queryKey: toolsHubDataQueryKey(user.id) });
       hapticFeedback('success');
       setDone(true);
       setTimeout(onComplete, 1500);
