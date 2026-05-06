@@ -20,6 +20,7 @@ import { parseEdgeFunctionError, toUserFacingAiErrorMessage } from '@/lib/edge-f
 import { trackEvent } from '@/lib/posthog';
 import { invokeEdge } from '@/lib/invoke-edge';
 import { practiceEntriesWeeklyCountQueryKey } from '@/components/PracticeWidget';
+import { groundHistoryStatsQueryKey } from '@/pages/GroundHistory';
 import {
   AlertDialog,
   AlertDialogCancel,
@@ -354,6 +355,7 @@ export default function Ground() {
       });
       if (!error) {
         void queryClient.invalidateQueries({ queryKey: practiceEntriesWeeklyCountQueryKey(user.id) });
+        void queryClient.invalidateQueries({ queryKey: groundHistoryStatsQueryKey(user.id) });
       }
     }
 

@@ -23,7 +23,8 @@ interface GroundingEntry {
 const ease: [number, number, number, number] = [0.22, 1, 0.36, 1];
 const PAGE_SIZE = 20;
 
-function groundHistoryStatsQueryKey(userId: string) {
+/** Used by `Ground` after a ritual save so Journey → Grounding history totals refresh without staleTime wait. */
+export function groundHistoryStatsQueryKey(userId: string) {
   return ['tools', 'ground-history', 'stats', userId] as const;
 }
 
