@@ -1,6 +1,8 @@
 import { useState, useCallback, useEffect, useRef } from 'react';
+import { useQueryClient } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
 import { motion, AnimatePresence } from 'framer-motion';
+import { practiceEntriesWeeklyCountQueryKey } from '@/components/PracticeWidget';
 import { supabase } from '@/integrations/supabase/client';
 import { invokeEdge } from '@/lib/invoke-edge';
 import { useAuth } from '@/hooks/use-auth';
@@ -30,6 +32,7 @@ interface Props {
 export function GuidedJournal({ onComplete, textColor, ringColor }: Props) {
   const { t } = useTranslation();
   const { user } = useAuth();
+  const queryClient = useQueryClient();
   const { language } = useHolzen();
   const [prompts, setPrompts] = useState<string[]>([]);
   const [promptIndex, setPromptIndex] = useState(0);
@@ -109,6 +112,7 @@ export function GuidedJournal({ onComplete, textColor, ringColor }: Props) {
         prompt,
       });
       if (practiceError) throw practiceError;
+      void queryClient.invalidateQueries({ queryKey: practiceEntriesWeeklyCountQueryKey(user.id) });
       hapticFeedback('success');
       setDone(true);
       setTimeout(onComplete, 1500);
@@ -117,7 +121,7 @@ export function GuidedJournal({ onComplete, textColor, ringColor }: Props) {
     } finally {
       setSaving(false);
     }
-  }, [user, body, prompt, onComplete, t]);
+  }, [user, body, prompt, onComplete, t, queryClient]);
 
   return (
     <motion.div
