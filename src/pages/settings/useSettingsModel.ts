@@ -1,4 +1,6 @@
+import { useQueryClient } from '@tanstack/react-query';
 import { useAuth } from '@/hooks/use-auth';
+import { getProfileRowQueryOptions } from '@/hooks/use-profile';
 import { useHolzen } from '@/hooks/use-holzen';
 import { useSubscription } from '@/hooks/use-subscription';
 import { useInstallPrompt } from '@/hooks/use-install-prompt';
@@ -19,6 +21,7 @@ import { isHapticEnabled, setHapticEnabled as persistHapticEnabled } from '@/lib
 
 export function useSettingsModel() {
   const { t } = useTranslation();
+  const queryClient = useQueryClient();
   const { user, signOut } = useAuth();
   const {
     threshold,
@@ -191,14 +194,15 @@ export function useSettingsModel() {
     if (!user) return;
     setExporting(true);
     try {
+      const userId = user.id;
       const [
-        { data: profile },
+        profile,
         { data: pauses },
         { data: stepEvents },
         { data: companionEvents },
         { data: artifacts },
       ] = await Promise.all([
-        supabase.from('profiles').select('*').eq('user_id', user.id).single(),
+        queryClient.fetchQuery(getProfileRowQueryOptions(userId)),
         supabase
           .from('v_pause_full' as never)
           .select('*')
