@@ -1,10 +1,11 @@
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
+import { useQuery } from '@tanstack/react-query';
 import { AnimatePresence, motion, useReducedMotion } from 'framer-motion';
 import { HoldGoalWidget } from '@/components/HoldGoalWidget';
 import { useHolzen } from '@/hooks/use-holzen';
 import { useAuth } from '@/hooks/use-auth';
-import { supabase } from '@/integrations/supabase/client';
+import { getProfileRowQueryOptions } from '@/hooks/use-profile';
 import { computeHoldGoalCompactHeadline, type HoldGoalHeadlineGoal } from '@/lib/hold-goal-headline';
 import { cn } from '@/lib/utils';
 
@@ -26,39 +27,23 @@ export function HomeGoalWhyCard({
   const { t } = useTranslation();
   const { motivations } = useHolzen();
   const { user } = useAuth();
+  const userId = user?.id;
   const prefersReduced = useReducedMotion();
-  const [holdGoal, setHoldGoal] = useState<HoldGoalRow | null>(null);
-  const [holdLoading, setHoldLoading] = useState(true);
 
-  const loadHoldGoal = useCallback(async () => {
-    if (!user) {
-      setHoldGoal(null);
-      setHoldLoading(false);
-      return;
-    }
-    const { data } = await supabase
-      .from('profiles')
-      .select('hold_goal_type, hold_goal_start, hold_goal_target_months, hold_goal_target_price, hold_goal_currency')
-      .eq('user_id', user.id)
-      .single();
+  const { data: profileRow, status: profileQueryStatus } = useQuery(getProfileRowQueryOptions(userId));
 
-    if (data?.hold_goal_type) {
-      setHoldGoal({
-        type: data.hold_goal_type as HoldGoalRow['type'],
-        start: data.hold_goal_start,
-        targetMonths: data.hold_goal_target_months,
-        targetPrice: data.hold_goal_target_price,
-        currency: data.hold_goal_currency || 'USD',
-      });
-    } else {
-      setHoldGoal(null);
-    }
-    setHoldLoading(false);
-  }, [user]);
+  const holdLoading = Boolean(userId && profileQueryStatus !== 'success' && profileQueryStatus !== 'error');
 
-  useEffect(() => {
-    void loadHoldGoal();
-  }, [loadHoldGoal]);
+  const holdGoal = useMemo((): HoldGoalRow | null => {
+    if (!userId || profileQueryStatus !== 'success' || !profileRow?.hold_goal_type) return null;
+    return {
+      type: profileRow.hold_goal_type as HoldGoalRow['type'],
+      start: profileRow.hold_goal_start,
+      targetMonths: profileRow.hold_goal_target_months,
+      targetPrice: profileRow.hold_goal_target_price,
+      currency: profileRow.hold_goal_currency || 'USD',
+    };
+  }, [userId, profileQueryStatus, profileRow]);
 
   const motivationLine = useMemo(
     () => motivations.map((m) => t(`settings.motivations.${m}`, m)).join(' \u00B7 '),

@@ -22,6 +22,20 @@ const PROFILE_SELECT_COLUMNS =
  * Loads (or creates) the caller's `profiles` row. Used as a single `queryFn` so all
  * subscribers share one in-flight request per `userId`.
  */
+const PROFILE_QUERY_SIGNED_OUT_KEY = '__signed_out__';
+
+/** Shared `useQuery` options for the signed-in `profiles` row (cache + `queryFn` aligned across subscribers). */
+export function getProfileRowQueryOptions(userId: string | undefined) {
+  return {
+    queryKey: PROFILE_QUERY_KEY(userId ?? PROFILE_QUERY_SIGNED_OUT_KEY),
+    queryFn: () => fetchProfileRowForUser(userId!),
+    enabled: Boolean(userId),
+    staleTime: 0,
+    refetchOnWindowFocus: false,
+    retry: false,
+  } as const;
+}
+
 export async function fetchProfileRowForUser(userId: string): Promise<ProfileRow | null> {
   holzenLog.profile('fetch profiles', { userIdPrefix: userId.slice(0, 8) });
   const initial = await supabase
@@ -81,16 +95,7 @@ export function useProfile() {
     status: profileQueryStatus,
     error: profileQueryError,
     refetch: refetchProfile,
-  } = useQuery({
-    queryKey: PROFILE_QUERY_KEY(userId ?? '__signed_out__'),
-    queryFn: () => fetchProfileRowForUser(userId!),
-    enabled: Boolean(userId),
-    // Fresh on remount so a newly mounted `useHolzen` tree does not hydrate from a stale
-    // cached row after another surface updated `profiles` (deduped when mounts overlap).
-    staleTime: 0,
-    refetchOnWindowFocus: false,
-    retry: false,
-  });
+  } = useQuery(getProfileRowQueryOptions(userId));
 
   const [threshold, setThresholdState] = useState(5);
   const [thresholdDown, setThresholdDownState] = useState(5);
