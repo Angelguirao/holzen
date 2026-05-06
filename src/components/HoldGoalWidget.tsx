@@ -1,11 +1,11 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 
 import { useTranslation } from 'react-i18next';
-import { useQueryClient } from '@tanstack/react-query';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/use-auth';
 import { useHolzen } from '@/hooks/use-holzen';
-import { PROFILE_QUERY_KEY } from '@/hooks/use-profile';
+import { getProfileRowQueryOptions, PROFILE_QUERY_KEY } from '@/hooks/use-profile';
 import { formatBtcPrice, SUPPORTED_CURRENCIES } from '@/lib/btc';
 import { computeHoldGoalCompactHeadline } from '@/lib/hold-goal-headline';
 import { Target, Calendar, Coins, Infinity as InfinityIcon, X, Check, Pencil } from 'lucide-react';
@@ -16,6 +16,7 @@ import { toast } from 'sonner';
 import { homeInWidget } from '@/components/home/home-widget-styles';
 import type { Database } from '@/integrations/supabase/types';
 
+type ProfileRow = Database['public']['Tables']['profiles']['Row'];
 type ProfilesHoldGoalUpdate = Pick<
   Database['public']['Tables']['profiles']['Update'],
   | 'hold_goal_type'
@@ -72,16 +73,31 @@ export function HoldGoalWidget({
   const queryClient = useQueryClient();
   const { currency } = useHolzen();
   const { user } = useAuth();
+  const userId = user?.id;
+
+  const { data: profileRow, status: profileQueryStatus } = useQuery(getProfileRowQueryOptions(userId));
+  const loading = Boolean(userId && profileQueryStatus !== 'success' && profileQueryStatus !== 'error');
 
   const bumpProfileCache = useCallback(() => {
-    if (!user?.id) return;
-    void queryClient.invalidateQueries({ queryKey: PROFILE_QUERY_KEY(user.id) });
-  }, [queryClient, user?.id]);
+    if (!userId) return;
+    void queryClient.invalidateQueries({ queryKey: PROFILE_QUERY_KEY(userId) });
+  }, [queryClient, userId]);
+
+  /** Keeps TanStack cache aligned with a successful hold-goal write so sync-from-cache does not race refetch. */
+  const mergeHoldGoalIntoProfileCache = useCallback(
+    (patch: Partial<Pick<ProfileRow, keyof ProfilesHoldGoalUpdate | 'hold_goal_type'>>) => {
+      if (!userId) return;
+      queryClient.setQueryData<ProfileRow | null>(PROFILE_QUERY_KEY(userId), (prev) =>
+        prev ? { ...prev, ...patch } : prev,
+      );
+      bumpProfileCache();
+    },
+    [bumpProfileCache, queryClient, userId],
+  );
 
   const isWire = variant === 'wireframe';
   const wireCompact = isWire && !wireframeDetailsExpanded;
   const [goal, setGoal] = useState<HoldGoal | null>(null);
-  const [loading, setLoading] = useState(true);
   const [setting, setSetting] = useState(false);
   const [goalType, setGoalType] = useState<GoalType>('time');
   const [timeUnit, setTimeUnit] = useState<TimeUnit>('months');
@@ -93,27 +109,29 @@ export function HoldGoalWidget({
   const headlineCb = useRef(onCompactHeadlineChange);
   headlineCb.current = onCompactHeadlineChange;
 
-  const loadGoal = useCallback(async () => {
-    if (!user) return;
-    const { data } = await supabase
-      .from('profiles')
-      .select('hold_goal_type, hold_goal_start, hold_goal_target_months, hold_goal_target_price, hold_goal_currency')
-      .eq('user_id', user.id)
-      .single();
-
-    if (data?.hold_goal_type) {
-      setGoal({
-        type: data.hold_goal_type as GoalType,
-        start: data.hold_goal_start,
-        targetMonths: data.hold_goal_target_months,
-        targetPrice: data.hold_goal_target_price,
-        currency: data.hold_goal_currency || 'USD',
-      });
+  useEffect(() => {
+    if (!userId) {
+      setGoal(null);
+      return;
     }
-    setLoading(false);
-  }, [user]);
-
-  useEffect(() => { loadGoal(); }, [loadGoal]);
+    if (setting) return;
+    if (profileQueryStatus === 'error') {
+      setGoal(null);
+      return;
+    }
+    if (profileQueryStatus !== 'success' || !profileRow) return;
+    if (profileRow.hold_goal_type) {
+      setGoal({
+        type: profileRow.hold_goal_type as GoalType,
+        start: profileRow.hold_goal_start ?? '',
+        targetMonths: profileRow.hold_goal_target_months ?? undefined,
+        targetPrice: profileRow.hold_goal_target_price ?? undefined,
+        currency: profileRow.hold_goal_currency || 'USD',
+      });
+    } else {
+      setGoal(null);
+    }
+  }, [userId, profileQueryStatus, profileRow, setting]);
 
   useEffect(() => {
     if (loading) return;
@@ -211,8 +229,7 @@ export function HoldGoalWidget({
         hold_goal_currency: currency,
       };
       const { error: saveError } = await supabase.from('profiles').update(updates).eq('user_id', user.id);
-      if (!saveError) bumpProfileCache();
-      setGoal({ type: 'forever', start: updates.hold_goal_start, currency });
+      if (!saveError) mergeHoldGoalIntoProfileCache(updates);
       setSetting(false);
       setInputValue('');
       toast(t('holdGoal.goalSavedForever'));
@@ -236,14 +253,7 @@ export function HoldGoalWidget({
     };
 
     const { error: saveError } = await supabase.from('profiles').update(updates).eq('user_id', user.id);
-    if (!saveError) bumpProfileCache();
-    setGoal({
-      type: goalType,
-      start: updates.hold_goal_start,
-      targetMonths: updates.hold_goal_target_months,
-      targetPrice: updates.hold_goal_target_price,
-      currency,
-    });
+    if (!saveError) mergeHoldGoalIntoProfileCache(updates);
     setSetting(false);
     setInputValue('');
     setValidationError(null);
@@ -257,8 +267,14 @@ export function HoldGoalWidget({
       hold_goal_target_months: null,
       hold_goal_target_price: null,
     }).eq('user_id', user.id);
-    if (!error) bumpProfileCache();
-    setGoal(null);
+    if (!error) {
+      mergeHoldGoalIntoProfileCache({
+        hold_goal_type: null,
+        hold_goal_start: null,
+        hold_goal_target_months: null,
+        hold_goal_target_price: null,
+      });
+    }
   };
 
   if (loading) return null;
