@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
+import { useQuery } from '@tanstack/react-query';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Anchor, Clock, Calendar } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
@@ -21,6 +22,25 @@ interface GroundingEntry {
 
 const ease: [number, number, number, number] = [0.22, 1, 0.36, 1];
 const PAGE_SIZE = 20;
+
+function groundHistoryStatsQueryKey(userId: string) {
+  return ['tools', 'ground-history', 'stats', userId] as const;
+}
+
+async function fetchGroundingHistoryStats(userId: string): Promise<{ totalSessions: number; totalMinutes: number }> {
+  const { data, count, error } = await supabase
+    .from('practice_entries')
+    .select('duration_seconds', { count: 'exact' })
+    .eq('user_id', userId)
+    .eq('type', 'grounding');
+
+  if (error || !data) {
+    return { totalSessions: 0, totalMinutes: 0 };
+  }
+  const totalSessions = count ?? data.length;
+  const mins = data.reduce((sum, e) => sum + ((e.duration_seconds as number) || 0), 0) / 60;
+  return { totalSessions, totalMinutes: Math.round(mins) };
+}
 
 function formatDuration(seconds: number): string {
   if (seconds < 60) return `${seconds}s`;
@@ -51,12 +71,22 @@ export default function GroundHistory() {
   const { t, i18n } = useTranslation();
   const navigate = useNavigate();
   const { user } = useAuth();
+  const userId = user?.id;
   const [entries, setEntries] = useState<GroundingEntry[]>([]);
   const [loading, setLoading] = useState(true);
   const [hasMore, setHasMore] = useState(true);
   const [listFetchFailed, setListFetchFailed] = useState(false);
-  const [totalMinutes, setTotalMinutes] = useState(0);
-  const [totalSessions, setTotalSessions] = useState(0);
+
+  const { data: groundingStats } = useQuery({
+    queryKey: userId ? groundHistoryStatsQueryKey(userId) : ['tools', 'ground-history', 'stats', 'none'],
+    queryFn: () => fetchGroundingHistoryStats(userId!),
+    enabled: Boolean(userId),
+    staleTime: 60_000,
+    refetchOnWindowFocus: false,
+    retry: false,
+  });
+  const totalSessions = groundingStats?.totalSessions ?? 0;
+  const totalMinutes = groundingStats?.totalMinutes ?? 0;
 
   const fetchEntries = useCallback(
     async (offset = 0) => {
@@ -105,27 +135,6 @@ export default function GroundHistory() {
     },
     [user, t],
   );
-
-  // Fetch stats
-  useEffect(() => {
-    if (!user) return;
-    void (async () => {
-      const { data, count, error } = await supabase
-        .from('practice_entries')
-        .select('duration_seconds', { count: 'exact' })
-        .eq('user_id', user.id)
-        .eq('type', 'grounding');
-
-      if (error || !data) {
-        setTotalSessions(0);
-        setTotalMinutes(0);
-        return;
-      }
-      setTotalSessions(count ?? data.length);
-      const mins = data.reduce((sum, e) => sum + ((e.duration_seconds as number) || 0), 0) / 60;
-      setTotalMinutes(Math.round(mins));
-    })();
-  }, [user]);
 
   useEffect(() => {
     fetchEntries(0);
