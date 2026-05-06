@@ -1,7 +1,9 @@
 import { ThumbsUp, ThumbsDown, RefreshCw } from 'lucide-react';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
+import { useAuth } from '@/hooks/use-auth';
 import { hapticFeedback } from '@/lib/haptics';
 import { FEEDBACK_TO_CACHE_TYPE } from '@/lib/companion-types';
 import type { RegenerateCompanionSlot } from '@/hooks/use-companion-data';
@@ -20,6 +22,31 @@ function voteFromMetadata(metadata: Json | null | undefined): 'up' | 'down' | nu
   if (!metadata || typeof metadata !== 'object' || Array.isArray(metadata)) return null;
   const v = (metadata as Record<string, unknown>).vote;
   return v === 'up' || v === 'down' ? v : null;
+}
+
+function companionFeedbackVoteQueryKey(userId: string, pauseInstanceId: string, companionType: string) {
+  return ['companion-feedback-vote', userId, pauseInstanceId, companionType] as const;
+}
+
+async function fetchCompanionFeedbackVote(
+  userId: string,
+  pauseInstanceId: string,
+  companionType: string,
+): Promise<'up' | 'down' | null> {
+  try {
+    const { data } = await supabase
+      .from('analytics_events')
+      .select('metadata')
+      .eq('user_id', userId)
+      .eq('event', 'companion_feedback')
+      .filter('metadata->>pause_instance_id', 'eq', pauseInstanceId)
+      .filter('metadata->>companion_type', 'eq', companionType)
+      .limit(1);
+    if (!data || data.length === 0) return null;
+    return voteFromMetadata(data[0].metadata);
+  } catch {
+    return null;
+  }
 }
 
 interface Props {
@@ -51,10 +78,31 @@ export function CompanionFeedback({
   regenerating,
 }: Props) {
   const { t } = useTranslation();
-  const [vote, setVote] = useState<'up' | 'down' | null>(null);
+  const { user } = useAuth();
+  const userId = user?.id;
+  const queryClient = useQueryClient();
+  const [optimisticVote, setOptimisticVote] = useState<'up' | 'down' | null>(null);
   const [loading, setLoading] = useState(false);
   const { isPro, requirePro, startCheckout } = useProGate();
   const { companionRemaining, flexCreditsBalance, applyOptimisticDecrement, refresh: refreshSubscription } = useSubscription();
+
+  useEffect(() => {
+    setOptimisticVote(null);
+  }, [pauseInstanceId, companionType, userId]);
+
+  const { data: persistedVote = null } = useQuery({
+    queryKey:
+      userId && pauseInstanceId
+        ? companionFeedbackVoteQueryKey(userId, pauseInstanceId, companionType)
+        : ['companion-feedback-vote', 'none'],
+    queryFn: () => fetchCompanionFeedbackVote(userId!, pauseInstanceId!, companionType),
+    enabled: Boolean(userId && pauseInstanceId),
+    staleTime: 60_000,
+    refetchOnWindowFocus: false,
+    retry: false,
+  });
+
+  const vote = optimisticVote ?? persistedVote;
 
   const canRegenerate = Boolean(
     pauseInstanceId && regenerateSlot && onRegenerate && isCompanionRegenerateUiEnabled(),
@@ -67,50 +115,18 @@ export function CompanionFeedback({
     flexCreditsBalance,
   });
 
-  // Load existing vote on mount (check if user already voted for this reflection+companion)
-  useEffect(() => {
-    if (!pauseInstanceId) return;
-
-    let cancelled = false;
-    (async () => {
-      try {
-        const { data: { user } } = await supabase.auth.getUser();
-        if (!user || cancelled) return;
-
-        const { data } = await supabase
-          .from('analytics_events')
-          .select('metadata')
-          .eq('user_id', user.id)
-          .eq('event', 'companion_feedback')
-          .filter('metadata->>pause_instance_id', 'eq', pauseInstanceId)
-          .filter('metadata->>companion_type', 'eq', companionType)
-          .limit(1);
-
-        if (cancelled || !data || data.length === 0) return;
-
-        setVote(voteFromMetadata(data[0].metadata));
-      } catch {
-        // Non-critical
-      }
-    })();
-
-    return () => { cancelled = true; };
-  }, [pauseInstanceId, companionType]);
-
-  const handleVote = async (type: 'up' | 'down') => {
+  const handleVote = useCallback(async (type: 'up' | 'down') => {
     if (vote || loading || regenBusy) return;
+    if (!userId) return;
     setLoading(true);
-    setVote(type);
+    setOptimisticVote(type);
     hapticFeedback('light');
 
     try {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) { setVote(null); return; }
-
       const cacheType = FEEDBACK_TO_CACHE_TYPE[companionType];
 
       const { error } = await supabase.from('analytics_events').insert({
-        user_id: user.id,
+        user_id: userId,
         event: 'companion_feedback',
         metadata: {
           companion_type: companionType,
@@ -120,13 +136,33 @@ export function CompanionFeedback({
           pause_instance_id: pauseInstanceId || null,
         },
       });
-      if (error) setVote(null); // rollback optimistic update on failure
+      if (error) {
+        setOptimisticVote(null);
+        return;
+      }
+      if (pauseInstanceId) {
+        queryClient.setQueryData<'up' | 'down' | null>(
+          companionFeedbackVoteQueryKey(userId, pauseInstanceId, companionType),
+          type,
+        );
+        setOptimisticVote(null);
+      }
+      // No pause_instance_id: prior UI kept local vote only (no server read key); leave optimistic set.
     } catch {
-      setVote(null); // rollback on unexpected error
+      setOptimisticVote(null);
     } finally {
       setLoading(false);
     }
-  };
+  }, [
+    vote,
+    loading,
+    regenBusy,
+    userId,
+    pauseInstanceId,
+    companionType,
+    cacheId,
+    queryClient,
+  ]);
 
   const handleRegenerate = () => {
     if (!canRegenerate || regenBusy) return;
