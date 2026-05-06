@@ -1,11 +1,11 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useCallback, useMemo } from 'react';
+import { useInfiniteQuery, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { invokeEdge } from '@/lib/invoke-edge';
 import { useAuth } from '@/hooks/use-auth';
 import { useHolzen } from '@/hooks/use-holzen';
 import { useTranslation } from 'react-i18next';
 import { RefreshCw, TrendingUp, Clock, Brain, Sparkles, Target, Loader2, Lock } from 'lucide-react';
-import { Button } from '@/components/ui/button';
 import { LoadingButton } from '@/components/ui/loading-button';
 import { toast } from 'sonner';
 import { format } from 'date-fns';
@@ -64,9 +64,24 @@ interface Props {
   completedPauseCount: number;
 }
 
+const REFLECTION_INSIGHTS_QUERY_KEY = (userId: string) => ['reflection-insights', userId] as const;
+
+async function fetchReflectionInsightsPage(userId: string, offset: number): Promise<InsightsRow[]> {
+  const { data: rows, error } = await supabase
+    .from('reflection_insights')
+    .select('*')
+    .eq('user_id', userId)
+    .order('generated_at', { ascending: false })
+    .range(offset, offset + PAGE_SIZE - 1);
+  if (error) throw error;
+  return (rows as unknown as InsightsRow[]) ?? [];
+}
+
 export function AIInsightsPanel({ completedPauseCount }: Props) {
   const { t } = useTranslation();
   const { user } = useAuth();
+  const userId = user?.id;
+  const queryClient = useQueryClient();
   const { language } = useHolzen();
   const {
     subscribed,
@@ -78,51 +93,40 @@ export function AIInsightsPanel({ completedPauseCount }: Props) {
     startCheckout,
   } = useSubscription();
   const { isPro, requirePro } = useProGate();
-  const [allData, setAllData] = useState<InsightsRow[]>([]);
-  const [loading, setLoading] = useState(true);
   const [generating, setGenerating] = useState(false);
-  const [hasMore, setHasMore] = useState(true);
-  const [loadingMore, setLoadingMore] = useState(false);
 
-  const loadInsights = useCallback(async () => {
-    if (!user) return;
-    const { data: rows } = await supabase
-      .from('reflection_insights')
-      .select('*')
-      .eq('user_id', user.id)
-      .order('generated_at', { ascending: false })
-      .range(0, PAGE_SIZE - 1);
+  const {
+    data: insightPages,
+    isPending,
+    hasNextPage,
+    isFetchingNextPage,
+    fetchNextPage,
+  } = useInfiniteQuery({
+    queryKey: userId ? REFLECTION_INSIGHTS_QUERY_KEY(userId) : ['reflection-insights', 'none'],
+    queryFn: ({ pageParam }) => fetchReflectionInsightsPage(userId!, pageParam),
+    initialPageParam: 0,
+    getNextPageParam: (lastPage, allPages) => {
+      if (lastPage.length < PAGE_SIZE) return undefined;
+      return allPages.reduce((sum, p) => sum + p.length, 0);
+    },
+    enabled: Boolean(userId),
+    staleTime: 60_000,
+    refetchOnWindowFocus: false,
+  });
 
-    const parsed = (rows as unknown as InsightsRow[]) ?? [];
-    setAllData(parsed);
-    setHasMore(parsed.length === PAGE_SIZE);
-    setLoading(false);
-  }, [user]);
+  const allData = useMemo(() => insightPages?.pages.flat() ?? [], [insightPages]);
+  const loading = Boolean(userId) && isPending;
 
-  useEffect(() => {
-    loadInsights();
-  }, [loadInsights]);
+  const onLoadMore = useCallback(() => {
+    if (!hasNextPage || isFetchingNextPage) return;
+    void fetchNextPage();
+  }, [hasNextPage, isFetchingNextPage, fetchNextPage]);
 
-  const loadMore = useCallback(async () => {
-    if (!user || loadingMore || !hasMore) return;
-    setLoadingMore(true);
-    const offset = allData.length;
-    const { data: rows } = await supabase
-      .from('reflection_insights')
-      .select('*')
-      .eq('user_id', user.id)
-      .order('generated_at', { ascending: false })
-      .range(offset, offset + PAGE_SIZE - 1);
-    const parsed = (rows as unknown as InsightsRow[]) ?? [];
-    setAllData((prev) => {
-      const seen = new Set(prev.map((row) => row.id));
-      return [...prev, ...parsed.filter((row) => !seen.has(row.id))];
-    });
-    setHasMore(parsed.length === PAGE_SIZE);
-    setLoadingMore(false);
-  }, [user, loadingMore, hasMore, allData]);
-
-  const sentinelRef = useInfiniteScroll({ hasMore, loading: loadingMore, onLoadMore: loadMore });
+  const sentinelRef = useInfiniteScroll({
+    hasMore: Boolean(hasNextPage),
+    loading: isFetchingNextPage,
+    onLoadMore,
+  });
 
   const generateInsights = useCallback(async () => {
     if (!user) return;
@@ -165,7 +169,7 @@ export function AIInsightsPanel({ completedPauseCount }: Props) {
         showLimitReachedToast({ feature: 'insight', startCheckout });
         return;
       }
-      await loadInsights();
+      await queryClient.invalidateQueries({ queryKey: REFLECTION_INSIGHTS_QUERY_KEY(user.id) });
       toast(t('aiInsights.generated'));
     } catch (e) {
       const message = e instanceof Error ? e.message : t('aiInsights.failedToGenerate');
@@ -177,7 +181,7 @@ export function AIInsightsPanel({ completedPauseCount }: Props) {
   }, [
     user,
     language,
-    loadInsights,
+    queryClient,
     t,
     applyOptimisticDecrement,
     refreshSubscription,
@@ -312,7 +316,7 @@ export function AIInsightsPanel({ completedPauseCount }: Props) {
       ))}
 
       <div ref={sentinelRef} className="h-1" />
-      {loadingMore && (
+      {isFetchingNextPage && (
         <p className="text-[10px] font-mono text-muted-foreground animate-pulse text-center">{t('common.loadingMore')}</p>
       )}
     </div>
