@@ -1,4 +1,5 @@
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
+import { useQuery } from "@tanstack/react-query";
 import { useIsAdmin } from "@/hooks/use-is-admin";
 import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
@@ -68,6 +69,23 @@ const COVERAGE: Row[] = [
 // Functions exempt from full wrapper coverage. `health` is the obvious one (verify_jwt=false probe).
 const EXEMPT = new Set<string>(["health"]);
 
+const EDGE_COVERAGE_HEARTBEATS_QUERY_KEY = ["admin", "edge-coverage", "heartbeats"] as const;
+
+async function fetchHeartbeatConfigMap(): Promise<Record<string, string>> {
+  const { data, error } = await supabase
+    .from("app_config")
+    .select("key,value")
+    .like("key", "heartbeat.%");
+  if (error || !data) return {};
+  const map: Record<string, string> = {};
+  for (const row of data as Array<{ key: string; value: unknown }>) {
+    const job = row.key.replace(/^heartbeat\./, "");
+    const uuid = typeof row.value === "string" ? row.value : String(row.value ?? "");
+    if (job && uuid) map[job] = uuid;
+  }
+  return map;
+}
+
 type Severity = "missing" | "partial" | "ok";
 function severityOf(r: Row): Severity {
   if (EXEMPT.has(r.name)) return "ok";
@@ -86,36 +104,19 @@ export default function EdgeCoverage() {
   const { isAdmin, loading } = useIsAdmin();
   const [q, setQ] = useState("");
   const [filter, setFilter] = useState<"all" | Severity>("all");
-  const [heartbeats, setHeartbeats] = useState<Record<string, string> | null>(null);
 
-  useEffect(() => {
-    if (!isAdmin) return;
-    let cancelled = false;
-    supabase
-      .from("app_config")
-      .select("key,value")
-      .like("key", "heartbeat.%")
-      .then(({ data, error }) => {
-        if (cancelled || error || !data) {
-          if (!cancelled) setHeartbeats({});
-          return;
-        }
-        const map: Record<string, string> = {};
-        for (const row of data as Array<{ key: string; value: unknown }>) {
-          const job = row.key.replace(/^heartbeat\./, "");
-          // value is jsonb — usually a JSON string holding the UUID.
-          const uuid = typeof row.value === "string" ? row.value : String(row.value ?? "");
-          if (job && uuid) map[job] = uuid;
-        }
-        setHeartbeats(map);
-      });
-    return () => { cancelled = true; };
-  }, [isAdmin]);
+  const { data: heartbeats, isPending: heartbeatsPending } = useQuery({
+    queryKey: EDGE_COVERAGE_HEARTBEATS_QUERY_KEY,
+    queryFn: fetchHeartbeatConfigMap,
+    enabled: isAdmin,
+    staleTime: 60_000,
+    refetchOnWindowFocus: false,
+  });
 
-  const heartbeatCount = useMemo(
-    () => (heartbeats ? Object.keys(heartbeats).length : 0),
-    [heartbeats],
-  );
+  const heartbeatCount = useMemo(() => {
+    if (heartbeatsPending) return 0;
+    return Object.keys(heartbeats ?? {}).length;
+  }, [heartbeats, heartbeatsPending]);
 
   const rows = useMemo(() => {
     return COVERAGE.map((r) => ({ ...r, sev: severityOf(r) }))
@@ -198,7 +199,7 @@ export default function EdgeCoverage() {
               {" "}<code>pg_cron</code> job pings BetterStack via{" "}
               <code>emit_job_heartbeat()</code>. Missing rows mean the function isn't
               monitored for liveness (only for errors).
-              {heartbeats !== null && (
+              {!heartbeatsPending && (
                 <span className="ml-1">
                   Found <span className="font-medium text-foreground">{heartbeatCount}</span>
                   {" "}configured heartbeat key{heartbeatCount === 1 ? "" : "s"}.
@@ -272,7 +273,7 @@ export default function EdgeCoverage() {
                     <td className="px-2 py-2 text-muted-foreground">{r.logger ? "✓" : "—"}</td>
                     <td className="px-2 py-2 text-muted-foreground">{r.audit ? "✓" : "—"}</td>
                     <td className="px-2 py-2">
-                      {heartbeats === null ? (
+                      {heartbeatsPending ? (
                         <span className="text-muted-foreground text-xs">…</span>
                       ) : hbUuid ? (
                         <span
