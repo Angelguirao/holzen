@@ -39,6 +39,7 @@ function scheduleInvalidatePauseStatsOnCompleted(pauseInstanceId: string) {
     if (qc) {
       void qc.invalidateQueries({ queryKey: pauseSessionCompanionSnapshotQueryKey(pauseInstanceId) });
       void qc.invalidateQueries({ queryKey: pauseSessionFetchedInstanceQueryKey(pauseInstanceId) });
+      void qc.invalidateQueries({ queryKey: ['pause-instance', pauseInstanceId] });
     }
   });
 }
