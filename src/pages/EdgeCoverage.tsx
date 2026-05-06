@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
-import { useAuth } from "@/hooks/use-auth";
+import { useIsAdmin } from "@/hooks/use-is-admin";
 import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -67,24 +67,6 @@ const COVERAGE: Row[] = [
 
 // Functions exempt from full wrapper coverage. `health` is the obvious one (verify_jwt=false probe).
 const EXEMPT = new Set<string>(["health"]);
-
-function useIsAdmin() {
-  const { user, loading } = useAuth();
-  const [isAdmin, setIsAdmin] = useState<boolean | null>(null);
-  useEffect(() => {
-    if (!user) { setIsAdmin(false); return; }
-    supabase.from("profiles").select("is_admin").eq("user_id", user.id).single()
-      .then(({ data }) => {
-        const p = data as { is_admin?: boolean } | null;
-        if (typeof p?.is_admin === "boolean") setIsAdmin(p.is_admin);
-        else {
-          const ids = import.meta.env.VITE_ADMIN_USER_IDS as string | undefined;
-          setIsAdmin(!!ids && ids.split(",").map((s) => s.trim()).includes(user.id));
-        }
-      });
-  }, [user]);
-  return { isAdmin: !!isAdmin, loading: loading || isAdmin === null };
-}
 
 type Severity = "missing" | "partial" | "ok";
 function severityOf(r: Row): Severity {
