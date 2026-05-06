@@ -1,9 +1,11 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 
 import { useTranslation } from 'react-i18next';
+import { useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/use-auth';
 import { useHolzen } from '@/hooks/use-holzen';
+import { PROFILE_QUERY_KEY } from '@/hooks/use-profile';
 import { formatBtcPrice, SUPPORTED_CURRENCIES } from '@/lib/btc';
 import { computeHoldGoalCompactHeadline } from '@/lib/hold-goal-headline';
 import { Target, Calendar, Coins, Infinity as InfinityIcon, X, Check, Pencil } from 'lucide-react';
@@ -67,8 +69,15 @@ export function HoldGoalWidget({
   onCompactHeadlineChange?: (headline: string | null) => void;
 }) {
   const { t } = useTranslation();
+  const queryClient = useQueryClient();
   const { currency } = useHolzen();
   const { user } = useAuth();
+
+  const bumpProfileCache = useCallback(() => {
+    if (!user?.id) return;
+    void queryClient.invalidateQueries({ queryKey: PROFILE_QUERY_KEY(user.id) });
+  }, [queryClient, user?.id]);
+
   const isWire = variant === 'wireframe';
   const wireCompact = isWire && !wireframeDetailsExpanded;
   const [goal, setGoal] = useState<HoldGoal | null>(null);
@@ -201,7 +210,8 @@ export function HoldGoalWidget({
         hold_goal_target_price: null,
         hold_goal_currency: currency,
       };
-      await supabase.from('profiles').update(updates).eq('user_id', user.id);
+      const { error: saveError } = await supabase.from('profiles').update(updates).eq('user_id', user.id);
+      if (!saveError) bumpProfileCache();
       setGoal({ type: 'forever', start: updates.hold_goal_start, currency });
       setSetting(false);
       setInputValue('');
@@ -225,7 +235,8 @@ export function HoldGoalWidget({
       hold_goal_currency: currency,
     };
 
-    await supabase.from('profiles').update(updates).eq('user_id', user.id);
+    const { error: saveError } = await supabase.from('profiles').update(updates).eq('user_id', user.id);
+    if (!saveError) bumpProfileCache();
     setGoal({
       type: goalType,
       start: updates.hold_goal_start,
@@ -240,12 +251,13 @@ export function HoldGoalWidget({
 
   const clearGoal = async () => {
     if (!user) return;
-    await supabase.from('profiles').update({
+    const { error } = await supabase.from('profiles').update({
       hold_goal_type: null,
       hold_goal_start: null,
       hold_goal_target_months: null,
       hold_goal_target_price: null,
     }).eq('user_id', user.id);
+    if (!error) bumpProfileCache();
     setGoal(null);
   };
 
