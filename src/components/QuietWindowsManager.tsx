@@ -1,4 +1,5 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useCallback } from 'react';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
 import { supabase } from '@/integrations/supabase/client';
 import type { Database } from '@/integrations/supabase/types';
@@ -20,21 +21,37 @@ interface QuietWindow {
   active: boolean;
 }
 
+const QUIET_WINDOWS_QUERY_KEY = (uid: string) => ['quiet-windows', uid] as const;
+
+async function fetchQuietWindows(userId: string): Promise<QuietWindow[]> {
+  const { data, error } = await supabase
+    .from('quiet_windows')
+    .select('*')
+    .eq('user_id', userId)
+    .order('created_at');
+  if (error) {
+    console.error('[QuietWindowsManager] load failed:', error.message);
+    return [];
+  }
+  return (data ?? []) as QuietWindow[];
+}
+
 export function QuietWindowsManager({ userId }: { userId?: string }) {
   const { t } = useTranslation();
-  const [windows, setWindows] = useState<QuietWindow[]>([]);
+  const queryClient = useQueryClient();
 
-  const load = useCallback(async () => {
+  const { data: windows = [] } = useQuery({
+    queryKey: userId ? QUIET_WINDOWS_QUERY_KEY(userId) : ['quiet-windows', 'none'],
+    queryFn: () => fetchQuietWindows(userId!),
+    enabled: Boolean(userId),
+    staleTime: 0,
+    refetchOnWindowFocus: false,
+  });
+
+  const bumpQuietWindows = useCallback(() => {
     if (!userId) return;
-    const { data } = await supabase
-      .from('quiet_windows')
-      .select('*')
-      .eq('user_id', userId)
-      .order('created_at');
-    if (data) setWindows(data as QuietWindow[]);
-  }, [userId]);
-
-  useEffect(() => { load(); }, [load]);
+    void queryClient.invalidateQueries({ queryKey: QUIET_WINDOWS_QUERY_KEY(userId) });
+  }, [queryClient, userId]);
 
   const addWindow = async () => {
     if (!userId) return;
@@ -47,19 +64,28 @@ export function QuietWindowsManager({ userId }: { userId?: string }) {
       active: true,
     });
     if (!error) {
-      await load();
+      bumpQuietWindows();
       toast(t('quietWindows.added', { defaultValue: 'Quiet window added' }));
     }
   };
 
   const updateWindow = async (id: string, updates: Partial<QuietWindow>) => {
     await supabase.from('quiet_windows').update(updates as QuietWindowUpdate).eq('id', id);
-    setWindows((prev) => prev.map((w) => (w.id === id ? { ...w, ...updates } : w)));
+    if (!userId) return;
+    queryClient.setQueryData<QuietWindow[]>(QUIET_WINDOWS_QUERY_KEY(userId), (prev) => {
+      if (!prev) return prev;
+      return prev.map((w) => (w.id === id ? { ...w, ...updates } : w));
+    });
   };
 
   const deleteWindow = async (id: string) => {
     await supabase.from('quiet_windows').delete().eq('id', id);
-    setWindows((prev) => prev.filter((w) => w.id !== id));
+    if (userId) {
+      queryClient.setQueryData<QuietWindow[]>(QUIET_WINDOWS_QUERY_KEY(userId), (prev) => {
+        if (!prev) return prev;
+        return prev.filter((w) => w.id !== id);
+      });
+    }
     toast(t('quietWindows.removed', { defaultValue: 'Quiet window removed' }));
   };
 
