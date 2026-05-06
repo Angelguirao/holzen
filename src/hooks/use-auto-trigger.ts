@@ -1,6 +1,8 @@
 import { useEffect, useRef, useState, useCallback } from 'react';
+import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/use-auth';
+import { getProfileRowQueryOptions } from '@/hooks/use-profile';
 
 /**
  * Listens for server-side auto-triggered pause notifications via realtime subscription
@@ -9,6 +11,9 @@ import { useAuth } from '@/hooks/use-auth';
  */
 export function useAutoTrigger() {
   const { user } = useAuth();
+  const userId = user?.id;
+  const { data: profileRow, status: profileStatus } = useQuery(getProfileRowQueryOptions(userId));
+
   const [pauseReady, setPauseReady] = useState(false);
   const lastMessageRef = useRef<string | null>(null);
   const initializedRef = useRef(false);
@@ -25,29 +30,34 @@ export function useAutoTrigger() {
     }
   }, []);
 
+  // Baseline last_message from the shared profiles query (same cache as useProfile).
   useEffect(() => {
-    if (!user) return;
+    if (!userId) {
+      lastMessageRef.current = null;
+      initializedRef.current = false;
+      return;
+    }
+    if (profileStatus !== 'success' && profileStatus !== 'error') {
+      initializedRef.current = false;
+      return;
+    }
+    lastMessageRef.current =
+      profileStatus === 'success' ? (profileRow?.last_message ?? null) : null;
+    initializedRef.current = true;
+  }, [userId, profileStatus, profileRow?.last_message]);
 
-    // Get initial message to establish baseline
-    supabase
-      .from('profiles')
-      .select('last_message')
-      .eq('user_id', user.id)
-      .single()
-      .then(({ data }) => {
-        lastMessageRef.current = data?.last_message ?? null;
-        initializedRef.current = true;
-      });
+  useEffect(() => {
+    if (!userId) return;
 
     const channel = supabase
-      .channel(`auto-trigger-${user.id}`)
+      .channel(`auto-trigger-${userId}`)
       .on(
         'postgres_changes',
         {
           event: 'UPDATE',
           schema: 'public',
           table: 'profiles',
-          filter: `user_id=eq.${user.id}`,
+          filter: `user_id=eq.${userId}`,
         },
         (payload) => {
           if (!initializedRef.current) return;
@@ -66,7 +76,7 @@ export function useAutoTrigger() {
     };
     // Depend only on user.id — the `user` object reference can change on token
     // refresh / re-emission and would otherwise tear down + resubscribe the channel.
-  }, [user?.id]);
+  }, [userId]);
 
   /** Hide the non-Home banner only. Intentionally does **not** call `pause_dismiss_current` — same pattern as dismissing a toast (avoid accidental end-pause from Archive/Tools). */
   const dismiss = useCallback(() => setPauseReady(false), []);
