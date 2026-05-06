@@ -1,4 +1,5 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useCallback } from 'react';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/use-auth';
 import { useTranslation } from 'react-i18next';
@@ -43,54 +44,62 @@ const TYPE_ICONS: Record<string, React.ReactNode> = {
 const SIGNAL_TYPE_ORDER = ['analyst', 'podcast', 'newsletter', 'blog', 'dashboard', 'youtube'];
 const GROUNDING_TYPE_ORDER = ['book', 'blog', 'podcast', 'newsletter', 'analyst'];
 
+export const SIGNAL_SOURCES_CATALOG_QUERY_KEY = ['signal-sources', 'catalog'] as const;
+
+export const USER_SIGNAL_PREFS_QUERY_KEY = (userId: string) => ['user-signal-preferences', userId] as const;
+
+async function fetchSignalSourcesCatalog(): Promise<CatalogSource[]> {
+  const { data, error } = await supabase.from('signal_sources').select('*').order('name');
+  if (error) throw error;
+  return (data as unknown as CatalogSource[]) ?? [];
+}
+
+async function fetchUserSignalPreferences(userId: string): Promise<UserPref[]> {
+  const { data, error } = await supabase.from('user_signal_preferences').select('*').eq('user_id', userId);
+  if (error) throw error;
+  return (data as unknown as UserPref[]) ?? [];
+}
+
 export function SourceManagement() {
   const { t } = useTranslation();
   const { user } = useAuth();
-  const [catalog, setCatalog] = useState<CatalogSource[]>([]);
-  const [prefs, setPrefs] = useState<UserPref[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [loadFailed, setLoadFailed] = useState(false);
-  const [reloadNonce, setReloadNonce] = useState(0);
+  const userId = user?.id;
+  const queryClient = useQueryClient();
+
+  const {
+    data: catalog = [],
+    isPending: catalogPending,
+    isError: catalogError,
+  } = useQuery({
+    queryKey: SIGNAL_SOURCES_CATALOG_QUERY_KEY,
+    queryFn: fetchSignalSourcesCatalog,
+    enabled: Boolean(userId),
+    staleTime: 60_000,
+    refetchOnWindowFocus: false,
+    retry: false,
+  });
+
+  const {
+    data: prefs = [],
+    isPending: prefsPending,
+    isError: prefsError,
+  } = useQuery({
+    queryKey: userId ? USER_SIGNAL_PREFS_QUERY_KEY(userId) : ['user-signal-preferences', 'none'],
+    queryFn: () => fetchUserSignalPreferences(userId!),
+    enabled: Boolean(userId),
+    staleTime: 60_000,
+    refetchOnWindowFocus: false,
+    retry: false,
+  });
+
+  const loading = Boolean(userId) && (catalogPending || prefsPending);
+  const loadFailed = Boolean(userId) && (catalogError || prefsError);
+
   const [activeTab, setActiveTab] = useState('signal');
   const [addingCustom, setAddingCustom] = useState(false);
   const [customName, setCustomName] = useState('');
   const [customUrl, setCustomUrl] = useState('');
   const [customType, setCustomType] = useState('blog');
-
-  useEffect(() => {
-    if (!user) {
-      setLoading(false);
-      setLoadFailed(false);
-      return;
-    }
-    let cancelled = false;
-    setLoading(true);
-    setLoadFailed(false);
-    const load = async () => {
-      try {
-        const [rSources, rPrefs] = await Promise.all([
-          supabase.from('signal_sources').select('*').order('name'),
-          supabase.from('user_signal_preferences').select('*').eq('user_id', user.id),
-        ]);
-        if (cancelled) return;
-        if (rSources.error || rPrefs.error) {
-          setLoadFailed(true);
-          return;
-        }
-        setCatalog((rSources.data as unknown as CatalogSource[]) ?? []);
-        setPrefs((rPrefs.data as unknown as UserPref[]) ?? []);
-        setLoadFailed(false);
-      } catch {
-        if (!cancelled) setLoadFailed(true);
-      } finally {
-        if (!cancelled) setLoading(false);
-      }
-    };
-    void load();
-    return () => {
-      cancelled = true;
-    };
-  }, [user, reloadNonce]);
 
   const isActive = useCallback((sourceId: string) => {
     const pref = prefs.find((p) => p.source_id === sourceId);
@@ -99,37 +108,44 @@ export function SourceManagement() {
   }, [prefs]);
 
   const removeCatalogSource = useCallback(async (sourceId: string) => {
-    if (!user) return;
+    if (!userId) return;
+    const prefsKey = USER_SIGNAL_PREFS_QUERY_KEY(userId);
     const existing = prefs.find((p) => p.source_id === sourceId);
     if (existing) {
       await supabase.from('user_signal_preferences').update({ active: false }).eq('id', existing.id);
-      setPrefs((prev) => prev.map((p) => p.id === existing.id ? { ...p, active: false } : p));
+      queryClient.setQueryData<UserPref[]>(prefsKey, (prev) =>
+        (prev ?? []).map((p) => (p.id === existing.id ? { ...p, active: false } : p)),
+      );
     } else {
       const cat = catalog.find((s) => s.id === sourceId)?.category || activeTab;
       const { data } = await supabase
         .from('user_signal_preferences')
-        .insert({ user_id: user.id, source_id: sourceId, active: false, category: cat })
+        .insert({ user_id: userId, source_id: sourceId, active: false, category: cat })
         .select()
         .single();
-      if (data) setPrefs((prev) => [...prev, data as unknown as UserPref]);
+      if (data) {
+        queryClient.setQueryData<UserPref[]>(prefsKey, (prev) => [...(prev ?? []), data as unknown as UserPref]);
+      }
     }
-  }, [user, prefs, catalog, activeTab]);
+  }, [userId, prefs, catalog, activeTab, queryClient]);
 
   const restoreCatalogSource = useCallback(async (sourceId: string) => {
-    if (!user) return;
+    if (!userId) return;
     const existing = prefs.find((p) => p.source_id === sourceId);
     if (existing) {
       await supabase.from('user_signal_preferences').update({ active: true }).eq('id', existing.id);
-      setPrefs((prev) => prev.map((p) => p.id === existing.id ? { ...p, active: true } : p));
+      queryClient.setQueryData<UserPref[]>(USER_SIGNAL_PREFS_QUERY_KEY(userId), (prev) =>
+        (prev ?? []).map((p) => (p.id === existing.id ? { ...p, active: true } : p)),
+      );
     }
-  }, [user, prefs]);
+  }, [userId, prefs, queryClient]);
 
   const addCustomSource = useCallback(async () => {
-    if (!user || !customName.trim()) return;
+    if (!userId || !customName.trim()) return;
     const { data, error } = await supabase
       .from('user_signal_preferences')
       .insert({
-        user_id: user.id,
+        user_id: userId,
         source_id: null,
         custom_name: customName.trim(),
         custom_url: customUrl.trim() || null,
@@ -143,24 +159,35 @@ export function SourceManagement() {
       toast.error(t('sources.addFailed'));
       return;
     }
-    if (data) setPrefs((prev) => [...prev, data as unknown as UserPref]);
+    if (data) {
+      queryClient.setQueryData<UserPref[]>(USER_SIGNAL_PREFS_QUERY_KEY(userId), (prev) => [
+        ...(prev ?? []),
+        data as unknown as UserPref,
+      ]);
+    }
     setCustomName('');
     setCustomUrl('');
     setAddingCustom(false);
     toast.success(t('sources.sourceAdded'));
-  }, [user, customName, customUrl, customType, activeTab, t]);
+  }, [userId, customName, customUrl, customType, activeTab, t, queryClient]);
 
   const removeCustomSource = useCallback(async (prefId: string) => {
+    if (!userId) return;
     await supabase.from('user_signal_preferences').delete().eq('id', prefId);
-    setPrefs((prev) => prev.filter((p) => p.id !== prefId));
-  }, []);
+    queryClient.setQueryData<UserPref[]>(USER_SIGNAL_PREFS_QUERY_KEY(userId), (prev) =>
+      (prev ?? []).filter((p) => p.id !== prefId),
+    );
+  }, [userId, queryClient]);
 
   const toggleCustomSource = useCallback(async (prefId: string) => {
+    if (!userId) return;
     const pref = prefs.find((p) => p.id === prefId);
     if (!pref) return;
     await supabase.from('user_signal_preferences').update({ active: !pref.active }).eq('id', prefId);
-    setPrefs((prev) => prev.map((p) => p.id === prefId ? { ...p, active: !p.active } : p));
-  }, [prefs]);
+    queryClient.setQueryData<UserPref[]>(USER_SIGNAL_PREFS_QUERY_KEY(userId), (prev) =>
+      (prev ?? []).map((p) => (p.id === prefId ? { ...p, active: !p.active } : p)),
+    );
+  }, [userId, prefs, queryClient]);
 
   if (loading) {
     return (
@@ -178,7 +205,16 @@ export function SourceManagement() {
         <Alert variant="destructive">
           <AlertDescription className="flex flex-col gap-3 text-left">
             <p>{t('sources.loadFailed')}</p>
-            <Button type="button" variant="outline" size="sm" className="self-start" onClick={() => setReloadNonce((n) => n + 1)}>
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              className="self-start"
+              onClick={() => {
+                void queryClient.invalidateQueries({ queryKey: SIGNAL_SOURCES_CATALOG_QUERY_KEY });
+                if (userId) void queryClient.invalidateQueries({ queryKey: USER_SIGNAL_PREFS_QUERY_KEY(userId) });
+              }}
+            >
               {t('common.tryAgain')}
             </Button>
           </AlertDescription>
