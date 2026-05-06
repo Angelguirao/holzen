@@ -1,6 +1,8 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
+import { useQueryClient } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
 import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
+import { practiceEntriesWeeklyCountQueryKey } from '@/components/PracticeWidget';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/use-auth';
 import { toast } from 'sonner';
@@ -29,6 +31,7 @@ interface Props {
 export function BodyScan({ onComplete, textColor, ringColor, glowColor }: Props) {
   const { t } = useTranslation();
   const { user } = useAuth();
+  const queryClient = useQueryClient();
   const prefersReducedMotion = useReducedMotion();
   const [stepIndex, setStepIndex] = useState(0);
   const [acknowledged, setAcknowledged] = useState(0);
@@ -49,8 +52,9 @@ export function BodyScan({ onComplete, textColor, ringColor, glowColor }: Props)
       duration_seconds: duration,
     });
     if (error) return { ok: false as const, error };
+    void queryClient.invalidateQueries({ queryKey: practiceEntriesWeeklyCountQueryKey(user.id) });
     return { ok: true as const };
-  }, [user]);
+  }, [user, queryClient]);
 
   const finishAfterSave = useCallback(() => {
     setDone(true);
