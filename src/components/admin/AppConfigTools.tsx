@@ -7,6 +7,7 @@
  * in `supabase/functions/_shared/app-config.ts`).
  */
 import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useQuery } from '@tanstack/react-query';
 import { AlertTriangle, Check, DollarSign, Loader2, Mail, Power, RefreshCw, Save, Users, Zap } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
@@ -165,6 +166,13 @@ async function loadSpendSnapshot(): Promise<SpendSnapshot> {
   };
 }
 
+export const ADMIN_APP_CONFIG_TOOLS_QUERY_KEY = ['admin', 'app-config-tools', 'bundle'] as const;
+
+async function fetchAppConfigToolsBundle(): Promise<{ config: ConfigState; spend: SpendSnapshot }> {
+  const [config, spend] = await Promise.all([loadConfig(), loadSpendSnapshot()]);
+  return { config, spend };
+}
+
 async function saveRow(key: string, value: unknown): Promise<void> {
   const { error } = await supabase
     .from('app_config' as never)
@@ -177,24 +185,31 @@ export function AppConfigTools() {
   const [state, setState] = useState<ConfigState>(DEFAULTS);
   const [initial, setInitial] = useState<ConfigState>(DEFAULTS);
   const [spend, setSpend] = useState<SpendSnapshot>({ dailyGlobal: null, monthlyGlobal: null });
-  const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState<Set<string>>(() => new Set());
 
-  const refresh = useCallback(async () => {
-    setLoading(true);
-    try {
-      const [cfg, sp] = await Promise.all([loadConfig(), loadSpendSnapshot()]);
-      setState(cfg);
-      setInitial(cfg);
-      setSpend(sp);
-    } catch (_e) {
-      toast({ title: 'Failed to load config', variant: 'destructive' });
-    } finally {
-      setLoading(false);
-    }
-  }, [toast]);
+  const { data, isPending, isFetching, isError, refetch } = useQuery({
+    queryKey: ADMIN_APP_CONFIG_TOOLS_QUERY_KEY,
+    queryFn: fetchAppConfigToolsBundle,
+    staleTime: 30_000,
+    refetchOnWindowFocus: false,
+    retry: false,
+  });
 
-  useEffect(() => { void refresh(); }, [refresh]);
+  const loading = isPending || isFetching;
+
+  useEffect(() => {
+    if (!data) return;
+    setState(data.config);
+    setInitial(data.config);
+    setSpend(data.spend);
+  }, [data]);
+
+  useEffect(() => {
+    if (!isError) return;
+    toast({ title: 'Failed to load config', variant: 'destructive' });
+  }, [isError, toast]);
+
+  const refresh = useCallback(() => refetch(), [refetch]);
 
   const mark = (k: string, busy: boolean) =>
     setSaving((prev) => {
