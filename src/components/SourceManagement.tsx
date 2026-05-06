@@ -48,7 +48,7 @@ export const SIGNAL_SOURCES_CATALOG_QUERY_KEY = ['signal-sources', 'catalog'] as
 
 export const USER_SIGNAL_PREFS_QUERY_KEY = (userId: string) => ['user-signal-preferences', userId] as const;
 
-async function fetchSignalSourcesCatalog(): Promise<CatalogSource[]> {
+export async function fetchSignalSourcesCatalog(): Promise<CatalogSource[]> {
   const { data, error } = await supabase.from('signal_sources').select('*').order('name');
   if (error) throw error;
   return (data as unknown as CatalogSource[]) ?? [];

@@ -1,8 +1,9 @@
-import { useEffect, useState } from 'react';
+import { useMemo } from 'react';
+import { useQuery } from '@tanstack/react-query';
 import { ExternalLink, ShieldCheck } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
-import { supabase } from '@/integrations/supabase/client';
 import { Skeleton } from '@/components/ui/skeleton';
+import { SIGNAL_SOURCES_CATALOG_QUERY_KEY, fetchSignalSourcesCatalog } from '@/components/SourceManagement';
 import { CompanionError } from '../CompanionError';
 import { ReadTime } from './ReadTime';
 import { WhyThisCard } from './WhyThisCard';
@@ -49,37 +50,30 @@ export function SignalFullView({
   preferredBias,
 }: Props) {
   const { t } = useTranslation();
-  const [isTrusted, setIsTrusted] = useState<boolean | null>(null);
 
   const host = extractHost(signal?.url);
 
-  useEffect(() => {
-    if (!host) {
-      setIsTrusted(null);
-      return;
+  const { data: catalog = [], isPending, isError } = useQuery({
+    queryKey: SIGNAL_SOURCES_CATALOG_QUERY_KEY,
+    queryFn: fetchSignalSourcesCatalog,
+    enabled: Boolean(host),
+    staleTime: 60_000,
+    refetchOnWindowFocus: false,
+    retry: false,
+  });
+
+  const isTrusted = useMemo((): boolean | null => {
+    if (!host) return null;
+    if (isPending) return null;
+    if (isError) return false;
+    if (catalog.length === 0) return false;
+    const trustedHosts = new Set<string>();
+    for (const row of catalog) {
+      const h = extractHost(row.url);
+      if (h) trustedHosts.add(h);
     }
-    let cancelled = false;
-    void (async () => {
-      const { data } = await supabase
-        .from('signal_sources')
-        .select('url')
-        .not('url', 'is', null);
-      if (cancelled) return;
-      if (!data || data.length === 0) {
-        setIsTrusted(false);
-        return;
-      }
-      const trustedHosts = new Set<string>();
-      for (const row of data) {
-        const h = extractHost(row.url as string | null);
-        if (h) trustedHosts.add(h);
-      }
-      setIsTrusted(trustedHosts.has(host));
-    })();
-    return () => {
-      cancelled = true;
-    };
-  }, [host]);
+    return trustedHosts.has(host);
+  }, [host, catalog, isPending, isError]);
 
   if (loading) {
     return (
@@ -128,7 +122,7 @@ export function SignalFullView({
               aria-hidden
             />
             <span className="text-xs font-mono text-muted-foreground/70">{host}</span>
-            {isTrusted && (
+            {isTrusted === true && (
               <span
                 className="inline-flex items-center gap-1 rounded-full border border-border/60 bg-muted/30 px-1.5 py-[2px] text-[9px] font-mono text-muted-foreground"
                 role="status"
