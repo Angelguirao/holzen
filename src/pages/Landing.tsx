@@ -17,6 +17,7 @@ import { LandingTestimonials } from '@/components/LandingTestimonials';
 import { LandingLanguageSwitcher } from '@/components/LandingLanguageSwitcher';
 import { PRICING } from '@/lib/pricing';
 import { prefetchCoingeckoBtcUsd } from '@/lib/coingecko-btc-usd-query';
+import { prefetchBlogPublishedFirstPage } from '@/lib/blog-post-query';
 
 function Section({ children, className = '', delay = 0 }: { children: React.ReactNode; className?: string; delay?: number }) {
   const ref = useRef(null);
@@ -401,7 +402,14 @@ const Landing = () => {
               {t('landing.btcReserve')}
             </Link>
             <span className="text-muted-foreground/20">·</span>
-            <Link to="/blog" className="hover:text-foreground transition-colors">{t('landing.blog')}</Link>
+            <Link
+              to="/blog"
+              className="hover:text-foreground transition-colors"
+              onMouseEnter={() => void prefetchBlogPublishedFirstPage(queryClient)}
+              onFocus={() => void prefetchBlogPublishedFirstPage(queryClient)}
+            >
+              {t('landing.blog')}
+            </Link>
             <span className="text-muted-foreground/20">·</span>
             <Link to="/terms" className="hover:text-foreground transition-colors">{t('landing.terms')}</Link>
             <span className="text-muted-foreground/20">·</span>
