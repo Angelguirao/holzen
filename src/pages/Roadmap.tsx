@@ -2,7 +2,6 @@ import { useTranslation } from 'react-i18next';
 import { useState, useCallback, useMemo } from 'react';
 import type { InfiniteData } from '@tanstack/react-query';
 import { useInfiniteQuery, useQuery, useQueryClient } from '@tanstack/react-query';
-import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/use-auth';
 import { Link } from 'react-router-dom';
 import { ArrowLeft, ChevronUp } from 'lucide-react';
@@ -12,8 +11,16 @@ import { PageMeta } from '@/components/PageMeta';
 import { PublicFooter } from '@/components/PublicFooter';
 import { useInfiniteScroll } from '@/hooks/use-infinite-scroll';
 import { PageHeading } from '@/components/PageHeading';
+import {
+  deleteRoadmapVote,
+  fetchRoadmapVotes,
+  getRoadmapItemsInfiniteQueryOptions,
+  insertRoadmapVote,
+  roadmapVotesQueryKey,
+  ROADMAP_ITEMS_QUERY_KEY,
+  type RoadmapListItem,
+} from '@/lib/roadmap-query';
 
-const PAGE_SIZE = 30;
 const CATEGORIES = ['all', 'self', 'together', 'intelligence', 'reach'] as const;
 
 const categoryTone: Record<string, 'default' | 'secondary' | 'outline'> = {
@@ -22,37 +29,6 @@ const categoryTone: Record<string, 'default' | 'secondary' | 'outline'> = {
   intelligence: 'outline',
   reach: 'secondary',
 };
-
-interface RoadmapItem {
-  id: string;
-  title: string;
-  description: string | null;
-  status: string;
-  vote_count: number;
-  category: string;
-}
-
-const ROADMAP_ITEMS_QUERY_KEY = ['roadmap', 'items'] as const;
-
-function roadmapVotesQueryKey(userId: string) {
-  return ['roadmap', 'votes', userId] as const;
-}
-
-async function fetchRoadmapPage(offset: number): Promise<RoadmapItem[]> {
-  const { data, error } = await supabase
-    .from('roadmap_items')
-    .select('id, title, description, status, vote_count, category')
-    .order('vote_count', { ascending: false })
-    .range(offset, offset + PAGE_SIZE - 1);
-  if (error) throw error;
-  return (data as unknown as RoadmapItem[]) ?? [];
-}
-
-async function fetchRoadmapVotes(userId: string): Promise<string[]> {
-  const { data, error } = await supabase.from('roadmap_votes').select('item_id').eq('user_id', userId);
-  if (error) throw error;
-  return data?.map((v) => v.item_id) ?? [];
-}
 
 const Roadmap = () => {
   const { t } = useTranslation();
@@ -67,17 +43,7 @@ const Roadmap = () => {
     hasNextPage,
     isFetchingNextPage,
     fetchNextPage,
-  } = useInfiniteQuery({
-    queryKey: ROADMAP_ITEMS_QUERY_KEY,
-    queryFn: ({ pageParam }) => fetchRoadmapPage(pageParam),
-    initialPageParam: 0,
-    getNextPageParam: (lastPage, allPages) => {
-      if (lastPage.length < PAGE_SIZE) return undefined;
-      return allPages.reduce((sum, p) => sum + p.length, 0);
-    },
-    staleTime: 60_000,
-    refetchOnWindowFocus: false,
-  });
+  } = useInfiniteQuery(getRoadmapItemsInfiniteQueryOptions());
 
   const { data: voteIds = [], isPending: votesPending } = useQuery({
     queryKey: userId ? roadmapVotesQueryKey(userId) : ['roadmap', 'votes', 'none'],
@@ -110,7 +76,7 @@ const Roadmap = () => {
       const hasVoted = votes.has(itemId);
       const votesKey = roadmapVotesQueryKey(userId);
       const prevVotes = queryClient.getQueryData<string[]>(votesKey);
-      const prevItems = queryClient.getQueryData<InfiniteData<RoadmapItem[]>>(ROADMAP_ITEMS_QUERY_KEY);
+      const prevItems = queryClient.getQueryData<InfiniteData<RoadmapListItem[]>>(ROADMAP_ITEMS_QUERY_KEY);
 
       queryClient.setQueryData<string[]>(votesKey, (ids) => {
         const cur = ids ?? [];
@@ -118,7 +84,7 @@ const Roadmap = () => {
         return [...cur, itemId];
       });
 
-      queryClient.setQueryData<InfiniteData<RoadmapItem[]>>(ROADMAP_ITEMS_QUERY_KEY, (old) => {
+      queryClient.setQueryData<InfiniteData<RoadmapListItem[]>>(ROADMAP_ITEMS_QUERY_KEY, (old) => {
         if (!old) return old;
         return {
           pageParams: old.pageParams,
@@ -134,11 +100,9 @@ const Roadmap = () => {
 
       try {
         if (hasVoted) {
-          const { error } = await supabase.from('roadmap_votes').delete().eq('user_id', userId).eq('item_id', itemId);
-          if (error) throw error;
+          await deleteRoadmapVote(userId, itemId);
         } else {
-          const { error } = await supabase.from('roadmap_votes').insert({ user_id: userId, item_id: itemId });
-          if (error) throw error;
+          await insertRoadmapVote(userId, itemId);
         }
       } catch {
         if (prevVotes !== undefined) queryClient.setQueryData(votesKey, prevVotes);
