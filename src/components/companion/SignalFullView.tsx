@@ -3,7 +3,7 @@ import { useQuery } from '@tanstack/react-query';
 import { ExternalLink, ShieldCheck } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { Skeleton } from '@/components/ui/skeleton';
-import { SIGNAL_SOURCES_CATALOG_QUERY_KEY, fetchSignalSourcesCatalog } from '@/components/SourceManagement';
+import { getSignalSourcesCatalogQueryOptions } from '@/lib/signal-sources-catalog-query';
 import { CompanionError } from '../CompanionError';
 import { ReadTime } from './ReadTime';
 import { WhyThisCard } from './WhyThisCard';
@@ -53,14 +53,9 @@ export function SignalFullView({
 
   const host = extractHost(signal?.url);
 
-  const { data: catalog = [], isPending, isError } = useQuery({
-    queryKey: SIGNAL_SOURCES_CATALOG_QUERY_KEY,
-    queryFn: fetchSignalSourcesCatalog,
-    enabled: Boolean(host),
-    staleTime: 60_000,
-    refetchOnWindowFocus: false,
-    retry: false,
-  });
+  const { data: catalog = [], isPending, isError } = useQuery(
+    getSignalSourcesCatalogQueryOptions(Boolean(host)),
+  );
 
   const isTrusted = useMemo((): boolean | null => {
     if (!host) return null;
