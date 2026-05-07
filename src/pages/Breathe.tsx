@@ -6,7 +6,7 @@ import { useNavigate } from 'react-router-dom';
 import { X, Info } from 'lucide-react';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 import { hapticFeedback } from '@/lib/haptics';
-import { fetchBtcData, type BtcPriceData } from '@/lib/btc';
+import { getBreatheAmbientBtcQueryOptions } from '@/lib/btc';
 import { getMempoolSpaceBlockDataQueryOptions } from '@/lib/mempool-space-block-data';
 import { playBlockDiscoveryTone, startAmbientDrone } from '@/lib/notification-tone';
 import { useProGate } from '@/hooks/use-pro-gate';
@@ -46,9 +46,6 @@ const textColors: Record<VolatilityLevel, string> = {
 };
 
 const BREATH_DURATION = 8;
-
-/** Ambient Breathe surface: CoinGecko-backed BTC strip (default USD), polled with mempool block data. */
-const BREATHE_AMBIENT_BTC_QUERY_KEY = ['ambient', 'breathe', 'btc-usd'] as const;
 
 function formatNumber(n: number): string {
   if (n >= 1_000_000) return `${(n / 1_000_000).toFixed(1)}M`;
@@ -205,21 +202,7 @@ export default function Breathe() {
 
   const ambientDataEnabled = isPro && !isPending;
 
-  const btcQuery = useQuery({
-    queryKey: BREATHE_AMBIENT_BTC_QUERY_KEY,
-    queryFn: async (): Promise<BtcPriceData | null> => {
-      try {
-        return await fetchBtcData();
-      } catch {
-        return null;
-      }
-    },
-    enabled: ambientDataEnabled,
-    refetchInterval: 30_000,
-    staleTime: 0,
-    refetchOnWindowFocus: false,
-    retry: false,
-  });
+  const btcQuery = useQuery(getBreatheAmbientBtcQueryOptions(ambientDataEnabled));
 
   const {
     data: blockDataRaw,
