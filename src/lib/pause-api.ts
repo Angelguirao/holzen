@@ -21,6 +21,7 @@ import { invalidatePauseStatsDataForUser } from '@/lib/pause-stats-invalidate';
 import { pauseSessionFetchedInstanceQueryKey } from '@/hooks/use-pause-session-fetch';
 import { pauseTerminalEntryStateQueryKey } from '@/hooks/use-pause-session-terminal-entry-redirect';
 import { pauseSessionCompanionSnapshotQueryKey } from '@/lib/pause-page-loader';
+import { companionUiCompletionQueryKey } from '@/lib/companion-ui-completion-query-key';
 import { trackEvent } from '@/lib/posthog';
 import type {
   PauseState,
@@ -42,6 +43,7 @@ function scheduleInvalidatePauseStatsOnCompleted(pauseInstanceId: string) {
       void qc.invalidateQueries({ queryKey: pauseSessionFetchedInstanceQueryKey(pauseInstanceId) });
       void qc.invalidateQueries({ queryKey: ['pause-instance', pauseInstanceId] });
       void qc.invalidateQueries({ queryKey: pauseTerminalEntryStateQueryKey(pauseInstanceId) });
+      void qc.invalidateQueries({ queryKey: companionUiCompletionQueryKey(pauseInstanceId) });
     }
   });
 }

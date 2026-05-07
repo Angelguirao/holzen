@@ -15,13 +15,13 @@ import type { ZoomOutData } from '@/components/ZoomOutDisplay';
 import { toZoomOutDisplayData, zoomOutLibraryAutosaveFromDisplayData } from '@/lib/zoom-out-payload';
 import type { CachedHistoricalInsightShape } from '@/components/HistoricalInsightDisplay';
 import {
-  companionUiCompletionQueryKey,
   EMPTY_COMPANION_UI_COMPLETION,
   loadCompanionUiCompletionState,
   persistCompanionUiStepCompletion,
   type CompanionUiCompletionStep,
   type CompanionUiCompletionState,
 } from '@/lib/companion-completion-sync';
+import { companionUiCompletionQueryKey } from '@/lib/companion-ui-completion-query-key';
 import { loadMoodHistoryForOrchestrate } from '@/lib/companion-mood-history';
 import { loadActiveOrchestrateSources } from '@/lib/companion-orchestrate-sources';
 import { getRecencyHints } from '@/lib/companion-recency-hints';

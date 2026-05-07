@@ -30,9 +30,7 @@ export const EMPTY_COMPANION_UI_COMPLETION: CompanionUiCompletionState = {
   history: false,
 };
 
-export function companionUiCompletionQueryKey(pauseInstanceId: string) {
-  return ['pause', 'companion-ui-completion', pauseInstanceId] as const;
-}
+export { companionUiCompletionQueryKey } from '@/lib/companion-ui-completion-query-key';
 
 /** Map a UI step key to the V2 companion_type persisted on pause_companion_events. */
 const STEP_TO_COMPANION_TYPE: Record<CompanionUiCompletionStep, string | null> = {
