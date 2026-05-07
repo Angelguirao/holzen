@@ -23,6 +23,7 @@ import { practiceEntriesWeeklyCountQueryKey } from '@/components/PracticeWidget'
 import { practicePrimarySuggestionQueryKey } from '@/hooks/use-practice-suggestion';
 import { toolsHubDataQueryKey } from '@/hooks/use-tools-hub-data';
 import { groundHistoryEntriesQueryKey, groundHistoryStatsQueryKey } from '@/pages/GroundHistory';
+import { invalidateHistoryCalendarActivities } from '@/lib/history-calendar-activities-query-key';
 import {
   AlertDialog,
   AlertDialogCancel,
@@ -361,6 +362,7 @@ export default function Ground() {
         void queryClient.invalidateQueries({ queryKey: toolsHubDataQueryKey(user.id) });
         void queryClient.invalidateQueries({ queryKey: groundHistoryStatsQueryKey(user.id) });
         void queryClient.invalidateQueries({ queryKey: groundHistoryEntriesQueryKey(user.id) });
+        invalidateHistoryCalendarActivities(queryClient, user.id);
       }
     }
 

@@ -12,6 +12,7 @@ import { Loader2 } from 'lucide-react';
 import { practiceEntriesWeeklyCountQueryKey } from '@/components/PracticeWidget';
 import { practicePrimarySuggestionQueryKey } from '@/hooks/use-practice-suggestion';
 import { toolsHubDataQueryKey } from '@/hooks/use-tools-hub-data';
+import { invalidateHistoryCalendarActivities } from '@/lib/history-calendar-activities-query-key';
 import { useAuth } from '@/hooks/use-auth';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
@@ -127,6 +128,7 @@ export function ReflectionReplay({ onComplete, initialPauseInstanceId }: Props) 
       void queryClient.invalidateQueries({ queryKey: toolsHubDataQueryKey(user.id) });
       void queryClient.invalidateQueries({ queryKey: replayRecentPausesQueryKey(user.id) });
       void queryClient.invalidateQueries({ queryKey: pauseReplayThreadQueryKey(selectedId) });
+      invalidateHistoryCalendarActivities(queryClient, user.id);
       toast.success(t('practice.replaySaved', { defaultValue: 'Replay saved' }));
     } catch {
       toast.error(t('common.tryAgain', { defaultValue: 'Try again' }));
