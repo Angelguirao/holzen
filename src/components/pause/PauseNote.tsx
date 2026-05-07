@@ -1,8 +1,14 @@
 import { useEffect, useState } from 'react';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
 import { Pencil } from 'lucide-react';
 import { pauseLogStep } from '@/lib/pause-api';
-import { supabase } from '@/integrations/supabase/client';
+import {
+  PAUSE_REFLECT_STEP_NOTE,
+  fetchLatestPauseReflectStep,
+  noteTextFromReflectRow,
+  pauseReflectStepLatestQueryKey,
+} from '@/lib/pause-reflect-step-queries';
 
 interface Props {
   pauseInstanceId: string;
@@ -15,37 +21,40 @@ interface Props {
  */
 export function PauseNote({ pauseInstanceId }: Props) {
   const { t } = useTranslation();
+  const queryClient = useQueryClient();
   const [note, setNote] = useState('');
   const [saving, setSaving] = useState(false);
 
+  const { data: serverNote = '' } = useQuery({
+    queryKey: pauseReflectStepLatestQueryKey(pauseInstanceId, PAUSE_REFLECT_STEP_NOTE),
+    queryFn: () => fetchLatestPauseReflectStep(pauseInstanceId, PAUSE_REFLECT_STEP_NOTE),
+    select: (row) => noteTextFromReflectRow(row),
+    enabled: Boolean(pauseInstanceId),
+    staleTime: 60_000,
+    refetchOnWindowFocus: false,
+    retry: false,
+  });
+
   useEffect(() => {
-    let cancelled = false;
-    void (async () => {
-      const { data } = await supabase
-        .from('pause_step_events' as never)
-        .select('payload, created_at')
-        .eq('pause_instance_id', pauseInstanceId)
-        .eq('step_type', 'note_updated')
-        .order('created_at', { ascending: false })
-        .limit(1);
-      if (cancelled) return;
-      const rows = (data ?? []) as Array<{ payload: Record<string, unknown> }>;
-      const text = typeof rows[0]?.payload?.text === 'string' ? (rows[0].payload.text as string) : '';
-      setNote(text);
-    })();
-    return () => {
-      cancelled = true;
-    };
-  }, [pauseInstanceId]);
+    setNote(serverNote);
+  }, [pauseInstanceId, serverNote]);
 
   async function commit(next: string) {
     setSaving(true);
-    await pauseLogStep({
-      instanceId: pauseInstanceId,
-      stepType: 'note_updated',
-      payload: { text: next },
-    }).catch(() => undefined);
-    setSaving(false);
+    try {
+      await pauseLogStep({
+        instanceId: pauseInstanceId,
+        stepType: 'note_updated',
+        payload: { text: next },
+      });
+      void queryClient.invalidateQueries({
+        queryKey: pauseReflectStepLatestQueryKey(pauseInstanceId, PAUSE_REFLECT_STEP_NOTE),
+      });
+    } catch {
+      /* ignore */
+    } finally {
+      setSaving(false);
+    }
   }
 
   return (

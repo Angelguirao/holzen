@@ -1,8 +1,14 @@
 import { useEffect, useState } from 'react';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
 import { Tag, X } from 'lucide-react';
 import { pauseLogStep } from '@/lib/pause-api';
-import { supabase } from '@/integrations/supabase/client';
+import {
+  PAUSE_REFLECT_STEP_TAGS,
+  fetchLatestPauseReflectStep,
+  pauseReflectStepLatestQueryKey,
+  tagsFromReflectRow,
+} from '@/lib/pause-reflect-step-queries';
 
 interface Props {
   pauseInstanceId: string;
@@ -10,36 +16,38 @@ interface Props {
 
 export function PauseTags({ pauseInstanceId }: Props) {
   const { t } = useTranslation();
+  const queryClient = useQueryClient();
   const [tags, setTags] = useState<string[]>([]);
   const [draft, setDraft] = useState('');
 
+  const { data: serverTags = [] } = useQuery({
+    queryKey: pauseReflectStepLatestQueryKey(pauseInstanceId, PAUSE_REFLECT_STEP_TAGS),
+    queryFn: () => fetchLatestPauseReflectStep(pauseInstanceId, PAUSE_REFLECT_STEP_TAGS),
+    select: (row) => tagsFromReflectRow(row),
+    enabled: Boolean(pauseInstanceId),
+    staleTime: 60_000,
+    refetchOnWindowFocus: false,
+    retry: false,
+  });
+
   useEffect(() => {
-    let cancelled = false;
-    void (async () => {
-      const { data } = await supabase
-        .from('pause_step_events' as never)
-        .select('payload, created_at')
-        .eq('pause_instance_id', pauseInstanceId)
-        .eq('step_type', 'tag_updated')
-        .order('created_at', { ascending: false })
-        .limit(1);
-      if (cancelled) return;
-      const rows = (data ?? []) as Array<{ payload: Record<string, unknown> }>;
-      const arr = rows[0]?.payload?.tags;
-      setTags(Array.isArray(arr) ? (arr as string[]).slice() : []);
-    })();
-    return () => {
-      cancelled = true;
-    };
-  }, [pauseInstanceId]);
+    setTags(serverTags);
+  }, [pauseInstanceId, serverTags]);
 
   async function commit(next: string[]) {
     setTags(next);
-    await pauseLogStep({
-      instanceId: pauseInstanceId,
-      stepType: 'tag_updated',
-      payload: { tags: next },
-    }).catch(() => undefined);
+    try {
+      await pauseLogStep({
+        instanceId: pauseInstanceId,
+        stepType: 'tag_updated',
+        payload: { tags: next },
+      });
+      void queryClient.invalidateQueries({
+        queryKey: pauseReflectStepLatestQueryKey(pauseInstanceId, PAUSE_REFLECT_STEP_TAGS),
+      });
+    } catch {
+      /* ignore */
+    }
   }
 
   function addDraft() {
