@@ -3,27 +3,15 @@ import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useQuery } from '@tanstack/react-query';
 import { toast } from 'sonner';
-import { supabase } from '@/integrations/supabase/client';
 import type { PauseState } from '@/lib/pause-state';
 import type { FetchedPauseInstance, PersistedSession } from '@/lib/pause-session-storage';
+import { getPauseTerminalEntryStateQueryOptions } from '@/lib/pause-terminal-entry-state-query';
 import {
   isTerminalPauseDbState,
   persistedPauseSessionAllowsTerminalEntry,
 } from '@/lib/pause-terminal-entry-guard';
 
-export function pauseTerminalEntryStateQueryKey(pauseInstanceId: string) {
-  return ['pause', 'terminal-entry', 'db-state', pauseInstanceId] as const;
-}
-
-async function fetchPauseInstanceStateForTerminalGuard(pauseInstanceId: string): Promise<PauseState | null> {
-  const { data, error } = await supabase
-    .from('pause_instances' as never)
-    .select('state')
-    .eq('id', pauseInstanceId)
-    .maybeSingle();
-  if (error) throw error;
-  return (data as { state?: PauseState } | null)?.state ?? null;
-}
+export { pauseTerminalEntryStateQueryKey } from '@/lib/pause-terminal-entry-state-query';
 
 /**
  * Blocks `/pause` when the instance is already terminal in Postgres unless the tab still has
@@ -65,14 +53,12 @@ export function usePauseSessionTerminalEntryRedirect(input: {
       derivedFromFetch == null,
   );
 
-  const { data: serverState } = useQuery({
-    queryKey: pauseInstanceId ? pauseTerminalEntryStateQueryKey(pauseInstanceId) : ['pause', 'terminal-entry', 'db-state', 'none'],
-    queryFn: () => fetchPauseInstanceStateForTerminalGuard(pauseInstanceId!),
-    enabled: needsServerState,
-    staleTime: 0,
-    refetchOnWindowFocus: false,
-    retry: false,
-  });
+  const { data: serverState } = useQuery(
+    getPauseTerminalEntryStateQueryOptions({
+      pauseInstanceId,
+      enabled: needsServerState,
+    }),
+  );
 
   const resolvedDbState = useMemo((): PauseState | string | null | undefined => {
     if (!pauseInstanceId || !shellReady || waitingForFetch || fetchFailed) return undefined;
