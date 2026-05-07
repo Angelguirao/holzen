@@ -4,7 +4,11 @@ import { motion, useReducedMotion } from 'framer-motion';
 import { ArrowLeft, ArrowRight } from 'lucide-react';
 import { useInfiniteQuery } from '@tanstack/react-query';
 import { toast } from 'sonner';
-import { supabase } from '@/integrations/supabase/client';
+import {
+  blogPublishedPostsInfiniteQueryKey,
+  blogPublishedPostsNextPageParam,
+  fetchBlogPublishedPostsPage,
+} from '@/lib/blog-post-query';
 import { format } from 'date-fns';
 import { PageMeta } from '@/components/PageMeta';
 import { PublicFooter } from '@/components/PublicFooter';
@@ -12,39 +16,12 @@ import { useInfiniteScroll } from '@/hooks/use-infinite-scroll';
 import { useTranslation } from 'react-i18next';
 import { PageHeading } from '@/components/PageHeading';
 
-const PAGE_SIZE = 20;
-
-const BLOG_POSTS_INFINITE_QUERY_KEY = ['blog-posts', 'published', PAGE_SIZE] as const;
-
 const fade = (delay = 0) => ({
   initial: { opacity: 0, y: 14 },
   whileInView: { opacity: 1, y: 0 },
   viewport: { once: true, margin: '-40px' },
   transition: { duration: 0.6, delay, ease: [0.25, 0.1, 0.25, 1] },
 });
-
-interface BlogPost {
-  id: string;
-  slug: string;
-  title: string;
-  excerpt: string | null;
-  published_at: string | null;
-}
-
-async function fetchBlogPostsPage(cursor: string | null): Promise<BlogPost[]> {
-  let q = supabase
-    .from('blog_posts')
-    .select('id, slug, title, excerpt, published_at')
-    .eq('published', true)
-    .order('published_at', { ascending: false })
-    .limit(PAGE_SIZE);
-  if (cursor) {
-    q = q.lt('published_at', cursor);
-  }
-  const { data, error } = await q;
-  if (error) throw error;
-  return (data ?? []) as BlogPost[];
-}
 
 const Blog = () => {
   const { t } = useTranslation();
@@ -61,15 +38,11 @@ const Blog = () => {
     hasNextPage,
     fetchNextPage,
   } = useInfiniteQuery({
-    queryKey: BLOG_POSTS_INFINITE_QUERY_KEY,
-    queryFn: ({ pageParam }) => fetchBlogPostsPage((pageParam as string | null) ?? null),
+    queryKey: blogPublishedPostsInfiniteQueryKey(),
+    queryFn: ({ pageParam }) =>
+      fetchBlogPublishedPostsPage((pageParam as string | null) ?? null),
     initialPageParam: null as string | null,
-    getNextPageParam: (lastPage) => {
-      if (lastPage.length < PAGE_SIZE) return undefined;
-      const last = lastPage[lastPage.length - 1];
-      if (!last?.published_at) return undefined;
-      return last.published_at;
-    },
+    getNextPageParam: (lastPage) => blogPublishedPostsNextPageParam(lastPage),
     staleTime: 5 * 60_000,
     refetchOnWindowFocus: false,
     retry: false,
