@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { invokeEdge } from '@/lib/invoke-edge';
 import { useAuth } from '@/hooks/use-auth';
@@ -25,6 +26,20 @@ function markShownThisSession(ids: string[]) {
   }
 }
 
+/** TanStack cache for `user_badges.badge_id` rows (used by {@link useBadgeSync}). */
+export function userBadgesIdsQueryKey(userId: string) {
+  return ['user-badges', 'badge-ids', userId] as const;
+}
+
+async function fetchUserBadgeIds(userId: string): Promise<string[]> {
+  const { data, error } = await supabase
+    .from('user_badges' as never)
+    .select('badge_id')
+    .eq('user_id', userId);
+  if (error) throw error;
+  return ((data ?? []) as Array<{ badge_id: string }>).map((b) => b.badge_id);
+}
+
 /**
  * Syncs computed badge IDs to `user_badges`.
  *
@@ -45,11 +60,23 @@ export function useBadgeSync(
   notifyEnabled = true,
 ) {
   const { user } = useAuth();
+  const queryClient = useQueryClient();
   const [newBadges, setNewBadges] = useState<NewBadge[]>([]);
   const [synced, setSynced] = useState(false);
 
+  const userId = user?.id;
+  const badgeIdsQuery = useQuery({
+    queryKey: userId ? userBadgesIdsQueryKey(userId) : ['user-badges', 'badge-ids', '__none__'],
+    queryFn: () => fetchUserBadgeIds(userId!),
+    enabled: Boolean(userId) && computedBadgeIds.length > 0 && !synced,
+    staleTime: 0,
+    refetchOnWindowFocus: false,
+    retry: 1,
+  });
+
   useEffect(() => {
     if (!user || computedBadgeIds.length === 0 || synced) return;
+    if (badgeIdsQuery.isPending) return;
 
     const sync = async () => {
       const seedKey = LAST_SEED_KEY_PREFIX + user.id;
@@ -61,14 +88,7 @@ export function useBadgeSync(
         }
       })();
 
-      const { data: existing } = await supabase
-        .from('user_badges' as never)
-        .select('badge_id')
-        .eq('user_id', user.id);
-
-      const existingIds = new Set(
-        ((existing ?? []) as Array<{ badge_id: string }>).map((b) => b.badge_id),
-      );
+      const existingIds = new Set(badgeIdsQuery.data ?? []);
       const fresh = computedBadgeIds.filter((id) => !existingIds.has(id));
 
       if (fresh.length > 0) {
@@ -77,6 +97,8 @@ export function useBadgeSync(
           onConflict: 'user_id,badge_id',
           ignoreDuplicates: true,
         } as never);
+
+        void queryClient.invalidateQueries({ queryKey: userBadgesIdsQueryKey(user.id) });
 
         const shouldSilentSeed = !alreadySeeded && existingIds.size === 0 && fresh.length > 1;
 
@@ -135,7 +157,16 @@ export function useBadgeSync(
     };
 
     void sync();
-  }, [user, computedBadgeIds, badgeMeta, synced, notifyEnabled]);
+  }, [
+    user,
+    computedBadgeIds,
+    badgeMeta,
+    synced,
+    notifyEnabled,
+    badgeIdsQuery.isPending,
+    badgeIdsQuery.data,
+    queryClient,
+  ]);
 
   const dismissCelebration = useCallback(() => {
     setNewBadges([]);
