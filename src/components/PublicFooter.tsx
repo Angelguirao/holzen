@@ -3,6 +3,7 @@ import { useQueryClient } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
 import { Twitter } from 'lucide-react';
 import { prefetchCoingeckoBtcUsd } from '@/lib/coingecko-btc-usd-query';
+import { prefetchBlogPublishedFirstPage } from '@/lib/blog-post-query';
 
 export function PublicFooter() {
   const { t } = useTranslation();
@@ -43,7 +44,14 @@ export function PublicFooter() {
             {t('landing.btcReserve')}
           </Link>
           <span className="text-muted-foreground/20">·</span>
-          <Link to="/blog" className="hover:text-foreground transition-colors">{t('landing.blog')}</Link>
+          <Link
+            to="/blog"
+            className="hover:text-foreground transition-colors"
+            onMouseEnter={() => void prefetchBlogPublishedFirstPage(queryClient)}
+            onFocus={() => void prefetchBlogPublishedFirstPage(queryClient)}
+          >
+            {t('landing.blog')}
+          </Link>
           <span className="text-muted-foreground/20">·</span>
           <Link to="/terms" className="hover:text-foreground transition-colors">{t('landing.terms')}</Link>
           <span className="text-muted-foreground/20">·</span>

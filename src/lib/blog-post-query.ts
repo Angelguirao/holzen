@@ -93,3 +93,8 @@ export function getBlogPostBySlugQueryOptions(slug: string | undefined) {
 export function prefetchBlogPostBySlug(queryClient: QueryClient, slug: string): Promise<void> {
   return queryClient.prefetchQuery(getBlogPostBySlugQueryOptions(slug));
 }
+
+/** Warm the first page of the public `/blog` list before navigation. */
+export function prefetchBlogPublishedFirstPage(queryClient: QueryClient): Promise<void> {
+  return queryClient.prefetchInfiniteQuery(getBlogPublishedPostsInfiniteQueryOptions());
+}
