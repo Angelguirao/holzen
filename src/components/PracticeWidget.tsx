@@ -4,7 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { Waves, PenLine, Activity, History, Lock, ChevronRight, Sparkles } from 'lucide-react';
 import { useSubscription } from '@/hooks/use-subscription';
 import { useAuth } from '@/hooks/use-auth';
-import { supabase } from '@/integrations/supabase/client';
+import { getPracticeEntriesWeeklyCountQueryOptions } from '@/lib/practice-entries-weekly-count-query';
 import { toast } from 'sonner';
 import { useNavigate } from 'react-router-dom';
 import { homeInWidget } from '@/components/home/home-widget-styles';
@@ -21,31 +21,10 @@ const PRACTICES = [
   { id: 'replay' as const, icon: History, labelKey: 'practice.replayLabel', descKey: 'practice.replayDesc', free: false, route: TOOLS.practice.replay },
 ] as const;
 
-/** Shared with check-in flows that should refresh the Home practice widget counter. */
-export function practiceEntriesWeeklyCountQueryKey(userId: string) {
-  return ['practice-entries', 'weekly-count', userId] as const;
-}
-
-async function fetchWeeklyPracticeEntryCount(userId: string): Promise<number> {
-  const sevenDaysAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString();
-  const { count, error } = await supabase
-    .from('practice_entries')
-    .select('id', { count: 'exact', head: true })
-    .eq('user_id', userId)
-    .gte('created_at', sevenDaysAgo);
-  if (error) throw error;
-  return count ?? 0;
-}
+export { practiceEntriesWeeklyCountQueryKey } from '@/lib/practice-entries-weekly-count-query';
 
 function useWeeklyProgress(userId: string | undefined) {
-  const { data: count = 0 } = useQuery({
-    queryKey: userId ? practiceEntriesWeeklyCountQueryKey(userId) : ['practice-entries', 'weekly-count', 'none'],
-    queryFn: () => fetchWeeklyPracticeEntryCount(userId!),
-    enabled: Boolean(userId),
-    staleTime: 60_000,
-    refetchOnWindowFocus: false,
-    retry: false,
-  });
+  const { data: count = 0 } = useQuery(getPracticeEntriesWeeklyCountQueryOptions(userId));
   return count;
 }
 
