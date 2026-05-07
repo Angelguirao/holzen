@@ -1,4 +1,5 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useMemo, useCallback, useEffect } from 'react';
+import { useInfiniteQuery, type InfiniteData } from '@tanstack/react-query';
 import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/use-auth';
@@ -39,6 +40,42 @@ function writeCache(key: string, data: PauseArchiveRow[]) {
   }
 }
 
+/** Prefix for TanStack invalidation when pause lifecycle bumps archive-related caches. */
+export function pauseArchiveListQueryPrefix(userId: string) {
+  return ['pause-archive', userId] as const;
+}
+
+function pauseArchiveInfiniteQueryKey(
+  userId: string,
+  segment: PauseArchiveSegment,
+  favoritesOnly: boolean,
+  listSort: PauseArchiveListSort,
+) {
+  return [...pauseArchiveListQueryPrefix(userId), segment, favoritesOnly ? 'fav' : 'all', listSort] as const;
+}
+
+async function fetchArchivePage(
+  userId: string,
+  table: (typeof TABLE)[PauseArchiveSegment],
+  favoritesOnly: boolean,
+  listSort: PauseArchiveListSort,
+  offset: number,
+): Promise<PauseArchiveRow[]> {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  let q: any = (supabase as any).from(table).select('*').eq('user_id', userId);
+  if (favoritesOnly) q = q.eq('is_favorite', true);
+  if (listSort === 'alphabetical') {
+    q = q.order('source', { ascending: true, nullsFirst: false }).order('terminal_at', { ascending: false, nullsFirst: false });
+  } else if (listSort === 'oldest') {
+    q = q.order('terminal_at', { ascending: true, nullsFirst: false }).order('created_at', { ascending: true });
+  } else {
+    q = q.order('terminal_at', { ascending: false, nullsFirst: false }).order('created_at', { ascending: false });
+  }
+  const { data, error } = await q.range(offset, offset + PAGE_SIZE - 1);
+  if (error) throw error;
+  return (data as PauseArchiveRow[]) ?? [];
+}
+
 export type UsePauseArchiveListOptions = {
   segment: PauseArchiveSegment;
   favoritesOnly?: boolean;
@@ -53,96 +90,76 @@ export function usePauseArchiveList(options: UsePauseArchiveListOptions) {
   const segment = options.segment;
   const favoritesOnly = options.favoritesOnly ?? false;
   const listSort: PauseArchiveListSort = options.listSort ?? 'newest';
-  const key = cacheKey(segment, favoritesOnly, listSort);
+  const storageKey = cacheKey(segment, favoritesOnly, listSort);
   const table = TABLE[segment];
+  const userId = user?.id;
+  const queryEnabled = enabled && Boolean(userId);
 
-  const [rows, setRows] = useState<PauseArchiveRow[]>(() => (enabled ? readCache(key) ?? [] : []));
-  const [loading, setLoading] = useState(true);
-  const [listLoadFailed, setListLoadFailed] = useState(false);
-  const [loadingMore, setLoadingMore] = useState(false);
-  const [hasMore, setHasMore] = useState(true);
+  const queryKey = useMemo(() => {
+    if (!userId) return ['pause-archive', 'signed-out', segment, favoritesOnly ? 'fav' : 'all', listSort] as const;
+    if (!enabled) return ['pause-archive', userId, 'paused', segment, favoritesOnly ? 'fav' : 'all', listSort] as const;
+    return pauseArchiveInfiniteQueryKey(userId, segment, favoritesOnly, listSort);
+  }, [userId, enabled, segment, favoritesOnly, listSort]);
 
-  const fetchPage = useCallback(
-    async (offset: number) => {
-      if (!enabled || !user) return { data: [] as PauseArchiveRow[], error: null };
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      let q: any = (supabase as any).from(table).select('*').eq('user_id', user.id);
-      if (favoritesOnly) q = q.eq('is_favorite', true);
-      if (listSort === 'alphabetical') {
-        q = q.order('source', { ascending: true, nullsFirst: false }).order('terminal_at', { ascending: false, nullsFirst: false });
-      } else if (listSort === 'oldest') {
-        q = q.order('terminal_at', { ascending: true, nullsFirst: false }).order('created_at', { ascending: true });
-      } else {
-        q = q.order('terminal_at', { ascending: false, nullsFirst: false }).order('created_at', { ascending: false });
-      }
-      return q.range(offset, offset + PAGE_SIZE - 1);
+  const initialData = useMemo((): InfiniteData<PauseArchiveRow[], number> | undefined => {
+    if (!queryEnabled || !userId) return undefined;
+    const cached = readCache(storageKey);
+    if (!cached?.length) return undefined;
+    const page0 = cached.length > PAGE_SIZE ? cached.slice(0, PAGE_SIZE) : cached;
+    return { pages: [page0], pageParams: [0] };
+  }, [queryEnabled, userId, storageKey]);
+
+  const {
+    data,
+    isPending,
+    isFetching,
+    isError,
+    isFetchingNextPage,
+    hasNextPage,
+    fetchNextPage,
+    refetch,
+  } = useInfiniteQuery({
+    queryKey,
+    queryFn: async ({ pageParam }) => fetchArchivePage(userId!, table, favoritesOnly, listSort, pageParam),
+    enabled: queryEnabled,
+    initialData,
+    initialPageParam: 0,
+    getNextPageParam: (lastPage, allPages) => {
+      if (lastPage.length < PAGE_SIZE) return undefined;
+      return allPages.reduce((sum, p) => sum + p.length, 0);
     },
-    [user, table, favoritesOnly, listSort, enabled],
-  );
+    staleTime: 0,
+    refetchOnWindowFocus: false,
+    retry: false,
+  });
 
-  const fetchAll = useCallback(async () => {
-    if (!enabled) {
-      setRows([]);
-      setLoading(false);
-      setListLoadFailed(false);
-      setHasMore(false);
-      return;
-    }
-    if (!user) {
-      setLoading(false);
-      setListLoadFailed(false);
-      return;
-    }
-    const cached = readCache(key) ?? [];
-    const optimistic = cached.length > PAGE_SIZE ? cached.slice(0, PAGE_SIZE) : cached;
-    setRows(optimistic);
-    setLoading(optimistic.length === 0);
+  const rows = useMemo((): PauseArchiveRow[] => {
+    if (!queryEnabled) return [];
+    return data?.pages.flat() ?? [];
+  }, [queryEnabled, data]);
 
-    const { data, error } = await fetchPage(0);
-    if (error) {
-      setListLoadFailed(true);
-      setLoading(false);
-      return;
-    }
-    const next = (data as PauseArchiveRow[]) ?? [];
-    setRows(next);
-    setHasMore(next.length === PAGE_SIZE);
-    setListLoadFailed(false);
-    setLoading(false);
-    writeCache(key, next);
-  }, [user, fetchPage, key, enabled]);
+  const loading = queryEnabled && !isError && rows.length === 0 && (isPending || isFetching);
+  const listLoadFailed = queryEnabled && isError;
+  const loadingMore = isFetchingNextPage;
+  const hasMore = Boolean(hasNextPage);
+
+  useEffect(() => {
+    if (enabled && rows.length > 0) writeCache(storageKey, rows);
+  }, [rows, storageKey, enabled]);
 
   const loadMore = useCallback(async () => {
-    if (!enabled || !user || loadingMore || !hasMore) return;
-    setLoadingMore(true);
-    const offset = rows.length;
-    const { data, error } = await fetchPage(offset);
-    if (error) {
+    if (!queryEnabled || isFetchingNextPage || !hasNextPage) return;
+    try {
+      const result = await fetchNextPage();
+      if (result.isError) toast.error('Could not load more');
+    } catch {
       toast.error('Could not load more');
-      setHasMore(false);
-      setLoadingMore(false);
-      return;
     }
-    const batch = (data as PauseArchiveRow[]) ?? [];
-    if (batch.length > 0) {
-      setRows((prev) => {
-        const seen = new Set(prev.map((r) => r.id).filter(Boolean) as string[]);
-        const merged = [...prev, ...batch.filter((r) => r.id && !seen.has(r.id))];
-        writeCache(key, merged);
-        return merged;
-      });
-    }
-    setHasMore(batch.length === PAGE_SIZE);
-    setLoadingMore(false);
-  }, [enabled, user, loadingMore, hasMore, rows.length, fetchPage, key]);
+  }, [queryEnabled, isFetchingNextPage, hasNextPage, fetchNextPage]);
 
-  useEffect(() => {
-    void fetchAll();
-  }, [fetchAll]);
-
-  useEffect(() => {
-    if (enabled && rows.length > 0) writeCache(key, rows);
-  }, [rows, key, enabled]);
+  const refetchAll = useCallback(() => {
+    void refetch();
+  }, [refetch]);
 
   return {
     rows,
@@ -151,6 +168,6 @@ export function usePauseArchiveList(options: UsePauseArchiveListOptions) {
     loadingMore,
     hasMore,
     loadMore,
-    refetch: fetchAll,
+    refetch: refetchAll,
   };
 }
