@@ -36,37 +36,17 @@ import {
   type FutureLetterInvalidReason,
 } from '@/lib/future-letter-validation';
 import { invalidateHistoryCalendarActivities } from '@/lib/history-calendar-activities-query-key';
+import {
+  futureLettersListQueryKey,
+  getFutureLettersListQueryOptions,
+  type FutureLetterRow,
+} from '@/lib/future-letters-query';
 import { toast } from 'sonner';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { format } from 'date-fns';
 import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
 
-interface Letter {
-  id: string;
-  body: string;
-  written_during: string;
-  deliver_during: string;
-  btc_price_at_write: number;
-  written_at: string;
-  delivered: boolean;
-  delivered_at: string | null;
-  btc_price_at_delivery: number | null;
-  delivery_threshold: number | null;
-}
-
-function futureLettersListQueryKey(userId: string) {
-  return ['future-letters', 'list', userId] as const;
-}
-
-async function fetchFutureLettersList(userId: string): Promise<Letter[]> {
-  const { data, error } = await supabase
-    .from('future_letters')
-    .select('*')
-    .eq('user_id', userId)
-    .order('written_at', { ascending: false });
-  if (error) throw error;
-  return (data as unknown as Letter[]) ?? [];
-}
+type Letter = FutureLetterRow;
 
 const WRITING_PROMPTS = {
   crash: [
@@ -200,14 +180,7 @@ export function LetterToFutureSelf({
     isPending,
     isError,
     refetch,
-  } = useQuery({
-    queryKey: userId ? futureLettersListQueryKey(userId) : ['future-letters', 'list', 'none'],
-    queryFn: () => fetchFutureLettersList(userId!),
-    enabled: Boolean(userId),
-    staleTime: 60_000,
-    refetchOnWindowFocus: false,
-    retry: false,
-  });
+  } = useQuery(getFutureLettersListQueryOptions(userId));
 
   const pendingLetters = useMemo(() => allLetters.filter((l) => !l.delivered), [allLetters]);
   const deliveredLetters = useMemo(() => allLetters.filter((l) => l.delivered), [allLetters]);
