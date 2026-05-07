@@ -1,3 +1,5 @@
+import type { QueryClient } from '@tanstack/react-query';
+
 /**
  * Lightweight CoinGecko `simple/price` for BTC in USD (e.g. `/reserve` treasury math).
  * Heavier market strips use `fetchMarketData` in `btc.ts`.
@@ -24,4 +26,8 @@ export function getCoingeckoBtcUsdQueryOptions() {
     refetchOnWindowFocus: false,
     retry: false,
   } as const;
+}
+
+export function prefetchCoingeckoBtcUsd(queryClient: QueryClient): Promise<void> {
+  return queryClient.prefetchQuery(getCoingeckoBtcUsdQueryOptions());
 }
