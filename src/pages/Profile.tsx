@@ -53,6 +53,11 @@ const Profile = () => {
     };
   }, [t]);
 
+  useEffect(() => {
+    if (tab !== 'activity' || !userId) return;
+    void queryClient.prefetchQuery(getHistoryCalendarActivitiesQueryOptions(userId));
+  }, [tab, userId, queryClient]);
+
   const tabs = [
     { id: 'stats' as const, label: t('profile.stats'), icon: BarChart3 },
     { id: 'insights' as const, label: t('profile.insights'), icon: Sparkles },
