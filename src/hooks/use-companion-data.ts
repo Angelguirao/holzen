@@ -16,12 +16,12 @@ import { toZoomOutDisplayData, zoomOutLibraryAutosaveFromDisplayData } from '@/l
 import type { CachedHistoricalInsightShape } from '@/components/HistoricalInsightDisplay';
 import {
   EMPTY_COMPANION_UI_COMPLETION,
-  loadCompanionUiCompletionState,
   persistCompanionUiStepCompletion,
   type CompanionUiCompletionStep,
   type CompanionUiCompletionState,
 } from '@/lib/companion-completion-sync';
 import { companionUiCompletionQueryKey } from '@/lib/companion-ui-completion-query-key';
+import { getCompanionUiCompletionQueryOptions } from '@/lib/companion-ui-completion-query';
 import { loadMoodHistoryForOrchestrate } from '@/lib/companion-mood-history';
 import { loadActiveOrchestrateSources } from '@/lib/companion-orchestrate-sources';
 import { getRecencyHints } from '@/lib/companion-recency-hints';
@@ -120,14 +120,7 @@ export function useCompanionData({ companions, prefs, pauseInstanceId, context, 
   const autoSaveToLibrary = useCallback(async (_params: CompanionSlotAutosaveParams) => {}, []);
 
   // ── Completion state (TanStack: shared per pause id, deduped vs useEffect fetch) ──
-  const completionQuery = useQuery({
-    queryKey: pauseInstanceId ? companionUiCompletionQueryKey(pauseInstanceId) : ['pause', 'companion-ui-completion', 'none'],
-    queryFn: () => loadCompanionUiCompletionState(pauseInstanceId!),
-    enabled: Boolean(pauseInstanceId),
-    staleTime: 60_000,
-    refetchOnWindowFocus: false,
-    retry: false,
-  });
+  const completionQuery = useQuery(getCompanionUiCompletionQueryOptions(pauseInstanceId));
   const completion = completionQuery.data ?? EMPTY_COMPANION_UI_COMPLETION;
 
   const [cacheIds, setCacheIds] = useState<CompanionSlotCacheIds>({
