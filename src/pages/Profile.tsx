@@ -1,6 +1,6 @@
 import { useTranslation } from 'react-i18next';
 import { useEffect } from 'react';
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useAuth } from '@/hooks/use-auth';
 import { getCompletedPauseCountQueryOptions } from '@/hooks/use-completed-pause-count';
@@ -8,6 +8,7 @@ import { useSubscription } from '@/hooks/use-subscription';
 import { useHoldGoalProfile } from '@/hooks/use-hold-goal';
 import { type ProfileTab } from '@/lib/router-location-state';
 import { journeyPath, isProfileTab } from '@/lib/app-routes';
+import { getHistoryCalendarActivitiesQueryOptions } from '@/lib/history-calendar-activities-fetch';
 import { BarChart3, Sparkles, Award, CalendarDays } from 'lucide-react';
 import HistoryContent from '@/components/library/HistoryContent';
 import { StatsContentV2 } from '@/components/stats/StatsContentV2';
@@ -18,6 +19,7 @@ import { BadgesPanelV2 } from '@/components/BadgesPanelV2';
 
 const Profile = () => {
   const { user } = useAuth();
+  const queryClient = useQueryClient();
   const { t } = useTranslation();
   const { subscribed } = useSubscription();
   const navigate = useNavigate();
@@ -71,7 +73,12 @@ const Profile = () => {
             <button
               key={tabItem.id}
               type="button"
-              onClick={() => navigate(journeyPath(tabItem.id), { replace: true })}
+              onClick={() => {
+                if (tabItem.id === 'activity' && userId) {
+                  void queryClient.prefetchQuery(getHistoryCalendarActivitiesQueryOptions(userId));
+                }
+                navigate(journeyPath(tabItem.id), { replace: true });
+              }}
               className={`relative flex items-center gap-1.5 whitespace-nowrap rounded-lg px-3 py-2 font-medium text-xs uppercase tracking-wide transition-all ${
                 isActive
                   ? 'bg-muted/70 text-foreground shadow-sm'
