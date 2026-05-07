@@ -53,3 +53,18 @@ export async function loadPauseSessionSnapshot(
     companions: companionDataFromArtifacts(artifactRows),
   };
 }
+
+export const PAUSE_SESSION_COMPANION_SNAPSHOT_NONE_QUERY_KEY = ['pause', 'companion-fullview', 'snapshot', 'none'] as const;
+
+export function getPauseSessionCompanionSnapshotQueryOptions(pauseInstanceId: string | undefined) {
+  return {
+    queryKey: pauseInstanceId
+      ? pauseSessionCompanionSnapshotQueryKey(pauseInstanceId)
+      : PAUSE_SESSION_COMPANION_SNAPSHOT_NONE_QUERY_KEY,
+    queryFn: () => loadPauseSessionSnapshot(pauseInstanceId!),
+    enabled: Boolean(pauseInstanceId),
+    staleTime: 60_000,
+    refetchOnWindowFocus: false,
+    retry: false,
+  } as const;
+}
