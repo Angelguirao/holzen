@@ -3,7 +3,7 @@ import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { invokeEdge } from '@/lib/invoke-edge';
 import { useAuth } from '@/hooks/use-auth';
-import { historyCalendarActivitiesQueryKey } from '@/lib/history-calendar-activities-query-key';
+import { invalidateHistoryCalendarActivities } from '@/lib/history-calendar-activities-query-key';
 import type { NewBadge } from '@/components/BadgeCelebration';
 
 const SESSION_SHOWN_KEY = 'holzen_badges_shown_this_session';
@@ -100,7 +100,7 @@ export function useBadgeSync(
         } as never);
 
         void queryClient.invalidateQueries({ queryKey: userBadgesIdsQueryKey(user.id) });
-        void queryClient.invalidateQueries({ queryKey: historyCalendarActivitiesQueryKey(user.id) });
+        invalidateHistoryCalendarActivities(queryClient, user.id);
 
         const shouldSilentSeed = !alreadySeeded && existingIds.size === 0 && fresh.length > 1;
 
