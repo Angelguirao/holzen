@@ -4,12 +4,13 @@ import { AreaChart, Area, XAxis, YAxis, ResponsiveContainer, Tooltip } from 'rec
 import { Skeleton } from '@/components/ui/skeleton';
 import { TrendingDown, TrendingUp } from 'lucide-react';
 import { formatBtcPrice } from '@/lib/btc';
+import {
+  getCoingeckoMarketChartQueryOptions,
+  type CoingeckoMarketChartPoint,
+} from '@/lib/coingecko-market-chart-query';
 import { ErrorRetry } from '@/components/ErrorRetry';
 
-interface ChartPoint {
-  timestamp: number;
-  price: number;
-}
+export { coingeckoMarketChartQueryKey } from '@/lib/coingecko-market-chart-query';
 
 interface Props {
   hidden?: boolean;
@@ -18,44 +19,17 @@ interface Props {
   coinId?: string;
 }
 
-export function coingeckoMarketChartQueryKey(currency: string, coinId: string, retryNonce: number) {
-  return ['external', 'coingecko', 'market_chart', coinId, currency.toLowerCase(), retryNonce] as const;
-}
-
-async function fetchCoinGeckoMarketChart(
-  currency: string,
-  coinId: string,
-  signal: AbortSignal,
-): Promise<ChartPoint[]> {
-  const cur = currency.toLowerCase();
-  const id = encodeURIComponent(coinId);
-  const res = await fetch(
-    `https://api.coingecko.com/api/v3/coins/${id}/market_chart?vs_currency=${cur}&days=7`,
-    { signal },
-  );
-  if (!res.ok) throw new Error('fetch_failed');
-  const json = await res.json();
-  const prices: [number, number][] = json.prices;
-  if (!prices?.length || prices.length < 2) {
-    throw new Error('insufficient_points');
-  }
-  const step = Math.max(1, Math.floor(prices.length / 48));
-  return prices
-    .filter((_, i) => i % step === 0 || i === prices.length - 1)
-    .map(([t, p]) => ({ timestamp: t, price: p }));
-}
-
 export function BtcChart({ hidden = false, currency = 'USD', coinId = 'bitcoin' }: Props) {
   const [retryNonce, setRetryNonce] = useState(0);
 
-  const { data, isPending, isError } = useQuery({
-    queryKey: coingeckoMarketChartQueryKey(currency, coinId, retryNonce),
-    queryFn: ({ signal }) => fetchCoinGeckoMarketChart(currency, coinId, signal),
-    enabled: !hidden,
-    staleTime: 5 * 60_000,
-    refetchOnWindowFocus: false,
-    retry: false,
-  });
+  const { data, isPending, isError } = useQuery(
+    getCoingeckoMarketChartQueryOptions({
+      currency,
+      coinId,
+      retryNonce,
+      enabled: !hidden,
+    }),
+  );
 
   if (hidden) return null;
   if (isError) {
@@ -120,7 +94,7 @@ export function BtcChart({ hidden = false, currency = 'USD', coinId = 'bitcoin' 
             <Tooltip
               content={({ active, payload }) => {
                 if (!active || !payload?.[0]) return null;
-                const point = payload[0].payload as ChartPoint;
+                const point = payload[0].payload as CoingeckoMarketChartPoint;
                 return (
                   <div className="bg-popover border border-border px-2 py-1 rounded text-[10px] font-mono shadow-sm">
                     <p className="text-foreground">{formatPrice(point.price)}</p>
