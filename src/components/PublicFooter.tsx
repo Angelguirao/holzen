@@ -1,9 +1,12 @@
 import { Link } from 'react-router-dom';
+import { useQueryClient } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
 import { Twitter } from 'lucide-react';
+import { prefetchCoingeckoBtcUsd } from '@/lib/coingecko-btc-usd-query';
 
 export function PublicFooter() {
   const { t } = useTranslation();
+  const queryClient = useQueryClient();
 
   return (
     <footer className="max-w-lg mx-auto px-6 py-12 space-y-6">
@@ -31,7 +34,14 @@ export function PublicFooter() {
           <span className="text-muted-foreground/20">·</span>
           <Link to="/about" className="hover:text-foreground transition-colors">{t('landing.about')}</Link>
           <span className="text-muted-foreground/20">·</span>
-          <Link to="/reserve" className="hover:text-foreground transition-colors">{t('landing.btcReserve')}</Link>
+          <Link
+            to="/reserve"
+            className="hover:text-foreground transition-colors"
+            onMouseEnter={() => void prefetchCoingeckoBtcUsd(queryClient)}
+            onFocus={() => void prefetchCoingeckoBtcUsd(queryClient)}
+          >
+            {t('landing.btcReserve')}
+          </Link>
           <span className="text-muted-foreground/20">·</span>
           <Link to="/blog" className="hover:text-foreground transition-colors">{t('landing.blog')}</Link>
           <span className="text-muted-foreground/20">·</span>
