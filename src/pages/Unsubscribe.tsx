@@ -1,9 +1,12 @@
 import { useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { Button } from '@/components/ui/button';
 import { invokeEdge } from '@/lib/invoke-edge';
-import { getEmailUnsubscribeLinkQueryOptions } from '@/lib/email-unsubscribe-query';
+import {
+  emailUnsubscribeLinkQueryKey,
+  getEmailUnsubscribeLinkQueryOptions,
+} from '@/lib/email-unsubscribe-query';
 
 type ConfirmState =
   | { kind: 'idle' }
@@ -17,6 +20,7 @@ export { emailUnsubscribeLinkQueryKey } from '@/lib/email-unsubscribe-query';
 export default function Unsubscribe() {
   const [params] = useSearchParams();
   const token = params.get('token');
+  const queryClient = useQueryClient();
   const [confirm, setConfirm] = useState<ConfirmState>({ kind: 'idle' });
 
   const linkQuery = useQuery(getEmailUnsubscribeLinkQueryOptions(token));
@@ -32,10 +36,12 @@ export default function Unsubscribe() {
       return;
     }
     if (data?.success) {
+      void queryClient.invalidateQueries({ queryKey: emailUnsubscribeLinkQueryKey(token) });
       setConfirm({ kind: 'success' });
       return;
     }
     if (data?.reason === 'already_unsubscribed') {
+      void queryClient.invalidateQueries({ queryKey: emailUnsubscribeLinkQueryKey(token) });
       setConfirm({ kind: 'already' });
       return;
     }
