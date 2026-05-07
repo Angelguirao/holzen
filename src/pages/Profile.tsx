@@ -54,9 +54,9 @@ const Profile = () => {
   }, [t]);
 
   useEffect(() => {
-    if (tab !== 'activity' || !userId) return;
+    if (tab !== 'activity' || !userId || !subscribed) return;
     void queryClient.prefetchQuery(getHistoryCalendarActivitiesQueryOptions(userId));
-  }, [tab, userId, queryClient]);
+  }, [tab, userId, subscribed, queryClient]);
 
   const tabs = [
     { id: 'stats' as const, label: t('profile.stats'), icon: BarChart3 },
@@ -79,7 +79,7 @@ const Profile = () => {
               key={tabItem.id}
               type="button"
               onClick={() => {
-                if (tabItem.id === 'activity' && userId) {
+                if (tabItem.id === 'activity' && userId && subscribed) {
                   void queryClient.prefetchQuery(getHistoryCalendarActivitiesQueryOptions(userId));
                 }
                 navigate(journeyPath(tabItem.id), { replace: true });
