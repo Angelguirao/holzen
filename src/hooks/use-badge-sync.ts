@@ -4,6 +4,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { invokeEdge } from '@/lib/invoke-edge';
 import { useAuth } from '@/hooks/use-auth';
 import { invalidateHistoryCalendarActivities } from '@/lib/history-calendar-activities-query-key';
+import { getUserBadgeIdsQueryOptions, userBadgesIdsQueryKey } from '@/lib/user-badge-ids-query';
 import type { NewBadge } from '@/components/BadgeCelebration';
 
 const SESSION_SHOWN_KEY = 'holzen_badges_shown_this_session';
@@ -25,20 +26,6 @@ function markShownThisSession(ids: string[]) {
   } catch {
     /* ignore */
   }
-}
-
-/** TanStack cache for `user_badges.badge_id` rows (used by {@link useBadgeSync}). */
-export function userBadgesIdsQueryKey(userId: string) {
-  return ['user-badges', 'badge-ids', userId] as const;
-}
-
-async function fetchUserBadgeIds(userId: string): Promise<string[]> {
-  const { data, error } = await supabase
-    .from('user_badges' as never)
-    .select('badge_id')
-    .eq('user_id', userId);
-  if (error) throw error;
-  return ((data ?? []) as Array<{ badge_id: string }>).map((b) => b.badge_id);
 }
 
 /**
@@ -66,14 +53,12 @@ export function useBadgeSync(
   const [synced, setSynced] = useState(false);
 
   const userId = user?.id;
-  const badgeIdsQuery = useQuery({
-    queryKey: userId ? userBadgesIdsQueryKey(userId) : ['user-badges', 'badge-ids', '__none__'],
-    queryFn: () => fetchUserBadgeIds(userId!),
-    enabled: Boolean(userId) && computedBadgeIds.length > 0 && !synced,
-    staleTime: 0,
-    refetchOnWindowFocus: false,
-    retry: 1,
-  });
+  const badgeIdsQuery = useQuery(
+    getUserBadgeIdsQueryOptions({
+      userId,
+      enabled: computedBadgeIds.length > 0 && !synced,
+    }),
+  );
 
   useEffect(() => {
     if (!user || computedBadgeIds.length === 0 || synced) return;
