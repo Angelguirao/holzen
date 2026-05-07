@@ -4,6 +4,12 @@ import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { Bell, X, CheckCheck, ArrowRight } from 'lucide-react';
 import { hapticFeedback } from '@/lib/haptics';
+import {
+  fetchNotificationsInboxRows,
+  notificationsInboxQueryKey,
+  NOTIFICATIONS_INBOX_NONE_QUERY_KEY,
+  type NotificationsInboxRow,
+} from '@/lib/notifications-inbox-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/use-auth';
 import { formatDistanceToNow } from 'date-fns';
@@ -117,22 +123,8 @@ type NotificationItem = {
   action?: { label: string; path: string; state?: NotificationNavigateState };
 };
 
-type NotificationRow = {
-  id: string;
-  type: NotificationItem['type'];
-  metadata: unknown;
-  action_path: string | null;
-  action_state: unknown;
-  created_at: string;
-  dismissed_at: string | null;
-};
-
 const LAST_READ_KEY = 'holzen_notifications_read_at';
 const DISMISSED_KEY = 'holzen_notifications_dismissed';
-
-export function notificationsInboxQueryKey(userId: string) {
-  return ['notifications', 'inbox', userId] as const;
-}
 
 function getDismissedIds(): Set<string> {
   try {
@@ -178,7 +170,7 @@ export function NotificationBell() {
       .slice(0, 20);
   }, []);
 
-  const mapRowToNotification = useCallback((row: NotificationRow): NotificationItem | null => {
+  const mapRowToNotification = useCallback((row: NotificationsInboxRow): NotificationItem | null => {
     if (!row?.id || !row?.type || !row?.created_at) return null;
 
     const metadata = asRecord(row.metadata);
@@ -234,17 +226,10 @@ export function NotificationBell() {
   }, [t]);
 
   const { data: allNotifications = [], isPending: loading } = useQuery({
-    queryKey: user ? notificationsInboxQueryKey(user.id) : ['notifications', 'inbox', 'none'],
+    queryKey: user ? notificationsInboxQueryKey(user.id) : NOTIFICATIONS_INBOX_NONE_QUERY_KEY,
     queryFn: async () => {
-      const { data } = await supabase
-        .from('notifications')
-        .select('id, type, metadata, action_path, action_state, created_at, dismissed_at')
-        .eq('user_id', user!.id)
-        .is('dismissed_at', null)
-        .order('created_at', { ascending: false })
-        .limit(20);
-
-      const mapped = ((data ?? []) as unknown as NotificationRow[])
+      const rows = await fetchNotificationsInboxRows(user!.id);
+      const mapped = rows
         .map(mapRowToNotification)
         .filter((item): item is NotificationItem => item !== null);
       return normalizeNotifications(mapped);
