@@ -3,8 +3,7 @@ import { useSearchParams } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { Button } from '@/components/ui/button';
 import { invokeEdge } from '@/lib/invoke-edge';
-
-type LinkCheck = 'valid' | 'already' | 'invalid';
+import { getEmailUnsubscribeLinkQueryOptions } from '@/lib/email-unsubscribe-query';
 
 type ConfirmState =
   | { kind: 'idle' }
@@ -13,45 +12,14 @@ type ConfirmState =
   | { kind: 'already' }
   | { kind: 'error'; message: string };
 
-export function emailUnsubscribeLinkQueryKey(token: string) {
-  return ['auth', 'email-unsubscribe', 'link', token] as const;
-}
-
-async function fetchUnsubscribeLinkCheck(token: string): Promise<LinkCheck> {
-  try {
-    const supabaseUrl = import.meta.env.VITE_SUPABASE_URL as string;
-    const anonKey = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY as string;
-    const res = await fetch(
-      `${supabaseUrl}/functions/v1/handle-email-unsubscribe?token=${encodeURIComponent(token)}`,
-      { headers: { apikey: anonKey } },
-    );
-    let data: { valid?: boolean; reason?: string };
-    try {
-      data = await res.json();
-    } catch {
-      return 'invalid';
-    }
-    if (data.valid) return 'valid';
-    if (data.reason === 'already_unsubscribed') return 'already';
-    return 'invalid';
-  } catch {
-    return 'invalid';
-  }
-}
+export { emailUnsubscribeLinkQueryKey } from '@/lib/email-unsubscribe-query';
 
 export default function Unsubscribe() {
   const [params] = useSearchParams();
   const token = params.get('token');
   const [confirm, setConfirm] = useState<ConfirmState>({ kind: 'idle' });
 
-  const linkQuery = useQuery({
-    queryKey: token ? emailUnsubscribeLinkQueryKey(token) : ['auth', 'email-unsubscribe', 'link', 'none'],
-    queryFn: () => fetchUnsubscribeLinkCheck(token!),
-    enabled: Boolean(token),
-    staleTime: Number.POSITIVE_INFINITY,
-    refetchOnWindowFocus: false,
-    retry: false,
-  });
+  const linkQuery = useQuery(getEmailUnsubscribeLinkQueryOptions(token));
 
   const onConfirm = async () => {
     if (!token) return;
