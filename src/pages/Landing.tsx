@@ -1,5 +1,6 @@
 import { useTranslation } from 'react-i18next';
 import { useEffect, useRef } from 'react';
+import { useQueryClient } from '@tanstack/react-query';
 import { LandingComparison } from '@/components/LandingComparison';
 import { useNavigate, Link, useSearchParams } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
@@ -15,6 +16,7 @@ import { PageMeta } from '@/components/PageMeta';
 import { LandingTestimonials } from '@/components/LandingTestimonials';
 import { LandingLanguageSwitcher } from '@/components/LandingLanguageSwitcher';
 import { PRICING } from '@/lib/pricing';
+import { prefetchCoingeckoBtcUsd } from '@/lib/coingecko-btc-usd-query';
 
 function Section({ children, className = '', delay = 0 }: { children: React.ReactNode; className?: string; delay?: number }) {
   const ref = useRef(null);
@@ -43,6 +45,7 @@ function SectionLabel({ children }: { children: React.ReactNode }) {
 }
 
 const Landing = () => {
+  const queryClient = useQueryClient();
   const { t } = useTranslation();
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
@@ -389,7 +392,14 @@ const Landing = () => {
           <div className="flex flex-wrap items-center gap-3 text-xs text-muted-foreground/60 mt-6">
             <Link to="/about" className="hover:text-foreground transition-colors">{t('landing.about')}</Link>
             <span className="text-muted-foreground/20">·</span>
-            <Link to="/reserve" className="hover:text-foreground transition-colors">{t('landing.btcReserve')}</Link>
+            <Link
+              to="/reserve"
+              className="hover:text-foreground transition-colors"
+              onMouseEnter={() => void prefetchCoingeckoBtcUsd(queryClient)}
+              onFocus={() => void prefetchCoingeckoBtcUsd(queryClient)}
+            >
+              {t('landing.btcReserve')}
+            </Link>
             <span className="text-muted-foreground/20">·</span>
             <Link to="/blog" className="hover:text-foreground transition-colors">{t('landing.blog')}</Link>
             <span className="text-muted-foreground/20">·</span>
