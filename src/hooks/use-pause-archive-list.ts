@@ -158,8 +158,9 @@ export function usePauseArchiveList(options: UsePauseArchiveListOptions) {
   }, [queryEnabled, isFetchingNextPage, hasNextPage, fetchNextPage]);
 
   const refetchAll = useCallback(() => {
+    if (!queryEnabled) return;
     void refetch();
-  }, [refetch]);
+  }, [refetch, queryEnabled]);
 
   return {
     rows,
