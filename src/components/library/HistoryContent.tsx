@@ -3,7 +3,10 @@ import { useState } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/use-auth';
-import { historyCalendarActivitiesQueryKey } from '@/lib/history-calendar-activities-query-key';
+import {
+  historyCalendarActivitiesQueryKey,
+  invalidateHistoryCalendarActivities,
+} from '@/lib/history-calendar-activities-query-key';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
@@ -119,7 +122,7 @@ const HistoryContent = () => {
             size="sm"
             className="self-start"
             onClick={() => {
-              if (userId) void queryClient.invalidateQueries({ queryKey: historyCalendarActivitiesQueryKey(userId) });
+              if (userId) invalidateHistoryCalendarActivities(queryClient, userId);
             }}
           >
             {t('common.tryAgain')}
