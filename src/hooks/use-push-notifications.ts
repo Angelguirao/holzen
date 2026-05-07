@@ -1,55 +1,46 @@
-import { useState, useEffect, useCallback, useMemo } from "react";
+import { useState, useCallback, useMemo } from "react";
 import { useTranslation } from "react-i18next";
 import { toast } from "sonner";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { invokeEdge } from "@/lib/invoke-edge";
 import { useAuth } from "@/hooks/use-auth";
+
+export function pushSubscriptionQueryKey(userId: string) {
+  return ["push", "subscription", userId] as const;
+}
+
+async function fetchBrowserPushSubscribed(): Promise<boolean> {
+  const reg = await navigator.serviceWorker.ready;
+  const sub = await reg.pushManager.getSubscription();
+  return Boolean(sub);
+}
 
 export function usePushNotifications() {
   const { t } = useTranslation();
   const { user } = useAuth();
-  const [isSubscribed, setIsSubscribed] = useState(false);
-  const [isSupported, setIsSupported] = useState(false);
+  const queryClient = useQueryClient();
   const [loading, setLoading] = useState(false);
-  /** False until first `getSubscription` completes for the signed-in user (avoids banner flash). */
-  const [pushRegistrationChecked, setPushRegistrationChecked] = useState(false);
 
-  useEffect(() => {
-    setIsSupported("serviceWorker" in navigator && "PushManager" in window);
-  }, []);
+  const isSupported = useMemo(
+    () => typeof navigator !== "undefined" && "serviceWorker" in navigator && "PushManager" in window,
+    [],
+  );
 
-  // Check existing subscription on mount / user change
-  useEffect(() => {
-    if (!isSupported || !user) {
-      setIsSubscribed(false);
-      setPushRegistrationChecked(false);
-      return;
-    }
-    let cancelled = false;
-    setPushRegistrationChecked(false);
-    void navigator.serviceWorker.ready.then((reg) =>
-      reg.pushManager.getSubscription().then((sub) => {
-        if (!cancelled) {
-          setIsSubscribed(!!sub);
-          setPushRegistrationChecked(true);
-        }
-      }),
-    );
-    return () => {
-      cancelled = true;
-    };
-  }, [isSupported, user]);
+  const subQueryEnabled = isSupported && Boolean(user);
 
-  // Re-check when returning to the tab (e.g. user cleared site data elsewhere)
-  useEffect(() => {
-    if (!isSupported || !user) return;
-    const recheck = () => {
-      void navigator.serviceWorker.ready.then((reg) =>
-        reg.pushManager.getSubscription().then((sub) => setIsSubscribed(!!sub)),
-      );
-    };
-    window.addEventListener("focus", recheck);
-    return () => window.removeEventListener("focus", recheck);
-  }, [isSupported, user]);
+  const pushSubQuery = useQuery({
+    queryKey: user ? pushSubscriptionQueryKey(user.id) : ["push", "subscription", "__none__"],
+    queryFn: fetchBrowserPushSubscribed,
+    enabled: subQueryEnabled,
+    staleTime: 0,
+    gcTime: 5 * 60_000,
+    refetchOnWindowFocus: true,
+    retry: false,
+  });
+
+  const isSubscribed = pushSubQuery.data ?? false;
+  /** False until first successful `getSubscription` read (avoids banner flash; errors stay unchecked like a hung promise). */
+  const pushRegistrationChecked = subQueryEnabled && pushSubQuery.isSuccess;
 
   const subscribe = useCallback(async () => {
     if (!user || !isSupported) return;
@@ -85,14 +76,14 @@ export function usePushNotifications() {
       });
       if (error) throw error;
 
-      setIsSubscribed(true);
+      queryClient.setQueryData(pushSubscriptionQueryKey(user.id), true);
     } catch (e) {
       console.error("Push subscribe error:", e);
       toast.error(t("settings.pushSubscribeFailed"));
     } finally {
       setLoading(false);
     }
-  }, [user, isSupported, t]);
+  }, [user, isSupported, t, queryClient]);
 
   const unsubscribe = useCallback(async () => {
     if (!user || !isSupported) return;
@@ -113,14 +104,14 @@ export function usePushNotifications() {
 
         await subscription.unsubscribe();
       }
-      setIsSubscribed(false);
+      queryClient.setQueryData(pushSubscriptionQueryKey(user.id), false);
     } catch (e) {
       console.error("Push unsubscribe error:", e);
       toast.error(t("settings.pushUnsubscribeFailed"));
     } finally {
       setLoading(false);
     }
-  }, [user, isSupported, t]);
+  }, [user, isSupported, t, queryClient]);
 
   const permissionGrantedNotSubscribed = useMemo(() => {
     if (typeof window === "undefined" || typeof Notification === "undefined") return false;
