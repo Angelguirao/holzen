@@ -6,6 +6,7 @@ import { pendingPauseOfferQueryKey } from '@/hooks/use-pending-pause-offer';
 import { pauseArchiveListQueryPrefix } from '@/hooks/use-pause-archive-list';
 import { libraryBundleQueryPrefix } from '@/hooks/use-library';
 import { getHolzenQueryClient } from '@/lib/holzen-query-client-ref';
+import { archivePausesTabHasRowsQueryPrefix } from '@/lib/archive-pauses-tab-query';
 import { invalidateHistoryCalendarActivities } from '@/lib/history-calendar-activities-query-key';
 
 /**
@@ -25,7 +26,7 @@ export function invalidatePauseStatsDataForUser(userId: string | null | undefine
   invalidateHistoryCalendarActivities(qc, userId);
   void qc.invalidateQueries({ queryKey: PAUSE_STATS_DATA_QUERY_KEY(userId) });
   void qc.invalidateQueries({ queryKey: COMPLETED_PAUSE_COUNT_QUERY_KEY(userId) });
-  void qc.invalidateQueries({ queryKey: ['archive', 'pauses-tab-has-rows', userId] });
+  void qc.invalidateQueries({ queryKey: archivePausesTabHasRowsQueryPrefix(userId) });
   void qc.invalidateQueries({ queryKey: pauseArchiveListQueryPrefix(userId) });
   void qc.invalidateQueries({ queryKey: libraryBundleQueryPrefix(userId) });
   void qc.invalidateQueries({ queryKey: pendingPauseOfferQueryKey(userId) });
