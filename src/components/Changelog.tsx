@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next';
 import {
   CHANGELOG_ENTRIES_QUERY_KEY,
   getChangelogEntriesInfiniteQueryOptions,
+  prefetchChangelogEntriesFirstPage,
 } from '@/lib/changelog-query';
 import {
   AlertDialog,
@@ -67,6 +68,8 @@ export const Changelog = forwardRef<HTMLDivElement, ChangelogProps>(function Cha
     <div ref={ref}>
       <button
         type="button"
+        onMouseEnter={() => void prefetchChangelogEntriesFirstPage(queryClient)}
+        onFocus={() => void prefetchChangelogEntriesFirstPage(queryClient)}
         onClick={() => {
           onWhatsNewOpen?.();
           setOpen(true);

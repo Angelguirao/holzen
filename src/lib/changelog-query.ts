@@ -1,3 +1,4 @@
+import type { QueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import type { Database } from '@/integrations/supabase/types';
 
@@ -48,16 +49,27 @@ export async function fetchChangelogEntriesPage(
   return (data as ChangelogEntryRow[]) ?? [];
 }
 
-export function getChangelogEntriesInfiniteQueryOptions(open: boolean) {
-  const pageSize = CHANGELOG_ENTRIES_PAGE_SIZE;
+function changelogEntriesInfiniteQueryCore(pageSize: number = CHANGELOG_ENTRIES_PAGE_SIZE) {
   return {
     queryKey: CHANGELOG_ENTRIES_QUERY_KEY,
-    queryFn: ({ pageParam }) => fetchChangelogEntriesPage(pageParam as string | undefined, pageSize),
+    queryFn: ({ pageParam }: { pageParam: unknown }) =>
+      fetchChangelogEntriesPage(pageParam as string | undefined, pageSize),
     initialPageParam: undefined as string | undefined,
     getNextPageParam: (lastPage: ChangelogEntryRow[]) =>
       lastPage.length < pageSize ? undefined : lastPage[lastPage.length - 1]!.created_at,
-    enabled: open,
     staleTime: 60_000,
     refetchOnWindowFocus: false,
   };
+}
+
+export function getChangelogEntriesInfiniteQueryOptions(open: boolean) {
+  return {
+    ...changelogEntriesInfiniteQueryCore(),
+    enabled: open,
+  };
+}
+
+/** Warm the first changelog page before the dialog opens (hover / keyboard focus on trigger). */
+export function prefetchChangelogEntriesFirstPage(queryClient: QueryClient): Promise<void> {
+  return queryClient.prefetchInfiniteQuery(changelogEntriesInfiniteQueryCore());
 }
