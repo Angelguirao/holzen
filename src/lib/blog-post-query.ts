@@ -46,6 +46,22 @@ export function blogPublishedPostsNextPageParam(
   return last.published_at;
 }
 
+/** Shared `useInfiniteQuery` bundle for the public `/blog` index. */
+export function getBlogPublishedPostsInfiniteQueryOptions() {
+  const pageSize = BLOG_PUBLISHED_LIST_PAGE_SIZE;
+  return {
+    queryKey: blogPublishedPostsInfiniteQueryKey(pageSize),
+    queryFn: ({ pageParam }) =>
+      fetchBlogPublishedPostsPage((pageParam as string | null) ?? null, pageSize),
+    initialPageParam: null as string | null,
+    getNextPageParam: (lastPage: BlogPublishedListRow[]) =>
+      blogPublishedPostsNextPageParam(lastPage, pageSize),
+    staleTime: 5 * 60_000,
+    refetchOnWindowFocus: false,
+    retry: false,
+  };
+}
+
 export function blogPostBySlugQueryKey(slug: string) {
   return ['blog-post', slug] as const;
 }
