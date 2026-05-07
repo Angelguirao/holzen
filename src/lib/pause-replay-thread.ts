@@ -101,6 +101,60 @@ export type PausePickerRow = {
   reflection_text: string | null;
 };
 
+export const REPLAY_RECENT_PAUSES_NONE_QUERY_KEY = ['practice', 'replay', 'recent-pauses', '__none__'] as const;
+
+export function replayRecentPausesQueryKey(userId: string) {
+  return ['practice', 'replay', 'recent-pauses', userId] as const;
+}
+
+export const PAUSE_REPLAY_THREAD_NONE_QUERY_KEY = ['practice', 'replay', 'thread', '__none__'] as const;
+
+/** Resolves the replay thread or throws (for TanStack `useQuery` error state). */
+export async function fetchPauseReplayThreadOrThrow(
+  pauseInstanceId: string,
+): Promise<PastReflectionWithWords> {
+  const res = await loadPauseReplayThread(pauseInstanceId);
+  if (!res.ok) {
+    throw new Error(res.message ?? res.code);
+  }
+  return res.thread;
+}
+
+/**
+ * Picker list: recent completed pauses. `listEnabled` is false once the user
+ * has selected a pause (parent stops refetching the list while viewing a thread).
+ */
+export function getReplayRecentPausesQueryOptions(params: {
+  userId: string | undefined;
+  listEnabled: boolean;
+}) {
+  const { userId, listEnabled } = params;
+  return {
+    queryKey: userId ? replayRecentPausesQueryKey(userId) : REPLAY_RECENT_PAUSES_NONE_QUERY_KEY,
+    queryFn: () => loadRecentCompletedPausesForReplay(),
+    enabled: Boolean(userId) && listEnabled,
+    staleTime: 60_000,
+    refetchOnWindowFocus: false,
+    retry: false,
+  } as const;
+}
+
+export function getPauseReplayThreadQueryOptions(params: {
+  userId: string | undefined;
+  pauseInstanceId: string | null | undefined;
+}) {
+  const { userId, pauseInstanceId } = params;
+  const enabled = Boolean(userId && pauseInstanceId);
+  return {
+    queryKey: pauseInstanceId ? pauseReplayThreadQueryKey(pauseInstanceId) : PAUSE_REPLAY_THREAD_NONE_QUERY_KEY,
+    queryFn: () => fetchPauseReplayThreadOrThrow(pauseInstanceId!),
+    enabled,
+    staleTime: 60_000,
+    refetchOnWindowFocus: false,
+    retry: false,
+  } as const;
+}
+
 /** Recent completed pauses for the replay picker (shell only — no per-row word counts). */
 export async function loadRecentCompletedPausesForReplay(limit = 24): Promise<PausePickerRow[]> {
   const { data, error } = await supabase

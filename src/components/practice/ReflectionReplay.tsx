@@ -18,11 +18,12 @@ import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { Textarea } from '@/components/ui/textarea';
 import { Button } from '@/components/ui/button';
-import type { PastReflectionWithWords, UserWord } from '../../../supabase/functions/_shared/past-reflection-util';
+import type { UserWord } from '../../../supabase/functions/_shared/past-reflection-util';
 import {
-  loadPauseReplayThread,
-  loadRecentCompletedPausesForReplay,
+  getPauseReplayThreadQueryOptions,
+  getReplayRecentPausesQueryOptions,
   pauseReplayThreadQueryKey,
+  replayRecentPausesQueryKey,
   type PausePickerRow,
 } from '@/lib/pause-replay-thread';
 
@@ -31,10 +32,6 @@ interface Props {
   textColor?: string;
   ringColor?: string;
   initialPauseInstanceId?: string;
-}
-
-function replayRecentPausesQueryKey(userId: string) {
-  return ['practice', 'replay', 'recent-pauses', userId] as const;
 }
 
 function ThreadLine({ word }: { word: UserWord }) {
@@ -64,29 +61,19 @@ export function ReflectionReplay({ onComplete, initialPauseInstanceId }: Props) 
   const {
     data: picker = [],
     isPending: loadingList,
-  } = useQuery({
-    queryKey: user ? replayRecentPausesQueryKey(user.id) : ['practice', 'replay', 'recent-pauses', '__none__'],
-    queryFn: () => loadRecentCompletedPausesForReplay(),
-    enabled: Boolean(user) && !selectedId,
-    staleTime: 60_000,
-    refetchOnWindowFocus: false,
-    retry: false,
-  });
+  } = useQuery(
+    getReplayRecentPausesQueryOptions({
+      userId: user?.id,
+      listEnabled: !selectedId,
+    }),
+  );
 
-  const threadQuery = useQuery({
-    queryKey: user && selectedId ? pauseReplayThreadQueryKey(selectedId) : ['practice', 'replay', 'thread', '__none__'],
-    queryFn: async (): Promise<PastReflectionWithWords> => {
-      const res = await loadPauseReplayThread(selectedId!);
-      if (!res.ok) {
-        throw new Error(res.message ?? res.code);
-      }
-      return res.thread;
-    },
-    enabled: Boolean(user && selectedId),
-    staleTime: 60_000,
-    refetchOnWindowFocus: false,
-    retry: false,
-  });
+  const threadQuery = useQuery(
+    getPauseReplayThreadQueryOptions({
+      userId: user?.id,
+      pauseInstanceId: selectedId,
+    }),
+  );
 
   const thread = threadQuery.data ?? null;
   /** Full-screen spinner until the first thread payload exists (initial pick or refetch after error). */
