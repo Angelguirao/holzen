@@ -2,11 +2,10 @@ import { useTranslation } from 'react-i18next';
 import { useState } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useAuth } from '@/hooks/use-auth';
-import { fetchHistoryCalendarActivities } from '@/lib/history-calendar-activities-fetch';
 import {
-  historyCalendarActivitiesQueryKey,
-  invalidateHistoryCalendarActivities,
-} from '@/lib/history-calendar-activities-query-key';
+  getHistoryCalendarActivitiesQueryOptions,
+} from '@/lib/history-calendar-activities-fetch';
+import { invalidateHistoryCalendarActivities } from '@/lib/history-calendar-activities-query-key';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
@@ -23,14 +22,7 @@ const HistoryContent = () => {
     data: activities = [],
     isPending,
     isError,
-  } = useQuery({
-    queryKey: userId ? historyCalendarActivitiesQueryKey(userId) : ['history-calendar', 'activities', 'none'],
-    queryFn: () => fetchHistoryCalendarActivities(userId!),
-    enabled: Boolean(userId),
-    staleTime: 60_000,
-    refetchOnWindowFocus: false,
-    retry: false,
-  });
+  } = useQuery(getHistoryCalendarActivitiesQueryOptions(userId));
 
   const loading = Boolean(userId) && isPending;
   const loadFailed = Boolean(userId) && isError;
