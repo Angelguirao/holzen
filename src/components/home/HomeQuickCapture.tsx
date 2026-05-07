@@ -5,6 +5,7 @@ import { useTranslation } from 'react-i18next';
 import { BookOpen } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/use-auth';
+import { getHomeQuickCaptureLastPauseQueryOptions } from '@/lib/home-quick-capture-last-pause-query';
 import { practiceEntriesWeeklyCountQueryKey } from '@/components/PracticeWidget';
 import { toolsHubDataQueryKey } from '@/hooks/use-tools-hub-data';
 import { practicePrimarySuggestionQueryKey } from '@/hooks/use-practice-suggestion';
@@ -22,12 +23,6 @@ import { cn } from '@/lib/utils';
 
 const QUICK_MOODS = ['calm', 'anxious', 'fomo', 'uncertain'] as const;
 
-interface LastPauseRow {
-  id: string;
-  created_at: string | null;
-  terminal_at: string | null;
-}
-
 function relTime(iso: string, locale: string): string {
   const d = new Date(iso);
   const now = new Date();
@@ -39,23 +34,6 @@ function relTime(iso: string, locale: string): string {
   return d.toLocaleDateString(locale, { month: 'short', day: 'numeric' });
 }
 
-function homeQuickCaptureLastPauseQueryKey(userId: string) {
-  return ['home', 'quick-capture', 'last-pause', userId] as const;
-}
-
-async function fetchLastPauseForQuickCapture(userId: string): Promise<LastPauseRow | null> {
-  const { data, error } = await supabase
-    .from('v_pause_full' as never)
-    .select('id, created_at, terminal_at')
-    .eq('user_id', userId)
-    .order('terminal_at', { ascending: false, nullsFirst: false })
-    .order('created_at', { ascending: false })
-    .limit(1)
-    .maybeSingle();
-  if (error) throw error;
-  return (data as LastPauseRow | null) ?? null;
-}
-
 export function HomeQuickCapture() {
   const { t, i18n } = useTranslation();
   const { user } = useAuth();
@@ -65,14 +43,9 @@ export function HomeQuickCapture() {
   const [note, setNote] = useState('');
   const [saving, setSaving] = useState(false);
 
-  const { data: lastPause = null, isPending: loadingLib } = useQuery({
-    queryKey: userId ? homeQuickCaptureLastPauseQueryKey(userId) : ['home', 'quick-capture', 'last-pause', 'none'],
-    queryFn: () => fetchLastPauseForQuickCapture(userId!),
-    enabled: Boolean(userId),
-    staleTime: 60_000,
-    refetchOnWindowFocus: false,
-    retry: false,
-  });
+  const { data: lastPause = null, isPending: loadingLib } = useQuery(
+    getHomeQuickCaptureLastPauseQueryOptions(userId),
+  );
 
   const saveCheckin = useCallback(async () => {
     if (!user) return;
