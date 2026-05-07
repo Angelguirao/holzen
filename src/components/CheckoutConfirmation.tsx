@@ -13,6 +13,7 @@ import { Button } from '@/components/ui/button';
 import { LoadingSpinner } from '@/components/ui/loading-spinner';
 import { useSubscription } from '@/hooks/use-subscription';
 import { PRICING } from '@/lib/pricing';
+import { fetchCheckoutEvents } from '@/lib/checkout-events-query';
 import { invokeEdge } from '@/lib/invoke-edge';
 import { toast } from 'sonner';
 import {
@@ -76,21 +77,6 @@ const QUIET_STATE_CHECKLIST = {
   //    affordance whose accessible name dismisses or navigates away.
   requiredExits: ['Close', 'Manage subscription'] as const,
 } as const;
-
-/**
- * Subset of the `list-checkout-events` row we care about. The full shape lives
- * in `src/pages/BillingHistory.tsx`; we duplicate the slice here to avoid a
- * cross-page import for a tiny structural type.
- */
-type CheckoutEventLite = {
-  session_id: string;
-  created: number;
-  pack_type: string | null;
-  expected_credits: number;
-  payment_status: string;
-  grant_status: 'applied' | 'pending' | 'not_applicable';
-  granted_credits: number | null;
-};
 
 /**
  * Persistent guard for the most-recently-confirmed checkout outcome.
@@ -605,9 +591,7 @@ export function CheckoutConfirmation() {
     const tick = async () => {
       attempt += 1;
       try {
-        const { data, error } = await invokeEdge<{ events?: CheckoutEventLite[] }>('list-checkout-events');
-        if (error) throw error;
-        const events = data?.events ?? [];
+        const events = await fetchCheckoutEvents();
         // Most recent paid session for this pack type, by created desc.
         const match = events
           .filter(
