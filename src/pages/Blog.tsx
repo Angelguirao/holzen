@@ -4,11 +4,7 @@ import { motion, useReducedMotion } from 'framer-motion';
 import { ArrowLeft, ArrowRight } from 'lucide-react';
 import { useInfiniteQuery } from '@tanstack/react-query';
 import { toast } from 'sonner';
-import {
-  blogPublishedPostsInfiniteQueryKey,
-  blogPublishedPostsNextPageParam,
-  fetchBlogPublishedPostsPage,
-} from '@/lib/blog-post-query';
+import { getBlogPublishedPostsInfiniteQueryOptions } from '@/lib/blog-post-query';
 import { format } from 'date-fns';
 import { PageMeta } from '@/components/PageMeta';
 import { PublicFooter } from '@/components/PublicFooter';
@@ -37,16 +33,7 @@ const Blog = () => {
     isFetchingNextPage,
     hasNextPage,
     fetchNextPage,
-  } = useInfiniteQuery({
-    queryKey: blogPublishedPostsInfiniteQueryKey(),
-    queryFn: ({ pageParam }) =>
-      fetchBlogPublishedPostsPage((pageParam as string | null) ?? null),
-    initialPageParam: null as string | null,
-    getNextPageParam: (lastPage) => blogPublishedPostsNextPageParam(lastPage),
-    staleTime: 5 * 60_000,
-    refetchOnWindowFocus: false,
-    retry: false,
-  });
+  } = useInfiniteQuery(getBlogPublishedPostsInfiniteQueryOptions());
 
   const posts = useMemo(() => data?.pages.flat() ?? [], [data]);
   const hasMore = Boolean(hasNextPage);
