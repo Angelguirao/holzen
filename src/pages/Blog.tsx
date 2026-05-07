@@ -2,9 +2,9 @@ import { useMemo, useCallback } from 'react';
 import { Link } from 'react-router-dom';
 import { motion, useReducedMotion } from 'framer-motion';
 import { ArrowLeft, ArrowRight } from 'lucide-react';
-import { useInfiniteQuery } from '@tanstack/react-query';
+import { useInfiniteQuery, useQueryClient } from '@tanstack/react-query';
 import { toast } from 'sonner';
-import { getBlogPublishedPostsInfiniteQueryOptions } from '@/lib/blog-post-query';
+import { getBlogPublishedPostsInfiniteQueryOptions, prefetchBlogPostBySlug } from '@/lib/blog-post-query';
 import { format } from 'date-fns';
 import { PageMeta } from '@/components/PageMeta';
 import { PublicFooter } from '@/components/PublicFooter';
@@ -21,6 +21,7 @@ const fade = (delay = 0) => ({
 
 const Blog = () => {
   const { t } = useTranslation();
+  const queryClient = useQueryClient();
   const prefersReduced = useReducedMotion();
   const m = (delay = 0) => (prefersReduced ? {} : fade(delay));
 
@@ -95,7 +96,12 @@ const Blog = () => {
           <div className="space-y-8">
             {posts.map((post, i) => (
               <motion.div key={post.id} {...m(i * 0.05)}>
-                <Link to={`/blog/${post.slug}`} className="block group space-y-2">
+                <Link
+                  to={`/blog/${post.slug}`}
+                  className="block group space-y-2"
+                  onMouseEnter={() => void prefetchBlogPostBySlug(queryClient, post.slug)}
+                  onFocus={() => void prefetchBlogPostBySlug(queryClient, post.slug)}
+                >
                   {post.published_at && (
                     <p className="text-[10px] font-mono text-muted-foreground/70 tracking-wider uppercase">
                       {format(new Date(post.published_at), 'MMM d, yyyy')}

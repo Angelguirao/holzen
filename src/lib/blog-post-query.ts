@@ -1,3 +1,4 @@
+import type { QueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import type { Database } from '@/integrations/supabase/types';
 
@@ -86,4 +87,9 @@ export function getBlogPostBySlugQueryOptions(slug: string | undefined) {
     refetchOnWindowFocus: false,
     retry: false,
   } as const;
+}
+
+/** Warm `/blog/:slug` cache from the index (hover / keyboard focus). */
+export function prefetchBlogPostBySlug(queryClient: QueryClient, slug: string): Promise<void> {
+  return queryClient.prefetchQuery(getBlogPostBySlugQueryOptions(slug));
 }
