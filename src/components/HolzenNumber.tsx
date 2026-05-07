@@ -1,26 +1,9 @@
 import { useQuery } from '@tanstack/react-query';
 import { motion, useReducedMotion } from 'framer-motion';
-import { invokeEdge } from '@/lib/invoke-edge';
+import { getHolzenNumberQueryOptions } from '@/lib/holzen-number-query';
 import { homeInWidget } from '@/components/home/home-widget-styles';
 
-interface HolzenNumberData {
-  total: number;
-  held_steady: number;
-  percent: number;
-  calculated_at: string;
-}
-
-export const HOLZEN_NUMBER_QUERY_KEY = ['public', 'holzen-number'] as const;
-
-async function fetchHolzenNumber(): Promise<HolzenNumberData | null> {
-  try {
-    const { data: result, error } = await invokeEdge<HolzenNumberData>('holzen-number');
-    if (error || !result) return null;
-    return result as HolzenNumberData;
-  } catch {
-    return null;
-  }
-}
+export { HOLZEN_NUMBER_QUERY_KEY } from '@/lib/holzen-number-query';
 
 /**
  * The Holzen Number — a public real-time metric:
@@ -28,14 +11,7 @@ async function fetchHolzenNumber(): Promise<HolzenNumberData | null> {
  */
 export function HolzenNumber({ variant = 'default' }: { variant?: 'default' | 'compact' }) {
   const prefersReduced = useReducedMotion();
-  const { data, isPending } = useQuery({
-    queryKey: HOLZEN_NUMBER_QUERY_KEY,
-    queryFn: fetchHolzenNumber,
-    refetchInterval: 60_000,
-    staleTime: 30_000,
-    refetchOnWindowFocus: false,
-    retry: false,
-  });
+  const { data, isPending } = useQuery(getHolzenNumberQueryOptions());
 
   // Don't render if no data or no users in today's aggregate sample
   if (isPending || !data || data.total === 0) return null;
