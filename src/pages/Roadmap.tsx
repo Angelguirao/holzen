@@ -13,8 +13,8 @@ import { useInfiniteScroll } from '@/hooks/use-infinite-scroll';
 import { PageHeading } from '@/components/PageHeading';
 import {
   deleteRoadmapVote,
-  fetchRoadmapVotes,
   getRoadmapItemsInfiniteQueryOptions,
+  getRoadmapVotesQueryOptions,
   insertRoadmapVote,
   roadmapVotesQueryKey,
   ROADMAP_ITEMS_QUERY_KEY,
@@ -45,14 +45,7 @@ const Roadmap = () => {
     fetchNextPage,
   } = useInfiniteQuery(getRoadmapItemsInfiniteQueryOptions());
 
-  const { data: voteIds = [], isPending: votesPending } = useQuery({
-    queryKey: userId ? roadmapVotesQueryKey(userId) : ['roadmap', 'votes', 'none'],
-    queryFn: () => fetchRoadmapVotes(userId!),
-    enabled: Boolean(userId),
-    staleTime: 60_000,
-    refetchOnWindowFocus: false,
-    retry: false,
-  });
+  const { data: voteIds = [], isPending: votesPending } = useQuery(getRoadmapVotesQueryOptions(userId));
 
   const votes = useMemo(() => new Set(voteIds), [voteIds]);
   const items = useMemo(() => itemsPages?.pages.flat() ?? [], [itemsPages]);
