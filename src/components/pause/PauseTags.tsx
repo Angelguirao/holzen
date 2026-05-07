@@ -2,6 +2,8 @@ import { useEffect, useState } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
 import { Tag, X } from 'lucide-react';
+import { useAuth } from '@/hooks/use-auth';
+import { pauseArchiveListQueryPrefix } from '@/hooks/use-pause-archive-list';
 import { pauseLogStep } from '@/lib/pause-api';
 import {
   PAUSE_REFLECT_STEP_TAGS,
@@ -16,6 +18,7 @@ interface Props {
 
 export function PauseTags({ pauseInstanceId }: Props) {
   const { t } = useTranslation();
+  const { user } = useAuth();
   const queryClient = useQueryClient();
   const [tags, setTags] = useState<string[]>([]);
   const [draft, setDraft] = useState('');
@@ -42,6 +45,9 @@ export function PauseTags({ pauseInstanceId }: Props) {
         stepType: 'tag_updated',
         payload: { tags: next },
       });
+      if (user?.id) {
+        void queryClient.invalidateQueries({ queryKey: pauseArchiveListQueryPrefix(user.id) });
+      }
       void queryClient.invalidateQueries({
         queryKey: pauseReflectStepLatestQueryKey(pauseInstanceId, PAUSE_REFLECT_STEP_TAGS),
       });
