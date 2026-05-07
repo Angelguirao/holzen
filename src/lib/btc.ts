@@ -216,3 +216,26 @@ export async function fetchMarketData(
 export async function fetchBtcData(currency: string = 'USD'): Promise<BtcPriceData> {
   return fetchMarketData('bitcoin', currency);
 }
+
+/** TanStack cache for `/breathe` ambient strip (bitcoin · USD, 30s poll). */
+export const BREATHE_AMBIENT_BTC_QUERY_KEY = ['ambient', 'breathe', 'btc-usd'] as const;
+
+async function fetchBreatheAmbientBtcUsd(): Promise<BtcPriceData | null> {
+  try {
+    return await fetchBtcData('USD');
+  } catch {
+    return null;
+  }
+}
+
+export function getBreatheAmbientBtcQueryOptions(enabled: boolean) {
+  return {
+    queryKey: BREATHE_AMBIENT_BTC_QUERY_KEY,
+    queryFn: fetchBreatheAmbientBtcUsd,
+    enabled,
+    refetchInterval: 30_000,
+    staleTime: 0,
+    refetchOnWindowFocus: false,
+    retry: false,
+  };
+}
