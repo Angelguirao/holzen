@@ -254,9 +254,6 @@ serve(
       { auth: { persistSession: false } }
     );
 
-    const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
-    if (!LOVABLE_API_KEY) throw new Error("LOVABLE_API_KEY not configured");
-
     const { data: profiles, error: profilesError } = await supabase
       .from("profiles")
       .select(
@@ -442,6 +439,19 @@ serve(
       total_profiles: profileRows.length,
     });
 
+    const lovableApiKey = Deno.env.get("LOVABLE_API_KEY") ?? "";
+    if (eligible.length > 0 && !lovableApiKey) {
+      log.error("check_volatility_config", {
+        holzen_event: "check_volatility_cron",
+        phase: "lovable_api_key_not_configured",
+        eligible: eligible.length,
+      });
+      return new Response(JSON.stringify({ error: "config_missing", triggered: 0 }), {
+        status: 500,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
     // Parse and configure VAPID once — all users share the same keys
     const vapidPublicKey = Deno.env.get("VAPID_PUBLIC_KEY");
     const vapidPrivateKeyJwk = Deno.env.get("VAPID_PRIVATE_KEY");
@@ -574,7 +584,7 @@ serve(
 
       const { result } = await generateUnifiedReflection({
         context: ctx,
-        apiKey: LOVABLE_API_KEY,
+        apiKey: lovableApiKey,
         tone,
         style,
         language: userLang,
