@@ -1,4 +1,5 @@
 import { useState, useCallback, useEffect, useLayoutEffect, useRef } from 'react';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { invokeEdge } from '@/lib/invoke-edge';
 import { toast as sonnerToast } from 'sonner';
 import { hapticFeedback } from '@/lib/haptics';
@@ -13,10 +14,12 @@ import {
 import type { ZoomOutData } from '@/components/ZoomOutDisplay';
 import { toZoomOutDisplayData, zoomOutLibraryAutosaveFromDisplayData } from '@/lib/zoom-out-payload';
 import type { CachedHistoricalInsightShape } from '@/components/HistoricalInsightDisplay';
-import type { CompanionUiCompletionStep } from '@/lib/companion-completion-sync';
 import {
+  companionUiCompletionQueryKey,
+  EMPTY_COMPANION_UI_COMPLETION,
   loadCompanionUiCompletionState,
   persistCompanionUiStepCompletion,
+  type CompanionUiCompletionStep,
   type CompanionUiCompletionState,
 } from '@/lib/companion-completion-sync';
 import { loadMoodHistoryForOrchestrate } from '@/lib/companion-mood-history';
@@ -89,6 +92,7 @@ interface UseCompanionDataParams {
 
 export function useCompanionData({ companions, prefs, pauseInstanceId, context, reflectionMessage, mood, severityNumber }: UseCompanionDataParams) {
   const { language } = useHolzen();
+  const queryClient = useQueryClient();
   const { toast } = useToast();
   const { favorites, toggleCompanionFavorite } = useCompanionLibraryFavorites(pauseInstanceId);
   const { isPro, requirePro, startCheckout } = useProGate();
@@ -115,15 +119,17 @@ export function useCompanionData({ companions, prefs, pauseInstanceId, context, 
   /** No-op: companion output is persisted in `pause_ai_artifacts` only. */
   const autoSaveToLibrary = useCallback(async (_params: CompanionSlotAutosaveParams) => {}, []);
 
-  // ── Completion state ──
-  const [completion, setCompletion] = useState<CompanionUiCompletionState>({
-    breathing: false,
-    haiku: false,
-    grounding: false,
-    signal: false,
-    zoomOut: false,
-    history: false,
+  // ── Completion state (TanStack: shared per pause id, deduped vs useEffect fetch) ──
+  const completionQuery = useQuery({
+    queryKey: pauseInstanceId ? companionUiCompletionQueryKey(pauseInstanceId) : ['pause', 'companion-ui-completion', 'none'],
+    queryFn: () => loadCompanionUiCompletionState(pauseInstanceId!),
+    enabled: Boolean(pauseInstanceId),
+    staleTime: 60_000,
+    refetchOnWindowFocus: false,
+    retry: false,
   });
+  const completion = completionQuery.data ?? EMPTY_COMPANION_UI_COMPLETION;
+
   const [cacheIds, setCacheIds] = useState<CompanionSlotCacheIds>({
     nudge: null,
     signal: null,
@@ -132,19 +138,19 @@ export function useCompanionData({ companions, prefs, pauseInstanceId, context, 
   });
   const [cacheRelaxations, setCacheRelaxations] = useState<CompanionSlotRelaxations>(EMPTY_COMPANION_SLOT_RELAXATIONS);
 
-  useEffect(() => {
-    if (!pauseInstanceId) return;
-    loadCompanionUiCompletionState(pauseInstanceId).then(setCompletion);
-  }, [pauseInstanceId]);
-
   const markCompleted = useCallback(async (key: CompanionUiCompletionStep) => {
-    if (completion[key]) return;
-    setCompletion((prev) => ({ ...prev, [key]: true }));
+    const id = pauseInstanceId;
+    if (!id) return;
+    const keyFull = companionUiCompletionQueryKey(id);
+    const snap =
+      queryClient.getQueryData<CompanionUiCompletionState>(keyFull) ??
+      completionQuery.data ??
+      EMPTY_COMPANION_UI_COMPLETION;
+    if (snap[key]) return;
+    queryClient.setQueryData<CompanionUiCompletionState>(keyFull, { ...snap, [key]: true });
     hapticFeedback('light');
-    if (pauseInstanceId) {
-      await persistCompanionUiStepCompletion(pauseInstanceId, key);
-    }
-  }, [pauseInstanceId, completion]);
+    await persistCompanionUiStepCompletion(id, key);
+  }, [pauseInstanceId, queryClient, completionQuery.data]);
 
   // ── Companion state ──
   const [nudge, setNudge] = useState<NudgeData | null>(null);
