@@ -14,6 +14,20 @@ export function roadmapVotesQueryKey(userId: string) {
   return ['roadmap', 'votes', userId] as const;
 }
 
+export const ROADMAP_VOTES_NONE_QUERY_KEY = ['roadmap', 'votes', 'none'] as const;
+
+/** Signed-in user's voted `roadmap_items` ids (empty when logged out). */
+export function getRoadmapVotesQueryOptions(userId: string | undefined) {
+  return {
+    queryKey: userId ? roadmapVotesQueryKey(userId) : ROADMAP_VOTES_NONE_QUERY_KEY,
+    queryFn: () => fetchRoadmapVotes(userId!),
+    enabled: Boolean(userId),
+    staleTime: 60_000,
+    refetchOnWindowFocus: false,
+    retry: false,
+  } as const;
+}
+
 export async function fetchRoadmapItemsPage(
   offset: number,
   pageSize: number = ROADMAP_ITEMS_PAGE_SIZE,
