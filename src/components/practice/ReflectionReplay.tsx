@@ -88,8 +88,8 @@ export function ReflectionReplay({ onComplete, initialPauseInstanceId }: Props) 
   });
 
   const thread = threadQuery.data ?? null;
-  /** Match prior `loadThread` UX: full-screen spinner during initial load and refetch (e.g. after save). */
-  const loadingThread = threadQuery.isPending || threadQuery.isFetching;
+  /** Full-screen spinner until the first thread payload exists (initial pick or refetch after error). */
+  const loadingThread = threadQuery.isPending || (threadQuery.isFetching && !thread);
   const threadLoadError = threadQuery.isError;
 
   useEffect(() => {
