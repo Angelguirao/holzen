@@ -2,37 +2,13 @@ import { useQuery } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
 import { motion } from 'framer-motion';
 import { MessageCircle } from 'lucide-react';
-import { supabase } from '@/integrations/supabase/client';
+import { getLandingTestimonialsQueryOptions } from '@/lib/landing-testimonials-query';
 
-interface Testimonial {
-  id: string;
-  display_name: string;
-  quote: string;
-}
-
-/** Public landing slice — shared cache if multiple trees mount this block. */
-export const LANDING_TESTIMONIALS_QUERY_KEY = ['testimonials', 'landing', { approved: true, limit: 6 }] as const;
-
-async function fetchLandingTestimonials(): Promise<Testimonial[]> {
-  const { data, error } = await supabase
-    .from('testimonials')
-    .select('id, display_name, quote')
-    .eq('approved', true)
-    .order('created_at', { ascending: false })
-    .limit(6);
-  if (error || !data?.length) return [];
-  return data as Testimonial[];
-}
+export { LANDING_TESTIMONIALS_QUERY_KEY } from '@/lib/landing-testimonials-query';
 
 export function LandingTestimonials() {
   const { t } = useTranslation();
-  const { data: testimonials = [] } = useQuery({
-    queryKey: LANDING_TESTIMONIALS_QUERY_KEY,
-    queryFn: fetchLandingTestimonials,
-    staleTime: 10 * 60_000,
-    refetchOnWindowFocus: false,
-    retry: false,
-  });
+  const { data: testimonials = [] } = useQuery(getLandingTestimonialsQueryOptions());
 
   if (!testimonials.length) return null;
 
