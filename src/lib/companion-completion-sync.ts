@@ -20,6 +20,20 @@ export interface CompanionUiCompletionState {
   history: boolean;
 }
 
+/** Default / placeholder before the first `loadCompanionUiCompletionState` result. */
+export const EMPTY_COMPANION_UI_COMPLETION: CompanionUiCompletionState = {
+  breathing: false,
+  haiku: false,
+  grounding: false,
+  signal: false,
+  zoomOut: false,
+  history: false,
+};
+
+export function companionUiCompletionQueryKey(pauseInstanceId: string) {
+  return ['pause', 'companion-ui-completion', pauseInstanceId] as const;
+}
+
 /** Map a UI step key to the V2 companion_type persisted on pause_companion_events. */
 const STEP_TO_COMPANION_TYPE: Record<CompanionUiCompletionStep, string | null> = {
   breathing: null, // breath is a step event, not a companion
