@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useRef, type MutableRefObject } from 'react';
 import type { TFunction } from 'i18next';
+import { invalidateCompanionUiCompletionQuery } from '@/lib/companion-ui-completion-query-key';
 import { pauseLogStep } from '@/lib/pause-api';
 import { breathCompletedSegment1Payload, breathCompletedSegment2Payload } from '@/lib/pause-breath-completed-payload';
 import type { PersistedSession } from '@/lib/pause-session-storage';
@@ -50,6 +51,7 @@ export function usePauseBreathSegmentRpcLoggers(input: {
           stepType: 'breath_completed',
           payload: breathCompletedSegment1Payload({ briefRitual: !!briefRitual }),
         });
+        invalidateCompanionUiCompletionQuery(pauseInstanceId);
         breath1RpcDoneRef.current = true;
         return true;
       } catch {
@@ -69,6 +71,7 @@ export function usePauseBreathSegmentRpcLoggers(input: {
         stepType: 'breath_completed',
         payload: breathCompletedSegment2Payload(),
       });
+      invalidateCompanionUiCompletionQuery(pauseInstanceId);
       breath2RpcDoneRef.current = true;
       return true;
     } catch {
@@ -86,6 +89,7 @@ export function usePauseBreathSegmentRpcLoggers(input: {
           stepType: 'breath_completed',
           payload: breathCompletedSegment1Payload({ skipped: true, ...opts }),
         });
+        invalidateCompanionUiCompletionQuery(pauseInstanceId);
         breath1RpcDoneRef.current = true;
         return true;
       } catch {
@@ -104,6 +108,7 @@ export function usePauseBreathSegmentRpcLoggers(input: {
         stepType: 'breath_completed',
         payload: breathCompletedSegment2Payload({ skipped: true }),
       });
+      invalidateCompanionUiCompletionQuery(pauseInstanceId);
       breath2RpcDoneRef.current = true;
       return true;
     } catch {

@@ -1,7 +1,6 @@
 import { supabase } from '@/integrations/supabase/client';
 import { deriveBreathingUiCompleteFromPayloads } from '@/lib/companion-breath-completion-detect';
-import { companionUiCompletionQueryKey } from '@/lib/companion-ui-completion-query-key';
-import { getHolzenQueryClient } from '@/lib/holzen-query-client-ref';
+import { invalidateCompanionUiCompletionQuery } from '@/lib/companion-ui-completion-query-key';
 import { pauseLogStep, pauseLogCompanion } from '@/lib/pause-api';
 import type { PauseStepType } from '@/lib/pause-state';
 
@@ -32,13 +31,7 @@ export const EMPTY_COMPANION_UI_COMPLETION: CompanionUiCompletionState = {
   history: false,
 };
 
-export { companionUiCompletionQueryKey } from '@/lib/companion-ui-completion-query-key';
-
-function invalidateCompanionUiCompletionQuery(pauseInstanceId: string): void {
-  const qc = getHolzenQueryClient();
-  if (!qc) return;
-  void qc.invalidateQueries({ queryKey: companionUiCompletionQueryKey(pauseInstanceId) });
-}
+export { companionUiCompletionQueryKey, invalidateCompanionUiCompletionQuery } from '@/lib/companion-ui-completion-query-key';
 
 /** Map a UI step key to the V2 companion_type persisted on pause_companion_events. */
 const STEP_TO_COMPANION_TYPE: Record<CompanionUiCompletionStep, string | null> = {
