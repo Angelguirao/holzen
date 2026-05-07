@@ -1,4 +1,5 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useCallback, useMemo } from 'react';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import type { Json } from '@/integrations/supabase/types';
 
@@ -216,6 +217,27 @@ export interface AdminStats {
   lastUpdated: Date | null;
 }
 
+/** TanStack Query key for the admin monitoring bundle (`useAdminStats`). */
+export const ADMIN_STATS_QUERY_KEY = ['admin', 'stats'] as const;
+
+/** Rows loaded together for `/admin` monitoring (RPC + views + feeds). */
+export interface AdminStatsBundle {
+  cacheHits: CacheHitRow[];
+  costs: CostRow[];
+  failures: FailureRow[];
+  feedback: FeedbackRow[];
+  cacheEntries: CacheEntryRow[];
+  signalSources: SignalSourceRow[];
+  rejections: RejectionRow[];
+  recentContent: RecentContentRow[];
+  sessions: SessionRow[];
+  libraryEntries: LibraryEntryRow[];
+  servesPerDay: DailyServeRow[];
+  failuresPerDay: DailyFailureRow[];
+  feedbackPerDay: DailyFeedbackRow[];
+  notificationPerDay: DailyNotificationRow[];
+}
+
 function periodToMs(period: TimePeriod): number | null {
   switch (period) {
     case 'today': return 24 * 60 * 60 * 1000;
@@ -236,183 +258,338 @@ function periodStart(period: TimePeriod): string | null {
   return new Date(Date.now() - ms).toISOString();
 }
 
-export function useAdminStats(enabled = true): AdminStats {
-  const [cacheHits, setCacheHits] = useState<CacheHitRow[]>([]);
-  const [costs, setCosts] = useState<CostRow[]>([]);
-  const [failures, setFailures] = useState<FailureRow[]>([]);
-  const [feedback, setFeedback] = useState<FeedbackRow[]>([]);
-  const [cacheEntries, setCacheEntries] = useState<CacheEntryRow[]>([]);
-  const [signalSources, setSignalSources] = useState<SignalSourceRow[]>([]);
-  const [rejections, setRejections] = useState<RejectionRow[]>([]);
-  const [recentContent, setRecentContent] = useState<RecentContentRow[]>([]);
-  const [sessions, setSessions] = useState<SessionRow[]>([]);
-  const [libraryEntries, setLibraryEntries] = useState<LibraryEntryRow[]>([]);
-  const [period, setPeriod] = useState<TimePeriod>('7d');
-  const [periodStats, setPeriodStats] = useState<PeriodStats>({ serves: 0, cacheHits: 0, cacheHitRate: 0, cost: 0, failures: 0, totalAttempts: 0, feedbackUp: 0, feedbackDown: 0 });
-  const [prevPeriodStats, setPrevPeriodStats] = useState<PeriodStats | null>(null);
-  // Daily rows from v_notification_response_rate — filtered client-side by period.
-  const [notificationPerDay, setNotificationPerDay] = useState<DailyNotificationRow[]>([]);
-  const [notificationStats, setNotificationStats] = useState<NotificationResponseStats>({
-    notifications: 0, completed: 0, engaged: 0, ignored: 0,
-    pctCompleted: null, pctEngaged: null, pctIgnored: null,
-  });
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-  const [lastUpdated, setLastUpdated] = useState<Date | null>(null);
+/**
+ * Compute period stats from daily views (client-side filtering).
+ * Uses the new v_companion_serves_per_day, v_generation_failures_per_day,
+ * and v_companion_feedback_per_day views (after running the migration).
+ * Falls back to all-time view data if daily views return empty.
+ */
+function computeAdminPeriodFields(
+  p: TimePeriod,
+  costsData: CostRow[],
+  cacheHitsData: CacheHitRow[],
+  failuresData: FailureRow[],
+  feedbackData: FeedbackRow[],
+  dailyServes: DailyServeRow[],
+  dailyFailures: DailyFailureRow[],
+  dailyFeedback: DailyFeedbackRow[],
+  dailyNotifications: DailyNotificationRow[],
+): {
+  periodStats: PeriodStats;
+  notificationStats: NotificationResponseStats;
+  prevPeriodStats: PeriodStats | null;
+} {
+  const start = periodStart(p);
+  const startDate = start?.slice(0, 10);
 
-  const fetchCacheEntries = useCallback(async () => {
+  let totalServes: number;
+  let totalCacheHits: number;
+  if (dailyServes.length > 0) {
+    const filtered = startDate
+      ? dailyServes.filter((r) => r.day && r.day >= startDate)
+      : dailyServes;
+    totalServes = filtered.reduce((s, r) => s + (r.serve_count ?? 0), 0);
+    totalCacheHits = filtered
+      .filter((r) => r.serve_source === 'cache')
+      .reduce((s, r) => s + (r.serve_count ?? 0), 0);
+  } else {
+    totalServes = cacheHitsData.reduce((s, r) => s + (r.total_serves ?? 0), 0);
+    totalCacheHits = cacheHitsData.reduce((s, r) => s + (r.cache_hits ?? 0), 0);
+  }
+  const cacheHitRate = totalServes > 0 ? Math.round((totalCacheHits / totalServes) * 100) : 0;
+
+  const filteredCosts = startDate
+    ? costsData.filter(r => r.day && r.day >= startDate)
+    : costsData;
+  const totalCost = filteredCosts.reduce((s, r) => s + (r.total_cost_usd ?? 0), 0);
+
+  let totalFails: number;
+  let totalAttempts: number;
+  if (dailyFailures.length > 0) {
+    const filtered = startDate
+      ? dailyFailures.filter((r) => r.day && r.day >= startDate)
+      : dailyFailures;
+    totalFails = filtered
+      .filter((r) => r.status === 'error' || r.status === 'timeout')
+      .reduce((s, r) => s + (r.attempt_count ?? 0), 0);
+    totalAttempts = filtered.reduce((s, r) => s + (r.attempt_count ?? 0), 0);
+  } else {
+    totalFails = failuresData.reduce((s, r) => s + (r.errors ?? 0) + (r.timeouts ?? 0), 0);
+    totalAttempts = failuresData.reduce((s, r) => s + (r.total_attempts ?? 0), 0);
+  }
+
+  let fbUp: number;
+  let fbDown: number;
+  if (dailyFeedback.length > 0) {
+    const filtered = startDate
+      ? dailyFeedback.filter((r) => r.day && r.day >= startDate)
+      : dailyFeedback;
+    fbUp = filtered.filter((r) => r.vote === 'up').reduce((s, r) => s + (r.vote_count ?? 0), 0);
+    fbDown = filtered.filter((r) => r.vote === 'down').reduce((s, r) => s + (r.vote_count ?? 0), 0);
+  } else {
+    fbUp = feedbackData.reduce((s, r) => s + (r.total_thumbs_up ?? 0), 0);
+    fbDown = feedbackData.reduce((s, r) => s + (r.total_thumbs_down ?? 0), 0);
+  }
+
+  const periodStats: PeriodStats = {
+    serves: totalServes,
+    cacheHits: totalCacheHits,
+    cacheHitRate,
+    cost: totalCost,
+    failures: totalFails,
+    totalAttempts,
+    feedbackUp: fbUp,
+    feedbackDown: fbDown,
+  };
+
+  const notifRows = dailyNotifications;
+  const notifFiltered = startDate
+    ? notifRows.filter((r) => r.day && r.day >= startDate)
+    : notifRows;
+  const notifs = notifFiltered.reduce((s, r) => s + (r.notifications ?? 0), 0);
+  const notifCompleted = notifFiltered.reduce((s, r) => s + (r.completed ?? 0), 0);
+  const notifEngaged = notifFiltered.reduce((s, r) => s + (r.engaged ?? 0), 0);
+  const notifIgnored = notifFiltered.reduce((s, r) => s + (r.ignored ?? 0), 0);
+  const notificationStats: NotificationResponseStats = {
+    notifications: notifs,
+    completed: notifCompleted,
+    engaged: notifEngaged,
+    ignored: notifIgnored,
+    pctCompleted: notifs > 0 ? Math.round((notifCompleted / notifs) * 100) : null,
+    pctEngaged: notifs > 0 ? Math.round((notifEngaged / notifs) * 100) : null,
+    pctIgnored: notifs > 0 ? Math.round((notifIgnored / notifs) * 100) : null,
+  };
+
+  const ms = periodToMs(p);
+  let prevPeriodStats: PeriodStats | null = null;
+  if (ms && startDate) {
+    const prevStartDate = new Date(Date.now() - ms * 2).toISOString().slice(0, 10);
+
+    const prevCosts = costsData.filter(r => r.day && r.day >= prevStartDate && r.day < startDate);
+    const prevServes = dailyServes.length > 0
+      ? dailyServes.filter((r) => r.day && r.day >= prevStartDate && r.day < startDate).reduce((s, r) => s + (r.serve_count ?? 0), 0)
+      : 0;
+    const prevFailFiltered = dailyFailures.length > 0
+      ? dailyFailures.filter((r) => r.day && r.day >= prevStartDate && r.day < startDate)
+      : [];
+    const prevFails = prevFailFiltered.filter((r) => r.status === 'error' || r.status === 'timeout').reduce((s, r) => s + (r.attempt_count ?? 0), 0);
+    const prevTotalAttempts = prevFailFiltered.reduce((s, r) => s + (r.attempt_count ?? 0), 0);
+
+    const prevCacheHits = dailyServes.length > 0
+      ? dailyServes.filter((r) => r.day && r.day >= prevStartDate && r.day < startDate && r.serve_source === 'cache').reduce((s, r) => s + (r.serve_count ?? 0), 0)
+      : 0;
+
+    prevPeriodStats = {
+      serves: prevServes,
+      cacheHits: prevCacheHits,
+      cacheHitRate: prevServes > 0 ? Math.round((prevCacheHits / prevServes) * 100) : 0,
+      cost: prevCosts.reduce((s, r) => s + (r.total_cost_usd ?? 0), 0),
+      failures: prevFails,
+      totalAttempts: prevTotalAttempts,
+      feedbackUp: 0,
+      feedbackDown: 0,
+    };
+  }
+
+  return { periodStats, notificationStats, prevPeriodStats };
+}
+
+async function fetchAdminStatsBundle(): Promise<AdminStatsBundle> {
+  const { data: adminData, error: rpcError } = await supabase.rpc('get_admin_stats' as never);
+
+  if (rpcError) {
+    throw new Error(`Admin stats: ${rpcError.message}`);
+  }
+
+  let cacheData: CacheHitRow[] = [];
+  let costData: CostRow[] = [];
+  let failData: FailureRow[] = [];
+  let feedData: FeedbackRow[] = [];
+
+  if (adminData) {
+    const parsed = typeof adminData === 'string' ? JSON.parse(adminData) : adminData;
+    cacheData = (parsed.cache_hits ?? []) as CacheHitRow[];
+    costData = (parsed.costs ?? []) as CostRow[];
+    failData = (parsed.failures ?? []) as FailureRow[];
+    feedData = (parsed.feedback ?? []) as FeedbackRow[];
+  }
+
+  const [servesRes, failDayRes, fbDayRes, notifRes] = await Promise.all([
+    supabase.from('v_companion_serves_per_day' as never).select('*').limit(500),
+    supabase.from('v_generation_failures_per_day' as never).select('*').limit(500),
+    supabase.from('v_companion_feedback_per_day' as never).select('*').limit(500),
+    supabase.from('v_notification_response_rate' as never).select('*').limit(500),
+  ]);
+
+  const dailyServes = servesRes.error ? [] : (servesRes.data ?? []);
+  const dailyFailures = failDayRes.error ? [] : (failDayRes.data ?? []);
+  const dailyFeedback = fbDayRes.error ? [] : (fbDayRes.data ?? []);
+  const dailyNotifications = notifRes.error ? [] : (notifRes.data ?? []);
+
+  const { data: cacheRows, error: cacheErr } = await supabase
+    .from('companion_cache')
+    .select('id, companion_type, title, quality_score, used_count, expires_at, thumbs_up, thumbs_down, created_at, content')
+    .order('quality_score', { ascending: false })
+    .order('used_count', { ascending: false })
+    .limit(200);
+
+  const cacheEntries = (!cacheErr ? (cacheRows ?? []) : []) as CacheEntryRow[];
+
+  const { data: rejectData } = await supabase
+    .from('generation_attempts')
+    .select('id, companion_type, model, quality_gate_reason, error_message, status, created_at, latency_ms')
+    .in('status', ['quality_gate_failed', 'error', 'timeout', 'rate_limited'])
+    .order('created_at', { ascending: false })
+    .limit(50);
+  const rejections = (rejectData ?? []) as RejectionRow[];
+
+  const { data: contentData } = await supabase
+    .from('companion_cache')
+    .select('id, companion_type, content, quality_score, title, created_at, used_count, source_author')
+    .order('created_at', { ascending: false })
+    .limit(20);
+  const recentContent = (contentData ?? []) as RecentContentRow[];
+
+  const { data: sessionData } = await supabase
+    .from('v_pause_full' as never)
+    .select(
+      'id, created_at, state, reflection_text, context_snapshot, initial_mood, outcome, haiku_text, counted_companion_types',
+    )
+    .order('created_at', { ascending: false })
+    .limit(20);
+  const sessions = (sessionData ?? []) as SessionRow[];
+
+  let libraryEntries: LibraryEntryRow[] = [];
+  try {
+    const { data: libraryData, error: libErr } = await supabase
+      .from('content_library')
+      .select('id, type, title, author, summary, url, original_url, original_publication, tags, companion_types, quality_score, active, created_at')
+      .eq('active', true)
+      .order('created_at', { ascending: false })
+      .limit(100);
+    if (!libErr) libraryEntries = (libraryData ?? []) as unknown as LibraryEntryRow[];
+  } catch { /* table may not exist yet */ }
+
+  const sourcesRes = await supabase
+    .from('signal_sources')
+    .select('id, name, type, url, category, last_fetch_feeds_at')
+    .order('category', { ascending: true })
+    .order('name', { ascending: true });
+  const signalSources = !sourcesRes.error
+    ? ((sourcesRes.data ?? []) as unknown as SignalSourceRow[])
+    : [];
+
+  return {
+    cacheHits: cacheData,
+    costs: costData,
+    failures: failData,
+    feedback: feedData,
+    cacheEntries,
+    signalSources,
+    rejections,
+    recentContent,
+    sessions,
+    libraryEntries,
+    servesPerDay: dailyServes as DailyServeRow[],
+    failuresPerDay: dailyFailures as DailyFailureRow[],
+    feedbackPerDay: dailyFeedback as DailyFeedbackRow[],
+    notificationPerDay: dailyNotifications as DailyNotificationRow[],
+  };
+}
+
+export function useAdminStats(enabled = true): AdminStats {
+  const queryClient = useQueryClient();
+  const [period, setPeriod] = useState<TimePeriod>('7d');
+
+  const statsQuery = useQuery({
+    queryKey: ADMIN_STATS_QUERY_KEY,
+    queryFn: fetchAdminStatsBundle,
+    enabled,
+    staleTime: 30_000,
+    refetchOnWindowFocus: false,
+    retry: false,
+  });
+
+  const bundle = statsQuery.data;
+
+  const { periodStats, prevPeriodStats, notificationStats } = useMemo(() => {
+    if (!bundle) {
+      const emptyPeriod: PeriodStats = {
+        serves: 0,
+        cacheHits: 0,
+        cacheHitRate: 0,
+        cost: 0,
+        failures: 0,
+        totalAttempts: 0,
+        feedbackUp: 0,
+        feedbackDown: 0,
+      };
+      const emptyNotif: NotificationResponseStats = {
+        notifications: 0,
+        completed: 0,
+        engaged: 0,
+        ignored: 0,
+        pctCompleted: null,
+        pctEngaged: null,
+        pctIgnored: null,
+      };
+      return {
+        periodStats: emptyPeriod,
+        prevPeriodStats: null as PeriodStats | null,
+        notificationStats: emptyNotif,
+      };
+    }
+    return computeAdminPeriodFields(
+      period,
+      bundle.costs,
+      bundle.cacheHits,
+      bundle.failures,
+      bundle.feedback,
+      bundle.servesPerDay,
+      bundle.failuresPerDay,
+      bundle.feedbackPerDay,
+      bundle.notificationPerDay,
+    );
+  }, [bundle, period]);
+
+  const handleSetPeriod = useCallback((p: TimePeriod) => {
+    setPeriod(p);
+  }, []);
+
+  const refreshCacheEntries = useCallback(async () => {
     const { data, error: err } = await supabase
       .from('companion_cache')
       .select('id, companion_type, title, quality_score, used_count, expires_at, thumbs_up, thumbs_down, created_at, content')
       .order('quality_score', { ascending: false })
       .order('used_count', { ascending: false })
       .limit(200);
-    if (!err) setCacheEntries((data ?? []) as CacheEntryRow[]);
-  }, []);
+    queryClient.setQueryData<AdminStatsBundle>(ADMIN_STATS_QUERY_KEY, (prev) => {
+      if (!prev || err) return prev;
+      return { ...prev, cacheEntries: (data ?? []) as CacheEntryRow[] };
+    });
+  }, [queryClient]);
 
   const refreshCompanionCacheUi = useCallback(async () => {
-    await fetchCacheEntries();
+    const { data: cacheRows, error: cacheErr } = await supabase
+      .from('companion_cache')
+      .select('id, companion_type, title, quality_score, used_count, expires_at, thumbs_up, thumbs_down, created_at, content')
+      .order('quality_score', { ascending: false })
+      .order('used_count', { ascending: false })
+      .limit(200);
     const { data: contentData } = await supabase
       .from('companion_cache')
       .select('id, companion_type, content, quality_score, title, created_at, used_count, source_author')
       .order('created_at', { ascending: false })
       .limit(20);
-    setRecentContent((contentData ?? []) as RecentContentRow[]);
-  }, [fetchCacheEntries]);
-
-  // Store daily view data for period filtering
-  const [servesPerDay, setServesPerDay] = useState<DailyServeRow[]>([]);
-  const [failuresPerDay, setFailuresPerDay] = useState<DailyFailureRow[]>([]);
-  const [feedbackPerDay, setFeedbackPerDay] = useState<DailyFeedbackRow[]>([]);
-
-  /**
-   * Compute period stats from daily views (client-side filtering).
-   * Uses the new v_companion_serves_per_day, v_generation_failures_per_day,
-   * and v_companion_feedback_per_day views (after running the migration).
-   * Falls back to all-time view data if daily views return empty.
-   */
-  const computePeriodStats = useCallback((
-    p: TimePeriod,
-    costsData: CostRow[],
-    cacheHitsData: CacheHitRow[],
-    failuresData: FailureRow[],
-    feedbackData: FeedbackRow[],
-    dailyServes: DailyServeRow[],
-    dailyFailures: DailyFailureRow[],
-    dailyFeedback: DailyFeedbackRow[],
-    dailyNotifications: DailyNotificationRow[],
-  ) => {
-    const start = periodStart(p);
-    const startDate = start?.slice(0, 10);
-
-    // ── Serves + Cache Hit Rate (from daily view, or fall back to all-time) ──
-    let totalServes: number;
-    let totalCacheHits: number;
-    if (dailyServes.length > 0) {
-      const filtered = startDate
-        ? dailyServes.filter((r) => r.day && r.day >= startDate)
-        : dailyServes;
-      totalServes = filtered.reduce((s, r) => s + (r.serve_count ?? 0), 0);
-      totalCacheHits = filtered
-        .filter((r) => r.serve_source === 'cache')
-        .reduce((s, r) => s + (r.serve_count ?? 0), 0);
-    } else {
-      totalServes = cacheHitsData.reduce((s, r) => s + (r.total_serves ?? 0), 0);
-      totalCacheHits = cacheHitsData.reduce((s, r) => s + (r.cache_hits ?? 0), 0);
-    }
-    const cacheHitRate = totalServes > 0 ? Math.round((totalCacheHits / totalServes) * 100) : 0;
-
-    // ── Cost (from costs view — always has daily granularity) ──
-    const filteredCosts = startDate
-      ? costsData.filter(r => r.day && r.day >= startDate)
-      : costsData;
-    const totalCost = filteredCosts.reduce((s, r) => s + (r.total_cost_usd ?? 0), 0);
-
-    // ── Failures (from daily view, or fall back to all-time) ──
-    let totalFails: number;
-    let totalAttempts: number;
-    if (dailyFailures.length > 0) {
-      const filtered = startDate
-        ? dailyFailures.filter((r) => r.day && r.day >= startDate)
-        : dailyFailures;
-      totalFails = filtered
-        .filter((r) => r.status === 'error' || r.status === 'timeout')
-        .reduce((s, r) => s + (r.attempt_count ?? 0), 0);
-      totalAttempts = filtered.reduce((s, r) => s + (r.attempt_count ?? 0), 0);
-    } else {
-      totalFails = failuresData.reduce((s, r) => s + (r.errors ?? 0) + (r.timeouts ?? 0), 0);
-      totalAttempts = failuresData.reduce((s, r) => s + (r.total_attempts ?? 0), 0);
-    }
-
-    // ── Feedback (from daily view, or fall back to all-time) ──
-    let fbUp: number;
-    let fbDown: number;
-    if (dailyFeedback.length > 0) {
-      const filtered = startDate
-        ? dailyFeedback.filter((r) => r.day && r.day >= startDate)
-        : dailyFeedback;
-      fbUp = filtered.filter((r) => r.vote === 'up').reduce((s, r) => s + (r.vote_count ?? 0), 0);
-      fbDown = filtered.filter((r) => r.vote === 'down').reduce((s, r) => s + (r.vote_count ?? 0), 0);
-    } else {
-      fbUp = feedbackData.reduce((s, r) => s + (r.total_thumbs_up ?? 0), 0);
-      fbDown = feedbackData.reduce((s, r) => s + (r.total_thumbs_down ?? 0), 0);
-    }
-
-    setPeriodStats({ serves: totalServes, cacheHits: totalCacheHits, cacheHitRate, cost: totalCost, failures: totalFails, totalAttempts, feedbackUp: fbUp, feedbackDown: fbDown });
-
-    // ── Notification response rate (from v_notification_response_rate daily rows) ──
-    // Empty array = view not available yet or zero notifications — render as zeros.
-    const notifRows = dailyNotifications;
-    const notifFiltered = startDate
-      ? notifRows.filter((r) => r.day && r.day >= startDate)
-      : notifRows;
-    const notifs = notifFiltered.reduce((s, r) => s + (r.notifications ?? 0), 0);
-    const notifCompleted = notifFiltered.reduce((s, r) => s + (r.completed ?? 0), 0);
-    const notifEngaged = notifFiltered.reduce((s, r) => s + (r.engaged ?? 0), 0);
-    const notifIgnored = notifFiltered.reduce((s, r) => s + (r.ignored ?? 0), 0);
-    setNotificationStats({
-      notifications: notifs,
-      completed: notifCompleted,
-      engaged: notifEngaged,
-      ignored: notifIgnored,
-      pctCompleted: notifs > 0 ? Math.round((notifCompleted / notifs) * 100) : null,
-      pctEngaged: notifs > 0 ? Math.round((notifEngaged / notifs) * 100) : null,
-      pctIgnored: notifs > 0 ? Math.round((notifIgnored / notifs) * 100) : null,
+    queryClient.setQueryData<AdminStatsBundle>(ADMIN_STATS_QUERY_KEY, (prev) => {
+      if (!prev) return prev;
+      return {
+        ...prev,
+        cacheEntries: (!cacheErr ? (cacheRows ?? []) : prev.cacheEntries) as CacheEntryRow[],
+        recentContent: (contentData ?? prev.recentContent) as RecentContentRow[],
+      };
     });
-
-    // ── Previous period for trend comparison ──
-    const ms = periodToMs(p);
-    if (ms && startDate) {
-      const prevStartDate = new Date(Date.now() - ms * 2).toISOString().slice(0, 10);
-
-      const prevCosts = costsData.filter(r => r.day && r.day >= prevStartDate && r.day < startDate);
-      const prevServes = dailyServes.length > 0
-        ? dailyServes.filter((r) => r.day && r.day >= prevStartDate && r.day < startDate).reduce((s, r) => s + (r.serve_count ?? 0), 0)
-        : 0;
-      const prevFailFiltered = dailyFailures.length > 0
-        ? dailyFailures.filter((r) => r.day && r.day >= prevStartDate && r.day < startDate)
-        : [];
-      const prevFails = prevFailFiltered.filter((r) => r.status === 'error' || r.status === 'timeout').reduce((s, r) => s + (r.attempt_count ?? 0), 0);
-      const prevTotalAttempts = prevFailFiltered.reduce((s, r) => s + (r.attempt_count ?? 0), 0);
-
-      const prevCacheHits = dailyServes.length > 0
-        ? dailyServes.filter((r) => r.day && r.day >= prevStartDate && r.day < startDate && r.serve_source === 'cache').reduce((s, r) => s + (r.serve_count ?? 0), 0)
-        : 0;
-
-      setPrevPeriodStats({
-        serves: prevServes,
-        cacheHits: prevCacheHits,
-        cacheHitRate: prevServes > 0 ? Math.round((prevCacheHits / prevServes) * 100) : 0,
-        cost: prevCosts.reduce((s, r) => s + (r.total_cost_usd ?? 0), 0),
-        failures: prevFails,
-        totalAttempts: prevTotalAttempts,
-        feedbackUp: 0,
-        feedbackDown: 0,
-      });
-    } else {
-      setPrevPeriodStats(null);
-    }
-  }, []);
+  }, [queryClient]);
 
   const refreshRejections = useCallback(async () => {
     const { data: rejectData } = await supabase
@@ -421,136 +598,44 @@ export function useAdminStats(enabled = true): AdminStats {
       .in('status', ['quality_gate_failed', 'error', 'timeout', 'rate_limited'])
       .order('created_at', { ascending: false })
       .limit(50);
-    setRejections((rejectData ?? []) as RejectionRow[]);
-  }, []);
+    queryClient.setQueryData<AdminStatsBundle>(ADMIN_STATS_QUERY_KEY, (prev) =>
+      prev ? { ...prev, rejections: (rejectData ?? []) as RejectionRow[] } : prev,
+    );
+  }, [queryClient]);
 
-  const fetchFeeds = useCallback(async () => {
-    await refreshRejections();
+  const loading = enabled ? statsQuery.isPending && !statsQuery.data : true;
+  const error =
+    statsQuery.error instanceof Error
+      ? statsQuery.error.message
+      : statsQuery.error
+        ? 'Failed to load monitoring data'
+        : null;
 
-    // Recent generated content (last 20 cache entries by creation date)
-    const { data: contentData } = await supabase
-      .from('companion_cache')
-      .select('id, companion_type, content, quality_score, title, created_at, used_count, source_author')
-      .order('created_at', { ascending: false })
-      .limit(20);
-    setRecentContent((contentData ?? []) as RecentContentRow[]);
-
-    // Recent sessions (last 20 completed pauses).
-    const { data: sessionData } = await supabase
-      .from('v_pause_full' as never)
-      .select(
-        'id, created_at, state, reflection_text, context_snapshot, initial_mood, outcome, haiku_text, counted_companion_types',
-      )
-      .order('created_at', { ascending: false })
-      .limit(20);
-    setSessions((sessionData ?? []) as SessionRow[]);
-
-    // Content library entries (table may not exist before migration — fail gracefully)
-    try {
-      const { data: libraryData, error: libErr } = await supabase
-        .from('content_library')
-        .select('id, type, title, author, summary, url, original_url, original_publication, tags, companion_types, quality_score, active, created_at')
-        .eq('active', true)
-        .order('created_at', { ascending: false })
-        .limit(100);
-      if (!libErr) setLibraryEntries((libraryData ?? []) as unknown as LibraryEntryRow[]);
-    } catch { /* table may not exist yet */ }
-  }, [refreshRejections]);
-
-  const fetchAll = useCallback(async () => {
-    setLoading(true);
-    setError(null);
-
-    try {
-      // Use the admin-only RPC that checks is_admin() server-side
-      const { data: adminData, error: rpcError } = await supabase.rpc('get_admin_stats' as never);
-
-      let cacheData: CacheHitRow[] = [];
-      let costData: CostRow[] = [];
-      let failData: FailureRow[] = [];
-      let feedData: FeedbackRow[] = [];
-
-      if (rpcError) {
-        throw new Error(`Admin stats: ${rpcError.message}`);
-      }
-
-      if (adminData) {
-        const parsed = typeof adminData === 'string' ? JSON.parse(adminData) : adminData;
-        cacheData = (parsed.cache_hits ?? []) as CacheHitRow[];
-        costData = (parsed.costs ?? []) as CostRow[];
-        failData = (parsed.failures ?? []) as FailureRow[];
-        feedData = (parsed.feedback ?? []) as FeedbackRow[];
-      }
-
-      setCacheHits(cacheData);
-      setCosts(costData);
-      setFailures(failData);
-      setFeedback(feedData);
-
-      // Fetch daily breakdown views (may return empty if migration hasn't run)
-      const [servesRes, failDayRes, fbDayRes, notifRes] = await Promise.all([
-        supabase.from('v_companion_serves_per_day' as never).select('*').limit(500),
-        supabase.from('v_generation_failures_per_day' as never).select('*').limit(500),
-        supabase.from('v_companion_feedback_per_day' as never).select('*').limit(500),
-        supabase.from('v_notification_response_rate' as never).select('*').limit(500),
-      ]);
-
-      const dailyServes = servesRes.error ? [] : (servesRes.data ?? []);
-      const dailyFailures = failDayRes.error ? [] : (failDayRes.data ?? []);
-      const dailyFeedback = fbDayRes.error ? [] : (fbDayRes.data ?? []);
-      const dailyNotifications = notifRes.error ? [] : (notifRes.data ?? []);
-
-      setServesPerDay(dailyServes as DailyServeRow[]);
-      setFailuresPerDay(dailyFailures as DailyFailureRow[]);
-      setFeedbackPerDay(dailyFeedback as DailyFeedbackRow[]);
-      setNotificationPerDay(dailyNotifications as DailyNotificationRow[]);
-
-      // Compute period stats from view data
-      computePeriodStats(
-        period,
-        costData,
-        cacheData,
-        failData,
-        feedData,
-        dailyServes,
-        dailyFailures,
-        dailyFeedback,
-        dailyNotifications,
-      );
-
-      await Promise.all([
-        fetchCacheEntries(),
-        fetchFeeds(),
-      ]);
-
-      const sourcesRes = await supabase
-        .from('signal_sources')
-        .select('id, name, type, url, category, last_fetch_feeds_at')
-        .order('category', { ascending: true })
-        .order('name', { ascending: true });
-      if (!sourcesRes.error) setSignalSources((sourcesRes.data ?? []) as unknown as SignalSourceRow[]);
-
-      setLastUpdated(new Date());
-    } catch (e: unknown) {
-      setError(e instanceof Error ? e.message : 'Failed to load monitoring data');
-    } finally {
-      setLoading(false);
-    }
-  }, [fetchCacheEntries, computePeriodStats, fetchFeeds, period]);
-
-  useEffect(() => { if (enabled) fetchAll(); }, [fetchAll, enabled]);
-
-  // Recompute period stats when period changes (no network call needed — uses cached view data)
-  const handleSetPeriod = useCallback((p: TimePeriod) => {
-    setPeriod(p);
-    computePeriodStats(p, costs, cacheHits, failures, feedback, servesPerDay, failuresPerDay, feedbackPerDay, notificationPerDay);
-  }, [computePeriodStats, costs, cacheHits, failures, feedback, servesPerDay, failuresPerDay, feedbackPerDay, notificationPerDay]);
+  const lastUpdated =
+    statsQuery.isSuccess && bundle ? new Date(statsQuery.dataUpdatedAt) : null;
 
   return {
-    cacheHits, costs, failures, feedback, cacheEntries, signalSources,
-    period, setPeriod: handleSetPeriod, periodStats, prevPeriodStats, notificationStats,
-    rejections, recentContent, sessions, libraryEntries,
-    loading, error, refresh: fetchAll, refreshCacheEntries: fetchCacheEntries,
-    refreshCompanionCacheUi, refreshRejections, lastUpdated,
+    cacheHits: bundle?.cacheHits ?? [],
+    costs: bundle?.costs ?? [],
+    failures: bundle?.failures ?? [],
+    feedback: bundle?.feedback ?? [],
+    cacheEntries: bundle?.cacheEntries ?? [],
+    signalSources: bundle?.signalSources ?? [],
+    period,
+    setPeriod: handleSetPeriod,
+    periodStats,
+    prevPeriodStats,
+    notificationStats,
+    rejections: bundle?.rejections ?? [],
+    recentContent: bundle?.recentContent ?? [],
+    sessions: bundle?.sessions ?? [],
+    libraryEntries: bundle?.libraryEntries ?? [],
+    loading,
+    error,
+    refresh: () => void statsQuery.refetch(),
+    refreshCacheEntries,
+    refreshCompanionCacheUi,
+    refreshRejections,
+    lastUpdated,
   };
 }
