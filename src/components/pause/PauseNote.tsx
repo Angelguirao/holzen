@@ -6,9 +6,8 @@ import { useAuth } from '@/hooks/use-auth';
 import { pauseArchiveListQueryPrefix } from '@/hooks/use-pause-archive-list';
 import { pauseLogStep } from '@/lib/pause-api';
 import {
+  getLatestPauseReflectNoteQueryOptions,
   PAUSE_REFLECT_STEP_NOTE,
-  fetchLatestPauseReflectStep,
-  noteTextFromReflectRow,
   pauseReflectStepLatestQueryKey,
 } from '@/lib/pause-reflect-step-queries';
 
@@ -28,15 +27,7 @@ export function PauseNote({ pauseInstanceId }: Props) {
   const [note, setNote] = useState('');
   const [saving, setSaving] = useState(false);
 
-  const { data: serverNote = '' } = useQuery({
-    queryKey: pauseReflectStepLatestQueryKey(pauseInstanceId, PAUSE_REFLECT_STEP_NOTE),
-    queryFn: () => fetchLatestPauseReflectStep(pauseInstanceId, PAUSE_REFLECT_STEP_NOTE),
-    select: (row) => noteTextFromReflectRow(row),
-    enabled: Boolean(pauseInstanceId),
-    staleTime: 60_000,
-    refetchOnWindowFocus: false,
-    retry: false,
-  });
+  const { data: serverNote = '' } = useQuery(getLatestPauseReflectNoteQueryOptions(pauseInstanceId));
 
   useEffect(() => {
     setNote(serverNote);
