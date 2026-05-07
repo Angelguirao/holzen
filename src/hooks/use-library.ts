@@ -1,4 +1,5 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useEffect, useCallback, useMemo } from 'react';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
 import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
@@ -72,6 +73,82 @@ function sortMemberPauses(rows: CollectionMemberPause[], listSort: LibraryListSo
   return copy;
 }
 
+/** Prefix for TanStack invalidation (e.g. pause completion → refresh member rows). */
+export function libraryBundleQueryPrefix(userId: string) {
+  return ['library', 'bundle', userId] as const;
+}
+
+type LibraryBundle = {
+  collections: Collection[];
+  collectionItems: CollectionItem[];
+  items: CollectionMemberPause[];
+  /** True when `v_pause_full` member fetch failed but collections + items loaded. */
+  memberRowsLoadFailed: boolean;
+};
+
+async function fetchLibraryMemberPausesForIds(
+  userId: string,
+  ids: string[],
+): Promise<{ data: CollectionMemberPause[] | null; error: unknown }> {
+  if (ids.length === 0) return { data: [], error: null };
+  const merged: CollectionMemberPause[] = [];
+  for (let i = 0; i < ids.length; i += PAUSE_IN_CHUNK) {
+    const chunk = ids.slice(i, i + PAUSE_IN_CHUNK);
+    const { data, error } = await supabase
+      .from('v_pause_full' as never)
+      .select('*')
+      .eq('user_id', userId)
+      .in('id', chunk);
+    if (error) return { data: null, error };
+    merged.push(...((data ?? []) as unknown as CollectionMemberPause[]));
+  }
+  return { data: merged, error: null };
+}
+
+async function fetchLibraryBundle(
+  userId: string,
+  listSort: LibraryListSortMode,
+  memberCacheKey: string,
+  t: (key: string) => string,
+): Promise<LibraryBundle> {
+  const [rCols, rColItems] = await Promise.all([
+    supabase
+      .from('collections')
+      .select('*')
+      .eq('user_id', userId)
+      .order('created_at', { ascending: false }),
+    supabase.from('collection_items').select('*').order('position', { ascending: true }),
+  ]);
+
+  if (rCols.error || rColItems.error) {
+    toast.error(t('library.collectionsPartialLoadFailed'));
+    throw rCols.error ?? rColItems.error;
+  }
+
+  const cols = (rCols.data as unknown as Collection[]) ?? [];
+  const cis = (rColItems.data as unknown as CollectionItem[]) ?? [];
+  const colIds = new Set(cols.map((c) => c.id));
+  const pauseIds = [...new Set(cis.filter((ci) => colIds.has(ci.collection_id)).map((ci) => ci.pause_instance_id))];
+
+  const { data: raw, error: pErr } = await fetchLibraryMemberPausesForIds(userId, pauseIds);
+  if (pErr != null || raw == null) {
+    const cachedItems = readCache<CollectionMemberPause[]>(memberCacheKey) ?? [];
+    return {
+      collections: cols,
+      collectionItems: cis,
+      items: sortMemberPauses(cachedItems, listSort),
+      memberRowsLoadFailed: true,
+    };
+  }
+
+  return {
+    collections: cols,
+    collectionItems: cis,
+    items: sortMemberPauses(raw, listSort),
+    memberRowsLoadFailed: false,
+  };
+}
+
 /**
  * User collections; each membership row points at a `pause_instance_id`.
  * Loads `v_pause_full` rows for members only (no `library_items`).
@@ -79,141 +156,88 @@ function sortMemberPauses(rows: CollectionMemberPause[], listSort: LibraryListSo
 export function useLibrary(options?: UseLibraryOptions) {
   const { t } = useTranslation();
   const { user } = useAuth();
+  const queryClient = useQueryClient();
   const listSort: LibraryListSortMode = options?.listSort ?? 'newest';
   const memberCacheKey = buildMemberCacheKey(listSort);
 
-  const [items, setItems] = useState<CollectionMemberPause[]>(() => readCache<CollectionMemberPause[]>(memberCacheKey) ?? []);
-  const [collections, setCollections] = useState<Collection[]>(() => readCache<Collection[]>(CACHE_KEY_COLLECTIONS) ?? []);
-  const [collectionItems, setCollectionItems] = useState<CollectionItem[]>(() => readCache<CollectionItem[]>(CACHE_KEY_COL_ITEMS) ?? []);
-  const [loading, setLoading] = useState(true);
-  const [listLoadFailed, setListLoadFailed] = useState(false);
+  const placeholderData = useMemo((): LibraryBundle | undefined => {
+    if (!user) return undefined;
+    const rawItems = readCache<CollectionMemberPause[]>(memberCacheKey) ?? [];
+    const cols = readCache<Collection[]>(CACHE_KEY_COLLECTIONS) ?? [];
+    const cis = readCache<CollectionItem[]>(CACHE_KEY_COL_ITEMS) ?? [];
+    if (rawItems.length === 0 && cols.length === 0 && cis.length === 0) return undefined;
+    return {
+      collections: cols,
+      collectionItems: cis,
+      items: sortMemberPauses(rawItems, listSort),
+      memberRowsLoadFailed: false,
+    };
+  }, [user, memberCacheKey, listSort]);
 
-  const fetchPausesForIds = useCallback(async (userId: string, ids: string[]) => {
-    if (ids.length === 0) return { data: [] as CollectionMemberPause[], error: null as null };
-    const merged: CollectionMemberPause[] = [];
-    for (let i = 0; i < ids.length; i += PAUSE_IN_CHUNK) {
-      const chunk = ids.slice(i, i + PAUSE_IN_CHUNK);
+  const query = useQuery({
+    queryKey: user ? [...libraryBundleQueryPrefix(user.id), listSort] : ['library', 'bundle', '__none__', listSort],
+    queryFn: () => fetchLibraryBundle(user!.id, listSort, memberCacheKey, t),
+    enabled: Boolean(user),
+    placeholderData,
+    staleTime: 60_000,
+    refetchOnWindowFocus: true,
+    retry: false,
+  });
+
+  const items = query.data?.items ?? [];
+  const collections = query.data?.collections ?? [];
+  const collectionItems = query.data?.collectionItems ?? [];
+  /** Match prior `fetchAll`: spinner only when nothing to show yet (no placeholder / empty cache). */
+  const loading =
+    Boolean(user) &&
+    query.isFetching &&
+    collections.length === 0 &&
+    collectionItems.length === 0 &&
+    items.length === 0;
+  const listLoadFailed = query.isError || Boolean(query.data?.memberRowsLoadFailed);
+
+  useEffect(() => {
+    const d = query.data;
+    if (!d) return;
+    if (d.items.length > 0) writeCache(memberCacheKey, d.items);
+    writeCache(CACHE_KEY_COLLECTIONS, d.collections);
+    writeCache(CACHE_KEY_COL_ITEMS, d.collectionItems);
+  }, [query.data, memberCacheKey]);
+
+  const bumpLibrary = useCallback(() => {
+    if (!user) return;
+    void queryClient.invalidateQueries({ queryKey: libraryBundleQueryPrefix(user.id) });
+  }, [queryClient, user]);
+
+  const addCollection = useCallback(
+    async (col: Partial<Collection>) => {
+      if (!user) return null;
       const { data, error } = await supabase
-        .from('v_pause_full' as never)
-        .select('*')
-        .eq('user_id', userId)
-        .in('id', chunk);
-      if (error) return { data: null, error };
-      merged.push(...((data ?? []) as unknown as CollectionMemberPause[]));
-    }
-    return { data: merged, error: null };
-  }, []);
-
-  const fetchAll = useCallback(async () => {
-    if (!user) {
-      setLoading(false);
-      setListLoadFailed(false);
-      return;
-    }
-    const cached = readCache<CollectionMemberPause[]>(memberCacheKey) ?? [];
-    setItems(cached);
-    setLoading(cached.length === 0);
-
-    const [rCols, rColItems] = await Promise.all([
-      supabase
         .from('collections')
-        .select('*')
-        .eq('user_id', user.id)
-        .order('created_at', { ascending: false }),
-      supabase
-        .from('collection_items')
-        .select('*')
-        .order('position', { ascending: true }),
-    ]);
+        .insert({ ...col, user_id: user.id } as CollectionsInsert)
+        .select()
+        .single();
+      if (error) return null;
+      bumpLibrary();
+      return data as unknown as Collection;
+    },
+    [user, bumpLibrary],
+  );
 
-    if (!rCols.error) {
-      const cols = (rCols.data as unknown as Collection[]) ?? [];
-      setCollections(cols);
-      writeCache(CACHE_KEY_COLLECTIONS, cols);
-    }
-    if (!rColItems.error) {
-      const cis = (rColItems.data as unknown as CollectionItem[]) ?? [];
-      setCollectionItems(cis);
-      writeCache(CACHE_KEY_COL_ITEMS, cis);
-    }
-    if (rCols.error || rColItems.error) {
-      toast.error(t('library.collectionsPartialLoadFailed'));
-      setListLoadFailed(true);
-      setLoading(false);
-      return;
-    }
-
-    const cols = (rCols.data as unknown as Collection[]) ?? [];
-    const cis = (rColItems.data as unknown as CollectionItem[]) ?? [];
-    const colIds = new Set(cols.map((c) => c.id));
-    const pauseIds = [...new Set(cis.filter((ci) => colIds.has(ci.collection_id)).map((ci) => ci.pause_instance_id))];
-
-    const { data: raw, error: pErr } = await fetchPausesForIds(user.id, pauseIds);
-    if (pErr != null || raw == null) {
-      setListLoadFailed(true);
-      setLoading(false);
-      return;
-    }
-
-    const sorted = sortMemberPauses(raw, listSort);
-    setItems(sorted);
-    setListLoadFailed(false);
-    setLoading(false);
-    writeCache(memberCacheKey, sorted);
-  }, [user, t, memberCacheKey, fetchPausesForIds, listSort]);
-
-  const loadMore = useCallback(async () => {
-    /* no pagination */
-  }, []);
-
-  useEffect(() => {
-    void fetchAll();
-  }, [fetchAll]);
-
-  useEffect(() => {
-    if (items.length > 0) writeCache(memberCacheKey, items);
-  }, [items, memberCacheKey]);
-  useEffect(() => {
-    writeCache(CACHE_KEY_COLLECTIONS, collections);
-  }, [collections]);
-  useEffect(() => {
-    writeCache(CACHE_KEY_COL_ITEMS, collectionItems);
-  }, [collectionItems]);
-
-  const addCollection = useCallback(async (col: Partial<Collection>) => {
-    if (!user) return null;
-    const { data, error } = await supabase
-      .from('collections')
-      .insert({ ...col, user_id: user.id } as CollectionsInsert)
-      .select()
-      .single();
-    if (error) return null;
-    const newCol = data as unknown as Collection;
-    setCollections((prev) => [newCol, ...prev]);
-    return newCol;
-  }, [user]);
-
-  const updateCollection = useCallback(async (id: string, updates: Partial<Collection>) => {
-    await supabase.from('collections').update(updates as CollectionsUpdate).eq('id', id);
-    setCollections((prev) => prev.map((c) => (c.id === id ? { ...c, ...updates } : c)));
-  }, []);
+  const updateCollection = useCallback(
+    async (id: string, updates: Partial<Collection>) => {
+      await supabase.from('collections').update(updates as CollectionsUpdate).eq('id', id);
+      bumpLibrary();
+    },
+    [bumpLibrary],
+  );
 
   const deleteCollection = useCallback(
     async (id: string) => {
       await supabase.from('collections').delete().eq('id', id);
-      setCollections((prev) => prev.filter((c) => c.id !== id));
-      setCollectionItems((prev) => {
-        const next = prev.filter((ci) => ci.collection_id !== id);
-        const kept = new Set(next.map((ci) => ci.pause_instance_id));
-        setItems((prevRows) => {
-          const pruned = prevRows.filter((r) => r.id && kept.has(r.id));
-          writeCache(memberCacheKey, pruned);
-          return pruned;
-        });
-        return next;
-      });
+      bumpLibrary();
     },
-    [memberCacheKey],
+    [bumpLibrary],
   );
 
   const addToCollection = useCallback(
@@ -235,30 +259,10 @@ export function useLibrary(options?: UseLibraryOptions) {
         .select()
         .single();
       if (error) return null;
-      const newCI = data as unknown as CollectionItem;
-      setCollectionItems((prev) => [...prev, newCI]);
-
-      if (user && !items.some((r) => r.id === pauseInstanceId)) {
-        const { data: row } = await supabase
-          .from('v_pause_full' as never)
-          .select('*')
-          .eq('id', pauseInstanceId)
-          .eq('user_id', user.id)
-          .maybeSingle();
-        if (row) {
-          const p = row as unknown as CollectionMemberPause;
-          setItems((prevRows) => {
-            if (prevRows.some((r) => r.id === p.id)) return prevRows;
-            const next = sortMemberPauses([...prevRows, p], listSort);
-            writeCache(memberCacheKey, next);
-            return next;
-          });
-        }
-      }
-
-      return newCI;
+      bumpLibrary();
+      return data as unknown as CollectionItem;
     },
-    [collectionItems, user, items, listSort, memberCacheKey],
+    [collectionItems, bumpLibrary],
   );
 
   const removeFromCollection = useCallback(
@@ -268,18 +272,9 @@ export function useLibrary(options?: UseLibraryOptions) {
         .delete()
         .eq('collection_id', collectionId)
         .eq('pause_instance_id', pauseInstanceId);
-      setCollectionItems((prev) => {
-        const next = prev.filter((ci) => !(ci.collection_id === collectionId && ci.pause_instance_id === pauseInstanceId));
-        const kept = new Set(next.map((ci) => ci.pause_instance_id));
-        setItems((prevRows) => {
-          const pruned = prevRows.filter((r) => r.id && kept.has(r.id));
-          writeCache(memberCacheKey, pruned);
-          return pruned;
-        });
-        return next;
-      });
+      bumpLibrary();
     },
-    [memberCacheKey],
+    [bumpLibrary],
   );
 
   const getCollectionItemIds = useCallback(
@@ -304,6 +299,10 @@ export function useLibrary(options?: UseLibraryOptions) {
     [collectionItems, collections],
   );
 
+  const loadMore = useCallback(async () => {
+    /* no pagination */
+  }, []);
+
   return {
     items,
     collections,
@@ -321,6 +320,6 @@ export function useLibrary(options?: UseLibraryOptions) {
     getCollectionItemIds,
     getCollectionItemCount,
     getItemCollections,
-    refetch: fetchAll,
+    refetch: () => void query.refetch(),
   };
 }
