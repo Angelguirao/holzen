@@ -18,7 +18,7 @@ import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import { useAuth } from '@/hooks/use-auth';
-import { supabase } from '@/integrations/supabase/client';
+import { getArchivePausesTabHasRowsQueryOptions } from '@/lib/archive-pauses-tab-query';
 import { useProGate } from '@/hooks/use-pro-gate';
 import type { ArchiveMainSegment } from '@/lib/archive-segment';
 
@@ -73,24 +73,13 @@ export default function Archive() {
   });
   const [pausesArchiveCountNonce, setPausesArchiveCountNonce] = useState(0);
 
-  const pausesArchiveCountQuery = useQuery({
-    queryKey:
-      user?.id && mainSegment === 'pauses'
-        ? (['archive', 'pauses-tab-has-rows', user.id, pausesArchiveCountNonce] as const)
-        : (['archive', 'pauses-tab-has-rows', '__off__'] as const),
-    queryFn: async (): Promise<boolean> => {
-      const { count, error } = await supabase
-        .from('v_pause_archive_pauses')
-        .select('*', { count: 'exact', head: true })
-        .eq('user_id', user!.id);
-      if (error) throw error;
-      return (count ?? 0) > 0;
-    },
-    enabled: Boolean(user?.id && mainSegment === 'pauses'),
-    staleTime: 30_000,
-    refetchOnWindowFocus: false,
-    retry: false,
-  });
+  const pausesArchiveCountQuery = useQuery(
+    getArchivePausesTabHasRowsQueryOptions({
+      userId: user?.id,
+      nonce: pausesArchiveCountNonce,
+      enabled: Boolean(user?.id && mainSegment === 'pauses'),
+    }),
+  );
 
   const pausesTabHasArchiveRows = useMemo((): boolean | null => {
     if (mainSegment !== 'pauses') return false;
