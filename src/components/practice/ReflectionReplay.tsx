@@ -21,6 +21,7 @@ import type { PastReflectionWithWords, UserWord } from '../../../supabase/functi
 import {
   loadPauseReplayThread,
   loadRecentCompletedPausesForReplay,
+  pauseReplayThreadQueryKey,
   type PausePickerRow,
 } from '@/lib/pause-replay-thread';
 
@@ -56,10 +57,6 @@ export function ReflectionReplay({ onComplete, initialPauseInstanceId }: Props) 
   const { user } = useAuth();
   const queryClient = useQueryClient();
   const [selectedId, setSelectedId] = useState<string | null>(initialPauseInstanceId ?? null);
-  const [thread, setThread] = useState<PastReflectionWithWords | null>(null);
-  const [loadingThread, setLoadingThread] = useState(false);
-  /** When load fails, `thread` stays null and `loadingThread` is false — without this we would spin forever (`!thread` treated as loading). */
-  const [threadLoadError, setThreadLoadError] = useState(false);
   const [draft, setDraft] = useState('');
   const [saving, setSaving] = useState(false);
 
@@ -75,30 +72,39 @@ export function ReflectionReplay({ onComplete, initialPauseInstanceId }: Props) 
     retry: false,
   });
 
-  const loadThread = useCallback(async (pauseId: string) => {
-    setLoadingThread(true);
-    setThreadLoadError(false);
-    const res = await loadPauseReplayThread(pauseId);
-    setLoadingThread(false);
-    if (!res.ok) {
-      setThread(null);
-      setThreadLoadError(true);
-      toast.error(
-        t('practice.replayLoadFailed', {
-          defaultValue: 'Could not load this pause.',
-        }),
-      );
-      return;
-    }
-    setThreadLoadError(false);
-    setThread(res.thread);
-    setDraft('');
-  }, [t]);
+  const threadQuery = useQuery({
+    queryKey: user && selectedId ? pauseReplayThreadQueryKey(selectedId) : ['practice', 'replay', 'thread', '__none__'],
+    queryFn: async (): Promise<PastReflectionWithWords> => {
+      const res = await loadPauseReplayThread(selectedId!);
+      if (!res.ok) {
+        throw new Error(res.message ?? res.code);
+      }
+      return res.thread;
+    },
+    enabled: Boolean(user && selectedId),
+    staleTime: 60_000,
+    refetchOnWindowFocus: false,
+    retry: false,
+  });
+
+  const thread = threadQuery.data ?? null;
+  /** Match prior `loadThread` UX: full-screen spinner during initial load and refetch (e.g. after save). */
+  const loadingThread = threadQuery.isPending || threadQuery.isFetching;
+  const threadLoadError = threadQuery.isError;
 
   useEffect(() => {
-    if (!user || !selectedId) return;
-    void loadThread(selectedId);
-  }, [user, selectedId, loadThread]);
+    if (!threadLoadError) return;
+    toast.error(
+      t('practice.replayLoadFailed', {
+        defaultValue: 'Could not load this pause.',
+      }),
+    );
+  }, [threadLoadError, t]);
+
+  useEffect(() => {
+    if (!threadQuery.isSuccess) return;
+    setDraft('');
+  }, [threadQuery.dataUpdatedAt, threadQuery.isSuccess]);
 
   const saveReplay = useCallback(async () => {
     if (!user || !selectedId) return;
@@ -120,14 +126,14 @@ export function ReflectionReplay({ onComplete, initialPauseInstanceId }: Props) 
       void queryClient.invalidateQueries({ queryKey: practicePrimarySuggestionQueryKey(user.id) });
       void queryClient.invalidateQueries({ queryKey: toolsHubDataQueryKey(user.id) });
       void queryClient.invalidateQueries({ queryKey: replayRecentPausesQueryKey(user.id) });
+      void queryClient.invalidateQueries({ queryKey: pauseReplayThreadQueryKey(selectedId) });
       toast.success(t('practice.replaySaved', { defaultValue: 'Replay saved' }));
-      await loadThread(selectedId);
     } catch {
       toast.error(t('common.tryAgain', { defaultValue: 'Try again' }));
     } finally {
       setSaving(false);
     }
-  }, [user, selectedId, draft, loadThread, t, queryClient]);
+  }, [user, selectedId, draft, t, queryClient]);
 
   if (!user) {
     return (
@@ -200,7 +206,7 @@ export function ReflectionReplay({ onComplete, initialPauseInstanceId }: Props) 
               variant="secondary"
               size="sm"
               onClick={() => {
-                if (selectedId) void loadThread(selectedId);
+                void threadQuery.refetch();
               }}
             >
               {t('common.tryAgain', { defaultValue: 'Try again' })}
@@ -211,8 +217,6 @@ export function ReflectionReplay({ onComplete, initialPauseInstanceId }: Props) 
               size="sm"
               onClick={() => {
                 setSelectedId(null);
-                setThread(null);
-                setThreadLoadError(false);
               }}
             >
               {t('practice.replayChangePause', { defaultValue: 'Change pause' })}
@@ -245,8 +249,6 @@ export function ReflectionReplay({ onComplete, initialPauseInstanceId }: Props) 
           type="button"
           onClick={() => {
             setSelectedId(null);
-            setThread(null);
-            setThreadLoadError(false);
           }}
           className="text-[10px] font-sans font-medium text-nox-text-link/90 underline-offset-2 transition-colors hover:text-nox-text-link hover:underline self-start"
         >

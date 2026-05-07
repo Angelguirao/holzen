@@ -5,6 +5,11 @@ import {
   type UserWord,
 } from '../../supabase/functions/_shared/past-reflection-util';
 
+/** TanStack cache key for `loadPauseReplayThread` (Daily Practice replay). */
+export function pauseReplayThreadQueryKey(pauseInstanceId: string) {
+  return ['practice', 'replay', 'thread', pauseInstanceId] as const;
+}
+
 function contextTextFromSnapshot(snapshot: Record<string, unknown> | null | undefined): string | null {
   const c = snapshot?.context_text;
   return typeof c === 'string' ? c : null;
