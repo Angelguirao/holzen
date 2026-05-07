@@ -4,60 +4,23 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Anchor, Clock, Calendar } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/use-auth';
 import { toast } from 'sonner';
 import { MoodIcon } from '@/components/icons/MoodIcon';
 import { Button } from '@/components/ui/button';
 import { TOOLS } from '@/lib/app-routes';
+import {
+  getGroundHistoryEntriesInfiniteQueryOptions,
+  getGroundHistoryStatsQueryOptions,
+  type GroundingEntry,
+} from '@/lib/ground-history-query';
 
-interface GroundingEntry {
-  id: string;
-  created_at: string;
-  mood: string | null;
-  duration_seconds: number | null;
-  body: string | null;
-  trigger_text: string | null;
-}
+export {
+  groundHistoryEntriesQueryKey,
+  groundHistoryStatsQueryKey,
+} from '@/lib/ground-history-query';
 
 const ease: [number, number, number, number] = [0.22, 1, 0.36, 1];
-const PAGE_SIZE = 20;
-
-/** Used by `Ground` after a ritual save so Journey → Grounding history totals refresh without staleTime wait. */
-export function groundHistoryStatsQueryKey(userId: string) {
-  return ['tools', 'ground-history', 'stats', userId] as const;
-}
-
-export function groundHistoryEntriesQueryKey(userId: string) {
-  return ['tools', 'ground-history', 'entries', userId] as const;
-}
-
-async function fetchGroundingHistoryStats(userId: string): Promise<{ totalSessions: number; totalMinutes: number }> {
-  const { data, count, error } = await supabase
-    .from('practice_entries')
-    .select('duration_seconds', { count: 'exact' })
-    .eq('user_id', userId)
-    .eq('type', 'grounding');
-
-  if (error || !data) {
-    return { totalSessions: 0, totalMinutes: 0 };
-  }
-  const totalSessions = count ?? data.length;
-  const mins = data.reduce((sum, e) => sum + ((e.duration_seconds as number) || 0), 0) / 60;
-  return { totalSessions, totalMinutes: Math.round(mins) };
-}
-
-async function fetchGroundHistoryEntriesPage(userId: string, offset: number): Promise<GroundingEntry[]> {
-  const { data, error } = await supabase
-    .from('practice_entries')
-    .select('id, created_at, mood, duration_seconds, body, trigger_text')
-    .eq('user_id', userId)
-    .eq('type', 'grounding')
-    .order('created_at', { ascending: false })
-    .range(offset, offset + PAGE_SIZE - 1);
-  if (error) throw error;
-  return (data ?? []) as GroundingEntry[];
-}
 
 function formatDuration(seconds: number): string {
   if (seconds < 60) return `${seconds}s`;
@@ -98,32 +61,13 @@ export default function GroundHistory() {
     hasNextPage,
     fetchNextPage,
     refetch,
-  } = useInfiniteQuery({
-    queryKey: userId ? groundHistoryEntriesQueryKey(userId) : ['tools', 'ground-history', 'entries', 'none'],
-    queryFn: ({ pageParam }) => fetchGroundHistoryEntriesPage(userId!, pageParam),
-    initialPageParam: 0,
-    getNextPageParam: (lastPage, allPages) => {
-      if (lastPage.length < PAGE_SIZE) return undefined;
-      return allPages.reduce((sum, p) => sum + p.length, 0);
-    },
-    enabled: Boolean(userId),
-    staleTime: 60_000,
-    refetchOnWindowFocus: false,
-    retry: false,
-  });
+  } = useInfiniteQuery(getGroundHistoryEntriesInfiniteQueryOptions(userId));
 
   const entries = useMemo(() => entriesPages?.pages.flat() ?? [], [entriesPages]);
   const loading = Boolean(userId) && isPending;
   const hasMore = Boolean(hasNextPage);
 
-  const { data: groundingStats } = useQuery({
-    queryKey: userId ? groundHistoryStatsQueryKey(userId) : ['tools', 'ground-history', 'stats', 'none'],
-    queryFn: () => fetchGroundingHistoryStats(userId!),
-    enabled: Boolean(userId),
-    staleTime: 60_000,
-    refetchOnWindowFocus: false,
-    retry: false,
-  });
+  const { data: groundingStats } = useQuery(getGroundHistoryStatsQueryOptions(userId));
   const totalSessions = groundingStats?.totalSessions ?? 0;
   const totalMinutes = groundingStats?.totalMinutes ?? 0;
 

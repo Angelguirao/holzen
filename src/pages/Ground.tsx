@@ -22,7 +22,7 @@ import { invokeEdge } from '@/lib/invoke-edge';
 import { practiceEntriesWeeklyCountQueryKey } from '@/components/PracticeWidget';
 import { practicePrimarySuggestionQueryKey } from '@/hooks/use-practice-suggestion';
 import { toolsHubDataQueryKey } from '@/hooks/use-tools-hub-data';
-import { groundHistoryEntriesQueryKey, groundHistoryStatsQueryKey } from '@/pages/GroundHistory';
+import { groundHistoryEntriesQueryKey, groundHistoryStatsQueryKey } from '@/lib/ground-history-query';
 import { invalidateHistoryCalendarActivities } from '@/lib/history-calendar-activities-query-key';
 import {
   AlertDialog,
