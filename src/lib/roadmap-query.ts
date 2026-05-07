@@ -1,0 +1,59 @@
+import { supabase } from '@/integrations/supabase/client';
+import type { Database } from '@/integrations/supabase/types';
+
+export type RoadmapListItem = Pick<
+  Database['public']['Tables']['roadmap_items']['Row'],
+  'id' | 'title' | 'description' | 'status' | 'vote_count' | 'category'
+>;
+
+export const ROADMAP_ITEMS_PAGE_SIZE = 30;
+
+export const ROADMAP_ITEMS_QUERY_KEY = ['roadmap', 'items'] as const;
+
+export function roadmapVotesQueryKey(userId: string) {
+  return ['roadmap', 'votes', userId] as const;
+}
+
+export async function fetchRoadmapItemsPage(
+  offset: number,
+  pageSize: number = ROADMAP_ITEMS_PAGE_SIZE,
+): Promise<RoadmapListItem[]> {
+  const { data, error } = await supabase
+    .from('roadmap_items')
+    .select('id, title, description, status, vote_count, category')
+    .order('vote_count', { ascending: false })
+    .range(offset, offset + pageSize - 1);
+  if (error) throw error;
+  return (data as RoadmapListItem[]) ?? [];
+}
+
+export async function fetchRoadmapVotes(userId: string): Promise<string[]> {
+  const { data, error } = await supabase.from('roadmap_votes').select('item_id').eq('user_id', userId);
+  if (error) throw error;
+  return data?.map((v) => v.item_id) ?? [];
+}
+
+export async function deleteRoadmapVote(userId: string, itemId: string): Promise<void> {
+  const { error } = await supabase.from('roadmap_votes').delete().eq('user_id', userId).eq('item_id', itemId);
+  if (error) throw error;
+}
+
+export async function insertRoadmapVote(userId: string, itemId: string): Promise<void> {
+  const { error } = await supabase.from('roadmap_votes').insert({ user_id: userId, item_id: itemId });
+  if (error) throw error;
+}
+
+export function getRoadmapItemsInfiniteQueryOptions() {
+  const pageSize = ROADMAP_ITEMS_PAGE_SIZE;
+  return {
+    queryKey: ROADMAP_ITEMS_QUERY_KEY,
+    queryFn: ({ pageParam }) => fetchRoadmapItemsPage(pageParam as number, pageSize),
+    initialPageParam: 0,
+    getNextPageParam: (lastPage: RoadmapListItem[], allPages: RoadmapListItem[][]) => {
+      if (lastPage.length < pageSize) return undefined;
+      return allPages.reduce((sum, p) => sum + p.length, 0);
+    },
+    staleTime: 60_000,
+    refetchOnWindowFocus: false,
+  };
+}
