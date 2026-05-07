@@ -1,6 +1,10 @@
 import { useState, useEffect, useCallback, useMemo } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { fetchMarketData, type BtcPriceData } from '@/lib/btc';
+import {
+  getHolzenMarketDisplayQueryOptions,
+  holzenMarketDisplayQueryKey,
+} from '@/lib/holzen-market-display-query';
 import { supabase } from '@/integrations/supabase/client';
 import { invokeEdge } from '@/lib/invoke-edge';
 import { useAuth } from '@/hooks/use-auth';
@@ -23,10 +27,7 @@ import { trackEvent } from '@/lib/posthog';
 
 const PAUSE_MANUAL_START_HOME = 'holzen_sess_pause_manual_started_home';
 
-/** TanStack cache for CoinGecko-backed market strip on Home (`useHolzen`). */
-export function holzenMarketDisplayQueryKey(coinIdRaw: string | null | undefined, currency: string) {
-  return ['holzen', 'market-display', normalizeTrackedAssetId(coinIdRaw), currency.toUpperCase()] as const;
-}
+export { holzenMarketDisplayQueryKey } from '@/lib/holzen-market-display-query';
 
 /** Once per tab session: user kicked off a manual “Need a moment” / holzen-reflect flow from Home. */
 function markPauseManualStartedHomeOnce(): void {
@@ -71,16 +72,13 @@ export function useHolzen() {
     profileLoaded,
   } = profile;
 
-  const btcQuery = useQuery({
-    queryKey: holzenMarketDisplayQueryKey(profileTrackedAssetId, currency),
-    queryFn: () => fetchMarketData(profileTrackedAssetId, currency),
-    enabled: profileLoaded,
-    staleTime: 4 * 60_000,
-    gcTime: 15 * 60_000,
-    refetchInterval: 5 * 60_000,
-    refetchOnWindowFocus: false,
-    retry: 1,
-  });
+  const btcQuery = useQuery(
+    getHolzenMarketDisplayQueryOptions({
+      coinIdRaw: profileTrackedAssetId,
+      currency,
+      enabled: profileLoaded,
+    }),
+  );
 
   const [message, setMessage] = useState<string | null>(null);
   const [context, setContext] = useState<string | null>(null);
