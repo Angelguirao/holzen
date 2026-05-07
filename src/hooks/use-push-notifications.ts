@@ -4,16 +4,12 @@ import { toast } from "sonner";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { invokeEdge } from "@/lib/invoke-edge";
 import { useAuth } from "@/hooks/use-auth";
+import {
+  getPushSubscriptionQueryOptions,
+  pushSubscriptionQueryKey,
+} from "@/lib/push-subscription-query";
 
-export function pushSubscriptionQueryKey(userId: string) {
-  return ["push", "subscription", userId] as const;
-}
-
-async function fetchBrowserPushSubscribed(): Promise<boolean> {
-  const reg = await navigator.serviceWorker.ready;
-  const sub = await reg.pushManager.getSubscription();
-  return Boolean(sub);
-}
+export { pushSubscriptionQueryKey } from "@/lib/push-subscription-query";
 
 export function usePushNotifications() {
   const { t } = useTranslation();
@@ -28,15 +24,9 @@ export function usePushNotifications() {
 
   const subQueryEnabled = isSupported && Boolean(user);
 
-  const pushSubQuery = useQuery({
-    queryKey: user ? pushSubscriptionQueryKey(user.id) : ["push", "subscription", "__none__"],
-    queryFn: fetchBrowserPushSubscribed,
-    enabled: subQueryEnabled,
-    staleTime: 0,
-    gcTime: 5 * 60_000,
-    refetchOnWindowFocus: true,
-    retry: false,
-  });
+  const pushSubQuery = useQuery(
+    getPushSubscriptionQueryOptions({ userId: user?.id, enabled: subQueryEnabled }),
+  );
 
   const isSubscribed = pushSubQuery.data ?? false;
   /** False until first successful `getSubscription` read (avoids banner flash; errors stay unchecked like a hung promise). */
