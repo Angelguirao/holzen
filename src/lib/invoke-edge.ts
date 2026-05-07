@@ -22,6 +22,11 @@ export interface InvokeEdgeOptions<B = unknown> {
   headers?: Record<string, string>;
   /** HTTP method override (defaults to POST; edge functions accept GET when declared). */
   method?: "GET" | "POST" | "PUT" | "PATCH" | "DELETE";
+  /**
+   * URL query string for the edge function. When set, uses `fetch` (still with anon key +
+   * `x-cid`) because `supabase.functions.invoke` does not attach query parameters to the URL.
+   */
+  query?: Record<string, string | undefined>;
   /** AbortSignal for cancellation. */
   signal?: AbortSignal;
 }
@@ -31,6 +36,15 @@ export interface InvokeEdgeResult<T> {
   error: Error | null;
   /** Correlation id sent on this call — pivot anchor for Sentry/BetterStack/audit_log. */
   cid: string;
+}
+
+function buildEdgeQueryString(query: Record<string, string | undefined>): string {
+  const params = new URLSearchParams();
+  for (const [key, value] of Object.entries(query)) {
+    if (value === undefined) continue;
+    params.set(key, value);
+  }
+  return params.toString();
 }
 
 export async function invokeEdge<T = unknown, B = unknown>(
@@ -50,13 +64,67 @@ export async function invokeEdge<T = unknown, B = unknown>(
 
   const start = performance.now();
   try {
-    const { data, error } = await supabase.functions.invoke<T>(functionName, {
-      body: options.body as unknown,
-      headers,
-      method: options.method,
-      // `signal` is supported on newer supabase-js; ignored on older versions.
-      ...(options.signal ? { signal: options.signal } : {}),
-    });
+    const queryString = options.query ? buildEdgeQueryString(options.query) : "";
+    const useFetchForQuery = queryString.length > 0;
+
+    let data: T | null = null;
+    let error: Error | null = null;
+
+    if (useFetchForQuery) {
+      const baseUrl = import.meta.env.VITE_SUPABASE_URL as string;
+      const anonKey = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY as string;
+      const url = `${baseUrl.replace(/\/$/, "")}/functions/v1/${encodeURIComponent(functionName)}?${queryString}`;
+      const fetchHeaders: Record<string, string> = {
+        apikey: anonKey,
+        Authorization: `Bearer ${anonKey}`,
+        ...headers,
+      };
+      const method = options.method ?? "GET";
+      const init: RequestInit = {
+        method,
+        headers: fetchHeaders,
+        signal: options.signal,
+      };
+      if (method !== "GET" && method !== "HEAD" && options.body !== undefined) {
+        init.headers = { ...fetchHeaders, "Content-Type": "application/json" };
+        init.body = JSON.stringify(options.body);
+      }
+      const res = await fetch(url, init);
+      const contentType = res.headers.get("content-type") ?? "";
+      if (!res.ok) {
+        let message = res.statusText || `Edge function error (${res.status})`;
+        if (contentType.includes("application/json")) {
+          try {
+            const errBody = (await res.json()) as { error?: string; message?: string };
+            if (typeof errBody.error === "string") message = errBody.error;
+            else if (typeof errBody.message === "string") message = errBody.message;
+          } catch {
+            /* keep statusText */
+          }
+        }
+        error = new Error(message);
+      } else if (contentType.includes("application/json")) {
+        try {
+          data = (await res.json()) as T;
+        } catch {
+          error = new Error("Invalid JSON response from edge function");
+        }
+      } else {
+        // Empty or non-JSON success body
+        data = null;
+      }
+    } else {
+      const invoked = await supabase.functions.invoke<T>(functionName, {
+        body: options.body as unknown,
+        headers,
+        method: options.method,
+        // `signal` is supported on newer supabase-js; ignored on older versions.
+        ...(options.signal ? { signal: options.signal } : {}),
+      });
+      data = invoked.data ?? null;
+      error = invoked.error ?? null;
+    }
+
     const durationMs = Math.round(performance.now() - start);
 
     try {
@@ -71,7 +139,7 @@ export async function invokeEdge<T = unknown, B = unknown>(
       /* no-op */
     }
 
-    return { data: data ?? null, error: error ?? null, cid };
+    return { data, error, cid };
   } catch (err) {
     return {
       data: null,

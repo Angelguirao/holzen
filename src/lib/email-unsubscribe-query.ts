@@ -1,7 +1,9 @@
 /**
  * One-click email unsubscribe deep link: GET `handle-email-unsubscribe?token=…`
- * (anon key) to validate before the user confirms via `invokeEdge` POST.
+ * via `invokeEdge` (anon + `x-cid`) to validate before the user confirms via POST.
  */
+
+import { invokeEdge } from '@/lib/invoke-edge';
 
 export type EmailUnsubscribeLinkCheck = 'valid' | 'already' | 'invalid';
 
@@ -11,22 +13,19 @@ export function emailUnsubscribeLinkQueryKey(token: string) {
   return ['auth', 'email-unsubscribe', 'link', token] as const;
 }
 
-export async function fetchEmailUnsubscribeLinkCheck(token: string): Promise<EmailUnsubscribeLinkCheck> {
+export async function fetchEmailUnsubscribeLinkCheck(
+  token: string,
+  signal?: AbortSignal,
+): Promise<EmailUnsubscribeLinkCheck> {
   try {
-    const supabaseUrl = import.meta.env.VITE_SUPABASE_URL as string;
-    const anonKey = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY as string;
-    const res = await fetch(
-      `${supabaseUrl}/functions/v1/handle-email-unsubscribe?token=${encodeURIComponent(token)}`,
-      { headers: { apikey: anonKey } },
-    );
-    let data: { valid?: boolean; reason?: string };
-    try {
-      data = await res.json();
-    } catch {
-      return 'invalid';
-    }
-    if (data.valid) return 'valid';
-    if (data.reason === 'already_unsubscribed') return 'already';
+    const { data, error } = await invokeEdge<{ valid?: boolean; reason?: string }>('handle-email-unsubscribe', {
+      method: 'GET',
+      query: { token },
+      signal,
+    });
+    if (error) return 'invalid';
+    if (data?.valid) return 'valid';
+    if (data?.reason === 'already_unsubscribed') return 'already';
     return 'invalid';
   } catch {
     return 'invalid';
@@ -36,7 +35,7 @@ export async function fetchEmailUnsubscribeLinkCheck(token: string): Promise<Ema
 export function getEmailUnsubscribeLinkQueryOptions(token: string | null) {
   return {
     queryKey: token ? emailUnsubscribeLinkQueryKey(token) : EMAIL_UNSUBSCRIBE_LINK_NONE_QUERY_KEY,
-    queryFn: () => fetchEmailUnsubscribeLinkCheck(token!),
+    queryFn: ({ signal }) => fetchEmailUnsubscribeLinkCheck(token!, signal),
     enabled: Boolean(token),
     staleTime: Number.POSITIVE_INFINITY,
     refetchOnWindowFocus: false,
