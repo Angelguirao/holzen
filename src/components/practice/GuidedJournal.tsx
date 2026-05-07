@@ -1,5 +1,6 @@
 import { useState, useCallback, useEffect, useRef } from 'react';
-import { useQueryClient } from '@tanstack/react-query';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
+import type { TFunction } from 'i18next';
 import { useTranslation } from 'react-i18next';
 import { motion, AnimatePresence } from 'framer-motion';
 import { practiceEntriesWeeklyCountQueryKey } from '@/components/PracticeWidget';
@@ -25,6 +26,48 @@ const FALLBACK_PROMPTS = [
   'practice.prompt6',
 ];
 
+export function guidedJournalPromptsQueryKey(userId: string, language: string) {
+  return ['practice', 'guided-journal', 'prompts', userId, language] as const;
+}
+
+type GuidedJournalPromptsBundle = {
+  prompts: string[];
+  isAI: boolean;
+  promptLoadFailed: boolean;
+  suggestedIndex: number;
+};
+
+async function fetchGuidedJournalPrompts(language: string, t: TFunction): Promise<GuidedJournalPromptsBundle> {
+  try {
+    const { data, error } = await invokeEdge<{ prompts?: string[] }>('journal-prompt', {
+      body: { language },
+    });
+    if (error) throw error;
+    const aiPrompts = data?.prompts;
+    if (Array.isArray(aiPrompts) && aiPrompts.length > 0) {
+      return { prompts: aiPrompts, isAI: true, promptLoadFailed: false, suggestedIndex: 0 };
+    }
+    throw new Error('Empty response');
+  } catch (error: unknown) {
+    const parsed = await parseEdgeFunctionError(error);
+    const message = toUserFacingAiErrorMessage(parsed, t('practice.journalPromptFailed'));
+    if (parsed.code === 'ai_action_quota_exceeded' || parsed.code === 'ai_action_upgrade_required') {
+      toast(message);
+    }
+    if (companionFallbacksDisabledClient()) {
+      toast.error(t('practice.journalPromptFailed'));
+      return { prompts: [], isAI: false, promptLoadFailed: true, suggestedIndex: 0 };
+    }
+    const fallback = FALLBACK_PROMPTS.map((k) => t(k));
+    return {
+      prompts: fallback,
+      isAI: false,
+      promptLoadFailed: false,
+      suggestedIndex: Math.floor(Math.random() * fallback.length),
+    };
+  }
+}
+
 interface Props {
   onComplete: () => void;
   textColor: string;
@@ -36,61 +79,36 @@ export function GuidedJournal({ onComplete, textColor, ringColor }: Props) {
   const { user } = useAuth();
   const queryClient = useQueryClient();
   const { language } = useHolzen();
-  const [prompts, setPrompts] = useState<string[]>([]);
   const [promptIndex, setPromptIndex] = useState(0);
-  const [isAI, setIsAI] = useState(false);
-  const [loadingPrompts, setLoadingPrompts] = useState(true);
-  const [promptLoadFailed, setPromptLoadFailed] = useState(false);
   const [body, setBody] = useState('');
   const [saving, setSaving] = useState(false);
   const [done, setDone] = useState(false);
-  const fetched = useRef(false);
+  const wasPromptsPendingRef = useRef(false);
 
-  // Fetch AI-generated prompts on mount
+  const promptsQuery = useQuery({
+    queryKey: user ? guidedJournalPromptsQueryKey(user.id, language) : ['practice', 'guided-journal', 'prompts', '__none__', language],
+    queryFn: () => fetchGuidedJournalPrompts(language, t),
+    enabled: Boolean(user),
+    staleTime: 10 * 60_000,
+    refetchOnWindowFocus: false,
+    retry: false,
+  });
+
+  const prompts = promptsQuery.data?.prompts ?? [];
+  const isAI = promptsQuery.data?.isAI ?? false;
+  const promptLoadFailed = promptsQuery.data?.promptLoadFailed ?? false;
+  const loadingPrompts = Boolean(user) && promptsQuery.isPending;
+
   useEffect(() => {
-    if (fetched.current || !user) return;
-    fetched.current = true;
-
-    async function fetchAIPrompts() {
-      try {
-        const { data, error } = await invokeEdge<{ prompts?: string[] }>('journal-prompt', {
-          body: { language },
-        });
-        if (error) throw error;
-        const aiPrompts = data?.prompts;
-        if (Array.isArray(aiPrompts) && aiPrompts.length > 0) {
-          setPrompts(aiPrompts);
-          setIsAI(true);
-          setPromptIndex(0);
-          setLoadingPrompts(false);
-          return;
-        }
-        throw new Error('Empty response');
-      } catch (error) {
-        const parsed = await parseEdgeFunctionError(error);
-        const message = toUserFacingAiErrorMessage(parsed, t('practice.journalPromptFailed'));
-        if (parsed.code === 'ai_action_quota_exceeded' || parsed.code === 'ai_action_upgrade_required') {
-          toast(message);
-        }
-        if (companionFallbacksDisabledClient()) {
-          setPromptLoadFailed(true);
-          setPrompts([]);
-          setIsAI(false);
-          setPromptIndex(0);
-          setLoadingPrompts(false);
-          toast.error(t('practice.journalPromptFailed'));
-          return;
-        }
-        const fallback = FALLBACK_PROMPTS.map((k) => t(k));
-        setPrompts(fallback);
-        setIsAI(false);
-        setPromptIndex(Math.floor(Math.random() * fallback.length));
-        setLoadingPrompts(false);
-      }
+    if (promptsQuery.isPending) {
+      wasPromptsPendingRef.current = true;
+      return;
     }
-
-    fetchAIPrompts();
-  }, [user, language, t]);
+    if (wasPromptsPendingRef.current && promptsQuery.data) {
+      setPromptIndex(promptsQuery.data.suggestedIndex);
+      wasPromptsPendingRef.current = false;
+    }
+  }, [promptsQuery.isPending, promptsQuery.data]);
 
   const prompt = prompts[promptIndex] ?? '';
 
