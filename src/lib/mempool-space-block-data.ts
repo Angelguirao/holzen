@@ -48,3 +48,17 @@ export async function fetchMempoolSpaceBlockData(): Promise<MempoolSpaceBlockDat
     return null;
   }
 }
+
+export const MEMPOOL_SPACE_BLOCK_DATA_QUERY_KEY = ['ambient', 'mempool-space', 'block-data'] as const;
+
+export function getMempoolSpaceBlockDataQueryOptions(enabled: boolean) {
+  return {
+    queryKey: MEMPOOL_SPACE_BLOCK_DATA_QUERY_KEY,
+    queryFn: fetchMempoolSpaceBlockData,
+    enabled,
+    refetchInterval: 30_000,
+    staleTime: 0,
+    refetchOnWindowFocus: false,
+    retry: false,
+  };
+}
