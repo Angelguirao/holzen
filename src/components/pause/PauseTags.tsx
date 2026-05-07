@@ -6,10 +6,9 @@ import { useAuth } from '@/hooks/use-auth';
 import { pauseArchiveListQueryPrefix } from '@/hooks/use-pause-archive-list';
 import { pauseLogStep } from '@/lib/pause-api';
 import {
+  getLatestPauseReflectTagsQueryOptions,
   PAUSE_REFLECT_STEP_TAGS,
-  fetchLatestPauseReflectStep,
   pauseReflectStepLatestQueryKey,
-  tagsFromReflectRow,
 } from '@/lib/pause-reflect-step-queries';
 
 interface Props {
@@ -23,15 +22,7 @@ export function PauseTags({ pauseInstanceId }: Props) {
   const [tags, setTags] = useState<string[]>([]);
   const [draft, setDraft] = useState('');
 
-  const { data: serverTags = [] } = useQuery({
-    queryKey: pauseReflectStepLatestQueryKey(pauseInstanceId, PAUSE_REFLECT_STEP_TAGS),
-    queryFn: () => fetchLatestPauseReflectStep(pauseInstanceId, PAUSE_REFLECT_STEP_TAGS),
-    select: (row) => tagsFromReflectRow(row),
-    enabled: Boolean(pauseInstanceId),
-    staleTime: 60_000,
-    refetchOnWindowFocus: false,
-    retry: false,
-  });
+  const { data: serverTags = [] } = useQuery(getLatestPauseReflectTagsQueryOptions(pauseInstanceId));
 
   useEffect(() => {
     setTags(serverTags);

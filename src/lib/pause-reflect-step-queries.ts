@@ -39,3 +39,27 @@ export function tagsFromReflectRow(row: PauseReflectStepLatestRow | null | undef
   const arr = row?.payload?.tags;
   return Array.isArray(arr) ? (arr as string[]).slice() : [];
 }
+
+export function getLatestPauseReflectNoteQueryOptions(pauseInstanceId: string) {
+  return {
+    queryKey: pauseReflectStepLatestQueryKey(pauseInstanceId, PAUSE_REFLECT_STEP_NOTE),
+    queryFn: () => fetchLatestPauseReflectStep(pauseInstanceId, PAUSE_REFLECT_STEP_NOTE),
+    select: (row: PauseReflectStepLatestRow | null) => noteTextFromReflectRow(row),
+    enabled: Boolean(pauseInstanceId),
+    staleTime: 60_000,
+    refetchOnWindowFocus: false,
+    retry: false,
+  } as const;
+}
+
+export function getLatestPauseReflectTagsQueryOptions(pauseInstanceId: string) {
+  return {
+    queryKey: pauseReflectStepLatestQueryKey(pauseInstanceId, PAUSE_REFLECT_STEP_TAGS),
+    queryFn: () => fetchLatestPauseReflectStep(pauseInstanceId, PAUSE_REFLECT_STEP_TAGS),
+    select: (row: PauseReflectStepLatestRow | null) => tagsFromReflectRow(row),
+    enabled: Boolean(pauseInstanceId),
+    staleTime: 60_000,
+    refetchOnWindowFocus: false,
+    retry: false,
+  } as const;
+}
