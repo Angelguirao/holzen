@@ -1,5 +1,7 @@
 import { supabase } from '@/integrations/supabase/client';
 import { deriveBreathingUiCompleteFromPayloads } from '@/lib/companion-breath-completion-detect';
+import { companionUiCompletionQueryKey } from '@/lib/companion-ui-completion-query-key';
+import { getHolzenQueryClient } from '@/lib/holzen-query-client-ref';
 import { pauseLogStep, pauseLogCompanion } from '@/lib/pause-api';
 import type { PauseStepType } from '@/lib/pause-state';
 
@@ -31,6 +33,12 @@ export const EMPTY_COMPANION_UI_COMPLETION: CompanionUiCompletionState = {
 };
 
 export { companionUiCompletionQueryKey } from '@/lib/companion-ui-completion-query-key';
+
+function invalidateCompanionUiCompletionQuery(pauseInstanceId: string): void {
+  const qc = getHolzenQueryClient();
+  if (!qc) return;
+  void qc.invalidateQueries({ queryKey: companionUiCompletionQueryKey(pauseInstanceId) });
+}
 
 /** Map a UI step key to the V2 companion_type persisted on pause_companion_events. */
 const STEP_TO_COMPANION_TYPE: Record<CompanionUiCompletionStep, string | null> = {
@@ -104,6 +112,9 @@ export async function loadCompanionUiCompletionState(
  *
  * The RPC decides counts_for_pause server-side based on template +
  * window + existing events. Callers don't pass that flag.
+ *
+ * After each RPC attempt, invalidates the TanStack `companionUiCompletionQueryKey`
+ * so `useCompanionData` refetches truth from `pause_step_events` / `pause_companion_events`.
  */
 export async function persistCompanionUiStepCompletion(
   pauseInstanceId: string,
@@ -116,6 +127,7 @@ export async function persistCompanionUiStepCompletion(
       instanceId: pauseInstanceId,
       stepType,
     }).catch(() => undefined);
+    invalidateCompanionUiCompletionQuery(pauseInstanceId);
     return;
   }
 
@@ -128,4 +140,5 @@ export async function persistCompanionUiStepCompletion(
     action: 'complete',
     entryPoint: options?.entryPoint ?? 'pause_flow',
   }).catch(() => undefined);
+  invalidateCompanionUiCompletionQuery(pauseInstanceId);
 }
