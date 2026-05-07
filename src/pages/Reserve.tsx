@@ -7,6 +7,7 @@ import { useQuery } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
 import { PageHeading } from '@/components/PageHeading';
 import { StateCard } from '@/components/ui/state-card';
+import { getCoingeckoBtcUsdQueryOptions } from '@/lib/coingecko-btc-usd-query';
 
 const fade = (delay = 0) => ({
   initial: { opacity: 0, y: 14 },
@@ -23,36 +24,11 @@ const TREASURY = {
   hasStarted: false,
 };
 
-/** Shared cache if other surfaces ever need the same spot quote. */
-export const COINGECKO_BTC_USD_QUERY_KEY = ['external', 'coingecko', 'btc-usd'] as const;
-
-async function fetchBtcUsd(): Promise<number | null> {
-  try {
-    const r = await fetch('https://api.coingecko.com/api/v3/simple/price?ids=bitcoin&vs_currencies=usd');
-    if (!r.ok) return null;
-    const d = (await r.json()) as { bitcoin?: { usd?: number } };
-    return d?.bitcoin?.usd ?? null;
-  } catch {
-    return null;
-  }
-}
-
-function useBtcPrice() {
-  const { data } = useQuery({
-    queryKey: COINGECKO_BTC_USD_QUERY_KEY,
-    queryFn: fetchBtcUsd,
-    staleTime: 5 * 60_000,
-    refetchOnWindowFocus: false,
-    retry: false,
-  });
-  return data ?? null;
-}
-
 const Reserve = () => {
   const { t } = useTranslation();
   const prefersReduced = useReducedMotion();
   const m = (delay = 0) => (prefersReduced ? {} : fade(delay));
-  const btcPrice = useBtcPrice();
+  const { data: btcPrice } = useQuery(getCoingeckoBtcUsdQueryOptions());
 
   const currentValue = btcPrice ? TREASURY.totalBtc * btcPrice : null;
   const unrealisedPnl = btcPrice
