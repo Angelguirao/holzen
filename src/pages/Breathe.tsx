@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback, useRef, useMemo } from 'react';
+import { useQuery } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
 import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
@@ -6,7 +7,7 @@ import { X, Info } from 'lucide-react';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 import { hapticFeedback } from '@/lib/haptics';
 import { fetchBtcData, type BtcPriceData } from '@/lib/btc';
-import { fetchMempoolSpaceBlockData, type MempoolSpaceBlockData } from '@/lib/mempool-space-block-data';
+import { getMempoolSpaceBlockDataQueryOptions } from '@/lib/mempool-space-block-data';
 import { playBlockDiscoveryTone, startAmbientDrone } from '@/lib/notification-tone';
 import { useProGate } from '@/hooks/use-pro-gate';
 import { ProLock } from '@/components/ProLock';
@@ -45,6 +46,9 @@ const textColors: Record<VolatilityLevel, string> = {
 };
 
 const BREATH_DURATION = 8;
+
+/** Ambient Breathe surface: CoinGecko-backed BTC strip (default USD), polled with mempool block data. */
+const BREATHE_AMBIENT_BTC_QUERY_KEY = ['ambient', 'breathe', 'btc-usd'] as const;
 
 function formatNumber(n: number): string {
   if (n >= 1_000_000) return `${(n / 1_000_000).toFixed(1)}M`;
@@ -199,9 +203,37 @@ export default function Breathe() {
   const prefersReducedMotion = useReducedMotion();
   const { isPro, isPending } = useProGate();
 
-  const [btcData, setBtcData] = useState<BtcPriceData | null>(null);
-  const [blockData, setBlockData] = useState<MempoolSpaceBlockData | null>(null);
-  const [level, setLevel] = useState<VolatilityLevel>('calm');
+  const ambientDataEnabled = isPro && !isPending;
+
+  const btcQuery = useQuery({
+    queryKey: BREATHE_AMBIENT_BTC_QUERY_KEY,
+    queryFn: async (): Promise<BtcPriceData | null> => {
+      try {
+        return await fetchBtcData();
+      } catch {
+        return null;
+      }
+    },
+    enabled: ambientDataEnabled,
+    refetchInterval: 30_000,
+    staleTime: 0,
+    refetchOnWindowFocus: false,
+    retry: false,
+  });
+
+  const {
+    data: blockDataRaw,
+    refetch: refetchBlockData,
+  } = useQuery({
+    ...getMempoolSpaceBlockDataQueryOptions(ambientDataEnabled),
+  });
+
+  const btcData = btcQuery.data ?? null;
+  const blockData = blockDataRaw ?? null;
+  const level = useMemo((): VolatilityLevel => {
+    if (!btcData) return 'calm';
+    return getVolatilityLevel(btcData.changePercent);
+  }, [btcData]);
   const [curtainLifted, setCurtainLifted] = useState(false);
 
   // Depth: 0 = surface ambient, 1 = deep void
@@ -227,26 +259,6 @@ export default function Breathe() {
     return () => clearTimeout(timer);
   }, [isPro]);
 
-  const loadData = useCallback(async () => {
-    const [btc, block] = await Promise.all([
-      fetchBtcData().catch(() => null),
-      fetchMempoolSpaceBlockData(),
-    ]);
-    if (btc) {
-      setBtcData(btc);
-      setLevel(getVolatilityLevel(btc.changePercent));
-    }
-    if (block) setBlockData(block);
-    return block;
-  }, []);
-
-  useEffect(() => {
-    if (!isPro) return;
-    loadData();
-    const interval = setInterval(loadData, 30_000);
-    return () => clearInterval(interval);
-  }, [loadData, isPro]);
-
   useEffect(() => {
     if (!isPro) return;
     document.body.classList.add('ambient-active');
@@ -271,23 +283,24 @@ export default function Breathe() {
     return () => { if (tickRef.current) clearInterval(tickRef.current); };
   }, [depth, deepReady, blockData?.lastBlockTime]);
 
-  // Deep: poll for new blocks every 15s
+  // Deep: poll for new blocks every 15s (faster than the surface 30s TanStack interval)
   useEffect(() => {
     if (depth !== 1 || !deepReady) return;
-    pollRef.current = setInterval(async () => {
-      const fresh = await fetchMempoolSpaceBlockData();
-      if (fresh) {
-        if (blockAtEntry && fresh.height > blockAtEntry && !newBlockMined) {
-          setNewBlockMined(true);
-          setNewBlockHeight(fresh.height);
-          hapticFeedback('success');
-          playBlockDiscoveryTone();
-        }
-        setBlockData(fresh);
-      }
+    pollRef.current = setInterval(() => {
+      void refetchBlockData();
     }, 15_000);
     return () => { if (pollRef.current) clearInterval(pollRef.current); };
-  }, [depth, deepReady, blockAtEntry, newBlockMined]);
+  }, [depth, deepReady, refetchBlockData]);
+
+  // Deep: celebrate when chain height passes the height captured at void entry
+  useEffect(() => {
+    if (depth !== 1 || !deepReady || !blockAtEntry || !blockData || newBlockMined) return;
+    if (blockData.height <= blockAtEntry) return;
+    setNewBlockMined(true);
+    setNewBlockHeight(blockData.height);
+    hapticFeedback('success');
+    playBlockDiscoveryTone();
+  }, [depth, deepReady, blockAtEntry, newBlockMined, blockData]);
 
   // Deep: cycle contemplations every 20s
   useEffect(() => {
