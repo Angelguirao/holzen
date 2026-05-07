@@ -35,6 +35,7 @@ import {
   validateFutureLetterBody,
   type FutureLetterInvalidReason,
 } from '@/lib/future-letter-validation';
+import { invalidateHistoryCalendarActivities } from '@/lib/history-calendar-activities-query-key';
 import { toast } from 'sonner';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { format } from 'date-fns';
@@ -295,6 +296,7 @@ export function LetterToFutureSelf({
       queryClient.setQueryData<Letter[]>(futureLettersListQueryKey(userId), (prev) =>
         (prev ?? []).filter((l) => l.id !== id),
       );
+      invalidateHistoryCalendarActivities(queryClient, userId);
       toast(t('letter.deleted'));
     },
     [t, queryClient, userId],
@@ -365,6 +367,7 @@ export function LetterToFutureSelf({
       if (error) throw error;
 
       const newLetter = data as unknown as Letter;
+      invalidateHistoryCalendarActivities(queryClient, user.id);
 
       setTimeout(() => {
         setSealPhase('sealed');
