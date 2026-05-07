@@ -2,26 +2,13 @@ import { useCallback } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { Link } from 'react-router-dom';
 import { ArrowLeft, RefreshCw, Check, Clock, Minus } from 'lucide-react';
-import { invokeEdge } from '@/lib/invoke-edge';
+import {
+  type CheckoutEvent,
+  getCheckoutEventsQueryOptions,
+} from '@/lib/checkout-events-query';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
 import { toast } from 'sonner';
-
-type CheckoutEvent = {
-  session_id: string;
-  created: number; // unix seconds
-  kind: string | null;
-  pack_type: string | null;
-  expected_credits: number;
-  amount_total: number | null;
-  currency: string | null;
-  payment_status: string;
-  status: string | null;
-  grant_status: 'applied' | 'pending' | 'not_applicable';
-  granted_credits: number | null;
-  granted_at: string | null;
-  grant_reason: string | null;
-};
 
 function formatCurrency(amount: number | null, currency: string | null): string {
   if (amount == null || !currency) return '—';
@@ -73,8 +60,6 @@ function describePaymentStatus(event: CheckoutEvent): { label: string; tone: 'pa
   return { label: raw, tone: 'neutral' };
 }
 
-const CHECKOUT_EVENTS_QUERY_KEY = ['billing', 'checkout-events'] as const;
-
 const STATUS_TONE_CLASS: Record<'paid' | 'free' | 'pending' | 'failed' | 'neutral', string> = {
   paid: 'text-foreground',
   free: 'text-muted-foreground',
@@ -108,14 +93,6 @@ function GrantBadge({ event }: { event: CheckoutEvent }) {
   );
 }
 
-async function fetchCheckoutEvents(): Promise<CheckoutEvent[]> {
-  const { data, error } = await invokeEdge<{ events?: CheckoutEvent[] }>('list-checkout-events', {
-    body: {},
-  });
-  if (error) throw error;
-  return data?.events ?? [];
-}
-
 export default function BillingHistory() {
   const {
     data: events,
@@ -124,12 +101,7 @@ export default function BillingHistory() {
     isError,
     error,
     refetch,
-  } = useQuery({
-    queryKey: CHECKOUT_EVENTS_QUERY_KEY,
-    queryFn: fetchCheckoutEvents,
-    staleTime: 60_000,
-    refetchOnWindowFocus: false,
-  });
+  } = useQuery(getCheckoutEventsQueryOptions());
 
   const eventList = events ?? [];
   const showSkeleton = isPending || (isFetching && eventList.length === 0);
