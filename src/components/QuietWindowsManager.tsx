@@ -3,6 +3,11 @@ import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
 import { supabase } from '@/integrations/supabase/client';
 import type { Database } from '@/integrations/supabase/types';
+import {
+  getQuietWindowsQueryOptions,
+  quietWindowsQueryKey,
+  type QuietWindow,
+} from '@/lib/quiet-windows-query';
 import { Switch } from '@/components/ui/switch';
 import { Button } from '@/components/ui/button';
 import { Plus, Trash2 } from 'lucide-react';
@@ -12,45 +17,15 @@ type QuietWindowUpdate = Database['public']['Tables']['quiet_windows']['Update']
 
 const DAY_LABELS = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 
-interface QuietWindow {
-  id: string;
-  label: string;
-  start_hour: number;
-  end_hour: number;
-  days: number[];
-  active: boolean;
-}
-
-const QUIET_WINDOWS_QUERY_KEY = (uid: string) => ['quiet-windows', uid] as const;
-
-async function fetchQuietWindows(userId: string): Promise<QuietWindow[]> {
-  const { data, error } = await supabase
-    .from('quiet_windows')
-    .select('*')
-    .eq('user_id', userId)
-    .order('created_at');
-  if (error) {
-    console.error('[QuietWindowsManager] load failed:', error.message);
-    return [];
-  }
-  return (data ?? []) as QuietWindow[];
-}
-
 export function QuietWindowsManager({ userId }: { userId?: string }) {
   const { t } = useTranslation();
   const queryClient = useQueryClient();
 
-  const { data: windows = [] } = useQuery({
-    queryKey: userId ? QUIET_WINDOWS_QUERY_KEY(userId) : ['quiet-windows', 'none'],
-    queryFn: () => fetchQuietWindows(userId!),
-    enabled: Boolean(userId),
-    staleTime: 0,
-    refetchOnWindowFocus: false,
-  });
+  const { data: windows = [] } = useQuery(getQuietWindowsQueryOptions(userId));
 
   const bumpQuietWindows = useCallback(() => {
     if (!userId) return;
-    void queryClient.invalidateQueries({ queryKey: QUIET_WINDOWS_QUERY_KEY(userId) });
+    void queryClient.invalidateQueries({ queryKey: quietWindowsQueryKey(userId) });
   }, [queryClient, userId]);
 
   const addWindow = async () => {
@@ -72,7 +47,7 @@ export function QuietWindowsManager({ userId }: { userId?: string }) {
   const updateWindow = async (id: string, updates: Partial<QuietWindow>) => {
     await supabase.from('quiet_windows').update(updates as QuietWindowUpdate).eq('id', id);
     if (!userId) return;
-    queryClient.setQueryData<QuietWindow[]>(QUIET_WINDOWS_QUERY_KEY(userId), (prev) => {
+    queryClient.setQueryData<QuietWindow[]>(quietWindowsQueryKey(userId), (prev) => {
       if (!prev) return prev;
       return prev.map((w) => (w.id === id ? { ...w, ...updates } : w));
     });
@@ -81,7 +56,7 @@ export function QuietWindowsManager({ userId }: { userId?: string }) {
   const deleteWindow = async (id: string) => {
     await supabase.from('quiet_windows').delete().eq('id', id);
     if (userId) {
-      queryClient.setQueryData<QuietWindow[]>(QUIET_WINDOWS_QUERY_KEY(userId), (prev) => {
+      queryClient.setQueryData<QuietWindow[]>(quietWindowsQueryKey(userId), (prev) => {
         if (!prev) return prev;
         return prev.filter((w) => w.id !== id);
       });
