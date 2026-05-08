@@ -1,10 +1,17 @@
 import { supabase } from '@/integrations/supabase/client';
 import type { RelatedBiasesRow } from '@/components/companion/related-biases-util';
 
-export const RELATED_BIASES_GROUND_NUDGE_NONE_QUERY_KEY = ['related-biases-ground-nudge', 'none'] as const;
+export const RELATED_BIASES_GROUND_NUDGE_QUERY_PREFIX = ['related-biases-ground-nudge'] as const;
+
+export const RELATED_BIASES_GROUND_NUDGE_DISABLED_USER_ID = 'none' as const;
+
+export const RELATED_BIASES_GROUND_NUDGE_NONE_QUERY_KEY = [
+  ...RELATED_BIASES_GROUND_NUDGE_QUERY_PREFIX,
+  RELATED_BIASES_GROUND_NUDGE_DISABLED_USER_ID,
+] as const;
 
 export function relatedBiasesGroundNudgeQueryKey(userId: string) {
-  return ['related-biases-ground-nudge', userId] as const;
+  return [...RELATED_BIASES_GROUND_NUDGE_QUERY_PREFIX, userId] as const;
 }
 
 export async function fetchGroundNudgeArtifactsLast30d(userId: string): Promise<RelatedBiasesRow[]> {
