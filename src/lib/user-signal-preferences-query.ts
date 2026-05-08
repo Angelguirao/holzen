@@ -10,10 +10,17 @@ export interface UserPref {
   category: string;
 }
 
-export const USER_SIGNAL_PREFS_NONE_QUERY_KEY = ['user-signal-preferences', 'none'] as const;
+export const USER_SIGNAL_PREFS_QUERY_PREFIX = ['user-signal-preferences'] as const;
+
+export const USER_SIGNAL_PREFS_DISABLED_USER_ID = 'none' as const;
+
+export const USER_SIGNAL_PREFS_NONE_QUERY_KEY = [
+  ...USER_SIGNAL_PREFS_QUERY_PREFIX,
+  USER_SIGNAL_PREFS_DISABLED_USER_ID,
+] as const;
 
 export const USER_SIGNAL_PREFS_QUERY_KEY = (userId: string) =>
-  ['user-signal-preferences', userId] as const;
+  [...USER_SIGNAL_PREFS_QUERY_PREFIX, userId] as const;
 
 export async function fetchUserSignalPreferences(userId: string): Promise<UserPref[]> {
   const { data, error } = await supabase.from('user_signal_preferences').select('*').eq('user_id', userId);
