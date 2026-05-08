@@ -5,10 +5,17 @@ import {
   type PauseInstanceContextSnapshotRow,
 } from '@/lib/pause-session-fetched-instance';
 
-export const PAUSE_SESSION_FETCHED_INSTANCE_NONE_QUERY_KEY = ['pause-session', 'fetched-instance', 'none'] as const;
+export const PAUSE_SESSION_FETCHED_INSTANCE_QUERY_PREFIX = ['pause-session', 'fetched-instance'] as const;
+
+export const PAUSE_SESSION_FETCHED_INSTANCE_DISABLED_INSTANCE_ID = 'none' as const;
+
+export const PAUSE_SESSION_FETCHED_INSTANCE_NONE_QUERY_KEY = [
+  ...PAUSE_SESSION_FETCHED_INSTANCE_QUERY_PREFIX,
+  PAUSE_SESSION_FETCHED_INSTANCE_DISABLED_INSTANCE_ID,
+] as const;
 
 export function pauseSessionFetchedInstanceQueryKey(pauseInstanceId: string) {
-  return ['pause-session', 'fetched-instance', pauseInstanceId] as const;
+  return [...PAUSE_SESSION_FETCHED_INSTANCE_QUERY_PREFIX, pauseInstanceId] as const;
 }
 
 export async function fetchPauseInstanceForSession(pauseInstanceId: string): Promise<FetchedPauseInstance> {
