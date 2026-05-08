@@ -1,7 +1,14 @@
 import { supabase } from '@/integrations/supabase/client';
 import type { PauseState } from '@/lib/pause-state';
 
-export const PAUSE_TERMINAL_ENTRY_STATE_QUERY_PREFIX = ['pause', 'terminal-entry', 'db-state'] as const;
+export const PAUSE_TERMINAL_ENTRY_SCOPE_PREFIX = ['pause', 'terminal-entry'] as const;
+
+export const PAUSE_TERMINAL_ENTRY_STATE_QUERY_LEAF = 'db-state' as const;
+
+export const PAUSE_TERMINAL_ENTRY_STATE_QUERY_PREFIX = [
+  ...PAUSE_TERMINAL_ENTRY_SCOPE_PREFIX,
+  PAUSE_TERMINAL_ENTRY_STATE_QUERY_LEAF,
+] as const;
 
 export const PAUSE_TERMINAL_ENTRY_STATE_DISABLED_INSTANCE_ID = 'none' as const;
 
