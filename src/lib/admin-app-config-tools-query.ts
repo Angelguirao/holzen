@@ -137,7 +137,14 @@ async function loadSpendSnapshot(): Promise<SpendSnapshot> {
   };
 }
 
-export const ADMIN_APP_CONFIG_TOOLS_QUERY_KEY = ['admin', 'app-config-tools', 'bundle'] as const;
+export const ADMIN_APP_CONFIG_TOOLS_QUERY_PREFIX = ['admin', 'app-config-tools'] as const;
+
+export const ADMIN_APP_CONFIG_TOOLS_QUERY_LEAF = 'bundle' as const;
+
+export const ADMIN_APP_CONFIG_TOOLS_QUERY_KEY = [
+  ...ADMIN_APP_CONFIG_TOOLS_QUERY_PREFIX,
+  ADMIN_APP_CONFIG_TOOLS_QUERY_LEAF,
+] as const;
 
 export async function fetchAppConfigToolsBundle(): Promise<{
   config: ConfigState;
