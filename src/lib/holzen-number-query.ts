@@ -7,7 +7,14 @@ export interface HolzenNumberData {
   calculated_at: string;
 }
 
-export const HOLZEN_NUMBER_QUERY_KEY = ['public', 'holzen-number'] as const;
+export const HOLZEN_NUMBER_QUERY_PREFIX = ['public'] as const;
+
+export const HOLZEN_NUMBER_QUERY_SEGMENT = 'holzen-number' as const;
+
+export const HOLZEN_NUMBER_QUERY_KEY = [
+  ...HOLZEN_NUMBER_QUERY_PREFIX,
+  HOLZEN_NUMBER_QUERY_SEGMENT,
+] as const;
 
 export async function fetchHolzenNumber(): Promise<HolzenNumberData | null> {
   try {
