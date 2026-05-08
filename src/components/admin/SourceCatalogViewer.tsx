@@ -2,7 +2,7 @@ import { useState, useMemo, useCallback, useEffect } from 'react';
 import { ChevronDown, ChevronRight, Trash2, Globe, BookOpen } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
-import type { SignalSourceRow, LibraryEntryRow } from '@/hooks/use-admin-stats';
+import type { SignalSourceRow, LibraryEntryRow } from '@/lib/admin-stats-bundle-query';
 import { Checkbox } from '@/components/ui/checkbox';
 import { AdminBulkBar } from './AdminBulkBar';
 import { adminDeleteOneRow, adminDeleteRowsByIds } from '@/lib/admin-delete';
