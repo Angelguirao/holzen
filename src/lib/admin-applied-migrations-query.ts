@@ -6,7 +6,14 @@ export interface AppliedMigrationRow {
   statements_count: number;
 }
 
-export const ADMIN_APPLIED_MIGRATIONS_QUERY_KEY = ['admin', 'applied-migrations'] as const;
+export const ADMIN_APPLIED_MIGRATIONS_QUERY_PREFIX = ['admin'] as const;
+
+export const ADMIN_APPLIED_MIGRATIONS_QUERY_LEAF = 'applied-migrations' as const;
+
+export const ADMIN_APPLIED_MIGRATIONS_QUERY_KEY = [
+  ...ADMIN_APPLIED_MIGRATIONS_QUERY_PREFIX,
+  ADMIN_APPLIED_MIGRATIONS_QUERY_LEAF,
+] as const;
 
 export async function fetchAppliedMigrations(): Promise<AppliedMigrationRow[]> {
   const { data, error } = await (supabase.rpc as unknown as (
