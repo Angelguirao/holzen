@@ -13,7 +13,14 @@ export interface SourceSuggestionRow {
   reviewed_at: string | null;
 }
 
-export const ADMIN_PENDING_SOURCE_SUGGESTIONS_QUERY_KEY = ['admin', 'signal-source-suggestions', 'pending'] as const;
+export const ADMIN_PENDING_SOURCE_SUGGESTIONS_QUERY_PREFIX = ['admin', 'signal-source-suggestions'] as const;
+
+export const ADMIN_PENDING_SOURCE_SUGGESTIONS_QUERY_LEAF = 'pending' as const;
+
+export const ADMIN_PENDING_SOURCE_SUGGESTIONS_QUERY_KEY = [
+  ...ADMIN_PENDING_SOURCE_SUGGESTIONS_QUERY_PREFIX,
+  ADMIN_PENDING_SOURCE_SUGGESTIONS_QUERY_LEAF,
+] as const;
 
 export async function fetchPendingSourceSuggestionsRows(): Promise<SourceSuggestionRow[]> {
   const { data, error } = await supabase
