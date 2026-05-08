@@ -55,9 +55,10 @@ function summarize(rows: AttemptRow[]): Record<Provider, ProviderStat> {
   return out;
 }
 
+export const ADMIN_PROVIDER_HEALTH_QUERY_PREFIX = ['admin', 'provider-health'] as const;
+
 export const ADMIN_PROVIDER_HEALTH_QUERY_KEY = [
-  'admin',
-  'provider-health',
+  ...ADMIN_PROVIDER_HEALTH_QUERY_PREFIX,
   PROVIDER_HEALTH_WINDOW_MINUTES,
 ] as const;
 
