@@ -67,6 +67,9 @@ export function blogPostBySlugQueryKey(slug: string) {
   return ['blog-post', slug] as const;
 }
 
+/** Placeholder when `slug` is missing; paired with `enabled: false` in `getBlogPostBySlugQueryOptions`. */
+export const BLOG_POST_BY_SLUG_NONE_QUERY_KEY = ['blog-post', 'none'] as const;
+
 export async function fetchBlogPostBySlug(slug: string): Promise<BlogPostRow | null> {
   const { data, error } = await supabase
     .from('blog_posts')
@@ -81,7 +84,7 @@ export async function fetchBlogPostBySlug(slug: string): Promise<BlogPostRow | n
 /** Shared TanStack options for `/blog/:slug` (stable key + single `queryFn`). */
 export function getBlogPostBySlugQueryOptions(slug: string | undefined) {
   return {
-    queryKey: slug ? blogPostBySlugQueryKey(slug) : (['blog-post', 'none'] as const),
+    queryKey: slug ? blogPostBySlugQueryKey(slug) : BLOG_POST_BY_SLUG_NONE_QUERY_KEY,
     queryFn: () => fetchBlogPostBySlug(slug!),
     enabled: Boolean(slug),
     refetchOnWindowFocus: false,
