@@ -14,10 +14,17 @@ export type ToolsHubData = {
   suggestions: PracticeSuggestion[];
 };
 
-export const TOOLS_HUB_DATA_NONE_QUERY_KEY = ['tools-hub', 'data', 'none'] as const;
+export const TOOLS_HUB_DATA_QUERY_PREFIX = ['tools-hub', 'data'] as const;
+
+export const TOOLS_HUB_DATA_DISABLED_USER_ID = 'none' as const;
+
+export const TOOLS_HUB_DATA_NONE_QUERY_KEY = [
+  ...TOOLS_HUB_DATA_QUERY_PREFIX,
+  TOOLS_HUB_DATA_DISABLED_USER_ID,
+] as const;
 
 export function toolsHubDataQueryKey(userId: string) {
-  return ['tools-hub', 'data', userId] as const;
+  return [...TOOLS_HUB_DATA_QUERY_PREFIX, userId] as const;
 }
 
 export async function fetchToolsHubData(userId: string): Promise<ToolsHubData> {
