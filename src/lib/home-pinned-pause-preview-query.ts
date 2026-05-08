@@ -2,7 +2,14 @@ import { supabase } from '@/integrations/supabase/client';
 
 export const HOLZEN_PINNED_REFLECTION_STORAGE_KEY = 'holzen_pinned_reflection';
 
-export const PINNED_PREVIEW_QUERY_DISABLED_KEY = ['home', 'pinned-pause-preview', 'disabled'] as const;
+export const HOME_PINNED_PAUSE_PREVIEW_QUERY_PREFIX = ['home', 'pinned-pause-preview'] as const;
+
+export const HOME_PINNED_PAUSE_PREVIEW_DISABLED_SEGMENT = 'disabled' as const;
+
+export const PINNED_PREVIEW_QUERY_DISABLED_KEY = [
+  ...HOME_PINNED_PAUSE_PREVIEW_QUERY_PREFIX,
+  HOME_PINNED_PAUSE_PREVIEW_DISABLED_SEGMENT,
+] as const;
 
 export interface PinnedPausePreview {
   id: string;
@@ -10,12 +17,12 @@ export interface PinnedPausePreview {
 }
 
 export function homePinnedPausePreviewQueryKey(userId: string, pinnedId: string) {
-  return ['home', 'pinned-pause-preview', userId, pinnedId] as const;
+  return [...HOME_PINNED_PAUSE_PREVIEW_QUERY_PREFIX, userId, pinnedId] as const;
 }
 
 /** User-scoped prefix for `invalidateQueries` / `removeQueries` over every pinned-id variant. */
 export function homePinnedPausePreviewQueryPrefix(userId: string) {
-  return ['home', 'pinned-pause-preview', userId] as const;
+  return [...HOME_PINNED_PAUSE_PREVIEW_QUERY_PREFIX, userId] as const;
 }
 
 export function readHomePinnedReflectionId(): string | null {
