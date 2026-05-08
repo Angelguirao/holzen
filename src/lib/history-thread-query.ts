@@ -19,10 +19,17 @@ export interface HistoryThreadRow {
   content: { title?: string; body?: string; btcInsight?: string } | null;
 }
 
-export const HISTORY_THREAD_NONE_QUERY_KEY = ['history-thread', 'none'] as const;
+export const HISTORY_THREAD_QUERY_PREFIX = ['history-thread'] as const;
+
+export const HISTORY_THREAD_DISABLED_USER_ID = 'none' as const;
+
+export const HISTORY_THREAD_NONE_QUERY_KEY = [
+  ...HISTORY_THREAD_QUERY_PREFIX,
+  HISTORY_THREAD_DISABLED_USER_ID,
+] as const;
 
 export function historyThreadQueryKey(userId: string, companion: RegenerateCompanionSlot, limit: number) {
-  return ['history-thread', userId, companion, limit] as const;
+  return [...HISTORY_THREAD_QUERY_PREFIX, userId, companion, limit] as const;
 }
 
 export async function fetchHistoryThreadRows(
