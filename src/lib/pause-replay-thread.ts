@@ -5,9 +5,15 @@ import {
   type UserWord,
 } from '../../supabase/functions/_shared/past-reflection-util';
 
+export const PRACTICE_REPLAY_RECENT_PAUSES_QUERY_PREFIX = ['practice', 'replay', 'recent-pauses'] as const;
+export const PRACTICE_REPLAY_THREAD_QUERY_PREFIX = ['practice', 'replay', 'thread'] as const;
+
+/** Placeholder segment when user/instance scope is missing (queries stay disabled). */
+export const PRACTICE_REPLAY_DISABLED_PLACEHOLDER = '__none__' as const;
+
 /** TanStack cache key for `loadPauseReplayThread` (Daily Practice replay). */
 export function pauseReplayThreadQueryKey(pauseInstanceId: string) {
-  return ['practice', 'replay', 'thread', pauseInstanceId] as const;
+  return [...PRACTICE_REPLAY_THREAD_QUERY_PREFIX, pauseInstanceId] as const;
 }
 
 function contextTextFromSnapshot(snapshot: Record<string, unknown> | null | undefined): string | null {
@@ -101,13 +107,19 @@ export type PausePickerRow = {
   reflection_text: string | null;
 };
 
-export const REPLAY_RECENT_PAUSES_NONE_QUERY_KEY = ['practice', 'replay', 'recent-pauses', '__none__'] as const;
+export const REPLAY_RECENT_PAUSES_NONE_QUERY_KEY = [
+  ...PRACTICE_REPLAY_RECENT_PAUSES_QUERY_PREFIX,
+  PRACTICE_REPLAY_DISABLED_PLACEHOLDER,
+] as const;
 
 export function replayRecentPausesQueryKey(userId: string) {
-  return ['practice', 'replay', 'recent-pauses', userId] as const;
+  return [...PRACTICE_REPLAY_RECENT_PAUSES_QUERY_PREFIX, userId] as const;
 }
 
-export const PAUSE_REPLAY_THREAD_NONE_QUERY_KEY = ['practice', 'replay', 'thread', '__none__'] as const;
+export const PAUSE_REPLAY_THREAD_NONE_QUERY_KEY = [
+  ...PRACTICE_REPLAY_THREAD_QUERY_PREFIX,
+  PRACTICE_REPLAY_DISABLED_PLACEHOLDER,
+] as const;
 
 /** Resolves the replay thread or throws (for TanStack `useQuery` error state). */
 export async function fetchPauseReplayThreadOrThrow(
