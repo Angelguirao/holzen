@@ -3,7 +3,7 @@ import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
 import { Pencil } from 'lucide-react';
 import { useAuth } from '@/hooks/use-auth';
-import { pauseArchiveListQueryPrefix } from '@/hooks/use-pause-archive-list';
+import { pauseArchiveListQueryPrefix } from '@/lib/pause-archive-list-query';
 import { pauseLogStep } from '@/lib/pause-api';
 import {
   getLatestPauseReflectNoteQueryOptions,

@@ -2,7 +2,7 @@ import { describe, expect, it, vi, beforeEach } from 'vitest';
 import { renderHook, act } from '@testing-library/react';
 import type { TFunction } from 'i18next';
 import { usePauseFavoriteToggle } from '@/hooks/use-pause-favorite-toggle';
-import { pauseArchiveListQueryPrefix } from '@/hooks/use-pause-archive-list';
+import { pauseArchiveListQueryPrefix } from '@/lib/pause-archive-list-query';
 import { showPauseFavoriteProHintToast } from '@/lib/pause-favorite-toast';
 
 const { pauseLogStepMock, invalidateQueriesMock } = vi.hoisted(() => ({
