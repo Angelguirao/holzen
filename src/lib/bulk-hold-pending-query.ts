@@ -6,12 +6,21 @@ import {
   type BulkHoldPendingPause,
 } from '@/lib/bulk-hold';
 
+export const BULK_HOLD_PENDING_QUERY_PREFIX = ['pause', 'bulk-hold', 'pending'] as const;
+
+/** Signed-out / disabled user segment (paired with `refetchNonce` in none-keys). */
+export const BULK_HOLD_PENDING_DISABLED_USER_ID = 'none' as const;
+
 export function bulkHoldPendingNoneQueryKey(refetchNonce: number) {
-  return ['pause', 'bulk-hold', 'pending', 'none', refetchNonce] as const;
+  return [
+    ...BULK_HOLD_PENDING_QUERY_PREFIX,
+    BULK_HOLD_PENDING_DISABLED_USER_ID,
+    refetchNonce,
+  ] as const;
 }
 
 export function bulkHoldPendingQueryKey(userId: string, refetchNonce: number) {
-  return ['pause', 'bulk-hold', 'pending', userId, refetchNonce] as const;
+  return [...BULK_HOLD_PENDING_QUERY_PREFIX, userId, refetchNonce] as const;
 }
 
 export async function fetchBulkHoldPendingPauses(userId: string): Promise<BulkHoldPendingPause[]> {
