@@ -4,8 +4,6 @@ import { motion } from 'framer-motion';
 import { MessageCircle } from 'lucide-react';
 import { getLandingTestimonialsQueryOptions } from '@/lib/landing-testimonials-query';
 
-export { LANDING_TESTIMONIALS_QUERY_KEY } from '@/lib/landing-testimonials-query';
-
 export function LandingTestimonials() {
   const { t } = useTranslation();
   const { data: testimonials = [] } = useQuery(getLandingTestimonialsQueryOptions());

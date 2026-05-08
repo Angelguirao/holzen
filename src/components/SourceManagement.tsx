@@ -34,14 +34,6 @@ const TYPE_ICONS: Record<string, React.ReactNode> = {
 const SIGNAL_TYPE_ORDER = ['analyst', 'podcast', 'newsletter', 'blog', 'dashboard', 'youtube'];
 const GROUNDING_TYPE_ORDER = ['book', 'blog', 'podcast', 'newsletter', 'analyst'];
 
-export { SIGNAL_SOURCES_CATALOG_QUERY_KEY, fetchSignalSourcesCatalog } from '@/lib/signal-sources-catalog-query';
-
-export {
-  USER_SIGNAL_PREFS_QUERY_KEY,
-  fetchUserSignalPreferences,
-  type UserPref,
-} from '@/lib/user-signal-preferences-query';
-
 export function SourceManagement() {
   const { t } = useTranslation();
   const { user } = useAuth();

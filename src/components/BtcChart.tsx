@@ -10,8 +10,6 @@ import {
 } from '@/lib/coingecko-market-chart-query';
 import { ErrorRetry } from '@/components/ErrorRetry';
 
-export { coingeckoMarketChartQueryKey } from '@/lib/coingecko-market-chart-query';
-
 interface Props {
   hidden?: boolean;
   currency?: string;
