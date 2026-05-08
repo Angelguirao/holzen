@@ -41,9 +41,11 @@ export type LibraryBundle = {
 
 const PAUSE_IN_CHUNK = 80;
 
+export const LIBRARY_BUNDLE_QUERY_PREFIX = ['library', 'bundle'] as const;
+
 /** Prefix for TanStack invalidation (e.g. pause completion → refresh member rows). */
 export function libraryBundleQueryPrefix(userId: string) {
-  return ['library', 'bundle', userId] as const;
+  return [...LIBRARY_BUNDLE_QUERY_PREFIX, userId] as const;
 }
 
 /** User-id segment for {@link getLibraryBundleDisabledQueryOptions} when signed out. */
