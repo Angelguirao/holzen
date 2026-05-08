@@ -1,14 +1,9 @@
 import { useQuery } from '@tanstack/react-query';
-import { supabase } from '@/integrations/supabase/client';
 import { Database, RefreshCw } from 'lucide-react';
-
-interface MigrationRow {
-  version: string;
-  name: string;
-  statements_count: number;
-}
-
-const ADMIN_APPLIED_MIGRATIONS_QUERY_KEY = ['admin', 'applied-migrations'] as const;
+import {
+  getAdminAppliedMigrationsQueryOptions,
+  type AppliedMigrationRow,
+} from '@/lib/admin-applied-migrations-query';
 
 function formatVersion(v: string): string {
   // Supabase migration versions are timestamps like 20260425121947
@@ -23,18 +18,6 @@ function formatVersion(v: string): string {
   return v;
 }
 
-async function fetchAppliedMigrations(): Promise<MigrationRow[]> {
-  const { data, error } = await (supabase.rpc as unknown as (
-    fn: string,
-    args: { p_limit: number },
-  ) => Promise<{ data: MigrationRow[] | null; error: { message: string } | null }>)(
-    'get_applied_migrations',
-    { p_limit: 20 },
-  );
-  if (error) throw new Error(error.message);
-  return data ?? [];
-}
-
 export function MigrationStatus() {
   const {
     data: rows = [],
@@ -43,15 +26,9 @@ export function MigrationStatus() {
     isError,
     error,
     refetch,
-  } = useQuery({
-    queryKey: ADMIN_APPLIED_MIGRATIONS_QUERY_KEY,
-    queryFn: fetchAppliedMigrations,
-    staleTime: 60_000,
-    refetchOnWindowFocus: false,
-    retry: false,
-  });
+  } = useQuery(getAdminAppliedMigrationsQueryOptions());
 
-  const latest = rows[0];
+  const latest: AppliedMigrationRow | undefined = rows[0];
   const errorMessage =
     error instanceof Error ? error.message : error != null ? String(error) : 'Failed to load migrations';
 
