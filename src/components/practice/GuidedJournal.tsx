@@ -1,6 +1,5 @@
 import { useState, useCallback, useEffect, useRef } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
-import type { TFunction } from 'i18next';
 import { useTranslation } from 'react-i18next';
 import { motion, AnimatePresence } from 'framer-motion';
 import { practiceEntriesWeeklyCountQueryKey } from '@/components/PracticeWidget';
@@ -8,66 +7,18 @@ import { practicePrimarySuggestionQueryKey } from '@/hooks/use-practice-suggesti
 import { toolsHubDataQueryKey } from '@/hooks/use-tools-hub-data';
 import { invalidateHistoryCalendarActivities } from '@/lib/history-calendar-activities-query-key';
 import { supabase } from '@/integrations/supabase/client';
-import { invokeEdge } from '@/lib/invoke-edge';
 import { useAuth } from '@/hooks/use-auth';
 import { useHolzen } from '@/hooks/use-holzen';
 import { hapticFeedback } from '@/lib/haptics';
 import { toast } from 'sonner';
 import { Check, RefreshCw, Sparkles, Loader2 } from 'lucide-react';
 import { WritingField } from '@/components/WritingField';
-import { companionFallbacksDisabledClient } from '@/lib/companion-strict';
-import { parseEdgeFunctionError, toUserFacingAiErrorMessage } from '@/lib/edge-function-error';
+import {
+  getGuidedJournalPromptsQueryOptions,
+  guidedJournalPromptsQueryKey,
+} from '@/lib/guided-journal-prompts-query';
 
-const FALLBACK_PROMPTS = [
-  'practice.prompt1',
-  'practice.prompt2',
-  'practice.prompt3',
-  'practice.prompt4',
-  'practice.prompt5',
-  'practice.prompt6',
-];
-
-export function guidedJournalPromptsQueryKey(userId: string, language: string) {
-  return ['practice', 'guided-journal', 'prompts', userId, language] as const;
-}
-
-type GuidedJournalPromptsBundle = {
-  prompts: string[];
-  isAI: boolean;
-  promptLoadFailed: boolean;
-  suggestedIndex: number;
-};
-
-async function fetchGuidedJournalPrompts(language: string, t: TFunction): Promise<GuidedJournalPromptsBundle> {
-  try {
-    const { data, error } = await invokeEdge<{ prompts?: string[] }>('journal-prompt', {
-      body: { language },
-    });
-    if (error) throw error;
-    const aiPrompts = data?.prompts;
-    if (Array.isArray(aiPrompts) && aiPrompts.length > 0) {
-      return { prompts: aiPrompts, isAI: true, promptLoadFailed: false, suggestedIndex: 0 };
-    }
-    throw new Error('Empty response');
-  } catch (error: unknown) {
-    const parsed = await parseEdgeFunctionError(error);
-    const message = toUserFacingAiErrorMessage(parsed, t('practice.journalPromptFailed'));
-    if (parsed.code === 'ai_action_quota_exceeded' || parsed.code === 'ai_action_upgrade_required') {
-      toast(message);
-    }
-    if (companionFallbacksDisabledClient()) {
-      toast.error(t('practice.journalPromptFailed'));
-      return { prompts: [], isAI: false, promptLoadFailed: true, suggestedIndex: 0 };
-    }
-    const fallback = FALLBACK_PROMPTS.map((k) => t(k));
-    return {
-      prompts: fallback,
-      isAI: false,
-      promptLoadFailed: false,
-      suggestedIndex: Math.floor(Math.random() * fallback.length),
-    };
-  }
-}
+export { guidedJournalPromptsQueryKey };
 
 interface Props {
   onComplete: () => void;
@@ -86,14 +37,13 @@ export function GuidedJournal({ onComplete, textColor, ringColor }: Props) {
   const [done, setDone] = useState(false);
   const wasPromptsPendingRef = useRef(false);
 
-  const promptsQuery = useQuery({
-    queryKey: user ? guidedJournalPromptsQueryKey(user.id, language) : ['practice', 'guided-journal', 'prompts', '__none__', language],
-    queryFn: () => fetchGuidedJournalPrompts(language, t),
-    enabled: Boolean(user),
-    staleTime: 10 * 60_000,
-    refetchOnWindowFocus: false,
-    retry: false,
-  });
+  const promptsQuery = useQuery(
+    getGuidedJournalPromptsQueryOptions({
+      userId: user?.id,
+      language,
+      t,
+    }),
+  );
 
   const prompts = promptsQuery.data?.prompts ?? [];
   const isAI = promptsQuery.data?.isAI ?? false;
