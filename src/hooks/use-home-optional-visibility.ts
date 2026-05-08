@@ -1,6 +1,5 @@
 import { useCallback, useState } from 'react';
 import {
-  HOME_SECTION_IDS_WITHOUT_VISIBILITY_TOGGLE,
   JOURNEY_STAT_TILES_VISIBILITY_ID,
   OPTIONAL_HOME_WIDGET_IDS,
 } from '@/lib/home-section-visibility-constants';
@@ -13,6 +12,7 @@ export {
   HOME_SECTION_IDS_WITHOUT_VISIBILITY_TOGGLE,
   JOURNEY_STAT_TILES_VISIBILITY_ID,
   OPTIONAL_HOME_WIDGET_IDS,
+  isHomeSectionAlwaysVisibleInLayout,
   type AllHomeSectionId,
   type HomeSectionIdWithoutVisibilityToggle,
   type OptionalHomeWidgetId,
@@ -39,10 +39,6 @@ function load(): Record<string, boolean> {
   } catch {
     return { ...defaultVisible };
   }
-}
-
-export function isHomeSectionAlwaysVisibleInLayout(id: string): boolean {
-  return (HOME_SECTION_IDS_WITHOUT_VISIBILITY_TOGGLE as readonly string[]).includes(id);
 }
 
 export function useHomeOptionalVisibility() {

@@ -6,10 +6,8 @@ import { Onboarding } from '@/components/Onboarding';
 import { useWidgetLayout } from '@/components/HomeWidget';
 import { HomeDashboardLayout } from '@/components/home/HomeDashboardLayout';
 import { HomeZenModeRoute } from '@/components/home/HomeZenModeRoute';
-import {
-  useHomeOptionalVisibility,
-  HOME_WIDGET_DEFAULT_ORDER,
-} from '@/hooks/use-home-optional-visibility';
+import { useHomeOptionalVisibility } from '@/hooks/use-home-optional-visibility';
+import { HOME_WIDGET_DEFAULT_ORDER } from '@/lib/home-section-visibility-constants';
 import { useHomeCheckoutWelcomeToast } from '@/hooks/use-home-checkout-welcome-toast';
 import { useHomeZenMode } from '@/hooks/use-home-zen-mode';
 import { useHomePinnedPausePreview } from '@/hooks/use-home-pinned-pause-preview';
