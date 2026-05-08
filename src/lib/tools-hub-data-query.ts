@@ -14,7 +14,14 @@ export type ToolsHubData = {
   suggestions: PracticeSuggestion[];
 };
 
-export const TOOLS_HUB_DATA_QUERY_PREFIX = ['tools-hub', 'data'] as const;
+export const TOOLS_HUB_QUERY_PREFIX = ['tools-hub'] as const;
+
+export const TOOLS_HUB_DATA_QUERY_LEAF = 'data' as const;
+
+export const TOOLS_HUB_DATA_QUERY_PREFIX = [
+  ...TOOLS_HUB_QUERY_PREFIX,
+  TOOLS_HUB_DATA_QUERY_LEAF,
+] as const;
 
 export const TOOLS_HUB_DATA_DISABLED_USER_ID = 'none' as const;
 
