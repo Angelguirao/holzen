@@ -1,10 +1,17 @@
 import { supabase } from '@/integrations/supabase/client';
 import type { PauseState } from '@/lib/pause-state';
 
-export const PAUSE_TERMINAL_ENTRY_STATE_NONE_QUERY_KEY = ['pause', 'terminal-entry', 'db-state', 'none'] as const;
+export const PAUSE_TERMINAL_ENTRY_STATE_QUERY_PREFIX = ['pause', 'terminal-entry', 'db-state'] as const;
+
+export const PAUSE_TERMINAL_ENTRY_STATE_DISABLED_INSTANCE_ID = 'none' as const;
+
+export const PAUSE_TERMINAL_ENTRY_STATE_NONE_QUERY_KEY = [
+  ...PAUSE_TERMINAL_ENTRY_STATE_QUERY_PREFIX,
+  PAUSE_TERMINAL_ENTRY_STATE_DISABLED_INSTANCE_ID,
+] as const;
 
 export function pauseTerminalEntryStateQueryKey(pauseInstanceId: string) {
-  return ['pause', 'terminal-entry', 'db-state', pauseInstanceId] as const;
+  return [...PAUSE_TERMINAL_ENTRY_STATE_QUERY_PREFIX, pauseInstanceId] as const;
 }
 
 export async function fetchPauseInstanceStateForTerminalGuard(
