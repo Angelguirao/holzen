@@ -30,10 +30,7 @@ const Profile = () => {
   const {
     data: completedPauseCount = 0,
     isPending: completedPauseCountPending,
-  } = useQuery({
-    ...getCompletedPauseCountQueryOptions(userId),
-    retry: false,
-  });
+  } = useQuery(getCompletedPauseCountQueryOptions(userId));
 
   const loading = Boolean(userId) && completedPauseCountPending;
 

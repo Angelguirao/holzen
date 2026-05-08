@@ -21,7 +21,7 @@ async function fetchCompletedPauseCount(userId: string): Promise<number> {
   return count ?? 0;
 }
 
-/** Shared TanStack options for completed-pause count (Home + Tools). */
+/** Shared TanStack options for completed-pause count (Home + Tools + Journey). */
 export function getCompletedPauseCountQueryOptions(userId: string | undefined) {
   return {
     queryKey: userId ? COMPLETED_PAUSE_COUNT_QUERY_KEY(userId) : COMPLETED_PAUSE_COUNT_NONE_KEY,
@@ -29,6 +29,7 @@ export function getCompletedPauseCountQueryOptions(userId: string | undefined) {
     enabled: Boolean(userId),
     staleTime: 60_000,
     refetchOnWindowFocus: false,
+    retry: false,
   } as const;
 }
 
@@ -39,9 +40,7 @@ export function getCompletedPauseCountQueryOptions(userId: string | undefined) {
 export function useCompletedPauseCount(): number | null {
   const { user } = useAuth();
   const userId = user?.id;
-  const { data, isPending } = useQuery({
-    ...getCompletedPauseCountQueryOptions(userId),
-  });
+  const { data, isPending } = useQuery(getCompletedPauseCountQueryOptions(userId));
   if (!userId) return null;
   if (isPending && data === undefined) return null;
   return data ?? 0;
