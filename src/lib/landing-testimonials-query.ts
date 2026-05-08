@@ -6,8 +6,16 @@ export interface LandingTestimonialRow {
   quote: string;
 }
 
+export const LANDING_TESTIMONIALS_QUERY_PREFIX = ['testimonials', 'landing'] as const;
+
+/** Stable object identity for the query key’s filter segment (must match `fetchLandingTestimonials`). */
+export const LANDING_TESTIMONIALS_QUERY_PARAMS = { approved: true, limit: 6 } as const;
+
 /** Public landing slice — shared cache if multiple trees mount this block. */
-export const LANDING_TESTIMONIALS_QUERY_KEY = ['testimonials', 'landing', { approved: true, limit: 6 }] as const;
+export const LANDING_TESTIMONIALS_QUERY_KEY = [
+  ...LANDING_TESTIMONIALS_QUERY_PREFIX,
+  LANDING_TESTIMONIALS_QUERY_PARAMS,
+] as const;
 
 export async function fetchLandingTestimonials(): Promise<LandingTestimonialRow[]> {
   const { data, error } = await supabase
