@@ -7,6 +7,9 @@ import { supabase } from '@/integrations/supabase/client';
 import type { Json } from '@/integrations/supabase/types';
 import type { UseQueryOptions } from '@tanstack/react-query';
 
+/** Admin dashboard period filter (cost analytics + in-hook period aggregation). */
+export type TimePeriod = 'today' | '7d' | '30d' | 'all';
+
 // ── Row types (bundle + client-side period aggregation) ──
 
 export interface CacheHitRow {

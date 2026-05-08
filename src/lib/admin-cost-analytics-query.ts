@@ -1,5 +1,5 @@
 import { supabase } from '@/integrations/supabase/client';
-import type { TimePeriod } from '@/hooks/use-admin-stats';
+import type { TimePeriod } from '@/lib/admin-stats-bundle-query';
 import { PRICING } from '@/lib/pricing';
 
 /** Raw rows for admin cost aggregation (`generation_attempts`). */

@@ -19,6 +19,7 @@ import {
   type RejectionRow,
   type SessionRow,
   type SignalSourceRow,
+  type TimePeriod,
 } from '@/lib/admin-stats-bundle-query';
 
 export type {
@@ -37,7 +38,7 @@ export type {
 
 export { ADMIN_STATS_QUERY_KEY } from '@/lib/admin-stats-bundle-query';
 
-export type TimePeriod = 'today' | '7d' | '30d' | 'all';
+export type { TimePeriod } from '@/lib/admin-stats-bundle-query';
 
 export interface PeriodStats {
   serves: number;
