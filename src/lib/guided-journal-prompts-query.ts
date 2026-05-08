@@ -13,12 +13,21 @@ const FALLBACK_PROMPTS = [
   'practice.prompt6',
 ] as const;
 
+export const GUIDED_JOURNAL_PROMPTS_QUERY_PREFIX = ['practice', 'guided-journal', 'prompts'] as const;
+
+/** `userId` segment for {@link guidedJournalPromptsNoneQueryKey} when signed out. */
+export const GUIDED_JOURNAL_PROMPTS_DISABLED_USER_ID = '__none__' as const;
+
 export function guidedJournalPromptsQueryKey(userId: string, language: string) {
-  return ['practice', 'guided-journal', 'prompts', userId, language] as const;
+  return [...GUIDED_JOURNAL_PROMPTS_QUERY_PREFIX, userId, language] as const;
 }
 
 export function guidedJournalPromptsNoneQueryKey(language: string) {
-  return ['practice', 'guided-journal', 'prompts', '__none__', language] as const;
+  return [
+    ...GUIDED_JOURNAL_PROMPTS_QUERY_PREFIX,
+    GUIDED_JOURNAL_PROMPTS_DISABLED_USER_ID,
+    language,
+  ] as const;
 }
 
 export type GuidedJournalPromptsBundle = {
