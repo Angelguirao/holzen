@@ -31,10 +31,17 @@ export function writeNightReflectionDismissedIds(userId: string, ids: string[]) 
   }
 }
 
-export const NIGHT_REFLECTION_VISIBLE_NONE_QUERY_KEY = ['night-reflections', 'visible', 'none'] as const;
+export const NIGHT_REFLECTION_VISIBLE_QUERY_PREFIX = ['night-reflections', 'visible'] as const;
+
+export const NIGHT_REFLECTION_VISIBLE_DISABLED_USER_ID = 'none' as const;
+
+export const NIGHT_REFLECTION_VISIBLE_NONE_QUERY_KEY = [
+  ...NIGHT_REFLECTION_VISIBLE_QUERY_PREFIX,
+  NIGHT_REFLECTION_VISIBLE_DISABLED_USER_ID,
+] as const;
 
 export const NIGHT_REFLECTION_VISIBLE_QUERY_KEY = (userId: string) =>
-  ['night-reflections', 'visible', userId] as const;
+  [...NIGHT_REFLECTION_VISIBLE_QUERY_PREFIX, userId] as const;
 
 export async function fetchVisibleNightReflection(userId: string): Promise<NightReflection | null> {
   const locallyDismissed = new Set(readNightReflectionDismissedIds(userId));
