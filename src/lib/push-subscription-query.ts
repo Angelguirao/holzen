@@ -1,7 +1,14 @@
-export const PUSH_SUBSCRIPTION_NONE_QUERY_KEY = ['push', 'subscription', '__none__'] as const;
+export const PUSH_SUBSCRIPTION_QUERY_PREFIX = ['push', 'subscription'] as const;
+
+export const PUSH_SUBSCRIPTION_DISABLED_USER_ID = '__none__' as const;
+
+export const PUSH_SUBSCRIPTION_NONE_QUERY_KEY = [
+  ...PUSH_SUBSCRIPTION_QUERY_PREFIX,
+  PUSH_SUBSCRIPTION_DISABLED_USER_ID,
+] as const;
 
 export function pushSubscriptionQueryKey(userId: string) {
-  return ['push', 'subscription', userId] as const;
+  return [...PUSH_SUBSCRIPTION_QUERY_PREFIX, userId] as const;
 }
 
 export async function fetchBrowserPushSubscribed(): Promise<boolean> {
