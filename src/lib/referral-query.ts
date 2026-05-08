@@ -6,16 +6,28 @@ export interface ReferralGrantedRewardRow {
   granted_at: string;
 }
 
-export const REFERRALS_COUNT_NONE_QUERY_KEY = ['referrals-count', 'none'] as const;
+export const REFERRALS_COUNT_QUERY_PREFIX = ['referrals-count'] as const;
+export const REFERRAL_REWARDS_QUERY_PREFIX = ['referral-rewards'] as const;
+
+/** Signed-out placeholder segment for referral TanStack keys. */
+export const REFERRAL_QUERY_DISABLED_USER_ID = 'none' as const;
+
+export const REFERRALS_COUNT_NONE_QUERY_KEY = [
+  ...REFERRALS_COUNT_QUERY_PREFIX,
+  REFERRAL_QUERY_DISABLED_USER_ID,
+] as const;
 
 export function referralsCountQueryKey(userId: string) {
-  return ['referrals-count', userId] as const;
+  return [...REFERRALS_COUNT_QUERY_PREFIX, userId] as const;
 }
 
-export const REFERRAL_REWARDS_NONE_QUERY_KEY = ['referral-rewards', 'none'] as const;
+export const REFERRAL_REWARDS_NONE_QUERY_KEY = [
+  ...REFERRAL_REWARDS_QUERY_PREFIX,
+  REFERRAL_QUERY_DISABLED_USER_ID,
+] as const;
 
 export function referralRewardsQueryKey(userId: string) {
-  return ['referral-rewards', userId] as const;
+  return [...REFERRAL_REWARDS_QUERY_PREFIX, userId] as const;
 }
 
 export async function fetchReferralsCount(userId: string): Promise<number> {
