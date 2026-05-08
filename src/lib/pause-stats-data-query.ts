@@ -51,6 +51,9 @@ export interface PauseFullRow {
 
 export const PAUSE_STATS_DATA_STALE_MS = 2 * 60_000;
 
+/** Disabled / signed-out placeholder; use with `getPauseStatsDataDisabledQueryOptions`. */
+export const PAUSE_STATS_DATA_NONE_QUERY_KEY = ['pause-stats-data', 'none'] as const;
+
 export const PAUSE_STATS_DATA_QUERY_KEY = (userId: string) =>
   ['pause-stats-data', userId] as const;
 
@@ -124,7 +127,7 @@ export function getPauseStatsDataDisabledQueryOptions(): Pick<
   'queryKey' | 'staleTime' | 'queryFn'
 > {
   return {
-    queryKey: ['pause-stats-data', 'none'] as const,
+    queryKey: PAUSE_STATS_DATA_NONE_QUERY_KEY,
     staleTime: PAUSE_STATS_DATA_STALE_MS,
     queryFn: async () => EMPTY_PAYLOAD,
   };
