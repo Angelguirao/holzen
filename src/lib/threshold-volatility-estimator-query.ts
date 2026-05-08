@@ -12,8 +12,14 @@ export interface ThresholdVolatilityCachedPayload {
   timestamp: number;
 }
 
+export const THRESHOLD_VOLATILITY_ESTIMATOR_QUERY_PREFIX = [
+  'external',
+  'coingecko',
+  'volatility_estimator',
+] as const;
+
 export function thresholdVolatilityEstimatorQueryKey(coinId: string) {
-  return ['external', 'coingecko', 'volatility_estimator', coinId] as const;
+  return [...THRESHOLD_VOLATILITY_ESTIMATOR_QUERY_PREFIX, coinId] as const;
 }
 
 function isValidCachedData(value: unknown): value is ThresholdVolatilityCachedPayload {
