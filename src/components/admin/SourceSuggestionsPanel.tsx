@@ -3,26 +3,19 @@ import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { Check, X, Loader2, RefreshCw } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
+import {
+  ADMIN_PENDING_SOURCE_SUGGESTIONS_QUERY_KEY,
+  fetchPendingSourceSuggestionsRows,
+  getAdminPendingSourceSuggestionsQueryOptions,
+  type SourceSuggestionRow,
+} from '@/lib/admin-source-suggestions-query';
 
-export interface SourceSuggestionRow {
-  id: string;
-  category: 'signal' | 'grounding';
-  suggested_name: string;
-  suggested_url: string | null;
-  suggested_type: string;
-  dedupe_key: string;
-  status: string;
-  metadata: Record<string, unknown> | null;
-  created_at: string;
-  reviewed_at: string | null;
-}
+export type { SourceSuggestionRow };
 
 const CAT_LABEL: Record<string, string> = {
   signal: 'Signal',
   grounding: 'Grounding',
 };
-
-const ADMIN_PENDING_SOURCE_SUGGESTIONS_QUERY_KEY = ['admin', 'signal-source-suggestions', 'pending'] as const;
 
 export function SourceSuggestionsPanel({ onCatalogChanged }: { onCatalogChanged?: () => void }) {
   const { toast } = useToast();
@@ -36,23 +29,16 @@ export function SourceSuggestionsPanel({ onCatalogChanged }: { onCatalogChanged?
     isError,
     refetch,
   } = useQuery({
-    queryKey: ADMIN_PENDING_SOURCE_SUGGESTIONS_QUERY_KEY,
-    queryFn: async (): Promise<SourceSuggestionRow[]> => {
-      const { data, error } = await supabase
-        .from('signal_source_suggestions')
-        .select('id, category, suggested_name, suggested_url, suggested_type, dedupe_key, status, metadata, created_at, reviewed_at')
-        .eq('status', 'pending')
-        .order('created_at', { ascending: false })
-        .limit(100);
-      if (error) {
-        toast({ title: 'Could not load suggestions', description: error.message, variant: 'destructive' });
+    ...getAdminPendingSourceSuggestionsQueryOptions(),
+    queryFn: async () => {
+      try {
+        return await fetchPendingSourceSuggestionsRows();
+      } catch (error: unknown) {
+        const message = error instanceof Error ? error.message : String(error);
+        toast({ title: 'Could not load suggestions', description: message, variant: 'destructive' });
         throw error;
       }
-      return (data ?? []) as SourceSuggestionRow[];
     },
-    staleTime: 30_000,
-    refetchOnWindowFocus: false,
-    retry: false,
   });
 
   const bumpSuggestions = useCallback(async () => {
