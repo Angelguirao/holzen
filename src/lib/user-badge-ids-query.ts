@@ -1,10 +1,17 @@
 import { supabase } from '@/integrations/supabase/client';
 
 /** TanStack cache for `user_badges.badge_id` rows (badge sync + celebrations). */
-export const USER_BADGE_IDS_NONE_QUERY_KEY = ['user-badges', 'badge-ids', '__none__'] as const;
+export const USER_BADGE_IDS_QUERY_PREFIX = ['user-badges', 'badge-ids'] as const;
+
+export const USER_BADGE_IDS_DISABLED_USER_ID = '__none__' as const;
+
+export const USER_BADGE_IDS_NONE_QUERY_KEY = [
+  ...USER_BADGE_IDS_QUERY_PREFIX,
+  USER_BADGE_IDS_DISABLED_USER_ID,
+] as const;
 
 export function userBadgesIdsQueryKey(userId: string) {
-  return ['user-badges', 'badge-ids', userId] as const;
+  return [...USER_BADGE_IDS_QUERY_PREFIX, userId] as const;
 }
 
 export async function fetchUserBadgeIds(userId: string): Promise<string[]> {
