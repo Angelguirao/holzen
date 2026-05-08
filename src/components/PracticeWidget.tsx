@@ -21,8 +21,6 @@ const PRACTICES = [
   { id: 'replay' as const, icon: History, labelKey: 'practice.replayLabel', descKey: 'practice.replayDesc', free: false, route: TOOLS.practice.replay },
 ] as const;
 
-export { practiceEntriesWeeklyCountQueryKey } from '@/lib/practice-entries-weekly-count-query';
-
 function useWeeklyProgress(userId: string | undefined) {
   const { data: count = 0 } = useQuery(getPracticeEntriesWeeklyCountQueryOptions(userId));
   return count;

@@ -6,7 +6,7 @@ import { BookOpen } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/use-auth';
 import { getHomeQuickCaptureLastPauseQueryOptions } from '@/lib/home-quick-capture-last-pause-query';
-import { practiceEntriesWeeklyCountQueryKey } from '@/components/PracticeWidget';
+import { practiceEntriesWeeklyCountQueryKey } from '@/lib/practice-entries-weekly-count-query';
 import { practicePrimarySuggestionQueryKey } from '@/lib/practice-primary-suggestion-query';
 import { toolsHubDataQueryKey } from '@/lib/tools-hub-data-query';
 import { invalidateHistoryCalendarActivities } from '@/lib/history-calendar-activities-query-key';

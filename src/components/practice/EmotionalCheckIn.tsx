@@ -2,7 +2,7 @@ import { useState, useCallback } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
 import { motion, AnimatePresence } from 'framer-motion';
-import { practiceEntriesWeeklyCountQueryKey } from '@/components/PracticeWidget';
+import { practiceEntriesWeeklyCountQueryKey } from '@/lib/practice-entries-weekly-count-query';
 import { practicePrimarySuggestionQueryKey } from '@/lib/practice-primary-suggestion-query';
 import { toolsHubDataQueryKey } from '@/lib/tools-hub-data-query';
 import { invalidateHistoryCalendarActivities } from '@/lib/history-calendar-activities-query-key';
