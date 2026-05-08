@@ -19,6 +19,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { getHolzenQueryClient } from '@/lib/holzen-query-client-ref';
 import { invalidatePauseStatsDataForUser } from '@/lib/pause-stats-invalidate';
 import { pauseSessionFetchedInstanceQueryKey } from '@/lib/pause-session-fetched-instance-query';
+import { pauseInstanceQueryPrefix } from '@/lib/pause-instance-query-prefix';
 import { pauseTerminalEntryStateQueryKey } from '@/lib/pause-terminal-entry-state-query';
 import { pauseSessionCompanionSnapshotQueryKey } from '@/lib/pause-page-loader';
 import { invalidateCompanionUiCompletionQuery } from '@/lib/companion-ui-completion-query-key';
@@ -42,7 +43,7 @@ function scheduleInvalidatePauseStatsOnCompleted(pauseInstanceId: string) {
     if (qc) {
       void qc.invalidateQueries({ queryKey: pauseSessionCompanionSnapshotQueryKey(pauseInstanceId) });
       void qc.invalidateQueries({ queryKey: pauseSessionFetchedInstanceQueryKey(pauseInstanceId) });
-      void qc.invalidateQueries({ queryKey: ['pause-instance', pauseInstanceId] });
+      void qc.invalidateQueries({ queryKey: pauseInstanceQueryPrefix(pauseInstanceId) });
       void qc.invalidateQueries({ queryKey: pauseTerminalEntryStateQueryKey(pauseInstanceId) });
     }
   });

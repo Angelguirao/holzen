@@ -1,12 +1,16 @@
 import { supabase } from '@/integrations/supabase/client';
+import { pauseInstanceQueryPrefix } from '@/lib/pause-instance-query-prefix';
 
 /** JSON key on `pause_instances.metadata` for per-slot hearts (shared with toggle writes). */
 export const COMPANION_SLOT_FAVORITES_METADATA_KEY = 'companion_slot_favorites';
 
-export const COMPANION_LIBRARY_FAVORITES_NONE_QUERY_KEY = ['pause-instance', 'none', 'companion-library-favorites'] as const;
+export const COMPANION_LIBRARY_FAVORITES_NONE_QUERY_KEY = [
+  ...pauseInstanceQueryPrefix('none'),
+  'companion-library-favorites',
+] as const;
 
 export function companionLibraryFavoritesQueryKey(pauseInstanceId: string) {
-  return ['pause-instance', pauseInstanceId, 'companion-library-favorites'] as const;
+  return [...pauseInstanceQueryPrefix(pauseInstanceId), 'companion-library-favorites'] as const;
 }
 
 function parseFavoritesFromMetadata(metadata: unknown): Record<string, boolean> {
