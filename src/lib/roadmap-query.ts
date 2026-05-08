@@ -8,9 +8,18 @@ export type RoadmapListItem = Pick<
 
 export const ROADMAP_ITEMS_PAGE_SIZE = 30;
 
-export const ROADMAP_ITEMS_QUERY_KEY = ['roadmap', 'items'] as const;
+export const ROADMAP_QUERY_PREFIX = ['roadmap'] as const;
 
-export const ROADMAP_VOTES_QUERY_PREFIX = ['roadmap', 'votes'] as const;
+export const ROADMAP_ITEMS_QUERY_LEAF = 'items' as const;
+
+export const ROADMAP_ITEMS_QUERY_KEY = [...ROADMAP_QUERY_PREFIX, ROADMAP_ITEMS_QUERY_LEAF] as const;
+
+export const ROADMAP_VOTES_QUERY_LEAF = 'votes' as const;
+
+export const ROADMAP_VOTES_QUERY_PREFIX = [
+  ...ROADMAP_QUERY_PREFIX,
+  ROADMAP_VOTES_QUERY_LEAF,
+] as const;
 
 export const ROADMAP_VOTES_DISABLED_USER_ID = 'none' as const;
 
