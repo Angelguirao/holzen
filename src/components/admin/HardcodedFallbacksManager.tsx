@@ -13,18 +13,15 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog';
 import { Textarea } from '@/components/ui/textarea';
+import {
+  ADMIN_COMPANION_FALLBACKS_QUERY_KEY,
+  fetchCompanionFallbackRows,
+  getAdminCompanionFallbacksQueryOptions,
+  type CompanionFallbackRow,
+  type FallbackPoolType,
+} from '@/lib/admin-companion-fallbacks-query';
 
-export type FallbackPoolType = 'signal' | 'grounding' | 'history' | 'zoom_out' | 'reflection';
-
-export interface CompanionFallbackRow {
-  id: string;
-  pool_type: FallbackPoolType;
-  sort_order: number;
-  payload: Record<string, unknown>;
-  is_active: boolean;
-  created_at: string;
-  updated_at: string;
-}
+export type { CompanionFallbackRow, FallbackPoolType };
 
 const POOL_LABELS: Record<FallbackPoolType, string> = {
   signal: 'Signal',
@@ -50,8 +47,6 @@ function previewLine(pool: FallbackPoolType, payload: Record<string, unknown>): 
   return '(untitled)';
 }
 
-const ADMIN_COMPANION_FALLBACKS_QUERY_KEY = ['admin', 'companion-fallbacks', 'all'] as const;
-
 export function HardcodedFallbacksManager({ onRefresh }: { onRefresh?: () => void }) {
   const { toast } = useToast();
   const queryClient = useQueryClient();
@@ -66,22 +61,16 @@ export function HardcodedFallbacksManager({ onRefresh }: { onRefresh?: () => voi
     isFetching,
     refetch,
   } = useQuery({
-    queryKey: ADMIN_COMPANION_FALLBACKS_QUERY_KEY,
-    queryFn: async (): Promise<CompanionFallbackRow[]> => {
-      const { data, error } = await supabase
-        .from('companion_fallbacks')
-        .select('id, pool_type, sort_order, payload, is_active, created_at, updated_at')
-        .order('pool_type', { ascending: true })
-        .order('sort_order', { ascending: true });
-      if (error) {
-        toast({ title: 'Failed to load fallbacks', description: error.message, variant: 'destructive' });
+    ...getAdminCompanionFallbacksQueryOptions(),
+    queryFn: async () => {
+      try {
+        return await fetchCompanionFallbackRows();
+      } catch (error: unknown) {
+        const message = error instanceof Error ? error.message : String(error);
+        toast({ title: 'Failed to load fallbacks', description: message, variant: 'destructive' });
         throw error;
       }
-      return (data ?? []) as CompanionFallbackRow[];
     },
-    staleTime: 30_000,
-    refetchOnWindowFocus: false,
-    retry: false,
   });
 
   const bumpFallbacks = useCallback(async () => {
