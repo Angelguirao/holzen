@@ -42,8 +42,14 @@ export async function fetchGenerationAttemptsForPeriod(
   return data as AttemptRow[];
 }
 
+/**
+ * Shared prefix for per-period `generation_attempts` queries. Pass to
+ * `invalidateQueries` to refetch all period variants (and the 7d shadow).
+ */
+export const ADMIN_COST_GENERATION_ATTEMPTS_QUERY_PREFIX = ['admin', 'cost', 'generation-attempts'] as const;
+
 export function adminCostGenerationAttemptsQueryKey(period: TimePeriod) {
-  return ['admin', 'cost', 'generation-attempts', period] as const;
+  return [...ADMIN_COST_GENERATION_ATTEMPTS_QUERY_PREFIX, period] as const;
 }
 
 export function getAdminCostGenerationAttemptsQueryOptions(period: TimePeriod) {
