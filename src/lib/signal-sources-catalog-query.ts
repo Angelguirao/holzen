@@ -9,7 +9,14 @@ export interface CatalogSource {
   category: string;
 }
 
-export const SIGNAL_SOURCES_CATALOG_QUERY_KEY = ['signal-sources', 'catalog'] as const;
+export const SIGNAL_SOURCES_CATALOG_QUERY_PREFIX = ['signal-sources'] as const;
+
+export const SIGNAL_SOURCES_CATALOG_QUERY_LEAF = 'catalog' as const;
+
+export const SIGNAL_SOURCES_CATALOG_QUERY_KEY = [
+  ...SIGNAL_SOURCES_CATALOG_QUERY_PREFIX,
+  SIGNAL_SOURCES_CATALOG_QUERY_LEAF,
+] as const;
 
 export async function fetchSignalSourcesCatalog(): Promise<CatalogSource[]> {
   const { data, error } = await supabase.from('signal_sources').select('*').order('name');
