@@ -7,7 +7,7 @@
  * fixture is injected at the `usePauseStatsData` hook layer only.
  */
 
-import type { PauseFullRow } from '@/hooks/use-pause-stats-data';
+import type { PauseFullRow } from '@/lib/pause-stats-data-query';
 import type {
   PauseStepEventRow,
   PauseCompanionEventRow,
