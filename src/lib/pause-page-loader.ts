@@ -20,6 +20,8 @@ export function pauseSessionCompanionSnapshotQueryKey(pauseInstanceId: string) {
   return [...PAUSE_SESSION_COMPANION_SNAPSHOT_QUERY_PREFIX, pauseInstanceId] as const;
 }
 
+export const PAUSE_SESSION_COMPANION_SNAPSHOT_DISABLED_INSTANCE_ID = 'none' as const;
+
 /**
  * Shared loader used by the four full-view companion pages. Reads a
  * pause_instance row + its artifacts, returns an in-memory snapshot
@@ -60,7 +62,10 @@ export async function loadPauseSessionSnapshot(
   };
 }
 
-export const PAUSE_SESSION_COMPANION_SNAPSHOT_NONE_QUERY_KEY = ['pause', 'companion-fullview', 'snapshot', 'none'] as const;
+export const PAUSE_SESSION_COMPANION_SNAPSHOT_NONE_QUERY_KEY = [
+  ...PAUSE_SESSION_COMPANION_SNAPSHOT_QUERY_PREFIX,
+  PAUSE_SESSION_COMPANION_SNAPSHOT_DISABLED_INSTANCE_ID,
+] as const;
 
 export function getPauseSessionCompanionSnapshotQueryOptions(pauseInstanceId: string | undefined) {
   return {
