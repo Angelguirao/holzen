@@ -4,7 +4,7 @@ import { homePinnedPausePreviewQueryPrefix } from '@/hooks/use-home-pinned-pause
 import { currentPauseQueryKey } from '@/hooks/use-current-pause';
 import { pendingPauseOfferQueryKey } from '@/hooks/use-pending-pause-offer';
 import { pauseArchiveListQueryPrefix } from '@/hooks/use-pause-archive-list';
-import { libraryBundleQueryPrefix } from '@/hooks/use-library';
+import { libraryBundleQueryPrefix } from '@/lib/library-bundle-query';
 import { getHolzenQueryClient } from '@/lib/holzen-query-client-ref';
 import { archivePausesTabHasRowsQueryPrefix } from '@/lib/archive-pauses-tab-query';
 import { invalidateHistoryCalendarActivities } from '@/lib/history-calendar-activities-query-key';
