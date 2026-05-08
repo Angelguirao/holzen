@@ -1,10 +1,17 @@
 import { supabase } from '@/integrations/supabase/client';
 
-export const PRACTICE_ENTRIES_WEEKLY_COUNT_NONE_QUERY_KEY = ['practice-entries', 'weekly-count', 'none'] as const;
+export const PRACTICE_ENTRIES_WEEKLY_COUNT_QUERY_PREFIX = ['practice-entries', 'weekly-count'] as const;
+
+export const PRACTICE_ENTRIES_WEEKLY_COUNT_DISABLED_USER_ID = 'none' as const;
+
+export const PRACTICE_ENTRIES_WEEKLY_COUNT_NONE_QUERY_KEY = [
+  ...PRACTICE_ENTRIES_WEEKLY_COUNT_QUERY_PREFIX,
+  PRACTICE_ENTRIES_WEEKLY_COUNT_DISABLED_USER_ID,
+] as const;
 
 /** Shared with practice flows that should refresh the Home practice widget counter. */
 export function practiceEntriesWeeklyCountQueryKey(userId: string) {
-  return ['practice-entries', 'weekly-count', userId] as const;
+  return [...PRACTICE_ENTRIES_WEEKLY_COUNT_QUERY_PREFIX, userId] as const;
 }
 
 export async function fetchWeeklyPracticeEntryCount(userId: string): Promise<number> {
