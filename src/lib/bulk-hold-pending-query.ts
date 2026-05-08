@@ -6,7 +6,14 @@ import {
   type BulkHoldPendingPause,
 } from '@/lib/bulk-hold';
 
-export const BULK_HOLD_PENDING_QUERY_PREFIX = ['pause', 'bulk-hold', 'pending'] as const;
+export const PAUSE_BULK_HOLD_QUERY_PREFIX = ['pause', 'bulk-hold'] as const;
+
+export const BULK_HOLD_PENDING_QUERY_LEAF = 'pending' as const;
+
+export const BULK_HOLD_PENDING_QUERY_PREFIX = [
+  ...PAUSE_BULK_HOLD_QUERY_PREFIX,
+  BULK_HOLD_PENDING_QUERY_LEAF,
+] as const;
 
 /** Signed-out / disabled user segment (paired with `refetchNonce` in none-keys). */
 export const BULK_HOLD_PENDING_DISABLED_USER_ID = 'none' as const;
