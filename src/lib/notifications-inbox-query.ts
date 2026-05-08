@@ -13,7 +13,14 @@ export type NotificationsInboxRow = {
   dismissed_at: string | null;
 };
 
-export const NOTIFICATIONS_INBOX_QUERY_PREFIX = ['notifications', 'inbox'] as const;
+export const NOTIFICATIONS_QUERY_PREFIX = ['notifications'] as const;
+
+export const NOTIFICATIONS_INBOX_QUERY_LEAF = 'inbox' as const;
+
+export const NOTIFICATIONS_INBOX_QUERY_PREFIX = [
+  ...NOTIFICATIONS_QUERY_PREFIX,
+  NOTIFICATIONS_INBOX_QUERY_LEAF,
+] as const;
 
 export const NOTIFICATIONS_INBOX_DISABLED_USER_ID = 'none' as const;
 
