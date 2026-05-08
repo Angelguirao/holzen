@@ -12,10 +12,17 @@ export interface CurrentPauseRow {
   context_snapshot: Record<string, unknown> | null;
 }
 
-export const CURRENT_PAUSE_NONE_QUERY_KEY = ['pause', 'current-open', 'none'] as const;
+export const CURRENT_PAUSE_QUERY_PREFIX = ['pause', 'current-open'] as const;
+
+export const CURRENT_PAUSE_DISABLED_USER_ID = 'none' as const;
+
+export const CURRENT_PAUSE_NONE_QUERY_KEY = [
+  ...CURRENT_PAUSE_QUERY_PREFIX,
+  CURRENT_PAUSE_DISABLED_USER_ID,
+] as const;
 
 export function currentPauseQueryKey(userId: string) {
-  return ['pause', 'current-open', userId] as const;
+  return [...CURRENT_PAUSE_QUERY_PREFIX, userId] as const;
 }
 
 export async function fetchCurrentPause(userId: string): Promise<CurrentPauseRow | null> {
