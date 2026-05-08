@@ -5,8 +5,21 @@ import {
   type UserWord,
 } from '../../supabase/functions/_shared/past-reflection-util';
 
-export const PRACTICE_REPLAY_RECENT_PAUSES_QUERY_PREFIX = ['practice', 'replay', 'recent-pauses'] as const;
-export const PRACTICE_REPLAY_THREAD_QUERY_PREFIX = ['practice', 'replay', 'thread'] as const;
+export const PRACTICE_REPLAY_QUERY_PREFIX = ['practice', 'replay'] as const;
+
+export const PRACTICE_REPLAY_RECENT_PAUSES_QUERY_LEAF = 'recent-pauses' as const;
+
+export const PRACTICE_REPLAY_RECENT_PAUSES_QUERY_PREFIX = [
+  ...PRACTICE_REPLAY_QUERY_PREFIX,
+  PRACTICE_REPLAY_RECENT_PAUSES_QUERY_LEAF,
+] as const;
+
+export const PRACTICE_REPLAY_THREAD_QUERY_LEAF = 'thread' as const;
+
+export const PRACTICE_REPLAY_THREAD_QUERY_PREFIX = [
+  ...PRACTICE_REPLAY_QUERY_PREFIX,
+  PRACTICE_REPLAY_THREAD_QUERY_LEAF,
+] as const;
 
 /** Placeholder segment when user/instance scope is missing (queries stay disabled). */
 export const PRACTICE_REPLAY_DISABLED_PLACEHOLDER = '__none__' as const;
