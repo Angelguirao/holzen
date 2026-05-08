@@ -1,10 +1,7 @@
 import { useState, useEffect, useCallback, useMemo } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
-import { fetchMarketData, type BtcPriceData } from '@/lib/btc';
-import {
-  getHolzenMarketDisplayQueryOptions,
-  holzenMarketDisplayQueryKey,
-} from '@/lib/holzen-market-display-query';
+import type { BtcPriceData } from '@/lib/btc';
+import { getHolzenMarketDisplayQueryOptions } from '@/lib/holzen-market-display-query';
 import { supabase } from '@/integrations/supabase/client';
 import { invokeEdge } from '@/lib/invoke-edge';
 import { useAuth } from '@/hooks/use-auth';
@@ -510,11 +507,16 @@ export function useHolzen() {
       }
 
       try {
+        const marketOpts = getHolzenMarketDisplayQueryOptions({
+          coinIdRaw: profileTrackedAssetId,
+          currency,
+          enabled: true,
+        });
         const data =
           btcQuery.data ??
           (await queryClient.fetchQuery({
-            queryKey: holzenMarketDisplayQueryKey(profileTrackedAssetId, currency),
-            queryFn: () => fetchMarketData(profileTrackedAssetId, currency),
+            queryKey: marketOpts.queryKey,
+            queryFn: marketOpts.queryFn,
           }));
         await generateMessage(data, mood);
         const now = Date.now();
