@@ -13,10 +13,17 @@ export type NotificationsInboxRow = {
   dismissed_at: string | null;
 };
 
-export const NOTIFICATIONS_INBOX_NONE_QUERY_KEY = ['notifications', 'inbox', 'none'] as const;
+export const NOTIFICATIONS_INBOX_QUERY_PREFIX = ['notifications', 'inbox'] as const;
+
+export const NOTIFICATIONS_INBOX_DISABLED_USER_ID = 'none' as const;
+
+export const NOTIFICATIONS_INBOX_NONE_QUERY_KEY = [
+  ...NOTIFICATIONS_INBOX_QUERY_PREFIX,
+  NOTIFICATIONS_INBOX_DISABLED_USER_ID,
+] as const;
 
 export function notificationsInboxQueryKey(userId: string) {
-  return ['notifications', 'inbox', userId] as const;
+  return [...NOTIFICATIONS_INBOX_QUERY_PREFIX, userId] as const;
 }
 
 /** Non-dismissed `notifications` rows. Map to UI + i18n in `NotificationBell` (or pass a `queryFn` into {@link getNotificationsInboxMappedListQueryOptions}). */
