@@ -1,6 +1,13 @@
 import { supabase } from '@/integrations/supabase/client';
 
-export const EDGE_COVERAGE_HEARTBEATS_QUERY_KEY = ['admin', 'edge-coverage', 'heartbeats'] as const;
+export const EDGE_COVERAGE_HEARTBEATS_QUERY_PREFIX = ['admin', 'edge-coverage'] as const;
+
+export const EDGE_COVERAGE_HEARTBEATS_QUERY_LEAF = 'heartbeats' as const;
+
+export const EDGE_COVERAGE_HEARTBEATS_QUERY_KEY = [
+  ...EDGE_COVERAGE_HEARTBEATS_QUERY_PREFIX,
+  EDGE_COVERAGE_HEARTBEATS_QUERY_LEAF,
+] as const;
 
 /** BetterStack heartbeat UUIDs keyed by cron job name (`heartbeat.*` in `app_config`). */
 export async function fetchHeartbeatConfigMap(): Promise<Record<string, string>> {
