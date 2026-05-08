@@ -1,6 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
 import type { User } from '@supabase/supabase-js';
-import { getCompletedPauseCountQueryOptions } from '@/hooks/use-completed-pause-count';
+import { getCompletedPauseCountQueryOptions } from '@/lib/completed-pause-count-query';
 
 /**
  * Exact count of completed pauses for testimonial prompt eligibility.

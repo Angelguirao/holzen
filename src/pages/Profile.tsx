@@ -3,7 +3,7 @@ import { useEffect } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useAuth } from '@/hooks/use-auth';
-import { getCompletedPauseCountQueryOptions } from '@/hooks/use-completed-pause-count';
+import { getCompletedPauseCountQueryOptions } from '@/lib/completed-pause-count-query';
 import { useSubscription } from '@/hooks/use-subscription';
 import { useHoldGoalProfile } from '@/hooks/use-hold-goal';
 import { type ProfileTab } from '@/lib/router-location-state';
