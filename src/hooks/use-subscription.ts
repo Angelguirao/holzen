@@ -2,19 +2,20 @@ import { useState, useEffect, useCallback, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { toast } from 'sonner';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
-import { supabase } from '@/integrations/supabase/client';
 import { invokeEdge } from '@/lib/invoke-edge';
 import { useAuth } from '@/hooks/use-auth';
-import { PRICING } from '@/lib/pricing';
 import { holzenLog } from '@/lib/holzen-console';
 import { getCheckoutSuppressionWindowMs } from '@/lib/checkout-suppression-window';
+import {
+  fetchSubscriptionSnapshot,
+  readSubCache,
+  subscriptionQueryKey,
+  type SubscriptionSnapshot,
+} from '@/lib/subscription-snapshot-query';
 
-const FREE_MONTHLY_LIMIT = PRICING.freeReflectionsPerMonth;
 const CHECKOUT_RETURN_KEY = 'holzen_checkout_started_at';
 /** Set when a checkout return includes `?subscribed=true` (timestamp for PaywallSubscribedTracker TTL) */
 export const POST_CHECKOUT_SUBSCRIBE_FLAG = 'holzen_post_checkout_subscribe';
-const SUB_CACHE_KEY = 'holzen_sub_cache';
-
 /** Next fetch uses `{ force: true }` on check-subscription (window focus, refresh(), etc.). */
 let subscriptionForceNext = false;
 
@@ -27,41 +28,7 @@ let subscriptionForceNext = false;
 type SubFetchSource = 'mount' | 'manual_retry' | 'focus' | 'interval' | 'invalidate';
 let subscriptionNextFetchSource: SubFetchSource | null = null;
 
-interface SubCache {
-  subscribed: boolean;
-  tier: 'free' | 'pro' | 'pro_plus' | 'lifetime';
-  monthlyUsed: number;
-  monthlyRemaining: number | undefined;
-  companionLimit: number;
-  companionUsed: number;
-  companionRemaining: number;
-  wallpaperLimit: number;
-  wallpaperUsed: number;
-  wallpaperRemaining: number;
-  insightsLimit: number;
-  insightsUsed: number;
-  insightsRemaining: number;
-  flexCreditsBalance: number;
-  ts: number;
-}
-
-function readSubCache(): SubCache | null {
-  try {
-    const raw = localStorage.getItem(SUB_CACHE_KEY);
-    if (!raw) return null;
-    return JSON.parse(raw) as SubCache;
-  } catch {
-    return null;
-  }
-}
-
-function writeSubCache(c: SubCache) {
-  try {
-    localStorage.setItem(SUB_CACHE_KEY, JSON.stringify(c));
-  } catch {
-    /* ignore */
-  }
-}
+export type { SubscriptionBillingInterval } from '@/lib/subscription-snapshot-query';
 
 function checkoutReturnWantsForce(): boolean {
   const params = new URLSearchParams(window.location.search);
@@ -92,151 +59,6 @@ function consumeInitialCheckoutForce(userId: string): boolean {
   return checkoutReturnWantsForce();
 }
 
-export type SubscriptionBillingInterval = 'month' | 'year' | 'day' | 'week';
-
-type SubscriptionSnapshot = {
-  subscribed: boolean;
-  tier: 'free' | 'pro' | 'pro_plus' | 'lifetime';
-  monthlyUsed: number;
-  monthlyRemaining: number | undefined;
-  companionLimit: number;
-  companionUsed: number;
-  companionRemaining: number;
-  wallpaperLimit: number;
-  wallpaperUsed: number;
-  wallpaperRemaining: number;
-  insightsLimit: number;
-  insightsUsed: number;
-  insightsRemaining: number;
-  flexCreditsBalance: number;
-  subscriptionStatus: string | null;
-  subscriptionEnd: string | null;
-  trialStart: string | null;
-  trialEnd: string | null;
-  /** From Stripe `price.recurring.interval` (fresh `check-subscription` only) */
-  subscriptionBillingInterval: SubscriptionBillingInterval | null;
-};
-
-async function fetchSubscriptionSnapshot(userId: string, force: boolean): Promise<SubscriptionSnapshot> {
-  const { data, error } = await invokeEdge<Record<string, unknown>>('check-subscription', {
-    body: force ? { force: true } : undefined,
-  });
-  if (error) throw error;
-  const apiFlexCreditsBalance = Number(data?.flex_credits_balance) || 0;
-
-  if (data?.subscribed) {
-    const tier = (data.tier as SubscriptionSnapshot['tier']) || 'pro';
-    const companionLimit = Number(data.monthly_companion_limit) || 0;
-    const companionUsed = Number(data.monthly_companion_used) || 0;
-    const companionRemaining = Math.max(0, Number(data.monthly_companion_remaining) || 0);
-    const wallpaperLimit = Number(data.monthly_wallpaper_limit) || 0;
-    const wallpaperUsed = Number(data.monthly_wallpaper_used) || 0;
-    const wallpaperRemaining = Math.max(0, Number(data.monthly_wallpaper_remaining) || 0);
-    const insightsLimit = Number(data.monthly_insights_limit) || 0;
-    const insightsUsed = Number(data.monthly_insights_used) || 0;
-    const insightsRemaining = Math.max(0, Number(data.monthly_insights_remaining) || 0);
-    const flexCreditsBalance = Number(data.flex_credits_balance) || 0;
-    const subscriptionStatus = (data.subscription_status as string) ?? null;
-    const subscriptionEnd = (data.subscription_end as string) ?? null;
-    const trialStart = (data.trial_start as string) ?? null;
-    const trialEnd = (data.trial_end as string) ?? null;
-    const bi = (data as { subscription_billing_interval?: unknown }).subscription_billing_interval;
-    const subscriptionBillingInterval: SubscriptionBillingInterval | null =
-      bi === 'month' || bi === 'year' || bi === 'day' || bi === 'week' ? bi : null;
-    writeSubCache({
-      subscribed: true,
-      tier,
-      monthlyUsed: 0,
-      monthlyRemaining: undefined,
-      companionLimit,
-      companionUsed,
-      companionRemaining,
-      wallpaperLimit,
-      wallpaperUsed,
-      wallpaperRemaining,
-      insightsLimit,
-      insightsUsed,
-      insightsRemaining,
-      flexCreditsBalance,
-      ts: Date.now(),
-    });
-    return {
-      subscribed: true,
-      tier,
-      monthlyUsed: 0,
-      monthlyRemaining: undefined,
-      companionLimit,
-      companionUsed,
-      companionRemaining,
-      wallpaperLimit,
-      wallpaperUsed,
-      wallpaperRemaining,
-      insightsLimit,
-      insightsUsed,
-      insightsRemaining,
-      flexCreditsBalance,
-      subscriptionStatus,
-      subscriptionEnd,
-      trialStart,
-      trialEnd,
-      subscriptionBillingInterval,
-    };
-  }
-
-  const now = new Date();
-  const monthStart = new Date(now.getFullYear(), now.getMonth(), 1).toISOString();
-  // Free-tier monthly quota: count completed pauses in the current month.
-  // Completion requires strict full ritual (breath + initial/shift mood +
-  // outcome + counted companion) — enforced by the pause state machine.
-  const { data: rows } = await supabase
-    .from('pause_instances' as never)
-    .select('id')
-    .eq('user_id', userId)
-    .eq('state', 'completed')
-    .gte('created_at', monthStart);
-
-  const used = (rows ?? []).length;
-  const remaining = Math.max(0, FREE_MONTHLY_LIMIT - used);
-  writeSubCache({
-    subscribed: false,
-    tier: 'free',
-    monthlyUsed: used,
-    monthlyRemaining: remaining,
-    companionLimit: 0,
-    companionUsed: 0,
-    companionRemaining: 0,
-    wallpaperLimit: 0,
-    wallpaperUsed: 0,
-    wallpaperRemaining: 0,
-    insightsLimit: 0,
-    insightsUsed: 0,
-    insightsRemaining: 0,
-    flexCreditsBalance: apiFlexCreditsBalance,
-    ts: Date.now(),
-  });
-  return {
-    subscribed: false,
-    tier: 'free',
-    monthlyUsed: used,
-    monthlyRemaining: remaining,
-    companionLimit: 0,
-    companionUsed: 0,
-    companionRemaining: 0,
-    wallpaperLimit: 0,
-    wallpaperUsed: 0,
-    wallpaperRemaining: 0,
-    insightsLimit: 0,
-    insightsUsed: 0,
-    insightsRemaining: 0,
-    flexCreditsBalance: apiFlexCreditsBalance,
-    subscriptionStatus: null,
-    subscriptionEnd: null,
-    trialStart: null,
-    trialEnd: null,
-    subscriptionBillingInterval: null,
-  };
-}
-
 export function useSubscription() {
   const { t } = useTranslation();
   const { user } = useAuth();
@@ -249,7 +71,7 @@ export function useSubscription() {
   const lastLoggedSubRef = useRef<{ subscribed: boolean; monthlyRemaining: number | undefined } | null>(null);
 
   const query = useQuery({
-    queryKey: ['subscription', userId],
+    queryKey: userId != null ? subscriptionQueryKey(userId) : (['subscription', null] as const),
     enabled: !!userId,
     // Tightened from 5min → 30s so credit changes (regenerate, wallpaper,
     // insights) reconcile within the same interaction window even if a
@@ -267,7 +89,7 @@ export function useSubscription() {
       // Initial mount = no explicit source set yet AND no cached query data.
       const source: SubFetchSource =
         subscriptionNextFetchSource ??
-        (queryClient.getQueryData(['subscription', userId]) ? 'interval' : 'mount');
+        (queryClient.getQueryData(subscriptionQueryKey(userId!)) ? 'interval' : 'mount');
       subscriptionNextFetchSource = null;
       if (!force) {
         force = consumeInitialCheckoutForce(userId!);
@@ -309,7 +131,7 @@ export function useSubscription() {
     const onFocus = () => {
       subscriptionForceNext = true;
       subscriptionNextFetchSource = 'focus';
-      void queryClient.invalidateQueries({ queryKey: ['subscription', userId] });
+      void queryClient.invalidateQueries({ queryKey: subscriptionQueryKey(userId) });
     };
     window.addEventListener('focus', onFocus);
     return () => window.removeEventListener('focus', onFocus);
@@ -422,7 +244,7 @@ export function useSubscription() {
     if (!userId) return Promise.resolve();
     subscriptionForceNext = true;
     subscriptionNextFetchSource = 'invalidate';
-    return queryClient.invalidateQueries({ queryKey: ['subscription', userId] });
+    return queryClient.invalidateQueries({ queryKey: subscriptionQueryKey(userId) });
   }, [userId, queryClient]);
 
   /**
@@ -435,7 +257,7 @@ export function useSubscription() {
     subscriptionForceNext = true;
     subscriptionNextFetchSource = 'manual_retry';
     holzenLog.subscription('manual_retry', { trigger: 'user_click' });
-    return queryClient.invalidateQueries({ queryKey: ['subscription', userId] });
+    return queryClient.invalidateQueries({ queryKey: subscriptionQueryKey(userId) });
   }, [userId, queryClient]);
 
   /**
@@ -448,7 +270,7 @@ export function useSubscription() {
     (feature: 'companion' | 'wallpaper' | 'insight', amount = 1) => {
       if (!userId) return;
       queryClient.setQueryData<SubscriptionSnapshot | undefined>(
-        ['subscription', userId],
+        subscriptionQueryKey(userId),
         (prev) => {
           if (!prev) return prev;
           const next = { ...prev };
