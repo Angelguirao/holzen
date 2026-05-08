@@ -5,7 +5,14 @@ import type { QueryClient } from '@tanstack/react-query';
  * Heavier market strips use `fetchMarketData` in `btc.ts`.
  */
 
-export const COINGECKO_BTC_USD_QUERY_KEY = ['external', 'coingecko', 'btc-usd'] as const;
+export const COINGECKO_BTC_USD_QUERY_PREFIX = ['external', 'coingecko'] as const;
+
+export const COINGECKO_BTC_USD_QUERY_LEAF = 'btc-usd' as const;
+
+export const COINGECKO_BTC_USD_QUERY_KEY = [
+  ...COINGECKO_BTC_USD_QUERY_PREFIX,
+  COINGECKO_BTC_USD_QUERY_LEAF,
+] as const;
 
 export async function fetchCoingeckoBtcUsd(): Promise<number | null> {
   try {
