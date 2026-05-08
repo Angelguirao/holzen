@@ -6,7 +6,14 @@ export interface HomeQuickCaptureLastPauseRow {
   terminal_at: string | null;
 }
 
-export const HOME_QUICK_CAPTURE_LAST_PAUSE_QUERY_PREFIX = ['home', 'quick-capture', 'last-pause'] as const;
+export const HOME_QUICK_CAPTURE_QUERY_PREFIX = ['home', 'quick-capture'] as const;
+
+export const HOME_QUICK_CAPTURE_LAST_PAUSE_QUERY_LEAF = 'last-pause' as const;
+
+export const HOME_QUICK_CAPTURE_LAST_PAUSE_QUERY_PREFIX = [
+  ...HOME_QUICK_CAPTURE_QUERY_PREFIX,
+  HOME_QUICK_CAPTURE_LAST_PAUSE_QUERY_LEAF,
+] as const;
 
 export const HOME_QUICK_CAPTURE_LAST_PAUSE_DISABLED_USER_ID = 'none' as const;
 
