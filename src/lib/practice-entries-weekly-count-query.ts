@@ -1,6 +1,13 @@
 import { supabase } from '@/integrations/supabase/client';
 
-export const PRACTICE_ENTRIES_WEEKLY_COUNT_QUERY_PREFIX = ['practice-entries', 'weekly-count'] as const;
+export const PRACTICE_ENTRIES_QUERY_PREFIX = ['practice-entries'] as const;
+
+export const PRACTICE_ENTRIES_WEEKLY_COUNT_QUERY_LEAF = 'weekly-count' as const;
+
+export const PRACTICE_ENTRIES_WEEKLY_COUNT_QUERY_PREFIX = [
+  ...PRACTICE_ENTRIES_QUERY_PREFIX,
+  PRACTICE_ENTRIES_WEEKLY_COUNT_QUERY_LEAF,
+] as const;
 
 export const PRACTICE_ENTRIES_WEEKLY_COUNT_DISABLED_USER_ID = 'none' as const;
 
