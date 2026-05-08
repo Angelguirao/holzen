@@ -5,7 +5,7 @@ import { Badge } from '@/components/ui/badge';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useProGate } from '@/hooks/use-pro-gate';
 import { TOOLS } from '@/lib/app-routes';
-import type { LastCheckInRow } from '@/hooks/use-tools-hub-data';
+import type { LastCheckInRow } from '@/lib/tools-hub-data-query';
 import type { PracticeSuggestion } from '@/lib/practice-suggestion';
 import {
   TOOLS_PRACTICE_SUGGESTION_LABEL_KEY,
