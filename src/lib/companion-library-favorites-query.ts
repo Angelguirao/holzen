@@ -4,13 +4,15 @@ import { pauseInstanceQueryPrefix } from '@/lib/pause-instance-query-prefix';
 /** JSON key on `pause_instances.metadata` for per-slot hearts (shared with toggle writes). */
 export const COMPANION_SLOT_FAVORITES_METADATA_KEY = 'companion_slot_favorites';
 
+export const COMPANION_LIBRARY_FAVORITES_QUERY_LEAF = 'companion-library-favorites' as const;
+
 export const COMPANION_LIBRARY_FAVORITES_NONE_QUERY_KEY = [
   ...pauseInstanceQueryPrefix('none'),
-  'companion-library-favorites',
+  COMPANION_LIBRARY_FAVORITES_QUERY_LEAF,
 ] as const;
 
 export function companionLibraryFavoritesQueryKey(pauseInstanceId: string) {
-  return [...pauseInstanceQueryPrefix(pauseInstanceId), 'companion-library-favorites'] as const;
+  return [...pauseInstanceQueryPrefix(pauseInstanceId), COMPANION_LIBRARY_FAVORITES_QUERY_LEAF] as const;
 }
 
 function parseFavoritesFromMetadata(metadata: unknown): Record<string, boolean> {
