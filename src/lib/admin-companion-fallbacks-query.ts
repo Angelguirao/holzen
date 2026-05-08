@@ -12,7 +12,14 @@ export interface CompanionFallbackRow {
   updated_at: string;
 }
 
-export const ADMIN_COMPANION_FALLBACKS_QUERY_KEY = ['admin', 'companion-fallbacks', 'all'] as const;
+export const ADMIN_COMPANION_FALLBACKS_QUERY_PREFIX = ['admin', 'companion-fallbacks'] as const;
+
+export const ADMIN_COMPANION_FALLBACKS_QUERY_LEAF = 'all' as const;
+
+export const ADMIN_COMPANION_FALLBACKS_QUERY_KEY = [
+  ...ADMIN_COMPANION_FALLBACKS_QUERY_PREFIX,
+  ADMIN_COMPANION_FALLBACKS_QUERY_LEAF,
+] as const;
 
 export async function fetchCompanionFallbackRows(): Promise<CompanionFallbackRow[]> {
   const { data, error } = await supabase
