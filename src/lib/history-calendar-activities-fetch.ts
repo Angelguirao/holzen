@@ -1,6 +1,9 @@
 import { supabase } from '@/integrations/supabase/client';
 import type { CalendarActivity } from '@/components/HistoryCalendar';
-import { historyCalendarActivitiesQueryKey } from '@/lib/history-calendar-activities-query-key';
+import {
+  HISTORY_CALENDAR_ACTIVITIES_NONE_QUERY_KEY,
+  historyCalendarActivitiesQueryKey,
+} from '@/lib/history-calendar-activities-query-key';
 
 const PRACTICE_LABELS: Record<string, string> = {
   checkin: 'Emotional check-in',
@@ -69,8 +72,6 @@ export async function fetchHistoryCalendarActivities(userId: string): Promise<Ca
   );
   return items;
 }
-
-const HISTORY_CALENDAR_ACTIVITIES_NONE_QUERY_KEY = ['history-calendar', 'activities', 'none'] as const;
 
 /** Shared TanStack options for Profile → Journey → Activity (`HistoryContent`). */
 export function getHistoryCalendarActivitiesQueryOptions(userId: string | undefined) {
