@@ -6,10 +6,17 @@ export interface HomeQuickCaptureLastPauseRow {
   terminal_at: string | null;
 }
 
-export const HOME_QUICK_CAPTURE_LAST_PAUSE_NONE_QUERY_KEY = ['home', 'quick-capture', 'last-pause', 'none'] as const;
+export const HOME_QUICK_CAPTURE_LAST_PAUSE_QUERY_PREFIX = ['home', 'quick-capture', 'last-pause'] as const;
+
+export const HOME_QUICK_CAPTURE_LAST_PAUSE_DISABLED_USER_ID = 'none' as const;
+
+export const HOME_QUICK_CAPTURE_LAST_PAUSE_NONE_QUERY_KEY = [
+  ...HOME_QUICK_CAPTURE_LAST_PAUSE_QUERY_PREFIX,
+  HOME_QUICK_CAPTURE_LAST_PAUSE_DISABLED_USER_ID,
+] as const;
 
 export function homeQuickCaptureLastPauseQueryKey(userId: string) {
-  return ['home', 'quick-capture', 'last-pause', userId] as const;
+  return [...HOME_QUICK_CAPTURE_LAST_PAUSE_QUERY_PREFIX, userId] as const;
 }
 
 export async function fetchLastPauseForQuickCapture(userId: string): Promise<HomeQuickCaptureLastPauseRow | null> {
