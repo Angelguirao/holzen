@@ -207,9 +207,7 @@ export default function Breathe() {
   const {
     data: blockDataRaw,
     refetch: refetchBlockData,
-  } = useQuery({
-    ...getMempoolSpaceBlockDataQueryOptions(ambientDataEnabled),
-  });
+  } = useQuery(getMempoolSpaceBlockDataQueryOptions(ambientDataEnabled));
 
   const btcData = btcQuery.data ?? null;
   const blockData = blockDataRaw ?? null;
