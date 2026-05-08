@@ -51,11 +51,20 @@ export interface PauseFullRow {
 
 export const PAUSE_STATS_DATA_STALE_MS = 2 * 60_000;
 
+/** First segment(s) of TanStack keys for `v_pause_full` + step/companion bundles. */
+export const PAUSE_STATS_DATA_QUERY_PREFIX = ['pause-stats-data'] as const;
+
+/** Signed-out placeholder segment (paired with {@link getPauseStatsDataDisabledQueryOptions}). */
+export const PAUSE_STATS_DATA_DISABLED_USER_ID = 'none' as const;
+
 /** Disabled / signed-out placeholder; use with `getPauseStatsDataDisabledQueryOptions`. */
-export const PAUSE_STATS_DATA_NONE_QUERY_KEY = ['pause-stats-data', 'none'] as const;
+export const PAUSE_STATS_DATA_NONE_QUERY_KEY = [
+  ...PAUSE_STATS_DATA_QUERY_PREFIX,
+  PAUSE_STATS_DATA_DISABLED_USER_ID,
+] as const;
 
 export const PAUSE_STATS_DATA_QUERY_KEY = (userId: string) =>
-  ['pause-stats-data', userId] as const;
+  [...PAUSE_STATS_DATA_QUERY_PREFIX, userId] as const;
 
 export type PauseStatsQueryPayload = {
   rows: PauseFullRow[];
