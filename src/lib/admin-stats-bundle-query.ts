@@ -159,8 +159,16 @@ export interface LibraryEntryRow {
   created_at: string;
 }
 
+/** TanStack prefix segment(s) for `/admin` monitoring queries (`useAdminStats`). */
+export const ADMIN_STATS_QUERY_PREFIX = ['admin'] as const;
+
+export const ADMIN_STATS_BUNDLE_QUERY_LEAF = 'stats' as const;
+
 /** TanStack Query key for the admin monitoring bundle (`useAdminStats`). */
-export const ADMIN_STATS_QUERY_KEY = ['admin', 'stats'] as const;
+export const ADMIN_STATS_QUERY_KEY = [
+  ...ADMIN_STATS_QUERY_PREFIX,
+  ADMIN_STATS_BUNDLE_QUERY_LEAF,
+] as const;
 
 /** Rows loaded together for `/admin` monitoring (RPC + views + feeds). */
 export interface AdminStatsBundle {
