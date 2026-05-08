@@ -20,8 +20,8 @@ import { parseEdgeFunctionError, toUserFacingAiErrorMessage } from '@/lib/edge-f
 import { trackEvent } from '@/lib/posthog';
 import { invokeEdge } from '@/lib/invoke-edge';
 import { practiceEntriesWeeklyCountQueryKey } from '@/components/PracticeWidget';
-import { practicePrimarySuggestionQueryKey } from '@/hooks/use-practice-suggestion';
-import { toolsHubDataQueryKey } from '@/hooks/use-tools-hub-data';
+import { practicePrimarySuggestionQueryKey } from '@/lib/practice-primary-suggestion-query';
+import { toolsHubDataQueryKey } from '@/lib/tools-hub-data-query';
 import { groundHistoryEntriesQueryKey, groundHistoryStatsQueryKey } from '@/lib/ground-history-query';
 import { invalidateHistoryCalendarActivities } from '@/lib/history-calendar-activities-query-key';
 import {
