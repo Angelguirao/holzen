@@ -16,7 +16,14 @@ export type CheckoutEvent = {
   grant_reason: string | null;
 };
 
-export const CHECKOUT_EVENTS_QUERY_KEY = ['billing', 'checkout-events'] as const;
+export const CHECKOUT_EVENTS_QUERY_PREFIX = ['billing'] as const;
+
+export const CHECKOUT_EVENTS_QUERY_LEAF = 'checkout-events' as const;
+
+export const CHECKOUT_EVENTS_QUERY_KEY = [
+  ...CHECKOUT_EVENTS_QUERY_PREFIX,
+  CHECKOUT_EVENTS_QUERY_LEAF,
+] as const;
 
 export async function fetchCheckoutEvents(): Promise<CheckoutEvent[]> {
   const { data, error } = await invokeEdge<{ events?: CheckoutEvent[] }>('list-checkout-events', {
