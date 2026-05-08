@@ -18,8 +18,8 @@
 import { supabase } from '@/integrations/supabase/client';
 import { getHolzenQueryClient } from '@/lib/holzen-query-client-ref';
 import { invalidatePauseStatsDataForUser } from '@/lib/pause-stats-invalidate';
-import { pauseSessionFetchedInstanceQueryKey } from '@/hooks/use-pause-session-fetch';
-import { pauseTerminalEntryStateQueryKey } from '@/hooks/use-pause-session-terminal-entry-redirect';
+import { pauseSessionFetchedInstanceQueryKey } from '@/lib/pause-session-fetched-instance-query';
+import { pauseTerminalEntryStateQueryKey } from '@/lib/pause-terminal-entry-state-query';
 import { pauseSessionCompanionSnapshotQueryKey } from '@/lib/pause-page-loader';
 import { invalidateCompanionUiCompletionQuery } from '@/lib/companion-ui-completion-query-key';
 import { trackEvent } from '@/lib/posthog';
