@@ -3,8 +3,15 @@ export interface CoingeckoMarketChartPoint {
   price: number;
 }
 
+export const COINGECKO_MARKET_CHART_QUERY_PREFIX = ['external', 'coingecko', 'market_chart'] as const;
+
 export function coingeckoMarketChartQueryKey(currency: string, coinId: string, retryNonce: number) {
-  return ['external', 'coingecko', 'market_chart', coinId, currency.toLowerCase(), retryNonce] as const;
+  return [
+    ...COINGECKO_MARKET_CHART_QUERY_PREFIX,
+    coinId,
+    currency.toLowerCase(),
+    retryNonce,
+  ] as const;
 }
 
 export async function fetchCoinGeckoMarketChart(
