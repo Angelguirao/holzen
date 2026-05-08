@@ -1,4 +1,4 @@
-import { getProfileRowQueryOptions } from '@/hooks/use-profile';
+import { getProfileRowQueryOptions } from '@/lib/profile-row-query';
 import type { Database } from '@/integrations/supabase/types';
 import { normalizeTrackedAssetId } from '@/lib/tracked-assets';
 
