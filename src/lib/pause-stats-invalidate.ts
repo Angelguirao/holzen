@@ -1,10 +1,10 @@
 import { COMPLETED_PAUSE_COUNT_QUERY_KEY } from '@/lib/completed-pause-count-query';
-import { PAUSE_STATS_DATA_QUERY_KEY } from '@/hooks/use-pause-stats-data';
-import { homePinnedPausePreviewQueryPrefix } from '@/hooks/use-home-pinned-pause-preview';
-import { currentPauseQueryKey } from '@/hooks/use-current-pause';
-import { pendingPauseOfferQueryKey } from '@/hooks/use-pending-pause-offer';
-import { pauseArchiveListQueryPrefix } from '@/hooks/use-pause-archive-list';
+import { currentPauseQueryKey } from '@/lib/current-pause-query';
+import { homePinnedPausePreviewQueryPrefix } from '@/lib/home-pinned-pause-preview-query';
 import { libraryBundleQueryPrefix } from '@/lib/library-bundle-query';
+import { pauseArchiveListQueryPrefix } from '@/lib/pause-archive-list-query';
+import { PAUSE_STATS_DATA_QUERY_KEY } from '@/lib/pause-stats-data-query';
+import { pendingPauseOfferQueryKey } from '@/lib/pending-pause-offer-query';
 import { getHolzenQueryClient } from '@/lib/holzen-query-client-ref';
 import { archivePausesTabHasRowsQueryPrefix } from '@/lib/archive-pauses-tab-query';
 import { invalidateHistoryCalendarActivities } from '@/lib/history-calendar-activities-query-key';
