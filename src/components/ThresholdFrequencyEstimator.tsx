@@ -4,8 +4,6 @@ import { useTranslation } from 'react-i18next';
 import { Activity } from 'lucide-react';
 import { getThresholdVolatilityEstimatorQueryOptions } from '@/lib/threshold-volatility-estimator-query';
 
-export { thresholdVolatilityEstimatorQueryKey } from '@/lib/threshold-volatility-estimator-query';
-
 interface Props {
   thresholdUp: number;
   thresholdDown?: number;

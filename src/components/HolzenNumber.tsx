@@ -3,8 +3,6 @@ import { motion, useReducedMotion } from 'framer-motion';
 import { getHolzenNumberQueryOptions } from '@/lib/holzen-number-query';
 import { homeInWidget } from '@/components/home/home-widget-styles';
 
-export { HOLZEN_NUMBER_QUERY_KEY } from '@/lib/holzen-number-query';
-
 /**
  * The Holzen Number — a public real-time metric:
  * "X% of Holzen users held steady today"
