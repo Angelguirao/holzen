@@ -16,7 +16,7 @@ import { MilestoneTimeline } from '@/components/stats/journey/MilestoneTimeline'
 import { PeriodComparisonCard } from '@/components/stats/journey/PeriodComparisonCard';
 import { MoodPriceChart } from '@/components/stats/advanced/MoodPriceChart';
 import { MoodPriceScatter } from '@/components/stats/advanced/MoodPriceScatter';
-import type { PauseFullRow } from '@/hooks/use-pause-stats-data';
+import type { PauseFullRow } from '@/lib/pause-stats-data-query';
 import { cn } from '@/lib/utils';
 
 interface Props {
