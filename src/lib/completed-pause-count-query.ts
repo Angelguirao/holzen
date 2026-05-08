@@ -6,10 +6,18 @@ import { supabase } from '@/integrations/supabase/client';
 import type { UseQueryOptions } from '@tanstack/react-query';
 import { holzenLog } from '@/lib/holzen-console';
 
-export const COMPLETED_PAUSE_COUNT_NONE_KEY = ['pause-instances', 'completed-count', '__none__'] as const;
+export const COMPLETED_PAUSE_COUNT_QUERY_PREFIX = ['pause-instances', 'completed-count'] as const;
+
+/** Signed-out placeholder segment (matches other `__none__` user-id keys). */
+export const COMPLETED_PAUSE_COUNT_DISABLED_USER_ID = '__none__' as const;
+
+export const COMPLETED_PAUSE_COUNT_NONE_KEY = [
+  ...COMPLETED_PAUSE_COUNT_QUERY_PREFIX,
+  COMPLETED_PAUSE_COUNT_DISABLED_USER_ID,
+] as const;
 
 export const COMPLETED_PAUSE_COUNT_QUERY_KEY = (userId: string) =>
-  ['pause-instances', 'completed-count', userId] as const;
+  [...COMPLETED_PAUSE_COUNT_QUERY_PREFIX, userId] as const;
 
 export async function fetchCompletedPauseCount(userId: string): Promise<number> {
   const { count, error } = await supabase
