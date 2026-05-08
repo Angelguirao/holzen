@@ -27,14 +27,21 @@ export interface GroundingEnrichmentInput {
   doi?: string | null;
 }
 
-export const GROUNDING_ENRICHMENT_DISABLED_QUERY_KEY = ['grounding-enrichment', 'disabled'] as const;
+export const GROUNDING_ENRICHMENT_QUERY_PREFIX = ['grounding-enrichment'] as const;
+
+export const GROUNDING_ENRICHMENT_DISABLED_SEGMENT = 'disabled' as const;
+
+export const GROUNDING_ENRICHMENT_DISABLED_QUERY_KEY = [
+  ...GROUNDING_ENRICHMENT_QUERY_PREFIX,
+  GROUNDING_ENRICHMENT_DISABLED_SEGMENT,
+] as const;
 
 export function groundingEnrichmentQueryKey(
   citation: string,
   doi: string | null | undefined,
   url: string | null | undefined,
 ) {
-  return ['grounding-enrichment', citation, doi ?? null, url ?? null] as const;
+  return [...GROUNDING_ENRICHMENT_QUERY_PREFIX, citation, doi ?? null, url ?? null] as const;
 }
 
 export async function fetchGroundingEnrichment(
