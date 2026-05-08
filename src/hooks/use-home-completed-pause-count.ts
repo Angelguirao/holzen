@@ -8,8 +8,6 @@ import { getCompletedPauseCountQueryOptions } from '@/hooks/use-completed-pause-
  */
 export function useHomeCompletedPauseCount(user: User | null): number {
   const userId = user?.id;
-  const { data = 0 } = useQuery({
-    ...getCompletedPauseCountQueryOptions(userId),
-  });
+  const { data = 0 } = useQuery(getCompletedPauseCountQueryOptions(userId));
   return userId ? data : 0;
 }
