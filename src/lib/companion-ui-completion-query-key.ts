@@ -7,7 +7,14 @@ import { getHolzenQueryClient } from '@/lib/holzen-query-client-ref';
  * Lives in a key-only module so `pause-api` and breath RPC helpers can invalidate
  * without importing `companion-completion-sync` (which depends on `pause-api`).
  */
-export const COMPANION_UI_COMPLETION_QUERY_PREFIX = ['pause', 'companion-ui-completion'] as const;
+export const PAUSE_NAMESPACE_PREFIX = ['pause'] as const;
+
+export const COMPANION_UI_COMPLETION_QUERY_LEAF = 'companion-ui-completion' as const;
+
+export const COMPANION_UI_COMPLETION_QUERY_PREFIX = [
+  ...PAUSE_NAMESPACE_PREFIX,
+  COMPANION_UI_COMPLETION_QUERY_LEAF,
+] as const;
 
 export const COMPANION_UI_COMPLETION_DISABLED_INSTANCE_ID = 'none' as const;
 
