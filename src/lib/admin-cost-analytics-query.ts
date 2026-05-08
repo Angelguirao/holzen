@@ -42,11 +42,19 @@ export async function fetchGenerationAttemptsForPeriod(
   return data as AttemptRow[];
 }
 
+/** Shared `['admin', 'cost', …]` namespace for cost analytics TanStack caches. */
+export const ADMIN_COST_QUERY_PREFIX = ['admin', 'cost'] as const;
+
+export const ADMIN_COST_GENERATION_ATTEMPTS_QUERY_LEAF = 'generation-attempts' as const;
+
 /**
  * Shared prefix for per-period `generation_attempts` queries. Pass to
  * `invalidateQueries` to refetch all period variants (and the 7d shadow).
  */
-export const ADMIN_COST_GENERATION_ATTEMPTS_QUERY_PREFIX = ['admin', 'cost', 'generation-attempts'] as const;
+export const ADMIN_COST_GENERATION_ATTEMPTS_QUERY_PREFIX = [
+  ...ADMIN_COST_QUERY_PREFIX,
+  ADMIN_COST_GENERATION_ATTEMPTS_QUERY_LEAF,
+] as const;
 
 export function adminCostGenerationAttemptsQueryKey(period: TimePeriod) {
   return [...ADMIN_COST_GENERATION_ATTEMPTS_QUERY_PREFIX, period] as const;
@@ -81,7 +89,12 @@ export interface MrrSnapshot {
   ratio: number | null;
 }
 
-export const ADMIN_COST_MRR_SNAPSHOT_QUERY_KEY = ['admin', 'cost', 'mrr-snapshot'] as const;
+export const ADMIN_COST_MRR_SNAPSHOT_QUERY_LEAF = 'mrr-snapshot' as const;
+
+export const ADMIN_COST_MRR_SNAPSHOT_QUERY_KEY = [
+  ...ADMIN_COST_QUERY_PREFIX,
+  ADMIN_COST_MRR_SNAPSHOT_QUERY_LEAF,
+] as const;
 
 export async function fetchCostAnalyticsMrrSnapshot(): Promise<MrrSnapshot> {
   const { count: activeCount } = await supabase
