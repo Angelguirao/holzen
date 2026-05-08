@@ -13,7 +13,14 @@ export interface FutureLetterRow {
   delivery_threshold: number | null;
 }
 
-export const FUTURE_LETTERS_LIST_QUERY_PREFIX = ['future-letters', 'list'] as const;
+export const FUTURE_LETTERS_QUERY_PREFIX = ['future-letters'] as const;
+
+export const FUTURE_LETTERS_LIST_QUERY_LEAF = 'list' as const;
+
+export const FUTURE_LETTERS_LIST_QUERY_PREFIX = [
+  ...FUTURE_LETTERS_QUERY_PREFIX,
+  FUTURE_LETTERS_LIST_QUERY_LEAF,
+] as const;
 
 export const FUTURE_LETTERS_LIST_DISABLED_USER_ID = 'none' as const;
 
