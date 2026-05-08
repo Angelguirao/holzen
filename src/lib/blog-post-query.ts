@@ -12,10 +12,12 @@ export type BlogPublishedListRow = Pick<
   'id' | 'slug' | 'title' | 'excerpt' | 'published_at'
 >;
 
+export const BLOG_PUBLISHED_POSTS_QUERY_PREFIX = ['blog-posts', 'published'] as const;
+
 export function blogPublishedPostsInfiniteQueryKey(
   pageSize: number = BLOG_PUBLISHED_LIST_PAGE_SIZE,
 ) {
-  return ['blog-posts', 'published', pageSize] as const;
+  return [...BLOG_PUBLISHED_POSTS_QUERY_PREFIX, pageSize] as const;
 }
 
 export async function fetchBlogPublishedPostsPage(
@@ -63,12 +65,19 @@ export function getBlogPublishedPostsInfiniteQueryOptions() {
   };
 }
 
+export const BLOG_POST_BY_SLUG_QUERY_PREFIX = ['blog-post'] as const;
+
+export const BLOG_POST_BY_SLUG_DISABLED_SLUG = 'none' as const;
+
 export function blogPostBySlugQueryKey(slug: string) {
-  return ['blog-post', slug] as const;
+  return [...BLOG_POST_BY_SLUG_QUERY_PREFIX, slug] as const;
 }
 
 /** Placeholder when `slug` is missing; paired with `enabled: false` in `getBlogPostBySlugQueryOptions`. */
-export const BLOG_POST_BY_SLUG_NONE_QUERY_KEY = ['blog-post', 'none'] as const;
+export const BLOG_POST_BY_SLUG_NONE_QUERY_KEY = [
+  ...BLOG_POST_BY_SLUG_QUERY_PREFIX,
+  BLOG_POST_BY_SLUG_DISABLED_SLUG,
+] as const;
 
 export async function fetchBlogPostBySlug(slug: string): Promise<BlogPostRow | null> {
   const { data, error } = await supabase
