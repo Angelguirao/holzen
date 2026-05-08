@@ -8,7 +8,7 @@
 import { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { computeBadges, type BadgeSnapshot } from '@/lib/badges/compute';
-import type { PauseFullRow } from '@/hooks/use-pause-stats-data';
+import type { PauseFullRow } from '@/lib/pause-stats-data-query';
 import type { PauseStepEventRow, PauseCompanionEventRow } from '@/lib/pause-state';
 
 interface HoldGoal {
