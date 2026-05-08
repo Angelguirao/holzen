@@ -11,7 +11,10 @@ const FREE_MONTHLY_LIMIT = PRICING.freeReflectionsPerMonth;
 
 export const SUB_CACHE_KEY = 'holzen_sub_cache';
 
-export const subscriptionQueryKey = (userId: string) => ['subscription', userId] as const;
+export const SUBSCRIPTION_QUERY_PREFIX = ['subscription'] as const;
+
+export const subscriptionQueryKey = (userId: string) =>
+  [...SUBSCRIPTION_QUERY_PREFIX, userId] as const;
 
 export type SubscriptionBillingInterval = 'month' | 'year' | 'day' | 'week';
 
