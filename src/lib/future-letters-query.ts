@@ -13,10 +13,17 @@ export interface FutureLetterRow {
   delivery_threshold: number | null;
 }
 
-export const FUTURE_LETTERS_LIST_NONE_QUERY_KEY = ['future-letters', 'list', 'none'] as const;
+export const FUTURE_LETTERS_LIST_QUERY_PREFIX = ['future-letters', 'list'] as const;
+
+export const FUTURE_LETTERS_LIST_DISABLED_USER_ID = 'none' as const;
+
+export const FUTURE_LETTERS_LIST_NONE_QUERY_KEY = [
+  ...FUTURE_LETTERS_LIST_QUERY_PREFIX,
+  FUTURE_LETTERS_LIST_DISABLED_USER_ID,
+] as const;
 
 export function futureLettersListQueryKey(userId: string) {
-  return ['future-letters', 'list', userId] as const;
+  return [...FUTURE_LETTERS_LIST_QUERY_PREFIX, userId] as const;
 }
 
 export async function fetchFutureLettersList(userId: string): Promise<FutureLetterRow[]> {
