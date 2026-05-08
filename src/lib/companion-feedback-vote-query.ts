@@ -1,14 +1,21 @@
 import { supabase } from '@/integrations/supabase/client';
 import type { Json } from '@/integrations/supabase/types';
 
-export const COMPANION_FEEDBACK_VOTE_NONE_QUERY_KEY = ['companion-feedback-vote', 'none'] as const;
+export const COMPANION_FEEDBACK_VOTE_QUERY_PREFIX = ['companion-feedback-vote'] as const;
+
+export const COMPANION_FEEDBACK_VOTE_DISABLED_USER_ID = 'none' as const;
+
+export const COMPANION_FEEDBACK_VOTE_NONE_QUERY_KEY = [
+  ...COMPANION_FEEDBACK_VOTE_QUERY_PREFIX,
+  COMPANION_FEEDBACK_VOTE_DISABLED_USER_ID,
+] as const;
 
 export function companionFeedbackVoteQueryKey(
   userId: string,
   pauseInstanceId: string,
   companionType: string,
 ) {
-  return ['companion-feedback-vote', userId, pauseInstanceId, companionType] as const;
+  return [...COMPANION_FEEDBACK_VOTE_QUERY_PREFIX, userId, pauseInstanceId, companionType] as const;
 }
 
 function voteFromMetadata(metadata: Json | null | undefined): 'up' | 'down' | null {
