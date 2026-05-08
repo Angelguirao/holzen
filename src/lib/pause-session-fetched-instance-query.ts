@@ -5,7 +5,14 @@ import {
   type PauseInstanceContextSnapshotRow,
 } from '@/lib/pause-session-fetched-instance';
 
-export const PAUSE_SESSION_FETCHED_INSTANCE_QUERY_PREFIX = ['pause-session', 'fetched-instance'] as const;
+export const PAUSE_SESSION_QUERY_PREFIX = ['pause-session'] as const;
+
+export const PAUSE_SESSION_FETCHED_INSTANCE_QUERY_LEAF = 'fetched-instance' as const;
+
+export const PAUSE_SESSION_FETCHED_INSTANCE_QUERY_PREFIX = [
+  ...PAUSE_SESSION_QUERY_PREFIX,
+  PAUSE_SESSION_FETCHED_INSTANCE_QUERY_LEAF,
+] as const;
 
 export const PAUSE_SESSION_FETCHED_INSTANCE_DISABLED_INSTANCE_ID = 'none' as const;
 
