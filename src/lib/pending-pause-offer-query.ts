@@ -8,10 +8,17 @@ export interface PendingPauseOfferRow {
   preview_message: string | null;
 }
 
-export const PENDING_PAUSE_OFFER_NONE_QUERY_KEY = ['pause', 'pending-offer', 'none'] as const;
+export const PENDING_PAUSE_OFFER_QUERY_PREFIX = ['pause', 'pending-offer'] as const;
+
+export const PENDING_PAUSE_OFFER_DISABLED_USER_ID = 'none' as const;
+
+export const PENDING_PAUSE_OFFER_NONE_QUERY_KEY = [
+  ...PENDING_PAUSE_OFFER_QUERY_PREFIX,
+  PENDING_PAUSE_OFFER_DISABLED_USER_ID,
+] as const;
 
 export function pendingPauseOfferQueryKey(userId: string) {
-  return ['pause', 'pending-offer', userId] as const;
+  return [...PENDING_PAUSE_OFFER_QUERY_PREFIX, userId] as const;
 }
 
 export async function fetchPendingPauseOffer(userId: string): Promise<PendingPauseOfferRow | null> {
