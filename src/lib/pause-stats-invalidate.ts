@@ -1,4 +1,4 @@
-import { COMPLETED_PAUSE_COUNT_QUERY_KEY } from '@/hooks/use-completed-pause-count';
+import { COMPLETED_PAUSE_COUNT_QUERY_KEY } from '@/lib/completed-pause-count-query';
 import { PAUSE_STATS_DATA_QUERY_KEY } from '@/hooks/use-pause-stats-data';
 import { homePinnedPausePreviewQueryPrefix } from '@/hooks/use-home-pinned-pause-preview';
 import { currentPauseQueryKey } from '@/hooks/use-current-pause';
