@@ -10,10 +10,13 @@ export interface PauseSessionSnapshot {
   companions: CompanionData;
 }
 
+export const PAUSE_COMPANION_FULLVIEW_QUERY_PREFIX = ['pause', 'companion-fullview'] as const;
+
+export const PAUSE_SESSION_COMPANION_SNAPSHOT_QUERY_LEAF = 'snapshot' as const;
+
 export const PAUSE_SESSION_COMPANION_SNAPSHOT_QUERY_PREFIX = [
-  'pause',
-  'companion-fullview',
-  'snapshot',
+  ...PAUSE_COMPANION_FULLVIEW_QUERY_PREFIX,
+  PAUSE_SESSION_COMPANION_SNAPSHOT_QUERY_LEAF,
 ] as const;
 
 export function pauseSessionCompanionSnapshotQueryKey(pauseInstanceId: string) {
