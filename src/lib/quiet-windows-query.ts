@@ -10,10 +10,17 @@ export interface QuietWindow {
   active: boolean;
 }
 
-export const QUIET_WINDOWS_NONE_QUERY_KEY = ['quiet-windows', 'none'] as const;
+export const QUIET_WINDOWS_QUERY_PREFIX = ['quiet-windows'] as const;
+
+export const QUIET_WINDOWS_DISABLED_USER_ID = 'none' as const;
+
+export const QUIET_WINDOWS_NONE_QUERY_KEY = [
+  ...QUIET_WINDOWS_QUERY_PREFIX,
+  QUIET_WINDOWS_DISABLED_USER_ID,
+] as const;
 
 export function quietWindowsQueryKey(userId: string) {
-  return ['quiet-windows', userId] as const;
+  return [...QUIET_WINDOWS_QUERY_PREFIX, userId] as const;
 }
 
 export async function fetchQuietWindows(userId: string): Promise<QuietWindow[]> {
