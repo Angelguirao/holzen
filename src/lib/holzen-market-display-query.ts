@@ -1,9 +1,15 @@
 import { fetchMarketData } from '@/lib/btc';
 import { normalizeTrackedAssetId } from '@/lib/tracked-assets';
 
+export const HOLZEN_MARKET_DISPLAY_QUERY_PREFIX = ['holzen', 'market-display'] as const;
+
 /** TanStack cache for CoinGecko-backed market strip on Home (`useHolzen`). */
 export function holzenMarketDisplayQueryKey(coinIdRaw: string | null | undefined, currency: string) {
-  return ['holzen', 'market-display', normalizeTrackedAssetId(coinIdRaw), currency.toUpperCase()] as const;
+  return [
+    ...HOLZEN_MARKET_DISPLAY_QUERY_PREFIX,
+    normalizeTrackedAssetId(coinIdRaw),
+    currency.toUpperCase(),
+  ] as const;
 }
 
 export function getHolzenMarketDisplayQueryOptions(input: {
