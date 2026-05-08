@@ -7,7 +7,14 @@ import { invokeEdge } from '@/lib/invoke-edge';
 
 export type EmailUnsubscribeLinkCheck = 'valid' | 'already' | 'invalid';
 
-export const EMAIL_UNSUBSCRIBE_LINK_QUERY_PREFIX = ['auth', 'email-unsubscribe', 'link'] as const;
+export const AUTH_EMAIL_UNSUBSCRIBE_QUERY_PREFIX = ['auth', 'email-unsubscribe'] as const;
+
+export const EMAIL_UNSUBSCRIBE_LINK_QUERY_LEAF = 'link' as const;
+
+export const EMAIL_UNSUBSCRIBE_LINK_QUERY_PREFIX = [
+  ...AUTH_EMAIL_UNSUBSCRIBE_QUERY_PREFIX,
+  EMAIL_UNSUBSCRIBE_LINK_QUERY_LEAF,
+] as const;
 
 /** Placeholder token segment when no unsubscribe token is present (query disabled). */
 export const EMAIL_UNSUBSCRIBE_LINK_DISABLED_TOKEN = 'none' as const;
