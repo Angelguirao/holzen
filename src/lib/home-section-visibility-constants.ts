@@ -34,3 +34,7 @@ export const HOME_WIDGET_DEFAULT_ORDER: string[] = [...ALL_HOME_SECTION_IDS];
 
 /** Layout + visibility id for the Holzen score + In motion row (`HomeStatTiles`). */
 export const JOURNEY_STAT_TILES_VISIBILITY_ID = 'journey-pulse' as const;
+
+export function isHomeSectionAlwaysVisibleInLayout(id: string): boolean {
+  return (HOME_SECTION_IDS_WITHOUT_VISIBILITY_TOGGLE as readonly string[]).includes(id);
+}
