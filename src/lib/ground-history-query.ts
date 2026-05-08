@@ -13,17 +13,29 @@ export interface GroundingEntry {
 
 export type GroundingHistoryStats = { totalSessions: number; totalMinutes: number };
 
-export const GROUND_HISTORY_ENTRIES_NONE_QUERY_KEY = ['tools', 'ground-history', 'entries', 'none'] as const;
+export const GROUND_HISTORY_ENTRIES_QUERY_PREFIX = ['tools', 'ground-history', 'entries'] as const;
+export const GROUND_HISTORY_STATS_QUERY_PREFIX = ['tools', 'ground-history', 'stats'] as const;
+
+/** Signed-out placeholder segment (this feature predates the repo-wide `__none__` convention). */
+export const GROUND_HISTORY_DISABLED_USER_ID = 'none' as const;
+
+export const GROUND_HISTORY_ENTRIES_NONE_QUERY_KEY = [
+  ...GROUND_HISTORY_ENTRIES_QUERY_PREFIX,
+  GROUND_HISTORY_DISABLED_USER_ID,
+] as const;
 
 export function groundHistoryEntriesQueryKey(userId: string) {
-  return ['tools', 'ground-history', 'entries', userId] as const;
+  return [...GROUND_HISTORY_ENTRIES_QUERY_PREFIX, userId] as const;
 }
 
-export const GROUND_HISTORY_STATS_NONE_QUERY_KEY = ['tools', 'ground-history', 'stats', 'none'] as const;
+export const GROUND_HISTORY_STATS_NONE_QUERY_KEY = [
+  ...GROUND_HISTORY_STATS_QUERY_PREFIX,
+  GROUND_HISTORY_DISABLED_USER_ID,
+] as const;
 
 /** Used by `Ground` after a ritual save so Journey → Grounding history totals refresh without staleTime wait. */
 export function groundHistoryStatsQueryKey(userId: string) {
-  return ['tools', 'ground-history', 'stats', userId] as const;
+  return [...GROUND_HISTORY_STATS_QUERY_PREFIX, userId] as const;
 }
 
 export async function fetchGroundingHistoryStats(userId: string): Promise<GroundingHistoryStats> {
