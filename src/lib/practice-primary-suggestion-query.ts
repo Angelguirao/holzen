@@ -1,6 +1,13 @@
 import { fetchPracticeSuggestions, type PracticeSuggestion } from '@/lib/practice-suggestion';
 
-export const PRACTICE_PRIMARY_SUGGESTION_QUERY_PREFIX = ['practice', 'suggestion', 'primary'] as const;
+export const PRACTICE_SUGGESTION_QUERY_PREFIX = ['practice', 'suggestion'] as const;
+
+export const PRACTICE_PRIMARY_SUGGESTION_QUERY_LEAF = 'primary' as const;
+
+export const PRACTICE_PRIMARY_SUGGESTION_QUERY_PREFIX = [
+  ...PRACTICE_SUGGESTION_QUERY_PREFIX,
+  PRACTICE_PRIMARY_SUGGESTION_QUERY_LEAF,
+] as const;
 
 export const PRACTICE_PRIMARY_SUGGESTION_DISABLED_USER_ID = 'none' as const;
 
