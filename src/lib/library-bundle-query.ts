@@ -46,6 +46,9 @@ export function libraryBundleQueryPrefix(userId: string) {
   return ['library', 'bundle', userId] as const;
 }
 
+/** User-id segment for {@link getLibraryBundleDisabledQueryOptions} when signed out. */
+export const LIBRARY_BUNDLE_DISABLED_USER_ID = '__none__' as const;
+
 export function buildMemberCacheKey(listSort: LibraryListSortMode): string {
   return `holzen_collection_member_pauses:${listSort}`;
 }
@@ -172,7 +175,7 @@ export function getLibraryBundleDisabledQueryOptions(listSort: LibraryListSortMo
     memberRowsLoadFailed: false,
   };
   return {
-    queryKey: ['library', 'bundle', '__none__', listSort],
+    queryKey: [...libraryBundleQueryPrefix(LIBRARY_BUNDLE_DISABLED_USER_ID), listSort],
     queryFn: async () => empty,
     staleTime: LIBRARY_BUNDLE_STALE_MS,
     retry: false,
