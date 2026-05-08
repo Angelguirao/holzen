@@ -1,13 +1,13 @@
 import { useState, useEffect, useRef, useCallback, forwardRef } from 'react';
-import { keepPreviousData, useQuery, useQueryClient } from '@tanstack/react-query';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { Bell, X, CheckCheck, ArrowRight } from 'lucide-react';
 import { hapticFeedback } from '@/lib/haptics';
 import {
   fetchNotificationsInboxRows,
+  getNotificationsInboxMappedListQueryOptions,
   notificationsInboxQueryKey,
-  NOTIFICATIONS_INBOX_NONE_QUERY_KEY,
   type NotificationsInboxRow,
 } from '@/lib/notifications-inbox-query';
 import { supabase } from '@/integrations/supabase/client';
@@ -225,21 +225,18 @@ export function NotificationBell() {
     };
   }, [t]);
 
-  const { data: allNotifications = [], isPending: loading } = useQuery({
-    queryKey: user ? notificationsInboxQueryKey(user.id) : NOTIFICATIONS_INBOX_NONE_QUERY_KEY,
-    queryFn: async () => {
-      const rows = await fetchNotificationsInboxRows(user!.id);
-      const mapped = rows
-        .map(mapRowToNotification)
-        .filter((item): item is NotificationItem => item !== null);
-      return normalizeNotifications(mapped);
-    },
-    enabled: Boolean(user),
-    staleTime: 30_000,
-    refetchOnWindowFocus: true,
-    retry: false,
-    placeholderData: keepPreviousData,
-  });
+  const { data: allNotifications = [], isPending: loading } = useQuery(
+    getNotificationsInboxMappedListQueryOptions({
+      userId: user?.id,
+      queryFn: async () => {
+        const rows = await fetchNotificationsInboxRows(user!.id);
+        const mapped = rows
+          .map(mapRowToNotification)
+          .filter((item): item is NotificationItem => item !== null);
+        return normalizeNotifications(mapped);
+      },
+    }),
+  );
 
   const visibleNotifications = allNotifications.filter((n) => !dismissed.has(n.id));
 
