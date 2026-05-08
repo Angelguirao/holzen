@@ -13,8 +13,21 @@ export interface GroundingEntry {
 
 export type GroundingHistoryStats = { totalSessions: number; totalMinutes: number };
 
-export const GROUND_HISTORY_ENTRIES_QUERY_PREFIX = ['tools', 'ground-history', 'entries'] as const;
-export const GROUND_HISTORY_STATS_QUERY_PREFIX = ['tools', 'ground-history', 'stats'] as const;
+export const GROUND_HISTORY_QUERY_PREFIX = ['tools', 'ground-history'] as const;
+
+export const GROUND_HISTORY_ENTRIES_QUERY_LEAF = 'entries' as const;
+
+export const GROUND_HISTORY_ENTRIES_QUERY_PREFIX = [
+  ...GROUND_HISTORY_QUERY_PREFIX,
+  GROUND_HISTORY_ENTRIES_QUERY_LEAF,
+] as const;
+
+export const GROUND_HISTORY_STATS_QUERY_LEAF = 'stats' as const;
+
+export const GROUND_HISTORY_STATS_QUERY_PREFIX = [
+  ...GROUND_HISTORY_QUERY_PREFIX,
+  GROUND_HISTORY_STATS_QUERY_LEAF,
+] as const;
 
 /** Signed-out placeholder segment (this feature predates the repo-wide `__none__` convention). */
 export const GROUND_HISTORY_DISABLED_USER_ID = 'none' as const;
