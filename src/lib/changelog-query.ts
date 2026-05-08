@@ -7,7 +7,14 @@ export type ChangelogEntryRow = Pick<
   'id' | 'version' | 'date' | 'changes' | 'created_at'
 >;
 
-export const CHANGELOG_LATEST_VERSION_QUERY_KEY = ['changelog-entries', 'latest-version'] as const;
+export const CHANGELOG_LATEST_VERSION_QUERY_PREFIX = ['changelog-entries'] as const;
+
+export const CHANGELOG_LATEST_VERSION_QUERY_LEAF = 'latest-version' as const;
+
+export const CHANGELOG_LATEST_VERSION_QUERY_KEY = [
+  ...CHANGELOG_LATEST_VERSION_QUERY_PREFIX,
+  CHANGELOG_LATEST_VERSION_QUERY_LEAF,
+] as const;
 
 export async function fetchLatestChangelogVersion(): Promise<string | null> {
   const { data, error } = await supabase
@@ -32,7 +39,14 @@ export function getLatestChangelogVersionQueryOptions() {
 
 export const CHANGELOG_ENTRIES_PAGE_SIZE = 15;
 
-export const CHANGELOG_ENTRIES_QUERY_KEY = ['changelog', 'entries'] as const;
+export const CHANGELOG_ENTRIES_QUERY_PREFIX = ['changelog'] as const;
+
+export const CHANGELOG_ENTRIES_QUERY_LEAF = 'entries' as const;
+
+export const CHANGELOG_ENTRIES_QUERY_KEY = [
+  ...CHANGELOG_ENTRIES_QUERY_PREFIX,
+  CHANGELOG_ENTRIES_QUERY_LEAF,
+] as const;
 
 export async function fetchChangelogEntriesPage(
   cursor: string | undefined,
