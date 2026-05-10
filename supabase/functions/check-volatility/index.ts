@@ -295,7 +295,7 @@ serve(
               const m = await fetchAssetVolatilityForCurrency(asset, c, log);
               return { asset, c, m };
             } catch (e) {
-              log.error("check_volatility_asset_fetch", {
+              log.warn("check_volatility_asset_fetch", {
                 holzen_event: "check_volatility_cron",
                 phase: "coingecko_failed",
                 coin_id: asset,
@@ -322,12 +322,15 @@ serve(
       metricsByAssetCur.get("bitcoin")?.get("usd") ??
       [...metricsByAssetCur.values()].find((m) => m.has("usd"))?.get("usd");
     if (!usdPeek) {
-      log.error("check_volatility_asset_fetch", {
+      log.warn("check_volatility_asset_fetch", {
         holzen_event: "check_volatility_cron",
         phase: "usd_metrics_missing",
       });
-      return new Response(JSON.stringify({ error: "market_fetch_failed" }), {
-        status: 500,
+      return new Response(JSON.stringify({
+        triggered: 0,
+        skipped: true,
+        reason: "market_fetch_failed",
+      }), {
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
@@ -795,19 +798,27 @@ serve(
                 webpush,
                 { endpoint: sub.endpoint, keys: { p256dh: sub.p256dh, auth: sub.auth } },
                 payload,
-                { notificationTag: "volatility" }
+                { notificationTag: "volatility", expectedStatusCodes: [404, 410] },
               );
             } catch (pushErr: unknown) {
               const sc = webPushStatusCode(pushErr);
-              log.error("check_volatility_push", {
-                holzen_event: "check_volatility_cron",
-                phase: "push_send_failed",
-                status_code: sc,
-                cid,
-                ...unknownErrorForLog(pushErr),
-              });
               if (sc === 410 || sc === 404) {
+                log.warn("check_volatility_push", {
+                  holzen_event: "check_volatility_cron",
+                  phase: "stale_push_subscription",
+                  status_code: sc,
+                  cid,
+                  ...unknownErrorForLog(pushErr),
+                });
                 await supabase.from("push_subscriptions").delete().eq("endpoint", sub.endpoint);
+              } else {
+                log.error("check_volatility_push", {
+                  holzen_event: "check_volatility_cron",
+                  phase: "push_send_failed",
+                  status_code: sc,
+                  cid,
+                  ...unknownErrorForLog(pushErr),
+                });
               }
             }
           }));
