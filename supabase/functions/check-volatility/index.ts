@@ -295,7 +295,7 @@ serve(
               const m = await fetchAssetVolatilityForCurrency(asset, c, log);
               return { asset, c, m };
             } catch (e) {
-              log.error("check_volatility_asset_fetch", {
+              log.warn("check_volatility_asset_fetch", {
                 holzen_event: "check_volatility_cron",
                 phase: "coingecko_failed",
                 coin_id: asset,
@@ -799,7 +799,8 @@ serve(
               );
             } catch (pushErr: unknown) {
               const sc = webPushStatusCode(pushErr);
-              log.error("check_volatility_push", {
+              const logPushFailure = sc === 410 || sc === 404 ? log.warn : log.error;
+              logPushFailure("check_volatility_push", {
                 holzen_event: "check_volatility_cron",
                 phase: "push_send_failed",
                 status_code: sc,
