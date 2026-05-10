@@ -254,9 +254,6 @@ serve(
       { auth: { persistSession: false } }
     );
 
-    const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
-    if (!LOVABLE_API_KEY) throw new Error("LOVABLE_API_KEY not configured");
-
     const { data: profiles, error: profilesError } = await supabase
       .from("profiles")
       .select(
@@ -295,7 +292,7 @@ serve(
               const m = await fetchAssetVolatilityForCurrency(asset, c, log);
               return { asset, c, m };
             } catch (e) {
-              log.error("check_volatility_asset_fetch", {
+              log.warn("check_volatility_asset_fetch", {
                 holzen_event: "check_volatility_cron",
                 phase: "coingecko_failed",
                 coin_id: asset,
@@ -322,12 +319,11 @@ serve(
       metricsByAssetCur.get("bitcoin")?.get("usd") ??
       [...metricsByAssetCur.values()].find((m) => m.has("usd"))?.get("usd");
     if (!usdPeek) {
-      log.error("check_volatility_asset_fetch", {
+      log.warn("check_volatility_asset_fetch", {
         holzen_event: "check_volatility_cron",
         phase: "usd_metrics_missing",
       });
-      return new Response(JSON.stringify({ error: "market_fetch_failed" }), {
-        status: 500,
+      return new Response(JSON.stringify({ triggered: 0, skipped: "market_fetch_failed" }), {
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
@@ -441,6 +437,19 @@ serve(
       eligible: eligible.length,
       total_profiles: profileRows.length,
     });
+
+    const lovableApiKey = Deno.env.get("LOVABLE_API_KEY") ?? "";
+    if (eligible.length > 0 && !lovableApiKey) {
+      log.error("check_volatility_config", {
+        holzen_event: "check_volatility_cron",
+        phase: "lovable_api_key_not_configured",
+        eligible: eligible.length,
+      });
+      return new Response(JSON.stringify({ error: "config_missing", triggered: 0 }), {
+        status: 500,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
 
     // Parse and configure VAPID once — all users share the same keys
     const vapidPublicKey = Deno.env.get("VAPID_PUBLIC_KEY");
@@ -574,7 +583,7 @@ serve(
 
       const { result } = await generateUnifiedReflection({
         context: ctx,
-        apiKey: LOVABLE_API_KEY,
+        apiKey: lovableApiKey,
         tone,
         style,
         language: userLang,
@@ -795,11 +804,12 @@ serve(
                 webpush,
                 { endpoint: sub.endpoint, keys: { p256dh: sub.p256dh, auth: sub.auth } },
                 payload,
-                { notificationTag: "volatility" }
+                { notificationTag: "volatility", expectedStatusCodes: [404, 410] }
               );
             } catch (pushErr: unknown) {
               const sc = webPushStatusCode(pushErr);
-              log.error("check_volatility_push", {
+              const logPushFailure = sc === 410 || sc === 404 ? log.warn : log.error;
+              logPushFailure("check_volatility_push", {
                 holzen_event: "check_volatility_cron",
                 phase: "push_send_failed",
                 status_code: sc,
