@@ -41,26 +41,60 @@ const corsHeaders = {
 
 const DEFAULT_COOLDOWN_MS = 6 * 60 * 60 * 1000; // 6 hours fallback
 
-async function fetchWithRetry(
-  url: string,
+async function fetchMarketMetricsForCurrency(
+  coinIds: string[],
+  vsCurrency: string,
   log: VolatilityFnLog,
   retries = 3,
   delayMs = 2000,
-): Promise<Response> {
+): Promise<Map<string, AssetVolatilityMetrics>> {
+  const ids = [...new Set(coinIds)].map(encodeURIComponent).join(",");
+  const cur = encodeURIComponent(vsCurrency.toLowerCase());
+  const url =
+    `https://api.coingecko.com/api/v3/coins/markets?vs_currency=${cur}` +
+    `&ids=${ids}&price_change_percentage=24h,7d&per_page=250&page=1&sparkline=false`;
+
   for (let i = 0; i < retries; i++) {
     const res = await fetch(url, { headers: coingeckoHeaders() });
-    if (res.ok) return res;
+    if (res.ok) {
+      const rows = await res.json() as Array<{
+        id?: unknown;
+        price_change_percentage_24h?: unknown;
+        price_change_percentage_24h_in_currency?: unknown;
+        price_change_percentage_7d_in_currency?: unknown;
+      }>;
+
+      const byAsset = new Map<string, AssetVolatilityMetrics>();
+      for (const row of rows) {
+        if (typeof row.id !== "string") continue;
+        const change24h = typeof row.price_change_percentage_24h_in_currency === "number"
+          ? row.price_change_percentage_24h_in_currency
+          : row.price_change_percentage_24h;
+        const change7d = row.price_change_percentage_7d_in_currency;
+        if (typeof change24h !== "number" || typeof change7d !== "number") continue;
+
+        byAsset.set(row.id, {
+          changePercent: change24h,
+          direction: change24h >= 0 ? "up" : "down",
+          cumulativeChangePercent: change7d,
+          cumulativeDirection: change7d >= 0 ? "up" : "down",
+        });
+      }
+
+      return byAsset;
+    }
     log.warn("check_volatility_coingecko", {
       holzen_event: "check_volatility_cron",
       phase: "coingecko_http_retry",
       attempt: i + 1,
       status: res.status,
+      vs_currency: vsCurrency.toLowerCase(),
       will_retry: i < retries - 1,
     });
     await res.text(); // consume body
     if (i < retries - 1) await new Promise((r) => setTimeout(r, delayMs * (i + 1)));
   }
-  throw new Error("Failed to fetch market data after retries");
+  throw new Error(`Failed to fetch market data for ${vsCurrency.toLowerCase()} after retries`);
 }
 
 /** CoinGecko quote currency — matches `use-holzen` / `fetchBtcData(currency)` (`profiles.hold_goal_currency`). */
@@ -103,48 +137,6 @@ interface VolatilityProfile {
   mantra?: string | null;
   grounding_activities?: unknown;
   tracked_asset_id?: string | null;
-}
-
-async function fetchAssetVolatilityForCurrency(
-  coinId: string,
-  vsCurrency: string,
-  log: VolatilityFnLog,
-): Promise<AssetVolatilityMetrics> {
-  const cur = vsCurrency.toLowerCase();
-  const id = encodeURIComponent(coinId);
-  const [res1d, res7d] = await Promise.all([
-    fetchWithRetry(
-      `https://api.coingecko.com/api/v3/coins/${id}/market_chart?vs_currency=${cur}&days=1`,
-      log,
-    ),
-    fetchWithRetry(
-      `https://api.coingecko.com/api/v3/coins/${id}/market_chart?vs_currency=${cur}&days=7`,
-      log,
-    ),
-  ]);
-
-  const data1d = await res1d.json();
-  const prices1d: [number, number][] = data1d.prices;
-  if (!prices1d || prices1d.length < 2) throw new Error("Insufficient price data");
-
-  const price24hAgo = prices1d[0][1];
-  const currentPrice = prices1d[prices1d.length - 1][1];
-  const changePercent = ((currentPrice - price24hAgo) / price24hAgo) * 100;
-
-  const data7d = await res7d.json();
-  const prices7d: [number, number][] = data7d.prices;
-  let cumulativeChangePercent = 0;
-  if (prices7d && prices7d.length >= 2) {
-    const price7dAgo = prices7d[0][1];
-    cumulativeChangePercent = ((currentPrice - price7dAgo) / price7dAgo) * 100;
-  }
-
-  return {
-    changePercent,
-    direction: changePercent >= 0 ? "up" : "down",
-    cumulativeChangePercent,
-    cumulativeDirection: cumulativeChangePercent >= 0 ? "up" : "down",
-  };
 }
 
 async function sendNotificationEmail(
@@ -287,47 +279,50 @@ serve(
       if (!curs.has("usd")) curs.add("usd");
     }
 
-    const [pairRows, fearGreedSnapshot, onChainSnapshot] = await Promise.all([
+    const currencies = [...new Set([...assetToCurrencies.values()].flatMap((curs) => [...curs]))];
+    const assets = [...assetToCurrencies.keys()];
+
+    const [currencyRows, fearGreedSnapshot, onChainSnapshot] = await Promise.all([
       Promise.all(
-        [...assetToCurrencies.entries()].flatMap(([asset, curs]) =>
-          [...curs].map(async (c) => {
-            try {
-              const m = await fetchAssetVolatilityForCurrency(asset, c, log);
-              return { asset, c, m };
-            } catch (e) {
-              log.error("check_volatility_asset_fetch", {
-                holzen_event: "check_volatility_cron",
-                phase: "coingecko_failed",
-                coin_id: asset,
-                vs_currency: c,
-                ...unknownErrorForLog(e),
-              });
-              return { asset, c, m: null as AssetVolatilityMetrics | null };
-            }
-          }),
-        ),
+        currencies.map(async (c) => {
+          try {
+            const metrics = await fetchMarketMetricsForCurrency(assets, c, log);
+            return { c, metrics };
+          } catch (e) {
+            log.warn("check_volatility_asset_fetch", {
+              holzen_event: "check_volatility_cron",
+              phase: "coingecko_failed",
+              vs_currency: c,
+              asset_count: assets.length,
+              ...unknownErrorForLog(e),
+            });
+            return { c, metrics: new Map<string, AssetVolatilityMetrics>() };
+          }
+        }),
       ),
       fetchFearGreedSnapshot(),
       fetchOnChainSnapshot(),
     ]);
 
     const metricsByAssetCur = new Map<string, Map<string, AssetVolatilityMetrics>>();
-    for (const row of pairRows) {
-      if (!row.m) continue;
-      if (!metricsByAssetCur.has(row.asset)) metricsByAssetCur.set(row.asset, new Map());
-      metricsByAssetCur.get(row.asset)!.set(row.c, row.m);
+    for (const row of currencyRows) {
+      for (const [asset, metrics] of row.metrics) {
+        if (!metricsByAssetCur.has(asset)) metricsByAssetCur.set(asset, new Map());
+        metricsByAssetCur.get(asset)!.set(row.c, metrics);
+      }
     }
 
     const usdPeek =
       metricsByAssetCur.get("bitcoin")?.get("usd") ??
       [...metricsByAssetCur.values()].find((m) => m.has("usd"))?.get("usd");
     if (!usdPeek) {
-      log.error("check_volatility_asset_fetch", {
+      log.warn("check_volatility_asset_fetch", {
         holzen_event: "check_volatility_cron",
         phase: "usd_metrics_missing",
+        currencies,
+        assets,
       });
-      return new Response(JSON.stringify({ error: "market_fetch_failed" }), {
-        status: 500,
+      return new Response(JSON.stringify({ triggered: 0, skipped: "market_fetch_failed" }), {
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
@@ -346,7 +341,7 @@ serve(
       phase: "market_sample_loaded",
       change24h_pct: Number(usdPeek.changePercent.toFixed(2)),
       change7d_pct: Number(usdPeek.cumulativeChangePercent.toFixed(2)),
-      asset_currency_pairs: pairRows.filter((r) => r.m).length,
+      asset_currency_pairs: [...metricsByAssetCur.values()].reduce((sum, m) => sum + m.size, 0),
     });
 
     // Helper: get user's local hour
@@ -799,7 +794,8 @@ serve(
               );
             } catch (pushErr: unknown) {
               const sc = webPushStatusCode(pushErr);
-              log.error("check_volatility_push", {
+              const logPushFailure = sc === 410 || sc === 404 ? log.warn : log.error;
+              logPushFailure("check_volatility_push", {
                 holzen_event: "check_volatility_cron",
                 phase: "push_send_failed",
                 status_code: sc,
@@ -828,7 +824,7 @@ serve(
       JSON.stringify({
         triggered,
         btcChangeUsd: usdPeek.changePercent,
-        marketPairsLoaded: pairRows.filter((r) => r.m).length,
+        marketPairsLoaded: [...metricsByAssetCur.values()].reduce((sum, m) => sum + m.size, 0),
       }),
       {
         headers: { ...corsHeaders, "Content-Type": "application/json" },
