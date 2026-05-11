@@ -99,6 +99,8 @@ interface WebPushLike {
 export interface SendWebPushOptions {
   /** Optional structured tag (idempotency key, notification type) for log dashboards. */
   notificationTag?: string;
+  /** Statuses like stale push endpoints that callers expect and handle locally. */
+  expectedStatusCodes?: readonly number[];
   /** Optional VAPID/TTL/etc options forwarded to `webpush.sendNotification`. */
   webpushOptions?: Record<string, unknown>;
 }
@@ -140,6 +142,7 @@ export async function sendWebPushWithCid(
     () => webpush.sendNotification(sub, payload, options.webpushOptions),
     {
       operation: "send",
+      expectedStatusCodes: options.expectedStatusCodes,
       extra: {
         endpoint_host: endpointHost,
         ...(options.notificationTag ? { notification_tag: options.notificationTag } : {}),
