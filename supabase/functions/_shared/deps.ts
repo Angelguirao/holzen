@@ -30,6 +30,19 @@ export interface LogDependencyOptions {
   operation?: string;
   /** Extra structured fields — scrubbed before hitting BetterStack via the logger. */
   extra?: Record<string, unknown>;
+  /** Status codes that are expected/recoverable and should log at warn, not error. */
+  expectedStatusCodes?: number[];
+}
+
+function statusCodeFromUnknown(err: unknown): number | undefined {
+  if (typeof err !== "object" || err === null) return undefined;
+  const maybeError = err as {
+    status?: unknown;
+    statusCode?: unknown;
+    response?: { status?: unknown };
+  };
+  const value = maybeError.statusCode ?? maybeError.status ?? maybeError.response?.status;
+  return typeof value === "number" ? value : undefined;
 }
 
 export async function logDependencyCall<T>(
@@ -51,14 +64,23 @@ export async function logDependencyCall<T>(
     return result;
   } catch (err) {
     const message = err instanceof Error ? err.message : String(err);
-    log.error("dependency_call", {
+    const statusCode = statusCodeFromUnknown(err);
+    const expectedStatus = statusCode !== undefined &&
+      options.expectedStatusCodes?.includes(statusCode) === true;
+    const logPayload = {
       dep: dependency,
       status: "error",
       duration_ms: Date.now() - start,
       message,
+      ...(statusCode !== undefined ? { status_code: statusCode } : {}),
       ...(options.operation ? { operation: options.operation } : {}),
       ...(options.extra ?? {}),
-    });
+    };
+    if (expectedStatus) {
+      log.warn("dependency_call", logPayload);
+    } else {
+      log.error("dependency_call", logPayload);
+    }
     throw err;
   }
 }
