@@ -492,13 +492,14 @@ serve(
                   webpush,
                   { endpoint: sub.endpoint, keys: { p256dh: sub.p256dh, auth: sub.auth } },
                   payload,
-                  { notificationTag: "night_reflection" }
+                  { notificationTag: "night_reflection", expectedStatusCodes: [404, 410] }
                 );
               } catch (pushErr: unknown) {
                 const sc = webPushStatusCode(pushErr);
-                log.error("night_reflection_push", {
+                const logPushFailure = sc === 410 || sc === 404 ? log.warn : log.error;
+                logPushFailure("night_reflection_push", {
                   holzen_event: "night_reflection_cron",
-                  phase: "push_send_failed",
+                  phase: sc === 410 || sc === 404 ? "stale_push_subscription_pruned" : "push_send_failed",
                   status_code: sc,
                   ...unknownErrorForLog(pushErr),
                 });

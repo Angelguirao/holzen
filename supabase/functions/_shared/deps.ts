@@ -30,6 +30,23 @@ export interface LogDependencyOptions {
   operation?: string;
   /** Extra structured fields — scrubbed before hitting BetterStack via the logger. */
   extra?: Record<string, unknown>;
+  /**
+   * Dependency-specific status codes that are expected and recoverable.
+   *
+   * The wrapped call still rejects so caller behavior stays unchanged, but the
+   * structured dependency log is downgraded to `warn` to avoid paging on normal
+   * cleanup paths such as stale web-push subscriptions.
+   */
+  expectedStatusCodes?: number[];
+}
+
+function statusCodeFromError(err: unknown): number | null {
+  if (!err || typeof err !== "object") return null;
+  const maybeStatus = (err as { statusCode?: unknown; status?: unknown }).statusCode ??
+    (err as { status?: unknown }).status;
+  return typeof maybeStatus === "number" && Number.isFinite(maybeStatus)
+    ? maybeStatus
+    : null;
 }
 
 export async function logDependencyCall<T>(
@@ -51,14 +68,20 @@ export async function logDependencyCall<T>(
     return result;
   } catch (err) {
     const message = err instanceof Error ? err.message : String(err);
-    log.error("dependency_call", {
+    const statusCode = statusCodeFromError(err);
+    const isExpectedStatus = statusCode !== null &&
+      (options.expectedStatusCodes ?? []).includes(statusCode);
+    const logFields = {
       dep: dependency,
       status: "error",
       duration_ms: Date.now() - start,
       message,
+      ...(statusCode !== null ? { status_code: statusCode } : {}),
       ...(options.operation ? { operation: options.operation } : {}),
       ...(options.extra ?? {}),
-    });
+    };
+    const logger = isExpectedStatus ? log.warn : log.error;
+    logger("dependency_call", logFields);
     throw err;
   }
 }
