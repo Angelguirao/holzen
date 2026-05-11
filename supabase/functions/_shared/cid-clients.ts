@@ -99,6 +99,8 @@ interface WebPushLike {
 export interface SendWebPushOptions {
   /** Optional structured tag (idempotency key, notification type) for log dashboards. */
   notificationTag?: string;
+  /** Push provider HTTP status codes that are expected cleanup paths. */
+  expectedStatusCodes?: number[];
   /** Optional VAPID/TTL/etc options forwarded to `webpush.sendNotification`. */
   webpushOptions?: Record<string, unknown>;
 }
@@ -117,7 +119,9 @@ export interface SendWebPushOptions {
  *     useful pivot for "is FCM down right now?".
  *
  * The helper re-throws on failure so the caller can still inspect
- * `err.statusCode` (e.g. to prune 404/410 subscriptions).
+ * `err.statusCode` (e.g. to prune 404/410 subscriptions). Stale push
+ * subscriptions are common, so 404/410 dependency failures are logged at
+ * warning level by default instead of paging the generic edge-error monitor.
  */
 export async function sendWebPushWithCid(
   log: Logger,
@@ -140,6 +144,7 @@ export async function sendWebPushWithCid(
     () => webpush.sendNotification(sub, payload, options.webpushOptions),
     {
       operation: "send",
+      expectedStatusCodes: options.expectedStatusCodes ?? [404, 410],
       extra: {
         endpoint_host: endpointHost,
         ...(options.notificationTag ? { notification_tag: options.notificationTag } : {}),
