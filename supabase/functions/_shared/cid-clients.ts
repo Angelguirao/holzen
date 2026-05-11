@@ -101,6 +101,8 @@ export interface SendWebPushOptions {
   notificationTag?: string;
   /** Optional VAPID/TTL/etc options forwarded to `webpush.sendNotification`. */
   webpushOptions?: Record<string, unknown>;
+  /** Web-push status codes the caller handles as routine cleanup. */
+  expectedStatusCodes?: number[];
 }
 
 /**
@@ -144,6 +146,7 @@ export async function sendWebPushWithCid(
         endpoint_host: endpointHost,
         ...(options.notificationTag ? { notification_tag: options.notificationTag } : {}),
       },
+      expectedStatusCodes: options.expectedStatusCodes,
     },
   );
 }
