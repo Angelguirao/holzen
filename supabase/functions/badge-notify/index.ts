@@ -9,6 +9,7 @@ const corsHeaders = {
   "Access-Control-Allow-Headers":
     "authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version",
 };
+const STALE_PUSH_STATUS_CODES = [404, 410];
 
 serve(
   withRequestLogging("badge-notify", async ({ req, log, cid }) => {
@@ -108,7 +109,7 @@ serve(
           webpush,
           { endpoint: sub.endpoint, keys: { p256dh: sub.p256dh, auth: sub.auth } },
           payload,
-          { notificationTag: "badge" }
+          { notificationTag: "badge", expectedStatusCodes: STALE_PUSH_STATUS_CODES }
         );
         sent++;
       } catch (pushErr: unknown) {

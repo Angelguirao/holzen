@@ -14,6 +14,7 @@ const corsHeaders = {
   "Access-Control-Allow-Headers":
     "authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version",
 };
+const STALE_PUSH_STATUS_CODES = [404, 410];
 
 function getUserLocalHour(timezone: string): number {
   try {
@@ -492,13 +493,14 @@ serve(
                   webpush,
                   { endpoint: sub.endpoint, keys: { p256dh: sub.p256dh, auth: sub.auth } },
                   payload,
-                  { notificationTag: "night_reflection" }
+                  { notificationTag: "night_reflection", expectedStatusCodes: STALE_PUSH_STATUS_CODES }
                 );
               } catch (pushErr: unknown) {
                 const sc = webPushStatusCode(pushErr);
-                log.error("night_reflection_push", {
+                const pushLog = sc === 410 || sc === 404 ? log.warn : log.error;
+                pushLog("night_reflection_push", {
                   holzen_event: "night_reflection_cron",
-                  phase: "push_send_failed",
+                  phase: sc === 410 || sc === 404 ? "stale_push_subscription" : "push_send_failed",
                   status_code: sc,
                   ...unknownErrorForLog(pushErr),
                 });

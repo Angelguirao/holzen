@@ -15,6 +15,7 @@ const corsHeaders = {
   "Access-Control-Allow-Headers":
     "authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version",
 };
+const STALE_PUSH_STATUS_CODES = [404, 410];
 
 type Mode = "subscription" | "flex_pack_s" | "flex_pack_m";
 
@@ -198,7 +199,7 @@ serve(
               webpush,
               { endpoint: sub.endpoint, keys: { p256dh: sub.p256dh, auth: sub.auth } },
               payload,
-              { notificationTag: idempotencyKey },
+              { notificationTag: idempotencyKey, expectedStatusCodes: STALE_PUSH_STATUS_CODES },
             );
             pushed++;
           } catch (pushErr: unknown) {
