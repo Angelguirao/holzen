@@ -492,18 +492,24 @@ serve(
                   webpush,
                   { endpoint: sub.endpoint, keys: { p256dh: sub.p256dh, auth: sub.auth } },
                   payload,
-                  { notificationTag: "night_reflection" }
+                  { notificationTag: "night_reflection", expectedStatusCodes: [404, 410] },
                 );
               } catch (pushErr: unknown) {
                 const sc = webPushStatusCode(pushErr);
-                log.error("night_reflection_push", {
-                  holzen_event: "night_reflection_cron",
-                  phase: "push_send_failed",
-                  status_code: sc,
-                  ...unknownErrorForLog(pushErr),
-                });
                 if (sc === 410 || sc === 404) {
+                  log.warn("night_reflection_push", {
+                    holzen_event: "night_reflection_cron",
+                    phase: "push_subscription_stale",
+                    status_code: sc,
+                  });
                   await supabase.from("push_subscriptions").delete().eq("endpoint", sub.endpoint);
+                } else {
+                  log.error("night_reflection_push", {
+                    holzen_event: "night_reflection_cron",
+                    phase: "push_send_failed",
+                    status_code: sc,
+                    ...unknownErrorForLog(pushErr),
+                  });
                 }
               }
             }
