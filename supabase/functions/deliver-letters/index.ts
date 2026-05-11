@@ -221,7 +221,7 @@ serve(
                   webpush,
                   { endpoint: sub.endpoint, keys: { p256dh: sub.p256dh, auth: sub.auth } },
                   payload,
-                  { notificationTag: "letter" }
+                  { notificationTag: "letter", expectedStatusCodes: [404, 410] },
                 );
               } catch (pushErr: unknown) {
                 const sc = webPushStatusCode(pushErr);
