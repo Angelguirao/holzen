@@ -11,6 +11,8 @@ const corsHeaders = {
     "authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version",
 };
 
+const STALE_PUSH_STATUS_CODES = [404, 410] as const;
+
 async function fetchWithRetry(url: string, retries = 3, delayMs = 2000): Promise<Response> {
   for (let i = 0; i < retries; i++) {
     const res = await fetch(url, { headers: coingeckoHeaders() });
@@ -221,7 +223,10 @@ serve(
                   webpush,
                   { endpoint: sub.endpoint, keys: { p256dh: sub.p256dh, auth: sub.auth } },
                   payload,
-                  { notificationTag: "letter" }
+                  {
+                    notificationTag: "letter",
+                    expectedStatusCodes: STALE_PUSH_STATUS_CODES,
+                  }
                 );
               } catch (pushErr: unknown) {
                 const sc = webPushStatusCode(pushErr);
