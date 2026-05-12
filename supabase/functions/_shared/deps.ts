@@ -30,6 +30,15 @@ export interface LogDependencyOptions {
   operation?: string;
   /** Extra structured fields — scrubbed before hitting BetterStack via the logger. */
   extra?: Record<string, unknown>;
+  /** Upstream HTTP statuses that are handled by the caller and should not page. */
+  expectedStatusCodes?: number[];
+}
+
+function statusCodeFromUnknown(err: unknown): number | null {
+  if (!err || typeof err !== "object") return null;
+  const record = err as Record<string, unknown>;
+  const statusCode = record.statusCode ?? record.status;
+  return typeof statusCode === "number" && Number.isFinite(statusCode) ? statusCode : null;
 }
 
 export async function logDependencyCall<T>(
@@ -51,11 +60,16 @@ export async function logDependencyCall<T>(
     return result;
   } catch (err) {
     const message = err instanceof Error ? err.message : String(err);
-    log.error("dependency_call", {
+    const statusCode = statusCodeFromUnknown(err);
+    const expectedStatus = statusCode !== null && options.expectedStatusCodes?.includes(statusCode) === true;
+    const logFailure = expectedStatus ? log.warn : log.error;
+    logFailure("dependency_call", {
       dep: dependency,
       status: "error",
       duration_ms: Date.now() - start,
       message,
+      ...(statusCode !== null ? { status_code: statusCode } : {}),
+      ...(expectedStatus ? { expected_status: true } : {}),
       ...(options.operation ? { operation: options.operation } : {}),
       ...(options.extra ?? {}),
     });
