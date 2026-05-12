@@ -76,6 +76,7 @@ export function HomePauseCardBody({
     openPauseState === 'engaged'
       ? t('home.pauseCtaEngaged')
       : t('home.pauseCtaActive');
+  const hasOpenPause = Boolean(message || openPauseState);
 
   return (
     <div className="space-y-4">
@@ -102,7 +103,7 @@ export function HomePauseCardBody({
             <p className={homeInWidget.meta}>{t('home.subscription.freeRemaining', { count: monthlyRemaining })}</p>
           )}
 
-          {message ? (
+          {hasOpenPause ? (
             <div className="space-y-4">
               {pending ? (
                 <div

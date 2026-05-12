@@ -122,11 +122,14 @@ export function computePauseSessionResolved(
   p: PauseSessionResolvedInput,
 ): PauseSessionHydrationReady | null {
   if (p.hydration.status === 'ready') return p.hydration;
-  if (p.hydration.status === 'fetch' && p.fetchedInstance?.reflection_message) {
+  if (p.hydration.status === 'fetch' && p.fetchedInstance) {
     const f = p.fetchedInstance;
+    const message = f.reflection_message.trim() || f.context?.trim() || '';
+    if (!message) return null;
+
     return {
       status: 'ready',
-      message: f.reflection_message,
+      message,
       context: f.context ?? null,
       pauseInstanceId: f.id,
       companions: {

@@ -528,18 +528,22 @@ export function useHolzen() {
   );
 
   const dismissMessage = useCallback(async () => {
-    setMessage(null);
-    setContext(null);
-    setCompanions({ haiku: null, groundingTitle: null, groundingBody: null });
-    setLastPauseInstanceId(null);
-    setOpenPauseState(null);
-    if (!user) return;
-    try {
-      await supabase.rpc('pause_dismiss_current' as never);
-    } catch {
-      /* non-fatal */
+    if (!user) {
+      clearOpenPausePreview();
+      return;
     }
-  }, [user]);
+
+    const { error } = await supabase.rpc('pause_dismiss_current' as never);
+    if (error) {
+      holzenLog.pause('dismiss current pause failed; resyncing from DB', {
+        message: error.message,
+      });
+      await syncOpenPauseFromDb();
+      return;
+    }
+
+    clearOpenPausePreview();
+  }, [user, clearOpenPausePreview, syncOpenPauseFromDb]);
 
   const refreshProfile = useCallback(async () => {
     // No-op in V2; the realtime subscription on pause_instances handles

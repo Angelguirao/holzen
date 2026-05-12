@@ -188,11 +188,11 @@ describe('computePauseSessionResolved', () => {
     ).toBeNull();
   });
 
-  it('returns null when fetch instance has empty reflection_message', () => {
+  it('uses context as a fallback when fetch instance has empty reflection_message', () => {
     const inst: FetchedPauseInstance = {
       id: 'p',
       reflection_message: '',
-      context: null,
+      context: 'BTC moved quickly.',
       haiku: null,
       grounding_title: null,
       grounding_body: null,
@@ -204,6 +204,39 @@ describe('computePauseSessionResolved', () => {
         navCompanionPrefs: prefsB,
         holzenCompanionPrefs: DEFAULT_PREFS,
         navSeverity: 'moderate',
+        holzenSeverity: 'mild',
+      }),
+    ).toEqual({
+      status: 'ready',
+      message: 'BTC moved quickly.',
+      context: 'BTC moved quickly.',
+      pauseInstanceId: 'p',
+      companions: {
+        haiku: null,
+        groundingTitle: null,
+        groundingBody: null,
+      },
+      companionPrefs: prefsB,
+      severity: 'moderate',
+    });
+  });
+
+  it('returns null when fetch instance has no reflection_message or context fallback', () => {
+    const inst: FetchedPauseInstance = {
+      id: 'p-empty',
+      reflection_message: '',
+      context: null,
+      haiku: null,
+      grounding_title: null,
+      grounding_body: null,
+    };
+    expect(
+      computePauseSessionResolved({
+        hydration: { status: 'fetch', pauseInstanceId: 'p-empty' },
+        fetchedInstance: inst,
+        navCompanionPrefs: undefined,
+        holzenCompanionPrefs: DEFAULT_PREFS,
+        navSeverity: undefined,
         holzenSeverity: 'mild',
       }),
     ).toBeNull();

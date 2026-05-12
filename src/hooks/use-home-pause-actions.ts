@@ -76,7 +76,7 @@ export function useHomePauseActions(args: {
     holzenLog.home('Navigate to /pause (pause with this message)', {
       pauseInstanceId: lastPauseInstanceId,
       severity,
-      messageLen: message.length,
+      messageLen: message?.length ?? 0,
       hasContext: !!context,
       companionKeys: companions
         ? Object.entries(companions)
