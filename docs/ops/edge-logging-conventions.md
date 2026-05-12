@@ -43,6 +43,7 @@ Edge function
 3. **Wrap external calls with `logDependencyCall(log, dependency, fn, options?)`.**
    - `dependency`: one of `anthropic`, `perplexity`, `lovable-email`, `stripe`, `supabase-db`, `lovable-ai-gateway`, `coingecko`, `crossref`, `firecrawl`, or a new well-known name.
    - `options.operation`: human-readable operation (`chat.completions`, `customers.list`, `emails.send`, `from.table.select`, …). Optional but useful for dashboards.
+   - `options.expectedStatusCodes`: upstream HTTP statuses that are expected cleanup/retry signals (for example stale web-push `404`/`410`). These still log a `dependency_call`, but at warn level with `status: "expected_error"` so they remain searchable without tripping error alerts.
    - On success: `dependency_call` log with `status: "ok"` + `duration_ms`.
    - On error: `dependency_call` log at error level with `status: "error"`, `duration_ms`, and message. The error re-throws so the wrapper's catch can decide the `EdgeError` shape.
    - **Don't** pass full request/response bodies. `logDependencyCall` logs specs only by contract.
