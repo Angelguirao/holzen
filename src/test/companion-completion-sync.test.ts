@@ -14,6 +14,23 @@ describe('deriveBreathingUiCompleteFromPayloads', () => {
     expect(deriveBreathingUiCompleteFromPayloads([{ payload: { skipped: true } }])).toBe(true);
   });
 
+  it('treats brief ritual segment 1 as complete without requiring segment 2', () => {
+    expect(
+      deriveBreathingUiCompleteFromPayloads([
+        { payload: { brief_ritual: true, breath_segment: 1 } },
+      ]),
+    ).toBe(true);
+  });
+
+  it('ignores brief ritual payloads that do not identify the first breath segment', () => {
+    expect(
+      deriveBreathingUiCompleteFromPayloads([
+        { payload: { brief_ritual: true } },
+        { payload: { brief_ritual: true, breath_segment: 2 } },
+      ]),
+    ).toBe(false);
+  });
+
   it('is false when only segment 1 is logged', () => {
     expect(deriveBreathingUiCompleteFromPayloads([{ payload: { breath_segment: 1 } }])).toBe(false);
   });
