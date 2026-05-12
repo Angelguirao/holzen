@@ -30,6 +30,23 @@ export interface LogDependencyOptions {
   operation?: string;
   /** Extra structured fields — scrubbed before hitting BetterStack via the logger. */
   extra?: Record<string, unknown>;
+  /**
+   * Upstream status codes that are operationally expected for this call.
+   * The error is still re-thrown so callers keep their normal cleanup/retry
+   * behavior, but the dependency log is downgraded to warn-level.
+   */
+  expectedStatusCodes?: number[];
+}
+
+function errorStatusCode(err: unknown): number | null {
+  if (!err || typeof err !== "object") return null;
+  const record = err as {
+    statusCode?: unknown;
+    status?: unknown;
+    response?: { status?: unknown };
+  };
+  const raw = record.statusCode ?? record.status ?? record.response?.status;
+  return typeof raw === "number" && Number.isFinite(raw) ? raw : null;
 }
 
 export async function logDependencyCall<T>(
@@ -51,14 +68,22 @@ export async function logDependencyCall<T>(
     return result;
   } catch (err) {
     const message = err instanceof Error ? err.message : String(err);
-    log.error("dependency_call", {
+    const statusCode = errorStatusCode(err);
+    const expected = statusCode !== null && options.expectedStatusCodes?.includes(statusCode) === true;
+    const payload = {
       dep: dependency,
-      status: "error",
+      status: expected ? "expected_error" : "error",
       duration_ms: Date.now() - start,
       message,
+      ...(statusCode !== null ? { status_code: statusCode } : {}),
       ...(options.operation ? { operation: options.operation } : {}),
       ...(options.extra ?? {}),
-    });
+    };
+    if (expected) {
+      log.warn("dependency_call", payload);
+    } else {
+      log.error("dependency_call", payload);
+    }
     throw err;
   }
 }

@@ -101,6 +101,11 @@ export interface SendWebPushOptions {
   notificationTag?: string;
   /** Optional VAPID/TTL/etc options forwarded to `webpush.sendNotification`. */
   webpushOptions?: Record<string, unknown>;
+  /**
+   * Delivery status codes the caller handles as expected maintenance, such as
+   * stale browser subscriptions returning 404/410.
+   */
+  expectedStatusCodes?: number[];
 }
 
 /**
@@ -140,6 +145,7 @@ export async function sendWebPushWithCid(
     () => webpush.sendNotification(sub, payload, options.webpushOptions),
     {
       operation: "send",
+      expectedStatusCodes: options.expectedStatusCodes,
       extra: {
         endpoint_host: endpointHost,
         ...(options.notificationTag ? { notification_tag: options.notificationTag } : {}),

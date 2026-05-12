@@ -142,8 +142,8 @@ also catches.
 - [`_shared/cors.ts`](./_shared/cors.ts) — preflight + allow-list.
 - [`_shared/edge-error.ts`](./_shared/edge-error.ts) — typed error envelope.
 - [`_shared/observe.ts`](./_shared/observe.ts) — `createLogger` + BetterStack forwarder.
-- [`_shared/deps.ts`](./_shared/deps.ts) — `logDependencyCall` for outbound HTTP.
-- [`_shared/cid-clients.ts`](./_shared/cid-clients.ts) — `createCidSupabaseClient` + `sendWebPushWithCid`: drop-in helpers that propagate the request `cid` to Supabase REST/Auth (via the `x-cid` header — reaches `audit_log.cid`) and to web-push deliveries (logged as `dependency_call dep=webpush` with cid + endpoint host). **Use these instead of bare `createClient(...)` and `webpush.sendNotification(...)`** so cross-surface joins don't break at the function boundary.
+- [`_shared/deps.ts`](./_shared/deps.ts) — `logDependencyCall` for outbound HTTP, including `expectedStatusCodes` for caller-handled upstream failures.
+- [`_shared/cid-clients.ts`](./_shared/cid-clients.ts) — `createCidSupabaseClient` + `sendWebPushWithCid`: drop-in helpers that propagate the request `cid` to Supabase REST/Auth (via the `x-cid` header — reaches `audit_log.cid`) and to web-push deliveries (logged as `dependency_call dep=webpush` with cid + endpoint host). Pass `expectedStatusCodes: [404, 410]` when pruning stale push subscriptions. **Use these instead of bare `createClient(...)` and `webpush.sendNotification(...)`** so cross-surface joins don't break at the function boundary.
 - [`_shared/audit.ts`](./_shared/audit.ts) — `logAudit` for security writes.
 - [`docs/ops/edge-logging-conventions.md`](../../docs/ops/edge-logging-conventions.md) — full contract.
 - [`docs/ops/observability-setup.md`](../../docs/ops/observability-setup.md) — DSNs, alerts, dashboards.
