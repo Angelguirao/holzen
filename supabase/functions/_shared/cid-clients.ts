@@ -28,7 +28,7 @@ import {
   type SupabaseClient,
   type SupabaseClientOptions,
 } from "https://esm.sh/@supabase/supabase-js@2.57.2";
-import { logDependencyCall } from "./deps.ts";
+import { logDependencyCall, type LogDependencyOptions } from "./deps.ts";
 import type { createLogger } from "./observe.ts";
 
 type Logger = ReturnType<typeof createLogger>;
@@ -99,6 +99,8 @@ interface WebPushLike {
 export interface SendWebPushOptions {
   /** Optional structured tag (idempotency key, notification type) for log dashboards. */
   notificationTag?: string;
+  /** Statuses such as 404/410 mean stale subscriptions and should not page. */
+  expectedStatusCodes?: LogDependencyOptions["expectedStatusCodes"];
   /** Optional VAPID/TTL/etc options forwarded to `webpush.sendNotification`. */
   webpushOptions?: Record<string, unknown>;
 }
@@ -140,6 +142,7 @@ export async function sendWebPushWithCid(
     () => webpush.sendNotification(sub, payload, options.webpushOptions),
     {
       operation: "send",
+      expectedStatusCodes: options.expectedStatusCodes,
       extra: {
         endpoint_host: endpointHost,
         ...(options.notificationTag ? { notification_tag: options.notificationTag } : {}),
