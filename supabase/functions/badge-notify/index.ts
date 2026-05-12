@@ -108,7 +108,7 @@ serve(
           webpush,
           { endpoint: sub.endpoint, keys: { p256dh: sub.p256dh, auth: sub.auth } },
           payload,
-          { notificationTag: "badge" }
+          { notificationTag: "badge", expectedStatusCodes: [404, 410] },
         );
         sent++;
       } catch (pushErr: unknown) {
