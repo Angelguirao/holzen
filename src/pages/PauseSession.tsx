@@ -485,12 +485,11 @@ export default function PauseSession() {
     shiftIntensity,
   });
 
-  const { depthContextLine, briefMacroLine } = usePauseSessionDepthAndBriefCopy({
+  const { depthContextLine } = usePauseSessionDepthAndBriefCopy({
     t,
     btcData,
     trackedAssetId,
     ritualEntry,
-    briefStep,
   });
 
   const { goToBriefPastStep } = usePauseSessionBriefPastStep({
@@ -514,6 +513,7 @@ export default function PauseSession() {
   const scaffoldRitualDerived = buildPauseSessionScaffoldRitualDerived({
     ritualEntry,
     step,
+    briefStep: ritualEntry === 'brief' ? briefStep : undefined,
     t,
   });
 
@@ -611,7 +611,6 @@ export default function PauseSession() {
               goToStep={goToStep}
               onHeaderBack={handlePauseHeaderBack}
               showHeaderBack={showPauseHeaderBack}
-              macroProgressLine={briefMacroLine ?? scaffoldRitualDerived.macroProgressLine}
               stepperSlot={briefStepperSlot}
               breathSecondLabelVariant={breathSecondLabelVariant}
               soundMuted={soundMuted}

@@ -1342,7 +1342,8 @@
     "openMaxCountdown": "{{remaining}} left in this ritual window",
     "brief": {
       "sessionTitle": "Your brief pause",
-      "macroProgress": "Step {{n}} of {{total}} · ~2 min",
+      "macroStepCount": "{{n}} of {{total}}",
+      "feelStepDurationHint": "~ 15 sec",
       "steps": {
         "feel": "Feel",
         "breath": "Breathe",
@@ -1427,7 +1428,7 @@
     "pendingDeclineFailed": "Could not dismiss the offer. Try again.",
     "breathYouAreHere": "You're here",
     "breathIntroKicker": "Step 1 · Breathe",
-    "macroProgress": "Step {{n}} of {{total}} · under ~15 min",
+    "macroProgress": "{{n}} of {{total}} · under ~15 min",
     "muteAriaOn": "Sound on (tap to mute)",
     "muteAriaOff": "Sound off (tap to unmute)",
     "chooseBridgeKicker": "Step 6 · Decide",

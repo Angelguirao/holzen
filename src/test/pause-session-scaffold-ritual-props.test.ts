@@ -7,6 +7,8 @@ const t = ((
   opts?: { defaultValue?: string; n?: number; total?: number },
 ): string => {
   if (key === 'pause.brief.sessionTitle') return 'Brief title';
+  if (key === 'pause.brief.macroStepCount') return `${opts?.n ?? '?'} of ${opts?.total ?? '?'}`;
+  if (key === 'pause.brief.feelStepDurationHint') return '~ 15 sec';
   if (key === 'pause.deep.sessionTitle') return 'Deep title';
   if (key === 'pause.deep.macroStepCount') return `${opts?.n ?? '?'} of ${opts?.total ?? '?'}`;
   if (key === 'pause.deep.feelStepDurationHint') return '~ 15 sec';
@@ -14,7 +16,35 @@ const t = ((
 }) as TFunction;
 
 describe('buildPauseSessionScaffoldRitualDerived', () => {
-  it('brief: no macro index, session title', () => {
+  it('brief feel: macro count + duration under, session title', () => {
+    expect(
+      buildPauseSessionScaffoldRitualDerived({
+        ritualEntry: 'brief',
+        step: 'feel',
+        briefStep: 'feel',
+        t,
+      }),
+    ).toEqual({
+      macroStepIndex: 1,
+      macroStepTotal: 4,
+      sessionTitle: 'Brief title',
+      macroProgressLine: '1 of 4',
+      macroProgressSubline: '~ 15 sec',
+    });
+  });
+
+  it('brief breath: macro count only (no duration line)', () => {
+    const d = buildPauseSessionScaffoldRitualDerived({
+      ritualEntry: 'brief',
+      step: 'feel',
+      briefStep: 'breath',
+      t,
+    });
+    expect(d.macroProgressLine).toBe('2 of 4');
+    expect(d.macroProgressSubline).toBeUndefined();
+  });
+
+  it('brief without briefStep: title only (macro unset)', () => {
     expect(
       buildPauseSessionScaffoldRitualDerived({
         ritualEntry: 'brief',
