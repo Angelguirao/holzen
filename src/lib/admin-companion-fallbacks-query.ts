@@ -1,4 +1,5 @@
 import { supabase } from '@/integrations/supabase/client';
+import { ADMIN_QUERY_PREFIX } from '@/lib/admin-query-namespace';
 
 export type FallbackPoolType = 'signal' | 'grounding' | 'history' | 'zoom_out' | 'reflection';
 
@@ -12,7 +13,7 @@ export interface CompanionFallbackRow {
   updated_at: string;
 }
 
-export const ADMIN_COMPANION_FALLBACKS_QUERY_PREFIX = ['admin', 'companion-fallbacks'] as const;
+export const ADMIN_COMPANION_FALLBACKS_QUERY_PREFIX = [...ADMIN_QUERY_PREFIX, 'companion-fallbacks'] as const;
 
 export const ADMIN_COMPANION_FALLBACKS_QUERY_LEAF = 'all' as const;
 

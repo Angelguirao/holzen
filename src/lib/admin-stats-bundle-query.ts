@@ -6,6 +6,7 @@
 import { supabase } from '@/integrations/supabase/client';
 import type { Json } from '@/integrations/supabase/types';
 import type { UseQueryOptions } from '@tanstack/react-query';
+import { ADMIN_QUERY_PREFIX } from '@/lib/admin-query-namespace';
 
 /** Admin dashboard period filter (cost analytics + in-hook period aggregation). */
 export type TimePeriod = 'today' | '7d' | '30d' | 'all';
@@ -160,13 +161,11 @@ export interface LibraryEntryRow {
 }
 
 /** TanStack prefix segment(s) for `/admin` monitoring queries (`useAdminStats`). */
-export const ADMIN_STATS_QUERY_PREFIX = ['admin'] as const;
-
 export const ADMIN_STATS_BUNDLE_QUERY_LEAF = 'stats' as const;
 
 /** TanStack Query key for the admin monitoring bundle (`useAdminStats`). */
 export const ADMIN_STATS_QUERY_KEY = [
-  ...ADMIN_STATS_QUERY_PREFIX,
+  ...ADMIN_QUERY_PREFIX,
   ADMIN_STATS_BUNDLE_QUERY_LEAF,
 ] as const;
 

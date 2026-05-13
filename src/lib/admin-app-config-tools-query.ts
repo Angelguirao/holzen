@@ -1,4 +1,5 @@
 import { supabase } from '@/integrations/supabase/client';
+import { ADMIN_QUERY_PREFIX } from '@/lib/admin-query-namespace';
 import {
   mergePregenerateCacheTopup,
   type PregenerateCacheTopupConfig,
@@ -137,7 +138,7 @@ async function loadSpendSnapshot(): Promise<SpendSnapshot> {
   };
 }
 
-export const ADMIN_APP_CONFIG_TOOLS_QUERY_PREFIX = ['admin', 'app-config-tools'] as const;
+export const ADMIN_APP_CONFIG_TOOLS_QUERY_PREFIX = [...ADMIN_QUERY_PREFIX, 'app-config-tools'] as const;
 
 export const ADMIN_APP_CONFIG_TOOLS_QUERY_LEAF = 'bundle' as const;
 

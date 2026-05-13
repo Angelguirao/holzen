@@ -1,5 +1,6 @@
 import { supabase } from '@/integrations/supabase/client';
 import type { TimePeriod } from '@/lib/admin-stats-bundle-query';
+import { ADMIN_QUERY_PREFIX } from '@/lib/admin-query-namespace';
 import { PRICING } from '@/lib/pricing';
 
 /** Raw rows for admin cost aggregation (`generation_attempts`). */
@@ -43,7 +44,7 @@ export async function fetchGenerationAttemptsForPeriod(
 }
 
 /** Shared `['admin', 'cost', …]` namespace for cost analytics TanStack caches. */
-export const ADMIN_COST_QUERY_PREFIX = ['admin', 'cost'] as const;
+export const ADMIN_COST_QUERY_PREFIX = [...ADMIN_QUERY_PREFIX, 'cost'] as const;
 
 export const ADMIN_COST_GENERATION_ATTEMPTS_QUERY_LEAF = 'generation-attempts' as const;
 

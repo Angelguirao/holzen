@@ -1,4 +1,5 @@
 import { supabase } from '@/integrations/supabase/client';
+import { ADMIN_QUERY_PREFIX } from '@/lib/admin-query-namespace';
 
 export function readLocalDevMode(): boolean {
   try {
@@ -8,7 +9,7 @@ export function readLocalDevMode(): boolean {
   }
 }
 
-export const ADMIN_DEV_MODE_SETTING_QUERY_PREFIX = ['admin', 'dev-mode-setting'] as const;
+export const ADMIN_DEV_MODE_SETTING_QUERY_PREFIX = [...ADMIN_QUERY_PREFIX, 'dev-mode-setting'] as const;
 
 export const ADMIN_DEV_MODE_SETTING_DISABLED_USER_ID = 'none' as const;
 

@@ -1,4 +1,5 @@
 import { supabase } from '@/integrations/supabase/client';
+import { ADMIN_QUERY_PREFIX } from '@/lib/admin-query-namespace';
 
 export interface AppliedMigrationRow {
   version: string;
@@ -6,12 +7,10 @@ export interface AppliedMigrationRow {
   statements_count: number;
 }
 
-export const ADMIN_APPLIED_MIGRATIONS_QUERY_PREFIX = ['admin'] as const;
-
 export const ADMIN_APPLIED_MIGRATIONS_QUERY_LEAF = 'applied-migrations' as const;
 
 export const ADMIN_APPLIED_MIGRATIONS_QUERY_KEY = [
-  ...ADMIN_APPLIED_MIGRATIONS_QUERY_PREFIX,
+  ...ADMIN_QUERY_PREFIX,
   ADMIN_APPLIED_MIGRATIONS_QUERY_LEAF,
 ] as const;
 
