@@ -84,7 +84,8 @@ export function buildPauseSessionScaffoldRitualPayloads(
       severity: p.severity,
       breathingFirstCompleted: p.breathingFirstCompleted,
       onTimedBreathingChange: p.setBreathTimedActive,
-      onBriefBreathPatternComplete: () => p.setBreathingFirstCompleted(true),
+      /** Brief: first segment “completed” is set after `breath_completed` RPC in `handleBriefBreathContinue`. */
+      onBriefBreathPatternComplete: () => {},
       onContinueAfterBriefBreath: () => void p.handleBriefBreathContinue(),
       onSkipBriefBreath: p.handleBriefSkipBreath,
       ritualSoundMuted: p.soundMuted,

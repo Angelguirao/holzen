@@ -1,4 +1,4 @@
-import { useState, useEffect, useImperativeHandle, forwardRef, useRef } from 'react';
+import { useState, useEffect, useImperativeHandle, forwardRef, useRef, useLayoutEffect } from 'react';
 import { motion, useReducedMotion } from 'framer-motion';
 import { Play } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
@@ -101,9 +101,9 @@ interface Props {
    * `deep` — deep intro kickers + hints; pattern from severity (box vs calming); `breathing.phaseHints.sigh` if pattern index 2.
    */
   ritualVariant?: 'brief' | 'deep';
-  /** First segment after Feel; second after Frame (Figma deep pause). */
+  /** First segment after Feel; second segment after Frame (deep pause only). */
   breathSegment?: PauseBreathSegment;
-  /** After full breath cycles: interstitial → parent logs `breath_completed` then navigates onward. */
+  /** After full breath cycles: deep shows an interstitial then continues; brief auto-invokes (Integrate). */
   onContinueAfterBreath: () => void;
   /** Intro or mid-pattern skip: leave breath without logging completion. */
   onSkipBreath: () => void | Promise<void>;
@@ -114,6 +114,14 @@ interface Props {
   onTimedBreathingChange?: (active: boolean) => void;
   /** Header mute: when true, phase ticks and pattern-complete chime are suppressed. */
   ritualSoundMuted?: boolean;
+}
+
+/** Brief ritual: no post-pattern card; advance as soon as the timed cycles finish. */
+function BriefBreathAdvanceToIntegrate({ onContinue }: { onContinue: () => void | Promise<unknown> }) {
+  useLayoutEffect(() => {
+    void onContinue();
+  }, [onContinue]);
+  return null;
 }
 
 export const PauseBreathing = forwardRef<PauseBreathingHandle, Props>(function PauseBreathing(
@@ -184,8 +192,10 @@ export const PauseBreathing = forwardRef<PauseBreathingHandle, Props>(function P
             if (nextCycle >= totalCycles) {
               const o = cueOptsRef.current;
               playPauseBreathPatternCompleteCue({ muted: o.muted, prefersReducedMotion: o.prefersReduced });
+              if (ritualVariant !== 'brief') {
+                onPatternComplete?.();
+              }
               setCompletedLocal(true);
-              onPatternComplete?.();
               hapticFeedback('success');
               return 0;
             }
@@ -216,6 +226,7 @@ export const PauseBreathing = forwardRef<PauseBreathingHandle, Props>(function P
     currentPhase.duration,
     pattern.phases.length,
     onPatternComplete,
+    ritualVariant,
     totalCycles,
   ]);
 
@@ -365,6 +376,8 @@ export const PauseBreathing = forwardRef<PauseBreathingHandle, Props>(function P
             })}
           </p>
         </motion.div>
+      ) : ritualVariant === 'brief' ? (
+        <BriefBreathAdvanceToIntegrate onContinue={onContinueAfterBreath} />
       ) : (
         <motion.div
           initial={{ opacity: 0, y: 8 }}
