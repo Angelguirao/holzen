@@ -2,8 +2,11 @@ import { describe, expect, it, vi, beforeEach } from 'vitest';
 import { renderHook, act } from '@testing-library/react';
 import type { TFunction } from 'i18next';
 import { usePauseFavoriteToggle } from '@/hooks/use-pause-favorite-toggle';
-import { pauseArchiveListQueryPrefix } from '@/lib/pause-archive-list-query';
 import { showPauseFavoriteProHintToast } from '@/lib/pause-favorite-toast';
+
+vi.mock('@/lib/pause-archive-list-query', () => ({
+  pauseArchiveListQueryPrefix: (userId: string) => ['pause-archive', userId] as const,
+}));
 
 const { pauseLogStepMock, invalidateQueriesMock } = vi.hoisted(() => ({
   pauseLogStepMock: vi.fn(),
@@ -29,6 +32,9 @@ vi.mock('@/lib/pause-favorite-toast', () => ({
 vi.mock('@/lib/haptics', () => ({
   hapticFeedback: vi.fn(),
 }));
+
+/** Mirrors `pauseArchiveListQueryPrefix` without loading the real module (Supabase client). */
+const archiveListPrefix = (userId: string) => ['pause-archive', userId] as const;
 
 const t = ((k: string) => k) as TFunction;
 
@@ -80,7 +86,7 @@ describe('usePauseFavoriteToggle', () => {
     });
     expect(showPauseFavoriteProHintToast).toHaveBeenCalledWith(t);
     expect(invalidateQueriesMock).toHaveBeenCalledWith({
-      queryKey: pauseArchiveListQueryPrefix('archive-user-1'),
+      queryKey: archiveListPrefix('archive-user-1'),
     });
   });
 
@@ -100,7 +106,7 @@ describe('usePauseFavoriteToggle', () => {
     });
     expect(showPauseFavoriteProHintToast).not.toHaveBeenCalled();
     expect(invalidateQueriesMock).toHaveBeenCalledWith({
-      queryKey: pauseArchiveListQueryPrefix('archive-user-1'),
+      queryKey: archiveListPrefix('archive-user-1'),
     });
   });
 
