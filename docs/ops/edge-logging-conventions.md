@@ -45,6 +45,7 @@ Edge function
    - `options.operation`: human-readable operation (`chat.completions`, `customers.list`, `emails.send`, `from.table.select`, …). Optional but useful for dashboards.
    - On success: `dependency_call` log with `status: "ok"` + `duration_ms`.
    - On error: `dependency_call` log at error level with `status: "error"`, `duration_ms`, and message. The error re-throws so the wrapper's catch can decide the `EdgeError` shape.
+   - For caller-handled HTTP outcomes, pass `expectedStatusCodes` so the dependency line is warning-level instead of alert-worthy. Example: web-push 404/410 means "stale subscription"; the caller should prune the row and continue.
    - **Don't** pass full request/response bodies. `logDependencyCall` logs specs only by contract.
 4. **Never `console.log` directly** from the handler or from new helpers. Always go through `log` from `ctx`. (Libraries under `_shared` can call `log.info/warn/error` from a passed-in logger.)
 5. **Use `logAudit` for security-sensitive state changes** (see §Audit).
