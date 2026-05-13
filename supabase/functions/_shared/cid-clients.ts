@@ -101,6 +101,8 @@ export interface SendWebPushOptions {
   notificationTag?: string;
   /** Optional VAPID/TTL/etc options forwarded to `webpush.sendNotification`. */
   webpushOptions?: Record<string, unknown>;
+  /** Web-push HTTP statuses that are handled by the caller, such as stale endpoints. */
+  expectedStatusCodes?: number[];
 }
 
 /**
@@ -117,7 +119,8 @@ export interface SendWebPushOptions {
  *     useful pivot for "is FCM down right now?".
  *
  * The helper re-throws on failure so the caller can still inspect
- * `err.statusCode` (e.g. to prune 404/410 subscriptions).
+ * `err.statusCode` (e.g. to prune 404/410 subscriptions). Pass those
+ * statuses via `expectedStatusCodes` to keep cleanup paths at warning level.
  */
 export async function sendWebPushWithCid(
   log: Logger,
@@ -144,6 +147,7 @@ export async function sendWebPushWithCid(
         endpoint_host: endpointHost,
         ...(options.notificationTag ? { notification_tag: options.notificationTag } : {}),
       },
+      expectedStatusCodes: options.expectedStatusCodes,
     },
   );
 }
