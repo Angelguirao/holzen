@@ -28,8 +28,17 @@ type Logger = ReturnType<typeof createLogger>;
 export interface LogDependencyOptions {
   /** Operation label for dashboards (e.g. "messages.create", "simple/price"). */
   operation?: string;
+  /** HTTP/status codes that are expected and should not page as errors. */
+  expectedStatusCodes?: number[];
   /** Extra structured fields — scrubbed before hitting BetterStack via the logger. */
   extra?: Record<string, unknown>;
+}
+
+function statusCodeFromUnknown(err: unknown): number | undefined {
+  if (!err || typeof err !== "object") return undefined;
+  const maybe = err as { statusCode?: unknown; status?: unknown };
+  const raw = maybe.statusCode ?? maybe.status;
+  return typeof raw === "number" && Number.isFinite(raw) ? raw : undefined;
 }
 
 export async function logDependencyCall<T>(
@@ -51,14 +60,23 @@ export async function logDependencyCall<T>(
     return result;
   } catch (err) {
     const message = err instanceof Error ? err.message : String(err);
-    log.error("dependency_call", {
+    const statusCode = statusCodeFromUnknown(err);
+    const expected = statusCode != null && options.expectedStatusCodes?.includes(statusCode) === true;
+    const fields = {
       dep: dependency,
       status: "error",
       duration_ms: Date.now() - start,
       message,
+      ...(statusCode != null ? { status_code: statusCode } : {}),
+      ...(expected ? { expected_status: true } : {}),
       ...(options.operation ? { operation: options.operation } : {}),
       ...(options.extra ?? {}),
-    });
+    };
+    if (expected) {
+      log.warn("dependency_call", fields);
+    } else {
+      log.error("dependency_call", fields);
+    }
     throw err;
   }
 }
