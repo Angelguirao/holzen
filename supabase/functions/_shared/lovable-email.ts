@@ -116,6 +116,31 @@ function isRetryableStatus(status: number): boolean {
   return status === 408 || status === 429 || (status >= 500 && status < 600);
 }
 
+/**
+ * Derive a plain-text version of an HTML email body. Lovable Email API
+ * rejects sends with empty `text` (`missing_parameter: text`), so callers
+ * that only provide HTML get a reasonable fallback.
+ */
+function htmlToPlainText(html: string): string {
+  if (!html) return " ";
+  const text = html
+    .replace(/<style[\s\S]*?<\/style>/gi, "")
+    .replace(/<script[\s\S]*?<\/script>/gi, "")
+    .replace(/<\/(p|div|h[1-6]|li|tr|br)>/gi, "\n")
+    .replace(/<br\s*\/?>(?!\n)/gi, "\n")
+    .replace(/<[^>]+>/g, "")
+    .replace(/&nbsp;/gi, " ")
+    .replace(/&amp;/gi, "&")
+    .replace(/&lt;/gi, "<")
+    .replace(/&gt;/gi, ">")
+    .replace(/&quot;/gi, '"')
+    .replace(/&#39;/gi, "'")
+    .replace(/[ \t]+\n/g, "\n")
+    .replace(/\n{3,}/g, "\n\n")
+    .trim();
+  return text.length > 0 ? text : " ";
+}
+
 export async function sendLovableEmailMessage(
   email: LovableEmail,
   opts: SendOptions = {},
