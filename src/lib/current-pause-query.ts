@@ -12,7 +12,14 @@ export interface CurrentPauseRow {
   context_snapshot: Record<string, unknown> | null;
 }
 
-export const CURRENT_PAUSE_QUERY_PREFIX = ['pause', 'current-open'] as const;
+export const PAUSE_QUERY_PREFIX = ['pause'] as const;
+
+export const CURRENT_PAUSE_QUERY_LEAF = 'current-open' as const;
+
+export const CURRENT_PAUSE_QUERY_PREFIX = [
+  ...PAUSE_QUERY_PREFIX,
+  CURRENT_PAUSE_QUERY_LEAF,
+] as const;
 
 export const CURRENT_PAUSE_DISABLED_USER_ID = 'none' as const;
 
