@@ -1,4 +1,5 @@
 import { supabase } from '@/integrations/supabase/client';
+import { ADMIN_QUERY_PREFIX } from '@/lib/admin-query-namespace';
 
 export interface SourceSuggestionRow {
   id: string;
@@ -13,7 +14,10 @@ export interface SourceSuggestionRow {
   reviewed_at: string | null;
 }
 
-export const ADMIN_PENDING_SOURCE_SUGGESTIONS_QUERY_PREFIX = ['admin', 'signal-source-suggestions'] as const;
+export const ADMIN_PENDING_SOURCE_SUGGESTIONS_QUERY_PREFIX = [
+  ...ADMIN_QUERY_PREFIX,
+  'signal-source-suggestions',
+] as const;
 
 export const ADMIN_PENDING_SOURCE_SUGGESTIONS_QUERY_LEAF = 'pending' as const;
 

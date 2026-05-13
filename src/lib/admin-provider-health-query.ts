@@ -1,4 +1,5 @@
 import { supabase } from '@/integrations/supabase/client';
+import { ADMIN_QUERY_PREFIX } from '@/lib/admin-query-namespace';
 
 export type Provider = 'perplexity' | 'lovable';
 
@@ -55,7 +56,7 @@ function summarize(rows: AttemptRow[]): Record<Provider, ProviderStat> {
   return out;
 }
 
-export const ADMIN_PROVIDER_HEALTH_QUERY_PREFIX = ['admin', 'provider-health'] as const;
+export const ADMIN_PROVIDER_HEALTH_QUERY_PREFIX = [...ADMIN_QUERY_PREFIX, 'provider-health'] as const;
 
 export const ADMIN_PROVIDER_HEALTH_QUERY_KEY = [
   ...ADMIN_PROVIDER_HEALTH_QUERY_PREFIX,
