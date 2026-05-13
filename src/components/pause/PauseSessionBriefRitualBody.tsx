@@ -117,7 +117,7 @@ export function PauseSessionBriefRitualBody({
             onDecide={onDecide}
             onBack={onBriefDecideBack}
             introKicker={briefDecideIntroKicker}
-            briefWireframe
+            briefDecidePillLayout
             hideChoicesBack
           />
         </motion.div>
