@@ -1,4 +1,5 @@
 import { useState, useEffect, useMemo, useCallback, useRef } from 'react';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/use-auth';
@@ -34,23 +35,18 @@ import {
   validateFutureLetterBody,
   type FutureLetterInvalidReason,
 } from '@/lib/future-letter-validation';
+import { invalidateHistoryCalendarActivities } from '@/lib/history-calendar-activities-query-key';
+import {
+  futureLettersListQueryKey,
+  getFutureLettersListQueryOptions,
+  type FutureLetterRow,
+} from '@/lib/future-letters-query';
 import { toast } from 'sonner';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { format } from 'date-fns';
 import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
 
-interface Letter {
-  id: string;
-  body: string;
-  written_during: string;
-  deliver_during: string;
-  btc_price_at_write: number;
-  written_at: string;
-  delivered: boolean;
-  delivered_at: string | null;
-  btc_price_at_delivery: number | null;
-  delivery_threshold: number | null;
-}
+type Letter = FutureLetterRow;
 
 const WRITING_PROMPTS = {
   crash: [
@@ -173,17 +169,25 @@ export function LetterToFutureSelf({
 }: Props) {
   const { t } = useTranslation();
   const { user } = useAuth();
+  const userId = user?.id;
+  const queryClient = useQueryClient();
   const { currency, threshold, thresholdDown } = useHolzen();
   const prefersReducedMotion = useReducedMotion();
-  // `letters` in the old implementation duplicated pending+delivered, so we only keep the split.
-  const [pendingLetters, setPendingLetters] = useState<Letter[]>([]);
-  const [deliveredLetters, setDeliveredLetters] = useState<Letter[]>([]);
+
+  const {
+    data: allLetters = [],
+    isFetched,
+    isPending,
+    isError,
+    refetch,
+  } = useQuery(getFutureLettersListQueryOptions(userId));
+
+  const pendingLetters = useMemo(() => allLetters.filter((l) => !l.delivered), [allLetters]);
+  const deliveredLetters = useMemo(() => allLetters.filter((l) => l.delivered), [allLetters]);
+
   const [body, setBody] = useState('');
   const [sending, setSending] = useState(false);
   const [sealPhase, setSealPhase] = useState<'idle' | 'sealing' | 'sealed'>('idle');
-  const [loaded, setLoaded] = useState(false);
-  const [lettersLoadFailed, setLettersLoadFailed] = useState(false);
-  const [reloadNonce, setReloadNonce] = useState(0);
   const [composerOpen, setComposerOpen] = useState(false);
   // Calm-mode recipient: who should receive this letter?
   const [calmTarget, setCalmTarget] = useState<'crash' | 'surge'>('crash');
@@ -223,42 +227,7 @@ export function LetterToFutureSelf({
   const letterValidation = useMemo(() => validateFutureLetterBody(body), [body]);
 
   useEffect(() => {
-    if (!user) return;
-    let cancelled = false;
-    setLoaded(false);
-    setLettersLoadFailed(false);
-    void (async () => {
-      try {
-        const { data, error } = await supabase
-          .from('future_letters')
-          .select('*')
-          .eq('user_id', user.id)
-          .order('written_at', { ascending: false });
-        if (cancelled) return;
-        if (error) {
-          setLettersLoadFailed(true);
-          setLoaded(true);
-          return;
-        }
-        const all = (data as unknown as Letter[]) ?? [];
-        setPendingLetters(all.filter((l) => !l.delivered));
-        setDeliveredLetters(all.filter((l) => l.delivered));
-        setLettersLoadFailed(false);
-        setLoaded(true);
-      } catch {
-        if (!cancelled) {
-          setLettersLoadFailed(true);
-          setLoaded(true);
-        }
-      }
-    })();
-    return () => {
-      cancelled = true;
-    };
-  }, [user, reloadNonce]);
-
-  useEffect(() => {
-    if (!scrollToLetterId || !loaded || didScrollToLetter.current) return;
+    if (!scrollToLetterId || !isFetched || didScrollToLetter.current) return;
     const raf = requestAnimationFrame(() => {
       const el = document.getElementById(`letter-${scrollToLetterId}`);
       if (el) {
@@ -267,12 +236,12 @@ export function LetterToFutureSelf({
       }
     });
     return () => cancelAnimationFrame(raf);
-  }, [scrollToLetterId, loaded, deliveredLetters, prefersReducedMotion]);
+  }, [scrollToLetterId, isFetched, deliveredLetters, prefersReducedMotion]);
 
   useEffect(() => {
     if (
       !autoOpenComposer ||
-      !loaded ||
+      !isFetched ||
       !user ||
       !canWrite ||
       scrollToLetterId ||
@@ -282,7 +251,7 @@ export function LetterToFutureSelf({
     }
     didAutoOpenComposer.current = true;
     setComposerOpen(true);
-  }, [autoOpenComposer, loaded, user, canWrite, scrollToLetterId]);
+  }, [autoOpenComposer, isFetched, user, canWrite, scrollToLetterId]);
 
   // Discard any draft when the composer closes without sealing.
   useEffect(() => {
@@ -291,20 +260,24 @@ export function LetterToFutureSelf({
 
   const handleDeleteDelivered = useCallback(
     async (id: string) => {
+      if (!userId) return;
       const { error } = await supabase.from('future_letters').delete().eq('id', id);
       if (error) {
         toast.error(t('letter.deleteDeliveredFailed'));
         return;
       }
-      setDeliveredLetters((prev) => prev.filter((l) => l.id !== id));
+      queryClient.setQueryData<Letter[]>(futureLettersListQueryKey(userId), (prev) =>
+        (prev ?? []).filter((l) => l.id !== id),
+      );
+      invalidateHistoryCalendarActivities(queryClient, userId);
       toast(t('letter.deleted'));
     },
-    [t],
+    [t, queryClient, userId],
   );
 
   if (!user) return null;
 
-  if (!loaded) {
+  if (userId && !isFetched && isPending) {
     return (
       <div className="flex justify-center py-16" role="status" aria-busy="true" aria-label={t('common.loading')}>
         <Loader2 className="h-6 w-6 animate-spin text-muted-foreground/40" />
@@ -312,13 +285,13 @@ export function LetterToFutureSelf({
     );
   }
 
-  if (lettersLoadFailed) {
+  if (userId && isError) {
     return (
       <div className="space-y-3">
         <Alert variant="destructive">
           <AlertDescription className="flex flex-col gap-3 text-left">
             <p>{t('letter.loadFailed')}</p>
-            <Button type="button" variant="outline" size="sm" className="self-start" onClick={() => setReloadNonce((n) => n + 1)}>
+            <Button type="button" variant="outline" size="sm" className="self-start" onClick={() => void refetch()}>
               {t('common.tryAgain')}
             </Button>
           </AlertDescription>
@@ -367,10 +340,14 @@ export function LetterToFutureSelf({
       if (error) throw error;
 
       const newLetter = data as unknown as Letter;
+      invalidateHistoryCalendarActivities(queryClient, user.id);
 
       setTimeout(() => {
         setSealPhase('sealed');
-        setPendingLetters((prev) => [newLetter, ...prev]);
+        queryClient.setQueryData<Letter[]>(futureLettersListQueryKey(user.id), (prev) => {
+          const rest = (prev ?? []).filter((l) => l.id !== newLetter.id);
+          return [newLetter, ...rest];
+        });
         setBody('');
 
         setTimeout(() => {

@@ -2,7 +2,7 @@ import { useMemo } from 'react';
 import {
   JOURNEY_STAT_TILES_VISIBILITY_ID,
   isHomeSectionAlwaysVisibleInLayout,
-} from '@/hooks/use-home-optional-visibility';
+} from '@/lib/home-section-visibility-constants';
 
 export function useHomeVisibleSections(args: {
   order: string[];

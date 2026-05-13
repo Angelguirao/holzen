@@ -8,9 +8,10 @@ import {
   showPauseOutcomeSaveFailedToast,
 } from '@/lib/pause-outcome-toast';
 
-const { pauseLogStepMock, clearSessionMock } = vi.hoisted(() => ({
+const { pauseLogStepMock, clearSessionMock, invalidatePauseStatsMock } = vi.hoisted(() => ({
   pauseLogStepMock: vi.fn(),
   clearSessionMock: vi.fn(),
+  invalidatePauseStatsMock: vi.fn(),
 }));
 
 vi.mock('@/lib/pause-api', () => ({
@@ -32,6 +33,18 @@ vi.mock('@/lib/haptics', () => ({
 vi.mock('@/lib/pause-outcome-toast', () => ({
   showPauseOutcomeSaveFailedToast: vi.fn(),
   showPauseOutcomeNotCompletedToast: vi.fn(),
+}));
+
+vi.mock('@/lib/pause-stats-invalidate', () => ({
+  invalidatePauseStatsDataForUser: (...args: unknown[]) => invalidatePauseStatsMock(...args),
+}));
+
+vi.mock('@/hooks/use-auth', () => ({
+  useAuth: () => ({
+    user: { id: 'user-decide-handler-test' } as import('@supabase/supabase-js').User,
+    loading: false,
+    signOut: async () => {},
+  }),
 }));
 
 const t = ((k: string) => k) as TFunction;
@@ -62,6 +75,7 @@ function baseInput(overrides: Partial<Parameters<typeof usePauseSessionDecideHan
 beforeEach(() => {
   pauseLogStepMock.mockReset();
   clearSessionMock.mockReset();
+  invalidatePauseStatsMock.mockReset();
   vi.mocked(showPauseOutcomeSaveFailedToast).mockClear();
   vi.mocked(showPauseOutcomeNotCompletedToast).mockClear();
 });
@@ -74,6 +88,7 @@ describe('usePauseSessionDecideHandler', () => {
       await result.current.handleDecide('hold');
     });
     expect(pauseLogStepMock).not.toHaveBeenCalled();
+    expect(invalidatePauseStatsMock).not.toHaveBeenCalled();
     expect(input.setDecision).toHaveBeenCalledWith('hold');
     expect(clearSessionMock).toHaveBeenCalled();
     expect(input.setPhase).toHaveBeenCalledWith('done');
@@ -89,6 +104,7 @@ describe('usePauseSessionDecideHandler', () => {
     });
     expect(pauseLogStepMock).toHaveBeenCalledTimes(1);
     expect(pauseLogStepMock.mock.calls[0][0].stepType).toBe('outcome_logged');
+    expect(invalidatePauseStatsMock).not.toHaveBeenCalled();
     expect(input.refreshSubscription).toHaveBeenCalled();
     expect(input.setDecision).toHaveBeenCalledWith('hold');
     expect(clearSessionMock).toHaveBeenCalled();
@@ -102,6 +118,7 @@ describe('usePauseSessionDecideHandler', () => {
       await result.current.handleDecide('hold');
     });
     expect(showPauseOutcomeSaveFailedToast).toHaveBeenCalledWith(t);
+    expect(invalidatePauseStatsMock).not.toHaveBeenCalled();
     expect(input.setDecision).not.toHaveBeenCalled();
     expect(clearSessionMock).not.toHaveBeenCalled();
   });
@@ -114,6 +131,7 @@ describe('usePauseSessionDecideHandler', () => {
       await result.current.handleDecide('hold');
     });
     expect(showPauseOutcomeNotCompletedToast).toHaveBeenCalledWith(t);
+    expect(invalidatePauseStatsMock).toHaveBeenCalledWith('user-decide-handler-test');
     expect(input.refreshSubscription).toHaveBeenCalled();
     expect(input.setDecision).not.toHaveBeenCalled();
     expect(clearSessionMock).not.toHaveBeenCalled();

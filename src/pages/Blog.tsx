@@ -1,18 +1,16 @@
-import { useState, useCallback } from 'react';
+import { useMemo, useCallback } from 'react';
 import { Link } from 'react-router-dom';
 import { motion, useReducedMotion } from 'framer-motion';
 import { ArrowLeft, ArrowRight } from 'lucide-react';
-import { useQuery } from '@tanstack/react-query';
+import { useInfiniteQuery, useQueryClient } from '@tanstack/react-query';
 import { toast } from 'sonner';
-import { supabase } from '@/integrations/supabase/client';
+import { getBlogPublishedPostsInfiniteQueryOptions, prefetchBlogPostBySlug } from '@/lib/blog-post-query';
 import { format } from 'date-fns';
 import { PageMeta } from '@/components/PageMeta';
 import { PublicFooter } from '@/components/PublicFooter';
 import { useInfiniteScroll } from '@/hooks/use-infinite-scroll';
 import { useTranslation } from 'react-i18next';
 import { PageHeading } from '@/components/PageHeading';
-
-const PAGE_SIZE = 20;
 
 const fade = (delay = 0) => ({
   initial: { opacity: 0, y: 14 },
@@ -21,61 +19,38 @@ const fade = (delay = 0) => ({
   transition: { duration: 0.6, delay, ease: [0.25, 0.1, 0.25, 1] },
 });
 
-interface BlogPost {
-  id: string;
-  slug: string;
-  title: string;
-  excerpt: string | null;
-  published_at: string | null;
-}
-
 const Blog = () => {
   const { t } = useTranslation();
+  const queryClient = useQueryClient();
   const prefersReduced = useReducedMotion();
   const m = (delay = 0) => (prefersReduced ? {} : fade(delay));
-  const [posts, setPosts] = useState<BlogPost[]>([]);
-  const [hasMore, setHasMore] = useState(true);
-  const [loadingMore, setLoadingMore] = useState(false);
 
-  const { isLoading, isError, refetch, isFetching } = useQuery({
-    queryKey: ['blog-posts-initial'],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from('blog_posts')
-        .select('id, slug, title, excerpt, published_at')
-        .eq('published', true)
-        .order('published_at', { ascending: false })
-        .limit(PAGE_SIZE);
-      if (error) throw error;
-      const rows = (data ?? []) as BlogPost[];
-      setPosts(rows);
-      setHasMore(rows.length === PAGE_SIZE);
-      return rows;
-    },
-  });
+  const {
+    data,
+    isPending,
+    isError,
+    refetch,
+    isFetching,
+    isFetchingNextPage,
+    hasNextPage,
+    fetchNextPage,
+  } = useInfiniteQuery(getBlogPublishedPostsInfiniteQueryOptions());
+
+  const posts = useMemo(() => data?.pages.flat() ?? [], [data]);
+  const hasMore = Boolean(hasNextPage);
+  const loadingMore = isFetchingNextPage;
 
   const loadMore = useCallback(async () => {
-    if (loadingMore || !hasMore) return;
-    setLoadingMore(true);
-    const last = posts[posts.length - 1];
-    if (!last?.published_at) { setLoadingMore(false); return; }
-    const { data, error } = await supabase
-      .from('blog_posts')
-      .select('id, slug, title, excerpt, published_at')
-      .eq('published', true)
-      .order('published_at', { ascending: false })
-      .lt('published_at', last.published_at)
-      .limit(PAGE_SIZE);
-    if (error) {
+    if (!hasNextPage || isFetchingNextPage) return;
+    try {
+      const result = await fetchNextPage();
+      if (result.isError) {
+        toast.error(t('blog.loadMoreFailed'));
+      }
+    } catch {
       toast.error(t('blog.loadMoreFailed'));
-      setLoadingMore(false);
-      return;
     }
-    const rows = (data ?? []) as BlogPost[];
-    setPosts((prev) => [...prev, ...rows]);
-    setHasMore(rows.length === PAGE_SIZE);
-    setLoadingMore(false);
-  }, [loadingMore, hasMore, posts, t]);
+  }, [hasNextPage, isFetchingNextPage, fetchNextPage, t]);
 
   const sentinelRef = useInfiniteScroll({ hasMore, loading: loadingMore, onLoadMore: loadMore });
 
@@ -95,7 +70,7 @@ const Blog = () => {
         </motion.div>
         <PageHeading title={t('blog.title')} />
 
-        {isLoading ? (
+        {isPending ? (
           <div className="space-y-6">
             {[1, 2, 3].map((i) => (
               <div key={i} className="space-y-2 animate-pulse">
@@ -117,11 +92,16 @@ const Blog = () => {
               {t('common.tryAgain')}
             </button>
           </motion.div>
-        ) : posts && posts.length > 0 ? (
+        ) : posts.length > 0 ? (
           <div className="space-y-8">
             {posts.map((post, i) => (
               <motion.div key={post.id} {...m(i * 0.05)}>
-                <Link to={`/blog/${post.slug}`} className="block group space-y-2">
+                <Link
+                  to={`/blog/${post.slug}`}
+                  className="block group space-y-2"
+                  onMouseEnter={() => void prefetchBlogPostBySlug(queryClient, post.slug)}
+                  onFocus={() => void prefetchBlogPostBySlug(queryClient, post.slug)}
+                >
                   {post.published_at && (
                     <p className="text-[10px] font-mono text-muted-foreground/70 tracking-wider uppercase">
                       {format(new Date(post.published_at), 'MMM d, yyyy')}

@@ -1,15 +1,9 @@
-import { useState, useCallback, useEffect, useMemo } from 'react';
+import { useState, useCallback, useMemo } from 'react';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { ChevronDown, ChevronRight, Pencil, Trash2, Loader2, Plus, ArrowUp, ArrowDown, Eye, EyeOff } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import type { Json } from '@/integrations/supabase/types';
 import { useToast } from '@/hooks/use-toast';
-const POOL_LABELS: Record<FallbackPoolType, string> = {
-  signal: 'Signal',
-  grounding: 'Grounding',
-  history: 'Historical echo',
-  zoom_out: 'Zoom Out (deep time)',
-  reflection: 'Reflection (pause)',
-};
 import { Button } from '@/components/ui/button';
 import {
   Dialog,
@@ -19,18 +13,23 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog';
 import { Textarea } from '@/components/ui/textarea';
+import {
+  ADMIN_COMPANION_FALLBACKS_QUERY_KEY,
+  fetchCompanionFallbackRows,
+  getAdminCompanionFallbacksQueryOptions,
+  type CompanionFallbackRow,
+  type FallbackPoolType,
+} from '@/lib/admin-companion-fallbacks-query';
 
-export type FallbackPoolType = 'signal' | 'grounding' | 'history' | 'zoom_out' | 'reflection';
+export type { CompanionFallbackRow, FallbackPoolType };
 
-export interface CompanionFallbackRow {
-  id: string;
-  pool_type: FallbackPoolType;
-  sort_order: number;
-  payload: Record<string, unknown>;
-  is_active: boolean;
-  created_at: string;
-  updated_at: string;
-}
+const POOL_LABELS: Record<FallbackPoolType, string> = {
+  signal: 'Signal',
+  grounding: 'Grounding',
+  history: 'Historical echo',
+  zoom_out: 'Zoom Out (deep time)',
+  reflection: 'Reflection (pause)',
+};
 
 const POOL_ORDER: FallbackPoolType[] = ['signal', 'grounding', 'history', 'zoom_out', 'reflection'];
 
@@ -50,30 +49,33 @@ function previewLine(pool: FallbackPoolType, payload: Record<string, unknown>): 
 
 export function HardcodedFallbacksManager({ onRefresh }: { onRefresh?: () => void }) {
   const { toast } = useToast();
+  const queryClient = useQueryClient();
   const [open, setOpen] = useState(false);
-  const [rows, setRows] = useState<CompanionFallbackRow[]>([]);
-  const [loading, setLoading] = useState(true);
   const [acting, setActing] = useState<string | null>(null);
   const [editRow, setEditRow] = useState<CompanionFallbackRow | null>(null);
   const [editJson, setEditJson] = useState('');
   const [addPool, setAddPool] = useState<FallbackPoolType | null>(null);
 
-  const fetchRows = useCallback(async () => {
-    setLoading(true);
-    const { data, error } = await supabase
-      .from('companion_fallbacks')
-      .select('id, pool_type, sort_order, payload, is_active, created_at, updated_at')
-      .order('pool_type', { ascending: true })
-      .order('sort_order', { ascending: true });
-    setLoading(false);
-    if (error) {
-      toast({ title: 'Failed to load fallbacks', description: error.message, variant: 'destructive' });
-      return;
-    }
-    setRows((data ?? []) as CompanionFallbackRow[]);
-  }, [toast]);
+  const {
+    data: rows = [],
+    isFetching,
+    refetch,
+  } = useQuery({
+    ...getAdminCompanionFallbacksQueryOptions(),
+    queryFn: async () => {
+      try {
+        return await fetchCompanionFallbackRows();
+      } catch (error: unknown) {
+        const message = error instanceof Error ? error.message : String(error);
+        toast({ title: 'Failed to load fallbacks', description: message, variant: 'destructive' });
+        throw error;
+      }
+    },
+  });
 
-  useEffect(() => { fetchRows(); }, [fetchRows]);
+  const bumpFallbacks = useCallback(async () => {
+    await queryClient.invalidateQueries({ queryKey: ADMIN_COMPANION_FALLBACKS_QUERY_KEY });
+  }, [queryClient]);
 
   const byPool = useMemo(() => {
     const m = new Map<FallbackPoolType, CompanionFallbackRow[]>();
@@ -97,7 +99,7 @@ export function HardcodedFallbacksManager({ onRefresh }: { onRefresh?: () => voi
       return;
     }
     toast({ title: 'Saved' });
-    await fetchRows();
+    await bumpFallbacks();
     onRefresh?.();
   };
 
@@ -112,7 +114,7 @@ export function HardcodedFallbacksManager({ onRefresh }: { onRefresh?: () => voi
       toast({ title: 'Update failed', description: error.message, variant: 'destructive' });
       return;
     }
-    await fetchRows();
+    await bumpFallbacks();
     onRefresh?.();
   };
 
@@ -126,7 +128,7 @@ export function HardcodedFallbacksManager({ onRefresh }: { onRefresh?: () => voi
       return;
     }
     toast({ title: 'Deleted' });
-    await fetchRows();
+    await bumpFallbacks();
     onRefresh?.();
   };
 
@@ -144,7 +146,7 @@ export function HardcodedFallbacksManager({ onRefresh }: { onRefresh?: () => voi
       toast({ title: 'Reorder failed', description: (e1 ?? e2)?.message ?? 'Unknown', variant: 'destructive' });
       return;
     }
-    await fetchRows();
+    await bumpFallbacks();
     onRefresh?.();
   };
 
@@ -172,7 +174,7 @@ export function HardcodedFallbacksManager({ onRefresh }: { onRefresh?: () => voi
     }
     setAddPool(null);
     toast({ title: 'Entry added' });
-    await fetchRows();
+    await bumpFallbacks();
     onRefresh?.();
   };
 
@@ -212,8 +214,8 @@ export function HardcodedFallbacksManager({ onRefresh }: { onRefresh?: () => voi
         <p className="text-[10px] font-mono uppercase tracking-wider text-muted-foreground/60">
           Hardcoded pools <span className="text-muted-foreground/45">({rows.length})</span>
         </p>
-        <Button type="button" variant="ghost" size="sm" className="h-6 text-[9px] font-mono ml-auto" onClick={(e) => { e.stopPropagation(); fetchRows(); }} disabled={loading}>
-          {loading ? <Loader2 className="h-3 w-3 animate-spin" /> : 'Refresh'}
+        <Button type="button" variant="ghost" size="sm" className="h-6 text-[9px] font-mono ml-auto" onClick={(e) => { e.stopPropagation(); void refetch(); }} disabled={isFetching}>
+          {isFetching ? <Loader2 className="h-3 w-3 animate-spin" /> : 'Refresh'}
         </Button>
       </button>
 

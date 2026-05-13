@@ -1,5 +1,5 @@
 import { useAdminStats } from '@/hooks/use-admin-stats';
-import { useAuth } from '@/hooks/use-auth';
+import { useIsAdmin } from '@/hooks/use-is-admin';
 import { supabase } from '@/integrations/supabase/client';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import { RefreshCw, Activity, Database, DollarSign, AlertTriangle, ThumbsUp, Clock, Loader2, ShieldX, ChevronDown, ChevronRight, Bell } from 'lucide-react';
@@ -24,45 +24,6 @@ import { CostAnalytics } from '@/components/admin/CostAnalytics';
 import { DemoModeToggle } from '@/components/admin/DemoModeToggle';
 import { BadgeDebug } from '@/components/admin/BadgeDebug';
 import { adminDeleteRowsByIds } from '@/lib/admin-delete';
-
-/**
- * Admin access control.
- *
- * Checks profiles.is_admin (server-side, used by RLS policies).
- * Falls back to VITE_ADMIN_USER_IDS env var if the DB column
- * doesn't exist yet (before migration).
- */
-function useIsAdmin(): { isAdmin: boolean; loading: boolean } {
-  const { user, loading: authLoading } = useAuth();
-  const [isAdmin, setIsAdmin] = useState(false);
-  const [checked, setChecked] = useState(false);
-
-  useEffect(() => {
-    if (!user) { setChecked(true); return; }
-
-    supabase
-      .from('profiles')
-      .select('is_admin')
-      .eq('user_id', user.id)
-      .single()
-      .then(({ data, error }) => {
-        const profile = data as { is_admin?: boolean } | null;
-        if (!error && typeof profile?.is_admin === 'boolean') {
-          setIsAdmin(profile.is_admin);
-        } else {
-          const adminIds = import.meta.env.VITE_ADMIN_USER_IDS;
-          if (!adminIds) {
-            setIsAdmin(false);
-          } else {
-            setIsAdmin(adminIds.split(',').map((id: string) => id.trim()).includes(user.id));
-          }
-        }
-        setChecked(true);
-      });
-  }, [user]);
-
-  return { isAdmin, loading: authLoading || !checked };
-}
 
 function computeTrend(current: number, previous: number | null, invertColor: boolean): TrendInfo | undefined {
   if (previous === null || previous === undefined) return undefined;

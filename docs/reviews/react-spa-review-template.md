@@ -23,6 +23,7 @@ Do **not** try to fill every audit section for every PR. For PRs: pick the **one
 
 ## Holzen pointers (pin these while reviewing)
 
+- **Truth vs projection:** [fundamentals/client-server-architecture-holzen.md](../fundamentals/client-server-architecture-holzen.md) — server owns invariants; client mirrors for UX only.
 - **Routes / guards:** `src/App.tsx`, [systems/routing/route-gating-system.md](../systems/routing/route-gating-system.md), [design/information-architecture.md](../design/information-architecture.md).
 - **Edge invokes:** Prefer patterns in [AGENTS.md](../../AGENTS.md) (`invokeEdge`, `x-cid`); new call sites should not break correlation.
 - **Observability / events:** [ops/event-taxonomy.md](../ops/event-taxonomy.md), [ops/feature-flags.md](../ops/feature-flags.md) when behavior is flag-gated.
@@ -51,7 +52,7 @@ Do **not** try to fill every audit section for every PR. For PRs: pick the **one
 **Smells in diff:**
 
 - [ ] Duplicated API/query logic that should reuse an existing hook or lib
-- [ ] Business rules embedded in JSX (prefer hook / `src/lib`)
+- [ ] Business rules embedded in JSX (prefer hook / `src/lib`) — and no **authoritative** lifecycle that exists only client-side (see [client-server-architecture-holzen.md](../fundamentals/client-server-architecture-holzen.md))
 - [ ] Magic strings for routes, event names, or edge function names (use existing constants or enums where the codebase already does)
 - [ ] New edge HTTP entrypoint without `withRequestLogging` (see `npm run check:edge-logging`)
 

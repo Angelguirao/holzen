@@ -1,9 +1,10 @@
-import { useState, useRef, useMemo, useCallback } from 'react';
+import { useState, useRef, useMemo, useCallback, useEffect, Fragment } from 'react';
 import { useReducedMotion } from 'framer-motion';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useHolzen } from '@/hooks/use-holzen';
 import { useSubscription } from '@/hooks/use-subscription';
+import { useProGate } from '@/hooks/use-pro-gate';
 import { type MoodValue } from '@/components/MoodCheck';
 
 import { type PauseStep } from '@/components/pause/PauseProgress';
@@ -43,8 +44,9 @@ import { usePauseSessionInitialMoodHandlers } from '@/hooks/use-pause-session-in
 import { usePauseShiftFrameDoneHandler } from '@/hooks/use-pause-shift-frame-done-handler';
 import { usePauseSessionDecideHandler } from '@/hooks/use-pause-session-decide-handler';
 import { usePauseSessionExitNavigation } from '@/hooks/use-pause-session-exit-navigation';
-import { clearSession } from '@/lib/pause-session-storage';
 import { trackEvent } from '@/lib/posthog';
+import { pauseAdoptPendingOffer, pauseDeclinePendingOffer } from '@/lib/pause-api';
+import { toast } from 'sonner';
 import { usePauseSessionBreathStepHandlers } from '@/hooks/use-pause-session-breath-step-handlers';
 import { usePauseSessionHeaderBackHandler } from '@/hooks/use-pause-session-header-back-handler';
 import { usePauseSessionPersistToStorage } from '@/hooks/use-pause-session-persist-to-storage';
@@ -64,9 +66,11 @@ import { buildPauseSessionScaffoldRitualDerived } from '@/lib/pause-session-scaf
 import { buildPauseSessionScaffoldRitualPayloads } from '@/lib/pause-session-scaffold-ritual-payloads';
 import { buildPauseSessionMountLogParams } from '@/lib/pause-session-mount-log-params';
 import { usePauseSessionPendingPauseOfferNavigation } from '@/hooks/use-pause-session-pending-pause-offer-navigation';
+import { usePendingPauseOffer } from '@/hooks/use-pending-pause-offer';
 import { usePauseSessionDepthPickerHandlers } from '@/hooks/use-pause-session-depth-picker-handlers';
 import { usePauseSessionDeepChooseBridgeHandler } from '@/hooks/use-pause-session-deep-choose-bridge-handler';
-import { usePauseSessionBriefFeelSelect } from '@/hooks/use-pause-session-brief-feel-select';
+import { usePauseSessionFeelTilesSelect } from '@/hooks/use-pause-session-feel-tiles-select';
+import { PauseLeaveWithPendingSheet } from '@/components/pause/PauseLeaveWithPendingSheet';
 
 /**
  * `/pause` route: wires shell hydration, local ritual state, `pause-api` step handlers, and pause UI
@@ -86,7 +90,7 @@ import { usePauseSessionBriefFeelSelect } from '@/hooks/use-pause-session-brief-
 export default function PauseSession() {
   const { t } = useTranslation();
   const navigate = useNavigate();
-  const { handleReturn } = usePauseSessionExitNavigation(navigate);
+  const { handleReturn, handleClose } = usePauseSessionExitNavigation(navigate);
   const location = useLocation();
   const prefersReducedMotion = useReducedMotion();
   const breathSecondLabelVariant = usePauseSessionBreathSecondLabelVariant();
@@ -104,13 +108,15 @@ export default function PauseSession() {
     btcData,
     trackedAssetId,
   } = useHolzen();
-  const { subscribed, refresh: refreshSubscription } = useSubscription();
+  const { subscribed, loading: subLoading, refresh: refreshSubscription } = useSubscription();
+  const { requirePro } = useProGate();
 
   const { onAfterMutation: pendingOfferAfterMutation, navigateAfterAdopt: pendingOfferNavigateAfterAdopt } =
     usePauseSessionPendingPauseOfferNavigation({
       navigate,
       resyncOpenPauseFromDb,
     });
+  const { pending, refresh: refreshPendingOffer } = usePendingPauseOffer();
 
   const nav = parsePauseSessionLocationState(location.state);
   const {
@@ -151,7 +157,10 @@ export default function PauseSession() {
   const pauseInstanceIdForTerminal =
     pauseInstanceId ?? navPauseInstanceId ?? fetchPauseInstanceId;
 
-  const handleAbandonClose = useCallback(async () => {
+  const [leaveWithPendingOpen, setLeaveWithPendingOpen] = useState(false);
+  const [leaveSheetBusy, setLeaveSheetBusy] = useState(false);
+
+  const confirmLeavePauseSession = useCallback(() => {
     try {
       trackEvent('pause_session_abandoned', {
         pause_instance_id: pauseInstanceIdForTerminal ?? undefined,
@@ -159,10 +168,69 @@ export default function PauseSession() {
     } catch {
       /* no-op */
     }
-    await dismissMessage();
-    clearSession();
-    navigate('/', { replace: true });
-  }, [dismissMessage, navigate, pauseInstanceIdForTerminal]);
+    setLeaveWithPendingOpen(false);
+    handleClose();
+  }, [handleClose, pauseInstanceIdForTerminal]);
+
+  const requestExitPauseBeforeDone = useCallback(() => {
+    if (pending) {
+      setLeaveWithPendingOpen(true);
+      return;
+    }
+    confirmLeavePauseSession();
+  }, [pending, confirmLeavePauseSession]);
+
+  const handleDeclinePendingFromLeaveSheet = useCallback(async () => {
+    if (!pending || leaveSheetBusy) return;
+    setLeaveSheetBusy(true);
+    try {
+      await pauseDeclinePendingOffer();
+      try {
+        trackEvent('pause_pending_declined', { pause_instance_id: pending.id });
+      } catch {
+        /* no-op */
+      }
+      await Promise.resolve(pendingOfferAfterMutation());
+      setLeaveWithPendingOpen(false);
+      await refreshPendingOffer();
+    } catch {
+      toast.error(t('pause.pendingDeclineFailed', { defaultValue: 'Could not dismiss the offer. Try again.' }));
+    } finally {
+      setLeaveSheetBusy(false);
+    }
+  }, [pending, leaveSheetBusy, t, pendingOfferAfterMutation, refreshPendingOffer]);
+
+  const handlePendingAdoptFromLeaveSheet = useCallback(async () => {
+    if (!pending || leaveSheetBusy) return;
+    setLeaveSheetBusy(true);
+    try {
+      const r = await pauseAdoptPendingOffer();
+      if (!r.ok || !r.instance_id) {
+        toast.error(t('pause.pendingAdoptFailed', { defaultValue: 'Could not switch to the new pause. Try again.' }));
+        return;
+      }
+      try {
+        trackEvent('pause_pending_adopted', { pause_instance_id: r.instance_id });
+      } catch {
+        /* no-op */
+      }
+      await Promise.resolve(pendingOfferAfterMutation());
+      pendingOfferNavigateAfterAdopt(r.instance_id);
+      setLeaveWithPendingOpen(false);
+      await refreshPendingOffer();
+    } catch {
+      toast.error(t('pause.pendingAdoptFailed', { defaultValue: 'Could not switch to the new pause. Try again.' }));
+    } finally {
+      setLeaveSheetBusy(false);
+    }
+  }, [
+    pending,
+    leaveSheetBusy,
+    t,
+    pendingOfferAfterMutation,
+    pendingOfferNavigateAfterAdopt,
+    refreshPendingOffer,
+  ]);
 
   const hasCoalescedShellMessage = message.length > 0;
 
@@ -219,6 +287,14 @@ export default function PauseSession() {
   const [curtainLifted, setCurtainLifted] = useState(false);
   const [pauseImpactData, setPauseImpactData] = useState<PauseImpactData | null>(null);
 
+  const handlePauseSessionChromeClose = useCallback(() => {
+    if (phase === 'done') {
+      handleReturn();
+    } else {
+      requestExitPauseBeforeDone();
+    }
+  }, [phase, handleReturn, requestExitPauseBeforeDone]);
+
   usePauseSessionEntryPresentationEffects({ step, setDecideOnBackStep, setCurtainLifted });
 
   const {
@@ -239,16 +315,17 @@ export default function PauseSession() {
     initialBriefIntegrateDoneFromRestored(restored),
   );
   const [selectedBriefFace, setSelectedBriefFace] = useState(() => initialSelectedBriefFaceFromRestored(restored));
-  const [pickerAboutOpen, setPickerAboutOpen] = useState(false);
+  const { onBrief: depthPickerOnBrief, onDeep: depthPickerOnDeep } = usePauseSessionDepthPickerHandlers({
+    setRitualEntry,
+    setBriefStep,
+  });
 
-  const { onBrief: depthPickerOnBrief, onDeep: depthPickerOnDeep, onAboutPauses: depthPickerOnAboutPauses } =
-    usePauseSessionDepthPickerHandlers({
-      setRitualEntry,
-      setBriefStep,
-      setPickerAboutOpen,
-    });
+  const handleDepthPickerDeep = useCallback(() => {
+    if (!requirePro('deep_pause')) return;
+    depthPickerOnDeep();
+  }, [requirePro, depthPickerOnDeep]);
 
-  const { handleMoodSelect, handleMoodSkip, handleMoodReset } = usePauseSessionInitialMoodHandlers({
+  const { handleMoodSelect } = usePauseSessionInitialMoodHandlers({
     pauseInstanceId,
     t,
     lastFeelLogKeyRef,
@@ -258,7 +335,17 @@ export default function PauseSession() {
     setSelectedBriefFace,
   });
 
-  const { onBriefFeelSelect } = usePauseSessionBriefFeelSelect({ handleMoodSelect });
+  const { onFeelTilesSelect } = usePauseSessionFeelTilesSelect({
+    handleMoodSelect,
+    isBriefRitual: ritualEntry === 'brief',
+  });
+
+  useEffect(() => {
+    if (subLoading) return;
+    if (ritualEntry !== 'deep') return;
+    if (subscribed) return;
+    setRitualEntry('picker');
+  }, [subLoading, subscribed, ritualEntry]);
 
   usePauseSessionRitualStorageSync({
     pauseInstanceId,
@@ -329,7 +416,7 @@ export default function PauseSession() {
   const breathingRef = useRef<PauseBreathingHandle>(null);
   const decidingRef = useRef(false);
   const [breathTimedActive, setBreathTimedActive] = useState(false);
-  const [soundMuted, setSoundMuted] = useState(false);
+  const [soundMuted, setSoundMuted] = useState(true);
 
   usePauseSessionBreathTimedActiveReset({ step, ritualEntry, briefStep, setBreathTimedActive });
 
@@ -427,7 +514,6 @@ export default function PauseSession() {
   const scaffoldRitualDerived = buildPauseSessionScaffoldRitualDerived({
     ritualEntry,
     step,
-    briefStep,
     t,
   });
 
@@ -456,7 +542,7 @@ export default function PauseSession() {
     selectedMood,
     selectedBriefFace,
     feelIntensity,
-    onBriefFeelSelect,
+    onFeelTilesSelect,
     setBriefStep,
     breathingRef,
     mantra,
@@ -473,9 +559,6 @@ export default function PauseSession() {
     handleBriefIntegrateComplete,
     handleDecide,
     briefDecideIntroKicker,
-    handleMoodSelect,
-    handleMoodSkip,
-    handleMoodReset,
     goToStep,
     handleContinueAfterFirstBreath,
     handleContinueAfterSecondBreath,
@@ -495,61 +578,72 @@ export default function PauseSession() {
   });
 
   return (
-    <PauseSessionGate
-      hasMessage={hasCoalescedShellMessage}
-      phase={phase}
-      waitingForFetch={waitingForFetch}
-      fetchFailed={fetchFailed}
-      hydrationStatus={hydration.status}
-      profileLoaded={profileLoaded}
-      onReturn={handleReturn}
-    >
-      <PauseSessionGateContent
-        onPendingAfterMutation={pendingOfferAfterMutation}
-        onPendingNavigateAfterAdopt={pendingOfferNavigateAfterAdopt}
-        sessionOnPicker={sessionOnPicker}
-        depthPickerSlot={
-          <PauseSessionDepthPickerStack
-            contextLine={depthContextLine}
-            onBrief={depthPickerOnBrief}
-            onDeep={depthPickerOnDeep}
-            onAboutPauses={depthPickerOnAboutPauses}
-            onClose={() => {
-              void handleAbandonClose();
-            }}
-            aboutSheetOpen={pickerAboutOpen}
-            onAboutSheetOpenChange={setPickerAboutOpen}
-            aboutSheetTitle={t('pause.aboutPauses.sheetTitle')}
-          />
-        }
-        scaffoldSlot={
-          <PauseSessionScaffoldShell
-            {...scaffoldRitualDerived}
-            countdownSlot={engagedOpenMaxCountdownSlot}
-            curtainLifted={curtainLifted}
-            prefersReducedMotion={!!prefersReducedMotion}
-            onClose={() => {
-              void handleAbandonClose();
-            }}
-            phase={phase}
-            step={step}
-            goToStep={goToStep}
-            onHeaderBack={handlePauseHeaderBack}
-            showHeaderBack={showPauseHeaderBack}
-            macroProgressLine={briefMacroLine}
-            stepperSlot={briefStepperSlot}
-            breathSecondLabelVariant={breathSecondLabelVariant}
-            soundMuted={soundMuted}
-            onSoundMutedChange={setSoundMuted}
-            ritualEntry={ritualEntry}
-            briefRitual={briefRitual}
-            deepRitual={deepRitual}
-            decision={decision}
-            onDoneReturn={handleReturn}
-            pauseImpactData={pauseImpactData}
-          />
-        }
+    <Fragment>
+      <PauseSessionGate
+        hasMessage={hasCoalescedShellMessage}
+        phase={phase}
+        waitingForFetch={waitingForFetch}
+        fetchFailed={fetchFailed}
+        hydrationStatus={hydration.status}
+        profileLoaded={profileLoaded}
+        onReturn={handleReturn}
+      >
+        <PauseSessionGateContent
+          sessionOnPicker={sessionOnPicker}
+          depthPickerSlot={
+            <PauseSessionDepthPickerStack
+              contextLine={depthContextLine}
+              onBrief={depthPickerOnBrief}
+              onDeep={handleDepthPickerDeep}
+              deepPauseLocked={!subscribed}
+              onClose={requestExitPauseBeforeDone}
+            />
+          }
+          scaffoldSlot={
+            <PauseSessionScaffoldShell
+              {...scaffoldRitualDerived}
+              countdownSlot={engagedOpenMaxCountdownSlot}
+              curtainLifted={curtainLifted}
+              prefersReducedMotion={!!prefersReducedMotion}
+              onClose={handlePauseSessionChromeClose}
+              phase={phase}
+              step={step}
+              goToStep={goToStep}
+              onHeaderBack={handlePauseHeaderBack}
+              showHeaderBack={showPauseHeaderBack}
+              macroProgressLine={briefMacroLine ?? scaffoldRitualDerived.macroProgressLine}
+              stepperSlot={briefStepperSlot}
+              breathSecondLabelVariant={breathSecondLabelVariant}
+              soundMuted={soundMuted}
+              onSoundMutedChange={setSoundMuted}
+              ritualEntry={ritualEntry}
+              briefRitual={briefRitual}
+              deepRitual={deepRitual}
+              decision={decision}
+              onDoneReturn={handleReturn}
+              pauseImpactData={pauseImpactData}
+            />
+          }
+        />
+      </PauseSessionGate>
+      <PauseLeaveWithPendingSheet
+        open={leaveWithPendingOpen}
+        onOpenChange={setLeaveWithPendingOpen}
+        pending={pending}
+        busy={leaveSheetBusy}
+        onStay={() => setLeaveWithPendingOpen(false)}
+        onLeave={() => {
+          confirmLeavePauseSession();
+        }}
+        onSwitchToBrief={() => {
+          setLeaveWithPendingOpen(false);
+          setRitualEntry('brief');
+          setBriefStep('feel');
+          setStep('feel');
+        }}
+        onAdoptNew={() => void handlePendingAdoptFromLeaveSheet()}
+        onDismissPendingOffer={() => void handleDeclinePendingFromLeaveSheet()}
       />
-    </PauseSessionGate>
+    </Fragment>
   );
 }

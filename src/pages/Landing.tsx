@@ -1,5 +1,6 @@
 import { useTranslation } from 'react-i18next';
 import { useEffect, useRef } from 'react';
+import { useQueryClient } from '@tanstack/react-query';
 import { LandingComparison } from '@/components/LandingComparison';
 import { useNavigate, Link, useSearchParams } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
@@ -15,6 +16,8 @@ import { PageMeta } from '@/components/PageMeta';
 import { LandingTestimonials } from '@/components/LandingTestimonials';
 import { LandingLanguageSwitcher } from '@/components/LandingLanguageSwitcher';
 import { PRICING } from '@/lib/pricing';
+import { prefetchCoingeckoBtcUsd } from '@/lib/coingecko-btc-usd-query';
+import { prefetchBlogPublishedFirstPage } from '@/lib/blog-post-query';
 
 function Section({ children, className = '', delay = 0 }: { children: React.ReactNode; className?: string; delay?: number }) {
   const ref = useRef(null);
@@ -43,6 +46,7 @@ function SectionLabel({ children }: { children: React.ReactNode }) {
 }
 
 const Landing = () => {
+  const queryClient = useQueryClient();
   const { t } = useTranslation();
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
@@ -208,7 +212,7 @@ const Landing = () => {
       {/* ─── SCIENCE ─── */}
       <div className="max-w-lg mx-auto px-6 py-16">
         <Section>
-          <div className="relative pl-5 border-l-2 border-primary/20 space-y-4">
+          <div className="relative space-y-4 border-l-2 border-border/60 pl-5">
             <p className="text-base text-foreground leading-relaxed italic">
               {t('landing.scienceQuote')}
             </p>
@@ -256,7 +260,7 @@ const Landing = () => {
               ] as const).map(({ key, icon: Icon, step, sources }) => (
                 <div key={key} className="rounded-lg border border-border/40 bg-background/60 p-4 space-y-2.5">
                   <div className="flex items-center gap-2.5">
-                    <div className="w-7 h-7 rounded-full bg-primary/10 flex items-center justify-center shrink-0">
+                    <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-muted/50">
                       <Icon className="h-3.5 w-3.5 text-muted-foreground" />
                     </div>
                     <div className="flex items-baseline gap-2">
@@ -389,9 +393,23 @@ const Landing = () => {
           <div className="flex flex-wrap items-center gap-3 text-xs text-muted-foreground/60 mt-6">
             <Link to="/about" className="hover:text-foreground transition-colors">{t('landing.about')}</Link>
             <span className="text-muted-foreground/20">·</span>
-            <Link to="/reserve" className="hover:text-foreground transition-colors">{t('landing.btcReserve')}</Link>
+            <Link
+              to="/reserve"
+              className="hover:text-foreground transition-colors"
+              onMouseEnter={() => void prefetchCoingeckoBtcUsd(queryClient)}
+              onFocus={() => void prefetchCoingeckoBtcUsd(queryClient)}
+            >
+              {t('landing.btcReserve')}
+            </Link>
             <span className="text-muted-foreground/20">·</span>
-            <Link to="/blog" className="hover:text-foreground transition-colors">{t('landing.blog')}</Link>
+            <Link
+              to="/blog"
+              className="hover:text-foreground transition-colors"
+              onMouseEnter={() => void prefetchBlogPublishedFirstPage(queryClient)}
+              onFocus={() => void prefetchBlogPublishedFirstPage(queryClient)}
+            >
+              {t('landing.blog')}
+            </Link>
             <span className="text-muted-foreground/20">·</span>
             <Link to="/terms" className="hover:text-foreground transition-colors">{t('landing.terms')}</Link>
             <span className="text-muted-foreground/20">·</span>

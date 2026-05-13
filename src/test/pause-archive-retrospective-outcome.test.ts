@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import { pauseArchiveRowAllowsRetrospectiveOutcome } from '@/lib/pause-archive-retrospective-outcome';
-import type { PauseArchiveRow } from '@/hooks/use-pause-archive-list';
+import type { PauseArchiveRow } from '@/lib/pause-archive-list-query';
 
 function row(partial: Partial<PauseArchiveRow>): PauseArchiveRow {
   return partial as PauseArchiveRow;

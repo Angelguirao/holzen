@@ -2,9 +2,11 @@ import { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { ConfidenceChip } from '@/components/stats/ConfidenceChip';
 import { sampleConfidence } from '@/lib/stats/confidence';
-import type { PauseFullRow } from '@/hooks/use-pause-stats-data';
+import type { PauseFullRow } from '@/lib/pause-stats-data-query';
 
-const HOLD = new Set(['held', 'nothing']);
+// Live UI emits `held | bought | sold` only; legacy `nothing` rows fall through
+// (consistent with src/lib/badges/compute.ts).
+const HOLD = new Set(['held']);
 
 interface Props {
   rows: readonly PauseFullRow[];

@@ -60,7 +60,7 @@ export function ScoreImpact({ data }: { data: PauseData }) {
 
     // Tolerance
     const vol = parseVolatility(data.context);
-    if (vol >= 3 && (data.decision === 'held' || data.decision === 'nothing')) {
+    if (vol >= 3 && data.decision === 'held') {
       list.push({
         label: t('holzenScore.distressTolerance', { defaultValue: 'Tolerance' }),
         key: 'tolerance',

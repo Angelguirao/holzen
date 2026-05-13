@@ -1,6 +1,12 @@
-import { useEffect, useState } from 'react';
-import { supabase } from '@/integrations/supabase/client';
+import { useQuery } from '@tanstack/react-query';
 import { useAuth } from '@/hooks/use-auth';
+import { getCompletedPauseCountQueryOptions } from '@/lib/completed-pause-count-query';
+
+export {
+  COMPLETED_PAUSE_COUNT_QUERY_KEY,
+  fetchCompletedPauseCount,
+  getCompletedPauseCountQueryOptions,
+} from '@/lib/completed-pause-count-query';
 
 /**
  * Exact count of completed pause rows for the current user (`pause_instances.state = 'completed'`).
@@ -8,27 +14,9 @@ import { useAuth } from '@/hooks/use-auth';
  */
 export function useCompletedPauseCount(): number | null {
   const { user } = useAuth();
-  const [count, setCount] = useState<number | null>(null);
-
-  useEffect(() => {
-    if (!user) {
-      setCount(null);
-      return;
-    }
-    let cancelled = false;
-    void supabase
-      .from('pause_instances' as never)
-      .select('id', { count: 'exact', head: true })
-      .eq('user_id', user.id)
-      .eq('state', 'completed')
-      .then(({ count: c }: { count: number | null }) => {
-        if (cancelled) return;
-        setCount(c ?? 0);
-      });
-    return () => {
-      cancelled = true;
-    };
-  }, [user]);
-
-  return count;
+  const userId = user?.id;
+  const { data, isPending } = useQuery(getCompletedPauseCountQueryOptions(userId));
+  if (!userId) return null;
+  if (isPending && data === undefined) return null;
+  return data ?? 0;
 }

@@ -41,14 +41,15 @@ export function detectSkills(r: ReflectionForSkills): SkillType[] {
     if (!skills.includes('regulation')) skills.push('regulation');
   }
 
-  // Distress Tolerance: held during volatility (nothing treated as held for legacy)
+  // Distress Tolerance: held during volatility. Legacy `nothing` rows are no
+  // longer treated as held (consistent with src/lib/badges/compute.ts).
   const vol = parseVolatility(r.context);
-  if (vol >= 3 && (r.outcome === 'held' || r.outcome === 'nothing')) {
+  if (vol >= 3 && r.outcome === 'held') {
     skills.push('tolerance');
   }
 
-  // Decision Alignment: held steady (nothing treated as held for legacy)
-  if (r.outcome === 'held' || r.outcome === 'nothing') {
+  // Decision Alignment: held steady.
+  if (r.outcome === 'held') {
     skills.push('alignment');
   }
 
@@ -74,9 +75,9 @@ export const SKILL_LABELS: Record<SkillType, string> = {
 };
 
 export const SKILL_COLORS: Record<SkillType, string> = {
-  regulation: 'bg-primary/15 text-primary',
+  regulation: 'bg-nox-accent-violet/15 text-nox-accent-violet',
   tolerance: 'bg-accent/15 text-accent-foreground',
   alignment: 'bg-muted text-muted-foreground',
-  reappraisal: 'bg-primary/10 text-primary/80',
+  reappraisal: 'bg-nox-accent-cyan/15 text-nox-accent-cyan',
   awareness: 'bg-secondary text-secondary-foreground',
 };

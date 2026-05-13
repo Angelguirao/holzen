@@ -20,18 +20,23 @@ interface Props {
   onAfterMutation: () => void | Promise<void>;
   /** Optional: e.g. reset `/pause` client state to the newly active instance. */
   navigateAfterAdopt?: (instanceId: string) => void;
+  /**
+   * When `false`, this instance never opens the dialog (`/pause` uses
+   * `PauseLeaveWithPendingSheet` instead). Default: blocking modal when `pending` exists.
+   */
+  autoOpen?: boolean;
 }
 
 /**
  * Blocking modal when the server has queued a `pending` pause (new market
  * context) while the user still has an active ritual.
  */
-export function PendingPauseOfferShell({ onAfterMutation, navigateAfterAdopt }: Props) {
+export function PendingPauseOfferShell({ onAfterMutation, navigateAfterAdopt, autoOpen = true }: Props) {
   const { t } = useTranslation();
   const { pending, refresh } = usePendingPauseOffer();
   const [busy, setBusy] = useState(false);
 
-  const open = !!pending;
+  const open = autoOpen && !!pending;
 
   const handleAdopt = async () => {
     if (!pending || busy) return;

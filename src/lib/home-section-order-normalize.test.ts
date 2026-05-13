@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { mergeOrderWithDefaults, normalizeHomeSectionOrder } from './home-section-order-normalize';
-import { ALL_HOME_SECTION_IDS } from '@/hooks/use-home-optional-visibility';
+import { ALL_HOME_SECTION_IDS } from '@/lib/home-section-visibility-constants';
 
 const DEFAULT = [...ALL_HOME_SECTION_IDS];
 

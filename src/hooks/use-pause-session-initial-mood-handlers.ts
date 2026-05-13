@@ -1,7 +1,7 @@
 import { useCallback, type Dispatch, type MutableRefObject, type SetStateAction } from 'react';
 import type { TFunction } from 'i18next';
 import type { MoodValue } from '@/components/MoodCheck';
-import type { BriefFeelTile } from '@/components/pause/PauseBriefFeel';
+import type { FeelStepTile } from '@/components/pause/pause-feel-types';
 import { hapticFeedback } from '@/lib/haptics';
 import { pauseLogStep } from '@/lib/pause-api';
 import {
@@ -19,12 +19,12 @@ export function usePauseSessionInitialMoodHandlers(input: {
   setMoodDone: Dispatch<SetStateAction<boolean>>;
   setSelectedMood: Dispatch<SetStateAction<MoodValue | null>>;
   setFeelIntensity: Dispatch<SetStateAction<number | null>>;
-  setSelectedBriefFace: Dispatch<SetStateAction<BriefFeelTile | null>>;
+  setSelectedBriefFace: Dispatch<SetStateAction<FeelStepTile | null>>;
 }): {
   handleMoodSelect: (
     mood: MoodValue,
     intensity?: number,
-    opts?: { briefRitual?: boolean; briefFace?: BriefFeelTile },
+    opts?: { briefRitual?: boolean; briefFace?: FeelStepTile },
   ) => Promise<void>;
   handleMoodSkip: () => Promise<void>;
   handleMoodReset: () => void;
@@ -43,7 +43,7 @@ export function usePauseSessionInitialMoodHandlers(input: {
     async (
       mood: MoodValue,
       intensity?: number,
-      opts?: { briefRitual?: boolean; briefFace?: BriefFeelTile },
+      opts?: { briefRitual?: boolean; briefFace?: FeelStepTile },
     ) => {
       hapticFeedback('light');
       const payload = buildInitialEmotionLoggedPayload(mood, intensity, opts);

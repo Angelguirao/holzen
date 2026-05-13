@@ -1,5 +1,5 @@
 import type { MoodValue } from '@/components/MoodCheck';
-import type { BriefFeelTile } from '@/components/pause/PauseBriefFeel';
+import type { FeelStepTile } from '@/components/pause/pause-feel-types';
 import type { CompanionData, CompanionPrefs } from '@/components/CompanionSection';
 import type { PauseStep } from '@/components/pause/PauseProgress';
 import type { PauseState } from '@/lib/pause-state';
@@ -50,7 +50,7 @@ export interface PersistedSession {
   /** v4: user finished the 20s integrate beat (or tapped Continue early). */
   briefIntegrateDone?: boolean;
   /** v4: which tile was chosen on the brief Feel grid (Other maps to uncertain in RPC mood). */
-  briefFace?: BriefFeelTile | null;
+  briefFace?: FeelStepTile | null;
 }
 
 export const DEFAULT_COMPANIONS: CompanionData = { haiku: null, groundingTitle: null, groundingBody: null };

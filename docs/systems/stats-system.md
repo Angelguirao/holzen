@@ -255,6 +255,46 @@ Unlock condition: at least 8 points with both mood and context.
 
 ---
 
+## Outcome scoring matrix
+
+This is the canonical mapping from a completed pause's `outcome` (recorded by the Decide step — see [pause-system.md](pause-system.md) §6) to per-skill values in [src/lib/stats/pause-score.ts](../../src/lib/stats/pause-score.ts). The scoring model deliberately treats `bought` as **context-aware** so a dip-buy (during a `down` move) and a chase-buy (during an `up` move) do not look identical to the score.
+
+`pctAbs` is the absolute 24h or 7d price change pulled from `pause_instances.context_snapshot` (see `parseVolatility`); `direction` is the sign of the same value (`up`, `down`, or `flat`). `tier` is a short scale based on `pctAbs`:
+
+| `pctAbs` range | `tier` | Conceptual label |
+| ---------- | ------ | ---------------- |
+| `< 3%`     | 1.0    | mild             |
+| `3% – 7%`  | 1.5    | moderate         |
+| `>= 7%`    | 2.0    | severe           |
+
+### Distress Tolerance — outcome × tier × direction
+
+| `outcome`         | Formula                                  | mild (tier 1) | moderate (tier 1.5) | severe (tier 2) |
+| ----------------- | ---------------------------------------- | ------------- | ------------------- | --------------- |
+| `held`            | `min(100, 60 + tier * 20)`               | 80            | 90                  | 100             |
+| `bought` + `down` | `min(100, 50 + tier * 10)` (dip-buy)     | 60            | 65                  | 70              |
+| `bought` + `up`   | `max(0, 50 - tier * 10)` (chase-buy)     | 40            | 35                  | 30              |
+| `bought` + `flat` | `45` (legacy fallback)                   | 45            | 45                  | 45              |
+| `sold`            | `max(0, 40 - tier * 15)`                 | 25            | 17.5                | 10              |
+| anything else (incl. legacy `nothing`) | `50` (catch-all)            | 50            | 50                  | 50              |
+
+### Decision Alignment — outcome × hold-goal type
+
+Only applied when the user has configured a hold goal. The values below are the per-row scores; the card averages across the recent completed window.
+
+| `outcome`                              | Hold goal `forever` | Hold goal time / price |
+| -------------------------------------- | ------------------- | ---------------------- |
+| `held`                                 | 100                 | 100                    |
+| `bought`                               | 60                  | 50                     |
+| `sold`                                 | 15                  | 20                     |
+| anything else (incl. legacy `nothing`) | 50 (catch-all)      | 50 (catch-all)         |
+
+### Why `nothing` falls through to neutral
+
+Historical `pause_step_events` rows may still carry `outcome = "nothing"` from a prior product iteration where a fourth "abstain" choice existed in the UI. The live `PauseDecide` flow no longer emits that value, and migration [supabase/migrations/20260519120000_pause_log_step_main_outcome_validation.sql](../../supabase/migrations/20260519120000_pause_log_step_main_outcome_validation.sql) now rejects it server-side. To avoid retroactively reclassifying historical rows, scoring treats `nothing` as the catch-all neutral 50 (it does **not** count toward tolerance or alignment ladders, and the `held` and `bought`/`sold` numbers above stay clean). Badges follow the same rule via `HOLD_OUTCOMES = new Set(['held'])` in [src/lib/badges/compute.ts](../../src/lib/badges/compute.ts).
+
+---
+
 ## Notes for maintainers
 
 - Rendering order is defined in `src/pages/Profile.tsx` inside `StatsContent`.

@@ -61,7 +61,7 @@ export function BulkHoldSuccessBody({ heldCount, onViewEchoes }: BulkHoldSuccess
         <Button
           type="button"
           variant="outline"
-          className="h-10 w-full justify-between rounded-xl border-primary/25 font-medium text-foreground"
+          className="h-10 w-full justify-between rounded-xl border-border font-medium text-foreground"
           onClick={() => {
             hapticFeedback('light');
             onViewEchoes();

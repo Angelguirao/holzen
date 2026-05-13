@@ -1,8 +1,15 @@
 import { useState, useEffect, useRef, useCallback, forwardRef } from 'react';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { Bell, X, CheckCheck, ArrowRight } from 'lucide-react';
 import { hapticFeedback } from '@/lib/haptics';
+import {
+  fetchNotificationsInboxRows,
+  getNotificationsInboxMappedListQueryOptions,
+  notificationsInboxQueryKey,
+  type NotificationsInboxRow,
+} from '@/lib/notifications-inbox-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/use-auth';
 import { formatDistanceToNow } from 'date-fns';
@@ -116,16 +123,6 @@ type NotificationItem = {
   action?: { label: string; path: string; state?: NotificationNavigateState };
 };
 
-type NotificationRow = {
-  id: string;
-  type: NotificationItem['type'];
-  metadata: unknown;
-  action_path: string | null;
-  action_state: unknown;
-  created_at: string;
-  dismissed_at: string | null;
-};
-
 const LAST_READ_KEY = 'holzen_notifications_read_at';
 const DISMISSED_KEY = 'holzen_notifications_dismissed';
 
@@ -157,26 +154,23 @@ function getNumber(value: unknown): number | null {
 export function NotificationBell() {
   const { t } = useTranslation();
   const { user } = useAuth();
+  const queryClient = useQueryClient();
   const navigate = useNavigate();
-  const [allNotifications, setAllNotifications] = useState<NotificationItem[]>([]);
   const [dismissed, setDismissed] = useState<Set<string>>(getDismissedIds);
   const [open, setOpen] = useState(false);
-  const [loading, setLoading] = useState(true);
   const [unreadCount, setUnreadCount] = useState(0);
   const [freshIds, setFreshIds] = useState<Set<string>>(new Set());
   const ref = useRef<HTMLDivElement>(null);
   const previousIdsRef = useRef<Set<string>>(new Set());
   const freshTimersRef = useRef<Map<string, number>>(new Map());
-  const fetchInFlightRef = useRef(false);
 
-  const visibleNotifications = allNotifications.filter(n => !dismissed.has(n.id));
   const normalizeNotifications = useCallback((items: NotificationItem[]) => {
     return [...items]
       .sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime())
       .slice(0, 20);
   }, []);
 
-  const mapRowToNotification = useCallback((row: NotificationRow): NotificationItem | null => {
+  const mapRowToNotification = useCallback((row: NotificationsInboxRow): NotificationItem | null => {
     if (!row?.id || !row?.type || !row?.created_at) return null;
 
     const metadata = asRecord(row.metadata);
@@ -231,58 +225,58 @@ export function NotificationBell() {
     };
   }, [t]);
 
-  const upsertNotification = useCallback((next: NotificationItem) => {
-    setAllNotifications((prev) => {
-      const filtered = prev.filter((item) => item.id !== next.id);
-      return normalizeNotifications([next, ...filtered]);
-    });
-  }, [normalizeNotifications]);
+  const { data: allNotifications = [], isPending: loading } = useQuery(
+    getNotificationsInboxMappedListQueryOptions({
+      userId: user?.id,
+      queryFn: async () => {
+        const rows = await fetchNotificationsInboxRows(user!.id);
+        const mapped = rows
+          .map(mapRowToNotification)
+          .filter((item): item is NotificationItem => item !== null);
+        return normalizeNotifications(mapped);
+      },
+    }),
+  );
 
-  const removeNotification = useCallback((id: string) => {
-    setAllNotifications((prev) => prev.filter((item) => item.id !== id));
-    setFreshIds((prev) => {
-      if (!prev.has(id)) return prev;
-      const next = new Set(prev);
-      next.delete(id);
-      return next;
-    });
-    const timer = freshTimersRef.current.get(id);
-    if (timer) {
-      window.clearTimeout(timer);
-      freshTimersRef.current.delete(id);
-    }
-  }, []);
+  const visibleNotifications = allNotifications.filter((n) => !dismissed.has(n.id));
 
-  const fetchNotifications = useCallback(async ({ showLoading = true }: { showLoading?: boolean } = {}) => {
+  const bumpInbox = useCallback(() => {
     if (!user) return;
-    if (fetchInFlightRef.current) return;
-    fetchInFlightRef.current = true;
+    void queryClient.invalidateQueries({ queryKey: notificationsInboxQueryKey(user.id) });
+  }, [user, queryClient]);
 
-    if (showLoading) setLoading(true);
+  const upsertNotification = useCallback(
+    (next: NotificationItem) => {
+      if (!user) return;
+      queryClient.setQueryData<NotificationItem[]>(notificationsInboxQueryKey(user.id), (prev) => {
+        const base = prev ?? [];
+        const filtered = base.filter((item) => item.id !== next.id);
+        return normalizeNotifications([next, ...filtered]);
+      });
+    },
+    [user, queryClient, normalizeNotifications],
+  );
 
-    try {
-      const { data } = await supabase
-        .from('notifications')
-        .select('id, type, metadata, action_path, action_state, created_at, dismissed_at')
-        .eq('user_id', user.id)
-        .is('dismissed_at', null)
-        .order('created_at', { ascending: false })
-        .limit(20);
-
-      const mapped = ((data ?? []) as unknown as NotificationRow[])
-        .map(mapRowToNotification)
-        .filter((item): item is NotificationItem => item !== null);
-      setAllNotifications(normalizeNotifications(mapped));
-    } finally {
-      fetchInFlightRef.current = false;
-      setLoading(false);
-    }
-  }, [user, mapRowToNotification, normalizeNotifications]);
-
-  useEffect(() => {
-    if (!user) return;
-    fetchNotifications();
-  }, [user, fetchNotifications]);
+  const removeNotification = useCallback(
+    (id: string) => {
+      if (!user) return;
+      queryClient.setQueryData<NotificationItem[]>(notificationsInboxQueryKey(user.id), (prev) =>
+        (prev ?? []).filter((item) => item.id !== id),
+      );
+      setFreshIds((prev) => {
+        if (!prev.has(id)) return prev;
+        const next = new Set(prev);
+        next.delete(id);
+        return next;
+      });
+      const timer = freshTimersRef.current.get(id);
+      if (timer) {
+        window.clearTimeout(timer);
+        freshTimersRef.current.delete(id);
+      }
+    },
+    [user, queryClient],
+  );
 
   useEffect(() => {
     const previousIds = previousIdsRef.current;
@@ -337,7 +331,7 @@ export function NotificationBell() {
             return;
           }
 
-          const row = (payload.new ?? {}) as NotificationRow;
+          const row = (payload.new ?? {}) as NotificationsInboxRow;
           if (row.dismissed_at) {
             removeNotification(row.id);
             return;
@@ -345,7 +339,7 @@ export function NotificationBell() {
 
           const mapped = mapRowToNotification(row);
           if (mapped) upsertNotification(mapped);
-          else fetchNotifications({ showLoading: false });
+          else bumpInbox();
         },
       )
       .subscribe();
@@ -353,7 +347,7 @@ export function NotificationBell() {
     return () => {
       supabase.removeChannel(channel);
     };
-  }, [user, fetchNotifications, mapRowToNotification, removeNotification, upsertNotification]);
+  }, [user, bumpInbox, mapRowToNotification, removeNotification, upsertNotification]);
 
   useEffect(() => {
     const visible = allNotifications.filter(n => !dismissed.has(n.id));

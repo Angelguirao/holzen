@@ -1,9 +1,10 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback } from 'react';
+import { useQuery } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
 import { Waves, PenLine, Activity, History, Lock, ChevronRight, Sparkles } from 'lucide-react';
 import { useSubscription } from '@/hooks/use-subscription';
 import { useAuth } from '@/hooks/use-auth';
-import { supabase } from '@/integrations/supabase/client';
+import { getPracticeEntriesWeeklyCountQueryOptions } from '@/lib/practice-entries-weekly-count-query';
 import { toast } from 'sonner';
 import { useNavigate } from 'react-router-dom';
 import { homeInWidget } from '@/components/home/home-widget-styles';
@@ -21,21 +22,7 @@ const PRACTICES = [
 ] as const;
 
 function useWeeklyProgress(userId: string | undefined) {
-  const [count, setCount] = useState(0);
-
-  useEffect(() => {
-    if (!userId) return;
-    (async () => {
-      const sevenDaysAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString();
-      const { count: c } = await supabase
-        .from('practice_entries')
-        .select('id', { count: 'exact', head: true })
-        .eq('user_id', userId)
-        .gte('created_at', sevenDaysAgo);
-      setCount(c ?? 0);
-    })();
-  }, [userId]);
-
+  const { data: count = 0 } = useQuery(getPracticeEntriesWeeklyCountQueryOptions(userId));
   return count;
 }
 
@@ -91,7 +78,7 @@ export function PracticeWidget() {
       {suggestion && (
         <button
           onClick={() => handleSelect(suggestion.id)}
-          className="flex w-full items-start gap-3 rounded-xl border border-primary/15 bg-primary/[0.04] px-3 py-3 transition-colors hover:bg-primary/[0.07]"
+          className="flex w-full items-start gap-3 rounded-xl border border-border/50 bg-nox-background-accent/20 px-3 py-3 transition-colors hover:bg-nox-background-accent/35"
         >
           <Sparkles className="h-3.5 w-3.5 shrink-0 mt-[6px] text-secondary-foreground" />
           <div className="min-w-0 flex-1 text-left">

@@ -3,10 +3,11 @@ import { motion, useReducedMotion } from 'framer-motion';
 import { ArrowLeft, Bitcoin } from 'lucide-react';
 import { PageMeta } from '@/components/PageMeta';
 import { PublicFooter } from '@/components/PublicFooter';
-import { useState, useEffect } from 'react';
+import { useQuery } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
 import { PageHeading } from '@/components/PageHeading';
 import { StateCard } from '@/components/ui/state-card';
+import { getCoingeckoBtcUsdQueryOptions } from '@/lib/coingecko-btc-usd-query';
 
 const fade = (delay = 0) => ({
   initial: { opacity: 0, y: 14 },
@@ -23,22 +24,11 @@ const TREASURY = {
   hasStarted: false,
 };
 
-function useBtcPrice() {
-  const [price, setPrice] = useState<number | null>(null);
-  useEffect(() => {
-    fetch('https://api.coingecko.com/api/v3/simple/price?ids=bitcoin&vs_currencies=usd')
-      .then((r) => r.json())
-      .then((d) => setPrice(d?.bitcoin?.usd ?? null))
-      .catch(() => {});
-  }, []);
-  return price;
-}
-
 const Reserve = () => {
   const { t } = useTranslation();
   const prefersReduced = useReducedMotion();
   const m = (delay = 0) => (prefersReduced ? {} : fade(delay));
-  const btcPrice = useBtcPrice();
+  const { data: btcPrice } = useQuery(getCoingeckoBtcUsdQueryOptions());
 
   const currentValue = btcPrice ? TREASURY.totalBtc * btcPrice : null;
   const unrealisedPnl = btcPrice
