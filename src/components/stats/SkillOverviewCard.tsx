@@ -9,7 +9,7 @@ import {
   DEFAULT_CONFIDENCE_THRESHOLDS,
 } from '@/lib/stats/confidence';
 import { computePauseScore } from '@/lib/stats/pause-score';
-import type { PauseFullRow } from '@/hooks/use-pause-stats-data';
+import type { PauseFullRow } from '@/lib/pause-stats-data-query';
 import type { PauseStepEventRow, PauseCompanionEventRow } from '@/lib/pause-state';
 
 interface HoldGoal {

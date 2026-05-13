@@ -1,9 +1,34 @@
 import { supabase } from '@/integrations/supabase/client';
+import { PRACTICE_QUERY_PREFIX } from '@/lib/practice-query-namespace';
 import {
   combineNoteAndReplayWords,
   type PastReflectionWithWords,
   type UserWord,
 } from '../../supabase/functions/_shared/past-reflection-util';
+
+export const PRACTICE_REPLAY_QUERY_PREFIX = [...PRACTICE_QUERY_PREFIX, 'replay'] as const;
+
+export const PRACTICE_REPLAY_RECENT_PAUSES_QUERY_LEAF = 'recent-pauses' as const;
+
+export const PRACTICE_REPLAY_RECENT_PAUSES_QUERY_PREFIX = [
+  ...PRACTICE_REPLAY_QUERY_PREFIX,
+  PRACTICE_REPLAY_RECENT_PAUSES_QUERY_LEAF,
+] as const;
+
+export const PRACTICE_REPLAY_THREAD_QUERY_LEAF = 'thread' as const;
+
+export const PRACTICE_REPLAY_THREAD_QUERY_PREFIX = [
+  ...PRACTICE_REPLAY_QUERY_PREFIX,
+  PRACTICE_REPLAY_THREAD_QUERY_LEAF,
+] as const;
+
+/** Placeholder segment when user/instance scope is missing (queries stay disabled). */
+export const PRACTICE_REPLAY_DISABLED_PLACEHOLDER = '__none__' as const;
+
+/** TanStack cache key for `loadPauseReplayThread` (Daily Practice replay). */
+export function pauseReplayThreadQueryKey(pauseInstanceId: string) {
+  return [...PRACTICE_REPLAY_THREAD_QUERY_PREFIX, pauseInstanceId] as const;
+}
 
 function contextTextFromSnapshot(snapshot: Record<string, unknown> | null | undefined): string | null {
   const c = snapshot?.context_text;
@@ -95,6 +120,67 @@ export type PausePickerRow = {
   created_at: string;
   reflection_text: string | null;
 };
+
+export const REPLAY_RECENT_PAUSES_NONE_QUERY_KEY = [
+  ...PRACTICE_REPLAY_RECENT_PAUSES_QUERY_PREFIX,
+  PRACTICE_REPLAY_DISABLED_PLACEHOLDER,
+] as const;
+
+export function replayRecentPausesQueryKey(userId: string) {
+  return [...PRACTICE_REPLAY_RECENT_PAUSES_QUERY_PREFIX, userId] as const;
+}
+
+export const PAUSE_REPLAY_THREAD_NONE_QUERY_KEY = [
+  ...PRACTICE_REPLAY_THREAD_QUERY_PREFIX,
+  PRACTICE_REPLAY_DISABLED_PLACEHOLDER,
+] as const;
+
+/** Resolves the replay thread or throws (for TanStack `useQuery` error state). */
+export async function fetchPauseReplayThreadOrThrow(
+  pauseInstanceId: string,
+): Promise<PastReflectionWithWords> {
+  const res = await loadPauseReplayThread(pauseInstanceId);
+  if (res.ok) {
+    return res.thread;
+  }
+  const failure = res as { ok: false; code: string; message?: string };
+  throw new Error(failure.message ?? failure.code);
+}
+
+/**
+ * Picker list: recent completed pauses. `listEnabled` is false once the user
+ * has selected a pause (parent stops refetching the list while viewing a thread).
+ */
+export function getReplayRecentPausesQueryOptions(params: {
+  userId: string | undefined;
+  listEnabled: boolean;
+}) {
+  const { userId, listEnabled } = params;
+  return {
+    queryKey: userId ? replayRecentPausesQueryKey(userId) : REPLAY_RECENT_PAUSES_NONE_QUERY_KEY,
+    queryFn: () => loadRecentCompletedPausesForReplay(),
+    enabled: Boolean(userId) && listEnabled,
+    staleTime: 60_000,
+    refetchOnWindowFocus: false,
+    retry: false,
+  } as const;
+}
+
+export function getPauseReplayThreadQueryOptions(params: {
+  userId: string | undefined;
+  pauseInstanceId: string | null | undefined;
+}) {
+  const { userId, pauseInstanceId } = params;
+  const enabled = Boolean(userId && pauseInstanceId);
+  return {
+    queryKey: pauseInstanceId ? pauseReplayThreadQueryKey(pauseInstanceId) : PAUSE_REPLAY_THREAD_NONE_QUERY_KEY,
+    queryFn: () => fetchPauseReplayThreadOrThrow(pauseInstanceId!),
+    enabled,
+    staleTime: 60_000,
+    refetchOnWindowFocus: false,
+    retry: false,
+  } as const;
+}
 
 /** Recent completed pauses for the replay picker (shell only — no per-row word counts). */
 export async function loadRecentCompletedPausesForReplay(limit = 24): Promise<PausePickerRow[]> {

@@ -1,7 +1,11 @@
 import { useState, useCallback, useMemo, forwardRef } from 'react';
 import { useInfiniteQuery, useQueryClient } from '@tanstack/react-query';
-import { supabase } from '@/integrations/supabase/client';
 import { useTranslation } from 'react-i18next';
+import {
+  CHANGELOG_ENTRIES_QUERY_KEY,
+  getChangelogEntriesInfiniteQueryOptions,
+  prefetchChangelogEntriesFirstPage,
+} from '@/lib/changelog-query';
 import {
   AlertDialog,
   AlertDialogContent,
@@ -13,30 +17,6 @@ import {
 } from '@/components/ui/alert-dialog';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useInfiniteScroll } from '@/hooks/use-infinite-scroll';
-
-const PAGE_SIZE = 15;
-
-const CHANGELOG_ENTRIES_QUERY_KEY = ['changelog', 'entries'] as const;
-
-interface ChangelogEntry {
-  id: string;
-  version: string;
-  date: string;
-  changes: string[];
-  created_at: string;
-}
-
-async function fetchChangelogPage(cursor: string | undefined): Promise<ChangelogEntry[]> {
-  let q = supabase
-    .from('changelog_entries')
-    .select('id, version, date, changes, created_at')
-    .order('created_at', { ascending: false })
-    .limit(PAGE_SIZE);
-  if (cursor) q = q.lt('created_at', cursor);
-  const { data, error } = await q;
-  if (error) return [];
-  return (data as unknown as ChangelogEntry[]) ?? [];
-}
 
 export type ChangelogProps = {
   /** Fires when the user opens “What’s new” (before the dialog opens). */
@@ -57,16 +37,7 @@ export const Changelog = forwardRef<HTMLDivElement, ChangelogProps>(function Cha
     hasNextPage,
     isFetchingNextPage,
     fetchNextPage,
-  } = useInfiniteQuery({
-    queryKey: CHANGELOG_ENTRIES_QUERY_KEY,
-    queryFn: ({ pageParam }: { pageParam: string | undefined }) => fetchChangelogPage(pageParam),
-    initialPageParam: undefined as string | undefined,
-    getNextPageParam: (lastPage) =>
-      lastPage.length < PAGE_SIZE ? undefined : lastPage[lastPage.length - 1]!.created_at,
-    enabled: open,
-    staleTime: 60_000,
-    refetchOnWindowFocus: false,
-  });
+  } = useInfiniteQuery(getChangelogEntriesInfiniteQueryOptions(open));
 
   const entries = useMemo(() => data?.pages.flat() ?? [], [data]);
 
@@ -97,6 +68,8 @@ export const Changelog = forwardRef<HTMLDivElement, ChangelogProps>(function Cha
     <div ref={ref}>
       <button
         type="button"
+        onMouseEnter={() => void prefetchChangelogEntriesFirstPage(queryClient)}
+        onFocus={() => void prefetchChangelogEntriesFirstPage(queryClient)}
         onClick={() => {
           onWhatsNewOpen?.();
           setOpen(true);

@@ -2,7 +2,7 @@ import { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { ConfidenceChip } from '@/components/stats/ConfidenceChip';
 import { sampleConfidence } from '@/lib/stats/confidence';
-import type { PauseFullRow } from '@/hooks/use-pause-stats-data';
+import type { PauseFullRow } from '@/lib/pause-stats-data-query';
 import { cn } from '@/lib/utils';
 
 interface Props {

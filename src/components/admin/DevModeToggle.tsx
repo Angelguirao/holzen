@@ -1,58 +1,59 @@
 import { useState, useEffect } from 'react';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { Zap } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
+import { useAuth } from '@/hooks/use-auth';
+import {
+  adminDevModeSettingQueryKey,
+  getAdminDevModeSettingQueryOptions,
+  readLocalDevMode,
+} from '@/lib/admin-dev-mode-setting-query';
 
 export function DevModeToggle() {
-  const [devMode, setDevMode] = useState(false);
+  const { user } = useAuth();
+  const userId = user?.id;
+  const queryClient = useQueryClient();
   const [syncing, setSyncing] = useState(false);
+  const [localOnlyMode, setLocalOnlyMode] = useState(() => readLocalDevMode());
 
   useEffect(() => {
-    try {
-      setDevMode(localStorage.getItem('holzen_dev_mode') === 'true');
-    } catch { /* ignore */ }
+    if (!userId) {
+      setLocalOnlyMode(readLocalDevMode());
+    }
+  }, [userId]);
 
-    (async () => {
-      try {
-        const { data: { user } } = await supabase.auth.getUser();
-        if (!user) return;
-        const { data } = await supabase
-          .from('analytics_events')
-          .select('metadata')
-          .eq('user_id', user.id)
-          .eq('event', 'dev_mode_setting')
-          .order('created_at', { ascending: false })
-          .limit(1);
-        if (data && data.length > 0) {
-          const metadata = data[0].metadata as { enabled?: boolean } | null;
-          const dbValue = metadata?.enabled === true;
-          setDevMode(dbValue);
-          try {
-            if (dbValue) localStorage.setItem('holzen_dev_mode', 'true');
-            else localStorage.removeItem('holzen_dev_mode');
-          } catch { /* ignore */ }
-        }
-      } catch { /* non-critical */ }
-    })();
-  }, []);
+  const { data: queryDevMode } = useQuery(getAdminDevModeSettingQueryOptions(userId));
+
+  const devMode = userId ? (queryDevMode ?? readLocalDevMode()) : localOnlyMode;
 
   const toggle = async () => {
     const next = !devMode;
-    setDevMode(next);
+    if (userId) {
+      queryClient.setQueryData(adminDevModeSettingQueryKey(userId), next);
+    } else {
+      setLocalOnlyMode(next);
+    }
     setSyncing(true);
     try {
       if (next) localStorage.setItem('holzen_dev_mode', 'true');
       else localStorage.removeItem('holzen_dev_mode');
-    } catch { /* ignore */ }
+    } catch {
+      /* ignore */
+    }
     try {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (user) {
+      const {
+        data: { user: u },
+      } = await supabase.auth.getUser();
+      if (u) {
         await supabase.from('analytics_events').insert({
-          user_id: user.id,
+          user_id: u.id,
           event: 'dev_mode_setting',
           metadata: { enabled: next },
         });
       }
-    } catch { /* non-critical */ }
+    } catch {
+      /* non-critical */
+    }
     setSyncing(false);
   };
 

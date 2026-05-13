@@ -1,20 +1,16 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useCallback } from 'react';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { Check, X, Loader2, RefreshCw } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
+import {
+  ADMIN_PENDING_SOURCE_SUGGESTIONS_QUERY_KEY,
+  fetchPendingSourceSuggestionsRows,
+  getAdminPendingSourceSuggestionsQueryOptions,
+  type SourceSuggestionRow,
+} from '@/lib/admin-source-suggestions-query';
 
-export interface SourceSuggestionRow {
-  id: string;
-  category: 'signal' | 'grounding';
-  suggested_name: string;
-  suggested_url: string | null;
-  suggested_type: string;
-  dedupe_key: string;
-  status: string;
-  metadata: Record<string, unknown> | null;
-  created_at: string;
-  reviewed_at: string | null;
-}
+export type { SourceSuggestionRow };
 
 const CAT_LABEL: Record<string, string> = {
   signal: 'Signal',
@@ -23,27 +19,31 @@ const CAT_LABEL: Record<string, string> = {
 
 export function SourceSuggestionsPanel({ onCatalogChanged }: { onCatalogChanged?: () => void }) {
   const { toast } = useToast();
-  const [rows, setRows] = useState<SourceSuggestionRow[]>([]);
-  const [loading, setLoading] = useState(true);
+  const queryClient = useQueryClient();
   const [acting, setActing] = useState<string | null>(null);
 
-  const fetchRows = useCallback(async () => {
-    setLoading(true);
-    const { data, error } = await supabase
-      .from('signal_source_suggestions')
-      .select('id, category, suggested_name, suggested_url, suggested_type, dedupe_key, status, metadata, created_at, reviewed_at')
-      .eq('status', 'pending')
-      .order('created_at', { ascending: false })
-      .limit(100);
-    setLoading(false);
-    if (error) {
-      toast({ title: 'Could not load suggestions', description: error.message, variant: 'destructive' });
-      return;
-    }
-    setRows((data ?? []) as SourceSuggestionRow[]);
-  }, [toast]);
+  const {
+    data: rows = [],
+    isPending,
+    isFetching,
+    isError,
+    refetch,
+  } = useQuery({
+    ...getAdminPendingSourceSuggestionsQueryOptions(),
+    queryFn: async () => {
+      try {
+        return await fetchPendingSourceSuggestionsRows();
+      } catch (error: unknown) {
+        const message = error instanceof Error ? error.message : String(error);
+        toast({ title: 'Could not load suggestions', description: message, variant: 'destructive' });
+        throw error;
+      }
+    },
+  });
 
-  useEffect(() => { fetchRows(); }, [fetchRows]);
+  const bumpSuggestions = useCallback(async () => {
+    await queryClient.invalidateQueries({ queryKey: ADMIN_PENDING_SOURCE_SUGGESTIONS_QUERY_KEY });
+  }, [queryClient]);
 
   const approve = async (row: SourceSuggestionRow) => {
     setActing(row.id);
@@ -70,7 +70,7 @@ export function SourceSuggestionsPanel({ onCatalogChanged }: { onCatalogChanged?
       return;
     }
     toast({ title: 'Added to catalog', description: row.suggested_name });
-    await fetchRows();
+    await bumpSuggestions();
     onCatalogChanged?.();
   };
 
@@ -85,8 +85,10 @@ export function SourceSuggestionsPanel({ onCatalogChanged }: { onCatalogChanged?
       toast({ title: 'Reject failed', description: error.message, variant: 'destructive' });
       return;
     }
-    await fetchRows();
+    await bumpSuggestions();
   };
+
+  const initialLoad = isPending && rows.length === 0;
 
   return (
     <div className="rounded-xl border border-border/20 bg-card/10 px-4 py-3 space-y-3">
@@ -99,17 +101,28 @@ export function SourceSuggestionsPanel({ onCatalogChanged }: { onCatalogChanged?
         </div>
         <button
           type="button"
-          onClick={() => fetchRows()}
-          disabled={loading}
+          onClick={() => void refetch()}
+          disabled={isFetching}
           className="text-[9px] font-sans font-medium text-muted-foreground/40 hover:text-nox-text-link flex items-center gap-1 shrink-0"
         >
-          <RefreshCw className={`h-3 w-3 ${loading ? 'animate-spin' : ''}`} />
+          <RefreshCw className={`h-3 w-3 ${isFetching ? 'animate-spin' : ''}`} />
           Refresh
         </button>
       </div>
 
-      {loading && rows.length === 0 ? (
+      {initialLoad ? (
         <p className="text-[10px] text-muted-foreground/50 text-center py-3">Loading…</p>
+      ) : isError && rows.length === 0 ? (
+        <div className="text-center py-3 space-y-2">
+          <p className="text-[10px] text-muted-foreground/60">Could not load suggestions.</p>
+          <button
+            type="button"
+            onClick={() => void refetch()}
+            className="text-[9px] font-mono text-nox-text-link/80 hover:text-nox-text-link"
+          >
+            Try again
+          </button>
+        </div>
       ) : rows.length === 0 ? (
         <p className="text-[10px] text-muted-foreground/50 text-center py-3">No pending suggestions</p>
       ) : (

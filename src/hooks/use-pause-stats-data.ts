@@ -16,68 +16,23 @@
 
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useCallback, useMemo } from 'react';
-import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/use-auth';
-import type {
-  PauseState,
-  PauseStepEventRow,
-  PauseCompanionEventRow,
-  PauseExpiredReason,
-} from '@/lib/pause-state';
-import { buildDemoFixture, isDemoModeActive } from '@/lib/stats/demo-fixture';
+import {
+  getPauseStatsDataDisabledQueryOptions,
+  getPauseStatsDataQueryOptions,
+  PAUSE_STATS_DATA_NONE_QUERY_KEY,
+  PAUSE_STATS_DATA_QUERY_KEY,
+} from '@/lib/pause-stats-data-query';
+import type { PauseStatsQueryPayload, PauseFullRow } from '@/lib/pause-stats-data-query';
 
-export interface PauseFullRow {
-  id: string;
-  user_id: string;
-  state: PauseState;
-  source: string;
-  context_snapshot: Record<string, unknown> | null;
-  context_fingerprint: string;
-  window_starts_at: string;
-  window_ends_at: string;
-  created_at: string;
-  engaged_at: string | null;
-  completed_at: string | null;
-  terminal_at: string | null;
-  expired_reason: PauseExpiredReason | null;
-  // v_pause_full additions:
-  has_breath_completed: boolean;
-  has_initial_emotion_logged: boolean;
-  has_shift_emotion_logged: boolean;
-  has_outcome_logged: boolean;
-  initial_mood: string | null;
-  /** True when any `initial_emotion_logged` row marks `brief_ritual` (same predicate as `pause_evaluate_transitions`). */
-  is_brief_ritual: boolean;
-  /** Latest `initial_emotion_logged` payload `intensity` (1–5), when logged. */
-  initial_emotion_intensity: number | null;
-  shift_mood: string | null;
-  /** Latest `shift_emotion_logged` payload `shift_intensity` (1–5), when logged. */
-  shift_emotion_intensity: number | null;
-  outcome: string | null;
-  note_text: string | null;
-  tags: string[] | null;
-  is_favorite: boolean;
-  counted_companion_count: number;
-  counted_companion_types: string[] | null;
-  reflection_text: string | null;
-  haiku_text: string | null;
-}
-
-export const PAUSE_STATS_DATA_QUERY_KEY = (userId: string) => ['pause-stats-data', userId] as const;
-
-const STALE_MS = 2 * 60_000;
-
-export interface PauseStatsQueryPayload {
-  rows: PauseFullRow[];
-  stepEvents: PauseStepEventRow[];
-  companionEvents: PauseCompanionEventRow[];
-}
+export type { PauseFullRow, PauseStatsQueryPayload };
+export { PAUSE_STATS_DATA_NONE_QUERY_KEY, PAUSE_STATS_DATA_QUERY_KEY };
 
 export interface UsePauseStatsData {
   ready: boolean;
   rows: PauseFullRow[];
-  stepEvents: PauseStepEventRow[];
-  companionEvents: PauseCompanionEventRow[];
+  stepEvents: PauseStatsQueryPayload['stepEvents'];
+  companionEvents: PauseStatsQueryPayload['companionEvents'];
   refresh: () => Promise<void>;
 }
 
@@ -86,50 +41,8 @@ export function usePauseStatsData(): UsePauseStatsData {
   const queryClient = useQueryClient();
 
   const q = useQuery({
-    queryKey: user ? PAUSE_STATS_DATA_QUERY_KEY(user.id) : ['pause-stats-data', 'none'],
+    ...(user ? getPauseStatsDataQueryOptions(user.id) : getPauseStatsDataDisabledQueryOptions()),
     enabled: !!user,
-    staleTime: STALE_MS,
-    queryFn: async (): Promise<PauseStatsQueryPayload> => {
-      if (!user) {
-        return { rows: [], stepEvents: [], companionEvents: [] };
-      }
-      if (isDemoModeActive()) {
-        return buildDemoFixture(user.id);
-      }
-      const [{ data: rowData }, { data: stepData }, { data: companionData }] =
-        await Promise.all([
-          supabase
-            .from('v_pause_full' as never)
-            .select('*')
-            .eq('user_id', user.id)
-            .order('created_at', { ascending: false })
-            .limit(500),
-          supabase
-            .from('pause_step_events' as never)
-            .select('pause_instance_id, step_type, payload, created_at')
-            .eq('user_id', user.id)
-            .order('created_at', { ascending: false })
-            .limit(2000),
-          supabase
-            .from('pause_companion_events' as never)
-            .select(
-              'pause_instance_id, companion_type, action, counts_for_pause, non_counting_reason, created_at',
-            )
-            .eq('user_id', user.id)
-            .order('created_at', { ascending: false })
-            .limit(2000),
-        ]);
-
-      const rawRows = ((rowData as unknown) as PauseFullRow[]) ?? [];
-      return {
-        rows: rawRows.map((r) => ({
-          ...r,
-          is_brief_ritual: Boolean(r.is_brief_ritual),
-        })),
-        stepEvents: ((stepData as unknown) as PauseStepEventRow[]) ?? [],
-        companionEvents: ((companionData as unknown) as PauseCompanionEventRow[]) ?? [],
-      };
-    },
   });
 
   const refresh = useCallback(async () => {

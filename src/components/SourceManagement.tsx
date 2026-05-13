@@ -1,6 +1,15 @@
 import { useState, useCallback } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
+import {
+  SIGNAL_SOURCES_CATALOG_QUERY_KEY,
+  getSignalSourcesCatalogQueryOptions,
+} from '@/lib/signal-sources-catalog-query';
+import {
+  type UserPref,
+  USER_SIGNAL_PREFS_QUERY_KEY,
+  getUserSignalPreferencesQueryOptions,
+} from '@/lib/user-signal-preferences-query';
 import { useAuth } from '@/hooks/use-auth';
 import { useTranslation } from 'react-i18next';
 import { Switch } from '@/components/ui/switch';
@@ -11,25 +20,6 @@ import { Plus, X, Rss, Mic, BookOpen, User, BarChart3, Youtube, Mail } from 'luc
 import { toast } from 'sonner';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Alert, AlertDescription } from '@/components/ui/alert';
-
-interface CatalogSource {
-  id: string;
-  name: string;
-  type: string;
-  url: string | null;
-  description: string | null;
-  category: string;
-}
-
-interface UserPref {
-  id: string;
-  source_id: string | null;
-  custom_name: string | null;
-  custom_url: string | null;
-  custom_type: string | null;
-  active: boolean;
-  category: string;
-}
 
 const TYPE_ICONS: Record<string, React.ReactNode> = {
   blog: <Rss className="h-3 w-3" />,
@@ -44,22 +34,6 @@ const TYPE_ICONS: Record<string, React.ReactNode> = {
 const SIGNAL_TYPE_ORDER = ['analyst', 'podcast', 'newsletter', 'blog', 'dashboard', 'youtube'];
 const GROUNDING_TYPE_ORDER = ['book', 'blog', 'podcast', 'newsletter', 'analyst'];
 
-export const SIGNAL_SOURCES_CATALOG_QUERY_KEY = ['signal-sources', 'catalog'] as const;
-
-export const USER_SIGNAL_PREFS_QUERY_KEY = (userId: string) => ['user-signal-preferences', userId] as const;
-
-export async function fetchSignalSourcesCatalog(): Promise<CatalogSource[]> {
-  const { data, error } = await supabase.from('signal_sources').select('*').order('name');
-  if (error) throw error;
-  return (data as unknown as CatalogSource[]) ?? [];
-}
-
-async function fetchUserSignalPreferences(userId: string): Promise<UserPref[]> {
-  const { data, error } = await supabase.from('user_signal_preferences').select('*').eq('user_id', userId);
-  if (error) throw error;
-  return (data as unknown as UserPref[]) ?? [];
-}
-
 export function SourceManagement() {
   const { t } = useTranslation();
   const { user } = useAuth();
@@ -70,27 +44,13 @@ export function SourceManagement() {
     data: catalog = [],
     isPending: catalogPending,
     isError: catalogError,
-  } = useQuery({
-    queryKey: SIGNAL_SOURCES_CATALOG_QUERY_KEY,
-    queryFn: fetchSignalSourcesCatalog,
-    enabled: Boolean(userId),
-    staleTime: 60_000,
-    refetchOnWindowFocus: false,
-    retry: false,
-  });
+  } = useQuery(getSignalSourcesCatalogQueryOptions(Boolean(userId)));
 
   const {
     data: prefs = [],
     isPending: prefsPending,
     isError: prefsError,
-  } = useQuery({
-    queryKey: userId ? USER_SIGNAL_PREFS_QUERY_KEY(userId) : ['user-signal-preferences', 'none'],
-    queryFn: () => fetchUserSignalPreferences(userId!),
-    enabled: Boolean(userId),
-    staleTime: 60_000,
-    refetchOnWindowFocus: false,
-    retry: false,
-  });
+  } = useQuery(getUserSignalPreferencesQueryOptions(userId));
 
   const loading = Boolean(userId) && (catalogPending || prefsPending);
   const loadFailed = Boolean(userId) && (catalogError || prefsError);

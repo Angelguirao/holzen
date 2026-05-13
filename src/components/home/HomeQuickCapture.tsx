@@ -1,9 +1,15 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useState } from 'react';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { BookOpen } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/use-auth';
+import { getHomeQuickCaptureLastPauseQueryOptions } from '@/lib/home-quick-capture-last-pause-query';
+import { practiceEntriesWeeklyCountQueryKey } from '@/lib/practice-entries-weekly-count-query';
+import { practicePrimarySuggestionQueryKey } from '@/lib/practice-primary-suggestion-query';
+import { toolsHubDataQueryKey } from '@/lib/tools-hub-data-query';
+import { invalidateHistoryCalendarActivities } from '@/lib/history-calendar-activities-query-key';
 import { TOOLS } from '@/lib/app-routes';
 import { MoodIcon } from '@/components/icons/MoodIcon';
 import { Textarea } from '@/components/ui/textarea';
@@ -16,12 +22,6 @@ import { homeInWidget } from '@/components/home/home-widget-styles';
 import { cn } from '@/lib/utils';
 
 const QUICK_MOODS = ['calm', 'anxious', 'fomo', 'uncertain'] as const;
-
-interface LastPauseRow {
-  id: string;
-  created_at: string | null;
-  terminal_at: string | null;
-}
 
 function relTime(iso: string, locale: string): string {
   const d = new Date(iso);
@@ -37,33 +37,15 @@ function relTime(iso: string, locale: string): string {
 export function HomeQuickCapture() {
   const { t, i18n } = useTranslation();
   const { user } = useAuth();
-  const [lastPause, setLastPause] = useState<LastPauseRow | null>(null);
-  const [loadingLib, setLoadingLib] = useState(true);
+  const userId = user?.id;
+  const queryClient = useQueryClient();
   const [mood, setMood] = useState<string | null>(null);
   const [note, setNote] = useState('');
   const [saving, setSaving] = useState(false);
 
-  useEffect(() => {
-    if (!user) return;
-    let cancelled = false;
-    void (async () => {
-      const { data } = await supabase
-        .from('v_pause_full' as never)
-        .select('id, created_at, terminal_at')
-        .eq('user_id', user.id)
-        .order('terminal_at', { ascending: false, nullsFirst: false })
-        .order('created_at', { ascending: false })
-        .limit(1)
-        .maybeSingle();
-      if (!cancelled) {
-        setLastPause((data as LastPauseRow | null) ?? null);
-        setLoadingLib(false);
-      }
-    })();
-    return () => {
-      cancelled = true;
-    };
-  }, [user]);
+  const { data: lastPause = null, isPending: loadingLib } = useQuery(
+    getHomeQuickCaptureLastPauseQueryOptions(userId),
+  );
 
   const saveCheckin = useCallback(async () => {
     if (!user) return;
@@ -74,13 +56,21 @@ export function HomeQuickCapture() {
     }
     setSaving(true);
     try {
-      await supabase.from('practice_entries').insert({
+      const { error } = await supabase.from('practice_entries').insert({
         user_id: user.id,
         type: 'checkin',
         mood: mood ?? 'calm',
         intensity: 3,
         trigger_text: trimmed || null,
       });
+      if (error) {
+        toast(t('common.tryAgain'));
+        return;
+      }
+      void queryClient.invalidateQueries({ queryKey: practiceEntriesWeeklyCountQueryKey(user.id) });
+      void queryClient.invalidateQueries({ queryKey: toolsHubDataQueryKey(user.id) });
+      void queryClient.invalidateQueries({ queryKey: practicePrimarySuggestionQueryKey(user.id) });
+      invalidateHistoryCalendarActivities(queryClient, user.id);
       hapticFeedback('success');
       setMood(null);
       setNote('');
@@ -90,7 +80,7 @@ export function HomeQuickCapture() {
     } finally {
       setSaving(false);
     }
-  }, [user, mood, note, t]);
+  }, [user, mood, note, t, queryClient]);
 
   return (
     <div className="space-y-4">

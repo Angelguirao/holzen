@@ -1,7 +1,9 @@
 import { useMemo, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useIsAdmin } from "@/hooks/use-is-admin";
-import { supabase } from "@/integrations/supabase/client";
+import {
+  getEdgeCoverageHeartbeatsQueryOptions,
+} from "@/lib/edge-coverage-heartbeats-query";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
@@ -69,23 +71,6 @@ const COVERAGE: Row[] = [
 // Functions exempt from full wrapper coverage. `health` is the obvious one (verify_jwt=false probe).
 const EXEMPT = new Set<string>(["health"]);
 
-const EDGE_COVERAGE_HEARTBEATS_QUERY_KEY = ["admin", "edge-coverage", "heartbeats"] as const;
-
-async function fetchHeartbeatConfigMap(): Promise<Record<string, string>> {
-  const { data, error } = await supabase
-    .from("app_config")
-    .select("key,value")
-    .like("key", "heartbeat.%");
-  if (error || !data) return {};
-  const map: Record<string, string> = {};
-  for (const row of data as Array<{ key: string; value: unknown }>) {
-    const job = row.key.replace(/^heartbeat\./, "");
-    const uuid = typeof row.value === "string" ? row.value : String(row.value ?? "");
-    if (job && uuid) map[job] = uuid;
-  }
-  return map;
-}
-
 type Severity = "missing" | "partial" | "ok";
 function severityOf(r: Row): Severity {
   if (EXEMPT.has(r.name)) return "ok";
@@ -105,13 +90,9 @@ export default function EdgeCoverage() {
   const [q, setQ] = useState("");
   const [filter, setFilter] = useState<"all" | Severity>("all");
 
-  const { data: heartbeats, isPending: heartbeatsPending } = useQuery({
-    queryKey: EDGE_COVERAGE_HEARTBEATS_QUERY_KEY,
-    queryFn: fetchHeartbeatConfigMap,
-    enabled: isAdmin,
-    staleTime: 60_000,
-    refetchOnWindowFocus: false,
-  });
+  const { data: heartbeats, isPending: heartbeatsPending } = useQuery(
+    getEdgeCoverageHeartbeatsQueryOptions(isAdmin),
+  );
 
   const heartbeatCount = useMemo(() => {
     if (heartbeatsPending) return 0;

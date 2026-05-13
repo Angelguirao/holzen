@@ -1,44 +1,18 @@
-import { useEffect, useState } from 'react';
+import { useQuery } from '@tanstack/react-query';
 import { motion, useReducedMotion } from 'framer-motion';
-import { invokeEdge } from '@/lib/invoke-edge';
+import { getHolzenNumberQueryOptions } from '@/lib/holzen-number-query';
 import { homeInWidget } from '@/components/home/home-widget-styles';
-
-interface HolzenNumberData {
-  total: number;
-  held_steady: number;
-  percent: number;
-  calculated_at: string;
-}
 
 /**
  * The Holzen Number — a public real-time metric:
  * "X% of Holzen users held steady today"
  */
 export function HolzenNumber({ variant = 'default' }: { variant?: 'default' | 'compact' }) {
-  const [data, setData] = useState<HolzenNumberData | null>(null);
-  const [loading, setLoading] = useState(true);
   const prefersReduced = useReducedMotion();
-
-  useEffect(() => {
-    async function fetch() {
-      try {
-        const { data: result, error } = await invokeEdge<HolzenNumberData>('holzen-number');
-        if (!error && result) {
-          setData(result as HolzenNumberData);
-        }
-      } catch {
-        // silent — metric is non-critical
-      } finally {
-        setLoading(false);
-      }
-    }
-    fetch();
-    const interval = setInterval(fetch, 60_000);
-    return () => clearInterval(interval);
-  }, []);
+  const { data, isPending } = useQuery(getHolzenNumberQueryOptions());
 
   // Don't render if no data or no users in today's aggregate sample
-  if (loading || !data || data.total === 0) return null;
+  if (isPending || !data || data.total === 0) return null;
 
   const motionProps = prefersReduced
     ? {}

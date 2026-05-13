@@ -23,7 +23,7 @@ import type {
   PauseStepEventRow,
   PauseCompanionEventRow,
 } from '@/lib/pause-state';
-import type { PauseFullRow } from '@/hooks/use-pause-stats-data';
+import type { PauseFullRow } from '@/lib/pause-stats-data-query';
 
 interface HoldGoal {
   type: string | null;

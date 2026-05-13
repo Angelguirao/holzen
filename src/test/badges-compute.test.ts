@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import { computeBadges } from '@/lib/badges/compute';
-import type { PauseFullRow } from '@/hooks/use-pause-stats-data';
+import type { PauseFullRow } from '@/lib/pause-stats-data-query';
 import type { PauseCompanionEventRow } from '@/lib/pause-state';
 
 function makeRow(overrides: Partial<PauseFullRow>): PauseFullRow {

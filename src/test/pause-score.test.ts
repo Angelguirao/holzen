@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import { computePauseScore } from '@/lib/stats/pause-score';
-import type { PauseFullRow } from '@/hooks/use-pause-stats-data';
+import type { PauseFullRow } from '@/lib/pause-stats-data-query';
 
 function makeRow(overrides: Partial<PauseFullRow>): PauseFullRow {
   return {

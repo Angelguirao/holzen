@@ -1,6 +1,11 @@
 import { useState, useCallback } from 'react';
+import { useQueryClient } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
 import { motion, AnimatePresence } from 'framer-motion';
+import { practiceEntriesWeeklyCountQueryKey } from '@/lib/practice-entries-weekly-count-query';
+import { practicePrimarySuggestionQueryKey } from '@/lib/practice-primary-suggestion-query';
+import { toolsHubDataQueryKey } from '@/lib/tools-hub-data-query';
+import { invalidateHistoryCalendarActivities } from '@/lib/history-calendar-activities-query-key';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/use-auth';
 import { hapticFeedback } from '@/lib/haptics';
@@ -21,6 +26,7 @@ interface Props {
 export function EmotionalCheckIn({ onComplete, textColor, ringColor }: Props) {
   const { t } = useTranslation();
   const { user } = useAuth();
+  const queryClient = useQueryClient();
   const [step, setStep] = useState<'mood' | 'intensity' | 'trigger' | 'done'>('mood');
   const [mood, setMood] = useState<string | null>(null);
   const [intensity, setIntensity] = useState<number>(3);
@@ -42,6 +48,10 @@ export function EmotionalCheckIn({ onComplete, textColor, ringColor }: Props) {
         trigger_text: trigger || null,
       });
       if (error) throw error;
+      void queryClient.invalidateQueries({ queryKey: practiceEntriesWeeklyCountQueryKey(user.id) });
+      void queryClient.invalidateQueries({ queryKey: toolsHubDataQueryKey(user.id) });
+      void queryClient.invalidateQueries({ queryKey: practicePrimarySuggestionQueryKey(user.id) });
+      invalidateHistoryCalendarActivities(queryClient, user.id);
       hapticFeedback('success');
       setStep('done');
       setTimeout(onComplete, 1500);
@@ -50,7 +60,7 @@ export function EmotionalCheckIn({ onComplete, textColor, ringColor }: Props) {
     } finally {
       setSaving(false);
     }
-  }, [user, mood, intensity, trigger, onComplete, t]);
+  }, [user, mood, intensity, trigger, onComplete, t, queryClient]);
 
   return (
     <motion.div

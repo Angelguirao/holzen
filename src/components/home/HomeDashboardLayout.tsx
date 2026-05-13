@@ -8,7 +8,7 @@ import { HomePullRefreshIndicator } from '@/components/home/HomePullRefreshIndic
 import { HomeCustomizeLinkButton } from '@/components/home/HomeCustomizeLinkButton';
 import { InstallHolzenCard } from '@/components/InstallHolzenCard';
 import { TestimonialRequest } from '@/components/TestimonialRequest';
-import { JOURNEY_STAT_TILES_VISIBILITY_ID } from '@/hooks/use-home-optional-visibility';
+import { JOURNEY_STAT_TILES_VISIBILITY_ID } from '@/lib/home-section-visibility-constants';
 
 export interface HomeDashboardLayoutCustomizeProps {
   open: boolean;

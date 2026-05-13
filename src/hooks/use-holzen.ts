@@ -1,5 +1,7 @@
-import { useState, useEffect, useCallback } from 'react';
-import { fetchMarketData, type BtcPriceData } from '@/lib/btc';
+import { useState, useEffect, useCallback, useMemo } from 'react';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
+import type { BtcPriceData } from '@/lib/btc';
+import { getHolzenMarketDisplayQueryOptions } from '@/lib/holzen-market-display-query';
 import { supabase } from '@/integrations/supabase/client';
 import { invokeEdge } from '@/lib/invoke-edge';
 import { useAuth } from '@/hooks/use-auth';
@@ -21,6 +23,8 @@ import { loadReflectRecencyHints } from '@/lib/load-reflect-recency-hints';
 import { trackEvent } from '@/lib/posthog';
 
 const PAUSE_MANUAL_START_HOME = 'holzen_sess_pause_manual_started_home';
+
+export { holzenMarketDisplayQueryKey } from '@/lib/holzen-market-display-query';
 
 /** Once per tab session: user kicked off a manual “Need a moment” / holzen-reflect flow from Home. */
 function markPauseManualStartedHomeOnce(): void {
@@ -48,6 +52,7 @@ function previewCompanionTypeTags(c: CompanionData): string[] {
 export function useHolzen() {
   const { user } = useAuth();
   const profile = useProfile();
+  const queryClient = useQueryClient();
 
   const {
     reflectionTone,
@@ -64,7 +69,14 @@ export function useHolzen() {
     profileLoaded,
   } = profile;
 
-  const [btcData, setBtcData] = useState<BtcPriceData | null>(null);
+  const btcQuery = useQuery(
+    getHolzenMarketDisplayQueryOptions({
+      coinIdRaw: profileTrackedAssetId,
+      currency,
+      enabled: profileLoaded,
+    }),
+  );
+
   const [message, setMessage] = useState<string | null>(null);
   const [context, setContext] = useState<string | null>(null);
   const [companions, setCompanions] = useState<CompanionData>({
@@ -451,20 +463,6 @@ export function useHolzen() {
     ],
   );
 
-  const fetchBtcDisplay = useCallback(async () => {
-    try {
-      const data = await fetchMarketData(profileTrackedAssetId, currency);
-      setBtcData(data);
-    } catch (e: unknown) {
-      const raw = e instanceof Error ? e.message : String(e);
-      if (raw.includes('fetch') || raw.includes('Failed to fetch')) {
-        setError('Price data unavailable. CoinGecko may be down — retrying shortly.');
-      } else {
-        setError('Could not check market data. Will retry automatically.');
-      }
-    }
-  }, [currency, profileTrackedAssetId]);
-
   const manualCooldownKey = user ? `holzen_last_manual_at_${user.id}` : 'holzen_last_manual_at';
   const [lastManualAt, setLastManualAt] = useState<number | null>(null);
 
@@ -509,8 +507,17 @@ export function useHolzen() {
       }
 
       try {
-        const data = btcData || (await fetchMarketData(profileTrackedAssetId, currency));
-        if (!btcData) setBtcData(data);
+        const marketOpts = getHolzenMarketDisplayQueryOptions({
+          coinIdRaw: profileTrackedAssetId,
+          currency,
+          enabled: true,
+        });
+        const data =
+          btcQuery.data ??
+          (await queryClient.fetchQuery({
+            queryKey: marketOpts.queryKey,
+            queryFn: marketOpts.queryFn,
+          }));
         await generateMessage(data, mood);
         const now = Date.now();
         setLastManualAt(now);
@@ -524,7 +531,7 @@ export function useHolzen() {
         }
       }
     },
-    [btcData, generateMessage, manualCooldownRemaining, currency, manualCooldownKey, profileTrackedAssetId],
+    [btcQuery.data, generateMessage, manualCooldownRemaining, currency, manualCooldownKey, profileTrackedAssetId, queryClient],
   );
 
   const dismissMessage = useCallback(async () => {
@@ -547,25 +554,27 @@ export function useHolzen() {
     return;
   }, []);
 
+  const btcData = btcQuery.data ?? null;
+
   const severity = severityFromBtcChangePercent(btcData?.changePercent);
 
-  useEffect(() => {
-    if (!profileLoaded) return;
-    fetchBtcDisplay();
-    const interval = setInterval(fetchBtcDisplay, 5 * 60 * 1000);
-    return () => clearInterval(interval);
-  }, [fetchBtcDisplay, profileLoaded]);
+  const marketFetchError = useMemo(() => {
+    if (!profileLoaded || !btcQuery.isError || !btcQuery.error) return null;
+    const raw = btcQuery.error instanceof Error ? btcQuery.error.message : String(btcQuery.error);
+    if (raw.includes('fetch') || raw.includes('Failed to fetch')) {
+      return 'Price data unavailable. CoinGecko may be down — retrying shortly.';
+    }
+    return 'Could not check market data. Will retry automatically.';
+  }, [profileLoaded, btcQuery.isError, btcQuery.error]);
 
   return {
     ...profile,
     /** CoinGecko id allowlist — normalized so consumers see `TrackedAssetId`, not raw profile strings. */
     trackedAssetId: normalizeTrackedAssetId(profile.trackedAssetId),
     setCurrency: async (val: string) => {
-      setBtcData(null);
       await profile.setCurrency(val);
     },
     setTrackedAssetId: async (val: string) => {
-      setBtcData(null);
       await profile.setTrackedAssetId(val);
     },
     btcData,
@@ -576,7 +585,7 @@ export function useHolzen() {
     lastPauseInstanceId,
     openPauseState,
     loading,
-    error,
+    error: error ?? marketFetchError,
     newPauseArrival,
     clearNewPauseArrival: () => setNewPauseArrival(false),
     dismissMessage,

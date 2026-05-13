@@ -2,31 +2,12 @@ import { useMemo } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/use-auth';
 import {
   dedupeBiases,
   type RelatedBias,
-  type RelatedBiasesRow,
 } from './related-biases-util';
-
-function relatedBiasesGroundNudgeQueryKey(userId: string) {
-  return ['related-biases-ground-nudge', userId] as const;
-}
-
-async function fetchGroundNudgeArtifactsLast30d(userId: string): Promise<RelatedBiasesRow[]> {
-  const thirtyDaysAgo = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString();
-  const { data, error } = await supabase
-    .from('pause_ai_artifacts' as never)
-    .select('pause_instance_id, created_at, content')
-    .eq('user_id', userId)
-    .eq('kind', 'ground_nudge')
-    .gte('created_at', thirtyDaysAgo)
-    .order('created_at', { ascending: false })
-    .limit(40);
-  if (error || !data) return [];
-  return data as unknown as RelatedBiasesRow[];
-}
+import { getRelatedBiasesGroundNudgeQueryOptions } from '@/lib/related-biases-ground-nudge-query';
 
 interface Props {
   /** Pause instance currently viewed — excluded from the list. */
@@ -52,14 +33,7 @@ export function RelatedBiasesThisMonth({
   const { user } = useAuth();
   const userId = user?.id;
 
-  const { data: rawRows } = useQuery({
-    queryKey: userId ? relatedBiasesGroundNudgeQueryKey(userId) : ['related-biases-ground-nudge', 'none'],
-    queryFn: () => fetchGroundNudgeArtifactsLast30d(userId!),
-    enabled: Boolean(userId),
-    staleTime: 60_000,
-    refetchOnWindowFocus: false,
-    retry: false,
-  });
+  const { data: rawRows } = useQuery(getRelatedBiasesGroundNudgeQueryOptions(userId));
 
   const biases = useMemo((): RelatedBias[] | null => {
     if (!userId) return null;

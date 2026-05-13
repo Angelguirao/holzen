@@ -1,21 +1,15 @@
 import { useState, useCallback } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/use-auth';
-import { getProfileRowQueryOptions } from '@/hooks/use-profile';
+import { getProfileRowQueryOptions } from '@/lib/profile-row-query';
+import {
+  getReferralRewardsQueryOptions,
+  getReferralsCountQueryOptions,
+} from '@/lib/referral-query';
 import { useTranslation } from 'react-i18next';
 import { Copy, Check, Gift, Star, Crown } from 'lucide-react';
 import { toast } from 'sonner';
 import { Progress } from '@/components/ui/progress';
-
-interface GrantedReward {
-  milestone: number;
-  reward_type: string;
-  granted_at: string;
-}
-
-const REFERRALS_COUNT_QUERY_KEY = (userId: string) => ['referrals-count', userId] as const;
-const REFERRAL_REWARDS_QUERY_KEY = (userId: string) => ['referral-rewards', userId] as const;
 
 export function ReferralSection({ defaultExpanded = false }: { defaultExpanded?: boolean }) {
   const { t } = useTranslation();
@@ -28,33 +22,9 @@ export function ReferralSection({ defaultExpanded = false }: { defaultExpanded?:
       ? profileRow.referral_code
       : null;
 
-  const { data: referralCount = 0 } = useQuery({
-    queryKey: userId ? REFERRALS_COUNT_QUERY_KEY(userId) : ['referrals-count', 'none'],
-    enabled: Boolean(userId),
-    staleTime: 60_000,
-    queryFn: async () => {
-      const { count, error } = await supabase
-        .from('referrals')
-        .select('*', { count: 'exact', head: true })
-        .eq('referrer_id', userId!);
-      if (error) throw error;
-      return count ?? 0;
-    },
-  });
+  const { data: referralCount = 0 } = useQuery(getReferralsCountQueryOptions(userId));
 
-  const { data: grantedRewards = [] } = useQuery({
-    queryKey: userId ? REFERRAL_REWARDS_QUERY_KEY(userId) : ['referral-rewards', 'none'],
-    enabled: Boolean(userId),
-    staleTime: 60_000,
-    queryFn: async () => {
-      const { data: rewards, error } = await supabase
-        .from('referral_rewards')
-        .select('milestone, reward_type, granted_at')
-        .eq('user_id', userId!);
-      if (error) throw error;
-      return (rewards ?? []) as GrantedReward[];
-    },
-  });
+  const { data: grantedRewards = [] } = useQuery(getReferralRewardsQueryOptions(userId));
 
   const MILESTONES = [
     { count: 1, icon: Gift, label: t('referral.milestone1'), reward: t('referral.reward1') },
