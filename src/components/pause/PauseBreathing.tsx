@@ -357,8 +357,12 @@ export const PauseBreathing = forwardRef<PauseBreathingHandle, Props>(function P
               {t(phaseHintTranslationKey(patternIndex, cycle, phaseIndex), { defaultValue: '' })}
             </motion.p>
           ) : null}
-          <p className="text-xs font-medium text-muted-foreground">
-            {cycle + 1} / {totalCycles}
+          <p className="text-base italic text-muted-foreground">
+            {t('pause.breathRoundLabel', {
+              current: cycle + 1,
+              total: totalCycles,
+              defaultValue: 'Round {{current}}/{{total}}',
+            })}
           </p>
         </motion.div>
       ) : (
