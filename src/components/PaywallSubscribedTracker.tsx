@@ -3,8 +3,8 @@ import { useAuth } from '@/hooks/use-auth';
 import {
   POST_CHECKOUT_SUBSCRIBE_FLAG,
   useSubscription,
-  type SubscriptionBillingInterval,
 } from '@/hooks/use-subscription';
+import type { SubscriptionBillingInterval } from '@/lib/subscription-snapshot-query';
 import { trackEvent } from '@/lib/posthog';
 
 const MAX_AGE_MS = 30 * 60 * 1000;

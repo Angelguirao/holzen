@@ -1,10 +1,12 @@
 import { useTranslation } from 'react-i18next';
+import { useQueryClient } from '@tanstack/react-query';
 import { Link } from 'react-router-dom';
 import { motion, useReducedMotion } from 'framer-motion';
 import { ArrowLeft } from 'lucide-react';
 import { PageMeta } from '@/components/PageMeta';
 import { PublicFooter } from '@/components/PublicFooter';
 import { PageHeading } from '@/components/PageHeading';
+import { prefetchCoingeckoBtcUsd } from '@/lib/coingecko-btc-usd-query';
 
 const fade = (delay = 0) => ({
   initial: { opacity: 0, y: 14 },
@@ -14,6 +16,7 @@ const fade = (delay = 0) => ({
 });
 
 const About = () => {
+  const queryClient = useQueryClient();
   const { t } = useTranslation();
   const prefersReduced = useReducedMotion();
   const m = (delay = 0) => (prefersReduced ? {} : fade(delay));
@@ -159,6 +162,8 @@ const About = () => {
             <Link
               to="/reserve"
               className="inline-flex items-center gap-1.5 text-xs font-sans font-medium text-nox-text-link underline-offset-4 transition-colors hover:text-nox-text-link/80"
+              onMouseEnter={() => void prefetchCoingeckoBtcUsd(queryClient)}
+              onFocus={() => void prefetchCoingeckoBtcUsd(queryClient)}
             >
               {t('about.readReserveStrategy')}
             </Link>

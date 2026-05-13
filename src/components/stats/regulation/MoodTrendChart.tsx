@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { ResponsiveContainer, LineChart, Line, XAxis, YAxis, Tooltip } from 'recharts';
 import { ConfidenceChip } from '@/components/stats/ConfidenceChip';
 import { sampleConfidence } from '@/lib/stats/confidence';
-import type { PauseFullRow } from '@/hooks/use-pause-stats-data';
+import type { PauseFullRow } from '@/lib/pause-stats-data-query';
 import { format, startOfWeek } from 'date-fns';
 
 const MOOD_VALUE: Record<string, number> = {

@@ -6,47 +6,19 @@ import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/use-auth';
 import { hapticFeedback } from '@/lib/haptics';
 import { FEEDBACK_TO_CACHE_TYPE } from '@/lib/companion-types';
-import type { RegenerateCompanionSlot } from '@/hooks/use-companion-data';
+import type { RegenerateCompanionSlot } from '@/lib/companion-orchestrate-types';
 import { useSubscription } from '@/hooks/use-subscription';
 import { useProGate } from '@/hooks/use-pro-gate';
 import { showLimitReachedToast, isPaidLimitReached } from '@/lib/limit-upsell';
 import { isHolzenDebugEnabled } from '@/lib/holzen-console';
-import type { Json } from '@/integrations/supabase/types';
+import {
+  companionFeedbackVoteQueryKey,
+  getCompanionFeedbackVoteQueryOptions,
+} from '@/lib/companion-feedback-vote-query';
 
 /** Orchestrate regenerate — dev / non-production builds, or prod + Holzen debug opt-in (see holzen-console). */
 function isCompanionRegenerateUiEnabled(): boolean {
   return !import.meta.env.PROD || isHolzenDebugEnabled();
-}
-
-function voteFromMetadata(metadata: Json | null | undefined): 'up' | 'down' | null {
-  if (!metadata || typeof metadata !== 'object' || Array.isArray(metadata)) return null;
-  const v = (metadata as Record<string, unknown>).vote;
-  return v === 'up' || v === 'down' ? v : null;
-}
-
-function companionFeedbackVoteQueryKey(userId: string, pauseInstanceId: string, companionType: string) {
-  return ['companion-feedback-vote', userId, pauseInstanceId, companionType] as const;
-}
-
-async function fetchCompanionFeedbackVote(
-  userId: string,
-  pauseInstanceId: string,
-  companionType: string,
-): Promise<'up' | 'down' | null> {
-  try {
-    const { data } = await supabase
-      .from('analytics_events')
-      .select('metadata')
-      .eq('user_id', userId)
-      .eq('event', 'companion_feedback')
-      .filter('metadata->>pause_instance_id', 'eq', pauseInstanceId)
-      .filter('metadata->>companion_type', 'eq', companionType)
-      .limit(1);
-    if (!data || data.length === 0) return null;
-    return voteFromMetadata(data[0].metadata);
-  } catch {
-    return null;
-  }
 }
 
 interface Props {
@@ -90,17 +62,9 @@ export function CompanionFeedback({
     setOptimisticVote(null);
   }, [pauseInstanceId, companionType, userId]);
 
-  const { data: persistedVote = null } = useQuery({
-    queryKey:
-      userId && pauseInstanceId
-        ? companionFeedbackVoteQueryKey(userId, pauseInstanceId, companionType)
-        : ['companion-feedback-vote', 'none'],
-    queryFn: () => fetchCompanionFeedbackVote(userId!, pauseInstanceId!, companionType),
-    enabled: Boolean(userId && pauseInstanceId),
-    staleTime: 60_000,
-    refetchOnWindowFocus: false,
-    retry: false,
-  });
+  const { data: persistedVote = null } = useQuery(
+    getCompanionFeedbackVoteQueryOptions(userId, pauseInstanceId, companionType),
+  );
 
   const vote = optimisticVote ?? persistedVote;
 

@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback, useRef, useLayoutEffect } from 'react';
+import { useQueryClient } from '@tanstack/react-query';
 import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
 import { Play, Pause, Anchor, Loader2, ExternalLink, Eye, EyeOff, Sparkles } from 'lucide-react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
@@ -18,6 +19,11 @@ import { Textarea } from '@/components/ui/textarea';
 import { parseEdgeFunctionError, toUserFacingAiErrorMessage } from '@/lib/edge-function-error';
 import { trackEvent } from '@/lib/posthog';
 import { invokeEdge } from '@/lib/invoke-edge';
+import { practiceEntriesWeeklyCountQueryKey } from '@/lib/practice-entries-weekly-count-query';
+import { practicePrimarySuggestionQueryKey } from '@/lib/practice-primary-suggestion-query';
+import { toolsHubDataQueryKey } from '@/lib/tools-hub-data-query';
+import { groundHistoryEntriesQueryKey, groundHistoryStatsQueryKey } from '@/lib/ground-history-query';
+import { invalidateHistoryCalendarActivities } from '@/lib/history-calendar-activities-query-key';
 import {
   AlertDialog,
   AlertDialogCancel,
@@ -53,6 +59,7 @@ export default function Ground() {
   const prefersReducedMotion = useReducedMotion();
   const { groundingActivities, btcData, severity, language } = useHolzen();
   const { user } = useAuth();
+  const queryClient = useQueryClient();
   const { isPro, isPending } = useProGate();
 
   const [phase, setPhase] = useState<Phase>('idle');
@@ -341,7 +348,7 @@ export default function Ground() {
     hapticFeedback('medium');
 
     if (user) {
-      void supabase.from('practice_entries').insert({
+      const { error } = await supabase.from('practice_entries').insert({
         user_id: user.id,
         type: 'grounding',
         mood: selectedMood || null,
@@ -349,10 +356,18 @@ export default function Ground() {
         body: reflectionText.trim() || null,
         trigger_text: activity || null,
       });
+      if (!error) {
+        void queryClient.invalidateQueries({ queryKey: practiceEntriesWeeklyCountQueryKey(user.id) });
+        void queryClient.invalidateQueries({ queryKey: practicePrimarySuggestionQueryKey(user.id) });
+        void queryClient.invalidateQueries({ queryKey: toolsHubDataQueryKey(user.id) });
+        void queryClient.invalidateQueries({ queryKey: groundHistoryStatsQueryKey(user.id) });
+        void queryClient.invalidateQueries({ queryKey: groundHistoryEntriesQueryKey(user.id) });
+        invalidateHistoryCalendarActivities(queryClient, user.id);
+      }
     }
 
     setPhase('done');
-  }, [user, selectedMood, selectedDuration, reflectionText, activity]);
+  }, [user, selectedMood, selectedDuration, reflectionText, activity, queryClient]);
 
   const handleReturn = useCallback(() => {
     navigate(TOOLS.hub, { replace: true });

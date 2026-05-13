@@ -2,7 +2,7 @@ import { useState, useCallback, useMemo } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/use-auth';
-import { getProfileRowQueryOptions, PROFILE_QUERY_KEY } from '@/hooks/use-profile';
+import { getProfileRowQueryOptions, PROFILE_QUERY_KEY } from '@/lib/profile-row-query';
 import type { Database } from '@/integrations/supabase/types';
 
 type ProfileRow = Database['public']['Tables']['profiles']['Row'];

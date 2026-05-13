@@ -5,12 +5,19 @@ import { usePauseBreathSegmentRpcLoggers } from '@/hooks/use-pause-breath-segmen
 import { showPauseStepSyncFailedToast } from '@/lib/pause-step-sync-toast';
 import { makeTestPersistedPauseSession } from '@/test/make-test-persisted-pause-session';
 
-const { pauseLogStepMock } = vi.hoisted(() => ({
+const { pauseLogStepMock, invalidateCompanionUiCompletionQueryMock } = vi.hoisted(() => ({
   pauseLogStepMock: vi.fn(),
+  invalidateCompanionUiCompletionQueryMock: vi.fn(),
 }));
 
 vi.mock('@/lib/pause-api', () => ({
   pauseLogStep: (...args: unknown[]) => pauseLogStepMock(...args),
+}));
+
+vi.mock('@/lib/companion-ui-completion-query-key', () => ({
+  companionUiCompletionQueryKey: (id: string) => ['pause', 'companion-ui-completion', id] as const,
+  invalidateCompanionUiCompletionQuery: (...args: unknown[]) =>
+    invalidateCompanionUiCompletionQueryMock(...args),
 }));
 
 vi.mock('@/lib/pause-step-sync-toast', () => ({
@@ -22,6 +29,7 @@ const t = ((k: string) => k) as TFunction;
 beforeEach(() => {
   pauseLogStepMock.mockReset();
   pauseLogStepMock.mockResolvedValue(undefined);
+  invalidateCompanionUiCompletionQueryMock.mockReset();
   vi.mocked(showPauseStepSyncFailedToast).mockClear();
 });
 
@@ -39,6 +47,7 @@ describe('usePauseBreathSegmentRpcLoggers', () => {
       expect(ok).toBe(true);
     });
     expect(pauseLogStepMock).not.toHaveBeenCalled();
+    expect(invalidateCompanionUiCompletionQueryMock).not.toHaveBeenCalled();
   });
 
   it('logs segment 1 once then short-circuits', async () => {
@@ -58,6 +67,8 @@ describe('usePauseBreathSegmentRpcLoggers', () => {
       instanceId: 'inst-1',
       stepType: 'breath_completed',
     });
+    expect(invalidateCompanionUiCompletionQueryMock).toHaveBeenCalledTimes(1);
+    expect(invalidateCompanionUiCompletionQueryMock).toHaveBeenCalledWith('inst-1');
   });
 
   it('resets dedupe when pauseInstanceId changes', async () => {
@@ -80,6 +91,9 @@ describe('usePauseBreathSegmentRpcLoggers', () => {
     });
     expect(pauseLogStepMock).toHaveBeenCalledTimes(2);
     expect(pauseLogStepMock.mock.calls[1][0]).toMatchObject({ instanceId: 'b' });
+    expect(invalidateCompanionUiCompletionQueryMock).toHaveBeenCalledTimes(2);
+    expect(invalidateCompanionUiCompletionQueryMock).toHaveBeenNthCalledWith(1, 'a');
+    expect(invalidateCompanionUiCompletionQueryMock).toHaveBeenNthCalledWith(2, 'b');
   });
 
   it('logBreathSegment1Skipped returns true without RPC when no instance id', async () => {
@@ -146,6 +160,7 @@ describe('usePauseBreathSegmentRpcLoggers', () => {
       expect(await result.current.logBreathSegment1Skipped()).toBe(false);
     });
     expect(showPauseStepSyncFailedToast).toHaveBeenCalledWith(t);
+    expect(invalidateCompanionUiCompletionQueryMock).not.toHaveBeenCalled();
   });
 
   it('logBreathSegment2Skipped sends segment 2 skipped payload', async () => {

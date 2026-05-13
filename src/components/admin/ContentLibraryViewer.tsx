@@ -4,7 +4,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { invokeEdge } from '@/lib/invoke-edge';
 import type { Database } from '@/integrations/supabase/types';
 import { useToast } from '@/hooks/use-toast';
-import type { LibraryEntryRow } from '@/hooks/use-admin-stats';
+import type { LibraryEntryRow } from '@/lib/admin-stats-bundle-query';
 import { Checkbox } from '@/components/ui/checkbox';
 import { label } from './admin-constants';
 import { FilterRow } from './FilterRow';

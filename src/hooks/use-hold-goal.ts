@@ -1,29 +1,11 @@
 import { useQuery } from '@tanstack/react-query';
 import { useAuth } from '@/hooks/use-auth';
-import { getProfileRowQueryOptions } from '@/hooks/use-profile';
-import type { Database } from '@/integrations/supabase/types';
-import { normalizeTrackedAssetId } from '@/lib/tracked-assets';
+import {
+  getHoldGoalProfileQueryOptions,
+  type HoldGoalProfile,
+} from '@/lib/hold-goal-profile-query';
 
-type ProfileRow = Database['public']['Tables']['profiles']['Row'];
-
-export interface HoldGoalProfile {
-  type: string | null;
-  targetMonths: number | null;
-  targetPrice: number | null;
-  start: string | null;
-  trackedAssetId: string;
-}
-
-function mapProfileRowToHoldGoal(row: ProfileRow | null): HoldGoalProfile | null {
-  if (!row) return null;
-  return {
-    type: row.hold_goal_type,
-    targetMonths: row.hold_goal_target_months,
-    targetPrice: row.hold_goal_target_price,
-    start: row.hold_goal_start,
-    trackedAssetId: normalizeTrackedAssetId(row.tracked_asset_id),
-  };
-}
+export type { HoldGoalProfile };
 
 /**
  * Hold-goal row fields used for stats alignment. Shared by Journey (Profile) and
@@ -35,8 +17,5 @@ export function useHoldGoalProfile() {
   const { user } = useAuth();
   const userId = user?.id;
 
-  return useQuery({
-    ...getProfileRowQueryOptions(userId),
-    select: (row: ProfileRow | null) => mapProfileRowToHoldGoal(row),
-  });
+  return useQuery(getHoldGoalProfileQueryOptions(userId));
 }

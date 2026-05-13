@@ -2,20 +2,9 @@ import { useMemo } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/use-auth';
 import type { RegenerateCompanionSlot } from '@/lib/companion-orchestrate-types';
-
-/**
- * Maps an internal orchestrator slot name to the `kind` value persisted
- * in `pause_ai_artifacts.kind`.
- */
-const DB_TYPE: Record<RegenerateCompanionSlot, string> = {
-  signal: 'signal',
-  grounding: 'ground_nudge',
-  history: 'historical_insight',
-  zoomOut: 'zoom_out_deep_time',
-};
+import { getHistoryThreadQueryOptions, type HistoryThreadRow } from '@/lib/history-thread-query';
 
 /**
  * Maps an internal orchestrator slot name to the Full View route prefix.
@@ -26,33 +15,6 @@ const ROUTE_PREFIX: Record<RegenerateCompanionSlot, string> = {
   history: '/companion/history',
   zoomOut: '/companion/zoom-out',
 };
-
-interface ThreadRow {
-  id: string;
-  pause_instance_id: string;
-  created_at: string | null;
-  content: { title?: string; body?: string; btcInsight?: string } | null;
-}
-
-function historyThreadQueryKey(userId: string, companion: RegenerateCompanionSlot, limit: number) {
-  return ['history-thread', userId, companion, limit] as const;
-}
-
-async function fetchHistoryThreadRows(
-  userId: string,
-  companion: RegenerateCompanionSlot,
-  limit: number,
-): Promise<ThreadRow[]> {
-  const { data, error } = await supabase
-    .from('pause_ai_artifacts' as never)
-    .select('id, pause_instance_id, created_at, content')
-    .eq('user_id', userId)
-    .eq('kind', DB_TYPE[companion])
-    .order('created_at', { ascending: false })
-    .limit(limit + 1);
-  if (error || !data) return [];
-  return data as unknown as ThreadRow[];
-}
 
 interface Props {
   companion: RegenerateCompanionSlot;
@@ -77,16 +39,11 @@ export function HistoryThread({
   const { user } = useAuth();
   const userId = user?.id;
 
-  const { data: rawRows } = useQuery({
-    queryKey: userId ? historyThreadQueryKey(userId, companion, limit) : ['history-thread', 'none'],
-    queryFn: () => fetchHistoryThreadRows(userId!, companion, limit),
-    enabled: Boolean(userId),
-    staleTime: 60_000,
-    refetchOnWindowFocus: false,
-    retry: false,
-  });
+  const { data: rawRows } = useQuery(
+    getHistoryThreadQueryOptions({ userId, companion, limit }),
+  );
 
-  const rows = useMemo((): ThreadRow[] | null => {
+  const rows = useMemo((): HistoryThreadRow[] | null => {
     if (!userId) return null;
     if (rawRows === undefined) return null;
     return rawRows

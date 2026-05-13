@@ -3,7 +3,7 @@ import { useCallback, useMemo, useState } from 'react';
 import { trackEvent } from '@/lib/posthog';
 import { getHomeCustomizeSectionDescription, getHomeCustomizeSectionTitle } from '@/lib/home-customize-section-copy';
 import type { HomeDashboardLayoutCustomizeProps } from '@/components/home/HomeDashboardLayout';
-import { isHomeSectionAlwaysVisibleInLayout } from '@/hooks/use-home-optional-visibility';
+import { isHomeSectionAlwaysVisibleInLayout } from '@/lib/home-section-visibility-constants';
 
 type SetZenModePersist = (zen: boolean) => void;
 

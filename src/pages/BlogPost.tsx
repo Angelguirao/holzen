@@ -2,7 +2,7 @@ import { Link, useParams } from 'react-router-dom';
 import { motion, useReducedMotion } from 'framer-motion';
 import { ArrowLeft } from 'lucide-react';
 import { useQuery } from '@tanstack/react-query';
-import { supabase } from '@/integrations/supabase/client';
+import { getBlogPostBySlugQueryOptions } from '@/lib/blog-post-query';
 import { format } from 'date-fns';
 import { PageMeta } from '@/components/PageMeta';
 import { useTranslation } from 'react-i18next';
@@ -21,20 +21,7 @@ const BlogPost = () => {
   const prefersReduced = useReducedMotion();
   const m = (delay = 0) => (prefersReduced ? {} : fade(delay));
 
-  const { data: post, isLoading, error } = useQuery({
-    queryKey: ['blog-post', slug],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from('blog_posts')
-        .select('*')
-        .eq('slug', slug!)
-        .eq('published', true)
-        .maybeSingle();
-      if (error) throw error;
-      return data;
-    },
-    enabled: !!slug,
-  });
+  const { data: post, isLoading, error } = useQuery(getBlogPostBySlugQueryOptions(slug));
 
   const postTitle = post?.title ? `${post.title} — Holzen Blog` : 'Holzen Blog';
   const postDesc = post?.excerpt || 'Read this article on the Holzen blog.';

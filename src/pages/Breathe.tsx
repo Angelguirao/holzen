@@ -1,11 +1,13 @@
 import { useState, useEffect, useCallback, useRef, useMemo } from 'react';
+import { useQuery } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
 import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import { X, Info } from 'lucide-react';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 import { hapticFeedback } from '@/lib/haptics';
-import { fetchBtcData, type BtcPriceData } from '@/lib/btc';
+import { getBreatheAmbientBtcQueryOptions } from '@/lib/btc';
+import { getMempoolSpaceBlockDataQueryOptions } from '@/lib/mempool-space-block-data';
 import { playBlockDiscoveryTone, startAmbientDrone } from '@/lib/notification-tone';
 import { useProGate } from '@/hooks/use-pro-gate';
 import { ProLock } from '@/components/ProLock';
@@ -44,52 +46,6 @@ const textColors: Record<VolatilityLevel, string> = {
 };
 
 const BREATH_DURATION = 8;
-
-interface BlockData {
-  height: number;
-  mempoolSize: number;
-  mempoolPending: number;
-  lastBlockTime?: number;
-  fastestFee?: number;
-  difficultyEpochProgress?: number;
-}
-
-async function fetchBlockData(): Promise<BlockData | null> {
-  try {
-    const [heightRes, mempoolRes, blocksRes, feesRes] = await Promise.all([
-      fetch('https://mempool.space/api/blocks/tip/height'),
-      fetch('https://mempool.space/api/mempool'),
-      fetch('https://mempool.space/api/blocks'),
-      fetch('https://mempool.space/api/v1/fees/recommended'),
-    ]);
-    const height = await heightRes.json();
-    const mempool = await mempoolRes.json();
-    const fees = await feesRes.json().catch(() => null);
-    let lastBlockTime: number | undefined;
-    try {
-      const blocks = await blocksRes.json();
-      if (Array.isArray(blocks) && blocks.length > 0) {
-        lastBlockTime = blocks[0].timestamp;
-      }
-    } catch {
-      /* ignore mempool blocks parse failures — tip height / fees still render */
-    }
-
-    const h = typeof height === 'number' ? height : parseInt(height);
-    const epochProgress = (h % 2016) / 2016;
-
-    return {
-      height: h,
-      mempoolSize: mempool?.vsize ?? 0,
-      mempoolPending: mempool?.count ?? 0,
-      lastBlockTime,
-      fastestFee: fees?.fastestFee,
-      difficultyEpochProgress: epochProgress,
-    };
-  } catch {
-    return null;
-  }
-}
 
 function formatNumber(n: number): string {
   if (n >= 1_000_000) return `${(n / 1_000_000).toFixed(1)}M`;
@@ -244,9 +200,21 @@ export default function Breathe() {
   const prefersReducedMotion = useReducedMotion();
   const { isPro, isPending } = useProGate();
 
-  const [btcData, setBtcData] = useState<BtcPriceData | null>(null);
-  const [blockData, setBlockData] = useState<BlockData | null>(null);
-  const [level, setLevel] = useState<VolatilityLevel>('calm');
+  const ambientDataEnabled = isPro && !isPending;
+
+  const btcQuery = useQuery(getBreatheAmbientBtcQueryOptions(ambientDataEnabled));
+
+  const {
+    data: blockDataRaw,
+    refetch: refetchBlockData,
+  } = useQuery(getMempoolSpaceBlockDataQueryOptions(ambientDataEnabled));
+
+  const btcData = btcQuery.data ?? null;
+  const blockData = blockDataRaw ?? null;
+  const level = useMemo((): VolatilityLevel => {
+    if (!btcData) return 'calm';
+    return getVolatilityLevel(btcData.changePercent);
+  }, [btcData]);
   const [curtainLifted, setCurtainLifted] = useState(false);
 
   // Depth: 0 = surface ambient, 1 = deep void
@@ -272,26 +240,6 @@ export default function Breathe() {
     return () => clearTimeout(timer);
   }, [isPro]);
 
-  const loadData = useCallback(async () => {
-    const [btc, block] = await Promise.all([
-      fetchBtcData().catch(() => null),
-      fetchBlockData(),
-    ]);
-    if (btc) {
-      setBtcData(btc);
-      setLevel(getVolatilityLevel(btc.changePercent));
-    }
-    if (block) setBlockData(block);
-    return block;
-  }, []);
-
-  useEffect(() => {
-    if (!isPro) return;
-    loadData();
-    const interval = setInterval(loadData, 30_000);
-    return () => clearInterval(interval);
-  }, [loadData, isPro]);
-
   useEffect(() => {
     if (!isPro) return;
     document.body.classList.add('ambient-active');
@@ -316,23 +264,24 @@ export default function Breathe() {
     return () => { if (tickRef.current) clearInterval(tickRef.current); };
   }, [depth, deepReady, blockData?.lastBlockTime]);
 
-  // Deep: poll for new blocks every 15s
+  // Deep: poll for new blocks every 15s (faster than the surface 30s TanStack interval)
   useEffect(() => {
     if (depth !== 1 || !deepReady) return;
-    pollRef.current = setInterval(async () => {
-      const fresh = await fetchBlockData();
-      if (fresh) {
-        if (blockAtEntry && fresh.height > blockAtEntry && !newBlockMined) {
-          setNewBlockMined(true);
-          setNewBlockHeight(fresh.height);
-          hapticFeedback('success');
-          playBlockDiscoveryTone();
-        }
-        setBlockData(fresh);
-      }
+    pollRef.current = setInterval(() => {
+      void refetchBlockData();
     }, 15_000);
     return () => { if (pollRef.current) clearInterval(pollRef.current); };
-  }, [depth, deepReady, blockAtEntry, newBlockMined]);
+  }, [depth, deepReady, refetchBlockData]);
+
+  // Deep: celebrate when chain height passes the height captured at void entry
+  useEffect(() => {
+    if (depth !== 1 || !deepReady || !blockAtEntry || !blockData || newBlockMined) return;
+    if (blockData.height <= blockAtEntry) return;
+    setNewBlockMined(true);
+    setNewBlockHeight(blockData.height);
+    hapticFeedback('success');
+    playBlockDiscoveryTone();
+  }, [depth, deepReady, blockAtEntry, newBlockMined, blockData]);
 
   // Deep: cycle contemplations every 20s
   useEffect(() => {

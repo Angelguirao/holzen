@@ -1,4 +1,4 @@
-import type { PauseArchiveRow } from '@/hooks/use-pause-archive-list';
+import type { PauseArchiveRow } from '@/lib/pause-archive-list-query';
 
 /**
  * `pause_log_step` allows retrospective `outcome_logged` when the row is terminal

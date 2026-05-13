@@ -16,7 +16,13 @@
  */
 
 import { supabase } from '@/integrations/supabase/client';
+import { getHolzenQueryClient } from '@/lib/holzen-query-client-ref';
 import { invalidatePauseStatsDataForUser } from '@/lib/pause-stats-invalidate';
+import { pauseSessionFetchedInstanceQueryKey } from '@/lib/pause-session-fetched-instance-query';
+import { pauseInstanceQueryPrefix } from '@/lib/pause-instance-query-prefix';
+import { pauseTerminalEntryStateQueryKey } from '@/lib/pause-terminal-entry-state-query';
+import { pauseSessionCompanionSnapshotQueryKey } from '@/lib/pause-page-loader';
+import { invalidateCompanionUiCompletionQuery } from '@/lib/companion-ui-completion-query-key';
 import { trackEvent } from '@/lib/posthog';
 import type {
   PauseState,
@@ -29,9 +35,17 @@ import type {
 const phPauseEngagedSent = new Set<string>();
 const phPauseCompletedSent = new Set<string>();
 
-function scheduleInvalidatePauseStatsOnCompleted() {
+function scheduleInvalidatePauseStatsOnCompleted(pauseInstanceId: string) {
   void supabase.auth.getUser().then(({ data: { user } }) => {
     invalidatePauseStatsDataForUser(user?.id);
+    invalidateCompanionUiCompletionQuery(pauseInstanceId);
+    const qc = getHolzenQueryClient();
+    if (qc) {
+      void qc.invalidateQueries({ queryKey: pauseSessionCompanionSnapshotQueryKey(pauseInstanceId) });
+      void qc.invalidateQueries({ queryKey: pauseSessionFetchedInstanceQueryKey(pauseInstanceId) });
+      void qc.invalidateQueries({ queryKey: pauseInstanceQueryPrefix(pauseInstanceId) });
+      void qc.invalidateQueries({ queryKey: pauseTerminalEntryStateQueryKey(pauseInstanceId) });
+    }
   });
 }
 
@@ -118,7 +132,7 @@ export async function pauseLogStep(params: {
     } catch {
       /* no-op */
     }
-    scheduleInvalidatePauseStatsOnCompleted();
+    scheduleInvalidatePauseStatsOnCompleted(params.instanceId);
   }
   return state;
 }
@@ -190,7 +204,7 @@ export async function pauseLogCompanion(params: {
     } catch {
       /* no-op */
     }
-    scheduleInvalidatePauseStatsOnCompleted();
+    scheduleInvalidatePauseStatsOnCompleted(params.instanceId);
   }
 
   return result;

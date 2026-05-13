@@ -8,92 +8,32 @@
 import { useMemo } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { AlertTriangle, CheckCircle2, Loader2 } from 'lucide-react';
-import { supabase } from '@/integrations/supabase/client';
-
-type Provider = 'perplexity' | 'lovable';
-
-interface ProviderStat {
-  state: 'ok' | 'degraded' | 'insufficient_sample';
-  errorRate: number;
-  sample: number;
-  successes: number;
-  errors: number;
-}
-
-const WINDOW_MINUTES = 10;
-const ERROR_RATE_THRESHOLD = 0.3;
-const MIN_SAMPLE = 10;
-
-interface AttemptRow {
-  provider: string | null;
-  status: string | null;
-}
-
-const ERROR_STATUSES = new Set(['error', 'timeout', 'rate_limited']);
-
-function normalize(raw: string | null): Provider | null {
-  if (!raw) return null;
-  const lower = raw.toLowerCase();
-  if (lower === 'perplexity') return 'perplexity';
-  if (lower === 'lovable' || lower === 'lovable-ai' || lower === 'google') return 'lovable';
-  return null;
-}
-
-function summarize(rows: AttemptRow[]): Record<Provider, ProviderStat> {
-  const agg: Record<Provider, { successes: number; errors: number }> = {
-    perplexity: { successes: 0, errors: 0 },
-    lovable: { successes: 0, errors: 0 },
-  };
-  for (const r of rows) {
-    const p = normalize(r.provider);
-    if (!p) continue;
-    if (r.status === 'success') agg[p].successes += 1;
-    else if (r.status && ERROR_STATUSES.has(r.status)) agg[p].errors += 1;
-  }
-  const out = {} as Record<Provider, ProviderStat>;
-  for (const p of ['perplexity', 'lovable'] as Provider[]) {
-    const sample = agg[p].successes + agg[p].errors;
-    const errorRate = sample === 0 ? 0 : agg[p].errors / sample;
-    let state: ProviderStat['state'] = 'ok';
-    if (sample < MIN_SAMPLE) state = 'insufficient_sample';
-    else if (errorRate >= ERROR_RATE_THRESHOLD) state = 'degraded';
-    out[p] = { state, errorRate, sample, successes: agg[p].successes, errors: agg[p].errors };
-  }
-  return out;
-}
-
-const ADMIN_PROVIDER_HEALTH_QUERY_KEY = ['admin', 'provider-health', WINDOW_MINUTES] as const;
-
-async function fetchProviderHealthStats(): Promise<Record<Provider, ProviderStat>> {
-  const since = new Date(Date.now() - WINDOW_MINUTES * 60_000).toISOString();
-  const { data, error } = await supabase
-    .from('generation_attempts')
-    .select('provider, status')
-    .gte('created_at', since)
-    .limit(10_000);
-  if (error || !data) return summarize([]);
-  return summarize(data as AttemptRow[]);
-}
+import {
+  type Provider,
+  type ProviderStat,
+  PROVIDER_HEALTH_ERROR_RATE_THRESHOLD,
+  PROVIDER_HEALTH_MIN_SAMPLE,
+  PROVIDER_HEALTH_WINDOW_MINUTES,
+  getProviderHealthQueryOptions,
+} from '@/lib/admin-provider-health-query';
 
 export function ProviderHealthCard() {
-  const { data: stats, isPending: loading } = useQuery({
-    queryKey: ADMIN_PROVIDER_HEALTH_QUERY_KEY,
-    queryFn: fetchProviderHealthStats,
-    refetchInterval: 30_000,
-    staleTime: 0,
-    refetchOnWindowFocus: false,
-  });
+  const { data: stats, isPending: loading } = useQuery(getProviderHealthQueryOptions());
 
   const providers: Provider[] = useMemo(() => ['perplexity', 'lovable'], []);
 
   return (
     <section className="space-y-2">
       <p className="text-[10px] font-mono uppercase tracking-wider text-muted-foreground/60">
-        Provider health <span className="text-muted-foreground/40 normal-case">(last {WINDOW_MINUTES}m)</span>
+        Provider health{' '}
+        <span className="text-muted-foreground/40 normal-case">
+          (last {PROVIDER_HEALTH_WINDOW_MINUTES}m)
+        </span>
       </p>
       <p className="text-[9px] font-mono text-muted-foreground/45 leading-relaxed">
-        Live circuit-breaker state. Degraded = error rate ≥ {Math.round(ERROR_RATE_THRESHOLD * 100)}%
-        over ≥ {MIN_SAMPLE} calls. When degraded, live generation is skipped for
+        Live circuit-breaker state. Degraded = error rate ≥{' '}
+        {Math.round(PROVIDER_HEALTH_ERROR_RATE_THRESHOLD * 100)}%
+        over ≥ {PROVIDER_HEALTH_MIN_SAMPLE} calls. When degraded, live generation is skipped for
         affected features; cache + library + curated fallback still serve. Recovery
         is automatic as new calls succeed.
       </p>

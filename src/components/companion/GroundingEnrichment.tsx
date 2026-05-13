@@ -1,6 +1,6 @@
 import { useTranslation } from 'react-i18next';
 import { Skeleton } from '@/components/ui/skeleton';
-import type { GroundingEnrichment as EnrichmentData } from '@/hooks/use-grounding-enrichment';
+import type { GroundingEnrichment as EnrichmentData } from '@/lib/grounding-enrichment-query';
 
 interface Props {
   data: EnrichmentData | null | undefined;

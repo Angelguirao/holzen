@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { ArrowRight } from 'lucide-react';
 import { ConfidenceChip } from '@/components/stats/ConfidenceChip';
 import { sampleConfidence } from '@/lib/stats/confidence';
-import type { PauseFullRow } from '@/hooks/use-pause-stats-data';
+import type { PauseFullRow } from '@/lib/pause-stats-data-query';
 
 interface HoldGoal {
   type: string | null;

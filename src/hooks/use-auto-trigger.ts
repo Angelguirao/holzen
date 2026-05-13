@@ -2,7 +2,7 @@ import { useEffect, useRef, useState, useCallback } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/use-auth';
-import { getProfileRowQueryOptions } from '@/hooks/use-profile';
+import { getProfileRowQueryOptions } from '@/lib/profile-row-query';
 
 /**
  * Listens for server-side auto-triggered pause notifications via realtime subscription
