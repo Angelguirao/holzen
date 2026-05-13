@@ -142,7 +142,9 @@ export async function sendLovableEmailMessage(
           sender_domain: senderDomain,
           subject: email.subject,
           html: email.html,
-          text: email.text ?? "",
+          text: email.text && email.text.trim().length > 0
+            ? email.text
+            : htmlToPlainText(email.html),
           purpose: email.purpose ?? "transactional",
           label: email.label ?? source,
           idempotency_key: opts.idempotencyKey,
