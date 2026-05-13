@@ -267,55 +267,6 @@ serve(
       log("zoomOut task forced for intervention secondary (companion pref off)");
     }
 
-    if (premiumCompanionUnits > 0) {
-      if (tier === "free") {
-        return new Response(
-          JSON.stringify({
-            error: "Premium companions require an active plan.",
-            code: "companions_upgrade_required",
-          }),
-          { status: 402, headers: { ...corsHeaders, "Content-Type": "application/json" } },
-        );
-      }
-
-      const quota = await consumeAllowanceOrCredits(svcClient, {
-        userId,
-        feature: "premium_companion",
-        limit: tierQuotaLimits.premium_companion,
-        amount: premiumCompanionUnits,
-        reason: "companions_overage",
-        source: "companion-orchestrate",
-      });
-      if (!quota.allowed) {
-        return new Response(
-          JSON.stringify({
-            error: "You've used this month's premium companion allowance.",
-            code: "companions_quota_exceeded",
-            tier,
-            companion_limit: quota.limit,
-            companion_used: quota.used,
-            companion_remaining: quota.remainingAllowance,
-            credits_balance: quota.creditsBalance,
-            credits_needed: Math.max(
-              0,
-              (premiumCompanionUnits - quota.remainingAllowance) * quota.creditCost - quota.creditsBalance,
-            ),
-          }),
-          { status: 402, headers: { ...corsHeaders, "Content-Type": "application/json" } },
-        );
-      }
-
-      log("premium companion quota consumed", {
-        tier,
-        amount: premiumCompanionUnits,
-        used: quota.used,
-        remaining: quota.remainingAllowance,
-        limit: quota.limit,
-        credits_used: quota.creditsUsed,
-        credits_balance: quota.creditsBalance,
-      });
-    }
-
     const pid = typeof pauseInstanceId === "string" ? pauseInstanceId : "";
     if (pid.length > 0) {
       const skipped = await tryOrchestrateSkipFromPauseArtifacts({
@@ -381,6 +332,55 @@ serve(
         }),
         { status: 503, headers: { ...corsHeaders, "Content-Type": "application/json" } },
       );
+    }
+
+    if (premiumCompanionUnits > 0) {
+      if (tier === "free") {
+        return new Response(
+          JSON.stringify({
+            error: "Premium companions require an active plan.",
+            code: "companions_upgrade_required",
+          }),
+          { status: 402, headers: { ...corsHeaders, "Content-Type": "application/json" } },
+        );
+      }
+
+      const quota = await consumeAllowanceOrCredits(svcClient, {
+        userId,
+        feature: "premium_companion",
+        limit: tierQuotaLimits.premium_companion,
+        amount: premiumCompanionUnits,
+        reason: "companions_overage",
+        source: "companion-orchestrate",
+      });
+      if (!quota.allowed) {
+        return new Response(
+          JSON.stringify({
+            error: "You've used this month's premium companion allowance.",
+            code: "companions_quota_exceeded",
+            tier,
+            companion_limit: quota.limit,
+            companion_used: quota.used,
+            companion_remaining: quota.remainingAllowance,
+            credits_balance: quota.creditsBalance,
+            credits_needed: Math.max(
+              0,
+              (premiumCompanionUnits - quota.remainingAllowance) * quota.creditCost - quota.creditsBalance,
+            ),
+          }),
+          { status: 402, headers: { ...corsHeaders, "Content-Type": "application/json" } },
+        );
+      }
+
+      log("premium companion quota consumed", {
+        tier,
+        amount: premiumCompanionUnits,
+        used: quota.used,
+        remaining: quota.remainingAllowance,
+        limit: quota.limit,
+        credits_used: quota.creditsUsed,
+        credits_balance: quota.creditsBalance,
+      });
     }
 
     if (selection && useIntervention && pauseInstanceId) {
