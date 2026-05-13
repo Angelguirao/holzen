@@ -13,7 +13,7 @@ interface Props {
   phase: 'session' | 'done';
   step: PauseStep;
   goToStep: (next: PauseStep) => void;
-  /** Shown under the stepper; invokes macro back or breathing intro reset from parent. */
+  /** Shown under the stepper band; invokes macro back or breathing intro reset from parent. */
   onHeaderBack?: () => void;
   showHeaderBack?: boolean;
   /** 1-based index in the macro ritual (Feel → … → Decide; six user-facing beats — Choose is folded into the last beat). */
@@ -39,9 +39,10 @@ interface Props {
 
 /**
  * Full-screen pause shell: curtain, gradient, **sticky** top strip (`<header>`: title · close ·
- * optional countdown only), then a **non-sticky** band (stepper · macro lines · mute · back)
- * in the scroll flow between that strip and the main step body. Step science / About tabs live
- * on the **depth picker** only (`PauseSessionDepthPickerStack`), not here.
+ * optional countdown only), then a **non-sticky** band with the **stepper only** (and optional
+ * macro back). **Macro progress** (“n of total”), optional duration hint, and **mute** sit in the
+ * main column above step content (wireframes: centered above the step headline, e.g. “What’s
+ * here?”). Step science / About tabs live on the **depth picker** only (`PauseSessionDepthPickerStack`).
  */
 export function PauseSessionScaffold({
   curtainLifted,
@@ -158,63 +159,8 @@ export function PauseSessionScaffold({
                 )}
               </div>
 
-              <div className="relative mt-3 w-full min-h-[2.25rem]">
-                {showMeta &&
-                  ((macroProgressSubline != null ||
-                    (macroProgressLine != null &&
-                      macroStepIndex != null &&
-                      macroStepTotal != null &&
-                      macroStepTotal > 0)) ? (
-                    <div className="flex flex-col items-center gap-0 px-11 text-center text-muted-foreground">
-                      <p className="text-base font-medium italic leading-6">
-                        {macroProgressLine ??
-                          t('pause.deep.macroStepCount', {
-                            defaultValue: '{{n}} of {{total}}',
-                            n: macroStepIndex,
-                            total: macroStepTotal,
-                          })}
-                      </p>
-                      {macroProgressSubline ? (
-                        <p className="text-base font-normal leading-6">{macroProgressSubline}</p>
-                      ) : null}
-                    </div>
-                  ) : (
-                    <div className="flex flex-col items-center px-11 text-center">
-                      <p className="text-[11px] font-medium uppercase tracking-[0.18em] text-muted-foreground">
-                        {macroProgressLine ??
-                          t('pause.macroProgress', {
-                            defaultValue: 'Step {{n}} of {{total}} · under ~15 min',
-                            n: macroStepIndex,
-                            total: macroStepTotal,
-                          })}
-                      </p>
-                    </div>
-                  ))}
-                <Button
-                  type="button"
-                  variant="ghost"
-                  size="icon"
-                  className={
-                    muted
-                      ? 'absolute right-0 top-0 h-9 w-9 shrink-0 text-muted-foreground/70 hover:text-foreground'
-                      : 'absolute right-0 top-0 h-9 w-9 shrink-0 text-muted-foreground hover:text-foreground'
-                  }
-                  onClick={() => {
-                    setMuted(!muted);
-                    if (muted) void resumePauseAudioContext();
-                  }}
-                  aria-label={
-                    muted
-                      ? t('pause.muteAriaOff', { defaultValue: 'Sound off (tap to unmute)' })
-                      : t('pause.muteAriaOn', { defaultValue: 'Sound on (tap to mute)' })
-                  }
-                >
-                  {muted ? <VolumeX className="h-4 w-4" aria-hidden /> : <Volume2 className="h-4 w-4" aria-hidden />}
-                </Button>
-              </div>
-
               {onHeaderBack && showHeaderBack && (
-                <div className="mt-2 flex w-full justify-start">
+                <div className="mt-3 flex w-full justify-start">
                   <button
                     type="button"
                     onClick={onHeaderBack}
@@ -230,6 +176,62 @@ export function PauseSessionScaffold({
         )}
 
         <div className="relative z-10 mx-auto max-w-lg overflow-hidden px-5 pb-16 pt-6 sm:px-8 sm:pb-20 sm:pt-8">
+          {phase === 'session' && (
+            <div className="relative mb-6 w-full min-h-[2.25rem] sm:mb-8">
+              {showMeta &&
+                ((macroProgressSubline != null ||
+                  (macroProgressLine != null &&
+                    macroStepIndex != null &&
+                    macroStepTotal != null &&
+                    macroStepTotal > 0)) ? (
+                  <div className="flex flex-col items-center gap-0 px-11 text-center text-muted-foreground">
+                    <p className="text-base font-medium italic leading-6">
+                      {macroProgressLine ??
+                        t('pause.deep.macroStepCount', {
+                          defaultValue: '{{n}} of {{total}}',
+                          n: macroStepIndex,
+                          total: macroStepTotal,
+                        })}
+                    </p>
+                    {macroProgressSubline ? (
+                      <p className="text-base font-normal leading-6">{macroProgressSubline}</p>
+                    ) : null}
+                  </div>
+                ) : (
+                  <div className="flex flex-col items-center px-11 text-center">
+                    <p className="text-[11px] font-medium uppercase tracking-[0.18em] text-muted-foreground">
+                      {macroProgressLine ??
+                        t('pause.macroProgress', {
+                          defaultValue: 'Step {{n}} of {{total}} · under ~15 min',
+                          n: macroStepIndex,
+                          total: macroStepTotal,
+                        })}
+                    </p>
+                  </div>
+                ))}
+              <Button
+                type="button"
+                variant="ghost"
+                size="icon"
+                className={
+                  muted
+                    ? 'absolute right-0 top-0 h-9 w-9 shrink-0 text-muted-foreground/70 hover:text-foreground'
+                    : 'absolute right-0 top-0 h-9 w-9 shrink-0 text-muted-foreground hover:text-foreground'
+                }
+                onClick={() => {
+                  setMuted(!muted);
+                  if (muted) void resumePauseAudioContext();
+                }}
+                aria-label={
+                  muted
+                    ? t('pause.muteAriaOff', { defaultValue: 'Sound off (tap to unmute)' })
+                    : t('pause.muteAriaOn', { defaultValue: 'Sound on (tap to mute)' })
+                }
+              >
+                {muted ? <VolumeX className="h-4 w-4" aria-hidden /> : <Volume2 className="h-4 w-4" aria-hidden />}
+              </Button>
+            </div>
+          )}
           {children}
         </div>
       </motion.div>

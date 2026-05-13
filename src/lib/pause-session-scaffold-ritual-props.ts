@@ -1,7 +1,8 @@
 import type { TFunction } from 'i18next';
 import type { PauseStep } from '@/components/pause/PauseProgress';
 import { PAUSE_DEEP_DISPLAY_STEP_COUNT, pauseDeepMacroStepNumber } from '@/components/pause/PauseProgress';
-import type { RitualDepth } from '@/lib/pause-session-storage';
+import { computeBriefMacroProgressPosition } from '@/lib/brief-pause-order';
+import type { BriefPauseStep, RitualDepth } from '@/lib/pause-session-storage';
 
 /**
  * Non-JSX scaffold props (macro index, session title) derived from ritual depth + step.
@@ -15,7 +16,7 @@ export type PauseSessionScaffoldRitualDerived = {
   macroStepIndex?: number;
   macroStepTotal?: number;
   sessionTitle?: string;
-  /** Deep pause: “{{n}} of {{total}}” under title; brief uses `briefMacroLine` from the page instead. */
+  /** Brief/deep: first line is “{{n}} of {{total}}” (no “Step”); optional duration line below (feel step). */
   macroProgressLine?: string;
   macroProgressSubline?: string;
 };
@@ -23,10 +24,29 @@ export type PauseSessionScaffoldRitualDerived = {
 export function buildPauseSessionScaffoldRitualDerived(input: {
   ritualEntry: RitualDepth | 'picker';
   step: PauseStep;
+  /** Required when `ritualEntry === 'brief'` so macro lines use the two-line scaffold layout. */
+  briefStep?: BriefPauseStep;
   t: TFunction;
 }): PauseSessionScaffoldRitualDerived {
-  const { ritualEntry, step, t } = input;
+  const { ritualEntry, step, briefStep, t } = input;
   if (ritualEntry === 'brief') {
+    if (briefStep != null) {
+      const { n, total } = computeBriefMacroProgressPosition(briefStep);
+      return {
+        macroStepIndex: n,
+        macroStepTotal: total,
+        sessionTitle: t('pause.brief.sessionTitle'),
+        macroProgressLine: t('pause.brief.macroStepCount', {
+          defaultValue: '{{n}} of {{total}}',
+          n,
+          total,
+        }),
+        macroProgressSubline:
+          briefStep === 'feel'
+            ? t('pause.brief.feelStepDurationHint', { defaultValue: '~ 15 sec' })
+            : undefined,
+      };
+    }
     return {
       macroStepIndex: undefined,
       macroStepTotal: undefined,
