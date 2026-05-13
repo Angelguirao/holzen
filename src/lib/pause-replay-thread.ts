@@ -143,7 +143,8 @@ export async function fetchPauseReplayThreadOrThrow(
   if (res.ok) {
     return res.thread;
   }
-  throw new Error(res.message ?? res.code);
+  const failure = res as { ok: false; code: string; message?: string };
+  throw new Error(failure.message ?? failure.code);
 }
 
 /**
