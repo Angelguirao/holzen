@@ -5,6 +5,8 @@ import { ChevronLeft } from 'lucide-react';
 import { OutcomeIcon } from '@/components/icons/OutcomeIcon';
 import { hapticFeedback } from '@/lib/haptics';
 import { pauseStepLayout } from '@/components/pause/pause-step-layout';
+import { Button } from '@/components/ui/button';
+import { cn } from '@/lib/utils';
 
 interface Props {
   onDecide: (decision: string) => void;
@@ -145,15 +147,19 @@ export function PauseDecide({ onDecide, onBack, introKicker }: Props) {
               animate={{ opacity: 1 }}
               transition={{ delay: 2.4, duration: 0.8 }}
             >
-              <button
+              <Button
                 type="button"
+                variant="default"
+                className={cn(
+                  pauseStepLayout.ritualPrimaryCta,
+                  'h-auto min-h-10 max-w-sm whitespace-normal py-3 leading-snug',
+                )}
                 onClick={confirmMirror}
-                className={pauseStepLayout.textContinue}
               >
                 {t(`mirror.confirm.${mirrorKey}`, {
                   defaultValue: mirrorKey === 'sell' ? 'I still want to sell' : 'I still want to buy',
                 })}
-              </button>
+              </Button>
               <button
                 type="button"
                 onClick={cancelMirror}

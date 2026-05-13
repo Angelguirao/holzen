@@ -2,6 +2,7 @@ import { motion } from 'framer-motion';
 import { useTranslation } from 'react-i18next';
 import { hapticFeedback } from '@/lib/haptics';
 import { pauseStepLayout } from '@/components/pause/pause-step-layout';
+import { Button } from '@/components/ui/button';
 
 interface Props {
   onChoose: () => void;
@@ -35,19 +36,23 @@ export function PauseChooseBridge({ onChoose }: Props) {
           })}
         </p>
       </div>
-      <motion.button
-        type="button"
+      <motion.div
         initial={{ opacity: 0, y: 6 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.25, duration: 0.5 }}
-        onClick={() => {
-          hapticFeedback('light');
-          onChoose();
-        }}
-        className="rounded-full bg-primary px-8 py-3 text-sm font-medium text-primary-foreground shadow-sm transition-opacity hover:opacity-95"
       >
-        {t('pause.chooseBridgeCta', { defaultValue: 'Choose' })}
-      </motion.button>
+        <Button
+          type="button"
+          variant="default"
+          className={pauseStepLayout.ritualPrimaryCta}
+          onClick={() => {
+            hapticFeedback('light');
+            onChoose();
+          }}
+        >
+          {t('pause.chooseBridgeCta', { defaultValue: 'Choose' })}
+        </Button>
+      </motion.div>
     </motion.div>
   );
 }

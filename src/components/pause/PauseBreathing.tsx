@@ -299,7 +299,7 @@ export const PauseBreathing = forwardRef<PauseBreathingHandle, Props>(function P
                 type="button"
                 variant="outline"
                 size="default"
-                className="rounded-full border-primary px-6 text-primary hover:bg-primary/10 hover:text-primary"
+                className={pauseStepLayout.ritualPrimaryOutlineCta}
                 onClick={() => {
                   hapticFeedback('light');
                   void resumePauseAudioContext();
@@ -383,7 +383,7 @@ export const PauseBreathing = forwardRef<PauseBreathingHandle, Props>(function P
               type="button"
               variant="default"
               size="default"
-              className="rounded-full px-8"
+              className={pauseStepLayout.ritualPrimaryCta}
               onClick={() => {
                 hapticFeedback('light');
                 onContinueAfterBreath();
