@@ -331,7 +331,7 @@ export function NotificationBell() {
             return;
           }
 
-          const row = (payload.new ?? {}) as NotificationRow;
+          const row = (payload.new ?? {}) as NotificationsInboxRow;
           if (row.dismissed_at) {
             removeNotification(row.id);
             return;
