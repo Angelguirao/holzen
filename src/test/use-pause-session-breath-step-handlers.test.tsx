@@ -46,6 +46,22 @@ describe('usePauseSessionBreathStepHandlers', () => {
     expect(input.goToStep).toHaveBeenCalledWith('reflect');
   });
 
+  it('handleBriefBreathContinue sets first segment completed after RPC then moves to integrate', async () => {
+    const setBreathingFirstCompleted = vi.fn();
+    const input = baseInput({
+      ritualEntry: 'brief',
+      briefStep: 'breath',
+      setBreathingFirstCompleted,
+    });
+    const { result } = renderHook(() => usePauseSessionBreathStepHandlers(input));
+    await act(async () => {
+      await result.current.handleBriefBreathContinue();
+    });
+    expect(input.ensureBreathSegment1Logged).toHaveBeenCalledWith(true);
+    expect(setBreathingFirstCompleted).toHaveBeenCalledWith(true);
+    expect(input.setBriefStep).toHaveBeenCalledWith('integrate');
+  });
+
   it('handleBriefIntegrateComplete only advances once', () => {
     const input = baseInput({ ritualEntry: 'brief', briefStep: 'integrate' });
     const { result } = renderHook(() => usePauseSessionBreathStepHandlers(input));

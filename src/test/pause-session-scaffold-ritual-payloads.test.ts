@@ -84,9 +84,6 @@ describe('buildPauseSessionScaffoldRitualPayloads', () => {
     briefRitual.onBriefDecideBack();
     expect(setBriefStep).toHaveBeenCalledWith('integrate');
 
-    briefRitual.onBriefBreathPatternComplete();
-    expect(setBreathingFirstCompleted).toHaveBeenCalledWith(true);
-
     void briefRitual.onContinueAfterBriefBreath();
     expect(handleBriefBreathContinue).toHaveBeenCalled();
   });

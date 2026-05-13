@@ -79,8 +79,9 @@ export function usePauseSessionBreathStepHandlers(input: {
   const handleBriefBreathContinue = useCallback(async () => {
     const ok = await ensureBreathSegment1Logged(true);
     if (!ok) return;
+    setBreathingFirstCompleted(true);
     setBriefStep('integrate');
-  }, [ensureBreathSegment1Logged, setBriefStep]);
+  }, [ensureBreathSegment1Logged, setBreathingFirstCompleted, setBriefStep]);
 
   const handleBriefSkipBreath = useCallback(async () => {
     setBreathingFirstCompleted(false);
