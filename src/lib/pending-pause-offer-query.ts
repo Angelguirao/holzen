@@ -1,4 +1,5 @@
 import { supabase } from '@/integrations/supabase/client';
+import { PAUSE_QUERY_PREFIX } from '@/lib/pause-query-namespace';
 
 export interface PendingPauseOfferRow {
   id: string;
@@ -7,8 +8,6 @@ export interface PendingPauseOfferRow {
   metadata: Record<string, unknown> | null;
   preview_message: string | null;
 }
-
-export const PAUSE_QUERY_PREFIX = ['pause'] as const;
 
 export const PENDING_PAUSE_OFFER_QUERY_LEAF = 'pending-offer' as const;
 
