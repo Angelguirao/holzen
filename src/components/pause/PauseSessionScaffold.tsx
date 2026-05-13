@@ -13,7 +13,7 @@ interface Props {
   phase: 'session' | 'done';
   step: PauseStep;
   goToStep: (next: PauseStep) => void;
-  /** Shown in the stepper row (left); invokes macro back or breathing intro reset from parent. */
+  /** Shown in the row below the stepper (left); invokes macro back or breathing intro reset. */
   onHeaderBack?: () => void;
   showHeaderBack?: boolean;
   /** 1-based index in the macro ritual (Feel → … → Decide; six user-facing beats — Choose is folded into the last beat). */
@@ -38,11 +38,11 @@ interface Props {
 }
 
 /**
- * Full-screen pause shell: curtain, gradient, **sticky** top strip (`<header>`: title · close ·
- * optional countdown only), then a **non-sticky** band: **back** (when shown) · **segment
- * stepper** · **mute** on one row (wireframe parity). **Macro progress** (“n of total”) and
- * optional duration sit in the main column above step content. Step science / About tabs live on
- * the **depth picker** only (`PauseSessionDepthPickerStack`).
+ * Full-screen pause shell: curtain, gradient, **sticky** header (title · close · optional
+ * countdown), then a **chrome band**: **segment stepper** full width, then a **control row**
+ * (Wireframes Kit pause 330-21123): **back** (left) · **macro “n of total” + duration** (center) ·
+ * **mute** (right).
+ * Main column is step content only. Step science / About tabs live on the depth picker only.
  */
 export function PauseSessionScaffold({
   curtainLifted,
@@ -148,8 +148,19 @@ export function PauseSessionScaffold({
         {phase === 'session' && (
           <div className="relative z-[55] border-b border-border/25 bg-background/60">
             <div className="mx-auto max-w-lg px-4 pb-3 pt-3 sm:px-6">
-              <div className="grid w-full grid-cols-[minmax(2.25rem,auto)_1fr_minmax(2.25rem,auto)] items-center gap-1">
-                <div className="flex min-h-9 items-center justify-start">
+              <div className="w-full">
+                {stepperSlot ?? (
+                  <PauseProgress
+                    currentStep={step}
+                    onStepClick={goToStep}
+                    variant="segment"
+                    breathSecondLabelVariant={breathSecondLabelVariant}
+                  />
+                )}
+              </div>
+
+              <div className="relative mt-3 flex w-full min-h-[2.5rem] items-start justify-center">
+                <div className="absolute left-0 top-0.5 z-10">
                   {onHeaderBack && showHeaderBack ? (
                     <Button
                       type="button"
@@ -163,17 +174,42 @@ export function PauseSessionScaffold({
                     </Button>
                   ) : null}
                 </div>
-                <div className="min-w-0">
-                  {stepperSlot ?? (
-                    <PauseProgress
-                      currentStep={step}
-                      onStepClick={goToStep}
-                      variant="segment"
-                      breathSecondLabelVariant={breathSecondLabelVariant}
-                    />
-                  )}
+
+                <div className="mx-auto max-w-[min(100%,16rem)] flex-1 px-11 text-center sm:px-12">
+                  {showMeta &&
+                    ((macroProgressSubline != null ||
+                      (macroProgressLine != null &&
+                        macroStepIndex != null &&
+                        macroStepTotal != null &&
+                        macroStepTotal > 0)) ? (
+                      <div className="flex flex-col items-center gap-0 text-muted-foreground">
+                        <p className="text-base font-medium italic leading-6">
+                          {macroProgressLine ??
+                            t('pause.deep.macroStepCount', {
+                              defaultValue: '{{n}} of {{total}}',
+                              n: macroStepIndex,
+                              total: macroStepTotal,
+                            })}
+                        </p>
+                        {macroProgressSubline ? (
+                          <p className="text-base font-normal leading-6">{macroProgressSubline}</p>
+                        ) : null}
+                      </div>
+                    ) : (
+                      <div className="flex flex-col items-center">
+                        <p className="text-[11px] font-medium uppercase tracking-[0.18em] text-muted-foreground">
+                          {macroProgressLine ??
+                            t('pause.macroProgress', {
+                              defaultValue: '{{n}} of {{total}} · under ~15 min',
+                              n: macroStepIndex,
+                              total: macroStepTotal,
+                            })}
+                        </p>
+                      </div>
+                    ))}
                 </div>
-                <div className="flex min-h-9 items-center justify-end">
+
+                <div className="absolute right-0 top-0.5 z-10">
                   <Button
                     type="button"
                     variant="ghost"
@@ -202,41 +238,6 @@ export function PauseSessionScaffold({
         )}
 
         <div className="relative z-10 mx-auto max-w-lg overflow-hidden px-5 pb-16 pt-6 sm:px-8 sm:pb-20 sm:pt-8">
-          {phase === 'session' && (
-            <div className="relative mb-6 w-full min-h-[2.25rem] sm:mb-8">
-              {showMeta &&
-                ((macroProgressSubline != null ||
-                  (macroProgressLine != null &&
-                    macroStepIndex != null &&
-                    macroStepTotal != null &&
-                    macroStepTotal > 0)) ? (
-                  <div className="flex flex-col items-center gap-0 px-2 text-center text-muted-foreground sm:px-6">
-                    <p className="text-base font-medium italic leading-6">
-                      {macroProgressLine ??
-                        t('pause.deep.macroStepCount', {
-                          defaultValue: '{{n}} of {{total}}',
-                          n: macroStepIndex,
-                          total: macroStepTotal,
-                        })}
-                    </p>
-                    {macroProgressSubline ? (
-                      <p className="text-base font-normal leading-6">{macroProgressSubline}</p>
-                    ) : null}
-                  </div>
-                ) : (
-                  <div className="flex flex-col items-center px-2 text-center sm:px-6">
-                    <p className="text-[11px] font-medium uppercase tracking-[0.18em] text-muted-foreground">
-                      {macroProgressLine ??
-                        t('pause.macroProgress', {
-                          defaultValue: '{{n}} of {{total}} · under ~15 min',
-                          n: macroStepIndex,
-                          total: macroStepTotal,
-                        })}
-                    </p>
-                  </div>
-                ))}
-            </div>
-          )}
           {children}
         </div>
       </motion.div>

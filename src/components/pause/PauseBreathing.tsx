@@ -1,5 +1,6 @@
 import { useState, useEffect, useImperativeHandle, forwardRef, useRef } from 'react';
 import { motion, useReducedMotion } from 'framer-motion';
+import { Play } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { hapticFeedback } from '@/lib/haptics';
 import { pauseStepLayout } from '@/components/pause/pause-step-layout';
@@ -121,7 +122,7 @@ export const PauseBreathing = forwardRef<PauseBreathingHandle, Props>(function P
     ritualVariant,
     breathSegment = 'first',
     onContinueAfterBreath,
-    onSkipBreath,
+    onSkipBreath: _onSkipBreath,
     completed: completedProp,
     onPatternComplete,
     onTimedBreathingChange,
@@ -260,17 +261,21 @@ export const PauseBreathing = forwardRef<PauseBreathingHandle, Props>(function P
           <div className="flex max-w-md flex-col items-center gap-4 text-center">
             <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-muted-foreground">{introKicker}</p>
             {breathSegment === 'second' ? (
-              <p className={pauseStepLayout.screenTitle}>
-                {t('pause.breathSecondHeadline', { defaultValue: "Let's slow this down again" })}
-              </p>
+              <>
+                <p className={pauseStepLayout.screenTitle}>
+                  {t('pause.breathSecondHeadline', { defaultValue: "Let's slow this down again" })}
+                </p>
+                <p className={pauseStepLayout.screenSubtitle}>
+                  {t('pause.breathIntroGuidance', { defaultValue: 'Just follow the rhythm.' })}
+                </p>
+              </>
             ) : (
-              <p className={pauseStepLayout.screenTitle}>
-                {t('pause.breathIntroHeadlineFirst', { defaultValue: "Let's slow this down." })}
+              <p className={`${pauseStepLayout.screenTitle} max-w-md`}>
+                {t('pause.breathIntroSingle', {
+                  defaultValue: "Let's slow this down. Just follow the rhythm.",
+                })}
               </p>
             )}
-            <p className={pauseStepLayout.screenSubtitle}>
-              {t('pause.breathIntroGuidance', { defaultValue: 'Just follow the rhythm.' })}
-            </p>
             {breathSegment === 'first' && mantra && (
               <motion.p
                 initial={{ opacity: 0 }}
@@ -293,22 +298,10 @@ export const PauseBreathing = forwardRef<PauseBreathingHandle, Props>(function P
                 void resumePauseAudioContext();
                 setStarted(true);
               }}
-              className={pauseStepLayout.textContinue}
+              className={`inline-flex items-center gap-2 ${pauseStepLayout.textContinue}`}
             >
               {t('pause.breathStartCta', { defaultValue: 'Start' })}
-            </motion.button>
-            <motion.button
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ delay: 0.55, duration: 0.8 }}
-              type="button"
-              onClick={() => {
-                hapticFeedback('light');
-                void onSkipBreath();
-              }}
-              className="text-xs text-muted-foreground underline-offset-4 transition-colors hover:text-foreground hover:underline"
-            >
-              {t('common.skip')}
+              <Play className="h-4 w-4 shrink-0 fill-current" aria-hidden />
             </motion.button>
           </div>
         </>
@@ -389,21 +382,6 @@ export const PauseBreathing = forwardRef<PauseBreathingHandle, Props>(function P
         </motion.div>
       )}
 
-      {!completed && started && (
-        <motion.button
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 3, duration: 1 }}
-          type="button"
-          onClick={() => {
-            hapticFeedback('light');
-            void onSkipBreath();
-          }}
-          className="text-xs text-muted-foreground underline-offset-4 transition-colors hover:text-foreground hover:underline"
-        >
-          {t('common.skip')}
-        </motion.button>
-      )}
     </motion.div>
   );
 });
