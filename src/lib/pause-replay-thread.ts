@@ -1,11 +1,12 @@
 import { supabase } from '@/integrations/supabase/client';
+import { PRACTICE_QUERY_PREFIX } from '@/lib/practice-query-namespace';
 import {
   combineNoteAndReplayWords,
   type PastReflectionWithWords,
   type UserWord,
 } from '../../supabase/functions/_shared/past-reflection-util';
 
-export const PRACTICE_REPLAY_QUERY_PREFIX = ['practice', 'replay'] as const;
+export const PRACTICE_REPLAY_QUERY_PREFIX = [...PRACTICE_QUERY_PREFIX, 'replay'] as const;
 
 export const PRACTICE_REPLAY_RECENT_PAUSES_QUERY_LEAF = 'recent-pauses' as const;
 

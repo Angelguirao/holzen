@@ -1,6 +1,7 @@
 import { fetchPracticeSuggestions, type PracticeSuggestion } from '@/lib/practice-suggestion';
+import { PRACTICE_QUERY_PREFIX } from '@/lib/practice-query-namespace';
 
-export const PRACTICE_SUGGESTION_QUERY_PREFIX = ['practice', 'suggestion'] as const;
+export const PRACTICE_SUGGESTION_QUERY_PREFIX = [...PRACTICE_QUERY_PREFIX, 'suggestion'] as const;
 
 export const PRACTICE_PRIMARY_SUGGESTION_QUERY_LEAF = 'primary' as const;
 

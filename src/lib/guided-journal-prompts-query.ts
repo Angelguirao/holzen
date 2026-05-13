@@ -3,6 +3,7 @@ import { toast } from 'sonner';
 import { invokeEdge } from '@/lib/invoke-edge';
 import { companionFallbacksDisabledClient } from '@/lib/companion-strict';
 import { parseEdgeFunctionError, toUserFacingAiErrorMessage } from '@/lib/edge-function-error';
+import { PRACTICE_QUERY_PREFIX } from '@/lib/practice-query-namespace';
 
 const FALLBACK_PROMPTS = [
   'practice.prompt1',
@@ -13,7 +14,7 @@ const FALLBACK_PROMPTS = [
   'practice.prompt6',
 ] as const;
 
-export const PRACTICE_GUIDED_JOURNAL_QUERY_PREFIX = ['practice', 'guided-journal'] as const;
+export const PRACTICE_GUIDED_JOURNAL_QUERY_PREFIX = [...PRACTICE_QUERY_PREFIX, 'guided-journal'] as const;
 
 export const GUIDED_JOURNAL_PROMPTS_QUERY_LEAF = 'prompts' as const;
 
