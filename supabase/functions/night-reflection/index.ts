@@ -492,17 +492,19 @@ serve(
                   webpush,
                   { endpoint: sub.endpoint, keys: { p256dh: sub.p256dh, auth: sub.auth } },
                   payload,
-                  { notificationTag: "night_reflection" }
+                  { notificationTag: "night_reflection", expectedStatusCodes: [404, 410] }
                 );
               } catch (pushErr: unknown) {
                 const sc = webPushStatusCode(pushErr);
-                log.error("night_reflection_push", {
+                const staleSubscription = sc === 410 || sc === 404;
+                const logPushFailure = staleSubscription ? log.warn : log.error;
+                logPushFailure("night_reflection_push", {
                   holzen_event: "night_reflection_cron",
-                  phase: "push_send_failed",
+                  phase: staleSubscription ? "push_subscription_stale" : "push_send_failed",
                   status_code: sc,
                   ...unknownErrorForLog(pushErr),
                 });
-                if (sc === 410 || sc === 404) {
+                if (staleSubscription) {
                   await supabase.from("push_subscriptions").delete().eq("endpoint", sub.endpoint);
                 }
               }
