@@ -74,8 +74,10 @@ Rules:
   chronologically when grouped by `cid`.
 - **Reserved prefixes** — do not reuse for unrelated events:
   - `request` / `response` — emitted by the wrapper itself.
-  - `dep.ok` / `dep.error` — emitted by `logDependencyCall` for outbound
-    HTTP calls (use it instead of hand-rolled fetch logging).
+  - `dependency_call` — emitted by `logDependencyCall` for outbound HTTP
+    calls (use it instead of hand-rolled fetch logging). Pass
+    `expectedStatusCodes` for normal cleanup paths such as stale web-push
+    `404`/`410` deliveries so they stay out of error alerts.
   - `edge_error` / `unhandled_exception` — emitted by the wrapper's catch.
   - `audit.*` — emitted by `logAudit` for security-sensitive writes.
 - **Errors carry an `error` payload, not a separate event.** Prefer
