@@ -28,8 +28,21 @@ type Logger = ReturnType<typeof createLogger>;
 export interface LogDependencyOptions {
   /** Operation label for dashboards (e.g. "messages.create", "simple/price"). */
   operation?: string;
+  /**
+   * Error status codes that are expected/handled by the caller. These still
+   * rethrow, but the dependency log is downgraded to warn so cleanup paths
+   * (for example stale web-push endpoints) do not page as edge errors.
+   */
+  expectedStatusCodes?: number[];
   /** Extra structured fields — scrubbed before hitting BetterStack via the logger. */
   extra?: Record<string, unknown>;
+}
+
+function errorStatusCode(err: unknown): number | null {
+  if (typeof err !== "object" || err === null) return null;
+  const maybeStatus = (err as { statusCode?: unknown; status?: unknown }).statusCode ??
+    (err as { status?: unknown }).status;
+  return typeof maybeStatus === "number" && Number.isFinite(maybeStatus) ? maybeStatus : null;
 }
 
 export async function logDependencyCall<T>(
@@ -51,11 +64,16 @@ export async function logDependencyCall<T>(
     return result;
   } catch (err) {
     const message = err instanceof Error ? err.message : String(err);
-    log.error("dependency_call", {
+    const statusCode = errorStatusCode(err);
+    const expected = statusCode !== null && options.expectedStatusCodes?.includes(statusCode) === true;
+    const logFailure = expected ? log.warn : log.error;
+    logFailure("dependency_call", {
       dep: dependency,
       status: "error",
       duration_ms: Date.now() - start,
       message,
+      ...(statusCode !== null ? { status_code: statusCode } : {}),
+      ...(expected ? { expected: true } : {}),
       ...(options.operation ? { operation: options.operation } : {}),
       ...(options.extra ?? {}),
     });
