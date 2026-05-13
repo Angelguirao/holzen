@@ -26,7 +26,7 @@ interface Props {
   decision: string | null;
   onReturn: () => void;
   pauseData?: PauseData | null;
-  /** Wireframes Kit: brief completion uses journey CTA + optional check-in block. */
+  /** Brief ritual completion: journey CTA + optional check-in block. */
   doneVariant?: 'default' | 'brief';
   /** Brief only: clears session and navigates to Journey (stats). */
   onSaveToJourney?: () => void;

@@ -32,7 +32,7 @@ describe('isPauseSessionHeaderBackVisible', () => {
     ).toBe(false);
   });
 
-  it('brief: false on breath step (wireframe: no back while breathing)', () => {
+  it('brief: false on breath step (no shell back while breathing)', () => {
     expect(isPauseSessionHeaderBackVisible(base({ ritualEntry: 'brief', briefStep: 'breath' }))).toBe(
       false,
     );
@@ -59,7 +59,7 @@ describe('isPauseSessionHeaderBackVisible', () => {
     expect(isPauseSessionHeaderBackVisible(base({ ritualEntry: 'deep', step: 'feel' }))).toBe(false);
   });
 
-  it('deep: false on breathe and breath2 (wireframe: no back while breathing)', () => {
+  it('deep: false on breathe and breath2 (no shell back while breathing)', () => {
     expect(isPauseSessionHeaderBackVisible(base({ ritualEntry: 'deep', step: 'breathe' }))).toBe(false);
     expect(
       isPauseSessionHeaderBackVisible(

@@ -14,13 +14,13 @@ interface Props {
   onBack?: () => void;
   /** Optional kicker above the title (e.g. brief vs deep step label). */
   introKicker?: string;
-  /** Brief wireframes: primary Hold pill + outlined Buy/Sell; hide footer Back on choices. */
-  briefWireframe?: boolean;
+  /** Brief decide layout: primary Hold pill + outlined Buy/Sell; hide footer Back on choices. */
+  briefDecidePillLayout?: boolean;
   /** When true, the choices-screen footer Back row is omitted (stepper-only nav). */
   hideChoicesBack?: boolean;
 }
 
-export function PauseDecide({ onDecide, onBack, introKicker, briefWireframe, hideChoicesBack }: Props) {
+export function PauseDecide({ onDecide, onBack, introKicker, briefDecidePillLayout, hideChoicesBack }: Props) {
   const { t } = useTranslation();
   const [mirrorDecision, setMirrorDecision] = useState<string | null>(null);
 
@@ -62,7 +62,7 @@ export function PauseDecide({ onDecide, onBack, introKicker, briefWireframe, hid
             key="choices"
             className={cn(
               'flex flex-col items-center gap-8 w-full',
-              briefWireframe ? 'max-w-sm' : 'max-w-xs',
+              briefDecidePillLayout ? 'max-w-sm' : 'max-w-xs',
             )}
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
@@ -79,7 +79,7 @@ export function PauseDecide({ onDecide, onBack, introKicker, briefWireframe, hid
               </p>
             </div>
 
-            {briefWireframe ? (
+            {briefDecidePillLayout ? (
               <>
                 <Button
                   type="button"

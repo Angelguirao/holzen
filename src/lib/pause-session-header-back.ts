@@ -15,8 +15,8 @@ export type PauseSessionHeaderBackInput = {
  * Whether the pause shell should show the header back affordance.
  * Mirrors `showPauseHeaderBack` in `PauseSession` (brief vs non-brief branches).
  *
- * Wireframes Kit: **brief** ritual never shows the shell chevron (navigation is the segment
- * stepper). **Deep** ritual hides it on **Breathe** (`breathe` / `breath2`) only.
+ * **Brief** ritual never shows the shell chevron (navigation uses the segment stepper only).
+ * **Deep** ritual hides it on **Breathe** (`breathe` / `breath2`) only.
  * `computePauseHeaderBackIntent` still describes breath reset behavior if the handler is called.
  */
 export function isPauseSessionHeaderBackVisible(p: PauseSessionHeaderBackInput): boolean {
