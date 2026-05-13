@@ -5,6 +5,7 @@ import { useSubscription } from '@/hooks/use-subscription';
 import { PRICING } from '@/lib/pricing';
 import { ScoreImpact } from './ScoreImpact';
 import { pauseStepLayout } from '@/components/pause/pause-step-layout';
+import { Button } from '@/components/ui/button';
 
 interface PauseData {
   mood: string | null;
@@ -134,15 +135,16 @@ export function PauseDone({ decision, onReturn, pauseData }: Props) {
         </motion.div>
       )}
 
-      <motion.button
+      <motion.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ delay: justHitLimit ? 2.5 : 1.5, duration: 1 }}
-        onClick={onReturn}
-        className="mt-4 text-sm text-muted-foreground underline-offset-4 transition-colors hover:text-foreground hover:underline"
+        className="mt-4"
       >
-        {t('pause.return')}
-      </motion.button>
+        <Button type="button" variant="default" className={pauseStepLayout.ritualPrimaryCta} onClick={onReturn}>
+          {t('pause.return')}
+        </Button>
+      </motion.div>
     </motion.div>
   );
 }

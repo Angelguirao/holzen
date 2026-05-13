@@ -228,9 +228,9 @@ export function PauseReflect({
         animate={{ opacity: 1 }}
         transition={{ delay: 0.2, duration: 0.5 }}
       >
-        <button type="button" onClick={onContinue} className={pauseStepLayout.textContinue}>
+        <Button type="button" variant="default" className={pauseStepLayout.ritualPrimaryCta} onClick={onContinue}>
           {t('pause.steps.continue', { defaultValue: 'Continue' })}
-        </button>
+        </Button>
         <p className="max-w-xs text-center text-xs text-muted-foreground">
           {t('pause.reflect.continueHint', {
             defaultValue: 'There is no "right" amount of time — continue when you feel done.',

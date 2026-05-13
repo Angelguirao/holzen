@@ -3,6 +3,7 @@ import { motion } from 'framer-motion';
 import { useTranslation } from 'react-i18next';
 import { Button } from '@/components/ui/button';
 import { pauseStepLayout } from '@/components/pause/pause-step-layout';
+import { cn } from '@/lib/utils';
 
 const INTEGRATE_SECONDS = 20;
 
@@ -61,7 +62,12 @@ export function PauseBriefIntegrate({ done, onComplete }: Props) {
           </p>
         </div>
 
-        <Button type="button" variant="secondary" className="w-full sm:w-auto sm:self-center" onClick={onComplete}>
+        <Button
+          type="button"
+          variant="default"
+          className={cn(pauseStepLayout.ritualPrimaryCta, 'w-full sm:w-auto sm:self-center')}
+          onClick={onComplete}
+        >
           {t('pause.steps.continue', { defaultValue: 'Continue' })}
         </Button>
       </div>

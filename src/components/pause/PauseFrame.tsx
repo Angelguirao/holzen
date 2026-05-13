@@ -76,7 +76,7 @@ export function PauseFrame({
         <Button
           type="button"
           variant="outline"
-          className="rounded-full border-border bg-muted/40 px-5 py-2 text-foreground hover:bg-muted/55"
+          className={pauseStepLayout.ritualMutedOutlineCta}
           onClick={onImDone}
         >
           {t('pause.frame.imDone', { defaultValue: "I'm done" })}
