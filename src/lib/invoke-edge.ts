@@ -117,7 +117,7 @@ export async function invokeEdge<T = unknown, B = unknown>(
       const invoked = await supabase.functions.invoke<T>(functionName, {
         body: options.body as unknown,
         headers,
-        method: options.method,
+        method: options.method === "HEAD" ? "GET" : options.method,
         // `signal` is supported on newer supabase-js; ignored on older versions.
         ...(options.signal ? { signal: options.signal } : {}),
       });
