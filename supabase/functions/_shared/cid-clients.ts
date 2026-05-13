@@ -101,6 +101,8 @@ export interface SendWebPushOptions {
   notificationTag?: string;
   /** Optional VAPID/TTL/etc options forwarded to `webpush.sendNotification`. */
   webpushOptions?: Record<string, unknown>;
+  /** Delivery status codes that are expected and should not trip error alerts. */
+  expectedStatusCodes?: number[];
 }
 
 /**
@@ -118,6 +120,8 @@ export interface SendWebPushOptions {
  *
  * The helper re-throws on failure so the caller can still inspect
  * `err.statusCode` (e.g. to prune 404/410 subscriptions).
+ * Pass `expectedStatusCodes: [404, 410]` when pruning stale push
+ * subscriptions so the dependency log line stays warning-level.
  */
 export async function sendWebPushWithCid(
   log: Logger,
@@ -140,6 +144,7 @@ export async function sendWebPushWithCid(
     () => webpush.sendNotification(sub, payload, options.webpushOptions),
     {
       operation: "send",
+      expectedStatusCodes: options.expectedStatusCodes,
       extra: {
         endpoint_host: endpointHost,
         ...(options.notificationTag ? { notification_tag: options.notificationTag } : {}),

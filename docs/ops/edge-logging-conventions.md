@@ -43,8 +43,9 @@ Edge function
 3. **Wrap external calls with `logDependencyCall(log, dependency, fn, options?)`.**
    - `dependency`: one of `anthropic`, `perplexity`, `lovable-email`, `stripe`, `supabase-db`, `lovable-ai-gateway`, `coingecko`, `crossref`, `firecrawl`, or a new well-known name.
    - `options.operation`: human-readable operation (`chat.completions`, `customers.list`, `emails.send`, `from.table.select`, …). Optional but useful for dashboards.
+   - `options.expectedStatusCodes`: status codes that should be warning-level instead of error-level. Use this for recoverable dependency responses such as stale web-push endpoints (`404`/`410`) that the caller will prune.
    - On success: `dependency_call` log with `status: "ok"` + `duration_ms`.
-   - On error: `dependency_call` log at error level with `status: "error"`, `duration_ms`, and message. The error re-throws so the wrapper's catch can decide the `EdgeError` shape.
+   - On unexpected error: `dependency_call` log at error level with `status: "error"`, `duration_ms`, and message. Expected status codes log at warning level with `status: "expected_error"`. The error re-throws so the wrapper's catch can decide the `EdgeError` shape.
    - **Don't** pass full request/response bodies. `logDependencyCall` logs specs only by contract.
 4. **Never `console.log` directly** from the handler or from new helpers. Always go through `log` from `ctx`. (Libraries under `_shared` can call `log.info/warn/error` from a passed-in logger.)
 5. **Use `logAudit` for security-sensitive state changes** (see §Audit).
