@@ -1,6 +1,7 @@
 import { useTranslation } from 'react-i18next';
-import { useEffect, useState, useCallback, useMemo } from 'react';
-import { supabase } from '@/integrations/supabase/client';
+import { useState, useCallback, useMemo } from 'react';
+import type { InfiniteData } from '@tanstack/react-query';
+import { useInfiniteQuery, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useAuth } from '@/hooks/use-auth';
 import { Link } from 'react-router-dom';
 import { ArrowLeft, ChevronUp } from 'lucide-react';
@@ -10,8 +11,16 @@ import { PageMeta } from '@/components/PageMeta';
 import { PublicFooter } from '@/components/PublicFooter';
 import { useInfiniteScroll } from '@/hooks/use-infinite-scroll';
 import { PageHeading } from '@/components/PageHeading';
+import {
+  deleteRoadmapVote,
+  getRoadmapItemsInfiniteQueryOptions,
+  getRoadmapVotesQueryOptions,
+  insertRoadmapVote,
+  roadmapVotesQueryKey,
+  ROADMAP_ITEMS_QUERY_KEY,
+  type RoadmapListItem,
+} from '@/lib/roadmap-query';
 
-const PAGE_SIZE = 30;
 const CATEGORIES = ['all', 'self', 'together', 'intelligence', 'reach'] as const;
 
 const categoryTone: Record<string, 'default' | 'secondary' | 'outline'> = {
@@ -21,80 +30,82 @@ const categoryTone: Record<string, 'default' | 'secondary' | 'outline'> = {
   reach: 'secondary',
 };
 
-interface RoadmapItem {
-  id: string;
-  title: string;
-  description: string | null;
-  status: string;
-  vote_count: number;
-  category: string;
-}
-
 const Roadmap = () => {
   const { t } = useTranslation();
   const { user } = useAuth();
-  const [items, setItems] = useState<RoadmapItem[]>([]);
-  const [votes, setVotes] = useState<Set<string>>(new Set());
-  const [loading, setLoading] = useState(true);
-  const [loadingMore, setLoadingMore] = useState(false);
-  const [hasMore, setHasMore] = useState(true);
+  const userId = user?.id;
+  const queryClient = useQueryClient();
   const [activeCategory, setActiveCategory] = useState<string>('all');
 
-  useEffect(() => {
-    const load = async () => {
-      const { data } = await supabase
-        .from('roadmap_items')
-        .select('id, title, description, status, vote_count, category')
-        .order('vote_count', { ascending: false })
-        .limit(PAGE_SIZE);
+  const {
+    data: itemsPages,
+    isPending: itemsPending,
+    hasNextPage,
+    isFetchingNextPage,
+    fetchNextPage,
+  } = useInfiniteQuery(getRoadmapItemsInfiniteQueryOptions());
 
-      const rows = (data as unknown as RoadmapItem[]) ?? [];
-      setItems(rows);
-      setHasMore(rows.length === PAGE_SIZE);
+  const { data: voteIds = [], isPending: votesPending } = useQuery(getRoadmapVotesQueryOptions(userId));
 
-      if (user) {
-        const { data: userVotes } = await supabase
-          .from('roadmap_votes')
-          .select('item_id')
-          .eq('user_id', user.id);
-        setVotes(new Set(userVotes?.map((v) => v.item_id) ?? []));
+  const votes = useMemo(() => new Set(voteIds), [voteIds]);
+  const items = useMemo(() => itemsPages?.pages.flat() ?? [], [itemsPages]);
+
+  const loading = itemsPending || (Boolean(userId) && votesPending);
+
+  const onLoadMore = useCallback(() => {
+    if (!hasNextPage || isFetchingNextPage) return;
+    void fetchNextPage();
+  }, [hasNextPage, isFetchingNextPage, fetchNextPage]);
+
+  const sentinelRef = useInfiniteScroll({
+    hasMore: Boolean(hasNextPage),
+    loading: isFetchingNextPage,
+    onLoadMore,
+  });
+
+  const toggleVote = useCallback(
+    async (itemId: string) => {
+      if (!userId) return;
+      const hasVoted = votes.has(itemId);
+      const votesKey = roadmapVotesQueryKey(userId);
+      const prevVotes = queryClient.getQueryData<string[]>(votesKey);
+      const prevItems = queryClient.getQueryData<InfiniteData<RoadmapListItem[]>>(ROADMAP_ITEMS_QUERY_KEY);
+
+      queryClient.setQueryData<string[]>(votesKey, (ids) => {
+        const cur = ids ?? [];
+        if (hasVoted) return cur.filter((id) => id !== itemId);
+        return [...cur, itemId];
+      });
+
+      queryClient.setQueryData<InfiniteData<RoadmapListItem[]>>(ROADMAP_ITEMS_QUERY_KEY, (old) => {
+        if (!old) return old;
+        return {
+          pageParams: old.pageParams,
+          pages: old.pages.map((page) =>
+            page.map((i) =>
+              i.id === itemId
+                ? { ...i, vote_count: Math.max(0, hasVoted ? i.vote_count - 1 : i.vote_count + 1) }
+                : i,
+            ),
+          ),
+        };
+      });
+
+      try {
+        if (hasVoted) {
+          await deleteRoadmapVote(userId, itemId);
+        } else {
+          await insertRoadmapVote(userId, itemId);
+        }
+      } catch {
+        if (prevVotes !== undefined) queryClient.setQueryData(votesKey, prevVotes);
+        else void queryClient.invalidateQueries({ queryKey: votesKey });
+        if (prevItems !== undefined) queryClient.setQueryData(ROADMAP_ITEMS_QUERY_KEY, prevItems);
+        else void queryClient.invalidateQueries({ queryKey: ROADMAP_ITEMS_QUERY_KEY });
       }
-
-      setLoading(false);
-    };
-    load();
-  }, [user]);
-
-  const loadMore = useCallback(async () => {
-    if (loadingMore || !hasMore) return;
-    setLoadingMore(true);
-    const { data } = await supabase
-      .from('roadmap_items')
-      .select('id, title, description, status, vote_count, category')
-      .order('vote_count', { ascending: false })
-      .range(items.length, items.length + PAGE_SIZE - 1);
-    const rows = (data as unknown as RoadmapItem[]) ?? [];
-    setItems((prev) => [...prev, ...rows]);
-    setHasMore(rows.length === PAGE_SIZE);
-    setLoadingMore(false);
-  }, [loadingMore, hasMore, items.length]);
-
-  const sentinelRef = useInfiniteScroll({ hasMore, loading: loadingMore, onLoadMore: loadMore });
-
-  const toggleVote = useCallback(async (itemId: string) => {
-    if (!user) return;
-    const hasVoted = votes.has(itemId);
-
-    if (hasVoted) {
-      await supabase.from('roadmap_votes').delete().eq('user_id', user.id).eq('item_id', itemId);
-      setItems((prev) => prev.map((i) => i.id === itemId ? { ...i, vote_count: Math.max(0, i.vote_count - 1) } : i));
-      setVotes((prev) => { const next = new Set(prev); next.delete(itemId); return next; });
-    } else {
-      await supabase.from('roadmap_votes').insert({ user_id: user.id, item_id: itemId });
-      setItems((prev) => prev.map((i) => i.id === itemId ? { ...i, vote_count: i.vote_count + 1 } : i));
-      setVotes((prev) => new Set(prev).add(itemId));
-    }
-  }, [user, votes]);
+    },
+    [userId, votes, queryClient],
+  );
 
   const filtered = useMemo(() => {
     const base = activeCategory === 'all' ? items : items.filter((i) => i.category === activeCategory);
@@ -152,7 +163,7 @@ const Roadmap = () => {
                   className="rounded-md border border-border/60 bg-muted/30 px-4 py-3 flex gap-3 items-start"
                 >
                   <button
-                    onClick={() => toggleVote(item.id)}
+                    onClick={() => void toggleVote(item.id)}
                     disabled={!user}
                     className={`shrink-0 flex flex-col items-center gap-0.5 pt-0.5 transition-colors ${
                       voted ? 'text-nox-text-highlight' : 'text-muted-foreground/40 hover:text-foreground'
@@ -184,7 +195,7 @@ const Roadmap = () => {
               </p>
             )}
             <div ref={sentinelRef} className="h-1" />
-            {loadingMore && (
+            {isFetchingNextPage && (
               <p className="text-[10px] font-mono text-muted-foreground animate-pulse text-center py-2">{t('common.loadingMore')}</p>
             )}
           </div>

@@ -1,6 +1,6 @@
 # Home (signed-in): dedupe redundant client fetches
 
-**Status:** partial — **subscription + market client dedupe shipped (2026-04)**; optional TanStack **`profiles`** lift still open.
+**Status:** partial — **subscription + market client dedupe shipped (2026-04)**; TanStack **`profiles`** row query **shipped** in `use-profile` (`PROFILE_QUERY_KEY`, shared cache across every `useHolzen()` instance).
 
 ## Progress
 
@@ -10,7 +10,7 @@
 
 ## Still optional (not required to close ticket)
 
-- Lift **`profiles`** into a single **`useQuery`** at layout level (or stricter stale policy) if DevTools still shows duplicate **`profiles`** rows from multiple trees.
+- If DevTools still shows redundant work, consider a **layout-level** profile provider (one hook instance) — the shared **`['profile', userId]`** query already dedupes the network read across trees.
 
 ## Doc pointer (done 2026-04)
 

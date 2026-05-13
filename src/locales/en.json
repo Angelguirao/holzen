@@ -911,7 +911,7 @@
       "03title": "You reflect",
       "03desc": "An AI-generated reflection encourages awareness, not action. Five companions offer context: a haiku, a signal, a grounding nudge, a zoom-out perspective, and a historical echo.",
       "04title": "You decide",
-      "04desc": "Choose deliberately: hold, sell, buy, or do nothing. The full pause guides you through feel, breathe, reflect, frame, a second breath, then a short settle before Decide — six beats in the ritual, so your choices come from clarity, not impulse.",
+      "04desc": "Choose deliberately whether you held steady, sold, or bought. The full pause guides you through feel, breathe, reflect, frame, a second breath, then a short settle before Decide — six beats in the ritual, so your choices come from clarity, not impulse.",
       "05title": "You grow",
       "05desc": "Tag emotions. Journal notes. Track outcomes. Over time, your Library, insights, and streaks reveal how your composure evolves."
     },
@@ -1302,36 +1302,52 @@
     "decideSubcopy": "You're choosing from your center.",
     "youChose": "You chose deliberately.",
     "return": "Return",
+    "leaveSessionTitle": "Leave ritual?",
+    "leaveSessionDescription": "Your pause stays open. You can resume from Home when you're ready. This only leaves this screen — it does not end your pause.",
+    "leaveSessionConfirm": "Leave",
+    "leaveWithPending": {
+      "sheetTitle": "Leave the pause",
+      "heading": "Leave this pause?",
+      "body": "A new pause is ready for the latest move. You can stay in this ritual, leave this screen, switch to a short brief pause, or open the new pause.",
+      "stayCta": "Stay",
+      "leaveCta": "Leave",
+      "switchBriefCta": "Or switch to brief pause (~2 min)"
+    },
     "sessionTitle": "Your pause",
+    "deep": {
+      "sessionTitle": "Your deep pause",
+      "macroStepCount": "{{n}} of {{total}}",
+      "feelStepDurationHint": "~ 15 sec"
+    },
+    "feelStep": {
+      "title": "What's here?",
+      "subtitle": "No need to be sure",
+      "tiles": {
+        "fomo": "FOMO",
+        "fearful": "Fearful",
+        "anxious": "Anxious",
+        "uncertain": "Uncertain",
+        "calm": "Calm",
+        "other": "Other"
+      },
+      "intensityTitle": "How strong?",
+      "intensity": {
+        "faint": "Faint",
+        "light": "Light",
+        "clear": "Clear",
+        "strong": "Strong",
+        "heavy": "Heavy"
+      }
+    },
     "openMaxCountdown": "{{remaining}} left in this ritual window",
     "brief": {
       "sessionTitle": "Your brief pause",
       "macroProgress": "Step {{n}} of {{total}} · ~2 min",
       "steps": {
         "feel": "Feel",
-        "breath": "Breath",
+        "breath": "Breathe",
         "integrate": "Integrate",
         "decide": "Decide"
-      },
-      "feel": {
-        "title": "What's here?",
-        "subtitle": "No need to be sure — pick what is closest.",
-        "tiles": {
-          "fomo": "FOMO",
-          "fearful": "Fearful",
-          "anxious": "Anxious",
-          "uncertain": "Uncertain",
-          "calm": "Calm",
-          "other": "Other"
-        },
-        "intensityTitle": "How strong?",
-        "intensity": {
-          "faint": "Faint",
-          "light": "Light",
-          "clear": "Clear",
-          "strong": "Strong",
-          "heavy": "Heavy"
-        }
       },
       "integrate": {
         "title": "Integrate",
@@ -1340,18 +1356,24 @@
         "hint": "When the timer ends, you'll move on — or continue early."
       },
       "decideKicker": "Step 4 · Decide",
-      "breathIntroKicker": "Step 2 · Breath"
+      "breathIntroKicker": "Step 2 · Breathe"
     },
     "depthPicker": {
       "contextMoved": "{{sym}} moved {{pct}}% in the last 24 hours.",
       "kicker": "What do you need?",
+      "headline1": "You paused",
+      "headline2": "That's the hardest part.",
       "brief": {
         "label": "Brief pause",
+        "duration": "~ 2 min",
         "desc": "Steady yourself, then decide."
       },
       "deep": {
         "label": "Deep pause",
-        "desc": "Sit with it. Reflect. Decide from your center."
+        "duration": "~ 7 min",
+        "desc": "Sit with it. Reflect. Decide from your center.",
+        "proRequiredHint": "Pro or free trial",
+        "ariaLocked": "Deep pause — Holzen Pro or free trial required. Tap to learn more."
       }
     },
     "aboutPauses": {
@@ -1379,7 +1401,7 @@
         },
         "sixSteps": {
           "title": "The deep pause (six beats)",
-          "body": "The header shows six beats: Feel, Breathe, Reflect, Frame, a second Breathe, then Decide. After that second breath, one short settle screen appears before the hold / sell / buy / nothing choice — it uses the same sixth segment as Decide, not a separate labeled step. Each beat maps to skills psychologists study: interoception, autonomic settling, perspective-taking, metacognition, re-centering, and values-aligned action."
+          "body": "The header shows six beats: Feel, Breathe, Reflect, Frame, a second Breathe, then Decide. After that second breath, one short settle screen appears before you record whether you held steady, sold, or bought — it uses the same sixth segment as Decide, not a separate labeled step. Each beat maps to skills psychologists study: interoception, autonomic settling, perspective-taking, metacognition, re-centering, and values-aligned action."
         },
         "ritual": {
           "title": "Not a remedy — a ritual",
@@ -1404,7 +1426,7 @@
     "pendingAdoptFailed": "Could not switch to the new pause. Try again.",
     "pendingDeclineFailed": "Could not dismiss the offer. Try again.",
     "breathYouAreHere": "You're here",
-    "breathIntroKicker": "Step 1 · Breath",
+    "breathIntroKicker": "Step 1 · Breathe",
     "macroProgress": "Step {{n}} of {{total}} · under ~15 min",
     "muteAriaOn": "Sound on (tap to mute)",
     "muteAriaOff": "Sound off (tap to unmute)",
@@ -1647,7 +1669,7 @@
     "breathe5Desc": "Completed breathing 5 times",
     "breathe25": "Breath Master",
     "breathe25Desc": "Completed breathing 25 times",
-    "breathe100": "Zen Lungs",
+    "breathe100": "Steady Lungs",
     "breathe100Desc": "Completed breathing 100 times",
     "haiku10": "Poetry Reader",
     "haiku10Desc": "Read 10 haiku",
@@ -2265,7 +2287,8 @@
     "desc_badges_pro": "Unlock exclusive Pro badges and track deeper milestones.",
     "desc_grounding": "Choose personal grounding activities and get AI-powered suggestions tailored to the market moment.",
     "desc_notifications": "Smart digests, night reflections, and quiet hours to control when and how Holzen reaches you.",
-    "desc_save_moment": "Capture what a companion card surfaces for you as a journal note saved to your library."
+    "desc_save_moment": "Capture what a companion card surfaces for you as a journal note saved to your library.",
+    "desc_deep_pause": "The full ~7 min ritual — feel, breathe, reflect, frame, and decide — is included with Holzen Pro or your free trial."
   },
   "triggerOverlay": {
     "readyToPause": "You paused. That's the hardest part.",

@@ -1,87 +1,51 @@
-import { useEffect, useState } from 'react';
+import { useCallback } from 'react';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/use-auth';
 import { Moon, X } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { homeInWidget } from '@/components/home/home-widget-styles';
+import {
+  type NightReflection,
+  NIGHT_REFLECTION_VISIBLE_QUERY_KEY,
+  getVisibleNightReflectionQueryOptions,
+  readNightReflectionDismissedIds,
+  writeNightReflectionDismissedIds,
+} from '@/lib/night-reflection-visible-query';
 
-interface NightReflection {
-  id: string;
-  message: string;
-  btc_change_percent: number;
-  btc_direction: string;
-  created_at: string;
-}
-
-function getDismissedCacheKey(userId: string) {
-  return `holzen_night_reflection_dismissed_${userId}`;
-}
-
-function readDismissedIds(userId: string): string[] {
-  try {
-    const raw = localStorage.getItem(getDismissedCacheKey(userId));
-    if (!raw) return [];
-    const parsed = JSON.parse(raw);
-    return Array.isArray(parsed) ? parsed.filter((v) => typeof v === 'string') : [];
-  } catch {
-    return [];
-  }
-}
-
-function writeDismissedIds(userId: string, ids: string[]) {
-  try {
-    // Keep only the latest handful to avoid unbounded growth.
-    localStorage.setItem(getDismissedCacheKey(userId), JSON.stringify(ids.slice(-50)));
-  } catch {
-    // ignore local cache write failures
-  }
-}
+export {
+  NIGHT_REFLECTION_VISIBLE_QUERY_KEY,
+  fetchVisibleNightReflection,
+} from '@/lib/night-reflection-visible-query';
 
 export function useNightReflection() {
   const { user } = useAuth();
-  const [reflection, setReflection] = useState<NightReflection | null>(null);
-  const [loaded, setLoaded] = useState(false);
+  const queryClient = useQueryClient();
+  const userId = user?.id;
 
-  useEffect(() => {
-    if (!user) return;
-    const locallyDismissed = new Set(readDismissedIds(user.id));
-    supabase
-      .from('night_reflections')
-      .select('id, message, btc_change_percent, btc_direction, created_at')
-      .eq('user_id', user.id)
-      .eq('dismissed', false)
-      .order('created_at', { ascending: false })
-      .limit(10)
-      .then(({ data }) => {
-        if (data && data.length > 0) {
-          const firstVisible = data.find((item) => !locallyDismissed.has(item.id));
-          if (firstVisible) {
-            setReflection(firstVisible as unknown as NightReflection);
-          } else {
-            setReflection(null);
-          }
-        } else {
-          setReflection(null);
-        }
-        setLoaded(true);
-      });
-  }, [user]);
+  const { data: reflection = null, isFetched } = useQuery(getVisibleNightReflectionQueryOptions(userId));
 
-  const dismiss = async () => {
-    if (!reflection || !user) return;
+  const loaded = Boolean(userId) && isFetched;
+
+  const dismiss = useCallback(async () => {
+    if (!reflection || !userId) return;
     const id = reflection.id;
-    setReflection(null);
-    const dismissedIds = readDismissedIds(user.id);
+    queryClient.setQueryData<NightReflection | null>(NIGHT_REFLECTION_VISIBLE_QUERY_KEY(userId), null);
+    const dismissedIds = readNightReflectionDismissedIds(userId);
     if (!dismissedIds.includes(id)) {
-      writeDismissedIds(user.id, [...dismissedIds, id]);
+      writeNightReflectionDismissedIds(userId, [...dismissedIds, id]);
     }
 
-    await supabase
-      .from('night_reflections')
-      .update({ dismissed: true })
-      .eq('user_id', user.id)
-      .eq('dismissed', false);
-  };
+    try {
+      await supabase
+        .from('night_reflections')
+        .update({ dismissed: true })
+        .eq('user_id', userId)
+        .eq('dismissed', false);
+    } finally {
+      await queryClient.invalidateQueries({ queryKey: NIGHT_REFLECTION_VISIBLE_QUERY_KEY(userId) });
+    }
+  }, [reflection, userId, queryClient]);
 
   return { reflection, loaded, dismiss };
 }

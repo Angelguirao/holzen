@@ -45,7 +45,9 @@ export function BadgeDebug() {
   const signals = useMemo(() => {
     const COMPOSED = new Set(['calm', 'detached']);
     const REACTIVE = new Set(['fomo', 'greedy', 'fearful', 'anxious', 'excited']);
-    const HOLD = new Set(['held', 'nothing']);
+    // Mirrors src/lib/badges/compute.ts — legacy `nothing` rows are no longer
+    // hold-aligned for badge counters.
+    const HOLD = new Set(['held']);
 
     const sevOf = (
       r: (typeof completed)[number],
@@ -97,10 +99,7 @@ export function BadgeDebug() {
         }
       }
       if (holdGoal?.type) {
-        if (
-          (holdGoal.type === 'forever' && r.outcome && HOLD.has(r.outcome)) ||
-          (holdGoal.type !== 'forever' && (r.outcome === 'held' || r.outcome === 'nothing'))
-        ) {
+        if (r.outcome && HOLD.has(r.outcome)) {
           alignmentN++;
         }
       }

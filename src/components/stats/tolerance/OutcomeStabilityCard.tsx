@@ -2,7 +2,7 @@ import { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { ConfidenceChip } from '@/components/stats/ConfidenceChip';
 import { sampleConfidence } from '@/lib/stats/confidence';
-import type { PauseFullRow } from '@/hooks/use-pause-stats-data';
+import type { PauseFullRow } from '@/lib/pause-stats-data-query';
 
 interface Props {
   rows: readonly PauseFullRow[];
@@ -19,7 +19,7 @@ export function OutcomeStabilityCard({ rows }: Props) {
   const { rate, recent } = useMemo(() => {
     const completed = rows.filter((r) => r.state === 'completed' && r.outcome);
     const recent = completed.slice(0, 30);
-    const held = recent.filter((r) => r.outcome === 'held' || r.outcome === 'nothing').length;
+    const held = recent.filter((r) => r.outcome === 'held').length;
     const rate = recent.length === 0 ? null : Math.round((held / recent.length) * 100);
     return { rate, recent: recent.length };
   }, [rows]);

@@ -23,7 +23,7 @@ import { restrictToVerticalAxis } from '@dnd-kit/modifiers';
 import {
   ALL_HOME_SECTION_IDS,
   isHomeSectionAlwaysVisibleInLayout,
-} from '@/hooks/use-home-optional-visibility';
+} from '@/lib/home-section-visibility-constants';
 import { GOAL_WHY_SECTION_ID, normalizeHomeSectionOrder } from '@/lib/home-section-order-normalize';
 
 export interface HomeCustomizeSheetProps {
@@ -69,7 +69,7 @@ function CustomizePinnedRow({
         <Label htmlFor={`home-section-${id}`} className="text-sm font-medium leading-snug text-foreground">
           {title}
         </Label>
-        <p className={cn(homeInWidget.metaFaint, 'text-[11px] leading-snug')}>{description}</p>
+        <p className={cn(homeInWidget.metaFaint, 'leading-snug')}>{description}</p>
       </div>
       <div className="h-6 w-10 shrink-0" aria-hidden />
     </div>
@@ -134,7 +134,7 @@ function CustomizeSortableRow({
         <Label htmlFor={`home-section-${id}`} className="text-sm font-medium leading-snug text-foreground">
           {title}
         </Label>
-        <p className={cn(homeInWidget.metaFaint, 'text-[11px] leading-snug')}>{description}</p>
+        <p className={cn(homeInWidget.metaFaint, 'leading-snug')}>{description}</p>
       </div>
       {showSwitch ? (
         <Switch
@@ -222,7 +222,7 @@ export function HomeCustomizeSheet({
                 htmlFor="home-mode-hold"
                 className={cn(
                   'flex cursor-pointer gap-3 rounded-xl border border-border/60 bg-card/40 p-4 transition-colors hover:bg-muted/30',
-                  modeValue === 'hold' && 'border-primary/40 bg-primary/5',
+                  modeValue === 'hold' && 'border-ring bg-muted/50 ring-1 ring-ring/40',
                 )}
               >
                 <RadioGroupItem id="home-mode-hold" value="hold" className="mt-0.5 shrink-0" />
@@ -235,7 +235,7 @@ export function HomeCustomizeSheet({
                 htmlFor="home-mode-zen"
                 className={cn(
                   'flex cursor-pointer gap-3 rounded-xl border border-border/60 bg-card/40 p-4 transition-colors hover:bg-muted/30',
-                  modeValue === 'zen' && 'border-primary/40 bg-primary/5',
+                  modeValue === 'zen' && 'border-ring bg-muted/50 ring-1 ring-ring/40',
                 )}
               >
                 <RadioGroupItem id="home-mode-zen" value="zen" className="mt-0.5 shrink-0" />

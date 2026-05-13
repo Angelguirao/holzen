@@ -14,5 +14,6 @@ export const pauseStepLayout = {
   screenSubtitle: 'mx-auto max-w-sm text-center text-sm leading-relaxed text-muted-foreground',
   backRow: 'flex justify-center pt-1',
   backButton: 'flex items-center gap-1 text-xs text-muted-foreground transition-colors hover:text-foreground',
-  textContinue: 'text-sm font-medium text-primary underline-offset-4 hover:underline',
+  textContinue:
+    'text-sm font-medium text-nox-text-link underline-offset-4 transition-colors hover:text-nox-text-link/80 hover:underline',
 } as const;

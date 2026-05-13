@@ -1,4 +1,4 @@
-import type { BriefFeelTile } from '@/components/pause/PauseBriefFeel';
+import type { FeelStepTile } from '@/components/pause/pause-feel-types';
 import type { BriefPauseStep, PersistedSession, RitualDepth } from '@/lib/pause-session-storage';
 import { initialRitualEntry } from '@/lib/pause-session-step-map';
 
@@ -12,7 +12,7 @@ export type PauseStorageRitualSyncPatch = {
   /** When `undefined`, callers must not call `setBriefStep` (preserve React state). */
   briefStep: BriefPauseStep | undefined;
   briefIntegrateDone: boolean;
-  selectedBriefFace: BriefFeelTile | null;
+  selectedBriefFace: FeelStepTile | null;
 };
 
 export function computePauseStorageRitualSyncPatch(

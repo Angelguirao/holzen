@@ -5,7 +5,7 @@ import { Badge } from '@/components/ui/badge';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useProGate } from '@/hooks/use-pro-gate';
 import { TOOLS } from '@/lib/app-routes';
-import type { LastCheckInRow } from '@/hooks/use-tools-hub-data';
+import type { LastCheckInRow } from '@/lib/tools-hub-data-query';
 import type { PracticeSuggestion } from '@/lib/practice-suggestion';
 import {
   TOOLS_PRACTICE_SUGGESTION_LABEL_KEY,
@@ -58,7 +58,7 @@ export function ToolsGoodNextStepSection({ loading, lastCheckIn, suggestions }: 
                   e.preventDefault();
                   requirePro(s.id);
                 }}
-                className="flex flex-1 min-w-0 items-start gap-2 rounded-xl border border-primary/15 bg-primary/[0.04] px-3 py-2.5 text-left transition-colors hover:bg-primary/[0.07] sm:min-w-[140px] sm:flex-initial"
+                className="flex flex-1 min-w-0 items-start gap-2 rounded-xl border border-border/50 bg-nox-background-accent/20 px-3 py-2.5 text-left transition-colors hover:bg-nox-background-accent/35 sm:min-w-[140px] sm:flex-initial"
               >
                 <Sparkles className="mt-0.5 h-3.5 w-3.5 shrink-0 text-nox-text-highlight" />
                 <div className="min-w-0 flex-1">

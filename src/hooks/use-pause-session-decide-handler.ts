@@ -4,11 +4,13 @@ import type { MoodValue } from '@/components/MoodCheck';
 import type { RitualDepth } from '@/lib/pause-session-storage';
 import { clearSession } from '@/lib/pause-session-storage';
 import { hapticFeedback } from '@/lib/haptics';
+import { useAuth } from '@/hooks/use-auth';
 import { pauseLogStep } from '@/lib/pause-api';
 import { buildOutcomeLoggedPayload } from '@/lib/pause-outcome-log-payload';
 import { showPauseOutcomeNotCompletedToast, showPauseOutcomeSaveFailedToast } from '@/lib/pause-outcome-toast';
 import type { PauseState } from '@/lib/pause-state';
 import { buildPauseImpactDataOnComplete, type PauseImpactData } from '@/lib/pause-impact-data';
+import { invalidatePauseStatsDataForUser } from '@/lib/pause-stats-invalidate';
 import { getSessionQuote } from '@/lib/wisdom-quotes';
 
 export function usePauseSessionDecideHandler(input: {
@@ -29,6 +31,7 @@ export function usePauseSessionDecideHandler(input: {
   feelIntensity: number | null;
   shiftIntensity: number | null;
 }): { handleDecide: (d: string) => Promise<void> } {
+  const { user } = useAuth();
   const {
     decidingRef,
     pauseInstanceId,
@@ -67,6 +70,7 @@ export function usePauseSessionDecideHandler(input: {
             return;
           }
           if (outcomeState !== 'completed') {
+            invalidatePauseStatsDataForUser(user?.id);
             showPauseOutcomeNotCompletedToast(t);
             void refreshSubscription();
             return;
@@ -110,6 +114,7 @@ export function usePauseSessionDecideHandler(input: {
       feelIntensity,
       shiftIntensity,
       refreshSubscription,
+      user?.id,
       t,
       setDecision,
       setPauseImpactData,

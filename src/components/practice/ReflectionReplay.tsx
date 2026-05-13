@@ -5,18 +5,25 @@
  */
 
 import { useCallback, useEffect, useState } from 'react';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
 import { format } from 'date-fns';
 import { Loader2 } from 'lucide-react';
+import { practiceEntriesWeeklyCountQueryKey } from '@/lib/practice-entries-weekly-count-query';
+import { practicePrimarySuggestionQueryKey } from '@/lib/practice-primary-suggestion-query';
+import { toolsHubDataQueryKey } from '@/lib/tools-hub-data-query';
+import { invalidateHistoryCalendarActivities } from '@/lib/history-calendar-activities-query-key';
 import { useAuth } from '@/hooks/use-auth';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { Textarea } from '@/components/ui/textarea';
 import { Button } from '@/components/ui/button';
-import type { PastReflectionWithWords, UserWord } from '../../../supabase/functions/_shared/past-reflection-util';
+import type { UserWord } from '../../../supabase/functions/_shared/past-reflection-util';
 import {
-  loadPauseReplayThread,
-  loadRecentCompletedPausesForReplay,
+  getPauseReplayThreadQueryOptions,
+  getReplayRecentPausesQueryOptions,
+  pauseReplayThreadQueryKey,
+  replayRecentPausesQueryKey,
   type PausePickerRow,
 } from '@/lib/pause-replay-thread';
 
@@ -46,49 +53,46 @@ function ThreadLine({ word }: { word: UserWord }) {
 export function ReflectionReplay({ onComplete, initialPauseInstanceId }: Props) {
   const { t } = useTranslation();
   const { user } = useAuth();
-  const [picker, setPicker] = useState<PausePickerRow[]>([]);
+  const queryClient = useQueryClient();
   const [selectedId, setSelectedId] = useState<string | null>(initialPauseInstanceId ?? null);
-  const [thread, setThread] = useState<PastReflectionWithWords | null>(null);
-  const [loadingThread, setLoadingThread] = useState(false);
-  /** When load fails, `thread` stays null and `loadingThread` is false — without this we would spin forever (`!thread` treated as loading). */
-  const [threadLoadError, setThreadLoadError] = useState(false);
-  const [loadingList, setLoadingList] = useState(!initialPauseInstanceId);
   const [draft, setDraft] = useState('');
   const [saving, setSaving] = useState(false);
 
-  const loadThread = useCallback(async (pauseId: string) => {
-    setLoadingThread(true);
-    setThreadLoadError(false);
-    const res = await loadPauseReplayThread(pauseId);
-    setLoadingThread(false);
-    if (!res.ok) {
-      setThread(null);
-      setThreadLoadError(true);
-      toast.error(
-        t('practice.replayLoadFailed', {
-          defaultValue: 'Could not load this pause.',
-        }),
-      );
-      return;
-    }
-    setThreadLoadError(false);
-    setThread(res.thread);
-    setDraft('');
-  }, [t]);
+  const {
+    data: picker = [],
+    isPending: loadingList,
+  } = useQuery(
+    getReplayRecentPausesQueryOptions({
+      userId: user?.id,
+      listEnabled: !selectedId,
+    }),
+  );
+
+  const threadQuery = useQuery(
+    getPauseReplayThreadQueryOptions({
+      userId: user?.id,
+      pauseInstanceId: selectedId,
+    }),
+  );
+
+  const thread = threadQuery.data ?? null;
+  /** Full-screen spinner until the first thread payload exists (initial pick or refetch after error). */
+  const loadingThread = threadQuery.isPending || (threadQuery.isFetching && !thread);
+  const threadLoadError = threadQuery.isError;
 
   useEffect(() => {
-    if (!user) return;
-    if (!selectedId) {
-      void (async () => {
-        setLoadingList(true);
-        const rows = await loadRecentCompletedPausesForReplay();
-        setPicker(rows);
-        setLoadingList(false);
-      })();
-      return;
-    }
-    void loadThread(selectedId);
-  }, [user, selectedId, loadThread]);
+    if (!threadLoadError) return;
+    toast.error(
+      t('practice.replayLoadFailed', {
+        defaultValue: 'Could not load this pause.',
+      }),
+    );
+  }, [threadLoadError, t]);
+
+  useEffect(() => {
+    if (!threadQuery.isSuccess) return;
+    setDraft('');
+  }, [threadQuery.dataUpdatedAt, threadQuery.isSuccess]);
 
   const saveReplay = useCallback(async () => {
     if (!user || !selectedId) return;
@@ -106,14 +110,19 @@ export function ReflectionReplay({ onComplete, initialPauseInstanceId }: Props) 
         pause_instance_id: selectedId,
       });
       if (error) throw error;
+      void queryClient.invalidateQueries({ queryKey: practiceEntriesWeeklyCountQueryKey(user.id) });
+      void queryClient.invalidateQueries({ queryKey: practicePrimarySuggestionQueryKey(user.id) });
+      void queryClient.invalidateQueries({ queryKey: toolsHubDataQueryKey(user.id) });
+      void queryClient.invalidateQueries({ queryKey: replayRecentPausesQueryKey(user.id) });
+      void queryClient.invalidateQueries({ queryKey: pauseReplayThreadQueryKey(selectedId) });
+      invalidateHistoryCalendarActivities(queryClient, user.id);
       toast.success(t('practice.replaySaved', { defaultValue: 'Replay saved' }));
-      await loadThread(selectedId);
     } catch {
       toast.error(t('common.tryAgain', { defaultValue: 'Try again' }));
     } finally {
       setSaving(false);
     }
-  }, [user, selectedId, draft, loadThread, t]);
+  }, [user, selectedId, draft, t, queryClient]);
 
   if (!user) {
     return (
@@ -186,7 +195,7 @@ export function ReflectionReplay({ onComplete, initialPauseInstanceId }: Props) 
               variant="secondary"
               size="sm"
               onClick={() => {
-                if (selectedId) void loadThread(selectedId);
+                void threadQuery.refetch();
               }}
             >
               {t('common.tryAgain', { defaultValue: 'Try again' })}
@@ -197,8 +206,6 @@ export function ReflectionReplay({ onComplete, initialPauseInstanceId }: Props) 
               size="sm"
               onClick={() => {
                 setSelectedId(null);
-                setThread(null);
-                setThreadLoadError(false);
               }}
             >
               {t('practice.replayChangePause', { defaultValue: 'Change pause' })}
@@ -231,8 +238,6 @@ export function ReflectionReplay({ onComplete, initialPauseInstanceId }: Props) 
           type="button"
           onClick={() => {
             setSelectedId(null);
-            setThread(null);
-            setThreadLoadError(false);
           }}
           className="text-[10px] font-sans font-medium text-nox-text-link/90 underline-offset-2 transition-colors hover:text-nox-text-link hover:underline self-start"
         >

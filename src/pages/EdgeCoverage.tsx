@@ -1,6 +1,9 @@
-import { useEffect, useMemo, useState } from "react";
-import { useAuth } from "@/hooks/use-auth";
-import { supabase } from "@/integrations/supabase/client";
+import { useMemo, useState } from "react";
+import { useQuery } from "@tanstack/react-query";
+import { useIsAdmin } from "@/hooks/use-is-admin";
+import {
+  getEdgeCoverageHeartbeatsQueryOptions,
+} from "@/lib/edge-coverage-heartbeats-query";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
@@ -68,24 +71,6 @@ const COVERAGE: Row[] = [
 // Functions exempt from full wrapper coverage. `health` is the obvious one (verify_jwt=false probe).
 const EXEMPT = new Set<string>(["health"]);
 
-function useIsAdmin() {
-  const { user, loading } = useAuth();
-  const [isAdmin, setIsAdmin] = useState<boolean | null>(null);
-  useEffect(() => {
-    if (!user) { setIsAdmin(false); return; }
-    supabase.from("profiles").select("is_admin").eq("user_id", user.id).single()
-      .then(({ data }) => {
-        const p = data as { is_admin?: boolean } | null;
-        if (typeof p?.is_admin === "boolean") setIsAdmin(p.is_admin);
-        else {
-          const ids = import.meta.env.VITE_ADMIN_USER_IDS as string | undefined;
-          setIsAdmin(!!ids && ids.split(",").map((s) => s.trim()).includes(user.id));
-        }
-      });
-  }, [user]);
-  return { isAdmin: !!isAdmin, loading: loading || isAdmin === null };
-}
-
 type Severity = "missing" | "partial" | "ok";
 function severityOf(r: Row): Severity {
   if (EXEMPT.has(r.name)) return "ok";
@@ -104,36 +89,15 @@ export default function EdgeCoverage() {
   const { isAdmin, loading } = useIsAdmin();
   const [q, setQ] = useState("");
   const [filter, setFilter] = useState<"all" | Severity>("all");
-  const [heartbeats, setHeartbeats] = useState<Record<string, string> | null>(null);
 
-  useEffect(() => {
-    if (!isAdmin) return;
-    let cancelled = false;
-    supabase
-      .from("app_config")
-      .select("key,value")
-      .like("key", "heartbeat.%")
-      .then(({ data, error }) => {
-        if (cancelled || error || !data) {
-          if (!cancelled) setHeartbeats({});
-          return;
-        }
-        const map: Record<string, string> = {};
-        for (const row of data as Array<{ key: string; value: unknown }>) {
-          const job = row.key.replace(/^heartbeat\./, "");
-          // value is jsonb — usually a JSON string holding the UUID.
-          const uuid = typeof row.value === "string" ? row.value : String(row.value ?? "");
-          if (job && uuid) map[job] = uuid;
-        }
-        setHeartbeats(map);
-      });
-    return () => { cancelled = true; };
-  }, [isAdmin]);
-
-  const heartbeatCount = useMemo(
-    () => (heartbeats ? Object.keys(heartbeats).length : 0),
-    [heartbeats],
+  const { data: heartbeats, isPending: heartbeatsPending } = useQuery(
+    getEdgeCoverageHeartbeatsQueryOptions(isAdmin),
   );
+
+  const heartbeatCount = useMemo(() => {
+    if (heartbeatsPending) return 0;
+    return Object.keys(heartbeats ?? {}).length;
+  }, [heartbeats, heartbeatsPending]);
 
   const rows = useMemo(() => {
     return COVERAGE.map((r) => ({ ...r, sev: severityOf(r) }))
@@ -216,7 +180,7 @@ export default function EdgeCoverage() {
               {" "}<code>pg_cron</code> job pings BetterStack via{" "}
               <code>emit_job_heartbeat()</code>. Missing rows mean the function isn't
               monitored for liveness (only for errors).
-              {heartbeats !== null && (
+              {!heartbeatsPending && (
                 <span className="ml-1">
                   Found <span className="font-medium text-foreground">{heartbeatCount}</span>
                   {" "}configured heartbeat key{heartbeatCount === 1 ? "" : "s"}.
@@ -290,7 +254,7 @@ export default function EdgeCoverage() {
                     <td className="px-2 py-2 text-muted-foreground">{r.logger ? "✓" : "—"}</td>
                     <td className="px-2 py-2 text-muted-foreground">{r.audit ? "✓" : "—"}</td>
                     <td className="px-2 py-2">
-                      {heartbeats === null ? (
+                      {heartbeatsPending ? (
                         <span className="text-muted-foreground text-xs">…</span>
                       ) : hbUuid ? (
                         <span

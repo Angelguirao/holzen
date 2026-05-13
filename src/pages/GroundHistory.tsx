@@ -1,26 +1,26 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useMemo, useCallback } from 'react';
+import { useInfiniteQuery, useQuery } from '@tanstack/react-query';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Anchor, Clock, Calendar } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/use-auth';
 import { toast } from 'sonner';
 import { MoodIcon } from '@/components/icons/MoodIcon';
 import { Button } from '@/components/ui/button';
 import { TOOLS } from '@/lib/app-routes';
+import {
+  getGroundHistoryEntriesInfiniteQueryOptions,
+  getGroundHistoryStatsQueryOptions,
+  type GroundingEntry,
+} from '@/lib/ground-history-query';
 
-interface GroundingEntry {
-  id: string;
-  created_at: string;
-  mood: string | null;
-  duration_seconds: number | null;
-  body: string | null;
-  trigger_text: string | null;
-}
+export {
+  groundHistoryEntriesQueryKey,
+  groundHistoryStatsQueryKey,
+} from '@/lib/ground-history-query';
 
 const ease: [number, number, number, number] = [0.22, 1, 0.36, 1];
-const PAGE_SIZE = 20;
 
 function formatDuration(seconds: number): string {
   if (seconds < 60) return `${seconds}s`;
@@ -51,87 +51,37 @@ export default function GroundHistory() {
   const { t, i18n } = useTranslation();
   const navigate = useNavigate();
   const { user } = useAuth();
-  const [entries, setEntries] = useState<GroundingEntry[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [hasMore, setHasMore] = useState(true);
-  const [listFetchFailed, setListFetchFailed] = useState(false);
-  const [totalMinutes, setTotalMinutes] = useState(0);
-  const [totalSessions, setTotalSessions] = useState(0);
+  const userId = user?.id;
 
-  const fetchEntries = useCallback(
-    async (offset = 0) => {
-      if (!user) {
-        setEntries([]);
-        setLoading(false);
-        setHasMore(false);
-        setListFetchFailed(false);
-        return;
+  const {
+    data: entriesPages,
+    isPending,
+    isError: listFetchFailed,
+    isFetchingNextPage,
+    hasNextPage,
+    fetchNextPage,
+    refetch,
+  } = useInfiniteQuery(getGroundHistoryEntriesInfiniteQueryOptions(userId));
+
+  const entries = useMemo(() => entriesPages?.pages.flat() ?? [], [entriesPages]);
+  const loading = Boolean(userId) && isPending;
+  const hasMore = Boolean(hasNextPage);
+
+  const { data: groundingStats } = useQuery(getGroundHistoryStatsQueryOptions(userId));
+  const totalSessions = groundingStats?.totalSessions ?? 0;
+  const totalMinutes = groundingStats?.totalMinutes ?? 0;
+
+  const loadMore = useCallback(async () => {
+    if (!hasNextPage || isFetchingNextPage) return;
+    try {
+      const result = await fetchNextPage();
+      if (result.isError) {
+        toast.error(t('common.tryAgain', { defaultValue: 'Try again' }));
       }
-
-      if (offset === 0) {
-        setLoading(true);
-        setListFetchFailed(false);
-      }
-
-      const { data, error } = await supabase
-        .from('practice_entries')
-        .select('id, created_at, mood, duration_seconds, body, trigger_text')
-        .eq('user_id', user.id)
-        .eq('type', 'grounding')
-        .order('created_at', { ascending: false })
-        .range(offset, offset + PAGE_SIZE - 1);
-
-      if (error) {
-        if (offset === 0) {
-          setEntries([]);
-          setListFetchFailed(true);
-          setHasMore(false);
-        } else {
-          toast.error(t('common.tryAgain', { defaultValue: 'Try again' }));
-          setHasMore(false);
-        }
-        setLoading(false);
-        return;
-      }
-
-      const rows = (data ?? []) as GroundingEntry[];
-      if (offset === 0) {
-        setEntries(rows);
-      } else {
-        setEntries((prev) => [...prev, ...rows]);
-      }
-      setHasMore(rows.length === PAGE_SIZE);
-      setLoading(false);
-    },
-    [user, t],
-  );
-
-  // Fetch stats
-  useEffect(() => {
-    if (!user) return;
-    void (async () => {
-      const { data, count, error } = await supabase
-        .from('practice_entries')
-        .select('duration_seconds', { count: 'exact' })
-        .eq('user_id', user.id)
-        .eq('type', 'grounding');
-
-      if (error || !data) {
-        setTotalSessions(0);
-        setTotalMinutes(0);
-        return;
-      }
-      setTotalSessions(count ?? data.length);
-      const mins = data.reduce((sum, e) => sum + ((e.duration_seconds as number) || 0), 0) / 60;
-      setTotalMinutes(Math.round(mins));
-    })();
-  }, [user]);
-
-  useEffect(() => {
-    fetchEntries(0);
-  }, [fetchEntries]);
-
-  const loadMore = () => fetchEntries(entries.length);
+    } catch {
+      toast.error(t('common.tryAgain', { defaultValue: 'Try again' }));
+    }
+  }, [hasNextPage, isFetchingNextPage, fetchNextPage, t]);
 
   return (
     <motion.div
@@ -179,7 +129,7 @@ export default function GroundHistory() {
             transition={{ delay: 0.15 }}
           >
             <p className="text-sm text-muted-foreground px-2">{t('ground.historyLoadFailed')}</p>
-            <Button variant="secondary" size="sm" className="mx-auto font-mono" onClick={() => void fetchEntries(0)}>
+            <Button variant="secondary" size="sm" className="mx-auto font-mono" onClick={() => void refetch()}>
               {t('common.tryAgain', { defaultValue: 'Try again' })}
             </Button>
           </motion.div>
@@ -284,10 +234,11 @@ export default function GroundHistory() {
               <motion.div className="text-center pt-4" initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
                 <button
                   type="button"
-                  onClick={loadMore}
-                  className="text-sm font-medium text-nox-text-link underline-offset-4 transition-colors hover:text-nox-text-link/80 hover:underline"
+                  onClick={() => void loadMore()}
+                  disabled={isFetchingNextPage}
+                  className="text-sm font-medium text-nox-text-link underline-offset-4 transition-colors hover:text-nox-text-link/80 hover:underline disabled:opacity-40"
                 >
-                  {t('common.loadMore', { defaultValue: 'Load more' })}
+                  {isFetchingNextPage ? t('common.loadingMore', { defaultValue: 'Loading…' }) : t('common.loadMore', { defaultValue: 'Load more' })}
                 </button>
               </motion.div>
             )}

@@ -40,9 +40,9 @@ export function serveSourceBadgeClass(source: string | null | undefined): string
   if (!source) return 'bg-muted/25 text-muted-foreground/40';
   switch (source) {
     case 'live':
-      return 'bg-primary/10 text-primary/80';
+      return 'bg-muted/50 text-foreground';
     case 'library':
-      return 'bg-primary/5 text-primary/65 ring-1 ring-primary/20';
+      return 'bg-muted/40 text-nox-text-link ring-1 ring-border/60';
     case 'cache':
       return 'bg-secondary text-secondary-foreground/80';
     case 'curated':
@@ -62,4 +62,4 @@ export const PERIOD_OPTIONS = [
 ];
 
 export const TAB_TRIGGER_CLASS =
-  'text-[10px] font-mono uppercase tracking-wider px-2.5 py-1 rounded-full data-[state=active]:bg-primary/10 data-[state=active]:text-primary';
+  'text-[10px] font-mono uppercase tracking-wider px-2.5 py-1 rounded-full data-[state=active]:bg-muted/55 data-[state=active]:text-foreground';

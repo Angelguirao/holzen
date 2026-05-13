@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import { computeBadges } from '@/lib/badges/compute';
-import type { PauseFullRow } from '@/hooks/use-pause-stats-data';
+import type { PauseFullRow } from '@/lib/pause-stats-data-query';
 import type { PauseCompanionEventRow } from '@/lib/pause-state';
 
 function makeRow(overrides: Partial<PauseFullRow>): PauseFullRow {
@@ -107,22 +107,22 @@ describe('computeBadges: Core skills', () => {
     expect(getBadge(snaps, 'regulation-10').current).toBe(2);
   });
 
-  it('tolerance requires hold/nothing AND severity >= moderate', () => {
+  it('tolerance requires held outcome AND severity >= moderate (legacy nothing rows do not count)', () => {
     const rows = [
       makeRow({ id: 'a', outcome: 'held', context_snapshot: { severity: 'moderate' } }),
       makeRow({ id: 'b', outcome: 'held', context_snapshot: { severity: 'mild' } }), // sev too low
       makeRow({ id: 'c', outcome: 'sold', context_snapshot: { severity: 'high' } }), // not hold
-      makeRow({ id: 'd', outcome: 'nothing', context_snapshot: { severity: 'high' } }),
+      makeRow({ id: 'd', outcome: 'nothing', context_snapshot: { severity: 'high' } }), // legacy alias, no longer counted
     ];
     const snaps = computeBadges({ completedRows: rows, stepEvents: [], companionEvents: [] });
-    expect(getBadge(snaps, 'tolerance-5').current).toBe(2);
+    expect(getBadge(snaps, 'tolerance-5').current).toBe(1);
   });
 
-  it('alignment with forever hold goal counts hold/nothing', () => {
+  it('alignment with forever hold goal counts only `held` (legacy nothing rows do not count)', () => {
     const rows = [
       makeRow({ id: 'a', outcome: 'held' }),
       makeRow({ id: 'b', outcome: 'bought' }),
-      makeRow({ id: 'c', outcome: 'nothing' }),
+      makeRow({ id: 'c', outcome: 'nothing' }), // legacy alias, no longer counted
     ];
     const snaps = computeBadges({
       completedRows: rows,
@@ -130,7 +130,7 @@ describe('computeBadges: Core skills', () => {
       companionEvents: [],
       holdGoal: { type: 'forever' },
     });
-    expect(getBadge(snaps, 'alignment-5').current).toBe(2);
+    expect(getBadge(snaps, 'alignment-5').current).toBe(1);
   });
 
   it('alignment is zero when no hold goal is set', () => {

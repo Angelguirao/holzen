@@ -18,10 +18,10 @@
  *   regulation-{10,25,50} -> count of completed pauses where initial mood
  *                            was reactive AND shift mood was composed
  *   tolerance-{5,15,40}   -> count of completed pauses with outcome
- *                            in {held, nothing} AND severity >= moderate
+ *                            'held' AND severity >= moderate
  *   alignment-{5,15,40}   -> count of completed pauses aligning with the
- *                            user's hold goal (held/nothing under a
- *                            'forever' goal; held under time/price goals).
+ *                            user's hold goal (held under any hold goal type;
+ *                            'forever' / time / price all use the same set).
  *                            When no hold goal exists, this counter is
  *                            fixed at 0 (the ladder stays visible but shows
  *                            "configure hold goal to earn" progress copy).
@@ -57,7 +57,7 @@ import type {
   PauseStepEventRow,
   PauseCompanionEventRow,
 } from '@/lib/pause-state';
-import type { PauseFullRow } from '@/hooks/use-pause-stats-data';
+import type { PauseFullRow } from '@/lib/pause-stats-data-query';
 import { normalizeTrackedAssetId } from '@/lib/tracked-assets';
 
 export interface BadgeSnapshot extends BadgeDefinition {
@@ -72,7 +72,11 @@ interface HoldGoal {
 
 const COMPOSED_MOODS = new Set(['calm', 'detached']);
 const REACTIVE_MOODS = new Set(['fomo', 'greedy', 'fearful', 'anxious', 'excited']);
-const HOLD_OUTCOMES = new Set(['held', 'nothing']);
+// Live UI emits `held | bought | sold` only (see migration
+// 20260519120000_pause_log_step_main_outcome_validation.sql). Historical
+// `nothing` rows in pause_step_events are no longer treated as hold-aligned;
+// they fall through here and contribute 0 to tolerance / alignment counters.
+const HOLD_OUTCOMES = new Set(['held']);
 
 function severityFromSnapshot(r: PauseFullRow): 'mild' | 'moderate' | 'high' | null {
   const s = r.context_snapshot?.severity;
@@ -180,8 +184,7 @@ export function computeBadges(params: {
   const alignment = hasHoldGoal
     ? completedRows.filter((r) => {
         if (!r.outcome) return false;
-        if (holdGoal?.type === 'forever') return HOLD_OUTCOMES.has(r.outcome);
-        return r.outcome === 'held' || r.outcome === 'nothing';
+        return HOLD_OUTCOMES.has(r.outcome);
       }).length
     : 0;
 

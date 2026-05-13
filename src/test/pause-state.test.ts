@@ -246,7 +246,7 @@ describe('computePauseState', () => {
       computePauseState({
         instance: makeInstance({ state: 'engaged' }),
         template: volatilityTemplate,
-        stepEvents: [makeStep({ step_type: 'outcome_logged', payload: { outcome: 'nothing' } })],
+        stepEvents: [makeStep({ step_type: 'outcome_logged', payload: { outcome: 'sold' } })],
         companionEvents: [],
         now: NOW,
       }),

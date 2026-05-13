@@ -1,6 +1,7 @@
 import { supabase } from '@/integrations/supabase/client';
 import type { CompanionData } from '@/components/CompanionSection';
 import { companionDataFromArtifacts } from '@/lib/pause-session-storage';
+import { PAUSE_QUERY_PREFIX } from '@/lib/pause-query-namespace';
 
 export interface PauseSessionSnapshot {
   id: string;
@@ -9,6 +10,21 @@ export interface PauseSessionSnapshot {
   mood: string | null;
   companions: CompanionData;
 }
+
+export const PAUSE_COMPANION_FULLVIEW_QUERY_PREFIX = [...PAUSE_QUERY_PREFIX, 'companion-fullview'] as const;
+
+export const PAUSE_SESSION_COMPANION_SNAPSHOT_QUERY_LEAF = 'snapshot' as const;
+
+export const PAUSE_SESSION_COMPANION_SNAPSHOT_QUERY_PREFIX = [
+  ...PAUSE_COMPANION_FULLVIEW_QUERY_PREFIX,
+  PAUSE_SESSION_COMPANION_SNAPSHOT_QUERY_LEAF,
+] as const;
+
+export function pauseSessionCompanionSnapshotQueryKey(pauseInstanceId: string) {
+  return [...PAUSE_SESSION_COMPANION_SNAPSHOT_QUERY_PREFIX, pauseInstanceId] as const;
+}
+
+export const PAUSE_SESSION_COMPANION_SNAPSHOT_DISABLED_INSTANCE_ID = 'none' as const;
 
 /**
  * Shared loader used by the four full-view companion pages. Reads a
@@ -48,4 +64,22 @@ export async function loadPauseSessionSnapshot(
     mood,
     companions: companionDataFromArtifacts(artifactRows),
   };
+}
+
+export const PAUSE_SESSION_COMPANION_SNAPSHOT_NONE_QUERY_KEY = [
+  ...PAUSE_SESSION_COMPANION_SNAPSHOT_QUERY_PREFIX,
+  PAUSE_SESSION_COMPANION_SNAPSHOT_DISABLED_INSTANCE_ID,
+] as const;
+
+export function getPauseSessionCompanionSnapshotQueryOptions(pauseInstanceId: string | undefined) {
+  return {
+    queryKey: pauseInstanceId
+      ? pauseSessionCompanionSnapshotQueryKey(pauseInstanceId)
+      : PAUSE_SESSION_COMPANION_SNAPSHOT_NONE_QUERY_KEY,
+    queryFn: () => loadPauseSessionSnapshot(pauseInstanceId!),
+    enabled: Boolean(pauseInstanceId),
+    staleTime: 60_000,
+    refetchOnWindowFocus: false,
+    retry: false,
+  } as const;
 }

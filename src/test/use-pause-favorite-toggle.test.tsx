@@ -2,10 +2,20 @@ import { describe, expect, it, vi, beforeEach } from 'vitest';
 import { renderHook, act } from '@testing-library/react';
 import type { TFunction } from 'i18next';
 import { usePauseFavoriteToggle } from '@/hooks/use-pause-favorite-toggle';
+import { pauseArchiveListQueryPrefix } from '@/lib/pause-archive-list-query';
 import { showPauseFavoriteProHintToast } from '@/lib/pause-favorite-toast';
 
-const { pauseLogStepMock } = vi.hoisted(() => ({
+const { pauseLogStepMock, invalidateQueriesMock } = vi.hoisted(() => ({
   pauseLogStepMock: vi.fn(),
+  invalidateQueriesMock: vi.fn(),
+}));
+
+vi.mock('@tanstack/react-query', () => ({
+  useQueryClient: () => ({ invalidateQueries: invalidateQueriesMock }),
+}));
+
+vi.mock('@/hooks/use-auth', () => ({
+  useAuth: () => ({ user: { id: 'archive-user-1' }, loading: false }),
 }));
 
 vi.mock('@/lib/pause-api', () => ({
@@ -25,6 +35,7 @@ const t = ((k: string) => k) as TFunction;
 beforeEach(() => {
   pauseLogStepMock.mockReset();
   pauseLogStepMock.mockResolvedValue(undefined);
+  invalidateQueriesMock.mockClear();
   vi.mocked(showPauseFavoriteProHintToast).mockClear();
 });
 
@@ -68,6 +79,9 @@ describe('usePauseFavoriteToggle', () => {
       payload: { is_favorite: true },
     });
     expect(showPauseFavoriteProHintToast).toHaveBeenCalledWith(t);
+    expect(invalidateQueriesMock).toHaveBeenCalledWith({
+      queryKey: pauseArchiveListQueryPrefix('archive-user-1'),
+    });
   });
 
   it('does not show Pro hint when already subscribed', async () => {
@@ -85,6 +99,9 @@ describe('usePauseFavoriteToggle', () => {
       await result.current.toggleFavorite();
     });
     expect(showPauseFavoriteProHintToast).not.toHaveBeenCalled();
+    expect(invalidateQueriesMock).toHaveBeenCalledWith({
+      queryKey: pauseArchiveListQueryPrefix('archive-user-1'),
+    });
   });
 
   it('rolls back optimistic favorite when RPC fails', async () => {
@@ -104,5 +121,6 @@ describe('usePauseFavoriteToggle', () => {
     });
     expect(setIsFavorite).toHaveBeenNthCalledWith(1, true);
     expect(setIsFavorite).toHaveBeenNthCalledWith(2, false);
+    expect(invalidateQueriesMock).not.toHaveBeenCalled();
   });
 });

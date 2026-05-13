@@ -88,7 +88,7 @@ export function HomePauseEmptyFlow({
               requirePro(primary.id);
             }}
             className={cn(
-              'flex w-full max-w-md items-start gap-2 rounded-xl border border-primary/15 bg-primary/[0.04] px-3 py-2.5 text-left transition-colors hover:bg-primary/[0.07]',
+              'flex w-full max-w-md items-start gap-2 rounded-xl border border-border/50 bg-nox-background-accent/20 px-3 py-2.5 text-left transition-colors hover:bg-nox-background-accent/35',
               zen && 'mx-auto',
             )}
           >

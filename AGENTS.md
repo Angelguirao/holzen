@@ -23,6 +23,7 @@ Use this table to pick the **canonical narrative** for the slice you are touchin
 | PostHog product events or properties | [docs/ops/event-taxonomy.md](docs/ops/event-taxonomy.md) | Call sites + privacy/sanitization patterns in `src/lib/posthog.ts` |
 | Feature flags (new flag or rollout change) | [docs/ops/feature-flags.md](docs/ops/feature-flags.md) | `use-feature-flag` usage; default and sunset note |
 | React pages (orchestration, hooks split, memoization) | [docs/fundamentals/react-screen-orchestration.md](docs/fundamentals/react-screen-orchestration.md) | Tests for the flow; [docs/fundamentals/refactoring-strategy.md](docs/fundamentals/refactoring-strategy.md) for larger refactors |
+| Cross-surface ownership (truth vs UI projection; TanStack Query vs UI-only state; avoid duplicate “backends”) | [docs/fundamentals/client-server-architecture-holzen.md](docs/fundamentals/client-server-architecture-holzen.md) | [docs/fundamentals/navigating-the-codebase.md](docs/fundamentals/navigating-the-codebase.md) §6.1 when fetch/cache patterns change; relevant `docs/systems/*` when domain rules change |
 | Visual tokens, Nox, component styling | [DESIGN.md](DESIGN.md), [docs/design/nox/](docs/design/nox/) | `src/index.css`, `tailwind.config.ts` — Figma owns pixel values; markdown owns migration rules |
 | Auth + referral side effects | [docs/systems/auth/auth-and-referral-system.md](docs/systems/auth/auth-and-referral-system.md) | RLS-sensitive paths per [docs/reviews/](docs/reviews/) phases when security-relevant |
 | Content library ingest / RSS / admin | [docs/systems/content-library-fetch-source-feeds.md](docs/systems/content-library-fetch-source-feeds.md) | Edge + admin docs referenced there |
@@ -143,6 +144,7 @@ Pushing triggers **automatic** DB migrations and edge function deploys to the li
 
 ## Related docs
 
+- [docs/fundamentals/client-server-architecture-holzen.md](docs/fundamentals/client-server-architecture-holzen.md) — **truth vs projection** (who owns invariants vs UI); pair with [docs/fundamentals/navigating-the-codebase.md](docs/fundamentals/navigating-the-codebase.md) **§6.1** for TanStack Query vs `useEffect` + Supabase. Listed explicitly here because fetch/cache refactors should read both before editing.
 - [docs/README.md](docs/README.md) — full docs index, **start-here** reading order, and **canonical sources** (what to edit when docs drift).
 - [docs/fundamentals/react-screen-orchestration.md](docs/fundamentals/react-screen-orchestration.md) — reusable React page patterns (orchestration, hooks, memoization, tests); **beginner primer** + Rules of Hooks examples + **guided tour of `Home.tsx`**; distilled from Home.
 - [docs/fundamentals/http-review-playbooks.md](docs/fundamentals/http-review-playbooks.md) — Postman/Bruno step-by-step API review; [bruno/](bruno/) collection, [bruno/SCOPE.md](bruno/SCOPE.md), [bruno/functions-catalog.md](bruno/functions-catalog.md).

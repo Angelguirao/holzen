@@ -17,3 +17,4 @@
 
 - [home-fetch-deduplication.md](home-fetch-deduplication.md)
 - [mental-models-for-contributors.md](../fundamentals/mental-models-for-contributors.md)
+- [client-server-architecture-holzen.md](../fundamentals/client-server-architecture-holzen.md) — mental model for **server state** (Query cache) vs **UI-only** state and where authority lives

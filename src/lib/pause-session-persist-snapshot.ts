@@ -1,6 +1,6 @@
 import type { PauseStep } from '@/components/pause/PauseProgress';
 import type { MoodValue } from '@/components/MoodCheck';
-import type { BriefFeelTile } from '@/components/pause/PauseBriefFeel';
+import type { FeelStepTile } from '@/components/pause/pause-feel-types';
 import type { CompanionData, CompanionPrefs } from '@/components/CompanionSection';
 import type { BriefPauseStep, PersistedSession, RitualDepth } from '@/lib/pause-session-storage';
 
@@ -28,7 +28,7 @@ export type PauseSessionPersistSnapshotInput = {
   ritualEntry: RitualDepth | 'picker';
   briefStep: BriefPauseStep;
   briefIntegrateDone: boolean;
-  selectedBriefFace: BriefFeelTile | null;
+  selectedBriefFace: FeelStepTile | null;
 };
 
 /**

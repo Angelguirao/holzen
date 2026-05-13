@@ -1,6 +1,11 @@
-import { useState, useEffect, useCallback, forwardRef } from 'react';
-import { supabase } from '@/integrations/supabase/client';
+import { useState, useCallback, useMemo, forwardRef } from 'react';
+import { useInfiniteQuery, useQueryClient } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
+import {
+  CHANGELOG_ENTRIES_QUERY_KEY,
+  getChangelogEntriesInfiniteQueryOptions,
+  prefetchChangelogEntriesFirstPage,
+} from '@/lib/changelog-query';
 import {
   AlertDialog,
   AlertDialogContent,
@@ -13,16 +18,6 @@ import {
 import { Skeleton } from '@/components/ui/skeleton';
 import { useInfiniteScroll } from '@/hooks/use-infinite-scroll';
 
-const PAGE_SIZE = 15;
-
-interface ChangelogEntry {
-  id: string;
-  version: string;
-  date: string;
-  changes: string[];
-  created_at: string;
-}
-
 export type ChangelogProps = {
   /** Fires when the user opens “What’s new” (before the dialog opens). */
   onWhatsNewOpen?: () => void;
@@ -33,51 +28,48 @@ export const Changelog = forwardRef<HTMLDivElement, ChangelogProps>(function Cha
   ref,
 ) {
   const { t } = useTranslation();
+  const queryClient = useQueryClient();
   const [open, setOpen] = useState(false);
-  const [entries, setEntries] = useState<ChangelogEntry[]>([]);
-  const [loading, setLoading] = useState(false);
-  const [hasMore, setHasMore] = useState(true);
-  const [loadingMore, setLoadingMore] = useState(false);
 
-  useEffect(() => {
-    if (!open) return;
-    setLoading(true);
-    supabase
-      .from('changelog_entries')
-      .select('id, version, date, changes, created_at')
-      .order('created_at', { ascending: false })
-      .limit(PAGE_SIZE)
-      .then(({ data }) => {
-        const rows = (data as unknown as ChangelogEntry[]) ?? [];
-        setEntries(rows);
-        setHasMore(rows.length === PAGE_SIZE);
-        setLoading(false);
-      });
-  }, [open]);
+  const {
+    data,
+    isPending,
+    hasNextPage,
+    isFetchingNextPage,
+    fetchNextPage,
+  } = useInfiniteQuery(getChangelogEntriesInfiniteQueryOptions(open));
 
-  const loadMore = useCallback(async () => {
-    if (loadingMore || !hasMore) return;
-    setLoadingMore(true);
-    const last = entries[entries.length - 1];
-    if (!last) { setLoadingMore(false); return; }
-    const { data } = await supabase
-      .from('changelog_entries')
-      .select('id, version, date, changes, created_at')
-      .order('created_at', { ascending: false })
-      .lt('created_at', last.created_at)
-      .limit(PAGE_SIZE);
-    const rows = (data as unknown as ChangelogEntry[]) ?? [];
-    setEntries((prev) => [...prev, ...rows]);
-    setHasMore(rows.length === PAGE_SIZE);
-    setLoadingMore(false);
-  }, [loadingMore, hasMore, entries]);
+  const entries = useMemo(() => data?.pages.flat() ?? [], [data]);
 
-  const sentinelRef = useInfiniteScroll({ hasMore, loading: loadingMore, onLoadMore: loadMore });
+  const onOpenChange = useCallback(
+    (next: boolean) => {
+      setOpen(next);
+      if (!next) {
+        queryClient.removeQueries({ queryKey: CHANGELOG_ENTRIES_QUERY_KEY });
+      }
+    },
+    [queryClient],
+  );
+
+  const onLoadMore = useCallback(() => {
+    if (!hasNextPage || isFetchingNextPage) return;
+    void fetchNextPage();
+  }, [hasNextPage, isFetchingNextPage, fetchNextPage]);
+
+  const sentinelRef = useInfiniteScroll({
+    hasMore: Boolean(hasNextPage),
+    loading: isFetchingNextPage,
+    onLoadMore,
+  });
+
+  const loading = open && isPending;
 
   return (
     <div ref={ref}>
       <button
         type="button"
+        onMouseEnter={() => void prefetchChangelogEntriesFirstPage(queryClient)}
+        onFocus={() => void prefetchChangelogEntriesFirstPage(queryClient)}
         onClick={() => {
           onWhatsNewOpen?.();
           setOpen(true);
@@ -87,7 +79,7 @@ export const Changelog = forwardRef<HTMLDivElement, ChangelogProps>(function Cha
         {t('changelog.whatsNew')}
       </button>
 
-      <AlertDialog open={open} onOpenChange={setOpen}>
+      <AlertDialog open={open} onOpenChange={onOpenChange}>
         <AlertDialogContent className="max-h-[80vh] overflow-y-auto">
           <AlertDialogHeader>
             <AlertDialogTitle className="font-mono text-sm">{t('changelog.title')}</AlertDialogTitle>
@@ -122,7 +114,7 @@ export const Changelog = forwardRef<HTMLDivElement, ChangelogProps>(function Cha
                 </div>
               ))}
               <div ref={sentinelRef} className="h-1" />
-              {loadingMore && (
+              {isFetchingNextPage && (
                 <p className="text-[10px] font-mono text-muted-foreground animate-pulse text-center">{t('common.loadingMore')}</p>
               )}
             </div>

@@ -1,13 +1,13 @@
-import { useEffect, useState } from 'react';
+import { useMemo } from 'react';
+import { useQuery } from '@tanstack/react-query';
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/use-auth';
 import {
   dedupeBiases,
   type RelatedBias,
-  type RelatedBiasesRow,
 } from './related-biases-util';
+import { getRelatedBiasesGroundNudgeQueryOptions } from '@/lib/related-biases-ground-nudge-query';
 
 interface Props {
   /** Pause instance currently viewed — excluded from the list. */
@@ -31,43 +31,19 @@ export function RelatedBiasesThisMonth({
 }: Props) {
   const { t } = useTranslation();
   const { user } = useAuth();
-  const [biases, setBiases] = useState<RelatedBias[] | null>(null);
+  const userId = user?.id;
 
-  useEffect(() => {
-    if (!user) {
-      setBiases([]);
-      return;
-    }
-    let cancelled = false;
-    const thirtyDaysAgo = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString();
-    void (async () => {
-      const { data, error } = await supabase
-        .from('pause_ai_artifacts' as never)
-        .select('pause_instance_id, created_at, content')
-        .eq('user_id', user.id)
-        .eq('kind', 'ground_nudge')
-        .gte('created_at', thirtyDaysAgo)
-        .order('created_at', { ascending: false })
-        .limit(40);
+  const { data: rawRows } = useQuery(getRelatedBiasesGroundNudgeQueryOptions(userId));
 
-      if (cancelled) return;
-      if (error || !data) {
-        setBiases([]);
-        return;
-      }
-
-      setBiases(
-        dedupeBiases(data as unknown as RelatedBiasesRow[], {
-          currentPauseInstanceId: currentPauseInstanceId ?? null,
-          currentTitle: currentTitle ?? null,
-          limit: 8,
-        }),
-      );
-    })();
-    return () => {
-      cancelled = true;
-    };
-  }, [user, currentPauseInstanceId, currentTitle]);
+  const biases = useMemo((): RelatedBias[] | null => {
+    if (!userId) return null;
+    if (rawRows === undefined) return null;
+    return dedupeBiases(rawRows, {
+      currentPauseInstanceId: currentPauseInstanceId ?? null,
+      currentTitle: currentTitle ?? null,
+      limit: 8,
+    });
+  }, [userId, rawRows, currentPauseInstanceId, currentTitle]);
 
   if (!biases || biases.length === 0) return null;
 

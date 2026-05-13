@@ -1,12 +1,9 @@
-import { useEffect, useState } from 'react';
-import { supabase } from '@/integrations/supabase/client';
+import { useQuery } from '@tanstack/react-query';
 import { Database, RefreshCw } from 'lucide-react';
-
-interface MigrationRow {
-  version: string;
-  name: string;
-  statements_count: number;
-}
+import {
+  getAdminAppliedMigrationsQueryOptions,
+  type AppliedMigrationRow,
+} from '@/lib/admin-applied-migrations-query';
 
 function formatVersion(v: string): string {
   // Supabase migration versions are timestamps like 20260425121947
@@ -22,35 +19,18 @@ function formatVersion(v: string): string {
 }
 
 export function MigrationStatus() {
-  const [rows, setRows] = useState<MigrationRow[]>([]);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const {
+    data: rows = [],
+    isPending,
+    isFetching,
+    isError,
+    error,
+    refetch,
+  } = useQuery(getAdminAppliedMigrationsQueryOptions());
 
-  const load = async () => {
-    setLoading(true);
-    setError(null);
-    try {
-      const { data, error } = await (supabase.rpc as unknown as (
-        fn: string,
-        args: { p_limit: number },
-      ) => Promise<{ data: MigrationRow[] | null; error: { message: string } | null }>)(
-        'get_applied_migrations',
-        { p_limit: 20 },
-      );
-      if (error) throw error;
-      setRows(data ?? []);
-    } catch (e) {
-      setError(e instanceof Error ? e.message : 'Failed to load migrations');
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    load();
-  }, []);
-
-  const latest = rows[0];
+  const latest: AppliedMigrationRow | undefined = rows[0];
+  const errorMessage =
+    error instanceof Error ? error.message : error != null ? String(error) : 'Failed to load migrations';
 
   return (
     <div className="rounded-xl border border-border/30 bg-card/20 p-4 space-y-3">
@@ -62,20 +42,21 @@ export function MigrationStatus() {
           </span>
         </div>
         <button
-          onClick={load}
-          disabled={loading}
+          type="button"
+          onClick={() => void refetch()}
+          disabled={isFetching}
           className="text-[10px] font-mono text-muted-foreground/60 hover:text-foreground inline-flex items-center gap-1 disabled:opacity-50"
         >
-          <RefreshCw className={`h-3 w-3 ${loading ? 'animate-spin' : ''}`} />
+          <RefreshCw className={`h-3 w-3 ${isFetching ? 'animate-spin' : ''}`} />
           Refresh
         </button>
       </div>
 
-      {error && (
-        <p className="text-[10px] font-mono text-destructive">{error}</p>
+      {isError && (
+        <p className="text-[10px] font-mono text-destructive">{errorMessage}</p>
       )}
 
-      {!error && latest && (
+      {!isError && latest && (
         <div className="space-y-1">
           <p className="text-[10px] text-muted-foreground/60">Last applied</p>
           <p className="text-sm font-mono text-foreground">{formatVersion(latest.version)}</p>
@@ -85,7 +66,7 @@ export function MigrationStatus() {
         </div>
       )}
 
-      {!error && rows.length > 1 && (
+      {!isError && rows.length > 1 && (
         <details className="text-[10px] font-mono text-muted-foreground/60">
           <summary className="cursor-pointer hover:text-foreground">
             Recent ({rows.length})
@@ -101,7 +82,7 @@ export function MigrationStatus() {
         </details>
       )}
 
-      {!error && !loading && rows.length === 0 && (
+      {!isError && !isPending && rows.length === 0 && (
         <p className="text-[10px] font-mono text-muted-foreground/50">No migrations recorded.</p>
       )}
 

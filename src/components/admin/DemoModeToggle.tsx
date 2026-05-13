@@ -10,7 +10,7 @@ import {
   isDemoModeActive,
   setDemoMode,
 } from '@/lib/stats/demo-fixture';
-import { PAUSE_STATS_DATA_QUERY_KEY } from '@/hooks/use-pause-stats-data';
+import { PAUSE_STATS_DATA_QUERY_KEY } from '@/lib/pause-stats-data-query';
 
 /**
  * Admin-only toggle that swaps real pause stats for a synthetic fixture.

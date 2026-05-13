@@ -1,12 +1,12 @@
 import type { MoodValue } from '@/components/MoodCheck';
-import type { BriefFeelTile } from '@/components/pause/PauseBriefFeel';
+import type { FeelStepTile } from '@/components/pause/pause-feel-types';
 
 export type InitialEmotionLogOpts = {
   briefRitual?: boolean;
-  briefFace?: BriefFeelTile;
+  briefFace?: FeelStepTile;
 };
 
-/** Body for `pauseLogStep` with `stepType: 'initial_emotion_logged'` (Feel / brief Feel). */
+/** Body for `pauseLogStep` with `stepType: 'initial_emotion_logged'` (shared ritual Feel step). */
 export function buildInitialEmotionLoggedPayload(
   mood: MoodValue,
   intensity: number | undefined,
@@ -25,7 +25,7 @@ export function buildInitialEmotionLoggedPayload(
  */
 export function initialEmotionLogDedupeKey(
   payload: Record<string, unknown>,
-  briefFace?: BriefFeelTile | null,
+  briefFace?: FeelStepTile | null,
 ): string {
   return JSON.stringify({ ...payload, _bf: briefFace });
 }

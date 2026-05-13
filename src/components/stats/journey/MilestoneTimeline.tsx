@@ -2,7 +2,7 @@ import { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { format } from 'date-fns';
 import { Sparkles, Flame, Shield, Target, Feather } from 'lucide-react';
-import type { PauseFullRow } from '@/hooks/use-pause-stats-data';
+import type { PauseFullRow } from '@/lib/pause-stats-data-query';
 
 interface Props {
   rows: readonly PauseFullRow[];
@@ -67,7 +67,7 @@ export function MilestoneTimeline({ rows }: Props) {
     }
     const firstHold = first(
       rows,
-      (r) => r.state === 'completed' && (r.outcome === 'held' || r.outcome === 'nothing'),
+      (r) => r.state === 'completed' && r.outcome === 'held',
     );
     if (firstHold) {
       out.push({

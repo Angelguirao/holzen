@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback, useRef, useLayoutEffect } from 'react';
+import { useQueryClient } from '@tanstack/react-query';
 import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
 import { Play, Pause, Anchor, Loader2, ExternalLink, Eye, EyeOff, Sparkles } from 'lucide-react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
@@ -18,6 +19,11 @@ import { Textarea } from '@/components/ui/textarea';
 import { parseEdgeFunctionError, toUserFacingAiErrorMessage } from '@/lib/edge-function-error';
 import { trackEvent } from '@/lib/posthog';
 import { invokeEdge } from '@/lib/invoke-edge';
+import { practiceEntriesWeeklyCountQueryKey } from '@/lib/practice-entries-weekly-count-query';
+import { practicePrimarySuggestionQueryKey } from '@/lib/practice-primary-suggestion-query';
+import { toolsHubDataQueryKey } from '@/lib/tools-hub-data-query';
+import { groundHistoryEntriesQueryKey, groundHistoryStatsQueryKey } from '@/lib/ground-history-query';
+import { invalidateHistoryCalendarActivities } from '@/lib/history-calendar-activities-query-key';
 import {
   AlertDialog,
   AlertDialogCancel,
@@ -53,6 +59,7 @@ export default function Ground() {
   const prefersReducedMotion = useReducedMotion();
   const { groundingActivities, btcData, severity, language } = useHolzen();
   const { user } = useAuth();
+  const queryClient = useQueryClient();
   const { isPro, isPending } = useProGate();
 
   const [phase, setPhase] = useState<Phase>('idle');
@@ -341,7 +348,7 @@ export default function Ground() {
     hapticFeedback('medium');
 
     if (user) {
-      void supabase.from('practice_entries').insert({
+      const { error } = await supabase.from('practice_entries').insert({
         user_id: user.id,
         type: 'grounding',
         mood: selectedMood || null,
@@ -349,10 +356,18 @@ export default function Ground() {
         body: reflectionText.trim() || null,
         trigger_text: activity || null,
       });
+      if (!error) {
+        void queryClient.invalidateQueries({ queryKey: practiceEntriesWeeklyCountQueryKey(user.id) });
+        void queryClient.invalidateQueries({ queryKey: practicePrimarySuggestionQueryKey(user.id) });
+        void queryClient.invalidateQueries({ queryKey: toolsHubDataQueryKey(user.id) });
+        void queryClient.invalidateQueries({ queryKey: groundHistoryStatsQueryKey(user.id) });
+        void queryClient.invalidateQueries({ queryKey: groundHistoryEntriesQueryKey(user.id) });
+        invalidateHistoryCalendarActivities(queryClient, user.id);
+      }
     }
 
     setPhase('done');
-  }, [user, selectedMood, selectedDuration, reflectionText, activity]);
+  }, [user, selectedMood, selectedDuration, reflectionText, activity, queryClient]);
 
   const handleReturn = useCallback(() => {
     navigate(TOOLS.hub, { replace: true });
@@ -485,7 +500,7 @@ export default function Ground() {
                       key={act}
                       type="button"
                       onClick={() => chooseFreeActivity(act)}
-                      className="rounded-full border border-border/60 bg-muted/30 px-3 py-1.5 text-sm text-foreground transition-colors hover:border-primary/40 hover:bg-primary/10"
+                      className="rounded-full border border-border/60 bg-muted/30 px-3 py-1.5 text-sm text-foreground transition-colors hover:border-nox-border-focus/40 hover:bg-muted/50"
                     >
                       {act}
                     </button>
@@ -625,7 +640,7 @@ export default function Ground() {
                           max={MAX_DURATION}
                           value={customDuration}
                           onChange={(e) => setCustomDuration(parseInt(e.target.value, 10))}
-                          className="h-2 w-full cursor-pointer appearance-none rounded-full bg-border accent-primary [&::-webkit-slider-thumb]:h-4 [&::-webkit-slider-thumb]:w-4 [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:border-0 [&::-webkit-slider-thumb]:bg-primary [&::-webkit-slider-thumb]:shadow-none"
+                          className="h-2 w-full cursor-pointer appearance-none rounded-full bg-border accent-nox-text-link [&::-webkit-slider-thumb]:h-4 [&::-webkit-slider-thumb]:w-4 [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:border-0 [&::-webkit-slider-thumb]:bg-nox-text-link [&::-webkit-slider-thumb]:shadow-none"
                         />
                         <div className="flex justify-between text-xs text-muted-foreground">
                           <span>{MIN_DURATION} min</span>
@@ -636,7 +651,7 @@ export default function Ground() {
                       <button
                         type="button"
                         onClick={() => startTimer(customDuration)}
-                        className="rounded-lg border border-primary/30 bg-primary/10 px-8 py-2.5 text-sm font-semibold text-foreground transition-colors hover:bg-primary/15"
+                        className="rounded-lg border border-nox-border-default/60 bg-nox-background-accent/25 px-8 py-2.5 text-sm font-semibold text-foreground transition-colors hover:bg-nox-background-accent/40"
                       >
                         {t('ground.begin')}
                       </button>
@@ -795,7 +810,7 @@ export default function Ground() {
                       className="group flex flex-col items-center gap-2"
                     >
                       <motion.div
-                        className="flex h-12 w-12 items-center justify-center rounded-full border border-border/60 bg-muted/40 backdrop-blur-sm transition-all duration-300 group-hover:scale-110 group-hover:border-primary/40 group-hover:bg-primary/10"
+                        className="flex h-12 w-12 items-center justify-center rounded-full border border-border/60 bg-muted/40 backdrop-blur-sm transition-all duration-300 group-hover:scale-110 group-hover:border-nox-border-focus/40 group-hover:bg-muted/55"
                         whileTap={{ scale: 0.92 }}
                       >
                         <MoodIcon mood={mood} size={22} className="text-muted-foreground transition-colors duration-300 group-hover:text-foreground" />
@@ -848,7 +863,7 @@ export default function Ground() {
                   <button
                     type="button"
                     onClick={handleComplete}
-                    className="rounded-lg border border-primary/30 bg-primary/10 px-8 py-2.5 text-sm font-semibold text-foreground transition-colors hover:bg-primary/15"
+                    className="rounded-lg border border-nox-border-default/60 bg-nox-background-accent/25 px-8 py-2.5 text-sm font-semibold text-foreground transition-colors hover:bg-nox-background-accent/40"
                   >
                     {t('common.done')}
                   </button>

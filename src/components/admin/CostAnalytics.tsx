@@ -11,9 +11,10 @@
  *     path even when it isn't.
  *
  * All queries hit `generation_attempts` directly (admin RLS allows SELECT).
- * Cached per mount; refresh button re-runs.
+ * Attempt rows use TanStack Query (per-period key + 7d when period ≠ 7d); refresh invalidates attempts + MRR snapshot.
  */
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useMemo, useState } from 'react';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import {
   AlertCircle,
   DollarSign,
@@ -23,10 +24,18 @@ import {
   Users,
   Wallet,
 } from 'lucide-react';
-import { supabase } from '@/integrations/supabase/client';
 import { PERIOD_OPTIONS, TAB_TRIGGER_CLASS, label } from '@/components/admin/admin-constants';
-import type { TimePeriod } from '@/hooks/use-admin-stats';
+import type { TimePeriod } from '@/lib/admin-stats-bundle-query';
 import { PRICING } from '@/lib/pricing';
+import {
+  ADMIN_COST_GENERATION_ATTEMPTS_QUERY_PREFIX,
+  ADMIN_COST_MRR_SNAPSHOT_QUERY_KEY,
+  type AttemptRow,
+  getAdminCostGenerationAttempts7dShadowQueryOptions,
+  getAdminCostGenerationAttemptsQueryOptions,
+  getAdminCostMrrSnapshotQueryOptions,
+  type MrrSnapshot,
+} from '@/lib/admin-cost-analytics-query';
 import { ProviderHealthCard } from '@/components/admin/ProviderHealthCard';
 
 /** All AI features we expect to see logging in `generation_attempts`. */
@@ -50,13 +59,6 @@ const EXPECTED_FEATURES = [
   'fetch_source_feeds',
 ] as const;
 
-interface AttemptRow {
-  companion_type: string | null;
-  user_id: string | null;
-  estimated_cost_usd: number | null;
-  created_at: string;
-}
-
 interface FeatureStat {
   feature: string;
   attempts: number;
@@ -69,38 +71,6 @@ interface UserStat {
   costUsd: number;
   attempts: number;
   topFeature: string;
-}
-
-function periodStart(period: TimePeriod): Date {
-  const now = new Date();
-  switch (period) {
-    case 'today': {
-      const d = new Date(now);
-      d.setUTCHours(0, 0, 0, 0);
-      return d;
-    }
-    case '7d':
-      return new Date(now.getTime() - 7 * 86_400_000);
-    case '30d':
-      return new Date(now.getTime() - 30 * 86_400_000);
-    case 'all':
-    default:
-      return new Date(0);
-  }
-}
-
-async function fetchAttempts(period: TimePeriod): Promise<AttemptRow[]> {
-  const sinceIso = periodStart(period).toISOString();
-  // Defensive upper bound — if something has blown up and written hundreds of
-  // thousands of rows, we'd rather show a slice than hang the tab.
-  const { data, error } = await supabase
-    .from('generation_attempts')
-    .select('companion_type, user_id, estimated_cost_usd, created_at')
-    .gte('created_at', sinceIso)
-    .not('estimated_cost_usd', 'is', null)
-    .limit(50_000);
-  if (error || !data) return [];
-  return data as AttemptRow[];
 }
 
 function summarizeByFeature(rows: AttemptRow[]): FeatureStat[] {
@@ -152,60 +122,32 @@ function loggedFeatures(rows: AttemptRow[]): Set<string> {
   return s;
 }
 
-interface MrrSnapshot {
-  activeSubscribers: number;
-  mrrUsd: number;
-  mtdCostUsd: number;
-  ratio: number | null;
-}
-
-async function fetchMrrSnapshot(): Promise<MrrSnapshot> {
-  // Count active/trialing subscribers. Lifetime-access users are not counted
-  // toward MRR (they've already paid one-off), but they still consume AI —
-  // the ratio reflects real unit economics rather than an idealized number.
-  const { count: activeCount } = await supabase
-    .from('profiles')
-    .select('*', { count: 'exact', head: true })
-    .in('subscription_status', ['active', 'trialing']);
-
-  const active = activeCount ?? 0;
-  const mrrUsd = active * PRICING.monthlyPrice;
-
-  const { data: mtdRow } = await supabase
-    .from('v_ai_spend_month_global' as never)
-    .select('total_usd')
-    .maybeSingle();
-  const mtdCostUsd =
-    mtdRow == null ? 0 : Number((mtdRow as { total_usd: number }).total_usd) || 0;
-
-  const ratio = mrrUsd > 0 ? mtdCostUsd / mrrUsd : null;
-  return { activeSubscribers: active, mrrUsd, mtdCostUsd, ratio };
-}
-
 export function CostAnalytics() {
+  const queryClient = useQueryClient();
   const [period, setPeriod] = useState<TimePeriod>('7d');
-  const [rows7d, setRows7d] = useState<AttemptRow[]>([]);
-  const [rowsPeriod, setRowsPeriod] = useState<AttemptRow[]>([]);
-  const [mrr, setMrr] = useState<MrrSnapshot | null>(null);
-  const [loading, setLoading] = useState(true);
 
-  const refresh = useCallback(async () => {
-    setLoading(true);
-    try {
-      const [periodData, sevenDayData, mrrSnap] = await Promise.all([
-        fetchAttempts(period),
-        period === '7d' ? Promise.resolve<AttemptRow[] | null>(null) : fetchAttempts('7d'),
-        fetchMrrSnapshot(),
-      ]);
-      setRowsPeriod(periodData);
-      setRows7d(sevenDayData ?? periodData);
-      setMrr(mrrSnap);
-    } finally {
-      setLoading(false);
-    }
-  }, [period]);
+  const { data: mrr, isPending: mrrPending } = useQuery(getAdminCostMrrSnapshotQueryOptions());
 
-  useEffect(() => { void refresh(); }, [refresh]);
+  const {
+    data: rowsPeriod = [],
+    isFetching: periodAttemptsFetching,
+  } = useQuery(getAdminCostGenerationAttemptsQueryOptions(period));
+
+  const {
+    data: rows7dSeparate = [],
+    isFetching: sevenDayAttemptsFetching,
+  } = useQuery(getAdminCostGenerationAttempts7dShadowQueryOptions(period));
+
+  const rows7d = period === '7d' ? rowsPeriod : rows7dSeparate;
+  const loading =
+    periodAttemptsFetching || (period !== '7d' && sevenDayAttemptsFetching);
+
+  const refreshAll = useCallback(async () => {
+    await queryClient.invalidateQueries({
+      queryKey: ADMIN_COST_GENERATION_ATTEMPTS_QUERY_PREFIX,
+    });
+    await queryClient.invalidateQueries({ queryKey: ADMIN_COST_MRR_SNAPSHOT_QUERY_KEY });
+  }, [queryClient]);
 
   const features = useMemo(() => summarizeByFeature(rowsPeriod), [rowsPeriod]);
   const topUsers = useMemo(() => summarizeByUser(rows7d), [rows7d]);
@@ -234,7 +176,7 @@ export function CostAnalytics() {
           Cost analytics
         </h3>
         <button
-          onClick={() => void refresh()}
+          onClick={() => void refreshAll()}
           className="flex items-center gap-1 text-[10px] font-sans font-medium text-muted-foreground/50 hover:text-nox-text-link"
         >
           <RefreshCw className="h-3 w-3" />
@@ -285,7 +227,7 @@ export function CostAnalytics() {
           Ratio &gt; 25% means AI cost is eating a large slice of revenue — worth rethinking
           defaults before the hard cap fires.
         </p>
-        <MrrCard snapshot={mrr} loading={loading} />
+        <MrrCard snapshot={mrr ?? null} loading={mrrPending} />
       </section>
 
       {/* Provider health (circuit breakers) */}

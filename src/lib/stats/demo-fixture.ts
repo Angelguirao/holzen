@@ -7,7 +7,7 @@
  * fixture is injected at the `usePauseStatsData` hook layer only.
  */
 
-import type { PauseFullRow } from '@/hooks/use-pause-stats-data';
+import type { PauseFullRow } from '@/lib/pause-stats-data-query';
 import type {
   PauseStepEventRow,
   PauseCompanionEventRow,
@@ -37,7 +37,7 @@ interface PauseSpec {
   date?: Date;
   initial: string;
   shift: string;
-  outcome: 'held' | 'nothing' | 'bought' | 'sold';
+  outcome: 'held' | 'bought' | 'sold';
   severity: 'mild' | 'moderate' | 'high';
   companionCount: number;
   depth: boolean;
@@ -74,7 +74,7 @@ export function buildDemoFixture(userId: string): DemoFixture {
       daysAgo: d,
       initial: reactive ? pickReactive() : 'uncertain',
       shift: reactive ? pickComposed() : 'calm',
-      outcome: d % 5 === 0 ? 'nothing' : 'held',
+      outcome: 'held',
       severity: d % 3 === 0 ? 'high' : d % 3 === 1 ? 'moderate' : 'mild',
       companionCount: 1 + (d % 3),
       depth: d % 2 === 0,
