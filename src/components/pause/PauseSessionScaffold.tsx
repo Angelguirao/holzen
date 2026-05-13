@@ -12,7 +12,6 @@ interface Props {
   onClose: () => void;
   phase: 'session' | 'done';
   step: PauseStep;
-  goToStep: (next: PauseStep) => void;
   /** Body row (below header): back, macro count + duration, mute — not the step labels. */
   onHeaderBack?: () => void;
   showHeaderBack?: boolean;
@@ -49,7 +48,6 @@ export function PauseSessionScaffold({
   onClose,
   phase,
   step,
-  goToStep,
   onHeaderBack,
   showHeaderBack = false,
   macroStepIndex,
@@ -147,7 +145,6 @@ export function PauseSessionScaffold({
                 {stepperSlot ?? (
                   <PauseProgress
                     currentStep={step}
-                    onStepClick={goToStep}
                     variant="segment"
                     breathSecondLabelVariant={breathSecondLabelVariant}
                   />

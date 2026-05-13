@@ -12,10 +12,11 @@ Authoritative orchestration: `[src/pages/PauseSession.tsx](../../src/pages/Pause
 | Depth picker + About pauses sheet            | `[PauseSessionDepthPickerStack.tsx](../../src/components/pause/PauseSessionDepthPickerStack.tsx)` |
 | Scaffold shell (header, stepper slot, sound) | `[PauseSessionScaffoldShell.tsx](../../src/components/pause/PauseSessionScaffoldShell.tsx)`       |
 | Scaffold frame + ritual routing              | `[PauseSessionScaffold.tsx](../../src/components/pause/PauseSessionScaffold.tsx)`                 |
+| Deep header stepper (read-only)             | `[PauseProgress.tsx](../../src/components/pause/PauseProgress.tsx)`                               |
 | Session / done body (brief vs deep)          | `[PauseSessionScaffoldBody.tsx](../../src/components/pause/PauseSessionScaffoldBody.tsx)`         |
 | Brief ritual beats (Framer transitions)      | `[PauseSessionBriefRitualBody.tsx](../../src/components/pause/PauseSessionBriefRitualBody.tsx)`   |
 | Deep ritual beats                            | `[PauseSessionDeepRitualBody.tsx](../../src/components/pause/PauseSessionDeepRitualBody.tsx)`     |
-| Brief macro stepper                          | `[PauseBriefProgress.tsx](../../src/components/pause/PauseBriefProgress.tsx)`                     |
+| Brief macro stepper (read-only)              | `[PauseBriefProgress.tsx](../../src/components/pause/PauseBriefProgress.tsx)`                     |
 | Header back visibility (pure)                | `[pause-session-header-back.ts](../../src/lib/pause-session-header-back.ts)`                      |
 
 
