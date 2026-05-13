@@ -16,7 +16,7 @@ import { type PauseBreathingHandle } from '@/components/pause/PauseBreathing';
 import { PauseSessionDepthPickerStack } from '@/components/pause/PauseSessionDepthPickerStack';
 import { PauseBriefProgress } from '@/components/pause/PauseBriefProgress';
 import { isPauseSessionHeaderBackVisible } from '@/lib/pause-session-header-back';
-import type { BriefPauseStep, RitualDepth } from '@/lib/pause-session-storage';
+import { clearSession, type BriefPauseStep, type RitualDepth } from '@/lib/pause-session-storage';
 import {
   mapPersistedStep,
   initialRitualEntry,
@@ -64,6 +64,7 @@ import { usePauseSessionGoBack } from '@/hooks/use-pause-session-go-back';
 import { usePauseSessionGoToStep } from '@/hooks/use-pause-session-go-to-step';
 import { buildPauseSessionScaffoldRitualDerived } from '@/lib/pause-session-scaffold-ritual-props';
 import { buildPauseSessionScaffoldRitualPayloads } from '@/lib/pause-session-scaffold-ritual-payloads';
+import { journeyPath } from '@/lib/app-routes';
 import { buildPauseSessionMountLogParams } from '@/lib/pause-session-mount-log-params';
 import { usePauseSessionPendingPauseOfferNavigation } from '@/hooks/use-pause-session-pending-pause-offer-navigation';
 import { usePendingPauseOffer } from '@/hooks/use-pending-pause-offer';
@@ -91,6 +92,10 @@ export default function PauseSession() {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const { handleReturn, handleClose } = usePauseSessionExitNavigation(navigate);
+  const handleBriefSaveToJourney = useCallback(() => {
+    clearSession();
+    navigate(journeyPath('stats'), { replace: true });
+  }, [navigate]);
   const location = useLocation();
   const prefersReducedMotion = useReducedMotion();
   const breathSecondLabelVariant = usePauseSessionBreathSecondLabelVariant();
@@ -466,6 +471,45 @@ export default function PauseSession() {
     setBriefIntegrateDone,
   });
 
+  const handleBriefRepeatBreaths = useCallback(() => {
+    setSwipeDirection('back');
+    setBriefIntegrateDone(false);
+    setBreathingFirstCompleted(false);
+    setBreathTimedActive(false);
+    setBriefStep('breath');
+    queueMicrotask(() => breathingRef.current?.resetToIntro());
+  }, [breathingRef, setSwipeDirection, setBriefIntegrateDone, setBreathingFirstCompleted, setBreathTimedActive, setBriefStep]);
+
+  const handleBriefSwitchToDeepPause = useCallback(() => {
+    if (!requirePro('deep_pause')) return;
+    setSwipeDirection('forward');
+    setRitualEntry('deep');
+    setStep('breathe');
+    setBriefStep('feel');
+    setBriefIntegrateDone(false);
+    setBreathingFirstCompleted(false);
+    setBreathingSecondCompleted(false);
+    setBreathTimedActive(false);
+    setFrameDone(false);
+    setMoodAfterDone(false);
+    setDecideOnBackStep('choose');
+    queueMicrotask(() => breathingRef.current?.resetToIntro());
+  }, [
+    breathingRef,
+    requirePro,
+    setSwipeDirection,
+    setRitualEntry,
+    setStep,
+    setBriefStep,
+    setBriefIntegrateDone,
+    setBreathingFirstCompleted,
+    setBreathingSecondCompleted,
+    setBreathTimedActive,
+    setFrameDone,
+    setMoodAfterDone,
+    setDecideOnBackStep,
+  ]);
+
   const { handleDecide } = usePauseSessionDecideHandler({
     decidingRef,
     pauseInstanceId,
@@ -558,6 +602,8 @@ export default function PauseSession() {
     soundMuted,
     briefIntegrateDone,
     handleBriefIntegrateComplete,
+    handleBriefRepeatBreaths,
+    handleBriefSwitchToDeepPause,
     handleDecide,
     briefDecideIntroKicker,
     goToStep,
@@ -621,6 +667,7 @@ export default function PauseSession() {
               deepRitual={deepRitual}
               decision={decision}
               onDoneReturn={handleReturn}
+              onSaveToJourney={ritualEntry === 'brief' ? handleBriefSaveToJourney : undefined}
               pauseImpactData={pauseImpactData}
             />
           }

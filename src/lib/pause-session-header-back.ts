@@ -1,5 +1,4 @@
 import { STEPS, type PauseStep } from '@/components/pause/PauseProgress';
-import { BRIEF_PAUSE_ORDER } from '@/lib/brief-pause-order';
 import type { BriefPauseStep, RitualDepth } from '@/lib/pause-session-storage';
 
 export type PauseSessionHeaderBackInput = {
@@ -16,16 +15,13 @@ export type PauseSessionHeaderBackInput = {
  * Whether the pause shell should show the header back affordance.
  * Mirrors `showPauseHeaderBack` in `PauseSession` (brief vs non-brief branches).
  *
- * Wireframes Kit: no back control on the **Breathe** macro step (intro, timed pattern, or
- * post-pattern interstitial) — only close + mute + stepper. `computePauseHeaderBackIntent`
- * still describes breath reset behavior if this ever becomes reachable again.
+ * Wireframes Kit: **brief** ritual never shows the shell chevron (navigation is the segment
+ * stepper). **Deep** ritual hides it on **Breathe** (`breathe` / `breath2`) only.
+ * `computePauseHeaderBackIntent` still describes breath reset behavior if the handler is called.
  */
 export function isPauseSessionHeaderBackVisible(p: PauseSessionHeaderBackInput): boolean {
   if (p.phase !== 'session') return false;
-  if (p.ritualEntry === 'brief') {
-    if (p.briefStep === 'breath') return false;
-    return BRIEF_PAUSE_ORDER.indexOf(p.briefStep) > 0;
-  }
+  if (p.ritualEntry === 'brief') return false;
   if (p.step === 'breathe' || p.step === 'breath2') return false;
   return STEPS.indexOf(p.step) > 0;
 }

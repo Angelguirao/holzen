@@ -40,6 +40,8 @@ function setup(overrides: Partial<Parameters<typeof buildPauseSessionScaffoldRit
     soundMuted: false,
     briefIntegrateDone: false,
     handleBriefIntegrateComplete: vi.fn(),
+    handleBriefRepeatBreaths: vi.fn(),
+    handleBriefSwitchToDeepPause: vi.fn(),
     handleDecide: vi.fn(),
     briefDecideIntroKicker: 'Step 4',
     goToStep: vi.fn(),
@@ -139,6 +141,28 @@ describe('buildPauseSessionScaffoldRitualPayloads', () => {
 
     deepRitual.onTimedBreathingChange(false);
     expect(setBreathTimedActive).toHaveBeenLastCalledWith(false);
+  });
+
+  it('wires brief integrate repeat / deep switch and deepPauseLocked from subscription', () => {
+    const handleBriefRepeatBreaths = vi.fn();
+    const handleBriefSwitchToDeepPause = vi.fn();
+    const { params } = setup({
+      handleBriefRepeatBreaths,
+      handleBriefSwitchToDeepPause,
+      subscribed: false,
+    });
+    const { briefRitual } = buildPauseSessionScaffoldRitualPayloads(params);
+    expect(briefRitual.deepPauseLocked).toBe(true);
+    briefRitual.onBriefRepeatBreaths();
+    expect(handleBriefRepeatBreaths).toHaveBeenCalled();
+    briefRitual.onBriefSwitchToDeepPause();
+    expect(handleBriefSwitchToDeepPause).toHaveBeenCalled();
+  });
+
+  it('brief deepPauseLocked false when subscribed', () => {
+    const { params } = setup({ subscribed: true });
+    const { briefRitual } = buildPauseSessionScaffoldRitualPayloads(params);
+    expect(briefRitual.deepPauseLocked).toBe(false);
   });
 
   it('forwards brief and deep skip breath handlers', () => {

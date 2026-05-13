@@ -3,6 +3,7 @@ import { Flame, Sparkles } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { useSubscription } from '@/hooks/use-subscription';
 import { PRICING } from '@/lib/pricing';
+import { cn } from '@/lib/utils';
 import { ScoreImpact } from './ScoreImpact';
 import { pauseStepLayout } from '@/components/pause/pause-step-layout';
 import { Button } from '@/components/ui/button';
@@ -25,13 +26,82 @@ interface Props {
   decision: string | null;
   onReturn: () => void;
   pauseData?: PauseData | null;
+  /** Wireframes Kit: brief completion uses journey CTA + optional check-in block. */
+  doneVariant?: 'default' | 'brief';
+  /** Brief only: clears session and navigates to Journey (stats). */
+  onSaveToJourney?: () => void;
 }
 
-export function PauseDone({ decision, onReturn, pauseData }: Props) {
+export function PauseDone({ decision, onReturn, pauseData, doneVariant = 'default', onSaveToJourney }: Props) {
   const { t } = useTranslation();
   const { subscribed, monthlyUsed, startCheckout, checkoutLoading } = useSubscription();
 
   const justHitLimit = !subscribed && monthlyUsed >= PRICING.freeReflectionsPerMonth;
+
+  const moodKey = pauseData?.mood;
+  const moodLabel =
+    moodKey && typeof moodKey === 'string'
+      ? t(`moodCheck.moods.${moodKey}`, { defaultValue: moodKey })
+      : null;
+
+  if (doneVariant === 'brief') {
+    const outcomeHeadline =
+      decision === 'held'
+        ? t('pause.brief.done.outcomeHeld')
+        : decision === 'sold'
+          ? t('pause.brief.done.outcomeSold')
+          : decision === 'bought'
+            ? t('pause.brief.done.outcomeBought')
+            : t('pause.brief.done.outcomeFallback', { defaultValue: 'Nice work' });
+
+    return (
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ duration: 0.6 }}
+        className={pauseStepLayout.columnDone}
+      >
+        <div className="flex w-full max-w-md flex-col items-center gap-6 text-center">
+          <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-muted-foreground">
+            {t('pause.brief.done.completedSaved')}
+          </p>
+          <h2 className="font-editorial text-2xl leading-tight text-foreground sm:text-3xl">{outcomeHeadline}</h2>
+          <p className="text-sm leading-relaxed text-muted-foreground">{t('pause.brief.done.journeyBody')}</p>
+
+          <div className="w-full rounded-2xl border border-border/60 bg-card/40 px-5 py-6 text-left shadow-sm">
+            <p className="text-center text-[11px] font-semibold uppercase tracking-[0.2em] text-muted-foreground">
+              {t('pause.brief.done.optionalBlockTitle')}
+            </p>
+            <p className="mt-4 text-center font-editorial text-lg italic text-primary">
+              {t('pause.brief.done.regulationPreview')}
+            </p>
+            {moodLabel ? (
+              <p className="mt-4 text-center text-sm text-muted-foreground">
+                <span className="font-medium text-foreground">{t('pause.brief.done.lastEmotionLabel')}: </span>
+                {moodLabel}
+              </p>
+            ) : null}
+            {onSaveToJourney ? (
+              <div className="mt-6 flex justify-center">
+                <Button
+                  type="button"
+                  variant="default"
+                  className={cn(pauseStepLayout.ritualPrimaryCta, 'rounded-full px-8')}
+                  onClick={() => onSaveToJourney()}
+                >
+                  {t('pause.brief.done.saveToJourney')}
+                </Button>
+              </div>
+            ) : null}
+          </div>
+
+          <Button type="button" variant="outline" className="mt-2 rounded-full" onClick={onReturn}>
+            {t('pause.return')}
+          </Button>
+        </div>
+      </motion.div>
+    );
+  }
 
   return (
     <motion.div

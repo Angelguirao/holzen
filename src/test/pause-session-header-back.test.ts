@@ -48,13 +48,11 @@ describe('isPauseSessionHeaderBackVisible', () => {
     ).toBe(false);
   });
 
-  it('brief: true when past breath (integrate or decide)', () => {
+  it('brief: never shows shell chevron (stepper-only navigation)', () => {
     expect(isPauseSessionHeaderBackVisible(base({ ritualEntry: 'brief', briefStep: 'integrate' }))).toBe(
-      true,
+      false,
     );
-    expect(isPauseSessionHeaderBackVisible(base({ ritualEntry: 'brief', briefStep: 'decide' }))).toBe(
-      true,
-    );
+    expect(isPauseSessionHeaderBackVisible(base({ ritualEntry: 'brief', briefStep: 'decide' }))).toBe(false);
   });
 
   it('deep: false on feel with no breath state', () => {
