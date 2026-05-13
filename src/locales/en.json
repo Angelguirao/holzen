@@ -1296,6 +1296,10 @@
   "pause": {
     "terminalEntryRedirect": "This pause already ended — opening your archive.",
     "youPaused": "You paused. That's the hardest part.",
+    "breathIntroKickerRitual": "Breathe",
+    "breathIntroHeadlineFirst": "Let's slow this down.",
+    "breathIntroGuidance": "Just follow the rhythm.",
+    "breathStartCta": "Start",
     "startRitual": "Start a ritual",
     "orDecideNow": "or scroll down to decide without a ritual",
     "whatWillYouDo": "What will you do?",
@@ -1317,7 +1321,10 @@
     "deep": {
       "sessionTitle": "Your deep pause",
       "macroStepCount": "{{n}} of {{total}}",
-      "feelStepDurationHint": "~ 15 sec"
+      "feelStepDurationHint": "~ 15 sec",
+      "breatheStepDurationHint": "< 1 min",
+      "breatheStepDurationHintCalming": "~ 1 min",
+      "breath2StepDurationHint": "< 1 min"
     },
     "feelStep": {
       "title": "What's here?",
@@ -1344,6 +1351,8 @@
       "sessionTitle": "Your brief pause",
       "macroStepCount": "{{n}} of {{total}}",
       "feelStepDurationHint": "~ 15 sec",
+      "breathStepDurationHint": "< 1 min",
+      "integrateStepDurationHint": "~ 20 sec",
       "steps": {
         "feel": "Feel",
         "breath": "Breathe",
@@ -1357,7 +1366,7 @@
         "hint": "When the timer ends, you'll move on — or continue early."
       },
       "decideKicker": "Step 4 · Decide",
-      "breathIntroKicker": "Step 2 · Breathe"
+      "breathIntroKicker": "Breathe"
     },
     "depthPicker": {
       "contextMoved": "{{sym}} moved {{pct}}% in the last 24 hours.",

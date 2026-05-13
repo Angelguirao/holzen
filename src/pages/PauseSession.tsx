@@ -514,6 +514,7 @@ export default function PauseSession() {
     ritualEntry,
     step,
     briefStep: ritualEntry === 'brief' ? briefStep : undefined,
+    severity,
     t,
   });
 

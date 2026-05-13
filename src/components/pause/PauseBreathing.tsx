@@ -1,8 +1,7 @@
-import { useState, useEffect, useMemo, useImperativeHandle, forwardRef, useRef } from 'react';
+import { useState, useEffect, useImperativeHandle, forwardRef, useRef } from 'react';
 import { motion, useReducedMotion } from 'framer-motion';
 import { useTranslation } from 'react-i18next';
 import { hapticFeedback } from '@/lib/haptics';
-import { getSessionQuote } from '@/lib/wisdom-quotes';
 import { pauseStepLayout } from '@/components/pause/pause-step-layout';
 import {
   playPauseBreathPatternCompleteCue,
@@ -40,6 +39,37 @@ const PATTERNS = [
 
 const EXPAND_KEYS = ['breathing.phases.inhale', 'breathing.phases.sip'];
 const CONTRACT_KEYS = ['breathing.phases.exhale'];
+
+const BREATH_ORB_PX = 140;
+const BREATH_RING_R = 56;
+const BREATH_RING_C = 2 * Math.PI * BREATH_RING_R;
+
+/** Phase progress ring (wireframe-style) around the breathing orb. */
+function BreathPhaseProgressRing({ progress }: { progress: number }) {
+  const dashOffset = BREATH_RING_C * (1 - progress);
+  const c = BREATH_ORB_PX / 2;
+  return (
+    <svg
+      className="pointer-events-none absolute inset-0 h-full w-full -rotate-90"
+      viewBox={`0 0 ${BREATH_ORB_PX} ${BREATH_ORB_PX}`}
+      aria-hidden
+    >
+      <circle cx={c} cy={c} r={BREATH_RING_R} fill="none" className="stroke-border/55" strokeWidth={3} />
+      <circle
+        cx={c}
+        cy={c}
+        r={BREATH_RING_R}
+        fill="none"
+        className="stroke-foreground/60"
+        strokeWidth={3}
+        strokeLinecap="round"
+        strokeDasharray={BREATH_RING_C}
+        strokeDashoffset={dashOffset}
+        style={{ transition: 'stroke-dashoffset 0.25s linear' }}
+      />
+    </svg>
+  );
+}
 
 type PhaseHintFamily = 'box' | 'calming' | 'sigh';
 
@@ -101,7 +131,6 @@ export const PauseBreathing = forwardRef<PauseBreathingHandle, Props>(function P
 ) {
   const { t } = useTranslation();
   const prefersReduced = useReducedMotion();
-  const quote = useMemo(() => getSessionQuote(), []);
   const cueOptsRef = useRef({ muted: ritualSoundMuted, prefersReduced: !!prefersReduced });
   useEffect(() => {
     cueOptsRef.current = { muted: ritualSoundMuted, prefersReduced: !!prefersReduced };
@@ -193,12 +222,7 @@ export const PauseBreathing = forwardRef<PauseBreathingHandle, Props>(function P
   const isContract = CONTRACT_KEYS.includes(currentPhase.labelKey);
   const scale = isExpand ? 0.5 + progress * 0.5 : isContract ? 1 - progress * 0.5 : 1;
 
-  const introKicker =
-    ritualVariant === 'brief'
-      ? t('pause.brief.breathIntroKicker', { defaultValue: 'Step 2 · Breathe' })
-      : breathSegment === 'second'
-        ? t('pause.breathIntroKickerSecond', { defaultValue: 'Step 5 · Breathe' })
-        : t('pause.breathIntroKickerFirst', { defaultValue: 'Step 2 · Breathe' });
+  const introKicker = t('pause.breathIntroKickerRitual', { defaultValue: 'Breathe' });
 
   const interstitialTitle =
     breathSegment === 'second'
@@ -235,31 +259,27 @@ export const PauseBreathing = forwardRef<PauseBreathingHandle, Props>(function P
 
           <div className="flex max-w-md flex-col items-center gap-4 text-center">
             <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-muted-foreground">{introKicker}</p>
-            <p className={pauseStepLayout.screenTitle}>
-              {breathSegment === 'second'
-                ? t('pause.breathSecondHeadline', { defaultValue: "Let's slow this down again" })
-                : t('pause.youPaused')}
+            {breathSegment === 'second' ? (
+              <p className={pauseStepLayout.screenTitle}>
+                {t('pause.breathSecondHeadline', { defaultValue: "Let's slow this down again" })}
+              </p>
+            ) : (
+              <p className={pauseStepLayout.screenTitle}>
+                {t('pause.breathIntroHeadlineFirst', { defaultValue: "Let's slow this down." })}
+              </p>
+            )}
+            <p className={pauseStepLayout.screenSubtitle}>
+              {t('pause.breathIntroGuidance', { defaultValue: 'Just follow the rhythm.' })}
             </p>
             {breathSegment === 'first' && mantra && (
               <motion.p
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
-                transition={{ delay: 1.2, duration: 1.5 }}
+                transition={{ delay: 0.6, duration: 1 }}
                 className="max-w-sm text-sm italic leading-relaxed text-muted-foreground"
               >
-                "{mantra}"
+                {`"${mantra}"`}
               </motion.p>
-            )}
-            {breathSegment === 'first' && (
-              <motion.div
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ delay: mantra ? 2.5 : 1.2, duration: 2 }}
-                className="flex max-w-md flex-col items-center gap-2"
-              >
-                <p className="text-center text-sm italic leading-relaxed text-muted-foreground">"{quote.text}"</p>
-                <p className="text-xs text-muted-foreground/80">— {quote.author}</p>
-              </motion.div>
             )}
           </div>
 
@@ -267,7 +287,7 @@ export const PauseBreathing = forwardRef<PauseBreathingHandle, Props>(function P
             <motion.button
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
-              transition={{ delay: 1.5, duration: 1 }}
+              transition={{ delay: 0.4, duration: 0.8 }}
               onClick={() => {
                 hapticFeedback('light');
                 void resumePauseAudioContext();
@@ -275,12 +295,12 @@ export const PauseBreathing = forwardRef<PauseBreathingHandle, Props>(function P
               }}
               className={pauseStepLayout.textContinue}
             >
-              {t('breathing.begin', { defaultValue: 'Begin breathing' })}
+              {t('pause.breathStartCta', { defaultValue: 'Start' })}
             </motion.button>
             <motion.button
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
-              transition={{ delay: 1.7, duration: 1 }}
+              transition={{ delay: 0.55, duration: 0.8 }}
               type="button"
               onClick={() => {
                 hapticFeedback('light');
@@ -299,16 +319,22 @@ export const PauseBreathing = forwardRef<PauseBreathingHandle, Props>(function P
           transition={{ duration: 0.6 }}
           className="flex flex-col items-center gap-8"
         >
-          <motion.div
-            className="rounded-full border-2 border-border/50"
-            style={{
-              width: 140,
-              height: 140,
-              background: 'radial-gradient(circle, hsl(var(--nox-color-background-accent) / 0.45) 0%, transparent 70%)',
-            }}
-            animate={{ scale }}
-            transition={{ duration: 1, ease: 'easeInOut' }}
-          />
+          <div
+            className="relative flex items-center justify-center"
+            style={{ width: BREATH_ORB_PX, height: BREATH_ORB_PX }}
+          >
+            <BreathPhaseProgressRing progress={progress} />
+            <motion.div
+              className="relative z-[1] rounded-full border-2 border-border/50"
+              style={{
+                width: 102,
+                height: 102,
+                background: 'radial-gradient(circle, hsl(var(--nox-color-background-accent) / 0.45) 0%, transparent 70%)',
+              }}
+              animate={{ scale }}
+              transition={{ duration: 1, ease: 'easeInOut' }}
+            />
+          </div>
           <motion.p
             key={`${phaseIndex}-${cycle}`}
             initial={{ opacity: 0 }}
