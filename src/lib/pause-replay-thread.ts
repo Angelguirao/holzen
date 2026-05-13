@@ -140,10 +140,10 @@ export async function fetchPauseReplayThreadOrThrow(
   pauseInstanceId: string,
 ): Promise<PastReflectionWithWords> {
   const res = await loadPauseReplayThread(pauseInstanceId);
-  if (!res.ok) {
-    throw new Error(res.message ?? res.code);
+  if (res.ok) {
+    return res.thread;
   }
-  return res.thread;
+  throw new Error(res.message ?? res.code);
 }
 
 /**
