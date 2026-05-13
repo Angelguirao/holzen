@@ -21,7 +21,7 @@ export interface InvokeEdgeOptions<B = unknown> {
   /** Extra headers (`x-cid` is added automatically if missing). */
   headers?: Record<string, string>;
   /** HTTP method override (defaults to POST; edge functions accept GET when declared). */
-  method?: "GET" | "POST" | "PUT" | "PATCH" | "DELETE";
+  method?: "GET" | "HEAD" | "POST" | "PUT" | "PATCH" | "DELETE";
   /**
    * URL query string for the edge function. When set, uses `fetch` (still with anon key +
    * `x-cid`) because `supabase.functions.invoke` does not attach query parameters to the URL.
@@ -117,7 +117,7 @@ export async function invokeEdge<T = unknown, B = unknown>(
       const invoked = await supabase.functions.invoke<T>(functionName, {
         body: options.body as unknown,
         headers,
-        method: options.method,
+        method: options.method === "HEAD" ? "GET" : options.method,
         // `signal` is supported on newer supabase-js; ignored on older versions.
         ...(options.signal ? { signal: options.signal } : {}),
       });

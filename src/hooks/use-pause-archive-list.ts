@@ -107,9 +107,9 @@ export function usePauseArchiveList(options: UsePauseArchiveListOptions) {
     }
   }, [queryEnabled, isFetchingNextPage, hasNextPage, fetchNextPage]);
 
-  const refetchAll = useCallback(() => {
+  const refetchAll = useCallback(async (): Promise<void> => {
     if (!queryEnabled) return;
-    void refetch();
+    await refetch();
   }, [refetch, queryEnabled]);
 
   return {
