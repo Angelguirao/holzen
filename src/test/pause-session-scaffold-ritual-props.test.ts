@@ -11,6 +11,7 @@ const t = ((
   if (key === 'pause.brief.feelStepDurationHint') return '~ 15 sec';
   if (key === 'pause.brief.breathStepDurationHint') return '< 1 min';
   if (key === 'pause.brief.integrateStepDurationHint') return '~ 20 sec';
+  if (key === 'pause.brief.decideStepDurationHint') return '< 15 sec';
   if (key === 'pause.deep.sessionTitle') return 'Deep title';
   if (key === 'pause.deep.macroStepCount') return `${opts?.n ?? '?'} of ${opts?.total ?? '?'}`;
   if (key === 'pause.deep.feelStepDurationHint') return '~ 15 sec';
@@ -58,6 +59,17 @@ describe('buildPauseSessionScaffoldRitualDerived', () => {
     });
     expect(d.macroProgressLine).toBe('3 of 4');
     expect(d.macroProgressSubline).toBe('~ 20 sec');
+  });
+
+  it('brief decide: macro count + decide duration hint', () => {
+    const d = buildPauseSessionScaffoldRitualDerived({
+      ritualEntry: 'brief',
+      step: 'feel',
+      briefStep: 'decide',
+      t,
+    });
+    expect(d.macroProgressLine).toBe('4 of 4');
+    expect(d.macroProgressSubline).toBe('< 15 sec');
   });
 
   it('brief without briefStep: title only (macro unset)', () => {

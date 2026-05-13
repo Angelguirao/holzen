@@ -16,6 +16,7 @@ export function PauseSessionScaffoldShell(props: PauseSessionScaffoldShellProps)
     deepRitual,
     decision,
     onDoneReturn,
+    onSaveToJourney,
     pauseImpactData,
     ...scaffold
   } = props;
@@ -29,6 +30,7 @@ export function PauseSessionScaffoldShell(props: PauseSessionScaffoldShellProps)
         deepRitual={deepRitual}
         decision={decision}
         onDoneReturn={onDoneReturn}
+        onSaveToJourney={onSaveToJourney}
         pauseImpactData={pauseImpactData}
       />
     </PauseSessionScaffold>

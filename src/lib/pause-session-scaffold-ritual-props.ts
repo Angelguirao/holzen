@@ -66,7 +66,9 @@ export function buildPauseSessionScaffoldRitualDerived(input: {
             : briefStep === 'breath'
               ? t('pause.brief.breathStepDurationHint', { defaultValue: '< 1 min' })
               : briefStep === 'integrate'
-                ? t('pause.brief.integrateStepDurationHint', { defaultValue: '~ 20 sec' })
+              ? t('pause.brief.integrateStepDurationHint', { defaultValue: '~ 20 sec' })
+              : briefStep === 'decide'
+                ? t('pause.brief.decideStepDurationHint', { defaultValue: '< 15 sec' })
                 : undefined,
       };
     }

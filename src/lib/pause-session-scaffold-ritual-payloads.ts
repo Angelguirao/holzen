@@ -40,6 +40,8 @@ export type PauseSessionScaffoldRitualPayloadsParams = {
   soundMuted: boolean;
   briefIntegrateDone: boolean;
   handleBriefIntegrateComplete: PauseSessionBriefRitualBodyProps['onBriefIntegrateComplete'];
+  handleBriefRepeatBreaths: PauseSessionBriefRitualBodyProps['onBriefRepeatBreaths'];
+  handleBriefSwitchToDeepPause: PauseSessionBriefRitualBodyProps['onBriefSwitchToDeepPause'];
   handleDecide: PauseSessionBriefRitualBodyProps['onDecide'];
   briefDecideIntroKicker: string;
   goToStep: PauseSessionDeepRitualBodyProps['goToStep'];
@@ -88,6 +90,9 @@ export function buildPauseSessionScaffoldRitualPayloads(
       ritualSoundMuted: p.soundMuted,
       briefIntegrateDone: p.briefIntegrateDone,
       onBriefIntegrateComplete: p.handleBriefIntegrateComplete,
+      onBriefRepeatBreaths: p.handleBriefRepeatBreaths,
+      onBriefSwitchToDeepPause: p.handleBriefSwitchToDeepPause,
+      deepPauseLocked: !p.subscribed,
       onDecide: p.handleDecide,
       onBriefDecideBack: () => p.setBriefStep('integrate'),
       briefDecideIntroKicker: p.briefDecideIntroKicker,

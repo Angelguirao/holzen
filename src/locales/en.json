@@ -1364,8 +1364,27 @@
       "integrate": {
         "title": "Integrate",
         "line1": "Sit, and quiet your mind.",
-        "line2": "Do nothing — just be here.",
-        "hint": "When the timer ends, you'll move on — or continue early."
+        "line2": "Do nothing.",
+        "hint": "When the timer ends, you'll move on to Decide.",
+        "repeatBreaths": "Repeat breaths",
+        "switchDeep": "Switch to Deep pause",
+        "switchDeepLockedHint": "Holzen Pro or free trial required."
+      },
+      "decideStepDurationHint": "< 15 sec",
+      "decide": {
+        "holdPrimary": "Hold"
+      },
+      "done": {
+        "completedSaved": "Completed and saved",
+        "journeyBody": "This pause is saved to your journey. You can revisit it anytime from Journey.",
+        "optionalBlockTitle": "Optional — how are you now?",
+        "regulationPreview": "+15 Regulation",
+        "lastEmotionLabel": "Last emotion",
+        "saveToJourney": "Save to journey",
+        "outcomeHeld": "You chose to Hold",
+        "outcomeSold": "You chose to Sell",
+        "outcomeBought": "You chose to Buy",
+        "outcomeFallback": "Nice work"
       },
       "decideKicker": "Step 4 · Decide",
       "breathIntroKicker": "Breathe"

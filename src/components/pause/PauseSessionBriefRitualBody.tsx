@@ -29,6 +29,9 @@ export type PauseSessionBriefRitualBodyProps = {
   ritualSoundMuted: boolean;
   briefIntegrateDone: boolean;
   onBriefIntegrateComplete: () => void;
+  onBriefRepeatBreaths: () => void;
+  onBriefSwitchToDeepPause: () => void;
+  deepPauseLocked: boolean;
   onDecide: (decision: string) => void;
   onBriefDecideBack: () => void;
   briefDecideIntroKicker: string;
@@ -55,6 +58,9 @@ export function PauseSessionBriefRitualBody({
   ritualSoundMuted,
   briefIntegrateDone,
   onBriefIntegrateComplete,
+  onBriefRepeatBreaths,
+  onBriefSwitchToDeepPause,
+  deepPauseLocked,
   onDecide,
   onBriefDecideBack,
   briefDecideIntroKicker,
@@ -95,7 +101,13 @@ export function PauseSessionBriefRitualBody({
 
       {briefStep === 'integrate' && (
         <motion.div key="b-integrate" {...stepTransition}>
-          <PauseBriefIntegrate done={briefIntegrateDone} onComplete={onBriefIntegrateComplete} />
+          <PauseBriefIntegrate
+            done={briefIntegrateDone}
+            onComplete={onBriefIntegrateComplete}
+            onRepeatBreaths={onBriefRepeatBreaths}
+            onSwitchToDeepPause={onBriefSwitchToDeepPause}
+            deepPauseLocked={deepPauseLocked}
+          />
         </motion.div>
       )}
 
@@ -105,6 +117,8 @@ export function PauseSessionBriefRitualBody({
             onDecide={onDecide}
             onBack={onBriefDecideBack}
             introKicker={briefDecideIntroKicker}
+            briefWireframe
+            hideChoicesBack
           />
         </motion.div>
       )}
