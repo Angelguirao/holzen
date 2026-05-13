@@ -59,7 +59,6 @@ import type { PauseImpactData } from '@/lib/pause-impact-data';
 import { usePauseSessionShell } from '@/hooks/use-pause-session-shell';
 import { usePauseSessionTerminalEntryRedirect } from '@/hooks/use-pause-session-terminal-entry-redirect';
 import { usePauseSessionMountLog } from '@/hooks/use-pause-session-mount-log';
-import { usePauseSessionBriefPastStep } from '@/hooks/use-pause-session-brief-past-step';
 import { usePauseSessionGoBack } from '@/hooks/use-pause-session-go-back';
 import { usePauseSessionGoToStep } from '@/hooks/use-pause-session-go-to-step';
 import { buildPauseSessionScaffoldRitualDerived } from '@/lib/pause-session-scaffold-ritual-props';
@@ -536,13 +535,6 @@ export default function PauseSession() {
     ritualEntry,
   });
 
-  const { goToBriefPastStep } = usePauseSessionBriefPastStep({
-    briefStep,
-    setBriefStep,
-    setBriefIntegrateDone,
-    setSwipeDirection,
-  });
-
   const stepTransition = usePauseSessionStepTransition({
     swipeDirection,
     prefersReducedMotion,
@@ -563,11 +555,8 @@ export default function PauseSession() {
   });
 
   const briefStepperSlot = useMemo(
-    () =>
-      ritualEntry === 'brief' ? (
-        <PauseBriefProgress currentStep={briefStep} onStepClick={goToBriefPastStep} />
-      ) : undefined,
-    [ritualEntry, briefStep, goToBriefPastStep],
+    () => (ritualEntry === 'brief' ? <PauseBriefProgress currentStep={briefStep} /> : undefined),
+    [ritualEntry, briefStep],
   );
 
   const briefDecideIntroKicker = t('pause.brief.decideKicker', { defaultValue: 'Step 4 · Decide' });
@@ -655,7 +644,6 @@ export default function PauseSession() {
               onClose={handlePauseSessionChromeClose}
               phase={phase}
               step={step}
-              goToStep={goToStep}
               onHeaderBack={handlePauseHeaderBack}
               showHeaderBack={showPauseHeaderBack}
               stepperSlot={briefStepperSlot}

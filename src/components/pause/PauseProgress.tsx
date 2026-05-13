@@ -29,16 +29,15 @@ function pauseDeepDisplayProgressIndex(step: PauseStep): number {
 
 interface Props {
   currentStep: PauseStep;
-  onStepClick?: (step: PauseStep) => void;
   /** `segment` = full-width macro bars (pause shell); `pill` = compact dash stepper. */
   variant?: 'segment' | 'pill';
-  /** Figma variant B: macro step 5 labeled “Shift” instead of repeating “Breathe”. */
+  /** Variant B: macro step 5 labeled “Shift” instead of repeating “Breathe”. */
   breathSecondLabelVariant?: 'breathe' | 'shift';
 }
 
+/** Deep pause header stepper: visual progress only (no step jumping). */
 export function PauseProgress({
   currentStep,
-  onStepClick,
   variant = 'segment',
   breathSecondLabelVariant = 'breathe',
 }: Props) {
@@ -60,18 +59,16 @@ export function PauseProgress({
 
   if (variant === 'pill') {
     return (
-      <div className="flex w-max min-w-full items-center justify-start gap-1 sm:gap-1.5">
+      <div className="flex w-max min-w-full items-center justify-start gap-1 sm:gap-1.5" role="list">
         {PAUSE_DEEP_DISPLAY_STEPS.map((step, i) => {
           const isActive = i === currentIndex;
           const isPast = i < currentIndex;
-          const canClick = isPast && onStepClick;
           return (
-            <button
+            <div
               key={step}
-              onClick={() => canClick && onStepClick(step)}
-              disabled={!canClick}
-              type="button"
-              className={`flex min-w-[2.75rem] flex-col items-center gap-1.5 px-0.5 sm:min-w-0 ${canClick ? 'cursor-pointer' : 'cursor-default'}`}
+              role="listitem"
+              className="flex min-w-[2.75rem] flex-col items-center gap-1.5 px-0.5 sm:min-w-0"
+              aria-current={isActive ? 'step' : undefined}
             >
               <div
                 className={`h-1 rounded-full transition-all duration-500 ${
@@ -83,13 +80,13 @@ export function PauseProgress({
                   isActive
                     ? 'text-foreground'
                     : isPast
-                      ? `text-muted-foreground ${canClick ? 'hover:text-foreground' : ''}`
+                      ? 'text-muted-foreground'
                       : 'text-muted-foreground/70'
                 }`}
               >
                 {displayLabels[step]}
               </span>
-            </button>
+            </div>
           );
         })}
       </div>
@@ -97,21 +94,16 @@ export function PauseProgress({
   }
 
   return (
-    <div className="flex w-full items-start justify-between gap-[11px]">
+    <div className="flex w-full items-start justify-between gap-[11px]" role="list">
       {PAUSE_DEEP_DISPLAY_STEPS.map((step, i) => {
         const isActive = i === currentIndex;
         const isPast = i < currentIndex;
-        const canClick = isPast && onStepClick;
         return (
-          <button
+          <div
             key={step}
-            type="button"
-            onClick={() => canClick && onStepClick(step)}
-            disabled={!canClick}
-            className={cn(
-              'flex min-w-0 flex-1 flex-col items-center gap-2.5',
-              canClick ? 'cursor-pointer' : 'cursor-default',
-            )}
+            role="listitem"
+            className="flex min-w-0 flex-1 flex-col items-center gap-2.5"
+            aria-current={isActive ? 'step' : undefined}
           >
             <div
               className={cn(
@@ -123,12 +115,11 @@ export function PauseProgress({
               className={cn(
                 'w-full truncate text-center text-xs font-medium leading-4 tracking-[0.05em]',
                 isActive ? 'text-foreground' : isPast ? 'text-foreground/85' : 'text-muted-foreground',
-                canClick && 'hover:text-foreground',
               )}
             >
               {displayLabels[step]}
             </span>
-          </button>
+          </div>
         );
       })}
     </div>
