@@ -1,12 +1,15 @@
 import { supabase } from '@/integrations/supabase/client';
+import { PAUSE_QUERY_PREFIX } from '@/lib/pause-query-namespace';
 
 export const PAUSE_REFLECT_STEP_NOTE = 'note_updated' as const;
 export const PAUSE_REFLECT_STEP_TAGS = 'tag_updated' as const;
 
 export type PauseReflectStepType = typeof PAUSE_REFLECT_STEP_NOTE | typeof PAUSE_REFLECT_STEP_TAGS;
 
+export const PAUSE_REFLECT_STEP_QUERY_PREFIX = [...PAUSE_QUERY_PREFIX, 'reflect-step', 'latest'] as const;
+
 export function pauseReflectStepLatestQueryKey(pauseInstanceId: string, stepType: PauseReflectStepType) {
-  return ['pause', 'reflect-step', 'latest', pauseInstanceId, stepType] as const;
+  return [...PAUSE_REFLECT_STEP_QUERY_PREFIX, pauseInstanceId, stepType] as const;
 }
 
 export type PauseReflectStepLatestRow = {

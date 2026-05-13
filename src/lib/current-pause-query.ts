@@ -1,5 +1,6 @@
 import { supabase } from '@/integrations/supabase/client';
 import type { PauseState } from '@/lib/pause-state';
+import { PAUSE_QUERY_PREFIX } from '@/lib/pause-query-namespace';
 
 export interface CurrentPauseRow {
   id: string;
@@ -11,8 +12,6 @@ export interface CurrentPauseRow {
   engaged_at: string | null;
   context_snapshot: Record<string, unknown> | null;
 }
-
-export const PAUSE_QUERY_PREFIX = ['pause'] as const;
 
 export const CURRENT_PAUSE_QUERY_LEAF = 'current-open' as const;
 
