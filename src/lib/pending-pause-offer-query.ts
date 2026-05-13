@@ -8,7 +8,14 @@ export interface PendingPauseOfferRow {
   preview_message: string | null;
 }
 
-export const PENDING_PAUSE_OFFER_QUERY_PREFIX = ['pause', 'pending-offer'] as const;
+export const PAUSE_QUERY_PREFIX = ['pause'] as const;
+
+export const PENDING_PAUSE_OFFER_QUERY_LEAF = 'pending-offer' as const;
+
+export const PENDING_PAUSE_OFFER_QUERY_PREFIX = [
+  ...PAUSE_QUERY_PREFIX,
+  PENDING_PAUSE_OFFER_QUERY_LEAF,
+] as const;
 
 export const PENDING_PAUSE_OFFER_DISABLED_USER_ID = 'none' as const;
 
