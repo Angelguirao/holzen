@@ -13,7 +13,7 @@ interface Props {
   phase: 'session' | 'done';
   step: PauseStep;
   goToStep: (next: PauseStep) => void;
-  /** Shown in the row below the stepper (left); invokes macro back or breathing intro reset. */
+  /** Body: back control below stepper (left); breathing intro reset or ritual go-back. */
   onHeaderBack?: () => void;
   showHeaderBack?: boolean;
   /** 1-based index in the macro ritual (Feel → … → Decide; six user-facing beats — Choose is folded into the last beat). */
@@ -38,11 +38,10 @@ interface Props {
 }
 
 /**
- * Full-screen pause shell: curtain, gradient, **sticky** header (title · close · optional
- * countdown), then a **chrome band**: **segment stepper** full width, then a **control row**
- * (Wireframes Kit pause 330-21123): **back** (left) · **macro “n of total” + duration** (center) ·
- * **mute** (right).
- * Main column is step content only. Step science / About tabs live on the depth picker only.
+ * Full-screen pause shell: curtain, gradient, **sticky** strip with **session title · close ·
+ * optional countdown only** (minimal header). **Stepper**, **back**, **macro count + duration**, and
+ * **mute** render in the **main body column** above step content (not in the sticky header), per
+ * wireframe layout and common app-shell practice.
  */
 export function PauseSessionScaffold({
   curtainLifted,
@@ -145,9 +144,9 @@ export function PauseSessionScaffold({
           </header>
         </motion.div>
 
-        {phase === 'session' && (
-          <div className="relative z-[55] border-b border-border/25 bg-background/60">
-            <div className="mx-auto max-w-lg px-4 pb-3 pt-3 sm:px-6">
+        <div className="relative z-10 mx-auto max-w-lg overflow-hidden px-5 pb-16 pt-4 sm:px-8 sm:pb-20 sm:pt-6">
+          {phase === 'session' && (
+            <div className="mb-8 w-full space-y-4 sm:mb-10">
               <div className="w-full">
                 {stepperSlot ?? (
                   <PauseProgress
@@ -159,7 +158,7 @@ export function PauseSessionScaffold({
                 )}
               </div>
 
-              <div className="relative mt-3 flex w-full min-h-[2.5rem] items-start justify-center">
+              <div className="relative flex w-full min-h-[2.5rem] items-start justify-center">
                 <div className="absolute left-0 top-0.5 z-10">
                   {onHeaderBack && showHeaderBack ? (
                     <Button
@@ -234,10 +233,8 @@ export function PauseSessionScaffold({
                 </div>
               </div>
             </div>
-          </div>
-        )}
+          )}
 
-        <div className="relative z-10 mx-auto max-w-lg overflow-hidden px-5 pb-16 pt-6 sm:px-8 sm:pb-20 sm:pt-8">
           {children}
         </div>
       </motion.div>

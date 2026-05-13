@@ -4,6 +4,7 @@ import { Play } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { hapticFeedback } from '@/lib/haptics';
 import { pauseStepLayout } from '@/components/pause/pause-step-layout';
+import { Button } from '@/components/ui/button';
 import {
   playPauseBreathPatternCompleteCue,
   playPauseBreathPhaseCue,
@@ -289,20 +290,26 @@ export const PauseBreathing = forwardRef<PauseBreathingHandle, Props>(function P
           </div>
 
           <div className="flex flex-col items-center gap-3">
-            <motion.button
+            <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ delay: 0.4, duration: 0.8 }}
-              onClick={() => {
-                hapticFeedback('light');
-                void resumePauseAudioContext();
-                setStarted(true);
-              }}
-              className={`inline-flex items-center gap-2 ${pauseStepLayout.textContinue}`}
             >
-              {t('pause.breathStartCta', { defaultValue: 'Start' })}
-              <Play className="h-4 w-4 shrink-0 fill-current" aria-hidden />
-            </motion.button>
+              <Button
+                type="button"
+                variant="outline"
+                size="default"
+                className="rounded-full border-primary px-6 text-primary hover:bg-primary/10 hover:text-primary"
+                onClick={() => {
+                  hapticFeedback('light');
+                  void resumePauseAudioContext();
+                  setStarted(true);
+                }}
+              >
+                {t('pause.breathStartCta', { defaultValue: 'Start' })}
+                <Play className="h-4 w-4 shrink-0 fill-current" aria-hidden />
+              </Button>
+            </motion.div>
           </div>
         </>
       ) : !completed ? (
@@ -367,18 +374,24 @@ export const PauseBreathing = forwardRef<PauseBreathingHandle, Props>(function P
           </p>
           <p className="text-center font-editorial text-2xl text-foreground sm:text-3xl">{interstitialTitle}</p>
           <p className="max-w-sm text-sm leading-relaxed text-muted-foreground">{interstitialBody}</p>
-          <motion.button
+          <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 0.5, duration: 0.8 }}
-            onClick={() => {
-              hapticFeedback('light');
-              onContinueAfterBreath();
-            }}
-            className={pauseStepLayout.textContinue}
           >
-            {t('pause.steps.continue', { defaultValue: 'Continue' })}
-          </motion.button>
+            <Button
+              type="button"
+              variant="default"
+              size="default"
+              className="rounded-full px-8"
+              onClick={() => {
+                hapticFeedback('light');
+                onContinueAfterBreath();
+              }}
+            >
+              {t('pause.steps.continue', { defaultValue: 'Continue' })}
+            </Button>
+          </motion.div>
         </motion.div>
       )}
 
