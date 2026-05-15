@@ -1,6 +1,6 @@
 # Phase 2: Manual pause pipeline review
 
-> **Pause V2 (current):** `use-holzen` opens the pause via `pause_create_or_reuse` on Home; **`holzen-reflect`** runs from **`use-pause-reflect-generation`** / **`generateReflectionAtReflectStep`** once the deep ritual reaches **Reflect** (**`PauseSession`** keeps that hook enabled through **Decide**), not from `use-holzen` on the non-silent path. Silent mode still writes a stub `reflection_text` on trigger.
+> **Pause V2 (current):** `use-holzen` opens the pause via `pause_create_or_reuse` on Home; **`holzen-reflect`** runs from **`use-pause-reflect-generation`** / **`generateReflectionAtReflectStep`** once the deep ritual reaches **Reflect** (**`PauseSession`** keeps that hook enabled through **Frame**, second **Breathe**, and **Decide**), not from `use-holzen` on the non-silent path. Silent mode still writes a stub `reflection_text` on trigger.
 
 This phase is the second "mental model pass": after Phase 1 (who can reach `/pause` and how auth works), we trace **how a manual pause is produced** (reflection + DB writes) and **how the pause UI consumes it** (`PauseSession`, companions, edge functions). If this contract is wrong, users see empty pause screens, wrong companions, or duplicate work.
 
@@ -19,7 +19,7 @@ This phase is the second "mental model pass": after Phase 1 (who can reach `/pau
 
 ## What to understand first (priority)
 
-1. **Producer/consumer contract**: what `useHolzen` writes (`pause_instances` + context snapshot; **silent** stub `reflection_text` on Home) vs what **`use-pause-reflect-generation`** adds once the deep ritual reaches **Reflect** (`holzen-reflect` → `pause_ai_artifacts`; hook stays enabled through **Decide**) vs what `PauseSession` reads (`location.state`, `useHolzen` fallback, `localStorage` session).
+1. **Producer/consumer contract**: what `useHolzen` writes (`pause_instances` + context snapshot; **silent** stub `reflection_text` on Home) vs what **`use-pause-reflect-generation`** adds once the deep ritual reaches **Reflect** (`holzen-reflect` → `pause_ai_artifacts`; hook stays enabled on **Frame**, second **Breathe**, and **Decide**) vs what `PauseSession` reads (`location.state`, `useHolzen` fallback, `localStorage` session).
 2. **Navigation payload**: `Home` navigates to `/pause` with a specific `state` shape; any other entry (deep link, notification) may omit fields.
 3. **Two-stage companions**: initial haiku/grounding may come from **`holzen-reflect`** at Reflect + upsert; expanded companions + intervention often come from `companion-orchestrate` via `useCompanionData`.
 4. **Cooldowns and errors**: `manualTrigger` respects manual cooldown; **`holzen-reflect`** failures surface on the **Reflect** step (`reflectionError` / retry), not necessarily as Home `useHolzen` errors for non-silent manual.
@@ -81,7 +81,7 @@ This phase is the second "mental model pass": after Phase 1 (who can reach `/pau
 ## Runtime touchpoints: endpoints, events, and side effects
 
 - **Edge function: `holzen-reflect`**
-  - Client: `invokeEdge('holzen-reflect', …)` from **`src/lib/pause-reflect-artifact.ts`** (`generateReflectionAtReflectStep`), used by **`use-pause-reflect-generation.ts`** from **`PauseSession`** once the deep ritual reaches **Reflect** (the hook stays enabled through **Decide**). **`use-holzen`** does **not** invoke it on the non-silent Home path.
+  - Client: `invokeEdge('holzen-reflect', …)` from **`src/lib/pause-reflect-artifact.ts`** (`generateReflectionAtReflectStep`), used by **`use-pause-reflect-generation.ts`** from **`PauseSession`** once the deep ritual reaches **Reflect** (the hook stays enabled on **Frame**, second **Breathe**, and **Decide**). **`use-holzen`** does **not** invoke it on the non-silent Home path.
 - **Edge function: `companion-orchestrate`**
   - Client: `invokeEdge('companion-orchestrate', …)` from `use-companion-data.ts` (multiple call sites for load/regenerate).
 - **Direct Supabase client writes (browser)**:

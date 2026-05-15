@@ -75,7 +75,7 @@ spent — a row without logging still runs but cannot be capped per-user.
 
 | Function                                          | Trigger                          | Provider / model(s)                                        | Logs `generation_attempts` | Fallback on block                          |
 | ------------------------------------------------- | -------------------------------- | ---------------------------------------------------------- | -------------------------- | ------------------------------------------ |
-| `holzen-reflect`                                  | user (SPA; deep ritual **Reflect → Decide**, pause manual or cron-created) | Lovable `gemini-3-flash-preview` → `gemini-2.5-flash`      | ✓                          | Curated fallback pool                      |
+| `holzen-reflect`                                  | user (SPA; deep ritual reflect hook **Reflect → Frame → second Breathe → Decide**, pause manual or cron-created) | Lovable `gemini-3-flash-preview` → `gemini-2.5-flash`      | ✓                          | Curated fallback pool                      |
 | `companion-orchestrate` → signal                  | user / cron                      | Perplexity `sonar-pro` + Lovable `gemini-2.5-flash(-lite)` | ✓                          | Library → cache → curated                  |
 | `companion-orchestrate` → grounding               | user / cron                      | Perplexity `sonar-pro` + Lovable `gemini-2.5-flash(-lite)` | ✓                          | Library → cache → curated                  |
 | `companion-orchestrate` → history                 | user / cron                      | Perplexity `sonar-pro` + Lovable `gemini-2.5-flash(-lite)` | ✓                          | Cache → curated                            |
