@@ -1,7 +1,9 @@
 import { useCallback, useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import { useTranslation } from 'react-i18next';
-import { ChevronLeft, ChevronRight, CirclePlus, Heart } from 'lucide-react';
+import { ChevronLeft, ChevronRight, CirclePlus, Heart, Loader2 } from 'lucide-react';
+import { Skeleton } from '@/components/ui/skeleton';
+import { HomePauseBlockingErrorPanel } from '@/components/home/HomePauseBlockingErrorPanel';
 import { PauseNote } from '@/components/pause/PauseNote';
 import { PauseTags } from '@/components/pause/PauseTags';
 import { pauseStepLayout } from '@/components/pause/pause-step-layout';
@@ -16,6 +18,9 @@ interface Props {
   pauseInstanceId: string | null;
   context: string | null;
   reflectionMessage: string;
+  reflectionLoading?: boolean;
+  reflectionError?: string | null;
+  onReflectionRetry?: () => void;
   /** When false, skip loading / showing the haiku line (profile companion toggle). */
   companionHaikuEnabled: boolean;
   isFavorite: boolean;
@@ -29,6 +34,9 @@ export function PauseReflect({
   pauseInstanceId,
   context,
   reflectionMessage,
+  reflectionLoading = false,
+  reflectionError = null,
+  onReflectionRetry,
   companionHaikuEnabled,
   isFavorite,
   onToggleFavorite,
@@ -118,7 +126,27 @@ export function PauseReflect({
               {context?.trim() ? (
                 <p className="text-xs font-mono uppercase tracking-wide text-muted-foreground">{context.trim()}</p>
               ) : null}
-              <p className="font-editorial text-base leading-relaxed text-foreground sm:text-lg">{reflectionMessage}</p>
+              {reflectionError ? (
+                <HomePauseBlockingErrorPanel
+                  error={reflectionError}
+                  onTryAgain={() => onReflectionRetry?.()}
+                />
+              ) : reflectionLoading && !reflectionMessage.trim() ? (
+                <div className="space-y-2" aria-busy="true">
+                  <div className="flex items-center gap-2 text-muted-foreground">
+                    <Loader2 className="h-3.5 w-3.5 animate-spin" aria-hidden />
+                    <p className="text-xs font-mono">
+                      {t('pause.reflect.generating', { defaultValue: 'Generating reflection…' })}
+                    </p>
+                  </div>
+                  <Skeleton className="h-4 w-full" />
+                  <Skeleton className="h-4 w-5/6" />
+                </div>
+              ) : (
+                <p className="font-editorial text-base leading-relaxed text-foreground sm:text-lg">
+                  {reflectionMessage}
+                </p>
+              )}
               {artifactHaiku?.trim() ? (
                 <p className="pt-1 text-sm italic leading-relaxed text-muted-foreground">{artifactHaiku.trim()}</p>
               ) : null}
@@ -189,6 +217,7 @@ export function PauseReflect({
           variant="outline"
           className={pauseStepLayout.ritualPrimaryOutlineCta}
           onClick={onContinue}
+          disabled={reflectionLoading || Boolean(reflectionError) || !reflectionMessage.trim()}
         >
           {t('pause.steps.continue', { defaultValue: 'Continue' })}
           <ChevronRight className="ml-1 h-4 w-4" aria-hidden />

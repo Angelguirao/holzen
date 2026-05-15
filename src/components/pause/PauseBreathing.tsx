@@ -67,6 +67,8 @@ interface Props {
   ritualSoundMuted?: boolean;
   /** Deep first Breathe post-pattern: tap to run three more rounds from intro (parent clears segment completion). */
   onRepeatDeepFirstBreathPattern?: () => void;
+  /** Deep second Breathe post-pattern: same affordance as first interstitial (wireframe 330:23551). */
+  onRepeatDeepSecondBreathPattern?: () => void;
 }
 
 /** Brief ritual: no post-pattern card; advance as soon as the timed cycles finish. */
@@ -107,6 +109,7 @@ export const PauseBreathing = forwardRef<PauseBreathingHandle, Props>(function P
     onTimedBreathingChange,
     ritualSoundMuted = false,
     onRepeatDeepFirstBreathPattern,
+    onRepeatDeepSecondBreathPattern,
   },
   ref,
 ) {
@@ -268,20 +271,6 @@ export const PauseBreathing = forwardRef<PauseBreathingHandle, Props>(function P
     : 0;
 
   const introKicker = t('pause.breathIntroKickerRitual', { defaultValue: 'Breathe' });
-
-  const interstitialTitle =
-    breathSegment === 'second'
-      ? t('pause.breathInterstitialTitleSecond', { defaultValue: 'You stayed with it' })
-      : t('pause.breathInterstitialTitle', { defaultValue: 'You stayed with it' });
-
-  const interstitialBody =
-    breathSegment === 'second'
-      ? t('pause.breathInterstitialBodySecond', {
-          defaultValue: 'When you are ready, continue to your decision.',
-        })
-      : t('pause.breathInterstitialBody', {
-          defaultValue: 'When you are ready, continue into reflection.',
-        });
 
   return (
     <motion.div
@@ -478,30 +467,56 @@ export const PauseBreathing = forwardRef<PauseBreathingHandle, Props>(function P
           initial={{ opacity: 0, y: 8 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8 }}
-          className="flex flex-col items-center gap-5 text-center"
+          className="flex max-w-md flex-col items-center gap-6 px-2 text-center"
         >
-          <div className="h-20 w-20 rounded-full border border-border/60 bg-muted/40" />
-          <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-muted-foreground">
-            {t('pause.breathYouAreHere', { defaultValue: "You're here" })}
+          <motion.div
+            className="flex shrink-0 items-center justify-center"
+            animate={prefersReduced ? {} : { scale: [1, 1.04, 1] }}
+            transition={{ duration: 6, repeat: Infinity, ease: 'easeInOut' }}
+          >
+            <BreathOrbVisual
+              orbScale={1}
+              phaseProgress={1}
+              showHoldMandala
+              holdProgress={1}
+              prefersReducedMotion={!!prefersReduced}
+            />
+          </motion.div>
+          <p className={pauseStepLayout.screenTitle}>
+            {t('pause.deep.breathSecondInterstitialTitle', { defaultValue: 'You already know' })}
           </p>
-          <p className="text-center font-editorial text-2xl text-foreground sm:text-3xl">{interstitialTitle}</p>
-          <p className="max-w-sm text-sm leading-relaxed text-muted-foreground">{interstitialBody}</p>
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            transition={{ delay: 0.5, duration: 0.8 }}
+            transition={{ delay: 0.35, duration: 0.6 }}
+            className="flex flex-wrap items-center justify-center gap-3 pt-1 sm:gap-6"
           >
+            {onRepeatDeepSecondBreathPattern ? (
+              <Button
+                type="button"
+                variant="ghost"
+                className="gap-2 font-semibold text-primary hover:bg-primary/5 hover:text-primary"
+                onClick={() => {
+                  hapticFeedback('light');
+                  onRepeatDeepSecondBreathPattern();
+                }}
+              >
+                <RefreshCw className="h-4 w-4 shrink-0" aria-hidden />
+                {t('pause.deep.breathSecondRepeatCta', { defaultValue: 'Three more' })}
+              </Button>
+            ) : null}
             <Button
               type="button"
-              variant="default"
+              variant="outline"
               size="default"
-              className={pauseStepLayout.ritualPrimaryCta}
+              className={pauseStepLayout.ritualPrimaryOutlineCta}
               onClick={() => {
                 hapticFeedback('light');
                 onContinueAfterBreath();
               }}
             >
               {t('pause.steps.continue', { defaultValue: 'Continue' })}
+              <ChevronRight className="ml-1 h-4 w-4 shrink-0" aria-hidden />
             </Button>
           </motion.div>
         </motion.div>

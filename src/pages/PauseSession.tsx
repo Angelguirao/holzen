@@ -236,7 +236,7 @@ export default function PauseSession() {
     refreshPendingOffer,
   ]);
 
-  const hasCoalescedShellMessage = message.length > 0;
+  const hasCoalescedShellSession = Boolean(pauseInstanceId) || message.length > 0;
 
   const waitingForFetch = isPauseSessionWaitingForInstanceFetch({
     hydrationStatus: hydration.status,
@@ -534,6 +534,20 @@ export default function PauseSession() {
     queueMicrotask(() => breathingRef.current?.resetToIntro());
   }, [breathingRef, setSwipeDirection, setBreathingFirstCompleted, setBreathTimedActive]);
 
+  const handleDeepSecondBreathRepeat = useCallback(() => {
+    setSwipeDirection('back');
+    setBreathingSecondCompleted(false);
+    setBreathTimedActive(false);
+    setBreathSecondTimedPatternStarted(false);
+    queueMicrotask(() => breathingRef.current?.resetToIntro());
+  }, [
+    breathingRef,
+    setSwipeDirection,
+    setBreathingSecondCompleted,
+    setBreathTimedActive,
+    setBreathSecondTimedPatternStarted,
+  ]);
+
   const handleBriefSwitchToDeepPause = useCallback(() => {
     if (!requirePro('deep_pause')) return;
     setSwipeDirection('forward');
@@ -601,7 +615,7 @@ export default function PauseSession() {
   const sessionOnPicker = isPauseSessionDepthPickerActive({
     phase,
     ritualEntry,
-    hasShellMessage: hasCoalescedShellMessage,
+    hasShellMessage: hasCoalescedShellSession,
   });
 
   const scaffoldRitualDerived = buildPauseSessionScaffoldRitualDerived({
@@ -671,12 +685,14 @@ export default function PauseSession() {
     handleDeepChooseBridgeContinue,
     decideOnBackStep,
     handleDeepFirstBreathRepeat,
+    handleDeepSecondBreathRepeat,
+    severityAbsPct: Math.abs(btcData?.changePercent ?? 0),
   });
 
   return (
     <Fragment>
       <PauseSessionGate
-        hasMessage={hasCoalescedShellMessage}
+        hasMessage={hasCoalescedShellSession}
         phase={phase}
         waitingForFetch={waitingForFetch}
         fetchFailed={fetchFailed}

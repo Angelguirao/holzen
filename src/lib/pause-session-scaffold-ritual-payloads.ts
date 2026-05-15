@@ -61,6 +61,8 @@ export type PauseSessionScaffoldRitualPayloadsParams = {
   handleDeepChooseBridgeContinue: PauseSessionDeepRitualBodyProps['onDeepChooseBridgeContinue'];
   decideOnBackStep: PauseSessionDeepRitualBodyProps['decideOnBackStep'];
   handleDeepFirstBreathRepeat: PauseSessionDeepRitualBodyProps['onRepeatDeepFirstBreathPattern'];
+  handleDeepSecondBreathRepeat: PauseSessionDeepRitualBodyProps['onRepeatDeepSecondBreathPattern'];
+  severityAbsPct: number;
 };
 
 /** Maps orchestrator deps to `PauseSessionBriefRitualBodyProps` and `PauseSessionDeepRitualBodyProps`. */
@@ -134,6 +136,8 @@ export function buildPauseSessionScaffoldRitualPayloads(
       onDecide: p.handleDecide,
       decideOnBackStep: p.decideOnBackStep,
       onRepeatDeepFirstBreathPattern: p.handleDeepFirstBreathRepeat,
+      onRepeatDeepSecondBreathPattern: p.handleDeepSecondBreathRepeat,
+      severityAbsPct: p.severityAbsPct,
     },
   };
 }
