@@ -1363,9 +1363,9 @@
       },
       "integrate": {
         "title": "Integrate",
-        "line1": "Centered.",
-        "line2": "Quietly.",
-        "hint": "Strength, without force. You stay. Inhale what you are becoming. Here, your way of being is built. Let go. Your center remains. When the timer ends, you'll move on to Decide.",
+        "line1": "Sit, and quiet your mind.",
+        "line2": "Do nothing.",
+        "hint": "When the timer ends, you'll move on to Decide.",
         "repeatBreaths": "Repeat breaths",
         "switchDeep": "Switch to Deep pause",
         "switchDeepLockedHint": "Holzen Pro or free trial required."
