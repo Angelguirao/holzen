@@ -1,8 +1,11 @@
 import { motion } from 'framer-motion';
-import { Flame, Sparkles } from 'lucide-react';
+import { ChevronDown, Flame, Pencil, Sparkles } from 'lucide-react';
+import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useSubscription } from '@/hooks/use-subscription';
+import { OutcomeIcon } from '@/components/icons/OutcomeIcon';
 import { PRICING } from '@/lib/pricing';
+import { TOOLS } from '@/lib/app-routes';
 import { cn } from '@/lib/utils';
 import { ScoreImpact } from './ScoreImpact';
 import { pauseStepLayout } from '@/components/pause/pause-step-layout';
@@ -54,6 +57,9 @@ export function PauseDone({ decision, onReturn, pauseData, doneVariant = 'defaul
             ? t('pause.brief.done.outcomeBought')
             : t('pause.brief.done.outcomeFallback', { defaultValue: 'Nice work' });
 
+    const outcomeIconKey =
+      decision === 'held' || decision === 'sold' || decision === 'bought' ? decision : 'held';
+
     return (
       <motion.div
         initial={{ opacity: 0 }}
@@ -61,32 +67,63 @@ export function PauseDone({ decision, onReturn, pauseData, doneVariant = 'defaul
         transition={{ duration: 0.6 }}
         className={pauseStepLayout.columnDone}
       >
-        <div className="flex w-full max-w-md flex-col items-center gap-6 text-center">
-          <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-muted-foreground">
+        <div className="flex w-full max-w-md flex-col items-center gap-10 text-center">
+          <p className="text-base font-medium italic leading-6 text-muted-foreground">
             {t('pause.brief.done.completedSaved')}
           </p>
-          <h2 className="font-editorial text-2xl leading-tight text-foreground sm:text-3xl">{outcomeHeadline}</h2>
-          <p className="text-sm leading-relaxed text-muted-foreground">{t('pause.brief.done.journeyBody')}</p>
 
-          <div className="w-full rounded-2xl border border-border/60 bg-card/40 px-5 py-6 text-left shadow-sm">
-            <p className="text-center text-[11px] font-semibold uppercase tracking-[0.2em] text-muted-foreground">
+          <div className="flex flex-col items-center gap-4">
+            <OutcomeIcon outcome={outcomeIconKey} size={44} className="text-foreground" aria-hidden />
+            <div className="flex max-w-sm flex-col gap-2">
+              <h2 className="text-[22px] font-normal leading-7 tracking-tight text-foreground">{outcomeHeadline}</h2>
+              <p className="text-sm leading-5 text-foreground">{t('pause.brief.done.journeyBody')}</p>
+            </div>
+          </div>
+
+          <div className="w-full rounded-xl border-2 border-primary bg-muted/20 p-4 text-left shadow-sm">
+            <p className="text-center text-sm font-medium leading-5 text-foreground">
               {t('pause.brief.done.optionalBlockTitle')}
             </p>
-            <p className="mt-4 text-center font-editorial text-lg italic text-primary">
-              {t('pause.brief.done.regulationPreview')}
-            </p>
+
+            <div className="mt-4 flex w-full items-start justify-between gap-3 text-sm leading-5 text-foreground">
+              <Link
+                to={TOOLS.practice.checkin}
+                className="shrink-0 font-normal text-foreground underline-offset-4 transition-colors hover:text-primary hover:underline"
+              >
+                {t('pause.brief.done.checkInAgain', { defaultValue: 'Check in again' })}
+              </Link>
+              <span className="text-right text-sm italic text-muted-foreground">
+                {t('pause.brief.done.checkInMeta', { defaultValue: 'Optional' })}
+              </span>
+            </div>
+
             {moodLabel ? (
-              <p className="mt-4 text-center text-sm text-muted-foreground">
-                <span className="font-medium text-foreground">{t('pause.brief.done.lastEmotionLabel')}: </span>
-                {moodLabel}
-              </p>
+              <div className="mt-4 rounded-lg border-2 border-muted-foreground/35 bg-muted/50 p-4">
+                <div className="flex items-center justify-between gap-2">
+                  <div className="flex min-w-0 flex-1 items-center gap-2">
+                    <span className="shrink-0 text-sm font-medium text-muted-foreground">
+                      {t('pause.brief.done.lastEmotionLabel')}
+                    </span>
+                    <ChevronDown className="h-4 w-4 shrink-0 text-muted-foreground" aria-hidden />
+                    <span className="truncate text-sm font-medium text-foreground">{moodLabel}</span>
+                  </div>
+                  <Link
+                    to={TOOLS.practice.checkin}
+                    className="shrink-0 text-muted-foreground transition-colors hover:text-foreground"
+                    aria-label={t('pause.brief.done.editMoodAria', { defaultValue: 'Update mood in check-in' })}
+                  >
+                    <Pencil className="h-4 w-4" aria-hidden />
+                  </Link>
+                </div>
+              </div>
             ) : null}
+
             {onSaveToJourney ? (
               <div className="mt-6 flex justify-center">
                 <Button
                   type="button"
-                  variant="default"
-                  className={cn(pauseStepLayout.ritualPrimaryCta, 'rounded-full px-8')}
+                  variant="outline"
+                  className={cn(pauseStepLayout.ritualPrimaryOutlineCta, 'rounded-full px-6')}
                   onClick={() => onSaveToJourney()}
                 >
                   {t('pause.brief.done.saveToJourney')}
@@ -95,7 +132,7 @@ export function PauseDone({ decision, onReturn, pauseData, doneVariant = 'defaul
             ) : null}
           </div>
 
-          <Button type="button" variant="outline" className="mt-2 rounded-full" onClick={onReturn}>
+          <Button type="button" variant="outline" className="rounded-full" onClick={onReturn}>
             {t('pause.return')}
           </Button>
         </div>
