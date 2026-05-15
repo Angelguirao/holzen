@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import {
   BRIEF_TRIANGLE_CYCLE_COUNT,
+  holdProgressWithinPhase,
   PAUSE_RITUAL_BREATHING_PATTERN_MODE,
   resolveBreathCycleTotal,
   resolvePauseBreathingPhases,
@@ -49,6 +50,15 @@ describe('pause-breathing-pattern', () => {
         phaseDurationsSec: d,
       }),
     ).toBe(12 + 8 + 3);
+  });
+
+  it('holdProgressWithinPhase maps discrete seconds to 0→1 within a hold', () => {
+    expect(holdProgressWithinPhase(0, 4)).toBe(0);
+    expect(holdProgressWithinPhase(1, 4)).toBeCloseTo(1 / 3);
+    expect(holdProgressWithinPhase(2, 4)).toBeCloseTo(2 / 3);
+    expect(holdProgressWithinPhase(3, 4)).toBe(1);
+    expect(holdProgressWithinPhase(0, 1)).toBe(1);
+    expect(holdProgressWithinPhase(0, 0)).toBe(0);
   });
 
   it('rotatingKickerIndexFromElapsed advances every 2s and holds the last line', () => {
