@@ -2,14 +2,16 @@ import { useLayoutEffect, useRef, useState } from 'react';
 import { motion } from 'framer-motion';
 import { Flame, Pencil, Sparkles } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
-import { useBriefDoneStatsPreview } from '@/hooks/use-brief-done-stats-preview';
+import { Link } from 'react-router-dom';
 import { useSubscription } from '@/hooks/use-subscription';
+import { journeyPath } from '@/lib/app-routes';
 import { PAUSE_MOOD_VALUES, type MoodValue } from '@/components/MoodCheck';
 import { MoodIcon } from '@/components/icons/MoodIcon';
 import { OutcomeIcon } from '@/components/icons/OutcomeIcon';
 import { PAUSE_FEEL_INTENSITY_KEYS } from '@/components/pause/pause-feel-intensity-labels';
 import { PRICING } from '@/lib/pricing';
 import { cn } from '@/lib/utils';
+import { PauseDoneBriefJourneyRecap } from './PauseDoneBriefJourneyRecap';
 import { ScoreImpact } from './ScoreImpact';
 import { pauseStepLayout } from '@/components/pause/pause-step-layout';
 import { Button } from '@/components/ui/button';
@@ -18,7 +20,6 @@ import { Slider } from '@/components/ui/slider';
 import { pauseLogStep } from '@/lib/pause-api';
 import { buildPostPauseEmotionLoggedPayload, isPauseMoodValue } from '@/lib/pause-post-pause-emotion-log';
 import { showPauseStepSyncFailedToast } from '@/lib/pause-step-sync-toast';
-import type { BriefSkillDeltaKey } from '@/lib/pause-brief-stats-preview';
 
 interface PauseData {
   mood: string | null;
@@ -51,15 +52,6 @@ function clampFeelIntensity(n: number | null | undefined): number {
   return 3;
 }
 
-function formatSkillDelta(delta: number): string {
-  if (delta > 0) return `+${delta}`;
-  return String(delta);
-}
-
-function holzenScoreSkillLabelKey(key: BriefSkillDeltaKey): string {
-  return `holzenScore.${key}`;
-}
-
 export function PauseDone({
   decision,
   onReturn,
@@ -88,11 +80,6 @@ export function PauseDone({
     initialFeelSnapshotRef.current = { mood: m, intensity: int };
     // eslint-disable-next-line react-hooks/exhaustive-deps -- mood/feel fields only; full `pauseData` identity would reset in-progress edits
   }, [doneVariant, pauseInstanceId, pauseData?.mood, pauseData?.feelIntensity]);
-
-  const statsPreview = useBriefDoneStatsPreview({
-    enabled: doneVariant === 'brief' && Boolean(pauseInstanceId),
-    pauseInstanceId,
-  });
 
   const handleSaveToJourney = async () => {
     if (!onSaveToJourney) return;
@@ -165,105 +152,25 @@ export function PauseDone({
 
           <div className="w-full max-w-md space-y-3 text-center">
             <p className="text-sm font-medium leading-snug text-foreground">{journeyShort}</p>
-            {statsPreview.kind === 'loading' ? (
-              <p className="mx-auto max-w-sm animate-pulse text-[11px] leading-snug text-muted-foreground">
-                {t('pause.brief.done.statsPreviewLoading', {
-                  defaultValue: 'Updating your Journey snapshot…',
-                })}
-              </p>
-            ) : null}
-            {statsPreview.kind === 'error' || statsPreview.kind === 'sync_pending' ? (
-              <p className="mx-auto max-w-sm text-[11px] leading-snug text-muted-foreground">
-                {statsPreview.kind === 'sync_pending'
-                  ? t('pause.brief.done.statsPreviewSyncPending', {
-                      defaultValue: 'Journey totals will catch up in a moment — this pause is already saved.',
-                    })
-                  : t('pause.brief.done.statsPreviewError', {
-                      defaultValue: 'Could not load score preview. Your pause is still saved to Journey.',
-                    })}
-              </p>
-            ) : null}
-            {statsPreview.kind === 'ready' ? (
-              <>
-                {statsPreview.preview.status === 'first_pause' ? (
-                  <p className="mx-auto max-w-sm text-xs leading-snug text-foreground">
-                    {t('pause.brief.done.statsPreviewFirstPause', {
-                      defaultValue:
-                        'Your first completed pause — Journey baseline starts here. Holzen score: {{score}}.',
-                      score: statsPreview.preview.compositeScore,
-                    })}
-                  </p>
-                ) : statsPreview.preview.status === 'delta' &&
-                  statsPreview.preview.compositeDelta === 0 &&
-                  statsPreview.preview.skills.length === 0 ? (
-                  <p className="mx-auto max-w-sm text-xs leading-snug text-muted-foreground">
-                    {t('pause.brief.done.statsPreviewFlat', {
-                      defaultValue:
-                        'Rolling Journey scores are unchanged by adding this pause to your last-30 window — it still shapes your long-term pattern.',
-                    })}
-                  </p>
-                ) : statsPreview.preview.status === 'delta' ? (
-                  <div className="flex flex-wrap justify-center gap-2">
-                    {statsPreview.preview.compositeDelta !== 0 ? (
-                      <span className="inline-flex items-baseline gap-1 rounded-full border border-primary/20 bg-primary/5 px-3 py-1.5 text-xs font-medium text-foreground">
-                        <span
-                          className={
-                            statsPreview.preview.compositeDelta > 0
-                              ? 'text-nox-accent-green'
-                              : statsPreview.preview.compositeDelta < 0
-                                ? 'text-destructive/90'
-                                : 'text-muted-foreground'
-                          }
-                        >
-                          {formatSkillDelta(statsPreview.preview.compositeDelta)}
-                        </span>
-                        <span>
-                          {t('pause.brief.done.statsPreviewHolzenChip', {
-                            defaultValue: 'Holzen',
-                          })}
-                        </span>
-                      </span>
-                    ) : null}
-                    {statsPreview.preview.skills.map((s) => (
-                      <span
-                        key={s.key}
-                        className="inline-flex items-baseline gap-1 rounded-full border border-primary/20 bg-primary/5 px-3 py-1.5 text-xs font-medium text-foreground"
-                      >
-                        <span
-                          className={
-                            s.delta > 0
-                              ? 'text-nox-accent-green'
-                              : s.delta < 0
-                                ? 'text-destructive/90'
-                                : 'text-muted-foreground'
-                          }
-                        >
-                          {formatSkillDelta(s.delta)}
-                        </span>
-                        <span>{t(holzenScoreSkillLabelKey(s.key))}</span>
-                      </span>
-                    ))}
-                  </div>
-                ) : null}
-                {statsPreview.preview.status === 'first_pause' ? (
-                  <p className="mx-auto max-w-sm text-[11px] leading-snug text-muted-foreground">
-                    {t('pause.brief.done.statsPreviewFirstPauseNote', {
-                      defaultValue:
-                        'Scores use your last 30 completed pauses; they refine as you keep practicing.',
-                    })}
-                  </p>
-                ) : statsPreview.preview.status === 'delta' &&
-                  (statsPreview.preview.compositeDelta !== 0 || statsPreview.preview.skills.length > 0) ? (
-                  <p className="mx-auto max-w-sm text-[11px] leading-snug text-muted-foreground">
-                    {t('pause.brief.done.journeyImpactNote', {
-                      defaultValue:
-                        'Compared to the same last-{{count}} completed-pause roll-up without this pause — same formula as Stats.',
-                      count: statsPreview.preview.sampleSize,
-                    })}
-                  </p>
-                ) : null}
-              </>
-            ) : null}
+            <PauseDoneBriefJourneyRecap pauseData={pauseData} />
+            <p className="mx-auto max-w-sm text-xs leading-relaxed text-foreground">
+              {t('pause.brief.done.practiceAffirmLead', {
+                defaultValue:
+                  'Stopping to decide is what matters here. Journey learns from your pauses over time — not a single grade on this moment.',
+              })}
+            </p>
+            <p className="mx-auto max-w-sm text-[11px] leading-relaxed text-muted-foreground">
+              {t('pause.brief.done.statsPatternExplainer', {
+                defaultValue:
+                  'Holzen and skill bars in Stats summarize patterns across many completed pauses. They can move slowly and are never a verdict on whether pausing was the right call.',
+              })}
+            </p>
+            <Link
+              to={journeyPath('stats')}
+              className="inline-block text-sm font-medium text-nox-text-link underline-offset-4 transition-colors hover:text-nox-text-link/80 hover:underline"
+            >
+              {t('pause.brief.done.openStatsCta', { defaultValue: 'How scores work in Journey' })}
+            </Link>
           </div>
 
           <div className="w-full max-w-md space-y-4 rounded-xl border border-primary bg-card p-4 text-left shadow-sm">
