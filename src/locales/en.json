@@ -1820,7 +1820,7 @@
     "return": "Return",
     "patterns": {
       "triangle": "Triangle",
-      "triangleDesc": "Inhale · hold · exhale (brief + deep ritual)",
+      "triangleDesc": "Inhale · hold · exhale (brief: 3 rounds; deep: 3 then 2)",
       "box": "Box",
       "boxDesc": "4-4-4-4 · Grounding",
       "calming": "Calming",
@@ -1842,9 +1842,9 @@
         "h1_0": "No need to move",
         "h1_1": "A pattern forms",
         "h1_2": "Strength, without force",
-        "h2_0": "Inhale what you're becoming",
-        "h2_1": "Here, your way of being is built",
-        "h2_2": "Exhale like you're turning down the noise.",
+        "h2_0": "Last round — same rhythm, gentler effort.",
+        "h2_1": "Nothing to prove in this hold.",
+        "h2_2": "Finish the exhale; widen the gap before you decide.",
         "h3_0": "Last round — same rhythm, gentler effort.",
         "h3_1": "Nothing to prove in this hold.",
         "h3_2": "Finish the exhale; widen the gap before you decide."

@@ -22,7 +22,7 @@ describe('pause-breathing-pattern', () => {
     ]);
   });
 
-  it('resolveBreathCycleTotal: brief 4 rounds, deep first 3, deep second 2', () => {
+  it('resolveBreathCycleTotal: brief 3 rounds, deep first 3, deep second 2', () => {
     expect(resolveBreathCycleTotal('brief', 'first')).toBe(BRIEF_TRIANGLE_CYCLE_COUNT);
     expect(resolveBreathCycleTotal('deep', 'first')).toBe(3);
     expect(resolveBreathCycleTotal('deep', 'second')).toBe(2);
