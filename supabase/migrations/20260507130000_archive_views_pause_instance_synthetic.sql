@@ -3,7 +3,12 @@
 -- non-deleted/archived library rows at all. Echo tab mirrors the same pattern.
 -- Always exclude open states: active, engaged, pending.
 
-CREATE OR REPLACE VIEW public.library_archive_pauses_tab_items AS
+-- Prior revisions used different column positions; `CREATE OR REPLACE VIEW` cannot
+-- rename columns in place (42P16). Drop first per migration-view-safety.
+DROP VIEW IF EXISTS public.library_archive_echo_items CASCADE;
+DROP VIEW IF EXISTS public.library_archive_pauses_tab_items CASCADE;
+
+CREATE VIEW public.library_archive_pauses_tab_items AS
 WITH
   synth_title AS (
     SELECT
@@ -70,12 +75,12 @@ SELECT
   li.body,
   li.source_type,
   li.source_url,
-  li.pause_instance_id,
   li.tags,
   li.pinned,
-  li.is_favorite,
-  li.status,
   li.created_at,
+  li.status,
+  li.is_favorite,
+  li.pause_instance_id,
   li.id AS source_library_item_id
 FROM public.library_items li
 LEFT JOIN public.pause_instances pi ON pi.id = li.pause_instance_id
@@ -110,12 +115,12 @@ SELECT
   sb.body,
   'pause'::text AS source_type,
   NULL::text AS source_url,
-  pi.id AS pause_instance_id,
   ARRAY[]::text[] AS tags,
   false AS pinned,
-  false AS is_favorite,
-  'read'::text AS status,
   COALESCE(pi.terminal_at, pi.completed_at, pi.created_at) AS created_at,
+  'read'::text AS status,
+  false AS is_favorite,
+  pi.id AS pause_instance_id,
   NULL::uuid AS source_library_item_id
 FROM public.pause_instances pi
 LEFT JOIN synth_title st ON st.pause_instance_id = pi.id
@@ -145,7 +150,7 @@ ALTER VIEW public.library_archive_pauses_tab_items SET (security_invoker = true)
 GRANT SELECT ON public.library_archive_pauses_tab_items TO authenticated;
 GRANT SELECT ON public.library_archive_pauses_tab_items TO service_role;
 
-CREATE OR REPLACE VIEW public.library_archive_echo_items AS
+CREATE VIEW public.library_archive_echo_items AS
 WITH
   synth_title AS (
     SELECT
@@ -212,12 +217,12 @@ SELECT
   li.body,
   li.source_type,
   li.source_url,
-  li.pause_instance_id,
   li.tags,
   li.pinned,
-  li.is_favorite,
-  li.status,
   li.created_at,
+  li.status,
+  li.is_favorite,
+  li.pause_instance_id,
   li.id AS source_library_item_id
 FROM public.library_items li
 INNER JOIN public.pause_instances pi ON pi.id = li.pause_instance_id
@@ -247,12 +252,12 @@ SELECT
   sb.body,
   'pause'::text AS source_type,
   NULL::text AS source_url,
-  pi.id AS pause_instance_id,
   ARRAY[]::text[] AS tags,
   false AS pinned,
-  false AS is_favorite,
-  'read'::text AS status,
   COALESCE(pi.terminal_at, pi.completed_at, pi.created_at) AS created_at,
+  'read'::text AS status,
+  false AS is_favorite,
+  pi.id AS pause_instance_id,
   NULL::uuid AS source_library_item_id
 FROM public.pause_instances pi
 LEFT JOIN synth_title st ON st.pause_instance_id = pi.id
@@ -309,12 +314,12 @@ AS $$
       li.body,
       li.source_type,
       li.source_url,
-      li.pause_instance_id,
       li.tags,
       li.pinned,
-      li.is_favorite,
+      li.created_at,
       li.status,
-      li.created_at
+      li.is_favorite,
+      li.pause_instance_id
     FROM public.library_items li
     WHERE li.user_id = auth.uid()
       AND p_segment = 'default'
@@ -355,12 +360,12 @@ AS $$
       v.body,
       v.source_type,
       v.source_url,
-      v.pause_instance_id,
       v.tags,
       v.pinned,
-      v.is_favorite,
+      v.created_at,
       v.status,
-      v.created_at
+      v.is_favorite,
+      v.pause_instance_id
     FROM public.library_archive_echo_items v
     WHERE v.user_id = auth.uid()
       AND p_segment = 'echo'
@@ -400,12 +405,12 @@ AS $$
       v.body,
       v.source_type,
       v.source_url,
-      v.pause_instance_id,
       v.tags,
       v.pinned,
-      v.is_favorite,
+      v.created_at,
       v.status,
-      v.created_at
+      v.is_favorite,
+      v.pause_instance_id
     FROM public.library_archive_pauses_tab_items v
     WHERE v.user_id = auth.uid()
       AND p_segment = 'pauses'

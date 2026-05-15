@@ -1,8 +1,16 @@
 BEGIN;
 
-DROP TRIGGER IF EXISTS trg_notifications_reflections ON public.reflections;
-DROP TRIGGER IF EXISTS trg_reflections_set_engaged_at ON public.reflections;
-DROP TRIGGER IF EXISTS trg_notifications_pause_notifications ON public.pause_notifications;
+DO $drop_refl_triggers$
+BEGIN
+  IF to_regclass('public.reflections') IS NOT NULL THEN
+    DROP TRIGGER IF EXISTS trg_notifications_reflections ON public.reflections;
+    DROP TRIGGER IF EXISTS trg_reflections_set_engaged_at ON public.reflections;
+  END IF;
+  IF to_regclass('public.pause_notifications') IS NOT NULL THEN
+    DROP TRIGGER IF EXISTS trg_notifications_pause_notifications ON public.pause_notifications;
+  END IF;
+END;
+$drop_refl_triggers$;
 
 DROP FUNCTION IF EXISTS public.notifications_from_reflections();
 DROP FUNCTION IF EXISTS public.notifications_from_pause_notifications();

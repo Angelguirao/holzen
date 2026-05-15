@@ -1,7 +1,7 @@
 -- Pauses archive tab: server-side row set (excludes anything tied to an echo-only pause instance).
 -- Matches src/lib/archive-segment.ts itemBelongsToPausesTab (echo = expired|dismissed + engaged_at IS NULL).
 -- Membership uses pause_instances; card UI still hydrates from v_pause_full.
-CREATE VIEW public.library_archive_pauses_tab_items AS
+CREATE OR REPLACE VIEW public.library_archive_pauses_tab_items AS
 SELECT li.*
 FROM public.library_items li
 LEFT JOIN public.pause_instances pi ON pi.id = li.pause_instance_id
