@@ -244,6 +244,15 @@ export default function PauseSession() {
     fetchedInstance,
   });
 
+  const restoredStep = mapPersistedStep(restored?.step);
+
+  const [step, setStep] = useState<PauseStep>(restoredStep);
+  const [decideOnBackStep, setDecideOnBackStep] = useState<'choose' | 'breath2'>(() =>
+    initialDecideOnBackStepFromPersisted(restored),
+  );
+  const [phase, setPhase] = useState<'session' | 'done'>(() => initialPhaseFromRestored(restored));
+  const [decision, setDecision] = useState<string | null>(() => initialDecisionFromRestored(restored));
+
   usePauseSessionTerminalEntryRedirect({
     pauseInstanceId: pauseInstanceIdForTerminal,
     shellReady:
@@ -257,16 +266,9 @@ export default function PauseSession() {
     fetchPauseInstanceId,
     fetchedInstance,
     restored,
+    pauseSessionPhase: phase,
   });
 
-  const restoredStep = mapPersistedStep(restored?.step);
-
-  const [step, setStep] = useState<PauseStep>(restoredStep);
-  const [decideOnBackStep, setDecideOnBackStep] = useState<'choose' | 'breath2'>(() =>
-    initialDecideOnBackStepFromPersisted(restored),
-  );
-  const [phase, setPhase] = useState<'session' | 'done'>(() => initialPhaseFromRestored(restored));
-  const [decision, setDecision] = useState<string | null>(() => initialDecisionFromRestored(restored));
   const [isFavorite, setIsFavorite] = useState(false);
   const { toggleFavorite } = usePauseFavoriteToggle({
     pauseInstanceId,
