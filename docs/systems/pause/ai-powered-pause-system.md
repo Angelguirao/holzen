@@ -196,7 +196,7 @@ Up to **five** recent haikus and **five** recent reflect-step **messages** (from
 
 - **Reflect path:** `**pause_ai_call`** is inserted **before** `**generateUnifiedReflection`** inside edge **`holzen-reflect`** (whether the pause was created manually or by cron). `**reflection_generated`** fires after success. `**companion-orchestrate`** still runs `**checkRateLimit`** on its own invoke. Details: **§11.1**.
 
-*Why:* manual and automatic should not diverge in **cost accounting** or **allowlisted** event semantics.
+*Why:* automatic and manual pauses converge on the **same** browser **`holzen-reflect`** call at **Reflect**, so **`pause_ai_call`** / **`reflection_generated`** semantics stay aligned once the user opens the ritual.
 
 ---
 
