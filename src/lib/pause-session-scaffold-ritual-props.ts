@@ -34,7 +34,7 @@ function deepPauseMacroSubline(
     return t('pause.deep.reflectStepDurationHint', { defaultValue: '~ 3 min' });
   }
   if (step === 'frame') {
-    return t('pause.deep.frameStepDurationHint', { defaultValue: '~ 2 min' });
+    return t('pause.reflect.subtitle', { defaultValue: 'Take your time' });
   }
   return undefined;
 }

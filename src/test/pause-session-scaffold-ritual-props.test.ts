@@ -19,7 +19,7 @@ const t = ((
   if (key === 'pause.deep.breatheStepDurationHintCalming') return '~ 1 min';
   if (key === 'pause.deep.breath2StepDurationHint') return '< 1 min';
   if (key === 'pause.deep.reflectStepDurationHint') return '~ 3 min';
-  if (key === 'pause.deep.frameStepDurationHint') return '~ 2 min';
+  if (key === 'pause.reflect.subtitle') return 'Take your time';
   if (key === 'pause.macroProgressStepCompleted') return 'Completed';
   return key;
 }) as TFunction;
@@ -176,14 +176,14 @@ describe('buildPauseSessionScaffoldRitualDerived', () => {
     expect(d.macroProgressSubline).toBe('~ 3 min');
   });
 
-  it('deep frame: macro subline duration hint', () => {
+  it('deep frame: macro subline matches Reflect subtitle (Take your time)', () => {
     const d = buildPauseSessionScaffoldRitualDerived({
       ritualEntry: 'deep',
       step: 'frame',
       t,
     });
     expect(d.macroProgressLine).toBe('4 of 6');
-    expect(d.macroProgressSubline).toBe('~ 2 min');
+    expect(d.macroProgressSubline).toBe('Take your time');
   });
 
   it('picker follows deep scaffold rules (same ternary as pre-refactor PauseSession)', () => {
