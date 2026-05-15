@@ -52,9 +52,10 @@ describe('pause-breathing-pattern', () => {
   });
 
   it('rotatingKickerIndexFromElapsed advances every 2s and holds the last line', () => {
-    expect(rotatingKickerIndexFromElapsed(0, 17, RITUAL_TRIANGLE_KICKER_INTERVAL_SEC)).toBe(0);
-    expect(rotatingKickerIndexFromElapsed(2, 17, RITUAL_TRIANGLE_KICKER_INTERVAL_SEC)).toBe(1);
-    expect(rotatingKickerIndexFromElapsed(33, 17, RITUAL_TRIANGLE_KICKER_INTERVAL_SEC)).toBe(16);
-    expect(rotatingKickerIndexFromElapsed(40, 17, RITUAL_TRIANGLE_KICKER_INTERVAL_SEC)).toBe(16);
+    const n = 15;
+    expect(rotatingKickerIndexFromElapsed(0, n, RITUAL_TRIANGLE_KICKER_INTERVAL_SEC)).toBe(0);
+    expect(rotatingKickerIndexFromElapsed(2, n, RITUAL_TRIANGLE_KICKER_INTERVAL_SEC)).toBe(1);
+    expect(rotatingKickerIndexFromElapsed(33, n, RITUAL_TRIANGLE_KICKER_INTERVAL_SEC)).toBe(14);
+    expect(rotatingKickerIndexFromElapsed(40, n, RITUAL_TRIANGLE_KICKER_INTERVAL_SEC)).toBe(14);
   });
 });
