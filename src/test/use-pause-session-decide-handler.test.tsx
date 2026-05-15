@@ -68,6 +68,8 @@ function baseInput(overrides: Partial<Parameters<typeof usePauseSessionDecideHan
     breathingSecondCompleted: true,
     feelIntensity: null as number | null,
     shiftIntensity: null as number | null,
+    reflectionMessage: 'Reflection text',
+    haiku: null as string | null,
     ...overrides,
   };
 }

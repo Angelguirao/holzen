@@ -31,7 +31,7 @@ function deepPauseMacroSubline(
       : t('pause.deep.breath2StepDurationHint', { defaultValue: '< 1 min' });
   }
   if (step === 'reflect') {
-    return t('pause.deep.reflectStepDurationHint', { defaultValue: '3 min' });
+    return t('pause.deep.reflectStepDurationHint', { defaultValue: '~ 3 min' });
   }
   if (step === 'frame') {
     return t('pause.deep.frameStepDurationHint', { defaultValue: '~ 2 min' });

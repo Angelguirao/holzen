@@ -14,6 +14,9 @@ export type PauseImpactData = {
   feelIntensity?: number | null;
   shiftIntensity?: number | null;
   reinforcementQuote?: string | null;
+  /** Reflection body at outcome time — for Done-shell share / wallpaper (not on Reflect step). */
+  reflectionMessage?: string | null;
+  haiku?: string | null;
 };
 
 export type BuildPauseImpactDataOnCompleteInput = {
@@ -27,6 +30,8 @@ export type BuildPauseImpactDataOnCompleteInput = {
   feelIntensity: number | null;
   shiftIntensity: number | null;
   reinforcementQuote: string;
+  reflectionMessage: string;
+  haiku: string | null;
 };
 
 /** Builds the payload for `setPauseImpactData` after `outcome_logged` succeeds. */
@@ -46,5 +51,7 @@ export function buildPauseImpactDataOnComplete(p: BuildPauseImpactDataOnComplete
     feelIntensity: p.feelIntensity,
     shiftIntensity: p.shiftIntensity,
     reinforcementQuote: p.reinforcementQuote,
+    reflectionMessage: p.reflectionMessage.trim() || null,
+    haiku: p.haiku?.trim() ? p.haiku.trim() : null,
   };
 }

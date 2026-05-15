@@ -30,6 +30,8 @@ export function usePauseSessionDecideHandler(input: {
   breathingSecondCompleted: boolean;
   feelIntensity: number | null;
   shiftIntensity: number | null;
+  reflectionMessage: string;
+  haiku: string | null;
 }): { handleDecide: (d: string) => Promise<void> } {
   const { user } = useAuth();
   const {
@@ -49,6 +51,8 @@ export function usePauseSessionDecideHandler(input: {
     breathingSecondCompleted,
     feelIntensity,
     shiftIntensity,
+    reflectionMessage,
+    haiku,
   } = input;
 
   const handleDecide = useCallback(
@@ -91,6 +95,8 @@ export function usePauseSessionDecideHandler(input: {
             feelIntensity,
             shiftIntensity,
             reinforcementQuote: `"${q.text}" — ${q.author}`,
+            reflectionMessage,
+            haiku,
           }),
         );
         // Must commit `done` before `await dismissMessage()` — otherwise React can paint an
@@ -116,6 +122,8 @@ export function usePauseSessionDecideHandler(input: {
       breathingSecondCompleted,
       feelIntensity,
       shiftIntensity,
+      reflectionMessage,
+      haiku,
       refreshSubscription,
       user?.id,
       t,

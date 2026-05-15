@@ -18,8 +18,8 @@ export type PauseSessionHeaderBackInput = {
  * Mirrors `showPauseHeaderBack` in `PauseSession` (brief vs non-brief branches).
  *
  * **Brief:** chevron on **Breathe** only **before** the timed pattern starts (intro → Feel to change mood).
- * **Deep:** same on **first Breathe** intro only; hidden after Start through interstitial; still hidden on **second Breathe**
- * (`breath2`); shown on later macro steps.
+ * **Deep:** same on **first Breathe** intro only; hidden on **second Breathe**
+ * (`breath2`); hidden on **Reflect** (Continue-only; back returns from **Frame** to add notes); shown from **Frame** onward.
  */
 export function isPauseSessionHeaderBackVisible(p: PauseSessionHeaderBackInput): boolean {
   if (p.phase !== 'session') return false;
@@ -28,6 +28,7 @@ export function isPauseSessionHeaderBackVisible(p: PauseSessionHeaderBackInput):
   }
   if (p.step === 'breathe') return !p.breathFirstTimedPatternStarted;
   if (p.step === 'breath2') return false;
+  if (p.step === 'reflect') return false;
   return STEPS.indexOf(p.step) > 0;
 }
 

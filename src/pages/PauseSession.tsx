@@ -571,6 +571,8 @@ export default function PauseSession() {
     breathingSecondCompleted,
     feelIntensity,
     shiftIntensity,
+    reflectionMessage: message,
+    haiku: companions.haiku ?? null,
   });
 
   const { depthContextLine } = usePauseSessionDepthAndBriefCopy({
@@ -645,6 +647,7 @@ export default function PauseSession() {
     handleContinueAfterSecondBreath,
     handleSkipFirstBreath,
     handleSkipSecondBreath,
+    prefersReducedMotion: !!prefersReducedMotion,
     companions,
     companionPrefs,
     pauseInstanceId,

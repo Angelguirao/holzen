@@ -18,7 +18,7 @@ const t = ((
   if (key === 'pause.deep.breatheStepDurationHint') return '< 1 min';
   if (key === 'pause.deep.breatheStepDurationHintCalming') return '~ 1 min';
   if (key === 'pause.deep.breath2StepDurationHint') return '< 1 min';
-  if (key === 'pause.deep.reflectStepDurationHint') return '3 min';
+  if (key === 'pause.deep.reflectStepDurationHint') return '~ 3 min';
   if (key === 'pause.deep.frameStepDurationHint') return '~ 2 min';
   if (key === 'pause.macroProgressStepCompleted') return 'Completed';
   return key;
@@ -173,7 +173,7 @@ describe('buildPauseSessionScaffoldRitualDerived', () => {
       t,
     });
     expect(d.macroProgressLine).toBe('3 of 6');
-    expect(d.macroProgressSubline).toBe('3 min');
+    expect(d.macroProgressSubline).toBe('~ 3 min');
   });
 
   it('deep frame: macro subline duration hint', () => {

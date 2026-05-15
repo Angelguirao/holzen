@@ -38,6 +38,7 @@ function setup(overrides: Partial<Parameters<typeof buildPauseSessionScaffoldRit
     handleBriefBreathContinue,
     handleBriefSkipBreath: vi.fn(),
     soundMuted: false,
+    prefersReducedMotion: false,
     briefIntegrateDone: false,
     handleBriefIntegrateComplete: vi.fn(),
     handleBriefRepeatBreaths: vi.fn(),
@@ -141,11 +142,19 @@ describe('buildPauseSessionScaffoldRitualPayloads', () => {
     const { params, setBreathTimedActive } = setup();
     const { briefRitual, deepRitual } = buildPauseSessionScaffoldRitualPayloads(params);
 
+    expect(deepRitual.prefersReducedMotion).toBe(false);
+
     briefRitual.onTimedBreathingChange(true);
     expect(setBreathTimedActive).toHaveBeenLastCalledWith(true);
 
     deepRitual.onTimedBreathingChange(false);
     expect(setBreathTimedActive).toHaveBeenLastCalledWith(false);
+  });
+
+  it('maps prefersReducedMotion onto deep ritual', () => {
+    const { params } = setup({ prefersReducedMotion: true });
+    const { deepRitual } = buildPauseSessionScaffoldRitualPayloads(params);
+    expect(deepRitual.prefersReducedMotion).toBe(true);
   });
 
   it('wires brief integrate repeat / deep switch and deepPauseLocked from subscription', () => {
