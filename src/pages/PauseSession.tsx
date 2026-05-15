@@ -561,8 +561,6 @@ export default function PauseSession() {
     [ritualEntry, briefStep],
   );
 
-  const briefDecideIntroKicker = t('pause.brief.decideKicker', { defaultValue: 'Step 4 · Decide' });
-
   const engagedOpenMaxCountdownSlot = useMemo(() => {
     if (phase !== 'session') return undefined;
     const ea = fetchedInstance?.engaged_at;
@@ -596,7 +594,6 @@ export default function PauseSession() {
     handleBriefRepeatBreaths,
     handleBriefSwitchToDeepPause,
     handleDecide,
-    briefDecideIntroKicker,
     goToStep,
     handleContinueAfterFirstBreath,
     handleContinueAfterSecondBreath,

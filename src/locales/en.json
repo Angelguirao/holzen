@@ -1386,7 +1386,6 @@
         "outcomeBought": "You chose to Buy",
         "outcomeFallback": "Nice work"
       },
-      "decideKicker": "Step 4 · Decide",
       "breathIntroKicker": "Breathe"
     },
     "depthPicker": {

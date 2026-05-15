@@ -43,7 +43,6 @@ export type PauseSessionScaffoldRitualPayloadsParams = {
   handleBriefRepeatBreaths: PauseSessionBriefRitualBodyProps['onBriefRepeatBreaths'];
   handleBriefSwitchToDeepPause: PauseSessionBriefRitualBodyProps['onBriefSwitchToDeepPause'];
   handleDecide: PauseSessionBriefRitualBodyProps['onDecide'];
-  briefDecideIntroKicker: string;
   goToStep: PauseSessionDeepRitualBodyProps['goToStep'];
   handleContinueAfterFirstBreath: () => void | Promise<unknown>;
   handleContinueAfterSecondBreath: () => void | Promise<unknown>;
@@ -96,7 +95,6 @@ export function buildPauseSessionScaffoldRitualPayloads(
       deepPauseLocked: !p.subscribed,
       onDecide: p.handleDecide,
       onBriefDecideBack: () => p.setBriefStep('integrate'),
-      briefDecideIntroKicker: p.briefDecideIntroKicker,
     },
     deepRitual: {
       step: p.step,

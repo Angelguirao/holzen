@@ -43,7 +43,6 @@ function setup(overrides: Partial<Parameters<typeof buildPauseSessionScaffoldRit
     handleBriefRepeatBreaths: vi.fn(),
     handleBriefSwitchToDeepPause: vi.fn(),
     handleDecide: vi.fn(),
-    briefDecideIntroKicker: 'Step 4',
     goToStep: vi.fn(),
     handleContinueAfterFirstBreath: vi.fn(),
     handleContinueAfterSecondBreath: vi.fn(),

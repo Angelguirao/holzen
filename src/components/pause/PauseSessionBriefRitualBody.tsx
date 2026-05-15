@@ -34,7 +34,6 @@ export type PauseSessionBriefRitualBodyProps = {
   deepPauseLocked: boolean;
   onDecide: (decision: string) => void;
   onBriefDecideBack: () => void;
-  briefDecideIntroKicker: string;
 };
 
 /** Brief ritual step panels inside `PauseSessionScaffold` (Framer step transitions preserved). */
@@ -63,7 +62,6 @@ export function PauseSessionBriefRitualBody({
   deepPauseLocked,
   onDecide,
   onBriefDecideBack,
-  briefDecideIntroKicker,
 }: PauseSessionBriefRitualBodyProps) {
   return (
     <AnimatePresence mode="wait" initial={false}>
@@ -117,7 +115,6 @@ export function PauseSessionBriefRitualBody({
           <PauseDecide
             onDecide={onDecide}
             onBack={onBriefDecideBack}
-            introKicker={briefDecideIntroKicker}
             briefDecidePillLayout
             hideChoicesBack
           />
