@@ -17,7 +17,7 @@ This document describes **how Holzen turns Bitcoin volatility into a pause exper
 1. [Conceptual model](#toc-conceptual-model)
 2. [Two triggers: comparison](#toc-two-triggers)
 3. [Reflection generation](#toc-reflection-generation)
-4. [Client flow after reflection (manual path)](#toc-client-flow) — [manual pause — request order (click path)](#toc-manual-pause-request-order)
+4. [Client flow (Pause V2)](#toc-client-flow) — [manual pause — request order (click path)](#toc-manual-pause-request-order)
 5. [companion-orchestrate (single entry point)](#toc-companion-orchestrate)
 6. [Generator family (orchestrated)](#toc-generator-family)
 7. [Interventions and companions (reference)](#toc-interventions-reference)
@@ -33,6 +33,8 @@ This document describes **how Holzen turns Bitcoin volatility into a pause exper
 Links use explicit HTML anchors before each numbered section so jumps behave consistently in GitHub, Cursor, and other Markdown previews (auto-generated heading slugs vary by tool).
 
 ---
+
+<a id="toc-conceptual-model"></a>
 
 ## 1. Conceptual model
 
@@ -69,6 +71,8 @@ flowchart TB
 Reflection text and haiku land in `pause_ai_artifacts` from **`holzen-reflect`** once the user is in the deep ritual’s **Reflect → Decide** window; the **intervention** is fetched first via **`companion-orchestrate`** (intervention-only) once **`pauseInstanceId`** is live in **`PauseSession`**, typically **before** that Reflect window; individual **companion slots** are generated lazily when the user taps a card (or hydrated from existing `pause_ai_artifacts`). **Who calls the orchestrator:** the **`PauseSession`** client (`**use-companion-data`**) for **both** manual- and cron-created pauses. **`check-volatility`** does **not** invoke **`companion-orchestrate`** on automatic pause claim in Pause V2.
 
 ---
+
+<a id="toc-two-triggers"></a>
 
 ## 2. Two triggers: manual vs automatic
 
@@ -249,6 +253,8 @@ flowchart TB
 
 ---
 
+<a id="toc-reflection-generation"></a>
+
 ## 3. Reflection generation (`_shared/reflection-generate.ts`)
 
 - `**generateUnifiedReflection(params)`** — Calls `**https://ai.gateway.lovable.dev/v1/chat/completions`** with `**LOVABLE_API_KEY`**, trying models in order: `**google/gemini-3-flash-preview`**, then `**google/gemini-2.5-flash**` (JSON path uses per-attempt timeouts **12s** then **8s**).
@@ -256,6 +262,8 @@ flowchart TB
 - **Callers:** `holzen-reflect/index.ts` (auth, sanitization, analytics, curated fallback), invoked from the SPA after the deep ritual reaches the **Reflect** beat (the HTTP call may still complete while the user is on **Frame**, second **Breathe**, or **Decide**). **`check-volatility`** creates instances and sends notifications **without** calling this generator.
 
 ---
+
+<a id="toc-client-flow"></a>
 
 ## 4. Client flow (Pause V2)
 
@@ -267,6 +275,8 @@ This section is **client-centric** (Home open → ritual → companions): `**use
 4. `**use-companion-data**` (once **`pauseInstanceId`** is live) — Hydrates companion payloads from **`pause_ai_artifacts`** where present; calls **`companion-orchestrate`** for intervention + cached reads using **`pauseInstanceId`** (typically **before** the deep **Reflect** step).
 5. `**use-companion-data`** (on tap) — `**fetchCompanion(slot)`** calls **`companion-orchestrate`** with a single **`enable*`** flag (`holzenInvokeSource: 'browser_lazy_fetch'`). Results persist via **`writeCompanionData`** into **`pause_ai_artifacts`** (library → cache → live → curated ordering unchanged).
 
+<a id="toc-manual-pause-request-order"></a>
+
 ### 4.1 Manual pause — request order (click path)
 
 `manualTrigger` → `generateMessage` in `**src/hooks/use-holzen.ts**` → Pause UI + `**src/hooks/use-companion-data.ts**`.
@@ -276,7 +286,7 @@ This section is **client-centric** (Home open → ritual → companions): `**use
 | 1 | Browser | `**fetchBtcData**` builds **context** (24h / optional 7d, Fear & Greed / on-chain enrichment). |
 | 2 | Browser + Postgres | **`pauseCreateOrReuse`** → open **`pause_instances`** row (no reflection AI yet). |
 | 3 | Pause UI — Reflect | Edge **`holzen-reflect`** → **`pause_ai_artifacts`** (`reflection_text`, optional `haiku` / `ground_nudge`). |
-| 4 | Pause UI | **`use-companion-data`** uses **`pauseInstanceId`**; intervention + lazy fetches call **`companion-orchestrate`**. |
+| 4 | Pause UI | **`use-companion-data`** uses **`pauseInstanceId`**; intervention (often before Reflect) + lazy fetches call **`companion-orchestrate`**. |
 
 **Silent mode:** `**holzen-reflect**` is not called; client still runs **`pauseCreateOrReuse`** and writes “BTC moved.” into **`pause_ai_artifacts`**.
 
@@ -358,6 +368,8 @@ flowchart LR
 
 ---
 
+<a id="toc-generator-family"></a>
+
 ## 6. Generator family (orchestrated)
 
 The pause UI invokes **`companion-orchestrate`** (via **`use-companion-data`**); **`companion-orchestrate`** imports **`_shared/generators/*`** in-process. There are no separate HTTP edge functions for individual companions—the generators are the implementation. **`check-volatility`** is **not** a caller of **`companion-orchestrate`** for Pause V2 automatic claims.
@@ -380,6 +392,8 @@ The pause UI invokes **`companion-orchestrate`** (via **`use-companion-data`**);
 For a full breakdown of **which intervention** maps to **which generator output** and **which UI block** shows it, see **§7**.
 
 ---
+
+<a id="toc-interventions-reference"></a>
 
 ## 7. Interventions and companions (reference)
 
@@ -598,6 +612,8 @@ Reads that need hydrated pause + companion text use **`v_pause_full`** and/or **
 
 ---
 
+<a id="toc-data-written"></a>
+
 ## 8. Data written by this system
 
 - `**pause_instances**` — Canonical pause row: state machine, `**context_snapshot**`, outcomes, timestamps (see [pause-system.md](../pause-system.md)).
@@ -611,6 +627,8 @@ Reads that need hydrated pause + companion text use **`v_pause_full`** and/or **
 - `**profiles**` — `**last_message**` / `**last_context**`: updated by **`check-volatility`** when a cron pause message is created (not by **`use-holzen`** today); `**last_trigger_at**` follows the automatic claim path (see §2 / cron docs).
 
 ---
+
+<a id="toc-frontend-surfaces"></a>
 
 ## 9. Frontend surfaces
 
@@ -652,6 +670,8 @@ Page mounts fire a single `companion_fullview_opened` analytics event (user, pau
 
 ---
 
+<a id="toc-background-jobs"></a>
+
 ## 10. Background jobs (pause-adjacent)
 
 Exact SQL lives in **[cron-setup.md](../../ops/cron-setup.md)**. Typical schedules documented there:
@@ -667,6 +687,8 @@ Exact SQL lives in **[cron-setup.md](../../ops/cron-setup.md)**. Typical schedul
 
 
 ---
+
+<a id="toc-known-issues"></a>
 
 ## 11. Operating assumptions, drift, and history
 
@@ -707,6 +729,8 @@ Intentional or deferred behavior — **not** parity bugs.
 
 ---
 
+<a id="toc-cost-limits"></a>
+
 ## 12. Cost and limits (orchestrator)
 
 Invoked at the start of `**companion-orchestrate`** only (before parsing the body’s `**enable*`** flags).
@@ -716,6 +740,8 @@ Invoked at the start of `**companion-orchestrate`** only (before parsing the bod
 
 ---
 
+<a id="toc-security"></a>
+
 ## 13. Security notes
 
 - **User JWT** paths validate via `getUser()`.
@@ -724,6 +750,8 @@ Invoked at the start of `**companion-orchestrate`** only (before parsing the bod
 - Prompt hardening: `sanitize.ts`, quality gates, `containsCryptoLanguage`, etc., in shared modules.
 
 ---
+
+<a id="toc-file-index"></a>
 
 ## 14. File index (pause core)
 
@@ -762,6 +790,8 @@ src/pages/Admin.tsx                   # ops UI (Monitor, Content, Sources, …) 
 ```
 
 ---
+
+<a id="toc-related-reading"></a>
 
 ## 15. Related reading
 
