@@ -18,7 +18,7 @@ function isAbortLike(e: unknown): boolean {
 export type UsePauseReflectGenerationParams = {
   pauseInstanceId: string | null;
   context: string | null;
-  /** Hydrated / nav seed — skipped when empty. */
+  /** Hydrated / nav seed — when non-empty, used as-is and skips edge `holzen-reflect`. */
   initialReflectionMessage: string;
   severityAbsPct: number;
   /** When false, aborts in-flight work and idles (outside deep **Reflect → Decide** window in `PauseSession`). */
@@ -42,7 +42,7 @@ export function usePauseReflectGeneration({
   const activeRunRef = useRef(0);
   /** Bumped when `pauseInstanceId` changes so stale async work cannot commit. */
   const validityRef = useRef(0);
-  /** Aborts the in-flight `holzen-reflect` when superseded or the instance changes. */
+  /** Aborts the in-flight `holzen-reflect` when superseded, `pauseInstanceId` changes, `enabled` turns false, or the effect cleans up. */
   const reflectGenAbortRef = useRef<AbortController | null>(null);
 
   useEffect(() => {

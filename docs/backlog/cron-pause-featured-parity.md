@@ -2,7 +2,7 @@
 
 ## Context
 
-Automatic pauses from `check-volatility` create `pause_instances` on claim **without** pre-filling companion **`pause_ai_artifacts`**; expanded content arrives from **`companion-orchestrate`** once **`PauseSession`** runs (intervention on mount, slots on tap). Manual pauses may arrive with more merged `location.state` from the browser.
+Automatic pauses from `check-volatility` create `pause_instances` on claim **without** pre-filling companion **`pause_ai_artifacts`**; expanded content arrives from **`companion-orchestrate`** once **`PauseSession`** runs (intervention-only orchestrate once **`pauseInstanceId`** is bound, slots on tap). Manual pauses may arrive with more merged `location.state` from the browser.
 
 ## What we shipped
 
