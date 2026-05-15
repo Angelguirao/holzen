@@ -7,6 +7,8 @@ export type PauseSessionHeaderBackInput = {
   briefStep: BriefPauseStep;
   step: PauseStep;
   breathTimedActive: boolean;
+  /** True after the user starts the triangle countdown on first Breathe (brief or deep); hides shell back until intro again. */
+  breathFirstTimedPatternStarted: boolean;
   breathingFirstCompleted: boolean;
   breathingSecondCompleted: boolean;
 };
@@ -15,16 +17,16 @@ export type PauseSessionHeaderBackInput = {
  * Whether the pause shell should show the header back affordance.
  * Mirrors `showPauseHeaderBack` in `PauseSession` (brief vs non-brief branches).
  *
- * **Brief:** chevron only on **Breathe** (back to Feel). Feel / Integrate / Decide use CTAs only.
- * **Deep:** same shell back on **first Breathe** (back to Feel); still hidden on **second Breathe**
+ * **Brief:** chevron on **Breathe** only **before** the timed pattern starts (intro → Feel to change mood).
+ * **Deep:** same on **first Breathe** intro only; hidden after Start through interstitial; still hidden on **second Breathe**
  * (`breath2`); shown on later macro steps.
  */
 export function isPauseSessionHeaderBackVisible(p: PauseSessionHeaderBackInput): boolean {
   if (p.phase !== 'session') return false;
   if (p.ritualEntry === 'brief') {
-    return p.briefStep === 'breath';
+    return p.briefStep === 'breath' && !p.breathFirstTimedPatternStarted;
   }
-  if (p.step === 'breathe') return true;
+  if (p.step === 'breathe') return !p.breathFirstTimedPatternStarted;
   if (p.step === 'breath2') return false;
   return STEPS.indexOf(p.step) > 0;
 }

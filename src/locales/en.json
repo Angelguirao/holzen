@@ -1326,7 +1326,10 @@
       "feelStepDurationHint": "~ 15 sec",
       "breatheStepDurationHint": "< 1 min",
       "breatheStepDurationHintCalming": "~ 1 min",
-      "breath2StepDurationHint": "< 1 min"
+      "breath2StepDurationHint": "< 1 min",
+      "breathFirstInterstitialTitle": "Three breaths",
+      "breathFirstInterstitialBody": "You've arrived",
+      "breathFirstRepeatCta": "Three more"
     },
     "feelStep": {
       "title": "What's here?",
@@ -1489,6 +1492,7 @@
     "breathYouAreHere": "You're here",
     "breathIntroKicker": "Step 1 · Breathe",
     "macroProgress": "{{n}} of {{total}} · under ~15 min",
+    "macroProgressStepCompleted": "Completed",
     "muteAriaOn": "Sound on (tap to mute)",
     "muteAriaOff": "Sound off (tap to unmute)",
     "chooseBridgeKicker": "Step 6 · Decide",

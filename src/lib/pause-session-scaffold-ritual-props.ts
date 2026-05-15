@@ -6,15 +6,29 @@ import type { BriefPauseStep, RitualDepth } from '@/lib/pause-session-storage';
 
 type PauseSeverity = 'mild' | 'moderate' | 'high';
 
-function deepPauseMacroSubline(step: PauseStep, t: TFunction): string | undefined {
+function macroProgressStepCompletedLine(t: TFunction): string {
+  return t('pause.macroProgressStepCompleted', { defaultValue: 'Completed' });
+}
+
+function deepPauseMacroSubline(
+  step: PauseStep,
+  t: TFunction,
+  input: { moodDone: boolean; breathingFirstCompleted: boolean; breathingSecondCompleted: boolean },
+): string | undefined {
   if (step === 'feel') {
-    return t('pause.deep.feelStepDurationHint', { defaultValue: '~ 15 sec' });
+    return input.moodDone
+      ? macroProgressStepCompletedLine(t)
+      : t('pause.deep.feelStepDurationHint', { defaultValue: '~ 15 sec' });
   }
   if (step === 'breathe') {
-    return t('pause.deep.breatheStepDurationHint', { defaultValue: '< 1 min' });
+    return input.breathingFirstCompleted
+      ? macroProgressStepCompletedLine(t)
+      : t('pause.deep.breatheStepDurationHint', { defaultValue: '< 1 min' });
   }
   if (step === 'breath2') {
-    return t('pause.deep.breath2StepDurationHint', { defaultValue: '< 1 min' });
+    return input.breathingSecondCompleted
+      ? macroProgressStepCompletedLine(t)
+      : t('pause.deep.breath2StepDurationHint', { defaultValue: '< 1 min' });
   }
   return undefined;
 }
@@ -43,9 +57,24 @@ export function buildPauseSessionScaffoldRitualDerived(input: {
   briefStep?: BriefPauseStep;
   /** Retained for scaffold callers; breathe duration hint is triangle-only for all severities. */
   severity?: PauseSeverity;
+  /** When the Feel step has a confirmed mood (wireframe: macro subline “Completed”). */
+  moodDone?: boolean;
+  /** Deep first Breathe: pattern finished, interstitial showing. */
+  breathingFirstCompleted?: boolean;
+  /** Deep second Breathe: pattern finished, interstitial showing. */
+  breathingSecondCompleted?: boolean;
   t: TFunction;
 }): PauseSessionScaffoldRitualDerived {
-  const { ritualEntry, step, briefStep, severity = 'mild', t } = input;
+  const {
+    ritualEntry,
+    step,
+    briefStep,
+    severity = 'mild',
+    moodDone = false,
+    breathingFirstCompleted = false,
+    breathingSecondCompleted = false,
+    t,
+  } = input;
   void severity;
   if (ritualEntry === 'brief') {
     if (briefStep != null) {
@@ -61,7 +90,9 @@ export function buildPauseSessionScaffoldRitualDerived(input: {
         }),
         macroProgressSubline:
           briefStep === 'feel'
-            ? t('pause.brief.feelStepDurationHint', { defaultValue: '~ 15 sec' })
+            ? moodDone
+              ? macroProgressStepCompletedLine(t)
+              : t('pause.brief.feelStepDurationHint', { defaultValue: '~ 15 sec' })
             : briefStep === 'breath'
               ? t('pause.brief.breathStepDurationHint', { defaultValue: '< 1 min' })
               : briefStep === 'integrate'
@@ -92,7 +123,11 @@ export function buildPauseSessionScaffoldRitualDerived(input: {
         n: macroStepIndex,
         total: macroStepTotal,
       }),
-      macroProgressSubline: deepPauseMacroSubline(step, t),
+      macroProgressSubline: deepPauseMacroSubline(step, t, {
+        moodDone,
+        breathingFirstCompleted,
+        breathingSecondCompleted,
+      }),
     };
   }
   return {
