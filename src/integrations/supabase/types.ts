@@ -3343,6 +3343,7 @@ export type Database = {
         | "note_updated"
         | "tag_updated"
         | "favorite_toggled"
+        | "post_pause_emotion_logged"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -3496,6 +3497,7 @@ export const Constants = {
         "note_updated",
         "tag_updated",
         "favorite_toggled",
+        "post_pause_emotion_logged",
       ],
     },
   },
