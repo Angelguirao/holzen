@@ -24,6 +24,14 @@ export function PauseDecide({ onDecide, onBack, introKicker, briefDecidePillLayo
   const { t } = useTranslation();
   const [mirrorDecision, setMirrorDecision] = useState<string | null>(null);
 
+  /** Figma brief Decide: stepper + “n of total” carry step context — no duplicate “Step 4 · Decide” line. */
+  const introLine =
+    introKicker != null && introKicker.trim() !== ''
+      ? introKicker
+      : briefDecidePillLayout
+        ? null
+        : t('pause.decideIntroKicker', { defaultValue: 'Step 6 · Decide' });
+
   const handleHold = () => {
     hapticFeedback('medium');
     onDecide('held');
@@ -70,9 +78,11 @@ export function PauseDecide({ onDecide, onBack, introKicker, briefDecidePillLayo
             transition={{ duration: 0.3 }}
           >
             <div className="flex flex-col items-center gap-3 text-center">
-              <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-muted-foreground">
-                {introKicker ?? t('pause.decideIntroKicker', { defaultValue: 'Step 6 · Decide' })}
-              </p>
+              {introLine ? (
+                <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-muted-foreground">
+                  {introLine}
+                </p>
+              ) : null}
               <p className={pauseStepLayout.screenTitle}>{t('pause.whatWillYouDo')}</p>
               <p className="max-w-sm text-sm leading-relaxed text-muted-foreground">
                 {t('pause.decideSubcopy', { defaultValue: "You're choosing from your center." })}
@@ -101,20 +111,20 @@ export function PauseDecide({ onDecide, onBack, introKicker, briefDecidePillLayo
                   <Button
                     type="button"
                     variant="outline"
-                    onClick={() => handleAction('sold')}
-                    className="flex flex-1 items-center justify-center gap-2 rounded-full border-primary/40 bg-primary/5 py-3 text-xs font-semibold text-foreground hover:bg-primary/10"
-                  >
-                    <OutcomeIcon outcome="sold" size={14} className="text-muted-foreground" />
-                    {t('ritual.decide.sell', { defaultValue: 'I sold' })}
-                  </Button>
-                  <Button
-                    type="button"
-                    variant="outline"
                     onClick={() => handleAction('bought')}
                     className="flex flex-1 items-center justify-center gap-2 rounded-full border-primary/40 bg-primary/5 py-3 text-xs font-semibold text-foreground hover:bg-primary/10"
                   >
                     <OutcomeIcon outcome="bought" size={14} className="text-muted-foreground" />
                     {t('ritual.decide.buy', { defaultValue: 'I bought' })}
+                  </Button>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={() => handleAction('sold')}
+                    className="flex flex-1 items-center justify-center gap-2 rounded-full border-primary/40 bg-primary/5 py-3 text-xs font-semibold text-foreground hover:bg-primary/10"
+                  >
+                    <OutcomeIcon outcome="sold" size={14} className="text-muted-foreground" />
+                    {t('ritual.decide.sell', { defaultValue: 'I sold' })}
                   </Button>
                 </div>
               </>
@@ -138,22 +148,22 @@ export function PauseDecide({ onDecide, onBack, introKicker, briefDecidePillLayo
                 <div className="flex items-center gap-6">
                   <button
                     type="button"
-                    onClick={() => handleAction('sold')}
+                    onClick={() => handleAction('bought')}
                     className="flex items-center gap-1.5 text-xs font-medium text-muted-foreground transition-colors hover:text-foreground"
                   >
-                    <OutcomeIcon outcome="sold" size={14} className="text-muted-foreground" />
-                    {t('ritual.decide.sell', { defaultValue: 'I sold' })}
+                    <OutcomeIcon outcome="bought" size={14} className="text-muted-foreground" />
+                    {t('ritual.decide.buy', { defaultValue: 'I bought' })}
                   </button>
                   <span className="text-muted-foreground/40" aria-hidden>
                     ·
                   </span>
                   <button
                     type="button"
-                    onClick={() => handleAction('bought')}
+                    onClick={() => handleAction('sold')}
                     className="flex items-center gap-1.5 text-xs font-medium text-muted-foreground transition-colors hover:text-foreground"
                   >
-                    <OutcomeIcon outcome="bought" size={14} className="text-muted-foreground" />
-                    {t('ritual.decide.buy', { defaultValue: 'I bought' })}
+                    <OutcomeIcon outcome="sold" size={14} className="text-muted-foreground" />
+                    {t('ritual.decide.sell', { defaultValue: 'I sold' })}
                   </button>
                 </div>
               </>
