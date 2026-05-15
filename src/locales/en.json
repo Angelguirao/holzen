@@ -1819,6 +1819,8 @@
     "settledDesc": "You gave yourself a moment. That's enough.",
     "return": "Return",
     "patterns": {
+      "brief": "Brief",
+      "briefDesc": "Inhale · hold · exhale · 4 rounds",
       "box": "Box",
       "boxDesc": "4-4-4-4 · Grounding",
       "calming": "Calming",
@@ -1833,6 +1835,20 @@
       "sip": "Sip"
     },
     "phaseHints": {
+      "brief": {
+        "h0_0": "It's here",
+        "h0_1": "Pieces settle",
+        "h0_2": "Let the jaw soften on the way out.",
+        "h1_0": "No need to move",
+        "h1_1": "A pattern forms",
+        "h1_2": "Strength, without force",
+        "h2_0": "Inhale what you're becoming",
+        "h2_1": "Here, your way of being is built",
+        "h2_2": "Exhale like you're turning down the noise.",
+        "h3_0": "Last round — same rhythm, gentler effort.",
+        "h3_1": "Nothing to prove in this hold.",
+        "h3_2": "Finish the exhale; widen the gap before you decide."
+      },
       "box": {
         "h0_0": "It's here",
         "h0_1": "Pieces settle",

@@ -1,9 +1,13 @@
 import { describe, expect, it } from 'vitest';
 import {
-  BOX_BREATH_PHASE_COUNT,
   computeBreathingPhaseAdvance,
   resolveBreathingCompleted,
 } from '@/lib/pause-breathing-phase-advance';
+import {
+  BOX_BREATH_PHASE_COUNT,
+  BRIEF_RITUAL_BREATH_CYCLES,
+  BRIEF_RITUAL_PHASE_COUNT,
+} from '@/lib/pause-breathing-pattern';
 
 describe('resolveBreathingCompleted', () => {
   it('uses session-local completion when parent prop is false', () => {
@@ -68,5 +72,33 @@ describe('computeBreathingPhaseAdvance', () => {
         cycle: 2,
       }),
     ).toEqual({ kind: 'next_phase', nextPhaseIndex: 2 });
+  });
+});
+
+describe('computeBreathingPhaseAdvance (brief ritual)', () => {
+  it('completes after final exhale of round 4/4 (no post-exhale hold)', () => {
+    expect(
+      computeBreathingPhaseAdvance({
+        elapsed: 4,
+        phaseDuration: 4,
+        phaseIndex: 2,
+        phaseCount: BRIEF_RITUAL_PHASE_COUNT,
+        cycle: 3,
+        totalCycles: BRIEF_RITUAL_BREATH_CYCLES,
+      }),
+    ).toEqual({ kind: 'pattern_complete' });
+  });
+
+  it('advances to next round after exhale on a non-final round', () => {
+    expect(
+      computeBreathingPhaseAdvance({
+        elapsed: 4,
+        phaseDuration: 4,
+        phaseIndex: 2,
+        phaseCount: BRIEF_RITUAL_PHASE_COUNT,
+        cycle: 0,
+        totalCycles: BRIEF_RITUAL_BREATH_CYCLES,
+      }),
+    ).toEqual({ kind: 'next_cycle', nextCycle: 1 });
   });
 });

@@ -1,5 +1,5 @@
-/** Box pattern: inhale, hold, exhale, hold — four phases per cycle. */
-export const BOX_BREATH_PHASE_COUNT = 4;
+/** Re-exported for tests; canonical definition in `pause-breathing-pattern.ts`. */
+export { BOX_BREATH_PHASE_COUNT } from '@/lib/pause-breathing-pattern';
 
 /**
  * Parent `completed` is false while the segment is in progress; session-local completion
