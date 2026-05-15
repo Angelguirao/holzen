@@ -23,6 +23,8 @@ export interface PauseScoreImpactRow {
   label: string;
   direction: 'up' | 'neutral';
   reason: string;
+  /** Illustrative skill points for done-screen UI (not a live server delta). */
+  points: number;
 }
 
 /** Builds qualitative Journey / skill hints (same rules as `ScoreImpact`). */
@@ -39,6 +41,7 @@ export function buildPauseScoreImpacts(
       key: 'regulation',
       direction: 'up',
       reason: t('scoreImpact.breathing', { defaultValue: 'Breathing completed' }),
+      points: 4,
     });
   } else if (data.mood && data.moodAfter && COMPOSURE[data.moodAfter] > COMPOSURE[data.mood]) {
     list.push({
@@ -46,6 +49,7 @@ export function buildPauseScoreImpacts(
       key: 'regulation',
       direction: 'up',
       reason: t('scoreImpact.moodImproved', { defaultValue: 'Mood shifted toward composure' }),
+      points: 5,
     });
   }
 
@@ -60,6 +64,7 @@ export function buildPauseScoreImpacts(
         defaultValue: 'Held steady during {{vol}}% move',
         vol: vol.toFixed(1),
       }),
+      points: Math.min(8, 3 + Math.round(vol)),
     });
   }
 
@@ -72,6 +77,7 @@ export function buildPauseScoreImpacts(
         defaultValue: 'Used {{count}} perspective tool(s)',
         count: data.engagedTools,
       }),
+      points: Math.min(6, 2 * data.engagedTools),
     });
   }
 
@@ -83,6 +89,7 @@ export function buildPauseScoreImpacts(
       reason: data.wroteNote
         ? t('scoreImpact.note', { defaultValue: 'Added a reflection note' })
         : t('scoreImpact.tags', { defaultValue: 'Tagged this pause' }),
+      points: 3,
     });
   }
 
@@ -105,6 +112,7 @@ export function buildPauseScoreImpacts(
                 defaultValue:
                   'Choosing to hold adds a steady-outcome signal your Journey uses under distress tolerance.',
               }),
+        points: 3,
       });
     }
 
@@ -117,6 +125,7 @@ export function buildPauseScoreImpacts(
           defaultValue:
             'Buys are scored against volatility context in Journey — this decision updates that pattern.',
         }),
+        points: 3,
       });
     }
 
@@ -129,6 +138,7 @@ export function buildPauseScoreImpacts(
           defaultValue:
             'Sells register as realized action; Journey reflects them alongside how calm the window felt.',
         }),
+        points: 0,
       });
     }
 
@@ -141,6 +151,7 @@ export function buildPauseScoreImpacts(
           defaultValue:
             'You named how you felt before deciding — that anchors regulation trends when intensity is logged.',
         }),
+        points: 2,
       });
     }
   }

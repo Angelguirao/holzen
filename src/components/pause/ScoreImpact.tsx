@@ -27,7 +27,9 @@ export function ScoreImpact({
     [data, t, variant],
   );
 
-  const displayImpacts = excludeFirstFromList ? impacts.slice(1) : impacts;
+  const sliced = excludeFirstFromList ? impacts.slice(1) : impacts;
+  const displayImpacts =
+    variant === 'brief' ? sliced.filter((imp) => imp.points > 0) : sliced;
 
   const motionDelay = variant === 'brief' ? 0.25 : 0.8;
 
@@ -51,35 +53,19 @@ export function ScoreImpact({
         ) : null}
         <p className="text-center text-sm leading-relaxed text-muted-foreground">
           {t('pause.brief.done.contributionFallback', {
-            defaultValue:
-              'Finished pauses build your Journey sample over time. Naming how you feel and intensity here sharpens how Journey reads this pause.',
+            defaultValue: 'This pause is now part of your Journey.',
           })}
         </p>
       </motion.div>
     );
   }
 
-  if (
-    variant === 'brief' &&
-    excludeFirstFromList &&
-    impacts.length > 0 &&
-    displayImpacts.length === 0
-  ) {
-    return (
-      <motion.div
-        initial={{ opacity: 0, y: 8 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: motionDelay, duration: 0.45 }}
-        className={cn('w-full', className)}
-      >
-        <p className="text-center text-[11px] leading-snug text-muted-foreground/90">
-          {t('pause.brief.done.contributionDisclaimer', {
-            defaultValue:
-              'Qualitative signals only — Journey does not show live point deltas from a single pause.',
-          })}
-        </p>
-      </motion.div>
-    );
+  if (variant === 'brief' && excludeFirstFromList && impacts.length > 0 && displayImpacts.length === 0) {
+    return null;
+  }
+
+  if (variant === 'brief' && displayImpacts.length === 0) {
+    return null;
   }
 
   return (
@@ -101,20 +87,21 @@ export function ScoreImpact({
               <Minus className="mt-0.5 h-4 w-4 shrink-0 text-muted-foreground" />
             )}
             <div className="min-w-0 flex-1 text-left text-sm leading-snug">
-              <span className="font-medium text-foreground">{imp.label}</span>
-              <span className="text-muted-foreground"> — {imp.reason}</span>
+              {variant === 'brief' ? (
+                <>
+                  <span className="font-medium text-foreground">{imp.label}</span>
+                  <span className="text-nox-accent-green"> +{imp.points}</span>
+                </>
+              ) : (
+                <>
+                  <span className="font-medium text-foreground">{imp.label}</span>
+                  <span className="text-muted-foreground"> — {imp.reason}</span>
+                </>
+              )}
             </div>
           </div>
         ))}
       </div>
-      {variant === 'brief' ? (
-        <p className="text-center text-[11px] leading-snug text-muted-foreground/90">
-          {t('pause.brief.done.contributionDisclaimer', {
-            defaultValue:
-              'Qualitative signals only — Journey does not show live point deltas from a single pause.',
-          })}
-        </p>
-      ) : null}
     </motion.div>
   );
 }
