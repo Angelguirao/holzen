@@ -16,14 +16,16 @@ export type PauseSessionHeaderBackInput = {
  * Mirrors `showPauseHeaderBack` in `PauseSession` (brief vs non-brief branches).
  *
  * **Brief:** chevron only on **Breathe** (back to Feel). Feel / Integrate / Decide use CTAs only.
- * **Deep:** hidden on **Breathe** (`breathe` / `breath2`); shown on later macro steps.
+ * **Deep:** same shell back on **first Breathe** (back to Feel); still hidden on **second Breathe**
+ * (`breath2`); shown on later macro steps.
  */
 export function isPauseSessionHeaderBackVisible(p: PauseSessionHeaderBackInput): boolean {
   if (p.phase !== 'session') return false;
   if (p.ritualEntry === 'brief') {
     return p.briefStep === 'breath';
   }
-  if (p.step === 'breathe' || p.step === 'breath2') return false;
+  if (p.step === 'breathe') return true;
+  if (p.step === 'breath2') return false;
   return STEPS.indexOf(p.step) > 0;
 }
 
@@ -38,10 +40,7 @@ export type PauseHeaderBackIntentInput = {
 };
 
 export type PauseHeaderBackIntent =
-  | { kind: 'brief_breath_reset_intro' }
-  | { kind: 'brief_breath_reset_intro_clear_first' }
   | { kind: 'deep_breath_reset_intro' }
-  | { kind: 'deep_breathe_reset_intro_clear_first' }
   | { kind: 'deep_breath2_reset_intro_clear_second' }
   | { kind: 'go_back' };
 
@@ -53,8 +52,11 @@ export function computePauseHeaderBackIntent(p: PauseHeaderBackIntentInput): Pau
   if (p.ritualEntry === 'brief') {
     return { kind: 'go_back' };
   }
-  if ((p.step === 'breathe' || p.step === 'breath2') && p.breathTimedActive) return { kind: 'deep_breath_reset_intro' };
-  if (p.step === 'breathe' && p.breathingFirstCompleted) return { kind: 'deep_breathe_reset_intro_clear_first' };
+  /** Deep first Breathe: match brief — header back always leaves the segment (→ Feel). */
+  if (p.step === 'breathe') {
+    return { kind: 'go_back' };
+  }
+  if (p.step === 'breath2' && p.breathTimedActive) return { kind: 'deep_breath_reset_intro' };
   if (p.step === 'breath2' && p.breathingSecondCompleted) return { kind: 'deep_breath2_reset_intro_clear_second' };
   return { kind: 'go_back' };
 }

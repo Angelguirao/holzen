@@ -67,4 +67,40 @@ describe('usePauseSessionHeaderBackHandler', () => {
     expect(input.goBack).toHaveBeenCalledTimes(1);
     expect(input.setBreathingFirstCompleted).not.toHaveBeenCalled();
   });
+
+  it('deep first Breathe: clears first-segment flag then goBack (to Feel)', () => {
+    const input = baseInput({
+      ritualEntry: 'deep',
+      briefStep: 'feel',
+      step: 'breathe',
+      breathTimedActive: true,
+      breathingFirstCompleted: true,
+    });
+    const { result } = renderHook(() => usePauseSessionHeaderBackHandler(input));
+    act(() => {
+      result.current.handlePauseHeaderBack();
+    });
+    expect(input.setBreathingFirstCompleted).toHaveBeenCalledWith(false);
+    expect(input.goBack).toHaveBeenCalledTimes(1);
+    const reset = (input.breathingRef.current as unknown as { resetToIntro: ReturnType<typeof vi.fn> })
+      .resetToIntro;
+    expect(reset).not.toHaveBeenCalled();
+  });
+
+  it('deep second Breathe while timed: resetToIntro only', () => {
+    const input = baseInput({
+      ritualEntry: 'deep',
+      briefStep: 'feel',
+      step: 'breath2',
+      breathTimedActive: true,
+    });
+    const { result } = renderHook(() => usePauseSessionHeaderBackHandler(input));
+    act(() => {
+      result.current.handlePauseHeaderBack();
+    });
+    expect(input.goBack).not.toHaveBeenCalled();
+    const reset = (input.breathingRef.current as unknown as { resetToIntro: ReturnType<typeof vi.fn> })
+      .resetToIntro;
+    expect(reset).toHaveBeenCalledTimes(1);
+  });
 });

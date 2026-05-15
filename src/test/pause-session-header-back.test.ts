@@ -57,17 +57,28 @@ describe('isPauseSessionHeaderBackVisible', () => {
     expect(isPauseSessionHeaderBackVisible(base({ ritualEntry: 'deep', step: 'feel' }))).toBe(false);
   });
 
-  it('deep: false on breathe and breath2 (no shell back while breathing)', () => {
-    expect(isPauseSessionHeaderBackVisible(base({ ritualEntry: 'deep', step: 'breathe' }))).toBe(false);
+  it('deep: shell back on first Breathe (same affordance as brief; back to Feel)', () => {
+    expect(isPauseSessionHeaderBackVisible(base({ ritualEntry: 'deep', step: 'breathe' }))).toBe(true);
     expect(
       isPauseSessionHeaderBackVisible(
         base({ ritualEntry: 'deep', step: 'breathe', breathTimedActive: true }),
       ),
-    ).toBe(false);
+    ).toBe(true);
+    expect(
+      isPauseSessionHeaderBackVisible(
+        base({ ritualEntry: 'deep', step: 'breathe', breathingFirstCompleted: true }),
+      ),
+    ).toBe(true);
+  });
+
+  it('deep: no shell back on second Breathe', () => {
     expect(
       isPauseSessionHeaderBackVisible(
         base({ ritualEntry: 'deep', step: 'breath2', breathingSecondCompleted: true }),
       ),
+    ).toBe(false);
+    expect(
+      isPauseSessionHeaderBackVisible(base({ ritualEntry: 'deep', step: 'breath2', breathTimedActive: true })),
     ).toBe(false);
   });
 
@@ -77,7 +88,7 @@ describe('isPauseSessionHeaderBackVisible', () => {
 
   it('picker uses non-brief branch', () => {
     expect(isPauseSessionHeaderBackVisible(base({ ritualEntry: 'picker', step: 'feel' }))).toBe(false);
-    expect(isPauseSessionHeaderBackVisible(base({ ritualEntry: 'picker', step: 'breathe' }))).toBe(false);
+    expect(isPauseSessionHeaderBackVisible(base({ ritualEntry: 'picker', step: 'breathe' }))).toBe(true);
     expect(isPauseSessionHeaderBackVisible(base({ ritualEntry: 'picker', step: 'reflect' }))).toBe(true);
   });
 });
@@ -109,19 +120,20 @@ describe('computePauseHeaderBackIntent', () => {
     });
   });
 
-  it('deep: timed breathe or breath2 resets intro', () => {
+  it('deep: first Breathe always uses ritual goBack (match brief)', () => {
     expect(
       computePauseHeaderBackIntent(intentBase({ step: 'breathe', breathTimedActive: true })),
-    ).toEqual({ kind: 'deep_breath_reset_intro' });
+    ).toEqual({ kind: 'go_back' });
+    expect(
+      computePauseHeaderBackIntent(intentBase({ step: 'breathe', breathingFirstCompleted: true })),
+    ).toEqual({ kind: 'go_back' });
+    expect(computePauseHeaderBackIntent(intentBase({ step: 'breathe' }))).toEqual({ kind: 'go_back' });
+  });
+
+  it('deep: timed second Breathe resets intro', () => {
     expect(
       computePauseHeaderBackIntent(intentBase({ step: 'breath2', breathTimedActive: true })),
     ).toEqual({ kind: 'deep_breath_reset_intro' });
-  });
-
-  it('deep: first segment done resets intro and clears first flag', () => {
-    expect(
-      computePauseHeaderBackIntent(intentBase({ step: 'breathe', breathingFirstCompleted: true })),
-    ).toEqual({ kind: 'deep_breathe_reset_intro_clear_first' });
   });
 
   it('deep: second segment done resets intro and clears second flag', () => {
