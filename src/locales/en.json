@@ -1363,9 +1363,9 @@
       },
       "integrate": {
         "title": "Integrate",
-        "line1": "Sit, and quiet your mind.",
-        "line2": "Do nothing.",
-        "hint": "When the timer ends, you'll move on to Decide.",
+        "line1": "Centered.",
+        "line2": "Quietly.",
+        "hint": "Strength, without force. You stay. Inhale what you are becoming. Here, your way of being is built. Let go. Your center remains. When the timer ends, you'll move on to Decide.",
         "repeatBreaths": "Repeat breaths",
         "switchDeep": "Switch to Deep pause",
         "switchDeepLockedHint": "Holzen Pro or free trial required."
@@ -1837,17 +1837,14 @@
     "phaseHints": {
       "triangle": {
         "h0_0": "It's here",
-        "h0_1": "Pieces settle",
-        "h0_2": "Let the jaw soften on the way out.",
-        "h1_0": "No need to move",
-        "h1_1": "A pattern forms",
-        "h1_2": "Strength, without force",
-        "h2_0": "Last round — same rhythm, gentler effort.",
-        "h2_1": "Nothing to prove in this hold.",
-        "h2_2": "Finish the exhale; widen the gap before you decide.",
-        "h3_0": "Last round — same rhythm, gentler effort.",
-        "h3_1": "Nothing to prove in this hold.",
-        "h3_2": "Finish the exhale; widen the gap before you decide."
+        "h0_1": "Let it be",
+        "h0_2": "Let it land",
+        "h1_0": "Pieces settle",
+        "h1_1": "Rooted in calm",
+        "h1_2": "Steady within",
+        "h2_0": "No need to move",
+        "h2_1": "Just noticing",
+        "h2_2": "A pattern forms"
       },
       "box": {
         "h0_0": "It's here",
