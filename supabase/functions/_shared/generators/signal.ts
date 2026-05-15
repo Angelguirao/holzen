@@ -26,6 +26,7 @@ import { type CacheServeRelaxation, parseMarketDirection, serveFromCache } from 
 import { createAttemptLogger, trackEvent } from "../observe.ts";
 import { enqueueCatalogSourceSuggestion } from "../source-suggestions.ts";
 import { callPerplexityChat, mergePerplexityUsage } from "../perplexity-client.ts";
+import { fetchInitWithIncomingTrace } from "../forward-trace-headers.ts";
 import { validateSource } from "../source-validation.ts";
 import { searchLibrary, essayToSignal, recordLibraryServe } from "../content-library.ts";
 import { preferNonYoutubeCitationsFirst } from "../recent-signal-urls.ts";
@@ -595,12 +596,15 @@ URL RULES (CRITICAL):
     const aiTimeout = setTimeout(() => aiController.abort(), AI_TIMEOUTS[idx]);
     const attemptT0 = Date.now();
     try {
-      const structureResponse = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
-        method: "POST",
-        headers: { Authorization: `Bearer ${LOVABLE_API_KEY}`, "Content-Type": "application/json" },
-        body: JSON.stringify({ ...aiBody, model }),
-        signal: aiController.signal,
-      });
+      const structureResponse = await fetch(
+        "https://ai.gateway.lovable.dev/v1/chat/completions",
+        fetchInitWithIncomingTrace(incomingRequest, {
+          method: "POST",
+          headers: { Authorization: `Bearer ${LOVABLE_API_KEY}`, "Content-Type": "application/json" },
+          body: JSON.stringify({ ...aiBody, model }),
+          signal: aiController.signal,
+        }),
+      );
       clearTimeout(aiTimeout);
       log(`AI ${model} responded ${structureResponse.status}`);
 

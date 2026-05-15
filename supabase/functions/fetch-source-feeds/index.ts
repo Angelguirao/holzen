@@ -587,7 +587,7 @@ serve(
           hzLog(`${source.name}: site_map requires FIRECRAWL_API_KEY`);
           return { refs: [{ url: source.url, feedAuthor: null, publishedAt: null }], discovery: "site_map_fallback_single" };
         }
-        const mapped = await firecrawlMapArticleUrls(source.url, FIRECRAWL_API_KEY, hzLog);
+        const mapped = await firecrawlMapArticleUrls(source.url, FIRECRAWL_API_KEY, hzLog, req);
         if (mapped.length > 0) {
           hzLog(`map: ${mapped.length} candidate URLs for ${source.name}`);
           return {
@@ -599,7 +599,7 @@ serve(
         return { refs: [{ url: source.url, feedAuthor: null, publishedAt: null }], discovery: "site_map_fallback_single" };
       }
 
-      const feedXml = await fetchFeedXmlIfApplicable(source.url, hzLog);
+      const feedXml = await fetchFeedXmlIfApplicable(source.url, hzLog, req);
       if (feedXml) {
         const refs = parseArticleRefsFromFeedXml(feedXml, source.url);
         if (refs.length > 0) {
