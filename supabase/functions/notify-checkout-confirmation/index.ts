@@ -90,6 +90,7 @@ serve(
       Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? "",
       cid,
       { auth: { persistSession: false } },
+      req,
     );
 
     const token = authHeader.replace("Bearer ", "");

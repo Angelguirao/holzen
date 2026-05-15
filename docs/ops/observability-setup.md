@@ -90,7 +90,17 @@ curl -X POST -H 'Content-Type: application/json' \
 1. Sentry → Settings → Integrations → **Slack** → Authorize workspace.
 2. Map project `holzen` → `#holzen-alerts`.
 
-### 2.4 Alert rules (Sentry Alerts UI)
+### 2.4 W3C Trace Context (browser → edge)
+
+The SPA enables Sentry’s **`propagateTraceparent`** and **`tracePropagationTargets`** (Supabase project origin from `VITE_SUPABASE_URL`) so outgoing edge calls carry **`traceparent`**, **`sentry-trace`**, and **`baggage`** in addition to **`x-cid`**. See `src/lib/trace-propagation.ts`, `src/lib/sentry.ts`, and the patched `supabase.functions.invoke` in `src/integrations/supabase/client.ts`.
+
+Edge CORS (`supabase/functions/_shared/cors.ts`) allow-lists those headers; `withRequestLogging` parses a valid version-`00` **`traceparent`** and adds **`trace_id`** / **`parent_span_id`** to the initial `request` log line for BetterStack joins alongside `cid`.
+
+`createCidSupabaseClient(..., incomingRequest?)` forwards the same trace headers on service-role PostgREST/Auth HTTP calls when the optional **`Request`** is passed (see `_shared/forward-trace-headers.ts`); explicit `global.headers` from the caller still win.
+
+This is **not** a full OpenTelemetry SDK in-app — it aligns the propagation **wire format** with OTel / W3C so downstream collectors or future OTLP export can reuse the same identifiers.
+
+### 2.5 Alert rules (Sentry Alerts UI)
 
 Create each as an **Issue Alert** (not Metric Alert) unless noted:
 

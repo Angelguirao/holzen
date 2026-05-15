@@ -20,6 +20,11 @@
  * dependency log line carries it (the logger is already `cid`-bound, so
  * `logDependencyCall(log, ...)` inherits it automatically).
  *
+ * When you pass the incoming `Request` into `createCidSupabaseClient`, W3C
+ * `traceparent` / `tracestate` and Sentry `sentry-trace` / `baggage` are
+ * forwarded on Supabase HTTP calls unless the caller already set those keys
+ * in `global.headers`.
+ *
  * Read alongside `with-request-logging.ts` and `deps.ts`.
  */
 
@@ -28,6 +33,7 @@ import {
   type SupabaseClient,
   type SupabaseClientOptions,
 } from "https://esm.sh/@supabase/supabase-js@2.57.2";
+import { extractForwardedTraceHeaders } from "./forward-trace-headers.ts";
 import { logDependencyCall } from "./deps.ts";
 import type { createLogger } from "./observe.ts";
 
@@ -54,6 +60,7 @@ type Logger = ReturnType<typeof createLogger>;
  *     Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!,
  *     cid,
  *     { auth: { persistSession: false } },
+ *     req,
  *   );
  */
 export function createCidSupabaseClient(
@@ -61,13 +68,25 @@ export function createCidSupabaseClient(
   key: string,
   cid: string,
   opts: SupabaseClientOptions<"public"> = {},
+  /** When set, W3C / Sentry trace headers from this request are forwarded on every Supabase HTTP call (caller headers still win). */
+  incomingRequest?: Request,
 ): SupabaseClient {
-  const callerHeaders = opts.global?.headers ?? {};
+  const callerHeaders = (opts.global?.headers ?? {}) as Record<string, string>;
+  const trace = incomingRequest ? extractForwardedTraceHeaders(incomingRequest) : {};
+
+  const callerKeysLower = new Set(Object.keys(callerHeaders).map((k) => k.toLowerCase()));
+  const fromTrace: Record<string, string> = {};
+  for (const [k, v] of Object.entries(trace)) {
+    if (!callerKeysLower.has(k.toLowerCase())) {
+      fromTrace[k] = v;
+    }
+  }
+
   // Don't overwrite an explicit x-cid that the caller already set (e.g. a
   // chained edge fn forwarding the upstream cid verbatim).
-  const headersWithCid = "x-cid" in callerHeaders || "X-Cid" in callerHeaders
-    ? callerHeaders
-    : { ...callerHeaders, "x-cid": cid };
+  const headersWithCid = callerKeysLower.has("x-cid")
+    ? { ...fromTrace, ...callerHeaders }
+    : { ...fromTrace, ...callerHeaders, "x-cid": cid };
 
   return createClient(url, key, {
     ...opts,
