@@ -1828,6 +1828,25 @@
       "sigh": "Sigh",
       "sighDesc": "Physiological sigh"
     },
+    "triangleRotatingKickers": [
+      "It's here",
+      "Let it be",
+      "Let it land",
+      "Pieces settle",
+      "Rooted in calm",
+      "Steady within",
+      "No need to move",
+      "Just noticing",
+      "A pattern forms",
+      "Centered.",
+      "Quietly.",
+      "Strength, without force.",
+      "You stay.",
+      "Inhale what you are becoming",
+      "Here, your way of being is built.",
+      "Let go.",
+      "Your center remains."
+    ],
     "phases": {
       "inhale": "Inhale",
       "hold": "Hold",
@@ -1835,17 +1854,6 @@
       "sip": "Sip"
     },
     "phaseHints": {
-      "triangle": {
-        "h0_0": "It's here",
-        "h0_1": "Let it be",
-        "h0_2": "Let it land",
-        "h1_0": "Pieces settle",
-        "h1_1": "Rooted in calm",
-        "h1_2": "Steady within",
-        "h2_0": "No need to move",
-        "h2_1": "Just noticing",
-        "h2_2": "A pattern forms"
-      },
       "box": {
         "h0_0": "It's here",
         "h0_1": "Pieces settle",
