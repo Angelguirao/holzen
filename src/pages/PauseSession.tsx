@@ -566,7 +566,7 @@ export default function PauseSession() {
     setMoodAfterDone,
   ]);
 
-  /** Enables `use-pause-reflect-generation` while `holzen-reflect` may still be in flight past the Reflect card (see `docs/systems/pause-system.md`, Reflection + haiku (deep)). */
+  /** Enables `use-pause-reflect-generation` while `holzen-reflect` may still be in flight past the Reflect card (see `docs/systems/pause-system.md` §7.1, Reflection + haiku (deep)). */
   const reflectGenEnabled =
     ritualEntry === 'deep' &&
     (step === 'reflect' ||
