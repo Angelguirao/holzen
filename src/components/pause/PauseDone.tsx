@@ -1,7 +1,8 @@
-import { useLayoutEffect, useMemo, useRef, useState } from 'react';
+import { useLayoutEffect, useRef, useState } from 'react';
 import { motion } from 'framer-motion';
 import { Flame, Pencil, Sparkles } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
+import { useBriefDoneStatsPreview } from '@/hooks/use-brief-done-stats-preview';
 import { useSubscription } from '@/hooks/use-subscription';
 import { PAUSE_MOOD_VALUES, type MoodValue } from '@/components/MoodCheck';
 import { MoodIcon } from '@/components/icons/MoodIcon';
@@ -16,8 +17,8 @@ import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover
 import { Slider } from '@/components/ui/slider';
 import { pauseLogStep } from '@/lib/pause-api';
 import { buildPostPauseEmotionLoggedPayload, isPauseMoodValue } from '@/lib/pause-post-pause-emotion-log';
-import { buildPauseScoreImpacts } from '@/lib/pause-score-impacts';
 import { showPauseStepSyncFailedToast } from '@/lib/pause-step-sync-toast';
+import type { BriefSkillDeltaKey } from '@/lib/pause-brief-stats-preview';
 
 interface PauseData {
   mood: string | null;
@@ -50,6 +51,15 @@ function clampFeelIntensity(n: number | null | undefined): number {
   return 3;
 }
 
+function formatSkillDelta(delta: number): string {
+  if (delta > 0) return `+${delta}`;
+  return String(delta);
+}
+
+function holzenScoreSkillLabelKey(key: BriefSkillDeltaKey): string {
+  return `holzenScore.${key}`;
+}
+
 export function PauseDone({
   decision,
   onReturn,
@@ -79,10 +89,10 @@ export function PauseDone({
     // eslint-disable-next-line react-hooks/exhaustive-deps -- mood/feel fields only; full `pauseData` identity would reset in-progress edits
   }, [doneVariant, pauseInstanceId, pauseData?.mood, pauseData?.feelIntensity]);
 
-  const briefImpacts = useMemo(() => {
-    if (doneVariant !== 'brief' || !pauseData) return [];
-    return buildPauseScoreImpacts(pauseData, t, 'brief');
-  }, [doneVariant, pauseData, t]);
+  const statsPreview = useBriefDoneStatsPreview({
+    enabled: doneVariant === 'brief' && Boolean(pauseInstanceId),
+    pauseInstanceId,
+  });
 
   const handleSaveToJourney = async () => {
     if (!onSaveToJourney) return;
@@ -125,10 +135,9 @@ export function PauseDone({
         ? t(`moodCheck.moods.${briefDoneMood}`, { defaultValue: briefDoneMood })
         : null;
 
-    const pointPreviewImpacts = briefImpacts.filter((i) => i.points > 0);
     const checkInRowRightHint = t('pause.brief.done.checkInRowRightHint', {
       defaultValue:
-        "You don't get extra skill points here—the +scores above are already from this pause. This only updates how you feel after deciding if you change mood or intensity, then Save.",
+        'Optional: if how you feel now changed after deciding, adjust mood or intensity and tap Save so Journey reflects your after-state.',
     });
 
     const journeyShort = t('pause.brief.done.journeyShort', {
@@ -156,25 +165,103 @@ export function PauseDone({
 
           <div className="w-full max-w-md space-y-3 text-center">
             <p className="text-sm font-medium leading-snug text-foreground">{journeyShort}</p>
-            {pointPreviewImpacts.length > 0 ? (
+            {statsPreview.kind === 'loading' ? (
+              <p className="mx-auto max-w-sm animate-pulse text-[11px] leading-snug text-muted-foreground">
+                {t('pause.brief.done.statsPreviewLoading', {
+                  defaultValue: 'Updating your Journey snapshot…',
+                })}
+              </p>
+            ) : null}
+            {statsPreview.kind === 'error' || statsPreview.kind === 'sync_pending' ? (
+              <p className="mx-auto max-w-sm text-[11px] leading-snug text-muted-foreground">
+                {statsPreview.kind === 'sync_pending'
+                  ? t('pause.brief.done.statsPreviewSyncPending', {
+                      defaultValue: 'Journey totals will catch up in a moment — this pause is already saved.',
+                    })
+                  : t('pause.brief.done.statsPreviewError', {
+                      defaultValue: 'Could not load score preview. Your pause is still saved to Journey.',
+                    })}
+              </p>
+            ) : null}
+            {statsPreview.kind === 'ready' ? (
               <>
-                <div className="flex flex-wrap justify-center gap-2">
-                  {pointPreviewImpacts.map((i) => (
-                    <span
-                      key={i.key}
-                      className="inline-flex items-baseline gap-1 rounded-full border border-primary/20 bg-primary/5 px-3 py-1.5 text-xs font-medium text-foreground"
-                    >
-                      <span className="text-nox-accent-green">+{i.points}</span>
-                      <span>{i.label}</span>
-                    </span>
-                  ))}
-                </div>
-                <p className="mx-auto max-w-sm text-[11px] leading-snug text-muted-foreground">
-                  {t('pause.brief.done.journeyImpactNote', {
-                    defaultValue:
-                      'Illustrative mix for this pause (before this step)—not live point totals. Journey infers skills from your pattern over time.',
-                  })}
-                </p>
+                {statsPreview.preview.status === 'first_pause' ? (
+                  <p className="mx-auto max-w-sm text-xs leading-snug text-foreground">
+                    {t('pause.brief.done.statsPreviewFirstPause', {
+                      defaultValue:
+                        'Your first completed pause — Journey baseline starts here. Holzen score: {{score}}.',
+                      score: statsPreview.preview.compositeScore,
+                    })}
+                  </p>
+                ) : statsPreview.preview.status === 'delta' &&
+                  statsPreview.preview.compositeDelta === 0 &&
+                  statsPreview.preview.skills.length === 0 ? (
+                  <p className="mx-auto max-w-sm text-xs leading-snug text-muted-foreground">
+                    {t('pause.brief.done.statsPreviewFlat', {
+                      defaultValue:
+                        'Rolling Journey scores are unchanged by adding this pause to your last-30 window — it still shapes your long-term pattern.',
+                    })}
+                  </p>
+                ) : statsPreview.preview.status === 'delta' ? (
+                  <div className="flex flex-wrap justify-center gap-2">
+                    {statsPreview.preview.compositeDelta !== 0 ? (
+                      <span className="inline-flex items-baseline gap-1 rounded-full border border-primary/20 bg-primary/5 px-3 py-1.5 text-xs font-medium text-foreground">
+                        <span
+                          className={
+                            statsPreview.preview.compositeDelta > 0
+                              ? 'text-nox-accent-green'
+                              : statsPreview.preview.compositeDelta < 0
+                                ? 'text-destructive/90'
+                                : 'text-muted-foreground'
+                          }
+                        >
+                          {formatSkillDelta(statsPreview.preview.compositeDelta)}
+                        </span>
+                        <span>
+                          {t('pause.brief.done.statsPreviewHolzenChip', {
+                            defaultValue: 'Holzen',
+                          })}
+                        </span>
+                      </span>
+                    ) : null}
+                    {statsPreview.preview.skills.map((s) => (
+                      <span
+                        key={s.key}
+                        className="inline-flex items-baseline gap-1 rounded-full border border-primary/20 bg-primary/5 px-3 py-1.5 text-xs font-medium text-foreground"
+                      >
+                        <span
+                          className={
+                            s.delta > 0
+                              ? 'text-nox-accent-green'
+                              : s.delta < 0
+                                ? 'text-destructive/90'
+                                : 'text-muted-foreground'
+                          }
+                        >
+                          {formatSkillDelta(s.delta)}
+                        </span>
+                        <span>{t(holzenScoreSkillLabelKey(s.key))}</span>
+                      </span>
+                    ))}
+                  </div>
+                ) : null}
+                {statsPreview.preview.status === 'first_pause' ? (
+                  <p className="mx-auto max-w-sm text-[11px] leading-snug text-muted-foreground">
+                    {t('pause.brief.done.statsPreviewFirstPauseNote', {
+                      defaultValue:
+                        'Scores use your last 30 completed pauses; they refine as you keep practicing.',
+                    })}
+                  </p>
+                ) : statsPreview.preview.status === 'delta' &&
+                  (statsPreview.preview.compositeDelta !== 0 || statsPreview.preview.skills.length > 0) ? (
+                  <p className="mx-auto max-w-sm text-[11px] leading-snug text-muted-foreground">
+                    {t('pause.brief.done.journeyImpactNote', {
+                      defaultValue:
+                        'Compared to the same last-{{count}} completed-pause roll-up without this pause — same formula as Stats.',
+                      count: statsPreview.preview.sampleSize,
+                    })}
+                  </p>
+                ) : null}
               </>
             ) : null}
           </div>

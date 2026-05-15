@@ -28,8 +28,8 @@ export function ScoreImpact({
   );
 
   const sliced = excludeFirstFromList ? impacts.slice(1) : impacts;
-  const displayImpacts =
-    variant === 'brief' ? sliced.filter((imp) => imp.points > 0) : sliced;
+  /** Brief uses the same qualitative rows as default — no illustrative +N chips (see brief done + `computePauseScore` preview). */
+  const displayImpacts = sliced;
 
   const motionDelay = variant === 'brief' ? 0.25 : 0.8;
 
@@ -87,17 +87,8 @@ export function ScoreImpact({
               <Minus className="mt-0.5 h-4 w-4 shrink-0 text-muted-foreground" />
             )}
             <div className="min-w-0 flex-1 text-left text-sm leading-snug">
-              {variant === 'brief' ? (
-                <>
-                  <span className="font-medium text-foreground">{imp.label}</span>
-                  <span className="text-nox-accent-green"> +{imp.points}</span>
-                </>
-              ) : (
-                <>
-                  <span className="font-medium text-foreground">{imp.label}</span>
-                  <span className="text-muted-foreground"> — {imp.reason}</span>
-                </>
-              )}
+              <span className="font-medium text-foreground">{imp.label}</span>
+              <span className="text-muted-foreground"> — {imp.reason}</span>
             </div>
           </div>
         ))}

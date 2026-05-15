@@ -210,8 +210,7 @@ export function computePauseScore(params: {
     else if (noteLen > 0) depth += 20;
     if (r.tags && r.tags.length > 0) depth += 30;
     if (r.is_favorite) depth += 15;
-    // Post-pause mood log (`shift_emotion_logged`) increases self-awareness depth for that row in aggregates.
-    // Not a fixed “+15 Regulation” badge on the completion screen — see `PauseDone` brief copy.
+    // Post-pause mood log (`shift_emotion_logged` / post) increases self-awareness depth in aggregates.
     if (hasPauseShiftOrPostEmotion(r)) depth += 15;
     return Math.min(100, depth);
   });
