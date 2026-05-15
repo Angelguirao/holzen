@@ -47,6 +47,8 @@ export type PauseSessionDeepRitualBodyProps = {
   onDeepChooseBridgeContinue: () => void;
   onDecide: (decision: string) => void;
   decideOnBackStep: 'choose' | 'breath2';
+  /** After first deep breath pattern: repeat three rounds from intro (wireframe “Three more”). */
+  onRepeatDeepFirstBreathPattern: () => void;
 };
 
 /** Deep ritual step panels inside `PauseSessionScaffold` (Framer step transitions preserved). */
@@ -84,6 +86,7 @@ export function PauseSessionDeepRitualBody({
   onDeepChooseBridgeContinue,
   onDecide,
   decideOnBackStep,
+  onRepeatDeepFirstBreathPattern,
 }: PauseSessionDeepRitualBodyProps) {
   return (
     <AnimatePresence mode="wait" initial={false}>
@@ -116,6 +119,7 @@ export function PauseSessionDeepRitualBody({
             onContinueAfterBreath={onContinueAfterFirstBreath}
             onSkipBreath={onSkipFirstBreath}
             ritualSoundMuted={ritualSoundMuted}
+            onRepeatDeepFirstBreathPattern={onRepeatDeepFirstBreathPattern}
           />
         </motion.div>
       )}

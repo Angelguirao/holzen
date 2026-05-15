@@ -59,6 +59,7 @@ function setup(overrides: Partial<Parameters<typeof buildPauseSessionScaffoldRit
     handleFrameImDone: vi.fn(),
     handleDeepChooseBridgeContinue: vi.fn(),
     decideOnBackStep: 'choose' as const,
+    handleDeepFirstBreathRepeat: vi.fn(),
     ...overrides,
   };
   return {
@@ -113,6 +114,14 @@ describe('buildPauseSessionScaffoldRitualPayloads', () => {
 
     void deepRitual.onContinueAfterSecondBreath();
     expect(handleContinueAfterSecondBreath).toHaveBeenCalled();
+  });
+
+  it('wires deep first breath repeat', () => {
+    const handleDeepFirstBreathRepeat = vi.fn();
+    const { params } = setup({ handleDeepFirstBreathRepeat });
+    const { deepRitual } = buildPauseSessionScaffoldRitualPayloads(params);
+    deepRitual.onRepeatDeepFirstBreathPattern();
+    expect(handleDeepFirstBreathRepeat).toHaveBeenCalled();
   });
 
   it('wires deep frame done and choose-bridge', () => {

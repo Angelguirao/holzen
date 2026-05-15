@@ -18,6 +18,7 @@ const t = ((
   if (key === 'pause.deep.breatheStepDurationHint') return '< 1 min';
   if (key === 'pause.deep.breatheStepDurationHintCalming') return '~ 1 min';
   if (key === 'pause.deep.breath2StepDurationHint') return '< 1 min';
+  if (key === 'pause.macroProgressStepCompleted') return 'Completed';
   return key;
 }) as TFunction;
 
@@ -117,6 +118,50 @@ describe('buildPauseSessionScaffoldRitualDerived', () => {
     });
     expect(d.macroProgressLine).toBe('1 of 6');
     expect(d.macroProgressSubline).toBe('~ 15 sec');
+  });
+
+  it('brief feel: macro subline shows Completed after mood is logged', () => {
+    const d = buildPauseSessionScaffoldRitualDerived({
+      ritualEntry: 'brief',
+      step: 'feel',
+      briefStep: 'feel',
+      moodDone: true,
+      t,
+    });
+    expect(d.macroProgressLine).toBe('1 of 4');
+    expect(d.macroProgressSubline).toBe('Completed');
+  });
+
+  it('deep feel: macro subline shows Completed when moodDone', () => {
+    const d = buildPauseSessionScaffoldRitualDerived({
+      ritualEntry: 'deep',
+      step: 'feel',
+      moodDone: true,
+      t,
+    });
+    expect(d.macroProgressLine).toBe('1 of 6');
+    expect(d.macroProgressSubline).toBe('Completed');
+  });
+
+  it('deep breathe: macro subline Completed after first pattern (interstitial)', () => {
+    const d = buildPauseSessionScaffoldRitualDerived({
+      ritualEntry: 'deep',
+      step: 'breathe',
+      breathingFirstCompleted: true,
+      t,
+    });
+    expect(d.macroProgressLine).toBe('2 of 6');
+    expect(d.macroProgressSubline).toBe('Completed');
+  });
+
+  it('deep breath2: macro subline Completed after second pattern', () => {
+    const d = buildPauseSessionScaffoldRitualDerived({
+      ritualEntry: 'deep',
+      step: 'breath2',
+      breathingSecondCompleted: true,
+      t,
+    });
+    expect(d.macroProgressSubline).toBe('Completed');
   });
 
   it('picker follows deep scaffold rules (same ternary as pre-refactor PauseSession)', () => {

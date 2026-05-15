@@ -1,6 +1,6 @@
 import { useState, useEffect, useImperativeHandle, forwardRef, useRef, useLayoutEffect, useMemo } from 'react';
 import { motion, useReducedMotion } from 'framer-motion';
-import { Play } from 'lucide-react';
+import { Play, RefreshCw, ChevronRight } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import type { FeelStepTile } from '@/components/pause/pause-feel-types';
 import { pauseStepLayout } from '@/components/pause/pause-step-layout';
@@ -65,6 +65,8 @@ interface Props {
   onTimedBreathingChange?: (active: boolean) => void;
   /** Header mute: when true, phase ticks and pattern-complete chime are suppressed. */
   ritualSoundMuted?: boolean;
+  /** Deep first Breathe post-pattern: tap to run three more rounds from intro (parent clears segment completion). */
+  onRepeatDeepFirstBreathPattern?: () => void;
 }
 
 /** Brief ritual: no post-pattern card; advance as soon as the timed cycles finish. */
@@ -104,6 +106,7 @@ export const PauseBreathing = forwardRef<PauseBreathingHandle, Props>(function P
     onPatternComplete,
     onTimedBreathingChange,
     ritualSoundMuted = false,
+    onRepeatDeepFirstBreathPattern,
   },
   ref,
 ) {
@@ -404,6 +407,54 @@ export const PauseBreathing = forwardRef<PauseBreathingHandle, Props>(function P
             phaseAdvanceGuardRef.current = false;
           }}
         />
+      ) : ritualVariant === 'deep' && breathSegment === 'first' ? (
+        <motion.div
+          initial={{ opacity: 0, y: 8 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8 }}
+          className="flex max-w-md flex-col items-center gap-6 px-2 text-center"
+        >
+          <p className={pauseStepLayout.screenTitle}>
+            {t('pause.deep.breathFirstInterstitialTitle', { defaultValue: 'Three breaths' })}
+          </p>
+          <p className={`${pauseStepLayout.screenSubtitle} max-w-sm`}>
+            {t('pause.deep.breathFirstInterstitialBody', { defaultValue: "You've arrived" })}
+          </p>
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.35, duration: 0.6 }}
+            className="flex flex-wrap items-center justify-center gap-3 pt-1 sm:gap-6"
+          >
+            {onRepeatDeepFirstBreathPattern ? (
+              <Button
+                type="button"
+                variant="ghost"
+                className="gap-2 font-semibold text-primary hover:bg-primary/5 hover:text-primary"
+                onClick={() => {
+                  hapticFeedback('light');
+                  onRepeatDeepFirstBreathPattern();
+                }}
+              >
+                <RefreshCw className="h-4 w-4 shrink-0" aria-hidden />
+                {t('pause.deep.breathFirstRepeatCta', { defaultValue: 'Three more' })}
+              </Button>
+            ) : null}
+            <Button
+              type="button"
+              variant="outline"
+              size="default"
+              className={pauseStepLayout.ritualPrimaryOutlineCta}
+              onClick={() => {
+                hapticFeedback('light');
+                onContinueAfterBreath();
+              }}
+            >
+              {t('pause.steps.continue', { defaultValue: 'Continue' })}
+              <ChevronRight className="ml-1 h-4 w-4 shrink-0" aria-hidden />
+            </Button>
+          </motion.div>
+        </motion.div>
       ) : (
         <motion.div
           initial={{ opacity: 0, y: 8 }}
