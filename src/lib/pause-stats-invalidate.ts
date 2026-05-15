@@ -15,9 +15,9 @@ import { invalidateHistoryCalendarActivities } from '@/lib/history-calendar-acti
  * probe, Archive pause/echoes infinite lists (`usePauseArchiveList`), library collections
  * bundle (`useLibrary`), pending pause offer (`usePendingPauseOffer`), current open pause
  * (`useCurrentPause`), Home pinned pause preview (`useHomePinnedPausePreview`), Journey
- * activity calendar (`HistoryContent`), and badges
- * re-read from Supabase
- * without waiting for the stats query `staleTime` window.
+ * activity calendar (`HistoryContent`). **Badges** reuse the same pause-stats bundle
+ * (`usePauseStatsData` → `useBadges`); invalidating this key refetches rows so
+ * `computeBadges` runs again (see `docs/systems/badges-system.md`).
  */
 export function invalidatePauseStatsDataForUser(userId: string | null | undefined): void {
   if (!userId) return;
