@@ -420,6 +420,7 @@ serve(
             svcClient,
             userId,
             log: (msg, extra) => log(`[question] ${msg}`, extra),
+            incomingRequest: req,
           })
         : Promise.resolve<string | null>(null);
 
