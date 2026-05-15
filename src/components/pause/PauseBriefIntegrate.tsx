@@ -26,6 +26,7 @@ export function PauseBriefIntegrate({
   deepPauseLocked,
 }: Props) {
   const { t } = useTranslation();
+  const integrateHint = t('pause.brief.integrate.hint', { defaultValue: '' }).trim();
   const [remaining, setRemaining] = useState(INTEGRATE_SECONDS);
   const autoFired = useRef(false);
 
@@ -92,9 +93,9 @@ export function PauseBriefIntegrate({
               {done ? '0' : Math.max(0, remaining)}
               <span className="text-base text-muted-foreground">s</span>
             </p>
-            <p className="mt-1 max-w-[9rem] text-[11px] leading-snug text-muted-foreground">
-              {t('pause.brief.integrate.hint')}
-            </p>
+            {integrateHint ? (
+              <p className="mt-1 max-w-[9rem] text-[11px] leading-snug text-muted-foreground">{integrateHint}</p>
+            ) : null}
           </div>
         </div>
 
