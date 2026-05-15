@@ -10,6 +10,10 @@ import {
   resolveBreathingCompleted,
 } from '@/lib/pause-breathing-phase-advance';
 import {
+  BRIEF_RITUAL_BREATH_PHASES,
+  resolveBreathCycleTotal,
+} from '@/lib/pause-breathing-pattern';
+import {
   playPauseBreathPatternCompleteCue,
   playPauseBreathPhaseCue,
   resumePauseAudioContext,
@@ -77,17 +81,26 @@ function BreathPhaseProgressRing({ progress }: { progress: number }) {
   );
 }
 
-type PhaseHintFamily = 'box' | 'calming' | 'sigh';
+type PhaseHintFamily = 'brief' | 'box' | 'calming' | 'sigh';
 
-function phaseHintFamily(patternIndex: number): PhaseHintFamily {
+function phaseHintFamily(
+  ritualVariant: 'brief' | 'deep' | undefined,
+  patternIndex: number,
+): PhaseHintFamily {
+  if (ritualVariant === 'brief') return 'brief';
   if (patternIndex === 1) return 'calming';
   if (patternIndex === 2) return 'sigh';
   return 'box';
 }
 
-/** Shared micro-copy for pause ritual breathing (aligned with `PATTERNS` indices). */
-function phaseHintTranslationKey(patternIndex: number, cycle: number, phaseIndex: number): string {
-  return `breathing.phaseHints.${phaseHintFamily(patternIndex)}.h${cycle}_${phaseIndex}`;
+/** Shared micro-copy for pause ritual breathing (aligned with cycle / phase indices). */
+function phaseHintTranslationKey(
+  ritualVariant: 'brief' | 'deep' | undefined,
+  patternIndex: number,
+  cycle: number,
+  phaseIndex: number,
+): string {
+  return `breathing.phaseHints.${phaseHintFamily(ritualVariant, patternIndex)}.h${cycle}_${phaseIndex}`;
 }
 
 export type PauseBreathingHandle = {
@@ -101,8 +114,8 @@ interface Props {
   mantra: string | null;
   severity?: 'mild' | 'moderate' | 'high';
   /**
-   * `brief` — brief intro kicker + phase hints; **always uses the box breath pattern** (ignores high-severity calming).
-   * `deep` — deep intro kickers + hints; pattern from severity (box vs calming); `breathing.phaseHints.sigh` if pattern index 2.
+   * `brief` — four rounds of inhale → hold → exhale (no post-exhale hold); phase seconds count up 1–4.
+   * `deep` — box or calming by severity; phase seconds count down; `breathing.phaseHints.sigh` if pattern index 2.
    */
   ritualVariant?: 'brief' | 'deep';
   /** First segment after Feel; second segment after Frame (deep pause only). */
@@ -166,11 +179,14 @@ export const PauseBreathing = forwardRef<PauseBreathingHandle, Props>(function P
     cueOptsRef.current = { muted: ritualSoundMuted, prefersReduced: !!prefersReduced };
   }, [ritualSoundMuted, prefersReduced]);
 
-  /** Brief ritual stays on the box pattern so timers, phase labels, and hints stay aligned (~2 min path). */
-  const patternIndex = ritualVariant === 'brief' ? 0 : severity === 'high' ? 1 : 0;
-  const pattern = PATTERNS[patternIndex];
-  const totalCycles = breathSegment === 'second' ? 2 : 3;
+  const isBriefRitual = ritualVariant === 'brief';
+  const patternIndex = isBriefRitual ? 0 : severity === 'high' ? 1 : 0;
+  const pattern = isBriefRitual
+    ? { nameKey: 'breathing.patterns.brief', phases: [...BRIEF_RITUAL_BREATH_PHASES] }
+    : PATTERNS[patternIndex];
+  const totalCycles = resolveBreathCycleTotal(ritualVariant, breathSegment);
   const showPhaseHints = ritualVariant === 'brief' || ritualVariant === 'deep';
+  const phaseSecondCountsUp = isBriefRitual;
 
   const [started, setStarted] = useState(!!completedProp);
   const [phaseIndex, setPhaseIndex] = useState(0);
@@ -395,7 +411,7 @@ export const PauseBreathing = forwardRef<PauseBreathingHandle, Props>(function P
             {t(currentPhase.labelKey)}
           </motion.p>
           <p className="font-mono text-3xl tabular-nums text-muted-foreground">
-            {currentPhase.duration - elapsed}
+            {phaseSecondCountsUp ? elapsed + 1 : currentPhase.duration - elapsed}
           </p>
           {showPhaseHints ? (
             <motion.p
@@ -405,7 +421,9 @@ export const PauseBreathing = forwardRef<PauseBreathingHandle, Props>(function P
               transition={{ duration: 0.35 }}
               className="max-w-xs px-2 text-center text-xs italic leading-snug text-muted-foreground"
             >
-              {t(phaseHintTranslationKey(patternIndex, cycle, phaseIndex), { defaultValue: '' })}
+              {t(phaseHintTranslationKey(ritualVariant, patternIndex, cycle, phaseIndex), {
+                defaultValue: '',
+              })}
             </motion.p>
           ) : null}
           <p className="text-base italic text-muted-foreground">
