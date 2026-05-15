@@ -47,16 +47,42 @@ function readCid(req: Request): string {
   return crypto.randomUUID();
 }
 
-/** W3C Trace Context version 00 — trace-id (32 hex) + parent span id (16 hex). */
-const TRACEPARENT_V00_RE = /^00-([0-9a-f]{32})-([0-9a-f]{16})-[0-9a-f]{2}$/i;
+/**
+ * W3C Trace Context version `00` (https://www.w3.org/TR/trace-context/#traceparent-header).
+ * Matches OpenTelemetry’s default propagator format for interoperable trace / span ids.
+ */
+const TRACEPARENT_V00_RE = /^00-([0-9a-f]{32})-([0-9a-f]{16})-([0-9a-f]{2})$/i;
 
-function parseTraceparentHeader(
-  header: string | null
-): { trace_id: string; parent_span_id: string } | undefined {
+/** W3C `tracestate` max length is 512; keep log field smaller for drain safety. */
+const TRACESTATE_LOG_MAX = 256;
+
+function parseTraceparentHeader(header: string | null): {
+  trace_id: string;
+  parent_span_id: string;
+  trace_flags: string;
+  trace_sampled: boolean;
+} | undefined {
   if (!header) return undefined;
   const m = header.trim().match(TRACEPARENT_V00_RE);
   if (!m) return undefined;
-  return { trace_id: m[1].toLowerCase(), parent_span_id: m[2].toLowerCase() };
+  const trace_flags = m[3].toLowerCase();
+  const n = parseInt(trace_flags, 16);
+  const trace_sampled = Number.isFinite(n) && (n & 0x01) === 0x01;
+  return {
+    trace_id: m[1].toLowerCase(),
+    parent_span_id: m[2].toLowerCase(),
+    trace_flags,
+    trace_sampled,
+  };
+}
+
+/** Optional `tracestate` list-member header (same spec); truncated for structured logs. */
+function tracestateForRequestLog(header: string | null): string | undefined {
+  if (!header) return undefined;
+  const t = header.trim();
+  if (t.length === 0) return undefined;
+  if (t.length > TRACESTATE_LOG_MAX) return `${t.slice(0, TRACESTATE_LOG_MAX)}…`;
+  return t;
 }
 
 function readFrontendRelease(req: Request): string | undefined {
@@ -104,6 +130,9 @@ export function withRequestLogging(fnName: string, handler: EdgeHandler) {
     const traceparent =
       req.headers.get("traceparent") || req.headers.get("Traceparent") || req.headers.get("TRACEPARENT");
     const w3c = parseTraceparentHeader(traceparent);
+    const tracestate =
+      req.headers.get("tracestate") || req.headers.get("Tracestate") || req.headers.get("TRACESTATE");
+    const tracestateLog = w3c ? tracestateForRequestLog(tracestate) : undefined;
 
     log("request", {
       method: req.method,
@@ -111,6 +140,7 @@ export function withRequestLogging(fnName: string, handler: EdgeHandler) {
       // Query string is safe to log in principle, but some functions accept `?q=` free text.
       // Keep it off by default — functions that need it can log inside the handler.
       ...(w3c ?? {}),
+      ...(tracestateLog ? { tracestate: tracestateLog } : {}),
     });
 
     try {

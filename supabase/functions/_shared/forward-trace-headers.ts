@@ -2,6 +2,9 @@
  * Extract W3C Trace Context + Sentry propagation headers from an incoming edge
  * `Request` for re-use on outbound HTTP (e.g. PostgREST via `createCidSupabaseClient`).
  *
+ * Header names follow W3C Trace Context (https://www.w3.org/TR/trace-context/) so the
+ * same values work with OpenTelemetry propagators and vendor tracers (Sentry).
+ *
  * Header names are lowercase on the wire; `Headers.get` is case-insensitive.
  * Values are clamped to avoid accidental log/header blowups.
  */
