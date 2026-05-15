@@ -126,12 +126,10 @@ export function PauseDone({
         : null;
 
     const pointPreviewImpacts = briefImpacts.filter((i) => i.points > 0);
-    const checkInMetaRight =
-      pointPreviewImpacts.length > 0
-        ? pointPreviewImpacts.map((i) => `+${i.points} ${i.label}`).join(' · ')
-        : t('pause.brief.done.checkInRowRightFallback', {
-            defaultValue: 'Skill signals update when you save.',
-          });
+    const checkInRowRightHint = t('pause.brief.done.checkInRowRightHint', {
+      defaultValue:
+        'Optional — only updates your saved pause if you change mood or intensity, then tap Save.',
+    });
 
     const journeyShort = t('pause.brief.done.journeyShort', {
       defaultValue: 'This pause is now part of your Journey.',
@@ -159,17 +157,25 @@ export function PauseDone({
           <div className="w-full max-w-md space-y-3 text-center">
             <p className="text-sm font-medium leading-snug text-foreground">{journeyShort}</p>
             {pointPreviewImpacts.length > 0 ? (
-              <div className="flex flex-wrap justify-center gap-2">
-                {pointPreviewImpacts.map((i) => (
-                  <span
-                    key={i.key}
-                    className="inline-flex items-baseline gap-1 rounded-full border border-primary/20 bg-primary/5 px-3 py-1.5 text-xs font-medium text-foreground"
-                  >
-                    <span className="text-nox-accent-green">+{i.points}</span>
-                    <span>{i.label}</span>
-                  </span>
-                ))}
-              </div>
+              <>
+                <div className="flex flex-wrap justify-center gap-2">
+                  {pointPreviewImpacts.map((i) => (
+                    <span
+                      key={i.key}
+                      className="inline-flex items-baseline gap-1 rounded-full border border-primary/20 bg-primary/5 px-3 py-1.5 text-xs font-medium text-foreground"
+                    >
+                      <span className="text-nox-accent-green">+{i.points}</span>
+                      <span>{i.label}</span>
+                    </span>
+                  ))}
+                </div>
+                <p className="mx-auto max-w-sm text-[11px] leading-snug text-muted-foreground">
+                  {t('pause.brief.done.journeyImpactNote', {
+                    defaultValue:
+                      'Illustrative mix for this pause — not live point totals. Journey infers skills from your pattern over time.',
+                  })}
+                </p>
+              </>
             ) : null}
           </div>
 
@@ -182,8 +188,8 @@ export function PauseDone({
               <span className="shrink-0 font-normal">
                 {t('pause.brief.done.checkInRowLeft', { defaultValue: 'Check in again' })}
               </span>
-              <span className="line-clamp-3 max-w-[58%] text-right text-xs font-medium leading-snug text-muted-foreground sm:text-sm">
-                {checkInMetaRight}
+              <span className="line-clamp-4 max-w-[62%] text-right text-xs font-normal leading-snug text-muted-foreground sm:text-sm">
+                {checkInRowRightHint}
               </span>
             </div>
 
@@ -276,21 +282,13 @@ export function PauseDone({
                 </div>
               </div>
 
-            {pauseData ? (
-              <ScoreImpact
-                data={pauseData}
-                variant="brief"
-                hideTitle
-                excludeFirstFromList
-                className="pt-1"
-              />
-            ) : (
+            {!pauseData ? (
               <p className="pt-1 text-center text-xs leading-relaxed text-muted-foreground">
                 {t('pause.brief.done.contributionWhenNoSnapshot', {
                   defaultValue: 'Save to Journey to see this pause in your stats.',
                 })}
               </p>
-            )}
+            ) : null}
 
             {onSaveToJourney ? (
               <div className="flex justify-center pt-1">
