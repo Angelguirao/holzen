@@ -1327,6 +1327,8 @@
       "breatheStepDurationHint": "< 1 min",
       "breatheStepDurationHintCalming": "~ 1 min",
       "breath2StepDurationHint": "< 1 min",
+      "reflectStepDurationHint": "3 min",
+      "frameStepDurationHint": "~ 2 min",
       "breathFirstInterstitialTitle": "Three breaths",
       "breathFirstInterstitialBody": "You've arrived",
       "breathFirstRepeatCta": "Three more"
@@ -1536,6 +1538,9 @@
       "title": "Frame",
       "subtitle": "Want another angle? Your companions",
       "haikuLabel": "Haiku",
+      "haikuSeen": "Seen",
+      "favoriteHaikuAria": "Favorite this reflection",
+      "toggleHaikuAria": "Expand or collapse haiku",
       "ground": "Ground yourself",
       "zoomOut": "Zoom out",
       "lookBack": "Look back",
@@ -1544,6 +1549,11 @@
       "hint": "Open a tool anytime — continue when you feel ready."
     },
     "reflect": {
+      "title": "Reflect",
+      "subtitle": "Take your time",
+      "cardAria": "Reflection",
+      "addPostIt": "Add your post-it",
+      "favoriteAria": "Favorite this reflection",
       "heading": "Sit with this reflection",
       "subcopy": "Read at your own pace. Notes and tags are optional; open a companion when you want another angle.",
       "block1Title": "The reflection",
