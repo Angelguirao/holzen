@@ -12,6 +12,7 @@ import { PauseReflect } from '@/components/pause/PauseReflect';
 import type { PauseStep } from '@/components/pause/PauseProgress';
 import type { PauseSessionStepTransitionConfig } from '@/lib/pause-session-step-transition';
 import { usePauseReflectFrameFocusAmbience } from '@/hooks/use-pause-reflect-frame-focus-ambience';
+import { usePauseReflectGeneration } from '@/hooks/use-pause-reflect-generation';
 
 export type PauseSessionDeepRitualBodyProps = {
   step: PauseStep;
@@ -42,6 +43,7 @@ export type PauseSessionDeepRitualBodyProps = {
   pauseInstanceId: string | null;
   context: string | null;
   reflectionMessage: string;
+  severityAbsPct: number;
   isFavorite: boolean;
   /** Reflect forwards to favorite control; async ok. */
   onToggleFavorite: () => void | Promise<void>;
@@ -52,6 +54,8 @@ export type PauseSessionDeepRitualBodyProps = {
   decideOnBackStep: 'choose' | 'breath2';
   /** After first deep breath pattern: repeat three rounds from intro (wireframe “Three more”). */
   onRepeatDeepFirstBreathPattern: () => void;
+  /** After second deep breath pattern: repeat three rounds from intro (wireframe 330:23551). */
+  onRepeatDeepSecondBreathPattern: () => void;
 };
 
 /** Deep ritual step panels inside `PauseSessionScaffold` (Framer step transitions preserved). */
@@ -83,6 +87,7 @@ export function PauseSessionDeepRitualBody({
   pauseInstanceId,
   context,
   reflectionMessage,
+  severityAbsPct,
   isFavorite,
   onToggleFavorite,
   subscribed,
@@ -91,12 +96,29 @@ export function PauseSessionDeepRitualBody({
   onDecide,
   decideOnBackStep,
   onRepeatDeepFirstBreathPattern,
+  onRepeatDeepSecondBreathPattern,
 }: PauseSessionDeepRitualBodyProps) {
   usePauseReflectFrameFocusAmbience({
     active: step === 'reflect' || step === 'frame',
     muted: ritualSoundMuted,
     prefersReducedMotion,
   });
+
+  const reflectGenEnabled = step === 'reflect' || step === 'frame';
+  const {
+    reflectionMessage: generatedReflection,
+    loading: reflectionLoading,
+    error: reflectionError,
+    retry: retryReflection,
+  } = usePauseReflectGeneration({
+    pauseInstanceId,
+    context,
+    initialReflectionMessage: reflectionMessage,
+    severityAbsPct,
+    enabled: reflectGenEnabled,
+  });
+
+  const displayReflection = generatedReflection.trim() || reflectionMessage.trim();
 
   return (
     <AnimatePresence mode="wait" initial={false}>
@@ -139,7 +161,10 @@ export function PauseSessionDeepRitualBody({
           <PauseReflect
             pauseInstanceId={pauseInstanceId}
             context={context}
-            reflectionMessage={reflectionMessage}
+            reflectionMessage={displayReflection}
+            reflectionLoading={reflectionLoading}
+            reflectionError={reflectionError}
+            onReflectionRetry={retryReflection}
             companionHaikuEnabled={companionPrefs.haiku}
             isFavorite={isFavorite}
             onToggleFavorite={() => {
@@ -155,7 +180,7 @@ export function PauseSessionDeepRitualBody({
         <motion.div key="frame" {...stepTransition}>
           <PauseFrame
             pauseInstanceId={pauseInstanceId}
-            reflectionMessage={reflectionMessage}
+            reflectionMessage={displayReflection}
             companionHaikuEnabled={companionPrefs.haiku}
             isFavorite={isFavorite}
             onToggleFavorite={() => {
@@ -183,6 +208,7 @@ export function PauseSessionDeepRitualBody({
             onContinueAfterBreath={onContinueAfterSecondBreath}
             onSkipBreath={onSkipSecondBreath}
             ritualSoundMuted={ritualSoundMuted}
+            onRepeatDeepSecondBreathPattern={onRepeatDeepSecondBreathPattern}
           />
         </motion.div>
       )}

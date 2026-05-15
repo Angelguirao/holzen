@@ -1331,7 +1331,9 @@
       "reflectStepDurationHint": "~ 3 min",
       "breathFirstInterstitialTitle": "Three breaths",
       "breathFirstInterstitialBody": "You've arrived",
-      "breathFirstRepeatCta": "Three more"
+      "breathFirstRepeatCta": "Three more",
+      "breathSecondInterstitialTitle": "You already know",
+      "breathSecondRepeatCta": "Three more"
     },
     "feelStep": {
       "title": "What's here?",
@@ -1510,8 +1512,6 @@
     "breathSecondSubline2": "when the body is here.",
     "breathInterstitialTitle": "You stayed with it",
     "breathInterstitialBody": "When you are ready, continue into reflection.",
-    "breathInterstitialTitleSecond": "You stayed with it",
-    "breathInterstitialBodySecond": "When you are ready, continue to your decision.",
     "feelIntensityTitle": "How strong is this feeling?",
     "feelIntensityLow": "Light",
     "feelIntensityHigh": "Strong",
