@@ -1,15 +1,18 @@
+import { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import { ChevronDown, Flame, Pencil, Sparkles } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useSubscription } from '@/hooks/use-subscription';
 import { OutcomeIcon } from '@/components/icons/OutcomeIcon';
+import { PAUSE_FEEL_INTENSITY_KEYS } from '@/components/pause/pause-feel-intensity-labels';
 import { PRICING } from '@/lib/pricing';
 import { TOOLS } from '@/lib/app-routes';
 import { cn } from '@/lib/utils';
 import { ScoreImpact } from './ScoreImpact';
 import { pauseStepLayout } from '@/components/pause/pause-step-layout';
 import { Button } from '@/components/ui/button';
+import { Slider } from '@/components/ui/slider';
 
 interface PauseData {
   mood: string | null;
@@ -46,6 +49,14 @@ export function PauseDone({ decision, onReturn, pauseData, doneVariant = 'defaul
     moodKey && typeof moodKey === 'string'
       ? t(`moodCheck.moods.${moodKey}`, { defaultValue: moodKey })
       : null;
+
+  const [briefDoneIntensity, setBriefDoneIntensity] = useState(() =>
+    Math.min(5, Math.max(1, pauseData?.feelIntensity ?? 3)),
+  );
+  useEffect(() => {
+    const n = pauseData?.feelIntensity;
+    if (typeof n === 'number' && n >= 1 && n <= 5) setBriefDoneIntensity(n);
+  }, [pauseData?.feelIntensity]);
 
   if (doneVariant === 'brief') {
     const outcomeHeadline =
@@ -115,6 +126,33 @@ export function PauseDone({ decision, onReturn, pauseData, doneVariant = 'defaul
                     <Pencil className="h-4 w-4" aria-hidden />
                   </Link>
                 </div>
+                <div className="mt-4 space-y-2.5">
+                  <Slider
+                    aria-label={t('pause.feelStep.intensityTitle', { defaultValue: 'How strong?' })}
+                    min={1}
+                    max={5}
+                    step={1}
+                    value={[briefDoneIntensity]}
+                    onValueChange={(v) => setBriefDoneIntensity(Math.min(5, Math.max(1, v[0] ?? 3)))}
+                    className="w-full py-1"
+                  />
+                  <div className="flex justify-between gap-1 px-0.5 text-center text-xs text-muted-foreground sm:text-sm">
+                    {PAUSE_FEEL_INTENSITY_KEYS.map((key) => (
+                      <span
+                        key={key}
+                        className={cn(
+                          'min-w-0 flex-1 truncate',
+                          key === PAUSE_FEEL_INTENSITY_KEYS[briefDoneIntensity - 1] && 'font-medium text-foreground',
+                        )}
+                      >
+                        {t(`pause.feelStep.intensity.${key}`, { defaultValue: key })}
+                      </span>
+                    ))}
+                  </div>
+                  <p className="pt-1 text-center text-xs leading-snug text-muted-foreground">
+                    {t('pause.brief.done.intensityFootnote')}
+                  </p>
+                </div>
               </div>
             ) : null}
 
@@ -131,10 +169,6 @@ export function PauseDone({ decision, onReturn, pauseData, doneVariant = 'defaul
               </div>
             ) : null}
           </div>
-
-          <Button type="button" variant="outline" className="rounded-full" onClick={onReturn}>
-            {t('pause.return')}
-          </Button>
         </div>
       </motion.div>
     );
