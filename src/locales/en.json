@@ -1328,7 +1328,6 @@
       "breatheStepDurationHintCalming": "~ 1 min",
       "breath2StepDurationHint": "< 1 min",
       "reflectStepDurationHint": "~ 3 min",
-      "frameStepDurationHint": "~ 2 min",
       "breathFirstInterstitialTitle": "Three breaths",
       "breathFirstInterstitialBody": "You've arrived",
       "breathFirstRepeatCta": "Three more"
