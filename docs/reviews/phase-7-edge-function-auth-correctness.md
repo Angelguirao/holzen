@@ -4,7 +4,7 @@
 
 - `supabase/functions/companion-orchestrate/index.ts`
 - `supabase/functions/holzen-reflect/index.ts`
-- `supabase/functions/check-volatility/index.ts` (how it dispatches orchestrator + notifications)
+- `supabase/functions/check-volatility/index.ts` (claim path: eligibility, pause row, profile/notification delivery; **Pause V2:** **no** orchestrator dispatch on claim)
 - Regenerate path: `supabase/functions/_shared/regenerate-only.ts`
 
 ## High-risk finding: `companion-orchestrate` pause ownership

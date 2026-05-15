@@ -1,5 +1,6 @@
 /**
- * Cron-side fetches + orchestrator hints. Context suffix wording lives in `pause-context-suffix.ts`
+ * Cron-side fetches + pause context enrichment (manual parity with the client).
+ * Context suffix wording lives in `pause-context-suffix.ts`
  * (shared with the client via `@holzen-pause-context`).
  */
 

@@ -1,8 +1,8 @@
 # Phase 3: Server triggers and cron behavior review
 
-This phase is the third "mental model pass": after Phase 1 (auth + route gating) and Phase 2 (manual pause producer/consumer), we trace **automatic pause** — how **scheduled work** and **`check-volatility`** create pause instances, notifications, and **background companion orchestration**, and how that lines up with what **NotificationBell** and **PauseSession** expect.
+This phase is the third "mental model pass": after Phase 1 (auth + route gating) and Phase 2 (manual pause producer/consumer), we trace **automatic pause** — how **scheduled work** and **`check-volatility`** create pause instances and notifications, and how **client-side** reflection (`holzen-reflect`) and **`companion-orchestrate`** line up with **NotificationBell** and **PauseSession** once the user opens the app (**Pause V2**: **no** reflection LLM and **no** orchestrator dispatch on cron **claim**).
 
-If this path diverges from the manual path (Phase 2), users see inconsistent pause content, races, or duplicate `companion-orchestrate` cost.
+If this path drifts from Phase 2 or from **`check-volatility`** / **`PauseSession`** code, users see inconsistent “pause ready” copy vs what is persisted before **Reflect**, or wasted duplicate **`companion-orchestrate`** work on the client.
 
 ## Table of Contents
 
@@ -20,20 +20,20 @@ If this path diverges from the manual path (Phase 2), users see inconsistent pau
 ## What to understand first (priority)
 
 1. **Eligibility gates**: who gets an automatic pause (thresholds, quiet hours/snooze, cooldown) and how `last_trigger_at` is claimed to avoid double-fires.
-2. **Order of writes**: pause instance + profile fields + `notifications` row vs **async** `companion-orchestrate` (not awaited) — UI may open `/pause` before companion rows exist.
+2. **Order of writes (V2):** pause instance + profile fields + `notifications` row on claim — **no** server-side `generateUnifiedReflection` and **no** `companion-orchestrate` from this worker; the UI may open `/pause` before the user has run **Reflect** / lazy companion fetches.
 3. **Parity with manual pause**: cron builds BTC context similarly to `use-holzen` (shared helpers in `_shared/`), but **reflection LLM** work is **deferred** to the client at **Reflect** (`holzen-reflect`), not inline `generateUnifiedReflection` inside `check-volatility` on claim.
 4. **Notification entry**: `NotificationBell` deep-links to `/pause` with `{ pauseInstanceId }` only — same boundary Phase 2 called out; hydration must come from profile/hooks/DB.
 
 ## Mental Models & Useful Concepts
 
-- **Worker as producer**: `check-volatility` is a batch producer of pause instances + notifications; the client runs **`holzen-reflect`** at **Reflect** and may call `companion-orchestrate`.
-- **Fire-and-forget orchestration**: companion dispatch uses `fetch` to `companion-orchestrate` without awaiting completion; **eventual consistency** for `pause_ai_artifacts` / featured fields.
+- **Worker as producer**: `check-volatility` is a batch producer of pause instances + notifications; **`PauseSession`** runs **`holzen-reflect`** (Reflect → Decide window) and **`companion-orchestrate`** (lazy / intervention) in the browser — same contracts as manual.
+- **Client orchestration**: companion slots fill from **`use-companion-data`** invokes after the user opens `/pause`; **eventual consistency** for `pause_ai_artifacts` depends on user navigation and taps, not a cron-side `fetch` to `companion-orchestrate`.
 - **Optimistic cooldown**: updating `profiles.last_trigger_at` before downstream work reduces duplicate triggers under concurrent cron runs.
-- **Featured vs expanded**: reflection copy appears after **Reflect**; do not assume featured grounding is immediate for cron-driven pauses until orchestration completes.
+- **Featured vs expanded**: reflection copy appears after **Reflect**; do not assume expanded companion slots exist until the client has invoked **`companion-orchestrate`**.
 
 ## CS/SE Concepts to Know (for this phase)
 
-- **Distributed race**: cron path vs user session both touching the same `pauseInstanceId` with `companion-orchestrate` — idempotency, cache, and cost (see `docs/backlog/orchestrate-client-cron.md`).
+- **Distributed race**: multiple **client** `companion-orchestrate` invokes for the same `pauseInstanceId` (rapid remounts / retries) — idempotency, cache, and cost (see `docs/backlog/orchestrate-client-cron.md` for historical cron+client overlap notes).
 - **Eventual consistency**: notification exists before all companion rows are written; UI must tolerate loading states.
 - **At-least-once / duplicate suppression**: eligibility + cooldown logic aims to avoid spam; still validate under clock skew and retries.
 - **Separation of triggers**: pg_cron (or HTTP) invokes the edge function; auth uses service role or cron secrets per `docs/ops/cron-setup.md`.
@@ -44,14 +44,13 @@ If this path diverges from the manual path (Phase 2), users see inconsistent pau
 
 - Loads profiles, filters to **eligible** users (daily/cumulative move vs thresholds, quiet hours / `quiet_windows`, snooze, cooldown vs `last_trigger_at`).
 - Fetches BTC metrics (CoinGecko) per user's hold currency; builds context string; enriches with Fear & Greed and on-chain snapshots via shared helpers.
-- Claims cooldown by updating `profiles.last_trigger_at` before generating (optimistic lock pattern).
-- Records analytics event, calls `generateUnifiedReflection` (cron-side reflection generation).
-- Creates the pause instance via `pause_create_or_reuse_as`, updates `profiles.last_message` / `last_context`, and inserts `notifications` for the bell UI.
-- Dispatches `companion-orchestrate` via `fetch` (service role, fire-and-forget) with `pauseInstanceId`, prefs, sources, recency hints, `useIntervention: true`.
+- Claims cooldown by updating `profiles.last_trigger_at` before persisting the pause (optimistic lock pattern).
+- Creates the pause instance via `pause_create_or_reuse_as`, updates `profiles` delivery fields (`last_context`, clears `last_message` per Pause V2), and inserts `notifications` for the bell UI.
+- **Pause V2:** does **not** call `generateUnifiedReflection` on this worker and does **not** `fetch` `companion-orchestrate` on claim; reflection + companion AI run from **`PauseSession`** after the user opens the ritual.
 
 ### `supabase/functions/_shared/pause-cron-parity.ts`
 
-- Shared enrichment and source-fetch helpers so cron-side context and orchestrate inputs stay aligned with manual/client expectations (Fear & Greed, on-chain, Signal/Grounding sources, recency hints from `pause_ai_artifacts`).
+- Shared enrichment helpers so cron-side **context strings** and **claim-time snapshot** fields stay aligned with manual/client expectations (Fear & Greed, on-chain, `pauseRecencyInputs` for mood hints). Full **`holzen-reflect`** / orchestrator input pools are assembled in the browser when the user reaches **Reflect** / taps companions.
 
 ### `supabase/functions/_shared/pause-context-suffix.ts`
 
@@ -68,18 +67,18 @@ If this path diverges from the manual path (Phase 2), users see inconsistent pau
 ## Runtime touchpoints: endpoints, events, and side effects
 
 - **Scheduled HTTP**: cron invokes edge function URL for `check-volatility` (see `docs/ops/cron-setup.md` for headers/secrets).
-- **Edge function: `check-volatility`**: full automatic pause pipeline (BTC fetch, generate, DB writes, notify, dispatch orchestrate).
-- **Edge function: `companion-orchestrate`**: invoked from `check-volatility` with `Authorization: Bearer <service role>` and JSON body including `userId`, `pauseInstanceId`, context, severity, mood history, feature flags.
+- **Edge function: `check-volatility`**: eligibility + BTC context + **`pause_create_or_reuse_as`** + profile/notification delivery (**Pause V2:** **no** `generateUnifiedReflection` / **no** `companion-orchestrate` on claim).
+- **Edge function: `companion-orchestrate`**: invoked from **`PauseSession`** via **`use-companion-data`** (user JWT) for intervention + lazy slots — **not** from `check-volatility` on automatic pause claim.
 - **External APIs**: CoinGecko (BTC charts), Fear & Greed, on-chain snapshot helpers; optional email via Lovable Email for notification copy.
 - **Web Push**: may be used in `check-volatility` for push delivery (see function body for full flow).
 
 ## Data models affected
 
-- **`profiles`**: `last_trigger_at` (cooldown claim), `last_message`, `last_context`, thresholds, quiet windows, currency, companion prefs.
-- **`pause_instances`**: new rows from automatic generation; `pause_ai_artifacts` holds reflection_text/haiku and companions after orchestration.
+- **`profiles`**: `last_trigger_at` (cooldown claim), `last_context`, cleared `last_message` (Pause V2 delivery shape), thresholds, quiet windows, currency, companion prefs.
+- **`pause_instances`**: new rows from automatic **claim**; `pause_ai_artifacts` for reflection/companions is filled later from **`holzen-reflect`** + **`companion-orchestrate`** in the client.
 - **`notifications`**: rows driving NotificationBell (`user_id`, `pause_instance_id`, message, context, severity).
-- **`analytics_events`**: `pause_ai_call` (or allowlisted event) before generation.
-- **Companion-related storage**: rows written/updated by `companion-orchestrate` (e.g. companion cache / `pause_ai_artifacts` — details in orchestrate + migrations).
+- **`analytics_events`**: cron-side reflection **`pause_ai_call`** is **not** inserted on claim; reflect-step analytics happen when **`holzen-reflect`** runs in the browser.
+- **Companion-related storage**: rows written/updated by **`companion-orchestrate`** when the user is in **`PauseSession`** (e.g. `pause_ai_artifacts` — details in orchestrate + migrations).
 
 ## Systems that emerge from this review
 
@@ -96,27 +95,27 @@ Use these as "prove-or-disprove" questions while reading the Phase 3 files.
 1. Can two concurrent `check-volatility` runs double-trigger the same user, or does `last_trigger_at` + eligibility prevent it?
 2. What is the exact order: pause instance create, `notifications` insert, then fire-and-forget orchestrate — and what breaks if the user opens the notification in the first seconds?
 3. Does automatic generation use the same conceptual context as manual (`use-holzen`) enough that severity and messaging feel consistent?
-4. When the client opens `/pause` with only `pauseInstanceId`, does `useCompanionData` issue a second orchestrate call while cron is still running — and is that acceptable cost-wise?
+4. When the client opens `/pause` with only `pauseInstanceId`, does `useCompanionData` orchestrate on mount while reflection is still loading — and is that acceptable cost-wise?
 5. Are quiet hours, snooze, and cumulative thresholds applied consistently with user expectations in settings UI?
 6. What happens if CoinGecko or a sub-fetch fails mid-batch — partial users processed, retries?
 
 ## Conclusions and Tradeoffs
 
-- **Coherent story**: automatic pause is **one server-owned pipeline**: eligibility -> generate -> persist pause + profile + notification -> **async** companion work. That matches "pause ready" in the bell before every companion slot is filled.
-- **Fragility**: **time window** between notification and orchestrate completion; **duplicate orchestrate** risk when the user opens `/pause` immediately (aligns with `docs/backlog/orchestrate-client-cron.md`).
-- **Featured grounding**: cron may leave featured grounding null initially; expanded companions should still load when orchestration completes — UI must not assume parity with manual path for every field on first paint. **2026-04:** `use-companion-data` resets all companion state in `useLayoutEffect` on `pauseInstanceId` change; companion slots are loaded **lazily** on card tap (not on mount), so cron-filled `pause_ai_artifacts` rows are hydrated from DB and the user sees cached content instantly without a skeleton flash (see `docs/backlog/cron-pause-featured-parity.md`).
+- **Coherent story (V2):** automatic pause is **server-owned claim** (eligibility → persist pause + profile + notification) and **client-owned AI** ( **`holzen-reflect`** + **`companion-orchestrate`** ) once the user is in **`PauseSession`** — aligned with the manual path.
+- **Fragility:** **time window** between notification and user completing **Reflect** / companion taps; UI must tolerate empty reflection and lazy companion loaders.
+- **Featured / expanded:** cron does not pre-fill companion slots on claim; expanded companions load after client orchestration — UI must not assume parity with a long-lived manual session on first paint. **`use-companion-data`** resets companion state on `pauseInstanceId` change; slots are lazy on tap where applicable (see `docs/backlog/cron-pause-featured-parity.md` for UX notes).
 
-Tradeoffs / alternatives (documented in backlog; **policy chosen 2026-04** — fire-and-forget retained):
+Tradeoffs / alternatives (historical backlog notes; **Pause V2** removed cron-side **`companion-orchestrate`** on claim):
 
-- **Await orchestrate before `notifications`**: fewer races, slower notifications, higher tail latency if orchestrate is slow.
-- **Enrich notification payload** with enough text to render without waiting for orchestrate: more duplication, faster first paint.
-- **Keep fire-and-forget**: current shape; rely on client cache, rate limits, skip-if-served orchestrate, and loader UX on `/pause` (see `docs/backlog/automatic-pause-notification-timing.md`).
+- **Await orchestrate before `notifications`**: was discussed when cron dispatched orchestrate; less relevant now that orchestration is client-driven.
+- **Enrich notification payload** with more preview text: still useful for faster first paint before **Reflect**.
+- **Current shape**: rely on client **`holzen-reflect`**, lazy orchestrate, rate limits, and loader UX on `/pause` (see `docs/backlog/automatic-pause-notification-timing.md` for older fire-and-forget narrative).
 
 ## What to Review Next and Why
 
 **Phase 4** covers **other scheduled edge workers** that feed the pause ecosystem but are not the main volatility trigger: **BTC price cache**, **content feeds**, **pregenerate companions**. That is the natural next step after Phase 3 because:
 
-1. Phase 3 established **who** triggers automatic pause and **how** notifications + orchestrate interact.
+1. Phase 3 established **who** triggers automatic pause **claim** and how **notifications** relate to **client-side** reflection/orchestration.
 2. Phase 4 answers **what data** those workers keep warm (prices, library content, companion cache lifecycle) so Phase 5 quality/rate-limit docs connect to real inputs.
 
 **Why Phase 4 before Phase 5 (quality gates)?**
