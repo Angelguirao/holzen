@@ -78,7 +78,6 @@ export function usePauseSessionDecideHandler(input: {
           void refreshSubscription();
         }
         setDecision(d);
-        await dismissMessage();
         const q = getSessionQuote();
         setPauseImpactData(
           buildPauseImpactDataOnComplete({
@@ -94,8 +93,12 @@ export function usePauseSessionDecideHandler(input: {
             reinforcementQuote: `"${q.text}" — ${q.author}`,
           }),
         );
-        hapticFeedback('success');
+        // Must commit `done` before `await dismissMessage()` — otherwise React can paint an
+        // intermediate frame where the DB is already `completed` but `pauseSessionPhase` is
+        // still `session`, and `usePauseSessionTerminalEntryRedirect` toasts + routes to archive.
         setPhase('done');
+        await dismissMessage();
+        hapticFeedback('success');
         clearSession();
       } finally {
         decidingRef.current = false;

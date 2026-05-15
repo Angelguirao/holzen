@@ -2,13 +2,11 @@ import { useLayoutEffect, useMemo, useRef, useState } from 'react';
 import { motion } from 'framer-motion';
 import { Flame, Pencil, Sparkles } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
-import type { TFunction } from 'i18next';
 import { useSubscription } from '@/hooks/use-subscription';
+import { PAUSE_MOOD_VALUES, type MoodValue } from '@/components/MoodCheck';
 import { MoodIcon } from '@/components/icons/MoodIcon';
 import { OutcomeIcon } from '@/components/icons/OutcomeIcon';
 import { PAUSE_FEEL_INTENSITY_KEYS } from '@/components/pause/pause-feel-intensity-labels';
-import type { MoodValue } from '@/components/MoodCheck';
-import { PAUSE_MOOD_VALUES } from '@/components/MoodCheck';
 import { PRICING } from '@/lib/pricing';
 import { cn } from '@/lib/utils';
 import { ScoreImpact } from './ScoreImpact';
@@ -50,62 +48,6 @@ interface Props {
 function clampFeelIntensity(n: number | null | undefined): number {
   if (typeof n === 'number' && n >= 1 && n <= 5) return n;
   return 3;
-}
-
-/** Brief done: replaces generic “saved to Journey” with decision + entry-mood–specific copy. */
-function briefJourneyPrimaryLine(t: TFunction, pauseData: PauseData | null | undefined, decisionProp: string | null): string {
-  const dec = (pauseData?.decision ?? decisionProp)?.toLowerCase() ?? '';
-  const entryMood =
-    pauseData?.mood && isPauseMoodValue(pauseData.mood)
-      ? t(`moodCheck.moods.${pauseData.mood}`, { defaultValue: pauseData.mood })
-      : null;
-
-  if (dec === 'held' && entryMood) {
-    return t('pause.brief.done.journeyPersonalHeldWithMood', { mood: entryMood });
-  }
-  if (dec === 'held') {
-    return t('pause.brief.done.journeyPersonalHeld');
-  }
-  if (dec === 'sold' && entryMood) {
-    return t('pause.brief.done.journeyPersonalSoldWithMood', { mood: entryMood });
-  }
-  if (dec === 'sold') {
-    return t('pause.brief.done.journeyPersonalSold');
-  }
-  if (dec === 'bought' && entryMood) {
-    return t('pause.brief.done.journeyPersonalBoughtWithMood', { mood: entryMood });
-  }
-  if (dec === 'bought') {
-    return t('pause.brief.done.journeyPersonalBought');
-  }
-  return t('pause.brief.done.journeyLead', { defaultValue: 'This pause is saved to your Journey.' });
-}
-
-/** Second line under journey primary — echoes their decision, then the “many pauses” framing. */
-function briefPersonalityKicker(t: TFunction, pauseData: PauseData | null | undefined, decisionProp: string | null): string {
-  const dec = (pauseData?.decision ?? decisionProp)?.toLowerCase() ?? '';
-  if (dec === 'held') {
-    return t('pause.brief.done.personalityKickerHeld', {
-      defaultValue:
-        'After a hold like this, every pause still nudges the picture Holzen builds of you under pressure — Journey infers that personality slowly from your pattern, not one headline.',
-    });
-  }
-  if (dec === 'sold') {
-    return t('pause.brief.done.personalityKickerSold', {
-      defaultValue:
-        'After a sell like this, each pause still feeds the story your stats tell about tolerance and alignment — it sharpens across many decisions, not a single swing.',
-    });
-  }
-  if (dec === 'bought') {
-    return t('pause.brief.done.personalityKickerBought', {
-      defaultValue:
-        'After a buy like this, each pause still refines how Journey reads your composure under urge — the shape emerges from repetition, not one dramatic number.',
-    });
-  }
-  return t('pause.brief.done.personalityKicker', {
-    defaultValue:
-      'Each pause strengthens the picture Holzen builds of you under pressure — the shape your Journey stats infer slowly from many pauses, not one headline.',
-  });
 }
 
 export function PauseDone({
@@ -183,15 +125,17 @@ export function PauseDone({
         ? t(`moodCheck.moods.${briefDoneMood}`, { defaultValue: briefDoneMood })
         : null;
 
+    const pointPreviewImpacts = briefImpacts.filter((i) => i.points > 0);
     const checkInMetaRight =
-      briefImpacts[0] != null
-        ? `${briefImpacts[0].label} — ${briefImpacts[0].reason}`
+      pointPreviewImpacts.length > 0
+        ? pointPreviewImpacts.map((i) => `+${i.points} ${i.label}`).join(' · ')
         : t('pause.brief.done.checkInRowRightFallback', {
-            defaultValue: 'One more signal for Journey when you save.',
+            defaultValue: 'Skill signals update when you save.',
           });
 
-    const journeyPrimary = briefJourneyPrimaryLine(t, pauseData, decision);
-    const journeyKicker = briefPersonalityKicker(t, pauseData, decision);
+    const journeyShort = t('pause.brief.done.journeyShort', {
+      defaultValue: 'This pause is now part of your Journey.',
+    });
 
     return (
       <motion.div
@@ -212,21 +156,33 @@ export function PauseDone({
             </div>
           </div>
 
-          <div className="w-full max-w-md space-y-2 text-center">
-            <p className="text-sm font-medium leading-snug text-foreground">{journeyPrimary}</p>
-            <p className="text-xs leading-relaxed text-muted-foreground">{journeyKicker}</p>
+          <div className="w-full max-w-md space-y-3 text-center">
+            <p className="text-sm font-medium leading-snug text-foreground">{journeyShort}</p>
+            {pointPreviewImpacts.length > 0 ? (
+              <div className="flex flex-wrap justify-center gap-2">
+                {pointPreviewImpacts.map((i) => (
+                  <span
+                    key={i.key}
+                    className="inline-flex items-baseline gap-1 rounded-full border border-primary/20 bg-primary/5 px-3 py-1.5 text-xs font-medium text-foreground"
+                  >
+                    <span className="text-nox-accent-green">+{i.points}</span>
+                    <span>{i.label}</span>
+                  </span>
+                ))}
+              </div>
+            ) : null}
           </div>
 
           <div className="w-full max-w-md space-y-4 rounded-xl border border-primary bg-card p-4 text-left shadow-sm">
             <p className="text-center text-sm font-medium leading-5 tracking-wide text-foreground">
-              {t('pause.brief.done.checkInSectionTitle', { defaultValue: 'How are you now? (Optional)' })}
+              {t('pause.brief.done.checkInSectionTitle', { defaultValue: 'How are you now?' })}
             </p>
 
             <div className="flex w-full items-start justify-between gap-3 text-sm leading-5 text-foreground">
               <span className="shrink-0 font-normal">
-                {t('pause.brief.done.checkInRowLeft', { defaultValue: 'Optional' })}
+                {t('pause.brief.done.checkInRowLeft', { defaultValue: 'Check in again' })}
               </span>
-              <span className="line-clamp-3 max-w-[58%] text-right font-serif text-xs italic leading-snug text-muted-foreground sm:text-sm">
+              <span className="line-clamp-3 max-w-[58%] text-right text-xs font-medium leading-snug text-muted-foreground sm:text-sm">
                 {checkInMetaRight}
               </span>
             </div>
@@ -331,8 +287,7 @@ export function PauseDone({
             ) : (
               <p className="pt-1 text-center text-xs leading-relaxed text-muted-foreground">
                 {t('pause.brief.done.contributionWhenNoSnapshot', {
-                  defaultValue:
-                    'When this screen loads without pause details, Journey still keeps your outcome — open Stats after saving to see trends.',
+                  defaultValue: 'Save to Journey to see this pause in your stats.',
                 })}
               </p>
             )}
