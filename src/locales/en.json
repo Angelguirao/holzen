@@ -1545,8 +1545,7 @@
       "zoomOut": "Zoom out",
       "lookBack": "Look back",
       "signal": "Signal",
-      "imDone": "I'm done",
-      "hint": "Open a tool anytime — continue when you feel ready."
+      "imDone": "I'm done"
     },
     "reflect": {
       "title": "Reflect",
