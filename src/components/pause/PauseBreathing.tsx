@@ -10,46 +10,23 @@ import {
   computeBreathingPhaseAdvance,
   resolveBreathingCompleted,
 } from '@/lib/pause-breathing-phase-advance';
-import { resolveBreathCycleTotal, resolvePauseBreathingPhases, rotatingKickerIndexFromElapsed, secondsIntoTrianglePattern } from '@/lib/pause-breathing-pattern';
+import {
+  holdProgressWithinPhase,
+  resolveBreathCycleTotal,
+  resolvePauseBreathingPhases,
+  rotatingKickerIndexFromElapsed,
+  secondsIntoTrianglePattern,
+} from '@/lib/pause-breathing-pattern';
 import {
   playPauseBreathPatternCompleteCue,
   playPauseBreathPhaseCue,
   resumePauseAudioContext,
 } from '@/lib/pause-ritual-audio';
+import { BreathOrbVisual } from '@/components/pause/breath-orb-visual';
 
 const EXPAND_KEYS = ['breathing.phases.inhale', 'breathing.phases.sip'];
 const CONTRACT_KEYS = ['breathing.phases.exhale'];
-
-const BREATH_ORB_PX = 140;
-const BREATH_RING_R = 56;
-const BREATH_RING_C = 2 * Math.PI * BREATH_RING_R;
-
-/** Phase progress ring (wireframe-style) around the breathing orb. */
-function BreathPhaseProgressRing({ progress }: { progress: number }) {
-  const dashOffset = BREATH_RING_C * (1 - progress);
-  const c = BREATH_ORB_PX / 2;
-  return (
-    <svg
-      className="pointer-events-none absolute inset-0 h-full w-full -rotate-90"
-      viewBox={`0 0 ${BREATH_ORB_PX} ${BREATH_ORB_PX}`}
-      aria-hidden
-    >
-      <circle cx={c} cy={c} r={BREATH_RING_R} fill="none" className="stroke-border/55" strokeWidth={3} />
-      <circle
-        cx={c}
-        cy={c}
-        r={BREATH_RING_R}
-        fill="none"
-        className="stroke-foreground/60"
-        strokeWidth={3}
-        strokeLinecap="round"
-        strokeDasharray={BREATH_RING_C}
-        strokeDashoffset={dashOffset}
-        style={{ transition: 'stroke-dashoffset 0.25s linear' }}
-      />
-    </svg>
-  );
-}
+const HOLD_PHASE_LABEL_KEY = 'breathing.phases.hold';
 
 /** i18n: `breathing.triangleRotatingKickers` — advances every 2s in `PauseBreathing`, not per phase. */
 const TRIANGLE_ROTATING_KICKERS_I18N_KEY = 'breathing.triangleRotatingKickers';
@@ -282,6 +259,10 @@ export const PauseBreathing = forwardRef<PauseBreathingHandle, Props>(function P
   const isExpand = EXPAND_KEYS.includes(currentPhase.labelKey);
   const isContract = CONTRACT_KEYS.includes(currentPhase.labelKey);
   const scale = isExpand ? 0.5 + progress * 0.5 : isContract ? 1 - progress * 0.5 : 1;
+  const showHoldMandala = currentPhase.labelKey === HOLD_PHASE_LABEL_KEY;
+  const holdProgress = showHoldMandala
+    ? holdProgressWithinPhase(elapsed, currentPhase.duration)
+    : 0;
 
   const introKicker = t('pause.breathIntroKickerRitual', { defaultValue: 'Breathe' });
 
@@ -378,22 +359,13 @@ export const PauseBreathing = forwardRef<PauseBreathingHandle, Props>(function P
           transition={{ duration: 0.6 }}
           className="flex flex-col items-center gap-8"
         >
-          <div
-            className="relative flex items-center justify-center"
-            style={{ width: BREATH_ORB_PX, height: BREATH_ORB_PX }}
-          >
-            <BreathPhaseProgressRing progress={progress} />
-            <motion.div
-              className="relative z-[1] rounded-full border-2 border-border/50"
-              style={{
-                width: 102,
-                height: 102,
-                background: 'radial-gradient(circle, hsl(var(--nox-color-background-accent) / 0.45) 0%, transparent 70%)',
-              }}
-              animate={{ scale }}
-              transition={{ duration: 1, ease: 'easeInOut' }}
-            />
-          </div>
+          <BreathOrbVisual
+            orbScale={scale}
+            phaseProgress={progress}
+            showHoldMandala={showHoldMandala}
+            holdProgress={holdProgress}
+            prefersReducedMotion={!!prefersReduced}
+          />
           <motion.p
             key={`${phaseIndex}-${cycle}`}
             initial={{ opacity: 0 }}

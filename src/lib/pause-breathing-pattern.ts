@@ -32,6 +32,18 @@ export function secondsIntoTrianglePattern(input: {
   return cycle * roundLen + before + elapsedInCurrentPhase;
 }
 
+/**
+ * Progress through the **current** hold segment (0 → 1), for layered hold visuals (mandala / mark).
+ * Resets each time the user enters a new hold. Uses whole-second `elapsedSec` from the breathing tick.
+ *
+ * Maps the last displayed second to 1 so the composition can resolve before phase advance.
+ */
+export function holdProgressWithinPhase(elapsedSec: number, durationSec: number): number {
+  if (durationSec <= 0) return 0;
+  if (durationSec === 1) return 1;
+  return Math.min(1, Math.max(0, elapsedSec / (durationSec - 1)));
+}
+
 /** Which kicker string to show (0-based), holding the last line for any tail time. */
 export function rotatingKickerIndexFromElapsed(
   secondsIntoPattern: number,
