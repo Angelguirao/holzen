@@ -3,6 +3,7 @@ import { createClient } from "https://esm.sh/@supabase/supabase-js@2.57.2";
 import { withRequestLogging } from "../_shared/with-request-logging.ts";
 import { EdgeError } from "../_shared/edge-error.ts";
 import { logDependencyCall } from "../_shared/deps.ts";
+import { fetchInitWithIncomingTrace } from "../_shared/forward-trace-headers.ts";
 import { sendLovableEmailMessage } from "../_shared/lovable-email.ts";
 
 const escapeHtml = (str: string) =>
@@ -101,11 +102,11 @@ serve(
         log,
         "slack",
         () =>
-          fetch(slackWebhook, {
+          fetch(slackWebhook, fetchInitWithIncomingTrace(req, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ text: slackLines.join("\n") }),
-          }),
+          })),
         { operation: "incoming_webhook" }
       ).catch(() => { /* swallowed — already logged by logDependencyCall */ });
     }

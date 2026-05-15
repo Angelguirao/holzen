@@ -4,6 +4,7 @@ import { createAttemptLogger } from "../_shared/observe.ts";
 import { withRequestLogging } from "../_shared/with-request-logging.ts";
 import { EdgeError } from "../_shared/edge-error.ts";
 import { logDependencyCall } from "../_shared/deps.ts";
+import { fetchInitWithIncomingTrace } from "../_shared/forward-trace-headers.ts";
 import { AI_TEMPORARILY_UNAVAILABLE_MESSAGE } from "../_shared/ai-user-messages.ts";
 import {
   consumeAllowanceOrCredits,
@@ -164,7 +165,7 @@ ${contextBlock}${recentPromptsBlock}`;
         log,
         "lovable-ai-gateway",
         () =>
-          fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
+          fetch("https://ai.gateway.lovable.dev/v1/chat/completions", fetchInitWithIncomingTrace(req, {
             method: "POST",
             headers: {
               Authorization: `Bearer ${LOVABLE_API_KEY}`,
@@ -180,7 +181,7 @@ ${contextBlock}${recentPromptsBlock}`;
               temperature: 0.9,
             }),
             signal: controller.signal,
-          }),
+          })),
         { operation: "chat.completions" }
       );
     } catch (e) {
