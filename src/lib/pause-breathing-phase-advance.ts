@@ -1,6 +1,17 @@
 /** Box pattern: inhale, hold, exhale, hold — four phases per cycle. */
 export const BOX_BREATH_PHASE_COUNT = 4;
 
+/**
+ * Parent `completed` is false while the segment is in progress; session-local completion
+ * must still surface the post-pattern UI. Do not use `??` here — `false ?? local` ignores local.
+ */
+export function resolveBreathingCompleted(
+  completedProp: boolean | undefined,
+  completedLocal: boolean,
+): boolean {
+  return (completedProp ?? false) || completedLocal;
+}
+
 export type BreathingPhaseAdvanceResult =
   | { kind: 'tick' }
   | { kind: 'next_phase'; nextPhaseIndex: number }
