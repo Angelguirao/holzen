@@ -24,7 +24,7 @@ export const TRIANGLE_BREATH_PHASES = [
 export const TRIANGLE_PHASE_COUNT = TRIANGLE_BREATH_PHASES.length;
 
 /** Rounds on the brief Breathe step (~2 min ritual). */
-export const BRIEF_TRIANGLE_CYCLE_COUNT = 4;
+export const BRIEF_TRIANGLE_CYCLE_COUNT = 3;
 
 /** Deep pause: first Breathe segment after Feel. */
 export const DEEP_TRIANGLE_FIRST_CYCLE_COUNT = 3;

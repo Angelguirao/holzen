@@ -76,14 +76,14 @@ describe('computeBreathingPhaseAdvance', () => {
 });
 
 describe('computeBreathingPhaseAdvance (brief ritual)', () => {
-  it('completes after final exhale of round 4/4 (no post-exhale hold)', () => {
+  it('completes after final exhale of round 3/3 (no post-exhale hold)', () => {
     expect(
       computeBreathingPhaseAdvance({
         elapsed: 4,
         phaseDuration: 4,
         phaseIndex: 2,
         phaseCount: TRIANGLE_PHASE_COUNT,
-        cycle: 3,
+        cycle: 2,
         totalCycles: BRIEF_TRIANGLE_CYCLE_COUNT,
       }),
     ).toEqual({ kind: 'pattern_complete' });
