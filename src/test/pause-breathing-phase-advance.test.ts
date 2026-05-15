@@ -5,8 +5,8 @@ import {
 } from '@/lib/pause-breathing-phase-advance';
 import {
   BOX_BREATH_PHASE_COUNT,
-  BRIEF_RITUAL_BREATH_CYCLES,
-  BRIEF_RITUAL_PHASE_COUNT,
+  BRIEF_TRIANGLE_CYCLE_COUNT,
+  TRIANGLE_PHASE_COUNT,
 } from '@/lib/pause-breathing-pattern';
 
 describe('resolveBreathingCompleted', () => {
@@ -82,9 +82,9 @@ describe('computeBreathingPhaseAdvance (brief ritual)', () => {
         elapsed: 4,
         phaseDuration: 4,
         phaseIndex: 2,
-        phaseCount: BRIEF_RITUAL_PHASE_COUNT,
+        phaseCount: TRIANGLE_PHASE_COUNT,
         cycle: 3,
-        totalCycles: BRIEF_RITUAL_BREATH_CYCLES,
+        totalCycles: BRIEF_TRIANGLE_CYCLE_COUNT,
       }),
     ).toEqual({ kind: 'pattern_complete' });
   });
@@ -95,9 +95,9 @@ describe('computeBreathingPhaseAdvance (brief ritual)', () => {
         elapsed: 4,
         phaseDuration: 4,
         phaseIndex: 2,
-        phaseCount: BRIEF_RITUAL_PHASE_COUNT,
+        phaseCount: TRIANGLE_PHASE_COUNT,
         cycle: 0,
-        totalCycles: BRIEF_RITUAL_BREATH_CYCLES,
+        totalCycles: BRIEF_TRIANGLE_CYCLE_COUNT,
       }),
     ).toEqual({ kind: 'next_cycle', nextCycle: 1 });
   });

@@ -86,7 +86,7 @@ describe('buildPauseSessionScaffoldRitualDerived', () => {
     });
   });
 
-  it('deep: macro lines + session title on breath (box pattern hint)', () => {
+  it('deep: macro lines + session title on breathe (triangle ritual)', () => {
     const d = buildPauseSessionScaffoldRitualDerived({
       ritualEntry: 'deep',
       step: 'breathe',
@@ -99,14 +99,14 @@ describe('buildPauseSessionScaffoldRitualDerived', () => {
     expect(d.macroProgressSubline).toBe('< 1 min');
   });
 
-  it('deep breathe high severity: calming duration hint', () => {
+  it('deep breathe high severity: same triangle duration hint as mild', () => {
     const d = buildPauseSessionScaffoldRitualDerived({
       ritualEntry: 'deep',
       step: 'breathe',
       severity: 'high',
       t,
     });
-    expect(d.macroProgressSubline).toBe('~ 1 min');
+    expect(d.macroProgressSubline).toBe('< 1 min');
   });
 
   it('deep feel: duration hint under macro step count', () => {

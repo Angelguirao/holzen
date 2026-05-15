@@ -109,6 +109,7 @@ export function PauseSessionDeepRitualBody({
             ritualVariant="deep"
             mantra={mantra}
             severity={severity}
+            feelTile={selectedBriefFace}
             completed={breathingFirstCompleted}
             onTimedBreathingChange={onTimedBreathingChange}
             onPatternComplete={onFirstBreathPatternComplete}
@@ -159,6 +160,7 @@ export function PauseSessionDeepRitualBody({
             ritualVariant="deep"
             mantra={mantra}
             severity={severity}
+            feelTile={selectedBriefFace}
             completed={breathingSecondCompleted}
             onTimedBreathingChange={onTimedBreathingChange}
             onPatternComplete={onSecondBreathPatternComplete}

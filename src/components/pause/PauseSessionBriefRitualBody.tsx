@@ -95,6 +95,7 @@ export function PauseSessionBriefRitualBody({
             onContinueAfterBreath={onContinueAfterBriefBreath}
             onSkipBreath={onSkipBriefBreath}
             ritualSoundMuted={ritualSoundMuted}
+            feelTile={selectedBriefFace}
           />
         </motion.div>
       )}
