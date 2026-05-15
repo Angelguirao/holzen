@@ -42,11 +42,14 @@ export interface WarmResult {
  *
  * Caller is responsible for choosing the date keys (e.g. today + 1..10 year
  * anniversaries for zoom-out). Returns counts for operator logging.
+ *
+ * Optional **`incoming`** forwards W3C trace headers on CoinGecko fetches when
+ * the caller has an edge `Request` (e.g. `refresh-btc-prices` cron).
  */
 export async function warmMissingBtcPrices(
   svcClient: SupabaseClient,
   dateKeys: string[],
-  opts: { concurrency?: number } = {},
+  opts: { concurrency?: number; incoming?: Request } = {},
 ): Promise<WarmResult> {
   const unique = Array.from(new Set(dateKeys));
   if (unique.length === 0) {
@@ -90,7 +93,9 @@ export async function warmMissingBtcPrices(
     if (i > 0) await new Promise((r) => setTimeout(r, BATCH_GAP_MS));
     const batch = toFetch.slice(i, i + concurrency);
     attempted += batch.length;
-    const batchResults = await Promise.all(batch.map((k) => fetchCoinGeckoHistoryPrice(k)));
+    const batchResults = await Promise.all(
+      batch.map((k) => fetchCoinGeckoHistoryPrice(k, opts.incoming)),
+    );
     for (let j = 0; j < batch.length; j++) {
       const hit = batchResults[j];
       if (!hit) { other++; continue; }

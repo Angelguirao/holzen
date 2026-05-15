@@ -3,6 +3,7 @@ import { createClient } from "https://esm.sh/@supabase/supabase-js@2.57.2";
 import { unknownErrorForLog } from "../_shared/log-unknown-error.ts";
 import { coingeckoHeaders, fetchCoinGeckoHistoryPrice } from "../_shared/coingecko.ts";
 import { withRequestLogging } from "../_shared/with-request-logging.ts";
+import { fetchInitWithIncomingTrace } from "../_shared/forward-trace-headers.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -250,7 +251,7 @@ serve(
       for (; i < limit; i++) {
         const dateKey = allKeys[i];
         if (i > 0) await new Promise((r) => setTimeout(r, PER_DATE_GAP_MS));
-        const hit = await fetchCoinGeckoHistoryPrice(dateKey);
+        const hit = await fetchCoinGeckoHistoryPrice(dateKey, req);
         chunks++;
         if (!hit) { other++; continue; }
         if ("rateLimited" in hit) {
@@ -332,7 +333,7 @@ serve(
 
       const url =
         `https://api.coingecko.com/api/v3/coins/bitcoin/market_chart/range?vs_currency=usd&from=${fromSec}&to=${toSec}`;
-      const res = await fetch(url, { headers: coingeckoHeaders() });
+      const res = await fetch(url, fetchInitWithIncomingTrace(req, { headers: coingeckoHeaders() }));
 
       if (res.status === 429) {
         log.warn("backfill_btc_coingecko", {
