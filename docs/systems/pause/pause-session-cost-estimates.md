@@ -23,7 +23,7 @@ This document estimates **third-party API spend** for a Holzen pause session whe
 
 ### 1.1 Reflection step (message + optional haiku)
 
-- **Manual path:** `holzen-reflect` → `generateUnifiedReflection` → Lovable AI Gateway `https://ai.gateway.lovable.dev/v1/chat/completions` when the deep ritual reaches **Reflect** (`use-pause-reflect-generation` in **`PauseSession`**, typically still **enabled** through **Decide** so the call can finish off the Reflect card).
+- **Manual path:** `holzen-reflect` → `generateUnifiedReflection` → Lovable AI Gateway `https://ai.gateway.lovable.dev/v1/chat/completions` when the deep ritual reaches **Reflect** (`use-pause-reflect-generation` in **`PauseSession`**, typically still **enabled** on **Frame**, second **Breathe**, and **Decide** so the call can finish off the Reflect card).
 - **Automatic path:** same **`holzen-reflect`** call in the browser when the user reaches **Reflect** for cron-created instances (**no** inline `generateUnifiedReflection` inside `check-volatility` on claim); same **`PauseSession`** enable window as manual.
 
 Models tried (in order): `google/gemini-3-flash-preview`, then `google/gemini-2.5-flash` on failure (`reflection-generate.ts`).

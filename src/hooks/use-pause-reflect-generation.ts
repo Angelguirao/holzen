@@ -21,7 +21,10 @@ export type UsePauseReflectGenerationParams = {
   /** Hydrated / nav seed — when non-empty, used as-is and skips edge `holzen-reflect`. */
   initialReflectionMessage: string;
   severityAbsPct: number;
-  /** When false, aborts in-flight work and idles (outside deep **Reflect → Decide** window in `PauseSession`). */
+  /**
+   * When false, aborts in-flight work and idles. In `PauseSession` (deep ritual) this follows
+   * `reflectGenEnabled`: **Reflect**, **Frame**, second **Breathe**, and **Decide** only.
+   */
   enabled: boolean;
 };
 

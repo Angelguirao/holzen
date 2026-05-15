@@ -38,8 +38,8 @@ function markPauseManualStartedHomeOnce(): void {
 /**
  * Pause V2 manual-trigger hook. Opens a `pause_instances` row via `pause_create_or_reuse`
  * (+ context snapshot). Non-silent reflection text is generated later in the deep ritual via
- * `holzen-reflect` (`PauseSession` + `use-pause-reflect-generation`, enabled from Reflect
- * through Decide). Silent mode still writes a stub `reflection_text` artifact here.
+ * `holzen-reflect` (`PauseSession` + `use-pause-reflect-generation`, enabled on Reflect, Frame,
+ * second Breathe, and Decide). Silent mode still writes a stub `reflection_text` artifact here.
  */
 export function useHolzen() {
   const { user } = useAuth();

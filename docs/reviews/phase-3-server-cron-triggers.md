@@ -26,7 +26,7 @@ If this path drifts from Phase 2 or from **`check-volatility`** / **`PauseSessio
 
 ## Mental Models & Useful Concepts
 
-- **Worker as producer**: `check-volatility` is a batch producer of pause instances + notifications; **`PauseSession`** runs **`holzen-reflect`** (Reflect → Decide window) and **`companion-orchestrate`** (lazy / intervention) in the browser — same contracts as manual.
+- **Worker as producer**: `check-volatility` is a batch producer of pause instances + notifications; **`PauseSession`** runs **`holzen-reflect`** (reflect hook on **Reflect** through **Decide**, **Frame** + second **Breathe** included) and **`companion-orchestrate`** (lazy / intervention) in the browser — same contracts as manual.
 - **Client orchestration**: companion slots fill from **`use-companion-data`** invokes after the user opens `/pause`; **eventual consistency** for `pause_ai_artifacts` depends on user navigation and taps, not a cron-side `fetch` to `companion-orchestrate`.
 - **Optimistic cooldown**: updating `profiles.last_trigger_at` before downstream work reduces duplicate triggers under concurrent cron runs.
 - **Featured vs expanded**: reflection copy appears after **Reflect**; do not assume expanded companion slots exist until the client has invoked **`companion-orchestrate`**.

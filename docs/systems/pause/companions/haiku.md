@@ -14,7 +14,7 @@ This page is the **companion-level** view. For **manual vs automatic pause**, **
 ## 1. Where Haiku sits in the pipeline
 
 1. **`generateUnifiedReflection`** (`_shared/reflection-generate.ts`) produces a JSON object with **`message`** + **`haiku`** in a single model call. The haiku is part of the same prompt and response as the reflection text.
-2. Edge **`holzen-reflect`** parses that JSON (manual **or** cron-created pause — same browser invoke once **`PauseSession`** enables reflect generation at **Reflect** through **Decide**; **`check-volatility`** does **not** run this model on claim in Pause V2).
+2. Edge **`holzen-reflect`** parses that JSON (manual **or** cron-created pause — same browser invoke once **`PauseSession`** enables reflect generation at **Reflect** through **Decide** (**Frame** and second **Breathe** included); **`check-volatility`** does **not** run this model on claim in Pause V2).
 3. **`persistReflectionArtifacts`** in **`src/lib/pause-reflect-artifact.ts`** (called from **`generateReflectionAtReflectStep`**) writes **`pause_ai_artifacts`** (`kind: haiku` when present) alongside **`reflection_text`**.
 4. `HaikuDisplay` in `CompanionSection` renders the haiku card.
 
