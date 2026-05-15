@@ -47,6 +47,18 @@ function readCid(req: Request): string {
   return crypto.randomUUID();
 }
 
+/** W3C Trace Context version 00 — trace-id (32 hex) + parent span id (16 hex). */
+const TRACEPARENT_V00_RE = /^00-([0-9a-f]{32})-([0-9a-f]{16})-[0-9a-f]{2}$/i;
+
+function parseTraceparentHeader(
+  header: string | null
+): { trace_id: string; parent_span_id: string } | undefined {
+  if (!header) return undefined;
+  const m = header.trim().match(TRACEPARENT_V00_RE);
+  if (!m) return undefined;
+  return { trace_id: m[1].toLowerCase(), parent_span_id: m[2].toLowerCase() };
+}
+
 function readFrontendRelease(req: Request): string | undefined {
   const raw = req.headers.get("x-app-version") || req.headers.get("X-App-Version");
   if (!raw) return undefined;
@@ -89,12 +101,16 @@ export function withRequestLogging(fnName: string, handler: EdgeHandler) {
     const frontendRelease = readFrontendRelease(req);
     const log = createLogger(fnName, cid, { frontendRelease });
     const url = new URL(req.url);
+    const traceparent =
+      req.headers.get("traceparent") || req.headers.get("Traceparent") || req.headers.get("TRACEPARENT");
+    const w3c = parseTraceparentHeader(traceparent);
 
     log("request", {
       method: req.method,
       path: url.pathname,
       // Query string is safe to log in principle, but some functions accept `?q=` free text.
       // Keep it off by default — functions that need it can log inside the handler.
+      ...(w3c ?? {}),
     });
 
     try {

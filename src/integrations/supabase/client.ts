@@ -3,6 +3,7 @@
 import { createClient } from '@supabase/supabase-js';
 import type { Database } from './types';
 import { getCid } from '@/lib/cid';
+import { getHolzenOutgoingTraceHeaders } from '@/lib/trace-propagation';
 
 declare const __APP_VERSION__: string;
 
@@ -53,6 +54,13 @@ supabase.functions.invoke = ((functionName: string, options?: Parameters<InvokeF
     } catch {
       /* define-guarded — shouldn't throw, but stay defensive */
     }
+  }
+  const trace = getHolzenOutgoingTraceHeaders();
+  const headerKeysLower = new Set(Object.keys(headers).map((k) => k.toLowerCase()));
+  for (const [k, v] of Object.entries(trace)) {
+    if (headerKeysLower.has(k.toLowerCase())) continue;
+    headers[k] = v;
+    headerKeysLower.add(k.toLowerCase());
   }
   return originalInvoke(functionName, { ...options, headers });
 }) as InvokeFn;

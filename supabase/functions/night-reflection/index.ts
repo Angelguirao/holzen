@@ -285,7 +285,8 @@ serve(
       Deno.env.get("SUPABASE_URL") ?? "",
       Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? "",
       cid,
-      { auth: { persistSession: false } }
+      { auth: { persistSession: false } },
+      req,
     );
 
     let LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");

@@ -2,6 +2,8 @@
 //
 // Why this exists even though `supabase.functions.invoke` is patched to inject `x-cid`:
 //   - It returns a normalized `{ data, error }` with a consistent error shape.
+//   - It merges W3C / Sentry trace headers (`trace-propagation.ts`) on every call, including
+//     the `fetch` path used when `query` is set (the patched invoke path cannot add query strings).
 //   - It lets us add cross-cutting behavior (breadcrumbs, PostHog timing, retries) in one place
 //     without touching every call site.
 //   - It's explicit: grep `invokeEdge(` to find all edge calls made from the UI.
@@ -12,6 +14,7 @@
 import { supabase } from "@/integrations/supabase/client";
 import { getCid } from "./cid";
 import { Sentry } from "./sentry";
+import { getHolzenOutgoingTraceHeaders } from "./trace-propagation";
 
 declare const __APP_VERSION__: string;
 
@@ -59,6 +62,7 @@ export async function invokeEdge<T = unknown, B = unknown>(
   const headers: Record<string, string> = {
     "x-cid": cid,
     "x-app-version": typeof __APP_VERSION__ === "string" ? __APP_VERSION__ : "dev",
+    ...getHolzenOutgoingTraceHeaders(),
     ...options.headers,
   };
 

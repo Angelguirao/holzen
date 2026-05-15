@@ -43,7 +43,8 @@ serve(
       Deno.env.get("SUPABASE_URL") ?? "",
       Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? "",
       cid,
-      { auth: { persistSession: false } }
+      { auth: { persistSession: false } },
+      req,
     );
 
     // 1. Fetch current BTC price and 24h change (USD for threshold check)
