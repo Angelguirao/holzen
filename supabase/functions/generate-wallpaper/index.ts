@@ -2,6 +2,7 @@ import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.57.2";
 import { createAttemptLogger } from "../_shared/observe.ts";
 import { withRequestLogging } from "../_shared/with-request-logging.ts";
+import { fetchInitWithIncomingTrace } from "../_shared/forward-trace-headers.ts";
 import {
   consumeAllowanceOrCredits,
   resolveTierFromProfile,
@@ -133,7 +134,7 @@ serve(
     const t0 = Date.now();
     const response = await fetch(
       "https://ai.gateway.lovable.dev/v1/chat/completions",
-      {
+      fetchInitWithIncomingTrace(req, {
         method: "POST",
         headers: {
           Authorization: `Bearer ${LOVABLE_API_KEY}`,
@@ -144,7 +145,7 @@ serve(
           messages: [{ role: "user", content: prompt }],
           modalities: ["image", "text"],
         }),
-      }
+      }),
     );
 
     if (!response.ok) {

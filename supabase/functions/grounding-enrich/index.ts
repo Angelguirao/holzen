@@ -2,6 +2,7 @@ import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.57.2";
 import { extractDoi, normalizeCitation } from "../_shared/grounding-enrichment-util.ts";
 import { withRequestLogging } from "../_shared/with-request-logging.ts";
+import { fetchInitWithIncomingTrace } from "../_shared/forward-trace-headers.ts";
 
 /**
  * `grounding-enrich` — read-optimized enrichment for Grounding Full View.
@@ -148,8 +149,8 @@ serve(
     // 2. Fan out upstream calls in parallel. Each helper returns null on
     //    failure so one bad source can't tank the whole enrichment.
     const [crossref, semanticScholar] = await Promise.all([
-      fetchCrossref(doiHint, citation).catch(() => null),
-      doiHint ? fetchSemanticScholar(doiHint).catch(() => null) : Promise.resolve(null),
+      fetchCrossref(doiHint, citation, req).catch(() => null),
+      doiHint ? fetchSemanticScholar(doiHint, req).catch(() => null) : Promise.resolve(null),
     ]);
 
     const resolvedDoi = doiHint ?? crossref?.doi ?? null;
@@ -159,7 +160,7 @@ serve(
 
     // Generate short bios only when Crossref gave us author names — no names,
     // no bios, no Gemini call (cost control).
-    const bios = researcherNames.length > 0 ? await generateBios(researcherNames, citation).catch(() => []) : [];
+    const bios = researcherNames.length > 0 ? await generateBios(researcherNames, citation, req).catch(() => []) : [];
     const researchers: Researcher[] = researcherNames.map((name, i) => ({
       name,
       bio: bios[i] ?? "",
@@ -257,22 +258,32 @@ interface CrossrefResult {
   authors: string[];
 }
 
-async function fetchCrossref(doiHint: string | null, citation: string): Promise<CrossrefResult | null> {
+async function fetchCrossref(
+  doiHint: string | null,
+  citation: string,
+  incoming?: Request,
+): Promise<CrossrefResult | null> {
   const controller = new AbortController();
   const timeout = setTimeout(() => controller.abort(), 8000);
   try {
     let res: Response;
     if (doiHint) {
-      res = await fetch(`https://api.crossref.org/works/${encodeURIComponent(doiHint)}`, {
-        headers: { "User-Agent": "Holzen/1.0 (mailto:support@holzen.app)" },
-        signal: controller.signal,
-      });
+      res = await fetch(
+        `https://api.crossref.org/works/${encodeURIComponent(doiHint)}`,
+        fetchInitWithIncomingTrace(incoming, {
+          headers: { "User-Agent": "Holzen/1.0 (mailto:support@holzen.app)" },
+          signal: controller.signal,
+        }),
+      );
     } else {
       // Title/author fuzzy search: use the citation text trimmed to ~120 chars.
       const q = citation.slice(0, 120);
       res = await fetch(
         `https://api.crossref.org/works?rows=1&query.bibliographic=${encodeURIComponent(q)}`,
-        { headers: { "User-Agent": "Holzen/1.0 (mailto:support@holzen.app)" }, signal: controller.signal },
+        fetchInitWithIncomingTrace(incoming, {
+          headers: { "User-Agent": "Holzen/1.0 (mailto:support@holzen.app)" },
+          signal: controller.signal,
+        }),
       );
     }
     if (!res.ok) return null;
@@ -314,13 +325,16 @@ function cleanCrossrefAbstract(raw?: string | null): string | null {
   return stripped.length > 0 ? stripped.slice(0, 800) : null;
 }
 
-async function fetchSemanticScholar(doi: string): Promise<{ citationCount: number | null } | null> {
+async function fetchSemanticScholar(
+  doi: string,
+  incoming?: Request,
+): Promise<{ citationCount: number | null } | null> {
   const controller = new AbortController();
   const timeout = setTimeout(() => controller.abort(), 8000);
   try {
     const res = await fetch(
       `https://api.semanticscholar.org/graph/v1/paper/DOI:${encodeURIComponent(doi)}?fields=citationCount`,
-      { signal: controller.signal },
+      fetchInitWithIncomingTrace(incoming, { signal: controller.signal }),
     );
     if (!res.ok) return null;
     const json = await res.json();
@@ -337,7 +351,7 @@ async function fetchSemanticScholar(doi: string): Promise<{ citationCount: numbe
  * aligned with the input `names` order. On failure, returns an empty array so
  * the caller can fall back to name-only display.
  */
-async function generateBios(names: string[], citation: string): Promise<string[]> {
+async function generateBios(names: string[], citation: string, incoming?: Request): Promise<string[]> {
   const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
   if (!LOVABLE_API_KEY) return [];
 
@@ -353,20 +367,23 @@ ${names.map((n, i) => `${i + 1}. ${n}`).join("\n")}
 
 Return a JSON object with key "bios" containing a string array of the same length as the input, in the same order. Each string is the bio.`;
 
-    const res = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
-      method: "POST",
-      headers: { Authorization: `Bearer ${LOVABLE_API_KEY}`, "Content-Type": "application/json" },
-      body: JSON.stringify({
-        model: "google/gemini-2.5-flash",
-        messages: [
-          { role: "system", content: systemPrompt },
-          { role: "user", content: userPrompt },
-        ],
-        response_format: { type: "json_object" },
-        temperature: 0.3,
+    const res = await fetch(
+      "https://ai.gateway.lovable.dev/v1/chat/completions",
+      fetchInitWithIncomingTrace(incoming, {
+        method: "POST",
+        headers: { Authorization: `Bearer ${LOVABLE_API_KEY}`, "Content-Type": "application/json" },
+        body: JSON.stringify({
+          model: "google/gemini-2.5-flash",
+          messages: [
+            { role: "system", content: systemPrompt },
+            { role: "user", content: userPrompt },
+          ],
+          response_format: { type: "json_object" },
+          temperature: 0.3,
+        }),
+        signal: controller.signal,
       }),
-      signal: controller.signal,
-    });
+    );
     if (!res.ok) return [];
     const json = await res.json();
     const raw = json.choices?.[0]?.message?.content ?? "{}";

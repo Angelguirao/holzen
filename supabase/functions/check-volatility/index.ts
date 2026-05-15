@@ -22,6 +22,7 @@ import {
 
 type VolatilityFnLog = RequestLoggingContext["log"];
 import { coingeckoHeaders } from "../_shared/coingecko.ts";
+import { fetchInitWithIncomingTrace } from "../_shared/forward-trace-headers.ts";
 import {
   holzenLovableEmailLogger,
   sendLovableEmailMessage,
@@ -42,13 +43,17 @@ const corsHeaders = {
 const DEFAULT_COOLDOWN_MS = 6 * 60 * 60 * 1000; // 6 hours fallback
 
 async function fetchWithRetry(
+  incoming: Request | undefined,
   url: string,
   log: VolatilityFnLog,
   retries = 3,
   delayMs = 2000,
 ): Promise<Response> {
   for (let i = 0; i < retries; i++) {
-    const res = await fetch(url, { headers: coingeckoHeaders() });
+    const res = await fetch(
+      url,
+      fetchInitWithIncomingTrace(incoming, { headers: coingeckoHeaders() }),
+    );
     if (res.ok) return res;
     log.warn("check_volatility_coingecko", {
       holzen_event: "check_volatility_cron",
@@ -106,6 +111,7 @@ interface VolatilityProfile {
 }
 
 async function fetchAssetVolatilityForCurrency(
+  incoming: Request | undefined,
   coinId: string,
   vsCurrency: string,
   log: VolatilityFnLog,
@@ -114,10 +120,12 @@ async function fetchAssetVolatilityForCurrency(
   const id = encodeURIComponent(coinId);
   const [res1d, res7d] = await Promise.all([
     fetchWithRetry(
+      incoming,
       `https://api.coingecko.com/api/v3/coins/${id}/market_chart?vs_currency=${cur}&days=1`,
       log,
     ),
     fetchWithRetry(
+      incoming,
       `https://api.coingecko.com/api/v3/coins/${id}/market_chart?vs_currency=${cur}&days=7`,
       log,
     ),
@@ -293,7 +301,7 @@ serve(
         [...assetToCurrencies.entries()].flatMap(([asset, curs]) =>
           [...curs].map(async (c) => {
             try {
-              const m = await fetchAssetVolatilityForCurrency(asset, c, log);
+              const m = await fetchAssetVolatilityForCurrency(req, asset, c, log);
               return { asset, c, m };
             } catch (e) {
               log.error("check_volatility_asset_fetch", {
@@ -308,8 +316,8 @@ serve(
           }),
         ),
       ),
-      fetchFearGreedSnapshot(),
-      fetchOnChainSnapshot(),
+      fetchFearGreedSnapshot(req),
+      fetchOnChainSnapshot(req),
     ]);
 
     const metricsByAssetCur = new Map<string, Map<string, AssetVolatilityMetrics>>();
@@ -333,13 +341,13 @@ serve(
       });
     }
 
-    function metricsForProfile(p: VolatilityProfile): AssetVolatilityMetrics {
+    function metricsForProfile(p: VolatilityProfile, fallback: AssetVolatilityMetrics): AssetVolatilityMetrics {
       const aid = normalizeTrackedAssetId(p.tracked_asset_id);
       const c = normalizeHoldGoalCurrency(p.hold_goal_currency);
       return metricsByAssetCur.get(aid)?.get(c) ??
         metricsByAssetCur.get(aid)?.get("usd") ??
         metricsByAssetCur.get("bitcoin")?.get(c) ??
-        usdPeek;
+        fallback;
     }
 
     log("check_volatility_phase", {
@@ -418,7 +426,7 @@ serve(
     }
 
     const eligible = profileRows.filter((p) => {
-      const b = metricsForProfile(p);
+      const b = metricsForProfile(p, usdPeek);
       const absChange = Math.abs(b.changePercent);
       const effectiveThreshold = b.direction === "down"
         ? (p.threshold_down ?? p.threshold ?? 5)
@@ -517,7 +525,7 @@ serve(
         return false;
       }
 
-      const userM = metricsForProfile(profile);
+      const userM = metricsForProfile(profile, usdPeek);
       const absChange = Math.abs(userM.changePercent);
       const dir = userM.direction === "down" ? "down" : "up";
       const pct = absChange.toFixed(1);

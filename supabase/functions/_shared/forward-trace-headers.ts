@@ -21,3 +21,28 @@ export function extractForwardedTraceHeaders(req: Request): Record<string, strin
   }
   return out;
 }
+
+/**
+ * Merge W3C / Sentry trace headers from the incoming edge `Request` into a
+ * `fetch` `RequestInit`. Existing header keys (case-insensitive) are not overwritten.
+ */
+export function fetchInitWithIncomingTrace(
+  incoming: Request | undefined,
+  init: RequestInit,
+): RequestInit {
+  if (!incoming) return init;
+  const trace = extractForwardedTraceHeaders(incoming);
+  if (Object.keys(trace).length === 0) return init;
+  const headers = new Headers(init.headers ?? undefined);
+  for (const [k, v] of Object.entries(trace)) {
+    let has = false;
+    for (const hk of headers.keys()) {
+      if (hk.toLowerCase() === k.toLowerCase()) {
+        has = true;
+        break;
+      }
+    }
+    if (!has) headers.set(k, v);
+  }
+  return { ...init, headers };
+}

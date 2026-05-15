@@ -98,6 +98,8 @@ Edge CORS (`supabase/functions/_shared/cors.ts`) allow-lists those headers; `wit
 
 `createCidSupabaseClient(..., incomingRequest?)` forwards the same trace headers on service-role PostgREST/Auth HTTP calls when the optional **`Request`** is passed (see `_shared/forward-trace-headers.ts`); explicit `global.headers` from the caller still win.
 
+`fetchInitWithIncomingTrace(incomingRequest, init)` merges the same headers into a plain `fetch` **`RequestInit`** for outbound third-party calls (for example the Lovable AI gateway or price APIs) without overwriting keys already set in `init.headers`.
+
 This is **not** a full OpenTelemetry SDK in-app — it aligns the propagation **wire format** with OTel / W3C so downstream collectors or future OTLP export can reuse the same identifiers.
 
 ### 2.5 Alert rules (Sentry Alerts UI)

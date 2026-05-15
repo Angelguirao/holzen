@@ -3,6 +3,7 @@ import { unknownErrorForLog } from "../_shared/log-unknown-error.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.57.2";
 import type { createLogger } from "../_shared/observe.ts";
 import { withRequestLogging } from "../_shared/with-request-logging.ts";
+import { fetchInitWithIncomingTrace } from "../_shared/forward-trace-headers.ts";
 import {
   consumeAllowanceOrCredits,
   resolveTierFromProfile,
@@ -53,20 +54,24 @@ async function callAIWithFallback(
   fallbackModel: string,
   timeoutMs: number,
   log: RequestLog,
+  incoming?: Request,
 ): Promise<{ data: unknown; status: number }> {
   for (const model of [primaryModel, fallbackModel]) {
     const controller = new AbortController();
     const timeout = setTimeout(() => controller.abort(), timeoutMs);
     try {
-      const res = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
-        method: "POST",
-        headers: {
-          Authorization: `Bearer ${apiKey}`,
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ ...body, model }),
-        signal: controller.signal,
-      });
+      const res = await fetch(
+        "https://ai.gateway.lovable.dev/v1/chat/completions",
+        fetchInitWithIncomingTrace(incoming, {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${apiKey}`,
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ ...body, model }),
+          signal: controller.signal,
+        }),
+      );
       clearTimeout(timeout);
 
       if (res.status === 429 || res.status === 402) {
@@ -416,6 +421,7 @@ Generate 3-5 skill development insights based on real patterns in this data. Ret
         "google/gemini-2.5-flash-lite",
         20000,
         log,
+        req,
       );
 
       if (status === 429 || status === 402) {

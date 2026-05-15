@@ -4,6 +4,7 @@ import { createCidSupabaseClient, sendWebPushWithCid } from "../_shared/cid-clie
 import { unknownErrorForLog, webPushStatusCode } from "../_shared/log-unknown-error.ts";
 import { createAttemptLogger } from "../_shared/observe.ts";
 import { coingeckoHeaders } from "../_shared/coingecko.ts";
+import { fetchInitWithIncomingTrace } from "../_shared/forward-trace-headers.ts";
 import {
   withRequestLogging,
   type RequestLoggingContext,
@@ -29,9 +30,17 @@ function getUserLocalHour(timezone: string): number {
   }
 }
 
-async function fetchWithRetry(url: string, retries = 3, delayMs = 2000): Promise<Response> {
+async function fetchWithRetry(
+  url: string,
+  retries = 3,
+  delayMs = 2000,
+  incoming?: Request,
+): Promise<Response> {
   for (let i = 0; i < retries; i++) {
-    const res = await fetch(url, { headers: coingeckoHeaders() });
+    const res = await fetch(
+      url,
+      fetchInitWithIncomingTrace(incoming, { headers: coingeckoHeaders() }),
+    );
     if (res.ok) return res;
     await res.text();
     if (i < retries - 1) await new Promise((r) => setTimeout(r, delayMs * (i + 1)));
@@ -41,13 +50,16 @@ async function fetchWithRetry(url: string, retries = 3, delayMs = 2000): Promise
 
 const btcCache = new Map<string, { changePercent: number; direction: string; absChange: string }>();
 
-async function fetchBtc1dData(currency: string) {
+async function fetchBtc1dData(currency: string, incoming?: Request) {
   const cached = btcCache.get(currency);
   if (cached) return cached;
 
   const cur = currency.toLowerCase();
   const res = await fetchWithRetry(
-    `https://api.coingecko.com/api/v3/coins/bitcoin/market_chart?vs_currency=${cur}&days=1`
+    `https://api.coingecko.com/api/v3/coins/bitcoin/market_chart?vs_currency=${cur}&days=1`,
+    3,
+    2000,
+    incoming,
   );
   const data = await res.json();
   const prices: [number, number][] = data.prices;
@@ -133,6 +145,7 @@ async function generateAIMessage(
   tone: string,
   logAttempt: (p: Parameters<ReturnType<typeof createAttemptLogger>>[0]) => void,
   log: RequestLoggingContext["log"],
+  incoming?: Request,
 ): Promise<string | null> {
   const moodSummary = recentMoods.length > 0
     ? `Recent moods (last 7 days): ${recentMoods.join(", ")}`
@@ -175,22 +188,25 @@ Write one personalized night reflection message.`;
     try {
       const controller = new AbortController();
       const timeout = setTimeout(() => controller.abort(), 15000);
-      const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
-        method: "POST",
-        headers: {
-          Authorization: `Bearer ${apiKey}`,
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          model,
-          messages: [
-            { role: "system", content: systemPrompt },
-            { role: "user", content: userPrompt },
-          ],
-          temperature: 0.6,
+      const response = await fetch(
+        "https://ai.gateway.lovable.dev/v1/chat/completions",
+        fetchInitWithIncomingTrace(incoming, {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${apiKey}`,
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            model,
+            messages: [
+              { role: "system", content: systemPrompt },
+              { role: "user", content: userPrompt },
+            ],
+            temperature: 0.6,
+          }),
+          signal: controller.signal,
         }),
-        signal: controller.signal,
-      });
+      );
       clearTimeout(timeout);
 
       if (!response.ok) {
@@ -306,7 +322,7 @@ serve(
       LOVABLE_API_KEY = undefined;
     }
 
-    const usdData = await fetchBtc1dData("USD");
+    const usdData = await fetchBtc1dData("USD", req);
     log("night_reflection_phase", {
       holzen_event: "night_reflection_cron",
       phase: "btc_24h_context",
@@ -342,7 +358,7 @@ serve(
       if (localHour !== targetHour) continue;
 
       const currency = profile.hold_goal_currency || "USD";
-      const btc = await fetchBtc1dData(currency);
+      const btc = await fetchBtc1dData(currency, req);
       const userLang = profile.language || "en";
       const tone = profile.reflection_tone || "stoic";
 
@@ -417,6 +433,7 @@ serve(
           tone,
           logAttempt,
           log,
+          req,
         );
         if (aiMessage) {
           message = aiMessage;

@@ -3,6 +3,7 @@ import webpush from "https://esm.sh/web-push@3.6.7";
 import { createCidSupabaseClient, sendWebPushWithCid } from "../_shared/cid-clients.ts";
 import { unknownErrorForLog, webPushStatusCode } from "../_shared/log-unknown-error.ts";
 import { coingeckoHeaders } from "../_shared/coingecko.ts";
+import { fetchInitWithIncomingTrace } from "../_shared/forward-trace-headers.ts";
 import { withRequestLogging } from "../_shared/with-request-logging.ts";
 
 const corsHeaders = {
@@ -11,9 +12,12 @@ const corsHeaders = {
     "authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version",
 };
 
-async function fetchWithRetry(url: string, retries = 3, delayMs = 2000): Promise<Response> {
+async function fetchWithRetry(req: Request, url: string, retries = 3, delayMs = 2000): Promise<Response> {
   for (let i = 0; i < retries; i++) {
-    const res = await fetch(url, { headers: coingeckoHeaders() });
+    const res = await fetch(
+      url,
+      fetchInitWithIncomingTrace(req, { headers: coingeckoHeaders() }),
+    );
     if (res.ok) return res;
     await res.text();
     if (i < retries - 1) await new Promise((r) => setTimeout(r, delayMs * (i + 1)));
@@ -49,6 +53,7 @@ serve(
 
     // 1. Fetch current BTC price and 24h change (USD for threshold check)
     const res = await fetchWithRetry(
+      req,
       "https://api.coingecko.com/api/v3/coins/bitcoin/market_chart?vs_currency=usd&days=1"
     );
     const data = await res.json();
@@ -142,7 +147,8 @@ serve(
         } else {
           try {
             const curRes = await fetchWithRetry(
-              `https://api.coingecko.com/api/v3/simple/price?ids=bitcoin&vs_currencies=${currency}`
+              req,
+              `https://api.coingecko.com/api/v3/simple/price?ids=bitcoin&vs_currencies=${currency}`,
             );
             const curData = await curRes.json();
             deliveryPrice = curData?.bitcoin?.[currency] ?? currentPriceUsd;
