@@ -165,10 +165,6 @@ export function PauseFrame({
           <ChevronRight className="ml-1 h-4 w-4" aria-hidden />
         </Button>
       </div>
-
-      <p className="mt-4 text-center text-xs leading-relaxed text-muted-foreground">
-        {t('pause.frame.hint', { defaultValue: 'Open a tool anytime — continue when you feel ready.' })}
-      </p>
     </motion.div>
   );
 }
