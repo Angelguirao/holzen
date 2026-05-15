@@ -102,6 +102,8 @@ Edge CORS (`supabase/functions/_shared/cors.ts`) allow-lists those headers; `wit
 
 BTC cache workers (`refresh-btc-prices`, `backfill-btc-prices`, `seed-btc-history`) and shared helpers such as **`fetchCoinGeckoHistoryPrice`** / **`warmMissingBtcPrices`** accept the incoming edge `Request` where applicable so CoinGecko, backup tickers, and CryptoCompare calls stay in the same trace when headers are present.
 
+**`callPerplexityChat(..., incoming?)`** forwards the same headers to Perplexity. **`companion-orchestrate`** passes the edge `Request` into signal, grounding, history, and zoom-out generators (including regenerate-only) so live search and Lovable structuring stay correlated with the client trace.
+
 This is **not** a full OpenTelemetry SDK in-app — it aligns the propagation **wire format** with OTel / W3C so downstream collectors or future OTLP export can reuse the same identifiers.
 
 ### 2.5 Alert rules (Sentry Alerts UI)

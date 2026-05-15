@@ -24,6 +24,7 @@ async function searchRecentArticle(
   activity: string,
   _langCode: string,
   log: RequestLog,
+  incoming?: Request,
 ): Promise<{ title: string; url: string; snippet: string; usage?: PerplexityUsage; searchMs: number } | null> {
   const PERPLEXITY_API_KEY = Deno.env.get("PERPLEXITY_API_KEY");
   if (!PERPLEXITY_API_KEY) return null;
@@ -43,6 +44,7 @@ async function searchRecentArticle(
       PERPLEXITY_API_KEY,
       () => {},
       10_000,
+      incoming,
     );
     const searchMs = Date.now() - t0;
     const content = result.content;
@@ -340,7 +342,7 @@ Rules:
       const chosenActivity = args.activity;
 
       // Now search Perplexity for a recent article about the chosen activity
-      const article = await searchRecentArticle(chosenActivity, langCode, log);
+      const article = await searchRecentArticle(chosenActivity, langCode, log, req);
 
       if (logAttempt) {
         logAttempt({

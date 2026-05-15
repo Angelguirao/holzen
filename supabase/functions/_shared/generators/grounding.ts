@@ -79,6 +79,8 @@ export interface GenerateGroundingParams {
   /** Skip the live phase only — library/cache still serve. Used by circuit breaker. */
   skipLive?: boolean;
   log: (msg: string, extra?: Record<string, unknown>) => void;
+  /** Edge `Request` for W3C trace propagation to Perplexity. */
+  incomingRequest?: Request;
 }
 
 // ── Internals ──
@@ -224,6 +226,7 @@ export async function generateGrounding(params: GenerateGroundingParams): Promis
     forceLive,
     skipLive,
     log,
+    incomingRequest,
   } = params;
   const marketDirectionForCache = parseMarketDirection(context);
   const phases = getPhaseConfig();
@@ -337,7 +340,7 @@ DIVERSITY: Use a different journal/venue angle when possible. Do not recycle the
     let apiCalls = 0;
     let mergedUsage = undefined as ReturnType<typeof mergePerplexityUsage>;
 
-    const result = await callPerplexityChat(perplexityBody, PERPLEXITY_API_KEY, (m) => log(m));
+    const result = await callPerplexityChat(perplexityBody, PERPLEXITY_API_KEY, (m) => log(m), 10_000, incomingRequest);
     apiCalls++;
     mergedUsage = result.usage;
     searchContent = result.content;
@@ -349,7 +352,7 @@ DIVERSITY: Use a different journal/venue angle when possible. Do not recycle the
       const retryBody = { ...perplexityBody };
       delete retryBody.search_domain_filter;
       try {
-        const retry = await callPerplexityChat(retryBody, PERPLEXITY_API_KEY, (m) => log(m));
+        const retry = await callPerplexityChat(retryBody, PERPLEXITY_API_KEY, (m) => log(m), 10_000, incomingRequest);
         apiCalls++;
         mergedUsage = mergePerplexityUsage(mergedUsage, retry.usage);
         if (retry.citations.length > 0) {

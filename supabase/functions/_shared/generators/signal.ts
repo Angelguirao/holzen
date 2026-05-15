@@ -164,6 +164,8 @@ export interface GenerateSignalParams {
    */
   skipLive?: boolean;
   log: (msg: string, extra?: Record<string, unknown>) => void;
+  /** Edge `Request` for W3C trace propagation to Perplexity (companion-orchestrate). */
+  incomingRequest?: Request;
 }
 
 // ── Internals ──
@@ -284,6 +286,7 @@ export async function generateSignal(params: GenerateSignalParams): Promise<Sign
     forceLive,
     skipLive,
     log,
+    incomingRequest,
   } = params;
   const marketDirection = parseMarketDirection(context);
   const phases = getPhaseConfig();
@@ -409,7 +412,7 @@ export async function generateSignal(params: GenerateSignalParams): Promise<Sign
     let apiCalls = 0;
     let mergedUsage = undefined as ReturnType<typeof mergePerplexityUsage>;
 
-    const result = await callPerplexityChat(perplexityBody, PERPLEXITY_API_KEY, (m) => log(m), 15_000);
+    const result = await callPerplexityChat(perplexityBody, PERPLEXITY_API_KEY, (m) => log(m), 15_000, incomingRequest);
     apiCalls++;
     mergedUsage = result.usage;
     searchContent = result.content;
@@ -421,7 +424,7 @@ export async function generateSignal(params: GenerateSignalParams): Promise<Sign
       const retryBody = { ...perplexityBody };
       delete retryBody.search_domain_filter;
       try {
-        const retry = await callPerplexityChat(retryBody, PERPLEXITY_API_KEY, (m) => log(m), 15_000);
+        const retry = await callPerplexityChat(retryBody, PERPLEXITY_API_KEY, (m) => log(m), 15_000, incomingRequest);
         apiCalls++;
         mergedUsage = mergePerplexityUsage(mergedUsage, retry.usage);
         if (retry.citations.length > 0) {
@@ -437,7 +440,7 @@ export async function generateSignal(params: GenerateSignalParams): Promise<Sign
       const retryWide = { ...perplexityBody };
       delete retryWide.search_domain_filter;
       try {
-        const wide = await callPerplexityChat(retryWide, PERPLEXITY_API_KEY, (m) => log(m), 15_000);
+        const wide = await callPerplexityChat(retryWide, PERPLEXITY_API_KEY, (m) => log(m), 15_000, incomingRequest);
         apiCalls++;
         mergedUsage = mergePerplexityUsage(mergedUsage, wide.usage);
         searchContent = wide.content;

@@ -153,6 +153,7 @@ async function searchWithPerplexity(
   category: string,
   apiKey: string,
   log: (msg: string) => void,
+  incoming?: Request,
 ): Promise<{ content: string; citations: string[]; usage?: PerplexityUsage; searchMs: number } | null> {
   const t0 = Date.now();
   try {
@@ -175,6 +176,7 @@ async function searchWithPerplexity(
       apiKey,
       log,
       15_000,
+      incoming,
     );
     return {
       content: result.content,
@@ -689,7 +691,7 @@ serve(
       }
 
       if (!scrapedContent && PERPLEXITY_API_KEY) {
-        const searchResult = await searchWithPerplexity(source.name, articleUrl, source.category, PERPLEXITY_API_KEY, hzLog);
+        const searchResult = await searchWithPerplexity(source.name, articleUrl, source.category, PERPLEXITY_API_KEY, hzLog, req);
         if (searchResult) {
           scrapedContent = searchResult.content;
           citations = searchResult.citations;
