@@ -4,6 +4,9 @@ import {
   PAUSE_RITUAL_BREATHING_PATTERN_MODE,
   resolveBreathCycleTotal,
   resolvePauseBreathingPhases,
+  rotatingKickerIndexFromElapsed,
+  RITUAL_TRIANGLE_KICKER_INTERVAL_SEC,
+  secondsIntoTrianglePattern,
   TRIANGLE_PHASE_COUNT,
 } from '@/lib/pause-breathing-pattern';
 
@@ -26,5 +29,32 @@ describe('pause-breathing-pattern', () => {
     expect(resolveBreathCycleTotal('brief', 'first')).toBe(BRIEF_TRIANGLE_CYCLE_COUNT);
     expect(resolveBreathCycleTotal('deep', 'first')).toBe(3);
     expect(resolveBreathCycleTotal('deep', 'second')).toBe(2);
+  });
+
+  it('secondsIntoTrianglePattern sums completed phases within the timed loop', () => {
+    const d = [4, 4, 4];
+    expect(
+      secondsIntoTrianglePattern({
+        cycle: 0,
+        phaseIndex: 0,
+        elapsedInCurrentPhase: 0,
+        phaseDurationsSec: d,
+      }),
+    ).toBe(0);
+    expect(
+      secondsIntoTrianglePattern({
+        cycle: 1,
+        phaseIndex: 2,
+        elapsedInCurrentPhase: 3,
+        phaseDurationsSec: d,
+      }),
+    ).toBe(12 + 8 + 3);
+  });
+
+  it('rotatingKickerIndexFromElapsed advances every 2s and holds the last line', () => {
+    expect(rotatingKickerIndexFromElapsed(0, 17, RITUAL_TRIANGLE_KICKER_INTERVAL_SEC)).toBe(0);
+    expect(rotatingKickerIndexFromElapsed(2, 17, RITUAL_TRIANGLE_KICKER_INTERVAL_SEC)).toBe(1);
+    expect(rotatingKickerIndexFromElapsed(33, 17, RITUAL_TRIANGLE_KICKER_INTERVAL_SEC)).toBe(16);
+    expect(rotatingKickerIndexFromElapsed(40, 17, RITUAL_TRIANGLE_KICKER_INTERVAL_SEC)).toBe(16);
   });
 });

@@ -7,12 +7,40 @@ import type { FeelStepTile } from '@/components/pause/pause-feel-types';
  * - **`feel_tile_mapped`** — reserved for design: route by Feel tile (e.g. FOMO → sigh, anxious → 4-6-8, calm → shorter box).
  *
  * Flip `PAUSE_RITUAL_BREATHING_PATTERN_MODE` when design + QA are ready; then implement branches in
- * `resolvePauseBreathingPhases` (and extend i18n under `breathing.phaseHints.*`).
+ * `resolvePauseBreathingPhases` (and extend i18n, e.g. `breathing.triangleRotatingKickers` or feel-tile-specific lists).
  */
 export type PauseRitualBreathingPatternMode = 'triangle' | 'feel_tile_mapped';
 
 /** Product default until Feel-tile routing ships. */
 export const PAUSE_RITUAL_BREATHING_PATTERN_MODE: PauseRitualBreathingPatternMode = 'triangle';
+
+/** Figma: kicker line under the phase timer advances every N seconds, not on phase boundaries. */
+export const RITUAL_TRIANGLE_KICKER_INTERVAL_SEC = 2;
+
+export function secondsIntoTrianglePattern(input: {
+  cycle: number;
+  phaseIndex: number;
+  elapsedInCurrentPhase: number;
+  phaseDurationsSec: readonly number[];
+}): number {
+  const { cycle, phaseIndex, elapsedInCurrentPhase, phaseDurationsSec } = input;
+  const roundLen = phaseDurationsSec.reduce((a, b) => a + b, 0);
+  let before = 0;
+  for (let i = 0; i < phaseIndex; i++) {
+    before += phaseDurationsSec[i] ?? 0;
+  }
+  return cycle * roundLen + before + elapsedInCurrentPhase;
+}
+
+/** Which kicker string to show (0-based), holding the last line for any tail time. */
+export function rotatingKickerIndexFromElapsed(
+  secondsIntoPattern: number,
+  kickerCount: number,
+  intervalSec: number = RITUAL_TRIANGLE_KICKER_INTERVAL_SEC,
+): number {
+  if (kickerCount <= 0) return 0;
+  return Math.min(Math.floor(secondsIntoPattern / intervalSec), kickerCount - 1);
+}
 
 /** Inhale → hold → exhale per round (triangle / “partial box”). */
 export const TRIANGLE_BREATH_PHASES = [

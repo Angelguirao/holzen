@@ -10,7 +10,7 @@ import {
   computeBreathingPhaseAdvance,
   resolveBreathingCompleted,
 } from '@/lib/pause-breathing-phase-advance';
-import { resolveBreathCycleTotal, resolvePauseBreathingPhases } from '@/lib/pause-breathing-pattern';
+import { resolveBreathCycleTotal, resolvePauseBreathingPhases, rotatingKickerIndexFromElapsed, secondsIntoTrianglePattern } from '@/lib/pause-breathing-pattern';
 import {
   playPauseBreathPatternCompleteCue,
   playPauseBreathPhaseCue,
@@ -51,10 +51,8 @@ function BreathPhaseProgressRing({ progress }: { progress: number }) {
   );
 }
 
-/** i18n: `breathing.phaseHints.triangle.h{cycle}_{phaseIndex}` (see `pause-breathing-pattern.ts`). */
-function phaseHintTranslationKey(cycle: number, phaseIndex: number): string {
-  return `breathing.phaseHints.triangle.h${cycle}_${phaseIndex}`;
-}
+/** i18n: `breathing.triangleRotatingKickers` — advances every 2s in `PauseBreathing`, not per phase. */
+const TRIANGLE_ROTATING_KICKERS_I18N_KEY = 'breathing.triangleRotatingKickers';
 
 export type PauseBreathingHandle = {
   /** Return from the timed breathing loop to the pre-start intro (same step). */
@@ -163,6 +161,33 @@ export const PauseBreathing = forwardRef<PauseBreathingHandle, Props>(function P
 
   const completed = resolveBreathingCompleted(completedProp, completedLocal);
   const currentPhase = pattern.phases[phaseIndex];
+
+  const phaseDurationsSec = useMemo(() => pattern.phases.map((p) => p.duration), [pattern.phases]);
+
+  const triangleRotatingKickers = useMemo((): string[] => {
+    const raw = t(TRIANGLE_ROTATING_KICKERS_I18N_KEY, { returnObjects: true }) as unknown;
+    if (!Array.isArray(raw)) return [];
+    return raw.filter((x): x is string => typeof x === 'string');
+  }, [t]);
+
+  const secondsIntoTrianglePatternMemo = useMemo(
+    () =>
+      secondsIntoTrianglePattern({
+        cycle,
+        phaseIndex,
+        elapsedInCurrentPhase: elapsed,
+        phaseDurationsSec,
+      }),
+    [cycle, phaseIndex, elapsed, phaseDurationsSec],
+  );
+
+  const triangleKickerIndex = useMemo(
+    () => rotatingKickerIndexFromElapsed(secondsIntoTrianglePatternMemo, triangleRotatingKickers.length),
+    [secondsIntoTrianglePatternMemo, triangleRotatingKickers.length],
+  );
+
+  const triangleKickerLine =
+    triangleRotatingKickers.length > 0 ? (triangleRotatingKickers[triangleKickerIndex] ?? '') : '';
 
   const onPatternCompleteRef = useRef(onPatternComplete);
   onPatternCompleteRef.current = onPatternComplete;
@@ -380,15 +405,15 @@ export const PauseBreathing = forwardRef<PauseBreathingHandle, Props>(function P
           <p className="font-mono text-3xl tabular-nums text-muted-foreground">
             {phaseSecondCountsUp ? elapsed + 1 : currentPhase.duration - elapsed}
           </p>
-          {showPhaseHints ? (
+          {showPhaseHints && triangleRotatingKickers.length > 0 ? (
             <motion.p
-              key={`phase-hint-triangle-${cycle}-${phaseIndex}`}
+              key={`triangle-kicker-${triangleKickerIndex}`}
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ duration: 0.35 }}
               className="max-w-xs px-2 text-center text-xs italic leading-snug text-muted-foreground"
             >
-              {t(phaseHintTranslationKey(cycle, phaseIndex), { defaultValue: '' })}
+              {triangleKickerLine}
             </motion.p>
           ) : null}
           <p className="text-base italic text-muted-foreground">
