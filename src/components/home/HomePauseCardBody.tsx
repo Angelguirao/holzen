@@ -21,7 +21,7 @@ interface HomePauseCardBodyProps {
   monthlyRemaining: number | undefined;
   checkoutLoading: boolean;
   onStartCheckoutPro: () => void;
-  message: string | null;
+  hasOpenPause: boolean;
   openPauseState: 'active' | 'engaged' | null;
   contextPreview: { btc24h: string | null; marketSentiment: string | null };
   onPauseWithThis: () => void;
@@ -50,7 +50,7 @@ export function HomePauseCardBody({
   monthlyRemaining,
   checkoutLoading,
   onStartCheckoutPro,
-  message,
+  hasOpenPause,
   openPauseState,
   contextPreview,
   onPauseWithThis,
@@ -102,7 +102,7 @@ export function HomePauseCardBody({
             <p className={homeInWidget.meta}>{t('home.subscription.freeRemaining', { count: monthlyRemaining })}</p>
           )}
 
-          {message ? (
+          {hasOpenPause ? (
             <div className="space-y-4">
               {pending ? (
                 <div
@@ -150,11 +150,12 @@ export function HomePauseCardBody({
                 <div className="space-y-4">
                   <div className={homeInWidget.loadingRow}>
                     <Loader2 className="h-4 w-4 shrink-0 animate-spin" aria-hidden />
-                    <p className={homeInWidget.bodyMuted}>{t('home.generatingReflection')}</p>
+                    <p className={homeInWidget.bodyMuted}>
+                      {t('home.openingPause', { defaultValue: 'Opening your pause…' })}
+                    </p>
                   </div>
                   <Skeleton className="h-4 w-full" />
-                  <Skeleton className="h-4 w-3/4" />
-                  <Skeleton className="h-4 w-1/2" />
+                  <Skeleton className="h-4 w-2/3" />
                 </div>
               ) : blockingError ? (
                 <HomePauseBlockingErrorPanel error={blockingError} onTryAgain={onReflectionRetry} />

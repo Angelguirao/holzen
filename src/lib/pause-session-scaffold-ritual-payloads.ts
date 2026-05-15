@@ -63,6 +63,9 @@ export type PauseSessionScaffoldRitualPayloadsParams = {
   handleDeepFirstBreathRepeat: PauseSessionDeepRitualBodyProps['onRepeatDeepFirstBreathPattern'];
   handleDeepSecondBreathRepeat: PauseSessionDeepRitualBodyProps['onRepeatDeepSecondBreathPattern'];
   severityAbsPct: number;
+  reflectionLoading: boolean;
+  reflectionError: string | null;
+  onReflectionRetry: PauseSessionDeepRitualBodyProps['onReflectionRetry'];
 };
 
 /** Maps orchestrator deps to `PauseSessionBriefRitualBodyProps` and `PauseSessionDeepRitualBodyProps`. */
@@ -137,7 +140,9 @@ export function buildPauseSessionScaffoldRitualPayloads(
       decideOnBackStep: p.decideOnBackStep,
       onRepeatDeepFirstBreathPattern: p.handleDeepFirstBreathRepeat,
       onRepeatDeepSecondBreathPattern: p.handleDeepSecondBreathRepeat,
-      severityAbsPct: p.severityAbsPct,
+      reflectionLoading: p.reflectionLoading,
+      reflectionError: p.reflectionError,
+      onReflectionRetry: p.onReflectionRetry,
     },
   };
 }

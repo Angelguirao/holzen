@@ -63,6 +63,9 @@ function setup(overrides: Partial<Parameters<typeof buildPauseSessionScaffoldRit
     handleDeepFirstBreathRepeat: vi.fn(),
     handleDeepSecondBreathRepeat: vi.fn(),
     severityAbsPct: 5,
+    reflectionLoading: false,
+    reflectionError: null,
+    onReflectionRetry: vi.fn(),
     ...overrides,
   };
   return {

@@ -3,7 +3,6 @@ import { useQuery, useQueryClient } from '@tanstack/react-query';
 import type { BtcPriceData } from '@/lib/btc';
 import { getHolzenMarketDisplayQueryOptions } from '@/lib/holzen-market-display-query';
 import { supabase } from '@/integrations/supabase/client';
-import { invokeEdge } from '@/lib/invoke-edge';
 import { useAuth } from '@/hooks/use-auth';
 import { useProfile } from '@/hooks/use-profile';
 import type { CompanionData } from '@/components/CompanionSection';
@@ -19,7 +18,6 @@ import {
   bucketChangePercent,
   computeContextFingerprint,
 } from '@/lib/pause-fingerprint';
-import { loadReflectRecencyHints } from '@/lib/load-reflect-recency-hints';
 import { trackEvent } from '@/lib/posthog';
 
 const PAUSE_MANUAL_START_HOME = 'holzen_sess_pause_manual_started_home';
@@ -35,13 +33,6 @@ function markPauseManualStartedHomeOnce(): void {
   } catch {
     /* sessionStorage */
   }
-}
-
-function previewCompanionTypeTags(c: CompanionData): string[] {
-  const tags: string[] = [];
-  if (c.haiku) tags.push('haiku');
-  if (c.groundingTitle || c.groundingBody) tags.push('grounding');
-  return tags;
 }
 
 /**
@@ -191,7 +182,7 @@ export function useHolzen() {
     };
   }, [user, syncOpenPauseFromDb]);
 
-  /** Generate reflect-step text (holzen-reflect) and create the V2 pause instance + artifacts. */
+  /** Create the V2 pause instance (reflection AI runs at Reflect step). */
   const generateMessage = useCallback(
     async (data: BtcPriceData, mood?: string) => {
       if (!user) {
@@ -305,42 +296,6 @@ export function useHolzen() {
       setError(null);
 
       try {
-        const { moodHistory, recentMessages, recentHaikus } = await loadReflectRecencyHints();
-        const { data: fnData, error: fnError } = await invokeEdge<{
-          message?: string;
-          haiku?: CompanionData['haiku'];
-          grounding_title?: string | null;
-          grounding_body?: string | null;
-          grounding_citation?: string | null;
-          grounding_url?: string | null;
-        }>('holzen-reflect', {
-          body: {
-            context: ctx,
-            tone: reflectionTone,
-            customPrompt: customPrompt || undefined,
-            style: reflectionStyle,
-            severity: Math.abs(data.changePercent),
-            motivations: motivations.length > 0 ? motivations : undefined,
-            mantra: mantra || undefined,
-            groundingActivities: groundingActivities.length > 0 ? groundingActivities : undefined,
-            currency,
-            language,
-            ...(moodHistory && moodHistory.length > 0 ? { moodHistory } : {}),
-            ...(recentMessages && recentMessages.length > 0 ? { recentMessages } : {}),
-            ...(recentHaikus && recentHaikus.length > 0 ? { recentHaikus } : {}),
-          },
-        });
-        if (fnError) throw fnError;
-
-        const msg: string | undefined = fnData?.message;
-        if (!msg) throw new Error('No pause message returned');
-
-        const companionData: CompanionData = {
-          haiku: fnData?.haiku ?? null,
-          groundingTitle: fnData?.grounding_title ?? null,
-          groundingBody: fnData?.grounding_body ?? null,
-        };
-
         const res = await pauseCreateOrReuse({
           templateSlug: 'volatility_v1',
           source: 'manual',
@@ -359,10 +314,6 @@ export function useHolzen() {
 
         if (!res.instance_id) {
           holzenLog.manual('generateMessage: reuse/skip', { reason: res.reused_reason });
-          setMessage(msg);
-          setContext(ctx);
-          setCompanions(companionData);
-          setNewPauseArrival(true);
           return;
         }
 
@@ -384,50 +335,17 @@ export function useHolzen() {
 
         if (!isPendingOffer) {
           setLastPauseInstanceId(res.instance_id);
-          setMessage(msg);
           setContext(ctx);
-          setCompanions(companionData);
+          setMessage(null);
+          setCompanions({ haiku: null, groundingTitle: null, groundingBody: null });
           setNewPauseArrival(true);
-        }
-
-        const artifacts: Array<{
-          pause_instance_id: string;
-          user_id: string;
-          kind: string;
-          content: Record<string, unknown>;
-        }> = [
-          {
-            pause_instance_id: res.instance_id,
-            user_id: user.id,
-            kind: 'reflection_text',
-            content: { message: msg, context: ctx },
-          },
-        ];
-        if (companionData.groundingTitle || companionData.groundingBody) {
-          artifacts.push({
-            pause_instance_id: res.instance_id,
-            user_id: user.id,
-            kind: 'ground_nudge',
-            content: {
-              title: companionData.groundingTitle ?? '',
-              body: companionData.groundingBody ?? '',
-              citation: typeof fnData?.grounding_citation === 'string' ? fnData.grounding_citation : '',
-              url: typeof fnData?.grounding_url === 'string' ? fnData.grounding_url : '',
-            },
-          });
-        }
-        await supabase
-          .from('pause_ai_artifacts' as never)
-          .upsert(artifacts as never, { onConflict: 'pause_instance_id,kind' } as never);
-
-        if (!isPendingOffer) {
           setLastTriggerAt(new Date().toISOString());
           try {
             trackEvent('pause.manual_completed', {
               duration_s: Math.round((Date.now() - t0) / 1000),
               had_bitcoin_context: assetId === 'bitcoin',
               tracked_asset_id: assetId,
-              companion_types: previewCompanionTypeTags(companionData),
+              companion_types: [],
             });
           } catch {
             /* no-op */
@@ -438,10 +356,8 @@ export function useHolzen() {
         holzenLog.manual('generateMessage: error', { message: raw });
         if (raw.includes('fetch') || raw.includes('network') || raw.includes('Failed to fetch')) {
           setError('Could not reach Holzen. Check your connection.');
-        } else if (raw.includes('rate') || raw.includes('limit') || raw.includes('429')) {
-          setError('Too many requests — please wait a moment and try again.');
         } else {
-          setError('AI pause prompt unavailable right now. Try again shortly.');
+          setError('Could not open a pause right now. Try again shortly.');
         }
       } finally {
         setLoading(false);
@@ -449,15 +365,7 @@ export function useHolzen() {
     },
     [
       user,
-      reflectionTone,
-      reflectionStyle,
       silentMode,
-      customPrompt,
-      motivations,
-      mantra,
-      groundingActivities,
-      currency,
-      language,
       profile.cumulativeThreshold,
       profile.trackedAssetId,
     ],

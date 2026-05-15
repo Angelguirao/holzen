@@ -18,7 +18,7 @@ export function useHomePauseCardProjection(args: {
   subscribed: boolean;
   monthlyRemaining: number | undefined;
   checkoutLoading: boolean;
-  message: string | null;
+  hasOpenPause: boolean;
   openPauseState: 'active' | 'engaged' | null;
   pauseContextHomePreview: PauseContextPreview;
   loading: boolean;
@@ -46,7 +46,7 @@ export function useHomePauseCardProjection(args: {
     subscribed,
     monthlyRemaining,
     checkoutLoading,
-    message,
+    hasOpenPause,
     openPauseState,
     pauseContextHomePreview,
     loading,
@@ -94,7 +94,7 @@ export function useHomePauseCardProjection(args: {
         monthlyRemaining={monthlyRemaining}
         checkoutLoading={checkoutLoading}
         onStartCheckoutPro={onStartCheckoutPro}
-        message={message}
+        hasOpenPause={hasOpenPause}
         openPauseState={openPauseState}
         contextPreview={pauseContextHomePreview}
         onPauseWithThis={onNavigatePauseWithThis}
@@ -120,7 +120,7 @@ export function useHomePauseCardProjection(args: {
       monthlyRemaining,
       checkoutLoading,
       onStartCheckoutPro,
-      message,
+      hasOpenPause,
       openPauseState,
       pauseContextHomePreview,
       onNavigatePauseWithThis,

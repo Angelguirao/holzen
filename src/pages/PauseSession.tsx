@@ -70,6 +70,7 @@ import { usePendingPauseOffer } from '@/hooks/use-pending-pause-offer';
 import { usePauseSessionDepthPickerHandlers } from '@/hooks/use-pause-session-depth-picker-handlers';
 import { usePauseSessionDeepChooseBridgeHandler } from '@/hooks/use-pause-session-deep-choose-bridge-handler';
 import { usePauseSessionFeelTilesSelect } from '@/hooks/use-pause-session-feel-tiles-select';
+import { usePauseReflectGeneration } from '@/hooks/use-pause-reflect-generation';
 import { PauseLeaveWithPendingSheet } from '@/components/pause/PauseLeaveWithPendingSheet';
 
 /**
@@ -579,6 +580,29 @@ export default function PauseSession() {
     setDecideOnBackStep,
   ]);
 
+  const reflectGenEnabled =
+    ritualEntry === 'deep' &&
+    (step === 'reflect' ||
+      step === 'frame' ||
+      step === 'breath2' ||
+      step === 'choose' ||
+      step === 'decide');
+
+  const {
+    reflectionMessage: generatedReflectionMessage,
+    loading: reflectionLoading,
+    error: reflectionError,
+    retry: retryReflection,
+  } = usePauseReflectGeneration({
+    pauseInstanceId,
+    context,
+    initialReflectionMessage: message,
+    severityAbsPct: Math.abs(btcData?.changePercent ?? 0),
+    enabled: reflectGenEnabled,
+  });
+
+  const effectiveReflectionMessage = generatedReflectionMessage.trim() || message;
+
   const { handleDecide } = usePauseSessionDecideHandler({
     decidingRef,
     pauseInstanceId,
@@ -596,7 +620,7 @@ export default function PauseSession() {
     breathingSecondCompleted,
     feelIntensity,
     shiftIntensity,
-    reflectionMessage: message,
+    reflectionMessage: effectiveReflectionMessage,
     haiku: companions.haiku ?? null,
   });
 
@@ -677,7 +701,7 @@ export default function PauseSession() {
     companionPrefs,
     pauseInstanceId,
     context,
-    message,
+    message: effectiveReflectionMessage,
     isFavorite,
     toggleFavorite,
     subscribed,
@@ -687,6 +711,9 @@ export default function PauseSession() {
     handleDeepFirstBreathRepeat,
     handleDeepSecondBreathRepeat,
     severityAbsPct: Math.abs(btcData?.changePercent ?? 0),
+    reflectionLoading,
+    reflectionError,
+    onReflectionRetry: retryReflection,
   });
 
   return (
