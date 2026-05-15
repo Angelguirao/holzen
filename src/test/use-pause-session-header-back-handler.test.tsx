@@ -39,7 +39,7 @@ describe('usePauseSessionHeaderBackHandler', () => {
     expect(reset).not.toHaveBeenCalled();
   });
 
-  it('resets breath intro on brief breath when timer active', () => {
+  it('calls goBack on brief Breathe (including during timed pattern)', () => {
     const input = baseInput({
       briefStep: 'breath',
       breathTimedActive: true,
@@ -48,13 +48,13 @@ describe('usePauseSessionHeaderBackHandler', () => {
     act(() => {
       result.current.handlePauseHeaderBack();
     });
-    expect(input.goBack).not.toHaveBeenCalled();
+    expect(input.goBack).toHaveBeenCalledTimes(1);
     const reset = (input.breathingRef.current as unknown as { resetToIntro: ReturnType<typeof vi.fn> })
       .resetToIntro;
-    expect(reset).toHaveBeenCalledTimes(1);
+    expect(reset).not.toHaveBeenCalled();
   });
 
-  it('clears first breath completed on brief breath after first segment done', () => {
+  it('calls goBack on brief Breathe after pattern complete (to Feel)', () => {
     const input = baseInput({
       briefStep: 'breath',
       breathingFirstCompleted: true,
@@ -64,7 +64,7 @@ describe('usePauseSessionHeaderBackHandler', () => {
     act(() => {
       result.current.handlePauseHeaderBack();
     });
-    expect(input.setBreathingFirstCompleted).toHaveBeenCalledWith(false);
-    expect(input.goBack).not.toHaveBeenCalled();
+    expect(input.goBack).toHaveBeenCalledTimes(1);
+    expect(input.setBreathingFirstCompleted).not.toHaveBeenCalled();
   });
 });

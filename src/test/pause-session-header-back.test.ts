@@ -32,23 +32,21 @@ describe('isPauseSessionHeaderBackVisible', () => {
     ).toBe(false);
   });
 
-  it('brief: false on breath step (no shell back while breathing)', () => {
-    expect(isPauseSessionHeaderBackVisible(base({ ritualEntry: 'brief', briefStep: 'breath' }))).toBe(
-      false,
-    );
+  it('brief: back chevron only on Breathe (to return to Feel)', () => {
+    expect(isPauseSessionHeaderBackVisible(base({ ritualEntry: 'brief', briefStep: 'breath' }))).toBe(true);
     expect(
       isPauseSessionHeaderBackVisible(
         base({ ritualEntry: 'brief', briefStep: 'breath', breathTimedActive: true }),
       ),
-    ).toBe(false);
+    ).toBe(true);
     expect(
       isPauseSessionHeaderBackVisible(
         base({ ritualEntry: 'brief', briefStep: 'breath', breathingFirstCompleted: true }),
       ),
-    ).toBe(false);
+    ).toBe(true);
   });
 
-  it('brief: never shows shell chevron (stepper-only navigation)', () => {
+  it('brief: no shell back on Feel, Integrate, or Decide', () => {
     expect(isPauseSessionHeaderBackVisible(base({ ritualEntry: 'brief', briefStep: 'integrate' }))).toBe(
       false,
     );
@@ -95,24 +93,18 @@ const intentBase = (over: Partial<PauseHeaderBackIntentInput> = {}): PauseHeader
 });
 
 describe('computePauseHeaderBackIntent', () => {
-  it('brief: breath timed segment resets intro only', () => {
+  it('brief: header back always uses ritual goBack (e.g. Breathe → Feel)', () => {
     expect(
       computePauseHeaderBackIntent(
         intentBase({ ritualEntry: 'brief', briefStep: 'breath', breathTimedActive: true }),
       ),
-    ).toEqual({ kind: 'brief_breath_reset_intro' });
-  });
-
-  it('brief: breath after completion resets intro and clears first flag', () => {
+    ).toEqual({ kind: 'go_back' });
     expect(
       computePauseHeaderBackIntent(
         intentBase({ ritualEntry: 'brief', briefStep: 'breath', breathingFirstCompleted: true }),
       ),
-    ).toEqual({ kind: 'brief_breath_reset_intro_clear_first' });
-  });
-
-  it('brief: otherwise ritual goBack', () => {
-    expect(computePauseHeaderBackIntent(intentBase({ ritualEntry: 'brief', briefStep: 'feel' }))).toEqual({
+    ).toEqual({ kind: 'go_back' });
+    expect(computePauseHeaderBackIntent(intentBase({ ritualEntry: 'brief', briefStep: 'breath' }))).toEqual({
       kind: 'go_back',
     });
   });
