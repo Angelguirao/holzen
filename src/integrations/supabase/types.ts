@@ -101,6 +101,21 @@ export type Database = {
         }
         Relationships: []
       }
+      badge_definitions: {
+        Row: {
+          badge_id: string
+          created_at: string
+        }
+        Insert: {
+          badge_id: string
+          created_at?: string
+        }
+        Update: {
+          badge_id?: string
+          created_at?: string
+        }
+        Relationships: []
+      }
       blog_posts: {
         Row: {
           body: string
@@ -2166,7 +2181,15 @@ export type Database = {
           notified?: boolean
           user_id?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "user_badges_badge_id_fkey"
+            columns: ["badge_id"]
+            isOneToOne: false
+            referencedRelation: "badge_definitions"
+            referencedColumns: ["badge_id"]
+          },
+        ]
       }
       user_companion_serves: {
         Row: {
@@ -2942,7 +2965,6 @@ export type Database = {
           has_breath_completed: boolean | null
           has_initial_emotion_logged: boolean | null
           has_outcome_logged: boolean | null
-          has_post_pause_emotion_logged: boolean | null
           has_shift_emotion_logged: boolean | null
           id: string | null
           initial_emotion_intensity: number | null
@@ -2952,8 +2974,6 @@ export type Database = {
           metadata: Json | null
           note_text: string | null
           outcome: string | null
-          post_pause_emotion_intensity: number | null
-          post_pause_mood: string | null
           reflection_text: string | null
           shift_emotion_intensity: number | null
           shift_mood: string | null
@@ -2984,7 +3004,6 @@ export type Database = {
           has_breath_completed?: never
           has_initial_emotion_logged?: never
           has_outcome_logged?: never
-          has_post_pause_emotion_logged?: never
           has_shift_emotion_logged?: never
           id?: string | null
           initial_emotion_intensity?: never
@@ -2994,8 +3013,6 @@ export type Database = {
           metadata?: Json | null
           note_text?: never
           outcome?: never
-          post_pause_emotion_intensity?: never
-          post_pause_mood?: never
           reflection_text?: never
           shift_emotion_intensity?: never
           shift_mood?: never
@@ -3026,7 +3043,6 @@ export type Database = {
           has_breath_completed?: never
           has_initial_emotion_logged?: never
           has_outcome_logged?: never
-          has_post_pause_emotion_logged?: never
           has_shift_emotion_logged?: never
           id?: string | null
           initial_emotion_intensity?: never
@@ -3036,8 +3052,6 @@ export type Database = {
           metadata?: Json | null
           note_text?: never
           outcome?: never
-          post_pause_emotion_intensity?: never
-          post_pause_mood?: never
           reflection_text?: never
           shift_emotion_intensity?: never
           shift_mood?: never
@@ -3325,7 +3339,6 @@ export type Database = {
         | "initial_emotion_logged"
         | "reflection_step"
         | "shift_emotion_logged"
-        | "post_pause_emotion_logged"
         | "outcome_logged"
         | "note_updated"
         | "tag_updated"
@@ -3479,7 +3492,6 @@ export const Constants = {
         "initial_emotion_logged",
         "reflection_step",
         "shift_emotion_logged",
-        "post_pause_emotion_logged",
         "outcome_logged",
         "note_updated",
         "tag_updated",
