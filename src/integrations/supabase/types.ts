@@ -101,6 +101,21 @@ export type Database = {
         }
         Relationships: []
       }
+      badge_definitions: {
+        Row: {
+          badge_id: string
+          created_at: string
+        }
+        Insert: {
+          badge_id: string
+          created_at?: string
+        }
+        Update: {
+          badge_id?: string
+          created_at?: string
+        }
+        Relationships: []
+      }
       blog_posts: {
         Row: {
           body: string
@@ -2166,7 +2181,15 @@ export type Database = {
           notified?: boolean
           user_id?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "user_badges_badge_id_fkey"
+            columns: ["badge_id"]
+            isOneToOne: false
+            referencedRelation: "badge_definitions"
+            referencedColumns: ["badge_id"]
+          },
+        ]
       }
       user_companion_serves: {
         Row: {
