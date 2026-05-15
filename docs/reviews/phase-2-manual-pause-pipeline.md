@@ -28,7 +28,7 @@ This phase is the second "mental model pass": after Phase 1 (who can reach `/pau
 
 - **Producer vs consumer**: `useHolzen.generateMessage` / `manualTrigger` is the producer; `PauseSession` + `PauseReflect` + `CompanionSection` are consumers. They must agree on field names and semantics.
 - **Ephemeral vs persisted**: `location.state` is lost on some navigations; `holzen_pause_session` in `localStorage` and `profiles` / `pause_ai_artifacts` are more durable.
-- **Layered companion data**: featured text from the reflect response vs full companion slots from orchestration; races possible if cron and client both call orchestration.
+- **Layered companion data**: featured text from the reflect response vs full companion slots from orchestration; overlapping **client** orchestrate invokes (remount / retry) can still race cost; **`check-volatility`** does not orchestrate on claim (Pause V2).
 - **Severity**: UI buckets (`mild` / `moderate` / `high`) come from BTC move in `useHolzen`; numeric severity may be passed to edge functions separately.
 
 ## CS/SE Concepts to Know (for this phase)
@@ -114,7 +114,7 @@ Use these as "prove-or-disprove" questions while reading the Phase 2 files.
 3. When is `holzen-reflect` called vs silent mode, and what gets written to `pause_ai_artifacts` in each case?
 4. Can the user open `/pause` with only `pauseInstanceId` (e.g. notification deep link)? What should they see?
 5. Does `useCompanionData` always send a valid `pauseInstanceId` when one exists, and does `companion-orchestrate` reject cross-user ids?
-6. Are there races between client orchestration and server cron writing the same reflection's companions?
+6. Can overlapping client **`companion-orchestrate`** invokes (remount / retry) waste cost or race writes for the same **`pauseInstanceId`**?
 7. What happens if **`pause_create_or_reuse`** succeeds on Home but **`holzen-reflect`** fails later at **Reflect** (partial reflection artifact)?
 8. How do manual cooldown and errors from **`useHolzen`** vs **`use-pause-reflect-generation`** affect whether navigation to `/pause` and the Reflect step remain usable?
 
@@ -122,7 +122,7 @@ Use these as "prove-or-disprove" questions while reading the Phase 2 files.
 
 - The manual pipeline is **coherent** when Home and `useHolzen` complete **`pause_create_or_reuse`** before navigation: `pause_instances` + context align with nav state; **non-silent** reflection text arrives at **Reflect** when **`holzen-reflect`** succeeds.
 - **Fragility** is at **entry boundaries**: any route to `/pause` that only passes `pauseInstanceId` (or nothing) requires the same fallback rules as full state; `PauseSession` + `useHolzen` hydration address the worst "no reflection" dead-ends when `profileLoaded` and hook state catch up.
-- **Cost / duplication**: multiple clients (user session + cron) can invoke `companion-orchestrate`; caching and server logic limit waste but the tradeoff is worth monitoring (see Phase 3 cron review). Backlog: `docs/backlog/orchestrate-client-cron.md`.
+- **Cost / duplication:** overlapping **`companion-orchestrate`** invokes can still happen from **client** remounts / retries / navigation; **`check-volatility`** does **not** orchestrate on claim (Pause V2), so the old “user session + cron” overlap is gone for automatic pause. Skip/cache + skip-if-served still matter (see Phase 3 review + `docs/backlog/orchestrate-client-cron.md` for pre–V2 history).
 
 - **Partial failure on the manual path**: **`holzen-reflect`** can succeed while **`pause_ai_artifacts`** upsert fails (rare); or the instance exists but Reflect-time generation fails (user-visible retry on Reflect). Backlog: `docs/backlog/reflection-insert-partial-failure.md` (rename pending).
 

@@ -32,7 +32,7 @@ After **`selectIntervention`** and computing which generator slots would run, th
 
 Grep: **`orchestrate_skip_cached`**.
 
-Typical win: cron finishes orchestration before the user opens `/pause` — the client’s invoke becomes a cheap DB read.
+**Historical (pre–V2):** if a cron worker finished orchestration before the user opened **`/pause`**, the client invoke could become a cheap cache read.
 
 ## Optional follow-up
 

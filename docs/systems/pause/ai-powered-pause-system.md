@@ -176,7 +176,7 @@ Up to **five** recent haikus and **five** recent reflect-step **messages** (from
 
 **G. Invoking `companion-orchestrate`**
 
-- **`PauseSession` (manual or cron-created instance):** **`use-companion-data`** sends the **user JWT**. On mount it calls orchestrate with **`useIntervention: true`** and all **`enable*`** flags **false** (intervention-only). When the user taps a companion card, a second call with a single **`enable*`** flag fetches that slot (`holzenInvokeSource: 'browser_lazy_fetch'`). Regenerate uses **`regenerateOnly`** (`holzenInvokeSource: 'browser_regenerate'`).
+- **`PauseSession` (manual or cron-created instance):** **`use-companion-data`** sends the **user JWT**. Once **`pauseInstanceId`** is available (typically early in **`PauseSession`**, often **before** Reflect), it calls orchestrate with **`useIntervention: true`** and all **`enable*`** flags **false** (intervention-only). When the user taps a companion card, a second call with a single **`enable*`** flag fetches that slot (`holzenInvokeSource: 'browser_lazy_fetch'`). Regenerate uses **`regenerateOnly`** (`holzenInvokeSource: 'browser_regenerate'`).
 - **Pause V2 `check-volatility`:** does **not** invoke **`companion-orchestrate`** on automatic pause **claim**. Companion orchestration runs only from the browser once the user opens the pause.
 
 *Why:* manual and server-opened pauses share the **same** in-tab orchestrator contract under the user’s session; the cron worker only **creates** the pause row and **delivers** notifications.
@@ -309,7 +309,7 @@ flowchart TD
 
 
 
-**Parallelism:** Within a single **companion-orchestrate** invoke, `**generateQuestion**` (if question mode) and any enabled generator tasks run **concurrently** (`Promise.all` + `Promise.allSettled`). Generators are **in-process** imports. The **SPA** usually sends **one slot per request** (lazy on tap), so **multi-generator concurrency** mostly shows up for **broad** server calls (e.g. cron) — **not** for the separate **`pregenerate-companions`** function, which does not go through this handler.
+**Parallelism:** Within a single **companion-orchestrate** invoke, `**generateQuestion**` (if question mode) and any enabled generator tasks run **concurrently** (`Promise.all` + `Promise.allSettled`). Generators are **in-process** imports. The **SPA** usually sends **one slot per request** (lazy on tap), so **multi-generator concurrency** mostly shows up when a **server** caller sets several **`enable*`** flags in one HTTP invoke (**not** from **`check-volatility`** on automatic pause claim in Pause V2) — **not** for the separate **`pregenerate-companions`** function, which does not go through this handler.
 
 **Intervention vs generators:** `**intervention.primary`** for **trap** / **pattern** and `**intervention.secondary`** for **zoom_out** are filled from the **same** generator runs as the cards. The orchestrator **forces** Grounding / History / Zoom Out when the selected intervention **requires** that output, even if the user turned the matching companion pref **off** (extra model cost vs empty headline). If `**groundingSources`** was omitted (pref off), the orchestrator loads the grounding catalog via `**fetchGroundingSourcesForOrchestrate`**. **Signal** is still prefs-only — not used as a headline type. See **§11.3** for broader cost notes.
 
@@ -388,7 +388,7 @@ For a full breakdown of **which intervention** maps to **which generator output*
 The pause step combines two ideas that are easy to conflate:
 
 1. **Featured intervention** — One **cognitive headline** at the top (`InterventionSection`): mirror, trap, pattern, question mode, plus an optional **secondary** zoom-out block.
-2. **Companion cards** — Collapsible **slots** below the divider (`CompanionSection`): Haiku, Ground, Signal, Zoom Out, Look Back (history). Four of these are filled by **companion-orchestrate** (one slot per lazy-load call, or multiple slots via cron); the intervention is fetched in a **separate** initial orchestrate call; **Haiku** is produced by **`holzen-reflect`** / **`generateUnifiedReflection`** and stored in **`pause_ai_artifacts`** like other companion kinds.
+2. **Companion cards** — Collapsible **slots** below the divider (`CompanionSection`): Haiku, Ground, Signal, Zoom Out, Look Back (history). Four of these are filled by **companion-orchestrate** (one slot per lazy-load call, or **several slots in one** HTTP invoke when a **server** caller sets multiple **`enable*`** flags — **not** from **`check-volatility`** on automatic pause claim in Pause V2); the intervention is fetched in a **separate** initial orchestrate call; **Haiku** is produced by **`holzen-reflect`** / **`generateUnifiedReflection`** and stored in **`pause_ai_artifacts`** like other companion kinds.
 
 **Session intent** (§5.4) biases **all** orchestrated generators toward one emotional angle (Signal angle, Grounding bias, History mood, Zoom-out seed). Intervention **selection** (`intervention-selector.ts`) is separate: it only decides **what to feature** and **which generator outputs** are copied into the intervention payload.
 
