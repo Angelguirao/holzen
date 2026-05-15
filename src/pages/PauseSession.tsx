@@ -424,6 +424,8 @@ export default function PauseSession() {
   const [breathTimedActive, setBreathTimedActive] = useState(false);
   /** After Start on first Breathe: hide shell back until intro again (wireframe: back only to change mood before starting). */
   const [breathFirstTimedPatternStarted, setBreathFirstTimedPatternStarted] = useState(false);
+  /** After Start on second Breathe (deep): hide shell back until intro again — matches wireframe “5 of 6” screen. */
+  const [breathSecondTimedPatternStarted, setBreathSecondTimedPatternStarted] = useState(false);
   const [soundMuted, setSoundMuted] = useState(true);
 
   usePauseSessionBreathTimedActiveReset({ step, ritualEntry, briefStep, setBreathTimedActive });
@@ -438,6 +440,9 @@ export default function PauseSession() {
       ) {
         setBreathFirstTimedPatternStarted(true);
       }
+      if (active && (ritualEntry === 'deep' || ritualEntry === 'picker') && step === 'breath2') {
+        setBreathSecondTimedPatternStarted(true);
+      }
       setBreathTimedActive(active);
     },
     [ritualEntry, briefStep, step],
@@ -451,6 +456,10 @@ export default function PauseSession() {
     if (!onFirstBreath) setBreathFirstTimedPatternStarted(false);
   }, [ritualEntry, step, briefStep]);
 
+  useEffect(() => {
+    if (step !== 'breath2') setBreathSecondTimedPatternStarted(false);
+  }, [step]);
+
   const { handlePauseHeaderBack } = usePauseSessionHeaderBackHandler({
     breathingRef,
     ritualEntry,
@@ -462,6 +471,7 @@ export default function PauseSession() {
     goBack,
     setBreathingFirstCompleted,
     setBreathingSecondCompleted,
+    setBreathSecondTimedPatternStarted,
   });
 
   const showPauseHeaderBack = isPauseSessionHeaderBackVisible({
@@ -471,6 +481,7 @@ export default function PauseSession() {
     step,
     breathTimedActive,
     breathFirstTimedPatternStarted,
+    breathSecondTimedPatternStarted,
     breathingFirstCompleted,
     breathingSecondCompleted,
   });

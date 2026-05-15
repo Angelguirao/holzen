@@ -17,7 +17,7 @@ const t = ((
   if (key === 'pause.deep.feelStepDurationHint') return '~ 15 sec';
   if (key === 'pause.deep.breatheStepDurationHint') return '< 1 min';
   if (key === 'pause.deep.breatheStepDurationHintCalming') return '~ 1 min';
-  if (key === 'pause.deep.breath2StepDurationHint') return '< 1 min';
+  if (key === 'pause.deep.breath2StepDurationHint') return '< 30 sec';
   if (key === 'pause.deep.reflectStepDurationHint') return '~ 3 min';
   if (key === 'pause.reflect.subtitle') return 'Take your time';
   if (key === 'pause.macroProgressStepCompleted') return 'Completed';
@@ -154,6 +154,17 @@ describe('buildPauseSessionScaffoldRitualDerived', () => {
     });
     expect(d.macroProgressLine).toBe('2 of 6');
     expect(d.macroProgressSubline).toBe('Completed');
+  });
+
+  it('deep breath2: macro subline duration hint before second pattern', () => {
+    const d = buildPauseSessionScaffoldRitualDerived({
+      ritualEntry: 'deep',
+      step: 'breath2',
+      breathingSecondCompleted: false,
+      t,
+    });
+    expect(d.macroProgressLine).toBe('5 of 6');
+    expect(d.macroProgressSubline).toBe('< 30 sec');
   });
 
   it('deep breath2: macro subline Completed after second pattern', () => {

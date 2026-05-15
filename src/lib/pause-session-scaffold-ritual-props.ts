@@ -28,7 +28,7 @@ function deepPauseMacroSubline(
   if (step === 'breath2') {
     return input.breathingSecondCompleted
       ? macroProgressStepCompletedLine(t)
-      : t('pause.deep.breath2StepDurationHint', { defaultValue: '< 1 min' });
+      : t('pause.deep.breath2StepDurationHint', { defaultValue: '< 30 sec' });
   }
   if (step === 'reflect') {
     return t('pause.deep.reflectStepDurationHint', { defaultValue: '~ 3 min' });

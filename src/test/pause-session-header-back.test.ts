@@ -15,6 +15,7 @@ const base = (over: Partial<PauseSessionHeaderBackInput> = {}): PauseSessionHead
   step: 'feel',
   breathTimedActive: false,
   breathFirstTimedPatternStarted: false,
+  breathSecondTimedPatternStarted: false,
   breathingFirstCompleted: false,
   breathingSecondCompleted: false,
   ...over,
@@ -82,10 +83,22 @@ describe('isPauseSessionHeaderBackVisible', () => {
     ).toBe(false);
   });
 
-  it('deep: no shell back on second Breathe', () => {
+  it('deep: shell back on second Breathe intro only (hide after Start / interstitial)', () => {
+    expect(isPauseSessionHeaderBackVisible(base({ ritualEntry: 'deep', step: 'breath2' }))).toBe(true);
     expect(
       isPauseSessionHeaderBackVisible(
-        base({ ritualEntry: 'deep', step: 'breath2', breathingSecondCompleted: true }),
+        base({ ritualEntry: 'deep', step: 'breath2', breathSecondTimedPatternStarted: true }),
+      ),
+    ).toBe(false);
+    expect(
+      isPauseSessionHeaderBackVisible(
+        base({
+          ritualEntry: 'deep',
+          step: 'breath2',
+          breathSecondTimedPatternStarted: false,
+          breathTimedActive: false,
+          breathingSecondCompleted: true,
+        }),
       ),
     ).toBe(false);
     expect(
