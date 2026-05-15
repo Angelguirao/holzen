@@ -6,6 +6,12 @@ import {
   generateReflectionAtReflectStep,
 } from '@/lib/pause-reflect-artifact';
 
+function isAbortLike(e: unknown): boolean {
+  if (e instanceof DOMException && e.name === 'AbortError') return true;
+  if (e instanceof Error && e.name === 'AbortError') return true;
+  return false;
+}
+
 export type UsePauseReflectGenerationParams = {
   pauseInstanceId: string | null;
   context: string | null;
@@ -29,7 +35,17 @@ export function usePauseReflectGeneration({
   const [reflectionMessage, setReflectionMessage] = useState(initialReflectionMessage);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const inflightRef = useRef<string | null>(null);
+  /** Monotonic id of the in-flight generation; only that run may clear loading / commit. */
+  const activeRunRef = useRef(0);
+  /** Bumped when `pauseInstanceId` changes so stale async work cannot commit. */
+  const validityRef = useRef(0);
+  /** Aborts the in-flight `holzen-reflect` when superseded or the instance changes. */
+  const reflectGenAbortRef = useRef<AbortController | null>(null);
+
+  useEffect(() => {
+    reflectGenAbortRef.current?.abort();
+    validityRef.current += 1;
+  }, [pauseInstanceId]);
 
   useEffect(() => {
     setReflectionMessage(initialReflectionMessage);
@@ -42,23 +58,30 @@ export function usePauseReflectGeneration({
     const seed = initialReflectionMessage.trim();
     if (seed) {
       setReflectionMessage(seed);
+      setLoading(false);
       return;
     }
 
-    if (inflightRef.current === pauseInstanceId) return;
-    inflightRef.current = pauseInstanceId;
+    const ticket = validityRef.current;
+    const instanceForThisRun = pauseInstanceId;
+    const myRun = ++activeRunRef.current;
+    reflectGenAbortRef.current?.abort();
+    const ac = new AbortController();
+    reflectGenAbortRef.current = ac;
+    const signal = ac.signal;
     setLoading(true);
     setError(null);
 
     try {
-      const cached = await fetchReflectionTextForPauseInstance(pauseInstanceId);
+      const cached = await fetchReflectionTextForPauseInstance(instanceForThisRun);
+      if (ticket !== validityRef.current) return;
       if (cached) {
         setReflectionMessage(cached);
         return;
       }
 
       const { message } = await generateReflectionAtReflectStep({
-        pauseInstanceId,
+        pauseInstanceId: instanceForThisRun,
         userId: user.id,
         context: context.trim(),
         severity: severityAbsPct,
@@ -71,9 +94,13 @@ export function usePauseReflectGeneration({
           profile.groundingActivities.length > 0 ? profile.groundingActivities : undefined,
         currency: profile.currency,
         language: profile.language,
+        signal,
       });
+      if (ticket !== validityRef.current) return;
       setReflectionMessage(message);
     } catch (e: unknown) {
+      if (ticket !== validityRef.current) return;
+      if (isAbortLike(e) || signal.aborted) return;
       const raw = e instanceof Error ? e.message : String(e);
       if (raw.includes('fetch') || raw.includes('network') || raw.includes('Failed to fetch')) {
         setError('Could not reach Holzen. Check your connection.');
@@ -83,10 +110,9 @@ export function usePauseReflectGeneration({
         setError('Reflection unavailable right now. Try again shortly.');
       }
     } finally {
-      if (inflightRef.current === pauseInstanceId) {
-        inflightRef.current = null;
+      if (activeRunRef.current === myRun) {
+        setLoading(false);
       }
-      setLoading(false);
     }
   }, [
     enabled,
@@ -106,12 +132,20 @@ export function usePauseReflectGeneration({
   ]);
 
   useEffect(() => {
-    if (!enabled) return;
+    if (!enabled) {
+      reflectGenAbortRef.current?.abort();
+      return () => {
+        reflectGenAbortRef.current?.abort();
+      };
+    }
     void runGeneration();
+    return () => {
+      reflectGenAbortRef.current?.abort();
+    };
   }, [enabled, runGeneration]);
 
   const retry = useCallback(() => {
-    inflightRef.current = null;
+    validityRef.current += 1;
     void runGeneration();
   }, [runGeneration]);
 

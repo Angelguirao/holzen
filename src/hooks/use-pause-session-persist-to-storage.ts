@@ -30,7 +30,6 @@ export function usePauseSessionPersistToStorage(p: PauseSessionPersistSnapshotIn
     p.breathingFirstCompleted,
     p.breathingSecondCompleted,
     p.frameDone,
-    p.decideOnBackStep,
     p.ritualEntry,
     p.briefStep,
     p.briefIntegrateDone,

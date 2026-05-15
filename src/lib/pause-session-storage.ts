@@ -41,8 +41,8 @@ export interface PersistedSession {
   breathingCompleted?: boolean;
   /** Present when `PAUSE_RITUAL_SCHEMA_VERSION` */
   pauseRitualSchema?: number;
-  /** Decide screen back target: normal flow uses Choose; skip-second-breath jumps straight to Decide. */
-  decideOnBackStep?: 'choose' | 'breath2';
+  /** Decide screen back target (second breath segment). */
+  decideOnBackStep?: 'breath2';
   /** v4: which ritual path; omitted in older saves → treated as deep when migrating. */
   ritualDepth?: RitualDepth;
   /** v4: macro position inside the four-step brief ritual. */
@@ -93,9 +93,15 @@ function normalizePauseRitualFields(raw: PersistedSession): Pick<
 
 export function migratePersistedPauseSession(raw: PersistedSession): PersistedSession {
   if (raw.pauseRitualSchema === PAUSE_RITUAL_SCHEMA_VERSION) {
+    const n = normalizePauseRitualFields(raw);
+    const fromChoose = (raw.step as string) === 'choose';
     return {
       ...raw,
-      ...normalizePauseRitualFields(raw),
+      ...n,
+      step: fromChoose ? ('decide' as PauseStep) : raw.step,
+      decideOnBackStep:
+        raw.decideOnBackStep === 'choose' || fromChoose ? 'breath2' : raw.decideOnBackStep,
+      breathingSecondCompleted: fromChoose ? true : n.breathingSecondCompleted,
     };
   }
 
@@ -109,13 +115,16 @@ export function migratePersistedPauseSession(raw: PersistedSession): PersistedSe
   }
 
   if (raw.pauseRitualSchema === 2) {
-    return {
+    return migratePersistedPauseSession({
       ...raw,
       ...normalizePauseRitualFields(raw),
-      decideOnBackStep: raw.decideOnBackStep ?? (raw.step === 'decide' ? 'breath2' : undefined),
+      decideOnBackStep:
+        (raw.decideOnBackStep as string) === 'choose'
+          ? 'breath2'
+          : (raw.decideOnBackStep ?? (raw.step === 'decide' ? 'breath2' : undefined)),
       ritualDepth: 'deep',
       pauseRitualSchema: PAUSE_RITUAL_SCHEMA_VERSION,
-    };
+    });
   }
 
   const legacy = raw.step as LegacyPauseStep | PauseStep;

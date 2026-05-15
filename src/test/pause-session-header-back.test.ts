@@ -114,8 +114,12 @@ describe('isPauseSessionHeaderBackVisible', () => {
     expect(isPauseSessionHeaderBackVisible(base({ ritualEntry: 'deep', step: 'frame' }))).toBe(true);
   });
 
-  it('deep: shell back after Frame (e.g. choose)', () => {
-    expect(isPauseSessionHeaderBackVisible(base({ ritualEntry: 'deep', step: 'choose' }))).toBe(true);
+  it('deep: shell back on second Breathe intro (before timed pattern)', () => {
+    expect(isPauseSessionHeaderBackVisible(base({ ritualEntry: 'deep', step: 'breath2' }))).toBe(true);
+  });
+
+  it('deep: no shell back on Decide (parity with brief)', () => {
+    expect(isPauseSessionHeaderBackVisible(base({ ritualEntry: 'deep', step: 'decide' }))).toBe(false);
   });
 
   it('picker uses non-brief branch', () => {

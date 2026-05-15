@@ -153,7 +153,7 @@ Each folder under **`supabase/functions/<name>/`** is a deployable function. Sha
 
 | Function | Call sites (representative) |
 |----------|-----------------------------|
-| `holzen-reflect` | `use-holzen.ts` |
+| `holzen-reflect` | `use-pause-reflect-generation.ts` → `pause-reflect-artifact.ts` (`invokeEdge`) |
 | `companion-orchestrate` | `use-companion-data.ts` |
 | `suggest-grounding` | `Home.tsx`, `Ground.tsx` |
 | `journal-prompt` | `GuidedJournal.tsx` |
@@ -259,13 +259,13 @@ Goal: one **vertical slice** you can trace in **docs → code → Network tab** 
 |------|------------|
 | 1. **Docs** | Read [ai-powered-pause-system.md](../systems/pause/ai-powered-pause-system.md) **§1–2** (skim), **§4–5** (focus). Optional: [phase-2-manual-pause-pipeline.md](../reviews/phase-2-manual-pause-pipeline.md) for producer/consumer contracts. |
 | 2. **Routes** | In `src/App.tsx`, find **`/pause`** → `PauseSession`. Note how **`Home`** also ties to pause (hooks, navigation). |
-| 3. **Hooks** | Read in order: `src/hooks/use-holzen.ts` (`manualTrigger` → `generateMessage`) → `src/hooks/use-companion-data.ts` (orchestrator invoke). Bounded **`use-holzen`** helpers live in **`src/lib/`**: `reflection-persist-error`, `holzen-manual-cooldown`, `pause-context-from-btc`, `btc-move-severity`, `next-cron-quarter`. **`use-companion-data`** pulls types/cache/mood/source-catalog/recency/completion helpers from **`companion-orchestrate-types`**, **`companion-reflection-cache`**, **`companion-mood-history`**, **`companion-orchestrate-sources`**, **`companion-recency-hints`**, **`companion-completion-sync`**, **`companion-completion-maps`**, **`companion-orchestrate-slot-apply`**, **`companion-url`**. Open `src/pages/PauseSession.tsx` (hydration + steps); persistence in `pause-session-storage.ts`, gates in `PauseSessionGate`, shell in `PauseSessionScaffold`. Companion slot hearts (favorites on cards): **`use-companion-library-favorites.ts`** (stores flags under **`pause_instances.metadata`**). |
+| 3. **Hooks** | Read in order: `src/hooks/use-holzen.ts` (`manualTrigger` → `generateMessage`, opens **`pause_instances`**) → `src/hooks/use-pause-reflect-generation.ts` (**`holzen-reflect`** at **Reflect** in the deep ritual) → `src/hooks/use-companion-data.ts` (orchestrator invoke). Bounded **`use-holzen`** helpers live in **`src/lib/`**: `reflection-persist-error`, `holzen-manual-cooldown`, `pause-context-from-btc`, `btc-move-severity`, `next-cron-quarter`. **`use-companion-data`** pulls types/cache/mood/source-catalog/recency/completion helpers from **`companion-orchestrate-types`**, **`companion-reflection-cache`**, **`companion-mood-history`**, **`companion-orchestrate-sources`**, **`companion-recency-hints`**, **`companion-completion-sync`**, **`companion-completion-maps`**, **`companion-orchestrate-slot-apply`**, **`companion-url`**. Open `src/pages/PauseSession.tsx` (hydration + steps); persistence in `pause-session-storage.ts`, gates in `PauseSessionGate`, shell in `PauseSessionScaffold`. Companion slot hearts (favorites on cards): **`use-companion-library-favorites.ts`** (stores flags under **`pause_instances.metadata`**). |
 | 4. **Edge** | In this doc **§12**, confirm **`holzen-reflect`** and **`companion-orchestrate`** invoke map. Optionally open `supabase/functions/holzen-reflect/index.ts` and `companion-orchestrate/index.ts` **headers only** (auth, entry). |
-| 5. **Click + Network** | With the app running, go to **`/pause`**, run a **non-silent** manual pause. In DevTools **Network**, filter for **`holzen-reflect`** and **`companion-orchestrate`** — order should match **§4.1** in the pause system doc. |
+| 5. **Click + Network** | With the app running, go to **`/pause`**, run a **non-silent** manual pause, advance the **deep** ritual to **Reflect**. In DevTools **Network**, expect **`holzen-reflect`** around the Reflect step and **`companion-orchestrate`** per the pause system doc (§4.1). |
 | 6. **DB** | Skim **`supabase/migrations/`** for `profiles`, `pause_instances`, `pause_ai_artifacts` — name recognition only. |
 | 7. **HTTP-only** (optional) | [bruno/README.md](../../bruno/README.md) `pause-pipeline/`: same functions in isolation; **not** a full UI substitute. |
 
-Stop when you can explain **in one sentence** each: what **`use-holzen`** does vs what **`use-companion-data`** does, and **where** `holzen-reflect` vs `companion-orchestrate` run.
+Stop when you can explain **in one sentence** each: what **`use-holzen`** does vs what **`use-companion-data`** does, and **where** **`holzen-reflect`** runs (Reflect step) vs **`companion-orchestrate`**.
 
 ---
 

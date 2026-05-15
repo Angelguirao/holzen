@@ -19,17 +19,17 @@ If this path diverges from the manual path (Phase 2), users see inconsistent pau
 
 ## What to understand first (priority)
 
-1. **Eligibility gates**: who gets an automatic reflection (thresholds, quiet hours/snooze, cooldown) and how `last_trigger_at` is claimed to avoid double-fires.
+1. **Eligibility gates**: who gets an automatic pause (thresholds, quiet hours/snooze, cooldown) and how `last_trigger_at` is claimed to avoid double-fires.
 2. **Order of writes**: pause instance + profile fields + `notifications` row vs **async** `companion-orchestrate` (not awaited) — UI may open `/pause` before companion rows exist.
-3. **Parity with manual pause**: cron builds BTC context similarly to `use-holzen` (shared helpers in `_shared/`), but generation runs **inside** `check-volatility` via `generateUnifiedReflection`, not `holzen-reflect` from the browser.
+3. **Parity with manual pause**: cron builds BTC context similarly to `use-holzen` (shared helpers in `_shared/`), but **reflection LLM** work is **deferred** to the client at **Reflect** (`holzen-reflect`), not inline `generateUnifiedReflection` inside `check-volatility` on claim.
 4. **Notification entry**: `NotificationBell` deep-links to `/pause` with `{ pauseInstanceId }` only — same boundary Phase 2 called out; hydration must come from profile/hooks/DB.
 
 ## Mental Models & Useful Concepts
 
-- **Worker as producer**: `check-volatility` is a batch producer of pause instances + notifications; the mobile/web client is a **consumer** that may also call `companion-orchestrate`.
+- **Worker as producer**: `check-volatility` is a batch producer of pause instances + notifications; the client runs **`holzen-reflect`** at **Reflect** and may call `companion-orchestrate`.
 - **Fire-and-forget orchestration**: companion dispatch uses `fetch` to `companion-orchestrate` without awaiting completion; **eventual consistency** for `pause_ai_artifacts` / featured fields.
-- **Optimistic cooldown**: updating `profiles.last_trigger_at` before generation reduces duplicate triggers under concurrent cron runs.
-- **Featured vs expanded**: cron writes reflection text first and fills grounding/companions after orchestration — do not assume featured grounding is immediate for cron-driven pauses.
+- **Optimistic cooldown**: updating `profiles.last_trigger_at` before downstream work reduces duplicate triggers under concurrent cron runs.
+- **Featured vs expanded**: reflection copy appears after **Reflect**; do not assume featured grounding is immediate for cron-driven pauses until orchestration completes.
 
 ## CS/SE Concepts to Know (for this phase)
 

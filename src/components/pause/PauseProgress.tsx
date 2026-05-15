@@ -1,27 +1,23 @@
 import { useTranslation } from 'react-i18next';
 import { cn } from '@/lib/utils';
 
-/**
- * Full routing order (includes `choose` between second breath and Decide).
- * The header stepper renders `PAUSE_DEEP_DISPLAY_STEPS` — six user-facing beats;
- * `choose` is a short interstitial before Decide, not a separate labeled segment.
- */
-const STEPS = ['feel', 'breathe', 'reflect', 'frame', 'breath2', 'choose', 'decide'] as const;
+/** Full deep-ritual routing order (matches header stepper beats). */
+const STEPS = ['feel', 'breathe', 'reflect', 'frame', 'breath2', 'decide'] as const;
 export type PauseStep = (typeof STEPS)[number];
 
-/** Six segments in the deep-pause shell (Choose is folded into the last “Decide” beat). */
+/** Six segments in the deep-pause shell. */
 const PAUSE_DEEP_DISPLAY_STEPS = ['feel', 'breathe', 'reflect', 'frame', 'breath2', 'decide'] as const;
 
 export const PAUSE_DEEP_DISPLAY_STEP_COUNT = PAUSE_DEEP_DISPLAY_STEPS.length;
 
-/** 1-based “Step n of 6” for the meta line; `choose` and `decide` both count as step 6. */
+/** 1-based “Step n of 6” for the meta line. */
 export function pauseDeepMacroStepNumber(step: PauseStep): number {
-  if (step === 'choose' || step === 'decide') return PAUSE_DEEP_DISPLAY_STEP_COUNT;
+  if (step === 'decide') return PAUSE_DEEP_DISPLAY_STEP_COUNT;
   return STEPS.indexOf(step) + 1;
 }
 
 function pauseDeepDisplayProgressIndex(step: PauseStep): number {
-  if (step === 'choose' || step === 'decide') {
+  if (step === 'decide') {
     return PAUSE_DEEP_DISPLAY_STEPS.indexOf('decide');
   }
   return PAUSE_DEEP_DISPLAY_STEPS.indexOf(step as (typeof PAUSE_DEEP_DISPLAY_STEPS)[number]);

@@ -99,6 +99,8 @@ export type GenerateReflectionAtReflectParams = {
   groundingActivities?: string[];
   currency: string;
   language: string;
+  /** Cancels the edge invoke when the user leaves Reflect or a newer run supersedes this one. */
+  signal?: AbortSignal;
 };
 
 export type GenerateReflectionAtReflectResult = {
@@ -120,6 +122,7 @@ export async function generateReflectionAtReflectStep(
     grounding_citation?: string | null;
     grounding_url?: string | null;
   }>('holzen-reflect', {
+    signal: params.signal,
     body: {
       context: params.context,
       tone: params.tone,

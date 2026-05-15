@@ -10,30 +10,10 @@ describe('usePauseSessionEntryPresentationEffects', () => {
     vi.useRealTimers();
   });
 
-  it('sets decide back target to choose when step is breath2', () => {
-    const setDecideOnBackStep = vi.fn();
-    const setCurtainLifted = vi.fn();
-    const { rerender } = renderHook(
-      ({ step }: { step: 'feel' | 'breath2' }) =>
-        usePauseSessionEntryPresentationEffects({
-          step,
-          setDecideOnBackStep,
-          setCurtainLifted,
-        }),
-      { initialProps: { step: 'feel' as const } },
-    );
-    expect(setDecideOnBackStep).not.toHaveBeenCalled();
-    rerender({ step: 'breath2' });
-    expect(setDecideOnBackStep).toHaveBeenCalledWith('choose');
-  });
-
   it('lifts curtain after 100ms on mount', () => {
-    const setDecideOnBackStep = vi.fn();
     const setCurtainLifted = vi.fn();
     renderHook(() =>
       usePauseSessionEntryPresentationEffects({
-        step: 'feel',
-        setDecideOnBackStep,
         setCurtainLifted,
       }),
     );

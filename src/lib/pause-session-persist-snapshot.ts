@@ -24,7 +24,6 @@ export type PauseSessionPersistSnapshotInput = {
   breathingFirstCompleted: boolean;
   breathingSecondCompleted: boolean;
   frameDone: boolean;
-  decideOnBackStep: 'choose' | 'breath2';
   ritualEntry: RitualDepth | 'picker';
   briefStep: BriefPauseStep;
   briefIntegrateDone: boolean;
@@ -55,7 +54,7 @@ export function buildPauseSessionPersistSnapshot(p: PauseSessionPersistSnapshotI
     breathingFirstCompleted: p.breathingFirstCompleted,
     breathingSecondCompleted: p.breathingSecondCompleted,
     frameDone: p.frameDone,
-    decideOnBackStep: p.decideOnBackStep,
+    decideOnBackStep: p.ritualEntry !== 'brief' && p.step === 'decide' ? 'breath2' : undefined,
     ritualDepth: p.ritualEntry === 'picker' ? undefined : p.ritualEntry,
     briefStep: p.ritualEntry === 'brief' ? p.briefStep : undefined,
     briefIntegrateDone: p.ritualEntry === 'brief' ? p.briefIntegrateDone : undefined,

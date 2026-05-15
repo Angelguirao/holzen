@@ -197,6 +197,16 @@ describe('buildPauseSessionScaffoldRitualDerived', () => {
     expect(d.macroProgressSubline).toBe('Take your time');
   });
 
+  it('deep decide: same duration hint as brief Decide', () => {
+    const d = buildPauseSessionScaffoldRitualDerived({
+      ritualEntry: 'deep',
+      step: 'decide',
+      t,
+    });
+    expect(d.macroProgressLine).toBe('6 of 6');
+    expect(d.macroProgressSubline).toBe('< 15 sec');
+  });
+
   it('picker follows deep scaffold rules (same ternary as pre-refactor PauseSession)', () => {
     const p = buildPauseSessionScaffoldRitualDerived({
       ritualEntry: 'picker',

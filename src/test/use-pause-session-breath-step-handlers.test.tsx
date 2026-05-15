@@ -13,7 +13,6 @@ function baseInput(overrides: Partial<Parameters<typeof usePauseSessionBreathSte
     logBreathSegment2Skipped: vi.fn().mockResolvedValue(true),
     setBreathingFirstCompleted: vi.fn(),
     setBreathingSecondCompleted: vi.fn(),
-    setDecideOnBackStep: vi.fn(),
     setBriefStep: vi.fn(),
     setBriefIntegrateDone: vi.fn(),
     ...overrides,
@@ -60,6 +59,25 @@ describe('usePauseSessionBreathStepHandlers', () => {
     expect(input.ensureBreathSegment1Logged).toHaveBeenCalledWith(true);
     expect(setBreathingFirstCompleted).toHaveBeenCalledWith(true);
     expect(input.setBriefStep).toHaveBeenCalledWith('integrate');
+  });
+
+  it('handleContinueAfterSecondBreath goes to decide when segment 2 succeeds', async () => {
+    const input = baseInput();
+    const { result } = renderHook(() => usePauseSessionBreathStepHandlers(input));
+    await act(async () => {
+      await result.current.handleContinueAfterSecondBreath();
+    });
+    expect(input.ensureBreathSegment2Logged).toHaveBeenCalled();
+    expect(input.goToStep).toHaveBeenCalledWith('decide');
+  });
+
+  it('handleSkipSecondBreath goes to decide when skip RPC succeeds', async () => {
+    const input = baseInput();
+    const { result } = renderHook(() => usePauseSessionBreathStepHandlers(input));
+    await act(async () => {
+      await result.current.handleSkipSecondBreath();
+    });
+    expect(input.goToStep).toHaveBeenCalledWith('decide');
   });
 
   it('handleBriefIntegrateComplete only advances once', () => {

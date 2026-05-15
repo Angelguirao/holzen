@@ -17,6 +17,8 @@ export function mapPersistedStep(s: string | undefined): PauseStep {
   if (!s || s === 'pause') return 'feel';
   if (s === 'ground') return 'reflect';
   if (s === 'shift') return 'frame';
+  /** Removed client-only `choose` beat — resume on Decide. */
+  if (s === 'choose') return 'decide';
   if (STEPS.includes(s as PauseStep)) return s as PauseStep;
   return 'feel';
 }

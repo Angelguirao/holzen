@@ -255,8 +255,8 @@ serve(
       req,
     );
 
-    const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
-    if (!LOVABLE_API_KEY) throw new Error("LOVABLE_API_KEY not configured");
+    // Reflection AI runs at Reflect (`holzen-reflect` from the client). Email still
+    // uses Lovable mail when configured — `sendNotificationEmail` no-ops without key.
 
     const { data: profiles, error: profilesError } = await supabase
       .from("profiles")

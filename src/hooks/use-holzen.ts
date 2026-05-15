@@ -24,7 +24,7 @@ const PAUSE_MANUAL_START_HOME = 'holzen_sess_pause_manual_started_home';
 
 export { holzenMarketDisplayQueryKey } from '@/lib/holzen-market-display-query';
 
-/** Once per tab session: user kicked off a manual “Need a moment” / holzen-reflect flow from Home. */
+/** Once per tab session: user kicked off a manual “Need a moment” (opens pause instance) from Home. */
 function markPauseManualStartedHomeOnce(): void {
   try {
     if (sessionStorage.getItem(PAUSE_MANUAL_START_HOME)) return;
@@ -36,9 +36,9 @@ function markPauseManualStartedHomeOnce(): void {
 }
 
 /**
- * Pause V2 manual-trigger hook. Writes every generated pause straight
- * into pause_instances / pause_ai_artifacts via the Phase B RPCs +
- * service helpers. No legacy reflections writes.
+ * Pause V2 manual-trigger hook. Opens a `pause_instances` row via `pause_create_or_reuse`
+ * (+ context snapshot). Non-silent reflection text is generated later at the Reflect step
+ * (`holzen-reflect`). Silent mode still writes a stub `reflection_text` artifact here.
  */
 export function useHolzen() {
   const { user } = useAuth();
@@ -435,7 +435,7 @@ export function useHolzen() {
         if (raw.includes('fetch') || raw.includes('Failed to fetch')) {
           setError('Could not connect. Check your internet and try again.');
         } else {
-          setError('A pause message could not be generated right now. Try again in a moment.');
+          setError('Could not start a pause right now. Try again in a moment.');
         }
       }
     },

@@ -81,8 +81,6 @@ const STEPS = [
 function stepHighlightsScienceRow(current: PauseStep | undefined, rowKey: (typeof STEPS)[number]['key']): boolean {
   if (!current) return false;
   if (current === rowKey) return true;
-  /** Choose bridge is between second breath and Decide — surface citations on the Decide row. */
-  if (current === 'choose' && rowKey === 'decide') return true;
   return false;
 }
 

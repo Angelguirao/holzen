@@ -62,9 +62,11 @@ export function PauseReflect({
     };
   }, [pauseInstanceId, companionHaikuEnabled]);
 
-  /** Records that the user reached Reflect (analytics / progression). */
+  /** Records that the user reached Reflect (analytics / progression) after copy is ready or failed to load. */
   useEffect(() => {
     if (!pauseInstanceId) return;
+    if (reflectionLoading) return;
+    if (!reflectionMessage.trim() && !reflectionError) return;
     const storageKey = `holzen_reflect_step_logged:${pauseInstanceId}`;
     try {
       if (sessionStorage.getItem(storageKey)) return;
@@ -91,7 +93,7 @@ export function PauseReflect({
     return () => {
       cancelled = true;
     };
-  }, [pauseInstanceId]);
+  }, [pauseInstanceId, reflectionLoading, reflectionMessage, reflectionError]);
 
   const openPostIt = useCallback(() => {
     hapticFeedback('light');

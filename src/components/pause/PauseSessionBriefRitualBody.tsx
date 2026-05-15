@@ -112,12 +112,7 @@ export function PauseSessionBriefRitualBody({
 
       {briefStep === 'decide' && (
         <motion.div key="b-decide" {...stepTransition}>
-          <PauseDecide
-            onDecide={onDecide}
-            onBack={onBriefDecideBack}
-            briefDecidePillLayout
-            hideChoicesBack
-          />
+          <PauseDecide onDecide={onDecide} onBack={onBriefDecideBack} hideChoicesBack />
         </motion.div>
       )}
     </AnimatePresence>
