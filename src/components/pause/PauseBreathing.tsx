@@ -5,6 +5,7 @@ import { useTranslation } from 'react-i18next';
 import { hapticFeedback } from '@/lib/haptics';
 import { pauseStepLayout } from '@/components/pause/pause-step-layout';
 import { Button } from '@/components/ui/button';
+import { computeBreathingPhaseAdvance } from '@/lib/pause-breathing-phase-advance';
 import {
   playPauseBreathPatternCompleteCue,
   playPauseBreathPhaseCue,
@@ -117,10 +118,26 @@ interface Props {
 }
 
 /** Brief ritual: no post-pattern card; advance as soon as the timed cycles finish. */
-function BriefBreathAdvanceToIntegrate({ onContinue }: { onContinue: () => void | Promise<unknown> }) {
+function BriefBreathAdvanceToIntegrate({
+  onContinue,
+  onAdvanceFailed,
+}: {
+  onContinue: () => void | Promise<unknown>;
+  onAdvanceFailed?: () => void;
+}) {
+  const onContinueRef = useRef(onContinue);
+  onContinueRef.current = onContinue;
+  const onAdvanceFailedRef = useRef(onAdvanceFailed);
+  onAdvanceFailedRef.current = onAdvanceFailed;
+  const firedRef = useRef(false);
   useLayoutEffect(() => {
-    void onContinue();
-  }, [onContinue]);
+    if (firedRef.current) return;
+    firedRef.current = true;
+    void Promise.resolve(onContinueRef.current()).catch(() => {
+      firedRef.current = false;
+      onAdvanceFailedRef.current?.();
+    });
+  }, []);
   return null;
 }
 
@@ -161,6 +178,12 @@ export const PauseBreathing = forwardRef<PauseBreathingHandle, Props>(function P
   const completed = completedProp ?? completedLocal;
   const currentPhase = pattern.phases[phaseIndex];
 
+  const onPatternCompleteRef = useRef(onPatternComplete);
+  onPatternCompleteRef.current = onPatternComplete;
+  const ritualVariantRef = useRef(ritualVariant);
+  ritualVariantRef.current = ritualVariant;
+  const phaseAdvanceGuardRef = useRef(false);
+
   useImperativeHandle(
     ref,
     () => ({
@@ -170,6 +193,7 @@ export const PauseBreathing = forwardRef<PauseBreathingHandle, Props>(function P
         setElapsed(0);
         setCycle(0);
         setCompletedLocal(false);
+        phaseAdvanceGuardRef.current = false;
       },
     }),
     [],
@@ -180,55 +204,67 @@ export const PauseBreathing = forwardRef<PauseBreathingHandle, Props>(function P
     onTimedBreathingChange?.(inTimedLoop);
   }, [inTimedLoop, onTimedBreathingChange]);
 
+  /** One tick per second; do not reset this interval when parent passes new callback refs. */
   useEffect(() => {
     if (!started || completed) return;
     const timer = setInterval(() => {
-      setElapsed((prev) => {
-        const next = prev + 1;
-        if (next >= currentPhase.duration) {
-          const nextPhase = phaseIndex + 1;
-          if (nextPhase >= pattern.phases.length) {
-            const nextCycle = cycle + 1;
-            if (nextCycle >= totalCycles) {
-              const o = cueOptsRef.current;
-              playPauseBreathPatternCompleteCue({ muted: o.muted, prefersReducedMotion: o.prefersReduced });
-              if (ritualVariant !== 'brief') {
-                onPatternComplete?.();
-              }
-              setCompletedLocal(true);
-              hapticFeedback('success');
-              return 0;
-            }
-            {
-              const o = cueOptsRef.current;
-              playPauseBreathPhaseCue({ muted: o.muted, prefersReducedMotion: o.prefersReduced });
-            }
-            setCycle(nextCycle);
-            setPhaseIndex(0);
-          } else {
-            {
-              const o = cueOptsRef.current;
-              playPauseBreathPhaseCue({ muted: o.muted, prefersReducedMotion: o.prefersReduced });
-            }
-            setPhaseIndex(nextPhase);
-          }
-          return 0;
-        }
-        return next;
-      });
+      setElapsed((prev) => prev + 1);
     }, 1000);
     return () => clearInterval(timer);
-  }, [
-    started,
-    completed,
-    phaseIndex,
-    cycle,
-    currentPhase.duration,
-    pattern.phases.length,
-    onPatternComplete,
-    ritualVariant,
-    totalCycles,
-  ]);
+  }, [started, completed]);
+
+  /** When the phase countdown completes, advance cycle/phase or finish the pattern. */
+  useEffect(() => {
+    if (!started || completed) return;
+    const phase = pattern.phases[phaseIndex];
+    if (elapsed < phase.duration) {
+      phaseAdvanceGuardRef.current = false;
+      return;
+    }
+    if (phaseAdvanceGuardRef.current) return;
+    phaseAdvanceGuardRef.current = true;
+
+    const advance = computeBreathingPhaseAdvance({
+      elapsed,
+      phaseDuration: phase.duration,
+      phaseIndex,
+      phaseCount: pattern.phases.length,
+      cycle,
+      totalCycles,
+    });
+
+    if (advance.kind === 'tick') {
+      phaseAdvanceGuardRef.current = false;
+      return;
+    }
+
+    const playPhaseCue = () => {
+      const o = cueOptsRef.current;
+      playPauseBreathPhaseCue({ muted: o.muted, prefersReducedMotion: o.prefersReduced });
+    };
+
+    if (advance.kind === 'pattern_complete') {
+      const o = cueOptsRef.current;
+      playPauseBreathPatternCompleteCue({ muted: o.muted, prefersReducedMotion: o.prefersReduced });
+      if (ritualVariantRef.current !== 'brief') {
+        onPatternCompleteRef.current?.();
+      }
+      setCompletedLocal(true);
+      hapticFeedback('success');
+      setElapsed(0);
+      return;
+    }
+
+    playPhaseCue();
+    if (advance.kind === 'next_cycle') {
+      setCycle(advance.nextCycle);
+      setPhaseIndex(0);
+    } else {
+      setPhaseIndex(advance.nextPhaseIndex);
+    }
+    setElapsed(0);
+    phaseAdvanceGuardRef.current = false;
+  }, [started, completed, elapsed, phaseIndex, cycle, pattern, totalCycles]);
 
   const progress = currentPhase.duration > 0 ? elapsed / currentPhase.duration : 0;
   const isExpand = EXPAND_KEYS.includes(currentPhase.labelKey);
@@ -377,7 +413,13 @@ export const PauseBreathing = forwardRef<PauseBreathingHandle, Props>(function P
           </p>
         </motion.div>
       ) : ritualVariant === 'brief' ? (
-        <BriefBreathAdvanceToIntegrate onContinue={onContinueAfterBreath} />
+        <BriefBreathAdvanceToIntegrate
+          onContinue={onContinueAfterBreath}
+          onAdvanceFailed={() => {
+            setCompletedLocal(false);
+            phaseAdvanceGuardRef.current = false;
+          }}
+        />
       ) : (
         <motion.div
           initial={{ opacity: 0, y: 8 }}
