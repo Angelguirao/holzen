@@ -38,7 +38,7 @@ Links use explicit HTML anchors before each numbered section so jumps behave con
 
 1. **Trigger** — User opens Pause (client) *or* the `check-volatility` cron decides a user crossed thresholds.
 2. **Reflection** — Short copy (+ optional haiku) anchored to market **context** (e.g. “BTC is down 5.2%…”).
-3. **Persist** — Create or reuse a `pause_instances` row via `pause_create_or_reuse` (manual) or `pause_create_or_reuse_as` (automatic), upsert **`pause_ai_artifacts`** (`reflection_text`, optional `haiku`, later slots). **`check-volatility`** also updates **`profiles.last_message`** / **`last_context`** for delivery/digest parity; **`use-holzen`** does **not** write those profile fields today (the pause row + artifacts are the manual source of truth). **`profiles.last_trigger_at`** advances on the **automatic** claim path; **silent** manual mode follows trigger-like rules (§2.3.B).
+3. **Persist** — Create or reuse a `pause_instances` row via `pause_create_or_reuse` (manual) or `pause_create_or_reuse_as` (automatic). **`reflection_text`** (+ optional **`haiku`**) upserts happen at **Reflect** via **`holzen-reflect`** (manual + cron pauses). **`check-volatility`** updates **`profiles.last_context`** for delivery; **`last_message`** is cleared (no eager AI preview). **`use-holzen`** does **not** write profile fields (the pause row is the manual source of truth). **`profiles.last_trigger_at`** advances on the **automatic** claim path; **silent** manual mode still writes a stub **`reflection_text`** at trigger time (§2.3.B).
 4. **Intervention** — `companion-orchestrate` (intervention-only call, no companion slots) chooses an **intervention** (mirror / trap / pattern / question) and persists it. See **§7** for a per-type reference.
 5. **Companion cards (lazy)** — When the user **taps/expands** a companion card, a **single-slot** `companion-orchestrate` call generates that companion on demand. Each generator tries **library → cache → live → curated** (phase ordering controlled by `COMPANION_PHASE_`* env vars in `_shared/phase-config.ts`).
 6. **Surface** — Client shows `InterventionSection` plus optional companion cards from user preferences.
@@ -47,17 +47,19 @@ Links use explicit HTML anchors before each numbered section so jumps behave con
 
 ```mermaid
 flowchart TB
-  M[Manual pause\nuse-holzen / holzen-reflect]
+  M[Manual pause\nuse-holzen]
   C[Automatic pause\ncheck-volatility]
-  GR[generateUnifiedReflection]
-  DB[(pause_instances +\npause_ai_artifacts)]
+  DB[(pause_instances)]
+  R[Reflect step\nholzen-reflect]
+  ART[(pause_ai_artifacts)]
   CO[companion-orchestrate]
   UI[Pause UI\nInterventionSection + companions]
-  M --> GR
-  C --> GR
-  GR --> DB
-  DB --> CO
-  CO --> DB
+  M --> DB
+  C --> DB
+  DB --> R
+  R --> ART
+  ART --> CO
+  CO --> ART
   CO --> UI
   C -.->|optional| N[Push / email /\nnotifications]
 ```
@@ -250,7 +252,7 @@ flowchart TB
 
 - `**generateUnifiedReflection(params)`** — Calls `**https://ai.gateway.lovable.dev/v1/chat/completions`** with `**LOVABLE_API_KEY`**, trying models in order: `**google/gemini-3-flash-preview`**, then `**google/gemini-2.5-flash**` (JSON path uses per-attempt timeouts **12s** then **8s**).
 - **Output** — JSON object with `**message`** + `**haiku`** only (`response_format: json_object`), plus the shared quality gate. Companion payloads are finalized by `**companion-orchestrate**` into **`pause_ai_artifacts`** (not legacy `reflections` columns). `**holzen-reflect`** may still echo `**grounding_***` keys in JSON for API stability (often null from this path).
-- **Callers:** `holzen-reflect/index.ts` (auth, sanitization, analytics, curated fallback) and `check-volatility/index.ts` (eligibility, notifications, orchestrator dispatch).
+- **Callers:** `holzen-reflect/index.ts` (auth, sanitization, analytics, curated fallback) from the **Reflect** step only. **`check-volatility`** creates instances and sends notifications **without** calling this generator.
 
 ---
 
@@ -258,7 +260,7 @@ flowchart TB
 
 This section is **client-centric**: `**use-holzen`** and `**use-companion-data`** run **in the browser** (React); `**holzen-reflect`** and `**companion-orchestrate`** are **HTTP edge functions**; persistence uses **`pause_instances`** and **`pause_ai_artifacts`** via the **Supabase client** under **RLS** (no **`profiles.last_message`** update in this hook — see §2.3.H). Canonical tables and transitions: [pause-system.md](../pause-system.md).
 
-1. `**use-holzen.ts`** — Builds context, calls `**holzen-reflect**`, then **`pauseCreateOrReuse`** (RPC). Upserts **`pause_ai_artifacts`**. React tracks **`lastPauseInstanceId`** (not `lastReflectionId`).
+1. `**use-holzen.ts`** — Builds context, calls **`pauseCreateOrReuse`** (RPC). React tracks **`lastPauseInstanceId`**. **`holzen-reflect`** runs at **Reflect** (`**use-pause-reflect-generation**` / **`generateReflectionAtReflectStep`**).
 2. **Pause UI** — `**use-companion-data.ts`** receives **`pauseInstanceId`**, **`context`**, **`reflectionMessage`** (prop name = AI reflect-step text), **`mood`**, **`severityNumber`**, language.
 3. `**use-companion-data**` (mount) — Hydrates companion payloads from **`pause_ai_artifacts`** where present; calls **`companion-orchestrate`** for intervention + cached reads using **`pauseInstanceId`**.
 4. `**use-companion-data`** (on tap) — `**fetchCompanion(slot)`** calls **`companion-orchestrate`** with a single **`enable*`** flag (`holzenInvokeSource: 'browser_lazy_fetch'`). Results persist via **`writeCompanionData`** into **`pause_ai_artifacts`** (library → cache → live → curated ordering unchanged).
@@ -270,8 +272,8 @@ This section is **client-centric**: `**use-holzen`** and `**use-companion-data`*
 | Step | Where | What happens |
 | ---- | ----- | -------------- |
 | 1 | Browser | `**fetchBtcData**` builds **context** (24h / optional 7d, Fear & Greed / on-chain enrichment). |
-| 2 | Edge `**holzen-reflect**` | Returns **`message`** (+ optional haiku / grounding preview JSON). |
-| 3 | Browser + Postgres | **`pauseCreateOrReuse`** → **`pause_ai_artifacts`** upserts. |
+| 2 | Browser + Postgres | **`pauseCreateOrReuse`** → open **`pause_instances`** row (no reflection AI yet). |
+| 3 | Pause UI — Reflect | Edge **`holzen-reflect`** → **`pause_ai_artifacts`** (`reflection_text`, optional `haiku` / `ground_nudge`). |
 | 4 | Pause UI | **`use-companion-data`** uses **`pauseInstanceId`**; intervention + lazy fetches call **`companion-orchestrate`**. |
 
 **Silent mode:** `**holzen-reflect**` is not called; client still runs **`pauseCreateOrReuse`** and writes “BTC moved.” into **`pause_ai_artifacts`**.

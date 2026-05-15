@@ -2,17 +2,11 @@ import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import webpush from "https://esm.sh/web-push@3.6.7";
 import { createCidSupabaseClient, sendWebPushWithCid } from "../_shared/cid-clients.ts";
 import {
-  generateUnifiedReflection,
-  REFLECTION_PROMPT_VERSION,
-  type MoodHistoryEntry,
-} from "../_shared/reflection-generate.ts";
-import {
   enrichAutomaticPauseContext,
   fetchFearGreedSnapshot,
   fetchOnChainSnapshot,
   pauseRecencyInputs,
 } from "../_shared/pause-cron-parity.ts";
-import { sanitizePromptInput, sanitizePromptArray } from "../_shared/sanitize.ts";
 import { isCumulativeMoveTriggered } from "../_shared/volatility-thresholds.ts";
 import { unknownErrorForLog, webPushStatusCode } from "../_shared/log-unknown-error.ts";
 import {
@@ -30,7 +24,6 @@ import {
 import {
   bucketChangePercent,
   computeContextFingerprint,
-  upsertPauseAiArtifact,
 } from "../_shared/pause.ts";
 import { normalizeTrackedAssetId, trackedAssetSymbol } from "../_shared/tracked-assets.ts";
 
@@ -157,7 +150,6 @@ async function fetchAssetVolatilityForCurrency(
 
 async function sendNotificationEmail(
   email: string,
-  reflection: string,
   context: string,
   pauseInstanceId: string | null,
   log: VolatilityFnLog,
@@ -177,7 +169,7 @@ async function sendNotificationEmail(
     <body style="font-family: 'IBM Plex Mono', monospace, sans-serif; max-width: 400px; margin: 0 auto; padding: 40px 20px; color: #2a2a2a; background: #f7f5f0;">
       <p style="font-size: 12px; letter-spacing: 2px; text-transform: uppercase; color: #737373; margin-bottom: 24px;">HOLZEN</p>
       <p style="font-size: 13px; color: #737373; margin-bottom: 16px;">${context}</p>
-      <p style="font-size: 14px; line-height: 1.6; margin-bottom: 24px;">${reflection}</p>
+      <p style="font-size: 14px; line-height: 1.6; margin-bottom: 24px;">Open Holzen when you're ready — your personalized reflection is waiting in the pause ritual.</p>
       <hr style="border: none; border-top: 1px solid #e5e2dc; margin: 24px 0;">
       <p style="font-size: 11px; color: #a3a3a3;">This is an automated notification from Holzen. You can disable email notifications in your settings.</p>
     </body>
@@ -540,88 +532,8 @@ serve(
       const onChainForUser = assetId === "bitcoin" ? onChainSnapshot : null;
       ctx = enrichAutomaticPauseContext(ctx, fearGreedSnapshot, onChainForUser);
 
-      const tone = profile.reflection_tone || "stoic";
-      const userLang = profile.language || "en";
-      const style =
-        typeof profile.reflection_style === "string" && profile.reflection_style.length > 0
-          ? profile.reflection_style
-          : "standard";
-      const customPrompt = sanitizePromptInput(profile.custom_prompt ?? undefined, 500);
-      const motivations = sanitizePromptArray(
-        Array.isArray(profile.motivations) ? (profile.motivations as string[]) : undefined,
-        10,
-        100,
-      );
-      const mantra = sanitizePromptInput(profile.mantra ?? undefined, 200);
-      const groundingActivities = sanitizePromptArray(
-        Array.isArray(profile.grounding_activities) ? (profile.grounding_activities as string[]) : undefined,
-        10,
-        100,
-      );
-
-      // Pause V2: pull mood history + reflection/haiku pools from the new tables.
-      const { moodHistory, recentMessages, recentHaikus } = await pauseRecencyInputs(
-        supabase,
-        profile.user_id,
-      );
+      const { moodHistory } = await pauseRecencyInputs(supabase, profile.user_id);
       const lastReportedMood = moodHistory?.[0]?.mood;
-      // Keep MoodHistoryEntry shape for the AI call below.
-      const moodHistoryForAi: MoodHistoryEntry[] | undefined = moodHistory
-        ? moodHistory.map((m) => ({ mood: m.mood, outcome: m.outcome, created_at: m.created_at }))
-        : undefined;
-
-      // Parity with holzen-reflect: same allowlisted event before reflection AI so per-user
-      // throttles and dashboards see a consistent signal for manual vs cron.
-      try {
-        await supabase.from("analytics_events").insert({
-          user_id: profile.user_id,
-          event: "pause_ai_call",
-        });
-      } catch {
-        /* tracking failure is non-fatal */
-      }
-
-      const { result } = await generateUnifiedReflection({
-        context: ctx,
-        apiKey: LOVABLE_API_KEY,
-        tone,
-        style,
-        language: userLang,
-        currency: typeof profile.hold_goal_currency === "string" && profile.hold_goal_currency.trim()
-          ? profile.hold_goal_currency.trim().toUpperCase()
-          : "USD",
-        severity: absChange,
-        moodHistory: moodHistoryForAi,
-        recentHaikus,
-        recentMessages,
-        customPrompt: customPrompt || undefined,
-        motivations: motivations.length > 0 ? motivations : undefined,
-        mantra: mantra || undefined,
-        groundingActivities: groundingActivities.length > 0 ? groundingActivities : undefined,
-        incomingRequest: req,
-      });
-      if (!result?.message) {
-        log("check_volatility_skip", {
-          holzen_event: "check_volatility_cron",
-          phase: "reflection_generation_empty",
-          user_id_prefix: String(profile.user_id).slice(0, 8),
-        });
-        return false;
-      }
-
-      supabase.from("analytics_events").insert({
-        user_id: profile.user_id,
-        event: "reflection_generated",
-        metadata: {
-          tone,
-          style,
-          message_length: result.message.length,
-          has_haiku: !!result.haiku,
-          prompt_version: REFLECTION_PROMPT_VERSION,
-          source: "check-volatility",
-        },
-      }).then(() => {});
-
 
       // Pause V2: create (or reuse) the pause instance via the
       // service-role RPC, which serializes per-user with an advisory
@@ -717,32 +629,13 @@ serve(
         return false;
       }
 
-      // Reflection text only; haiku and other companions are created when
-      // the user opens them in the reflect step (same as manual pauses).
-      await upsertPauseAiArtifact(supabase, {
-        instanceId: pauseInstanceId,
-        userId: profile.user_id,
-        kind: "reflection_text",
-        content: { message: result.message, context: ctx },
-        model: "lovable",
-        promptVersion: REFLECTION_PROMPT_VERSION,
-      }).catch((e) =>
-        log.error("check_volatility_artifact", {
-          holzen_event: "check_volatility_cron",
-          phase: "reflection_text_upsert_failed",
-          ...unknownErrorForLog(e),
-        })
-      );
-
-      // Profile update only — companion-orchestrate runs from the client on
-      // first Reflect open (intervention-only) and on card taps (lazy slots),
-      // same as manual volatility pauses. Skip while a pending context offer
-      // is queued so Home still reflects the current open pause.
+      // Reflection AI runs at Reflect step (holzen-reflect from the client).
+      // Profile update signals delivery; skip while a pending context offer is queued.
       const profileUpdate = pendingOffer
         ? Promise.resolve({ error: null })
         : supabase
           .from("profiles")
-          .update({ last_message: result.message, last_context: ctx })
+          .update({ last_message: null, last_context: ctx })
           .eq("user_id", profile.user_id);
 
       const { error: profileUpdateErr } = await profileUpdate;
@@ -774,13 +667,7 @@ serve(
           const { data: userData } = await supabase.auth.admin.getUserById(profile.user_id);
           const email = userData?.user?.email;
           if (email) {
-            await sendNotificationEmail(
-              email,
-              result.message,
-              ctx,
-              pauseInstanceId,
-              log,
-            );
+            await sendNotificationEmail(email, ctx, pauseInstanceId, log);
           }
         })(),
         // Push
@@ -794,7 +681,7 @@ serve(
 
           const payload = JSON.stringify({
             title: "Holzen",
-            body: result.message.slice(0, 120),
+            body: ctx.slice(0, 120),
             pauseInstanceId,
             action: "pause_ready",
           });

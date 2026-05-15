@@ -48,18 +48,9 @@ export async function fetchPendingPauseOffer(userId: string): Promise<PendingPau
     metadata: Record<string, unknown> | null;
   };
 
-  const { data: art } = await supabase
-    .from('pause_ai_artifacts' as never)
-    .select('content')
-    .eq('pause_instance_id', row.id)
-    .eq('kind', 'reflection_text')
-    .maybeSingle();
-
-  const content = art as { content: Record<string, unknown> } | null;
+  const ctxSnap = row.context_snapshot ?? {};
   const preview =
-    content?.content && typeof content.content.message === 'string'
-      ? (content.content.message as string)
-      : null;
+    typeof ctxSnap.context_text === 'string' ? (ctxSnap.context_text as string) : null;
 
   return {
     id: row.id,

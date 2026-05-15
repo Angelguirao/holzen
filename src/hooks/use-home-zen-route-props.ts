@@ -9,18 +9,17 @@ type CooldownFn = () => number;
  * Keeps Zen branch readable and avoids accidental prop drift vs the type.
  */
 export function useHomeZenModeRouteProps(args: {
-  message: ZenModeHomeProps['message'];
+  hasOpenPause: ZenModeHomeProps['hasOpenPause'];
   context: ZenModeHomeProps['context'];
-  companions: ZenModeHomeProps['companions'];
-  companionPrefs: ZenModeHomeProps['companionPrefs'];
-  severity: ZenModeHomeProps['severity'];
-  lastPauseInstanceId: ZenModeHomeProps['lastPauseInstanceId'];
+  contextPreview: ZenModeHomeProps['contextPreview'];
+  openPauseState: ZenModeHomeProps['openPauseState'];
   loading: ZenModeHomeProps['loading'];
   error: ZenModeHomeProps['error'];
   btcData: ZenModeHomeProps['btcData'];
   onDismiss: ZenModeHomeProps['onDismiss'];
   onNeedPause: ZenModeHomeProps['onNeedPause'];
   onManualTrigger: ZenModeHomeProps['onManualTrigger'];
+  onPauseWithThis: ZenModeHomeProps['onPauseWithThis'];
   subscriptionReady: ZenModeHomeProps['subscriptionReady'];
   hasAccess: ZenModeHomeProps['hasAccess'];
   showLimitUpsell: ZenModeHomeProps['showLimitUpsell'];
@@ -34,18 +33,17 @@ export function useHomeZenModeRouteProps(args: {
   onStartCheckoutPro: ZenModeHomeProps['onStartCheckoutPro'];
 }): ZenModeHomeProps {
   const {
-    message,
+    hasOpenPause,
     context,
-    companions,
-    companionPrefs,
-    severity,
-    lastPauseInstanceId,
+    contextPreview,
+    openPauseState,
     loading,
     error,
     btcData,
     onDismiss,
     onNeedPause,
     onManualTrigger,
+    onPauseWithThis,
     subscriptionReady,
     hasAccess,
     showLimitUpsell,
@@ -61,18 +59,28 @@ export function useHomeZenModeRouteProps(args: {
 
   return useMemo(
     () => ({
-      message,
+      hasOpenPause,
       context,
-      companions,
-      companionPrefs,
-      severity,
-      lastPauseInstanceId,
+      contextPreview,
+      openPauseState,
+      companions: { haiku: null, groundingTitle: null, groundingBody: null },
+      companionPrefs: {
+        breathing: true,
+        haiku: false,
+        grounding: false,
+        signal: false,
+        zoomOut: false,
+        history: false,
+      },
+      severity: 'mild',
+      lastPauseInstanceId: null,
       loading,
       error,
       btcData,
       onDismiss,
       onNeedPause,
       onManualTrigger,
+      onPauseWithThis,
       subscriptionReady,
       hasAccess,
       showLimitUpsell,
@@ -86,18 +94,17 @@ export function useHomeZenModeRouteProps(args: {
       onStartCheckoutPro,
     }),
     [
-      message,
+      hasOpenPause,
       context,
-      companions,
-      companionPrefs,
-      severity,
-      lastPauseInstanceId,
+      contextPreview,
+      openPauseState,
       loading,
       error,
       btcData,
       onDismiss,
       onNeedPause,
       onManualTrigger,
+      onPauseWithThis,
       subscriptionReady,
       hasAccess,
       showLimitUpsell,

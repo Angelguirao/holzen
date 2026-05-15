@@ -6,7 +6,7 @@ import { getProfileRowQueryOptions } from '@/lib/profile-row-query';
 
 /**
  * Listens for server-side auto-triggered pause notifications via realtime subscription
- * on the profiles table (last_message changes).
+ * on the profiles table (`last_context` changes when cron opens a pause).
  * Returns a flag + dismiss function for non-Home pages to show a banner.
  */
 export function useAutoTrigger() {
@@ -15,7 +15,7 @@ export function useAutoTrigger() {
   const { data: profileRow, status: profileStatus } = useQuery(getProfileRowQueryOptions(userId));
 
   const [pauseReady, setPauseReady] = useState(false);
-  const lastMessageRef = useRef<string | null>(null);
+  const lastContextRef = useRef<string | null>(null);
   const initializedRef = useRef(false);
 
   // Check URL for ?pause=ready (from push notification deep-link)
@@ -30,10 +30,10 @@ export function useAutoTrigger() {
     }
   }, []);
 
-  // Baseline last_message from the shared profiles query (same cache as useProfile).
+  // Baseline last_context from the shared profiles query (same cache as useProfile).
   useEffect(() => {
     if (!userId) {
-      lastMessageRef.current = null;
+      lastContextRef.current = null;
       initializedRef.current = false;
       return;
     }
@@ -41,10 +41,10 @@ export function useAutoTrigger() {
       initializedRef.current = false;
       return;
     }
-    lastMessageRef.current =
-      profileStatus === 'success' ? (profileRow?.last_message ?? null) : null;
+    lastContextRef.current =
+      profileStatus === 'success' ? (profileRow?.last_context ?? null) : null;
     initializedRef.current = true;
-  }, [userId, profileStatus, profileRow?.last_message]);
+  }, [userId, profileStatus, profileRow?.last_context]);
 
   useEffect(() => {
     if (!userId) return;
@@ -61,10 +61,10 @@ export function useAutoTrigger() {
         },
         (payload) => {
           if (!initializedRef.current) return;
-          const row = payload.new as { last_message?: string | null };
-          const newMessage = row?.last_message;
-          if (newMessage && newMessage !== lastMessageRef.current) {
-            lastMessageRef.current = newMessage;
+          const row = payload.new as { last_context?: string | null };
+          const newContext = row?.last_context;
+          if (newContext && newContext !== lastContextRef.current) {
+            lastContextRef.current = newContext;
             setPauseReady(true);
           }
         },

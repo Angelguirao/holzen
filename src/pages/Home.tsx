@@ -73,20 +73,22 @@ const Home = () => {
     refreshProfile,
   } = useHolzen();
 
+  const hasOpenPause = Boolean(lastPauseInstanceId);
+
   const { subscriptionReady, hasAccess, showLimitUpsell, showPauseScheduling } = getHomeSubscriptionGate({
     subLoading,
     subscribed,
     monthlyRemaining,
-    message,
+    hasOpenPause,
     loading,
   });
 
   const outletCtx = useOutletContext<HomeAppLayoutOutletContext>();
   const pauseReady = outletCtx?.pauseReady ?? false;
   const dismissPauseReady = outletCtx?.dismissPauseReady;
-  useHomeOutletPauseReady(pauseReady, message, loading, refreshProfile, dismissPauseReady);
+  useHomeOutletPauseReady(pauseReady, hasOpenPause, dismissPauseReady);
   useHomeHeroQuoteViewed(profileLoaded, user?.id);
-  useHomePauseAudio(newPauseArrival, message, clearNewPauseArrival);
+  useHomePauseAudio(newPauseArrival, lastPauseInstanceId, clearNewPauseArrival);
 
   const { reflection: nightReflection, dismiss: dismissNight } = useNightReflection();
 
@@ -164,7 +166,7 @@ const Home = () => {
     subscribed,
     monthlyRemaining,
     checkoutLoading,
-    message,
+    hasOpenPause,
     openPauseState,
     pauseContextHomePreview,
     loading,
@@ -219,18 +221,17 @@ const Home = () => {
   );
 
   const zenRouteProps = useHomeZenModeRouteProps({
-    message,
+    hasOpenPause,
     context,
-    companions,
-    companionPrefs,
-    severity,
-    lastPauseInstanceId,
+    contextPreview: pauseContextHomePreview,
+    openPauseState,
     loading,
     error,
     btcData,
     onDismiss: pauseActions.handleDismiss,
     onNeedPause: pauseActions.handleNeedAPause,
     onManualTrigger: manualTrigger,
+    onPauseWithThis: pauseActions.handleNavigatePauseWithThis,
     subscriptionReady,
     hasAccess,
     showLimitUpsell,
