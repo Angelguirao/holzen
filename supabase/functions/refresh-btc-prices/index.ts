@@ -5,6 +5,7 @@ import { btcOnThisDayYearOffsets } from "../_shared/btc-on-this-day-config.ts";
 import { coingeckoHeaders } from "../_shared/coingecko.ts";
 import { warmMissingBtcPrices } from "../_shared/btc-price-warm.ts";
 import { withRequestLogging } from "../_shared/with-request-logging.ts";
+import { fetchInitWithIncomingTrace } from "../_shared/forward-trace-headers.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -72,7 +73,10 @@ serve(
 
     // ── 1. Fetch current price ──
     try {
-      const res = await fetch("https://api.coingecko.com/api/v3/simple/price?ids=bitcoin&vs_currencies=usd", { headers: coingeckoHeaders() });
+      const res = await fetch(
+        "https://api.coingecko.com/api/v3/simple/price?ids=bitcoin&vs_currencies=usd",
+        fetchInitWithIncomingTrace(req, { headers: coingeckoHeaders() }),
+      );
       if (res.ok) {
         const data = await res.json();
         const price = data?.bitcoin?.usd;
@@ -108,7 +112,10 @@ serve(
         coingeckoInterCallMs = 12000; // reduce immediate second 429 on market_chart/range
         // Try backup: Blockchain.info
         try {
-          const backupRes = await fetch("https://blockchain.info/ticker");
+          const backupRes = await fetch(
+            "https://blockchain.info/ticker",
+            fetchInitWithIncomingTrace(req, {}),
+          );
           if (backupRes.ok) {
             const data = await backupRes.json();
             const price = data?.USD?.last;
@@ -187,6 +194,7 @@ serve(
         const warm = await warmMissingBtcPrices(
           supabase,
           missingTargets.map((t) => t.dateKey),
+          { incoming: req },
         );
         if (warm.upserted > 0) {
           results.push(

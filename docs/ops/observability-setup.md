@@ -100,6 +100,8 @@ Edge CORS (`supabase/functions/_shared/cors.ts`) allow-lists those headers; `wit
 
 `fetchInitWithIncomingTrace(incomingRequest, init)` merges the same headers into a plain `fetch` **`RequestInit`** for outbound third-party calls (for example the Lovable AI gateway or price APIs) without overwriting keys already set in `init.headers`.
 
+BTC cache workers (`refresh-btc-prices`, `backfill-btc-prices`, `seed-btc-history`) and shared helpers such as **`fetchCoinGeckoHistoryPrice`** / **`warmMissingBtcPrices`** accept the incoming edge `Request` where applicable so CoinGecko, backup tickers, and CryptoCompare calls stay in the same trace when headers are present.
+
 This is **not** a full OpenTelemetry SDK in-app — it aligns the propagation **wire format** with OTel / W3C so downstream collectors or future OTLP export can reuse the same identifiers.
 
 ### 2.5 Alert rules (Sentry Alerts UI)

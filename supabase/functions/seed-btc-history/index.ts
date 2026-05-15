@@ -2,6 +2,7 @@ import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.57.2";
 import { unknownErrorForLog } from "../_shared/log-unknown-error.ts";
 import { withRequestLogging } from "../_shared/with-request-logging.ts";
+import { fetchInitWithIncomingTrace } from "../_shared/forward-trace-headers.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -75,6 +76,7 @@ function toDateKey(unixSeconds: number): string {
 async function fetchCryptoCompareHistoDay(
   toTsSec: number,
   limit: number,
+  incoming?: Request,
 ): Promise<{ rows: CryptoCompareDayRow[]; rateLimited: boolean; httpStatus: number }> {
   const url =
     `https://min-api.cryptocompare.com/data/v2/histoday?fsym=BTC&tsym=USD&limit=${limit}&toTs=${toTsSec}`;
@@ -82,7 +84,13 @@ async function fetchCryptoCompareHistoDay(
   const headers: HeadersInit = apiKey ? { authorization: `Apikey ${apiKey}` } : {};
   let res: Response;
   try {
-    res = await fetch(url, { headers, signal: AbortSignal.timeout(15000) });
+    res = await fetch(
+      url,
+      fetchInitWithIncomingTrace(incoming, {
+        headers,
+        signal: AbortSignal.timeout(15000),
+      }),
+    );
   } catch {
     return { rows: [], rateLimited: false, httpStatus: 0 };
   }
@@ -223,6 +231,7 @@ serve(
       const { rows, rateLimited: rl, httpStatus } = await fetchCryptoCompareHistoDay(
         cursorTsSec,
         batchLimit,
+        req,
       );
       pagesFetched++;
       if (rl) {

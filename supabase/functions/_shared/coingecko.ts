@@ -5,6 +5,8 @@
  * Without the key, requests fall back to the shared free-tier IP pool (subject
  * to 429 rate limits and 401s on certain endpoints).
  */
+import { fetchInitWithIncomingTrace } from "./forward-trace-headers.ts";
+
 export function coingeckoHeaders(): HeadersInit {
   const key = Deno.env.get("COINGECKO_API_KEY");
   return key ? { "x-cg-demo-api-key": key } : {};
@@ -34,6 +36,7 @@ import { dateKeyToCoinGeckoHistory } from "./coingecko-util.ts";
  */
 export async function fetchCoinGeckoHistoryPrice(
   dateKey: string,
+  incoming?: Request,
 ): Promise<{ price: number } | { rateLimited: true } | null> {
   const formatted = dateKeyToCoinGeckoHistory(dateKey);
   if (!formatted) return null;
@@ -42,7 +45,10 @@ export async function fetchCoinGeckoHistoryPrice(
   try {
     res = await fetch(
       `https://api.coingecko.com/api/v3/coins/bitcoin/history?date=${formatted}&localization=false`,
-      { headers: coingeckoHeaders(), signal: AbortSignal.timeout(8000) },
+      fetchInitWithIncomingTrace(incoming, {
+        headers: coingeckoHeaders(),
+        signal: AbortSignal.timeout(8000),
+      }),
     );
   } catch {
     return null;
