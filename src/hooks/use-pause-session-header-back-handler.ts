@@ -39,25 +39,17 @@ export function usePauseSessionHeaderBackHandler(input: {
       breathingSecondCompleted,
     });
     switch (intent.kind) {
-      case 'brief_breath_reset_intro':
-        breathingRef.current?.resetToIntro();
-        return;
-      case 'brief_breath_reset_intro_clear_first':
-        breathingRef.current?.resetToIntro();
-        setBreathingFirstCompleted(false);
-        return;
       case 'deep_breath_reset_intro':
         breathingRef.current?.resetToIntro();
-        return;
-      case 'deep_breathe_reset_intro_clear_first':
-        breathingRef.current?.resetToIntro();
-        setBreathingFirstCompleted(false);
         return;
       case 'deep_breath2_reset_intro_clear_second':
         breathingRef.current?.resetToIntro();
         setBreathingSecondCompleted(false);
         return;
       case 'go_back':
+        if (ritualEntry === 'deep' && step === 'breathe') {
+          setBreathingFirstCompleted(false);
+        }
         goBack();
     }
   }, [
