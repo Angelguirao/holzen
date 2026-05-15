@@ -66,7 +66,7 @@ flowchart TB
 
 
 
-Reflection text and haiku land in `pause_ai_artifacts` from **`holzen-reflect`** once the user is in the deep ritual’s **Reflect → Decide** window; the **intervention** is fetched eagerly via **`companion-orchestrate`** in **`PauseSession`**; individual **companion slots** are generated lazily when the user taps a card (or hydrated from existing `pause_ai_artifacts`). **Who calls the orchestrator:** the **`PauseSession`** client (`**use-companion-data`**) for **both** manual- and cron-created pauses. **`check-volatility`** does **not** invoke **`companion-orchestrate`** on automatic pause claim in Pause V2.
+Reflection text and haiku land in `pause_ai_artifacts` from **`holzen-reflect`** once the user is in the deep ritual’s **Reflect → Decide** window; the **intervention** is fetched first via **`companion-orchestrate`** (intervention-only) once **`pauseInstanceId`** is live in **`PauseSession`**, typically **before** that Reflect window; individual **companion slots** are generated lazily when the user taps a card (or hydrated from existing `pause_ai_artifacts`). **Who calls the orchestrator:** the **`PauseSession`** client (`**use-companion-data`**) for **both** manual- and cron-created pauses. **`check-volatility`** does **not** invoke **`companion-orchestrate`** on automatic pause claim in Pause V2.
 
 ---
 
@@ -257,14 +257,14 @@ flowchart TB
 
 ---
 
-## 4. Client flow after reflect-step (manual path, Pause V2)
+## 4. Client flow (Pause V2)
 
-This section is **client-centric**: `**use-holzen`** and `**use-companion-data`** run **in the browser** (React); `**holzen-reflect`** and `**companion-orchestrate`** are **HTTP edge functions**; persistence uses **`pause_instances`** and **`pause_ai_artifacts`** via the **Supabase client** under **RLS** (no **`profiles.last_message`** update in this hook — see §2.3.H). Canonical tables and transitions: [pause-system.md](../pause-system.md).
+This section is **client-centric** (Home open → ritual → companions): `**use-holzen`** and `**use-companion-data`** run **in the browser** (React); `**holzen-reflect`** and `**companion-orchestrate`** are **HTTP edge functions**; persistence uses **`pause_instances`** and **`pause_ai_artifacts`** via the **Supabase client** under **RLS** (no **`profiles.last_message`** update in this hook — see §2.3.H). **Intervention** orchestration usually runs **once `pauseInstanceId` is live**, often **before** the deep **Reflect** step; **reflection** runs from **Reflect** through **Decide** (see §2). Canonical tables and transitions: [pause-system.md](../pause-system.md).
 
 1. `**use-holzen.ts`** — Builds context, calls **`pauseCreateOrReuse`** (RPC). React tracks **`lastPauseInstanceId`**. The non-silent Home path does **not** invoke **`holzen-reflect`**.
 2. `**PauseSession`** + **`use-pause-reflect-generation.ts`** — Invoke **`holzen-reflect`** via **`generateReflectionAtReflectStep`** once the deep ritual reaches **Reflect**; **`PauseSession`** keeps that hook **enabled** through **Decide** so in-flight generation can finish after the user leaves the Reflect card.
 3. **Pause UI** — `**use-companion-data.ts`** receives **`pauseInstanceId`**, **`context`**, **`reflectionMessage`** (prop name = AI reflect-step text), **`mood`**, **`severityNumber`**, language.
-4. `**use-companion-data**` (mount) — Hydrates companion payloads from **`pause_ai_artifacts`** where present; calls **`companion-orchestrate`** for intervention + cached reads using **`pauseInstanceId`**.
+4. `**use-companion-data**` (once **`pauseInstanceId`** is live) — Hydrates companion payloads from **`pause_ai_artifacts`** where present; calls **`companion-orchestrate`** for intervention + cached reads using **`pauseInstanceId`** (typically **before** the deep **Reflect** step).
 5. `**use-companion-data`** (on tap) — `**fetchCompanion(slot)`** calls **`companion-orchestrate`** with a single **`enable*`** flag (`holzenInvokeSource: 'browser_lazy_fetch'`). Results persist via **`writeCompanionData`** into **`pause_ai_artifacts`** (library → cache → live → curated ordering unchanged).
 
 ### 4.1 Manual pause — request order (click path)
@@ -578,7 +578,7 @@ flowchart TB
 | Piece                    | Role                                                                                                                                                                                       |
 | ------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
 | **Breathing**            | `**CompanionPrefs.breathing**` exists for pause prefs; the **breathing ritual** is **not** rendered inside `CompanionSection` companion cards — it is a **separate flow** in the pause UI. |
-| **Intervention loading** | `use-companion-data` fetches the intervention eagerly on mount (`useIntervention: true`, all `enable*` false); companion slots are fetched lazily on card tap.                             |
+| **Intervention loading** | `use-companion-data` fetches the intervention eagerly once **`pauseInstanceId`** is available (`useIntervention: true`, all `enable*` false), typically early in **`PauseSession`** and often **before** Reflect; companion slots are fetched lazily on card tap.                             |
 
 
 ---
@@ -619,7 +619,7 @@ Reads that need hydrated pause + companion text use **`v_pause_full`** and/or **
 | ---------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `use-holzen.ts`              | BTC context, manual cooldown, **`pauseCreateOrReuse`** (opens instance + snapshot); **silent** stub `reflection_text`; non-silent defers AI to Reflect                                                                                       |
 | `use-pause-reflect-generation.ts` | Deep ritual: **`PauseSession`** enables the hook from **Reflect** through **Decide**; cache read, then **`holzen-reflect`** via **`generateReflectionAtReflectStep`** → **`pause_ai_artifacts`**                                                                                         |
-| `use-companion-data.ts`      | Intervention-only orchestrate on mount, lazy per-slot `fetchCompanion` on card tap, per-companion loading/errors, recency hints; companion payloads persist in **`pause_ai_artifacts`** only                         |
+| `use-companion-data.ts`      | Intervention-only orchestrate once **`pauseInstanceId`** is set (often before Reflect), lazy per-slot `fetchCompanion` on card tap, per-companion loading/errors, recency hints; companion payloads persist in **`pause_ai_artifacts`** only                         |
 | `InterventionSection.tsx`    | Renders mirror / trap / pattern / question + optional zoom-out secondary                                                                                                                                  |
 | `CompanionSection.tsx`       | Container for companion cards and prefs; hides Zoom Out card when intervention already shows zoom-out secondary (§7.5). Each companion card has an **"Open full view"** button wired to the routes below. |
 | `src/lib/companion-types.ts` | Canonical type strings shared with tests; full intervention ↔ generator ↔ UI map in **§7**                                                                                                                |

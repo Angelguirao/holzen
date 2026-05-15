@@ -95,7 +95,7 @@ Use these as "prove-or-disprove" questions while reading the Phase 3 files.
 1. Can two concurrent `check-volatility` runs double-trigger the same user, or does `last_trigger_at` + eligibility prevent it?
 2. What is the exact order: pause instance create, `notifications` insert, then fire-and-forget orchestrate — and what breaks if the user opens the notification in the first seconds?
 3. Does automatic generation use the same conceptual context as manual (`use-holzen`) enough that severity and messaging feel consistent?
-4. When the client opens `/pause` with only `pauseInstanceId`, does `useCompanionData` orchestrate on mount while reflection is still loading — and is that acceptable cost-wise?
+4. When the client opens `/pause` with only `pauseInstanceId`, does `useCompanionData` issue intervention orchestrate while reflection is still empty — and is that acceptable cost-wise?
 5. Are quiet hours, snooze, and cumulative thresholds applied consistently with user expectations in settings UI?
 6. What happens if CoinGecko or a sub-fetch fails mid-batch — partial users processed, retries?
 
