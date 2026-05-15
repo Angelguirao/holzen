@@ -1,18 +1,25 @@
-import { useEffect, useState } from 'react';
+import { useLayoutEffect, useMemo, useRef, useState } from 'react';
 import { motion } from 'framer-motion';
-import { ChevronDown, Flame, Pencil, Sparkles } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import { Flame, Pencil, Sparkles } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
+import type { TFunction } from 'i18next';
 import { useSubscription } from '@/hooks/use-subscription';
+import { MoodIcon } from '@/components/icons/MoodIcon';
 import { OutcomeIcon } from '@/components/icons/OutcomeIcon';
 import { PAUSE_FEEL_INTENSITY_KEYS } from '@/components/pause/pause-feel-intensity-labels';
+import type { MoodValue } from '@/components/MoodCheck';
+import { PAUSE_MOOD_VALUES } from '@/components/MoodCheck';
 import { PRICING } from '@/lib/pricing';
-import { TOOLS } from '@/lib/app-routes';
 import { cn } from '@/lib/utils';
 import { ScoreImpact } from './ScoreImpact';
 import { pauseStepLayout } from '@/components/pause/pause-step-layout';
 import { Button } from '@/components/ui/button';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Slider } from '@/components/ui/slider';
+import { pauseLogStep } from '@/lib/pause-api';
+import { buildPostPauseEmotionLoggedPayload, isPauseMoodValue } from '@/lib/pause-post-pause-emotion-log';
+import { buildPauseScoreImpacts } from '@/lib/pause-score-impacts';
+import { showPauseStepSyncFailedToast } from '@/lib/pause-step-sync-toast';
 
 interface PauseData {
   mood: string | null;
@@ -34,29 +41,129 @@ interface Props {
   pauseData?: PauseData | null;
   /** Brief ritual completion: journey CTA + optional check-in block. */
   doneVariant?: 'default' | 'brief';
-  /** Brief only: clears session and navigates to Journey (stats). */
+  /** Brief only: runs after optional mood RPC; clears session and navigates to Journey. */
   onSaveToJourney?: () => void;
+  /** When set, brief Save to journey can persist post-completion mood via `post_pause_emotion_logged`. */
+  pauseInstanceId?: string | null;
 }
 
-export function PauseDone({ decision, onReturn, pauseData, doneVariant = 'default', onSaveToJourney }: Props) {
+function clampFeelIntensity(n: number | null | undefined): number {
+  if (typeof n === 'number' && n >= 1 && n <= 5) return n;
+  return 3;
+}
+
+/** Brief done: replaces generic “saved to Journey” with decision + entry-mood–specific copy. */
+function briefJourneyPrimaryLine(t: TFunction, pauseData: PauseData | null | undefined, decisionProp: string | null): string {
+  const dec = (pauseData?.decision ?? decisionProp)?.toLowerCase() ?? '';
+  const entryMood =
+    pauseData?.mood && isPauseMoodValue(pauseData.mood)
+      ? t(`moodCheck.moods.${pauseData.mood}`, { defaultValue: pauseData.mood })
+      : null;
+
+  if (dec === 'held' && entryMood) {
+    return t('pause.brief.done.journeyPersonalHeldWithMood', { mood: entryMood });
+  }
+  if (dec === 'held') {
+    return t('pause.brief.done.journeyPersonalHeld');
+  }
+  if (dec === 'sold' && entryMood) {
+    return t('pause.brief.done.journeyPersonalSoldWithMood', { mood: entryMood });
+  }
+  if (dec === 'sold') {
+    return t('pause.brief.done.journeyPersonalSold');
+  }
+  if (dec === 'bought' && entryMood) {
+    return t('pause.brief.done.journeyPersonalBoughtWithMood', { mood: entryMood });
+  }
+  if (dec === 'bought') {
+    return t('pause.brief.done.journeyPersonalBought');
+  }
+  return t('pause.brief.done.journeyLead', { defaultValue: 'This pause is saved to your Journey.' });
+}
+
+/** Second line under journey primary — echoes their decision, then the “many pauses” framing. */
+function briefPersonalityKicker(t: TFunction, pauseData: PauseData | null | undefined, decisionProp: string | null): string {
+  const dec = (pauseData?.decision ?? decisionProp)?.toLowerCase() ?? '';
+  if (dec === 'held') {
+    return t('pause.brief.done.personalityKickerHeld', {
+      defaultValue:
+        'After a hold like this, every pause still nudges the picture Holzen builds of you under pressure — Journey infers that personality slowly from your pattern, not one headline.',
+    });
+  }
+  if (dec === 'sold') {
+    return t('pause.brief.done.personalityKickerSold', {
+      defaultValue:
+        'After a sell like this, each pause still feeds the story your stats tell about tolerance and alignment — it sharpens across many decisions, not a single swing.',
+    });
+  }
+  if (dec === 'bought') {
+    return t('pause.brief.done.personalityKickerBought', {
+      defaultValue:
+        'After a buy like this, each pause still refines how Journey reads your composure under urge — the shape emerges from repetition, not one dramatic number.',
+    });
+  }
+  return t('pause.brief.done.personalityKicker', {
+    defaultValue:
+      'Each pause strengthens the picture Holzen builds of you under pressure — the shape your Journey stats infer slowly from many pauses, not one headline.',
+  });
+}
+
+export function PauseDone({
+  decision,
+  onReturn,
+  pauseData,
+  doneVariant = 'default',
+  onSaveToJourney,
+  pauseInstanceId,
+}: Props) {
   const { t } = useTranslation();
   const { subscribed, monthlyUsed, startCheckout, checkoutLoading } = useSubscription();
 
   const justHitLimit = !subscribed && monthlyUsed >= PRICING.freeReflectionsPerMonth;
 
-  const moodKey = pauseData?.mood;
-  const moodLabel =
-    moodKey && typeof moodKey === 'string'
-      ? t(`moodCheck.moods.${moodKey}`, { defaultValue: moodKey })
-      : null;
+  const [briefDoneMood, setBriefDoneMood] = useState<MoodValue | null>(null);
+  const [briefDoneIntensity, setBriefDoneIntensity] = useState(3);
+  const [moodEditorOpen, setMoodEditorOpen] = useState(false);
+  const [saveBusy, setSaveBusy] = useState(false);
+  const initialFeelSnapshotRef = useRef<{ mood: MoodValue | null; intensity: number } | null>(null);
 
-  const [briefDoneIntensity, setBriefDoneIntensity] = useState(() =>
-    Math.min(5, Math.max(1, pauseData?.feelIntensity ?? 3)),
-  );
-  useEffect(() => {
-    const n = pauseData?.feelIntensity;
-    if (typeof n === 'number' && n >= 1 && n <= 5) setBriefDoneIntensity(n);
-  }, [pauseData?.feelIntensity]);
+  useLayoutEffect(() => {
+    if (doneVariant !== 'brief' || !pauseData) return;
+    const m = isPauseMoodValue(pauseData.mood) ? pauseData.mood : null;
+    const int = clampFeelIntensity(pauseData.feelIntensity ?? null);
+    setBriefDoneMood(m);
+    setBriefDoneIntensity(int);
+    initialFeelSnapshotRef.current = { mood: m, intensity: int };
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- mood/feel fields only; full `pauseData` identity would reset in-progress edits
+  }, [doneVariant, pauseInstanceId, pauseData?.mood, pauseData?.feelIntensity]);
+
+  const briefImpacts = useMemo(() => {
+    if (doneVariant !== 'brief' || !pauseData) return [];
+    return buildPauseScoreImpacts(pauseData, t, 'brief');
+  }, [doneVariant, pauseData, t]);
+
+  const handleSaveToJourney = async () => {
+    if (!onSaveToJourney) return;
+    setSaveBusy(true);
+    try {
+      const snap = initialFeelSnapshotRef.current;
+      const feelDirty =
+        briefDoneMood != null &&
+        (!snap || briefDoneMood !== snap.mood || briefDoneIntensity !== snap.intensity);
+      if (pauseInstanceId && feelDirty) {
+        await pauseLogStep({
+          instanceId: pauseInstanceId,
+          stepType: 'post_pause_emotion_logged',
+          payload: buildPostPauseEmotionLoggedPayload(briefDoneMood!, briefDoneIntensity),
+        });
+      }
+      onSaveToJourney();
+    } catch {
+      showPauseStepSyncFailedToast(t);
+    } finally {
+      setSaveBusy(false);
+    }
+  };
 
   if (doneVariant === 'brief') {
     const outcomeHeadline =
@@ -70,6 +177,21 @@ export function PauseDone({ decision, onReturn, pauseData, doneVariant = 'defaul
 
     const outcomeIconKey =
       decision === 'held' || decision === 'sold' || decision === 'bought' ? decision : 'held';
+
+    const moodLabel =
+      briefDoneMood != null
+        ? t(`moodCheck.moods.${briefDoneMood}`, { defaultValue: briefDoneMood })
+        : null;
+
+    const checkInMetaRight =
+      briefImpacts[0] != null
+        ? `${briefImpacts[0].label} — ${briefImpacts[0].reason}`
+        : t('pause.brief.done.checkInRowRightFallback', {
+            defaultValue: 'One more signal for Journey when you save.',
+          });
+
+    const journeyPrimary = briefJourneyPrimaryLine(t, pauseData, decision);
+    const journeyKicker = briefPersonalityKicker(t, pauseData, decision);
 
     return (
       <motion.div
@@ -87,45 +209,91 @@ export function PauseDone({ decision, onReturn, pauseData, doneVariant = 'defaul
             <OutcomeIcon outcome={outcomeIconKey} size={44} className="text-foreground" aria-hidden />
             <div className="flex max-w-sm flex-col gap-2">
               <h2 className="text-[22px] font-normal leading-7 tracking-tight text-foreground">{outcomeHeadline}</h2>
-              <p className="text-sm leading-5 text-foreground">{t('pause.brief.done.journeyBody')}</p>
             </div>
           </div>
 
-          <div className="w-full rounded-xl border-2 border-primary bg-muted/20 p-4 text-left shadow-sm">
-            <p className="text-center text-sm font-medium leading-5 text-foreground">
-              {t('pause.brief.done.optionalBlockTitle')}
+          <div className="w-full max-w-md space-y-2 text-center">
+            <p className="text-sm font-medium leading-snug text-foreground">{journeyPrimary}</p>
+            <p className="text-xs leading-relaxed text-muted-foreground">{journeyKicker}</p>
+          </div>
+
+          <div className="w-full max-w-md space-y-4 rounded-xl border border-primary bg-card p-4 text-left shadow-sm">
+            <p className="text-center text-sm font-medium leading-5 tracking-wide text-foreground">
+              {t('pause.brief.done.checkInSectionTitle', { defaultValue: 'How are you now? (Optional)' })}
             </p>
 
-            <div className="mt-4 flex w-full items-start justify-between gap-3 text-sm leading-5 text-foreground">
-              <Link
-                to={TOOLS.practice.checkin}
-                className="shrink-0 font-normal text-foreground underline-offset-4 transition-colors hover:text-primary hover:underline"
-              >
-                {t('pause.brief.done.checkInAgain', { defaultValue: 'Check in again' })}
-              </Link>
-              <span className="text-right text-sm italic text-muted-foreground">
-                {t('pause.brief.done.checkInMeta', { defaultValue: 'Optional' })}
+            <div className="flex w-full items-start justify-between gap-3 text-sm leading-5 text-foreground">
+              <span className="shrink-0 font-normal">
+                {t('pause.brief.done.checkInRowLeft', { defaultValue: 'Optional' })}
+              </span>
+              <span className="line-clamp-3 max-w-[58%] text-right font-serif text-xs italic leading-snug text-muted-foreground sm:text-sm">
+                {checkInMetaRight}
               </span>
             </div>
 
-            {moodLabel ? (
-              <div className="mt-4 rounded-lg border-2 border-muted-foreground/35 bg-muted/50 p-4">
+            <div className="rounded-lg border-2 border-muted-foreground/35 bg-muted p-4">
                 <div className="flex items-center justify-between gap-2">
                   <div className="flex min-w-0 flex-1 items-center gap-2">
                     <span className="shrink-0 text-sm font-medium text-muted-foreground">
-                      {t('pause.brief.done.lastEmotionLabel')}
+                      {t('pause.brief.done.lastEmotionLabel', { defaultValue: 'Feel' })}
                     </span>
-                    <ChevronDown className="h-4 w-4 shrink-0 text-muted-foreground" aria-hidden />
-                    <span className="truncate text-sm font-medium text-foreground">{moodLabel}</span>
+                    {briefDoneMood && moodLabel ? (
+                      <>
+                        <MoodIcon mood={briefDoneMood} size={20} className="shrink-0 text-muted-foreground" />
+                        <span className="truncate text-sm font-medium text-foreground">{moodLabel}</span>
+                      </>
+                    ) : (
+                      <span className="truncate text-sm text-muted-foreground">
+                        {t('pause.brief.done.pickMood', { defaultValue: 'Tap pencil to choose' })}
+                      </span>
+                    )}
                   </div>
-                  <Link
-                    to={TOOLS.practice.checkin}
-                    className="shrink-0 text-muted-foreground transition-colors hover:text-foreground"
-                    aria-label={t('pause.brief.done.editMoodAria', { defaultValue: 'Update mood in check-in' })}
-                  >
-                    <Pencil className="h-4 w-4" aria-hidden />
-                  </Link>
+                  <Popover open={moodEditorOpen} onOpenChange={setMoodEditorOpen}>
+                    <PopoverTrigger asChild>
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="icon"
+                        className="h-9 w-9 shrink-0 text-muted-foreground hover:text-foreground"
+                        aria-label={t('pause.brief.done.editMoodAria', { defaultValue: 'Edit emotion' })}
+                      >
+                        <Pencil className="h-4 w-4" aria-hidden />
+                      </Button>
+                    </PopoverTrigger>
+                    <PopoverContent
+                      align="end"
+                      className="w-[min(20rem,calc(100vw-2rem))] p-3"
+                      onOpenAutoFocus={(e) => e.preventDefault()}
+                    >
+                      <p className="mb-2 text-center text-xs font-medium text-muted-foreground">
+                        {t('pause.brief.done.moodPickerTitle', { defaultValue: 'Choose emotion' })}
+                      </p>
+                      <div className="grid grid-cols-4 gap-1.5">
+                        {PAUSE_MOOD_VALUES.map((value) => (
+                          <Button
+                            key={value}
+                            type="button"
+                            variant="outline"
+                            size="sm"
+                            aria-pressed={briefDoneMood === value}
+                            onClick={() => {
+                              setBriefDoneMood(value);
+                              setMoodEditorOpen(false);
+                            }}
+                            className={cn(
+                              'flex h-auto flex-col items-center gap-1 border-border/60 py-2 text-[10px] font-medium leading-tight text-foreground transition-colors',
+                              briefDoneMood === value && 'border-primary/70 bg-primary/8',
+                            )}
+                          >
+                            <MoodIcon mood={value} size={18} className="text-muted-foreground" />
+                            {t(`moodCheck.moods.${value}`, { defaultValue: value })}
+                          </Button>
+                        ))}
+                      </div>
+                    </PopoverContent>
+                  </Popover>
                 </div>
+
                 <div className="mt-4 space-y-2.5">
                   <Slider
                     aria-label={t('pause.feelStep.intensityTitle', { defaultValue: 'How strong?' })}
@@ -136,7 +304,7 @@ export function PauseDone({ decision, onReturn, pauseData, doneVariant = 'defaul
                     onValueChange={(v) => setBriefDoneIntensity(Math.min(5, Math.max(1, v[0] ?? 3)))}
                     className="w-full py-1"
                   />
-                  <div className="flex justify-between gap-1 px-0.5 text-center text-xs text-muted-foreground sm:text-sm">
+                  <div className="flex justify-between gap-1 px-0.5 text-center text-[10px] text-muted-foreground sm:text-xs">
                     {PAUSE_FEEL_INTENSITY_KEYS.map((key) => (
                       <span
                         key={key}
@@ -149,22 +317,41 @@ export function PauseDone({ decision, onReturn, pauseData, doneVariant = 'defaul
                       </span>
                     ))}
                   </div>
-                  <p className="pt-1 text-center text-xs leading-snug text-muted-foreground">
-                    {t('pause.brief.done.intensityFootnote')}
-                  </p>
                 </div>
               </div>
-            ) : null}
+
+            {pauseData ? (
+              <ScoreImpact
+                data={pauseData}
+                variant="brief"
+                hideTitle
+                excludeFirstFromList
+                className="pt-1"
+              />
+            ) : (
+              <p className="pt-1 text-center text-xs leading-relaxed text-muted-foreground">
+                {t('pause.brief.done.contributionWhenNoSnapshot', {
+                  defaultValue:
+                    'When this screen loads without pause details, Journey still keeps your outcome — open Stats after saving to see trends.',
+                })}
+              </p>
+            )}
 
             {onSaveToJourney ? (
-              <div className="mt-6 flex justify-center">
+              <div className="flex justify-center pt-1">
                 <Button
                   type="button"
                   variant="outline"
-                  className={cn(pauseStepLayout.ritualPrimaryOutlineCta, 'rounded-full px-6')}
-                  onClick={() => onSaveToJourney()}
+                  disabled={saveBusy}
+                  className={cn(
+                    'rounded-full border-primary bg-primary/5 px-6 py-2.5 text-sm font-medium text-primary shadow-sm hover:bg-primary/10',
+                    saveBusy && 'opacity-70',
+                  )}
+                  onClick={() => void handleSaveToJourney()}
                 >
-                  {t('pause.brief.done.saveToJourney')}
+                  {saveBusy
+                    ? t('pause.brief.done.saveToJourneySaving', { defaultValue: 'Saving…' })
+                    : t('pause.brief.done.saveToJourney')}
                 </Button>
               </div>
             ) : null}
@@ -214,9 +401,7 @@ export function PauseDone({ decision, onReturn, pauseData, doneVariant = 'defaul
         className="flex items-center gap-2"
       >
         <Flame className="h-4 w-4 text-nox-text-highlight" />
-        <p className="text-sm font-medium text-muted-foreground">
-          {t('outcome.streakUpdated')}
-        </p>
+        <p className="text-sm font-medium text-muted-foreground">{t('outcome.streakUpdated')}</p>
       </motion.div>
 
       <div className="space-y-2">
@@ -240,10 +425,8 @@ export function PauseDone({ decision, onReturn, pauseData, doneVariant = 'defaul
         </motion.div>
       )}
 
-      {/* Score impact summary */}
       {pauseData && <ScoreImpact data={pauseData} />}
 
-      {/* Gentle upsell when free user hits limit */}
       {justHitLimit && (
         <motion.div
           initial={{ opacity: 0, y: 12 }}

@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { ArrowUpRight, ArrowDownRight, Minus } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import type { PauseFullRow } from '@/lib/pause-stats-data-query';
+import { effectivePauseShiftMood } from '@/lib/pause-effective-emotion';
 import {
   startOfWeek, endOfWeek, subWeeks,
   startOfMonth, endOfMonth, subMonths,
@@ -31,8 +32,8 @@ function computeStats(subset: PauseFullRow[]): Stats {
   const hold = completed.filter((r) => HOLD.has(r.outcome!)).length;
   const holdRate = completed.length === 0 ? null : hold / completed.length;
 
-  const withShift = completed.filter((r) => r.shift_mood);
-  const calmExits = withShift.filter((r) => CALM.has(r.shift_mood!)).length;
+  const withShift = completed.filter((r) => effectivePauseShiftMood(r));
+  const calmExits = withShift.filter((r) => CALM.has(effectivePauseShiftMood(r)!)).length;
   const calmExitRate = withShift.length === 0 ? null : calmExits / withShift.length;
 
   return { count: completed.length, holdRate, calmExitRate };

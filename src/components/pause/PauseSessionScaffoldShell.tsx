@@ -18,6 +18,7 @@ export function PauseSessionScaffoldShell(props: PauseSessionScaffoldShellProps)
     onDoneReturn,
     onSaveToJourney,
     pauseImpactData,
+    pauseInstanceIdForDone,
     ...scaffold
   } = props;
 
@@ -32,6 +33,7 @@ export function PauseSessionScaffoldShell(props: PauseSessionScaffoldShellProps)
         onDoneReturn={onDoneReturn}
         onSaveToJourney={onSaveToJourney}
         pauseImpactData={pauseImpactData}
+        pauseInstanceIdForDone={pauseInstanceIdForDone}
       />
     </PauseSessionScaffold>
   );

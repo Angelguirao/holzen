@@ -656,6 +656,7 @@ export default function PauseSession() {
               onDoneReturn={handleReturn}
               onSaveToJourney={ritualEntry === 'brief' ? handleBriefSaveToJourney : undefined}
               pauseImpactData={pauseImpactData}
+              pauseInstanceIdForDone={pauseInstanceIdForTerminal}
             />
           }
         />
