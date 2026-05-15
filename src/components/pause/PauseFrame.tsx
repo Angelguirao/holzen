@@ -42,7 +42,8 @@ export function PauseFrame({
   onImDone,
 }: PauseFrameProps) {
   const { t } = useTranslation();
-  const [haikuOpen, setHaikuOpen] = useState(true);
+  /** Match Reflect companion pattern: collapsed until the user opens the card. */
+  const [haikuOpen, setHaikuOpen] = useState(false);
 
   const zoomHref = pauseInstanceId ? `/companion/zoom-out/${pauseInstanceId}` : '/tools';
   const signalHref = pauseInstanceId ? `/companion/signal/${pauseInstanceId}` : '/tools';
@@ -85,25 +86,6 @@ export function PauseFrame({
                     <span className="truncate">{t('pause.frame.haikuLabel', { defaultValue: 'Haiku' })}</span>
                   </button>
                 </CollapsibleTrigger>
-                {subscribed ? (
-                  <span className="shrink-0 text-[10px] font-semibold uppercase tracking-wide text-muted-foreground">
-                    {t('pause.frame.haikuSeen', { defaultValue: 'Seen' })}
-                  </span>
-                ) : null}
-                {subscribed ? (
-                  <button
-                    type="button"
-                    className="shrink-0 rounded-full p-1.5 text-muted-foreground transition-colors hover:text-destructive"
-                    aria-label={t('pause.frame.favoriteHaikuAria', { defaultValue: 'Favorite' })}
-                    onClick={(e) => {
-                      e.preventDefault();
-                      hapticFeedback('light');
-                      onToggleFavorite();
-                    }}
-                  >
-                    <Heart className={cn('h-4 w-4', isFavorite && 'fill-current text-destructive')} aria-hidden />
-                  </button>
-                ) : null}
                 <CollapsibleTrigger asChild>
                   <button
                     type="button"
@@ -120,6 +102,25 @@ export function PauseFrame({
                 </CollapsibleTrigger>
               </div>
               <CollapsibleContent>
+                {subscribed ? (
+                  <div className="flex items-center justify-end gap-2 border-t border-border/40 px-4 py-2">
+                    <span className="text-[10px] font-semibold uppercase tracking-wide text-muted-foreground">
+                      {t('pause.frame.haikuSeen', { defaultValue: 'Seen' })}
+                    </span>
+                    <button
+                      type="button"
+                      className="rounded-full p-1.5 text-muted-foreground transition-colors hover:text-destructive"
+                      aria-label={t('pause.frame.favoriteHaikuAria', { defaultValue: 'Favorite' })}
+                      onClick={(e) => {
+                        e.preventDefault();
+                        hapticFeedback('light');
+                        onToggleFavorite();
+                      }}
+                    >
+                      <Heart className={cn('h-4 w-4', isFavorite && 'fill-current text-destructive')} aria-hidden />
+                    </button>
+                  </div>
+                ) : null}
                 <p className="px-4 pb-4 text-sm leading-relaxed text-muted-foreground">
                   {haiku?.trim() ? haiku.trim() : reflectionMessage}
                 </p>
