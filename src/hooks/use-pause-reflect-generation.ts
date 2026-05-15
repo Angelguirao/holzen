@@ -22,8 +22,9 @@ export type UsePauseReflectGenerationParams = {
   initialReflectionMessage: string;
   severityAbsPct: number;
   /**
-   * When false, aborts in-flight work and idles. In `PauseSession` (deep ritual) this follows
-   * `reflectGenEnabled`: **Reflect**, **Frame**, second **Breathe**, and **Decide** only.
+   * When false, aborts in-flight work and idles. For `/pause` deep ritual, `PauseSession` passes
+   * true on Reflect, Frame, second Breathe, and Decide so `holzen-reflect` can finish after the
+   * Reflect card (see `docs/systems/pause-system.md`, Reflection + haiku (deep)).
    */
   enabled: boolean;
 };
