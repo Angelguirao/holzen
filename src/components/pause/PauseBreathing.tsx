@@ -1,51 +1,21 @@
-import { useState, useEffect, useImperativeHandle, forwardRef, useRef, useLayoutEffect } from 'react';
+import { useState, useEffect, useImperativeHandle, forwardRef, useRef, useLayoutEffect, useMemo } from 'react';
 import { motion, useReducedMotion } from 'framer-motion';
 import { Play } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
-import { hapticFeedback } from '@/lib/haptics';
+import type { FeelStepTile } from '@/components/pause/pause-feel-types';
 import { pauseStepLayout } from '@/components/pause/pause-step-layout';
 import { Button } from '@/components/ui/button';
+import { hapticFeedback } from '@/lib/haptics';
 import {
   computeBreathingPhaseAdvance,
   resolveBreathingCompleted,
 } from '@/lib/pause-breathing-phase-advance';
-import {
-  BRIEF_RITUAL_BREATH_PHASES,
-  resolveBreathCycleTotal,
-} from '@/lib/pause-breathing-pattern';
+import { resolveBreathCycleTotal, resolvePauseBreathingPhases } from '@/lib/pause-breathing-pattern';
 import {
   playPauseBreathPatternCompleteCue,
   playPauseBreathPhaseCue,
   resumePauseAudioContext,
 } from '@/lib/pause-ritual-audio';
-
-const PATTERNS = [
-  {
-    nameKey: 'breathing.patterns.box',
-    phases: [
-      { labelKey: 'breathing.phases.inhale', duration: 4 },
-      { labelKey: 'breathing.phases.hold', duration: 4 },
-      { labelKey: 'breathing.phases.exhale', duration: 4 },
-      { labelKey: 'breathing.phases.hold', duration: 4 },
-    ],
-  },
-  {
-    nameKey: 'breathing.patterns.calming',
-    phases: [
-      { labelKey: 'breathing.phases.inhale', duration: 4 },
-      { labelKey: 'breathing.phases.hold', duration: 7 },
-      { labelKey: 'breathing.phases.exhale', duration: 8 },
-    ],
-  },
-  {
-    nameKey: 'breathing.patterns.sigh',
-    phases: [
-      { labelKey: 'breathing.phases.inhale', duration: 3 },
-      { labelKey: 'breathing.phases.sip', duration: 1 },
-      { labelKey: 'breathing.phases.exhale', duration: 6 },
-    ],
-  },
-];
 
 const EXPAND_KEYS = ['breathing.phases.inhale', 'breathing.phases.sip'];
 const CONTRACT_KEYS = ['breathing.phases.exhale'];
@@ -81,26 +51,9 @@ function BreathPhaseProgressRing({ progress }: { progress: number }) {
   );
 }
 
-type PhaseHintFamily = 'brief' | 'box' | 'calming' | 'sigh';
-
-function phaseHintFamily(
-  ritualVariant: 'brief' | 'deep' | undefined,
-  patternIndex: number,
-): PhaseHintFamily {
-  if (ritualVariant === 'brief') return 'brief';
-  if (patternIndex === 1) return 'calming';
-  if (patternIndex === 2) return 'sigh';
-  return 'box';
-}
-
-/** Shared micro-copy for pause ritual breathing (aligned with cycle / phase indices). */
-function phaseHintTranslationKey(
-  ritualVariant: 'brief' | 'deep' | undefined,
-  patternIndex: number,
-  cycle: number,
-  phaseIndex: number,
-): string {
-  return `breathing.phaseHints.${phaseHintFamily(ritualVariant, patternIndex)}.h${cycle}_${phaseIndex}`;
+/** i18n: `breathing.phaseHints.triangle.h{cycle}_{phaseIndex}` (see `pause-breathing-pattern.ts`). */
+function phaseHintTranslationKey(cycle: number, phaseIndex: number): string {
+  return `breathing.phaseHints.triangle.h${cycle}_${phaseIndex}`;
 }
 
 export type PauseBreathingHandle = {
@@ -112,14 +65,20 @@ export type PauseBreathSegment = 'first' | 'second';
 
 interface Props {
   mantra: string | null;
+  /** Retained for future Feel-tile pattern routing (`pause-breathing-pattern.ts`). */
   severity?: 'mild' | 'moderate' | 'high';
   /**
-   * `brief` — four rounds of inhale → hold → exhale (no post-exhale hold); phase seconds count up 1–4.
-   * `deep` — box or calming by severity; phase seconds count down; `breathing.phaseHints.sigh` if pattern index 2.
+   * Brief vs deep only changes post-pattern behavior (auto-advance vs interstitial).
+   * Phases are triangle for both until `PAUSE_RITUAL_BREATHING_PATTERN_MODE` enables feel-tile routing.
    */
   ritualVariant?: 'brief' | 'deep';
   /** First segment after Feel; second segment after Frame (deep pause only). */
   breathSegment?: PauseBreathSegment;
+  /**
+   * Feel grid tile from the shared ritual step; passed through for future `feel_tile_mapped` breathing.
+   * Optional until design wires pattern choice.
+   */
+  feelTile?: FeelStepTile | null;
   /** After full breath cycles: deep shows an interstitial then continues; brief auto-invokes (Integrate). */
   onContinueAfterBreath: () => void;
   /** Intro or mid-pattern skip: leave breath without logging completion. */
@@ -163,6 +122,7 @@ export const PauseBreathing = forwardRef<PauseBreathingHandle, Props>(function P
     severity = 'mild',
     ritualVariant,
     breathSegment = 'first',
+    feelTile = null,
     onContinueAfterBreath,
     onSkipBreath: _onSkipBreath,
     completed: completedProp,
@@ -179,14 +139,21 @@ export const PauseBreathing = forwardRef<PauseBreathingHandle, Props>(function P
     cueOptsRef.current = { muted: ritualSoundMuted, prefersReduced: !!prefersReduced };
   }, [ritualSoundMuted, prefersReduced]);
 
-  const isBriefRitual = ritualVariant === 'brief';
-  const patternIndex = isBriefRitual ? 0 : severity === 'high' ? 1 : 0;
-  const pattern = isBriefRitual
-    ? { nameKey: 'breathing.patterns.brief', phases: [...BRIEF_RITUAL_BREATH_PHASES] }
-    : PATTERNS[patternIndex];
+  const ritualVar: 'brief' | 'deep' = ritualVariant ?? 'deep';
+  const pattern = useMemo(
+    () => ({
+      phases: resolvePauseBreathingPhases({
+        ritualVariant: ritualVar,
+        feelTile,
+        severity,
+      }),
+    }),
+    [ritualVar, feelTile, severity],
+  );
   const totalCycles = resolveBreathCycleTotal(ritualVariant, breathSegment);
   const showPhaseHints = ritualVariant === 'brief' || ritualVariant === 'deep';
-  const phaseSecondCountsUp = isBriefRitual;
+  /** Triangle UX: seconds within the phase count 1 → duration (same for brief and deep). */
+  const phaseSecondCountsUp = true;
 
   const [started, setStarted] = useState(!!completedProp);
   const [phaseIndex, setPhaseIndex] = useState(0);
@@ -415,15 +382,13 @@ export const PauseBreathing = forwardRef<PauseBreathingHandle, Props>(function P
           </p>
           {showPhaseHints ? (
             <motion.p
-              key={`phase-hint-${patternIndex}-${cycle}-${phaseIndex}`}
+              key={`phase-hint-triangle-${cycle}-${phaseIndex}`}
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ duration: 0.35 }}
               className="max-w-xs px-2 text-center text-xs italic leading-snug text-muted-foreground"
             >
-              {t(phaseHintTranslationKey(ritualVariant, patternIndex, cycle, phaseIndex), {
-                defaultValue: '',
-              })}
+              {t(phaseHintTranslationKey(cycle, phaseIndex), { defaultValue: '' })}
             </motion.p>
           ) : null}
           <p className="text-base italic text-muted-foreground">

@@ -1819,8 +1819,8 @@
     "settledDesc": "You gave yourself a moment. That's enough.",
     "return": "Return",
     "patterns": {
-      "brief": "Brief",
-      "briefDesc": "Inhale · hold · exhale · 4 rounds",
+      "triangle": "Triangle",
+      "triangleDesc": "Inhale · hold · exhale (brief + deep ritual)",
       "box": "Box",
       "boxDesc": "4-4-4-4 · Grounding",
       "calming": "Calming",
@@ -1835,7 +1835,7 @@
       "sip": "Sip"
     },
     "phaseHints": {
-      "brief": {
+      "triangle": {
         "h0_0": "It's here",
         "h0_1": "Pieces settle",
         "h0_2": "Let the jaw soften on the way out.",

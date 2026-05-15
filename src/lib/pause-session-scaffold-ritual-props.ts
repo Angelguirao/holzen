@@ -6,14 +6,12 @@ import type { BriefPauseStep, RitualDepth } from '@/lib/pause-session-storage';
 
 type PauseSeverity = 'mild' | 'moderate' | 'high';
 
-function deepPauseMacroSubline(step: PauseStep, severity: PauseSeverity, t: TFunction): string | undefined {
+function deepPauseMacroSubline(step: PauseStep, t: TFunction): string | undefined {
   if (step === 'feel') {
     return t('pause.deep.feelStepDurationHint', { defaultValue: '~ 15 sec' });
   }
   if (step === 'breathe') {
-    return severity === 'high'
-      ? t('pause.deep.breatheStepDurationHintCalming', { defaultValue: '~ 1 min' })
-      : t('pause.deep.breatheStepDurationHint', { defaultValue: '< 1 min' });
+    return t('pause.deep.breatheStepDurationHint', { defaultValue: '< 1 min' });
   }
   if (step === 'breath2') {
     return t('pause.deep.breath2StepDurationHint', { defaultValue: '< 1 min' });
@@ -43,11 +41,12 @@ export function buildPauseSessionScaffoldRitualDerived(input: {
   step: PauseStep;
   /** Required when `ritualEntry === 'brief'` so macro lines use the two-line scaffold layout. */
   briefStep?: BriefPauseStep;
-  /** Used for deep pause breathe-step duration hints (box vs calming pattern). */
+  /** Retained for scaffold callers; breathe duration hint is triangle-only for all severities. */
   severity?: PauseSeverity;
   t: TFunction;
 }): PauseSessionScaffoldRitualDerived {
   const { ritualEntry, step, briefStep, severity = 'mild', t } = input;
+  void severity;
   if (ritualEntry === 'brief') {
     if (briefStep != null) {
       const { n, total } = computeBriefMacroProgressPosition(briefStep);
@@ -93,7 +92,7 @@ export function buildPauseSessionScaffoldRitualDerived(input: {
         n: macroStepIndex,
         total: macroStepTotal,
       }),
-      macroProgressSubline: deepPauseMacroSubline(step, severity, t),
+      macroProgressSubline: deepPauseMacroSubline(step, t),
     };
   }
   return {
