@@ -2387,6 +2387,7 @@ export type Database = {
           has_breath_completed: boolean | null
           has_initial_emotion_logged: boolean | null
           has_outcome_logged: boolean | null
+          has_post_pause_emotion_logged: boolean | null
           has_shift_emotion_logged: boolean | null
           id: string | null
           initial_emotion_intensity: number | null
@@ -2396,6 +2397,8 @@ export type Database = {
           metadata: Json | null
           note_text: string | null
           outcome: string | null
+          post_pause_emotion_intensity: number | null
+          post_pause_mood: string | null
           reflection_text: string | null
           shift_emotion_intensity: number | null
           shift_mood: string | null
@@ -2426,6 +2429,7 @@ export type Database = {
           has_breath_completed?: never
           has_initial_emotion_logged?: never
           has_outcome_logged?: never
+          has_post_pause_emotion_logged?: never
           has_shift_emotion_logged?: never
           id?: string | null
           initial_emotion_intensity?: never
@@ -2435,6 +2439,8 @@ export type Database = {
           metadata?: Json | null
           note_text?: never
           outcome?: never
+          post_pause_emotion_intensity?: never
+          post_pause_mood?: never
           reflection_text?: never
           shift_emotion_intensity?: never
           shift_mood?: never
@@ -2465,6 +2471,7 @@ export type Database = {
           has_breath_completed?: never
           has_initial_emotion_logged?: never
           has_outcome_logged?: never
+          has_post_pause_emotion_logged?: never
           has_shift_emotion_logged?: never
           id?: string | null
           initial_emotion_intensity?: never
@@ -2474,6 +2481,8 @@ export type Database = {
           metadata?: Json | null
           note_text?: never
           outcome?: never
+          post_pause_emotion_intensity?: never
+          post_pause_mood?: never
           reflection_text?: never
           shift_emotion_intensity?: never
           shift_mood?: never
@@ -2557,6 +2566,7 @@ export type Database = {
           has_breath_completed: boolean | null
           has_initial_emotion_logged: boolean | null
           has_outcome_logged: boolean | null
+          has_post_pause_emotion_logged: boolean | null
           has_shift_emotion_logged: boolean | null
           id: string | null
           initial_emotion_intensity: number | null
@@ -2566,6 +2576,8 @@ export type Database = {
           metadata: Json | null
           note_text: string | null
           outcome: string | null
+          post_pause_emotion_intensity: number | null
+          post_pause_mood: string | null
           reflection_text: string | null
           shift_emotion_intensity: number | null
           shift_mood: string | null
@@ -2596,6 +2608,7 @@ export type Database = {
           has_breath_completed?: never
           has_initial_emotion_logged?: never
           has_outcome_logged?: never
+          has_post_pause_emotion_logged?: never
           has_shift_emotion_logged?: never
           id?: string | null
           initial_emotion_intensity?: never
@@ -2605,6 +2618,8 @@ export type Database = {
           metadata?: Json | null
           note_text?: never
           outcome?: never
+          post_pause_emotion_intensity?: never
+          post_pause_mood?: never
           reflection_text?: never
           shift_emotion_intensity?: never
           shift_mood?: never
@@ -2635,6 +2650,7 @@ export type Database = {
           has_breath_completed?: never
           has_initial_emotion_logged?: never
           has_outcome_logged?: never
+          has_post_pause_emotion_logged?: never
           has_shift_emotion_logged?: never
           id?: string | null
           initial_emotion_intensity?: never
@@ -2644,6 +2660,8 @@ export type Database = {
           metadata?: Json | null
           note_text?: never
           outcome?: never
+          post_pause_emotion_intensity?: never
+          post_pause_mood?: never
           reflection_text?: never
           shift_emotion_intensity?: never
           shift_mood?: never
@@ -2965,6 +2983,7 @@ export type Database = {
           has_breath_completed: boolean | null
           has_initial_emotion_logged: boolean | null
           has_outcome_logged: boolean | null
+          has_post_pause_emotion_logged: boolean | null
           has_shift_emotion_logged: boolean | null
           id: string | null
           initial_emotion_intensity: number | null
@@ -2974,6 +2993,8 @@ export type Database = {
           metadata: Json | null
           note_text: string | null
           outcome: string | null
+          post_pause_emotion_intensity: number | null
+          post_pause_mood: string | null
           reflection_text: string | null
           shift_emotion_intensity: number | null
           shift_mood: string | null
@@ -3004,6 +3025,7 @@ export type Database = {
           has_breath_completed?: never
           has_initial_emotion_logged?: never
           has_outcome_logged?: never
+          has_post_pause_emotion_logged?: never
           has_shift_emotion_logged?: never
           id?: string | null
           initial_emotion_intensity?: never
@@ -3013,6 +3035,8 @@ export type Database = {
           metadata?: Json | null
           note_text?: never
           outcome?: never
+          post_pause_emotion_intensity?: never
+          post_pause_mood?: never
           reflection_text?: never
           shift_emotion_intensity?: never
           shift_mood?: never
@@ -3043,6 +3067,7 @@ export type Database = {
           has_breath_completed?: never
           has_initial_emotion_logged?: never
           has_outcome_logged?: never
+          has_post_pause_emotion_logged?: never
           has_shift_emotion_logged?: never
           id?: string | null
           initial_emotion_intensity?: never
@@ -3052,6 +3077,8 @@ export type Database = {
           metadata?: Json | null
           note_text?: never
           outcome?: never
+          post_pause_emotion_intensity?: never
+          post_pause_mood?: never
           reflection_text?: never
           shift_emotion_intensity?: never
           shift_mood?: never
