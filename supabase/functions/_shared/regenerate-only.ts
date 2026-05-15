@@ -43,8 +43,9 @@ export async function handleRegenerateOnly(params: {
   svcClient: SupabaseClient;
   body: Record<string, unknown>;
   log: ReturnType<typeof createLogger>;
+  incomingRequest?: Request;
 }): Promise<Response> {
-  const { slot, userId, svcClient, body, log } = params;
+  const { slot, userId, svcClient, body, log, incomingRequest } = params;
 
   const pauseInstanceId = body.pauseInstanceId as string | undefined;
   if (!pauseInstanceId) {
@@ -252,6 +253,7 @@ export async function handleRegenerateOnly(params: {
         log,
         preferredBias: intent.groundingBias,
         forceLive: true,
+        incomingRequest,
       });
       result = {
         data: g.data,
@@ -294,6 +296,7 @@ export async function handleRegenerateOnly(params: {
         log,
         searchAngle: intent.signalAngle,
         forceLive: true,
+        incomingRequest,
       });
       result = {
         data: s.data,
@@ -315,6 +318,7 @@ export async function handleRegenerateOnly(params: {
         log,
         preferredMood: intent.historyMood as "recovery" | "caution" | "neutral",
         forceLive: true,
+        incomingRequest,
       });
       result = {
         data: h.data,
@@ -338,6 +342,7 @@ export async function handleRegenerateOnly(params: {
         zoomOutAngle: intent.zoomOutAngle,
         forceLive: true,
         trackedAssetId,
+        incomingRequest,
       });
       result = {
         data: z.data,

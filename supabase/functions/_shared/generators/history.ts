@@ -58,6 +58,8 @@ export interface GenerateHistoryParams {
   /** Skip the live phase only — library/cache still serve. Used by circuit breaker. */
   skipLive?: boolean;
   log: (msg: string, extra?: Record<string, unknown>) => void;
+  /** Edge `Request` for W3C trace propagation to Perplexity. */
+  incomingRequest?: Request;
 }
 
 // ── Internals ──
@@ -154,7 +156,8 @@ async function serveFallback(
 // ── Public entry point ──
 
 export async function generateHistory(params: GenerateHistoryParams): Promise<HistoryResult> {
-  const { svcClient, context, mood, recentTitles, userId, preferredMood, forceLive, skipLive, log } = params;
+  const { svcClient, context, mood, recentTitles, userId, preferredMood, forceLive, skipLive, log, incomingRequest } =
+    params;
   const marketDirection = parseMarketDirection(context);
   const phases = getPhaseConfig();
   const liveEnabled = phases.live && !skipLive;
@@ -236,7 +239,7 @@ export async function generateHistory(params: GenerateHistoryParams): Promise<Hi
   let perplexityMerged: PerplexityUsage | undefined;
 
   try {
-    const result = await callPerplexityChat(perplexityBody, PERPLEXITY_API_KEY, (m) => log(m));
+    const result = await callPerplexityChat(perplexityBody, PERPLEXITY_API_KEY, (m) => log(m), 10_000, incomingRequest);
     perplexityMerged = result.usage;
     searchContent = result.content;
     citations = result.citations;

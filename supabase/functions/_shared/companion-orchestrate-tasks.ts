@@ -47,6 +47,8 @@ export interface BuildOrchestrateCompanionTasksParams {
   skipLiveLovable?: boolean;
   /** profiles.tracked_asset_id — zoom-out BTC anniversary path only for bitcoin. */
   trackedAssetId?: string | null;
+  /** Incoming edge request for W3C trace propagation (Perplexity live phase). */
+  incomingRequest?: Request;
 }
 
 /** Build parallel generator promises (grounding / history / zoomOut / signal) from orchestrate inputs. */
@@ -81,6 +83,7 @@ export function buildOrchestrateCompanionTasks(
         log: p.log,
         preferredBias: p.intent.groundingBias,
         skipLive: skipLiveGrounding,
+        incomingRequest: p.incomingRequest,
       });
       const latencyMs = Date.now() - t;
       logCompanionSlotResolved(p.log, {
@@ -118,6 +121,7 @@ export function buildOrchestrateCompanionTasks(
         log: p.log,
         preferredMood: p.intent.historyMood,
         skipLive: skipLiveHistory,
+        incomingRequest: p.incomingRequest,
       });
       const latencyMs = Date.now() - t;
       logCompanionSlotResolved(p.log, {
@@ -157,6 +161,7 @@ export function buildOrchestrateCompanionTasks(
         zoomOutAngle: p.intent.zoomOutAngle,
         skipLive: skipLiveZoomOut,
         trackedAssetId: p.trackedAssetId,
+        incomingRequest: p.incomingRequest,
       });
       const latencyMs = Date.now() - t;
       logCompanionSlotResolved(p.log, {
@@ -219,6 +224,7 @@ export function buildOrchestrateCompanionTasks(
         log: p.log,
         searchAngle: p.intent.signalAngle,
         skipLive: skipLiveSignal,
+        incomingRequest: p.incomingRequest,
       });
       const latencyMs = Date.now() - t;
       logCompanionSlotResolved(p.log, {

@@ -142,6 +142,7 @@ serve(
         svcClient,
         body,
         log,
+        incomingRequest: req,
       });
     }
 
@@ -466,6 +467,7 @@ serve(
       skipLivePerplexity,
       skipLiveLovable,
       trackedAssetId,
+      incomingRequest: req,
     });
 
     const keys = Object.keys(tasks);
