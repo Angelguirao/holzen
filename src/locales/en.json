@@ -1381,6 +1381,7 @@
         "checkInAgain": "Check in again",
         "checkInMeta": "Optional",
         "editMoodAria": "Update mood in check-in",
+        "intensityFootnote": "This pause is already saved. Use Check-in to log how you feel now — that updates your ongoing stats.",
         "lastEmotionLabel": "Last emotion",
         "saveToJourney": "Save to journey",
         "outcomeHeld": "You chose to Hold",
