@@ -11,6 +11,7 @@ import { PauseFrame } from '@/components/pause/PauseFrame';
 import { PauseReflect } from '@/components/pause/PauseReflect';
 import type { PauseStep } from '@/components/pause/PauseProgress';
 import type { PauseSessionStepTransitionConfig } from '@/lib/pause-session-step-transition';
+import { usePauseReflectFrameFocusAmbience } from '@/hooks/use-pause-reflect-frame-focus-ambience';
 
 export type PauseSessionDeepRitualBodyProps = {
   step: PauseStep;
@@ -34,6 +35,8 @@ export type PauseSessionDeepRitualBodyProps = {
   onSkipFirstBreath: () => void;
   onSkipSecondBreath: () => void;
   ritualSoundMuted: boolean;
+  /** When true, ritual audio (including Reflect/Frame focus bed) is off. */
+  prefersReducedMotion: boolean;
   companions: CompanionData;
   companionPrefs: CompanionPrefs;
   pauseInstanceId: string | null;
@@ -74,6 +77,7 @@ export function PauseSessionDeepRitualBody({
   onSkipFirstBreath,
   onSkipSecondBreath,
   ritualSoundMuted,
+  prefersReducedMotion,
   companions,
   companionPrefs,
   pauseInstanceId,
@@ -88,6 +92,12 @@ export function PauseSessionDeepRitualBody({
   decideOnBackStep,
   onRepeatDeepFirstBreathPattern,
 }: PauseSessionDeepRitualBodyProps) {
+  usePauseReflectFrameFocusAmbience({
+    active: step === 'reflect' || step === 'frame',
+    muted: ritualSoundMuted,
+    prefersReducedMotion,
+  });
+
   return (
     <AnimatePresence mode="wait" initial={false}>
       {step === 'feel' && (

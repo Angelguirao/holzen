@@ -38,6 +38,7 @@ export type PauseSessionScaffoldRitualPayloadsParams = {
   handleBriefBreathContinue: () => void | Promise<unknown>;
   handleBriefSkipBreath: PauseSessionBriefRitualBodyProps['onSkipBriefBreath'];
   soundMuted: boolean;
+  prefersReducedMotion: boolean;
   briefIntegrateDone: boolean;
   handleBriefIntegrateComplete: PauseSessionBriefRitualBodyProps['onBriefIntegrateComplete'];
   handleBriefRepeatBreaths: PauseSessionBriefRitualBodyProps['onBriefRepeatBreaths'];
@@ -119,6 +120,7 @@ export function buildPauseSessionScaffoldRitualPayloads(
       onSkipFirstBreath: p.handleSkipFirstBreath,
       onSkipSecondBreath: p.handleSkipSecondBreath,
       ritualSoundMuted: p.soundMuted,
+      prefersReducedMotion: p.prefersReducedMotion,
       companions: p.companions,
       companionPrefs: p.companionPrefs,
       pauseInstanceId: p.pauseInstanceId,

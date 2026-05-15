@@ -1,4 +1,4 @@
-import { useLayoutEffect, useRef, useState } from 'react';
+import { useCallback, useLayoutEffect, useRef, useState } from 'react';
 import { motion } from 'framer-motion';
 import { Flame, Pencil, Sparkles } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
@@ -17,8 +17,11 @@ import { pauseStepLayout } from '@/components/pause/pause-step-layout';
 import { Button } from '@/components/ui/button';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Slider } from '@/components/ui/slider';
+import { ShareReflection } from '@/components/ShareReflection';
+import { ReflectionWallpaper } from '@/components/ReflectionWallpaper';
+import { trackEvent } from '@/lib/posthog';
+import { isPauseMoodValue, buildPostPauseEmotionLoggedPayload } from '@/lib/pause-post-pause-emotion-log';
 import { pauseLogStep } from '@/lib/pause-api';
-import { buildPostPauseEmotionLoggedPayload, isPauseMoodValue } from '@/lib/pause-post-pause-emotion-log';
 import { showPauseStepSyncFailedToast } from '@/lib/pause-step-sync-toast';
 
 interface PauseData {
@@ -33,6 +36,8 @@ interface PauseData {
   feelIntensity?: number | null;
   shiftIntensity?: number | null;
   reinforcementQuote?: string | null;
+  reflectionMessage?: string | null;
+  haiku?: string | null;
 }
 
 interface Props {
@@ -45,6 +50,50 @@ interface Props {
   onSaveToJourney?: () => void;
   /** When set, brief Save to journey can persist post-completion mood via `post_pause_emotion_logged`. */
   pauseInstanceId?: string | null;
+}
+
+function PauseDoneReflectShareRow({
+  subscribed,
+  reflectionMessage,
+  context,
+  haiku,
+  wallpaperMood,
+  pauseInstanceId,
+}: {
+  subscribed: boolean;
+  reflectionMessage?: string | null;
+  context?: string | null;
+  haiku?: string | null;
+  wallpaperMood: string | null;
+  pauseInstanceId?: string | null;
+}) {
+  const msg = (reflectionMessage ?? '').trim();
+  const trackShareMenuOpen = useCallback(() => {
+    trackEvent('pause_reflect_share_tap', { surface: 'pause_done', has_pause_id: !!pauseInstanceId });
+  }, [pauseInstanceId]);
+  const trackWallpaperTap = useCallback(() => {
+    trackEvent('pause_reflect_wallpaper_tap', { surface: 'pause_done' });
+  }, []);
+  if (!subscribed || !msg) return null;
+  const mood = wallpaperMood && isPauseMoodValue(wallpaperMood) ? wallpaperMood : null;
+  return (
+    <div className="flex w-full max-w-md flex-wrap items-center justify-center gap-2 border-t border-border/25 pt-5">
+      <ShareReflection
+        message={msg}
+        context={context ?? null}
+        haiku={haiku ?? null}
+        onMenuOpen={trackShareMenuOpen}
+      />
+      <ReflectionWallpaper
+        message={msg}
+        mood={mood}
+        context={context ?? null}
+        haiku={haiku ?? null}
+        variant="button"
+        onGenerateIntent={trackWallpaperTap}
+      />
+    </div>
+  );
 }
 
 function clampFeelIntensity(n: number | null | undefined): number {
@@ -303,6 +352,14 @@ export function PauseDone({
               </div>
             ) : null}
           </div>
+          <PauseDoneReflectShareRow
+            subscribed={subscribed}
+            reflectionMessage={pauseData?.reflectionMessage}
+            context={pauseData?.context}
+            haiku={pauseData?.haiku}
+            wallpaperMood={briefDoneMood}
+            pauseInstanceId={pauseInstanceId}
+          />
         </div>
       </motion.div>
     );
@@ -373,6 +430,21 @@ export function PauseDone({
       )}
 
       {pauseData && <ScoreImpact data={pauseData} />}
+
+      <PauseDoneReflectShareRow
+        subscribed={subscribed}
+        reflectionMessage={pauseData?.reflectionMessage}
+        context={pauseData?.context}
+        haiku={pauseData?.haiku}
+        wallpaperMood={
+          pauseData?.moodAfter && isPauseMoodValue(pauseData.moodAfter)
+            ? pauseData.moodAfter
+            : pauseData?.mood && isPauseMoodValue(pauseData.mood)
+              ? pauseData.mood
+              : null
+        }
+        pauseInstanceId={pauseInstanceId}
+      />
 
       {justHitLimit && (
         <motion.div

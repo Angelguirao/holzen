@@ -1,5 +1,6 @@
 /**
- * Lightweight Web Audio cues for pause breathing (phase ticks + pattern-complete “bowl”).
+ * Lightweight Web Audio for pause rituals: breathing cues (phase ticks + pattern-complete “bowl”)
+ * and a soft continuous drone on Reflect / Frame when sound is on.
  * Respects mute (header) and prefers-reduced-motion (no audio).
  */
 
@@ -76,5 +77,72 @@ export function playPauseBreathPatternCompleteCue(opts: CueOptions): void {
     const t = ctx.currentTime;
     scheduleSineTone(ctx, 196 * 2, t, 2.4, 0.07);
     scheduleSineTone(ctx, 196 * 2.67, t + 0.04, 2.0, 0.045);
+  });
+}
+
+type AmbienceRuntime = {
+  oscillators: OscillatorNode[];
+  masterGain: GainNode;
+};
+
+let reflectFrameAmbience: AmbienceRuntime | null = null;
+
+function teardownReflectFrameAmbienceImmediate(): void {
+  if (!reflectFrameAmbience) return;
+  const rt = reflectFrameAmbience;
+  reflectFrameAmbience = null;
+  try {
+    rt.masterGain.disconnect();
+  } catch {
+    /* already disconnected */
+  }
+  for (const o of rt.oscillators) {
+    try {
+      o.stop();
+      o.disconnect();
+    } catch {
+      /* already stopped */
+    }
+  }
+}
+
+/** Stop the Reflect / Frame focus bed (e.g. step change, unmount, mute). */
+export function stopPauseReflectFrameFocusAmbience(): void {
+  teardownReflectFrameAmbienceImmediate();
+}
+
+/**
+ * Starts a very low, slow-rising sine stack for Reflect + Frame (deep focus bed).
+ * `shouldContinue` is re-checked after `AudioContext` resume so mute / step changes win over async resume.
+ */
+export function startPauseReflectFrameFocusAmbience(shouldContinue: () => boolean): void {
+  if (!shouldContinue()) return;
+  teardownReflectFrameAmbienceImmediate();
+  runWhenReady((ctx) => {
+    if (!shouldContinue()) return;
+    const t = ctx.currentTime;
+    const master = ctx.createGain();
+    master.gain.setValueAtTime(0, t);
+    master.gain.linearRampToValueAtTime(0.022, t + 3.2);
+
+    const layers: { hz: number; level: number }[] = [
+      { hz: 55, level: 0.52 },
+      { hz: 82.41, level: 0.22 },
+      { hz: 110, level: 0.18 },
+    ];
+    const oscillators: OscillatorNode[] = [];
+    for (const { hz, level } of layers) {
+      const osc = ctx.createOscillator();
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(hz, t);
+      const branch = ctx.createGain();
+      branch.gain.setValueAtTime(level, t);
+      osc.connect(branch);
+      branch.connect(master);
+      osc.start(t);
+      oscillators.push(osc);
+    }
+    master.connect(ctx.destination);
+    reflectFrameAmbience = { oscillators, masterGain: master };
   });
 }

@@ -2,8 +2,6 @@ import { useCallback, useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import { useTranslation } from 'react-i18next';
 import { ChevronLeft, ChevronRight, CirclePlus, Heart } from 'lucide-react';
-import { ShareReflection } from '@/components/ShareReflection';
-import { ReflectionWallpaper } from '@/components/ReflectionWallpaper';
 import { PauseNote } from '@/components/pause/PauseNote';
 import { PauseTags } from '@/components/pause/PauseTags';
 import { pauseStepLayout } from '@/components/pause/pause-step-layout';
@@ -76,14 +74,6 @@ export function PauseReflect({
     setPostItOpen(true);
     trackEvent('pause_reflect_post_it_open', { surface: 'pause_reflect', has_pause_id: !!pauseInstanceId });
   }, [pauseInstanceId]);
-
-  const trackShareMenuOpen = useCallback(() => {
-    trackEvent('pause_reflect_share_tap', { surface: 'pause_reflect', has_pause_id: !!pauseInstanceId });
-  }, [pauseInstanceId]);
-
-  const trackWallpaperTap = useCallback(() => {
-    trackEvent('pause_reflect_wallpaper_tap', { surface: 'pause_reflect' });
-  }, []);
 
   return (
     <motion.div
@@ -169,29 +159,6 @@ export function PauseReflect({
               })}
             </p>
           ) : null}
-
-          {subscribed ? (
-            <div
-              className="mt-4 flex flex-wrap items-center justify-center gap-1 border-t border-border/20 pt-4 sm:justify-start"
-              onClick={(e) => e.stopPropagation()}
-              onKeyDown={(e) => e.stopPropagation()}
-            >
-              <ShareReflection
-                message={reflectionMessage}
-                context={context}
-                haiku={haiku}
-                onMenuOpen={trackShareMenuOpen}
-              />
-              <ReflectionWallpaper
-                message={reflectionMessage}
-                mood={null}
-                context={context}
-                haiku={haiku}
-                variant="button"
-                onGenerateIntent={trackWallpaperTap}
-              />
-            </div>
-          ) : null}
         </div>
       </section>
 
@@ -210,11 +177,6 @@ export function PauseReflect({
           {t('pause.steps.continue', { defaultValue: 'Continue' })}
           <ChevronRight className="ml-1 h-4 w-4" aria-hidden />
         </Button>
-        <p className="max-w-xs text-center text-xs text-muted-foreground">
-          {t('pause.reflect.continueHint', {
-            defaultValue: 'There is no "right" amount of time — continue when you feel done.',
-          })}
-        </p>
       </motion.div>
 
       {onBack ? (
