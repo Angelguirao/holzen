@@ -5,6 +5,7 @@
  */
 
 import { containsSlop, containsCryptoLanguage } from "./quality.ts";
+import { fetchInitWithIncomingTrace } from "./forward-trace-headers.ts";
 
 /** Bump when the system prompt, tone rules, or quality gate changes. */
 export const REFLECTION_PROMPT_VERSION = "v5";
@@ -41,6 +42,8 @@ export interface GenerateUnifiedReflectionParams {
   groundingActivities?: string[];
   log?: (msg: string) => void;
   logAttempt?: (entry: Record<string, unknown>) => void;
+  /** Edge `Request` for W3C trace propagation to the Lovable AI gateway. */
+  incomingRequest?: Request;
 }
 
 export interface GenerateUnifiedReflectionOutcome {
@@ -430,6 +433,7 @@ export async function generateUnifiedReflection(
     groundingActivities,
     log,
     logAttempt,
+    incomingRequest,
   } = params;
 
   const severity = typeof severityRaw === "number" ? severityRaw : 0;
@@ -472,6 +476,7 @@ export async function generateUnifiedReflection(
     apiKey,
     log,
     logAttempt,
+    incomingRequest,
   });
 }
 
@@ -481,8 +486,9 @@ async function generateWithJson(opts: {
   apiKey: string;
   log?: (msg: string) => void;
   logAttempt?: (e: Record<string, unknown>) => void;
+  incomingRequest?: Request;
 }): Promise<GenerateUnifiedReflectionOutcome> {
-  const { fullSystemPrompt, context, apiKey, log, logAttempt } = opts;
+  const { fullSystemPrompt, context, apiKey, log, logAttempt, incomingRequest } = opts;
   const aiBody = {
     messages: [
       { role: "system" as const, content: fullSystemPrompt },
@@ -504,15 +510,18 @@ async function generateWithJson(opts: {
     const timeout = setTimeout(() => controller.abort(), timeoutMs);
     const attemptT0 = Date.now();
     try {
-      const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
-        method: "POST",
-        headers: {
-          Authorization: `Bearer ${apiKey}`,
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ ...aiBody, model }),
-        signal: controller.signal,
-      });
+      const response = await fetch(
+        "https://ai.gateway.lovable.dev/v1/chat/completions",
+        fetchInitWithIncomingTrace(incomingRequest, {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${apiKey}`,
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ ...aiBody, model }),
+          signal: controller.signal,
+        }),
+      );
       clearTimeout(timeout);
 
       if (response.status === 429 || response.status === 402) {

@@ -598,6 +598,7 @@ serve(
         motivations: motivations.length > 0 ? motivations : undefined,
         mantra: mantra || undefined,
         groundingActivities: groundingActivities.length > 0 ? groundingActivities : undefined,
+        incomingRequest: req,
       });
       if (!result?.message) {
         log("check_volatility_skip", {
