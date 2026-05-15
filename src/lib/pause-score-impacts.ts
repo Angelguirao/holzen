@@ -23,7 +23,7 @@ export interface PauseScoreImpactRow {
   label: string;
   direction: 'up' | 'neutral';
   reason: string;
-  /** Illustrative skill points for done-screen UI (not a live server delta). */
+  /** Optional numeric weight used by older UI; not rendered in `ScoreImpact` (brief and default use reasons only). */
   points: number;
 }
 
