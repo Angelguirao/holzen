@@ -175,7 +175,7 @@ BEGIN
   IF v_jobid IS NOT NULL THEN
     PERFORM cron.unschedule(v_jobid);
   END IF;
-EXCEPTION WHEN undefined_table OR undefined_schema THEN
+EXCEPTION WHEN undefined_table OR invalid_schema_name THEN
   -- pg_cron not installed (local psql without extensions); safe to skip.
   NULL;
 END$$;

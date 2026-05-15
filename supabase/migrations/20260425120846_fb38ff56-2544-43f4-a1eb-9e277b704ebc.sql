@@ -134,13 +134,29 @@ DROP TRIGGER IF EXISTS trg_notifications_reflection_insights ON public.reflectio
 CREATE TRIGGER trg_notifications_reflection_insights AFTER INSERT ON public.reflection_insights
   FOR EACH ROW EXECUTE FUNCTION public.notifications_from_reflection_insights();
 
-DROP TRIGGER IF EXISTS trg_notifications_reflections ON public.reflections;
-CREATE TRIGGER trg_notifications_reflections AFTER INSERT ON public.reflections
-  FOR EACH ROW EXECUTE FUNCTION public.notifications_from_reflections();
+-- reflections table removed in pause V2 cutover (20260423202000); skip trigger + backfill when absent.
+DO $notif_refl$
+BEGIN
+  IF to_regclass('public.reflections') IS NULL THEN
+    RETURN;
+  END IF;
+  DROP TRIGGER IF EXISTS trg_notifications_reflections ON public.reflections;
+  CREATE TRIGGER trg_notifications_reflections AFTER INSERT ON public.reflections
+    FOR EACH ROW EXECUTE FUNCTION public.notifications_from_reflections();
+END;
+$notif_refl$;
 
-DROP TRIGGER IF EXISTS trg_notifications_pause_notifications ON public.pause_notifications;
-CREATE TRIGGER trg_notifications_pause_notifications AFTER INSERT ON public.pause_notifications
-  FOR EACH ROW EXECUTE FUNCTION public.notifications_from_pause_notifications();
+-- pause_notifications dropped in pause V2 cutover; only attach trigger when table exists.
+DO $notif_pn$
+BEGIN
+  IF to_regclass('public.pause_notifications') IS NULL THEN
+    RETURN;
+  END IF;
+  DROP TRIGGER IF EXISTS trg_notifications_pause_notifications ON public.pause_notifications;
+  CREATE TRIGGER trg_notifications_pause_notifications AFTER INSERT ON public.pause_notifications
+    FOR EACH ROW EXECUTE FUNCTION public.notifications_from_pause_notifications();
+END;
+$notif_pn$;
 
 -- Backfill (with orphan filter)
 INSERT INTO public.notifications (user_id, type, source_table, source_id, metadata, action_path, action_state, created_at)
@@ -179,34 +195,57 @@ WHERE ri.generated_at >= now() - interval '30 days'
   AND EXISTS (SELECT 1 FROM auth.users u WHERE u.id = ri.user_id)
 ON CONFLICT (source_table, source_id) DO NOTHING;
 
-INSERT INTO public.notifications (user_id, type, source_table, source_id, metadata, action_path, action_state, created_at)
-SELECT r.user_id, 'pause', 'reflections', r.id,
-  jsonb_build_object('message', r.message, 'context', r.context),
-  '/pause', jsonb_build_object('reflectionId', r.id::text), r.created_at
-FROM public.reflections r
-WHERE r.created_at >= now() - interval '30 days'
-  AND EXISTS (SELECT 1 FROM auth.users u WHERE u.id = r.user_id)
-  AND NOT EXISTS (SELECT 1 FROM public.pause_notifications pn WHERE pn.reflection_id = r.id)
-ON CONFLICT (source_table, source_id) DO NOTHING;
+DO $backfill_refl$
+BEGIN
+  IF to_regclass('public.reflections') IS NULL THEN
+    RETURN;
+  END IF;
+  INSERT INTO public.notifications (user_id, type, source_table, source_id, metadata, action_path, action_state, created_at)
+  SELECT r.user_id, 'pause', 'reflections', r.id,
+    jsonb_build_object('message', r.message, 'context', r.context),
+    '/pause', jsonb_build_object('reflectionId', r.id::text), r.created_at
+  FROM public.reflections r
+  WHERE r.created_at >= now() - interval '30 days'
+    AND EXISTS (SELECT 1 FROM auth.users u WHERE u.id = r.user_id)
+    AND (
+      to_regclass('public.pause_notifications') IS NULL
+      OR NOT EXISTS (SELECT 1 FROM public.pause_notifications pn WHERE pn.reflection_id = r.id)
+    )
+  ON CONFLICT (source_table, source_id) DO NOTHING;
+END;
+$backfill_refl$;
 
-INSERT INTO public.notifications (user_id, type, source_table, source_id, metadata, action_path, action_state, created_at)
-SELECT pn.user_id, 'pause', 'pause_notifications', pn.id,
-  jsonb_build_object('message', pn.message, 'context', pn.context, 'reflection_id', pn.reflection_id),
-  CASE WHEN pn.reflection_id IS NOT NULL THEN '/pause' ELSE NULL END,
-  CASE WHEN pn.reflection_id IS NOT NULL THEN jsonb_build_object('reflectionId', pn.reflection_id::text) ELSE NULL END,
-  pn.created_at
-FROM public.pause_notifications pn
-WHERE pn.created_at >= now() - interval '30 days'
-  AND EXISTS (SELECT 1 FROM auth.users u WHERE u.id = pn.user_id)
-ON CONFLICT (source_table, source_id) DO NOTHING;
+DO $backfill_pn$
+BEGIN
+  IF to_regclass('public.pause_notifications') IS NULL THEN
+    RETURN;
+  END IF;
+  INSERT INTO public.notifications (user_id, type, source_table, source_id, metadata, action_path, action_state, created_at)
+  SELECT pn.user_id, 'pause', 'pause_notifications', pn.id,
+    jsonb_build_object('message', pn.message, 'context', pn.context, 'reflection_id', pn.reflection_id),
+    CASE WHEN pn.reflection_id IS NOT NULL THEN '/pause' ELSE NULL END,
+    CASE WHEN pn.reflection_id IS NOT NULL THEN jsonb_build_object('reflectionId', pn.reflection_id::text) ELSE NULL END,
+    pn.created_at
+  FROM public.pause_notifications pn
+  WHERE pn.created_at >= now() - interval '30 days'
+    AND EXISTS (SELECT 1 FROM auth.users u WHERE u.id = pn.user_id)
+  ON CONFLICT (source_table, source_id) DO NOTHING;
+END;
+$backfill_pn$;
 
-DELETE FROM public.notifications n
-USING public.pause_notifications pn
-WHERE n.source_table = 'reflections'
-  AND pn.reflection_id IS NOT NULL
-  AND n.source_id = pn.reflection_id;
+DO $del_refl_notif$
+BEGIN
+  IF to_regclass('public.reflections') IS NULL OR to_regclass('public.pause_notifications') IS NULL THEN
+    RETURN;
+  END IF;
+  DELETE FROM public.notifications n
+  USING public.pause_notifications pn
+  WHERE n.source_table = 'reflections'
+    AND pn.reflection_id IS NOT NULL
+    AND n.source_id = pn.reflection_id;
+END;
+$del_refl_notif$;
 
--- ============ Guardrail defaults ============
 INSERT INTO public.app_config (key, value, description) VALUES
   ('budget_daily_usd_global', '60.0'::jsonb, 'Global AI spend cap per UTC day (sum of generation_attempts.estimated_cost_usd).'),
   ('budget_daily_usd_per_user', '2.5'::jsonb, 'Per-user AI spend cap per UTC day. Abuse backstop for runaway accounts.'),

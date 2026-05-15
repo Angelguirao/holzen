@@ -69,4 +69,5 @@ CREATE UNIQUE INDEX IF NOT EXISTS collection_items_collection_pause_uniq
   ON public.collection_items (collection_id, pause_instance_id);
 CREATE INDEX IF NOT EXISTS idx_collection_items_pause_instance ON public.collection_items (pause_instance_id);
 
-DROP TABLE IF EXISTS public.library_items CASCADE;
+-- `library_items` is dropped in 20260509140000_collection_items_pause_instance_drop_library_items.sql
+-- after archive RPCs/views are migrated off the table.

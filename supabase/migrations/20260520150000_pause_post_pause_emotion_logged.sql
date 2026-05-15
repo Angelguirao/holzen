@@ -2,8 +2,11 @@
 -- `pause_log_step` previously returned without INSERT when `pause_instances.state = 'completed'`,
 -- so users could not amend mood/intensity for stats after `outcome_logged`. This adds
 -- `post_pause_emotion_logged` (mood + optional 1–5 intensity) and exposes it on `v_pause_full`.
+-- Enum label is added in 20260520145959_pause_step_type_add_post_pause_emotion_logged.sql
+-- (separate transaction; avoids 55P04 when this file creates views/functions).
 
-ALTER TYPE public.pause_step_type ADD VALUE IF NOT EXISTS 'post_pause_emotion_logged';
+-- Inserting columns before `has_outcome_logged` is not allowed with `CREATE OR REPLACE VIEW` (42P16).
+DROP VIEW IF EXISTS public.v_pause_full CASCADE;
 
 CREATE OR REPLACE FUNCTION public.pause_log_step(
   p_instance_id uuid,

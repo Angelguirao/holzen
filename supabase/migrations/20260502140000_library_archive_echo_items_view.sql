@@ -1,6 +1,6 @@
 -- Archive Echo tab: server-side row set for pagination (matches client helpers in
 -- src/lib/archive-segment.ts — isArchiveEchoPause + main pause bookmark).
-CREATE VIEW public.library_archive_echo_items AS
+CREATE OR REPLACE VIEW public.library_archive_echo_items AS
 SELECT li.*
 FROM public.library_items li
 INNER JOIN public.pause_instances pi ON pi.id = li.pause_instance_id
