@@ -1,8 +1,10 @@
 # Companion orchestration: client vs cron
 
+> **Pause V2 supersession:** `check-volatility` **does not** POST `companion-orchestrate` on automatic pause claim. The overlap described below applied to the **pre–V2** cron dispatch; keep for log archaeology and any **non–check-volatility** server callers.
+
 ## Context
 
-The manual pause path calls `companion-orchestrate` from the client (`use-companion-data`). **`check-volatility`** also POSTs the same function with service role + `userId` (fire-and-forget). Both can target the same `pauseInstanceId` around the same time → possible duplicate work and races.
+The manual pause path calls `companion-orchestrate` from the client (`use-companion-data`). **Historically,** `check-volatility` could POST the same function with service role + `userId` (fire-and-forget), so both could target the same `pauseInstanceId` around the same time → duplicate work and races. **Pause V2:** only the **client** path remains for pause claim → companions.
 
 ## Shipped (2026-04) — measure + skip-if-served
 
@@ -18,7 +20,7 @@ The manual pause path calls `companion-orchestrate` from the client (`use-compan
 | `browser_pause_intervention` | `use-companion-data` intervention-only on mount |
 | `browser_lazy_fetch` | `use-companion-data` `fetchCompanion` (single slot on card tap) |
 | `browser_regenerate` | `use-companion-data` `regenerateCompanion` |
-| `cron_check_volatility` | `check-volatility` fetch body |
+| `cron_check_volatility` | Historical: `check-volatility` fetch body (**removed** Pause V2 automatic claim path) |
 
 ### Skip cached (dedup)
 

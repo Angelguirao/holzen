@@ -66,7 +66,7 @@ flowchart TB
 
 
 
-Reflection text and haiku land in `pause_ai_artifacts` first; the **intervention** is fetched eagerly; individual **companion slots** are generated lazily when the user taps a card (or hydrated from existing `pause_ai_artifacts`). **Who calls the orchestrator:** the **client** after the pause instance is created (manual) vs `**check-volatility`** with service role + `**userId`** (automatic).
+Reflection text and haiku land in `pause_ai_artifacts` from **`holzen-reflect`** once the user is in the deep ritual’s **Reflect → Decide** window; the **intervention** is fetched eagerly via **`companion-orchestrate`** in **`PauseSession`**; individual **companion slots** are generated lazily when the user taps a card (or hydrated from existing `pause_ai_artifacts`). **Who calls the orchestrator:** the **`PauseSession`** client (`**use-companion-data`**) for **both** manual- and cron-created pauses. **`check-volatility`** does **not** invoke **`companion-orchestrate`** on automatic pause claim in Pause V2.
 
 ---
 
@@ -176,10 +176,10 @@ Up to **five** recent haikus and **five** recent reflect-step **messages** (from
 
 **G. Invoking `companion-orchestrate`**
 
-- **Manual:** `**use-companion-data`** sends **user JWT**. On mount it calls orchestrate with `**useIntervention: true`** and all `enable*` flags **false** (intervention-only). When the user taps a companion card, a second call with a single `enable*` flag fetches that slot (`holzenInvokeSource: 'browser_lazy_fetch'`). Regenerate uses `**regenerateOnly`** (`holzenInvokeSource: 'browser_regenerate'`).
-- **Automatic:** `**check-volatility`** uses **service role** `**Authorization`** and passes `**userId`** in the JSON body so the orchestrator acts **as that user** with the same field names.
+- **`PauseSession` (manual or cron-created instance):** **`use-companion-data`** sends the **user JWT**. On mount it calls orchestrate with **`useIntervention: true`** and all **`enable*`** flags **false** (intervention-only). When the user taps a companion card, a second call with a single **`enable*`** flag fetches that slot (`holzenInvokeSource: 'browser_lazy_fetch'`). Regenerate uses **`regenerateOnly`** (`holzenInvokeSource: 'browser_regenerate'`).
+- **Pause V2 `check-volatility`:** does **not** invoke **`companion-orchestrate`** on automatic pause **claim**. Companion orchestration runs only from the browser once the user opens the pause.
 
-*Why:* the orchestrator is one implementation; the cron is not logged in as each user, so it uses **service role + explicit `userId`** instead of a browser session.
+*Why:* manual and server-opened pauses share the **same** in-tab orchestrator contract under the user’s session; the cron worker only **creates** the pause row and **delivers** notifications.
 
 ---
 
@@ -208,8 +208,8 @@ Up to **five** recent haikus and **five** recent reflect-step **messages** (from
 | **Entry**             | `use-holzen.ts`                                | `check-volatility/index.ts`                                                |
 | **BTC + suffix**      | `fetchBtcData` + `pause-context-suffix`        | CoinGecko per currency + one F&G / on-chain per run + same suffix module   |
 | **Cooldown / gates**  | Short client cooldown; no volatility gate      | Thresholds, `cooldown_hours`, quiet hours, snooze, `last_trigger_at` claim |
-| **Reflection AI**     | At **Reflect** (browser): `holzen-reflect` → `generateUnifiedReflection` | Instance created on claim; **reflection LLM** runs when user reaches **Reflect** (same client path)                                        |
-| **Orchestrator auth** | User JWT                                       | Service role + `userId` in body                                            |
+| **Reflection AI**     | At **Reflect** (browser): `holzen-reflect` → `generateUnifiedReflection` | Pause row on claim; **reflection LLM** in browser (**Reflect → Decide** window), same path as manual |
+| **Orchestrator auth** | User JWT                                       | User JWT in **`PauseSession`** after claim (**no** service-role **`companion-orchestrate`** from **`check-volatility`** in Pause V2) |
 | **Notifications**     | In-app                                         | Push / email / unified `notifications` (legacy `pause_notifications` removed) |
 
 
@@ -229,25 +229,23 @@ flowchart TB
     POC -. Reflect step .-> HR
     HR --> INS --> UCD
   end
-  subgraph AUTO [Automatic pause — server]
+  subgraph AUTO [Automatic pause — server claim only]
     CV[check-volatility\nCoinGecko + thresholds]
-    GUR[generateUnifiedReflection\nsame shared module]
-    INS2[pause_instances + artifacts\nnotifications]
-    COS[companion-orchestrate\nservice role + userId body]
-    CV --> GUR --> INS2 --> COS
+    ROWA[pause row +\nprofiles + notifications]
+    CV --> ROWA
   end
   subgraph SHARED [Shared backend]
     ORCH[companion-orchestrate]
     ROW[(pause_instances\npause_ai_artifacts\ncompanion_serves\nanalytics)]
   end
   UCD --> ORCH
-  COS --> ORCH
+  ROWA -. user opens PauseSession\nsame HR / UCD path .-> HR
   ORCH --> ROW
 ```
 
 
 
-**Caption:** Both paths end in the **same** orchestrator and **same** reflection generator; arrows differ in **where** each step runs, **which credential** is used, and **when** the manual path calls **`holzen-reflect`** (deferred until **Reflect** in the ritual).
+**Caption:** Manual and automatic **claims** diverge on **Home vs cron**; once a cron-created pause is opened, **reflection** (**`holzen-reflect`**) and **orchestration** (**`companion-orchestrate`**) run in the **browser** on the **same** paths as manual. **`check-volatility`** does **not** run **`generateUnifiedReflection`** or **`companion-orchestrate`** on claim in Pause V2.
 
 ---
 
@@ -292,7 +290,7 @@ This section is **client-centric**: `**use-holzen`** and `**use-companion-data`*
 
 - **Files:** `supabase/functions/companion-orchestrate/index.ts` (HTTP handler) and `**_shared/companion-orchestrate-*.ts`** (types, body parsing, logging, skip-cache, **parallel generator tasks**, **settled-result fold + background writes**).
 - **Role:** Auth → rate limit → daily budget → parse body → `**determineSessionIntent`** → `**selectIntervention`** (when `**useIntervention`** is true **and** `**pauseInstanceId`** is present) → `**Promise.all`** of `**generateQuestion`** (question mode only) **and** enabled generator tasks → assemble `**intervention`** + companion results → `companion_serves` inserts → `**writeCompanionData`** (upserts **`pause_ai_artifacts`** per slot; legacy `**reflection_companions**` / `**reflections**` storage was **dropped** in Pause V2).
-- **Invocation modes (client):** The SPA usually sends **narrow** requests: (1) intervention-only (all `enable*` false, `holzenInvokeSource: 'browser_pause_intervention'`), (2) single-slot lazy fetch (`holzenInvokeSource: 'browser_lazy_fetch'`), (3) regenerate (`regenerateOnly`). Some **server-side** calls (e.g. **cron** / automatic flows that invoke `companion-orchestrate`) may set several `enable*` flags and run **multiple** generator tasks in **one** HTTP invoke. The **`pregenerate-companions`** edge function is **separate** — it does **not** call `companion-orchestrate`; it writes rows into `companion_cache` only (see [pregenerate.md](companions/pregenerate.md)).
+- **Invocation modes (client):** The SPA usually sends **narrow** requests: (1) intervention-only (all `enable*` false, `holzenInvokeSource: 'browser_pause_intervention'`), (2) single-slot lazy fetch (`holzenInvokeSource: 'browser_lazy_fetch'`), (3) regenerate (`regenerateOnly`). Some **server-side** HTTP invokes may set several `enable*` flags in **one** call (automation **outside** Pause V2 **`check-volatility`** claim — see repo callers). The **`pregenerate-companions`** edge function is **separate** — it does **not** call `companion-orchestrate`; it writes rows into `companion_cache` only (see [pregenerate.md](companions/pregenerate.md)).
 - **Typical JSON body:** `**pauseInstanceId**` (UUID of the row in **`pause_instances`**), `**context`**, `**reflectionMessage**` (AI reflect-step text), `**language**`, `**mood**`, numeric `**severity**` (absolute % move → `**bucketSeverity**` in `intervention-selector.ts`), `**moodHistory**`, `**signalSources**` / `**groundingSources**` (merged catalog URLs when Signal/Ground are on), recency arrays (`**recentNudgeTopics**`, `**recentGroundingSources**`, `**recentSignalSources**`, …), `**enableSignal` / `enableGrounding` / `enableHistory` / `enableZoomOut**`, `**useIntervention**` (default true). If `**pauseInstanceId**` is missing or `**useIntervention: false**`, no intervention is selected (`**response.intervention**` omitted); generators still run per `**enable***`.
 
 ### Diagram — inside `companion-orchestrate`
@@ -356,13 +354,13 @@ flowchart LR
 
 - **File:** `supabase/functions/_shared/session-intent.ts`
 - **Inputs:** `context` (parse “is up” / “is down”), `mood`, numeric `severity`, `moodHistory` (selling pattern).
-- **Automatic path:** `**severity`** (24h absolute % change), **`lastReportedMood`** (newest mood from **`pauseRecencyInputs`** / **`pause_step_events`**), and **`moodHistory`** are sent from `check-volatility`, so `**selectIntervention`** / session intent align with manual orchestration when the user has logged moods before.
+- **Automatic claim → session intent:** **`check-volatility`** persists **`severity`** and mood hints (e.g. **`lastReportedMood`** via **`pauseRecencyInputs`**) into the **`context_snapshot`** on the pause row; **`moodHistory`** and the fields **`selectIntervention`** consumes are assembled when the **browser** invokes **`companion-orchestrate`** in **`PauseSession`**, aligning intent with the manual path once the user is in-session.
 
 ---
 
 ## 6. Generator family (orchestrated)
 
-The pause UI and `**check-volatility`** only call `**companion-orchestrate`**, which imports `**_shared/generators/*`** in-process. There are no separate HTTP edge functions for individual companions—the generators are the implementation.
+The pause UI invokes **`companion-orchestrate`** (via **`use-companion-data`**); **`companion-orchestrate`** imports **`_shared/generators/*`** in-process. There are no separate HTTP edge functions for individual companions—the generators are the implementation. **`check-volatility`** is **not** a caller of **`companion-orchestrate`** for Pause V2 automatic claims.
 
 
 | Generator | File                              | Phase order                                                         | Last resort |
@@ -661,7 +659,7 @@ Exact SQL lives in **[cron-setup.md](../../ops/cron-setup.md)**. Typical schedul
 
 | Job                      | Role for pause system                                            |
 | ------------------------ | ---------------------------------------------------------------- |
-| `check-volatility`       | Eligibility + reflection + orchestrator dispatch + notifications |
+| `check-volatility`       | Eligibility + **`pause_create_or_reuse_as`** + profile / notifications delivery; **no** reflection LLM and **no** **`companion-orchestrate`** on claim (Pause V2) |
 | `refresh-btc-prices`     | Feeds zoom-out generator                                         |
 | `pregenerate-companions` | `companion_cache` lifecycle + need-based pool warming (does **not** call `companion-orchestrate`; see [pregenerate.md](companions/pregenerate.md)) |
 | `fetch-source-feeds`     | Fills `content_library` for fallbacks                            |
@@ -692,7 +690,7 @@ Exact SQL lives in **[cron-setup.md](../../ops/cron-setup.md)**. Typical schedul
 Brief archaeology — **current `main` is expected to include these fixes**; listed so “why does the code look this way?” stays traceable.
 
 1. `**questionPromise` undefined** — Question mode could throw until `questionPromise` was wired from `**generateQuestion**` when `**selection.mode === "question"**`.
-2. **Cron → orchestrator auth** — Service role + `**userId` in body`**; **`check-volatility`** sends **`userId`** and **`severity`** for automatic sessions.
+2. **Automatic pause does not orchestrate on claim** — **`check-volatility`** creates the row + notifications only; **`holzen-reflect`** and **`companion-orchestrate`** run from **`PauseSession`** with the user JWT. (Older narratives described service-role **`companion-orchestrate`** from **`check-volatility`**; that pause path is removed in V2.)
 3. **Mirror intervention not returned** — `**intervention.primary`** populated when mirror is selected.
 4. **Unified reflection pipeline** — `**generateUnifiedReflection`** (message + haiku JSON); companion slots and **`intervention`** payloads persist via **`pause_ai_artifacts`** (orchestrated **`writeCompanionData`**), not legacy **`reflections`** columns — the reflect step alone does not fill those slots.
 5. **Cron parity with manual pause** — Profile-backed inputs for the orchestrator (sanitized like `**holzen-reflect`**), recent haiku/message lists, orchestrator `**enable*`** flags, **mood / moodHistory** when available.
@@ -745,9 +743,9 @@ supabase/functions/
     ├── companion-orchestrate-skip-cached.ts
     ├── companion-orchestrate-tasks.ts
     ├── companion-orchestrate-assemble.ts
-    ├── reflection-generate.ts      # shared manual + cron reflection AI
+    ├── reflection-generate.ts      # shared model path for holzen-reflect (browser); not invoked by check-volatility on claim (V2)
     ├── pause-context-suffix.ts     # single formatter: Fear & Greed + on-chain context suffix (client + cron)
-    ├── pause-cron-parity.ts        # fetches + enrichAutomaticPauseContext + orchestrator hints for check-volatility
+    ├── pause-cron-parity.ts        # shared fetches + pause context enrichment for check-volatility (manual parity)
     ├── session-intent.ts
     ├── intervention-selector.ts
     ├── companion-data.ts
@@ -755,7 +753,7 @@ supabase/functions/
     ├── phase-config.ts              # library → cache → live phase toggles (COMPANION_PHASE_*)
     ├── quality.ts, sanitize.ts, cache.ts, content-library.ts, observe.ts, ratelimit.ts, fallbacks.ts
 
-src/lib/load-reflect-recency-hints.ts   # manual holzen-reflect: moodHistory + dedup pools (cron parity)
+src/lib/load-reflect-recency-hints.ts   # browser holzen-reflect: moodHistory + dedup pools (parity with pauseRecencyInputs on claim)
 src/hooks/use-holzen.ts
 src/hooks/use-companion-data.ts
 src/components/InterventionSection.tsx
