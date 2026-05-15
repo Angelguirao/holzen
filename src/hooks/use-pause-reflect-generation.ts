@@ -21,7 +21,7 @@ export type UsePauseReflectGenerationParams = {
   /** Hydrated / nav seed — skipped when empty. */
   initialReflectionMessage: string;
   severityAbsPct: number;
-  /** When false, hook idles (e.g. not on Reflect/Frame). */
+  /** When false, aborts in-flight work and idles (outside deep **Reflect → Decide** window in `PauseSession`). */
   enabled: boolean;
 };
 

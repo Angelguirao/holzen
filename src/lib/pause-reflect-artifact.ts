@@ -99,7 +99,7 @@ export type GenerateReflectionAtReflectParams = {
   groundingActivities?: string[];
   currency: string;
   language: string;
-  /** Cancels the edge invoke when the user leaves Reflect or a newer run supersedes this one. */
+  /** Cancels the edge invoke when the run is superseded, `pauseInstanceId` changes, reflect generation is disabled in `PauseSession`, or the effect cleans up. */
   signal?: AbortSignal;
 };
 
