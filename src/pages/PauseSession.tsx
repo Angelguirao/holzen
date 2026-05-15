@@ -29,7 +29,6 @@ import {
   initialBreathingSecondCompletedFromRestored,
   initialFrameDoneFromRestored,
 } from '@/lib/pause-session-step-map';
-import { initialDecideOnBackStepFromPersisted } from '@/lib/pause-session-initial-decide-on-back-step';
 import { parsePauseSessionLocationState } from '@/lib/router-location-state';
 import { coalescePauseSessionShellViewModel } from '@/lib/pause-session-shell-view-model';
 import {
@@ -68,7 +67,6 @@ import { buildPauseSessionMountLogParams } from '@/lib/pause-session-mount-log-p
 import { usePauseSessionPendingPauseOfferNavigation } from '@/hooks/use-pause-session-pending-pause-offer-navigation';
 import { usePendingPauseOffer } from '@/hooks/use-pending-pause-offer';
 import { usePauseSessionDepthPickerHandlers } from '@/hooks/use-pause-session-depth-picker-handlers';
-import { usePauseSessionDeepChooseBridgeHandler } from '@/hooks/use-pause-session-deep-choose-bridge-handler';
 import { usePauseSessionFeelTilesSelect } from '@/hooks/use-pause-session-feel-tiles-select';
 import { usePauseReflectGeneration } from '@/hooks/use-pause-reflect-generation';
 import { PauseLeaveWithPendingSheet } from '@/components/pause/PauseLeaveWithPendingSheet';
@@ -248,9 +246,6 @@ export default function PauseSession() {
   const restoredStep = mapPersistedStep(restored?.step);
 
   const [step, setStep] = useState<PauseStep>(restoredStep);
-  const [decideOnBackStep, setDecideOnBackStep] = useState<'choose' | 'breath2'>(() =>
-    initialDecideOnBackStepFromPersisted(restored),
-  );
   const [phase, setPhase] = useState<'session' | 'done'>(() => initialPhaseFromRestored(restored));
   const [decision, setDecision] = useState<string | null>(() => initialDecisionFromRestored(restored));
 
@@ -302,7 +297,7 @@ export default function PauseSession() {
     }
   }, [phase, handleReturn, requestExitPauseBeforeDone]);
 
-  usePauseSessionEntryPresentationEffects({ step, setDecideOnBackStep, setCurtainLifted });
+  usePauseSessionEntryPresentationEffects({ setCurtainLifted });
 
   const {
     ensureBreathSegment1Logged,
@@ -381,7 +376,6 @@ export default function PauseSession() {
     breathingFirstCompleted,
     breathingSecondCompleted,
     frameDone,
-    decideOnBackStep,
     ritualEntry,
     briefStep,
     briefIntegrateDone,
@@ -394,11 +388,6 @@ export default function PauseSession() {
     step,
     setSwipeDirection,
     setStep,
-  });
-
-  const { handleDeepChooseBridgeContinue } = usePauseSessionDeepChooseBridgeHandler({
-    setDecideOnBackStep,
-    goToStep,
   });
 
   const { handleFrameImDone } = usePauseShiftFrameDoneHandler({
@@ -505,7 +494,6 @@ export default function PauseSession() {
     logBreathSegment2Skipped,
     setBreathingFirstCompleted,
     setBreathingSecondCompleted,
-    setDecideOnBackStep,
     setBriefStep,
     setBriefIntegrateDone,
   });
@@ -562,7 +550,6 @@ export default function PauseSession() {
     setBreathFirstTimedPatternStarted(false);
     setFrameDone(false);
     setMoodAfterDone(false);
-    setDecideOnBackStep('choose');
     queueMicrotask(() => breathingRef.current?.resetToIntro());
   }, [
     breathingRef,
@@ -577,7 +564,6 @@ export default function PauseSession() {
     setBreathTimedActive,
     setFrameDone,
     setMoodAfterDone,
-    setDecideOnBackStep,
   ]);
 
   const reflectGenEnabled =
@@ -585,7 +571,6 @@ export default function PauseSession() {
     (step === 'reflect' ||
       step === 'frame' ||
       step === 'breath2' ||
-      step === 'choose' ||
       step === 'decide');
 
   const {
@@ -706,8 +691,6 @@ export default function PauseSession() {
     toggleFavorite,
     subscribed,
     handleFrameImDone,
-    handleDeepChooseBridgeContinue,
-    decideOnBackStep,
     handleDeepFirstBreathRepeat,
     handleDeepSecondBreathRepeat,
     severityAbsPct: Math.abs(btcData?.changePercent ?? 0),

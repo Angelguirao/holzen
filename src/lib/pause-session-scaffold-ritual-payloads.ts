@@ -58,8 +58,6 @@ export type PauseSessionScaffoldRitualPayloadsParams = {
   toggleFavorite: PauseSessionDeepRitualBodyProps['onToggleFavorite'];
   subscribed: boolean;
   handleFrameImDone: () => void | Promise<unknown>;
-  handleDeepChooseBridgeContinue: PauseSessionDeepRitualBodyProps['onDeepChooseBridgeContinue'];
-  decideOnBackStep: PauseSessionDeepRitualBodyProps['decideOnBackStep'];
   handleDeepFirstBreathRepeat: PauseSessionDeepRitualBodyProps['onRepeatDeepFirstBreathPattern'];
   handleDeepSecondBreathRepeat: PauseSessionDeepRitualBodyProps['onRepeatDeepSecondBreathPattern'];
   severityAbsPct: number;
@@ -135,9 +133,7 @@ export function buildPauseSessionScaffoldRitualPayloads(
       onToggleFavorite: p.toggleFavorite,
       subscribed: p.subscribed,
       onFrameImDone: () => void p.handleFrameImDone(),
-      onDeepChooseBridgeContinue: p.handleDeepChooseBridgeContinue,
       onDecide: p.handleDecide,
-      decideOnBackStep: p.decideOnBackStep,
       onRepeatDeepFirstBreathPattern: p.handleDeepFirstBreathRepeat,
       onRepeatDeepSecondBreathPattern: p.handleDeepSecondBreathRepeat,
       reflectionLoading: p.reflectionLoading,

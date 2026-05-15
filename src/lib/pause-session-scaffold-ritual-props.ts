@@ -36,6 +36,9 @@ function deepPauseMacroSubline(
   if (step === 'frame') {
     return t('pause.reflect.subtitle', { defaultValue: 'Take your time' });
   }
+  if (step === 'decide') {
+    return t('pause.brief.decideStepDurationHint', { defaultValue: '< 15 sec' });
+  }
   return undefined;
 }
 

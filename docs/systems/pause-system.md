@@ -201,19 +201,19 @@ Payloads are `**jsonb**` on `**pause_step_events**`. Common shapes:
 
 ### 7.1 Step order
 
-**Deep pause (full ritual)** — **six user-facing beats** in the header stepper: **Feel → Breathe → Reflect → Frame → second Breathe → Decide**. The last segment lights for both the short settle screen (`**PauseChooseBridge**`, routing key `**choose**`) and the outcome screen (`**decide**`); we do **not** show a separate seventh bar for **Choose**.
+**Deep pause (full ritual)** — **six user-facing beats** in the header stepper: **Feel → Breathe → Reflect → Frame → second Breathe → Decide**.
 
-Routing still uses a dedicated `**choose**` step between `**breath2**` and `**decide**` in `**PauseSession.tsx**` (full `**PauseStep**` union in `**PauseProgress.tsx**`):
+Routing order in `**PauseSession.tsx**` / `**PauseStep**` (`**PauseProgress.tsx**`):
 
-`**feel` → `breathe` → `reflect` → `frame` → `breath2` → `choose` → `decide**`
+`**feel` → `breathe` → `reflect` → `frame` → `breath2` → `decide**`
 
 **Gates (§3):** deep `**volatility_v1` `engaged**` requires `**initial_emotion_logged**` and first-segment `**breath_completed**` (Feel, then first Breathe — the same order as this list). Postgres checks those as a **set**, not by comparing row timestamps.
 
 Optional PostHog flag `**pause.step5_breath_label_shift**` renames the second-breath bar to **Shift** (wireframe variant B).
 
-**Product defaults (Figma alignment):** macro step 4 is labeled **Frame** (not the wireframe **Explore** title variant). `**choose**` is a **client-only** interstitial after the second breath (no `**pause_step_events**` row); it shares the **sixth** stepper segment with **Decide**. Skipping the second breath still jumps straight to **Decide** (interstitial skipped; back navigation can return to `**breath2**` via `**decideOnBackStep**`).
+**Product defaults (Figma alignment):** macro step 4 is labeled **Frame** (not the wireframe **Explore** title variant). After the second **Breathe** segment completes (or is skipped), the client advances straight to **Decide**. **Decide** back returns to **second Breathe** (`**breath2**`). Legacy local snapshots that stored the removed client-only `**choose**` step are migrated to `**decide**` on load (`**migratePersistedPauseSession**`).
 
-**Brief pause (quick ritual)** — four product steps, separate UI state (`**BriefPauseStep**` in `**src/lib/pause-session-storage.ts**`): **Feel → Breathe → Integrate → Decide**. There is no Reflect/Frame/second breath/Choose; **Integrate** is a client-only quiet window (no companion RPC). In the **happy path**, RPCs follow that order: `**initial_emotion_logged**` (with `**brief_ritual**`), then one `**breath_completed**`, then `**outcome_logged**` on Decide (§7.3.1). Postgres `**completed**` still keys only off `**outcome_logged**` (§5.1).
+**Brief pause (quick ritual)** — four product steps, separate UI state (`**BriefPauseStep**` in `**src/lib/pause-session-storage.ts**`): **Feel → Breathe → Integrate → Decide**. There is no Reflect/Frame/second breath; **Integrate** is a client-only quiet window (no companion RPC). In the **happy path**, RPCs follow that order: `**initial_emotion_logged**` (with `**brief_ritual**`), then one `**breath_completed**`, then `**outcome_logged**` on Decide (§7.3.1). Postgres `**completed**` still keys only off `**outcome_logged**` (§5.1).
 
 **Ritual audio:** the pause shell mute (below the stepper, wireframe-aligned) drives `**src/lib/pause-ritual-audio.ts**` on the same `**AudioContext**` singleton. `**PauseBreathing**` plays soft phase ticks + a short pattern-complete swell. **Deep pause only:** while **Reflect** and **Frame** are visible, a **continuous low sine focus bed** runs when sound is on (one uninterrupted bed across Reflect → Frame). **Default is muted** until the user turns sound on. All ritual audio is off when muted or when the user prefers reduced motion (`**PauseSessionDeepRitualBody**` + `**usePauseReflectFrameFocusAmbience**`).
 
@@ -226,7 +226,7 @@ Optional PostHog flag `**pause.step5_breath_label_shift**` renames the second-br
 ### 7.2 Hydration and local persistence
 
 - **Input:** `useHolzen()`, navigation `**location.state`**, and optional fetch-by-id when only `**pauseInstanceId`** is present.
-- **Resilience:** `src/lib/pause-session-storage.ts` `**saveSession` / `loadSession`** persist step, moods, intensities, `**breathingFirstCompleted`**, `**breathingSecondCompleted**`, `**frameDone**`, optional `**decideOnBackStep**` (`**choose**` vs `**breath2**` for Decide back when the second breath was skipped), `**ritualDepth**` (`**brief**` / `**deep**`), brief-only fields (`**briefStep**`, `**briefIntegrateDone**`, optional `**brief_face**`), and `**pauseRitualSchema**` (v3) so a reload mid-ritual can resume. Older keys (`**breathingCompleted**`, five-step `**shift**`, schema v2) are migrated on load.
+- **Resilience:** `src/lib/pause-session-storage.ts` `**saveSession` / `loadSession`** persist step, moods, intensities, `**breathingFirstCompleted`**, `**breathingSecondCompleted**`, `**frameDone**`, optional `**decideOnBackStep**` (`**breath2**` when on **Decide** for resume), `**ritualDepth**` (`**brief**` / `**deep**`), brief-only fields (`**briefStep**`, `**briefIntegrateDone**`, optional `**brief_face**`), and `**pauseRitualSchema**` (v3) so a reload mid-ritual can resume. Older keys (`**breathingCompleted**`, five-step `**shift**`, schema v2) are migrated on load.
 
 ### 7.3 When each RPC runs (happy path)
 
@@ -239,7 +239,7 @@ Optional PostHog flag `**pause.step5_breath_label_shift**` renames the second-br
 | **Breathe** (first) — Skip                                | `**breath_completed`** with `**{ "skipped": true, "breath_segment": 1 }`**, then navigate to Reflect.                                                                                                                                   |
 | **Reflect**                                               | Read-only for steps; companion cards still use `**pause_log_companion`** `**complete**` (and `**counts_for_pause**` for analytics / quality). Finishing a card is **not** required for `**volatility_v1`** `**completed**` in Postgres. |
 | **Frame** — **I'm done**                                  | `**shift_emotion_logged`** with `**{ "from_frame_hub": true }`** (satisfies `**volatility_v1**` without a mirror mood), then navigate to second Breathe.                                                                                |
-| **Breathe** (second segment) — Continue                   | `**breath_completed`** with `**{ "breath_segment": 2 }**`, then navigate to `**choose**` (`**PauseChooseBridge**` — same sixth stepper segment as **Decide**), then **Decide** on primary CTA.                                          |
+| **Breathe** (second segment) — Continue                   | `**breath_completed`** with `**{ "breath_segment": 2 }**`, then navigate to **Decide**.                                                                                                                                                   |
 | **Breathe** (second) — Skip                               | `**breath_completed`** with `**{ "skipped": true, "breath_segment": 2 }`**, then **Decide** (settle interstitial skipped).                                                                                                              |
 | **Decide**                                                | `**outcome_logged`**. The client must not clear home/session “done” state until the RPC succeeds; `**dismissMessage()`** runs **after** a successful outcome log to avoid racing `**pause_dismiss_current`**.                           |
 

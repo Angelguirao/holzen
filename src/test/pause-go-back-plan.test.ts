@@ -22,6 +22,6 @@ describe('computePauseGoBackPlan', () => {
   it('deep: uses STEPS order for picker and deep', () => {
     expect(computePauseGoBackPlan('picker', 'feel', 'feel')).toEqual({ kind: 'none' });
     expect(computePauseGoBackPlan('picker', 'feel', 'breathe')).toEqual({ kind: 'deep', prev: 'feel' });
-    expect(computePauseGoBackPlan('deep', 'feel', 'decide')).toEqual({ kind: 'deep', prev: 'choose' });
+    expect(computePauseGoBackPlan('deep', 'feel', 'decide')).toEqual({ kind: 'deep', prev: 'breath2' });
   });
 });

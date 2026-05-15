@@ -42,7 +42,6 @@ function base(over: Partial<PauseSessionPersistSnapshotInput> = {}): PauseSessio
     breathingFirstCompleted: false,
     breathingSecondCompleted: false,
     frameDone: false,
-    decideOnBackStep: 'choose',
     ritualEntry: 'picker',
     briefStep: 'feel',
     briefIntegrateDone: false,

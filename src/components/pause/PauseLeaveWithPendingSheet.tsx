@@ -38,6 +38,7 @@ export function PauseLeaveWithPendingSheet({
     pending?.context_snapshot && typeof pending.context_snapshot.context_text === 'string'
       ? (pending.context_snapshot.context_text as string)
       : null;
+  const showPreviewLine = Boolean(preview && preview !== ctx?.trim());
 
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
@@ -60,7 +61,7 @@ export function PauseLeaveWithPendingSheet({
           {ctx ? (
             <p className="rounded-md border border-border/60 bg-muted/30 px-3 py-2 text-xs text-foreground/90">{ctx}</p>
           ) : null}
-          {preview ? <p className="line-clamp-4 text-xs leading-relaxed text-foreground/85">{preview}</p> : null}
+          {showPreviewLine ? <p className="line-clamp-4 text-xs leading-relaxed text-foreground/85">{preview}</p> : null}
         </div>
         <div className="mt-6 flex flex-col gap-2">
           <Button type="button" disabled={busy} className="w-full" onClick={onStay}>

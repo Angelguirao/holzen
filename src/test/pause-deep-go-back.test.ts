@@ -8,7 +8,6 @@ describe('computeDeepRitualGoBackTarget', () => {
 
   it('returns the prior STEPS entry', () => {
     expect(computeDeepRitualGoBackTarget('breathe')).toBe('feel');
-    expect(computeDeepRitualGoBackTarget('decide')).toBe('choose');
-    expect(computeDeepRitualGoBackTarget('choose')).toBe('breath2');
+    expect(computeDeepRitualGoBackTarget('decide')).toBe('breath2');
   });
 });

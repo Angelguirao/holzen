@@ -1,5 +1,7 @@
 # Phase 2: Manual pause pipeline review
 
+> **Pause V2 (current):** `use-holzen` opens the pause via `pause_create_or_reuse` on Home; **`holzen-reflect`** runs at the **Reflect** step (`use-pause-reflect-generation` / `generateReflectionAtReflectStep`), not from `use-holzen` on the non-silent path. Silent mode still writes a stub `reflection_text` on trigger.
+
 This phase is the second "mental model pass": after Phase 1 (who can reach `/pause` and how auth works), we trace **how a manual pause is produced** (reflection + DB writes) and **how the pause UI consumes it** (`PauseSession`, companions, edge functions). If this contract is wrong, users see empty pause screens, wrong companions, or duplicate work.
 
 ## Table of Contents
@@ -17,10 +19,10 @@ This phase is the second "mental model pass": after Phase 1 (who can reach `/pau
 
 ## What to understand first (priority)
 
-1. **Producer/consumer contract**: what `useHolzen` writes (reflection row, profile fields, companions from `holzen-reflect`) vs what `PauseSession` reads (`location.state`, `useHolzen` fallback, `localStorage` session).
+1. **Producer/consumer contract**: what `useHolzen` writes (`pause_instances` + context snapshot; **silent** stub `reflection_text` on Home) vs what **`use-pause-reflect-generation`** adds at **Reflect** (`holzen-reflect` → `pause_ai_artifacts`) vs what `PauseSession` reads (`location.state`, `useHolzen` fallback, `localStorage` session).
 2. **Navigation payload**: `Home` navigates to `/pause` with a specific `state` shape; any other entry (deep link, notification) may omit fields.
-3. **Two-stage companions**: initial haiku/grounding may come from `holzen-reflect` + insert; expanded companions + intervention often come from `companion-orchestrate` via `useCompanionData`.
-4. **Cooldowns and errors**: `manualTrigger` respects manual cooldown; `holzen-reflect` failures set `error` state and may leave no reflection to navigate with.
+3. **Two-stage companions**: initial haiku/grounding may come from **`holzen-reflect`** at Reflect + upsert; expanded companions + intervention often come from `companion-orchestrate` via `useCompanionData`.
+4. **Cooldowns and errors**: `manualTrigger` respects manual cooldown; **`holzen-reflect`** failures surface on the **Reflect** step (`reflectionError` / retry), not necessarily as Home `useHolzen` errors for non-silent manual.
 
 ## Mental Models & Useful Concepts
 
@@ -47,7 +49,7 @@ This phase is the second "mental model pass": after Phase 1 (who can reach `/pau
 
 ### `src/hooks/use-holzen.ts` — producer for pause state
 
-- `manualTrigger` -> `generateMessage`: builds context from BTC data; invokes `holzen-reflect` (unless silent mode); creates a pause via `pause_create_or_reuse`, writes `pause_ai_artifacts`; sets `message`, `context`, `companions`, `lastPauseInstanceId`.
+- `manualTrigger` -> `generateMessage`: builds context from BTC data; **`pause_create_or_reuse`** (non-silent: no `holzen-reflect` on Home); **silent**: stub `reflection_text` upsert; sets `context`, `lastPauseInstanceId`, and **`message`** only when a reflection exists (silent or hydrated from DB).
 - Cooldown: `manualCooldownRemaining` + `localStorage` key per user.
 
 ### `src/pages/PauseSession.tsx` — pause UI orchestration + restoration
@@ -79,12 +81,11 @@ This phase is the second "mental model pass": after Phase 1 (who can reach `/pau
 ## Runtime touchpoints: endpoints, events, and side effects
 
 - **Edge function: `holzen-reflect`**
-  - Client: `supabase.functions.invoke('holzen-reflect', { body: { context, tone, style, ... } })` from `use-holzen.ts` (non-silent path).
+  - Client: `invokeEdge('holzen-reflect', …)` from **`src/lib/pause-reflect-artifact.ts`** (`generateReflectionAtReflectStep`), used by **`use-pause-reflect-generation.ts`** at **Reflect** (non-silent). **`use-holzen`** does **not** invoke it on the non-silent Home path.
 - **Edge function: `companion-orchestrate`**
-  - Client: `supabase.functions.invoke('companion-orchestrate', ...)` from `use-companion-data.ts` (multiple call sites for load/regenerate).
+  - Client: `invokeEdge('companion-orchestrate', …)` from `use-companion-data.ts` (multiple call sites for load/regenerate).
 - **Direct Supabase client writes (browser)**:
-  - `pause_instances` insert via RPC + `pause_ai_artifacts` upserts (reflect text, companions)
-  - `profiles` update (`last_message`, `last_context`, `last_trigger_at` in some paths)
+  - `pause_instances` via **`pause_create_or_reuse`** RPC; **`pause_ai_artifacts`** upserts for **silent** stub and for **Reflect**-time reflection (and companion rows from orchestration).
 - **Local**:
   - `localStorage` key `holzen_pause_session` for pause step persistence
   - Manual cooldown key `holzen_last_manual_at_*`
@@ -92,7 +93,7 @@ This phase is the second "mental model pass": after Phase 1 (who can reach `/pau
 ## Data models affected
 
 - **`pause_instances`**: inserted on manual generate; `PauseSession` logs step events for mood/outcome/note/etc.
-- **`profiles`**: `last_message`, `last_context`, `last_trigger_at` updated after reflection generation.
+- **`profiles`**: `last_message` / `last_context` / `last_trigger_at` are **not** written by **`use-holzen`** on the manual path today; automatic / cron paths update profile fields as documented in the pause AI doc.
 - **`collections` / `collection_items`**: optional user-defined groupings keyed by `pause_instance_id` (see `use-library.ts`).
 - **Companion-related tables** (server-side via orchestrate): `pause_ai_artifacts`, `companion_cache`, `companion_serves`, etc.
 
@@ -114,16 +115,16 @@ Use these as "prove-or-disprove" questions while reading the Phase 2 files.
 4. Can the user open `/pause` with only `pauseInstanceId` (e.g. notification deep link)? What should they see?
 5. Does `useCompanionData` always send a valid `pauseInstanceId` when one exists, and does `companion-orchestrate` reject cross-user ids?
 6. Are there races between client orchestration and server cron writing the same reflection's companions?
-7. What happens if `holzen-reflect` succeeds but creating the pause instance fails (partial state)?
-8. How do manual cooldown and `error` from `useHolzen` affect whether navigation to `/pause` is possible?
+7. What happens if **`pause_create_or_reuse`** succeeds on Home but **`holzen-reflect`** fails later at **Reflect** (partial reflection artifact)?
+8. How do manual cooldown and errors from **`useHolzen`** vs **`use-pause-reflect-generation`** affect whether navigation to `/pause` and the Reflect step remain usable?
 
 ## Conclusions and Tradeoffs
 
-- The manual pipeline is **coherent** when Home and `useHolzen` complete before navigation: reflection row, profile fields, and nav state align.
+- The manual pipeline is **coherent** when Home and `useHolzen` complete **`pause_create_or_reuse`** before navigation: `pause_instances` + context align with nav state; **non-silent** reflection text arrives at **Reflect** when **`holzen-reflect`** succeeds.
 - **Fragility** is at **entry boundaries**: any route to `/pause` that only passes `pauseInstanceId` (or nothing) requires the same fallback rules as full state; `PauseSession` + `useHolzen` hydration address the worst "no reflection" dead-ends when `profileLoaded` and hook state catch up.
 - **Cost / duplication**: multiple clients (user session + cron) can invoke `companion-orchestrate`; caching and server logic limit waste but the tradeoff is worth monitoring (see Phase 3 cron review). Backlog: `docs/backlog/orchestrate-client-cron.md`.
 
-- **Partial failure on the manual path**: `holzen-reflect` can succeed while a later pause insert fails; backlog: `docs/backlog/reflection-insert-partial-failure.md` (rename pending).
+- **Partial failure on the manual path**: **`holzen-reflect`** can succeed while **`pause_ai_artifacts`** upsert fails (rare); or the instance exists but Reflect-time generation fails (user-visible retry on Reflect). Backlog: `docs/backlog/reflection-insert-partial-failure.md` (rename pending).
 
 Tradeoffs / alternatives (see also `docs/backlog/pause-session-hydration.md`):
 

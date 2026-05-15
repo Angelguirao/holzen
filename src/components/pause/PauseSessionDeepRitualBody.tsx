@@ -5,7 +5,6 @@ import type { MoodValue } from '@/components/MoodCheck';
 import { PauseRitualFeelStep } from '@/components/pause/PauseRitualFeelStep';
 import type { FeelStepTile } from '@/components/pause/pause-feel-types';
 import { PauseBreathing, type PauseBreathingHandle } from '@/components/pause/PauseBreathing';
-import { PauseChooseBridge } from '@/components/pause/PauseChooseBridge';
 import { PauseDecide } from '@/components/pause/PauseDecide';
 import { PauseFrame } from '@/components/pause/PauseFrame';
 import { PauseReflect } from '@/components/pause/PauseReflect';
@@ -50,9 +49,7 @@ export type PauseSessionDeepRitualBodyProps = {
   onToggleFavorite: () => void | Promise<void>;
   subscribed: boolean;
   onFrameImDone: () => void;
-  onDeepChooseBridgeContinue: () => void;
   onDecide: (decision: string) => void;
-  decideOnBackStep: 'choose' | 'breath2';
   /** After first deep breath pattern: repeat three rounds from intro (wireframe “Three more”). */
   onRepeatDeepFirstBreathPattern: () => void;
   /** After second deep breath pattern: repeat three rounds from intro (wireframe 330:23551). */
@@ -95,9 +92,7 @@ export function PauseSessionDeepRitualBody({
   onToggleFavorite,
   subscribed,
   onFrameImDone,
-  onDeepChooseBridgeContinue,
   onDecide,
-  decideOnBackStep,
   onRepeatDeepFirstBreathPattern,
   onRepeatDeepSecondBreathPattern,
 }: PauseSessionDeepRitualBodyProps) {
@@ -200,15 +195,9 @@ export function PauseSessionDeepRitualBody({
         </motion.div>
       )}
 
-      {step === 'choose' && (
-        <motion.div key="choose" {...stepTransition}>
-          <PauseChooseBridge onChoose={onDeepChooseBridgeContinue} />
-        </motion.div>
-      )}
-
       {step === 'decide' && (
         <motion.div key="decide" {...stepTransition}>
-          <PauseDecide onDecide={onDecide} onBack={() => goToStep(decideOnBackStep)} />
+          <PauseDecide onDecide={onDecide} onBack={() => goToStep('breath2')} hideChoicesBack />
         </motion.div>
       )}
     </AnimatePresence>

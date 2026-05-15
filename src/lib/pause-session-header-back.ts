@@ -32,6 +32,8 @@ export function isPauseSessionHeaderBackVisible(p: PauseSessionHeaderBackInput):
   if (p.step === 'breath2')
     return !(p.breathSecondTimedPatternStarted || p.breathTimedActive || p.breathingSecondCompleted);
   if (p.step === 'reflect') return false;
+  /** Match brief Decide: stepper + in-content mirror back — no shell chevron on Decide. */
+  if (p.step === 'decide') return false;
   return STEPS.indexOf(p.step) > 0;
 }
 

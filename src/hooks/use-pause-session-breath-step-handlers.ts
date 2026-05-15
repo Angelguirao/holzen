@@ -15,7 +15,6 @@ export function usePauseSessionBreathStepHandlers(input: {
   logBreathSegment2Skipped: () => Promise<boolean>;
   setBreathingFirstCompleted: Dispatch<SetStateAction<boolean>>;
   setBreathingSecondCompleted: Dispatch<SetStateAction<boolean>>;
-  setDecideOnBackStep: Dispatch<SetStateAction<'choose' | 'breath2'>>;
   setBriefStep: Dispatch<SetStateAction<BriefPauseStep>>;
   setBriefIntegrateDone: Dispatch<SetStateAction<boolean>>;
 }): {
@@ -37,7 +36,6 @@ export function usePauseSessionBreathStepHandlers(input: {
     logBreathSegment2Skipped,
     setBreathingFirstCompleted,
     setBreathingSecondCompleted,
-    setDecideOnBackStep,
     setBriefStep,
     setBriefIntegrateDone,
   } = input;
@@ -56,7 +54,7 @@ export function usePauseSessionBreathStepHandlers(input: {
   const handleContinueAfterSecondBreath = useCallback(async () => {
     const ok = await ensureBreathSegment2Logged();
     if (!ok) return;
-    goToStep('choose');
+    goToStep('decide');
   }, [ensureBreathSegment2Logged, goToStep]);
 
   const handleSkipFirstBreath = useCallback(async () => {
@@ -69,12 +67,11 @@ export function usePauseSessionBreathStepHandlers(input: {
 
   const handleSkipSecondBreath = useCallback(async () => {
     setBreathingSecondCompleted(false);
-    setDecideOnBackStep('breath2');
     const ok = await logBreathSegment2Skipped();
     if (!ok) return;
     setBreathingSecondCompleted(true);
     goToStep('decide');
-  }, [logBreathSegment2Skipped, goToStep, setBreathingSecondCompleted, setDecideOnBackStep]);
+  }, [logBreathSegment2Skipped, goToStep, setBreathingSecondCompleted]);
 
   const handleBriefBreathContinue = useCallback(async () => {
     const ok = await ensureBreathSegment1Logged(true);

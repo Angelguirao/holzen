@@ -38,7 +38,7 @@ Links use explicit HTML anchors before each numbered section so jumps behave con
 
 1. **Trigger** — User opens Pause (client) *or* the `check-volatility` cron decides a user crossed thresholds.
 2. **Reflection** — Short copy (+ optional haiku) anchored to market **context** (e.g. “BTC is down 5.2%…”).
-3. **Persist** — Create or reuse a `pause_instances` row via `pause_create_or_reuse` (manual) or `pause_create_or_reuse_as` (automatic). **`reflection_text`** (+ optional **`haiku`**) upserts happen at **Reflect** via **`holzen-reflect`** (manual + cron pauses). **`check-volatility`** updates **`profiles.last_context`** for delivery; **`last_message`** is cleared (no eager AI preview). **`use-holzen`** does **not** write profile fields (the pause row is the manual source of truth). **`profiles.last_trigger_at`** advances on the **automatic** claim path; **silent** manual mode still writes a stub **`reflection_text`** at trigger time (§2.3.B).
+3. **Persist** — Create or reuse a `pause_instances` row via `pause_create_or_reuse` (manual) or `pause_create_or_reuse_as` (automatic). **`reflection_text`** (+ optional **`haiku`**) upserts happen at **Reflect** in the ritual: the browser invokes edge **`holzen-reflect`** for **both** manual- and cron-created instances (cron does **not** run the reflection LLM on claim). **`check-volatility`** updates **`profiles.last_context`** for delivery; **`last_message`** is cleared (no eager AI preview). **`use-holzen`** does **not** write profile fields (the pause row is the manual source of truth). **`profiles.last_trigger_at`** advances on the **automatic** claim path; **silent** manual mode still writes a stub **`reflection_text`** at trigger time (§2.3.B).
 4. **Intervention** — `companion-orchestrate` (intervention-only call, no companion slots) chooses an **intervention** (mirror / trap / pattern / question) and persists it. See **§7** for a per-type reference.
 5. **Companion cards (lazy)** — When the user **taps/expands** a companion card, a **single-slot** `companion-orchestrate` call generates that companion on demand. Each generator tries **library → cache → live → curated** (phase ordering controlled by `COMPANION_PHASE_`* env vars in `_shared/phase-config.ts`).
 6. **Surface** — Client shows `InterventionSection` plus optional companion cards from user preferences.
@@ -130,10 +130,10 @@ If two rows in the reference table below look “duplicated,” check whether th
 
 **D. Calling the reflection model**
 
-- **Manual:** Edge function `**holzen-reflect`** (auth, sanitization, analytics) calls `**generateUnifiedReflection`**.
-- **Automatic:** `**check-volatility`** calls `**generateUnifiedReflection`** **inline** (same module, same parameters shape after sanitization).
+- **Manual:** Edge function `**holzen-reflect`** (auth, sanitization, analytics) calls `**generateUnifiedReflection**` when the user reaches **Reflect** in the ritual (`**use-pause-reflect-generation**`).
+- **Automatic:** `**check-volatility`** **does not** call `**generateUnifiedReflection`** on claim. The pause row is created server-side; **`holzen-reflect`** runs later in the **browser** at **Reflect**, same as manual.
 
-*Why:* one thin HTTP wrapper for the client; the cron already has service auth and batch logic, so it can call the generator directly without an extra hop.
+*Why:* one thin HTTP wrapper for the client; the cron focuses on eligibility, **`pause_create_or_reuse_as`**, and delivery signals—reflection stays user-session scoped.
 
 ---
 
@@ -151,25 +151,25 @@ Tone, reflection style, custom prompt, motivations, mantra, grounding activities
 **2. `moodHistory` — “how have they been feeling lately?”**  
 Canonical source in Pause V2 is **`pause_step_events`**: pair **`initial_emotion_logged`** with **`outcome_logged`** per `pause_instance_id`, then sort newest-first (`**pause-cron-parity.ts**` → `**pauseRecencyInputs**` on the server; **`loadMoodHistoryForOrchestrate`** in the browser for **`companion-orchestrate`**). The **`generateUnifiedReflection`** prompt uses `moodHistory` when the **caller passes it**.
 
-- **Manual (reflect step):** `**use-holzen`** loads the same shapes as cron via **`loadReflectRecencyHints`** (`**src/lib/load-reflect-recency-hints.ts**`) and passes `moodHistory` / `recentMessages` / `recentHaikus` into **`holzen-reflect`** when present (parity with **`pauseRecencyInputs`** in **`check-volatility`**).  
+- **Manual (reflect step):** `**use-pause-reflect-generation**` / **`generateReflectionAtReflectStep`** loads the same shapes as cron via **`loadReflectRecencyHints`** (`**src/lib/load-reflect-recency-hints.ts**`) and passes `moodHistory` / `recentMessages` / `recentHaikus` into **`holzen-reflect`** when present (parity with **`pauseRecencyInputs`** in **`check-volatility`**).  
 - **Manual (orchestrator):** `**use-companion-data`** loads `moodHistory` from **`pause_step_events`** (`**loadMoodHistoryForOrchestrate`**) and sends it to **`companion-orchestrate`** (intervention + lazy slots).  
-- **Automatic:** `**check-volatility`** calls `**pauseRecencyInputs**` before **`generateUnifiedReflection`**.
+- **Automatic (claim-time):** `**check-volatility`** calls `**pauseRecencyInputs**` to optionally set **`last_reported_mood`** in the **`context_snapshot`** when creating the pause row; the reflection LLM still runs only at **Reflect** in the client.
 
 **Nuance:** A mood picked **only after** the reflect-step returns is **not** in `moodHistory` for **that** `generateUnifiedReflection` call; it will show up on **later** runs once logged to **`pause_step_events`**. If the user already chose a mood **before** invoking generation, `**use-holzen`** can pass **`last_reported_mood`** inside **`pause_create_or_reuse`**’s **`context_snapshot`** for storage/analytics.
 
 **3. `recentHaikus` / `recentMessages` — “don’t repeat yourself”**  
 Up to **five** recent haikus and **five** recent reflect-step **messages** (from **`pause_ai_artifacts`** kinds `haiku` / `reflection_text`). Used as **dedup hints** in **`generateUnifiedReflection`** when provided.
 
-- **Manual (reflect step):** Sent by `**use-holzen**` when **`loadReflectRecencyHints`** returns non-empty pools (§2.3.E.2).  
-- **Automatic:** Filled by `**pauseRecencyInputs**` alongside `moodHistory`.
+- **Manual (reflect step):** Populated by **`loadReflectRecencyHints`** inside **`generateReflectionAtReflectStep`** (§2.3.E.2).  
+- **Automatic:** Filled by **`pauseRecencyInputs`** for **`context_snapshot`** hints on claim; full dedup pools for **`holzen-reflect`** are assembled client-side at **Reflect** via **`loadReflectRecencyHints`**.
 
-*Why reconstruct on the server for cron:* there is **no** open Pause tab — **`Postgres`** is the only place to assemble the same JSON shapes the edge functions expect.
+*Why split automatic assembly:* during cron there is **no** open Pause tab — **`Postgres`** is still the right place to peek **`pauseRecencyInputs`** for **`context_snapshot`** (e.g. last mood). Full **`recentMessages` / `recentHaikus`** dedup pools for **`holzen-reflect`** are assembled **client-side at Reflect** via **`loadReflectRecencyHints`**, matching what the edge expects.
 
 ---
 
 **F. First writes vs orchestration (Pause V2)**
 
-- **Reflect step:** `**holzen-reflect`** / inline cron generation returns **`message`** + optional **`haiku`** (and may echo optional **`grounding_*`** fields). The client or cron upserts **`pause_ai_artifacts`** (`reflection_text`, `haiku`, optional `ground_nudge` from echoed grounding).  
+- **Reflect step:** `**holzen-reflect`** (browser) returns **`message`** + optional **`haiku`** (and may echo optional **`grounding_*`** fields). The client upserts **`pause_ai_artifacts`** (`reflection_text`, `haiku`, optional `ground_nudge` from echoed grounding).  
 - **Orchestrated companions:** Slots that still need model work are produced by **`companion-orchestrate`**, which upserts **`pause_ai_artifacts`** per slot (`signal`, `ground_nudge`, `historical_insight`, `zoom_out_deep_time`, …). Profile **`companion_*`** flags still gate which generators run.
 
 ---
@@ -185,8 +185,8 @@ Up to **five** recent haikus and **five** recent reflect-step **messages** (from
 
 **H. Notifications and profile bookkeeping**
 
-- **Manual:** In-app delivery; **`use-holzen`** persists **`pause_instances`** + **`pause_ai_artifacts`** after `**holzen-reflect`** succeeds (no legacy **`reflections`** insert). **`profiles.last_message`** / **`last_context`** are **not** updated by that hook in the current code.  
-- **Automatic:** Push / optional email / unified **`notifications`** feed (and any digest paths) as configured; `**last_trigger_at`** updated when claiming work; **`check-volatility`** updates **`profiles.last_message`** / **`last_context`** when it creates the pause message.
+- **Manual:** In-app delivery; **`use-holzen`** opens **`pause_instances`** via **`pauseCreateOrReuse`** (context snapshot). **`holzen-reflect`** runs later at **Reflect** (`**use-pause-reflect-generation**` → **`pause_ai_artifacts`** upsert). **Silent** manual still writes a stub **`reflection_text`** at trigger time. No legacy **`reflections`** insert. **`profiles.last_message`** / **`last_context`** are **not** updated by **`use-holzen`** in the current code.  
+- **Automatic:** Push / optional email / unified **`notifications`** feed (and any digest paths) as configured; `**last_trigger_at`** updated when claiming work; **`check-volatility`** updates **`profiles.last_context`** for delivery and clears **`last_message`** (no server-side reflection body at claim in Pause V2).
 
 *Why:* automatic pause must **reach** the user outside the app; manual pause already has them in-session.
 
@@ -194,7 +194,7 @@ Up to **five** recent haikus and **five** recent reflect-step **messages** (from
 
 **I. Analytics parity**
 
-- **Both:** `**pause_ai_call`** is inserted **before** `**generateUnifiedReflection`** so rate limiting and dashboards see the same pattern. `**reflection_generated`** fires after success; cron metadata can tag `**source: "check-volatility"`**. `**companion-orchestrate`** still runs `**checkRateLimit`** on its own invoke. Details: **§11.1**.
+- **Reflect path:** `**pause_ai_call`** is inserted **before** `**generateUnifiedReflection`** inside edge **`holzen-reflect`** (whether the pause was created manually or by cron). `**reflection_generated`** fires after success. `**companion-orchestrate`** still runs `**checkRateLimit`** on its own invoke. Details: **§11.1**.
 
 *Why:* manual and automatic should not diverge in **cost accounting** or **allowlisted** event semantics.
 
@@ -208,7 +208,7 @@ Up to **five** recent haikus and **five** recent reflect-step **messages** (from
 | **Entry**             | `use-holzen.ts`                                | `check-volatility/index.ts`                                                |
 | **BTC + suffix**      | `fetchBtcData` + `pause-context-suffix`        | CoinGecko per currency + one F&G / on-chain per run + same suffix module   |
 | **Cooldown / gates**  | Short client cooldown; no volatility gate      | Thresholds, `cooldown_hours`, quiet hours, snooze, `last_trigger_at` claim |
-| **Reflection AI**     | `holzen-reflect` → `generateUnifiedReflection` | `check-volatility` → same generator                                        |
+| **Reflection AI**     | At **Reflect** (browser): `holzen-reflect` → `generateUnifiedReflection` | Instance created on claim; **reflection LLM** runs when user reaches **Reflect** (same client path)                                        |
 | **Orchestrator auth** | User JWT                                       | Service role + `userId` in body                                            |
 | **Notifications**     | In-app                                         | Push / email / unified `notifications` (legacy `pause_notifications` removed) |
 
@@ -221,10 +221,13 @@ Up to **five** recent haikus and **five** recent reflect-step **messages** (from
 flowchart TB
   subgraph MANUAL [Manual pause — client]
     BTC[fetchBtcData\ncontext string]
-    HR[holzen-reflect\nuser JWT]
-    INS[Client: pauseCreateOrReuse\npause_ai_artifacts]
-    UCD[use-companion-data\ncompanion-orchestrate\nuser JWT]
-    BTC --> HR --> INS --> UCD
+    POC[pauseCreateOrReuse\npause_instances + snapshot]
+    HR[holzen-reflect\nuser JWT at Reflect]
+    INS[pause_ai_artifacts\nreflection_text + optional haiku]
+    UCD[use-companion-data\ncompanion-orchestrate]
+    BTC --> POC --> UCD
+    POC -. Reflect step .-> HR
+    HR --> INS --> UCD
   end
   subgraph AUTO [Automatic pause — server]
     CV[check-volatility\nCoinGecko + thresholds]
@@ -244,7 +247,7 @@ flowchart TB
 
 
 
-**Caption:** Both paths end in the **same** orchestrator and **same** reflection generator; arrows differ only in **where** each step runs and **which credential** is used.
+**Caption:** Both paths end in the **same** orchestrator and **same** reflection generator; arrows differ in **where** each step runs, **which credential** is used, and **when** the manual path calls **`holzen-reflect`** (deferred until **Reflect** in the ritual).
 
 ---
 
@@ -615,7 +618,8 @@ Reads that need hydrated pause + companion text use **`v_pause_full`** and/or **
 
 | Piece                        | Role                                                                                                                                                                                                      |
 | ---------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `use-holzen.ts`              | BTC context, manual cooldown, `holzen-reflect`, `pauseCreateOrReuse` + `pause_ai_artifacts` upserts, initial companion state from reflect response                                                                                       |
+| `use-holzen.ts`              | BTC context, manual cooldown, **`pauseCreateOrReuse`** (opens instance + snapshot); **silent** stub `reflection_text`; non-silent defers AI to Reflect                                                                                       |
+| `use-pause-reflect-generation.ts` | At **Reflect** (deep ritual): cache read, then **`holzen-reflect`** via **`generateReflectionAtReflectStep`** → **`pause_ai_artifacts`**                                                                                         |
 | `use-companion-data.ts`      | Intervention-only orchestrate on mount, lazy per-slot `fetchCompanion` on card tap, per-companion loading/errors, recency hints; companion payloads persist in **`pause_ai_artifacts`** only                         |
 | `InterventionSection.tsx`    | Renders mirror / trap / pattern / question + optional zoom-out secondary                                                                                                                                  |
 | `CompanionSection.tsx`       | Container for companion cards and prefs; hides Zoom Out card when intervention already shows zoom-out secondary (§7.5). Each companion card has an **"Open full view"** button wired to the routes below. |
@@ -673,11 +677,11 @@ Exact SQL lives in **[cron-setup.md](../../ops/cron-setup.md)**. Typical schedul
 
 **What the user sees** is one pause surface: reflection copy, an intervention (mirror / trap / pattern / question / default), and optional companion cards driven by preferences.
 
-**What the server does** is split across phases: (1) **reflect-step** — `holzen-reflect` or `check-volatility` calling `generateUnifiedReflection` (the model output is **message + haiku**; `**holzen-reflect**` may echo `**grounding_***` keys for API stability, but `**generateUnifiedReflection**` often returns them as **null** — companion slots fill those via orchestration); (2) **orchestration** — `companion-orchestrate` may run model-backed generators (one per typical **client** lazy request, or **several in one** invoke when a **server** caller sets multiple `**enable*`** flags) (Signal, Grounding, History, Zoom Out, and question mode when selected), then write results to **`pause_ai_artifacts`**, `**companion_serves**`, and analytics. The **`pregenerate-companions`** job does **not** use this path: it only pre-fills **`companion_cache`** (see [pregenerate.md](companions/pregenerate.md)).
+**What the server does** is split across phases: (1) **reflect-step** — browser **`holzen-reflect`** calling `generateUnifiedReflection` when the user reaches **Reflect** (the model output is **message + haiku**; `**holzen-reflect**` may echo `**grounding_***` keys for API stability, but `**generateUnifiedReflection**` often returns them as **null** — companion slots fill those via orchestration); (2) **orchestration** — `companion-orchestrate` may run model-backed generators (one per typical **client** lazy request, or **several in one** invoke when a **server** caller sets multiple `**enable*`** flags) (Signal, Grounding, History, Zoom Out, and question mode when selected), then write results to **`pause_ai_artifacts`**, `**companion_serves**`, and analytics. The **`pregenerate-companions`** job does **not** use this path: it only pre-fills **`companion_cache`** (see [pregenerate.md](companions/pregenerate.md)).
 
 **Rate limits and budgets** do not line up 1:1 with that UX split:
 
-- **Sliding-window throttle (per user)** — `checkRateLimit` (`_shared/ratelimit.ts`) counts only `**analytics_events.event**` values on a **fixed allowlist** (e.g. `**pause_ai_call**`, `**signal_companion_ai_call**`, `**zoom_out_ai_call**`, `**historical_insight_ai_call**`, plus other named AI events — **read the file** for the current list). `**reflection_generated**` is **not** counted. `**intervention_selected**` is **not** on the allowlist, so companion fan-out does **not** add allowlisted rows. `**companion-orchestrate**` calls `**checkRateLimit**` on every invoke but **does not** insert `**pause_ai_call**` per companion. **Reflection step (manual and automatic):** `**holzen-reflect**` and `**check-volatility**` each insert **one** `**pause_ai_call**` immediately before `**generateUnifiedReflection**`, so the orchestrator’s rate check sees the same pattern for both triggers.
+- **Sliding-window throttle (per user)** — `checkRateLimit` (`_shared/ratelimit.ts`) counts only `**analytics_events.event**` values on a **fixed allowlist** (e.g. `**pause_ai_call**`, `**signal_companion_ai_call**`, `**zoom_out_ai_call**`, `**historical_insight_ai_call**`, plus other named AI events — **read the file** for the current list). `**reflection_generated**` is **not** counted. `**intervention_selected**` is **not** on the allowlist, so companion fan-out does **not** add allowlisted rows. `**companion-orchestrate**` calls `**checkRateLimit**` on every invoke but **does not** insert `**pause_ai_call**` per companion. **Reflection step:** edge **`holzen-reflect`** inserts **one** `**pause_ai_call**` immediately before `**generateUnifiedReflection**` (automatic- and manual-created pauses share this path once the user hits **Reflect**). **`check-volatility`** no longer inserts a reflect-path `**pause_ai_call**` on claim in Pause V2.
 - **Daily cap (platform-wide)** — `**checkDailyBudget**` runs **only** at `**companion-orchestrate**` entry (not in `**holzen-reflect**`). It sums **all** `**generation_attempts.estimated_cost_usd**` from **UTC midnight** with **no `user_id` filter** — a shared pool for the whole project (see §12). Reflection AI can still run if the pool is exhausted, then orchestration may return **503**.
 
 **Practical levers:** Changing **UX** (what to show), **cost** (how many model calls), **per-user throttle** (allowlist + who inserts which event), and **platform daily spend** are **different** concerns. Hiding a companion in the UI does **not** reduce server work unless `**enable***` flags or generator gating in `companion-orchestrate` change too.
