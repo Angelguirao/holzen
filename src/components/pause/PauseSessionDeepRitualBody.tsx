@@ -140,7 +140,7 @@ export function PauseSessionDeepRitualBody({
             pauseInstanceId={pauseInstanceId}
             context={context}
             reflectionMessage={reflectionMessage}
-            haiku={companions.haiku ?? null}
+            companionHaikuEnabled={companionPrefs.haiku}
             isFavorite={isFavorite}
             onToggleFavorite={() => {
               void onToggleFavorite();
@@ -156,7 +156,7 @@ export function PauseSessionDeepRitualBody({
           <PauseFrame
             pauseInstanceId={pauseInstanceId}
             reflectionMessage={reflectionMessage}
-            haiku={companions.haiku ?? null}
+            companionHaikuEnabled={companionPrefs.haiku}
             isFavorite={isFavorite}
             onToggleFavorite={() => {
               void onToggleFavorite();

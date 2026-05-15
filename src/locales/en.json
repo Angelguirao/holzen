@@ -1544,7 +1544,8 @@
       "zoomOut": "Zoom out",
       "lookBack": "Look back",
       "signal": "Signal",
-      "imDone": "I'm done"
+      "imDone": "I'm done",
+      "haikuLoading": "Loading…"
     },
     "reflect": {
       "title": "Reflect",

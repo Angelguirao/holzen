@@ -1,4 +1,4 @@
-import { useState, type ReactNode } from 'react';
+import { useEffect, useRef, useState, type ReactNode } from 'react';
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { motion } from 'framer-motion';
@@ -16,12 +16,14 @@ import { pauseStepLayout } from '@/components/pause/pause-step-layout';
 import { Button } from '@/components/ui/button';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import { hapticFeedback } from '@/lib/haptics';
+import { fetchHaikuTextForPauseInstance } from '@/lib/pause-haiku-artifact';
 import { cn } from '@/lib/utils';
 
 export interface PauseFrameProps {
   pauseInstanceId: string | null;
   reflectionMessage: string;
-  haiku: string | null;
+  /** When false, hide the haiku row (profile companion toggle). */
+  companionHaikuEnabled: boolean;
   isFavorite: boolean;
   onToggleFavorite: () => void;
   subscribed: boolean;
@@ -35,7 +37,7 @@ export interface PauseFrameProps {
 export function PauseFrame({
   pauseInstanceId,
   reflectionMessage,
-  haiku,
+  companionHaikuEnabled,
   isFavorite,
   onToggleFavorite,
   subscribed,
@@ -44,12 +46,49 @@ export function PauseFrame({
   const { t } = useTranslation();
   /** Match Reflect companion pattern: collapsed until the user opens the card. */
   const [haikuOpen, setHaikuOpen] = useState(false);
+  const [artifactHaiku, setArtifactHaiku] = useState<string | null>(null);
+  const [haikuFetch, setHaikuFetch] = useState<'idle' | 'loading' | 'error' | 'done'>('idle');
+  const haikuFetchedForPauseRef = useRef<string | null>(null);
 
   const zoomHref = pauseInstanceId ? `/companion/zoom-out/${pauseInstanceId}` : '/tools';
   const signalHref = pauseInstanceId ? `/companion/signal/${pauseInstanceId}` : '/tools';
 
-  const haikuBody = (haiku ?? '').trim() || reflectionMessage.trim();
-  const showHaikuCard = Boolean(haikuBody);
+  useEffect(() => {
+    setArtifactHaiku(null);
+    setHaikuFetch('idle');
+    haikuFetchedForPauseRef.current = null;
+  }, [pauseInstanceId]);
+
+  useEffect(() => {
+    if (!haikuOpen || !pauseInstanceId || !companionHaikuEnabled) return;
+    if (haikuFetchedForPauseRef.current === pauseInstanceId) return;
+    const myId = pauseInstanceId;
+    let cancelled = false;
+    haikuFetchedForPauseRef.current = myId;
+    setHaikuFetch('loading');
+    void fetchHaikuTextForPauseInstance(myId)
+      .then((h) => {
+        if (cancelled) return;
+        if (haikuFetchedForPauseRef.current !== myId) return;
+        setArtifactHaiku(h);
+        setHaikuFetch('done');
+      })
+      .catch(() => {
+        if (!cancelled) {
+          if (haikuFetchedForPauseRef.current === myId) {
+            setHaikuFetch('error');
+            haikuFetchedForPauseRef.current = null;
+          }
+        }
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [haikuOpen, pauseInstanceId, companionHaikuEnabled]);
+
+  const showHaikuCard = companionHaikuEnabled && Boolean(pauseInstanceId) && Boolean(reflectionMessage.trim());
+  const displayHaikuBody =
+    artifactHaiku?.trim() || (haikuFetch === 'error' || haikuFetch === 'done' ? reflectionMessage.trim() : '');
 
   return (
     <motion.div
@@ -121,9 +160,13 @@ export function PauseFrame({
                     </button>
                   </div>
                 ) : null}
-                <p className="px-4 pb-4 text-sm leading-relaxed text-muted-foreground">
-                  {haiku?.trim() ? haiku.trim() : reflectionMessage}
-                </p>
+                {haikuFetch === 'loading' ? (
+                  <p className="px-4 pb-4 text-sm leading-relaxed text-muted-foreground">
+                    {t('pause.frame.haikuLoading', { defaultValue: 'Loading…' })}
+                  </p>
+                ) : (
+                  <p className="px-4 pb-4 text-sm leading-relaxed text-muted-foreground">{displayHaikuBody}</p>
+                )}
               </CollapsibleContent>
             </div>
           </Collapsible>

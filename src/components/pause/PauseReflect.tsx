@@ -9,14 +9,15 @@ import { Button } from '@/components/ui/button';
 import { trackEvent } from '@/lib/posthog';
 import { pauseLogStep } from '@/lib/pause-api';
 import { hapticFeedback } from '@/lib/haptics';
+import { fetchHaikuTextForPauseInstance } from '@/lib/pause-haiku-artifact';
 import { cn } from '@/lib/utils';
 
 interface Props {
   pauseInstanceId: string | null;
   context: string | null;
   reflectionMessage: string;
-  /** Optional companion haiku shown as a second line in the reflection card. */
-  haiku: string | null;
+  /** When false, skip loading / showing the haiku line (profile companion toggle). */
+  companionHaikuEnabled: boolean;
   isFavorite: boolean;
   onToggleFavorite: () => void;
   subscribed: boolean;
@@ -28,7 +29,7 @@ export function PauseReflect({
   pauseInstanceId,
   context,
   reflectionMessage,
-  haiku,
+  companionHaikuEnabled,
   isFavorite,
   onToggleFavorite,
   subscribed,
@@ -37,6 +38,21 @@ export function PauseReflect({
 }: Props) {
   const { t } = useTranslation();
   const [postItOpen, setPostItOpen] = useState(false);
+  const [artifactHaiku, setArtifactHaiku] = useState<string | null>(null);
+
+  useEffect(() => {
+    setArtifactHaiku(null);
+    if (!pauseInstanceId || !companionHaikuEnabled) return;
+    const myId = pauseInstanceId;
+    let cancelled = false;
+    void fetchHaikuTextForPauseInstance(myId).then((h) => {
+      if (cancelled) return;
+      setArtifactHaiku(h);
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, [pauseInstanceId, companionHaikuEnabled]);
 
   /** Records that the user reached Reflect (analytics / progression). */
   useEffect(() => {
@@ -103,8 +119,8 @@ export function PauseReflect({
                 <p className="text-xs font-mono uppercase tracking-wide text-muted-foreground">{context.trim()}</p>
               ) : null}
               <p className="font-editorial text-base leading-relaxed text-foreground sm:text-lg">{reflectionMessage}</p>
-              {haiku?.trim() ? (
-                <p className="pt-1 text-sm italic leading-relaxed text-muted-foreground">{haiku.trim()}</p>
+              {artifactHaiku?.trim() ? (
+                <p className="pt-1 text-sm italic leading-relaxed text-muted-foreground">{artifactHaiku.trim()}</p>
               ) : null}
             </div>
             {subscribed ? (
