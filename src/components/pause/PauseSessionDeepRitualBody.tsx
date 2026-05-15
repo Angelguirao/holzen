@@ -127,19 +127,16 @@ export function PauseSessionDeepRitualBody({
       {step === 'reflect' && (
         <motion.div key="reflect" {...stepTransition}>
           <PauseReflect
-            companions={companions}
-            companionPrefs={companionPrefs}
-            severity={severity}
             pauseInstanceId={pauseInstanceId}
             context={context}
             reflectionMessage={reflectionMessage}
+            haiku={companions.haiku ?? null}
             isFavorite={isFavorite}
             onToggleFavorite={() => {
               void onToggleFavorite();
             }}
             subscribed={subscribed}
             onContinue={() => goToStep('frame')}
-            mood={selectedMood}
           />
         </motion.div>
       )}
@@ -147,9 +144,14 @@ export function PauseSessionDeepRitualBody({
       {step === 'frame' && (
         <motion.div key="frame" {...stepTransition}>
           <PauseFrame
-            companions={companions}
             pauseInstanceId={pauseInstanceId}
             reflectionMessage={reflectionMessage}
+            haiku={companions.haiku ?? null}
+            isFavorite={isFavorite}
+            onToggleFavorite={() => {
+              void onToggleFavorite();
+            }}
+            subscribed={subscribed}
             onImDone={onFrameImDone}
           />
         </motion.div>
