@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { format } from 'date-fns';
 import { Sparkles, Flame, Shield, Target, Feather } from 'lucide-react';
 import type { PauseFullRow } from '@/lib/pause-stats-data-query';
+import { effectivePauseShiftMood } from '@/lib/pause-effective-emotion';
 
 interface Props {
   rows: readonly PauseFullRow[];
@@ -53,10 +54,11 @@ export function MilestoneTimeline({ rows }: Props) {
         icon: Flame,
       });
     }
-    const firstCalmExit = first(
-      rows,
-      (r) => r.state === 'completed' && (r.shift_mood === 'calm' || r.shift_mood === 'detached'),
-    );
+    const firstCalmExit = first(rows, (r) => {
+      if (r.state !== 'completed') return false;
+      const m = effectivePauseShiftMood(r);
+      return m === 'calm' || m === 'detached';
+    });
     if (firstCalmExit) {
       out.push({
         key: 'first-calm-exit',

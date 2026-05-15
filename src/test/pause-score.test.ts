@@ -20,12 +20,15 @@ function makeRow(overrides: Partial<PauseFullRow>): PauseFullRow {
     has_breath_completed: true,
     has_initial_emotion_logged: true,
     has_shift_emotion_logged: true,
+    has_post_pause_emotion_logged: false,
     has_outcome_logged: true,
     initial_mood: 'fearful',
     is_brief_ritual: false,
     initial_emotion_intensity: null,
     shift_mood: 'calm',
     shift_emotion_intensity: null,
+    post_pause_mood: null,
+    post_pause_emotion_intensity: null,
     outcome: 'held',
     note_text: null,
     tags: null,
@@ -239,6 +242,39 @@ describe('computePauseScore', () => {
       expect(heldOut.decisionAlignment).toBe(100);
       expect(boughtOut.decisionAlignment).toBe(60);
       expect(soldOut.decisionAlignment).toBe(15);
+    });
+  });
+
+  describe('post_pause_emotion_logged', () => {
+    it('prefers post_pause_mood over shift_mood for emotional regulation', () => {
+      const stuck = makeRow({
+        initial_mood: 'anxious',
+        shift_mood: 'anxious',
+        post_pause_mood: 'calm',
+        has_post_pause_emotion_logged: true,
+      });
+      const out = computePauseScore({
+        completedRows: [stuck],
+        stepEvents: [],
+        companionEvents: [],
+      })!;
+      expect(out.emotionalRegulation).toBeGreaterThan(50);
+    });
+
+    it('counts post_pause toward self-awareness depth bonus like shift', () => {
+      const withPostOnly = makeRow({
+        has_shift_emotion_logged: false,
+        shift_mood: null,
+        has_post_pause_emotion_logged: true,
+        post_pause_mood: 'calm',
+        post_pause_emotion_intensity: 3,
+      });
+      const out = computePauseScore({
+        completedRows: [withPostOnly],
+        stepEvents: [],
+        companionEvents: [],
+      })!;
+      expect(out.selfAwareness).toBe(15);
     });
   });
 });

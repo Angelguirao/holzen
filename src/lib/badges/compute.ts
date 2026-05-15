@@ -58,6 +58,7 @@ import type {
   PauseCompanionEventRow,
 } from '@/lib/pause-state';
 import type { PauseFullRow } from '@/lib/pause-stats-data-query';
+import { effectivePauseShiftMood } from '@/lib/pause-effective-emotion';
 import { normalizeTrackedAssetId } from '@/lib/tracked-assets';
 
 export interface BadgeSnapshot extends BadgeDefinition {
@@ -166,13 +167,15 @@ export function computeBadges(params: {
   );
 
   // Core skill counters
-  const regulation = completedRows.filter(
-    (r) =>
+  const regulation = completedRows.filter((r) => {
+    const after = effectivePauseShiftMood(r);
+    return (
       r.initial_mood != null &&
-      r.shift_mood != null &&
+      after != null &&
       REACTIVE_MOODS.has(r.initial_mood) &&
-      COMPOSED_MOODS.has(r.shift_mood),
-  ).length;
+      COMPOSED_MOODS.has(after)
+    );
+  }).length;
 
   const tolerance = completedRows.filter((r) => {
     if (!r.outcome || !HOLD_OUTCOMES.has(r.outcome)) return false;

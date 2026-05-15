@@ -4,6 +4,7 @@ import { ResponsiveContainer, BarChart, Bar, XAxis, YAxis, Tooltip, ReferenceLin
 import { ConfidenceChip } from '@/components/stats/ConfidenceChip';
 import { sampleConfidence } from '@/lib/stats/confidence';
 import type { PauseFullRow } from '@/lib/pause-stats-data-query';
+import { effectivePauseShiftMood, effectivePauseShiftIntensity } from '@/lib/pause-effective-emotion';
 import { startOfWeek, format } from 'date-fns';
 
 const COMPOSURE: Record<string, number> = {
@@ -17,25 +18,28 @@ interface Props {
 
 /**
  * Regulation deep-dive card: weekly mood_shift (after - before) from
- * initial_emotion_logged + shift_emotion_logged. Positive = mood improved
- * after the pause. Denominator: completed pauses with both emotions logged.
+ * initial_emotion_logged plus shift or post-completion check-in mood.
+ * Positive = mood improved after the pause. Denominator: completed pauses with both emotions logged.
  */
 export function MoodShiftChart({ rows }: Props) {
   const { t } = useTranslation();
 
   const { weekly, sample, feelIntensityLogged, shiftIntensityLogged } = useMemo(() => {
-    const withPair = rows.filter(
-      (r) =>
+    const withPair = rows.filter((r) => {
+      const afterMood = effectivePauseShiftMood(r);
+      return (
         r.initial_mood != null &&
-        r.shift_mood != null &&
+        afterMood != null &&
         COMPOSURE[r.initial_mood] != null &&
-        COMPOSURE[r.shift_mood] != null,
-    );
+        COMPOSURE[afterMood] != null
+      );
+    });
     const byWeek = new Map<string, { sum: number; n: number }>();
     for (const r of withPair) {
       const iso = r.completed_at ?? r.engaged_at ?? r.created_at;
       const weekStart = startOfWeek(new Date(iso), { weekStartsOn: 1 }).toISOString();
-      const delta = (COMPOSURE[r.shift_mood!] ?? 50) - (COMPOSURE[r.initial_mood!] ?? 50);
+      const afterMood = effectivePauseShiftMood(r)!;
+      const delta = (COMPOSURE[afterMood] ?? 50) - (COMPOSURE[r.initial_mood!] ?? 50);
       const entry = byWeek.get(weekStart) ?? { sum: 0, n: 0 };
       entry.sum += delta;
       entry.n += 1;
@@ -51,7 +55,7 @@ export function MoodShiftChart({ rows }: Props) {
       }));
     const isIntensity = (v: unknown) => typeof v === 'number' && Number.isFinite(v);
     const feelIntensityLogged = withPair.filter((r) => isIntensity(r.initial_emotion_intensity)).length;
-    const shiftIntensityLogged = withPair.filter((r) => isIntensity(r.shift_emotion_intensity)).length;
+    const shiftIntensityLogged = withPair.filter((r) => isIntensity(effectivePauseShiftIntensity(r))).length;
     return { weekly, sample: withPair.length, feelIntensityLogged, shiftIntensityLogged };
   }, [rows]);
 

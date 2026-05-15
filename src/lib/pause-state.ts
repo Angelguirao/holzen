@@ -43,6 +43,7 @@ export type PauseStepType =
   | 'initial_emotion_logged'
   | 'reflection_step'
   | 'shift_emotion_logged'
+  | 'post_pause_emotion_logged'
   | 'outcome_logged'
   | 'note_updated'
   | 'tag_updated'

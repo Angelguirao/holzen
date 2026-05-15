@@ -222,12 +222,15 @@ export function buildDemoFixture(userId: string): DemoFixture {
       has_breath_completed: isCompleted,
       has_initial_emotion_logged: isCompleted,
       has_shift_emotion_logged: isCompleted,
+      has_post_pause_emotion_logged: false,
       has_outcome_logged: isCompleted,
       initial_mood: isCompleted ? spec.initial : null,
       is_brief_ritual: isCompleted && !spec.depth,
       initial_emotion_intensity: isCompleted ? ((i % 5) + 1) : null,
       shift_mood: isCompleted ? spec.shift : null,
       shift_emotion_intensity: isCompleted ? (((i + 2) % 5) + 1) : null,
+      post_pause_mood: null,
+      post_pause_emotion_intensity: null,
       outcome: isCompleted ? spec.outcome : null,
       note_text:
         isCompleted && spec.depth

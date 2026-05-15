@@ -33,7 +33,7 @@ Where possible, time bucketing uses `engaged_at` (via `pauseTimestamp`) so delay
 
 Computed from the last 30 completed pauses using 5 skill dimensions:
 
-- **Emotional Regulation**: mood -> mood_after improvement + breathing bonus
+- **Emotional Regulation**: entry mood → after-mood improvement (after = latest `post_pause_emotion_logged` or `shift_emotion_logged`) + breathing bonus
 - **Distress Tolerance**: outcome quality under volatility context
 - **Decision Alignment**: alignment to hold-goal strategy (only when hold goal exists)
 - **Cognitive Reappraisal**: use of perspective companions (zoom/history/signal/grounding)

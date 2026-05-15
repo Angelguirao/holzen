@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { ConfidenceChip } from '@/components/stats/ConfidenceChip';
 import { sampleConfidence } from '@/lib/stats/confidence';
 import type { PauseFullRow } from '@/lib/pause-stats-data-query';
+import { effectivePauseShiftMood } from '@/lib/pause-effective-emotion';
 
 const REACTIVE = new Set(['fomo', 'greedy', 'fearful', 'anxious', 'excited']);
 const COMPOSED = new Set(['calm', 'detached']);
@@ -23,9 +24,10 @@ export function ReactiveToComposedConversionCard({ rows }: Props) {
     const reactive = rows.filter(
       (r) => r.initial_mood != null && REACTIVE.has(r.initial_mood),
     );
-    const converted = reactive.filter(
-      (r) => r.shift_mood != null && COMPOSED.has(r.shift_mood),
-    );
+    const converted = reactive.filter((r) => {
+      const after = effectivePauseShiftMood(r);
+      return after != null && COMPOSED.has(after);
+    });
     const rate =
       reactive.length === 0 ? null : Math.round((converted.length / reactive.length) * 100);
     return { rate, reactiveTotal: reactive.length };
