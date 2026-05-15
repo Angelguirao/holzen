@@ -131,7 +131,7 @@ If two rows in the reference table below look “duplicated,” check whether th
 **D. Calling the reflection model**
 
 - **Manual:** Edge function `**holzen-reflect`** (auth, sanitization, analytics) calls `**generateUnifiedReflection**` once the deep ritual reaches **Reflect** (`**use-pause-reflect-generation**` in **`PauseSession`**, kept enabled through **Decide**).
-- **Automatic:** `**check-volatility`** **does not** call `**generateUnifiedReflection`** on claim. The pause row is created server-side; **`holzen-reflect`** runs later in the **browser** at **Reflect**, same as manual.
+- **Automatic:** `**check-volatility`** **does not** call `**generateUnifiedReflection`** on claim. The pause row is created server-side; **`holzen-reflect`** runs later in the **browser** once the ritual reaches **Reflect** (same **`PauseSession`** hook window through **Decide** as manual).
 
 *Why:* one thin HTTP wrapper for the client; the cron focuses on eligibility, **`pause_create_or_reuse_as`**, and delivery signals—reflection stays user-session scoped.
 
@@ -678,7 +678,7 @@ Exact SQL lives in **[cron-setup.md](../../ops/cron-setup.md)**. Typical schedul
 
 **What the user sees** is one pause surface: reflection copy, an intervention (mirror / trap / pattern / question / default), and optional companion cards driven by preferences.
 
-**What the server does** is split across phases: (1) **reflect-step** — browser **`holzen-reflect`** calling `generateUnifiedReflection` when the user reaches **Reflect** (the model output is **message + haiku**; `**holzen-reflect**` may echo `**grounding_***` keys for API stability, but `**generateUnifiedReflection**` often returns them as **null** — companion slots fill those via orchestration); (2) **orchestration** — `companion-orchestrate` may run model-backed generators (one per typical **client** lazy request, or **several in one** invoke when a **server** caller sets multiple `**enable*`** flags) (Signal, Grounding, History, Zoom Out, and question mode when selected), then write results to **`pause_ai_artifacts`**, `**companion_serves**`, and analytics. The **`pregenerate-companions`** job does **not** use this path: it only pre-fills **`companion_cache`** (see [pregenerate.md](companions/pregenerate.md)).
+**What the server does** is split across phases: (1) **reflect-step** — browser **`holzen-reflect`** calling `generateUnifiedReflection` once **`PauseSession`** enables reflect generation (**Reflect** through **Decide** in deep mode; the model output is **message + haiku**; `**holzen-reflect**` may echo `**grounding_***` keys for API stability, but `**generateUnifiedReflection**` often returns them as **null** — companion slots fill those via orchestration); (2) **orchestration** — `companion-orchestrate` may run model-backed generators (one per typical **client** lazy request, or **several in one** invoke when a **server** caller sets multiple `**enable*`** flags) (Signal, Grounding, History, Zoom Out, and question mode when selected), then write results to **`pause_ai_artifacts`**, `**companion_serves**`, and analytics. The **`pregenerate-companions`** job does **not** use this path: it only pre-fills **`companion_cache`** (see [pregenerate.md](companions/pregenerate.md)).
 
 **Rate limits and budgets** do not line up 1:1 with that UX split:
 
