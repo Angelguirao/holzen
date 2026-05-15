@@ -5,7 +5,10 @@ import { useTranslation } from 'react-i18next';
 import { hapticFeedback } from '@/lib/haptics';
 import { pauseStepLayout } from '@/components/pause/pause-step-layout';
 import { Button } from '@/components/ui/button';
-import { computeBreathingPhaseAdvance } from '@/lib/pause-breathing-phase-advance';
+import {
+  computeBreathingPhaseAdvance,
+  resolveBreathingCompleted,
+} from '@/lib/pause-breathing-phase-advance';
 import {
   playPauseBreathPatternCompleteCue,
   playPauseBreathPhaseCue,
@@ -175,7 +178,7 @@ export const PauseBreathing = forwardRef<PauseBreathingHandle, Props>(function P
   const [cycle, setCycle] = useState(0);
   const [completedLocal, setCompletedLocal] = useState(!!completedProp);
 
-  const completed = completedProp ?? completedLocal;
+  const completed = resolveBreathingCompleted(completedProp, completedLocal);
   const currentPhase = pattern.phases[phaseIndex];
 
   const onPatternCompleteRef = useRef(onPatternComplete);
@@ -252,6 +255,7 @@ export const PauseBreathing = forwardRef<PauseBreathingHandle, Props>(function P
       setCompletedLocal(true);
       hapticFeedback('success');
       setElapsed(0);
+      phaseAdvanceGuardRef.current = false;
       return;
     }
 
