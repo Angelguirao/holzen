@@ -22,6 +22,7 @@ function baseInput(
     goBack: vi.fn(),
     setBreathingFirstCompleted: vi.fn(),
     setBreathingSecondCompleted: vi.fn(),
+    setBreathSecondTimedPatternStarted: vi.fn(),
     ...overrides,
   };
 }
@@ -87,7 +88,7 @@ describe('usePauseSessionHeaderBackHandler', () => {
     expect(reset).not.toHaveBeenCalled();
   });
 
-  it('deep second Breathe while timed: resetToIntro only', () => {
+  it('deep second Breathe while timed: resetToIntro and clears second timed flag', () => {
     const input = baseInput({
       ritualEntry: 'deep',
       briefStep: 'feel',
@@ -99,6 +100,26 @@ describe('usePauseSessionHeaderBackHandler', () => {
       result.current.handlePauseHeaderBack();
     });
     expect(input.goBack).not.toHaveBeenCalled();
+    const reset = (input.breathingRef.current as unknown as { resetToIntro: ReturnType<typeof vi.fn> })
+      .resetToIntro;
+    expect(reset).toHaveBeenCalledTimes(1);
+    expect(input.setBreathSecondTimedPatternStarted).toHaveBeenCalledWith(false);
+  });
+
+  it('deep second Breathe interstitial: reset clears second completion and timed flag', () => {
+    const input = baseInput({
+      ritualEntry: 'deep',
+      briefStep: 'feel',
+      step: 'breath2',
+      breathTimedActive: false,
+      breathingSecondCompleted: true,
+    });
+    const { result } = renderHook(() => usePauseSessionHeaderBackHandler(input));
+    act(() => {
+      result.current.handlePauseHeaderBack();
+    });
+    expect(input.setBreathingSecondCompleted).toHaveBeenCalledWith(false);
+    expect(input.setBreathSecondTimedPatternStarted).toHaveBeenCalledWith(false);
     const reset = (input.breathingRef.current as unknown as { resetToIntro: ReturnType<typeof vi.fn> })
       .resetToIntro;
     expect(reset).toHaveBeenCalledTimes(1);

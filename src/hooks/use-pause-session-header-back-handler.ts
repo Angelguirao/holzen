@@ -15,6 +15,7 @@ export function usePauseSessionHeaderBackHandler(input: {
   goBack: () => void;
   setBreathingFirstCompleted: Dispatch<SetStateAction<boolean>>;
   setBreathingSecondCompleted: Dispatch<SetStateAction<boolean>>;
+  setBreathSecondTimedPatternStarted: Dispatch<SetStateAction<boolean>>;
 }): { handlePauseHeaderBack: () => void } {
   const {
     breathingRef,
@@ -27,6 +28,7 @@ export function usePauseSessionHeaderBackHandler(input: {
     goBack,
     setBreathingFirstCompleted,
     setBreathingSecondCompleted,
+    setBreathSecondTimedPatternStarted,
   } = input;
 
   const handlePauseHeaderBack = useCallback(() => {
@@ -41,14 +43,19 @@ export function usePauseSessionHeaderBackHandler(input: {
     switch (intent.kind) {
       case 'deep_breath_reset_intro':
         breathingRef.current?.resetToIntro();
+        if (step === 'breath2') setBreathSecondTimedPatternStarted(false);
         return;
       case 'deep_breath2_reset_intro_clear_second':
         breathingRef.current?.resetToIntro();
         setBreathingSecondCompleted(false);
+        setBreathSecondTimedPatternStarted(false);
         return;
       case 'go_back':
         if (ritualEntry === 'deep' && step === 'breathe') {
           setBreathingFirstCompleted(false);
+        }
+        if ((ritualEntry === 'deep' || ritualEntry === 'picker') && step === 'breath2') {
+          setBreathingSecondCompleted(false);
         }
         goBack();
     }
@@ -63,6 +70,7 @@ export function usePauseSessionHeaderBackHandler(input: {
     goBack,
     setBreathingFirstCompleted,
     setBreathingSecondCompleted,
+    setBreathSecondTimedPatternStarted,
   ]);
 
   return { handlePauseHeaderBack };

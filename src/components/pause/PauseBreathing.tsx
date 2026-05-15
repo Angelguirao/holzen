@@ -101,7 +101,7 @@ export const PauseBreathing = forwardRef<PauseBreathingHandle, Props>(function P
     breathSegment = 'first',
     feelTile = null,
     onContinueAfterBreath,
-    onSkipBreath: _onSkipBreath,
+    onSkipBreath,
     completed: completedProp,
     onPatternComplete,
     onTimedBreathingChange,
@@ -303,22 +303,27 @@ export const PauseBreathing = forwardRef<PauseBreathingHandle, Props>(function P
           />
 
           <div className="flex max-w-md flex-col items-center gap-4 text-center">
-            <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-muted-foreground">{introKicker}</p>
+            {breathSegment === 'second' ? null : (
+              <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-muted-foreground">{introKicker}</p>
+            )}
             {breathSegment === 'second' ? (
               <>
                 <p className={pauseStepLayout.screenTitle}>
-                  {t('pause.breathSecondHeadline', { defaultValue: "Let's slow this down again" })}
+                  {t('pause.breathSecondHeadline', { defaultValue: 'Just two more breaths' })}
                 </p>
-                <p className={pauseStepLayout.screenSubtitle}>
-                  {t('pause.breathIntroGuidance', { defaultValue: 'Just follow the rhythm.' })}
-                </p>
+                <div className={`${pauseStepLayout.screenSubtitle} flex flex-col gap-0`}>
+                  <p>{t('pause.breathSecondSubline1', { defaultValue: 'Decisions land differently' })}</p>
+                  <p>{t('pause.breathSecondSubline2', { defaultValue: 'when the body is here.' })}</p>
+                </div>
               </>
             ) : (
-              <p className={`${pauseStepLayout.screenTitle} max-w-md`}>
-                {t('pause.breathIntroSingle', {
-                  defaultValue: "Let's slow this down. Just follow the rhythm.",
-                })}
-              </p>
+              <>
+                <p className={`${pauseStepLayout.screenTitle} max-w-md`}>
+                  {t('pause.breathIntroSingle', {
+                    defaultValue: "Let's slow this down. Just follow the rhythm.",
+                  })}
+                </p>
+              </>
             )}
             {breathSegment === 'first' && mantra && (
               <motion.p
@@ -353,6 +358,19 @@ export const PauseBreathing = forwardRef<PauseBreathingHandle, Props>(function P
                 <Play className="h-4 w-4 shrink-0 fill-current" aria-hidden />
               </Button>
             </motion.div>
+            {ritualVar === 'deep' && breathSegment === 'second' ? (
+              <Button
+                type="button"
+                variant="ghost"
+                className={`${pauseStepLayout.textContinue} font-medium`}
+                onClick={() => {
+                  hapticFeedback('light');
+                  void onSkipBreath();
+                }}
+              >
+                {t('pause.breathSkipToDecide', { defaultValue: 'Skip to decide' })}
+              </Button>
+            ) : null}
           </div>
         </>
       ) : !completed ? (

@@ -9,6 +9,8 @@ export type PauseSessionHeaderBackInput = {
   breathTimedActive: boolean;
   /** True after the user starts the triangle countdown on first Breathe (brief or deep); hides shell back until intro again. */
   breathFirstTimedPatternStarted: boolean;
+  /** Deep second Breathe: after Start on timed pattern, hide shell back until intro again (wireframe parity with first Breathe). */
+  breathSecondTimedPatternStarted: boolean;
   breathingFirstCompleted: boolean;
   breathingSecondCompleted: boolean;
 };
@@ -18,8 +20,8 @@ export type PauseSessionHeaderBackInput = {
  * Mirrors `showPauseHeaderBack` in `PauseSession` (brief vs non-brief branches).
  *
  * **Brief:** chevron on **Breathe** only **before** the timed pattern starts (intro → Feel to change mood).
- * **Deep:** same on **first Breathe** intro only; hidden on **second Breathe**
- * (`breath2`); hidden on **Reflect** (Continue-only; back returns from **Frame** to add notes); shown from **Frame** onward.
+ * **Deep:** same on **first Breathe** intro only; **second Breathe** matches (back on intro, hidden after Start / interstitial).
+ * Hidden on **Reflect** (Continue-only; back returns from **Frame** to add notes); shown from **Frame** onward.
  */
 export function isPauseSessionHeaderBackVisible(p: PauseSessionHeaderBackInput): boolean {
   if (p.phase !== 'session') return false;
@@ -27,7 +29,8 @@ export function isPauseSessionHeaderBackVisible(p: PauseSessionHeaderBackInput):
     return p.briefStep === 'breath' && !p.breathFirstTimedPatternStarted;
   }
   if (p.step === 'breathe') return !p.breathFirstTimedPatternStarted;
-  if (p.step === 'breath2') return false;
+  if (p.step === 'breath2')
+    return !(p.breathSecondTimedPatternStarted || p.breathTimedActive || p.breathingSecondCompleted);
   if (p.step === 'reflect') return false;
   return STEPS.indexOf(p.step) > 0;
 }
