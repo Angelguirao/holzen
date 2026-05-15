@@ -128,7 +128,7 @@ export function PauseDone({
     const pointPreviewImpacts = briefImpacts.filter((i) => i.points > 0);
     const checkInRowRightHint = t('pause.brief.done.checkInRowRightHint', {
       defaultValue:
-        'Optional — only updates your saved pause if you change mood or intensity, then tap Save.',
+        "You don't get extra skill points here—the +scores above are already from this pause. This only updates how you feel after deciding if you change mood or intensity, then Save.",
     });
 
     const journeyShort = t('pause.brief.done.journeyShort', {
@@ -172,7 +172,7 @@ export function PauseDone({
                 <p className="mx-auto max-w-sm text-[11px] leading-snug text-muted-foreground">
                   {t('pause.brief.done.journeyImpactNote', {
                     defaultValue:
-                      'Illustrative mix for this pause — not live point totals. Journey infers skills from your pattern over time.',
+                      'Illustrative mix for this pause (before this step)—not live point totals. Journey infers skills from your pattern over time.',
                   })}
                 </p>
               </>
