@@ -43,6 +43,19 @@ function session(overrides: Partial<PersistedSession> = {}): PersistedSession {
 }
 
 describe('computePauseSessionHydration', () => {
+  it('restores session with instance id before reflection text exists', () => {
+    const out = computePauseSessionHydration({
+      restored: session({ message: '', pauseInstanceId: 'pre-reflect', step: 'reflect' }),
+      ...navEmpty,
+      ...holzenBase,
+    });
+    expect(out).toMatchObject({
+      status: 'ready',
+      message: '',
+      pauseInstanceId: 'pre-reflect',
+    });
+  });
+
   it('prefers restored session when present', () => {
     const out = computePauseSessionHydration({
       restored: session({ message: 'from disk' }),
