@@ -20,6 +20,11 @@ import {
   computeContextFingerprint,
 } from '@/lib/pause-fingerprint';
 import { trackEvent } from '@/lib/posthog';
+import {
+  MANUAL_PAUSE_TRIGGER_IDLE,
+  type ManualPauseTriggerResult,
+} from '@/lib/manual-pause-trigger-result';
+import { clearSession } from '@/lib/pause-session-storage';
 
 const PAUSE_MANUAL_START_HOME = 'holzen_sess_pause_manual_started_home';
 
@@ -93,6 +98,7 @@ export function useHolzen() {
     setMessage(null);
     setContext(null);
     setCompanions({ haiku: null, groundingTitle: null, groundingBody: null });
+    clearSession();
   }, []);
 
   /** Re-read v_pause_current + artifacts so Home matches Library after completes / dismissals. */
@@ -184,12 +190,12 @@ export function useHolzen() {
     };
   }, [user, syncOpenPauseFromDb]);
 
-  /** Create the V2 pause instance (reflection AI runs at Reflect step). Returns whether Home should treat the trigger as successful. */
+  /** Create the V2 pause instance (reflection AI runs at Reflect step). */
   const generateMessage = useCallback(
-    async (data: BtcPriceData, mood?: string): Promise<boolean> => {
+    async (data: BtcPriceData, mood?: string): Promise<ManualPauseTriggerResult> => {
       if (!user) {
         holzenLog.manual('generateMessage: skipped (no user)');
-        return false;
+        return MANUAL_PAUSE_TRIGGER_IDLE;
       }
       markPauseManualStartedHomeOnce();
       const t0 = Date.now();
@@ -243,10 +249,11 @@ export function useHolzen() {
           });
           if (!res.instance_id) {
             setError(pauseCreateSkippedUserMessage(res.reused_reason));
-            return false;
+            return MANUAL_PAUSE_TRIGGER_IDLE;
           }
           const isPendingOffer = res.pending_offer === true;
           if (!isPendingOffer) {
+            clearSession();
             setLastPauseInstanceId(res.instance_id);
           }
           if (res.created) {
@@ -291,13 +298,18 @@ export function useHolzen() {
           if (!isPendingOffer) {
             await syncOpenPauseFromDb();
           }
-          return true;
+          return {
+            opened: true,
+            instanceId: res.instance_id,
+            context: ctx,
+            pendingOffer: isPendingOffer || undefined,
+          };
         } catch (e: unknown) {
           holzenLog.manual('generateMessage: silent pause create failed', {
             message: e instanceof Error ? e.message : String(e),
           });
           setError(reflectionPersistErrorMessage(e));
-          return false;
+          return MANUAL_PAUSE_TRIGGER_IDLE;
         }
       }
 
@@ -324,7 +336,7 @@ export function useHolzen() {
         if (!res.instance_id) {
           holzenLog.manual('generateMessage: reuse/skip', { reason: res.reused_reason });
           setError(pauseCreateSkippedUserMessage(res.reused_reason));
-          return false;
+          return MANUAL_PAUSE_TRIGGER_IDLE;
         }
 
         const isPendingOffer = res.pending_offer === true;
@@ -344,6 +356,7 @@ export function useHolzen() {
         }
 
         if (!isPendingOffer) {
+          clearSession();
           setLastPauseInstanceId(res.instance_id);
           setContext(ctx);
           setMessage(null);
@@ -364,7 +377,12 @@ export function useHolzen() {
         if (!isPendingOffer) {
           await syncOpenPauseFromDb();
         }
-        return true;
+        return {
+          opened: true,
+          instanceId: res.instance_id,
+          context: ctx,
+          pendingOffer: isPendingOffer || undefined,
+        };
       } catch (e: unknown) {
         const raw = e instanceof Error ? e.message : String(e);
         holzenLog.manual('generateMessage: error', { message: raw });
@@ -373,7 +391,7 @@ export function useHolzen() {
         } else {
           setError('Could not open a pause right now. Try again shortly.');
         }
-        return false;
+        return MANUAL_PAUSE_TRIGGER_IDLE;
       } finally {
         setLoading(false);
       }
@@ -420,14 +438,14 @@ export function useHolzen() {
   const nextCronCheckIn = useCallback(() => millisecondsUntilNextQuarterHour(), []);
 
   const manualTrigger = useCallback(
-    async (mood?: string) => {
+    async (mood?: string): Promise<ManualPauseTriggerResult> => {
       const remaining = manualCooldownRemaining();
       if (remaining > 0) {
         holzenLog.manual('manualTrigger: blocked by cooldown', {
           remainingMs: remaining,
           devMode: isHolzenDevMode(),
         });
-        return;
+        return MANUAL_PAUSE_TRIGGER_IDLE;
       }
 
       try {
@@ -442,12 +460,13 @@ export function useHolzen() {
             queryKey: marketOpts.queryKey,
             queryFn: marketOpts.queryFn,
           }));
-        const opened = await generateMessage(data, mood);
-        if (opened) {
+        const result = await generateMessage(data, mood);
+        if (result.opened) {
           const now = Date.now();
           setLastManualAt(now);
           localStorage.setItem(manualCooldownKey, String(now));
         }
+        return result;
       } catch (e: unknown) {
         const raw = e instanceof Error ? e.message : String(e);
         if (raw.includes('fetch') || raw.includes('Failed to fetch')) {
@@ -455,12 +474,14 @@ export function useHolzen() {
         } else {
           setError('Could not start a pause right now. Try again in a moment.');
         }
+        return MANUAL_PAUSE_TRIGGER_IDLE;
       }
     },
     [btcQuery.data, generateMessage, manualCooldownRemaining, currency, manualCooldownKey, profileTrackedAssetId, queryClient],
   );
 
   const dismissMessage = useCallback(async () => {
+    clearSession();
     setMessage(null);
     setContext(null);
     setCompanions({ haiku: null, groundingTitle: null, groundingBody: null });
