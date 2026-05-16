@@ -1579,6 +1579,7 @@ export type Database = {
           is_admin: boolean | null
           language: string
           last_context: string | null
+          last_message: string | null
           last_trigger_at: string | null
           lifetime_access: boolean
           mantra: string | null
@@ -1632,6 +1633,7 @@ export type Database = {
           is_admin?: boolean | null
           language?: string
           last_context?: string | null
+          last_message?: string | null
           last_trigger_at?: string | null
           lifetime_access?: boolean
           mantra?: string | null
@@ -1685,6 +1687,7 @@ export type Database = {
           is_admin?: boolean | null
           language?: string
           last_context?: string | null
+          last_message?: string | null
           last_trigger_at?: string | null
           lifetime_access?: boolean
           mantra?: string | null
