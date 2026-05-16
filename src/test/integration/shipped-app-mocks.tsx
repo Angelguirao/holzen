@@ -29,6 +29,8 @@ vi.mock('@/hooks/use-subscription', () => ({
     flexCreditsBalance: 0,
     refresh: vi.fn().mockResolvedValue(undefined),
     startCheckout: vi.fn(),
+    ensureTrial: vi.fn().mockResolvedValue(undefined),
+    trialLoading: false,
     openPortal: vi.fn(),
   }),
 }));
