@@ -1,15 +1,10 @@
 import type { TFunction } from 'i18next';
 import type { ReactNode } from 'react';
-import type { ComponentProps } from 'react';
 import { BtcStatus } from '@/components/BtcStatus';
-import { NightReflectionCard } from '@/components/NightReflectionCard';
 import { HomeGoalWhyCard } from '@/components/home/HomeGoalWhyCard';
 import { HomeSectionCard } from '@/components/home/HomeSectionCard';
-import { HomeQuickCapture } from '@/components/home/HomeQuickCapture';
 import type { BtcPriceData } from '@/lib/btc';
 import type { TrackedAssetId } from '@/lib/tracked-assets';
-
-type NightReflection = NonNullable<ComponentProps<typeof NightReflectionCard>['reflection']>;
 
 /** Everything needed to render one Home “Today” / goal-why section by id. */
 export interface HomeDashboardSectionDeps {
@@ -33,8 +28,6 @@ export interface HomeDashboardSectionDeps {
   toggleMarketChartExpanded: () => void;
   pauseCardBody: ReactNode;
   pauseSectionHeaderRight: ReactNode | undefined;
-  nightReflection: NightReflection | null;
-  dismissNight: () => void;
   subscribed: boolean;
   collapsed: Record<string, boolean>;
   toggleCollapsed: (id: string) => void;
@@ -89,29 +82,9 @@ export function renderHomeDashboardSection(sectionId: string, d: HomeDashboardSe
       );
 
     case 'quick-capture':
-      return (
-        <HomeSectionCard
-          title={d.t('home.widget.quickCapture')}
-          collapsible
-          collapsed={!!d.collapsed['quick-capture']}
-          onToggleCollapse={() => d.toggleCollapsed('quick-capture')}
-        >
-          <HomeQuickCapture />
-        </HomeSectionCard>
-      );
-
     case 'night':
-      if (!d.nightReflection || !d.subscribed) return null;
-      return (
-        <HomeSectionCard
-          title={d.t('home.widget.evening')}
-          collapsible
-          collapsed={!!d.collapsed.night}
-          onToggleCollapse={() => d.toggleCollapsed('night')}
-        >
-          <NightReflectionCard reflection={d.nightReflection} onDismiss={d.dismissNight} />
-        </HomeSectionCard>
-      );
+    case 'journey-pulse':
+      return null;
 
     default:
       return null;

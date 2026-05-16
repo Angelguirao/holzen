@@ -1,31 +1,31 @@
-import type { ProfileTab } from '@/lib/router-location-state';
+/** Authenticated Journey overview (MVP — no tab subpaths). */
+export const JOURNEY_PREFIX = '/journey' as const;
 
-/** Authenticated “Journey” hub (stats, insights, badges, activity). */
-export const JOURNEY_PREFIX = '/journey';
+/** Shipped primary shell tabs (order matches BottomNav). */
+export const APP_SHELL_TABS = [
+  { to: '/', key: 'home' },
+  { to: '/archive', key: 'archive' },
+  { to: JOURNEY_PREFIX, key: 'journey' },
+  { to: '/settings', key: 'settings' },
+] as const;
 
-/** In-app tools hub in the shell; immersive `/tools/...` routes are full-screen (no bottom nav). */
-export const TOOLS_PREFIX = '/tools';
+export type AppShellTabKey = (typeof APP_SHELL_TABS)[number]['key'];
+
+/** Registered authenticated shell paths (404 for anything else). */
+export const APP_SHELL_ROUTES = ['/', '/archive', JOURNEY_PREFIX, '/settings'] as const;
 
 /**
- * Instance-scoped companion flows (orchestrated from `/pause`). Not under `/tools/*`;
- * that namespace is for regulation / practice / letters.
+ * Bookmarkable settings section URL (`/settings/<id>`).
+ * Valid ids: you, companions, notifications, subscription, account.
  */
-export const COMPANION_PREFIX = '/companion' as const;
-
-/** Build a bookmarkable Journey URL. */
-export function journeyPath(tab: ProfileTab): string {
-  return `${JOURNEY_PREFIX}/${tab}`;
+export function settingsSectionPath(section: string): string {
+  return `/settings/${encodeURIComponent(section)}`;
 }
 
-/** Full-screen in shell: letters to future self; optional `letter` for notification deep link. */
-export function toolsLettersPath(opts?: { letterId?: string }): string {
-  if (opts?.letterId) {
-    return `${TOOLS.letters}?letter=${encodeURIComponent(opts.letterId)}`;
-  }
-  return TOOLS.letters;
-}
+/** @deprecated Full-IA tools namespace — not registered in MVP router; reference/legacy only. */
+export const TOOLS_PREFIX = '/tools';
 
-/** Immersive regulation / practice tools (single namespace). */
+/** @deprecated Full-IA companion/tools helpers — legacy imports until Step 3 move. */
 export const TOOLS = {
   hub: '/tools',
   letters: '/tools/letters',
@@ -40,14 +40,20 @@ export const TOOLS = {
   },
 } as const;
 
-export function isProfileTab(s: string | undefined): s is ProfileTab {
-  return s === 'stats' || s === 'insights' || s === 'badges' || s === 'activity';
+/** @deprecated Use `/journey` — full-IA tab paths are not registered. */
+export function journeyPath(_tab: 'stats' | 'insights' | 'badges' | 'activity'): string {
+  return JOURNEY_PREFIX;
 }
 
-/**
- * Bookmarkable settings section URL (`/settings/<id>`).
- * Valid ids: you, reflection, experience, companions, notifications, subscription, account.
- */
-export function settingsSectionPath(section: string): string {
-  return `/settings/${encodeURIComponent(section)}`;
+/** @deprecated Full-IA tools letters deep link. */
+export function toolsLettersPath(opts?: { letterId?: string }): string {
+  if (opts?.letterId) {
+    return `${TOOLS.letters}?letter=${encodeURIComponent(opts.letterId)}`;
+  }
+  return TOOLS.letters;
+}
+
+/** @deprecated Full-IA Profile tab guard. */
+export function isProfileTab(_s: string | undefined): _s is 'stats' | 'insights' | 'badges' | 'activity' {
+  return false;
 }

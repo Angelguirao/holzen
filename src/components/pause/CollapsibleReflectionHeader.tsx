@@ -75,7 +75,6 @@ export function CollapsibleReflectionHeader({
                 </button>
               )}
               <ShareReflection message={message} context={context} haiku={haiku} />
-              {subscribed && <ReflectionWallpaper message={message} mood={null} context={context} haiku={haiku} variant="button" />}
             </div>
           </motion.div>
         )}

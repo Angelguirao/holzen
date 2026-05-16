@@ -3,13 +3,10 @@ import { memo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { HomeHeroQuote } from '@/components/home/HomeHeroQuote';
 import { HomeCustomizeSheet } from '@/components/home/HomeCustomizeSheet';
-import { HomeStatTiles } from '@/components/home/HomeStatTiles';
 import { HomePullRefreshIndicator } from '@/components/home/HomePullRefreshIndicator';
 import { HomeCustomizeLinkButton } from '@/components/home/HomeCustomizeLinkButton';
 import { InstallHolzenCard } from '@/components/InstallHolzenCard';
 import { TestimonialRequest } from '@/components/TestimonialRequest';
-import { JOURNEY_STAT_TILES_VISIBILITY_ID } from '@/lib/home-section-visibility-constants';
-
 export interface HomeDashboardLayoutCustomizeProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
@@ -38,7 +35,6 @@ export interface HomeDashboardLayoutProps {
   userId: string | undefined;
   firstName: string | null | undefined;
   todaySectionIds: string[];
-  showJourneyStatTiles: boolean;
   goalWhyBlock: ReactNode | null;
   renderSection: (sectionId: string) => ReactNode;
   onOpenCustomize: () => void;
@@ -54,7 +50,6 @@ export const HomeDashboardLayout = memo(function HomeDashboardLayout({
   userId,
   firstName,
   todaySectionIds,
-  showJourneyStatTiles,
   goalWhyBlock,
   renderSection,
   onOpenCustomize,
@@ -92,14 +87,6 @@ export const HomeDashboardLayout = memo(function HomeDashboardLayout({
             </div>
             <div className="space-y-4">
               {todaySectionIds.map((sectionId) => {
-                if (sectionId === JOURNEY_STAT_TILES_VISIBILITY_ID) {
-                  if (!showJourneyStatTiles) return null;
-                  return (
-                    <div key={sectionId}>
-                      <HomeStatTiles />
-                    </div>
-                  );
-                }
                 const node = renderSection(sectionId);
                 if (node == null) return null;
                 return <div key={sectionId}>{node}</div>;

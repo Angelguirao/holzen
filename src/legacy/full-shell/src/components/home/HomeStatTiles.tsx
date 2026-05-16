@@ -8,7 +8,7 @@ import { useHoldGoalProfile } from '@/hooks/use-hold-goal';
 import { useBadges } from '@/hooks/use-badges';
 import { useSubscription } from '@/hooks/use-subscription';
 import { computePauseScore } from '@/lib/stats/pause-score';
-import { journeyPath } from '@/lib/app-routes';
+import { JOURNEY_PREFIX } from '@/lib/app-routes';
 import { Skeleton } from '@/components/ui/skeleton';
 import type { BadgeSnapshot } from '@/lib/badges/compute';
 import { cn } from '@/lib/utils';
@@ -85,7 +85,7 @@ export function HomeStatTiles() {
   return (
     <div className="grid grid-cols-2 gap-3">
       <Link
-        to={journeyPath('stats')}
+        to={JOURNEY_PREFIX}
         aria-label={t('home.journeyPulse.openStats')}
         className={cn(
           'relative flex min-h-[128px] flex-col overflow-hidden rounded-xl border border-border/40 p-3',
@@ -119,7 +119,7 @@ export function HomeStatTiles() {
       </Link>
 
       <Link
-        to={journeyPath('badges')}
+        to={JOURNEY_PREFIX}
         aria-label={t('home.journeyPulse.openBadges')}
         className={cn(
           'relative flex min-h-[128px] flex-col overflow-hidden rounded-xl border border-border/40 p-3',

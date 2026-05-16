@@ -20,8 +20,7 @@ import { FeedbackWidget } from "./components/FeedbackWidget";
 
 const Home = lazy(() => import("./pages/Home"));
 const Archive = lazy(() => import("./pages/Archive"));
-const Profile = lazy(() => import("./pages/Profile"));
-const BadgeGuide = lazy(() => import("./pages/BadgeGuide"));
+const JourneyOverview = lazy(() => import("./pages/journey/JourneyOverview"));
 const SettingsRoot = lazy(() => import("./pages/settings/SettingsRoot"));
 const SettingsStateLayout = lazy(() => import("./pages/settings/SettingsStateLayout"));
 const SettingsHub = lazy(() => import("./pages/settings/SettingsHub"));
@@ -35,38 +34,22 @@ const NotFound = lazy(() => import("./pages/NotFound"));
 const About = lazy(() => import("./pages/About"));
 const Blog = lazy(() => import("./pages/Blog"));
 const BlogPost = lazy(() => import("./pages/BlogPost"));
-// Roadmap: public stub page (`RoadmapStub`) — not a full product roadmap inside the shell.
-const Breathe = lazy(() => import("./pages/Breathe"));
-const ToolsGroundLayout = lazy(() => import("./pages/ToolsGroundLayout"));
 const Reserve = lazy(() => import("./pages/Reserve"));
-const PracticeCheckIn = lazy(() => import("./pages/PracticeCheckIn"));
-const PracticeJournal = lazy(() => import("./pages/PracticeJournal"));
-const PracticeBodyScan = lazy(() => import("./pages/PracticeBodyScan"));
-const PracticeReplay = lazy(() => import("./pages/PracticeReplay"));
 const PauseSession = lazy(() => import("./pages/PauseSession"));
 const CompanionZoomOutPage = lazy(() => import("./pages/CompanionZoomOutPage"));
 const CompanionHistoryPage = lazy(() => import("./pages/CompanionHistoryPage"));
 const CompanionSignalPage = lazy(() => import("./pages/CompanionSignalPage"));
 const CompanionGroundingPage = lazy(() => import("./pages/CompanionGroundingPage"));
-const Ground = lazy(() => import("./pages/Ground"));
-const GroundHistory = lazy(() => import("./pages/GroundHistory"));
 const Admin = lazy(() => import("./pages/Admin"));
 const SmokeTest = lazy(() => import("./pages/SmokeTest"));
 const SentryAlerts = lazy(() => import("./pages/SentryAlerts"));
 const EdgeCoverage = lazy(() => import("./pages/EdgeCoverage"));
 const Unsubscribe = lazy(() => import("./pages/Unsubscribe"));
 const BillingHistory = lazy(() => import("./pages/BillingHistory"));
-const ToolsHub = lazy(() => import("./pages/ToolsHub"));
-const ToolsLetters = lazy(() => import("./pages/ToolsLetters"));
 const SettingsAbout = lazy(() => import("./pages/SettingsAbout"));
 const RoadmapStub = lazy(() => import("./pages/RoadmapStub"));
 
 const queryClient = createHolzenQueryClient();
-
-function LibraryToArchiveRedirect() {
-  const { search } = useLocation();
-  return <Navigate to={`/archive${search}`} replace />;
-}
 
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
   const { user, loading } = useAuth();
@@ -179,10 +162,7 @@ const App = () => (
                   <Route path="/" element={<Home />} />
                   <Route path="/index" element={<Navigate to="/" replace />} />
                   <Route path="/archive" element={<Archive />} />
-                  <Route path="/library" element={<LibraryToArchiveRedirect />} />
-                  <Route path="/journey" element={<Navigate to="/journey/stats" replace />} />
-                  <Route path="/journey/:tab" element={<Profile />} />
-                  <Route path="/journey/badges/guide" element={<BadgeGuide />} />
+                  <Route path="/journey" element={<JourneyOverview />} />
                   <Route path="/settings" element={<SettingsRoot />}>
                     <Route path="about" element={<SettingsAbout />} />
                     <Route path="billing-history" element={<BillingHistory />} />
@@ -191,8 +171,6 @@ const App = () => (
                       <Route path=":section" element={<SettingsSectionPage />} />
                     </Route>
                   </Route>
-                  <Route path="/tools" element={<ToolsHub />} />
-                  <Route path="/tools/letters" element={<ToolsLetters />} />
                 </Route>
                 {/* Immersive full-screen experiences — no nav bar */}
                 <Route path="/pause" element={<ProtectedRoute><PauseSession /></ProtectedRoute>} />
@@ -212,15 +190,6 @@ const App = () => (
                   path="/companion/grounding/:pauseInstanceId"
                   element={<ProtectedRoute><CompanionGroundingPage /></ProtectedRoute>}
                 />
-                <Route path="/tools/breathe" element={<ProtectedRoute><Breathe /></ProtectedRoute>} />
-                <Route path="/tools/ground" element={<ProtectedRoute><ToolsGroundLayout /></ProtectedRoute>}>
-                  <Route index element={<Ground />} />
-                  <Route path="history" element={<GroundHistory />} />
-                </Route>
-                <Route path="/tools/practice/checkin" element={<ProtectedRoute><PracticeCheckIn /></ProtectedRoute>} />
-                <Route path="/tools/practice/journal" element={<ProtectedRoute><PracticeJournal /></ProtectedRoute>} />
-                <Route path="/tools/practice/bodyscan" element={<ProtectedRoute><PracticeBodyScan /></ProtectedRoute>} />
-                <Route path="/tools/practice/replay" element={<ProtectedRoute><PracticeReplay /></ProtectedRoute>} />
                 <Route path="/admin" element={<ProtectedRoute><Admin /></ProtectedRoute>} />
                 <Route path="/admin/smoke-test" element={<ProtectedRoute><SmokeTest /></ProtectedRoute>} />
                 <Route path="/admin/sentry-alerts" element={<ProtectedRoute><SentryAlerts /></ProtectedRoute>} />
