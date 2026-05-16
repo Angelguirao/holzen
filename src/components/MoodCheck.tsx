@@ -30,6 +30,9 @@ const allMoods = [
 
 export type MoodValue = (typeof allMoods)[number]['value'];
 
+/** Canonical Feel / Shift / post-pause mood keys (keep aligned with `moodCheck.moods.*`). */
+export const PAUSE_MOOD_VALUES: readonly MoodValue[] = allMoods.map((m) => m.value);
+
 interface Props {
   onSelect: (mood: MoodValue) => void;
   onSkip: () => void | Promise<void>;

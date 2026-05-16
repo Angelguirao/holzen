@@ -2,11 +2,16 @@
  * Shared Perplexity Chat Completions client (edge functions).
  * Returns API usage for cost attribution alongside content.
  *
+ * When **`incoming`** is set, W3C / Sentry trace headers are forwarded on the
+ * HTTP request (see `forward-trace-headers.ts`).
+ *
  * Perplexity returns source URLs in multiple places:
  * - `citations` (string[]) — often populated
  * - `search_results[].url` — frequently populated when `citations` is empty (we merge both)
  * - Inline `https://` links in the assistant message — last-resort fallback
  */
+
+import { fetchInitWithIncomingTrace } from "./forward-trace-headers.ts";
 
 export interface PerplexityUsage {
   prompt_tokens?: number;
@@ -82,16 +87,20 @@ export async function callPerplexityChat(
   apiKey: string,
   log: (msg: string) => void,
   timeoutMs = 10_000,
+  incoming?: Request,
 ): Promise<PerplexityChatResult> {
   const controller = new AbortController();
   const timeout = setTimeout(() => controller.abort(), timeoutMs);
   try {
-    const res = await fetch("https://api.perplexity.ai/chat/completions", {
-      method: "POST",
-      headers: { Authorization: `Bearer ${apiKey}`, "Content-Type": "application/json" },
-      body: JSON.stringify(body),
-      signal: controller.signal,
-    });
+    const res = await fetch(
+      "https://api.perplexity.ai/chat/completions",
+      fetchInitWithIncomingTrace(incoming, {
+        method: "POST",
+        headers: { Authorization: `Bearer ${apiKey}`, "Content-Type": "application/json" },
+        body: JSON.stringify(body),
+        signal: controller.signal,
+      }),
+    );
     clearTimeout(timeout);
     log(`perplexity responded ${res.status}`);
     if (!res.ok) {

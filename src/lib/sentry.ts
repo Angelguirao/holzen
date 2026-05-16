@@ -16,6 +16,16 @@ import * as Sentry from "@sentry/react";
 
 import { SENTRY_DSN } from "@/config/public-env";
 
+function tracePropagationTargets(): (string | RegExp)[] {
+  const raw = import.meta.env.VITE_SUPABASE_URL as string | undefined;
+  if (!raw || typeof raw !== "string") return [];
+  try {
+    return [new URL(raw).origin];
+  } catch {
+    return [];
+  }
+}
+
 /** Keys whose values are free-text user content we must never send to Sentry. */
 const PII_VALUE_KEYS = new Set<string>([
   "email",
@@ -107,6 +117,9 @@ export function initSentry(): void {
         }),
       ],
       tracesSampleRate: 0.1,
+      // W3C `traceparent` + Sentry headers on edge calls (CORS allow-list in `cors.ts`).
+      propagateTraceparent: true,
+      tracePropagationTargets: tracePropagationTargets(),
       replaysSessionSampleRate: 0,
       replaysOnErrorSampleRate: 1.0,
       // Keep breadcrumbs short — they can carry PII from console/fetch traffic.

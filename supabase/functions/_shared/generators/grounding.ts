@@ -26,6 +26,7 @@ import { type CacheServeRelaxation, parseMarketDirection, serveFromCache } from 
 import { createAttemptLogger, trackEvent } from "../observe.ts";
 import { enqueueCatalogSourceSuggestion } from "../source-suggestions.ts";
 import { callPerplexityChat, mergePerplexityUsage } from "../perplexity-client.ts";
+import { fetchInitWithIncomingTrace } from "../forward-trace-headers.ts";
 import { searchLibrary, paperToGrounding, recordLibraryServe } from "../content-library.ts";
 import { getPhaseConfig } from "../phase-config.ts";
 import { type CompanionCacheTitleRow } from "../companion-cache-dedup.ts";
@@ -79,6 +80,8 @@ export interface GenerateGroundingParams {
   /** Skip the live phase only — library/cache still serve. Used by circuit breaker. */
   skipLive?: boolean;
   log: (msg: string, extra?: Record<string, unknown>) => void;
+  /** Edge `Request` for W3C trace propagation to Perplexity. */
+  incomingRequest?: Request;
 }
 
 // ── Internals ──
@@ -224,6 +227,7 @@ export async function generateGrounding(params: GenerateGroundingParams): Promis
     forceLive,
     skipLive,
     log,
+    incomingRequest,
   } = params;
   const marketDirectionForCache = parseMarketDirection(context);
   const phases = getPhaseConfig();
@@ -337,7 +341,7 @@ DIVERSITY: Use a different journal/venue angle when possible. Do not recycle the
     let apiCalls = 0;
     let mergedUsage = undefined as ReturnType<typeof mergePerplexityUsage>;
 
-    const result = await callPerplexityChat(perplexityBody, PERPLEXITY_API_KEY, (m) => log(m));
+    const result = await callPerplexityChat(perplexityBody, PERPLEXITY_API_KEY, (m) => log(m), 10_000, incomingRequest);
     apiCalls++;
     mergedUsage = result.usage;
     searchContent = result.content;
@@ -349,7 +353,7 @@ DIVERSITY: Use a different journal/venue angle when possible. Do not recycle the
       const retryBody = { ...perplexityBody };
       delete retryBody.search_domain_filter;
       try {
-        const retry = await callPerplexityChat(retryBody, PERPLEXITY_API_KEY, (m) => log(m));
+        const retry = await callPerplexityChat(retryBody, PERPLEXITY_API_KEY, (m) => log(m), 10_000, incomingRequest);
         apiCalls++;
         mergedUsage = mergePerplexityUsage(mergedUsage, retry.usage);
         if (retry.citations.length > 0) {
@@ -472,12 +476,15 @@ BANNED PHRASES — NEVER use any of these: dive into, game-changer, paradigm shi
     const aiTimeout = setTimeout(() => aiController.abort(), AI_TIMEOUTS[idx]);
     const attemptT0 = Date.now();
     try {
-      const res = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
-        method: "POST",
-        headers: { Authorization: `Bearer ${LOVABLE_API_KEY}`, "Content-Type": "application/json" },
-        body: JSON.stringify({ ...aiBody, model }),
-        signal: aiController.signal,
-      });
+      const res = await fetch(
+        "https://ai.gateway.lovable.dev/v1/chat/completions",
+        fetchInitWithIncomingTrace(incomingRequest, {
+          method: "POST",
+          headers: { Authorization: `Bearer ${LOVABLE_API_KEY}`, "Content-Type": "application/json" },
+          body: JSON.stringify({ ...aiBody, model }),
+          signal: aiController.signal,
+        }),
+      );
       clearTimeout(aiTimeout);
       log(`AI ${model} responded ${res.status}`);
 

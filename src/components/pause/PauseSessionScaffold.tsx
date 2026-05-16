@@ -12,8 +12,7 @@ interface Props {
   onClose: () => void;
   phase: 'session' | 'done';
   step: PauseStep;
-  goToStep: (next: PauseStep) => void;
-  /** Shown under the stepper; invokes macro back or breathing intro reset from parent. */
+  /** Body row (below header): back, macro count + duration, mute — not the step labels. */
   onHeaderBack?: () => void;
   showHeaderBack?: boolean;
   /** 1-based index in the macro ritual (Feel → … → Decide; six user-facing beats — Choose is folded into the last beat). */
@@ -25,11 +24,11 @@ interface Props {
   macroProgressLine?: string;
   /** Optional second line under `macroProgressLine` (deep pause wireframe: step duration hint). */
   macroProgressSubline?: string;
-  /** When set, replaces the default six-beat `PauseProgress` (e.g. brief four-step bar). */
+  /** Sticky header: segment stepper (Feel · Breathe · …). */
   stepperSlot?: ReactNode;
   /** PostHog flag `pause.step5_breath_label_shift`: label second breathing macro step as “Shift”. */
   breathSecondLabelVariant?: 'breathe' | 'shift';
-  /** When set with `onSoundMutedChange`, header mute controls ritual audio (breathing cues). */
+  /** With `onSoundMutedChange`, body mute controls ritual audio (breathing cues). */
   soundMuted?: boolean;
   onSoundMutedChange?: (muted: boolean) => void;
   /** Shown under the session title (e.g. engaged-only `open_max_age` countdown). */
@@ -38,10 +37,10 @@ interface Props {
 }
 
 /**
- * Full-screen pause shell: curtain, gradient, **sticky** top strip (`<header>`: title · close ·
- * optional countdown only), then a **non-sticky** band (stepper · macro lines · mute · back)
- * in the scroll flow between that strip and the main step body. Step science / About tabs live
- * on the **depth picker** only (`PauseSessionDepthPickerStack`), not here.
+ * Full-screen pause shell: **Sticky header** — session title · close · optional countdown ·
+ * **segment stepper** (Feel, Breathe, …). **Body** — back, macro “n of total” + optional duration,
+ * mute, then step content. Keeps step labels in the header and progress controls in the scrollable
+ * body per wireframe / shell best practice.
  */
 export function PauseSessionScaffold({
   curtainLifted,
@@ -49,7 +48,6 @@ export function PauseSessionScaffold({
   onClose,
   phase,
   step,
-  goToStep,
   onHeaderBack,
   showHeaderBack = false,
   macroStepIndex,
@@ -141,31 +139,47 @@ export function PauseSessionScaffold({
             </div>
 
             {phase === 'session' && countdownSlot ? <div className="mt-1.5 px-1">{countdownSlot}</div> : null}
-          </header>
-        </motion.div>
 
-        {phase === 'session' && (
-          <div className="relative z-[55] border-b border-border/25 bg-background/60">
-            <div className="mx-auto max-w-lg px-4 pb-3 pt-3 sm:px-6">
-              <div className="w-full">
+            {phase === 'session' ? (
+              <div className="mt-3 border-t border-border/20 pt-3">
                 {stepperSlot ?? (
                   <PauseProgress
                     currentStep={step}
-                    onStepClick={goToStep}
                     variant="segment"
                     breathSecondLabelVariant={breathSecondLabelVariant}
                   />
                 )}
               </div>
+            ) : null}
+          </header>
+        </motion.div>
 
-              <div className="relative mt-3 w-full min-h-[2.25rem]">
+        <div className="relative z-10 mx-auto max-w-lg overflow-hidden px-5 pb-16 pt-4 sm:px-8 sm:pb-20 sm:pt-6">
+          {phase === 'session' && (
+            <div className="relative mb-8 flex w-full min-h-[2.5rem] items-start justify-center sm:mb-10">
+              <div className="absolute left-0 top-0.5 z-10">
+                {onHeaderBack && showHeaderBack ? (
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="icon"
+                    className="h-9 w-9 shrink-0 text-muted-foreground hover:text-foreground"
+                    onClick={onHeaderBack}
+                    aria-label={t('pause.steps.back', { defaultValue: 'Back' })}
+                  >
+                    <ChevronLeft className="h-4 w-4" aria-hidden />
+                  </Button>
+                ) : null}
+              </div>
+
+              <div className="mx-auto max-w-[min(100%,16rem)] flex-1 px-11 text-center sm:px-12">
                 {showMeta &&
                   ((macroProgressSubline != null ||
                     (macroProgressLine != null &&
                       macroStepIndex != null &&
                       macroStepTotal != null &&
                       macroStepTotal > 0)) ? (
-                    <div className="flex flex-col items-center gap-0 px-11 text-center text-muted-foreground">
+                    <div className="flex flex-col items-center gap-0 text-muted-foreground">
                       <p className="text-base font-medium italic leading-6">
                         {macroProgressLine ??
                           t('pause.deep.macroStepCount', {
@@ -179,25 +193,28 @@ export function PauseSessionScaffold({
                       ) : null}
                     </div>
                   ) : (
-                    <div className="flex flex-col items-center px-11 text-center">
+                    <div className="flex flex-col items-center">
                       <p className="text-[11px] font-medium uppercase tracking-[0.18em] text-muted-foreground">
                         {macroProgressLine ??
                           t('pause.macroProgress', {
-                            defaultValue: 'Step {{n}} of {{total}} · under ~15 min',
+                            defaultValue: '{{n}} of {{total}} · under ~15 min',
                             n: macroStepIndex,
                             total: macroStepTotal,
                           })}
                       </p>
                     </div>
                   ))}
+              </div>
+
+              <div className="absolute right-0 top-0.5 z-10">
                 <Button
                   type="button"
                   variant="ghost"
                   size="icon"
                   className={
                     muted
-                      ? 'absolute right-0 top-0 h-9 w-9 shrink-0 text-muted-foreground/70 hover:text-foreground'
-                      : 'absolute right-0 top-0 h-9 w-9 shrink-0 text-muted-foreground hover:text-foreground'
+                      ? 'h-9 w-9 shrink-0 text-muted-foreground/70 hover:text-foreground'
+                      : 'h-9 w-9 shrink-0 text-muted-foreground hover:text-foreground'
                   }
                   onClick={() => {
                     setMuted(!muted);
@@ -212,24 +229,9 @@ export function PauseSessionScaffold({
                   {muted ? <VolumeX className="h-4 w-4" aria-hidden /> : <Volume2 className="h-4 w-4" aria-hidden />}
                 </Button>
               </div>
-
-              {onHeaderBack && showHeaderBack && (
-                <div className="mt-2 flex w-full justify-start">
-                  <button
-                    type="button"
-                    onClick={onHeaderBack}
-                    className="inline-flex items-center gap-1 rounded-md px-1 py-1.5 text-xs font-medium text-muted-foreground transition-colors hover:bg-muted/50 hover:text-foreground"
-                  >
-                    <ChevronLeft className="h-4 w-4 shrink-0" aria-hidden />
-                    {t('pause.steps.back', { defaultValue: 'Back' })}
-                  </button>
-                </div>
-              )}
             </div>
-          </div>
-        )}
+          )}
 
-        <div className="relative z-10 mx-auto max-w-lg overflow-hidden px-5 pb-16 pt-6 sm:px-8 sm:pb-20 sm:pt-8">
           {children}
         </div>
       </motion.div>

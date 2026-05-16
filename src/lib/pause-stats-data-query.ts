@@ -30,6 +30,8 @@ export interface PauseFullRow {
   has_breath_completed: boolean;
   has_initial_emotion_logged: boolean;
   has_shift_emotion_logged: boolean;
+  /** Optional completion-screen mood (after `outcome_logged`); see `post_pause_emotion_logged`. */
+  has_post_pause_emotion_logged: boolean;
   has_outcome_logged: boolean;
   initial_mood: string | null;
   /** True when any `initial_emotion_logged` row marks `brief_ritual` (same predicate as `pause_evaluate_transitions`). */
@@ -39,6 +41,10 @@ export interface PauseFullRow {
   shift_mood: string | null;
   /** Latest `shift_emotion_logged` payload `shift_intensity` (1–5), when logged. */
   shift_emotion_intensity: number | null;
+  /** Latest `post_pause_emotion_logged` payload `mood` (completion check-in). */
+  post_pause_mood: string | null;
+  /** Latest `post_pause_emotion_logged` payload `intensity` (1–5), when logged. */
+  post_pause_emotion_intensity: number | null;
   outcome: string | null;
   note_text: string | null;
   tags: string[] | null;
@@ -111,6 +117,12 @@ export async function fetchPauseStatsData(userId: string): Promise<PauseStatsQue
     rows: rawRows.map((r) => ({
       ...r,
       is_brief_ritual: Boolean(r.is_brief_ritual),
+      has_post_pause_emotion_logged: Boolean(
+        (r as { has_post_pause_emotion_logged?: boolean }).has_post_pause_emotion_logged,
+      ),
+      post_pause_mood: (r as { post_pause_mood?: string | null }).post_pause_mood ?? null,
+      post_pause_emotion_intensity:
+        (r as { post_pause_emotion_intensity?: number | null }).post_pause_emotion_intensity ?? null,
     })),
     stepEvents: ((stepData as unknown) as PauseStepEventRow[]) ?? [],
     companionEvents: ((companionData as unknown) as PauseCompanionEventRow[]) ?? [],

@@ -15,6 +15,8 @@ interface Props {
   message: string;
   context?: string | null;
   haiku?: string | null;
+  /** Fires when the share menu opens (product analytics). */
+  onMenuOpen?: () => void;
 }
 
 function buildShareText(message: string): string {
@@ -164,7 +166,7 @@ function generateShareImage(
 }
 
 export const ShareReflection = forwardRef<HTMLButtonElement, Props>(
-  function ShareReflection({ message, context, haiku }, ref) {
+  function ShareReflection({ message, context, haiku, onMenuOpen }, ref) {
     const { t } = useTranslation();
 
     const copyText = useCallback(async () => {
@@ -218,7 +220,7 @@ export const ShareReflection = forwardRef<HTMLButtonElement, Props>(
     }, [message]);
 
     return (
-      <DropdownMenu>
+      <DropdownMenu onOpenChange={(open) => { if (open) onMenuOpen?.(); }}>
         <DropdownMenuTrigger asChild>
           <Button
             ref={ref}

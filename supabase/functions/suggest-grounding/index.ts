@@ -4,6 +4,7 @@ import { sanitizePromptArray } from "../_shared/sanitize.ts";
 import { createAttemptLogger } from "../_shared/observe.ts";
 import { callPerplexityChat, type PerplexityUsage } from "../_shared/perplexity-client.ts";
 import { withRequestLogging, type RequestLoggingContext } from "../_shared/with-request-logging.ts";
+import { fetchInitWithIncomingTrace } from "../_shared/forward-trace-headers.ts";
 import { AI_TEMPORARILY_UNAVAILABLE_MESSAGE } from "../_shared/ai-user-messages.ts";
 import {
   consumeAllowanceOrCredits,
@@ -23,6 +24,7 @@ async function searchRecentArticle(
   activity: string,
   _langCode: string,
   log: RequestLog,
+  incoming?: Request,
 ): Promise<{ title: string; url: string; snippet: string; usage?: PerplexityUsage; searchMs: number } | null> {
   const PERPLEXITY_API_KEY = Deno.env.get("PERPLEXITY_API_KEY");
   if (!PERPLEXITY_API_KEY) return null;
@@ -42,6 +44,7 @@ async function searchRecentArticle(
       PERPLEXITY_API_KEY,
       () => {},
       10_000,
+      incoming,
     );
     const searchMs = Date.now() - t0;
     const content = result.content;
@@ -219,60 +222,63 @@ Rules:
     const aiWallClockT0 = Date.now();
     const aiController = new AbortController();
     const aiTimeout = setTimeout(() => aiController.abort(), 15000);
-    const aiPromise = fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${LOVABLE_API_KEY}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        model: "google/gemini-3-flash-preview",
-        messages: [
-          { role: "system", content: systemPrompt },
-          { role: "user", content: userPrompt },
-        ],
-        tools: [
-          {
-            type: "function",
-            function: {
-              name: "suggest_grounding",
-              description: langCode !== "en"
-                ? `Suggest a grounding activity with an interesting insight. ALL fields MUST be in ${langName}.`
-                : "Suggest the best grounding activity for this moment with an interesting insight.",
-              parameters: {
-                type: "object",
-                properties: {
-                  activity: {
-                    type: "string",
-                    description: "The activity name from the user's list (e.g. 'running', 'guitar')",
+    const aiPromise = fetch(
+      "https://ai.gateway.lovable.dev/v1/chat/completions",
+      fetchInitWithIncomingTrace(req, {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${LOVABLE_API_KEY}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          model: "google/gemini-3-flash-preview",
+          messages: [
+            { role: "system", content: systemPrompt },
+            { role: "user", content: userPrompt },
+          ],
+          tools: [
+            {
+              type: "function",
+              function: {
+                name: "suggest_grounding",
+                description: langCode !== "en"
+                  ? `Suggest a grounding activity with an interesting insight. ALL fields MUST be in ${langName}.`
+                  : "Suggest the best grounding activity for this moment with an interesting insight.",
+                parameters: {
+                  type: "object",
+                  properties: {
+                    activity: {
+                      type: "string",
+                      description: "The activity name from the user's list (e.g. 'running', 'guitar')",
+                    },
+                    suggestion: {
+                      type: "string",
+                      description: langCode !== "en"
+                        ? `A personal, warm suggestion in 2-3 sentences. MUST be in ${langName}.`
+                        : "A personal, warm suggestion in 2-3 sentences explaining why this activity fits right now.",
+                    },
+                    duration: {
+                      type: "number",
+                      description: "Suggested duration in minutes (5, 10, or 15)",
+                    },
+                    insight: {
+                      type: "string",
+                      description: langCode !== "en"
+                        ? `A verifiable interesting fact about this activity (1-2 sentences). MUST be in ${langName}. Do NOT invent researcher names or statistics.`
+                        : "A verifiable interesting fact, well-known scientific finding, or cultural perspective about this activity (1-2 sentences). Do NOT invent researcher names or statistics.",
+                    },
                   },
-                  suggestion: {
-                    type: "string",
-                    description: langCode !== "en"
-                      ? `A personal, warm suggestion in 2-3 sentences. MUST be in ${langName}.`
-                      : "A personal, warm suggestion in 2-3 sentences explaining why this activity fits right now.",
-                  },
-                  duration: {
-                    type: "number",
-                    description: "Suggested duration in minutes (5, 10, or 15)",
-                  },
-                  insight: {
-                    type: "string",
-                    description: langCode !== "en"
-                      ? `A verifiable interesting fact about this activity (1-2 sentences). MUST be in ${langName}. Do NOT invent researcher names or statistics.`
-                      : "A verifiable interesting fact, well-known scientific finding, or cultural perspective about this activity (1-2 sentences). Do NOT invent researcher names or statistics.",
-                  },
+                  required: ["activity", "suggestion", "duration", "insight"],
+                  additionalProperties: false,
                 },
-                required: ["activity", "suggestion", "duration", "insight"],
-                additionalProperties: false,
               },
             },
-          },
-        ],
-        tool_choice: { type: "function", function: { name: "suggest_grounding" } },
+          ],
+          tool_choice: { type: "function", function: { name: "suggest_grounding" } },
+        }),
+        signal: aiController.signal,
       }),
-      signal: aiController.signal,
-    });
+    );
 
     let response: Response;
     try {
@@ -336,7 +342,7 @@ Rules:
       const chosenActivity = args.activity;
 
       // Now search Perplexity for a recent article about the chosen activity
-      const article = await searchRecentArticle(chosenActivity, langCode, log);
+      const article = await searchRecentArticle(chosenActivity, langCode, log, req);
 
       if (logAttempt) {
         logAttempt({

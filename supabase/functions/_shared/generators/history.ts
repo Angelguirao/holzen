@@ -25,6 +25,7 @@ import {
 import { type CacheServeRelaxation, parseMarketDirection, serveFromCache } from "../cache.ts";
 import { createAttemptLogger, trackEvent } from "../observe.ts";
 import { callPerplexityChat, type PerplexityUsage } from "../perplexity-client.ts";
+import { fetchInitWithIncomingTrace } from "../forward-trace-headers.ts";
 import { searchLibrary, eventToHistory, recordLibraryServe } from "../content-library.ts";
 import { getPhaseConfig } from "../phase-config.ts";
 import { type CompanionCacheTitleRow } from "../companion-cache-dedup.ts";
@@ -58,6 +59,8 @@ export interface GenerateHistoryParams {
   /** Skip the live phase only — library/cache still serve. Used by circuit breaker. */
   skipLive?: boolean;
   log: (msg: string, extra?: Record<string, unknown>) => void;
+  /** Edge `Request` for W3C trace propagation to Perplexity. */
+  incomingRequest?: Request;
 }
 
 // ── Internals ──
@@ -154,7 +157,8 @@ async function serveFallback(
 // ── Public entry point ──
 
 export async function generateHistory(params: GenerateHistoryParams): Promise<HistoryResult> {
-  const { svcClient, context, mood, recentTitles, userId, preferredMood, forceLive, skipLive, log } = params;
+  const { svcClient, context, mood, recentTitles, userId, preferredMood, forceLive, skipLive, log, incomingRequest } =
+    params;
   const marketDirection = parseMarketDirection(context);
   const phases = getPhaseConfig();
   const liveEnabled = phases.live && !skipLive;
@@ -236,7 +240,7 @@ export async function generateHistory(params: GenerateHistoryParams): Promise<Hi
   let perplexityMerged: PerplexityUsage | undefined;
 
   try {
-    const result = await callPerplexityChat(perplexityBody, PERPLEXITY_API_KEY, (m) => log(m));
+    const result = await callPerplexityChat(perplexityBody, PERPLEXITY_API_KEY, (m) => log(m), 10_000, incomingRequest);
     perplexityMerged = result.usage;
     searchContent = result.content;
     citations = result.citations;
@@ -332,12 +336,15 @@ BANNED PHRASES — NEVER use any of these: ${BANNED_PHRASES.join(", ")}${mood ? 
     const aiTimeout = setTimeout(() => aiController.abort(), AI_TIMEOUTS[idx]);
     const attemptT0 = Date.now();
     try {
-      const res = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
-        method: "POST",
-        headers: { Authorization: `Bearer ${LOVABLE_API_KEY}`, "Content-Type": "application/json" },
-        body: JSON.stringify({ ...aiBody, model }),
-        signal: aiController.signal,
-      });
+      const res = await fetch(
+        "https://ai.gateway.lovable.dev/v1/chat/completions",
+        fetchInitWithIncomingTrace(incomingRequest, {
+          method: "POST",
+          headers: { Authorization: `Bearer ${LOVABLE_API_KEY}`, "Content-Type": "application/json" },
+          body: JSON.stringify({ ...aiBody, model }),
+          signal: aiController.signal,
+        }),
+      );
       clearTimeout(aiTimeout);
       log(`AI ${model} responded ${res.status}`);
 

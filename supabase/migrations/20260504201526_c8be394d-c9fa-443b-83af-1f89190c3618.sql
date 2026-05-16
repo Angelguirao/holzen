@@ -1,11 +1,7 @@
--- Backfill: apply 16 pending migration files that never reached the DB.
--- Source files (timestamps registered at the bottom):
--- 20260503150000, 20260504103000, 20260505120000, 20260506120000, 20260506200000,
--- 20260507130000, 20260508120000 (two files share timestamp), 20260509140000,
--- 20260510120000, 20260511120000, 20260512120000, 20260513130000,
--- 20260514160000, 20260515180000, 20260518120000
-
--- ============ 20260503150000_pause_brief_ritual_transition.sql ============
+-- Backfill: merged SQL for pause transition logic that historically shipped in
+-- separate migration files (see comments in repo history). Standalone files in
+-- `supabase/migrations/` apply afterward; do not insert duplicate `schema_migrations`
+-- rows here — that breaks `supabase db reset` when the same version runs as a file.
 CREATE OR REPLACE FUNCTION public.pause_evaluate_transitions(p_instance_id uuid)
 RETURNS public.pause_state
 LANGUAGE plpgsql VOLATILE SECURITY DEFINER SET search_path = public
@@ -55,21 +51,6 @@ BEGIN
   RETURN v_inst.state;
 END; $$;
 
--- Mark all pending source migration files as applied so future syncs don't re-attempt them.
-INSERT INTO supabase_migrations.schema_migrations (version, name, statements) VALUES
-  ('20260503150000','pause_brief_ritual_transition',ARRAY['-- backfilled into combined migration']),
-  ('20260504103000','pause_open_max_age_auto_supersede',ARRAY['-- skipped: superseded by later versions']),
-  ('20260505120000','pause_log_step_expired_outcome_rescue',ARRAY['-- skipped: superseded by later versions']),
-  ('20260506120000','archive_views_superseded_on_pauses_tab',ARRAY['-- skipped: superseded']),
-  ('20260506200000','pause_volatility_v1_contract_and_transitions',ARRAY['-- skipped: superseded']),
-  ('20260507130000','archive_views_pause_instance_synthetic',ARRAY['-- skipped: superseded']),
-  ('20260508120000','pause_archive_instance_views',ARRAY['-- skipped: superseded']),
-  ('20260509140000','collection_items_pause_instance_drop_library_items',ARRAY['-- skipped: destructive, deferred']),
-  ('20260510120000','pause_volatility_v1_completed_outcome_only',ARRAY['-- skipped: superseded']),
-  ('20260511120000','v_pause_full_is_brief_ritual',ARRAY['-- skipped: superseded']),
-  ('20260512120000','pause_log_step_dismissed_retrospective_outcome',ARRAY['-- skipped: superseded']),
-  ('20260513130000','pause_log_step_retrospective_outcomes_three',ARRAY['-- skipped: superseded']),
-  ('20260514160000','pause_open_max_age_from_engaged_at',ARRAY['-- skipped: superseded']),
-  ('20260515180000','pause_open_max_age_engaged_only',ARRAY['-- skipped: superseded']),
-  ('20260518120000','pause_archive_exclude_pending_churn',ARRAY['-- skipped: superseded'])
-ON CONFLICT (version) DO NOTHING;
+-- Historical note: some environments backfilled `schema_migrations` rows here so
+-- merged SQL would not re-run. Fresh resets apply the standalone migration files in
+-- `supabase/migrations/`; inserting the same versions would duplicate `schema_migrations`.

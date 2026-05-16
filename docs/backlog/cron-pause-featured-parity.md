@@ -2,7 +2,7 @@
 
 ## Context
 
-Automatic pauses from `check-volatility` may create `pause_instances` with **`pause_ai_artifacts`** missing grounding content initially; expanded content is filled by `companion-orchestrate`. Manual pauses may arrive with more merged `location.state` from the browser.
+Automatic pauses from `check-volatility` create `pause_instances` on claim **without** pre-filling companion **`pause_ai_artifacts`**; expanded content arrives from **`companion-orchestrate`** once **`PauseSession`** runs (intervention-only orchestrate once **`pauseInstanceId`** is bound, slots on tap). Manual pauses may arrive with more merged `location.state` from the browser.
 
 ## What we shipped
 
@@ -16,7 +16,7 @@ Existing UI already had skeletons for intervention (`InterventionSection`) and g
 - `src/components/CompanionSection.tsx` — intervention + companion cards
 - `src/components/InterventionSection.tsx` — featured intervention skeletons
 - `src/components/LearningInput.tsx` — grounding skeleton while nudge loads
-- `supabase/functions/check-volatility/index.ts` — pause instance write before orchestrate
+- `supabase/functions/check-volatility/index.ts` — pause instance + profile/notification writes on claim (**V2:** no orchestrate dispatch)
 - `docs/reviews/phase-3-server-cron-triggers.md`
 
 ## Acceptance (met)

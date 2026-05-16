@@ -56,7 +56,7 @@ do not regenerate it inside the handler.
 | CORS headers on responses | `decorateResponse` in the wrapper merges `corsHeaders` into every `Response` (including `EdgeError` and 500 envelopes). | Return a bare `new Response(...)`; CORS is appended. |
 | Correlation ID | `readCid` reads `x-cid` (or generates a UUID), bound to the logger, attached as the `x-cid` response header. | Read it from context if you need to pass it to a downstream call. |
 | Sentry init + capture | `initSentryEdges()` runs once per cold start; the wrapper's `catch` invokes `captureEdgeError`. | Don't init Sentry per-function; don't `try/catch` just to re-throw. |
-| Structured request/response logs | The wrapper logs `request` (method + path) and `response` (status). | Don't duplicate these from inside the handler. |
+| Structured request/response logs | The wrapper logs `request` (method + path; plus `trace_id` / `parent_span_id` when a valid W3C `traceparent` header is present) and `response` (status). | Don't duplicate these from inside the handler. |
 
 ## Event-name naming conventions
 
@@ -93,7 +93,8 @@ The full list of reserved/standard events lives in
 The wrapper checks `req.method === "OPTIONS"` first. If true, it returns
 `new Response(null, { headers: corsHeaders })` — `200`, empty body, the
 canonical allow-list (`authorization, x-client-info, apikey, content-type,
-x-cid, x-app-version, x-supabase-client-platform[, ...]`). Your handler is
+x-cid, x-app-version, traceparent, tracestate, sentry-trace, baggage,
+x-supabase-client-platform[, ...]`). Your handler is
 never invoked for preflight. For non-OPTIONS requests, every `Response` you
 return — including ones you didn't construct (e.g. the `EdgeError`
 envelope) — has `Access-Control-Allow-Origin: *` and the allow-headers
@@ -143,7 +144,7 @@ also catches.
 - [`_shared/edge-error.ts`](./_shared/edge-error.ts) — typed error envelope.
 - [`_shared/observe.ts`](./_shared/observe.ts) — `createLogger` + BetterStack forwarder.
 - [`_shared/deps.ts`](./_shared/deps.ts) — `logDependencyCall` for outbound HTTP.
-- [`_shared/cid-clients.ts`](./_shared/cid-clients.ts) — `createCidSupabaseClient` + `sendWebPushWithCid`: drop-in helpers that propagate the request `cid` to Supabase REST/Auth (via the `x-cid` header — reaches `audit_log.cid`) and to web-push deliveries (logged as `dependency_call dep=webpush` with cid + endpoint host). **Use these instead of bare `createClient(...)` and `webpush.sendNotification(...)`** so cross-surface joins don't break at the function boundary.
+- [`_shared/cid-clients.ts`](./_shared/cid-clients.ts) — `createCidSupabaseClient` + `sendWebPushWithCid`: drop-in helpers that propagate the request `cid` to Supabase REST/Auth (via the `x-cid` header — reaches `audit_log.cid`) and, when you pass the incoming `Request`, W3C/Sentry trace headers (`_shared/forward-trace-headers.ts`) to PostgREST. Web-push deliveries use `sendWebPushWithCid` (logged as `dependency_call dep=webpush` with cid + endpoint host). **Use these instead of bare `createClient(...)` and `webpush.sendNotification(...)`** so cross-surface joins don't break at the function boundary.
 - [`_shared/audit.ts`](./_shared/audit.ts) — `logAudit` for security writes.
 - [`docs/ops/edge-logging-conventions.md`](../../docs/ops/edge-logging-conventions.md) — full contract.
 - [`docs/ops/observability-setup.md`](../../docs/ops/observability-setup.md) — DSNs, alerts, dashboards.

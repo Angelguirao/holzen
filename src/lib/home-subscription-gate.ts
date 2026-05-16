@@ -26,17 +26,17 @@ export function getHomeShowLimitUpsell(
 export function getHomeShowPauseScheduling(
   subscriptionReady: boolean,
   hasAccess: boolean,
-  message: string | null,
+  hasOpenPause: boolean,
   loading: boolean,
 ): boolean {
-  return subscriptionReady && hasAccess && !message && !loading;
+  return subscriptionReady && hasAccess && !hasOpenPause && !loading;
 }
 
 export function getHomeSubscriptionGate(args: {
   subLoading: boolean;
   subscribed: boolean;
   monthlyRemaining: number | undefined;
-  message: string | null;
+  hasOpenPause: boolean;
   loading: boolean;
 }) {
   const subscriptionReady = getHomeSubscriptionReady(args.subLoading, args.subscribed, args.monthlyRemaining);
@@ -48,7 +48,7 @@ export function getHomeSubscriptionGate(args: {
     showPauseScheduling: getHomeShowPauseScheduling(
       subscriptionReady,
       hasAccess,
-      args.message,
+      args.hasOpenPause,
       args.loading,
     ),
   };

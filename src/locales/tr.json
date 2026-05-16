@@ -46,8 +46,6 @@
     "holzen": "Holzen",
     "new": "Yeni",
     "read": "Oku",
-    "pinned": "Sabitlenmiş",
-    "unpin": "Sabitlemeyi kaldır",
     "from": "Başlangıç",
     "until": "Bitiş"
   },
@@ -148,9 +146,7 @@
     "zoomOut": "Perspektif",
     "historicalInsight": "Tarihsel bakış",
     "echo": "Yankı",
-    "parallel": "paralel",
-    "reflectionUnpinned": "Düşünce sabitleme kaldırıldı",
-    "reflectionPinned": "Düşünce Ana Sayfaya sabitlendi"
+    "parallel": "paralel"
   },
   "journey": {
     "pageSubtitle": "Uzun vadeli ilerleme ve notlar — hesap ayarları değil (Ayarlar’da).",
@@ -983,7 +979,9 @@
     "leaveSessionConfirm": "Çık",
     "sessionTitle": "Molanız",
     "scienceInfoAria": "Bu molanın arkasındaki bilim",
-    "noReflection": "Aktif düşünce yok. Birini tetiklemek için geri dönün.",
+    "sessionEmptyTitle": "Açılacak duraklama yok",
+    "reflectMissingContext": "Bu duraklamada piyasa bağlamı eksik. Ana sayfaya dönüp yeni bir duraklama başlatın.",
+    "sessionEmptyBody": "Ana sayfadan «Bir duraklamaya ihtiyacım var» ile başlayın veya hazır bildirimden açın.",
     "outcomeSaveFailed": "Seçimin kaydedilemedi. Tekrar dene.",
     "outcomeNotCompleted": "Seçimin kaydedildi ama bu mola henüz tamamlanmadı — eksik ritüel adımlarını tamamlayıp yeniden seç.",
     "stepSyncFailed": "Bu adım eşitlenemedi. Bağlantını kontrol edip tekrar dene.",

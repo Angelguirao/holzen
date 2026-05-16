@@ -183,7 +183,7 @@ Migration: `supabase/migrations/20260305200517_table_profiles.sql`
 Runtime impact:
 
 - Browser updates profiles in app.
-- Cron updates `profiles.last_message/last_context/last_trigger_at` for eligible users.
+- Cron updates `profiles.last_context` and `last_trigger_at` for eligible users.
 
 Risk / assumption:
 

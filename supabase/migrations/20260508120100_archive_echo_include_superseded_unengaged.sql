@@ -69,12 +69,12 @@ SELECT
   li.body,
   li.source_type,
   li.source_url,
-  li.pause_instance_id,
   li.tags,
   li.pinned,
-  li.is_favorite,
-  li.status,
   li.created_at,
+  li.status,
+  li.is_favorite,
+  li.pause_instance_id,
   li.id AS source_library_item_id
 FROM public.library_items li
 LEFT JOIN public.pause_instances pi ON pi.id = li.pause_instance_id
@@ -105,12 +105,12 @@ SELECT
   sb.body,
   'pause'::text AS source_type,
   NULL::text AS source_url,
-  pi.id AS pause_instance_id,
   ARRAY[]::text[] AS tags,
   false AS pinned,
-  false AS is_favorite,
-  'read'::text AS status,
   COALESCE(pi.terminal_at, pi.completed_at, pi.created_at) AS created_at,
+  'read'::text AS status,
+  false AS is_favorite,
+  pi.id AS pause_instance_id,
   NULL::uuid AS source_library_item_id
 FROM public.pause_instances pi
 LEFT JOIN synth_title st ON st.pause_instance_id = pi.id
@@ -204,12 +204,12 @@ SELECT
   li.body,
   li.source_type,
   li.source_url,
-  li.pause_instance_id,
   li.tags,
   li.pinned,
-  li.is_favorite,
-  li.status,
   li.created_at,
+  li.status,
+  li.is_favorite,
+  li.pause_instance_id,
   li.id AS source_library_item_id
 FROM public.library_items li
 INNER JOIN public.pause_instances pi ON pi.id = li.pause_instance_id
@@ -233,12 +233,12 @@ SELECT
   sb.body,
   'pause'::text AS source_type,
   NULL::text AS source_url,
-  pi.id AS pause_instance_id,
   ARRAY[]::text[] AS tags,
   false AS pinned,
-  false AS is_favorite,
-  'read'::text AS status,
   COALESCE(pi.terminal_at, pi.completed_at, pi.created_at) AS created_at,
+  'read'::text AS status,
+  false AS is_favorite,
+  pi.id AS pause_instance_id,
   NULL::uuid AS source_library_item_id
 FROM public.pause_instances pi
 LEFT JOIN synth_title st ON st.pause_instance_id = pi.id

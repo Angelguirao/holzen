@@ -5,6 +5,7 @@ import { useTranslation } from 'react-i18next';
 import { MoodIcon } from '@/components/icons/MoodIcon';
 import type { MoodValue } from '@/components/MoodCheck';
 import type { FeelStepTile } from '@/components/pause/pause-feel-types';
+import { PAUSE_FEEL_INTENSITY_KEYS } from '@/components/pause/pause-feel-intensity-labels';
 import { Button } from '@/components/ui/button';
 import { Slider } from '@/components/ui/slider';
 import { pauseStepLayout } from '@/components/pause/pause-step-layout';
@@ -18,8 +19,6 @@ const TILES: { tile: FeelStepTile; mood: MoodValue }[] = [
   { tile: 'calm', mood: 'calm' },
   { tile: 'other', mood: 'uncertain' },
 ];
-
-const INTENSITY_KEYS = ['faint', 'light', 'clear', 'strong', 'heavy'] as const;
 
 interface Props {
   moodDone: boolean;
@@ -130,12 +129,12 @@ export function PauseRitualFeelStep({
               className="w-full py-1"
             />
             <div className="flex justify-between gap-1 px-0.5 text-center text-xs text-muted-foreground sm:text-sm">
-              {INTENSITY_KEYS.map((key) => (
+              {PAUSE_FEEL_INTENSITY_KEYS.map((key) => (
                 <span
                   key={key}
                   className={cn(
                     'min-w-0 flex-1 truncate',
-                    key === INTENSITY_KEYS[intensity - 1] && 'font-medium text-foreground',
+                    key === PAUSE_FEEL_INTENSITY_KEYS[intensity - 1] && 'font-medium text-foreground',
                   )}
                 >
                   {t(`pause.feelStep.intensity.${key}`, { defaultValue: key })}
@@ -150,7 +149,7 @@ export function PauseRitualFeelStep({
             type="button"
             variant="outline"
             disabled={!moodDone}
-            className="rounded-full border-primary bg-primary/5 px-5 py-2.5 font-medium text-primary hover:bg-primary/10 disabled:opacity-60"
+            className={pauseStepLayout.ritualPrimaryOutlineCta}
             onClick={onContinue}
           >
             {t('pause.steps.continue', { defaultValue: 'Continue' })}

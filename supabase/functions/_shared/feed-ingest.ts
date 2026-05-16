@@ -6,6 +6,8 @@
  * Scrape (used elsewhere) pulls markdown per page.
  */
 
+import { fetchInitWithIncomingTrace } from "./forward-trace-headers.ts";
+
 const MAX_LINKS_FROM_FEED = 40;
 
 /** Firecrawl Map `limit` — max raw URLs returned per request (see https://docs.firecrawl.dev/features/map). */
@@ -62,17 +64,21 @@ export function isExplicitSiteMapSourceType(type: string | null | undefined): bo
 export async function fetchFeedXmlIfApplicable(
   feedUrl: string,
   log: (msg: string) => void,
+  incoming?: Request,
 ): Promise<string | null> {
   try {
     const controller = new AbortController();
     const t = setTimeout(() => controller.abort(), 15_000);
-    const res = await fetch(feedUrl, {
-      signal: controller.signal,
-      headers: {
-        Accept: "application/rss+xml, application/atom+xml, application/xml, text/xml, */*",
-        "User-Agent": "HolzenFetchSourceFeeds/1.0",
-      },
-    });
+    const res = await fetch(
+      feedUrl,
+      fetchInitWithIncomingTrace(incoming, {
+        signal: controller.signal,
+        headers: {
+          Accept: "application/rss+xml, application/atom+xml, application/xml, text/xml, */*",
+          "User-Agent": "HolzenFetchSourceFeeds/1.0",
+        },
+      }),
+    );
     clearTimeout(t);
 
     const ct = res.headers.get("content-type") ?? "";
@@ -318,22 +324,26 @@ export async function firecrawlMapArticleUrls(
   siteUrl: string,
   apiKey: string,
   log: (msg: string) => void,
+  incoming?: Request,
 ): Promise<string[]> {
   try {
     const controller = new AbortController();
     const t = setTimeout(() => controller.abort(), 25_000);
-    const res = await fetch("https://api.firecrawl.dev/v2/map", {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${apiKey}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        url: siteUrl,
-        limit: FIRECRAWL_MAP_LIMIT,
+    const res = await fetch(
+      "https://api.firecrawl.dev/v2/map",
+      fetchInitWithIncomingTrace(incoming, {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${apiKey}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          url: siteUrl,
+          limit: FIRECRAWL_MAP_LIMIT,
+        }),
+        signal: controller.signal,
       }),
-      signal: controller.signal,
-    });
+    );
     clearTimeout(t);
 
     if (!res.ok) {

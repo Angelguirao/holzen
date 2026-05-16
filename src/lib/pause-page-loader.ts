@@ -55,7 +55,6 @@ export async function loadPauseSessionSnapshot(
   const reflectionMessage = typeof reflectionArt?.content?.message === 'string'
     ? (reflectionArt.content.message as string)
     : '';
-  if (!reflectionMessage) return null;
 
   return {
     id: pauseInstanceId,
@@ -71,6 +70,8 @@ export const PAUSE_SESSION_COMPANION_SNAPSHOT_NONE_QUERY_KEY = [
   PAUSE_SESSION_COMPANION_SNAPSHOT_DISABLED_INSTANCE_ID,
 ] as const;
 
+const COMPANION_SNAPSHOT_REFLECT_POLL_MS = 2_000;
+
 export function getPauseSessionCompanionSnapshotQueryOptions(pauseInstanceId: string | undefined) {
   return {
     queryKey: pauseInstanceId
@@ -81,5 +82,9 @@ export function getPauseSessionCompanionSnapshotQueryOptions(pauseInstanceId: st
     staleTime: 60_000,
     refetchOnWindowFocus: false,
     retry: false,
+    refetchInterval: (query: { state: { data?: PauseSessionSnapshot | null } }) => {
+      const msg = query.state.data?.reflectionMessage?.trim() ?? '';
+      return msg ? false : COMPANION_SNAPSHOT_REFLECT_POLL_MS;
+    },
   } as const;
 }

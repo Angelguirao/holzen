@@ -86,6 +86,7 @@ export function PendingPauseOfferShell({ onAfterMutation, navigateAfterAdopt, au
     pending?.context_snapshot && typeof pending.context_snapshot.context_text === 'string'
       ? (pending.context_snapshot.context_text as string)
       : null;
+  const showPreviewLine = Boolean(preview && preview !== ctx?.trim());
 
   return (
     <AlertDialog open={open}>
@@ -107,7 +108,7 @@ export function PendingPauseOfferShell({ onAfterMutation, navigateAfterAdopt, au
                   {ctx}
                 </p>
               ) : null}
-              {preview ? (
+              {showPreviewLine ? (
                 <p className="line-clamp-4 text-xs leading-relaxed text-foreground/85">{preview}</p>
               ) : null}
             </div>

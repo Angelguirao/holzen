@@ -3,7 +3,7 @@ import { computeBriefPastStepClick } from '@/lib/brief-pause-past-step-click';
 import { hapticFeedback } from '@/lib/haptics';
 import type { BriefPauseStep } from '@/lib/pause-session-storage';
 
-/** Brief progress bar: jump to an earlier macro (swipe + haptics + optional integrate flag clear). */
+/** Navigate to an earlier brief macro (haptics + optional integrate flag clear). Not used from the read-only header stepper. */
 export function usePauseSessionBriefPastStep(input: {
   briefStep: BriefPauseStep;
   setBriefStep: Dispatch<SetStateAction<BriefPauseStep>>;

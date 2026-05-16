@@ -8,6 +8,7 @@
 
 import type { SupabaseClient } from "https://esm.sh/@supabase/supabase-js@2.57.2";
 import { createAttemptLogger } from "../observe.ts";
+import { fetchInitWithIncomingTrace } from "../forward-trace-headers.ts";
 
 /** Bump when the system prompt or style rules change. */
 export const PROMPT_VERSION = "v1";
@@ -23,6 +24,8 @@ export interface GenerateQuestionParams {
   svcClient?: SupabaseClient;
   userId?: string;
   log?: (msg: string, extra?: Record<string, unknown>) => void;
+  /** Edge `Request` for W3C trace propagation to the Lovable AI gateway. */
+  incomingRequest?: Request;
 }
 
 const LANG_NAMES: Record<string, string> = {
@@ -31,7 +34,8 @@ const LANG_NAMES: Record<string, string> = {
 };
 
 export async function generateQuestion(params: GenerateQuestionParams): Promise<string | null> {
-  const { context, mood, direction, severity, moodHistory, apiKey, language = "en", svcClient, userId, log } = params;
+  const { context, mood, direction, severity, moodHistory, apiKey, language = "en", svcClient, userId, log, incomingRequest } =
+    params;
   const logAttempt = svcClient ? createAttemptLogger(svcClient, { userId: userId ?? undefined }) : null;
 
   const langName = LANG_NAMES[language] || "English";
@@ -79,23 +83,26 @@ Return JSON: { "question": "..." }`;
   const t0 = Date.now();
 
   try {
-    const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${apiKey}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        model: "google/gemini-3-flash-preview",
-        messages: [
-          { role: "system", content: systemPrompt },
-          { role: "user", content: context },
-        ],
-        response_format: { type: "json_object" },
-        temperature: 0.8,
+    const response = await fetch(
+      "https://ai.gateway.lovable.dev/v1/chat/completions",
+      fetchInitWithIncomingTrace(incomingRequest, {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${apiKey}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          model: "google/gemini-3-flash-preview",
+          messages: [
+            { role: "system", content: systemPrompt },
+            { role: "user", content: context },
+          ],
+          response_format: { type: "json_object" },
+          temperature: 0.8,
+        }),
+        signal: controller.signal,
       }),
-      signal: controller.signal,
-    });
+    );
     clearTimeout(timeout);
 
     if (!response.ok) {

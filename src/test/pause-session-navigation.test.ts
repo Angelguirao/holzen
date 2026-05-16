@@ -92,17 +92,4 @@ describe('canAdvanceFromPauseStep', () => {
       }),
     ).toBe(false);
   });
-
-  it('blocks forward swipe on choose (CTA-only advance to Decide)', () => {
-    expect(
-      canAdvanceFromPauseStep({
-        ...base,
-        step: 'choose' as PauseStep,
-        moodDone: true,
-        breathingFirstCompleted: true,
-        breathingSecondCompleted: true,
-        frameDone: true,
-      }),
-    ).toBe(false);
-  });
 });

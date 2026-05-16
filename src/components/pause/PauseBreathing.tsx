@@ -1,58 +1,35 @@
-import { useState, useEffect, useMemo, useImperativeHandle, forwardRef, useRef } from 'react';
+import { useState, useEffect, useImperativeHandle, forwardRef, useRef, useLayoutEffect, useMemo } from 'react';
 import { motion, useReducedMotion } from 'framer-motion';
+import { Play, RefreshCw, ChevronRight } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
-import { hapticFeedback } from '@/lib/haptics';
-import { getSessionQuote } from '@/lib/wisdom-quotes';
+import type { FeelStepTile } from '@/components/pause/pause-feel-types';
 import { pauseStepLayout } from '@/components/pause/pause-step-layout';
+import { Button } from '@/components/ui/button';
+import { hapticFeedback } from '@/lib/haptics';
+import {
+  computeBreathingPhaseAdvance,
+  resolveBreathingCompleted,
+} from '@/lib/pause-breathing-phase-advance';
+import {
+  holdProgressWithinPhase,
+  resolveBreathCycleTotal,
+  resolvePauseBreathingPhases,
+  rotatingKickerIndexFromElapsed,
+  secondsIntoTrianglePattern,
+} from '@/lib/pause-breathing-pattern';
 import {
   playPauseBreathPatternCompleteCue,
   playPauseBreathPhaseCue,
   resumePauseAudioContext,
 } from '@/lib/pause-ritual-audio';
-
-const PATTERNS = [
-  {
-    nameKey: 'breathing.patterns.box',
-    phases: [
-      { labelKey: 'breathing.phases.inhale', duration: 4 },
-      { labelKey: 'breathing.phases.hold', duration: 4 },
-      { labelKey: 'breathing.phases.exhale', duration: 4 },
-      { labelKey: 'breathing.phases.hold', duration: 4 },
-    ],
-  },
-  {
-    nameKey: 'breathing.patterns.calming',
-    phases: [
-      { labelKey: 'breathing.phases.inhale', duration: 4 },
-      { labelKey: 'breathing.phases.hold', duration: 7 },
-      { labelKey: 'breathing.phases.exhale', duration: 8 },
-    ],
-  },
-  {
-    nameKey: 'breathing.patterns.sigh',
-    phases: [
-      { labelKey: 'breathing.phases.inhale', duration: 3 },
-      { labelKey: 'breathing.phases.sip', duration: 1 },
-      { labelKey: 'breathing.phases.exhale', duration: 6 },
-    ],
-  },
-];
+import { BreathOrbVisual } from '@/components/pause/breath-orb-visual';
 
 const EXPAND_KEYS = ['breathing.phases.inhale', 'breathing.phases.sip'];
 const CONTRACT_KEYS = ['breathing.phases.exhale'];
+const HOLD_PHASE_LABEL_KEY = 'breathing.phases.hold';
 
-type PhaseHintFamily = 'box' | 'calming' | 'sigh';
-
-function phaseHintFamily(patternIndex: number): PhaseHintFamily {
-  if (patternIndex === 1) return 'calming';
-  if (patternIndex === 2) return 'sigh';
-  return 'box';
-}
-
-/** Shared micro-copy for pause ritual breathing (aligned with `PATTERNS` indices). */
-function phaseHintTranslationKey(patternIndex: number, cycle: number, phaseIndex: number): string {
-  return `breathing.phaseHints.${phaseHintFamily(patternIndex)}.h${cycle}_${phaseIndex}`;
-}
+/** i18n: `breathing.triangleRotatingKickers` — advances every 2s in `PauseBreathing`, not per phase. */
+const TRIANGLE_ROTATING_KICKERS_I18N_KEY = 'breathing.triangleRotatingKickers';
 
 export type PauseBreathingHandle = {
   /** Return from the timed breathing loop to the pre-start intro (same step). */
@@ -63,15 +40,21 @@ export type PauseBreathSegment = 'first' | 'second';
 
 interface Props {
   mantra: string | null;
+  /** Retained for future Feel-tile pattern routing (`pause-breathing-pattern.ts`). */
   severity?: 'mild' | 'moderate' | 'high';
   /**
-   * `brief` — brief intro kicker + phase hints; **always uses the box breath pattern** (ignores high-severity calming).
-   * `deep` — deep intro kickers + hints; pattern from severity (box vs calming); `breathing.phaseHints.sigh` if pattern index 2.
+   * Brief vs deep only changes post-pattern behavior (auto-advance vs interstitial).
+   * Phases are triangle for both until `PAUSE_RITUAL_BREATHING_PATTERN_MODE` enables feel-tile routing.
    */
   ritualVariant?: 'brief' | 'deep';
-  /** First segment after Feel; second after Frame (Figma deep pause). */
+  /** First segment after Feel; second segment after Frame (deep pause only). */
   breathSegment?: PauseBreathSegment;
-  /** After full breath cycles: interstitial → parent logs `breath_completed` then navigates onward. */
+  /**
+   * Feel grid tile from the shared ritual step; passed through for future `feel_tile_mapped` breathing.
+   * Optional until design wires pattern choice.
+   */
+  feelTile?: FeelStepTile | null;
+  /** After full breath cycles: deep shows an interstitial then continues; brief auto-invokes (Integrate). */
   onContinueAfterBreath: () => void;
   /** Intro or mid-pattern skip: leave breath without logging completion. */
   onSkipBreath: () => void | Promise<void>;
@@ -82,6 +65,34 @@ interface Props {
   onTimedBreathingChange?: (active: boolean) => void;
   /** Header mute: when true, phase ticks and pattern-complete chime are suppressed. */
   ritualSoundMuted?: boolean;
+  /** Deep first Breathe post-pattern: tap to run three more rounds from intro (parent clears segment completion). */
+  onRepeatDeepFirstBreathPattern?: () => void;
+  /** Deep second Breathe post-pattern: same affordance as first interstitial (wireframe 330:23551). */
+  onRepeatDeepSecondBreathPattern?: () => void;
+}
+
+/** Brief ritual: no post-pattern card; advance as soon as the timed cycles finish. */
+function BriefBreathAdvanceToIntegrate({
+  onContinue,
+  onAdvanceFailed,
+}: {
+  onContinue: () => void | Promise<unknown>;
+  onAdvanceFailed?: () => void;
+}) {
+  const onContinueRef = useRef(onContinue);
+  onContinueRef.current = onContinue;
+  const onAdvanceFailedRef = useRef(onAdvanceFailed);
+  onAdvanceFailedRef.current = onAdvanceFailed;
+  const firedRef = useRef(false);
+  useLayoutEffect(() => {
+    if (firedRef.current) return;
+    firedRef.current = true;
+    void Promise.resolve(onContinueRef.current()).catch(() => {
+      firedRef.current = false;
+      onAdvanceFailedRef.current?.();
+    });
+  }, []);
+  return null;
 }
 
 export const PauseBreathing = forwardRef<PauseBreathingHandle, Props>(function PauseBreathing(
@@ -90,28 +101,40 @@ export const PauseBreathing = forwardRef<PauseBreathingHandle, Props>(function P
     severity = 'mild',
     ritualVariant,
     breathSegment = 'first',
+    feelTile = null,
     onContinueAfterBreath,
     onSkipBreath,
     completed: completedProp,
     onPatternComplete,
     onTimedBreathingChange,
     ritualSoundMuted = false,
+    onRepeatDeepFirstBreathPattern,
+    onRepeatDeepSecondBreathPattern,
   },
   ref,
 ) {
   const { t } = useTranslation();
   const prefersReduced = useReducedMotion();
-  const quote = useMemo(() => getSessionQuote(), []);
   const cueOptsRef = useRef({ muted: ritualSoundMuted, prefersReduced: !!prefersReduced });
   useEffect(() => {
     cueOptsRef.current = { muted: ritualSoundMuted, prefersReduced: !!prefersReduced };
   }, [ritualSoundMuted, prefersReduced]);
 
-  /** Brief ritual stays on the box pattern so timers, phase labels, and hints stay aligned (~2 min path). */
-  const patternIndex = ritualVariant === 'brief' ? 0 : severity === 'high' ? 1 : 0;
-  const pattern = PATTERNS[patternIndex];
-  const totalCycles = breathSegment === 'second' ? 2 : 3;
+  const ritualVar: 'brief' | 'deep' = ritualVariant ?? 'deep';
+  const pattern = useMemo(
+    () => ({
+      phases: resolvePauseBreathingPhases({
+        ritualVariant: ritualVar,
+        feelTile,
+        severity,
+      }),
+    }),
+    [ritualVar, feelTile, severity],
+  );
+  const totalCycles = resolveBreathCycleTotal(ritualVariant, breathSegment);
   const showPhaseHints = ritualVariant === 'brief' || ritualVariant === 'deep';
+  /** Triangle UX: seconds within the phase count 1 → duration (same for brief and deep). */
+  const phaseSecondCountsUp = true;
 
   const [started, setStarted] = useState(!!completedProp);
   const [phaseIndex, setPhaseIndex] = useState(0);
@@ -119,8 +142,41 @@ export const PauseBreathing = forwardRef<PauseBreathingHandle, Props>(function P
   const [cycle, setCycle] = useState(0);
   const [completedLocal, setCompletedLocal] = useState(!!completedProp);
 
-  const completed = completedProp ?? completedLocal;
+  const completed = resolveBreathingCompleted(completedProp, completedLocal);
   const currentPhase = pattern.phases[phaseIndex];
+
+  const phaseDurationsSec = useMemo(() => pattern.phases.map((p) => p.duration), [pattern.phases]);
+
+  const triangleRotatingKickers = useMemo((): string[] => {
+    const raw = t(TRIANGLE_ROTATING_KICKERS_I18N_KEY, { returnObjects: true }) as unknown;
+    if (!Array.isArray(raw)) return [];
+    return raw.filter((x): x is string => typeof x === 'string');
+  }, [t]);
+
+  const secondsIntoTrianglePatternMemo = useMemo(
+    () =>
+      secondsIntoTrianglePattern({
+        cycle,
+        phaseIndex,
+        elapsedInCurrentPhase: elapsed,
+        phaseDurationsSec,
+      }),
+    [cycle, phaseIndex, elapsed, phaseDurationsSec],
+  );
+
+  const triangleKickerIndex = useMemo(
+    () => rotatingKickerIndexFromElapsed(secondsIntoTrianglePatternMemo, triangleRotatingKickers.length),
+    [secondsIntoTrianglePatternMemo, triangleRotatingKickers.length],
+  );
+
+  const triangleKickerLine =
+    triangleRotatingKickers.length > 0 ? (triangleRotatingKickers[triangleKickerIndex] ?? '') : '';
+
+  const onPatternCompleteRef = useRef(onPatternComplete);
+  onPatternCompleteRef.current = onPatternComplete;
+  const ritualVariantRef = useRef(ritualVariant);
+  ritualVariantRef.current = ritualVariant;
+  const phaseAdvanceGuardRef = useRef(false);
 
   useImperativeHandle(
     ref,
@@ -131,6 +187,7 @@ export const PauseBreathing = forwardRef<PauseBreathingHandle, Props>(function P
         setElapsed(0);
         setCycle(0);
         setCompletedLocal(false);
+        phaseAdvanceGuardRef.current = false;
       },
     }),
     [],
@@ -141,78 +198,79 @@ export const PauseBreathing = forwardRef<PauseBreathingHandle, Props>(function P
     onTimedBreathingChange?.(inTimedLoop);
   }, [inTimedLoop, onTimedBreathingChange]);
 
+  /** One tick per second; do not reset this interval when parent passes new callback refs. */
   useEffect(() => {
     if (!started || completed) return;
     const timer = setInterval(() => {
-      setElapsed((prev) => {
-        const next = prev + 1;
-        if (next >= currentPhase.duration) {
-          const nextPhase = phaseIndex + 1;
-          if (nextPhase >= pattern.phases.length) {
-            const nextCycle = cycle + 1;
-            if (nextCycle >= totalCycles) {
-              const o = cueOptsRef.current;
-              playPauseBreathPatternCompleteCue({ muted: o.muted, prefersReducedMotion: o.prefersReduced });
-              setCompletedLocal(true);
-              onPatternComplete?.();
-              hapticFeedback('success');
-              return 0;
-            }
-            {
-              const o = cueOptsRef.current;
-              playPauseBreathPhaseCue({ muted: o.muted, prefersReducedMotion: o.prefersReduced });
-            }
-            setCycle(nextCycle);
-            setPhaseIndex(0);
-          } else {
-            {
-              const o = cueOptsRef.current;
-              playPauseBreathPhaseCue({ muted: o.muted, prefersReducedMotion: o.prefersReduced });
-            }
-            setPhaseIndex(nextPhase);
-          }
-          return 0;
-        }
-        return next;
-      });
+      setElapsed((prev) => prev + 1);
     }, 1000);
     return () => clearInterval(timer);
-  }, [
-    started,
-    completed,
-    phaseIndex,
-    cycle,
-    currentPhase.duration,
-    pattern.phases.length,
-    onPatternComplete,
-    totalCycles,
-  ]);
+  }, [started, completed]);
+
+  /** When the phase countdown completes, advance cycle/phase or finish the pattern. */
+  useEffect(() => {
+    if (!started || completed) return;
+    const phase = pattern.phases[phaseIndex];
+    if (elapsed < phase.duration) {
+      phaseAdvanceGuardRef.current = false;
+      return;
+    }
+    if (phaseAdvanceGuardRef.current) return;
+    phaseAdvanceGuardRef.current = true;
+
+    const advance = computeBreathingPhaseAdvance({
+      elapsed,
+      phaseDuration: phase.duration,
+      phaseIndex,
+      phaseCount: pattern.phases.length,
+      cycle,
+      totalCycles,
+    });
+
+    if (advance.kind === 'tick') {
+      phaseAdvanceGuardRef.current = false;
+      return;
+    }
+
+    const playPhaseCue = () => {
+      const o = cueOptsRef.current;
+      playPauseBreathPhaseCue({ muted: o.muted, prefersReducedMotion: o.prefersReduced });
+    };
+
+    if (advance.kind === 'pattern_complete') {
+      const o = cueOptsRef.current;
+      playPauseBreathPatternCompleteCue({ muted: o.muted, prefersReducedMotion: o.prefersReduced });
+      if (ritualVariantRef.current !== 'brief') {
+        onPatternCompleteRef.current?.();
+      }
+      setCompletedLocal(true);
+      hapticFeedback('success');
+      setElapsed(0);
+      phaseAdvanceGuardRef.current = false;
+      return;
+    }
+
+    playPhaseCue();
+    if (advance.kind === 'next_cycle') {
+      setCycle(advance.nextCycle);
+      setPhaseIndex(0);
+    } else {
+      setPhaseIndex(advance.nextPhaseIndex);
+    }
+    setElapsed(0);
+    phaseAdvanceGuardRef.current = false;
+  }, [started, completed, elapsed, phaseIndex, cycle, pattern, totalCycles]);
 
   const progress = currentPhase.duration > 0 ? elapsed / currentPhase.duration : 0;
   const isExpand = EXPAND_KEYS.includes(currentPhase.labelKey);
   const isContract = CONTRACT_KEYS.includes(currentPhase.labelKey);
   const scale = isExpand ? 0.5 + progress * 0.5 : isContract ? 1 - progress * 0.5 : 1;
+  const showHoldMandala = currentPhase.labelKey === HOLD_PHASE_LABEL_KEY;
+  const holdProgress = showHoldMandala
+    ? holdProgressWithinPhase(elapsed, currentPhase.duration)
+    : 0;
 
-  const introKicker =
-    ritualVariant === 'brief'
-      ? t('pause.brief.breathIntroKicker', { defaultValue: 'Step 2 · Breathe' })
-      : breathSegment === 'second'
-        ? t('pause.breathIntroKickerSecond', { defaultValue: 'Step 5 · Breathe' })
-        : t('pause.breathIntroKickerFirst', { defaultValue: 'Step 2 · Breathe' });
-
-  const interstitialTitle =
-    breathSegment === 'second'
-      ? t('pause.breathInterstitialTitleSecond', { defaultValue: 'You stayed with it' })
-      : t('pause.breathInterstitialTitle', { defaultValue: 'You stayed with it' });
-
-  const interstitialBody =
-    breathSegment === 'second'
-      ? t('pause.breathInterstitialBodySecond', {
-          defaultValue: 'When you are ready, continue to your decision.',
-        })
-      : t('pause.breathInterstitialBody', {
-          defaultValue: 'When you are ready, continue into reflection.',
-        });
+  const introKicker = t('pause.breathIntroKickerRitual', { defaultValue: 'Breathe' });
 
   return (
     <motion.div
@@ -234,62 +292,74 @@ export const PauseBreathing = forwardRef<PauseBreathingHandle, Props>(function P
           />
 
           <div className="flex max-w-md flex-col items-center gap-4 text-center">
-            <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-muted-foreground">{introKicker}</p>
-            <p className={pauseStepLayout.screenTitle}>
-              {breathSegment === 'second'
-                ? t('pause.breathSecondHeadline', { defaultValue: "Let's slow this down again" })
-                : t('pause.youPaused')}
-            </p>
+            {breathSegment === 'second' ? null : (
+              <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-muted-foreground">{introKicker}</p>
+            )}
+            {breathSegment === 'second' ? (
+              <>
+                <p className={pauseStepLayout.screenTitle}>
+                  {t('pause.breathSecondHeadline', { defaultValue: 'Just two more breaths' })}
+                </p>
+                <div className={`${pauseStepLayout.screenSubtitle} flex flex-col gap-0`}>
+                  <p>{t('pause.breathSecondSubline1', { defaultValue: 'Decisions land differently' })}</p>
+                  <p>{t('pause.breathSecondSubline2', { defaultValue: 'when the body is here.' })}</p>
+                </div>
+              </>
+            ) : (
+              <>
+                <p className={`${pauseStepLayout.screenTitle} max-w-md`}>
+                  {t('pause.breathIntroSingle', {
+                    defaultValue: "Let's slow this down. Just follow the rhythm.",
+                  })}
+                </p>
+              </>
+            )}
             {breathSegment === 'first' && mantra && (
               <motion.p
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
-                transition={{ delay: 1.2, duration: 1.5 }}
+                transition={{ delay: 0.6, duration: 1 }}
                 className="max-w-sm text-sm italic leading-relaxed text-muted-foreground"
               >
-                "{mantra}"
+                {`"${mantra}"`}
               </motion.p>
-            )}
-            {breathSegment === 'first' && (
-              <motion.div
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ delay: mantra ? 2.5 : 1.2, duration: 2 }}
-                className="flex max-w-md flex-col items-center gap-2"
-              >
-                <p className="text-center text-sm italic leading-relaxed text-muted-foreground">"{quote.text}"</p>
-                <p className="text-xs text-muted-foreground/80">— {quote.author}</p>
-              </motion.div>
             )}
           </div>
 
           <div className="flex flex-col items-center gap-3">
-            <motion.button
+            <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
-              transition={{ delay: 1.5, duration: 1 }}
-              onClick={() => {
-                hapticFeedback('light');
-                void resumePauseAudioContext();
-                setStarted(true);
-              }}
-              className={pauseStepLayout.textContinue}
+              transition={{ delay: 0.4, duration: 0.8 }}
             >
-              {t('breathing.begin', { defaultValue: 'Begin breathing' })}
-            </motion.button>
-            <motion.button
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ delay: 1.7, duration: 1 }}
-              type="button"
-              onClick={() => {
-                hapticFeedback('light');
-                void onSkipBreath();
-              }}
-              className="text-xs text-muted-foreground underline-offset-4 transition-colors hover:text-foreground hover:underline"
-            >
-              {t('common.skip')}
-            </motion.button>
+              <Button
+                type="button"
+                variant="outline"
+                size="default"
+                className={pauseStepLayout.ritualPrimaryOutlineCta}
+                onClick={() => {
+                  hapticFeedback('light');
+                  void resumePauseAudioContext();
+                  setStarted(true);
+                }}
+              >
+                {t('pause.breathStartCta', { defaultValue: 'Start' })}
+                <Play className="h-4 w-4 shrink-0 fill-current" aria-hidden />
+              </Button>
+            </motion.div>
+            {ritualVar === 'deep' && breathSegment === 'second' ? (
+              <Button
+                type="button"
+                variant="ghost"
+                className={`${pauseStepLayout.textContinue} font-medium`}
+                onClick={() => {
+                  hapticFeedback('light');
+                  void onSkipBreath();
+                }}
+              >
+                {t('pause.breathSkipToDecide', { defaultValue: 'Skip to decide' })}
+              </Button>
+            ) : null}
           </div>
         </>
       ) : !completed ? (
@@ -299,15 +369,12 @@ export const PauseBreathing = forwardRef<PauseBreathingHandle, Props>(function P
           transition={{ duration: 0.6 }}
           className="flex flex-col items-center gap-8"
         >
-          <motion.div
-            className="rounded-full border-2 border-border/50"
-            style={{
-              width: 140,
-              height: 140,
-              background: 'radial-gradient(circle, hsl(var(--nox-color-background-accent) / 0.45) 0%, transparent 70%)',
-            }}
-            animate={{ scale }}
-            transition={{ duration: 1, ease: 'easeInOut' }}
+          <BreathOrbVisual
+            orbScale={scale}
+            phaseProgress={progress}
+            showHoldMandala={showHoldMandala}
+            holdProgress={holdProgress}
+            prefersReducedMotion={!!prefersReduced}
           />
           <motion.p
             key={`${phaseIndex}-${cycle}`}
@@ -318,66 +385,143 @@ export const PauseBreathing = forwardRef<PauseBreathingHandle, Props>(function P
             {t(currentPhase.labelKey)}
           </motion.p>
           <p className="font-mono text-3xl tabular-nums text-muted-foreground">
-            {currentPhase.duration - elapsed}
+            {phaseSecondCountsUp ? elapsed + 1 : currentPhase.duration - elapsed}
           </p>
-          {showPhaseHints ? (
+          {showPhaseHints && triangleRotatingKickers.length > 0 ? (
             <motion.p
-              key={`phase-hint-${patternIndex}-${cycle}-${phaseIndex}`}
+              key={`triangle-kicker-${triangleKickerIndex}`}
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ duration: 0.35 }}
               className="max-w-xs px-2 text-center text-xs italic leading-snug text-muted-foreground"
             >
-              {t(phaseHintTranslationKey(patternIndex, cycle, phaseIndex), { defaultValue: '' })}
+              {triangleKickerLine}
             </motion.p>
           ) : null}
-          <p className="text-xs font-medium text-muted-foreground">
-            {cycle + 1} / {totalCycles}
+          <p className="text-base italic text-muted-foreground">
+            {t('pause.breathRoundLabel', {
+              current: cycle + 1,
+              total: totalCycles,
+              defaultValue: 'Round {{current}}/{{total}}',
+            })}
           </p>
+        </motion.div>
+      ) : ritualVariant === 'brief' ? (
+        <BriefBreathAdvanceToIntegrate
+          onContinue={onContinueAfterBreath}
+          onAdvanceFailed={() => {
+            setCompletedLocal(false);
+            phaseAdvanceGuardRef.current = false;
+          }}
+        />
+      ) : ritualVariant === 'deep' && breathSegment === 'first' ? (
+        <motion.div
+          initial={{ opacity: 0, y: 8 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8 }}
+          className="flex max-w-md flex-col items-center gap-6 px-2 text-center"
+        >
+          <p className={pauseStepLayout.screenTitle}>
+            {t('pause.deep.breathFirstInterstitialTitle', { defaultValue: 'Three breaths' })}
+          </p>
+          <p className={`${pauseStepLayout.screenSubtitle} max-w-sm`}>
+            {t('pause.deep.breathFirstInterstitialBody', { defaultValue: "You've arrived" })}
+          </p>
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.35, duration: 0.6 }}
+            className="flex flex-wrap items-center justify-center gap-3 pt-1 sm:gap-6"
+          >
+            {onRepeatDeepFirstBreathPattern ? (
+              <Button
+                type="button"
+                variant="ghost"
+                className="gap-2 font-semibold text-primary hover:bg-primary/5 hover:text-primary"
+                onClick={() => {
+                  hapticFeedback('light');
+                  onRepeatDeepFirstBreathPattern();
+                }}
+              >
+                <RefreshCw className="h-4 w-4 shrink-0" aria-hidden />
+                {t('pause.deep.breathFirstRepeatCta', { defaultValue: 'Three more' })}
+              </Button>
+            ) : null}
+            <Button
+              type="button"
+              variant="outline"
+              size="default"
+              className={pauseStepLayout.ritualPrimaryOutlineCta}
+              onClick={() => {
+                hapticFeedback('light');
+                onContinueAfterBreath();
+              }}
+            >
+              {t('pause.steps.continue', { defaultValue: 'Continue' })}
+              <ChevronRight className="ml-1 h-4 w-4 shrink-0" aria-hidden />
+            </Button>
+          </motion.div>
         </motion.div>
       ) : (
         <motion.div
           initial={{ opacity: 0, y: 8 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8 }}
-          className="flex flex-col items-center gap-5 text-center"
+          className="flex max-w-md flex-col items-center gap-6 px-2 text-center"
         >
-          <div className="h-20 w-20 rounded-full border border-border/60 bg-muted/40" />
-          <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-muted-foreground">
-            {t('pause.breathYouAreHere', { defaultValue: "You're here" })}
+          <motion.div
+            className="flex shrink-0 items-center justify-center"
+            animate={prefersReduced ? {} : { scale: [1, 1.04, 1] }}
+            transition={{ duration: 6, repeat: Infinity, ease: 'easeInOut' }}
+          >
+            <BreathOrbVisual
+              orbScale={1}
+              phaseProgress={1}
+              showHoldMandala
+              holdProgress={1}
+              prefersReducedMotion={!!prefersReduced}
+            />
+          </motion.div>
+          <p className={pauseStepLayout.screenTitle}>
+            {t('pause.deep.breathSecondInterstitialTitle', { defaultValue: 'You already know' })}
           </p>
-          <p className="text-center font-editorial text-2xl text-foreground sm:text-3xl">{interstitialTitle}</p>
-          <p className="max-w-sm text-sm leading-relaxed text-muted-foreground">{interstitialBody}</p>
-          <motion.button
+          <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            transition={{ delay: 0.5, duration: 0.8 }}
-            onClick={() => {
-              hapticFeedback('light');
-              onContinueAfterBreath();
-            }}
-            className={pauseStepLayout.textContinue}
+            transition={{ delay: 0.35, duration: 0.6 }}
+            className="flex flex-wrap items-center justify-center gap-3 pt-1 sm:gap-6"
           >
-            {t('pause.steps.continue', { defaultValue: 'Continue' })}
-          </motion.button>
+            {onRepeatDeepSecondBreathPattern ? (
+              <Button
+                type="button"
+                variant="ghost"
+                className="gap-2 font-semibold text-primary hover:bg-primary/5 hover:text-primary"
+                onClick={() => {
+                  hapticFeedback('light');
+                  onRepeatDeepSecondBreathPattern();
+                }}
+              >
+                <RefreshCw className="h-4 w-4 shrink-0" aria-hidden />
+                {t('pause.deep.breathSecondRepeatCta', { defaultValue: 'Three more' })}
+              </Button>
+            ) : null}
+            <Button
+              type="button"
+              variant="outline"
+              size="default"
+              className={pauseStepLayout.ritualPrimaryOutlineCta}
+              onClick={() => {
+                hapticFeedback('light');
+                onContinueAfterBreath();
+              }}
+            >
+              {t('pause.steps.continue', { defaultValue: 'Continue' })}
+              <ChevronRight className="ml-1 h-4 w-4 shrink-0" aria-hidden />
+            </Button>
+          </motion.div>
         </motion.div>
       )}
 
-      {!completed && started && (
-        <motion.button
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 3, duration: 1 }}
-          type="button"
-          onClick={() => {
-            hapticFeedback('light');
-            void onSkipBreath();
-          }}
-          className="text-xs text-muted-foreground underline-offset-4 transition-colors hover:text-foreground hover:underline"
-        >
-          {t('common.skip')}
-        </motion.button>
-      )}
     </motion.div>
   );
 });

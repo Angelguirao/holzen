@@ -45,13 +45,12 @@ ALTER TABLE public.audit_log ENABLE ROW LEVEL SECURITY;
 DROP POLICY IF EXISTS "audit_log admin select" ON public.audit_log;
 
 -- Admin-only SELECT. `public.is_admin()` is the existing helper (migration
--- 20260328115647_function_is_admin.sql) — any function marked `is_admin(auth.uid())` gates
--- admin surfaces.
+-- 20260328115647_function_is_admin.sql) — it reads `auth.uid()` internally.
 CREATE POLICY "audit_log admin select"
   ON public.audit_log
   FOR SELECT
   TO authenticated
-  USING (public.is_admin(auth.uid()));
+  USING (public.is_admin());
 
 -- No INSERT / UPDATE / DELETE policies: only the service role can write. Users — including
 -- admins — never modify audit rows through PostgREST. This keeps the log tamper-resistant.

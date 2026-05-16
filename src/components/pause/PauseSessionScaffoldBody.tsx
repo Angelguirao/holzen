@@ -18,6 +18,10 @@ export type PauseSessionScaffoldBodyProps = {
   decision: string | null;
   onDoneReturn: () => void;
   pauseImpactData: PauseImpactData | null;
+  /** Brief completion: navigate to Journey after outcome (session already cleared on decide). */
+  onSaveToJourney?: () => void;
+  /** Completed pause id — brief done screen logs `post_pause_emotion_logged`. */
+  pauseInstanceIdForDone?: string | null;
 };
 
 /** Session / done content inside `PauseSessionScaffold` (brief vs deep vs completion). */
@@ -29,13 +33,22 @@ export function PauseSessionScaffoldBody({
   decision,
   onDoneReturn,
   pauseImpactData,
+  onSaveToJourney,
+  pauseInstanceIdForDone,
 }: PauseSessionScaffoldBodyProps) {
   return (
     <>
       {phase === 'session' && ritualEntry === 'brief' && <PauseSessionBriefRitualBody {...briefRitual} />}
       {phase === 'session' && ritualEntry === 'deep' && <PauseSessionDeepRitualBody {...deepRitual} />}
       {phase === 'done' && (
-        <PauseDone decision={decision} onReturn={onDoneReturn} pauseData={pauseImpactData} />
+        <PauseDone
+          decision={decision}
+          onReturn={onDoneReturn}
+          pauseData={pauseImpactData}
+          doneVariant={ritualEntry === 'brief' ? 'brief' : 'default'}
+          onSaveToJourney={onSaveToJourney}
+          pauseInstanceId={pauseInstanceIdForDone}
+        />
       )}
     </>
   );

@@ -1,0 +1,19 @@
+---
+description: >-
+  Holzen — after completing implementation work, create a git commit unless the user explicitly
+  asked for WIP-only or read-only exploration. Aligns agent behavior with repo workflow.
+alwaysApply: true
+---
+
+# Git commits (Holzen)
+
+When you **finish** a task that **changes tracked code or project config** (features, fixes, refactors, tests, paired doc updates), **create a git commit** with a message that matches recent history (`feat(scope):`, `fix(scope):`, etc.).
+
+**Skip a commit** only when:
+
+- The user explicitly asked for **WIP / no commit** / **do not commit**, or
+- You made **no file changes** (read-only exploration, answers only).
+
+**Never** commit secrets (`.env`, keys), and do not use `--no-verify` or force-push unless the user explicitly asks.
+
+If a pre-commit hook fails, fix the issue and create a **new** commit (do not amend a failed attempt unless the user’s commit rules allow it).

@@ -1,11 +1,13 @@
 /**
- * Cron-side fetches + orchestrator hints. Context suffix wording lives in `pause-context-suffix.ts`
+ * Cron-side fetches + pause context enrichment (manual parity with the client).
+ * Context suffix wording lives in `pause-context-suffix.ts`
  * (shared with the client via `@holzen-pause-context`).
  */
 
 import type { SupabaseClient } from "https://esm.sh/@supabase/supabase-js@2.57.2";
 import type { PauseContextFearGreed, PauseContextOnChain } from "./pause-context-suffix.ts";
 import { enrichPauseContextWithMarketData } from "./pause-context-suffix.ts";
+import { fetchInitWithIncomingTrace } from "./forward-trace-headers.ts";
 
 export type FearGreedSnapshot = PauseContextFearGreed;
 export type OnChainSnapshot = PauseContextOnChain;
@@ -20,9 +22,12 @@ export function enrichAutomaticPauseContext(
 }
 
 /** One shared Fear & Greed fetch per cron run (same index for all users that tick). */
-export async function fetchFearGreedSnapshot(): Promise<FearGreedSnapshot | null> {
+export async function fetchFearGreedSnapshot(incoming?: Request): Promise<FearGreedSnapshot | null> {
   try {
-    const res = await fetch("https://api.alternative.me/fng/?limit=1");
+    const res = await fetch(
+      "https://api.alternative.me/fng/?limit=1",
+      fetchInitWithIncomingTrace(incoming, {}),
+    );
     if (!res.ok) return null;
     const data = await res.json();
     const entry = data?.data?.[0];
@@ -36,13 +41,20 @@ export async function fetchFearGreedSnapshot(): Promise<FearGreedSnapshot | null
 }
 
 /** One shared mempool.space round-trip per cron run (same parsing as `fetchOnChainData` in `src/lib/btc.ts`). */
-export async function fetchOnChainSnapshot(): Promise<OnChainSnapshot | null> {
+export async function fetchOnChainSnapshot(incoming?: Request): Promise<OnChainSnapshot | null> {
   try {
+    const base = fetchInitWithIncomingTrace(incoming, {});
     const [mempoolRes, feesRes, hashrateRes, tipRes] = await Promise.all([
-      fetch("https://mempool.space/api/mempool").then((r) => (r.ok ? r.json() : null)).catch(() => null),
-      fetch("https://mempool.space/api/v1/fees/recommended").then((r) => (r.ok ? r.json() : null)).catch(() => null),
-      fetch("https://mempool.space/api/v1/mining/hashrate/1d").then((r) => (r.ok ? r.json() : null)).catch(() => null),
-      fetch("https://mempool.space/api/blocks/tip/height").then((r) => (r.ok ? r.text() : null)).catch(() => null),
+      fetch("https://mempool.space/api/mempool", base).then((r) => (r.ok ? r.json() : null)).catch(() => null),
+      fetch("https://mempool.space/api/v1/fees/recommended", base).then((r) => (r.ok ? r.json() : null)).catch(
+        () => null,
+      ),
+      fetch("https://mempool.space/api/v1/mining/hashrate/1d", base).then((r) => (r.ok ? r.json() : null)).catch(
+        () => null,
+      ),
+      fetch("https://mempool.space/api/blocks/tip/height", base).then((r) => (r.ok ? r.text() : null)).catch(
+        () => null,
+      ),
     ]);
 
     const result: OnChainSnapshot = {};

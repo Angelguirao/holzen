@@ -16,12 +16,6 @@ export { PROFILE_QUERY_KEY, fetchProfileRowForUser, getProfileRowQueryOptions } 
 
 type ProfileUpdate = Database['public']['Tables']['profiles']['Update'];
 
-export interface ProfileLoadReflectionData {
-  lastMessage: string | null;
-  lastContext: string | null;
-  lastTriggerAt: string | null;
-}
-
 export function useProfile() {
   const { user } = useAuth();
   const { t } = useTranslation();
@@ -65,8 +59,6 @@ export function useProfile() {
   const [language, setLanguageState] = useState<string>('en');
   const [companionPrefs, setCompanionPrefsState] = useState<CompanionPrefs>({ breathing: true, haiku: true, grounding: true, signal: true, zoomOut: true, history: true });
   const [hasOnboarded, setHasOnboarded] = useState(true);
-
-  const [_profileLoadReflectionData, setProfileLoadReflectionData] = useState<ProfileLoadReflectionData | null>(null);
 
   const retryProfileLoad = useCallback(() => {
     void refetchProfile();
@@ -126,17 +118,12 @@ export function useProfile() {
         history: row.companion_history ?? true,
       });
 
-      setProfileLoadReflectionData({
-        lastMessage: row.last_message ?? null,
-        lastContext: row.last_context ?? null,
-        lastTriggerAt: row.last_trigger_at ?? null,
-      });
     }
     holzenLog.profile('ready', {
       hasRow: !!data,
       hasOnboarded: data?.has_onboarded ?? null,
       silentMode: data ? !!data.silent_mode : null,
-      hasLastMessage: !!(data?.last_message),
+      hasLastContext: !!(data?.last_context),
     });
   }, [userId, profileQueryStatus, profileRow]);
 
@@ -444,6 +431,5 @@ export function useProfile() {
     completeOnboarding,
     isInCooldown,
     isInQuietHours,
-    _profileLoadReflectionData,
   };
 }

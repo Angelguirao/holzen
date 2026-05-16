@@ -38,10 +38,12 @@ function setup(overrides: Partial<Parameters<typeof buildPauseSessionScaffoldRit
     handleBriefBreathContinue,
     handleBriefSkipBreath: vi.fn(),
     soundMuted: false,
+    prefersReducedMotion: false,
     briefIntegrateDone: false,
     handleBriefIntegrateComplete: vi.fn(),
+    handleBriefRepeatBreaths: vi.fn(),
+    handleBriefSwitchToDeepPause: vi.fn(),
     handleDecide: vi.fn(),
-    briefDecideIntroKicker: 'Step 4',
     goToStep: vi.fn(),
     handleContinueAfterFirstBreath: vi.fn(),
     handleContinueAfterSecondBreath: vi.fn(),
@@ -56,8 +58,12 @@ function setup(overrides: Partial<Parameters<typeof buildPauseSessionScaffoldRit
     toggleFavorite: vi.fn(),
     subscribed: false,
     handleFrameImDone: vi.fn(),
-    handleDeepChooseBridgeContinue: vi.fn(),
-    decideOnBackStep: 'choose' as const,
+    handleDeepFirstBreathRepeat: vi.fn(),
+    handleDeepSecondBreathRepeat: vi.fn(),
+    severityAbsPct: 5,
+    reflectionLoading: false,
+    reflectionError: null,
+    onReflectionRetry: vi.fn(),
     ...overrides,
   };
   return {
@@ -81,9 +87,6 @@ describe('buildPauseSessionScaffoldRitualPayloads', () => {
 
     briefRitual.onBriefDecideBack();
     expect(setBriefStep).toHaveBeenCalledWith('integrate');
-
-    briefRitual.onBriefBreathPatternComplete();
-    expect(setBreathingFirstCompleted).toHaveBeenCalledWith(true);
 
     void briefRitual.onContinueAfterBriefBreath();
     expect(handleBriefBreathContinue).toHaveBeenCalled();
@@ -117,28 +120,70 @@ describe('buildPauseSessionScaffoldRitualPayloads', () => {
     expect(handleContinueAfterSecondBreath).toHaveBeenCalled();
   });
 
-  it('wires deep frame done and choose-bridge', () => {
+  it('wires deep first breath repeat', () => {
+    const handleDeepFirstBreathRepeat = vi.fn();
+    const { params } = setup({ handleDeepFirstBreathRepeat });
+    const { deepRitual } = buildPauseSessionScaffoldRitualPayloads(params);
+    deepRitual.onRepeatDeepFirstBreathPattern();
+    expect(handleDeepFirstBreathRepeat).toHaveBeenCalled();
+  });
+
+  it('wires deep second breath repeat', () => {
+    const handleDeepSecondBreathRepeat = vi.fn();
+    const { params } = setup({ handleDeepSecondBreathRepeat });
+    const { deepRitual } = buildPauseSessionScaffoldRitualPayloads(params);
+    deepRitual.onRepeatDeepSecondBreathPattern();
+    expect(handleDeepSecondBreathRepeat).toHaveBeenCalled();
+  });
+
+  it('wires deep frame done', () => {
     const handleFrameImDone = vi.fn();
-    const handleDeepChooseBridgeContinue = vi.fn();
-    const { params } = setup({ handleFrameImDone, handleDeepChooseBridgeContinue });
+    const { params } = setup({ handleFrameImDone });
     const { deepRitual } = buildPauseSessionScaffoldRitualPayloads(params);
 
     void deepRitual.onFrameImDone();
     expect(handleFrameImDone).toHaveBeenCalled();
-
-    deepRitual.onDeepChooseBridgeContinue();
-    expect(handleDeepChooseBridgeContinue).toHaveBeenCalled();
   });
 
   it('forwards timed breathing changes to setBreathTimedActive for brief and deep', () => {
     const { params, setBreathTimedActive } = setup();
     const { briefRitual, deepRitual } = buildPauseSessionScaffoldRitualPayloads(params);
 
+    expect(deepRitual.prefersReducedMotion).toBe(false);
+
     briefRitual.onTimedBreathingChange(true);
     expect(setBreathTimedActive).toHaveBeenLastCalledWith(true);
 
     deepRitual.onTimedBreathingChange(false);
     expect(setBreathTimedActive).toHaveBeenLastCalledWith(false);
+  });
+
+  it('maps prefersReducedMotion onto deep ritual', () => {
+    const { params } = setup({ prefersReducedMotion: true });
+    const { deepRitual } = buildPauseSessionScaffoldRitualPayloads(params);
+    expect(deepRitual.prefersReducedMotion).toBe(true);
+  });
+
+  it('wires brief integrate repeat / deep switch and deepPauseLocked from subscription', () => {
+    const handleBriefRepeatBreaths = vi.fn();
+    const handleBriefSwitchToDeepPause = vi.fn();
+    const { params } = setup({
+      handleBriefRepeatBreaths,
+      handleBriefSwitchToDeepPause,
+      subscribed: false,
+    });
+    const { briefRitual } = buildPauseSessionScaffoldRitualPayloads(params);
+    expect(briefRitual.deepPauseLocked).toBe(true);
+    briefRitual.onBriefRepeatBreaths();
+    expect(handleBriefRepeatBreaths).toHaveBeenCalled();
+    briefRitual.onBriefSwitchToDeepPause();
+    expect(handleBriefSwitchToDeepPause).toHaveBeenCalled();
+  });
+
+  it('brief deepPauseLocked false when subscribed', () => {
+    const { params } = setup({ subscribed: true });
+    const { briefRitual } = buildPauseSessionScaffoldRitualPayloads(params);
+    expect(briefRitual.deepPauseLocked).toBe(false);
   });
 
   it('forwards brief and deep skip breath handlers', () => {

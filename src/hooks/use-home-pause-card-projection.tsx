@@ -1,9 +1,9 @@
 import type { ReactNode } from 'react';
 import { useMemo } from 'react';
 import { HomePauseCardBody } from '@/components/home/HomePauseCardBody';
-import { HomePinnedPauseInset } from '@/components/home/HomePinnedPauseInset';
 import { SnoozeToolbarControl } from '@/components/SnoozeControl';
 import type { BtcPriceData } from '@/lib/btc';
+import type { ManualPauseTriggerResult } from '@/lib/manual-pause-trigger-result';
 
 /** Shape returned by {@link parsePauseContextForHomePreview}. */
 type PauseContextPreview = {
@@ -18,21 +18,18 @@ export function useHomePauseCardProjection(args: {
   subscribed: boolean;
   monthlyRemaining: number | undefined;
   checkoutLoading: boolean;
-  message: string | null;
+  hasOpenPause: boolean;
   openPauseState: 'active' | 'engaged' | null;
   pauseContextHomePreview: PauseContextPreview;
   loading: boolean;
   error: string | null;
   btcData: BtcPriceData | null;
-  pinnedPausePreview: { context: string | null } | null;
-  pinnedPreviewFields: PauseContextPreview;
-  unpinPausePreview: () => void;
   showPauseScheduling: boolean;
   autoCooldownRemaining: () => number;
   cooldownHours: number;
   nextCronCheckIn: () => number;
   manualCooldownRemaining: () => number;
-  manualTrigger: () => void;
+  manualTrigger: (mood?: string) => Promise<ManualPauseTriggerResult>;
   onNavigatePauseWithThis: () => void;
   onNavigatePauseFromPendingBanner: () => void;
   onDismissOpenPause: () => void;
@@ -46,15 +43,12 @@ export function useHomePauseCardProjection(args: {
     subscribed,
     monthlyRemaining,
     checkoutLoading,
-    message,
+    hasOpenPause,
     openPauseState,
     pauseContextHomePreview,
     loading,
     error,
     btcData,
-    pinnedPausePreview,
-    pinnedPreviewFields,
-    unpinPausePreview,
     showPauseScheduling,
     autoCooldownRemaining,
     cooldownHours,
@@ -73,18 +67,6 @@ export function useHomePauseCardProjection(args: {
     return <SnoozeToolbarControl />;
   }, [subscriptionReady, hasAccess]);
 
-  const pauseEmptyPinnedPreview = useMemo(
-    () =>
-      pinnedPausePreview ? (
-        <HomePinnedPauseInset
-          btc24h={pinnedPreviewFields.btc24h}
-          marketSentiment={pinnedPreviewFields.marketSentiment}
-          onUnpin={unpinPausePreview}
-        />
-      ) : null,
-    [pinnedPausePreview, pinnedPreviewFields.btc24h, pinnedPreviewFields.marketSentiment, unpinPausePreview],
-  );
-
   const pauseCardBody: ReactNode = useMemo(
     () => (
       <HomePauseCardBody
@@ -94,7 +76,7 @@ export function useHomePauseCardProjection(args: {
         monthlyRemaining={monthlyRemaining}
         checkoutLoading={checkoutLoading}
         onStartCheckoutPro={onStartCheckoutPro}
-        message={message}
+        hasOpenPause={hasOpenPause}
         openPauseState={openPauseState}
         contextPreview={pauseContextHomePreview}
         onPauseWithThis={onNavigatePauseWithThis}
@@ -104,7 +86,6 @@ export function useHomePauseCardProjection(args: {
         error={error}
         btcData={btcData}
         onReflectionRetry={manualTrigger}
-        pinnedPreview={pauseEmptyPinnedPreview}
         showPauseScheduling={showPauseScheduling}
         autoCooldownRemaining={autoCooldownRemaining}
         cooldownHours={cooldownHours}
@@ -120,7 +101,7 @@ export function useHomePauseCardProjection(args: {
       monthlyRemaining,
       checkoutLoading,
       onStartCheckoutPro,
-      message,
+      hasOpenPause,
       openPauseState,
       pauseContextHomePreview,
       onNavigatePauseWithThis,
@@ -130,7 +111,6 @@ export function useHomePauseCardProjection(args: {
       error,
       btcData,
       manualTrigger,
-      pauseEmptyPinnedPreview,
       showPauseScheduling,
       autoCooldownRemaining,
       cooldownHours,
@@ -140,5 +120,5 @@ export function useHomePauseCardProjection(args: {
     ],
   );
 
-  return { pauseSectionHeaderRight, pauseEmptyPinnedPreview, pauseCardBody };
+  return { pauseSectionHeaderRight, pauseCardBody };
 }

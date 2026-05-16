@@ -1,9 +1,11 @@
 import { useTranslation } from 'react-i18next';
 import { AnimatePresence, motion, useReducedMotion } from 'framer-motion';
 import { Loader2 } from 'lucide-react';
-import type { ReactNode } from 'react';
-import { ReflectionMessage } from '@/components/ReflectionMessage';
 import { HomePauseEmptyFlow } from '@/components/home/HomePauseEmptyFlow';
+import { HomePauseContextMeta } from '@/components/home/HomePauseContextMeta';
+import { homeInWidget } from '@/components/home/home-widget-styles';
+import { cn } from '@/lib/utils';
+import { Sparkles } from 'lucide-react';
 import { HomePauseBlockingErrorPanel } from '@/components/home/HomePauseBlockingErrorPanel';
 import { LoadingButton } from '@/components/ui/loading-button';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -14,8 +16,10 @@ import type { BtcMoveSeverity } from '@/lib/btc-move-severity';
 import { shouldSurfacePauseWidgetError } from '@/lib/home-pause-widget-error';
 
 export interface ZenModeHomeProps {
-  message: string | null;
+  hasOpenPause: boolean;
   context: string | null;
+  contextPreview: { btc24h: string | null; marketSentiment: string | null };
+  openPauseState: 'active' | 'engaged' | null;
   companions: CompanionData;
   companionPrefs: CompanionPrefs;
   severity: BtcMoveSeverity;
@@ -28,11 +32,11 @@ export interface ZenModeHomeProps {
   onNeedPause: () => void;
   /** Direct regenerate (error panel Try again). */
   onManualTrigger: () => void;
+  onPauseWithThis: () => void;
   subscriptionReady: boolean;
   hasAccess: boolean;
   showLimitUpsell: boolean;
   showPauseScheduling: boolean;
-  pinnedPreview: ReactNode;
   autoCooldownRemaining: () => number;
   cooldownHours: number;
   nextCronCheckIn: () => number;
@@ -43,23 +47,21 @@ export interface ZenModeHomeProps {
 
 /** Minimal Home layout when Zen mode is enabled in customize / settings. */
 export function ZenModeHome({
-  message,
+  hasOpenPause,
   context,
-  companions,
-  companionPrefs,
-  severity,
-  lastPauseInstanceId,
+  contextPreview,
+  openPauseState,
   loading,
   error,
   btcData,
   onDismiss,
   onNeedPause,
   onManualTrigger,
+  onPauseWithThis,
   subscriptionReady,
   hasAccess,
   showLimitUpsell,
   showPauseScheduling,
-  pinnedPreview,
   autoCooldownRemaining,
   cooldownHours,
   nextCronCheckIn,
@@ -78,28 +80,46 @@ export function ZenModeHome({
       };
 
   const blockingError = error && shouldSurfacePauseWidgetError(error, btcData) ? error : null;
+  const pausePrimaryCta =
+    openPauseState === 'engaged'
+      ? t('home.pauseCtaEngaged')
+      : t('home.pauseCtaActive');
 
   return (
     <div className="min-h-[60vh] flex flex-col justify-center text-sm font-sans">
       <AnimatePresence mode="wait">
-        {message ? (
-          <motion.div key="zen-reflection" variants={zenVariants} initial="hidden" animate="visible" exit="hidden">
-            <ReflectionMessage
-              message={message}
-              context={context}
-              onDismiss={onDismiss}
-              companions={companions}
-              companionPrefs={{
-                breathing: companionPrefs.breathing,
-                haiku: false,
-                grounding: false,
-                signal: false,
-                zoomOut: false,
-                history: false,
-              }}
-              severity={severity}
-              pauseInstanceId={lastPauseInstanceId}
+        {hasOpenPause ? (
+          <motion.div
+            key="zen-open-pause"
+            variants={zenVariants}
+            initial="hidden"
+            animate="visible"
+            exit="hidden"
+            className="mx-auto max-w-md space-y-4 text-left"
+          >
+            <HomePauseContextMeta
+              btc24h={contextPreview.btc24h}
+              marketSentiment={contextPreview.marketSentiment}
+              className="min-w-0"
             />
+            {context?.trim() ? (
+              <p className="text-xs font-mono leading-relaxed text-muted-foreground">{context.trim()}</p>
+            ) : null}
+            <button
+              type="button"
+              onClick={onPauseWithThis}
+              className={cn(homeInWidget.ctaPrimary, 'w-full bg-foreground text-background hover:bg-foreground/90')}
+            >
+              <Sparkles className="h-4 w-4 shrink-0 text-background" aria-hidden />
+              {pausePrimaryCta}
+            </button>
+            <button
+              type="button"
+              onClick={onDismiss}
+              className="w-full rounded-lg border border-border/80 bg-transparent px-3 py-2 text-center text-xs font-medium text-muted-foreground transition-colors hover:bg-muted/30 hover:text-foreground"
+            >
+              {t('home.pauseDismissCta', { defaultValue: 'Dismiss pause' })}
+            </button>
           </motion.div>
         ) : loading ? (
           <motion.div
@@ -112,7 +132,7 @@ export function ZenModeHome({
           >
             <div className="flex items-center gap-2 text-muted-foreground">
               <Loader2 className="h-3 w-3 animate-spin" aria-hidden />
-              <p className="text-xs font-mono">{t('home.generatingReflection')}</p>
+              <p className="text-xs font-mono">{t('home.openingPause', { defaultValue: 'Opening your pause…' })}</p>
             </div>
             <Skeleton className="h-4 w-full" />
             <Skeleton className="h-4 w-3/4" />
@@ -144,7 +164,6 @@ export function ZenModeHome({
             {hasAccess && !showLimitUpsell ? (
               <HomePauseEmptyFlow
                 variant="zen"
-                pinnedPreview={pinnedPreview}
                 showPauseScheduling={showPauseScheduling}
                 autoCooldownRemaining={autoCooldownRemaining}
                 cooldownHours={cooldownHours}

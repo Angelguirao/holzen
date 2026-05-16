@@ -29,9 +29,11 @@ export type PauseSessionBriefRitualBodyProps = {
   ritualSoundMuted: boolean;
   briefIntegrateDone: boolean;
   onBriefIntegrateComplete: () => void;
+  onBriefRepeatBreaths: () => void;
+  onBriefSwitchToDeepPause: () => void;
+  deepPauseLocked: boolean;
   onDecide: (decision: string) => void;
   onBriefDecideBack: () => void;
-  briefDecideIntroKicker: string;
 };
 
 /** Brief ritual step panels inside `PauseSessionScaffold` (Framer step transitions preserved). */
@@ -55,9 +57,11 @@ export function PauseSessionBriefRitualBody({
   ritualSoundMuted,
   briefIntegrateDone,
   onBriefIntegrateComplete,
+  onBriefRepeatBreaths,
+  onBriefSwitchToDeepPause,
+  deepPauseLocked,
   onDecide,
   onBriefDecideBack,
-  briefDecideIntroKicker,
 }: PauseSessionBriefRitualBodyProps) {
   return (
     <AnimatePresence mode="wait" initial={false}>
@@ -89,23 +93,26 @@ export function PauseSessionBriefRitualBody({
             onContinueAfterBreath={onContinueAfterBriefBreath}
             onSkipBreath={onSkipBriefBreath}
             ritualSoundMuted={ritualSoundMuted}
+            feelTile={selectedBriefFace}
           />
         </motion.div>
       )}
 
       {briefStep === 'integrate' && (
         <motion.div key="b-integrate" {...stepTransition}>
-          <PauseBriefIntegrate done={briefIntegrateDone} onComplete={onBriefIntegrateComplete} />
+          <PauseBriefIntegrate
+            done={briefIntegrateDone}
+            onComplete={onBriefIntegrateComplete}
+            onRepeatBreaths={onBriefRepeatBreaths}
+            onSwitchToDeepPause={onBriefSwitchToDeepPause}
+            deepPauseLocked={deepPauseLocked}
+          />
         </motion.div>
       )}
 
       {briefStep === 'decide' && (
         <motion.div key="b-decide" {...stepTransition}>
-          <PauseDecide
-            onDecide={onDecide}
-            onBack={onBriefDecideBack}
-            introKicker={briefDecideIntroKicker}
-          />
+          <PauseDecide onDecide={onDecide} onBack={onBriefDecideBack} hideChoicesBack />
         </motion.div>
       )}
     </AnimatePresence>

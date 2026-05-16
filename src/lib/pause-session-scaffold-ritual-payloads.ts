@@ -38,10 +38,12 @@ export type PauseSessionScaffoldRitualPayloadsParams = {
   handleBriefBreathContinue: () => void | Promise<unknown>;
   handleBriefSkipBreath: PauseSessionBriefRitualBodyProps['onSkipBriefBreath'];
   soundMuted: boolean;
+  prefersReducedMotion: boolean;
   briefIntegrateDone: boolean;
   handleBriefIntegrateComplete: PauseSessionBriefRitualBodyProps['onBriefIntegrateComplete'];
+  handleBriefRepeatBreaths: PauseSessionBriefRitualBodyProps['onBriefRepeatBreaths'];
+  handleBriefSwitchToDeepPause: PauseSessionBriefRitualBodyProps['onBriefSwitchToDeepPause'];
   handleDecide: PauseSessionBriefRitualBodyProps['onDecide'];
-  briefDecideIntroKicker: string;
   goToStep: PauseSessionDeepRitualBodyProps['goToStep'];
   handleContinueAfterFirstBreath: () => void | Promise<unknown>;
   handleContinueAfterSecondBreath: () => void | Promise<unknown>;
@@ -56,8 +58,12 @@ export type PauseSessionScaffoldRitualPayloadsParams = {
   toggleFavorite: PauseSessionDeepRitualBodyProps['onToggleFavorite'];
   subscribed: boolean;
   handleFrameImDone: () => void | Promise<unknown>;
-  handleDeepChooseBridgeContinue: PauseSessionDeepRitualBodyProps['onDeepChooseBridgeContinue'];
-  decideOnBackStep: PauseSessionDeepRitualBodyProps['decideOnBackStep'];
+  handleDeepFirstBreathRepeat: PauseSessionDeepRitualBodyProps['onRepeatDeepFirstBreathPattern'];
+  handleDeepSecondBreathRepeat: PauseSessionDeepRitualBodyProps['onRepeatDeepSecondBreathPattern'];
+  severityAbsPct: number;
+  reflectionLoading: boolean;
+  reflectionError: string | null;
+  onReflectionRetry: PauseSessionDeepRitualBodyProps['onReflectionRetry'];
 };
 
 /** Maps orchestrator deps to `PauseSessionBriefRitualBodyProps` and `PauseSessionDeepRitualBodyProps`. */
@@ -82,15 +88,18 @@ export function buildPauseSessionScaffoldRitualPayloads(
       severity: p.severity,
       breathingFirstCompleted: p.breathingFirstCompleted,
       onTimedBreathingChange: p.setBreathTimedActive,
-      onBriefBreathPatternComplete: () => p.setBreathingFirstCompleted(true),
+      /** Brief: first segment “completed” is set after `breath_completed` RPC in `handleBriefBreathContinue`. */
+      onBriefBreathPatternComplete: () => {},
       onContinueAfterBriefBreath: () => void p.handleBriefBreathContinue(),
       onSkipBriefBreath: p.handleBriefSkipBreath,
       ritualSoundMuted: p.soundMuted,
       briefIntegrateDone: p.briefIntegrateDone,
       onBriefIntegrateComplete: p.handleBriefIntegrateComplete,
+      onBriefRepeatBreaths: p.handleBriefRepeatBreaths,
+      onBriefSwitchToDeepPause: p.handleBriefSwitchToDeepPause,
+      deepPauseLocked: !p.subscribed,
       onDecide: p.handleDecide,
       onBriefDecideBack: () => p.setBriefStep('integrate'),
-      briefDecideIntroKicker: p.briefDecideIntroKicker,
     },
     deepRitual: {
       step: p.step,
@@ -114,6 +123,7 @@ export function buildPauseSessionScaffoldRitualPayloads(
       onSkipFirstBreath: p.handleSkipFirstBreath,
       onSkipSecondBreath: p.handleSkipSecondBreath,
       ritualSoundMuted: p.soundMuted,
+      prefersReducedMotion: p.prefersReducedMotion,
       companions: p.companions,
       companionPrefs: p.companionPrefs,
       pauseInstanceId: p.pauseInstanceId,
@@ -123,9 +133,12 @@ export function buildPauseSessionScaffoldRitualPayloads(
       onToggleFavorite: p.toggleFavorite,
       subscribed: p.subscribed,
       onFrameImDone: () => void p.handleFrameImDone(),
-      onDeepChooseBridgeContinue: p.handleDeepChooseBridgeContinue,
       onDecide: p.handleDecide,
-      decideOnBackStep: p.decideOnBackStep,
+      onRepeatDeepFirstBreathPattern: p.handleDeepFirstBreathRepeat,
+      onRepeatDeepSecondBreathPattern: p.handleDeepSecondBreathRepeat,
+      reflectionLoading: p.reflectionLoading,
+      reflectionError: p.reflectionError,
+      onReflectionRetry: p.onReflectionRetry,
     },
   };
 }

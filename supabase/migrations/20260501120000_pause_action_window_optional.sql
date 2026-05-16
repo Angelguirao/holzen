@@ -16,9 +16,15 @@ ALTER TABLE public.pause_templates
   ADD COLUMN IF NOT EXISTS action_window_ms bigint NULL,
   ADD COLUMN IF NOT EXISTS dismissal_suppression_ms bigint NOT NULL DEFAULT 21600000;
 
-ALTER TABLE public.pause_templates
-  ADD CONSTRAINT pause_templates_dismissal_suppression_positive
-  CHECK (dismissal_suppression_ms > 0);
+DO $pause_tpl_chk$
+BEGIN
+  ALTER TABLE public.pause_templates
+    ADD CONSTRAINT pause_templates_dismissal_suppression_positive
+    CHECK (dismissal_suppression_ms > 0);
+EXCEPTION WHEN duplicate_object THEN
+  NULL;
+END;
+$pause_tpl_chk$;
 
 COMMENT ON COLUMN public.pause_templates.action_window_ms IS
   'When set, pause_instances.window_ends_at = created + this duration and the '

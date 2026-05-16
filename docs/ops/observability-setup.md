@@ -90,7 +90,23 @@ curl -X POST -H 'Content-Type: application/json' \
 1. Sentry → Settings → Integrations → **Slack** → Authorize workspace.
 2. Map project `holzen` → `#holzen-alerts`.
 
-### 2.4 Alert rules (Sentry Alerts UI)
+### 2.4 W3C Trace Context (browser → edge)
+
+The SPA enables Sentry’s **`propagateTraceparent`** and **`tracePropagationTargets`** (Supabase project origin from `VITE_SUPABASE_URL`) so outgoing edge calls carry **`traceparent`**, **`sentry-trace`**, and **`baggage`** in addition to **`x-cid`**. See `src/lib/trace-propagation.ts`, `src/lib/sentry.ts`, and the patched `supabase.functions.invoke` in `src/integrations/supabase/client.ts`.
+
+Edge CORS (`supabase/functions/_shared/cors.ts`) allow-lists those headers; `withRequestLogging` parses a valid version-`00` **`traceparent`** (W3C Trace Context, same wire format as OpenTelemetry’s default propagator) and adds **`trace_id`**, **`parent_span_id`**, **`trace_flags`** (2 hex chars), **`trace_sampled`** (W3C sampled bit), and a truncated **`tracestate`** (when both `traceparent` parses and a `tracestate` header is present) to the initial `request` log line for BetterStack joins alongside `cid`.
+
+`createCidSupabaseClient(..., incomingRequest?)` forwards the same trace headers on service-role PostgREST/Auth HTTP calls when the optional **`Request`** is passed (see `_shared/forward-trace-headers.ts`); explicit `global.headers` from the caller still win.
+
+`fetchInitWithIncomingTrace(incomingRequest, init)` merges the same headers into a plain `fetch` **`RequestInit`** for outbound third-party calls (for example the Lovable AI gateway or price APIs) without overwriting keys already set in `init.headers`.
+
+BTC cache workers (`refresh-btc-prices`, `backfill-btc-prices`, `seed-btc-history`) and shared helpers such as **`fetchCoinGeckoHistoryPrice`** / **`warmMissingBtcPrices`** accept the incoming edge `Request` where applicable so CoinGecko, backup tickers, and CryptoCompare calls stay in the same trace when headers are present.
+
+**`callPerplexityChat(..., incoming?)`** forwards the same headers to Perplexity. **`companion-orchestrate`** passes the edge `Request` into signal, grounding, history, zoom-out, and **question-mode** `generateQuestion` (including regenerate-only) so live search and Lovable calls stay correlated with the client trace. **`generateUnifiedReflection`** accepts the same for **`holzen-reflect`** (browser Reflect step). Companion **structuring** steps (signal, grounding, history) forward the same headers on Lovable **`/chat/completions`**. **`fetchFeedXmlIfApplicable`** / **`firecrawlMapArticleUrls`** accept an optional incoming request for **`fetch-source-feeds`** outbound RSS and Firecrawl Map calls.
+
+This is **not** a full OpenTelemetry SDK in-app — it aligns propagation and log fields with **W3C Trace Context** and common **OTel collector pivots** (`trace_id`, parent span id, trace flags / sampled) so downstream OTLP or log pipelines can reuse the same identifiers without a browser-side `@opentelemetry/*` bundle.
+
+### 2.5 Alert rules (Sentry Alerts UI)
 
 Create each as an **Issue Alert** (not Metric Alert) unless noted:
 

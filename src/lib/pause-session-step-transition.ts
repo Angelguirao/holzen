@@ -1,4 +1,4 @@
-/** Horizontal slide distance (px) between pause beat panels in `PauseSession`. */
+/** Horizontal slide distance (px) for Framer step-change animations (not a user swipe gesture). */
 export const PAUSE_SESSION_STEP_SLIDE_OFFSET_PX = 80;
 
 /** Framer `transition.duration` (seconds) when full motion is allowed. */
@@ -24,7 +24,8 @@ export type PauseSessionStepTransitionConfig = {
 
 /**
  * Slide props for brief/deep step `motion.div` wrappers in `PauseSession`.
- * Matches the prior inline `slideX` + `stepTransition` object.
+ * `swipeDirection` only picks animation direction when the route advances steps programmatically;
+ * there is no horizontal swipe-to-navigate on `/pause`.
  */
 export function buildPauseSessionStepTransitionConfig(params: {
   swipeDirection: PauseSessionSwipeDirection;

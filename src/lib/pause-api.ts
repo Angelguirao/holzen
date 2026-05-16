@@ -117,6 +117,11 @@ export async function pauseLogStep(params: {
   } as never);
   if (error) throw error;
   const state = (data as PauseState | null) ?? null;
+  if (params.stepType === 'post_pause_emotion_logged') {
+    void supabase.auth.getUser().then(({ data: { user } }) => {
+      invalidatePauseStatsDataForUser(user?.id);
+    });
+  }
   if (state === 'engaged' && !phPauseEngagedSent.has(params.instanceId)) {
     phPauseEngagedSent.add(params.instanceId);
     try {

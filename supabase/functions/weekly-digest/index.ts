@@ -3,6 +3,7 @@ import { createClient } from "https://esm.sh/@supabase/supabase-js@2.57.2";
 import { unknownErrorForLog } from "../_shared/log-unknown-error.ts";
 import { createAttemptLogger } from "../_shared/observe.ts";
 import { coingeckoHeaders } from "../_shared/coingecko.ts";
+import { fetchInitWithIncomingTrace } from "../_shared/forward-trace-headers.ts";
 import {
   withRequestLogging,
   type RequestLoggingContext,
@@ -32,9 +33,17 @@ const corsHeaders = {
     "authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version",
 };
 
-async function fetchWithRetry(url: string, retries = 3, delayMs = 2000): Promise<Response> {
+async function fetchWithRetry(
+  incoming: Request | undefined,
+  url: string,
+  retries = 3,
+  delayMs = 2000,
+): Promise<Response> {
   for (let i = 0; i < retries; i++) {
-    const res = await fetch(url, { headers: coingeckoHeaders() });
+    const res = await fetch(
+      url,
+      fetchInitWithIncomingTrace(incoming, { headers: coingeckoHeaders() }),
+    );
     if (res.ok) return res;
     await res.text();
     if (i < retries - 1) await new Promise((r) => setTimeout(r, delayMs * (i + 1)));
@@ -76,13 +85,14 @@ interface BtcWeekData {
 
 const btcCache = new Map<string, BtcWeekData>();
 
-async function fetchBtcWeekData(currency: string): Promise<BtcWeekData> {
+async function fetchBtcWeekData(currency: string, incoming?: Request): Promise<BtcWeekData> {
   const cached = btcCache.get(currency);
   if (cached) return cached;
 
   const cur = currency.toLowerCase();
   const res7d = await fetchWithRetry(
-    `https://api.coingecko.com/api/v3/coins/bitcoin/market_chart?vs_currency=${cur}&days=7`
+    incoming,
+    `https://api.coingecko.com/api/v3/coins/bitcoin/market_chart?vs_currency=${cur}&days=7`,
   );
   const data7d = await res7d.json();
   const prices: [number, number][] = data7d.prices;
@@ -118,6 +128,7 @@ async function generateAIInsight(
   language: string | undefined,
   logAttempt: (params: Parameters<ReturnType<typeof createAttemptLogger>>[0]) => void,
   log: RequestLoggingContext["log"],
+  incoming?: Request,
 ): Promise<string | null> {
   if (pauseCount === 0) return null;
 
@@ -139,17 +150,20 @@ Be observational, not prescriptive. No advice, no exclamation marks. Calm and gr
 - "Three pauses during a quiet week — you're building awareness beyond volatility."
 - "Anxiety appeared twice this week, both during drops. The pattern is worth noticing."${langInstruction}`;
 
-    const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${LOVABLE_API_KEY}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        model: DIGEST_MODEL,
-        messages: [{ role: "user", content: prompt }],
+    const response = await fetch(
+      "https://ai.gateway.lovable.dev/v1/chat/completions",
+      fetchInitWithIncomingTrace(incoming, {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${LOVABLE_API_KEY}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          model: DIGEST_MODEL,
+          messages: [{ role: "user", content: prompt }],
+        }),
       }),
-    });
+    );
 
     if (!response.ok) {
       log.error("weekly_digest_ai", {
@@ -268,7 +282,7 @@ serve(
 
     for (const profile of eligible) {
       const currency = profile.hold_goal_currency || "USD";
-      const btc = await fetchBtcWeekData(currency);
+      const btc = await fetchBtcWeekData(currency, req);
 
       const weekDir = btc.weekChange >= 0 ? "up" : "down";
       const absWeekChange = Math.abs(btc.weekChange).toFixed(1);
@@ -318,6 +332,7 @@ serve(
           profile.language ?? undefined,
           logAttempt,
           log,
+          req,
         );
       }
 

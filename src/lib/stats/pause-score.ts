@@ -24,6 +24,10 @@ import type {
   PauseCompanionEventRow,
 } from '@/lib/pause-state';
 import type { PauseFullRow } from '@/lib/pause-stats-data-query';
+import {
+  effectivePauseShiftMood,
+  hasPauseShiftOrPostEmotion,
+} from '@/lib/pause-effective-emotion';
 
 interface HoldGoal {
   type: string | null;
@@ -119,18 +123,21 @@ export function computePauseScore(params: {
   }
 
   // --- 1. Emotional Regulation ---
-  const withDelta = recent.filter(
-    (r) =>
+  const withDelta = recent.filter((r) => {
+    const afterMood = effectivePauseShiftMood(r);
+    return (
       r.initial_mood &&
-      r.shift_mood &&
+      afterMood &&
       COMPOSURE[r.initial_mood] !== undefined &&
-      COMPOSURE[r.shift_mood] !== undefined,
-  );
+      COMPOSURE[afterMood] !== undefined
+    );
+  });
   let emotionalScore = 50;
   if (withDelta.length > 0) {
     const deltas = withDelta.map((r) => {
+      const afterMood = effectivePauseShiftMood(r)!;
       const before = COMPOSURE[r.initial_mood!] ?? 50;
-      const after = COMPOSURE[r.shift_mood!] ?? 50;
+      const after = COMPOSURE[afterMood] ?? 50;
       const delta = Math.min(100, Math.max(0, 50 + (after - before)));
       const breathBonus = r.has_breath_completed ? 10 : 0;
       return Math.min(100, delta + breathBonus);
@@ -203,7 +210,8 @@ export function computePauseScore(params: {
     else if (noteLen > 0) depth += 20;
     if (r.tags && r.tags.length > 0) depth += 30;
     if (r.is_favorite) depth += 15;
-    if (r.has_shift_emotion_logged) depth += 15;
+    // Post-pause mood log (`shift_emotion_logged` / post) increases self-awareness depth in aggregates.
+    if (hasPauseShiftOrPostEmotion(r)) depth += 15;
     return Math.min(100, depth);
   });
   const awarenessScore =
@@ -227,10 +235,13 @@ export function computePauseScore(params: {
     const newer = recent.slice(0, mid);
 
     const avgComposure = (arr: typeof recent) => {
-      const withMood = arr.filter((r) => r.shift_mood && COMPOSURE[r.shift_mood!]);
+      const withMood = arr.filter((r) => {
+        const m = effectivePauseShiftMood(r);
+        return m && COMPOSURE[m];
+      });
       if (withMood.length === 0) return 50;
       return (
-        withMood.reduce((s, r) => s + (COMPOSURE[r.shift_mood!] ?? 50), 0) / withMood.length
+        withMood.reduce((s, r) => s + (COMPOSURE[effectivePauseShiftMood(r)!] ?? 50), 0) / withMood.length
       );
     };
 

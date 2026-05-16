@@ -6,14 +6,11 @@ import { useEffect } from 'react';
  */
 export function useHomeOutletPauseReady(
   pauseReady: boolean,
-  message: string | null,
-  loading: boolean,
-  refreshProfile: () => void | Promise<void>,
+  hasOpenPause: boolean,
   dismissPauseReady?: () => void,
 ): void {
   useEffect(() => {
-    if (!pauseReady || message || loading) return;
-    void refreshProfile();
+    if (!pauseReady || !hasOpenPause) return;
     dismissPauseReady?.();
-  }, [pauseReady, message, loading, refreshProfile, dismissPauseReady]);
+  }, [pauseReady, hasOpenPause, dismissPauseReady]);
 }

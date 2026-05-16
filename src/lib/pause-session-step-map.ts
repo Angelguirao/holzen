@@ -2,6 +2,7 @@ import type { FeelStepTile } from '@/components/pause/pause-feel-types';
 import type { PauseStep } from '@/components/pause/PauseProgress';
 import { STEPS } from '@/components/pause/PauseProgress';
 import type { BriefPauseStep, PersistedSession, RitualDepth } from '@/lib/pause-session-storage';
+import { hasPersistedPauseSessionPayload } from '@/lib/pause-persisted-session';
 
 /**
  * Pause route helpers: map persisted step strings and derive initial ritual UI from `PersistedSession`.
@@ -17,6 +18,8 @@ export function mapPersistedStep(s: string | undefined): PauseStep {
   if (!s || s === 'pause') return 'feel';
   if (s === 'ground') return 'reflect';
   if (s === 'shift') return 'frame';
+  /** Removed client-only `choose` beat — resume on Decide. */
+  if (s === 'choose') return 'decide';
   if (STEPS.includes(s as PauseStep)) return s as PauseStep;
   return 'feel';
 }
@@ -26,7 +29,7 @@ export function mapPersistedStep(s: string | undefined): PauseStep {
  * Call with `null` when there is no compatible restore payload.
  */
 export function initialRitualEntry(restored: PersistedSession | null): RitualDepth | 'picker' {
-  if (!restored?.message) return 'picker';
+  if (!hasPersistedPauseSessionPayload(restored)) return 'picker';
   if (restored.ritualDepth === 'brief' || restored.ritualDepth === 'deep') return restored.ritualDepth;
   if (restored.moodDone || restored.phase === 'done' || restored.step !== 'feel') return 'deep';
   return 'picker';

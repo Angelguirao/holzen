@@ -3,6 +3,7 @@ import { createClient } from "https://esm.sh/@supabase/supabase-js@2.57.2";
 import { unknownErrorForLog } from "../_shared/log-unknown-error.ts";
 import { createAttemptLogger } from "../_shared/observe.ts";
 import { coingeckoHeaders } from "../_shared/coingecko.ts";
+import { fetchInitWithIncomingTrace } from "../_shared/forward-trace-headers.ts";
 import { withRequestLogging } from "../_shared/with-request-logging.ts";
 import {
   holzenLovableEmailLogger,
@@ -26,9 +27,17 @@ const corsHeaders = {
     "authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version",
 };
 
-async function fetchWithRetry(url: string, retries = 3, delayMs = 2000): Promise<Response> {
+async function fetchWithRetry(
+  incoming: Request | undefined,
+  url: string,
+  retries = 3,
+  delayMs = 2000,
+): Promise<Response> {
   for (let i = 0; i < retries; i++) {
-    const res = await fetch(url, { headers: coingeckoHeaders() });
+    const res = await fetch(
+      url,
+      fetchInitWithIncomingTrace(incoming, { headers: coingeckoHeaders() }),
+    );
     if (res.ok) return res;
     await res.text();
     if (i < retries - 1) await new Promise((r) => setTimeout(r, delayMs * (i + 1)));
@@ -50,13 +59,14 @@ interface BtcMonthData {
 
 const btcCache = new Map<string, BtcMonthData>();
 
-async function fetchBtcMonthData(currency: string): Promise<BtcMonthData> {
+async function fetchBtcMonthData(currency: string, incoming?: Request): Promise<BtcMonthData> {
   const cached = btcCache.get(currency);
   if (cached) return cached;
 
   const cur = currency.toLowerCase();
   const res30d = await fetchWithRetry(
-    `https://api.coingecko.com/api/v3/coins/bitcoin/market_chart?vs_currency=${cur}&days=30`
+    incoming,
+    `https://api.coingecko.com/api/v3/coins/bitcoin/market_chart?vs_currency=${cur}&days=30`,
   );
   const data30d = await res30d.json();
   const prices: [number, number][] = data30d.prices;
@@ -166,7 +176,7 @@ serve(
 
     for (const profile of eligible) {
       const currency = profile.hold_goal_currency || "USD";
-      const btc = await fetchBtcMonthData(currency);
+      const btc = await fetchBtcMonthData(currency, req);
 
       const monthDir = btc.monthChange >= 0 ? "up" : "down";
       const absMonthChange = Math.abs(btc.monthChange).toFixed(1);
@@ -224,17 +234,20 @@ serve(
 - Top tags: ${topTags.map(([t, c]) => `${t}(${c})`).join(", ") || "none"}
 Be observational, calm. No advice, no exclamation marks.${langInstruction}`;
 
-          const aiRes = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
-            method: "POST",
-            headers: {
-              Authorization: `Bearer ${LOVABLE_API_KEY}`,
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify({
-              model: REPORT_MODEL,
-              messages: [{ role: "user", content: prompt }],
+          const aiRes = await fetch(
+            "https://ai.gateway.lovable.dev/v1/chat/completions",
+            fetchInitWithIncomingTrace(req, {
+              method: "POST",
+              headers: {
+                Authorization: `Bearer ${LOVABLE_API_KEY}`,
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify({
+                model: REPORT_MODEL,
+                messages: [{ role: "user", content: prompt }],
+              }),
             }),
-          });
+          );
 
           if (aiRes.ok) {
             const aiData = await aiRes.json();
