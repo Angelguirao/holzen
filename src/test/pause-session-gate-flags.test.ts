@@ -54,7 +54,7 @@ describe('isPauseSessionWaitingForInstanceFetch', () => {
 });
 
 describe('isPauseSessionDepthPickerActive', () => {
-  it('is true in session on picker with message', () => {
+  it('is true in session on picker with coalesced shell (message or instance id)', () => {
     expect(
       isPauseSessionDepthPickerActive({
         phase: 'session',
@@ -64,7 +64,7 @@ describe('isPauseSessionDepthPickerActive', () => {
     ).toBe(true);
   });
 
-  it('is false without message', () => {
+  it('is false without coalesced shell', () => {
     expect(
       isPauseSessionDepthPickerActive({
         phase: 'session',
