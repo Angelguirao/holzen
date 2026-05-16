@@ -2,6 +2,7 @@ import type { CompanionData, CompanionPrefs } from '@/components/CompanionSectio
 import type { PauseSeverity } from '@/lib/router-location-state';
 import type { FetchedPauseInstance, PersistedSession } from '@/lib/pause-session-storage';
 import { DEFAULT_COMPANIONS, DEFAULT_PREFS } from '@/lib/pause-session-storage';
+import { hasPersistedPauseSessionPayload } from '@/lib/pause-persisted-session';
 
 /**
  * Pure hydration merge for `/pause`: which reflection payload wins (restore vs nav vs Holzen) and
@@ -52,10 +53,10 @@ export type PauseSessionHydrationInput = {
  * Order matches `PauseSession` historical behavior; do not reorder without product review.
  */
 export function computePauseSessionHydration(p: PauseSessionHydrationInput): PauseSessionHydrationState {
-  if (p.restored?.message) {
+  if (p.restored && hasPersistedPauseSessionPayload(p.restored)) {
     return {
       status: 'ready',
-      message: p.restored.message,
+      message: p.restored.message?.trim() ?? '',
       context: p.restored.context ?? null,
       pauseInstanceId:
         p.restored.pauseInstanceId ?? p.navPauseInstanceId ?? p.holzenLastPauseInstanceId,
@@ -98,7 +99,7 @@ export function computePauseSessionHydration(p: PauseSessionHydrationInput): Pau
     p.holzenLastPauseInstanceId &&
     !p.navReflectionMessage &&
     !p.holzenMessage &&
-    !p.restored?.message
+    !(p.restored && hasPersistedPauseSessionPayload(p.restored))
   ) {
     return { status: 'fetch', pauseInstanceId: p.holzenLastPauseInstanceId };
   }

@@ -635,7 +635,7 @@ serve(
         ? Promise.resolve({ error: null })
         : supabase
           .from("profiles")
-          .update({ last_message: null, last_context: ctx })
+          .update({ last_context: ctx })
           .eq("user_id", profile.user_id);
 
       const { error: profileUpdateErr } = await profileUpdate;

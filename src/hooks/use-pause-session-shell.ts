@@ -8,6 +8,7 @@ import {
   type PauseSessionHydrationState,
 } from '@/lib/pause-session-hydration';
 import { loadSession, type FetchedPauseInstance, type PersistedSession } from '@/lib/pause-session-storage';
+import { hasPersistedPauseSessionPayload } from '@/lib/pause-persisted-session';
 import type { PauseSessionNavParsed } from '@/lib/router-location-state';
 
 export type PauseSessionShellHolzen = {
@@ -42,7 +43,7 @@ export function usePauseSessionShell(params: {
 
   const restored = useMemo(() => {
     const saved = loadSession();
-    if (!saved?.message) return null;
+    if (!hasPersistedPauseSessionPayload(saved)) return null;
     if (nav.pauseInstanceId && saved.pauseInstanceId && saved.pauseInstanceId !== nav.pauseInstanceId) {
       return null;
     }

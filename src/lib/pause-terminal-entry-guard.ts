@@ -1,5 +1,6 @@
 import type { PauseState } from '@/lib/pause-state';
 import type { PersistedSession } from '@/lib/pause-session-storage';
+import { hasPersistedPauseSessionPayload } from '@/lib/pause-persisted-session';
 
 /** DB rows in a terminal lifecycle state (not `active`, `engaged`, or `pending`). */
 export const TERMINAL_PAUSE_DB_STATES = new Set<PauseState>(['completed', 'dismissed', 'expired']);
@@ -16,6 +17,6 @@ export function persistedPauseSessionAllowsTerminalEntry(
   saved: PersistedSession | null,
   pauseInstanceId: string | null,
 ): boolean {
-  if (!pauseInstanceId || !saved?.message) return false;
-  return saved.pauseInstanceId === pauseInstanceId;
+  if (!pauseInstanceId || !hasPersistedPauseSessionPayload(saved)) return false;
+  return saved!.pauseInstanceId === pauseInstanceId;
 }
