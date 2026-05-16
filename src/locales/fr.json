@@ -46,8 +46,6 @@
     "holzen": "Holzen",
     "new": "Nouveau",
     "read": "Lire",
-    "pinned": "Épinglé",
-    "unpin": "Désépingler",
     "from": "De",
     "until": "Jusqu'à"
   },
@@ -148,9 +146,7 @@
     "zoomOut": "Perspective",
     "historicalInsight": "Perspective historique",
     "echo": "Écho",
-    "parallel": "parallèle",
-    "reflectionUnpinned": "Réflexion désépinglée",
-    "reflectionPinned": "Réflexion épinglée sur l'accueil"
+    "parallel": "parallèle"
   },
   "journey": {
     "pageSubtitle": "Vos progrès et écrits — pas le compte (voir Paramètres).",

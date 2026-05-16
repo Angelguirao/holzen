@@ -46,8 +46,6 @@
     "holzen": "Holzen",
     "new": "Novo",
     "read": "Ler",
-    "pinned": "Fixado",
-    "unpin": "Desfixar",
     "from": "De",
     "until": "Até"
   },
@@ -148,9 +146,7 @@
     "zoomOut": "Perspectiva",
     "historicalInsight": "Perspectiva histórica",
     "echo": "Eco",
-    "parallel": "paralelo",
-    "reflectionUnpinned": "Reflexão desfixada",
-    "reflectionPinned": "Reflexão fixada no Início"
+    "parallel": "paralelo"
   },
   "journey": {
     "pageSubtitle": "Seu progresso e anotações — não a conta (isso fica em Configurações).",
