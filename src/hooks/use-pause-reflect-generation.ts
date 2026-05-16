@@ -1,10 +1,12 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useAuth } from '@/hooks/use-auth';
 import { useProfile } from '@/hooks/use-profile';
 import {
   fetchReflectionTextForPauseInstance,
   generateReflectionAtReflectStep,
 } from '@/lib/pause-reflect-artifact';
+import { reflectGenerationPrerequisite } from '@/lib/pause-reflect-generation-prerequisites';
 
 function isAbortLike(e: unknown): boolean {
   if (e instanceof DOMException && e.name === 'AbortError') return true;
@@ -36,6 +38,7 @@ export function usePauseReflectGeneration({
   severityAbsPct,
   enabled,
 }: UsePauseReflectGenerationParams) {
+  const { t } = useTranslation();
   const { user } = useAuth();
   const profile = useProfile();
 
@@ -60,7 +63,23 @@ export function usePauseReflectGeneration({
   }, [pauseInstanceId, initialReflectionMessage]);
 
   const runGeneration = useCallback(async () => {
-    if (!enabled || !pauseInstanceId || !user?.id || !context?.trim()) return;
+    const prereq = reflectGenerationPrerequisite({
+      enabled,
+      pauseInstanceId,
+      userId: user?.id,
+      context,
+    });
+    if (prereq === 'idle') return;
+    if (prereq === 'missing_context') {
+      setLoading(false);
+      setError(
+        t('pause.reflectMissingContext', {
+          defaultValue:
+            'This pause is missing market context. Go back to Home and start a new pause.',
+        }),
+      );
+      return;
+    }
 
     const seed = initialReflectionMessage.trim();
     if (seed) {
@@ -122,6 +141,7 @@ export function usePauseReflectGeneration({
       }
     }
   }, [
+    t,
     enabled,
     pauseInstanceId,
     user?.id,
