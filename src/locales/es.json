@@ -943,6 +943,8 @@
     "sessionTitle": "Tu pausa",
     "scienceInfoAria": "La ciencia detrás de esta pausa",
     "noReflection": "Sin reflexión activa. Vuelve para activar una.",
+    "sessionEmptyTitle": "No hay pausa para abrir",
+    "sessionEmptyBody": "Empieza en Inicio con «Necesito una pausa» o abre una desde una notificación de pausa lista.",
     "outcomeSaveFailed": "No se pudo guardar tu elección. Inténtalo de nuevo.",
     "outcomeNotCompleted": "Tu elección se guardó, pero esta pausa aún no está completa — termina los pasos del ritual que falten y elige de nuevo.",
     "stepSyncFailed": "No se pudo sincronizar este paso. Comprueba tu conexión e inténtalo de nuevo.",

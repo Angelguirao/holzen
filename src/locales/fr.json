@@ -957,6 +957,8 @@
     "sessionTitle": "Ta pause",
     "scienceInfoAria": "La science derrière cette pause",
     "noReflection": "Pas de réflexion active. Retourne en déclencher une.",
+    "sessionEmptyTitle": "Aucune pause à ouvrir",
+    "sessionEmptyBody": "Lance une pause depuis l’accueil avec « J’ai besoin d’une pause », ou ouvre-en une via une notification.",
     "outcomeSaveFailed": "Impossible d’enregistrer ton choix. Réessaie.",
     "outcomeNotCompleted": "Ton choix est enregistré, mais cette pause n’est pas encore terminée — termine les étapes du rituel encore manquantes, puis choisis à nouveau.",
     "stepSyncFailed": "Impossible de synchroniser cette étape. Vérifie ta connexion et réessaie.",

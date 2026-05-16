@@ -78,7 +78,7 @@ The subsections through **`generation_attempts`** describe the **2026-04-02** mi
 
 ### `profiles`
 - Implement: `FOR UPDATE` for `service_role`
-- Current flows update `last_message`, `last_context`, and `last_trigger_at`.
+- Current flows update `last_context` and `last_trigger_at` (cron claim path).
 
 ### `analytics_events`
 - Implement: `FOR INSERT` for `service_role`

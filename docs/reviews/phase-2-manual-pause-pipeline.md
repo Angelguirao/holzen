@@ -56,7 +56,7 @@ This phase is the second "mental model pass": after Phase 1 (who can reach `/pau
 
 - Merges `location.state`, persisted `holzen_pause_session`, and `useHolzen()` into one view model (`message`, `context`, `pauseInstanceId`, `companions`, etc.).
 - Mismatch guard: saved session discarded when `navState.pauseInstanceId` differs from saved (when `navState.pauseInstanceId` is present).
-- If no `message` and profile still loading: loading UI; if still none: `noReflection` path.
+- If shell not ready and profile still loading: loading UI; if still none: **`PauseSessionGate`** empty state (`pause.sessionEmptyTitle` / `sessionEmptyBody`) — not shown when an instance id exists but reflection is still generating at Reflect.
 
 ### `src/components/pause/PauseReflect.tsx` — reflect step shell
 
@@ -93,7 +93,7 @@ This phase is the second "mental model pass": after Phase 1 (who can reach `/pau
 ## Data models affected
 
 - **`pause_instances`**: inserted on manual generate; `PauseSession` logs step events for mood/outcome/note/etc.
-- **`profiles`**: `last_message` / `last_context` / `last_trigger_at` are **not** written by **`use-holzen`** on the manual path today; automatic / cron paths update profile fields as documented in the pause AI doc.
+- **`profiles`**: `last_context` / `last_trigger_at` are **not** written by **`use-holzen`** on the manual path today; automatic / cron paths update `last_context` and `last_trigger_at` as documented in the pause AI doc.
 - **`collections` / `collection_items`**: optional user-defined groupings keyed by `pause_instance_id` (see `use-library.ts`).
 - **Companion-related tables** (server-side via orchestrate): `pause_ai_artifacts`, `companion_cache`, `companion_serves`, etc.
 

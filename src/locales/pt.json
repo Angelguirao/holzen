@@ -958,6 +958,8 @@
     "sessionTitle": "A tua pausa",
     "scienceInfoAria": "A ciência por detrás desta pausa",
     "noReflection": "Sem reflexão ativa. Volte para ativar uma.",
+    "sessionEmptyTitle": "Nenhuma pausa para abrir",
+    "sessionEmptyBody": "Comece na página inicial com «Preciso de uma pausa» ou abra uma a partir de uma notificação.",
     "outcomeSaveFailed": "Não foi possível guardar a tua escolha. Tenta novamente.",
     "outcomeNotCompleted": "A tua escolha foi guardada, mas esta pausa ainda não está completa — conclui os passos em falta do ritual e escolhe de novo.",
     "stepSyncFailed": "Não foi possível sincronizar este passo. Verifica a ligação e tenta novamente.",

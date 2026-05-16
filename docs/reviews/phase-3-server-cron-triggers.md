@@ -45,7 +45,7 @@ If this path drifts from Phase 2 or from **`check-volatility`** / **`PauseSessio
 - Loads profiles, filters to **eligible** users (daily/cumulative move vs thresholds, quiet hours / `quiet_windows`, snooze, cooldown vs `last_trigger_at`).
 - Fetches BTC metrics (CoinGecko) per user's hold currency; builds context string; enriches with Fear & Greed and on-chain snapshots via shared helpers.
 - Claims cooldown by updating `profiles.last_trigger_at` before persisting the pause (optimistic lock pattern).
-- Creates the pause instance via `pause_create_or_reuse_as`, updates `profiles` delivery fields (`last_context`, clears `last_message` per Pause V2), and inserts `notifications` for the bell UI.
+- Creates the pause instance via `pause_create_or_reuse_as`, updates `profiles.last_context` for delivery, and inserts `notifications` for the bell UI (reflection subtitle from `pause_ai_artifacts` after Reflect).
 - **Pause V2:** does **not** call `generateUnifiedReflection` on this worker and does **not** `fetch` `companion-orchestrate` on claim; reflection + companion AI run from **`PauseSession`** after the user opens the ritual.
 
 ### `supabase/functions/_shared/pause-cron-parity.ts`
@@ -74,7 +74,7 @@ If this path drifts from Phase 2 or from **`check-volatility`** / **`PauseSessio
 
 ## Data models affected
 
-- **`profiles`**: `last_trigger_at` (cooldown claim), `last_context`, cleared `last_message` (Pause V2 delivery shape), thresholds, quiet windows, currency, companion prefs.
+- **`profiles`**: `last_trigger_at` (cooldown claim), `last_context` (delivery banner), thresholds, quiet windows, currency, companion prefs.
 - **`pause_instances`**: new rows from automatic **claim**; `pause_ai_artifacts` for reflection/companions is filled later from **`holzen-reflect`** + **`companion-orchestrate`** in the client.
 - **`notifications`**: rows driving NotificationBell (`user_id`, `pause_instance_id`, message, context, severity).
 - **`analytics_events`**: cron-side reflection **`pause_ai_call`** is **not** inserted on claim; reflect-step analytics happen when **`holzen-reflect`** runs in the browser.
