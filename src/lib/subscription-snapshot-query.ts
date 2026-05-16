@@ -1,13 +1,9 @@
 /**
- * Subscription snapshot: `check-subscription` edge + free-tier monthly pause
- * count, with a small localStorage cache for offline / cold-start fallbacks.
+ * Subscription snapshot: `check-subscription` edge with a small localStorage
+ * cache for offline / cold-start fallbacks.
  */
 
-import { supabase } from '@/integrations/supabase/client';
 import { invokeEdge } from '@/lib/invoke-edge';
-import { PRICING } from '@/lib/pricing';
-
-const FREE_MONTHLY_LIMIT = PRICING.freeReflectionsPerMonth;
 
 export const SUB_CACHE_KEY = 'holzen_sub_cache';
 
@@ -143,22 +139,11 @@ export async function fetchSubscriptionSnapshot(userId: string, force: boolean):
     };
   }
 
-  const now = new Date();
-  const monthStart = new Date(now.getFullYear(), now.getMonth(), 1).toISOString();
-  const { data: rows } = await supabase
-    .from('pause_instances' as never)
-    .select('id')
-    .eq('user_id', userId)
-    .eq('state', 'completed')
-    .gte('created_at', monthStart);
-
-  const used = (rows ?? []).length;
-  const remaining = Math.max(0, FREE_MONTHLY_LIMIT - used);
   writeSubCache({
     subscribed: false,
     tier: 'free',
-    monthlyUsed: used,
-    monthlyRemaining: remaining,
+    monthlyUsed: 0,
+    monthlyRemaining: 0,
     companionLimit: 0,
     companionUsed: 0,
     companionRemaining: 0,
@@ -174,8 +159,8 @@ export async function fetchSubscriptionSnapshot(userId: string, force: boolean):
   return {
     subscribed: false,
     tier: 'free',
-    monthlyUsed: used,
-    monthlyRemaining: remaining,
+    monthlyUsed: 0,
+    monthlyRemaining: 0,
     companionLimit: 0,
     companionUsed: 0,
     companionRemaining: 0,
