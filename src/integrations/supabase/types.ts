@@ -3311,6 +3311,10 @@ export type Database = {
         }
         Returns: Database["public"]["Enums"]["pause_state"]
       }
+      pause_instance_is_brief_ritual: {
+        Args: { p_pause_instance_id: string }
+        Returns: boolean
+      }
       pause_log_companion: {
         Args: {
           p_action: Database["public"]["Enums"]["pause_companion_action"]

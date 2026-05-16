@@ -33,11 +33,13 @@ describe('pauseInstanceHasBriefRitualTag with upgrade', () => {
       {
         pause_instance_id: instanceId,
         step_type: 'initial_emotion_logged',
+        created_at: '2026-05-16T00:00:00.000Z',
         payload: { brief_ritual: true },
       },
       {
         pause_instance_id: instanceId,
         step_type: 'ritual_depth_upgraded',
+        created_at: '2026-05-16T00:00:01.000Z',
         payload: { from: 'brief', to: 'deep' },
       },
     ];

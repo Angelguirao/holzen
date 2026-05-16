@@ -1,0 +1,1 @@
+ALTER TYPE public.pause_step_type ADD VALUE IF NOT EXISTS 'ritual_depth_upgraded';
