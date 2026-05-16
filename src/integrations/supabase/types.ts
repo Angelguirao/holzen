@@ -1579,7 +1579,6 @@ export type Database = {
           is_admin: boolean | null
           language: string
           last_context: string | null
-          last_message: string | null
           last_trigger_at: string | null
           lifetime_access: boolean
           mantra: string | null
@@ -1633,7 +1632,6 @@ export type Database = {
           is_admin?: boolean | null
           language?: string
           last_context?: string | null
-          last_message?: string | null
           last_trigger_at?: string | null
           lifetime_access?: boolean
           mantra?: string | null
@@ -1687,7 +1685,6 @@ export type Database = {
           is_admin?: boolean | null
           language?: string
           last_context?: string | null
-          last_message?: string | null
           last_trigger_at?: string | null
           lifetime_access?: boolean
           mantra?: string | null
@@ -3330,6 +3327,12 @@ export type Database = {
           p_step_type: Database["public"]["Enums"]["pause_step_type"]
         }
         Returns: Database["public"]["Enums"]["pause_state"]
+      }
+      pause_notification_metadata: {
+        Args: {
+          p_pause_instance: Database["public"]["Tables"]["pause_instances"]["Row"]
+        }
+        Returns: Json
       }
       pause_sweep_window_elapsed: { Args: never; Returns: number }
       read_email_batch: {
