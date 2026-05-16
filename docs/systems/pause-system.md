@@ -226,7 +226,7 @@ Optional PostHog flag `**pause.step5_breath_label_shift**` renames the second-br
 ### 7.2 Hydration and local persistence
 
 - **Input:** `useHolzen()`, navigation `**location.state`**, and optional fetch-by-id when only `**pauseInstanceId`** is present.
-- **Resilience:** `src/lib/pause-session-storage.ts` `**saveSession` / `loadSession`** persist step, moods, intensities, `**breathingFirstCompleted`**, `**breathingSecondCompleted**`, `**frameDone**`, optional `**decideOnBackStep**` (`**breath2**` when on **Decide** for resume), `**ritualDepth**` (`**brief**` / `**deep**`), brief-only fields (`**briefStep**`, `**briefIntegrateDone**`, optional `**brief_face**`), and `**pauseRitualSchema**` (v3) so a reload mid-ritual can resume. Older keys (`**breathingCompleted**`, five-step `**shift**`, schema v2) are migrated on load.
+- **Resilience:** `src/lib/pause-session-storage.ts` `**saveSession` / `loadSession`** persist step, moods, intensities, `**breathingFirstCompleted`**, `**breathingSecondCompleted**`, `**frameDone**`, optional `**decideOnBackStep**` (`**breath2**` when on **Decide** for resume), `**ritualDepth**` (`**brief**` / `**deep**`), brief-only fields (`**briefStep**`, `**briefIntegrateDone**`, optional `**brief_face**`), and `**pauseRitualSchema**` (v3) so a reload mid-ritual can resume. Autosave runs when `**pauseInstanceId**` and/or non-empty reflection copy exist (`**hasPersistablePauseSessionAnchor**` — same predicate as restore), so deep pauses without `**reflection_text**` yet still persist Feel/Breathe position. Older keys (`**breathingCompleted**`, five-step `**shift**`, schema v2) are migrated on load.
 
 ### 7.3 When each RPC runs (happy path)
 
