@@ -9,39 +9,29 @@ import {
 
 describe('getHomeSubscriptionReady', () => {
   it('is false while subscription is loading', () => {
-    expect(getHomeSubscriptionReady(true, false, undefined)).toBe(false);
+    expect(getHomeSubscriptionReady(true)).toBe(false);
   });
 
-  it('is true when subscribed even if remaining is undefined', () => {
-    expect(getHomeSubscriptionReady(false, true, undefined)).toBe(true);
-  });
-
-  it('is true when not subscribed but monthly remaining is known', () => {
-    expect(getHomeSubscriptionReady(false, false, 3)).toBe(true);
+  it('is true when subscription finished loading', () => {
+    expect(getHomeSubscriptionReady(false)).toBe(true);
   });
 });
 
 describe('getHomeHasAccess', () => {
-  it('is true when subscribed', () => {
-    expect(getHomeHasAccess(true, 0)).toBe(true);
+  it('is true when subscribed (including trialing)', () => {
+    expect(getHomeHasAccess(true)).toBe(true);
   });
 
-  it('is true when free tier has remaining', () => {
-    expect(getHomeHasAccess(false, 2)).toBe(true);
-  });
-
-  it('is false when not subscribed and no remaining', () => {
-    expect(getHomeHasAccess(false, 0)).toBe(false);
-    expect(getHomeHasAccess(false, undefined)).toBe(false);
+  it('is false when not subscribed', () => {
+    expect(getHomeHasAccess(false)).toBe(false);
   });
 });
 
 describe('getHomeShowLimitUpsell', () => {
-  it('is true only when ready, not subscribed, and remaining is exactly zero', () => {
-    expect(getHomeShowLimitUpsell(true, false, 0)).toBe(true);
-    expect(getHomeShowLimitUpsell(true, false, undefined)).toBe(false);
-    expect(getHomeShowLimitUpsell(true, true, 0)).toBe(false);
-    expect(getHomeShowLimitUpsell(false, false, 0)).toBe(false);
+  it('is true when ready and not subscribed', () => {
+    expect(getHomeShowLimitUpsell(true, false)).toBe(true);
+    expect(getHomeShowLimitUpsell(true, true)).toBe(false);
+    expect(getHomeShowLimitUpsell(false, false)).toBe(false);
   });
 });
 
@@ -59,7 +49,6 @@ describe('getHomeSubscriptionGate', () => {
     const g = getHomeSubscriptionGate({
       subLoading: false,
       subscribed: false,
-      monthlyRemaining: 0,
       hasOpenPause: false,
       loading: false,
     });

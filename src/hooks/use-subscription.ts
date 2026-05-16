@@ -65,6 +65,7 @@ export function useSubscription() {
   const queryClient = useQueryClient();
   const userId = user?.id ?? null;
   const [checkoutLoading, setCheckoutLoading] = useState(false);
+  const [trialLoading, setTrialLoading] = useState(false);
   const [checkoutLoadingTarget, setCheckoutLoadingTarget] = useState<
     'pro' | 'pro_plus' | 'flex_pack_s' | 'flex_pack_m' | null
   >(null);
@@ -216,6 +217,30 @@ export function useSubscription() {
     }
   }, [t]);
 
+  const ensureTrial = useCallback(async () => {
+    if (!userId) return;
+    holzenLog.subscription('trial', { action: 'ensure' });
+    setTrialLoading(true);
+    try {
+      const { data, error } = await invokeEdge<{ ok?: boolean }>('ensure-trial-subscription', {
+        body: {},
+      });
+      if (error) throw error;
+      if (!data?.ok) throw new Error('Trial not started');
+      subscriptionForceNext = true;
+      subscriptionNextFetchSource = 'invalidate';
+      await queryClient.invalidateQueries({ queryKey: subscriptionQueryKey(userId) });
+    } catch (e) {
+      console.error('Trial error:', e);
+      toast.error(
+        t('home.subscription.trialFailed', { defaultValue: 'Could not start trial. Try again.' }),
+      );
+      throw e;
+    } finally {
+      setTrialLoading(false);
+    }
+  }, [userId, queryClient, t]);
+
   const openPortal = useCallback(async () => {
     holzenLog.subscription('portal', { action: 'open' });
     try {
@@ -295,16 +320,18 @@ export function useSubscription() {
     [userId, queryClient],
   );
 
-  const canReflect =
-    !userId ? false : subscribed || (monthlyRemaining !== undefined && monthlyRemaining > 0);
+  const canEngagePause = !userId ? false : subscribed;
+  const canReflect = canEngagePause;
 
   if (!userId) {
     return {
       subscribed: false,
       loading: false,
       checkoutLoading,
+      trialLoading,
       checkoutLoadingTarget,
       startCheckout,
+      ensureTrial,
       openPortal,
       refresh,
       manualRetry,
@@ -322,6 +349,7 @@ export function useSubscription() {
       insightsUsed: 0,
       insightsRemaining: 0,
       flexCreditsBalance: 0,
+      canEngagePause: false,
       canReflect: false,
       subscriptionStatus: null,
       subscriptionEnd: null,
@@ -335,8 +363,10 @@ export function useSubscription() {
     subscribed,
     loading,
     checkoutLoading,
+    trialLoading,
     checkoutLoadingTarget,
     startCheckout,
+    ensureTrial,
     openPortal,
     refresh,
     manualRetry,
@@ -354,6 +384,7 @@ export function useSubscription() {
     insightsUsed,
     insightsRemaining,
     flexCreditsBalance,
+    canEngagePause,
     canReflect,
     subscriptionStatus,
     subscriptionEnd,

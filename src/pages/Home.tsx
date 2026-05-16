@@ -76,7 +76,6 @@ const Home = () => {
   const { subscriptionReady, hasAccess, showLimitUpsell, showPauseScheduling } = getHomeSubscriptionGate({
     subLoading,
     subscribed,
-    monthlyRemaining,
     hasOpenPause,
     loading,
   });

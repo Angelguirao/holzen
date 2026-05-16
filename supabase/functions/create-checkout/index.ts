@@ -87,7 +87,6 @@ serve(
             plan_tier: requestedTier,
           },
           subscription_data: {
-            trial_period_days: 7,
             description: "Holzen — Bitcoin self-awareness companion",
             metadata: { plan_tier: requestedTier, user_id: user.id },
           },

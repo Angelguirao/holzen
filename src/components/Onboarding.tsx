@@ -2,9 +2,6 @@ import { useTranslation } from 'react-i18next';
 import { useState, useCallback } from 'react';
 import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
 import { OnboardingWhy } from '@/components/onboarding/OnboardingWhy';
-import { OnboardingCommitment } from '@/components/onboarding/OnboardingCommitment';
-import { OnboardingGrounding } from '@/components/onboarding/OnboardingGrounding';
-import { OnboardingThreshold } from '@/components/onboarding/OnboardingThreshold';
 import { OnboardingReady } from '@/components/onboarding/OnboardingReady';
 import { useSubscription } from '@/hooks/use-subscription';
 
@@ -25,17 +22,14 @@ interface Props {
 }
 
 const detectedTimezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
-const TOTAL_STEPS = 5;
+const TOTAL_STEPS = 2;
 
 export function Onboarding({ onComplete }: Props) {
   const { t } = useTranslation();
-  const { startCheckout, checkoutLoading } = useSubscription();
+  const { ensureTrial, trialLoading } = useSubscription();
   const [step, setStep] = useState(0);
   const [timezone] = useState(detectedTimezone);
-  const [threshold, setThreshold] = useState(5);
   const [motivations, setMotivations] = useState<string[]>([]);
-  const [groundingActivities, setGroundingActivities] = useState<string[]>([]);
-  const [hasHoldGoal, setHasHoldGoal] = useState(false);
   const [direction, setDirection] = useState(1);
   const [startingTrial, setStartingTrial] = useState(false);
   const prefersReduced = useReducedMotion();
@@ -68,31 +62,21 @@ export function Onboarding({ onComplete }: Props) {
     );
   }, []);
 
-  const toggleGrounding = useCallback((id: string) => {
-    setGroundingActivities((prev) =>
-      prev.includes(id) ? prev.filter((g) => g !== id) : [...prev, id]
-    );
-  }, []);
-
-  const handleHoldGoalPresence = useCallback((has: boolean) => {
-    setHasHoldGoal(has);
-  }, []);
-
   const buildResult = useCallback(
     (): OnboardingResult => ({
-      threshold,
+      threshold: 5,
       firstName: null,
       timezone,
       motivations,
-      groundingActivities,
+      groundingActivities: [],
     }),
-    [threshold, timezone, motivations, groundingActivities],
+    [timezone, motivations],
   );
 
   return (
-    <div className="fixed inset-0 z-[60] bg-background flex items-center justify-center p-6">
+    <motion.div className="fixed inset-0 z-[60] bg-background flex items-center justify-center p-6">
       <div className="w-full max-w-sm">
-        <div className="min-h-[460px] relative">
+        <motion.div className="min-h-[460px] relative">
           <AnimatePresence mode="wait" custom={direction}>
             <motion.div
               key={step}
@@ -112,63 +96,35 @@ export function Onboarding({ onComplete }: Props) {
               )}
 
               {step === 1 && (
-                <OnboardingCommitment
-                  onHoldGoalPresenceChange={handleHoldGoalPresence}
-                  stagger={stagger}
-                />
-              )}
-
-              {step === 2 && (
-                <OnboardingGrounding
-                  selected={groundingActivities}
-                  onToggle={toggleGrounding}
-                  stagger={stagger}
-                />
-              )}
-
-              {step === 3 && (
-                <OnboardingThreshold
-                  threshold={threshold}
-                  onThresholdChange={setThreshold}
-                  stagger={stagger}
-                />
-              )}
-
-              {step === 4 && (
                 <OnboardingReady
                   motivations={motivations}
-                  groundingActivities={groundingActivities}
-                  threshold={threshold}
-                  hasHoldGoal={hasHoldGoal}
-                  onBeginFree={() => onComplete(buildResult())}
                   onStartTrial={() => {
                     void (async () => {
                       setStartingTrial(true);
                       try {
-                        // Save onboarding first, but keep onboarding visible until redirect starts
                         await onComplete(buildResult(), { setLocalOnboarded: false });
-                        await startCheckout();
+                        await ensureTrial();
+                        await onComplete(buildResult());
                       } finally {
                         setStartingTrial(false);
                       }
                     })();
                   }}
-                  checkoutLoading={checkoutLoading || startingTrial}
+                  trialLoading={trialLoading || startingTrial}
                   stagger={stagger}
                 />
               )}
             </motion.div>
           </AnimatePresence>
-        </div>
+        </motion.div>
 
-        {/* Navigation */}
         <motion.div
           className="flex items-center justify-between mt-8"
           initial={prefersReduced ? {} : { opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.5 }}
         >
-          <div className="flex items-center gap-2">
+          <motion.div className="flex items-center gap-2">
             {[...Array(TOTAL_STEPS)].map((_, i) => (
               <motion.div
                 key={i}
@@ -183,15 +139,13 @@ export function Onboarding({ onComplete }: Props) {
             <span className="text-[10px] font-mono text-muted-foreground/40 ml-1.5">
               {step + 1}/{TOTAL_STEPS}
             </span>
-          </div>
+          </motion.div>
 
-          <div className="flex items-center gap-3">
-            {step < TOTAL_STEPS - 1 &&
-            ((step === 0 && motivations.length === 0) ||
-              step === 1 ||
-              (step === 2 && groundingActivities.length === 0)) ? (
+          <motion.div className="flex items-center gap-3">
+            {step === 0 && motivations.length === 0 ? (
               <button
-                onClick={() => goTo(step + 1)}
+                type="button"
+                onClick={() => goTo(1)}
                 className="text-[10px] font-mono text-muted-foreground/40 hover:text-foreground transition-colors"
               >
                 {t('common.skip')}
@@ -199,6 +153,7 @@ export function Onboarding({ onComplete }: Props) {
             ) : null}
             {step > 0 && (
               <button
+                type="button"
                 onClick={() => goTo(step - 1)}
                 className="text-[10px] font-mono text-muted-foreground/50 hover:text-foreground transition-colors"
               >
@@ -208,15 +163,16 @@ export function Onboarding({ onComplete }: Props) {
 
             {step < TOTAL_STEPS - 1 && (
               <button
+                type="button"
                 onClick={() => goTo(step + 1)}
                 className="text-[10px] font-mono text-muted-foreground underline underline-offset-4 hover:text-foreground transition-colors"
               >
                 {t('common.continue')}
               </button>
             )}
-          </div>
+          </motion.div>
         </motion.div>
-      </div>
-    </div>
+      </motion.div>
+    </motion.div>
   );
 }

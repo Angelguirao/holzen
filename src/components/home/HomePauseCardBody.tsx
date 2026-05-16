@@ -95,10 +95,6 @@ export function HomePauseCardBody({
         <SubscriptionSkeleton variant="inline" />
       ) : (
         <>
-          {!subscribed && monthlyRemaining !== undefined && monthlyRemaining > 0 && (
-            <p className={homeInWidget.meta}>{t('home.subscription.freeRemaining', { count: monthlyRemaining })}</p>
-          )}
-
           {hasOpenPause ? (
             <div className="space-y-4">
               {pending ? (
