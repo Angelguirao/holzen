@@ -3,6 +3,7 @@ import { useMemo } from 'react';
 import { HomePauseCardBody } from '@/components/home/HomePauseCardBody';
 import { SnoozeToolbarControl } from '@/components/SnoozeControl';
 import type { BtcPriceData } from '@/lib/btc';
+import type { ManualPauseTriggerResult } from '@/lib/manual-pause-trigger-result';
 
 /** Shape returned by {@link parsePauseContextForHomePreview}. */
 type PauseContextPreview = {
@@ -28,7 +29,7 @@ export function useHomePauseCardProjection(args: {
   cooldownHours: number;
   nextCronCheckIn: () => number;
   manualCooldownRemaining: () => number;
-  manualTrigger: () => void;
+  manualTrigger: (mood?: string) => Promise<ManualPauseTriggerResult>;
   onNavigatePauseWithThis: () => void;
   onNavigatePauseFromPendingBanner: () => void;
   onDismissOpenPause: () => void;

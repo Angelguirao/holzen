@@ -5,9 +5,10 @@ import type { BtcMoveSeverity } from '@/lib/btc-move-severity';
 import { holzenLog } from '@/lib/holzen-console';
 import { canNavigateToPauseSession } from '@/lib/home-pause-navigate';
 import { trackEvent } from '@/lib/posthog';
+import type { ManualPauseTriggerResult } from '@/lib/manual-pause-trigger-result';
+import { type PauseSessionLocationState } from '@/lib/router-location-state';
 
 export type PauseDismissAnalyticsSurface = 'home_zen_reflection' | 'home_your_pause_widget';
-import { type PauseSessionLocationState } from '@/lib/router-location-state';
 
 export function useHomePauseActions(args: {
   message: string | null;
@@ -20,7 +21,7 @@ export function useHomePauseActions(args: {
   severity: BtcMoveSeverity;
   navigate: NavigateFunction;
   dismissMessage: () => void;
-  manualTrigger: () => void;
+  manualTrigger: (mood?: string) => Promise<ManualPauseTriggerResult>;
   manualCooldownRemaining: () => number;
   startCheckout: (target?: 'pro' | 'pro_plus' | 'flex_pack_s' | 'flex_pack_m') => Promise<void>;
   /** PostHog `pause_open_dismissed.surface` — Zen reflection Done vs dashboard Your pause widget. */
@@ -42,15 +43,37 @@ export function useHomePauseActions(args: {
     dismissAnalyticsSurface,
   } = args;
 
-  const handleNeedAPause = useCallback(() => {
+  const handleNeedAPause = useCallback(async () => {
     const remaining = manualCooldownRemaining();
     if (remaining > 0) {
       holzenLog.home('Need a moment: ignored (cooldown)', { remainingMs: remaining });
       return;
     }
     holzenLog.home('Need a moment: invoking manualTrigger');
-    manualTrigger();
-  }, [manualCooldownRemaining, manualTrigger]);
+    const result = await manualTrigger();
+    if (!result.opened || result.pendingOffer || !result.instanceId) return;
+    const navState: PauseSessionLocationState = {
+      reflectionMessage: message ?? '',
+      context: result.context ?? context,
+      pauseInstanceId: result.instanceId,
+      companions,
+      companionPrefs,
+      severity,
+    };
+    holzenLog.home('Navigate to /pause after Need a moment', {
+      pauseInstanceId: result.instanceId,
+    });
+    navigate('/pause', { state: navState });
+  }, [
+    manualCooldownRemaining,
+    manualTrigger,
+    message,
+    context,
+    companions,
+    companionPrefs,
+    severity,
+    navigate,
+  ]);
 
   const handleDismiss = useCallback(() => {
     try {
