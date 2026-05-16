@@ -200,11 +200,11 @@ describe('computePauseSessionResolved', () => {
     ).toBeNull();
   });
 
-  it('returns null when fetch instance has empty reflection_message', () => {
+  it('returns ready when fetch instance has empty reflection_message (reflect step not run yet)', () => {
     const inst: FetchedPauseInstance = {
       id: 'p',
       reflection_message: '',
-      context: null,
+      context: 'BTC moved',
       haiku: null,
       grounding_title: null,
       grounding_body: null,
@@ -218,7 +218,15 @@ describe('computePauseSessionResolved', () => {
         navSeverity: 'moderate',
         holzenSeverity: 'mild',
       }),
-    ).toBeNull();
+    ).toEqual({
+      status: 'ready',
+      message: '',
+      context: 'BTC moved',
+      pauseInstanceId: 'p',
+      companions: { haiku: null, groundingTitle: null, groundingBody: null },
+      companionPrefs: prefsB,
+      severity: 'moderate',
+    });
   });
 
   it('returns null for empty hydration', () => {

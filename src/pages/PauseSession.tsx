@@ -235,7 +235,8 @@ export default function PauseSession() {
     refreshPendingOffer,
   ]);
 
-  const hasCoalescedShellSession = Boolean(pauseInstanceId) || message.length > 0;
+  const hasCoalescedShellSession =
+    Boolean(pauseInstanceIdForTerminal) || message.length > 0;
 
   const waitingForFetch = isPauseSessionWaitingForInstanceFetch({
     hydrationStatus: hydration.status,
