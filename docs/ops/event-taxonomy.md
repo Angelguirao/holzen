@@ -37,11 +37,23 @@ The authoritative list of PostHog events Holzen emits. Deliberate events only �
 
 | Event | When | Properties | Owner |
 |---|---|---|---|
-| `navigation.primary_tab_opened` | User taps a **different** primary bottom tab (shell) than the current one | `{ tab: 'home' \| 'archive' \| 'tools' \| 'journey' \| 'settings' }` | @holzen |
+| `navigation.primary_tab_opened` | User taps a **different** primary bottom tab (shell) than the current one | `{ tab: 'home' \| 'archive' \| 'journey' \| 'settings' }` | @holzen |
 
 Does not fire when re-tapping the active tab or when navigation is not from the bottom bar (e.g. deep link, back button).
 
 The Archive tab uses route `/archive` and reports `tab: 'archive'`.
+
+### app
+
+| Event | When | Properties | Owner |
+|---|---|---|---|
+| `app.route_not_found` | Catch-all `NotFound` for an unregistered path | `{ attempted_path: string }` — pathname only, no query string | @holzen |
+
+### journey
+
+| Event | When | Properties | Owner |
+|---|---|---|---|
+| `journey.overview_viewed` | `JourneyOverview` first paint after data ready | `{ streak_days?: number; completed_pause_count?: number }` — aggregates only | @holzen |
 
 ### auth
 

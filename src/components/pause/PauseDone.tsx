@@ -4,21 +4,18 @@ import { Flame, Pencil, Sparkles } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
 import { useSubscription } from '@/hooks/use-subscription';
-import { journeyPath } from '@/lib/app-routes';
 import { PAUSE_MOOD_VALUES, type MoodValue } from '@/components/MoodCheck';
 import { MoodIcon } from '@/components/icons/MoodIcon';
 import { OutcomeIcon } from '@/components/icons/OutcomeIcon';
 import { PAUSE_FEEL_INTENSITY_KEYS } from '@/components/pause/pause-feel-intensity-labels';
 import { PRICING } from '@/lib/pricing';
 import { cn } from '@/lib/utils';
-import { PauseDoneBriefJourneyRecap } from './PauseDoneBriefJourneyRecap';
 import { ScoreImpact } from './ScoreImpact';
 import { pauseStepLayout } from '@/components/pause/pause-step-layout';
 import { Button } from '@/components/ui/button';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Slider } from '@/components/ui/slider';
 import { ShareReflection } from '@/components/ShareReflection';
-import { ReflectionWallpaper } from '@/components/ReflectionWallpaper';
 import { trackEvent } from '@/lib/posthog';
 import { isPauseMoodValue, buildPostPauseEmotionLoggedPayload } from '@/lib/pause-post-pause-emotion-log';
 import { pauseLogStep } from '@/lib/pause-api';
@@ -83,14 +80,6 @@ function PauseDoneReflectShareRow({
         context={context ?? null}
         haiku={haiku ?? null}
         onMenuOpen={trackShareMenuOpen}
-      />
-      <ReflectionWallpaper
-        message={msg}
-        mood={mood}
-        context={context ?? null}
-        haiku={haiku ?? null}
-        variant="button"
-        onGenerateIntent={trackWallpaperTap}
       />
     </div>
   );
@@ -201,7 +190,6 @@ export function PauseDone({
 
           <div className="w-full max-w-md space-y-3 text-center">
             <p className="text-sm font-medium leading-snug text-foreground">{journeyShort}</p>
-            <PauseDoneBriefJourneyRecap pauseData={pauseData} />
             <p className="mx-auto max-w-sm text-xs leading-relaxed text-foreground">
               {t('pause.brief.done.practiceAffirmLead', {
                 defaultValue:
@@ -214,12 +202,6 @@ export function PauseDone({
                   'Holzen and skill bars in Stats summarize patterns across many completed pauses. They can move slowly and are never a verdict on whether pausing was the right call.',
               })}
             </p>
-            <Link
-              to={journeyPath('stats')}
-              className="inline-block text-sm font-medium text-nox-text-link underline-offset-4 transition-colors hover:text-nox-text-link/80 hover:underline"
-            >
-              {t('pause.brief.done.openStatsCta', { defaultValue: 'How scores work in Journey' })}
-            </Link>
           </div>
 
           <div className="w-full max-w-md space-y-4 rounded-xl border border-primary bg-card p-4 text-left shadow-sm">

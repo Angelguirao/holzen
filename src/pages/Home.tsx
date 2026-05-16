@@ -19,7 +19,6 @@ import { useHomeMarketDisplayPreferences } from '@/hooks/use-home-market-display
 import { useState } from 'react';
 import { useOutletContext, useSearchParams, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '@/hooks/use-auth';
-import { useNightReflection } from '@/components/NightReflectionCard';
 import { useHomeVisibleSections } from '@/hooks/use-home-visible-sections';
 import { useHomeCustomizeBridge } from '@/hooks/use-home-customize-bridge';
 import { useHomeMarketGoalHeaders } from '@/hooks/use-home-market-goal-headers';
@@ -89,8 +88,6 @@ const Home = () => {
   useHomeHeroQuoteViewed(profileLoaded, user?.id);
   useHomePauseAudio(newPauseArrival, lastPauseInstanceId, clearNewPauseArrival);
 
-  const { reflection: nightReflection, dismiss: dismissNight } = useNightReflection();
-
   const {
     priceHidden,
     btcMode,
@@ -110,11 +107,11 @@ const Home = () => {
   const { order, collapsed, reorder, toggleCollapsed, resetLayout } = useWidgetLayout(HOME_WIDGET_DEFAULT_ORDER);
   const { visible: sectionVisible, setVisible, resetVisibility: resetSectionVisibility } = useHomeOptionalVisibility();
 
-  const { visibleOrderedSectionIds, todaySectionIds, showJourneyStatTiles } = useHomeVisibleSections({
+  const { visibleOrderedSectionIds, todaySectionIds } = useHomeVisibleSections({
     order,
     sectionVisible,
     subscribed,
-    hasNightReflection: !!nightReflection,
+    hasNightReflection: false,
   });
 
   const { customizeSheet, onOpenCustomize } = useHomeCustomizeBridge({
@@ -202,8 +199,6 @@ const Home = () => {
       toggleMarketChartExpanded,
       pauseCardBody: pauseProjection.pauseCardBody,
       pauseSectionHeaderRight: pauseProjection.pauseSectionHeaderRight,
-      nightReflection,
-      dismissNight,
       subscribed,
       collapsed,
       toggleCollapsed,
@@ -242,7 +237,6 @@ const Home = () => {
     userId: user?.id,
     firstName,
     todaySectionIds,
-    showJourneyStatTiles,
     goalWhyBlock,
     renderSection,
     onOpenCustomize,
