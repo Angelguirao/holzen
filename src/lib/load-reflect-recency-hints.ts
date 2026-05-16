@@ -1,7 +1,7 @@
 import { supabase } from '@/integrations/supabase/client';
 
 /**
- * Pause V2: mood + dedup hints for `holzen-reflect` / `generateUnifiedReflection`.
+ * Pause V2: mood + dedup hints for edge `holzen-reflect` (Reflect step in `PauseSession`).
  * Mirrors `pauseRecencyInputs` in `supabase/functions/_shared/pause-cron-parity.ts`
  * so the manual reflect-step sees the same shapes as `check-volatility`.
  */

@@ -68,6 +68,11 @@ describe('pauseHomeErrorKind', () => {
       pauseHomeErrorKind('A pause message could not be generated right now. Try again in a moment.'),
     ).toBe('ai');
   });
+
+  it('does not treat reflect-step wording as a Home AI failure', () => {
+    expect(pauseHomeErrorKind('holzen-reflect timed out')).toBe('generic');
+    expect(pauseHomeErrorKind('Could not generate reflection')).toBe('generic');
+  });
 });
 
 describe('shouldSurfacePauseWidgetError', () => {
