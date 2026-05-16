@@ -1,0 +1,255 @@
+-- Post-completion emotion: append-only step on completed pauses.
+DROP VIEW IF EXISTS public.v_pause_full CASCADE;
+
+CREATE OR REPLACE FUNCTION public.pause_log_step(
+  p_instance_id uuid,
+  p_step_type public.pause_step_type,
+  p_payload jsonb DEFAULT '{}'::jsonb
+)
+RETURNS public.pause_state
+LANGUAGE plpgsql
+VOLATILE
+SECURITY DEFINER
+SET search_path = public
+AS $$
+DECLARE
+  v_inst public.pause_instances%ROWTYPE;
+  v_uid uuid := auth.uid();
+  v_role text := auth.role();
+  v_outcome text;
+  v_mood text;
+  v_intensity text;
+BEGIN
+  SELECT * INTO v_inst FROM public.pause_instances WHERE id = p_instance_id FOR UPDATE;
+  IF NOT FOUND THEN RAISE EXCEPTION 'pause_log_step: instance % not found', p_instance_id; END IF;
+  IF v_role <> 'service_role' AND v_inst.user_id <> v_uid THEN
+    RAISE EXCEPTION 'pause_log_step: not authorized';
+  END IF;
+
+  IF v_inst.state = 'pending' THEN
+    RAISE EXCEPTION 'pause_log_step: instance % is a pending context offer (adopt it first)', p_instance_id;
+  END IF;
+
+  IF v_inst.state = 'expired' THEN
+    IF p_step_type <> 'outcome_logged' THEN RETURN v_inst.state; END IF;
+    IF EXISTS (SELECT 1 FROM public.pause_step_events e WHERE e.pause_instance_id = p_instance_id AND e.step_type = 'outcome_logged') THEN
+      RETURN v_inst.state;
+    END IF;
+    v_outcome := COALESCE(p_payload->>'outcome', '');
+    IF v_outcome NOT IN ('held', 'bought', 'sold') THEN
+      RAISE EXCEPTION 'pause_log_step: invalid outcome % for retrospective outcome_logged', v_outcome;
+    END IF;
+    INSERT INTO public.pause_step_events (pause_instance_id, user_id, step_type, payload)
+    VALUES (p_instance_id, v_inst.user_id, p_step_type, COALESCE(p_payload, '{}'::jsonb));
+    RETURN v_inst.state;
+  END IF;
+
+  IF v_inst.state = 'dismissed' THEN
+    IF p_step_type <> 'outcome_logged' THEN RETURN v_inst.state; END IF;
+    IF EXISTS (SELECT 1 FROM public.pause_step_events e WHERE e.pause_instance_id = p_instance_id AND e.step_type = 'outcome_logged') THEN
+      RETURN v_inst.state;
+    END IF;
+    v_outcome := COALESCE(p_payload->>'outcome', '');
+    IF v_outcome NOT IN ('held', 'bought', 'sold') THEN
+      RAISE EXCEPTION 'pause_log_step: invalid outcome % for retrospective outcome_logged', v_outcome;
+    END IF;
+    INSERT INTO public.pause_step_events (pause_instance_id, user_id, step_type, payload)
+    VALUES (p_instance_id, v_inst.user_id, p_step_type, COALESCE(p_payload, '{}'::jsonb));
+    RETURN v_inst.state;
+  END IF;
+
+  IF v_inst.state = 'completed' THEN
+    IF p_step_type <> 'post_pause_emotion_logged' THEN RETURN v_inst.state; END IF;
+    v_mood := lower(trim(COALESCE(p_payload->>'mood', '')));
+    IF v_mood NOT IN ('calm', 'detached', 'uncertain', 'excited', 'anxious', 'fearful', 'greedy', 'fomo') THEN
+      RAISE EXCEPTION 'pause_log_step: invalid mood % for post_pause_emotion_logged', v_mood;
+    END IF;
+    v_intensity := NULLIF(trim(both from COALESCE(p_payload->>'intensity', '')), '');
+    IF v_intensity IS NOT NULL AND v_intensity !~ '^[1-5]$' THEN
+      RAISE EXCEPTION 'pause_log_step: intensity for post_pause_emotion_logged must be 1-5';
+    END IF;
+    INSERT INTO public.pause_step_events (pause_instance_id, user_id, step_type, payload)
+    VALUES (p_instance_id, v_inst.user_id, p_step_type, COALESCE(p_payload, '{}'::jsonb));
+    RETURN v_inst.state;
+  END IF;
+
+  IF p_step_type = 'outcome_logged' THEN
+    v_outcome := COALESCE(p_payload->>'outcome', '');
+    IF v_outcome NOT IN ('held', 'bought', 'sold') THEN
+      RAISE EXCEPTION 'pause_log_step: invalid outcome % for outcome_logged', v_outcome;
+    END IF;
+  END IF;
+
+  INSERT INTO public.pause_step_events (pause_instance_id, user_id, step_type, payload)
+  VALUES (p_instance_id, v_inst.user_id, p_step_type, COALESCE(p_payload, '{}'::jsonb));
+
+  SELECT state INTO v_inst.state FROM public.pause_instances WHERE id = p_instance_id;
+  RETURN v_inst.state;
+END;
+$$;
+
+CREATE OR REPLACE VIEW public.v_pause_full WITH (security_invoker = true) AS
+SELECT
+  pi.*,
+  (EXISTS (SELECT 1 FROM public.pause_step_events e WHERE e.pause_instance_id = pi.id AND e.step_type = 'breath_completed')) AS has_breath_completed,
+  (EXISTS (SELECT 1 FROM public.pause_step_events e WHERE e.pause_instance_id = pi.id AND e.step_type = 'initial_emotion_logged')) AS has_initial_emotion_logged,
+  (EXISTS (SELECT 1 FROM public.pause_step_events e WHERE e.pause_instance_id = pi.id AND e.step_type = 'shift_emotion_logged')) AS has_shift_emotion_logged,
+  (EXISTS (SELECT 1 FROM public.pause_step_events e WHERE e.pause_instance_id = pi.id AND e.step_type = 'post_pause_emotion_logged')) AS has_post_pause_emotion_logged,
+  (EXISTS (SELECT 1 FROM public.pause_step_events e WHERE e.pause_instance_id = pi.id AND e.step_type = 'outcome_logged')) AS has_outcome_logged,
+  (SELECT payload->>'mood' FROM public.pause_step_events e WHERE e.pause_instance_id = pi.id AND e.step_type = 'initial_emotion_logged' ORDER BY e.created_at DESC LIMIT 1) AS initial_mood,
+  (SELECT payload->>'mood' FROM public.pause_step_events e WHERE e.pause_instance_id = pi.id AND e.step_type = 'shift_emotion_logged' ORDER BY e.created_at DESC LIMIT 1) AS shift_mood,
+  (SELECT payload->>'outcome' FROM public.pause_step_events e WHERE e.pause_instance_id = pi.id AND e.step_type = 'outcome_logged' ORDER BY e.created_at DESC LIMIT 1) AS outcome,
+  (SELECT payload->>'text' FROM public.pause_step_events e WHERE e.pause_instance_id = pi.id AND e.step_type = 'note_updated' ORDER BY e.created_at DESC LIMIT 1) AS note_text,
+  (SELECT ARRAY(SELECT jsonb_array_elements_text(payload->'tags')) FROM public.pause_step_events e WHERE e.pause_instance_id = pi.id AND e.step_type = 'tag_updated' ORDER BY e.created_at DESC LIMIT 1) AS tags,
+  COALESCE((SELECT (payload->>'is_favorite')::boolean FROM public.pause_step_events e WHERE e.pause_instance_id = pi.id AND e.step_type = 'favorite_toggled' ORDER BY e.created_at DESC LIMIT 1), false) AS is_favorite,
+  (SELECT count(*) FROM public.pause_companion_events ce WHERE ce.pause_instance_id = pi.id AND ce.action='complete' AND ce.counts_for_pause=true)::int AS counted_companion_count,
+  (SELECT COALESCE(array_agg(DISTINCT ce.companion_type), ARRAY[]::text[]) FROM public.pause_companion_events ce WHERE ce.pause_instance_id = pi.id AND ce.action='complete' AND ce.counts_for_pause=true) AS counted_companion_types,
+  (SELECT content->>'message' FROM public.pause_ai_artifacts a WHERE a.pause_instance_id = pi.id AND a.kind = 'reflection_text' LIMIT 1) AS reflection_text,
+  (SELECT content->>'haiku' FROM public.pause_ai_artifacts a WHERE a.pause_instance_id = pi.id AND a.kind = 'haiku' LIMIT 1) AS haiku_text,
+  (SELECT NULLIF(trim(both from (e.payload->>'intensity')), '')::smallint FROM public.pause_step_events e WHERE e.pause_instance_id = pi.id AND e.step_type = 'initial_emotion_logged' ORDER BY e.created_at DESC LIMIT 1) AS initial_emotion_intensity,
+  (SELECT NULLIF(trim(both from (e.payload->>'shift_intensity')), '')::smallint FROM public.pause_step_events e WHERE e.pause_instance_id = pi.id AND e.step_type = 'shift_emotion_logged' ORDER BY e.created_at DESC LIMIT 1) AS shift_emotion_intensity,
+  (SELECT payload->>'mood' FROM public.pause_step_events e WHERE e.pause_instance_id = pi.id AND e.step_type = 'post_pause_emotion_logged' ORDER BY e.created_at DESC LIMIT 1) AS post_pause_mood,
+  (SELECT NULLIF(trim(both from (e.payload->>'intensity')), '')::smallint FROM public.pause_step_events e WHERE e.pause_instance_id = pi.id AND e.step_type = 'post_pause_emotion_logged' ORDER BY e.created_at DESC LIMIT 1) AS post_pause_emotion_intensity,
+  (EXISTS (SELECT 1 FROM public.pause_step_events e WHERE e.pause_instance_id = pi.id AND e.step_type = 'initial_emotion_logged'
+       AND ((e.payload->'brief_ritual') = 'true'::jsonb OR lower(trim(COALESCE(e.payload->>'brief_ritual', ''))) IN ('true', 't', '1')))) AS is_brief_ritual
+FROM public.pause_instances pi;
+
+CREATE OR REPLACE VIEW public.v_pause_archive_pauses AS
+SELECT vf.* FROM public.v_pause_full vf
+WHERE vf.state NOT IN ('active', 'engaged', 'pending')
+  AND NOT ((vf.state = 'expired' AND vf.engaged_at IS NULL AND vf.expired_reason IS DISTINCT FROM 'superseded'::public.pause_expired_reason)
+    OR (vf.state = 'dismissed' AND vf.engaged_at IS NULL));
+
+ALTER VIEW public.v_pause_archive_pauses SET (security_invoker = true);
+
+CREATE OR REPLACE VIEW public.v_pause_archive_echoes AS
+SELECT vf.* FROM public.v_pause_full vf
+WHERE vf.state NOT IN ('active', 'engaged', 'pending') AND vf.engaged_at IS NULL
+  AND (vf.state = 'dismissed' OR (vf.state = 'expired' AND vf.expired_reason IS DISTINCT FROM 'superseded'::public.pause_expired_reason));
+
+ALTER VIEW public.v_pause_archive_echoes SET (security_invoker = true);
+
+GRANT SELECT ON public.v_pause_archive_pauses TO authenticated, service_role;
+GRANT SELECT ON public.v_pause_archive_echoes TO authenticated, service_role;
+
+-- Reflect-step cleanup
+CREATE OR REPLACE FUNCTION public.pause_notification_metadata(p_pause_instance public.pause_instances)
+RETURNS jsonb LANGUAGE sql STABLE SET search_path = public AS $$
+  SELECT jsonb_build_object(
+    'pause_instance_id', p_pause_instance.id,
+    'template_slug', (SELECT slug FROM public.pause_templates WHERE id = p_pause_instance.template_id),
+    'source', p_pause_instance.source,
+    'severity', p_pause_instance.context_snapshot->>'severity',
+    'context', p_pause_instance.context_snapshot->>'context_text',
+    'message', (SELECT NULLIF(trim(a.content->>'message'), '') FROM public.pause_ai_artifacts a WHERE a.pause_instance_id = p_pause_instance.id AND a.kind = 'reflection_text' ORDER BY a.created_at DESC LIMIT 1),
+    'window_ends_at', p_pause_instance.window_ends_at,
+    'pending_offer', p_pause_instance.state = 'pending'
+  );
+$$;
+
+CREATE OR REPLACE FUNCTION public.notifications_from_pause_instances()
+RETURNS trigger LANGUAGE plpgsql SET search_path = public AS $$
+BEGIN
+  IF TG_OP = 'INSERT' AND NEW.state = 'active' THEN
+    PERFORM public.notifications_upsert(NEW.user_id, 'pause', 'pause_instances', NEW.id, public.pause_notification_metadata(NEW), '/pause', jsonb_build_object('pauseInstanceId', NEW.id::text), NEW.created_at);
+    RETURN NEW;
+  END IF;
+  IF TG_OP = 'INSERT' AND NEW.state = 'pending' THEN
+    PERFORM public.notifications_upsert(NEW.user_id, 'pause', 'pause_instances', NEW.id, public.pause_notification_metadata(NEW), '/pause', jsonb_build_object('pauseInstanceId', NEW.id::text, 'pendingOffer', 'true'), NEW.created_at);
+    RETURN NEW;
+  END IF;
+  IF TG_OP = 'UPDATE' AND OLD.state = 'pending' AND NEW.state = 'active' THEN
+    PERFORM public.notifications_upsert(NEW.user_id, 'pause', 'pause_instances', NEW.id, public.pause_notification_metadata(NEW), '/pause', jsonb_build_object('pauseInstanceId', NEW.id::text), NEW.created_at);
+    RETURN NEW;
+  END IF;
+  IF TG_OP = 'UPDATE' AND OLD.state IN ('active', 'engaged') AND NEW.state IN ('completed', 'dismissed', 'expired') THEN
+    UPDATE public.notifications SET dismissed_at = now() WHERE source_table = 'pause_instances' AND source_id = NEW.id AND dismissed_at IS NULL;
+    RETURN NEW;
+  END IF;
+  IF TG_OP = 'UPDATE' AND OLD.state = 'pending' AND NEW.state = 'expired' THEN
+    UPDATE public.notifications SET dismissed_at = now() WHERE source_table = 'pause_instances' AND source_id = NEW.id AND dismissed_at IS NULL;
+    RETURN NEW;
+  END IF;
+  RETURN NEW;
+END; $$;
+
+CREATE OR REPLACE FUNCTION public.notifications_enrich_pause_from_reflection_artifact()
+RETURNS trigger LANGUAGE plpgsql SET search_path = public AS $$
+DECLARE v_msg text;
+BEGIN
+  IF NEW.kind <> 'reflection_text' THEN RETURN NEW; END IF;
+  v_msg := NULLIF(trim(NEW.content->>'message'), '');
+  IF v_msg IS NULL THEN RETURN NEW; END IF;
+  UPDATE public.notifications n
+     SET metadata = COALESCE(n.metadata, '{}'::jsonb) || jsonb_build_object('message', v_msg),
+         updated_at = now()
+   WHERE n.source_table = 'pause_instances' AND n.source_id = NEW.pause_instance_id AND n.type = 'pause' AND n.dismissed_at IS NULL;
+  RETURN NEW;
+END; $$;
+
+DROP TRIGGER IF EXISTS trg_notifications_enrich_pause_reflection ON public.pause_ai_artifacts;
+CREATE TRIGGER trg_notifications_enrich_pause_reflection
+  AFTER INSERT OR UPDATE OF content, kind ON public.pause_ai_artifacts
+  FOR EACH ROW EXECUTE FUNCTION public.notifications_enrich_pause_from_reflection_artifact();
+
+ALTER TABLE public.profiles DROP COLUMN IF EXISTS last_message;
+
+CREATE OR REPLACE FUNCTION public.update_profile_safe(_user_id uuid, _updates jsonb)
+RETURNS void LANGUAGE plpgsql SECURITY DEFINER SET search_path TO 'public'
+AS $function$
+DECLARE safe_updates jsonb;
+BEGIN
+  IF auth.role() <> 'service_role' THEN
+    IF auth.uid() IS NULL THEN RAISE EXCEPTION 'update_profile_safe: not authenticated' USING ERRCODE = '42501'; END IF;
+    IF auth.uid() <> _user_id THEN RAISE EXCEPTION 'update_profile_safe: not authorized' USING ERRCODE = '42501'; END IF;
+  END IF;
+  safe_updates := _updates - 'subscription_status' - 'lifetime_access' - 'subscription_end' - 'subscription_checked_at' - 'user_id' - 'id' - 'created_at' - 'is_admin' - 'subscription_tier';
+  UPDATE public.profiles SET
+    threshold = COALESCE((safe_updates->>'threshold')::numeric, threshold),
+    threshold_down = COALESCE((safe_updates->>'threshold_down')::numeric, threshold_down),
+    cumulative_threshold = COALESCE((safe_updates->>'cumulative_threshold')::numeric, cumulative_threshold),
+    cooldown_hours = COALESCE((safe_updates->>'cooldown_hours')::integer, cooldown_hours),
+    email_notifications = COALESCE((safe_updates->>'email_notifications')::boolean, email_notifications),
+    has_onboarded = COALESCE((safe_updates->>'has_onboarded')::boolean, has_onboarded),
+    companion_breathing = COALESCE((safe_updates->>'companion_breathing')::boolean, companion_breathing),
+    companion_haiku = COALESCE((safe_updates->>'companion_haiku')::boolean, companion_haiku),
+    companion_grounding = COALESCE((safe_updates->>'companion_grounding')::boolean, (safe_updates->>'companion_learning')::boolean, companion_grounding),
+    companion_signal = COALESCE((safe_updates->>'companion_signal')::boolean, companion_signal),
+    companion_zoom_out = COALESCE((safe_updates->>'companion_zoom_out')::boolean, companion_zoom_out),
+    companion_history = COALESCE((safe_updates->>'companion_history')::boolean, companion_history),
+    silent_mode = COALESCE((safe_updates->>'silent_mode')::boolean, silent_mode),
+    quiet_hours_start = CASE WHEN safe_updates ? 'quiet_hours_start' THEN (safe_updates->>'quiet_hours_start')::integer ELSE quiet_hours_start END,
+    quiet_hours_end = CASE WHEN safe_updates ? 'quiet_hours_end' THEN (safe_updates->>'quiet_hours_end')::integer ELSE quiet_hours_end END,
+    night_reflection_hour = CASE WHEN safe_updates ? 'night_reflection_hour' THEN (safe_updates->>'night_reflection_hour')::integer ELSE night_reflection_hour END,
+    ai_insights_enabled = COALESCE((safe_updates->>'ai_insights_enabled')::boolean, ai_insights_enabled),
+    reflection_tone = COALESCE(safe_updates->>'reflection_tone', reflection_tone),
+    reflection_style = COALESCE(safe_updates->>'reflection_style', reflection_style),
+    custom_prompt = CASE WHEN safe_updates ? 'custom_prompt' THEN safe_updates->>'custom_prompt' ELSE custom_prompt END,
+    first_name = CASE WHEN safe_updates ? 'first_name' THEN safe_updates->>'first_name' ELSE first_name END,
+    timezone = CASE WHEN safe_updates ? 'timezone' THEN safe_updates->>'timezone' ELSE timezone END,
+    ritual_template = COALESCE(safe_updates->>'ritual_template', ritual_template),
+    hold_goal_type = CASE WHEN safe_updates ? 'hold_goal_type' THEN safe_updates->>'hold_goal_type' ELSE hold_goal_type END,
+    hold_goal_currency = CASE WHEN safe_updates ? 'hold_goal_currency' THEN safe_updates->>'hold_goal_currency' ELSE hold_goal_currency END,
+    hold_goal_start = CASE WHEN safe_updates ? 'hold_goal_start' THEN (safe_updates->>'hold_goal_start')::timestamptz ELSE hold_goal_start END,
+    hold_goal_target_months = CASE WHEN safe_updates ? 'hold_goal_target_months' THEN (safe_updates->>'hold_goal_target_months')::integer ELSE hold_goal_target_months END,
+    hold_goal_target_price = CASE WHEN safe_updates ? 'hold_goal_target_price' THEN (safe_updates->>'hold_goal_target_price')::numeric ELSE hold_goal_target_price END,
+    tracked_asset_id = CASE WHEN safe_updates ? 'tracked_asset_id' THEN
+      CASE lower(trim(safe_updates->>'tracked_asset_id'))
+        WHEN 'bitcoin' THEN 'bitcoin' WHEN 'ethereum' THEN 'ethereum' WHEN 'solana' THEN 'solana' WHEN 'monero' THEN 'monero' ELSE tracked_asset_id END
+      ELSE tracked_asset_id END,
+    motivations = CASE WHEN safe_updates ? 'motivations' THEN ARRAY(SELECT jsonb_array_elements_text(safe_updates->'motivations')) ELSE motivations END,
+    mantra = CASE WHEN safe_updates ? 'mantra' THEN safe_updates->>'mantra' ELSE mantra END,
+    language = COALESCE(safe_updates->>'language', language),
+    grounding_activities = CASE WHEN safe_updates ? 'grounding_activities' THEN ARRAY(SELECT jsonb_array_elements_text(safe_updates->'grounding_activities')) ELSE grounding_activities END,
+    digest_frequency = COALESCE(safe_updates->>'digest_frequency', digest_frequency),
+    notify_badges = COALESCE((safe_updates->>'notify_badges')::boolean, notify_badges),
+    last_context = CASE WHEN safe_updates ? 'last_context' THEN safe_updates->>'last_context' ELSE last_context END,
+    last_trigger_at = CASE WHEN safe_updates ? 'last_trigger_at' THEN (safe_updates->>'last_trigger_at')::timestamptz ELSE last_trigger_at END,
+    streak_freeze_dates = CASE WHEN safe_updates ? 'streak_freeze_dates' THEN ARRAY(SELECT jsonb_array_elements_text(safe_updates->'streak_freeze_dates')) ELSE streak_freeze_dates END,
+    referral_code = COALESCE(safe_updates->>'referral_code', referral_code),
+    referred_by = CASE WHEN safe_updates ? 'referred_by' THEN safe_updates->>'referred_by' ELSE referred_by END,
+    snoozed_until = CASE WHEN safe_updates ? 'snoozed_until' THEN (safe_updates->>'snoozed_until')::timestamptz ELSE snoozed_until END,
+    updated_at = now()
+  WHERE user_id = _user_id;
+END;
+$function$;

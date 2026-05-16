@@ -3328,6 +3328,12 @@ export type Database = {
         }
         Returns: Database["public"]["Enums"]["pause_state"]
       }
+      pause_notification_metadata: {
+        Args: {
+          p_pause_instance: Database["public"]["Tables"]["pause_instances"]["Row"]
+        }
+        Returns: Json
+      }
       pause_sweep_window_elapsed: { Args: never; Returns: number }
       read_email_batch: {
         Args: { batch_size: number; queue_name: string; vt: number }
