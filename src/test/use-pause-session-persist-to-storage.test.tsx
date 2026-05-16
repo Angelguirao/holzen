@@ -55,9 +55,22 @@ beforeEach(() => {
 });
 
 describe('usePauseSessionPersistToStorage', () => {
-  it('does not save when message is empty', () => {
-    renderHook(() => usePauseSessionPersistToStorage(base({ message: '' })));
+  it('does not save when there is no instance id and message is empty', () => {
+    renderHook(() => usePauseSessionPersistToStorage(base({ message: '', pauseInstanceId: null })));
     expect(saveSessionMock).not.toHaveBeenCalled();
+  });
+
+  it('saves when pauseInstanceId is set even if reflection message is empty', () => {
+    const input = base({
+      message: '',
+      pauseInstanceId: 'pause-uuid',
+      step: 'breathe',
+      moodDone: true,
+      ritualEntry: 'deep',
+    });
+    renderHook(() => usePauseSessionPersistToStorage(input));
+    expect(saveSessionMock).toHaveBeenCalledTimes(1);
+    expect(saveSessionMock).toHaveBeenCalledWith(buildPauseSessionPersistSnapshot(input));
   });
 
   it('saves built snapshot when message is set', () => {
