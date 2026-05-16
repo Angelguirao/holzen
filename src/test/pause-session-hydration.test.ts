@@ -114,6 +114,18 @@ describe('computePauseSessionHydration', () => {
     expect(out).toEqual({ status: 'fetch', pauseInstanceId: 'n2' });
   });
 
+  it('fetch when holzen is aligned with open pause id but no reflection text yet', () => {
+    const out = computePauseSessionHydration({
+      restored: null,
+      ...navEmpty,
+      ...holzenBase,
+      holzenMessage: null,
+      holzenLastPauseInstanceId: 'open-1',
+      holzenAligned: true,
+    });
+    expect(out).toEqual({ status: 'fetch', pauseInstanceId: 'open-1' });
+  });
+
   it('falls back to holzen message without alignment when nav id absent', () => {
     const out = computePauseSessionHydration({
       restored: null,

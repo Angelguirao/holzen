@@ -93,6 +93,16 @@ export function computePauseSessionHydration(p: PauseSessionHydrationInput): Pau
     return { status: 'fetch', pauseInstanceId: p.navPauseInstanceId };
   }
 
+  if (
+    p.holzenAligned &&
+    p.holzenLastPauseInstanceId &&
+    !p.navReflectionMessage &&
+    !p.holzenMessage &&
+    !p.restored?.message
+  ) {
+    return { status: 'fetch', pauseInstanceId: p.holzenLastPauseInstanceId };
+  }
+
   if (p.holzenMessage) {
     return {
       status: 'ready',

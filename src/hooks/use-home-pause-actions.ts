@@ -3,6 +3,7 @@ import type { NavigateFunction } from 'react-router-dom';
 import type { CompanionData, CompanionPrefs } from '@/components/CompanionSection';
 import type { BtcMoveSeverity } from '@/lib/btc-move-severity';
 import { holzenLog } from '@/lib/holzen-console';
+import { canNavigateToPauseSession } from '@/lib/home-pause-navigate';
 import { trackEvent } from '@/lib/posthog';
 
 export type PauseDismissAnalyticsSurface = 'home_zen_reflection' | 'home_your_pause_widget';
@@ -64,7 +65,7 @@ export function useHomePauseActions(args: {
   }, [dismissMessage, dismissAnalyticsSurface, lastPauseInstanceId]);
 
   const handleNavigatePauseWithThis = useCallback(() => {
-    if (!message && !lastPauseInstanceId) return;
+    if (!canNavigateToPauseSession(message, lastPauseInstanceId)) return;
     const navState: PauseSessionLocationState = {
       reflectionMessage: message ?? '',
       context,
@@ -76,7 +77,7 @@ export function useHomePauseActions(args: {
     holzenLog.home('Navigate to /pause (pause with this message)', {
       pauseInstanceId: lastPauseInstanceId,
       severity,
-      messageLen: message.length,
+      messageLen: message?.length ?? 0,
       hasContext: !!context,
       companionKeys: companions
         ? Object.entries(companions)
@@ -88,7 +89,7 @@ export function useHomePauseActions(args: {
   }, [message, context, lastPauseInstanceId, companions, companionPrefs, severity, navigate]);
 
   const handleNavigatePauseWithThisFromPendingBanner = useCallback(() => {
-    if (!message && !lastPauseInstanceId) return;
+    if (!canNavigateToPauseSession(message, lastPauseInstanceId)) return;
     try {
       trackEvent('home.pending_pause_banner_pause_opened', {
         pause_instance_id: lastPauseInstanceId ?? undefined,
