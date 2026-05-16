@@ -1480,6 +1480,8 @@
     },
     "scienceInfoAria": "The science behind this pause",
     "noReflection": "No active pause. Go back to trigger one.",
+    "sessionEmptyTitle": "No pause to open",
+    "sessionEmptyBody": "Start from Home with “I need a pause,” or open one from a pause-ready notification.",
     "outcomeSaveFailed": "Could not save your choice. Try again.",
     "outcomeNotCompleted": "Your choice was saved, but this pause is not complete yet — finish the remaining ritual steps, then choose again.",
     "stepSyncFailed": "Could not sync this step. Check your connection and try again.",

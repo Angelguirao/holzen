@@ -980,6 +980,8 @@
     "sessionTitle": "Molanız",
     "scienceInfoAria": "Bu molanın arkasındaki bilim",
     "noReflection": "Aktif düşünce yok. Birini tetiklemek için geri dönün.",
+    "sessionEmptyTitle": "Açılacak duraklama yok",
+    "sessionEmptyBody": "Ana sayfadan «Bir duraklamaya ihtiyacım var» ile başlayın veya hazır bildirimden açın.",
     "outcomeSaveFailed": "Seçimin kaydedilemedi. Tekrar dene.",
     "outcomeNotCompleted": "Seçimin kaydedildi ama bu mola henüz tamamlanmadı — eksik ritüel adımlarını tamamlayıp yeniden seç.",
     "stepSyncFailed": "Bu adım eşitlenemedi. Bağlantını kontrol edip tekrar dene.",

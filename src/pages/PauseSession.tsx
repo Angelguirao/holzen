@@ -704,7 +704,7 @@ export default function PauseSession() {
   return (
     <Fragment>
       <PauseSessionGate
-        hasMessage={hasCoalescedShellSession}
+        shellReady={hasCoalescedShellSession}
         phase={phase}
         waitingForFetch={waitingForFetch}
         fetchFailed={fetchFailed}
