@@ -204,8 +204,9 @@ export function NotificationBell() {
       actionLabel = t('notifications.viewInsights');
     } else if (row.type === 'pause') {
       title = t('notifications.pauseReady', { defaultValue: 'Pause ready' });
-      const message = getString(metadata.message) ?? '';
-      subtitle = message.slice(0, 80) + (message.length > 80 ? '…' : '');
+      const preview =
+        getString(metadata.message) ?? getString(metadata.context) ?? '';
+      subtitle = preview.slice(0, 80) + (preview.length > 80 ? '…' : '');
       actionLabel = t('notifications.openPause', { defaultValue: 'Open pause' });
     } else {
       return null;

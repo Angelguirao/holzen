@@ -9,7 +9,7 @@ interface Props {
 }
 
 /**
- * Slide-in banner on non-Home routes when `profiles.last_message` updates (new pause reflection).
+ * Slide-in banner on non-Home routes when `profiles.last_context` updates (cron / auto pause).
  * Primary tap → Home. **X / `onDismiss` only clears local visibility** (`useAutoTrigger`); it does not
  * end the open pause in Postgres — use Home “Dismiss pause” or Zen Done / `pause_dismiss_current` for that.
  */
