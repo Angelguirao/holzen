@@ -16,7 +16,7 @@ import { useHomeDocumentTitle } from '@/hooks/use-home-document-title';
 import { useHomeHeroQuoteViewed } from '@/hooks/use-home-hero-quote-viewed';
 import { useHomePauseAudio } from '@/hooks/use-home-pause-audio';
 import { useHomeMarketDisplayPreferences } from '@/hooks/use-home-market-display-preferences';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { useOutletContext, useSearchParams, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '@/hooks/use-auth';
 import { useNightReflection } from '@/components/NightReflectionCard';
@@ -33,17 +33,7 @@ import { useHomeZenModeRouteProps } from '@/hooks/use-home-zen-route-props';
 import { useHomeDashboardLayoutProps } from '@/hooks/use-home-dashboard-layout-props';
 import type { HomeAppLayoutOutletContext } from '@/lib/home-app-layout-outlet';
 
-const LEGACY_PINNED_REFLECTION_KEY = 'holzen_pinned_reflection';
-
 const Home = () => {
-  useEffect(() => {
-    try {
-      localStorage.removeItem(LEGACY_PINNED_REFLECTION_KEY);
-    } catch {
-      /* ignore */
-    }
-  }, []);
-
   const { t } = useTranslation();
   const { user } = useAuth();
   const navigate = useNavigate();
