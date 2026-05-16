@@ -273,15 +273,19 @@ Optimize: time to completed pause, completion rate, D7 return after first pause.
 
 <a id="s5-3"></a>
 
-### 5.3 Old URLs
+### 5.3 Dead URLs — 404 only (no legacy redirects)
 
+**Policy:** The router registers **MVP paths only**. Anything else hits a **single `NotFound`** route — no `Navigate replace`, no “compat” aliases, no `/library` → `/archive` shim. Pre-launch has no users to preserve bookmarks for; redirects add cognitive load (“is this URL still a thing?”).
 
-| Path                   | Behavior                                                                                                                      |
-| ---------------------- | ----------------------------------------------------------------------------------------------------------------------------- |
-| `/tools`, `/tools/*`   | **Not registered** — React Router falls through to app 404 or catch-all → `/` (pick one in Step 2; prefer **single 404** route). |
-| `/journey/stats`, etc. | Redirect to `/journey` (301-style `Navigate replace`) while old links exist.                                                  |
-| `/library`             | Keep redirect → `/archive` if already present.                                                                                |
+| Path | Behavior |
+| --- | --- |
+| `/tools`, `/tools/*` | **Not registered** → `NotFound` |
+| `/journey/stats`, `/journey/badges`, `/journey/insights`, `/journey/activity`, `/journey/:tab` | **Not registered** → `NotFound` (only `/journey` exists) |
+| `/library` | **Not registered** → `NotFound` (product URL is `/archive` only) |
+| `/settings/reflection`, `/settings/experience`, old Profile routes | **Not registered** → `NotFound` |
+| Any other unknown path | `NotFound` + `app.route_not_found` analytics |
 
+**Remove** from Step 2: `LibraryToArchiveRedirect`, `/journey` → `/journey/stats` redirect, `/journey/:tab` → `/journey` compat routes.
 
 **No** per-surface Coming soon pages in-app.
 
@@ -298,6 +302,7 @@ Optimize: time to completed pause, completion rate, D7 return after first pause.
 - Merging Archive into Journey
 - Keeping “dormant” stats/tools **routes** or **hooks** in active tree “for later” (move to legacy; port back deliberately)
 - `VITE_MVP` build-time fork that hides half the app in one bundle (same cognitive problem as a flag)
+- **Legacy URL redirects** (`/library` → `/archive`, `/journey/stats` → `/journey`, bookmark `Navigate replace`) — **404 only**; see §5.3
 
 ---
 
@@ -318,13 +323,12 @@ Optimize: time to completed pause, completion rate, D7 return after first pause.
 ### 7.2 Route
 
 
-| Route           | Component                                      |
-| --------------- | ---------------------------------------------- |
-| `/journey`      | `JourneyMvpOverview`                           |
-| `/journey/:tab` | `Navigate` → `/journey` (compat for bookmarks) |
+| Route      | Component            |
+| ---------- | -------------------- |
+| `/journey` | `JourneyMvpOverview` |
 
 
-Update [App.tsx](src/App.tsx): replace `/journey` → `/journey/stats` redirect and tabbed `Profile` route with above.
+Update [App.tsx](src/App.tsx): **delete** `/journey` → `/journey/stats` redirect, `LibraryToArchiveRedirect`, `/journey/:tab` compat routes, and tabbed `Profile` route; register **only** `/journey` → `JourneyMvpOverview`.
 
 [BottomNav](src/components/BottomNav.tsx): Journey tab `to="/journey"` (not `/journey/stats`).
 
@@ -407,7 +411,7 @@ Hub sections: `you`, `companions`, `notifications`, `subscription`, `account`.
 
 Move hub entries for `reflection`, `experience` off the hub list (sections can move to legacy or stay as files unlinked).
 
-`/settings/reflection` direct URL → redirect to `/settings`.
+`/settings/reflection` (and other removed hub sections): **not** in router — direct URL → `NotFound` (§5.3). Hub list omits those entries only.
 
 **Paywall honesty:** Subscription copy lists only what MVP ships: unlimited pauses, deep ritual, companions, **Archive (Pro)**. Mark stats/tools/insights as roadmap, not included today.
 
@@ -451,9 +455,9 @@ Skim [Terms](src/pages/Terms.tsx) vs landing Coming soon claims (Step 5).
 
 ## 13. Notifications
 
-**Step 5 §17.5** handles server-side mute + path backfill. **Step 2** adds client safety net:
+**Step 5 §17.5** handles server-side mute + `action_path` backfill on stored notifications (pause-safe paths only).
 
-- Catch-all or `NotFound`: if `location.pathname` matches `/tools` or old `/journey/(stats|badges|insights|activity)`, optional one-line toast (“That page isn’t available yet”) then `Navigate` to `/` or `/journey` — **single** implementation, not per-page guards.
+**Step 2 — client:** no special-case handling for old paths. Unknown URLs → `NotFound` + `app.route_not_found` (§5.3). Do **not** add redirect-to-home/journey or “that page isn’t available” toasts for `/tools/*` or old `/journey/*` — that reintroduces a second routing layer.
 
 ---
 
@@ -653,7 +657,7 @@ After `companion_catalog` / `opening_message` migration: rename `_shared/content
 
 **H — `email_queue`:** Cancel rows for retired template types.
 
-**Backfill:** `notifications.action_path` for pause-only paths; client toast for stale `/tools/*` (§13).
+**Backfill:** `notifications.action_path` for pause-only paths only (§13 — no client redirect/toast for stale paths).
 
 <a id="s18"></a>
 
@@ -815,7 +819,7 @@ Document in decision doc § **Architecture**: “legacy is read-only reference; 
 
 | Opportunity | What | Step | Why now |
 | --- | --- | --- | --- |
-| **Declarative route manifest** | [`app-routes.ts`](src/lib/app-routes.ts): `MVP_ROUTES`, `MVP_SHELL_TABS`, redirect map; [`App.tsx`](src/App.tsx) consumes it — no scattered path strings | Step 2 | IA change forces router touch; one place for agents/humans |
+| **Declarative route manifest** | [`app-routes.ts`](src/lib/app-routes.ts): `MVP_ROUTES`, `MVP_SHELL_TABS` (allowlist only — **no redirect map**); [`App.tsx`](src/App.tsx) registers exactly those paths | Step 2 | IA change forces router touch; one place for agents/humans |
 | **Drop dead lazy imports** | Remove `React.lazy` for Tools, Profile, practice, Ground, etc.; lazy-load only MVP pages + public/admin | Step 2 | **Smaller initial bundle**; chunks can’t load removed UI |
 | **Prefetch alignment** | `AppLayout` idle-import only `Journey` MVP chunk (not Profile/ToolsHub) | Step 2 | Already in plan; architectural perf win |
 | **Legacy bulk move = delete dead libs** | Move `pause-stats-data-query`, `pause-score-impacts`, `pause-impact-data`, `pause-replay-thread`, `guided-journal-*`, `grounding-enrichment-query` to legacy with stats/tools | Step 3 | ~15 root `src/lib/*` files disappear from active tree |
@@ -1313,7 +1317,7 @@ Items not fully spelled out elsewhere. **Pre-launch = be aggressive** where cost
 | Item | Action |
 | --- | --- |
 | [`sw.ts`](src/sw.ts) | `pause_ready` → `/?pause=ready` is MVP-safe. No change unless you add generic deep-link parser for `action_path`. |
-| **`NotificationBell`** | Uses DB `action_path` — fixed by §17.5 backfill + only pause triggers left. Step 2 toast for stale `/tools/*` bookmarks. |
+| **`NotificationBell`** | Uses DB `action_path` — fixed by §17.5 backfill + only pause triggers left. Stale paths after backfill → user lands on `NotFound` if they tap (acceptable). |
 | **`register-push`** | Keep; verify VAPID secrets in Lovable. |
 | **Push payload types** | Document: MVP only expects **pause** notifications in feed; badge/letter types are gone after cutover. |
 
@@ -1336,7 +1340,7 @@ Items not fully spelled out elsewhere. **Pre-launch = be aggressive** where cost
 | --- | --- |
 | `/welcome` (Landing), `/auth`, `/roadmap`, `/pricing` (if exists), legal | **Keep** — Coming soon only on Landing |
 | `/blog`, `/blog/:slug`, `blog_posts` | **Keep** — acquisition/SEO |
-| `/reserve` | **Keep** or redirect to `/welcome` if unused — grep analytics |
+| `/reserve` | Grep analytics — **keep route** only if still used; if dead, **omit** from router (404). No redirect to `/welcome`. |
 | `changelog_entries` | **Keep** — `check:version-sync` / About |
 | `testimonials`, `feedback` | **Keep** for landing + widget |
 
@@ -1734,20 +1738,73 @@ PostgREST suites for all `pause_*` RPCs; OpenAPI; Bruno in CI against prod; HTTP
 
 ## 29. Testing
 
-**Vitest** ([vitest.config.ts](vitest.config.ts)): add `exclude: ['src/legacy/**']` so legacy reference code does not run in default `npm run test`. Move or duplicate only tests that guard **ported** logic (e.g. streak math) under `src/lib/journey/*.test.ts`.
+**Principle:** The default test suite should match the **shipped product**, not the reference tree. Same cognitive rule as §5.3 routing — no “compat” tests that assert old URLs redirect.
 
-**Legacy-only tests** → move with code to `src/legacy/**` or `src/test/legacy/` (excluded from CI default):
+### 29.1 Default `npm run test` (Vitest)
 
-- `badges-compute.test.ts`, `pause-score.test.ts`, `home-section-order-normalize.test.ts` (journey-pulse ids), `feed-ingest-filter.test.ts`, `grounding-enrichment-util.test.ts`, etc.
+**Config** ([vitest.config.ts](vitest.config.ts)) — Step 3:
 
-**MVP CI tests (keep / add):**
+```ts
+test: {
+  exclude: ['src/legacy/**', 'src/test/legacy/**'],
+  // …existing include/setup unchanged
+}
+```
 
-- Router: only expected routes match; `/tools/foo` → 404 + optional `app.route_not_found`.
-- `/journey/stats` → `/journey`.
-- BottomNav four tabs.
-- `scripts/check-mvp-active-surface.mjs` in `test:ci` or `prebuild` (§18.2).
-- Onboarding step count; Journey Archive CTA free vs Pro.
-- Pause flow: post-complete navigation does not reference `journeyPath('stats')`.
+- **~108** test files today; expect **~15–25** to move with legacy code (not deleted — reference only).
+- **Keep** pause ritual, checkout guards, archive helpers, companion/orchestrate unit tests, and anything imported only from active `src/`.
+- **Move** with legacy modules (or to `src/test/legacy/**`, same exclude): `badges-compute.test.ts`, `pause-score.test.ts`, `pause-impact-data.test.ts`, `home-section-order-normalize.test.ts`, `feed-ingest-filter.test.ts`, `grounding-enrichment-util.test.ts`, `hold-goal-headline.test.ts`, `apply-bulk-hold-outcomes.test.ts`, tools/journey-tab helpers tied to removed IA, etc.
+- **Port, don’t import legacy:** if Journey MVP reuses streak math from `StreakTimeline`, add `src/lib/journey/*.test.ts` with copied fixtures — do not `@/legacy` from active tests.
+
+**Coverage** ([package.json](package.json) `test:ci`): unchanged policy — **only** `CheckoutConfirmation.tsx` + `checkout-suppression-window.ts` have per-file thresholds. No global coverage floor; MVP strip does not require raising coverage %.
+
+### 29.2 Step 2 — routing & nav tests (404 policy)
+
+Add **`src/test/mvp-routes.test.tsx`** (or extend a small `app-routes.test.ts`) — render `App` / route manifest with `MemoryRouter` + auth stub:
+
+| Assert | Example paths |
+| --- | --- |
+| MVP routes render (smoke) | `/`, `/archive`, `/journey`, `/settings`, `/pause` |
+| Dead paths → `NotFound` | `/tools/foo`, `/library`, `/journey/stats`, `/journey/badges`, `/settings/reflection` |
+| **No** redirect hops | `initialEntries: ['/library']` → screen shows NotFound, **not** `/archive` |
+| Analytics | Optional: `app.route_not_found` fired with `attempted_path` (mock PostHog) |
+
+**Update** [`BottomNav.test.tsx`](src/components/BottomNav.test.tsx) (Step 2):
+
+- Remove “tools tab on `/tools/*`” cases.
+- Journey tab: active **only** on `/journey` (exact or `pathname === '/journey'`), **not** `/journey/stats`.
+- Four tabs: home · archive · journey · settings.
+
+### 29.3 Pause & product tests (keep / tighten)
+
+| Area | Action |
+| --- | --- |
+| **Pause flow** | Keep existing `src/test/pause-*.test.ts` / hook tests; add assertion that post-complete navigation never calls `journeyPath('stats')` or `/tools/*` (§18.4). |
+| **Onboarding** | Test **2-step** flow only after Step 4; move paywall/hold-goal tests to legacy. |
+| **Journey MVP** | New tests for `JourneyStreakCard` / overview CTA (free vs Pro Archive copy) — Step 2–4. |
+| **Checkout** | Keep all `checkout-confirmation-*` tests — billing stays in MVP. |
+
+### 29.4 CI scripts (not Vitest — Step 3)
+
+| Script | Role |
+| --- | --- |
+| `check:mvp-surface` | Forbidden imports/paths in active `src/` (§18.2) |
+| `check:mvp-invoke-edge` | Allowlisted `invokeEdge(` names only |
+| `check:edge-coverage-manifest` | Already in `test:ci` — trim to MVP edges after Step 3 |
+
+Wire `npm run check:mvp-surface` into **`test:ci`** (cheap; catches stray `@/lib/stats` imports tests might not hit).
+
+**Optional Step 6:** post-`build` grep `dist/assets/*.js` for `BadgesPanelV2` / `ToolsHub` strings (bundle leak guard).
+
+### 29.5 What we are not doing
+
+- **No** tests that assert legacy redirects (`/library` → `/archive`, `/journey/stats` → `/journey`).
+- **No** running legacy tests in default CI (optional `npm run test:legacy` later if you want a manual reference check).
+- **No** global coverage gate on the slimmed tree.
+
+### 29.6 Step gates (unchanged)
+
+Every implementation step still runs **`npm run test`** before commit. Step 3+ also **`check:mvp-surface`** · **`check:edge-coverage-manifest`**; Step 5 adds **`npm run build`** + **`check:view-migrations`**.
 
 ---
 
@@ -1790,6 +1847,7 @@ PostgREST suites for all `pause_*` RPCs; OpenAPI; Bruno in CI against prod; HTTP
 | **Demo mode** | Move stats demo to legacy; optional pause-only fixture (3 fake `pause_instances`) if needed |
 | **`signal_source_suggestions`** | Grep Step 5; **DROP** if no writer, else keep |
 | **Bundle guard** | **On** — Step 6 `dist` grep for legacy UI strings (§18.2) |
+| **Routing** | **No legacy URL redirects** — MVP paths only; `/library`, `/journey/*` subpaths, `/tools/*` → `NotFound` (§5.3) |
 
 
 <a id="s31"></a>
@@ -1823,7 +1881,7 @@ Canonical refs: [DESIGN.md](DESIGN.md), [docs/design/nox/](docs/design/nox/), es
 | **Onboarding** (2-step) | Same spacing scale (§ category/group/section) |
 | **Settings hub** + kept panels | Remove dead sections; link variant = `text-nox-text-link` |
 | **Roadmap.tsx** | Public page — match Landing/footer language |
-| **NotFound** / old-path redirect toast | Minimal, on-token |
+| **NotFound** | Minimal, on-token — no redirect or toast for legacy paths |
 
 **Out of scope for design step work:** PauseSession internals (only fix if a file is already open for functional work), Archive (unchanged unless copy tweak), full admin console.
 
