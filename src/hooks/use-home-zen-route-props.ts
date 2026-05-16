@@ -1,4 +1,3 @@
-import type { ReactNode } from 'react';
 import { useMemo } from 'react';
 import type { ZenModeHomeProps } from '@/components/home/ZenModeHome';
 
@@ -24,7 +23,6 @@ export function useHomeZenModeRouteProps(args: {
   hasAccess: ZenModeHomeProps['hasAccess'];
   showLimitUpsell: ZenModeHomeProps['showLimitUpsell'];
   showPauseScheduling: ZenModeHomeProps['showPauseScheduling'];
-  pinnedPreview: ReactNode;
   autoCooldownRemaining: CooldownFn;
   cooldownHours: ZenModeHomeProps['cooldownHours'];
   nextCronCheckIn: CooldownFn;
@@ -48,7 +46,6 @@ export function useHomeZenModeRouteProps(args: {
     hasAccess,
     showLimitUpsell,
     showPauseScheduling,
-    pinnedPreview,
     autoCooldownRemaining,
     cooldownHours,
     nextCronCheckIn,
@@ -85,7 +82,6 @@ export function useHomeZenModeRouteProps(args: {
       hasAccess,
       showLimitUpsell,
       showPauseScheduling,
-      pinnedPreview,
       autoCooldownRemaining,
       cooldownHours,
       nextCronCheckIn,
@@ -109,7 +105,6 @@ export function useHomeZenModeRouteProps(args: {
       hasAccess,
       showLimitUpsell,
       showPauseScheduling,
-      pinnedPreview,
       autoCooldownRemaining,
       cooldownHours,
       nextCronCheckIn,

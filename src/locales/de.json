@@ -46,8 +46,6 @@
     "holzen": "Holzen",
     "new": "Neu",
     "read": "Lesen",
-    "pinned": "Angepinnt",
-    "unpin": "Lösen",
     "from": "Von",
     "until": "Bis"
   },
@@ -148,9 +146,7 @@
     "zoomOut": "Perspektive",
     "historicalInsight": "Historische Einordnung",
     "echo": "Echo",
-    "parallel": "parallel",
-    "reflectionUnpinned": "Reflexion gelöst",
-    "reflectionPinned": "Reflexion auf Startseite angepinnt"
+    "parallel": "parallel"
   },
   "journey": {
     "pageSubtitle": "Dein Verlauf, Erkenntnisse und Notizen — nicht die Kontoeinstellungen (die findest du unter Einstellungen).",

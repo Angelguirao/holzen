@@ -52,8 +52,6 @@
     "holzen": "Holzen",
     "new": "New",
     "read": "Read",
-    "pinned": "Pinned",
-    "unpin": "Unpin",
     "from": "From",
     "until": "Until",
     "offlineBanner": "You're offline",
@@ -277,9 +275,7 @@
     "zoomOut": "Zoom out",
     "historicalInsight": "Historical insight",
     "echo": "Echo",
-    "parallel": "parallel",
-    "reflectionUnpinned": "Pause unpinned",
-    "reflectionPinned": "Pause pinned to Home"
+    "parallel": "parallel"
   },
   "journey": {
     "pageSubtitle": "Your progress across stats, insights, badges, and activity.",

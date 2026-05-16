@@ -1,7 +1,6 @@
 import type { ReactNode } from 'react';
 import { useMemo } from 'react';
 import { HomePauseCardBody } from '@/components/home/HomePauseCardBody';
-import { HomePinnedPauseInset } from '@/components/home/HomePinnedPauseInset';
 import { SnoozeToolbarControl } from '@/components/SnoozeControl';
 import type { BtcPriceData } from '@/lib/btc';
 
@@ -24,9 +23,6 @@ export function useHomePauseCardProjection(args: {
   loading: boolean;
   error: string | null;
   btcData: BtcPriceData | null;
-  pinnedPausePreview: { context: string | null } | null;
-  pinnedPreviewFields: PauseContextPreview;
-  unpinPausePreview: () => void;
   showPauseScheduling: boolean;
   autoCooldownRemaining: () => number;
   cooldownHours: number;
@@ -52,9 +48,6 @@ export function useHomePauseCardProjection(args: {
     loading,
     error,
     btcData,
-    pinnedPausePreview,
-    pinnedPreviewFields,
-    unpinPausePreview,
     showPauseScheduling,
     autoCooldownRemaining,
     cooldownHours,
@@ -72,18 +65,6 @@ export function useHomePauseCardProjection(args: {
     if (!subscriptionReady || !hasAccess) return undefined;
     return <SnoozeToolbarControl />;
   }, [subscriptionReady, hasAccess]);
-
-  const pauseEmptyPinnedPreview = useMemo(
-    () =>
-      pinnedPausePreview ? (
-        <HomePinnedPauseInset
-          btc24h={pinnedPreviewFields.btc24h}
-          marketSentiment={pinnedPreviewFields.marketSentiment}
-          onUnpin={unpinPausePreview}
-        />
-      ) : null,
-    [pinnedPausePreview, pinnedPreviewFields.btc24h, pinnedPreviewFields.marketSentiment, unpinPausePreview],
-  );
 
   const pauseCardBody: ReactNode = useMemo(
     () => (
@@ -104,7 +85,6 @@ export function useHomePauseCardProjection(args: {
         error={error}
         btcData={btcData}
         onReflectionRetry={manualTrigger}
-        pinnedPreview={pauseEmptyPinnedPreview}
         showPauseScheduling={showPauseScheduling}
         autoCooldownRemaining={autoCooldownRemaining}
         cooldownHours={cooldownHours}
@@ -130,7 +110,6 @@ export function useHomePauseCardProjection(args: {
       error,
       btcData,
       manualTrigger,
-      pauseEmptyPinnedPreview,
       showPauseScheduling,
       autoCooldownRemaining,
       cooldownHours,
@@ -140,5 +119,5 @@ export function useHomePauseCardProjection(args: {
     ],
   );
 
-  return { pauseSectionHeaderRight, pauseEmptyPinnedPreview, pauseCardBody };
+  return { pauseSectionHeaderRight, pauseCardBody };
 }

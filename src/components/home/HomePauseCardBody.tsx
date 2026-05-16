@@ -1,4 +1,3 @@
-import type { ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Loader2, Sparkles } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -33,7 +32,6 @@ interface HomePauseCardBodyProps {
   error: string | null;
   btcData: BtcPriceData | null;
   onReflectionRetry: () => void;
-  pinnedPreview: ReactNode;
   showPauseScheduling: boolean;
   autoCooldownRemaining: () => number;
   cooldownHours: number;
@@ -60,7 +58,6 @@ export function HomePauseCardBody({
   error,
   btcData,
   onReflectionRetry,
-  pinnedPreview,
   showPauseScheduling,
   autoCooldownRemaining,
   cooldownHours,
@@ -161,7 +158,6 @@ export function HomePauseCardBody({
                 <HomePauseBlockingErrorPanel error={blockingError} onTryAgain={onReflectionRetry} />
               ) : (
                 <HomePauseEmptyFlow
-                  pinnedPreview={pinnedPreview}
                   showPauseScheduling={showPauseScheduling}
                   autoCooldownRemaining={autoCooldownRemaining}
                   cooldownHours={cooldownHours}

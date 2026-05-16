@@ -1,7 +1,6 @@
 import { useTranslation } from 'react-i18next';
 import { AnimatePresence, motion, useReducedMotion } from 'framer-motion';
 import { Loader2 } from 'lucide-react';
-import type { ReactNode } from 'react';
 import { HomePauseEmptyFlow } from '@/components/home/HomePauseEmptyFlow';
 import { HomePauseContextMeta } from '@/components/home/HomePauseContextMeta';
 import { homeInWidget } from '@/components/home/home-widget-styles';
@@ -38,7 +37,6 @@ export interface ZenModeHomeProps {
   hasAccess: boolean;
   showLimitUpsell: boolean;
   showPauseScheduling: boolean;
-  pinnedPreview: ReactNode;
   autoCooldownRemaining: () => number;
   cooldownHours: number;
   nextCronCheckIn: () => number;
@@ -64,7 +62,6 @@ export function ZenModeHome({
   hasAccess,
   showLimitUpsell,
   showPauseScheduling,
-  pinnedPreview,
   autoCooldownRemaining,
   cooldownHours,
   nextCronCheckIn,
@@ -167,7 +164,6 @@ export function ZenModeHome({
             {hasAccess && !showLimitUpsell ? (
               <HomePauseEmptyFlow
                 variant="zen"
-                pinnedPreview={pinnedPreview}
                 showPauseScheduling={showPauseScheduling}
                 autoCooldownRemaining={autoCooldownRemaining}
                 cooldownHours={cooldownHours}

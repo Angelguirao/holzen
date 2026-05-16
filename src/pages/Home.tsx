@@ -10,14 +10,13 @@ import { useHomeOptionalVisibility } from '@/hooks/use-home-optional-visibility'
 import { HOME_WIDGET_DEFAULT_ORDER } from '@/lib/home-section-visibility-constants';
 import { useHomeCheckoutWelcomeToast } from '@/hooks/use-home-checkout-welcome-toast';
 import { useHomeZenMode } from '@/hooks/use-home-zen-mode';
-import { useHomePinnedPausePreview } from '@/hooks/use-home-pinned-pause-preview';
 import { useHomeCompletedPauseCount } from '@/hooks/use-home-completed-pause-count';
 import { useHomeOutletPauseReady } from '@/hooks/use-home-outlet-pause-ready';
 import { useHomeDocumentTitle } from '@/hooks/use-home-document-title';
 import { useHomeHeroQuoteViewed } from '@/hooks/use-home-hero-quote-viewed';
 import { useHomePauseAudio } from '@/hooks/use-home-pause-audio';
 import { useHomeMarketDisplayPreferences } from '@/hooks/use-home-market-display-preferences';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useOutletContext, useSearchParams, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '@/hooks/use-auth';
 import { useNightReflection } from '@/components/NightReflectionCard';
@@ -34,7 +33,17 @@ import { useHomeZenModeRouteProps } from '@/hooks/use-home-zen-route-props';
 import { useHomeDashboardLayoutProps } from '@/hooks/use-home-dashboard-layout-props';
 import type { HomeAppLayoutOutletContext } from '@/lib/home-app-layout-outlet';
 
+const LEGACY_PINNED_REFLECTION_KEY = 'holzen_pinned_reflection';
+
 const Home = () => {
+  useEffect(() => {
+    try {
+      localStorage.removeItem(LEGACY_PINNED_REFLECTION_KEY);
+    } catch {
+      /* ignore */
+    }
+  }, []);
+
   const { t } = useTranslation();
   const { user } = useAuth();
   const navigate = useNavigate();
@@ -103,13 +112,8 @@ const Home = () => {
   } = useHomeMarketDisplayPreferences();
   const unitBasisModeSupported = trackedAssetId === 'bitcoin';
   const { zenMode, setZenModePersist } = useHomeZenMode(pathname);
-  const { pinnedPausePreview, unpinPausePreview } = useHomePinnedPausePreview(user);
   const completedPauseCount = useHomeCompletedPauseCount(user);
-
-  const { pauseContextHomePreview, pinnedContextHomePreview } = useHomePauseContextPreviews({
-    context,
-    pinnedContext: pinnedPausePreview?.context ?? null,
-  });
+  const pauseContextHomePreview = useHomePauseContextPreviews(context);
 
   const [goalWhyHoldSummary, setGoalWhyHoldSummary] = useState<string | null>(null);
 
@@ -172,9 +176,6 @@ const Home = () => {
     loading,
     error,
     btcData,
-    pinnedPausePreview,
-    pinnedPreviewFields: pinnedContextHomePreview,
-    unpinPausePreview,
     showPauseScheduling,
     autoCooldownRemaining,
     cooldownHours,
@@ -236,7 +237,6 @@ const Home = () => {
     hasAccess,
     showLimitUpsell,
     showPauseScheduling,
-    pinnedPreview: pauseProjection.pauseEmptyPinnedPreview,
     autoCooldownRemaining,
     cooldownHours,
     nextCronCheckIn,

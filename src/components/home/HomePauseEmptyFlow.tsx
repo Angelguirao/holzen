@@ -1,4 +1,3 @@
-import type { ReactNode } from 'react';
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { ChevronRight, Sparkles } from 'lucide-react';
@@ -17,7 +16,6 @@ import { TOOLS } from '@/lib/app-routes';
 import { Skeleton } from '@/components/ui/skeleton';
 
 type Props = {
-  pinnedPreview: ReactNode;
   showPauseScheduling: boolean;
   autoCooldownRemaining: () => number;
   cooldownHours: number;
@@ -34,7 +32,6 @@ type Props = {
  * logic as Tools hub → manual pause.
  */
 export function HomePauseEmptyFlow({
-  pinnedPreview,
   showPauseScheduling,
   autoCooldownRemaining,
   cooldownHours,
@@ -54,8 +51,6 @@ export function HomePauseEmptyFlow({
 
   return (
     <div className={cn('space-y-4', zen && 'text-center')}>
-      {pinnedPreview}
-
       <p className={cn(homeInWidget.bodyMuted, 'leading-relaxed', zen && 'mx-auto max-w-sm')}>
         {t('home.pauseEmpty.statusLine')}
       </p>

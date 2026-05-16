@@ -46,8 +46,6 @@
     "holzen": "Holzen",
     "new": "Yeni",
     "read": "Oku",
-    "pinned": "Sabitlenmiş",
-    "unpin": "Sabitlemeyi kaldır",
     "from": "Başlangıç",
     "until": "Bitiş"
   },
@@ -148,9 +146,7 @@
     "zoomOut": "Perspektif",
     "historicalInsight": "Tarihsel bakış",
     "echo": "Yankı",
-    "parallel": "paralel",
-    "reflectionUnpinned": "Düşünce sabitleme kaldırıldı",
-    "reflectionPinned": "Düşünce Ana Sayfaya sabitlendi"
+    "parallel": "paralel"
   },
   "journey": {
     "pageSubtitle": "Uzun vadeli ilerleme ve notlar — hesap ayarları değil (Ayarlar’da).",

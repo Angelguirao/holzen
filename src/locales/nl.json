@@ -46,8 +46,6 @@
     "holzen": "Holzen",
     "new": "Nieuw",
     "read": "Lezen",
-    "pinned": "Vastgezet",
-    "unpin": "Losmaken",
     "from": "Van",
     "until": "Tot"
   },
@@ -148,9 +146,7 @@
     "zoomOut": "Perspectief",
     "historicalInsight": "Historisch inzicht",
     "echo": "Echo",
-    "parallel": "parallel",
-    "reflectionUnpinned": "Reflectie losgemaakt",
-    "reflectionPinned": "Reflectie vastgezet op Home"
+    "parallel": "parallel"
   },
   "journey": {
     "pageSubtitle": "Je voortgang en notities — niet je account (dat staat onder Instellingen).",
