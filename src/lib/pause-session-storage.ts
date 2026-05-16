@@ -100,7 +100,9 @@ export function migratePersistedPauseSession(raw: PersistedSession): PersistedSe
       ...n,
       step: fromChoose ? ('decide' as PauseStep) : raw.step,
       decideOnBackStep:
-        raw.decideOnBackStep === 'choose' || fromChoose ? 'breath2' : raw.decideOnBackStep,
+        (raw.decideOnBackStep as string) === 'choose' || fromChoose
+          ? 'breath2'
+          : raw.decideOnBackStep,
       breathingSecondCompleted: fromChoose ? true : n.breathingSecondCompleted,
     };
   }
