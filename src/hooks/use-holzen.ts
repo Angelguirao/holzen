@@ -14,6 +14,7 @@ import { normalizeTrackedAssetId, trackedAssetSymbol } from '@/lib/tracked-asset
 import { severityFromBtcChangePercent } from '@/lib/btc-move-severity';
 import { millisecondsUntilNextQuarterHour } from '@/lib/next-cron-quarter';
 import { pauseCreateOrReuse } from '@/lib/pause-api';
+import { pauseCreateSkippedUserMessage } from '@/lib/pause-create-skipped-message';
 import {
   bucketChangePercent,
   computeContextFingerprint,
@@ -183,12 +184,12 @@ export function useHolzen() {
     };
   }, [user, syncOpenPauseFromDb]);
 
-  /** Create the V2 pause instance (reflection AI runs at Reflect step). */
+  /** Create the V2 pause instance (reflection AI runs at Reflect step). Returns whether Home should treat the trigger as successful. */
   const generateMessage = useCallback(
-    async (data: BtcPriceData, mood?: string) => {
+    async (data: BtcPriceData, mood?: string): Promise<boolean> => {
       if (!user) {
         holzenLog.manual('generateMessage: skipped (no user)');
-        return;
+        return false;
       }
       markPauseManualStartedHomeOnce();
       const t0 = Date.now();
@@ -240,7 +241,10 @@ export function useHolzen() {
             contextRuleResult: { triggered: ['manual'] },
             contextFingerprint: fingerprint,
           });
-          if (!res.instance_id) return;
+          if (!res.instance_id) {
+            setError(pauseCreateSkippedUserMessage(res.reused_reason));
+            return false;
+          }
           const isPendingOffer = res.pending_offer === true;
           if (!isPendingOffer) {
             setLastPauseInstanceId(res.instance_id);
@@ -284,13 +288,17 @@ export function useHolzen() {
               /* no-op */
             }
           }
+          if (!isPendingOffer) {
+            await syncOpenPauseFromDb();
+          }
+          return true;
         } catch (e: unknown) {
           holzenLog.manual('generateMessage: silent pause create failed', {
             message: e instanceof Error ? e.message : String(e),
           });
           setError(reflectionPersistErrorMessage(e));
+          return false;
         }
-        return;
       }
 
       setLoading(true);
@@ -315,7 +323,8 @@ export function useHolzen() {
 
         if (!res.instance_id) {
           holzenLog.manual('generateMessage: reuse/skip', { reason: res.reused_reason });
-          return;
+          setError(pauseCreateSkippedUserMessage(res.reused_reason));
+          return false;
         }
 
         const isPendingOffer = res.pending_offer === true;
@@ -352,6 +361,10 @@ export function useHolzen() {
             /* no-op */
           }
         }
+        if (!isPendingOffer) {
+          await syncOpenPauseFromDb();
+        }
+        return true;
       } catch (e: unknown) {
         const raw = e instanceof Error ? e.message : String(e);
         holzenLog.manual('generateMessage: error', { message: raw });
@@ -360,6 +373,7 @@ export function useHolzen() {
         } else {
           setError('Could not open a pause right now. Try again shortly.');
         }
+        return false;
       } finally {
         setLoading(false);
       }
@@ -369,6 +383,7 @@ export function useHolzen() {
       silentMode,
       profile.cumulativeThreshold,
       profile.trackedAssetId,
+      syncOpenPauseFromDb,
     ],
   );
 
@@ -427,10 +442,12 @@ export function useHolzen() {
             queryKey: marketOpts.queryKey,
             queryFn: marketOpts.queryFn,
           }));
-        await generateMessage(data, mood);
-        const now = Date.now();
-        setLastManualAt(now);
-        localStorage.setItem(manualCooldownKey, String(now));
+        const opened = await generateMessage(data, mood);
+        if (opened) {
+          const now = Date.now();
+          setLastManualAt(now);
+          localStorage.setItem(manualCooldownKey, String(now));
+        }
       } catch (e: unknown) {
         const raw = e instanceof Error ? e.message : String(e);
         if (raw.includes('fetch') || raw.includes('Failed to fetch')) {
