@@ -44,6 +44,7 @@ export type PauseStepType =
   | 'reflection_step'
   | 'shift_emotion_logged'
   | 'post_pause_emotion_logged'
+  | 'ritual_depth_upgraded'
   | 'outcome_logged'
   | 'note_updated'
   | 'tag_updated'
@@ -143,17 +144,27 @@ function payloadMarksBriefRitual(payload: Record<string, unknown> | undefined): 
   return false;
 }
 
-/** True when any `initial_emotion_logged` marks this instance as the ~2 min brief ritual. */
+/**
+ * True when this instance counts as **brief** for engaged gates and `is_brief_ritual`
+ * (Feel tagged `brief_ritual`, no `ritual_depth_upgraded` — mirrors `pause_instance_is_brief_ritual` in SQL).
+ */
 export function pauseInstanceHasBriefRitualTag(
   stepEvents: readonly PauseStepEventRow[],
   instanceId: string,
 ): boolean {
+  let briefFeel = false;
+  let upgraded = false;
   for (const e of stepEvents) {
     if (e.pause_instance_id !== instanceId) continue;
-    if (e.step_type !== 'initial_emotion_logged') continue;
-    if (payloadMarksBriefRitual(e.payload as Record<string, unknown> | undefined)) return true;
+    if (e.step_type === 'ritual_depth_upgraded') upgraded = true;
+    if (
+      e.step_type === 'initial_emotion_logged' &&
+      payloadMarksBriefRitual(e.payload as Record<string, unknown> | undefined)
+    ) {
+      briefFeel = true;
+    }
   }
-  return false;
+  return briefFeel && !upgraded;
 }
 
 /** Count of `complete` companion events for this instance where `counts_for_pause=true`. */
