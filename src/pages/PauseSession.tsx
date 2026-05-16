@@ -16,6 +16,8 @@ import { type PauseBreathingHandle } from '@/components/pause/PauseBreathing';
 import { PauseSessionDepthPickerStack } from '@/components/pause/PauseSessionDepthPickerStack';
 import { PauseBriefProgress } from '@/components/pause/PauseBriefProgress';
 import { isPauseSessionHeaderBackVisible } from '@/lib/pause-session-header-back';
+import { briefSwitchToDeepPauseState } from '@/lib/pause-brief-switch-to-deep';
+import { logPauseRitualDepthUpgraded } from '@/lib/pause-ritual-depth-upgrade';
 import { clearSession, type BriefPauseStep, type RitualDepth } from '@/lib/pause-session-storage';
 import {
   mapPersistedStep,
@@ -538,23 +540,28 @@ export default function PauseSession() {
     setBreathSecondTimedPatternStarted,
   ]);
 
-  const handleBriefSwitchToDeepPause = useCallback(() => {
+  const handleBriefSwitchToDeepPause = useCallback(async () => {
     if (!requirePro('deep_pause')) return;
+    if (pauseInstanceId) {
+      const ok = await logPauseRitualDepthUpgraded(pauseInstanceId, t);
+      if (!ok) return;
+    }
+    const next = briefSwitchToDeepPauseState();
     setSwipeDirection('forward');
-    setRitualEntry('deep');
-    setStep('breathe');
-    setBriefStep('feel');
-    setBriefIntegrateDone(false);
-    setBreathingFirstCompleted(false);
-    setBreathingSecondCompleted(false);
-    setBreathTimedActive(false);
-    setBreathFirstTimedPatternStarted(false);
-    setFrameDone(false);
-    setMoodAfterDone(false);
-    queueMicrotask(() => breathingRef.current?.resetToIntro());
+    setRitualEntry(next.ritualEntry);
+    setStep(next.step);
+    setBriefStep(next.briefStep);
+    setBriefIntegrateDone(next.briefIntegrateDone);
+    setBreathingFirstCompleted(next.breathingFirstCompleted);
+    setBreathingSecondCompleted(next.breathingSecondCompleted);
+    setBreathTimedActive(next.breathTimedActive);
+    setBreathFirstTimedPatternStarted(next.breathFirstTimedPatternStarted);
+    setFrameDone(next.frameDone);
+    setMoodAfterDone(next.moodAfterDone);
   }, [
-    breathingRef,
     requirePro,
+    pauseInstanceId,
+    t,
     setSwipeDirection,
     setRitualEntry,
     setStep,
