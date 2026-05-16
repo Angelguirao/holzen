@@ -20,9 +20,8 @@ export function pauseHomeErrorKind(error: string | null): PauseHomeErrorKind | n
   ) {
     return 'network';
   }
+  // Reflect-step AI errors surface on `/pause`, not Home (non-silent manual only creates the instance).
   if (
-    e.includes('generate') ||
-    e.includes('reflect') ||
     e.includes('ai pause') ||
     e.includes('pause message could not') ||
     e.includes('too many requests')

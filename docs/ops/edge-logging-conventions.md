@@ -29,7 +29,7 @@ Edge function
 
 1. **Export via `withRequestLogging('<fn-name>', async ({ req, log, cid }) => { ... })`.**
    - The handler receives a single `RequestLoggingContext` argument: `{ req, log, cid }`. Use `log` (not `console`) for all messages inside the handler.
-   - Wrapper handles CORS preflight, logs `request` and `response`, sets `x-cid` on the response, captures edge errors, and returns a standard `EdgeError` envelope on failure.
+   - Wrapper handles CORS preflight, logs `request` (method + path; adds W3C / OTel-friendly fields when a valid version-`00` `traceparent` is present: `trace_id`, `parent_span_id`, `trace_flags`, `trace_sampled`, plus truncated `tracestate` when sent) and `response`, sets `x-cid` on the response, captures edge errors, and returns a standard `EdgeError` envelope on failure.
 2. **Throw `EdgeError` for user-actionable failures**, with one of the typed codes in `_shared/edge-error.ts`:
    - `auth_required` — missing/invalid Authorization header.
    - `forbidden` — authenticated but not allowed.

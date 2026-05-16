@@ -10,7 +10,6 @@ import { useHomeOptionalVisibility } from '@/hooks/use-home-optional-visibility'
 import { HOME_WIDGET_DEFAULT_ORDER } from '@/lib/home-section-visibility-constants';
 import { useHomeCheckoutWelcomeToast } from '@/hooks/use-home-checkout-welcome-toast';
 import { useHomeZenMode } from '@/hooks/use-home-zen-mode';
-import { useHomePinnedPausePreview } from '@/hooks/use-home-pinned-pause-preview';
 import { useHomeCompletedPauseCount } from '@/hooks/use-home-completed-pause-count';
 import { useHomeOutletPauseReady } from '@/hooks/use-home-outlet-pause-ready';
 import { useHomeDocumentTitle } from '@/hooks/use-home-document-title';
@@ -73,20 +72,22 @@ const Home = () => {
     refreshProfile,
   } = useHolzen();
 
+  const hasOpenPause = Boolean(lastPauseInstanceId);
+
   const { subscriptionReady, hasAccess, showLimitUpsell, showPauseScheduling } = getHomeSubscriptionGate({
     subLoading,
     subscribed,
     monthlyRemaining,
-    message,
+    hasOpenPause,
     loading,
   });
 
   const outletCtx = useOutletContext<HomeAppLayoutOutletContext>();
   const pauseReady = outletCtx?.pauseReady ?? false;
   const dismissPauseReady = outletCtx?.dismissPauseReady;
-  useHomeOutletPauseReady(pauseReady, message, loading, refreshProfile, dismissPauseReady);
+  useHomeOutletPauseReady(pauseReady, hasOpenPause, dismissPauseReady);
   useHomeHeroQuoteViewed(profileLoaded, user?.id);
-  useHomePauseAudio(newPauseArrival, message, clearNewPauseArrival);
+  useHomePauseAudio(newPauseArrival, lastPauseInstanceId, clearNewPauseArrival);
 
   const { reflection: nightReflection, dismiss: dismissNight } = useNightReflection();
 
@@ -101,13 +102,8 @@ const Home = () => {
   } = useHomeMarketDisplayPreferences();
   const unitBasisModeSupported = trackedAssetId === 'bitcoin';
   const { zenMode, setZenModePersist } = useHomeZenMode(pathname);
-  const { pinnedPausePreview, unpinPausePreview } = useHomePinnedPausePreview(user);
   const completedPauseCount = useHomeCompletedPauseCount(user);
-
-  const { pauseContextHomePreview, pinnedContextHomePreview } = useHomePauseContextPreviews({
-    context,
-    pinnedContext: pinnedPausePreview?.context ?? null,
-  });
+  const pauseContextHomePreview = useHomePauseContextPreviews(context);
 
   const [goalWhyHoldSummary, setGoalWhyHoldSummary] = useState<string | null>(null);
 
@@ -164,15 +160,12 @@ const Home = () => {
     subscribed,
     monthlyRemaining,
     checkoutLoading,
-    message,
+    hasOpenPause,
     openPauseState,
     pauseContextHomePreview,
     loading,
     error,
     btcData,
-    pinnedPausePreview,
-    pinnedPreviewFields: pinnedContextHomePreview,
-    unpinPausePreview,
     showPauseScheduling,
     autoCooldownRemaining,
     cooldownHours,
@@ -219,23 +212,21 @@ const Home = () => {
   );
 
   const zenRouteProps = useHomeZenModeRouteProps({
-    message,
+    hasOpenPause,
     context,
-    companions,
-    companionPrefs,
-    severity,
-    lastPauseInstanceId,
+    contextPreview: pauseContextHomePreview,
+    openPauseState,
     loading,
     error,
     btcData,
     onDismiss: pauseActions.handleDismiss,
     onNeedPause: pauseActions.handleNeedAPause,
     onManualTrigger: manualTrigger,
+    onPauseWithThis: pauseActions.handleNavigatePauseWithThis,
     subscriptionReady,
     hasAccess,
     showLimitUpsell,
     showPauseScheduling,
-    pinnedPreview: pauseProjection.pauseEmptyPinnedPreview,
     autoCooldownRemaining,
     cooldownHours,
     nextCronCheckIn,

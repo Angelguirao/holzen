@@ -3,6 +3,7 @@ import { createClient } from "https://esm.sh/@supabase/supabase-js@2.57.2";
 import { normalizeSourceUrl } from "../_shared/feed-ingest.ts";
 import { createAttemptLogger } from "../_shared/observe.ts";
 import { withRequestLogging } from "../_shared/with-request-logging.ts";
+import { fetchInitWithIncomingTrace } from "../_shared/forward-trace-headers.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -12,24 +13,27 @@ const corsHeaders = {
 
 type PreviewBody = { url?: string };
 
-async function firecrawlMarkdown(url: string, apiKey: string): Promise<string | null> {
+async function firecrawlMarkdown(url: string, apiKey: string, incoming?: Request): Promise<string | null> {
   try {
     const controller = new AbortController();
     const t = setTimeout(() => controller.abort(), 25_000);
-    const res = await fetch("https://api.firecrawl.dev/v2/scrape", {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${apiKey}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        url,
-        formats: ["markdown"],
-        onlyMainContent: false,
-        timeout: 20000,
+    const res = await fetch(
+      "https://api.firecrawl.dev/v2/scrape",
+      fetchInitWithIncomingTrace(incoming, {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${apiKey}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          url,
+          formats: ["markdown"],
+          onlyMainContent: false,
+          timeout: 20000,
+        }),
+        signal: controller.signal,
       }),
-      signal: controller.signal,
-    });
+    );
     clearTimeout(t);
     if (!res.ok) return null;
     const data = await res.json() as {
@@ -126,7 +130,7 @@ serve(
       });
     }
 
-    const markdown = await firecrawlMarkdown(url, FIRECRAWL_API_KEY);
+    const markdown = await firecrawlMarkdown(url, FIRECRAWL_API_KEY, req);
     if (!markdown?.trim()) {
       return new Response(JSON.stringify({ error: "Could not fetch page content (Firecrawl returned empty)" }), {
         status: 502,
@@ -154,23 +158,26 @@ serve(
     const excerpt = markdown.length > 14_000 ? `${markdown.slice(0, 10_000)}\n\n[...]\n\n${markdown.slice(-4000)}` : markdown;
 
     const t0 = Date.now();
-    const llmRes = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
-      method: "POST",
-      headers: { Authorization: `Bearer ${LOVABLE_API_KEY}`, "Content-Type": "application/json" },
-      body: JSON.stringify({
-        model: LIB_MODEL,
-        messages: [
-          {
-            role: "system",
-            content:
-              `Return JSON only with keys: title (string), author (string or null), summary (string, 2-4 sentences), key_quote (string or null, only if a short verbatim quote is clearly present). Page URL: ${url}`,
-          },
-          { role: "user", content: `Markdown from page:\n\n${excerpt}` },
-        ],
-        response_format: { type: "json_object" },
-        temperature: 0.2,
+    const llmRes = await fetch(
+      "https://ai.gateway.lovable.dev/v1/chat/completions",
+      fetchInitWithIncomingTrace(req, {
+        method: "POST",
+        headers: { Authorization: `Bearer ${LOVABLE_API_KEY}`, "Content-Type": "application/json" },
+        body: JSON.stringify({
+          model: LIB_MODEL,
+          messages: [
+            {
+              role: "system",
+              content:
+                `Return JSON only with keys: title (string), author (string or null), summary (string, 2-4 sentences), key_quote (string or null, only if a short verbatim quote is clearly present). Page URL: ${url}`,
+            },
+            { role: "user", content: `Markdown from page:\n\n${excerpt}` },
+          ],
+          response_format: { type: "json_object" },
+          temperature: 0.2,
+        }),
       }),
-    });
+    );
 
     if (!llmRes.ok) {
       logAttempt({

@@ -1,11 +1,13 @@
 # Automatic pause: notification vs orchestrate ordering (Done — 2026-04)
 
+> **Pause V2 supersession:** `check-volatility` **no longer** dispatches `companion-orchestrate` on claim. This doc’s **fire-and-forget orchestrate** narrative is **historical**; notifications still precede client-side reflection/orchestration.
+
 ## Chosen policy
 
-**Keep fire-and-forget** (`check-volatility` creates the pause instance + `pause_ai_artifacts` and relies on the `notifications` trigger, then dispatches `companion-orchestrate` without awaiting). Rationale:
+**Keep fire-and-forget** (`check-volatility` creates the pause instance + relies on the `notifications` trigger; **Pause V2** does **not** dispatch `companion-orchestrate` from this worker). Rationale:
 
 - Faster “pause ready” in the bell; users are not blocked on orchestrate tail latency or overload.
-- **Duplicate / overlapping orchestrate** when the client opens `/pause` immediately is acceptable when mitigated by cache + skip-if-served (`orchestrate_skip_cached` — see `orchestrate-client-cron.md`).
+- **Duplicate / overlapping orchestrate** when the client opens `/pause` immediately is acceptable when mitigated by cache + skip-if-served (`orchestrate_skip_cached` — see `orchestrate-client-cron.md` for historical cron+client overlap).
 - Alternatives (await orchestrate before notify, or duplicate copy into the notification payload) remain documented below if product priorities change.
 
 ## Implications (accepted)
@@ -19,7 +21,7 @@
 
 ## Related code pointers
 
-- `supabase/functions/check-volatility/index.ts` — order of inserts and orchestrate dispatch
+- `supabase/functions/check-volatility/index.ts` — claim order (pause row, profiles, notifications); **V2:** no orchestrate dispatch
 - `docs/reviews/phase-3-server-cron-triggers.md` — mental model and tradeoffs
 
 ## How to verify

@@ -266,9 +266,9 @@ const Home = () => {
 
 ---
 
-### Step 5 — Night card, market prefs, Zen flag, pinned pause, testimonial count
+### Step 5 — Night card, market prefs, Zen flag, completed pause count
 
-```92:106:src/pages/Home.tsx
+```102:116:src/pages/Home.tsx
   const { reflection: nightReflection, dismiss: dismissNight } = useNightReflection();
 
   const {
@@ -282,24 +282,20 @@ const Home = () => {
   } = useHomeMarketDisplayPreferences();
   const unitBasisModeSupported = trackedAssetId === 'bitcoin';
   const { zenMode, setZenModePersist } = useHomeZenMode(pathname);
-  const { pinnedPausePreview, unpinPausePreview } = useHomePinnedPausePreview(user);
   const completedPauseCount = useHomeCompletedPauseCount(user);
 ```
 
-**What to notice:** each line group is **one concern**. `unitBasisModeSupported` is a **simple derived boolean** from `trackedAssetId` (no hook needed). `pathname` only exists to drive Zen mode persistence tied to the route.
+**What to notice:** each line group is **one concern**. `unitBasisModeSupported` is a **simple derived boolean** from `trackedAssetId` (no hook needed). `pathname` only exists to drive Zen mode persistence tied to the route. Reflection copy for the pause widget comes from **`useHolzen`** (`message`) and **`pause_ai_artifacts`** after **Reflect** — there is no Home “pinned preview” inset anymore.
 
 ---
 
 ### Step 6 — Parsed preview text for pause cards
 
-```108:111:src/pages/Home.tsx
-  const { pauseContextHomePreview, pinnedContextHomePreview } = useHomePauseContextPreviews({
-    context,
-    pinnedContext: pinnedPausePreview?.context ?? null,
-  });
+```116:116:src/pages/Home.tsx
+  const pauseContextHomePreview = useHomePauseContextPreviews(context);
 ```
 
-**What to notice:** [`useHomePauseContextPreviews`](../../src/hooks/use-home-pause-context-previews.ts) wraps two **`useMemo`** parsers so `Home` does not repeat `parsePauseContextForHomePreview` boilerplate.
+**What to notice:** [`useHomePauseContextPreviews`](../../src/hooks/use-home-pause-context-previews.ts) wraps a **`useMemo`** parser so `Home` does not repeat `parsePauseContextForHomePreview` boilerplate for the open-pause **context** line only.
 
 ---
 
@@ -391,9 +387,9 @@ const Home = () => {
 
 ---
 
-### Step 12 — Pause card body + snooze + pinned inset
+### Step 12 — Pause card body + snooze
 
-```162:191:src/pages/Home.tsx
+```166:191:src/pages/Home.tsx
   const pauseProjection = useHomePauseCardProjection({
     subscriptionReady,
     hasAccess,
@@ -401,15 +397,12 @@ const Home = () => {
     subscribed,
     monthlyRemaining,
     checkoutLoading,
-    message,
+    hasOpenPause,
     openPauseState,
     pauseContextHomePreview,
     loading,
     error,
     btcData,
-    pinnedPausePreview,
-    pinnedPreviewFields: pinnedContextHomePreview,
-    unpinPausePreview,
     showPauseScheduling,
     autoCooldownRemaining,
     cooldownHours,
@@ -496,7 +489,7 @@ const Home = () => {
     hasAccess,
     showLimitUpsell,
     showPauseScheduling,
-    pinnedPreview: pauseProjection.pauseEmptyPinnedPreview,
+    onPauseWithThis: pauseActions.handleNavigatePauseWithThis,
     autoCooldownRemaining,
     cooldownHours,
     nextCronCheckIn,

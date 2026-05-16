@@ -10,6 +10,7 @@ import {
 import { callPerplexityChat, type PerplexityUsage } from "../_shared/perplexity-client.ts";
 import { unknownErrorForLog } from "../_shared/log-unknown-error.ts";
 import { withRequestLogging } from "../_shared/with-request-logging.ts";
+import { fetchInitWithIncomingTrace } from "../_shared/forward-trace-headers.ts";
 import {
   fetchFeedXmlIfApplicable,
   type FeedArticleRef,
@@ -85,25 +86,29 @@ async function scrapeWithFirecrawl(
   apiKey: string,
   log: (msg: string) => void,
   opts?: { onlyMainContent?: boolean },
+  incoming?: Request,
 ): Promise<FirecrawlScrapeResult | null> {
   try {
     const controller = new AbortController();
     const timeout = setTimeout(() => controller.abort(), 20000);
 
-    const res = await fetch("https://api.firecrawl.dev/v2/scrape", {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${apiKey}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        url,
-        formats: ["markdown", "links"],
-        onlyMainContent: opts?.onlyMainContent ?? true,
-        timeout: 15000,
+    const res = await fetch(
+      "https://api.firecrawl.dev/v2/scrape",
+      fetchInitWithIncomingTrace(incoming, {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${apiKey}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          url,
+          formats: ["markdown", "links"],
+          onlyMainContent: opts?.onlyMainContent ?? true,
+          timeout: 15000,
+        }),
+        signal: controller.signal,
       }),
-      signal: controller.signal,
-    });
+    );
     clearTimeout(timeout);
 
     if (!res.ok) {
@@ -148,6 +153,7 @@ async function searchWithPerplexity(
   category: string,
   apiKey: string,
   log: (msg: string) => void,
+  incoming?: Request,
 ): Promise<{ content: string; citations: string[]; usage?: PerplexityUsage; searchMs: number } | null> {
   const t0 = Date.now();
   try {
@@ -170,6 +176,7 @@ async function searchWithPerplexity(
       apiKey,
       log,
       15_000,
+      incoming,
     );
     return {
       content: result.content,
@@ -580,7 +587,7 @@ serve(
           hzLog(`${source.name}: site_map requires FIRECRAWL_API_KEY`);
           return { refs: [{ url: source.url, feedAuthor: null, publishedAt: null }], discovery: "site_map_fallback_single" };
         }
-        const mapped = await firecrawlMapArticleUrls(source.url, FIRECRAWL_API_KEY, hzLog);
+        const mapped = await firecrawlMapArticleUrls(source.url, FIRECRAWL_API_KEY, hzLog, req);
         if (mapped.length > 0) {
           hzLog(`map: ${mapped.length} candidate URLs for ${source.name}`);
           return {
@@ -592,7 +599,7 @@ serve(
         return { refs: [{ url: source.url, feedAuthor: null, publishedAt: null }], discovery: "site_map_fallback_single" };
       }
 
-      const feedXml = await fetchFeedXmlIfApplicable(source.url, hzLog);
+      const feedXml = await fetchFeedXmlIfApplicable(source.url, hzLog, req);
       if (feedXml) {
         const refs = parseArticleRefsFromFeedXml(feedXml, source.url);
         if (refs.length > 0) {
@@ -651,7 +658,7 @@ serve(
       if (scrapeMode === "firecrawl") {
         const fc = await scrapeWithFirecrawl(articleUrl, FIRECRAWL_API_KEY!, hzLog, {
           onlyMainContent: contentType !== "essay",
-        });
+        }, req);
         if (fc) {
           scrapedContent = fc.markdown;
           firecrawlMetadata = fc.metadata;
@@ -684,7 +691,7 @@ serve(
       }
 
       if (!scrapedContent && PERPLEXITY_API_KEY) {
-        const searchResult = await searchWithPerplexity(source.name, articleUrl, source.category, PERPLEXITY_API_KEY, hzLog);
+        const searchResult = await searchWithPerplexity(source.name, articleUrl, source.category, PERPLEXITY_API_KEY, hzLog, req);
         if (searchResult) {
           scrapedContent = searchResult.content;
           citations = searchResult.citations;
@@ -739,19 +746,22 @@ Return JSON with:
         ? `${scrapedContent.slice(0, 4500)}\n\n[...middle omitted...]\n\n${scrapedContent.slice(-4000)}`
         : scrapedContent.slice(0, 6000);
 
-      const structureRes = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
-        method: "POST",
-        headers: { Authorization: `Bearer ${LOVABLE_API_KEY}`, "Content-Type": "application/json" },
-        body: JSON.stringify({
-          model: "google/gemini-2.5-flash-lite",
-          messages: [
-            { role: "system", content: structurePrompt },
-            { role: "user", content: `Source: ${source.name}\nURL: ${articleUrl}\n\nContent:\n${structureExcerpt}` },
-          ],
-          response_format: { type: "json_object" },
-          temperature: 0.3,
+      const structureRes = await fetch(
+        "https://ai.gateway.lovable.dev/v1/chat/completions",
+        fetchInitWithIncomingTrace(req, {
+          method: "POST",
+          headers: { Authorization: `Bearer ${LOVABLE_API_KEY}`, "Content-Type": "application/json" },
+          body: JSON.stringify({
+            model: "google/gemini-2.5-flash-lite",
+            messages: [
+              { role: "system", content: structurePrompt },
+              { role: "user", content: `Source: ${source.name}\nURL: ${articleUrl}\n\nContent:\n${structureExcerpt}` },
+            ],
+            response_format: { type: "json_object" },
+            temperature: 0.3,
+          }),
         }),
-      });
+      );
 
       if (!structureRes.ok) {
         results.push(`${source.name}: structure error ${structureRes.status}`);

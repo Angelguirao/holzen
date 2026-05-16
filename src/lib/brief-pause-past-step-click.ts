@@ -7,10 +7,9 @@ export type BriefPastStepClickResult = {
 };
 
 /**
- * When the user taps an earlier brief macro in the progress bar, returns the
+ * When an earlier brief macro would be selected (e.g. programmatic restore), returns the
  * navigation target and whether to clear the integrate-completion flag.
- * `null` if the tap is not allowed (same step or future step).
- * Mirrors `goToBriefPastStep` in `PauseSession`.
+ * `null` if the selection is not allowed (same step or future step).
  */
 export function computeBriefPastStepClick(
   target: BriefPauseStep,

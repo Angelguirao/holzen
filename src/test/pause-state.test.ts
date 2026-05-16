@@ -217,6 +217,43 @@ describe('computePauseState', () => {
     ).toBe('engaged');
   });
 
+  it('brief upgraded to deep uses deep engaged gate (needs breath_completed)', () => {
+    expect(
+      computePauseState({
+        instance: makeInstance(),
+        template: volatilityTemplate,
+        stepEvents: [
+          makeStep({
+            step_type: 'initial_emotion_logged',
+            payload: { mood: 'calm', intensity: 2, brief_ritual: true },
+          }),
+          makeStep({ step_type: 'ritual_depth_upgraded', payload: { from: 'brief', to: 'deep' } }),
+        ],
+        companionEvents: [],
+        now: NOW,
+      }),
+    ).toBe('active');
+    expect(
+      computePauseState({
+        instance: makeInstance(),
+        template: volatilityTemplate,
+        stepEvents: [
+          makeStep({
+            step_type: 'initial_emotion_logged',
+            payload: { mood: 'calm', intensity: 2, brief_ritual: true },
+          }),
+          makeStep({
+            step_type: 'breath_completed',
+            payload: { breath_segment: 1, brief_ritual: true },
+          }),
+          makeStep({ step_type: 'ritual_depth_upgraded', payload: { from: 'brief', to: 'deep' } }),
+        ],
+        companionEvents: [],
+        now: NOW,
+      }),
+    ).toBe('engaged');
+  });
+
   it('deep volatility_v1 stays active with only initial_emotion (no breath yet)', () => {
     expect(
       computePauseState({

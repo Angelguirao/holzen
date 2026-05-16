@@ -20,6 +20,8 @@ interface Props {
   context?: string | null;
   haiku?: string | null;
   variant?: 'icon' | 'button';
+  /** Fires when the user starts wallpaper generation from this control. */
+  onGenerateIntent?: () => void;
 }
 
 function wrapText(
@@ -111,7 +113,7 @@ function compositeWallpaper(
   });
 }
 
-export function ReflectionWallpaper({ message, mood, context, haiku, variant = 'icon' }: Props) {
+export function ReflectionWallpaper({ message, mood, context, haiku, variant = 'icon', onGenerateIntent }: Props) {
   const { t } = useTranslation();
   const [generating, setGenerating] = useState(false);
   const [compositeUrl, setCompositeUrl] = useState<string | null>(null);
@@ -126,6 +128,7 @@ export function ReflectionWallpaper({ message, mood, context, haiku, variant = '
   const { isPro, requirePro } = useProGate();
 
   const generate = useCallback(async () => {
+    onGenerateIntent?.();
     // Mirror the regenerate paywall: free users see the upgrade toast,
     // Pro users with no wallpaper bucket and no flex credits see the
     // limit-reached toast — never the raw edge function error.
@@ -186,6 +189,7 @@ export function ReflectionWallpaper({ message, mood, context, haiku, variant = '
     wallpaperRemaining,
     flexCreditsBalance,
     startCheckout,
+    onGenerateIntent,
   ]);
 
   const download = useCallback(() => {

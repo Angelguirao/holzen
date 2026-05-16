@@ -1,19 +1,17 @@
 import { useMemo } from 'react';
 import type { TFunction } from 'i18next';
 import type { BtcPriceData } from '@/lib/btc';
-import { computeBriefMacroProgressPosition } from '@/lib/brief-pause-order';
-import type { BriefPauseStep, RitualDepth } from '@/lib/pause-session-storage';
+import type { RitualDepth } from '@/lib/pause-session-storage';
 import { trackedAssetSymbol } from '@/lib/tracked-assets';
 
-/** Depth-picker context line + brief ritual macro progress line for `PauseSessionScaffold`. */
+/** Depth-picker context line for the depth picker (`PauseSessionDepthPickerStack`). */
 export function usePauseSessionDepthAndBriefCopy(input: {
   t: TFunction;
   btcData: BtcPriceData | null;
   trackedAssetId: string | null;
   ritualEntry: RitualDepth | 'picker';
-  briefStep: BriefPauseStep;
-}): { depthContextLine: string | null; briefMacroLine: string | undefined } {
-  const { t, btcData, trackedAssetId, ritualEntry, briefStep } = input;
+}): { depthContextLine: string | null } {
+  const { t, btcData, trackedAssetId, ritualEntry } = input;
 
   const depthContextLine = useMemo(() => {
     if (!btcData) return null;
@@ -25,11 +23,5 @@ export function usePauseSessionDepthAndBriefCopy(input: {
     });
   }, [btcData, trackedAssetId, t]);
 
-  const briefMacroLine = useMemo(() => {
-    if (ritualEntry !== 'brief') return undefined;
-    const { n, total } = computeBriefMacroProgressPosition(briefStep);
-    return t('pause.brief.macroProgress', { n, total });
-  }, [ritualEntry, briefStep, t]);
-
-  return { depthContextLine, briefMacroLine };
+  return { depthContextLine };
 }

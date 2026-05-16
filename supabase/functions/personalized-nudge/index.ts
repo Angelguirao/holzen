@@ -2,6 +2,7 @@ import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.57.2";
 import { unknownErrorForLog } from "../_shared/log-unknown-error.ts";
 import { coingeckoHeaders } from "../_shared/coingecko.ts";
+import { fetchInitWithIncomingTrace } from "../_shared/forward-trace-headers.ts";
 import { withRequestLogging } from "../_shared/with-request-logging.ts";
 import {
   holzenLovableEmailLogger,
@@ -55,7 +56,7 @@ serve(
     // 1. Check current BTC volatility
     const res = await fetch(
       "https://api.coingecko.com/api/v3/simple/price?ids=bitcoin&vs_currencies=usd&include_24hr_change=true",
-      { headers: coingeckoHeaders() }
+      fetchInitWithIncomingTrace(req, { headers: coingeckoHeaders() }),
     );
     const data = await res.json();
     const change24h = Math.abs(data?.bitcoin?.usd_24h_change ?? 0);

@@ -5,10 +5,10 @@ import type { BriefPauseStep } from '@/lib/pause-session-storage';
 
 interface Props {
   currentStep: BriefPauseStep;
-  onStepClick?: (step: BriefPauseStep) => void;
 }
 
-export function PauseBriefProgress({ currentStep, onStepClick }: Props) {
+/** Brief ritual header stepper: visual progress only (no step jumping). */
+export function PauseBriefProgress({ currentStep }: Props) {
   const { t } = useTranslation();
   const labels: Record<BriefPauseStep, string> = {
     feel: t('pause.brief.steps.feel', { defaultValue: 'Feel' }),
@@ -20,21 +20,20 @@ export function PauseBriefProgress({ currentStep, onStepClick }: Props) {
   const currentIndex = BRIEF_PAUSE_ORDER.indexOf(currentStep);
 
   return (
-    <div className="flex w-full items-start justify-between gap-1 sm:gap-2">
+    <div
+      className="flex w-full items-start justify-between gap-1 sm:gap-2"
+      role="list"
+      aria-label={t('pause.brief.stepsAria', { defaultValue: 'Brief pause steps' })}
+    >
       {BRIEF_PAUSE_ORDER.map((step, i) => {
         const isActive = i === currentIndex;
         const isPast = i < currentIndex;
-        const canClick = isPast && onStepClick;
         return (
-          <button
+          <div
             key={step}
-            type="button"
-            onClick={() => canClick && onStepClick(step)}
-            disabled={!canClick}
-            className={cn(
-              'flex min-w-0 flex-1 flex-col items-center gap-2',
-              canClick ? 'cursor-pointer' : 'cursor-default',
-            )}
+            role="listitem"
+            className="flex min-w-0 flex-1 flex-col items-center gap-2"
+            aria-current={isActive ? 'step' : undefined}
           >
             <div
               className={cn(
@@ -46,12 +45,11 @@ export function PauseBriefProgress({ currentStep, onStepClick }: Props) {
               className={cn(
                 'w-full truncate text-center text-[9px] font-medium uppercase leading-tight tracking-wide sm:text-[10px]',
                 isActive ? 'text-foreground' : isPast ? 'text-foreground/80' : 'text-muted-foreground/70',
-                canClick && 'hover:text-foreground',
               )}
             >
               {labels[step]}
             </span>
-          </button>
+          </div>
         );
       })}
     </div>

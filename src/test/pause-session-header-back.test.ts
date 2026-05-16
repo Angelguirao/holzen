@@ -14,6 +14,8 @@ const base = (over: Partial<PauseSessionHeaderBackInput> = {}): PauseSessionHead
   briefStep: 'feel',
   step: 'feel',
   breathTimedActive: false,
+  breathFirstTimedPatternStarted: false,
+  breathSecondTimedPatternStarted: false,
   breathingFirstCompleted: false,
   breathingSecondCompleted: false,
   ...over,
@@ -24,7 +26,7 @@ describe('isPauseSessionHeaderBackVisible', () => {
     expect(isPauseSessionHeaderBackVisible(base({ phase: 'done' }))).toBe(false);
   });
 
-  it('brief: false on first macro step with no breath escape hatches', () => {
+  it('brief: false on first macro step', () => {
     expect(
       isPauseSessionHeaderBackVisible(
         base({ ritualEntry: 'brief', briefStep: 'feel', step: 'feel' }),
@@ -32,54 +34,104 @@ describe('isPauseSessionHeaderBackVisible', () => {
     ).toBe(false);
   });
 
-  it('brief: true when past first step', () => {
+  it('brief: shell back only on Breathe intro (before timed pattern starts)', () => {
     expect(isPauseSessionHeaderBackVisible(base({ ritualEntry: 'brief', briefStep: 'breath' }))).toBe(true);
-  });
-
-  it('brief: true on breath when timed segment active', () => {
     expect(
       isPauseSessionHeaderBackVisible(
-        base({ ritualEntry: 'brief', briefStep: 'feel', breathTimedActive: true }),
+        base({ ritualEntry: 'brief', briefStep: 'breath', breathFirstTimedPatternStarted: true }),
       ),
     ).toBe(false);
     expect(
       isPauseSessionHeaderBackVisible(
-        base({ ritualEntry: 'brief', briefStep: 'breath', breathTimedActive: true }),
+        base({
+          ritualEntry: 'brief',
+          briefStep: 'breath',
+          breathFirstTimedPatternStarted: true,
+          breathTimedActive: true,
+        }),
       ),
-    ).toBe(true);
+    ).toBe(false);
   });
 
-  it('brief: true on breath when first breath already completed', () => {
-    expect(
-      isPauseSessionHeaderBackVisible(
-        base({ ritualEntry: 'brief', briefStep: 'breath', breathingFirstCompleted: true }),
-      ),
-    ).toBe(true);
+  it('brief: no shell back on Feel, Integrate, or Decide', () => {
+    expect(isPauseSessionHeaderBackVisible(base({ ritualEntry: 'brief', briefStep: 'integrate' }))).toBe(
+      false,
+    );
+    expect(isPauseSessionHeaderBackVisible(base({ ritualEntry: 'brief', briefStep: 'decide' }))).toBe(false);
   });
 
   it('deep: false on feel with no breath state', () => {
     expect(isPauseSessionHeaderBackVisible(base({ ritualEntry: 'deep', step: 'feel' }))).toBe(false);
   });
 
-  it('deep: true when past first STEPS entry', () => {
+  it('deep: shell back on first Breathe intro only (hide after Start / interstitial)', () => {
     expect(isPauseSessionHeaderBackVisible(base({ ritualEntry: 'deep', step: 'breathe' }))).toBe(true);
+    expect(
+      isPauseSessionHeaderBackVisible(
+        base({ ritualEntry: 'deep', step: 'breathe', breathFirstTimedPatternStarted: true }),
+      ),
+    ).toBe(false);
+    expect(
+      isPauseSessionHeaderBackVisible(
+        base({
+          ritualEntry: 'deep',
+          step: 'breathe',
+          breathFirstTimedPatternStarted: true,
+          breathingFirstCompleted: true,
+        }),
+      ),
+    ).toBe(false);
   });
 
-  it('deep: true on breath2 when second segment completed', () => {
+  it('deep: shell back on second Breathe intro only (hide after Start / interstitial)', () => {
+    expect(isPauseSessionHeaderBackVisible(base({ ritualEntry: 'deep', step: 'breath2' }))).toBe(true);
+    expect(
+      isPauseSessionHeaderBackVisible(
+        base({ ritualEntry: 'deep', step: 'breath2', breathSecondTimedPatternStarted: true }),
+      ),
+    ).toBe(false);
     expect(
       isPauseSessionHeaderBackVisible(
         base({
           ritualEntry: 'deep',
           step: 'breath2',
+          breathSecondTimedPatternStarted: false,
+          breathTimedActive: false,
           breathingSecondCompleted: true,
         }),
       ),
-    ).toBe(true);
+    ).toBe(false);
+    expect(
+      isPauseSessionHeaderBackVisible(base({ ritualEntry: 'deep', step: 'breath2', breathTimedActive: true })),
+    ).toBe(false);
+  });
+
+  it('deep: no shell back on Reflect (wireframe: back from Frame to revisit notes)', () => {
+    expect(isPauseSessionHeaderBackVisible(base({ ritualEntry: 'deep', step: 'reflect' }))).toBe(false);
+  });
+
+  it('deep: shell back from Frame onward (back target is Reflect)', () => {
+    expect(isPauseSessionHeaderBackVisible(base({ ritualEntry: 'deep', step: 'frame' }))).toBe(true);
+  });
+
+  it('deep: shell back on second Breathe intro (before timed pattern)', () => {
+    expect(isPauseSessionHeaderBackVisible(base({ ritualEntry: 'deep', step: 'breath2' }))).toBe(true);
+  });
+
+  it('deep: no shell back on Decide (parity with brief)', () => {
+    expect(isPauseSessionHeaderBackVisible(base({ ritualEntry: 'deep', step: 'decide' }))).toBe(false);
   });
 
   it('picker uses non-brief branch', () => {
     expect(isPauseSessionHeaderBackVisible(base({ ritualEntry: 'picker', step: 'feel' }))).toBe(false);
     expect(isPauseSessionHeaderBackVisible(base({ ritualEntry: 'picker', step: 'breathe' }))).toBe(true);
+    expect(
+      isPauseSessionHeaderBackVisible(
+        base({ ritualEntry: 'picker', step: 'breathe', breathFirstTimedPatternStarted: true }),
+      ),
+    ).toBe(false);
+    expect(isPauseSessionHeaderBackVisible(base({ ritualEntry: 'picker', step: 'reflect' }))).toBe(false);
+    expect(isPauseSessionHeaderBackVisible(base({ ritualEntry: 'picker', step: 'frame' }))).toBe(true);
   });
 });
 
@@ -94,41 +146,36 @@ const intentBase = (over: Partial<PauseHeaderBackIntentInput> = {}): PauseHeader
 });
 
 describe('computePauseHeaderBackIntent', () => {
-  it('brief: breath timed segment resets intro only', () => {
+  it('brief: header back always uses ritual goBack (e.g. Breathe → Feel)', () => {
     expect(
       computePauseHeaderBackIntent(
         intentBase({ ritualEntry: 'brief', briefStep: 'breath', breathTimedActive: true }),
       ),
-    ).toEqual({ kind: 'brief_breath_reset_intro' });
-  });
-
-  it('brief: breath after completion resets intro and clears first flag', () => {
+    ).toEqual({ kind: 'go_back' });
     expect(
       computePauseHeaderBackIntent(
         intentBase({ ritualEntry: 'brief', briefStep: 'breath', breathingFirstCompleted: true }),
       ),
-    ).toEqual({ kind: 'brief_breath_reset_intro_clear_first' });
-  });
-
-  it('brief: otherwise ritual goBack', () => {
-    expect(computePauseHeaderBackIntent(intentBase({ ritualEntry: 'brief', briefStep: 'feel' }))).toEqual({
+    ).toEqual({ kind: 'go_back' });
+    expect(computePauseHeaderBackIntent(intentBase({ ritualEntry: 'brief', briefStep: 'breath' }))).toEqual({
       kind: 'go_back',
     });
   });
 
-  it('deep: timed breathe or breath2 resets intro', () => {
+  it('deep: first Breathe always uses ritual goBack (match brief)', () => {
     expect(
       computePauseHeaderBackIntent(intentBase({ step: 'breathe', breathTimedActive: true })),
-    ).toEqual({ kind: 'deep_breath_reset_intro' });
+    ).toEqual({ kind: 'go_back' });
+    expect(
+      computePauseHeaderBackIntent(intentBase({ step: 'breathe', breathingFirstCompleted: true })),
+    ).toEqual({ kind: 'go_back' });
+    expect(computePauseHeaderBackIntent(intentBase({ step: 'breathe' }))).toEqual({ kind: 'go_back' });
+  });
+
+  it('deep: timed second Breathe resets intro', () => {
     expect(
       computePauseHeaderBackIntent(intentBase({ step: 'breath2', breathTimedActive: true })),
     ).toEqual({ kind: 'deep_breath_reset_intro' });
-  });
-
-  it('deep: first segment done resets intro and clears first flag', () => {
-    expect(
-      computePauseHeaderBackIntent(intentBase({ step: 'breathe', breathingFirstCompleted: true })),
-    ).toEqual({ kind: 'deep_breathe_reset_intro_clear_first' });
   });
 
   it('deep: second segment done resets intro and clears second flag', () => {

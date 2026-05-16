@@ -31,7 +31,6 @@ const base = (over: Partial<PauseSessionPersistSnapshotInput> = {}): PauseSessio
   breathingFirstCompleted: false,
   breathingSecondCompleted: false,
   frameDone: false,
-  decideOnBackStep: 'choose',
   ritualEntry: 'picker',
   briefStep: 'feel',
   briefIntegrateDone: false,
@@ -78,10 +77,21 @@ describe('buildPauseSessionPersistSnapshot', () => {
     expect(s.briefFace).toBe('anxious');
   });
 
+  it('sets decideOnBackStep to breath2 when deep on decide', () => {
+    const s = buildPauseSessionPersistSnapshot(base({ ritualEntry: 'deep', step: 'decide' }));
+    expect(s.decideOnBackStep).toBe('breath2');
+  });
+
+  it('omits decideOnBackStep when deep not on decide', () => {
+    const s = buildPauseSessionPersistSnapshot(base({ ritualEntry: 'deep', step: 'breath2' }));
+    expect(s.decideOnBackStep).toBeUndefined();
+  });
+
   it('omits briefFace when brief but face is null', () => {
     const s = buildPauseSessionPersistSnapshot(
       base({ ritualEntry: 'brief', briefStep: 'feel', selectedBriefFace: null }),
     );
     expect(s.briefFace).toBeUndefined();
+    expect(s.decideOnBackStep).toBeUndefined();
   });
 });

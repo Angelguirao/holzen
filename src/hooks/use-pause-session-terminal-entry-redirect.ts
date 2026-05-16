@@ -16,6 +16,9 @@ export { pauseTerminalEntryStateQueryKey } from '@/lib/pause-terminal-entry-stat
 /**
  * Blocks `/pause` when the instance is already terminal in Postgres unless the tab still has
  * local ritual storage for that same instance (user finishing after expiry, etc.).
+ *
+ * Skips redirect while `pauseSessionPhase === 'done'` — after Decide we clear storage / DB is
+ * `completed`; the user is still on the completion screen and should not see “already ended”.
  */
 export function usePauseSessionTerminalEntryRedirect(input: {
   pauseInstanceId: string | null;
@@ -26,6 +29,8 @@ export function usePauseSessionTerminalEntryRedirect(input: {
   fetchPauseInstanceId: string | null;
   fetchedInstance: FetchedPauseInstance | null;
   restored: PersistedSession | null;
+  /** When showing post-ritual completion, DB may already be terminal — do not bounce to archive. */
+  pauseSessionPhase: 'session' | 'done';
 }): void {
   const {
     pauseInstanceId,
@@ -35,6 +40,7 @@ export function usePauseSessionTerminalEntryRedirect(input: {
     fetchPauseInstanceId,
     fetchedInstance,
     restored,
+    pauseSessionPhase,
   } = input;
   const navigate = useNavigate();
   const { t } = useTranslation();
@@ -81,6 +87,7 @@ export function usePauseSessionTerminalEntryRedirect(input: {
   }, [pauseInstanceId]);
 
   useEffect(() => {
+    if (pauseSessionPhase === 'done') return;
     if (!pauseInstanceId || !shellReady) return;
     if (waitingForFetch || fetchFailed) return;
     if (persistedPauseSessionAllowsTerminalEntry(restored, pauseInstanceId)) return;
@@ -107,5 +114,6 @@ export function usePauseSessionTerminalEntryRedirect(input: {
     resolvedDbState,
     navigate,
     t,
+    pauseSessionPhase,
   ]);
 }

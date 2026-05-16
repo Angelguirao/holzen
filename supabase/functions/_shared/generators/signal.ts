@@ -26,6 +26,7 @@ import { type CacheServeRelaxation, parseMarketDirection, serveFromCache } from 
 import { createAttemptLogger, trackEvent } from "../observe.ts";
 import { enqueueCatalogSourceSuggestion } from "../source-suggestions.ts";
 import { callPerplexityChat, mergePerplexityUsage } from "../perplexity-client.ts";
+import { fetchInitWithIncomingTrace } from "../forward-trace-headers.ts";
 import { validateSource } from "../source-validation.ts";
 import { searchLibrary, essayToSignal, recordLibraryServe } from "../content-library.ts";
 import { preferNonYoutubeCitationsFirst } from "../recent-signal-urls.ts";
@@ -164,6 +165,8 @@ export interface GenerateSignalParams {
    */
   skipLive?: boolean;
   log: (msg: string, extra?: Record<string, unknown>) => void;
+  /** Edge `Request` for W3C trace propagation to Perplexity (companion-orchestrate). */
+  incomingRequest?: Request;
 }
 
 // ── Internals ──
@@ -284,6 +287,7 @@ export async function generateSignal(params: GenerateSignalParams): Promise<Sign
     forceLive,
     skipLive,
     log,
+    incomingRequest,
   } = params;
   const marketDirection = parseMarketDirection(context);
   const phases = getPhaseConfig();
@@ -409,7 +413,7 @@ export async function generateSignal(params: GenerateSignalParams): Promise<Sign
     let apiCalls = 0;
     let mergedUsage = undefined as ReturnType<typeof mergePerplexityUsage>;
 
-    const result = await callPerplexityChat(perplexityBody, PERPLEXITY_API_KEY, (m) => log(m), 15_000);
+    const result = await callPerplexityChat(perplexityBody, PERPLEXITY_API_KEY, (m) => log(m), 15_000, incomingRequest);
     apiCalls++;
     mergedUsage = result.usage;
     searchContent = result.content;
@@ -421,7 +425,7 @@ export async function generateSignal(params: GenerateSignalParams): Promise<Sign
       const retryBody = { ...perplexityBody };
       delete retryBody.search_domain_filter;
       try {
-        const retry = await callPerplexityChat(retryBody, PERPLEXITY_API_KEY, (m) => log(m), 15_000);
+        const retry = await callPerplexityChat(retryBody, PERPLEXITY_API_KEY, (m) => log(m), 15_000, incomingRequest);
         apiCalls++;
         mergedUsage = mergePerplexityUsage(mergedUsage, retry.usage);
         if (retry.citations.length > 0) {
@@ -437,7 +441,7 @@ export async function generateSignal(params: GenerateSignalParams): Promise<Sign
       const retryWide = { ...perplexityBody };
       delete retryWide.search_domain_filter;
       try {
-        const wide = await callPerplexityChat(retryWide, PERPLEXITY_API_KEY, (m) => log(m), 15_000);
+        const wide = await callPerplexityChat(retryWide, PERPLEXITY_API_KEY, (m) => log(m), 15_000, incomingRequest);
         apiCalls++;
         mergedUsage = mergePerplexityUsage(mergedUsage, wide.usage);
         searchContent = wide.content;
@@ -592,12 +596,15 @@ URL RULES (CRITICAL):
     const aiTimeout = setTimeout(() => aiController.abort(), AI_TIMEOUTS[idx]);
     const attemptT0 = Date.now();
     try {
-      const structureResponse = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
-        method: "POST",
-        headers: { Authorization: `Bearer ${LOVABLE_API_KEY}`, "Content-Type": "application/json" },
-        body: JSON.stringify({ ...aiBody, model }),
-        signal: aiController.signal,
-      });
+      const structureResponse = await fetch(
+        "https://ai.gateway.lovable.dev/v1/chat/completions",
+        fetchInitWithIncomingTrace(incomingRequest, {
+          method: "POST",
+          headers: { Authorization: `Bearer ${LOVABLE_API_KEY}`, "Content-Type": "application/json" },
+          body: JSON.stringify({ ...aiBody, model }),
+          signal: aiController.signal,
+        }),
+      );
       clearTimeout(aiTimeout);
       log(`AI ${model} responded ${structureResponse.status}`);
 

@@ -3,6 +3,7 @@ import { createAttemptLogger } from "../_shared/observe.ts";
 import { callPerplexityChat } from "../_shared/perplexity-client.ts";
 import { unknownErrorForLog } from "../_shared/log-unknown-error.ts";
 import { withRequestLogging } from "../_shared/with-request-logging.ts";
+import { fetchInitWithIncomingTrace } from "../_shared/forward-trace-headers.ts";
 import {
   canonicalContentUrl,
   contentSnippetFingerprint,
@@ -211,7 +212,7 @@ serve(
             { role: "user", content: `Find one specific behavioral finance research paper about ${topic} relevant to Bitcoin/crypto holders.` },
           ],
           search_mode: "academic",
-        }, PERPLEXITY_API_KEY, hzLog, 45_000);
+        }, PERPLEXITY_API_KEY, hzLog, 45_000, req);
         logAttempt({
           companion_type: "pregenerate",
           provider: "perplexity",
@@ -227,7 +228,9 @@ serve(
 
         if (searchContent) {
           const aiT0 = Date.now();
-          const aiRes = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
+          const aiRes = await fetch(
+            "https://ai.gateway.lovable.dev/v1/chat/completions",
+            fetchInitWithIncomingTrace(req, {
               method: "POST",
               headers: { Authorization: `Bearer ${LOVABLE_API_KEY}`, "Content-Type": "application/json" },
               body: JSON.stringify({
@@ -257,7 +260,8 @@ serve(
                 tool_choice: { type: "function", function: { name: "return_grounding_nudge" } },
                 temperature: 0.3,
               }),
-            });
+            }),
+          );
 
             if (aiRes.ok) {
               const aiData = await aiRes.json();
@@ -334,7 +338,7 @@ serve(
           { role: "user", content: `Find a specific philosophical Bitcoin essay or insight about: ${signalTopic}. Include the author/thinker name and a link to the original piece.` },
         ],
         search_recency_filter: "year",
-      }, PERPLEXITY_API_KEY, hzLog, 45_000);
+      }, PERPLEXITY_API_KEY, hzLog, 45_000, req);
       logAttempt({
         companion_type: "pregenerate",
         provider: "perplexity",
@@ -350,7 +354,9 @@ serve(
 
         if (searchContent) {
           const sigAiT0 = Date.now();
-          const aiRes = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
+          const aiRes = await fetch(
+            "https://ai.gateway.lovable.dev/v1/chat/completions",
+            fetchInitWithIncomingTrace(req, {
             method: "POST",
             headers: { Authorization: `Bearer ${LOVABLE_API_KEY}`, "Content-Type": "application/json" },
             body: JSON.stringify({
@@ -380,7 +386,8 @@ serve(
               tool_choice: { type: "function", function: { name: "return_signal" } },
               temperature: 0.5,
             }),
-          });
+          }),
+          );
 
             if (aiRes.ok) {
               const aiData = await aiRes.json();
@@ -460,7 +467,7 @@ serve(
           { role: "system", content: "Find a detailed historical account of this financial event. Include specific dates, percentage changes, key figures involved, and the long-term outcome. Focus on the emotional experience of investors during the crisis." },
           { role: "user", content: `Tell me about ${historyEra} — what happened, how investors felt, and what the outcome was years later.` },
         ],
-      }, PERPLEXITY_API_KEY, hzLog, 45_000);
+      }, PERPLEXITY_API_KEY, hzLog, 45_000, req);
       logAttempt({
         companion_type: "pregenerate",
         provider: "perplexity",
@@ -476,7 +483,9 @@ serve(
 
         if (searchContent) {
           const histAiT0 = Date.now();
-          const aiRes = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
+          const aiRes = await fetch(
+            "https://ai.gateway.lovable.dev/v1/chat/completions",
+            fetchInitWithIncomingTrace(req, {
             method: "POST",
             headers: { Authorization: `Bearer ${LOVABLE_API_KEY}`, "Content-Type": "application/json" },
             body: JSON.stringify({
@@ -488,7 +497,8 @@ serve(
               response_format: { type: "json_object" },
               temperature: 0.4,
             }),
-          });
+          }),
+          );
 
             if (aiRes.ok) {
               const aiData = await aiRes.json();
@@ -563,19 +573,22 @@ serve(
     if (zoomToGenerate > 0) {
       try {
         const zoomT0 = Date.now();
-        const aiRes = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
-        method: "POST",
-        headers: { Authorization: `Bearer ${LOVABLE_API_KEY}`, "Content-Type": "application/json" },
-        body: JSON.stringify({
-          model: "google/gemini-2.5-flash",
-          messages: [
-            { role: "system", content: `You provide deep-time civilizational perspective on Bitcoin. Frame everything against thousands or millions of years. Tone: calm, vast, philosophical. No market data, no price predictions, no trading advice. Return JSON with "title" (evocative, 5-8 words) and "body" (2-3 sentences).` },
-            { role: "user", content: zoomTheme },
-          ],
-          response_format: { type: "json_object" },
-          temperature: 0.6,
-        }),
-      });
+        const aiRes = await fetch(
+          "https://ai.gateway.lovable.dev/v1/chat/completions",
+          fetchInitWithIncomingTrace(req, {
+            method: "POST",
+            headers: { Authorization: `Bearer ${LOVABLE_API_KEY}`, "Content-Type": "application/json" },
+            body: JSON.stringify({
+              model: "google/gemini-2.5-flash",
+              messages: [
+                { role: "system", content: `You provide deep-time civilizational perspective on Bitcoin. Frame everything against thousands or millions of years. Tone: calm, vast, philosophical. No market data, no price predictions, no trading advice. Return JSON with "title" (evocative, 5-8 words) and "body" (2-3 sentences).` },
+                { role: "user", content: zoomTheme },
+              ],
+              response_format: { type: "json_object" },
+              temperature: 0.6,
+            }),
+          }),
+        );
 
         if (aiRes.ok) {
           const aiData = await aiRes.json();

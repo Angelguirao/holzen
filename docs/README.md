@@ -9,6 +9,7 @@ This folder contains human-readable notes that complement the source code and in
 3. **Optional — [fundamentals/mental-models-for-contributors.md](fundamentals/mental-models-for-contributors.md)** — plain-language glossary, SPA/React/Supabase mental models, and suggested external primers if you’re coming from a backend-heavy background.
 4. **Optional — [fundamentals/client-server-architecture-holzen.md](fundamentals/client-server-architecture-holzen.md)** — where **truth** vs **projection** live, layer mapping to this repo, TanStack Query vs UI-only state, and anti-patterns (pair with §6.1 in navigating-the-codebase).
 5. **Your vertical slice** — pick one area below (e.g. [systems/routing/route-gating-system.md](systems/routing/route-gating-system.md) or [systems/pause-system.md](systems/pause-system.md)) and read the phased [reviews/](reviews/) docs in order when you need depth on security and pipelines.
+6. **Optional — [fundamentals/documentation-strategy.md](fundamentals/documentation-strategy.md)** — where to put new docs, HTTP/API posture (Bruno vs OpenAPI), and edge-function doc checklist (links only).
 
 [AGENTS.md](../AGENTS.md) at the repo root is the **quick reference** for commands and “where to change what” (optimized for automation and fast lookup). This index is the **full map**.
 
@@ -17,6 +18,7 @@ This folder contains human-readable notes that complement the source code and in
 | Kind of information | Authoritative place | Notes |
 |---------------------|---------------------|--------|
 | Commands, env vars, “where to edit” table | [AGENTS.md](../AGENTS.md) | Keep tables here; link out for narratives. |
+| **Meta:** where docs go, HTTP doc posture (Bruno vs OpenAPI), edge checklist | [fundamentals/documentation-strategy.md](fundamentals/documentation-strategy.md) | Complements this index; does not duplicate the owner table. |
 | Supabase **`Database` types** (`src/integrations/supabase/types.ts`) | [AGENTS.md](../AGENTS.md) (`npm run gen:types`) | Regenerate after migrations; if types lag, use `as unknown as T` per [deployment-sync-guide.md](ops/deployment-sync-guide.md). |
 | Boot sequence, repo tour, Lovable vs local | [fundamentals/navigating-the-codebase.md](fundamentals/navigating-the-codebase.md) | Do not duplicate long boot narratives in AGENTS. |
 | Pause lifecycle (instances, events, artifacts, state machine) | [systems/pause-system.md](systems/pause-system.md) | Canonical **data model** and invariants (Pause V2). |
@@ -49,6 +51,7 @@ When you change behavior, update the **one** doc that owns that slice (and ADRs 
 - `fundamentals/mental-models-for-contributors.md` — glossary + vocabulary for SPAs, React, TypeScript, Vite, Supabase (RLS, edge functions); links to official docs and learning resources.
 - `fundamentals/client-server-architecture-holzen.md` — **truth vs projection**: layer mapping (browser vs Postgres/RLS/edge), TanStack Query vs ephemeral UI state, shared types without shared domain logic.
 - `fundamentals/codebase-size-and-review-practices.md` — codebase size snapshot and review best-practices.
+- `fundamentals/documentation-strategy.md` — meta: choosing `systems/` vs `ops/` vs `backlog/`, default HTTP documentation (Bruno + playbooks), when OpenAPI is worth it, edge-function wiring checklist (pointers to AGENTS and ops docs).
 - `fundamentals/http-review-playbooks.md` — step-by-step Postman/Bruno flows, Supabase `invoke` headers, pairing with Edge logs; [bruno/](../bruno/) collection, [bruno/SCOPE.md](../bruno/SCOPE.md) (HTTP vs full app), [bruno/functions-catalog.md](../bruno/functions-catalog.md) (full **`config.toml`** name list + Bruno smoke subset).
 - `fundamentals/browser-360-mcp-playbook.md` — Chrome DevTools MCP: network, console, Lighthouse, performance traces; complements HTTP playbooks and source reading.
 - **UI / journeys vs API review:** full app flows (pause, journal, settings) belong in browser automation — see [backlog/e2e-browser-automation.md](backlog/e2e-browser-automation.md). Bruno/Postman stay on the HTTP side; they do not replace E2E.

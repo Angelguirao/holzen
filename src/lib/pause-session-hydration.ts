@@ -2,6 +2,7 @@ import type { CompanionData, CompanionPrefs } from '@/components/CompanionSectio
 import type { PauseSeverity } from '@/lib/router-location-state';
 import type { FetchedPauseInstance, PersistedSession } from '@/lib/pause-session-storage';
 import { DEFAULT_COMPANIONS, DEFAULT_PREFS } from '@/lib/pause-session-storage';
+import { hasPersistedPauseSessionPayload } from '@/lib/pause-persisted-session';
 
 /**
  * Pure hydration merge for `/pause`: which reflection payload wins (restore vs nav vs Holzen) and
@@ -52,10 +53,10 @@ export type PauseSessionHydrationInput = {
  * Order matches `PauseSession` historical behavior; do not reorder without product review.
  */
 export function computePauseSessionHydration(p: PauseSessionHydrationInput): PauseSessionHydrationState {
-  if (p.restored?.message) {
+  if (p.restored && hasPersistedPauseSessionPayload(p.restored)) {
     return {
       status: 'ready',
-      message: p.restored.message,
+      message: p.restored.message?.trim() ?? '',
       context: p.restored.context ?? null,
       pauseInstanceId:
         p.restored.pauseInstanceId ?? p.navPauseInstanceId ?? p.holzenLastPauseInstanceId,
@@ -93,6 +94,16 @@ export function computePauseSessionHydration(p: PauseSessionHydrationInput): Pau
     return { status: 'fetch', pauseInstanceId: p.navPauseInstanceId };
   }
 
+  if (
+    p.holzenAligned &&
+    p.holzenLastPauseInstanceId &&
+    !p.navReflectionMessage &&
+    !p.holzenMessage &&
+    !(p.restored && hasPersistedPauseSessionPayload(p.restored))
+  ) {
+    return { status: 'fetch', pauseInstanceId: p.holzenLastPauseInstanceId };
+  }
+
   if (p.holzenMessage) {
     return {
       status: 'ready',
@@ -122,11 +133,12 @@ export function computePauseSessionResolved(
   p: PauseSessionResolvedInput,
 ): PauseSessionHydrationReady | null {
   if (p.hydration.status === 'ready') return p.hydration;
-  if (p.hydration.status === 'fetch' && p.fetchedInstance?.reflection_message) {
+  // Instance may exist before `reflection_text` artifact (reflect-step generation).
+  if (p.hydration.status === 'fetch' && p.fetchedInstance) {
     const f = p.fetchedInstance;
     return {
       status: 'ready',
-      message: f.reflection_message,
+      message: f.reflection_message ?? '',
       context: f.context ?? null,
       pauseInstanceId: f.id,
       companions: {

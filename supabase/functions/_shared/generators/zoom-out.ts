@@ -38,6 +38,7 @@ import { fetchPastReflectionWithWords, type PastReflectionWithWords } from "../p
 import { type CompanionCacheTitleRow } from "../companion-cache-dedup.ts";
 import { errorMessageFromUnknown, getEdgeRuntime } from "../edge-runtime.ts";
 import { normalizeTrackedAssetId } from "../tracked-assets.ts";
+import { fetchInitWithIncomingTrace } from "../forward-trace-headers.ts";
 
 /** Bump when the deep-time prompt, seed pool, or quality rules change. */
 export const PROMPT_VERSION = "v4";
@@ -78,6 +79,8 @@ export interface GenerateZoomOutParams {
   /** When not bitcoin, skip BTC anniversary cache pipeline and serve curated deep-time only. */
   trackedAssetId?: string | null;
   log: (msg: string, extra?: Record<string, unknown>) => void;
+  /** Edge `Request` for W3C trace propagation to the Lovable AI gateway. */
+  incomingRequest?: Request;
 }
 
 // ── Internals: CoinGecko price fetching ──
@@ -241,9 +244,10 @@ async function generateDeepTime(
     onThisDay: { yearsAgo: number; price: number; date: string }[];
     userId?: string;
     log: GenerateZoomOutParams["log"];
+    incomingRequest?: Request;
   },
 ): Promise<DeepTimeResult> {
-  const { context, mood, recentTitles, zoomOutAngle, currentPrice, onThisDay, userId, log } = params;
+  const { context, mood, recentTitles, zoomOutAngle, currentPrice, onThisDay, userId, log, incomingRequest } = params;
   const logAttempt = createAttemptLogger(svcClient, { userId });
 
   const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
@@ -380,12 +384,15 @@ FORMAT: JSON with "title" (3-8 word evocative phrase) and "body" (1-2 poetic but
     const aiTimeout = setTimeout(() => aiController.abort(), AI_TIMEOUTS[idx]);
     const attemptT0 = Date.now();
     try {
-      const aiRes = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
-        method: "POST",
-        headers: { Authorization: `Bearer ${LOVABLE_API_KEY}`, "Content-Type": "application/json" },
-        body: JSON.stringify({ ...aiBody, model }),
-        signal: aiController.signal,
-      });
+      const aiRes = await fetch(
+        "https://ai.gateway.lovable.dev/v1/chat/completions",
+        fetchInitWithIncomingTrace(incomingRequest, {
+          method: "POST",
+          headers: { Authorization: `Bearer ${LOVABLE_API_KEY}`, "Content-Type": "application/json" },
+          body: JSON.stringify({ ...aiBody, model }),
+          signal: aiController.signal,
+        }),
+      );
       clearTimeout(aiTimeout);
       if (aiRes.ok) {
         const aiData = await aiRes.json();
@@ -494,7 +501,8 @@ FORMAT: JSON with "title" (3-8 word evocative phrase) and "body" (1-2 poetic but
 // ── Public entry point ──
 
 export async function generateZoomOut(params: GenerateZoomOutParams): Promise<ZoomOutResult> {
-  const { svcClient, context, mood, recentTitles, userId, zoomOutAngle, forceLive, skipLive, log } = params;
+  const { svcClient, context, mood, recentTitles, userId, zoomOutAngle, forceLive, skipLive, log, incomingRequest } =
+    params;
   const tracked = normalizeTrackedAssetId(params.trackedAssetId);
   if (tracked !== "bitcoin") {
     log(`zoomOut: tracked asset ${tracked} — BTC anniversary pipeline skipped`);
@@ -597,6 +605,7 @@ export async function generateZoomOut(params: GenerateZoomOutParams): Promise<Zo
     onThisDay: prices.onThisDay,
     userId,
     log,
+    incomingRequest,
   });
 
   // ── 4. Build response ──

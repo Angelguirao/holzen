@@ -1,5 +1,4 @@
 import { STEPS, type PauseStep } from '@/components/pause/PauseProgress';
-import { BRIEF_PAUSE_ORDER } from '@/lib/brief-pause-order';
 import type { BriefPauseStep, RitualDepth } from '@/lib/pause-session-storage';
 
 export type PauseSessionHeaderBackInput = {
@@ -8,6 +7,10 @@ export type PauseSessionHeaderBackInput = {
   briefStep: BriefPauseStep;
   step: PauseStep;
   breathTimedActive: boolean;
+  /** True after the user starts the triangle countdown on first Breathe (brief or deep); hides shell back until intro again. */
+  breathFirstTimedPatternStarted: boolean;
+  /** Deep second Breathe: after Start on timed pattern, hide shell back until intro again (wireframe parity with first Breathe). */
+  breathSecondTimedPatternStarted: boolean;
   breathingFirstCompleted: boolean;
   breathingSecondCompleted: boolean;
 };
@@ -15,22 +18,23 @@ export type PauseSessionHeaderBackInput = {
 /**
  * Whether the pause shell should show the header back affordance.
  * Mirrors `showPauseHeaderBack` in `PauseSession` (brief vs non-brief branches).
+ *
+ * **Brief:** chevron on **Breathe** only **before** the timed pattern starts (intro → Feel to change mood).
+ * **Deep:** same on **first Breathe** intro only; **second Breathe** matches (back on intro, hidden after Start / interstitial).
+ * Hidden on **Reflect** (Continue-only; back returns from **Frame** to add notes); shown from **Frame** onward.
  */
 export function isPauseSessionHeaderBackVisible(p: PauseSessionHeaderBackInput): boolean {
   if (p.phase !== 'session') return false;
   if (p.ritualEntry === 'brief') {
-    return (
-      BRIEF_PAUSE_ORDER.indexOf(p.briefStep) > 0 ||
-      (p.briefStep === 'breath' && p.breathTimedActive) ||
-      (p.briefStep === 'breath' && p.breathingFirstCompleted)
-    );
+    return p.briefStep === 'breath' && !p.breathFirstTimedPatternStarted;
   }
-  return (
-    STEPS.indexOf(p.step) > 0 ||
-    ((p.step === 'breathe' || p.step === 'breath2') && p.breathTimedActive) ||
-    ((p.step === 'breathe' || p.step === 'breath2') &&
-      (p.step === 'breathe' ? p.breathingFirstCompleted : p.breathingSecondCompleted))
-  );
+  if (p.step === 'breathe') return !p.breathFirstTimedPatternStarted;
+  if (p.step === 'breath2')
+    return !(p.breathSecondTimedPatternStarted || p.breathTimedActive || p.breathingSecondCompleted);
+  if (p.step === 'reflect') return false;
+  /** Match brief Decide: stepper + in-content mirror back — no shell chevron on Decide. */
+  if (p.step === 'decide') return false;
+  return STEPS.indexOf(p.step) > 0;
 }
 
 /** Inputs for header back press (no `phase` — visibility is handled separately). */
@@ -44,10 +48,7 @@ export type PauseHeaderBackIntentInput = {
 };
 
 export type PauseHeaderBackIntent =
-  | { kind: 'brief_breath_reset_intro' }
-  | { kind: 'brief_breath_reset_intro_clear_first' }
   | { kind: 'deep_breath_reset_intro' }
-  | { kind: 'deep_breathe_reset_intro_clear_first' }
   | { kind: 'deep_breath2_reset_intro_clear_second' }
   | { kind: 'go_back' };
 
@@ -57,12 +58,13 @@ export type PauseHeaderBackIntent =
  */
 export function computePauseHeaderBackIntent(p: PauseHeaderBackIntentInput): PauseHeaderBackIntent {
   if (p.ritualEntry === 'brief') {
-    if (p.briefStep === 'breath' && p.breathTimedActive) return { kind: 'brief_breath_reset_intro' };
-    if (p.briefStep === 'breath' && p.breathingFirstCompleted) return { kind: 'brief_breath_reset_intro_clear_first' };
     return { kind: 'go_back' };
   }
-  if ((p.step === 'breathe' || p.step === 'breath2') && p.breathTimedActive) return { kind: 'deep_breath_reset_intro' };
-  if (p.step === 'breathe' && p.breathingFirstCompleted) return { kind: 'deep_breathe_reset_intro_clear_first' };
+  /** Deep first Breathe: match brief — header back always leaves the segment (→ Feel). */
+  if (p.step === 'breathe') {
+    return { kind: 'go_back' };
+  }
+  if (p.step === 'breath2' && p.breathTimedActive) return { kind: 'deep_breath_reset_intro' };
   if (p.step === 'breath2' && p.breathingSecondCompleted) return { kind: 'deep_breath2_reset_intro_clear_second' };
   return { kind: 'go_back' };
 }

@@ -31,6 +31,10 @@ describe('mapPersistedStep', () => {
     expect(mapPersistedStep('decide')).toBe('decide');
     expect(mapPersistedStep('breath2')).toBe('breath2');
   });
+
+  it('maps removed choose step to decide for storage resume', () => {
+    expect(mapPersistedStep('choose')).toBe('decide');
+  });
 });
 
 describe('initialRitualEntry', () => {
@@ -203,7 +207,7 @@ describe('initialBreathSegmentRpcLoggedFlagsFromRestored', () => {
       segment1Logged: true,
       segment2Logged: false,
     });
-    expect(initialBreathSegmentRpcLoggedFlagsFromRestored(makeTestPersistedPauseSession({ step: 'choose' }))).toEqual({
+    expect(initialBreathSegmentRpcLoggedFlagsFromRestored(makeTestPersistedPauseSession({ step: 'decide' }))).toEqual({
       segment1Logged: true,
       segment2Logged: true,
     });

@@ -5,12 +5,12 @@ import type { MoodValue } from '@/components/MoodCheck';
 import { PauseRitualFeelStep } from '@/components/pause/PauseRitualFeelStep';
 import type { FeelStepTile } from '@/components/pause/pause-feel-types';
 import { PauseBreathing, type PauseBreathingHandle } from '@/components/pause/PauseBreathing';
-import { PauseChooseBridge } from '@/components/pause/PauseChooseBridge';
 import { PauseDecide } from '@/components/pause/PauseDecide';
 import { PauseFrame } from '@/components/pause/PauseFrame';
 import { PauseReflect } from '@/components/pause/PauseReflect';
 import type { PauseStep } from '@/components/pause/PauseProgress';
 import type { PauseSessionStepTransitionConfig } from '@/lib/pause-session-step-transition';
+import { usePauseReflectFrameFocusAmbience } from '@/hooks/use-pause-reflect-frame-focus-ambience';
 
 export type PauseSessionDeepRitualBodyProps = {
   step: PauseStep;
@@ -34,19 +34,26 @@ export type PauseSessionDeepRitualBodyProps = {
   onSkipFirstBreath: () => void;
   onSkipSecondBreath: () => void;
   ritualSoundMuted: boolean;
+  /** When true, ritual audio (including Reflect/Frame focus bed) is off. */
+  prefersReducedMotion: boolean;
   companions: CompanionData;
   companionPrefs: CompanionPrefs;
   pauseInstanceId: string | null;
   context: string | null;
   reflectionMessage: string;
+  reflectionLoading?: boolean;
+  reflectionError?: string | null;
+  onReflectionRetry?: () => void;
   isFavorite: boolean;
   /** Reflect forwards to favorite control; async ok. */
   onToggleFavorite: () => void | Promise<void>;
   subscribed: boolean;
   onFrameImDone: () => void;
-  onDeepChooseBridgeContinue: () => void;
   onDecide: (decision: string) => void;
-  decideOnBackStep: 'choose' | 'breath2';
+  /** After first deep breath pattern: repeat three rounds from intro (wireframe “Three more”). */
+  onRepeatDeepFirstBreathPattern: () => void;
+  /** After second deep breath pattern: repeat three rounds from intro (wireframe 330:23551). */
+  onRepeatDeepSecondBreathPattern: () => void;
 };
 
 /** Deep ritual step panels inside `PauseSessionScaffold` (Framer step transitions preserved). */
@@ -72,19 +79,29 @@ export function PauseSessionDeepRitualBody({
   onSkipFirstBreath,
   onSkipSecondBreath,
   ritualSoundMuted,
+  prefersReducedMotion,
   companions,
   companionPrefs,
   pauseInstanceId,
   context,
   reflectionMessage,
+  reflectionLoading,
+  reflectionError,
+  onReflectionRetry,
   isFavorite,
   onToggleFavorite,
   subscribed,
   onFrameImDone,
-  onDeepChooseBridgeContinue,
   onDecide,
-  decideOnBackStep,
+  onRepeatDeepFirstBreathPattern,
+  onRepeatDeepSecondBreathPattern,
 }: PauseSessionDeepRitualBodyProps) {
+  usePauseReflectFrameFocusAmbience({
+    active: step === 'reflect' || step === 'frame',
+    muted: ritualSoundMuted,
+    prefersReducedMotion,
+  });
+
   return (
     <AnimatePresence mode="wait" initial={false}>
       {step === 'feel' && (
@@ -109,12 +126,14 @@ export function PauseSessionDeepRitualBody({
             ritualVariant="deep"
             mantra={mantra}
             severity={severity}
+            feelTile={selectedBriefFace}
             completed={breathingFirstCompleted}
             onTimedBreathingChange={onTimedBreathingChange}
             onPatternComplete={onFirstBreathPatternComplete}
             onContinueAfterBreath={onContinueAfterFirstBreath}
             onSkipBreath={onSkipFirstBreath}
             ritualSoundMuted={ritualSoundMuted}
+            onRepeatDeepFirstBreathPattern={onRepeatDeepFirstBreathPattern}
           />
         </motion.div>
       )}
@@ -122,19 +141,19 @@ export function PauseSessionDeepRitualBody({
       {step === 'reflect' && (
         <motion.div key="reflect" {...stepTransition}>
           <PauseReflect
-            companions={companions}
-            companionPrefs={companionPrefs}
-            severity={severity}
             pauseInstanceId={pauseInstanceId}
             context={context}
             reflectionMessage={reflectionMessage}
+            reflectionLoading={reflectionLoading}
+            reflectionError={reflectionError}
+            onReflectionRetry={onReflectionRetry}
+            companionHaikuEnabled={companionPrefs.haiku}
             isFavorite={isFavorite}
             onToggleFavorite={() => {
               void onToggleFavorite();
             }}
             subscribed={subscribed}
             onContinue={() => goToStep('frame')}
-            mood={selectedMood}
           />
         </motion.div>
       )}
@@ -142,9 +161,14 @@ export function PauseSessionDeepRitualBody({
       {step === 'frame' && (
         <motion.div key="frame" {...stepTransition}>
           <PauseFrame
-            companions={companions}
             pauseInstanceId={pauseInstanceId}
             reflectionMessage={reflectionMessage}
+            companionHaikuEnabled={companionPrefs.haiku}
+            isFavorite={isFavorite}
+            onToggleFavorite={() => {
+              void onToggleFavorite();
+            }}
+            subscribed={subscribed}
             onImDone={onFrameImDone}
           />
         </motion.div>
@@ -159,25 +183,21 @@ export function PauseSessionDeepRitualBody({
             ritualVariant="deep"
             mantra={mantra}
             severity={severity}
+            feelTile={selectedBriefFace}
             completed={breathingSecondCompleted}
             onTimedBreathingChange={onTimedBreathingChange}
             onPatternComplete={onSecondBreathPatternComplete}
             onContinueAfterBreath={onContinueAfterSecondBreath}
             onSkipBreath={onSkipSecondBreath}
             ritualSoundMuted={ritualSoundMuted}
+            onRepeatDeepSecondBreathPattern={onRepeatDeepSecondBreathPattern}
           />
-        </motion.div>
-      )}
-
-      {step === 'choose' && (
-        <motion.div key="choose" {...stepTransition}>
-          <PauseChooseBridge onChoose={onDeepChooseBridgeContinue} />
         </motion.div>
       )}
 
       {step === 'decide' && (
         <motion.div key="decide" {...stepTransition}>
-          <PauseDecide onDecide={onDecide} onBack={() => goToStep(decideOnBackStep)} />
+          <PauseDecide onDecide={onDecide} onBack={() => goToStep('breath2')} hideChoicesBack />
         </motion.div>
       )}
     </AnimatePresence>

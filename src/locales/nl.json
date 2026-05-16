@@ -46,8 +46,6 @@
     "holzen": "Holzen",
     "new": "Nieuw",
     "read": "Lezen",
-    "pinned": "Vastgezet",
-    "unpin": "Losmaken",
     "from": "Van",
     "until": "Tot"
   },
@@ -148,9 +146,7 @@
     "zoomOut": "Perspectief",
     "historicalInsight": "Historisch inzicht",
     "echo": "Echo",
-    "parallel": "parallel",
-    "reflectionUnpinned": "Reflectie losgemaakt",
-    "reflectionPinned": "Reflectie vastgezet op Home"
+    "parallel": "parallel"
   },
   "journey": {
     "pageSubtitle": "Je voortgang en notities — niet je account (dat staat onder Instellingen).",
@@ -961,7 +957,9 @@
     "leaveSessionConfirm": "Verlaten",
     "sessionTitle": "Je pauze",
     "scienceInfoAria": "De wetenschap achter deze pauze",
-    "noReflection": "Geen actieve reflectie. Ga terug om er een te starten.",
+    "sessionEmptyTitle": "Geen pauze om te openen",
+    "reflectMissingContext": "Deze pauze mist marktcontext. Ga terug naar Home en start een nieuwe pauze.",
+    "sessionEmptyBody": "Start op Home met «Ik heb een pauze nodig», of open er een via een melding dat je pauze klaar is.",
     "outcomeSaveFailed": "Je keuze kon niet worden opgeslagen. Probeer het opnieuw.",
     "outcomeNotCompleted": "Je keuze is opgeslagen, maar deze pauze is nog niet af — voltooi de ontbrekende rituele stappen en kies opnieuw.",
     "stepSyncFailed": "Deze stap kon niet worden gesynchroniseerd. Controleer je verbinding en probeer opnieuw.",

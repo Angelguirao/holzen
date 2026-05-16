@@ -9,28 +9,28 @@ function readSoundEnabled(): boolean {
   }
 }
 
-/** Prefetch tone once; play once per distinct `message` when `newPauseArrival` fires. */
+/** Prefetch tone once; play once per distinct open pause when `newPauseArrival` fires. */
 export function useHomePauseAudio(
   newPauseArrival: boolean,
-  message: string | null,
+  pauseInstanceId: string | null,
   clearNewPauseArrival: () => void,
 ): void {
-  const lastToneMsgRef = useRef<string | null>(null);
+  const lastToneInstanceRef = useRef<string | null>(null);
 
   useEffect(() => {
     prefetchNotificationTone();
   }, []);
 
   useEffect(() => {
-    if (!newPauseArrival || !message) return;
-    if (message === lastToneMsgRef.current) {
+    if (!newPauseArrival || !pauseInstanceId) return;
+    if (pauseInstanceId === lastToneInstanceRef.current) {
       clearNewPauseArrival();
       return;
     }
-    lastToneMsgRef.current = message;
+    lastToneInstanceRef.current = pauseInstanceId;
     if (readSoundEnabled()) {
       playNotificationTone();
     }
     clearNewPauseArrival();
-  }, [newPauseArrival, message, clearNewPauseArrival]);
+  }, [newPauseArrival, pauseInstanceId, clearNewPauseArrival]);
 }

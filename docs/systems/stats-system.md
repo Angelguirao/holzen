@@ -4,12 +4,32 @@
 > this doc is **shipped**. `Profile > Stats` renders
 > [`StatsContentV2`](../../src/components/stats/StatsContentV2.tsx) with all
 > 13 deep-dive / Journey / Advanced cards, reading exclusively from
-> `v_pause_full` + `pause_step_events` + `pause_companion_events`. See
-> [`pause-system.md`](pause-system.md) §9 for the data flow.
+> `v_pause_full` + `pause_step_events` + `pause_companion_events`.
+> **Holzen + skill values are computed client-side on read** — see **Pause V2 — data flow and where scores are computed** below. Pause lifecycle narrative: [`pause-system.md`](pause-system.md).
 >
 > The "Current App Order" section below is retained as historical context —
 > it describes the legacy layout that ran on `reflections` and was removed
 > in the Pause V2 cutover.
+
+## Pause V2 — data flow and where scores are computed (authoritative)
+
+### Source of truth (Postgres)
+
+Pause lifecycle and ritual signals live in **`pause_instances`**, **`pause_step_events`**, **`pause_companion_events`**, and the read-model view **`v_pause_full`** (extended as migrations add columns). There is **no** trigger or materialized column that writes Holzen Score or per-skill numbers at `completed` time.
+
+### Read path and client-side aggregation
+
+- [`usePauseStatsData`](../../src/hooks/use-pause-stats-data.ts) loads one **TanStack Query** bundle per user: `v_pause_full` (bounded) + `pause_step_events` + `pause_companion_events` via [`fetchPauseStatsData`](../../src/lib/pause-stats-data-query.ts). Home, Journey → Stats, and badges all reuse this cache.
+- **Holzen Score and the five skill values** are computed **in the browser on read** by [`computePauseScore`](../../src/lib/stats/pause-score.ts) from that bundle (e.g. [`SkillOverviewCard`](../../src/components/stats/SkillOverviewCard.tsx), [`HomeStatTiles`](../../src/components/home/HomeStatTiles.tsx)).
+- After a pause reaches **`completed`** (and on a few related paths), [`invalidatePauseStatsDataForUser`](../../src/lib/pause-stats-invalidate.ts) **invalidates** the pause-stats query key (and several related keys). The next fetch supplies fresh rows; scores **recompute** because they are pure functions of fetched data — nothing is “stale” in a hidden server cache for those numbers.
+- **Brief ritual done** ([`PauseDone`](../../src/components/pause/PauseDone.tsx) `doneVariant="brief"`): shows qualitative **skill-area hints** for *this* pause via [`ScoreImpact`](../../src/components/pause/ScoreImpact.tsx) (`buildPauseScoreImpacts` — reasons only, no fake +N) and lists **badges newly eligible** vs persisted `user_badges` ([`PauseDoneBriefJourneyRecap`](../../src/components/pause/PauseDoneBriefJourneyRecap.tsx)), using the same bundle + `computeBadges` as Journey → Badges. It does **not** show marginal Holzen deltas (those confused “effort vs roll-up”); see Stats for numeric roll-ups.
+
+### Why client-side today (and what “move to server” usually means)
+
+- **Single formula in TypeScript** (`pause-score.ts`) stays aligned with the Stats UI without maintaining parallel SQL.
+- The database stays **event-sourced**: it records what happened; derived metrics remain ephemeral until a second consumer needs them (e.g. public API, email digest, anti-tamper surfaces).
+- A **Postgres trigger** that writes score columns would still duplicate formula ownership (SQL vs app) or call out to an edge — it does not remove the need for one canonical implementation.
+- A practical server step, when needed, is usually an **RPC or Edge Function** that runs the **same** scoring logic (shared or ported module) for non-SPA consumers — not necessarily triggers.
 
 ## Current App Order (legacy, removed in Pause V2)
 
@@ -33,7 +53,7 @@ Where possible, time bucketing uses `engaged_at` (via `pauseTimestamp`) so delay
 
 Computed from the last 30 completed pauses using 5 skill dimensions:
 
-- **Emotional Regulation**: mood -> mood_after improvement + breathing bonus
+- **Emotional Regulation**: entry mood → after-mood improvement (after = latest `post_pause_emotion_logged` or `shift_emotion_logged`) + breathing bonus
 - **Distress Tolerance**: outcome quality under volatility context
 - **Decision Alignment**: alignment to hold-goal strategy (only when hold goal exists)
 - **Cognitive Reappraisal**: use of perspective companions (zoom/history/signal/grounding)
@@ -295,11 +315,13 @@ Historical `pause_step_events` rows may still carry `outcome = "nothing"` from a
 
 ---
 
-## Notes for maintainers
+## Notes for maintainers (Pause V2)
 
-- Rendering order is defined in `src/pages/Profile.tsx` inside `StatsContent`.
-- Score internals are defined in `src/hooks/use-holzen-score.ts`.
-- Shared pause-count semantics are in `src/lib/engaged-pause.ts`.
+- Stats tab layout: [`StatsContentV2`](../../src/components/stats/StatsContentV2.tsx) and components under [`src/components/stats/`](../../src/components/stats/).
+- Holzen + five skills: [`src/lib/stats/pause-score.ts`](../../src/lib/stats/pause-score.ts) (`computePauseScore`).
+- Data loader + cache keys: [`src/hooks/use-pause-stats-data.ts`](../../src/hooks/use-pause-stats-data.ts), [`src/lib/pause-stats-data-query.ts`](../../src/lib/pause-stats-data-query.ts), [`src/lib/pause-stats-invalidate.ts`](../../src/lib/pause-stats-invalidate.ts).
+- Shared pause-count / “engaged” semantics where still used: [`src/lib/engaged-pause.ts`](../../src/lib/engaged-pause.ts).
+- Legacy `use-holzen-score` / `reflections` paths were removed at the Pause V2 cutover.
 
 ---
 

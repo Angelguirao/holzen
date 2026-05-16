@@ -4,7 +4,7 @@ import { pauseStepSwipeDirection } from '@/lib/pause-step-swipe-direction';
 describe('pauseStepSwipeDirection', () => {
   it('is forward when advancing along STEPS', () => {
     expect(pauseStepSwipeDirection('feel', 'breathe')).toBe('forward');
-    expect(pauseStepSwipeDirection('choose', 'decide')).toBe('forward');
+    expect(pauseStepSwipeDirection('breath2', 'decide')).toBe('forward');
   });
 
   it('is forward when staying on the same step', () => {

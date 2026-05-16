@@ -46,8 +46,6 @@
     "holzen": "Holzen",
     "new": "Nuevo",
     "read": "Leer",
-    "pinned": "Fijado",
-    "unpin": "Desfijar",
     "from": "Desde",
     "until": "Hasta"
   },
@@ -148,9 +146,7 @@
     "zoomOut": "Perspectiva",
     "historicalInsight": "Perspectiva histórica",
     "echo": "Eco",
-    "parallel": "paralelo",
-    "reflectionUnpinned": "Reflexión desfijada",
-    "reflectionPinned": "Reflexión fijada en Inicio"
+    "parallel": "paralelo"
   },
   "journey": {
     "pageSubtitle": "Progreso, análisis y escritos — no la cuenta (eso está en Ajustes).",
@@ -946,7 +942,9 @@
     "leaveSessionConfirm": "Salir",
     "sessionTitle": "Tu pausa",
     "scienceInfoAria": "La ciencia detrás de esta pausa",
-    "noReflection": "Sin reflexión activa. Vuelve para activar una.",
+    "sessionEmptyTitle": "No hay pausa para abrir",
+    "reflectMissingContext": "A esta pausa le falta el contexto del mercado. Vuelve a Inicio e inicia una pausa nueva.",
+    "sessionEmptyBody": "Empieza en Inicio con «Necesito una pausa» o abre una desde una notificación de pausa lista.",
     "outcomeSaveFailed": "No se pudo guardar tu elección. Inténtalo de nuevo.",
     "outcomeNotCompleted": "Tu elección se guardó, pero esta pausa aún no está completa — termina los pasos del ritual que falten y elige de nuevo.",
     "stepSyncFailed": "No se pudo sincronizar este paso. Comprueba tu conexión e inténtalo de nuevo.",

@@ -46,11 +46,11 @@ describe('getHomeShowLimitUpsell', () => {
 });
 
 describe('getHomeShowPauseScheduling', () => {
-  it('requires ready, access, no message, and not loading', () => {
-    expect(getHomeShowPauseScheduling(true, true, null, false)).toBe(true);
-    expect(getHomeShowPauseScheduling(true, true, 'hi', false)).toBe(false);
-    expect(getHomeShowPauseScheduling(true, true, null, true)).toBe(false);
-    expect(getHomeShowPauseScheduling(true, false, null, false)).toBe(false);
+  it('requires ready, access, no open pause, and not loading', () => {
+    expect(getHomeShowPauseScheduling(true, true, false, false)).toBe(true);
+    expect(getHomeShowPauseScheduling(true, true, true, false)).toBe(false);
+    expect(getHomeShowPauseScheduling(true, true, false, true)).toBe(false);
+    expect(getHomeShowPauseScheduling(true, false, false, false)).toBe(false);
   });
 });
 
@@ -60,7 +60,7 @@ describe('getHomeSubscriptionGate', () => {
       subLoading: false,
       subscribed: false,
       monthlyRemaining: 0,
-      message: null,
+      hasOpenPause: false,
       loading: false,
     });
     expect(g.subscriptionReady).toBe(true);

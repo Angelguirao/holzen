@@ -2,118 +2,84 @@ import { useMemo } from 'react';
 import { motion } from 'framer-motion';
 import { TrendingUp, Minus } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
+import { cn } from '@/lib/utils';
+import type { PauseImpactData } from '@/lib/pause-impact-data';
+import { buildPauseScoreImpacts } from '@/lib/pause-score-impacts';
 
-interface PauseData {
-  mood: string | null;
-  moodAfter: string | null;
-  breathingCompleted: boolean;
-  decision: string | null;
-  context: string | null;
-  engagedTools: number; // count of perspective tools read
-  wroteNote: boolean;
-  usedTags: boolean;
-  feelIntensity?: number | null;
-  shiftIntensity?: number | null;
-  reinforcementQuote?: string | null;
-}
-
-const COMPOSURE: Record<string, number> = {
-  fomo: 10, greedy: 15, anxious: 20, fearful: 25,
-  excited: 40, uncertain: 50, detached: 75, calm: 100,
-};
-
-function parseVolatility(context: string | null): number {
-  if (!context) return 0;
-  const match = context.match(/[↑↓](\d+(?:\.\d+)?)%/);
-  return match ? parseFloat(match[1]) : 0;
-}
-
-interface Impact {
-  label: string;
-  key: string;
-  direction: 'up' | 'neutral';
-  reason: string;
-}
-
-export function ScoreImpact({ data }: { data: PauseData }) {
+export function ScoreImpact({
+  data,
+  variant = 'default',
+  className,
+  hideTitle = false,
+  excludeFirstFromList = false,
+}: {
+  data: PauseImpactData;
+  variant?: 'default' | 'brief';
+  className?: string;
+  hideTitle?: boolean;
+  /** When true with `variant="brief"`, the first qualitative row is omitted (e.g. shown in a meta row above). */
+  excludeFirstFromList?: boolean;
+}) {
   const { t } = useTranslation();
 
-  const impacts = useMemo(() => {
-    const list: Impact[] = [];
+  const impacts = useMemo(
+    () => buildPauseScoreImpacts(data, t, variant),
+    [data, t, variant],
+  );
 
-    // Regulation
-    if (data.breathingCompleted) {
-      list.push({
-        label: t('holzenScore.emotionalRegulation', { defaultValue: 'Regulation' }),
-        key: 'regulation',
-        direction: 'up',
-        reason: t('scoreImpact.breathing', { defaultValue: 'Breathing completed' }),
-      });
-    } else if (data.mood && data.moodAfter && COMPOSURE[data.moodAfter] > COMPOSURE[data.mood]) {
-      list.push({
-        label: t('holzenScore.emotionalRegulation', { defaultValue: 'Regulation' }),
-        key: 'regulation',
-        direction: 'up',
-        reason: t('scoreImpact.moodImproved', { defaultValue: 'Mood shifted toward composure' }),
-      });
-    }
+  const sliced = excludeFirstFromList ? impacts.slice(1) : impacts;
+  /** Brief uses the same qualitative rows as default — no illustrative +N chips (see brief done + `computePauseScore` preview). */
+  const displayImpacts = sliced;
 
-    // Tolerance
-    const vol = parseVolatility(data.context);
-    if (vol >= 3 && data.decision === 'held') {
-      list.push({
-        label: t('holzenScore.distressTolerance', { defaultValue: 'Tolerance' }),
-        key: 'tolerance',
-        direction: 'up',
-        reason: t('scoreImpact.heldVolatility', {
-          defaultValue: 'Held steady during {{vol}}% move',
-          vol: vol.toFixed(1),
-        }),
-      });
-    }
+  const motionDelay = variant === 'brief' ? 0.25 : 0.8;
 
-    // Reappraisal
-    if (data.engagedTools > 0) {
-      list.push({
-        label: t('holzenScore.cognitiveReappraisal', { defaultValue: 'Reappraisal' }),
-        key: 'reappraisal',
-        direction: 'up',
-        reason: t('scoreImpact.tools', {
-          defaultValue: 'Used {{count}} perspective tool(s)',
-          count: data.engagedTools,
-        }),
-      });
-    }
+  if (impacts.length === 0 && variant !== 'brief') return null;
 
-    // Awareness
-    if (data.wroteNote || data.usedTags) {
-      list.push({
-        label: t('holzenScore.selfAwareness', { defaultValue: 'Awareness' }),
-        key: 'awareness',
-        direction: 'up',
-        reason: data.wroteNote
-          ? t('scoreImpact.note', { defaultValue: 'Added a reflection note' })
-          : t('scoreImpact.tags', { defaultValue: 'Tagged this pause' }),
-      });
-    }
+  const title =
+    variant === 'brief'
+      ? t('pause.brief.done.contributionTitle', { defaultValue: 'How this pause contributes' })
+      : t('scoreImpact.title', { defaultValue: 'Score impact' });
 
-    return list;
-  }, [data, t]);
+  if (impacts.length === 0 && variant === 'brief') {
+    return (
+      <motion.div
+        initial={{ opacity: 0, y: 8 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: motionDelay, duration: 0.45 }}
+        className={cn('w-full space-y-2', className)}
+      >
+        {!hideTitle ? (
+          <p className="text-center text-xs font-medium uppercase tracking-wide text-muted-foreground">{title}</p>
+        ) : null}
+        <p className="text-center text-sm leading-relaxed text-muted-foreground">
+          {t('pause.brief.done.contributionFallback', {
+            defaultValue: 'This pause is now part of your Journey.',
+          })}
+        </p>
+      </motion.div>
+    );
+  }
 
-  if (impacts.length === 0) return null;
+  if (variant === 'brief' && excludeFirstFromList && impacts.length > 0 && displayImpacts.length === 0) {
+    return null;
+  }
+
+  if (variant === 'brief' && displayImpacts.length === 0) {
+    return null;
+  }
 
   return (
     <motion.div
       initial={{ opacity: 0, y: 12 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ delay: 0.8, duration: 0.6 }}
-      className="w-full max-w-sm space-y-3"
+      transition={{ delay: motionDelay, duration: 0.6 }}
+      className={cn('w-full max-w-sm space-y-3', variant === 'brief' && 'max-w-none', className)}
     >
-      <p className="text-center text-xs font-medium uppercase tracking-wide text-muted-foreground">
-        {t('scoreImpact.title', { defaultValue: 'Score impact' })}
-      </p>
+      {!hideTitle ? (
+        <p className="text-center text-xs font-medium uppercase tracking-wide text-muted-foreground">{title}</p>
+      ) : null}
       <div className="space-y-2.5">
-        {impacts.map((imp) => (
+        {displayImpacts.map((imp) => (
           <div key={imp.key} className="flex items-start gap-2.5">
             {imp.direction === 'up' ? (
               <TrendingUp className="mt-0.5 h-4 w-4 shrink-0 text-nox-accent-green" />

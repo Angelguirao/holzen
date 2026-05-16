@@ -7,9 +7,7 @@ import { usePauseSessionDepthAndBriefCopy } from '@/hooks/use-pause-session-dept
 const t = ((key: string, opts?: Record<string, unknown>) =>
   key === 'pause.depthPicker.contextMoved'
     ? `${opts?.sym} ${opts?.pct}`
-    : key === 'pause.brief.macroProgress'
-      ? `n=${opts?.n} total=${opts?.total}`
-      : key) as TFunction;
+    : key) as TFunction;
 
 const sampleBtc = (changePercent: number): BtcPriceData => ({
   coinId: 'bitcoin',
@@ -28,7 +26,6 @@ describe('usePauseSessionDepthAndBriefCopy', () => {
         btcData: null,
         trackedAssetId: 'btc',
         ritualEntry: 'picker',
-        briefStep: 'feel',
       }),
     );
     expect(result.current.depthContextLine).toBeNull();
@@ -41,26 +38,8 @@ describe('usePauseSessionDepthAndBriefCopy', () => {
         btcData: sampleBtc(-2.5),
         trackedAssetId: 'btc',
         ritualEntry: 'picker',
-        briefStep: 'feel',
       }),
     );
     expect(result.current.depthContextLine).toContain('2.5');
-  });
-
-  it('returns brief macro line only in brief ritual', () => {
-    const { result, rerender } = renderHook(
-      ({ ritualEntry }: { ritualEntry: 'picker' | 'brief' }) =>
-        usePauseSessionDepthAndBriefCopy({
-          t,
-          btcData: null,
-          trackedAssetId: null,
-          ritualEntry,
-          briefStep: 'breath',
-        }),
-      { initialProps: { ritualEntry: 'picker' as const } },
-    );
-    expect(result.current.briefMacroLine).toBeUndefined();
-    rerender({ ritualEntry: 'brief' });
-    expect(result.current.briefMacroLine).toMatch(/n=2 total=4/);
   });
 });

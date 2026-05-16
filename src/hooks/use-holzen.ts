@@ -3,7 +3,6 @@ import { useQuery, useQueryClient } from '@tanstack/react-query';
 import type { BtcPriceData } from '@/lib/btc';
 import { getHolzenMarketDisplayQueryOptions } from '@/lib/holzen-market-display-query';
 import { supabase } from '@/integrations/supabase/client';
-import { invokeEdge } from '@/lib/invoke-edge';
 import { useAuth } from '@/hooks/use-auth';
 import { useProfile } from '@/hooks/use-profile';
 import type { CompanionData } from '@/components/CompanionSection';
@@ -15,18 +14,23 @@ import { normalizeTrackedAssetId, trackedAssetSymbol } from '@/lib/tracked-asset
 import { severityFromBtcChangePercent } from '@/lib/btc-move-severity';
 import { millisecondsUntilNextQuarterHour } from '@/lib/next-cron-quarter';
 import { pauseCreateOrReuse } from '@/lib/pause-api';
+import { pauseCreateSkippedUserMessage } from '@/lib/pause-create-skipped-message';
 import {
   bucketChangePercent,
   computeContextFingerprint,
 } from '@/lib/pause-fingerprint';
-import { loadReflectRecencyHints } from '@/lib/load-reflect-recency-hints';
 import { trackEvent } from '@/lib/posthog';
+import {
+  MANUAL_PAUSE_TRIGGER_IDLE,
+  type ManualPauseTriggerResult,
+} from '@/lib/manual-pause-trigger-result';
+import { clearSession } from '@/lib/pause-session-storage';
 
 const PAUSE_MANUAL_START_HOME = 'holzen_sess_pause_manual_started_home';
 
 export { holzenMarketDisplayQueryKey } from '@/lib/holzen-market-display-query';
 
-/** Once per tab session: user kicked off a manual “Need a moment” / holzen-reflect flow from Home. */
+/** Once per tab session: user kicked off a manual “Need a moment” (opens pause instance) from Home. */
 function markPauseManualStartedHomeOnce(): void {
   try {
     if (sessionStorage.getItem(PAUSE_MANUAL_START_HOME)) return;
@@ -37,17 +41,11 @@ function markPauseManualStartedHomeOnce(): void {
   }
 }
 
-function previewCompanionTypeTags(c: CompanionData): string[] {
-  const tags: string[] = [];
-  if (c.haiku) tags.push('haiku');
-  if (c.groundingTitle || c.groundingBody) tags.push('grounding');
-  return tags;
-}
-
 /**
- * Pause V2 manual-trigger hook. Writes every generated pause straight
- * into pause_instances / pause_ai_artifacts via the Phase B RPCs +
- * service helpers. No legacy reflections writes.
+ * Pause V2 manual-trigger hook. Opens a `pause_instances` row via `pause_create_or_reuse`
+ * (+ context snapshot). Non-silent reflection text is generated later in the deep ritual via
+ * `holzen-reflect` (`PauseSession` + `use-pause-reflect-generation`, enabled on Reflect, Frame,
+ * second Breathe, and Decide). Silent mode still writes a stub `reflection_text` artifact here.
  */
 export function useHolzen() {
   const { user } = useAuth();
@@ -100,6 +98,7 @@ export function useHolzen() {
     setMessage(null);
     setContext(null);
     setCompanions({ haiku: null, groundingTitle: null, groundingBody: null });
+    clearSession();
   }, []);
 
   /** Re-read v_pause_current + artifacts so Home matches Library after completes / dismissals. */
@@ -191,12 +190,12 @@ export function useHolzen() {
     };
   }, [user, syncOpenPauseFromDb]);
 
-  /** Generate reflect-step text (holzen-reflect) and create the V2 pause instance + artifacts. */
+  /** Create the V2 pause instance (reflection AI runs at Reflect step). */
   const generateMessage = useCallback(
-    async (data: BtcPriceData, mood?: string) => {
+    async (data: BtcPriceData, mood?: string): Promise<ManualPauseTriggerResult> => {
       if (!user) {
         holzenLog.manual('generateMessage: skipped (no user)');
-        return;
+        return MANUAL_PAUSE_TRIGGER_IDLE;
       }
       markPauseManualStartedHomeOnce();
       const t0 = Date.now();
@@ -248,9 +247,13 @@ export function useHolzen() {
             contextRuleResult: { triggered: ['manual'] },
             contextFingerprint: fingerprint,
           });
-          if (!res.instance_id) return;
+          if (!res.instance_id) {
+            setError(pauseCreateSkippedUserMessage(res.reused_reason));
+            return MANUAL_PAUSE_TRIGGER_IDLE;
+          }
           const isPendingOffer = res.pending_offer === true;
           if (!isPendingOffer) {
+            clearSession();
             setLastPauseInstanceId(res.instance_id);
           }
           if (res.created) {
@@ -292,55 +295,28 @@ export function useHolzen() {
               /* no-op */
             }
           }
+          if (!isPendingOffer) {
+            await syncOpenPauseFromDb();
+          }
+          return {
+            opened: true,
+            instanceId: res.instance_id,
+            context: ctx,
+            pendingOffer: isPendingOffer || undefined,
+          };
         } catch (e: unknown) {
           holzenLog.manual('generateMessage: silent pause create failed', {
             message: e instanceof Error ? e.message : String(e),
           });
           setError(reflectionPersistErrorMessage(e));
+          return MANUAL_PAUSE_TRIGGER_IDLE;
         }
-        return;
       }
 
       setLoading(true);
       setError(null);
 
       try {
-        const { moodHistory, recentMessages, recentHaikus } = await loadReflectRecencyHints();
-        const { data: fnData, error: fnError } = await invokeEdge<{
-          message?: string;
-          haiku?: CompanionData['haiku'];
-          grounding_title?: string | null;
-          grounding_body?: string | null;
-          grounding_citation?: string | null;
-          grounding_url?: string | null;
-        }>('holzen-reflect', {
-          body: {
-            context: ctx,
-            tone: reflectionTone,
-            customPrompt: customPrompt || undefined,
-            style: reflectionStyle,
-            severity: Math.abs(data.changePercent),
-            motivations: motivations.length > 0 ? motivations : undefined,
-            mantra: mantra || undefined,
-            groundingActivities: groundingActivities.length > 0 ? groundingActivities : undefined,
-            currency,
-            language,
-            ...(moodHistory && moodHistory.length > 0 ? { moodHistory } : {}),
-            ...(recentMessages && recentMessages.length > 0 ? { recentMessages } : {}),
-            ...(recentHaikus && recentHaikus.length > 0 ? { recentHaikus } : {}),
-          },
-        });
-        if (fnError) throw fnError;
-
-        const msg: string | undefined = fnData?.message;
-        if (!msg) throw new Error('No pause message returned');
-
-        const companionData: CompanionData = {
-          haiku: fnData?.haiku ?? null,
-          groundingTitle: fnData?.grounding_title ?? null,
-          groundingBody: fnData?.grounding_body ?? null,
-        };
-
         const res = await pauseCreateOrReuse({
           templateSlug: 'volatility_v1',
           source: 'manual',
@@ -359,11 +335,8 @@ export function useHolzen() {
 
         if (!res.instance_id) {
           holzenLog.manual('generateMessage: reuse/skip', { reason: res.reused_reason });
-          setMessage(msg);
-          setContext(ctx);
-          setCompanions(companionData);
-          setNewPauseArrival(true);
-          return;
+          setError(pauseCreateSkippedUserMessage(res.reused_reason));
+          return MANUAL_PAUSE_TRIGGER_IDLE;
         }
 
         const isPendingOffer = res.pending_offer === true;
@@ -383,83 +356,52 @@ export function useHolzen() {
         }
 
         if (!isPendingOffer) {
+          clearSession();
           setLastPauseInstanceId(res.instance_id);
-          setMessage(msg);
           setContext(ctx);
-          setCompanions(companionData);
+          setMessage(null);
+          setCompanions({ haiku: null, groundingTitle: null, groundingBody: null });
           setNewPauseArrival(true);
-        }
-
-        const artifacts: Array<{
-          pause_instance_id: string;
-          user_id: string;
-          kind: string;
-          content: Record<string, unknown>;
-        }> = [
-          {
-            pause_instance_id: res.instance_id,
-            user_id: user.id,
-            kind: 'reflection_text',
-            content: { message: msg, context: ctx },
-          },
-        ];
-        if (companionData.groundingTitle || companionData.groundingBody) {
-          artifacts.push({
-            pause_instance_id: res.instance_id,
-            user_id: user.id,
-            kind: 'ground_nudge',
-            content: {
-              title: companionData.groundingTitle ?? '',
-              body: companionData.groundingBody ?? '',
-              citation: typeof fnData?.grounding_citation === 'string' ? fnData.grounding_citation : '',
-              url: typeof fnData?.grounding_url === 'string' ? fnData.grounding_url : '',
-            },
-          });
-        }
-        await supabase
-          .from('pause_ai_artifacts' as never)
-          .upsert(artifacts as never, { onConflict: 'pause_instance_id,kind' } as never);
-
-        if (!isPendingOffer) {
           setLastTriggerAt(new Date().toISOString());
           try {
             trackEvent('pause.manual_completed', {
               duration_s: Math.round((Date.now() - t0) / 1000),
               had_bitcoin_context: assetId === 'bitcoin',
               tracked_asset_id: assetId,
-              companion_types: previewCompanionTypeTags(companionData),
+              companion_types: [],
             });
           } catch {
             /* no-op */
           }
         }
+        if (!isPendingOffer) {
+          await syncOpenPauseFromDb();
+        }
+        return {
+          opened: true,
+          instanceId: res.instance_id,
+          context: ctx,
+          pendingOffer: isPendingOffer || undefined,
+        };
       } catch (e: unknown) {
         const raw = e instanceof Error ? e.message : String(e);
         holzenLog.manual('generateMessage: error', { message: raw });
         if (raw.includes('fetch') || raw.includes('network') || raw.includes('Failed to fetch')) {
           setError('Could not reach Holzen. Check your connection.');
-        } else if (raw.includes('rate') || raw.includes('limit') || raw.includes('429')) {
-          setError('Too many requests — please wait a moment and try again.');
         } else {
-          setError('AI pause prompt unavailable right now. Try again shortly.');
+          setError('Could not open a pause right now. Try again shortly.');
         }
+        return MANUAL_PAUSE_TRIGGER_IDLE;
       } finally {
         setLoading(false);
       }
     },
     [
       user,
-      reflectionTone,
-      reflectionStyle,
       silentMode,
-      customPrompt,
-      motivations,
-      mantra,
-      groundingActivities,
-      currency,
-      language,
       profile.cumulativeThreshold,
       profile.trackedAssetId,
+      syncOpenPauseFromDb,
     ],
   );
 
@@ -496,14 +438,14 @@ export function useHolzen() {
   const nextCronCheckIn = useCallback(() => millisecondsUntilNextQuarterHour(), []);
 
   const manualTrigger = useCallback(
-    async (mood?: string) => {
+    async (mood?: string): Promise<ManualPauseTriggerResult> => {
       const remaining = manualCooldownRemaining();
       if (remaining > 0) {
         holzenLog.manual('manualTrigger: blocked by cooldown', {
           remainingMs: remaining,
           devMode: isHolzenDevMode(),
         });
-        return;
+        return MANUAL_PAUSE_TRIGGER_IDLE;
       }
 
       try {
@@ -518,23 +460,28 @@ export function useHolzen() {
             queryKey: marketOpts.queryKey,
             queryFn: marketOpts.queryFn,
           }));
-        await generateMessage(data, mood);
-        const now = Date.now();
-        setLastManualAt(now);
-        localStorage.setItem(manualCooldownKey, String(now));
+        const result = await generateMessage(data, mood);
+        if (result.opened) {
+          const now = Date.now();
+          setLastManualAt(now);
+          localStorage.setItem(manualCooldownKey, String(now));
+        }
+        return result;
       } catch (e: unknown) {
         const raw = e instanceof Error ? e.message : String(e);
         if (raw.includes('fetch') || raw.includes('Failed to fetch')) {
           setError('Could not connect. Check your internet and try again.');
         } else {
-          setError('A pause message could not be generated right now. Try again in a moment.');
+          setError('Could not start a pause right now. Try again in a moment.');
         }
+        return MANUAL_PAUSE_TRIGGER_IDLE;
       }
     },
     [btcQuery.data, generateMessage, manualCooldownRemaining, currency, manualCooldownKey, profileTrackedAssetId, queryClient],
   );
 
   const dismissMessage = useCallback(async () => {
+    clearSession();
     setMessage(null);
     setContext(null);
     setCompanions({ haiku: null, groundingTitle: null, groundingBody: null });

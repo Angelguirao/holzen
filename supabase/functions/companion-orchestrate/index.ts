@@ -142,6 +142,7 @@ serve(
         svcClient,
         body,
         log,
+        incomingRequest: req,
       });
     }
 
@@ -419,6 +420,7 @@ serve(
             svcClient,
             userId,
             log: (msg, extra) => log(`[question] ${msg}`, extra),
+            incomingRequest: req,
           })
         : Promise.resolve<string | null>(null);
 
@@ -466,6 +468,7 @@ serve(
       skipLivePerplexity,
       skipLiveLovable,
       trackedAssetId,
+      incomingRequest: req,
     });
 
     const keys = Object.keys(tasks);

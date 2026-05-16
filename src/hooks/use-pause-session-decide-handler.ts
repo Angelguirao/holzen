@@ -30,6 +30,8 @@ export function usePauseSessionDecideHandler(input: {
   breathingSecondCompleted: boolean;
   feelIntensity: number | null;
   shiftIntensity: number | null;
+  reflectionMessage: string;
+  haiku: string | null;
 }): { handleDecide: (d: string) => Promise<void> } {
   const { user } = useAuth();
   const {
@@ -49,6 +51,8 @@ export function usePauseSessionDecideHandler(input: {
     breathingSecondCompleted,
     feelIntensity,
     shiftIntensity,
+    reflectionMessage,
+    haiku,
   } = input;
 
   const handleDecide = useCallback(
@@ -78,7 +82,6 @@ export function usePauseSessionDecideHandler(input: {
           void refreshSubscription();
         }
         setDecision(d);
-        await dismissMessage();
         const q = getSessionQuote();
         setPauseImpactData(
           buildPauseImpactDataOnComplete({
@@ -92,10 +95,16 @@ export function usePauseSessionDecideHandler(input: {
             feelIntensity,
             shiftIntensity,
             reinforcementQuote: `"${q.text}" — ${q.author}`,
+            reflectionMessage,
+            haiku,
           }),
         );
-        hapticFeedback('success');
+        // Must commit `done` before `await dismissMessage()` — otherwise React can paint an
+        // intermediate frame where the DB is already `completed` but `pauseSessionPhase` is
+        // still `session`, and `usePauseSessionTerminalEntryRedirect` toasts + routes to archive.
         setPhase('done');
+        await dismissMessage();
+        hapticFeedback('success');
         clearSession();
       } finally {
         decidingRef.current = false;
@@ -113,6 +122,8 @@ export function usePauseSessionDecideHandler(input: {
       breathingSecondCompleted,
       feelIntensity,
       shiftIntensity,
+      reflectionMessage,
+      haiku,
       refreshSubscription,
       user?.id,
       t,

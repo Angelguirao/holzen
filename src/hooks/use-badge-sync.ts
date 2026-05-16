@@ -29,6 +29,16 @@ function markShownThisSession(ids: string[]) {
 }
 
 /**
+ * Marks badge ids as already surfaced this browser session so `useBadgeSync`
+ * does not open duplicate celebration overlays (e.g. brief done listed them first).
+ * Push / `user_badges` upsert still run when Badges mounts — only the overlay dedupes.
+ */
+export function suppressBadgeCelebrationOverlayThisSession(ids: string[]): void {
+  if (ids.length === 0) return;
+  markShownThisSession(ids);
+}
+
+/**
  * Syncs computed badge IDs to `user_badges`.
  *
  * Silent-seed mode: on first post-cutover render (`user_badges` was

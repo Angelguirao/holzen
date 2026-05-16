@@ -9,6 +9,8 @@ const base = () => ({
   feelIntensity: 3,
   shiftIntensity: 4,
   reinforcementQuote: '"Hi" — Author',
+  reflectionMessage: 'Reflection body',
+  haiku: 'one\ntwo\nthree' as string | null,
 });
 
 describe('buildPauseImpactDataOnComplete', () => {
@@ -65,5 +67,7 @@ describe('buildPauseImpactDataOnComplete', () => {
     expect(d.wroteNote).toBe(false);
     expect(d.usedTags).toBe(false);
     expect(d.reinforcementQuote).toBe('"Hi" — Author');
+    expect(d.reflectionMessage).toBe('Reflection body');
+    expect(d.haiku).toBe('one\ntwo\nthree');
   });
 });

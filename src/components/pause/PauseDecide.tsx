@@ -5,18 +5,25 @@ import { ChevronLeft } from 'lucide-react';
 import { OutcomeIcon } from '@/components/icons/OutcomeIcon';
 import { hapticFeedback } from '@/lib/haptics';
 import { pauseStepLayout } from '@/components/pause/pause-step-layout';
+import { Button } from '@/components/ui/button';
+import { cn } from '@/lib/utils';
 
 interface Props {
   onDecide: (decision: string) => void;
   /** Return to the prior macro step (second Breathe). */
   onBack?: () => void;
-  /** Optional kicker above the title (e.g. brief vs deep step label). */
+  /** Optional kicker above the title (e.g. archive retrospective). Ritual flows omit — stepper carries context. */
   introKicker?: string;
+  /** When true, the choices-screen footer Back row is omitted (stepper-only nav in `/pause`). */
+  hideChoicesBack?: boolean;
 }
 
-export function PauseDecide({ onDecide, onBack, introKicker }: Props) {
+export function PauseDecide({ onDecide, onBack, introKicker, hideChoicesBack }: Props) {
   const { t } = useTranslation();
   const [mirrorDecision, setMirrorDecision] = useState<string | null>(null);
+
+  const introLine =
+    introKicker != null && introKicker.trim() !== '' ? introKicker : null;
 
   const handleHold = () => {
     hapticFeedback('medium');
@@ -54,63 +61,65 @@ export function PauseDecide({ onDecide, onBack, introKicker }: Props) {
         {!mirrorDecision ? (
           <motion.div
             key="choices"
-            className="flex flex-col items-center gap-8 w-full max-w-xs"
+            className="flex w-full max-w-sm flex-col items-center gap-8"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0, scale: 0.95 }}
             transition={{ duration: 0.3 }}
           >
             <div className="flex flex-col items-center gap-3 text-center">
-              <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-muted-foreground">
-                {introKicker ?? t('pause.decideIntroKicker', { defaultValue: 'Step 6 · Decide' })}
-              </p>
+              {introLine ? (
+                <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-muted-foreground">
+                  {introLine}
+                </p>
+              ) : null}
               <p className={pauseStepLayout.screenTitle}>{t('pause.whatWillYouDo')}</p>
               <p className="max-w-sm text-sm leading-relaxed text-muted-foreground">
                 {t('pause.decideSubcopy', { defaultValue: "You're choosing from your center." })}
               </p>
             </div>
 
-            {/* Primary: Hold */}
-            <motion.button
+            <Button
+              type="button"
+              variant="default"
               onClick={handleHold}
-              whileTap={{ scale: 0.97 }}
-              className="flex w-full items-center justify-center gap-3 rounded-2xl border border-nox-border-default/60 bg-nox-background-accent/20 py-5 transition-all duration-300 hover:border-nox-border-focus/40 hover:bg-nox-background-accent/35"
+              className={cn(
+                pauseStepLayout.ritualPrimaryCta,
+                'flex h-auto min-h-12 w-full max-w-[280px] items-center justify-center gap-3 rounded-full py-4',
+              )}
             >
-              <div className="flex h-10 w-10 items-center justify-center rounded-full border border-border/60 bg-muted/50">
-                <OutcomeIcon outcome="held" size={18} className="text-muted-foreground" />
+              <div className="flex h-9 w-9 items-center justify-center rounded-full border border-primary-foreground/25 bg-primary-foreground/10">
+                <OutcomeIcon outcome="held" size={18} className="text-primary-foreground" />
               </div>
-              <span className="text-sm font-semibold tracking-wide text-foreground">
-                {t('ritual.decide.hold', { defaultValue: "I'm holding" })}
+              <span className="text-sm font-semibold tracking-wide">
+                {t('pause.brief.decide.holdPrimary', { defaultValue: 'Hold' })}
               </span>
-            </motion.button>
-
-            {/* Secondary: Sell / Buy */}
-            <div className="flex items-center gap-6">
-              <button
+            </Button>
+            <div className="flex w-full max-w-[280px] gap-3">
+              <Button
                 type="button"
-                onClick={() => handleAction('sold')}
-                className="flex items-center gap-1.5 text-xs font-medium text-muted-foreground transition-colors hover:text-foreground"
-              >
-                <OutcomeIcon outcome="sold" size={14} className="text-muted-foreground" />
-                {t('ritual.decide.sell', { defaultValue: 'I sold' })}
-              </button>
-              <span className="text-muted-foreground/40" aria-hidden>
-                ·
-              </span>
-              <button
-                type="button"
+                variant="outline"
                 onClick={() => handleAction('bought')}
-                className="flex items-center gap-1.5 text-xs font-medium text-muted-foreground transition-colors hover:text-foreground"
+                className="flex flex-1 items-center justify-center gap-2 rounded-full border-primary/40 bg-primary/5 py-3 text-xs font-semibold text-foreground hover:bg-primary/10"
               >
                 <OutcomeIcon outcome="bought" size={14} className="text-muted-foreground" />
                 {t('ritual.decide.buy', { defaultValue: 'I bought' })}
-              </button>
+              </Button>
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => handleAction('sold')}
+                className="flex flex-1 items-center justify-center gap-2 rounded-full border-primary/40 bg-primary/5 py-3 text-xs font-semibold text-foreground hover:bg-primary/10"
+              >
+                <OutcomeIcon outcome="sold" size={14} className="text-muted-foreground" />
+                {t('ritual.decide.sell', { defaultValue: 'I sold' })}
+              </Button>
             </div>
           </motion.div>
         ) : (
           <motion.div
             key="mirror"
-            className="flex flex-col items-center gap-6 max-w-xs text-center"
+            className="flex max-w-sm flex-col items-center gap-6 text-center"
             initial={{ opacity: 0, y: 12 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0 }}
@@ -145,15 +154,19 @@ export function PauseDecide({ onDecide, onBack, introKicker }: Props) {
               animate={{ opacity: 1 }}
               transition={{ delay: 2.4, duration: 0.8 }}
             >
-              <button
+              <Button
                 type="button"
+                variant="default"
+                className={cn(
+                  pauseStepLayout.ritualPrimaryCta,
+                  'h-auto min-h-10 max-w-sm whitespace-normal py-3 leading-snug',
+                )}
                 onClick={confirmMirror}
-                className={pauseStepLayout.textContinue}
               >
                 {t(`mirror.confirm.${mirrorKey}`, {
                   defaultValue: mirrorKey === 'sell' ? 'I still want to sell' : 'I still want to buy',
                 })}
-              </button>
+              </Button>
               <button
                 type="button"
                 onClick={cancelMirror}
@@ -181,7 +194,7 @@ export function PauseDecide({ onDecide, onBack, introKicker }: Props) {
       </AnimatePresence>
 
       {/* Back link (choices only — mirror uses row inside mirror block) */}
-      {onBack && !mirrorDecision ? (
+      {onBack && !mirrorDecision && !hideChoicesBack ? (
         <motion.div
           className={pauseStepLayout.backRow}
           initial={{ opacity: 0 }}

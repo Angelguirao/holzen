@@ -23,15 +23,15 @@ This document estimates **third-party API spend** for a Holzen pause session whe
 
 ### 1.1 Reflection step (message + optional haiku)
 
-- **Manual path:** `holzen-reflect` → `generateUnifiedReflection` → Lovable AI Gateway `https://ai.gateway.lovable.dev/v1/chat/completions`.
-- **Automatic path:** `check-volatility` calls the **same** `generateUnifiedReflection` inline after inserting `pause_ai_call` (parity with manual).
+- **Manual path:** `holzen-reflect` → `generateUnifiedReflection` → Lovable AI Gateway `https://ai.gateway.lovable.dev/v1/chat/completions` when the deep ritual reaches **Reflect** (`use-pause-reflect-generation` in **`PauseSession`**, typically still **enabled** on **Frame**, second **Breathe**, and **Decide** so the call can finish off the Reflect card).
+- **Automatic path:** same **`holzen-reflect`** call in the browser when the user reaches **Reflect** for cron-created instances (**no** inline `generateUnifiedReflection` inside `check-volatility` on claim); same **`PauseSession`** enable window as manual.
 
 Models tried (in order): `google/gemini-3-flash-preview`, then `google/gemini-2.5-flash` on failure (`reflection-generate.ts`).
 
 ### 1.2 Companion step (Signal, Grounding, History, Zoom Out)
 
-- **Client:** `use-companion-data` invokes `companion-orchestrate` when the user reaches the reflect/companion UI and cached rows are missing (intervention-only on mount, then one slot per card tap).
-- **Automatic pause:** `check-volatility` does **not** call `companion-orchestrate`; companions run only through the same client paths as manual pauses once the user opens Reflect.
+- **Client:** `use-companion-data` invokes `companion-orchestrate` for **intervention-only** once **`pauseInstanceId`** is live (typically early in **`PauseSession`**, often **before** Reflect), then one slot per card tap when artifacts are missing.
+- **Automatic pause:** `check-volatility` does **not** call `companion-orchestrate`; intervention + companions use the **same** client paths as manual pauses after the user opens **`/pause`**.
 
 Generators (in `supabase/functions/_shared/generators/`):
 
