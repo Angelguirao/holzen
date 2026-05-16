@@ -30,7 +30,7 @@ Home is the signed-in landing surface after onboarding: hero quote, optional ins
 
 | Area | Source | Notes |
 |------|--------|--------|
-| Profile + reflection + BTC context | [`useHolzen`](../../src/hooks/use-holzen.ts) | `message`, `loading`, `error`, `btcData`, `manualTrigger`, cooldown helpers, companions; **`trackedAssetId`** is re-exported as `normalizeTrackedAssetId(profile.trackedAssetId)` (`TrackedAssetId`) |
+| Open pause + market context | [`useHolzen`](../../src/hooks/use-holzen.ts) | `lastPauseInstanceId` / `hasOpenPause`, `context` (market line from `context_snapshot`), `message` only when a `reflection_text` artifact exists (post-Reflect or silent stub), `loading`, `error`, `btcData`, `manualTrigger`, cooldown helpers, companions; **`trackedAssetId`** is re-exported as `normalizeTrackedAssetId(profile.trackedAssetId)` (`TrackedAssetId`) |
 | Subscription / Pro | [`useSubscription`](../../src/hooks/use-subscription.ts) | `subscribed`, `monthlyRemaining`, `startCheckout`, `refresh` |
 | Layout + DnD order | [`useWidgetLayout`](../../src/components/HomeWidget.tsx) | Section order persisted per user expectations |
 | Optional widgets | [`useHomeOptionalVisibility`](../../src/hooks/use-home-optional-visibility.ts) | Toggles + `JOURNEY_STAT_TILES_VISIBILITY_ID` + `HOME_WIDGET_DEFAULT_ORDER` for layout |
@@ -45,7 +45,7 @@ Home is the signed-in landing surface after onboarding: hero quote, optional ins
 
 1. **Loading** — `!profileLoaded` → `AuthLoading`.
 2. **Onboarding** — `!hasOnboarded` → `Onboarding`.
-3. **Zen mode** — `localStorage.holzen_zen_mode`; one-time migration cleared a stale default (`holzen_zen_mode_reset_v1`). Zen shows reflection, loading, **blocking errors** (persist, AI, connectivity — not price-only when cached market data exists), subscription skeleton, or empty flow. Cross-tab: `storage` listener syncs zen flag.
+3. **Zen mode** — `localStorage.holzen_zen_mode`; one-time migration cleared a stale default (`holzen_zen_mode_reset_v1`). When an open pause exists, Zen shows **market context meta** (+ optional context line) and the same **Continue pause** / dismiss CTAs as the dashboard widget (not the AI reflection paragraph — that appears in `/pause` at Reflect). Otherwise: loading, **blocking errors** (persist, AI, connectivity — not price-only when cached market data exists), subscription skeleton, or empty flow. Cross-tab: `storage` listener syncs zen flag.
 4. **Full dashboard** — Hero quote, pull-to-refresh (full reload), “Today” sections driven by `visibleOrderedSectionIds`, customize sheet, testimonial prompt.
 
 ## Pause widget error surfacing
