@@ -1,24 +1,24 @@
 ---
 name: Pause-first MVP launch
-overview: Ship a pause-first Holzen with maximum cognitive clarity—active src/ and deployed edges read as a small pause product. No product-wide feature flag. Single branch (`cursor/pause-v2-final`); agent runs steps 1–6 in order with a commit after each step (no separate PRs). Git tag + legacy folders + CI guards (§18). Marketing Coming soon only on Landing.
+overview: Ship a pause-first Holzen with maximum cognitive clarity—active src/ and deployed edges read as a small pause product. Subscription §5.4 — Stripe-native 7-day trial started in-app (no card, no Checkout redirect); Checkout only when trial ends; lapsed = read-only Archive/Journey. Landing/Home/Settings copy updated (§12.4). Branch `feature/mvpPauseCleanup` from `main`; steps 1–6; Step 6 = §14.3 + §29 F1–F9. Cache-only companions §20.4.1; telemetry §20.8; naming §5.0.
 todos:
   - id: step-1-preserve
-    content: "Step 1: Git tag + archive branch; legacy READMEs; src/README.md MVP map stub — commit"
+    content: "Step 1: Git tag full-ia-pre-strip; archive branch; legacy READMEs; src/README.md shipped-surface map — commit"
     status: pending
   - id: step-2-shell
-    content: "Step 2: 4-tab nav, Journey MVP, pause exits, routes; decision doc + manifest stub — commit"
+    content: "Step 2: 4-tab nav, JourneyOverview, pause exits, routes; decision doc + manifest stub — commit"
     status: pending
   - id: step-3-legacy-edges
     content: "Step 3: Legacy bulk moves; edge undeploy; _shared/legacy; CI/Bruno checks — commit"
     status: pending
   - id: step-4-surfaces
-    content: "Step 4: Home/settings/admin; profile-row-query narrow; i18n MVP; HomePauseEmptyFlow — commit"
+    content: "Step 4: ensure-trial-subscription edge; 2-step onboarding; §12.4 copy; Home/settings; F1–F7 — commit"
     status: pending
   - id: step-5-cutover
-    content: "Step 5: baseline squash + roadmap; landing; design; analytics; gen:types — commit"
+    content: "Step 5: baseline squash + §20.8; lapsed + stripe-webhook; landing FAQ; roadmap; gen:types — commit"
     status: pending
   - id: step-6-ship
-    content: "Step 6: Launch sequence (25.9) QA + observability; stamp:release; push; Lovable publish — commit"
+    content: "Step 6: F1–F9 + §14.3 gate; Bruno smoke; launch-runbook (25.9); push feature/mvpPauseCleanup; Lovable publish — commit"
     status: pending
 isProject: false
 ---
@@ -29,11 +29,11 @@ isProject: false
 | Field                  | Value                                                     |
 | ---------------------- | --------------------------------------------------------- |
 | **Status**             | Ready to build (§30 review gate)                          |
-| **Version**            | 2026-05-16                                                |
-| **Review**             | §30 + §31; locked choices in §30.5 |
-| **Integration branch** | `cursor/pause-v2-final`                                   |
-| **Target soft launch** | ~2026-06-06 (see §14)                                     |
-| **Decision record**    | `docs/decisions/2026-05-16-pause-first-mvp.md`            |
+| **Version**            | 2026-05-17 (v3.13 — final review)                      |
+| **Review**             | §30.1 · §30.2 audit · [§30.3 freeze](#s30-3) · [Locked](#s30-5) · [Design](#s31) |
+| **Base branch** | `main` |
+| **Integration branch** | `feature/mvpPauseCleanup` (all steps 1–6; PR back to `main`) |
+| **Decision record**    | `docs/decisions/2026-05-16-pause-first-shipped-scope.md`            |
 
 ---
 
@@ -49,20 +49,23 @@ In-app links use heading ids (`#s1`, `#s20-7`, …). Click a link in the table o
 
 | Jump to | Link |
 | --- | --- |
-| Build when ready | [Final review gate](#s30) |
+| Build when ready | [Final review gate](#s30) · [Audit 2026-05-17](#s30-2) · branch `feature/mvpPauseCleanup` from `main` |
+| Branch | `feature/mvpPauseCleanup` ← `main` |
+| Before push | [Repo consistency gate](#s14-3) · [Testing pyramid](#s29-0) · [Flows F1–F9](#s29-8) |
 | Locked decisions | [Locked product decisions](#s30-5) |
 | Implementation steps | [Implementation loop](#s14) · [Step mapping](#s15) |
 | Launch order | [Launch sequence](#s25-9) |
-| Baseline squash | [Baseline squash](#s20-7) |
+| Baseline squash | [Baseline squash](#s20-7) · [Cache-only companions](#s20-4-1) · [Telemetry reset](#s20-8) |
 | Design pass | [Design alignment](#s31) |
+| Subscription model | [Subscription & entitlements](#s5-4) |
 
 ### Part A — Decision & scope
 
-0. [How to read this plan](#s0) · 1. [Executive summary](#s1) · 2. [Why not a feature flag](#s2) · 3. [Preservation](#s3) · 4. [Thesis](#s4) · 5. [MVP scope](#s5) · 6. [What we are not doing](#s6)
+0. [How to read this plan](#s0) · 1. [Executive summary](#s1) · 2. [Why not a feature flag](#s2) · 3. [Preservation](#s3) · [3.1 Data assumption](#s3-1) · 4. [Thesis](#s4) · 5. [MVP scope](#s5) · [5.4 Subscription](#s5-4) · 6. [What we are not doing](#s6)
 
 ### Part B — Product surfaces
 
-7. [Journey](#s7) · 8. [Archive](#s8) · 9. [Home](#s9) · 10. [Onboarding](#s10) · 11. [Settings](#s11) · 12. [Landing & roadmap](#s12) · 13. [Notifications](#s13)
+7. [Journey](#s7) · 8. [Archive](#s8) · 9. [Home](#s9) · 10. [Onboarding](#s10) · 11. [Settings](#s11) · 12. [Landing](#s12) · [12.4 Copy](#s12-4) · 13. [Notifications](#s13)
 
 ### Part C — Delivery
 
@@ -70,7 +73,7 @@ In-app links use heading ids (`#s1`, `#s20-7`, …). Click a link in the table o
 
 ### Part D — Platform & data
 
-20. [Postgres](#s20) · [20.7 Baseline squash](#s20-7) · 21. [Naming](#s21) · 22. [Client data contract](#s22)
+20. [Postgres](#s20) · [20.4.1 Cache-only](#s20-4-1) · [20.7 Baseline](#s20-7) · [20.8 Telemetry reset](#s20-8) · 21. [Naming](#s21) · 22. [Client contract](#s22)
 
 ### Part E — Operations
 
@@ -78,7 +81,7 @@ In-app links use heading ids (`#s1`, `#s20-7`, …). Click a link in the table o
 
 ### Part F — Sign-off
 
-28. [Risks](#s28) · 29. [Testing](#s29) · 30. [Review gate](#s30) · [Locked decisions](#s30-5) · 31. [Design](#s31) · 32. [Ship](#s32) · 33. [Re-intro playbook](#s33)
+28. [Risks](#s28) · 29. [Testing](#s29) · [29.0 Pyramid](#s29-0) · [29.8 Flows](#s29-8) · 30. [Review](#s30) · [30.2 Audit](#s30-2) · [30.5 Locked](#s30-5) · 31. [Design](#s31) · 32. [Ship](#s32) · 33. [Re-intro](#s33)
 
 *Sections 0–33 follow file order top to bottom.*
 
@@ -109,7 +112,7 @@ Part F — Sign-off                (§28–§33)
 
 | Part | Purpose | Read in this order |
 | --- | --- | --- |
-| **A — Decision & scope** | Strategy before code | [1](#s1) · [2](#s2) · [3](#s3) · [4](#s4) · [5](#s5) · [6](#s6) · [30.5](#s30-5) |
+| **A — Decision & scope** | Strategy before code | [5.0 Naming](#s5-0) · [5.4 Subscription](#s5-4) · [1](#s1) · [2](#s2) · [3](#s3) · [3.1](#s3-1) · [4](#s4) · [5](#s5) · [6](#s6) · [30.5](#s30-5) |
 | **B — Product surfaces** | Routes & UX | [7](#s7) · [8](#s8) · [9](#s9) · [10](#s10) · [11](#s11) · [12](#s12) · [13](#s13) |
 | **C — Delivery** | Steps 1–6 + inventories + guards | [14](#s14) · [15](#s15) · [16](#s16) · [17](#s17) · [18](#s18) · [19](#s19) |
 | **D — Platform & data** | Postgres + naming + client contract | [20](#s20) · [20.7](#s20-7) · [21](#s21) · [22](#s22) |
@@ -124,7 +127,7 @@ Part F — Sign-off                (§28–§33)
 | --- | --- |
 | **Product / you** | A → B → [Locked decisions](#s30-5) → F |
 | **Implementing (agent loop)** | Steps 1→6 per [Implementation loop](#s14); commit after each step; push once green at step 6 |
-| **DB cutover (step 5)** | [Baseline squash](#s20-7) → D → [17.5](#s17-5); profile narrow in step 4 first |
+| **DB cutover (step 5)** | [§3.1 checklist](#s3-1) → [Baseline](#s20-7) → [§20.8 truncate](#s20-8) → [§17.5](#s17-5); profile narrow in step 4 first |
 | **Docs / ops** | E → [Docs program](#s26) → [Bruno](#s27) |
 
 <a id="s0-4"></a>
@@ -150,17 +153,17 @@ File order differs from dependency order. For backend work, read:
 **North star (two equal goals):**
 
 1. **Product:** Ship the best **pause ritual** (trigger → `/pause` → reflection → companions).
-2. **Cognitive load:** When you open the repo or Supabase dashboard, it should be obvious **what we ship and why**—everything else is **reference-only legacy** or **removed from Postgres** (pre-launch: **no users**, so we prefer **DROP** over “empty table + manifest”).
+2. **Cognitive load:** When you open the repo or Supabase dashboard, it should be obvious **what we ship and why**—everything else is **reference-only legacy** or **removed from Postgres** (pre-launch: **no production users** — test accounts disposable per §3.1 — so we prefer **DROP** over “empty table + manifest”).
 
 Stats, badges, Tools, and full Journey are **out of the shipped surface** until rebuilt—not hidden behind flags or “dormant but deployed” noise.
 
 **How we preserve work without carrying it in your head:**
 
 1. **Git tag + archive branch** — point-in-time recovery (read, cherry-pick, copy).
-2. **`src/legacy/pre-mvp-full-shell/`** — bulk-moved pre-MVP UI + libs, **not imported**, **excluded** from build.
-3. **`supabase/functions/legacy/pre-mvp-full-shell/`** — non-MVP HTTP edge handlers **removed from `config.toml`** so they **do not deploy** (§17).
-4. **Router as source of truth** — only MVP routes in `App.tsx`.
-5. **Single manifest doc** — [`docs/ops/mvp-active-surface.md`](docs/ops/mvp-active-surface.md) lists active routes, edges, crons, and DB touchpoints (§17.4).
+2. **`src/legacy/full-shell/`** — bulk-moved full-shell UI + libs, **not imported**, **excluded** from build.
+3. **`supabase/functions/legacy/full-shell/`** — undeployed HTTP handlers **removed from `config.toml`** (§17).
+4. **Router as source of truth** — only shipped routes in `App.tsx`.
+5. **Single manifest doc** — [`docs/ops/active-surface.md`](docs/ops/active-surface.md) lists active routes, edges, crons, and DB touchpoints (§17.4).
 6. **Mechanical guardrails** — ESLint import zones, CI grep allowlists, Vitest excludes legacy, slim i18n bundle (§18)—so “folder moved” cannot regress via a stray import.
 
 **“Coming soon” (marketing copy only):** `**[/welcome` Landing](src/pages/Landing.tsx)** feature grid and pricing footnotes—nowhere else in the signed-in app (no Journey teaser card, no in-app badges).
@@ -198,17 +201,40 @@ flowchart TB
     Nav[BottomNav 4 tabs]
     Pause[Pause and companions]
     Archive[Archive]
-    Journey[JourneyMvpOverview]
+    Journey[JourneyOverview]
   end
   subgraph preserve [Preserved - not imported]
-    Tag["git tag full-ia-pre-mvp"]
-    Branch["branch archive/full-ia-pre-mvp"]
-    Legacy["src/legacy/pre-mvp-full-shell/"]
+    Tag["git tag full-ia-pre-strip"]
+    Branch["branch archive/full-ia-pre-strip"]
+    Legacy["src/legacy/full-shell/"]
   end
   Tag --> Legacy
   Branch --> Legacy
   Router --> live
 ```
+
+<a id="s3-1"></a>
+
+### 3.1 Linked data assumption — no production users (locked)
+
+**Reality today:** The linked Supabase project may have **`auth.users` rows** (founder, partner, QA fixtures) — but **no paying customers or real launch cohort**. Every account is **test-only** and **disposable**.
+
+| Implication | What we do |
+| --- | --- |
+| **Aggressive DROP / baseline squash (§20)** | **Proceed** — Tier B drops and `holzen_schema_baseline.sql` may wipe **all** user-linked rows (pauses, profiles, subscriptions snapshot, push tokens, etc.). |
+| **Founder / partner profiles** | **Do not preserve** for cutover — re-sign-up after reset is acceptable. No special-case migrations for your UUIDs. |
+| **Step 5 gate (replaces “`auth.users` = 0”)** | Confirm **no production data you need to keep** (see checklist below). **Do not** block cutover merely because `auth.users` is non-empty. |
+| **Stripe** | Test-mode customers / webhooks only — still run webhook idempotency smoke after reset; no obligation to migrate old test `stripe_customer_id` rows. |
+| **Recovery** | Git tag `full-ia-pre-strip` + archive branch — **schema/code** recovery, not “restore my pause history.” |
+
+**Step 5 checklist (human, ~2 min):**
+
+1. No real customers or paid subs you must keep.
+2. Stripe dashboard: test mode (or accept losing test customer links).
+3. Optional: export anything you want for nostalgia — not required for go-live.
+4. Then: `db reset` / baseline squash / Tier B DROP per §20.7.
+
+**Wording elsewhere in this doc:** “Zero users” means **zero production users**, not an empty `auth.users` table.
 
 <a id="s4"></a>
 
@@ -222,14 +248,16 @@ Optimize: time to completed pause, completion rate, D7 return after first pause.
 
 <a id="s4-2"></a>
 
-### 4.2 Metrics (4–8 weeks)
+### 4.2 Metrics (after publish — no fixed calendar)
+
+Measure from **PostHog cohorts created after** publish + **`telemetry_baseline_at`** (§20.8) for Postgres ops SQL. No target launch week.
 
 
 | Metric                            | Notes                                                |
 | --------------------------------- | ---------------------------------------------------- |
-| Onboarded → first pause completed | Map to existing PostHog events; define funnel in Step 2 |
+| Onboarded → first pause completed | §23.1 funnel in PostHog; not pre-cutover `analytics_events` |
 | D7 retention                      | Cohort with ≥1 completed pause                       |
-| Trial → paid                      | Pause completion as leading indicator                |
+| Trial → paid                      | Pause completion as leading indicator (§5.4)         |
 | Support: “where are stats/tools?” | Landing Coming soon + `/roadmap` link                |
 
 
@@ -247,6 +275,46 @@ Optimize: time to completed pause, completion rate, D7 return after first pause.
 
 ## 5. MVP scope
 
+<a id="s5-0"></a>
+
+### 5.0 Naming — no launch-phase labels in shipped paths (locked)
+
+**Rule:** Anything **users or devs touch** while building or operating the **live product** is named for what it **is**, not for the launch phase (`mvp`, `Mvp`, `MVP`, `PauseFirst`, `pre-mvp`, etc.).
+
+| Surface | In scope for this rule |
+| --- | --- |
+| **Active `src/`** | Components, pages, hooks, `lib/`, routes, tests, i18n keys |
+| **Ops & CI** | Manifest docs, `scripts/*.mjs`, `npm run check:*`, ESLint paths, `package.json` script names |
+| **Agent / repo hygiene** | [`.cursor/rules/*.mdc`](.cursor/rules/), [`AGENTS.md`](AGENTS.md) cross-links, [`src/README.md`](src/README.md) map |
+| **Legacy & edge archive folders** | Bulk-moved reference tree — name the **content** (`full-shell`), not the milestone |
+| **Bruno** | Collection folders devs run daily |
+| **Migrations (new)** | Baseline filename describes schema, not “mvp cutover” |
+| **Commits (this strip)** | Prefer `feat(shell):`, `feat(routes):`, `chore(legacy):` — not `feat(shell):` |
+
+| Avoid (phase label) | Use (product / role name) |
+| --- | --- |
+| `JourneyMvp`, `*Mvp*` components | **`JourneyOverview`**, [`JourneyOverview.tsx`](src/pages/journey/JourneyOverview.tsx) |
+| `journey.mvp.*` locale keys | **`journey.overview.*`** |
+| `active-surface.md`, `check:active-surface` | **[`active-surface.md`](docs/ops/active-surface.md)**, **`check:active-surface`** |
+| `full-shell/` | **`src/legacy/full-shell/`**, **`functions/legacy/full-shell/`** |
+| `bruno/active/` | **`bruno/active/`** |
+| `YYYYMMDD_holzen_schema_baseline.sql` | **`YYYYMMDD_holzen_schema_baseline.sql`** |
+| `RoadmapStub` beside full `Roadmap` | Move stub to legacy; ship **`Roadmap.tsx`** only |
+
+**Narrow exceptions only** (do not extend):
+
+| OK | Why |
+| --- | --- |
+| This file: [`.cursor/plans/pause-first_mvp_launch_09b4d948.plan.md`](.cursor/plans/pause-first_mvp_launch_09b4d948.plan.md) | Historical plan artifact; not imported at runtime |
+| Immutable **git tag** already pushed | If an old tag `full-ia-pre-mvp` exists, **do not delete**; **new** preservation tag = **`full-ia-pre-strip`** only |
+| **Git branch** `feature/mvpPauseCleanup` | Team-chosen integration branch name (§14); not a runtime path — do not copy `mvp` into new file paths |
+| ADR filename date slug | [`docs/decisions/2026-05-16-pause-first-shipped-scope.md`](docs/decisions/2026-05-16-pause-first-shipped-scope.md) — “pause-first” is product direction, not `mvp` token |
+| Prose in plan sections titled “MVP scope” | Planning vocabulary inside this doc only — **not** copied into code paths |
+
+**Verification (Step 3 + Step 6):** `rg -i '(mvp|pre-mvp)' src supabase/functions scripts docs/ops .cursor/rules bruno package.json --glob '!**/.cursor/plans/**' --glob '!**/legacy/**' --glob '!**/migrations-archive/**'` → **zero** hits (except allowed ADR/plan paths above).
+
+**i18n (locked — §18.5):** Shipped English in **`src/locales/en.json`** only. Full pre-strip keys → **`src/legacy/locales/en.full.json`**. No `locales/mvp/` folder.
+
 <a id="s5-1"></a>
 
 ### 5.1 In the live app
@@ -255,8 +323,8 @@ Optimize: time to completed pause, completion rate, D7 return after first pause.
 | Surface                    | Behavior                                                                                                                                 |     |
 | -------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------- | --- |
 | **Home**                   | Onboarding; widgets: goal-why → market → your-pause. No journey-pulse, quick-capture, **night** widget (hide for Pro too—tool-adjacent). |     |
-| **Pause** + **companions** | Unchanged; quality bar. **Deep pause + premium companions Pro gates stay.**                                                              |     |
-| **Archive**                | **Unchanged** (including Pro gate).                                                                                                      |     |
+| **Pause** + **companions** | Ritual quality unchanged. **Engagement** gated by entitlement (§5.4): trial + paid = full ritual; **lapsed** = cannot open/continue active pause until card. |     |
+| **Archive**                | **Always browsable** when signed in (remove Pro paywall). Same for **Journey** overview.                                                    |     |
 | **Journey**                | Single **overview** only—no Coming soon card, no stats/badges (§7).                                                                      |     |
 | **Settings**               | you, companions, notifications, subscription, account.                                                                                   |     |
 | **Landing**                | Pause-led hero; **only surface** with “Coming soon” marketing for deferred features.                                                     |     |
@@ -275,7 +343,7 @@ Optimize: time to completed pause, completion rate, D7 return after first pause.
 
 ### 5.3 Dead URLs — 404 only (no legacy redirects)
 
-**Policy:** The router registers **MVP paths only**. Anything else hits a **single `NotFound`** route — no `Navigate replace`, no “compat” aliases, no `/library` → `/archive` shim. Pre-launch has no users to preserve bookmarks for; redirects add cognitive load (“is this URL still a thing?”).
+**Policy:** The router registers **MVP paths only**. Anything else hits a **single `NotFound`** route — no `Navigate replace`, no “compat” aliases, no `/library` → `/archive` shim. No production users to preserve bookmarks for (§3.1); redirects add cognitive load (“is this URL still a thing?”).
 
 | Path | Behavior |
 | --- | --- |
@@ -288,6 +356,138 @@ Optimize: time to completed pause, completion rate, D7 return after first pause.
 **Remove** from Step 2: `LibraryToArchiveRedirect`, `/journey` → `/journey/stats` redirect, `/journey/:tab` → `/journey` compat routes.
 
 **No** per-surface Coming soon pages in-app.
+
+<a id="s5-4"></a>
+
+### 5.4 Subscription & entitlements (locked — team May 2026)
+
+**Canonical section** for billing product rules. Do **not** maintain a separate plan file — all subscription work is specified here and in cross-linked §7.4, §11, §12, §23, §29.
+
+**North star:** Pay to **do** pauses (start, continue, complete the ritual). **See** your history and rhythm anytime — Archive and Journey stay open without a card.
+
+**Replaces the current model:**
+
+| Today (code) | After launch |
+| --- | --- |
+| Free tier: **3 completed pauses/month** ([`pricing.ts`](src/lib/pricing.ts) `freeReflectionsPerMonth`, [`subscription-snapshot-query.ts`](src/lib/subscription-snapshot-query.ts) client count) | **No perpetual free pause quota** |
+| **Archive Pro paywall** ([`Archive.tsx`](src/pages/Archive.tsx) `!isPro`) | **Archive always available** when signed in |
+| `subscribed` ≈ Stripe `active` \| `trialing` only | Add **`lapsed`** (trial ended, no paid sub) with split **read vs engage** |
+
+#### Entitlement states
+
+```mermaid
+stateDiagram-v2
+  direction LR
+  [*] --> pre_trial: signed_up
+  pre_trial --> trialing: ensure_trial_edge
+  trialing --> active: add_card_subscribe
+  trialing --> lapsed: trial_ends_no_card
+  lapsed --> active: add_card_subscribe
+  active --> lapsed: sub_canceled_or_past_due
+```
+
+| State | User can | User cannot |
+| --- | --- | --- |
+| **`trialing`** (7 days, **no card** at signup) | Full pause ritual (deep pause, companions per existing metered limits), manual + cron-driven pauses, **Archive**, **Journey** | — |
+| **`active`** (paid subscription) | Same as trialing | — |
+| **`lapsed`** (trial ended, no active sub) | **Archive** + **Journey** (read/browse); market monitoring continues; server may **create/update** `pause_instances` in background (volatility cron) | **Enter `/pause`** for a **non-terminal** open instance; **start manual pause** from Home; deep ritual / premium companions without paying (same as today’s non-`subscribed` rules) |
+| **Pre-trial** | Auth + onboarding before Stripe sub exists | Ritual blocked until trial sub created (§5.4 B — end of onboarding) |
+
+#### 7-day trial — implementation (locked: Stripe-native)
+
+| | **A — App-managed trial** (not shipping) | **B — Stripe-native trial** (locked) |
+| --- | --- | --- |
+| **How** | `profiles.trial_*` at signup; no Stripe until checkout | Stripe Subscription with **`trial_period_days: 7`**; profile cache via `check-subscription` + webhook |
+| **Pros** | Trial without Stripe customer | **Stripe-native** + **in-app UX** — no Checkout redirect, no card for trial |
+| **Cons** | Two sources of truth (app dates + Stripe) | New edge + webhook sync; map trial end → **`lapsed`** |
+
+**Locked for implementation:** **Option B — Stripe-native trial** (§30.5). Option A is explicitly **not** shipping.
+
+#### Trial start — in-app, no card, no Checkout redirect (locked)
+
+**Product rule:** Users get **7 days of full pause access without entering a credit card** and **without leaving the app** for Stripe Checkout. Trial still exists as a **Stripe Subscription** in `trialing` (single billing source of truth).
+
+**How (locked):** new edge **`ensure-trial-subscription`** (**Step 4** — deploy + `config.toml` + `EdgeCoverage` in same commit as onboarding):
+
+1. Authenticated user finishes onboarding → client calls `invokeEdge('ensure-trial-subscription')` (not `create-checkout`).
+2. Edge (service role): find-or-create Stripe Customer by email → `subscriptions.create` with `trial_period_days: 7`, **no default payment method**; **`trial_settings.end_behavior: 'cancel'`** (locked — trial ends without card → canceled sub → **`lapsed`** in Holzen; do not use `pause` without an explicit product decision).
+3. **Idempotent:** if user already has `trialing`/`active` sub, return success + current entitlement (no second sub).
+4. Edge writes `profiles.subscription_status = 'trialing'`, `subscription_tier`, `subscription_end` / trial end from Stripe; returns `{ entitlement: 'trialing', can_engage_pause: true, trial_ends_at }`.
+5. Client: `has_onboarded: true` → navigate to **Home** — user never sees Stripe hosted Checkout for trial.
+
+**Do not use for trial start:** [`create-checkout`](supabase/functions/create-checkout/index.ts) / `startCheckout()` — even with `payment_method_collection: 'if_required'`, Checkout **redirects** users to Stripe’s page. That is **out of scope** for trial activation.
+
+**Reactivation (after trial / lapsed):** Settings + Home + blocked `/pause` → **`create-checkout` only here** — `payment_method_collection: 'always'`, body flag `reactivation: true` → user adds card → `active`. Reuse existing `/?subscribed=true` return + [`CheckoutConfirmation.tsx`](src/components/CheckoutConfirmation.tsx).
+
+#### Onboarding change (Step 4)
+
+Replace today’s [`Onboarding.tsx`](src/components/Onboarding.tsx) `onStartTrial` → `startCheckout()` with **`ensureTrial()`** hook calling the new edge. Remove **`onBeginFree`**. Flow stays in-app; **F1** mocks edge success → Home with `trialing`.
+
+#### API contract (`check-subscription` + client)
+
+Extend JSON (names illustrative — align types in Step 5):
+
+- `entitlement`: `trialing` \| `active` \| `lapsed`
+- `trial_ends_at`: ISO string \| null (from Stripe `subscription.trial_end` — already returned by `check-subscription` as `trial_end`)
+- `can_engage_pause`: boolean (`trialing` \| `active`)
+- **`subscribed` (backward compat):** map to **`can_engage_pause`** (i.e. `trialing` **or** `active`) — **not** `entitlement === 'active'` only, or trialing users break on legacy call sites. Prefer new code paths use `can_engage_pause` / `entitlement` only; remove `subscribed` when grep-clean.
+
+**Remove:** client-side monthly pause count for free tier in [`subscription-snapshot-query.ts`](src/lib/subscription-snapshot-query.ts) (completed `pause_instances` count when not subscribed).
+
+**Replace** [`home-subscription-gate.ts`](src/lib/home-subscription-gate.ts) `monthlyRemaining` / `hasAccess` with **`canEngagePause`** (and keep metered companion limits from existing subscription payload).
+
+#### UX by surface
+
+| Surface | Rule |
+| --- | --- |
+| **Home** | If `can_engage_pause`: scheduling + empty flow. If `lapsed`: explain trial ended + CTA to add card (no “3 free pauses used”). |
+| **`/pause`** | Route guard: `lapsed` + open instance → reactivation screen (not ritual steps). |
+| **Archive** | Remove `useProGate()` paywall wrapper — all signed-in users. |
+| **Journey** | Same; Archive CTA always “Open your pause library” → `/archive` (§7.4). |
+| **Landing / Settings** | Trial-first: “7 days free, no card” → “Add card to continue pauses”; drop “free forever / N pauses per month”. |
+| **Notifications** | §17.5 backfill: `action_path` to pause only when `can_engage_pause`; otherwise reactivation or read-only routes. |
+
+#### Server enforcement (required)
+
+Client gates are not enough. When `lapsed`:
+
+- Block pause **ritual RPCs** / step logging / `holzen-reflect` + `companion-orchestrate` for that user (standard `EdgeError` / RLS).
+- **Allow** read queries Archive/Journey use (`pause_instances`, collections, completed artifacts).
+
+#### Postgres & edges (Step 5 — Stripe-native; no `trial_*` columns)
+
+**Do not add** `profiles.trial_started_at` / `trial_ends_at`. Trial clock lives on **Stripe Subscription**; cache on existing columns: `subscription_status`, `subscription_end`, `subscription_checked_at` ([`check-subscription`](supabase/functions/check-subscription/index.ts) already writes these).
+
+| Item | Action |
+| --- | --- |
+| **`lapsed` mapping** | **Locked:** persist `profiles.subscription_status = 'lapsed'` when Stripe customer exists but no `trialing`/`active` sub (trial ended canceled, `unpaid`, `incomplete_expired`, etc.). `check-subscription` + webhook both write cache. |
+| **`free` vs `lapsed`** | `subscription_status = 'free'` only when **no Stripe customer** or never had a subscription — maps to API `entitlement: 'pre_trial'`. Do not use `free` for post-trial users. |
+| **`entitlement` JSON** | `trialing` ← Stripe `trialing`; `active` ← Stripe `active`; `lapsed` ← cached `lapsed`; `pre_trial` ← `free`/no customer |
+| **`user_can_engage_pause`** | `SECURITY DEFINER` helper: `lifetime_access` **OR** `subscription_status IN ('trialing','active')` on `profiles` (service-written only) |
+| **Pause RPCs** | Call helper at top of engage RPCs (`pause_log_step`, `pause_create_or_reuse`, …) |
+| **`ensure-trial-subscription`** | **New** edge (**Step 4**): idempotent; `withRequestLogging`; `[functions.ensure-trial-subscription]` in `config.toml`; `EdgeCoverage.tsx`; `check:invoke-edge-allowlist`; Bruno `billing/ensure-trial` |
+| **`create-checkout`** | **Reactivation only** — `payment_method_collection: 'always'` when `reactivation: true`; **remove** default `trial_period_days: 7` from subscription checkout (trial is not created here) |
+| **`stripe-webhook`** | **Extend** Step 5: `customer.subscription.created/updated/deleted`, `checkout.session.completed` (paid reactivation), optional `trial_will_end` → update `profiles.subscription_*` |
+| **Onboarding** | End of 2-step flow → **`ensure-trial-subscription`** only — **F1** mocks in-app success (no redirect) |
+| **Cron** | Optional safety net: nightly `check-subscription`-style sweep for stale cache — **not** a second trial clock |
+
+No migration required for trial columns; optional: allow `subscription_status = 'lapsed'` in CHECK constraint if one exists. Document mapping table in [`active-surface.md`](docs/ops/active-surface.md) + [event-taxonomy.md](docs/ops/event-taxonomy.md).
+
+#### Step mapping
+
+| Step | Subscription work |
+| --- | --- |
+| **2** | Types + `canEngagePause` in route manifest; remove Archive paywall; `/pause` lapsed shell; decision doc § billing (no copy sweep yet — §12.4 is Step 4) |
+| **4** | **`ensure-trial-subscription`** + [`use-subscription.ts`](src/hooks/use-subscription.ts) `ensureTrial()` + `entitlement`/`can_engage_pause`; 2-step onboarding; Home/Pause/Settings; **§12.4** + slim `en.json`; remove `onBeginFree` |
+| **5** | §5.4 `lapsed` mapping; **stripe-webhook**; reactivation `create-checkout`; `user_can_engage_pause` + RPC guards; profile DROPs; §23 events |
+| **6** | §29 entitlement matrix tests; Bruno billing smoke |
+
+#### Explicit removals (do not ship)
+
+- “3 free pauses per month forever” copy ([`en.json`](src/locales/en.json) `landing.pricingDesc`, `home.subscription.*`).
+- Client **monthly pause quota** path: [`subscription-snapshot-query.ts`](src/lib/subscription-snapshot-query.ts) completed-pause count + [`pricing.ts`](src/lib/pricing.ts) `freeReflectionsPerMonth` — remove or gate to legacy (Step 4).
+- Journey/Archive **free vs Pro** upsell CTAs tied to Archive access (§7.4 old table).
+- A **second** subscription plan document — this §5.4 is the only owner.
 
 ---
 
@@ -303,6 +503,11 @@ Optimize: time to completed pause, completion rate, D7 return after first pause.
 - Keeping “dormant” stats/tools **routes** or **hooks** in active tree “for later” (move to legacy; port back deliberately)
 - `VITE_MVP` build-time fork that hides half the app in one bundle (same cognitive problem as a flag)
 - **Legacy URL redirects** (`/library` → `/archive`, `/journey/stats` → `/journey`, bookmark `Navigate replace`) — **404 only**; see §5.3
+- **Launch-phase tokens in shipped paths** — no `mvp` / `Mvp` / `pre-mvp` in active code, ops manifests, CI scripts, or legacy folder names (§5.0)
+- **Perpetual free pause tier** (3/month) or **Archive paywall** — see §5.4
+- **Separate “subscription model” plan file** — subscription rules live only in this plan (§5.4)
+- **Stripe Checkout redirect to start trial** — trial starts only via `ensure-trial-subscription` (§5.4)
+- **Fat `en.json` + prefix denylist i18n check (Option B)** — use slim `en.json` + legacy full locales only (§18.5)
 
 ---
 
@@ -325,10 +530,10 @@ Optimize: time to completed pause, completion rate, D7 return after first pause.
 
 | Route      | Component            |
 | ---------- | -------------------- |
-| `/journey` | `JourneyMvpOverview` |
+| `/journey` | `JourneyOverview` |
 
 
-Update [App.tsx](src/App.tsx): **delete** `/journey` → `/journey/stats` redirect, `LibraryToArchiveRedirect`, `/journey/:tab` compat routes, and tabbed `Profile` route; register **only** `/journey` → `JourneyMvpOverview`.
+Update [App.tsx](src/App.tsx): **delete** `/journey` → `/journey/stats` redirect, `LibraryToArchiveRedirect`, `/journey/:tab` compat routes, and tabbed `Profile` route; register **only** `/journey` → `JourneyOverview`.
 
 [BottomNav](src/components/BottomNav.tsx): Journey tab `to="/journey"` (not `/journey/stats`).
 
@@ -341,7 +546,7 @@ Update [App.tsx](src/App.tsx): **delete** `/journey` → `/journey/stats` redire
 
 | Block       | Implementation                                                                                                                                                                                                                |
 | ----------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Subtitle    | `journey.mvp.subtitle` — habit focus only (e.g. “Your pause rhythm”).                                                                                                                                                         |
+| Subtitle    | `journey.overview.subtitle` — habit focus only (e.g. “Your pause rhythm”).                                                                                                                                                         |
 | Streak      | New `JourneyStreakCard` in active `src/components/journey/` — logic **ported** from legacy `StreakTimeline` (do not import legacy). Data: minimal `pause_instances` fetch in `src/lib/journey/` (not `use-pause-stats-data`). |
 | Totals      | [getCompletedPauseCountQueryOptions](src/lib/completed-pause-count-query.ts); optional “this week” from same data.                                                                                                            |
 | Archive CTA | See §7.4 — **only** secondary action on this screen.                                                                                                                                                                          |
@@ -353,16 +558,15 @@ Update [App.tsx](src/App.tsx): **delete** `/journey` → `/journey/stats` redire
 
 ### 7.4 Archive CTA — product rule (required)
 
-Archive is **Pro-gated** today. Do **not** use “Browse your pauses” for free users.
+Align with §5.4 — **no Pro paywall on Archive**. Journey is the **habit** surface; Archive is **read/browse** for every signed-in user (`active`, `trialing`, `lapsed`).
 
 
-| User | CTA                                                                             |
-| ---- | ------------------------------------------------------------------------------- |
-| Free | “Save and revisit pauses with Pro” → subscription or `/archive` knowing paywall |
-| Pro  | “Open your pause library” → `/archive`                                          |
+| Entitlement | CTA |
+| --- | --- |
+| **Any signed-in** (including `lapsed`) | “Open your pause library” → `/archive` (readable; ritual still gated elsewhere per §5.4) |
+| **Anonymous** | N/A — Journey is behind auth |
 
-
-Implement in `JourneyMvpOverview` via `useProGate()`.
+**Do not** use `useProGate()` on this CTA. **Do not** use “Save and revisit pauses with Pro” or paywall copy here.
 
 ---
 
@@ -391,15 +595,17 @@ No code changes to [Archive.tsx](src/pages/Archive.tsx) in the MVP strip unless 
 
 ## 10. Onboarding
 
+**Today (pre-strip):** 5 steps in [`Onboarding.tsx`](src/components/Onboarding.tsx) ending in `OnboardingReady` with `onStartTrial` → `startCheckout()` (already Stripe-native). **Step 4** collapses to:
+
 
 | Step | Component                                                        |
 | ---- | ---------------------------------------------------------------- |
 | 1    | `OnboardingThreshold`                                            |
 | 2    | New `OnboardingPersonalizeOptional` (Why + Grounding, skippable) |
-| Done | “Start your first pause” → `/pause`; `has_onboarded: true`       |
+| Done | **Start 7-day trial** → `invokeEdge('ensure-trial-subscription')` — **no redirect, no card**; then `has_onboarded: true` → Home (`trialing`) |
 
 
-Move `OnboardingReady`, `OnboardingCommitment` to legacy folder; no Stripe in onboarding.
+Move legacy onboarding steps to `src/legacy/`. **Remove `onBeginFree`**. **Do not** use `startCheckout()` for trial (§5.4).
 
 ---
 
@@ -413,7 +619,7 @@ Move hub entries for `reflection`, `experience` off the hub list (sections can m
 
 `/settings/reflection` (and other removed hub sections): **not** in router — direct URL → `NotFound` (§5.3). Hub list omits those entries only.
 
-**Paywall honesty:** Subscription copy lists only what MVP ships: unlimited pauses, deep ritual, companions, **Archive (Pro)**. Mark stats/tools/insights as roadmap, not included today.
+**Paywall honesty (§5.4):** **7-day trial, no card** → then **paid to engage pauses**. Archive + Journey stay available when lapsed. List what trial includes (full ritual, companions within limits). Mark stats/tools/insights as roadmap, not included today. Remove “N free pauses per month forever”.
 
 ---
 
@@ -432,7 +638,34 @@ Only `[Landing.tsx](src/pages/Landing.tsx)` + `landing.`* locales may use Coming
 - Tools hub (breathe, ground, journal, letters, practice)  
 - Journey insights / activity (if mentioned on landing today)
 
-Pause, companions, Archive (as Pro benefit), and pricing for **what ships** stay prominent.
+Pause, companions, **Archive + Journey always available when signed in**, and pricing for **trial → paid ritual** (§5.4) stay prominent. No “3 free pauses/month forever”.
+
+<a id="s12-4"></a>
+
+### 12.4 Copy migration — trial messaging (Step 4, required)
+
+Update **slim** [`src/locales/en.json`](src/locales/en.json) (§18.5). Full strings move to `src/legacy/locales/` for archived UI. **Messaging rules:**
+
+| Say | Do not say |
+| --- | --- |
+| **7-day free trial, no credit card** | “Free forever”, “N pauses per month free”, “unlimited free pauses” |
+| **After trial: add a card to keep pausing** | “Upgrade to Pro for Archive” (Archive is not paywalled) |
+| **Archive & Journey always available** (when signed in) | “Pro library”, “insights included in trial” if insights are Coming soon |
+
+**Keys to rewrite (grep `freeReflectionsPerMonth`, `free forever`, `pricingDesc`):**
+
+| Namespace / key | Step | Intent |
+| --- | --- | --- |
+| `landing.pricingDesc`, `landing.freeToStart`, `landing.noCreditCard` | 4–5 | Hero/pricing: trial-first, no card, paid after 7 days |
+| `landing.faq.*` (especially `valueAnswer`, any `freeAnswer`) | 5 | Remove free-tier pause quota claims |
+| `home.subscription.monthlyLimitReached`, `upgradeToPro` | 4 | Lapsed / reactivation copy, not “free pauses used” |
+| `onboarding.*` (final CTA) | 4 | “Start your 7-day trial” (in-app), not “checkout” |
+| `settings.subscription.*` / `pro.upgradeDesc` | 4 | Trial status + “Add card before {{date}}” / reactivation |
+| [`Landing.tsx`](src/pages/Landing.tsx) hardcoded strings | 4 | Align with keys above |
+| [`Auth.tsx`](src/pages/Auth.tsx) / welcome CTAs | 4 | Sign-up path promises trial (no card), not free-tier quota |
+| [`SmokeTest.tsx`](src/pages/SmokeTest.tsx) | 4–6 | Add manual step: `ensure-trial-subscription` → `trialing` (replace checkout-only trial path) |
+
+**Also update (same PR as copy):** [`docs/ops/event-taxonomy.md`](docs/ops/event-taxonomy.md) (`trial.started`, `trial.expired`, `paywall.*`); [`docs/systems/costs/pricing-strategy.md`](docs/systems/costs/pricing-strategy.md) (Step 5). **PostHog:** `trial.started` with `source: 'ensure_trial'` (not `checkout`).
 
 <a id="s12-2"></a>
 
@@ -465,7 +698,20 @@ Skim [Terms](src/pages/Terms.tsx) vs landing Coming soon claims (Step 5).
 
 ## 14. Implementation loop (single branch, commit-as-you-go)
 
-**Not separate PRs.** Work on **`cursor/pause-v2-final`** in **dependency order** (steps 1→6). An agent (or you) completes each step, runs the step gate, **commits**, then continues. **Push** when step 6 is green (or when you want a remote backup)—not one GitHub PR per step unless you split manually for review.
+**Not separate PRs.** Branch from **`main`**, integrate on **`feature/mvpPauseCleanup`**, in **dependency order** (steps 1→6). An agent (or you) completes each step, runs the step gate, **commits**, then continues. **Push** when step 6 is green (or when you want a remote backup)—not one GitHub PR per step unless you split manually for review.
+
+<a id="s14-0"></a>
+
+### 14.0 Branch (locked)
+
+```text
+git checkout main && git pull
+git checkout -b feature/mvpPauseCleanup   # or checkout existing
+# … steps 1–6 …
+# open PR: feature/mvpPauseCleanup → main
+```
+
+**Note:** [AGENTS.md](AGENTS.md) mentions `cursor/pause-v2-final` for older Pause V2 IA work — **this strip uses `feature/mvpPauseCleanup` from `main`** only.
 
 <a id="s14-1"></a>
 
@@ -478,12 +724,43 @@ LOOP until step 6 done:
   3. Gate: npm run test (+ build/lint/checks listed for step)
   4. git commit (feat/fix/docs scope): one clear message per step
   5. If blocked, fix in branch — do not skip dependencies
-END → §25.9 deploy (push, Lovable publish)
+END → §14.3 repo consistency gate → §25.9 deploy (push, Lovable publish)
 ```
 
-**Commits:** Use conventional messages (`feat(mvp):`, `fix(mvp):`, `chore(mvp):`). Multiple commits *within* a large step are OK (e.g. step 3: legacy move, then edge undeploy)—but **do not** start step 5 (DB) before step 4 lands `profile-row-query` narrow.
+**Commits:** Use conventional messages (`feat(shell):`, `fix(shell):`, `chore(shell):`). Multiple commits *within* a large step are OK (e.g. step 3: legacy move, then edge undeploy)—but **do not** start step 5 (DB) before step 4 lands `profile-row-query` narrow.
 
-**Anti-patterns:** Parallel “PR branches”; step 5 migration before step 3 edge undeploy; step 5 before step 4 profile SELECT narrow.
+**Anti-patterns:** Parallel integration branches; step 5 migration before step 3 edge undeploy; step 5 before step 4 profile SELECT narrow; **push without §14.3** after Step 6.
+
+<a id="s14-3"></a>
+
+### 14.3 Repo consistency gate (Step 6 — run before push)
+
+**Goal:** After steps 1–6, run **every check script the repo exposes** so types, edges, migrations, release stamp, and tests agree. Canonical narrative: [deployment-sync-guide.md](docs/ops/deployment-sync-guide.md). Treat failures as **blockers** — fix and re-run, do not “ship and fix later.”
+
+**Order (single session before `git push`):**
+
+| # | Command | When required |
+| --- | --- | --- |
+| 1 | `npm run test` | Always |
+| 2 | `npm run check:active-surface` | After Step 3 (wire in `test:ci` when script lands) |
+| 3 | `npm run check:invoke-edge-allowlist` | After Step 3 |
+| 4 | `npm run check:edge-logging` | Always (in `test:ci`) |
+| 5 | `npm run check:edge-coverage-manifest` | Always (in `test:ci`) |
+| 6 | `npm run test:ci` | **Full CI gate** — superset of Vitest + edge manifest/logging |
+| 7 | `npm run build` | Always (`prebuild` → `check:version-sync`) |
+| 8 | `npm run lint` | Touched files minimum; whole-repo optional if noisy |
+| 9 | `npm run check:view-migrations` | Step 5+ if any migration added/changed |
+| 10 | `npm run check:edge` | If Deno installed (skip OK locally; run before high-stakes push) |
+| 11 | `npm run gen:types` | After Step 5 schema; commit `types.ts` if diff |
+| 12 | `npm run stamp:release` | Before push; commit `release.ts` if updated |
+| 13 | `npm run check:release-stamp` | Confirm stamp matches `git rev-parse --short=12 HEAD` |
+| 14 | `npm run check:prepush` | If **bash** available (Git Bash / WSL) — scripted bundle of the above |
+| 15 | §5.0 `rg` naming audit | Zero `mvp`/`pre-mvp` in active paths (see §5.0 verification) |
+| 16 | `npm run design:lint` | Optional — if `DESIGN.md` / Nox tokens touched in Step 5–6 |
+
+**After push (not npm):** Lovable secrets per deployment guide · migrations green on linked project · **Publish → Update** for frontend · Bruno smoke from `bruno/active/` if you changed edges.
+
+**Step 6 is not done** until §14.3 passes **and** §29 unit + **F1–F9** flow integration bars are satisfied (add tests in Steps 2–6 if gaps remain).
 
 <a id="s14-2"></a>
 
@@ -492,14 +769,14 @@ END → §25.9 deploy (push, Lovable publish)
 
 | Step | Scope (finish before next step) | Gate (minimum) |
 | --- | --- | --- |
-| **1 — Preserve** | Tag `full-ia-pre-mvp`; branch `archive/full-ia-pre-mvp`; `src/legacy/README.md`; [`src/README.md`](src/README.md) stub | Tag exists; READMEs committed |
-| **2 — MVP shell** | Router, BottomNav, `JourneyMvpOverview`, slim `app-routes`, pause exits (§18.4), 404 + analytics, decision doc, `mvp-active-surface.md` stub | `npm run test` |
-| **3 — Legacy + edges** | §16.2 bulk moves; tsconfig/vitest exclude; §18.2 ESLint + `check:mvp-surface`; §17.2 undeploy + §17.6 `_shared/legacy`; Bruno `mvp/`; EdgeCoverage trim | `npm run test` · `check:mvp-surface` · `check:edge-coverage-manifest` |
-| **4 — Surfaces** | Home/onboarding/settings/admin; **profile-row-query narrow**; HomePauseEmptyFlow; i18n Option A (§18.5) | `npm run test` · lint touched files |
-| **5 — Cutover + marketing** | §20.7 baseline squash (or tail cutover); §17.5 crons/triggers; `delete-account`; roadmap seed; landing; §31 design; §23 analytics; manifest + AGENTS + cursor rule; `gen:types` | `npm run test` · `npm run build` · `check:view-migrations` |
-| **6 — Ship** | Flow-first QA (§29); §26 docs/runbook; observability trim; optional bundle grep; `stamp:release` | Full §25.9 checklist |
+| **1 — Preserve** | Tag `full-ia-pre-strip`; branch `archive/full-ia-pre-strip`; `src/legacy/README.md`; [`src/README.md`](src/README.md) stub | Tag exists; READMEs committed |
+| **2 — Shipped shell** | Router, BottomNav, `JourneyOverview`, slim `app-routes`, pause exits (§18.4), 404 + analytics, decision doc, `active-surface.md` stub; **§29.8** harness + **F8** (+ start **F3/F6**) | `npm run test` |
+| **3 — Legacy + edges** | §16.2 bulk moves; tsconfig/vitest exclude; §18.2 ESLint + `check:active-surface`; §17.2 undeploy + §17.6 `_shared/legacy`; Bruno `active/`; EdgeCoverage trim | `npm run test` · `check:active-surface` · `check:edge-coverage-manifest` |
+| **4 — Surfaces** | **`ensure-trial-subscription`** + 2-step onboarding; §12.4 copy + slim `en.json`; Home/settings/admin; profile narrow; **§29.8** **F1–F7** | `npm run test` · `check:edge-coverage-manifest` · lint touched |
+| **5 — Cutover + marketing** | §20.7 baseline squash; §20.8 telemetry; §5.4 Stripe lapsed + webhook; §17.5 crons/triggers; `delete-account`; roadmap seed; landing; §31 design; §23 analytics; manifest + AGENTS + cursor rule; `gen:types` | `npm run test` · `npm run build` · `check:view-migrations` |
+| **6 — Ship** | Flow-first QA (§29); §29.7 core tests; §26 docs/runbook; observability trim; optional bundle grep; **§14.3 full repo gate** | §14.3 green · §25.9 deploy |
 
-**Target soft launch ~2026-06-06** — steps 1–5 are sequential work; step 6 includes QA buffer before publish.
+**No calendar launch date** — steps 1–5 are sequential work; step 6 is QA + §14.3 + publish when green (§25.9), not tied to a target week.
 
 ---
 
@@ -510,12 +787,12 @@ END → §25.9 deploy (push, Lovable publish)
 
 | Step | Frontend                                                                                               | Backend / ops                                                         |
 | --- | ------------------------------------------------------------------------------------------------------ | --------------------------------------------------------------------- |
-| 1 | `src/README.md` stub; legacy README                                                                    | Tag `full-ia-pre-mvp` + `archive/full-ia-pre-mvp`                     |
+| 1 | `src/README.md` stub; legacy README                                                                    | Tag `full-ia-pre-strip` + `archive/full-ia-pre-strip`                     |
 | 2 | §7 Journey; route manifest; §18.4 pause exits; decision doc; manifest stub | —                                                                     |
-| 3 | §16.2 legacy; §18.2 CI; **§27 Bruno** `mvp/` + `legacy/`                                               | §17.2 edge undeploy; **§17.6 `_shared/legacy` strip**; EdgeCoverage trim |
-| 4 | §9–§11; **profile-row-query narrow**; HomePauseEmptyFlow; admin slim; i18n MVP (Option A)              | —                                                                     |
-| 5 | §12 landing; §31 design; §23 analytics; **delete-account**; Roadmap route                         | **§20.7 baseline squash**; roadmap seed; **§17.5**; `gen:types`      |
-| 6 | §26 docs/README; §25.9 launch runbook; flow-first QA; observability trim                             | Push; Lovable publish; `stamp:release`                                      |
+| 3 | §16.2 legacy; §18.2 CI; **§27 Bruno** `active/` + `legacy/`                                               | §17.2 edge undeploy; **§17.6 `_shared/legacy` strip**; EdgeCoverage trim |
+| 4 | §9–§11; §12.4; 2-step onboarding + `ensureTrial`; `use-subscription` entitlement; profile narrow; admin slim; §18.5 | **Deploy** `ensure-trial-subscription`; `config.toml`; `check:edge-coverage-manifest`; `check:invoke-edge-allowlist` |
+| 5 | §12 landing; §31 design; §23 analytics; **delete-account**; Roadmap route                         | **§20.7** squash; **§20.8** telemetry; **§5.4** Stripe + RPC guards; **§17.5**; `gen:types` |
+| 6 | §26 docs; §25.9; §14.3 gate; §29 F1–F9; observability trim                                          | Push; Lovable publish (§32 defers detail to §14.3)                          |
 
 
 ---
@@ -539,18 +816,18 @@ END → §25.9 deploy (push, Lovable publish)
 | **Router / shell** | `App.tsx`, `AppLayout.tsx`, `BottomNav.tsx`, `NotFound.tsx`, `app-routes.ts` (slimmed) | Defines live product |
 | **Home** | `pages/Home.tsx`, pause widgets, market, `HolzenNumber.tsx`, `use-holzen.tsx` (trimmed) | Pause entry |
 | **Pause + companions** | `pages/PauseSession.tsx`, `components/pause/*`, `use-companion-data.ts`, `lib/pause-*.ts` | Core ritual |
-| **Archive** | `pages/Archive.tsx`, `hooks/use-library.ts` → rename `use-collections.ts` (§21) | Pro depth |
-| **Journey MVP** | `pages/journey/JourneyMvpOverview.tsx`, `components/journey/JourneyStreakCard.tsx`, `lib/journey/*` | Overview only |
+| **Archive** | `pages/Archive.tsx`, `hooks/use-library.ts` → rename `use-collections.ts` (§21) | Browse for all signed-in (§5.4; no Pro gate) |
+| **Journey** | `pages/journey/JourneyOverview.tsx`, `components/journey/JourneyStreakCard.tsx`, `lib/journey/*` | Overview only (§5.0) |
 | **Settings** | `pages/Settings.tsx`, `settings/*`, `use-profile.ts`, `profile-row-query.ts` (narrowed Step 4) | Hub |
 | **Onboarding** | `pages/Onboarding*.tsx` (2-step flow) | Activation |
 | **Auth / billing** | `use-auth.tsx`, `use-subscription.ts`, Stripe pages | Platform |
 | **Public** | `Landing.tsx`, `Roadmap.tsx`, `Auth.tsx`, legal/blog | Marketing |
-| **Admin (slim)** | `Admin.tsx`, `EdgeCoverage.tsx` (MVP list), `SmokeTest.tsx` (trimmed) | Ops |
-| **Shared** | `components/ui/*`, `FeedbackWidget`, `NotificationBell`, i18n MVP bundle | Chrome |
+| **Admin (slim)** | `Admin.tsx`, `EdgeCoverage.tsx` (shipped list), `SmokeTest.tsx` (trimmed) | Ops |
+| **Shared** | `components/ui/*`, `FeedbackWidget`, `NotificationBell`, slim `en.json` (§18.5) | Chrome |
 
 <a id="s16-2"></a>
 
-### 16.2 Move to `src/legacy/pre-mvp-full-shell/` (bulk Step 3)
+### 16.2 Move to `src/legacy/full-shell/` (bulk Step 3)
 
 Preserve relative paths under legacy root. **tsconfig** + **vitest** exclude `src/legacy/**`.
 
@@ -561,14 +838,14 @@ Preserve relative paths under legacy root. **tsconfig** + **vitest** exclude `sr
 | **Profile / gamification** | `pages/Profile.tsx`, `lib/badges/**`, `lib/stats/**`, `use-badge-sync.ts`, `use-pause-stats-data.ts`, `pause-stats-data-query.ts`, `pause-score*.ts` |
 | **Widgets / hooks** | journey-pulse, quick-capture, night widgets; `useToolsHubData`; `PauseDoneBriefJourneyRecap.tsx` |
 | **Libs** | `guided-journal-*`, `grounding-enrichment-query`, `demo-fixture.ts` (or pause-only demo — §25.5), tools-hub-practice-suggestions |
-| **Locales** | Full `en.json` → `legacy/locales/en.full.json` if using Option A (§18.5) |
+| **Locales** | All non-shipped locale files → `src/legacy/locales/` (§18.5); active app uses slim `src/locales/en.json` only |
 
 <a id="s16-3"></a>
 
 ### 16.3 Step 3 verification
 
-- `npm run check:mvp-surface` (forbidden imports/paths)
-- `npm run check:mvp-invoke-edge` (allowlisted `invokeEdge` names)
+- `npm run check:active-surface` (forbidden imports/paths)
+- `npm run check:invoke-edge-allowlist` (allowlisted `invokeEdge` names)
 - Vitest `exclude: ['src/legacy/**']`
 - ESLint `no-restricted-imports` for `@/legacy/**` and retired paths (§18.2)
 - Optional Step 6: bundle grep for `BadgesPanelV2`, `ToolsHub` strings (§18.2)
@@ -583,9 +860,9 @@ It was a **risk-minimization** default: undeploying an edge or dropping a table 
 
 **Your goal is different:** *clean separation of what we ship vs reference.* The plan now matches that.
 
-| Layer | Pre-launch (zero users) | What we do |
+| Layer | Pre-launch (no production users — §3.1) | What we do |
 | --- | --- | --- |
-| **Frontend `src/`** | Yes | `src/legacy/pre-mvp-full-shell/`, tsconfig exclude |
+| **Frontend `src/`** | Yes | `src/legacy/full-shell/`, tsconfig exclude |
 | **Edge HTTP handlers** | Yes | Undeploy non-MVP; move folders to `functions/legacy/` |
 | **`_shared/` helpers** | **Yes — strip** | Move legacy-only modules to `_shared/legacy/`; trim dead branches in modules MVP edges still import (§17.6) |
 | **SQL migration files** | Do not delete/reorder applied files | **§20.7 baseline squash** (locked) or tail cutover fallback |
@@ -593,20 +870,22 @@ It was a **risk-minimization** default: undeploying an edge or dropping a table 
 
 <a id="s17-1"></a>
 
-### 17.1 MVP edge deploy list (Step 3 — `config.toml` + production)
+### 17.1 MVP edge deploy list (`config.toml` + production)
+
+**Step 3** — trim undeployed legacy functions; **Step 4** — add **`ensure-trial-subscription`** (new file + `[functions.*]` + `EdgeCoverage` + `check:edge-coverage-manifest`).
 
 **Keep deployed** (HTTP + crons MVP needs):
 
 | Group | Functions |
 | --- | --- |
 | **Pause / AI** | `holzen-reflect`, `companion-orchestrate`, `pregenerate-companions` |
-| **Billing** | `check-subscription`, `create-checkout`, `customer-portal`, `stripe-webhook`, `retry-flex-credit`, `list-checkout-events`, `notify-checkout-confirmation` |
+| **Billing** | `check-subscription`, **`ensure-trial-subscription`** (Step 4), `create-checkout`, `customer-portal`, `stripe-webhook`, `retry-flex-credit`, `list-checkout-events`, `notify-checkout-confirmation` |
 | **Platform** | `health`, `register-push`, `delete-account`, `send-feedback`, `holzen-number`, `record-referral`, `process-referral-pending` |
 | **Email** | `process-email-queue`, `send-transactional-email`, `preview-transactional-email`, `handle-email-unsubscribe`, `handle-email-suppression`, `auth-email-hook` |
 | **Crons** | `check-volatility`, `refresh-btc-prices` (optional `backfill-btc-prices`, `seed-btc-history` under ops) |
 | **Admin** | `admin-check-stripe-prices` (slim admin); `ai-cost-alert` optional |
 
-**Undeploy + move to `supabase/functions/legacy/pre-mvp-full-shell/`:**
+**Undeploy + move to `supabase/functions/legacy/full-shell/`:**
 
 `badge-notify`, `reflection-insights`, `journal-prompt`, `deliver-letters`, `night-reflection`, `weekly-digest`, `monthly-report`, `personalized-nudge`, `generate-wallpaper`, `suggest-grounding`, `suggest-ritual`, `grounding-enrich`, `fetch-source-feeds`, `admin-library-preview`
 
@@ -616,7 +895,7 @@ Update [`EdgeCoverage.tsx`](src/pages/EdgeCoverage.tsx) to MVP list only. `npm r
 
 ### 17.2 Edge legacy moves (Step 3)
 
-1. `git mv supabase/functions/<name>` → `functions/legacy/pre-mvp-full-shell/<name>` for each undeployed handler.
+1. `git mv supabase/functions/<name>` → `functions/legacy/full-shell/<name>` for each undeployed handler.
 2. Remove `[functions.<name>]` blocks from `config.toml` (same step 3 commit).
 3. Add [`supabase/functions/legacy/README.md`](supabase/functions/legacy/README.md) with restore steps.
 4. `scripts/check-edge.mjs`: exclude `functions/legacy/**` from `deno check`.
@@ -629,23 +908,23 @@ Move legacy-only modules to `supabase/functions/_shared/legacy/` (feed-ingest, b
 
 <a id="s17-6-3"></a>
 
-#### 17.6.3 Step 5 companion rename follow-up
+#### 17.6.3 Step 5 companion cache-only follow-up (§20.4.1)
 
-After `companion_catalog` / `opening_message` migration: rename `_shared/content-library.ts` → `companion-catalog.ts`; grep `serve_source = 'library'` → `'catalog'`.
+Remove library phase from generators; move `_shared/content-library.ts` to `_shared/legacy/`; grep zero `searchLibrary` / `content_library` in active `_shared`. Same commit: `opening_message` rename (§21.2) — **no** `companion_catalog` table.
 
 <a id="s17-3"></a>
 
 ### 17.3 Client disconnect (Step 2–Step 4)
 
 - Remove `invokeEdge` call sites for undeployed functions before Step 3 undeploy.
-- Trim `use-admin-stats` datasets (no content-library ingest in slim admin — §30.5).
+- Trim `use-admin-stats` datasets (no ingest; no all-time `generation_attempts` / serve-rate charts — §20.8, §30.5).
 - Stop `invalidatePauseStatsDataForUser` and stats/badge hooks in active tree (§18.3).
 
 <a id="s17-4"></a>
 
 ### 17.4 SQL manifest (Step 2 stub → Step 5 complete)
 
-[`docs/ops/mvp-active-surface.md`](docs/ops/mvp-active-surface.md) is the single owner for: routes, deployed edges, crons, Tier C tables, RPCs, PostHog events, secrets. Step 2 stub; Step 5 lists Tier B drops and renames.
+[`docs/ops/active-surface.md`](docs/ops/active-surface.md) is the single owner for: routes, deployed edges, crons, Tier C tables, RPCs, PostHog events, secrets. Step 2 stub; Step 5 lists Tier B drops and renames.
 
 <a id="s17-5"></a>
 
@@ -665,19 +944,19 @@ After `companion_catalog` / `opening_message` migration: rename `_shared/content
 
 **Problem:** Moving trees to `legacy/` helps, but developers still get lost if active code **imports** old modules, **prefetches** dead routes, **ships** 3k lines of unused i18n, or **deploys** edges Bruno still documents as first-class.
 
-**Principle:** The shipped product should be visible in **four places only** — open `src/` (excluding legacy), `App.tsx` routes, `mvp-active-surface.md`, and production `config.toml` edge list. Everything else is reference.
+**Principle:** The shipped product should be visible in **four places only** — open `src/` (excluding legacy), `App.tsx` routes, `active-surface.md`, and production `config.toml` edge list. Everything else is reference.
 
 ```mermaid
 flowchart LR
   subgraph guards [Mechanical guards]
     ESLint[ESLint import zones]
-    CI[check-mvp-active-surface]
+    CI[check-active-surface]
     Vitest[vitest exclude legacy]
-    I18n[MVP locale bundle]
+    I18n[slim en.json]
   end
   subgraph truth [Sources of truth]
     Router[App.tsx]
-    Manifest[mvp-active-surface.md]
+    Manifest[active-surface.md]
     Config[config.toml functions]
   end
   ActiveSrc[Active src/] --> guards
@@ -691,10 +970,10 @@ flowchart LR
 | Artifact | Purpose | When |
 | --- | --- | --- |
 | [`src/README.md`](src/README.md) | One screen: “what lives here” + link to manifest; **no** legacy imports | Step 1 stub, Step 5 complete |
-| [`docs/ops/mvp-active-surface.md`](docs/ops/mvp-active-surface.md) | Routes, edges, crons, tables, RPCs, PostHog events — **shipped vs reference** | Step 2 stub, Step 5 complete |
-| [`docs/decisions/2026-05-16-pause-first-mvp.md`](docs/decisions/2026-05-16-pause-first-mvp.md) | Why legacy + no global flag | Step 2 |
-| [`.cursor/rules/mvp-active-surface.mdc`](.cursor/rules/mvp-active-surface.mdc) | Agents: read manifest before non-trivial edits; forbid `@/legacy` imports | Step 5 |
-| [AGENTS.md](AGENTS.md) Change map row | “Pause-first MVP strip” → manifest + legacy rules | Step 5 |
+| [`docs/ops/active-surface.md`](docs/ops/active-surface.md) | Routes, edges, crons, tables, RPCs, PostHog events — **shipped vs reference** | Step 2 stub, Step 5 complete |
+| [`docs/decisions/2026-05-16-pause-first-shipped-scope.md`](docs/decisions/2026-05-16-pause-first-shipped-scope.md) | Why legacy + no global flag | Step 2 |
+| [`.cursor/rules/active-surface.mdc`](.cursor/rules/active-surface.mdc) | Agents: read manifest before non-trivial edits; forbid `@/legacy` imports | Step 5 |
+| [AGENTS.md](AGENTS.md) Change map row | “Pause-first shipped scope” → `active-surface.md` + legacy rules | Step 5 |
 
 Update [docs/README.md](docs/README.md) start-here: point new contributors to `src/README.md` + manifest before `docs/systems/stats-system.md`.
 
@@ -714,9 +993,9 @@ Legacy folder may import from `@/` (reference build) but is **excluded** from `t
 
 **Scripts:**
 
-- `scripts/check-mvp-active-surface.mjs` — ripgrep-based forbidden import/path scan (§18.2).
-- `scripts/check-mvp-invoke-edge.mjs` — allowlist function names for `invokeEdge(` in active `src/`.
-- Add `npm run check:mvp-surface` and wire into `test:ci` (cheap, no Deno required).
+- `scripts/check-active-surface.mjs` — ripgrep-based forbidden import/path scan (§18.2).
+- `scripts/check-invoke-edge-allowlist.mjs` — allowlist function names for `invokeEdge(` in active `src/`.
+- Add `npm run check:active-surface` and wire into `test:ci` (cheap, no Deno required).
 
 **Optional Step 6:** `npm run build` post-step greps `dist/assets/*.js` for strings like `BadgesPanelV2` or `ToolsHub` — fails if dead UI leaked into bundle (catches dynamic import mistakes).
 
@@ -731,7 +1010,7 @@ Legacy folder may import from `@/` (reference build) but is **excluded** from `t
 | `useBadges` / `use-badge-sync` anywhere in shell | Legacy only |
 | `useToolsHubData` on Home empty state | Static pause CTA copy |
 
-**Admin:** `use-admin-stats` must not load content-library / source-ingest datasets in slim admin (§30.5).
+**Admin:** `use-admin-stats` must not load ingest datasets or pre-cutover cost/serve aggregates (§20.8, §30.5).
 
 <a id="s18-4"></a>
 
@@ -746,19 +1025,32 @@ Audit and fix in **active** code (before or with legacy move):
 | [`PauseSession.tsx`](src/pages/PauseSession.tsx) | Remove brief-save → `journeyPath('stats')` |
 | [`PauseDoneBriefJourneyRecap.tsx`](src/components/pause/PauseDoneBriefJourneyRecap.tsx) | **Legacy-move** entire file |
 
-Post-pause emotional loop = **one more pause** or **Archive** (Pro), not “see your score.”
+Post-pause emotional loop = **one more pause** or **Archive**, not “see your score.”
 
 <a id="s18-5"></a>
 
-### 18.5 i18n — smaller mental surface (Step 4)
+### 18.5 i18n — smaller mental surface (Step 4, locked)
 
-Today all namespaces live in seven `src/locales/*.json` files (~thousands of keys). **MVP approach (pick one in Step 4):**
+Today all namespaces live in seven `src/locales/*.json` files (~thousands of keys). **Shipped approach (locked — no Option B):**
 
-**Option A (recommended):** Split English into `src/locales/mvp/en.json` (namespaces: `common`, `nav`, `home`, `pause`, `archive`, `journey.mvp`, `settings`, `landing`, `auth`, `pricing`, `companion`) + move full keys to `src/locales/legacy/en.full.json` (not imported by app). Other languages: keep full files in `legacy/locales/` until translated MVP copy exists; **en-only MVP launch** is acceptable if already documented.
+**Slim active bundle only**
 
-**Option B (lighter):** Keep single `en.json` but add `scripts/check-mvp-i18n-keys.mjs` — fail if active `t('...')` calls reference keys under `journey.stats`, `tools.`, `badges.`, `stats.` (allowlist MVP key prefixes).
+1. **Step 4:** Replace active `src/locales/en.json` with a **shipped-only** key tree (copy keys from current `en.json`, do not leave dead namespaces in place).
+2. **Move** the current full English file to **`src/legacy/locales/en.full.json`** (reference for cherry-pick / re-expansion; **not** imported by the app).
+3. **Move** `src/locales/de.json`, `es.json`, `fr.json`, `pt.json`, `tr.json`, `nl.json` → **`src/legacy/locales/`** (same folder as `en.full.json`). App config loads **`en` only** until translations are rebuilt intentionally.
+4. **Wire** i18n init ([`src/i18n/`](src/i18n/)) to a single resource: `en` → `src/locales/en.json`. Document **en-first launch** in decision doc + manifest.
 
-Remove retired widget copy from active keys when components are deleted (not “unused but still in JSON”).
+**Allowed key prefixes in active `en.json`** (illustrative — prune anything else):
+
+`common`, `nav`, `home`, `pause`, `archive`, `journey.overview`, `settings`, `landing`, `auth`, `pricing`, `companion`, `pro`, `subscription` (§5.4 trial copy), `errors`, `notFound` — plus any key paths proven by grep of active `src/` (excluding `legacy/`).
+
+**Explicitly not doing (rejected Option B):**
+
+- Keeping a **fat** `en.json` with thousands of legacy keys + `scripts/check-mvp-i18n-keys.mjs` prefix allowlist. That preserves cognitive noise and false confidence (“CI passed but JSON still has Tools copy”).
+
+**Hygiene rule:** When a component is deleted in Step 3–4, **delete its keys** from `en.json` in the same commit — not “unused but still in JSON.”
+
+**Optional Step 6 guard:** `scripts/check-i18n-active-keys.mjs` — fail if `t('...')` in active `src/` references a key missing from `en.json` (strict completeness, not prefix denylist). Wire into `test:ci` if cheap.
 
 <a id="s18-6"></a>
 
@@ -766,7 +1058,7 @@ Remove retired widget copy from active keys when components are deleted (not “
 
 | Surface | MVP behavior |
 | --- | --- |
-| [`bruno/`](bruno/) | Add `bruno/mvp/` with pause + billing + auth smoke requests; move rest to `bruno/legacy/pre-mvp-full-shell/`; update [`bruno/SCOPE.md`](bruno/SCOPE.md) — “default collection = mvp” |
+| [`bruno/`](bruno/) | Add `bruno/active/` with pause + billing + auth smoke requests; move rest to `bruno/legacy/full-shell/`; update [`bruno/SCOPE.md`](bruno/SCOPE.md) — “default collection = active” |
 | [`EdgeCoverage.tsx`](src/pages/EdgeCoverage.tsx) | List **only** deployed MVP functions (matches `config.toml`) |
 | [`feature-flags.md`](docs/ops/feature-flags.md) | Mark `ui.home_v2` **sunset / unused** if no call sites; no new flags for hiding Tools |
 
@@ -774,7 +1066,7 @@ Remove retired widget copy from active keys when components are deleted (not “
 
 ### 18.7 Docs and marketing alignment (Step 5)
 
-- [information-architecture.md](docs/design/information-architecture.md): add **“MVP (2026-05)”** section at top — 4-tab nav, Journey overview-only, Tools/Badges/Stats **deferred** with link to tag `full-ia-pre-mvp`.
+- [information-architecture.md](docs/design/information-architecture.md): add **“MVP (2026-05)”** section at top — 4-tab nav, Journey overview-only, Tools/Badges/Stats **deferred** with link to tag `full-ia-pre-strip`.
 - [stats-system.md](docs/systems/stats-system.md) / [badges-system.md](docs/systems/badges-system.md): banner **“Not in shipped MVP — see legacy folder / archive branch.”**
 - Landing Coming soon list must match manifest “reference-only” list (no drift).
 
@@ -808,7 +1100,7 @@ Align with [client-server-architecture-holzen.md](docs/fundamentals/client-serve
 | Layer | MVP active tree |
 | --- | --- |
 | **Truth** | Postgres `pause_*`, RLS, `pause_log_step`, edges `holzen-reflect` + `companion-orchestrate` + billing |
-| **Projection** | TanStack Query + hooks on Home, PauseSession, Archive, Journey MVP |
+| **Projection** | TanStack Query + hooks on Home, PauseSession, Archive, Journey overview |
 | **Reference** | `src/legacy/`, `bruno/legacy/`, git tag — **not** a second runtime |
 
 Document in decision doc § **Architecture**: “legacy is read-only reference; active code is the product.”
@@ -819,15 +1111,38 @@ Document in decision doc § **Architecture**: “legacy is read-only reference; 
 
 | Opportunity | What | Step | Why now |
 | --- | --- | --- | --- |
-| **Declarative route manifest** | [`app-routes.ts`](src/lib/app-routes.ts): `MVP_ROUTES`, `MVP_SHELL_TABS` (allowlist only — **no redirect map**); [`App.tsx`](src/App.tsx) registers exactly those paths | Step 2 | IA change forces router touch; one place for agents/humans |
+| **Declarative route manifest** | [`app-routes.ts`](src/lib/app-routes.ts): `APP_ROUTES`, `APP_SHELL_TABS` (allowlist only — **no redirect map**); [`App.tsx`](src/App.tsx) registers exactly those paths | Step 2 | IA change forces router touch; one place for agents/humans |
 | **Drop dead lazy imports** | Remove `React.lazy` for Tools, Profile, practice, Ground, etc.; lazy-load only MVP pages + public/admin | Step 2 | **Smaller initial bundle**; chunks can’t load removed UI |
-| **Prefetch alignment** | `AppLayout` idle-import only `Journey` MVP chunk (not Profile/ToolsHub) | Step 2 | Already in plan; architectural perf win |
+| **Prefetch alignment** | `AppLayout` idle-import only `JourneyOverview` chunk (not Profile/ToolsHub) | Step 2 | Already in plan; architectural perf win |
 | **Legacy bulk move = delete dead libs** | Move `pause-stats-data-query`, `pause-score-impacts`, `pause-impact-data`, `pause-replay-thread`, `guided-journal-*`, `grounding-enrichment-query` to legacy with stats/tools | Step 3 | ~15 root `src/lib/*` files disappear from active tree |
 | **`pause-stats-invalidate` trim** | Single module: invalidate keys for pause, archive, companion only | Step 4 | Prevents mystery invalidations to dropped queries |
 | **`src/lib/journey/`** | Streak + count only (already planned) — no `components/stats` | Step 2 | Correct bounded context |
 | **Settings hub data model** | Split `useSettingsModel` only by **removing** dead sections, not new hooks | Step 4 | File shrinks with product |
 | **Slim Home by deletion** | Removing widgets/hooks (night, journey-pulse, quick-capture) **is** the refactor — resist adding new abstractions in the same step | Step 4 | Follow “extract after shrink,” not before |
 | **Edge catalog in code** | `supabase/functions/README.md` + **§17.6** `_shared/legacy/` — MVP deployed list vs reference | Step 3 | Mirrors Bruno + config.toml + active `_shared` graph |
+
+<a id="s19-2b"></a>
+
+### 19.2b “God hooks” — what to refactor in this window
+
+Yes — there are a few **large surfaces**. PauseSession is already **split into many `use-pause-session-*` hooks** (~40 files); the remaining pain is **`useHolzen`**, **`use-companion-data`**, and **orchestrator pages** that still call too much. MVP strip is the right time to **delete branches**, not rewrite everything.
+
+| Surface | ~lines (active tree) | Verdict for this launch | What to do |
+| --- | --- | --- | --- |
+| [`useHolzen`](src/hooks/use-holzen.ts) | ~500 | **Refactor by shrinking** (Step 4) | Owns BTC/market query, manual pause trigger, open-pause context, profile bits, reflection persist paths. **Remove** stats/tools/journey-pulse consumers when widgets move to legacy. **Optional Step 4:** extract `useHomeOpenPause` (open instance + manual trigger only) **after** deletions — see §19.3. **Do not** TanStack-rewrite the whole hook in one step. |
+| [`Home.tsx`](src/pages/Home.tsx) + ~20 `use-home-*` hooks | Page ~250; hooks split | **Already orchestrated** | Stripping night / journey-pulse / quick-capture / customize DnD **is** the refactor. Drop `useNightReflection`, shrink `use-home-visible-sections` + dashboard wiring. Rewire subscription → `canEngagePause` (§5.4). |
+| [`PauseSession.tsx`](src/pages/PauseSession.tsx) | ~720 | **Surgical edits only** (Step 2–4) | Many step handlers already extracted. **Do:** remove `handleBriefSaveToJourney` → `journeyPath('stats')`; entitlement gate for `lapsed`; drop dead imports. **Do not:** rewrite ritual state machine (§19.4). |
+| [`use-companion-data.ts`](src/hooks/use-companion-data.ts) | ~700 | **Trim, don’t split** (Step 3–4) | Core MVP path for companion slots in pause. **Remove** code paths only used by legacy Tools/standalone companion **pages** when those routes move. **Do not** split into multiple hooks pre-launch (§19.4) — high risk, low clarity win. |
+| [`useSettingsModel`](src/pages/settings/useSettingsModel.ts) | ~400 | **Shrink by deletion** (Step 4) | Drop reflection/experience/stats-related sections from the model when hub entries removed — **no** new `useSettings*` files. |
+| [`use-pause-reflect-generation`](src/hooks/use-pause-reflect-generation.ts) | ~180 | **Keep; narrow if needed** | Core deep ritual; only touch for §5.4 / entitlement if reflect must block when `lapsed`. |
+
+**Order of operations (matches [refactoring-strategy.md](docs/fundamentals/refactoring-strategy.md)):**
+
+1. **Step 3** — legacy moves → dead imports fail CI → delete call sites from `useHolzen` / `use-companion-data` / Home hooks.  
+2. **Step 4** — subscription + Home/PauseSession entitlement; optional `useHomeOpenPause` extract **only if** `useHolzen` still confusing after deletion.  
+3. **Step 4 optional** — `src/lib/pause/` barrel moves (§19.3) — pure paths, no behavior.
+
+**Not “god hooks” worth touching now:** `use-auth`, `use-subscription` (extend for §5.4), `use-profile` — stay small; extend snapshot/query, don’t fork.
 
 <a id="s19-3"></a>
 
@@ -838,9 +1153,9 @@ Document in decision doc § **Architecture**: “legacy is read-only reference; 
 | **`src/lib/pause/` package** | Group ~40 active `pause-*.ts` files under `src/lib/pause/` + `index.ts` re-export barrel | Step 4 optional | Pure moves + import path updates; run tests; **no** behavior change |
 | **`src/lib/companion/` package** | Same for `companion-*` helpers used by `use-companion-data` | Step 4 optional | Large diff; do only if pause folder move done |
 | **`pause` client facade** | `src/lib/pause/index.ts` exports `pause-api`, `pause-state`, `pause-session-storage`, invalidate helpers — single import path for pages | Step 4 | Thin barrel only; don’t wrap RPCs twice |
-| **Home open-pause hook** | Extract `useHomeOpenPause` from `useHolzen` **after** Home loses non-pause widgets — owns `v_pause_current` + CTA only | Post-MVP or Step 4 if `useHolzen` still painful | Don’t split `useHolzen` three ways in the same step as widget strip |
+| **Home open-pause hook** | Extract `useHomeOpenPause` from `useHolzen` **after** Home loses non-pause widgets — owns open pause + manual trigger + `canEngagePause` only | Step 4 **only if** `useHolzen` still painful after §19.2b deletions | Don’t split `useHolzen` three ways in the same commit as widget strip |
 | **Route-level splitting audit** | Confirm [route-level-code-splitting](docs/backlog/route-level-code-splitting.md): companions + pause already lazy; admin separate | Step 6 | Document in manifest |
-| **C4 / workspace.dsl** | Grey Tools/Journey containers; label `companion_catalog` | Step 6 | Optional |
+| **C4 / workspace.dsl** | Grey Tools/Journey containers; pause AI = `companion_cache` only | Step 6 | Optional |
 
 <a id="s19-4"></a>
 
@@ -851,8 +1166,9 @@ Document in decision doc § **Architecture**: “legacy is read-only reference; 
 | **`src/features/` full reorg** | Moves every import — same pain as rename without MVP benefit |
 | **`packages/` monorepo split** | Org change, zero user value pre-launch |
 | **Rewrite PauseSession state machine** | High risk; Pause V2 already extracted gate/scaffold/storage |
-| **Split `use-companion-data`** | Core MVP path; already has `src/lib/companion-*` |
-| **TanStack Query rewrite of entire `useHolzen`** | BTC + manual trigger coupling; defer until Home stable |
+| **Split `use-companion-data` into many hooks** | Core MVP path; trim legacy page branches instead (§19.2b) |
+| **TanStack Query rewrite of entire `useHolzen`** | BTC + manual trigger coupling; shrink by deletion first (§19.2b) |
+| **New `usePauseSession` mega-hook** | Pause already uses ~20 `use-pause-session-*` hooks; page stays thin conductor |
 | **`holzen-reflect` / edge renames** | Deploy URLs and observability dashboards |
 | **GraphQL / tRPC layer** | Supabase + `pause-api` is the contract |
 | **Micro-frontend / module federation** | Absurd for current team size |
@@ -865,7 +1181,7 @@ Document in decision doc § **Architecture**: “legacy is read-only reference; 
 | Change type | Refactor pairing |
 | --- | --- |
 | **DROP tables** | Remove client queries + delete-account rows in same step 5 commit (**§20.3**) |
-| **RENAME `companion_catalog`** | Rename `_shared/content-library.ts` + generators + types regen (**§21**) |
+| **Cache-only companions** | §20.4.1 — drop library phase + `content_library`; legacy `content-library.ts` |
 | **`opening_message` kind** | Update `pause-page-loader`, reflect hooks, views — grep-driven in step 5 |
 | **RLS deny-write** | No client refactor if tables dropped |
 
@@ -878,7 +1194,7 @@ Order: **code stops calling** → **migration** → **`gen:types`** (deployment-
 Already in §18; treat as architecture:
 
 - ESLint import zones (active ⊄ legacy, active ⊄ stats paths)  
-- `check-mvp-active-surface.mjs` + optional `check-bruno-mvp-manifest.mjs`  
+- `check-active-surface.mjs` + optional `check-bruno-active-manifest.mjs`  
 - Vitest excludes `src/legacy/**`  
 
 Optional Step 4: **`src/lib/pause/ARCHITECTURE.md`** (5 lines): “All pause ritual client mechanics; pages import from here.”
@@ -901,16 +1217,16 @@ Optional Step 4: **`src/lib/pause/ARCHITECTURE.md`** (5 lines): “All pause rit
 | Step 2 | Route manifest + drop dead `lazy()` + layout prefetch |
 | Step 3 | Dead `lib/` to legacy; edge README; Bruno layout |
 | Step 4 | Home/Pause **deletion-first**; optional `lib/pause/` grouping; invalidate module trim |
-| Step 5 | Schema renames drive generator/import grep (opening_message, companion_catalog) |
+| Step 5 | Cache-only orchestrate (§20.4.1) + `opening_message` rename |
 | Step 6 | Bundle smoke; C4 optional; no new refactors unless bugfix |
 
 ---
 
 <a id="s20"></a>
 
-## 20. Pre-launch aggressive Postgres cutover (zero users)
+## 20. Pre-launch aggressive Postgres cutover (no production users)
 
-**Why change the old “no DROP” rule:** With **no production users**, empty gamification/tools tables only add noise in Supabase Studio, `gen:types`, and mental models. Holzen already shipped one destructive cutover for Pause V2 ([`20260423202000`](supabase/migrations/20260423202000_pause_v2_destructive_cutover.sql)). MVP launch is the right time for **cutover #2**.
+**Why change the old “no DROP” rule:** With **no production users** (§3.1 — test `auth.users` rows are OK to wipe), empty gamification/tools tables only add noise in Supabase Studio, `gen:types`, and mental models. Holzen already shipped one destructive cutover for Pause V2 ([`20260423202000`](supabase/migrations/20260423202000_pause_v2_destructive_cutover.sql)). MVP launch is the right time for **cutover #2**.
 
 <a id="s20-1"></a>
 
@@ -921,7 +1237,7 @@ Optional Step 4: **`src/lib/pause/ARCHITECTURE.md`** (5 lines): “All pause rit
 | Can we delete/reorder files in `supabase/migrations/`? | **No** for the linked project — Supabase records applied filenames; missing files break `db push` / GitHub sync. |
 | Can we “move migrations to legacy”? | **Not as a folder move** — applied history must stay append-only. |
 | What *can* we do? | (1) **New** destructive migration at the tail (§20.3 Tier B). (2) **Baseline squash** (§20.7, locked) after `db reset` on a disposable project (§20.4). |
-| Recovery if we DROP too much? | `git checkout full-ia-pre-mvp` + restore DB from backup **or** re-apply old schema from archive branch migrations (slow). Tag **before** Step 5. |
+| Recovery if we DROP too much? | `git checkout full-ia-pre-strip` + restore DB from backup **or** re-apply old schema from archive branch migrations (slow). Tag **before** Step 5. |
 
 <a id="s20-2"></a>
 
@@ -931,7 +1247,7 @@ From Pause V2 cutover and follow-ons: `reflections`, `reflection_companions`, `p
 
 <a id="s20-3"></a>
 
-### 20.3 Tier B — DROP in `YYYYMMDD_mvp_schema_cutover.sql` (Step 5)
+### 20.3 Tier B — DROP in `YYYYMMDD_holzen_schema_cutover.sql` (Step 5)
 
 **Single `BEGIN` … `COMMIT` transaction.** Order: triggers → functions that reference Tier B → views → child tables → parent tables → `profiles` column drops → notification row cleanup → optional `notifications.type` constraint tighten.
 
@@ -939,7 +1255,7 @@ From Pause V2 cutover and follow-ons: `reflections`, `reflection_companions`, `p
 | --- | --- | --- |
 | **Triggers** | DROP non-pause notification triggers | Same list as §17.5A |
 | **Functions** | `DROP FUNCTION IF EXISTS` | `notifications_from_user_badges`, `…_night_reflections`, `…_future_letters`, `…_reflection_insights`, `…_reflections` (if any) |
-| **Tables** | `DROP TABLE IF EXISTS … CASCADE` | `user_badges`, `badge_definitions`, `practice_entries`, `reflection_insights`, `future_letters`, `night_reflections`, `graph_edges`, `ritual_completions`, `ritual_templates`, `grounding_enrichment_cache` |
+| **Tables** | `DROP TABLE IF EXISTS … CASCADE` | `user_badges`, `badge_definitions`, `practice_entries`, `reflection_insights`, `future_letters`, `night_reflections`, `graph_edges`, `ritual_completions`, `ritual_templates`, `grounding_enrichment_cache`, **`content_library`** (§20.4.1 — no `companion_catalog` rename) |
 | **Data cleanup** | `DELETE FROM notifications WHERE type IN ('badge','insight','letter','night_reflection')` | Before or after drops |
 | **Optional** | `ALTER TABLE notifications DROP CONSTRAINT` + re-add CHECK with only `'pause'` | Only if no historical rows need other types |
 | **Views** | Drop any view solely over Tier B tables | Grep migrations after drop |
@@ -948,9 +1264,12 @@ From Pause V2 cutover and follow-ons: `reflections`, `reflection_companions`, `p
 
 1. [`delete-account`](supabase/functions/delete-account/index.ts) — remove `.delete()` lines for dropped tables (account delete must not 500).
 2. Undeploy edges that **write** Tier B (`badge-notify`, `reflection-insights`, `journal-prompt`, `deliver-letters`, `night-reflection`, `grounding-enrich`, …).
-3. Frontend legacy move complete — no active `supabase.from('user_badges')` etc.
-4. `npm run gen:types` after migration applies.
-5. `npm run check:view-migrations` — ensure no view migration references dropped tables.
+3. Orchestrate **cache-only** — no `searchLibrary` / `content_library` in active `_shared` (§20.4.1).
+4. Frontend legacy move complete — no active `supabase.from('user_badges')` etc.
+5. §5.4 Stripe lapsed mapping + RPC `user_can_engage_pause` merged **before** relying on client-only lapsed gates.
+6. `npm run gen:types` after migration applies.
+7. `npm run check:view-migrations` — ensure no view migration references dropped tables.
+8. Record **`telemetry_baseline_at`** in `active-surface.md` when §20.8 runs.
 
 <a id="s20-4"></a>
 
@@ -958,16 +1277,58 @@ From Pause V2 cutover and follow-ons: `reflections`, `reflection_companions`, `p
 
 | Object | Why keep (even if UI is gone) |
 | --- | --- |
-| **`companion_catalog`** (renamed from `content_library`, §21) | Curated companion source rows for signal/grounding/history phases. Dropping requires cache-only companions (bigger change). |
 | **`companion_fallbacks`** | Circuit-breaker / empty-slot fallbacks for companions |
-| **`companion_cache`**, **`companion_serves`**, **`generation_attempts`** | Pause AI path |
-| **`signal_sources`**, **`user_signal_preferences`** | Signal companion sourcing |
-| **`signal_source_suggestions`** | Admin legacy only — **optional DROP** if admin ingest is fully legacy and no cron writes; grep before drop |
+| **`companion_cache`**, **`companion_serves`**, **`generation_attempts`** | Pause AI path — **sole** pre-live pool after §20.4.1 |
+| **`signal_sources`**, **`user_signal_preferences`** | Live Signal/Grounding URLs ([`pause-cron-parity.ts`](supabase/functions/_shared/pause-cron-parity.ts)) — not RSS catalog ingest |
+| **`signal_source_suggestions`** | **KEEP** — live gens enqueue admin-review URLs; unrelated to `content_library` |
 | **`quiet_windows`** | [`check-volatility`](supabase/functions/check-volatility/index.ts) reads it for cron triggers |
-| **`v_pause_full`** | Slim admin Activity tab; not Journey MVP |
+| **`v_pause_full`** | Slim admin Activity tab; not Journey overview |
 | **Email**, **Stripe/credits**, **roadmap**, **blog/testimonials**, **feedback**, **audit_log**, **app_config** | Platform / marketing / ops |
 
-**Future aggressive step (post-MVP, separate project):** replace `content_library` with expanded `companion_cache` + pregen only — then DROP `content_library` and ingest edges.
+**Dropped (§20.4.1):** `content_library` — do **not** rename to `companion_catalog`.
+
+<a id="s20-4-1"></a>
+
+### 20.4.1 Cache-only companions — DROP catalog, pregen-only pool (locked)
+
+**Your question:** why not replace `content_library` with expanded `companion_cache` + pregen only, then DROP the catalog table and ingest edges?
+
+**Short answer:** We **should**, for this launch. The earlier plan kept the catalog table under a rename only to **shrink Step 5 risk** while the frontend strip landed. That left two mental models (catalog vs cache) while ingest was already undeployed — poor fit for §3.1 and cognitive-load goals.
+
+#### Two tables, two jobs (today)
+
+| Store | What it is | Filled by | Orchestrate phase |
+| --- | --- | --- | --- |
+| **`content_library`** | Curated rows: essay / paper / event schema | `fetch-source-feeds` (RSS → Gemini) | **Phase 1 “library”** |
+| **`companion_cache`** | AI-shaped `jsonb` per slot type | **`pregenerate-companions`** | **Phase 2 “cache”** |
+
+Zoom Out already runs **cache → live → curated**. Grounding **disables** library in code (`GROUNDING_LIBRARY_ENABLED = false`) because the paper pool is empty.
+
+**“Expand companion_cache”** does **not** mean merge schemas into one table. It means: **remove phase 1** from orchestrate; **`pregenerate-companions`** owns the warm pool; **live → curated** when thin.
+
+#### Why deferral was wrong for this launch
+
+| Old rationale | Why it doesn’t apply |
+| --- | --- |
+| “Bigger change” in Step 5 | Step 5 is already baseline squash + Tier B DROP — cache-only belongs in the **same** commit. |
+| Need catalog rows at launch | Ingest is **off**; test data disposable (§3.1). Cold start = run pregen + brief live-heavy period. |
+| Rename fixes “library” confusion | `companion_catalog` still implies a second table + `searchLibrary` — **less** clear than one pool. |
+
+#### Locked MVP behavior (Step 3 + Step 5)
+
+**Phase stack (Signal, Grounding, History):** `cache → live → curated`.
+
+| Layer | Action |
+| --- | --- |
+| **Edges (Step 3)** | Undeploy: `fetch-source-feeds`, `admin-library-preview`, `grounding-enrich` (§17.1). |
+| **`_shared` (Step 5)** | Remove library phase from [`signal.ts`](supabase/functions/_shared/generators/signal.ts), [`grounding.ts`](supabase/functions/_shared/generators/grounding.ts), [`history.ts`](supabase/functions/_shared/generators/history.ts); default **`COMPANION_PHASE_LIBRARY=0`** or delete phase. Move [`content-library.ts`](supabase/functions/_shared/content-library.ts) + catalog-only [`content-dedup.ts`](supabase/functions/_shared/content-dedup.ts) paths to `_shared/legacy/`. |
+| **Postgres (Step 5)** | **`DROP TABLE content_library CASCADE`** — **never** `companion_catalog` in baseline. |
+| **Pregen (Step 5–6)** | Keep cron; optionally raise `pregenerate_cache_topup` mins; after reset, manual `pregenerate-companions` until healthy. |
+| **Docs** | [ai-powered-pause-system.md](docs/systems/pause/ai-powered-pause-system.md): **cache → live → curated**; ingest doc → legacy banner. |
+
+**Keep:** `signal_sources`, `signal_source_suggestions`, `companion_fallbacks`, curated static pools in code.
+
+**Accept:** Slightly more live AI until cache warms; one companion content table in Studio.
 
 <a id="s20-5"></a>
 
@@ -995,7 +1356,7 @@ Update `update_profile_safe` / safe column allowlist in the same migration if it
 | --- | --- |
 | **Crons** | §17.5D unschedule all non-MVP jobs (including `fetch-source-feeds` if library ingest is not MVP) |
 | **`email_queue`** | Cancel rows for dropped template types (§17.5H) |
-| **`analytics_events`** | Optional one-time `DELETE` where `event` in legacy-only names (or leave history — harmless with zero users) |
+| **Telemetry tables** | **§20.8** — `TRUNCATE` `analytics_events`, `generation_attempts`, `companion_serves`, `user_companion_serves` (keep tables; drop misleading test-era rows) |
 | **`app_config`** | `DELETE` keys for insights/wallpaper/night/badge crons — or leave orphaned keys (slim admin ignores) |
 | **`companion_fallbacks` seed** | Keep; trim seed JSON in a follow-up if it references retired ritual keys |
 | **Bruno / types / docs** | `gen:types` + manifest lists **only Tier C** tables |
@@ -1005,26 +1366,76 @@ Update `update_profile_safe` / safe column allowlist in the same migration if it
 
 ### 20.7 Migration baseline squash (locked — Step 5)
 
-**Chosen approach:** One clean `mvp_baseline.sql` on a **reset** linked project (zero users). Git tag `full-ia-pre-mvp` + archive branch preserve recovery.
+**Chosen approach:** One clean `holzen_schema_baseline.sql` on a **reset** linked project (wipes all test users — §3.1). Git tag `full-ia-pre-strip` + archive branch preserve recovery.
 
 | Step | Action |
 | --- | --- |
-| 1 | Confirm `auth.users` count = 0 (or abort DROP/squash) |
-| 2 | Move applied history to `supabase/migrations-archive/pre-mvp/` (read-only reference; do not delete from git carelessly) |
-| 3 | Author `supabase/migrations/YYYYMMDD_mvp_baseline.sql` with **final** names only: `companion_catalog`, `opening_message`, no Tier B tables, trimmed `profiles` columns (§20.5, §21) |
+| 1 | Run §3.1 checklist (no production data to keep — **not** `auth.users` = 0) |
+| 2 | Move applied history to `supabase/migrations-archive/pre-baseline/` (read-only reference; do not delete from git carelessly) |
+| 3 | Author `supabase/migrations/YYYYMMDD_holzen_schema_baseline.sql` with **final** names only: `companion_cache` (no `content_library`), `opening_message`, no Tier B tables, trimmed `profiles` (§20.5, §21) |
 | 4 | `supabase db reset` on disposable/local; then apply to linked project in Step 5 window |
 | 5 | `npm run gen:types` · `npm run test` · `npm run check:view-migrations` |
-| 6 | Update `mvp-active-surface.md` schema section |
+| 6 | Update `active-surface.md` schema section |
 
-**Fallback** (if reset blocked): append tail `YYYYMMDD_mvp_launch_cutover.sql` with §20.3 Tier B DROP + §21 renames in one transaction — no squash.
+**Fallback** (if reset blocked): append tail `YYYYMMDD_holzen_launch_cutover.sql` with §20.3 Tier B DROP + §21 renames in one transaction — no squash.
 
-**Code same step 5 commit:** `delete-account` table list, edge undeploy (step 3 already done), frontend legacy moves complete, `profile-row-query` narrowed (step 4).
+**Code same step 5 commit:** `delete-account` table list, edge undeploy (step 3 already done), frontend legacy moves complete, `profile-row-query` narrowed (step 4); **§20.8** telemetry truncate in same migration window.
+
+<a id="s20-8"></a>
+
+### 20.8 Telemetry baseline reset — `analytics_events` & `generation_attempts` (locked)
+
+**Your concern is right:** keeping years of **test-only** rows makes **Postgres-side** cost and behavior metrics **misleading** after launch — mixed legacy event names (Tools, badges, rituals), pre–Pause V2 shapes, and QA traffic that is not a real cohort.
+
+**Keep the tables** — they are still **write paths** for shipped product:
+
+| Table | Why it stays | What old rows were wrongly implying |
+| --- | --- | --- |
+| **`analytics_events`** | Client + edge telemetry; `checkRateLimit` allowlist counts; pregen reads `companion_feedback` (24h window) | “Production” funnels, ritual/tools noise, rate-limit history |
+| **`generation_attempts`** | Every model call logs cost/latency; **`checkDailyBudget`** sums **all** `estimated_cost_usd` from **UTC midnight**; **`ai-cost-alert`** cron uses historical spend | Inflated/deflated daily budget; bogus WoW cost alerts |
+| **`companion_serves`** | Per-serve analytics; admin/debug; freshness input with `user_companion_serves` | Cache/library hit rates from retired IA |
+| **`user_companion_serves`** | Dedup / freshness for cache (and legacy library ids until dropped) | “Already seen” pool from test accounts |
+
+**Do not** confuse with **PostHog** — product funnels in §23 use PostHog; historical PostHog projects may still contain old events unless you reset or filter by date. **Postgres `analytics_events`** is a separate, smaller stream (rate limits, some edge inserts, companion feedback). **Both** should be interpreted **from cutover forward** for launch metrics.
+
+#### Locked action (Step 5 — same window as §20.3 / §20.7)
+
+After §3.1 checklist, in the **same cutover migration** (or immediately after `db reset` when baseline starts empty):
+
+```sql
+TRUNCATE public.analytics_events;
+TRUNCATE public.generation_attempts;
+TRUNCATE public.companion_serves;
+TRUNCATE public.user_companion_serves;
+```
+
+| Case | Behavior |
+| --- | --- |
+| **`db reset` + `holzen_schema_baseline.sql`** | Tables recreated **empty** — no separate `TRUNCATE` needed; document cutover timestamp in manifest |
+| **Tail cutover only** | **`TRUNCATE` required** — do not rely on “optional DELETE legacy event names” |
+
+**Do not truncate:** `companion_cache` (warm pool — optional prune via pregen lifecycle), `pause_*` / `pause_ai_artifacts` (user pauses wiped with §3.1 reset anyway), `audit_log` (security trail — optional narrow `DELETE` only if you want zero test audit noise).
+
+#### Slim admin & ops (Step 4–5)
+
+| Surface | Change |
+| --- | --- |
+| **`use-admin-stats` / cost tabs** | **Drop or gate** all-time aggregates that read `generation_attempts` / `v_companion_serves_per_day` from pre-cutover — slim admin shows **pause health + edge list**, not legacy Monitor/Rejections dashboards built for full IA |
+| **`Admin.tsx` generation_attempts delete UI** | Move to legacy **or** label “since cutover” — do not imply historical rejection backlog matters |
+| **`ai-cost-alert`** | Document in [ai-cost-model.md](docs/systems/costs/ai-cost-model.md) / manifest: **first ~7 days after cutover** alerts are cold-start baselines only |
+| **`active-surface.md`** | Record **`telemetry_baseline_at`** (timestamptz) + “ignore SQL metrics before this instant” |
+
+#### Product metrics (§4.2, §23)
+
+- **Activation / D7 / trial→paid** → **PostHog** (§23.3 funnel), cohorts **created after** launch publish — not Postgres row counts from test era.
+- **AI cost per pause** (§23.4) → `generation_attempts` **joined to `pause_instance_id` where `created_at >= telemetry_baseline_at`** only.
+- **Do not** build launch KPIs from pre-cutover `analytics_events` row counts.
 
 <a id="s21"></a>
 
 ## 21. Naming & vocabulary (pre-launch rename window)
 
-**You have no users** — this is the **only cheap moment** to fix names that fight pause-first mental models. After launch, table/column renames are expensive; **do the high-value renames in Step 5** with the §20 cutover.
+**You have no production users** (§3.1) — this is the **only cheap moment** to fix names that fight pause-first mental models. After launch, table/column renames are expensive; **do the high-value renames in Step 5** with the §20 cutover.
 
 <a id="s21-1"></a>
 
@@ -1032,8 +1443,8 @@ Update `update_profile_safe` / safe column allowlist in the same migration if it
 
 | Rule | Example |
 | --- | --- |
-| **No “library” for non-Archive data** | Users see **Archive**; Postgres should not say `content_library` for curated essays |
-| **“Companion” prefix for catalog/cache/serve** | `companion_catalog`, `companion_cache`, `companion_serves` read as one subsystem |
+| **No “library” for non-Archive data** | Users see **Archive**; **no** `content_library` / `companion_catalog` table at MVP (§20.4.1) |
+| **“Companion” prefix for cache/serve** | `companion_cache`, `companion_serves`, `companion_fallbacks` — one pool + telemetry |
 | **“Pause” prefix for ritual truth** | `pause_instances`, `pause_ai_artifacts`, `pause_log_step` — keep |
 | **“Reflection” = user pause message, not Journey** | Prefer `opening_message` over `reflection_text` in artifacts/views |
 | **Drop columns, don’t alias forever** | Prefer `DROP COLUMN` over leaving deprecated fields in `profiles` |
@@ -1045,10 +1456,9 @@ Update `update_profile_safe` / safe column allowlist in the same migration if it
 
 | Current | Recommended | Rationale |
 | --- | --- | --- |
-| **`content_library`** (table) | **`companion_catalog`** | Global curated catalog for companion phases — not user Archive, not RSS “library” UI |
-| `companion_serves.serve_source = 'library'` | **`'catalog'`** | `UPDATE … SET serve_source = 'catalog' WHERE serve_source = 'library'`; tighten CHECK if present |
-| `CompanionPhase` / phase-config **`library`** | **`catalog`** | Edge + TS types (`companion-orchestrate-types.ts`, `phase-config.ts`) |
-| Admin/stats **`library_hits`** (if column on materialized admin query) | **`catalog_hits`** | Only if exposed; grep in Step 5 |
+| **`content_library`** (table) | **DROP** (§20.4.1) | Cache-only orchestrate; ingest edges undeployed — do **not** rename to `companion_catalog` |
+| `companion_serves.serve_source = 'library'` | **N/A** (no new rows) | Optional cleanup on non-reset DB; baseline has no `library` phase |
+| `CompanionPhase` / phase-config **`library`** | **Remove** or leave env off | Generators use **cache → live → curated** only |
 | `pause_ai_artifacts.kind = 'reflection_text'` | **`opening_message`** | `UPDATE pause_ai_artifacts SET kind = 'opening_message' WHERE kind = 'reflection_text'`; update triggers + `v_pause_full` |
 | `v_pause_full.reflection_text` (column) | **`opening_message`** | Recreate view; map from artifact kind `opening_message` |
 | `v_pause_full.haiku_text` | **keep** | Haiku still ships in MVP pause UI |
@@ -1060,10 +1470,8 @@ Update `update_profile_safe` / safe column allowlist in the same migration if it
 **SQL sketch:**
 
 ```sql
-ALTER TABLE public.content_library RENAME TO companion_catalog;
--- RENAME indexes/constraints if names embed old table (optional cosmetic)
+DROP TABLE IF EXISTS public.content_library CASCADE;  -- §20.4.1; in baseline squash, table never created
 
-UPDATE public.companion_serves SET serve_source = 'catalog' WHERE serve_source = 'library';
 UPDATE public.pause_ai_artifacts SET kind = 'opening_message' WHERE kind = 'reflection_text';
 -- Then DROP FUNCTION + CREATE OR REPLACE views (v_pause_full, v_pause_archive_*)
 ```
@@ -1075,7 +1483,7 @@ UPDATE public.pause_ai_artifacts SET kind = 'opening_message' WHERE kind = 'refl
 | Table | Column | Why |
 | --- | --- | --- |
 | `profiles` | `ai_insights_enabled`, `night_reflection_hour`, `digest_frequency`, `ritual_template`, `notify_badges` | Non-MVP surfaces |
-| `profiles` | **`streak_freeze_dates`** | Gamification; Journey MVP streak is computed from `pause_instances` — no freeze UI in MVP |
+| `profiles` | **`streak_freeze_dates`** | Gamification; Journey streak is computed from `pause_instances` — no freeze UI in shipped app |
 | `profiles` | **`companion_breathing`** | **DROP** — no “breathing companion” product; pause ritual **Breathe** step is separate (`pause_log_step`, not this column) |
 
 **Keep on `profiles` (pause MVP):** `reflection_tone`, `reflection_style`, `companion_haiku`, `companion_grounding`, `companion_signal`, `companion_zoom_out`, `companion_history` (not `companion_breathing`), `grounding_activities`, hold-goal fields, thresholds, quiet hours, `custom_prompt`, `silent_mode`, subscription fields.
@@ -1090,13 +1498,13 @@ UPDATE public.pause_ai_artifacts SET kind = 'opening_message' WHERE kind = 'refl
 
 | Current | Recommended |
 | --- | --- |
-| `_shared/content-library.ts`, `content-dedup.ts` comments | **`companion-catalog.ts`** (+ update imports) |
+| `_shared/content-library.ts`, catalog paths in `content-dedup.ts` | Move to **`_shared/legacy/`** (§20.4.1) |
 | `src/hooks/use-library.ts` | **`use-collections.ts`** |
 | `src/components/library/*` | **`src/components/archive-collections/*`** (or nest under `archive/`) |
 | `normalize-library-source-type.ts` | **`pause-archive-source-type.ts`** (Archive segment helpers, not “library”) |
-| `docs/systems/content-library-fetch-source-feeds.md` | **`companion-catalog-ingest.md`** (or banner at top: table is `companion_catalog`) |
-| PostHog / analytics `serve_source: 'library'` in any client mirrors | **`catalog`** |
-| Bruno folder names referencing `content_library` | Update when ingest is legacy |
+| `docs/systems/content-library-fetch-source-feeds.md` | Legacy banner: ingest **undeployed**; table **dropped** at MVP |
+| PostHog / analytics `serve_source: 'library'` | Remove / stop emitting; cache/live/curated only |
+| Bruno `fetch-source-feeds` | Move with `functions/legacy/` |
 
 **Routes (already good):** `/archive` not `/library` — keep.
 
@@ -1118,14 +1526,14 @@ UPDATE public.pause_ai_artifacts SET kind = 'opening_message' WHERE kind = 'refl
 
 ### 21.6 Optional “big bang” vocabulary (only with §20.7 baseline squash)
 
-If you **reset DB + squash migrations**, encode **final names only** in `mvp_baseline.sql` (never create `content_library`). Same for dropped Tier B tables — they never appear in baseline.
+If you **reset DB + squash migrations**, encode **final names only** in `holzen_schema_baseline.sql` — **never** create `content_library` or `companion_catalog` (§20.4.1). Same for dropped Tier B tables.
 
 <a id="s21-7"></a>
 
 ### 21.7 Verification
 
 - `rg 'content_library' supabase src` → zero (except `migrations-archive/` or comments in old migration files).
-- `rg "serve_source.*library" supabase src` → zero.
+- `rg "searchLibrary|content-library" supabase/functions/_shared` → zero outside `legacy/`.
 - `rg "reflection_text" src supabase` → only historical migration archive OR gone.
 - `npm run gen:types` · `check:edge` · `test` · `check:view-migrations`.
 
@@ -1141,9 +1549,9 @@ If you **reset DB + squash migrations**, encode **final names only** in `mvp_bas
 
 ### 22.1 Pre-launch stance: DROP beats “empty + manifest”
 
-**You have no users** — treat Postgres like the frontend: **remove** non-MVP domains in a single cutover migration (§20), not only mute triggers. Git tag `full-ia-pre-mvp` + archive branch preserve recovery.
+**You have no production users** (§3.1) — treat Postgres like the frontend: **remove** non-MVP domains in a single cutover migration (§20), not only mute triggers. Git tag `full-ia-pre-strip` + archive branch preserve recovery.
 
-**Exception:** Do not drop tables still read by **MVP** edges (`content_library`, `companion_fallbacks`, …) — see §20.3.
+**Exception:** Do not drop tables still read by **MVP** edges (`companion_cache`, `companion_fallbacks`, …) — see §20.3–§20.4. **`content_library` is dropped** per §20.4.1 after orchestrate no longer calls `searchLibrary`.
 
 <a id="s22-2"></a>
 
@@ -1151,7 +1559,7 @@ If you **reset DB + squash migrations**, encode **final names only** in `mvp_bas
 
 | Category | MVP may use | Removed by §20 (must not appear in types/queries) |
 | --- | --- | --- |
-| **Tables** | `pause_*`, `collections*`, trimmed `profiles`, `notifications`, `roadmap_*`, `btc_price_cache`, `companion_*`, `generation_attempts`, **`companion_catalog`** (§21), `signal_sources`, subscription/credits, email, `analytics_events`, `quiet_windows` | Tier B drops (§20.3) |
+| **Tables** | `pause_*`, `collections*`, trimmed `profiles`, `notifications`, `roadmap_*`, `btc_price_cache`, `companion_cache`, `companion_serves`, `companion_fallbacks`, `generation_attempts`, `signal_sources`, subscription/credits, email, `analytics_events`, `quiet_windows` | Tier B drops incl. **`content_library`** (§20.3–§20.4.1) |
 | **Views** | `v_pause_archive_*`, `v_pause_full` (admin only) | Any view over dropped tables — drop in same migration |
 | **RPCs** | `pause_*`, profile update, archive/collection, billing | RPCs that only served Tools/Journey — `DROP FUNCTION` if nothing references |
 | **Edge → Postgres** | pause/companion analytics events only | Legacy event names stop when edges + tables are gone |
@@ -1203,9 +1611,12 @@ If you **reset DB + squash migrations**, encode **final names only** in `mvp_bas
 | Event | When | Properties | Step |
 | --- | --- | --- | --- |
 | `app.route_not_found` | Catch-all / NotFound for unknown path | `{ attempted_path: string }` — no query strings with PII | Step 2 |
-| `journey.overview_viewed` | `JourneyMvpOverview` mount (once per visit) | `{ streak_days?: number; completed_pause_count?: number }` — aggregates only | Step 2 |
+| `journey.overview_viewed` | `JourneyOverview` mount (once per visit) | `{ streak_days?: number; completed_pause_count?: number }` — aggregates only | Step 2 |
 | `onboarding.completed` | `has_onboarded` set true after new 2-step flow | `{ steps_completed: 2 \| 1; skipped_personalize?: boolean }` | Step 4 |
-| `paywall.viewed` | Extend `source` enum | Add `'journey_archive_cta'` when free user taps Journey Archive upsell (§7.4) | Step 2 |
+| `trial.started` | Stripe subscription enters `trialing` via `ensure-trial-subscription` | `{ trial_days: 7, source: 'ensure_trial' }` | Step 4 |
+| `trial.expired` | `entitlement` → `lapsed` (once per user) | `{ had_completed_pause?: boolean }` — boolean only | Step 5 |
+| `subscription.reactivate_started` | Lapsed user taps add-card CTA (Home, Settings, blocked `/pause`) | `{ source: 'home' \| 'settings' \| 'pause_blocked' }` | Step 4 |
+| `paywall.viewed` | Ritual blocked (`requirePro`, lapsed `/pause`) | `{ source: string; entitlement?: 'lapsed' \| 'trialing' }` — remove Archive upsell sources | Step 4 |
 | `landing.coming_soon_impression` (optional) | Landing section with deferred features enters viewport | `{ section: 'features_grid' }` | Step 5 |
 
 **Launch funnel (document as canonical PostHog funnel in taxonomy):**
@@ -1216,7 +1627,7 @@ If you **reset DB + squash migrations**, encode **final names only** in `mvp_bas
 4. `pause_completed` (first per user = activation; use PostHog “first time” or HogQL)
 5. D7: `pause_completed` or `auth.signed_in` again
 
-**Secondary:** `paywall.viewed` → `paywall.subscribed`; Archive `pause_outcome_retrospective` for Pro depth.
+**Secondary:** `paywall.viewed` → `paywall.subscribed`; `trial.started` / `trial.expired` (§5.4).
 
 <a id="s23-2"></a>
 
@@ -1228,7 +1639,7 @@ If you **reset DB + squash migrations**, encode **final names only** in `mvp_bas
 | `home.optional_widget_toggled` | Only emit for widget ids that still exist in Customize; remove `journey-pulse`, `quick-capture`, `night` from active customize constants |
 | `home.customize_*` | Keep if Customize still offers section order for MVP widgets; otherwise simplify sheet and events |
 
-Historical PostHog data for deprecated events stays (§ taxonomy “Removing an event”).
+**PostHog:** Deprecated events stay documented in taxonomy; for launch dashboards use **cohorts / date filters after publish** so test-era traffic does not dominate (optional: reset PostHog project — ops choice, not required if filters suffice).
 
 <a id="s23-3"></a>
 
@@ -1238,22 +1649,25 @@ Historical PostHog data for deprecated events stays (§ taxonomy “Removing an 
 | --- | --- |
 | **Super-properties** | **Unchanged only:** `cid`, `environment`, `$app_version` — **no** `product_surface` / `product_mode` (explicit non-goal) |
 | **No** | Session replay, autocapture |
-| **Dashboards** | Add subsection in [event-taxonomy.md](docs/ops/event-taxonomy.md) or [mvp-active-surface.md](docs/ops/mvp-active-surface.md): 3 insights — activation funnel, D7 retention on `pause_completed`, companion `generation.initiated` → `pause_completed` ratio |
+| **Dashboards** | Add subsection in [event-taxonomy.md](docs/ops/event-taxonomy.md) or [active-surface.md](docs/ops/active-surface.md): 3 insights — activation funnel, D7 retention on `pause_completed`, companion `generation.initiated` → `pause_completed` ratio |
 | **Web Vitals** | `performance.web_vital.route` will show fewer paths — expected; document MVP route list |
 
 <a id="s23-4"></a>
 
 ### 23.4 Postgres analytics (ops doc, not PostHog)
 
-Document in `mvp-active-surface.md` **canonical SQL** for product review (no new tables):
+**Prerequisite:** §20.8 — all SQL below filters **`created_at >= telemetry_baseline_at`** (cutover). Pre-cutover rows are **test noise**, not launch KPIs.
+
+Document in `active-surface.md` **canonical SQL** for ops review (no new tables):
 
 | Question | Source |
 | --- | --- |
-| Completed pauses / user | `pause_instances` where `state = 'completed'` |
-| Brief vs deep mix | `v_pause_full.is_brief_ritual` or event-derived from `pause_instance_events` |
-| AI cost per pause | `generation_attempts`, `companion_serves`, `analytics_events` |
-| Regenerate pressure | `analytics_events.event = 'companion_regenerate'` |
-| Badge/insight noise after MVP | Should trend to **zero** new rows in `user_badges` / `reflection_insights` once RLS + client removed |
+| Completed pauses / user | `pause_instances` where `state = 'completed'` and `created_at >= telemetry_baseline_at` |
+| Brief vs deep mix | `v_pause_full.is_brief_ritual` (post-cutover pauses only) |
+| AI cost per pause | `generation_attempts` where `pause_instance_id` is not null and `created_at >= telemetry_baseline_at` |
+| Serve mix (cache vs live) | `companion_serves` post-cutover only |
+| Regenerate pressure | `analytics_events` where `event = 'companion_regenerate'` and `created_at >= telemetry_baseline_at` |
+| Legacy domain noise | **Zero** new rows in dropped tables (§20.3); do not query `user_badges` / `reflection_insights` |
 
 **Sentry / BetterStack:** unchanged — filter by `pause_instance_id`, `x-cid`. MVP launch monitor list: `holzen-reflect`, `companion-orchestrate`, `pregenerate-companions` only (§32 Step 6).
 
@@ -1261,7 +1675,7 @@ Document in `mvp-active-surface.md` **canonical SQL** for product review (no new
 
 ### 23.5 Optional CI guard (Step 5)
 
-`scripts/check-mvp-posthog-events.mjs` — parse `trackEvent('...')` in active `src/`; fail if event name not in allowlist from taxonomy MVP section. Catches re-introduced `ritual.*` from accidental imports.
+`scripts/check-posthog-events-allowlist.mjs` — parse `trackEvent('...')` in active `src/`; fail if event name not in allowlist from taxonomy MVP section. Catches re-introduced `ritual.*` from accidental imports.
 
 <a id="s23-6"></a>
 
@@ -1295,7 +1709,7 @@ No `product_mode` flag that gates UI.
 
 ## 25. What else — comprehensive pre-launch checklist
 
-Items not fully spelled out elsewhere. **Pre-launch = be aggressive** where cost is low (no users).
+Items not fully spelled out elsewhere. **Pre-launch = be aggressive** where cost is low (no production users — §3.1).
 
 <a id="s25-1"></a>
 
@@ -1303,7 +1717,7 @@ Items not fully spelled out elsewhere. **Pre-launch = be aggressive** where cost
 
 | Item | Action |
 | --- | --- |
-| **Lovable / Edge secrets** | Document in `mvp-active-surface.md`: **required** vs **optional**. After undeploying ingest/digest edges, **remove or ignore** `FETCH_FEEDS_*` secrets (no runtime caller). Keep `CRON_SECRET`, Stripe, VAPID, model keys, Sentry/BetterStack. |
+| **Lovable / Edge secrets** | Document in `active-surface.md`: **required** vs **optional**. After undeploying ingest/digest edges, **remove or ignore** `FETCH_FEEDS_*` secrets (no runtime caller). Keep `CRON_SECRET`, Stripe, VAPID, model keys, Sentry/BetterStack. |
 | **`app_config` heartbeat keys** | `DELETE FROM app_config WHERE key LIKE 'heartbeat.%'` for dead jobs (`night_reflection`, `fetch_source_feeds`, `badge_notify`, `weekly_digest`, `monthly_report`, `check_followups`, …). Update [observability-setup.md](docs/ops/observability-setup.md) MVP table. |
 | **BetterStack** | Pause/delete monitors for retired crons; keep pause/reflect/companion/volatility/BTC/email-queue heartbeats. |
 | **`npm run stamp:release`** | Step 6 before publish — align `EDGE_RELEASE` / `VITE_APP_VERSION` (Git SHA). |
@@ -1327,8 +1741,8 @@ Items not fully spelled out elsewhere. **Pre-launch = be aggressive** where cost
 
 | Item | Action |
 | --- | --- |
-| **Stripe / Pro** | Keep checkout, portal, flex credits, `monthly_feature_usage`, `credit_wallets` — Archive + deep pause are Pro gates. |
-| **Settings subscription** | Pricing copy: list **pause + Archive + companions** only; referrals can stay if low-cost (table `referrals` kept). |
+| **Stripe / billing** | Keep checkout, portal, flex credits, `monthly_feature_usage`, `credit_wallets`. **Ritual engagement** gated by §5.4 (`trialing` \| `active` \| `lapsed`); Archive/Journey not gated. |
+| **Settings subscription** | Copy per §5.4: trial without card, paid to **continue pauses**, Archive/Journey always available; referrals can stay if low-cost. |
 | **`process-referral-pending` cron** | **Keep** if referral program stays in settings. |
 | **SmokeTest** | Update [`SmokeTest.tsx`](src/pages/SmokeTest.tsx) checklist — remove steps for legacy edges; keep pause + billing smoke. |
 
@@ -1357,14 +1771,14 @@ Items not fully spelled out elsewhere. **Pre-launch = be aggressive** where cost
 
 <a id="s25-6"></a>
 
-### 25.6 Companion catalog pipeline (Step 5)
+### 25.6 Companion content pipeline (Step 5 — §20.4.1)
 
 | Item | Action |
 | --- | --- |
-| **`companion_catalog` rows** | **Keep existing seed data** — companions need catalog + cache. Do not truncate catalog on cutover. |
-| **`fetch-source-feeds` cron** | **Unschedule** for MVP (no admin ingest). Catalog is **read-only** at launch unless you manually add rows. |
-| **`signal_source_suggestions`** | Optional **DROP** if no MVP writer; else keep for future ingest. |
-| **Pregenerate companions cron** | **Keep** — warms `companion_cache`. |
+| **`content_library`** | **DROP** — no catalog table at MVP. |
+| **`fetch-source-feeds` cron** | **Unschedule** + edge undeployed (Step 3). |
+| **`signal_source_suggestions`** | **KEEP** — live gens enqueue URLs; slim admin drops approve UI only. |
+| **Pregenerate companions cron** | **Keep** — sole warm pool for `companion_cache`; bump `minHealthyRows` if needed; manual invoke after DB reset. |
 
 <a id="s25-7"></a>
 
@@ -1389,14 +1803,15 @@ Step 2–Step 5 doc work is owned by **[Documentation program](#s26)** (inventor
 
 | Order | Action | Owner |
 | --- | --- | --- |
-| 1 | Steps 1–5 committed on `cursor/pause-v2-final` (tag before step 3 moves / step 5 DROP) | Branch |
+| 1 | Steps 1–5 committed on `feature/mvpPauseCleanup` (tag before step 3 moves / step 5 DROP) | Branch |
 | 2 | Step 3 already deployed edges undeploy + `_shared/legacy` (step 5 does **not** redeploy legacy handlers) | Supabase |
 | 3 | Step 5: §20.7 squash or cutover + §17.5 + `delete-account` + `gen:types` pushed | DB |
-| 4 | Verify: `npm run test` · `npm run build` · `check:view-migrations` · `check:edge` (if Deno) | CI |
-| 5 | `npm run stamp:release` — align `EDGE_RELEASE` / `VITE_APP_VERSION` (Git SHA) | Ops |
-| 6 | **Push** GitHub → migrations/edges apply; confirm green | Deploy |
-| 7 | Lovable **Publish → Update** (frontend) | Lovable |
-| 8 | PostHog/Sentry smoke; 24h pause/reflect error monitor | Ops |
+| 4 | **§14.3** — full repo consistency gate (all `npm run check:*` / `test:ci` / `build` / `lint` / `stamp:release` per table) | CI |
+| 5 | §29.7 + §29.8 — unit + RTL integration matrix green; Bruno `active/` smoke if env available | Tests |
+| 6 | **Push** `feature/mvpPauseCleanup` → GitHub; migrations/edges apply; confirm green | Deploy |
+| 7 | `npm run stamp:release` already in §14.3 — align `EDGE_RELEASE` / `VITE_APP_VERSION` (Git SHA) | Ops |
+| 8 | Lovable **Publish → Update** (frontend) | Lovable |
+| 9 | PostHog/Sentry smoke; 24h pause/reflect error monitor | Ops |
 
 **Hard rule:** Step 4 narrows `profile-row-query` **before** step 5 column DROP. Step 3 undeploys edges; step 5 is SQL + account delete only.
 
@@ -1412,14 +1827,14 @@ Step 2–Step 5 doc work is owned by **[Documentation program](#s26)** (inventor
 
 | Document | Purpose | Step |
 | --- | --- | --- |
-| [`docs/ops/mvp-active-surface.md`](docs/ops/mvp-active-surface.md) | **Ship manifest:** routes, edges, crons, tables/RPCs, PostHog events, env secrets; “removed from DB” list after §20; link to tag `full-ia-pre-mvp` | Step 2 stub → Step 5 complete |
-| [`docs/decisions/2026-05-16-pause-first-mvp.md`](docs/decisions/2026-05-16-pause-first-mvp.md) | ADR: why legacy folder + no global flag + aggressive DROP pre-launch + recovery | Step 2 |
-| [`docs/ops/mvp-launch-runbook.md`](docs/ops/mvp-launch-runbook.md) | Human checklist: §25.9 order, verification SQL, Lovable publish, rollback pointer | Step 6 |
+| [`docs/ops/active-surface.md`](docs/ops/active-surface.md) | **Ship manifest:** routes, edges, crons, tables/RPCs, PostHog events, env secrets; “removed from DB” list after §20; link to tag `full-ia-pre-strip` | Step 2 stub → Step 5 complete |
+| [`docs/decisions/2026-05-16-pause-first-shipped-scope.md`](docs/decisions/2026-05-16-pause-first-shipped-scope.md) | ADR: why legacy folder + no global flag + aggressive DROP pre-launch + recovery | Step 2 |
+| [`docs/ops/launch-runbook.md`](docs/ops/launch-runbook.md) | Human checklist: §25.9 order, verification SQL, Lovable publish, rollback pointer | Step 6 |
 | [`src/legacy/README.md`](src/legacy/README.md) | Tag name, what’s inside, “never import”, recovery steps | Step 1 |
 | [`supabase/functions/legacy/README.md`](supabase/functions/legacy/README.md) | Undeployed edges list + restore from `config.toml` | Step 3 |
 | [`src/README.md`](src/README.md) | One-screen map of active `src/` (not legacy) | Step 1 |
-| [`docs/screens/journey-mvp.md`](docs/screens/journey-mvp.md) | **`/journey`** overview-only: data sources, Pro Archive CTA, explicit non-goals | Step 2 |
-| [`.cursor/rules/mvp-active-surface.mdc`](.cursor/rules/mvp-active-surface.mdc) | Agents: read manifest first; no `@/legacy` imports | Step 5 |
+| [`docs/screens/journey-overview.md`](docs/screens/journey-overview.md) | **`/journey`** overview-only: data sources, universal Archive CTA (§7.4 — no Pro gate), explicit non-goals | Step 2 |
+| [`.cursor/rules/active-surface.mdc`](.cursor/rules/active-surface.mdc) | Agents: read manifest first; no `@/legacy` imports | Step 5 |
 
 <a id="s26-2"></a>
 
@@ -1429,12 +1844,12 @@ Add row to **Canonical sources** table:
 
 | Kind | Authoritative place |
 | --- | --- |
-| **What ships in MVP** (routes, edges, schema, analytics) | [`docs/ops/mvp-active-surface.md`](docs/ops/mvp-active-surface.md) |
-| **Why we stripped full IA** | [`docs/decisions/2026-05-16-pause-first-mvp.md`](docs/decisions/2026-05-16-pause-first-mvp.md) |
+| **What ships in MVP** (routes, edges, schema, analytics) | [`docs/ops/active-surface.md`](docs/ops/active-surface.md) |
+| **Why we stripped full IA** | [`docs/decisions/2026-05-16-pause-first-shipped-scope.md`](docs/decisions/2026-05-16-pause-first-shipped-scope.md) |
 
 **Rewrite “Start here” (Step 5)** — new order:
 
-1. `mvp-active-surface.md` + `src/README.md`  
+1. `active-surface.md` + `src/README.md`  
 2. [pause-system.md](docs/systems/pause-system.md) + [ai-powered-pause-system.md](docs/systems/pause/ai-powered-pause-system.md)  
 3. [navigating-the-codebase.md](docs/fundamentals/navigating-the-codebase.md) (MVP pause slice)  
 4. [information-architecture.md](docs/design/information-architecture.md) § MVP only  
@@ -1446,9 +1861,9 @@ Do **not** start new contributors on `stats-system.md` / `badges-system.md` unti
 
 ### 26.3 [AGENTS.md](AGENTS.md) (Step 5)
 
-- Add **Change map** row: “Pause-first MVP strip” → decision + `mvp-active-surface.md` + legacy rules.  
+- Add **Change map** row: “Pause-first shipped scope” → decision + `active-surface.md` + legacy rules.  
 - Trim **Where to change what** table: remove or footnote Journey tabs, Tools, badge/stats paths → “legacy / deferred”.  
-- Point `gen:types` and migration work at §20–§22 naming (`companion_catalog`, `opening_message`).
+- Point `gen:types` and migration work at §20–§22 (cache-only §20.4.1, `opening_message`).
 
 <a id="s26-4"></a>
 
@@ -1467,10 +1882,11 @@ Do **not** start new contributors on `stats-system.md` / `badges-system.md` unti
 | Doc | Action | Step |
 | --- | --- | --- |
 | [pause-system.md](docs/systems/pause-system.md) | Remove “stats, badges” from intro if present; document artifact kind **`opening_message`**; `reflection_text` → historical name in footnote | Step 5 |
-| [ai-powered-pause-system.md](docs/systems/pause/ai-powered-pause-system.md) | Rename `content_library` → **`companion_catalog`**; phase **`catalog`** not `library`; list **undeployed** edges | Step 5 |
-| [companions/*.md](docs/systems/pause/companions/) | Replace `content_library` / `library` phase wording with `companion_catalog` / `catalog` | Step 5 |
+| [ai-powered-pause-system.md](docs/systems/pause/ai-powered-pause-system.md) | Phase **cache → live → curated**; **`content_library` dropped** (§20.4.1); list undeployed ingest edges | Step 5 |
+| [companions/*.md](docs/systems/pause/companions/) | Remove library phase; point pool to **`companion_cache`** + pregen doc | Step 5 |
 | [ai-cost-model.md](docs/systems/costs/ai-cost-model.md) | Mark retired functions (insights, wallpaper, digest, badge-notify) **not deployed**; MVP cost path = pause + companions | Step 5 |
 | [auth-and-referral-system.md](docs/systems/auth/auth-and-referral-system.md) | Light touch: MVP still has auth + optional referrals in settings | Step 4 if copy changes |
+| [pricing-strategy.md](docs/systems/costs/pricing-strategy.md) | Replace 3-free/month + “free forever” with §5.4 Stripe trial + lapsed read/engage split | Step 5 |
 
 <a id="s26-6"></a>
 
@@ -1479,14 +1895,14 @@ Do **not** start new contributors on `stats-system.md` / `badges-system.md` unti
 Use a **standard banner** at line 1 (template in decision doc):
 
 ```markdown
-> **Not in shipped MVP (2026-05).** Reference implementation: git tag `full-ia-pre-mvp` or `src/legacy/pre-mvp-full-shell/`. Shipped surface: [mvp-active-surface.md](../ops/mvp-active-surface.md).
+> **Not in shipped MVP (2026-05).** Reference implementation: git tag `full-ia-pre-strip` or `src/legacy/full-shell/`. Shipped surface: [active-surface.md](../ops/active-surface.md).
 ```
 
 | Doc | Step |
 | --- | --- |
 | [stats-system.md](docs/systems/stats-system.md) | Step 5 |
 | [badges-system.md](docs/systems/badges-system.md) | Step 5 |
-| [content-library-fetch-source-feeds.md](docs/systems/content-library-fetch-source-feeds.md) | Step 5 — rename file to **`companion-catalog-ingest.md`** *or* banner + “ingest undeployed at MVP” |
+| [content-library-fetch-source-feeds.md](docs/systems/content-library-fetch-source-feeds.md) | Step 5 — legacy banner: ingest undeployed, **`content_library` dropped** |
 | [past-reflections.md](docs/systems/pause/past-reflections.md) | Step 5 — banner (`practice_entries` dropped) unless Echo still uses it (grep; may archive doc) |
 
 **Do not** move deferred docs to `docs/backlog/` — that implies “planned work”; these are **frozen reference** until rebuild.
@@ -1513,7 +1929,7 @@ Use a **standard banner** at line 1 (template in decision doc):
 | --- | --- | --- |
 | [home.md](docs/screens/home.md) | Rewrite for MVP widgets only (goal-why, market, your-pause); remove journey-pulse / quick-capture | Step 4 |
 | [pause.md](docs/screens/pause.md) | Post-pause CTAs → Home/Archive; `opening_message` naming | Step 4 |
-| **New** [journey-mvp.md](docs/screens/journey-mvp.md) | Overview screen contract | Step 2 |
+| **New** [journey-overview.md](docs/screens/journey-overview.md) | Overview screen contract | Step 2 |
 | Archive | Add **`archive.md`** if missing — or confirm Archive behavior unchanged, link from manifest | Step 5 |
 
 <a id="s26-9"></a>
@@ -1523,7 +1939,7 @@ Use a **standard banner** at line 1 (template in decision doc):
 | Doc | Action | Step |
 | --- | --- | --- |
 | [end-to-end-review-master-checklist.md](docs/reviews/end-to-end-review-master-checklist.md) | Add **MVP column** or new section “Shipped MVP only” with ~15 flows; mark Tools/Journey tabs as N/A | Step 6 |
-| [react-spa-review-template.md](docs/reviews/react-spa-review-template.md) | Link to `mvp-active-surface.md` + holzen-flow-review skill | Step 5 |
+| [react-spa-review-template.md](docs/reviews/react-spa-review-template.md) | Link to `active-surface.md` + holzen-flow-review skill | Step 5 |
 | Phase 1–8 review docs | Top banner: “Full IA pre-MVP; use for security audit reference” | Step 5 |
 | [http-review-playbooks.md](docs/fundamentals/http-review-playbooks.md) | MVP HTTP sequence; link **[Bruno](#s27)** | Step 5 |
 
@@ -1548,7 +1964,7 @@ Use a **standard banner** at line 1 (template in decision doc):
 | [navigating-the-codebase.md](docs/fundamentals/navigating-the-codebase.md) | §10: “MVP path” = Home → pause → Archive; legacy folder callout | Step 5 |
 | [client-server-architecture-holzen.md](docs/fundamentals/client-server-architecture-holzen.md) | One paragraph: legacy = reference, not second backend | Step 5 |
 | [react-screen-orchestration.md](docs/fundamentals/react-screen-orchestration.md) | Keep Home tour but add note “full Home had more widgets pre-MVP” | Step 6 |
-| [mental-models-for-contributors.md](docs/fundamentals/mental-models-for-contributors.md) | Optional: glossary entries `companion_catalog`, `opening_message` | Step 6 |
+| [mental-models-for-contributors.md](docs/fundamentals/mental-models-for-contributors.md) | Optional: glossary `companion_cache` pool, `opening_message` | Step 6 |
 
 <a id="s26-12"></a>
 
@@ -1557,7 +1973,7 @@ Use a **standard banner** at line 1 (template in decision doc):
 | Avoid | Why |
 | --- | --- |
 | Duplicate MVP route list in 5 files | Manifest is single owner |
-| Long narrative in `AGENTS.md` | Link to `mvp-active-surface.md` |
+| Long narrative in `AGENTS.md` | Link to `active-surface.md` |
 | Delete deferred system docs | Git tag + banners preserve recovery context |
 | OpenAPI spec for MVP | Bruno + taxonomy sufficient per documentation-strategy |
 | Rewrite all 8 phase review docs | Banner only |
@@ -1570,10 +1986,10 @@ Use a **standard banner** at line 1 (template in decision doc):
 ```bash
 # No doc still tells contributors to open Tools as shipped
 rg -n "/tools|journey/stats|Holzen Score|content_library" docs --glob '!**/legacy/**' \
-  | rg -v "pre-MVP|Not in shipped|deferred|full-ia-pre-mvp|Appendix"
+  | rg -v "pre-MVP|Not in shipped|deferred|full-ia-pre-strip|Appendix"
 
 # Manifest links resolve
-rg "mvp-active-surface" docs AGENTS.md README.md src/README.md
+rg "mvp|pre-mvp" docs/ops/active-surface.md AGENTS.md README.md src/README.md --glob '!**/.cursor/plans/**'
 ```
 
 ---
@@ -1582,7 +1998,7 @@ rg "mvp-active-surface" docs AGENTS.md README.md src/README.md
 
 ## 27. Bruno (MVP HTTP review)
 
-Bruno exercises **HTTP only** ([SCOPE.md](bruno/SCOPE.md)) — Auth + **deployed** Edge Functions. It does not replace Playwright/Vitest for UI. After MVP strip, the collection must match **`config.toml`** + [`mvp-active-surface.md`](docs/ops/mvp-active-surface.md), not every historical `.bru`.
+Bruno exercises **HTTP only** ([SCOPE.md](bruno/SCOPE.md)) — Auth + **deployed** Edge Functions. It does not replace Playwright/Vitest for UI. After MVP strip, the collection must match **`config.toml`** + [`active-surface.md`](docs/ops/active-surface.md), not every historical `.bru`.
 
 <a id="s27-1"></a>
 
@@ -1590,10 +2006,10 @@ Bruno exercises **HTTP only** ([SCOPE.md](bruno/SCOPE.md)) — Auth + **deployed
 
 | Goal | How |
 | --- | --- |
-| **Cognitive clarity** | **`bruno/mvp/`** = default review tree; retired requests under **`bruno/legacy/pre-mvp-full-shell/`** |
+| **Cognitive clarity** | **`bruno/active/`** = default review tree; retired requests under **`bruno/legacy/full-shell/`** |
 | **Match production** | No top-level folder implying `weekly-digest` or `badge-notify` still deploy |
 | **Auth grouping** | Keep credential-based folders ([README](bruno/README.md)); add **`platform/`** for health + feedback + dangerous ops |
-| **Single catalog** | [`bruno/mvp/functions-catalog.md`](bruno/mvp/functions-catalog.md) = deployed MVP only |
+| **Single catalog** | [`bruno/active/functions-catalog.md`](bruno/active/functions-catalog.md) = deployed surface only |
 
 <a id="s27-2"></a>
 
@@ -1602,10 +2018,10 @@ Bruno exercises **HTTP only** ([SCOPE.md](bruno/SCOPE.md)) — Auth + **deployed
 ```text
 bruno/
   bruno.json
-  README.md                 ← “Start in mvp/”
-  SCOPE.md                  ← § MVP vs legacy
+  README.md                 ← “Start in active/”
+  SCOPE.md                  ← § shipped vs legacy
   environments/             ← local.bru, hosted.bru (unchanged)
-  mvp/
+  active/
     README.md               ← smoke sequence (§20.6)
     functions-catalog.md
     auth/
@@ -1613,9 +2029,9 @@ bruno/
     pause-pipeline/         ← holzen-reflect, companion-orchestrate
     billing/
     platform/               ← health, send-feedback, register-push, delete-account-DANGEROUS, referral
-    service-cron/           ← MVP crons only
+    service-cron/           ← shipped crons only
     auth-hook/              ← optional preview
-  legacy/pre-mvp-full-shell/
+  legacy/full-shell/
     README.md               ← tag + “undeployed in prod”
     user-jwt/               ← moved: badge, journal, insights, wallpaper, suggest-*
     service-cron/           ← moved: digest, night-reflection, letters, fetch-source-feeds, …
@@ -1632,7 +2048,7 @@ bruno/
 | **auth/** | Supabase sign-up / sign-in (unchanged) |
 | **public/** | `holzen-number` |
 | **pause-pipeline/** | `holzen-reflect`, `companion-orchestrate` — **primary smoke** |
-| **billing/** | `create-checkout`, `check-subscription`, `customer-portal` |
+| **billing/** | `ensure-trial-subscription` (Step 4 smoke), `check-subscription`, `create-checkout` (reactivation), `customer-portal` |
 | **platform/** | **`health`** (add), `send-feedback`, `register-push`, `delete-account` (DANGEROUS), `record-referral` / `process-referral-pending` if referrals ship, **`retry-flex-credit`** (add if used) |
 | **service-cron/** | `check-volatility`, `refresh-btc-prices`, `pregenerate-companions`; optional `backfill-btc-prices`, `seed-btc-history` under `ops/` |
 | **auth-hook/** | `auth-email-hook-preview` only (optional; needs `LOVABLE_API_KEY`) |
@@ -1641,7 +2057,7 @@ bruno/
 
 <a id="s27-4"></a>
 
-### 27.4 Move to `bruno/legacy/pre-mvp-full-shell/`
+### 27.4 Move to `bruno/legacy/full-shell/`
 
 | Requests | Why |
 | --- | --- |
@@ -1655,16 +2071,16 @@ bruno/
 
 | File | Action |
 | --- | --- |
-| `bruno/mvp/functions-catalog.md` | New — Name, folder, auth, `verify_jwt`, smoke (Y/n) |
-| `bruno/functions-catalog.md` | Banner → points to `mvp/functions-catalog.md` |
+| `bruno/active/functions-catalog.md` | New — Name, folder, auth, `verify_jwt`, smoke (Y/n) |
+| `bruno/functions-catalog.md` | Banner → points to `active/functions-catalog.md` |
 | `bruno/README.md` | Folder table + **Typical flows** = MVP only |
 | `bruno/SCOPE.md` | § what Bruno proves at launch |
-| `mvp-active-surface.md` | Link Bruno catalog as HTTP mirror |
+| `active-surface.md` | Link Bruno catalog as HTTP mirror |
 | `http-review-playbooks.md` | MVP sequence, not “every function” |
 
 <a id="s27-6"></a>
 
-### 27.6 MVP smoke sequence (`bruno/mvp/README.md`)
+### 27.6 MVP smoke sequence (`bruno/active/README.md`)
 
 1. `auth/01-sign-in-password`  
 2. `public/holzen-number`  
@@ -1678,10 +2094,10 @@ bruno/
 
 <a id="s27-7"></a>
 
-### 27.7 Optional CI (`scripts/check-bruno-mvp-manifest.mjs`)
+### 27.7 Optional CI (`scripts/check-bruno-active-manifest.mjs`)
 
-- Every URL in `bruno/mvp/**/*.bru` must match a `[functions.*]` name still in `config.toml`.  
-- Fail if `bruno/mvp/` references a function that exists only under `bruno/legacy/`.
+- Every URL in `bruno/active/**/*.bru` must match a `[functions.*]` name still in `config.toml`.  
+- Fail if `bruno/active/` references a function that exists only under `bruno/legacy/`.
 
 <a id="s27-8"></a>
 
@@ -1703,9 +2119,9 @@ PostgREST suites for all `pause_*` RPCs; OpenAPI; Bruno in CI against prod; HTTP
 
 | Step | Bruno |
 | --- | --- |
-| Step 3 | Layout, moves, `health`, `x-cid`, `mvp/functions-catalog.md`, optional CI script |
+| Step 3 | Layout, moves, `health`, `x-cid`, `active/functions-catalog.md`, optional CI script |
 | Step 5 | Catalog matches final `config.toml` |
-| Step 6 | Run smoke seq; note in `mvp-launch-runbook.md` |
+| Step 6 | Run smoke seq; note in `launch-runbook.md` |
 
 ---
 
@@ -1718,15 +2134,15 @@ PostgREST suites for all `pause_*` RPCs; OpenAPI; Bruno in CI against prod; HTTP
 | ------------------------------- | ------------------------------------------------------------- |
 | Legacy drift from active APIs   | Legacy excluded from build + Vitest; port intentionally when restoring |
 | Pro users miss stats            | Tag/branch + roadmap + landing Coming soon; no dual UI fork   |
-| Free user Journey → Archive CTA | Pro-aware copy (§7.4)                                         |
-| Import from legacy by mistake   | **ESLint error** + `check-mvp-active-surface.mjs` in CI (§18.2) |
+| Journey → Archive CTA implies paywall | §7.4 — same CTA for all signed-in; no `useProGate` on Journey      |
+| Import from legacy by mistake   | **ESLint error** + `check-active-surface.mjs` in CI (§18.2) |
 | Stray `/tools` links in pause UI | Step 2 `PauseFrame` / `PauseDone` / `PauseSession` audit (§18.4) |
-| i18n noise in bundle            | MVP locale file + check script (§18.5)                        |
+| i18n noise in bundle            | Slim `en.json` + legacy locale archive (§18.5); optional missing-key check in Step 6 |
 | Lost work                       | Step 1 tag mandatory before Step 3 moves and **before Step 5 DROP**       |
 | Rename breaks companions        | Apply §21 **before** deploy; run view regen + edge grep in same step 5 commit |
-| DROP breaks companions          | Do **not** drop `companion_catalog` until cache-only product spec |
+| Thin cache at launch            | §20.4.1 — run pregen after reset; brief live-heavy period OK (§3.1) |
 | Migration fails on FK/view      | Order per §20.3; run `check:view-migrations` in Step 5            |
-| Zero-user assumption wrong      | Confirm `auth.users` count before §20.3; skip DROP if not empty |
+| Cutover wipes wanted data       | Run §3.1 checklist before Step 5; export optional; tag `full-ia-pre-strip` mandatory |
 | **Profile SELECT after DROP**   | Narrow `profile-row-query` in **Step 4**; migration in **Step 5** (§16.3) |
 | **check:edge** scans legacy     | Exclude `functions/legacy/` in Step 3 (§18.2)                     |
 | Push migration before Lovable   | Step 5: code tolerant of new schema same day; publish frontend after migration green (§25.9) |
@@ -1739,6 +2155,38 @@ PostgREST suites for all `pause_*` RPCs; OpenAPI; Bruno in CI against prod; HTTP
 ## 29. Testing
 
 **Principle:** The default test suite should match the **shipped product**, not the reference tree. Same cognitive rule as §5.3 routing — no “compat” tests that assert old URLs redirect.
+
+<a id="s29-0"></a>
+
+### 29.0 Testing pyramid (locked — how layers fit)
+
+This is a **plan**; nothing below exists until **Steps 2–6** land it. “What to add” = **implementation deliverables**, not “missing because we forgot.”
+
+```text
+                    ┌─────────────────────────────┐
+                    │  Bruno active/ (optional)   │  HTTP smoke — real edges, env required
+                    │  Playwright/Cypress: OUT    │
+                    └──────────────┬──────────────┘
+                                   │
+              ┌────────────────────┴────────────────────┐
+              │  Integration — Vitest + RTL + router      │  Main **user flows** (§29.8)
+              │  mocked supabase + invokeEdge           │  one describe per flow
+              └────────────────────┬────────────────────┘
+                                   │
+         ┌─────────────────────────┴─────────────────────────┐
+         │  Unit — Vitest (isolated)                           │  Rules, hooks, lib (§29.7)
+         │  subscription gate, pause hooks, app-routes helpers │
+         └─────────────────────────────────────────────────────┘
+```
+
+| Layer | Count philosophy | Runs in |
+| --- | --- | --- |
+| **Unit** | Many small tests — fast, no router | `npm run test` |
+| **Integration** | **Few files, one per main flow** — not seven random nav checks | `npm run test` |
+| **HTTP smoke** | Thin Bruno sequence | Step 6 manual / optional CI |
+| **Browser E2E** | **Not in this strip** | Backlog |
+
+**Do not** duplicate the same assertion at every layer (e.g. 404 policy: one integration flow file, optional unit test for `APP_ROUTES` helpers only).
 
 ### 29.1 Default `npm run test` (Vitest)
 
@@ -1754,45 +2202,33 @@ test: {
 - **~108** test files today; expect **~15–25** to move with legacy code (not deleted — reference only).
 - **Keep** pause ritual, checkout guards, archive helpers, companion/orchestrate unit tests, and anything imported only from active `src/`.
 - **Move** with legacy modules (or to `src/test/legacy/**`, same exclude): `badges-compute.test.ts`, `pause-score.test.ts`, `pause-impact-data.test.ts`, `home-section-order-normalize.test.ts`, `feed-ingest-filter.test.ts`, `grounding-enrichment-util.test.ts`, `hold-goal-headline.test.ts`, `apply-bulk-hold-outcomes.test.ts`, tools/journey-tab helpers tied to removed IA, etc.
-- **Port, don’t import legacy:** if Journey MVP reuses streak math from `StreakTimeline`, add `src/lib/journey/*.test.ts` with copied fixtures — do not `@/legacy` from active tests.
+- **Port, don’t import legacy:** if Journey overview reuses streak math from `StreakTimeline`, add `src/lib/journey/*.test.ts` with copied fixtures — do not `@/legacy` from active tests.
 
 **Coverage** ([package.json](package.json) `test:ci`): unchanged policy — **only** `CheckoutConfirmation.tsx` + `checkout-suppression-window.ts` have per-file thresholds. No global coverage floor; MVP strip does not require raising coverage %.
 
-### 29.2 Step 2 — routing & nav tests (404 policy)
+### 29.2 Unit vs integration — who owns what
 
-Add **`src/test/mvp-routes.test.tsx`** (or extend a small `app-routes.test.ts`) — render `App` / route manifest with `MemoryRouter` + auth stub:
+| Concern | **Unit** (§29.7) | **Integration** (§29.8) |
+| --- | --- | --- |
+| `canEngagePause`, trial/lapsed helpers | `home-subscription-gate.test.ts`, `lib/*` | — |
+| Pause step transitions, breath RPC loggers | existing `src/test/pause-*.test.ts`, `use-pause-session-*` | — |
+| `APP_ROUTES` / path helpers | `app-routes.test.ts` (no full App render) | — |
+| `JourneyStreakCard` math / empty state | component test with mocked data | — |
+| Checkout suppression window | existing `checkout-confirmation-*` | — |
+| **User can complete a journey in the app shell** | — | flow integration files |
+| Nav + entitlement + route together | — | flow integration files |
 
-| Assert | Example paths |
-| --- | --- |
-| MVP routes render (smoke) | `/`, `/archive`, `/journey`, `/settings`, `/pause` |
-| Dead paths → `NotFound` | `/tools/foo`, `/library`, `/journey/stats`, `/journey/badges`, `/settings/reflection` |
-| **No** redirect hops | `initialEntries: ['/library']` → screen shows NotFound, **not** `/archive` |
-| Analytics | Optional: `app.route_not_found` fired with `attempted_path` (mock PostHog) |
-
-**Update** [`BottomNav.test.tsx`](src/components/BottomNav.test.tsx) (Step 2):
-
-- Remove “tools tab on `/tools/*`” cases.
-- Journey tab: active **only** on `/journey` (exact or `pathname === '/journey'`), **not** `/journey/stats`.
-- Four tabs: home · archive · journey · settings.
-
-### 29.3 Pause & product tests (keep / tighten)
-
-| Area | Action |
-| --- | --- |
-| **Pause flow** | Keep existing `src/test/pause-*.test.ts` / hook tests; add assertion that post-complete navigation never calls `journeyPath('stats')` or `/tools/*` (§18.4). |
-| **Onboarding** | Test **2-step** flow only after Step 4; move paywall/hold-goal tests to legacy. |
-| **Journey MVP** | New tests for `JourneyStreakCard` / overview CTA (free vs Pro Archive copy) — Step 2–4. |
-| **Checkout** | Keep all `checkout-confirmation-*` tests — billing stays in MVP. |
+**Update** [`BottomNav.test.tsx`](src/components/BottomNav.test.tsx) (Step 2, unit): four tabs only; Journey active on `/journey` only — or fold into flow **F-shell** if redundant.
 
 ### 29.4 CI scripts (not Vitest — Step 3)
 
 | Script | Role |
 | --- | --- |
-| `check:mvp-surface` | Forbidden imports/paths in active `src/` (§18.2) |
-| `check:mvp-invoke-edge` | Allowlisted `invokeEdge(` names only |
+| `check:active-surface` | Forbidden imports/paths in active `src/` (§18.2) |
+| `check:invoke-edge-allowlist` | Allowlisted `invokeEdge(` names only |
 | `check:edge-coverage-manifest` | Already in `test:ci` — trim to MVP edges after Step 3 |
 
-Wire `npm run check:mvp-surface` into **`test:ci`** (cheap; catches stray `@/lib/stats` imports tests might not hit).
+Wire `npm run check:active-surface` into **`test:ci`** (cheap; catches stray `@/lib/stats` imports tests might not hit).
 
 **Optional Step 6:** post-`build` grep `dist/assets/*.js` for `BadgesPanelV2` / `ToolsHub` strings (bundle leak guard).
 
@@ -1802,9 +2238,76 @@ Wire `npm run check:mvp-surface` into **`test:ci`** (cheap; catches stray `@/lib
 - **No** running legacy tests in default CI (optional `npm run test:legacy` later if you want a manual reference check).
 - **No** global coverage gate on the slimmed tree.
 
-### 29.6 Step gates (unchanged)
+### 29.6 Step gates (per-step minimum)
 
-Every implementation step still runs **`npm run test`** before commit. Step 3+ also **`check:mvp-surface`** · **`check:edge-coverage-manifest`**; Step 5 adds **`npm run build`** + **`check:view-migrations`**.
+Every implementation step still runs **`npm run test`** before commit. Step 3+ also **`check:active-surface`** · **`check:edge-coverage-manifest`**; Step 5 adds **`npm run build`** + **`check:view-migrations`**. **Step 6** runs the full **[§14.3](#s14-3)** gate (all repo scripts), not only Vitest.
+
+<a id="s29-7"></a>
+
+### 29.7 Unit layer (bottom of pyramid)
+
+**Rule:** Add or keep **unit** tests when logic is isolated — no full `App` render. Same commit as the feature (Steps 2–6).
+
+| Unit target | Examples (keep / add) | Step |
+| --- | --- | --- |
+| Subscription / engage gate | `home-subscription-gate`, `canEngagePause` (§5.4) | 4 |
+| Pause hooks & state | existing `pause-*.test.ts`, session hook tests | 2–4 |
+| Route helpers | `app-routes.test.ts` — paths only, no layout | 2 |
+| Journey overview widget | `JourneyStreakCard`, `lib/journey/*` | 2–4 |
+| Checkout guards | `checkout-confirmation-*` | keep |
+| Onboarding steps | 2-step only; move paywall tests to legacy | 4 |
+
+Legacy-only unit tests → `src/test/legacy/**` with §16.2 (excluded from default `npm run test`).
+
+<a id="s29-8"></a>
+
+### 29.8 Integration layer — main user flows (middle of pyramid)
+
+**One integration file per main flow** under `src/test/integration/flows/` (not a grab-bag of nav trivia). Each file uses shared **`render-shipped-app.tsx`** (Step 2) and mocks Supabase/`invokeEdge` like [`checkout-confirmation-guard.test.tsx`](src/test/checkout-confirmation-guard.test.tsx).
+
+**Harness (implement Step 2, first):** `src/test/integration/render-shipped-app.tsx` — `QueryClientProvider`, `MemoryRouter`, auth/entitlement stub, default mocks. Short `src/test/integration/README.md`: RTL + router = integration; not Playwright.
+
+#### Main flows = what we ship (§1 north star + §5.1)
+
+| ID | Main flow (user journey) | Integration file (implement) | Key asserts (mocked backend) | Step |
+| --- | --- | --- | --- | --- |
+| **F1** | **Sign up → onboard → trial → Home** | `flows/onboarding-to-home.integration.test.tsx` | 2-step flow; mock `ensure-trial-subscription` → `trialing` (no Checkout redirect); `has_onboarded`; 4-tab shell | 4 |
+| **F2** | **Home → start pause** (`trialing` / `active`) | `flows/home-start-pause.integration.test.tsx` | Primary CTA reaches `/pause` shell; no `/tools` link | 4 |
+| **F3** | **Pause ritual shell** (no full AI) | `flows/pause-shell.integration.test.tsx` | `/pause` renders steps with mocked instance; **done/error** paths never navigate to `/tools` or `/journey/stats` (§18.4) | 2–4 |
+| **F4** | **Lapsed: read but don’t engage** | `flows/lapsed-readonly.integration.test.tsx` | `/archive` + `/journey` OK; `/pause` shows reactivation not ritual; Home blocks start | 4 |
+| **F5** | **Archive browse** | `flows/archive.integration.test.tsx` | Signed-in `/archive` loads (no Pro gate); no `/library` redirect | 4 |
+| **F6** | **Journey overview** | `flows/journey-overview.integration.test.tsx` | `/journey` overview + Archive CTA; not `/journey/stats` | 2–4 |
+| **F7** | **Settings / subscription** | `flows/settings.integration.test.tsx` | `/settings` subscription block; no removed tools/badges panels | 4 |
+| **F8** | **Dead IA → 404** (guardrail) | `flows/dead-routes.integration.test.tsx` | `/tools/*`, `/library`, `/journey/stats` → NotFound; **no** redirect to `/archive` | 2 |
+| **F9** | **Subscribe / checkout return** | reuse `checkout-confirmation-*` (unit/integration already) | No new file unless gap found | keep |
+| **—** | **Public Landing / Auth** (optional) | Smoke `/welcome`, `/auth` if not covered by F1 | No broken shell | 5 optional |
+
+**Optional:** Add `flows/landing-auth.integration.test.tsx` in Step 5 if auth wrapper regressions are a concern — not required if F1 covers signed-in path.
+
+**F8** is the only flow whose *primary* purpose is routing policy; it is still a **user-visible** outcome (“old bookmark shows not found”), not a substitute for product flows.
+
+**Not integration-file goals:** per-tab highlight alone, generic “4 tabs exist” without a flow — cover those inside **F1/F6** if needed.
+
+#### Top of pyramid — Bruno (Step 6)
+
+| Item | Role |
+| --- | --- |
+| **`bruno/active/`** | HTTP smoke: `health`, pause pipeline with bearer, billing — **real** edges when env secrets exist |
+| **Optional** | `npm run smoke:bruno-active` script later |
+
+#### Explicitly out of this strip (top of pyramid empty for browser)
+
+| Out | Why |
+| --- | --- |
+| Playwright / Cypress / `e2e/` | Backlog ([e2e-browser-automation.md](docs/backlog/e2e-browser-automation.md)) |
+| CI calling live `holzen-reflect` / `companion-orchestrate` | Flaky, costly; mock in F3 |
+| `supabase start` in GitHub Actions | Optional local dev only |
+
+#### Traceability (Step 6)
+
+Map **F1–F9** to [end-to-end-review-master-checklist.md](docs/reviews/end-to-end-review-master-checklist.md) **shipped** rows (add MVP column in Step 6 doc pass). Every shipped row has **≥1** unit and/or integration owner; gap = add test before §14.3.
+
+**Agent checklist (Step 6):** All **F*** flow files present or consciously merged · harness exists · `npm run test` · `npm run test:ci` green.
 
 ---
 
@@ -1812,7 +2315,7 @@ Every implementation step still runs **`npm run test`** before commit. Step 3+ a
 
 ## 30. Final review gate (build when this section is green)
 
-**Purpose:** Last pass before implementation. v3.7 incorporates findings below; if execution discovers a new blocker, update this section — do not “remember in chat only.”
+**Purpose:** Last pass before implementation. **v3.13 (2026-05-17)** — in-app trial (`ensure-trial-subscription`); §12.4 copy; audit [§30.2](#s30-2); locked [§30.5](#s30-5).
 
 <a id="s30-1"></a>
 
@@ -1820,16 +2323,58 @@ Every implementation step still runs **`npm run test`** before commit. Step 3+ a
 
 | Area | Status |
 | --- | --- |
-| Product scope (§5–13) | **OK** — pause-first, 4-tab, Landing-only Coming soon |
+| Product scope (§5–13) | **OK** — pause-first, 4-tab, Landing-only Coming soon; §5.4 subscription model locked |
 | Preservation (§3, Step 1) | **OK** — tag before Step 3 moves and Step 5 DROP |
 | Frontend legacy (§16) | **OK** — bulk moves + CI guards |
 | Edge undeploy + `_shared` (§17, §17.6) | **OK** — move + trim policy clear |
-| Postgres (§20–22) | **OK** — baseline squash §20.7; keep `companion_catalog`; roadmap seed |
+| Postgres (§20–22) | **OK** — baseline §20.7; cache-only §20.4.1; telemetry §20.8; roadmap seed |
 | Docs / Bruno / ops (§25–27, §26) | **OK** |
-| Analytics (§23) | **OK** — no global MVP flag |
+| Analytics (§23–24) | **OK** — PostHog funnels; Postgres ops post-§20.8 only |
 | Architecture refactors (§19) | **OK** — optional `lib/pause/` only; no big-bang |
+| Branch + gates (§14.0, §14.3, §29.7–§29.8) | **OK** — `feature/mvpPauseCleanup` from `main`; Step 6 = all repo scripts + unit + RTL integration bar |
 
-**Ready to build** after **step 1 tag** on `cursor/pause-v2-final`, then run the §14 loop with commits.
+**Ready to build** after **`git checkout main` → `feature/mvpPauseCleanup`**, **step 1 tag**, then the §14 loop with commits.
+
+<a id="s30-2"></a>
+
+### 30.2 Final plan review audit (2026-05-17, pass 4 — ship-ready)
+
+Cross-check after in-app trial (`ensure-trial-subscription`) + §12.4 copy. **Verdict: coherent and ready to execute** on `feature/mvpPauseCleanup` from `main`.
+
+| Area | Status | Notes |
+| --- | --- | --- |
+| Branch & preservation | OK | §14.0, §3, tag `full-ia-pre-strip` |
+| Subscription §5.4 | OK | **Option B**; **`ensure-trial-subscription`** (no Checkout for trial); Checkout = reactivation only |
+| Onboarding + copy | OK | §10 in-app trial; **§12.4** landing/settings/home i18n |
+| Routing 404 | OK | §5.3, F8, §13 |
+| Naming §5.0 | OK | `active-surface`, `full-shell`, `check:active-surface` |
+| Postgres | OK | Tier B drops, §20.4.1, §20.7, §20.8; **no** `trial_*` columns |
+| Tests | OK | §29 F1–F9; F1 mocks `ensure-trial-subscription` (no redirect) |
+| Ops / analytics | OK | §23 + §20.8; no launch date |
+| Docs / Bruno | OK | §26–§27; add `pricing-strategy.md` billing row in Step 5 |
+| Risks | OK | §28 |
+
+**Gaps closed (v3.13):** Step 4 owns `ensure-trial-subscription` deploy; `create-checkout` drops trial_period for reactivation-only; §14/§15 aligned; event-taxonomy in Step 4 with copy.
+
+**Pre-execution checklist (human):** Stripe Dashboard price IDs in Lovable secrets · Stripe webhook URL + signing secret in edge secrets · webhook listens for `customer.subscription.*` + `checkout.session.completed` · smoke `ensure-trial-subscription` on disposable project after Step 4.
+
+**No open product ambiguities** — if execution finds one, update §5.4 + §30.5 in the same PR (do not fork a second billing doc).
+
+**Implementation artifacts not in repo yet (expected):** `docs/ops/active-surface.md`, `scripts/check-active-surface.mjs`, `src/test/integration/*`, `.cursor/rules/active-surface.mdc`, `docs/decisions/2026-05-16-pause-first-shipped-scope.md`.
+
+**Explicit non-goals (unchanged):** Pause RPC rewrite; Playwright; pre-cutover telemetry KPIs; `companion_catalog`; legacy URL redirects.
+
+**Start command:** `git checkout main && git pull && git checkout -b feature/mvpPauseCleanup` → Step 1 tag → §14 loop.
+
+<a id="s30-3"></a>
+
+### 30.3 Review freeze (v3.13)
+
+Multiple audits (v3.8–v3.13) converged on the same architecture. **Treat this plan as frozen for implementation** unless you explicitly change product rules (trial UX, lapsed behavior, scope of DROPs) or Stripe dashboard setup.
+
+**Do not re-litigate during Steps 1–6:** Checkout for trial start (forbidden); `profiles.trial_*` columns (forbidden); Archive Pro paywall (forbidden); legacy URL redirects (forbidden).
+
+**Canonical pointers:** billing = §5.4 only · trial UX = `ensure-trial-subscription` Step 4 · copy = §12.4 Step 4 · ship gate = §14.3 + §29.8 F1–F9.
 
 <a id="s30-5"></a>
 
@@ -1837,18 +2382,26 @@ Every implementation step still runs **`npm run test`** before commit. Step 3+ a
 
 | Topic | Decision |
 | --- | --- |
-| **Delivery** | **Single branch** `cursor/pause-v2-final`; **steps 1–6** per [Implementation loop](#s14); **commit after each step**; agent loops until step 6 green — **no separate PRs** |
+| **Delivery** | **`feature/mvpPauseCleanup`** from **`main`**; **steps 1–6** per [§14](#s14); Step 6 = **[§14.3](#s14-3)** + **[§29.7–§29.8](#s29-7)** tests — **no separate PRs** until merge to `main` |
 | **Roadmap** | Full [`Roadmap.tsx`](src/pages/Roadmap.tsx) + idempotent `roadmap_items` seed (not stub-only) |
 | **`companion_breathing`** | **DROP** `profiles.companion_breathing`; remove Settings toggle; pause **Breathe step** stays |
 | **Postgres** | **Baseline squash** §20.7 (required); tag before Step 5 |
 | **PostHog** | **No** `product.mvp_pause_focus` / `product_surface` super-property |
 | **Design** | Nox/DESIGN pass on MVP-touched screens only (§31) |
-| **i18n** | **Option A** — `src/locales/mvp/en.json` + full keys in legacy; **en-first launch** acceptable |
+| **i18n** | **§18.5 locked** — slim `src/locales/en.json` only; full `en` + other langs in `src/legacy/locales/`; **en-first launch**; no Option B denylist script |
+| **Naming** | §5.0 — no `mvp`/`Mvp`/`pre-mvp` in active code, ops paths, CI, legacy folders; canonical manifest [`active-surface.md`](docs/ops/active-surface.md) |
 | **Demo mode** | Move stats demo to legacy; optional pause-only fixture (3 fake `pause_instances`) if needed |
-| **`signal_source_suggestions`** | Grep Step 5; **DROP** if no writer, else keep |
+| **`signal_source_suggestions`** | **KEEP** (live Signal/Ground writers). Optional later: remove `enqueueCatalogSourceSuggestion` calls → then DROP table |
 | **Bundle guard** | **On** — Step 6 `dist` grep for legacy UI strings (§18.2) |
 | **Routing** | **No legacy URL redirects** — MVP paths only; `/library`, `/journey/*` subpaths, `/tools/*` → `NotFound` (§5.3) |
-
+| **Subscription** | §5.4 — **Stripe-native trial**; **`lapsed`** = read Archive/Journey, cron continues, **ritual blocked** until card; no 3-free/month tier |
+| **Trial implementation** | **Option B** — **`ensure-trial-subscription`** (in-app, no card, no Checkout redirect); `create-checkout` **reactivation only**; webhook + `lapsed` on `profiles`; **no** `profiles.trial_*` |
+| **Landing / copy** | **§12.4** — rewrite `landing.*`, `home.subscription.*`, onboarding CTA; drop free-tier quota language |
+| **Production data** | §3.1 — **no real users**; test accounts (incl. founder/partner) **disposable**; Step 5 gate = checklist, not empty `auth.users` |
+| **Companion content** | §20.4.1 — **cache-only**; **DROP** `content_library`; keep **`pregenerate-companions`**; no `companion_catalog` rename |
+| **Pre-push quality** | §14.3 — all repo checks; §29 unit + flow integration F1–F9; Bruno `active/` smoke Step 6; no Playwright in this strip |
+| **Telemetry history** | §20.8 — **TRUNCATE** `analytics_events`, `generation_attempts`, `companion_serves`, `user_companion_serves` at cutover; launch metrics **from baseline forward** only |
+| **AGENTS.md** | Step 5 — add Change map row for shipped-scope strip + `feature/mvpPauseCleanup`; note branch overrides Pause V2 line |
 
 <a id="s31"></a>
 
@@ -1863,7 +2416,7 @@ Every implementation step still runs **`npm run test`** before commit. Step 3+ a
 | Yes | No (avoid scope trap) |
 | --- | --- |
 | Fewer active routes → parity board becomes achievable | Don’t reskin every pause sub-component in one step |
-| Landing + Journey MVP + slim Settings are **new or heavily edited** — ship them **on-token** | Don’t chase legacy `components/stats` / Tools (they move to `src/legacy/`) |
+| Landing + Journey overview + slim Settings are **new or heavily edited** — ship them **on-token** | Don’t chase legacy `components/stats` / Tools (they move to `src/legacy/`) |
 | Aligns cognitive goal: repo **and** UI read as one product | Don’t block launch on 100% parity-board green for deferred routes |
 
 Canonical refs: [DESIGN.md](DESIGN.md), [docs/design/nox/](docs/design/nox/), especially [parity-board.md](docs/design/nox/parity-board.md).
@@ -1877,7 +2430,7 @@ Canonical refs: [DESIGN.md](DESIGN.md), [docs/design/nox/](docs/design/nox/), es
 | **Landing** | Hero, feature grid, Coming soon badges, footer → `/roadmap` — editorial headings (`font-editorial`), link tokens |
 | **BottomNav** + **AppLayout** headers | Spacing + Nox borders; four tabs only |
 | **Home** (slim widgets) | Card surfaces `bg-card` / `border-border`; no hardcoded hex |
-| **JourneyMvpOverview** + `JourneyStreakCard` | New components — **build to DESIGN.md from first commit** |
+| **JourneyOverview** + `JourneyStreakCard` | New components — **build to DESIGN.md from first commit** |
 | **Onboarding** (2-step) | Same spacing scale (§ category/group/section) |
 | **Settings hub** + kept panels | Remove dead sections; link variant = `text-nox-text-link` |
 | **Roadmap.tsx** | Public page — match Landing/footer language |
@@ -1908,7 +2461,7 @@ Canonical refs: [DESIGN.md](DESIGN.md), [docs/design/nox/](docs/design/nox/), es
 
 | Step | Design work |
 | --- | --- |
-| Step 2 | Journey MVP + nav — **design-first** for new journey components |
+| Step 2 | Journey overview + nav — **design-first** for `JourneyOverview` / `JourneyStreakCard` |
 | Step 4 | Home, onboarding, settings — checklist §31.3 |
 | Step 5 | Landing, Roadmap, NotFound — checklist + `design:lint` optional |
 
@@ -1918,14 +2471,18 @@ Canonical refs: [DESIGN.md](DESIGN.md), [docs/design/nox/](docs/design/nox/), es
 
 <a id="s32"></a>
 
-## 32. Ship checklist
+## 32. Ship checklist (pointer)
 
-1. Steps 1–6 committed; step 1 tag `full-ia-pre-mvp` exists.
-2. `npm run test` · `npm run build` · lint touched files.
-3. `changelog_entries` + version if user-facing release.
-4. Push → apply roadmap migration if any.
-5. Lovable Publish → Update.
-6. 24h pause/reflect error monitor.
+**Canonical close-out:** [§25.9 Launch sequence](#s25-9) + **[§14.3 Repo consistency gate](#s14-3)** + **[§29.8 flow tests](#s29-8)**.
+
+Short list:
+
+1. Steps 1–6 on `feature/mvpPauseCleanup`; tag `full-ia-pre-strip` before Step 3 moves / Step 5 DROP.
+2. §14.3 all green (not only `npm run test`).
+3. §20.8 telemetry baseline recorded in `active-surface.md`.
+4. Push → migrations/edges apply → Lovable **Publish → Update**.
+5. PostHog/Sentry smoke; monitor `holzen-reflect`, `companion-orchestrate`, `pregenerate-companions`.
+6. `changelog_entries` + version when user-facing release warrants it.
 
 ---
 
@@ -1934,7 +2491,7 @@ Canonical refs: [DESIGN.md](DESIGN.md), [docs/design/nox/](docs/design/nox/), es
 ## 33. Re-introducing a feature (playbook)
 
 1. Product spec + roadmap item closed or prioritized.
-2. Port or rewrite under **active** `src/pages` / `src/components` (reference `src/legacy/` or `git show full-ia-pre-mvp:path`).
+2. Port or rewrite under **active** `src/pages` / `src/components` (reference `src/legacy/` or `git show full-ia-pre-strip:path`).
 3. Register route in `App.tsx` + nav item if top-level.
 4. Update landing (remove Coming soon badge), taxonomy, IA doc.
 5. Delete ported files from legacy when duplicate-free.
