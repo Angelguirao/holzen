@@ -28,7 +28,7 @@ isProject: false
 
 | Field                  | Value                                                     |
 | ---------------------- | --------------------------------------------------------- |
-| **Status**             | Ready to build (§30 review gate)                          |
+| **Status**             | **Implemented** on `feature/mvpPauseCleanup` (steps 1–6) — **ship pending** ([launch-runbook](docs/ops/launch-runbook.md)) |
 | **Version**            | 2026-05-17 (v3.13 — final review)                      |
 | **Review**             | §30.1 · §30.2 audit · [§30.3 freeze](#s30-3) · [Locked](#s30-5) · [Design](#s31) |
 | **Base branch** | `main` |
@@ -2360,11 +2360,11 @@ Cross-check after in-app trial (`ensure-trial-subscription`) + §12.4 copy. **Ve
 
 **No open product ambiguities** — if execution finds one, update §5.4 + §30.5 in the same PR (do not fork a second billing doc).
 
-**Implementation artifacts not in repo yet (expected):** `docs/ops/active-surface.md`, `scripts/check-active-surface.mjs`, `src/test/integration/*`, `.cursor/rules/active-surface.mdc`, `docs/decisions/2026-05-16-pause-first-shipped-scope.md`.
+**Implementation artifacts (landed on branch):** `docs/ops/active-surface.md`, `scripts/check-active-surface.mjs`, `scripts/check-bundle-shipped.mjs`, `src/test/integration/*`, `.cursor/rules/active-surface.mdc`, `docs/decisions/2026-05-16-pause-first-shipped-scope.md`, `docs/ops/launch-runbook.md`. Follow-up migration: `20260522130000_drop_companion_breathing.sql`.
 
 **Explicit non-goals (unchanged):** Pause RPC rewrite; Playwright; pre-cutover telemetry KPIs; `companion_catalog`; legacy URL redirects.
 
-**Start command:** `git checkout main && git pull && git checkout -b feature/mvpPauseCleanup` → Step 1 tag → §14 loop.
+**Ship command:** Push `feature/mvpPauseCleanup` → §14.3 gate → apply migrations → Lovable publish. See [launch-runbook](docs/ops/launch-runbook.md).
 
 <a id="s30-3"></a>
 
