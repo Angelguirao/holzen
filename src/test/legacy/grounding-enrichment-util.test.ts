@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { extractDoi, normalizeCitation } from "../../supabase/functions/_shared/grounding-enrichment-util";
+import { extractDoi, normalizeCitation } from "../../../supabase/functions/_shared/grounding-enrichment-util";
 
 describe("normalizeCitation", () => {
   it("lowercases and collapses whitespace", () => {

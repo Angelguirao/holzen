@@ -4,7 +4,7 @@ import {
   normalizeSourceUrl,
   parseArticleRefsFromFeedXml,
   sortFeedArticleRefsByPublishedAtDesc,
-} from "../../supabase/functions/_shared/feed-ingest.ts";
+} from "../../../supabase/functions/_shared/feed-ingest.ts";
 
 describe("normalizeSourceUrl", () => {
   it("prepends https when scheme is missing (admin paste)", () => {

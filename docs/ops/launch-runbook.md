@@ -21,6 +21,7 @@ npm run check:edge-logging
 npm run check:edge-coverage-manifest
 npm run test:ci
 npm run build
+npm run check:bundle-shipped
 npm run check:view-migrations
 npm run check:edge          # when Deno is installed
 npm run stamp:release
@@ -28,13 +29,6 @@ npm run check:release-stamp
 ```
 
 Optional (bash): `npm run check:prepush`
-
-Bundle guard (no legacy UI strings in production assets):
-
-```bash
-npm run build
-npm run check:bundle-shipped
-```
 
 Naming audit (plan §5.0):
 

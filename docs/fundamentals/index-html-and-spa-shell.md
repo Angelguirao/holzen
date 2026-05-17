@@ -51,7 +51,7 @@ Sets Tailwind’s `dark:` variant before CSS/JS load so the first paint matches 
 - **Canonical, Open Graph, Twitter** — link previews when someone shares `https://holzen.app/...`. Default tags live here; per-route pages can override via `PageMeta` (`src/components/PageMeta.tsx`), which uses `SITE_ORIGIN` from `src/config/site.ts`.
 - **`og:image` / `twitter:image`** — hosted preview image URLs (currently on R2/CDN; not required to match the site hostname).
 - **PWA** — `manifest.json`, theme color, Apple touch icon.
-- **JSON-LD** (`SoftwareApplication`) — structured data for crawlers; `url` should match the custom domain.
+- **JSON-LD** (`SoftwareApplication`) — structured data for crawlers; `url` should match the custom domain. Keep `offers.price` aligned with [`src/lib/pricing.ts`](../../src/lib/pricing.ts) (`4.99`) and trial-first copy in [`src/locales/en.json`](../../src/locales/en.json) (`landing.pricingDesc`).
 
 ### `<body>` — `#root` and scripts
 
