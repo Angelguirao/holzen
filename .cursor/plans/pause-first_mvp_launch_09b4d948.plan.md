@@ -4,22 +4,22 @@ overview: Ship a pause-first Holzen with maximum cognitive clarity—active src/
 todos:
   - id: step-1-preserve
     content: "Step 1: Git tag full-ia-pre-strip; archive branch; legacy READMEs; src/README.md shipped-surface map — commit"
-    status: pending
+    status: completed
   - id: step-2-shell
     content: "Step 2: 4-tab nav, JourneyOverview, pause exits, routes; decision doc + manifest stub — commit"
-    status: pending
+    status: completed
   - id: step-3-legacy-edges
     content: "Step 3: Legacy bulk moves; edge undeploy; _shared/legacy; CI/Bruno checks — commit"
-    status: pending
+    status: completed
   - id: step-4-surfaces
     content: "Step 4: ensure-trial-subscription edge; 2-step onboarding; §12.4 copy; Home/settings; F1–F7 — commit"
-    status: pending
+    status: completed
   - id: step-5-cutover
     content: "Step 5: baseline squash + §20.8; lapsed + stripe-webhook; landing FAQ; roadmap; gen:types — commit"
-    status: pending
+    status: completed
   - id: step-6-ship
     content: "Step 6: F1–F9 + §14.3 gate; Bruno smoke; launch-runbook (25.9); push feature/mvpPauseCleanup; Lovable publish — commit"
-    status: pending
+    status: completed
 isProject: false
 ---
 
