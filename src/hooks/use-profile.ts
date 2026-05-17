@@ -100,7 +100,7 @@ export function useProfile() {
       setGroundingActivitiesState(row.grounding_activities ?? []);
       setHasOnboarded(row.has_onboarded ?? false);
       setCompanionPrefsState({
-        breathing: row.companion_breathing ?? true,
+        breathing: true,
         haiku: row.companion_haiku ?? true,
         grounding: row.companion_grounding ?? true,
         signal: row.companion_signal ?? true,
@@ -179,7 +179,7 @@ export function useProfile() {
 
   const setCompanionPref = useCallback(async (key: keyof CompanionPrefs, val: boolean) => {
     setCompanionPrefsState((prev) => ({ ...prev, [key]: val }));
-    if (!user) return;
+    if (!user || key === 'breathing') return;
     const snakeKey = key === 'zoomOut' ? 'zoom_out' : key;
     const dbKey = `companion_${snakeKey}` as string;
     const { error } = await supabase

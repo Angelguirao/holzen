@@ -21,6 +21,7 @@ Alphabetical names (each must match `supabase/functions/<name>/`):
 | companion-orchestrate | `pause-pipeline/` | User JWT |
 | create-checkout | `billing/` | User JWT |
 | customer-portal | `billing/` | User JWT |
+| ensure-trial-subscription | `billing/`, `active/` | User JWT — onboarding trial (no Checkout redirect) |
 | delete-account | `user-jwt/` (DANGEROUS) | User JWT |
 | deliver-letters | `service-cron/` | `SERVICE_CRON_BEARER` |
 | fetch-source-feeds | `service-cron/` | `SERVICE_CRON_BEARER` |

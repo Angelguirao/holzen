@@ -17,7 +17,7 @@ export const PROFILE_QUERY_KEY = (userId: string) =>
   [...PROFILE_QUERY_PREFIX, userId] as const;
 
 const PROFILE_SELECT_COLUMNS =
-  'threshold, threshold_down, cumulative_threshold, last_context, email_notifications, has_onboarded, companion_breathing, companion_haiku, companion_grounding, companion_signal, companion_zoom_out, companion_history, reflection_tone, cooldown_hours, last_trigger_at, silent_mode, custom_prompt, reflection_style, quiet_hours_start, quiet_hours_end, first_name, motivations, mantra, hold_goal_currency, hold_goal_type, hold_goal_start, hold_goal_target_months, hold_goal_target_price, tracked_asset_id, language, grounding_activities, referral_code, created_at, snoozed_until, is_admin';
+  'threshold, threshold_down, cumulative_threshold, last_context, email_notifications, has_onboarded, companion_haiku, companion_grounding, companion_signal, companion_zoom_out, companion_history, reflection_tone, cooldown_hours, last_trigger_at, silent_mode, custom_prompt, reflection_style, quiet_hours_start, quiet_hours_end, first_name, motivations, mantra, hold_goal_currency, hold_goal_type, hold_goal_start, hold_goal_target_months, hold_goal_target_price, tracked_asset_id, language, grounding_activities, referral_code, created_at, snoozed_until, is_admin';
 
 /**
  * Loads (or creates) the caller's `profiles` row. Used as a single `queryFn` so all

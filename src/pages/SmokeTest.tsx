@@ -18,7 +18,7 @@ const TEST_CARDS = [
 ];
 
 type Scenario = {
-  id: 'A' | 'B' | 'C' | 'D';
+  id: 'A' | 'A2' | 'B' | 'C' | 'D';
   title: string;
   goal: string;
   steps: string[];
@@ -28,20 +28,33 @@ type Scenario = {
 const SCENARIOS: Scenario[] = [
   {
     id: 'A',
-    title: 'Subscription — Pro (7-day trial)',
-    goal: 'Confirm subscription checkout creates a trialing Stripe sub and the confirmation dialog/notification fire.',
+    title: 'Onboarding trial — ensure-trial-subscription',
+    goal: 'Confirm the 7-day Pro trial starts in-app (no Checkout redirect, no card at signup).',
     steps: [
-      'Open Settings → Billing and click "Upgrade to Pro".',
-      'Pay with test card 4242 4242 4242 4242 (any future expiry, any CVC, any ZIP).',
-      'Get redirected back with ?subscribed=true.',
-      'Confirmation dialog should show plan tier + trial dates.',
-      'Click "Manage subscription" — should land on /settings.',
+      'Sign in with a disposable test user who has no Stripe subscription yet.',
+      'Complete onboarding step 2 and tap "Start your free trial" (or call Bruno `ensure-trial-subscription`).',
+      'Land on Home with trial entitlement; primary pause CTA should be available.',
     ],
     verify: [
-      { label: 'Stripe customer + subscription exists (status: trialing)', where: 'Stripe Dashboard → Customers (test mode)' },
+      { label: 'ensure-trial-subscription returns { ok: true, subscription_status: trialing }', where: 'Edge logs / Bruno active/03' },
       { label: 'check-subscription returns subscribed=true, tier=pro', where: 'Edge logs: check-subscription' },
-      { label: 'Email + push confirmation dispatched (if email_notifications=on)', where: 'Edge logs: notify-checkout-confirmation' },
       { label: 'profiles.subscription_tier = pro, subscription_status = trialing', where: 'DB: profiles row' },
+      { label: 'PostHog trial.started with source ensure_trial (when created: true)', where: 'PostHog live events' },
+    ],
+  },
+  {
+    id: 'A2',
+    title: 'Reactivation — Pro via Checkout (post-trial / lapsed)',
+    goal: 'After trial ends without a card, Checkout reactivation creates an active paid subscription.',
+    steps: [
+      'Use a lapsed test user (or cancel trial in Stripe test mode).',
+      'From Home or Settings, start reactivation checkout.',
+      'Pay with 4242 4242 4242 4242; return with ?subscribed=true.',
+    ],
+    verify: [
+      { label: 'create-checkout (reactivation) + stripe-webhook fired', where: 'Edge logs' },
+      { label: 'profiles.subscription_status = active (or trialing if trial re-applied in Stripe)', where: 'DB: profiles row' },
+      { label: 'notify-checkout-confirmation when applicable', where: 'Edge logs: notify-checkout-confirmation' },
     ],
   },
   {
