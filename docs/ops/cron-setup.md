@@ -42,7 +42,7 @@ jsonb_build_object(
 
 **Self-hosted / rare setups:** If `SELECT current_setting('supabase.service_role_key', true)` is non-null, you may use that instead of Vault; on hosted Supabase, expect **false** / NULL.
 
-**Bruno** (`bruno/service-cron/*.bru`): **`401`** usually means **`SERVICE_CRON_BEARER`** is wrong — it must match the project’s **service_role** JWT or **`CRON_SECRET`** (see [`bruno/service-cron/README.md`](../../bruno/service-cron/README.md)). Redeploying the function does not fix a bad client secret.
+**Bruno** (`bruno/active/service-cron/*.bru`): **`401`** usually means **`SERVICE_CRON_BEARER`** is wrong — it must match the project’s **service_role** JWT or **`CRON_SECRET`** (see [`bruno/active/service-cron/README.md`](../../bruno/active/service-cron/README.md)). Redeploying the function does not fix a bad client secret.
 
 **Edge logs:** Cron workers use **`withRequestLogging`** + **`createLogger`** — **JSON** lines with **`fn`**, **`cid`**, **`msg`**, and often **`extra.holzen_event`**. Filter in Supabase **Edge Functions → Logs** by function name or stable **`msg`** tokens (see [logging-strategy.md](logging-strategy.md)).
 
@@ -95,7 +95,7 @@ SELECT cron.schedule(
 - **`chunkDays`** (optional, default `45`): window size per `market_chart/range` call. Ignored in `per_date` mode.
 - **`maxChunks`** (optional, default `10`, max `25`): CoinGecko HTTP calls **per invocation** (edge wall-clock) in `range` mode. If more work remains, the JSON response sets **`completed: false`** and **`resumeFrom`** (`YYYY-MM-DD`). Call again with **`from: resumeFrom`** and the **same** **`to`** until **`completed: true`** (e.g. a **10-year** daily gap needs many invocations or a small loop script—watch **429**; paid CoinGecko helps). In `per_date` mode the cap is fixed at 60 calls and `resumeFrom` works the same way.
 
-Bruno: `bruno/service-cron/backfill-btc-prices.bru`. Logs: filter **`holzen:backfill-btc`**.
+Bruno: `bruno/active/service-cron/backfill-btc-prices.bru`. Logs: filter **`holzen:backfill-btc`**.
 
 **Local chaining (e.g. ~10 years):** `node scripts/backfill-btc-chain.mjs 2016-04-14 2026-04-14` with the same env vars as Bruno (stops on **429** / `abortReason`; rerun after a pause or upgrade CoinGecko).
 
@@ -115,7 +115,7 @@ Body (all optional):
 - **`dryRun`** (default `false`): fetch + parse but don't upsert.
 - **`batchLimit`** (default `2000`, max `2000`): rows per CryptoCompare call; ~12 years fit in 3 pages.
 
-Recommended one-off from Bruno (`bruno/service-cron/seed-btc-history.bru`):
+Recommended one-off from Bruno (`bruno/active/service-cron/seed-btc-history.bru`):
 
 1. POST with `{"from": "2014-09-17", "onlyMissing": true, "dryRun": true}` — confirm the row count looks right (~4000+ rows on a fresh install).
 2. POST again with `"dryRun": false` — takes ~3–5s, uses 3 pages.

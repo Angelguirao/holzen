@@ -1,0 +1,17 @@
+meta {
+  name: process-referral-pending
+  type: http
+  seq: 1
+}
+
+post {
+  url: {{VITE_SUPABASE_URL}}/functions/v1/process-referral-pending
+  body: none
+  auth: none
+}
+
+headers {
+  x-cid: bruno-{{$timestamp}}-review
+  Authorization: Bearer {{SERVICE_CRON_BEARER}}
+  apikey: {{VITE_SUPABASE_PUBLISHABLE_KEY}}
+}

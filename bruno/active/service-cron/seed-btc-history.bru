@@ -1,0 +1,26 @@
+meta {
+  name: seed-btc-history
+  type: http
+  seq: 12
+}
+
+post {
+  url: {{VITE_SUPABASE_URL}}/functions/v1/seed-btc-history
+  body: json
+  auth: none
+}
+
+headers {
+  x-cid: bruno-{{$timestamp}}-review
+  Authorization: Bearer {{SERVICE_CRON_BEARER}}
+  apikey: {{VITE_SUPABASE_PUBLISHABLE_KEY}}
+  Content-Type: application/json
+}
+
+body:json {
+  {
+    "from": "2014-09-17",
+    "onlyMissing": true,
+    "dryRun": true
+  }
+}

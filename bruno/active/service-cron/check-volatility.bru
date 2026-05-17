@@ -1,0 +1,17 @@
+meta {
+  name: check-volatility
+  type: http
+  seq: 2
+}
+
+post {
+  url: {{VITE_SUPABASE_URL}}/functions/v1/check-volatility
+  body: none
+  auth: none
+}
+
+headers {
+  x-cid: bruno-{{$timestamp}}-review
+  Authorization: Bearer {{SERVICE_CRON_BEARER}}
+  apikey: {{VITE_SUPABASE_PUBLISHABLE_KEY}}
+}
