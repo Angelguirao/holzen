@@ -37,8 +37,17 @@ const Home = () => {
   const { user } = useAuth();
   const navigate = useNavigate();
   const { pathname } = useLocation();
-  const { subscribed, loading: subLoading, monthlyRemaining, checkoutLoading, startCheckout, refresh } =
-    useSubscription();
+  const {
+    subscribed,
+    loading: subLoading,
+    entitlement,
+    checkoutLoading,
+    trialLoading,
+    startCheckout,
+    startReactivationCheckout,
+    ensureTrial,
+    refresh,
+  } = useSubscription();
   const [searchParams] = useSearchParams();
   useHomeCheckoutWelcomeToast(searchParams.get('subscribed'), refresh, t);
   useHomeDocumentTitle(true);
@@ -75,7 +84,7 @@ const Home = () => {
 
   const { subscriptionReady, hasAccess, showLimitUpsell, showPauseScheduling } = getHomeSubscriptionGate({
     subLoading,
-    subscribed,
+    entitlement,
     hasOpenPause,
     loading,
   });
@@ -153,9 +162,9 @@ const Home = () => {
     subscriptionReady,
     hasAccess,
     subLoading,
-    subscribed,
-    monthlyRemaining,
+    entitlement,
     checkoutLoading,
+    trialLoading,
     hasOpenPause,
     openPauseState,
     pauseContextHomePreview,
@@ -173,6 +182,8 @@ const Home = () => {
     onDismissOpenPause: pauseActions.handleDismiss,
     onNeedPause: pauseActions.handleNeedAPause,
     onStartCheckoutPro: pauseActions.startProCheckout,
+    onStartTrial: () => void ensureTrial(),
+    onReactivate: () => void startReactivationCheckout(),
   });
 
   const { pullDistance, refreshing: pullRefreshing, handlers: pullHandlers } = useHomePullFullReload();

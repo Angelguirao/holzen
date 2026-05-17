@@ -49,6 +49,12 @@ The Archive tab uses route `/archive` and reports `tab: 'archive'`.
 |---|---|---|---|
 | `app.route_not_found` | Catch-all `NotFound` for an unregistered path | `{ attempted_path: string }` — pathname only, no query string | @holzen |
 
+### onboarding
+
+| Event | When | Properties | Owner |
+|---|---|---|---|
+| `onboarding.completed` | User finishes the 2-step onboarding flow and `ensure-trial-subscription` succeeds | `{ steps_completed: 2 }` | @holzen |
+
 ### journey
 
 | Event | When | Properties | Owner |

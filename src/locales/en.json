@@ -226,16 +226,16 @@
       "checkinNeedOne": "Pick a mood or add a short note."
     },
     "subscription": {
-      "monthlyLimitReached": "You've used your {{freeReflectionsPerMonth}} free pauses this month. Start your {{trialDays}}-day free trial for unlimited.",
-      "upgradeToPro": "{{trialDays}}-day free trial · ${{price}}/month after · Cancel anytime",
+      "trialEnded": "Your free trial has ended. Subscribe to start and complete pauses again.",
+      "startTrialPrompt": "Start your {{trialDays}}-day free trial to use Pause when markets move.",
+      "startTrialCta": "Start {{trialDays}}-day free trial",
+      "trialFailed": "Could not start trial. Try again.",
       "pricePerMonth": "${{price}} per month · Cancel anytime",
       "openingCheckout": "Opening checkout…",
       "checkoutFailed": "Checkout could not be started. Check your connection and try again.",
       "checkoutNoUrl": "Checkout did not return a link. Please try again or contact support.",
       "portalFailed": "Billing portal could not be opened. Check your connection and try again.",
-      "portalNoUrl": "Billing portal did not return a link. Please try again.",
-      "freeRemaining": "{{count}} free pause remaining this month",
-      "freeRemaining_other": "{{count}} free pauses remaining this month"
+      "portalNoUrl": "Billing portal did not return a link. Please try again."
     },
     "errors": {
       "couldNotReachPrice": "Could not reach price data",
@@ -1290,6 +1290,18 @@
     "retrospectiveOutcomeFailed": "Could not save — check your connection and try again."
   },
   "pause": {
+    "lapsed": {
+      "kicker": "Trial ended",
+      "title": "Add a card to keep pausing",
+      "body": "Your archive and journey are still here. Subscribe to open and complete pauses when markets move.",
+      "cta": "Subscribe to continue"
+    },
+    "preTrial": {
+      "kicker": "Start your trial",
+      "title": "Start your {{days}}-day free trial",
+      "body": "No card required. Full pause ritual for {{days}} days — cancel anytime before it ends.",
+      "cta": "Start {{days}}-day free trial"
+    },
     "terminalEntryRedirect": "This pause already ended — opening your archive.",
     "youPaused": "You paused. That's the hardest part.",
     "breathIntroKickerRitual": "Breathe",

@@ -1,6 +1,7 @@
 import type { ReactNode } from 'react';
 import { useMemo } from 'react';
 import { HomePauseCardBody } from '@/components/home/HomePauseCardBody';
+import type { Entitlement } from '@/lib/subscription-entitlement';
 import { SnoozeToolbarControl } from '@/components/SnoozeControl';
 import type { BtcPriceData } from '@/lib/btc';
 import type { ManualPauseTriggerResult } from '@/lib/manual-pause-trigger-result';
@@ -15,9 +16,9 @@ export function useHomePauseCardProjection(args: {
   subscriptionReady: boolean;
   hasAccess: boolean;
   subLoading: boolean;
-  subscribed: boolean;
-  monthlyRemaining: number | undefined;
+  entitlement: Entitlement;
   checkoutLoading: boolean;
+  trialLoading: boolean;
   hasOpenPause: boolean;
   openPauseState: 'active' | 'engaged' | null;
   pauseContextHomePreview: PauseContextPreview;
@@ -35,14 +36,16 @@ export function useHomePauseCardProjection(args: {
   onDismissOpenPause: () => void;
   onNeedPause: () => void;
   onStartCheckoutPro: () => void;
+  onStartTrial: () => void;
+  onReactivate: () => void;
 }) {
   const {
     subscriptionReady,
     hasAccess,
     subLoading,
-    subscribed,
-    monthlyRemaining,
+    entitlement,
     checkoutLoading,
+    trialLoading,
     hasOpenPause,
     openPauseState,
     pauseContextHomePreview,
@@ -60,6 +63,8 @@ export function useHomePauseCardProjection(args: {
     onDismissOpenPause,
     onNeedPause,
     onStartCheckoutPro,
+    onStartTrial,
+    onReactivate,
   } = args;
 
   const pauseSectionHeaderRight = useMemo(() => {
@@ -72,10 +77,12 @@ export function useHomePauseCardProjection(args: {
       <HomePauseCardBody
         subLoading={subLoading}
         hasAccess={hasAccess}
-        subscribed={subscribed}
-        monthlyRemaining={monthlyRemaining}
+        entitlement={entitlement}
         checkoutLoading={checkoutLoading}
+        trialLoading={trialLoading}
         onStartCheckoutPro={onStartCheckoutPro}
+        onStartTrial={onStartTrial}
+        onReactivate={onReactivate}
         hasOpenPause={hasOpenPause}
         openPauseState={openPauseState}
         contextPreview={pauseContextHomePreview}
@@ -97,10 +104,12 @@ export function useHomePauseCardProjection(args: {
     [
       subLoading,
       hasAccess,
-      subscribed,
-      monthlyRemaining,
+      entitlement,
       checkoutLoading,
+      trialLoading,
       onStartCheckoutPro,
+      onStartTrial,
+      onReactivate,
       hasOpenPause,
       openPauseState,
       pauseContextHomePreview,

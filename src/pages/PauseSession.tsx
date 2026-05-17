@@ -5,6 +5,7 @@ import { useTranslation } from 'react-i18next';
 import { useHolzen } from '@/hooks/use-holzen';
 import { useSubscription } from '@/hooks/use-subscription';
 import { useProGate } from '@/hooks/use-pro-gate';
+import { PauseEngagementBlocked } from '@/components/pause/PauseEngagementBlocked';
 import { type MoodValue } from '@/components/MoodCheck';
 
 import { type PauseStep } from '@/components/pause/PauseProgress';
@@ -113,7 +114,17 @@ export default function PauseSession() {
     btcData,
     trackedAssetId,
   } = useHolzen();
-  const { subscribed, loading: subLoading, refresh: refreshSubscription } = useSubscription();
+  const {
+    subscribed,
+    loading: subLoading,
+    entitlement,
+    canEngagePause,
+    checkoutLoading,
+    trialLoading,
+    ensureTrial,
+    startReactivationCheckout,
+    refresh: refreshSubscription,
+  } = useSubscription();
   const { requirePro } = useProGate();
 
   const { onAfterMutation: pendingOfferAfterMutation, navigateAfterAdopt: pendingOfferNavigateAfterAdopt } =
@@ -707,6 +718,19 @@ export default function PauseSession() {
     reflectionError,
     onReflectionRetry: retryReflection,
   });
+
+  if (!subLoading && !canEngagePause) {
+    return (
+      <PauseEngagementBlocked
+        entitlement={entitlement}
+        checkoutLoading={checkoutLoading}
+        trialLoading={trialLoading}
+        onReactivate={() => void startReactivationCheckout()}
+        onStartTrial={() => void ensureTrial().then(() => refreshSubscription())}
+        onReturn={handleReturn}
+      />
+    );
+  }
 
   return (
     <Fragment>

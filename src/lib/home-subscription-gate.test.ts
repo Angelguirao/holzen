@@ -18,20 +18,22 @@ describe('getHomeSubscriptionReady', () => {
 });
 
 describe('getHomeHasAccess', () => {
-  it('is true when subscribed (including trialing)', () => {
-    expect(getHomeHasAccess(true)).toBe(true);
+  it('is true when trialing or active', () => {
+    expect(getHomeHasAccess('trialing')).toBe(true);
+    expect(getHomeHasAccess('active')).toBe(true);
   });
 
-  it('is false when not subscribed', () => {
-    expect(getHomeHasAccess(false)).toBe(false);
+  it('is false when lapsed or pre_trial', () => {
+    expect(getHomeHasAccess('lapsed')).toBe(false);
+    expect(getHomeHasAccess('pre_trial')).toBe(false);
   });
 });
 
 describe('getHomeShowLimitUpsell', () => {
-  it('is true when ready and not subscribed', () => {
-    expect(getHomeShowLimitUpsell(true, false)).toBe(true);
-    expect(getHomeShowLimitUpsell(true, true)).toBe(false);
-    expect(getHomeShowLimitUpsell(false, false)).toBe(false);
+  it('is true when ready and cannot engage pause', () => {
+    expect(getHomeShowLimitUpsell(true, 'lapsed')).toBe(true);
+    expect(getHomeShowLimitUpsell(true, 'trialing')).toBe(false);
+    expect(getHomeShowLimitUpsell(false, 'lapsed')).toBe(false);
   });
 });
 
@@ -45,10 +47,10 @@ describe('getHomeShowPauseScheduling', () => {
 });
 
 describe('getHomeSubscriptionGate', () => {
-  it('bundles flags consistently', () => {
+  it('bundles flags consistently for lapsed', () => {
     const g = getHomeSubscriptionGate({
       subLoading: false,
-      subscribed: false,
+      entitlement: 'lapsed',
       hasOpenPause: false,
       loading: false,
     });
