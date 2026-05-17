@@ -40,6 +40,7 @@ serve(
     const origin = req.headers.get("origin") || "http://localhost:3000";
     let requestedTier = "pro";
     let checkoutKind: "subscription" | FlexPackType = "subscription";
+    let reactivation = false;
     try {
       const body = await req.json();
       const rawTier = typeof body?.planTier === "string" ? body.planTier.trim().toLowerCase() : "pro";
@@ -48,6 +49,7 @@ serve(
       if (FLEX_PACK_TYPES.has(rawKind as FlexPackType)) {
         checkoutKind = rawKind as FlexPackType;
       }
+      reactivation = body?.reactivation === true;
     } catch {
       requestedTier = "pro";
       checkoutKind = "subscription";
@@ -77,6 +79,7 @@ serve(
           customer_email: customerId ? undefined : user.email,
           line_items: [{ price: selectedPriceId, quantity: 1 }],
           mode: "subscription",
+          payment_method_collection: reactivation ? "always" : "if_required",
           allow_promotion_codes: true,
           success_url: `${origin}/?subscribed=true`,
           cancel_url: `${origin}/`,
