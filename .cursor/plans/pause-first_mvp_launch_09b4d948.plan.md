@@ -28,7 +28,7 @@ isProject: false
 
 | Field                  | Value                                                     |
 | ---------------------- | --------------------------------------------------------- |
-| **Status**             | **Implemented + pushed** — **you:** [ship-checklist.md](docs/ops/ship-checklist.md) · [launch-runbook](docs/ops/launch-runbook.md) |
+| **Status**             | **AGENT COMPLETE** (steps 1–6 + audit fixes on `feature/mvpPauseCleanup`, pushed). **You:** [ship-checklist.md](docs/ops/ship-checklist.md) only. **Do not** re-run the external audit paste — see [§30.2.2](#s30-2-2). |
 | **Version**            | 2026-05-17 (v3.15 — repo audit reconciled; §30.2.1) |
 | **Review**             | §30.1 · §30.2 audit · [§30.3 freeze](#s30-3) · [Locked](#s30-5) · [Design](#s31) |
 | **Base branch** | `main` |
