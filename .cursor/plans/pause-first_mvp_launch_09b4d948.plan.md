@@ -2373,7 +2373,7 @@ Cross-check of §0–§33 against **`feature/mvpPauseCleanup`** working tree (no
 | §20.7 Baseline squash | ⚠️ | Tail cutover `20260521200000_*` instead of `holzen_schema_baseline.sql` — **accepted fallback** |
 | §20.8 Telemetry | ✅ | TRUNCATE in cutover; `telemetry_baseline_at` in [active-surface.md](docs/ops/active-surface.md) |
 | §21 Reflect artifact | ✅ | **`reflection_text`** kept; migration `20260523150000_*` if old rename applied |
-| §23 PostHog | ✅ | Taxonomy + `check:posthog-events-allowlist` (prepush) |
+| §23 PostHog | ✅ | Taxonomy + `check:posthog-events-allowlist` (**test:ci** + prepush) |
 | §26 Docs | ✅ | active-surface, e2e “Shipped MVP only”, phase review banners |
 | §27 Bruno | ✅ | `bruno/active/` + `legacy/full-shell/`; `check:bruno-active-manifest` in **test:ci** |
 | §29 Tests | ✅ | F1–F9; 650+ unit/integration |
