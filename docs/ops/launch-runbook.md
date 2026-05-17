@@ -68,7 +68,8 @@ SELECT user_id, subscription_status, subscription_tier FROM profiles WHERE subsc
 With `hosted.bru` env (JWT + Supabase URL/key):
 
 1. `health` — 200
-2. `check-subscription` — 200, `entitlement` in body when fresh
+2. `check-subscription` — 200, `subscription_status` / tier fields
+3. `ensure-trial-subscription` — 200, `{ ok: true }` (use a disposable test user; idempotent)
 
 See [bruno/active/README.md](../../bruno/active/README.md).
 
