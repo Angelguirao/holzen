@@ -81,7 +81,7 @@ An **application use case** is one coherent action: *log pause step*, *ensure tr
 
 ### P3 — Domain vocabulary is shared and testable
 
-**Domain** holds entities, value objects, transitions, and **client-advisory** rules (formatting, “should we show upgrade?”). Vocabulary aligns with `docs/systems/*` (e.g. pause instance, `opening_message`, entitlement).
+**Domain** holds entities, value objects, transitions, and **client-advisory** rules (formatting, “should we show upgrade?”). Vocabulary aligns with `docs/systems/*` (e.g. pause instance, `reflection_text`, entitlement).
 
 **Therefore:** Domain modules have **no** imports from React, Supabase, or `window`.
 

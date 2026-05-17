@@ -184,7 +184,7 @@ Web Vitals are also forwarded to Sentry metrics. PostHog copy supports cohort/fu
 
 ## CI guard (shipped strip)
 
-`npm run check:posthog-events-allowlist` — every `trackEvent('…')` in active `src/` (excluding `src/legacy/` and `src/test/`) must appear in the **Active events** section above. Wired in `scripts/pre-push-check.sh`.
+`npm run check:posthog-events-allowlist` — every `trackEvent('…')` in active `src/` (excluding `src/legacy/` and `src/test/`) must appear in the **Active events** section above. Runs in **`test:ci`** and `scripts/pre-push-check.sh`.
 
 ## Server-side events
 
