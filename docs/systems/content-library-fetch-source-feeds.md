@@ -1,5 +1,7 @@
 # Content library ingestion — `fetch-source-feeds`
 
+> **Not in shipped pause-first scope (2026-05).** `content_library` was dropped in `20260521200000_holzen_mvp_launch_cutover.sql`; ingest edge lives under `supabase/functions/legacy/`. Companions use **`companion_cache`** only. Shipped surface: [active-surface.md](../ops/active-surface.md).
+
 This document describes the **Edge function** [`supabase/functions/fetch-source-feeds/index.ts`](../../supabase/functions/fetch-source-feeds/index.ts) and how it fills [`content_library`](../../supabase/migrations/20260321000003_content_library.sql) from admin-configured [`signal_sources`](../../src/components/admin/SourceCatalogViewer.tsx).
 
 ## Role in the product

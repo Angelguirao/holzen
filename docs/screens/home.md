@@ -1,5 +1,7 @@
 # Home (`/`)
 
+**Pause-first shipped scope (2026-05):** widgets are **goal-why**, **market**, and **your-pause** only (no journey-pulse, quick-capture, night reflection, or stats). Trial/lapsed gating via `getHomeSubscriptionGate` + `useSubscription` entitlement. Manifest: [active-surface.md](../ops/active-surface.md).
+
 Authoritative orchestration: [`src/pages/Home.tsx`](../../src/pages/Home.tsx).
 
 **Cross-screen patterns:** the refactor behind this page is generalized in [**React screen orchestration**](../fundamentals/react-screen-orchestration.md) — written for **React beginners** (vocabulary, Rules of Hooks examples, `memo` / `lazy` toolbox), a **step-by-step guided tour of `Home.tsx`**, plus the same patterns for edge handlers.
