@@ -15,4 +15,4 @@ Allow: /
 Disallow: /auth
 Disallow: /reset-password
 
-Sitemap: https://holzen.lovable.app/sitemap.xml
+Sitemap: https://holzen.app/sitemap.xml

@@ -202,7 +202,7 @@ serve(
     ${copy.reminder}
   </p>
 
-  <a href="https://holzen.lovable.app" style="display: inline-block; font-size: 12px; font-family: 'IBM Plex Mono', monospace; color: #2a2a2a; border: 1px solid #d4d0c8; padding: 8px 16px; text-decoration: none; border-radius: 4px;">
+  <a href="https://holzen.app" style="display: inline-block; font-size: 12px; font-family: 'IBM Plex Mono', monospace; color: #2a2a2a; border: 1px solid #d4d0c8; padding: 8px 16px; text-decoration: none; border-radius: 4px;">
     ${copy.cta}
   </a>
 

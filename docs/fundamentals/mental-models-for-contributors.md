@@ -49,7 +49,7 @@ If you wonder **“why not Next.js / a full framework?”**, see [spa-framework-
 
 **Mental model:** A **long-lived app in a tab**, not “every click equals one server HTML response.” (Data still loads over the network — Supabase, `fetch`, etc. — but the **document** is not replaced wholesale.)
 
-**Caveat:** Initial `index.html` is still a real file; SEO crawlers see that first unless you add prerendering or SSR (out of scope here; see backlog link above).
+**Caveat:** Initial `index.html` is still a real file; SEO crawlers see that first unless you add prerendering or SSR (out of scope here; see backlog link above). Details: [index-html-and-spa-shell.md](index-html-and-spa-shell.md).
 
 **In Holzen:** Routes live in `src/App.tsx`; see [navigating-the-codebase.md](navigating-the-codebase.md) (section *Routing and layout*).
 
