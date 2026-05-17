@@ -7,6 +7,7 @@ Requires a **signed-in user JWT** (`auth/01-sign-in-password` or paste `SUPABASE
 | `01-create-checkout` | [create-checkout](../../supabase/functions/create-checkout/index.ts) | None — returns `{ url }` to Stripe Checkout. |
 | `02-check-subscription` | [check-subscription](../../supabase/functions/check-subscription/index.ts) | JSON: `{ "force": false }` — set **`force`: true** to bypass profile cache (see function). |
 | `03-customer-portal` | [customer-portal](../../supabase/functions/customer-portal/index.ts) | None — returns `{ url }` to Stripe Billing Portal; **requires** an existing Stripe customer. |
+| `04-ensure-trial-subscription` | [ensure-trial-subscription](../../supabase/functions/ensure-trial-subscription/index.ts) | `{}` — starts or returns existing **7-day** Stripe trial (onboarding path; no Checkout redirect). |
 
 ## Local vs hosted
 
