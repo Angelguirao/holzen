@@ -237,7 +237,10 @@ const Home = () => {
     nextCronCheckIn,
     manualCooldownRemaining,
     checkoutLoading,
-    onStartCheckoutPro: pauseActions.startProCheckout,
+    trialLoading,
+    entitlement,
+    onStartTrial: () => void ensureTrial(),
+    onReactivate: () => void startReactivationCheckout(),
   });
 
   const dashboardLayout = useHomeDashboardLayoutProps({

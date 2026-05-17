@@ -696,7 +696,10 @@ export function SettingsSubscriptionPanel() {
     subLoading,
     subscribed,
     tier,
-    monthlyRemaining,
+    entitlement,
+    trialLoading,
+    ensureTrial,
+    startReactivationCheckout,
     checkoutLoading,
     checkoutLoadingTarget,
     startCheckoutFromSettings,
@@ -781,49 +784,71 @@ export function SettingsSubscriptionPanel() {
                 </div>
               ) : (
                 <div className="space-y-2">
-                  {monthlyRemaining !== undefined && monthlyRemaining > 0 && (
-                    <p className="text-sm font-sans text-foreground">
-                      {t('home.subscription.freeRemaining', { count: monthlyRemaining })}
-                    </p>
-                  )}
-                  {monthlyRemaining !== undefined && monthlyRemaining <= 0 && (
-                    <p className="text-sm font-sans text-foreground">
-                      {t('home.subscription.monthlyLimitReached')}
-                    </p>
-                  )}
-                  <p className="text-sm font-sans text-muted-foreground">
-                    {t('settings.choosePlan', { defaultValue: 'Choose your plan' })}
+                  <p className="text-sm font-sans text-foreground">
+                    {entitlement === 'lapsed'
+                      ? t('home.subscription.trialEnded')
+                      : t('home.subscription.startTrialPrompt')}
                   </p>
-                  <div className="grid grid-cols-1 gap-2">
+                  {entitlement === 'pre_trial' ? (
                     <LoadingButton
-                      onClick={() => startCheckoutFromSettings('pro')}
-                      loading={checkoutLoading}
-                      loadingText={t('settings.openingCheckout')}
+                      onClick={() => void ensureTrial()}
+                      loading={trialLoading}
+                      loadingText={t('onboarding.ready.startingTrial', { defaultValue: 'Starting trial…' })}
                       className="w-full text-base font-sans"
                       size="sm"
                     >
-                      {t('settings.planProCta', {
-                        price: PRICING.monthlyPrice.toFixed(2),
-                        defaultValue: 'Start Pro Â· ${{price}}/month',
-                      })}
+                      {t('home.subscription.startTrialCta')}
                     </LoadingButton>
-                    <LoadingButton
-                      onClick={() => startCheckoutFromSettings('pro_plus')}
-                      loading={checkoutLoading}
-                      loadingText={t('settings.openingCheckout')}
-                      variant="outline"
-                      className="w-full text-base font-sans"
-                      size="sm"
-                    >
-                      {t('settings.planProPlusCta', {
-                        price: PRICING.proPlusMonthlyPrice.toFixed(2),
-                        defaultValue: 'Start Pro+ Â· ${{price}}/month',
-                      })}
-                    </LoadingButton>
-                  </div>
+                  ) : (
+                    <>
+                      <LoadingButton
+                        onClick={() => void startReactivationCheckout()}
+                        loading={checkoutLoading}
+                        loadingText={t('settings.openingCheckout')}
+                        className="w-full text-base font-sans"
+                        size="sm"
+                      >
+                        {t('pro.upgradeCta')}
+                      </LoadingButton>
+                    </>
+                  )}
+                  {entitlement === 'lapsed' ? (
+                    <>
+                      <p className="text-sm font-sans text-muted-foreground">
+                        {t('settings.choosePlan', { defaultValue: 'Choose your plan' })}
+                      </p>
+                      <div className="grid grid-cols-1 gap-2">
+                        <LoadingButton
+                          onClick={() => startCheckoutFromSettings('pro')}
+                          loading={checkoutLoading}
+                          loadingText={t('settings.openingCheckout')}
+                          className="w-full text-base font-sans"
+                          size="sm"
+                        >
+                          {t('settings.planProCta', {
+                            price: PRICING.monthlyPrice.toFixed(2),
+                            defaultValue: 'Start Pro · ${{price}}/month',
+                          })}
+                        </LoadingButton>
+                        <LoadingButton
+                          onClick={() => startCheckoutFromSettings('pro_plus')}
+                          loading={checkoutLoading}
+                          loadingText={t('settings.openingCheckout')}
+                          variant="outline"
+                          className="w-full text-base font-sans"
+                          size="sm"
+                        >
+                          {t('settings.planProPlusCta', {
+                            price: PRICING.proPlusMonthlyPrice.toFixed(2),
+                            defaultValue: 'Start Pro+ · ${{price}}/month',
+                          })}
+                        </LoadingButton>
+                      </div>
+                    </>
+                  ) : null}
                 </div>
               )}
-            </div>
+            </motion.div>
 
             <CreditsDashboard />
 
@@ -984,4 +1009,5 @@ export function SettingsAccountPanel() {
     </>
   );
 }
+
 

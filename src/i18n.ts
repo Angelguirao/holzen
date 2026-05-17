@@ -17,7 +17,6 @@ i18n.use(initReactI18next).init({
     escapeValue: false,
     defaultVariables: {
       price: PRICING.monthlyPrice,
-      freeReflectionsPerMonth: PRICING.freeReflectionsPerMonth,
       trialDays: PRICING.trialDays,
     },
   },
