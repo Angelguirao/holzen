@@ -46,6 +46,7 @@ GitHub sync applies `supabase/migrations/` and deploys edge functions. Confirm m
 
 - `20260516180000_subscription_lapsed_pause_engagement.sql` — lapsed status + `user_can_engage_pause`
 - `20260521200000_holzen_mvp_launch_cutover.sql` — Tier B drops, `opening_message`, telemetry baseline, cron unschedule (**destructive**)
+- `20260522130000_drop_companion_breathing.sql` — drops `profiles.companion_breathing` (plan §20.5)
 
 ### Quick SQL checks (linked project)
 
