@@ -34,13 +34,13 @@ import {
   FUTURE_LETTER_MIN_WORDS,
   validateFutureLetterBody,
   type FutureLetterInvalidReason,
-} from '@/lib/future-letter-validation';
-import { invalidateHistoryCalendarActivities } from '@/lib/history-calendar-activities-query-key';
+} from '@/legacy/full-shell/src/lib/future-letter-validation';
+import { invalidateHistoryCalendarActivities } from '@/legacy/full-shell/src/lib/history-calendar-activities-query-key';
 import {
   futureLettersListQueryKey,
   getFutureLettersListQueryOptions,
   type FutureLetterRow,
-} from '@/lib/future-letters-query';
+} from '@/legacy/full-shell/src/lib/future-letters-query';
 import { toast } from 'sonner';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { format } from 'date-fns';

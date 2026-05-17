@@ -1,7 +1,7 @@
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { ImmersivePracticeShell } from '@/components/practice/ImmersivePracticeShell';
-import { ReflectionReplay } from '@/components/practice/ReflectionReplay';
+import { ImmersivePracticeShell } from '@/legacy/full-shell/src/components/practice/ImmersivePracticeShell';
+import { ReflectionReplay } from '@/legacy/full-shell/src/components/practice/ReflectionReplay';
 
 const COLORS = {
   textColor: 'hsl(var(--foreground) / 0.7)',

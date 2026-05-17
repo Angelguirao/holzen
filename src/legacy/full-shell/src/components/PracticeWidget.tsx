@@ -4,13 +4,13 @@ import { useTranslation } from 'react-i18next';
 import { Waves, PenLine, Activity, History, Lock, ChevronRight, Sparkles } from 'lucide-react';
 import { useSubscription } from '@/hooks/use-subscription';
 import { useAuth } from '@/hooks/use-auth';
-import { getPracticeEntriesWeeklyCountQueryOptions } from '@/lib/practice-entries-weekly-count-query';
+import { getPracticeEntriesWeeklyCountQueryOptions } from '@/legacy/full-shell/src/lib/practice-entries-weekly-count-query';
 import { toast } from 'sonner';
 import { useNavigate } from 'react-router-dom';
 import { homeInWidget } from '@/components/home/home-widget-styles';
 import { TOOLS } from '@/lib/app-routes';
-import { usePracticeSuggestion } from '@/hooks/use-practice-suggestion';
-import type { SuggestedPracticeId } from '@/lib/practice-suggestion';
+import { usePracticeSuggestion } from '@/legacy/full-shell/src/hooks/use-practice-suggestion';
+import type { SuggestedPracticeId } from '@/legacy/full-shell/src/lib/practice-suggestion';
 
 type PracticeId = SuggestedPracticeId;
 

@@ -9,10 +9,10 @@ import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
 import { format } from 'date-fns';
 import { Loader2 } from 'lucide-react';
-import { practiceEntriesWeeklyCountQueryKey } from '@/lib/practice-entries-weekly-count-query';
-import { practicePrimarySuggestionQueryKey } from '@/lib/practice-primary-suggestion-query';
+import { practiceEntriesWeeklyCountQueryKey } from '@/legacy/full-shell/src/lib/practice-entries-weekly-count-query';
+import { practicePrimarySuggestionQueryKey } from '@/legacy/full-shell/src/lib/practice-primary-suggestion-query';
 import { toolsHubDataQueryKey } from '@/lib/tools-hub-data-query';
-import { invalidateHistoryCalendarActivities } from '@/lib/history-calendar-activities-query-key';
+import { invalidateHistoryCalendarActivities } from '@/legacy/full-shell/src/lib/history-calendar-activities-query-key';
 import { useAuth } from '@/hooks/use-auth';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
@@ -25,7 +25,7 @@ import {
   pauseReplayThreadQueryKey,
   replayRecentPausesQueryKey,
   type PausePickerRow,
-} from '@/lib/pause-replay-thread';
+} from '@/legacy/full-shell/src/lib/pause-replay-thread';
 
 interface Props {
   onComplete?: () => void;

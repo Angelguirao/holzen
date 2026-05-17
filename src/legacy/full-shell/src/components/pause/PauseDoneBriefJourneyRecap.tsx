@@ -7,7 +7,7 @@ import { useBadges } from '@/hooks/use-badges';
 import { useHoldGoalProfile } from '@/hooks/use-hold-goal';
 import { usePauseStatsData } from '@/hooks/use-pause-stats-data';
 import { suppressBadgeCelebrationOverlayThisSession } from '@/hooks/use-badge-sync';
-import { getUserBadgeIdsQueryOptions } from '@/lib/user-badge-ids-query';
+import { getUserBadgeIdsQueryOptions } from '@/legacy/full-shell/src/lib/user-badge-ids-query';
 import type { PauseImpactData } from '@/lib/pause-impact-data';
 import { ScoreImpact } from './ScoreImpact';
 

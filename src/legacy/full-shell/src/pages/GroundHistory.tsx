@@ -13,12 +13,12 @@ import {
   getGroundHistoryEntriesInfiniteQueryOptions,
   getGroundHistoryStatsQueryOptions,
   type GroundingEntry,
-} from '@/lib/ground-history-query';
+} from '@/legacy/full-shell/src/lib/ground-history-query';
 
 export {
   groundHistoryEntriesQueryKey,
   groundHistoryStatsQueryKey,
-} from '@/lib/ground-history-query';
+} from '@/legacy/full-shell/src/lib/ground-history-query';
 
 const ease: [number, number, number, number] = [0.22, 1, 0.36, 1];
 

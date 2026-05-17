@@ -1,5 +1,5 @@
 import { supabase } from '@/integrations/supabase/client';
-import { fetchPracticeSuggestions, type PracticeSuggestion } from '@/lib/practice-suggestion';
+import { fetchPracticeSuggestions, type PracticeSuggestion } from '@/legacy/full-shell/src/lib/practice-suggestion';
 
 export type LastCheckInRow = {
   id: string;

@@ -1,12 +1,12 @@
 import { useMemo } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
-import { getPracticePrimarySuggestionQueryOptions } from '@/lib/practice-primary-suggestion-query';
-import type { SuggestedPracticeId } from '@/lib/practice-suggestion';
+import { getPracticePrimarySuggestionQueryOptions } from '@/legacy/full-shell/src/lib/practice-primary-suggestion-query';
+import type { SuggestedPracticeId } from '@/legacy/full-shell/src/lib/practice-suggestion';
 
 export type PracticeSuggestionPick = { id: SuggestedPracticeId; reason: string };
 
-export { practicePrimarySuggestionQueryKey } from '@/lib/practice-primary-suggestion-query';
+export { practicePrimarySuggestionQueryKey } from '@/legacy/full-shell/src/lib/practice-primary-suggestion-query';
 
 /**
  * Top practice suggestion for Home / pause empty states (same source as PracticeWidget).
