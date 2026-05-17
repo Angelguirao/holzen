@@ -1,5 +1,7 @@
 # Cron Job Setup
 
+**Pause-first shipped crons (2026-05):** `check-volatility`, `refresh-btc-prices`, `pregenerate-companions`, `process-email-queue` (pause-related templates only). Retired in cutover: `fetch-source-feeds`, `badge-notify`, `weekly-digest`, `night-reflection`, `deliver-letters-check`, etc. See [active-surface.md](./active-surface.md).
+
 ## Cron HTTP auth
 
 Server-side functions that use `verifyServiceAuth` (e.g. `check-volatility`) accept:

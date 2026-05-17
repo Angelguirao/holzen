@@ -848,7 +848,7 @@ export function SettingsSubscriptionPanel() {
                   ) : null}
                 </div>
               )}
-            </motion.div>
+            </div>
 
             <CreditsDashboard />
 

@@ -2,16 +2,19 @@
 
 This guide walks a new contributor through the repository in roughly the order you would discover it while running the app locally. It complements [README.md](../README.md) (setup and scripts) and [AGENTS.md](../AGENTS.md) (conventions for automation). Deep dives on the AI pause pipeline and cron jobs live in [ai-powered-pause-system.md](../systems/pause/ai-powered-pause-system.md) and [cron-setup.md](../ops/cron-setup.md).
 
+**Pause-first shipped path (2026-05):** sign in → **Home** (trial via `ensure-trial-subscription`) → **`/pause`** ritual → **Archive** to browse past pauses → **Journey** overview (streak/count) → **Settings**. Do not import `@/legacy/*`; full IA is tag `full-ia-pre-strip`. Manifest: [active-surface.md](../ops/active-surface.md).
+
 ---
 
 ## 1. Orientation: what to read first
 
-1. **[README.md](../README.md)** — Node version, `npm install`, environment files (`.env`, `.env.hosted.local`, `.env.localstack.local`), and npm scripts (`dev` on port **8080**, Supabase CLI wrappers).
-2. **[AGENTS.md](../AGENTS.md)** — Where routes, pages, hooks, and Supabase artifacts live; import alias `@/` → `src/`; note on ESLint volume.
-3. **[architecture/c4-holzen.md](../architecture/c4-holzen.md)** — C4 **System Context** and **Container** diagrams (and [workspace.dsl](../architecture/workspace.dsl) for Structurizr).
-4. **This doc** — How those pieces connect at runtime.
-5. **Optional:** [mental-models-for-contributors.md](mental-models-for-contributors.md) — SPA, React hooks, and Supabase-in-the-browser in a **backend-friendly** frame, plus suggested external links (not Holzen-specific).
-6. **Refactors:** [refactoring-strategy.md](refactoring-strategy.md) — how we split large pages/hooks incrementally; backlog checklist in [react-page-and-hook-splitting.md](../backlog/react-page-and-hook-splitting.md).
+1. **[src/README.md](../../src/README.md)** + **[active-surface.md](../ops/active-surface.md)** — what ships in the active tree.
+2. **[README.md](../README.md)** — Node version, `npm install`, environment files (`.env`, `.env.hosted.local`, `.env.localstack.local`), and npm scripts (`dev` on port **8080**, Supabase CLI wrappers).
+3. **[AGENTS.md](../AGENTS.md)** — Where routes, pages, hooks, and Supabase artifacts live; import alias `@/` → `src/`; note on ESLint volume.
+4. **[architecture/c4-holzen.md](../architecture/c4-holzen.md)** — C4 **System Context** and **Container** diagrams (and [workspace.dsl](../architecture/workspace.dsl) for Structurizr).
+5. **This doc** — How those pieces connect at runtime.
+6. **Optional:** [mental-models-for-contributors.md](mental-models-for-contributors.md) — SPA, React hooks, and Supabase-in-the-browser in a **backend-friendly** frame, plus suggested external links (not Holzen-specific).
+7. **Refactors:** [refactoring-strategy.md](refactoring-strategy.md) — how we split large pages/hooks incrementally; backlog checklist in [react-page-and-hook-splitting.md](../backlog/react-page-and-hook-splitting.md).
 
 ---
 

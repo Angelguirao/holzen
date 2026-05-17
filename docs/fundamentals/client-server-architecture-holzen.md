@@ -2,6 +2,8 @@
 
 This note is the **canonical place** for **where authority lives** in Holzen: how the **browser SPA**, **Supabase (Postgres + RLS + edge functions)**, and **shared TypeScript** fit together. It complements [navigating-the-codebase.md](navigating-the-codebase.md) (concrete file map), [react-screen-orchestration.md](react-screen-orchestration.md) (large-screen React patterns), and [mental-models-for-contributors.md](mental-models-for-contributors.md) (glossary and SPA basics).
 
+**Pause-first strip (2026-05):** `src/legacy/` and `supabase/functions/legacy/` are **read-only reference** for the pre-strip full product — not a second runtime or alternate backend. Active code must match [active-surface.md](../ops/active-surface.md).
+
 ---
 
 ## Thesis
