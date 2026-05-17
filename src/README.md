@@ -27,7 +27,11 @@ Dead IA (`/tools/*`, `/library`, `/journey/stats`, …) → `NotFound` (no legac
 
 ## Architecture
 
-[`docs/fundamentals/holzen-application-architecture.md`](../docs/fundamentals/holzen-application-architecture.md) — principles for bounded contexts, use cases, and target package layout (read before large `src/` restructures).
+- [`docs/fundamentals/holzen-application-architecture.md`](../docs/fundamentals/holzen-application-architecture.md) — principles (bounded contexts, use cases, ports).
+- [`docs/fundamentals/frontend-module-layout.md`](../docs/fundamentals/frontend-module-layout.md) — target monorepo tree and migration waves.
+- [`docs/decisions/2026-05-17-modular-monolith-hexagonal-client.md`](../docs/decisions/2026-05-17-modular-monolith-hexagonal-client.md) — accepted ADR.
+
+Read before large `src/` restructures.
 
 ## Manifest
 
