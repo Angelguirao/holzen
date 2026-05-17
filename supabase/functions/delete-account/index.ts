@@ -123,16 +123,8 @@ serve(
       );
 
     await Promise.all([
-      serviceClient.from("graph_edges").delete().eq("user_id", userId),
       serviceClient.from("user_signal_preferences").delete().eq("user_id", userId),
       serviceClient.from("collections").delete().eq("user_id", userId),
-      serviceClient.from("reflection_insights").delete().eq("user_id", userId),
-      serviceClient.from("night_reflections").delete().eq("user_id", userId),
-      serviceClient.from("user_badges").delete().eq("user_id", userId),
-      serviceClient.from("practice_entries").delete().eq("user_id", userId),
-      serviceClient.from("ritual_completions").delete().eq("user_id", userId),
-      serviceClient.from("ritual_templates").delete().eq("user_id", userId),
-      serviceClient.from("future_letters").delete().eq("user_id", userId),
       serviceClient.from("feedback").delete().eq("user_id", userId),
       serviceClient.from("analytics_events").delete().eq("user_id", userId),
       serviceClient.from("testimonials").delete().eq("user_id", userId),

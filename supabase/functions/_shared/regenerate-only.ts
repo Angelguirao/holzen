@@ -178,7 +178,7 @@ export async function handleRegenerateOnly(params: {
     .from("pause_ai_artifacts")
     .select("content")
     .eq("pause_instance_id", pauseInstanceId)
-    .eq("kind", "reflection_text")
+    .eq("kind", "opening_message")
     .maybeSingle();
 
   const ctxSnapshot = (instance.context_snapshot ?? {}) as Record<string, unknown>;
