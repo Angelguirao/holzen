@@ -7,7 +7,7 @@ describe('buildFetchedPauseInstanceFromFetch', () => {
       'pid-1',
       { context_snapshot: { context_text: 'BTC quiet' } },
       [
-        { kind: 'reflection_text', content: { message: 'Breathe first.' } },
+        { kind: 'opening_message', content: { message: 'Breathe first.' } },
         { kind: 'haiku', content: { haiku: 'line / line / line' } },
         { kind: 'ground_nudge', content: { title: 'G title', body: 'G body' } },
       ],

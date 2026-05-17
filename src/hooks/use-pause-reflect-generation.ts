@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { useAuth } from '@/hooks/use-auth';
 import { useProfile } from '@/hooks/use-profile';
 import {
-  fetchReflectionTextForPauseInstance,
+  fetchOpeningMessageForPauseInstance,
   generateReflectionAtReflectStep,
 } from '@/lib/pause-reflect-artifact';
 import { reflectGenerationPrerequisite } from '@/lib/pause-reflect-generation-prerequisites';
@@ -99,7 +99,7 @@ export function usePauseReflectGeneration({
     setError(null);
 
     try {
-      const cached = await fetchReflectionTextForPauseInstance(instanceForThisRun);
+      const cached = await fetchOpeningMessageForPauseInstance(instanceForThisRun);
       if (ticket !== validityRef.current) return;
       if (cached) {
         setReflectionMessage(cached);

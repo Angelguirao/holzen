@@ -739,7 +739,7 @@ export default function Admin() {
                       )}
                     </div>
                     <p className="text-[9px] font-mono text-foreground/70 leading-relaxed pl-4">
-                      {s.reflection_text?.slice(0, 100)}{(s.reflection_text?.length ?? 0) > 100 ? '…' : ''}
+                      {s.opening_message?.slice(0, 100)}{(s.opening_message?.length ?? 0) > 100 ? '…' : ''}
                     </p>
                     <div className="flex items-center gap-1.5 flex-wrap pl-4">
                       {[
@@ -761,7 +761,7 @@ export default function Admin() {
                     <div className="mt-1.5 space-y-2 rounded border border-border/20 bg-card/10 px-3 py-2 text-[9px] font-mono">
                       <div className="space-y-0.5">
                         <p className="text-muted-foreground/50 uppercase tracking-wider">Reflection text</p>
-                        <p className="text-foreground/70 whitespace-pre-wrap break-words leading-relaxed">{s.reflection_text ?? '—'}</p>
+                        <p className="text-foreground/70 whitespace-pre-wrap break-words leading-relaxed">{s.opening_message ?? '—'}</p>
                       </div>
                       <div className="space-y-1.5 border-t border-border/10 pt-2">
                         <p className="text-muted-foreground/50 uppercase tracking-wider">Counted companions</p>

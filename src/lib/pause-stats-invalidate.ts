@@ -5,8 +5,6 @@ import { pauseArchiveListQueryPrefix } from '@/lib/pause-archive-list-query';
 import { pendingPauseOfferQueryKey } from '@/lib/pending-pause-offer-query';
 import { getHolzenQueryClient } from '@/lib/holzen-query-client-ref';
 import { archivePausesTabHasRowsQueryPrefix } from '@/lib/archive-pauses-tab-query';
-import { invalidateHistoryCalendarActivities } from '@/lib/history-calendar-activities-query-key';
-
 /**
  * Call after a pause reaches `completed` so Home, Journey overview, completed-pause count,
  * Archive lists, library bundle, pending offer, and current open pause stay fresh.
@@ -15,7 +13,6 @@ export function invalidatePauseStatsDataForUser(userId: string | null | undefine
   if (!userId) return;
   const qc = getHolzenQueryClient();
   if (!qc) return;
-  invalidateHistoryCalendarActivities(qc, userId);
   void qc.invalidateQueries({ queryKey: ['journey', 'pause-instances', userId] });
   void qc.invalidateQueries({ queryKey: COMPLETED_PAUSE_COUNT_QUERY_KEY(userId) });
   void qc.invalidateQueries({ queryKey: archivePausesTabHasRowsQueryPrefix(userId) });

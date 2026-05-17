@@ -35,7 +35,7 @@ type PauseFullRow = {
   initial_mood: string | null;
   outcome: string | null;
   context_snapshot: Record<string, unknown> | null;
-  reflection_text: string | null;
+  opening_message: string | null;
   note_text: string | null;
 };
 
@@ -66,7 +66,7 @@ export async function fetchPastReflectionWithWords(
     const { data, error } = await svcClient
       .from("v_pause_full")
       .select(
-        "id, created_at, completed_at, engaged_at, initial_mood, outcome, context_snapshot, reflection_text, note_text",
+        "id, created_at, completed_at, engaged_at, initial_mood, outcome, context_snapshot, opening_message, note_text",
       )
       .eq("user_id", userId)
       .eq("state", "completed")
@@ -148,7 +148,7 @@ export async function fetchPastReflectionWithWords(
       mood: p.initial_mood,
       outcome: p.outcome,
       context: contextTextOf(p),
-      aiPrompt: p.reflection_text,
+      aiPrompt: p.opening_message,
       userWords: merged,
     });
   }

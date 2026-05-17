@@ -37,20 +37,15 @@ export function useProfile() {
   const [threshold, setThresholdState] = useState(5);
   const [thresholdDown, setThresholdDownState] = useState(5);
   const [cumulativeThreshold, setCumulativeThresholdState] = useState(15);
-  const [streakFreezeDates, setStreakFreezeDatesState] = useState<string[]>([]);
   const [emailNotifications, setEmailNotificationsState] = useState(true);
   const [reflectionTone, setReflectionToneState] = useState('stoic');
   const [silentMode, setSilentModeState] = useState(false);
   const [cooldownHours, setCooldownHoursState] = useState(6);
-  const [digestFrequency, setDigestFrequencyState] = useState('weekly');
   const [customPrompt, setCustomPromptState] = useState<string | null>(null);
   const [reflectionStyle, setReflectionStyleState] = useState('standard');
   const [quietHoursStart, setQuietHoursStartState] = useState<number | null>(null);
   const [quietHoursEnd, setQuietHoursEndState] = useState<number | null>(null);
   const [firstName, setFirstNameState] = useState<string | null>(null);
-  const [aiInsightsEnabled, setAiInsightsEnabledState] = useState(true);
-  const [nightReflectionHour, setNightReflectionHourState] = useState<number | null>(21);
-  const [notifyBadges, setNotifyBadgesState] = useState(true);
   const [motivations, setMotivationsState] = useState<string[]>([]);
   const [mantra, setMantraState] = useState<string | null>(null);
   const [groundingActivities, setGroundingActivitiesState] = useState<string[]>([]);
@@ -88,20 +83,15 @@ export function useProfile() {
       setThresholdState(row.threshold);
       setThresholdDownState(row.threshold_down ?? row.threshold);
       setCumulativeThresholdState(row.cumulative_threshold ?? 15);
-      setStreakFreezeDatesState(row.streak_freeze_dates ?? []);
       setEmailNotificationsState(row.email_notifications ?? true);
       setReflectionToneState(row.reflection_tone ?? 'stoic');
       setCooldownHoursState(row.cooldown_hours ?? 6);
       setSilentModeState(row.silent_mode ?? false);
-      setDigestFrequencyState(row.digest_frequency ?? 'weekly');
       setCustomPromptState(row.custom_prompt ?? null);
       setReflectionStyleState(row.reflection_style ?? 'standard');
       setQuietHoursStartState(row.quiet_hours_start ?? null);
       setQuietHoursEndState(row.quiet_hours_end ?? null);
       setFirstNameState(row.first_name ?? null);
-      setNightReflectionHourState(row.night_reflection_hour ?? 21);
-      setAiInsightsEnabledState(row.ai_insights_enabled ?? true);
-      setNotifyBadgesState(row.notify_badges ?? true);
       setMotivationsState(row.motivations ?? []);
       setMantraState(row.mantra ?? null);
       setCurrencyState(row.hold_goal_currency ?? 'USD');
@@ -157,24 +147,6 @@ export function useProfile() {
     if (!error) invalidateProfileQuery();
   }, [user, invalidateProfileQuery]);
 
-  const useStreakFreeze = useCallback(async () => {
-    if (!user) return;
-    const today = new Date().toISOString().slice(0, 10);
-    if (streakFreezeDates.includes(today)) return;
-    const recent = streakFreezeDates.filter((d) => {
-      const diff = Math.abs(Date.now() - new Date(d).getTime());
-      return diff < 7 * 24 * 60 * 60 * 1000;
-    });
-    if (recent.length >= 1) return;
-    const updated = [...streakFreezeDates, today];
-    setStreakFreezeDatesState(updated);
-    const { error } = await supabase
-      .from('profiles')
-      .update({ streak_freeze_dates: updated })
-      .eq('user_id', user.id);
-    if (!error) invalidateProfileQuery();
-  }, [user, streakFreezeDates, invalidateProfileQuery]);
-
   const setEmailNotifications = useCallback(async (val: boolean) => {
     setEmailNotificationsState(val);
     if (!user) return;
@@ -201,16 +173,6 @@ export function useProfile() {
     const { error } = await supabase
       .from('profiles')
       .update({ silent_mode: val })
-      .eq('user_id', user.id);
-    if (!error) invalidateProfileQuery();
-  }, [user, invalidateProfileQuery]);
-
-  const setDigestFrequency = useCallback(async (val: string) => {
-    setDigestFrequencyState(val);
-    if (!user) return;
-    const { error } = await supabase
-      .from('profiles')
-      .update({ digest_frequency: val })
       .eq('user_id', user.id);
     if (!error) invalidateProfileQuery();
   }, [user, invalidateProfileQuery]);
@@ -303,8 +265,6 @@ export function useProfile() {
     setThresholdDown,
     cumulativeThreshold,
     setCumulativeThreshold,
-    streakFreezeDates,
-    useStreakFreeze,
     emailNotifications,
     setEmailNotifications,
     reflectionTone,
@@ -313,8 +273,6 @@ export function useProfile() {
     setSilentMode,
     cooldownHours,
     setCooldownHours,
-    digestFrequency,
-    setDigestFrequency,
     customPrompt,
     setCustomPrompt: async (val: string | null) => {
       setCustomPromptState(val);
@@ -341,32 +299,11 @@ export function useProfile() {
         .eq('user_id', user.id);
       if (!error) invalidateProfileQuery();
     },
-    nightReflectionHour,
-    setNightReflectionHour: async (val: number | null) => {
-      setNightReflectionHourState(val);
-      if (!user) return;
-      const { error } = await supabase.from('profiles').update({ night_reflection_hour: val }).eq('user_id', user.id);
-      if (!error) invalidateProfileQuery();
-    },
     firstName,
     setFirstName: async (val: string | null) => {
       setFirstNameState(val);
       if (!user) return;
       const { error } = await supabase.from('profiles').update({ first_name: val }).eq('user_id', user.id);
-      if (!error) invalidateProfileQuery();
-    },
-    aiInsightsEnabled,
-    setAiInsightsEnabled: async (val: boolean) => {
-      setAiInsightsEnabledState(val);
-      if (!user) return;
-      const { error } = await supabase.from('profiles').update({ ai_insights_enabled: val }).eq('user_id', user.id);
-      if (!error) invalidateProfileQuery();
-    },
-    notifyBadges,
-    setNotifyBadges: async (val: boolean) => {
-      setNotifyBadgesState(val);
-      if (!user) return;
-      const { error } = await supabase.from('profiles').update({ notify_badges: val }).eq('user_id', user.id);
       if (!error) invalidateProfileQuery();
     },
     motivations,

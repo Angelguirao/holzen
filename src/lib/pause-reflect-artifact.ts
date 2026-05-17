@@ -3,13 +3,13 @@ import type { CompanionData } from '@/components/CompanionSection';
 import { invokeEdge } from '@/lib/invoke-edge';
 import { loadReflectRecencyHints } from '@/lib/load-reflect-recency-hints';
 
-/** Reads persisted reflect-step copy (`pause_ai_artifacts.kind === 'reflection_text'`). */
-export async function fetchReflectionTextForPauseInstance(pauseInstanceId: string): Promise<string | null> {
+/** Reads persisted reflect-step copy (`pause_ai_artifacts.kind === 'opening_message'`). */
+export async function fetchOpeningMessageForPauseInstance(pauseInstanceId: string): Promise<string | null> {
   const { data, error } = await supabase
     .from('pause_ai_artifacts' as never)
     .select('content')
     .eq('pause_instance_id', pauseInstanceId)
-    .eq('kind', 'reflection_text')
+    .eq('kind', 'opening_message')
     .maybeSingle();
   if (error || !data) return null;
   const row = data as { content: unknown };
@@ -52,7 +52,7 @@ export async function persistReflectionArtifacts(params: PersistReflectionArtifa
     {
       pause_instance_id: pauseInstanceId,
       user_id: userId,
-      kind: 'reflection_text',
+      kind: 'opening_message',
       content: { message, context },
     },
   ];

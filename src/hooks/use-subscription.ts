@@ -17,6 +17,7 @@ import {
   deriveEntitlement,
   type Entitlement,
 } from '@/lib/subscription-entitlement';
+import { trackEvent } from '@/lib/posthog';
 
 const CHECKOUT_RETURN_KEY = 'holzen_checkout_started_at';
 /** Set when a checkout return includes `?subscribed=true` (timestamp for PaywallSubscribedTracker TTL) */
@@ -235,11 +236,21 @@ export function useSubscription() {
     holzenLog.subscription('trial', { action: 'ensure' });
     setTrialLoading(true);
     try {
-      const { data, error } = await invokeEdge<{ ok?: boolean }>('ensure-trial-subscription', {
-        body: {},
-      });
+      const { data, error } = await invokeEdge<{ ok?: boolean; created?: boolean }>(
+        'ensure-trial-subscription',
+        {
+          body: {},
+        },
+      );
       if (error) throw error;
       if (!data?.ok) throw new Error('Trial not started');
+      if (data.created) {
+        try {
+          trackEvent('trial.started', { source: 'ensure_trial' });
+        } catch {
+          /* no-op */
+        }
+      }
       subscriptionForceNext = true;
       subscriptionNextFetchSource = 'invalidate';
       await queryClient.invalidateQueries({ queryKey: subscriptionQueryKey(userId) });
@@ -336,6 +347,18 @@ export function useSubscription() {
   const entitlement: Entitlement = !userId
     ? 'pre_trial'
     : deriveEntitlement({ subscribed, subscriptionStatus });
+  const prevEntitlementRef = useRef<Entitlement | null>(null);
+  useEffect(() => {
+    const prev = prevEntitlementRef.current;
+    if (prev && prev !== 'lapsed' && entitlement === 'lapsed') {
+      try {
+        trackEvent('trial.expired', {});
+      } catch {
+        /* no-op */
+      }
+    }
+    prevEntitlementRef.current = entitlement;
+  }, [entitlement]);
   const canEngagePause = canEngagePauseFromEntitlement(entitlement);
   const isLapsed = entitlement === 'lapsed';
   const canReflect = canEngagePause;

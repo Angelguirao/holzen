@@ -136,7 +136,7 @@ export interface SessionRow {
   id: string;
   created_at: string;
   state: string;
-  reflection_text: string | null;
+  opening_message: string | null;
   context_snapshot: Record<string, unknown> | null;
   initial_mood: string | null;
   outcome: string | null;
@@ -246,22 +246,11 @@ export async function fetchAdminStatsBundle(): Promise<AdminStatsBundle> {
   const { data: sessionData } = await supabase
     .from('v_pause_full' as never)
     .select(
-      'id, created_at, state, reflection_text, context_snapshot, initial_mood, outcome, haiku_text, counted_companion_types',
+      'id, created_at, state, opening_message, context_snapshot, initial_mood, outcome, haiku_text, counted_companion_types',
     )
     .order('created_at', { ascending: false })
     .limit(20);
   const sessions = (sessionData ?? []) as SessionRow[];
-
-  let libraryEntries: LibraryEntryRow[] = [];
-  try {
-    const { data: libraryData, error: libErr } = await supabase
-      .from('content_library')
-      .select('id, type, title, author, summary, url, original_url, original_publication, tags, companion_types, quality_score, active, created_at')
-      .eq('active', true)
-      .order('created_at', { ascending: false })
-      .limit(100);
-    if (!libErr) libraryEntries = (libraryData ?? []) as unknown as LibraryEntryRow[];
-  } catch { /* table may not exist yet */ }
 
   const sourcesRes = await supabase
     .from('signal_sources')
@@ -282,7 +271,7 @@ export async function fetchAdminStatsBundle(): Promise<AdminStatsBundle> {
     rejections,
     recentContent,
     sessions,
-    libraryEntries,
+    libraryEntries: [],
     servesPerDay: dailyServes as DailyServeRow[],
     failuresPerDay: dailyFailures as DailyFailureRow[],
     feedbackPerDay: dailyFeedback as DailyFeedbackRow[],

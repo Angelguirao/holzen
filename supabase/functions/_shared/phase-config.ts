@@ -2,7 +2,7 @@
  * Companion generation phase configuration.
  *
  * Controls the order in which companions are resolved:
- *   1. Library  (content_library — curated essays/papers/events)
+ *   1. Library  (deprecated — content_library dropped; off by default)
  *   2. Cache    (companion_cache — previously generated content)
  *   3. Live     (Perplexity + AI generation)
  *   4. Curated  (static fallback pools — always available as last resort)
@@ -35,7 +35,7 @@ function readBoolEnv(key: string, defaultValue: boolean): boolean {
 /** Read the phase config from env vars. All phases enabled by default. */
 export function getPhaseConfig(): PhaseConfig {
   return {
-    library: readBoolEnv("COMPANION_PHASE_LIBRARY", true),
+    library: readBoolEnv("COMPANION_PHASE_LIBRARY", false),
     cache: readBoolEnv("COMPANION_PHASE_CACHE", true),
     live: readBoolEnv("COMPANION_PHASE_LIVE", true),
   };

@@ -45,7 +45,7 @@ export async function loadPauseReplayThread(pauseInstanceId: string): Promise<
 > {
   const { data: row, error } = await supabase
     .from('v_pause_full')
-    .select('id, created_at, initial_mood, outcome, context_snapshot, reflection_text, state')
+    .select('id, created_at, initial_mood, outcome, context_snapshot, opening_message, state')
     .eq('id', pauseInstanceId)
     .maybeSingle();
 
@@ -78,29 +78,7 @@ export async function loadPauseReplayThread(pauseInstanceId: string): Promise<
     notes.push({ kind: 'note', body: text, created_at: e.created_at });
   }
 
-  const replayQuery = await (supabase
-    .from('practice_entries')
-    .select('body, created_at')
-    .eq('pause_instance_id' as never, pauseInstanceId as never)
-    .eq('type', 'replay')
-    .order('created_at', { ascending: true }) as unknown as Promise<{
-      data: Array<{ body: string | null; created_at: string }> | null;
-      error: { message: string } | null;
-    }>);
-  const { data: replays, error: rErr } = replayQuery;
-
-  if (rErr) {
-    return { ok: false, code: 'load_error', message: rErr.message };
-  }
-
-  const replayRows = (replays ?? [])
-    .map((r) => ({
-      body: typeof r.body === 'string' ? r.body : '',
-      created_at: r.created_at,
-    }))
-    .filter((r) => r.created_at);
-
-  const userWords = combineNoteAndReplayWords(notes, replayRows);
+  const userWords = combineNoteAndReplayWords(notes, []);
 
   const thread: PastReflectionWithWords = {
     id: row.id,
@@ -108,7 +86,7 @@ export async function loadPauseReplayThread(pauseInstanceId: string): Promise<
     mood: row.initial_mood,
     outcome: row.outcome,
     context: contextTextFromSnapshot(row.context_snapshot as Record<string, unknown> | null),
-    aiPrompt: row.reflection_text,
+    aiPrompt: row.opening_message,
     userWords,
   };
 
@@ -118,7 +96,7 @@ export async function loadPauseReplayThread(pauseInstanceId: string): Promise<
 export type PausePickerRow = {
   id: string;
   created_at: string;
-  reflection_text: string | null;
+  opening_message: string | null;
 };
 
 export const REPLAY_RECENT_PAUSES_NONE_QUERY_KEY = [
@@ -186,7 +164,7 @@ export function getPauseReplayThreadQueryOptions(params: {
 export async function loadRecentCompletedPausesForReplay(limit = 24): Promise<PausePickerRow[]> {
   const { data, error } = await supabase
     .from('v_pause_full')
-    .select('id, created_at, reflection_text')
+    .select('id, created_at, opening_message')
     .eq('state', 'completed')
     .order('created_at', { ascending: false })
     .limit(limit);

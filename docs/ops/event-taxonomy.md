@@ -55,6 +55,13 @@ The Archive tab uses route `/archive` and reports `tab: 'archive'`.
 |---|---|---|---|
 | `onboarding.completed` | User finishes the 2-step onboarding flow and `ensure-trial-subscription` succeeds | `{ steps_completed: 2 }` | @holzen |
 
+### subscription
+
+| Event | When | Properties | Owner |
+|---|---|---|---|
+| `trial.started` | Stripe trial subscription created via `ensure-trial-subscription` (`created: true`) | `{ source: 'ensure_trial' }` | @holzen |
+| `trial.expired` | Client entitlement transitions to `lapsed` (trial ended without active paid sub) | `{}` | @holzen |
+
 ### journey
 
 | Event | When | Properties | Owner |
