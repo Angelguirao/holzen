@@ -1,4 +1,4 @@
-# Pause-first MVP launch runbook
+# Pause-first launch runbook
 
 Human checklist for shipping `feature/mvpPauseCleanup` to production. Canonical deploy narrative: [deployment-sync-guide.md](./deployment-sync-guide.md).
 
@@ -15,6 +15,7 @@ Run in order; fix failures before push:
 ```bash
 npm run test
 npm run check:active-surface
+npm run check:no-phase-labels
 npm run check:invoke-edge-allowlist
 npm run check:edge-logging
 npm run check:edge-coverage-manifest
@@ -35,13 +36,11 @@ npm run build
 rg -l "BadgesPanelV2|ToolsHub" dist/assets/*.js && exit 1 || echo "bundle clean"
 ```
 
-Naming audit (active paths only):
+Naming audit (plan §5.0):
 
 ```bash
-rg -i '(mvp|pre-mvp)' src supabase/functions scripts docs/ops .cursor/rules bruno package.json --glob '!**/.cursor/plans/**' --glob '!**/legacy/**'
+npm run check:no-phase-labels
 ```
-
-Expect **zero** hits except ADR/plan references.
 
 ## 2. Push backend
 

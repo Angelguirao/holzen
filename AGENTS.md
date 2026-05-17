@@ -41,7 +41,9 @@ Use this table to pick the **canonical narrative** for the slice you are touchin
 | `npm run build` | Production build (**`prebuild`** → **`npm run check:version-sync`**) |
 | `npm run preview` | Serve built output locally |
 | `npm run test` | Vitest (jsdom), single run |
-| `npm run test:ci` | CI gate: `check:edge-logging`, `check:edge-coverage-manifest`, Vitest with coverage + JUnit |
+| `npm run test:ci` | CI gate: `check:edge-logging`, `check:edge-coverage-manifest`, `check:active-surface`, `check:no-phase-labels`, `check:invoke-edge-allowlist`, Vitest with coverage + JUnit |
+| `npm run check:no-phase-labels` | Plan §5.0 — fail on `mvp` / `pre-mvp` tokens in active `src/`, ops, Bruno, CI scripts (allowlisted migration filename + branch) |
+| `npm run check:i18n-active-keys` | Optional — `t('…')` keys in active `src/` must exist in `src/locales/en.json` (not in `test:ci` until tree is complete) |
 | `npm run test:watch` | Vitest watch mode |
 | `npm run lint` | ESLint across the repo |
 | `npm run check:view-migrations` | Fail on unsafe `CREATE OR REPLACE VIEW` column renames in `supabase/migrations/` (runs in **`check:prepush`**). |

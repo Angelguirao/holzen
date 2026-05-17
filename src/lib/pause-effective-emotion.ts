@@ -1,4 +1,4 @@
-/** Minimal pause row fields for post-ritual mood helpers (MVP — no v_pause_full). */
+/** Minimal pause row fields for post-ritual mood helpers (no v_pause_full join). */
 
 export type PauseEmotionFields = {
   post_pause_mood: string | null;

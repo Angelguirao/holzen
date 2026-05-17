@@ -4,7 +4,7 @@ Decision document for pricing and packaging after the AI cost-model audit.
 This translates cost analysis into a customer-facing pricing model that is
 simple, defensible, and resilient while cache coverage is still maturing.
 
-> **Pause-first MVP (2026-05):** Shipped acquisition is **7-day in-app trial** via `ensure-trial-subscription` (no card at signup). Checkout is for **reactivation** after trial/lapse. Marketing copy is trial-first — not “free forever” with unlimited Pro features. The plan table in §3.1 remains the **long-term** packaging target; align landing/Settings with [docs/ops/active-surface.md](../../ops/active-surface.md) until tiers are re-enabled in product.
+> **Pause-first shipped scope (2026-05):** Shipped acquisition is **7-day in-app trial** via `ensure-trial-subscription` (no card at signup). Checkout is for **reactivation** after trial/lapse. Marketing copy is trial-first — not “free forever” with unlimited Pro features. The plan table in §3.1 remains the **long-term** packaging target; align landing/Settings with [docs/ops/active-surface.md](../../ops/active-surface.md) until tiers are re-enabled in product.
 
 ---
 

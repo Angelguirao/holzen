@@ -1,4 +1,4 @@
-# Bruno — pause-first MVP smoke
+# Bruno — pause-first shipped smoke
 
 Thin HTTP checks for **deployed** edges after push. Use environment **`hosted`** ([`../environments/hosted.bru`](../environments/hosted.bru)).
 
