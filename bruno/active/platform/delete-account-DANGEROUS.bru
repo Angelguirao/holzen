@@ -1,0 +1,17 @@
+meta {
+  name: delete-account-DANGEROUS
+  type: http
+  seq: 99
+}
+
+post {
+  url: {{VITE_SUPABASE_URL}}/functions/v1/delete-account
+  body: none
+  auth: none
+}
+
+headers {
+  x-cid: bruno-{{$timestamp}}-review
+  Authorization: Bearer {{SUPABASE_ACCESS_TOKEN}}
+  apikey: {{VITE_SUPABASE_PUBLISHABLE_KEY}}
+}

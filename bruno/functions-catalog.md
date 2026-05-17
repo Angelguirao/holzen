@@ -1,8 +1,10 @@
 # Edge Functions catalog (HTTP URLs)
 
+> **Pause-first MVP:** Use **[`active/functions-catalog.md`](active/functions-catalog.md)** for the **deployed** surface and Bruno folder map. This file is a **historical** index (includes undeployed full-IA functions).
+
 Base URL: **`{{VITE_SUPABASE_URL}}/functions/v1/<name>`**
 
-**Bruno coverage:** The table lists functions that already have **named smoke `.bru` files** under `bruno/` (see folder READMEs). Bodies are minimal — read `supabase/functions/<name>/index.ts` for full contracts. Deployed functions without a row here simply lack Bruno coverage yet.
+**Bruno coverage:** Shipped requests live under **`bruno/active/`**. Retired `.bru` files are in **`bruno/legacy/full-shell/`**. Bodies are minimal — read `supabase/functions/<name>/index.ts` for contracts.
 
 ### All deployed edge functions (`supabase/config.toml`)
 

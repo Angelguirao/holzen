@@ -79,3 +79,4 @@ Full taxonomy: [event-taxonomy.md](./event-taxonomy.md).
 - [src/README.md](../../src/README.md) — active tree map
 - [.cursor/rules/active-surface.mdc](../../.cursor/rules/active-surface.mdc) — import guardrails
 - [launch-runbook.md](./launch-runbook.md) — ship checklist
+- [bruno/active/functions-catalog.md](../../bruno/active/functions-catalog.md) — HTTP mirror of deployed edges

@@ -66,13 +66,15 @@ SELECT user_id, subscription_status, subscription_tier FROM profiles WHERE subsc
 
 ## 4. Bruno smoke (`bruno/active/`)
 
-With `hosted.bru` env (JWT + Supabase URL/key):
+With `hosted.bru` env (JWT + Supabase URL/key). Full sequence: [bruno/active/README.md](../../bruno/active/README.md).
 
-1. `health` — 200
-2. `check-subscription` — 200, `subscription_status` / tier fields
-3. `ensure-trial-subscription` — 200, `{ ok: true }` (use a disposable test user; idempotent)
+1. `auth/01-sign-in-password`
+2. `platform/health` — 200
+3. `billing/02-check-subscription` — `subscription_status` / tier fields
+4. `billing/04-ensure-trial-subscription` — `{ ok: true }` (disposable user; idempotent)
+5. Optional: `pause-pipeline/01-holzen-reflect`, `02-companion-orchestrate`
 
-See [bruno/active/README.md](../../bruno/active/README.md).
+Do not use requests under `bruno/legacy/full-shell/` for MVP ship checks (undeployed edges).
 
 ## 5. Post-launch (24h)
 
