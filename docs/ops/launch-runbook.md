@@ -50,6 +50,10 @@ npm run check:no-phase-labels
 
 ## 2. Push backend
 
+**Done (2026-05-17):** `806009f3` on `origin/feature/mvpPauseCleanup`.
+
+If you need to push again:
+
 ```bash
 git push -u origin feature/mvpPauseCleanup
 ```
