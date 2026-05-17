@@ -1,6 +1,6 @@
 # Pause-first launch runbook
 
-Human checklist for shipping `feature/mvpPauseCleanup` to production. Canonical deploy narrative: [deployment-sync-guide.md](./deployment-sync-guide.md).
+Human checklist for shipping `feature/mvpPauseCleanup` to production. **Quick ticks:** [ship-checklist.md](./ship-checklist.md). Canonical deploy narrative: [deployment-sync-guide.md](./deployment-sync-guide.md).
 
 ## Ship status (agent-complete vs human)
 
