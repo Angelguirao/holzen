@@ -114,6 +114,7 @@ Correlation: keep **`x-cid`** on edge calls per [AGENTS.md](../../AGENTS.md).
 | Pause truth + AI pipeline | [systems/pause-system.md](../systems/pause-system.md), [systems/pause/ai-powered-pause-system.md](../systems/pause/ai-powered-pause-system.md) |
 | Auth + RLS | [systems/auth/auth-and-referral-system.md](../systems/auth/auth-and-referral-system.md) |
 | Application structure (principles, use cases, packages) | [holzen-application-architecture.md](holzen-application-architecture.md) |
+| Modern React practices (Query, colocation, feature folders) | [modern-react-practices-holzen.md](modern-react-practices-holzen.md) |
 | Refactors across UI and lib | [refactoring-strategy.md](refactoring-strategy.md) |
 | Edge HTTP + logging | [ops/edge-logging-conventions.md](../ops/edge-logging-conventions.md) |
 | PR / flow review | [reviews/react-spa-review-template.md](../reviews/react-spa-review-template.md) |

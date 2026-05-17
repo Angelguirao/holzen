@@ -98,6 +98,8 @@ TanStack Query is available app-wide (`QueryClient` in `App.tsx`); individual ho
 
 ### 6.1 TanStack Query vs `useEffect` + Supabase
 
+Broader React norms (feature folders, colocation, scorecard): [modern-react-practices-holzen.md](modern-react-practices-holzen.md).
+
 Both are valid. Use this to choose and to match nearby code:
 
 | Prefer | When |

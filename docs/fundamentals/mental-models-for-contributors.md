@@ -40,6 +40,7 @@ If you wonder **“why not Next.js / a full framework?”**, see [spa-framework-
 | **Auth & RLS** | [systems/auth/auth-and-referral-system.md](../systems/auth/auth-and-referral-system.md), [systems/routing/route-gating-system.md](../systems/routing/route-gating-system.md) |
 | **HTTP-only testing** (Bruno, Postman) | [http-review-playbooks.md](http-review-playbooks.md) — app behavior still needs the browser |
 | **Application structure** (use cases, bounded contexts, target packages) | [holzen-application-architecture.md](holzen-application-architecture.md) |
+| **Modern React practices** (feature folders, Query vs local state, industry fit) | [modern-react-practices-holzen.md](modern-react-practices-holzen.md) |
 | **Who enforces rules vs who projects UI** (authority, TanStack Query vs UI state) | [client-server-architecture-holzen.md](client-server-architecture-holzen.md) |
 
 ---
