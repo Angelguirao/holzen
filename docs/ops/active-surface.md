@@ -59,7 +59,7 @@ Active in `supabase/config.toml` + `EdgeCoverage.tsx`: pause (`holzen-reflect`, 
 ## Schema notes
 
 - Reflect-step artifact kind: **`opening_message`** (`v_pause_full.opening_message`).
-- `profiles` columns removed: `ai_insights_enabled`, `night_reflection_hour`, `digest_frequency`, `ritual_template`, `notify_badges`, `streak_freeze_dates`.
+- `profiles` columns removed: `ai_insights_enabled`, `night_reflection_hour`, `digest_frequency`, `ritual_template`, `notify_badges`, `streak_freeze_dates`, `companion_breathing` (`20260522130000_drop_companion_breathing.sql`).
 - Companions: **`COMPANION_PHASE_LIBRARY=false`** default — cache → live → curated only.
 
 ## PostHog (shipped)
