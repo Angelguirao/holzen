@@ -1,4 +1,4 @@
-# Move non-MVP edge handlers to supabase/functions/legacy/full-shell/
+# Move non-shipped edge handlers to supabase/functions/legacy/full-shell/
 $ErrorActionPreference = 'Stop'
 Set-Location (Split-Path -Parent $PSScriptRoot)
 

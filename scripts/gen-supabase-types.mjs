@@ -29,11 +29,12 @@ const banner = `/**
 
 let body;
 try {
-  body = execFileSync(
-    process.platform === "win32" ? "npx.cmd" : "npx",
-    ["supabase", "gen", "types", "typescript", "--linked", "--schema", "public"],
-    { encoding: "utf8", cwd: root, stdio: ["ignore", "pipe", "pipe"] },
-  );
+  body = execFileSync("npx", ["supabase", "gen", "types", "typescript", "--linked", "--schema", "public"], {
+    encoding: "utf8",
+    cwd: root,
+    stdio: ["ignore", "pipe", "pipe"],
+    shell: process.platform === "win32",
+  });
 } catch (e) {
   const err = e instanceof Error ? e.message : String(e);
   const stderr = e && typeof e === "object" && "stderr" in e ? String(e.stderr) : "";

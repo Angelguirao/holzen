@@ -38,7 +38,7 @@ export function OnboardingReady({ motivations, onStartTrial, trialLoading, stagg
       ) : null}
 
       <motion.p className="text-sm text-muted-foreground leading-relaxed" {...stagger(0.2)}>
-        {t('onboarding.ready.mvpBody', {
+        {t('onboarding.ready.trialBody', {
           days: PRICING.trialDays,
           defaultValue:
             'Start your {{days}}-day trial to use Pause when volatility spikes. No card required — cancel anytime before it ends.',

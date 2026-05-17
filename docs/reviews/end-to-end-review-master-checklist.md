@@ -10,7 +10,7 @@
 
 **Route source of truth:** `src/App.tsx` (last reconciled with this doc as a structural inventory). **Edge names:** `supabase/config.toml` `[functions.*]` and [bruno/functions-catalog.md](../../bruno/functions-catalog.md).
 
-**Pause-first MVP (2026-05):** For the shipped 4-tab product, prefer integration tests **F1–F9** in `src/test/integration/flows/` and [active-surface.md](../ops/active-surface.md) over Tier A rows that reference `/tools`, `/journey/stats`, or five-tab nav — those describe pre-strip full IA (tag `full-ia-pre-strip`).
+**Pause-first shipped scope (2026-05):** For the shipped 4-tab product, prefer integration tests **F1–F9** in `src/test/integration/flows/` and [active-surface.md](../ops/active-surface.md) over Tier A rows that reference `/tools`, `/journey/stats`, or five-tab nav — those describe pre-strip full IA (tag `full-ia-pre-strip`).
 
 ---
 

@@ -1,12 +1,12 @@
 ---
-description: Pause-first MVP shipped scope — read manifest before non-trivial edits
+description: Pause-first shipped scope — read manifest before non-trivial edits
 globs:
   - src/**
   - supabase/**
 alwaysApply: false
 ---
 
-# Active surface (pause-first MVP)
+# Active surface (pause-first shipped scope)
 
 Before non-trivial edits under `src/` or `supabase/`, read [docs/ops/active-surface.md](../../docs/ops/active-surface.md).
 

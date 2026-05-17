@@ -1,6 +1,6 @@
-# Active surface manifest (pause-first MVP)
+# Active surface manifest (pause-first shipped scope)
 
-**Status:** Shipped on `feature/mvpPauseCleanup` (pause-first MVP).
+**Status:** Shipped on `feature/mvpPauseCleanup` (pause-first product strip).
 
 **Recovery:** Full pre-strip snapshot: git tag `full-ia-pre-strip`, branch `archive/full-ia-pre-strip`.
 
@@ -31,7 +31,7 @@
 
 Server: `user_can_engage_pause(uuid)`; guards on `pause_create_or_reuse` and `pause_log_step`. Sync: `check-subscription`, `stripe-webhook`, `ensure-trial-subscription`.
 
-## Deployed edges (MVP)
+## Deployed edges (shipped)
 
 Active in `supabase/config.toml` + `EdgeCoverage.tsx`: pause (`holzen-reflect`, `companion-orchestrate`, `pregenerate-companions`), volatility (`check-volatility`, `refresh-btc-prices`), billing (`check-subscription`, `create-checkout`, `ensure-trial-subscription`, `stripe-webhook`, `customer-portal`, credits), account (`delete-account`, `export-user-data`), `health`, `send-feedback`, admin edges as listed in config.
 
@@ -52,7 +52,7 @@ Active in `supabase/config.toml` + `EdgeCoverage.tsx`: pause (`holzen-reflect`, 
 
 `user_badges`, `badge_definitions`, `practice_entries`, `reflection_insights`, `future_letters`, `night_reflections`, `graph_edges`, `ritual_completions`, `ritual_templates`, `grounding_enrichment_cache`, **`content_library`**.
 
-## Postgres — Tier C (MVP)
+## Postgres — Tier C (shipped)
 
 `pause_*`, `collections` / `collection_items`, trimmed `profiles`, `notifications`, `roadmap_items` / `roadmap_votes`, `companion_cache`, `companion_serves`, `companion_fallbacks`, `generation_attempts`, `signal_sources`, `user_signal_preferences`, `signal_source_suggestions`, `quiet_windows`, Stripe/credits, `btc_price_cache`, email infra, `audit_log`, `app_config`.
 

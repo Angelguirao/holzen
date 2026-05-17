@@ -638,12 +638,17 @@
     "commitmentFooterHint": "Skip if you prefer — you can set this later under Settings → You.",
     "commitmentHoldLabel": "Hold goal",
     "ready": {
+      "title": "You're set",
       "recapWhy": "Your why",
       "recapHoldGoal": "Hold goal",
       "recapHoldGoalSet": "Saved",
       "recapHoldGoalUnset": "Not set yet",
       "recapGrounding": "Grounds you",
-      "recapThreshold": "Threshold"
+      "recapThreshold": "Threshold",
+      "trialBody": "Start your {{days}}-day trial to use Pause when volatility spikes. No card required — cancel anytime before it ends.",
+      "startingTrial": "Starting trial…",
+      "startTrialNoCard": "Start {{days}}-day free trial",
+      "trialFinePrintNoCard": "Then ${{price}}/mo if you keep going · Cancel anytime"
     }
   },
   "moodCheck": {

@@ -6,7 +6,7 @@ import { createIntegrationSupabaseMock } from './integration-supabase-mock';
 
 const TEST_USER = {
   id: '00000000-0000-4000-8000-000000000001',
-  email: 'mvp@test.holzen.app',
+  email: 'pause@test.holzen.app',
 };
 
 vi.mock('@/hooks/use-auth', () => ({

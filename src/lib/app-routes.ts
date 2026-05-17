@@ -1,4 +1,4 @@
-/** Authenticated Journey overview (MVP — no tab subpaths). */
+/** Authenticated Journey overview (shipped shell — no tab subpaths). */
 export const JOURNEY_PREFIX = '/journey' as const;
 
 /** Shipped primary shell tabs (order matches BottomNav). */
@@ -22,7 +22,7 @@ export function settingsSectionPath(section: string): string {
   return `/settings/${encodeURIComponent(section)}`;
 }
 
-/** @deprecated Full-IA tools namespace — not registered in MVP router; reference/legacy only. */
+/** @deprecated Full-IA tools namespace — not registered in shipped router; reference/legacy only. */
 export const TOOLS_PREFIX = '/tools';
 
 /** @deprecated Full-IA companion/tools helpers — legacy imports until Step 3 move. */

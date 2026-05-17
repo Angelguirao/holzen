@@ -844,7 +844,7 @@ export default function Admin() {
 
         <TabsContent value="library" className="mt-0">
           <p className="text-sm text-muted-foreground py-4">
-            Library ingest preview moved to legacy reference (pause-first MVP). Use fetch-source-feeds ops runbook if needed.
+            Library ingest preview moved to legacy reference (pause-first shipped scope). Use fetch-source-feeds ops runbook if needed.
           </p>
         </TabsContent>
 
