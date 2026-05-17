@@ -10,11 +10,12 @@ This document is the **constitution** for application structure. It does not rep
 |-----|------|
 | **This file** | Principles, bounded contexts, layers, use cases, inspirations, alternatives, anti-patterns |
 | [client-server-architecture-holzen.md](client-server-architecture-holzen.md) | Truth vs projection, trust boundaries, Query vs UI state |
-| [frontend-module-layout.md](frontend-module-layout.md) | Target repo tree, package graph, naming, CI boundary checks *(companion; create when restructure starts)* |
+| [frontend-module-layout.md](frontend-module-layout.md) | Target repo tree, package graph, naming, migration waves, CI checks |
+| [2026-05-17-modular-monolith-hexagonal-client.md](../decisions/2026-05-17-modular-monolith-hexagonal-client.md) | Accepted ADR for monorepo + hexagonal client |
 | [ops/active-surface.md](../ops/active-surface.md) | Shipped routes, edges, tables, events |
 | [systems/pause-system.md](../systems/pause-system.md) | Pause lifecycle invariants and schema |
 
-**Decision record:** When the monorepo / package layout is formally adopted, add or link an ADR under [docs/decisions/](../decisions/) (see [decisions/README.md](../decisions/README.md)).
+**Decision record:** [2026-05-17-modular-monolith-hexagonal-client.md](../decisions/2026-05-17-modular-monolith-hexagonal-client.md) (accepted).
 
 ---
 
@@ -202,30 +203,139 @@ sequenceDiagram
 
 ---
 
-## 7. Bounded contexts (product modules)
+## 7. Screens vs bounded contexts (read this before naming packages)
 
-Align code with **what the product does**, not with technical layers at the repo root.
+Three ideas often get conflated:
 
-| Context | Responsibility | System doc (behavior) |
-|---------|----------------|------------------------|
-| **pause** | Ritual session, steps, artifacts, terminal states | [pause-system.md](../systems/pause-system.md) |
-| **companion** | Orchestration, slots, grounding enrichment UX | [ai-powered-pause-system.md](../systems/pause/ai-powered-pause-system.md) |
-| **subscription** | Entitlement, Stripe, trial, paywall | auth/billing docs + active-surface |
-| **market** | BTC context, thresholds, display preferences | navigating-the-codebase, hooks around `btc.ts` |
-| **home** | Dashboard composition, pause card, onboarding entry | [screens/home.md](../screens/home.md) |
-| **archive** | Past pauses, collections | active-surface |
-| **journey** | Overview, streaks (shipped scope) | active-surface |
-| **settings** | Profile prefs, signals, quiet windows | settings screens |
-| **auth** | Session, sign-in/out | [auth-and-referral-system.md](../systems/auth/auth-and-referral-system.md) |
-| **admin** | Internal ops (non-user-facing) | admin components + edges in manifest |
+| Idea | What it is | Holzen examples |
+|------|------------|-----------------|
+| **Screen / route** | UI entry point in the app shell | Home, Archive, Journey, Settings, `/pause`, `/companion/grounding/:id` |
+| **Bounded context** | A **consistent model + rules + vocabulary** backed by its own tables/RPCs | Pause ritual, subscription, market signals |
+| **Package** | Code boundary to enforce dependencies | `@holzen/pause`, `@holzen/subscription` — should follow **contexts**, not every tab |
+
+**Rule:** One **bottom-nav tab** is not automatically a bounded context. Home, Archive, Journey, and Settings are primarily **screens that compose** real contexts (mostly **pause** + **subscription** + **user**).
+
+### 7.1 Core bounded contexts (packages)
+
+| Context | Responsibility | System doc |
+|---------|----------------|------------|
+| **pause** | **The product core:** `pause_instances`, step events, ritual state machine, AI artifacts, companion opens/completes, reflect/frame/breathe/decide | [pause-system.md](../systems/pause-system.md), [ai-powered-pause-system.md](../systems/pause/ai-powered-pause-system.md) |
+| **subscription** | Entitlement, Stripe, trial, paywall, `user_can_engage_pause` projection | auth/billing + [active-surface.md](../ops/active-surface.md) |
+| **market** | BTC/volatility context, thresholds, display prefs; **creates** pause offers via cron | navigating-the-codebase, `check-volatility` |
+| **user** | Profile row, signal source prefs, quiet windows (settings **content**, not the settings shell) | settings + signals docs |
+| **auth** | Session lifecycle | [auth-and-referral-system.md](../systems/auth/auth-and-referral-system.md) |
+| **roadmap** | Voting on roadmap items (small; may stay in `apps/web` only) | active-surface |
+| **admin** | Internal ops (supporting; not user product domain) | admin edges in manifest |
 
 **Shared kernel** (tiny): `Result`, branded IDs, shared errors — only if truly cross-cutting.
 
-Contexts map to **`packages/<context>`** in the target monorepo (see §9), not to a flat `src/hooks` or `src/lib`.
+There is **no** `@holzen/home`, `@holzen/archive`, `@holzen/journey`, or `@holzen/settings` package in the target model.
+
+### 7.2 Screens live in `apps/web` (composition only)
+
+| Screen | Composes |
+|--------|----------|
+| **Home** | pause (card, triggers), market, subscription, user, onboarding flow |
+| **Archive** | pause read models (past instances, collections) |
+| **Journey** | pause aggregates / overview |
+| **Settings** | user + subscription + presentation |
+| **PauseSession** (`/pause`) | pause ritual (all steps) |
+| **Companion routes** (`/companion/*`) | pause — full-screen views for a **slot** on an instance (grounding, zoom-out, …) |
+| **Marketing / auth / admin** | auth, marketing copy, admin |
+
+Screens call **use cases** from packages; they do not own business rules.
 
 ---
 
-## 8. Inspirations — what we take and what we skip
+## 8. Pause is one context — companions are inside it
+
+In Postgres, the ritual is already **one aggregate family**:
+
+- `pause_instances`, `pause_step_events`, `pause_companion_events`, `pause_ai_artifacts`
+- Deep ritual order: **Feel → Breathe → Reflect → Frame → second Breathe → Decide** ([pause-system.md](../systems/pause-system.md) §7.1)
+- **Reflect** runs `holzen-reflect`; **Frame** loads signal / grounding / history / zoom-out via `companion-orchestrate` — still keyed by `pause_instance_id`
+- Brief ritual has **no** Frame/Reflect companions; breathing and Feel are the same **pause** step types
+
+So **companions are not a separate product domain** like billing. They are:
+
+1. **Ritual beats** (Reflect copy, Frame slots, breathing segments, Decide outcome), and  
+2. **AI delivery mechanisms** (orchestrate, reflect, pregenerate, grounding-enrich) that **write into pause tables**.
+
+Treat **companion** as a **module inside `@holzen/pause`**, not a peer package — unless edge/team size forces a **private subfolder** (see below).
+
+### 8.1 Suggested interior of `@holzen/pause`
+
+Organize by **ritual concern**, not by old `src/hooks` filenames:
+
+```text
+packages/pause/src/
+  domain/
+    instance.ts                 # states, transitions (mirrors pause-state.ts)
+    ritual-steps.ts             # PauseStep, BriefPauseStep, canAdvanceFromStep
+    step-types.ts               # initial_emotion_logged, breath_completed, …
+    companion-slots.ts          # allowed types per template (volatility_v1)
+  application/
+    use-cases/
+      session/
+        hydrate-pause-session.ts
+        persist-session-snapshot.ts
+        exit-pause-session.ts
+      ritual/
+        log-pause-step.ts
+        log-companion-event.ts
+        navigate-ritual-step.ts
+      breathing/
+        advance-breath-phase.ts
+      reflect/
+        generate-reflection.ts    # holzen-reflect
+      companions/
+        orchestrate-companion-slots.ts
+        fetch-grounding-enrichment.ts
+      terminal/
+        log-outcome-and-await-completed.ts
+  ports/
+    PauseRepository.ts
+    ReflectGenerator.ts
+    CompanionOrchestrator.ts
+    PauseSessionStorage.ts
+  public.ts
+```
+
+**Presentation** for ritual UI (`PauseBreathing`, `PauseFrame`, `PauseReflect`, …) can live in:
+
+- `packages/pause/presentation/` (if you colocate UI in the package), or  
+- `apps/web/src/screens/pause/` (if you keep React only in the app) — both are valid; pick one rule and stick to it.
+
+Full-screen `/companion/*` pages are **pause presentation** for a single slot (e.g. grounding full view), not a new domain.
+
+### 8.2 What about `companion-orchestrate` on the server?
+
+Edge functions remain in `supabase/functions/` — that is **infrastructure**. On the client, **`CompanionOrchestrator` port** + adapter in `packages/infrastructure` implements the HTTP call. The **use case** `orchestrateCompanionSlots` lives under **`pause/application/companion/`**.
+
+Pipeline narrative stays in [ai-powered-pause-system.md](../systems/pause/ai-powered-pause-system.md); **ownership** stays under **pause**.
+
+### 8.3 When *not* to split `@holzen/companion` out
+
+| Reason to split a separate package | Holzen today |
+|--------------------------------------|--------------|
+| Separate team owning a different product | No — companions serve the ritual |
+| Different ubiquitous language (“Order” vs “Pause”) | No — slots are defined on `pause_templates` |
+| Different database with no `pause_instance_id` | No — companions are pause-scoped |
+| Reused by non-pause features at scale | Not on shipped surface |
+
+If the **edge** tree is huge, use `supabase/functions/_shared/pause/` and `_shared/companion-orchestrate-*` — that is **server file organization**, not a client bounded context.
+
+### 8.4 Care principles for organizing pause (non-negotiable)
+
+1. **One state machine owner** — `domain/ritual-steps.ts` + `domain/instance.ts`; UI reads projection, does not invent transitions.  
+2. **One front door for mutations** — use cases call `pause_log_step` / `pause_log_companion`; components never RPC directly.  
+3. **Step-mapped use cases** — names match product beats (Feel, Breathe, Reflect, Frame, Decide) and RPC `step_type` where applicable.  
+4. **Companions subordinate to instance** — every orchestrate/reflect/grounding call includes `pauseInstanceId`; no global companion store.  
+5. **Read models explicit** — Archive/Journey queries live under `pause/infrastructure/queries/` (or `application/queries/`), not scattered in screen files.
+
+---
+
+## 9. Inspirations — what we take and what we skip
 
 | Idea | Reference | We take | We skip |
 |------|-----------|---------|---------|
@@ -242,9 +352,9 @@ External reading is **optional**; this table is the project’s **curated** stan
 
 ---
 
-## 9. Target repository shape (pre-launch baseline)
+## 10. Target repository shape (pre-launch baseline)
 
-The **current** tree (`src/pages`, flat `src/hooks`, flat `src/lib`) is **transitional**. The **target** shape below implements these principles. Operational detail lives in [frontend-module-layout.md](frontend-module-layout.md) when that companion doc is added.
+The **current** tree (`src/pages`, flat `src/hooks`, flat `src/lib`) is **transitional**. The **target** shape below implements these principles. Operational detail: [frontend-module-layout.md](frontend-module-layout.md).
 
 ```text
 apps/
@@ -254,15 +364,13 @@ packages/
   contracts/                    # Zod + types for wire boundaries
   shared-kernel/                # minimal shared types/helpers
   infrastructure/               # Supabase + invokeEdge adapter implementations
-  pause/                        # domain + application + ports (+ tests)
-  companion/
+  pause/                        # ritual + companions + reflect (see §8)
   subscription/
   market/
-  archive/
-  journey/
-  settings/
+  user/
   auth/
-  …                             # other bounded contexts as needed
+  roadmap/                      # optional; small
+  admin/                        # optional; may stay in apps/web
 
 supabase/                       # authoritative domain (unchanged role)
 docs/systems/                   # behavioral truth per context
@@ -273,19 +381,21 @@ docs/systems/                   # behavioral truth per context
 - `apps/web` may import `packages/*` public APIs and `contracts`.
 - `packages/<context>/application` imports `domain` + `ports` only — not Supabase, not React.
 - `packages/infrastructure` implements `ports`; may import `contracts` and Supabase client.
-- `packages/<context>A` must not import `packages/<context>B>` internals (only `public` exports).
+- `packages/<context>A` must not import `packages/<context>B` internals (only `public` exports).
 
 Until the monorepo exists, approximate this with `src/features/<context>/{domain,application,infrastructure,presentation}` and the same dependency rules inside each feature.
 
 ---
 
-## 10. Alternatives considered
+## 11. Alternatives considered
 
 | Alternative | Appeal | Why not the long-term default for Holzen |
 |-------------|--------|------------------------------------------|
 | **Flat `src/lib` + `src/hooks` with naming prefixes** | Zero migration cost | No compile-time boundaries; rots quickly; agents cross-import freely |
 | **Feature folders only (no packages)** | Simpler than monorepo | Import rules are convention-only; harder to share with a second client |
-| **Feature-Sliced Design verbatim** | Popular in React | Vocabulary mismatch; our contexts are product-shaped (pause, companion), not FSD layers |
+| **Feature-Sliced Design verbatim** | Popular in React | Vocabulary mismatch; our core context is **pause**, not one slice per tab |
+| **Separate `@holzen/companion` package** | Large edge pipeline | Companions are pause-scoped in schema and ritual (§8); use submodules inside `@holzen/pause` |
+| **Package per nav tab** (home, archive, …) | Matches IA | Tabs are screens, not domains (§7) |
 | **Next.js / Remix instead of SPA** | SSR, colocated routes | Lovable publish path, PWA, mostly authenticated app — revisit only if SEO/SSR becomes launch-critical ([spa-framework-evaluation.md](../backlog/spa-framework-evaluation.md)) |
 | **All logic in edge functions** | Thin client | Poor offline UX, chatty network, still need client state machine projection |
 | **All logic in client hooks** | Fast to ship | Fails P1; duplicate truth; untestable policy |
@@ -296,7 +406,7 @@ Until the monorepo exists, approximate this with `src/features/<context>/{domain
 
 ---
 
-## 11. Anti-patterns (review checklist)
+## 12. Anti-patterns (review checklist)
 
 Flag in PR review when you see:
 
@@ -310,10 +420,12 @@ Flag in PR review when you see:
 - [ ] **Fat edge `index.ts`** with no extracted steps or shared validation.
 - [ ] **Behavior copied** into edge and client instead of shared **contract** + server truth.
 - [ ] **Active import from `@/legacy/*`** (forbidden — [active-surface](../ops/active-surface.md)).
+- [ ] **Separate “companion domain”** that bypasses pause use cases for ritual mutations.
+- [ ] **New package named after a screen** (Home, Settings) instead of a real context.
 
 ---
 
-## 12. Testing strategy (aligned with layers)
+## 13. Testing strategy (aligned with layers)
 
 | Layer | Test style |
 |-------|------------|
@@ -328,25 +440,25 @@ Launch gate flows (documented in [end-to-end-review-master-checklist.md](../revi
 
 ---
 
-## 13. Relationship to other documentation
+## 14. Relationship to other documentation
 
 ```text
 holzen-application-architecture.md     ← you are here (principles)
         │
         ├── client-server-architecture-holzen.md   (authority / projection)
-        ├── frontend-module-layout.md              (repo map — companion)
+        ├── frontend-module-layout.md              (repo map, migration waves)
+        ├── decisions/2026-05-17-modular-monolith-hexagonal-client.md
         ├── react-screen-orchestration.md          (React mechanics)
         ├── refactoring-strategy.md                (incremental moves; superseded for greenfield by §9)
         ├── docs/systems/*                         (per-context behavior)
-        ├── ops/active-surface.md                  (shipped manifest)
-        └── docs/decisions/*                       (dated forks, e.g. monorepo adoption)
+        └── ops/active-surface.md                  (shipped manifest)
 ```
 
 When **behavior** of pause changes, update **`pause-system.md`**. When **why we structure code** changes, update **this file** and add an ADR if the decision is costly to reverse.
 
 ---
 
-## 14. Evolution and governance
+## 15. Evolution and governance
 
 | Change type | Action |
 |-------------|--------|
@@ -359,12 +471,12 @@ When **behavior** of pause changes, update **`pause-system.md`**. When **why we 
 
 ---
 
-## 15. Summary
+## 16. Summary
 
 1. **Postgres, RLS, RPCs, and edge** own truth; the SPA **projects** it honestly.  
-2. **Bounded contexts** and **use cases** name product intentions; **ports/adapters** isolate IO.  
-3. **Contracts** align wire formats; **types** do not smuggle behavior across runtimes.  
-4. **Presentation stays thin**; **domain stays pure**; **CI enforces boundaries** as the repo matures.  
-5. **Pre-launch** is the window to match **structure to these principles** — not to preserve accidental layout.
+2. **Pause** is the primary bounded context; **companions, reflect, and breathing** are modules inside it, not peer domains.  
+3. **Tabs are screens** in `apps/web`; they **compose** pause, subscription, market, and user — they are not packages.  
+4. **Use cases** name intentions; **ports/adapters** isolate IO; **contracts** align wire formats.  
+5. **Pre-launch** is the window to match **structure to the product model** — not to preserve accidental layout.
 
-**One-line mandate:** *Modular monolith on the client, authoritative core on Supabase, explicit contracts at the boundary, React only presents and composes.*
+**One-line mandate:** *One pause context on the client, authoritative ritual on Supabase, screens that compose, React that presents.*
