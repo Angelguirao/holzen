@@ -1,7 +1,7 @@
 import { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { ResponsiveContainer, BarChart, Bar, XAxis, YAxis, Tooltip, ReferenceLine } from 'recharts';
-import { ConfidenceChip } from '@/components/stats/ConfidenceChip';
+import { ConfidenceChip } from '@/legacy/full-shell/src/components/stats/ConfidenceChip';
 import { sampleConfidence } from '@/lib/stats/confidence';
 import type { PauseFullRow } from '@/lib/pause-stats-data-query';
 import { effectivePauseShiftMood, effectivePauseShiftIntensity } from '@/lib/pause-effective-emotion';

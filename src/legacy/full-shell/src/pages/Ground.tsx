@@ -19,11 +19,11 @@ import { Textarea } from '@/components/ui/textarea';
 import { parseEdgeFunctionError, toUserFacingAiErrorMessage } from '@/lib/edge-function-error';
 import { trackEvent } from '@/lib/posthog';
 import { invokeEdge } from '@/lib/invoke-edge';
-import { practiceEntriesWeeklyCountQueryKey } from '@/lib/practice-entries-weekly-count-query';
-import { practicePrimarySuggestionQueryKey } from '@/lib/practice-primary-suggestion-query';
+import { practiceEntriesWeeklyCountQueryKey } from '@/legacy/full-shell/src/lib/practice-entries-weekly-count-query';
+import { practicePrimarySuggestionQueryKey } from '@/legacy/full-shell/src/lib/practice-primary-suggestion-query';
 import { toolsHubDataQueryKey } from '@/lib/tools-hub-data-query';
-import { groundHistoryEntriesQueryKey, groundHistoryStatsQueryKey } from '@/lib/ground-history-query';
-import { invalidateHistoryCalendarActivities } from '@/lib/history-calendar-activities-query-key';
+import { groundHistoryEntriesQueryKey, groundHistoryStatsQueryKey } from '@/legacy/full-shell/src/lib/ground-history-query';
+import { invalidateHistoryCalendarActivities } from '@/legacy/full-shell/src/lib/history-calendar-activities-query-key';
 import {
   AlertDialog,
   AlertDialogCancel,

@@ -3,9 +3,9 @@ import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { invokeEdge } from '@/lib/invoke-edge';
 import { useAuth } from '@/hooks/use-auth';
-import { invalidateHistoryCalendarActivities } from '@/lib/history-calendar-activities-query-key';
-import { getUserBadgeIdsQueryOptions, userBadgesIdsQueryKey } from '@/lib/user-badge-ids-query';
-import type { NewBadge } from '@/components/BadgeCelebration';
+import { invalidateHistoryCalendarActivities } from '@/legacy/full-shell/src/lib/history-calendar-activities-query-key';
+import { getUserBadgeIdsQueryOptions, userBadgesIdsQueryKey } from '@/legacy/full-shell/src/lib/user-badge-ids-query';
+import type { NewBadge } from '@/legacy/full-shell/src/components/BadgeCelebration';
 
 const SESSION_SHOWN_KEY = 'holzen_badges_shown_this_session';
 const LAST_SEED_KEY_PREFIX = 'holzen_badges_last_seed_';

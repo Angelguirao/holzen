@@ -4,8 +4,8 @@ import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useAuth } from '@/hooks/use-auth';
 import {
   getHistoryCalendarActivitiesQueryOptions,
-} from '@/lib/history-calendar-activities-fetch';
-import { invalidateHistoryCalendarActivities } from '@/lib/history-calendar-activities-query-key';
+} from '@/legacy/full-shell/src/lib/history-calendar-activities-fetch';
+import { invalidateHistoryCalendarActivities } from '@/legacy/full-shell/src/lib/history-calendar-activities-query-key';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';

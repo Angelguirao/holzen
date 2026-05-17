@@ -3,7 +3,7 @@ import type { CalendarActivity } from '@/components/HistoryCalendar';
 import {
   HISTORY_CALENDAR_ACTIVITIES_NONE_QUERY_KEY,
   historyCalendarActivitiesQueryKey,
-} from '@/lib/history-calendar-activities-query-key';
+} from '@/legacy/full-shell/src/lib/history-calendar-activities-query-key';
 
 const PRACTICE_LABELS: Record<string, string> = {
   checkin: 'Emotional check-in',

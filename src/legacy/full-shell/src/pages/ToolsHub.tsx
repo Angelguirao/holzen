@@ -1,7 +1,7 @@
 import { useToolsHubData } from '@/hooks/use-tools-hub-data';
-import { ToolsGoodNextStepSection } from '@/components/tools/ToolsGoodNextStepSection';
-import { ToolsPickGridSection } from '@/components/tools/ToolsPickGridSection';
-import { ToolsYourActivitiesSection } from '@/components/tools/ToolsYourActivitiesSection';
+import { ToolsGoodNextStepSection } from '@/legacy/full-shell/src/components/tools/ToolsGoodNextStepSection';
+import { ToolsPickGridSection } from '@/legacy/full-shell/src/components/tools/ToolsPickGridSection';
+import { ToolsYourActivitiesSection } from '@/legacy/full-shell/src/components/tools/ToolsYourActivitiesSection';
 import { CurrentPauseCard } from '@/components/library/CurrentPauseCard';
 
 /**

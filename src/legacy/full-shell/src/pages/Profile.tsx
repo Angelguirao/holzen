@@ -8,14 +8,14 @@ import { useSubscription } from '@/hooks/use-subscription';
 import { useHoldGoalProfile } from '@/hooks/use-hold-goal';
 import { type ProfileTab } from '@/lib/router-location-state';
 import { journeyPath, isProfileTab } from '@/lib/app-routes';
-import { getHistoryCalendarActivitiesQueryOptions } from '@/lib/history-calendar-activities-fetch';
+import { getHistoryCalendarActivitiesQueryOptions } from '@/legacy/full-shell/src/lib/history-calendar-activities-fetch';
 import { BarChart3, Sparkles, Award, CalendarDays } from 'lucide-react';
-import HistoryContent from '@/components/library/HistoryContent';
-import { StatsContentV2 } from '@/components/stats/StatsContentV2';
+import HistoryContent from '@/legacy/full-shell/src/components/library/HistoryContent';
+import { StatsContentV2 } from '@/legacy/full-shell/src/components/stats/StatsContentV2';
 import { Skeleton } from '@/components/ui/skeleton';
-import { AIInsightsPanel } from '@/components/AIInsightsPanel';
+import { AIInsightsPanel } from '@/legacy/full-shell/src/components/AIInsightsPanel';
 import { ProLock } from '@/components/ProLock';
-import { BadgesPanelV2 } from '@/components/BadgesPanelV2';
+import { BadgesPanelV2 } from '@/legacy/full-shell/src/components/BadgesPanelV2';
 
 const Profile = () => {
   const { user } = useAuth();

@@ -1,7 +1,7 @@
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { ImmersivePracticeShell } from '@/components/practice/ImmersivePracticeShell';
-import { GuidedJournal } from '@/components/practice/GuidedJournal';
+import { ImmersivePracticeShell } from '@/legacy/full-shell/src/components/practice/ImmersivePracticeShell';
+import { GuidedJournal } from '@/legacy/full-shell/src/components/practice/GuidedJournal';
 
 const COLORS = {
   textColor: 'hsl(var(--foreground) / 0.7)',

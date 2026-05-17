@@ -1,5 +1,5 @@
 import { TOOLS } from '@/lib/app-routes';
-import type { PracticeSuggestion } from '@/lib/practice-suggestion';
+import type { PracticeSuggestion } from '@/legacy/full-shell/src/lib/practice-suggestion';
 
 /** Routes for hub practice suggestions (shared: Tools hub + Home pause empty). */
 export const TOOLS_PRACTICE_SUGGESTION_ROUTE: Record<PracticeSuggestion['id'], string> = {
