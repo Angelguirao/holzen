@@ -10,6 +10,10 @@ import {
   tierFromStripePriceId,
   tierLimits,
 } from "../_shared/subscription-entitlements.ts";
+import {
+  entitlementFromHolzenStatus,
+  resolveHolzenSubscriptionStatus,
+} from "../_shared/subscription-profile-sync.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -88,6 +92,7 @@ serve(
         subscribed: true,
         lifetime: true,
         tier: "lifetime",
+        entitlement: "active",
         subscription_end: null,
         monthly_companion_limit: limits.premium_companion,
         monthly_companion_used: companions.used,
@@ -117,10 +122,12 @@ serve(
       const now = Date.now();
       if (now - checkedAt < CACHE_TTL_MS) {
         // Return cached result
-        const cachedSubscribed = SUBSCRIBED_STATUSES.has(profile.subscription_status);
-        const tier = profile.subscription_status && SUBSCRIBED_STATUSES.has(profile.subscription_status)
+        const cachedSubscribed = SUBSCRIBED_STATUSES.has(profile.subscription_status ?? "");
+        const cachedStatus = profile.subscription_status ?? "free";
+        const tier = cachedSubscribed
           ? (profile.subscription_tier === "pro_plus" ? "pro_plus" : "pro")
           : "free";
+        const cachedEntitlement = entitlementFromHolzenStatus(cachedSubscribed, cachedStatus);
         const limits = tierLimits(tier);
         const monthStart = startOfUtcMonthDate();
         const [companionsUsed, wallpapersUsed, insightsUsed, flexCreditsBalance] = await Promise.all([
@@ -136,9 +143,10 @@ serve(
           subscribed: cachedSubscribed,
           lifetime: false,
           tier,
+          entitlement: cachedEntitlement,
           subscription_end: profile.subscription_end,
           cached: true,
-          subscription_status: profile.subscription_status,
+          subscription_status: cachedStatus,
           monthly_companion_limit: limits.premium_companion,
           monthly_companion_used: companions.used,
           monthly_companion_remaining: companions.remaining,
@@ -173,7 +181,9 @@ serve(
     const proPriceId = Deno.env.get("STRIPE_PRICE_ID_PRO") ?? null;
     const proPlusPriceId = Deno.env.get("STRIPE_PRICE_ID_PRO_PLUS") ?? null;
 
-    if (customers.data.length > 0) {
+    const hasStripeCustomer = customers.data.length > 0;
+
+    if (hasStripeCustomer) {
       const subscriptions = await stripe.subscriptions.list({
         customer: customers.data[0].id,
         status: "all",
@@ -226,7 +236,19 @@ serve(
         try {
           if (typeof te === "number") trialEnd = new Date(te * 1000).toISOString();
         } catch { /* ignore */ }
+      } else {
+        subscriptionStatus = resolveHolzenSubscriptionStatus({
+          hasStripeCustomer: true,
+          stripeSubscriptionStatus: null,
+        });
+        subscriptionTier = "free";
       }
+    } else {
+      subscriptionStatus = resolveHolzenSubscriptionStatus({
+        hasStripeCustomer: false,
+        stripeSubscriptionStatus: null,
+      });
+      subscriptionTier = "free";
     }
 
     // Write result to cache
@@ -252,10 +274,13 @@ serve(
     const wallpapers = clampUsage(wallpapersUsed, limits.wallpaper);
     const insights = clampUsage(insightsUsed, limits.reflection_insights);
 
+    const entitlement = entitlementFromHolzenStatus(hasActive, subscriptionStatus);
+
     return new Response(JSON.stringify({
       subscribed: hasActive,
       lifetime: false,
       tier: subscriptionTier,
+      entitlement,
       subscription_end: subscriptionEnd,
       cached: false,
       stripe_price_id: activePriceId,
