@@ -7,8 +7,7 @@ import { usePauseArchiveList } from '@/hooks/use-pause-archive-list';
 import type { PauseArchiveSegment, PauseArchiveRow } from '@/lib/pause-archive-list-query';
 import { useInfiniteScroll } from '@/hooks/use-infinite-scroll';
 import { PageMeta } from '@/components/PageMeta';
-import { Search, X, Lock, ArrowUpDown, RefreshCw, ArrowRight, Loader2 } from 'lucide-react';
-import { SubscriptionSkeleton } from '@/components/SubscriptionSkeleton';
+import { Search, X, ArrowUpDown, RefreshCw, Loader2 } from 'lucide-react';
 import { ArchivePauseItems } from '@/components/archive/ArchivePauseItems';
 import { ArchiveCollectionsSection } from '@/components/archive/ArchiveCollectionsSection';
 import { CurrentPauseCard } from '@/components/library/CurrentPauseCard';
@@ -20,7 +19,6 @@ import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import { useAuth } from '@/hooks/use-auth';
 import { getArchivePausesTabHasRowsQueryOptions } from '@/lib/archive-pauses-tab-query';
-import { useProGate } from '@/hooks/use-pro-gate';
 import type { ArchiveMainSegment } from '@/lib/archive-segment';
 
 type SortMode = 'newest' | 'oldest' | 'alphabetical';
@@ -55,7 +53,6 @@ function rowMatchesSearch(row: PauseArchiveRow, q: string): boolean {
 export default function Archive() {
   const { t } = useTranslation();
   const { user } = useAuth();
-  const { isPro, isPending, startCheckout, checkoutLoading } = useProGate();
   const [searchParams, setSearchParams] = useSearchParams();
   const mainSegment = useMemo(() => readSegment(searchParams), [searchParams]);
   const pausesScope = useMemo(() => readPausesScope(searchParams), [searchParams]);
@@ -274,46 +271,6 @@ export default function Archive() {
     setSearch('');
   };
 
-  if (isPending) {
-    return (
-      <div className="space-y-6 pb-24">
-        <PageMeta title={t('archive.pageTitle')} description={t('archive.pageDescription')} />
-        <div className="flex items-center justify-between gap-3 border-b border-border pb-3">
-          <span className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">{t('common.holzen')}</span>
-          <h1 className="text-base font-medium text-foreground">{t('archive.title')}</h1>
-          <div className="w-9" />
-        </div>
-        <SubscriptionSkeleton variant="inline" />
-      </div>
-    );
-  }
-
-  if (!isPro) {
-    return (
-      <div className="space-y-6 pb-24">
-        <PageMeta title={t('archive.pageTitle')} description={t('archive.pageDescription')} />
-        <div className="flex items-center justify-between gap-3 border-b border-border pb-3">
-          <span className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">{t('common.holzen')}</span>
-          <h1 className="text-base font-medium text-foreground">{t('archive.title')}</h1>
-          <div className="w-9" />
-        </div>
-        <div className="flex flex-col items-center justify-center min-h-[40vh] gap-4 text-center px-6">
-          <Lock className="h-6 w-6 text-[#dbb266]" />
-          <h2 className="text-sm font-semibold text-foreground">{t('pro.featureLocked')}</h2>
-          <p className="max-w-xs text-sm leading-relaxed text-muted-foreground">{t('pro.desc_archive')}</p>
-          <button
-            type="button"
-            onClick={() => startCheckout('pro')}
-            disabled={checkoutLoading}
-            className="group inline-flex items-center gap-1.5 text-sm font-medium text-nox-text-link underline-offset-4 transition-colors hover:text-nox-text-link/80 hover:underline disabled:opacity-50"
-          >
-            {t('pro.upgradeCta')}
-            <ArrowRight className="h-3.5 w-3.5 transition-transform group-hover:translate-x-0.5" />
-          </button>
-        </div>
-      </div>
-    );
-  }
 
   return (
     <div className="space-y-6 pb-24" {...handlers}>

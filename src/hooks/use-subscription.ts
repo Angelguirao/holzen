@@ -12,6 +12,11 @@ import {
   subscriptionQueryKey,
   type SubscriptionSnapshot,
 } from '@/lib/subscription-snapshot-query';
+import {
+  canEngagePauseFromEntitlement,
+  deriveEntitlement,
+  type Entitlement,
+} from '@/lib/subscription-entitlement';
 
 const CHECKOUT_RETURN_KEY = 'holzen_checkout_started_at';
 /** Set when a checkout return includes `?subscribed=true` (timestamp for PaywallSubscribedTracker TTL) */
@@ -29,6 +34,7 @@ type SubFetchSource = 'mount' | 'manual_retry' | 'focus' | 'interval' | 'invalid
 let subscriptionNextFetchSource: SubFetchSource | null = null;
 
 export type { SubscriptionBillingInterval } from '@/lib/subscription-snapshot-query';
+export type { Entitlement } from '@/lib/subscription-entitlement';
 
 function checkoutReturnWantsForce(): boolean {
   const params = new URLSearchParams(window.location.search);
@@ -177,7 +183,10 @@ export function useSubscription() {
     });
   }, [loading, subscribed, tier, monthlyRemaining, monthlyUsed, companionRemaining, wallpaperRemaining, insightsRemaining, flexCreditsBalance]);
 
-  const startCheckout = useCallback(async (target: 'pro' | 'pro_plus' | 'flex_pack_s' | 'flex_pack_m' = 'pro') => {
+  const startCheckout = useCallback(async (
+    target: 'pro' | 'pro_plus' | 'flex_pack_s' | 'flex_pack_m' = 'pro',
+    options?: { reactivation?: boolean },
+  ) => {
     holzenLog.subscription('checkout', { action: 'start', target });
     setCheckoutLoading(true);
     setCheckoutLoadingTarget(target);
@@ -187,7 +196,11 @@ export function useSubscription() {
       const { data, error } = await invokeEdge<{ url?: string }>('create-checkout', {
         body: isPack
           ? { checkoutKind: target }
-          : { checkoutKind: 'subscription', planTier: target },
+          : {
+              checkoutKind: 'subscription',
+              planTier: target,
+              reactivation: options?.reactivation === true,
+            },
       });
       if (error) throw error;
 
@@ -320,8 +333,14 @@ export function useSubscription() {
     [userId, queryClient],
   );
 
-  const canEngagePause = !userId ? false : subscribed;
+  const entitlement: Entitlement = !userId
+    ? 'pre_trial'
+    : deriveEntitlement({ subscribed, subscriptionStatus });
+  const canEngagePause = canEngagePauseFromEntitlement(entitlement);
+  const isLapsed = entitlement === 'lapsed';
   const canReflect = canEngagePause;
+
+  const startReactivationCheckout = useCallback(() => startCheckout('pro', { reactivation: true }), [startCheckout]);
 
   if (!userId) {
     return {
@@ -349,8 +368,11 @@ export function useSubscription() {
       insightsUsed: 0,
       insightsRemaining: 0,
       flexCreditsBalance: 0,
+      entitlement: 'pre_trial' as Entitlement,
       canEngagePause: false,
+      isLapsed: false,
       canReflect: false,
+      startReactivationCheckout: async () => {},
       subscriptionStatus: null,
       subscriptionEnd: null,
       trialStart: null,
@@ -384,8 +406,11 @@ export function useSubscription() {
     insightsUsed,
     insightsRemaining,
     flexCreditsBalance,
+    entitlement,
     canEngagePause,
+    isLapsed,
     canReflect,
+    startReactivationCheckout,
     subscriptionStatus,
     subscriptionEnd,
     trialStart,

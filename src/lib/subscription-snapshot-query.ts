@@ -139,6 +139,9 @@ export async function fetchSubscriptionSnapshot(userId: string, force: boolean):
     };
   }
 
+  const subscriptionStatus = (data.subscription_status as string) ?? null;
+  const subscriptionEnd = (data.subscription_end as string) ?? null;
+
   writeSubCache({
     subscribed: false,
     tier: 'free',
@@ -171,8 +174,8 @@ export async function fetchSubscriptionSnapshot(userId: string, force: boolean):
     insightsUsed: 0,
     insightsRemaining: 0,
     flexCreditsBalance: apiFlexCreditsBalance,
-    subscriptionStatus: null,
-    subscriptionEnd: null,
+    subscriptionStatus,
+    subscriptionEnd,
     trialStart: null,
     trialEnd: null,
     subscriptionBillingInterval: null,
