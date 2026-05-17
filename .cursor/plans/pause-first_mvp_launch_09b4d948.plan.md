@@ -28,7 +28,7 @@ isProject: false
 
 | Field                  | Value                                                     |
 | ---------------------- | --------------------------------------------------------- |
-| **Status**             | **Implemented + pushed** (`806009f3`) — **Lovable publish + prod cutover verify** human ([launch-runbook](docs/ops/launch-runbook.md)) |
+| **Status**             | **Implemented + pushed** — **you:** [ship-checklist.md](docs/ops/ship-checklist.md) · [launch-runbook](docs/ops/launch-runbook.md) |
 | **Version**            | 2026-05-17 (v3.15 — repo audit reconciled; §30.2.1) |
 | **Review**             | §30.1 · §30.2 audit · [§30.3 freeze](#s30-3) · [Locked](#s30-5) · [Design](#s31) |
 | **Base branch** | `main` |
@@ -2382,6 +2382,28 @@ Cross-check of §0–§33 against **`feature/mvpPauseCleanup`** working tree (no
 | §30.5 Locked | ✅ | Matches correction table (catalog, reflection_text, grounding-enrich) |
 
 **Human-only before prod:** §3.1 no-real-users checklist · apply migrations on linked project · Lovable **Publish → Update** · observability secrets per [deployment-sync-guide](docs/ops/deployment-sync-guide.md).
+
+<a id="s30-2-2"></a>
+
+### 30.2.2 If you are re-pasting the old §0–§33 audit
+
+**That paste is obsolete** (pre-May-2026 fixes). Do not re-run those rows as tasks. Use this map instead:
+
+| Old paste claim | **Current (tip `4d03c6fa`)** |
+| --- | --- |
+| Bruno uncommitted | ✅ Committed + pushed |
+| §32 push pending | ✅ Pushed |
+| Undeploy `grounding-enrich` | ❌ **Wrong** — **keep deployed** (Full View) |
+| §21 `opening_message` ✅ | ❌ **Wrong** — **`reflection_text` kept** |
+| DROP `content_library` | ❌ **Wrong** — **RENAME** → `companion_catalog` |
+| `export-user-data` in manifest | ✅ Fixed — not in repo |
+| bundle/bruno/posthog not in test:ci | ✅ All in **test:ci** |
+| PostHog allowlist script missing | ✅ `scripts/check-posthog-events-allowlist.mjs` |
+| `telemetry_baseline_at` only migration name | ✅ Timestamptz in active-surface |
+| E2E no MVP section | ✅ “Shipped MVP only” section exists |
+| Step 6 optional scripts missing | ✅ Done except optional i18n CI debt |
+
+**Agent work: complete.** Remaining: Lovable publish · prod migration verify · §3.1 checklist ([launch-runbook](docs/ops/launch-runbook.md)).
 
 <a id="s30-3"></a>
 
