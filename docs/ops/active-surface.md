@@ -1,6 +1,6 @@
 # Active surface manifest (pause-first MVP)
 
-**Status:** Step 2 stub — complete in Step 5 after DB/edge cutover.
+**Status:** Shipped on `feature/mvpPauseCleanup` (pause-first MVP).
 
 **Recovery:** Full pre-strip snapshot: git tag `full-ia-pre-strip`, branch `archive/full-ia-pre-strip`.
 
@@ -17,9 +17,19 @@
 
 **Dead IA (404 only):** `/tools`, `/tools/*`, `/library`, `/journey/stats`, `/journey/:tab`, …
 
+## Subscription (§5.4)
+
+| `profiles.subscription_status` | Client `entitlement` | Pause engage |
+| --- | --- | --- |
+| `free` (no Stripe customer) | `pre_trial` | After `ensure-trial-subscription` |
+| `trialing` / `active` | `trialing` / `active` | Yes |
+| `lapsed` | `lapsed` | No (Archive/Journey read OK) |
+
+Server: `user_can_engage_pause(uuid)`; guards on `pause_create_or_reuse` (authenticated) and `pause_log_step` (active/engaged). Sync: `check-subscription`, `stripe-webhook`, `ensure-trial-subscription`.
+
 ## Deployed edges
 
-See Step 5 — MVP list in pause-first plan §17.1.
+MVP list: `check-subscription`, `create-checkout` (reactivation), `ensure-trial-subscription`, `stripe-webhook`, `holzen-reflect`, `companion-orchestrate`, `pregenerate-companions`, `health`, plus billing/account edges in `supabase/config.toml`. Undeployed: `supabase/functions/legacy/`.
 
 ## PostHog (shipped)
 
@@ -27,5 +37,6 @@ See Step 5 — MVP list in pause-first plan §17.1.
 | --- | --- |
 | `app.route_not_found` | NotFound for unknown path |
 | `journey.overview_viewed` | Journey overview mount |
+| `onboarding.completed` | 2-step onboarding finished (`ensureTrial`) |
 
 Full taxonomy: [event-taxonomy.md](./event-taxonomy.md).

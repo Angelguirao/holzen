@@ -47,7 +47,7 @@ const EdgeCoverage = lazy(() => import("./pages/EdgeCoverage"));
 const Unsubscribe = lazy(() => import("./pages/Unsubscribe"));
 const BillingHistory = lazy(() => import("./pages/BillingHistory"));
 const SettingsAbout = lazy(() => import("./pages/SettingsAbout"));
-const RoadmapStub = lazy(() => import("./pages/RoadmapStub"));
+const Roadmap = lazy(() => import("./pages/Roadmap"));
 
 const queryClient = createHolzenQueryClient();
 
@@ -202,7 +202,7 @@ const App = () => (
                 <Route path="/about" element={<About />} />
                 <Route path="/blog" element={<Blog />} />
                 <Route path="/blog/:slug" element={<BlogPost />} />
-                <Route path="/roadmap" element={<RoadmapStub />} />
+                <Route path="/roadmap" element={<Roadmap />} />
                 <Route path="/reserve" element={<Reserve />} />
                 <Route path="/unsubscribe" element={<Unsubscribe />} />
                 <Route path="*" element={<NotFound />} />
