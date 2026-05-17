@@ -2,6 +2,14 @@
 
 Holzen is a React + TypeScript single-page app focused on **Bitcoin-aware mindfulness**: breathing and grounding practices, journaling, a content library, and companions powered by Supabase edge functions.
 
+## Pause-first shipped product
+
+The active app is a **pause-first MVP**: four primary tabs (Home, Archive, Journey, Settings), full-screen `/pause` ritual, and Stripe-native **7-day trial** (no card) via `ensure-trial-subscription`. After trial, users need a paid subscription to **engage** pauses; Archive and Journey stay readable when **lapsed**. Legacy Tools, stats, and library routes return **404** (no redirects).
+
+- **What ships:** [docs/ops/active-surface.md](docs/ops/active-surface.md)
+- **Why / recovery:** [docs/decisions/2026-05-16-pause-first-shipped-scope.md](docs/decisions/2026-05-16-pause-first-shipped-scope.md) · tag `full-ia-pre-strip`
+- **Launch checklist:** [docs/ops/launch-runbook.md](docs/ops/launch-runbook.md)
+
 ## Stack
 
 | Layer | Technology |
