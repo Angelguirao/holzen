@@ -229,7 +229,7 @@ export function useSettingsModel() {
           'tags',
           'is_favorite',
           'counted_companion_types',
-          'opening_message',
+          'reflection_text',
         ];
         const refRows = pauseRows.map((r) =>
           refHeaders

@@ -133,7 +133,7 @@ export function computePauseSessionResolved(
   p: PauseSessionResolvedInput,
 ): PauseSessionHydrationReady | null {
   if (p.hydration.status === 'ready') return p.hydration;
-  // Instance may exist before `opening_message` artifact (reflect-step generation).
+  // Instance may exist before `reflection_text` artifact (reflect-step generation).
   if (p.hydration.status === 'fetch' && p.fetchedInstance) {
     const f = p.fetchedInstance;
     return {

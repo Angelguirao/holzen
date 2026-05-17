@@ -2375,7 +2375,7 @@ export type Database = {
           outcome: string | null
           post_pause_emotion_intensity: number | null
           post_pause_mood: string | null
-          opening_message: string | null
+          reflection_text: string | null
           shift_emotion_intensity: number | null
           shift_mood: string | null
           source: string | null
@@ -2417,7 +2417,7 @@ export type Database = {
           outcome?: never
           post_pause_emotion_intensity?: never
           post_pause_mood?: never
-          opening_message?: never
+          reflection_text?: never
           shift_emotion_intensity?: never
           shift_mood?: never
           source?: string | null
@@ -2459,7 +2459,7 @@ export type Database = {
           outcome?: never
           post_pause_emotion_intensity?: never
           post_pause_mood?: never
-          opening_message?: never
+          reflection_text?: never
           shift_emotion_intensity?: never
           shift_mood?: never
           source?: string | null
@@ -2554,7 +2554,7 @@ export type Database = {
           outcome: string | null
           post_pause_emotion_intensity: number | null
           post_pause_mood: string | null
-          opening_message: string | null
+          reflection_text: string | null
           shift_emotion_intensity: number | null
           shift_mood: string | null
           source: string | null
@@ -2596,7 +2596,7 @@ export type Database = {
           outcome?: never
           post_pause_emotion_intensity?: never
           post_pause_mood?: never
-          opening_message?: never
+          reflection_text?: never
           shift_emotion_intensity?: never
           shift_mood?: never
           source?: string | null
@@ -2638,7 +2638,7 @@ export type Database = {
           outcome?: never
           post_pause_emotion_intensity?: never
           post_pause_mood?: never
-          opening_message?: never
+          reflection_text?: never
           shift_emotion_intensity?: never
           shift_mood?: never
           source?: string | null
@@ -2971,7 +2971,7 @@ export type Database = {
           outcome: string | null
           post_pause_emotion_intensity: number | null
           post_pause_mood: string | null
-          opening_message: string | null
+          reflection_text: string | null
           shift_emotion_intensity: number | null
           shift_mood: string | null
           source: string | null
@@ -3013,7 +3013,7 @@ export type Database = {
           outcome?: never
           post_pause_emotion_intensity?: never
           post_pause_mood?: never
-          opening_message?: never
+          reflection_text?: never
           shift_emotion_intensity?: never
           shift_mood?: never
           source?: string | null
@@ -3055,7 +3055,7 @@ export type Database = {
           outcome?: never
           post_pause_emotion_intensity?: never
           post_pause_mood?: never
-          opening_message?: never
+          reflection_text?: never
           shift_emotion_intensity?: never
           shift_mood?: never
           source?: string | null

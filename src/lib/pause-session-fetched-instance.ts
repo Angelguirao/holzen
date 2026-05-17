@@ -29,7 +29,7 @@ export function buildFetchedPauseInstanceFromFetch(
   artifactRows: PauseAiArtifactKindRow[],
 ): FetchedPauseInstance {
   const companionData = companionDataFromArtifacts(artifactRows);
-  const reflectionArt = artifactRows.find((a) => a.kind === 'opening_message');
+  const reflectionArt = artifactRows.find((a) => a.kind === 'reflection_text');
   const msg =
     typeof reflectionArt?.content?.message === 'string' ? (reflectionArt.content.message as string) : '';
   const ctxSnap = inst.context_snapshot ?? {};

@@ -1,6 +1,6 @@
 # Service / cron Edge Functions (legacy full-IA)
 
-**Not shipped at MVP** — crons below were unscheduled in `20260521200000_holzen_mvp_launch_cutover.sql`. Use [`../../../active/service-cron/`](../../../active/service-cron/) for shipped workers.
+**Not shipped** — crons below were unscheduled in `20260521200000_holzen_mvp_launch_cutover.sql`. Use [`../../../active/service-cron/`](../../../active/service-cron/) for shipped workers.
 
 ## Bruno: `SERVICE_CRON_BEARER`
 

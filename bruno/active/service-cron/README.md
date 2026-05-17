@@ -1,6 +1,6 @@
-# Service / cron (shipped at MVP)
+# Service / cron (shipped)
 
-MVP keeps volatility, BTC cache, companion pregeneration, referral processing, and optional BTC backfill/seed. **Digest, night reflection, letters, and library ingest** moved to [`../../legacy/full-shell/service-cron/`](../../legacy/full-shell/service-cron/).
+Shipped workers: volatility, BTC cache, companion pregeneration, referral processing, and optional BTC backfill/seed. **Digest, night reflection, letters, and library ingest** moved to [`../../legacy/full-shell/service-cron/`](../../legacy/full-shell/service-cron/).
 
 ## `SERVICE_CRON_BEARER`
 

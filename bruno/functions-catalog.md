@@ -1,16 +1,14 @@
 # Edge Functions catalog (HTTP URLs)
 
-> **Pause-first MVP:** Use **[`active/functions-catalog.md`](active/functions-catalog.md)** for the **deployed** surface and Bruno folder map. This file is a **historical** index (includes undeployed full-IA functions).
+> **Pause-first shipped:** Use **[`active/functions-catalog.md`](active/functions-catalog.md)** for the **deployed** surface and Bruno folder map. This file is a **historical** index (includes undeployed full-IA functions).
 
 Base URL: **`{{VITE_SUPABASE_URL}}/functions/v1/<name>`**
 
 **Bruno coverage:** Shipped requests live under **`bruno/active/`**. Retired `.bru` files are in **`bruno/legacy/full-shell/`**. Bodies are minimal — read `supabase/functions/<name>/index.ts` for contracts.
 
-### All deployed edge functions (`supabase/config.toml`)
+### Historical index (includes undeployed full-IA names)
 
-Alphabetical names (each must match `supabase/functions/<name>/`):
-
-`admin-check-stripe-prices` · `admin-library-preview` · `ai-cost-alert` · `auth-email-hook` · `backfill-btc-prices` · `badge-notify` · `check-subscription` · `check-volatility` · `companion-orchestrate` · `create-checkout` · `customer-portal` · `delete-account` · `deliver-letters` · `ensure-trial-subscription` · `export-user-data` · `fetch-source-feeds` · `generate-wallpaper` · `grounding-enrich` · `handle-email-suppression` · `handle-email-unsubscribe` · `health` · `holzen-number` · `holzen-reflect` · `journal-prompt` · `list-checkout-events` · `monthly-report` · `night-reflection` · `notify-checkout-confirmation` · `personalized-nudge` · `pregenerate-companions` · `preview-transactional-email` · `process-email-queue` · `process-referral-pending` · `record-referral` · `reflection-insights` · `refresh-btc-prices` · `register-push` · `retry-flex-credit` · `seed-btc-history` · `send-feedback` · `send-transactional-email` · `stripe-webhook` · `suggest-grounding` · `suggest-ritual` · `weekly-digest`
+This list is **not** the shipped surface. Names like `export-user-data`, `badge-notify`, and `fetch-source-feeds` may appear here but are **not** in `supabase/config.toml` on the pause-first branch. For deployed functions only, see **[`active/functions-catalog.md`](active/functions-catalog.md)** (~27 edges).
 
 **`verify_jwt = true` (must send a user JWT, not only `apikey`):** `admin-library-preview`, `process-email-queue`, `admin-check-stripe-prices`. All other entries above use `verify_jwt = false` in this repo — still read each handler for custom auth (e.g. `SERVICE_CRON_BEARER`, Stripe signatures).
 

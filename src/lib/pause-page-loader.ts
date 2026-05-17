@@ -51,7 +51,7 @@ export async function loadPauseSessionSnapshot(
     .eq('pause_instance_id', pauseInstanceId);
   const artifactRows = (artifacts ?? []) as Array<{ kind: string; content: Record<string, unknown> }>;
 
-  const reflectionArt = artifactRows.find((r) => r.kind === 'opening_message');
+  const reflectionArt = artifactRows.find((r) => r.kind === 'reflection_text');
   const reflectionMessage = typeof reflectionArt?.content?.message === 'string'
     ? (reflectionArt.content.message as string)
     : '';

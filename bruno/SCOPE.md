@@ -6,8 +6,8 @@ Holzen is a **React SPA** (`src/`) plus **Supabase** (Postgres, Auth, Edge Funct
 
 | Tree | Use when |
 | --- | --- |
-| **[`active/`](active/)** | **Shipped MVP** — auth, pause pipeline, billing, platform, shipped crons. Start here. |
-| **[`legacy/full-shell/`](legacy/full-shell/)** | Pre-strip reference only; many functions **undeployed** on production after MVP. |
+| **[`active/`](active/)** | **Shipped surface** — auth, pause pipeline, billing, platform, shipped crons. Start here. |
+| **[`legacy/full-shell/`](legacy/full-shell/)** | Pre-strip reference only; many functions **undeployed** on production after launch cutover. |
 
 Catalog of deployed functions: [`active/functions-catalog.md`](active/functions-catalog.md). Root [`functions-catalog.md`](functions-catalog.md) redirects there.
 

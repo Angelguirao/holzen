@@ -35,7 +35,7 @@ function readPausesScope(params: URLSearchParams): 'all' | 'favorites' {
 
 function rowMatchesSearch(row: PauseArchiveRow, q: string): boolean {
   const hay = [
-    row.opening_message,
+    row.reflection_text,
     row.haiku_text,
     row.note_text,
     row.outcome,

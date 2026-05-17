@@ -60,7 +60,7 @@ if (!existsSync(fnRoot)) {
 }
 
 const entrypoints = readdirSync(fnRoot, { withFileTypes: true })
-  .filter((e) => e.isDirectory() && e.name !== '_shared')
+  .filter((e) => e.isDirectory() && e.name !== '_shared' && e.name !== 'legacy')
   .map((e) => join(fnRoot, e.name, 'index.ts'))
   .filter((p) => existsSync(p));
 
