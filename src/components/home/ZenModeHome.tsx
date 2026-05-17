@@ -14,6 +14,7 @@ import type { CompanionData, CompanionPrefs } from '@/components/CompanionSectio
 import type { BtcPriceData } from '@/lib/btc';
 import type { BtcMoveSeverity } from '@/lib/btc-move-severity';
 import { shouldSurfacePauseWidgetError } from '@/lib/home-pause-widget-error';
+import type { Entitlement } from '@/lib/subscription-entitlement';
 
 export interface ZenModeHomeProps {
   hasOpenPause: boolean;
@@ -36,13 +37,16 @@ export interface ZenModeHomeProps {
   subscriptionReady: boolean;
   hasAccess: boolean;
   showLimitUpsell: boolean;
+  entitlement: Entitlement;
   showPauseScheduling: boolean;
   autoCooldownRemaining: () => number;
   cooldownHours: number;
   nextCronCheckIn: () => number;
   manualCooldownRemaining: () => number;
   checkoutLoading: boolean;
-  onStartCheckoutPro: () => void;
+  trialLoading: boolean;
+  onStartTrial: () => void;
+  onReactivate: () => void;
 }
 
 /** Minimal Home layout when Zen mode is enabled in customize / settings. */
@@ -61,13 +65,16 @@ export function ZenModeHome({
   subscriptionReady,
   hasAccess,
   showLimitUpsell,
+  entitlement,
   showPauseScheduling,
   autoCooldownRemaining,
   cooldownHours,
   nextCronCheckIn,
   manualCooldownRemaining,
   checkoutLoading,
-  onStartCheckoutPro,
+  trialLoading,
+  onStartTrial,
+  onReactivate,
 }: ZenModeHomeProps) {
   const { t } = useTranslation();
   const prefersReducedMotion = useReducedMotion();
@@ -174,22 +181,25 @@ export function ZenModeHome({
               />
             ) : (
               <>
-                <p className="text-sm text-muted-foreground font-mono leading-relaxed">
-                  {t('home.subscription.monthlyLimitReached', {
-                    defaultValue: "You've used your free pauses this month.",
-                  })}
-                </p>
-                <p className="text-xs text-muted-foreground/60 font-mono leading-relaxed max-w-[280px] mx-auto">
-                  {t('home.subscription.upgradeToPro')}
+                <p className="text-sm text-muted-foreground font-mono leading-relaxed max-w-[280px] mx-auto">
+                  {entitlement === 'lapsed'
+                    ? t('home.subscription.trialEnded')
+                    : t('home.subscription.startTrialPrompt')}
                 </p>
                 <LoadingButton
-                  onClick={onStartCheckoutPro}
-                  loading={checkoutLoading}
-                  loadingText={t('home.subscription.openingCheckout')}
+                  onClick={entitlement === 'lapsed' ? onReactivate : onStartTrial}
+                  loading={entitlement === 'lapsed' ? checkoutLoading : trialLoading}
+                  loadingText={
+                    entitlement === 'lapsed'
+                      ? t('home.subscription.openingCheckout')
+                      : t('onboarding.ready.startingTrial', { defaultValue: 'Starting trial…' })
+                  }
                   size="sm"
                   className="font-mono text-xs"
                 >
-                  {t('pro.upgradeCta')}
+                  {entitlement === 'lapsed'
+                    ? t('pro.upgradeCta')
+                    : t('home.subscription.startTrialCta')}
                 </LoadingButton>
               </>
             )}

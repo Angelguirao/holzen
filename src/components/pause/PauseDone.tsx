@@ -1,14 +1,12 @@
 import { useCallback, useLayoutEffect, useRef, useState } from 'react';
 import { motion } from 'framer-motion';
-import { Flame, Pencil, Sparkles } from 'lucide-react';
+import { Flame, Pencil } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
-import { useSubscription } from '@/hooks/use-subscription';
 import { PAUSE_MOOD_VALUES, type MoodValue } from '@/components/MoodCheck';
 import { MoodIcon } from '@/components/icons/MoodIcon';
 import { OutcomeIcon } from '@/components/icons/OutcomeIcon';
 import { PAUSE_FEEL_INTENSITY_KEYS } from '@/components/pause/pause-feel-intensity-labels';
-import { PRICING } from '@/lib/pricing';
 import { cn } from '@/lib/utils';
 import { ScoreImpact } from './ScoreImpact';
 import { pauseStepLayout } from '@/components/pause/pause-step-layout';
@@ -99,9 +97,6 @@ export function PauseDone({
   pauseInstanceId,
 }: Props) {
   const { t } = useTranslation();
-  const { subscribed, monthlyUsed, startCheckout, checkoutLoading } = useSubscription();
-
-  const justHitLimit = !subscribed && monthlyUsed >= PRICING.freeReflectionsPerMonth;
 
   const [briefDoneMood, setBriefDoneMood] = useState<MoodValue | null>(null);
   const [briefDoneIntensity, setBriefDoneIntensity] = useState(3);
@@ -428,42 +423,10 @@ export function PauseDone({
         pauseInstanceId={pauseInstanceId}
       />
 
-      {justHitLimit && (
-        <motion.div
-          initial={{ opacity: 0, y: 12 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 2, duration: 0.8 }}
-          className="flex max-w-[300px] flex-col items-center gap-3 rounded-2xl border border-border/30 bg-card/30 px-6 py-5 backdrop-blur-sm"
-        >
-          <div className="flex items-center gap-2">
-            <Sparkles className="h-3.5 w-3.5 text-muted-foreground" />
-            <p className="text-xs font-medium text-foreground/80">
-              {t('pause.upsellTitle', {
-                defaultValue: "You've used all {{count}} free pauses this month",
-                count: PRICING.freeReflectionsPerMonth,
-              })}
-            </p>
-          </div>
-          <p className="text-center text-sm leading-relaxed text-muted-foreground">
-            {t('pause.upsellBody', {
-              defaultValue: 'Unlock unlimited pauses, AI companions, and your full library.',
-            })}
-          </p>
-          <button
-            type="button"
-            onClick={() => startCheckout()}
-            disabled={checkoutLoading}
-            className="text-sm font-medium text-nox-text-link underline-offset-4 transition-colors hover:text-nox-text-link/80 hover:underline disabled:opacity-50"
-          >
-            {t('pause.upsellCta', { defaultValue: 'Start {{days}}-day free trial', days: PRICING.trialDays })}
-          </button>
-        </motion.div>
-      )}
-
       <motion.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
-        transition={{ delay: justHitLimit ? 2.5 : 1.5, duration: 1 }}
+        transition={{ delay: 1.5, duration: 1 }}
         className="mt-4"
       >
         <Button type="button" variant="default" className={pauseStepLayout.ritualPrimaryCta} onClick={onReturn}>
