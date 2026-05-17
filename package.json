@@ -23,6 +23,7 @@
     "check:no-phase-labels": "node scripts/check-no-phase-labels.mjs",
     "check:i18n-active-keys": "node scripts/check-i18n-active-keys.mjs",
     "check:invoke-edge-allowlist": "node scripts/check-invoke-edge-allowlist.mjs",
+    "check:bundle-shipped": "node scripts/check-bundle-shipped.mjs",
     "smoke:edge-logging": "node scripts/smoke-edge-logging.mjs",
     "check:version-sync": "node scripts/check-version-sync.mjs",
     "check:view-migrations": "node scripts/lint-view-migrations.mjs",

@@ -3,9 +3,8 @@ import { initReactI18next } from 'react-i18next';
 import { PRICING } from './lib/pricing';
 import en from './locales/en.json';
 
-// Other locales (es, pt, de, nl, fr, tr) are kept in /src/locales/ but disabled for now.
-// Re-enable by importing and adding to resources below. When you do, keep `breathing.phaseHints`
-// in sync across languages (or rely on fallbackLng for missing keys — en is the source of truth).
+// Full pre-strip locale bundles live in src/legacy/locales/ (not loaded at runtime).
+// Re-enable by importing and adding to resources below; keep keys in sync with en.json.
 
 i18n.use(initReactI18next).init({
   resources: {
