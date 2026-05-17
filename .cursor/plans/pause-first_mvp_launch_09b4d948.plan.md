@@ -2355,7 +2355,7 @@ Cross-check after in-app trial (`ensure-trial-subscription`) + §12.4 copy. **Ve
 
 **Explicit non-goals (unchanged):** Pause RPC rewrite; Playwright; pre-cutover telemetry KPIs; legacy URL redirects; renaming **`reflection_text`** → `opening_message`.
 
-**Ship command:** Push `feature/mvpPauseCleanup` → §14.3 gate → apply migrations → Lovable publish. See [launch-runbook](docs/ops/launch-runbook.md).
+**Ship command:** ~~Push~~ ✅ → apply migrations on linked project → Lovable **Publish → Update**. See [launch-runbook](docs/ops/launch-runbook.md).
 
 <a id="s30-2-1"></a>
 
