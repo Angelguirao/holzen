@@ -4,7 +4,7 @@
 **ADR:** [2026-05-17-modular-monolith-hexagonal-client.md](../decisions/2026-05-17-modular-monolith-hexagonal-client.md)  
 **Shipped product boundary:** [active-surface.md](../ops/active-surface.md)
 
-This document is the **operational map**: folders, packages, naming, import rules, migration waves, and CI. **Why** we do this lives in [holzen-application-architecture.md](holzen-application-architecture.md) (especially **§7 screens vs contexts** and **§8 pause includes companions**); **who enforces truth** lives in [client-server-architecture-holzen.md](client-server-architecture-holzen.md).
+This document is the **operational map**: folders, packages, naming, import rules, migration waves, and CI. **Why** we do this lives in [holzen-application-architecture.md](holzen-application-architecture.md) (especially **§7 screens vs contexts** and **§8 pause includes companions**); **who enforces truth** lives in [client-server-architecture-holzen.md](client-server-architecture-holzen.md). **Modern React alignment** (feature folders, Query, colocation): [modern-react-practices-holzen.md](modern-react-practices-holzen.md).
 
 ---
 

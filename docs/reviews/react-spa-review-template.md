@@ -24,6 +24,7 @@ Do **not** try to fill every audit section for every PR. For PRs: pick the **one
 ## Holzen pointers (pin these while reviewing)
 
 - **Truth vs projection:** [fundamentals/client-server-architecture-holzen.md](../fundamentals/client-server-architecture-holzen.md) — server owns invariants; client mirrors for UX only.
+- **Modern React + structure:** [fundamentals/modern-react-practices-holzen.md](../fundamentals/modern-react-practices-holzen.md) — feature/colocation, Query vs UI state, scorecard; [holzen-application-architecture.md](../fundamentals/holzen-application-architecture.md) for packages/use cases.
 - **Routes / guards:** `src/App.tsx`, [systems/routing/route-gating-system.md](../systems/routing/route-gating-system.md), [design/information-architecture.md](../design/information-architecture.md).
 - **Edge invokes:** Prefer patterns in [AGENTS.md](../../AGENTS.md) (`invokeEdge`, `x-cid`); new call sites should not break correlation.
 - **Observability / events:** [ops/event-taxonomy.md](../ops/event-taxonomy.md), [ops/feature-flags.md](../ops/feature-flags.md) when behavior is flag-gated.
@@ -39,7 +40,8 @@ Do **not** try to fill every audit section for every PR. For PRs: pick the **one
 
 - [ ] Entry: route + root component/hook for this change
 - [ ] Trigger: what user action or effect starts the work?
-- [ ] State: local vs shared; any unnecessary global coupling?
+- [ ] State: local vs shared; server data via Query (not duplicated global store)? See [modern-react-practices-holzen.md](../fundamentals/modern-react-practices-holzen.md) §2.3–2.4.
+- [ ] Placement: feature/package ownership vs root `hooks/`/`lib/` dump? See [modern-react-practices-holzen.md](../fundamentals/modern-react-practices-holzen.md) §6.
 - [ ] I/O: Supabase client, `functions.invoke` / `invokeEdge`, storage—errors handled?
 - [ ] UI: loading / error / empty states for new or changed async paths
 

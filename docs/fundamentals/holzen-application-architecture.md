@@ -12,6 +12,7 @@ This document is the **constitution** for application structure. It does not rep
 | [client-server-architecture-holzen.md](client-server-architecture-holzen.md) | Truth vs projection, trust boundaries, Query vs UI state |
 | [frontend-module-layout.md](frontend-module-layout.md) | Target repo tree, package graph, naming, migration waves, CI checks |
 | [2026-05-17-modular-monolith-hexagonal-client.md](../decisions/2026-05-17-modular-monolith-hexagonal-client.md) | Accepted ADR for monorepo + hexagonal client |
+| [modern-react-practices-holzen.md](modern-react-practices-holzen.md) | Industry React norms + Holzen fit/gap scorecard |
 | [ops/active-surface.md](../ops/active-surface.md) | Shipped routes, edges, tables, events |
 | [systems/pause-system.md](../systems/pause-system.md) | Pause lifecycle invariants and schema |
 
@@ -448,6 +449,7 @@ holzen-application-architecture.md     ← you are here (principles)
         ├── client-server-architecture-holzen.md   (authority / projection)
         ├── frontend-module-layout.md              (repo map, migration waves)
         ├── decisions/2026-05-17-modular-monolith-hexagonal-client.md
+        ├── modern-react-practices-holzen.md       (React industry norms vs Holzen)
         ├── react-screen-orchestration.md          (React mechanics)
         ├── refactoring-strategy.md                (incremental moves; superseded for greenfield by §9)
         ├── docs/systems/*                         (per-context behavior)
