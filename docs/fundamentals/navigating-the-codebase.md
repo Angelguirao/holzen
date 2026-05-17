@@ -24,6 +24,7 @@ This guide walks a new contributor through the repository in roughly the order y
 | `supabase/migrations/` | Postgres schema and RLS — **source of truth** for the database. |
 | `supabase/functions/` | Deno edge functions (HTTP APIs, crons, webhooks). |
 | `supabase/config.toml` | Supabase project id and **`[functions.<name>]`** per deployable folder — keep **one block per function** so local serve and hosted deploys match. |
+| `index.html` | Vite HTML entry: default SEO/PWA meta, `#root`, inline boot-recovery — see [index-html-and-spa-shell.md](index-html-and-spa-shell.md). |
 | `vite.config.ts` | Dev server (port 8080), `@` alias, PWA inject-manifest, **optional Supabase URL/key fallbacks** on dev serve and `vite build` when not in `localstack` mode; **`transformIndexHtml`** injects **`preconnect`** for Supabase, Google Fonts, and CoinGecko ([resource-hints-preconnect.md](../backlog/resource-hints-preconnect.md)). |
 | `vitest.config.ts` | Tests: jsdom, `src/test/setup.ts`, same `@` alias as Vite. |
 
@@ -31,13 +32,15 @@ This guide walks a new contributor through the repository in roughly the order y
 
 ## 3. Boot sequence: from `index.html` to first paint
 
-1. **`index.html`** loads the Vite entry script and sets **`class="dark"`** on `<html>` so Tailwind’s `dark:` variant matches the single Nox appearance.
-2. **`src/main.tsx`** is the real entry:
-   - Registers global `error` / `unhandledrejection` handlers and a **crash screen** if the app fails before React mounts (clears storage + reload button).
-   - Dynamically imports `App.tsx`, `lib/sw-update.ts`, and `i18n.ts`, then renders `<App />` into `#root`.
+Full diagram, metadata, boot-recovery, and domain notes: **[index-html-and-spa-shell.md](index-html-and-spa-shell.md)**.
+
+1. **`index.html`** loads the Vite entry script, sets **`class="dark"`** on `<html>`, and runs an **inline boot-recovery** script (cache reset + fallback UI if the bundle never mounts).
+2. **`src/main.tsx`** is the JS entry:
+   - Inits Sentry, cid, PostHog; registers global `error` / `unhandledrejection` handlers and a **crash screen** if React fails before mount.
+   - **Static imports** `i18n`, `App.tsx`, and `sw-update`, then `createRoot(#root).render(<App />)`.
 3. **`src/App.tsx`** wraps the tree in `ErrorBoundary`, `QueryClientProvider`, `TooltipProvider`, toasts, offline banner, `BrowserRouter`, and **`AuthProvider`**.
 
-**Why it matters:** anything that throws during static import of `App` or `i18n` is caught by `main.tsx`; errors inside React use `ErrorBoundary`.
+**Why it matters:** throws during static import of `App` or `i18n` are caught in `main.tsx`; errors inside React use `ErrorBoundary`.
 
 ---
 
