@@ -1,6 +1,6 @@
 # Client–server architecture (Holzen)
 
-This note is the **canonical place** for **where authority lives** in Holzen: how the **browser SPA**, **Supabase (Postgres + RLS + edge functions)**, and **shared TypeScript** fit together. It complements [navigating-the-codebase.md](navigating-the-codebase.md) (concrete file map), [react-screen-orchestration.md](react-screen-orchestration.md) (large-screen React patterns), and [mental-models-for-contributors.md](mental-models-for-contributors.md) (glossary and SPA basics).
+This note is the **canonical place** for **where authority lives** in Holzen: how the **browser SPA**, **Supabase (Postgres + RLS + edge functions)**, and **shared TypeScript** fit together. It complements [holzen-application-architecture.md](holzen-application-architecture.md) (principles, bounded contexts, use cases, target structure), [navigating-the-codebase.md](navigating-the-codebase.md) (concrete file map), [react-screen-orchestration.md](react-screen-orchestration.md) (large-screen React patterns), and [mental-models-for-contributors.md](mental-models-for-contributors.md) (glossary and SPA basics).
 
 **Pause-first strip (2026-05):** `src/legacy/` and `supabase/functions/legacy/` are **read-only reference** for the pre-strip full product — not a second runtime or alternate backend. Active code must match [active-surface.md](../ops/active-surface.md).
 
@@ -28,7 +28,7 @@ A **monorepo** (if you ever split `apps/web` + packages) is organizational; it d
 
 ## Layer names mapped to Holzen
 
-The labels **domain / application / infrastructure** are useful **mental** buckets. They do not require new top-level folders in this repo today.
+The labels **domain / application / infrastructure** are useful **mental** buckets. The **target** physical layout (packages, use-case modules) is defined in [holzen-application-architecture.md](holzen-application-architecture.md) §9 and [frontend-module-layout.md](frontend-module-layout.md); the current `src/` tree may still be transitional.
 
 ### Server side (authoritative)
 
@@ -113,15 +113,16 @@ Correlation: keep **`x-cid`** on edge calls per [AGENTS.md](../../AGENTS.md).
 |-------|-----|
 | Pause truth + AI pipeline | [systems/pause-system.md](../systems/pause-system.md), [systems/pause/ai-powered-pause-system.md](../systems/pause/ai-powered-pause-system.md) |
 | Auth + RLS | [systems/auth/auth-and-referral-system.md](../systems/auth/auth-and-referral-system.md) |
+| Application structure (principles, use cases, packages) | [holzen-application-architecture.md](holzen-application-architecture.md) |
 | Refactors across UI and lib | [refactoring-strategy.md](refactoring-strategy.md) |
 | Edge HTTP + logging | [ops/edge-logging-conventions.md](../ops/edge-logging-conventions.md) |
 | PR / flow review | [reviews/react-spa-review-template.md](../reviews/react-spa-review-template.md) |
 
 ### External concepts (optional reading)
 
-These names describe **ideas** Holzen maps pragmatically; they are not a mandate to adopt every pattern:
+Curated **take / skip** table and normative principles: [holzen-application-architecture.md](holzen-application-architecture.md) §7–§8. Short pointers:
 
-- **Domain-Driven Design** — bounded contexts, aggregates, ubiquitous language (Eric Evans; Vaughn Vernon for tactical patterns).
+- **Domain-Driven Design** — bounded contexts, ubiquitous language (Eric Evans; Vaughn Vernon for tactical patterns).
 - **Clean Architecture** — dependency direction toward domain, use cases as application boundary (Robert C. Martin).
 - **Hexagonal / ports and adapters** — isolate core logic from IO (Alistair Cockburn).
 

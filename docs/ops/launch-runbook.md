@@ -21,7 +21,9 @@ npm run check:edge-logging
 npm run check:edge-coverage-manifest
 npm run test:ci
 npm run build
-npm run check:bundle-shipped
+npm run check:bundle-shipped   # also runs inside test:ci
+npm run check:bruno-active-manifest
+npm run check:posthog-events-allowlist
 npm run check:view-migrations
 npm run check:edge          # when Deno is installed
 npm run stamp:release
@@ -45,8 +47,11 @@ git push -u origin feature/mvpPauseCleanup
 GitHub sync applies `supabase/migrations/` and deploys edge functions. Confirm migrations applied, especially:
 
 - `20260516180000_subscription_lapsed_pause_engagement.sql` — lapsed status + `user_can_engage_pause`
-- `20260521200000_holzen_mvp_launch_cutover.sql` — Tier B drops, `opening_message`, telemetry baseline, cron unschedule (**destructive**)
+- `20260521200000_holzen_mvp_launch_cutover.sql` — Tier B drops, `content_library` → `companion_catalog`, telemetry baseline, cron unschedule (**destructive**)
 - `20260522130000_drop_companion_breathing.sql` — drops `profiles.companion_breathing` (plan §20.5)
+- `20260523140000_companion_catalog_serve_source.sql` — `serve_source` includes `catalog`
+- `20260523140100_companion_catalog_recreate_if_missing.sql` — safety recreate if an earlier cutover dropped the table
+- `20260523150000_keep_reflection_text_artifact_kind.sql` — reverts `opening_message` kind if an old cutover revision ran
 
 ### Quick SQL checks (linked project)
 
@@ -74,7 +79,7 @@ With `hosted.bru` env (JWT + Supabase URL/key). Full sequence: [bruno/active/REA
 4. `billing/04-ensure-trial-subscription` — `{ ok: true }` (disposable user; idempotent)
 5. Optional: `pause-pipeline/01-holzen-reflect`, `02-companion-orchestrate`
 
-Do not use requests under `bruno/legacy/full-shell/` for MVP ship checks (undeployed edges).
+Do not use requests under `bruno/legacy/full-shell/` for launch ship checks (undeployed edges).
 
 ## 5. Post-launch (24h)
 

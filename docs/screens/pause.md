@@ -1,6 +1,6 @@
 # Pause session (`/pause`)
 
-**Pause-first shipped scope (2026-05):** full ritual on `/pause`; reflect artifact kind **`opening_message`**; post-pause exits go Home/Archive (no Journey stats). Lapsed users see engagement block via entitlement. Manifest: [active-surface.md](../ops/active-surface.md).
+**Pause-first shipped scope (2026-05):** full ritual on `/pause`; reflect artifact kind **`reflection_text`**; post-pause exits go Home/Archive (no Journey stats). Lapsed users see engagement block via entitlement. Manifest: [active-surface.md](../ops/active-surface.md).
 
 Authoritative orchestration: `[src/pages/PauseSession.tsx](../../src/pages/PauseSession.tsx)`.
 

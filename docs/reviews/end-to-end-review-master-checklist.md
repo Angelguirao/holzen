@@ -14,6 +14,22 @@
 
 ---
 
+## Shipped MVP only (pause-first strip)
+
+Use this slice when signing off **production** on `feature/mvpPauseCleanup` / post-cutover — not the full Tier A–D inventory below.
+
+| Area | Verify |
+| --- | --- |
+| **Routes** | `/`, `/archive`, `/journey`, `/settings`, `/pause`, `/companion/*`, `/roadmap`; `/tools*`, `/journey/stats`, `/library` → **404** + `app.route_not_found` |
+| **Subscription** | `ensure-trial-subscription` on onboarding; `lapsed` blocks pause engage; Archive/Journey read without Pro gate |
+| **Integration tests** | `npm run test` — F1–F9 in `src/test/integration/flows/` |
+| **Edges** | [active-surface.md](../ops/active-surface.md) deployed list = `config.toml` = `EdgeCoverage.tsx`; Bruno [bruno/active/functions-catalog.md](../../bruno/active/functions-catalog.md) |
+| **DB cutover** | `20260521200000_holzen_mvp_launch_cutover.sql` applied; Tier B tables absent; **`companion_catalog`** + `grounding_enrichment_cache` **present** |
+| **Telemetry** | Post-cutover metrics use `telemetry_baseline_at` in active-surface; truncated tables empty |
+| **Ship** | [launch-runbook.md](../ops/launch-runbook.md) §14.3 + Lovable **Publish → Update** after push |
+
+---
+
 ## 0 — Prerequisites (read once, then spot-check)
 
 - [x] [phase-1-frontend-routing-auth.md](phase-1-frontend-routing-auth.md) — routing, `ProtectedRoute` / `PublicOnlyRoute`, `AuthProvider`, session semantics — *L45 2026-04-30: **`AuthProvider`** wraps **`Routes`** (`App.tsx`). **`ProtectedRoute`**: **`loading` → `AuthLoading`**; **`!user` → `Navigate` `/welcome`** — no protected child until settled. **`PublicOnlyRoute`**: mirror → **`/`** if **`user`**. **`use-auth`**: **`onAuthStateChange`** sets **`user`** + **`loading: false`**; observability (**Sentry/PostHog**) + **`auth.*`** events; **`SIGNED_IN`** → **`referral_pending_jobs`** insert + **`record-referral`** invoke; **`holzen_ref`** cleared only on **`ok: true`** (or invalid code); welcome email path uses **`send-transactional-email`**. **`getSession()`** initial hydrate **`.then` only** — **no `.catch`**: reject / hang risk vs guards (**`INITIAL_SESSION`** usually clears **`loading`**). **`client.ts`**: **`localStorage`**, **`persistSession`**, **`autoRefreshToken`**; **`functions.invoke`** patched **`x-cid`** / **`x-app-version`**. **`main.tsx`**: boot crash screen + **`unhandledrejection` → Sentry**. Ungated routes: legal/blog/**`ResetPassword`**/**`NotFound`** etc. (doc **`route-gating-system.md`**).*

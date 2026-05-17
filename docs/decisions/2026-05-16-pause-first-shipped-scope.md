@@ -11,6 +11,8 @@ Holzen accumulated a full IA (Tools, Journey tabs, badges, stats) alongside the 
 3. **404 only** for retired paths — no `/library` → `/archive` or `/journey/stats` → `/journey` shims.
 4. **No global feature flag** — the router is the product boundary.
 5. **Aggressive DB/edge cutover** in Step 5 after client disconnect (Tier B drops, edge undeploy).
+6. **Companion pool:** `content_library` → **`companion_catalog`**; orchestrate phases **catalog → cache → live → curated** (`COMPANION_PHASE_CATALOG` default on). **`grounding-enrich`** stays deployed (Full View).
+7. **Reflect artifact:** keep **`reflection_text`** — no rename to `opening_message`.
 
 ## Consequences
 
