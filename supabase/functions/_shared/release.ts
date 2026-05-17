@@ -3,5 +3,5 @@
 // Mirrors the frontend `__APP_VERSION__` so Sentry can correlate releases
 // across both surfaces. Env vars (SENTRY_RELEASE / APP_VERSION) still win if set.
 
-export const EDGE_RELEASE = "a6b11b13229a";
-export const EDGE_RELEASE_STAMPED_AT = "2026-05-17T19:00:47.004Z";
+export const EDGE_RELEASE = "806009f3cc0f";
+export const EDGE_RELEASE_STAMPED_AT = "2026-05-17T19:03:23.383Z";

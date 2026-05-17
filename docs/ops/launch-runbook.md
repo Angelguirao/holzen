@@ -2,6 +2,16 @@
 
 Human checklist for shipping `feature/mvpPauseCleanup` to production. Canonical deploy narrative: [deployment-sync-guide.md](./deployment-sync-guide.md).
 
+## Ship status (agent-complete vs human)
+
+| Step | Status |
+| --- | --- |
+| Steps 1–6 code + CI + docs | ✅ on `feature/mvpPauseCleanup` |
+| `git push` | ✅ tip **`806009f3`** (`EDGE_RELEASE` matches HEAD) |
+| Linked DB migrations + cutover verify | 🚢 you |
+| Lovable **Publish → Update** | 🚢 you |
+| §3.1 no real prod users (before destructive cutover) | 🚢 you |
+
 ## Preconditions
 
 - Steps 1–5 committed on `feature/mvpPauseCleanup` (tag `full-ia-pre-strip` exists).
