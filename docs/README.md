@@ -4,12 +4,14 @@ This folder contains human-readable notes that complement the source code and in
 
 ## Start here (new contributors)
 
-1. **[architecture/c4-holzen.md](architecture/c4-holzen.md)** — who the system talks to (System Context + Container). Optional: [workspace.dsl](architecture/workspace.dsl) in Structurizr.
-2. **[fundamentals/navigating-the-codebase.md](fundamentals/navigating-the-codebase.md)** — boot flow, routing, auth, hooks, and how Supabase pieces connect at runtime. **§19** — phased **learning path** (pause slice first, then whole app).
-3. **Optional — [fundamentals/mental-models-for-contributors.md](fundamentals/mental-models-for-contributors.md)** — plain-language glossary, SPA/React/Supabase mental models, and suggested external primers if you’re coming from a backend-heavy background.
-4. **Optional — [fundamentals/client-server-architecture-holzen.md](fundamentals/client-server-architecture-holzen.md)** — where **truth** vs **projection** live, layer mapping to this repo, TanStack Query vs UI-only state, and anti-patterns (pair with §6.1 in navigating-the-codebase).
-5. **Your vertical slice** — pick one area below (e.g. [systems/routing/route-gating-system.md](systems/routing/route-gating-system.md) or [systems/pause-system.md](systems/pause-system.md)) and read the phased [reviews/](reviews/) docs in order when you need depth on security and pipelines.
-6. **Optional — [fundamentals/documentation-strategy.md](fundamentals/documentation-strategy.md)** — where to put new docs, HTTP/API posture (Bruno vs OpenAPI), and edge-function doc checklist (links only).
+1. **[src/README.md](../src/README.md)** — what ships in active `src/` (4-tab pause-first surface).
+2. **[ops/active-surface.md](ops/active-surface.md)** — routes, edges, crons, dropped tables, PostHog events (canonical shipped manifest).
+3. **[architecture/c4-holzen.md](architecture/c4-holzen.md)** — who the system talks to (System Context + Container). Optional: [workspace.dsl](architecture/workspace.dsl) in Structurizr.
+4. **[fundamentals/navigating-the-codebase.md](fundamentals/navigating-the-codebase.md)** — boot flow, routing, auth, hooks, and how Supabase pieces connect at runtime. **§19** — phased **learning path** (pause slice first, then whole app).
+5. **Optional — [fundamentals/mental-models-for-contributors.md](fundamentals/mental-models-for-contributors.md)** — plain-language glossary, SPA/React/Supabase mental models, and suggested external primers if you’re coming from a backend-heavy background.
+6. **Optional — [fundamentals/client-server-architecture-holzen.md](fundamentals/client-server-architecture-holzen.md)** — where **truth** vs **projection** live, layer mapping to this repo, TanStack Query vs UI-only state, and anti-patterns (pair with §6.1 in navigating-the-codebase).
+7. **Your vertical slice** — pick one area below (e.g. [systems/routing/route-gating-system.md](systems/routing/route-gating-system.md) or [systems/pause-system.md](systems/pause-system.md)) and read the phased [reviews/](reviews/) docs in order when you need depth on security and pipelines.
+8. **Optional — [fundamentals/documentation-strategy.md](fundamentals/documentation-strategy.md)** — where to put new docs, HTTP/API posture (Bruno vs OpenAPI), and edge-function doc checklist (links only).
 
 [AGENTS.md](../AGENTS.md) at the repo root is the **quick reference** for commands and “where to change what” (optimized for automation and fast lookup). This index is the **full map**.
 
@@ -18,6 +20,7 @@ This folder contains human-readable notes that complement the source code and in
 | Kind of information | Authoritative place | Notes |
 |---------------------|---------------------|--------|
 | Commands, env vars, “where to edit” table | [AGENTS.md](../AGENTS.md) | Keep tables here; link out for narratives. |
+| **Pause-first shipped scope** (routes, edges, crons, dropped tables) | [ops/active-surface.md](ops/active-surface.md) | Pairs with [src/README.md](../src/README.md); enforced by `npm run check:active-surface`. |
 | **Meta:** where docs go, HTTP doc posture (Bruno vs OpenAPI), edge checklist | [fundamentals/documentation-strategy.md](fundamentals/documentation-strategy.md) | Complements this index; does not duplicate the owner table. |
 | Supabase **`Database` types** (`src/integrations/supabase/types.ts`) | [AGENTS.md](../AGENTS.md) (`npm run gen:types`) | Regenerate after migrations; if types lag, use `as unknown as T` per [deployment-sync-guide.md](ops/deployment-sync-guide.md). |
 | Boot sequence, repo tour, Lovable vs local | [fundamentals/navigating-the-codebase.md](fundamentals/navigating-the-codebase.md) | Do not duplicate long boot narratives in AGENTS. |

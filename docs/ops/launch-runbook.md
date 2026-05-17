@@ -28,6 +28,13 @@ npm run check:release-stamp
 
 Optional (bash): `npm run check:prepush`
 
+Bundle guard (optional — no legacy UI strings in production assets):
+
+```bash
+npm run build
+rg -l "BadgesPanelV2|ToolsHub" dist/assets/*.js && exit 1 || echo "bundle clean"
+```
+
 Naming audit (active paths only):
 
 ```bash
@@ -42,7 +49,10 @@ Expect **zero** hits except ADR/plan references.
 git push -u origin feature/mvpPauseCleanup
 ```
 
-GitHub sync applies `supabase/migrations/` and deploys edge functions. Confirm migration `20260516180000_subscription_lapsed_pause_engagement.sql` applied.
+GitHub sync applies `supabase/migrations/` and deploys edge functions. Confirm migrations applied, especially:
+
+- `20260516180000_subscription_lapsed_pause_engagement.sql` — lapsed status + `user_can_engage_pause`
+- `20260521200000_holzen_mvp_launch_cutover.sql` — Tier B drops, `opening_message`, telemetry baseline, cron unschedule (**destructive**)
 
 ### Quick SQL checks (linked project)
 
