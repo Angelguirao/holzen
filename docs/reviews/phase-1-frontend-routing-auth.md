@@ -1,5 +1,7 @@
 # Phase 1: Frontend routing & authentication review
 
+> **Pre-strip / security reference (2026-05).** Shipped product scope: [active-surface.md](../ops/active-surface.md). Some routes below describe full IA (tag `full-ia-pre-strip`).
+
 This phase is the first "mental model pass" for the codebase because authentication and routing determine:
 
 1. Which code paths run for a given user (or when the user is still loading).

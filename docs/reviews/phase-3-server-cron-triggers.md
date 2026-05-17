@@ -1,5 +1,7 @@
 # Phase 3: Server triggers and cron behavior review
 
+> **Pre-strip / security reference (2026-05).** Shipped cron list: [active-surface.md](../ops/active-surface.md) (many jobs below are unscheduled at MVP).
+
 This phase is the third "mental model pass": after Phase 1 (auth + route gating) and Phase 2 (manual pause producer/consumer), we trace **automatic pause** — how **scheduled work** and **`check-volatility`** create pause instances and notifications, and how **client-side** reflection (`holzen-reflect`) and **`companion-orchestrate`** line up with **NotificationBell** and **PauseSession** once the user opens the app (**Pause V2**: **no** reflection LLM and **no** orchestrator dispatch on cron **claim**).
 
 If this path drifts from Phase 2 or from **`check-volatility`** / **`PauseSession`** code, users see inconsistent “pause ready” copy vs what is persisted before **Reflect**, or wasted duplicate **`companion-orchestrate`** work on the client.

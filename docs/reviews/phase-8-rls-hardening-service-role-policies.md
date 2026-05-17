@@ -1,5 +1,7 @@
 # Phase 8: RLS hardening (explicit service-role write policies)
 
+> **Pre-strip / security reference (2026-05).** Post-cutover tables: [active-surface.md](../ops/active-surface.md).
+
 > **Pause V2 (2026-04):** `public.reflections`, `public.reflection_companions`, and `public.pause_notifications` were **dropped** in `supabase/migrations/20260423202000_pause_v2_destructive_cutover.sql`. Companion + pause writes now target **`pause_instances`**, **`pause_ai_artifacts`**, **`companion_serves`**, **`notifications`**, etc. Treat the **target tables** section below as **historical audit context** for the migrations that existed before cutover — not the live schema checklist.
 
 ## Why this exists

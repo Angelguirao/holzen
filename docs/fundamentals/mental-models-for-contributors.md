@@ -24,7 +24,7 @@ This note is for anyone who is strong on **servers, databases, and HTTP APIs** b
 | **Anon (publishable) key** | A **public** key shipped in the frontend bundle. It only lets you talk to Supabase **as** whoever is logged in; it does **not** bypass RLS. |
 | **RLS (Row Level Security)** | **Postgres policies** evaluated on the **server** for each row. Even if the client sends a malicious query, the database **enforces** what rows are visible or writable. |
 | **Edge function** | A **small HTTP service** (Deno) hosted next to your Supabase project. Invoked via `supabase.functions.invoke(...)` or cron/webhooks. Not the same as SQL stored procedures. |
-| **`opening_message`** | Reflect-step AI copy stored on `pause_ai_artifacts` (shipped kind name; was `reflection_text` pre-cutover). |
+| **`reflection_text`** | Reflect-step AI copy stored on `pause_ai_artifacts` (`kind` + `v_pause_full.reflection_text`). |
 | **`companion_cache`** | Warm pool of pre-generated companion payloads (`pregenerate-companions` cron); shipped companions skip `content_library`. |
 
 If you wonder **“why not Next.js / a full framework?”**, see [spa-framework-evaluation.md](../backlog/spa-framework-evaluation.md) (backlog — strategic note, not a decision).
@@ -39,7 +39,8 @@ If you wonder **“why not Next.js / a full framework?”**, see [spa-framework-
 | **Pause flow, companions, cron** | [systems/pause/ai-powered-pause-system.md](../systems/pause/ai-powered-pause-system.md), [ops/cron-setup.md](../ops/cron-setup.md) |
 | **Auth & RLS** | [systems/auth/auth-and-referral-system.md](../systems/auth/auth-and-referral-system.md), [systems/routing/route-gating-system.md](../systems/routing/route-gating-system.md) |
 | **HTTP-only testing** (Bruno, Postman) | [http-review-playbooks.md](http-review-playbooks.md) — app behavior still needs the browser |
-| **Who enforces rules vs who projects UI** (layers, symmetry, TanStack Query vs UI state) | [client-server-architecture-holzen.md](client-server-architecture-holzen.md) |
+| **Application structure** (use cases, bounded contexts, target packages) | [holzen-application-architecture.md](holzen-application-architecture.md) |
+| **Who enforces rules vs who projects UI** (authority, TanStack Query vs UI state) | [client-server-architecture-holzen.md](client-server-architecture-holzen.md) |
 
 ---
 

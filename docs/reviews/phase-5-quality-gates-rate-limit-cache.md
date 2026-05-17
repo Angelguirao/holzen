@@ -1,5 +1,7 @@
 # Phase 5: Quality gates, rate limiting, and cache/write semantics review
 
+> **Pre-strip / security reference (2026-05).** Shipped surface: [active-surface.md](../ops/active-surface.md).
+
 This phase is the fifth "mental model pass": after Phase 4 (scheduled workers that **produce** cache and library data), we review **shared edge modules** that **bound cost**, **reject low-quality output**, and **serve or write** companion data. These files are imported across `companion-orchestrate`, generators, and related paths — they define **policy**, not a single user-facing screen.
 
 If rate limits fail open without matching analytics instrumentation, or quality gates misfire on valid non-English text, you get runaway spend or empty companion slots.

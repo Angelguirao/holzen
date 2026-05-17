@@ -129,7 +129,7 @@ PII stance unchanged: no generated pause message text, no companion content, no 
 | Event | When | Properties | Owner |
 |---|---|---|---|
 | `generation.initiated` | `companion-orchestrate` invoked for a card (lazy first fetch or regenerate) | `{ companion_type: 'signal' \| 'grounding' \| 'history' \| 'zoom_out'; source: 'lazy' \| 'regenerate' }` | @holzen |
-| `companion.served` | First fill for a slot (cache hydrate, lazy fetch, regenerate, or intervention sidecar) | `{ companion_type; source: 'live' \| 'library' \| 'cache' \| 'curated' \| 'empty'; slot: 'signal' \| 'grounding' \| 'history' \| 'zoomOut' }` | @holzen |
+| `companion.served` | First fill for a slot (cache hydrate, lazy fetch, regenerate, or intervention sidecar) | `{ companion_type; source: 'live' \| 'catalog' \| 'library' \| 'cache' \| 'curated' \| 'empty'; slot: 'signal' \| 'grounding' \| 'history' \| 'zoomOut' }` | @holzen |
 
 ### paywall
 
@@ -181,6 +181,10 @@ Web Vitals are also forwarded to Sentry metrics. PostHog copy supports cohort/fu
 1. Mark **deprecated** in the table with a date.
 2. Remove emission from code in the same PR.
 3. Leave historical data in PostHog (it's cheap and useful for regression checks).
+
+## CI guard (shipped strip)
+
+`npm run check:posthog-events-allowlist` — every `trackEvent('…')` in active `src/` (excluding `src/legacy/` and `src/test/`) must appear in the **Active events** section above. Wired in `scripts/pre-push-check.sh`.
 
 ## Server-side events
 

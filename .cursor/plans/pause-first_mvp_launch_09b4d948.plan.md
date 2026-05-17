@@ -1,6 +1,6 @@
 ---
 name: Pause-first MVP launch
-overview: Ship a pause-first Holzen with maximum cognitive clarity—active src/ and deployed edges read as a small pause product. Subscription §5.4 — Stripe-native 7-day trial started in-app (no card, no Checkout redirect); Checkout only when trial ends; lapsed = read-only Archive/Journey. Landing/Home/Settings copy updated (§12.4). Branch `feature/mvpPauseCleanup` from `main`; steps 1–6; Step 6 = §14.3 + §29 F1–F9. Cache-only companions §20.4.1; telemetry §20.8; naming §5.0.
+overview: Ship a pause-first Holzen with maximum cognitive clarity—active src/ and deployed edges read as a small pause product. Subscription §5.4 — Stripe-native 7-day trial started in-app (no card, no Checkout redirect); Checkout only when trial ends; lapsed = read-only Archive/Journey. Landing/Home/Settings copy updated (§12.4). Branch `feature/mvpPauseCleanup` from `main`; steps 1–6; Step 6 = §14.3 + §29 F1–F9. Companions **catalog → cache → live → curated** with **`companion_catalog`** table (§20.4.1); telemetry §20.8; naming §5.0. **Keep** `reflection_text` artifact kind (do **not** rename to `opening_message`).
 todos:
   - id: step-1-preserve
     content: "Step 1: Git tag full-ia-pre-strip; archive branch; legacy READMEs; src/README.md shipped-surface map — commit"
@@ -29,11 +29,23 @@ isProject: false
 | Field                  | Value                                                     |
 | ---------------------- | --------------------------------------------------------- |
 | **Status**             | **Implemented** on `feature/mvpPauseCleanup` (steps 1–6) — **ship pending** ([launch-runbook](docs/ops/launch-runbook.md)) |
-| **Version**            | 2026-05-17 (v3.13 — final review)                      |
+| **Version**            | 2026-05-17 (v3.15 — repo audit reconciled; §30.2.1) |
 | **Review**             | §30.1 · §30.2 audit · [§30.3 freeze](#s30-3) · [Locked](#s30-5) · [Design](#s31) |
 | **Base branch** | `main` |
 | **Integration branch** | `feature/mvpPauseCleanup` (all steps 1–6; PR back to `main`) |
 | **Decision record**    | `docs/decisions/2026-05-16-pause-first-shipped-scope.md`            |
+
+### Plan corrections (2026-05 — read before executing §20–§21)
+
+Earlier plan text (v3.8–v3.13) contained **two wrong defaults** that do **not** match product intent:
+
+| Topic | Old plan text (wrong) | **Locked correction (code + manifest)** |
+| --- | --- | --- |
+| **Curated companion pool** | §20.4.1 “cache-only” — **DROP** `content_library`; **no** `companion_catalog` | **RENAME** `content_library` → **`companion_catalog`**; orchestrate phase **`catalog → cache → live → curated`**; `_shared/companion-catalog.ts`; `COMPANION_PHASE_CATALOG` default on |
+| **Reflect-step artifact** | §21.2 rename `reflection_text` → **`opening_message`** | **KEEP** **`reflection_text`** on `pause_ai_artifacts` and **`v_pause_full.reflection_text`** — no kind/column rename |
+| **`grounding-enrich`** | §17.1 “undeploy with ingest” | **KEEP deployed** — `/companion/grounding/:pauseInstanceId` uses it; **`grounding_enrichment_cache`** is Tier C (not dropped) |
+
+Canonical runtime truth: [docs/ops/active-surface.md](docs/ops/active-surface.md). If this plan still says “cache-only” or “opening_message” elsewhere, **trust the correction table and active-surface** over stale paragraphs.
 
 ---
 
@@ -55,7 +67,7 @@ In-app links use heading ids (`#s1`, `#s20-7`, …). Click a link in the table o
 | Locked decisions | [Locked product decisions](#s30-5) |
 | Implementation steps | [Implementation loop](#s14) · [Step mapping](#s15) |
 | Launch order | [Launch sequence](#s25-9) |
-| Baseline squash | [Baseline squash](#s20-7) · [Cache-only companions](#s20-4-1) · [Telemetry reset](#s20-8) |
+| Baseline squash | [Baseline squash](#s20-7) · [Companion catalog](#s20-4-1) · [Telemetry reset](#s20-8) |
 | Design pass | [Design alignment](#s31) |
 | Subscription model | [Subscription & entitlements](#s5-4) |
 
@@ -73,7 +85,7 @@ In-app links use heading ids (`#s1`, `#s20-7`, …). Click a link in the table o
 
 ### Part D — Platform & data
 
-20. [Postgres](#s20) · [20.4.1 Cache-only](#s20-4-1) · [20.7 Baseline](#s20-7) · [20.8 Telemetry reset](#s20-8) · 21. [Naming](#s21) · 22. [Client contract](#s22)
+20. [Postgres](#s20) · [20.4.1 Companion catalog](#s20-4-1) · [20.7 Baseline](#s20-7) · [20.8 Telemetry reset](#s20-8) · 21. [Naming](#s21) · 22. [Client contract](#s22)
 
 ### Part E — Operations
 
@@ -908,9 +920,9 @@ Move legacy-only modules to `supabase/functions/_shared/legacy/` (feed-ingest, b
 
 <a id="s17-6-3"></a>
 
-#### 17.6.3 Step 5 companion cache-only follow-up (§20.4.1)
+#### 17.6.3 Step 5 companion catalog follow-up (§20.4.1)
 
-Remove library phase from generators; move `_shared/content-library.ts` to `_shared/legacy/`; grep zero `searchLibrary` / `content_library` in active `_shared`. Same commit: `opening_message` rename (§21.2) — **no** `companion_catalog` table.
+Rename `content_library` → `companion_catalog`; wire [`companion-catalog.ts`](supabase/functions/_shared/companion-catalog.ts) + **catalog** phase in generators; `COMPANION_PHASE_CATALOG` default on. **Keep** `reflection_text` artifact kind (no `opening_message` rename).
 
 <a id="s17-3"></a>
 
@@ -1181,8 +1193,8 @@ Yes — there are a few **large surfaces**. PauseSession is already **split into
 | Change type | Refactor pairing |
 | --- | --- |
 | **DROP tables** | Remove client queries + delete-account rows in same step 5 commit (**§20.3**) |
-| **Cache-only companions** | §20.4.1 — drop library phase + `content_library`; legacy `content-library.ts` |
-| **`opening_message` kind** | Update `pause-page-loader`, reflect hooks, views — grep-driven in step 5 |
+| **Companion catalog** | §20.4.1 — `companion_catalog` + catalog phase; [`companion-catalog.ts`](supabase/functions/_shared/companion-catalog.ts) |
+| **`reflection_text` kind** | **Keep** — pause-page-loader, reflect hooks, `v_pause_full` unchanged |
 | **RLS deny-write** | No client refactor if tables dropped |
 
 Order: **code stops calling** → **migration** → **`gen:types`** (deployment-sync guide).
@@ -1217,7 +1229,7 @@ Optional Step 4: **`src/lib/pause/ARCHITECTURE.md`** (5 lines): “All pause rit
 | Step 2 | Route manifest + drop dead `lazy()` + layout prefetch |
 | Step 3 | Dead `lib/` to legacy; edge README; Bruno layout |
 | Step 4 | Home/Pause **deletion-first**; optional `lib/pause/` grouping; invalidate module trim |
-| Step 5 | Cache-only orchestrate (§20.4.1) + `opening_message` rename |
+| Step 5 | `companion_catalog` + catalog phase (§20.4.1); keep `reflection_text` |
 | Step 6 | Bundle smoke; C4 optional; no new refactors unless bugfix |
 
 ---
@@ -1255,7 +1267,7 @@ From Pause V2 cutover and follow-ons: `reflections`, `reflection_companions`, `p
 | --- | --- | --- |
 | **Triggers** | DROP non-pause notification triggers | Same list as §17.5A |
 | **Functions** | `DROP FUNCTION IF EXISTS` | `notifications_from_user_badges`, `…_night_reflections`, `…_future_letters`, `…_reflection_insights`, `…_reflections` (if any) |
-| **Tables** | `DROP TABLE IF EXISTS … CASCADE` | `user_badges`, `badge_definitions`, `practice_entries`, `reflection_insights`, `future_letters`, `night_reflections`, `graph_edges`, `ritual_completions`, `ritual_templates`, `grounding_enrichment_cache`, **`content_library`** (§20.4.1 — no `companion_catalog` rename) |
+| **Tables** | `DROP TABLE IF EXISTS … CASCADE` | Tier B only — **not** `companion_catalog` (renamed from `content_library` §20.4.1); **not** `grounding_enrichment_cache` (shipped with `grounding-enrich`) |
 | **Data cleanup** | `DELETE FROM notifications WHERE type IN ('badge','insight','letter','night_reflection')` | Before or after drops |
 | **Optional** | `ALTER TABLE notifications DROP CONSTRAINT` + re-add CHECK with only `'pause'` | Only if no historical rows need other types |
 | **Views** | Drop any view solely over Tier B tables | Grep migrations after drop |
@@ -1264,7 +1276,7 @@ From Pause V2 cutover and follow-ons: `reflections`, `reflection_companions`, `p
 
 1. [`delete-account`](supabase/functions/delete-account/index.ts) — remove `.delete()` lines for dropped tables (account delete must not 500).
 2. Undeploy edges that **write** Tier B (`badge-notify`, `reflection-insights`, `journal-prompt`, `deliver-letters`, `night-reflection`, `grounding-enrich`, …).
-3. Orchestrate **cache-only** — no `searchLibrary` / `content_library` in active `_shared` (§20.4.1).
+3. Orchestrate **catalog → cache → live** — `searchCompanionCatalog` on `companion_catalog` (§20.4.1).
 4. Frontend legacy move complete — no active `supabase.from('user_badges')` etc.
 5. §5.4 Stripe lapsed mapping + RPC `user_can_engage_pause` merged **before** relying on client-only lapsed gates.
 6. `npm run gen:types` after migration applies.
@@ -1285,50 +1297,30 @@ From Pause V2 cutover and follow-ons: `reflections`, `reflection_companions`, `p
 | **`v_pause_full`** | Slim admin Activity tab; not Journey overview |
 | **Email**, **Stripe/credits**, **roadmap**, **blog/testimonials**, **feedback**, **audit_log**, **app_config** | Platform / marketing / ops |
 
-**Dropped (§20.4.1):** `content_library` — do **not** rename to `companion_catalog`.
+**Renamed (§20.4.1):** `content_library` → **`companion_catalog`** (curated essays/papers/events — **not** user Archive / `collections`).
 
 <a id="s20-4-1"></a>
 
-### 20.4.1 Cache-only companions — DROP catalog, pregen-only pool (locked)
+### 20.4.1 Companion catalog — catalog phase + cache + live (locked)
 
-**Your question:** why not replace `content_library` with expanded `companion_cache` + pregen only, then DROP the catalog table and ingest edges?
+**Short answer:** Shipped companions use **two warm pools** with different jobs:
 
-**Short answer:** We **should**, for this launch. The earlier plan kept the catalog table under a rename only to **shrink Step 5 risk** while the frontend strip landed. That left two mental models (catalog vs cache) while ingest was already undeployed — poor fit for §3.1 and cognitive-load goals.
-
-#### Two tables, two jobs (today)
-
-| Store | What it is | Filled by | Orchestrate phase |
+| Store | Role | Filled by | Orchestrate phase |
 | --- | --- | --- | --- |
-| **`content_library`** | Curated rows: essay / paper / event schema | `fetch-source-feeds` (RSS → Gemini) | **Phase 1 “library”** |
-| **`companion_cache`** | AI-shaped `jsonb` per slot type | **`pregenerate-companions`** | **Phase 2 “cache”** |
+| **`companion_catalog`** | Curated rows (essay / paper / event) | Admin seed; legacy `fetch-source-feeds` when re-enabled | **Phase 1 catalog** |
+| **`companion_cache`** | AI-shaped `jsonb` per slot | **`pregenerate-companions`** cron | **Phase 2 cache** |
 
-Zoom Out already runs **cache → live → curated**. Grounding **disables** library in code (`GROUNDING_LIBRARY_ENABLED = false`) because the paper pool is empty.
-
-**“Expand companion_cache”** does **not** mean merge schemas into one table. It means: **remove phase 1** from orchestrate; **`pregenerate-companions`** owns the warm pool; **live → curated** when thin.
-
-#### Why deferral was wrong for this launch
-
-| Old rationale | Why it doesn’t apply |
-| --- | --- |
-| “Bigger change” in Step 5 | Step 5 is already baseline squash + Tier B DROP — cache-only belongs in the **same** commit. |
-| Need catalog rows at launch | Ingest is **off**; test data disposable (§3.1). Cold start = run pregen + brief live-heavy period. |
-| Rename fixes “library” confusion | `companion_catalog` still implies a second table + `searchLibrary` — **less** clear than one pool. |
-
-#### Locked MVP behavior (Step 3 + Step 5)
-
-**Phase stack (Signal, Grounding, History):** `cache → live → curated`.
+**Phase stack (Signal, Grounding, History):** **`catalog → cache → live → curated`**.
 
 | Layer | Action |
 | --- | --- |
-| **Edges (Step 3)** | Undeploy: `fetch-source-feeds`, `admin-library-preview`, `grounding-enrich` (§17.1). |
-| **`_shared` (Step 5)** | Remove library phase from [`signal.ts`](supabase/functions/_shared/generators/signal.ts), [`grounding.ts`](supabase/functions/_shared/generators/grounding.ts), [`history.ts`](supabase/functions/_shared/generators/history.ts); default **`COMPANION_PHASE_LIBRARY=0`** or delete phase. Move [`content-library.ts`](supabase/functions/_shared/content-library.ts) + catalog-only [`content-dedup.ts`](supabase/functions/_shared/content-dedup.ts) paths to `_shared/legacy/`. |
-| **Postgres (Step 5)** | **`DROP TABLE content_library CASCADE`** — **never** `companion_catalog` in baseline. |
-| **Pregen (Step 5–6)** | Keep cron; optionally raise `pregenerate_cache_topup` mins; after reset, manual `pregenerate-companions` until healthy. |
-| **Docs** | [ai-powered-pause-system.md](docs/systems/pause/ai-powered-pause-system.md): **cache → live → curated**; ingest doc → legacy banner. |
+| **Postgres (Step 5)** | `ALTER TABLE content_library RENAME TO companion_catalog` in cutover (or recreate if already dropped — see `20260523140100_companion_catalog_recreate_if_missing.sql`) |
+| **`_shared` (Step 5)** | [`companion-catalog.ts`](supabase/functions/_shared/companion-catalog.ts) queries `companion_catalog`; [`phase-config.ts`](supabase/functions/_shared/phase-config.ts) — `COMPANION_PHASE_CATALOG` default **on** |
+| **Edges (Step 3)** | Undeploy **ingest-only** edges: `fetch-source-feeds`, `admin-library-preview`. **Keep** [`grounding-enrich`](supabase/functions/grounding-enrich/) (companion Full View). |
+| **Pregen** | Keep **`pregenerate-companions`**; warm `companion_cache` after cutover |
+| **Telemetry** | `companion_serves.serve_source` includes **`catalog`** (and legacy **`library`** for old rows) |
 
-**Keep:** `signal_sources`, `signal_source_suggestions`, `companion_fallbacks`, curated static pools in code.
-
-**Accept:** Slightly more live AI until cache warms; one companion content table in Studio.
+**Do not confuse:** user-facing **Archive** (`/archive`, `collections`) vs **`companion_catalog`** (companion content pool).
 
 <a id="s20-5"></a>
 
@@ -1372,7 +1364,7 @@ Update `update_profile_safe` / safe column allowlist in the same migration if it
 | --- | --- |
 | 1 | Run §3.1 checklist (no production data to keep — **not** `auth.users` = 0) |
 | 2 | Move applied history to `supabase/migrations-archive/pre-baseline/` (read-only reference; do not delete from git carelessly) |
-| 3 | Author `supabase/migrations/YYYYMMDD_holzen_schema_baseline.sql` with **final** names only: `companion_cache` (no `content_library`), `opening_message`, no Tier B tables, trimmed `profiles` (§20.5, §21) |
+| 3 | Author `supabase/migrations/YYYYMMDD_holzen_schema_baseline.sql` with **final** names only: `companion_catalog`, `companion_cache`, `reflection_text`, no Tier B tables, trimmed `profiles` (§20.5) |
 | 4 | `supabase db reset` on disposable/local; then apply to linked project in Step 5 window |
 | 5 | `npm run gen:types` · `npm run test` · `npm run check:view-migrations` |
 | 6 | Update `active-surface.md` schema section |
@@ -1443,12 +1435,12 @@ TRUNCATE public.user_companion_serves;
 
 | Rule | Example |
 | --- | --- |
-| **No “library” for non-Archive data** | Users see **Archive**; **no** `content_library` / `companion_catalog` table at MVP (§20.4.1) |
-| **“Companion” prefix for cache/serve** | `companion_cache`, `companion_serves`, `companion_fallbacks` — one pool + telemetry |
+| **Archive vs catalog** | Users see **Archive** (`collections`); curated companion rows live in **`companion_catalog`** (renamed from `content_library`) — not the same thing |
+| **“Companion” prefix for cache/serve** | `companion_cache`, `companion_serves`, `companion_fallbacks`, **`companion_catalog`** |
 | **“Pause” prefix for ritual truth** | `pause_instances`, `pause_ai_artifacts`, `pause_log_step` — keep |
-| **“Reflection” = user pause message, not Journey** | Prefer `opening_message` over `reflection_text` in artifacts/views |
+| **Reflect-step artifact kind** | **Keep** `pause_ai_artifacts.kind = 'reflection_text'` and **`v_pause_full.reflection_text`** — **do not** rename to `opening_message` (rejected at review) |
 | **Drop columns, don’t alias forever** | Prefer `DROP COLUMN` over leaving deprecated fields in `profiles` |
-| **Code follows DB** | Rename `_shared/content-library.ts` → `companion-catalog.ts` in same step 5 as table |
+| **Code follows DB** | `_shared/companion-catalog.ts` reads `companion_catalog`; env `COMPANION_PHASE_CATALOG` |
 
 <a id="s21-2"></a>
 
@@ -1456,11 +1448,11 @@ TRUNCATE public.user_companion_serves;
 
 | Current | Recommended | Rationale |
 | --- | --- | --- |
-| **`content_library`** (table) | **DROP** (§20.4.1) | Cache-only orchestrate; ingest edges undeployed — do **not** rename to `companion_catalog` |
-| `companion_serves.serve_source = 'library'` | **N/A** (no new rows) | Optional cleanup on non-reset DB; baseline has no `library` phase |
-| `CompanionPhase` / phase-config **`library`** | **Remove** or leave env off | Generators use **cache → live → curated** only |
-| `pause_ai_artifacts.kind = 'reflection_text'` | **`opening_message`** | `UPDATE pause_ai_artifacts SET kind = 'opening_message' WHERE kind = 'reflection_text'`; update triggers + `v_pause_full` |
-| `v_pause_full.reflection_text` (column) | **`opening_message`** | Recreate view; map from artifact kind `opening_message` |
+| **`content_library`** (table) | **`companion_catalog`** | `ALTER TABLE … RENAME` in cutover (§20.4.1) |
+| `companion_serves.serve_source` | Add **`catalog`** | Keep **`library`** for historical rows; new serves use **`catalog`** |
+| `CompanionPhase` / phase-config | **`catalog`** \| `cache` \| `live` | Default all on; order **catalog → cache → live** |
+| `pause_ai_artifacts.kind = 'reflection_text'` | **KEEP** | **No rename** to `opening_message` |
+| `v_pause_full.reflection_text` (column) | **KEEP** | Maps `kind = 'reflection_text'` |
 | `v_pause_full.haiku_text` | **keep** | Haiku still ships in MVP pause UI |
 | `get_holzen_number()` | **keep** | Product brand metric; name is intentional |
 | `collections` / `collection_items` | **keep** | User-facing “collections” in Archive — clear |
@@ -1470,10 +1462,9 @@ TRUNCATE public.user_companion_serves;
 **SQL sketch:**
 
 ```sql
-DROP TABLE IF EXISTS public.content_library CASCADE;  -- §20.4.1; in baseline squash, table never created
+ALTER TABLE IF EXISTS public.content_library RENAME TO companion_catalog;
 
-UPDATE public.pause_ai_artifacts SET kind = 'opening_message' WHERE kind = 'reflection_text';
--- Then DROP FUNCTION + CREATE OR REPLACE views (v_pause_full, v_pause_archive_*)
+-- reflection_text: NO UPDATE — keep artifact kind and v_pause_full.reflection_text column
 ```
 
 <a id="s21-3"></a>
@@ -1498,7 +1489,7 @@ UPDATE public.pause_ai_artifacts SET kind = 'opening_message' WHERE kind = 'refl
 
 | Current | Recommended |
 | --- | --- |
-| `_shared/content-library.ts`, catalog paths in `content-dedup.ts` | Move to **`_shared/legacy/`** (§20.4.1) |
+| `_shared/content-library.ts` | **`_shared/companion-catalog.ts`** — queries **`companion_catalog`** (§20.4.1) |
 | `src/hooks/use-library.ts` | **`use-collections.ts`** |
 | `src/components/library/*` | **`src/components/archive-collections/*`** (or nest under `archive/`) |
 | `normalize-library-source-type.ts` | **`pause-archive-source-type.ts`** (Archive segment helpers, not “library”) |
@@ -1526,7 +1517,7 @@ UPDATE public.pause_ai_artifacts SET kind = 'opening_message' WHERE kind = 'refl
 
 ### 21.6 Optional “big bang” vocabulary (only with §20.7 baseline squash)
 
-If you **reset DB + squash migrations**, encode **final names only** in `holzen_schema_baseline.sql` — **never** create `content_library` or `companion_catalog` (§20.4.1). Same for dropped Tier B tables.
+If you **reset DB + squash migrations**, encode **final names only** in `holzen_schema_baseline.sql`: **`companion_catalog`** (not `content_library`), **`reflection_text`** artifact kind, no Tier B tables. Same for dropped Tier B tables.
 
 <a id="s21-7"></a>
 
@@ -1551,7 +1542,7 @@ If you **reset DB + squash migrations**, encode **final names only** in `holzen_
 
 **You have no production users** (§3.1) — treat Postgres like the frontend: **remove** non-MVP domains in a single cutover migration (§20), not only mute triggers. Git tag `full-ia-pre-strip` + archive branch preserve recovery.
 
-**Exception:** Do not drop tables still read by **MVP** edges (`companion_cache`, `companion_fallbacks`, …) — see §20.3–§20.4. **`content_library` is dropped** per §20.4.1 after orchestrate no longer calls `searchLibrary`.
+**Exception:** Do not drop tables still read by **MVP** edges (`companion_cache`, **`companion_catalog`**, `companion_fallbacks`, `grounding_enrichment_cache`, …) — see §20.3–§20.4.
 
 <a id="s22-2"></a>
 
@@ -1766,7 +1757,7 @@ Items not fully spelled out elsewhere. **Pre-launch = be aggressive** where cost
 | --- | --- |
 | **Demo mode** | [`DemoModeToggle`](src/components/admin/DemoModeToggle.tsx) + [`demo-fixture.ts`](src/lib/stats/demo-fixture.ts) tie to **stats** — move to legacy with stats or replace with **pause-only demo seed** (optional: 3 fake `pause_instances` for screenshots). |
 | **EdgeCoverage / SentryAlerts** | MVP function list only (§17). |
-| **Admin Activity tab** | May still query `v_pause_full` — OK; rename column to `opening_message` after §16. |
+| **Admin Activity tab** | May still query `v_pause_full` — OK; column **`reflection_text`** |
 | **Content-library admin UI** | Legacy — do not wire in slim admin. |
 
 <a id="s25-6"></a>
@@ -1789,7 +1780,7 @@ Items not fully spelled out elsewhere. **Pre-launch = be aggressive** where cost
 | **`delete-account`** | Update table list for §20 drops **before** migration (§20.3). |
 | **RLS on dropped tables** | Dropped with `CASCADE`; grep policies referencing Tier B names. |
 | **Privacy / Terms** | Step 5 skim: remove claims about badges, tools hub, journey insights if user-facing. |
-| **PII review** | No new PostHog properties; `opening_message` not in analytics (unchanged stance). |
+| **PII review** | No new PostHog properties; reflect copy (`reflection_text`) not in analytics (unchanged stance). |
 
 <a id="s25-8"></a>
 
@@ -1863,7 +1854,7 @@ Do **not** start new contributors on `stats-system.md` / `badges-system.md` unti
 
 - Add **Change map** row: “Pause-first shipped scope” → decision + `active-surface.md` + legacy rules.  
 - Trim **Where to change what** table: remove or footnote Journey tabs, Tools, badge/stats paths → “legacy / deferred”.  
-- Point `gen:types` and migration work at §20–§22 (cache-only §20.4.1, `opening_message`).
+- Point `gen:types` and migration work at §20–§22 (`companion_catalog` §20.4.1; keep `reflection_text`).
 
 <a id="s26-4"></a>
 
@@ -1881,7 +1872,7 @@ Do **not** start new contributors on `stats-system.md` / `badges-system.md` unti
 
 | Doc | Action | Step |
 | --- | --- | --- |
-| [pause-system.md](docs/systems/pause-system.md) | Remove “stats, badges” from intro if present; document artifact kind **`opening_message`**; `reflection_text` → historical name in footnote | Step 5 |
+| [pause-system.md](docs/systems/pause-system.md) | Catalog → cache → live; **`companion_catalog`**; artifact kind **`reflection_text`** | Step 5 |
 | [ai-powered-pause-system.md](docs/systems/pause/ai-powered-pause-system.md) | Phase **cache → live → curated**; **`content_library` dropped** (§20.4.1); list undeployed ingest edges | Step 5 |
 | [companions/*.md](docs/systems/pause/companions/) | Remove library phase; point pool to **`companion_cache`** + pregen doc | Step 5 |
 | [ai-cost-model.md](docs/systems/costs/ai-cost-model.md) | Mark retired functions (insights, wallpaper, digest, badge-notify) **not deployed**; MVP cost path = pause + companions | Step 5 |
@@ -1928,7 +1919,7 @@ Use a **standard banner** at line 1 (template in decision doc):
 | Doc | Action | Step |
 | --- | --- | --- |
 | [home.md](docs/screens/home.md) | Rewrite for MVP widgets only (goal-why, market, your-pause); remove journey-pulse / quick-capture | Step 4 |
-| [pause.md](docs/screens/pause.md) | Post-pause CTAs → Home/Archive; `opening_message` naming | Step 4 |
+| [pause.md](docs/screens/pause.md) | Post-pause CTAs → Home/Archive; `reflection_text` artifact kind | Step 4 |
 | **New** [journey-overview.md](docs/screens/journey-overview.md) | Overview screen contract | Step 2 |
 | Archive | Add **`archive.md`** if missing — or confirm Archive behavior unchanged, link from manifest | Step 5 |
 
@@ -1964,7 +1955,7 @@ Use a **standard banner** at line 1 (template in decision doc):
 | [navigating-the-codebase.md](docs/fundamentals/navigating-the-codebase.md) | §10: “MVP path” = Home → pause → Archive; legacy folder callout | Step 5 |
 | [client-server-architecture-holzen.md](docs/fundamentals/client-server-architecture-holzen.md) | One paragraph: legacy = reference, not second backend | Step 5 |
 | [react-screen-orchestration.md](docs/fundamentals/react-screen-orchestration.md) | Keep Home tour but add note “full Home had more widgets pre-MVP” | Step 6 |
-| [mental-models-for-contributors.md](docs/fundamentals/mental-models-for-contributors.md) | Optional: glossary `companion_cache` pool, `opening_message` | Step 6 |
+| [mental-models-for-contributors.md](docs/fundamentals/mental-models-for-contributors.md) | Optional: glossary `companion_catalog`, `companion_cache`, `reflection_text` | Step 6 |
 
 <a id="s26-12"></a>
 
@@ -2327,7 +2318,7 @@ Map **F1–F9** to [end-to-end-review-master-checklist.md](docs/reviews/end-to-e
 | Preservation (§3, Step 1) | **OK** — tag before Step 3 moves and Step 5 DROP |
 | Frontend legacy (§16) | **OK** — bulk moves + CI guards |
 | Edge undeploy + `_shared` (§17, §17.6) | **OK** — move + trim policy clear |
-| Postgres (§20–22) | **OK** — baseline §20.7; cache-only §20.4.1; telemetry §20.8; roadmap seed |
+| Postgres (§20–22) | **OK** — baseline §20.7 (fallback tail cutover OK); **companion_catalog** §20.4.1; **reflection_text** kept; telemetry §20.8 |
 | Docs / Bruno / ops (§25–27, §26) | **OK** |
 | Analytics (§23–24) | **OK** — PostHog funnels; Postgres ops post-§20.8 only |
 | Architecture refactors (§19) | **OK** — optional `lib/pause/` only; no big-bang |
@@ -2362,9 +2353,34 @@ Cross-check after in-app trial (`ensure-trial-subscription`) + §12.4 copy. **Ve
 
 **Implementation artifacts (landed on branch):** `docs/ops/active-surface.md`, `scripts/check-active-surface.mjs`, `scripts/check-bundle-shipped.mjs`, `src/test/integration/*`, `.cursor/rules/active-surface.mdc`, `docs/decisions/2026-05-16-pause-first-shipped-scope.md`, `docs/ops/launch-runbook.md`. Follow-up migration: `20260522130000_drop_companion_breathing.sql`.
 
-**Explicit non-goals (unchanged):** Pause RPC rewrite; Playwright; pre-cutover telemetry KPIs; `companion_catalog`; legacy URL redirects.
+**Explicit non-goals (unchanged):** Pause RPC rewrite; Playwright; pre-cutover telemetry KPIs; legacy URL redirects; renaming **`reflection_text`** → `opening_message`.
 
 **Ship command:** Push `feature/mvpPauseCleanup` → §14.3 gate → apply migrations → Lovable publish. See [launch-runbook](docs/ops/launch-runbook.md).
+
+<a id="s30-2-1"></a>
+
+### 30.2.1 Implementation audit vs repo (2026-05-17, pass 5)
+
+Cross-check of §0–§33 against **`feature/mvpPauseCleanup`** working tree (not every bullet is a blocker).
+
+| Area | Verdict | Notes |
+| --- | --- | --- |
+| §1–6 Product / scope | ✅ | 4-tab shell, trial/lapsed, 404-only dead IA |
+| §7–13 Surfaces | ✅ | Journey, Archive, Home, onboarding, Settings, roadmap |
+| §14 Steps 1–6 | ✅ | Code landed; **ship** = human push + Lovable publish |
+| §17 Edges | ✅ | Legacy in `functions/legacy/full-shell/`; **`grounding-enrich` deployed**; no `export-user-data` in repo |
+| §20.4.1 Companion | ✅ | **RENAME** → `companion_catalog`; `companion-catalog.ts` + catalog phase |
+| §20.7 Baseline squash | ⚠️ | Tail cutover `20260521200000_*` instead of `holzen_schema_baseline.sql` — **accepted fallback** |
+| §20.8 Telemetry | ✅ | TRUNCATE in cutover; `telemetry_baseline_at` in [active-surface.md](docs/ops/active-surface.md) |
+| §21 Reflect artifact | ✅ | **`reflection_text`** kept; migration `20260523150000_*` if old rename applied |
+| §23 PostHog | ✅ | Taxonomy + `check:posthog-events-allowlist` (prepush) |
+| §26 Docs | ✅ | active-surface, e2e “Shipped MVP only”, phase review banners |
+| §27 Bruno | ✅ | `bruno/active/` + `legacy/full-shell/`; `check:bruno-active-manifest` in **test:ci** |
+| §29 Tests | ✅ | F1–F9; 650+ unit/integration |
+| §14.3 CI | ✅ | `test:ci` includes bundle + bruno manifest; `check:i18n-active-keys` **optional** (debt) |
+| §30.5 Locked | ✅ | Matches correction table (catalog, reflection_text, grounding-enrich) |
+
+**Human-only before prod:** §3.1 no-real-users checklist · apply migrations on linked project · Lovable **Publish → Update** · observability secrets per [deployment-sync-guide](docs/ops/deployment-sync-guide.md).
 
 <a id="s30-3"></a>
 
@@ -2398,7 +2414,8 @@ Multiple audits (v3.8–v3.13) converged on the same architecture. **Treat this 
 | **Trial implementation** | **Option B** — **`ensure-trial-subscription`** (in-app, no card, no Checkout redirect); `create-checkout` **reactivation only**; webhook + `lapsed` on `profiles`; **no** `profiles.trial_*` |
 | **Landing / copy** | **§12.4** — rewrite `landing.*`, `home.subscription.*`, onboarding CTA; drop free-tier quota language |
 | **Production data** | §3.1 — **no real users**; test accounts (incl. founder/partner) **disposable**; Step 5 gate = checklist, not empty `auth.users` |
-| **Companion content** | §20.4.1 — **cache-only**; **DROP** `content_library`; keep **`pregenerate-companions`**; no `companion_catalog` rename |
+| **Companion content** | §20.4.1 — **`companion_catalog`** + **catalog → cache → live → curated**; keep **`pregenerate-companions`**; **`grounding-enrich`** deployed |
+| **Reflect artifact** | **Keep** `reflection_text` — **no** `opening_message` rename |
 | **Pre-push quality** | §14.3 — all repo checks; §29 unit + flow integration F1–F9; Bruno `active/` smoke Step 6; no Playwright in this strip |
 | **Telemetry history** | §20.8 — **TRUNCATE** `analytics_events`, `generation_attempts`, `companion_serves`, `user_companion_serves` at cutover; launch metrics **from baseline forward** only |
 | **AGENTS.md** | Step 5 — add Change map row for shipped-scope strip + `feature/mvpPauseCleanup`; note branch overrides Pause V2 line |

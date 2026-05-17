@@ -1,5 +1,7 @@
 # Phase 2: Manual pause pipeline review
 
+> **Pre-strip / security reference (2026-05).** Shipped product scope: [active-surface.md](../ops/active-surface.md).
+
 > **Pause V2 (current):** `use-holzen` opens the pause via `pause_create_or_reuse` on Home; **`holzen-reflect`** runs from **`use-pause-reflect-generation`** / **`generateReflectionAtReflectStep`** once the deep ritual reaches **Reflect** (**`PauseSession`** keeps that hook enabled through **Frame**, second **Breathe**, and **Decide**), not from `use-holzen` on the non-silent path. Silent mode still writes a stub `reflection_text` on trigger.
 
 This phase is the second "mental model pass": after Phase 1 (who can reach `/pause` and how auth works), we trace **how a manual pause is produced** (reflection + DB writes) and **how the pause UI consumes it** (`PauseSession`, companions, edge functions). If this contract is wrong, users see empty pause screens, wrong companions, or duplicate work.

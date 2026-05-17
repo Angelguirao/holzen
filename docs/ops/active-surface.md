@@ -4,7 +4,13 @@
 
 **Recovery:** Full pre-strip snapshot: git tag `full-ia-pre-strip`, branch `archive/full-ia-pre-strip`.
 
-**Telemetry baseline:** `20260521200000_holzen_mvp_launch_cutover.sql` truncates `analytics_events`, `generation_attempts`, `companion_serves`, `user_companion_serves` (tables kept).
+**Telemetry baseline:** Migration `20260521200000_holzen_mvp_launch_cutover.sql` truncates `analytics_events`, `generation_attempts`, `companion_serves`, `user_companion_serves` (tables kept). For ad-hoc SQL on historical rows, treat events before **`telemetry_baseline_at`** as pre-launch noise:
+
+| Field | Value |
+| --- | --- |
+| `telemetry_baseline_at` | `2026-05-21T20:00:00.000Z` (UTC; matches migration filename `20260521200000`) |
+
+Example: `WHERE created_at >= '2026-05-21T20:00:00.000Z'` on truncated tables is always empty post-cutover; use on **non-truncated** tables if you add backfills.
 
 ## Shipped client routes (authenticated shell)
 
@@ -17,7 +23,7 @@
 
 **Public:** `/roadmap` (voting), landing, auth, legal.
 
-**Full-screen (no bottom nav):** `/pause`, `/companion/*`
+**Full-screen (no bottom nav):** `/pause`, `/companion/*` (including `/companion/grounding/:pauseInstanceId` → `grounding-enrich`)
 
 **Dead IA (404 only):** `/tools`, `/tools/*`, `/library`, `/journey/stats`, `/journey/:tab`, …
 
@@ -33,9 +39,18 @@ Server: `user_can_engage_pause(uuid)`; guards on `pause_create_or_reuse` and `pa
 
 ## Deployed edges (shipped)
 
-Active in `supabase/config.toml` + `EdgeCoverage.tsx`: pause (`holzen-reflect`, `companion-orchestrate`, `pregenerate-companions`), volatility (`check-volatility`, `refresh-btc-prices`), billing (`check-subscription`, `create-checkout`, `ensure-trial-subscription`, `stripe-webhook`, `customer-portal`, credits), account (`delete-account`, `export-user-data`), `health`, `send-feedback`, admin edges as listed in config.
+Listed in `supabase/config.toml` `[functions.*]` and `src/pages/EdgeCoverage.tsx` (also [bruno/active/functions-catalog.md](../../bruno/active/functions-catalog.md)):
 
-**Undeployed / legacy:** `supabase/functions/legacy/` (ingest, badges, night reflection, letters, digest, etc.).
+| Group | Functions |
+| --- | --- |
+| Pause | `holzen-reflect`, `companion-orchestrate`, `pregenerate-companions`, `grounding-enrich` |
+| Volatility | `check-volatility`, `refresh-btc-prices`, `backfill-btc-prices`, `seed-btc-history` |
+| Billing | `check-subscription`, `create-checkout`, `ensure-trial-subscription`, `stripe-webhook`, `customer-portal`, `retry-flex-credit`, `list-checkout-events`, `notify-checkout-confirmation` |
+| Account / platform | `delete-account`, `health`, `send-feedback`, `register-push`, `record-referral`, `process-referral-pending`, `holzen-number` |
+| Email | `process-email-queue`, `send-transactional-email`, `preview-transactional-email`, `handle-email-unsubscribe`, `handle-email-suppression`, `auth-email-hook` |
+| Ops / admin | `ai-cost-alert`, `admin-check-stripe-prices` |
+
+**Undeployed / legacy:** `supabase/functions/legacy/full-shell/` (ingest, badges, night reflection, letters, digest, `fetch-source-feeds`, …). No `export-user-data` edge exists in this repo.
 
 ## pg_cron (kept)
 
@@ -50,17 +65,17 @@ Active in `supabase/config.toml` + `EdgeCoverage.tsx`: pause (`holzen-reflect`, 
 
 ## Postgres — Tier B dropped (do not query)
 
-`user_badges`, `badge_definitions`, `practice_entries`, `reflection_insights`, `future_letters`, `night_reflections`, `graph_edges`, `ritual_completions`, `ritual_templates`, `grounding_enrichment_cache`, **`content_library`**.
+`user_badges`, `badge_definitions`, `practice_entries`, `reflection_insights`, `future_letters`, `night_reflections`, `graph_edges`, `ritual_completions`, `ritual_templates`.
 
 ## Postgres — Tier C (shipped)
 
-`pause_*`, `collections` / `collection_items`, trimmed `profiles`, `notifications`, `roadmap_items` / `roadmap_votes`, `companion_cache`, `companion_serves`, `companion_fallbacks`, `generation_attempts`, `signal_sources`, `user_signal_preferences`, `signal_source_suggestions`, `quiet_windows`, Stripe/credits, `btc_price_cache`, email infra, `audit_log`, `app_config`.
+`pause_*`, `collections` / `collection_items`, trimmed `profiles`, `notifications`, `roadmap_items` / `roadmap_votes`, **`companion_catalog`** (curated companion pool; renamed from `content_library`), `companion_cache`, `companion_serves`, `companion_fallbacks`, `generation_attempts`, `signal_sources`, `user_signal_preferences`, `signal_source_suggestions`, `quiet_windows`, **`grounding_enrichment_cache`** (companion grounding enrichment), Stripe/credits, `btc_price_cache`, email infra, `audit_log`, `app_config`.
 
 ## Schema notes
 
-- Reflect-step artifact kind: **`opening_message`** (`v_pause_full.opening_message`).
+- Reflect-step artifact kind: **`reflection_text`** (`v_pause_full.reflection_text`) — **not** renamed to `opening_message`.
 - `profiles` columns removed: `ai_insights_enabled`, `night_reflection_hour`, `digest_frequency`, `ritual_template`, `notify_badges`, `streak_freeze_dates`, `companion_breathing` (`20260522130000_drop_companion_breathing.sql`).
-- Companions: **`COMPANION_PHASE_LIBRARY=false`** default — cache → live → curated only.
+- Companions: **catalog → cache → live → curated** (`companion_catalog` table; `COMPANION_PHASE_CATALOG` default on). Code: `_shared/companion-catalog.ts`, `_shared/phase-config.ts`.
 
 ## PostHog (shipped)
 

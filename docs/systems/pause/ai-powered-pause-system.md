@@ -385,7 +385,7 @@ The pause UI invokes **`companion-orchestrate`** (via **`use-companion-data`**);
 
 **Zoom out dependency:** Cron `**refresh-btc-prices`** must keep `btc_price_cache` fresh ([cron-setup.md](../../ops/cron-setup.md)).
 
-**Phase ordering (pause-first MVP):** Generators use **cache → live → curated** only. `_shared/phase-config.ts` defaults `COMPANION_PHASE_LIBRARY=false`; the `content_library` table was dropped in migration `20260521200000_holzen_mvp_launch_cutover.sql`. Warm pool: **`pregenerate-companions`** cron → `companion_cache`. Toggle phases via edge secrets: `COMPANION_PHASE_CACHE`, `COMPANION_PHASE_LIVE` (set `0`/`false`/`no` to disable). When `DISABLE_COMPANION_FALLBACKS` is set, only live runs (testing).
+**Phase ordering (pause-first shipped):** Generators use **catalog → cache → live → curated**. `_shared/phase-config.ts` reads `COMPANION_PHASE_CATALOG`, `COMPANION_PHASE_CACHE`, `COMPANION_PHASE_LIVE` (all default on). Curated rows live in **`companion_catalog`** (renamed from `content_library` in `20260521200000_holzen_mvp_launch_cutover.sql`). Warm pool: **`pregenerate-companions`** cron → `companion_cache`. When `DISABLE_COMPANION_FALLBACKS` is set, only live runs (testing).
 
 **Cache strictness:** `serveFromCache` uses `COMPANION_SERVE_FRESHNESS_DAYS` (30 days; `_shared/companion-serve-freshness.ts`) to skip recently served `companion_cache` rows. Main-flow cache reads run in **strict mode** (no pass-3 `repeat_or_lower_quality` relaxation) so an empty fresh pool falls through to live AI. After live fails, `serveFallback` may relax cache rules and finally use **curated** static pools — slots should not stay empty in production.
 

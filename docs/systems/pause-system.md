@@ -1,6 +1,6 @@
 # Pause system (Pause V2)
 
-> **Reflect artifact (shipped):** deep ritual copy uses kind **`opening_message`** on `pause_ai_artifacts` (renamed from `reflection_text` in `20260521200000_holzen_mvp_launch_cutover.sql`).
+> **Reflect artifact (shipped):** deep ritual copy uses kind **`reflection_text`** on `pause_ai_artifacts` (unchanged at launch cutover).
 
 This document is the **canonical data and lifecycle reference** for Pause V2: tables, state machine, RPCs, step payloads, and how the `**/pause`** ritual lines up with Postgres.
 
