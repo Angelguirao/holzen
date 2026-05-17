@@ -234,13 +234,13 @@ export async function pauseRecencyInputs(
       .from("pause_ai_artifacts")
       .select("kind, content, created_at")
       .eq("user_id", userId)
-      .in("kind", ["opening_message", "haiku"])
+      .in("kind", ["reflection_text", "haiku"])
       .order("created_at", { ascending: false })
       .limit(20);
     const msgs: string[] = [];
     const haikus: string[] = [];
     for (const a of (artifacts ?? []) as Array<{ kind: string; content: Record<string, unknown> }>) {
-      if (a.kind === "opening_message" && typeof a.content?.message === "string") {
+      if (a.kind === "reflection_text" && typeof a.content?.message === "string") {
         msgs.push(a.content.message as string);
       } else if (a.kind === "haiku" && typeof a.content?.haiku === "string") {
         haikus.push(a.content.haiku as string);

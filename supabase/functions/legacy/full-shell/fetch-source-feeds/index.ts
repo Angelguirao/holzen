@@ -31,7 +31,7 @@ const corsHeaders = {
  * Active Source Feeds — fetches latest content from signal_sources URLs.
  *
  * Uses Firecrawl `/v2/scrape` (markdown + links + page metadata), then Gemini to
- * structure the content into content_library entries.
+ * structure the content into companion_catalog entries.
  *
  * Falls back to Perplexity search if Firecrawl is not configured.
  *
@@ -630,7 +630,7 @@ serve(
       const preUrlCandidates = urlDedupCandidates(articleUrl);
       if (!opts?.skipPreUrlDedup && preUrlCandidates.length > 0) {
         const { data: existingPre } = await supabase
-          .from("content_library")
+          .from("companion_catalog")
           .select("id")
           .eq("type", contentType)
           .eq("active", true)
@@ -838,14 +838,14 @@ Return JSON with:
       const urlCandidates = urlDedupCandidates(resolvedUrl);
       if (urlCandidates.length > 0) {
         const { data: byUrl } = await supabase
-          .from("content_library")
+          .from("companion_catalog")
           .select("id")
           .eq("type", contentType)
           .eq("active", true)
           .in("url", urlCandidates)
           .limit(1);
         if (byUrl && byUrl.length > 0) {
-          results.push(`${source.name}: URL already in content_library`);
+          results.push(`${source.name}: URL already in companion_catalog`);
           log("fetch_feeds_article", {
           holzen_event: "fetch_feeds_cron",
             ms: Date.now() - t0,
@@ -862,14 +862,14 @@ Return JSON with:
 
       const titleNorm = normalizeTitleKey(entry.title);
       const { data: byNorm } = await supabase
-        .from("content_library")
+        .from("companion_catalog")
         .select("id")
         .eq("type", contentType)
         .eq("active", true)
         .eq("title_norm", titleNorm)
         .limit(1);
       if (byNorm && byNorm.length > 0) {
-        results.push(`${source.name}: same normalized title already in content_library`);
+        results.push(`${source.name}: same normalized title already in companion_catalog`);
         log("fetch_feeds_article", {
           holzen_event: "fetch_feeds_cron",
           ms: Date.now() - t0,
@@ -977,7 +977,7 @@ Return JSON with:
         insertData.finding = typeof entry.finding === "string" ? entry.finding : null;
       }
 
-      await supabase.from("content_library").insert(insertData);
+      await supabase.from("companion_catalog").insert(insertData);
       results.push(`${source.name}: added "${entry.title}" (via ${scrapeMode})`);
       fetched++;
       log("fetch_feeds_article", {
