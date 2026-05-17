@@ -1,12 +1,17 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import Stripe from "https://esm.sh/stripe@18.5.0";
-import { createClient } from "https://esm.sh/@supabase/supabase-js@2.57.2";
+import { createClient, type SupabaseClient } from "https://esm.sh/@supabase/supabase-js@2.57.2";
 import { withRequestLogging } from "../_shared/with-request-logging.ts";
+import type { createLogger } from "../_shared/observe.ts";
 import {
   FLEX_PACK_CREDITS,
   grantFlexCredits,
   type FlexPackType,
 } from "../_shared/subscription-entitlements.ts";
+import {
+  resolveUserIdForSubscription,
+  syncProfileFromStripeSubscription,
+} from "../_shared/subscription-profile-sync.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -14,12 +19,47 @@ const corsHeaders = {
     "authorization, x-client-info, apikey, content-type, stripe-signature, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version",
 };
 
+const SUBSCRIPTION_EVENT_TYPES = new Set([
+  "customer.subscription.created",
+  "customer.subscription.updated",
+  "customer.subscription.deleted",
+]);
+
 function resolvePackCredits(pack: string | null | undefined): number {
   if (!pack) return 0;
   if (pack in FLEX_PACK_CREDITS) {
     return FLEX_PACK_CREDITS[pack as FlexPackType];
   }
   return 0;
+}
+
+type EdgeLog = ReturnType<typeof createLogger>;
+
+async function syncSubscriptionProfile(
+  stripe: Stripe,
+  svcClient: SupabaseClient,
+  sub: Stripe.Subscription,
+  log: EdgeLog,
+): Promise<void> {
+  const userId = await resolveUserIdForSubscription(stripe, sub);
+  if (!userId) {
+    log.warn("stripe_webhook_subscription_no_user", {
+      subscription_id: sub.id,
+      customer: sub.customer,
+    });
+    return;
+  }
+
+  const proPriceId = Deno.env.get("STRIPE_PRICE_ID_PRO") ?? null;
+  const proPlusPriceId = Deno.env.get("STRIPE_PRICE_ID_PRO_PLUS") ?? null;
+
+  await syncProfileFromStripeSubscription(svcClient, userId, sub, proPriceId, proPlusPriceId);
+
+  log("subscription profile cache updated", {
+    user_id: userId,
+    subscription_id: sub.id,
+    status: sub.status,
+  });
 }
 
 serve(
@@ -68,11 +108,37 @@ serve(
       { auth: { persistSession: false } },
     );
 
+    if (SUBSCRIPTION_EVENT_TYPES.has(event.type)) {
+      const sub = event.data.object as Stripe.Subscription;
+      await syncSubscriptionProfile(stripe, svcClient, sub, log);
+    }
+
     if (event.type === "checkout.session.completed" || event.type === "checkout.session.async_payment_succeeded") {
       const session = event.data.object as Stripe.Checkout.Session;
       const kind = session.metadata?.checkout_kind ?? null;
       const packType = session.metadata?.flex_pack_type ?? null;
       const userId = session.metadata?.user_id ?? session.client_reference_id ?? null;
+
+      if (session.mode === "subscription" && userId) {
+        const subRef = session.subscription;
+        if (subRef) {
+          const subId = typeof subRef === "string" ? subRef : subRef.id;
+          const sub = await stripe.subscriptions.retrieve(subId);
+          await syncProfileFromStripeSubscription(
+            svcClient,
+            userId,
+            sub,
+            Deno.env.get("STRIPE_PRICE_ID_PRO") ?? null,
+            Deno.env.get("STRIPE_PRICE_ID_PRO_PLUS") ?? null,
+          );
+          log("checkout subscription profile cache updated", {
+            user_id: userId,
+            checkout_session_id: session.id,
+            subscription_id: sub.id,
+            status: sub.status,
+          });
+        }
+      }
 
       if (kind && kind !== "subscription" && packType && userId) {
         const credits = resolvePackCredits(packType);

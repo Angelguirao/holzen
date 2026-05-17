@@ -2,6 +2,7 @@ import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import Stripe from "https://esm.sh/stripe@18.5.0";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.57.2";
 import { withRequestLogging } from "../_shared/with-request-logging.ts";
+import { syncProfileFromStripeSubscription } from "../_shared/subscription-profile-sync.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -62,12 +63,12 @@ serve(
         limit: 20,
       });
 
-      const current = existing.data.find((s) =>
+      const current = existing.data.find((s: Stripe.Subscription) =>
         s.status === "trialing" || s.status === "active"
       );
 
       if (current) {
-        log.info("trial_exists", { status: current.status, subscription_id: current.id });
+        log("trial_exists", { status: current.status, subscription_id: current.id });
         return new Response(
           JSON.stringify({
             ok: true,
@@ -89,7 +90,20 @@ serve(
         metadata: { user_id: user.id, plan_tier: "pro", source: "ensure_trial" },
       });
 
-      log.info("trial_created", { subscription_id: subscription.id, status: subscription.status });
+      const serviceClient = createClient(
+        Deno.env.get("SUPABASE_URL") ?? "",
+        Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? "",
+        { auth: { persistSession: false } },
+      );
+      await syncProfileFromStripeSubscription(
+        serviceClient,
+        user.id,
+        subscription,
+        priceIdPro,
+        Deno.env.get("STRIPE_PRICE_ID_PRO_PLUS") ?? null,
+      );
+
+      log("trial_created", { subscription_id: subscription.id, status: subscription.status });
 
       return new Response(
         JSON.stringify({
