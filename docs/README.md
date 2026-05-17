@@ -4,6 +4,8 @@ This folder contains human-readable notes that complement the source code and in
 
 ## Start here (new contributors)
 
+**Shipping pause-first?** Tick [ops/ship-checklist.md](ops/ship-checklist.md) (agent work is done on `feature/mvpPauseCleanup`; you finish Lovable publish + prod migrations).
+
 1. **[src/README.md](../src/README.md)** — what ships in active `src/` (4-tab pause-first surface).
 2. **[ops/active-surface.md](ops/active-surface.md)** — routes, edges, crons, dropped tables, PostHog events (canonical shipped manifest).
 3. **[architecture/c4-holzen.md](architecture/c4-holzen.md)** — who the system talks to (System Context + Container). Optional: [workspace.dsl](architecture/workspace.dsl) in Structurizr.
