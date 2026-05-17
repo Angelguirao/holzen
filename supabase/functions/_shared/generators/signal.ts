@@ -28,7 +28,11 @@ import { enqueueCatalogSourceSuggestion } from "../source-suggestions.ts";
 import { callPerplexityChat, mergePerplexityUsage } from "../perplexity-client.ts";
 import { fetchInitWithIncomingTrace } from "../forward-trace-headers.ts";
 import { validateSource } from "../source-validation.ts";
-import { searchLibrary, essayToSignal, recordLibraryServe } from "../content-library.ts";
+import {
+  searchCompanionCatalog,
+  essayToSignal,
+  recordCatalogServe,
+} from "../companion-catalog.ts";
 import { preferNonYoutubeCitationsFirst } from "../recent-signal-urls.ts";
 import { getPhaseConfig } from "../phase-config.ts";
 import { type CompanionCacheTitleRow } from "../companion-cache-dedup.ts";
@@ -132,10 +136,8 @@ export interface SignalResult {
     url: string;
     quote?: string;
   } | null;
-  /** `library` = served from `content_library`; `cache` = served from runtime `companion_cache`. Keep
-   *  them distinct — they're populated and invalidated separately, and monitoring treats them as
-   *  different phases. */
-  source: "live" | "library" | "cache" | "curated" | "empty";
+  /** `catalog` = `companion_catalog`; `cache` = `companion_cache` — distinct pools and invalidation. */
+  source: "live" | "catalog" | "library" | "cache" | "curated" | "empty";
   cacheId: string | null;
   /** Set when `serveFromCache` served this row (not library / curated). */
   cacheRelaxation?: CacheServeRelaxation;
@@ -171,22 +173,21 @@ export interface GenerateSignalParams {
 
 // ── Internals ──
 
-/** Try content_library (essays) for signal. */
-async function tryLibrary(
+async function tryCatalog(
   svcClient: SupabaseClient,
   userId?: string,
 ): Promise<SignalResult | null> {
-  const libraryRows = await searchLibrary(svcClient, {
+  const rows = await searchCompanionCatalog(svcClient, {
     type: "essay",
     companionType: "signal",
     userId,
     includeStale: false,
   });
-  if (libraryRows.length > 0) {
-    const pick = libraryRows[Math.floor(Math.random() * Math.min(libraryRows.length, 3))];
+  if (rows.length > 0) {
+    const pick = rows[Math.floor(Math.random() * Math.min(rows.length, 3))];
     const result = essayToSignal(pick);
-    recordLibraryServe(svcClient, userId, pick.id, "signal");
-    return { data: result, source: "library", cacheId: null };
+    recordCatalogServe(svcClient, userId, pick.id, "signal");
+    return { data: result, source: "catalog", cacheId: null };
   }
   return null;
 }
@@ -230,7 +231,7 @@ async function serveCurated(svcClient: SupabaseClient): Promise<SignalResult> {
   return { data: pickRandom(pool), source: "curated", cacheId: null };
 }
 
-/** Resolve from non-live phases in order (library → cache → curated). */
+/** Resolve from non-live phases in order (catalog → cache → curated). */
 async function serveFallback(
   svcClient: SupabaseClient,
   userId?: string,
@@ -242,9 +243,9 @@ async function serveFallback(
     return { data: null, source: "empty", cacheId: null, error: COMPANION_FALLBACKS_DISABLED_MESSAGE };
   }
   const phases = getPhaseConfig();
-  if (phases.library) {
-    const lib = await tryLibrary(svcClient, userId);
-    if (lib) return lib;
+  if (phases.catalog) {
+    const cat = await tryCatalog(svcClient, userId);
+    if (cat) return cat;
   }
   if (phases.cache) {
     const cached = await tryCache(svcClient, userId, marketDirection, excludeIds, false, structuredLog);
@@ -294,12 +295,11 @@ export async function generateSignal(params: GenerateSignalParams): Promise<Sign
   const liveEnabled = phases.live && !skipLive;
 
   if (!forceLive) {
-  // ── Phase 1: Library ──
-  if (phases.library) {
-    const lib = await tryLibrary(svcClient, userId);
-    if (lib) {
-      log("signal resolved from library (phase 1)");
-      return lib;
+  if (phases.catalog) {
+    const cat = await tryCatalog(svcClient, userId);
+    if (cat) {
+      log("signal resolved from catalog (phase 1)");
+      return cat;
     }
   }
 

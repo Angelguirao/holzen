@@ -178,7 +178,7 @@ export async function handleRegenerateOnly(params: {
     .from("pause_ai_artifacts")
     .select("content")
     .eq("pause_instance_id", pauseInstanceId)
-    .eq("kind", "opening_message")
+    .eq("kind", "reflection_text")
     .maybeSingle();
 
   const ctxSnapshot = (instance.context_snapshot ?? {}) as Record<string, unknown>;
@@ -222,7 +222,7 @@ export async function handleRegenerateOnly(params: {
 
   type CompanionResult = {
     data: unknown;
-    source: "live" | "library" | "cache" | "curated" | "empty";
+    source: "live" | "catalog" | "library" | "cache" | "curated" | "empty";
     cacheId: string | null;
     cacheRelaxation?: string | null;
     latencyMs: number;

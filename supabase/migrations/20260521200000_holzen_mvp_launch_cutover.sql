@@ -1,4 +1,4 @@
--- Pause-first MVP launch cutover (§20.3, §17.5, §20.8, §21.2, roadmap seed).
+-- Pause-first MVP launch cutover (§20.3, §17.5, §20.8, §20.4.1 companion_catalog, roadmap seed).
 -- Fallback tail migration (no baseline squash). Single transaction.
 
 BEGIN;
@@ -23,65 +23,9 @@ DELETE FROM public.notifications
  WHERE type IN ('badge', 'insight', 'letter', 'night_reflection');
 
 -- ---------------------------------------------------------------------------
--- C. Artifact kind rename: reflection_text → opening_message (§21.2)
+-- C. Reflect-step artifact kind: keep `reflection_text` (do not rename to opening_message)
 -- ---------------------------------------------------------------------------
-UPDATE public.pause_ai_artifacts
-   SET kind = 'opening_message'
- WHERE kind = 'reflection_text';
-
-CREATE OR REPLACE FUNCTION public.pause_notification_metadata(p_pause_instance public.pause_instances)
-RETURNS jsonb
-LANGUAGE sql
-STABLE
-SET search_path = public
-AS $$
-  SELECT jsonb_build_object(
-    'pause_instance_id', p_pause_instance.id,
-    'template_slug', (SELECT slug FROM public.pause_templates WHERE id = p_pause_instance.template_id),
-    'source', p_pause_instance.source,
-    'severity', p_pause_instance.context_snapshot->>'severity',
-    'context', p_pause_instance.context_snapshot->>'context_text',
-    'message', (
-      SELECT NULLIF(trim(a.content->>'message'), '')
-      FROM public.pause_ai_artifacts a
-      WHERE a.pause_instance_id = p_pause_instance.id
-        AND a.kind = 'opening_message'
-      ORDER BY a.created_at DESC
-      LIMIT 1
-    ),
-    'window_ends_at', p_pause_instance.window_ends_at,
-    'pending_offer', p_pause_instance.state = 'pending'
-  );
-$$;
-
-CREATE OR REPLACE FUNCTION public.notifications_enrich_pause_from_reflection_artifact()
-RETURNS trigger
-LANGUAGE plpgsql
-SET search_path = public
-AS $$
-DECLARE
-  v_msg text;
-BEGIN
-  IF NEW.kind <> 'opening_message' THEN
-    RETURN NEW;
-  END IF;
-
-  v_msg := NULLIF(trim(NEW.content->>'message'), '');
-  IF v_msg IS NULL THEN
-    RETURN NEW;
-  END IF;
-
-  UPDATE public.notifications n
-     SET metadata = COALESCE(n.metadata, '{}'::jsonb) || jsonb_build_object('message', v_msg),
-         updated_at = now()
-   WHERE n.source_table = 'pause_instances'
-     AND n.source_id = NEW.pause_instance_id
-     AND n.type = 'pause'
-     AND n.dismissed_at IS NULL;
-
-  RETURN NEW;
-END;
-$$;
+-- Notification helpers already use reflection_text (20260520153000_pause_reflect_step_cleanup.sql).
 
 -- ---------------------------------------------------------------------------
 -- D. Tier B tables (§20.3)
@@ -95,8 +39,11 @@ DROP TABLE IF EXISTS public.night_reflections CASCADE;
 DROP TABLE IF EXISTS public.graph_edges CASCADE;
 DROP TABLE IF EXISTS public.ritual_completions CASCADE;
 DROP TABLE IF EXISTS public.ritual_templates CASCADE;
-DROP TABLE IF EXISTS public.grounding_enrichment_cache CASCADE;
-DROP TABLE IF EXISTS public.content_library CASCADE;
+-- grounding_enrichment_cache: KEEP — shipped `grounding-enrich` edge (companion Full View)
+-- §20.4.1: curated companion pool → companion_catalog (not user Archive / collections)
+ALTER TABLE IF EXISTS public.content_library RENAME TO companion_catalog;
+COMMENT ON TABLE public.companion_catalog IS
+  'Curated essays, papers, and events for companion catalog phase (renamed from content_library at pause-first launch).';
 
 -- ---------------------------------------------------------------------------
 -- E. Telemetry baseline (§20.8)
@@ -193,7 +140,7 @@ END;
 $function$;
 
 -- ---------------------------------------------------------------------------
--- G. v_pause_full + archive views (opening_message column)
+-- G. v_pause_full + archive views (reflection_text column)
 -- ---------------------------------------------------------------------------
 CREATE OR REPLACE VIEW public.v_pause_full WITH (security_invoker = true) AS
 SELECT
@@ -211,7 +158,7 @@ SELECT
   COALESCE((SELECT (payload->>'is_favorite')::boolean FROM public.pause_step_events e WHERE e.pause_instance_id = pi.id AND e.step_type = 'favorite_toggled' ORDER BY e.created_at DESC LIMIT 1), false) AS is_favorite,
   (SELECT count(*) FROM public.pause_companion_events ce WHERE ce.pause_instance_id = pi.id AND ce.action='complete' AND ce.counts_for_pause=true)::int AS counted_companion_count,
   (SELECT COALESCE(array_agg(DISTINCT ce.companion_type), ARRAY[]::text[]) FROM public.pause_companion_events ce WHERE ce.pause_instance_id = pi.id AND ce.action='complete' AND ce.counts_for_pause=true) AS counted_companion_types,
-  (SELECT content->>'message' FROM public.pause_ai_artifacts a WHERE a.pause_instance_id = pi.id AND a.kind = 'opening_message' LIMIT 1) AS opening_message,
+  (SELECT content->>'message' FROM public.pause_ai_artifacts a WHERE a.pause_instance_id = pi.id AND a.kind = 'reflection_text' LIMIT 1) AS reflection_text,
   (SELECT content->>'haiku' FROM public.pause_ai_artifacts a WHERE a.pause_instance_id = pi.id AND a.kind = 'haiku' LIMIT 1) AS haiku_text,
   (SELECT NULLIF(trim(both from (e.payload->>'intensity')), '')::smallint FROM public.pause_step_events e WHERE e.pause_instance_id = pi.id AND e.step_type = 'initial_emotion_logged' ORDER BY e.created_at DESC LIMIT 1) AS initial_emotion_intensity,
   (SELECT NULLIF(trim(both from (e.payload->>'shift_intensity')), '')::smallint FROM public.pause_step_events e WHERE e.pause_instance_id = pi.id AND e.step_type = 'shift_emotion_logged' ORDER BY e.created_at DESC LIMIT 1) AS shift_emotion_intensity,
@@ -222,7 +169,7 @@ FROM public.pause_instances pi;
 
 COMMENT ON VIEW public.v_pause_full IS
   'Rich join of pause_instances + step presence + companion counts + artifact text + latest mood/intensity. '
-  'opening_message: reflect-step AI copy (pause_ai_artifacts.kind = opening_message).';
+  'reflection_text: reflect-step AI copy (pause_ai_artifacts.kind = reflection_text).';
 
 CREATE OR REPLACE VIEW public.v_pause_archive_pauses AS
 SELECT vf.* FROM public.v_pause_full vf
