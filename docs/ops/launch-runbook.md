@@ -29,11 +29,11 @@ npm run check:release-stamp
 
 Optional (bash): `npm run check:prepush`
 
-Bundle guard (optional — no legacy UI strings in production assets):
+Bundle guard (no legacy UI strings in production assets):
 
 ```bash
 npm run build
-rg -l "BadgesPanelV2|ToolsHub" dist/assets/*.js && exit 1 || echo "bundle clean"
+npm run check:bundle-shipped
 ```
 
 Naming audit (plan §5.0):

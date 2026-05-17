@@ -1,8 +1,20 @@
 import { render, type RenderOptions } from '@testing-library/react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import type { ReactNode } from 'react';
 import { Suspense } from 'react';
+import { vi } from 'vitest';
 import { MemoryRouter } from 'react-router-dom';
 import { reactRouterFutureFlags } from '@/lib/router-future';
+
+/** App embeds `BrowserRouter`; tests supply `MemoryRouter` — passthrough avoids nested routers. */
+vi.mock('react-router-dom', async (importOriginal) => {
+  const mod = await importOriginal<typeof import('react-router-dom')>();
+  return {
+    ...mod,
+    BrowserRouter: ({ children }: { children: ReactNode }) => children,
+  };
+});
+
 import App from '@/App';
 
 function createTestQueryClient() {

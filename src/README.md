@@ -23,6 +23,7 @@ Dead IA (`/tools/*`, `/library`, `/journey/stats`, …) → `NotFound` (no legac
 | Pause lifecycle | `lib/pause-*.ts`, `components/pause/` |
 | Subscription | `hooks/use-subscription.ts`, §5.4 in launch plan |
 | Legacy full IA | [`legacy/README.md`](legacy/README.md) — **not imported** |
+| i18n | Shipped: `locales/en.json` only; archived langs in `legacy/locales/` |
 
 ## Manifest
 

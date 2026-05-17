@@ -13,7 +13,7 @@ Related: [navigating-the-codebase.md](navigating-the-codebase.md) §3 (short boo
 | | `index.html` | `src/` (React) |
 |---|----------------|----------------|
 | **Role** | Static shell: metadata, mount point, early boot scripts | UI, routing, data, features |
-| **Routes** | Same file for `/`, `/pause`, `/journey/stats`, etc. | `App.tsx` + `react-router` choose the screen |
+| **Routes** | Same file for `/`, `/pause`, `/journey`, etc. (client router picks the screen) | `App.tsx` + `react-router` choose the screen |
 | **When it changes** | SEO/PWA meta, boot recovery, Vite entry | Almost all product work |
 
 You do **not** add new screens by adding new HTML files. You add pages under `src/pages/` and routes in `src/App.tsx`.
