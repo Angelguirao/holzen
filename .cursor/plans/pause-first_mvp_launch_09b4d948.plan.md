@@ -28,7 +28,7 @@ isProject: false
 
 | Field                  | Value                                                     |
 | ---------------------- | --------------------------------------------------------- |
-| **Status**             | **Implemented** on `feature/mvpPauseCleanup` (steps 1–6) — **ship pending** ([launch-runbook](docs/ops/launch-runbook.md)) |
+| **Status**             | **Implemented + pushed** (`806009f3`) — **Lovable publish + prod cutover verify** human ([launch-runbook](docs/ops/launch-runbook.md)) |
 | **Version**            | 2026-05-17 (v3.15 — repo audit reconciled; §30.2.1) |
 | **Review**             | §30.1 · §30.2 audit · [§30.3 freeze](#s30-3) · [Locked](#s30-5) · [Design](#s31) |
 | **Base branch** | `main` |
