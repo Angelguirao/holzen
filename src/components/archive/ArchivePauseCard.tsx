@@ -11,7 +11,7 @@ import { pauseArchiveRowAllowsRetrospectiveOutcome } from '@/lib/pause-archive-r
 
 function firstPreviewSource(row: PauseArchiveRow): string {
   const parts = [
-    row.opening_message,
+    row.reflection_text,
     row.haiku_text,
     row.note_text,
     row.outcome,

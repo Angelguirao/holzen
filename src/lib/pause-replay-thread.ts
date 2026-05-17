@@ -45,7 +45,7 @@ export async function loadPauseReplayThread(pauseInstanceId: string): Promise<
 > {
   const { data: row, error } = await supabase
     .from('v_pause_full')
-    .select('id, created_at, initial_mood, outcome, context_snapshot, opening_message, state')
+    .select('id, created_at, initial_mood, outcome, context_snapshot, reflection_text, state')
     .eq('id', pauseInstanceId)
     .maybeSingle();
 
@@ -86,7 +86,7 @@ export async function loadPauseReplayThread(pauseInstanceId: string): Promise<
     mood: row.initial_mood,
     outcome: row.outcome,
     context: contextTextFromSnapshot(row.context_snapshot as Record<string, unknown> | null),
-    aiPrompt: row.opening_message,
+    aiPrompt: row.reflection_text,
     userWords,
   };
 
@@ -96,7 +96,7 @@ export async function loadPauseReplayThread(pauseInstanceId: string): Promise<
 export type PausePickerRow = {
   id: string;
   created_at: string;
-  opening_message: string | null;
+  reflection_text: string | null;
 };
 
 export const REPLAY_RECENT_PAUSES_NONE_QUERY_KEY = [
@@ -164,7 +164,7 @@ export function getPauseReplayThreadQueryOptions(params: {
 export async function loadRecentCompletedPausesForReplay(limit = 24): Promise<PausePickerRow[]> {
   const { data, error } = await supabase
     .from('v_pause_full')
-    .select('id, created_at, opening_message')
+    .select('id, created_at, reflection_text')
     .eq('state', 'completed')
     .order('created_at', { ascending: false })
     .limit(limit);

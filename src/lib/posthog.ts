@@ -19,7 +19,6 @@ const PII_VALUE_KEYS = new Set<string>([
   "user_email",
   "reflection",
   "reflection_text",
-  "opening_message",
   "reflection_body",
   "journal",
   "journal_text",

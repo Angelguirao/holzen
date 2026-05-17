@@ -25,6 +25,10 @@ Dead IA (`/tools/*`, `/library`, `/journey/stats`, …) → `NotFound` (no legac
 | Legacy full IA | [`legacy/README.md`](legacy/README.md) — **not imported** |
 | i18n | Shipped: `locales/en.json` only; archived langs in `legacy/locales/` |
 
+## Architecture
+
+[`docs/fundamentals/holzen-application-architecture.md`](../docs/fundamentals/holzen-application-architecture.md) — principles for bounded contexts, use cases, and target package layout (read before large `src/` restructures).
+
 ## Manifest
 
 [`docs/ops/active-surface.md`](../docs/ops/active-surface.md) — routes, edges, crons, tables, events (canonical).

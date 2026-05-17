@@ -1,6 +1,6 @@
 # Bruno — pause-first shipped (start here)
 
-**Default collection tree** for Holzen MVP HTTP review. Open collection root [`../`](../) in Bruno, then run requests under **`active/`** only unless you are debugging pre-strip behavior ([`../legacy/full-shell/`](../legacy/full-shell/)).
+**Default collection tree** for Holzen shipped-surface HTTP review. Open collection root [`../`](../) in Bruno, then run requests under **`active/`** only unless you are debugging pre-strip behavior ([`../legacy/full-shell/`](../legacy/full-shell/)).
 
 Environment: **`hosted`** or **`local`** ([`../environments/`](../environments/)). Run **`auth/01-sign-in-password`** first for any user-JWT request.
 

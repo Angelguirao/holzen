@@ -136,7 +136,7 @@ export interface SessionRow {
   id: string;
   created_at: string;
   state: string;
-  opening_message: string | null;
+  reflection_text: string | null;
   context_snapshot: Record<string, unknown> | null;
   initial_mood: string | null;
   outcome: string | null;
@@ -246,7 +246,7 @@ export async function fetchAdminStatsBundle(): Promise<AdminStatsBundle> {
   const { data: sessionData } = await supabase
     .from('v_pause_full' as never)
     .select(
-      'id, created_at, state, opening_message, context_snapshot, initial_mood, outcome, haiku_text, counted_companion_types',
+      'id, created_at, state, reflection_text, context_snapshot, initial_mood, outcome, haiku_text, counted_companion_types',
     )
     .order('created_at', { ascending: false })
     .limit(20);

@@ -1,4 +1,4 @@
-# Deployed Edge Functions (MVP)
+# Deployed Edge Functions (shipped)
 
 Base URL: **`{{VITE_SUPABASE_URL}}/functions/v1/<name>`**
 
@@ -26,11 +26,11 @@ Source of truth: `supabase/config.toml` + [active-surface.md](../../docs/ops/act
 | `backfill-btc-prices` | `service-cron/` | `SERVICE_CRON_BEARER` | ops |
 | `seed-btc-history` | `service-cron/` | `SERVICE_CRON_BEARER` | ops |
 | `auth-email-hook` | `auth-hook/` | Signed webhook / preview key | optional |
-| `retry-flex-credit` | — | User JWT | no `.bru` yet |
+| `retry-flex-credit` | `billing/` | User JWT | Y |
 | `list-checkout-events` | — | User JWT | no `.bru` yet |
 | `notify-checkout-confirmation` | — | varies | no `.bru` yet |
 | `ai-cost-alert` | — | service | no `.bru` yet |
-| `grounding-enrich` | — | — | no `.bru` (legacy tools) |
+| `grounding-enrich` | `pause-pipeline/` | User JWT | Y (companion Full View) |
 | `process-email-queue` | — | admin/service | no `.bru` yet |
 | `send-transactional-email` | — | service | no `.bru` yet |
 | `preview-transactional-email` | — | service | no `.bru` yet |

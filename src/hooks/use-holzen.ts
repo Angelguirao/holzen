@@ -45,7 +45,7 @@ function markPauseManualStartedHomeOnce(): void {
  * Pause V2 manual-trigger hook. Opens a `pause_instances` row via `pause_create_or_reuse`
  * (+ context snapshot). Non-silent reflection text is generated later in the deep ritual via
  * `holzen-reflect` (`PauseSession` + `use-pause-reflect-generation`, enabled on Reflect, Frame,
- * second Breathe, and Decide). Silent mode still writes a stub `opening_message` artifact here.
+ * second Breathe, and Decide). Silent mode still writes a stub `reflection_text` artifact here.
  */
 export function useHolzen() {
   const { user } = useAuth();
@@ -147,7 +147,7 @@ export function useHolzen() {
     let groundingTitle: string | null = null;
     let groundingBody: string | null = null;
     for (const a of ((artifacts ?? []) as Array<{ kind: string; content: Record<string, unknown> }>)) {
-      if (a.kind === 'opening_message' && typeof a.content?.message === 'string') {
+      if (a.kind === 'reflection_text' && typeof a.content?.message === 'string') {
         msg = a.content.message as string;
       } else if (a.kind === 'haiku' && typeof a.content?.haiku === 'string') {
         haiku = a.content.haiku as string;
@@ -273,7 +273,7 @@ export function useHolzen() {
             {
               pause_instance_id: res.instance_id,
               user_id: user.id,
-              kind: 'opening_message',
+              kind: 'reflection_text',
               content: { message: silentMsg, context: ctx },
             } as never,
             { onConflict: 'pause_instance_id,kind' } as never,

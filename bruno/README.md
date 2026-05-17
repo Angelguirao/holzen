@@ -35,7 +35,7 @@ After auth, `active/auth/00` and `01` set **`SUPABASE_ACCESS_TOKEN`** (and **`AU
 | **`legacy/full-shell/`** | Retired full-IA `.bru` (undeployed on prod) |
 | **`environments/`** | `local` / `hosted` vars |
 
-## Typical MVP flow
+## Typical shipped-surface flow
 
 1. `active/auth/01-sign-in-password`
 2. `active/pause-pipeline/*`, `active/billing/*`, `active/platform/health`
