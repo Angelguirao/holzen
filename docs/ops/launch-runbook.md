@@ -7,7 +7,7 @@ Human checklist for shipping `feature/mvpPauseCleanup` to production. Canonical 
 | Step | Status |
 | --- | --- |
 | Steps 1–6 code + CI + docs | ✅ on `feature/mvpPauseCleanup` |
-| `git push` | ✅ tip **`806009f3`** (`EDGE_RELEASE` matches HEAD) |
+| `git push` | ✅ tip **`038c7c84`** · set `VITE_APP_VERSION` / `SENTRY_RELEASE` to this SHA on publish |
 | Linked DB migrations + cutover verify | 🚢 you |
 | Lovable **Publish → Update** | 🚢 you |
 | §3.1 no real prod users (before destructive cutover) | 🚢 you |
