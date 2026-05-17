@@ -2367,7 +2367,8 @@ Cross-check of §0–§33 against **`feature/mvpPauseCleanup`** working tree (no
 | --- | --- | --- |
 | §1–6 Product / scope | ✅ | 4-tab shell, trial/lapsed, 404-only dead IA |
 | §7–13 Surfaces | ✅ | Journey, Archive, Home, onboarding, Settings, roadmap |
-| §14 Steps 1–6 | ✅ | Code landed; **ship** = human push + Lovable publish |
+| §14 Steps 1–6 | ✅ | Code landed + **pushed** (`6356ff69`); **Lovable publish** + prod migration verify = human |
+| §32 Ship | ✅ pushed · 🚢 publish | GitHub sync done; [launch-runbook](docs/ops/launch-runbook.md) §3–5 remain |
 | §17 Edges | ✅ | Legacy in `functions/legacy/full-shell/`; **`grounding-enrich` deployed**; no `export-user-data` in repo |
 | §20.4.1 Companion | ✅ | **RENAME** → `companion_catalog`; `companion-catalog.ts` + catalog phase |
 | §20.7 Baseline squash | ⚠️ | Tail cutover `20260521200000_*` instead of `holzen_schema_baseline.sql` — **accepted fallback** |
@@ -2497,7 +2498,7 @@ Short list:
 1. Steps 1–6 on `feature/mvpPauseCleanup`; tag `full-ia-pre-strip` before Step 3 moves / Step 5 DROP.
 2. §14.3 all green (not only `npm run test`).
 3. §20.8 telemetry baseline recorded in `active-surface.md`.
-4. Push → migrations/edges apply → Lovable **Publish → Update**.
+4. ~~Push~~ ✅ (`806009f3` on `origin/feature/mvpPauseCleanup`) → migrations/edges apply → Lovable **Publish → Update**.
 5. PostHog/Sentry smoke; monitor `holzen-reflect`, `companion-orchestrate`, `pregenerate-companions`.
 6. `changelog_entries` + version when user-facing release warrants it.
 
