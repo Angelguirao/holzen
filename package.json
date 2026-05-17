@@ -13,6 +13,7 @@
     "lint": "eslint .",
     "preview": "vite preview",
     "test": "vitest run",
+    "test:legacy": "vitest run src/test/legacy",
     "test:watch": "vitest",
     "test:ci": "npm run check:edge-logging && npm run check:edge-coverage-manifest && npm run check:active-surface && npm run check:no-phase-labels && npm run check:invoke-edge-allowlist && vitest run --coverage --reporter=default --reporter=junit --outputFile.junit=./coverage/junit.xml",
     "test:coverage": "vitest run --coverage",
