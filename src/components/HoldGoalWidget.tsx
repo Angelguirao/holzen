@@ -7,7 +7,7 @@ import { useAuth } from '@/hooks/use-auth';
 import { useHolzen } from '@/hooks/use-holzen';
 import { getProfileRowQueryOptions, PROFILE_QUERY_KEY } from '@/features/user/public-queries';
 import { formatBtcPrice, SUPPORTED_CURRENCIES } from '@/features/market/public';
-import { computeHoldGoalCompactHeadline } from '@/lib/hold-goal-headline';
+import { computeHoldGoalCompactHeadline } from '@/features/user/public';
 import { Target, Calendar, Coins, Infinity as InfinityIcon, X, Check, Pencil } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';

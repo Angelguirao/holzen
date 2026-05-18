@@ -13,3 +13,4 @@ export {
   PROFILE_QUERY_KEY,
   type ProfileRow,
 } from './infrastructure/queries/profile-row-query';
+export { getHoldGoalProfileQueryOptions } from './infrastructure/queries/hold-goal-profile-query';
