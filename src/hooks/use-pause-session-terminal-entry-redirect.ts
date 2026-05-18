@@ -9,9 +9,9 @@ import {
 } from '@/features/pause/application/session/terminal-entry-guard';
 import type { PauseState } from '@/features/pause/domain/pause-state';
 import type { FetchedPauseInstance, PersistedSession } from '@/lib/pause-session-storage';
-import { getPauseTerminalEntryStateQueryOptions } from '@/lib/pause-terminal-entry-state-query';
+import { getPauseTerminalEntryStateQueryOptions } from '@/features/pause/infrastructure/queries/terminal-entry-state-query';
 
-export { pauseTerminalEntryStateQueryKey } from '@/lib/pause-terminal-entry-state-query';
+export { pauseTerminalEntryStateQueryKey } from '@/features/pause/infrastructure/queries/terminal-entry-state-query';
 
 /**
  * Blocks `/pause` when the instance is already terminal in Postgres unless the tab still has
