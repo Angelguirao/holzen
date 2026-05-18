@@ -60,6 +60,19 @@ export {
   type RitualDepth,
 } from './domain/ritual-types';
 export {
+  DEFAULT_COMPANIONS,
+  DEFAULT_PREFS,
+  type FetchedPauseInstance,
+  type PersistedSession,
+} from './domain/session-model';
+export { companionDataFromArtifacts } from './application/companion/companion-data-from-artifacts';
+export { migratePersistedPauseSession } from './application/session/migrate-persisted-session';
+export {
+  clearSession,
+  loadSession,
+  saveSession,
+} from './infrastructure/session/persisted-session-storage';
+export {
   getInterventionIdempotencyDecision,
   hasInvokedIntervention,
   resetInterventionIdempotency,

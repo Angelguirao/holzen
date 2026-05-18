@@ -1,6 +1,6 @@
 import type { CompanionData, CompanionPrefs } from '@/components/CompanionSection';
 import type { PauseSessionHydrationReady } from '@/features/pause/application/session/hydration';
-import { DEFAULT_COMPANIONS, DEFAULT_PREFS } from '@/lib/pause-session-storage';
+import { DEFAULT_COMPANIONS, DEFAULT_PREFS } from '@/features/pause/domain/session-model';
 
 /**
  * Normalizes `PauseSessionHydrationReady | null` into the shell fields the `/pause` route reads

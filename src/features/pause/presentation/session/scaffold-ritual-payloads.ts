@@ -6,7 +6,7 @@ import type { PauseBreathingHandle } from '@/components/pause/PauseBreathing';
 import type { PauseSessionBriefRitualBodyProps } from '@/components/pause/PauseSessionBriefRitualBody';
 import type { PauseSessionDeepRitualBodyProps } from '@/components/pause/PauseSessionDeepRitualBody';
 import type { PauseStep } from '@/components/pause/PauseProgress';
-import type { BriefPauseStep } from '@/lib/pause-session-storage';
+import type { BriefPauseStep } from '@/features/pause/domain/ritual-types';
 import type { PauseSessionStepTransitionConfig } from '@/features/pause/application/session/step-transition';
 
 /**

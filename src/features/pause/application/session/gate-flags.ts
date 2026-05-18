@@ -1,4 +1,5 @@
-import type { FetchedPauseInstance, RitualDepth } from '@/lib/pause-session-storage';
+import type { RitualDepth } from '@/features/pause/domain/ritual-types';
+import type { FetchedPauseInstance } from '@/features/pause/domain/session-model';
 import type { PauseSessionHydrationState } from '@/features/pause/application/session/hydration';
 
 /**

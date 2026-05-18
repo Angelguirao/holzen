@@ -1,5 +1,5 @@
 import { supabase } from '@/integrations/supabase/client';
-import type { FetchedPauseInstance } from '@/lib/pause-session-storage';
+import type { FetchedPauseInstance } from '@/features/pause/domain/session-model';
 import {
   buildFetchedPauseInstanceFromFetch,
   type PauseInstanceContextSnapshotRow,
