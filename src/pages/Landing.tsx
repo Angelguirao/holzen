@@ -16,7 +16,7 @@ import { PageMeta } from '@/components/PageMeta';
 import { LandingTestimonials } from '@/components/LandingTestimonials';
 import { LandingLanguageSwitcher } from '@/components/LandingLanguageSwitcher';
 import { PRICING } from '@/lib/pricing';
-import { prefetchCoingeckoBtcUsd } from '@/lib/coingecko-btc-usd-query';
+import { prefetchCoingeckoBtcUsd } from '@/features/market/public';
 import { prefetchBlogPublishedFirstPage } from '@/lib/blog-post-query';
 
 function Section({ children, className = '', delay = 0 }: { children: React.ReactNode; className?: string; delay?: number }) {

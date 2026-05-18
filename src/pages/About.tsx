@@ -6,7 +6,7 @@ import { ArrowLeft } from 'lucide-react';
 import { PageMeta } from '@/components/PageMeta';
 import { PublicFooter } from '@/components/PublicFooter';
 import { PageHeading } from '@/components/PageHeading';
-import { prefetchCoingeckoBtcUsd } from '@/lib/coingecko-btc-usd-query';
+import { prefetchCoingeckoBtcUsd } from '@/features/market/public';
 
 const fade = (delay = 0) => ({
   initial: { opacity: 0, y: 14 },
