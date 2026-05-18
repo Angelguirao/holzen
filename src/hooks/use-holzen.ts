@@ -16,7 +16,7 @@ import { useAuth } from '@/hooks/use-auth';
 import { useProfile } from '@/hooks/use-profile';
 import type { CompanionData } from '@/components/CompanionSection';
 import { holzenLog } from '@/lib/holzen-console';
-import { reflectionPersistErrorMessage } from '@/lib/reflection-persist-error';
+import { reflectionPersistErrorMessage } from '@/features/pause/application/use-cases/reflection-persist-error';
 import {
   buildPauseContextFromMarket,
   getManualReflectionCooldownMs,
