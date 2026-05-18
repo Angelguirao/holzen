@@ -9,8 +9,11 @@ import {
   type ReactNode,
 } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
-import type { BtcPriceData } from '@/lib/btc';
-import { getHolzenMarketDisplayQueryOptions } from '@/lib/holzen-market-display-query';
+import {
+  getHolzenMarketDisplayQueryOptions,
+  holzenMarketDisplayQueryKey,
+  type BtcPriceData,
+} from '@/features/market/public';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/use-auth';
 import { useProfile } from '@/hooks/use-profile';
@@ -22,7 +25,7 @@ import {
   getManualReflectionCooldownMs,
   isHolzenDevMode,
 } from '@/features/market/public';
-import { normalizeTrackedAssetId, trackedAssetSymbol } from '@/lib/tracked-assets';
+import { normalizeTrackedAssetId, trackedAssetSymbol } from '@/features/market/public';
 import { severityFromBtcChangePercent } from '@/features/market/public';
 import { millisecondsUntilNextQuarterHour } from '@/lib/next-cron-quarter';
 import {
@@ -40,7 +43,7 @@ import {
 
 const PAUSE_MANUAL_START_HOME = 'holzen_sess_pause_manual_started_home';
 
-export { holzenMarketDisplayQueryKey } from '@/lib/holzen-market-display-query';
+export { holzenMarketDisplayQueryKey };
 
 /** Once per tab session: user kicked off a manual “Need a moment” (opens pause instance) from Home. */
 function markPauseManualStartedHomeOnce(): void {

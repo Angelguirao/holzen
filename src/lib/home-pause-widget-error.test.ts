@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import type { TFunction } from 'i18next';
-import type { BtcPriceData } from '@/lib/btc';
+import type { BtcPriceData } from '@/features/market/public';
 import { PAUSE_PERSIST_ERROR_MARKER } from '@/lib/reflection-persist-error';
 import {
   isLikelyPriceOnlyMarketError,

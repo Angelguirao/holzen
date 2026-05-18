@@ -10,7 +10,7 @@ import { BulkHoldCard } from '@/components/BulkHoldCard';
 import { homeInWidget } from '@/components/home/home-widget-styles';
 import { cn } from '@/lib/utils';
 import { shouldSurfacePauseWidgetError } from '@/lib/home-pause-widget-error';
-import type { BtcPriceData } from '@/lib/btc';
+import type { BtcPriceData } from '@/features/market/public';
 import { usePendingPauseOffer } from '@/hooks/use-pending-pause-offer';
 import type { Entitlement } from '@/features/subscription/public';
 

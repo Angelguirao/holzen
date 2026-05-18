@@ -6,7 +6,7 @@ import { TrendingUp, TrendingDown, Clock, Globe, CloudOff, PenLine, ChevronDown,
 import { CompanionError } from './CompanionError';
 import { format } from 'date-fns';
 import { useHolzen } from '@/hooks/use-holzen';
-import { formatBtcPrice } from '@/lib/btc';
+import { formatBtcPrice } from '@/features/market/public';
 import { useSubscription } from '@/hooks/use-subscription';
 import { toast } from 'sonner';
 import { TOOLS } from '@/lib/app-routes';

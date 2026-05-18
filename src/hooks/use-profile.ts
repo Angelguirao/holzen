@@ -7,7 +7,7 @@ import { useAuth } from '@/hooks/use-auth';
 import { holzenLog } from '@/lib/holzen-console';
 import type { CompanionPrefs } from '@/components/CompanionSection';
 import type { Database } from '@/integrations/supabase/types';
-import { normalizeTrackedAssetId } from '@/lib/tracked-assets';
+import { normalizeTrackedAssetId } from '@/features/market/public';
 import {
   fetchProfileRowForUser,
   getProfileRowQueryOptions,

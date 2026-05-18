@@ -1,5 +1,5 @@
 import { differenceInDays } from 'date-fns';
-import { formatBtcPrice } from '@/lib/btc';
+import { formatBtcPrice } from '@/features/market/public';
 
 export type HoldGoalHeadlineGoal = {
   type: 'time' | 'price' | 'forever';

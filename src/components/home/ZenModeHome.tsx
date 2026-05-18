@@ -11,7 +11,7 @@ import { LoadingButton } from '@/components/ui/loading-button';
 import { Skeleton } from '@/components/ui/skeleton';
 import { SubscriptionSkeleton } from '@/components/SubscriptionSkeleton';
 import type { CompanionData, CompanionPrefs } from '@/components/CompanionSection';
-import type { BtcPriceData } from '@/lib/btc';
+import type { BtcPriceData } from '@/features/market/public';
 import type { BtcMoveSeverity } from '@/features/market/public';
 import { shouldSurfacePauseWidgetError } from '@/lib/home-pause-widget-error';
 import type { Entitlement } from '@/features/subscription/public';

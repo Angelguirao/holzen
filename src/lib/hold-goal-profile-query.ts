@@ -1,6 +1,6 @@
 import { getProfileRowQueryOptions } from '@/features/user/public';
 import type { Database } from '@/integrations/supabase/types';
-import { normalizeTrackedAssetId } from '@/lib/tracked-assets';
+import { normalizeTrackedAssetId } from '@/features/market/public';
 
 type ProfileRow = Database['public']['Tables']['profiles']['Row'];
 
