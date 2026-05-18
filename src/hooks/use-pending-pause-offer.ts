@@ -2,10 +2,14 @@ import { useCallback, useEffect } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/use-auth';
-import { getPendingPauseOfferQueryOptions, pendingPauseOfferQueryKey } from '@/lib/pending-pause-offer-query';
+import {
+  getPendingPauseOfferQueryOptions,
+  pendingPauseOfferQueryKey,
+  type PendingPauseOfferRow,
+} from '@/features/pause/infrastructure/queries/pending-pause-offer-query';
 
-export type { PendingPauseOfferRow } from '@/lib/pending-pause-offer-query';
-export { pendingPauseOfferQueryKey } from '@/lib/pending-pause-offer-query';
+export type { PendingPauseOfferRow };
+export { pendingPauseOfferQueryKey };
 
 /**
  * The single `state = 'pending'` pause row for the user (if any), plus a

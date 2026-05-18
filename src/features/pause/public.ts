@@ -18,6 +18,17 @@ export {
 export { pauseArchiveRowAllowsRetrospectiveOutcome } from './application/archive/retrospective-outcome';
 export { pauseArchiveListQueryPrefix } from './application/queries/archive-query-keys';
 export { getArchivePausesTabHasRowsQueryOptions } from './infrastructure/queries/archive-pauses-tab-query';
+export { getCompletedPauseCountQueryOptions } from './infrastructure/queries/completed-pause-count-query';
+export {
+  currentPauseQueryKey,
+  getCurrentPauseQueryOptions,
+  type CurrentPauseRow,
+} from './infrastructure/queries/current-pause-query';
+export {
+  getPendingPauseOfferQueryOptions,
+  pendingPauseOfferQueryKey,
+  type PendingPauseOfferRow,
+} from './infrastructure/queries/pending-pause-offer-query';
 export {
   type PauseArchiveListSort,
   type PauseArchiveRow,
