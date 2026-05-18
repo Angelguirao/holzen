@@ -17,7 +17,7 @@
 
 import { supabase } from '@/integrations/supabase/client';
 import { getHolzenQueryClient } from '@/lib/holzen-query-client-ref';
-import { invalidatePauseStatsDataForUser } from '@/lib/pause-stats-invalidate';
+import { invalidatePauseStatsDataForUser } from '@/features/pause/application/queries/invalidate-pause-stats';
 import { pauseSessionFetchedInstanceQueryKey } from '@/lib/pause-session-fetched-instance-query';
 import { pauseInstanceQueryPrefix } from '@/lib/pause-instance-query-prefix';
 import { pauseTerminalEntryStateQueryKey } from '@/lib/pause-terminal-entry-state-query';

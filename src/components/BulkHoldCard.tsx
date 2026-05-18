@@ -8,7 +8,7 @@ import { ChevronRight, Folder, List, X } from 'lucide-react';
 import { hapticFeedback } from '@/lib/haptics';
 import { applyBulkHoldOutcomes } from '@/lib/apply-bulk-hold-outcomes';
 import { groupBulkHoldByLocalDay, type BulkHoldOutcomeChoice, type BulkHoldPendingPause } from '@/lib/bulk-hold';
-import { invalidatePauseStatsDataForUser } from '@/lib/pause-stats-invalidate';
+import { invalidatePauseStatsDataForUser } from '@/features/pause/public';
 import { Button } from '@/components/ui/button';
 import { homeInWidget } from '@/components/home/home-widget-styles';
 import {
