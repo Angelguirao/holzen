@@ -8,17 +8,35 @@ This document is the **operational map**: folders, packages, naming, import rule
 
 ---
 
-## 0. Screens vs packages (do not conflate)
+## 0. Lovable constraint (execution vs north star)
+
+| | **Now (Lovable-managed publish)** | **North star (gated)** |
+|---|-----------------------------------|-------------------------|
+| **Vite root** | Repository root (`vite.config.ts`, `index.html`, `src/`) | `apps/web` |
+| **Bounded contexts** | `src/features/<context>/` (same layers as packages) | `packages/<context>/` |
+| **Screens** | `src/pages/`, `src/components/` | `apps/web/src/screens/` |
+| **Boundary enforcement** | `npm run check:feature-imports` | `check:package-boundaries` + package `public.ts` |
+| **When to extract packages** | — | Second client, leave Lovable publish, or confirmed Lovable subdirectory-root support |
+
+Do **not** move the SPA to `apps/web` without passing the extraction gate in [ADR §8](../decisions/2026-05-17-modular-monolith-hexagonal-client.md). That breaks Publish → Update, `lovable-tagger`, and agent heuristics that assume root `src/App.tsx`.
+
+`supabase/` (migrations, edge functions) is unchanged either way.
+
+---
+
+## 0.1 Screens vs packages (do not conflate)
 
 | Kind | Lives in | Examples |
 |------|----------|----------|
-| **Bounded context** | `packages/<context>/` | `pause`, `subscription`, `market`, `user`, `auth` |
-| **Screen / route** | `apps/web/src/screens/` + thin `pages/` | Home, Archive, Journey, Settings, PauseSession, Companion* |
+| **Bounded context** | `src/features/<context>/` (now) → `packages/<context>/` (later) | `pause`, `subscription`, `market`, `user`, `auth` |
+| **Screen / route** | `src/pages/` + `src/components/` (now) → `apps/web/src/screens/` | Home, Archive, Journey, Settings, PauseSession, Companion* |
 | **Not a package** | — | `home`, `archive`, `journey`, `settings`, `companion` (companions are **inside** `pause`) |
 
 ---
 
-## 1. Target monorepo tree
+## 1. Target monorepo tree (north star — gated on §0)
+
+When Holzen extracts to `packages/*`, use this tree. Until then, mirror the **package interior** under `src/features/` (§10).
 
 ```text
 holzen/
@@ -284,32 +302,32 @@ Use this when moving files. Paths are indicative — adjust to actual filenames 
 
 ---
 
-## 10. Transitional layout (before full monorepo)
+## 10. Transitional layout (active — root Vite + `src/features/`)
 
-If the first PR cannot introduce `packages/` yet, use **in-repo features** with identical rules:
+**This is the execution layout** while Lovable publish stays at the repo root. See `src/features/README.md` and `src/features/pause/`.
 
 ```text
 src/
-  app/
-  pages/
+  App.tsx, pages/, components/     # screens & UI (unchanged for Lovable)
+  hooks/, lib/                      # shrink as contexts migrate into features/
   features/
     pause/
       domain/
       application/
+        use-cases/
+        companion/                 # ritual modules inside pause (§3)
+        reflect/
+        breathing/
       ports/
-      infrastructure/
-      presentation/
-      public.ts
+      public.ts                    # only export other features may import
     subscription/
     market/
     user/
     …
-  shared/
-    presentation/ui/
-    infrastructure/
+  integrations/supabase/           # until adapters move to features/*/infrastructure
 ```
 
-Same dependency rules as §2–3; `check:feature-imports` (below) applies to `src/features/**`.
+Same dependency rules as §2–3 for layers that exist. `npm run check:feature-imports` enforces `domain/`, `application/`, and `ports/` rules under `src/features/**`.
 
 ---
 
@@ -317,15 +335,14 @@ Same dependency rules as §2–3; `check:feature-imports` (below) applies to `sr
 
 | Wave | Scope | Exit criteria |
 |------|--------|----------------|
-| **0** | Docs + ADR + delete dead trees / fix legacy import paths | `test:ci` green |
-| **1** | Monorepo scaffold: `pnpm-workspace.yaml`, `apps/web`, empty packages | `npm run build` from `apps/web` |
-| **2** | `shared-kernel`, `contracts` (minimal), `infrastructure` (supabase + invokeEdge) | Adapter smoke test |
-| **3** | `auth`, `marketing`, `roadmap`, `admin` | Thin pages re-export |
-| **4** | `subscription`, `market` | Home can depend on public APIs |
-| **5** | `user` + settings/archive/journey **screens** in `apps/web` | Settings + archive reads via pause queries |
-| **6** | `pause` (largest; split PRs: domain → use cases → screens) | Pause E2E path green; companions under pause |
-| **7** | `apps/web` home screen wiring | Full shell flows |
-| **8** | Remove `src/legacy` from main; enable `check:package-boundaries` | CI enforced |
+| **0** | Docs + ADR (Lovable §) + `src/features/pause/` skeleton + `check:feature-imports` | `test:ci` green; root `npm run build` |
+| **1** | Migrate **pause** domain + use cases into `src/features/pause/` (small PRs) | Pause E2E green; companions under `application/companion/` |
+| **2** | `subscription`, `market`, `user`, `auth` features + shrink root `hooks/`/`lib/` | Home/settings flows use `public.ts` only |
+| **3** | Optional `src/features/*/infrastructure` adapters; keep Supabase types in `integrations/` until needed | Adapter tests |
+| **4** | Remove `src/legacy` from main | `check:active-surface` |
+| **5** | **Gated:** `pnpm-workspace.yaml`, `apps/web`, `packages/*` extract | Only after ADR §8 trigger; `build` from `apps/web` |
+| **6** | `shared-kernel`, `contracts` (minimal), `packages/infrastructure` | Adapter smoke test |
+| **7+** | Screens move to `apps/web`; `check:package-boundaries` | Post-extraction only |
 
 **Per-PR rule:** mechanical moves + import updates only; behavior changes in separate PRs.
 
@@ -364,24 +381,23 @@ Root `tsconfig.json` references project refs per package, or a single base + per
 | Script | When | Purpose |
 |--------|------|---------|
 | `check:active-surface` | now | No legacy imports, shipped surface |
-| `check:feature-imports` | transitional | Enforce §2 layer rules under `src/features/` |
+| `check:feature-imports` | **now** (`scripts/check-feature-imports.mjs`) | Enforce §2 layer rules under `src/features/` |
 | `check:package-boundaries` | post-monorepo | dependency-cruiser or eslint-plugin-boundaries on `@holzen/*` graph |
 | `test:ci` | always | Existing gate |
 
-**Planned `check:feature-imports` rules (summary):**
+**`check:feature-imports` rules (summary):**
 
 - `domain/**` must not import `presentation`, `infrastructure`, `react`, `@supabase/*`.
 - `application/**` must not import `react`, `@supabase/*`.
 - `presentation/**` must not import other features’ `infrastructure/**` (only `public.ts`).
 
-Implement in `scripts/check-feature-imports.mjs` when wave 0/1 starts.
-
 ---
 
 ## 13. Lovable and env
 
-- **Publish root** becomes `apps/web` (document in README / AGENTS when switched).
-- `VITE_*` env vars load in `apps/web`; `packages/infrastructure` receives config via factory args, not `import.meta` in packages (keeps packages testable).
+**Today:** publish and dev use **repository root** — do not relocate `index.html` or `vite.config.ts` without ADR §8.
+
+**After extraction:** publish root becomes `apps/web` (document in README / AGENTS when switched). `VITE_*` env vars load in `apps/web`; `packages/infrastructure` receives config via factory args, not `import.meta` in packages (keeps packages testable).
 
 ---
 
