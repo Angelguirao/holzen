@@ -12,7 +12,7 @@ import { InterventionCrossRefBadge } from '@/components/companion/InterventionCr
 import { useStaggeredReveal } from '@/components/companion/use-staggered-reveal';
 import { useFullviewTelemetry } from '@/hooks/use-fullview-telemetry';
 import { PageMeta } from '@/components/PageMeta';
-import { DEFAULT_COMPANIONS, DEFAULT_PREFS } from '@/features/pause/domain/session-model';
+import { DEFAULT_COMPANIONS, DEFAULT_PREFS } from '@/features/pause/public';
 
 const SEVERITY_NUMBER: Record<string, number> = { mild: 3, moderate: 6, high: 10 };
 /**

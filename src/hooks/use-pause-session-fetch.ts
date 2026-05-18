@@ -1,6 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
 import { getPauseSessionFetchedInstanceQueryOptions } from '@/features/pause/public-queries';
-import { type FetchedPauseInstance } from '@/features/pause/domain/session-model';
+import { type FetchedPauseInstance } from '@/features/pause/public';
 
 export { pauseSessionFetchedInstanceQueryKey } from '@/features/pause/public-queries';
 

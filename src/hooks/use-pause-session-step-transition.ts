@@ -3,7 +3,7 @@ import {
   buildPauseSessionStepTransitionConfig,
   type PauseSessionStepTransitionConfig,
   type PauseSessionSwipeDirection,
-} from '@/features/pause/application/session/step-transition';
+} from '@/features/pause/public';
 
 /**
  * Framer Motion transition props shared by pause ritual step panels.

@@ -34,7 +34,7 @@ let subscriptionForceNext = false;
 type SubFetchSource = 'mount' | 'manual_retry' | 'focus' | 'interval' | 'invalidate';
 let subscriptionNextFetchSource: SubFetchSource | null = null;
 
-export type { SubscriptionBillingInterval } from '@/features/subscription/domain/subscription-snapshot';
+export type { SubscriptionBillingInterval } from '@/features/subscription/public';
 export type { Entitlement } from '@/features/subscription/public';
 
 function checkoutReturnWantsForce(): boolean {

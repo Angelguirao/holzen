@@ -2,7 +2,7 @@ import { useCallback, type Dispatch, type MutableRefObject, type SetStateAction 
 import type { TFunction } from 'i18next';
 import type { PauseStep } from '@/components/pause/PauseProgress';
 import { pauseLogStep } from '@/features/pause/public-rpc';
-import { buildShiftEmotionFrameHubLogBundle } from '@/features/pause/application/session/shift-emotion-log';
+import { buildShiftEmotionFrameHubLogBundle } from '@/features/pause/public';
 import { showPauseStepSyncFailedToast } from '@/features/pause/public';
 
 /**

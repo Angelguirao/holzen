@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef, type Dispatch, type SetStateAction } from 'react';
 import type { PauseStep } from '@/components/pause/PauseProgress';
-import { type BriefPauseStep, type RitualDepth } from '@/features/pause/domain/ritual-types';
+import { type BriefPauseStep, type RitualDepth } from '@/features/pause/public';
 
 /**
  * Deep + brief ritual transitions around breath segments (`ensure` / skip RPCs) and brief integrate advance guard.

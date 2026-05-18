@@ -1,10 +1,10 @@
 import { useEffect } from 'react';
-import { hasPersistablePauseSessionAnchor } from '@/features/pause/application/session/persisted-session-guards';
+import { hasPersistablePauseSessionAnchor } from '@/features/pause/public';
 import { saveSession } from '@/features/pause/public';
 import {
   buildPauseSessionPersistSnapshot,
   type PauseSessionPersistSnapshotInput,
-} from '@/features/pause/application/session/persist-snapshot';
+} from '@/features/pause/public';
 
 /** Autosave ritual fields to `holzen_pause_session` when we have an instance id and/or reflection copy. */
 export function usePauseSessionPersistToStorage(p: PauseSessionPersistSnapshotInput): void {

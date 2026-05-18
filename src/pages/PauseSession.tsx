@@ -16,8 +16,8 @@ import { PauseSessionGateContent } from '@/components/pause/PauseSessionGateCont
 import { type PauseBreathingHandle } from '@/components/pause/PauseBreathing';
 import { PauseSessionDepthPickerStack } from '@/components/pause/PauseSessionDepthPickerStack';
 import { PauseBriefProgress } from '@/components/pause/PauseBriefProgress';
-import { isPauseSessionHeaderBackVisible } from '@/features/pause/application/session/header-back';
-import { briefSwitchToDeepPauseState } from '@/features/pause/application/session/brief-switch-to-deep';
+import { isPauseSessionHeaderBackVisible } from '@/features/pause/public';
+import { briefSwitchToDeepPauseState } from '@/features/pause/public';
 import { logPauseRitualDepthUpgraded } from '@/features/pause/application/session/ritual-depth-upgrade';
 import {
   mapPersistedStep,
@@ -30,13 +30,13 @@ import {
   initialBreathingFirstCompletedFromRestored,
   initialBreathingSecondCompletedFromRestored,
   initialFrameDoneFromRestored,
-} from '@/features/pause/application/session/step-map';
+} from '@/features/pause/public';
 import { parsePauseSessionLocationState } from '@/features/pause/public';
-import { coalescePauseSessionShellViewModel } from '@/features/pause/application/session/shell-view-model';
+import { coalescePauseSessionShellViewModel } from '@/features/pause/public';
 import {
   isPauseSessionDepthPickerActive,
   isPauseSessionWaitingForInstanceFetch,
-} from '@/features/pause/application/session/gate-flags';
+} from '@/features/pause/public';
 import { usePauseSessionStepTransition } from '@/hooks/use-pause-session-step-transition';
 import { usePauseBreathSegmentRpcLoggers } from '@/hooks/use-pause-breath-segment-rpc-loggers';
 import { usePauseFeelShiftLogDedupeRefs } from '@/hooks/use-pause-feel-shift-log-dedupe-refs';
@@ -56,23 +56,23 @@ import { usePauseSessionEntryPresentationEffects } from '@/hooks/use-pause-sessi
 import { usePauseSessionBreathTimedActiveReset } from '@/hooks/use-pause-session-breath-timed-active-reset';
 import { usePauseSessionDepthAndBriefCopy } from '@/hooks/use-pause-session-depth-and-brief-copy';
 import { usePauseSessionBreathSecondLabelVariant } from '@/hooks/use-pause-session-breath-second-label-variant';
-import type { PauseImpactData } from '@/features/pause/application/use-cases/impact-data';
+import type { PauseImpactData } from '@/features/pause/public';
 import { usePauseSessionShell } from '@/hooks/use-pause-session-shell';
 import { usePauseSessionTerminalEntryRedirect } from '@/hooks/use-pause-session-terminal-entry-redirect';
 import { usePauseSessionMountLog } from '@/hooks/use-pause-session-mount-log';
 import { usePauseSessionGoBack } from '@/hooks/use-pause-session-go-back';
 import { usePauseSessionGoToStep } from '@/hooks/use-pause-session-go-to-step';
-import { buildPauseSessionScaffoldRitualDerived } from '@/features/pause/application/session/scaffold-ritual-derived';
-import { buildPauseSessionScaffoldRitualPayloads } from '@/features/pause/presentation/session/scaffold-ritual-payloads';
+import { buildPauseSessionScaffoldRitualDerived } from '@/features/pause/public';
+import { buildPauseSessionScaffoldRitualPayloads } from '@/features/pause/public';
 import { JOURNEY_PREFIX } from '@/lib/app-routes';
-import { buildPauseSessionMountLogParams } from '@/features/pause/application/session/mount-log-params';
+import { buildPauseSessionMountLogParams } from '@/features/pause/public';
 import { usePauseSessionPendingPauseOfferNavigation } from '@/hooks/use-pause-session-pending-pause-offer-navigation';
 import { usePendingPauseOffer } from '@/hooks/use-pending-pause-offer';
 import { usePauseSessionDepthPickerHandlers } from '@/hooks/use-pause-session-depth-picker-handlers';
 import { usePauseSessionFeelTilesSelect } from '@/hooks/use-pause-session-feel-tiles-select';
 import { usePauseReflectGeneration } from '@/hooks/use-pause-reflect-generation';
 import { PauseLeaveWithPendingSheet } from '@/components/pause/PauseLeaveWithPendingSheet';
-import { type BriefPauseStep, type RitualDepth } from '@/features/pause/domain/ritual-types';
+import { type BriefPauseStep, type RitualDepth } from '@/features/pause/public';
 import { clearSession } from '@/features/pause/public';
 
 /**

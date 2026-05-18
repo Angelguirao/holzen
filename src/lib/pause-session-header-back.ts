@@ -1,2 +1,5 @@
-/** @deprecated Import from `@/features/pause/application/session/header-back`. */
-export * from '@/features/pause/application/session/header-back';
+/** @deprecated Import from `@/features/pause/public`. */
+export {
+  computePauseHeaderBackIntent,
+  isPauseSessionHeaderBackVisible,
+} from '@/features/pause/public';
