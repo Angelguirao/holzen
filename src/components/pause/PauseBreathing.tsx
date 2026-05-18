@@ -21,7 +21,7 @@ import {
   playPauseBreathPatternCompleteCue,
   playPauseBreathPhaseCue,
   resumePauseAudioContext,
-} from '@/lib/pause-ritual-audio';
+} from '@/features/pause/application/breathing/ritual-audio';
 import { BreathOrbVisual } from '@/components/pause/breath-orb-visual';
 
 const EXPAND_KEYS = ['breathing.phases.inhale', 'breathing.phases.sip'];

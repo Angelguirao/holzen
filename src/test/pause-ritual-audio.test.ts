@@ -2,7 +2,7 @@ import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import {
   startPauseReflectFrameFocusAmbience,
   stopPauseReflectFrameFocusAmbience,
-} from '@/lib/pause-ritual-audio';
+} from '@/features/pause/application/breathing/ritual-audio';
 
 describe('pause-ritual-audio reflect/frame ambience', () => {
   const resume = vi.fn().mockResolvedValue(undefined);

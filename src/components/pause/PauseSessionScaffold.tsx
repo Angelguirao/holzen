@@ -4,7 +4,7 @@ import { ChevronLeft, Volume2, VolumeX, X } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { PauseProgress, type PauseStep } from '@/components/pause/PauseProgress';
 import { Button } from '@/components/ui/button';
-import { resumePauseAudioContext } from '@/lib/pause-ritual-audio';
+import { resumePauseAudioContext } from '@/features/pause/application/breathing/ritual-audio';
 
 interface Props {
   curtainLifted: boolean;
