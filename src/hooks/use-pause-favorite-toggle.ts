@@ -5,7 +5,7 @@ import { useAuth } from '@/hooks/use-auth';
 import { pauseArchiveListQueryPrefix } from '@/lib/pause-archive-list-query';
 import { hapticFeedback } from '@/lib/haptics';
 import { pauseLogStep } from '@/features/pause/public-rpc';
-import { showPauseFavoriteProHintToast } from '@/lib/pause-favorite-toast';
+import { showPauseFavoriteProHintToast } from '@/features/pause/public';
 
 export function usePauseFavoriteToggle(input: {
   pauseInstanceId: string | null;

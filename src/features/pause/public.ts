@@ -84,6 +84,12 @@ export {
   computePauseQualityScore,
   type PauseQualityBreakdown,
 } from './domain/pause-quality';
+export { showPauseFavoriteProHintToast } from './application/feedback/favorite-toast';
+export {
+  showPauseOutcomeNotCompletedToast,
+  showPauseOutcomeSaveFailedToast,
+} from './application/feedback/outcome-toast';
+export { showPauseStepSyncFailedToast } from './application/feedback/step-sync-toast';
 export {
   collectStepTypes,
   computePauseState,

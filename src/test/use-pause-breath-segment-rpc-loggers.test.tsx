@@ -2,7 +2,7 @@ import { describe, expect, it, vi, beforeEach } from 'vitest';
 import { renderHook, act } from '@testing-library/react';
 import type { TFunction } from 'i18next';
 import { usePauseBreathSegmentRpcLoggers } from '@/hooks/use-pause-breath-segment-rpc-loggers';
-import { showPauseStepSyncFailedToast } from '@/lib/pause-step-sync-toast';
+import { showPauseStepSyncFailedToast } from '@/features/pause/public';
 import { makeTestPersistedPauseSession } from '@/test/make-test-persisted-pause-session';
 
 const { pauseLogStepMock, invalidateCompanionUiCompletionQueryMock } = vi.hoisted(() => ({
@@ -20,9 +20,13 @@ vi.mock('@/lib/companion-ui-completion-query-key', () => ({
     invalidateCompanionUiCompletionQueryMock(...args),
 }));
 
-vi.mock('@/lib/pause-step-sync-toast', () => ({
-  showPauseStepSyncFailedToast: vi.fn(),
-}));
+vi.mock('@/features/pause/public', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('@/features/pause/public')>();
+  return {
+    ...actual,
+    showPauseStepSyncFailedToast: vi.fn(),
+  };
+});
 
 const t = ((k: string) => k) as TFunction;
 

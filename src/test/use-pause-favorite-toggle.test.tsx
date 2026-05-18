@@ -2,7 +2,7 @@ import { describe, expect, it, vi, beforeEach } from 'vitest';
 import { renderHook, act } from '@testing-library/react';
 import type { TFunction } from 'i18next';
 import { usePauseFavoriteToggle } from '@/hooks/use-pause-favorite-toggle';
-import { showPauseFavoriteProHintToast } from '@/lib/pause-favorite-toast';
+import { showPauseFavoriteProHintToast } from '@/features/pause/public';
 
 vi.mock('@/lib/pause-archive-list-query', () => ({
   pauseArchiveListQueryPrefix: (userId: string) => ['pause-archive', userId] as const,
@@ -25,9 +25,13 @@ vi.mock('@/features/pause/public-rpc', () => ({
   pauseLogStep: (...args: unknown[]) => pauseLogStepMock(...args),
 }));
 
-vi.mock('@/lib/pause-favorite-toast', () => ({
-  showPauseFavoriteProHintToast: vi.fn(),
-}));
+vi.mock('@/features/pause/public', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('@/features/pause/public')>();
+  return {
+    ...actual,
+    showPauseFavoriteProHintToast: vi.fn(),
+  };
+});
 
 vi.mock('@/lib/haptics', () => ({
   hapticFeedback: vi.fn(),

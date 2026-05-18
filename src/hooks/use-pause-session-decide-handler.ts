@@ -7,7 +7,10 @@ import { hapticFeedback } from '@/lib/haptics';
 import { useAuth } from '@/hooks/use-auth';
 import { pauseLogStep } from '@/features/pause/public-rpc';
 import { buildOutcomeLoggedPayload } from '@/lib/pause-outcome-log-payload';
-import { showPauseOutcomeNotCompletedToast, showPauseOutcomeSaveFailedToast } from '@/lib/pause-outcome-toast';
+import {
+  showPauseOutcomeNotCompletedToast,
+  showPauseOutcomeSaveFailedToast,
+} from '@/features/pause/public';
 import type { PauseState } from '@/features/pause/domain/pause-state';
 import { buildPauseImpactDataOnComplete, type PauseImpactData } from '@/lib/pause-impact-data';
 import { invalidatePauseStatsDataForUser } from '@/lib/pause-stats-invalidate';
