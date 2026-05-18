@@ -5,7 +5,7 @@ import { useProfile } from '@/hooks/use-profile';
 import {
   fetchOpeningMessageForPauseInstance,
   generateReflectionAtReflectStep,
-} from '@/lib/pause-reflect-artifact';
+} from '@/features/pause/infrastructure/reflect/reflection-artifact';
 import { reflectGenerationPrerequisite } from '@/features/pause/public';
 
 function isAbortLike(e: unknown): boolean {
