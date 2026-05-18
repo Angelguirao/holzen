@@ -4,6 +4,8 @@ How Lovable Cloud auto-deploys when you push to GitHub, and how to avoid surpris
 
 **Repo integration:** This checklist is referenced from [AGENTS.md](../../AGENTS.md) (humans + AI) and enforced for Cursor via [`.cursor/rules/deployment-sync.mdc`](../../.cursor/rules/deployment-sync.mdc) (`alwaysApply`). Run it before every push that touches app code, migrations, or edge functions.
 
+**Staging / leaving Lovable:** Git branches do **not** isolate the database—migrations on the synced branch hit **production** immediately. For risk model, invisible CI, hybrid paths, and a phased exit checklist, see **[lovable-staging-and-platform-exit.md](lovable-staging-and-platform-exit.md)**.
+
 ## What happens on GitHub → Lovable sync
 
 | Artifact | Deployed automatically? | Goes live immediately? |
