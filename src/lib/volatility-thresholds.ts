@@ -1,5 +1,2 @@
-export {
-  DEFAULT_CUMULATIVE_THRESHOLD,
-  effectiveCumulativeThreshold,
-  isCumulativeMoveTriggered,
-} from '../../supabase/functions/_shared/volatility-thresholds.ts';
+/** @deprecated Import from `@/features/market/domain/volatility-thresholds`. */
+export * from '@/features/market/domain/volatility-thresholds';
