@@ -12,7 +12,7 @@ import {
   fetchParsedPauseArtifactCache,
 } from '@/features/pause/infrastructure/queries/artifact-cache-query';
 import type { ZoomOutData } from '@/components/ZoomOutDisplay';
-import { toZoomOutDisplayData, zoomOutLibraryAutosaveFromDisplayData } from '@/lib/zoom-out-payload';
+import { toZoomOutDisplayData, zoomOutLibraryAutosaveFromDisplayData } from '@/features/pause/application/companion/zoom-out-payload';
 import type { CachedHistoricalInsightShape } from '@/components/HistoricalInsightDisplay';
 import {
   EMPTY_COMPANION_UI_COMPLETION,
