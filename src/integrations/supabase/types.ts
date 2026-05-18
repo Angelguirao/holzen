@@ -101,21 +101,6 @@ export type Database = {
         }
         Relationships: []
       }
-      badge_definitions: {
-        Row: {
-          badge_id: string
-          created_at: string
-        }
-        Insert: {
-          badge_id: string
-          created_at?: string
-        }
-        Update: {
-          badge_id?: string
-          created_at?: string
-        }
-        Relationships: []
-      }
       blog_posts: {
         Row: {
           body: string
@@ -394,6 +379,87 @@ export type Database = {
         }
         Relationships: []
       }
+      companion_catalog: {
+        Row: {
+          active: boolean | null
+          analogy: string | null
+          asset_class: string | null
+          author: string | null
+          citation: string | null
+          companion_types: string[] | null
+          created_at: string | null
+          event_date: string | null
+          finding: string | null
+          id: string
+          key_quote: string | null
+          language: string | null
+          mood_tag: string | null
+          original_publication: string | null
+          original_url: string | null
+          quality_score: number | null
+          recovery: string | null
+          summary: string
+          tags: string[] | null
+          title: string
+          title_norm: string | null
+          type: string
+          updated_at: string | null
+          url: string | null
+        }
+        Insert: {
+          active?: boolean | null
+          analogy?: string | null
+          asset_class?: string | null
+          author?: string | null
+          citation?: string | null
+          companion_types?: string[] | null
+          created_at?: string | null
+          event_date?: string | null
+          finding?: string | null
+          id?: string
+          key_quote?: string | null
+          language?: string | null
+          mood_tag?: string | null
+          original_publication?: string | null
+          original_url?: string | null
+          quality_score?: number | null
+          recovery?: string | null
+          summary: string
+          tags?: string[] | null
+          title: string
+          title_norm?: string | null
+          type: string
+          updated_at?: string | null
+          url?: string | null
+        }
+        Update: {
+          active?: boolean | null
+          analogy?: string | null
+          asset_class?: string | null
+          author?: string | null
+          citation?: string | null
+          companion_types?: string[] | null
+          created_at?: string | null
+          event_date?: string | null
+          finding?: string | null
+          id?: string
+          key_quote?: string | null
+          language?: string | null
+          mood_tag?: string | null
+          original_publication?: string | null
+          original_url?: string | null
+          quality_score?: number | null
+          recovery?: string | null
+          summary?: string
+          tags?: string[] | null
+          title?: string
+          title_norm?: string | null
+          type?: string
+          updated_at?: string | null
+          url?: string | null
+        }
+        Relationships: []
+      }
       companion_fallbacks: {
         Row: {
           created_at: string
@@ -515,87 +581,6 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
-      }
-      content_library: {
-        Row: {
-          active: boolean | null
-          analogy: string | null
-          asset_class: string | null
-          author: string | null
-          citation: string | null
-          companion_types: string[] | null
-          created_at: string | null
-          event_date: string | null
-          finding: string | null
-          id: string
-          key_quote: string | null
-          language: string | null
-          mood_tag: string | null
-          original_publication: string | null
-          original_url: string | null
-          quality_score: number | null
-          recovery: string | null
-          summary: string
-          tags: string[] | null
-          title: string
-          title_norm: string | null
-          type: string
-          updated_at: string | null
-          url: string | null
-        }
-        Insert: {
-          active?: boolean | null
-          analogy?: string | null
-          asset_class?: string | null
-          author?: string | null
-          citation?: string | null
-          companion_types?: string[] | null
-          created_at?: string | null
-          event_date?: string | null
-          finding?: string | null
-          id?: string
-          key_quote?: string | null
-          language?: string | null
-          mood_tag?: string | null
-          original_publication?: string | null
-          original_url?: string | null
-          quality_score?: number | null
-          recovery?: string | null
-          summary: string
-          tags?: string[] | null
-          title: string
-          title_norm?: string | null
-          type: string
-          updated_at?: string | null
-          url?: string | null
-        }
-        Update: {
-          active?: boolean | null
-          analogy?: string | null
-          asset_class?: string | null
-          author?: string | null
-          citation?: string | null
-          companion_types?: string[] | null
-          created_at?: string | null
-          event_date?: string | null
-          finding?: string | null
-          id?: string
-          key_quote?: string | null
-          language?: string | null
-          mood_tag?: string | null
-          original_publication?: string | null
-          original_url?: string | null
-          quality_score?: number | null
-          recovery?: string | null
-          summary?: string
-          tags?: string[] | null
-          title?: string
-          title_norm?: string | null
-          type?: string
-          updated_at?: string | null
-          url?: string | null
-        }
-        Relationships: []
       }
       credit_ledger: {
         Row: {
@@ -786,48 +771,6 @@ export type Database = {
         }
         Relationships: []
       }
-      future_letters: {
-        Row: {
-          body: string
-          btc_price_at_delivery: number | null
-          btc_price_at_write: number
-          deliver_during: string
-          delivered: boolean
-          delivered_at: string | null
-          delivery_threshold: number | null
-          id: string
-          user_id: string
-          written_at: string
-          written_during: string
-        }
-        Insert: {
-          body: string
-          btc_price_at_delivery?: number | null
-          btc_price_at_write: number
-          deliver_during: string
-          delivered?: boolean
-          delivered_at?: string | null
-          delivery_threshold?: number | null
-          id?: string
-          user_id: string
-          written_at?: string
-          written_during: string
-        }
-        Update: {
-          body?: string
-          btc_price_at_delivery?: number | null
-          btc_price_at_write?: number
-          deliver_during?: string
-          delivered?: boolean
-          delivered_at?: string | null
-          delivery_threshold?: number | null
-          id?: string
-          user_id?: string
-          written_at?: string
-          written_during?: string
-        }
-        Relationships: []
-      }
       generation_attempts: {
         Row: {
           attempt_order: number
@@ -879,39 +822,6 @@ export type Database = {
           quality_gate_reason?: string | null
           status?: string
           user_id?: string | null
-        }
-        Relationships: []
-      }
-      graph_edges: {
-        Row: {
-          created_at: string
-          id: string
-          label: string | null
-          source_id: string
-          source_type: string
-          target_id: string
-          target_type: string
-          user_id: string
-        }
-        Insert: {
-          created_at?: string
-          id?: string
-          label?: string | null
-          source_id: string
-          source_type: string
-          target_id: string
-          target_type: string
-          user_id: string
-        }
-        Update: {
-          created_at?: string
-          id?: string
-          label?: string | null
-          source_id?: string
-          source_type?: string
-          target_id?: string
-          target_type?: string
-          user_id?: string
         }
         Relationships: []
       }
@@ -983,39 +893,6 @@ export type Database = {
           month_start?: string
           updated_at?: string
           used?: number
-          user_id?: string
-        }
-        Relationships: []
-      }
-      night_reflections: {
-        Row: {
-          btc_change_percent: number
-          btc_direction: string
-          created_at: string
-          dismissed: boolean
-          had_reflection: boolean
-          id: string
-          message: string
-          user_id: string
-        }
-        Insert: {
-          btc_change_percent: number
-          btc_direction: string
-          created_at?: string
-          dismissed?: boolean
-          had_reflection?: boolean
-          id?: string
-          message: string
-          user_id: string
-        }
-        Update: {
-          btc_change_percent?: number
-          btc_direction?: string
-          created_at?: string
-          dismissed?: boolean
-          had_reflection?: boolean
-          id?: string
-          message?: string
           user_id?: string
         }
         Relationships: []
@@ -1467,95 +1344,8 @@ export type Database = {
         }
         Relationships: []
       }
-      practice_entries: {
-        Row: {
-          body: string | null
-          created_at: string
-          duration_seconds: number | null
-          id: string
-          intensity: number | null
-          mood: string | null
-          pause_instance_id: string | null
-          prompt: string | null
-          trigger_text: string | null
-          type: string
-          user_id: string
-        }
-        Insert: {
-          body?: string | null
-          created_at?: string
-          duration_seconds?: number | null
-          id?: string
-          intensity?: number | null
-          mood?: string | null
-          pause_instance_id?: string | null
-          prompt?: string | null
-          trigger_text?: string | null
-          type?: string
-          user_id: string
-        }
-        Update: {
-          body?: string | null
-          created_at?: string
-          duration_seconds?: number | null
-          id?: string
-          intensity?: number | null
-          mood?: string | null
-          pause_instance_id?: string | null
-          prompt?: string | null
-          trigger_text?: string | null
-          type?: string
-          user_id?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "practice_entries_pause_instance_id_fkey"
-            columns: ["pause_instance_id"]
-            isOneToOne: false
-            referencedRelation: "pause_instances"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "practice_entries_pause_instance_id_fkey"
-            columns: ["pause_instance_id"]
-            isOneToOne: false
-            referencedRelation: "v_pause_archive_echoes"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "practice_entries_pause_instance_id_fkey"
-            columns: ["pause_instance_id"]
-            isOneToOne: false
-            referencedRelation: "v_pause_archive_pauses"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "practice_entries_pause_instance_id_fkey"
-            columns: ["pause_instance_id"]
-            isOneToOne: false
-            referencedRelation: "v_pause_completed"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "practice_entries_pause_instance_id_fkey"
-            columns: ["pause_instance_id"]
-            isOneToOne: false
-            referencedRelation: "v_pause_current"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "practice_entries_pause_instance_id_fkey"
-            columns: ["pause_instance_id"]
-            isOneToOne: false
-            referencedRelation: "v_pause_full"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
       profiles: {
         Row: {
-          ai_insights_enabled: boolean
-          companion_breathing: boolean
           companion_grounding: boolean
           companion_haiku: boolean
           companion_history: boolean
@@ -1565,7 +1355,6 @@ export type Database = {
           created_at: string
           cumulative_threshold: number
           custom_prompt: string | null
-          digest_frequency: string
           email_notifications: boolean
           first_name: string | null
           grounding_activities: string[] | null
@@ -1583,18 +1372,14 @@ export type Database = {
           lifetime_access: boolean
           mantra: string | null
           motivations: string[] | null
-          night_reflection_hour: number | null
-          notify_badges: boolean
           quiet_hours_end: number | null
           quiet_hours_start: number | null
           referral_code: string
           referred_by: string | null
           reflection_style: string
           reflection_tone: string
-          ritual_template: string
           silent_mode: boolean
           snoozed_until: string | null
-          streak_freeze_dates: string[]
           subscription_checked_at: string | null
           subscription_end: string | null
           subscription_status: string
@@ -1607,8 +1392,6 @@ export type Database = {
           user_id: string
         }
         Insert: {
-          ai_insights_enabled?: boolean
-          companion_breathing?: boolean
           companion_grounding?: boolean
           companion_haiku?: boolean
           companion_history?: boolean
@@ -1618,7 +1401,6 @@ export type Database = {
           created_at?: string
           cumulative_threshold?: number
           custom_prompt?: string | null
-          digest_frequency?: string
           email_notifications?: boolean
           first_name?: string | null
           grounding_activities?: string[] | null
@@ -1636,18 +1418,14 @@ export type Database = {
           lifetime_access?: boolean
           mantra?: string | null
           motivations?: string[] | null
-          night_reflection_hour?: number | null
-          notify_badges?: boolean
           quiet_hours_end?: number | null
           quiet_hours_start?: number | null
           referral_code?: string
           referred_by?: string | null
           reflection_style?: string
           reflection_tone?: string
-          ritual_template?: string
           silent_mode?: boolean
           snoozed_until?: string | null
-          streak_freeze_dates?: string[]
           subscription_checked_at?: string | null
           subscription_end?: string | null
           subscription_status?: string
@@ -1660,8 +1438,6 @@ export type Database = {
           user_id: string
         }
         Update: {
-          ai_insights_enabled?: boolean
-          companion_breathing?: boolean
           companion_grounding?: boolean
           companion_haiku?: boolean
           companion_history?: boolean
@@ -1671,7 +1447,6 @@ export type Database = {
           created_at?: string
           cumulative_threshold?: number
           custom_prompt?: string | null
-          digest_frequency?: string
           email_notifications?: boolean
           first_name?: string | null
           grounding_activities?: string[] | null
@@ -1689,18 +1464,14 @@ export type Database = {
           lifetime_access?: boolean
           mantra?: string | null
           motivations?: string[] | null
-          night_reflection_hour?: number | null
-          notify_badges?: boolean
           quiet_hours_end?: number | null
           quiet_hours_start?: number | null
           referral_code?: string
           referred_by?: string | null
           reflection_style?: string
           reflection_tone?: string
-          ritual_template?: string
           silent_mode?: boolean
           snoozed_until?: string | null
-          streak_freeze_dates?: string[]
           subscription_checked_at?: string | null
           subscription_end?: string | null
           subscription_status?: string
@@ -1858,125 +1629,13 @@ export type Database = {
         }
         Relationships: []
       }
-      reflection_insights: {
-        Row: {
-          created_at: string
-          generated_at: string
-          id: string
-          insights: Json
-          language: string
-          period_end: string | null
-          period_start: string | null
-          reflection_count: number
-          user_id: string
-        }
-        Insert: {
-          created_at?: string
-          generated_at?: string
-          id?: string
-          insights?: Json
-          language?: string
-          period_end?: string | null
-          period_start?: string | null
-          reflection_count?: number
-          user_id: string
-        }
-        Update: {
-          created_at?: string
-          generated_at?: string
-          id?: string
-          insights?: Json
-          language?: string
-          period_end?: string | null
-          period_start?: string | null
-          reflection_count?: number
-          user_id?: string
-        }
-        Relationships: []
-      }
-      ritual_completions: {
-        Row: {
-          created_at: string
-          custom_template_id: string | null
-          decision: string
-          duration_seconds: number | null
-          id: string
-          journal_text: string | null
-          steps_completed: Json | null
-          template: string
-          user_id: string
-        }
-        Insert: {
-          created_at?: string
-          custom_template_id?: string | null
-          decision: string
-          duration_seconds?: number | null
-          id?: string
-          journal_text?: string | null
-          steps_completed?: Json | null
-          template?: string
-          user_id: string
-        }
-        Update: {
-          created_at?: string
-          custom_template_id?: string | null
-          decision?: string
-          duration_seconds?: number | null
-          id?: string
-          journal_text?: string | null
-          steps_completed?: Json | null
-          template?: string
-          user_id?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "ritual_completions_custom_template_id_fkey"
-            columns: ["custom_template_id"]
-            isOneToOne: false
-            referencedRelation: "ritual_templates"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      ritual_templates: {
-        Row: {
-          created_at: string
-          description: string | null
-          id: string
-          is_preset: boolean
-          name: string
-          steps: Json
-          updated_at: string
-          user_id: string
-        }
-        Insert: {
-          created_at?: string
-          description?: string | null
-          id?: string
-          is_preset?: boolean
-          name: string
-          steps?: Json
-          updated_at?: string
-          user_id: string
-        }
-        Update: {
-          created_at?: string
-          description?: string | null
-          id?: string
-          is_preset?: boolean
-          name?: string
-          steps?: Json
-          updated_at?: string
-          user_id?: string
-        }
-        Relationships: []
-      }
       roadmap_items: {
         Row: {
           category: string
           created_at: string
           description: string | null
           id: string
+          slug: string | null
           status: string
           title: string
           vote_count: number
@@ -1986,6 +1645,7 @@ export type Database = {
           created_at?: string
           description?: string | null
           id?: string
+          slug?: string | null
           status?: string
           title: string
           vote_count?: number
@@ -1995,6 +1655,7 @@ export type Database = {
           created_at?: string
           description?: string | null
           id?: string
+          slug?: string | null
           status?: string
           title?: string
           vote_count?: number
@@ -2155,38 +1816,6 @@ export type Database = {
           user_id?: string
         }
         Relationships: []
-      }
-      user_badges: {
-        Row: {
-          badge_id: string
-          earned_at: string
-          id: string
-          notified: boolean
-          user_id: string
-        }
-        Insert: {
-          badge_id: string
-          earned_at?: string
-          id?: string
-          notified?: boolean
-          user_id: string
-        }
-        Update: {
-          badge_id?: string
-          earned_at?: string
-          id?: string
-          notified?: boolean
-          user_id?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "user_badges_badge_id_fkey"
-            columns: ["badge_id"]
-            isOneToOne: false
-            referencedRelation: "badge_definitions"
-            referencedColumns: ["badge_id"]
-          },
-        ]
       }
       user_companion_serves: {
         Row: {

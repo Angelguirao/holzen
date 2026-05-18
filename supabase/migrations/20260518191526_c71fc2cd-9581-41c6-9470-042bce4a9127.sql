@@ -1,0 +1,1 @@
+UPDATE public.pause_ai_artifacts SET kind = 'reflection_text' WHERE kind = 'opening_message';
