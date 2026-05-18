@@ -385,6 +385,7 @@ Root `tsconfig.json` references project refs per package, or a single base + per
 |--------|------|---------|
 | `check:active-surface` | now | No legacy imports, shipped surface |
 | `check:feature-imports` | **now** (`scripts/check-feature-imports.mjs`) | Enforce §2 layer rules under `src/features/` |
+| `check:architecture-alignment` | **now** (`scripts/check-architecture-alignment.mjs`) | Waves 0–4 scaffold (five contexts, root Vite, legacy excluded); runs `check:feature-imports` |
 | `check:package-boundaries` | post-monorepo | dependency-cruiser or eslint-plugin-boundaries on `@holzen/*` graph |
 | `test:ci` | always | Existing gate |
 
