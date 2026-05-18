@@ -46,6 +46,29 @@ export {
   type RitualDepth,
 } from './domain/ritual-types';
 export {
+  getInterventionIdempotencyDecision,
+  hasInvokedIntervention,
+  resetInterventionIdempotency,
+  runOnceIntervention,
+  type InterventionIdempotencyDecision,
+} from './application/companion/intervention-idempotency';
+export {
+  reflectGenerationPrerequisite,
+  type ReflectGenerationPrerequisite,
+} from './application/reflect/generation-prerequisites';
+export {
+  BOX_BREATH_PHASE_COUNT,
+  computeBreathingPhaseAdvance,
+  resolveBreathingCompleted,
+  type BreathingPhaseAdvanceResult,
+} from './application/breathing/phase-advance';
+export {
+  effectivePauseShiftIntensity,
+  effectivePauseShiftMood,
+  hasPauseShiftOrPostEmotion,
+  type PauseEmotionFields,
+} from './domain/effective-emotion';
+export {
   bucketChangePercent,
   computeContextFingerprint,
 } from './domain/pause-fingerprint';

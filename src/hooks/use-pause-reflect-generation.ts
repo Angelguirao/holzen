@@ -6,7 +6,7 @@ import {
   fetchOpeningMessageForPauseInstance,
   generateReflectionAtReflectStep,
 } from '@/lib/pause-reflect-artifact';
-import { reflectGenerationPrerequisite } from '@/lib/pause-reflect-generation-prerequisites';
+import { reflectGenerationPrerequisite } from '@/features/pause/public';
 
 function isAbortLike(e: unknown): boolean {
   if (e instanceof DOMException && e.name === 'AbortError') return true;
