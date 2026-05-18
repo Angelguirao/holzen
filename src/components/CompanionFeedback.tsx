@@ -5,17 +5,16 @@ import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/use-auth';
 import { hapticFeedback } from '@/lib/haptics';
-import { FEEDBACK_TO_CACHE_TYPE } from '@/lib/companion-types';
-import type { RegenerateCompanionSlot } from '@/features/pause/public';
+import {
+  FEEDBACK_TO_CACHE_TYPE,
+  companionFeedbackVoteQueryKey,
+  getCompanionFeedbackVoteQueryOptions,
+  type RegenerateCompanionSlot,
+} from '@/features/pause/public';
 import { useSubscription } from '@/hooks/use-subscription';
 import { useProGate } from '@/hooks/use-pro-gate';
 import { showLimitReachedToast, isPaidLimitReached } from '@/lib/limit-upsell';
 import { isHolzenDebugEnabled } from '@/lib/holzen-console';
-import {
-  companionFeedbackVoteQueryKey,
-  getCompanionFeedbackVoteQueryOptions,
-} from '@/lib/companion-feedback-vote-query';
-
 /** Orchestrate regenerate — dev / non-production builds, or prod + Holzen debug opt-in (see holzen-console). */
 function isCompanionRegenerateUiEnabled(): boolean {
   return !import.meta.env.PROD || isHolzenDebugEnabled();

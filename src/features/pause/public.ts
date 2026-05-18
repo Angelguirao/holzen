@@ -128,6 +128,11 @@ export type {
   InterventionState,
   RegenerateCompanionSlot,
 } from './domain/companion-orchestrate';
+export { COMPANION_TYPES, FEEDBACK_TO_CACHE_TYPE } from './domain/companion-types';
+export {
+  companionFeedbackVoteQueryKey,
+  getCompanionFeedbackVoteQueryOptions,
+} from './infrastructure/queries/companion-feedback-vote-query';
 export {
   collectStepTypes,
   computePauseState,
