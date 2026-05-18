@@ -4,7 +4,7 @@ import { TrendingUp, Minus } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { cn } from '@/lib/utils';
 import type { PauseImpactData } from '@/lib/pause-impact-data';
-import { buildPauseScoreImpacts } from '@/lib/pause-score-impacts';
+import { buildPauseScoreImpacts } from '@/features/pause/application/use-cases/score-impacts';
 
 export function ScoreImpact({
   data,
