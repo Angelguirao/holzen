@@ -5,7 +5,7 @@ import type { RitualDepth } from '@/lib/pause-session-storage';
 import { clearSession } from '@/lib/pause-session-storage';
 import { hapticFeedback } from '@/lib/haptics';
 import { useAuth } from '@/hooks/use-auth';
-import { pauseLogStep } from '@/features/pause/public';
+import { pauseLogStep } from '@/features/pause/public-rpc';
 import { buildOutcomeLoggedPayload } from '@/lib/pause-outcome-log-payload';
 import { showPauseOutcomeNotCompletedToast, showPauseOutcomeSaveFailedToast } from '@/lib/pause-outcome-toast';
 import type { PauseState } from '@/features/pause/domain/pause-state';

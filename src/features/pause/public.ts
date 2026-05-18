@@ -1,18 +1,7 @@
 /**
- * Public API for the pause bounded context.
- * Other features import from `@/features/pause/public` only — not deep paths.
+ * Public API for the pause bounded context (no Supabase eager load).
+ * RPC mutations: `@/features/pause/public-rpc`.
  */
-export {
-  pauseAdoptPendingOffer,
-  pauseCreateOrReuse,
-  pauseDeclinePendingOffer,
-  pauseDismissCurrent,
-  pauseLogCompanion,
-  pauseLogStep,
-  type PauseAdoptPendingResult,
-  type PauseCreateOrReuseResult,
-  type PauseLogCompanionResult,
-} from './infrastructure/pause-rpc-client';
 export { pauseCreateSkippedUserMessage } from './application/use-cases/create-skipped-message';
 export {
   buildPauseImpactDataOnComplete,
