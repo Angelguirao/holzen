@@ -17,6 +17,7 @@ export {
 } from './application/use-cases/reflection-persist-error';
 export { pauseArchiveRowAllowsRetrospectiveOutcome } from './application/archive/retrospective-outcome';
 export { pauseArchiveListQueryPrefix } from './application/queries/archive-query-keys';
+export { getArchivePausesTabHasRowsQueryOptions } from './infrastructure/queries/archive-pauses-tab-query';
 export {
   type PauseArchiveListSort,
   type PauseArchiveRow,

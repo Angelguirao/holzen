@@ -4,7 +4,7 @@ import { libraryBundleQueryPrefix } from '@/lib/library-bundle-query';
 import { pauseArchiveListQueryPrefix } from '@/features/pause/application/queries/archive-query-keys';
 import { pendingPauseOfferQueryKey } from '@/lib/pending-pause-offer-query';
 import { getHolzenQueryClient } from '@/lib/holzen-query-client-ref';
-import { archivePausesTabHasRowsQueryPrefix } from '@/lib/archive-pauses-tab-query';
+import { archivePausesTabHasRowsQueryPrefix } from './archive-pauses-tab-keys';
 
 /**
  * Call after a pause reaches `completed` so Home, Journey overview, completed-pause count,
