@@ -2,7 +2,7 @@ import { useTranslation } from 'react-i18next';
 import { motion } from 'framer-motion';
 import { Sparkles } from 'lucide-react';
 import { LoadingButton } from '@/components/ui/loading-button';
-import { PRICING } from '@/lib/pricing';
+import { PRICING } from '@/features/subscription/public';
 
 interface Props {
   motivations: string[];

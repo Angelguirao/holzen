@@ -26,7 +26,7 @@ import {
 } from 'lucide-react';
 import { PERIOD_OPTIONS, TAB_TRIGGER_CLASS, label } from '@/components/admin/admin-constants';
 import type { TimePeriod } from '@/lib/admin-stats-bundle-query';
-import { PRICING } from '@/lib/pricing';
+import { PRICING } from '@/features/subscription/public';
 import {
   ADMIN_COST_GENERATION_ATTEMPTS_QUERY_PREFIX,
   ADMIN_COST_MRR_SNAPSHOT_QUERY_KEY,

@@ -2,10 +2,8 @@ import { useCallback } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { Link } from 'react-router-dom';
 import { ArrowLeft, RefreshCw, Check, Clock, Minus } from 'lucide-react';
-import {
-  getCheckoutEventsQueryOptions,
-  type CheckoutEvent,
-} from '@/features/subscription/public';
+import type { CheckoutEvent } from '@/features/subscription/public';
+import { getCheckoutEventsQueryOptions } from '@/features/subscription/public-queries';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
 import { toast } from 'sonner';
