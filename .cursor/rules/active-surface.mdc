@@ -1,0 +1,21 @@
+---
+description: Pause-first shipped scope — read manifest before non-trivial edits
+globs:
+  - src/**
+  - supabase/**
+alwaysApply: false
+---
+
+# Active surface (pause-first shipped scope)
+
+Before non-trivial edits under `src/` or `supabase/`, read [docs/ops/active-surface.md](../../docs/ops/active-surface.md).
+
+## Rules
+
+- Do **not** import `@/legacy/**` from active code (enforced by `npm run check:active-surface`).
+- Do **not** add queries to Tier B tables dropped in `20260521200000_holzen_mvp_launch_cutover.sql` (`user_badges`, `practice_entries`, etc.).
+- Curated companion pool is **`companion_catalog`** (renamed from `content_library` in the same cutover) — not user Archive / `collections`.
+- Do **not** use dropped `profiles` columns (`companion_breathing`, `ai_insights_enabled`, `notify_badges`, …) — see manifest schema notes.
+- Companion orchestration is **catalog → cache → live → curated** (`COMPANION_PHASE_CATALOG` defaults on).
+- Reflect-step artifact kind stays **`reflection_text`** (do not rename to `opening_message`).
+- New edge HTTP handlers need `config.toml`, `EdgeCoverage.tsx`, and logging checks per AGENTS.md.

@@ -2,16 +2,19 @@
 
 This guide walks a new contributor through the repository in roughly the order you would discover it while running the app locally. It complements [README.md](../README.md) (setup and scripts) and [AGENTS.md](../AGENTS.md) (conventions for automation). Deep dives on the AI pause pipeline and cron jobs live in [ai-powered-pause-system.md](../systems/pause/ai-powered-pause-system.md) and [cron-setup.md](../ops/cron-setup.md).
 
+**Pause-first shipped path (2026-05):** sign in → **Home** (trial via `ensure-trial-subscription`) → **`/pause`** ritual → **Archive** to browse past pauses → **Journey** overview (streak/count) → **Settings**. Do not import `@/legacy/*`; full IA is tag `full-ia-pre-strip`. Manifest: [active-surface.md](../ops/active-surface.md).
+
 ---
 
 ## 1. Orientation: what to read first
 
-1. **[README.md](../README.md)** — Node version, `npm install`, environment files (`.env`, `.env.hosted.local`, `.env.localstack.local`), and npm scripts (`dev` on port **8080**, Supabase CLI wrappers).
-2. **[AGENTS.md](../AGENTS.md)** — Where routes, pages, hooks, and Supabase artifacts live; import alias `@/` → `src/`; note on ESLint volume.
-3. **[architecture/c4-holzen.md](../architecture/c4-holzen.md)** — C4 **System Context** and **Container** diagrams (and [workspace.dsl](../architecture/workspace.dsl) for Structurizr).
-4. **This doc** — How those pieces connect at runtime.
-5. **Optional:** [mental-models-for-contributors.md](mental-models-for-contributors.md) — SPA, React hooks, and Supabase-in-the-browser in a **backend-friendly** frame, plus suggested external links (not Holzen-specific).
-6. **Refactors:** [refactoring-strategy.md](refactoring-strategy.md) — how we split large pages/hooks incrementally; backlog checklist in [react-page-and-hook-splitting.md](../backlog/react-page-and-hook-splitting.md).
+1. **[src/README.md](../../src/README.md)** + **[active-surface.md](../ops/active-surface.md)** — what ships in the active tree.
+2. **[README.md](../README.md)** — Node version, `npm install`, environment files (`.env`, `.env.hosted.local`, `.env.localstack.local`), and npm scripts (`dev` on port **8080**, Supabase CLI wrappers).
+3. **[AGENTS.md](../AGENTS.md)** — Where routes, pages, hooks, and Supabase artifacts live; import alias `@/` → `src/`; note on ESLint volume.
+4. **[architecture/c4-holzen.md](../architecture/c4-holzen.md)** — C4 **System Context** and **Container** diagrams (and [workspace.dsl](../architecture/workspace.dsl) for Structurizr).
+5. **This doc** — How those pieces connect at runtime.
+6. **Optional:** [mental-models-for-contributors.md](mental-models-for-contributors.md) — SPA, React hooks, and Supabase-in-the-browser in a **backend-friendly** frame, plus suggested external links (not Holzen-specific).
+7. **Refactors:** [refactoring-strategy.md](refactoring-strategy.md) — how we split large pages/hooks incrementally; backlog checklist in [react-page-and-hook-splitting.md](../backlog/react-page-and-hook-splitting.md).
 
 ---
 
@@ -24,6 +27,7 @@ This guide walks a new contributor through the repository in roughly the order y
 | `supabase/migrations/` | Postgres schema and RLS — **source of truth** for the database. |
 | `supabase/functions/` | Deno edge functions (HTTP APIs, crons, webhooks). |
 | `supabase/config.toml` | Supabase project id and **`[functions.<name>]`** per deployable folder — keep **one block per function** so local serve and hosted deploys match. |
+| `index.html` | Vite HTML entry: default SEO/PWA meta, `#root`, inline boot-recovery — see [index-html-and-spa-shell.md](index-html-and-spa-shell.md). |
 | `vite.config.ts` | Dev server (port 8080), `@` alias, PWA inject-manifest, **optional Supabase URL/key fallbacks** on dev serve and `vite build` when not in `localstack` mode; **`transformIndexHtml`** injects **`preconnect`** for Supabase, Google Fonts, and CoinGecko ([resource-hints-preconnect.md](../backlog/resource-hints-preconnect.md)). |
 | `vitest.config.ts` | Tests: jsdom, `src/test/setup.ts`, same `@` alias as Vite. |
 
@@ -31,13 +35,15 @@ This guide walks a new contributor through the repository in roughly the order y
 
 ## 3. Boot sequence: from `index.html` to first paint
 
-1. **`index.html`** loads the Vite entry script and sets **`class="dark"`** on `<html>` so Tailwind’s `dark:` variant matches the single Nox appearance.
-2. **`src/main.tsx`** is the real entry:
-   - Registers global `error` / `unhandledrejection` handlers and a **crash screen** if the app fails before React mounts (clears storage + reload button).
-   - Dynamically imports `App.tsx`, `lib/sw-update.ts`, and `i18n.ts`, then renders `<App />` into `#root`.
+Full diagram, metadata, boot-recovery, and domain notes: **[index-html-and-spa-shell.md](index-html-and-spa-shell.md)**.
+
+1. **`index.html`** loads the Vite entry script, sets **`class="dark"`** on `<html>`, and runs an **inline boot-recovery** script (cache reset + fallback UI if the bundle never mounts).
+2. **`src/main.tsx`** is the JS entry:
+   - Inits Sentry, cid, PostHog; registers global `error` / `unhandledrejection` handlers and a **crash screen** if React fails before mount.
+   - **Static imports** `i18n`, `App.tsx`, and `sw-update`, then `createRoot(#root).render(<App />)`.
 3. **`src/App.tsx`** wraps the tree in `ErrorBoundary`, `QueryClientProvider`, `TooltipProvider`, toasts, offline banner, `BrowserRouter`, and **`AuthProvider`**.
 
-**Why it matters:** anything that throws during static import of `App` or `i18n` is caught by `main.tsx`; errors inside React use `ErrorBoundary`.
+**Why it matters:** throws during static import of `App` or `i18n` are caught in `main.tsx`; errors inside React use `ErrorBoundary`.
 
 ---
 
@@ -91,6 +97,8 @@ TanStack Query is available app-wide (`QueryClient` in `App.tsx`); individual ho
 **Shared client fetch patterns (dedupe):** subscription status is centralized in **`use-subscription.ts`** (`useQuery` so all consumers share one `check-subscription` request/cache). BTC / market reads go through **`fetchBtcData`** in **`src/lib/btc.ts`**, which coalesces concurrent calls per currency. **`use-profile.ts`** loads the signed-in **`profiles`** row via TanStack Query (`getProfileRowQueryOptions` / `PROFILE_QUERY_KEY` / `['profile', userId]`) so every **`useHolzen()`** tree shares one in-flight fetch and cache entry; **`HomeGoalWhyCard`** subscribes with the same options (no second `profiles` read for hold-goal header data). Successful **`profiles`** writes **`invalidateQueries`** that key so parallel trees refetch server truth (see [home-fetch-deduplication.md](../backlog/home-fetch-deduplication.md)).
 
 ### 6.1 TanStack Query vs `useEffect` + Supabase
+
+Broader React norms (feature folders, colocation, scorecard): [modern-react-practices-holzen.md](modern-react-practices-holzen.md).
 
 Both are valid. Use this to choose and to match nearby code:
 
@@ -230,6 +238,8 @@ If you use [Lovable](https://lovable.dev) with GitHub sync to a linked Supabase 
 | Changes under **`src/`**, `public/`, etc. | **Frontend** updates only after you **publish** and confirm **Update** in Lovable’s publish UI (not automatic the moment you push). |
 
 **Locally**, nothing in this table runs by itself: your machine uses **`.env` / `.env.*.local`** and **`npm run dev`** (or `dev:hosted` / `dev:local`). Use **local Supabase** (`npm run supabase:start`, `supabase:reset`) to test migrations safely; use **`npx supabase functions serve`** (and [function secrets](https://supabase.com/docs/guides/functions/secrets)) to approximate hosted function behavior.
+
+**Strategic context** (why feature branches do not protect prod DB, staging project, visible CI, leaving Lovable): [lovable-staging-and-platform-exit.md](../ops/lovable-staging-and-platform-exit.md).
 
 ---
 

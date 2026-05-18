@@ -19,7 +19,6 @@ import { useHomeMarketDisplayPreferences } from '@/hooks/use-home-market-display
 import { useState } from 'react';
 import { useOutletContext, useSearchParams, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '@/hooks/use-auth';
-import { useNightReflection } from '@/components/NightReflectionCard';
 import { useHomeVisibleSections } from '@/hooks/use-home-visible-sections';
 import { useHomeCustomizeBridge } from '@/hooks/use-home-customize-bridge';
 import { useHomeMarketGoalHeaders } from '@/hooks/use-home-market-goal-headers';
@@ -38,8 +37,17 @@ const Home = () => {
   const { user } = useAuth();
   const navigate = useNavigate();
   const { pathname } = useLocation();
-  const { subscribed, loading: subLoading, monthlyRemaining, checkoutLoading, startCheckout, refresh } =
-    useSubscription();
+  const {
+    subscribed,
+    loading: subLoading,
+    entitlement,
+    checkoutLoading,
+    trialLoading,
+    startCheckout,
+    startReactivationCheckout,
+    ensureTrial,
+    refresh,
+  } = useSubscription();
   const [searchParams] = useSearchParams();
   useHomeCheckoutWelcomeToast(searchParams.get('subscribed'), refresh, t);
   useHomeDocumentTitle(true);
@@ -76,8 +84,7 @@ const Home = () => {
 
   const { subscriptionReady, hasAccess, showLimitUpsell, showPauseScheduling } = getHomeSubscriptionGate({
     subLoading,
-    subscribed,
-    monthlyRemaining,
+    entitlement,
     hasOpenPause,
     loading,
   });
@@ -88,8 +95,6 @@ const Home = () => {
   useHomeOutletPauseReady(pauseReady, hasOpenPause, dismissPauseReady);
   useHomeHeroQuoteViewed(profileLoaded, user?.id);
   useHomePauseAudio(newPauseArrival, lastPauseInstanceId, clearNewPauseArrival);
-
-  const { reflection: nightReflection, dismiss: dismissNight } = useNightReflection();
 
   const {
     priceHidden,
@@ -110,11 +115,11 @@ const Home = () => {
   const { order, collapsed, reorder, toggleCollapsed, resetLayout } = useWidgetLayout(HOME_WIDGET_DEFAULT_ORDER);
   const { visible: sectionVisible, setVisible, resetVisibility: resetSectionVisibility } = useHomeOptionalVisibility();
 
-  const { visibleOrderedSectionIds, todaySectionIds, showJourneyStatTiles } = useHomeVisibleSections({
+  const { visibleOrderedSectionIds, todaySectionIds } = useHomeVisibleSections({
     order,
     sectionVisible,
     subscribed,
-    hasNightReflection: !!nightReflection,
+    hasNightReflection: false,
   });
 
   const { customizeSheet, onOpenCustomize } = useHomeCustomizeBridge({
@@ -157,9 +162,9 @@ const Home = () => {
     subscriptionReady,
     hasAccess,
     subLoading,
-    subscribed,
-    monthlyRemaining,
+    entitlement,
     checkoutLoading,
+    trialLoading,
     hasOpenPause,
     openPauseState,
     pauseContextHomePreview,
@@ -177,6 +182,8 @@ const Home = () => {
     onDismissOpenPause: pauseActions.handleDismiss,
     onNeedPause: pauseActions.handleNeedAPause,
     onStartCheckoutPro: pauseActions.startProCheckout,
+    onStartTrial: () => void ensureTrial(),
+    onReactivate: () => void startReactivationCheckout(),
   });
 
   const { pullDistance, refreshing: pullRefreshing, handlers: pullHandlers } = useHomePullFullReload();
@@ -202,8 +209,6 @@ const Home = () => {
       toggleMarketChartExpanded,
       pauseCardBody: pauseProjection.pauseCardBody,
       pauseSectionHeaderRight: pauseProjection.pauseSectionHeaderRight,
-      nightReflection,
-      dismissNight,
       subscribed,
       collapsed,
       toggleCollapsed,
@@ -232,7 +237,10 @@ const Home = () => {
     nextCronCheckIn,
     manualCooldownRemaining,
     checkoutLoading,
-    onStartCheckoutPro: pauseActions.startProCheckout,
+    trialLoading,
+    entitlement,
+    onStartTrial: () => void ensureTrial(),
+    onReactivate: () => void startReactivationCheckout(),
   });
 
   const dashboardLayout = useHomeDashboardLayoutProps({
@@ -242,7 +250,6 @@ const Home = () => {
     userId: user?.id,
     firstName,
     todaySectionIds,
-    showJourneyStatTiles,
     goalWhyBlock,
     renderSection,
     onOpenCustomize,

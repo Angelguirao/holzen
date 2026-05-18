@@ -75,14 +75,14 @@ export function SettingsYouPanel() {
               />
             </div>
 
-            {/* Hold goal — full editor (Home “Why you stay” is summary-only) */}
+            {/* Hold goal â€” full editor (Home â€œWhy you stayâ€ is summary-only) */}
             <div className="space-y-3">
               <p className="text-muted-foreground/60 uppercase tracking-wider text-sm font-sans">{t('settings.holdGoalTitle')}</p>
               <p className="leading-relaxed text-foreground text-sm">{t('settings.holdGoalDesc')}</p>
               <HoldGoalWidget />
             </div>
 
-            {/* My Why — Motivations */}
+            {/* My Why â€” Motivations */}
             <div className="space-y-3">
               <p className="text-muted-foreground/60 uppercase tracking-wider text-sm font-sans">{t('settings.myWhy')}</p>
               <p className="leading-relaxed text-foreground text-sm">
@@ -140,7 +140,7 @@ export function SettingsYouPanel() {
             />
 
 
-            {/* Language — disabled, English only for now */}
+            {/* Language â€” disabled, English only for now */}
     </>
   );
 }
@@ -244,7 +244,7 @@ export function SettingsReflectionPanel() {
               </div>
             </div>
 
-            {/* Tone — Pro */}
+            {/* Tone â€” Pro */}
             <ProLock feature="tone">
             <div className="space-y-3">
               <p className="text-muted-foreground/60 uppercase tracking-wider text-sm font-sans">{t('settings.tone')}</p>
@@ -270,7 +270,7 @@ export function SettingsReflectionPanel() {
             </div>
             </ProLock>
 
-            {/* Style — Pro */}
+            {/* Style â€” Pro */}
             <ProLock feature="style">
             <div className="space-y-3">
               <p className="text-muted-foreground/60 uppercase tracking-wider text-sm font-sans">{t('settings.style')}</p>
@@ -302,7 +302,7 @@ export function SettingsReflectionPanel() {
             </div>
             </ProLock>
 
-            {/* Custom Prompt — Pro */}
+            {/* Custom Prompt â€” Pro */}
             <ProLock feature="custom_prompt">
             <div className="space-y-3">
               <p className="text-muted-foreground/60 uppercase tracking-wider text-sm font-sans">{t('settings.customPrompt')}</p>
@@ -381,13 +381,13 @@ export function SettingsExperiencePanel() {
               <div className="grid grid-cols-2 gap-2">
                 {([
                   { code: 'USD', label: 'USD', desc: 'US Dollar ($)' },
-                  { code: 'EUR', label: 'EUR', desc: 'Euro (€)' },
-                  { code: 'GBP', label: 'GBP', desc: 'British Pound (£)' },
+                  { code: 'EUR', label: 'EUR', desc: 'Euro (â‚¬)' },
+                  { code: 'GBP', label: 'GBP', desc: 'British Pound (Â£)' },
                   { code: 'CHF', label: 'CHF', desc: 'Swiss Franc' },
                   { code: 'CAD', label: 'CAD', desc: 'Canadian Dollar (C$)' },
                   { code: 'AUD', label: 'AUD', desc: 'Australian Dollar (A$)' },
                   { code: 'BRL', label: 'BRL', desc: 'Brazilian Real (R$)' },
-                  { code: 'TRY', label: 'TRY', desc: 'Turkish Lira (₺)' },
+                  { code: 'TRY', label: 'TRY', desc: 'Turkish Lira (â‚º)' },
                 ] as const).map((c) => (
                   <button
                     key={c.code}
@@ -468,7 +468,7 @@ export function SettingsExperiencePanel() {
               <p className="text-[11px] font-mono text-muted-foreground">
                 {t(
                   'settings.checkoutWindowRange',
-                  'Allowed range: {{min}}–{{max}} minutes.',
+                  'Allowed range: {{min}}â€“{{max}} minutes.',
                   {
                     min: CHECKOUT_SUPPRESSION_WINDOW_MIN_MINUTES,
                     max: CHECKOUT_SUPPRESSION_WINDOW_MAX_MINUTES,
@@ -527,8 +527,6 @@ export function SettingsCompanionsPanel() {
     t,
     companionPrefs,
     setCompanionPref,
-    aiInsightsEnabled,
-    setAiInsightsEnabled,
   } = useSettingsState();
   return (
     <>
@@ -539,7 +537,7 @@ export function SettingsCompanionsPanel() {
                 <p className="text-xs text-muted-foreground leading-relaxed">
                   {t('settings.companionsDesc')}
                 </p>
-                {(['breathing', 'haiku', 'grounding', 'signal', 'zoomOut', 'history'] as const).map((comp) => (
+                {(['haiku', 'grounding', 'signal', 'zoomOut', 'history'] as const).map((comp) => (
                   <div key={comp} className="flex items-center justify-between">
                     <Label htmlFor={`comp-${comp}`} className="text-xs font-mono text-muted-foreground">
                       {t(`settings.companionLabels.${comp}`)}
@@ -556,18 +554,6 @@ export function SettingsCompanionsPanel() {
               {/* Source Management */}
               <SourceManagement />
 
-              <div className="space-y-3">
-                <p className="text-muted-foreground/60 uppercase tracking-wider text-sm font-sans">{t('settings.aiInsights')}</p>
-                <p className="text-xs text-muted-foreground leading-relaxed">
-                  {t('settings.aiInsightsDesc')}
-                </p>
-                <div className="flex items-center justify-between">
-                  <Label htmlFor="ai-insights" className="text-xs font-mono text-muted-foreground">
-                    {t('settings.enableAiInsights')}
-                  </Label>
-                  <Switch id="ai-insights" checked={aiInsightsEnabled} onCheckedChange={setAiInsightsEnabled} />
-                </div>
-              </div>
             </div>
             </ProLock>
     </>
@@ -586,12 +572,6 @@ export function SettingsNotificationsPanel() {
     pushPermissionGrantedIncomplete,
     pushSubscribe,
     pushUnsubscribe,
-    notifyBadges,
-    setNotifyBadges,
-    digestFrequency,
-    setDigestFrequency,
-    nightReflectionHour,
-    setNightReflectionHour,
     quietHoursStart,
     quietHoursEnd,
     setQuietHours,
@@ -650,96 +630,12 @@ export function SettingsNotificationsPanel() {
               )}
             </div>
 
-            {/* Install Holzen — persistent re-entry point */}
+            {/* Install Holzen â€” persistent re-entry point */}
             <InstallHolzenCard alwaysShow compact />
 
-            {/* Badge notifications — free */}
-            <div className="space-y-3">
-              <p className="text-muted-foreground/60 uppercase tracking-wider text-sm font-sans">{t('settings.badgeNotifications')}</p>
-              <p className="leading-relaxed text-foreground text-sm">
-                {t('settings.badgeNotifDesc')}
-              </p>
-              <div className="flex items-center justify-between">
-                <Label htmlFor="notify-badges" className="text-xs font-mono text-muted-foreground">
-                  {t('settings.enableBadgeNotif')}
-                </Label>
-                <Switch id="notify-badges" checked={notifyBadges} onCheckedChange={setNotifyBadges} />
-              </div>
-            </div>
-
-            {/* Pro notification settings — single ProLock */}
+            {/* Pro notification settings â€” single ProLock */}
             <ProLock feature="notifications" hideContent>
             <div className="space-y-6">
-              {/* Digest */}
-              <div className="space-y-3">
-                <p className="text-muted-foreground/60 uppercase tracking-wider text-sm font-sans">{t('settings.digestFrequency')}</p>
-                <p className="text-xs text-muted-foreground leading-relaxed">
-                  {t('settings.digestDesc')}
-                </p>
-                <div className="grid grid-cols-3 gap-2">
-                  {(['daily', 'weekly', 'biweekly'] as const).map((opt) => (
-                    <button
-                      key={opt}
-                      onClick={() => setDigestFrequency(opt)}
-                      className={`rounded-md border px-3 py-2 text-center transition-colors ${
-                        digestFrequency === opt
-                          ? 'border-ring bg-muted/40 text-foreground'
-                          : 'border-border/60 bg-muted/30 text-muted-foreground hover:text-foreground'
-                      }`}
-                    >
-                      <p className="text-xs font-mono">{t(`settings.digestOptions.${opt}`)}</p>
-                    </button>
-                  ))}
-                </div>
-                <div className="grid grid-cols-2 gap-2">
-                  {(['monthly', 'off'] as const).map((opt) => (
-                    <button
-                      key={opt}
-                      onClick={() => setDigestFrequency(opt)}
-                      className={`rounded-md border px-3 py-2 text-center transition-colors ${
-                        digestFrequency === opt
-                          ? 'border-ring bg-muted/40 text-foreground'
-                          : 'border-border/60 bg-muted/30 text-muted-foreground hover:text-foreground'
-                      }`}
-                    >
-                      <p className="text-xs font-mono">{t(`settings.digestOptions.${opt}`)}</p>
-                    </button>
-                  ))}
-                </div>
-              </div>
-
-              {/* Night Reflection */}
-              <div className="space-y-3">
-                <p className="text-muted-foreground/60 uppercase tracking-wider text-sm font-sans">{t('settings.nightReflection')}</p>
-                <p className="text-xs text-muted-foreground leading-relaxed">
-                  {t('settings.nightReflectionDesc')}
-                </p>
-                <div className="flex items-center justify-between">
-                  <Label htmlFor="night-reflection-enabled" className="text-xs font-mono text-muted-foreground">
-                    {t('settings.enableNightReflection')}
-                  </Label>
-                  <Switch
-                    id="night-reflection-enabled"
-                    checked={nightReflectionHour !== null}
-                    onCheckedChange={(v) => v ? setNightReflectionHour(21) : setNightReflectionHour(null)}
-                  />
-                </div>
-                {nightReflectionHour !== null && (
-                  <div className="space-y-1.5">
-                    <p className="text-muted-foreground/60 uppercase tracking-wider text-sm font-sans">{t('settings.deliveryTime')}</p>
-                    <select
-                      value={nightReflectionHour}
-                      onChange={(e) => setNightReflectionHour(Number(e.target.value))}
-                      className="w-full text-xs font-mono px-2 py-1.5 rounded-md border border-border/60 bg-background text-foreground"
-                    >
-                      {Array.from({ length: 24 }, (_, i) => (
-                        <option key={i} value={i}>{String(i).padStart(2, '0')}:00</option>
-                      ))}
-                    </select>
-                  </div>
-                )}
-              </div>
-
               {/* Quiet Hours */}
               <div className="space-y-3">
                 <p className="text-muted-foreground/60 uppercase tracking-wider text-sm font-sans">{t('settings.quietHours')}</p>
@@ -800,7 +696,10 @@ export function SettingsSubscriptionPanel() {
     subLoading,
     subscribed,
     tier,
-    monthlyRemaining,
+    entitlement,
+    trialLoading,
+    ensureTrial,
+    startReactivationCheckout,
     checkoutLoading,
     checkoutLoadingTarget,
     startCheckoutFromSettings,
@@ -885,46 +784,32 @@ export function SettingsSubscriptionPanel() {
                 </div>
               ) : (
                 <div className="space-y-2">
-                  {monthlyRemaining !== undefined && monthlyRemaining > 0 && (
-                    <p className="text-sm font-sans text-foreground">
-                      {t('home.subscription.freeRemaining', { count: monthlyRemaining })}
-                    </p>
-                  )}
-                  {monthlyRemaining !== undefined && monthlyRemaining <= 0 && (
-                    <p className="text-sm font-sans text-foreground">
-                      {t('home.subscription.monthlyLimitReached')}
-                    </p>
-                  )}
-                  <p className="text-sm font-sans text-muted-foreground">
-                    {t('settings.choosePlan', { defaultValue: 'Choose your plan' })}
+                  <p className="text-sm font-sans text-foreground">
+                    {entitlement === 'lapsed'
+                      ? t('home.subscription.trialEnded')
+                      : t('home.subscription.startTrialPrompt')}
                   </p>
-                  <div className="grid grid-cols-1 gap-2">
+                  {entitlement === 'pre_trial' ? (
                     <LoadingButton
-                      onClick={() => startCheckoutFromSettings('pro')}
+                      onClick={() => void ensureTrial()}
+                      loading={trialLoading}
+                      loadingText={t('onboarding.ready.startingTrial', { defaultValue: 'Starting trial…' })}
+                      className="w-full text-base font-sans"
+                      size="sm"
+                    >
+                      {t('home.subscription.startTrialCta')}
+                    </LoadingButton>
+                  ) : (
+                    <LoadingButton
+                      onClick={() => void startReactivationCheckout()}
                       loading={checkoutLoading}
                       loadingText={t('settings.openingCheckout')}
                       className="w-full text-base font-sans"
                       size="sm"
                     >
-                      {t('settings.planProCta', {
-                        price: PRICING.monthlyPrice.toFixed(2),
-                        defaultValue: 'Start Pro · ${{price}}/month',
-                      })}
+                      {t('pro.upgradeCta')}
                     </LoadingButton>
-                    <LoadingButton
-                      onClick={() => startCheckoutFromSettings('pro_plus')}
-                      loading={checkoutLoading}
-                      loadingText={t('settings.openingCheckout')}
-                      variant="outline"
-                      className="w-full text-base font-sans"
-                      size="sm"
-                    >
-                      {t('settings.planProPlusCta', {
-                        price: PRICING.proPlusMonthlyPrice.toFixed(2),
-                        defaultValue: 'Start Pro+ · ${{price}}/month',
-                      })}
-                    </LoadingButton>
-                  </div>
+                  )}
                 </div>
               )}
             </div>
@@ -1088,4 +973,5 @@ export function SettingsAccountPanel() {
     </>
   );
 }
+
 

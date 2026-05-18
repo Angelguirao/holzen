@@ -1,5 +1,7 @@
 # Refactoring strategy (React pages & hooks — plus full-stack touchpoints)
 
+**Pre-launch baseline:** Structural principles, bounded contexts, and target monorepo layout live in [holzen-application-architecture.md](holzen-application-architecture.md). Modern React alignment (feature folders, Query, colocation scorecard): [modern-react-practices-holzen.md](modern-react-practices-holzen.md). Use **this** doc for **incremental** extractions inside the current tree until that restructure lands.
+
 This document is the **canonical description** of how Holzen approaches **incremental** refactors on the **client**: splitting large pages and heavy hooks. **Backend work** (Postgres, RLS, edge functions) uses the **same incremental spirit** but different mechanics—see [§ Full-stack and backend-adjacent refactors](#full-stack-and-backend-adjacent-refactors) below.
 
 It complements:

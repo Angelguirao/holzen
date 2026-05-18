@@ -1,4 +1,5 @@
 import { useEffect } from 'react';
+import { SITE_ORIGIN } from '@/config/site';
 
 interface PageMetaProps {
   title: string;
@@ -6,8 +7,6 @@ interface PageMetaProps {
   path?: string;
   noindex?: boolean;
 }
-
-const BASE_URL = 'https://holzen.lovable.app';
 const DEFAULT_TITLE = 'Holzen — Pause before you act';
 
 export function PageMeta({ title, description, path, noindex }: PageMetaProps) {
@@ -32,13 +31,13 @@ export function PageMeta({ title, description, path, noindex }: PageMetaProps) {
         canonical.setAttribute('rel', 'canonical');
         document.head.appendChild(canonical);
       }
-      canonical.href = `${BASE_URL}${path}`;
+      canonical.href = `${SITE_ORIGIN}${path}`;
     }
 
     // OG tags
     setMeta('og:title', title);
     setMeta('og:description', description);
-    if (path !== undefined) setMeta('og:url', `${BASE_URL}${path}`);
+    if (path !== undefined) setMeta('og:url', `${SITE_ORIGIN}${path}`);
 
     // Twitter tags
     setMeta('twitter:title', title);

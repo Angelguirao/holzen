@@ -2,7 +2,6 @@ import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ChevronDown, Heart } from 'lucide-react';
 import { ShareReflection } from '@/components/ShareReflection';
-import { ReflectionWallpaper } from '@/components/ReflectionWallpaper';
 import { hapticFeedback } from '@/lib/haptics';
 
 interface Props {
@@ -75,7 +74,6 @@ export function CollapsibleReflectionHeader({
                 </button>
               )}
               <ShareReflection message={message} context={context} haiku={haiku} />
-              {subscribed && <ReflectionWallpaper message={message} mood={null} context={context} haiku={haiku} variant="button" />}
             </div>
           </motion.div>
         )}

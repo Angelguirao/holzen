@@ -1,5 +1,7 @@
 # Phase 4: Cron workers, caching, and content pipelines review
 
+> **Pre-strip / security reference (2026-05).** `content_library` / `fetch-source-feeds` are legacy; shipped companions: cache → live → curated per [active-surface.md](../ops/active-surface.md).
+
 This phase is the fourth "mental model pass": after Phase 3 (`check-volatility` and automatic pause), we review **other scheduled edge workers** that **warm caches** and **fill content libraries** so companion generation, Zoom Out, and Signal/Grounding have cheap inputs at user time. These workers are not the volatility trigger; they **feed** the pause ecosystem.
 
 If these workers drift (stale prices, bad dedup, permissive auth), you get wrong Zoom Out numbers, bloated caches, or noisy duplicates — often **before** Phase 5 quality gates run.

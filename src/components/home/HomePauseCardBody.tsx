@@ -12,14 +12,17 @@ import { cn } from '@/lib/utils';
 import { shouldSurfacePauseWidgetError } from '@/lib/home-pause-widget-error';
 import type { BtcPriceData } from '@/lib/btc';
 import { usePendingPauseOffer } from '@/hooks/use-pending-pause-offer';
+import type { Entitlement } from '@/lib/subscription-entitlement';
 
 interface HomePauseCardBodyProps {
   subLoading: boolean;
   hasAccess: boolean;
-  subscribed: boolean;
-  monthlyRemaining: number | undefined;
+  entitlement: Entitlement;
   checkoutLoading: boolean;
+  trialLoading: boolean;
   onStartCheckoutPro: () => void;
+  onStartTrial: () => void;
+  onReactivate: () => void;
   hasOpenPause: boolean;
   openPauseState: 'active' | 'engaged' | null;
   contextPreview: { btc24h: string | null; marketSentiment: string | null };
@@ -44,10 +47,12 @@ interface HomePauseCardBodyProps {
 export function HomePauseCardBody({
   subLoading,
   hasAccess,
-  subscribed,
-  monthlyRemaining,
+  entitlement,
   checkoutLoading,
+  trialLoading,
   onStartCheckoutPro,
+  onStartTrial,
+  onReactivate,
   hasOpenPause,
   openPauseState,
   contextPreview,
@@ -80,25 +85,34 @@ export function HomePauseCardBody({
 
       {!subLoading && !hasAccess ? (
         <div className="space-y-3">
-          <p className={homeInWidget.bodyMuted}>{t('home.subscription.monthlyLimitReached')}</p>
-          <p className={`${homeInWidget.meta} mb-[16px]`}>{t('home.subscription.upgradeToPro')}</p>
+          <p className={homeInWidget.bodyMuted}>
+            {entitlement === 'lapsed'
+              ? t('home.subscription.trialEnded', {
+                  defaultValue: 'Your free trial has ended. Subscribe to start and complete pauses again.',
+                })
+              : t('home.subscription.startTrialPrompt', {
+                  defaultValue: 'Start your free trial to use Pause when markets move.',
+                })}
+          </p>
           <LoadingButton
-            onClick={onStartCheckoutPro}
-            loading={checkoutLoading}
-            loadingText={t('home.subscription.openingCheckout')}
+            onClick={entitlement === 'lapsed' ? onReactivate : onStartTrial}
+            loading={entitlement === 'lapsed' ? checkoutLoading : trialLoading}
+            loadingText={
+              entitlement === 'lapsed'
+                ? t('home.subscription.openingCheckout')
+                : t('onboarding.ready.startingTrial', { defaultValue: 'Starting trial…' })
+            }
             className="w-full text-sm font-medium mt-4"
           >
-            {t('pro.upgradeCta')}
+            {entitlement === 'lapsed'
+              ? t('pro.upgradeCta')
+              : t('home.subscription.startTrialCta', { defaultValue: 'Start free trial' })}
           </LoadingButton>
         </div>
       ) : subLoading ? (
         <SubscriptionSkeleton variant="inline" />
       ) : (
         <>
-          {!subscribed && monthlyRemaining !== undefined && monthlyRemaining > 0 && (
-            <p className={homeInWidget.meta}>{t('home.subscription.freeRemaining', { count: monthlyRemaining })}</p>
-          )}
-
           {hasOpenPause ? (
             <div className="space-y-4">
               {pending ? (

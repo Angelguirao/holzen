@@ -1,5 +1,5 @@
 /**
- * Shared dedup helpers for content_library inserts and companion_cache pregeneration.
+ * Shared dedup helpers for companion_catalog inserts and companion_cache pregeneration.
  * Keep normalization aligned with DB generated columns where applicable.
  */
 
@@ -10,7 +10,7 @@ import type { FeedArticleRef } from "./feed-ingest.ts";
 // deno-lint-ignore no-explicit-any
 type SupabaseClient = any;
 
-/** Trim, lowercase, collapse internal whitespace — matches content_library.title_norm in SQL. */
+/** Trim, lowercase, collapse internal whitespace — matches companion_catalog.title_norm in SQL. */
 export function normalizeTitleKey(s: string): string {
   return s.trim().toLowerCase().replace(/\s+/g, " ");
 }
@@ -29,7 +29,7 @@ export function canonicalContentUrl(raw: string): string | null {
   }
 }
 
-/** URL strings to match against content_library.url (raw + canonical variants). */
+/** URL strings to match against companion_catalog.url (raw + canonical variants). */
 export function urlDedupCandidates(raw: string | null | undefined): string[] {
   if (!raw || raw.length < 4) return [];
   const out = new Set<string>();
@@ -51,7 +51,7 @@ export function urlDedupCandidates(raw: string | null | undefined): string[] {
 }
 
 /**
- * Drop article refs whose URL (or a canonical variant) already exists in `content_library`.
+ * Drop article refs whose URL (or a canonical variant) already exists in `companion_catalog`.
  * Use before ingest so each cron run does not walk the same known URLs from index 0 and burn
  * attempt budget on `dedup_url_pre_scrape` skips.
  */
@@ -101,7 +101,7 @@ export async function filterArticleRefsNotInLibrary(
   for (let i = 0; i < flat.length; i += CONTENT_LIBRARY_URL_IN_CHUNK) {
     const chunk = flat.slice(i, i + CONTENT_LIBRARY_URL_IN_CHUNK);
     const { data, error } = await svcClient
-      .from("content_library")
+      .from("companion_catalog")
       .select("url")
       .eq("type", contentType)
       .eq("active", true)

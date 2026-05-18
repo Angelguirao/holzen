@@ -1,0 +1,127 @@
+import { useCallback } from 'react';
+import { useQuery } from '@tanstack/react-query';
+import { useTranslation } from 'react-i18next';
+import { Waves, PenLine, Activity, History, Lock, ChevronRight, Sparkles } from 'lucide-react';
+import { useSubscription } from '@/hooks/use-subscription';
+import { useAuth } from '@/hooks/use-auth';
+import { getPracticeEntriesWeeklyCountQueryOptions } from '@/legacy/full-shell/src/lib/practice-entries-weekly-count-query';
+import { toast } from 'sonner';
+import { useNavigate } from 'react-router-dom';
+import { homeInWidget } from '@/components/home/home-widget-styles';
+import { TOOLS } from '@/lib/app-routes';
+import { usePracticeSuggestion } from '@/legacy/full-shell/src/hooks/use-practice-suggestion';
+import type { SuggestedPracticeId } from '@/legacy/full-shell/src/lib/practice-suggestion';
+
+type PracticeId = SuggestedPracticeId;
+
+const PRACTICES = [
+  { id: 'checkin' as const, icon: Waves, labelKey: 'practice.checkinLabel', descKey: 'practice.checkinDesc', free: true, route: TOOLS.practice.checkin },
+  { id: 'journal' as const, icon: PenLine, labelKey: 'practice.journalLabel', descKey: 'practice.journalDesc', free: false, route: TOOLS.practice.journal },
+  { id: 'bodyscan' as const, icon: Activity, labelKey: 'practice.bodyscanLabel', descKey: 'practice.bodyscanDesc', free: false, route: TOOLS.practice.bodyscan },
+  { id: 'replay' as const, icon: History, labelKey: 'practice.replayLabel', descKey: 'practice.replayDesc', free: false, route: TOOLS.practice.replay },
+] as const;
+
+function useWeeklyProgress(userId: string | undefined) {
+  const { data: count = 0 } = useQuery(getPracticeEntriesWeeklyCountQueryOptions(userId));
+  return count;
+}
+
+export function PracticeWidget() {
+  const { t } = useTranslation();
+  const { subscribed, startCheckout } = useSubscription();
+  const { user } = useAuth();
+  const navigate = useNavigate();
+  const rawSuggestion = usePracticeSuggestion(user?.id);
+  const weeklyCount = useWeeklyProgress(user?.id);
+
+  // Only show AI suggestion for Pro users, or if it suggests a free practice
+  const suggestion = rawSuggestion && (subscribed || PRACTICES.find(p => p.id === rawSuggestion.id)?.free)
+    ? rawSuggestion
+    : null;
+
+  const handleSelect = useCallback((id: PracticeId) => {
+    const practice = PRACTICES.find(p => p.id === id);
+    if (!practice) return;
+    if (!practice.free && !subscribed) {
+      const descKey = `pro.desc_${id}`;
+      const description = t(descKey) !== descKey ? t(descKey) : t('pro.upgradeDesc');
+      toast(t('pro.featureLocked'), {
+        description,
+        action: { label: t('pro.upgradeCta'), onClick: () => startCheckout() },
+        duration: 6000,
+      });
+      return;
+    }
+    navigate(practice.route);
+  }, [subscribed, startCheckout, t, navigate]);
+
+  return (
+    <div className="space-y-3">
+      {/* Weekly progress */}
+      <div className="flex items-center justify-between">
+        <p className={homeInWidget.bodyMuted}>{t('practice.intro')}</p>
+      </div>
+
+      {/* Progress dots */}
+      <div className="flex gap-1">
+        {Array.from({ length: 7 }).map((_, i) => (
+          <div
+            key={i}
+            className={`h-1 flex-1 rounded-full transition-colors ${
+              i < Math.min(weeklyCount, 7) ? 'bg-primary/40' : 'bg-border/30'
+            }`}
+          />
+        ))}
+      </div>
+
+      {/* Contextual suggestion */}
+      {suggestion && (
+        <button
+          onClick={() => handleSelect(suggestion.id)}
+          className="flex w-full items-start gap-3 rounded-xl border border-border/50 bg-nox-background-accent/20 px-3 py-3 transition-colors hover:bg-nox-background-accent/35"
+        >
+          <Sparkles className="h-3.5 w-3.5 shrink-0 mt-[6px] text-secondary-foreground" />
+          <div className="min-w-0 flex-1 text-left">
+            <span className={`${homeInWidget.kicker} text-nox-text-highlight/90`}>
+              {t('practice.suggested', { defaultValue: 'Suggested' })}
+            </span>
+            <span className={`mt-1 block ${homeInWidget.bodyMuted} leading-snug`}>
+              {suggestion.reason}
+            </span>
+          </div>
+          <ChevronRight className="h-3 w-3 text-muted-foreground/50 shrink-0 mt-[5px]" />
+        </button>
+      )}
+
+      {/* All exercises */}
+      <div className="space-y-1.5">
+        {PRACTICES.map((p) => {
+          const Icon = p.icon;
+          const locked = !p.free && !subscribed;
+          return (
+            <button
+              key={p.id}
+              onClick={() => handleSelect(p.id)}
+              className="w-full gap-3 rounded-xl px-3 py-2.5 text-left transition-colors hover:bg-muted/30 group py-2.5 flex items-start justify-start"
+            >
+              <Icon className="h-3.5 w-3.5 shrink-0 mt-[6px] text-secondary-foreground" />
+              <div className="min-w-0 flex-1 text-left">
+                <span className="text-sm font-medium text-foreground transition-colors group-hover:text-foreground">
+                  {t(p.labelKey)}
+                </span>
+                <span className="mt-0.5 block leading-snug text-muted-foreground text-sm">
+                  {t(p.descKey)}
+                </span>
+              </div>
+              {locked ? (
+                <Lock className="h-3 w-3 text-muted-foreground/30 shrink-0 mt-[6px]" />
+              ) : (
+                <ChevronRight className="h-3 w-3 text-muted-foreground/30 shrink-0 mt-[6px]" />
+              )}
+            </button>
+          );
+        })}
+      </div>
+    </div>
+  );
+}

@@ -5,10 +5,6 @@ import { HolzenNumber } from '@/components/HolzenNumber';
 import type { HomeDashboardSectionDeps } from '@/components/home/render-home-dashboard-section';
 import type { BtcPriceData } from '@/lib/btc';
 import type { TrackedAssetId } from '@/lib/tracked-assets';
-import type { ComponentProps } from 'react';
-import { NightReflectionCard } from '@/components/NightReflectionCard';
-
-type NightReflection = NonNullable<ComponentProps<typeof NightReflectionCard>['reflection']>;
 
 /** Memoized bundle passed into {@link renderHomeDashboardSection}. */
 export function useHomeDashboardSectionDeps(args: {
@@ -33,8 +29,6 @@ export function useHomeDashboardSectionDeps(args: {
   toggleMarketChartExpanded: () => void;
   pauseCardBody: ReactNode;
   pauseSectionHeaderRight: ReactNode | undefined;
-  nightReflection: NightReflection | null;
-  dismissNight: () => void;
   subscribed: boolean;
   collapsed: Record<string, boolean>;
   toggleCollapsed: (id: string) => void;
@@ -62,8 +56,6 @@ export function useHomeDashboardSectionDeps(args: {
     toggleMarketChartExpanded,
     pauseCardBody,
     pauseSectionHeaderRight,
-    nightReflection,
-    dismissNight,
     subscribed,
     collapsed,
     toggleCollapsed,
@@ -93,8 +85,6 @@ export function useHomeDashboardSectionDeps(args: {
       toggleMarketChartExpanded,
       pauseCardBody,
       pauseSectionHeaderRight,
-      nightReflection,
-      dismissNight,
       subscribed,
       collapsed,
       toggleCollapsed,
@@ -120,8 +110,6 @@ export function useHomeDashboardSectionDeps(args: {
       toggleMarketChartExpanded,
       pauseCardBody,
       pauseSectionHeaderRight,
-      nightReflection,
-      dismissNight,
       subscribed,
       collapsed,
       toggleCollapsed,

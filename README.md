@@ -1,6 +1,14 @@
 # Holzen
 
-Holzen is a React + TypeScript single-page app focused on **Bitcoin-aware mindfulness**: breathing and grounding practices, journaling, a content library, and companions powered by Supabase edge functions.
+Holzen is a React + TypeScript single-page app focused on **Bitcoin-aware mindfulness**: pause rituals when markets move, AI companions, archive, and subscription billing via Supabase edge functions.
+
+## Pause-first shipped product
+
+The active app is a **pause-first MVP**: four primary tabs (Home, Archive, Journey, Settings), full-screen `/pause` ritual, and Stripe-native **7-day trial** (no card) via `ensure-trial-subscription`. After trial, users need a paid subscription to **engage** pauses; Archive and Journey stay readable when **lapsed**. Legacy Tools, stats, and library routes return **404** (no redirects).
+
+- **What ships:** [docs/ops/active-surface.md](docs/ops/active-surface.md)
+- **Why / recovery:** [docs/decisions/2026-05-16-pause-first-shipped-scope.md](docs/decisions/2026-05-16-pause-first-shipped-scope.md) · tag `full-ia-pre-strip`
+- **Launch checklist:** [docs/ops/launch-runbook.md](docs/ops/launch-runbook.md)
 
 ## Stack
 
@@ -145,4 +153,4 @@ ESLint is enabled project-wide. The tree may report many existing issues; treat 
 
 The project was initially scaffolded with [Lovable](https://lovable.dev); you can keep using that workflow alongside local development. **Lovable Cloud** can generate and manage **`VITE_SUPABASE_*` for previews and deploys** so you do not hand-edit `.env` in that environment. **Locally**, Git + Vite still use `.env` / `.env.*.local` on your machine when you run `npm run dev` (or the `dev:hosted` / `dev:local` scripts above). Publishing and custom domains are documented in [Lovable’s docs](https://docs.lovable.dev/features/custom-domain#custom-domain).
 
-**When the repo syncs from GitHub into Lovable**, the linked Supabase project typically **applies new migrations and deploys edge function changes automatically** — that can affect **production** immediately, with no extra click. **Frontend** (this React app) still goes live for end users when you **publish** and confirm **Update** in Lovable’s publish flow. Merge backend changes with that split in mind; see [docs/fundamentals/navigating-the-codebase.md](docs/fundamentals/navigating-the-codebase.md) for `config.toml`, JWT defaults, and local vs hosted behavior.
+**When the repo syncs from GitHub into Lovable**, the linked Supabase project typically **applies new migrations and deploys edge function changes automatically** — that can affect **production** immediately, with no extra click. **Frontend** (this React app) still goes live for end users when you **publish** and confirm **Update** in Lovable’s publish flow. Merge backend changes with that split in mind; see [docs/fundamentals/navigating-the-codebase.md](docs/fundamentals/navigating-the-codebase.md) for `config.toml`, JWT defaults, and local vs hosted behavior. For **staging**, **visible CI**, and **moving off Lovable**, see [docs/ops/lovable-staging-and-platform-exit.md](docs/ops/lovable-staging-and-platform-exit.md).

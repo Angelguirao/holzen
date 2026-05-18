@@ -23,7 +23,7 @@ export interface InterventionState {
 
 /** Where a slot result came from. `library` = served from the curated `content_library` table (distinct from
  *  the runtime `companion_cache`). Keep aligned with edge `CompanionResultSource` and `companion_serves.serve_source`. */
-export type CompanionSlotSource = 'live' | 'library' | 'cache' | 'curated' | 'empty';
+export type CompanionSlotSource = 'live' | 'catalog' | 'library' | 'cache' | 'curated' | 'empty';
 
 /** Slot payload shape returned by `companion-orchestrate` for each companion key. */
 export interface CompanionOrchestrateSlotResult {

@@ -37,11 +37,36 @@ The authoritative list of PostHog events Holzen emits. Deliberate events only �
 
 | Event | When | Properties | Owner |
 |---|---|---|---|
-| `navigation.primary_tab_opened` | User taps a **different** primary bottom tab (shell) than the current one | `{ tab: 'home' \| 'archive' \| 'tools' \| 'journey' \| 'settings' }` | @holzen |
+| `navigation.primary_tab_opened` | User taps a **different** primary bottom tab (shell) than the current one | `{ tab: 'home' \| 'archive' \| 'journey' \| 'settings' }` | @holzen |
 
 Does not fire when re-tapping the active tab or when navigation is not from the bottom bar (e.g. deep link, back button).
 
 The Archive tab uses route `/archive` and reports `tab: 'archive'`.
+
+### app
+
+| Event | When | Properties | Owner |
+|---|---|---|---|
+| `app.route_not_found` | Catch-all `NotFound` for an unregistered path | `{ attempted_path: string }` — pathname only, no query string | @holzen |
+
+### onboarding
+
+| Event | When | Properties | Owner |
+|---|---|---|---|
+| `onboarding.completed` | User finishes the 2-step onboarding flow and `ensure-trial-subscription` succeeds | `{ steps_completed: 2 }` | @holzen |
+
+### subscription
+
+| Event | When | Properties | Owner |
+|---|---|---|---|
+| `trial.started` | Stripe trial subscription created via `ensure-trial-subscription` (`created: true`) | `{ source: 'ensure_trial' }` | @holzen |
+| `trial.expired` | Client entitlement transitions to `lapsed` (trial ended without active paid sub) | `{}` | @holzen |
+
+### journey
+
+| Event | When | Properties | Owner |
+|---|---|---|---|
+| `journey.overview_viewed` | `JourneyOverview` first paint after data ready | `{ streak_days?: number; completed_pause_count?: number }` — aggregates only | @holzen |
 
 ### auth
 
@@ -104,7 +129,7 @@ PII stance unchanged: no generated pause message text, no companion content, no 
 | Event | When | Properties | Owner |
 |---|---|---|---|
 | `generation.initiated` | `companion-orchestrate` invoked for a card (lazy first fetch or regenerate) | `{ companion_type: 'signal' \| 'grounding' \| 'history' \| 'zoom_out'; source: 'lazy' \| 'regenerate' }` | @holzen |
-| `companion.served` | First fill for a slot (cache hydrate, lazy fetch, regenerate, or intervention sidecar) | `{ companion_type; source: 'live' \| 'library' \| 'cache' \| 'curated' \| 'empty'; slot: 'signal' \| 'grounding' \| 'history' \| 'zoomOut' }` | @holzen |
+| `companion.served` | First fill for a slot (cache hydrate, lazy fetch, regenerate, or intervention sidecar) | `{ companion_type; source: 'live' \| 'catalog' \| 'library' \| 'cache' \| 'curated' \| 'empty'; slot: 'signal' \| 'grounding' \| 'history' \| 'zoomOut' }` | @holzen |
 
 ### paywall
 
@@ -156,6 +181,10 @@ Web Vitals are also forwarded to Sentry metrics. PostHog copy supports cohort/fu
 1. Mark **deprecated** in the table with a date.
 2. Remove emission from code in the same PR.
 3. Leave historical data in PostHog (it's cheap and useful for regression checks).
+
+## CI guard (shipped strip)
+
+`npm run check:posthog-events-allowlist` — every `trackEvent('…')` in active `src/` (excluding `src/legacy/` and `src/test/`) must appear in the **Active events** section above. Runs in **`test:ci`** and `scripts/pre-push-check.sh`.
 
 ## Server-side events
 

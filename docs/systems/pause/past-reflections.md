@@ -1,5 +1,7 @@
 # Past pauses (user-words read model)
 
+> **Not in shipped pause-first scope (2026-05).** `practice_entries` was dropped in cutover; Echo/Replay tools routes are legacy. Reference: tag `full-ia-pre-strip`. Shipped: [active-surface.md](../../ops/active-surface.md).
+
 > **Pause V2:** User-word extraction now runs against pause events
 > (`pause_step_events`) + `practice_entries`. There is no legacy
 > `reflections` table post-cutover.

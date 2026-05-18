@@ -1,14 +1,14 @@
 /**
  * Companion generation phase configuration.
  *
- * Controls the order in which companions are resolved:
- *   1. Library  (content_library — curated essays/papers/events)
+ * Shipped order (pause-first strip):
+ *   1. Catalog  (companion_catalog — curated essays, papers, events)
  *   2. Cache    (companion_cache — previously generated content)
  *   3. Live     (Perplexity + AI generation)
  *   4. Curated  (static fallback pools — always available as last resort)
  *
- * Each phase can be toggled via Supabase Edge Function secrets:
- *   COMPANION_PHASE_LIBRARY  — default: enabled
+ * Toggle via Supabase Edge Function secrets:
+ *   COMPANION_PHASE_CATALOG  — default: enabled
  *   COMPANION_PHASE_CACHE    — default: enabled
  *   COMPANION_PHASE_LIVE     — default: enabled
  *
@@ -18,10 +18,10 @@
  * (existing behaviour for testing live paths without masking failures).
  */
 
-export type CompanionPhase = "library" | "cache" | "live";
+export type CompanionPhase = "catalog" | "cache" | "live";
 
 export interface PhaseConfig {
-  library: boolean;
+  catalog: boolean;
   cache: boolean;
   live: boolean;
 }
@@ -32,10 +32,10 @@ function readBoolEnv(key: string, defaultValue: boolean): boolean {
   return !(v === "0" || v === "false" || v === "no");
 }
 
-/** Read the phase config from env vars. All phases enabled by default. */
+/** Read the phase config from env vars. Catalog, cache, and live enabled by default. */
 export function getPhaseConfig(): PhaseConfig {
   return {
-    library: readBoolEnv("COMPANION_PHASE_LIBRARY", true),
+    catalog: readBoolEnv("COMPANION_PHASE_CATALOG", true),
     cache: readBoolEnv("COMPANION_PHASE_CACHE", true),
     live: readBoolEnv("COMPANION_PHASE_LIVE", true),
   };
@@ -45,7 +45,7 @@ export function getPhaseConfig(): PhaseConfig {
 export function getActivePhases(): CompanionPhase[] {
   const config = getPhaseConfig();
   const phases: CompanionPhase[] = [];
-  if (config.library) phases.push("library");
+  if (config.catalog) phases.push("catalog");
   if (config.cache) phases.push("cache");
   if (config.live) phases.push("live");
   return phases;

@@ -1,5 +1,7 @@
 # Phase 6: Supabase RLS/authz security model
 
+> **Pre-strip / security reference (2026-05).** Tier B drops: [active-surface.md](../ops/active-surface.md).
+
 ## Goal
 
 Verify the security posture for the tables involved in the pause + companion pipeline:

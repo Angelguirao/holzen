@@ -27,34 +27,23 @@ import { createAttemptLogger, trackEvent } from "../observe.ts";
 import { enqueueCatalogSourceSuggestion } from "../source-suggestions.ts";
 import { callPerplexityChat, mergePerplexityUsage } from "../perplexity-client.ts";
 import { fetchInitWithIncomingTrace } from "../forward-trace-headers.ts";
-import { searchLibrary, paperToGrounding, recordLibraryServe } from "../content-library.ts";
+import {
+  searchCompanionCatalog,
+  paperToGrounding,
+  recordCatalogServe,
+} from "../companion-catalog.ts";
 import { getPhaseConfig } from "../phase-config.ts";
 import { type CompanionCacheTitleRow } from "../companion-cache-dedup.ts";
 
 /** Bump when the search query, structuring prompt, or quality rules change. */
 export const PROMPT_VERSION = "v4";
 
-/**
- * Temporarily disable the Phase-1 library lookup for grounding.
- *
- * As of 2026-04-18 `content_library` has no rows of `type: "paper"` and the
- * ingestion pipeline for papers is parked. Every library call would only emit
- * `library_search_rejected reason:"empty"` and add an unnecessary DB round-trip
- * per grounding request. Skipping the phase entirely is faster and keeps the
- * edge logs quieter.
- *
- * Flip this back to `true` when we resume ingesting papers into
- * `content_library` (or replace with a `COMPANION_PHASE_LIBRARY_GROUNDING`
- * env-var toggle if we need runtime control).
- */
-const GROUNDING_LIBRARY_ENABLED = false;
-
 // ── Public types ──
 
 export interface GroundingResult {
   data: { title: string; body: string; citation: string; url: string } | null;
-  /** `library` = served from `content_library`; `cache` = served from runtime `companion_cache`. */
-  source: "live" | "library" | "cache" | "curated" | "empty";
+  /** `catalog` = `companion_catalog`; `cache` = `companion_cache`. */
+  source: "live" | "catalog" | "library" | "cache" | "curated" | "empty";
   cacheId: string | null;
   /** Set when `serveFromCache` served this row (not library / curated). */
   cacheRelaxation?: CacheServeRelaxation;
@@ -129,22 +118,21 @@ function findMatchingBiasTopic(preferredBias: string | undefined): (typeof BIAS_
   return null;
 }
 
-/** Try content_library (papers) for grounding. */
-async function tryLibrary(
+async function tryCatalog(
   svcClient: SupabaseClient,
   userId?: string,
 ): Promise<GroundingResult | null> {
-  const libraryRows = await searchLibrary(svcClient, {
+  const rows = await searchCompanionCatalog(svcClient, {
     type: "paper",
     companionType: "ground_nudge",
     userId,
     includeStale: false,
   });
-  if (libraryRows.length > 0) {
-    const pick = libraryRows[Math.floor(Math.random() * Math.min(libraryRows.length, 3))];
+  if (rows.length > 0) {
+    const pick = rows[Math.floor(Math.random() * Math.min(rows.length, 3))];
     const result = paperToGrounding(pick);
-    recordLibraryServe(svcClient, userId, pick.id, "ground_nudge");
-    return { data: result, source: "library", cacheId: null };
+    recordCatalogServe(svcClient, userId, pick.id, "ground_nudge");
+    return { data: result, source: "catalog", cacheId: null };
   }
   return null;
 }
@@ -188,7 +176,7 @@ async function serveCurated(svcClient: SupabaseClient): Promise<GroundingResult>
   return { data: pickRandom(pool), source: "curated", cacheId: null };
 }
 
-/** Resolve from non-live phases in order (library → cache → curated). */
+/** Resolve from non-live phases in order (catalog → cache → curated). */
 async function serveFallback(
   svcClient: SupabaseClient,
   userId?: string,
@@ -200,9 +188,9 @@ async function serveFallback(
     return { data: null, source: "empty", cacheId: null, error: COMPANION_FALLBACKS_DISABLED_MESSAGE };
   }
   const phases = getPhaseConfig();
-  if (phases.library && GROUNDING_LIBRARY_ENABLED) {
-    const lib = await tryLibrary(svcClient, userId);
-    if (lib) return lib;
+  if (phases.catalog) {
+    const cat = await tryCatalog(svcClient, userId);
+    if (cat) return cat;
   }
   if (phases.cache) {
     const cached = await tryCache(svcClient, userId, marketDirection, excludeIds, false, structuredLog);
@@ -234,12 +222,11 @@ export async function generateGrounding(params: GenerateGroundingParams): Promis
   const liveEnabled = phases.live && !skipLive;
 
   if (!forceLive) {
-  // ── Phase 1: Library (disabled for grounding — see GROUNDING_LIBRARY_ENABLED) ──
-  if (phases.library && GROUNDING_LIBRARY_ENABLED) {
-    const lib = await tryLibrary(svcClient, userId);
-    if (lib) {
-      log("grounding resolved from library (phase 1)");
-      return lib;
+  if (phases.catalog) {
+    const cat = await tryCatalog(svcClient, userId);
+    if (cat) {
+      log("grounding resolved from catalog (phase 1)");
+      return cat;
     }
   }
 

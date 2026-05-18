@@ -1,28 +1,24 @@
 import { useCallback, useLayoutEffect, useRef, useState } from 'react';
 import { motion } from 'framer-motion';
-import { Flame, Pencil, Sparkles } from 'lucide-react';
+import { Flame, Pencil } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
-import { useSubscription } from '@/hooks/use-subscription';
-import { journeyPath } from '@/lib/app-routes';
 import { PAUSE_MOOD_VALUES, type MoodValue } from '@/components/MoodCheck';
 import { MoodIcon } from '@/components/icons/MoodIcon';
 import { OutcomeIcon } from '@/components/icons/OutcomeIcon';
 import { PAUSE_FEEL_INTENSITY_KEYS } from '@/components/pause/pause-feel-intensity-labels';
-import { PRICING } from '@/lib/pricing';
 import { cn } from '@/lib/utils';
-import { PauseDoneBriefJourneyRecap } from './PauseDoneBriefJourneyRecap';
 import { ScoreImpact } from './ScoreImpact';
 import { pauseStepLayout } from '@/components/pause/pause-step-layout';
 import { Button } from '@/components/ui/button';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Slider } from '@/components/ui/slider';
 import { ShareReflection } from '@/components/ShareReflection';
-import { ReflectionWallpaper } from '@/components/ReflectionWallpaper';
 import { trackEvent } from '@/lib/posthog';
 import { isPauseMoodValue, buildPostPauseEmotionLoggedPayload } from '@/lib/pause-post-pause-emotion-log';
 import { pauseLogStep } from '@/lib/pause-api';
 import { showPauseStepSyncFailedToast } from '@/lib/pause-step-sync-toast';
+import { useSubscription } from '@/hooks/use-subscription';
 
 interface PauseData {
   mood: string | null;
@@ -84,14 +80,6 @@ function PauseDoneReflectShareRow({
         haiku={haiku ?? null}
         onMenuOpen={trackShareMenuOpen}
       />
-      <ReflectionWallpaper
-        message={msg}
-        mood={mood}
-        context={context ?? null}
-        haiku={haiku ?? null}
-        variant="button"
-        onGenerateIntent={trackWallpaperTap}
-      />
     </div>
   );
 }
@@ -110,9 +98,7 @@ export function PauseDone({
   pauseInstanceId,
 }: Props) {
   const { t } = useTranslation();
-  const { subscribed, monthlyUsed, startCheckout, checkoutLoading } = useSubscription();
-
-  const justHitLimit = !subscribed && monthlyUsed >= PRICING.freeReflectionsPerMonth;
+  const { subscribed } = useSubscription();
 
   const [briefDoneMood, setBriefDoneMood] = useState<MoodValue | null>(null);
   const [briefDoneIntensity, setBriefDoneIntensity] = useState(3);
@@ -201,7 +187,6 @@ export function PauseDone({
 
           <div className="w-full max-w-md space-y-3 text-center">
             <p className="text-sm font-medium leading-snug text-foreground">{journeyShort}</p>
-            <PauseDoneBriefJourneyRecap pauseData={pauseData} />
             <p className="mx-auto max-w-sm text-xs leading-relaxed text-foreground">
               {t('pause.brief.done.practiceAffirmLead', {
                 defaultValue:
@@ -214,12 +199,6 @@ export function PauseDone({
                   'Holzen and skill bars in Stats summarize patterns across many completed pauses. They can move slowly and are never a verdict on whether pausing was the right call.',
               })}
             </p>
-            <Link
-              to={journeyPath('stats')}
-              className="inline-block text-sm font-medium text-nox-text-link underline-offset-4 transition-colors hover:text-nox-text-link/80 hover:underline"
-            >
-              {t('pause.brief.done.openStatsCta', { defaultValue: 'How scores work in Journey' })}
-            </Link>
           </div>
 
           <div className="w-full max-w-md space-y-4 rounded-xl border border-primary bg-card p-4 text-left shadow-sm">
@@ -446,42 +425,10 @@ export function PauseDone({
         pauseInstanceId={pauseInstanceId}
       />
 
-      {justHitLimit && (
-        <motion.div
-          initial={{ opacity: 0, y: 12 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 2, duration: 0.8 }}
-          className="flex max-w-[300px] flex-col items-center gap-3 rounded-2xl border border-border/30 bg-card/30 px-6 py-5 backdrop-blur-sm"
-        >
-          <div className="flex items-center gap-2">
-            <Sparkles className="h-3.5 w-3.5 text-muted-foreground" />
-            <p className="text-xs font-medium text-foreground/80">
-              {t('pause.upsellTitle', {
-                defaultValue: "You've used all {{count}} free pauses this month",
-                count: PRICING.freeReflectionsPerMonth,
-              })}
-            </p>
-          </div>
-          <p className="text-center text-sm leading-relaxed text-muted-foreground">
-            {t('pause.upsellBody', {
-              defaultValue: 'Unlock unlimited pauses, AI companions, and your full library.',
-            })}
-          </p>
-          <button
-            type="button"
-            onClick={() => startCheckout()}
-            disabled={checkoutLoading}
-            className="text-sm font-medium text-nox-text-link underline-offset-4 transition-colors hover:text-nox-text-link/80 hover:underline disabled:opacity-50"
-          >
-            {t('pause.upsellCta', { defaultValue: 'Start {{days}}-day free trial', days: PRICING.trialDays })}
-          </button>
-        </motion.div>
-      )}
-
       <motion.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
-        transition={{ delay: justHitLimit ? 2.5 : 1.5, duration: 1 }}
+        transition={{ delay: 1.5, duration: 1 }}
         className="mt-4"
       >
         <Button type="button" variant="default" className={pauseStepLayout.ritualPrimaryCta} onClick={onReturn}>

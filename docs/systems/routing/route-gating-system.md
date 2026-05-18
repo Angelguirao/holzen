@@ -1,5 +1,7 @@
 # Route gating system
 
+**Pause-first shipped scope (2026-05):** Authenticated shell routes are Home, Archive, Journey overview, Settings (+ full-screen Pause/Companion). `/tools/*`, `/library`, `/journey/stats`, and legacy Journey tabs → **404** (`NotFound`), not redirects. See [active-surface.md](../ops/active-surface.md).
+
 This document describes how Holzen decides whether to show **protected** app UI, **public-only** marketing/auth UI, or **ungated** content. It is implemented in `src/App.tsx` using `ProtectedRoute` and `PublicOnlyRoute` around `react-router-dom` routes.
 
 Related: `docs/systems/auth/auth-and-referral-system.md` (session + `AuthProvider`); this doc focuses on **routing decisions** given `user` and `loading` from `useAuth()`.
@@ -39,8 +41,9 @@ return <>{children}</>;
 
 | Pattern | Example paths | Behavior |
 |--------|-----------------|----------|
-| Protected + shell | `/`, `/archive`, `/journey/*`, `/settings`, `/tools` (hub); `/library` redirects to `/archive` | `ProtectedRoute` -> `AppLayout` -> nested `Outlet` routes |
-| Protected, full-screen | `/pause`, `/tools/*` (breathe, ground + nested history, practice, …), `/companion/*`, `/admin/*` | `ProtectedRoute` wraps page only (no `AppLayout` nav chrome). |
+| Protected + shell | `/`, `/archive`, `/journey`, `/settings` | `ProtectedRoute` → `AppLayout` → nested `Outlet` routes |
+| Protected, full-screen | `/pause`, `/companion/*`, `/admin/*` | `ProtectedRoute` wraps page only (no `AppLayout` nav chrome). |
+| Dead (404) | `/tools`, `/tools/*`, `/library`, `/journey/stats`, `/journey/:tab` | `NotFound` — no redirect map |
 | Public-only | `/welcome`, `/auth` | `PublicOnlyRoute` |
 | Ungated | `/terms`, `/privacy`, `/about`, `/blog`, `/roadmap`, `/reserve`, `/reset-password`, `*` | No wrapper; available without login |
 

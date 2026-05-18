@@ -1,0 +1,17 @@
+meta {
+  name: 03 customer-portal
+  type: http
+  seq: 6
+}
+
+post {
+  url: {{VITE_SUPABASE_URL}}/functions/v1/customer-portal
+  body: none
+  auth: none
+}
+
+headers {
+  x-cid: bruno-{{$timestamp}}-review
+  Authorization: Bearer {{SUPABASE_ACCESS_TOKEN}}
+  apikey: {{VITE_SUPABASE_PUBLISHABLE_KEY}}
+}

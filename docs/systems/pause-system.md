@@ -1,5 +1,7 @@
 # Pause system (Pause V2)
 
+> **Reflect artifact (shipped):** deep ritual copy uses kind **`reflection_text`** on `pause_ai_artifacts` (unchanged at launch cutover).
+
 This document is the **canonical data and lifecycle reference** for Pause V2: tables, state machine, RPCs, step payloads, and how the `**/pause`** ritual lines up with Postgres.
 
 For **how reflection and companions are produced** (edge functions, orchestrator, cron, hooks), read **[pause/ai-powered-pause-system.md](pause/ai-powered-pause-system.md)** first or in parallel. That file is the narrative pipeline; this file is the **contract** the pipeline and UI must satisfy.

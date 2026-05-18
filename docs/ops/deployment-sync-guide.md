@@ -4,6 +4,8 @@ How Lovable Cloud auto-deploys when you push to GitHub, and how to avoid surpris
 
 **Repo integration:** This checklist is referenced from [AGENTS.md](../../AGENTS.md) (humans + AI) and enforced for Cursor via [`.cursor/rules/deployment-sync.mdc`](../../.cursor/rules/deployment-sync.mdc) (`alwaysApply`). Run it before every push that touches app code, migrations, or edge functions.
 
+**Staging / leaving Lovable:** Git branches do **not** isolate the database—migrations on the synced branch hit **production** immediately. For risk model, invisible CI, hybrid paths, and a phased exit checklist, see **[lovable-staging-and-platform-exit.md](lovable-staging-and-platform-exit.md)**.
+
 ## What happens on GitHub → Lovable sync
 
 | Artifact | Deployed automatically? | Goes live immediately? |
@@ -125,7 +127,7 @@ Frontend is safe — it only goes live when you click **Publish → Update** in 
 
 ### Combined local gate (`npm run check:prepush`)
 
-`npm run check:prepush` runs `scripts/pre-push-check.sh`: edge release stamp (**`node scripts/stamp-edge-release.mjs`**, same effect as **`npm run stamp:release`**), **`npm run check:view-migrations`** (unsafe `CREATE OR REPLACE VIEW` patterns), every `supabase/functions/<name>/` has a matching `[functions.<name>]` in `config.toml`, **`npm run check:edge`** (skips if Deno missing), **`npm run check:edge-logging`**, **`npm run check:edge-coverage-manifest`**, **`npm run test`**, **`npm run build`** (which runs **`prebuild`** → **`npm run check:version-sync`**), and (when Docker + Supabase CLI are available) a local **`supabase db reset`**. **Requires `bash`** — on Windows use **Git Bash** or **WSL** (PowerShell alone will not run this script).
+`npm run check:prepush` runs `scripts/pre-push-check.sh`: edge release stamp (**`node scripts/stamp-edge-release.mjs`**, same effect as **`npm run stamp:release`**), **`npm run check:view-migrations`** (unsafe `CREATE OR REPLACE VIEW` patterns), every `supabase/functions/<name>/` has a matching `[functions.<name>]` in `config.toml`, **`npm run check:edge`** (skips if Deno missing), **`npm run check:edge-logging`**, **`npm run check:edge-coverage-manifest`**, **`npm run check:active-surface`**, **`npm run check:no-phase-labels`**, **`npm run check:invoke-edge-allowlist`**, **`npm run test`**, **`npm run build`** (which runs **`prebuild`** → **`npm run check:version-sync`**), and (when Docker + Supabase CLI are available) a local **`supabase db reset`**. **Requires `bash`** — on Windows use **Git Bash** or **WSL** (PowerShell alone will not run this script). For the full CI gate (coverage + JUnit), also run **`npm run test:ci`** before high-stakes pushes.
 
 **Optional deeper probe** after changing request logging / `x-cid` behavior: **`npm run smoke:edge-logging`** — OPTIONS each HTTP edge URL and assert `x-cid` round-trip (and optionally BetterStack query when `LOG_DRAIN_QUERY_*` are set). See **`supabase/functions/README.md`**.
 

@@ -10,6 +10,7 @@ lerna-debug.log*
 node_modules
 dist
 dist-ssr
+coverage
 
 # Supabase CLI local state (not repo config)
 supabase/.temp/

@@ -1,5 +1,7 @@
 # Stats System
 
+> **Not in shipped pause-first scope (2026-05).** Reference implementation: git tag `full-ia-pre-strip` or `src/legacy/full-shell/`. Shipped surface: [active-surface.md](../ops/active-surface.md).
+
 > **Status:** the "Recommended target model (skills-first)" at the bottom of
 > this doc is **shipped**. `Profile > Stats` renders
 > [`StatsContentV2`](../../src/components/stats/StatsContentV2.tsx) with all
