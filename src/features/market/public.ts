@@ -1,2 +1,5 @@
 /** Public API for market context — export only what other features may import. */
-export {};
+export {
+  getManualReflectionCooldownMs,
+  isHolzenDevMode,
+} from './application/manual-cooldown';
