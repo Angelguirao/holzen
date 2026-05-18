@@ -78,6 +78,13 @@ const ALLOWED_DEEP_IMPORT_FILES = new Set([
   'src/lib/pause-ritual-depth-upgrade.ts',
 ]);
 
+/** Migrated pause/companion domain — active app must use feature public APIs, not lib shims. */
+const LIB_COMPANION_SHIM = /@\/lib\/companion-/;
+const ALLOWED_LIB_PAUSE_IMPORTS = new Set([
+  '@/lib/pause-ritual-depth-upgrade',
+  '@/lib/apply-bulk-hold-outcomes',
+]);
+
 const ACTIVE_APP_ROOTS = [
   join(root, 'src', 'hooks'),
   join(root, 'src', 'pages'),
@@ -96,6 +103,21 @@ for (const dir of ACTIVE_APP_ROOTS) {
         file: rel,
         label: 'deep feature import — use @/features/<ctx>/public, public-queries, public-rpc, or lib RPC shim',
       });
+    }
+    if (LIB_COMPANION_SHIM.test(text)) {
+      violations.push({
+        file: rel,
+        label: '@/lib/companion-* import — use @/features/pause/public or public-queries',
+      });
+    }
+    const pauseLibImports = text.match(/@\/lib\/pause-[a-z0-9-]+/g) ?? [];
+    for (const imp of pauseLibImports) {
+      if (!ALLOWED_LIB_PAUSE_IMPORTS.has(imp)) {
+        violations.push({
+          file: rel,
+          label: `${imp} — use @/features/pause/public or public-queries (RPC: allowlisted lib shims only)`,
+        });
+      }
     }
   }
 }

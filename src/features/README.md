@@ -28,4 +28,4 @@ features/<context>/
 
 ## CI
 
-`npm run check:feature-imports` — layer rules on `src/features/**/*.ts` (passes when only READMEs exist).
+`npm run check:feature-imports` — layer rules on `src/features/**/*.ts`; blocks deep feature imports and migrated `@/lib/pause-*` shims in active `hooks/`, `pages/`, `components/`, and `test/` (in `test:ci`).
