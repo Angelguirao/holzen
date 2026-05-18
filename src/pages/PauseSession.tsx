@@ -73,7 +73,7 @@ import { usePauseSessionFeelTilesSelect } from '@/hooks/use-pause-session-feel-t
 import { usePauseReflectGeneration } from '@/hooks/use-pause-reflect-generation';
 import { PauseLeaveWithPendingSheet } from '@/components/pause/PauseLeaveWithPendingSheet';
 import { type BriefPauseStep, type RitualDepth } from '@/features/pause/domain/ritual-types';
-import { clearSession } from '@/features/pause/infrastructure/session/persisted-session-storage';
+import { clearSession } from '@/features/pause/public';
 
 /**
  * `/pause` route: wires shell hydration, local ritual state, `pause-api` step handlers, and pause UI

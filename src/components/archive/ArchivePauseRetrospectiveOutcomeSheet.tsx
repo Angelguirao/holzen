@@ -12,10 +12,11 @@ import {
 import { cn } from '@/lib/utils';
 import { hapticFeedback } from '@/lib/haptics';
 import { pauseLogStep } from '@/features/pause/public-rpc';
-import { buildOutcomeLoggedPayload, invalidatePauseStatsDataForUser } from '@/features/pause/public';
+import { buildOutcomeLoggedPayload } from '@/features/pause/public';
+import { invalidatePauseStatsDataForUser } from '@/features/pause/application/queries/invalidate-pause-stats';
 import { supabase } from '@/integrations/supabase/client';
 import { trackEvent } from '@/lib/posthog';
-import type { PauseArchiveRow } from '@/features/pause/public';
+import type { PauseArchiveRow } from '@/features/pause/public-queries';
 
 type Props = {
   row: PauseArchiveRow;

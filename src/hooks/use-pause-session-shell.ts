@@ -10,7 +10,7 @@ import {
 import { hasPersistedPauseSessionPayload } from '@/features/pause/application/session/persisted-session-guards';
 import type { PauseSessionNavParsed } from '@/lib/router-location-state';
 import { type FetchedPauseInstance, type PersistedSession } from '@/features/pause/domain/session-model';
-import { loadSession } from '@/features/pause/infrastructure/session/persisted-session-storage';
+import { loadSession } from '@/features/pause/public';
 
 export type PauseSessionShellHolzen = {
   message: string | null;

@@ -19,7 +19,7 @@ import { useAuth } from '@/hooks/use-auth';
 import { useProfile } from '@/hooks/use-profile';
 import type { CompanionData } from '@/components/CompanionSection';
 import { holzenLog } from '@/lib/holzen-console';
-import { reflectionPersistErrorMessage } from '@/features/pause/application/use-cases/reflection-persist-error';
+import { clearSession, reflectionPersistErrorMessage } from '@/features/pause/public';
 import {
   buildPauseContextFromMarket,
   getManualReflectionCooldownMs,
@@ -35,7 +35,6 @@ import {
 } from '@/features/pause/public';
 import { pauseCreateOrReuse } from '@/features/pause/public-rpc';
 import { trackEvent } from '@/lib/posthog';
-import { clearSession } from '@/features/pause/infrastructure/session/persisted-session-storage';
 import {
   MANUAL_PAUSE_TRIGGER_IDLE,
   type ManualPauseTriggerResult,
