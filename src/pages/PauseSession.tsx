@@ -18,7 +18,7 @@ import { PauseSessionDepthPickerStack } from '@/components/pause/PauseSessionDep
 import { PauseBriefProgress } from '@/components/pause/PauseBriefProgress';
 import { isPauseSessionHeaderBackVisible } from '@/features/pause/application/session/header-back';
 import { briefSwitchToDeepPauseState } from '@/features/pause/application/session/brief-switch-to-deep';
-import { logPauseRitualDepthUpgraded } from '@/lib/pause-ritual-depth-upgrade';
+import { logPauseRitualDepthUpgraded } from '@/features/pause/application/session/ritual-depth-upgrade';
 import { clearSession, type BriefPauseStep, type RitualDepth } from '@/lib/pause-session-storage';
 import {
   mapPersistedStep,
@@ -63,8 +63,8 @@ import { usePauseSessionTerminalEntryRedirect } from '@/hooks/use-pause-session-
 import { usePauseSessionMountLog } from '@/hooks/use-pause-session-mount-log';
 import { usePauseSessionGoBack } from '@/hooks/use-pause-session-go-back';
 import { usePauseSessionGoToStep } from '@/hooks/use-pause-session-go-to-step';
-import { buildPauseSessionScaffoldRitualDerived } from '@/lib/pause-session-scaffold-ritual-props';
-import { buildPauseSessionScaffoldRitualPayloads } from '@/lib/pause-session-scaffold-ritual-payloads';
+import { buildPauseSessionScaffoldRitualDerived } from '@/features/pause/application/session/scaffold-ritual-derived';
+import { buildPauseSessionScaffoldRitualPayloads } from '@/features/pause/presentation/session/scaffold-ritual-payloads';
 import { JOURNEY_PREFIX } from '@/lib/app-routes';
 import { buildPauseSessionMountLogParams } from '@/lib/pause-session-mount-log-params';
 import { usePauseSessionPendingPauseOfferNavigation } from '@/hooks/use-pause-session-pending-pause-offer-navigation';
