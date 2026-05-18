@@ -11,6 +11,15 @@ export const APP_SHELL_TABS = [
 
 export type AppShellTabKey = (typeof APP_SHELL_TABS)[number]['key'];
 
+/** True for primary bottom-nav destinations (incl. `/settings/*` subpaths). */
+export function isAppShellPath(pathname: string): boolean {
+  if (pathname === '/' || pathname === '/index') return true;
+  if (pathname === '/archive' || pathname.startsWith('/archive/')) return true;
+  if (pathname === JOURNEY_PREFIX) return true;
+  if (pathname === '/settings' || pathname.startsWith('/settings/')) return true;
+  return false;
+}
+
 /** Registered authenticated shell paths (404 for anything else). */
 export const APP_SHELL_ROUTES = ['/', '/archive', JOURNEY_PREFIX, '/settings'] as const;
 
