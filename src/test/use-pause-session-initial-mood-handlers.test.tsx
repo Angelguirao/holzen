@@ -8,7 +8,7 @@ const { pauseLogStepMock } = vi.hoisted(() => ({
   pauseLogStepMock: vi.fn(),
 }));
 
-vi.mock('@/lib/pause-api', () => ({
+vi.mock('@/features/pause/public', () => ({
   pauseLogStep: (...args: unknown[]) => pauseLogStepMock(...args),
 }));
 

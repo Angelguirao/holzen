@@ -3,13 +3,13 @@ import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useQuery } from '@tanstack/react-query';
 import { toast } from 'sonner';
-import type { PauseState } from '@/lib/pause-state';
-import type { FetchedPauseInstance, PersistedSession } from '@/lib/pause-session-storage';
-import { getPauseTerminalEntryStateQueryOptions } from '@/lib/pause-terminal-entry-state-query';
 import {
   isTerminalPauseDbState,
   persistedPauseSessionAllowsTerminalEntry,
-} from '@/lib/pause-terminal-entry-guard';
+} from '@/features/pause/application/session/terminal-entry-guard';
+import type { PauseState } from '@/features/pause/domain/pause-state';
+import type { FetchedPauseInstance, PersistedSession } from '@/lib/pause-session-storage';
+import { getPauseTerminalEntryStateQueryOptions } from '@/lib/pause-terminal-entry-state-query';
 
 export { pauseTerminalEntryStateQueryKey } from '@/lib/pause-terminal-entry-state-query';
 

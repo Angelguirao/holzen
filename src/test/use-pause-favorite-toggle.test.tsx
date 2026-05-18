@@ -21,7 +21,7 @@ vi.mock('@/hooks/use-auth', () => ({
   useAuth: () => ({ user: { id: 'archive-user-1' }, loading: false }),
 }));
 
-vi.mock('@/lib/pause-api', () => ({
+vi.mock('@/features/pause/public', () => ({
   pauseLogStep: (...args: unknown[]) => pauseLogStepMock(...args),
 }));
 
