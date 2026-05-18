@@ -15,16 +15,22 @@ Holzen is pre-launch with no production users. The active SPA still uses a **tra
 
 We want a **long-term** structure aligned with industry practice (bounded contexts, use cases, ports/adapters) without rewriting Postgres truth or moving to microservices. Authority remains on Supabase per [client-server-architecture-holzen.md](../fundamentals/client-server-architecture-holzen.md).
 
+**Lovable platform constraint (verified 2026-05):** Holzen is developed and published through Lovable’s managed flow. That stack assumes a **single Vite app at the repository root** — `vite.config.ts`, `index.html`, `package.json`, `src/`, dev server on `:8080`, `lovable-tagger`, and **Publish → Update** all target `./`. There is no first-class “project root = subdirectory” setting in this project today. **pnpm workspaces**, `workspace:*`, and `pnpm --filter` are not part of the standard Lovable agent path. **Edge functions and migrations** (`supabase/`) are unaffected; the constraint applies only to the **web client**.
+
+Moving the SPA to `apps/web` **today** would break publish (no root `index.html`), degrade preview/tagging, confuse agent file heuristics, and conflict with CI scripts that assume `src/` and `dist/assets/`.
+
 ## Decision
 
 1. **Adopt** [holzen-application-architecture.md](../fundamentals/holzen-application-architecture.md) as the **principles constitution** (accepted pre-launch baseline).
 
-2. **Target client layout:** **pnpm monorepo** with:
+2. **North-star client layout (when not blocked by Lovable publish):** **pnpm monorepo** with:
    - `apps/web` — Vite SPA (routing, providers, composition only).
    - `packages/<bounded-context>` — `domain`, `application` (use cases), `ports`, `public.ts` per context. **Pause** includes companions/reflect/breathing (no separate `@holzen/companion`); nav tabs are **screens** in `apps/web`, not packages (see [holzen-application-architecture.md](../fundamentals/holzen-application-architecture.md) §7–8).
    - `packages/infrastructure` — Supabase / `invokeEdge` adapter implementations.
    - `packages/contracts` — Zod + shared wire types for edge and critical RPC boundaries.
    - `packages/shared-kernel` — minimal cross-cutting types (`Result`, branded IDs, shared errors).
+
+   **Execution path while on Lovable-managed publish:** keep **root Vite**; adopt the **same layer model** under `src/features/<context>/` with `npm run check:feature-imports`. See [frontend-module-layout.md](../fundamentals/frontend-module-layout.md) §0, §10–11.
 
 3. **Hexagonal rules on the client:**
    - Use cases are **functions** (not a DI framework or class-per-action requirement).
@@ -37,9 +43,14 @@ We want a **long-term** structure aligned with industry practice (bounded contex
 
 6. **Keep React SPA + Vite** for the web app; do **not** migrate to Next.js/Remix as part of this ADR ([spa-framework-evaluation.md](../backlog/spa-framework-evaluation.md) remains the place to revisit SSR).
 
-7. **Transitional bridge (optional first PR):** `src/features/<context>/…` with the same layer folders and import rules **before** extracting `packages/*`, so migration can be incremental.
+7. **Wave 0 (now):** `src/features/<context>/…` with the same layer folders and import rules as packages; screens stay in `src/pages/` and `src/components/` until a deliberate move. Scaffold started at `src/features/pause/`.
 
-8. **CI (phased):** Add `check:package-boundaries` (or equivalent) once the monorepo exists; keep existing gates (`check:active-surface`, `test:ci`, etc.).
+8. **Extract `packages/*` only when** at least one is true:
+   - A **second client** (e.g. mobile/native) needs shared modules.
+   - Holzen **leaves Lovable-managed publish** for the web app and runs its own CI/CD with `apps/web` as the Vite root.
+   - Lovable ships **documented subdirectory-root support** and it is verified on a throwaway project.
+
+9. **CI (phased):** `check:feature-imports` on `src/features/**` now; add `check:package-boundaries` once the monorepo exists; keep existing gates (`check:active-surface`, `test:ci`, etc.).
 
 ## Consequences
 
@@ -53,9 +64,9 @@ We want a **long-term** structure aligned with industry practice (bounded contex
 
 ### Negative / tradeoffs
 
-- **Up-front cost:** estimated 3–8 weeks focused work to migrate all shipped contexts (see [frontend-module-layout.md](../fundamentals/frontend-module-layout.md) migration waves).
-- **Tooling:** introduce pnpm workspaces + Turborepo (or npm workspaces if pnpm is blocked — prefer pnpm for long-term monorepos).
-- **Short-term churn:** every import path touch; Lovable publish path must remain valid (`apps/web` becomes the Vite root or documented alias).
+- **Up-front cost:** estimated 3–8 weeks focused work to migrate all shipped contexts into `src/features/` (see waves); **additional** cost if/when extracting to `packages/*`.
+- **Tooling:** `check:feature-imports` immediately; pnpm workspaces + Turborepo deferred until extraction gate (decision §8).
+- **Short-term churn:** import path touches as code moves into `src/features/`; **must not** move Vite root to `apps/web` until Lovable publish is confirmed for that layout.
 - **Discipline required:** reviewers must reject deep cross-context imports and presentation-layer I/O.
 
 ### Follow-ups
@@ -63,7 +74,8 @@ We want a **long-term** structure aligned with industry practice (bounded contex
 | Item | Owner / when |
 |------|----------------|
 | Flesh out [frontend-module-layout.md](../fundamentals/frontend-module-layout.md) as structure lands | Same PR series as scaffold |
-| Scaffold `pnpm-workspace.yaml`, `apps/web`, empty `packages/*` | First implementation PR |
+| `src/features/pause/` skeleton + `check:feature-imports` | Done in scaffold PR |
+| Scaffold `pnpm-workspace.yaml`, `apps/web`, empty `packages/*` | **Gated** — only after §8 extraction trigger |
 | `packages/contracts` for top edges + critical RPCs | Early in pause/companion wave |
 | ADR supersession only if we adopt Next.js or split services | Future |
 

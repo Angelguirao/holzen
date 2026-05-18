@@ -28,7 +28,8 @@ Dead IA (`/tools/*`, `/library`, `/journey/stats`, …) → `NotFound` (no legac
 ## Architecture
 
 - [`docs/fundamentals/holzen-application-architecture.md`](../docs/fundamentals/holzen-application-architecture.md) — principles (bounded contexts, use cases, ports).
-- [`docs/fundamentals/frontend-module-layout.md`](../docs/fundamentals/frontend-module-layout.md) — target monorepo tree and migration waves.
+- [`docs/fundamentals/frontend-module-layout.md`](../docs/fundamentals/frontend-module-layout.md) — `src/features/` layout (now) and `packages/*` north star (gated).
+- [`features/README.md`](features/README.md) — bounded-context folders under root Vite.
 - [`docs/decisions/2026-05-17-modular-monolith-hexagonal-client.md`](../docs/decisions/2026-05-17-modular-monolith-hexagonal-client.md) — accepted ADR.
 - [`docs/fundamentals/modern-react-practices-holzen.md`](../docs/fundamentals/modern-react-practices-holzen.md) — industry React norms vs Holzen (scorecard).
 
