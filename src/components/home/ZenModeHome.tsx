@@ -12,7 +12,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { SubscriptionSkeleton } from '@/components/SubscriptionSkeleton';
 import type { CompanionData, CompanionPrefs } from '@/components/CompanionSection';
 import type { BtcPriceData } from '@/lib/btc';
-import type { BtcMoveSeverity } from '@/lib/btc-move-severity';
+import type { BtcMoveSeverity } from '@/features/market/public';
 import { shouldSurfacePauseWidgetError } from '@/lib/home-pause-widget-error';
 import type { Entitlement } from '@/features/subscription/public';
 
