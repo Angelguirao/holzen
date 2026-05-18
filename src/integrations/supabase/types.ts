@@ -1346,7 +1346,6 @@ export type Database = {
       }
       profiles: {
         Row: {
-          companion_breathing: boolean
           companion_grounding: boolean
           companion_haiku: boolean
           companion_history: boolean
@@ -1393,7 +1392,6 @@ export type Database = {
           user_id: string
         }
         Insert: {
-          companion_breathing?: boolean
           companion_grounding?: boolean
           companion_haiku?: boolean
           companion_history?: boolean
@@ -1440,7 +1438,6 @@ export type Database = {
           user_id: string
         }
         Update: {
-          companion_breathing?: boolean
           companion_grounding?: boolean
           companion_haiku?: boolean
           companion_history?: boolean
