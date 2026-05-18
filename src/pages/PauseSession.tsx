@@ -17,7 +17,7 @@ import { type PauseBreathingHandle } from '@/components/pause/PauseBreathing';
 import { PauseSessionDepthPickerStack } from '@/components/pause/PauseSessionDepthPickerStack';
 import { PauseBriefProgress } from '@/components/pause/PauseBriefProgress';
 import { isPauseSessionHeaderBackVisible } from '@/features/pause/application/session/header-back';
-import { briefSwitchToDeepPauseState } from '@/lib/pause-brief-switch-to-deep';
+import { briefSwitchToDeepPauseState } from '@/features/pause/application/session/brief-switch-to-deep';
 import { logPauseRitualDepthUpgraded } from '@/lib/pause-ritual-depth-upgrade';
 import { clearSession, type BriefPauseStep, type RitualDepth } from '@/lib/pause-session-storage';
 import {
