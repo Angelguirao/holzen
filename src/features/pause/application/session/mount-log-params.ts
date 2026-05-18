@@ -1,5 +1,6 @@
 import type { PauseSessionHydrationState } from '@/features/pause/application/session/hydration';
-import type { BriefPauseStep, PersistedSession, RitualDepth } from '@/lib/pause-session-storage';
+import type { BriefPauseStep, RitualDepth } from '@/features/pause/domain/ritual-types';
+import type { PersistedSession } from '@/features/pause/domain/session-model';
 import {
   initialBriefPauseStepFromRestored,
   initialPhaseFromRestored,

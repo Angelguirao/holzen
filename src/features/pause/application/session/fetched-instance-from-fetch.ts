@@ -1,7 +1,5 @@
-import {
-  companionDataFromArtifacts,
-  type FetchedPauseInstance,
-} from '@/lib/pause-session-storage';
+import { companionDataFromArtifacts } from '@/features/pause/application/companion/companion-data-from-artifacts';
+import type { FetchedPauseInstance } from '@/features/pause/domain/session-model';
 import type { PauseState } from '@/features/pause/domain/pause-state';
 
 /**

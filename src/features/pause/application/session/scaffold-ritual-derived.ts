@@ -2,7 +2,7 @@ import type { TFunction } from 'i18next';
 import type { PauseStep } from '@/components/pause/PauseProgress';
 import { PAUSE_DEEP_DISPLAY_STEP_COUNT, pauseDeepMacroStepNumber } from '@/components/pause/PauseProgress';
 import { computeBriefMacroProgressPosition } from '@/features/pause/application/brief-ritual/brief-pause-order';
-import type { BriefPauseStep, RitualDepth } from '@/lib/pause-session-storage';
+import type { BriefPauseStep, RitualDepth } from '@/features/pause/domain/ritual-types';
 
 type PauseSeverity = 'mild' | 'moderate' | 'high';
 

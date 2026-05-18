@@ -2,7 +2,8 @@ import type { PauseStep } from '@/components/pause/PauseProgress';
 import type { MoodValue } from '@/components/MoodCheck';
 import type { FeelStepTile } from '@/components/pause/pause-feel-types';
 import type { CompanionData, CompanionPrefs } from '@/components/CompanionSection';
-import type { BriefPauseStep, PersistedSession, RitualDepth } from '@/lib/pause-session-storage';
+import type { BriefPauseStep, RitualDepth } from '@/features/pause/domain/ritual-types';
+import type { PersistedSession } from '@/features/pause/domain/session-model';
 
 /** Fields that flow into the `saveSession` autosync effect in `PauseSession`. */
 export type PauseSessionPersistSnapshotInput = {

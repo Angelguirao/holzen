@@ -1,7 +1,11 @@
 import type { CompanionData, CompanionPrefs } from '@/components/CompanionSection';
 import type { PauseSeverity } from '@/lib/router-location-state';
-import type { FetchedPauseInstance, PersistedSession } from '@/lib/pause-session-storage';
-import { DEFAULT_COMPANIONS, DEFAULT_PREFS } from '@/lib/pause-session-storage';
+import {
+  DEFAULT_COMPANIONS,
+  DEFAULT_PREFS,
+  type FetchedPauseInstance,
+  type PersistedSession,
+} from '@/features/pause/domain/session-model';
 import { hasPersistedPauseSessionPayload } from '@/features/pause/application/session/persisted-session-guards';
 
 /**
