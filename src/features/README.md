@@ -28,6 +28,6 @@ features/<context>/
 
 ## CI
 
-`npm run check:feature-imports` — layer rules on `src/features/**/*.ts`; blocks deep feature imports and migrated `@/lib/pause-*` shims in active `hooks/`, `pages/`, `components/`, and `test/` (in `test:ci`).
+`npm run check:feature-imports` — layer rules on `src/features/**/*.ts`; blocks deep feature imports and migrated `@/lib/pause-*` shims in active `hooks/`, `pages/`, `components/`, and `test/`.
 
-`npm run check:architecture-alignment` — waves 0–4 scaffold gate (five contexts, legacy excluded, runs `check:feature-imports`).
+`npm run check:architecture-alignment` — waves 0–4 scaffold gate (five contexts, legacy excluded, runs `check:feature-imports`); in **`test:ci`**.
