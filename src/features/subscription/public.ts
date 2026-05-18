@@ -11,3 +11,7 @@ export {
   getHomeSubscriptionGate,
   getHomeSubscriptionReady,
 } from './application/home-gate';
+export {
+  getCheckoutSuppressionWindowMinutes,
+  getCheckoutSuppressionWindowMs,
+} from './application/checkout-suppression-window';
