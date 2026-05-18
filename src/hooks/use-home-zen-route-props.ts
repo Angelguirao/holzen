@@ -1,6 +1,6 @@
 import { useMemo } from 'react';
 import type { ZenModeHomeProps } from '@/components/home/ZenModeHome';
-import type { Entitlement } from '@/lib/subscription-entitlement';
+import type { Entitlement } from '@/features/subscription/public';
 
 type CooldownFn = () => number;
 

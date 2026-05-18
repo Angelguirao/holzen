@@ -14,7 +14,7 @@ import type { CompanionData, CompanionPrefs } from '@/components/CompanionSectio
 import type { BtcPriceData } from '@/lib/btc';
 import type { BtcMoveSeverity } from '@/lib/btc-move-severity';
 import { shouldSurfacePauseWidgetError } from '@/lib/home-pause-widget-error';
-import type { Entitlement } from '@/lib/subscription-entitlement';
+import type { Entitlement } from '@/features/subscription/public';
 
 export interface ZenModeHomeProps {
   hasOpenPause: boolean;
