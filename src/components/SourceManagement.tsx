@@ -6,10 +6,10 @@ import {
   getSignalSourcesCatalogQueryOptions,
 } from '@/lib/signal-sources-catalog-query';
 import {
-  type UserPref,
-  USER_SIGNAL_PREFS_QUERY_KEY,
   getUserSignalPreferencesQueryOptions,
-} from '@/lib/user-signal-preferences-query';
+  USER_SIGNAL_PREFS_QUERY_KEY,
+  type UserPref,
+} from '@/features/user/public';
 import { useAuth } from '@/hooks/use-auth';
 import { useTranslation } from 'react-i18next';
 import { Switch } from '@/components/ui/switch';
