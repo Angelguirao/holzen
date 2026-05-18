@@ -9,7 +9,7 @@ import {
   getLatestPauseReflectNoteQueryOptions,
   PAUSE_REFLECT_STEP_NOTE,
   pauseReflectStepLatestQueryKey,
-} from '@/features/pause/infrastructure/queries/reflect-step-query';
+} from '@/features/pause/public-queries';
 
 interface Props {
   pauseInstanceId: string;

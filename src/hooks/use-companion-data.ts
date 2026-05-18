@@ -8,22 +8,20 @@ import { useToast } from '@/hooks/use-toast';
 import { useCompanionLibraryFavorites } from '@/hooks/use-companion-library-favorites';
 import type { CompanionData, CompanionPrefs } from '@/components/CompanionSection';
 import type { InterventionState, RegenerateCompanionSlot } from '@/features/pause/domain/companion-orchestrate';
-import {
-  fetchParsedPauseArtifactCache,
-} from '@/features/pause/infrastructure/queries/artifact-cache-query';
+import { fetchParsedPauseArtifactCache } from '@/features/pause/public-queries';
 import type { ZoomOutData } from '@/components/ZoomOutDisplay';
 import { toZoomOutDisplayData, zoomOutLibraryAutosaveFromDisplayData } from '@/features/pause/application/companion/zoom-out-payload';
 import type { CachedHistoricalInsightShape } from '@/components/HistoricalInsightDisplay';
 import {
   EMPTY_COMPANION_UI_COMPLETION,
+  getCompanionUiCompletionQueryOptions,
+  loadActiveOrchestrateSources,
+  loadMoodHistoryForOrchestrate,
   persistCompanionUiStepCompletion,
   type CompanionUiCompletionStep,
   type CompanionUiCompletionState,
-} from '@/features/pause/infrastructure/companion/companion-ui-completion-sync';
+} from '@/features/pause/public-queries';
 import { companionUiCompletionQueryKey } from '@/features/pause/application/queries/companion-ui-completion-query-key';
-import { getCompanionUiCompletionQueryOptions } from '@/features/pause/infrastructure/queries/companion-ui-completion-query';
-import { loadMoodHistoryForOrchestrate } from '@/features/pause/infrastructure/companion/mood-history';
-import { loadActiveOrchestrateSources } from '@/features/pause/infrastructure/companion/orchestrate-sources';
 import { getRecencyHints } from '@/features/pause/application/companion/recency-hints';
 import { parseEdgeFunctionError, toUserFacingAiErrorMessage } from '@/lib/edge-function-error';
 import {

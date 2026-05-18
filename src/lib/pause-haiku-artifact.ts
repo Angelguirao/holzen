@@ -1,2 +1,2 @@
-/** @deprecated Import from `@/features/pause/infrastructure/queries/haiku-artifact-query`. */
-export { fetchHaikuTextForPauseInstance } from '@/features/pause/infrastructure/queries/haiku-artifact-query';
+/** @deprecated Import from `@/features/pause/public-queries`. */
+export { fetchHaikuTextForPauseInstance } from '@/features/pause/public-queries';

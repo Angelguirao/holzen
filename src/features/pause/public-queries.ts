@@ -55,3 +55,71 @@ export {
   getBulkHoldPendingQueryOptions,
   PAUSE_BULK_HOLD_QUERY_PREFIX,
 } from './infrastructure/queries/bulk-hold-pending-query';
+export {
+  PAUSE_ARCHIVE_LIST_QUERY_PREFIX,
+  PAUSE_ARCHIVE_PAGE_SIZE,
+  fetchPauseArchivePage,
+  getPauseArchiveInfiniteQueryDefaults,
+  pauseArchiveInfiniteQueryKey,
+  pauseArchiveListQueryPrefix,
+  pauseArchiveStorageCacheKey,
+} from './infrastructure/queries/archive-list-query';
+export {
+  COMPANION_SLOT_FAVORITES_METADATA_KEY,
+  COMPANION_LIBRARY_FAVORITES_NONE_QUERY_KEY,
+  COMPANION_LIBRARY_FAVORITES_QUERY_LEAF,
+  companionLibraryFavoritesQueryKey,
+  fetchCompanionLibraryFavorites,
+  getCompanionLibraryFavoritesQueryOptions,
+} from './infrastructure/queries/companion-library-favorites-query';
+export {
+  fetchParsedPauseArtifactCache,
+  type CachedGroundingShape,
+  type CachedSignalShape,
+  type CachedZoomOutShape,
+  type ParsedPauseArtifactCache,
+} from './infrastructure/queries/artifact-cache-query';
+export {
+  COMPANION_UI_COMPLETION_NONE_QUERY_KEY,
+  getCompanionUiCompletionQueryOptions,
+} from './infrastructure/queries/companion-ui-completion-query';
+export {
+  EMPTY_COMPANION_UI_COMPLETION,
+  loadCompanionUiCompletionState,
+  persistCompanionUiStepCompletion,
+  type CompanionUiCompletionState,
+  type CompanionUiCompletionStep,
+} from './infrastructure/companion/companion-ui-completion-sync';
+export {
+  getPauseTerminalEntryStateQueryOptions,
+  pauseTerminalEntryStateQueryKey,
+} from './infrastructure/queries/terminal-entry-state-query';
+export {
+  getPauseSessionFetchedInstanceQueryOptions,
+  pauseSessionFetchedInstanceQueryKey,
+} from './infrastructure/queries/session-fetched-instance-query';
+export {
+  getPauseSessionCompanionSnapshotQueryOptions,
+  pauseSessionCompanionSnapshotQueryKey,
+  type PauseSessionSnapshot,
+} from './infrastructure/queries/companion-session-snapshot-query';
+export {
+  fetchLatestPauseReflectStep,
+  getLatestPauseReflectNoteQueryOptions,
+  getLatestPauseReflectTagsQueryOptions,
+  noteTextFromReflectRow,
+  PAUSE_REFLECT_STEP_NOTE,
+  PAUSE_REFLECT_STEP_QUERY_PREFIX,
+  PAUSE_REFLECT_STEP_TAGS,
+  pauseReflectStepLatestQueryKey,
+  tagsFromReflectRow,
+  type PauseReflectStepLatestRow,
+  type PauseReflectStepType,
+} from './infrastructure/queries/reflect-step-query';
+export { fetchHaikuTextForPauseInstance } from './infrastructure/queries/haiku-artifact-query';
+export {
+  fetchOpeningMessageForPauseInstance,
+  generateReflectionAtReflectStep,
+} from './infrastructure/reflect/reflection-artifact';
+export { loadMoodHistoryForOrchestrate } from './infrastructure/companion/mood-history';
+export { loadActiveOrchestrateSources } from './infrastructure/companion/orchestrate-sources';

@@ -2,7 +2,7 @@ import { useQuery } from '@tanstack/react-query';
 import {
   getPauseSessionCompanionSnapshotQueryOptions,
   type PauseSessionSnapshot,
-} from '@/features/pause/infrastructure/queries/companion-session-snapshot-query';
+} from '@/features/pause/public-queries';
 
 /**
  * TanStack-backed load for companion full-view routes (`/companions/.../:pauseInstanceId`).

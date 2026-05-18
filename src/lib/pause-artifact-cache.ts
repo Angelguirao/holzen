@@ -1,8 +1,8 @@
-/** @deprecated Import from `@/features/pause/infrastructure/queries/artifact-cache-query`. */
+/** @deprecated Import from `@/features/pause/public-queries`. */
 export {
   fetchParsedPauseArtifactCache,
   type CachedGroundingShape,
   type CachedSignalShape,
   type CachedZoomOutShape,
   type ParsedPauseArtifactCache,
-} from '@/features/pause/infrastructure/queries/artifact-cache-query';
+} from '@/features/pause/public-queries';

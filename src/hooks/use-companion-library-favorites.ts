@@ -6,7 +6,7 @@ import {
   COMPANION_SLOT_FAVORITES_METADATA_KEY,
   companionLibraryFavoritesQueryKey,
   getCompanionLibraryFavoritesQueryOptions,
-} from '@/features/pause/infrastructure/queries/companion-library-favorites-query';
+} from '@/features/pause/public-queries';
 
 /**
  * Per-slot heart state for companion cards on one pause instance.

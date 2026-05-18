@@ -11,10 +11,10 @@ import {
   type PauseArchiveListSort,
   type PauseArchiveRow,
   type PauseArchiveSegment,
-} from '@/features/pause/infrastructure/queries/archive-list-query';
+} from '@/features/pause/public-queries';
 
 export type { PauseArchiveRow, PauseArchiveListSort, PauseArchiveSegment };
-export { pauseArchiveListQueryPrefix } from '@/features/pause/infrastructure/queries/archive-list-query';
+export { pauseArchiveListQueryPrefix } from '@/features/pause/public-queries';
 
 export type UsePauseArchiveListOptions = {
   segment: PauseArchiveSegment;
