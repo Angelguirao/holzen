@@ -1,4 +1,2 @@
-/** Payload for `pause_log_step` → `ritual_depth_upgraded` (server merges `from`/`to` if omitted). */
-export function ritualDepthUpgradedPayload(): Record<string, unknown> {
-  return { from: 'brief', to: 'deep' };
-}
+/** @deprecated Import from `@/features/pause/application/use-cases/ritual-depth-upgrade-payload`. */
+export * from '@/features/pause/application/use-cases/ritual-depth-upgrade-payload';
