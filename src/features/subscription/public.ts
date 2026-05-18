@@ -4,3 +4,10 @@ export {
   deriveEntitlement,
   type Entitlement,
 } from './domain/entitlement';
+export {
+  getHomeHasAccess,
+  getHomeShowLimitUpsell,
+  getHomeShowPauseScheduling,
+  getHomeSubscriptionGate,
+  getHomeSubscriptionReady,
+} from './application/home-gate';
