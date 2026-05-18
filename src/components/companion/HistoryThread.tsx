@@ -4,7 +4,7 @@ import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '@/hooks/use-auth';
 import type { RegenerateCompanionSlot } from '@/features/pause/public';
-import { getHistoryThreadQueryOptions, type HistoryThreadRow } from '@/lib/history-thread-query';
+import { getHistoryThreadQueryOptions, type HistoryThreadRow } from '@/features/pause/public';
 
 /**
  * Maps an internal orchestrator slot name to the Full View route prefix.

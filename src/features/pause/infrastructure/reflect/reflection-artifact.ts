@@ -1,7 +1,7 @@
 import { supabase } from '@/integrations/supabase/client';
 import type { CompanionData } from '@/components/CompanionSection';
 import { invokeEdge } from '@/lib/invoke-edge';
-import { loadReflectRecencyHints } from '@/lib/load-reflect-recency-hints';
+import { loadReflectRecencyHints } from './load-reflect-recency-hints';
 
 /** Reads persisted reflect-step copy (`pause_ai_artifacts.kind === 'reflection_text'`). */
 export async function fetchOpeningMessageForPauseInstance(pauseInstanceId: string): Promise<string | null> {

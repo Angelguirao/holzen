@@ -130,6 +130,17 @@ export type {
 } from './domain/companion-orchestrate';
 export { COMPANION_TYPES, FEEDBACK_TO_CACHE_TYPE } from './domain/companion-types';
 export {
+  ZOOM_OUT_DEFAULT_BODY_PLACEHOLDER,
+  ZOOM_OUT_DEFAULT_LABEL,
+  toZoomOutDisplayData,
+  zoomOutLibraryAutosaveFromDisplayData,
+  zoomOutTotalCharsForReadTime,
+} from './application/companion/zoom-out-payload';
+export {
+  getHistoryThreadQueryOptions,
+  type HistoryThreadRow,
+} from './infrastructure/queries/history-thread-query';
+export {
   companionFeedbackVoteQueryKey,
   getCompanionFeedbackVoteQueryOptions,
 } from './infrastructure/queries/companion-feedback-vote-query';
