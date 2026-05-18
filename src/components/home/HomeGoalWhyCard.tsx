@@ -5,7 +5,7 @@ import { AnimatePresence, motion, useReducedMotion } from 'framer-motion';
 import { HoldGoalWidget } from '@/components/HoldGoalWidget';
 import { useHolzen } from '@/hooks/use-holzen';
 import { useAuth } from '@/hooks/use-auth';
-import { getProfileRowQueryOptions } from '@/features/user/public';
+import { getProfileRowQueryOptions } from '@/features/user/public-queries';
 import { computeHoldGoalCompactHeadline, type HoldGoalHeadlineGoal } from '@/lib/hold-goal-headline';
 import { cn } from '@/lib/utils';
 

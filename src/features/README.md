@@ -22,6 +22,7 @@ features/<context>/
 
 - Put **pause ritual** logic in `features/pause/` (companions and reflect are subfolders under `application/`, not a separate feature).
 - Put **subscription**, **market**, **user**, **auth** in their own `features/<name>/` as you migrate.
+- **user** and **subscription** use `public-queries.ts` for profile/snapshot TanStack modules; `public.ts` stays Supabase-free.
 - Do **not** add new root-level `src/hooks/use-<feature>-*` or `src/lib/<feature>-*` for migrated contexts.
 
 ## CI

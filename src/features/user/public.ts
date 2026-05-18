@@ -1,14 +1,3 @@
-/** Public API for user — export only what other features may import. */
+/** Public API for user — export only what other features may import (no Supabase). */
 export { isAdminFromEnvList } from './application/is-admin-env';
 export type { UserSignalPreference } from './domain/user-signal-preference';
-export {
-  getUserSignalPreferencesQueryOptions,
-  USER_SIGNAL_PREFS_QUERY_KEY,
-  type UserPref,
-} from './infrastructure/queries/user-signal-preferences-query';
-export {
-  fetchProfileRowForUser,
-  getProfileRowQueryOptions,
-  PROFILE_QUERY_KEY,
-  type ProfileRow,
-} from './infrastructure/queries/profile-row-query';
