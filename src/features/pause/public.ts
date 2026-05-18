@@ -91,6 +91,11 @@ export {
 } from './application/feedback/outcome-toast';
 export { showPauseStepSyncFailedToast } from './application/feedback/step-sync-toast';
 export {
+  buildFetchedPauseInstanceFromFetch,
+  type PauseAiArtifactKindRow,
+  type PauseInstanceContextSnapshotRow,
+} from './application/session/fetched-instance-from-fetch';
+export {
   collectStepTypes,
   computePauseState,
   countedCompanionCount,
