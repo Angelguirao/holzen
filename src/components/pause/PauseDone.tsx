@@ -16,7 +16,7 @@ import { Slider } from '@/components/ui/slider';
 import { ShareReflection } from '@/components/ShareReflection';
 import { trackEvent } from '@/lib/posthog';
 import { isPauseMoodValue, buildPostPauseEmotionLoggedPayload } from '@/lib/pause-post-pause-emotion-log';
-import { pauseLogStep } from '@/lib/pause-api';
+import { pauseLogStep } from '@/features/pause/public-rpc';
 import { showPauseStepSyncFailedToast } from '@/lib/pause-step-sync-toast';
 import { useSubscription } from '@/hooks/use-subscription';
 

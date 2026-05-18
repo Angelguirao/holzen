@@ -2,11 +2,11 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { applyBulkHoldOutcomes } from '@/lib/apply-bulk-hold-outcomes';
 import type { BulkHoldPendingPause } from '@/lib/bulk-hold';
 
-vi.mock('@/lib/pause-api', () => ({
+vi.mock('@/features/pause/public-rpc', () => ({
   pauseLogStep: vi.fn(),
 }));
 
-import { pauseLogStep } from '@/lib/pause-api';
+import { pauseLogStep } from '@/features/pause/public-rpc';
 
 const row = (id: string): BulkHoldPendingPause => ({
   id,

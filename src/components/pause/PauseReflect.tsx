@@ -9,7 +9,7 @@ import { PauseTags } from '@/components/pause/PauseTags';
 import { pauseStepLayout } from '@/components/pause/pause-step-layout';
 import { Button } from '@/components/ui/button';
 import { trackEvent } from '@/lib/posthog';
-import { pauseLogStep } from '@/lib/pause-api';
+import { pauseLogStep } from '@/features/pause/public-rpc';
 import { hapticFeedback } from '@/lib/haptics';
 import { fetchHaikuTextForPauseInstance } from '@/lib/pause-haiku-artifact';
 import { cn } from '@/lib/utils';

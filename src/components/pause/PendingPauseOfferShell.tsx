@@ -12,7 +12,7 @@ import {
 } from '@/components/ui/alert-dialog';
 import { Button } from '@/components/ui/button';
 import { usePendingPauseOffer } from '@/hooks/use-pending-pause-offer';
-import { pauseAdoptPendingOffer, pauseDeclinePendingOffer } from '@/lib/pause-api';
+import { pauseAdoptPendingOffer, pauseDeclinePendingOffer } from '@/features/pause/public-rpc';
 import { trackEvent } from '@/lib/posthog';
 
 interface Props {

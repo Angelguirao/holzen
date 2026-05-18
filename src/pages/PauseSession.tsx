@@ -16,7 +16,7 @@ import { PauseSessionGateContent } from '@/components/pause/PauseSessionGateCont
 import { type PauseBreathingHandle } from '@/components/pause/PauseBreathing';
 import { PauseSessionDepthPickerStack } from '@/components/pause/PauseSessionDepthPickerStack';
 import { PauseBriefProgress } from '@/components/pause/PauseBriefProgress';
-import { isPauseSessionHeaderBackVisible } from '@/lib/pause-session-header-back';
+import { isPauseSessionHeaderBackVisible } from '@/features/pause/application/session/header-back';
 import { briefSwitchToDeepPauseState } from '@/lib/pause-brief-switch-to-deep';
 import { logPauseRitualDepthUpgraded } from '@/lib/pause-ritual-depth-upgrade';
 import { clearSession, type BriefPauseStep, type RitualDepth } from '@/lib/pause-session-storage';
@@ -37,7 +37,7 @@ import { coalescePauseSessionShellViewModel } from '@/lib/pause-session-shell-vi
 import {
   isPauseSessionDepthPickerActive,
   isPauseSessionWaitingForInstanceFetch,
-} from '@/lib/pause-session-gate-flags';
+} from '@/features/pause/application/session/gate-flags';
 import { usePauseSessionStepTransition } from '@/hooks/use-pause-session-step-transition';
 import { usePauseBreathSegmentRpcLoggers } from '@/hooks/use-pause-breath-segment-rpc-loggers';
 import { usePauseFeelShiftLogDedupeRefs } from '@/hooks/use-pause-feel-shift-log-dedupe-refs';
@@ -47,7 +47,7 @@ import { usePauseShiftFrameDoneHandler } from '@/hooks/use-pause-shift-frame-don
 import { usePauseSessionDecideHandler } from '@/hooks/use-pause-session-decide-handler';
 import { usePauseSessionExitNavigation } from '@/hooks/use-pause-session-exit-navigation';
 import { trackEvent } from '@/lib/posthog';
-import { pauseAdoptPendingOffer, pauseDeclinePendingOffer } from '@/lib/pause-api';
+import { pauseAdoptPendingOffer, pauseDeclinePendingOffer } from '@/features/pause/public-rpc';
 import { toast } from 'sonner';
 import { usePauseSessionBreathStepHandlers } from '@/hooks/use-pause-session-breath-step-handlers';
 import { usePauseSessionHeaderBackHandler } from '@/hooks/use-pause-session-header-back-handler';

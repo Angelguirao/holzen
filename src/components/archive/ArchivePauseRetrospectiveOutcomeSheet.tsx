@@ -11,7 +11,7 @@ import {
 } from '@/components/ui/sheet';
 import { cn } from '@/lib/utils';
 import { hapticFeedback } from '@/lib/haptics';
-import { pauseLogStep } from '@/lib/pause-api';
+import { pauseLogStep } from '@/features/pause/public-rpc';
 import { buildOutcomeLoggedPayload } from '@/lib/pause-outcome-log-payload';
 import { invalidatePauseStatsDataForUser } from '@/lib/pause-stats-invalidate';
 import { supabase } from '@/integrations/supabase/client';

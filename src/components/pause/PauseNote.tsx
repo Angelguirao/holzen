@@ -4,7 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { Pencil } from 'lucide-react';
 import { useAuth } from '@/hooks/use-auth';
 import { pauseArchiveListQueryPrefix } from '@/lib/pause-archive-list-query';
-import { pauseLogStep } from '@/lib/pause-api';
+import { pauseLogStep } from '@/features/pause/public-rpc';
 import {
   getLatestPauseReflectNoteQueryOptions,
   PAUSE_REFLECT_STEP_NOTE,
