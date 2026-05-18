@@ -17,7 +17,7 @@ import { ShareReflection } from '@/components/ShareReflection';
 import { trackEvent } from '@/lib/posthog';
 import { isPauseMoodValue, buildPostPauseEmotionLoggedPayload } from '@/lib/pause-post-pause-emotion-log';
 import { pauseLogStep } from '@/features/pause/public-rpc';
-import { showPauseStepSyncFailedToast } from '@/lib/pause-step-sync-toast';
+import { showPauseStepSyncFailedToast } from '@/features/pause/public';
 import { useSubscription } from '@/hooks/use-subscription';
 
 interface PauseData {
