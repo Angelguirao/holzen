@@ -16,6 +16,12 @@ export {
   REFLECTION_PERSIST_ERROR_MARKER,
 } from './application/use-cases/reflection-persist-error';
 export { pauseArchiveRowAllowsRetrospectiveOutcome } from './application/archive/retrospective-outcome';
+export {
+  pauseArchiveListQueryPrefix,
+  type PauseArchiveListSort,
+  type PauseArchiveRow,
+  type PauseArchiveSegment,
+} from './infrastructure/queries/archive-list-query';
 export { buildOutcomeLoggedPayload } from './application/use-cases/outcome-log-payload';
 export {
   resolvePauseBreathSecondLabelVariant,

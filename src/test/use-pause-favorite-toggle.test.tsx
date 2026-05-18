@@ -4,7 +4,8 @@ import type { TFunction } from 'i18next';
 import { usePauseFavoriteToggle } from '@/hooks/use-pause-favorite-toggle';
 import { showPauseFavoriteProHintToast } from '@/features/pause/public';
 
-vi.mock('@/lib/pause-archive-list-query', () => ({
+vi.mock('@/features/pause/public', () => ({
+  showPauseFavoriteProHintToast: vi.fn(),
   pauseArchiveListQueryPrefix: (userId: string) => ['pause-archive', userId] as const,
 }));
 
@@ -27,6 +28,7 @@ vi.mock('@/features/pause/public-rpc', () => ({
 
 vi.mock('@/features/pause/public', () => ({
   showPauseFavoriteProHintToast: vi.fn(),
+  pauseArchiveListQueryPrefix: (userId: string) => ['pause-archive', userId] as const,
 }));
 
 vi.mock('@/lib/haptics', () => ({

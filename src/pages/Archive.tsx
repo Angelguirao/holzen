@@ -4,7 +4,7 @@ import { useSearchParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { motion, AnimatePresence } from 'framer-motion';
 import { usePauseArchiveList } from '@/hooks/use-pause-archive-list';
-import type { PauseArchiveSegment, PauseArchiveRow } from '@/lib/pause-archive-list-query';
+import type { PauseArchiveRow, PauseArchiveSegment } from '@/features/pause/public';
 import { useInfiniteScroll } from '@/hooks/use-infinite-scroll';
 import { PageMeta } from '@/components/PageMeta';
 import { Search, X, ArrowUpDown, RefreshCw, Loader2 } from 'lucide-react';
