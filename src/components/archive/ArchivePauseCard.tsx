@@ -7,7 +7,7 @@ import type { PauseArchiveRow } from '@/lib/pause-archive-list-query';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import { Button } from '@/components/ui/button';
 import { ArchivePauseRetrospectiveOutcomeSheet } from '@/components/archive/ArchivePauseRetrospectiveOutcomeSheet';
-import { pauseArchiveRowAllowsRetrospectiveOutcome } from '@/lib/pause-archive-retrospective-outcome';
+import { pauseArchiveRowAllowsRetrospectiveOutcome } from '@/features/pause/public';
 
 function firstPreviewSource(row: PauseArchiveRow): string {
   const parts = [

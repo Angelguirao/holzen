@@ -4,7 +4,7 @@ import { ArrowRight, Pause } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { useCurrentPause } from '@/hooks/use-current-pause';
 import { usePendingPauseOffer } from '@/hooks/use-pending-pause-offer';
-import { pauseWindowShowsClockCountdown } from '@/lib/pause-state';
+import { pauseWindowShowsClockCountdown } from '@/features/pause/public';
 import { PauseEngagedOpenMaxCountdown } from '@/components/pause/PauseEngagedOpenMaxCountdown';
 import { cn } from '@/lib/utils';
 
