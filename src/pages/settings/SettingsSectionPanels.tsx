@@ -41,7 +41,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { TRACKED_ASSETS } from '@/lib/tracked-assets';
+import { TRACKED_ASSETS } from '@/features/market/public';
 
 export function SettingsYouPanel() {
   const {

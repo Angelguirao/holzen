@@ -3,8 +3,7 @@ import type { ReactNode } from 'react';
 import { BtcStatus } from '@/components/BtcStatus';
 import { HomeGoalWhyCard } from '@/components/home/HomeGoalWhyCard';
 import { HomeSectionCard } from '@/components/home/HomeSectionCard';
-import type { BtcPriceData } from '@/lib/btc';
-import type { TrackedAssetId } from '@/lib/tracked-assets';
+import type { BtcPriceData, TrackedAssetId } from '@/features/market/public';
 
 /** Everything needed to render one Home “Today” / goal-why section by id. */
 export interface HomeDashboardSectionDeps {

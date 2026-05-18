@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { format } from 'date-fns';
 import { X } from 'lucide-react';
 import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
-import { formatBtcPrice } from '@/lib/btc';
+import { formatBtcPrice } from '@/features/market/public';
 import { useHolzen } from '@/hooks/use-holzen';
 
 interface Letter {

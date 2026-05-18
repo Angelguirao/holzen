@@ -1,4 +1,4 @@
-import type { BtcPriceData } from '@/lib/btc';
+import type { BtcPriceData } from '@/features/market/domain/market-quote';
 import { isCumulativeMoveTriggered } from '@/features/market/domain/volatility-thresholds';
 import { enrichPauseContextWithMarketData } from '@holzen-pause-context';
 

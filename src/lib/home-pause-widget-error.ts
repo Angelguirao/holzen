@@ -1,5 +1,5 @@
 import type { TFunction } from 'i18next';
-import type { BtcPriceData } from '@/lib/btc';
+import type { BtcPriceData } from '@/features/market/public';
 import { isPausePersistError } from '@/features/pause/application/use-cases/reflection-persist-error';
 
 /** Buckets for Home pause widget + zen error copy (aligned with `useHolzen` setError strings). */
