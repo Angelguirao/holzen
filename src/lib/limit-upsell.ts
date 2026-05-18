@@ -1,6 +1,6 @@
 import { toast } from 'sonner';
 import i18n from '@/i18n';
-import { PRICING } from '@/lib/pricing';
+import { PRICING } from '@/features/subscription/public';
 import { trackEvent } from '@/lib/posthog';
 
 /**
