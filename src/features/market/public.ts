@@ -12,3 +12,4 @@ export {
   effectiveCumulativeThreshold,
   isCumulativeMoveTriggered,
 } from './domain/volatility-thresholds';
+export { parsePauseContextForHomePreview } from './application/pause-context-home-preview';
