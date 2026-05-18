@@ -5,7 +5,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClientProvider } from "@tanstack/react-query";
 import { createHolzenQueryClient } from "@/lib/query-client";
 import { setHolzenQueryClient } from "@/lib/holzen-query-client-ref";
-import { BrowserRouter, Routes, Route, Navigate, useLocation } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate, Outlet, useLocation } from "react-router-dom";
 import { reactRouterFutureFlags } from "@/lib/router-future";
 import { AuthProvider, useAuth } from "@/hooks/use-auth";
 import { HolzenProvider } from "@/hooks/use-holzen";
@@ -18,6 +18,7 @@ import { OfflineBanner } from "./components/OfflineBanner";
 import { CookieConsent } from "./components/CookieConsent";
 import AuthLoading from "./components/AuthLoading";
 import { AppLayout } from "./components/AppLayout";
+import { RobotsNoIndex } from "./components/PageMeta";
 import { FeedbackWidget } from "./components/FeedbackWidget";
 
 const Home = lazy(() => import("./pages/Home"));
@@ -161,6 +162,25 @@ function FeedbackWidgetGate() {
 }
 
 /** Logs pathname + auth state when either changes (under `[holzen:router]`). */
+/** Full-screen authenticated routes — keep out of search indexes. */
+function PrivateExperienceLayout() {
+  return (
+    <>
+      <RobotsNoIndex />
+      <Outlet />
+    </>
+  );
+}
+
+function UtilityNoIndexLayout() {
+  return (
+    <>
+      <RobotsNoIndex />
+      <Outlet />
+    </>
+  );
+}
+
 function RouterLocationLog() {
   const { pathname } = useLocation();
   const { user, loading } = useAuth();
@@ -207,31 +227,23 @@ const App = () => (
                     </Route>
                   </Route>
                 </Route>
-                {/* Immersive full-screen experiences — no nav bar */}
-                <Route path="/pause" element={<ProtectedRoute><PauseSession /></ProtectedRoute>} />
-                <Route
-                  path="/companion/zoom-out/:pauseInstanceId"
-                  element={<ProtectedRoute><CompanionZoomOutPage /></ProtectedRoute>}
-                />
-                <Route
-                  path="/companion/history/:pauseInstanceId"
-                  element={<ProtectedRoute><CompanionHistoryPage /></ProtectedRoute>}
-                />
-                <Route
-                  path="/companion/signal/:pauseInstanceId"
-                  element={<ProtectedRoute><CompanionSignalPage /></ProtectedRoute>}
-                />
-                <Route
-                  path="/companion/grounding/:pauseInstanceId"
-                  element={<ProtectedRoute><CompanionGroundingPage /></ProtectedRoute>}
-                />
-                <Route path="/admin" element={<ProtectedRoute><Admin /></ProtectedRoute>} />
-                <Route path="/admin/smoke-test" element={<ProtectedRoute><SmokeTest /></ProtectedRoute>} />
-                <Route path="/admin/sentry-alerts" element={<ProtectedRoute><SentryAlerts /></ProtectedRoute>} />
-                <Route path="/admin/edge-coverage" element={<ProtectedRoute><EdgeCoverage /></ProtectedRoute>} />
+                <Route element={<ProtectedRoute><PrivateExperienceLayout /></ProtectedRoute>}>
+                  <Route path="/pause" element={<PauseSession />} />
+                  <Route path="/companion/zoom-out/:pauseInstanceId" element={<CompanionZoomOutPage />} />
+                  <Route path="/companion/history/:pauseInstanceId" element={<CompanionHistoryPage />} />
+                  <Route path="/companion/signal/:pauseInstanceId" element={<CompanionSignalPage />} />
+                  <Route path="/companion/grounding/:pauseInstanceId" element={<CompanionGroundingPage />} />
+                  <Route path="/admin" element={<Admin />} />
+                  <Route path="/admin/smoke-test" element={<SmokeTest />} />
+                  <Route path="/admin/sentry-alerts" element={<SentryAlerts />} />
+                  <Route path="/admin/edge-coverage" element={<EdgeCoverage />} />
+                </Route>
                 <Route path="/welcome" element={<PublicOnlyRoute><Landing /></PublicOnlyRoute>} />
-                <Route path="/auth" element={<PublicOnlyRoute><Auth /></PublicOnlyRoute>} />
-                <Route path="/reset-password" element={<ResetPassword />} />
+                <Route element={<UtilityNoIndexLayout />}>
+                  <Route path="/auth" element={<PublicOnlyRoute><Auth /></PublicOnlyRoute>} />
+                  <Route path="/reset-password" element={<ResetPassword />} />
+                  <Route path="/unsubscribe" element={<Unsubscribe />} />
+                </Route>
                 <Route path="/terms" element={<Terms />} />
                 <Route path="/privacy" element={<Privacy />} />
                 <Route path="/about" element={<About />} />
@@ -239,7 +251,6 @@ const App = () => (
                 <Route path="/blog/:slug" element={<BlogPost />} />
                 <Route path="/roadmap" element={<Roadmap />} />
                 <Route path="/reserve" element={<Reserve />} />
-                <Route path="/unsubscribe" element={<Unsubscribe />} />
                 <Route path="*" element={<NotFound />} />
               </Routes>
             </Suspense>

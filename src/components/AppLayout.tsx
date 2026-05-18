@@ -13,6 +13,7 @@ import { useAutoTrigger } from '@/hooks/use-auto-trigger';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
+import { RobotsNoIndex } from '@/components/PageMeta';
 
 /**
  * Lightweight fallback shown while a lazy page chunk downloads *within*
@@ -89,6 +90,7 @@ export function AppLayout() {
 
   return (
     <div className="min-h-screen flex items-start justify-center p-6 pb-20">
+      <RobotsNoIndex />
       <PendingPauseOfferShell
         onAfterMutation={() => void resyncOpenPauseFromDb()}
         autoOpen={location.pathname !== '/pause'}

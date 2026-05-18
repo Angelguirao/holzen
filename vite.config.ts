@@ -6,6 +6,7 @@ import { readFileSync } from "node:fs";
 import { componentTagger } from "lovable-tagger";
 import { VitePWA } from "vite-plugin-pwa";
 import { sentryVitePlugin } from "@sentry/vite-plugin";
+import { PRICING } from "./src/lib/pricing";
 
 // Defaults when `VITE_SUPABASE_*` are unset: local `npm run dev`, and `vite build` without env
 // (e.g. Lovable preview). Override with `.env` / CI / Lovable Cloud vars for another project.
@@ -39,6 +40,28 @@ function preconnectHeadSnippet(supabaseUrl: string): string {
     '    <link rel="preconnect" href="https://api.coingecko.com" />',
   );
   return lines.join("\n");
+}
+
+const FALLBACK_SITE_ORIGIN = "https://holzen.app";
+
+function resolveSiteOrigin(env: Record<string, string>): string {
+  const raw = env.VITE_SITE_ORIGIN?.trim();
+  if (raw) return raw.replace(/\/$/, "");
+  return FALLBACK_SITE_ORIGIN;
+}
+
+/** Replaces `index.html` SEO placeholders; keeps `src/lib/pricing.ts` as price source of truth. */
+function injectIndexHtmlSeo(html: string, siteOrigin: string): string {
+  const ogImageUrl = `${siteOrigin}/og-image.png`;
+  const offer = {
+    price: PRICING.monthlyPrice.toFixed(2),
+    description: `${PRICING.trialDays}-day free trial of Pro, then $${PRICING.monthlyPrice}/month. Unlimited pauses and AI companions. Cancel anytime.`,
+  };
+  return html
+    .replaceAll("__SITE_ORIGIN__", siteOrigin)
+    .replaceAll("__OG_IMAGE_URL__", ogImageUrl)
+    .replaceAll("__JSON_LD_PRICE__", offer.price)
+    .replaceAll("__JSON_LD_OFFER_DESCRIPTION__", offer.description);
 }
 
 /**
@@ -111,6 +134,7 @@ export default defineConfig(({ mode, command }) => {
     explicit: env.VITE_APP_VERSION || process.env.VITE_APP_VERSION,
     isBuild: command === "build",
   });
+  const siteOrigin = resolveSiteOrigin(env);
 
   // Source-map upload gated on CI-only secrets; plugin is a no-op without them.
   const sentryAuthToken = process.env.SENTRY_AUTH_TOKEN;
@@ -130,6 +154,7 @@ export default defineConfig(({ mode, command }) => {
     define: {
       "import.meta.env.VITE_SUPABASE_URL": JSON.stringify(supabaseUrl),
       "import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY": JSON.stringify(supabaseKey),
+      "import.meta.env.VITE_SITE_ORIGIN": JSON.stringify(siteOrigin),
       "__BUILD_TIME__": JSON.stringify(new Date().toISOString()),
       "__APP_VERSION__": JSON.stringify(appVersion),
     },
@@ -139,10 +164,11 @@ export default defineConfig(({ mode, command }) => {
     },
     plugins: [
       {
-        name: "holzen-inject-preconnect",
+        name: "holzen-inject-index-html",
         transformIndexHtml(html: string) {
-          if (!html.includes("</head>")) return html;
-          return html.replace(
+          let next = injectIndexHtmlSeo(html, siteOrigin);
+          if (!next.includes("</head>")) return next;
+          return next.replace(
             "</head>",
             `${preconnectHeadSnippet(supabaseUrl)}\n  </head>`,
           );
@@ -157,7 +183,7 @@ export default defineConfig(({ mode, command }) => {
         filename: "sw.ts",
         registerType: "prompt",
         injectRegister: false,
-        includeAssets: ["icon-512.png"],
+        includeAssets: ["icon-512.png", "favicon.png", "og-image.png"],
         manifest: false,
         injectManifest: {
           globPatterns: ["**/*.{js,css,html,ico,png,svg,woff2}"],

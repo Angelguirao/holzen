@@ -4,8 +4,8 @@
   "description": "Pause before you act. Bitcoin volatility reflections.",
   "start_url": "/",
   "display": "standalone",
-  "background_color": "#f5f2ec",
-  "theme_color": "#f5f2ec",
+  "background_color": "#151719",
+  "theme_color": "#151719",
   "icons": [
     {
       "src": "/icon-512.png",
