@@ -13,3 +13,7 @@ export {
   isCumulativeMoveTriggered,
 } from './domain/volatility-thresholds';
 export { parsePauseContextForHomePreview } from './application/pause-context-home-preview';
+export {
+  severityFromBtcChangePercent,
+  type BtcMoveSeverity,
+} from './domain/btc-move-severity';
