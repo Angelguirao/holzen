@@ -1,8 +1,8 @@
 import { describe, expect, it, vi, beforeEach } from 'vitest';
 import { renderHook } from '@testing-library/react';
 import { usePauseSessionPersistToStorage } from '@/hooks/use-pause-session-persist-to-storage';
-import type { PauseSessionPersistSnapshotInput } from '@/lib/pause-session-persist-snapshot';
-import { buildPauseSessionPersistSnapshot } from '@/lib/pause-session-persist-snapshot';
+import type { PauseSessionPersistSnapshotInput } from '@/features/pause/application/session/persist-snapshot';
+import { buildPauseSessionPersistSnapshot } from '@/features/pause/application/session/persist-snapshot';
 
 const { saveSessionMock } = vi.hoisted(() => ({
   saveSessionMock: vi.fn(),
