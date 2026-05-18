@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import type { TFunction } from 'i18next';
-import { buildPauseSessionScaffoldRitualDerived } from '@/lib/pause-session-scaffold-ritual-props';
+import { buildPauseSessionScaffoldRitualDerived } from '@/features/pause/application/session/scaffold-ritual-derived';
 
 const t = ((
   key: string,
