@@ -1,14 +1,2 @@
-import type { MoodValue } from '@/components/MoodCheck';
-import { PAUSE_MOOD_VALUES } from '@/components/MoodCheck';
-
-export function isPauseMoodValue(s: string | null | undefined): s is MoodValue {
-  return s != null && (PAUSE_MOOD_VALUES as readonly string[]).includes(s);
-}
-
-/** Payload for `pauseLogStep` with `stepType: 'post_pause_emotion_logged'` (after `outcome_logged`). */
-export function buildPostPauseEmotionLoggedPayload(
-  mood: MoodValue,
-  intensity: number,
-): Record<string, unknown> {
-  return { mood, intensity };
-}
+/** @deprecated Import from `@/features/pause/application/session/post-pause-emotion-log`. */
+export * from '@/features/pause/application/session/post-pause-emotion-log';
