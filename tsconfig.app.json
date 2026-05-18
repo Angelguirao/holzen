@@ -37,6 +37,7 @@
     "supabase/functions/_shared/pause-context-suffix.ts"
   ],
   "exclude": [
-    "src/legacy/**"
+    "src/legacy/**",
+    "src/test/legacy/**"
   ]
 }
