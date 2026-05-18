@@ -7,9 +7,10 @@ import {
   type PauseSessionHydrationReady,
   type PauseSessionHydrationState,
 } from '@/features/pause/application/session/hydration';
-import { loadSession, type FetchedPauseInstance, type PersistedSession } from '@/lib/pause-session-storage';
 import { hasPersistedPauseSessionPayload } from '@/features/pause/application/session/persisted-session-guards';
 import type { PauseSessionNavParsed } from '@/lib/router-location-state';
+import { type FetchedPauseInstance, type PersistedSession } from '@/features/pause/domain/session-model';
+import { loadSession } from '@/features/pause/infrastructure/session/persisted-session-storage';
 
 export type PauseSessionShellHolzen = {
   message: string | null;

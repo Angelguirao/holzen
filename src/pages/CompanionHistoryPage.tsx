@@ -3,7 +3,6 @@ import { useNavigate, useParams, useLocation, Navigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next';
 import { useHolzen } from '@/hooks/use-holzen';
 import { useCompanionData } from '@/hooks/use-companion-data';
-import { DEFAULT_COMPANIONS, DEFAULT_PREFS } from '@/lib/pause-session-storage';
 import { usePauseSessionCompanionSnapshot } from '@/hooks/use-pause-session-companion-snapshot';
 import { HistoricalInsightDisplay } from '@/components/HistoricalInsightDisplay';
 import { CompanionFeedback } from '@/components/CompanionFeedback';
@@ -15,6 +14,7 @@ import { InterventionCrossRefBadge } from '@/components/companion/InterventionCr
 import { useStaggeredReveal } from '@/components/companion/use-staggered-reveal';
 import { useFullviewTelemetry } from '@/hooks/use-fullview-telemetry';
 import { PageMeta } from '@/components/PageMeta';
+import { DEFAULT_COMPANIONS, DEFAULT_PREFS } from '@/features/pause/domain/session-model';
 
 const SEVERITY_NUMBER: Record<string, number> = { mild: 3, moderate: 6, high: 10 };
 const BREATHING_ROOM_MS = 8000;

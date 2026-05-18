@@ -13,8 +13,8 @@ import {
   initialBreathSegmentRpcLoggedFlagsFromRestored,
   briefStepToPauseScienceStep,
 } from '@/lib/pause-session-step-map';
-import type { PersistedSession } from '@/lib/pause-session-storage';
 import { makeTestPersistedPauseSession } from '@/test/make-test-persisted-pause-session';
+import { type PersistedSession } from '@/features/pause/domain/session-model';
 
 describe('mapPersistedStep', () => {
   it('maps legacy and empty keys to feel', () => {

@@ -19,7 +19,6 @@ import { PauseBriefProgress } from '@/components/pause/PauseBriefProgress';
 import { isPauseSessionHeaderBackVisible } from '@/features/pause/application/session/header-back';
 import { briefSwitchToDeepPauseState } from '@/features/pause/application/session/brief-switch-to-deep';
 import { logPauseRitualDepthUpgraded } from '@/features/pause/application/session/ritual-depth-upgrade';
-import { clearSession, type BriefPauseStep, type RitualDepth } from '@/lib/pause-session-storage';
 import {
   mapPersistedStep,
   initialRitualEntry,
@@ -73,6 +72,8 @@ import { usePauseSessionDepthPickerHandlers } from '@/hooks/use-pause-session-de
 import { usePauseSessionFeelTilesSelect } from '@/hooks/use-pause-session-feel-tiles-select';
 import { usePauseReflectGeneration } from '@/hooks/use-pause-reflect-generation';
 import { PauseLeaveWithPendingSheet } from '@/components/pause/PauseLeaveWithPendingSheet';
+import { type BriefPauseStep, type RitualDepth } from '@/features/pause/domain/ritual-types';
+import { clearSession } from '@/features/pause/infrastructure/session/persisted-session-storage';
 
 /**
  * `/pause` route: wires shell hydration, local ritual state, `pause-api` step handlers, and pause UI
