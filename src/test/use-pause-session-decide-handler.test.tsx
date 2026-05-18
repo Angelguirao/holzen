@@ -30,16 +30,9 @@ vi.mock('@/lib/haptics', () => ({
   hapticFeedback: vi.fn(),
 }));
 
-vi.mock('@/features/pause/public', async (importOriginal) => {
-  const actual = await importOriginal<typeof import('@/features/pause/public')>();
-  return {
-    ...actual,
-    showPauseOutcomeSaveFailedToast: vi.fn(),
-    showPauseOutcomeNotCompletedToast: vi.fn(),
-  };
-});
-
-vi.mock('@/lib/pause-stats-invalidate', () => ({
+vi.mock('@/features/pause/public', () => ({
+  showPauseOutcomeSaveFailedToast: vi.fn(),
+  showPauseOutcomeNotCompletedToast: vi.fn(),
   invalidatePauseStatsDataForUser: (...args: unknown[]) => invalidatePauseStatsMock(...args),
 }));
 

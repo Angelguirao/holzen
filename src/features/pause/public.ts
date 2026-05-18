@@ -96,6 +96,11 @@ export {
   type PauseInstanceContextSnapshotRow,
 } from './application/session/fetched-instance-from-fetch';
 export {
+  computePauseStorageRitualSyncPatch,
+  type PauseStorageRitualSyncPatch,
+} from './application/session/storage-ritual-sync';
+export { invalidatePauseStatsDataForUser } from './application/queries/invalidate-pause-stats';
+export {
   collectStepTypes,
   computePauseState,
   countedCompanionCount,

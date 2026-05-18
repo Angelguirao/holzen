@@ -25,13 +25,9 @@ vi.mock('@/features/pause/public-rpc', () => ({
   pauseLogStep: (...args: unknown[]) => pauseLogStepMock(...args),
 }));
 
-vi.mock('@/features/pause/public', async (importOriginal) => {
-  const actual = await importOriginal<typeof import('@/features/pause/public')>();
-  return {
-    ...actual,
-    showPauseFavoriteProHintToast: vi.fn(),
-  };
-});
+vi.mock('@/features/pause/public', () => ({
+  showPauseFavoriteProHintToast: vi.fn(),
+}));
 
 vi.mock('@/lib/haptics', () => ({
   hapticFeedback: vi.fn(),

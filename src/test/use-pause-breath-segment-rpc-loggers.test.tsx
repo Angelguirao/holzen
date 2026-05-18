@@ -20,13 +20,9 @@ vi.mock('@/lib/companion-ui-completion-query-key', () => ({
     invalidateCompanionUiCompletionQueryMock(...args),
 }));
 
-vi.mock('@/features/pause/public', async (importOriginal) => {
-  const actual = await importOriginal<typeof import('@/features/pause/public')>();
-  return {
-    ...actual,
-    showPauseStepSyncFailedToast: vi.fn(),
-  };
-});
+vi.mock('@/features/pause/public', () => ({
+  showPauseStepSyncFailedToast: vi.fn(),
+}));
 
 const t = ((k: string) => k) as TFunction;
 

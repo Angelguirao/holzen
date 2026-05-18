@@ -13,7 +13,7 @@ import {
 } from '@/features/pause/public';
 import type { PauseState } from '@/features/pause/domain/pause-state';
 import { buildPauseImpactDataOnComplete, type PauseImpactData } from '@/lib/pause-impact-data';
-import { invalidatePauseStatsDataForUser } from '@/lib/pause-stats-invalidate';
+import { invalidatePauseStatsDataForUser } from '@/features/pause/public';
 import { getSessionQuote } from '@/lib/wisdom-quotes';
 
 export function usePauseSessionDecideHandler(input: {
