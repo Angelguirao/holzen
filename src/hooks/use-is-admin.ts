@@ -1,7 +1,7 @@
 import { useMemo } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { useAuth } from '@/hooks/use-auth';
-import { isAdminFromEnvList } from '@/features/user/application/is-admin-env';
+import { isAdminFromEnvList } from '@/features/user/public';
 import { getProfileRowQueryOptions } from '@/features/user/public';
 
 /**

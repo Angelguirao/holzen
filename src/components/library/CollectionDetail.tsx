@@ -1,7 +1,7 @@
 import { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { ArrowLeft, Trash2 } from 'lucide-react';
-import type { Collection, CollectionMemberPause } from '@/features/pause/domain/library-bundle';
+import type { Collection, CollectionMemberPause } from '@/features/pause/public';
 import { ArchivePauseCard } from '@/components/archive/ArchivePauseCard';
 
 interface Props {

@@ -1,6 +1,6 @@
 import { useCallback } from 'react';
 import type { NavigateFunction } from 'react-router-dom';
-import { clearSession } from '@/features/pause/infrastructure/session/persisted-session-storage';
+import { clearSession } from '@/features/pause/public';
 
 /** Leave `/pause` without vs with clearing persisted session snapshot. */
 export function usePauseSessionExitNavigation(navigate: NavigateFunction): {

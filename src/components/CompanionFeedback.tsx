@@ -5,12 +5,12 @@ import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/use-auth';
 import { hapticFeedback } from '@/lib/haptics';
+import { FEEDBACK_TO_CACHE_TYPE } from '@/features/pause/public';
+import type { RegenerateCompanionSlot } from '@/features/pause/public';
 import {
-  FEEDBACK_TO_CACHE_TYPE,
   companionFeedbackVoteQueryKey,
   getCompanionFeedbackVoteQueryOptions,
-  type RegenerateCompanionSlot,
-} from '@/features/pause/public';
+} from '@/features/pause/public-queries';
 import { useSubscription } from '@/hooks/use-subscription';
 import { useProGate } from '@/hooks/use-pro-gate';
 import { showLimitReachedToast, isPaidLimitReached } from '@/lib/limit-upsell';

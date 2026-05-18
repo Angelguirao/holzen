@@ -14,7 +14,7 @@ import { buildPauseImpactDataOnComplete, type PauseImpactData } from '@/features
 import { invalidatePauseStatsDataForUser } from '@/features/pause/application/queries/invalidate-pause-stats';
 import { getSessionQuote } from '@/lib/wisdom-quotes';
 import { type RitualDepth } from '@/features/pause/domain/ritual-types';
-import { clearSession } from '@/features/pause/infrastructure/session/persisted-session-storage';
+import { clearSession } from '@/features/pause/public';
 
 export function usePauseSessionDecideHandler(input: {
   decidingRef: MutableRefObject<boolean>;

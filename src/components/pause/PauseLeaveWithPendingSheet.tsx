@@ -1,4 +1,4 @@
-import type { PendingPauseOfferRow } from '@/features/pause/infrastructure/queries/pending-pause-offer-query';
+import type { PendingPauseOfferRow } from '@/features/pause/public-queries';
 import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sheet';
 import { useTranslation } from 'react-i18next';

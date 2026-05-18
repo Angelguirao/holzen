@@ -17,35 +17,13 @@ export {
 } from './application/use-cases/reflection-persist-error';
 export { pauseArchiveRowAllowsRetrospectiveOutcome } from './application/archive/retrospective-outcome';
 export { pauseArchiveListQueryPrefix } from './application/queries/archive-query-keys';
-export { getArchivePausesTabHasRowsQueryOptions } from './infrastructure/queries/archive-pauses-tab-query';
-export { getCompletedPauseCountQueryOptions } from './infrastructure/queries/completed-pause-count-query';
-export {
-  buildMemberCacheKey,
-  getLibraryBundleDisabledQueryOptions,
-  getLibraryBundleQueryOptions,
-  libraryBundleQueryPrefix,
-  sortMemberPauses,
-  type Collection,
-  type CollectionItem,
-  type CollectionMemberPause,
-  type LibraryBundle,
-  type LibraryListSortMode,
-} from './infrastructure/queries/library-bundle-query';
-export {
-  currentPauseQueryKey,
-  getCurrentPauseQueryOptions,
-  type CurrentPauseRow,
-} from './infrastructure/queries/current-pause-query';
-export {
-  getPendingPauseOfferQueryOptions,
-  pendingPauseOfferQueryKey,
-  type PendingPauseOfferRow,
-} from './infrastructure/queries/pending-pause-offer-query';
-export {
-  type PauseArchiveListSort,
-  type PauseArchiveRow,
-  type PauseArchiveSegment,
-} from './infrastructure/queries/archive-list-query';
+export type {
+  Collection,
+  CollectionItem,
+  CollectionMemberPause,
+  LibraryBundle,
+  LibraryListSortMode,
+} from './domain/library-bundle';
 export { buildOutcomeLoggedPayload } from './application/use-cases/outcome-log-payload';
 export {
   resolvePauseBreathSecondLabelVariant,
@@ -143,7 +121,6 @@ export {
   computePauseStorageRitualSyncPatch,
   type PauseStorageRitualSyncPatch,
 } from './application/session/storage-ritual-sync';
-export { invalidatePauseStatsDataForUser } from './application/queries/invalidate-pause-stats';
 export type {
   CompanionOrchestrateSlotResult,
   CompanionSlotSource,
@@ -160,14 +137,6 @@ export {
   zoomOutLibraryAutosaveFromDisplayData,
   zoomOutTotalCharsForReadTime,
 } from './application/companion/zoom-out-payload';
-export {
-  getHistoryThreadQueryOptions,
-  type HistoryThreadRow,
-} from './infrastructure/queries/history-thread-query';
-export {
-  companionFeedbackVoteQueryKey,
-  getCompanionFeedbackVoteQueryOptions,
-} from './infrastructure/queries/companion-feedback-vote-query';
 export {
   collectStepTypes,
   computePauseState,

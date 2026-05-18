@@ -4,7 +4,7 @@ import {
   COMPLETED_PAUSE_COUNT_QUERY_KEY,
   fetchCompletedPauseCount,
   getCompletedPauseCountQueryOptions,
-} from '@/features/pause/infrastructure/queries/completed-pause-count-query';
+} from '@/features/pause/public-queries';
 
 export {
   COMPLETED_PAUSE_COUNT_QUERY_KEY,

@@ -6,7 +6,7 @@ import {
   getPendingPauseOfferQueryOptions,
   pendingPauseOfferQueryKey,
   type PendingPauseOfferRow,
-} from '@/features/pause/infrastructure/queries/pending-pause-offer-query';
+} from '@/features/pause/public-queries';
 
 export type { PendingPauseOfferRow };
 export { pendingPauseOfferQueryKey };

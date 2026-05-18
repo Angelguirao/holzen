@@ -17,7 +17,7 @@ import {
   currentPauseQueryKey,
   getCurrentPauseQueryOptions,
   type CurrentPauseRow,
-} from '@/features/pause/infrastructure/queries/current-pause-query';
+} from '@/features/pause/public-queries';
 
 export type { CurrentPauseRow };
 export { currentPauseQueryKey };

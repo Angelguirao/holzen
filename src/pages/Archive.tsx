@@ -4,7 +4,7 @@ import { useSearchParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { motion, AnimatePresence } from 'framer-motion';
 import { usePauseArchiveList } from '@/hooks/use-pause-archive-list';
-import type { PauseArchiveRow, PauseArchiveSegment } from '@/features/pause/public';
+import type { PauseArchiveRow, PauseArchiveSegment } from '@/features/pause/public-queries';
 import { useInfiniteScroll } from '@/hooks/use-infinite-scroll';
 import { PageMeta } from '@/components/PageMeta';
 import { Search, X, ArrowUpDown, RefreshCw, Loader2 } from 'lucide-react';
@@ -18,7 +18,7 @@ import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import { useAuth } from '@/hooks/use-auth';
-import { getArchivePausesTabHasRowsQueryOptions } from '@/features/pause/public';
+import { getArchivePausesTabHasRowsQueryOptions } from '@/features/pause/public-queries';
 import type { ArchiveMainSegment } from '@/lib/archive-segment';
 
 type SortMode = 'newest' | 'oldest' | 'alphabetical';
