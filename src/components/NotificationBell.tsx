@@ -15,7 +15,7 @@ import { useAuth } from '@/hooks/use-auth';
 import { formatDistanceToNow } from 'date-fns';
 import { AnimatePresence, motion } from 'framer-motion';
 import { Skeleton } from '@/components/ui/skeleton';
-import type { NotificationNavigateState } from '@/lib/router-location-state';
+import type { NotificationNavigateState } from '@/features/pause/public';
 
 const SWIPE_THRESHOLD = 80;
 
