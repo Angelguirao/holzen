@@ -1,7 +1,7 @@
 import { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { cn } from '@/lib/utils';
-import type { JourneyPauseRow } from '@/lib/journey/pause-instances-for-journey';
+import type { JourneyPauseRow } from '@/features/pause/public-queries';
 
 interface Props {
   rows: readonly JourneyPauseRow[];

@@ -1,5 +1,6 @@
 import { libraryBundleQueryPrefix } from './library-bundle-keys';
 import { pauseArchiveListQueryPrefix } from '@/features/pause/application/queries/archive-query-keys';
+import { journeyPauseInstancesQueryKey } from './journey-pause-instances-keys';
 import { COMPLETED_PAUSE_COUNT_QUERY_KEY } from './completed-pause-count-keys';
 import { currentPauseQueryKey } from './current-pause-keys';
 import { pendingPauseOfferQueryKey } from './pending-pause-offer-keys';
@@ -14,7 +15,7 @@ export function invalidatePauseStatsDataForUser(userId: string | null | undefine
   if (!userId) return;
   const qc = getHolzenQueryClient();
   if (!qc) return;
-  void qc.invalidateQueries({ queryKey: ['journey', 'pause-instances', userId] });
+  void qc.invalidateQueries({ queryKey: journeyPauseInstancesQueryKey(userId) });
   void qc.invalidateQueries({ queryKey: COMPLETED_PAUSE_COUNT_QUERY_KEY(userId) });
   void qc.invalidateQueries({ queryKey: archivePausesTabHasRowsQueryPrefix(userId) });
   void qc.invalidateQueries({ queryKey: pauseArchiveListQueryPrefix(userId) });

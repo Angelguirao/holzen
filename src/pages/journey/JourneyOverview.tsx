@@ -5,7 +5,7 @@ import { useTranslation } from 'react-i18next';
 import { JourneyStreakCard } from '@/components/journey/JourneyStreakCard';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/hooks/use-auth';
-import { fetchPauseInstancesForJourney } from '@/lib/journey/pause-instances-for-journey';
+import { getJourneyPauseInstancesQueryOptions } from '@/features/pause/public-queries';
 import { trackEvent } from '@/lib/posthog';
 import { Skeleton } from '@/components/ui/skeleton';
 
@@ -15,12 +15,7 @@ export default function JourneyOverview() {
   const userId = user?.id;
   const viewedRef = useRef(false);
 
-  const { data: rows = [], isLoading } = useQuery({
-    queryKey: ['journey', 'pause-instances', userId ?? 'none'],
-    queryFn: () => fetchPauseInstancesForJourney(userId!),
-    enabled: Boolean(userId),
-    staleTime: 60_000,
-  });
+  const { data: rows = [], isLoading } = useQuery(getJourneyPauseInstancesQueryOptions(userId));
 
   const completedCount = rows.filter((r) => r.state === 'completed').length;
 

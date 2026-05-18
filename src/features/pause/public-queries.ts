@@ -9,6 +9,12 @@ export {
   getCompletedPauseCountQueryOptions,
 } from './infrastructure/queries/completed-pause-count-query';
 export {
+  fetchPauseInstancesForJourney,
+  getJourneyPauseInstancesQueryOptions,
+  journeyPauseInstancesQueryKey,
+  type JourneyPauseRow,
+} from './infrastructure/queries/journey-pause-instances-query';
+export {
   buildMemberCacheKey,
   getLibraryBundleDisabledQueryOptions,
   getLibraryBundleQueryOptions,
