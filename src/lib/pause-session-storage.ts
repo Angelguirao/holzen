@@ -3,13 +3,15 @@ import type { FeelStepTile } from '@/components/pause/pause-feel-types';
 import type { CompanionData, CompanionPrefs } from '@/components/CompanionSection';
 import type { PauseStep } from '@/components/pause/PauseProgress';
 import type { PauseState } from '@/lib/pause-state';
+import {
+  PAUSE_RITUAL_SCHEMA_VERSION,
+  type BriefPauseStep,
+  type RitualDepth,
+} from '@/features/pause/domain/ritual-types';
+
+export { PAUSE_RITUAL_SCHEMA_VERSION, type BriefPauseStep, type RitualDepth };
 
 const SESSION_KEY = 'holzen_pause_session';
-/** Bump when persisted step model changes (v4: brief vs deep ritual). */
-export const PAUSE_RITUAL_SCHEMA_VERSION = 4 as const;
-
-export type RitualDepth = 'deep' | 'brief';
-export type BriefPauseStep = 'feel' | 'breath' | 'integrate' | 'decide';
 
 export interface PersistedSession {
   message: string;
