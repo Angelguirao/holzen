@@ -46,7 +46,7 @@ That means the app can keep `session` across reloads and refresh tokens automati
 
 ### 2) AuthProvider lifecycle
 
-`src/hooks/use-auth.tsx`’s `AuthProvider` is the source of truth for `useAuth()`:
+`src/features/auth/presentation/AuthProvider.tsx` (re-exported from `src/hooks/use-auth.tsx`) is the source of truth for `useAuth()`:
 
 1. On mount, it subscribes to Supabase auth events via `supabase.auth.onAuthStateChange(...)`.
 2. For every auth change it updates:
