@@ -286,7 +286,7 @@ Use this when moving files. Paths are indicative — adjust to actual filenames 
 | `src/hooks/use-companion-data.ts` | `packages/pause/application/companion/` |
 | `src/hooks/use-holzen.ts` | `packages/market` + `apps/web/screens/home` (wires pause triggers) |
 | `src/hooks/use-subscription.ts` | `packages/subscription` |
-| `src/hooks/use-auth.tsx` | `packages/auth` + `apps/web` provider |
+| `src/hooks/use-auth.tsx` (re-export) | `features/auth/presentation/AuthProvider.tsx` → `packages/auth` |
 | `src/hooks/use-library.ts` | `packages/pause` queries (archive collections) |
 | `src/lib/pause-*.ts` | `packages/pause/domain` + `application` |
 | `src/lib/*-query.ts` | Owning context `queries/` or `packages/infrastructure` |
