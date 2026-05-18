@@ -9,7 +9,7 @@ import {
   RITUAL_TRIANGLE_KICKER_INTERVAL_SEC,
   secondsIntoTrianglePattern,
   TRIANGLE_PHASE_COUNT,
-} from '@/lib/pause-breathing-pattern';
+} from '@/features/pause/application/breathing/ritual-pattern';
 
 describe('pause-breathing-pattern', () => {
   it('defaults to triangle mode until feel-tile routing ships', () => {

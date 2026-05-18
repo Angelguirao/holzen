@@ -30,9 +30,9 @@ import {
   initialBreathingFirstCompletedFromRestored,
   initialBreathingSecondCompletedFromRestored,
   initialFrameDoneFromRestored,
-} from '@/lib/pause-session-step-map';
+} from '@/features/pause/application/session/step-map';
 import { parsePauseSessionLocationState } from '@/lib/router-location-state';
-import { coalescePauseSessionShellViewModel } from '@/lib/pause-session-shell-view-model';
+import { coalescePauseSessionShellViewModel } from '@/features/pause/application/session/shell-view-model';
 import {
   isPauseSessionDepthPickerActive,
   isPauseSessionWaitingForInstanceFetch,
@@ -56,7 +56,7 @@ import { usePauseSessionEntryPresentationEffects } from '@/hooks/use-pause-sessi
 import { usePauseSessionBreathTimedActiveReset } from '@/hooks/use-pause-session-breath-timed-active-reset';
 import { usePauseSessionDepthAndBriefCopy } from '@/hooks/use-pause-session-depth-and-brief-copy';
 import { usePauseSessionBreathSecondLabelVariant } from '@/hooks/use-pause-session-breath-second-label-variant';
-import type { PauseImpactData } from '@/lib/pause-impact-data';
+import type { PauseImpactData } from '@/features/pause/application/use-cases/impact-data';
 import { usePauseSessionShell } from '@/hooks/use-pause-session-shell';
 import { usePauseSessionTerminalEntryRedirect } from '@/hooks/use-pause-session-terminal-entry-redirect';
 import { usePauseSessionMountLog } from '@/hooks/use-pause-session-mount-log';
@@ -65,7 +65,7 @@ import { usePauseSessionGoToStep } from '@/hooks/use-pause-session-go-to-step';
 import { buildPauseSessionScaffoldRitualDerived } from '@/features/pause/application/session/scaffold-ritual-derived';
 import { buildPauseSessionScaffoldRitualPayloads } from '@/features/pause/presentation/session/scaffold-ritual-payloads';
 import { JOURNEY_PREFIX } from '@/lib/app-routes';
-import { buildPauseSessionMountLogParams } from '@/lib/pause-session-mount-log-params';
+import { buildPauseSessionMountLogParams } from '@/features/pause/application/session/mount-log-params';
 import { usePauseSessionPendingPauseOfferNavigation } from '@/hooks/use-pause-session-pending-pause-offer-navigation';
 import { usePendingPauseOffer } from '@/hooks/use-pending-pause-offer';
 import { usePauseSessionDepthPickerHandlers } from '@/hooks/use-pause-session-depth-picker-handlers';

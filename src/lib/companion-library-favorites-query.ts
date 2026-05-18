@@ -1,5 +1,5 @@
 import { supabase } from '@/integrations/supabase/client';
-import { pauseInstanceQueryPrefix } from '@/lib/pause-instance-query-prefix';
+import { pauseInstanceQueryPrefix } from '@/features/pause/application/queries/pause-instance-query-prefix';
 
 /** JSON key on `pause_instances.metadata` for per-slot hearts (shared with toggle writes). */
 export const COMPANION_SLOT_FAVORITES_METADATA_KEY = 'companion_slot_favorites';

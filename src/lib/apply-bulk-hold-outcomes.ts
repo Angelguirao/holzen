@@ -1,5 +1,5 @@
 import { pauseLogStep } from '@/features/pause/public-rpc';
-import { buildOutcomeLoggedPayload } from '@/lib/pause-outcome-log-payload';
+import { buildOutcomeLoggedPayload } from '@/features/pause/application/use-cases/outcome-log-payload';
 import type { BulkHoldOutcomeChoice, BulkHoldPendingPause } from '@/lib/bulk-hold';
 
 export type BulkHoldApplyResult =

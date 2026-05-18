@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { computeBriefRitualGoBack } from '@/lib/brief-pause-go-back';
+import { computeBriefRitualGoBack } from '@/features/pause/application/brief-ritual/brief-pause-go-back';
 
 describe('computeBriefRitualGoBack', () => {
   it('returns null on first step', () => {

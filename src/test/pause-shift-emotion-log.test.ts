@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { buildShiftEmotionFrameHubLogBundle } from '@/lib/pause-shift-emotion-log';
+import { buildShiftEmotionFrameHubLogBundle } from '@/features/pause/application/session/shift-emotion-log';
 
 describe('buildShiftEmotionFrameHubLogBundle', () => {
   it('keeps payload and logKey in sync', () => {

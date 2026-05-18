@@ -4,7 +4,7 @@ import {
   isTerminalPauseDbState,
   persistedPauseSessionAllowsTerminalEntry,
   TERMINAL_PAUSE_DB_STATES,
-} from '@/lib/pause-terminal-entry-guard';
+} from '@/features/pause/application/session/terminal-entry-guard';
 
 describe('pause-terminal-entry-guard', () => {
   it('TERMINAL_PAUSE_DB_STATES matches product states', () => {

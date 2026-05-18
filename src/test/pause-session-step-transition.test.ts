@@ -5,7 +5,7 @@ import {
   PAUSE_SESSION_STEP_TRANSITION_DURATION_S,
   PAUSE_SESSION_STEP_TRANSITION_EASE,
   buildPauseSessionStepTransitionConfig,
-} from '@/lib/pause-session-step-transition';
+} from '@/features/pause/application/session/step-transition';
 
 describe('PAUSE_SESSION_STEP_SLIDE_OFFSET_PX', () => {
   it('matches legacy PauseSession slide distance', () => {

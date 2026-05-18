@@ -12,7 +12,7 @@ import {
   initialFrameDoneFromRestored,
   initialBreathSegmentRpcLoggedFlagsFromRestored,
   briefStepToPauseScienceStep,
-} from '@/lib/pause-session-step-map';
+} from '@/features/pause/application/session/step-map';
 import { makeTestPersistedPauseSession } from '@/test/make-test-persisted-pause-session';
 import { type PersistedSession } from '@/features/pause/domain/session-model';
 

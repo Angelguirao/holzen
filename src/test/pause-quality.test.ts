@@ -2,13 +2,13 @@ import { describe, it, expect } from 'vitest';
 import {
   computePauseQualityScore,
   PAUSE_QUALITY_WEIGHTS,
-} from '@/lib/pause-quality';
+} from '@/features/pause/domain/pause-quality';
 import type {
   PauseInstanceRow,
   PauseTemplateRow,
   PauseStepEventRow,
   PauseCompanionEventRow,
-} from '@/lib/pause-state';
+} from '@/features/pause/domain/pause-state';
 
 const tpl: PauseTemplateRow = {
   slug: 'volatility_v1',
