@@ -13,10 +13,14 @@ import { useCallback, useEffect } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/use-auth';
-import { currentPauseQueryKey, getCurrentPauseQueryOptions } from '@/lib/current-pause-query';
+import {
+  currentPauseQueryKey,
+  getCurrentPauseQueryOptions,
+  type CurrentPauseRow,
+} from '@/features/pause/infrastructure/queries/current-pause-query';
 
-export type { CurrentPauseRow } from '@/lib/current-pause-query';
-export { currentPauseQueryKey } from '@/lib/current-pause-query';
+export type { CurrentPauseRow };
+export { currentPauseQueryKey };
 
 export function useCurrentPause() {
   const { user } = useAuth();
