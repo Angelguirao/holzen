@@ -1,7 +1,7 @@
 import { COMPLETED_PAUSE_COUNT_QUERY_KEY } from '@/lib/completed-pause-count-query';
 import { currentPauseQueryKey } from '@/lib/current-pause-query';
 import { libraryBundleQueryPrefix } from '@/lib/library-bundle-query';
-import { pauseArchiveListQueryPrefix } from '@/lib/pause-archive-list-query';
+import { pauseArchiveListQueryPrefix } from '@/features/pause/infrastructure/queries/archive-list-query';
 import { pendingPauseOfferQueryKey } from '@/lib/pending-pause-offer-query';
 import { getHolzenQueryClient } from '@/lib/holzen-query-client-ref';
 import { archivePausesTabHasRowsQueryPrefix } from '@/lib/archive-pauses-tab-query';

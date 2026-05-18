@@ -2,7 +2,7 @@ import { useCallback, type Dispatch, type SetStateAction } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
 import type { TFunction } from 'i18next';
 import { useAuth } from '@/hooks/use-auth';
-import { pauseArchiveListQueryPrefix } from '@/lib/pause-archive-list-query';
+import { pauseArchiveListQueryPrefix } from '@/features/pause/public';
 import { hapticFeedback } from '@/lib/haptics';
 import { pauseLogStep } from '@/features/pause/public-rpc';
 import { showPauseFavoriteProHintToast } from '@/features/pause/public';

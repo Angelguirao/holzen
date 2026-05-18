@@ -15,7 +15,7 @@ import { pauseLogStep } from '@/features/pause/public-rpc';
 import { buildOutcomeLoggedPayload, invalidatePauseStatsDataForUser } from '@/features/pause/public';
 import { supabase } from '@/integrations/supabase/client';
 import { trackEvent } from '@/lib/posthog';
-import type { PauseArchiveRow } from '@/lib/pause-archive-list-query';
+import type { PauseArchiveRow } from '@/features/pause/public';
 
 type Props = {
   row: PauseArchiveRow;
