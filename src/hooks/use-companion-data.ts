@@ -42,7 +42,7 @@ import {
   hasInvokedIntervention,
   resetInterventionIdempotency,
   runOnceIntervention,
-} from '@/lib/orchestrate-intervention-idempotency';
+} from '@/features/pause/public';
 import { useSubscription } from '@/hooks/use-subscription';
 import { useProGate } from '@/hooks/use-pro-gate';
 import { showLimitReachedToast, isPaidLimitReached } from '@/lib/limit-upsell';
