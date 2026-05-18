@@ -1,4 +1,4 @@
-import { lazy, Suspense, useEffect } from "react";
+import { lazy, Suspense, useEffect, useRef } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -8,6 +8,8 @@ import { setHolzenQueryClient } from "@/lib/holzen-query-client-ref";
 import { BrowserRouter, Routes, Route, Navigate, useLocation } from "react-router-dom";
 import { reactRouterFutureFlags } from "@/lib/router-future";
 import { AuthProvider, useAuth } from "@/hooks/use-auth";
+import { HolzenProvider } from "@/hooks/use-holzen";
+import { isAppShellPath } from "@/lib/app-routes";
 import { holzenLog } from "@/lib/holzen-console";
 import { attachHolzenQueryLogging } from "@/lib/holzen-query-logging";
 import { scheduleCheckoutGuardCleanup } from "@/lib/checkout-suppression-window";
@@ -65,10 +67,42 @@ function PublicOnlyRoute({ children }: { children: React.ReactNode }) {
   return <>{children}</>;
 }
 
-function ScrollToTop() {
+/**
+ * Primary-tab switches keep each tab's scroll position; other navigations scroll to top.
+ * Avoids the "full refresh" feel when hopping Home ↔ Archive ↔ Journey ↔ Settings.
+ */
+function ShellScrollRestoration() {
   const { pathname } = useLocation();
-  useEffect(() => { window.scrollTo(0, 0); }, [pathname]);
+  const scrollByPath = useRef<Map<string, number>>(new Map());
+  const prevPath = useRef(pathname);
+
+  useEffect(() => {
+    const from = prevPath.current;
+    scrollByPath.current.set(from, window.scrollY);
+    prevPath.current = pathname;
+
+    const scrollToY = (y: number) => {
+      if (typeof window.scrollTo === "function") {
+        window.scrollTo(0, y);
+      }
+    };
+
+    if (isAppShellPath(from) && isAppShellPath(pathname)) {
+      const y = scrollByPath.current.get(pathname) ?? 0;
+      requestAnimationFrame(() => scrollToY(y));
+      return;
+    }
+    scrollToY(0);
+  }, [pathname]);
+
   return null;
+}
+
+/** Mount shared pause/profile state only when signed in (see `useHolzen`). */
+function HolzenBridge({ children }: { children: React.ReactNode }) {
+  const { user } = useAuth();
+  if (!user) return <>{children}</>;
+  return <HolzenProvider>{children}</HolzenProvider>;
 }
 
 /** Shown while a lazy route chunk downloads — neutral copy (not session restore). */
@@ -151,9 +185,10 @@ const App = () => (
         <Sonner />
         <OfflineBanner />
         <BrowserRouter future={reactRouterFutureFlags}>
-          <ScrollToTop />
+          <ShellScrollRestoration />
           <CookieConsent />
           <AuthProvider>
+            <HolzenBridge>
             <RouterLocationLog />
             <FeedbackWidgetGate />
             <Suspense fallback={<RouteChunkFallback />}>
@@ -208,6 +243,7 @@ const App = () => (
                 <Route path="*" element={<NotFound />} />
               </Routes>
             </Suspense>
+            </HolzenBridge>
           </AuthProvider>
         </BrowserRouter>
       </TooltipProvider>
