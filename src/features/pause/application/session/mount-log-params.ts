@@ -1,4 +1,4 @@
-import type { PauseSessionHydrationState } from '@/lib/pause-session-hydration';
+import type { PauseSessionHydrationState } from '@/features/pause/application/session/hydration';
 import type { BriefPauseStep, PersistedSession, RitualDepth } from '@/lib/pause-session-storage';
 import {
   initialBriefPauseStepFromRestored,

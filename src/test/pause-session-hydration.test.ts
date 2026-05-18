@@ -2,7 +2,7 @@ import { describe, it, expect } from 'vitest';
 import {
   computePauseSessionHydration,
   computePauseSessionResolved,
-} from '@/lib/pause-session-hydration';
+} from '@/features/pause/application/session/hydration';
 import type { FetchedPauseInstance, PersistedSession } from '@/lib/pause-session-storage';
 import { DEFAULT_COMPANIONS, DEFAULT_PREFS } from '@/lib/pause-session-storage';
 
