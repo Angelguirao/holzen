@@ -27,6 +27,7 @@
     "check:bundle-shipped": "node scripts/check-bundle-shipped.mjs",
     "check:bruno-active-manifest": "node scripts/check-bruno-active-manifest.mjs",
     "check:feature-imports": "node scripts/check-feature-imports.mjs",
+    "check:architecture-alignment": "node scripts/check-architecture-alignment.mjs",
     "check:posthog-events-allowlist": "node scripts/check-posthog-events-allowlist.mjs",
     "smoke:edge-logging": "node scripts/smoke-edge-logging.mjs",
     "check:version-sync": "node scripts/check-version-sync.mjs",
