@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef, type MutableRefObject } from 'react';
 import type { TFunction } from 'i18next';
-import { invalidateCompanionUiCompletionQuery } from '@/lib/companion-ui-completion-query-key';
+import { invalidateCompanionUiCompletionQuery } from '@/features/pause/application/queries/companion-ui-completion-query-key';
 import { pauseLogStep } from '@/features/pause/public-rpc';
 import { breathCompletedSegment1Payload, breathCompletedSegment2Payload } from '@/features/pause/application/breathing/breath-completed-payload';
 import { initialBreathSegmentRpcLoggedFlagsFromRestored } from '@/features/pause/application/session/step-map';
