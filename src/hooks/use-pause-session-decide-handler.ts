@@ -11,7 +11,7 @@ import {
 } from '@/features/pause/application/feedback/outcome-toast';
 import type { PauseState } from '@/features/pause/domain/pause-state';
 import { buildPauseImpactDataOnComplete, type PauseImpactData } from '@/features/pause/application/use-cases/impact-data';
-import { invalidatePauseStatsDataForUser } from '@/features/pause/application/queries/invalidate-pause-stats';
+import { invalidatePauseStatsDataForUser } from '@/features/pause/public';
 import { getSessionQuote } from '@/lib/wisdom-quotes';
 import { type RitualDepth } from '@/features/pause/domain/ritual-types';
 import { clearSession } from '@/features/pause/public';

@@ -1,2 +1,2 @@
-/** @deprecated Import from `@/features/pause/application/queries/invalidate-pause-stats`. */
-export { invalidatePauseStatsDataForUser } from '@/features/pause/application/queries/invalidate-pause-stats';
+/** @deprecated Import from `@/features/pause/public`. */
+export { invalidatePauseStatsDataForUser } from '@/features/pause/public';

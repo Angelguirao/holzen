@@ -31,7 +31,7 @@ import {
   initialBreathingSecondCompletedFromRestored,
   initialFrameDoneFromRestored,
 } from '@/features/pause/application/session/step-map';
-import { parsePauseSessionLocationState } from '@/lib/router-location-state';
+import { parsePauseSessionLocationState } from '@/features/pause/public';
 import { coalescePauseSessionShellViewModel } from '@/features/pause/application/session/shell-view-model';
 import {
   isPauseSessionDepthPickerActive,

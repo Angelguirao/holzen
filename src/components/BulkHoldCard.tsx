@@ -6,9 +6,13 @@ import { useTranslation } from 'react-i18next';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ChevronRight, Folder, List, X } from 'lucide-react';
 import { hapticFeedback } from '@/lib/haptics';
-import { applyBulkHoldOutcomes } from '@/lib/apply-bulk-hold-outcomes';
-import { groupBulkHoldByLocalDay, type BulkHoldOutcomeChoice, type BulkHoldPendingPause } from '@/lib/bulk-hold';
-import { invalidatePauseStatsDataForUser } from '@/features/pause/application/queries/invalidate-pause-stats';
+import { applyBulkHoldOutcomes } from '@/features/pause/application/use-cases/apply-bulk-hold-outcomes';
+import {
+  groupBulkHoldByLocalDay,
+  invalidatePauseStatsDataForUser,
+  type BulkHoldOutcomeChoice,
+  type BulkHoldPendingPause,
+} from '@/features/pause/public';
 import { Button } from '@/components/ui/button';
 import { homeInWidget } from '@/components/home/home-widget-styles';
 import {

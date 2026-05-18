@@ -25,6 +25,18 @@ export type {
   LibraryListSortMode,
 } from './domain/library-bundle';
 export { buildOutcomeLoggedPayload } from './application/use-cases/outcome-log-payload';
+export { groupBulkHoldByLocalDay } from './application/bulk-hold/group-by-local-day';
+export {
+  bulkHoldMaxRows,
+  bulkHoldQueryWindowIso,
+  formatBulkHoldContextQuote,
+  formatBulkHoldLocalTime,
+  parseBulkHoldChange24hPct,
+  type BulkHoldOutcomeChoice,
+  type BulkHoldPendingPause,
+  type BulkHoldReviewSection,
+} from './domain/bulk-hold';
+export { invalidatePauseStatsDataForUser } from './application/queries/invalidate-pause-stats';
 export {
   resolvePauseBreathSecondLabelVariant,
   viteWantsPauseBreathSecondLabelShift,
@@ -137,6 +149,13 @@ export {
   zoomOutLibraryAutosaveFromDisplayData,
   zoomOutTotalCharsForReadTime,
 } from './application/companion/zoom-out-payload';
+export {
+  type NotificationNavigateState,
+  type PauseSessionLocationState,
+  type PauseSessionNavParsed,
+  type PauseSeverity,
+  parsePauseSessionLocationState,
+} from './application/session/location-state';
 export {
   collectStepTypes,
   computePauseState,

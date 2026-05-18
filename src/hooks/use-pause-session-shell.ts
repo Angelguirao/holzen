@@ -8,7 +8,7 @@ import {
   type PauseSessionHydrationState,
 } from '@/features/pause/application/session/hydration';
 import { hasPersistedPauseSessionPayload } from '@/features/pause/application/session/persisted-session-guards';
-import type { PauseSessionNavParsed } from '@/lib/router-location-state';
+import type { PauseSessionNavParsed } from '@/features/pause/public';
 import { type FetchedPauseInstance, type PersistedSession } from '@/features/pause/domain/session-model';
 import { loadSession } from '@/features/pause/public';
 

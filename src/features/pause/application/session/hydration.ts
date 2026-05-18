@@ -1,5 +1,5 @@
 import type { CompanionData, CompanionPrefs } from '@/components/CompanionSection';
-import type { PauseSeverity } from '@/lib/router-location-state';
+import type { PauseSeverity } from './location-state';
 import {
   DEFAULT_COMPANIONS,
   DEFAULT_PREFS,
