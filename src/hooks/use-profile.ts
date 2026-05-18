@@ -13,7 +13,7 @@ import {
   getProfileRowQueryOptions,
   PROFILE_QUERY_KEY,
   type ProfileRow,
-} from '@/features/user/public';
+} from '@/features/user/public-queries';
 
 export type { ProfileRow };
 export { PROFILE_QUERY_KEY, fetchProfileRowForUser, getProfileRowQueryOptions };

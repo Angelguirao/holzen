@@ -1,9 +1,7 @@
-/** @deprecated Import from `@/features/user/public` or `@/features/user/infrastructure/queries/profile-row-query`. */
+/** @deprecated Import from `@/features/user/public-queries`. */
 export {
   fetchProfileRowForUser,
   getProfileRowQueryOptions,
   PROFILE_QUERY_KEY,
-  PROFILE_QUERY_PREFIX,
-  PROFILE_QUERY_SIGNED_OUT_KEY,
   type ProfileRow,
-} from '@/features/user/infrastructure/queries/profile-row-query';
+} from '@/features/user/public-queries';

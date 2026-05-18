@@ -9,7 +9,7 @@ import {
   getUserSignalPreferencesQueryOptions,
   USER_SIGNAL_PREFS_QUERY_KEY,
   type UserPref,
-} from '@/features/user/public';
+} from '@/features/user/public-queries';
 import { useAuth } from '@/hooks/use-auth';
 import { useTranslation } from 'react-i18next';
 import { Switch } from '@/components/ui/switch';

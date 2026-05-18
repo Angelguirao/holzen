@@ -1,6 +1,6 @@
 import { useQueryClient } from '@tanstack/react-query';
 import { useAuth } from '@/hooks/use-auth';
-import { getProfileRowQueryOptions } from '@/features/user/public';
+import { getProfileRowQueryOptions } from '@/features/user/public-queries';
 import { useHolzen } from '@/hooks/use-holzen';
 import { useSubscription } from '@/hooks/use-subscription';
 import { useInstallPrompt } from '@/hooks/use-install-prompt';
