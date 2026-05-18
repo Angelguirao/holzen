@@ -1,5 +1,5 @@
 import { supabase } from '@/integrations/supabase/client';
-import type { RegenerateCompanionSlot } from '@/lib/companion-orchestrate-types';
+import type { RegenerateCompanionSlot } from '@/features/pause/domain/companion-orchestrate';
 
 /**
  * Maps an internal orchestrator slot name to the `kind` value persisted

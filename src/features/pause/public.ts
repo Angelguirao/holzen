@@ -120,6 +120,14 @@ export {
   type PauseStorageRitualSyncPatch,
 } from './application/session/storage-ritual-sync';
 export { invalidatePauseStatsDataForUser } from './application/queries/invalidate-pause-stats';
+export type {
+  CompanionOrchestrateSlotResult,
+  CompanionSlotSource,
+  InterventionPrimary,
+  InterventionSecondary,
+  InterventionState,
+  RegenerateCompanionSlot,
+} from './domain/companion-orchestrate';
 export {
   collectStepTypes,
   computePauseState,

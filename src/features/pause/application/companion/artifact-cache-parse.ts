@@ -1,4 +1,4 @@
-import type { InterventionState } from '@/lib/companion-orchestrate-types';
+import type { InterventionState } from '@/features/pause/domain/companion-orchestrate';
 import type { CachedHistoricalInsightShape } from '@/components/HistoricalInsightDisplay';
 
 export interface CachedSignalShape {

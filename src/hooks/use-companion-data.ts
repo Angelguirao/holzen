@@ -7,7 +7,7 @@ import { useHolzen } from '@/hooks/use-holzen';
 import { useToast } from '@/hooks/use-toast';
 import { useCompanionLibraryFavorites } from '@/hooks/use-companion-library-favorites';
 import type { CompanionData, CompanionPrefs } from '@/components/CompanionSection';
-import type { RegenerateCompanionSlot, InterventionState } from '@/lib/companion-orchestrate-types';
+import type { InterventionState, RegenerateCompanionSlot } from '@/features/pause/domain/companion-orchestrate';
 import {
   fetchParsedPauseArtifactCache,
 } from '@/features/pause/infrastructure/queries/artifact-cache-query';
@@ -22,9 +22,9 @@ import {
 } from '@/features/pause/infrastructure/companion/companion-ui-completion-sync';
 import { companionUiCompletionQueryKey } from '@/features/pause/application/queries/companion-ui-completion-query-key';
 import { getCompanionUiCompletionQueryOptions } from '@/features/pause/infrastructure/queries/companion-ui-completion-query';
-import { loadMoodHistoryForOrchestrate } from '@/lib/companion-mood-history';
-import { loadActiveOrchestrateSources } from '@/lib/companion-orchestrate-sources';
-import { getRecencyHints } from '@/lib/companion-recency-hints';
+import { loadMoodHistoryForOrchestrate } from '@/features/pause/infrastructure/companion/mood-history';
+import { loadActiveOrchestrateSources } from '@/features/pause/infrastructure/companion/orchestrate-sources';
+import { getRecencyHints } from '@/features/pause/application/companion/recency-hints';
 import { parseEdgeFunctionError, toUserFacingAiErrorMessage } from '@/lib/edge-function-error';
 import {
   applyOrchestrateSlotLazyOrRegenerate,
@@ -36,7 +36,7 @@ import {
   type CompanionSlotCommitters,
   type CompanionSlotRelaxations,
   type CompanionSlotAutosaveParams,
-} from '@/lib/companion-orchestrate-slot-apply';
+} from '@/features/pause/application/companion/orchestrate-slot-apply';
 import { holzenLog } from '@/lib/holzen-console';
 import {
   hasInvokedIntervention,
@@ -47,7 +47,7 @@ import { useSubscription } from '@/hooks/use-subscription';
 import { useProGate } from '@/hooks/use-pro-gate';
 import { showLimitReachedToast, isPaidLimitReached } from '@/lib/limit-upsell';
 import { trackEvent } from '@/lib/posthog';
-import { trackCompanionServed } from '@/lib/companion-analytics';
+import { trackCompanionServed } from '@/features/pause/application/companion/analytics';
 
 const GEN_TYPE_BY_SLOT: Record<RegenerateCompanionSlot, 'signal' | 'grounding' | 'history' | 'zoom_out'> = {
   signal: 'signal',
@@ -61,7 +61,7 @@ export type {
   InterventionPrimary,
   InterventionSecondary,
   InterventionState,
-} from '@/lib/companion-orchestrate-types';
+} from '@/features/pause/domain/companion-orchestrate';
 
 interface NudgeData {
   title: string;
