@@ -12,7 +12,8 @@ features/<context>/
   application/
     use-cases/      # named actions; call ports only
   ports/            # interfaces infrastructure implements
-  public.ts         # exports other features may import
+  public.ts         # cross-feature exports (no eager Supabase)
+  public-queries.ts # optional: TanStack query modules for app hooks/screens
 ```
 
 **Screens** (Home, Archive, Settings, Pause UI) stay in `src/pages/` and `src/components/` until a deliberate move to `src/screens/` — Lovable and existing checks assume root `src/`.

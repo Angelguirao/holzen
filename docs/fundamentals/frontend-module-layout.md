@@ -319,7 +319,8 @@ src/
         reflect/
         breathing/
       ports/
-      public.ts                    # only export other features may import
+      public.ts                    # cross-feature API (no eager Supabase)
+      public-queries.ts            # TanStack query modules (app hooks/screens)
     subscription/
     market/
     user/
@@ -337,7 +338,7 @@ Same dependency rules as §2–3 for layers that exist. `npm run check:feature-i
 |------|--------|----------------|
 | **0** | Docs + ADR (Lovable §) + `src/features/pause/` skeleton + `check:feature-imports` | `test:ci` green; root `npm run build` |
 | **1** | Migrate **pause** domain + use cases into `src/features/pause/` (small PRs) | Pause E2E green; companions under `application/companion/` |
-| **2** | `subscription`, `market`, `user`, `auth` features + shrink root `hooks/`/`lib/` | Home/settings flows use `public.ts` only |
+| **2** | `subscription`, `market`, `user`, `auth` features + shrink root `hooks/`/`lib/` | Cross-feature: `public.ts` only; app hooks may use `public-queries.ts` where queries need Supabase |
 | **3** | Optional `src/features/*/infrastructure` adapters; keep Supabase types in `integrations/` until needed | Adapter tests |
 | **4** | Remove `src/legacy` from main | `check:active-surface` |
 | **5** | **Gated:** `pnpm-workspace.yaml`, `apps/web`, `packages/*` extract | Only after ADR §8 trigger; `build` from `apps/web` |
