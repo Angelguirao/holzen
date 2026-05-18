@@ -1,5 +1,10 @@
-import { useEffect } from 'react';
-import { SITE_ORIGIN } from '@/config/site';
+import { useEffect } from "react";
+import { SITE_ORIGIN } from "@/config/site";
+import {
+  DEFAULT_OG_IMAGE_URL,
+  DEFAULT_SITE_DESCRIPTION,
+  DEFAULT_SITE_TITLE,
+} from "@/config/site-seo-defaults";
 
 interface PageMetaProps {
   title: string;
@@ -7,72 +12,93 @@ interface PageMetaProps {
   path?: string;
   noindex?: boolean;
 }
-const DEFAULT_TITLE = 'Holzen — Pause before you act';
+
+const MANAGED_META_KEYS = [
+  "description",
+  "og:title",
+  "og:description",
+  "og:url",
+  "twitter:title",
+  "twitter:description",
+  "robots",
+] as const;
 
 export function PageMeta({ title, description, path, noindex }: PageMetaProps) {
   useEffect(() => {
-    // Title
     document.title = title;
+    setMeta("description", description, "name");
+    setMeta("og:title", title, "property");
+    setMeta("og:description", description, "property");
+    setMeta("twitter:title", title, "name");
+    setMeta("twitter:description", description, "name");
 
-    // Meta description
-    let metaDesc = document.querySelector('meta[name="description"]');
-    if (!metaDesc) {
-      metaDesc = document.createElement('meta');
-      metaDesc.setAttribute('name', 'description');
-      document.head.appendChild(metaDesc);
-    }
-    metaDesc.setAttribute('content', description);
-
-    // Canonical
     if (path !== undefined) {
-      let canonical = document.querySelector('link[rel="canonical"]') as HTMLLinkElement | null;
-      if (!canonical) {
-        canonical = document.createElement('link');
-        canonical.setAttribute('rel', 'canonical');
-        document.head.appendChild(canonical);
-      }
-      canonical.href = `${SITE_ORIGIN}${path}`;
+      setCanonical(`${SITE_ORIGIN}${path}`);
+      setMeta("og:url", `${SITE_ORIGIN}${path}`, "property");
     }
 
-    // OG tags
-    setMeta('og:title', title);
-    setMeta('og:description', description);
-    if (path !== undefined) setMeta('og:url', `${SITE_ORIGIN}${path}`);
-
-    // Twitter tags
-    setMeta('twitter:title', title);
-    setMeta('twitter:description', description);
-
-    // Robots
     if (noindex) {
-      setMeta('robots', 'noindex, nofollow');
+      setMeta("robots", "noindex, nofollow", "name");
     } else {
-      const robots = document.querySelector('meta[name="robots"]');
-      if (robots) robots.remove();
+      removeMeta("robots", "name");
     }
 
     return () => {
-      document.title = DEFAULT_TITLE;
+      document.title = DEFAULT_SITE_TITLE;
+      setMeta("description", DEFAULT_SITE_DESCRIPTION, "name");
+      setMeta("og:title", DEFAULT_SITE_TITLE, "property");
+      setMeta("og:description", DEFAULT_SITE_DESCRIPTION, "property");
+      setMeta("twitter:title", DEFAULT_SITE_TITLE, "name");
+      setMeta("twitter:description", DEFAULT_SITE_DESCRIPTION, "name");
+      setCanonical(`${SITE_ORIGIN}/`);
+      setMeta("og:url", `${SITE_ORIGIN}/`, "property");
+      removeMeta("robots", "name");
     };
   }, [title, description, path, noindex]);
 
   return null;
 }
 
-function setMeta(property: string, content: string) {
-  const isOg = property.startsWith('og:');
-  const selector = isOg
-    ? `meta[property="${property}"]`
-    : `meta[name="${property}"]`;
+/** App shell / auth / pause routes — keep out of search indexes without changing the tab title. */
+export function RobotsNoIndex() {
+  useEffect(() => {
+    setMeta("robots", "noindex, nofollow", "name");
+    return () => {
+      removeMeta("robots", "name");
+    };
+  }, []);
+
+  return null;
+}
+
+function setCanonical(href: string) {
+  let canonical = document.querySelector('link[rel="canonical"]') as HTMLLinkElement | null;
+  if (!canonical) {
+    canonical = document.createElement("link");
+    canonical.setAttribute("rel", "canonical");
+    document.head.appendChild(canonical);
+  }
+  canonical.href = href;
+}
+
+function setMeta(
+  key: (typeof MANAGED_META_KEYS)[number] | string,
+  content: string,
+  attr: "name" | "property",
+) {
+  const selector =
+    attr === "property" ? `meta[property="${key}"]` : `meta[name="${key}"]`;
   let el = document.querySelector(selector);
   if (!el) {
-    el = document.createElement('meta');
-    if (isOg) {
-      el.setAttribute('property', property);
-    } else {
-      el.setAttribute('name', property);
-    }
+    el = document.createElement("meta");
+    el.setAttribute(attr, key);
     document.head.appendChild(el);
   }
-  el.setAttribute('content', content);
+  el.setAttribute("content", content);
+}
+
+function removeMeta(key: string, attr: "name" | "property") {
+  const selector =
+    attr === "property" ? `meta[property="${key}"]` : `meta[name="${key}"]`;
+  document.querySelector(selector)?.remove();
 }

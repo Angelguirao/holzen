@@ -274,7 +274,11 @@ export default function Archive() {
 
   return (
     <div className="space-y-6 pb-24" {...handlers}>
-      <PageMeta title={t('archive.pageTitle')} description={t('archive.pageDescription')} />
+      <PageMeta
+        title={t('archive.pageTitle')}
+        description={t('archive.pageDescription')}
+        noindex
+      />
 
       {mainSegment !== 'collections' && <CurrentPauseCard />}
 

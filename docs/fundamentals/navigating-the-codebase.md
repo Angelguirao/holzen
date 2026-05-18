@@ -62,7 +62,7 @@ Routes are declared in one file. **Page components** under `src/pages/` are **`R
 
 **Redirects:** `/index` → `/`, `/journey` → `/journey/stats`.
 
-**Public pages:** `/welcome` (landing), `/auth`, `/reset-password`, `/terms`, `/privacy`, `/about`, `/blog`, `/blog/:slug`, `/roadmap` (stub: no in-app roadmap yet; links to blog/about), `/reserve`.
+**Public pages:** `/welcome` (landing), `/auth`, `/reset-password`, `/terms`, `/privacy`, `/about`, `/blog`, `/blog/:slug`, `/roadmap`, `/reserve`.
 
 **Catch-all:** `*` → `NotFound`.
 
