@@ -17,7 +17,7 @@ import {
   CHECKOUT_SUPPRESSION_WINDOW_DEFAULT_MINUTES,
   CHECKOUT_SUPPRESSION_WINDOW_MIN_MINUTES,
   CHECKOUT_SUPPRESSION_WINDOW_MAX_MINUTES,
-} from '@/lib/checkout-suppression-window';
+} from '@/features/subscription/public';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import {
   AlertDialog,

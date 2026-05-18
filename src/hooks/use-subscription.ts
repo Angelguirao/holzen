@@ -5,13 +5,13 @@ import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { invokeEdge } from '@/lib/invoke-edge';
 import { useAuth } from '@/hooks/use-auth';
 import { holzenLog } from '@/lib/holzen-console';
-import { getCheckoutSuppressionWindowMs } from '@/lib/checkout-suppression-window';
+import { getCheckoutSuppressionWindowMs } from '@/features/subscription/public';
 import {
   fetchSubscriptionSnapshot,
   readSubCache,
   subscriptionQueryKey,
-  type SubscriptionSnapshot,
-} from '@/lib/subscription-snapshot-query';
+} from '@/features/subscription/infrastructure/queries/subscription-snapshot-query';
+import type { SubscriptionSnapshot } from '@/features/subscription/domain/subscription-snapshot';
 import {
   canEngagePauseFromEntitlement,
   deriveEntitlement,
@@ -34,7 +34,7 @@ let subscriptionForceNext = false;
 type SubFetchSource = 'mount' | 'manual_retry' | 'focus' | 'interval' | 'invalidate';
 let subscriptionNextFetchSource: SubFetchSource | null = null;
 
-export type { SubscriptionBillingInterval } from '@/lib/subscription-snapshot-query';
+export type { SubscriptionBillingInterval } from '@/features/subscription/domain/subscription-snapshot';
 export type { Entitlement } from '@/features/subscription/public';
 
 function checkoutReturnWantsForce(): boolean {

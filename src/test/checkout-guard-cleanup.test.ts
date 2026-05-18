@@ -4,7 +4,7 @@ import {
   scheduleCheckoutGuardCleanup,
   setCheckoutSuppressionWindowMinutes,
   resetCheckoutSuppressionWindow,
-} from '@/lib/checkout-suppression-window';
+} from '@/features/subscription/application/checkout-suppression-window';
 
 const CONFIRMED_KEY = 'holzen_checkout_confirmed';
 const REFRESH_STATE_KEY = 'holzen_checkout_refresh_state';
