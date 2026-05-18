@@ -1,7 +1,7 @@
 import { useState, useCallback } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { useAuth } from '@/hooks/use-auth';
-import { getProfileRowQueryOptions } from '@/lib/profile-row-query';
+import { getProfileRowQueryOptions } from '@/features/user/public';
 import {
   getReferralRewardsQueryOptions,
   getReferralsCountQueryOptions,

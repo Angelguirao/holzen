@@ -6,3 +6,9 @@ export {
   USER_SIGNAL_PREFS_QUERY_KEY,
   type UserPref,
 } from './infrastructure/queries/user-signal-preferences-query';
+export {
+  fetchProfileRowForUser,
+  getProfileRowQueryOptions,
+  PROFILE_QUERY_KEY,
+  type ProfileRow,
+} from './infrastructure/queries/profile-row-query';
