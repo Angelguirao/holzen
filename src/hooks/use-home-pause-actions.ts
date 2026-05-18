@@ -5,7 +5,7 @@ import type { BtcMoveSeverity } from '@/features/market/public';
 import { holzenLog } from '@/lib/holzen-console';
 import { canNavigateToPauseSession } from '@/lib/home-pause-navigate';
 import { trackEvent } from '@/lib/posthog';
-import type { ManualPauseTriggerResult } from '@/lib/manual-pause-trigger-result';
+import type { ManualPauseTriggerResult } from '@/features/pause/public';
 import { type PauseSessionLocationState } from '@/lib/router-location-state';
 
 export type PauseDismissAnalyticsSurface = 'home_zen_reflection' | 'home_your_pause_widget';
