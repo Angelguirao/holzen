@@ -37,9 +37,11 @@ Pick one tool and keep **one** canonical exported collection (or Bruno folder) i
 
 Some functions validate the Bearer token in code even when `[functions.<name>]` has `verify_jwt = false` in `config.toml` — the gateway may not enforce JWT, but the function still returns 401 without a valid user token.
 
-### Service role calls (`bruno/service-cron/*`)
+### Service role calls (`bruno/active/service-cron/*`)
 
-Cron-style Edge functions expect **`Authorization: Bearer {{SERVICE_CRON_BEARER}}`** (see `bruno/service-cron/check-volatility.bru`). Set **`SERVICE_CRON_BEARER`** to the **service_role** JWT (**Dashboard → Project Settings → API**) or, on hosts without dashboard access, to the same **`CRON_SECRET`** string configured on Edge — not the anon/publishable key.
+Cron-style Edge functions expect **`Authorization: Bearer {{SERVICE_CRON_BEARER}}`** (see `bruno/active/service-cron/check-volatility.bru`). Set **`SERVICE_CRON_BEARER`** to the **service_role** JWT (**Dashboard → Project Settings → API**) or, on hosts without dashboard access, to the same **`CRON_SECRET`** string configured on Edge — not the anon/publishable key.
+
+Pre-strip cron/journal requests: `bruno/legacy/full-shell/` (may 404 on production).
 
 If Bruno returns **`401 Unauthorized`**, the bearer value usually **does not match** the project’s **service_role** or **`CRON_SECRET`** (wrong project, typo, stale env). Fix **`SERVICE_CRON_BEARER`**, then retry; redeploying the function does not correct a bad client secret.
 
@@ -70,10 +72,10 @@ Never commit tokens, passwords, or service role keys.
 
 ## Repo collection (Bruno)
 
-A starter collection lives at **`bruno/`** (see `bruno.json` and `pause-pipeline/*.bru`).
+A starter collection lives at **`bruno/`** (see `bruno.json`; start in **`bruno/active/`**).
 
 1. **Open** the `bruno` folder in Bruno (not the repo root).
-2. Copy **`bruno/environments/local.bru.example`** → **`local.bru`**, or **`hosted.bru.example`** → **`hosted.bru`** for the hosted Supabase URL; fill `VITE_SUPABASE_URL`, `VITE_SUPABASE_PUBLISHABLE_KEY`, and **`AUTH_EMAIL` / `AUTH_PASSWORD`**; run **`auth/00-sign-up-password`** and/or **`auth/01-sign-in-password`**, or paste a JWT into **`SUPABASE_ACCESS_TOKEN`** in Bruno. Full catalog: [bruno/functions-catalog.md](../../bruno/functions-catalog.md).
+2. Copy **`bruno/environments/local.bru.example`** → **`local.bru`**, or **`hosted.bru.example`** → **`hosted.bru`** for the hosted Supabase URL; fill `VITE_SUPABASE_URL`, `VITE_SUPABASE_PUBLISHABLE_KEY`, and **`AUTH_EMAIL` / `AUTH_PASSWORD`**; run **`active/auth/00-sign-up-password`** and/or **`active/auth/01-sign-in-password`**, or paste a JWT into **`SUPABASE_ACCESS_TOKEN`** in Bruno. Deployed catalog: [bruno/active/functions-catalog.md](../../bruno/active/functions-catalog.md).
 3. Run requests in order; pair with Edge Function logs.
 
 Details: [bruno/README.md](../../bruno/README.md).

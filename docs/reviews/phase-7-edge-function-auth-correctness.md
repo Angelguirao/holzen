@@ -1,5 +1,7 @@
 # Phase 7: Edge-function auth & correctness audit (updated for Pause V2)
 
+> **Pre-strip / security reference (2026-05).** Deployed edge list: [active-surface.md](../ops/active-surface.md).
+
 ## Scope
 
 - `supabase/functions/companion-orchestrate/index.ts`

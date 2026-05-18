@@ -1,7 +1,7 @@
 /**
  * Shared window for "don't repeat this serve" logic (library + cache).
  *
- * Applies to both `searchLibrary` (content_library dedup) and `serveFromCache`
+ * Applies to both `searchCompanionCatalog` (companion_catalog dedup) and `serveFromCache`
  * (companion_cache dedup) so the two tiers stay aligned.
  *
  * Chosen to work for the three usage cadences we actually see:

@@ -1,5 +1,6 @@
 import { useMemo } from 'react';
 import type { ZenModeHomeProps } from '@/components/home/ZenModeHome';
+import type { Entitlement } from '@/lib/subscription-entitlement';
 
 type CooldownFn = () => number;
 
@@ -22,13 +23,16 @@ export function useHomeZenModeRouteProps(args: {
   subscriptionReady: ZenModeHomeProps['subscriptionReady'];
   hasAccess: ZenModeHomeProps['hasAccess'];
   showLimitUpsell: ZenModeHomeProps['showLimitUpsell'];
+  entitlement: Entitlement;
   showPauseScheduling: ZenModeHomeProps['showPauseScheduling'];
   autoCooldownRemaining: CooldownFn;
   cooldownHours: ZenModeHomeProps['cooldownHours'];
   nextCronCheckIn: CooldownFn;
   manualCooldownRemaining: CooldownFn;
   checkoutLoading: ZenModeHomeProps['checkoutLoading'];
-  onStartCheckoutPro: ZenModeHomeProps['onStartCheckoutPro'];
+  trialLoading: ZenModeHomeProps['trialLoading'];
+  onStartTrial: ZenModeHomeProps['onStartTrial'];
+  onReactivate: ZenModeHomeProps['onReactivate'];
 }): ZenModeHomeProps {
   const {
     hasOpenPause,
@@ -45,13 +49,16 @@ export function useHomeZenModeRouteProps(args: {
     subscriptionReady,
     hasAccess,
     showLimitUpsell,
+    entitlement,
     showPauseScheduling,
     autoCooldownRemaining,
     cooldownHours,
     nextCronCheckIn,
     manualCooldownRemaining,
     checkoutLoading,
-    onStartCheckoutPro,
+    trialLoading,
+    onStartTrial,
+    onReactivate,
   } = args;
 
   return useMemo(
@@ -81,13 +88,16 @@ export function useHomeZenModeRouteProps(args: {
       subscriptionReady,
       hasAccess,
       showLimitUpsell,
+      entitlement,
       showPauseScheduling,
       autoCooldownRemaining,
       cooldownHours,
       nextCronCheckIn,
       manualCooldownRemaining,
       checkoutLoading,
-      onStartCheckoutPro,
+      trialLoading,
+      onStartTrial,
+      onReactivate,
     }),
     [
       hasOpenPause,
@@ -104,13 +114,16 @@ export function useHomeZenModeRouteProps(args: {
       subscriptionReady,
       hasAccess,
       showLimitUpsell,
+      entitlement,
       showPauseScheduling,
       autoCooldownRemaining,
       cooldownHours,
       nextCronCheckIn,
       manualCooldownRemaining,
       checkoutLoading,
-      onStartCheckoutPro,
+      trialLoading,
+      onStartTrial,
+      onReactivate,
     ],
   );
 }

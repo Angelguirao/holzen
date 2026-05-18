@@ -4,11 +4,9 @@ import { useTranslation } from 'react-i18next';
 import { motion } from 'framer-motion';
 import {
   Activity,
-  Anchor,
   ChevronDown,
   ChevronRight,
   Heart,
-  History,
   ImageIcon,
   ZoomOut,
 } from 'lucide-react';
@@ -50,8 +48,8 @@ export function PauseFrame({
   const [haikuFetch, setHaikuFetch] = useState<'idle' | 'loading' | 'error' | 'done'>('idle');
   const haikuFetchedForPauseRef = useRef<string | null>(null);
 
-  const zoomHref = pauseInstanceId ? `/companion/zoom-out/${pauseInstanceId}` : '/tools';
-  const signalHref = pauseInstanceId ? `/companion/signal/${pauseInstanceId}` : '/tools';
+  const zoomHref = pauseInstanceId ? `/companion/zoom-out/${pauseInstanceId}` : '/pause';
+  const signalHref = pauseInstanceId ? `/companion/signal/${pauseInstanceId}` : '/pause';
 
   useEffect(() => {
     setArtifactHaiku(null);
@@ -165,19 +163,9 @@ export function PauseFrame({
         ) : null}
 
         <FrameToolRow
-          icon={<Anchor className="h-5 w-5 text-primary" aria-hidden />}
-          label={t('pause.frame.ground', { defaultValue: 'Ground yourself' })}
-          href="/tools/ground"
-        />
-        <FrameToolRow
           icon={<ZoomOut className="h-5 w-5 text-primary" aria-hidden />}
           label={t('pause.frame.zoomOut', { defaultValue: 'Zoom out' })}
           href={zoomHref}
-        />
-        <FrameToolRow
-          icon={<History className="h-5 w-5 text-primary" aria-hidden />}
-          label={t('pause.frame.lookBack', { defaultValue: 'Look back' })}
-          href="/tools/ground/history"
         />
         <FrameToolRow
           icon={<Activity className="h-5 w-5 text-primary" aria-hidden />}

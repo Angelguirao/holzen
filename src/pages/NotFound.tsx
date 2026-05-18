@@ -1,14 +1,20 @@
-import { useLocation } from "react-router-dom";
-import { useEffect } from "react";
-import { useTranslation } from "react-i18next";
-import { Button } from "@/components/ui/button";
+import { useLocation } from 'react-router-dom';
+import { useEffect, useRef } from 'react';
+import { useTranslation } from 'react-i18next';
+import { Button } from '@/components/ui/button';
+import { trackEvent } from '@/lib/posthog';
 
 const NotFound = () => {
   const location = useLocation();
   const { t } = useTranslation();
+  const trackedPathRef = useRef<string | null>(null);
 
   useEffect(() => {
-    console.error("404 Error: User attempted to access non-existent route:", location.pathname);
+    const attempted = location.pathname;
+    if (trackedPathRef.current === attempted) return;
+    trackedPathRef.current = attempted;
+    trackEvent('app.route_not_found', { attempted_path: attempted });
+    console.error('404 Error: User attempted to access non-existent route:', attempted);
   }, [location.pathname]);
 
   return (

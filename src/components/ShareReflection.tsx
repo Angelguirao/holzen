@@ -10,6 +10,7 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { toast } from 'sonner';
+import { SITE_HOST, SITE_ORIGIN } from '@/config/site';
 
 interface Props {
   message: string;
@@ -20,7 +21,7 @@ interface Props {
 }
 
 function buildShareText(message: string): string {
-  return `${message}\n\n— Holzen\nholzen.lovable.app`;
+  return `${message}\n\n— Holzen\n${SITE_HOST}`;
 }
 
 function wrapText(
@@ -215,7 +216,7 @@ export const ShareReflection = forwardRef<HTMLButtonElement, Props>(
 
     const shareToTelegram = useCallback(() => {
       const text = buildShareText(message);
-      const url = `https://t.me/share/url?url=${encodeURIComponent('https://holzen.lovable.app')}&text=${encodeURIComponent(text)}`;
+      const url = `https://t.me/share/url?url=${encodeURIComponent(SITE_ORIGIN)}&text=${encodeURIComponent(text)}`;
       window.open(url, '_blank', 'noopener,noreferrer');
     }, [message]);
 

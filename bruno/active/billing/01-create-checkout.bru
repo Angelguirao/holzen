@@ -1,0 +1,17 @@
+meta {
+  name: 01 create-checkout
+  type: http
+  seq: 4
+}
+
+post {
+  url: {{VITE_SUPABASE_URL}}/functions/v1/create-checkout
+  body: none
+  auth: none
+}
+
+headers {
+  x-cid: bruno-{{$timestamp}}-review
+  Authorization: Bearer {{SUPABASE_ACCESS_TOKEN}}
+  apikey: {{VITE_SUPABASE_PUBLISHABLE_KEY}}
+}

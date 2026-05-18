@@ -41,6 +41,10 @@ What we chose (one or two short paragraphs).
 
 | Date | Title | File |
 |------|--------|------|
-| — | *(none yet)* | — |
+| 2026-05-17 | Modular monolith + hexagonal client (pre-launch) | [2026-05-17-modular-monolith-hexagonal-client.md](2026-05-17-modular-monolith-hexagonal-client.md) |
+| 2026-05-16 | Pause-first shipped scope | [2026-05-16-pause-first-shipped-scope.md](2026-05-16-pause-first-shipped-scope.md) |
+| 2026-04-23 | Pause V2 — no fallback | [2026-04-23-pause-v2-no-fallback.md](2026-04-23-pause-v2-no-fallback.md) |
+| 2026-04-23 | Skills-first stats IA | [2026-04-23-skills-first-stats-ia.md](2026-04-23-skills-first-stats-ia.md) |
+| 2026-04-23 | Four-family badge reorg | [2026-04-23-four-family-badge-reorg.md](2026-04-23-four-family-badge-reorg.md) |
 
 Add a row when you accept a decision.

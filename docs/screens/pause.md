@@ -1,5 +1,7 @@
 # Pause session (`/pause`)
 
+**Pause-first shipped scope (2026-05):** full ritual on `/pause`; reflect artifact kind **`reflection_text`**; post-pause exits go Home/Archive (no Journey stats). Lapsed users see engagement block via entitlement. Manifest: [active-surface.md](../ops/active-surface.md).
+
 Authoritative orchestration: `[src/pages/PauseSession.tsx](../../src/pages/PauseSession.tsx)`.
 
 **Cross-screen patterns:** the same **thin page + named hooks + `src/lib` pure helpers** playbook as [Home](home.md) is spelled out in **[React screen orchestration](../fundamentals/react-screen-orchestration.md)**. Home **produces** navigation into this route; this doc is the **consumer** map for the full-screen volatility ritual.

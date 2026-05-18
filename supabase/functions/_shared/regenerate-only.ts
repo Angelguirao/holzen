@@ -222,7 +222,7 @@ export async function handleRegenerateOnly(params: {
 
   type CompanionResult = {
     data: unknown;
-    source: "live" | "library" | "cache" | "curated" | "empty";
+    source: "live" | "catalog" | "library" | "cache" | "curated" | "empty";
     cacheId: string | null;
     cacheRelaxation?: string | null;
     latencyMs: number;

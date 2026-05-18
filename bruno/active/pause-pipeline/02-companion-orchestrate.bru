@@ -1,0 +1,29 @@
+meta {
+  name: 02 companion-orchestrate
+  type: http
+  seq: 3
+}
+
+post {
+  url: {{VITE_SUPABASE_URL}}/functions/v1/companion-orchestrate
+  body: json
+  auth: none
+}
+
+headers {
+  x-cid: bruno-{{$timestamp}}-review
+  Authorization: Bearer {{SUPABASE_ACCESS_TOKEN}}
+  apikey: {{VITE_SUPABASE_PUBLISHABLE_KEY}}
+  Content-Type: application/json
+}
+
+body:json {
+  {
+    "context": "Bruno smoke test — pause companion pipeline.",
+    "language": "en",
+    "enableSignal": true,
+    "enableGrounding": false,
+    "enableHistory": false,
+    "enableZoomOut": false
+  }
+}

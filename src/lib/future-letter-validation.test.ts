@@ -3,7 +3,7 @@ import {
   FUTURE_LETTER_MAX_CHARS,
   FUTURE_LETTER_MIN_CHARS,
   validateFutureLetterBody,
-} from './future-letter-validation';
+} from '../legacy/full-shell/src/lib/future-letter-validation';
 
 describe('validateFutureLetterBody', () => {
   it('rejects short and few-word input', () => {

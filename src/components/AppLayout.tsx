@@ -42,7 +42,7 @@ function PageChunkFallback() {
 /**
  * Warm up the main-tab route chunks so switching tabs feels instant the first
  * time. Runs once when the authenticated shell mounts, on an idle callback so
- * it never competes with critical rendering (Home, Archive, Journey, Settings, Tools).
+ * it never competes with critical rendering (Home, Archive, Journey, Settings).
  */
 function useTabChunkPrefetch() {
   useEffect(() => {
@@ -50,9 +50,8 @@ function useTabChunkPrefetch() {
     const run = () => {
       void import('@/pages/Home').catch(() => {});
       void import('@/pages/Archive').catch(() => {});
-      void import('@/pages/Profile').catch(() => {});
+      void import('@/pages/journey/JourneyOverview').catch(() => {});
       void import('@/pages/settings/SettingsHub').catch(() => {});
-      void import('@/pages/ToolsHub').catch(() => {});
     };
     const ric = (window as Window & {
       requestIdleCallback?: (cb: () => void, opts?: { timeout: number }) => number;
@@ -73,7 +72,6 @@ function useTabChunkPrefetch() {
 function shellCenterNavLabel(pathname: string, t: (key: string) => string): string | null {
   if (pathname === '/' || pathname === '/index') return null;
   if (isPrimaryTabActive(pathname, 'archive')) return t('nav.archive');
-  if (isPrimaryTabActive(pathname, 'tools')) return t('nav.tools');
   if (isPrimaryTabActive(pathname, 'journey')) return t('nav.journey');
   if (isPrimaryTabActive(pathname, 'settings')) return t('nav.settings');
   return null;

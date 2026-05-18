@@ -226,16 +226,16 @@
       "checkinNeedOne": "Pick a mood or add a short note."
     },
     "subscription": {
-      "monthlyLimitReached": "You've used your {{freeReflectionsPerMonth}} free pauses this month. Start your {{trialDays}}-day free trial for unlimited.",
-      "upgradeToPro": "{{trialDays}}-day free trial · ${{price}}/month after · Cancel anytime",
+      "trialEnded": "Your free trial has ended. Subscribe to start and complete pauses again.",
+      "startTrialPrompt": "Start your {{trialDays}}-day free trial to use Pause when markets move.",
+      "startTrialCta": "Start {{trialDays}}-day free trial",
+      "trialFailed": "Could not start trial. Try again.",
       "pricePerMonth": "${{price}} per month · Cancel anytime",
       "openingCheckout": "Opening checkout…",
       "checkoutFailed": "Checkout could not be started. Check your connection and try again.",
       "checkoutNoUrl": "Checkout did not return a link. Please try again or contact support.",
       "portalFailed": "Billing portal could not be opened. Check your connection and try again.",
-      "portalNoUrl": "Billing portal did not return a link. Please try again.",
-      "freeRemaining": "{{count}} free pause remaining this month",
-      "freeRemaining_other": "{{count}} free pauses remaining this month"
+      "portalNoUrl": "Billing portal did not return a link. Please try again."
     },
     "errors": {
       "couldNotReachPrice": "Could not reach price data",
@@ -638,12 +638,17 @@
     "commitmentFooterHint": "Skip if you prefer — you can set this later under Settings → You.",
     "commitmentHoldLabel": "Hold goal",
     "ready": {
+      "title": "You're set",
       "recapWhy": "Your why",
       "recapHoldGoal": "Hold goal",
       "recapHoldGoalSet": "Saved",
       "recapHoldGoalUnset": "Not set yet",
       "recapGrounding": "Grounds you",
-      "recapThreshold": "Threshold"
+      "recapThreshold": "Threshold",
+      "trialBody": "Start your {{days}}-day trial to use Pause when volatility spikes. No card required — cancel anytime before it ends.",
+      "startingTrial": "Starting trial…",
+      "startTrialNoCard": "Start {{days}}-day free trial",
+      "trialFinePrintNoCard": "Then ${{price}}/mo if you keep going · Cancel anytime"
     }
   },
   "moodCheck": {
@@ -880,8 +885,8 @@
   "landing": {
     "hero": "When Bitcoin moves, pause before you do.",
     "heroDesc": "Holzen is a self-awareness practice for Bitcoin holders. When volatility hits, you get a moment to breathe, reflect, and notice your patterns — before impulse takes over.",
-    "getStartedForFree": "Start for free",
-    "noCreditCard": "Free forever · {{trialDays}}-day Pro trial · ${{price}}/mo after",
+    "getStartedForFree": "Start your free trial",
+    "noCreditCard": "{{trialDays}}-day Pro trial · no card required · ${{price}}/mo after trial",
     "reflectionLoop": "Impulse vs. Intention",
     "reaction": {
       "label": "Without Holzen",
@@ -909,7 +914,7 @@
       "04title": "You decide",
       "04desc": "Choose deliberately whether you held steady, sold, or bought. The full pause guides you through feel, breathe, reflect, frame, a second breath, then a short settle before Decide — six beats in the ritual, so your choices come from clarity, not impulse.",
       "05title": "You grow",
-      "05desc": "Tag emotions. Journal notes. Track outcomes. Over time, your Library, insights, and streaks reveal how your composure evolves."
+      "05desc": "Tag emotions. Add notes. Log outcomes. Your Archive and Journey overview show how your composure evolves over time."
     },
     "companionsTitle": "Five companions",
     "companionsDesc": "Every pause comes with companions designed to slow you down and add perspective. Save any to your Library with a tap.",
@@ -993,7 +998,7 @@
     "scienceStepsSummary": "Feel, breathe, reflect, frame, breathe again, then decide — six beats, with a brief settle moment on the same final segment before you record an outcome; each maps to peer-reviewed work from Lieberman, Porges, Gross, Flavell, and Kahneman.",
     "readFullResearch": "Read the full research →",
     "freeToStart": "{{trialDays}}-day free trial",
-    "pricingDesc": "{{freeReflectionsPerMonth}} pauses per month — free forever, no credit card. Or start a {{trialDays}}-day free trial of Pro (${{price}}/month after): unlimited pauses, AI companions, insights, library, and more. Cancel anytime.",
+    "pricingDesc": "Start with a {{trialDays}}-day free trial of Pro — unlimited pauses and AI companions (${{price}}/month after, cancel anytime). When your trial ends, you can reactivate from Settings to keep pausing.",
     "questions": "Common questions",
     "faq": {
       "whoQuestion": "Who is Holzen for?",
@@ -1003,7 +1008,7 @@
       "meditationQuestion": "Isn't this just another meditation app?",
       "meditationAnswer": "Meditation apps are general-purpose. Holzen is triggered by real market events — it meets you in the moment you're most likely to act on impulse. It combines breathing, AI reflections, behavioral science, curated intelligence, and long-term pattern tracking into one practice. Calm doesn't know when Bitcoin just dropped 8%.",
       "valueQuestion": "${{price}}/month for something I might rarely use?",
-      "valueAnswer": "The moments you use Holzen are the moments that matter most — when a single impulsive decision can cost thousands. One avoided panic sell or FOMO buy pays for years of the subscription.\n\nHow often you pause is not \"once in a blue moon\" by design: when markets are choppy or your thresholds are sensitive, alerts can add up to many times a month. In settings, Holzen estimates how often you would have paused on recent price action so you can tune how often you want to be interrupted instead of guessing. You can also request a pause anytime from Home without waiting for an alert, with a short cooldown so the habit stays intentional.\n\nAnd the free tier gives you {{freeReflectionsPerMonth}} pauses per month forever.",
+      "valueAnswer": "The moments you use Holzen are the moments that matter most — when a single impulsive decision can cost thousands. One avoided panic sell or FOMO buy pays for years of the subscription.\n\nHow often you pause is not \"once in a blue moon\" by design: when markets are choppy or your thresholds are sensitive, alerts can add up to many times a month. In settings, Holzen estimates how often you would have paused on recent price action so you can tune how often you want to be interrupted instead of guessing. You can also request a pause anytime from Home without waiting for an alert, with a short cooldown so the habit stays intentional.\n\nYour {{trialDays}}-day trial includes full Pro access. After it ends, reactivate from Settings to keep engaging with new pauses.",
       "fairUseQuestion": "What does \"unlimited\" actually mean?",
       "fairUseAnswer": "Pro includes unlimited pauses and AI companions for personal use — there's no per-month cap you can hit. To keep the service healthy for everyone, we apply light technical limits (a short cooldown between pauses and a per-hour ceiling) that real users never notice in practice. These only come into play for clearly abusive patterns like scripted traffic or repeated automated runs.",
       "worksQuestion": "Does this actually change behavior?",
@@ -1290,6 +1295,18 @@
     "retrospectiveOutcomeFailed": "Could not save — check your connection and try again."
   },
   "pause": {
+    "lapsed": {
+      "kicker": "Trial ended",
+      "title": "Add a card to keep pausing",
+      "body": "Your archive and journey are still here. Subscribe to open and complete pauses when markets move.",
+      "cta": "Subscribe to continue"
+    },
+    "preTrial": {
+      "kicker": "Start your trial",
+      "title": "Start your {{days}}-day free trial",
+      "body": "No card required. Full pause ritual for {{days}} days — cancel anytime before it ends.",
+      "cta": "Start {{days}}-day free trial"
+    },
     "terminalEntryRedirect": "This pause already ended — opening your archive.",
     "youPaused": "You paused. That's the hardest part.",
     "breathIntroKickerRitual": "Breathe",

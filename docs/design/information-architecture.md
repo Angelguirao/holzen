@@ -4,11 +4,13 @@
 
 **Source of truth for URLs:** `src/App.tsx` (React Router). **Primary nav:** `src/components/BottomNav.tsx` + `src/components/AppLayout.tsx`.
 
-**Document status:** **§1–§2** describe the **current** shipped shell and routes. **§3–§4** cover gaps, decisions, and alternatives; **§6** is the doc history. *Package/app version* for builds is the Git SHA / `VITE_APP_VERSION` — not duplicated here.
+**Pause-first shipped scope (2026-05):** The **shipped** product on `feature/mvpPauseCleanup` is a **4-tab shell** — Home, Archive, Journey (overview only), Settings — plus full-screen `/pause` and `/companion/*`. Tools, full Journey tabs (stats/badges/activity), Profile gamification, and `/library` are **not** in the active tree (404 on old bookmarks). Recovery snapshot: git tag `full-ia-pre-strip`. Canonical manifest: [docs/ops/active-surface.md](../ops/active-surface.md). **§1 below** still describes the **pre-MVP full IA** for reference when reading legacy code or the archive branch.
+
+**Document status:** **§1–§2** describe the **pre-strip full** shell and routes. **§3–§4** cover gaps, decisions, and alternatives; **§6** is the doc history. *Package/app version* for builds is the Git SHA / `VITE_APP_VERSION` — not duplicated here.
 
 ---
 
-## 1. Current model (as shipped)
+## 1. Current model (pre-MVP full IA — reference)
 
 **Route constants and helpers:** `src/lib/app-routes.ts` (`journeyPath`, `toolsLettersPath`, `TOOLS`, `JOURNEY_PREFIX`, `TOOLS_PREFIX`).
 

@@ -1,0 +1,16 @@
+meta {
+  name: holzen-number
+  type: http
+  seq: 1
+}
+
+post {
+  url: {{VITE_SUPABASE_URL}}/functions/v1/holzen-number
+  body: none
+  auth: none
+}
+
+headers {
+  x-cid: bruno-{{$timestamp}}-review
+  apikey: {{VITE_SUPABASE_PUBLISHABLE_KEY}}
+}

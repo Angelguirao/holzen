@@ -1,0 +1,24 @@
+meta {
+  name: record-referral
+  type: http
+  seq: 9
+}
+
+post {
+  url: {{VITE_SUPABASE_URL}}/functions/v1/record-referral
+  body: json
+  auth: none
+}
+
+headers {
+  x-cid: bruno-{{$timestamp}}-review
+  Authorization: Bearer {{SUPABASE_ACCESS_TOKEN}}
+  apikey: {{VITE_SUPABASE_PUBLISHABLE_KEY}}
+  Content-Type: application/json
+}
+
+body:json {
+  {
+    "referral_code": "REPLACE_WITH_REAL_REFERRAL_CODE"
+  }
+}

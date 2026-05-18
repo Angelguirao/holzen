@@ -1,9 +1,8 @@
 import type { CacheServeRelaxation } from "./cache.ts";
 
 /** Where an orchestrate slot result came from. Keep in sync with client `CompanionOrchestrateSlotResult.source`
- *  and with `companion_serves.serve_source` values. `library` = served from `content_library` (curated catalog,
- *  not live AI, not the runtime `companion_cache`). */
-export type CompanionResultSource = "live" | "library" | "cache" | "curated" | "empty";
+ *  and with `companion_serves.serve_source` values. `catalog` = `companion_catalog`; `library` = legacy label. */
+export type CompanionResultSource = "live" | "catalog" | "library" | "cache" | "curated" | "empty";
 
 /** Response slot shape for companion-orchestrate JSON (mirrors client `CompanionOrchestrateSlotResult`). */
 export interface CompanionResult {

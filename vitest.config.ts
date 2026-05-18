@@ -9,6 +9,7 @@ export default defineConfig({
     globals: true,
     setupFiles: ["./src/test/setup.ts"],
     include: ["src/**/*.{test,spec}.{ts,tsx}"],
+    exclude: ["src/legacy/**", "src/test/legacy/**", "node_modules/**"],
     /**
      * Coverage configuration — designed for CI (`npm run test:ci`).
      *

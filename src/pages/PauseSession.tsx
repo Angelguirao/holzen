@@ -5,6 +5,7 @@ import { useTranslation } from 'react-i18next';
 import { useHolzen } from '@/hooks/use-holzen';
 import { useSubscription } from '@/hooks/use-subscription';
 import { useProGate } from '@/hooks/use-pro-gate';
+import { PauseEngagementBlocked } from '@/components/pause/PauseEngagementBlocked';
 import { type MoodValue } from '@/components/MoodCheck';
 
 import { type PauseStep } from '@/components/pause/PauseProgress';
@@ -64,7 +65,7 @@ import { usePauseSessionGoBack } from '@/hooks/use-pause-session-go-back';
 import { usePauseSessionGoToStep } from '@/hooks/use-pause-session-go-to-step';
 import { buildPauseSessionScaffoldRitualDerived } from '@/lib/pause-session-scaffold-ritual-props';
 import { buildPauseSessionScaffoldRitualPayloads } from '@/lib/pause-session-scaffold-ritual-payloads';
-import { journeyPath } from '@/lib/app-routes';
+import { JOURNEY_PREFIX } from '@/lib/app-routes';
 import { buildPauseSessionMountLogParams } from '@/lib/pause-session-mount-log-params';
 import { usePauseSessionPendingPauseOfferNavigation } from '@/hooks/use-pause-session-pending-pause-offer-navigation';
 import { usePendingPauseOffer } from '@/hooks/use-pending-pause-offer';
@@ -94,7 +95,7 @@ export default function PauseSession() {
   const { handleReturn, handleClose } = usePauseSessionExitNavigation(navigate);
   const handleBriefSaveToJourney = useCallback(() => {
     clearSession();
-    navigate(journeyPath('stats'), { replace: true });
+    navigate(JOURNEY_PREFIX, { replace: true });
   }, [navigate]);
   const location = useLocation();
   const prefersReducedMotion = useReducedMotion();
@@ -113,7 +114,17 @@ export default function PauseSession() {
     btcData,
     trackedAssetId,
   } = useHolzen();
-  const { subscribed, loading: subLoading, refresh: refreshSubscription } = useSubscription();
+  const {
+    subscribed,
+    loading: subLoading,
+    entitlement,
+    canEngagePause,
+    checkoutLoading,
+    trialLoading,
+    ensureTrial,
+    startReactivationCheckout,
+    refresh: refreshSubscription,
+  } = useSubscription();
   const { requirePro } = useProGate();
 
   const { onAfterMutation: pendingOfferAfterMutation, navigateAfterAdopt: pendingOfferNavigateAfterAdopt } =
@@ -707,6 +718,19 @@ export default function PauseSession() {
     reflectionError,
     onReflectionRetry: retryReflection,
   });
+
+  if (!subLoading && !canEngagePause) {
+    return (
+      <PauseEngagementBlocked
+        entitlement={entitlement}
+        checkoutLoading={checkoutLoading}
+        trialLoading={trialLoading}
+        onReactivate={() => void startReactivationCheckout()}
+        onStartTrial={() => void ensureTrial().then(() => refreshSubscription())}
+        onReturn={handleReturn}
+      />
+    );
+  }
 
   return (
     <Fragment>

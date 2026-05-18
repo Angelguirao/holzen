@@ -26,7 +26,11 @@ import { type CacheServeRelaxation, parseMarketDirection, serveFromCache } from 
 import { createAttemptLogger, trackEvent } from "../observe.ts";
 import { callPerplexityChat, type PerplexityUsage } from "../perplexity-client.ts";
 import { fetchInitWithIncomingTrace } from "../forward-trace-headers.ts";
-import { searchLibrary, eventToHistory, recordLibraryServe } from "../content-library.ts";
+import {
+  searchCompanionCatalog,
+  eventToHistory,
+  recordCatalogServe,
+} from "../companion-catalog.ts";
 import { getPhaseConfig } from "../phase-config.ts";
 import { type CompanionCacheTitleRow } from "../companion-cache-dedup.ts";
 import { type HistoricalEra, pickEra } from "../history-util.ts";
@@ -38,8 +42,8 @@ export const PROMPT_VERSION = "v3";
 
 export interface HistoryResult {
   data: { title: string; btcInsight: string; analogy: string; assetClass: string; period: string; source?: string; url?: string } | null;
-  /** `library` = served from `content_library`; `cache` = served from runtime `companion_cache`. */
-  source: "live" | "library" | "cache" | "curated" | "empty";
+  /** `catalog` = served from `companion_catalog`; `cache` = served from runtime `companion_cache`. */
+  source: "live" | "catalog" | "library" | "cache" | "curated" | "empty";
   cacheId: string | null;
   /** Set when `serveFromCache` served this row (not library / curated). */
   cacheRelaxation?: CacheServeRelaxation;
@@ -65,30 +69,29 @@ export interface GenerateHistoryParams {
 
 // ── Internals ──
 
-// `HistoricalEra`, `HISTORICAL_ERAS`, and `pickEra` live in `../history-util.ts`
-// (pure, unit-tested). See that file for the keyword-anchored dedup rationale.
-
-/** Try content_library (events) for history. */
-async function tryLibrary(
+async function tryCatalog(
   svcClient: SupabaseClient,
   userId?: string,
   moodTag?: string,
 ): Promise<HistoryResult | null> {
-  const libraryRows = await searchLibrary(svcClient, {
+  const rows = await searchCompanionCatalog(svcClient, {
     type: "event",
     companionType: "historical_insight",
     userId,
     includeStale: false,
     moodTag,
   });
-  if (libraryRows.length > 0) {
-    const pick = libraryRows[Math.floor(Math.random() * Math.min(libraryRows.length, 3))];
+  if (rows.length > 0) {
+    const pick = rows[Math.floor(Math.random() * Math.min(rows.length, 3))];
     const result = eventToHistory(pick);
-    recordLibraryServe(svcClient, userId, pick.id, "historical_insight");
-    return { data: result, source: "library", cacheId: null };
+    recordCatalogServe(svcClient, userId, pick.id, "historical_insight");
+    return { data: result, source: "catalog", cacheId: null };
   }
   return null;
 }
+
+// `HistoricalEra`, `HISTORICAL_ERAS`, and `pickEra` live in `../history-util.ts`
+// (pure, unit-tested). See that file for the keyword-anchored dedup rationale.
 
 /**
  * Try companion_cache for history.
@@ -130,7 +133,7 @@ async function serveCurated(svcClient: SupabaseClient): Promise<HistoryResult> {
   return { data: pickRandom(pool), source: "curated", cacheId: null };
 }
 
-/** Resolve from non-live phases in order (library → cache → curated). */
+/** Resolve from non-live phases in order (catalog → cache → curated). */
 async function serveFallback(
   svcClient: SupabaseClient,
   userId?: string,
@@ -143,9 +146,9 @@ async function serveFallback(
     return { data: null, source: "empty", cacheId: null, error: COMPANION_FALLBACKS_DISABLED_MESSAGE };
   }
   const phases = getPhaseConfig();
-  if (phases.library) {
-    const lib = await tryLibrary(svcClient, userId, moodTag);
-    if (lib) return lib;
+  if (phases.catalog) {
+    const cat = await tryCatalog(svcClient, userId, moodTag);
+    if (cat) return cat;
   }
   if (phases.cache) {
     const cached = await tryCache(svcClient, userId, marketDirection, excludeIds, false, structuredLog);
@@ -172,12 +175,11 @@ export async function generateHistory(params: GenerateHistoryParams): Promise<Hi
         : undefined);
 
   if (!forceLive) {
-  // ── Phase 1: Library ──
-  if (phases.library) {
-    const lib = await tryLibrary(svcClient, userId, historyMoodTag);
-    if (lib) {
-      log("history resolved from library (phase 1)");
-      return lib;
+  if (phases.catalog) {
+    const cat = await tryCatalog(svcClient, userId, historyMoodTag);
+    if (cat) {
+      log("history resolved from catalog (phase 1)");
+      return cat;
     }
   }
 

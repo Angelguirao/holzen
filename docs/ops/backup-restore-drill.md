@@ -4,7 +4,7 @@ Untested backups don't exist. Run this drill every 3 months; document outcomes i
 
 ## Scope
 
-Holzen runs on **Lovable-managed Supabase**. Direct dashboard access is limited, so this drill describes what's possible and what's blocked until we claim the project (`Option A` in the plan's Decision 3).
+Holzen runs on **Lovable-managed Supabase**. Direct dashboard access is limited, so this drill describes what's possible and what's blocked until we claim the project. See [lovable-staging-and-platform-exit.md](lovable-staging-and-platform-exit.md) for claiming Supabase, staging projects, and phased platform exit.
 
 Data categories:
 

@@ -128,6 +128,12 @@ fi
 # ---- 4. Frontend build + tests ----------------------------------------------
 step "4/6  Frontend tests + build"
 
+if npm run check:active-surface --silent && npm run check:no-phase-labels --silent && npm run check:invoke-edge-allowlist --silent; then
+  ok "active-surface + phase-label + invoke-edge guards"
+else
+  fail_check "surface/allowlist guard failed"
+fi
+
 if npm run test --silent 2>&1 | tail -30; then
   ok "vitest passed"
 else
@@ -138,6 +144,18 @@ if npm run build --silent 2>&1 | tail -20; then
   ok "vite build passed"
 else
   fail_check "npm run build failed"
+fi
+
+if npm run check:bundle-shipped --silent; then
+  ok "production bundle has no legacy UI symbols"
+else
+  fail_check "npm run check:bundle-shipped failed — BadgesPanelV2/ToolsHub leaked into dist/assets"
+fi
+
+if npm run check:bruno-active-manifest --silent && npm run check:posthog-events-allowlist --silent; then
+  ok "bruno active manifest + PostHog event allowlist"
+else
+  fail_check "bruno manifest or PostHog allowlist check failed"
 fi
 
 # ---- 5. Local supabase db reset ---------------------------------------------

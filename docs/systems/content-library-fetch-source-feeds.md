@@ -1,5 +1,7 @@
 # Content library ingestion — `fetch-source-feeds`
 
+> **Ingest edge not deployed at pause-first launch (2026-05).** `fetch-source-feeds` lives under `supabase/functions/legacy/`. Shipped companions read **`companion_catalog`** (renamed from `content_library` in cutover) via the catalog phase — see [active-surface.md](../ops/active-surface.md).
+
 This document describes the **Edge function** [`supabase/functions/fetch-source-feeds/index.ts`](../../supabase/functions/fetch-source-feeds/index.ts) and how it fills [`content_library`](../../supabase/migrations/20260321000003_content_library.sql) from admin-configured [`signal_sources`](../../src/components/admin/SourceCatalogViewer.tsx).
 
 ## Role in the product
@@ -8,7 +10,7 @@ This document describes the **Edge function** [`supabase/functions/fetch-source-
 |--------|---------|
 | **`signal_sources`** | Admin catalog: name, `type`, `url`, category. **One row per publisher/feed/site**, not per article. |
 | **`fetch-source-feeds`** | Cron- or invoke-driven worker: discovers article URLs, scrapes pages, structures JSON with Gemini, inserts rows into **`content_library`**. |
-| **Companion Signal** | Generators read `content_library` essays first (see [`signal.md`](pause/companions/signal.md), [`content-library.ts`](../../supabase/functions/_shared/content-library.ts)). |
+| **Companion Signal** | *Legacy:* generators read `content_library` first — see tag `full-ia-pre-strip` and [`_shared/legacy/content-library.ts`](../../supabase/functions/_shared/legacy/content-library.ts). |
 
 ## When it runs
 

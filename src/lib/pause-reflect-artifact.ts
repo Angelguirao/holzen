@@ -4,7 +4,7 @@ import { invokeEdge } from '@/lib/invoke-edge';
 import { loadReflectRecencyHints } from '@/lib/load-reflect-recency-hints';
 
 /** Reads persisted reflect-step copy (`pause_ai_artifacts.kind === 'reflection_text'`). */
-export async function fetchReflectionTextForPauseInstance(pauseInstanceId: string): Promise<string | null> {
+export async function fetchOpeningMessageForPauseInstance(pauseInstanceId: string): Promise<string | null> {
   const { data, error } = await supabase
     .from('pause_ai_artifacts' as never)
     .select('content')

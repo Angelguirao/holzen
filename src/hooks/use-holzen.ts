@@ -1,4 +1,13 @@
-import { useState, useEffect, useCallback, useMemo } from 'react';
+import {
+  createContext,
+  createElement,
+  useContext,
+  useState,
+  useEffect,
+  useCallback,
+  useMemo,
+  type ReactNode,
+} from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import type { BtcPriceData } from '@/lib/btc';
 import { getHolzenMarketDisplayQueryOptions } from '@/lib/holzen-market-display-query';
@@ -47,7 +56,25 @@ function markPauseManualStartedHomeOnce(): void {
  * `holzen-reflect` (`PauseSession` + `use-pause-reflect-generation`, enabled on Reflect, Frame,
  * second Breathe, and Decide). Silent mode still writes a stub `reflection_text` artifact here.
  */
-export function useHolzen() {
+export type HolzenContextValue = ReturnType<typeof useHolzenState>;
+
+const HolzenContext = createContext<HolzenContextValue | null>(null);
+
+/** One shared pause/profile/market tree for the signed-in session (survives tab switches). */
+export function HolzenProvider({ children }: { children: ReactNode }) {
+  const value = useHolzenState();
+  return createElement(HolzenContext.Provider, { value }, children);
+}
+
+export function useHolzen(): HolzenContextValue {
+  const ctx = useContext(HolzenContext);
+  if (!ctx) {
+    throw new Error('useHolzen must be used within HolzenProvider');
+  }
+  return ctx;
+}
+
+function useHolzenState() {
   const { user } = useAuth();
   const profile = useProfile();
   const queryClient = useQueryClient();
@@ -186,7 +213,9 @@ export function useHolzen() {
       .subscribe();
 
     return () => {
-      supabase.removeChannel(channel);
+      if (typeof supabase.removeChannel === 'function') {
+        supabase.removeChannel(channel);
+      }
     };
   }, [user, syncOpenPauseFromDb]);
 

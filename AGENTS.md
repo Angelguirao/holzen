@@ -22,13 +22,16 @@ Use this table to pick the **canonical narrative** for the slice you are touchin
 | New or renamed edge HTTP handler | `supabase/functions/_shared/with-request-logging.ts`, [docs/ops/edge-logging-conventions.md](docs/ops/edge-logging-conventions.md) | `[functions.*]` in `supabase/config.toml`, `EdgeCoverage.tsx`, `npm run check:edge-logging` + `check:edge-coverage-manifest` |
 | PostHog product events or properties | [docs/ops/event-taxonomy.md](docs/ops/event-taxonomy.md) | Call sites + privacy/sanitization patterns in `src/lib/posthog.ts` |
 | Feature flags (new flag or rollout change) | [docs/ops/feature-flags.md](docs/ops/feature-flags.md) | `use-feature-flag` usage; default and sunset note |
-| React pages (orchestration, hooks split, memoization) | [docs/fundamentals/react-screen-orchestration.md](docs/fundamentals/react-screen-orchestration.md) | Tests for the flow; [docs/fundamentals/refactoring-strategy.md](docs/fundamentals/refactoring-strategy.md) for larger refactors |
-| Cross-surface ownership (truth vs UI projection; TanStack Query vs UI-only state; avoid duplicate “backends”) | [docs/fundamentals/client-server-architecture-holzen.md](docs/fundamentals/client-server-architecture-holzen.md) | [docs/fundamentals/navigating-the-codebase.md](docs/fundamentals/navigating-the-codebase.md) §6.1 when fetch/cache patterns change; relevant `docs/systems/*` when domain rules change |
+| React pages (orchestration, hooks split, memoization) | [docs/fundamentals/react-screen-orchestration.md](docs/fundamentals/react-screen-orchestration.md) | [modern-react-practices-holzen.md](docs/fundamentals/modern-react-practices-holzen.md) scorecard; [refactoring-strategy.md](docs/fundamentals/refactoring-strategy.md) for larger refactors |
+| Application structure (bounded contexts, use cases, ports, monorepo target, pre-launch restructure) | [docs/fundamentals/holzen-application-architecture.md](docs/fundamentals/holzen-application-architecture.md) | [frontend-module-layout.md](docs/fundamentals/frontend-module-layout.md); ADR [2026-05-17-modular-monolith-hexagonal-client.md](docs/decisions/2026-05-17-modular-monolith-hexagonal-client.md) |
+| Cross-surface ownership (truth vs UI projection; TanStack Query vs UI-only state; avoid duplicate “backends”) | [docs/fundamentals/client-server-architecture-holzen.md](docs/fundamentals/client-server-architecture-holzen.md) | [holzen-application-architecture.md](docs/fundamentals/holzen-application-architecture.md); [navigating-the-codebase.md](docs/fundamentals/navigating-the-codebase.md) §6.1 when fetch/cache patterns change |
 | Visual tokens, Nox, component styling | [DESIGN.md](DESIGN.md), [docs/design/nox/](docs/design/nox/) | `src/index.css`, `tailwind.config.ts` — Figma owns pixel values; markdown owns migration rules |
 | Auth + referral side effects | [docs/systems/auth/auth-and-referral-system.md](docs/systems/auth/auth-and-referral-system.md) | RLS-sensitive paths per [docs/reviews/](docs/reviews/) phases when security-relevant |
 | Content library ingest / RSS / admin | [docs/systems/content-library-fetch-source-feeds.md](docs/systems/content-library-fetch-source-feeds.md) | Edge + admin docs referenced there |
 | PR / release discipline, flow-first review | [docs/reviews/react-spa-review-template.md](docs/reviews/react-spa-review-template.md), [docs/reviews/end-to-end-review-master-checklist.md](docs/reviews/end-to-end-review-master-checklist.md) | Cursor skill `.cursor/skills/holzen-flow-review/SKILL.md` |
 | Ship to GitHub / Lovable / Supabase | [docs/ops/deployment-sync-guide.md](docs/ops/deployment-sync-guide.md) | `.cursor/rules/deployment-sync.mdc` mirrors the minimum gate |
+| Lovable staging / platform exit (risk, CI, hybrid paths) | [docs/ops/lovable-staging-and-platform-exit.md](docs/ops/lovable-staging-and-platform-exit.md) | Pairs with deployment-sync-guide; not a substitute for pre-push checklist |
+| Pause-first shipped scope (MVP routes, edges, Tier B drops) | [docs/ops/active-surface.md](docs/ops/active-surface.md) | `.cursor/rules/active-surface.mdc`; no `@/legacy` imports in active `src/` |
 
 **Default habit:** skim the **one** row that matches your change, open the linked doc section, then edit code. If the row’s “Also update” column applies, treat it as part of the same task—not a follow-up doc ticket.
 
@@ -40,7 +43,12 @@ Use this table to pick the **canonical narrative** for the slice you are touchin
 | `npm run build` | Production build (**`prebuild`** → **`npm run check:version-sync`**) |
 | `npm run preview` | Serve built output locally |
 | `npm run test` | Vitest (jsdom), single run |
-| `npm run test:ci` | CI gate: `check:edge-logging`, `check:edge-coverage-manifest`, Vitest with coverage + JUnit |
+| `npm run test:ci` | CI gate: `check:edge-logging`, `check:edge-coverage-manifest`, `check:active-surface`, `check:no-phase-labels`, `check:invoke-edge-allowlist`, `check:bundle-shipped`, `check:bruno-active-manifest`, Vitest with coverage + JUnit |
+| `npm run check:no-phase-labels` | Plan §5.0 — fail on `mvp` / `pre-mvp` tokens in active `src/`, ops, Bruno, CI scripts (allowlisted migration filename + branch) |
+| `npm run check:bundle-shipped` | After **`build`**: no `BadgesPanelV2` / `ToolsHub` in `dist/assets` (pause-first strip guard; in **`test:ci`** and **`check:prepush`**) |
+| `npm run check:bruno-active-manifest` | Every `[functions.*]` in `config.toml` is listed in `bruno/active/functions-catalog.md` (in **`test:ci`**) |
+| `npm run check:posthog-events-allowlist` | Active `trackEvent` names ⊆ `docs/ops/event-taxonomy.md` Active section (in **`check:prepush`**) |
+| `npm run check:i18n-active-keys` | Optional — `t('…')` keys in active `src/` must exist in `src/locales/en.json` (not in `test:ci` until tree is complete) |
 | `npm run test:watch` | Vitest watch mode |
 | `npm run lint` | ESLint across the repo |
 | `npm run check:view-migrations` | Fail on unsafe `CREATE OR REPLACE VIEW` column renames in `supabase/migrations/` (runs in **`check:prepush`**). |
@@ -113,7 +121,7 @@ Never commit `.env` or service role keys.
 
 ## Git
 
-- **Pause V2 / information-architecture work** that touches Journey, Tools, Home, or app routes: use branch **`cursor/pause-v2-final`** (not `main`) as the integration line unless you are told otherwise.
+- **Pause-first MVP launch** (shipped 4-tab shell, legacy strip, cutover): integrate on **`feature/mvpPauseCleanup`** → PR to `main`; manifest [docs/ops/active-surface.md](docs/ops/active-surface.md). Older Pause V2 line was **`cursor/pause-v2-final`** — superseded for this strip.
 - **Commit as you go** when a logical chunk of work is done (e.g. one fix, one migration, one doc update)—do not leave the tree dirty at the end of a task unless the user asked for WIP only.
 - Use clear commit messages (what changed and why). Prefer `git` from the system install if it is not on `PATH` (e.g. `C:\Program Files\Git\bin\git.exe` on Windows).
 

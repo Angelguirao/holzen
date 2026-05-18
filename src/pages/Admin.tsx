@@ -16,13 +16,10 @@ import { CuratedContentManager } from '@/components/admin/CuratedContentManager'
 import { HardcodedFallbacksManager } from '@/components/admin/HardcodedFallbacksManager';
 import { SourceCatalogViewer } from '@/components/admin/SourceCatalogViewer';
 import { SourceSuggestionsPanel } from '@/components/admin/SourceSuggestionsPanel';
-import { ContentLibraryViewer } from '@/components/admin/ContentLibraryViewer';
 import { AdminSubNav } from '@/components/admin/AdminSubNav';
 import { AppConfigTools } from '@/components/admin/AppConfigTools';
 import { MigrationStatus } from '@/components/admin/MigrationStatus';
 import { CostAnalytics } from '@/components/admin/CostAnalytics';
-import { DemoModeToggle } from '@/components/admin/DemoModeToggle';
-import { BadgeDebug } from '@/components/admin/BadgeDebug';
 import { adminDeleteRowsByIds } from '@/lib/admin-delete';
 
 function computeTrend(current: number, previous: number | null, invertColor: boolean): TrendInfo | undefined {
@@ -846,7 +843,9 @@ export default function Admin() {
         </TabsContent>
 
         <TabsContent value="library" className="mt-0">
-          <ContentLibraryViewer entries={libraryEntries} onRefresh={refresh} />
+          <p className="text-sm text-muted-foreground py-4">
+            Library ingest preview moved to legacy reference (pause-first shipped scope). Use fetch-source-feeds ops runbook if needed.
+          </p>
         </TabsContent>
 
         <TabsContent value="content" className="mt-0 space-y-2">
@@ -868,8 +867,6 @@ export default function Admin() {
           <div className="space-y-3">
             <MigrationStatus />
             <AppConfigTools />
-            <DemoModeToggle />
-            <BadgeDebug />
           </div>
         </TabsContent>
       </Tabs>
