@@ -1,2 +1,2 @@
-/** @deprecated Import from `@/features/pause/application/queries/companion-ui-completion-query-key`. */
-export * from '@/features/pause/application/queries/companion-ui-completion-query-key';
+/** @deprecated Import from `@/features/pause/public`. */
+export * from '@/features/pause/public-queries';

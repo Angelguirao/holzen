@@ -1,2 +1,2 @@
-/** @deprecated Import from `@/features/pause/application/reflect/generation-prerequisites`. */
-export * from '@/features/pause/application/reflect/generation-prerequisites';
+/** @deprecated Import from `@/features/pause/public`. */
+export * from '@/features/pause/public';

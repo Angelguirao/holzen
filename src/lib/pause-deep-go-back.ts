@@ -1,2 +1,2 @@
-/** @deprecated Import from `@/features/pause/application/session/deep-go-back`. */
-export * from '@/features/pause/application/session/deep-go-back';
+/** @deprecated Import from `@/features/pause/public`. */
+export * from '@/features/pause/public';

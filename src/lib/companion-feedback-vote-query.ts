@@ -1,4 +1,4 @@
-/** @deprecated Import from `@/features/pause/infrastructure/queries/companion-feedback-vote-query`. */
+/** @deprecated Import from `@/features/pause/public-queries`. */
 export {
   companionFeedbackVoteQueryKey,
   COMPANION_FEEDBACK_VOTE_DISABLED_USER_ID,
@@ -6,4 +6,4 @@ export {
   COMPANION_FEEDBACK_VOTE_QUERY_PREFIX,
   fetchCompanionFeedbackVote,
   getCompanionFeedbackVoteQueryOptions,
-} from '@/features/pause/infrastructure/queries/companion-feedback-vote-query';
+} from '@/features/pause/public-queries';

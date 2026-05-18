@@ -1,2 +1,2 @@
-/** @deprecated Import from `@/features/pause/public` or `@/features/pause/domain/pause-state`. */
-export * from '@/features/pause/domain/pause-state';
+/** @deprecated Import from `@/features/pause/public` or `@/features/pause/public`. */
+export * from '@/features/pause/public';

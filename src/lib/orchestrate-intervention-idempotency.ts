@@ -1,2 +1,2 @@
-/** @deprecated Import from `@/features/pause/application/companion/intervention-idempotency`. */
-export * from '@/features/pause/application/companion/intervention-idempotency';
+/** @deprecated Import from `@/features/pause/public`. */
+export * from '@/features/pause/public';

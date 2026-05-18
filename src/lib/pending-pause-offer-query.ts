@@ -1,4 +1,4 @@
-/** @deprecated Import from `@/features/pause/public` or `@/features/pause/infrastructure/queries/pending-pause-offer-query`. */
+/** @deprecated Import from `@/features/pause/public` or `@/features/pause/public-queries`. */
 export {
   PENDING_PAUSE_OFFER_DISABLED_USER_ID,
   PENDING_PAUSE_OFFER_NONE_QUERY_KEY,
@@ -8,4 +8,4 @@ export {
   fetchPendingPauseOffer,
   getPendingPauseOfferQueryOptions,
   type PendingPauseOfferRow,
-} from '@/features/pause/infrastructure/queries/pending-pause-offer-query';
+} from '@/features/pause/public-queries';

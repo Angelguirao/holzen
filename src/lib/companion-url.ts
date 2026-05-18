@@ -1,2 +1,2 @@
-/** @deprecated Import from `@/features/pause/application/companion/url`. */
-export { hostnameFromUrl } from '@/features/pause/application/companion/url';
+/** @deprecated Import from `@/features/pause/public`. */
+export { hostnameFromUrl } from '@/features/pause/public';

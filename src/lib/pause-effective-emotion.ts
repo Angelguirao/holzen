@@ -1,2 +1,2 @@
-/** @deprecated Import from `@/features/pause/domain/effective-emotion`. */
-export * from '@/features/pause/domain/effective-emotion';
+/** @deprecated Import from `@/features/pause/public`. */
+export * from '@/features/pause/public';

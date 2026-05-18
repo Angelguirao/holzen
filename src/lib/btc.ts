@@ -4,16 +4,16 @@ export type {
   FearGreedData,
   OnChainData,
   SupportedCurrency,
-} from '@/features/market/domain/market-quote';
+} from '@/features/market/public';
 export {
   SUPPORTED_CURRENCIES,
-} from '@/features/market/domain/market-quote';
-export { formatBtcPrice } from '@/features/market/application/format-market-price';
+} from '@/features/market/public';
+export { formatBtcPrice } from '@/features/market/public';
 export {
   fetchBtcData,
   fetchMarketData,
-} from '@/features/market/infrastructure/fetch-market-data';
+} from '@/features/market/public';
 export {
   BREATHE_AMBIENT_BTC_QUERY_KEY,
   getBreatheAmbientBtcQueryOptions,
-} from '@/features/market/infrastructure/queries/breathe-ambient-btc-query';
+} from '@/features/market/public';

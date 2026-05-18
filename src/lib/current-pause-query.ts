@@ -1,4 +1,4 @@
-/** @deprecated Import from `@/features/pause/public` or `@/features/pause/infrastructure/queries/current-pause-query`. */
+/** @deprecated Import from `@/features/pause/public` or `@/features/pause/public-queries`. */
 export {
   CURRENT_PAUSE_DISABLED_USER_ID,
   CURRENT_PAUSE_NONE_QUERY_KEY,
@@ -8,4 +8,4 @@ export {
   fetchCurrentPause,
   getCurrentPauseQueryOptions,
   type CurrentPauseRow,
-} from '@/features/pause/infrastructure/queries/current-pause-query';
+} from '@/features/pause/public-queries';

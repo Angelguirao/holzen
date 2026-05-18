@@ -7,4 +7,4 @@ export {
   archivePausesTabHasRowsQueryPrefix,
   fetchArchivePausesTabHasRows,
   getArchivePausesTabHasRowsQueryOptions,
-} from '@/features/pause/infrastructure/queries/archive-pauses-tab-query';
+} from '@/features/pause/public-queries';

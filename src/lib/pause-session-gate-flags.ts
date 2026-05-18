@@ -1,2 +1,2 @@
-/** @deprecated Import from `@/features/pause/application/session/gate-flags`. */
-export * from '@/features/pause/application/session/gate-flags';
+/** @deprecated Import from `@/features/pause/public`. */
+export * from '@/features/pause/public';

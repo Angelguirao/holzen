@@ -1,6 +1,6 @@
-/** @deprecated Import from `@/features/pause/application/use-cases/score-impacts`. */
+/** @deprecated Import from `@/features/pause/public`. */
 export {
   buildPauseScoreImpacts,
   parseScoreImpactVolatilityPct,
   type PauseScoreImpactRow,
-} from '@/features/pause/application/use-cases/score-impacts';
+} from '@/features/pause/public';

@@ -1,2 +1,2 @@
-/** @deprecated Import from `@/features/pause/application/use-cases/ritual-depth-upgrade-payload`. */
-export * from '@/features/pause/application/use-cases/ritual-depth-upgrade-payload';
+/** @deprecated Import `ritualDepthUpgradedPayload` from `@/features/pause/public`. */
+export { ritualDepthUpgradedPayload } from '@/features/pause/public';

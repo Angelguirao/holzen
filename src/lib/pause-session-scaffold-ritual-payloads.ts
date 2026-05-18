@@ -1,5 +1,5 @@
-/** @deprecated Import from `@/features/pause/presentation/session/scaffold-ritual-payloads`. */
+/** @deprecated Import from `@/features/pause/public`. */
 export {
   buildPauseSessionScaffoldRitualPayloads,
   type PauseSessionScaffoldRitualPayloadsParams,
-} from '@/features/pause/presentation/session/scaffold-ritual-payloads';
+} from '@/features/pause/public';

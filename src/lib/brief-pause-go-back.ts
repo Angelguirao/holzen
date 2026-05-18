@@ -1,2 +1,2 @@
-/** @deprecated Import from `@/features/pause/application/brief-ritual/brief-pause-go-back`. */
-export * from '@/features/pause/application/brief-ritual/brief-pause-go-back';
+/** @deprecated Import from `@/features/pause/public`. */
+export * from '@/features/pause/public';

@@ -1,4 +1,4 @@
-/** @deprecated Import from `@/features/pause/domain/companion-orchestrate` or `@/features/pause/public`. */
+/** @deprecated Import from `@/features/pause/public` or `@/features/pause/public`. */
 export type {
   CompanionCacheRelaxation,
   CompanionOrchestrateSlotResult,
@@ -7,4 +7,4 @@ export type {
   InterventionSecondary,
   InterventionState,
   RegenerateCompanionSlot,
-} from '@/features/pause/domain/companion-orchestrate';
+} from '@/features/pause/public';

@@ -1,2 +1,2 @@
-/** @deprecated Import from `@/features/pause/application/session/step-map`. */
-export * from '@/features/pause/application/session/step-map';
+/** @deprecated Import from `@/features/pause/public`. */
+export * from '@/features/pause/public';

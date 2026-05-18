@@ -7,7 +7,7 @@ import {
   zoomOutLibraryAutosaveFromDisplayData,
   zoomOutSaveThisMomentSeed,
   zoomOutTotalCharsForReadTime,
-} from '@/features/pause/application/companion/zoom-out-payload';
+} from '@/features/pause/public';
 
 describe('zoom-out-payload', () => {
   it('toZoomOutDisplayData defaults missing arrays and nulls', () => {

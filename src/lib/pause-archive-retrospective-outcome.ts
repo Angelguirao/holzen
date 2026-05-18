@@ -1,2 +1,2 @@
-/** @deprecated Import from `@/features/pause/application/archive/retrospective-outcome`. */
-export * from '@/features/pause/application/archive/retrospective-outcome';
+/** @deprecated Import from `@/features/pause/public`. */
+export * from '@/features/pause/public';

@@ -1,6 +1,6 @@
-/** @deprecated Import from `@/features/pause/application/session/fetched-instance-from-fetch`. */
+/** @deprecated Import from `@/features/pause/public`. */
 export {
   buildFetchedPauseInstanceFromFetch,
   type PauseAiArtifactKindRow,
   type PauseInstanceContextSnapshotRow,
-} from '@/features/pause/application/session/fetched-instance-from-fetch';
+} from '@/features/pause/public';
