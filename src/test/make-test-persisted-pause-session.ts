@@ -1,4 +1,4 @@
-import type { PersistedSession } from '@/lib/pause-session-storage';
+import { type PersistedSession } from '@/features/pause/domain/session-model';
 
 /**
  * Minimal {@link PersistedSession} for Vitest (pause hydrate helpers, breath RPC mount dedupe, etc.).

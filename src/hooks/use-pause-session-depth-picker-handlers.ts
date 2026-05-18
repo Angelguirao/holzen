@@ -1,5 +1,5 @@
 import { useCallback, type Dispatch, type SetStateAction } from 'react';
-import type { BriefPauseStep, RitualDepth } from '@/lib/pause-session-storage';
+import { type BriefPauseStep, type RitualDepth } from '@/features/pause/domain/ritual-types';
 
 /** `PauseDepthPicker` actions on `/pause` depth selection screen. */
 export function usePauseSessionDepthPickerHandlers(input: {

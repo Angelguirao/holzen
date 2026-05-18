@@ -7,7 +7,7 @@ import type { FeelStepTile } from '@/components/pause/pause-feel-types';
 import { PauseBriefIntegrate } from '@/components/pause/PauseBriefIntegrate';
 import { PauseDecide } from '@/components/pause/PauseDecide';
 import type { PauseSessionStepTransitionConfig } from '@/lib/pause-session-step-transition';
-import type { BriefPauseStep } from '@/lib/pause-session-storage';
+import { type BriefPauseStep } from '@/features/pause/domain/ritual-types';
 
 export type PauseSessionBriefRitualBodyProps = {
   briefStep: BriefPauseStep;

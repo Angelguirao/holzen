@@ -1,8 +1,6 @@
 import { useCallback, type Dispatch, type MutableRefObject, type SetStateAction } from 'react';
 import type { TFunction } from 'i18next';
 import type { MoodValue } from '@/components/MoodCheck';
-import type { RitualDepth } from '@/lib/pause-session-storage';
-import { clearSession } from '@/lib/pause-session-storage';
 import { hapticFeedback } from '@/lib/haptics';
 import { useAuth } from '@/hooks/use-auth';
 import { pauseLogStep } from '@/features/pause/public-rpc';
@@ -15,6 +13,8 @@ import type { PauseState } from '@/features/pause/domain/pause-state';
 import { buildPauseImpactDataOnComplete, type PauseImpactData } from '@/lib/pause-impact-data';
 import { invalidatePauseStatsDataForUser } from '@/features/pause/public';
 import { getSessionQuote } from '@/lib/wisdom-quotes';
+import { type RitualDepth } from '@/features/pause/domain/ritual-types';
+import { clearSession } from '@/features/pause/infrastructure/session/persisted-session-storage';
 
 export function usePauseSessionDecideHandler(input: {
   decidingRef: MutableRefObject<boolean>;

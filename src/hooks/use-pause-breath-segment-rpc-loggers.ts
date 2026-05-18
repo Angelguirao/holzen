@@ -3,9 +3,9 @@ import type { TFunction } from 'i18next';
 import { invalidateCompanionUiCompletionQuery } from '@/lib/companion-ui-completion-query-key';
 import { pauseLogStep } from '@/features/pause/public-rpc';
 import { breathCompletedSegment1Payload, breathCompletedSegment2Payload } from '@/lib/pause-breath-completed-payload';
-import type { PersistedSession } from '@/lib/pause-session-storage';
 import { initialBreathSegmentRpcLoggedFlagsFromRestored } from '@/features/pause/application/session/step-map';
 import { showPauseStepSyncFailedToast } from '@/features/pause/public';
+import { type PersistedSession } from '@/features/pause/domain/session-model';
 
 /**
  * Dedupes `breath_completed` RPCs for deep + brief breath segments and resets when `pauseInstanceId` changes.

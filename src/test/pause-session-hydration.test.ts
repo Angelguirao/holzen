@@ -1,10 +1,14 @@
 import { describe, it, expect } from 'vitest';
 import {
+  DEFAULT_COMPANIONS,
+  DEFAULT_PREFS,
+  type FetchedPauseInstance,
+  type PersistedSession,
+} from '@/features/pause/domain/session-model';
+import {
   computePauseSessionHydration,
   computePauseSessionResolved,
 } from '@/features/pause/application/session/hydration';
-import type { FetchedPauseInstance, PersistedSession } from '@/lib/pause-session-storage';
-import { DEFAULT_COMPANIONS, DEFAULT_PREFS } from '@/lib/pause-session-storage';
 
 const holzenBase = {
   holzenMessage: null as string | null,

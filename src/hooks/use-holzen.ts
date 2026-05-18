@@ -32,11 +32,11 @@ import {
 } from '@/features/pause/public';
 import { pauseCreateOrReuse } from '@/features/pause/public-rpc';
 import { trackEvent } from '@/lib/posthog';
+import { clearSession } from '@/features/pause/infrastructure/session/persisted-session-storage';
 import {
   MANUAL_PAUSE_TRIGGER_IDLE,
   type ManualPauseTriggerResult,
 } from '@/features/pause/public';
-import { clearSession } from '@/lib/pause-session-storage';
 
 const PAUSE_MANUAL_START_HOME = 'holzen_sess_pause_manual_started_home';
 

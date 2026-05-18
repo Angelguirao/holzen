@@ -8,7 +8,7 @@ const { saveSessionMock } = vi.hoisted(() => ({
   saveSessionMock: vi.fn(),
 }));
 
-vi.mock('@/lib/pause-session-storage', () => ({
+vi.mock('@/features/pause/infrastructure/session/persisted-session-storage', () => ({
   saveSession: (...args: unknown[]) => saveSessionMock(...args),
 }));
 

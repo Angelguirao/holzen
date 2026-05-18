@@ -1,7 +1,7 @@
 import { useCallback, type Dispatch, type SetStateAction } from 'react';
 import { computeBriefPastStepClick } from '@/lib/brief-pause-past-step-click';
 import { hapticFeedback } from '@/lib/haptics';
-import type { BriefPauseStep } from '@/lib/pause-session-storage';
+import { type BriefPauseStep } from '@/features/pause/domain/ritual-types';
 
 /** Navigate to an earlier brief macro (haptics + optional integrate flag clear). Not used from the read-only header stepper. */
 export function usePauseSessionBriefPastStep(input: {

@@ -8,8 +8,8 @@ import {
   persistedPauseSessionAllowsTerminalEntry,
 } from '@/features/pause/application/session/terminal-entry-guard';
 import type { PauseState } from '@/features/pause/domain/pause-state';
-import type { FetchedPauseInstance, PersistedSession } from '@/lib/pause-session-storage';
 import { getPauseTerminalEntryStateQueryOptions } from '@/features/pause/infrastructure/queries/terminal-entry-state-query';
+import { type FetchedPauseInstance, type PersistedSession } from '@/features/pause/domain/session-model';
 
 export { pauseTerminalEntryStateQueryKey } from '@/features/pause/infrastructure/queries/terminal-entry-state-query';
 

@@ -1,6 +1,6 @@
 import { useCallback } from 'react';
 import type { NavigateFunction } from 'react-router-dom';
-import { clearSession } from '@/lib/pause-session-storage';
+import { clearSession } from '@/features/pause/infrastructure/session/persisted-session-storage';
 
 /** After adopt on `/pause`: resync Holzen + hard navigation to the new instance (`PauseLeaveWithPendingSheet`). */
 export function usePauseSessionPendingPauseOfferNavigation(input: {

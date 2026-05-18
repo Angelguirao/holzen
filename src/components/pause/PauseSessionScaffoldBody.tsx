@@ -8,7 +8,7 @@ import {
   type PauseSessionDeepRitualBodyProps,
 } from '@/components/pause/PauseSessionDeepRitualBody';
 import type { PauseImpactData } from '@/lib/pause-impact-data';
-import type { RitualDepth } from '@/lib/pause-session-storage';
+import { type RitualDepth } from '@/features/pause/domain/ritual-types';
 
 export type PauseSessionScaffoldBodyProps = {
   phase: 'session' | 'done';

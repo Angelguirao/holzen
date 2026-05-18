@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { computePauseStorageRitualSyncPatch } from '@/features/pause/application/session/storage-ritual-sync';
-import type { PersistedSession } from '@/lib/pause-session-storage';
+import { type PersistedSession } from '@/features/pause/domain/session-model';
 
 const baseSaved = (over: Partial<PersistedSession> = {}): PersistedSession => ({
   message: 'm',

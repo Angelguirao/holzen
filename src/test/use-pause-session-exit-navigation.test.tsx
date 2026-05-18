@@ -6,7 +6,7 @@ const { clearSessionMock } = vi.hoisted(() => ({
   clearSessionMock: vi.fn(),
 }));
 
-vi.mock('@/lib/pause-session-storage', () => ({
+vi.mock('@/features/pause/infrastructure/session/persisted-session-storage', () => ({
   clearSession: () => clearSessionMock(),
 }));
 
