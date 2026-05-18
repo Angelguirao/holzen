@@ -2,7 +2,7 @@ import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import {
   broadcastCheckoutConfirmed,
   subscribeToCheckoutConfirmations,
-} from '@/lib/checkout-suppression-window';
+} from '@/features/subscription/application/checkout-suppression-window';
 
 /**
  * Cross-tab confirmation broadcast.

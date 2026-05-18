@@ -15,7 +15,7 @@ import { useTranslation } from 'react-i18next';
 import {
   getCheckoutSuppressionWindowMinutes,
   setCheckoutSuppressionWindowMinutes,
-} from '@/lib/checkout-suppression-window';
+} from '@/features/subscription/public';
 import { readThrownMessage } from '@/pages/settings/readThrownMessage';
 import { isHapticEnabled, setHapticEnabled as persistHapticEnabled } from '@/lib/haptics';
 

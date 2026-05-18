@@ -4,7 +4,7 @@ import {
   POST_CHECKOUT_SUBSCRIBE_FLAG,
   useSubscription,
 } from '@/hooks/use-subscription';
-import type { SubscriptionBillingInterval } from '@/lib/subscription-snapshot-query';
+import type { SubscriptionBillingInterval } from '@/features/subscription/public';
 import { trackEvent } from '@/lib/posthog';
 
 const MAX_AGE_MS = 30 * 60 * 1000;

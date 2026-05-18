@@ -20,7 +20,7 @@ import {
   getCheckoutSuppressionWindowMs,
   broadcastCheckoutConfirmed,
   subscribeToCheckoutConfirmations,
-} from '@/lib/checkout-suppression-window';
+} from '@/features/subscription/public';
 
 type Mode = 'subscription' | 'flex_pack_s' | 'flex_pack_m' | null;
 
