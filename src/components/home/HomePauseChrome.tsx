@@ -116,10 +116,12 @@ export function NeedAMomentButton({
   onTrigger,
   cooldownRemaining,
   loading,
+  className,
 }: {
   onTrigger: () => void;
   cooldownRemaining: () => number;
   loading: boolean;
+  className?: string;
 }) {
   const [remaining, setRemaining] = useState(cooldownRemaining());
 
@@ -140,7 +142,7 @@ export function NeedAMomentButton({
   const inCooldown = remaining > 0;
 
   return (
-    <div className="space-y-3">
+    <div className={cn('space-y-3', className)}>
       <NeedAMomentButtonInner onTrigger={onTrigger} inCooldown={inCooldown} loading={loading} remainingMs={remaining} />
     </div>
   );
