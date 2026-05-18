@@ -4,14 +4,14 @@ import type { TFunction } from 'i18next';
 import { usePauseFavoriteToggle } from '@/hooks/use-pause-favorite-toggle';
 import { showPauseFavoriteProHintToast } from '@/features/pause/public';
 
-vi.mock('@/features/pause/public', () => ({
-  showPauseFavoriteProHintToast: vi.fn(),
-  pauseArchiveListQueryPrefix: (userId: string) => ['pause-archive', userId] as const,
-}));
-
 const { pauseLogStepMock, invalidateQueriesMock } = vi.hoisted(() => ({
   pauseLogStepMock: vi.fn(),
   invalidateQueriesMock: vi.fn(),
+}));
+
+vi.mock('@/features/pause/public', () => ({
+  showPauseFavoriteProHintToast: vi.fn(),
+  pauseArchiveListQueryPrefix: (userId: string) => ['pause-archive', userId] as const,
 }));
 
 vi.mock('@tanstack/react-query', () => ({
@@ -24,11 +24,6 @@ vi.mock('@/hooks/use-auth', () => ({
 
 vi.mock('@/features/pause/public-rpc', () => ({
   pauseLogStep: (...args: unknown[]) => pauseLogStepMock(...args),
-}));
-
-vi.mock('@/features/pause/public', () => ({
-  showPauseFavoriteProHintToast: vi.fn(),
-  pauseArchiveListQueryPrefix: (userId: string) => ['pause-archive', userId] as const,
 }));
 
 vi.mock('@/lib/haptics', () => ({
