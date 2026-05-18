@@ -1,9 +1,9 @@
 import { describe, it, expect, vi } from 'vitest';
 import { createRef } from 'react';
-import { buildPauseSessionScaffoldRitualPayloads } from '@/features/pause/presentation/session/scaffold-ritual-payloads';
-import { buildPauseSessionStepTransitionConfig } from '@/features/pause/application/session/step-transition';
+import { buildPauseSessionScaffoldRitualPayloads } from '@/features/pause/public';
+import { buildPauseSessionStepTransitionConfig } from '@/features/pause/public';
 import type { PauseBreathingHandle } from '@/components/pause/PauseBreathing';
-import { DEFAULT_COMPANIONS, DEFAULT_PREFS } from '@/features/pause/domain/session-model';
+import { DEFAULT_COMPANIONS, DEFAULT_PREFS } from '@/features/pause/public';
 
 function transition() {
   return buildPauseSessionStepTransitionConfig({ swipeDirection: 'forward', prefersReducedMotion: true });

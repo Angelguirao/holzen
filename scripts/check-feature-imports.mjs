@@ -68,6 +68,38 @@ for (const file of files) {
   }
 }
 
+/** Active app must use public / public-queries / public-rpc — not deep feature layers. */
+const DEEP_FEATURE_IMPORT =
+  /from\s+['"]@\/features\/[^'"]+\/(application|infrastructure|domain|presentation)\//;
+
+const ALLOWED_DEEP_IMPORT_FILES = new Set([
+  'src/lib/apply-bulk-hold-outcomes.ts',
+  'src/lib/apply-bulk-hold-outcomes.test.ts',
+  'src/lib/pause-ritual-depth-upgrade.ts',
+]);
+
+const ACTIVE_APP_ROOTS = [
+  join(root, 'src', 'hooks'),
+  join(root, 'src', 'pages'),
+  join(root, 'src', 'components'),
+  join(root, 'src', 'test'),
+];
+
+for (const dir of ACTIVE_APP_ROOTS) {
+  for (const file of walk(dir)) {
+    const rel = relative(root, file).replace(/\\/g, '/');
+    if (rel.includes('/legacy/')) continue;
+    if (ALLOWED_DEEP_IMPORT_FILES.has(rel)) continue;
+    const text = readFileSync(file, 'utf8');
+    if (DEEP_FEATURE_IMPORT.test(text)) {
+      violations.push({
+        file: rel,
+        label: 'deep feature import — use @/features/<ctx>/public, public-queries, public-rpc, or lib RPC shim',
+      });
+    }
+  }
+}
+
 if (violations.length) {
   console.error('check:feature-imports failed:\n');
   for (const v of violations) {

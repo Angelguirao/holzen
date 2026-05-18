@@ -328,7 +328,7 @@ src/
   integrations/supabase/           # until adapters move to features/*/infrastructure
 ```
 
-Same dependency rules as §2–3 for layers that exist. `npm run check:feature-imports` enforces `domain/`, `application/`, and `ports/` rules under `src/features/**`.
+Same dependency rules as §2–3 for layers that exist. `npm run check:feature-imports` enforces layer rules under `src/features/**` and blocks deep `@/features/<ctx>/(application|infrastructure|domain|presentation)/` imports from active `src/hooks`, `src/pages`, `src/components`, and `src/test` (allowed: `public`, `public-queries`, `public-rpc`, plus RPC lib shims `apply-bulk-hold-outcomes` / `pause-ritual-depth-upgrade`).
 
 **`src/lib/*` shims (legacy + gradual removal):** re-export from `@/features/<ctx>/public` (domain/application, no Supabase) or `public-queries.ts` (TanStack + Supabase). RPC-heavy use cases (`applyBulkHoldOutcomes`, `logPauseRitualDepthUpgraded`) stay on narrow `application/` or `public-rpc` paths — not `public.ts` — so Vitest does not eager-load the Supabase client.
 

@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { buildOutcomeLoggedPayload } from '@/features/pause/application/use-cases/outcome-log-payload';
+import { buildOutcomeLoggedPayload } from '@/features/pause/public';
 
 describe('buildOutcomeLoggedPayload', () => {
   it('wraps the decision string', () => {

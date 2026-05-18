@@ -1,7 +1,7 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import type { TFunction } from 'i18next';
 import { toast } from 'sonner';
-import { showPauseFavoriteProHintToast } from '@/features/pause/application/feedback/favorite-toast';
+import { showPauseFavoriteProHintToast } from '@/features/pause/public';
 
 vi.mock('sonner', () => ({
   toast: vi.fn(),

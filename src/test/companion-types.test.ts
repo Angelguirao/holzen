@@ -7,7 +7,7 @@ import { describe, it, expect } from 'vitest';
 import {
   COMPANION_TYPES,
   FEEDBACK_TO_CACHE_TYPE,
-} from '@/features/pause/domain/companion-types';
+} from '@/features/pause/public';
 
 describe('COMPANION_TYPES', () => {
   it('has all expected companion types', () => {

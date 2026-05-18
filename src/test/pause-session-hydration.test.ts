@@ -4,11 +4,11 @@ import {
   DEFAULT_PREFS,
   type FetchedPauseInstance,
   type PersistedSession,
-} from '@/features/pause/domain/session-model';
+} from '@/features/pause/public';
 import {
   computePauseSessionHydration,
   computePauseSessionResolved,
-} from '@/features/pause/application/session/hydration';
+} from '@/features/pause/public';
 
 const holzenBase = {
   holzenMessage: null as string | null,

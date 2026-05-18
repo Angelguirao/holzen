@@ -1,10 +1,10 @@
 import { describe, it, expect } from 'vitest';
-import { type PersistedSession } from '@/features/pause/domain/session-model';
+import { type PersistedSession } from '@/features/pause/public';
 import {
   isTerminalPauseDbState,
   persistedPauseSessionAllowsTerminalEntry,
   TERMINAL_PAUSE_DB_STATES,
-} from '@/features/pause/application/session/terminal-entry-guard';
+} from '@/features/pause/public';
 
 describe('pause-terminal-entry-guard', () => {
   it('TERMINAL_PAUSE_DB_STATES matches product states', () => {
