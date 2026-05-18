@@ -1,13 +1,8 @@
 import { useMemo } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { useAuth } from '@/hooks/use-auth';
+import { isAdminFromEnvList } from '@/features/user/application/is-admin-env';
 import { getProfileRowQueryOptions } from '@/lib/profile-row-query';
-
-function isAdminFromEnvList(userId: string): boolean {
-  const ids = import.meta.env.VITE_ADMIN_USER_IDS as string | undefined;
-  if (!ids) return false;
-  return ids.split(',').some((s) => s.trim() === userId);
-}
 
 /**
  * Client-side admin gate for internal /ops pages (aligns with `profiles.is_admin` / RLS).
