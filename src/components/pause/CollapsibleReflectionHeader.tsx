@@ -2,7 +2,6 @@ import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ChevronDown, Heart } from 'lucide-react';
 import { ShareReflection } from '@/components/ShareReflection';
-import { ReflectionWallpaper } from '@/components/ReflectionWallpaper';
 import { hapticFeedback } from '@/lib/haptics';
 
 interface Props {
