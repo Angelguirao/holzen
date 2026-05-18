@@ -8,7 +8,7 @@ import {
   type PauseSessionHydrationState,
 } from '@/lib/pause-session-hydration';
 import { loadSession, type FetchedPauseInstance, type PersistedSession } from '@/lib/pause-session-storage';
-import { hasPersistedPauseSessionPayload } from '@/lib/pause-persisted-session';
+import { hasPersistedPauseSessionPayload } from '@/features/pause/application/session/persisted-session-guards';
 import type { PauseSessionNavParsed } from '@/lib/router-location-state';
 
 export type PauseSessionShellHolzen = {

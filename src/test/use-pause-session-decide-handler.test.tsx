@@ -14,7 +14,7 @@ const { pauseLogStepMock, clearSessionMock, invalidatePauseStatsMock } = vi.hois
   invalidatePauseStatsMock: vi.fn(),
 }));
 
-vi.mock('@/lib/pause-api', () => ({
+vi.mock('@/features/pause/public', () => ({
   pauseLogStep: (...args: unknown[]) => pauseLogStepMock(...args),
 }));
 
