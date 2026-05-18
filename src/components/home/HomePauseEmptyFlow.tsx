@@ -53,12 +53,13 @@ export function HomePauseEmptyFlow({
       ) : null}
 
       <div className={cn('border-t border-border/40 pt-3', zen && 'mx-auto w-full max-w-sm')}>
-        <NeedAMomentButton
-          onClick={onNeedPause}
-          cooldownRemaining={manualCooldownRemaining}
-          loading={pauseLoading}
-          className={zen ? 'mx-auto' : undefined}
-        />
+        <div className={zen ? 'mx-auto' : undefined}>
+          <NeedAMomentButton
+            onTrigger={onNeedPause}
+            cooldownRemaining={manualCooldownRemaining}
+            loading={pauseLoading}
+          />
+        </div>
       </div>
     </div>
   );
