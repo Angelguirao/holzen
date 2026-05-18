@@ -1,2 +1,2 @@
-/** @deprecated Import from `@/features/pause/application/session/initial-emotion-log`. */
-export * from '@/features/pause/application/session/initial-emotion-log';
+/** @deprecated Import from `@/features/pause/public`. */
+export * from '@/features/pause/public';

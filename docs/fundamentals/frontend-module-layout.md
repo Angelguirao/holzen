@@ -288,8 +288,8 @@ Use this when moving files. Paths are indicative — adjust to actual filenames 
 | `src/hooks/use-subscription.ts` | `packages/subscription` |
 | `src/hooks/use-auth.tsx` (re-export) | `features/auth/presentation/AuthProvider.tsx` → `packages/auth` |
 | `src/hooks/use-library.ts` | `packages/pause` queries (archive collections) |
-| `src/lib/pause-*.ts` | `packages/pause/domain` + `application` |
-| `src/lib/*-query.ts` | Owning context `queries/` or `packages/infrastructure` |
+| `src/lib/pause-*.ts`, `src/lib/companion-*.ts` | Thin re-exports → `features/pause/public` or `public-queries` (until legacy removed) |
+| `src/lib/*-query.ts` (subscription, market, user) | Re-exports → owning `features/*/public-queries` |
 | `src/lib/posthog.ts`, `sentry.ts`, `invoke-edge.ts`, `cid.ts` | `packages/infrastructure` or `shared-kernel` |
 | `src/components/pause/*`, `Companion*.tsx` | `apps/web/src/screens/pause/` |
 | `src/components/home/*` | `apps/web/src/screens/home/` |
@@ -329,6 +329,8 @@ src/
 ```
 
 Same dependency rules as §2–3 for layers that exist. `npm run check:feature-imports` enforces `domain/`, `application/`, and `ports/` rules under `src/features/**`.
+
+**`src/lib/*` shims (legacy + gradual removal):** re-export from `@/features/<ctx>/public` (domain/application, no Supabase) or `public-queries.ts` (TanStack + Supabase). RPC-heavy use cases (`applyBulkHoldOutcomes`, `logPauseRitualDepthUpgraded`) stay on narrow `application/` or `public-rpc` paths — not `public.ts` — so Vitest does not eager-load the Supabase client.
 
 ---
 

@@ -1,4 +1,4 @@
-/** @deprecated Import from `@/features/pause/infrastructure/reflect/reflection-artifact`. */
+/** @deprecated Import from `@/features/pause/public-queries`. */
 export {
   fetchOpeningMessageForPauseInstance,
   generateReflectionAtReflectStep,
@@ -6,4 +6,4 @@ export {
   type GenerateReflectionAtReflectParams,
   type GenerateReflectionAtReflectResult,
   type PersistReflectionArtifactsParams,
-} from '@/features/pause/infrastructure/reflect/reflection-artifact';
+} from '@/features/pause/public-queries';

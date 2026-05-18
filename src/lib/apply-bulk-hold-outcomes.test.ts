@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { applyBulkHoldOutcomes } from '@/features/pause/application/use-cases/apply-bulk-hold-outcomes';
-import type { BulkHoldPendingPause } from '@/features/pause/domain/bulk-hold';
+import type { BulkHoldPendingPause } from '@/features/pause/public';
 
 vi.mock('@/features/pause/infrastructure/pause-rpc-client', () => ({
   pauseLogStep: vi.fn(),

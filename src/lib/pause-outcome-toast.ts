@@ -1,5 +1,5 @@
-/** @deprecated Import from `@/features/pause/public` or `@/features/pause/application/feedback/outcome-toast`. */
+/** @deprecated Import from `@/features/pause/public` or `@/features/pause/public`. */
 export {
   showPauseOutcomeNotCompletedToast,
   showPauseOutcomeSaveFailedToast,
-} from '@/features/pause/application/feedback/outcome-toast';
+} from '@/features/pause/public';

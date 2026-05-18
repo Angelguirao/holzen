@@ -1,2 +1,2 @@
-/** @deprecated Import from `@/features/pause/domain/manual-pause-trigger-result`. */
-export * from '@/features/pause/domain/manual-pause-trigger-result';
+/** @deprecated Import from `@/features/pause/public`. */
+export * from '@/features/pause/public';

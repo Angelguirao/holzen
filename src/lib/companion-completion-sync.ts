@@ -1,4 +1,4 @@
-/** @deprecated Import from `@/features/pause/infrastructure/companion/companion-ui-completion-sync`. */
+/** @deprecated Import from `@/features/pause/public-queries`. */
 export {
   companionUiCompletionQueryKey,
   EMPTY_COMPANION_UI_COMPLETION,
@@ -7,4 +7,4 @@ export {
   persistCompanionUiStepCompletion,
   type CompanionUiCompletionState,
   type CompanionUiCompletionStep,
-} from '@/features/pause/infrastructure/companion/companion-ui-completion-sync';
+} from '@/features/pause/public-queries';

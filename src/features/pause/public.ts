@@ -146,7 +146,9 @@ export {
   ZOOM_OUT_DEFAULT_BODY_PLACEHOLDER,
   ZOOM_OUT_DEFAULT_LABEL,
   toZoomOutDisplayData,
+  zoomOutBodyPreviewFromJsonString,
   zoomOutLibraryAutosaveFromDisplayData,
+  zoomOutSaveThisMomentSeed,
   zoomOutTotalCharsForReadTime,
 } from './application/companion/zoom-out-payload';
 export {
@@ -249,6 +251,19 @@ export {
   type CompanionSlotRelaxations,
 } from './application/companion/orchestrate-slot-apply';
 export { buildPauseSessionScaffoldRitualPayloads } from './presentation/session/scaffold-ritual-payloads';
+export type { PauseSessionShellViewModel } from './application/session/shell-view-model';
+export { canAdvanceFromPauseStep } from './application/session/navigation';
+export { computeDeepRitualGoBackTarget } from './application/session/deep-go-back';
+export { hostnameFromUrl } from './application/companion/url';
+export { deriveBreathingUiCompleteFromPayloads } from './application/companion/breathing-ui-complete';
+export { ritualDepthUpgradedPayload } from './application/use-cases/ritual-depth-upgrade-payload';
+export {
+  PAUSE_QUERY_PREFIX,
+} from './application/queries/pause-query-namespace';
+export {
+  PAUSE_INSTANCE_QUERY_ROOT,
+  pauseInstanceQueryPrefix,
+} from './application/queries/pause-instance-query-prefix';
 export { buildShiftEmotionFrameHubLogBundle } from './application/session/shift-emotion-log';
 export {
   buildInitialEmotionLoggedPayload,

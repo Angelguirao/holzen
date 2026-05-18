@@ -1,5 +1,5 @@
-/** @deprecated Import from `@/features/pause/application/session/storage-ritual-sync`. */
+/** @deprecated Import from `@/features/pause/public`. */
 export {
   computePauseStorageRitualSyncPatch,
   type PauseStorageRitualSyncPatch,
-} from '@/features/pause/application/session/storage-ritual-sync';
+} from '@/features/pause/public';

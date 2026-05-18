@@ -23,10 +23,22 @@ export {
   trackedAssetSymbol,
   type TrackedAssetId,
 } from './domain/tracked-assets';
-export type { BtcPriceData, SupportedCurrency } from './domain/market-quote';
+export type {
+  BtcPriceData,
+  FearGreedData,
+  OnChainData,
+  SupportedCurrency,
+} from './domain/market-quote';
 export { SUPPORTED_CURRENCIES } from './domain/market-quote';
 export { formatBtcPrice } from './application/format-market-price';
-export { fetchMarketData } from './infrastructure/fetch-market-data';
+export {
+  fetchBtcData,
+  fetchMarketData,
+} from './infrastructure/fetch-market-data';
+export {
+  BREATHE_AMBIENT_BTC_QUERY_KEY,
+  getBreatheAmbientBtcQueryOptions,
+} from './infrastructure/queries/breathe-ambient-btc-query';
 export {
   getHolzenMarketDisplayQueryOptions,
   holzenMarketDisplayQueryKey,

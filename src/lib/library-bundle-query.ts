@@ -13,4 +13,4 @@ export {
   type CollectionMemberPause,
   type LibraryBundle,
   type LibraryListSortMode,
-} from '@/features/pause/infrastructure/queries/library-bundle-query';
+} from '@/features/pause/public-queries';

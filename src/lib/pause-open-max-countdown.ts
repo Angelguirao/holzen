@@ -1,2 +1,2 @@
-/** @deprecated Import from `@/features/pause/application/session/open-max-countdown`. */
-export * from '@/features/pause/application/session/open-max-countdown';
+/** @deprecated Import from `@/features/pause/public`. */
+export * from '@/features/pause/public';

@@ -1,2 +1,2 @@
-/** @deprecated Import from `@/features/pause/application/breathing/phase-advance`. */
-export * from '@/features/pause/application/breathing/phase-advance';
+/** @deprecated Import from `@/features/pause/public`. */
+export * from '@/features/pause/public';

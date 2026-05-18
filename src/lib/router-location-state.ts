@@ -5,7 +5,7 @@ export {
   type PauseSessionNavParsed,
   type PauseSeverity,
   parsePauseSessionLocationState,
-} from '@/features/pause/application/session/location-state';
+} from '@/features/pause/public';
 
 /** Pre-generated grounding card from Home → `/tools/ground`. */
 export interface GroundPreGenerated {

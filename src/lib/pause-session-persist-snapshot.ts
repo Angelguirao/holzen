@@ -1,5 +1,5 @@
-/** @deprecated Import from `@/features/pause/application/session/persist-snapshot`. */
+/** @deprecated Import from `@/features/pause/public`. */
 export {
   buildPauseSessionPersistSnapshot,
   type PauseSessionPersistSnapshotInput,
-} from '@/features/pause/application/session/persist-snapshot';
+} from '@/features/pause/public';

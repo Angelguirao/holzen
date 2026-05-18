@@ -1,2 +1,2 @@
-/** @deprecated Import from `@/features/pause/application/session/shell-view-model`. */
-export * from '@/features/pause/application/session/shell-view-model';
+/** @deprecated Import from `@/features/pause/public`. */
+export * from '@/features/pause/public';

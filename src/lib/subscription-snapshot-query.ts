@@ -1,4 +1,4 @@
-/** @deprecated Import from `@/features/subscription/infrastructure/queries/subscription-snapshot-query` or domain types from `@/features/subscription/domain/subscription-snapshot`. */
+/** @deprecated Import from `@/features/subscription/public-queries`. */
 export {
   fetchSubscriptionSnapshot,
   readSubCache,
@@ -6,9 +6,9 @@ export {
   SUBSCRIPTION_QUERY_PREFIX,
   subscriptionQueryKey,
   writeSubCache,
-} from '@/features/subscription/infrastructure/queries/subscription-snapshot-query';
+} from '@/features/subscription/public-queries';
 export type {
   SubCache,
   SubscriptionBillingInterval,
   SubscriptionSnapshot,
-} from '@/features/subscription/domain/subscription-snapshot';
+} from '@/features/subscription/public-queries';

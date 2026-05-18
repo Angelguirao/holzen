@@ -1,6 +1,6 @@
-/** @deprecated Import from `@/features/pause/infrastructure/reflect/load-reflect-recency-hints`. */
+/** @deprecated Import from `@/features/pause/public-queries`. */
 export {
   loadReflectRecencyHints,
   type ReflectMoodHistoryEntry,
   type ReflectRecencyHints,
-} from '@/features/pause/infrastructure/reflect/load-reflect-recency-hints';
+} from '@/features/pause/public-queries';

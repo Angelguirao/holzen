@@ -1,2 +1,2 @@
-/** @deprecated Import from `@/features/pause/application/session/mount-log-params`. */
-export * from '@/features/pause/application/session/mount-log-params';
+/** @deprecated Import from `@/features/pause/public`. */
+export * from '@/features/pause/public';

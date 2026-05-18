@@ -1,2 +1,2 @@
-/** @deprecated Import from `@/features/pause/public` or `@/features/pause/application/feedback/step-sync-toast`. */
-export { showPauseStepSyncFailedToast } from '@/features/pause/application/feedback/step-sync-toast';
+/** @deprecated Import from `@/features/pause/public` or `@/features/pause/public`. */
+export { showPauseStepSyncFailedToast } from '@/features/pause/public';

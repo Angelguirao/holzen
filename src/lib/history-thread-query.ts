@@ -1,4 +1,4 @@
-/** @deprecated Import from `@/features/pause/public` or `@/features/pause/infrastructure/queries/history-thread-query`. */
+/** @deprecated Import from `@/features/pause/public` or `@/features/pause/public-queries`. */
 export {
   HISTORY_THREAD_DISABLED_USER_ID,
   HISTORY_THREAD_NONE_QUERY_KEY,
@@ -7,4 +7,4 @@ export {
   getHistoryThreadQueryOptions,
   historyThreadQueryKey,
   type HistoryThreadRow,
-} from '@/features/pause/infrastructure/queries/history-thread-query';
+} from '@/features/pause/public-queries';

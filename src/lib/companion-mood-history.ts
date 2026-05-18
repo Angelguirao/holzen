@@ -1,2 +1,2 @@
-/** @deprecated Import from `@/features/pause/infrastructure/companion/mood-history`. */
-export * from '@/features/pause/infrastructure/companion/mood-history';
+/** @deprecated Import from `@/features/pause/public-queries`. */
+export * from '@/features/pause/public-queries';

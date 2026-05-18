@@ -1,2 +1,2 @@
-/** @deprecated Import from `@/features/pause/application/companion/breathing-ui-complete`. */
-export { deriveBreathingUiCompleteFromPayloads } from '@/features/pause/application/companion/breathing-ui-complete';
+/** @deprecated Import from `@/features/pause/public`. */
+export { deriveBreathingUiCompleteFromPayloads } from '@/features/pause/public';

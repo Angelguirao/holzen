@@ -4,4 +4,4 @@ export {
   fetchCoingeckoBtcUsd,
   getCoingeckoBtcUsdQueryOptions,
   prefetchCoingeckoBtcUsd,
-} from '@/features/market/infrastructure/queries/coingecko-btc-usd-query';
+} from '@/features/market/public';

@@ -123,3 +123,8 @@ export {
 } from './infrastructure/reflect/reflection-artifact';
 export { loadMoodHistoryForOrchestrate } from './infrastructure/companion/mood-history';
 export { loadActiveOrchestrateSources } from './infrastructure/companion/orchestrate-sources';
+export {
+  loadReflectRecencyHints,
+  type ReflectMoodHistoryEntry,
+  type ReflectRecencyHints,
+} from './infrastructure/reflect/load-reflect-recency-hints';
