@@ -1554,6 +1554,8 @@ export type Database = {
       }
       profiles: {
         Row: {
+          ai_insights_enabled: boolean
+          companion_breathing: boolean
           companion_grounding: boolean
           companion_haiku: boolean
           companion_history: boolean
@@ -1563,6 +1565,7 @@ export type Database = {
           created_at: string
           cumulative_threshold: number
           custom_prompt: string | null
+          digest_frequency: string
           email_notifications: boolean
           first_name: string | null
           grounding_activities: string[] | null
@@ -1580,14 +1583,18 @@ export type Database = {
           lifetime_access: boolean
           mantra: string | null
           motivations: string[] | null
+          night_reflection_hour: number | null
+          notify_badges: boolean
           quiet_hours_end: number | null
           quiet_hours_start: number | null
           referral_code: string
           referred_by: string | null
           reflection_style: string
           reflection_tone: string
+          ritual_template: string
           silent_mode: boolean
           snoozed_until: string | null
+          streak_freeze_dates: string[]
           subscription_checked_at: string | null
           subscription_end: string | null
           subscription_status: string
@@ -1600,6 +1607,8 @@ export type Database = {
           user_id: string
         }
         Insert: {
+          ai_insights_enabled?: boolean
+          companion_breathing?: boolean
           companion_grounding?: boolean
           companion_haiku?: boolean
           companion_history?: boolean
@@ -1609,6 +1618,7 @@ export type Database = {
           created_at?: string
           cumulative_threshold?: number
           custom_prompt?: string | null
+          digest_frequency?: string
           email_notifications?: boolean
           first_name?: string | null
           grounding_activities?: string[] | null
@@ -1626,14 +1636,18 @@ export type Database = {
           lifetime_access?: boolean
           mantra?: string | null
           motivations?: string[] | null
+          night_reflection_hour?: number | null
+          notify_badges?: boolean
           quiet_hours_end?: number | null
           quiet_hours_start?: number | null
           referral_code?: string
           referred_by?: string | null
           reflection_style?: string
           reflection_tone?: string
+          ritual_template?: string
           silent_mode?: boolean
           snoozed_until?: string | null
+          streak_freeze_dates?: string[]
           subscription_checked_at?: string | null
           subscription_end?: string | null
           subscription_status?: string
@@ -1646,6 +1660,8 @@ export type Database = {
           user_id: string
         }
         Update: {
+          ai_insights_enabled?: boolean
+          companion_breathing?: boolean
           companion_grounding?: boolean
           companion_haiku?: boolean
           companion_history?: boolean
@@ -1655,6 +1671,7 @@ export type Database = {
           created_at?: string
           cumulative_threshold?: number
           custom_prompt?: string | null
+          digest_frequency?: string
           email_notifications?: boolean
           first_name?: string | null
           grounding_activities?: string[] | null
@@ -1672,14 +1689,18 @@ export type Database = {
           lifetime_access?: boolean
           mantra?: string | null
           motivations?: string[] | null
+          night_reflection_hour?: number | null
+          notify_badges?: boolean
           quiet_hours_end?: number | null
           quiet_hours_start?: number | null
           referral_code?: string
           referred_by?: string | null
           reflection_style?: string
           reflection_tone?: string
+          ritual_template?: string
           silent_mode?: boolean
           snoozed_until?: string | null
+          streak_freeze_dates?: string[]
           subscription_checked_at?: string | null
           subscription_end?: string | null
           subscription_status?: string
