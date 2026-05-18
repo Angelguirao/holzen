@@ -19,9 +19,9 @@ import {
   persistCompanionUiStepCompletion,
   type CompanionUiCompletionStep,
   type CompanionUiCompletionState,
-} from '@/lib/companion-completion-sync';
-import { companionUiCompletionQueryKey } from '@/lib/companion-ui-completion-query-key';
-import { getCompanionUiCompletionQueryOptions } from '@/lib/companion-ui-completion-query';
+} from '@/features/pause/infrastructure/companion/companion-ui-completion-sync';
+import { companionUiCompletionQueryKey } from '@/features/pause/application/queries/companion-ui-completion-query-key';
+import { getCompanionUiCompletionQueryOptions } from '@/features/pause/infrastructure/queries/companion-ui-completion-query';
 import { loadMoodHistoryForOrchestrate } from '@/lib/companion-mood-history';
 import { loadActiveOrchestrateSources } from '@/lib/companion-orchestrate-sources';
 import { getRecencyHints } from '@/lib/companion-recency-hints';

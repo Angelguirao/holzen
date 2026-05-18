@@ -14,7 +14,7 @@ vi.mock('@/features/pause/public-rpc', () => ({
   pauseLogStep: (...args: unknown[]) => pauseLogStepMock(...args),
 }));
 
-vi.mock('@/lib/companion-ui-completion-query-key', () => ({
+vi.mock('@/features/pause/application/queries/companion-ui-completion-query-key', () => ({
   companionUiCompletionQueryKey: (id: string) => ['pause', 'companion-ui-completion', id] as const,
   invalidateCompanionUiCompletionQuery: (...args: unknown[]) =>
     invalidateCompanionUiCompletionQueryMock(...args),
