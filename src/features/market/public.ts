@@ -31,3 +31,7 @@ export {
   getHolzenMarketDisplayQueryOptions,
   holzenMarketDisplayQueryKey,
 } from './infrastructure/queries/holzen-market-display-query';
+export {
+  getCoingeckoBtcUsdQueryOptions,
+  prefetchCoingeckoBtcUsd,
+} from './infrastructure/queries/coingecko-btc-usd-query';

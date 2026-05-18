@@ -7,7 +7,7 @@ import { useQuery } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
 import { PageHeading } from '@/components/PageHeading';
 import { StateCard } from '@/components/ui/state-card';
-import { getCoingeckoBtcUsdQueryOptions } from '@/lib/coingecko-btc-usd-query';
+import { getCoingeckoBtcUsdQueryOptions } from '@/features/market/public';
 
 const fade = (delay = 0) => ({
   initial: { opacity: 0, y: 14 },

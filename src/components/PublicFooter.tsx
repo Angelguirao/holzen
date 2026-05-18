@@ -2,7 +2,7 @@ import { Link } from 'react-router-dom';
 import { useQueryClient } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
 import { Twitter } from 'lucide-react';
-import { prefetchCoingeckoBtcUsd } from '@/lib/coingecko-btc-usd-query';
+import { prefetchCoingeckoBtcUsd } from '@/features/market/public';
 import { prefetchBlogPublishedFirstPage } from '@/lib/blog-post-query';
 
 export function PublicFooter() {
