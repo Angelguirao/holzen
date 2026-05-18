@@ -1,5 +1,5 @@
 import type { CompanionData, CompanionPrefs } from '@/components/CompanionSection';
-import type { PauseSessionHydrationReady } from '@/lib/pause-session-hydration';
+import type { PauseSessionHydrationReady } from '@/features/pause/application/session/hydration';
 import { DEFAULT_COMPANIONS, DEFAULT_PREFS } from '@/lib/pause-session-storage';
 
 /**

@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import type { PauseSessionHydrationReady } from '@/lib/pause-session-hydration';
+import type { PauseSessionHydrationReady } from '@/features/pause/application/session/hydration';
 import { coalescePauseSessionShellViewModel } from '@/lib/pause-session-shell-view-model';
 import { DEFAULT_COMPANIONS, DEFAULT_PREFS } from '@/lib/pause-session-storage';
 

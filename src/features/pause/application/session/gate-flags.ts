@@ -1,5 +1,5 @@
 import type { FetchedPauseInstance, RitualDepth } from '@/lib/pause-session-storage';
-import type { PauseSessionHydrationState } from '@/lib/pause-session-hydration';
+import type { PauseSessionHydrationState } from '@/features/pause/application/session/hydration';
 
 /**
  * Pure predicates for `/pause` gate UI: spinner while fetching instance by id, vs depth picker when
