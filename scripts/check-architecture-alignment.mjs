@@ -48,8 +48,11 @@ if (!pkg.includes('check:feature-imports')) {
   failures.push('package.json must define check:feature-imports');
 }
 const testCi = pkg.match(/"test:ci"\s*:\s*"([^"]+)"/)?.[1] ?? '';
-if (!testCi.includes('check:feature-imports')) {
-  failures.push('test:ci must run check:feature-imports');
+if (
+  !testCi.includes('check:architecture-alignment') &&
+  !testCi.includes('check:feature-imports')
+) {
+  failures.push('test:ci must run check:architecture-alignment (or check:feature-imports)');
 }
 
 if (failures.length) {

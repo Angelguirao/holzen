@@ -15,7 +15,7 @@
     "test": "vitest run",
     "test:legacy": "vitest run src/test/legacy",
     "test:watch": "vitest",
-    "test:ci": "npm run check:edge-logging && npm run check:edge-coverage-manifest && npm run check:active-surface && npm run check:no-phase-labels && npm run check:invoke-edge-allowlist && npm run check:bundle-shipped && npm run check:bruno-active-manifest && npm run check:posthog-events-allowlist && npm run check:feature-imports && vitest run --coverage --reporter=default --reporter=junit --outputFile.junit=./coverage/junit.xml",
+    "test:ci": "npm run check:edge-logging && npm run check:edge-coverage-manifest && npm run check:active-surface && npm run check:no-phase-labels && npm run check:invoke-edge-allowlist && npm run check:bundle-shipped && npm run check:bruno-active-manifest && npm run check:posthog-events-allowlist && npm run check:architecture-alignment && vitest run --coverage --reporter=default --reporter=junit --outputFile.junit=./coverage/junit.xml",
     "test:coverage": "vitest run --coverage",
     "check:edge": "node scripts/check-edge.mjs",
     "check:edge-logging": "node scripts/check-edge-logging.mjs",
