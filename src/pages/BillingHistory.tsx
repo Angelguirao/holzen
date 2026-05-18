@@ -3,9 +3,9 @@ import { useQuery } from '@tanstack/react-query';
 import { Link } from 'react-router-dom';
 import { ArrowLeft, RefreshCw, Check, Clock, Minus } from 'lucide-react';
 import {
-  type CheckoutEvent,
   getCheckoutEventsQueryOptions,
-} from '@/lib/checkout-events-query';
+  type CheckoutEvent,
+} from '@/features/subscription/public';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
 import { toast } from 'sonner';

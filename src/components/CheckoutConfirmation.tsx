@@ -13,7 +13,7 @@ import { Button } from '@/components/ui/button';
 import { LoadingSpinner } from '@/components/ui/loading-spinner';
 import { useSubscription } from '@/hooks/use-subscription';
 import { PRICING } from '@/lib/pricing';
-import { fetchCheckoutEvents } from '@/lib/checkout-events-query';
+import { fetchCheckoutEvents } from '@/features/subscription/public';
 import { invokeEdge } from '@/lib/invoke-edge';
 import { toast } from 'sonner';
 import {
