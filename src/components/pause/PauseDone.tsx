@@ -18,6 +18,7 @@ import { trackEvent } from '@/lib/posthog';
 import { isPauseMoodValue, buildPostPauseEmotionLoggedPayload } from '@/lib/pause-post-pause-emotion-log';
 import { pauseLogStep } from '@/lib/pause-api';
 import { showPauseStepSyncFailedToast } from '@/lib/pause-step-sync-toast';
+import { useSubscription } from '@/hooks/use-subscription';
 
 interface PauseData {
   mood: string | null;
@@ -97,6 +98,7 @@ export function PauseDone({
   pauseInstanceId,
 }: Props) {
   const { t } = useTranslation();
+  const { subscribed } = useSubscription();
 
   const [briefDoneMood, setBriefDoneMood] = useState<MoodValue | null>(null);
   const [briefDoneIntensity, setBriefDoneIntensity] = useState(3);
