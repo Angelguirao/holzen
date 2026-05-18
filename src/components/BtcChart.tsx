@@ -7,7 +7,7 @@ import { formatBtcPrice } from '@/features/market/public';
 import {
   getCoingeckoMarketChartQueryOptions,
   type CoingeckoMarketChartPoint,
-} from '@/lib/coingecko-market-chart-query';
+} from '@/features/market/public';
 import { ErrorRetry } from '@/components/ErrorRetry';
 
 interface Props {

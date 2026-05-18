@@ -47,3 +47,7 @@ export {
   getCoingeckoBtcUsdQueryOptions,
   prefetchCoingeckoBtcUsd,
 } from './infrastructure/queries/coingecko-btc-usd-query';
+export {
+  getCoingeckoMarketChartQueryOptions,
+  type CoingeckoMarketChartPoint,
+} from './infrastructure/queries/coingecko-market-chart-query';
