@@ -15,7 +15,7 @@ import {
 import { PageMeta } from '@/components/PageMeta';
 import { LandingTestimonials } from '@/components/LandingTestimonials';
 import { LandingLanguageSwitcher } from '@/components/LandingLanguageSwitcher';
-import { PRICING } from '@/lib/pricing';
+import { PRICING } from '@/features/subscription/public';
 import { prefetchCoingeckoBtcUsd } from '@/features/market/public';
 import { prefetchBlogPublishedFirstPage } from '@/lib/blog-post-query';
 

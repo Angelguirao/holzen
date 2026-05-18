@@ -2,7 +2,7 @@ import { Link } from 'react-router-dom';
 import { QuietWindowsManager } from '@/components/QuietWindowsManager';
 import { SourceManagement } from '@/components/SourceManagement';
 import { ProLock } from '@/components/ProLock';
-import { PRICING } from '@/lib/pricing';
+import { PRICING } from '@/features/subscription/public';
 import { ThresholdSetting } from '@/components/ThresholdSetting';
 import { ReferralSection } from '@/components/ReferralSection';
 import { CreditsDashboard } from '@/components/CreditsDashboard';

@@ -7,16 +7,16 @@ import { useAuth } from '@/hooks/use-auth';
 import { holzenLog } from '@/lib/holzen-console';
 import { getCheckoutSuppressionWindowMs } from '@/features/subscription/public';
 import {
-  fetchSubscriptionSnapshot,
-  readSubCache,
-  subscriptionQueryKey,
-} from '@/features/subscription/infrastructure/queries/subscription-snapshot-query';
-import type { SubscriptionSnapshot } from '@/features/subscription/domain/subscription-snapshot';
-import {
   canEngagePauseFromEntitlement,
   deriveEntitlement,
   type Entitlement,
+  type SubscriptionSnapshot,
 } from '@/features/subscription/public';
+import {
+  fetchSubscriptionSnapshot,
+  readSubCache,
+  subscriptionQueryKey,
+} from '@/features/subscription/public-queries';
 import { trackEvent } from '@/lib/posthog';
 
 const CHECKOUT_RETURN_KEY = 'holzen_checkout_started_at';

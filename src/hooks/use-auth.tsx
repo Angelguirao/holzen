@@ -6,11 +6,9 @@ import { holzenLog } from '@/lib/holzen-console';
 import { setSentryUser } from '@/lib/sentry';
 import { identifyPostHog, resetPostHog, trackEvent } from '@/lib/posthog';
 
-interface AuthContextType {
-  user: User | null;
-  loading: boolean;
-  signOut: () => Promise<void>;
-}
+import type { AuthSessionState } from '@/features/auth/public';
+
+type AuthContextType = AuthSessionState;
 
 interface UntypedInsertClient {
   from: (table: string) => {

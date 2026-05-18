@@ -1,7 +1,7 @@
 import { Lock, Sparkles, ArrowRight } from 'lucide-react';
 import { useProGate } from '@/hooks/use-pro-gate';
 import { useTranslation } from 'react-i18next';
-import type { ProFeature } from '@/lib/pricing';
+import type { ProFeature } from '@/features/subscription/public';
 
 interface Props {
   children: React.ReactNode;

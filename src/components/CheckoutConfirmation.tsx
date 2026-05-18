@@ -12,8 +12,8 @@ import {
 import { Button } from '@/components/ui/button';
 import { LoadingSpinner } from '@/components/ui/loading-spinner';
 import { useSubscription } from '@/hooks/use-subscription';
-import { PRICING } from '@/lib/pricing';
-import { fetchCheckoutEvents } from '@/features/subscription/public';
+import { PRICING } from '@/features/subscription/public';
+import { fetchCheckoutEvents } from '@/features/subscription/public-queries';
 import { invokeEdge } from '@/lib/invoke-edge';
 import { toast } from 'sonner';
 import {

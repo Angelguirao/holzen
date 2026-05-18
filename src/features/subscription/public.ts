@@ -30,7 +30,4 @@ export type {
   SubscriptionSnapshot,
 } from './domain/subscription-snapshot';
 export type { CheckoutEvent } from './domain/checkout-event';
-export {
-  fetchCheckoutEvents,
-  getCheckoutEventsQueryOptions,
-} from './infrastructure/queries/checkout-events-query';
+export { PRICING, PRO_FEATURES, type ProFeature } from './domain/pricing';
