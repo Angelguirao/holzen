@@ -342,7 +342,7 @@ Same dependency rules as §2–3 for layers that exist. `npm run check:feature-i
 | **1** | Migrate **pause** domain + use cases into `src/features/pause/` (small PRs) | Pause E2E green; companions under `application/companion/` |
 | **2** | `subscription`, `market`, `user`, `auth` features + shrink root `hooks/`/`lib/` | Cross-feature: `public.ts` only; app hooks may use `public-queries.ts` where queries need Supabase |
 | **3** | Optional `src/features/*/infrastructure` adapters; keep Supabase types in `integrations/` until needed | Adapter tests |
-| **4** | Remove `src/legacy` from main | `check:active-surface` |
+| **4** | `src/legacy` off main runtime path | **Done (transitional):** `tsconfig.app.json` + Vitest exclude `src/legacy/**`; `check:active-surface` blocks `@/legacy/*` in active tree; folder kept for `archive/full-ia-pre-strip` recovery only. Physical delete is optional / separate archive PR. |
 | **5** | **Gated:** `pnpm-workspace.yaml`, `apps/web`, `packages/*` extract | Only after ADR §8 trigger; `build` from `apps/web` |
 | **6** | `shared-kernel`, `contracts` (minimal), `packages/infrastructure` | Adapter smoke test |
 | **7+** | Screens move to `apps/web`; `check:package-boundaries` | Post-extraction only |
