@@ -14,7 +14,7 @@ import { pauseStepLayout } from '@/components/pause/pause-step-layout';
 import { Button } from '@/components/ui/button';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import { hapticFeedback } from '@/lib/haptics';
-import { fetchHaikuTextForPauseInstance } from '@/features/pause/infrastructure/queries/haiku-artifact-query';
+import { fetchHaikuTextForPauseInstance } from '@/features/pause/public-queries';
 import { cn } from '@/lib/utils';
 
 export interface PauseFrameProps {

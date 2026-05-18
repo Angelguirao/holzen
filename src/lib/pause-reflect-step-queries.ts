@@ -1,4 +1,4 @@
-/** @deprecated Import from `@/features/pause/infrastructure/queries/reflect-step-query`. */
+/** @deprecated Import from `@/features/pause/public-queries`. */
 export {
   fetchLatestPauseReflectStep,
   getLatestPauseReflectNoteQueryOptions,
@@ -11,4 +11,4 @@ export {
   tagsFromReflectRow,
   type PauseReflectStepLatestRow,
   type PauseReflectStepType,
-} from '@/features/pause/infrastructure/queries/reflect-step-query';
+} from '@/features/pause/public-queries';

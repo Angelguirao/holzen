@@ -1,4 +1,4 @@
-/** @deprecated Import from `@/features/pause/infrastructure/queries/archive-list-query` or `@/features/pause/public`. */
+/** @deprecated Import from `@/features/pause/public-queries`. */
 export {
   fetchPauseArchivePage,
   getPauseArchiveInfiniteQueryDefaults,
@@ -10,4 +10,4 @@ export {
   type PauseArchiveListSort,
   type PauseArchiveRow,
   type PauseArchiveSegment,
-} from '@/features/pause/infrastructure/queries/archive-list-query';
+} from '@/features/pause/public-queries';

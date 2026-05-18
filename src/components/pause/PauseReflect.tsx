@@ -11,7 +11,7 @@ import { Button } from '@/components/ui/button';
 import { trackEvent } from '@/lib/posthog';
 import { pauseLogStep } from '@/features/pause/public-rpc';
 import { hapticFeedback } from '@/lib/haptics';
-import { fetchHaikuTextForPauseInstance } from '@/features/pause/infrastructure/queries/haiku-artifact-query';
+import { fetchHaikuTextForPauseInstance } from '@/features/pause/public-queries';
 import { cn } from '@/lib/utils';
 
 interface Props {
