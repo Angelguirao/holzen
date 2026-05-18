@@ -1,7 +1,7 @@
 import { useEffect, type Dispatch, type SetStateAction } from 'react';
 import type { FeelStepTile } from '@/components/pause/pause-feel-types';
-import { computePauseStorageRitualSyncPatch } from '@/features/pause/application/session/storage-ritual-sync';
-import { type BriefPauseStep, type RitualDepth } from '@/features/pause/domain/ritual-types';
+import { computePauseStorageRitualSyncPatch } from '@/features/pause/public';
+import { type BriefPauseStep, type RitualDepth } from '@/features/pause/public';
 import { loadSession } from '@/features/pause/public';
 
 /**

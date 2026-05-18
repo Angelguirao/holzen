@@ -14,15 +14,16 @@ vi.mock('@/features/pause/public-rpc', () => ({
   pauseLogStep: (...args: unknown[]) => pauseLogStepMock(...args),
 }));
 
-vi.mock('@/features/pause/application/queries/companion-ui-completion-query-key', () => ({
-  companionUiCompletionQueryKey: (id: string) => ['pause', 'companion-ui-completion', id] as const,
-  invalidateCompanionUiCompletionQuery: (...args: unknown[]) =>
-    invalidateCompanionUiCompletionQueryMock(...args),
-}));
-
-vi.mock('@/features/pause/public', () => ({
-  showPauseStepSyncFailedToast: vi.fn(),
-}));
+vi.mock('@/features/pause/public', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('@/features/pause/public')>();
+  return {
+    ...actual,
+    showPauseStepSyncFailedToast: vi.fn(),
+    companionUiCompletionQueryKey: (id: string) => ['pause', 'companion-ui-completion', id] as const,
+    invalidateCompanionUiCompletionQuery: (...args: unknown[]) =>
+      invalidateCompanionUiCompletionQueryMock(...args),
+  };
+});
 
 const t = ((k: string) => k) as TFunction;
 

@@ -6,8 +6,8 @@ import { PauseRitualFeelStep } from '@/components/pause/PauseRitualFeelStep';
 import type { FeelStepTile } from '@/components/pause/pause-feel-types';
 import { PauseBriefIntegrate } from '@/components/pause/PauseBriefIntegrate';
 import { PauseDecide } from '@/components/pause/PauseDecide';
-import type { PauseSessionStepTransitionConfig } from '@/features/pause/application/session/step-transition';
-import { type BriefPauseStep } from '@/features/pause/domain/ritual-types';
+import type { PauseSessionStepTransitionConfig } from '@/features/pause/public';
+import { type BriefPauseStep } from '@/features/pause/public';
 
 export type PauseSessionBriefRitualBodyProps = {
   briefStep: BriefPauseStep;

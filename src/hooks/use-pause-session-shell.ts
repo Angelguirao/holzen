@@ -6,10 +6,10 @@ import {
   computePauseSessionResolved,
   type PauseSessionHydrationReady,
   type PauseSessionHydrationState,
-} from '@/features/pause/application/session/hydration';
-import { hasPersistedPauseSessionPayload } from '@/features/pause/application/session/persisted-session-guards';
+} from '@/features/pause/public';
+import { hasPersistedPauseSessionPayload } from '@/features/pause/public';
 import type { PauseSessionNavParsed } from '@/features/pause/public';
-import { type FetchedPauseInstance, type PersistedSession } from '@/features/pause/domain/session-model';
+import { type FetchedPauseInstance, type PersistedSession } from '@/features/pause/public';
 import { loadSession } from '@/features/pause/public';
 
 export type PauseSessionShellHolzen = {

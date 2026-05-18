@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { formatPauseOpenMaxRemaining, pauseOpenMaxDeadlineMs } from '@/features/pause/application/session/open-max-countdown';
+import { formatPauseOpenMaxRemaining, pauseOpenMaxDeadlineMs } from '@/features/pause/public';
 
 type Props = {
   engagedAtIso: string;

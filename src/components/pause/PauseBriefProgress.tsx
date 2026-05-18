@@ -1,7 +1,7 @@
 import { useTranslation } from 'react-i18next';
-import { BRIEF_PAUSE_ORDER } from '@/features/pause/application/brief-ritual/brief-pause-order';
+import { BRIEF_PAUSE_ORDER } from '@/features/pause/public';
 import { cn } from '@/lib/utils';
-import { type BriefPauseStep } from '@/features/pause/domain/ritual-types';
+import { type BriefPauseStep } from '@/features/pause/public';
 
 interface Props {
   currentStep: BriefPauseStep;

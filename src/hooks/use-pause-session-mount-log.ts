@@ -1,12 +1,12 @@
 import { useEffect } from 'react';
 import { holzenLog } from '@/lib/holzen-console';
-import type { PauseSessionMountLogParams } from '@/features/pause/application/session/mount-log-params';
+import type { PauseSessionMountLogParams } from '@/features/pause/public';
 
 /**
  * One-shot dev diagnostic when `/pause` mounts. Arguments are read from the **first** render only
  * (empty dependency array); matches prior inline `PauseSession` behavior.
  *
- * **Call site:** pass `buildPauseSessionMountLogParams(...)` from `@/features/pause/application/session/mount-log-params`
+ * **Call site:** pass `buildPauseSessionMountLogParams(...)` from `@/features/pause/public`
  * so restore + nav + hydration wiring stays in one place.
  *
  * **Observability:** `docs/ops/logging-strategy.md` (browser Holzen console / `[holzen:pause]`). Payload

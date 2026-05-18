@@ -1,11 +1,11 @@
 import { useCallback, useEffect, useRef, type MutableRefObject } from 'react';
 import type { TFunction } from 'i18next';
-import { invalidateCompanionUiCompletionQuery } from '@/features/pause/application/queries/companion-ui-completion-query-key';
+import { invalidateCompanionUiCompletionQuery } from '@/features/pause/public';
 import { pauseLogStep } from '@/features/pause/public-rpc';
-import { breathCompletedSegment1Payload, breathCompletedSegment2Payload } from '@/features/pause/application/breathing/breath-completed-payload';
-import { initialBreathSegmentRpcLoggedFlagsFromRestored } from '@/features/pause/application/session/step-map';
+import { breathCompletedSegment1Payload, breathCompletedSegment2Payload } from '@/features/pause/public';
+import { initialBreathSegmentRpcLoggedFlagsFromRestored } from '@/features/pause/public';
 import { showPauseStepSyncFailedToast } from '@/features/pause/public';
-import { type PersistedSession } from '@/features/pause/domain/session-model';
+import { type PersistedSession } from '@/features/pause/public';
 
 /**
  * Dedupes `breath_completed` RPCs for deep + brief breath segments and resets when `pauseInstanceId` changes.

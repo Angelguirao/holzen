@@ -9,19 +9,19 @@ import { hapticFeedback } from '@/lib/haptics';
 import {
   computeBreathingPhaseAdvance,
   resolveBreathingCompleted,
-} from '@/features/pause/application/breathing/phase-advance';
+} from '@/features/pause/public';
 import {
   holdProgressWithinPhase,
   resolveBreathCycleTotal,
   resolvePauseBreathingPhases,
   rotatingKickerIndexFromElapsed,
   secondsIntoTrianglePattern,
-} from '@/features/pause/application/breathing/ritual-pattern';
+} from '@/features/pause/public';
 import {
   playPauseBreathPatternCompleteCue,
   playPauseBreathPhaseCue,
   resumePauseAudioContext,
-} from '@/features/pause/application/breathing/ritual-audio';
+} from '@/features/pause/public';
 import { BreathOrbVisual } from '@/components/pause/breath-orb-visual';
 
 const EXPAND_KEYS = ['breathing.phases.inhale', 'breathing.phases.sip'];

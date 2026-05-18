@@ -3,8 +3,8 @@ import { motion } from 'framer-motion';
 import { TrendingUp, Minus } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { cn } from '@/lib/utils';
-import type { PauseImpactData } from '@/features/pause/application/use-cases/impact-data';
-import { buildPauseScoreImpacts } from '@/features/pause/application/use-cases/score-impacts';
+import type { PauseImpactData } from '@/features/pause/public';
+import { buildPauseScoreImpacts } from '@/features/pause/public';
 
 export function ScoreImpact({
   data,

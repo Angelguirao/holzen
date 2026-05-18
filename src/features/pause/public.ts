@@ -157,6 +157,112 @@ export {
   parsePauseSessionLocationState,
 } from './application/session/location-state';
 export {
+  computePauseHeaderBackIntent,
+  isPauseSessionHeaderBackVisible,
+} from './application/session/header-back';
+export { briefSwitchToDeepPauseState } from './application/session/brief-switch-to-deep';
+export {
+  mapPersistedStep,
+  initialRitualEntry,
+  initialBriefPauseStepFromRestored,
+  initialBriefIntegrateDoneFromRestored,
+  initialSelectedBriefFaceFromRestored,
+  initialPhaseFromRestored,
+  initialDecisionFromRestored,
+  initialBreathingFirstCompletedFromRestored,
+  initialBreathingSecondCompletedFromRestored,
+  initialFrameDoneFromRestored,
+  initialBreathSegmentRpcLoggedFlagsFromRestored,
+} from './application/session/step-map';
+export { coalescePauseSessionShellViewModel } from './application/session/shell-view-model';
+export {
+  isPauseSessionDepthPickerActive,
+  isPauseSessionWaitingForInstanceFetch,
+} from './application/session/gate-flags';
+export {
+  computePauseSessionHydration,
+  computePauseSessionResolved,
+  type PauseSessionHydrationInput,
+  type PauseSessionHydrationReady,
+  type PauseSessionHydrationState,
+  type PauseSessionResolvedInput,
+} from './application/session/hydration';
+export { buildPauseSessionScaffoldRitualDerived } from './application/session/scaffold-ritual-derived';
+export {
+  buildPauseSessionMountLogParams,
+  type PauseSessionMountLogParams,
+} from './application/session/mount-log-params';
+export {
+  buildPauseSessionPersistSnapshot,
+  type PauseSessionPersistSnapshotInput,
+} from './application/session/persist-snapshot';
+export { computePauseGoBackPlan } from './application/session/go-back-plan';
+export { pauseStepSwipeDirection } from './application/session/step-swipe-direction';
+export {
+  buildPauseSessionStepTransitionConfig,
+  PAUSE_SESSION_STEP_SLIDE_OFFSET_PX,
+  PAUSE_SESSION_STEP_TRANSITION_DURATION_REDUCED_S,
+  PAUSE_SESSION_STEP_TRANSITION_DURATION_S,
+  PAUSE_SESSION_STEP_TRANSITION_EASE,
+  type PauseSessionStepTransitionConfig,
+  type PauseSessionSwipeDirection,
+} from './application/session/step-transition';
+export {
+  isPauseMoodValue,
+  buildPostPauseEmotionLoggedPayload,
+} from './application/session/post-pause-emotion-log';
+export { buildPauseScoreImpacts } from './application/use-cases/score-impacts';
+export {
+  breathCompletedSegment1Payload,
+  breathCompletedSegment2Payload,
+} from './application/breathing/breath-completed-payload';
+export {
+  holdProgressWithinPhase,
+  resolveBreathCycleTotal,
+  resolvePauseBreathingPhases,
+  rotatingKickerIndexFromElapsed,
+  secondsIntoTrianglePattern,
+} from './application/breathing/ritual-pattern';
+export {
+  playPauseBreathPatternCompleteCue,
+  playPauseBreathPhaseCue,
+  resumePauseAudioContext,
+  startPauseReflectFrameFocusAmbience,
+  stopPauseReflectFrameFocusAmbience,
+} from './application/breathing/ritual-audio';
+export { getRecencyHints } from './application/companion/recency-hints';
+export { trackCompanionServed } from './application/companion/analytics';
+export {
+  companionUiCompletionQueryKey,
+  invalidateCompanionUiCompletionQuery,
+} from './application/queries/companion-ui-completion-query-key';
+export {
+  applyOrchestrateSlotLazyOrRegenerate,
+  EMPTY_COMPANION_SLOT_RELAXATIONS,
+  hydrateOrchestrateSlotIfNew,
+  isFilledOrchestrateSlot,
+  readOrchestrateSlotBody,
+  type CompanionSlotAutosaveParams,
+  type CompanionSlotCacheIds,
+  type CompanionSlotCommitters,
+  type CompanionSlotRelaxationUi,
+  type CompanionSlotRelaxations,
+} from './application/companion/orchestrate-slot-apply';
+export { buildPauseSessionScaffoldRitualPayloads } from './presentation/session/scaffold-ritual-payloads';
+export { buildShiftEmotionFrameHubLogBundle } from './application/session/shift-emotion-log';
+export {
+  buildInitialEmotionLoggedPayload,
+  initialEmotionLogDedupeKey,
+  initialEmotionSkippedLogDedupeKey,
+  initialEmotionSkippedLoggedPayload,
+  type InitialEmotionLogOpts,
+} from './application/session/initial-emotion-log';
+export {
+  formatPauseOpenMaxRemaining,
+  pauseOpenMaxDeadlineMs,
+  PAUSE_OPEN_MAX_AGE_MS,
+} from './application/session/open-max-countdown';
+export {
   collectStepTypes,
   computePauseState,
   countedCompanionCount,

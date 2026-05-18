@@ -9,7 +9,7 @@ import {
   initialEmotionLogDedupeKey,
   initialEmotionSkippedLogDedupeKey,
   initialEmotionSkippedLoggedPayload,
-} from '@/features/pause/application/session/initial-emotion-log';
+} from '@/features/pause/public';
 import { showPauseStepSyncFailedToast } from '@/features/pause/public';
 
 export function usePauseSessionInitialMoodHandlers(input: {
