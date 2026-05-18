@@ -23,7 +23,7 @@ import {
   isHolzenDevMode,
 } from '@/features/market/public';
 import { normalizeTrackedAssetId, trackedAssetSymbol } from '@/lib/tracked-assets';
-import { severityFromBtcChangePercent } from '@/lib/btc-move-severity';
+import { severityFromBtcChangePercent } from '@/features/market/public';
 import { millisecondsUntilNextQuarterHour } from '@/lib/next-cron-quarter';
 import {
   bucketChangePercent,
