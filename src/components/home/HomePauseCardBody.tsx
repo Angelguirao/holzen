@@ -12,7 +12,7 @@ import { cn } from '@/lib/utils';
 import { shouldSurfacePauseWidgetError } from '@/lib/home-pause-widget-error';
 import type { BtcPriceData } from '@/lib/btc';
 import { usePendingPauseOffer } from '@/hooks/use-pending-pause-offer';
-import type { Entitlement } from '@/lib/subscription-entitlement';
+import type { Entitlement } from '@/features/subscription/public';
 
 interface HomePauseCardBodyProps {
   subLoading: boolean;

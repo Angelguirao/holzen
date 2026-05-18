@@ -17,22 +17,25 @@ import { useProfile } from '@/hooks/use-profile';
 import type { CompanionData } from '@/components/CompanionSection';
 import { holzenLog } from '@/lib/holzen-console';
 import { reflectionPersistErrorMessage } from '@/lib/reflection-persist-error';
-import { getManualReflectionCooldownMs, isHolzenDevMode } from '@/lib/holzen-manual-cooldown';
-import { buildPauseContextFromMarket } from '@/lib/pause-context-from-btc';
+import {
+  buildPauseContextFromMarket,
+  getManualReflectionCooldownMs,
+  isHolzenDevMode,
+} from '@/features/market/public';
 import { normalizeTrackedAssetId, trackedAssetSymbol } from '@/lib/tracked-assets';
 import { severityFromBtcChangePercent } from '@/lib/btc-move-severity';
 import { millisecondsUntilNextQuarterHour } from '@/lib/next-cron-quarter';
-import { pauseCreateOrReuse } from '@/lib/pause-api';
-import { pauseCreateSkippedUserMessage } from '@/lib/pause-create-skipped-message';
 import {
   bucketChangePercent,
   computeContextFingerprint,
-} from '@/lib/pause-fingerprint';
+  pauseCreateOrReuse,
+  pauseCreateSkippedUserMessage,
+} from '@/features/pause/public';
 import { trackEvent } from '@/lib/posthog';
 import {
   MANUAL_PAUSE_TRIGGER_IDLE,
   type ManualPauseTriggerResult,
-} from '@/lib/manual-pause-trigger-result';
+} from '@/features/pause/public';
 import { clearSession } from '@/lib/pause-session-storage';
 
 const PAUSE_MANUAL_START_HOME = 'holzen_sess_pause_manual_started_home';

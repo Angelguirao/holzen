@@ -1,7 +1,7 @@
 import type { ReactNode } from 'react';
 import { useMemo } from 'react';
 import { HomePauseCardBody } from '@/components/home/HomePauseCardBody';
-import type { Entitlement } from '@/lib/subscription-entitlement';
+import type { Entitlement } from '@/features/subscription/public';
 import { SnoozeToolbarControl } from '@/components/SnoozeControl';
 import type { BtcPriceData } from '@/lib/btc';
 import type { ManualPauseTriggerResult } from '@/lib/manual-pause-trigger-result';

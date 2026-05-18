@@ -16,7 +16,7 @@ import {
   canEngagePauseFromEntitlement,
   deriveEntitlement,
   type Entitlement,
-} from '@/lib/subscription-entitlement';
+} from '@/features/subscription/public';
 import { trackEvent } from '@/lib/posthog';
 
 const CHECKOUT_RETURN_KEY = 'holzen_checkout_started_at';
@@ -35,7 +35,7 @@ type SubFetchSource = 'mount' | 'manual_retry' | 'focus' | 'interval' | 'invalid
 let subscriptionNextFetchSource: SubFetchSource | null = null;
 
 export type { SubscriptionBillingInterval } from '@/lib/subscription-snapshot-query';
-export type { Entitlement } from '@/lib/subscription-entitlement';
+export type { Entitlement } from '@/features/subscription/public';
 
 function checkoutReturnWantsForce(): boolean {
   const params = new URLSearchParams(window.location.search);

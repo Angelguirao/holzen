@@ -3,7 +3,7 @@ import { motion } from 'framer-motion';
 import { Sparkles } from 'lucide-react';
 import { LoadingButton } from '@/components/ui/loading-button';
 import { PRICING } from '@/lib/pricing';
-import type { Entitlement } from '@/lib/subscription-entitlement';
+import type { Entitlement } from '@/features/subscription/public';
 
 type Props = {
   entitlement: Entitlement;

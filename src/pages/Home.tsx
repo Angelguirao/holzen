@@ -25,7 +25,7 @@ import { useHomeMarketGoalHeaders } from '@/hooks/use-home-market-goal-headers';
 import { useHomePauseActions } from '@/hooks/use-home-pause-actions';
 import { useHomePauseCardProjection } from '@/hooks/use-home-pause-card-projection';
 import { useHomeDashboardTodayWiring } from '@/hooks/use-home-dashboard-today-wiring';
-import { getHomeSubscriptionGate } from '@/lib/home-subscription-gate';
+import { getHomeSubscriptionGate } from '@/features/subscription/public';
 import { useHomePauseContextPreviews } from '@/hooks/use-home-pause-context-previews';
 import { useHomePullFullReload } from '@/hooks/use-home-pull-full-reload';
 import { useHomeZenModeRouteProps } from '@/hooks/use-home-zen-route-props';
