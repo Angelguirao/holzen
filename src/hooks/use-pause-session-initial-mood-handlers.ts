@@ -3,7 +3,7 @@ import type { TFunction } from 'i18next';
 import type { MoodValue } from '@/components/MoodCheck';
 import type { FeelStepTile } from '@/components/pause/pause-feel-types';
 import { hapticFeedback } from '@/lib/haptics';
-import { pauseLogStep } from '@/features/pause/public';
+import { pauseLogStep } from '@/features/pause/public-rpc';
 import {
   buildInitialEmotionLoggedPayload,
   initialEmotionLogDedupeKey,

@@ -10,7 +10,7 @@ const { pauseLogStepMock, invalidateCompanionUiCompletionQueryMock } = vi.hoiste
   invalidateCompanionUiCompletionQueryMock: vi.fn(),
 }));
 
-vi.mock('@/features/pause/public', () => ({
+vi.mock('@/features/pause/public-rpc', () => ({
   pauseLogStep: (...args: unknown[]) => pauseLogStepMock(...args),
 }));
 

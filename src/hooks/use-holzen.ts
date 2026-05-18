@@ -28,9 +28,9 @@ import { millisecondsUntilNextQuarterHour } from '@/lib/next-cron-quarter';
 import {
   bucketChangePercent,
   computeContextFingerprint,
-  pauseCreateOrReuse,
   pauseCreateSkippedUserMessage,
 } from '@/features/pause/public';
+import { pauseCreateOrReuse } from '@/features/pause/public-rpc';
 import { trackEvent } from '@/lib/posthog';
 import {
   MANUAL_PAUSE_TRIGGER_IDLE,

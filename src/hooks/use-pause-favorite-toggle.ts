@@ -4,7 +4,7 @@ import type { TFunction } from 'i18next';
 import { useAuth } from '@/hooks/use-auth';
 import { pauseArchiveListQueryPrefix } from '@/lib/pause-archive-list-query';
 import { hapticFeedback } from '@/lib/haptics';
-import { pauseLogStep } from '@/features/pause/public';
+import { pauseLogStep } from '@/features/pause/public-rpc';
 import { showPauseFavoriteProHintToast } from '@/lib/pause-favorite-toast';
 
 export function usePauseFavoriteToggle(input: {
