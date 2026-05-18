@@ -22,7 +22,7 @@ import { pauseSessionFetchedInstanceQueryKey } from '@/lib/pause-session-fetched
 import { pauseInstanceQueryPrefix } from '@/lib/pause-instance-query-prefix';
 import { pauseTerminalEntryStateQueryKey } from '@/lib/pause-terminal-entry-state-query';
 import { pauseSessionCompanionSnapshotQueryKey } from '@/lib/pause-page-loader';
-import { invalidateCompanionUiCompletionQuery } from '@/lib/companion-ui-completion-query-key';
+import { invalidateCompanionUiCompletionQuery } from '@/features/pause/application/queries/companion-ui-completion-query-key';
 import { trackEvent } from '@/lib/posthog';
 import type {
   PauseAdoptPendingResult,
