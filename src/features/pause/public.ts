@@ -15,6 +15,24 @@ export {
 } from './infrastructure/pause-rpc-client';
 export { pauseCreateSkippedUserMessage } from './application/use-cases/create-skipped-message';
 export {
+  buildPauseImpactDataOnComplete,
+  type BuildPauseImpactDataOnCompleteInput,
+  type PauseImpactData,
+} from './application/use-cases/impact-data';
+export {
+  isPausePersistError,
+  isReflectionPersistError,
+  reflectionPersistErrorMessage,
+  PAUSE_PERSIST_ERROR_MARKER,
+  REFLECTION_PERSIST_ERROR_MARKER,
+} from './application/use-cases/reflection-persist-error';
+export { pauseArchiveRowAllowsRetrospectiveOutcome } from './application/archive/retrospective-outcome';
+export {
+  resolvePauseBreathSecondLabelVariant,
+  viteWantsPauseBreathSecondLabelShift,
+  type PauseBreathSecondLabelVariant,
+} from './application/breathing/breath-second-label-variant';
+export {
   BRIEF_PAUSE_ORDER,
   computeBriefMacroProgressPosition,
 } from './application/brief-ritual/brief-pause-order';
