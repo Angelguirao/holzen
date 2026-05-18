@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { hasPersistedPauseSessionPayload } from '@/lib/pause-persisted-session';
+import { hasPersistedPauseSessionPayload } from '@/features/pause/application/session/persisted-session-guards';
 import { DEFAULT_COMPANIONS, DEFAULT_PREFS } from '@/features/pause/domain/session-model';
 
 const base = {

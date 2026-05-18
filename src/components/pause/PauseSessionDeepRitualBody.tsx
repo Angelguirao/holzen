@@ -9,7 +9,7 @@ import { PauseDecide } from '@/components/pause/PauseDecide';
 import { PauseFrame } from '@/components/pause/PauseFrame';
 import { PauseReflect } from '@/components/pause/PauseReflect';
 import type { PauseStep } from '@/components/pause/PauseProgress';
-import type { PauseSessionStepTransitionConfig } from '@/lib/pause-session-step-transition';
+import type { PauseSessionStepTransitionConfig } from '@/features/pause/application/session/step-transition';
 import { usePauseReflectFrameFocusAmbience } from '@/hooks/use-pause-reflect-frame-focus-ambience';
 
 export type PauseSessionDeepRitualBodyProps = {

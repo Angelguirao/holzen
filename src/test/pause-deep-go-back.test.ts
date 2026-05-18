@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { computeDeepRitualGoBackTarget } from '@/lib/pause-deep-go-back';
+import { computeDeepRitualGoBackTarget } from '@/features/pause/application/session/deep-go-back';
 
 describe('computeDeepRitualGoBackTarget', () => {
   it('returns null on first step', () => {

@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import type { PauseSessionHydrationReady } from '@/features/pause/application/session/hydration';
-import { coalescePauseSessionShellViewModel } from '@/lib/pause-session-shell-view-model';
+import { coalescePauseSessionShellViewModel } from '@/features/pause/application/session/shell-view-model';
 import { DEFAULT_COMPANIONS, DEFAULT_PREFS } from '@/features/pause/domain/session-model';
 
 const ready = (over: Partial<PauseSessionHydrationReady> = {}): PauseSessionHydrationReady => ({

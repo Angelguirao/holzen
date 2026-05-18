@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { BRIEF_PAUSE_ORDER, computeBriefMacroProgressPosition } from '@/lib/brief-pause-order';
+import { BRIEF_PAUSE_ORDER, computeBriefMacroProgressPosition } from '@/features/pause/application/brief-ritual/brief-pause-order';
 
 describe('computeBriefMacroProgressPosition', () => {
   it('is 1-based within BRIEF_PAUSE_ORDER', () => {

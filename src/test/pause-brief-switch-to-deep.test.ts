@@ -2,9 +2,9 @@ import { describe, expect, it } from 'vitest';
 import {
   BRIEF_SWITCH_TO_DEEP_STEP,
   briefSwitchToDeepPauseState,
-} from '@/lib/pause-brief-switch-to-deep';
-import { ritualDepthUpgradedPayload } from '@/lib/pause-ritual-depth-upgrade-payload';
-import { pauseInstanceHasBriefRitualTag, type PauseStepEventRow } from '@/lib/pause-state';
+} from '@/features/pause/application/session/brief-switch-to-deep';
+import { ritualDepthUpgradedPayload } from '@/features/pause/application/use-cases/ritual-depth-upgrade-payload';
+import { pauseInstanceHasBriefRitualTag, type PauseStepEventRow } from '@/features/pause/domain/pause-state';
 
 describe('briefSwitchToDeepPauseState', () => {
   it('lands on Reflect with first breath treated complete (brief breath already RPC-logged)', () => {

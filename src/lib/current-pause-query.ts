@@ -1,6 +1,6 @@
 import { supabase } from '@/integrations/supabase/client';
-import type { PauseState } from '@/lib/pause-state';
-import { PAUSE_QUERY_PREFIX } from '@/lib/pause-query-namespace';
+import type { PauseState } from '@/features/pause/domain/pause-state';
+import { PAUSE_QUERY_PREFIX } from '@/features/pause/application/queries/pause-query-namespace';
 
 export interface CurrentPauseRow {
   id: string;

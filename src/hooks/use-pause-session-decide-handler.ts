@@ -4,14 +4,14 @@ import type { MoodValue } from '@/components/MoodCheck';
 import { hapticFeedback } from '@/lib/haptics';
 import { useAuth } from '@/hooks/use-auth';
 import { pauseLogStep } from '@/features/pause/public-rpc';
-import { buildOutcomeLoggedPayload } from '@/lib/pause-outcome-log-payload';
+import { buildOutcomeLoggedPayload } from '@/features/pause/application/use-cases/outcome-log-payload';
 import {
   showPauseOutcomeNotCompletedToast,
   showPauseOutcomeSaveFailedToast,
-} from '@/features/pause/public';
+} from '@/features/pause/application/feedback/outcome-toast';
 import type { PauseState } from '@/features/pause/domain/pause-state';
-import { buildPauseImpactDataOnComplete, type PauseImpactData } from '@/lib/pause-impact-data';
-import { invalidatePauseStatsDataForUser } from '@/features/pause/public';
+import { buildPauseImpactDataOnComplete, type PauseImpactData } from '@/features/pause/application/use-cases/impact-data';
+import { invalidatePauseStatsDataForUser } from '@/features/pause/application/queries/invalidate-pause-stats';
 import { getSessionQuote } from '@/lib/wisdom-quotes';
 import { type RitualDepth } from '@/features/pause/domain/ritual-types';
 import { clearSession } from '@/features/pause/infrastructure/session/persisted-session-storage';

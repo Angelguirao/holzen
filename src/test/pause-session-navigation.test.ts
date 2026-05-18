@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { canAdvanceFromPauseStep } from '@/lib/pause-session-navigation';
+import { canAdvanceFromPauseStep } from '@/features/pause/application/session/navigation';
 import type { PauseStep } from '@/components/pause/PauseProgress';
 
 const base = {

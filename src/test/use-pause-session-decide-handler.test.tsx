@@ -6,7 +6,7 @@ import { usePauseSessionDecideHandler } from '@/hooks/use-pause-session-decide-h
 import {
   showPauseOutcomeNotCompletedToast,
   showPauseOutcomeSaveFailedToast,
-} from '@/features/pause/public';
+} from '@/features/pause/application/feedback/outcome-toast';
 
 const { pauseLogStepMock, clearSessionMock, invalidatePauseStatsMock } = vi.hoisted(() => ({
   pauseLogStepMock: vi.fn(),
@@ -30,9 +30,12 @@ vi.mock('@/lib/haptics', () => ({
   hapticFeedback: vi.fn(),
 }));
 
-vi.mock('@/features/pause/public', () => ({
+vi.mock('@/features/pause/application/feedback/outcome-toast', () => ({
   showPauseOutcomeSaveFailedToast: vi.fn(),
   showPauseOutcomeNotCompletedToast: vi.fn(),
+}));
+
+vi.mock('@/features/pause/application/queries/invalidate-pause-stats', () => ({
   invalidatePauseStatsDataForUser: (...args: unknown[]) => invalidatePauseStatsMock(...args),
 }));
 

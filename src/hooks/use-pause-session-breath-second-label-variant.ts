@@ -3,7 +3,7 @@ import {
   resolvePauseBreathSecondLabelVariant,
   type PauseBreathSecondLabelVariant,
   viteWantsPauseBreathSecondLabelShift,
-} from '@/lib/pause-breath-second-label-variant';
+} from '@/features/pause/application/breathing/breath-second-label-variant';
 
 /** PostHog `pause.step5_breath_label_shift` + optional Vite override → scaffold breath label variant. */
 export function usePauseSessionBreathSecondLabelVariant(): PauseBreathSecondLabelVariant {

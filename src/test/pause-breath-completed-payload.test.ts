@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { breathCompletedSegment1Payload, breathCompletedSegment2Payload } from '@/lib/pause-breath-completed-payload';
+import { breathCompletedSegment1Payload, breathCompletedSegment2Payload } from '@/features/pause/application/breathing/breath-completed-payload';
 
 describe('breathCompletedSegment1Payload', () => {
   it('defaults to deep first segment', () => {

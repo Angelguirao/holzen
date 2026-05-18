@@ -9,14 +9,14 @@ import { hapticFeedback } from '@/lib/haptics';
 import {
   computeBreathingPhaseAdvance,
   resolveBreathingCompleted,
-} from '@/lib/pause-breathing-phase-advance';
+} from '@/features/pause/application/breathing/phase-advance';
 import {
   holdProgressWithinPhase,
   resolveBreathCycleTotal,
   resolvePauseBreathingPhases,
   rotatingKickerIndexFromElapsed,
   secondsIntoTrianglePattern,
-} from '@/lib/pause-breathing-pattern';
+} from '@/features/pause/application/breathing/ritual-pattern';
 import {
   playPauseBreathPatternCompleteCue,
   playPauseBreathPhaseCue,

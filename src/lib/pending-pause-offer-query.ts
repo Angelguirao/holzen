@@ -1,5 +1,5 @@
 import { supabase } from '@/integrations/supabase/client';
-import { PAUSE_QUERY_PREFIX } from '@/lib/pause-query-namespace';
+import { PAUSE_QUERY_PREFIX } from '@/features/pause/application/queries/pause-query-namespace';
 
 export interface PendingPauseOfferRow {
   id: string;

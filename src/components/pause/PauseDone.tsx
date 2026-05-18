@@ -15,7 +15,7 @@ import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover
 import { Slider } from '@/components/ui/slider';
 import { ShareReflection } from '@/components/ShareReflection';
 import { trackEvent } from '@/lib/posthog';
-import { isPauseMoodValue, buildPostPauseEmotionLoggedPayload } from '@/lib/pause-post-pause-emotion-log';
+import { isPauseMoodValue, buildPostPauseEmotionLoggedPayload } from '@/features/pause/application/session/post-pause-emotion-log';
 import { pauseLogStep } from '@/features/pause/public-rpc';
 import { showPauseStepSyncFailedToast } from '@/features/pause/public';
 import { useSubscription } from '@/hooks/use-subscription';
