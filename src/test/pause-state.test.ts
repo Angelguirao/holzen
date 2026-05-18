@@ -10,7 +10,7 @@ import {
   type PauseTemplateRow,
   type PauseStepEventRow,
   type PauseCompanionEventRow,
-} from '@/features/pause/domain/pause-state';
+} from '@/features/pause/public';
 
 const NOW = new Date('2026-04-23T20:00:00.000Z');
 

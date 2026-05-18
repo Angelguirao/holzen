@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 import {
   resolvePauseBreathSecondLabelVariant,
   viteWantsPauseBreathSecondLabelShift,
-} from '@/features/pause/application/breathing/breath-second-label-variant';
+} from '@/features/pause/public';
 
 describe('viteWantsPauseBreathSecondLabelShift', () => {
   it('is false for undefined / empty / other strings', () => {

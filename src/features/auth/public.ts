@@ -1,9 +1,10 @@
 /** Public API for auth — export only what other features may import. */
 import type { User } from '@supabase/supabase-js';
 
+export { AuthProvider, useAuth } from './presentation/AuthProvider';
+
 /**
  * Shape exposed by `AuthProvider` / `useAuth`.
- * React provider: `@/features/auth/presentation/AuthProvider` (re-exported from `@/hooks/use-auth`).
  */
 export interface AuthSessionState {
   user: User | null;

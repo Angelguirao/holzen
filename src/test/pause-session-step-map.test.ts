@@ -12,9 +12,9 @@ import {
   initialFrameDoneFromRestored,
   initialBreathSegmentRpcLoggedFlagsFromRestored,
   briefStepToPauseScienceStep,
-} from '@/features/pause/application/session/step-map';
+} from '@/features/pause/public';
 import { makeTestPersistedPauseSession } from '@/test/make-test-persisted-pause-session';
-import { type PersistedSession } from '@/features/pause/domain/session-model';
+import { type PersistedSession } from '@/features/pause/public';
 
 describe('mapPersistedStep', () => {
   it('maps legacy and empty keys to feel', () => {

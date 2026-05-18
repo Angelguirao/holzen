@@ -2,12 +2,12 @@ import { describe, expect, it } from 'vitest';
 import {
   computeBreathingPhaseAdvance,
   resolveBreathingCompleted,
-} from '@/features/pause/application/breathing/phase-advance';
+} from '@/features/pause/public';
 import {
   BOX_BREATH_PHASE_COUNT,
   BRIEF_TRIANGLE_CYCLE_COUNT,
   TRIANGLE_PHASE_COUNT,
-} from '@/features/pause/application/breathing/ritual-pattern';
+} from '@/features/pause/public';
 
 describe('resolveBreathingCompleted', () => {
   it('uses session-local completion when parent prop is false', () => {

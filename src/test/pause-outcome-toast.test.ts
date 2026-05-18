@@ -4,7 +4,7 @@ import { toast } from 'sonner';
 import {
   showPauseOutcomeNotCompletedToast,
   showPauseOutcomeSaveFailedToast,
-} from '@/features/pause/application/feedback/outcome-toast';
+} from '@/features/pause/public';
 
 vi.mock('sonner', () => ({
   toast: {

@@ -162,8 +162,13 @@ export {
   computePauseHeaderBackIntent,
   isPauseSessionHeaderBackVisible,
 } from './application/session/header-back';
-export { briefSwitchToDeepPauseState } from './application/session/brief-switch-to-deep';
 export {
+  BRIEF_SWITCH_TO_DEEP_STEP,
+  briefSwitchToDeepPauseState,
+  type BriefSwitchToDeepPauseState,
+} from './application/session/brief-switch-to-deep';
+export {
+  briefStepToPauseScienceStep,
   mapPersistedStep,
   initialRitualEntry,
   initialBriefPauseStepFromRestored,
@@ -219,11 +224,16 @@ export {
   breathCompletedSegment2Payload,
 } from './application/breathing/breath-completed-payload';
 export {
+  BRIEF_TRIANGLE_CYCLE_COUNT,
   holdProgressWithinPhase,
+  PAUSE_RITUAL_BREATHING_PATTERN_MODE,
   resolveBreathCycleTotal,
   resolvePauseBreathingPhases,
   rotatingKickerIndexFromElapsed,
+  RITUAL_TRIANGLE_KICKER_INTERVAL_SEC,
   secondsIntoTrianglePattern,
+  TRIANGLE_PHASE_COUNT,
+  type PauseRitualBreathingPatternMode,
 } from './application/breathing/ritual-pattern';
 export {
   playPauseBreathPatternCompleteCue,

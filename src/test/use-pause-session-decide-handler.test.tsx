@@ -6,7 +6,7 @@ import { usePauseSessionDecideHandler } from '@/hooks/use-pause-session-decide-h
 import {
   showPauseOutcomeNotCompletedToast,
   showPauseOutcomeSaveFailedToast,
-} from '@/features/pause/application/feedback/outcome-toast';
+} from '@/features/pause/public';
 
 const { pauseLogStepMock, clearSessionMock, invalidatePauseStatsMock } = vi.hoisted(() => ({
   pauseLogStepMock: vi.fn(),
@@ -18,10 +18,6 @@ vi.mock('@/features/pause/public-rpc', () => ({
   pauseLogStep: (...args: unknown[]) => pauseLogStepMock(...args),
 }));
 
-vi.mock('@/features/pause/infrastructure/session/persisted-session-storage', () => ({
-  clearSession: () => clearSessionMock(),
-}));
-
 vi.mock('@/lib/wisdom-quotes', () => ({
   getSessionQuote: () => ({ text: 'Q', author: 'A' }),
 }));
@@ -30,14 +26,16 @@ vi.mock('@/lib/haptics', () => ({
   hapticFeedback: vi.fn(),
 }));
 
-vi.mock('@/features/pause/application/feedback/outcome-toast', () => ({
-  showPauseOutcomeSaveFailedToast: vi.fn(),
-  showPauseOutcomeNotCompletedToast: vi.fn(),
-}));
-
-vi.mock('@/features/pause/application/queries/invalidate-pause-stats', () => ({
-  invalidatePauseStatsDataForUser: (...args: unknown[]) => invalidatePauseStatsMock(...args),
-}));
+vi.mock('@/features/pause/public', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('@/features/pause/public')>();
+  return {
+    ...actual,
+    clearSession: () => clearSessionMock(),
+    invalidatePauseStatsDataForUser: (...args: unknown[]) => invalidatePauseStatsMock(...args),
+    showPauseOutcomeSaveFailedToast: vi.fn(),
+    showPauseOutcomeNotCompletedToast: vi.fn(),
+  };
+});
 
 vi.mock('@/hooks/use-auth', () => ({
   useAuth: () => ({

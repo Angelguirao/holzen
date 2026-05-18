@@ -100,6 +100,7 @@ export {
 } from './infrastructure/queries/session-fetched-instance-query';
 export {
   getPauseSessionCompanionSnapshotQueryOptions,
+  loadPauseSessionSnapshot,
   pauseSessionCompanionSnapshotQueryKey,
   type PauseSessionSnapshot,
 } from './infrastructure/queries/companion-session-snapshot-query';
