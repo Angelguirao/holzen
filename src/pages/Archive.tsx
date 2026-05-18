@@ -18,7 +18,7 @@ import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import { useAuth } from '@/hooks/use-auth';
-import { getArchivePausesTabHasRowsQueryOptions } from '@/lib/archive-pauses-tab-query';
+import { getArchivePausesTabHasRowsQueryOptions } from '@/features/pause/public';
 import type { ArchiveMainSegment } from '@/lib/archive-segment';
 
 type SortMode = 'newest' | 'oldest' | 'alphabetical';
