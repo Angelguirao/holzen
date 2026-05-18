@@ -2,7 +2,7 @@ import { useMemo } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { useAuth } from '@/hooks/use-auth';
 import { isAdminFromEnvList } from '@/features/user/application/is-admin-env';
-import { getProfileRowQueryOptions } from '@/lib/profile-row-query';
+import { getProfileRowQueryOptions } from '@/features/user/public';
 
 /**
  * Client-side admin gate for internal /ops pages (aligns with `profiles.is_admin` / RLS).
