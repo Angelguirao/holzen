@@ -20,6 +20,18 @@ export { pauseArchiveListQueryPrefix } from './application/queries/archive-query
 export { getArchivePausesTabHasRowsQueryOptions } from './infrastructure/queries/archive-pauses-tab-query';
 export { getCompletedPauseCountQueryOptions } from './infrastructure/queries/completed-pause-count-query';
 export {
+  buildMemberCacheKey,
+  getLibraryBundleDisabledQueryOptions,
+  getLibraryBundleQueryOptions,
+  libraryBundleQueryPrefix,
+  sortMemberPauses,
+  type Collection,
+  type CollectionItem,
+  type CollectionMemberPause,
+  type LibraryBundle,
+  type LibraryListSortMode,
+} from './infrastructure/queries/library-bundle-query';
+export {
   currentPauseQueryKey,
   getCurrentPauseQueryOptions,
   type CurrentPauseRow,

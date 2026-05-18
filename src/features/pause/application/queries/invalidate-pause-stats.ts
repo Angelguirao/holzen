@@ -1,4 +1,4 @@
-import { libraryBundleQueryPrefix } from '@/lib/library-bundle-query';
+import { libraryBundleQueryPrefix } from './library-bundle-keys';
 import { pauseArchiveListQueryPrefix } from '@/features/pause/application/queries/archive-query-keys';
 import { COMPLETED_PAUSE_COUNT_QUERY_KEY } from './completed-pause-count-keys';
 import { currentPauseQueryKey } from './current-pause-keys';
