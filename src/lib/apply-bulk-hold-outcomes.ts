@@ -1,4 +1,4 @@
-import { pauseLogStep } from '@/lib/pause-api';
+import { pauseLogStep } from '@/features/pause/public-rpc';
 import { buildOutcomeLoggedPayload } from '@/lib/pause-outcome-log-payload';
 import type { BulkHoldOutcomeChoice, BulkHoldPendingPause } from '@/lib/bulk-hold';
 

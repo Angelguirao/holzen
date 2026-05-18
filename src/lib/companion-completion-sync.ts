@@ -1,7 +1,7 @@
 import { supabase } from '@/integrations/supabase/client';
 import { deriveBreathingUiCompleteFromPayloads } from '@/lib/companion-breath-completion-detect';
 import { invalidateCompanionUiCompletionQuery } from '@/lib/companion-ui-completion-query-key';
-import { pauseLogStep, pauseLogCompanion } from '@/lib/pause-api';
+import { pauseLogStep, pauseLogCompanion } from '@/features/pause/public-rpc';
 import type { PauseStepType } from '@/lib/pause-state';
 
 export type CompanionUiCompletionStep =

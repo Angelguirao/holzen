@@ -1,5 +1,5 @@
 import type { TFunction } from 'i18next';
-import { pauseLogStep } from '@/lib/pause-api';
+import { pauseLogStep } from '@/features/pause/public-rpc';
 import { ritualDepthUpgradedPayload } from '@/lib/pause-ritual-depth-upgrade-payload';
 import { showPauseStepSyncFailedToast } from '@/lib/pause-step-sync-toast';
 
