@@ -4,7 +4,7 @@ import { saveSession } from '@/lib/pause-session-storage';
 import {
   buildPauseSessionPersistSnapshot,
   type PauseSessionPersistSnapshotInput,
-} from '@/lib/pause-session-persist-snapshot';
+} from '@/features/pause/application/session/persist-snapshot';
 
 /** Autosave ritual fields to `holzen_pause_session` when we have an instance id and/or reflection copy. */
 export function usePauseSessionPersistToStorage(p: PauseSessionPersistSnapshotInput): void {
