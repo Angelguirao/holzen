@@ -20,12 +20,10 @@ const TABLE: Record<PauseArchiveSegment, 'v_pause_archive_pauses' | 'v_pause_arc
   echoes: 'v_pause_archive_echoes',
 };
 
-export const PAUSE_ARCHIVE_LIST_QUERY_PREFIX = ['pause-archive'] as const;
-
-/** Prefix for TanStack invalidation when pause lifecycle bumps archive-related caches. */
-export function pauseArchiveListQueryPrefix(userId: string) {
-  return [...PAUSE_ARCHIVE_LIST_QUERY_PREFIX, userId] as const;
-}
+export {
+  PAUSE_ARCHIVE_LIST_QUERY_PREFIX,
+  pauseArchiveListQueryPrefix,
+} from '@/features/pause/application/queries/archive-query-keys';
 
 export function pauseArchiveInfiniteQueryKey(
   userId: string,
