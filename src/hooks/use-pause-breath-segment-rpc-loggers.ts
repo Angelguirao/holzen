@@ -4,7 +4,7 @@ import { invalidateCompanionUiCompletionQuery } from '@/lib/companion-ui-complet
 import { pauseLogStep } from '@/features/pause/public-rpc';
 import { breathCompletedSegment1Payload, breathCompletedSegment2Payload } from '@/lib/pause-breath-completed-payload';
 import type { PersistedSession } from '@/lib/pause-session-storage';
-import { initialBreathSegmentRpcLoggedFlagsFromRestored } from '@/lib/pause-session-step-map';
+import { initialBreathSegmentRpcLoggedFlagsFromRestored } from '@/features/pause/application/session/step-map';
 import { showPauseStepSyncFailedToast } from '@/lib/pause-step-sync-toast';
 
 /**
