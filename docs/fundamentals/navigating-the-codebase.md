@@ -239,6 +239,8 @@ If you use [Lovable](https://lovable.dev) with GitHub sync to a linked Supabase 
 
 **Locally**, nothing in this table runs by itself: your machine uses **`.env` / `.env.*.local`** and **`npm run dev`** (or `dev:hosted` / `dev:local`). Use **local Supabase** (`npm run supabase:start`, `supabase:reset`) to test migrations safely; use **`npx supabase functions serve`** (and [function secrets](https://supabase.com/docs/guides/functions/secrets)) to approximate hosted function behavior.
 
+**Strategic context** (why feature branches do not protect prod DB, staging project, visible CI, leaving Lovable): [lovable-staging-and-platform-exit.md](../ops/lovable-staging-and-platform-exit.md).
+
 ---
 
 ## 18. Review notes: improvements and caveats

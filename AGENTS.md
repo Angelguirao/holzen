@@ -30,6 +30,7 @@ Use this table to pick the **canonical narrative** for the slice you are touchin
 | Content library ingest / RSS / admin | [docs/systems/content-library-fetch-source-feeds.md](docs/systems/content-library-fetch-source-feeds.md) | Edge + admin docs referenced there |
 | PR / release discipline, flow-first review | [docs/reviews/react-spa-review-template.md](docs/reviews/react-spa-review-template.md), [docs/reviews/end-to-end-review-master-checklist.md](docs/reviews/end-to-end-review-master-checklist.md) | Cursor skill `.cursor/skills/holzen-flow-review/SKILL.md` |
 | Ship to GitHub / Lovable / Supabase | [docs/ops/deployment-sync-guide.md](docs/ops/deployment-sync-guide.md) | `.cursor/rules/deployment-sync.mdc` mirrors the minimum gate |
+| Lovable staging / platform exit (risk, CI, hybrid paths) | [docs/ops/lovable-staging-and-platform-exit.md](docs/ops/lovable-staging-and-platform-exit.md) | Pairs with deployment-sync-guide; not a substitute for pre-push checklist |
 | Pause-first shipped scope (MVP routes, edges, Tier B drops) | [docs/ops/active-surface.md](docs/ops/active-surface.md) | `.cursor/rules/active-surface.mdc`; no `@/legacy` imports in active `src/` |
 
 **Default habit:** skim the **one** row that matches your change, open the linked doc section, then edit code. If the row’s “Also update” column applies, treat it as part of the same task—not a follow-up doc ticket.

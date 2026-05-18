@@ -28,6 +28,7 @@ This folder contains human-readable notes that complement the source code and in
 | **Meta:** where docs go, HTTP doc posture (Bruno vs OpenAPI), edge checklist | [fundamentals/documentation-strategy.md](fundamentals/documentation-strategy.md) | Complements this index; does not duplicate the owner table. |
 | Supabase **`Database` types** (`src/integrations/supabase/types.ts`) | [AGENTS.md](../AGENTS.md) (`npm run gen:types`) | Regenerate after migrations; if types lag, use `as unknown as T` per [deployment-sync-guide.md](ops/deployment-sync-guide.md). |
 | Boot sequence, repo tour, Lovable vs local | [fundamentals/navigating-the-codebase.md](fundamentals/navigating-the-codebase.md) | Do not duplicate long boot narratives in AGENTS. |
+| **Lovable sync risk, staging, platform exit** | [ops/lovable-staging-and-platform-exit.md](ops/lovable-staging-and-platform-exit.md) | Why merges hit prod DB; CI gaps; phased exit / hybrid paths. Pairs with [deployment-sync-guide.md](ops/deployment-sync-guide.md). |
 | `index.html`, SPA shell, default SEO/PWA meta | [fundamentals/index-html-and-spa-shell.md](fundamentals/index-html-and-spa-shell.md) | Canonical origin `https://holzen.app`; pairs with §3 in navigating-the-codebase. |
 | Pause lifecycle (instances, events, artifacts, state machine) | [systems/pause-system.md](systems/pause-system.md) | Canonical **data model** and invariants (Pause V2). |
 | Pause AI pipeline (triggers, edge functions, generators, storage, hooks) | [systems/pause/ai-powered-pause-system.md](systems/pause/ai-powered-pause-system.md) | **Current** Pause V2 pipeline narrative; complements `pause-system.md` (starts with a V2 banner — not a pre‑V2 archive). |
@@ -87,6 +88,7 @@ When you change behavior, update the **one** doc that owns that slice (and ADRs 
 ## Ops
 
 - `ops/deployment-sync-guide.md` — **GitHub ↔ Lovable sync**: what auto-deploys, safe workflow, pre-push checklist, **`npm run check:prepush`** (bash full gate), and troubleshooting (401s, migration failures, stale deploys, CRON_SECRET mismatches).
+- `ops/lovable-staging-and-platform-exit.md` — **staging DB + visible CI + leaving Lovable**: production migration risk, hybrid paths, phased exit checklist (strategic; not a day-to-day push guide).
 - `ops/cron-setup.md` — scheduled jobs: pg_cron + `net.http_post` callouts for pause-adjacent workers.
 - `ops/logging-strategy.md` — edge vs browser vs DB logging; `observe.ts` patterns; correlation and PII.
 - `ops/versioning.md` — canonical version policy: changelog version vs build/release ID vs `package.json` metadata.
