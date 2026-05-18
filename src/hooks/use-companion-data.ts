@@ -10,7 +10,7 @@ import type { CompanionData, CompanionPrefs } from '@/components/CompanionSectio
 import type { RegenerateCompanionSlot, InterventionState } from '@/lib/companion-orchestrate-types';
 import {
   fetchParsedPauseArtifactCache,
-} from '@/lib/pause-artifact-cache';
+} from '@/features/pause/infrastructure/queries/artifact-cache-query';
 import type { ZoomOutData } from '@/components/ZoomOutDisplay';
 import { toZoomOutDisplayData, zoomOutLibraryAutosaveFromDisplayData } from '@/lib/zoom-out-payload';
 import type { CachedHistoricalInsightShape } from '@/components/HistoricalInsightDisplay';
