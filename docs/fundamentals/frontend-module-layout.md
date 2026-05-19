@@ -282,12 +282,12 @@ Use this when moving files. Paths are indicative — adjust to actual filenames 
 
 | Current (transitional) | Target |
 |------------------------|--------|
-| `src/hooks/use-pause-*.ts` | `packages/pause` (§3 subdirs) + thin hooks in `apps/web` |
-| `src/screens/pause/hooks/use-companion-data.ts` | `packages/pause/application/companion/` |
+| ~~`src/hooks/use-pause-*`~~ (removed) | `packages/pause` (§3 subdirs) + thin hooks in `apps/web` |
+| `src/screens/pause/hooks/use-companion-data.ts` | `packages/pause/application/use-cases/companion/` |
 | `src/screens/home/hooks/use-holzen.ts` | `packages/market` + `apps/web/screens/home` (wires pause triggers) |
-| `src/hooks/use-subscription.ts` | `packages/subscription` |
-| `src/hooks/use-auth.tsx` (re-export) | `features/auth/presentation/AuthProvider.tsx` → `packages/auth` |
-| `src/hooks/use-library.ts` | `packages/pause` queries (archive collections) |
+| ~~`src/hooks/use-subscription`~~ → `features/subscription/public-hooks` | `packages/subscription` |
+| ~~`src/hooks/use-auth`~~ → `@/features/auth/public` | `packages/auth` |
+| Archive library hooks | `features/pause/public-queries` + `screens/archive/hooks/` |
 | `src/lib/pause-*.ts`, `src/lib/companion-*.ts` | Thin re-exports → `features/pause/public` or `public-queries` (until legacy removed) |
 | `src/lib/*-query.ts` (subscription, market, user) | Re-exports → owning `features/*/public-queries` |
 | `src/lib/posthog.ts`, `sentry.ts`, `invoke-edge.ts`, `cid.ts` | `packages/infrastructure` or `shared-kernel` |
@@ -312,7 +312,9 @@ src/
   app/components/                  # cross-route shell (wave 5j)
   screens/<route>/                 # *Screen.tsx, components/, hooks/
   components/ui/, components/icons/  # design system only at components root
-  hooks/, lib/                      # shims; shrink as contexts migrate
+  lib/use-*.ts                     # shared utilities (flags, gestures, refs)
+  components/ui/use-*.ts           # toast, mobile breakpoint
+  app/hooks/                       # install prompt, auto-trigger, language sync
   features/
     pause/
       domain/
@@ -331,7 +333,7 @@ src/
   integrations/supabase/           # until adapters move to features/*/infrastructure
 ```
 
-Same dependency rules as §2–3 for layers that exist. `npm run check:feature-imports` enforces layer rules under `src/features/**` and blocks deep `@/features/<ctx>/(application|infrastructure|domain|presentation)/` imports from active `src/hooks`, `src/components`, and `src/test` (allowed: `public`, `public-queries`, `public-rpc`, plus RPC lib shims `apply-bulk-hold-outcomes` / `pause-ritual-depth-upgrade`).
+Same dependency rules as §2–3 for layers that exist. `npm run check:feature-imports` enforces layer rules under `src/features/**` and blocks deep `@/features/<ctx>/(application|infrastructure|domain|presentation)/` imports from active `src/lib`, `src/components`, `src/screens`, `src/app`, and `src/test` (allowed: `public`, `public-queries`, `public-rpc`, plus RPC lib shims `apply-bulk-hold-outcomes` / `pause-ritual-depth-upgrade`).
 
 **`src/lib/*` shims (legacy + gradual removal):** re-export from `@/features/<ctx>/public` (domain/application, no Supabase) or `public-queries.ts` (TanStack + Supabase). RPC-heavy use cases (`applyBulkHoldOutcomes`, `logPauseRitualDepthUpgraded`) stay on narrow `application/` or `public-rpc` paths — not `public.ts` — so Vitest does not eager-load the Supabase client.
 
@@ -342,8 +344,8 @@ Same dependency rules as §2–3 for layers that exist. `npm run check:feature-i
 | Wave | Scope | Exit criteria |
 |------|--------|----------------|
 | **0** | Docs + ADR (Lovable §) + `src/features/pause/` skeleton + `check:feature-imports` | `test:ci` green; root `npm run build` |
-| **1** | Migrate **pause** domain + use cases into `src/features/pause/` (small PRs) | Pause E2E green; companions under `application/companion/` |
-| **2** | `subscription`, `market`, `user`, `auth` features + shrink root `hooks/`/`lib/` | Cross-feature: `public.ts` only; app hooks may use `public-queries.ts` where queries need Supabase |
+| **1** | Migrate **pause** domain + use cases into `src/features/pause/` (small PRs) | Pause E2E green; companions under `application/use-cases/companion/` |
+| **2** | `subscription`, `market`, `user`, `auth` features + shrink root `lib/` feature shims | Cross-feature: `public.ts` only; app hooks may use `public-queries.ts` where queries need Supabase |
 | **3** | Optional `src/features/*/infrastructure` adapters; keep Supabase types in `integrations/` until needed | Adapter tests |
 | **4** | `src/legacy` off main runtime path | **Done (transitional):** `tsconfig.app.json` + Vitest exclude `src/legacy/**`; `check:active-surface` blocks `@/legacy/*` in active tree; folder kept for `archive/full-ia-pre-strip` recovery only. Physical delete is optional / separate archive PR. |
 | **5a** | Domain contexts in `src/features/*` + `check:architecture-alignment` | **Done** on `feature/refactoring6` — see §10 |
@@ -353,7 +355,7 @@ Same dependency rules as §2–3 for layers that exist. `npm run check:feature-i
 | **5e** | **Archive, Journey, Settings** | **Done** — `screens/{archive,journey,settings}/components/` |
 | **5f** | Companion routes | **Done** — `/companion/*` + companion UI under `screens/pause/` |
 | **5g** | Marketing / admin | **Done** — `screens/marketing/*Screen` + `components/`; `screens/admin/AdminScreen` |
-| **5h** | Orchestration | **Done (shipped surfaces)** — `use-home-*` + `HolzenProvider`/`useHolzen` → `screens/home/hooks/` (active imports `@/screens/home/hooks/use-holzen`; root `@/hooks/use-holzen` shim for legacy only); `use-pause-session-*` + ritual hooks → `screens/pause/hooks/`; `HomeScreen` / `PauseSessionScreen` |
+| **5h** | Orchestration | **Done (shipped surfaces)** — `use-home-*` + `HolzenProvider`/`useHolzen` → `screens/home/hooks/`; `use-pause-session-*` + ritual hooks → `screens/pause/hooks/`; `HomeScreen` / `PauseSessionScreen` |
 | **5i** | Shrink global layers | **Done (shipped)** — allowlist **37** root shell/shared components (was 59); home market widgets + onboarding + `MoodCheck` under screens; domain `MoodValue` in `features/pause` |
 | **5j** | App shell | **Done (shipped)** — `src/app/components/` (layout, nav, meta, error boundary, checkout/subscribe chrome, auth loading); allowlist **0** at `src/components/*.tsx` (was 37; only `components/ui/` remains); `check:no-screens-in-features` |
 | **5j+** | Screen hooks + route entrypoints | **Done** — all shipped routes under `screens/*/*Screen`; removed `src/pages/` shim (May 2026); `screens/ops/` for internal tools; removed `src/hooks/` (May 2026); `App.tsx` lazy-loads screens |

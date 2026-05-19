@@ -174,7 +174,7 @@ Open [`src/screens/home/HomeScreen.tsx`](../../src/screens/home/HomeScreen.tsx) 
 import { useTranslation } from 'react-i18next';
 import { useHolzen } from '@/screens/home/hooks/use-holzen';
 // ... many use-home-* hooks and layout components ...
-import type { HomeAppLayoutOutletContext } from '@/lib/home-app-layout-outlet';
+import type { HomeAppLayoutOutletContext } from '@/screens/home/lib/home-app-layout-outlet';
 ```
 
 **What to notice:** almost everything is **imported** from hooks, components, or `src/lib/`. The page file is not where the heavy logic lives — it **orchestrates** named modules.
@@ -295,7 +295,7 @@ const Home = () => {
   const pauseContextHomePreview = useHomePauseContextPreviews(context);
 ```
 
-**What to notice:** [`useHomePauseContextPreviews`](../../src/hooks/use-home-pause-context-previews.ts) wraps a **`useMemo`** parser so `Home` does not repeat `parsePauseContextForHomePreview` boilerplate for the open-pause **context** line only.
+**What to notice:** [`useHomePauseContextPreviews`](../../src/screens/home/hooks/use-home-pause-context-previews.ts) wraps a **`useMemo`** parser so `Home` does not repeat `parsePauseContextForHomePreview` boilerplate for the open-pause **context** line only.
 
 ---
 
@@ -323,7 +323,7 @@ const Home = () => {
   });
 ```
 
-**What to notice:** **`HOME_WIDGET_DEFAULT_ORDER`** is a **stable default** from optional-visibility settings so `useWidgetLayout` does not see a new array every render. [`useHomeVisibleSections`](../../src/hooks/use-home-visible-sections.ts) turns order + toggles into **what to render**.
+**What to notice:** **`HOME_WIDGET_DEFAULT_ORDER`** is a **stable default** from optional-visibility settings so `useWidgetLayout` does not see a new array every render. [`useHomeVisibleSections`](../../src/screens/home/hooks/use-home-visible-sections.ts) turns order + toggles into **what to render**.
 
 ---
 
@@ -344,7 +344,7 @@ const Home = () => {
   });
 ```
 
-**What to notice:** the hook returns a **ready-made `customizeSheet` object** for the layout component and an **`onOpenCustomize`** handler. PostHog events for customize live **inside** [`useHomeCustomizeBridge`](../../src/hooks/use-home-customize-bridge.tsx), not scattered in JSX.
+**What to notice:** the hook returns a **ready-made `customizeSheet` object** for the layout component and an **`onOpenCustomize`** handler. PostHog events for customize live **inside** [`useHomeCustomizeBridge`](../../src/screens/home/hooks/use-home-customize-bridge.tsx), not scattered in JSX.
 
 ---
 
@@ -383,7 +383,7 @@ const Home = () => {
   });
 ```
 
-**What to notice:** [`useHomePauseActions`](../../src/hooks/use-home-pause-actions.ts) returns **stable callbacks** used by Zen, the pause card, etc. `pauseProjection` (next step) **consumes** those callbacks — order in the file follows **data flow** (define actions, then pass them into UI projection).
+**What to notice:** [`useHomePauseActions`](../../src/screens/home/hooks/use-home-pause-actions.ts) returns **stable callbacks** used by Zen, the pause card, etc. `pauseProjection` (next step) **consumes** those callbacks — order in the file follows **data flow** (define actions, then pass them into UI projection).
 
 ---
 
@@ -427,7 +427,7 @@ const Home = () => {
   const { pullDistance, refreshing: pullRefreshing, handlers: pullHandlers } = useHomePullFullReload();
 ```
 
-**What to notice:** [`useHomePullFullReload`](../../src/hooks/use-home-pull-full-reload.ts) bundles **`usePullToRefresh`** + “reload the page” in one line here.
+**What to notice:** [`useHomePullFullReload`](../../src/screens/home/hooks/use-home-pull-full-reload.ts) bundles **`usePullToRefresh`** + “reload the page” in one line here.
 
 ---
 
@@ -465,7 +465,7 @@ const Home = () => {
   );
 ```
 
-**What to notice:** one hook ([`useHomeDashboardTodayWiring`](../../src/hooks/use-home-dashboard-today-wiring.ts)) hides the **`useHomeDashboardSectionDeps` + `useHomeDashboardSectionRenderers`** pair. The big object is the **dependency bundle** for [`render-home-dashboard-section`](../../src/screens/home/components/render-home-dashboard-section.tsx).
+**What to notice:** one hook ([`useHomeDashboardTodayWiring`](../../src/screens/home/hooks/use-home-dashboard-today-wiring.ts)) hides the **`useHomeDashboardSectionDeps` + `useHomeDashboardSectionRenderers`** pair. The big object is the **dependency bundle** for [`render-home-dashboard-section`](../../src/screens/home/components/render-home-dashboard-section.tsx).
 
 ---
 
@@ -499,7 +499,7 @@ const Home = () => {
   });
 ```
 
-**What to notice:** [`useHomeZenModeRouteProps`](../../src/hooks/use-home-zen-route-props.ts) memoizes a **typed props object** for [`HomeZenModeRoute`](../../src/screens/home/components/HomeZenModeRoute.tsx). That keeps the Zen JSX line short: `{...zenRouteProps}`.
+**What to notice:** [`useHomeZenModeRouteProps`](../../src/screens/home/hooks/use-home-zen-route-props.ts) memoizes a **typed props object** for [`HomeZenModeRoute`](../../src/screens/home/components/HomeZenModeRoute.tsx). That keeps the Zen JSX line short: `{...zenRouteProps}`.
 
 ---
 
@@ -522,7 +522,7 @@ const Home = () => {
   });
 ```
 
-**What to notice:** [`useHomeDashboardLayoutProps`](../../src/hooks/use-home-dashboard-layout-props.ts) exists so [`HomeDashboardLayout`](../../src/screens/home/components/HomeDashboardLayout.tsx) (wrapped in **`React.memo`**) gets **referentially stable props** when nothing relevant changed.
+**What to notice:** [`useHomeDashboardLayoutProps`](../../src/screens/home/hooks/use-home-dashboard-layout-props.ts) exists so [`HomeDashboardLayout`](../../src/screens/home/components/HomeDashboardLayout.tsx) (wrapped in **`React.memo`**) gets **referentially stable props** when nothing relevant changed.
 
 ---
 
