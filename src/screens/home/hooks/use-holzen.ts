@@ -15,15 +15,12 @@ import {
   type BtcPriceData,
 } from '@/features/market/public';
 import { supabase } from '@/integrations/supabase/client';
-import {
-  fetchOpenPauseHomePreview,
-  persistReflectionArtifacts,
-} from '@/features/pause/public-queries';
+import { fetchOpenPauseHomePreview } from '@/features/pause/public-queries';
 import { useAuth } from '@/features/auth/public';
 import { useProfile } from '@/features/user/public-hooks';
 import type { CompanionData } from '@/screens/pause/components/CompanionSection';
 import { holzenLog } from '@/lib/holzen-console';
-import { clearSession, reflectionPersistErrorMessage } from '@/features/pause/public';
+import { clearSession } from '@/features/pause/public';
 import {
   buildPauseContextFromMarket,
   getManualReflectionCooldownMs,
@@ -32,12 +29,8 @@ import {
 import { normalizeTrackedAssetId, trackedAssetSymbol } from '@/features/market/public';
 import { severityFromBtcChangePercent } from '@/features/market/public';
 import { millisecondsUntilNextQuarterHour } from '@/screens/home/lib/next-cron-quarter';
-import {
-  bucketChangePercent,
-  computeContextFingerprint,
-  pauseCreateSkippedUserMessage,
-} from '@/features/pause/public';
-import { pauseCreateOrReuse } from '@/features/pause/public-rpc';
+import { openManualPauseFromHome } from '@/features/pause/public-rpc';
+import type { OpenManualPauseFromHomeResult } from '@/features/pause/public-rpc';
 import { trackEvent } from '@/lib/posthog';
 import {
   MANUAL_PAUSE_TRIGGER_IDLE,
@@ -211,7 +204,6 @@ function useHolzenState() {
       const assetId = normalizeTrackedAssetId(profile.trackedAssetId);
       const assetSym = trackedAssetSymbol(assetId);
       const ctx = buildPauseContextFromMarket(data, profile.cumulativeThreshold, assetSym);
-      const directionBucket = data.changePercent < 0 ? 'down' : 'up';
       const severityBand = severityFromBtcChangePercent(data.changePercent) ?? 'mild';
       const onChainBand =
         assetId === 'bitcoin' && data.onChain
@@ -219,132 +211,30 @@ function useHolzenState() {
               (x) => typeof x === 'number' && Number.isFinite(x),
             ) as number[]).join(':') || null
           : null;
-      const fingerprint = await computeContextFingerprint({
-        templateSlug: 'volatility_v1',
-        directionBucket,
-        severityBand,
-        dailyBucketPct: bucketChangePercent(data.changePercent),
-        cumulativeBucketPct: bucketChangePercent(data.cumulativeChangePercent ?? 0),
-        trackedAssetId: assetId,
-        fearGreedBand: data.fearGreed?.label ?? null,
-        onChainBand,
-      });
+      const silentMsg = `${assetSym} moved.`;
 
-      if (silentMode) {
-        holzenLog.manual('generateMessage: silent mode');
-        const silentMsg = `${assetSym} moved.`;
-
-        try {
-          const res = await pauseCreateOrReuse({
-            templateSlug: 'volatility_v1',
-            source: 'manual',
-            contextSnapshot: {
-              change_24h_pct: data.changePercent,
-              change_7d_pct: data.cumulativeChangePercent ?? null,
-              direction: directionBucket,
-              severity: severityBand,
-              context_text: ctx,
-              last_reported_mood: mood ?? null,
-              tracked_asset_id: assetId,
-            },
-            contextRuleResult: { triggered: ['manual'] },
-            contextFingerprint: fingerprint,
-          });
-          if (!res.instance_id) {
-            setError(pauseCreateSkippedUserMessage(res.reused_reason));
-            return MANUAL_PAUSE_TRIGGER_IDLE;
-          }
-          const isPendingOffer = res.pending_offer === true;
-          if (!isPendingOffer) {
-            clearSession();
-            setLastPauseInstanceId(res.instance_id);
-          }
-          if (res.created) {
-            try {
-              trackEvent('pause_instance_created', {
-                pause_instance_id: res.instance_id,
-                template_slug: 'volatility_v1',
-                source: 'manual',
-                severity: severityBand,
-                pending_offer: isPendingOffer,
-              });
-            } catch {
-              /* no-op */
-            }
-          }
-          await persistReflectionArtifacts({
-            pauseInstanceId: res.instance_id,
-            userId: user.id,
-            context: ctx,
-            message: silentMsg,
-          });
-          if (!isPendingOffer) {
-            setMessage(silentMsg);
-            setContext(ctx);
-            setCompanions({ haiku: null, groundingTitle: null, groundingBody: null });
-            setNewPauseArrival(true);
-            setLastTriggerAt(new Date().toISOString());
-            try {
-              trackEvent('pause.manual_completed', {
-                duration_s: Math.round((Date.now() - t0) / 1000),
-                had_bitcoin_context: assetId === 'bitcoin',
-                tracked_asset_id: assetId,
-                companion_types: [],
-              });
-            } catch {
-              /* no-op */
-            }
-          }
-          if (!isPendingOffer) {
-            await syncOpenPauseFromDb();
-          }
-          return {
-            opened: true,
-            instanceId: res.instance_id,
-            context: ctx,
-            pendingOffer: isPendingOffer || undefined,
-          };
-        } catch (e: unknown) {
-          holzenLog.manual('generateMessage: silent pause create failed', {
-            message: e instanceof Error ? e.message : String(e),
-          });
-          setError(reflectionPersistErrorMessage(e));
+      const applyOpenResult = async (
+        result: OpenManualPauseFromHomeResult,
+      ): Promise<ManualPauseTriggerResult> => {
+        if (result.outcome === 'idle') {
+          setError(result.userMessage);
           return MANUAL_PAUSE_TRIGGER_IDLE;
         }
-      }
-
-      setLoading(true);
-      setError(null);
-
-      try {
-        const res = await pauseCreateOrReuse({
-          templateSlug: 'volatility_v1',
-          source: 'manual',
-          contextSnapshot: {
-            change_24h_pct: data.changePercent,
-            change_7d_pct: data.cumulativeChangePercent ?? null,
-            direction: directionBucket,
-            severity: severityBand,
-            context_text: ctx,
-            last_reported_mood: mood ?? null,
-            tracked_asset_id: assetId,
-          },
-          contextRuleResult: { triggered: ['manual'] },
-          contextFingerprint: fingerprint,
-        });
-
-        if (!res.instance_id) {
-          holzenLog.manual('generateMessage: reuse/skip', { reason: res.reused_reason });
-          setError(pauseCreateSkippedUserMessage(res.reused_reason));
+        if (result.outcome === 'error') {
+          holzenLog.manual('generateMessage: error', { message: result.userMessage });
+          setError(result.userMessage);
           return MANUAL_PAUSE_TRIGGER_IDLE;
         }
 
-        const isPendingOffer = res.pending_offer === true;
-
-        if (res.created) {
+        const isPendingOffer = result.pendingOffer;
+        if (!isPendingOffer) {
+          clearSession();
+          setLastPauseInstanceId(result.instanceId);
+        }
+        if (result.created) {
           try {
             trackEvent('pause_instance_created', {
-              pause_instance_id: res.instance_id,
+              pause_instance_id: result.instanceId,
               template_slug: 'volatility_v1',
               source: 'manual',
               severity: severityBand,
@@ -354,12 +244,9 @@ function useHolzenState() {
             /* no-op */
           }
         }
-
         if (!isPendingOffer) {
-          clearSession();
-          setLastPauseInstanceId(res.instance_id);
+          setMessage(result.silentStubPersisted ? silentMsg : null);
           setContext(ctx);
-          setMessage(null);
           setCompanions({ haiku: null, groundingTitle: null, groundingBody: null });
           setNewPauseArrival(true);
           setLastTriggerAt(new Date().toISOString());
@@ -373,25 +260,49 @@ function useHolzenState() {
           } catch {
             /* no-op */
           }
-        }
-        if (!isPendingOffer) {
           await syncOpenPauseFromDb();
         }
         return {
           opened: true,
-          instanceId: res.instance_id,
+          instanceId: result.instanceId,
           context: ctx,
           pendingOffer: isPendingOffer || undefined,
         };
-      } catch (e: unknown) {
-        const raw = e instanceof Error ? e.message : String(e);
-        holzenLog.manual('generateMessage: error', { message: raw });
-        if (raw.includes('fetch') || raw.includes('network') || raw.includes('Failed to fetch')) {
-          setError('Could not reach Holzen. Check your connection.');
-        } else {
-          setError('Could not open a pause right now. Try again shortly.');
+      };
+
+      const openParams = {
+        userId: user.id,
+        silentMode,
+        contextText: ctx,
+        silentMessage: silentMsg,
+        mood,
+        changePercent: data.changePercent,
+        cumulativeChangePercent: data.cumulativeChangePercent ?? null,
+        trackedAssetId: assetId,
+        severityBand,
+        fearGreedLabel: data.fearGreed?.label ?? null,
+        onChainBand,
+      };
+
+      if (silentMode) {
+        holzenLog.manual('generateMessage: silent mode');
+        const result = await openManualPauseFromHome(openParams);
+        if (result.outcome === 'error') {
+          holzenLog.manual('generateMessage: silent pause create failed', {
+            message: result.userMessage,
+          });
         }
-        return MANUAL_PAUSE_TRIGGER_IDLE;
+        return applyOpenResult(result);
+      }
+
+      setLoading(true);
+      setError(null);
+      try {
+        const result = await openManualPauseFromHome(openParams);
+        if (result.outcome === 'idle') {
+          holzenLog.manual('generateMessage: reuse/skip');
+        }
+        return applyOpenResult(result);
       } finally {
         setLoading(false);
       }

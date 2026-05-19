@@ -13,6 +13,7 @@ export {
   type PauseCreateOrReuseResult,
   type PauseLogCompanionResult,
 } from './infrastructure/pause-rpc-client';
+export type { OpenManualPauseFromHomeResult } from './application/use-cases/trigger/open-manual-pause-from-home';
 
 export { ritualDepthUpgradedPayload } from './application/use-cases/session/ritual-depth-upgrade';
 export { supabasePauseRepository } from './infrastructure/supabase-pause-repository';
@@ -24,11 +25,23 @@ import {
   type BulkHoldApplyResult,
 } from './application/use-cases/apply-bulk-hold-outcomes';
 import { supabasePauseRepository } from './infrastructure/supabase-pause-repository';
+import { openManualPauseFromHome as openManualPauseFromHomeUseCase } from './application/use-cases/trigger/open-manual-pause-from-home';
+import { persistReflectionArtifacts } from './infrastructure/reflect/reflection-artifact';
+import { pauseCreateOrReuse } from './infrastructure/pause-rpc-client';
+import type { OpenManualPauseFromHomeParams } from './application/use-cases/trigger/open-manual-pause-from-home';
 import type { TFunction } from 'i18next';
 import type { BulkHoldOutcomeChoice, BulkHoldPendingPause } from './domain/bulk-hold';
 import type { PauseState } from './domain/pause-state';
 
 export type { BulkHoldApplyResult };
+
+/** Home manual trigger — `pause_create_or_reuse` (+ silent reflection stub). */
+export function openManualPauseFromHome(params: OpenManualPauseFromHomeParams) {
+  return openManualPauseFromHomeUseCase(
+    { createOrReuse: pauseCreateOrReuse, persistReflectionArtifacts },
+    params,
+  );
+}
 
 /** Wired with default Supabase repository — screens/tests keep a stable import. */
 export function logPauseRitualDepthUpgraded(instanceId: string, t: TFunction): Promise<boolean> {
