@@ -18,10 +18,6 @@ vi.mock('@/features/pause/public-rpc', () => ({
   pauseLogStep: (...args: unknown[]) => pauseLogStepMock(...args),
 }));
 
-vi.mock('@/lib/wisdom-quotes', () => ({
-  getSessionQuote: () => ({ text: 'Q', author: 'A' }),
-}));
-
 vi.mock('@/lib/haptics', () => ({
   hapticFeedback: vi.fn(),
 }));
@@ -30,6 +26,7 @@ vi.mock('@/features/pause/public', async (importOriginal) => {
   const actual = await importOriginal<typeof import('@/features/pause/public')>();
   return {
     ...actual,
+    getSessionQuote: () => ({ text: 'Q', author: 'A' }),
     clearSession: () => clearSessionMock(),
     invalidatePauseStatsDataForUser: (...args: unknown[]) => invalidatePauseStatsMock(...args),
     showPauseOutcomeSaveFailedToast: vi.fn(),

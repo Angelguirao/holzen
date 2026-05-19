@@ -17,7 +17,7 @@ export {
 export {
   logPauseRitualDepthUpgraded,
   ritualDepthUpgradedPayload,
-} from './application/session/ritual-depth-upgrade';
+} from './application/use-cases/session/ritual-depth-upgrade';
 
 export {
   applyBulkHoldOutcomes,

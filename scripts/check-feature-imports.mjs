@@ -79,7 +79,7 @@ const ALLOWED_DEEP_IMPORT_FILES = new Set([
   'src/features/subscription/presentation/CheckoutConfirmation.cross-tab.test.tsx',
   'src/features/subscription/presentation/CheckoutConfirmation.guard.test.tsx',
   'src/features/subscription/presentation/CheckoutConfirmation.refresh-state.test.tsx',
-  'src/features/subscription/presentation/CheckoutConfirmation.no-refetch-on-back-nav.test.tsx',
+  'src/test/subscription-checkout-no-refetch-on-back-nav.test.tsx',
   'src/app/components/AppLayout.tsx',
 ]);
 
@@ -88,13 +88,13 @@ const LIB_COMPANION_SHIM = /@\/lib\/companion-/;
 const ALLOWED_LIB_PAUSE_IMPORTS = new Set([]);
 
 const ALLOWED_FEATURE_IMPORT =
-  /from\s+['"]@\/features\/[^'"]+\/(public|public-queries|public-rpc|public-hooks)['"]/;
+  /from\s+['"]@\/features\/[^'"]+\/(public|public-queries|public-rpc|public-hooks|public-limits)['"]/;
 
 const ACTIVE_APP_ROOTS = [
-  join(root, 'src', 'hooks'),
   join(root, 'src', 'components'),
   join(root, 'src', 'screens'),
   join(root, 'src', 'app'),
+  join(root, 'src', 'lib'),
   join(root, 'src', 'test'),
 ];
 

@@ -21,7 +21,7 @@ features/<context>/
 
 ## New code
 
-- Put **pause ritual** logic in `features/pause/` (companions and reflect are subfolders under `application/`, not a separate feature).
+- Put **pause ritual** logic in `features/pause/` (`application/use-cases/` — companions, reflect, breathing inside pause, not a separate feature).
 - Put **subscription**, **market**, **user**, **notifications**, **auth** in their own `features/<name>/` as you migrate.
 - **user** and **subscription** use `public-queries.ts` for profile/snapshot TanStack modules; `public.ts` stays Supabase-free.
 - **auth** — `AuthProvider` / `useAuth` exported from `features/auth/public.ts` (implementation in `presentation/`).
@@ -30,7 +30,7 @@ features/<context>/
 
 ## Tests
 
-Co-locate Vitest files with the module under test (`domain/foo.test.ts`, `application/session/bar.test.ts`). Cross-route flows stay in [`src/test/integration/`](../test/integration/README.md). Rules: [client-src-layout.md](../../docs/fundamentals/client-src-layout.md) (Testing), [src/test/README.md](../test/README.md).
+Co-locate Vitest files with the module under test (`domain/foo.test.ts`, `application/use-cases/session/bar.test.ts`). Cross-route flows stay in [`src/test/integration/`](../test/integration/README.md). Rules: [client-src-layout.md](../../docs/fundamentals/client-src-layout.md) (Testing), [src/test/README.md](../test/README.md).
 
 ## CI
 
