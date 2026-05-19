@@ -1,12 +1,7 @@
 import { Skeleton } from '@/components/ui/skeleton';
 import { History, ArrowRight } from 'lucide-react';
-export interface CachedHistoricalInsightShape {
-  title?: string;
-  period?: string;
-  btcInsight?: string;
-  assetClass?: string;
-  analogy?: string;
-}
+export type { CachedHistoricalInsightShape } from '@/features/pause/public';
+import type { CachedHistoricalInsightShape } from '@/features/pause/public';
 import { CompanionError } from './CompanionError';
 
 interface Props {

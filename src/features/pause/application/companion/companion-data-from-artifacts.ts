@@ -1,4 +1,4 @@
-import type { CompanionData } from '@/screens/pause/components/CompanionSection';
+import type { CompanionData } from '@/features/pause/public';
 
 export function companionDataFromArtifacts(
   rows: Array<{ kind: string; content: Record<string, unknown> }>,

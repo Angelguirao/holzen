@@ -142,6 +142,25 @@ export type {
   RegenerateCompanionSlot,
 } from './domain/companion-orchestrate';
 export { COMPANION_TYPES, FEEDBACK_TO_CACHE_TYPE } from './domain/companion-types';
+export type { FeelStepTile } from './domain/feel-step-tile';
+export {
+  PAUSE_DEEP_RITUAL_STEPS,
+  PAUSE_DEEP_DISPLAY_STEP_COUNT,
+  STEPS,
+  pauseDeepDisplayProgressIndex,
+  pauseDeepMacroStepNumber,
+  type PauseStep,
+} from './domain/pause-ritual-steps';
+export type { CompanionData, CompanionPrefs } from './domain/companion-card-types';
+export type {
+  CachedHistoricalInsightShape,
+} from './domain/historical-insight';
+export type {
+  EchoUserWord,
+  ZoomOutData,
+  ZoomOutEchoData,
+  ZoomOutOnThisDayEntry,
+} from './domain/zoom-out-display';
 export {
   ZOOM_OUT_DEFAULT_BODY_PLACEHOLDER,
   ZOOM_OUT_DEFAULT_LABEL,

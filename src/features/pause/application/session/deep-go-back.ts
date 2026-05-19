@@ -1,4 +1,4 @@
-import { STEPS, type PauseStep } from '@/screens/pause/components/PauseProgress';
+import { STEPS, type PauseStep } from '@/features/pause/public';
 
 /**
  * Previous deep-ritual step in `STEPS` order, or `null` on the first step.

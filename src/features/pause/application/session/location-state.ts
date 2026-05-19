@@ -1,4 +1,4 @@
-import type { CompanionData, CompanionPrefs } from '@/screens/pause/components/CompanionSection';
+import type { CompanionData, CompanionPrefs } from '@/features/pause/public';
 
 /** Severity passed with pause navigation (Home, hook-aligned data). */
 export type PauseSeverity = 'mild' | 'moderate' | 'high';

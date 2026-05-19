@@ -1,27 +1,19 @@
 import { useTranslation } from 'react-i18next';
 import { cn } from '@/lib/utils';
+import {
+  PAUSE_DEEP_RITUAL_STEPS,
+  pauseDeepDisplayProgressIndex,
+  type PauseStep,
+} from '@/features/pause/public';
 
-/** Full deep-ritual routing order (matches header stepper beats). */
-const STEPS = ['feel', 'breathe', 'reflect', 'frame', 'breath2', 'decide'] as const;
-export type PauseStep = (typeof STEPS)[number];
+export type { PauseStep } from '@/features/pause/public';
+export {
+  PAUSE_DEEP_DISPLAY_STEP_COUNT,
+  pauseDeepMacroStepNumber,
+  STEPS,
+} from '@/features/pause/public';
 
-/** Six segments in the deep-pause shell. */
-const PAUSE_DEEP_DISPLAY_STEPS = ['feel', 'breathe', 'reflect', 'frame', 'breath2', 'decide'] as const;
-
-export const PAUSE_DEEP_DISPLAY_STEP_COUNT = PAUSE_DEEP_DISPLAY_STEPS.length;
-
-/** 1-based “Step n of 6” for the meta line. */
-export function pauseDeepMacroStepNumber(step: PauseStep): number {
-  if (step === 'decide') return PAUSE_DEEP_DISPLAY_STEP_COUNT;
-  return STEPS.indexOf(step) + 1;
-}
-
-function pauseDeepDisplayProgressIndex(step: PauseStep): number {
-  if (step === 'decide') {
-    return PAUSE_DEEP_DISPLAY_STEPS.indexOf('decide');
-  }
-  return PAUSE_DEEP_DISPLAY_STEPS.indexOf(step as (typeof PAUSE_DEEP_DISPLAY_STEPS)[number]);
-}
+const PAUSE_DEEP_DISPLAY_STEPS = PAUSE_DEEP_RITUAL_STEPS;
 
 interface Props {
   currentStep: PauseStep;
@@ -121,5 +113,3 @@ export function PauseProgress({
     </div>
   );
 }
-
-export { STEPS };
