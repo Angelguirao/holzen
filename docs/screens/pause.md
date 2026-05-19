@@ -2,13 +2,14 @@
 
 **Pause-first shipped scope (2026-05):** full ritual on `/pause`; reflect artifact kind **`reflection_text`**; post-pause exits go Home/Archive (no Journey stats). Lapsed users see engagement block via entitlement. Manifest: [active-surface.md](../ops/active-surface.md).
 
-Authoritative orchestration: `[src/pages/PauseSession.tsx](../../src/pages/PauseSession.tsx)`.
+Authoritative orchestration: `[PauseSessionScreen.tsx](../../src/screens/pause/PauseSessionScreen.tsx)` (`[use-pause-session-screen.ts](../../src/screens/pause/hooks/use-pause-session-screen.ts)`); thin page `[PauseSession.tsx](../../src/pages/PauseSession.tsx)`.
 
 **Cross-screen patterns:** the same **thin page + named hooks + `src/lib` pure helpers** playbook as [Home](home.md) is spelled out in **[React screen orchestration](../fundamentals/react-screen-orchestration.md)**. Home **produces** navigation into this route; this doc is the **consumer** map for the full-screen volatility ritual.
 
 
 | Piece                                        | File                                                                                              |
 | -------------------------------------------- | ------------------------------------------------------------------------------------------------- |
+| Route screen + conductor hook                | `[PauseSessionScreen.tsx](../../src/screens/pause/PauseSessionScreen.tsx)`, `[use-pause-session-screen.ts](../../src/screens/pause/hooks/use-pause-session-screen.ts)` |
 | Gate (hydration / fetch / profile)           | `[PauseSessionGate.tsx](../../src/screens/pause/components/PauseSessionGate.tsx)`                         |
 | Gate body: picker vs scaffold slot           | `[PauseSessionGateContent.tsx](../../src/screens/pause/components/PauseSessionGateContent.tsx)`           |
 | Depth picker + About pauses sheet            | `[PauseSessionDepthPickerStack.tsx](../../src/screens/pause/components/PauseSessionDepthPickerStack.tsx)` |
@@ -45,7 +46,7 @@ Hooks (`src/hooks/use-pause-session-*.ts`, `use-pause-*` where pause-specific): 
 
 ## Rendering and hooks
 
-`PauseSession.tsx` runs **hooks in a stable order** at the top (Holzen, subscription, shell, mount log, coalesced view-model, then large local `useState` blocks, then handler hooks, then derived memo/objects). There is **no** early return that skips hooks after a subset has run — same **Rules of Hooks** discipline as Home. Full-screen route: see `[App.tsx](../../src/App.tsx)` / route table (no bottom nav on `/pause`).
+`usePauseSessionScreen` runs **hooks in a stable order**; `PauseSessionScreen.tsx` is presentation-only. at the top (Holzen, subscription, shell, mount log, coalesced view-model, then large local `useState` blocks, then handler hooks, then derived memo/objects). There is **no** early return that skips hooks after a subset has run — same **Rules of Hooks** discipline as Home. Full-screen route: see `[App.tsx](../../src/App.tsx)` / route table (no bottom nav on `/pause`).
 
 ## User-visible modes (high level)
 
