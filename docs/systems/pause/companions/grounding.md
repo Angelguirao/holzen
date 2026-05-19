@@ -130,16 +130,16 @@ When `selectIntervention` picks **trap** as the primary intervention:
 | Quality gate | `supabase/functions/_shared/quality.ts` |
 | Phase config | `supabase/functions/_shared/phase-config.ts` |
 | Content library | `supabase/functions/_shared/content-library.ts` |
-| Client invoke | `src/hooks/use-companion-data.ts` |
-| UI | `src/components/CompanionSection.tsx` (Ground card via `LearningInput`) |
-| Full View page | `src/pages/CompanionGroundingPage.tsx` (route `/companion/grounding/:pauseInstanceId`) |
-| Full View presentation | `src/components/companion/GroundingFullView.tsx` |
+| Client invoke | `src/screens/pause/hooks/use-companion-data.ts` |
+| UI | `src/screens/pause/components/CompanionSection.tsx` (Ground card via `LearningInput`) |
+| Full View page | `src/screens/pause/CompanionGroundingPage.tsx` (route `/companion/grounding/:pauseInstanceId`) |
+| Full View presentation | `src/screens/pause/components/companion/GroundingFullView.tsx` |
 | Enrichment edge fn | `supabase/functions/grounding-enrich/index.ts` |
 | Enrichment helpers | `supabase/functions/_shared/grounding-enrichment-util.ts` |
 | Enrichment client hook | `src/screens/pause/hooks/use-grounding-enrichment.ts` |
-| Enrichment presentation | `src/components/companion/GroundingEnrichment.tsx` |
+| Enrichment presentation | `src/screens/pause/components/companion/GroundingEnrichment.tsx` |
 | Enrichment cache table | `grounding_enrichment_cache` (migration `20260418140000_grounding_enrichment_cache.sql`) |
-| Related biases rail | `src/components/companion/RelatedBiasesThisMonth.tsx` (+ `related-biases-util.ts`) |
+| Related biases rail | `src/screens/pause/components/companion/RelatedBiasesThisMonth.tsx` (+ `related-biases-util.ts`) |
 | Full View telemetry hook | `src/screens/pause/hooks/use-fullview-telemetry.ts` (event `companion_fullview_opened`) |
 
 ---

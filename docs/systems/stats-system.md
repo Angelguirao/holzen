@@ -4,7 +4,7 @@
 
 > **Status:** the "Recommended target model (skills-first)" at the bottom of
 > this doc is **shipped**. `Profile > Stats` renders
-> [`StatsContentV2`](../../src/components/stats/StatsContentV2.tsx) with all
+> [`StatsContentV2`](../../src/legacy/full-shell/src/components/stats/StatsContentV2.tsx) with all
 > 13 deep-dive / Journey / Advanced cards, reading exclusively from
 > `v_pause_full` + `pause_step_events` + `pause_companion_events`.
 > **Holzen + skill values are computed client-side on read** — see **Pause V2 — data flow and where scores are computed** below. Pause lifecycle narrative: [`pause-system.md`](pause-system.md).
@@ -22,9 +22,9 @@ Pause lifecycle and ritual signals live in **`pause_instances`**, **`pause_step_
 ### Read path and client-side aggregation
 
 - [`usePauseStatsData`](../../src/hooks/use-pause-stats-data.ts) loads one **TanStack Query** bundle per user: `v_pause_full` (bounded) + `pause_step_events` + `pause_companion_events` via [`fetchPauseStatsData`](../../src/lib/pause-stats-data-query.ts). Home, Journey → Stats, and badges all reuse this cache.
-- **Holzen Score and the five skill values** are computed **in the browser on read** by [`computePauseScore`](../../src/lib/stats/pause-score.ts) from that bundle (e.g. [`SkillOverviewCard`](../../src/components/stats/SkillOverviewCard.tsx), [`HomeStatTiles`](../../src/screens/home/components/HomeStatTiles.tsx)).
+- **Holzen Score and the five skill values** are computed **in the browser on read** by [`computePauseScore`](../../src/lib/stats/pause-score.ts) from that bundle (e.g. [`SkillOverviewCard`](../../src/legacy/full-shell/src/components/stats/SkillOverviewCard.tsx), [`HomeStatTiles`](../../src/screens/home/components/HomeStatTiles.tsx)).
 - After a pause reaches **`completed`** (and on a few related paths), [`invalidatePauseStatsDataForUser`](../../src/lib/pause-stats-invalidate.ts) **invalidates** the pause-stats query key (and several related keys). The next fetch supplies fresh rows; scores **recompute** because they are pure functions of fetched data — nothing is “stale” in a hidden server cache for those numbers.
-- **Brief ritual done** ([`PauseDone`](../../src/components/pause/PauseDone.tsx) `doneVariant="brief"`): shows qualitative **skill-area hints** for *this* pause via [`ScoreImpact`](../../src/components/pause/ScoreImpact.tsx) (`buildPauseScoreImpacts` — reasons only, no fake +N) and lists **badges newly eligible** vs persisted `user_badges` ([`PauseDoneBriefJourneyRecap`](../../src/components/pause/PauseDoneBriefJourneyRecap.tsx)), using the same bundle + `computeBadges` as Journey → Badges. It does **not** show marginal Holzen deltas (those confused “effort vs roll-up”); see Stats for numeric roll-ups.
+- **Brief ritual done** (shipped [`PauseDone`](../../src/screens/pause/components/PauseDone.tsx) + [`ScoreImpact`](../../src/screens/pause/components/ScoreImpact.tsx); full-IA badge recap in legacy [`PauseDoneBriefJourneyRecap`](../../src/legacy/full-shell/src/components/pause/PauseDoneBriefJourneyRecap.tsx)): qualitative hints via `buildPauseScoreImpacts` — reasons only, no fake +N. Numeric roll-ups lived in Journey → Stats (not shipped).
 
 ### Why client-side today (and what “move to server” usually means)
 
@@ -319,7 +319,7 @@ Historical `pause_step_events` rows may still carry `outcome = "nothing"` from a
 
 ## Notes for maintainers (Pause V2)
 
-- Stats tab layout: [`StatsContentV2`](../../src/components/stats/StatsContentV2.tsx) and components under [`src/components/stats/`](../../src/components/stats/).
+- Stats tab layout (legacy): [`StatsContentV2`](../../src/legacy/full-shell/src/components/stats/StatsContentV2.tsx) and `src/legacy/full-shell/src/components/stats/`.
 - Holzen + five skills: [`src/lib/stats/pause-score.ts`](../../src/lib/stats/pause-score.ts) (`computePauseScore`).
 - Data loader + cache keys: [`src/hooks/use-pause-stats-data.ts`](../../src/hooks/use-pause-stats-data.ts), [`src/lib/pause-stats-data-query.ts`](../../src/lib/pause-stats-data-query.ts), [`src/lib/pause-stats-invalidate.ts`](../../src/lib/pause-stats-invalidate.ts).
 - Shared pause-count / “engaged” semantics where still used: [`src/lib/engaged-pause.ts`](../../src/lib/engaged-pause.ts).

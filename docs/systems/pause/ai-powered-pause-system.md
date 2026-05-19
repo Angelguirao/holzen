@@ -279,7 +279,7 @@ This section is **client-centric** (Home open → ritual → companions): `**use
 
 ### 4.1 Manual pause — request order (click path)
 
-`manualTrigger` → `generateMessage` in `**src/hooks/use-holzen.ts**` → Pause UI + `**src/hooks/use-companion-data.ts**`.
+`manualTrigger` → `generateMessage` in `**src/screens/home/hooks/use-holzen.ts**` → Pause UI + `**src/screens/pause/hooks/use-companion-data.ts**`.
 
 | Step | Where | What happens |
 | ---- | ----- | -------------- |
@@ -652,13 +652,13 @@ All four companion cards have a dedicated Full View route that mounts the same p
 
 | Companion | Route                                | Page                                   | Presentation                                                                                                                                                                                                                                                                              |
 | --------- | ------------------------------------ | -------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Signal    | `/companion/signal/:pauseInstanceId`    | `src/pages/CompanionSignalPage.tsx`    | `SignalFullView` (favicon + trusted-source badge)                                                                                                                                                                                                                                         |
-| Grounding | `/companion/grounding/:pauseInstanceId` | `src/pages/CompanionGroundingPage.tsx` | `GroundingFullView` (promoted citation CTA + enrichment block: abstract preview, researcher bios, citation count — via `grounding-enrich` edge function; see [grounding.md §10](companions/grounding.md)). Also: `RelatedBiasesThisMonth` chip rail dedup-by-title from the last 30 days. |
-| History   | `/companion/history/:pauseInstanceId`   | `src/pages/CompanionHistoryPage.tsx`   | `HistoricalInsightDisplay`                                                                                                                                                                                                                                                                |
-| Zoom Out  | `/companion/zoom-out/:pauseInstanceId`  | `src/pages/CompanionZoomOutPage.tsx`   | `ZoomOutDisplay`                                                                                                                                                                                                                                                                          |
+| Signal    | `/companion/signal/:pauseInstanceId`    | `src/screens/pause/CompanionSignalPage.tsx`    | `SignalFullView` (favicon + trusted-source badge)                                                                                                                                                                                                                                         |
+| Grounding | `/companion/grounding/:pauseInstanceId` | `src/screens/pause/CompanionGroundingPage.tsx` | `GroundingFullView` (promoted citation CTA + enrichment block: abstract preview, researcher bios, citation count — via `grounding-enrich` edge function; see [grounding.md §10](companions/grounding.md)). Also: `RelatedBiasesThisMonth` chip rail dedup-by-title from the last 30 days. |
+| History   | `/companion/history/:pauseInstanceId`   | `src/screens/pause/CompanionHistoryPage.tsx`   | `HistoricalInsightDisplay`                                                                                                                                                                                                                                                                |
+| Zoom Out  | `/companion/zoom-out/:pauseInstanceId`  | `src/screens/pause/CompanionZoomOutPage.tsx`   | `ZoomOutDisplay`                                                                                                                                                                                                                                                                          |
 
 
-Shared primitives reused across all four pages (in `src/components/companion/`):
+Shared primitives reused across all four pages (in `src/screens/pause/components/companion/`):
 
 - `**ReadTime**` — chars/WPM-bucketed read-time indicator.
 - `**WhyThisCard**` — collapsible disclosure that explains the orchestrator's pick in terms of mood + market direction + session `preferredBias`. Renders nothing if none of the three are known.
@@ -784,11 +784,10 @@ supabase/functions/
     ├── quality.ts, sanitize.ts, cache.ts, content-library.ts, observe.ts, ratelimit.ts, fallbacks.ts
 
 src/lib/load-reflect-recency-hints.ts   # browser holzen-reflect: moodHistory + dedup pools (parity with pauseRecencyInputs on claim)
-src/hooks/use-holzen.ts
-src/hooks/use-companion-data.ts
-src/components/InterventionSection.tsx
-src/components/CompanionSection.tsx   # embeds InterventionSection + useCompanionData
-src/pages/Admin.tsx                   # ops UI (Monitor, Content, Sources, …) — adjacent tooling, not pause pipeline
+src/screens/home/hooks/use-holzen.ts
+src/screens/pause/hooks/use-companion-data.ts
+src/screens/pause/components/CompanionSection.tsx
+src/screens/admin/AdminScreen.tsx     # ops UI (Monitor, Content, Sources, …) — adjacent tooling, not pause pipeline
 ```
 
 ---

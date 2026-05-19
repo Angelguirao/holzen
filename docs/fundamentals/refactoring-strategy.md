@@ -25,7 +25,7 @@ It complements:
 | **One vertical slice per change set** | Each bullet in the backlog table is an independently reviewable extraction, not a tree-wide rename. |
 | **Preserve product behavior** | Moves are structural (file boundaries), not semantic rewrites of pause / orchestrate / BTC flows. |
 | **Narrow hooks, don’t micro-fragment** | `use-holzen` and `use-companion-data` still **own orchestration and React state**; helpers are **pure or I/O-shaped** modules in `src/lib/`. |
-| **Colocate UI by feature** | Pause/Home pieces live under `src/screens/home/components/` or `pause/` (or existing feature folders), not a generic `widgets/` dump. |
+| **Colocate UI by route** | Pause/Home pieces live under `src/screens/<route>/components/`, not root `src/components/<feature>/` or a generic `widgets/` dump. |
 
 That is **appropriate** for a shipping product with a small surface area of “god” modules: you get **reviewability and test hooks** without destabilizing the app.
 
@@ -35,9 +35,9 @@ That is **appropriate** for a shipping product with a small surface area of “g
 
 ### 1. **Extract presentational UI first**
 
-**What:** Move self-contained JSX (chrome, gates, scaffolds, widgets) into components under `src/components/<feature>/`.
+**What:** Move self-contained JSX (chrome, gates, scaffolds, widgets) into `src/screens/<route>/components/` (or `src/app/components/` when cross-route).
 
-**Why:** Lowest risk—no change to data flow if props stay the same. Improves scanability of `Home.tsx` / `PauseSession.tsx` and matches patterns already used elsewhere (`pause/Pause*`).
+**Why:** Lowest risk—no change to data flow if props stay the same. Improves scanability of `HomeScreen.tsx` / `PauseSessionScreen.tsx`. Placement rules: [client-src-layout.md](client-src-layout.md).
 
 ### 2. **Extract pure logic to `src/lib/` (not new hooks by default)**
 

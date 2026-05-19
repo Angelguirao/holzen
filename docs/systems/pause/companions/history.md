@@ -143,9 +143,9 @@ When `selectIntervention` picks **pattern** as the primary intervention:
 | Quality gate | `supabase/functions/_shared/quality.ts` |
 | Phase config | `supabase/functions/_shared/phase-config.ts` |
 | Content library | `supabase/functions/_shared/content-library.ts` |
-| Client invoke | `src/hooks/use-companion-data.ts` |
-| Full-screen view | `src/pages/CompanionHistoryPage.tsx` — route `/companion/history/:pauseInstanceId` |
-| UI | `src/components/CompanionSection.tsx` (Look Back card via `HistoricalInsightDisplay`) |
+| Client invoke | `src/screens/pause/hooks/use-companion-data.ts` |
+| Full-screen view | `src/screens/pause/CompanionHistoryPage.tsx` — route `/companion/history/:pauseInstanceId` |
+| UI | `src/screens/pause/components/CompanionSection.tsx` (Look Back card via `HistoricalInsightDisplay`) |
 
 ---
 

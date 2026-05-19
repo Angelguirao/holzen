@@ -17,7 +17,7 @@ de-emphasized and advanced charts collapsed by default.
 
 Ship the skills-first IA together with the Pause V2 cutover:
 
-- Stats V2 lives in `src/components/stats/StatsContentV2.tsx` and
+- Stats V2 lives in `src/legacy/full-shell/src/components/stats/StatsContentV2.tsx` (not pause-first bundle) and
   renders four sections in order: Skill Overview → Skill Deep Dives
   → Journey & Consistency → Advanced (collapsed).
 - Every card exposes formula, denominator, sample size, last-updated

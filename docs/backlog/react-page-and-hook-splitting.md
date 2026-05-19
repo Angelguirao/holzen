@@ -21,7 +21,7 @@ The app already follows sound patterns (function components, custom hooks, route
 
 ## Direction
 
-- **Pages:** Extract **presentational** subcomponents and small hooks colocated under `src/components/<feature>/` or `src/pages/<Feature>/parts/` — follow existing patterns (`pause/Pause*` components).
+- **Screens:** Extract **presentational** subcomponents and small hooks under `src/screens/<route>/components/` and `hooks/` — follow `screens/pause/components/Pause*` patterns. See [client-src-layout.md](../fundamentals/client-src-layout.md).
 - **`use-holzen`:** Consider splitting only where boundaries are clear (e.g. cooldown helpers vs `generateMessage` vs BTC fetch), after tests or a stable API for callers.
 - **Scope:** Touch **one vertical slice per PR**; avoid drive-by renames across the tree.
 

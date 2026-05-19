@@ -262,7 +262,7 @@ const Home = () => {
   useHomePauseAudio(newPauseArrival, message, clearNewPauseArrival);
 ```
 
-**What to notice:** **`useOutletContext`** reads data from a **parent route layout** ([`AppLayout`](../../src/components/AppLayout.tsx)). The typed shape lives in [`src/lib/home-app-layout-outlet.ts`](../../src/lib/home-app-layout-outlet.ts). The following lines are small **effect-style** hooks (analytics, audio).
+**What to notice:** **`useOutletContext`** reads data from a **parent route layout** ([`AppLayout`](../../src/app/components/AppLayout.tsx)). The typed shape lives in [`src/lib/home-app-layout-outlet.ts`](../../src/lib/home-app-layout-outlet.ts). The following lines are small **effect-style** hooks (analytics, audio).
 
 ---
 
@@ -553,7 +553,7 @@ const Home = () => {
 - Walk **`useHomeDashboardTodayWiring`** → **`useHomeDashboardSectionDeps`** → **`renderHomeDashboardSection`** to see how one **section id** becomes a card.  
 - Open [`HomeZenModeRoute`](../../src/screens/home/components/HomeZenModeRoute.tsx) to see **`lazy` + `Suspense`** around Zen.  
 - Keep [`screens/home.md`](../screens/home.md) open for product modes and file map.  
-- For **`/pause`**, keep [`screens/pause.md`](../screens/pause.md) open next to [`PauseSession.tsx`](../../src/pages/PauseSession.tsx).
+- For **`/pause`**, keep [`screens/pause.md`](../screens/pause.md) open next to [`PauseSession.tsx`](../../src/screens/pause/PauseSessionScreen.tsx).
 
 ---
 
@@ -580,7 +580,7 @@ const Home = () => {
 
 ### Where Pause fits
 
-**[screens/pause.md](../screens/pause.md)** maps [`PauseSession.tsx`](../../src/pages/PauseSession.tsx): same **conductor** idea as Home (hooks first, returns at the bottom), but for a **single vertical** (volatility ritual) instead of a dashboard. Canonical **data** and RPC contracts stay in [systems/pause-system.md](../systems/pause-system.md) — especially **section 10** — while `pause.md` is the **UI + file** index for this route.
+**[screens/pause.md](../screens/pause.md)** maps [`PauseSession.tsx`](../../src/screens/pause/PauseSessionScreen.tsx): same **conductor** idea as Home (hooks first, returns at the bottom), but for a **single vertical** (volatility ritual) instead of a dashboard. Canonical **data** and RPC contracts stay in [systems/pause-system.md](../systems/pause-system.md) — especially **section 10** — while `pause.md` is the **UI + file** index for this route.
 
 ---
 

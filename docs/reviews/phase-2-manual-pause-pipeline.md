@@ -49,26 +49,26 @@ This phase is the second "mental model pass": after Phase 1 (who can reach `/pau
 - Defines the "happy path" shape that `PauseSession` expects when coming from Home.
 - Maintainer-oriented overview (widgets, zen mode, checkout params, error helpers): [screens/home.md](../screens/home.md).
 
-### `src/hooks/use-holzen.ts` — producer for pause state
+### `src/screens/home/hooks/use-holzen.ts` — producer for pause state
 
 - `manualTrigger` -> `generateMessage`: builds context from BTC data; **`pause_create_or_reuse`** (non-silent: no `holzen-reflect` on Home); **silent**: stub `reflection_text` upsert; sets `context`, `lastPauseInstanceId`, and **`message`** only when a reflection exists (silent or hydrated from DB).
 - Cooldown: `manualCooldownRemaining` + `localStorage` key per user.
 
-### `src/pages/PauseSession.tsx` — pause UI orchestration + restoration
+### `src/screens/pause/PauseSessionScreen.tsx` — pause UI orchestration + restoration
 
 - Merges `location.state`, persisted `holzen_pause_session`, and `useHolzen()` into one view model (`message`, `context`, `pauseInstanceId`, `companions`, etc.).
 - Mismatch guard: saved session discarded when `navState.pauseInstanceId` differs from saved (when `navState.pauseInstanceId` is present).
 - If shell not ready and profile still loading: loading UI; if still none: **`PauseSessionGate`** empty state (`pause.sessionEmptyTitle` / `sessionEmptyBody`) — not shown when an instance id exists but reflection is still generating at Reflect.
 
-### `src/components/pause/PauseReflect.tsx` — reflect step shell
+### `src/screens/pause/components/PauseReflect.tsx` — reflect step shell
 
 - Passes `companions`, `companionPrefs`, `severity`, `pauseInstanceId`, `context`, `reflectionMessage` into `CompanionSection`.
 
-### `src/components/CompanionSection.tsx` — companion UI + data hook
+### `src/screens/pause/components/CompanionSection.tsx` — companion UI + data hook
 
 - Renders companion cards; uses `useCompanionData` internally (or passes through per codebase) for orchestration-driven content.
 
-### `src/hooks/use-companion-data.ts` — orchestration client
+### `src/screens/pause/hooks/use-companion-data.ts` — orchestration client
 
 - Invokes `companion-orchestrate` with `pauseInstanceId`, context, prefs, mood, etc.; handles cache-oriented responses and regeneration paths.
 
