@@ -49,9 +49,9 @@ function useTabChunkPrefetch() {
   useEffect(() => {
     if (typeof window === 'undefined') return;
     const run = () => {
-      void import('@/pages/Home').catch(() => {});
-      void import('@/pages/Archive').catch(() => {});
-      void import('@/pages/journey/JourneyOverview').catch(() => {});
+      void import('@/screens/home/HomeScreen').catch(() => {});
+      void import('@/screens/archive/ArchiveScreen').catch(() => {});
+      void import('@/screens/journey/JourneyOverviewScreen').catch(() => {});
       void import('@/screens/settings/SettingsHubScreen').catch(() => {});
     };
     const ric = (window as Window & {

@@ -1,11 +1,22 @@
 # Marketing / public screens
 
-Public routes (no auth shell). Components for landing live under `components/`; full pages colocate here over time.
+Public routes (no auth shell). Landing section components live under `components/`.
 
-| Path | Route |
-|------|-------|
-| `AboutScreen.tsx` | `/about` |
+| Screen | Route |
+|--------|-------|
+| `LandingScreen` | `/welcome` (and public entry) |
+| `AuthScreen` | `/auth` |
+| `AboutScreen` | `/about` |
+| `TermsScreen` | `/terms` |
+| `PrivacyScreen` | `/privacy` |
+| `ResetPasswordScreen` | `/reset-password` |
+| `NotFoundScreen` | `*` catch-all |
+| `BlogScreen` | `/blog` |
+| `BlogPostScreen` | `/blog/:slug` |
+| `RoadmapScreen` | `/roadmap` |
+| `ReserveScreen` | `/reserve` |
+| `UnsubscribeScreen` | `/unsubscribe` |
 
-Thin page: `pages/About.tsx` re-exports `AboutScreen`.
+`pages/*.tsx` — thin re-exports for Lovable/route stability. `App.tsx` lazy-loads `screens/marketing/*Screen` directly.
 
-Still in `pages/` (not yet migrated): `Landing`, `Auth`, `Terms`, `Privacy`, `Blog`, `BlogPost`, `Reserve`, `Roadmap`, `ResetPassword`.
+**Still in `pages/`:** internal ops (`SmokeTest`, `SentryAlerts`, `EdgeCoverage`).
