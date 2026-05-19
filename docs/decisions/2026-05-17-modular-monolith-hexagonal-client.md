@@ -43,7 +43,7 @@ Moving the SPA to `apps/web` **today** would break publish (no root `index.html`
 
 6. **Keep React SPA + Vite** for the web app; do **not** migrate to Next.js/Remix as part of this ADR ([spa-framework-evaluation.md](../backlog/spa-framework-evaluation.md) remains the place to revisit SSR).
 
-7. **Wave 0–5j (shipped on root Vite):** `src/features/<context>/…` with layer import rules; presentation in `src/screens/`, `src/app/components/`, and `src/components/ui/` (wave 5 — see [frontend-module-layout.md](../fundamentals/frontend-module-layout.md) §11). Thin `src/pages/*` re-exports remain for stable paths; `App.tsx` lazy-loads `screens/*` directly.
+7. **Wave 0–5j (shipped on root Vite):** `src/features/<context>/…` with layer import rules; presentation in `src/screens/`, `src/app/components/`, and `src/components/ui/` (wave 5 — see [frontend-module-layout.md](../fundamentals/frontend-module-layout.md) §11). `App.tsx` lazy-loads `screens/*` directly (removed `src/pages/` shim, May 2026).
 
 8. **Extract `packages/*` only when** at least one is true:
    - A **second client** (e.g. mobile/native) needs shared modules.

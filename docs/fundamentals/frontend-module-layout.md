@@ -14,7 +14,7 @@ This document is the **operational map**: folders, packages, naming, import rule
 |---|-----------------------------------|-------------------------|
 | **Vite root** | Repository root (`vite.config.ts`, `index.html`, `src/`) | `apps/web` |
 | **Bounded contexts** | `src/features/<context>/` (same layers as packages) | `packages/<context>/` |
-| **Screens** | `src/screens/` (+ thin `src/pages/` re-exports); design system in `src/components/ui/` | `apps/web/src/screens/` |
+| **Screens** | `src/screens/`; design system in `src/components/ui/` | `apps/web/src/screens/` |
 | **Boundary enforcement** | `npm run check:feature-imports` | `check:package-boundaries` + package `public.ts` |
 | **When to extract packages** | — | Second client, leave Lovable publish, or confirmed Lovable subdirectory-root support |
 
@@ -44,7 +44,7 @@ holzen/
     web/
       src/
         app/                    # App.tsx, providers, route table
-        pages/                  # thin re-exports only
+        screens/                # route presentation (*Screen.tsx, hooks/, components/)
         modules/                # optional: wire adapters → use cases per route
       index.html
       vite.config.ts
@@ -293,8 +293,8 @@ Use this when moving files. Paths are indicative — adjust to actual filenames 
 | `src/lib/posthog.ts`, `sentry.ts`, `invoke-edge.ts`, `cid.ts` | `packages/infrastructure` or `shared-kernel` |
 | `src/screens/pause/components/*`, `Companion*.tsx` | `apps/web/src/screens/pause/` (5c); was `components/pause/*` |
 | `src/screens/home/components/*` | `apps/web/src/screens/home/` |
-| `src/pages/settings/*` | `apps/web/src/screens/settings/` + `packages/user` |
-| `src/screens/pause/PauseSessionScreen.tsx` | `apps/web` pause screen (+ optional thin `pages/` re-export) |
+| `src/screens/settings/*` | `apps/web/src/screens/settings/` + `packages/user` |
+| `src/screens/pause/PauseSessionScreen.tsx` | `apps/web` pause screen |
 | `src/integrations/supabase/types.ts` | Stay generated; consumed by infrastructure only |
 | `src/legacy/**` | Remove from `main`; git tag / archive branch only |
 
@@ -311,7 +311,6 @@ src/
   App.tsx
   app/components/                  # cross-route shell (wave 5j)
   screens/<route>/                 # *Screen.tsx, components/, hooks/
-  pages/                           # thin re-exports (check:thin-pages)
   components/ui/, components/icons/  # design system only at components root
   hooks/, lib/                      # shims; shrink as contexts migrate
   features/
@@ -332,7 +331,7 @@ src/
   integrations/supabase/           # until adapters move to features/*/infrastructure
 ```
 
-Same dependency rules as §2–3 for layers that exist. `npm run check:feature-imports` enforces layer rules under `src/features/**` and blocks deep `@/features/<ctx>/(application|infrastructure|domain|presentation)/` imports from active `src/hooks`, `src/pages`, `src/components`, and `src/test` (allowed: `public`, `public-queries`, `public-rpc`, plus RPC lib shims `apply-bulk-hold-outcomes` / `pause-ritual-depth-upgrade`).
+Same dependency rules as §2–3 for layers that exist. `npm run check:feature-imports` enforces layer rules under `src/features/**` and blocks deep `@/features/<ctx>/(application|infrastructure|domain|presentation)/` imports from active `src/hooks`, `src/components`, and `src/test` (allowed: `public`, `public-queries`, `public-rpc`, plus RPC lib shims `apply-bulk-hold-outcomes` / `pause-ritual-depth-upgrade`).
 
 **`src/lib/*` shims (legacy + gradual removal):** re-export from `@/features/<ctx>/public` (domain/application, no Supabase) or `public-queries.ts` (TanStack + Supabase). RPC-heavy use cases (`applyBulkHoldOutcomes`, `logPauseRitualDepthUpgraded`) stay on narrow `application/` or `public-rpc` paths — not `public.ts` — so Vitest does not eager-load the Supabase client.
 
@@ -350,14 +349,14 @@ Same dependency rules as §2–3 for layers that exist. `npm run check:feature-i
 | **5a** | Domain contexts in `src/features/*` + `check:architecture-alignment` | **Done** on `feature/refactoring6` — see §10 |
 | **5b** | Presentation guardrails | **Done** — `src/screens/README.md`; `check:no-root-components` in `test:ci` |
 | **5c** | **Pause** screen pilot | **Done** — `components/pause/**` → `screens/pause/components/**`; [docs/screens/pause.md](../screens/pause.md) |
-| **5d** | **Home** screen | **Done** — `components/home/**` → `screens/home/components/`; thin `pages/Home.tsx` → `HomeScreen` |
+| **5d** | **Home** screen | **Done** — `components/home/**` → `screens/home/components/`; `HomeScreen.tsx` |
 | **5e** | **Archive, Journey, Settings** | **Done** — `screens/{archive,journey,settings}/components/` |
-| **5f** | Companion routes | **Done** — `/companion/*` pages + companion UI under `screens/pause/`; thin `pages/Companion*.tsx` re-exports |
+| **5f** | Companion routes | **Done** — `/companion/*` + companion UI under `screens/pause/` |
 | **5g** | Marketing / admin | **Done** — `screens/marketing/*Screen` + `components/`; `screens/admin/AdminScreen` |
-| **5h** | Orchestration | **Done (shipped surfaces)** — `use-home-*` + `HolzenProvider`/`useHolzen` → `screens/home/hooks/` (active imports `@/screens/home/hooks/use-holzen`; root `@/hooks/use-holzen` shim for legacy only); `use-pause-session-*` + ritual hooks → `screens/pause/hooks/`; `HomeScreen` / `PauseSessionScreen` with thin `pages/` re-exports |
+| **5h** | Orchestration | **Done (shipped surfaces)** — `use-home-*` + `HolzenProvider`/`useHolzen` → `screens/home/hooks/` (active imports `@/screens/home/hooks/use-holzen`; root `@/hooks/use-holzen` shim for legacy only); `use-pause-session-*` + ritual hooks → `screens/pause/hooks/`; `HomeScreen` / `PauseSessionScreen` |
 | **5i** | Shrink global layers | **Done (shipped)** — allowlist **37** root shell/shared components (was 59); home market widgets + onboarding + `MoodCheck` under screens; domain `MoodValue` in `features/pause` |
 | **5j** | App shell | **Done (shipped)** — `src/app/components/` (layout, nav, meta, error boundary, checkout/subscribe chrome, auth loading); allowlist **0** at `src/components/*.tsx` (was 37; only `components/ui/` remains); `check:no-screens-in-features` |
-| **5j+** | Screen hooks + route entrypoints | **Done** — all shipped routes under `screens/*/*Screen`; `pages/` thin re-exports; `screens/ops/` for internal tools; `@/hooks/*` shims; `App.tsx` lazy-loads screens |
+| **5j+** | Screen hooks + route entrypoints | **Done** — all shipped routes under `screens/*/*Screen`; removed `src/pages/` shim (May 2026); `screens/ops/` for internal tools; `@/hooks/*` shims; `App.tsx` lazy-loads screens |
 | **6** | **Gated:** `pnpm-workspace.yaml`, `apps/web`, `packages/*` extract | Only after ADR §8 trigger; `build` from `apps/web` |
 | **7** | `shared-kernel`, `contracts` (minimal), `packages/infrastructure` | Adapter smoke test |
 | **8+** | `apps/web/src/screens`; `check:package-boundaries` | Post-extraction only |

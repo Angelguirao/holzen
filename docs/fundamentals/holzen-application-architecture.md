@@ -357,7 +357,7 @@ External reading is **optional**; this table is the project’s **curated** stan
 
 ## 10. Target repository shape (pre-launch baseline)
 
-The **current** tree (`src/pages`, flat `src/hooks`, flat `src/lib`) is **transitional**. The **target** shape below implements these principles. Operational detail: [frontend-module-layout.md](frontend-module-layout.md).
+The **current** tree (flat `src/hooks`, flat `src/lib`) is **transitional**. Presentation lives in `src/screens/`; the former `src/pages/` shim was removed (May 2026). The **target** shape below implements these principles. Operational detail: [frontend-module-layout.md](frontend-module-layout.md).
 
 ```text
 apps/

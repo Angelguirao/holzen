@@ -55,4 +55,4 @@ Cross-route chrome and providers: layout, bottom nav, document meta, error bound
 | Notification inbox | `features/user/public` (mounted in `AppLayout`) |
 | Marketing footer | `screens/marketing/components/PublicFooter` |
 | Primitives (`PageHeading`, `ProLock`, …) | `components/ui/` |
-| Route wiring | `src/pages/` + `App.tsx` |
+| Route wiring | `App.tsx` → `src/screens/*` |

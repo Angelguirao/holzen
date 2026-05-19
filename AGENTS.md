@@ -22,7 +22,7 @@ Use this table to pick the **canonical narrative** for the slice you are touchin
 | New or renamed edge HTTP handler | `supabase/functions/_shared/with-request-logging.ts`, [docs/ops/edge-logging-conventions.md](docs/ops/edge-logging-conventions.md) | `[functions.*]` in `supabase/config.toml`, `EdgeCoverage.tsx`, `npm run check:edge-logging` + `check:edge-coverage-manifest` |
 | PostHog product events or properties | [docs/ops/event-taxonomy.md](docs/ops/event-taxonomy.md) | Call sites + privacy/sanitization patterns in `src/lib/posthog.ts` |
 | Feature flags (new flag or rollout change) | [docs/ops/feature-flags.md](docs/ops/feature-flags.md) | `use-feature-flag` usage; default and sunset note |
-| React screens (orchestration, hooks split, memoization) | [docs/fundamentals/react-screen-orchestration.md](docs/fundamentals/react-screen-orchestration.md), [src/screens/README.md](src/screens/README.md) | [modern-react-practices-holzen.md](docs/fundamentals/modern-react-practices-holzen.md) scorecard; [refactoring-strategy.md](docs/fundamentals/refactoring-strategy.md); `npm run check:thin-pages` |
+| React screens (orchestration, hooks split, memoization) | [docs/fundamentals/react-screen-orchestration.md](docs/fundamentals/react-screen-orchestration.md), [src/screens/README.md](src/screens/README.md) | [modern-react-practices-holzen.md](docs/fundamentals/modern-react-practices-holzen.md) scorecard; [refactoring-strategy.md](docs/fundamentals/refactoring-strategy.md) |
 | Client `src/` folder placement (app / screens / components / features) | [docs/fundamentals/client-src-layout.md](docs/fundamentals/client-src-layout.md) | Folder READMEs under `src/app`, `src/screens`, `src/components` |
 | Application structure (bounded contexts, use cases, ports, monorepo target, pre-launch restructure) | [docs/fundamentals/holzen-application-architecture.md](docs/fundamentals/holzen-application-architecture.md) | [frontend-module-layout.md](docs/fundamentals/frontend-module-layout.md); ADR [2026-05-17-modular-monolith-hexagonal-client.md](docs/decisions/2026-05-17-modular-monolith-hexagonal-client.md) |
 | Cross-surface ownership (truth vs UI projection; TanStack Query vs UI-only state; avoid duplicate “backends”) | [docs/fundamentals/client-server-architecture-holzen.md](docs/fundamentals/client-server-architecture-holzen.md) | [holzen-application-architecture.md](docs/fundamentals/holzen-application-architecture.md); [navigating-the-codebase.md](docs/fundamentals/navigating-the-codebase.md) §6.1 when fetch/cache patterns change |
@@ -56,9 +56,8 @@ Use this table to pick the **canonical narrative** for the slice you are touchin
 | `npm run check:edge` | Optional: `deno check` on all `supabase/functions/*/index.ts`; **skips** if Deno is missing. Resolves `deno` from PATH, then `DENO_INSTALL/bin`, then `~/.deno/bin` (official installer default). |
 | `npm run check:edge-logging` | Regex guardrail: HTTP-serving edge `index.ts` files must wrap handlers in `withRequestLogging` (BetterStack + Sentry). Runs in **`test:ci`** and **`check:prepush`**. |
 | `npm run check:edge-coverage-manifest` | Ensures `src/screens/ops/EdgeCoverageScreen.tsx` `COVERAGE` lists every `supabase/config.toml` `[functions.*]` name (and no extras). Run when adding/removing edge functions. |
-| `npm run check:thin-pages` | Every `src/pages/**/*.tsx` is a one-line re-export from `@/screens/*` (in **`check:architecture-alignment`** / **`test:ci`**) |
 | `npm run check:no-root-components` | No new `src/components/*.tsx` outside `ui/` + allowlist (in **`test:ci`**) |
-| `npm run check:architecture-alignment` | Features layout, no screens-in-features, thin pages (in **`test:ci`**) |
+| `npm run check:architecture-alignment` | Features layout, no screens-in-features (in **`test:ci`**) |
 | `npm run check:prepush` | Full scripted preflight (`scripts/pre-push-check.sh`). **Requires `bash`** (Git Bash / WSL on Windows). |
 | `npm run smoke:edge-logging` | Optional: HTTP smoke against deployed edges — verifies `x-cid` round-trip through `withRequestLogging` (see `supabase/functions/README.md`). |
 | `npm run gen:types` | Regenerate `src/integrations/supabase/types.ts` from the **linked** Supabase project (`supabase login` or `SUPABASE_ACCESS_TOKEN`). Run after DB migrations. |
@@ -76,7 +75,7 @@ Use this table to pick the **canonical narrative** for the slice you are touchin
 | Area | Location |
 |------|----------|
 | Routes | `src/App.tsx` — `ProtectedRoute` / `PublicOnlyRoute`, shell vs full-screen; helpers in `src/lib/app-routes.ts` (four-tab shell; dead `/tools/*` → `NotFound`) |
-| Screens (presentation) | `src/screens/<route>/` — [src/screens/README.md](src/screens/README.md); thin re-exports in `src/pages/` (`check:thin-pages`) |
+| Screens (presentation) | `src/screens/<route>/` — [src/screens/README.md](src/screens/README.md); `App.tsx` lazy-loads `*Screen.tsx` |
 | App shell (layout, nav, chrome) | `src/app/components/`, `src/app/hooks/` — [src/app/README.md](src/app/README.md) |
 | Pause lifecycle | `src/features/pause/` + ritual UI in `src/screens/pause/`; `@/lib/pause-*` shims until removed. Canonical model: [docs/systems/pause-system.md](docs/systems/pause-system.md). Schema + RPCs: `202604232007*_pause_*.sql` … `20260423202000_pause_v2_destructive_cutover.sql`. |
 | Stats / badges UI | **Not in active bundle** — `src/legacy/full-shell/` + [active-surface.md](docs/ops/active-surface.md); `src/lib/stats/` may remain for tests |

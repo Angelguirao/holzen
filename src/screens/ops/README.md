@@ -8,4 +8,4 @@ Admin-gated dev/ops routes. Not part of the pause-first product shell.
 | `SentryAlertsScreen` | `/sentry-alerts` |
 | `EdgeCoverageScreen` | `/edge-coverage` |
 
-`pages/*.tsx` remain thin re-exports. `App.tsx` lazy-loads `screens/ops/*` directly.
+`App.tsx` lazy-loads `screens/ops/*` directly.

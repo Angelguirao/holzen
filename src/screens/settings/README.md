@@ -16,4 +16,4 @@
 | `components/` | Section panels, hub UI, email change |
 | `hooks/` | Screen-local hooks colocated under other screens; settings uses shared `src/hooks/` for auth/subscription |
 
-`pages/settings/SettingsSectionPage.tsx` — thin re-export only. `pages/BillingHistory.tsx` → `BillingHistoryScreen`.
+`App.tsx` lazy-loads `SettingsSectionScreen`, `BillingHistoryScreen`, etc. from this folder.
