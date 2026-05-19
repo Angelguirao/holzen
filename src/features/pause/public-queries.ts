@@ -133,7 +133,13 @@ export { fetchHaikuTextForPauseInstance } from './infrastructure/queries/haiku-a
 export {
   fetchOpeningMessageForPauseInstance,
   generateReflectionAtReflectStep,
+  persistReflectionArtifacts,
+  type PersistReflectionArtifactsParams,
 } from './infrastructure/reflect/reflection-artifact';
+export {
+  fetchOpenPauseHomePreview,
+  type OpenPauseHomePreview,
+} from './infrastructure/queries/open-pause-home-preview-query';
 export {
   GROUNDING_ENRICHMENT_DISABLED_QUERY_KEY,
   GROUNDING_ENRICHMENT_DISABLED_SEGMENT,
