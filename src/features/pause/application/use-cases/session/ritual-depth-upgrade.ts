@@ -1,17 +1,19 @@
 import type { TFunction } from 'i18next';
-import { pauseLogStep } from '@/features/pause/public-rpc';
+import { logPauseStep } from '@/features/pause/application/use-cases/ritual/log-pause-step';
 import { ritualDepthUpgradedPayload } from '@/features/pause/application/use-cases/ritual-depth-upgrade-payload';
 import { showPauseStepSyncFailedToast } from '@/features/pause/application/use-cases/feedback/step-sync-toast';
+import type { PauseRepository } from '@/features/pause/ports/pause-repository';
 
 export { ritualDepthUpgradedPayload } from '@/features/pause/application/use-cases/ritual-depth-upgrade-payload';
 
 /** Persists brief → deep upgrade so Postgres/analytics no longer treat the row as brief-only. */
 export async function logPauseRitualDepthUpgraded(
+  repository: PauseRepository,
   instanceId: string,
   t: TFunction,
 ): Promise<boolean> {
   try {
-    await pauseLogStep({
+    await logPauseStep(repository, {
       instanceId,
       stepType: 'ritual_depth_upgraded',
       payload: ritualDepthUpgradedPayload(),

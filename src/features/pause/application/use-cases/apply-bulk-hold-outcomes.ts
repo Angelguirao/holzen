@@ -1,6 +1,7 @@
-import { pauseLogStep } from '../../infrastructure/pause-rpc-client';
+import { logPauseStep } from './ritual/log-pause-step';
 import { buildOutcomeLoggedPayload } from './outcome-log-payload';
 import type { BulkHoldOutcomeChoice, BulkHoldPendingPause } from '../../domain/bulk-hold';
+import type { PauseRepository } from '../../ports/pause-repository';
 
 export type BulkHoldApplyResult =
   | { status: 'success'; count: number }
@@ -18,6 +19,7 @@ function rowFailed(result: PromiseSettledResult<unknown>): boolean {
  * after DB allows retrospective outcomes (see pause migration expired rescue).
  */
 export async function applyBulkHoldOutcomes(
+  repository: PauseRepository,
   rows: BulkHoldPendingPause[],
   resolver: (p: BulkHoldPendingPause) => BulkHoldOutcomeChoice,
 ): Promise<BulkHoldApplyResult> {
@@ -25,7 +27,7 @@ export async function applyBulkHoldOutcomes(
 
   const settled = await Promise.allSettled(
     rows.map((p) =>
-      pauseLogStep({
+      logPauseStep(repository, {
         instanceId: p.id,
         stepType: 'outcome_logged',
         payload: buildOutcomeLoggedPayload(resolver(p)),

@@ -1,12 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { applyBulkHoldOutcomes } from '@/features/pause/application/use-cases/apply-bulk-hold-outcomes';
 import type { BulkHoldPendingPause } from '@/features/pause/public';
-
-vi.mock('@/features/pause/infrastructure/pause-rpc-client', () => ({
-  pauseLogStep: vi.fn(),
-}));
-
-import { pauseLogStep } from '@/features/pause/infrastructure/pause-rpc-client';
+import type { PauseRepository } from '@/features/pause/ports/pause-repository';
 
 const row = (id: string): BulkHoldPendingPause => ({
   id,
@@ -14,29 +9,46 @@ const row = (id: string): BulkHoldPendingPause => ({
   context_snapshot: null,
 });
 
-beforeEach(() => {
-  vi.mocked(pauseLogStep).mockReset();
-});
+function mockRepository(logStep: PauseRepository['logStep']): PauseRepository {
+  return {
+    createOrReuse: vi.fn(),
+    adoptPendingOffer: vi.fn(),
+    declinePendingOffer: vi.fn(),
+    logStep,
+    logCompanion: vi.fn(),
+    dismissCurrent: vi.fn(),
+  };
+}
 
 describe('applyBulkHoldOutcomes', () => {
+  let logStep: ReturnType<typeof vi.fn>;
+
+  beforeEach(() => {
+    logStep = vi.fn();
+  });
+
   it('returns success when all RPCs resolve', async () => {
-    vi.mocked(pauseLogStep).mockResolvedValue('expired' as never);
-    const r = await applyBulkHoldOutcomes([row('a'), row('b')], () => 'held');
+    logStep.mockResolvedValue('expired');
+    const r = await applyBulkHoldOutcomes(mockRepository(logStep), [row('a'), row('b')], () => 'held');
     expect(r).toEqual({ status: 'success', count: 2 });
   });
 
   it('returns failed when all reject', async () => {
-    vi.mocked(pauseLogStep).mockRejectedValue(new Error('nope'));
-    const r = await applyBulkHoldOutcomes([row('a')], () => 'held');
+    logStep.mockRejectedValue(new Error('nope'));
+    const r = await applyBulkHoldOutcomes(mockRepository(logStep), [row('a')], () => 'held');
     expect(r).toEqual({ status: 'failed' });
   });
 
   it('returns partial when some fail', async () => {
-    vi.mocked(pauseLogStep).mockImplementation(async ({ instanceId }) => {
+    logStep.mockImplementation(async ({ instanceId }) => {
       if (instanceId === 'bad') throw new Error('nope');
-      return 'expired' as never;
+      return 'expired';
     });
-    const r = await applyBulkHoldOutcomes([row('ok'), row('bad')], () => 'held');
+    const r = await applyBulkHoldOutcomes(
+      mockRepository(logStep),
+      [row('ok'), row('bad')],
+      () => 'held',
+    );
     expect(r.status).toBe('partial');
     if (r.status === 'partial') {
       expect(r.failedRows.map((x) => x.id)).toEqual(['bad']);
