@@ -1,0 +1,2 @@
+# One path per line — shrink as files migrate to src/screens/*/components/ or src/app/components/
+# (empty = no allowlisted root presentation files except components/ui/)

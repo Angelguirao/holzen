@@ -18,7 +18,7 @@ vi.mock('@/hooks/use-subscription', () => ({
   }),
 }));
 
-import { Onboarding } from '@/components/Onboarding';
+import { Onboarding } from '@/screens/home/components/Onboarding';
 
 describe('F1 — Sign up → onboard → trial', () => {
   beforeEach(() => {

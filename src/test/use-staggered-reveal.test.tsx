@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import { renderHook, act } from '@testing-library/react';
-import { useStaggeredReveal } from '@/components/companion/use-staggered-reveal';
+import { useStaggeredReveal } from '@/screens/pause/components/companion/use-staggered-reveal';
 
 /**
  * `useStaggeredReveal` gates breathing-room behavior on companion Full Views.

@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
-import { hasPersistedPauseSessionPayload } from '@/lib/pause-persisted-session';
-import { DEFAULT_COMPANIONS, DEFAULT_PREFS } from '@/lib/pause-session-storage';
+import { hasPersistedPauseSessionPayload } from '@/features/pause/public';
+import { DEFAULT_COMPANIONS, DEFAULT_PREFS } from '@/features/pause/public';
 
 const base = {
   message: '',

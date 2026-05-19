@@ -1,16 +1,17 @@
 import { describe, expect, it, vi, beforeEach } from 'vitest';
 import { renderHook, act } from '@testing-library/react';
 import type { TFunction } from 'i18next';
-import { usePauseFavoriteToggle } from '@/hooks/use-pause-favorite-toggle';
-import { showPauseFavoriteProHintToast } from '@/lib/pause-favorite-toast';
-
-vi.mock('@/lib/pause-archive-list-query', () => ({
-  pauseArchiveListQueryPrefix: (userId: string) => ['pause-archive', userId] as const,
-}));
+import { usePauseFavoriteToggle } from '@/screens/pause/hooks/use-pause-favorite-toggle';
+import { showPauseFavoriteProHintToast } from '@/features/pause/public';
 
 const { pauseLogStepMock, invalidateQueriesMock } = vi.hoisted(() => ({
   pauseLogStepMock: vi.fn(),
   invalidateQueriesMock: vi.fn(),
+}));
+
+vi.mock('@/features/pause/public', () => ({
+  showPauseFavoriteProHintToast: vi.fn(),
+  pauseArchiveListQueryPrefix: (userId: string) => ['pause-archive', userId] as const,
 }));
 
 vi.mock('@tanstack/react-query', () => ({
@@ -21,12 +22,8 @@ vi.mock('@/hooks/use-auth', () => ({
   useAuth: () => ({ user: { id: 'archive-user-1' }, loading: false }),
 }));
 
-vi.mock('@/lib/pause-api', () => ({
+vi.mock('@/features/pause/public-rpc', () => ({
   pauseLogStep: (...args: unknown[]) => pauseLogStepMock(...args),
-}));
-
-vi.mock('@/lib/pause-favorite-toast', () => ({
-  showPauseFavoriteProHintToast: vi.fn(),
 }));
 
 vi.mock('@/lib/haptics', () => ({

@@ -6,48 +6,45 @@
     <title>Holzen — Pause before you act</title>
     <meta name="description" content="When Bitcoin moves, pause before you do. Holzen watches volatility and sends AI-generated reflections — not advice, not urgency — just a moment to consider.">
     <meta name="author" content="Holzen" />
-    <link rel="canonical" href="https://holzen.app/" />
+    <link rel="canonical" href="__SITE_ORIGIN__/" />
+    <link rel="icon" type="image/png" href="/favicon.png" />
 
     <meta property="og:title" content="Holzen — Pause before you act">
     <meta name="twitter:title" content="Holzen — Pause before you act">
     <meta property="og:description" content="When Bitcoin moves, pause before you do. Holzen watches volatility and sends AI-generated reflections — not advice, not urgency — just a moment to consider.">
     <meta name="twitter:description" content="When Bitcoin moves, pause before you do. Holzen watches volatility and sends AI-generated reflections — not advice, not urgency — just a moment to consider.">
 
-    <!-- Open Graph -->
     <meta property="og:type" content="website" />
-    <meta property="og:url" content="https://holzen.app/" />
-    <meta property="og:image" content="https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/c4653e5c-d931-45b2-9f4e-5ad80cd926c5/id-preview-d4ee90a8--20ccae1d-fb38-404c-8a5c-12455c341261.lovable.app-1776614060044.png">
+    <meta property="og:url" content="__SITE_ORIGIN__/" />
+    <meta property="og:image" content="__OG_IMAGE_URL__">
     <meta property="og:site_name" content="Holzen" />
 
-    <!-- Twitter -->
     <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:image" content="https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/c4653e5c-d931-45b2-9f4e-5ad80cd926c5/id-preview-d4ee90a8--20ccae1d-fb38-404c-8a5c-12455c341261.lovable.app-1776614060044.png">
+    <meta name="twitter:image" content="__OG_IMAGE_URL__">
 
-    <!-- PWA & Icons -->
     <link rel="manifest" href="/manifest.json" />
     <meta name="theme-color" content="#151719" />
     <meta name="mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-capable" content="yes" />
-    <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
     <link rel="apple-touch-icon" href="/icon-512.png" />
 
-    <!-- JSON-LD Structured Data -->
     <script type="application/ld+json">
     {
       "@context": "https://schema.org",
       "@type": "SoftwareApplication",
       "name": "Holzen",
-      "url": "https://holzen.app",
+      "url": "__SITE_ORIGIN__",
       "description": "When Bitcoin moves, pause before you do. Holzen watches volatility and sends AI-generated reflections — not advice, not urgency — just a moment to consider.",
       "applicationCategory": "FinanceApplication",
       "operatingSystem": "Web",
       "offers": {
         "@type": "Offer",
-        "price": "4.99",
+        "price": "__JSON_LD_PRICE__",
         "priceCurrency": "USD",
-        "description": "7-day free trial of Pro, then $4.99/month. Unlimited pauses and AI companions. Cancel anytime."
+        "description": "__JSON_LD_OFFER_DESCRIPTION__"
       },
-      "image": "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/c4653e5c-d931-45b2-9f4e-5ad80cd926c5/id-preview-d4ee90a8--20ccae1d-fb38-404c-8a5c-12455c341261.lovable.app-1776614060044.png"
+      "image": "__OG_IMAGE_URL__"
     }
     </script>
 </head>
@@ -103,8 +100,6 @@
           return;
         }
 
-        // If app bundle fails to boot (e.g. stale SW/chunk mismatch),
-        // render a self-healing recovery UI instead of a blank white page.
         window.setTimeout(() => {
           const root = document.getElementById("root");
           if (!root || root.children.length > 0) return;
@@ -114,12 +109,12 @@
             : "";
 
           root.innerHTML = `
-            <main style="min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px;background:#f5f2ec;color:#1f2937;font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif;">
+            <main style="min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px;background:#151719;color:#f5f2ec;font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif;">
               <section style="max-width:460px;text-align:center;line-height:1.5;">
                 <h1 style="font-size:22px;margin:0 0 12px;">Holzen needs a quick refresh</h1>
                 <p style="margin:0 0 18px;opacity:0.82;">Your browser likely has an old cached app version. Resetting local app cache will fix this.</p>
                 ${detail}
-                <button id="reset-app-cache-btn" style="border:0;border-radius:999px;padding:12px 18px;background:#111827;color:#ffffff;font-weight:600;cursor:pointer;">Reset app cache</button>
+                <button id="reset-app-cache-btn" style="border:0;border-radius:999px;padding:12px 18px;background:#DBB366;color:#151719;font-weight:600;cursor:pointer;">Reset app cache</button>
               </section>
             </main>
           `;

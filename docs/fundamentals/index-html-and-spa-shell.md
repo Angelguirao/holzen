@@ -88,7 +88,15 @@ Sets Tailwind’s `dark:` variant before CSS/JS load so the first paint matches 
 | **Stripe customer portal return URL** | `holzen.app` default; `holzen.lovable.app` and `*.lovable.app` previews remain in `ALLOWED_ORIGINS` (`customer-portal` edge) |
 | **Sentry / PostHog origin allowlists** | Both `holzen.app` and `*.lovable.app` where applicable — see [sentry-allowed-domains.md](../backlog/sentry-allowed-domains.md) |
 
-When you change the canonical domain, update **`index.html`**, **`src/config/site.ts`**, **`public/sitemap.xml`**, **`public/robots.txt`**, and any hardcoded share/email links in the same PR.
+When you change the canonical domain, set optional **`VITE_SITE_ORIGIN`** (build + runtime) or edit the fallback in **`vite.config.ts`** / **`src/config/site.ts`**. **`index.html`** uses `__SITE_ORIGIN__` placeholders replaced at build/dev by the `holzen-inject-index-html` plugin. Also update **`public/sitemap.xml`**, **`public/robots.txt`**, and email/share links as needed.
+
+**Pricing in JSON-LD:** `__JSON_LD_PRICE__` and offer copy are injected from **`src/lib/pricing.ts`** at build time — do not hand-edit prices in `index.html`.
+
+**Brand assets in `public/`:** `icon-512.png`, `favicon.png`, `og-image.png` (horizontal color imagotipo today). For best link previews, replace `og-image.png` with a **1200×630** social card on brand background; until then previews may letterbox the wide logo.
+
+**SPA meta limits:** Per-route tags from `PageMeta` apply after JavaScript runs. Marketing pages that must be perfect for every crawler may eventually need prerender/SSR; authenticated routes use `RobotsNoIndex` / `noindex` and `robots.txt` `Disallow` rules.
+
+**Manual ops (not in repo):** Sentry **Allowed Domains** and PostHog **Authorized URLs** must include `holzen.app` (and preview hosts if used) — [sentry-allowed-domains.md](../backlog/sentry-allowed-domains.md).
 
 ---
 
@@ -96,8 +104,9 @@ When you change the canonical domain, update **`index.html`**, **`src/config/sit
 
 | Goal | Where |
 |------|--------|
-| Default title / OG / JSON-LD | `index.html` `<head>` |
+| Default title / OG / JSON-LD | `index.html` placeholders + `src/lib/pricing.ts` (via Vite inject) |
 | Per-route SEO | `PageMeta` on the page + `SITE_ORIGIN` |
+| Private / app routes | `RobotsNoIndex`, `AppLayout`, or `noindex` on `PageMeta` |
 | Boot / cache recovery behavior | `index.html` inline script |
 | New screen or flow | `src/pages/`, `App.tsx` — not `index.html` |
 | Faster third-party connections | `vite.config.ts` `preconnectHeadSnippet` |
@@ -113,6 +122,8 @@ When you change the canonical domain, update **`index.html`**, **`src/config/sit
 | `src/App.tsx` | Providers, router, layouts |
 | `src/config/site.ts` | `SITE_ORIGIN` / `SITE_HOST` for runtime canonical and share URLs |
 | `src/components/PageMeta.tsx` | Per-route title, description, canonical, OG |
-| `vite.config.ts` | `transformIndexHtml` → preconnects |
+| `vite.config.ts` | `transformIndexHtml` → SEO placeholders + preconnects |
+| `src/config/site-seo-defaults.ts` | Default title/description/OG URL; JSON-LD offer helper |
 | `public/manifest.json` | PWA manifest (`start_url` is path-relative `/`) |
+| `public/icon-512.png`, `favicon.png`, `og-image.png` | PWA icon, favicon, default share image |
 | `public/sitemap.xml`, `public/robots.txt` | Crawlers (absolute URLs use `holzen.app`) |

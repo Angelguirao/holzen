@@ -1,8 +1,8 @@
 import { describe, expect, it, vi, beforeEach } from 'vitest';
 import { renderHook, act } from '@testing-library/react';
 import type { TFunction } from 'i18next';
-import { usePauseBreathSegmentRpcLoggers } from '@/hooks/use-pause-breath-segment-rpc-loggers';
-import { showPauseStepSyncFailedToast } from '@/lib/pause-step-sync-toast';
+import { usePauseBreathSegmentRpcLoggers } from '@/screens/pause/hooks/use-pause-breath-segment-rpc-loggers';
+import { showPauseStepSyncFailedToast } from '@/features/pause/public';
 import { makeTestPersistedPauseSession } from '@/test/make-test-persisted-pause-session';
 
 const { pauseLogStepMock, invalidateCompanionUiCompletionQueryMock } = vi.hoisted(() => ({
@@ -10,19 +10,20 @@ const { pauseLogStepMock, invalidateCompanionUiCompletionQueryMock } = vi.hoiste
   invalidateCompanionUiCompletionQueryMock: vi.fn(),
 }));
 
-vi.mock('@/lib/pause-api', () => ({
+vi.mock('@/features/pause/public-rpc', () => ({
   pauseLogStep: (...args: unknown[]) => pauseLogStepMock(...args),
 }));
 
-vi.mock('@/lib/companion-ui-completion-query-key', () => ({
-  companionUiCompletionQueryKey: (id: string) => ['pause', 'companion-ui-completion', id] as const,
-  invalidateCompanionUiCompletionQuery: (...args: unknown[]) =>
-    invalidateCompanionUiCompletionQueryMock(...args),
-}));
-
-vi.mock('@/lib/pause-step-sync-toast', () => ({
-  showPauseStepSyncFailedToast: vi.fn(),
-}));
+vi.mock('@/features/pause/public', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('@/features/pause/public')>();
+  return {
+    ...actual,
+    showPauseStepSyncFailedToast: vi.fn(),
+    companionUiCompletionQueryKey: (id: string) => ['pause', 'companion-ui-completion', id] as const,
+    invalidateCompanionUiCompletionQuery: (...args: unknown[]) =>
+      invalidateCompanionUiCompletionQueryMock(...args),
+  };
+});
 
 const t = ((k: string) => k) as TFunction;
 

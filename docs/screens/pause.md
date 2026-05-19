@@ -2,23 +2,24 @@
 
 **Pause-first shipped scope (2026-05):** full ritual on `/pause`; reflect artifact kind **`reflection_text`**; post-pause exits go Home/Archive (no Journey stats). Lapsed users see engagement block via entitlement. Manifest: [active-surface.md](../ops/active-surface.md).
 
-Authoritative orchestration: `[src/pages/PauseSession.tsx](../../src/pages/PauseSession.tsx)`.
+Authoritative orchestration: `[PauseSessionScreen.tsx](../../src/screens/pause/PauseSessionScreen.tsx)` (`[use-pause-session-screen.tsx](../../src/screens/pause/hooks/use-pause-session-screen.tsx)`); thin page `[PauseSession.tsx](../../src/pages/PauseSession.tsx)`.
 
 **Cross-screen patterns:** the same **thin page + named hooks + `src/lib` pure helpers** playbook as [Home](home.md) is spelled out in **[React screen orchestration](../fundamentals/react-screen-orchestration.md)**. Home **produces** navigation into this route; this doc is the **consumer** map for the full-screen volatility ritual.
 
 
 | Piece                                        | File                                                                                              |
 | -------------------------------------------- | ------------------------------------------------------------------------------------------------- |
-| Gate (hydration / fetch / profile)           | `[PauseSessionGate.tsx](../../src/components/pause/PauseSessionGate.tsx)`                         |
-| Gate body: picker vs scaffold slot           | `[PauseSessionGateContent.tsx](../../src/components/pause/PauseSessionGateContent.tsx)`           |
-| Depth picker + About pauses sheet            | `[PauseSessionDepthPickerStack.tsx](../../src/components/pause/PauseSessionDepthPickerStack.tsx)` |
-| Scaffold shell (header, stepper slot, sound) | `[PauseSessionScaffoldShell.tsx](../../src/components/pause/PauseSessionScaffoldShell.tsx)`       |
-| Scaffold frame + ritual routing              | `[PauseSessionScaffold.tsx](../../src/components/pause/PauseSessionScaffold.tsx)`                 |
-| Deep header stepper (read-only)             | `[PauseProgress.tsx](../../src/components/pause/PauseProgress.tsx)`                               |
-| Session / done body (brief vs deep)          | `[PauseSessionScaffoldBody.tsx](../../src/components/pause/PauseSessionScaffoldBody.tsx)`         |
-| Brief ritual beats (Framer transitions)      | `[PauseSessionBriefRitualBody.tsx](../../src/components/pause/PauseSessionBriefRitualBody.tsx)`   |
-| Deep ritual beats                            | `[PauseSessionDeepRitualBody.tsx](../../src/components/pause/PauseSessionDeepRitualBody.tsx)`     |
-| Brief macro stepper (read-only)              | `[PauseBriefProgress.tsx](../../src/components/pause/PauseBriefProgress.tsx)`                     |
+| Route screen + conductor hook                | `[PauseSessionScreen.tsx](../../src/screens/pause/PauseSessionScreen.tsx)`, `[use-pause-session-screen.tsx](../../src/screens/pause/hooks/use-pause-session-screen.tsx)` |
+| Gate (hydration / fetch / profile)           | `[PauseSessionGate.tsx](../../src/screens/pause/components/PauseSessionGate.tsx)`                         |
+| Gate body: picker vs scaffold slot           | `[PauseSessionGateContent.tsx](../../src/screens/pause/components/PauseSessionGateContent.tsx)`           |
+| Depth picker + About pauses sheet            | `[PauseSessionDepthPickerStack.tsx](../../src/screens/pause/components/PauseSessionDepthPickerStack.tsx)` |
+| Scaffold shell (header, stepper slot, sound) | `[PauseSessionScaffoldShell.tsx](../../src/screens/pause/components/PauseSessionScaffoldShell.tsx)`       |
+| Scaffold frame + ritual routing              | `[PauseSessionScaffold.tsx](../../src/screens/pause/components/PauseSessionScaffold.tsx)`                 |
+| Deep header stepper (read-only)             | `[PauseProgress.tsx](../../src/screens/pause/components/PauseProgress.tsx)`                               |
+| Session / done body (brief vs deep)          | `[PauseSessionScaffoldBody.tsx](../../src/screens/pause/components/PauseSessionScaffoldBody.tsx)`         |
+| Brief ritual beats (Framer transitions)      | `[PauseSessionBriefRitualBody.tsx](../../src/screens/pause/components/PauseSessionBriefRitualBody.tsx)`   |
+| Deep ritual beats                            | `[PauseSessionDeepRitualBody.tsx](../../src/screens/pause/components/PauseSessionDeepRitualBody.tsx)`     |
+| Brief macro stepper (read-only)              | `[PauseBriefProgress.tsx](../../src/screens/pause/components/PauseBriefProgress.tsx)`                     |
 | Header back visibility (pure)                | `[pause-session-header-back.ts](../../src/lib/pause-session-header-back.ts)`                      |
 
 
@@ -45,7 +46,7 @@ Hooks (`src/hooks/use-pause-session-*.ts`, `use-pause-*` where pause-specific): 
 
 ## Rendering and hooks
 
-`PauseSession.tsx` runs **hooks in a stable order** at the top (Holzen, subscription, shell, mount log, coalesced view-model, then large local `useState` blocks, then handler hooks, then derived memo/objects). There is **no** early return that skips hooks after a subset has run — same **Rules of Hooks** discipline as Home. Full-screen route: see `[App.tsx](../../src/App.tsx)` / route table (no bottom nav on `/pause`).
+`usePauseSessionScreen` runs **hooks in a stable order**; `PauseSessionScreen.tsx` is presentation-only. at the top (Holzen, subscription, shell, mount log, coalesced view-model, then large local `useState` blocks, then handler hooks, then derived memo/objects). There is **no** early return that skips hooks after a subset has run — same **Rules of Hooks** discipline as Home. Full-screen route: see `[App.tsx](../../src/App.tsx)` / route table (no bottom nav on `/pause`).
 
 ## User-visible modes (high level)
 
@@ -73,7 +74,7 @@ Do **not** add new PostHog events here without updating `[docs/ops/event-taxonom
 
 ## Archive — retrospective decision (not `/pause`)
 
-The **Archive** Pauses and Echoes tabs use separate `**v_pause_archive_*`** lists (see [pause-system §9](../systems/pause-system.md)). For terminal rows **`expired` or `dismissed`** that still lack `**outcome_logged**`, the app offers **Log decision** on each card: it opens a sheet that calls `**pause_log_step**` with the same three retrospective outcomes as Home bulk-hold (**held / bought / sold** — `**src/components/archive/ArchivePauseRetrospectiveOutcomeSheet.tsx**` reuses **PauseDecide**). That path does **not** navigate to `/pause`. For **many** expired instances at once, Home **`BulkHoldCard`** still provides the bulk review flow.
+The **Archive** Pauses and Echoes tabs use separate `**v_pause_archive_*`** lists (see [pause-system §9](../systems/pause-system.md)). For terminal rows **`expired` or `dismissed`** that still lack `**outcome_logged**`, the app offers **Log decision** on each card: it opens a sheet that calls `**pause_log_step**` with the same three retrospective outcomes as Home bulk-hold (**held / bought / sold** — `**src/screens/archive/components/ArchivePauseRetrospectiveOutcomeSheet.tsx**` reuses **PauseDecide**). That path does **not** navigate to `/pause`. For **many** expired instances at once, Home **`BulkHoldCard`** still provides the bulk review flow.
 
 ## Related reading
 

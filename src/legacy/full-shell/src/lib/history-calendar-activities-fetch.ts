@@ -1,5 +1,5 @@
 import { supabase } from '@/integrations/supabase/client';
-import type { CalendarActivity } from '@/components/HistoryCalendar';
+import type { CalendarActivity } from '@/legacy/quarantine/root-components/HistoryCalendar';
 import {
   HISTORY_CALENDAR_ACTIVITIES_NONE_QUERY_KEY,
   historyCalendarActivitiesQueryKey,

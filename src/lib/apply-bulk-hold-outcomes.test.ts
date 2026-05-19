@@ -1,12 +1,12 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { applyBulkHoldOutcomes } from '@/lib/apply-bulk-hold-outcomes';
-import type { BulkHoldPendingPause } from '@/lib/bulk-hold';
+import { applyBulkHoldOutcomes } from '@/features/pause/application/use-cases/apply-bulk-hold-outcomes';
+import type { BulkHoldPendingPause } from '@/features/pause/public';
 
-vi.mock('@/lib/pause-api', () => ({
+vi.mock('@/features/pause/infrastructure/pause-rpc-client', () => ({
   pauseLogStep: vi.fn(),
 }));
 
-import { pauseLogStep } from '@/lib/pause-api';
+import { pauseLogStep } from '@/features/pause/infrastructure/pause-rpc-client';
 
 const row = (id: string): BulkHoldPendingPause => ({
   id,

@@ -286,13 +286,13 @@ Use this when moving files. Paths are indicative — adjust to actual filenames 
 | `src/hooks/use-companion-data.ts` | `packages/pause/application/companion/` |
 | `src/hooks/use-holzen.ts` | `packages/market` + `apps/web/screens/home` (wires pause triggers) |
 | `src/hooks/use-subscription.ts` | `packages/subscription` |
-| `src/hooks/use-auth.tsx` | `packages/auth` + `apps/web` provider |
+| `src/hooks/use-auth.tsx` (re-export) | `features/auth/presentation/AuthProvider.tsx` → `packages/auth` |
 | `src/hooks/use-library.ts` | `packages/pause` queries (archive collections) |
-| `src/lib/pause-*.ts` | `packages/pause/domain` + `application` |
-| `src/lib/*-query.ts` | Owning context `queries/` or `packages/infrastructure` |
+| `src/lib/pause-*.ts`, `src/lib/companion-*.ts` | Thin re-exports → `features/pause/public` or `public-queries` (until legacy removed) |
+| `src/lib/*-query.ts` (subscription, market, user) | Re-exports → owning `features/*/public-queries` |
 | `src/lib/posthog.ts`, `sentry.ts`, `invoke-edge.ts`, `cid.ts` | `packages/infrastructure` or `shared-kernel` |
-| `src/components/pause/*`, `Companion*.tsx` | `apps/web/src/screens/pause/` |
-| `src/components/home/*` | `apps/web/src/screens/home/` |
+| `src/screens/pause/components/*`, `Companion*.tsx` | `apps/web/src/screens/pause/` (5c); was `components/pause/*` |
+| `src/screens/home/components/*` | `apps/web/src/screens/home/` |
 | `src/pages/settings/*` | `apps/web/src/screens/settings/` + `packages/user` |
 | `src/pages/PauseSession.tsx` | `apps/web/pages` re-export + pause screen |
 | `src/integrations/supabase/types.ts` | Stay generated; consumed by infrastructure only |
@@ -319,7 +319,8 @@ src/
         reflect/
         breathing/
       ports/
-      public.ts                    # only export other features may import
+      public.ts                    # cross-feature API (no eager Supabase)
+      public-queries.ts            # TanStack query modules (app hooks/screens)
     subscription/
     market/
     user/
@@ -327,7 +328,9 @@ src/
   integrations/supabase/           # until adapters move to features/*/infrastructure
 ```
 
-Same dependency rules as §2–3 for layers that exist. `npm run check:feature-imports` enforces `domain/`, `application/`, and `ports/` rules under `src/features/**`.
+Same dependency rules as §2–3 for layers that exist. `npm run check:feature-imports` enforces layer rules under `src/features/**` and blocks deep `@/features/<ctx>/(application|infrastructure|domain|presentation)/` imports from active `src/hooks`, `src/pages`, `src/components`, and `src/test` (allowed: `public`, `public-queries`, `public-rpc`, plus RPC lib shims `apply-bulk-hold-outcomes` / `pause-ritual-depth-upgrade`).
+
+**`src/lib/*` shims (legacy + gradual removal):** re-export from `@/features/<ctx>/public` (domain/application, no Supabase) or `public-queries.ts` (TanStack + Supabase). RPC-heavy use cases (`applyBulkHoldOutcomes`, `logPauseRitualDepthUpgraded`) stay on narrow `application/` or `public-rpc` paths — not `public.ts` — so Vitest does not eager-load the Supabase client.
 
 ---
 
@@ -337,12 +340,23 @@ Same dependency rules as §2–3 for layers that exist. `npm run check:feature-i
 |------|--------|----------------|
 | **0** | Docs + ADR (Lovable §) + `src/features/pause/` skeleton + `check:feature-imports` | `test:ci` green; root `npm run build` |
 | **1** | Migrate **pause** domain + use cases into `src/features/pause/` (small PRs) | Pause E2E green; companions under `application/companion/` |
-| **2** | `subscription`, `market`, `user`, `auth` features + shrink root `hooks/`/`lib/` | Home/settings flows use `public.ts` only |
+| **2** | `subscription`, `market`, `user`, `auth` features + shrink root `hooks/`/`lib/` | Cross-feature: `public.ts` only; app hooks may use `public-queries.ts` where queries need Supabase |
 | **3** | Optional `src/features/*/infrastructure` adapters; keep Supabase types in `integrations/` until needed | Adapter tests |
-| **4** | Remove `src/legacy` from main | `check:active-surface` |
-| **5** | **Gated:** `pnpm-workspace.yaml`, `apps/web`, `packages/*` extract | Only after ADR §8 trigger; `build` from `apps/web` |
-| **6** | `shared-kernel`, `contracts` (minimal), `packages/infrastructure` | Adapter smoke test |
-| **7+** | Screens move to `apps/web`; `check:package-boundaries` | Post-extraction only |
+| **4** | `src/legacy` off main runtime path | **Done (transitional):** `tsconfig.app.json` + Vitest exclude `src/legacy/**`; `check:active-surface` blocks `@/legacy/*` in active tree; folder kept for `archive/full-ia-pre-strip` recovery only. Physical delete is optional / separate archive PR. |
+| **5a** | Domain contexts in `src/features/*` + `check:architecture-alignment` | **Done** on `feature/refactoring6` — see §10 |
+| **5b** | Presentation guardrails | **Done** — `src/screens/README.md`; `check:no-root-components` in `test:ci` |
+| **5c** | **Pause** screen pilot | **Done** — `components/pause/**` → `screens/pause/components/**`; [docs/screens/pause.md](../screens/pause.md) |
+| **5d** | **Home** screen | **Done** — `components/home/**` → `screens/home/components/`; thin `pages/Home.tsx` → `HomeScreen` |
+| **5e** | **Archive, Journey, Settings** | **Done** — `screens/{archive,journey,settings}/components/` |
+| **5f** | Companion routes | **Done** — `/companion/*` pages + companion UI under `screens/pause/`; thin `pages/Companion*.tsx` re-exports |
+| **5g** | Marketing / admin | **Done** — `screens/marketing/*Screen` + `components/`; `screens/admin/AdminScreen` |
+| **5h** | Orchestration | **Done (shipped surfaces)** — `use-home-*` + `HolzenProvider`/`useHolzen` → `screens/home/hooks/` (active imports `@/screens/home/hooks/use-holzen`; root `@/hooks/use-holzen` shim for legacy only); `use-pause-session-*` + ritual hooks → `screens/pause/hooks/`; `HomeScreen` / `PauseSessionScreen` with thin `pages/` re-exports |
+| **5i** | Shrink global layers | **Done (shipped)** — allowlist **37** root shell/shared components (was 59); home market widgets + onboarding + `MoodCheck` under screens; domain `MoodValue` in `features/pause` |
+| **5j** | App shell | **Done (shipped)** — `src/app/components/` (layout, nav, meta, error boundary, checkout/subscribe chrome, auth loading); allowlist **0** at `src/components/*.tsx` (was 37; only `components/ui/` remains); `check:no-screens-in-features` |
+| **5j+** | Screen hooks + route entrypoints | **Done** — all shipped routes under `screens/*/*Screen`; `pages/` thin re-exports; `screens/ops/` for internal tools; `@/hooks/*` shims; `App.tsx` lazy-loads screens |
+| **6** | **Gated:** `pnpm-workspace.yaml`, `apps/web`, `packages/*` extract | Only after ADR §8 trigger; `build` from `apps/web` |
+| **7** | `shared-kernel`, `contracts` (minimal), `packages/infrastructure` | Adapter smoke test |
+| **8+** | `apps/web/src/screens`; `check:package-boundaries` | Post-extraction only |
 
 **Per-PR rule:** mechanical moves + import updates only; behavior changes in separate PRs.
 
@@ -382,8 +396,10 @@ Root `tsconfig.json` references project refs per package, or a single base + per
 |--------|------|---------|
 | `check:active-surface` | now | No legacy imports, shipped surface |
 | `check:feature-imports` | **now** (`scripts/check-feature-imports.mjs`) | Enforce §2 layer rules under `src/features/` |
+| `check:architecture-alignment` | **now** (`scripts/check-architecture-alignment.mjs`) | Waves 0–4 scaffold (five contexts, root Vite, legacy excluded); runs `check:feature-imports`; in **`test:ci`** |
+| `check:no-root-components` | **now** (`scripts/check-no-root-components.mjs`) | Blocks new `src/components/*.tsx` at repo root; allowlist shrinks during waves 5c–5i |
 | `check:package-boundaries` | post-monorepo | dependency-cruiser or eslint-plugin-boundaries on `@holzen/*` graph |
-| `test:ci` | always | Existing gate |
+| `test:ci` | always | Existing gate (includes `check:architecture-alignment`) |
 
 **`check:feature-imports` rules (summary):**
 

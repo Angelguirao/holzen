@@ -1,9 +1,7 @@
 import { useQuery } from '@tanstack/react-query';
 import { useAuth } from '@/hooks/use-auth';
-import {
-  getHoldGoalProfileQueryOptions,
-  type HoldGoalProfile,
-} from '@/lib/hold-goal-profile-query';
+import { getHoldGoalProfileQueryOptions } from '@/features/user/public-queries';
+import type { HoldGoalProfile } from '@/features/user/public';
 
 export type { HoldGoalProfile };
 

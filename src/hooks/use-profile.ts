@@ -5,14 +5,18 @@ import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/use-auth';
 import { holzenLog } from '@/lib/holzen-console';
-import type { CompanionPrefs } from '@/components/CompanionSection';
+import type { CompanionPrefs } from '@/screens/pause/components/CompanionSection';
 import type { Database } from '@/integrations/supabase/types';
-import { normalizeTrackedAssetId } from '@/lib/tracked-assets';
-import type { ProfileRow } from '@/lib/profile-row-query';
-import { getProfileRowQueryOptions, PROFILE_QUERY_KEY } from '@/lib/profile-row-query';
+import { normalizeTrackedAssetId } from '@/features/market/public';
+import {
+  fetchProfileRowForUser,
+  getProfileRowQueryOptions,
+  PROFILE_QUERY_KEY,
+  type ProfileRow,
+} from '@/features/user/public-queries';
 
-export type { ProfileRow } from '@/lib/profile-row-query';
-export { PROFILE_QUERY_KEY, fetchProfileRowForUser, getProfileRowQueryOptions } from '@/lib/profile-row-query';
+export type { ProfileRow };
+export { PROFILE_QUERY_KEY, fetchProfileRowForUser, getProfileRowQueryOptions };
 
 type ProfileUpdate = Database['public']['Tables']['profiles']['Update'];
 

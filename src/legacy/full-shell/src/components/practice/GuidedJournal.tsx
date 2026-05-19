@@ -12,7 +12,7 @@ import { useHolzen } from '@/hooks/use-holzen';
 import { hapticFeedback } from '@/lib/haptics';
 import { toast } from 'sonner';
 import { Check, RefreshCw, Sparkles, Loader2 } from 'lucide-react';
-import { WritingField } from '@/components/WritingField';
+import { WritingField } from '@/legacy/quarantine/root-components/WritingField';
 import { getGuidedJournalPromptsQueryOptions } from '@/lib/guided-journal-prompts-query';
 
 interface Props {

@@ -1,11 +1,2 @@
-import { STEPS, type PauseStep } from '@/components/pause/PauseProgress';
-
-/**
- * Swipe transition direction for deep ritual navigation by `STEPS` index order.
- * Matches `goToStep` in `PauseSession` (`nextIndex >= currentIndex` → forward).
- */
-export function pauseStepSwipeDirection(from: PauseStep, to: PauseStep): 'forward' | 'back' {
-  const fromIdx = STEPS.indexOf(from);
-  const toIdx = STEPS.indexOf(to);
-  return toIdx >= fromIdx ? 'forward' : 'back';
-}
+/** @deprecated Import from `@/features/pause/public`. */
+export * from '@/features/pause/public';

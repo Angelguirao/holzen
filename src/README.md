@@ -4,14 +4,14 @@ Active Holzen frontend. **Pause ritual** is the product; Archive, Journey overvi
 
 ## Shipped routes (shell)
 
-| Tab / area | Path | Entry |
-| ---------- | ---- | ----- |
-| Home | `/` | `pages/Home.tsx` |
-| Archive | `/archive` | `pages/Archive.tsx` |
-| Journey | `/journey` | `pages/journey/JourneyOverview.tsx` |
-| Settings | `/settings/*` | `pages/settings/` |
-| Pause | `/pause` | `pages/PauseSession.tsx` |
-| Public | `/welcome`, `/auth`, `/roadmap`, legal, blog | `pages/` |
+| Tab / area | Path | Screen entry |
+| ---------- | ---- | ------------- |
+| Home | `/` | `screens/home/HomeScreen.tsx` |
+| Archive | `/archive` | `screens/archive/ArchiveScreen.tsx` |
+| Journey | `/journey` | `screens/journey/JourneyOverviewScreen.tsx` |
+| Settings | `/settings/*` | `screens/settings/*` (+ thin `pages/settings/`) |
+| Pause | `/pause`, `/companion/*` | `screens/pause/` |
+| Public | `/welcome`, `/auth`, legal, blog | `screens/marketing/*Screen` |
 
 Dead IA (`/tools/*`, `/library`, `/journey/stats`, …) → `NotFound` (no legacy redirects).
 
@@ -20,7 +20,7 @@ Dead IA (`/tools/*`, `/library`, `/journey/stats`, …) → `NotFound` (no legac
 | Concern | Location |
 | ------- | -------- |
 | Router | `App.tsx`, `lib/app-routes.ts` |
-| Pause lifecycle | `lib/pause-*.ts`, `components/pause/` |
+| Pause lifecycle | `features/pause/`, `screens/pause/` |
 | Subscription | `hooks/use-subscription.ts`, §5.4 in launch plan |
 | Legacy full IA | [`legacy/README.md`](legacy/README.md) — **not imported** |
 | i18n | Shipped: `locales/en.json` only; archived langs in `legacy/locales/` |

@@ -4,7 +4,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/use-auth';
 import { Moon, X } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
-import { homeInWidget } from '@/components/home/home-widget-styles';
+import { homeInWidget } from '@/screens/home/components/home-widget-styles';
 import {
   type NightReflection,
   NIGHT_REFLECTION_VISIBLE_QUERY_KEY,

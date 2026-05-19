@@ -1,5 +1,5 @@
 import { describe, expect, it, vi, beforeEach } from 'vitest';
-import { loadPauseSessionSnapshot } from '@/lib/pause-page-loader';
+import { loadPauseSessionSnapshot } from '@/features/pause/public-queries';
 
 const fromMock = vi.fn();
 

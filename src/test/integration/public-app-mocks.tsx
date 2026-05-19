@@ -42,6 +42,6 @@ vi.mock('@/lib/posthog', () => ({
   initPostHog: vi.fn(),
 }));
 
-vi.mock('@/components/FeedbackWidget', () => ({
+vi.mock('@/app/components/FeedbackWidget', () => ({
   FeedbackWidget: () => null,
 }));

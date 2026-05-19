@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
-import { buildPauseSessionPersistSnapshot } from '@/lib/pause-session-persist-snapshot';
-import type { PauseSessionPersistSnapshotInput } from '@/lib/pause-session-persist-snapshot';
+import { buildPauseSessionPersistSnapshot } from '@/features/pause/public';
+import type { PauseSessionPersistSnapshotInput } from '@/features/pause/public';
 
 const companions = { haiku: null, groundingTitle: null, groundingBody: null } as const;
 const companionPrefs = {

@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { estimateReadTime } from '@/components/companion/read-time-util';
+import { estimateReadTime } from '@/screens/pause/components/companion/read-time-util';
 
 /**
  * Pure-helper coverage for the shared companion Full View primitives. The
