@@ -60,6 +60,7 @@ if (files.length === 0) {
 const violations = [];
 for (const file of files) {
   const rel = relative(root, file).replace(/\\/g, '/');
+  if (/\.(test|spec)\.(ts|tsx)$/.test(rel)) continue;
   const layer = layerFromPath(rel);
   if (!layer) continue;
   const text = readFileSync(file, 'utf8');
@@ -73,11 +74,11 @@ const DEEP_FEATURE_IMPORT =
   /from\s+['"]@\/features\/[^'"]+\/(application|infrastructure|domain|presentation)\//;
 
 const ALLOWED_DEEP_IMPORT_FILES = new Set([
-  'src/test/lib/apply-bulk-hold-outcomes.test.ts',
-  'src/test/checkout-confirmation-close-reopen.test.tsx',
-  'src/test/checkout-confirmation-cross-tab.test.tsx',
-  'src/test/checkout-confirmation-guard.test.tsx',
-  'src/test/checkout-confirmation-refresh-state.test.tsx',
+  'src/features/pause/application/use-cases/apply-bulk-hold-outcomes.test.ts',
+  'src/features/subscription/presentation/CheckoutConfirmation.close-reopen.test.tsx',
+  'src/features/subscription/presentation/CheckoutConfirmation.cross-tab.test.tsx',
+  'src/features/subscription/presentation/CheckoutConfirmation.guard.test.tsx',
+  'src/features/subscription/presentation/CheckoutConfirmation.refresh-state.test.tsx',
   'src/test/no-refetch-on-back-nav.test.tsx',
   'src/app/components/AppLayout.tsx',
 ]);

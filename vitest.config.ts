@@ -53,7 +53,7 @@ export default defineConfig({
           functions: 73,
           lines: 80,
         },
-        "src/lib/checkout-suppression-window.ts": {
+        "src/features/subscription/application/checkout-suppression-window.ts": {
           // Measured baseline (Apr 2026): stmts 90.10 / branches 65.16 /
           // funcs 77.77 / lines 90.10. Branch coverage is lower because
           // several `try/catch` arms exist purely as belt-and-braces
