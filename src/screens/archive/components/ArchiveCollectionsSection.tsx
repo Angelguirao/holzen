@@ -1,4 +1,4 @@
-import { useLibrary } from '@/hooks/use-library';
+import { useLibrary } from '@/screens/archive/hooks/use-library';
 import { LibraryCollections } from '@/screens/archive/components/library/LibraryCollections';
 
 type Props = {

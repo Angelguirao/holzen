@@ -49,7 +49,7 @@ const SentryAlerts = lazy(() => import("./pages/SentryAlerts"));
 const EdgeCoverage = lazy(() => import("./pages/EdgeCoverage"));
 const Unsubscribe = lazy(() => import("./pages/Unsubscribe"));
 const BillingHistory = lazy(() => import("./pages/BillingHistory"));
-const SettingsAbout = lazy(() => import("./pages/SettingsAbout"));
+const SettingsAbout = lazy(() => import("./screens/settings/SettingsAboutScreen"));
 const Roadmap = lazy(() => import("./pages/Roadmap"));
 
 const queryClient = createHolzenQueryClient();

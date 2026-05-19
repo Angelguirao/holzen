@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { CollectionCard } from './CollectionCard';
 import { NewCollectionForm } from './NewCollectionForm';
 import { CollectionDetail } from './CollectionDetail';
-import type { useLibrary } from '@/hooks/use-library';
+import type { useLibrary } from '@/screens/archive/hooks/use-library';
 
 interface Props {
   library: ReturnType<typeof useLibrary>;
