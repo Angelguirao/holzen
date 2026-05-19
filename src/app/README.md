@@ -27,6 +27,8 @@ Cross-route chrome and providers: layout, bottom nav, document meta, error bound
 | `components/QuietWindowsManager.tsx` | Quiet hours UI (Settings) |
 | `components/ThresholdSetting.tsx` | BTC threshold control (Settings) |
 
+| `hooks/use-is-admin.ts` | Client admin gate for `/admin` and internal ops pages |
+
 Settings orchestration: `src/screens/settings/hooks/`, `SettingsStateLayout.tsx`.
 
 See [frontend-module-layout.md](../../docs/fundamentals/frontend-module-layout.md) wave **5j**.

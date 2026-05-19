@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useIsAdmin } from '@/hooks/use-is-admin';
+import { useIsAdmin } from '@/app/hooks/use-is-admin';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
