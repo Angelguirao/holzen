@@ -1,5 +1,5 @@
 import type { PauseStep } from '@/features/pause/public';
-import type { MoodValue } from '@/components/MoodCheck';
+import type { MoodValue } from '@/features/pause/public';
 import type { FeelStepTile } from '@/features/pause/public';
 import type { CompanionData, CompanionPrefs } from '@/features/pause/public';
 import type { BriefPauseStep, RitualDepth } from '@/features/pause/domain/ritual-types';

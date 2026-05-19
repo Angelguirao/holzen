@@ -6,7 +6,7 @@ import { useHolzen } from '@/hooks/use-holzen';
 import { useSubscription } from '@/hooks/use-subscription';
 import { useProGate } from '@/hooks/use-pro-gate';
 import { PauseEngagementBlocked } from '@/screens/pause/components/PauseEngagementBlocked';
-import { type MoodValue } from '@/components/MoodCheck';
+import { type MoodValue } from '@/screens/pause/components/MoodCheck';
 
 import { type PauseStep } from '@/screens/pause/components/PauseProgress';
 import { PauseSessionGate } from '@/screens/pause/components/PauseSessionGate';

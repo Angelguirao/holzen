@@ -1,5 +1,5 @@
-import type { MoodValue } from '@/components/MoodCheck';
-import { PAUSE_MOOD_VALUES } from '@/components/MoodCheck';
+import type { MoodValue } from '@/features/pause/public';
+import { PAUSE_MOOD_VALUES } from '@/features/pause/public';
 
 export function isPauseMoodValue(s: string | null | undefined): s is MoodValue {
   return s != null && (PAUSE_MOOD_VALUES as readonly string[]).includes(s);

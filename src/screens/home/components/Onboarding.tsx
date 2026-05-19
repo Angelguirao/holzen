@@ -1,8 +1,8 @@
 import { useTranslation } from 'react-i18next';
 import { useState, useCallback } from 'react';
 import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
-import { OnboardingWhy } from '@/components/onboarding/OnboardingWhy';
-import { OnboardingReady } from '@/components/onboarding/OnboardingReady';
+import { OnboardingWhy } from '@/screens/home/components/onboarding/OnboardingWhy';
+import { OnboardingReady } from '@/screens/home/components/onboarding/OnboardingReady';
 import { useSubscription } from '@/hooks/use-subscription';
 import { trackEvent } from '@/lib/posthog';
 

@@ -1,6 +1,6 @@
 import { useCallback, type Dispatch, type MutableRefObject, type SetStateAction } from 'react';
 import type { TFunction } from 'i18next';
-import type { MoodValue } from '@/components/MoodCheck';
+import type { MoodValue } from '@/screens/pause/components/MoodCheck';
 import type { FeelStepTile } from '@/screens/pause/components/pause-feel-types';
 import { hapticFeedback } from '@/lib/haptics';
 import { pauseLogStep } from '@/features/pause/public-rpc';

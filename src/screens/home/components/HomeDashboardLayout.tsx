@@ -6,7 +6,7 @@ import { HomeCustomizeSheet } from '@/screens/home/components/HomeCustomizeSheet
 import { HomePullRefreshIndicator } from '@/screens/home/components/HomePullRefreshIndicator';
 import { HomeCustomizeLinkButton } from '@/screens/home/components/HomeCustomizeLinkButton';
 import { InstallHolzenCard } from '@/components/InstallHolzenCard';
-import { TestimonialRequest } from '@/components/TestimonialRequest';
+import { TestimonialRequest } from '@/screens/home/components/TestimonialRequest';
 export interface HomeDashboardLayoutCustomizeProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;

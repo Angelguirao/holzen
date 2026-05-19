@@ -1,37 +1,10 @@
 import { Button } from '@/components/ui/button';
 import { useTranslation } from 'react-i18next';
 import { MoodIcon } from '@/components/icons/MoodIcon';
+import { PAUSE_MOOD_GROUPS, type MoodValue } from '@/features/pause/public';
 
-const moodGroups = [
-  {
-    key: 'highEnergy',
-    moods: [
-      { value: 'fomo', key: 'fomo' },
-      { value: 'excited', key: 'excited' },
-      { value: 'greedy', key: 'greedy' },
-      { value: 'anxious', key: 'anxious' },
-    ],
-  },
-  {
-    key: 'lowEnergy',
-    moods: [
-      { value: 'calm', key: 'calm' },
-      { value: 'detached', key: 'detached' },
-      { value: 'uncertain', key: 'uncertain' },
-      { value: 'fearful', key: 'fearful' },
-    ],
-  },
-] as const;
-
-const allMoods = [
-  ...moodGroups[0].moods,
-  ...moodGroups[1].moods,
-] as const;
-
-export type MoodValue = (typeof allMoods)[number]['value'];
-
-/** Canonical Feel / Shift / post-pause mood keys (keep aligned with `moodCheck.moods.*`). */
-export const PAUSE_MOOD_VALUES: readonly MoodValue[] = allMoods.map((m) => m.value);
+export type { MoodValue } from '@/features/pause/public';
+export { PAUSE_MOOD_VALUES } from '@/features/pause/public';
 
 interface Props {
   onSelect: (mood: MoodValue) => void;
@@ -61,7 +34,7 @@ export function MoodCheck({ onSelect, onSkip, variant = 'before', hideHeading = 
           )}
         </div>
       )}
-      {moodGroups.map((group) => (
+      {PAUSE_MOOD_GROUPS.map((group) => (
         <div key={group.key} className="space-y-1.5">
           <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
             {t(`moodCheck.${group.key}`)}

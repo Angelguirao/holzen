@@ -1,6 +1,6 @@
 import { AnimatePresence, motion } from 'framer-motion';
 import type { RefObject } from 'react';
-import type { MoodValue } from '@/components/MoodCheck';
+import type { MoodValue } from '@/screens/pause/components/MoodCheck';
 import { PauseBreathing, type PauseBreathingHandle } from '@/screens/pause/components/PauseBreathing';
 import { PauseRitualFeelStep } from '@/screens/pause/components/PauseRitualFeelStep';
 import type { FeelStepTile } from '@/screens/pause/components/pause-feel-types';

@@ -1,7 +1,7 @@
 import type { TFunction } from 'i18next';
 import type { ReactNode } from 'react';
 import { useMemo } from 'react';
-import { HolzenNumber } from '@/components/HolzenNumber';
+import { HolzenNumber } from '@/screens/home/components/HolzenNumber';
 import type { HomeDashboardSectionDeps } from '@/screens/home/components/render-home-dashboard-section';
 import type { BtcPriceData, TrackedAssetId } from '@/features/market/public';
 

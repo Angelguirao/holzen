@@ -1,5 +1,5 @@
 import { Eye, EyeOff, WifiOff, Bitcoin, CircleDollarSign, Clock, ChevronDown } from 'lucide-react';
-import { BtcChartLazyGate } from '@/components/BtcChartLazyGate';
+import { BtcChartLazyGate } from '@/screens/home/components/BtcChartLazyGate';
 import { Skeleton } from '@/components/ui/skeleton';
 import { formatBtcPrice, trackedAssetSymbol, type BtcPriceData } from '@/features/market/public';
 import { useTranslation } from 'react-i18next';

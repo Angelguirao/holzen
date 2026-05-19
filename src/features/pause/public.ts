@@ -143,6 +143,8 @@ export type {
 } from './domain/companion-orchestrate';
 export { COMPANION_TYPES, FEEDBACK_TO_CACHE_TYPE } from './domain/companion-types';
 export type { FeelStepTile } from './domain/feel-step-tile';
+export type { MoodValue } from './domain/mood-value';
+export { PAUSE_MOOD_VALUES, PAUSE_MOOD_GROUPS } from './domain/mood-value';
 export {
   PAUSE_DEEP_RITUAL_STEPS,
   PAUSE_DEEP_DISPLAY_STEP_COUNT,

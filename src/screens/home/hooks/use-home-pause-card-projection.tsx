@@ -2,7 +2,7 @@ import type { ReactNode } from 'react';
 import { useMemo } from 'react';
 import { HomePauseCardBody } from '@/screens/home/components/HomePauseCardBody';
 import type { Entitlement } from '@/features/subscription/public';
-import { SnoozeToolbarControl } from '@/components/SnoozeControl';
+import { SnoozeToolbarControl } from '@/screens/home/components/SnoozeControl';
 import type { BtcPriceData } from '@/features/market/public';
 import type { ManualPauseTriggerResult } from '@/features/pause/public';
 

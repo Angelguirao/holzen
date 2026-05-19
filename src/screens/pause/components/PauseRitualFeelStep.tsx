@@ -3,7 +3,7 @@ import { motion } from 'framer-motion';
 import { ChevronRight } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { MoodIcon } from '@/components/icons/MoodIcon';
-import type { MoodValue } from '@/components/MoodCheck';
+import type { MoodValue } from '@/screens/pause/components/MoodCheck';
 import type { FeelStepTile } from '@/screens/pause/components/pause-feel-types';
 import { PAUSE_FEEL_INTENSITY_KEYS } from '@/screens/pause/components/pause-feel-intensity-labels';
 import { Button } from '@/components/ui/button';
