@@ -19,7 +19,6 @@ import {
   type CompanionUiCompletionState,
 } from '@/features/pause/public-queries';
 import { companionUiCompletionQueryKey } from '@/features/pause/public';
-import { getRecencyHints } from '@/features/pause/public';
 import {
   EMPTY_COMPANION_SLOT_RELAXATIONS,
   type CompanionSlotCacheIds,
@@ -31,11 +30,9 @@ import { holzenLog } from '@/lib/holzen-console';
 import {
   resetInterventionIdempotency,
   companionSlotToGenerationTaxonomy,
-  resolveCompanionOrchestrateInvokeFailure,
   tryApplyOrchestrateSlotFromBody,
   buildCompanionOrchestrateSessionFromRitual,
-  buildLazyFetchOrchestrateBody,
-  buildRegenerateOrchestrateBody,
+  runCompanionSlotOrchestrate,
   setCompanionSlotError,
   setCompanionSlotLoading,
 } from '@/features/pause/public';
@@ -209,6 +206,30 @@ export function useCompanionData({ companions, prefs, pauseInstanceId, context, 
     setCacheRelaxations,
   });
 
+  const slotOrchestratePorts = useMemo(
+    () => ({
+      loadSignalSources: () => loadActiveOrchestrateSources('signal'),
+      loadGroundingSources: () => loadActiveOrchestrateSources('grounding'),
+      invoke: (body: Record<string, unknown>) =>
+        invokeEdge('companion-orchestrate', { body }),
+    }),
+    [],
+  );
+
+  const buildOrchestrateSession = useCallback(async () => {
+    if (!pauseInstanceId) return null;
+    const moodHistory = await loadMoodHistoryForOrchestrate();
+    return buildCompanionOrchestrateSessionFromRitual({
+      pauseInstanceId,
+      context,
+      language,
+      reflectionMessage,
+      mood,
+      severityNumber,
+      moodHistory,
+    });
+  }, [pauseInstanceId, context, language, reflectionMessage, mood, severityNumber]);
+
   // Reset companion slot state when switching pause instances (intervention reset lives in bootstrap hook).
   useLayoutEffect(() => {
     setSignal(null);
@@ -250,19 +271,8 @@ export function useCompanionData({ companions, prefs, pauseInstanceId, context, 
     setCompanionSlotError(slot, companionSlotErrorSetters, false);
 
     try {
-      const recency = getRecencyHints();
-      const signalSources = slot === 'signal' ? await loadActiveOrchestrateSources('signal') : undefined;
-      const groundingSources = slot === 'grounding' ? await loadActiveOrchestrateSources('grounding') : undefined;
-      const moodHistory = await loadMoodHistoryForOrchestrate();
-      const orchestrateSession = buildCompanionOrchestrateSessionFromRitual({
-        pauseInstanceId,
-        context,
-        language,
-        reflectionMessage,
-        mood,
-        severityNumber,
-        moodHistory,
-      });
+      const orchestrateSession = await buildOrchestrateSession();
+      if (!orchestrateSession) return;
 
       holzenLog.companion('lazy fetch orchestrate invoke', {
         slot,
@@ -275,26 +285,18 @@ export function useCompanionData({ companions, prefs, pauseInstanceId, context, 
         source: 'lazy',
       });
 
-      const { data, error: fnError } = await invokeEdge('companion-orchestrate', {
-        body: buildLazyFetchOrchestrateBody(orchestrateSession, slot, {
-          recency,
-          signalSources,
-          groundingSources,
-        }),
-      });
-
-      const body = data as Record<string, unknown> | null;
-      const lazyFailure = await resolveCompanionOrchestrateInvokeFailure(
-        fnError,
-        body,
+      const result = await runCompanionSlotOrchestrate(
         'lazy_fetch',
-        'This AI feature is temporarily unavailable. Please try again in a minute.',
+        slot,
+        orchestrateSession,
+        slotOrchestratePorts,
       );
-      if (lazyFailure) {
+
+      if (result.status === 'failure') {
+        const lazyFailure = result.failure;
         holzenLog.companion('lazy fetch orchestrate failed', {
           slot,
           pause_instance_prefix: pauseInstanceId.slice(0, 8),
-          fnError: fnError?.message ?? null,
           bodyError: lazyFailure.userMessage,
           bodyCode: lazyFailure.code,
         });
@@ -319,7 +321,7 @@ export function useCompanionData({ companions, prefs, pauseInstanceId, context, 
       }
 
       const filled = tryApplyOrchestrateSlotFromBody(
-        body,
+        result.body,
         slot,
         setCacheIds,
         slotCommitters,
@@ -346,12 +348,6 @@ export function useCompanionData({ companions, prefs, pauseInstanceId, context, 
     }
   }, [
     pauseInstanceId,
-    context,
-    reflectionMessage,
-    mood,
-    severityNumber,
-    language,
-    autoSaveToLibrary,
     canAccessCompanion,
     applyOptimisticDecrement,
     refreshSubscription,
@@ -361,6 +357,8 @@ export function useCompanionData({ companions, prefs, pauseInstanceId, context, 
     companionSlotLoadingSetters,
     companionSlotErrorSetters,
     slotCommitters,
+    buildOrchestrateSession,
+    slotOrchestratePorts,
   ]);
 
   // ── Retry helpers ──
@@ -415,19 +413,8 @@ export function useCompanionData({ companions, prefs, pauseInstanceId, context, 
     setCompanionSlotLoading(slot, companionSlotLoadingSetters, true);
     setCompanionSlotError(slot, companionSlotErrorSetters, false);
     try {
-      const recency = getRecencyHints();
-      const signalSources = slot === 'signal' ? await loadActiveOrchestrateSources('signal') : undefined;
-      const groundingSources = slot === 'grounding' ? await loadActiveOrchestrateSources('grounding') : undefined;
-      const moodHistory = await loadMoodHistoryForOrchestrate();
-      const orchestrateSession = buildCompanionOrchestrateSessionFromRitual({
-        pauseInstanceId,
-        context,
-        language,
-        reflectionMessage,
-        mood,
-        severityNumber,
-        moodHistory,
-      });
+      const orchestrateSession = await buildOrchestrateSession();
+      if (!orchestrateSession) return;
 
       holzenLog.companion('regenerate orchestrate invoke', {
         slot,
@@ -440,27 +427,19 @@ export function useCompanionData({ companions, prefs, pauseInstanceId, context, 
         source: 'regenerate',
       });
 
-      const { data, error: fnError } = await invokeEdge('companion-orchestrate', {
-        body: buildRegenerateOrchestrateBody(orchestrateSession, slot, {
-          recency,
-          signalSources,
-          groundingSources,
-        }),
-      });
-
-      const body = data as Record<string, unknown> | null;
-      const regenerateFailure = await resolveCompanionOrchestrateInvokeFailure(
-        fnError,
-        body,
+      const result = await runCompanionSlotOrchestrate(
         'regenerate',
-        'This AI feature is temporarily unavailable. Please try again in a minute.',
+        slot,
+        orchestrateSession,
+        slotOrchestratePorts,
       );
-      if (regenerateFailure) {
+
+      if (result.status === 'failure') {
+        const regenerateFailure = result.failure;
         holzenLog.companion('regenerate orchestrate failed', {
           slot,
           pause_instance_prefix: pauseInstanceId.slice(0, 8),
-          fnError: fnError?.message ?? null,
-          bodyError: typeof body?.error === 'string' ? body.error : null,
+          bodyError: regenerateFailure.userMessage,
           bodyCode: regenerateFailure.code,
         });
         if (regenerateFailure.isPaywall) {
@@ -483,7 +462,7 @@ export function useCompanionData({ companions, prefs, pauseInstanceId, context, 
       }
 
       const filled = tryApplyOrchestrateSlotFromBody(
-        body,
+        result.body,
         slot,
         setCacheIds,
         slotCommitters,
@@ -507,17 +486,13 @@ export function useCompanionData({ companions, prefs, pauseInstanceId, context, 
     }
   }, [
     pauseInstanceId,
-    context,
-    reflectionMessage,
-    mood,
-    severityNumber,
-    language,
     toast,
-    autoSaveToLibrary,
     canAccessCompanion,
     companionSlotLoadingSetters,
     companionSlotErrorSetters,
     slotCommitters,
+    buildOrchestrateSession,
+    slotOrchestratePorts,
   ]);
 
   return {
