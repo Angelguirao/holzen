@@ -1,14 +1,12 @@
-import { useState, useCallback, useEffect, useLayoutEffect, useMemo, useRef } from 'react';
+import { useState, useCallback, useLayoutEffect, useMemo, useRef } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { invokeEdge } from '@/lib/invoke-edge';
-import { toast as sonnerToast } from 'sonner';
 import { hapticFeedback } from '@/lib/haptics';
 import { useHolzen } from '@/screens/home/hooks/use-holzen';
 import { useToast } from '@/components/ui/use-toast';
 import { useCompanionLibraryFavorites } from '@/screens/pause/hooks/use-companion-library-favorites';
 import type { CompanionData, CompanionPrefs } from '@/screens/pause/components/CompanionSection';
-import type { InterventionState, RegenerateCompanionSlot } from '@/features/pause/public';
-import { fetchParsedPauseArtifactCache } from '@/features/pause/public-queries';
+import type { RegenerateCompanionSlot } from '@/features/pause/public';
 import type { ZoomOutData } from '@/screens/pause/components/ZoomOutDisplay';
 import type { CachedHistoricalInsightShape } from '@/screens/pause/components/HistoricalInsightDisplay';
 import {
@@ -24,10 +22,6 @@ import { companionUiCompletionQueryKey } from '@/features/pause/public';
 import { getRecencyHints } from '@/features/pause/public';
 import {
   EMPTY_COMPANION_SLOT_RELAXATIONS,
-  hydrateCompanionSlotsFromArtifactCache,
-  hydrateOrchestrateSlotsFromInterventionResponse,
-  isFilledOrchestrateSlot,
-  readOrchestrateSlotBody,
   type CompanionSlotCacheIds,
   type CompanionSlotCommitters,
   type CompanionSlotRelaxations,
@@ -35,19 +29,17 @@ import {
 } from '@/features/pause/public';
 import { holzenLog } from '@/lib/holzen-console';
 import {
-  hasInvokedIntervention,
   resetInterventionIdempotency,
-  runOnceIntervention,
   companionSlotToGenerationTaxonomy,
   resolveCompanionOrchestrateInvokeFailure,
   tryApplyOrchestrateSlotFromBody,
   buildCompanionOrchestrateSessionFromRitual,
-  buildInterventionOrchestrateBody,
   buildLazyFetchOrchestrateBody,
   buildRegenerateOrchestrateBody,
   setCompanionSlotError,
   setCompanionSlotLoading,
 } from '@/features/pause/public';
+import { useCompanionInterventionBootstrap } from '@/screens/pause/hooks/use-companion-intervention-bootstrap';
 import { useSubscription } from '@/features/subscription/public-hooks';
 import { useProGate } from '@/features/subscription/public-hooks';
 import {
@@ -179,29 +171,45 @@ export function useCompanionData({ companions, prefs, pauseInstanceId, context, 
   );
 
   const [retryCount, setRetryCount] = useState(0);
-  const fetchedRef = useRef<string | null>(null);
-
-  // ── Intervention state (new pause flow) ──
-  const [intervention, setIntervention] = useState<InterventionState | null>(null);
-  const [interventionLoading, setInterventionLoading] = useState(false);
-  const [interventionError, setInterventionError] = useState(false);
 
   // Track which companion slots have already been fetched/requested for this pause instance
   const fetchedSlotsRef = useRef<Set<string>>(new Set());
 
-  // Tracks whether the most recent intervention auto-fetch was short-circuited
-  // by the per-tab idempotency guard. Used by `retryOrchestrate` to surface a
-  // confirmation toast once the deliberate retry actually issues a fresh call.
-  const interventionSkippedRef = useRef<boolean>(false);
+  const slotCommitters = useMemo<CompanionSlotCommitters>(
+    () => ({
+      setSignal,
+      setNudge,
+      setHistoryInsight,
+      setZoomOut,
+      autoSaveToLibrary,
+    }),
+    [autoSaveToLibrary],
+  );
 
-  // When `retryOrchestrate` is triggered from a skipped state, we stash the
-  // `pauseInstanceId` here so the watcher effect below can fire a confirmation
-  // toast as soon as fresh intervention data arrives. Cleared after firing
-  // (or on pause switch) so we never confirm twice.
-  const pendingRetryConfirmRef = useRef<string | null>(null);
+  const {
+    intervention,
+    interventionLoading,
+    interventionError,
+    setIntervention,
+    setInterventionError,
+    interventionSkippedRef,
+    pendingRetryConfirmRef,
+    clearInterventionFetchDedupe,
+  } = useCompanionInterventionBootstrap({
+    pauseInstanceId,
+    retryCount,
+    context,
+    reflectionMessage,
+    mood,
+    severityNumber,
+    language,
+    autoSaveToLibrary,
+    slotCommitters,
+    fetchedSlotsRef,
+    setCacheRelaxations,
+  });
 
-  // Reset all companion state when switching pause instances so stale data from a
-  // previous session never leaks into the new one.
+  // Reset companion slot state when switching pause instances (intervention reset lives in bootstrap hook).
   useLayoutEffect(() => {
     setSignal(null);
     setSignalLoading(false);
@@ -215,188 +223,10 @@ export function useCompanionData({ companions, prefs, pauseInstanceId, context, 
     setHistoryInsight(null);
     setHistoryLoading(false);
     setHistoryError(false);
-    setIntervention(null);
-    setInterventionError(false);
     setCacheIds({ nudge: null, signal: null, zoomOut: null, history: null });
     setCacheRelaxations(EMPTY_COMPANION_SLOT_RELAXATIONS);
     fetchedSlotsRef.current = new Set();
-    // New pause → forget any stale skip / retry-confirm state from the
-    // previous one so we never confirm a retry against the wrong id.
-    interventionSkippedRef.current = false;
-    pendingRetryConfirmRef.current = null;
-
-    if (!pauseInstanceId) {
-      setInterventionLoading(false);
-      return;
-    }
-    setInterventionLoading(true);
   }, [pauseInstanceId]);
-
-  // Watcher: when a deliberate retry that followed an idempotency skip lands
-  // a fresh `intervention` payload, confirm to the user that the retry went
-  // through. Single-fire per retry — `pendingRetryConfirmRef` is cleared
-  // immediately so re-renders don't re-toast.
-  useEffect(() => {
-    if (!intervention) return;
-    if (!pendingRetryConfirmRef.current) return;
-    if (pendingRetryConfirmRef.current !== pauseInstanceId) return;
-    sonnerToast.success('New perspective loaded', {
-      id: `intervention-retry:${pauseInstanceId}`,
-    });
-    pendingRetryConfirmRef.current = null;
-    interventionSkippedRef.current = false;
-  }, [intervention, pauseInstanceId]);
-
-  // ── Intervention-only fetch + cached companion hydration ──
-  // Companions are NOT fetched here — only on user tap (see fetchCompanion below).
-  useEffect(() => {
-    if (!pauseInstanceId) return;
-
-    const key = `${pauseInstanceId}:${retryCount}`;
-    if (fetchedRef.current === key) return;
-    fetchedRef.current = key;
-
-    let cancelled = false;
-    setInterventionLoading(true);
-    setInterventionError(false);
-
-    (async () => {
-      try {
-        // Hydrate any already-persisted companion data from pause_ai_artifacts
-        const cached = await fetchParsedPauseArtifactCache(pauseInstanceId);
-        if (cancelled) return;
-
-        const slotCommitters: CompanionSlotCommitters = {
-          setSignal,
-          setNudge,
-          setHistoryInsight,
-          setZoomOut,
-          autoSaveToLibrary,
-        };
-        const { hasCachedIntervention } = hydrateCompanionSlotsFromArtifactCache({
-          cached,
-          fetchedSlots: fetchedSlotsRef.current,
-          committers: slotCommitters,
-          setIntervention,
-        });
-        if (hasCachedIntervention) {
-          setInterventionLoading(false);
-          return;
-        }
-
-        // Per-trigger idempotency. If we've already issued the intervention
-        // call for this `pauseInstanceId` in the current tab session — even if
-        // a remount happened before the server persisted the row that the
-        // cache lookup above reads — bail out and wait for the
-        // `pause_ai_artifacts` realtime subscription / next remount to
-        // hydrate. The `retryOrchestrate` path explicitly resets the marker
-        // so a deliberate retry still gets through.
-        if (hasInvokedIntervention(pauseInstanceId)) {
-          holzenLog.companion('orchestrate intervention skipped (idempotency)', {
-            pause_instance_prefix: pauseInstanceId.slice(0, 8),
-          });
-          // Passive remount/idempotency skips are expected (StrictMode, quick
-          // route bounces). Keep this path silent to avoid surfacing
-          // implementation details to users; manual retry remains available.
-          interventionSkippedRef.current = true;
-          setInterventionLoading(false);
-          return;
-        }
-
-        // Intervention not cached — fetch from orchestrate (intervention-only, no companion slots)
-        const moodHistory = await loadMoodHistoryForOrchestrate();
-
-        holzenLog.companion('orchestrate invoke (intervention only)', {
-          holzenInvokeSource: 'browser_pause_intervention',
-          pause_instance_prefix: pauseInstanceId.slice(0, 8),
-        });
-
-        // Single-flight per `pauseInstanceId`: concurrent renders share the
-        // same Promise, and on success a `sessionStorage` marker prevents
-        // future remounts in the same tab session from re-issuing the call.
-        const orchestrateSession = buildCompanionOrchestrateSessionFromRitual({
-          pauseInstanceId,
-          context,
-          language,
-          reflectionMessage,
-          mood,
-          severityNumber,
-          moodHistory,
-        });
-        const { data, error: fnError } = await runOnceIntervention(
-          pauseInstanceId,
-          () =>
-            invokeEdge('companion-orchestrate', {
-              body: buildInterventionOrchestrateBody(orchestrateSession),
-            }),
-        );
-
-        if (cancelled) return;
-
-        const body = data as Record<string, unknown> | null;
-        const interventionFailure = await resolveCompanionOrchestrateInvokeFailure(
-          fnError,
-          body,
-          'intervention',
-          'This AI feature is temporarily unavailable. Please try again in a minute.',
-        );
-        if (interventionFailure) {
-          holzenLog.companion('orchestrate intervention invoke failed', {
-            pause_instance_prefix: pauseInstanceId.slice(0, 8),
-            fnError: fnError?.message ?? null,
-            bodyError: interventionFailure.userMessage,
-            bodyCode: interventionFailure.code,
-          });
-          setInterventionError(true);
-          setInterventionLoading(false);
-          return;
-        }
-
-        if (body.intervention) {
-          setIntervention(body.intervention as InterventionState);
-        } else {
-          setInterventionError(true);
-        }
-        setInterventionLoading(false);
-
-        holzenLog.companion('orchestrate intervention ok', {
-          pause_instance_prefix: pauseInstanceId.slice(0, 8),
-          hasIntervention: Boolean(body.intervention),
-        });
-
-        // Hydrate any companion data the server returned alongside intervention
-        // (e.g. trap forces grounding, pattern forces history, secondary forces zoomOut)
-        const orchestrateBody = (data ?? {}) as Record<string, unknown>;
-        const slotCommitters: CompanionSlotCommitters = {
-          setSignal,
-          setNudge,
-          setHistoryInsight,
-          setZoomOut,
-          autoSaveToLibrary,
-        };
-        const sigSlot = hydrateOrchestrateSlotsFromInterventionResponse(
-          orchestrateBody,
-          fetchedSlotsRef.current,
-          slotCommitters,
-          setCacheRelaxations,
-        );
-        if (isFilledOrchestrateSlot(sigSlot)) {
-          holzenLog.companion('hydrated signal from intervention response', {
-            pause_instance_prefix: pauseInstanceId.slice(0, 8),
-            source: sigSlot.source,
-            cacheRelaxation: sigSlot.cacheRelaxation ?? null,
-          });
-        }
-      } catch (e) {
-        console.error('[useCompanionData] intervention fetch failed', e);
-        setInterventionError(true);
-      } finally {
-        if (!cancelled) setInterventionLoading(false);
-      }
-    })();
-
-    return () => { cancelled = true; };
-  }, [pauseInstanceId, retryCount, context, reflectionMessage, mood, severityNumber, language, autoSaveToLibrary]);
 
   // ── On-demand companion slot fetch (triggered when user taps a card) ──
   const fetchCompanion = useCallback(async (slot: RegenerateCompanionSlot) => {
@@ -488,13 +318,6 @@ export function useCompanionData({ companions, prefs, pauseInstanceId, context, 
         return;
       }
 
-      const slotCommitters: CompanionSlotCommitters = {
-        setSignal,
-        setNudge,
-        setHistoryInsight,
-        setZoomOut,
-        autoSaveToLibrary,
-      };
       const filled = tryApplyOrchestrateSlotFromBody(
         body,
         slot,
@@ -537,6 +360,7 @@ export function useCompanionData({ companions, prefs, pauseInstanceId, context, 
     startCheckout,
     companionSlotLoadingSetters,
     companionSlotErrorSetters,
+    slotCommitters,
   ]);
 
   // ── Retry helpers ──
@@ -566,10 +390,19 @@ export function useCompanionData({ companions, prefs, pauseInstanceId, context, 
     setNudge(null); setNudgeError(false);
     setZoomOut(null); setZoomOutError(false);
     setHistoryInsight(null); setHistoryError(false);
-    setIntervention(null); setInterventionError(false);
+    setIntervention(null);
+    setInterventionError(false);
+    clearInterventionFetchDedupe();
     setCacheRelaxations(EMPTY_COMPANION_SLOT_RELAXATIONS);
     setRetryCount(c => c + 1);
-  }, [pauseInstanceId]);
+  }, [
+    pauseInstanceId,
+    setIntervention,
+    setInterventionError,
+    clearInterventionFetchDedupe,
+    interventionSkippedRef,
+    pendingRetryConfirmRef,
+  ]);
 
   const regenerateCompanion = useCallback(async (slot: RegenerateCompanionSlot) => {
     if (!pauseInstanceId) return;
@@ -649,13 +482,6 @@ export function useCompanionData({ companions, prefs, pauseInstanceId, context, 
         return;
       }
 
-      const slotCommitters: CompanionSlotCommitters = {
-        setSignal,
-        setNudge,
-        setHistoryInsight,
-        setZoomOut,
-        autoSaveToLibrary,
-      };
       const filled = tryApplyOrchestrateSlotFromBody(
         body,
         slot,
@@ -691,6 +517,7 @@ export function useCompanionData({ companions, prefs, pauseInstanceId, context, 
     canAccessCompanion,
     companionSlotLoadingSetters,
     companionSlotErrorSetters,
+    slotCommitters,
   ]);
 
   return {
