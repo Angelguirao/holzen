@@ -1,10 +1,10 @@
 import { useCallback, useMemo, useReducer } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { getLatestChangelogVersionQueryOptions } from '@/lib/changelog-query';
+import { getLatestChangelogVersionQueryOptions } from '@/screens/marketing/lib/changelog-query';
 
 const LAST_SEEN_VERSION_KEY = 'holzen_last_seen_version';
 
-export { CHANGELOG_LATEST_VERSION_QUERY_KEY } from '@/lib/changelog-query';
+export { CHANGELOG_LATEST_VERSION_QUERY_KEY } from '@/screens/marketing/lib/changelog-query';
 
 function readLastSeenVersion(): string | null {
   try {

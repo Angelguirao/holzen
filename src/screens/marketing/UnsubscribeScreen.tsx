@@ -6,7 +6,7 @@ import { invokeEdge } from '@/lib/invoke-edge';
 import {
   emailUnsubscribeLinkQueryKey,
   getEmailUnsubscribeLinkQueryOptions,
-} from '@/lib/email-unsubscribe-query';
+} from '@/screens/marketing/lib/email-unsubscribe-query';
 
 type ConfirmState =
   | { kind: 'idle' }
@@ -15,7 +15,7 @@ type ConfirmState =
   | { kind: 'already' }
   | { kind: 'error'; message: string };
 
-export { emailUnsubscribeLinkQueryKey } from '@/lib/email-unsubscribe-query';
+export { emailUnsubscribeLinkQueryKey } from '@/screens/marketing/lib/email-unsubscribe-query';
 
 export default function UnsubscribeScreen() {
   const [params] = useSearchParams();

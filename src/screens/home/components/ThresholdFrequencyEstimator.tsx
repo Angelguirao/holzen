@@ -2,7 +2,7 @@ import { useMemo } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
 import { Activity } from 'lucide-react';
-import { getThresholdVolatilityEstimatorQueryOptions } from '@/lib/threshold-volatility-estimator-query';
+import { getThresholdVolatilityEstimatorQueryOptions } from '@/features/user/public-queries';
 
 interface Props {
   thresholdUp: number;

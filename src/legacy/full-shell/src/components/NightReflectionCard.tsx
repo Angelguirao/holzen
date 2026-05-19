@@ -11,12 +11,12 @@ import {
   getVisibleNightReflectionQueryOptions,
   readNightReflectionDismissedIds,
   writeNightReflectionDismissedIds,
-} from '@/lib/night-reflection-visible-query';
+} from '@/legacy/full-shell/src/lib/night-reflection-visible-query';
 
 export {
   NIGHT_REFLECTION_VISIBLE_QUERY_KEY,
   fetchVisibleNightReflection,
-} from '@/lib/night-reflection-visible-query';
+} from '@/legacy/full-shell/src/lib/night-reflection-visible-query';
 
 export function useNightReflection() {
   const { user } = useAuth();

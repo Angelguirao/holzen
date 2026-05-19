@@ -7,7 +7,7 @@ import {
   getQuietWindowsQueryOptions,
   quietWindowsQueryKey,
   type QuietWindow,
-} from '@/lib/quiet-windows-query';
+} from '@/features/user/public-queries';
 import { Switch } from '@/components/ui/switch';
 import { Button } from '@/components/ui/button';
 import { Plus, Trash2 } from 'lucide-react';

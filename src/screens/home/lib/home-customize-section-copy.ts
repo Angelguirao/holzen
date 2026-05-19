@@ -1,5 +1,5 @@
 import type { TFunction } from 'i18next';
-import { JOURNEY_STAT_TILES_VISIBILITY_ID } from '@/lib/home-section-visibility-constants';
+import { JOURNEY_STAT_TILES_VISIBILITY_ID } from '@/screens/home/lib/home-section-visibility-constants';
 
 /** Customize sheet section titles (layout widget ids). */
 export function getHomeCustomizeSectionTitle(t: TFunction, id: string): string {

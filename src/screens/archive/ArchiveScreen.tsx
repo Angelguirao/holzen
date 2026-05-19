@@ -5,13 +5,13 @@ import { useTranslation } from 'react-i18next';
 import { motion, AnimatePresence } from 'framer-motion';
 import { usePauseArchiveList } from '@/screens/archive/hooks/use-pause-archive-list';
 import type { PauseArchiveRow, PauseArchiveSegment } from '@/features/pause/public-queries';
-import { useInfiniteScroll } from '@/lib/use-infinite-scroll';
+import { useInfiniteScroll } from '@/hooks/use-infinite-scroll';
 import { PageMeta } from '@/app/components/PageMeta';
 import { Search, X, ArrowUpDown, RefreshCw, Loader2 } from 'lucide-react';
 import { ArchivePauseItems } from '@/screens/archive/components/ArchivePauseItems';
 import { ArchiveCollectionsSection } from '@/screens/archive/components/ArchiveCollectionsSection';
 import { CurrentPauseCard } from '@/screens/archive/components/library/CurrentPauseCard';
-import { usePullToRefresh } from '@/lib/use-pull-to-refresh';
+import { usePullToRefresh } from '@/hooks/use-pull-to-refresh';
 
 import { Input } from '@/components/ui/input';
 import { Alert, AlertDescription } from '@/components/ui/alert';
@@ -19,7 +19,7 @@ import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import { useAuth } from '@/features/auth/public';
 import { getArchivePausesTabHasRowsQueryOptions } from '@/features/pause/public-queries';
-import type { ArchiveMainSegment } from '@/lib/archive-segment';
+import type { ArchiveMainSegment } from '@/features/pause/public';
 
 type SortMode = 'newest' | 'oldest' | 'alphabetical';
 

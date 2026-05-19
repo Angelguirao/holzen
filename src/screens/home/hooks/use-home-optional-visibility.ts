@@ -2,7 +2,7 @@ import { useCallback, useState } from 'react';
 import {
   JOURNEY_STAT_TILES_VISIBILITY_ID,
   OPTIONAL_HOME_WIDGET_IDS,
-} from '@/lib/home-section-visibility-constants';
+} from '@/screens/home/lib/home-section-visibility-constants';
 
 const STORAGE_KEY = 'holzen_home_optional_visible';
 
@@ -16,7 +16,7 @@ export {
   type AllHomeSectionId,
   type HomeSectionIdWithoutVisibilityToggle,
   type OptionalHomeWidgetId,
-} from '@/lib/home-section-visibility-constants';
+} from '@/screens/home/lib/home-section-visibility-constants';
 
 const VISIBILITY_KEYS = [...OPTIONAL_HOME_WIDGET_IDS, JOURNEY_STAT_TILES_VISIBILITY_ID] as const;
 

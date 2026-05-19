@@ -68,7 +68,7 @@ Routes are declared in **`src/App.tsx`**. Screen modules under **`src/screens/`*
 
 ---
 
-## 5. Authentication (`src/features/auth/`, `src/hooks/use-auth.tsx` shim)
+## 5. Authentication (`src/features/auth/public`)
 
 - **`AuthProvider`** (`features/auth/public.ts`) subscribes to `supabase.auth.onAuthStateChange` and seeds state from `getSession()`.
 - On **`SIGNED_IN`**, if `localStorage` has `holzen_ref`, the app inserts **`referral_pending_jobs`** then invokes **`record-referral`**; **`holzen_ref`** is cleared on success or invalid code (see **`docs/systems/auth/auth-and-referral-system.md`**).

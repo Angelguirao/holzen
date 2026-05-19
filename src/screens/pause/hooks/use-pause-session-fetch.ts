@@ -9,7 +9,7 @@ export { pauseSessionFetchedInstanceQueryKey } from '@/features/pause/public-que
  * (hydration `status === 'fetch'` from `computePauseSessionHydration`). Row shaping:
  * `src/lib/pause-session-fetched-instance.ts`.
  *
- * **Caller:** `src/hooks/use-pause-session-shell.ts`. **Contract:** `docs/systems/pause-system.md`
+ * **Caller:** `screens/pause/hooks/use-pause-session-shell.ts`. **Contract:** `docs/systems/pause-system.md`
  * section 7.2; **code map:** same doc, section 10.
  */
 export function usePauseSessionFetch(fetchPauseInstanceId: string | null): {

@@ -25,7 +25,8 @@ features/<context>/
 - Put **subscription**, **market**, **user**, **notifications**, **auth** in their own `features/<name>/` as you migrate.
 - **user** and **subscription** use `public-queries.ts` for profile/snapshot TanStack modules; `public.ts` stays Supabase-free.
 - **auth** — `AuthProvider` / `useAuth` exported from `features/auth/public.ts` (implementation in `presentation/`).
-- Do **not** add new root-level `src/hooks/` (removed) or `src/lib/<feature>-*` shims for migrated contexts.
+- Do **not** add feature-specific root `src/hooks/` (use `features/<context>/presentation` or `screens/<route>/hooks`). Cross-cutting hooks only: `src/hooks/use-feature-flag`, `use-pull-to-refresh`, etc.
+- Do **not** add new `src/lib/<feature>-*` modules for bounded contexts — use `features/` or `screens/<route>/lib/`.
 - Import domain hooks from `@/features/<ctx>/public-hooks` (not `presentation/` paths from `components/`).
 
 ## Tests

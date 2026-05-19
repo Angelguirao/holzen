@@ -1,6 +1,6 @@
 import { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
-import { heroQuoteIndexForDay, utcYmd, HERO_QUOTE_LINE_KEY_GROUPS } from '@/lib/home-hero-quote';
+import { heroQuoteIndexForDay, utcYmd, HERO_QUOTE_LINE_KEY_GROUPS } from '@/screens/home/lib/home-hero-quote';
 
 interface HomeHeroQuoteProps {
   userId: string | undefined;

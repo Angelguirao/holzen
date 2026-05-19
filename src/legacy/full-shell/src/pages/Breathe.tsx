@@ -7,8 +7,8 @@ import { X, Info } from 'lucide-react';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 import { hapticFeedback } from '@/lib/haptics';
 import { getBreatheAmbientBtcQueryOptions } from '@/features/market/public';
-import { getMempoolSpaceBlockDataQueryOptions } from '@/lib/mempool-space-block-data';
-import { playBlockDiscoveryTone, startAmbientDrone } from '@/lib/notification-tone';
+import { getMempoolSpaceBlockDataQueryOptions } from '@/legacy/full-shell/src/lib/mempool-space-block-data';
+import { playBlockDiscoveryTone, startAmbientDrone } from '@/screens/home/lib/notification-tone';
 import { useProGate } from '@/features/subscription/public-hooks';
 import { ProLock } from '@/components/ui/pro-lock';
 

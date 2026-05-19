@@ -314,7 +314,7 @@ Full-screen `/companion/*` pages are **pause presentation** for a single slot (e
 
 ### 8.2 What about `companion-orchestrate` on the server?
 
-Edge functions remain in `supabase/functions/` — that is **infrastructure**. On the client, **`CompanionOrchestrator` port** + adapter in `packages/infrastructure` implements the HTTP call. The **use case** `orchestrateCompanionSlots` lives under **`pause/application/companion/`**.
+Edge functions remain in `supabase/functions/` — that is **infrastructure**. On the client, **`CompanionOrchestrator` port** + adapter in `packages/infrastructure` implements the HTTP call. The **use case** `orchestrateCompanionSlots` lives under **`pause/application/use-cases/companion/`**.
 
 Pipeline narrative stays in [ai-powered-pause-system.md](../systems/pause/ai-powered-pause-system.md); **ownership** stays under **pause**.
 
@@ -358,7 +358,7 @@ External reading is **optional**; this table is the project’s **curated** stan
 
 ## 10. Target repository shape (pre-launch baseline)
 
-The **current** tree (flat `src/hooks`, flat `src/lib`) is **transitional**. Presentation lives in `src/screens/`; the former `src/pages/` shim was removed (May 2026). The **target** shape below implements these principles. Operational detail: [frontend-module-layout.md](frontend-module-layout.md).
+The **current** tree (flat `src/lib`, screen-local hooks) is **transitional**. Presentation lives in `src/screens/`; the former `src/pages/` shim was removed (May 2026). The **target** shape below implements these principles. Operational detail: [frontend-module-layout.md](frontend-module-layout.md).
 
 ```text
 apps/

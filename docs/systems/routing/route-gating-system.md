@@ -8,7 +8,7 @@ Related: `docs/systems/auth/auth-and-referral-system.md` (session + `AuthProvide
 
 ## Source of truth
 
-- `useAuth()` returns `{ user, loading }` from `AuthProvider` (`@/features/auth/public`; `src/hooks/use-auth.tsx` is a deprecated shim).
+- `useAuth()` returns `{ user, loading }` from `AuthProvider` (`@/features/auth/public`).
 - Route wrappers read **only** those two values. They do not call Supabase directly.
 
 ## Components

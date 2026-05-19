@@ -6,7 +6,7 @@
 import { supabase } from '@/integrations/supabase/client';
 import type { Json } from '@/integrations/supabase/types';
 import type { UseQueryOptions } from '@tanstack/react-query';
-import { ADMIN_QUERY_PREFIX } from '@/lib/admin-query-namespace';
+import { ADMIN_QUERY_PREFIX } from '@/screens/admin/lib/admin-query-namespace';
 
 /** Admin dashboard period filter (cost analytics + in-hook period aggregation). */
 export type TimePeriod = 'today' | '7d' | '30d' | 'all';

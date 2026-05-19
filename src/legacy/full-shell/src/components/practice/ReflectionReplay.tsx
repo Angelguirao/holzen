@@ -11,7 +11,7 @@ import { format } from 'date-fns';
 import { Loader2 } from 'lucide-react';
 import { practiceEntriesWeeklyCountQueryKey } from '@/legacy/full-shell/src/lib/practice-entries-weekly-count-query';
 import { practicePrimarySuggestionQueryKey } from '@/legacy/full-shell/src/lib/practice-primary-suggestion-query';
-import { toolsHubDataQueryKey } from '@/lib/tools-hub-data-query';
+import { toolsHubDataQueryKey } from '@/legacy/full-shell/src/lib/tools-hub-data-query';
 import { invalidateHistoryCalendarActivities } from '@/legacy/full-shell/src/lib/history-calendar-activities-query-key';
 import { useAuth } from '@/features/auth/public';
 import { supabase } from '@/integrations/supabase/client';

@@ -19,7 +19,7 @@ import {
   getAdminCompanionFallbacksQueryOptions,
   type CompanionFallbackRow,
   type FallbackPoolType,
-} from '@/lib/admin-companion-fallbacks-query';
+} from '@/screens/admin/lib/admin-companion-fallbacks-query';
 
 export type { CompanionFallbackRow, FallbackPoolType };
 

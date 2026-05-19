@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { heroQuoteIndexForDay } from '@/lib/home-hero-quote';
+import { heroQuoteIndexForDay } from '@/screens/home/lib/home-hero-quote';
 
 describe('heroQuoteIndexForDay', () => {
   it('is stable for the same user and day', () => {

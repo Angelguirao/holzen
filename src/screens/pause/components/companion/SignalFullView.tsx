@@ -3,7 +3,7 @@ import { useQuery } from '@tanstack/react-query';
 import { ExternalLink, ShieldCheck } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { Skeleton } from '@/components/ui/skeleton';
-import { getSignalSourcesCatalogQueryOptions } from '@/lib/signal-sources-catalog-query';
+import { getSignalSourcesCatalogQueryOptions } from '@/features/user/public-queries';
 import { CompanionError } from '../CompanionError';
 import { ReadTime } from './ReadTime';
 import { WhyThisCard } from './WhyThisCard';

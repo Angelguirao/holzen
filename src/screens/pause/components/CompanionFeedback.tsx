@@ -13,7 +13,7 @@ import {
 } from '@/features/pause/public-queries';
 import { useSubscription } from '@/features/subscription/public-hooks';
 import { useProGate } from '@/features/subscription/public-hooks';
-import { showLimitReachedToast, isPaidLimitReached } from '@/lib/limit-upsell';
+import { isPaidLimitReached, showLimitReachedToast } from '@/features/subscription/public-limits';
 import { isHolzenDebugEnabled } from '@/lib/holzen-console';
 /** Orchestrate regenerate — dev / non-production builds, or prod + Holzen debug opt-in (see holzen-console). */
 function isCompanionRegenerateUiEnabled(): boolean {

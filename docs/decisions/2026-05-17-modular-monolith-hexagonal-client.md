@@ -7,7 +7,7 @@
 
 ## Context
 
-Holzen is pre-launch with no production users. The active SPA still uses a **transitional** layout: bounded contexts in `src/features/`, route UI in `src/screens/`, shell in `src/app/`, design system in `src/components/ui/`, plus residual flat `src/hooks/` / `src/lib/` shims and `src/legacy/` on main (not imported). That layout:
+Holzen is pre-launch with no production users. The active SPA still uses a **transitional** layout: bounded contexts in `src/features/`, route UI in `src/screens/`, shell in `src/app/`, design system in `src/components/ui/`, shared utilities in `src/lib/`, and `src/legacy/` on main (not imported). That layout:
 
 - Does not enforce dependency direction (presentation imports infrastructure freely).
 - Makes cross-feature coupling easy (deep imports, types defined in `.tsx` consumed by `lib/`).

@@ -8,7 +8,7 @@ import {
   fetchPendingSourceSuggestionsRows,
   getAdminPendingSourceSuggestionsQueryOptions,
   type SourceSuggestionRow,
-} from '@/lib/admin-source-suggestions-query';
+} from '@/screens/admin/lib/admin-source-suggestions-query';
 
 export type { SourceSuggestionRow };
 

@@ -87,7 +87,7 @@ Use this table to pick the **canonical narrative** for the slice you are touchin
 | i18n | `src/i18n/`; `useTranslation()` where strings are already externalized |
 | PWA / service worker | `src/sw.ts`; registered via `vite-plugin-pwa` in `vite.config.ts` |
 | Frontend error reporting | `src/lib/sentry.ts` (init + `beforeSend` scrubber); `src/app/components/ErrorBoundary.tsx`; `src/main.tsx` (boot + unhandledrejection) |
-| Frontend analytics + flags | `src/lib/posthog.ts` (privacy-first init); `src/hooks/use-feature-flag.ts`; events listed in [docs/ops/event-taxonomy.md](docs/ops/event-taxonomy.md); flags in [docs/ops/feature-flags.md](docs/ops/feature-flags.md) |
+| Frontend analytics + flags | `src/lib/posthog.ts` (privacy-first init); `src/lib/use-feature-flag.ts`; events listed in [docs/ops/event-taxonomy.md](docs/ops/event-taxonomy.md); flags in [docs/ops/feature-flags.md](docs/ops/feature-flags.md) |
 | Cross-surface correlation | `src/lib/cid.ts` → per-tab `cid`, attached as `x-cid` header via `invokeEdge` wrapper; set as Sentry tag + PostHog super-property |
 | Web Vitals | `src/lib/web-vitals.ts` forwards CLS/INP/LCP/FCP/TTFB to Sentry + PostHog |
 | Edge request logging | `supabase/functions/_shared/with-request-logging.ts` wraps new functions; `_shared/deps.ts` for external call logging; `_shared/edge-error.ts` for standardized errors |

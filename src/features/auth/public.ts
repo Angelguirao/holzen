@@ -13,3 +13,8 @@ export interface AuthSessionState {
 }
 
 export type { AuthFunnelUser } from './application/auth-funnel-events';
+export {
+  SIGNUPS_ENABLED,
+  checkSignupGate,
+  type SignupGateStatus,
+} from './infrastructure/signup-gate';

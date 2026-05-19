@@ -3,7 +3,7 @@ import {
   getGroundingEnrichmentQueryOptions,
   type GroundingEnrichment,
   type GroundingEnrichmentInput,
-} from '@/lib/grounding-enrichment-query';
+} from '@/features/pause/public-queries';
 
 export type { GroundingEnrichment };
 

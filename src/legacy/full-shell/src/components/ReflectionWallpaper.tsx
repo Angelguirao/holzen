@@ -6,7 +6,7 @@ import { toast } from 'sonner';
 import { parseEdgeFunctionError, toUserFacingAiErrorMessage } from '@/lib/edge-function-error';
 import { useSubscription } from '@/features/subscription/public-hooks';
 import { useProGate } from '@/features/subscription/public-hooks';
-import { showLimitReachedToast, isPaidLimitReached } from '@/lib/limit-upsell';
+import { isPaidLimitReached, showLimitReachedToast } from '@/features/subscription/public-limits';
 import {
   Dialog,
   DialogContent,

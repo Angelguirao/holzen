@@ -4,7 +4,7 @@ import { supabase } from '@/integrations/supabase/client';
 import {
   SIGNAL_SOURCES_CATALOG_QUERY_KEY,
   getSignalSourcesCatalogQueryOptions,
-} from '@/lib/signal-sources-catalog-query';
+} from '@/features/user/public-queries';
 import {
   getUserSignalPreferencesQueryOptions,
   USER_SIGNAL_PREFS_QUERY_KEY,

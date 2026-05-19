@@ -6,7 +6,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { useHolzen } from '@/screens/home/hooks/use-holzen';
 import { useCompletedPauseCount } from '@/features/pause/public-hooks';
 import { settingsSectionPath, TOOLS } from '@/lib/app-routes';
-import { groundingActivityLabel } from '@/lib/grounding-activity-label';
+import { groundingActivityLabel } from '@/legacy/full-shell/src/lib/grounding-activity-label';
 
 /**
  * “So you” — shows **grounding activities** from `profiles.grounding_activities`

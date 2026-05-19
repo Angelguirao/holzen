@@ -1,5 +1,5 @@
 import { supabase } from '@/integrations/supabase/client';
-import { ADMIN_QUERY_PREFIX } from '@/lib/admin-query-namespace';
+import { ADMIN_QUERY_PREFIX } from '@/screens/admin/lib/admin-query-namespace';
 
 export type FallbackPoolType = 'signal' | 'grounding' | 'history' | 'zoom_out' | 'reflection';
 

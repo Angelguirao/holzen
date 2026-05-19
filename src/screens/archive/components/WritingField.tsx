@@ -2,7 +2,7 @@ import { useState, useRef, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { writingTextareaClassName } from '@/lib/writing-surface';
+import { writingTextareaClassName } from '@/features/pause/public';
 
 interface WritingFieldProps {
   value: string;

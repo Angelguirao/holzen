@@ -7,7 +7,7 @@ import { useWidgetLayout } from '@/screens/home/components/HomeWidget';
 import { HomeDashboardLayout } from '@/screens/home/components/HomeDashboardLayout';
 import { HomeZenModeRoute } from '@/screens/home/components/HomeZenModeRoute';
 import { useHomeOptionalVisibility } from '@/screens/home/hooks/use-home-optional-visibility';
-import { HOME_WIDGET_DEFAULT_ORDER } from '@/lib/home-section-visibility-constants';
+import { HOME_WIDGET_DEFAULT_ORDER } from '@/screens/home/lib/home-section-visibility-constants';
 import { useHomeCheckoutWelcomeToast } from '@/screens/home/hooks/use-home-checkout-welcome-toast';
 import { useHomeZenMode } from '@/screens/home/hooks/use-home-zen-mode';
 import { useHomeCompletedPauseCount } from '@/screens/home/hooks/use-home-completed-pause-count';
@@ -30,7 +30,7 @@ import { useHomePauseContextPreviews } from '@/screens/home/hooks/use-home-pause
 import { useHomePullFullReload } from '@/screens/home/hooks/use-home-pull-full-reload';
 import { useHomeZenModeRouteProps } from '@/screens/home/hooks/use-home-zen-route-props';
 import { useHomeDashboardLayoutProps } from '@/screens/home/hooks/use-home-dashboard-layout-props';
-import type { HomeAppLayoutOutletContext } from '@/lib/home-app-layout-outlet';
+import type { HomeAppLayoutOutletContext } from '@/screens/home/lib/home-app-layout-outlet';
 
 const Home = () => {
   const { t } = useTranslation();

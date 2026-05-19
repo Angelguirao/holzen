@@ -20,7 +20,7 @@ import { AdminSubNav } from '@/screens/admin/components/AdminSubNav';
 import { AppConfigTools } from '@/screens/admin/components/AppConfigTools';
 import { MigrationStatus } from '@/screens/admin/components/MigrationStatus';
 import { CostAnalytics } from '@/screens/admin/components/CostAnalytics';
-import { adminDeleteRowsByIds } from '@/lib/admin-delete';
+import { adminDeleteRowsByIds } from '@/screens/admin/lib/admin-delete';
 
 function computeTrend(current: number, previous: number | null, invertColor: boolean): TrendInfo | undefined {
   if (previous === null || previous === undefined) return undefined;

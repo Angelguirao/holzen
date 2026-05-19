@@ -1,9 +1,9 @@
 import { supabase } from '@/integrations/supabase/client';
-import { ADMIN_QUERY_PREFIX } from '@/lib/admin-query-namespace';
+import { ADMIN_QUERY_PREFIX } from '@/screens/admin/lib/admin-query-namespace';
 import {
   mergePregenerateCacheTopup,
   type PregenerateCacheTopupConfig,
-} from '../../supabase/functions/_shared/pregenerate-cache-topup-config.ts';
+} from '../../../../supabase/functions/_shared/pregenerate-cache-topup-config.ts';
 
 export const FEATURE_KEYS = [
   'wallpaper',

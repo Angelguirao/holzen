@@ -1,5 +1,5 @@
 import { fetchPracticeSuggestions, type PracticeSuggestion } from '@/legacy/full-shell/src/lib/practice-suggestion';
-import { PRACTICE_QUERY_PREFIX } from '@/lib/practice-query-namespace';
+import { PRACTICE_QUERY_PREFIX } from '@/legacy/full-shell/src/lib/practice-query-namespace';
 
 export const PRACTICE_SUGGESTION_QUERY_PREFIX = [...PRACTICE_QUERY_PREFIX, 'suggestion'] as const;
 

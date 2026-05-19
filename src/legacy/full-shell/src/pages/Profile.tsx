@@ -6,7 +6,7 @@ import { useAuth } from '@/features/auth/public';
 import { getCompletedPauseCountQueryOptions } from '@/features/pause/public-queries';
 import { useSubscription } from '@/features/subscription/public-hooks';
 import { useHoldGoalProfile } from '@/features/user/public-hooks';
-import { type ProfileTab } from '@/lib/router-location-state';
+import { type ProfileTab } from '@/legacy/full-shell/src/lib/router-location-state';
 import { journeyPath, isProfileTab } from '@/lib/app-routes';
 import { getHistoryCalendarActivitiesQueryOptions } from '@/legacy/full-shell/src/lib/history-calendar-activities-fetch';
 import { BarChart3, Sparkles, Award, CalendarDays } from 'lucide-react';
