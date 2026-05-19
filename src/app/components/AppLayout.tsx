@@ -2,12 +2,10 @@ import { Suspense, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Outlet, useLocation } from 'react-router-dom';
 import { BottomNav, isPrimaryTabActive } from './BottomNav';
-import { PauseReadyBanner } from '@/app/components/PauseReadyBanner';
+import { ShellPauseChrome } from '@/app/components/ShellPauseChrome';
 import { CheckoutConfirmation, PaywallSubscribedTracker } from '@/features/subscription/public';
 import { NotificationBell } from '@/features/user/public';
-import { useHolzen } from '@/screens/home/hooks/use-holzen';
-import { PendingPauseOfferShell } from '@/screens/pause/components/PendingPauseOfferShell';
-import { useLanguageSync } from '@/hooks/use-language-sync';
+import { useShellProfile } from '@/app/hooks/use-shell-profile';
 import { useAutoTrigger } from '@/hooks/use-auto-trigger';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Alert, AlertDescription } from '@/components/ui/alert';
@@ -73,9 +71,8 @@ function useTabChunkPrefetch() {
  *
  * **Orchestration (intentional):** this file mounts cross-context chrome that must
  * survive tab switches — not domain logic owned by a single screen.
- * - `useHolzen` — profile/language + open-pause resync (Home provider, app-wide when signed in)
- * - `PendingPauseOfferShell` — pause offer modal (pause feature UI, shell-triggered)
- * - `useAutoTrigger` + `PauseReadyBanner` — market/cron “pause ready” strip off-Home
+ * - `useShellProfile` — profile load errors + i18n (via `useProfile`, not Home’s `useHolzen`)
+ * - `ShellPauseChrome` — pending offer modal + pause-ready banner (`useHolzen` isolated there)
  * - `CheckoutConfirmation` / `PaywallSubscribedTracker` — subscription return UX on any tab
  * - `NotificationBell` — inbox header (user presentation)
  *
@@ -92,23 +89,16 @@ function shellCenterNavLabel(pathname: string, t: (key: string) => string): stri
 
 export function AppLayout() {
   const { t } = useTranslation();
-  const { language, profileLoadError, retryProfileLoad, resyncOpenPauseFromDb } = useHolzen();
-  useLanguageSync(language);
+  const { profileLoadError, retryProfileLoad } = useShellProfile();
   useTabChunkPrefetch();
   const { pauseReady, dismiss } = useAutoTrigger();
   const location = useLocation();
-  const isHome = location.pathname === '/' || location.pathname === '/index';
   const centerNavLabel = shellCenterNavLabel(location.pathname, t);
 
   return (
     <div className="min-h-screen flex items-start justify-center p-6 pb-20">
       <RobotsNoIndex />
-      <PendingPauseOfferShell
-        onAfterMutation={() => void resyncOpenPauseFromDb()}
-        autoOpen={location.pathname !== '/pause'}
-      />
-      {/* Show banner on non-Home pages when auto-trigger fires */}
-      {!isHome && <PauseReadyBanner visible={pauseReady} onDismiss={dismiss} />}
+      <ShellPauseChrome pauseReady={pauseReady} onDismissPauseReady={dismiss} />
       <CheckoutConfirmation />
       <PaywallSubscribedTracker />
       <div className="w-full max-w-sm">

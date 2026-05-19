@@ -4,7 +4,7 @@ import { PageHeading } from '@/components/ui/page-heading';
 import { LetterToFutureSelf } from '@/legacy/full-shell/src/components/LetterToFutureSelf';
 import { ProLock } from '@/components/ui/pro-lock';
 import { Skeleton } from '@/components/ui/skeleton';
-import { useHolzen } from '@/hooks/use-holzen';
+import { useHolzen } from '@/screens/home/hooks/use-holzen';
 
 /**
  * Pro feature: letters to your future self (BTC context). Lives under Tools, not Journey.

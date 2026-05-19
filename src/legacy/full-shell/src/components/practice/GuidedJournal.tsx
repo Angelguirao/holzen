@@ -8,7 +8,7 @@ import { toolsHubDataQueryKey } from '@/lib/tools-hub-data-query';
 import { invalidateHistoryCalendarActivities } from '@/legacy/full-shell/src/lib/history-calendar-activities-query-key';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/use-auth';
-import { useHolzen } from '@/hooks/use-holzen';
+import { useHolzen } from '@/screens/home/hooks/use-holzen';
 import { hapticFeedback } from '@/lib/haptics';
 import { toast } from 'sonner';
 import { Check, RefreshCw, Sparkles, Loader2 } from 'lucide-react';
