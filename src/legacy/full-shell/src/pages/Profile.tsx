@@ -14,7 +14,7 @@ import HistoryContent from '@/legacy/full-shell/src/components/library/HistoryCo
 import { StatsContentV2 } from '@/legacy/full-shell/src/components/stats/StatsContentV2';
 import { Skeleton } from '@/components/ui/skeleton';
 import { AIInsightsPanel } from '@/legacy/full-shell/src/components/AIInsightsPanel';
-import { ProLock } from '@/components/ProLock';
+import { ProLock } from '@/app/components/ProLock';
 import { BadgesPanelV2 } from '@/legacy/full-shell/src/components/BadgesPanelV2';
 
 const Profile = () => {

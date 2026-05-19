@@ -1,6 +1,6 @@
 import { useContext } from 'react';
-import { SettingsStateContext } from '@/pages/settings/settings-context';
-import type { SettingsModel } from '@/pages/settings/useSettingsModel';
+import { SettingsStateContext } from '@/screens/settings/settings-context';
+import type { SettingsModel } from '@/screens/settings/hooks/use-settings-model';
 
 export function useSettingsState(): SettingsModel {
   const v = useContext(SettingsStateContext);

@@ -12,10 +12,10 @@ import {
   ChevronRight,
 } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
-import { useSettingsState } from '@/pages/settings/use-settings-state';
+import { useSettingsState } from '@/screens/settings/hooks/use-settings-state';
 import { settingsSectionPath } from '@/lib/app-routes';
-import { isSettingsSectionId } from '@/pages/settings/sectionIds';
-import type { SettingsSectionId } from '@/pages/settings/sectionIds';
+import { isSettingsSectionId } from '@/screens/settings/section-ids';
+import type { SettingsSectionId } from '@/screens/settings/section-ids';
 
 const SECTION_ROWS: {
   id: SettingsSectionId;

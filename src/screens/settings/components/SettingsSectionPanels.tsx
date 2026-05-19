@@ -1,9 +1,9 @@
 import { Link } from 'react-router-dom';
-import { QuietWindowsManager } from '@/components/QuietWindowsManager';
+import { QuietWindowsManager } from '@/app/components/QuietWindowsManager';
 import { SourceManagement } from '@/components/SourceManagement';
-import { ProLock } from '@/components/ProLock';
+import { ProLock } from '@/app/components/ProLock';
 import { PRICING } from '@/features/subscription/public';
-import { ThresholdSetting } from '@/components/ThresholdSetting';
+import { ThresholdSetting } from '@/app/components/ThresholdSetting';
 import { ReferralSection } from '@/components/ReferralSection';
 import { CreditsDashboard } from '@/components/CreditsDashboard';
 import { InstallHolzenCard } from '@/components/InstallHolzenCard';
@@ -30,10 +30,10 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from '@/components/ui/alert-dialog';
-import { useSettingsState } from '@/pages/settings/use-settings-state';
+import { useSettingsState } from '@/screens/settings/hooks/use-settings-state';
 import { GroundingTagInput } from '@/screens/settings/components/GroundingTagInput';
 import { ChangeEmailSection } from '@/screens/settings/components/ChangeEmailSection';
-import { HoldGoalWidget } from '@/components/HoldGoalWidget';
+import { HoldGoalWidget } from '@/app/components/HoldGoalWidget';
 import {
   Select,
   SelectContent,
