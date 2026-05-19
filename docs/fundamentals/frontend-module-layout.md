@@ -356,7 +356,7 @@ Same dependency rules as §2–3 for layers that exist. `npm run check:feature-i
 | **5h** | Orchestration | **Done (shipped surfaces)** — `use-home-*` + `HolzenProvider`/`useHolzen` → `screens/home/hooks/` (active imports `@/screens/home/hooks/use-holzen`; root `@/hooks/use-holzen` shim for legacy only); `use-pause-session-*` + ritual hooks → `screens/pause/hooks/`; `HomeScreen` / `PauseSessionScreen` |
 | **5i** | Shrink global layers | **Done (shipped)** — allowlist **37** root shell/shared components (was 59); home market widgets + onboarding + `MoodCheck` under screens; domain `MoodValue` in `features/pause` |
 | **5j** | App shell | **Done (shipped)** — `src/app/components/` (layout, nav, meta, error boundary, checkout/subscribe chrome, auth loading); allowlist **0** at `src/components/*.tsx` (was 37; only `components/ui/` remains); `check:no-screens-in-features` |
-| **5j+** | Screen hooks + route entrypoints | **Done** — all shipped routes under `screens/*/*Screen`; removed `src/pages/` shim (May 2026); `screens/ops/` for internal tools; `@/hooks/*` shims; `App.tsx` lazy-loads screens |
+| **5j+** | Screen hooks + route entrypoints | **Done** — all shipped routes under `screens/*/*Screen`; removed `src/pages/` shim (May 2026); `screens/ops/` for internal tools; removed `src/hooks/` (May 2026); `App.tsx` lazy-loads screens |
 | **6** | **Gated:** `pnpm-workspace.yaml`, `apps/web`, `packages/*` extract | Only after ADR §8 trigger; `build` from `apps/web` |
 | **7** | `shared-kernel`, `contracts` (minimal), `packages/infrastructure` | Adapter smoke test |
 | **8+** | `apps/web/src/screens`; `check:package-boundaries` | Post-extraction only |

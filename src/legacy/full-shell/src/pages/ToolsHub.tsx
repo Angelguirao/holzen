@@ -1,4 +1,4 @@
-import { useToolsHubData } from '@/hooks/use-tools-hub-data';
+import { useToolsHubData } from '@/legacy/full-shell/src/hooks/use-tools-hub-data';
 import { ToolsGoodNextStepSection } from '@/legacy/full-shell/src/components/tools/ToolsGoodNextStepSection';
 import { ToolsPickGridSection } from '@/legacy/full-shell/src/components/tools/ToolsPickGridSection';
 import { ToolsYourActivitiesSection } from '@/legacy/full-shell/src/components/tools/ToolsYourActivitiesSection';

@@ -1,9 +1,9 @@
 import { useMemo } from 'react';
 import { Check, X, Lock } from 'lucide-react';
-import { useAuth } from '@/hooks/use-auth';
-import { usePauseStatsData } from '@/hooks/use-pause-stats-data';
+import { useAuth } from '@/features/auth/public';
+import { usePauseStatsData } from '@/legacy/full-shell/src/hooks/use-pause-stats-data';
 import { useHoldGoalProfile } from '@/features/user/public-hooks';
-import { useBadges } from '@/hooks/use-badges';
+import { useBadges } from '@/legacy/full-shell/src/hooks/use-badges';
 import {
   BADGE_DEFINITIONS,
   CORE_SKILL_KEYS,

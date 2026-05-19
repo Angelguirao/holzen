@@ -9,7 +9,7 @@
 import { useCallback, useState } from 'react';
 import { AlertTriangle, CheckCircle2, Loader2, RefreshCw, XCircle } from 'lucide-react';
 import { invokeEdge } from '@/lib/invoke-edge';
-import { useToast } from '@/hooks/use-toast';
+import { useToast } from '@/components/ui/use-toast';
 
 type Result = {
   secret: string;

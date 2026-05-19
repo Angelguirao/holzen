@@ -6,7 +6,7 @@ import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { supabase } from '@/integrations/supabase/client';
 import { useHolzen } from '@/screens/home/hooks/use-holzen';
-import { useAuth } from '@/hooks/use-auth';
+import { useAuth } from '@/features/auth/public';
 import { hapticFeedback } from '@/lib/haptics';
 import { playGroundingChime } from '@/lib/grounding-chime';
 import { type MoodValue } from '@/screens/pause/components/MoodCheck';

@@ -16,7 +16,7 @@
 
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useCallback, useMemo } from 'react';
-import { useAuth } from '@/hooks/use-auth';
+import { useAuth } from '@/features/auth/public';
 import {
   getPauseStatsDataDisabledQueryOptions,
   getPauseStatsDataQueryOptions,

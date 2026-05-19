@@ -4,9 +4,9 @@ import { Award, Lock, Sparkles, HelpCircle } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
 import { BadgeCelebration } from './BadgeCelebration';
-import { useBadgeSync } from '@/hooks/use-badge-sync';
-import { useBadges } from '@/hooks/use-badges';
-import { usePauseStatsData } from '@/hooks/use-pause-stats-data';
+import { useBadgeSync } from '@/legacy/full-shell/src/hooks/use-badge-sync';
+import { useBadges } from '@/legacy/full-shell/src/hooks/use-badges';
+import { usePauseStatsData } from '@/legacy/full-shell/src/hooks/use-pause-stats-data';
 import { CORE_SKILL_KEYS, type BadgeFamily } from '@/legacy/full-shell/src/lib/badges/definitions';
 import { cn } from '@/lib/utils';
 

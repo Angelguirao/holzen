@@ -39,11 +39,11 @@ flowchart TB
 |------|-------|----------------|-------------|
 | `src/app/components/` | Shell | Cross-route chrome (nav, meta, feedback); **mount-only** subscription/user UI via `features/*/public` | [app/README.md](../../src/app/README.md) (placement rationale table) |
 | `src/screens/<route>/` | Presentation | Route UI, screen-only hooks | [screens/README.md](../../src/screens/README.md) |
-| `src/components/ui/` | Design system | Primitives used on **2+** routes | [components/README.md](../../src/components/README.md) |
-| `src/components/icons/` | Design system | Shared mood/outcome glyphs | same |
+| `src/components/icons/` | Design system | Shared mood/outcome glyphs | [components/README.md](../../src/components/README.md) |
 | `src/features/<context>/` | Domain + application | Bounded context rules, use cases, ports | [features/README.md](../../src/features/README.md) |
-| `src/hooks/` | Shared UI utilities | Cross-route primitives (`use-toast`, `use-feature-flag`, …); `use-auth.tsx` legacy shim only | Domain hooks: `features/*/public-hooks` |
-| `src/lib/` | Transitional | Shared I/O until fully migrated | Prefer `features/*/public` / `public-queries` |
+| `src/lib/` | Shared I/O + utilities | TanStack/query helpers, `use-feature-flag`, `use-pull-to-refresh`, `use-infinite-scroll`, `use-latest-ref`; prefer `features/*/public` for domain |
+| `src/components/ui/` | Design system | Primitives + `use-toast`, `use-mobile` (see [components/README.md](../../src/components/README.md)) |
+| `src/app/hooks/` | Shell hooks | `use-auto-trigger`, `use-install-prompt`, `use-shell-profile`, … |
 | `src/legacy/` | Archive | Pre-strip full IA — **never import** in active code | [legacy/README.md](../../src/legacy/README.md) |
 
 **Closed:** `src/components/*.tsx` at repo root (`npm run check:no-root-components`).
@@ -171,7 +171,7 @@ Vitest runs `src/**/*.{test,spec}.{ts,tsx}` (jsdom, `src/test/setup.ts`). **Do n
 | `app/components` shell | Beside the component |
 | Transitional `src/lib/*` | Beside the lib file until the shim is removed |
 | **Shipped user journeys** (auth → home → pause, lapsed, settings) | `src/test/integration/flows/*.integration.test.tsx` |
-| Cross-cutting sanitization / shared edge pure math | `src/test/` root (document in [src/test/README.md](../../src/test/README.md)) |
+| Cross-cutting sanitization / shared edge pure math | `supabase/functions/_shared/*.test.ts` or `src/test/shared/` mirrors ([src/test/README.md](../../src/test/README.md)) |
 | Pre-strip / undeployed UI | `src/test/legacy/` (excluded from default `npm run test`) |
 
 **Integration vs browser E2E:** `src/test/integration/` is RTL + `MemoryRouter` with mocked Supabase — not Playwright. See [integration/README.md](../../src/test/integration/README.md) and [holzen-application-architecture.md](holzen-application-architecture.md) §13.

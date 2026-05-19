@@ -1,7 +1,7 @@
 import { useCallback } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
-import { useAuth } from '@/hooks/use-auth';
+import { useAuth } from '@/features/auth/public';
 import { Moon, X } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { homeInWidget } from '@/screens/home/components/home-widget-styles';
