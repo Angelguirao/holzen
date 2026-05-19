@@ -55,3 +55,4 @@ export {
   updateProfileSnoozedUntil,
   type ProfilesHoldGoalUpdate,
 } from './infrastructure/queries/profile-mutations';
+export { submitUserTestimonial } from './infrastructure/queries/testimonial-mutations';

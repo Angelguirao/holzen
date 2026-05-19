@@ -5,8 +5,8 @@ import { MessageCircle, X, Send } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { LoadingButton } from '@/components/ui/loading-button';
 import { Textarea } from '@/components/ui/textarea';
-import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/features/auth/public';
+import { submitUserTestimonial } from '@/features/user/public-queries';
 import { useHolzen } from '@/screens/home/hooks/use-holzen';
 import { toast } from 'sonner';
 
@@ -56,10 +56,10 @@ export function TestimonialRequest({ completedPauseCount }: Props) {
   const submit = async () => {
     if (!user || !quote.trim() || !displayName.trim()) return;
     setSubmitting(true);
-    const { error } = await supabase.from('testimonials').insert({
-      user_id: user.id,
-      display_name: displayName.trim(),
-      quote: quote.trim(),
+    const { error } = await submitUserTestimonial({
+      userId: user.id,
+      displayName,
+      quote,
     });
     setSubmitting(false);
     if (error) {
