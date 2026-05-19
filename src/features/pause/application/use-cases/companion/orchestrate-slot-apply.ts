@@ -222,3 +222,17 @@ export function applyOrchestrateSlotLazyOrRegenerate(
   }
   pushRecencyForOrchestrateSlot(slot, r.data);
 }
+
+/** Lazy fetch / regenerate: commit slot data when the orchestrate body includes a filled slot. */
+export function tryApplyOrchestrateSlotFromBody(
+  body: Record<string, unknown> | null,
+  slot: RegenerateCompanionSlot,
+  setCacheIds: (fn: (prev: CompanionSlotCacheIds) => CompanionSlotCacheIds) => void,
+  committers: CompanionSlotCommitters,
+  setCacheRelaxations?: (fn: (prev: CompanionSlotRelaxations) => CompanionSlotRelaxations) => void,
+): boolean {
+  const slotResult = readOrchestrateSlotBody(body ?? {}, slot);
+  if (!isFilledOrchestrateSlot(slotResult)) return false;
+  applyOrchestrateSlotLazyOrRegenerate(slot, slotResult, setCacheIds, committers, setCacheRelaxations);
+  return true;
+}

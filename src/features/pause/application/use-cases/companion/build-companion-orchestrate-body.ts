@@ -23,6 +23,27 @@ export interface CompanionOrchestrateSessionContext {
   moodHistory: CompanionOrchestrateMoodHistoryEntry[];
 }
 
+/** Maps ritual hook inputs into the wire session shape (null-safe defaults). */
+export function buildCompanionOrchestrateSessionFromRitual(input: {
+  pauseInstanceId: string;
+  context?: string | null;
+  language: string;
+  reflectionMessage?: string | null;
+  mood?: string | null;
+  severityNumber?: number | null;
+  moodHistory: CompanionOrchestrateMoodHistoryEntry[];
+}): CompanionOrchestrateSessionContext {
+  return {
+    pauseInstanceId: input.pauseInstanceId,
+    context: input.context ?? '',
+    language: input.language,
+    reflectionMessage: input.reflectionMessage ?? '',
+    mood: input.mood ?? null,
+    severity: input.severityNumber ?? 0,
+    moodHistory: input.moodHistory,
+  };
+}
+
 const ALL_SLOTS_DISABLED = {
   enableSignal: false,
   enableGrounding: false,

@@ -286,10 +286,14 @@ export {
 export {
   isCompanionOrchestratePaywallCode,
   isOrchestratePayloadError,
+  resolveCompanionOrchestrateInvokeFailure,
   resolveOrchestrateInvokeUserMessage,
+  type CompanionOrchestrateInvokeFailure,
+  type CompanionOrchestrateInvokeFailureKind,
   type CompanionOrchestratePaywallCode,
 } from './application/use-cases/companion/orchestrate-invoke-error';
 export {
+  buildCompanionOrchestrateSessionFromRitual,
   buildInterventionOrchestrateBody,
   buildLazyFetchOrchestrateBody,
   buildRegenerateOrchestrateBody,
@@ -313,6 +317,7 @@ export {
   INTERVENTION_RESPONSE_COMPANION_SLOTS,
   isFilledOrchestrateSlot,
   readOrchestrateSlotBody,
+  tryApplyOrchestrateSlotFromBody,
   type CompanionSlotAutosaveParams,
   type CompanionSlotCacheIds,
   type CompanionSlotCommitters,

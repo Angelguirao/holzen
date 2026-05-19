@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest';
 import {
   isCompanionOrchestratePaywallCode,
   isOrchestratePayloadError,
+  resolveCompanionOrchestrateInvokeFailure,
   resolveOrchestrateInvokeUserMessage,
 } from './orchestrate-invoke-error';
 
@@ -24,6 +25,25 @@ describe('isCompanionOrchestratePaywallCode', () => {
     expect(isCompanionOrchestratePaywallCode('companions_quota_exceeded')).toBe(true);
     expect(isCompanionOrchestratePaywallCode('companions_upgrade_required')).toBe(true);
     expect(isCompanionOrchestratePaywallCode('rate_limited')).toBe(false);
+  });
+});
+
+describe('resolveCompanionOrchestrateInvokeFailure', () => {
+  it('returns null for success-shaped body', async () => {
+    await expect(
+      resolveCompanionOrchestrateInvokeFailure(null, { signal: {} }, 'lazy_fetch', 'fb'),
+    ).resolves.toBeNull();
+  });
+
+  it('classifies paywall failures for lazy fetch', async () => {
+    const failure = await resolveCompanionOrchestrateInvokeFailure(
+      null,
+      { error: 'upgrade', code: 'companions_upgrade_required' },
+      'lazy_fetch',
+      'fb',
+    );
+    expect(failure?.kind).toBe('lazy_fetch');
+    expect(failure?.isPaywall).toBe(true);
   });
 });
 
