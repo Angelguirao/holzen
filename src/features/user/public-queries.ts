@@ -63,8 +63,11 @@ export {
 } from './infrastructure/queries/holzen-number-query';
 export {
   clearProfileHoldGoal,
+  fetchProfileLastTriggerAt,
+  updateProfileFields,
   updateProfileHoldGoal,
   updateProfileSnoozedUntil,
+  type ProfileUpdate,
   type ProfilesHoldGoalUpdate,
 } from './infrastructure/queries/profile-mutations';
 export { submitUserTestimonial } from './infrastructure/queries/testimonial-mutations';
