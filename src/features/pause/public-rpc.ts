@@ -18,3 +18,8 @@ export {
   logPauseRitualDepthUpgraded,
   ritualDepthUpgradedPayload,
 } from './application/session/ritual-depth-upgrade';
+
+export {
+  applyBulkHoldOutcomes,
+  type BulkHoldApplyResult,
+} from './application/use-cases/apply-bulk-hold-outcomes';

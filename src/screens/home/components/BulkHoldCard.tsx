@@ -6,7 +6,7 @@ import { useTranslation } from 'react-i18next';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ChevronRight, Folder, List, X } from 'lucide-react';
 import { hapticFeedback } from '@/lib/haptics';
-import { applyBulkHoldOutcomes } from '@/lib/apply-bulk-hold-outcomes';
+import { applyBulkHoldOutcomes } from '@/features/pause/public-rpc';
 import {
   groupBulkHoldByLocalDay,
   invalidatePauseStatsDataForUser,
