@@ -1,7 +1,7 @@
 import { useTranslation } from 'react-i18next';
 import { useEffect, useRef } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
-import { LandingComparison } from '@/components/LandingComparison';
+import { LandingComparison } from '@/screens/marketing/components/LandingComparison';
 import { useNavigate, Link, useSearchParams } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
@@ -13,8 +13,8 @@ import {
   Smartphone, Anchor, ExternalLink, UserCircle,
 } from 'lucide-react';
 import { PageMeta } from '@/components/PageMeta';
-import { LandingTestimonials } from '@/components/LandingTestimonials';
-import { LandingLanguageSwitcher } from '@/components/LandingLanguageSwitcher';
+import { LandingTestimonials } from '@/screens/marketing/components/LandingTestimonials';
+import { LandingLanguageSwitcher } from '@/screens/marketing/components/LandingLanguageSwitcher';
 import { PRICING } from '@/features/subscription/public';
 import { prefetchCoingeckoBtcUsd } from '@/features/market/public';
 import { prefetchBlogPublishedFirstPage } from '@/lib/blog-post-query';

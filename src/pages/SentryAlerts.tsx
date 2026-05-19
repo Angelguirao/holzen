@@ -6,7 +6,7 @@ import { Separator } from '@/components/ui/separator';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Button } from '@/components/ui/button';
 import { AlertTriangle, Bell, ExternalLink, Slack, Mail, ListChecks, RotateCw } from 'lucide-react';
-import { AdminSubNav } from '@/components/admin/AdminSubNav';
+import { AdminSubNav } from '@/screens/admin/components/AdminSubNav';
 
 type AlertRule = {
   id: string;

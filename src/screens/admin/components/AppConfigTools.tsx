@@ -11,12 +11,12 @@ import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { AlertTriangle, Check, DollarSign, Loader2, Mail, Power, RefreshCw, Save, Users, Zap } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
-import { DevModeToggle } from '@/components/admin/DevModeToggle';
-import { StripePriceCheck } from '@/components/admin/StripePriceCheck';
+import { DevModeToggle } from '@/screens/admin/components/DevModeToggle';
+import { StripePriceCheck } from '@/screens/admin/components/StripePriceCheck';
 import {
   mergePregenerateCacheTopup,
   type PregenerateCacheTopupKey,
-} from '../../../supabase/functions/_shared/pregenerate-cache-topup-config.ts';
+} from '../../../../supabase/functions/_shared/pregenerate-cache-topup-config.ts';
 import {
   ADMIN_APP_CONFIG_TOOLS_QUERY_KEY,
   DEFAULTS,

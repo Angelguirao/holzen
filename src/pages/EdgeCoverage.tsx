@@ -9,7 +9,7 @@ import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { ShieldCheck, ShieldAlert, Search, FileWarning, HeartPulse } from "lucide-react";
-import { AdminSubNav } from "@/components/admin/AdminSubNav";
+import { AdminSubNav } from "@/screens/admin/components/AdminSubNav";
 
 // Static manifest of edge-function error-reporting coverage.
 // Curated from `supabase/functions/*/index.ts` by scanning for:
