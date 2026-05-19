@@ -12,7 +12,6 @@ import { useQuery, useQueryClient } from '@tanstack/react-query';
 import {
   getHolzenMarketDisplayQueryOptions,
   holzenMarketDisplayQueryKey,
-  type BtcPriceData,
 } from '@/features/market/public';
 import { supabase } from '@/integrations/supabase/client';
 import { fetchOpenPauseHomePreview } from '@/features/pause/public-queries';
@@ -22,35 +21,19 @@ import type { CompanionData } from '@/screens/pause/components/CompanionSection'
 import { holzenLog } from '@/lib/holzen-console';
 import { clearSession } from '@/features/pause/public';
 import {
-  buildPauseContextFromMarket,
   getManualReflectionCooldownMs,
   isHolzenDevMode,
 } from '@/features/market/public';
-import { normalizeTrackedAssetId, trackedAssetSymbol } from '@/features/market/public';
+import { normalizeTrackedAssetId } from '@/features/market/public';
 import { severityFromBtcChangePercent } from '@/features/market/public';
 import { millisecondsUntilNextQuarterHour } from '@/screens/home/lib/next-cron-quarter';
-import { openManualPauseFromHome } from '@/features/pause/public-rpc';
-import type { OpenManualPauseFromHomeResult } from '@/features/pause/public-rpc';
-import { trackEvent } from '@/lib/posthog';
 import {
   MANUAL_PAUSE_TRIGGER_IDLE,
   type ManualPauseTriggerResult,
 } from '@/features/pause/public';
-
-const PAUSE_MANUAL_START_HOME = 'holzen_sess_pause_manual_started_home';
+import { useManualPauseTrigger } from '@/screens/home/hooks/use-manual-pause-trigger';
 
 export { holzenMarketDisplayQueryKey };
-
-/** Once per tab session: user kicked off a manual “Need a moment” (opens pause instance) from Home. */
-function markPauseManualStartedHomeOnce(): void {
-  try {
-    if (sessionStorage.getItem(PAUSE_MANUAL_START_HOME)) return;
-    sessionStorage.setItem(PAUSE_MANUAL_START_HOME, '1');
-    trackEvent('pause.manual_started', { surface: 'home' });
-  } catch {
-    /* sessionStorage */
-  }
-}
 
 /**
  * Pause V2 manual-trigger hook. Opens a `pause_instances` row via `pause_create_or_reuse`
@@ -186,135 +169,21 @@ function useHolzenState() {
     };
   }, [user, syncOpenPauseFromDb]);
 
-  /** Create the V2 pause instance (reflection AI runs at Reflect step). */
-  const generateMessage = useCallback(
-    async (data: BtcPriceData, mood?: string): Promise<ManualPauseTriggerResult> => {
-      if (!user) {
-        holzenLog.manual('generateMessage: skipped (no user)');
-        return MANUAL_PAUSE_TRIGGER_IDLE;
-      }
-      markPauseManualStartedHomeOnce();
-      const t0 = Date.now();
-      holzenLog.manual('generateMessage: start', {
-        btcChangePct: data.changePercent,
-        silentMode,
-        mood: mood ?? '(none)',
-      });
-
-      const assetId = normalizeTrackedAssetId(profile.trackedAssetId);
-      const assetSym = trackedAssetSymbol(assetId);
-      const ctx = buildPauseContextFromMarket(data, profile.cumulativeThreshold, assetSym);
-      const severityBand = severityFromBtcChangePercent(data.changePercent) ?? 'mild';
-      const onChainBand =
-        assetId === 'bitcoin' && data.onChain
-          ? ([data.onChain.mempoolSize, data.onChain.fastestFee, data.onChain.medianFee].filter(
-              (x) => typeof x === 'number' && Number.isFinite(x),
-            ) as number[]).join(':') || null
-          : null;
-      const silentMsg = `${assetSym} moved.`;
-
-      const applyOpenResult = async (
-        result: OpenManualPauseFromHomeResult,
-      ): Promise<ManualPauseTriggerResult> => {
-        if (result.outcome === 'idle') {
-          setError(result.userMessage);
-          return MANUAL_PAUSE_TRIGGER_IDLE;
-        }
-        if (result.outcome === 'error') {
-          holzenLog.manual('generateMessage: error', { message: result.userMessage });
-          setError(result.userMessage);
-          return MANUAL_PAUSE_TRIGGER_IDLE;
-        }
-
-        const isPendingOffer = result.pendingOffer;
-        if (!isPendingOffer) {
-          clearSession();
-          setLastPauseInstanceId(result.instanceId);
-        }
-        if (result.created) {
-          try {
-            trackEvent('pause_instance_created', {
-              pause_instance_id: result.instanceId,
-              template_slug: 'volatility_v1',
-              source: 'manual',
-              severity: severityBand,
-              pending_offer: isPendingOffer,
-            });
-          } catch {
-            /* no-op */
-          }
-        }
-        if (!isPendingOffer) {
-          setMessage(result.silentStubPersisted ? silentMsg : null);
-          setContext(ctx);
-          setCompanions({ haiku: null, groundingTitle: null, groundingBody: null });
-          setNewPauseArrival(true);
-          setLastTriggerAt(new Date().toISOString());
-          try {
-            trackEvent('pause.manual_completed', {
-              duration_s: Math.round((Date.now() - t0) / 1000),
-              had_bitcoin_context: assetId === 'bitcoin',
-              tracked_asset_id: assetId,
-              companion_types: [],
-            });
-          } catch {
-            /* no-op */
-          }
-          await syncOpenPauseFromDb();
-        }
-        return {
-          opened: true,
-          instanceId: result.instanceId,
-          context: ctx,
-          pendingOffer: isPendingOffer || undefined,
-        };
-      };
-
-      const openParams = {
-        userId: user.id,
-        silentMode,
-        contextText: ctx,
-        silentMessage: silentMsg,
-        mood,
-        changePercent: data.changePercent,
-        cumulativeChangePercent: data.cumulativeChangePercent ?? null,
-        trackedAssetId: assetId,
-        severityBand,
-        fearGreedLabel: data.fearGreed?.label ?? null,
-        onChainBand,
-      };
-
-      if (silentMode) {
-        holzenLog.manual('generateMessage: silent mode');
-        const result = await openManualPauseFromHome(openParams);
-        if (result.outcome === 'error') {
-          holzenLog.manual('generateMessage: silent pause create failed', {
-            message: result.userMessage,
-          });
-        }
-        return applyOpenResult(result);
-      }
-
-      setLoading(true);
-      setError(null);
-      try {
-        const result = await openManualPauseFromHome(openParams);
-        if (result.outcome === 'idle') {
-          holzenLog.manual('generateMessage: reuse/skip');
-        }
-        return applyOpenResult(result);
-      } finally {
-        setLoading(false);
-      }
-    },
-    [
-      user,
-      silentMode,
-      profile.cumulativeThreshold,
-      profile.trackedAssetId,
-      syncOpenPauseFromDb,
-    ],
-  );
+  const { generateMessage } = useManualPauseTrigger({
+    user,
+    silentMode,
+    cumulativeThreshold: profile.cumulativeThreshold,
+    trackedAssetId: profile.trackedAssetId,
+    syncOpenPauseFromDb,
+    setError,
+    setLoading,
+    setMessage,
+    setContext,
+    setCompanions,
+    setNewPauseArrival,
+    setLastPauseInstanceId,
+    setLastTriggerAt,
+  });
 
   const manualCooldownKey = user ? `holzen_last_manual_at_${user.id}` : 'holzen_last_manual_at';
   const [lastManualAt, setLastManualAt] = useState<number | null>(null);
