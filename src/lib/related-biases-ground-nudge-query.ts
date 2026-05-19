@@ -1,5 +1,5 @@
 import { supabase } from '@/integrations/supabase/client';
-import type { RelatedBiasesRow } from '@/components/companion/related-biases-util';
+import type { RelatedBiasesRow } from '@/screens/pause/components/companion/related-biases-util';
 
 export const RELATED_BIASES_GROUND_NUDGE_QUERY_PREFIX = ['related-biases-ground-nudge'] as const;
 

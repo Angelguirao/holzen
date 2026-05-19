@@ -1,8 +1,8 @@
 import { useTranslation } from 'react-i18next';
 import { useState } from 'react';
 import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
-import { HaikuDisplay } from '@/components/HaikuDisplay';
-import { LearningInput } from '@/components/LearningInput';
+import { HaikuDisplay } from '@/screens/pause/components/HaikuDisplay';
+import { LearningInput } from '@/screens/pause/components/LearningInput';
 import { Wind, BookOpen, BookOpenText, History, Eye, Pen } from 'lucide-react';
 
 interface Props {
