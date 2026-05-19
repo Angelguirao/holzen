@@ -8,6 +8,7 @@ import {
 import type { RegenerateCompanionSlot } from '@/features/pause/public';
 import {
   companionSlotToGenerationTaxonomy,
+  resolveCompanionSlotOrchestrateFailureUi,
   runCompanionSlotOrchestrate,
   setCompanionSlotError,
   setCompanionSlotLoading,
@@ -144,27 +145,17 @@ export function useCompanionSlotOrchestrateActions({
               bodyCode: failure.code,
             },
           );
-          if (failure.isPaywall) {
-            if (mode === 'lazy_fetch') {
-              fetchedSlotsRef.current.delete(slot);
-              if (failure.code === 'companions_upgrade_required') {
-                requirePro('companions');
-              } else {
-                showLimitReachedToast({ feature: 'companion', startCheckout });
-              }
-            } else {
-              toast({
-                title: 'Companion unavailable',
-                description:
-                  failure.userMessage ??
-                  'This companion is outside your current plan allowance.',
-                variant: 'destructive',
-              });
-            }
+          const failureUi = resolveCompanionSlotOrchestrateFailureUi(failure, mode);
+          if (failureUi.action === 'lazy_paywall_upgrade_required') {
+            fetchedSlotsRef.current.delete(slot);
+            requirePro('companions');
+          } else if (failureUi.action === 'lazy_paywall_limit_reached') {
+            fetchedSlotsRef.current.delete(slot);
+            showLimitReachedToast({ feature: 'companion', startCheckout });
           } else {
             toast({
-              title: mode === 'lazy_fetch' ? 'Companion unavailable' : 'Regenerate failed',
-              description: failure.userMessage,
+              title: failureUi.title,
+              description: failureUi.description,
               variant: 'destructive',
             });
           }
