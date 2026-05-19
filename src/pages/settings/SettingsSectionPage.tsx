@@ -1,6 +1,6 @@
 import { Link, Navigate, useParams } from 'react-router-dom';
 import { ArrowLeft } from 'lucide-react';
-import { PageHeading } from '@/components/PageHeading';
+import { PageHeading } from '@/app/components/PageHeading';
 import { isSettingsSectionId, type SettingsSectionId } from '@/pages/settings/sectionIds';
 import { useSettingsState } from '@/pages/settings/use-settings-state';
 import {

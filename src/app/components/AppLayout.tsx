@@ -2,10 +2,10 @@ import { Suspense, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Outlet, useLocation } from 'react-router-dom';
 import { BottomNav, isPrimaryTabActive } from './BottomNav';
-import { NotificationBell } from './NotificationBell';
-import { PauseReadyBanner } from './PauseReadyBanner';
-import { CheckoutConfirmation } from './CheckoutConfirmation';
-import { PaywallSubscribedTracker } from './PaywallSubscribedTracker';
+import { NotificationBell } from '@/components/NotificationBell';
+import { PauseReadyBanner } from '@/components/PauseReadyBanner';
+import { CheckoutConfirmation } from '@/components/CheckoutConfirmation';
+import { PaywallSubscribedTracker } from '@/components/PaywallSubscribedTracker';
 import { useHolzen } from '@/screens/home/hooks/use-holzen';
 import { PendingPauseOfferShell } from '@/screens/pause/components/PendingPauseOfferShell';
 import { useLanguageSync } from '@/hooks/use-language-sync';
@@ -13,7 +13,7 @@ import { useAutoTrigger } from '@/hooks/use-auto-trigger';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
-import { RobotsNoIndex } from '@/components/PageMeta';
+import { RobotsNoIndex } from '@/app/components/PageMeta';
 
 /**
  * Lightweight fallback shown while a lazy page chunk downloads *within*

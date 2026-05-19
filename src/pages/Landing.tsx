@@ -12,7 +12,7 @@ import {
   Zap, Moon, ChevronDown, Timer, Eye, Sparkles, Compass,
   Smartphone, Anchor, ExternalLink, UserCircle,
 } from 'lucide-react';
-import { PageMeta } from '@/components/PageMeta';
+import { PageMeta } from '@/app/components/PageMeta';
 import { LandingTestimonials } from '@/screens/marketing/components/LandingTestimonials';
 import { LandingLanguageSwitcher } from '@/screens/marketing/components/LandingLanguageSwitcher';
 import { PRICING } from '@/features/subscription/public';

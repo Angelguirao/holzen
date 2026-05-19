@@ -1,16 +1,11 @@
-# One path per line — shrink as files migrate to src/screens/*/components/
-src/components/AppLayout.tsx
+# One path per line — shrink as files migrate to src/screens/*/components/ or src/app/components/
 src/components/AppVersionBadge.tsx
 src/components/AuthLoading.tsx
 src/components/AutoSaveIndicator.tsx
-src/components/BottomNav.test.tsx
-src/components/BottomNav.tsx
 src/components/Changelog.tsx
 src/components/ChartEmptyState.tsx
 src/components/CheckoutConfirmation.tsx
-src/components/CookieConsent.tsx
 src/components/CreditsDashboard.tsx
-src/components/ErrorBoundary.tsx
 src/components/ErrorRetry.tsx
 src/components/FeedbackForm.tsx
 src/components/FeedbackWidget.tsx
@@ -20,13 +15,9 @@ src/components/InstallHolzenCard.tsx
 src/components/LetterViewer.tsx
 src/components/NavLink.tsx
 src/components/NotificationBell.tsx
-src/components/OfflineBanner.tsx
-src/components/PageHeading.tsx
-src/components/PageMeta.tsx
 src/components/PauseReadyBanner.tsx
 src/components/PaywallSubscribedTracker.tsx
 src/components/ProLock.tsx
-src/components/PublicFooter.tsx
 src/components/QuietWindowsManager.tsx
 src/components/ReferralSection.tsx
 src/components/ShareReflection.tsx

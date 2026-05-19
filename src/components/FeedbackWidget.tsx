@@ -9,7 +9,7 @@ import { enqueueAction } from '@/lib/offline-queue';
 import { useTranslation } from 'react-i18next';
 import { getCid } from '@/lib/cid';
 import { getPostHog, trackEvent } from '@/lib/posthog';
-import type { OpenFeedbackDetail } from '@/components/ErrorBoundary';
+import type { OpenFeedbackDetail } from '@/app/components/ErrorBoundary';
 
 type Category = 'bug' | 'feature' | 'question';
 

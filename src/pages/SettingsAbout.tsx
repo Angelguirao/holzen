@@ -5,7 +5,7 @@ import { AppVersionBadge } from '@/components/AppVersionBadge';
 import { Changelog } from '@/components/Changelog';
 import { FeedbackForm } from '@/components/FeedbackForm';
 import { useLatestChangelogVersion } from '@/hooks/use-latest-changelog-version';
-import { PageHeading } from '@/components/PageHeading';
+import { PageHeading } from '@/app/components/PageHeading';
 
 /**
  * Low-frequency "about" surface: feedback, what’s new, version — kept out of the main Settings accordion.

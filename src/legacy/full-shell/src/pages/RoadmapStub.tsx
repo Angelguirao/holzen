@@ -1,6 +1,6 @@
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { PageMeta } from '@/components/PageMeta';
+import { PageMeta } from '@/app/components/PageMeta';
 
 /**
  * Public stub for `/roadmap` so inbound links don’t rot (or land on welcome with no explanation).

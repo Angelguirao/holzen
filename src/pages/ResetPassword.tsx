@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useTranslation } from 'react-i18next';
-import { PageHeading } from '@/components/PageHeading';
+import { PageHeading } from '@/app/components/PageHeading';
 
 const ResetPassword = () => {
   const { t } = useTranslation();
