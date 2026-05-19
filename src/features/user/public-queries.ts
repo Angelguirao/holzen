@@ -49,3 +49,9 @@ export {
   getHolzenNumberQueryOptions,
   type HolzenNumberData,
 } from './infrastructure/queries/holzen-number-query';
+export {
+  clearProfileHoldGoal,
+  updateProfileHoldGoal,
+  updateProfileSnoozedUntil,
+  type ProfilesHoldGoalUpdate,
+} from './infrastructure/queries/profile-mutations';
