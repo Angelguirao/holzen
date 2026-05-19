@@ -350,7 +350,7 @@ Same dependency rules as §2–3 for layers that exist. `npm run check:feature-i
 | **5e** | **Archive, Journey, Settings** | **Done** — `screens/{archive,journey,settings}/components/` |
 | **5f** | Companion routes | **Done** — `/companion/*` pages + companion UI under `screens/pause/`; thin `pages/Companion*.tsx` re-exports |
 | **5g** | Marketing / admin | **Done** — `screens/marketing/components/`, `screens/admin/` |
-| **5h** | Orchestration | **Done (shipped surfaces)** — `use-home-*` + `HolzenProvider`/`useHolzen` → `screens/home/hooks/` (shim `@/hooks/use-holzen`); `use-pause-session-*` + ritual hooks → `screens/pause/hooks/`; `HomeScreen` / `PauseSessionScreen` with thin `pages/` re-exports |
+| **5h** | Orchestration | **Done (shipped surfaces)** — `use-home-*` + `HolzenProvider`/`useHolzen` → `screens/home/hooks/` (active imports `@/screens/home/hooks/use-holzen`; root `@/hooks/use-holzen` shim for legacy only); `use-pause-session-*` + ritual hooks → `screens/pause/hooks/`; `HomeScreen` / `PauseSessionScreen` with thin `pages/` re-exports |
 | **5i** | Shrink global layers | **Done (shipped)** — allowlist **37** root shell/shared components (was 59); home market widgets + onboarding + `MoodCheck` under screens; domain `MoodValue` in `features/pause` |
 | **6** | **Gated:** `pnpm-workspace.yaml`, `apps/web`, `packages/*` extract | Only after ADR §8 trigger; `build` from `apps/web` |
 | **7** | `shared-kernel`, `contracts` (minimal), `packages/infrastructure` | Adapter smoke test |
