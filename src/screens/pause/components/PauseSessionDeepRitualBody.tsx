@@ -1,60 +1,15 @@
 import { AnimatePresence, motion } from 'framer-motion';
-import type { RefObject } from 'react';
-import type { CompanionData, CompanionPrefs } from '@/screens/pause/components/CompanionSection';
 import type { MoodValue } from '@/screens/pause/components/MoodCheck';
 import { PauseRitualFeelStep } from '@/screens/pause/components/PauseRitualFeelStep';
 import type { FeelStepTile } from '@/screens/pause/components/pause-feel-types';
-import { PauseBreathing, type PauseBreathingHandle } from '@/screens/pause/components/PauseBreathing';
+import { PauseBreathing } from '@/screens/pause/components/PauseBreathing';
 import { PauseDecide } from '@/screens/pause/components/PauseDecide';
 import { PauseFrame } from '@/screens/pause/components/PauseFrame';
 import { PauseReflect } from '@/screens/pause/components/PauseReflect';
-import type { PauseStep } from '@/screens/pause/components/PauseProgress';
-import type { PauseSessionStepTransitionConfig } from '@/features/pause/public';
 import { usePauseReflectFrameFocusAmbience } from '@/screens/pause/hooks/use-pause-reflect-frame-focus-ambience';
 
-export type PauseSessionDeepRitualBodyProps = {
-  step: PauseStep;
-  stepTransition: PauseSessionStepTransitionConfig;
-  moodDone: boolean;
-  selectedMood: MoodValue | null;
-  selectedBriefFace: FeelStepTile | null;
-  feelIntensity: number | null;
-  onFeelTilesSelect: (mood: MoodValue, intensity: number, tile: FeelStepTile) => void;
-  goToStep: (next: PauseStep) => void;
-  breathingRef: RefObject<PauseBreathingHandle | null>;
-  mantra: string | null;
-  severity: 'mild' | 'moderate' | 'high';
-  breathingFirstCompleted: boolean;
-  breathingSecondCompleted: boolean;
-  onTimedBreathingChange: (active: boolean) => void;
-  onFirstBreathPatternComplete: () => void;
-  onSecondBreathPatternComplete: () => void;
-  onContinueAfterFirstBreath: () => void;
-  onContinueAfterSecondBreath: () => void;
-  onSkipFirstBreath: () => void;
-  onSkipSecondBreath: () => void;
-  ritualSoundMuted: boolean;
-  /** When true, ritual audio (including Reflect/Frame focus bed) is off. */
-  prefersReducedMotion: boolean;
-  companions: CompanionData;
-  companionPrefs: CompanionPrefs;
-  pauseInstanceId: string | null;
-  context: string | null;
-  reflectionMessage: string;
-  reflectionLoading?: boolean;
-  reflectionError?: string | null;
-  onReflectionRetry?: () => void;
-  isFavorite: boolean;
-  /** Reflect forwards to favorite control; async ok. */
-  onToggleFavorite: () => void | Promise<void>;
-  subscribed: boolean;
-  onFrameImDone: () => void;
-  onDecide: (decision: string) => void;
-  /** After first deep breath pattern: repeat three rounds from intro (wireframe “Three more”). */
-  onRepeatDeepFirstBreathPattern: () => void;
-  /** After second deep breath pattern: repeat three rounds from intro (wireframe 330:23551). */
-  onRepeatDeepSecondBreathPattern: () => void;
-};
+export type { PauseSessionDeepRitualBodyProps } from '@/features/pause/presentation/session/ritual-body-props';
+import type { PauseSessionDeepRitualBodyProps } from '@/features/pause/presentation/session/ritual-body-props';
 
 /** Deep ritual step panels inside `PauseSessionScaffold` (Framer step transitions preserved). */
 export function PauseSessionDeepRitualBody({

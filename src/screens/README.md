@@ -4,6 +4,13 @@ Route-scoped UI and thin orchestration live here. **Domain rules** stay in `src/
 
 **Canonical:** [docs/fundamentals/frontend-module-layout.md](../../docs/fundamentals/frontend-module-layout.md) §11 (waves 5b–5i), [docs/fundamentals/react-screen-orchestration.md](../../docs/fundamentals/react-screen-orchestration.md).
 
+## Related folders
+
+| Folder | Role |
+|--------|------|
+| `src/app/components/` | Cross-route shell (layout, bottom nav, page meta) — see [src/app/README.md](../app/README.md) |
+| `src/components/ui/` | Design system (shadcn) |
+
 ## Layout
 
 ```text

@@ -61,11 +61,13 @@ if (failures.length) {
   process.exit(1);
 }
 
-const child = spawnSync(process.execPath, ['scripts/check-feature-imports.mjs'], {
-  cwd: root,
-  stdio: 'inherit',
-});
-if (child.status !== 0) process.exit(child.status ?? 1);
+for (const script of ['check-feature-imports.mjs', 'check-no-screens-in-features.mjs']) {
+  const child = spawnSync(process.execPath, [`scripts/${script}`], {
+    cwd: root,
+    stdio: 'inherit',
+  });
+  if (child.status !== 0) process.exit(child.status ?? 1);
+}
 
 console.log(
   'check:architecture-alignment: OK (waves 0–4 — src/features/*, public APIs, legacy quarantined)',
