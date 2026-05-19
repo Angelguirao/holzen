@@ -8,7 +8,7 @@ import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import { ChevronDown, ExternalLink, CreditCard, ListChecks, Wallet, FileText, RotateCw } from 'lucide-react';
-import { AdminSubNav } from '@/components/admin/AdminSubNav';
+import { AdminSubNav } from '@/screens/admin/components/AdminSubNav';
 
 const TEST_CARDS = [
   { label: 'Success', number: '4242 4242 4242 4242', note: 'Standard happy path' },

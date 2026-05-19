@@ -20,8 +20,8 @@ screens/<route>/
 | `archive/` | Archive tab — **`components/` migrated (5e)** | [docs/design/information-architecture.md](../../docs/design/information-architecture.md) |
 | `journey/` | Journey tab — **`components/` migrated (5e)** | [docs/screens/journey-overview.md](../../docs/screens/journey-overview.md) |
 | `settings/` | Settings hub — **`components/` migrated (5e)**; route shells in `pages/settings/` | — |
-| `marketing/` | Landing, blog, legal | — |
-| `admin/` | `/admin` | — |
+| `marketing/` | Landing, blog, legal — **`components/` migrated (5g)** | — |
+| `admin/` | `/admin` — **`components/` + screen (5g)** | — |
 
 ## Rules
 
