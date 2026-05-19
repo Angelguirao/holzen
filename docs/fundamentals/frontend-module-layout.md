@@ -14,7 +14,7 @@ This document is the **operational map**: folders, packages, naming, import rule
 |---|-----------------------------------|-------------------------|
 | **Vite root** | Repository root (`vite.config.ts`, `index.html`, `src/`) | `apps/web` |
 | **Bounded contexts** | `src/features/<context>/` (same layers as packages) | `packages/<context>/` |
-| **Screens** | `src/pages/`, `src/components/` | `apps/web/src/screens/` |
+| **Screens** | `src/screens/` (+ thin `src/pages/` re-exports); design system in `src/components/ui/` | `apps/web/src/screens/` |
 | **Boundary enforcement** | `npm run check:feature-imports` | `check:package-boundaries` + package `public.ts` |
 | **When to extract packages** | — | Second client, leave Lovable publish, or confirmed Lovable subdirectory-root support |
 
@@ -29,7 +29,7 @@ Do **not** move the SPA to `apps/web` without passing the extraction gate in [AD
 | Kind | Lives in | Examples |
 |------|----------|----------|
 | **Bounded context** | `src/features/<context>/` (now) → `packages/<context>/` (later) | `pause`, `subscription`, `market`, `user`, `auth` |
-| **Screen / route** | `src/pages/` + `src/components/` (now) → `apps/web/src/screens/` | Home, Archive, Journey, Settings, PauseSession, Companion* |
+| **Screen / route** | `src/screens/<route>/` (now) → `apps/web/src/screens/` | Home, Archive, Journey, Settings, PauseSession, Companion* |
 | **Not a package** | — | `home`, `archive`, `journey`, `settings`, `companion` (companions are **inside** `pause`) |
 
 ---
