@@ -53,6 +53,10 @@ export {
   logCompanionFeedbackVote,
 } from './infrastructure/queries/companion-feedback-vote-query';
 export {
+  logCompanionFullviewOpened,
+  type CompanionFullviewKind,
+} from './infrastructure/analytics-events';
+export {
   BULK_HOLD_PENDING_DISABLED_USER_ID,
   BULK_HOLD_PENDING_QUERY_LEAF,
   BULK_HOLD_PENDING_QUERY_PREFIX,
