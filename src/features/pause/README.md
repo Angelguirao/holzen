@@ -23,7 +23,9 @@ features/pause/
         deep/                     # deep go-back, brief→deep upgrade
       breathing/
       reflect/
-      companion/
+      companion/                  # UI completion, orchestration helpers
+      ritual/log-pause-step.ts    # port-backed pause_log_step
+      archive/log-retrospective-outcome.ts
       feedback/                   # toasts (thin; may move to presentation later)
       archive/
       bulk-hold/
