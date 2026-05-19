@@ -15,8 +15,8 @@ screens/<route>/
 
 | Screen folder | Routes / product area | Screen map doc |
 |---------------|----------------------|----------------|
-| `home/` | `/` Home — **`components/` migrated (5d)** | [docs/screens/home.md](../../docs/screens/home.md) |
-| `pause/` | `/pause`, `/companion/*` — **`components/` + companion routes (5c, 5f)** | [docs/screens/pause.md](../../docs/screens/pause.md) |
+| `home/` | `/` — **`HomeScreen`**, `components/`, `hooks/` (incl. `useHolzen`) | [docs/screens/home.md](../../docs/screens/home.md) |
+| `pause/` | `/pause`, `/companion/*` — **`PauseSessionScreen`**, `components/`, `hooks/` | [docs/screens/pause.md](../../docs/screens/pause.md) |
 | `archive/` | Archive tab — **`components/` migrated (5e)** | [docs/design/information-architecture.md](../../docs/design/information-architecture.md) |
 | `journey/` | Journey tab — **`components/` migrated (5e)** | [docs/screens/journey-overview.md](../../docs/screens/journey-overview.md) |
 | `settings/` | Settings hub — **`components/` migrated (5e)**; route shells in `pages/settings/` | — |

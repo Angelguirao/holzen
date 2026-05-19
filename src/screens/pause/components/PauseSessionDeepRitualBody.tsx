@@ -10,7 +10,7 @@ import { PauseFrame } from '@/screens/pause/components/PauseFrame';
 import { PauseReflect } from '@/screens/pause/components/PauseReflect';
 import type { PauseStep } from '@/screens/pause/components/PauseProgress';
 import type { PauseSessionStepTransitionConfig } from '@/features/pause/public';
-import { usePauseReflectFrameFocusAmbience } from '@/hooks/use-pause-reflect-frame-focus-ambience';
+import { usePauseReflectFrameFocusAmbience } from '@/screens/pause/hooks/use-pause-reflect-frame-focus-ambience';
 
 export type PauseSessionDeepRitualBodyProps = {
   step: PauseStep;

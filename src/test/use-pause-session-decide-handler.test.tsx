@@ -2,7 +2,7 @@ import { describe, expect, it, vi, beforeEach } from 'vitest';
 import { renderHook, act } from '@testing-library/react';
 import type { TFunction } from 'i18next';
 import type { MutableRefObject } from 'react';
-import { usePauseSessionDecideHandler } from '@/hooks/use-pause-session-decide-handler';
+import { usePauseSessionDecideHandler } from '@/screens/pause/hooks/use-pause-session-decide-handler';
 import {
   showPauseOutcomeNotCompletedToast,
   showPauseOutcomeSaveFailedToast,

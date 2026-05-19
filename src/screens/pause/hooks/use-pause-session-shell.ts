@@ -1,6 +1,6 @@
 import { useMemo } from 'react';
 import type { CompanionData, CompanionPrefs } from '@/screens/pause/components/CompanionSection';
-import { usePauseSessionFetch } from '@/hooks/use-pause-session-fetch';
+import { usePauseSessionFetch } from '@/screens/pause/hooks/use-pause-session-fetch';
 import {
   computePauseSessionHydration,
   computePauseSessionResolved,

@@ -3,7 +3,7 @@ import { useNavigate, useParams, useLocation, Navigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next';
 import { useHolzen } from '@/hooks/use-holzen';
 import { useCompanionData } from '@/screens/pause/hooks/use-companion-data';
-import { usePauseSessionCompanionSnapshot } from '@/hooks/use-pause-session-companion-snapshot';
+import { usePauseSessionCompanionSnapshot } from '@/screens/pause/hooks/use-pause-session-companion-snapshot';
 import { CompanionFeedback } from '@/screens/pause/components/CompanionFeedback';
 import { CompanionFocusLayout } from '@/screens/pause/components/companion/CompanionFocusLayout';
 import { SignalFullView } from '@/screens/pause/components/companion/SignalFullView';
