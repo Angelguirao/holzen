@@ -9,23 +9,19 @@ import { useTranslation } from 'react-i18next';
 import { useHolzen } from '@/screens/home/hooks/use-holzen';
 import { useSubscription } from '@/features/subscription/public-hooks';
 import { useProGate } from '@/features/subscription/public-hooks';
-import { isPauseSessionDepthPickerActive } from '@/features/pause/public';
-import { usePauseSessionStepTransition } from '@/screens/pause/hooks/use-pause-session-step-transition';
 import { usePauseFavoriteToggle } from '@/screens/pause/hooks/use-pause-favorite-toggle';
 import { usePauseShiftFrameDoneHandler } from '@/screens/pause/hooks/use-pause-shift-frame-done-handler';
 import { usePauseSessionExitNavigation } from '@/screens/pause/hooks/use-pause-session-exit-navigation';
 import { usePauseSessionMoodAndPersist } from '@/screens/pause/hooks/use-pause-session-mood-and-persist';
 import { usePauseSessionRitualState } from '@/screens/pause/hooks/use-pause-session-ritual-state';
-import { usePauseSessionDepthAndBriefCopy } from '@/screens/pause/hooks/use-pause-session-depth-and-brief-copy';
+import { usePauseSessionScaffoldPresentation } from '@/screens/pause/hooks/use-pause-session-scaffold-presentation';
 import { usePauseSessionBreathSecondLabelVariant } from '@/screens/pause/hooks/use-pause-session-breath-second-label-variant';
 import { usePauseSessionTerminalEntryRedirect } from '@/screens/pause/hooks/use-pause-session-terminal-entry-redirect';
 import { usePauseSessionShellBootstrap } from '@/screens/pause/hooks/use-pause-session-shell-bootstrap';
 import { usePauseSessionBreathHandlers } from '@/screens/pause/hooks/use-pause-session-breath-handlers';
-import { usePauseSessionScaffoldRitual } from '@/screens/pause/hooks/use-pause-session-scaffold-ritual';
 import { JOURNEY_PREFIX } from '@/lib/app-routes';
 import { clearSession } from '@/features/pause/public';
 import { usePauseSessionReflectAndDecide } from '@/screens/pause/hooks/use-pause-session-reflect-and-decide';
-import { usePauseSessionScaffoldChromeSlots } from '@/screens/pause/hooks/use-pause-session-scaffold-chrome-slots';
 
 export function usePauseSessionScreen() {
   const { t } = useTranslation();
@@ -296,90 +292,69 @@ export function usePauseSessionScreen() {
     shiftIntensity,
   });
 
-  const { depthContextLine } = usePauseSessionDepthAndBriefCopy({
+  const {
+    depthContextLine,
+    sessionOnPicker,
+    briefStepperSlot,
+    engagedOpenMaxCountdownSlot,
+    scaffoldRitualDerived,
+    briefRitual,
+    deepRitual,
+  } = usePauseSessionScaffoldPresentation({
     t,
     btcData,
     trackedAssetId,
     ritualEntry,
-  });
-
-  const stepTransition = usePauseSessionStepTransition({
+    phase,
+    hasCoalescedShellSession,
+    fetchedInstance,
     swipeDirection,
     prefersReducedMotion,
-  });
-
-  const sessionOnPicker = isPauseSessionDepthPickerActive({
-    phase,
-    ritualEntry,
-    hasShellMessage: hasCoalescedShellSession,
-  });
-
-  const { briefStepperSlot, engagedOpenMaxCountdownSlot } = usePauseSessionScaffoldChromeSlots({
-    phase,
-    ritualEntry,
     briefStep,
-    fetchedInstance,
-  });
-
-  const { scaffoldRitualDerived, briefRitual, deepRitual } = usePauseSessionScaffoldRitual({
-    derived: {
-      ritualEntry,
-      step,
-      briefStep: ritualEntry === 'brief' ? briefStep : undefined,
-      severity,
-      moodDone,
-      breathingFirstCompleted,
-      breathingSecondCompleted,
-      t,
-    },
-    payloads: {
-      briefStep,
-      step,
-      stepTransition,
-      moodDone,
-      selectedMood,
-      selectedBriefFace,
-      feelIntensity,
-      onFeelTilesSelect,
-      setBriefStep,
-      breathingRef,
-      mantra,
-      severity,
-      breathingFirstCompleted,
-      breathingSecondCompleted,
-      setBreathTimedActive: trackBreathTimedActive,
-      setBreathingFirstCompleted,
-      setBreathingSecondCompleted,
-      handleBriefBreathContinue,
-      handleBriefSkipBreath,
-      soundMuted,
-      briefIntegrateDone,
-      handleBriefIntegrateComplete,
-      handleBriefRepeatBreaths,
-      handleBriefSwitchToDeepPause,
-      handleDecide,
-      goToStep,
-      handleContinueAfterFirstBreath,
-      handleContinueAfterSecondBreath,
-      handleSkipFirstBreath,
-      handleSkipSecondBreath,
-      prefersReducedMotion: !!prefersReducedMotion,
-      companions,
-      companionPrefs,
-      pauseInstanceId,
-      context,
-      message: effectiveReflectionMessage,
-      isFavorite,
-      toggleFavorite,
-      subscribed,
-      handleFrameImDone,
-      handleDeepFirstBreathRepeat,
-      handleDeepSecondBreathRepeat,
-      severityAbsPct: Math.abs(btcData?.changePercent ?? 0),
-      reflectionLoading,
-      reflectionError,
-      onReflectionRetry: retryReflection,
-    },
+    step,
+    moodDone,
+    selectedMood,
+    selectedBriefFace,
+    feelIntensity,
+    onFeelTilesSelect,
+    setBriefStep,
+    breathingRef,
+    mantra,
+    severity,
+    breathingFirstCompleted,
+    breathingSecondCompleted,
+    setBreathTimedActive: trackBreathTimedActive,
+    setBreathingFirstCompleted,
+    setBreathingSecondCompleted,
+    handleBriefBreathContinue,
+    handleBriefSkipBreath,
+    soundMuted,
+    briefIntegrateDone,
+    handleBriefIntegrateComplete,
+    handleBriefRepeatBreaths,
+    handleBriefSwitchToDeepPause,
+    handleDecide,
+    goToStep,
+    handleContinueAfterFirstBreath,
+    handleContinueAfterSecondBreath,
+    handleSkipFirstBreath,
+    handleSkipSecondBreath,
+    prefersReducedMotion,
+    companions,
+    companionPrefs,
+    pauseInstanceId,
+    context,
+    message: effectiveReflectionMessage,
+    isFavorite,
+    toggleFavorite,
+    subscribed,
+    handleFrameImDone,
+    handleDeepFirstBreathRepeat,
+    handleDeepSecondBreathRepeat,
+    severityAbsPct: Math.abs(btcData?.changePercent ?? 0),
+    reflectionLoading,
+    reflectionError,
+    onReflectionRetry: retryReflection,
   });
 
 
