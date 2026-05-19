@@ -1,6 +1,6 @@
 import type { TFunction } from 'i18next';
 import type { ReactNode } from 'react';
-import { BtcStatus } from '@/components/BtcStatus';
+import { BtcStatus } from '@/screens/home/components/BtcStatus';
 import { HomeGoalWhyCard } from '@/screens/home/components/HomeGoalWhyCard';
 import { HomeSectionCard } from '@/screens/home/components/HomeSectionCard';
 import type { BtcPriceData, TrackedAssetId } from '@/features/market/public';

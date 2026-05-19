@@ -1,15 +1,9 @@
-# One path per line — shrink as files migrate to src/screens/*/components/
 src/components/AppLayout.tsx
 src/components/AppVersionBadge.tsx
 src/components/AuthLoading.tsx
 src/components/AutoSaveIndicator.tsx
 src/components/BottomNav.test.tsx
 src/components/BottomNav.tsx
-src/components/BreathingExercise.tsx
-src/components/BtcChartLazyGate.tsx
-src/components/BtcChart.tsx
-src/components/BtcStatus.tsx
-src/components/BulkHoldCard.tsx
 src/components/Changelog.tsx
 src/components/ChartEmptyState.tsx
 src/components/CheckoutConfirmation.tsx
@@ -21,15 +15,11 @@ src/components/FeedbackForm.tsx
 src/components/FeedbackWidget.tsx
 src/components/HistoryCalendar.tsx
 src/components/HoldGoalWidget.tsx
-src/components/HolzenNumber.tsx
-src/components/HomeWidget.tsx
 src/components/InstallHolzenCard.tsx
 src/components/LetterViewer.tsx
-src/components/MoodCheck.tsx
 src/components/NavLink.tsx
 src/components/NotificationBell.tsx
 src/components/OfflineBanner.tsx
-src/components/Onboarding.tsx
 src/components/PageHeading.tsx
 src/components/PageMeta.tsx
 src/components/PauseReadyBanner.tsx
@@ -39,10 +29,8 @@ src/components/PublicFooter.tsx
 src/components/QuietWindowsManager.tsx
 src/components/ReferralSection.tsx
 src/components/ShareReflection.tsx
-src/components/SnoozeControl.tsx
 src/components/SourceManagement.tsx
 src/components/SubscriptionSkeleton.tsx
-src/components/TestimonialRequest.tsx
 src/components/TheVoid.tsx
 src/components/ThresholdFrequencyEstimator.tsx
 src/components/ThresholdSetting.tsx

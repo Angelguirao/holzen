@@ -22,8 +22,8 @@ import {
   SheetHeader,
   SheetTitle,
 } from '@/components/ui/sheet';
-import { BulkHoldReviewBody } from '@/components/bulk-hold/BulkHoldReviewBody';
-import { BulkHoldSuccessBody } from '@/components/bulk-hold/BulkHoldSuccessBody';
+import { BulkHoldReviewBody } from '@/screens/home/components/bulk-hold/BulkHoldReviewBody';
+import { BulkHoldSuccessBody } from '@/screens/home/components/bulk-hold/BulkHoldSuccessBody';
 import { cn } from '@/lib/utils';
 import { useLatestRef } from '@/hooks/use-latest-ref';
 

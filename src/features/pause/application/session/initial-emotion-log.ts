@@ -1,4 +1,4 @@
-import type { MoodValue } from '@/components/MoodCheck';
+import type { MoodValue } from '@/features/pause/public';
 import type { FeelStepTile } from '@/features/pause/public';
 
 export type InitialEmotionLogOpts = {

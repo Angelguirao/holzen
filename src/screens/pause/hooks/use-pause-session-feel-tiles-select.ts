@@ -1,5 +1,5 @@
 import { useCallback } from 'react';
-import type { MoodValue } from '@/components/MoodCheck';
+import type { MoodValue } from '@/screens/pause/components/MoodCheck';
 import type { FeelStepTile } from '@/screens/pause/components/pause-feel-types';
 
 /**

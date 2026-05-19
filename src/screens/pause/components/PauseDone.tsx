@@ -3,7 +3,7 @@ import { motion } from 'framer-motion';
 import { Flame, Pencil } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
-import { PAUSE_MOOD_VALUES, type MoodValue } from '@/components/MoodCheck';
+import { PAUSE_MOOD_VALUES, type MoodValue } from '@/screens/pause/components/MoodCheck';
 import { MoodIcon } from '@/components/icons/MoodIcon';
 import { OutcomeIcon } from '@/components/icons/OutcomeIcon';
 import { PAUSE_FEEL_INTENSITY_KEYS } from '@/screens/pause/components/pause-feel-intensity-labels';

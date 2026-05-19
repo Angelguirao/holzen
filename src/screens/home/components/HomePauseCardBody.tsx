@@ -6,7 +6,7 @@ import { LoadingButton } from '@/components/ui/loading-button';
 import { HomePauseEmptyFlow } from '@/screens/home/components/HomePauseEmptyFlow';
 import { HomePauseBlockingErrorPanel } from '@/screens/home/components/HomePauseBlockingErrorPanel';
 import { HomePauseContextMeta } from '@/screens/home/components/HomePauseContextMeta';
-import { BulkHoldCard } from '@/components/BulkHoldCard';
+import { BulkHoldCard } from '@/screens/home/components/BulkHoldCard';
 import { homeInWidget } from '@/screens/home/components/home-widget-styles';
 import { cn } from '@/lib/utils';
 import { shouldSurfacePauseWidgetError } from '@/lib/home-pause-widget-error';

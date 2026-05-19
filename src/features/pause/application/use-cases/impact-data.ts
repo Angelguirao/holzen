@@ -1,4 +1,4 @@
-import type { MoodValue } from '@/components/MoodCheck';
+import type { MoodValue } from '@/features/pause/public';
 import type { RitualDepth } from '@/features/pause/domain/ritual-types';
 
 /** Snapshot passed into the pause “done” / impact shell after a successful Decide. */

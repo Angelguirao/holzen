@@ -2,7 +2,7 @@ import { lazy, Suspense, useEffect, useRef, useState } from 'react';
 import { Skeleton } from '@/components/ui/skeleton';
 
 const BtcChartLazy = lazy(async () => {
-  const m = await import('@/components/BtcChart');
+  const m = await import('@/screens/home/components/BtcChart');
   return { default: m.BtcChart };
 });
 
