@@ -1,12 +1,4 @@
-/** @deprecated Pause navigation types: `@/features/pause/public`. Ground/profile helpers remain here until migrated. */
-export {
-  type NotificationNavigateState,
-  type PauseSessionLocationState,
-  type PauseSessionNavParsed,
-  type PauseSeverity,
-  parsePauseSessionLocationState,
-} from '@/features/pause/public';
-
+/** Legacy full-IA ground route state (`/tools/ground`). Shipped pause nav types: `@/features/pause/public`. */
 /** Pre-generated grounding card from Home → `/tools/ground`. */
 export interface GroundPreGenerated {
   activity: string;

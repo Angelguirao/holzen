@@ -52,14 +52,14 @@ import {
   HALVING_DATES,
   type BadgeDefinition,
   type CoreSkill,
-} from '@/lib/badges/definitions';
+} from '@/legacy/full-shell/src/lib/badges/definitions';
 import type {
   PauseStepEventRow,
   PauseCompanionEventRow,
-} from '@/lib/pause-state';
-import type { PauseFullRow } from '@/lib/pause-stats-data-query';
-import { effectivePauseShiftMood } from '@/lib/pause-effective-emotion';
-import { normalizeTrackedAssetId } from '@/lib/tracked-assets';
+} from '@/features/pause/public';
+import type { PauseFullRow } from '@/legacy/full-shell/src/lib/pause-stats-data-query';
+import { effectivePauseShiftMood } from '@/features/pause/public';
+import { normalizeTrackedAssetId } from '@/features/market/public';
 
 export interface BadgeSnapshot extends BadgeDefinition {
   current: number;

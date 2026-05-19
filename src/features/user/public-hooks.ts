@@ -8,5 +8,5 @@ export {
   fetchProfileRowForUser,
   getProfileRowQueryOptions,
 } from './presentation/use-profile';
-export { usePushNotifications, pushSubscriptionQueryKey } from './presentation/use-push-notifications';
+export { usePushNotifications, pushSubscriptionQueryKey } from '@/features/notifications/public-hooks';
 export { useHoldGoalProfile, type HoldGoalProfile } from './presentation/use-hold-goal';

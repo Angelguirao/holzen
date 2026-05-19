@@ -8,8 +8,8 @@ import { PauseFrame } from '@/screens/pause/components/PauseFrame';
 import { PauseReflect } from '@/screens/pause/components/PauseReflect';
 import { usePauseReflectFrameFocusAmbience } from '@/screens/pause/hooks/use-pause-reflect-frame-focus-ambience';
 
-export type { PauseSessionDeepRitualBodyProps } from '@/features/pause/presentation/session/ritual-body-props';
-import type { PauseSessionDeepRitualBodyProps } from '@/features/pause/presentation/session/ritual-body-props';
+export type { PauseSessionDeepRitualBodyProps } from '@/features/pause/public';
+import type { PauseSessionDeepRitualBodyProps } from '@/features/pause/public';
 
 /** Deep ritual step panels inside `PauseSessionScaffold` (Framer step transitions preserved). */
 export function PauseSessionDeepRitualBody({

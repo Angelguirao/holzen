@@ -22,7 +22,7 @@ features/<context>/
 ## New code
 
 - Put **pause ritual** logic in `features/pause/` (companions and reflect are subfolders under `application/`, not a separate feature).
-- Put **subscription**, **market**, **user**, **auth** in their own `features/<name>/` as you migrate.
+- Put **subscription**, **market**, **user**, **notifications**, **auth** in their own `features/<name>/` as you migrate.
 - **user** and **subscription** use `public-queries.ts` for profile/snapshot TanStack modules; `public.ts` stays Supabase-free.
 - **auth** — `AuthProvider` / `useAuth` exported from `features/auth/public.ts` (implementation in `presentation/`).
 - Do **not** add new root-level `src/hooks/use-<feature>-*` or `src/lib/<feature>-*` for migrated contexts.
@@ -36,4 +36,4 @@ Co-locate Vitest files with the module under test (`domain/foo.test.ts`, `applic
 
 `npm run check:feature-imports` — layer rules on `src/features/**/*.ts`; blocks deep feature imports and migrated `@/lib/pause-*` shims in active `hooks/`, `screens/`, `components/`, `app/`, and `test/`.
 
-`npm run check:architecture-alignment` — waves 0–4 scaffold gate (five contexts, legacy excluded, runs `check:feature-imports`); in **`test:ci`**.
+`npm run check:architecture-alignment` — waves 0–4 scaffold gate (six contexts, legacy excluded, runs `check:feature-imports`); in **`test:ci`**.

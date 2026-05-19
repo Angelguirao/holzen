@@ -7,10 +7,10 @@ import { ConfidenceChip } from './ConfidenceChip';
 import {
   sampleConfidence,
   DEFAULT_CONFIDENCE_THRESHOLDS,
-} from '@/lib/stats/confidence';
-import { computePauseScore } from '@/lib/stats/pause-score';
-import type { PauseFullRow } from '@/lib/pause-stats-data-query';
-import type { PauseStepEventRow, PauseCompanionEventRow } from '@/lib/pause-state';
+} from '@/legacy/full-shell/src/lib/stats/confidence';
+import { computePauseScore } from '@/legacy/full-shell/src/lib/stats/pause-score';
+import type { PauseFullRow } from '@/legacy/full-shell/src/lib/pause-stats-data-query';
+import type { PauseStepEventRow, PauseCompanionEventRow } from '@/features/pause/public';
 
 interface HoldGoal {
   type: string | null;

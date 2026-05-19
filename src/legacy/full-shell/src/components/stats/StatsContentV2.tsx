@@ -16,7 +16,7 @@ import { MilestoneTimeline } from '@/legacy/full-shell/src/components/stats/jour
 import { PeriodComparisonCard } from '@/legacy/full-shell/src/components/stats/journey/PeriodComparisonCard';
 import { MoodPriceChart } from '@/legacy/full-shell/src/components/stats/advanced/MoodPriceChart';
 import { MoodPriceScatter } from '@/legacy/full-shell/src/components/stats/advanced/MoodPriceScatter';
-import type { PauseFullRow } from '@/lib/pause-stats-data-query';
+import type { PauseFullRow } from '@/legacy/full-shell/src/lib/pause-stats-data-query';
 import { cn } from '@/lib/utils';
 
 interface Props {

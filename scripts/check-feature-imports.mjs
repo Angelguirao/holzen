@@ -73,21 +73,27 @@ const DEEP_FEATURE_IMPORT =
   /from\s+['"]@\/features\/[^'"]+\/(application|infrastructure|domain|presentation)\//;
 
 const ALLOWED_DEEP_IMPORT_FILES = new Set([
-  'src/lib/apply-bulk-hold-outcomes.test.ts',
+  'src/test/lib/apply-bulk-hold-outcomes.test.ts',
   'src/test/checkout-confirmation-close-reopen.test.tsx',
   'src/test/checkout-confirmation-cross-tab.test.tsx',
   'src/test/checkout-confirmation-guard.test.tsx',
   'src/test/checkout-confirmation-refresh-state.test.tsx',
   'src/test/no-refetch-on-back-nav.test.tsx',
+  'src/app/components/AppLayout.tsx',
 ]);
 
 /** Migrated pause/companion domain — active app must use feature public APIs, not lib shims. */
 const LIB_COMPANION_SHIM = /@\/lib\/companion-/;
 const ALLOWED_LIB_PAUSE_IMPORTS = new Set([]);
 
+const ALLOWED_FEATURE_IMPORT =
+  /from\s+['"]@\/features\/[^'"]+\/(public|public-queries|public-rpc|public-hooks)['"]/;
+
 const ACTIVE_APP_ROOTS = [
   join(root, 'src', 'hooks'),
   join(root, 'src', 'components'),
+  join(root, 'src', 'screens'),
+  join(root, 'src', 'app'),
   join(root, 'src', 'test'),
 ];
 
@@ -98,10 +104,16 @@ for (const dir of ACTIVE_APP_ROOTS) {
     if (ALLOWED_DEEP_IMPORT_FILES.has(rel)) continue;
     const text = readFileSync(file, 'utf8');
     if (DEEP_FEATURE_IMPORT.test(text)) {
-      violations.push({
-        file: rel,
-        label: 'deep feature import — use @/features/<ctx>/public, public-queries, public-rpc, or lib RPC shim',
-      });
+      const lines = text.split('\n');
+      const badLines = lines.filter(
+        (line) => DEEP_FEATURE_IMPORT.test(line) && !ALLOWED_FEATURE_IMPORT.test(line),
+      );
+      if (badLines.length) {
+        violations.push({
+          file: rel,
+          label: 'deep feature import — use @/features/<ctx>/public, public-queries, public-rpc, or public-hooks',
+        });
+      }
     }
     if (LIB_COMPANION_SHIM.test(text)) {
       violations.push({

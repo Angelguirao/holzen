@@ -9,7 +9,7 @@ import { fileURLToPath } from 'node:url';
 import { spawnSync } from 'node:child_process';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
-const contexts = ['pause', 'subscription', 'market', 'user', 'auth'];
+const contexts = ['pause', 'subscription', 'market', 'user', 'auth', 'notifications'];
 const failures = [];
 
 function mustExist(rel, label = rel) {

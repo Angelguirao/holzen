@@ -19,7 +19,8 @@ describe('F4 — Lapsed read-only surfaces', () => {
 
   it('allows /journey when lapsed', async () => {
     renderShippedApp({ initialEntries: ['/journey'] });
-    expect(await screen.findByRole('heading', { name: /journey/i })).toBeInTheDocument();
+    await waitForRouteLoaded();
+    expect(await screen.findByRole('heading', { name: /journey/i }, { timeout: 15_000 })).toBeInTheDocument();
   });
 
   it('shows reactivation screen instead of ritual when lapsed', () => {

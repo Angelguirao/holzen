@@ -7,7 +7,7 @@ import { BadgeCelebration } from './BadgeCelebration';
 import { useBadgeSync } from '@/hooks/use-badge-sync';
 import { useBadges } from '@/hooks/use-badges';
 import { usePauseStatsData } from '@/hooks/use-pause-stats-data';
-import { CORE_SKILL_KEYS, type BadgeFamily } from '@/lib/badges/definitions';
+import { CORE_SKILL_KEYS, type BadgeFamily } from '@/legacy/full-shell/src/lib/badges/definitions';
 import { cn } from '@/lib/utils';
 
 interface Props {

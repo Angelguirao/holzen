@@ -3,7 +3,7 @@ import {
   normalizeLibrarySourceType,
   isMainPauseLibraryBookmark,
   isPauseLibraryNote,
-} from './normalize-library-source-type';
+} from '@/lib/normalize-library-source-type';
 
 describe('normalizeLibrarySourceType', () => {
   it('passes through canonical types', () => {

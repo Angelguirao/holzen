@@ -22,8 +22,8 @@ import {
   getPauseStatsDataQueryOptions,
   PAUSE_STATS_DATA_NONE_QUERY_KEY,
   PAUSE_STATS_DATA_QUERY_KEY,
-} from '@/lib/pause-stats-data-query';
-import type { PauseStatsQueryPayload, PauseFullRow } from '@/lib/pause-stats-data-query';
+} from '@/legacy/full-shell/src/lib/pause-stats-data-query';
+import type { PauseStatsQueryPayload, PauseFullRow } from '@/legacy/full-shell/src/lib/pause-stats-data-query';
 
 export type { PauseFullRow, PauseStatsQueryPayload };
 export { PAUSE_STATS_DATA_NONE_QUERY_KEY, PAUSE_STATS_DATA_QUERY_KEY };

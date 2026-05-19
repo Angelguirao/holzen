@@ -7,7 +7,7 @@ import {
   BADGE_DEFINITIONS,
   CORE_SKILL_KEYS,
   type CoreSkill,
-} from '@/lib/badges/definitions';
+} from '@/legacy/full-shell/src/lib/badges/definitions';
 
 /**
  * In-app badge details / guide screen.
