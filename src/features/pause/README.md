@@ -31,6 +31,10 @@ features/pause/
       …                           # flat use-case files at use-cases/*.ts
     queries/                      # query keys + invalidation (no Supabase in application)
   infrastructure/                 # Supabase, invokeEdge, TanStack query modules
+    pause-rpc-client.ts           # RPC implementations + analytics side effects
+    supabase-pause-repository.ts  # default PauseRepository adapter
+  ports/
+    pause-repository.ts           # mutation port (create, logStep, logCompanion, …)
   presentation/                   # thin hooks; ritual UI in src/screens/pause/
   public.ts | public-queries.ts | public-rpc.ts | public-hooks.ts
 ```

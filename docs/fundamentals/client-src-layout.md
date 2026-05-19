@@ -107,7 +107,7 @@ Traces one **shipped** vertical slice: user starts a manual pause from Home and 
 | Ritual UI | Screen components | `PauseSessionGate` → depth picker or `PauseSessionScaffoldShell` → `PauseDecide`, etc. |
 | Step mutations | Screen hooks → feature | `pauseLogStep` / `pauseLogCompanion` via `features/pause/public-rpc` |
 
-Step handlers under `screens/pause/hooks/` call **`pauseLogStep`** (e.g. feel/shift, breath segments, decide outcome). RPC return value drives `engaged` / `completed` and PostHog `pause_engaged` / `pause_completed` inside `pause-rpc-client.ts`.
+Step handlers under `screens/pause/hooks/` call **`pauseLogStep`** from `@/features/pause/public-rpc` (e.g. feel/shift, breath segments, decide outcome). Feature use cases such as **`logPauseStep`** (`application/use-cases/ritual/log-pause-step.ts`) go through **`PauseRepository`** (`ports/pause-repository.ts`, default adapter `infrastructure/supabase-pause-repository.ts`). RPC return value drives `engaged` / `completed` and PostHog `pause_engaged` / `pause_completed` inside `pause-rpc-client.ts`.
 
 ### 3. Deep ritual — AI (after instance exists)
 
