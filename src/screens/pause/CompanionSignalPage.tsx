@@ -10,7 +10,7 @@ import { SignalFullView } from '@/screens/pause/components/companion/SignalFullV
 import { HistoryThread } from '@/screens/pause/components/companion/HistoryThread';
 import { InterventionCrossRefBadge } from '@/screens/pause/components/companion/InterventionCrossRefBadge';
 import { useStaggeredReveal } from '@/screens/pause/components/companion/use-staggered-reveal';
-import { useFullviewTelemetry } from '@/hooks/use-fullview-telemetry';
+import { useFullviewTelemetry } from '@/screens/pause/hooks/use-fullview-telemetry';
 import { PageMeta } from '@/app/components/PageMeta';
 import { DEFAULT_COMPANIONS, DEFAULT_PREFS } from '@/features/pause/public';
 

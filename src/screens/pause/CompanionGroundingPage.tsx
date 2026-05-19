@@ -10,8 +10,8 @@ import { GroundingFullView } from '@/screens/pause/components/companion/Groundin
 import { GroundingEnrichment } from '@/screens/pause/components/companion/GroundingEnrichment';
 import { HistoryThread } from '@/screens/pause/components/companion/HistoryThread';
 import { RelatedBiasesThisMonth } from '@/screens/pause/components/companion/RelatedBiasesThisMonth';
-import { useGroundingEnrichment } from '@/hooks/use-grounding-enrichment';
-import { useFullviewTelemetry } from '@/hooks/use-fullview-telemetry';
+import { useGroundingEnrichment } from '@/screens/pause/hooks/use-grounding-enrichment';
+import { useFullviewTelemetry } from '@/screens/pause/hooks/use-fullview-telemetry';
 import { InterventionCrossRefBadge } from '@/screens/pause/components/companion/InterventionCrossRefBadge';
 import { useStaggeredReveal } from '@/screens/pause/components/companion/use-staggered-reveal';
 import { PageMeta } from '@/app/components/PageMeta';
