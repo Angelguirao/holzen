@@ -2,23 +2,22 @@ import { useState, useEffect, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import { toast } from 'sonner';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
-import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/features/auth/public';
 import { holzenLog } from '@/lib/holzen-console';
 import type { CompanionPrefs } from '@/features/pause/public';
-import type { Database } from '@/integrations/supabase/types';
 import { normalizeTrackedAssetId } from '@/features/market/public';
 import {
+  fetchProfileLastTriggerAt,
   fetchProfileRowForUser,
   getProfileRowQueryOptions,
   PROFILE_QUERY_KEY,
+  updateProfileFields,
   type ProfileRow,
+  type ProfileUpdate,
 } from '../public-queries';
 
 export type { ProfileRow };
 export { PROFILE_QUERY_KEY, fetchProfileRowForUser, getProfileRowQueryOptions };
-
-type ProfileUpdate = Database['public']['Tables']['profiles']['Update'];
 
 export function useProfile() {
   const { user } = useAuth();
@@ -124,60 +123,42 @@ export function useProfile() {
   const setThreshold = useCallback(async (val: number) => {
     setThresholdState(val);
     if (!user) return;
-    const { error } = await supabase
-      .from('profiles')
-      .update({ threshold: val })
-      .eq('user_id', user.id);
+    const { error } = await updateProfileFields(user.id, { threshold: val });
     if (!error) invalidateProfileQuery();
   }, [user, invalidateProfileQuery]);
 
   const setThresholdDown = useCallback(async (val: number) => {
     setThresholdDownState(val);
     if (!user) return;
-    const { error } = await supabase
-      .from('profiles')
-      .update({ threshold_down: val })
-      .eq('user_id', user.id);
+    const { error } = await updateProfileFields(user.id, { threshold_down: val });
     if (!error) invalidateProfileQuery();
   }, [user, invalidateProfileQuery]);
 
   const setCumulativeThreshold = useCallback(async (val: number) => {
     setCumulativeThresholdState(val);
     if (!user) return;
-    const { error } = await supabase
-      .from('profiles')
-      .update({ cumulative_threshold: val })
-      .eq('user_id', user.id);
+    const { error } = await updateProfileFields(user.id, { cumulative_threshold: val });
     if (!error) invalidateProfileQuery();
   }, [user, invalidateProfileQuery]);
 
   const setEmailNotifications = useCallback(async (val: boolean) => {
     setEmailNotificationsState(val);
     if (!user) return;
-    const { error } = await supabase
-      .from('profiles')
-      .update({ email_notifications: val })
-      .eq('user_id', user.id);
+    const { error } = await updateProfileFields(user.id, { email_notifications: val });
     if (!error) invalidateProfileQuery();
   }, [user, invalidateProfileQuery]);
 
   const setReflectionTone = useCallback(async (val: string) => {
     setReflectionToneState(val);
     if (!user) return;
-    const { error } = await supabase
-      .from('profiles')
-      .update({ reflection_tone: val })
-      .eq('user_id', user.id);
+    const { error } = await updateProfileFields(user.id, { reflection_tone: val });
     if (!error) invalidateProfileQuery();
   }, [user, invalidateProfileQuery]);
 
   const setSilentMode = useCallback(async (val: boolean) => {
     setSilentModeState(val);
     if (!user) return;
-    const { error } = await supabase
-      .from('profiles')
-      .update({ silent_mode: val })
-      .eq('user_id', user.id);
+    const { error } = await updateProfileFields(user.id, { silent_mode: val });
     if (!error) invalidateProfileQuery();
   }, [user, invalidateProfileQuery]);
 
@@ -186,10 +167,7 @@ export function useProfile() {
     if (!user || key === 'breathing') return;
     const snakeKey = key === 'zoomOut' ? 'zoom_out' : key;
     const dbKey = `companion_${snakeKey}` as string;
-    const { error } = await supabase
-      .from('profiles')
-      .update({ [dbKey]: val } as ProfileUpdate)
-      .eq('user_id', user.id);
+    const { error } = await updateProfileFields(user.id, { [dbKey]: val } as ProfileUpdate);
     if (!error) invalidateProfileQuery();
   }, [user, invalidateProfileQuery]);
 
@@ -216,31 +194,23 @@ export function useProfile() {
 
     if (!user) return;
 
-    const { error } = await supabase
-      .from('profiles')
-      .update({
-        has_onboarded: true,
-        threshold: result.threshold,
-        first_name: result.firstName,
-        timezone: result.timezone,
-        motivations: result.motivations.length > 0 ? result.motivations : null,
-        grounding_activities: result.groundingActivities.length > 0 ? result.groundingActivities : [],
-      })
-      .eq('user_id', user.id);
+    const { error } = await updateProfileFields(user.id, {
+      has_onboarded: true,
+      threshold: result.threshold,
+      first_name: result.firstName,
+      timezone: result.timezone,
+      motivations: result.motivations.length > 0 ? result.motivations : null,
+      grounding_activities: result.groundingActivities.length > 0 ? result.groundingActivities : [],
+    });
     if (!error) invalidateProfileQuery();
   }, [user, invalidateProfileQuery]);
 
   const isInCooldown = useCallback(async () => {
     if (!user) return true;
-    const { data } = await supabase
-      .from('profiles')
-      .select('last_trigger_at')
-      .eq('user_id', user.id)
-      .single();
-
-    if (!data?.last_trigger_at) return false;
+    const lastTriggerAt = await fetchProfileLastTriggerAt(user.id);
+    if (!lastTriggerAt) return false;
     const cooldownMs = cooldownHours * 60 * 60 * 1000;
-    return Date.now() - new Date(data.last_trigger_at).getTime() < cooldownMs;
+    return Date.now() - new Date(lastTriggerAt).getTime() < cooldownMs;
   }, [user, cooldownHours]);
 
   const isInQuietHours = useCallback(() => {
@@ -255,10 +225,7 @@ export function useProfile() {
   const setCooldownHours = useCallback(async (val: number) => {
     setCooldownHoursState(val);
     if (!user) return;
-    const { error } = await supabase
-      .from('profiles')
-      .update({ cooldown_hours: val })
-      .eq('user_id', user.id);
+    const { error } = await updateProfileFields(user.id, { cooldown_hours: val });
     if (!error) invalidateProfileQuery();
   }, [user, invalidateProfileQuery]);
 
@@ -281,14 +248,14 @@ export function useProfile() {
     setCustomPrompt: async (val: string | null) => {
       setCustomPromptState(val);
       if (!user) return;
-      const { error } = await supabase.from('profiles').update({ custom_prompt: val }).eq('user_id', user.id);
+      const { error } = await updateProfileFields(user.id, { custom_prompt: val });
       if (!error) invalidateProfileQuery();
     },
     reflectionStyle,
     setReflectionStyle: async (val: string) => {
       setReflectionStyleState(val);
       if (!user) return;
-      const { error } = await supabase.from('profiles').update({ reflection_style: val }).eq('user_id', user.id);
+      const { error } = await updateProfileFields(user.id, { reflection_style: val });
       if (!error) invalidateProfileQuery();
     },
     quietHoursStart,
@@ -297,45 +264,45 @@ export function useProfile() {
       setQuietHoursStartState(start);
       setQuietHoursEndState(end);
       if (!user) return;
-      const { error } = await supabase
-        .from('profiles')
-        .update({ quiet_hours_start: start, quiet_hours_end: end })
-        .eq('user_id', user.id);
+      const { error } = await updateProfileFields(user.id, {
+        quiet_hours_start: start,
+        quiet_hours_end: end,
+      });
       if (!error) invalidateProfileQuery();
     },
     firstName,
     setFirstName: async (val: string | null) => {
       setFirstNameState(val);
       if (!user) return;
-      const { error } = await supabase.from('profiles').update({ first_name: val }).eq('user_id', user.id);
+      const { error } = await updateProfileFields(user.id, { first_name: val });
       if (!error) invalidateProfileQuery();
     },
     motivations,
     setMotivations: async (val: string[]) => {
       setMotivationsState(val);
       if (!user) return;
-      const { error } = await supabase.from('profiles').update({ motivations: val }).eq('user_id', user.id);
+      const { error } = await updateProfileFields(user.id, { motivations: val });
       if (!error) invalidateProfileQuery();
     },
     groundingActivities,
     setGroundingActivities: async (val: string[]) => {
       setGroundingActivitiesState(val);
       if (!user) return;
-      const { error } = await supabase.from('profiles').update({ grounding_activities: val }).eq('user_id', user.id);
+      const { error } = await updateProfileFields(user.id, { grounding_activities: val });
       if (!error) invalidateProfileQuery();
     },
     mantra,
     setMantra: async (val: string | null) => {
       setMantraState(val);
       if (!user) return;
-      const { error } = await supabase.from('profiles').update({ mantra: val }).eq('user_id', user.id);
+      const { error } = await updateProfileFields(user.id, { mantra: val });
       if (!error) invalidateProfileQuery();
     },
     currency,
     setCurrency: async (val: string) => {
       setCurrencyState(val);
       if (!user) return;
-      const { error } = await supabase.from('profiles').update({ hold_goal_currency: val }).eq('user_id', user.id);
+      const { error } = await updateProfileFields(user.id, { hold_goal_currency: val });
       if (!error) invalidateProfileQuery();
     },
     trackedAssetId,
@@ -343,7 +310,7 @@ export function useProfile() {
       const next = normalizeTrackedAssetId(val);
       setTrackedAssetIdState(next);
       if (!user) return;
-      const { error } = await supabase.from('profiles').update({ tracked_asset_id: next }).eq('user_id', user.id);
+      const { error } = await updateProfileFields(user.id, { tracked_asset_id: next });
       if (!error) invalidateProfileQuery();
     },
     language,
@@ -354,7 +321,7 @@ export function useProfile() {
       }
       const prev = language;
       setLanguageState(val);
-      const { error } = await supabase.from('profiles').update({ language: val }).eq('user_id', user.id);
+      const { error } = await updateProfileFields(user.id, { language: val });
       if (error) {
         holzenLog.profile('language update failed', { error: error.message });
         setLanguageState(prev);
