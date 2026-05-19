@@ -8,7 +8,7 @@ import {
   getCoingeckoMarketChartQueryOptions,
   type CoingeckoMarketChartPoint,
 } from '@/features/market/public';
-import { ErrorRetry } from '@/components/ErrorRetry';
+import { ErrorRetry } from '@/screens/home/components/ErrorRetry';
 
 interface Props {
   hidden?: boolean;

@@ -3,7 +3,7 @@ import { Button } from '@/components/ui/button';
 import { LoadingButton } from '@/components/ui/loading-button';
 import { Plus, X } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
-import { WritingField } from '@/components/WritingField';
+import { WritingField } from '@/screens/archive/components/WritingField';
 
 interface Props {
   onSave: (title: string, body: string, tags: string[]) => Promise<void>;

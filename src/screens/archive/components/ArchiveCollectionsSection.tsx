@@ -1,5 +1,5 @@
 import { useLibrary } from '@/hooks/use-library';
-import { LibraryCollections } from '@/components/library/LibraryCollections';
+import { LibraryCollections } from '@/screens/archive/components/library/LibraryCollections';
 
 type Props = {
   listSort: 'newest' | 'oldest' | 'alphabetical';

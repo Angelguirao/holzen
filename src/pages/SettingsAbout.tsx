@@ -2,8 +2,8 @@ import { Link } from 'react-router-dom';
 import { ArrowLeft } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { AppVersionBadge } from '@/app/components/AppVersionBadge';
-import { Changelog } from '@/components/Changelog';
-import { FeedbackForm } from '@/components/FeedbackForm';
+import { Changelog } from '@/screens/settings/components/Changelog';
+import { FeedbackForm } from '@/screens/settings/components/FeedbackForm';
 import { useLatestChangelogVersion } from '@/hooks/use-latest-changelog-version';
 import { PageHeading } from '@/app/components/PageHeading';
 

@@ -10,7 +10,7 @@ import { PageMeta } from '@/app/components/PageMeta';
 import { Search, X, ArrowUpDown, RefreshCw, Loader2 } from 'lucide-react';
 import { ArchivePauseItems } from '@/screens/archive/components/ArchivePauseItems';
 import { ArchiveCollectionsSection } from '@/screens/archive/components/ArchiveCollectionsSection';
-import { CurrentPauseCard } from '@/components/library/CurrentPauseCard';
+import { CurrentPauseCard } from '@/screens/archive/components/library/CurrentPauseCard';
 import { usePullToRefresh } from '@/hooks/use-pull-to-refresh';
 
 import { Input } from '@/components/ui/input';

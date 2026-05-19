@@ -24,7 +24,7 @@ screens/<route>/
 |---------------|----------------------|----------------|
 | `home/` | `/` — **`HomeScreen`**, `components/`, `hooks/` (incl. `useHolzen`) | [docs/screens/home.md](../../docs/screens/home.md) |
 | `pause/` | `/pause`, `/companion/*` — **`PauseSessionScreen`**, `components/`, `hooks/` | [docs/screens/pause.md](../../docs/screens/pause.md) |
-| `archive/` | Archive tab — **`components/` migrated (5e)** | [docs/design/information-architecture.md](../../docs/design/information-architecture.md) |
+| `archive/` | Archive tab — **`ArchiveScreen`**, `components/` (+ `library/`) | [docs/design/information-architecture.md](../../docs/design/information-architecture.md) |
 | `journey/` | Journey tab — **`components/` migrated (5e)** | [docs/screens/journey-overview.md](../../docs/screens/journey-overview.md) |
 | `settings/` | Settings hub — **`SettingsStateLayout`**, `hooks/`, `components/`; thin `pages/settings/` | [README](settings/README.md) |
 | `marketing/` | Landing, blog, legal — **`components/` migrated (5g)** | — |
