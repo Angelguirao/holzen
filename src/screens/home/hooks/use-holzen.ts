@@ -211,7 +211,7 @@ function useHolzenState() {
     } catch {
       /* non-fatal */
     }
-  }, [user]);
+  }, [user, setMessage, setContext, setCompanions, setLastPauseInstanceId, setOpenPauseState]);
 
   const refreshProfile = useCallback(async () => {
     // No-op in V2; the realtime subscription on pause_instances handles
