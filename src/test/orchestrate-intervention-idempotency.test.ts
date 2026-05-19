@@ -12,7 +12,7 @@ import {
   hasInvokedIntervention,
   runOnceIntervention,
   resetInterventionIdempotency,
-} from '@/lib/orchestrate-intervention-idempotency';
+} from '@/features/pause/public';
 
 /**
  * These tests pin down the contract of the per-tab-session idempotency key
