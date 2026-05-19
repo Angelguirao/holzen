@@ -1,6 +1,10 @@
 # Architecture (C4)
 
-This folder holds **C4-style** views of Holzen: **System Context** and **Container** diagrams. They complement narrative docs such as [navigating-the-codebase.md](../fundamentals/navigating-the-codebase.md) and [ai-powered-pause-system.md](../systems/pause/ai-powered-pause-system.md).
+This folder holds **C4-style** views of Holzen: **System Context** and **Container** diagrams (external systems and deployables). They complement:
+
+- [client-src-layout.md](../fundamentals/client-src-layout.md) — **inside the SPA**: `app` / `screens` / `components` / `features` folders
+- [navigating-the-codebase.md](../fundamentals/navigating-the-codebase.md) — boot and runtime tour
+- [ai-powered-pause-system.md](../systems/pause/ai-powered-pause-system.md) — pause AI pipeline
 
 | Artifact | Purpose |
 |----------|---------|

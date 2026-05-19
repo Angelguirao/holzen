@@ -4,7 +4,7 @@
 
 The repo root of this folder (`src/components/*.tsx`) is **closed** — presentation migrated to `screens/<route>/components/` during wave 5. Only `ui/` and `icons/` remain active subtrees.
 
-**Canonical:** [frontend-module-layout.md](../../docs/fundamentals/frontend-module-layout.md) §11 (waves 5b–5i), [DESIGN.md](../../DESIGN.md), [docs/design/nox/README.md](../../docs/design/nox/README.md).
+**Canonical:** [client-src-layout.md](../../docs/fundamentals/client-src-layout.md), [frontend-module-layout.md](../../docs/fundamentals/frontend-module-layout.md) §11 (waves 5b–5i), [DESIGN.md](../../DESIGN.md), [docs/design/nox/README.md](../../docs/design/nox/README.md).
 
 ## Where UI lives
 
