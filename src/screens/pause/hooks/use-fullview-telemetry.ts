@@ -1,40 +1,36 @@
 import { useEffect, useRef } from 'react';
-import { supabase } from '@/integrations/supabase/client';
+import { useAuth } from '@/features/auth/public';
+import {
+  logCompanionFullviewOpened,
+  type CompanionFullviewKind,
+} from '@/features/pause/public-queries';
 
-export type FullviewCompanion = 'signal' | 'grounding' | 'history' | 'zoomOut';
+export type { CompanionFullviewKind as FullviewCompanion };
 
 /**
  * Fires a single `companion_fullview_opened` analytics event per
  * (user, pauseInstanceId, companion) mount.
  */
 export function useFullviewTelemetry(
-  companion: FullviewCompanion,
+  companion: CompanionFullviewKind,
   pauseInstanceId: string | null | undefined,
 ) {
+  const { user } = useAuth();
   const firedRef = useRef<string | null>(null);
 
   useEffect(() => {
-    if (!pauseInstanceId) return;
+    const userId = user?.id;
+    if (!pauseInstanceId || !userId) return;
     const key = `${companion}:${pauseInstanceId}`;
     if (firedRef.current === key) return;
     firedRef.current = key;
 
-    void (async () => {
-      try {
-        const { data: { user } } = await supabase.auth.getUser();
-        if (!user) return;
-        await supabase.from('analytics_events').insert({
-          user_id: user.id,
-          event: 'companion_fullview_opened',
-          metadata: {
-            companion,
-            pause_instance_id: pauseInstanceId,
-            ts: new Date().toISOString(),
-          },
-        });
-      } catch {
-        // observation only
-      }
-    })();
-  }, [companion, pauseInstanceId]);
+    void logCompanionFullviewOpened({
+      userId,
+      companion,
+      pauseInstanceId,
+    }).catch(() => {
+      // observation only
+    });
+  }, [companion, pauseInstanceId, user?.id]);
 }
