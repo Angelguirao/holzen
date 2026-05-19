@@ -3,7 +3,7 @@ import { useState, useEffect, useCallback, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
-import { useAuth } from '@/hooks/use-auth';
+import { useAuth } from '@/features/auth/public';
 import { useHolzen } from '@/screens/home/hooks/use-holzen';
 import { getProfileRowQueryOptions, PROFILE_QUERY_KEY } from '@/features/user/public-queries';
 import { formatBtcPrice, SUPPORTED_CURRENCIES } from '@/features/market/public';

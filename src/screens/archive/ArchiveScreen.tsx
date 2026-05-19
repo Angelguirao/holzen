@@ -17,7 +17,7 @@ import { Input } from '@/components/ui/input';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
-import { useAuth } from '@/hooks/use-auth';
+import { useAuth } from '@/features/auth/public';
 import { getArchivePausesTabHasRowsQueryOptions } from '@/features/pause/public-queries';
 import type { ArchiveMainSegment } from '@/lib/archive-segment';
 

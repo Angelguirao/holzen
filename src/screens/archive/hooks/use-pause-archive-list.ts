@@ -1,7 +1,7 @@
 import { useMemo, useCallback, useEffect } from 'react';
 import { useInfiniteQuery, type InfiniteData } from '@tanstack/react-query';
 import { toast } from 'sonner';
-import { useAuth } from '@/hooks/use-auth';
+import { useAuth } from '@/features/auth/public';
 import {
   PAUSE_ARCHIVE_PAGE_SIZE,
   fetchPauseArchivePage,

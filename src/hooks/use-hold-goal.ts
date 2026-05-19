@@ -1,5 +1,5 @@
 import { useQuery } from '@tanstack/react-query';
-import { useAuth } from '@/hooks/use-auth';
+import { useAuth } from '@/features/auth/public';
 import { getHoldGoalProfileQueryOptions } from '@/features/user/public-queries';
 import type { HoldGoalProfile } from '@/features/user/public';
 

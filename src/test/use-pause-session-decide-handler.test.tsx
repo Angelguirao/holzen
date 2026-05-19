@@ -37,7 +37,7 @@ vi.mock('@/features/pause/public', async (importOriginal) => {
   };
 });
 
-vi.mock('@/hooks/use-auth', () => ({
+vi.mock('@/features/auth/public', () => ({
   useAuth: () => ({
     user: { id: 'user-decide-handler-test' } as import('@supabase/supabase-js').User,
     loading: false,

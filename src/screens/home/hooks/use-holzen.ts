@@ -15,7 +15,7 @@ import {
   type BtcPriceData,
 } from '@/features/market/public';
 import { supabase } from '@/integrations/supabase/client';
-import { useAuth } from '@/hooks/use-auth';
+import { useAuth } from '@/features/auth/public';
 import { useProfile } from '@/hooks/use-profile';
 import type { CompanionData } from '@/screens/pause/components/CompanionSection';
 import { holzenLog } from '@/lib/holzen-console';

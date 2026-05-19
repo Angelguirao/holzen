@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { toast } from 'sonner';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
-import { useAuth } from '@/hooks/use-auth';
+import { useAuth } from '@/features/auth/public';
 import { holzenLog } from '@/lib/holzen-console';
 import type { CompanionPrefs } from '@/screens/pause/components/CompanionSection';
 import type { Database } from '@/integrations/supabase/types';

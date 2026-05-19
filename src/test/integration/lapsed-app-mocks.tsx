@@ -9,7 +9,7 @@ const TEST_USER = {
   email: 'pause@test.holzen.app',
 };
 
-vi.mock('@/hooks/use-auth', () => ({
+vi.mock('@/features/auth/public', () => ({
   AuthProvider: ({ children }: { children: ReactNode }) => children,
   useAuth: () => ({
     user: TEST_USER,

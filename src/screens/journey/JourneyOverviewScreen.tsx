@@ -4,7 +4,7 @@ import { useQuery } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
 import { JourneyStreakCard } from '@/screens/journey/components/JourneyStreakCard';
 import { Button } from '@/components/ui/button';
-import { useAuth } from '@/hooks/use-auth';
+import { useAuth } from '@/features/auth/public';
 import { getJourneyPauseInstancesQueryOptions } from '@/features/pause/public-queries';
 import { trackEvent } from '@/lib/posthog';
 import { Skeleton } from '@/components/ui/skeleton';

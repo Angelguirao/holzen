@@ -18,7 +18,7 @@ vi.mock('@tanstack/react-query', () => ({
   useQueryClient: () => ({ invalidateQueries: invalidateQueriesMock }),
 }));
 
-vi.mock('@/hooks/use-auth', () => ({
+vi.mock('@/features/auth/public', () => ({
   useAuth: () => ({ user: { id: 'archive-user-1' }, loading: false }),
 }));
 

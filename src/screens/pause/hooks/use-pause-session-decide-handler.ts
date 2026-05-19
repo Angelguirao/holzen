@@ -2,7 +2,7 @@ import { useCallback, type Dispatch, type MutableRefObject, type SetStateAction 
 import type { TFunction } from 'i18next';
 import type { MoodValue } from '@/screens/pause/components/MoodCheck';
 import { hapticFeedback } from '@/lib/haptics';
-import { useAuth } from '@/hooks/use-auth';
+import { useAuth } from '@/features/auth/public';
 import { pauseLogStep } from '@/features/pause/public-rpc';
 import {
   buildOutcomeLoggedPayload,
