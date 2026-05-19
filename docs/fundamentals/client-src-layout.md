@@ -42,7 +42,8 @@ flowchart TB
 | `src/components/ui/` | Design system | Primitives used on **2+** routes | [components/README.md](../../src/components/README.md) |
 | `src/components/icons/` | Design system | Shared mood/outcome glyphs | same |
 | `src/features/<context>/` | Domain + application | Bounded context rules, use cases, ports | [features/README.md](../../src/features/README.md) |
-| `src/hooks/`, `src/lib/` | Transitional | Shims and shared I/O until fully migrated | Prefer `features/*/public` |
+| `src/hooks/` | Shared UI utilities | Cross-route primitives (`use-toast`, `use-feature-flag`, …); `use-auth.tsx` legacy shim only | Domain hooks: `features/*/public-hooks` |
+| `src/lib/` | Transitional | Shared I/O until fully migrated | Prefer `features/*/public` / `public-queries` |
 | `src/legacy/` | Archive | Pre-strip full IA — **never import** in active code | [legacy/README.md](../../src/legacy/README.md) |
 
 **Closed:** `src/components/*.tsx` at repo root (`npm run check:no-root-components`).
@@ -159,9 +160,30 @@ Walk the sequence once in DevTools **Network** when changing pause code: expect 
 
 ---
 
+## Testing (Vitest placement)
+
+Vitest runs `src/**/*.{test,spec}.{ts,tsx}` (jsdom, `src/test/setup.ts`). **Do not** default new unit tests into flat `src/test/` — co-locate with the layer you are exercising.
+
+| Layer under test | Put the test file… |
+|------------------|-------------------|
+| `features/<ctx>/domain` or `application` | Beside the module (e.g. `gate-flags.test.ts` next to `gate-flags.ts`) |
+| `screens/<route>/hooks` or screen-only helpers | Beside the hook (e.g. `use-pause-session-go-back.test.tsx`) |
+| `app/components` shell | Beside the component |
+| Transitional `src/lib/*` | Beside the lib file until the shim is removed |
+| **Shipped user journeys** (auth → home → pause, lapsed, settings) | `src/test/integration/flows/*.integration.test.tsx` |
+| Cross-cutting sanitization / shared edge pure math | `src/test/` root (document in [src/test/README.md](../../src/test/README.md)) |
+| Pre-strip / undeployed UI | `src/test/legacy/` (excluded from default `npm run test`) |
+
+**Integration vs browser E2E:** `src/test/integration/` is RTL + `MemoryRouter` with mocked Supabase — not Playwright. See [integration/README.md](../../src/test/integration/README.md) and [holzen-application-architecture.md](holzen-application-architecture.md) §13.
+
+**Import rule:** tests use `@/features/*/public` (same as screens); `npm run check:feature-imports` includes `src/test/`.
+
+---
+
 ## Related
 
 - [src/README.md](../../src/README.md) — shipped routes
+- [src/test/README.md](../../src/test/README.md) — integration hub, fixtures, legacy bucket
 - [AGENTS.md](../../AGENTS.md) — commands and edit table
 - [react-screen-orchestration.md](react-screen-orchestration.md) — conductor pattern inside a screen
 - End-to-end sequence (generic use case → adapter): [holzen-application-architecture.md](holzen-application-architecture.md) §6.3
