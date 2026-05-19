@@ -11,7 +11,7 @@ import { CompanionFeedback } from './CompanionFeedback';
 import { Check, Heart, Lock, Feather, Anchor, BookOpenText, Mountain, Clock, Maximize2 } from 'lucide-react';
 import { useProGate } from '@/hooks/use-pro-gate';
 import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
-import { useCompanionData } from '@/hooks/use-companion-data';
+import { useCompanionData } from '@/screens/pause/hooks/use-companion-data';
 
 export interface CompanionData {
   haiku: string | null;

@@ -1,5 +1,5 @@
-import { useHomeDashboardSectionDeps } from '@/hooks/use-home-dashboard-section-deps';
-import { useHomeDashboardSectionRenderers } from '@/hooks/use-home-dashboard-section-renderers';
+import { useHomeDashboardSectionDeps } from '@/screens/home/hooks/use-home-dashboard-section-deps';
+import { useHomeDashboardSectionRenderers } from '@/screens/home/hooks/use-home-dashboard-section-renderers';
 
 /**
  * Memoized `HomeDashboardSectionDeps` plus `renderSection` / `goalWhyBlock`
