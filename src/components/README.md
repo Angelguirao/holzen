@@ -40,6 +40,8 @@ Extend these before inventing ad-hoc markup in screens:
 | `status-card.tsx` | Compact status summaries |
 | `process-stepper.tsx` | Multi-step flows |
 | `layout-spacing.tsx` | Consistent section spacing |
+| `page-heading.tsx` | In-page title block (marketing, settings, companions) |
+| `pro-lock.tsx` | Pro feature gate overlay / inline badge |
 | `threshold-slider.tsx` | Numeric threshold control (Settings) |
 | `control-selector.tsx` | Segmented control picker |
 | `value-equivalence.tsx` | BTC / fiat equivalence display |

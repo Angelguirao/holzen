@@ -1,6 +1,6 @@
 # Marketing / public screens
 
-Public routes (no auth shell). Landing section components live under `components/`.
+Public routes (no auth shell). Shared marketing chrome: `components/PublicFooter.tsx`. Other section components under `components/`.
 
 | Screen | Route |
 |--------|-------|

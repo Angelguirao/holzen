@@ -7,10 +7,10 @@ import { toast } from 'sonner';
 import { getBlogPublishedPostsInfiniteQueryOptions, prefetchBlogPostBySlug } from '@/lib/blog-post-query';
 import { format } from 'date-fns';
 import { PageMeta } from '@/app/components/PageMeta';
-import { PublicFooter } from '@/app/components/PublicFooter';
+import { PublicFooter } from '@/screens/marketing/components/PublicFooter';
 import { useInfiniteScroll } from '@/hooks/use-infinite-scroll';
 import { useTranslation } from 'react-i18next';
-import { PageHeading } from '@/app/components/PageHeading';
+import { PageHeading } from '@/components/ui/page-heading';
 
 const fade = (delay = 0) => ({
   initial: { opacity: 0, y: 14 },

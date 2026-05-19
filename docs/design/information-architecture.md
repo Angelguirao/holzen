@@ -77,7 +77,7 @@ Under `/admin` and children (`/admin/smoke-test`, `/admin/sentry-alerts`, `/admi
 
 ### 1.6 Cross-cutting behaviors
 
-- **Global chrome:** `NotificationBell` (header), `FeedbackWidget` (signed-in), `CheckoutConfirmation`, `PauseReadyBanner` on non-Home when auto-trigger fires.
+- **Global chrome:** `NotificationBell` (header, `features/user/presentation`), `FeedbackWidget` (signed-in, `app/components`), `CheckoutConfirmation` (`features/subscription/presentation`, mounted in `AppLayout`), `PauseReadyBanner` on non-Home when auto-trigger fires.
 - **Library vs Journey → Activity:** **Library** is the browsable, filterable collection of saved items. **Journey → Activity** is the unified chronological log (pauses, letters, badges, practice, **and library saves**) rendered by `HistoryContent` / `HistoryCalendar`. There is **no** `HistoryCrossLinks` strip anymore — navigation is primary tabs + in-page links (e.g. Home **Journey pulse** → Activity).
 
 ### 1.7 Primary navigation (product analytics)

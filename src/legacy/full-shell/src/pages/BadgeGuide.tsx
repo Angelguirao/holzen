@@ -1,7 +1,7 @@
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { ArrowLeft, Award, Flame, Shield, Target, BookOpen, Feather, Sparkles, Calendar, Mountain, Wind, Lock } from 'lucide-react';
-import { PageHeading } from '@/app/components/PageHeading';
+import { PageHeading } from '@/components/ui/page-heading';
 import { Button } from '@/components/ui/button';
 import {
   BADGE_DEFINITIONS,

@@ -1,6 +1,6 @@
 import { useTranslation } from 'react-i18next';
 import { motion } from 'framer-motion';
-import { HoldGoalWidget } from '@/app/components/HoldGoalWidget';
+import { HoldGoalWidget } from '@/screens/home/components/HoldGoalWidget';
 
 interface Props {
   onHoldGoalPresenceChange: (hasGoal: boolean) => void;

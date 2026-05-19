@@ -2,10 +2,9 @@ import { Suspense, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Outlet, useLocation } from 'react-router-dom';
 import { BottomNav, isPrimaryTabActive } from './BottomNav';
-import { NotificationBell } from '@/app/components/NotificationBell';
 import { PauseReadyBanner } from '@/app/components/PauseReadyBanner';
-import { CheckoutConfirmation } from '@/app/components/CheckoutConfirmation';
-import { PaywallSubscribedTracker } from '@/app/components/PaywallSubscribedTracker';
+import { CheckoutConfirmation, PaywallSubscribedTracker } from '@/features/subscription/public';
+import { NotificationBell } from '@/features/user/public';
 import { useHolzen } from '@/screens/home/hooks/use-holzen';
 import { PendingPauseOfferShell } from '@/screens/pause/components/PendingPauseOfferShell';
 import { useLanguageSync } from '@/hooks/use-language-sync';
@@ -69,6 +68,19 @@ function useTabChunkPrefetch() {
   }, []);
 }
 
+/**
+ * Authenticated four-tab shell (header, main outlet, bottom nav).
+ *
+ * **Orchestration (intentional):** this file mounts cross-context chrome that must
+ * survive tab switches — not domain logic owned by a single screen.
+ * - `useHolzen` — profile/language + open-pause resync (Home provider, app-wide when signed in)
+ * - `PendingPauseOfferShell` — pause offer modal (pause feature UI, shell-triggered)
+ * - `useAutoTrigger` + `PauseReadyBanner` — market/cron “pause ready” strip off-Home
+ * - `CheckoutConfirmation` / `PaywallSubscribedTracker` — subscription return UX on any tab
+ * - `NotificationBell` — inbox header (user presentation)
+ *
+ * See [app/README.md](../README.md) placement table.
+ */
 /** Primary-tab label for the shell header center (Home intentionally has none). */
 function shellCenterNavLabel(pathname: string, t: (key: string) => string): string | null {
   if (pathname === '/' || pathname === '/index') return null;

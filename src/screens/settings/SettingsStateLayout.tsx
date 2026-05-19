@@ -1,7 +1,7 @@
 import { useEffect } from 'react';
 import { Outlet } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { PageHeading } from '@/app/components/PageHeading';
+import { PageHeading } from '@/components/ui/page-heading';
 import { useSettingsModel } from '@/screens/settings/hooks/use-settings-model';
 import { SettingsStateProvider } from '@/screens/settings/settings-context';
 

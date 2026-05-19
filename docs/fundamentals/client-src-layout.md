@@ -37,7 +37,7 @@ flowchart TB
 
 | Path | Layer | Put here when… | Local index |
 |------|-------|----------------|-------------|
-| `src/app/components/` | Shell | Cross-route chrome (nav, meta, checkout, feedback) | [app/README.md](../../src/app/README.md) |
+| `src/app/components/` | Shell | Cross-route chrome (nav, meta, feedback); **mount-only** subscription/user UI via `features/*/public` | [app/README.md](../../src/app/README.md) (placement rationale table) |
 | `src/screens/<route>/` | Presentation | Route UI, screen-only hooks | [screens/README.md](../../src/screens/README.md) |
 | `src/components/ui/` | Design system | Primitives used on **2+** routes | [components/README.md](../../src/components/README.md) |
 | `src/components/icons/` | Design system | Shared mood/outcome glyphs | same |

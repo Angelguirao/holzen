@@ -1,11 +1,11 @@
 import { Link } from 'react-router-dom';
 import { ArrowLeft } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
-import { AppVersionBadge } from '@/app/components/AppVersionBadge';
+import { AppVersionBadge } from '@/screens/settings/components/AppVersionBadge';
 import { Changelog } from '@/screens/settings/components/Changelog';
 import { FeedbackForm } from '@/screens/settings/components/FeedbackForm';
 import { useLatestChangelogVersion } from '@/hooks/use-latest-changelog-version';
-import { PageHeading } from '@/app/components/PageHeading';
+import { PageHeading } from '@/components/ui/page-heading';
 
 /**
  * Low-frequency "about" surface: feedback, what's new, version — kept out of the main Settings accordion.

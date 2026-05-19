@@ -3,7 +3,7 @@ import { Slider } from '@/components/ui/slider';
 import { Button } from '@/components/ui/button';
 import { ArrowUp, ArrowDown } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
-import { ThresholdFrequencyEstimator } from '@/app/components/ThresholdFrequencyEstimator';
+import { ThresholdFrequencyEstimator } from '@/screens/home/components/ThresholdFrequencyEstimator';
 
 interface Props {
   thresholdUp: number;

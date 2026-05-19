@@ -6,3 +6,4 @@ export {
 } from './application/hold-goal-headline';
 export type { HoldGoalProfile } from './domain/hold-goal-profile';
 export type { UserSignalPreference } from './domain/user-signal-preference';
+export { NotificationBell } from './presentation/NotificationBell';
