@@ -7,7 +7,7 @@ import { CompanionError } from './CompanionError';
 import { format } from 'date-fns';
 import { useHolzen } from '@/screens/home/hooks/use-holzen';
 import { formatBtcPrice } from '@/features/market/public';
-import { useSubscription } from '@/hooks/use-subscription';
+import { useSubscription } from '@/features/subscription/public-hooks';
 import { toast } from 'sonner';
 import { companionHistoryPath } from '@/lib/app-routes';
 

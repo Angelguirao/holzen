@@ -10,10 +10,10 @@ import { LoadingButton } from '@/components/ui/loading-button';
 import { toast } from 'sonner';
 import { format } from 'date-fns';
 import { useInfiniteScroll } from '@/hooks/use-infinite-scroll';
-import { useSubscription } from '@/hooks/use-subscription';
+import { useSubscription } from '@/features/subscription/public-hooks';
 import { SubscriptionSkeleton } from '@/screens/home/components/SubscriptionSkeleton';
 import { parseEdgeFunctionError, toUserFacingAiErrorMessage } from '@/lib/edge-function-error';
-import { useProGate } from '@/hooks/use-pro-gate';
+import { useProGate } from '@/features/subscription/public-hooks';
 import { showLimitReachedToast, isPaidLimitReached } from '@/lib/limit-upsell';
 
 interface Insight {

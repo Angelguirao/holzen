@@ -5,7 +5,7 @@ import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/features/auth/public';
 import { holzenLog } from '@/lib/holzen-console';
-import type { CompanionPrefs } from '@/screens/pause/components/CompanionSection';
+import type { CompanionPrefs } from '@/features/pause/public';
 import type { Database } from '@/integrations/supabase/types';
 import { normalizeTrackedAssetId } from '@/features/market/public';
 import {
@@ -13,7 +13,7 @@ import {
   getProfileRowQueryOptions,
   PROFILE_QUERY_KEY,
   type ProfileRow,
-} from '@/features/user/public-queries';
+} from '../public-queries';
 
 export type { ProfileRow };
 export { PROFILE_QUERY_KEY, fetchProfileRowForUser, getProfileRowQueryOptions };

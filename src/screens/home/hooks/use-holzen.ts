@@ -16,7 +16,7 @@ import {
 } from '@/features/market/public';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/features/auth/public';
-import { useProfile } from '@/hooks/use-profile';
+import { useProfile } from '@/features/user/public-hooks';
 import type { CompanionData } from '@/screens/pause/components/CompanionSection';
 import { holzenLog } from '@/lib/holzen-console';
 import { clearSession, reflectionPersistErrorMessage } from '@/features/pause/public';

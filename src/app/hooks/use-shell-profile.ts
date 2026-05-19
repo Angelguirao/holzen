@@ -1,4 +1,4 @@
-import { useProfile } from '@/hooks/use-profile';
+import { useProfile } from '@/features/user/public-hooks';
 import { useLanguageSync } from '@/app/hooks/use-language-sync';
 
 /**

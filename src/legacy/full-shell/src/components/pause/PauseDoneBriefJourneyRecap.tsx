@@ -4,11 +4,11 @@ import { Sparkles } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '@/hooks/use-auth';
 import { useBadges } from '@/hooks/use-badges';
-import { useHoldGoalProfile } from '@/hooks/use-hold-goal';
+import { useHoldGoalProfile } from '@/features/user/public-hooks';
 import { usePauseStatsData } from '@/hooks/use-pause-stats-data';
 import { suppressBadgeCelebrationOverlayThisSession } from '@/hooks/use-badge-sync';
 import { getUserBadgeIdsQueryOptions } from '@/legacy/full-shell/src/lib/user-badge-ids-query';
-import type { PauseImpactData } from '@/lib/pause-impact-data';
+import type { PauseImpactData } from '@/features/pause/public';
 import { ScoreImpact } from './ScoreImpact';
 
 interface Props {

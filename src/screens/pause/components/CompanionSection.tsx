@@ -9,7 +9,7 @@ import { ZoomOutDisplay } from './ZoomOutDisplay';
 import { HistoricalInsightDisplay } from './HistoricalInsightDisplay';
 import { CompanionFeedback } from './CompanionFeedback';
 import { Check, Heart, Lock, Feather, Anchor, BookOpenText, Mountain, Clock, Maximize2 } from 'lucide-react';
-import { useProGate } from '@/hooks/use-pro-gate';
+import { useProGate } from '@/features/subscription/public-hooks';
 import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
 import { useCompanionData } from '@/screens/pause/hooks/use-companion-data';
 

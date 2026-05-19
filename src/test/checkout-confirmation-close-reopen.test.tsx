@@ -37,7 +37,7 @@ const { navigateMock, invokeMock, toastMessageMock } = vi.hoisted(() => ({
   toastMessageMock: vi.fn(),
 }));
 
-vi.mock('@/hooks/use-subscription', () => ({
+vi.mock('@/features/subscription/public-hooks', () => ({
   useSubscription: () => ({
     tier: 'free',
     loading: false,

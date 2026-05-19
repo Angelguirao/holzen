@@ -32,7 +32,7 @@ const { manualRetryMock, refreshMock, navigateMock, toastMessageMock, invokeMock
   invokeMock: vi.fn().mockResolvedValue({ data: { events: [] }, error: null }),
 }));
 
-vi.mock('@/hooks/use-subscription', () => ({
+vi.mock('@/features/subscription/public-hooks', () => ({
   useSubscription: () => ({
     loading: false,
     subscribed: true,

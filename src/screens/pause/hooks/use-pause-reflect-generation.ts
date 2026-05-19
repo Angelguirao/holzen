@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '@/features/auth/public';
-import { useProfile } from '@/hooks/use-profile';
+import { useProfile } from '@/features/user/public-hooks';
 import {
   fetchOpeningMessageForPauseInstance,
   generateReflectionAtReflectStep,

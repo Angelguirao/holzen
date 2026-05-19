@@ -11,7 +11,7 @@ import { hapticFeedback } from '@/lib/haptics';
 import { playGroundingChime } from '@/lib/grounding-chime';
 import { type MoodValue } from '@/screens/pause/components/MoodCheck';
 import { MoodIcon } from '@/components/icons/MoodIcon';
-import { useProGate } from '@/hooks/use-pro-gate';
+import { useProGate } from '@/features/subscription/public-hooks';
 import { companionFallbacksDisabledClient } from '@/lib/companion-strict';
 import { parseGroundLocationState } from '@/lib/router-location-state';
 import { TOOLS, settingsSectionPath } from '@/lib/app-routes';

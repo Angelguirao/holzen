@@ -11,7 +11,7 @@ import {
 } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { LoadingSpinner } from '@/components/ui/loading-spinner';
-import { useSubscription } from '@/hooks/use-subscription';
+import { useSubscription } from '@/features/subscription/public-hooks';
 import { PRICING } from '@/features/subscription/public';
 import { fetchCheckoutEvents } from '@/features/subscription/public-queries';
 import { invokeEdge } from '@/lib/invoke-edge';

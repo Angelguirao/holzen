@@ -3,7 +3,7 @@ import { useAuth } from '@/features/auth/public';
 import {
   POST_CHECKOUT_SUBSCRIBE_FLAG,
   useSubscription,
-} from '@/hooks/use-subscription';
+} from '@/features/subscription/public-hooks';
 import type { SubscriptionBillingInterval } from '@/features/subscription/public';
 import { trackEvent } from '@/lib/posthog';
 

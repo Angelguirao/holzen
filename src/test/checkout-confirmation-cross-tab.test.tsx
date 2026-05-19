@@ -24,7 +24,7 @@ const { refreshMock, navigateMock, toastMessageMock, invokeMock } = vi.hoisted((
   invokeMock: vi.fn().mockResolvedValue({ data: { events: [] }, error: null }),
 }));
 
-vi.mock('@/hooks/use-subscription', () => ({
+vi.mock('@/features/subscription/public-hooks', () => ({
   useSubscription: () => ({
     tier: 'pro',
     loading: false,
