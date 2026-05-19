@@ -18,7 +18,7 @@ import { LoadingButton } from '@/components/ui/loading-button';
 import { Skeleton } from '@/components/ui/skeleton';
 import { hapticFeedback } from '@/lib/haptics';
 import { toast } from 'sonner';
-import { homeInWidget } from '@/components/home/home-widget-styles';
+import { homeInWidget } from '@/screens/home/components/home-widget-styles';
 import { cn } from '@/lib/utils';
 
 const QUICK_MOODS = ['calm', 'anxious', 'fomo', 'uncertain'] as const;

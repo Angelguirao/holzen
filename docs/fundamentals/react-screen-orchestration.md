@@ -465,7 +465,7 @@ const Home = () => {
   );
 ```
 
-**What to notice:** one hook ([`useHomeDashboardTodayWiring`](../../src/hooks/use-home-dashboard-today-wiring.ts)) hides the **`useHomeDashboardSectionDeps` + `useHomeDashboardSectionRenderers`** pair. The big object is the **dependency bundle** for [`render-home-dashboard-section`](../../src/components/home/render-home-dashboard-section.tsx).
+**What to notice:** one hook ([`useHomeDashboardTodayWiring`](../../src/hooks/use-home-dashboard-today-wiring.ts)) hides the **`useHomeDashboardSectionDeps` + `useHomeDashboardSectionRenderers`** pair. The big object is the **dependency bundle** for [`render-home-dashboard-section`](../../src/screens/home/components/render-home-dashboard-section.tsx).
 
 ---
 
@@ -499,7 +499,7 @@ const Home = () => {
   });
 ```
 
-**What to notice:** [`useHomeZenModeRouteProps`](../../src/hooks/use-home-zen-route-props.ts) memoizes a **typed props object** for [`HomeZenModeRoute`](../../src/components/home/HomeZenModeRoute.tsx). That keeps the Zen JSX line short: `{...zenRouteProps}`.
+**What to notice:** [`useHomeZenModeRouteProps`](../../src/hooks/use-home-zen-route-props.ts) memoizes a **typed props object** for [`HomeZenModeRoute`](../../src/screens/home/components/HomeZenModeRoute.tsx). That keeps the Zen JSX line short: `{...zenRouteProps}`.
 
 ---
 
@@ -522,7 +522,7 @@ const Home = () => {
   });
 ```
 
-**What to notice:** [`useHomeDashboardLayoutProps`](../../src/hooks/use-home-dashboard-layout-props.ts) exists so [`HomeDashboardLayout`](../../src/components/home/HomeDashboardLayout.tsx) (wrapped in **`React.memo`**) gets **referentially stable props** when nothing relevant changed.
+**What to notice:** [`useHomeDashboardLayoutProps`](../../src/hooks/use-home-dashboard-layout-props.ts) exists so [`HomeDashboardLayout`](../../src/screens/home/components/HomeDashboardLayout.tsx) (wrapped in **`React.memo`**) gets **referentially stable props** when nothing relevant changed.
 
 ---
 
@@ -551,7 +551,7 @@ const Home = () => {
 ### Step 18 — Where to go next
 
 - Walk **`useHomeDashboardTodayWiring`** → **`useHomeDashboardSectionDeps`** → **`renderHomeDashboardSection`** to see how one **section id** becomes a card.  
-- Open [`HomeZenModeRoute`](../../src/components/home/HomeZenModeRoute.tsx) to see **`lazy` + `Suspense`** around Zen.  
+- Open [`HomeZenModeRoute`](../../src/screens/home/components/HomeZenModeRoute.tsx) to see **`lazy` + `Suspense`** around Zen.  
 - Keep [`screens/home.md`](../screens/home.md) open for product modes and file map.  
 - For **`/pause`**, keep [`screens/pause.md`](../screens/pause.md) open next to [`PauseSession.tsx`](../../src/pages/PauseSession.tsx).
 
@@ -571,7 +571,7 @@ const Home = () => {
 | **Conductor page** (no giant `switch` / logic in JSX) | **Yes** | The bottom of the file is almost only **returns**; wiring lives in hooks and `getHomeSubscriptionGate`. |
 | **Named behavior + tests** | **Yes** for gates | `getHomeSubscriptionGate` + Vitest; other hooks are named and colocated under `use-home-*`. |
 | **Types at source** | **Yes** for `trackedAssetId` | Normalized in `useHolzen`; Home does not cast. |
-| **`React.lazy` + `Suspense` for rare UI** | **Yes** (by delegation) | Lazy Zen lives in [`HomeZenModeRoute`](../../src/components/home/HomeZenModeRoute.tsx); `Home` imports that boundary, not `ZenModeHome` directly. Same idea, split file. |
+| **`React.lazy` + `Suspense` for rare UI** | **Yes** (by delegation) | Lazy Zen lives in [`HomeZenModeRoute`](../../src/screens/home/components/HomeZenModeRoute.tsx); `Home` imports that boundary, not `ZenModeHome` directly. Same idea, split file. |
 | **`React.memo` + stable props for heavy shell** | **Yes** | `HomeDashboardLayout` is memoized; `useHomeDashboardLayoutProps` stabilizes the prop object. |
 | **Child-only-signed-in pattern** | **Not used** | The guide’s **alternative** is a child that mounts only when `profileLoaded` — Home instead keeps **all signed-in hooks in the parent** so order never flips. That is the **first “correct” pattern** in [Rules of Hooks](#rules-of-hooks-why-order-matters), not the child pattern. **Tradeoff:** Zen and loading paths still **execute** dashboard-related hooks; memoization keeps the cost bounded. Same tradeoff is described in [screens/home.md](../screens/home.md) under “Rendering and hooks”. |
 | **“Thin” = low line count** | **Partial** | `Home.tsx` is still **many lines** because listing ~15+ hooks is verbose. **Thin** here means **no business kitchen sink** — not “20 lines total.” Further collapsing into one mega-hook would save lines but **hurt** navigation and grep-ability (arguably *against* the spirit of named hooks). |

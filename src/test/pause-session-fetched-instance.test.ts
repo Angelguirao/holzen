@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { buildFetchedPauseInstanceFromFetch } from '@/lib/pause-session-fetched-instance';
+import { buildFetchedPauseInstanceFromFetch } from '@/features/pause/public';
 
 describe('buildFetchedPauseInstanceFromFetch', () => {
   it('maps reflection, context snapshot, and companion artifact kinds', () => {

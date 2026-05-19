@@ -9,7 +9,7 @@ import { useHolzen } from '@/hooks/use-holzen';
 import { useAuth } from '@/hooks/use-auth';
 import { hapticFeedback } from '@/lib/haptics';
 import { playGroundingChime } from '@/lib/grounding-chime';
-import { type MoodValue } from '@/components/MoodCheck';
+import { type MoodValue } from '@/screens/pause/components/MoodCheck';
 import { MoodIcon } from '@/components/icons/MoodIcon';
 import { useProGate } from '@/hooks/use-pro-gate';
 import { companionFallbacksDisabledClient } from '@/lib/companion-strict';

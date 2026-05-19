@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { parsePauseContextForHomePreview } from '@/lib/pause-context-home-preview';
+import { parsePauseContextForHomePreview } from '@/features/market/public';
 
 describe('parsePauseContextForHomePreview', () => {
   it('extracts 24h BTC line and market sentiment', () => {

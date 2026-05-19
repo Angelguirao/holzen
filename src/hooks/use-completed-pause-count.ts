@@ -1,12 +1,16 @@
 import { useQuery } from '@tanstack/react-query';
 import { useAuth } from '@/hooks/use-auth';
-import { getCompletedPauseCountQueryOptions } from '@/lib/completed-pause-count-query';
+import {
+  COMPLETED_PAUSE_COUNT_QUERY_KEY,
+  fetchCompletedPauseCount,
+  getCompletedPauseCountQueryOptions,
+} from '@/features/pause/public-queries';
 
 export {
   COMPLETED_PAUSE_COUNT_QUERY_KEY,
   fetchCompletedPauseCount,
   getCompletedPauseCountQueryOptions,
-} from '@/lib/completed-pause-count-query';
+};
 
 /**
  * Exact count of completed pause rows for the current user (`pause_instances.state = 'completed'`).

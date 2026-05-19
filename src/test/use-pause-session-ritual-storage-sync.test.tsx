@@ -1,19 +1,15 @@
 import { describe, expect, it, vi, beforeEach } from 'vitest';
 import { renderHook } from '@testing-library/react';
-import type { PersistedSession } from '@/lib/pause-session-storage';
-import { usePauseSessionRitualStorageSync } from '@/hooks/use-pause-session-ritual-storage-sync';
+import { usePauseSessionRitualStorageSync } from '@/screens/pause/hooks/use-pause-session-ritual-storage-sync';
+import { type PersistedSession } from '@/features/pause/public';
 
 const { loadSessionMock } = vi.hoisted(() => ({
   loadSessionMock: vi.fn(),
 }));
 
-vi.mock('@/lib/pause-session-storage', async (importOriginal) => {
-  const actual = await importOriginal<typeof import('@/lib/pause-session-storage')>();
-  return {
-    ...actual,
-    loadSession: () => loadSessionMock(),
-  };
-});
+vi.mock('@/features/pause/infrastructure/session/persisted-session-storage', () => ({
+  loadSession: () => loadSessionMock(),
+}));
 
 const companions = { haiku: null, groundingTitle: null, groundingBody: null } as const;
 const companionPrefs = {

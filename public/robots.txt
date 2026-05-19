@@ -14,5 +14,11 @@ User-agent: *
 Allow: /
 Disallow: /auth
 Disallow: /reset-password
+Disallow: /admin
+Disallow: /pause
+Disallow: /companion/
+Disallow: /journey
+Disallow: /settings
+Disallow: /archive
 
 Sitemap: https://holzen.app/sitemap.xml

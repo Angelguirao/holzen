@@ -1,6 +1,6 @@
 import { describe, it, expect, vi } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
-import { PauseSessionGate } from '@/components/pause/PauseSessionGate';
+import { PauseSessionGate } from '@/screens/pause/components/PauseSessionGate';
 import '@/i18n';
 
 describe('F3 — Pause ritual shell', () => {

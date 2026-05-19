@@ -5,51 +5,52 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClientProvider } from "@tanstack/react-query";
 import { createHolzenQueryClient } from "@/lib/query-client";
 import { setHolzenQueryClient } from "@/lib/holzen-query-client-ref";
-import { BrowserRouter, Routes, Route, Navigate, useLocation } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate, Outlet, useLocation } from "react-router-dom";
 import { reactRouterFutureFlags } from "@/lib/router-future";
 import { AuthProvider, useAuth } from "@/hooks/use-auth";
-import { HolzenProvider } from "@/hooks/use-holzen";
+import { HolzenProvider } from "@/screens/home/hooks/use-holzen";
 import { isAppShellPath } from "@/lib/app-routes";
 import { holzenLog } from "@/lib/holzen-console";
 import { attachHolzenQueryLogging } from "@/lib/holzen-query-logging";
-import { scheduleCheckoutGuardCleanup } from "@/lib/checkout-suppression-window";
-import { ErrorBoundary } from "./components/ErrorBoundary";
-import { OfflineBanner } from "./components/OfflineBanner";
-import { CookieConsent } from "./components/CookieConsent";
-import AuthLoading from "./components/AuthLoading";
-import { AppLayout } from "./components/AppLayout";
-import { FeedbackWidget } from "./components/FeedbackWidget";
+import { scheduleCheckoutGuardCleanup } from "@/features/subscription/public";
+import { ErrorBoundary } from "@/app/components/ErrorBoundary";
+import { OfflineBanner } from "@/app/components/OfflineBanner";
+import { CookieConsent } from "@/app/components/CookieConsent";
+import AuthLoading from "@/app/components/AuthLoading";
+import { AppLayout } from "@/app/components/AppLayout";
+import { RobotsNoIndex } from "@/app/components/PageMeta";
+import { FeedbackWidget } from "@/app/components/FeedbackWidget";
 
-const Home = lazy(() => import("./pages/Home"));
-const Archive = lazy(() => import("./pages/Archive"));
-const JourneyOverview = lazy(() => import("./pages/journey/JourneyOverview"));
-const SettingsRoot = lazy(() => import("./pages/settings/SettingsRoot"));
-const SettingsStateLayout = lazy(() => import("./pages/settings/SettingsStateLayout"));
-const SettingsHub = lazy(() => import("./pages/settings/SettingsHub"));
-const SettingsSectionPage = lazy(() => import("./pages/settings/SettingsSectionPage"));
-const Auth = lazy(() => import("./pages/Auth"));
-const Landing = lazy(() => import("./pages/Landing"));
-const Terms = lazy(() => import("./pages/Terms"));
-const Privacy = lazy(() => import("./pages/Privacy"));
-const ResetPassword = lazy(() => import("./pages/ResetPassword"));
-const NotFound = lazy(() => import("./pages/NotFound"));
-const About = lazy(() => import("./pages/About"));
-const Blog = lazy(() => import("./pages/Blog"));
-const BlogPost = lazy(() => import("./pages/BlogPost"));
-const Reserve = lazy(() => import("./pages/Reserve"));
-const PauseSession = lazy(() => import("./pages/PauseSession"));
-const CompanionZoomOutPage = lazy(() => import("./pages/CompanionZoomOutPage"));
-const CompanionHistoryPage = lazy(() => import("./pages/CompanionHistoryPage"));
-const CompanionSignalPage = lazy(() => import("./pages/CompanionSignalPage"));
-const CompanionGroundingPage = lazy(() => import("./pages/CompanionGroundingPage"));
-const Admin = lazy(() => import("./pages/Admin"));
-const SmokeTest = lazy(() => import("./pages/SmokeTest"));
-const SentryAlerts = lazy(() => import("./pages/SentryAlerts"));
-const EdgeCoverage = lazy(() => import("./pages/EdgeCoverage"));
-const Unsubscribe = lazy(() => import("./pages/Unsubscribe"));
-const BillingHistory = lazy(() => import("./pages/BillingHistory"));
-const SettingsAbout = lazy(() => import("./pages/SettingsAbout"));
-const Roadmap = lazy(() => import("./pages/Roadmap"));
+const Home = lazy(() => import("./screens/home/HomeScreen"));
+const Archive = lazy(() => import("./screens/archive/ArchiveScreen"));
+const JourneyOverview = lazy(() => import("./screens/journey/JourneyOverviewScreen"));
+const SettingsRoot = lazy(() => import("./screens/settings/SettingsRoot"));
+const SettingsStateLayout = lazy(() => import("./screens/settings/SettingsStateLayout"));
+const SettingsHub = lazy(() => import("./screens/settings/SettingsHubScreen"));
+const SettingsSectionPage = lazy(() => import("./screens/settings/SettingsSectionScreen"));
+const Auth = lazy(() => import("./screens/marketing/AuthScreen"));
+const Landing = lazy(() => import("./screens/marketing/LandingScreen"));
+const Terms = lazy(() => import("./screens/marketing/TermsScreen"));
+const Privacy = lazy(() => import("./screens/marketing/PrivacyScreen"));
+const ResetPassword = lazy(() => import("./screens/marketing/ResetPasswordScreen"));
+const NotFound = lazy(() => import("./screens/marketing/NotFoundScreen"));
+const About = lazy(() => import("./screens/marketing/AboutScreen"));
+const Blog = lazy(() => import("./screens/marketing/BlogScreen"));
+const BlogPost = lazy(() => import("./screens/marketing/BlogPostScreen"));
+const Reserve = lazy(() => import("./screens/marketing/ReserveScreen"));
+const PauseSession = lazy(() => import("./screens/pause/PauseSessionScreen"));
+const CompanionZoomOutPage = lazy(() => import("./screens/pause/CompanionZoomOutPage"));
+const CompanionHistoryPage = lazy(() => import("./screens/pause/CompanionHistoryPage"));
+const CompanionSignalPage = lazy(() => import("./screens/pause/CompanionSignalPage"));
+const CompanionGroundingPage = lazy(() => import("./screens/pause/CompanionGroundingPage"));
+const Admin = lazy(() => import("./screens/admin/AdminScreen"));
+const SmokeTest = lazy(() => import("./screens/ops/SmokeTestScreen"));
+const SentryAlerts = lazy(() => import("./screens/ops/SentryAlertsScreen"));
+const EdgeCoverage = lazy(() => import("./screens/ops/EdgeCoverageScreen"));
+const Unsubscribe = lazy(() => import("./screens/marketing/UnsubscribeScreen"));
+const BillingHistory = lazy(() => import("./screens/settings/BillingHistoryScreen"));
+const SettingsAbout = lazy(() => import("./screens/settings/SettingsAboutScreen"));
+const Roadmap = lazy(() => import("./screens/marketing/RoadmapScreen"));
 
 const queryClient = createHolzenQueryClient();
 
@@ -161,6 +162,25 @@ function FeedbackWidgetGate() {
 }
 
 /** Logs pathname + auth state when either changes (under `[holzen:router]`). */
+/** Full-screen authenticated routes — keep out of search indexes. */
+function PrivateExperienceLayout() {
+  return (
+    <>
+      <RobotsNoIndex />
+      <Outlet />
+    </>
+  );
+}
+
+function UtilityNoIndexLayout() {
+  return (
+    <>
+      <RobotsNoIndex />
+      <Outlet />
+    </>
+  );
+}
+
 function RouterLocationLog() {
   const { pathname } = useLocation();
   const { user, loading } = useAuth();
@@ -207,31 +227,23 @@ const App = () => (
                     </Route>
                   </Route>
                 </Route>
-                {/* Immersive full-screen experiences — no nav bar */}
-                <Route path="/pause" element={<ProtectedRoute><PauseSession /></ProtectedRoute>} />
-                <Route
-                  path="/companion/zoom-out/:pauseInstanceId"
-                  element={<ProtectedRoute><CompanionZoomOutPage /></ProtectedRoute>}
-                />
-                <Route
-                  path="/companion/history/:pauseInstanceId"
-                  element={<ProtectedRoute><CompanionHistoryPage /></ProtectedRoute>}
-                />
-                <Route
-                  path="/companion/signal/:pauseInstanceId"
-                  element={<ProtectedRoute><CompanionSignalPage /></ProtectedRoute>}
-                />
-                <Route
-                  path="/companion/grounding/:pauseInstanceId"
-                  element={<ProtectedRoute><CompanionGroundingPage /></ProtectedRoute>}
-                />
-                <Route path="/admin" element={<ProtectedRoute><Admin /></ProtectedRoute>} />
-                <Route path="/admin/smoke-test" element={<ProtectedRoute><SmokeTest /></ProtectedRoute>} />
-                <Route path="/admin/sentry-alerts" element={<ProtectedRoute><SentryAlerts /></ProtectedRoute>} />
-                <Route path="/admin/edge-coverage" element={<ProtectedRoute><EdgeCoverage /></ProtectedRoute>} />
+                <Route element={<ProtectedRoute><PrivateExperienceLayout /></ProtectedRoute>}>
+                  <Route path="/pause" element={<PauseSession />} />
+                  <Route path="/companion/zoom-out/:pauseInstanceId" element={<CompanionZoomOutPage />} />
+                  <Route path="/companion/history/:pauseInstanceId" element={<CompanionHistoryPage />} />
+                  <Route path="/companion/signal/:pauseInstanceId" element={<CompanionSignalPage />} />
+                  <Route path="/companion/grounding/:pauseInstanceId" element={<CompanionGroundingPage />} />
+                  <Route path="/admin" element={<Admin />} />
+                  <Route path="/admin/smoke-test" element={<SmokeTest />} />
+                  <Route path="/admin/sentry-alerts" element={<SentryAlerts />} />
+                  <Route path="/admin/edge-coverage" element={<EdgeCoverage />} />
+                </Route>
                 <Route path="/welcome" element={<PublicOnlyRoute><Landing /></PublicOnlyRoute>} />
-                <Route path="/auth" element={<PublicOnlyRoute><Auth /></PublicOnlyRoute>} />
-                <Route path="/reset-password" element={<ResetPassword />} />
+                <Route element={<UtilityNoIndexLayout />}>
+                  <Route path="/auth" element={<PublicOnlyRoute><Auth /></PublicOnlyRoute>} />
+                  <Route path="/reset-password" element={<ResetPassword />} />
+                  <Route path="/unsubscribe" element={<Unsubscribe />} />
+                </Route>
                 <Route path="/terms" element={<Terms />} />
                 <Route path="/privacy" element={<Privacy />} />
                 <Route path="/about" element={<About />} />
@@ -239,7 +251,6 @@ const App = () => (
                 <Route path="/blog/:slug" element={<BlogPost />} />
                 <Route path="/roadmap" element={<Roadmap />} />
                 <Route path="/reserve" element={<Reserve />} />
-                <Route path="/unsubscribe" element={<Unsubscribe />} />
                 <Route path="*" element={<NotFound />} />
               </Routes>
             </Suspense>

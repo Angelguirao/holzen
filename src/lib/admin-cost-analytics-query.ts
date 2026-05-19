@@ -1,7 +1,7 @@
 import { supabase } from '@/integrations/supabase/client';
 import type { TimePeriod } from '@/lib/admin-stats-bundle-query';
 import { ADMIN_QUERY_PREFIX } from '@/lib/admin-query-namespace';
-import { PRICING } from '@/lib/pricing';
+import { PRICING } from '@/features/subscription/public';
 
 /** Raw rows for admin cost aggregation (`generation_attempts`). */
 export interface AttemptRow {

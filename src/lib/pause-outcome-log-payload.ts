@@ -1,4 +1,2 @@
-/** Payload for `pauseLogStep` with `stepType: 'outcome_logged'`. */
-export function buildOutcomeLoggedPayload(outcome: string): Record<string, unknown> {
-  return { outcome };
-}
+/** @deprecated Import from `@/features/pause/public`. */
+export * from '@/features/pause/public';

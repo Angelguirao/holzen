@@ -6,7 +6,7 @@
 
 | When | Slice |
 |------|--------|
-| 2026-04 | **`Home`:** `NeedAMomentButton`, `AutoCooldownIndicator`, and `ProLockedWidget` moved to **`src/components/home/HomePauseChrome.tsx`**. |
+| 2026-04 | **`Home`:** `NeedAMomentButton`, `AutoCooldownIndicator`, and `ProLockedWidget` moved to **`src/screens/home/components/HomePauseChrome.tsx`**. |
 | 2026-04 | **`PauseSession`:** localStorage + types → **`src/lib/pause-session-storage.ts`**; loading/error full-screen → **`PauseSessionGate`**; curtain / gradient / chrome → **`PauseSessionScaffold`**. |
 | 2026-04 | **`use-holzen`:** pure helpers → **`reflection-persist-error`**, **`holzen-manual-cooldown`**, **`pause-context-from-btc`**, **`btc-move-severity`**, **`next-cron-quarter`** (`src/lib/`). Hook still owns orchestration + state. |
 | 2026-04 | **`use-companion-data`:** **`src/lib/companion-*`** helpers (orchestrate types, reflection cache, mood history, sources, recency, completion sync/maps, slot-apply, URL) + **`use-companion-library-favorites.ts`** for per-slot hearts stored on **`pause_instances.metadata`**. Hook keeps orchestration + companion state. |

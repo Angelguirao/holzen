@@ -1,8 +1,8 @@
 import { describe, expect, it } from 'vitest';
 import { renderHook } from '@testing-library/react';
 import type { TFunction } from 'i18next';
-import type { BtcPriceData } from '@/lib/btc';
-import { usePauseSessionDepthAndBriefCopy } from '@/hooks/use-pause-session-depth-and-brief-copy';
+import type { BtcPriceData } from '@/features/market/public';
+import { usePauseSessionDepthAndBriefCopy } from '@/screens/pause/hooks/use-pause-session-depth-and-brief-copy';
 
 const t = ((key: string, opts?: Record<string, unknown>) =>
   key === 'pause.depthPicker.contextMoved'

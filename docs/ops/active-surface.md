@@ -39,7 +39,7 @@ Server: `user_can_engage_pause(uuid)`; guards on `pause_create_or_reuse` and `pa
 
 ## Deployed edges (shipped)
 
-Listed in `supabase/config.toml` `[functions.*]` and `src/pages/EdgeCoverage.tsx` (also [bruno/active/functions-catalog.md](../../bruno/active/functions-catalog.md)):
+Listed in `supabase/config.toml` `[functions.*]` and `src/screens/ops/EdgeCoverageScreen.tsx` `COVERAGE` (also [bruno/active/functions-catalog.md](../../bruno/active/functions-catalog.md)):
 
 | Group | Functions |
 | --- | --- |

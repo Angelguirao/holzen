@@ -3,7 +3,7 @@ import { render, screen, waitFor } from '@testing-library/react';
 import '@/i18n';
 import '../lapsed-app-mocks';
 import { renderShippedApp } from '../render-shipped-app';
-import { PauseEngagementBlocked } from '@/components/pause/PauseEngagementBlocked';
+import { PauseEngagementBlocked } from '@/screens/pause/components/PauseEngagementBlocked';
 
 describe('F4 — Lapsed read-only surfaces', () => {
   it('allows /archive when lapsed (no Pro gate)', async () => {

@@ -5,7 +5,7 @@ import {
   getHomeShowPauseScheduling,
   getHomeSubscriptionGate,
   getHomeSubscriptionReady,
-} from '@/lib/home-subscription-gate';
+} from '@/features/subscription/public';
 
 describe('getHomeSubscriptionReady', () => {
   it('is false while subscription is loading', () => {

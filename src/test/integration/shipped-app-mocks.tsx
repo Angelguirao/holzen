@@ -60,11 +60,11 @@ vi.mock('@/lib/posthog', () => ({
   initPostHog: vi.fn(),
 }));
 
-vi.mock('@/components/FeedbackWidget', () => ({
+vi.mock('@/app/components/FeedbackWidget', () => ({
   FeedbackWidget: () => null,
 }));
 
-vi.mock('@/components/AppLayout', () => ({
+vi.mock('@/app/components/AppLayout', () => ({
   AppLayout: () => (
     <div data-testid="app-shell">
       <main>
@@ -74,7 +74,7 @@ vi.mock('@/components/AppLayout', () => ({
   ),
 }));
 
-vi.mock('@/components/BottomNav', () => ({
+vi.mock('@/app/components/BottomNav', () => ({
   BottomNav: () => <nav aria-label="Primary" />,
   isPrimaryTabActive: () => false,
 }));
