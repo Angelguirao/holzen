@@ -9,28 +9,21 @@ import { useTranslation } from 'react-i18next';
 import { useHolzen } from '@/screens/home/hooks/use-holzen';
 import { useSubscription } from '@/features/subscription/public-hooks';
 import { useProGate } from '@/features/subscription/public-hooks';
-import { isPauseSessionHeaderBackVisible } from '@/features/pause/public';
 import { isPauseSessionDepthPickerActive } from '@/features/pause/public';
 import { usePauseSessionStepTransition } from '@/screens/pause/hooks/use-pause-session-step-transition';
-import { usePauseBreathSegmentRpcLoggers } from '@/screens/pause/hooks/use-pause-breath-segment-rpc-loggers';
 import { usePauseFeelShiftLogDedupeRefs } from '@/screens/pause/hooks/use-pause-feel-shift-log-dedupe-refs';
 import { usePauseFavoriteToggle } from '@/screens/pause/hooks/use-pause-favorite-toggle';
 import { usePauseSessionInitialMoodHandlers } from '@/screens/pause/hooks/use-pause-session-initial-mood-handlers';
 import { usePauseShiftFrameDoneHandler } from '@/screens/pause/hooks/use-pause-shift-frame-done-handler';
 import { usePauseSessionExitNavigation } from '@/screens/pause/hooks/use-pause-session-exit-navigation';
-import { usePauseSessionBreathStepHandlers } from '@/screens/pause/hooks/use-pause-session-breath-step-handlers';
-import { usePauseSessionHeaderBackHandler } from '@/screens/pause/hooks/use-pause-session-header-back-handler';
 import { usePauseSessionPersistToStorage } from '@/screens/pause/hooks/use-pause-session-persist-to-storage';
 import { usePauseSessionRitualStorageSync } from '@/screens/pause/hooks/use-pause-session-ritual-storage-sync';
 import { usePauseSessionRitualState } from '@/screens/pause/hooks/use-pause-session-ritual-state';
-import { usePauseSessionBreathUi } from '@/screens/pause/hooks/use-pause-session-breath-ui';
-import { usePauseSessionBriefToDeep } from '@/screens/pause/hooks/use-pause-session-brief-to-deep';
 import { usePauseSessionDepthAndBriefCopy } from '@/screens/pause/hooks/use-pause-session-depth-and-brief-copy';
 import { usePauseSessionBreathSecondLabelVariant } from '@/screens/pause/hooks/use-pause-session-breath-second-label-variant';
 import { usePauseSessionTerminalEntryRedirect } from '@/screens/pause/hooks/use-pause-session-terminal-entry-redirect';
 import { usePauseSessionShellBootstrap } from '@/screens/pause/hooks/use-pause-session-shell-bootstrap';
-import { usePauseSessionGoBack } from '@/screens/pause/hooks/use-pause-session-go-back';
-import { usePauseSessionGoToStep } from '@/screens/pause/hooks/use-pause-session-go-to-step';
+import { usePauseSessionBreathHandlers } from '@/screens/pause/hooks/use-pause-session-breath-handlers';
 import { usePauseSessionScaffoldRitual } from '@/screens/pause/hooks/use-pause-session-scaffold-ritual';
 import { JOURNEY_PREFIX } from '@/lib/app-routes';
 import { usePauseSessionDepthPickerHandlers } from '@/screens/pause/hooks/use-pause-session-depth-picker-handlers';
@@ -191,16 +184,6 @@ export function usePauseSessionScreen() {
     }
   }, [phase, handleReturn, requestExitPauseBeforeDone]);
 
-  const {
-    ensureBreathSegment1Logged,
-    ensureBreathSegment2Logged,
-    logBreathSegment1Skipped,
-    logBreathSegment2Skipped,
-  } = usePauseBreathSegmentRpcLoggers({
-    pauseInstanceId,
-    restored,
-    t,
-  });
   const { lastFeelLogKeyRef, lastShiftLogKeyRef } = usePauseFeelShiftLogDedupeRefs(pauseInstanceId);
 
   const { onBrief: depthPickerOnBrief, onDeep: depthPickerOnDeep } = usePauseSessionDepthPickerHandlers({
@@ -261,10 +244,45 @@ export function usePauseSessionScreen() {
     selectedBriefFace,
   });
 
-  const { goToStep } = usePauseSessionGoToStep({
+  const {
+    goToStep,
+    breathingRef,
+    trackBreathTimedActive,
+    handleBriefRepeatBreaths,
+    handleDeepFirstBreathRepeat,
+    handleDeepSecondBreathRepeat,
+    handlePauseHeaderBack,
+    showPauseHeaderBack,
+    handleContinueAfterFirstBreath,
+    handleContinueAfterSecondBreath,
+    handleSkipFirstBreath,
+    handleSkipSecondBreath,
+    handleBriefBreathContinue,
+    handleBriefSkipBreath,
+    handleBriefIntegrateComplete,
+    handleBriefSwitchToDeepPause,
+  } = usePauseSessionBreathHandlers({
+    pauseInstanceId,
+    restored,
+    t,
+    subLoading,
+    subscribed,
+    requirePro,
+    phase,
+    ritualEntry,
+    briefStep,
     step,
+    breathingFirstCompleted,
+    breathingSecondCompleted,
     setSwipeDirection,
     setStep,
+    setBriefStep,
+    setBriefIntegrateDone,
+    setBreathingFirstCompleted,
+    setBreathingSecondCompleted,
+    setRitualEntry,
+    setFrameDone,
+    setMoodAfterDone,
   });
 
   const { handleFrameImDone } = usePauseShiftFrameDoneHandler({
@@ -274,107 +292,6 @@ export function usePauseSessionScreen() {
     setFrameDone,
     setMoodAfterDone,
     goToStep,
-  });
-
-  const { goBack } = usePauseSessionGoBack({
-    ritualEntry,
-    briefStep,
-    step,
-    setSwipeDirection,
-    setBriefStep,
-    setBriefIntegrateDone,
-    setStep,
-  });
-
-  const {
-    breathingRef,
-    breathTimedActive,
-    setBreathTimedActive,
-    breathFirstTimedPatternStarted,
-    breathSecondTimedPatternStarted,
-    setBreathFirstTimedPatternStarted,
-    setBreathSecondTimedPatternStarted,
-    trackBreathTimedActive,
-    handleBriefRepeatBreaths,
-    handleDeepFirstBreathRepeat,
-    handleDeepSecondBreathRepeat,
-  } = usePauseSessionBreathUi({
-    ritualEntry,
-    briefStep,
-    step,
-    setSwipeDirection,
-    setBriefIntegrateDone,
-    setBriefStep,
-    setBreathingFirstCompleted,
-    setBreathingSecondCompleted,
-  });
-
-  const { handlePauseHeaderBack } = usePauseSessionHeaderBackHandler({
-    breathingRef,
-    ritualEntry,
-    briefStep,
-    step,
-    breathTimedActive,
-    breathingFirstCompleted,
-    breathingSecondCompleted,
-    goBack,
-    setBreathingFirstCompleted,
-    setBreathingSecondCompleted,
-    setBreathSecondTimedPatternStarted,
-  });
-
-  const showPauseHeaderBack = isPauseSessionHeaderBackVisible({
-    phase,
-    ritualEntry,
-    briefStep,
-    step,
-    breathTimedActive,
-    breathFirstTimedPatternStarted,
-    breathSecondTimedPatternStarted,
-    breathingFirstCompleted,
-    breathingSecondCompleted,
-  });
-
-  const {
-    handleContinueAfterFirstBreath,
-    handleContinueAfterSecondBreath,
-    handleSkipFirstBreath,
-    handleSkipSecondBreath,
-    handleBriefBreathContinue,
-    handleBriefSkipBreath,
-    handleBriefIntegrateComplete,
-  } = usePauseSessionBreathStepHandlers({
-    goToStep,
-    ritualEntry,
-    briefStep,
-    ensureBreathSegment1Logged,
-    ensureBreathSegment2Logged,
-    logBreathSegment1Skipped,
-    logBreathSegment2Skipped,
-    setBreathingFirstCompleted,
-    setBreathingSecondCompleted,
-    setBriefStep,
-    setBriefIntegrateDone,
-  });
-
-  const { handleBriefSwitchToDeepPause } = usePauseSessionBriefToDeep({
-    subLoading,
-    subscribed,
-    ritualEntry,
-    pauseInstanceId,
-    t,
-    requirePro,
-    setRitualEntry,
-    setSwipeDirection,
-    setStep,
-    setBriefStep,
-    setBriefIntegrateDone,
-    setBreathingFirstCompleted,
-    setBreathingSecondCompleted,
-    setBreathTimedActive,
-    setBreathFirstTimedPatternStarted,
-    setFrameDone,
-    setMoodAfterDone,
   });
 
   const {
