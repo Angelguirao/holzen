@@ -37,6 +37,6 @@ screens/<route>/
 |---------|------------|
 | Pause ritual UI | `screens/pause/components/` |
 | Pause rules / RPC | `features/pause/` |
-| Home dashboard UI | `screens/home/components/` (**5d** done) |
+| Home dashboard UI + hooks | `screens/home/components/`, `screens/home/hooks/` (**5d**, **5h**) |
 | Route wiring | `src/pages/` + `App.tsx` |
 | Primitives | `components/ui/` |
