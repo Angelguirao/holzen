@@ -1,6 +1,6 @@
 import { useTranslation } from 'react-i18next';
 import { AlertCircle } from 'lucide-react';
-import { homeInWidget } from '@/components/home/home-widget-styles';
+import { homeInWidget } from '@/screens/home/components/home-widget-styles';
 import { holzenLog } from '@/lib/holzen-console';
 import { pauseHomeErrorKind, pauseHomeErrorStrings } from '@/lib/home-pause-widget-error';
 import { cn } from '@/lib/utils';

@@ -1,12 +1,12 @@
 import { useTranslation } from 'react-i18next';
 import { AnimatePresence, motion, useReducedMotion } from 'framer-motion';
 import { Loader2 } from 'lucide-react';
-import { HomePauseEmptyFlow } from '@/components/home/HomePauseEmptyFlow';
-import { HomePauseContextMeta } from '@/components/home/HomePauseContextMeta';
-import { homeInWidget } from '@/components/home/home-widget-styles';
+import { HomePauseEmptyFlow } from '@/screens/home/components/HomePauseEmptyFlow';
+import { HomePauseContextMeta } from '@/screens/home/components/HomePauseContextMeta';
+import { homeInWidget } from '@/screens/home/components/home-widget-styles';
 import { cn } from '@/lib/utils';
 import { Sparkles } from 'lucide-react';
-import { HomePauseBlockingErrorPanel } from '@/components/home/HomePauseBlockingErrorPanel';
+import { HomePauseBlockingErrorPanel } from '@/screens/home/components/HomePauseBlockingErrorPanel';
 import { LoadingButton } from '@/components/ui/loading-button';
 import { Skeleton } from '@/components/ui/skeleton';
 import { SubscriptionSkeleton } from '@/components/SubscriptionSkeleton';

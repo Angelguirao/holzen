@@ -1,6 +1,6 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { act, cleanup, render, screen } from '@testing-library/react';
-import { AutoCooldownIndicator } from '@/components/home/HomePauseChrome';
+import { AutoCooldownIndicator } from '@/screens/home/components/HomePauseChrome';
 
 const SNAPSHOT_STORAGE_KEY = 'holzen_home_cooldown_snapshot_v1';
 

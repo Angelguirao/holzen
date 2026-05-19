@@ -1,6 +1,6 @@
 import { useTranslation } from 'react-i18next';
-import { AutoCooldownIndicator, NeedAMomentButton } from '@/components/home/HomePauseChrome';
-import { homeInWidget } from '@/components/home/home-widget-styles';
+import { AutoCooldownIndicator, NeedAMomentButton } from '@/screens/home/components/HomePauseChrome';
+import { homeInWidget } from '@/screens/home/components/home-widget-styles';
 import { cn } from '@/lib/utils';
 
 type Props = {

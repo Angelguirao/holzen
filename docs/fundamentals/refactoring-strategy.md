@@ -25,7 +25,7 @@ It complements:
 | **One vertical slice per change set** | Each bullet in the backlog table is an independently reviewable extraction, not a tree-wide rename. |
 | **Preserve product behavior** | Moves are structural (file boundaries), not semantic rewrites of pause / orchestrate / BTC flows. |
 | **Narrow hooks, don’t micro-fragment** | `use-holzen` and `use-companion-data` still **own orchestration and React state**; helpers are **pure or I/O-shaped** modules in `src/lib/`. |
-| **Colocate UI by feature** | Pause/Home pieces live under `src/components/home/` or `pause/` (or existing feature folders), not a generic `widgets/` dump. |
+| **Colocate UI by feature** | Pause/Home pieces live under `src/screens/home/components/` or `pause/` (or existing feature folders), not a generic `widgets/` dump. |
 
 That is **appropriate** for a shipping product with a small surface area of “god” modules: you get **reviewability and test hooks** without destabilizing the app.
 

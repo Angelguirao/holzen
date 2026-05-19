@@ -3,7 +3,7 @@ import { motion } from 'framer-motion';
 import { useTranslation } from 'react-i18next';
 import { ChevronLeft, ChevronRight, CirclePlus, Heart, Loader2 } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
-import { HomePauseBlockingErrorPanel } from '@/components/home/HomePauseBlockingErrorPanel';
+import { HomePauseBlockingErrorPanel } from '@/screens/home/components/HomePauseBlockingErrorPanel';
 import { PauseNote } from '@/screens/pause/components/PauseNote';
 import { PauseTags } from '@/screens/pause/components/PauseTags';
 import { pauseStepLayout } from '@/screens/pause/components/pause-step-layout';

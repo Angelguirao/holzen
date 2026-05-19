@@ -14,7 +14,7 @@ import {
   type BulkHoldPendingPause,
 } from '@/features/pause/public';
 import { Button } from '@/components/ui/button';
-import { homeInWidget } from '@/components/home/home-widget-styles';
+import { homeInWidget } from '@/screens/home/components/home-widget-styles';
 import {
   Sheet,
   SheetContent,

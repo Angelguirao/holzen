@@ -7,7 +7,7 @@ import { useAuth } from '@/hooks/use-auth';
 import { getPracticeEntriesWeeklyCountQueryOptions } from '@/legacy/full-shell/src/lib/practice-entries-weekly-count-query';
 import { toast } from 'sonner';
 import { useNavigate } from 'react-router-dom';
-import { homeInWidget } from '@/components/home/home-widget-styles';
+import { homeInWidget } from '@/screens/home/components/home-widget-styles';
 import { TOOLS } from '@/lib/app-routes';
 import { usePracticeSuggestion } from '@/legacy/full-shell/src/hooks/use-practice-suggestion';
 import type { SuggestedPracticeId } from '@/legacy/full-shell/src/lib/practice-suggestion';

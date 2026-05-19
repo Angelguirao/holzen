@@ -8,21 +8,21 @@ Authoritative orchestration: [`src/pages/Home.tsx`](../../src/pages/Home.tsx).
 
 | Piece | File |
 |-------|------|
-| Dashboard shell (non-Zen) | [`HomeDashboardLayout.tsx`](../../src/components/home/HomeDashboardLayout.tsx) (`React.memo`) |
-| Section switch + deps type | [`render-home-dashboard-section.tsx`](../../src/components/home/render-home-dashboard-section.tsx) |
-| Pull-to-refresh row | [`HomePullRefreshIndicator.tsx`](../../src/components/home/HomePullRefreshIndicator.tsx) |
-| Customize link button | [`HomeCustomizeLinkButton.tsx`](../../src/components/home/HomeCustomizeLinkButton.tsx) |
-| Zen lazy route (Suspense + `React.lazy`) | [`HomeZenModeRoute.tsx`](../../src/components/home/HomeZenModeRoute.tsx) |
-| Zen layout | [`ZenModeHome.tsx`](../../src/components/home/ZenModeHome.tsx) |
-| Pause widget body | [`HomePauseCardBody.tsx`](../../src/components/home/HomePauseCardBody.tsx) |
-| Pause error panel | [`HomePauseBlockingErrorPanel.tsx`](../../src/components/home/HomePauseBlockingErrorPanel.tsx) |
-| Context meta lines | [`HomePauseContextMeta.tsx`](../../src/components/home/HomePauseContextMeta.tsx) |
-| Expand chevrons | [`HomeExpandChevronButton.tsx`](../../src/components/home/HomeExpandChevronButton.tsx) |
+| Dashboard shell (non-Zen) | [`HomeDashboardLayout.tsx`](../../src/screens/home/components/HomeDashboardLayout.tsx) (`React.memo`) |
+| Section switch + deps type | [`render-home-dashboard-section.tsx`](../../src/screens/home/components/render-home-dashboard-section.tsx) |
+| Pull-to-refresh row | [`HomePullRefreshIndicator.tsx`](../../src/screens/home/components/HomePullRefreshIndicator.tsx) |
+| Customize link button | [`HomeCustomizeLinkButton.tsx`](../../src/screens/home/components/HomeCustomizeLinkButton.tsx) |
+| Zen lazy route (Suspense + `React.lazy`) | [`HomeZenModeRoute.tsx`](../../src/screens/home/components/HomeZenModeRoute.tsx) |
+| Zen layout | [`ZenModeHome.tsx`](../../src/screens/home/components/ZenModeHome.tsx) |
+| Pause widget body | [`HomePauseCardBody.tsx`](../../src/screens/home/components/HomePauseCardBody.tsx) |
+| Pause error panel | [`HomePauseBlockingErrorPanel.tsx`](../../src/screens/home/components/HomePauseBlockingErrorPanel.tsx) |
+| Context meta lines | [`HomePauseContextMeta.tsx`](../../src/screens/home/components/HomePauseContextMeta.tsx) |
+| Expand chevrons | [`HomeExpandChevronButton.tsx`](../../src/screens/home/components/HomeExpandChevronButton.tsx) |
 | Customize copy keys | [`home-customize-section-copy.ts`](../../src/lib/home-customize-section-copy.ts) |
 | Pause error surfacing | [`home-pause-widget-error.ts`](../../src/lib/home-pause-widget-error.ts) |
 | Subscription / Zen gate flags (pure) | [`home-subscription-gate.ts`](../../src/lib/home-subscription-gate.ts) |
 
-Hooks (`src/hooks/use-home-*.ts` / `use-home-*.tsx`): checkout welcome toast, zen mode, completed pause count, outlet `pauseReady`, document title, hero quote analytics, pause arrival chime + prefetch, market display preferences (price hide, BTC mode, chart expand), **visible section ids** (`useHomeVisibleSections`), **customize sheet wiring** (`useHomeCustomizeBridge`), **market + goal/why header chevrons** (`useHomeMarketGoalHeaders`), **pause navigation + checkout** (`useHomePauseActions`), **pause card projection** (`useHomePauseCardProjection`), **Today wiring** (`useHomeDashboardTodayWiring` composes `useHomeDashboardSectionDeps` + `useHomeDashboardSectionRenderers`; section deps default an optional compact `HolzenNumber` market footer when `marketFooter` is omitted), **dashboard layout props** (`useHomeDashboardLayoutProps` — stable object for `HomeDashboardLayout`), **pause context preview parsing** (`useHomePauseContextPreviews`), **pull full reload** (`useHomePullFullReload`), **Zen route props** (`useHomeZenModeRouteProps`). App shell outlet typing: [`home-app-layout-outlet.ts`](../../src/lib/home-app-layout-outlet.ts). Layout prop surface: exported **`HomeDashboardLayoutProps`** on [`HomeDashboardLayout.tsx`](../../src/components/home/HomeDashboardLayout.tsx). Use **`HOME_WIDGET_DEFAULT_ORDER`** from optional-visibility for a stable `useWidgetLayout` default-order reference. Subscription booleans for Home/Zen come from **`getHomeSubscriptionGate`** in `home-subscription-gate.ts` (Vitest-covered).
+Hooks (`src/hooks/use-home-*.ts` / `use-home-*.tsx`): checkout welcome toast, zen mode, completed pause count, outlet `pauseReady`, document title, hero quote analytics, pause arrival chime + prefetch, market display preferences (price hide, BTC mode, chart expand), **visible section ids** (`useHomeVisibleSections`), **customize sheet wiring** (`useHomeCustomizeBridge`), **market + goal/why header chevrons** (`useHomeMarketGoalHeaders`), **pause navigation + checkout** (`useHomePauseActions`), **pause card projection** (`useHomePauseCardProjection`), **Today wiring** (`useHomeDashboardTodayWiring` composes `useHomeDashboardSectionDeps` + `useHomeDashboardSectionRenderers`; section deps default an optional compact `HolzenNumber` market footer when `marketFooter` is omitted), **dashboard layout props** (`useHomeDashboardLayoutProps` — stable object for `HomeDashboardLayout`), **pause context preview parsing** (`useHomePauseContextPreviews`), **pull full reload** (`useHomePullFullReload`), **Zen route props** (`useHomeZenModeRouteProps`). App shell outlet typing: [`home-app-layout-outlet.ts`](../../src/lib/home-app-layout-outlet.ts). Layout prop surface: exported **`HomeDashboardLayoutProps`** on [`HomeDashboardLayout.tsx`](../../src/screens/home/components/HomeDashboardLayout.tsx). Use **`HOME_WIDGET_DEFAULT_ORDER`** from optional-visibility for a stable `useWidgetLayout` default-order reference. Subscription booleans for Home/Zen come from **`getHomeSubscriptionGate`** in `home-subscription-gate.ts` (Vitest-covered).
 
 ## Purpose
 

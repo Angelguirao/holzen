@@ -2,7 +2,7 @@ import type { TFunction } from 'i18next';
 import type { ReactNode } from 'react';
 import { useMemo } from 'react';
 import { HolzenNumber } from '@/components/HolzenNumber';
-import type { HomeDashboardSectionDeps } from '@/components/home/render-home-dashboard-section';
+import type { HomeDashboardSectionDeps } from '@/screens/home/components/render-home-dashboard-section';
 import type { BtcPriceData, TrackedAssetId } from '@/features/market/public';
 
 /** Memoized bundle passed into {@link renderHomeDashboardSection}. */

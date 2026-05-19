@@ -2,7 +2,7 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Pause, Timer, Lock, ArrowRight } from 'lucide-react';
 import { LoadingButton } from '@/components/ui/loading-button';
-import { homeInWidget } from '@/components/home/home-widget-styles';
+import { homeInWidget } from '@/screens/home/components/home-widget-styles';
 import { cn } from '@/lib/utils';
 
 /** Format ms as m:ss for short countdowns (e.g. next cron tick, manual cooldown under one minute). */

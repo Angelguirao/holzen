@@ -12,7 +12,7 @@ import { JOURNEY_PREFIX } from '@/lib/app-routes';
 import { Skeleton } from '@/components/ui/skeleton';
 import type { BadgeSnapshot } from '@/lib/badges/compute';
 import { cn } from '@/lib/utils';
-import { homeInWidget } from '@/components/home/home-widget-styles';
+import { homeInWidget } from '@/screens/home/components/home-widget-styles';
 
 type ScoreTrend = 'improving' | 'declining' | 'stable';
 

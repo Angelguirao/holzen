@@ -3,7 +3,7 @@ import type { ReactNode } from 'react';
 import {
   renderHomeDashboardSection,
   type HomeDashboardSectionDeps,
-} from '@/components/home/render-home-dashboard-section';
+} from '@/screens/home/components/render-home-dashboard-section';
 
 export function useHomeDashboardSectionRenderers(
   sectionDeps: HomeDashboardSectionDeps,

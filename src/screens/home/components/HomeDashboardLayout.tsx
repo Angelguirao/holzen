@@ -1,10 +1,10 @@
 import type { HTMLAttributes, ReactNode } from 'react';
 import { memo } from 'react';
 import { useTranslation } from 'react-i18next';
-import { HomeHeroQuote } from '@/components/home/HomeHeroQuote';
-import { HomeCustomizeSheet } from '@/components/home/HomeCustomizeSheet';
-import { HomePullRefreshIndicator } from '@/components/home/HomePullRefreshIndicator';
-import { HomeCustomizeLinkButton } from '@/components/home/HomeCustomizeLinkButton';
+import { HomeHeroQuote } from '@/screens/home/components/HomeHeroQuote';
+import { HomeCustomizeSheet } from '@/screens/home/components/HomeCustomizeSheet';
+import { HomePullRefreshIndicator } from '@/screens/home/components/HomePullRefreshIndicator';
+import { HomeCustomizeLinkButton } from '@/screens/home/components/HomeCustomizeLinkButton';
 import { InstallHolzenCard } from '@/components/InstallHolzenCard';
 import { TestimonialRequest } from '@/components/TestimonialRequest';
 export interface HomeDashboardLayoutCustomizeProps {
