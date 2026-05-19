@@ -26,7 +26,7 @@ screens/<route>/
 | `pause/` | `/pause`, `/companion/*` — **`PauseSessionScreen`**, `components/`, `hooks/` | [docs/screens/pause.md](../../docs/screens/pause.md) |
 | `archive/` | Archive tab — **`components/` migrated (5e)** | [docs/design/information-architecture.md](../../docs/design/information-architecture.md) |
 | `journey/` | Journey tab — **`components/` migrated (5e)** | [docs/screens/journey-overview.md](../../docs/screens/journey-overview.md) |
-| `settings/` | Settings hub — **`components/` migrated (5e)**; route shells in `pages/settings/` | — |
+| `settings/` | Settings hub — **`SettingsStateLayout`**, `hooks/`, `components/`; thin `pages/settings/` | [README](settings/README.md) |
 | `marketing/` | Landing, blog, legal — **`components/` migrated (5g)** | — |
 | `admin/` | `/admin` — **`components/` + screen (5g)** | — |
 

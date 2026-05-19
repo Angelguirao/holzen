@@ -16,7 +16,7 @@ import {
   getCheckoutSuppressionWindowMinutes,
   setCheckoutSuppressionWindowMinutes,
 } from '@/features/subscription/public';
-import { readThrownMessage } from '@/pages/settings/readThrownMessage';
+import { readThrownMessage } from '@/screens/settings/read-thrown-message';
 import { isHapticEnabled, setHapticEnabled as persistHapticEnabled } from '@/lib/haptics';
 
 export function useSettingsModel() {

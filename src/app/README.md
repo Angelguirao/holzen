@@ -21,5 +21,12 @@ Cross-route chrome and providers: layout, bottom nav, document meta, error bound
 | `components/AuthLoading.tsx` | Auth bootstrap spinner |
 | `components/AppVersionBadge.tsx` | Build version display |
 | `components/FeedbackWidget.tsx` | Global feedback sheet (bug / feature / question) |
+| `components/HoldGoalWidget.tsx` | Hold goal editor (Home + Settings) |
+| `components/ProLock.tsx` | Pro feature gate wrapper |
+| `components/SubscriptionSkeleton.tsx` | Subscription loading placeholders |
+| `components/QuietWindowsManager.tsx` | Quiet hours UI (Settings) |
+| `components/ThresholdSetting.tsx` | BTC threshold control (Settings) |
+
+Settings orchestration: `src/screens/settings/hooks/`, `SettingsStateLayout.tsx`.
 
 See [frontend-module-layout.md](../../docs/fundamentals/frontend-module-layout.md) wave **5j**.

@@ -1,8 +1,8 @@
 import { Link, Navigate, useParams } from 'react-router-dom';
 import { ArrowLeft } from 'lucide-react';
 import { PageHeading } from '@/app/components/PageHeading';
-import { isSettingsSectionId, type SettingsSectionId } from '@/pages/settings/sectionIds';
-import { useSettingsState } from '@/pages/settings/use-settings-state';
+import { isSettingsSectionId, type SettingsSectionId } from '@/screens/settings/section-ids';
+import { useSettingsState } from '@/screens/settings/hooks/use-settings-state';
 import {
   SettingsYouPanel,
   SettingsReflectionPanel,

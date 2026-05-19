@@ -6,17 +6,12 @@ src/components/CreditsDashboard.tsx
 src/components/ErrorRetry.tsx
 src/components/FeedbackForm.tsx
 src/components/HistoryCalendar.tsx
-src/components/HoldGoalWidget.tsx
 src/components/InstallHolzenCard.tsx
 src/components/LetterViewer.tsx
 src/components/NavLink.tsx
-src/components/ProLock.tsx
-src/components/QuietWindowsManager.tsx
 src/components/ReferralSection.tsx
 src/components/ShareReflection.tsx
 src/components/SourceManagement.tsx
-src/components/SubscriptionSkeleton.tsx
 src/components/TheVoid.tsx
 src/components/ThresholdFrequencyEstimator.tsx
-src/components/ThresholdSetting.tsx
 src/components/WritingField.tsx

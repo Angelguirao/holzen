@@ -2,7 +2,7 @@ import { useState, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
-import { readThrownMessage } from '@/pages/settings/readThrownMessage';
+import { readThrownMessage } from '@/screens/settings/read-thrown-message';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 

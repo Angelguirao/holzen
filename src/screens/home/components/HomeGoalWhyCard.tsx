@@ -2,7 +2,7 @@ import { useEffect, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useQuery } from '@tanstack/react-query';
 import { AnimatePresence, motion, useReducedMotion } from 'framer-motion';
-import { HoldGoalWidget } from '@/components/HoldGoalWidget';
+import { HoldGoalWidget } from '@/app/components/HoldGoalWidget';
 import { useHolzen } from '@/screens/home/hooks/use-holzen';
 import { useAuth } from '@/hooks/use-auth';
 import { getProfileRowQueryOptions } from '@/features/user/public-queries';

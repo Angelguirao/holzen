@@ -1,7 +1,7 @@
 import { useTranslation } from 'react-i18next';
 import { Loader2, Sparkles } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
-import { SubscriptionSkeleton } from '@/components/SubscriptionSkeleton';
+import { SubscriptionSkeleton } from '@/app/components/SubscriptionSkeleton';
 import { LoadingButton } from '@/components/ui/loading-button';
 import { HomePauseEmptyFlow } from '@/screens/home/components/HomePauseEmptyFlow';
 import { HomePauseBlockingErrorPanel } from '@/screens/home/components/HomePauseBlockingErrorPanel';
