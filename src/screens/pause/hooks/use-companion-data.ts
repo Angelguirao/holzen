@@ -23,7 +23,6 @@ import {
 } from '@/features/pause/public-queries';
 import { companionUiCompletionQueryKey } from '@/features/pause/public';
 import { getRecencyHints } from '@/features/pause/public';
-import { parseEdgeFunctionError, toUserFacingAiErrorMessage } from '@/lib/edge-function-error';
 import {
   applyOrchestrateSlotLazyOrRegenerate,
   EMPTY_COMPANION_SLOT_RELAXATIONS,
@@ -40,19 +39,16 @@ import {
   hasInvokedIntervention,
   resetInterventionIdempotency,
   runOnceIntervention,
+  companionSlotToGenerationTaxonomy,
+  isCompanionOrchestratePaywallCode,
+  isOrchestratePayloadError,
+  resolveOrchestrateInvokeUserMessage,
 } from '@/features/pause/public';
 import { useSubscription } from '@/features/subscription/public-hooks';
 import { useProGate } from '@/features/subscription/public-hooks';
 import { isPaidLimitReached, showLimitReachedToast } from '@/features/subscription/public-limits';
 import { trackEvent } from '@/lib/posthog';
 import { trackCompanionServed } from '@/features/pause/public';
-
-const GEN_TYPE_BY_SLOT: Record<RegenerateCompanionSlot, 'signal' | 'grounding' | 'history' | 'zoom_out'> = {
-  signal: 'signal',
-  grounding: 'grounding',
-  history: 'history',
-  zoomOut: 'zoom_out',
-};
 
 export type {
   RegenerateCompanionSlot,
@@ -462,7 +458,7 @@ export function useCompanionData({ companions, prefs, pauseInstanceId, context, 
       });
 
       trackEvent('generation.initiated', {
-        companion_type: GEN_TYPE_BY_SLOT[slot],
+        companion_type: companionSlotToGenerationTaxonomy(slot),
         source: 'lazy',
       });
 
@@ -488,15 +484,10 @@ export function useCompanionData({ companions, prefs, pauseInstanceId, context, 
       });
 
       const body = data as Record<string, unknown> | null;
-      const payloadError = !!fnError || !body || Boolean(body.error);
-      if (payloadError) {
-        const parsedError = fnError ? await parseEdgeFunctionError(fnError) : { code: null, message: null, details: null };
-        const code = typeof body?.code === 'string' ? body.code : parsedError.code;
-        const msg = toUserFacingAiErrorMessage(
-          {
-            ...parsedError,
-            message: typeof body?.error === 'string' ? body.error : parsedError.message,
-          },
+      if (isOrchestratePayloadError(fnError, body)) {
+        const { code, userMessage: msg } = await resolveOrchestrateInvokeUserMessage(
+          fnError,
+          body,
           'This AI feature is temporarily unavailable. Please try again in a minute.',
         );
         holzenLog.companion('lazy fetch orchestrate failed', {
@@ -506,7 +497,7 @@ export function useCompanionData({ companions, prefs, pauseInstanceId, context, 
           bodyError: msg,
           bodyCode: code,
         });
-        if (code === 'companions_quota_exceeded' || code === 'companions_upgrade_required') {
+        if (isCompanionOrchestratePaywallCode(code)) {
           // Roll back the optimistic spend and route to the standard
           // upsell so the very-first card tap that hits a paywall lands
           // in the same place as regenerate.
@@ -644,7 +635,7 @@ export function useCompanionData({ companions, prefs, pauseInstanceId, context, 
       });
 
       trackEvent('generation.initiated', {
-        companion_type: GEN_TYPE_BY_SLOT[slot],
+        companion_type: companionSlotToGenerationTaxonomy(slot),
         source: 'regenerate',
       });
 
@@ -666,18 +657,10 @@ export function useCompanionData({ companions, prefs, pauseInstanceId, context, 
       });
 
       const body = data as Record<string, unknown> | null;
-      const payloadError = !!fnError || !body || Boolean(body.error);
-      if (payloadError) {
-        const parsedError = fnError ? await parseEdgeFunctionError(fnError) : { code: null, message: null, details: null };
-        const code = typeof body?.code === 'string' ? body.code : parsedError.code;
-        const msg = toUserFacingAiErrorMessage(
-          {
-            ...parsedError,
-            message:
-              typeof body?.error === 'string'
-                ? body.error
-                : parsedError.message ?? fnError?.message,
-          },
+      if (isOrchestratePayloadError(fnError, body)) {
+        const { code, userMessage: msg } = await resolveOrchestrateInvokeUserMessage(
+          fnError,
+          body,
           'This AI feature is temporarily unavailable. Please try again in a minute.',
         );
         holzenLog.companion('regenerate orchestrate failed', {
@@ -687,7 +670,7 @@ export function useCompanionData({ companions, prefs, pauseInstanceId, context, 
           bodyError: typeof body?.error === 'string' ? body.error : null,
           bodyCode: code,
         });
-        if (code === 'companions_quota_exceeded' || code === 'companions_upgrade_required') {
+        if (isCompanionOrchestratePaywallCode(code)) {
           toast({
             title: 'Companion unavailable',
             description: msg ?? 'This companion is outside your current plan allowance.',
