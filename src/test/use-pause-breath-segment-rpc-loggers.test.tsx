@@ -1,7 +1,7 @@
 import { describe, expect, it, vi, beforeEach } from 'vitest';
 import { renderHook, act } from '@testing-library/react';
 import type { TFunction } from 'i18next';
-import { usePauseBreathSegmentRpcLoggers } from '@/hooks/use-pause-breath-segment-rpc-loggers';
+import { usePauseBreathSegmentRpcLoggers } from '@/screens/pause/hooks/use-pause-breath-segment-rpc-loggers';
 import { showPauseStepSyncFailedToast } from '@/features/pause/public';
 import { makeTestPersistedPauseSession } from '@/test/make-test-persisted-pause-session';
 

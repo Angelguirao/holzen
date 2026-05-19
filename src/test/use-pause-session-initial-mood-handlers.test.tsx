@@ -2,7 +2,7 @@ import { describe, expect, it, vi, beforeEach } from 'vitest';
 import { renderHook, act } from '@testing-library/react';
 import type { TFunction } from 'i18next';
 import type { MutableRefObject } from 'react';
-import { usePauseSessionInitialMoodHandlers } from '@/hooks/use-pause-session-initial-mood-handlers';
+import { usePauseSessionInitialMoodHandlers } from '@/screens/pause/hooks/use-pause-session-initial-mood-handlers';
 
 const { pauseLogStepMock } = vi.hoisted(() => ({
   pauseLogStepMock: vi.fn(),

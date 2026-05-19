@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { renderHook } from '@testing-library/react';
-import { usePauseSessionStepTransition } from '@/hooks/use-pause-session-step-transition';
+import { usePauseSessionStepTransition } from '@/screens/pause/hooks/use-pause-session-step-transition';
 
 type Props = { swipeDirection: 'forward' | 'back'; prm: boolean | null };
 

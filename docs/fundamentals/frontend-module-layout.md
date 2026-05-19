@@ -350,8 +350,8 @@ Same dependency rules as §2–3 for layers that exist. `npm run check:feature-i
 | **5e** | **Archive, Journey, Settings** | **Done** — `screens/{archive,journey,settings}/components/` |
 | **5f** | Companion routes | **Done** — `/companion/*` pages + companion UI under `screens/pause/`; thin `pages/Companion*.tsx` re-exports |
 | **5g** | Marketing / admin | **Done** — `screens/marketing/components/`, `screens/admin/` |
-| **5h** | Orchestration | **Partial** — `use-home-*` → `screens/home/hooks/`; `use-companion-data` → `screens/pause/hooks/`; `use-holzen` remains cross-screen in `hooks/` |
-| **5i** | Shrink global layers | **Partial** — allowlist 48 root components (was 59); no `components/pause|home|archive` folders |
+| **5h** | Orchestration | **Done (shipped surfaces)** — `use-home-*` + `HolzenProvider`/`useHolzen` → `screens/home/hooks/` (shim `@/hooks/use-holzen`); `use-pause-session-*` + ritual hooks → `screens/pause/hooks/`; `HomeScreen` / `PauseSessionScreen` with thin `pages/` re-exports |
+| **5i** | Shrink global layers | **Partial** — allowlist 48 root shell/shared components; deprecated feature folders removed; optional follow-up: zero shims |
 | **6** | **Gated:** `pnpm-workspace.yaml`, `apps/web`, `packages/*` extract | Only after ADR §8 trigger; `build` from `apps/web` |
 | **7** | `shared-kernel`, `contracts` (minimal), `packages/infrastructure` | Adapter smoke test |
 | **8+** | `apps/web/src/screens`; `check:package-boundaries` | Post-extraction only |
