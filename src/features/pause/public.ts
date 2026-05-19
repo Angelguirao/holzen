@@ -300,6 +300,11 @@ export {
   type CompanionOrchestrateSessionContext,
 } from './application/use-cases/companion/build-companion-orchestrate-body';
 export {
+  runCompanionSlotOrchestrate,
+  type CompanionSlotOrchestrateMode,
+  type RunCompanionSlotOrchestrateResult,
+} from './application/use-cases/companion/run-companion-slot-orchestrate';
+export {
   setCompanionSlotError,
   setCompanionSlotLoading,
   type CompanionSlotErrorSetters,
