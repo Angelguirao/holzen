@@ -98,6 +98,15 @@ export {
   type ReflectGenerationPrerequisite,
 } from './application/use-cases/reflect/generation-prerequisites';
 export {
+  isAbortLikeReflectError,
+  reflectGenerationUserErrorMessage,
+} from './application/use-cases/reflect/reflect-generation-errors';
+export {
+  buildReflectGenerationEdgeInvokeInput,
+  type ReflectGenerationEdgeInvokeInput,
+  type ReflectGenerationProfileInput,
+} from './application/use-cases/reflect/reflect-generation-edge-params';
+export {
   BOX_BREATH_PHASE_COUNT,
   computeBreathingPhaseAdvance,
   resolveBreathingCompleted,
