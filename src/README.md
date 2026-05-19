@@ -28,6 +28,7 @@ Dead IA (`/tools/*`, `/library`, `/journey/stats`, …) → `NotFound` (no legac
 
 ## Architecture
 
+- [`docs/fundamentals/client-src-layout.md`](../docs/fundamentals/client-src-layout.md) — **folder map** (`app` / `screens` / `components` / `features`), layer diagram, PR alignment checklist.
 - [`docs/fundamentals/holzen-application-architecture.md`](../docs/fundamentals/holzen-application-architecture.md) — principles (bounded contexts, use cases, ports).
 - [`docs/fundamentals/frontend-module-layout.md`](../docs/fundamentals/frontend-module-layout.md) — `src/features/` layout (now) and `packages/*` north star (gated).
 - [`features/README.md`](features/README.md) — bounded-context folders under root Vite.

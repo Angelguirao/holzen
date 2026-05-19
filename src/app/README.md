@@ -4,7 +4,7 @@ Cross-route chrome and providers: layout, bottom nav, document meta, error bound
 
 **Screens** (`src/screens/<route>/`) own tab-specific UI and orchestration. **Features** (`src/features/*`) own domain truth.
 
-**Canonical:** [frontend-module-layout.md](../../docs/fundamentals/frontend-module-layout.md) wave **5j**.
+**Canonical:** [client-src-layout.md](../../docs/fundamentals/client-src-layout.md), [frontend-module-layout.md](../../docs/fundamentals/frontend-module-layout.md) wave **5j**.
 
 ## Related folders
 
