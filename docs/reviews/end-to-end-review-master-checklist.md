@@ -49,7 +49,7 @@ Use this slice when signing off **production** on `feature/mvpPauseCleanup` / po
 - [x] `OfflineBanner`, `CookieConsent`, `ScrollToTop`, `Sonner` (as relevant to flows you test) — *L1: `App.tsx` wiring; `ScrollToTop` on pathname; Sonner inside `TooltipProvider`.*
 - [x] `ErrorBoundary` + `FeedbackWidgetGate` (signed-in only) — *L1: root boundary; feedback only when `useAuth().user`.*
 - [x] `RouterLocationLog` / routing instrumentation (sanity: no PII leaks) — *L1: logs pathname, authLoading, signedIn, `user?.id?.slice(0,8)` only.*
-- [x] `CheckoutGuardCleanup` (checkout return UX) — *L1: `scheduleCheckoutGuardCleanup` on mount; covered by `src/test/checkout-guard-cleanup.test.ts`.*
+- [x] `CheckoutGuardCleanup` (checkout return UX) — *L1: `scheduleCheckoutGuardCleanup` on mount; covered by `src/features/subscription/application/checkout-guard-cleanup.test.ts`.*
 
 ### Home
 
