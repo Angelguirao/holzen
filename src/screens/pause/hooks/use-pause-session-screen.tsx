@@ -11,7 +11,6 @@ import { useSubscription } from '@/features/subscription/public-hooks';
 import { useProGate } from '@/features/subscription/public-hooks';
 import { type MoodValue } from '@/screens/pause/components/MoodCheck';
 import { type PauseStep } from '@/screens/pause/components/PauseProgress';
-import { type PauseBreathingHandle } from '@/screens/pause/components/PauseBreathing';
 import { isPauseSessionHeaderBackVisible } from '@/features/pause/public';
 import { briefSwitchToDeepPauseState } from '@/features/pause/public';
 import { logPauseRitualDepthUpgraded } from '@/features/pause/public-rpc';
@@ -47,7 +46,7 @@ import { usePauseSessionHeaderBackHandler } from '@/screens/pause/hooks/use-paus
 import { usePauseSessionPersistToStorage } from '@/screens/pause/hooks/use-pause-session-persist-to-storage';
 import { usePauseSessionRitualStorageSync } from '@/screens/pause/hooks/use-pause-session-ritual-storage-sync';
 import { usePauseSessionEntryPresentationEffects } from '@/screens/pause/hooks/use-pause-session-entry-presentation-effects';
-import { usePauseSessionBreathTimedActiveReset } from '@/screens/pause/hooks/use-pause-session-breath-timed-active-reset';
+import { usePauseSessionBreathUi } from '@/screens/pause/hooks/use-pause-session-breath-ui';
 import { usePauseSessionDepthAndBriefCopy } from '@/screens/pause/hooks/use-pause-session-depth-and-brief-copy';
 import { usePauseSessionBreathSecondLabelVariant } from '@/screens/pause/hooks/use-pause-session-breath-second-label-variant';
 import type { PauseImpactData } from '@/features/pause/public';
@@ -348,46 +347,31 @@ export function usePauseSessionScreen() {
     setStep,
   });
 
-  const breathingRef = useRef<PauseBreathingHandle>(null);
   const decidingRef = useRef(false);
-  const [breathTimedActive, setBreathTimedActive] = useState(false);
-  /** After Start on first Breathe: hide shell back until intro again (wireframe: back only to change mood before starting). */
-  const [breathFirstTimedPatternStarted, setBreathFirstTimedPatternStarted] = useState(false);
-  /** After Start on second Breathe (deep): hide shell back until intro again — matches wireframe “5 of 6” screen. */
-  const [breathSecondTimedPatternStarted, setBreathSecondTimedPatternStarted] = useState(false);
   const [soundMuted, setSoundMuted] = useState(true);
 
-  usePauseSessionBreathTimedActiveReset({ step, ritualEntry, briefStep, setBreathTimedActive });
-
-  const trackBreathTimedActive = useCallback(
-    (active: boolean) => {
-      if (
-        active &&
-        ((ritualEntry === 'deep' && step === 'breathe') ||
-          (ritualEntry === 'brief' && briefStep === 'breath') ||
-          (ritualEntry === 'picker' && step === 'breathe'))
-      ) {
-        setBreathFirstTimedPatternStarted(true);
-      }
-      if (active && (ritualEntry === 'deep' || ritualEntry === 'picker') && step === 'breath2') {
-        setBreathSecondTimedPatternStarted(true);
-      }
-      setBreathTimedActive(active);
-    },
-    [ritualEntry, briefStep, step],
-  );
-
-  useEffect(() => {
-    const onFirstBreath =
-      (ritualEntry === 'deep' && step === 'breathe') ||
-      (ritualEntry === 'brief' && briefStep === 'breath') ||
-      (ritualEntry === 'picker' && step === 'breathe');
-    if (!onFirstBreath) setBreathFirstTimedPatternStarted(false);
-  }, [ritualEntry, step, briefStep]);
-
-  useEffect(() => {
-    if (step !== 'breath2') setBreathSecondTimedPatternStarted(false);
-  }, [step]);
+  const {
+    breathingRef,
+    breathTimedActive,
+    setBreathTimedActive,
+    breathFirstTimedPatternStarted,
+    breathSecondTimedPatternStarted,
+    setBreathFirstTimedPatternStarted,
+    setBreathSecondTimedPatternStarted,
+    trackBreathTimedActive,
+    handleBriefRepeatBreaths,
+    handleDeepFirstBreathRepeat,
+    handleDeepSecondBreathRepeat,
+  } = usePauseSessionBreathUi({
+    ritualEntry,
+    briefStep,
+    step,
+    setSwipeDirection,
+    setBriefIntegrateDone,
+    setBriefStep,
+    setBreathingFirstCompleted,
+    setBreathingSecondCompleted,
+  });
 
   const { handlePauseHeaderBack } = usePauseSessionHeaderBackHandler({
     breathingRef,
@@ -436,45 +420,6 @@ export function usePauseSessionScreen() {
     setBriefStep,
     setBriefIntegrateDone,
   });
-
-  const handleBriefRepeatBreaths = useCallback(() => {
-    setSwipeDirection('back');
-    setBriefIntegrateDone(false);
-    setBreathingFirstCompleted(false);
-    setBreathTimedActive(false);
-    setBreathFirstTimedPatternStarted(false);
-    setBriefStep('breath');
-    queueMicrotask(() => breathingRef.current?.resetToIntro());
-  }, [
-    breathingRef,
-    setSwipeDirection,
-    setBriefIntegrateDone,
-    setBreathingFirstCompleted,
-    setBreathTimedActive,
-    setBriefStep,
-  ]);
-
-  const handleDeepFirstBreathRepeat = useCallback(() => {
-    setSwipeDirection('back');
-    setBreathingFirstCompleted(false);
-    setBreathTimedActive(false);
-    setBreathFirstTimedPatternStarted(false);
-    queueMicrotask(() => breathingRef.current?.resetToIntro());
-  }, [breathingRef, setSwipeDirection, setBreathingFirstCompleted, setBreathTimedActive]);
-
-  const handleDeepSecondBreathRepeat = useCallback(() => {
-    setSwipeDirection('back');
-    setBreathingSecondCompleted(false);
-    setBreathTimedActive(false);
-    setBreathSecondTimedPatternStarted(false);
-    queueMicrotask(() => breathingRef.current?.resetToIntro());
-  }, [
-    breathingRef,
-    setSwipeDirection,
-    setBreathingSecondCompleted,
-    setBreathTimedActive,
-    setBreathSecondTimedPatternStarted,
-  ]);
 
   const handleBriefSwitchToDeepPause = useCallback(async () => {
     if (!requirePro('deep_pause')) return;
