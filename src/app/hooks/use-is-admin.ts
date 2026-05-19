@@ -1,6 +1,6 @@
 import { useMemo } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { useAuth } from '@/hooks/use-auth';
+import { useAuth } from '@/features/auth/public';
 import { isAdminFromEnvList } from '@/features/user/public';
 import { getProfileRowQueryOptions } from '@/features/user/public-queries';
 

@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
 import { Tag, X } from 'lucide-react';
-import { useAuth } from '@/hooks/use-auth';
+import { useAuth } from '@/features/auth/public';
 import { pauseArchiveListQueryPrefix } from '@/features/pause/public';
 import { pauseLogStep } from '@/features/pause/public-rpc';
 import {

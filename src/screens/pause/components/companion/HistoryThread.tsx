@@ -2,7 +2,7 @@ import { useMemo } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { useAuth } from '@/hooks/use-auth';
+import { useAuth } from '@/features/auth/public';
 import type { RegenerateCompanionSlot } from '@/features/pause/public';
 import { getHistoryThreadQueryOptions, type HistoryThreadRow } from '@/features/pause/public-queries';
 

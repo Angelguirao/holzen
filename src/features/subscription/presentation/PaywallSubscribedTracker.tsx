@@ -1,5 +1,5 @@
 import { useEffect, useRef } from 'react';
-import { useAuth } from '@/hooks/use-auth';
+import { useAuth } from '@/features/auth/public';
 import {
   POST_CHECKOUT_SUBSCRIBE_FLAG,
   useSubscription,

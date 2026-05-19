@@ -1,5 +1,5 @@
 import { useQuery } from '@tanstack/react-query';
-import { useAuth } from '@/hooks/use-auth';
+import { useAuth } from '@/features/auth/public';
 import {
   COMPLETED_PAUSE_COUNT_QUERY_KEY,
   fetchCompletedPauseCount,

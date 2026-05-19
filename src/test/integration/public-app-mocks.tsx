@@ -2,7 +2,7 @@ import type { ReactNode } from 'react';
 import { vi } from 'vitest';
 import '@/i18n';
 
-vi.mock('@/hooks/use-auth', () => ({
+vi.mock('@/features/auth/public', () => ({
   AuthProvider: ({ children }: { children: ReactNode }) => children,
   useAuth: () => ({
     user: null,

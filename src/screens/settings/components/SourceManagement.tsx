@@ -10,7 +10,7 @@ import {
   USER_SIGNAL_PREFS_QUERY_KEY,
   type UserPref,
 } from '@/features/user/public-queries';
-import { useAuth } from '@/hooks/use-auth';
+import { useAuth } from '@/features/auth/public';
 import { useTranslation } from 'react-i18next';
 import { Switch } from '@/components/ui/switch';
 import { Input } from '@/components/ui/input';

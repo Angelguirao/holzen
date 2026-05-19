@@ -18,7 +18,7 @@ import { useHomePauseAudio } from '@/screens/home/hooks/use-home-pause-audio';
 import { useHomeMarketDisplayPreferences } from '@/screens/home/hooks/use-home-market-display-preferences';
 import { useState } from 'react';
 import { useOutletContext, useSearchParams, useNavigate, useLocation } from 'react-router-dom';
-import { useAuth } from '@/hooks/use-auth';
+import { useAuth } from '@/features/auth/public';
 import { useHomeVisibleSections } from '@/screens/home/hooks/use-home-visible-sections';
 import { useHomeCustomizeBridge } from '@/screens/home/hooks/use-home-customize-bridge';
 import { useHomeMarketGoalHeaders } from '@/screens/home/hooks/use-home-market-goal-headers';

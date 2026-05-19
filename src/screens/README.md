@@ -17,7 +17,7 @@ Route-scoped UI and thin orchestration live here. **Domain rules** stay in `src/
 screens/<route>/
   components/     # presentation for this route only
   hooks/          # orchestration used only by this screen (optional)
-  *Screen.tsx     # optional main export (pages/ may re-export)
+  *Screen.tsx     # route entry (lazy-loaded from App.tsx)
 ```
 
 | Screen folder | Routes / product area | Screen map doc |
@@ -26,7 +26,7 @@ screens/<route>/
 | `pause/` | `/pause`, `/companion/*` — **`PauseSessionScreen`**, `components/`, `hooks/` | [docs/screens/pause.md](../../docs/screens/pause.md) |
 | `archive/` | Archive tab — **`ArchiveScreen`**, `hooks/`, `components/` (+ `library/`) | [README](archive/README.md), [IA](../../docs/design/information-architecture.md) |
 | `journey/` | Journey tab — **`components/` migrated (5e)** | [docs/screens/journey-overview.md](../../docs/screens/journey-overview.md) |
-| `settings/` | Settings hub — **`SettingsStateLayout`**, `hooks/`, `components/`; thin `pages/settings/` | [README](settings/README.md) |
+| `settings/` | Settings hub — **`SettingsStateLayout`**, `hooks/`, `components/` | [README](settings/README.md) |
 | `marketing/` | Public pages — **`AboutScreen`**, landing **`components/`** | [README](marketing/README.md) |
 | `admin/` | `/admin` — **`AdminScreen`**, `hooks/`, **`components/`** | [README](admin/README.md) |
 | `ops/` | Dev/ops (`/smoke-test`, `/edge-coverage`, …) | [README](ops/README.md) |
@@ -47,6 +47,6 @@ screens/<route>/
 | Pause rules / RPC | `features/pause/` |
 | Home dashboard UI + hooks | `screens/home/components/` (`HoldGoalWidget`, `InstallHolzenCard`, `ThresholdFrequencyEstimator`, onboarding), `hooks/` |
 | Settings prefs UI | `screens/settings/components/` (`ThresholdSetting`, `QuietWindowsManager`, …) |
-| Route wiring | `src/pages/` + `App.tsx` |
+| Route wiring | `App.tsx` → `screens/<route>/*Screen.tsx` |
 | Primitives / mood glyphs | [components/README.md](../components/README.md) (`ui/`, `icons/`) |
 | Home → Pause flow (layers + RPC/edge) | [client-src-layout.md](../../docs/fundamentals/client-src-layout.md) § Reference flow |

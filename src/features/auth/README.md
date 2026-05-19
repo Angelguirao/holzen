@@ -8,8 +8,8 @@ Session and identity projection.
 | Infrastructure | `infrastructure/auth-signed-in-side-effects.ts` (welcome email, referral queue) |
 | Presentation | `presentation/AuthProvider.tsx` — `AuthProvider`, `useAuth` |
 | Ports | `ports/session.ts` — scaffold for future adapter split |
-| Public API | `public.ts` — `AuthSessionState` only (no React) |
+| Public API | `public.ts` — `AuthProvider`, `useAuth`, `AuthSessionState` |
 
-**App wiring:** `src/App.tsx` imports `AuthProvider` from `@/hooks/use-auth` (thin re-export). Cross-feature code should import types from `@/features/auth/public` only.
+**App wiring:** `src/App.tsx` and screens import `AuthProvider` / `useAuth` from `@/features/auth/public`. `src/hooks/use-auth.tsx` remains a deprecated re-export for legacy paths only.
 
 See [docs/systems/auth/auth-and-referral-system.md](../../docs/systems/auth/auth-and-referral-system.md).

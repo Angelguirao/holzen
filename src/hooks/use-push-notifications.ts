@@ -3,7 +3,7 @@ import { useTranslation } from "react-i18next";
 import { toast } from "sonner";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { invokeEdge } from "@/lib/invoke-edge";
-import { useAuth } from "@/hooks/use-auth";
+import { useAuth } from "@/features/auth/public";
 import {
   getPushSubscriptionQueryOptions,
   pushSubscriptionQueryKey,

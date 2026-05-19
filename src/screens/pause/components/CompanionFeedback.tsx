@@ -3,7 +3,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
-import { useAuth } from '@/hooks/use-auth';
+import { useAuth } from '@/features/auth/public';
 import { hapticFeedback } from '@/lib/haptics';
 import { FEEDBACK_TO_CACHE_TYPE } from '@/features/pause/public';
 import type { RegenerateCompanionSlot } from '@/features/pause/public';

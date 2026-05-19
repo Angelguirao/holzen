@@ -4,7 +4,7 @@ import { useQuery } from '@tanstack/react-query';
 import { AnimatePresence, motion, useReducedMotion } from 'framer-motion';
 import { HoldGoalWidget } from '@/screens/home/components/HoldGoalWidget';
 import { useHolzen } from '@/screens/home/hooks/use-holzen';
-import { useAuth } from '@/hooks/use-auth';
+import { useAuth } from '@/features/auth/public';
 import { getProfileRowQueryOptions } from '@/features/user/public-queries';
 import {
   computeHoldGoalCompactHeadline,

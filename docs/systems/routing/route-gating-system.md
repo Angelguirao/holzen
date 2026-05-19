@@ -8,7 +8,7 @@ Related: `docs/systems/auth/auth-and-referral-system.md` (session + `AuthProvide
 
 ## Source of truth
 
-- `useAuth()` returns `{ user, loading }` from `AuthProvider` (`src/hooks/use-auth.tsx`).
+- `useAuth()` returns `{ user, loading }` from `AuthProvider` (`@/features/auth/public`; `src/hooks/use-auth.tsx` is a deprecated shim).
 - Route wrappers read **only** those two values. They do not call Supabase directly.
 
 ## Components
@@ -78,5 +78,5 @@ Route gating is **UX and navigation policy** only. It does not replace:
 ## Files
 
 - `src/App.tsx` - `ProtectedRoute`, `PublicOnlyRoute`, route table
-- `src/hooks/use-auth.tsx` - `user`, `loading`
+- `@/features/auth/public` (`AuthProvider` / `useAuth`) — `user`, `loading`
 - `src/app/components/AuthLoading.tsx` - loading UI used by both wrappers
