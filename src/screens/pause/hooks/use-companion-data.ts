@@ -10,7 +10,6 @@ import type { CompanionData, CompanionPrefs } from '@/screens/pause/components/C
 import type { InterventionState, RegenerateCompanionSlot } from '@/features/pause/public';
 import { fetchParsedPauseArtifactCache } from '@/features/pause/public-queries';
 import type { ZoomOutData } from '@/screens/pause/components/ZoomOutDisplay';
-import { toZoomOutDisplayData, zoomOutLibraryAutosaveFromDisplayData } from '@/features/pause/public';
 import type { CachedHistoricalInsightShape } from '@/screens/pause/components/HistoricalInsightDisplay';
 import {
   EMPTY_COMPANION_UI_COMPLETION,
@@ -26,6 +25,7 @@ import { getRecencyHints } from '@/features/pause/public';
 import {
   applyOrchestrateSlotLazyOrRegenerate,
   EMPTY_COMPANION_SLOT_RELAXATIONS,
+  hydrateCompanionSlotsFromArtifactCache,
   hydrateOrchestrateSlotsFromInterventionResponse,
   isFilledOrchestrateSlot,
   readOrchestrateSlotBody,
@@ -54,7 +54,6 @@ import { useSubscription } from '@/features/subscription/public-hooks';
 import { useProGate } from '@/features/subscription/public-hooks';
 import { isPaidLimitReached, showLimitReachedToast } from '@/features/subscription/public-limits';
 import { trackEvent } from '@/lib/posthog';
-import { trackCompanionServed } from '@/features/pause/public';
 
 export type {
   RegenerateCompanionSlot,
@@ -269,34 +268,20 @@ export function useCompanionData({ companions, prefs, pauseInstanceId, context, 
         const cached = await fetchParsedPauseArtifactCache(pauseInstanceId);
         if (cancelled) return;
 
-        if (cached.signal) {
-          setSignal(cached.signal);
-          fetchedSlotsRef.current.add('signal');
-          trackCompanionServed('signal', 'cache');
-          autoSaveToLibrary({ title: cached.signal.title, body: cached.signal.body, sourceType: 'signal', sourceUrl: cached.signal.url });
-        }
-        if (cached.grounding) {
-          setNudge(cached.grounding);
-          fetchedSlotsRef.current.add('grounding');
-          trackCompanionServed('grounding', 'cache');
-          autoSaveToLibrary({ title: cached.grounding.title, body: cached.grounding.body, sourceType: 'grounding', sourceUrl: cached.grounding.url });
-        }
-        if (cached.history) {
-          setHistoryInsight(cached.history);
-          fetchedSlotsRef.current.add('history');
-          trackCompanionServed('history', 'cache');
-          autoSaveToLibrary({ title: cached.history.title, body: cached.history.btcInsight, sourceType: 'history_insight' });
-        }
-        if (cached.zoomOut) {
-          const z = toZoomOutDisplayData(cached.zoomOut);
-          setZoomOut(z);
-          fetchedSlotsRef.current.add('zoomOut');
-          trackCompanionServed('zoomOut', 'cache');
-          const { title, body } = zoomOutLibraryAutosaveFromDisplayData(z);
-          autoSaveToLibrary({ title, body, sourceType: 'zoom_out' });
-        }
-        if (cached.intervention) {
-          setIntervention(cached.intervention);
+        const slotCommitters: CompanionSlotCommitters = {
+          setSignal,
+          setNudge,
+          setHistoryInsight,
+          setZoomOut,
+          autoSaveToLibrary,
+        };
+        const { hasCachedIntervention } = hydrateCompanionSlotsFromArtifactCache({
+          cached,
+          fetchedSlots: fetchedSlotsRef.current,
+          committers: slotCommitters,
+          setIntervention,
+        });
+        if (hasCachedIntervention) {
           setInterventionLoading(false);
           return;
         }

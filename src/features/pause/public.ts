@@ -319,6 +319,10 @@ export {
   type CompanionSlotRelaxationUi,
   type CompanionSlotRelaxations,
 } from './application/use-cases/companion/orchestrate-slot-apply';
+export {
+  hydrateCompanionSlotsFromArtifactCache,
+  type HydrateCompanionSlotsFromArtifactCacheResult,
+} from './application/use-cases/companion/hydrate-companion-slots-from-artifact-cache';
 export { buildPauseSessionScaffoldRitualPayloads } from './presentation/session/scaffold-ritual-payloads';
 export type { PauseSessionShellViewModel } from './application/use-cases/session/shell-view-model';
 export { canAdvanceFromPauseStep } from './application/use-cases/session/navigation';
