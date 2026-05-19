@@ -39,9 +39,7 @@ import {
   resetInterventionIdempotency,
   runOnceIntervention,
   companionSlotToGenerationTaxonomy,
-  isOrchestratePayloadError,
   resolveCompanionOrchestrateInvokeFailure,
-  resolveOrchestrateInvokeUserMessage,
   tryApplyOrchestrateSlotFromBody,
   buildCompanionOrchestrateSessionFromRitual,
   buildInterventionOrchestrateBody,
@@ -52,7 +50,10 @@ import {
 } from '@/features/pause/public';
 import { useSubscription } from '@/features/subscription/public-hooks';
 import { useProGate } from '@/features/subscription/public-hooks';
-import { isPaidLimitReached, showLimitReachedToast } from '@/features/subscription/public-limits';
+import {
+  classifyCompanionAccessDenied,
+  showLimitReachedToast,
+} from '@/features/subscription/public-limits';
 import { trackEvent } from '@/lib/posthog';
 
 export type {
@@ -98,22 +99,19 @@ export function useCompanionData({ companions, prefs, pauseInstanceId, context, 
   const { companionRemaining, flexCreditsBalance, applyOptimisticDecrement, refresh: refreshSubscription } = useSubscription();
 
   const canAccessCompanion = useCallback(() => {
-    if (!isPro) {
+    const denied = classifyCompanionAccessDenied({
+      isPro,
+      companionRemaining,
+      flexCreditsBalance,
+    });
+    if (!denied) return true;
+    if (denied === 'upgrade_required') {
       requirePro('companions');
-      return false;
-    }
-    if (isPaidLimitReached({ remaining: companionRemaining, flexCreditsBalance })) {
+    } else {
       showLimitReachedToast({ feature: 'companion', startCheckout });
-      return false;
     }
-    return true;
-  }, [
-    isPro,
-    requirePro,
-    companionRemaining,
-    flexCreditsBalance,
-    startCheckout,
-  ]);
+    return false;
+  }, [isPro, requirePro, companionRemaining, flexCreditsBalance, startCheckout]);
 
   /** No-op: companion output is persisted in `pause_ai_artifacts` only. */
   const autoSaveToLibrary = useCallback(async (_params: CompanionSlotAutosaveParams) => {}, []);
@@ -336,17 +334,18 @@ export function useCompanionData({ companions, prefs, pauseInstanceId, context, 
         if (cancelled) return;
 
         const body = data as Record<string, unknown> | null;
-        if (isOrchestratePayloadError(fnError, body)) {
-          const { code, userMessage } = await resolveOrchestrateInvokeUserMessage(
-            fnError,
-            body,
-            'This AI feature is temporarily unavailable. Please try again in a minute.',
-          );
+        const interventionFailure = await resolveCompanionOrchestrateInvokeFailure(
+          fnError,
+          body,
+          'intervention',
+          'This AI feature is temporarily unavailable. Please try again in a minute.',
+        );
+        if (interventionFailure) {
           holzenLog.companion('orchestrate intervention invoke failed', {
             pause_instance_prefix: pauseInstanceId.slice(0, 8),
             fnError: fnError?.message ?? null,
-            bodyError: userMessage,
-            bodyCode: code,
+            bodyError: interventionFailure.userMessage,
+            bodyCode: interventionFailure.code,
           });
           setInterventionError(true);
           setInterventionLoading(false);
