@@ -4,18 +4,13 @@
  */
 import { useCallback } from 'react';
 import { useReducedMotion } from 'framer-motion';
-import { useNavigate, useLocation } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useHolzen } from '@/screens/home/hooks/use-holzen';
 import { useSubscription } from '@/features/subscription/public-hooks';
 import { useProGate } from '@/features/subscription/public-hooks';
 import { isPauseSessionHeaderBackVisible } from '@/features/pause/public';
-import { parsePauseSessionLocationState } from '@/features/pause/public';
-import { coalescePauseSessionShellViewModel } from '@/features/pause/public';
-import {
-  isPauseSessionDepthPickerActive,
-  isPauseSessionWaitingForInstanceFetch,
-} from '@/features/pause/public';
+import { isPauseSessionDepthPickerActive } from '@/features/pause/public';
 import { usePauseSessionStepTransition } from '@/screens/pause/hooks/use-pause-session-step-transition';
 import { usePauseBreathSegmentRpcLoggers } from '@/screens/pause/hooks/use-pause-breath-segment-rpc-loggers';
 import { usePauseFeelShiftLogDedupeRefs } from '@/screens/pause/hooks/use-pause-feel-shift-log-dedupe-refs';
@@ -32,17 +27,12 @@ import { usePauseSessionBreathUi } from '@/screens/pause/hooks/use-pause-session
 import { usePauseSessionBriefToDeep } from '@/screens/pause/hooks/use-pause-session-brief-to-deep';
 import { usePauseSessionDepthAndBriefCopy } from '@/screens/pause/hooks/use-pause-session-depth-and-brief-copy';
 import { usePauseSessionBreathSecondLabelVariant } from '@/screens/pause/hooks/use-pause-session-breath-second-label-variant';
-import { usePauseSessionShell } from '@/screens/pause/hooks/use-pause-session-shell';
 import { usePauseSessionTerminalEntryRedirect } from '@/screens/pause/hooks/use-pause-session-terminal-entry-redirect';
-import { usePauseSessionMountLog } from '@/screens/pause/hooks/use-pause-session-mount-log';
+import { usePauseSessionShellBootstrap } from '@/screens/pause/hooks/use-pause-session-shell-bootstrap';
 import { usePauseSessionGoBack } from '@/screens/pause/hooks/use-pause-session-go-back';
 import { usePauseSessionGoToStep } from '@/screens/pause/hooks/use-pause-session-go-to-step';
 import { usePauseSessionScaffoldRitual } from '@/screens/pause/hooks/use-pause-session-scaffold-ritual';
 import { JOURNEY_PREFIX } from '@/lib/app-routes';
-import { buildPauseSessionMountLogParams } from '@/features/pause/public';
-import { usePauseSessionPendingPauseOfferNavigation } from '@/screens/pause/hooks/use-pause-session-pending-pause-offer-navigation';
-import { usePauseSessionPendingLeaveSheet } from '@/screens/pause/hooks/use-pause-session-pending-leave-sheet';
-import { usePendingPauseOffer } from '@/screens/pause/hooks/use-pending-pause-offer';
 import { usePauseSessionDepthPickerHandlers } from '@/screens/pause/hooks/use-pause-session-depth-picker-handlers';
 import { usePauseSessionFeelTilesSelect } from '@/screens/pause/hooks/use-pause-session-feel-tiles-select';
 import { clearSession } from '@/features/pause/public';
@@ -57,7 +47,6 @@ export function usePauseSessionScreen() {
     clearSession();
     navigate(JOURNEY_PREFIX, { replace: true });
   }, [navigate]);
-  const location = useLocation();
   const prefersReducedMotion = useReducedMotion();
   const breathSecondLabelVariant = usePauseSessionBreathSecondLabelVariant();
   const {
@@ -87,26 +76,31 @@ export function usePauseSessionScreen() {
   } = useSubscription();
   const { requirePro } = useProGate();
 
-  const { onAfterMutation: pendingOfferAfterMutation, navigateAfterAdopt: pendingOfferNavigateAfterAdopt } =
-    usePauseSessionPendingPauseOfferNavigation({
-      navigate,
-      resyncOpenPauseFromDb,
-    });
-  const { pending, refresh: refreshPendingOffer } = usePendingPauseOffer();
-
-  const nav = parsePauseSessionLocationState(location.state);
   const {
-    pauseInstanceId: navPauseInstanceId,
-    reflectionMessage: navReflectionMessage,
-    context: navContext,
-    companions: navCompanions,
-    companionPrefs: navCompanionPrefs,
-    severity: navSeverity,
-  } = nav;
-
-  const { restored, hydration, fetchPauseInstanceId, fetchedInstance, fetchFailed, resolved } = usePauseSessionShell({
-    locationKey: location.key,
-    nav,
+    restored,
+    hydration,
+    fetchPauseInstanceId,
+    fetchedInstance,
+    fetchFailed,
+    resolved,
+    message,
+    context,
+    pauseInstanceId,
+    companions,
+    companionPrefs,
+    severity,
+    pauseInstanceIdForTerminal,
+    pending,
+    leaveWithPendingOpen,
+    setLeaveWithPendingOpen,
+    leaveSheetBusy,
+    confirmLeavePauseSession,
+    requestExitPauseBeforeDone,
+    handleDeclinePendingFromLeaveSheet,
+    handlePendingAdoptFromLeaveSheet,
+    hasCoalescedShellSession,
+    waitingForFetch,
+  } = usePauseSessionShellBootstrap({
     holzen: {
       message: holzenMessage,
       context: holzenContext,
@@ -115,49 +109,10 @@ export function usePauseSessionScreen() {
       companionPrefs: holzenCompanionPrefs,
       severity: holzenSeverity,
     },
-  });
-
-  usePauseSessionMountLog(
-    buildPauseSessionMountLogParams({
-      restored,
-      fetchPauseInstanceId,
-      navPauseInstanceId,
-      navReflectionMessage,
-      hydrationStatus: hydration.status,
-    }),
-  );
-
-  const { message, context, pauseInstanceId, companions, companionPrefs, severity } =
-    coalescePauseSessionShellViewModel(resolved, holzenSeverity);
-
-  const pauseInstanceIdForTerminal =
-    pauseInstanceId ?? navPauseInstanceId ?? fetchPauseInstanceId;
-
-  const {
-    leaveWithPendingOpen,
-    setLeaveWithPendingOpen,
-    leaveSheetBusy,
-    confirmLeavePauseSession,
-    requestExitPauseBeforeDone,
-    handleDeclinePendingFromLeaveSheet,
-    handlePendingAdoptFromLeaveSheet,
-  } = usePauseSessionPendingLeaveSheet({
-    pending,
-    pauseInstanceIdForTerminal,
+    navigate,
+    resyncOpenPauseFromDb,
     handleClose,
-    pendingOfferAfterMutation,
-    pendingOfferNavigateAfterAdopt,
-    refreshPendingOffer,
     t,
-  });
-
-  const hasCoalescedShellSession =
-    Boolean(pauseInstanceIdForTerminal) || message.length > 0;
-
-  const waitingForFetch = isPauseSessionWaitingForInstanceFetch({
-    hydrationStatus: hydration.status,
-    fetchFailed,
-    fetchedInstance,
   });
 
   const {
