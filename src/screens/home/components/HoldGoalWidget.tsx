@@ -2,10 +2,16 @@ import { useState, useEffect, useCallback, useRef } from 'react';
 
 import { useTranslation } from 'react-i18next';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
-import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/features/auth/public';
 import { useHolzen } from '@/screens/home/hooks/use-holzen';
-import { getProfileRowQueryOptions, PROFILE_QUERY_KEY } from '@/features/user/public-queries';
+import {
+  clearProfileHoldGoal,
+  getProfileRowQueryOptions,
+  PROFILE_QUERY_KEY,
+  updateProfileHoldGoal,
+  type ProfileRow,
+  type ProfilesHoldGoalUpdate,
+} from '@/features/user/public-queries';
 import { formatBtcPrice, SUPPORTED_CURRENCIES } from '@/features/market/public';
 import { computeHoldGoalCompactHeadline } from '@/features/user/public';
 import { Target, Calendar, Coins, Infinity as InfinityIcon, X, Check, Pencil } from 'lucide-react';
@@ -14,18 +20,6 @@ import { Input } from '@/components/ui/input';
 import { differenceInDays, format } from 'date-fns';
 import { toast } from 'sonner';
 import { homeInWidget } from '@/screens/home/components/home-widget-styles';
-import type { Database } from '@/integrations/supabase/types';
-
-type ProfileRow = Database['public']['Tables']['profiles']['Row'];
-type ProfilesHoldGoalUpdate = Pick<
-  Database['public']['Tables']['profiles']['Update'],
-  | 'hold_goal_type'
-  | 'hold_goal_start'
-  | 'hold_goal_target_months'
-  | 'hold_goal_target_price'
-  | 'hold_goal_currency'
->;
-
 import {
   AlertDialog,
   AlertDialogAction,
@@ -228,7 +222,7 @@ export function HoldGoalWidget({
         hold_goal_target_price: null,
         hold_goal_currency: currency,
       };
-      const { error: saveError } = await supabase.from('profiles').update(updates).eq('user_id', user.id);
+      const { error: saveError } = await updateProfileHoldGoal(user.id, updates);
       if (!saveError) mergeHoldGoalIntoProfileCache(updates);
       setSetting(false);
       setInputValue('');
@@ -252,7 +246,7 @@ export function HoldGoalWidget({
       hold_goal_currency: currency,
     };
 
-    const { error: saveError } = await supabase.from('profiles').update(updates).eq('user_id', user.id);
+    const { error: saveError } = await updateProfileHoldGoal(user.id, updates);
     if (!saveError) mergeHoldGoalIntoProfileCache(updates);
     setSetting(false);
     setInputValue('');
@@ -261,12 +255,7 @@ export function HoldGoalWidget({
 
   const clearGoal = async () => {
     if (!user) return;
-    const { error } = await supabase.from('profiles').update({
-      hold_goal_type: null,
-      hold_goal_start: null,
-      hold_goal_target_months: null,
-      hold_goal_target_price: null,
-    }).eq('user_id', user.id);
+    const { error } = await clearProfileHoldGoal(user.id);
     if (!error) {
       mergeHoldGoalIntoProfileCache({
         hold_goal_type: null,
