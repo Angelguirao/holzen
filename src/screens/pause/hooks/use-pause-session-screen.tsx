@@ -2,7 +2,7 @@
  * `/pause` route orchestration — wires shell, ritual state, step handlers, and scaffold props.
  * Screen map: docs/screens/pause.md · Product model: docs/systems/pause-system.md
  */
-import { useState, useRef, useMemo, useCallback } from 'react';
+import { useState, useRef, useCallback } from 'react';
 import { useReducedMotion } from 'framer-motion';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
@@ -66,8 +66,7 @@ import { usePauseSessionFeelTilesSelect } from '@/screens/pause/hooks/use-pause-
 import { usePauseReflectGeneration } from '@/screens/pause/hooks/use-pause-reflect-generation';
 import { type BriefPauseStep, type RitualDepth } from '@/features/pause/public';
 import { clearSession } from '@/features/pause/public';
-import { PauseBriefProgress } from '@/screens/pause/components/PauseBriefProgress';
-import { PauseEngagedOpenMaxCountdown } from '@/screens/pause/components/PauseEngagedOpenMaxCountdown';
+import { usePauseSessionScaffoldChromeSlots } from '@/screens/pause/hooks/use-pause-session-scaffold-chrome-slots';
 
 export function usePauseSessionScreen() {
   const { t } = useTranslation();
@@ -500,17 +499,12 @@ export function usePauseSessionScreen() {
     t,
   });
 
-  const briefStepperSlot = useMemo(
-    () => (ritualEntry === 'brief' ? <PauseBriefProgress currentStep={briefStep} /> : undefined),
-    [ritualEntry, briefStep],
-  );
-
-  const engagedOpenMaxCountdownSlot = useMemo(() => {
-    if (phase !== 'session') return undefined;
-    const ea = fetchedInstance?.engaged_at;
-    if (fetchedInstance?.db_state !== 'engaged' || !ea) return undefined;
-    return <PauseEngagedOpenMaxCountdown engagedAtIso={ea} />;
-  }, [phase, fetchedInstance?.db_state, fetchedInstance?.engaged_at]);
+  const { briefStepperSlot, engagedOpenMaxCountdownSlot } = usePauseSessionScaffoldChromeSlots({
+    phase,
+    ritualEntry,
+    briefStep,
+    fetchedInstance,
+  });
 
   const { briefRitual, deepRitual } = buildPauseSessionScaffoldRitualPayloads({
     briefStep,
