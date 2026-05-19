@@ -10,7 +10,7 @@ Multi-channel delivery: **in-app inbox** (`notifications` table), **web push** (
 | Layer | Role |
 |-------|------|
 | `domain/` | Inbox row types, `DeliveryChannel` |
-| `application/` | Channel constants; future `notifyUser` use cases |
+| `application/` | `delivery-policy.ts` — `channelsForPauseOffer`, `buildPauseOfferNotifyIntent` |
 | `ports/` | `NotificationDeliveryGateway` (server orchestration target) |
 | `infrastructure/queries/` | Inbox + push subscription TanStack modules |
 | `presentation/` | `NotificationBell`, `usePushNotifications` |
