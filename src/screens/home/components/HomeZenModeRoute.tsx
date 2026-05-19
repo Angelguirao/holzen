@@ -1,10 +1,10 @@
 import { lazy, Suspense } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Loader2 } from 'lucide-react';
-import type { ZenModeHomeProps } from '@/components/home/ZenModeHome';
+import type { ZenModeHomeProps } from '@/screens/home/components/ZenModeHome';
 
 const ZenModeHomeLazy = lazy(() =>
-  import('@/components/home/ZenModeHome').then((m) => ({ default: m.ZenModeHome })),
+  import('@/screens/home/components/ZenModeHome').then((m) => ({ default: m.ZenModeHome })),
 );
 
 function ZenFallback() {

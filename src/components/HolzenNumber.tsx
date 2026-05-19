@@ -1,7 +1,7 @@
 import { useQuery } from '@tanstack/react-query';
 import { motion, useReducedMotion } from 'framer-motion';
 import { getHolzenNumberQueryOptions } from '@/lib/holzen-number-query';
-import { homeInWidget } from '@/components/home/home-widget-styles';
+import { homeInWidget } from '@/screens/home/components/home-widget-styles';
 
 /**
  * The Holzen Number — a public real-time metric:

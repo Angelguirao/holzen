@@ -1,5 +1,5 @@
 import { useMemo } from 'react';
-import type { HomeDashboardLayoutProps } from '@/components/home/HomeDashboardLayout';
+import type { HomeDashboardLayoutProps } from '@/screens/home/components/HomeDashboardLayout';
 
 /** Stable props object for {@link HomeDashboardLayout} (avoids a fresh inline object every render). */
 export function useHomeDashboardLayoutProps(p: HomeDashboardLayoutProps): HomeDashboardLayoutProps {

@@ -1,6 +1,6 @@
 import type { TFunction } from 'i18next';
 import { useCallback, useMemo, useState } from 'react';
-import { HomeExpandChevronButton } from '@/components/home/HomeExpandChevronButton';
+import { HomeExpandChevronButton } from '@/screens/home/components/HomeExpandChevronButton';
 import { trackEvent } from '@/lib/posthog';
 
 export function useHomeMarketGoalHeaders(args: {

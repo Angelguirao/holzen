@@ -1,6 +1,6 @@
 import type { ReactNode } from 'react';
 import { useMemo } from 'react';
-import { HomePauseCardBody } from '@/components/home/HomePauseCardBody';
+import { HomePauseCardBody } from '@/screens/home/components/HomePauseCardBody';
 import type { Entitlement } from '@/features/subscription/public';
 import { SnoozeToolbarControl } from '@/components/SnoozeControl';
 import type { BtcPriceData } from '@/features/market/public';

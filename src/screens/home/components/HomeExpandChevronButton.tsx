@@ -1,6 +1,6 @@
 import { ChevronDown } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { homeInWidget } from '@/components/home/home-widget-styles';
+import { homeInWidget } from '@/screens/home/components/home-widget-styles';
 
 interface HomeExpandChevronButtonProps {
   expanded: boolean;

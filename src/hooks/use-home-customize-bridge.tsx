@@ -2,7 +2,7 @@ import type { TFunction } from 'i18next';
 import { useCallback, useMemo, useState } from 'react';
 import { trackEvent } from '@/lib/posthog';
 import { getHomeCustomizeSectionDescription, getHomeCustomizeSectionTitle } from '@/lib/home-customize-section-copy';
-import type { HomeDashboardLayoutCustomizeProps } from '@/components/home/HomeDashboardLayout';
+import type { HomeDashboardLayoutCustomizeProps } from '@/screens/home/components/HomeDashboardLayout';
 import { isHomeSectionAlwaysVisibleInLayout } from '@/lib/home-section-visibility-constants';
 
 type SetZenModePersist = (zen: boolean) => void;

@@ -292,7 +292,7 @@ Use this when moving files. Paths are indicative — adjust to actual filenames 
 | `src/lib/*-query.ts` (subscription, market, user) | Re-exports → owning `features/*/public-queries` |
 | `src/lib/posthog.ts`, `sentry.ts`, `invoke-edge.ts`, `cid.ts` | `packages/infrastructure` or `shared-kernel` |
 | `src/screens/pause/components/*`, `Companion*.tsx` | `apps/web/src/screens/pause/` (5c); was `components/pause/*` |
-| `src/components/home/*` | `apps/web/src/screens/home/` |
+| `src/screens/home/components/*` | `apps/web/src/screens/home/` |
 | `src/pages/settings/*` | `apps/web/src/screens/settings/` + `packages/user` |
 | `src/pages/PauseSession.tsx` | `apps/web/pages` re-export + pause screen |
 | `src/integrations/supabase/types.ts` | Stay generated; consumed by infrastructure only |

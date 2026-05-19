@@ -1,8 +1,8 @@
 import type { TFunction } from 'i18next';
 import type { ReactNode } from 'react';
 import { BtcStatus } from '@/components/BtcStatus';
-import { HomeGoalWhyCard } from '@/components/home/HomeGoalWhyCard';
-import { HomeSectionCard } from '@/components/home/HomeSectionCard';
+import { HomeGoalWhyCard } from '@/screens/home/components/HomeGoalWhyCard';
+import { HomeSectionCard } from '@/screens/home/components/HomeSectionCard';
 import type { BtcPriceData, TrackedAssetId } from '@/features/market/public';
 
 /** Everything needed to render one Home “Today” / goal-why section by id. */

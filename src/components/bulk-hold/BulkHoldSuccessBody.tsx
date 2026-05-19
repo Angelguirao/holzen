@@ -2,7 +2,7 @@ import { useTranslation } from 'react-i18next';
 import { motion } from 'framer-motion';
 import { ChevronRight, Inbox, Sparkles } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { homeInWidget } from '@/components/home/home-widget-styles';
+import { homeInWidget } from '@/screens/home/components/home-widget-styles';
 import { hapticFeedback } from '@/lib/haptics';
 import { cn } from '@/lib/utils';
 

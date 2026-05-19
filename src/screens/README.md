@@ -15,7 +15,7 @@ screens/<route>/
 
 | Screen folder | Routes / product area | Screen map doc |
 |---------------|----------------------|----------------|
-| `home/` | `/` Home | [docs/screens/home.md](../../docs/screens/home.md) |
+| `home/` | `/` Home — **`components/` migrated (5d)** | [docs/screens/home.md](../../docs/screens/home.md) |
 | `pause/` | `/pause`, companion full-screen — **`components/` migrated (5c)** | [docs/screens/pause.md](../../docs/screens/pause.md) |
 | `archive/` | Archive tab | [docs/design/information-architecture.md](../../docs/design/information-architecture.md) |
 | `journey/` | Journey tab | [docs/screens/journey-overview.md](../../docs/screens/journey-overview.md) |
@@ -37,6 +37,6 @@ screens/<route>/
 |---------|------------|
 | Pause ritual UI | `screens/pause/components/` |
 | Pause rules / RPC | `features/pause/` |
-| Home dashboard UI | `screens/home/components/` (migrating from `components/home/`) |
+| Home dashboard UI | `screens/home/components/` (**5d** done) |
 | Route wiring | `src/pages/` + `App.tsx` |
 | Primitives | `components/ui/` |
