@@ -11,7 +11,7 @@ import {
   SettingsNotificationsPanel,
   SettingsSubscriptionPanel,
   SettingsAccountPanel,
-} from '@/pages/settings/SettingsSectionPanels';
+} from '@/screens/settings/components/SettingsSectionPanels';
 import type { ComponentType } from 'react';
 
 const PANEL: Record<SettingsSectionId, ComponentType> = {

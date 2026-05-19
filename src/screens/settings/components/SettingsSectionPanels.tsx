@@ -31,8 +31,8 @@ import {
   AlertDialogTrigger,
 } from '@/components/ui/alert-dialog';
 import { useSettingsState } from '@/pages/settings/use-settings-state';
-import { GroundingTagInput } from '@/pages/settings/GroundingTagInput';
-import { ChangeEmailSection } from '@/pages/settings/ChangeEmailSection';
+import { GroundingTagInput } from '@/screens/settings/components/GroundingTagInput';
+import { ChangeEmailSection } from '@/screens/settings/components/ChangeEmailSection';
 import { HoldGoalWidget } from '@/components/HoldGoalWidget';
 import {
   Select,

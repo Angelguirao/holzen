@@ -8,8 +8,8 @@ import type { PauseArchiveRow, PauseArchiveSegment } from '@/features/pause/publ
 import { useInfiniteScroll } from '@/hooks/use-infinite-scroll';
 import { PageMeta } from '@/components/PageMeta';
 import { Search, X, ArrowUpDown, RefreshCw, Loader2 } from 'lucide-react';
-import { ArchivePauseItems } from '@/components/archive/ArchivePauseItems';
-import { ArchiveCollectionsSection } from '@/components/archive/ArchiveCollectionsSection';
+import { ArchivePauseItems } from '@/screens/archive/components/ArchivePauseItems';
+import { ArchiveCollectionsSection } from '@/screens/archive/components/ArchiveCollectionsSection';
 import { CurrentPauseCard } from '@/components/library/CurrentPauseCard';
 import { usePullToRefresh } from '@/hooks/use-pull-to-refresh';
 

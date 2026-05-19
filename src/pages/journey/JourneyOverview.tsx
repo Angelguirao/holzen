@@ -2,7 +2,7 @@ import { useEffect, useMemo, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
-import { JourneyStreakCard } from '@/components/journey/JourneyStreakCard';
+import { JourneyStreakCard } from '@/screens/journey/components/JourneyStreakCard';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/hooks/use-auth';
 import { getJourneyPauseInstancesQueryOptions } from '@/features/pause/public-queries';
