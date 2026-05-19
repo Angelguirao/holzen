@@ -333,7 +333,10 @@ export {
   hydrateCompanionSlotsFromArtifactCache,
   type HydrateCompanionSlotsFromArtifactCacheResult,
 } from './application/use-cases/companion/hydrate-companion-slots-from-artifact-cache';
-export { buildPauseSessionScaffoldRitualPayloads } from './presentation/session/scaffold-ritual-payloads';
+export {
+  buildPauseSessionScaffoldRitualPayloads,
+  type PauseSessionScaffoldRitualPayloadsParams,
+} from './presentation/session/scaffold-ritual-payloads';
 export type { PauseSessionShellViewModel } from './application/use-cases/session/shell-view-model';
 export { canAdvanceFromPauseStep } from './application/use-cases/session/navigation';
 export { computeDeepRitualGoBackTarget } from './application/use-cases/ritual/deep/deep-go-back';
