@@ -217,7 +217,7 @@ Each folder under **`supabase/functions/<name>/`** is a deployable function. Sha
 - **`npm run check:view-migrations`** — Blocks unsafe `CREATE OR REPLACE VIEW` column renames in **`supabase/migrations/`** (also run from **`check:prepush`**).
 - **`npm run build`** — Runs **`npm run check:version-sync`** first (`prebuild`): **`package.json` `version`** must match the latest **`changelog_entries`** row for the configured Supabase project.
 - **`npm run stamp:release`** — Writes the current **12-character** Git commit id into **`supabase/functions/_shared/release.ts`** (`EDGE_RELEASE`) for edge Sentry/BetterStack releases (also invoked at the start of **`check:prepush`**). See [AGENTS.md](../AGENTS.md) for the full script table.
-- **`src/test/`** — `setup.ts` plus tests for sanitization, fallbacks, companion types, etc.
+- **Tests** — Vitest discovers `src/**/*.{test,spec}.{ts,tsx}`; co-locate unit tests with `features/` and `screens/`; use **`src/test/`** for `setup.ts`, **integration flows** (`integration/flows/`), shared **fixtures**, and cross-cutting util tests — see [client-src-layout.md](client-src-layout.md) (Testing) and [src/test/README.md](../../src/test/README.md).
 - **`npm run lint`** — ESLint; the repo may have many pre-existing warnings/errors — avoid adding new ones in touched files ([AGENTS.md](../AGENTS.md)).
 
 ---
