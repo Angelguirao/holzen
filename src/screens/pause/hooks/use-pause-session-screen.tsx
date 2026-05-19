@@ -2,28 +2,14 @@
  * `/pause` route orchestration — wires shell, ritual state, step handlers, and scaffold props.
  * Screen map: docs/screens/pause.md · Product model: docs/systems/pause-system.md
  */
-import { useState, useRef, useCallback } from 'react';
+import { useRef, useCallback } from 'react';
 import { useReducedMotion } from 'framer-motion';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useHolzen } from '@/screens/home/hooks/use-holzen';
 import { useSubscription } from '@/features/subscription/public-hooks';
 import { useProGate } from '@/features/subscription/public-hooks';
-import { type MoodValue } from '@/screens/pause/components/MoodCheck';
-import { type PauseStep } from '@/screens/pause/components/PauseProgress';
 import { isPauseSessionHeaderBackVisible } from '@/features/pause/public';
-import {
-  mapPersistedStep,
-  initialRitualEntry,
-  initialBriefPauseStepFromRestored,
-  initialBriefIntegrateDoneFromRestored,
-  initialSelectedBriefFaceFromRestored,
-  initialPhaseFromRestored,
-  initialDecisionFromRestored,
-  initialBreathingFirstCompletedFromRestored,
-  initialBreathingSecondCompletedFromRestored,
-  initialFrameDoneFromRestored,
-} from '@/features/pause/public';
 import { parsePauseSessionLocationState } from '@/features/pause/public';
 import { coalescePauseSessionShellViewModel } from '@/features/pause/public';
 import {
@@ -43,12 +29,11 @@ import { usePauseSessionBreathStepHandlers } from '@/screens/pause/hooks/use-pau
 import { usePauseSessionHeaderBackHandler } from '@/screens/pause/hooks/use-pause-session-header-back-handler';
 import { usePauseSessionPersistToStorage } from '@/screens/pause/hooks/use-pause-session-persist-to-storage';
 import { usePauseSessionRitualStorageSync } from '@/screens/pause/hooks/use-pause-session-ritual-storage-sync';
-import { usePauseSessionEntryPresentationEffects } from '@/screens/pause/hooks/use-pause-session-entry-presentation-effects';
+import { usePauseSessionRitualState } from '@/screens/pause/hooks/use-pause-session-ritual-state';
 import { usePauseSessionBreathUi } from '@/screens/pause/hooks/use-pause-session-breath-ui';
 import { usePauseSessionBriefToDeep } from '@/screens/pause/hooks/use-pause-session-brief-to-deep';
 import { usePauseSessionDepthAndBriefCopy } from '@/screens/pause/hooks/use-pause-session-depth-and-brief-copy';
 import { usePauseSessionBreathSecondLabelVariant } from '@/screens/pause/hooks/use-pause-session-breath-second-label-variant';
-import type { PauseImpactData } from '@/features/pause/public';
 import { usePauseSessionShell } from '@/screens/pause/hooks/use-pause-session-shell';
 import { usePauseSessionTerminalEntryRedirect } from '@/screens/pause/hooks/use-pause-session-terminal-entry-redirect';
 import { usePauseSessionMountLog } from '@/screens/pause/hooks/use-pause-session-mount-log';
@@ -63,7 +48,6 @@ import { usePendingPauseOffer } from '@/screens/pause/hooks/use-pending-pause-of
 import { usePauseSessionDepthPickerHandlers } from '@/screens/pause/hooks/use-pause-session-depth-picker-handlers';
 import { usePauseSessionFeelTilesSelect } from '@/screens/pause/hooks/use-pause-session-feel-tiles-select';
 import { usePauseReflectGeneration } from '@/screens/pause/hooks/use-pause-reflect-generation';
-import { type BriefPauseStep, type RitualDepth } from '@/features/pause/public';
 import { clearSession } from '@/features/pause/public';
 import { usePauseSessionScaffoldChromeSlots } from '@/screens/pause/hooks/use-pause-session-scaffold-chrome-slots';
 
@@ -178,11 +162,49 @@ export function usePauseSessionScreen() {
     fetchedInstance,
   });
 
-  const restoredStep = mapPersistedStep(restored?.step);
-
-  const [step, setStep] = useState<PauseStep>(restoredStep);
-  const [phase, setPhase] = useState<'session' | 'done'>(() => initialPhaseFromRestored(restored));
-  const [decision, setDecision] = useState<string | null>(() => initialDecisionFromRestored(restored));
+  const {
+    step,
+    setStep,
+    phase,
+    setPhase,
+    decision,
+    setDecision,
+    isFavorite,
+    setIsFavorite,
+    moodDone,
+    setMoodDone,
+    moodAfterDone,
+    setMoodAfterDone,
+    selectedMood,
+    setSelectedMood,
+    selectedMoodAfter,
+    setSelectedMoodAfter,
+    feelIntensity,
+    setFeelIntensity,
+    shiftIntensity,
+    setShiftIntensity,
+    breathingFirstCompleted,
+    setBreathingFirstCompleted,
+    breathingSecondCompleted,
+    setBreathingSecondCompleted,
+    frameDone,
+    setFrameDone,
+    curtainLifted,
+    pauseImpactData,
+    setPauseImpactData,
+    ritualEntry,
+    setRitualEntry,
+    briefStep,
+    setBriefStep,
+    briefIntegrateDone,
+    setBriefIntegrateDone,
+    selectedBriefFace,
+    setSelectedBriefFace,
+    swipeDirection,
+    setSwipeDirection,
+    soundMuted,
+    setSoundMuted,
+  } = usePauseSessionRitualState(restored);
 
   usePauseSessionTerminalEntryRedirect({
     pauseInstanceId: pauseInstanceIdForTerminal,
@@ -200,7 +222,6 @@ export function usePauseSessionScreen() {
     pauseSessionPhase: phase,
   });
 
-  const [isFavorite, setIsFavorite] = useState(false);
   const { toggleFavorite } = usePauseFavoriteToggle({
     pauseInstanceId,
     isFavorite,
@@ -208,21 +229,6 @@ export function usePauseSessionScreen() {
     subscribed,
     t,
   });
-  const [moodDone, setMoodDone] = useState(restored?.moodDone ?? false);
-  const [moodAfterDone, setMoodAfterDone] = useState(restored?.moodAfterDone ?? false);
-  const [selectedMood, setSelectedMood] = useState<MoodValue | null>(restored?.selectedMood ?? null);
-  const [selectedMoodAfter, setSelectedMoodAfter] = useState<MoodValue | null>(restored?.selectedMoodAfter ?? null);
-  const [feelIntensity, setFeelIntensity] = useState<number | null>(restored?.feelIntensity ?? null);
-  const [shiftIntensity, setShiftIntensity] = useState<number | null>(restored?.shiftIntensity ?? null);
-  const [breathingFirstCompleted, setBreathingFirstCompleted] = useState(() =>
-    initialBreathingFirstCompletedFromRestored(restored),
-  );
-  const [breathingSecondCompleted, setBreathingSecondCompleted] = useState(() =>
-    initialBreathingSecondCompletedFromRestored(restored),
-  );
-  const [frameDone, setFrameDone] = useState(() => initialFrameDoneFromRestored(restored));
-  const [curtainLifted, setCurtainLifted] = useState(false);
-  const [pauseImpactData, setPauseImpactData] = useState<PauseImpactData | null>(null);
 
   const handlePauseSessionChromeClose = useCallback(() => {
     if (phase === 'done') {
@@ -231,8 +237,6 @@ export function usePauseSessionScreen() {
       requestExitPauseBeforeDone();
     }
   }, [phase, handleReturn, requestExitPauseBeforeDone]);
-
-  usePauseSessionEntryPresentationEffects({ setCurtainLifted });
 
   const {
     ensureBreathSegment1Logged,
@@ -246,12 +250,6 @@ export function usePauseSessionScreen() {
   });
   const { lastFeelLogKeyRef, lastShiftLogKeyRef } = usePauseFeelShiftLogDedupeRefs(pauseInstanceId);
 
-  const [ritualEntry, setRitualEntry] = useState<RitualDepth | 'picker'>(() => initialRitualEntry(restored));
-  const [briefStep, setBriefStep] = useState<BriefPauseStep>(() => initialBriefPauseStepFromRestored(restored));
-  const [briefIntegrateDone, setBriefIntegrateDone] = useState(() =>
-    initialBriefIntegrateDoneFromRestored(restored),
-  );
-  const [selectedBriefFace, setSelectedBriefFace] = useState(() => initialSelectedBriefFaceFromRestored(restored));
   const { onBrief: depthPickerOnBrief, onDeep: depthPickerOnDeep } = usePauseSessionDepthPickerHandlers({
     setRitualEntry,
     setBriefStep,
@@ -310,8 +308,6 @@ export function usePauseSessionScreen() {
     selectedBriefFace,
   });
 
-  const [swipeDirection, setSwipeDirection] = useState<'forward' | 'back'>('forward');
-
   const { goToStep } = usePauseSessionGoToStep({
     step,
     setSwipeDirection,
@@ -338,7 +334,6 @@ export function usePauseSessionScreen() {
   });
 
   const decidingRef = useRef(false);
-  const [soundMuted, setSoundMuted] = useState(true);
 
   const {
     breathingRef,
