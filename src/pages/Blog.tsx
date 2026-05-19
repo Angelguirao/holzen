@@ -6,11 +6,11 @@ import { useInfiniteQuery, useQueryClient } from '@tanstack/react-query';
 import { toast } from 'sonner';
 import { getBlogPublishedPostsInfiniteQueryOptions, prefetchBlogPostBySlug } from '@/lib/blog-post-query';
 import { format } from 'date-fns';
-import { PageMeta } from '@/components/PageMeta';
-import { PublicFooter } from '@/components/PublicFooter';
+import { PageMeta } from '@/app/components/PageMeta';
+import { PublicFooter } from '@/app/components/PublicFooter';
 import { useInfiniteScroll } from '@/hooks/use-infinite-scroll';
 import { useTranslation } from 'react-i18next';
-import { PageHeading } from '@/components/PageHeading';
+import { PageHeading } from '@/app/components/PageHeading';
 
 const fade = (delay = 0) => ({
   initial: { opacity: 0, y: 14 },

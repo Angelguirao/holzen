@@ -13,7 +13,7 @@ import { HistoryThread } from '@/screens/pause/components/companion/HistoryThrea
 import { InterventionCrossRefBadge } from '@/screens/pause/components/companion/InterventionCrossRefBadge';
 import { useStaggeredReveal } from '@/screens/pause/components/companion/use-staggered-reveal';
 import { useFullviewTelemetry } from '@/hooks/use-fullview-telemetry';
-import { PageMeta } from '@/components/PageMeta';
+import { PageMeta } from '@/app/components/PageMeta';
 import { zoomOutTotalCharsForReadTime } from '@/features/pause/public';
 import { DEFAULT_COMPANIONS, DEFAULT_PREFS } from '@/features/pause/public';
 

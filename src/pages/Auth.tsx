@@ -12,7 +12,7 @@ import { Label } from '@/components/ui/label';
 import { Separator } from '@/components/ui/separator';
 import { useTranslation } from 'react-i18next';
 import { checkSignupGate } from '@/lib/signup-gate';
-import { PageHeading } from '@/components/PageHeading';
+import { PageHeading } from '@/app/components/PageHeading';
 
 type AuthView = 'sign-in' | 'sign-up' | 'forgot-password';
 

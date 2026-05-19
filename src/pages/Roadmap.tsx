@@ -7,10 +7,10 @@ import { Link } from 'react-router-dom';
 import { ArrowLeft, ChevronUp } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Badge } from '@/components/ui/badge';
-import { PageMeta } from '@/components/PageMeta';
-import { PublicFooter } from '@/components/PublicFooter';
+import { PageMeta } from '@/app/components/PageMeta';
+import { PublicFooter } from '@/app/components/PublicFooter';
 import { useInfiniteScroll } from '@/hooks/use-infinite-scroll';
-import { PageHeading } from '@/components/PageHeading';
+import { PageHeading } from '@/app/components/PageHeading';
 import {
   deleteRoadmapVote,
   getRoadmapItemsInfiniteQueryOptions,

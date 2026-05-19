@@ -1,7 +1,7 @@
 /** @vitest-environment jsdom */
 import { render } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
-import { PageMeta } from "@/components/PageMeta";
+import { PageMeta } from "@/app/components/PageMeta";
 import {
   DEFAULT_SITE_DESCRIPTION,
   DEFAULT_SITE_TITLE,

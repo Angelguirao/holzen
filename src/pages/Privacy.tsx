@@ -1,8 +1,8 @@
 import { useNavigate } from 'react-router-dom';
 import { Separator } from '@/components/ui/separator';
-import { PageMeta } from '@/components/PageMeta';
-import { PublicFooter } from '@/components/PublicFooter';
-import { PageHeading } from '@/components/PageHeading';
+import { PageMeta } from '@/app/components/PageMeta';
+import { PublicFooter } from '@/app/components/PublicFooter';
+import { PageHeading } from '@/app/components/PageHeading';
 
 const Privacy = () => {
   const navigate = useNavigate();

@@ -13,12 +13,12 @@ import { isAppShellPath } from "@/lib/app-routes";
 import { holzenLog } from "@/lib/holzen-console";
 import { attachHolzenQueryLogging } from "@/lib/holzen-query-logging";
 import { scheduleCheckoutGuardCleanup } from "@/features/subscription/public";
-import { ErrorBoundary } from "./components/ErrorBoundary";
-import { OfflineBanner } from "./components/OfflineBanner";
-import { CookieConsent } from "./components/CookieConsent";
+import { ErrorBoundary } from "@/app/components/ErrorBoundary";
+import { OfflineBanner } from "@/app/components/OfflineBanner";
+import { CookieConsent } from "@/app/components/CookieConsent";
 import AuthLoading from "./components/AuthLoading";
-import { AppLayout } from "./components/AppLayout";
-import { RobotsNoIndex } from "./components/PageMeta";
+import { AppLayout } from "@/app/components/AppLayout";
+import { RobotsNoIndex } from "@/app/components/PageMeta";
 import { FeedbackWidget } from "./components/FeedbackWidget";
 
 const Home = lazy(() => import("./pages/Home"));

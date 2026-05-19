@@ -6,7 +6,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { usePauseArchiveList } from '@/hooks/use-pause-archive-list';
 import type { PauseArchiveRow, PauseArchiveSegment } from '@/features/pause/public-queries';
 import { useInfiniteScroll } from '@/hooks/use-infinite-scroll';
-import { PageMeta } from '@/components/PageMeta';
+import { PageMeta } from '@/app/components/PageMeta';
 import { Search, X, ArrowUpDown, RefreshCw, Loader2 } from 'lucide-react';
 import { ArchivePauseItems } from '@/screens/archive/components/ArchivePauseItems';
 import { ArchiveCollectionsSection } from '@/screens/archive/components/ArchiveCollectionsSection';

@@ -4,9 +4,9 @@ import { ArrowLeft } from 'lucide-react';
 import { useQuery } from '@tanstack/react-query';
 import { getBlogPostBySlugQueryOptions } from '@/lib/blog-post-query';
 import { format } from 'date-fns';
-import { PageMeta } from '@/components/PageMeta';
+import { PageMeta } from '@/app/components/PageMeta';
 import { useTranslation } from 'react-i18next';
-import { PageHeading } from '@/components/PageHeading';
+import { PageHeading } from '@/app/components/PageHeading';
 
 const fade = (delay = 0) => ({
   initial: { opacity: 0, y: 14 },
