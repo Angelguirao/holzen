@@ -1,12 +1,13 @@
 import { useState, useCallback } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
-import { supabase } from '@/integrations/supabase/client';
 import {
   SIGNAL_SOURCES_CATALOG_QUERY_KEY,
+  deleteUserSignalPreference,
   getSignalSourcesCatalogQueryOptions,
-} from '@/features/user/public-queries';
-import {
   getUserSignalPreferencesQueryOptions,
+  insertCatalogSignalPreference,
+  insertCustomUserSignalPreference,
+  updateUserSignalPreferenceActive,
   USER_SIGNAL_PREFS_QUERY_KEY,
   type UserPref,
 } from '@/features/user/public-queries';
@@ -72,19 +73,20 @@ export function SourceManagement() {
     const prefsKey = USER_SIGNAL_PREFS_QUERY_KEY(userId);
     const existing = prefs.find((p) => p.source_id === sourceId);
     if (existing) {
-      await supabase.from('user_signal_preferences').update({ active: false }).eq('id', existing.id);
+      await updateUserSignalPreferenceActive(existing.id, false);
       queryClient.setQueryData<UserPref[]>(prefsKey, (prev) =>
         (prev ?? []).map((p) => (p.id === existing.id ? { ...p, active: false } : p)),
       );
     } else {
       const cat = catalog.find((s) => s.id === sourceId)?.category || activeTab;
-      const { data } = await supabase
-        .from('user_signal_preferences')
-        .insert({ user_id: userId, source_id: sourceId, active: false, category: cat })
-        .select()
-        .single();
+      const { data } = await insertCatalogSignalPreference({
+        userId,
+        sourceId,
+        category: cat,
+        active: false,
+      });
       if (data) {
-        queryClient.setQueryData<UserPref[]>(prefsKey, (prev) => [...(prev ?? []), data as unknown as UserPref]);
+        queryClient.setQueryData<UserPref[]>(prefsKey, (prev) => [...(prev ?? []), data]);
       }
     }
   }, [userId, prefs, catalog, activeTab, queryClient]);
@@ -93,7 +95,7 @@ export function SourceManagement() {
     if (!userId) return;
     const existing = prefs.find((p) => p.source_id === sourceId);
     if (existing) {
-      await supabase.from('user_signal_preferences').update({ active: true }).eq('id', existing.id);
+      await updateUserSignalPreferenceActive(existing.id, true);
       queryClient.setQueryData<UserPref[]>(USER_SIGNAL_PREFS_QUERY_KEY(userId), (prev) =>
         (prev ?? []).map((p) => (p.id === existing.id ? { ...p, active: true } : p)),
       );
@@ -102,19 +104,13 @@ export function SourceManagement() {
 
   const addCustomSource = useCallback(async () => {
     if (!userId || !customName.trim()) return;
-    const { data, error } = await supabase
-      .from('user_signal_preferences')
-      .insert({
-        user_id: userId,
-        source_id: null,
-        custom_name: customName.trim(),
-        custom_url: customUrl.trim() || null,
-        custom_type: customType,
-        active: true,
-        category: activeTab,
-      })
-      .select()
-      .single();
+    const { data, error } = await insertCustomUserSignalPreference({
+      userId,
+      customName: customName.trim(),
+      customUrl: customUrl.trim() || null,
+      customType,
+      category: activeTab,
+    });
     if (error) {
       toast.error(t('sources.addFailed'));
       return;
@@ -122,7 +118,7 @@ export function SourceManagement() {
     if (data) {
       queryClient.setQueryData<UserPref[]>(USER_SIGNAL_PREFS_QUERY_KEY(userId), (prev) => [
         ...(prev ?? []),
-        data as unknown as UserPref,
+        data,
       ]);
     }
     setCustomName('');
@@ -133,7 +129,7 @@ export function SourceManagement() {
 
   const removeCustomSource = useCallback(async (prefId: string) => {
     if (!userId) return;
-    await supabase.from('user_signal_preferences').delete().eq('id', prefId);
+    await deleteUserSignalPreference(prefId);
     queryClient.setQueryData<UserPref[]>(USER_SIGNAL_PREFS_QUERY_KEY(userId), (prev) =>
       (prev ?? []).filter((p) => p.id !== prefId),
     );
@@ -143,7 +139,7 @@ export function SourceManagement() {
     if (!userId) return;
     const pref = prefs.find((p) => p.id === prefId);
     if (!pref) return;
-    await supabase.from('user_signal_preferences').update({ active: !pref.active }).eq('id', prefId);
+    await updateUserSignalPreferenceActive(prefId, !pref.active);
     queryClient.setQueryData<UserPref[]>(USER_SIGNAL_PREFS_QUERY_KEY(userId), (prev) =>
       (prev ?? []).map((p) => (p.id === prefId ? { ...p, active: !p.active } : p)),
     );

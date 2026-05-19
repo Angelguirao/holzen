@@ -8,6 +8,12 @@ export {
   type UserPref,
 } from './infrastructure/queries/user-signal-preferences-query';
 export {
+  deleteUserSignalPreference,
+  insertCatalogSignalPreference,
+  insertCustomUserSignalPreference,
+  updateUserSignalPreferenceActive,
+} from './infrastructure/queries/user-signal-preferences-mutations';
+export {
   fetchProfileRowForUser,
   getProfileRowQueryOptions,
   PROFILE_QUERY_KEY,
