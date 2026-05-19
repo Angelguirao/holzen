@@ -344,14 +344,14 @@ Same dependency rules as §2–3 for layers that exist. `npm run check:feature-i
 | **3** | Optional `src/features/*/infrastructure` adapters; keep Supabase types in `integrations/` until needed | Adapter tests |
 | **4** | `src/legacy` off main runtime path | **Done (transitional):** `tsconfig.app.json` + Vitest exclude `src/legacy/**`; `check:active-surface` blocks `@/legacy/*` in active tree; folder kept for `archive/full-ia-pre-strip` recovery only. Physical delete is optional / separate archive PR. |
 | **5a** | Domain contexts in `src/features/*` + `check:architecture-alignment` | **Done** on `feature/refactoring6` — see §10 |
-| **5b** | Presentation guardrails | `src/screens/README.md`; `check:no-root-components` in `test:ci` |
-| **5c** | **Pause** screen pilot | `components/pause/**` → `screens/pause/components/**`; [docs/screens/pause.md](../screens/pause.md) paths updated |
-| **5d** | **Home** screen | `components/home/**` → `screens/home/`; thin `pages/Home.tsx` |
-| **5e** | **Archive, Journey, Settings** | Same colocation pattern per tab |
-| **5f** | Companion routes | `/companion/*` UI under `screens/pause/` |
-| **5g** | Marketing / admin | `screens/marketing/`, `screens/admin/` |
-| **5h** | Orchestration | Screen-local hooks; split god hooks (`use-holzen`, `use-companion-data`, …) |
-| **5i** | Shrink global layers | Empty `components/` shims; root `hooks/` only cross-screen |
+| **5b** | Presentation guardrails | **Done** — `src/screens/README.md`; `check:no-root-components` in `test:ci` |
+| **5c** | **Pause** screen pilot | **Done** — `components/pause/**` → `screens/pause/components/**`; [docs/screens/pause.md](../screens/pause.md) |
+| **5d** | **Home** screen | **Done** — `components/home/**` → `screens/home/components/`; `pages/Home.tsx` still orchestrates (thin split optional) |
+| **5e** | **Archive, Journey, Settings** | **Done** — `screens/{archive,journey,settings}/components/` |
+| **5f** | Companion routes | **Done** — `/companion/*` pages + companion UI under `screens/pause/`; thin `pages/Companion*.tsx` re-exports |
+| **5g** | Marketing / admin | **Done** — `screens/marketing/components/`, `screens/admin/` |
+| **5h** | Orchestration | **Partial** — `use-home-*` → `screens/home/hooks/`; `use-companion-data` → `screens/pause/hooks/`; `use-holzen` remains cross-screen in `hooks/` |
+| **5i** | Shrink global layers | **Partial** — allowlist 48 root components (was 59); no `components/pause|home|archive` folders |
 | **6** | **Gated:** `pnpm-workspace.yaml`, `apps/web`, `packages/*` extract | Only after ADR §8 trigger; `build` from `apps/web` |
 | **7** | `shared-kernel`, `contracts` (minimal), `packages/infrastructure` | Adapter smoke test |
 | **8+** | `apps/web/src/screens`; `check:package-boundaries` | Post-extraction only |
