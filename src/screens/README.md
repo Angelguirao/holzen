@@ -48,3 +48,4 @@ screens/<route>/
 | Home dashboard UI + hooks | `screens/home/components/` (incl. market widgets, onboarding), `hooks/` |
 | Route wiring | `src/pages/` + `App.tsx` |
 | Primitives / mood glyphs | [components/README.md](../components/README.md) (`ui/`, `icons/`) |
+| Home → Pause flow (layers + RPC/edge) | [client-src-layout.md](../../docs/fundamentals/client-src-layout.md) § Reference flow |

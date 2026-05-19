@@ -80,9 +80,89 @@ Moving long architecture narratives into `src/` would split ownership and stale 
 
 ---
 
+## Reference flow: Home → Pause (manual “Need a moment”)
+
+Traces one **shipped** vertical slice: user starts a manual pause from Home and lands on `/pause`. Canonical contracts: [pause-system.md](../systems/pause-system.md), [screens/pause.md](../screens/pause.md), [ai-powered-pause-system.md](../systems/pause/ai-powered-pause-system.md).
+
+### 1. User action → navigation
+
+| Step | Layer | Code |
+|------|-------|------|
+| Tap “Need a moment” (or equivalent CTA) | Screen | `HomeScreen` → `HomePauseCardBody` via `useHomePauseCardProjection` |
+| Orchestration | Screen hook | `useHomePauseActions.handleNeedAPause` |
+| Market + pause create | Screen hook → feature | `useHolzen.manualTrigger` → `generateMessage` |
+| RPC (authority) | Feature infra | `pauseCreateOrReuse` → Postgres `pause_create_or_reuse` |
+| Route change | Router | `navigate('/pause', { state: PauseSessionLocationState })` |
+
+`generateMessage` (in `use-holzen.ts`) builds context from BTC data (`features/market` query + `buildPauseContextFromMarket`, fingerprint helpers in `features/pause`), then calls **`pauseCreateOrReuse`** — it does **not** call `holzen-reflect` on Home. Non-silent manual opens clear the Home reflection stub and pass `pauseInstanceId` + context through location state.
+
+### 2. `/pause` screen
+
+| Step | Layer | Code |
+|------|-------|------|
+| Route | App | `App.tsx` lazy-loads `PauseSessionScreen` (full-screen, no `AppLayout`) |
+| Conductor | Screen hook | `usePauseSessionScreen` composes shell, ritual, step handlers |
+| Subscription gate | Screen + feature | `useSubscription` / `useProGate`; blocks with `PauseEngagementBlocked` when `!canEngagePause` |
+| Hydration | Screen hooks + feature | `usePauseSessionShell`, location state, `v_pause_full` / session queries |
+| Ritual UI | Screen components | `PauseSessionGate` → depth picker or `PauseSessionScaffoldShell` → `PauseDecide`, etc. |
+| Step mutations | Screen hooks → feature | `pauseLogStep` / `pauseLogCompanion` via `features/pause/public-rpc` |
+
+Step handlers under `screens/pause/hooks/` call **`pauseLogStep`** (e.g. feel/shift, breath segments, decide outcome). RPC return value drives `engaged` / `completed` and PostHog `pause_engaged` / `pause_completed` inside `pause-rpc-client.ts`.
+
+### 3. Deep ritual — AI (after instance exists)
+
+| Step | Layer | Code |
+|------|-------|------|
+| Reflect copy | Screen hook → feature | `usePauseReflectGeneration` → `generateReflectionAtReflectStep` |
+| Edge | Feature infra | `invokeEdge('holzen-reflect', …)` (`x-cid` via `invoke-edge`) |
+| Persist artifacts | Feature infra | `pause_ai_artifacts` upsert (`reflection_text`, haiku, …) |
+| Companions | Screen hook → feature | `useCompanionData` → `invokeEdge('companion-orchestrate', …)` |
+| Full-view routes | Screen | `/companion/{signal,grounding,history,zoom-out}/:pauseInstanceId` |
+
+Brief ritual skips Frame/Reflect companions per [pause-system.md](../systems/pause-system.md); deep ritual runs reflect during the Reflect→Decide window and orchestrates companion slots per step.
+
+### Sequence (manual open)
+
+```mermaid
+sequenceDiagram
+  participant U as User
+  participant Home as screens/home
+  participant Holzen as useHolzen
+  participant PauseFeat as features/pause
+  participant PG as Postgres RPC
+  participant Pause as screens/pause
+  participant Edge as Edge functions
+
+  U->>Home: Need a moment
+  Home->>Holzen: manualTrigger()
+  Holzen->>Holzen: fetch BTC context
+  Holzen->>PauseFeat: pauseCreateOrReuse()
+  PauseFeat->>PG: pause_create_or_reuse
+  PG-->>PauseFeat: instance_id, state
+  Holzen-->>Home: instanceId + context
+  Home->>Pause: navigate /pause (location state)
+  Pause->>PauseFeat: pauseLogStep (ritual steps)
+  PauseFeat->>PG: pause_log_step
+  Note over Pause,Edge: Deep ritual only
+  Pause->>PauseFeat: generateReflectionAtReflectStep
+  PauseFeat->>Edge: holzen-reflect
+  Edge-->>PauseFeat: reflection + artifacts
+  Pause->>PauseFeat: companion-orchestrate
+  PauseFeat->>Edge: companion-orchestrate
+  Edge-->>Pause: companion payloads
+  Pause->>PG: pause_log_step outcome_logged
+  PG-->>Pause: completed
+```
+
+### How to use this flow in review
+
+Walk the sequence once in DevTools **Network** when changing pause code: expect `rpc/pause_create_or_reuse` after Home CTA, then `rpc/pause_log_step` on `/pause`, then `functions/v1/holzen-reflect` and `companion-orchestrate` on deep ritual steps. If a rule appears only in React (e.g. button `disabled`) but not in RPC/RLS/edge, flag it against checklist row **1** above.
+
+---
+
 ## Related
 
 - [src/README.md](../../src/README.md) — shipped routes
 - [AGENTS.md](../../AGENTS.md) — commands and edit table
 - [react-screen-orchestration.md](react-screen-orchestration.md) — conductor pattern inside a screen
-- End-to-end sequence (use case → adapter): [holzen-application-architecture.md](holzen-application-architecture.md) §6.3
+- End-to-end sequence (generic use case → adapter): [holzen-application-architecture.md](holzen-application-architecture.md) §6.3
