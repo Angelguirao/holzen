@@ -3,7 +3,7 @@ import { renderHook, act } from '@testing-library/react';
 import type { TFunction } from 'i18next';
 import { usePauseBreathSegmentRpcLoggers } from '@/screens/pause/hooks/use-pause-breath-segment-rpc-loggers';
 import { showPauseStepSyncFailedToast } from '@/features/pause/public';
-import { makeTestPersistedPauseSession } from '@/test/make-test-persisted-pause-session';
+import { makeTestPersistedPauseSession } from '@/test/fixtures/make-test-persisted-pause-session';
 
 const { pauseLogStepMock, invalidateCompanionUiCompletionQueryMock } = vi.hoisted(() => ({
   pauseLogStepMock: vi.fn(),

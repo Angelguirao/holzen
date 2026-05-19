@@ -22,7 +22,7 @@ Vitest discovers tests anywhere under `src/**/*.{test,spec}.{ts,tsx}` (see `vite
 |------|---------|
 | `setup.ts` | Global Vitest setup (`jest-dom`, `matchMedia` stub) |
 | `integration/` | Mocked `App` + Supabase; flow matrix F1–F9 — [integration/README.md](./integration/README.md) |
-| `fixtures/` | Shared factories used by multiple test files |
+| `fixtures/` | Shared factories (`make-test-persisted-pause-session.ts`, …) |
 | `legacy/` | Manual-only tests for stripped IA — [legacy/README.md](./legacy/README.md) |
 
 ## Imports in tests
