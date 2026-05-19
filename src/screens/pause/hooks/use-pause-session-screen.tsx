@@ -11,13 +11,10 @@ import { useSubscription } from '@/features/subscription/public-hooks';
 import { useProGate } from '@/features/subscription/public-hooks';
 import { isPauseSessionDepthPickerActive } from '@/features/pause/public';
 import { usePauseSessionStepTransition } from '@/screens/pause/hooks/use-pause-session-step-transition';
-import { usePauseFeelShiftLogDedupeRefs } from '@/screens/pause/hooks/use-pause-feel-shift-log-dedupe-refs';
 import { usePauseFavoriteToggle } from '@/screens/pause/hooks/use-pause-favorite-toggle';
-import { usePauseSessionInitialMoodHandlers } from '@/screens/pause/hooks/use-pause-session-initial-mood-handlers';
 import { usePauseShiftFrameDoneHandler } from '@/screens/pause/hooks/use-pause-shift-frame-done-handler';
 import { usePauseSessionExitNavigation } from '@/screens/pause/hooks/use-pause-session-exit-navigation';
-import { usePauseSessionPersistToStorage } from '@/screens/pause/hooks/use-pause-session-persist-to-storage';
-import { usePauseSessionRitualStorageSync } from '@/screens/pause/hooks/use-pause-session-ritual-storage-sync';
+import { usePauseSessionMoodAndPersist } from '@/screens/pause/hooks/use-pause-session-mood-and-persist';
 import { usePauseSessionRitualState } from '@/screens/pause/hooks/use-pause-session-ritual-state';
 import { usePauseSessionDepthAndBriefCopy } from '@/screens/pause/hooks/use-pause-session-depth-and-brief-copy';
 import { usePauseSessionBreathSecondLabelVariant } from '@/screens/pause/hooks/use-pause-session-breath-second-label-variant';
@@ -26,8 +23,6 @@ import { usePauseSessionShellBootstrap } from '@/screens/pause/hooks/use-pause-s
 import { usePauseSessionBreathHandlers } from '@/screens/pause/hooks/use-pause-session-breath-handlers';
 import { usePauseSessionScaffoldRitual } from '@/screens/pause/hooks/use-pause-session-scaffold-ritual';
 import { JOURNEY_PREFIX } from '@/lib/app-routes';
-import { usePauseSessionDepthPickerHandlers } from '@/screens/pause/hooks/use-pause-session-depth-picker-handlers';
-import { usePauseSessionFeelTilesSelect } from '@/screens/pause/hooks/use-pause-session-feel-tiles-select';
 import { clearSession } from '@/features/pause/public';
 import { usePauseSessionReflectAndDecide } from '@/screens/pause/hooks/use-pause-session-reflect-and-decide';
 import { usePauseSessionScaffoldChromeSlots } from '@/screens/pause/hooks/use-pause-session-scaffold-chrome-slots';
@@ -184,45 +179,18 @@ export function usePauseSessionScreen() {
     }
   }, [phase, handleReturn, requestExitPauseBeforeDone]);
 
-  const { lastFeelLogKeyRef, lastShiftLogKeyRef } = usePauseFeelShiftLogDedupeRefs(pauseInstanceId);
-
-  const { onBrief: depthPickerOnBrief, onDeep: depthPickerOnDeep } = usePauseSessionDepthPickerHandlers({
-    setRitualEntry,
-    setBriefStep,
-  });
-
-  const handleDepthPickerDeep = useCallback(() => {
-    if (!requirePro('deep_pause')) return;
-    depthPickerOnDeep();
-  }, [requirePro, depthPickerOnDeep]);
-
-  const { handleMoodSelect } = usePauseSessionInitialMoodHandlers({
+  const {
+    lastShiftLogKeyRef,
+    depthPickerOnBrief,
+    handleDepthPickerDeep,
+    onFeelTilesSelect,
+  } = usePauseSessionMoodAndPersist({
     pauseInstanceId,
     t,
-    lastFeelLogKeyRef,
-    setMoodDone,
-    setSelectedMood,
-    setFeelIntensity,
-    setSelectedBriefFace,
-  });
-
-  const { onFeelTilesSelect } = usePauseSessionFeelTilesSelect({
-    handleMoodSelect,
-    isBriefRitual: ritualEntry === 'brief',
-  });
-
-  usePauseSessionRitualStorageSync({
-    pauseInstanceId,
-    setRitualEntry,
-    setBriefStep,
-    setBriefIntegrateDone,
-    setSelectedBriefFace,
-  });
-
-  usePauseSessionPersistToStorage({
+    requirePro,
+    ritualEntry,
     message,
     context,
-    pauseInstanceId,
     companions,
     companionPrefs,
     severity,
@@ -238,10 +206,16 @@ export function usePauseSessionScreen() {
     breathingFirstCompleted,
     breathingSecondCompleted,
     frameDone,
-    ritualEntry,
     briefStep,
     briefIntegrateDone,
     selectedBriefFace,
+    setRitualEntry,
+    setBriefStep,
+    setBriefIntegrateDone,
+    setSelectedBriefFace,
+    setMoodDone,
+    setSelectedMood,
+    setFeelIntensity,
   });
 
   const {
