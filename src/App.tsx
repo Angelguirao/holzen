@@ -26,7 +26,7 @@ const Archive = lazy(() => import("./pages/Archive"));
 const JourneyOverview = lazy(() => import("./pages/journey/JourneyOverview"));
 const SettingsRoot = lazy(() => import("./pages/settings/SettingsRoot"));
 const SettingsStateLayout = lazy(() => import("./pages/settings/SettingsStateLayout"));
-const SettingsHub = lazy(() => import("./pages/settings/SettingsHub"));
+const SettingsHub = lazy(() => import("./screens/settings/components/SettingsHub"));
 const SettingsSectionPage = lazy(() => import("./pages/settings/SettingsSectionPage"));
 const Auth = lazy(() => import("./pages/Auth"));
 const Landing = lazy(() => import("./pages/Landing"));

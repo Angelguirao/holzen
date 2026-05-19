@@ -6,7 +6,7 @@
 
 | UI | Source |
 | --- | --- |
-| Streak card | [`JourneyStreakCard`](../../src/components/journey/JourneyStreakCard.tsx) + [`fetchPauseInstancesForJourney`](../../src/lib/journey/pause-instances-for-journey.ts) |
+| Streak card | [`JourneyStreakCard`](../../src/screens/journey/components/JourneyStreakCard.tsx) + [`fetchPauseInstancesForJourney`](../../src/features/pause/public-queries.ts) (journey query) |
 | Completed count | Same query — `state === 'completed'` rows |
 | Archive CTA | Link to `/archive` — **no Pro gate** (universal browse) |
 
