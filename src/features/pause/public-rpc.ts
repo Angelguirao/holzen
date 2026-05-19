@@ -13,3 +13,8 @@ export {
   type PauseCreateOrReuseResult,
   type PauseLogCompanionResult,
 } from './infrastructure/pause-rpc-client';
+
+export {
+  logPauseRitualDepthUpgraded,
+  ritualDepthUpgradedPayload,
+} from './application/session/ritual-depth-upgrade';

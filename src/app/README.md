@@ -14,5 +14,12 @@ Cross-route chrome and providers: layout, bottom nav, document meta, error bound
 | `components/OfflineBanner.tsx` | Network offline indicator |
 | `components/CookieConsent.tsx` | Cookie banner |
 | `components/PublicFooter.tsx` | Public page footer |
+| `components/NotificationBell.tsx` | Header notifications |
+| `components/PauseReadyBanner.tsx` | Pause-ready promo strip |
+| `components/CheckoutConfirmation.tsx` | Stripe return / checkout modal |
+| `components/PaywallSubscribedTracker.tsx` | Post-subscribe analytics |
+| `components/AuthLoading.tsx` | Auth bootstrap spinner |
+| `components/AppVersionBadge.tsx` | Build version display |
+| `components/FeedbackWidget.tsx` | Global feedback sheet (bug / feature / question) |
 
 See [frontend-module-layout.md](../../docs/fundamentals/frontend-module-layout.md) wave **5j**.

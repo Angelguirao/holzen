@@ -1,6 +1,6 @@
 import { useTranslation } from 'react-i18next';
 import { useHolzen } from '@/screens/home/hooks/use-holzen';
-import AuthLoading from '@/components/AuthLoading';
+import AuthLoading from '@/app/components/AuthLoading';
 import { useSubscription } from '@/hooks/use-subscription';
 import { Onboarding } from '@/screens/home/components/Onboarding';
 import { useWidgetLayout } from '@/screens/home/components/HomeWidget';

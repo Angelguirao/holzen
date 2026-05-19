@@ -18,7 +18,7 @@ interface State {
  * "Report this". `FeedbackWidget` mounts a listener and pre-fills its sheet with
  * this context so the report carries the Sentry event id + component stack anchor.
  *
- * Keep this in sync with src/components/FeedbackWidget.tsx.
+ * Keep this in sync with src/app/components/FeedbackWidget.tsx.
  */
 export interface OpenFeedbackDetail {
   source: 'error-boundary' | 'manual';
