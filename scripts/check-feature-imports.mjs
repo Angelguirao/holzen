@@ -73,7 +73,6 @@ const DEEP_FEATURE_IMPORT =
   /from\s+['"]@\/features\/[^'"]+\/(application|infrastructure|domain|presentation)\//;
 
 const ALLOWED_DEEP_IMPORT_FILES = new Set([
-  'src/lib/apply-bulk-hold-outcomes.ts',
   'src/lib/apply-bulk-hold-outcomes.test.ts',
   'src/test/checkout-confirmation-close-reopen.test.tsx',
   'src/test/checkout-confirmation-cross-tab.test.tsx',
@@ -84,7 +83,7 @@ const ALLOWED_DEEP_IMPORT_FILES = new Set([
 
 /** Migrated pause/companion domain — active app must use feature public APIs, not lib shims. */
 const LIB_COMPANION_SHIM = /@\/lib\/companion-/;
-const ALLOWED_LIB_PAUSE_IMPORTS = new Set(['@/lib/apply-bulk-hold-outcomes']);
+const ALLOWED_LIB_PAUSE_IMPORTS = new Set([]);
 
 const ACTIVE_APP_ROOTS = [
   join(root, 'src', 'hooks'),
