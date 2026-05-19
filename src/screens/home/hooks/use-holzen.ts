@@ -14,12 +14,11 @@ import {
   holzenMarketDisplayQueryKey,
 } from '@/features/market/public';
 import { supabase } from '@/integrations/supabase/client';
-import { fetchOpenPauseHomePreview } from '@/features/pause/public-queries';
 import { useAuth } from '@/features/auth/public';
 import { useProfile } from '@/features/user/public-hooks';
-import type { CompanionData } from '@/screens/pause/components/CompanionSection';
 import { holzenLog } from '@/lib/holzen-console';
 import { clearSession } from '@/features/pause/public';
+import { useOpenPauseHomePreview } from '@/screens/home/hooks/use-open-pause-home-preview';
 import {
   getManualReflectionCooldownMs,
   isHolzenDevMode,
@@ -87,87 +86,26 @@ function useHolzenState() {
     }),
   );
 
-  const [message, setMessage] = useState<string | null>(null);
-  const [context, setContext] = useState<string | null>(null);
-  const [companions, setCompanions] = useState<CompanionData>({
-    haiku: null,
-    groundingTitle: null,
-    groundingBody: null,
-  });
+  const {
+    message,
+    context,
+    companions,
+    lastPauseInstanceId,
+    openPauseState,
+    lastTriggerAt,
+    setMessage,
+    setContext,
+    setCompanions,
+    setLastPauseInstanceId,
+    setOpenPauseState,
+    setLastTriggerAt,
+    syncOpenPauseFromDb,
+  } = useOpenPauseHomePreview(user);
+
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   /** True briefly after a new pause message is shown — Home uses it for one-shot chime. */
   const [newPauseArrival, setNewPauseArrival] = useState(false);
-  const [lastPauseInstanceId, setLastPauseInstanceId] = useState<string | null>(null);
-  /** From `v_pause_current.state` — `active` vs `engaged` for Home CTA copy. */
-  const [openPauseState, setOpenPauseState] = useState<'active' | 'engaged' | null>(null);
-  const [lastTriggerAt, setLastTriggerAt] = useState<string | null>(null);
-
-  const clearOpenPausePreview = useCallback(() => {
-    setLastPauseInstanceId(null);
-    setOpenPauseState(null);
-    setLastTriggerAt(null);
-    setMessage(null);
-    setContext(null);
-    setCompanions({ haiku: null, groundingTitle: null, groundingBody: null });
-    clearSession();
-  }, []);
-
-  /** Re-read v_pause_current + artifacts so Home matches Library after completes / dismissals. */
-  const syncOpenPauseFromDb = useCallback(async (signal?: AbortSignal) => {
-    const dead = () => signal?.aborted ?? false;
-    if (!user) {
-      clearOpenPausePreview();
-      return;
-    }
-    const preview = await fetchOpenPauseHomePreview(user.id);
-
-    if (dead()) return;
-
-    if (!preview) {
-      clearOpenPausePreview();
-      return;
-    }
-
-    setLastPauseInstanceId(preview.pauseInstanceId);
-    setOpenPauseState(preview.openPauseState);
-    setLastTriggerAt(preview.createdAt);
-    setContext(preview.contextText);
-    setMessage(preview.reflectionMessage);
-    setCompanions(preview.companions);
-  }, [user, clearOpenPausePreview]);
-
-  // Hydrate open pause on login; keep in sync when pause_instances changes (complete / dismiss / cron).
-  useEffect(() => {
-    const ac = new AbortController();
-    void syncOpenPauseFromDb(ac.signal);
-    return () => ac.abort();
-  }, [syncOpenPauseFromDb]);
-
-  useEffect(() => {
-    if (!user) return;
-    const channel = supabase
-      .channel(`holzen-open-pause-${user.id}`)
-      .on(
-        'postgres_changes',
-        {
-          event: '*',
-          schema: 'public',
-          table: 'pause_instances',
-          filter: `user_id=eq.${user.id}`,
-        },
-        () => {
-          void syncOpenPauseFromDb();
-        },
-      )
-      .subscribe();
-
-    return () => {
-      if (typeof supabase.removeChannel === 'function') {
-        supabase.removeChannel(channel);
-      }
-    };
-  }, [user, syncOpenPauseFromDb]);
 
   const { generateMessage } = useManualPauseTrigger({
     user,
