@@ -10,7 +10,7 @@ import { getBreatheAmbientBtcQueryOptions } from '@/lib/btc';
 import { getMempoolSpaceBlockDataQueryOptions } from '@/lib/mempool-space-block-data';
 import { playBlockDiscoveryTone, startAmbientDrone } from '@/lib/notification-tone';
 import { useProGate } from '@/hooks/use-pro-gate';
-import { ProLock } from '@/app/components/ProLock';
+import { ProLock } from '@/components/ui/pro-lock';
 
 type VolatilityLevel = 'calm' | 'moderate' | 'intense';
 

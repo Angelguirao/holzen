@@ -1,8 +1,8 @@
 # App shell (`src/app/`)
 
-Cross-route chrome and providers: layout, bottom nav, document meta, error boundary, offline/cookie banners, public marketing footer.
+Cross-route chrome and providers: layout, bottom nav, document meta, error boundary, offline/cookie banners, global feedback.
 
-**Screens** (`src/screens/<route>/`) own tab-specific UI and orchestration. **Features** (`src/features/*`) own domain truth.
+**Screens** (`src/screens/<route>/`) own tab-specific UI. **Features** (`src/features/*`) own domain truth and shell-mounted presentation re-exported via `public.ts`.
 
 **Canonical:** [client-src-layout.md](../../docs/fundamentals/client-src-layout.md), [frontend-module-layout.md](../../docs/fundamentals/frontend-module-layout.md) wave **5j**.
 
@@ -11,43 +11,46 @@ Cross-route chrome and providers: layout, bottom nav, document meta, error bound
 | Folder | Role |
 |--------|------|
 | `src/screens/<route>/` | Route-scoped UI — [screens/README.md](../screens/README.md) |
-| `src/components/ui/` | Design system (shadcn + Holzen composites) — [components/README.md](../components/README.md) |
-| `src/features/*` | Domain truth — [features/README.md](../features/README.md) |
+| `src/components/ui/` | Design system — [components/README.md](../components/README.md) |
+| `src/features/*` | Domain + presentation mounted from shell — [features/README.md](../features/README.md) |
 
-## Components
+## Components in this folder
 
 | Path | Role |
 |------|------|
-| `components/AppLayout.tsx` | Authenticated shell (header, outlet, bottom nav) |
+| `components/AppLayout.tsx` | Authenticated shell (header, outlet, bottom nav); composes subscription/user/pause chrome |
 | `components/BottomNav.tsx` | Primary tab navigation |
-| `components/PageMeta.tsx` | Title / SEO / robots |
-| `components/PageHeading.tsx` | Marketing / settings page titles |
-| `components/ErrorBoundary.tsx` | React error boundary + feedback hook |
+| `components/PageMeta.tsx` | Per-route title / SEO / robots (imported by screens; head shell API) |
+| `components/ErrorBoundary.tsx` | React error boundary + Sentry feedback hook |
 | `components/OfflineBanner.tsx` | Network offline indicator |
 | `components/CookieConsent.tsx` | Cookie banner |
-| `components/PublicFooter.tsx` | Public page footer |
-| `components/NotificationBell.tsx` | Header notifications |
-| `components/PauseReadyBanner.tsx` | Pause-ready promo strip |
-| `components/CheckoutConfirmation.tsx` | Stripe return / checkout modal |
-| `components/PaywallSubscribedTracker.tsx` | Post-subscribe analytics |
-| `components/AuthLoading.tsx` | Auth bootstrap spinner |
-| `components/AppVersionBadge.tsx` | Build version display |
-| `components/FeedbackWidget.tsx` | Global feedback sheet (bug / feature / question) |
-| `components/HoldGoalWidget.tsx` | Hold goal editor (Home + Settings) |
-| `components/ProLock.tsx` | Pro feature gate wrapper |
-| `components/SubscriptionSkeleton.tsx` | Subscription loading placeholders |
-| `components/QuietWindowsManager.tsx` | Quiet hours UI (Settings) |
-| `components/ThresholdSetting.tsx` | BTC threshold control (Settings) |
+| `components/PauseReadyBanner.tsx` | Cross-tab “pause ready” strip (non-Home) |
+| `components/AuthLoading.tsx` | Auth bootstrap spinner (router gates) |
+| `components/FeedbackWidget.tsx` | Global error-report sheet (signed-in) |
 
-| `hooks/use-is-admin.ts` | Client admin gate for `/admin` and internal ops pages |
+| `hooks/use-is-admin.ts` | Client admin gate for `/admin` and ops pages |
 
-Settings orchestration: `src/screens/settings/hooks/`, `SettingsStateLayout.tsx`.
+## Placement rationale (what lives elsewhere)
+
+| UI | Location | Mount / import | Why not `app/components/`? |
+|----|----------|----------------|----------------------------|
+| `PublicFooter` | `screens/marketing/components/` | Marketing screens only | Public route footer, not app-root chrome |
+| `CheckoutConfirmation`, `PaywallSubscribedTracker` | `features/subscription/presentation/` | `AppLayout` via `@/features/subscription/public` | Subscription domain; shell only mounts globally for Stripe return on any tab |
+| `NotificationBell` | `features/user/presentation/` | `AppLayout` via `@/features/user/public` | Inbox logic + Supabase; header slot is shell |
+| `PageHeading`, `ProLock` | `components/ui/` | Many routes | Shared presentation primitives |
+| `HoldGoalWidget`, `InstallHolzenCard`, `SubscriptionSkeleton`, `ThresholdFrequencyEstimator` | `screens/home/components/` | Home (+ Settings composes some) | Home/settings product UI, not shell |
+| `ThresholdSetting`, `QuietWindowsManager`, `AppVersionBadge` | `screens/settings/components/` | Settings | User prefs content |
+
+**`AppLayout` orchestration:** intentionally wires `useHolzen` (profile), `PendingPauseOfferShell` (pause), `useAutoTrigger` + `PauseReadyBanner` (market/cron), and subscription checkout trackers — see docblock in `AppLayout.tsx`.
 
 ## Navigation cheat sheet
 
 | I need… | Start here |
 |---------|------------|
 | Tab / route UI | `screens/<route>/` |
-| Bottom nav, global banners, checkout | `app/components/` (this folder) |
-| Button, dialog, `LoadingButton` | `components/ui/` |
+| Bottom nav, global banners, meta, feedback | `app/components/` |
+| Checkout modal / subscribe analytics | `features/subscription/public` (mounted in `AppLayout`) |
+| Notification inbox | `features/user/public` (mounted in `AppLayout`) |
+| Marketing footer | `screens/marketing/components/PublicFooter` |
+| Primitives (`PageHeading`, `ProLock`, …) | `components/ui/` |
 | Route wiring | `src/pages/` + `App.tsx` |

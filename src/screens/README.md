@@ -45,7 +45,8 @@ screens/<route>/
 |---------|------------|
 | Pause ritual UI | `screens/pause/components/` |
 | Pause rules / RPC | `features/pause/` |
-| Home dashboard UI + hooks | `screens/home/components/` (incl. market widgets, onboarding), `hooks/` |
+| Home dashboard UI + hooks | `screens/home/components/` (`HoldGoalWidget`, `InstallHolzenCard`, `ThresholdFrequencyEstimator`, onboarding), `hooks/` |
+| Settings prefs UI | `screens/settings/components/` (`ThresholdSetting`, `QuietWindowsManager`, …) |
 | Route wiring | `src/pages/` + `App.tsx` |
 | Primitives / mood glyphs | [components/README.md](../components/README.md) (`ui/`, `icons/`) |
 | Home → Pause flow (layers + RPC/edge) | [client-src-layout.md](../../docs/fundamentals/client-src-layout.md) § Reference flow |

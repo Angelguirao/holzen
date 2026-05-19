@@ -81,7 +81,7 @@ vi.mock('react-i18next', () => ({
   }),
 }));
 
-import { CheckoutConfirmation } from '@/app/components/CheckoutConfirmation';
+import { CheckoutConfirmation } from '@/features/subscription/public';
 import { CreditsDashboard } from '@/screens/settings/components/CreditsDashboard';
 
 const CHECKOUT_CONFIRMED_KEY = 'holzen_checkout_confirmed';

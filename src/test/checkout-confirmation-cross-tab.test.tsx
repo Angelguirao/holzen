@@ -50,7 +50,7 @@ vi.mock('react-router-dom', async () => {
   return { ...actual, useNavigate: () => navigateMock };
 });
 
-import { CheckoutConfirmation } from '@/app/components/CheckoutConfirmation';
+import { CheckoutConfirmation } from '@/features/subscription/public';
 
 const PING_KEY = 'holzen_checkout_guard_ping';
 const CONFIRMED_KEY = 'holzen_checkout_confirmed';

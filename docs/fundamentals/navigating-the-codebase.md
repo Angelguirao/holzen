@@ -54,7 +54,7 @@ Routes are declared in **`src/App.tsx`**. Screen modules under **`src/screens/`*
 - **`ProtectedRoute`** — If auth is still loading, show `AuthLoading` (`src/app/components/`). If no user, redirect to `/welcome`. Otherwise render children.
 - **`PublicOnlyRoute`** — Logged-in users are redirected to `/`.
 
-**Main shell (four tabs):** `/`, `/archive`, `/journey`, `/settings` (+ nested `/settings/about`, `/settings/billing-history`, `/settings/:section`) use **`AppLayout`** (`src/app/components/AppLayout.tsx`): max-width column, header (“Holzen” + `NotificationBell`), **`<main id="main-content">`** around **`Outlet`**, and **`BottomNav`** (Home, Archive, Journey, Settings). `AppLayout` wires pause-ready chrome via outlet context; **`HolzenProvider`** wraps signed-in routes from `screens/home/hooks/use-holzen.ts`.
+**Main shell (four tabs):** `/`, `/archive`, `/journey`, `/settings` (+ nested `/settings/about`, `/settings/billing-history`, `/settings/:section`) use **`AppLayout`** (`src/app/components/AppLayout.tsx`): max-width column, header (“Holzen” + `NotificationBell` from `features/user/presentation`), **`<main id="main-content">`** around **`Outlet`**, and **`BottomNav`** (Home, Archive, Journey, Settings). `AppLayout` wires pause-ready chrome via outlet context; **`HolzenProvider`** wraps signed-in routes from `screens/home/hooks/use-holzen.ts`.
 
 **Full-screen authenticated routes** (no `AppLayout`, `RobotsNoIndex`): `/pause`, companion deep links `/companion/{zoom-out,history,signal,grounding}/:pauseInstanceId`, `/admin`, `/admin/smoke-test`, `/admin/sentry-alerts`, `/admin/edge-coverage`.
 

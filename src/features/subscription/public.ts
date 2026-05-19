@@ -31,3 +31,5 @@ export type {
 } from './domain/subscription-snapshot';
 export type { CheckoutEvent } from './domain/checkout-event';
 export { PRICING, PRO_FEATURES, type ProFeature } from './domain/pricing';
+export { CheckoutConfirmation } from './presentation/CheckoutConfirmation';
+export { PaywallSubscribedTracker } from './presentation/PaywallSubscribedTracker';

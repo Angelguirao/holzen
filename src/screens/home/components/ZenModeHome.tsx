@@ -9,7 +9,7 @@ import { Sparkles } from 'lucide-react';
 import { HomePauseBlockingErrorPanel } from '@/screens/home/components/HomePauseBlockingErrorPanel';
 import { LoadingButton } from '@/components/ui/loading-button';
 import { Skeleton } from '@/components/ui/skeleton';
-import { SubscriptionSkeleton } from '@/app/components/SubscriptionSkeleton';
+import { SubscriptionSkeleton } from '@/screens/home/components/SubscriptionSkeleton';
 import type { CompanionData, CompanionPrefs } from '@/screens/pause/components/CompanionSection';
 import type { BtcPriceData } from '@/features/market/public';
 import type { BtcMoveSeverity } from '@/features/market/public';

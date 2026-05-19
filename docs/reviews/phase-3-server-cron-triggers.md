@@ -62,7 +62,7 @@ If this path drifts from Phase 2 or from **`check-volatility`** / **`PauseSessio
 
 - How `pg_cron` (or equivalent) calls `check-volatility` and related workers; schedule and auth headers.
 
-### `src/app/components/NotificationBell.tsx` — notification consumer
+### `src/features/user/presentation/NotificationBell.tsx` — notification consumer
 
 - "Open pause" navigates to `/pause` with `state: { pauseInstanceId: p.pause_instance_id }` only — minimal payload; relies on Phase 2 hydration and profile/`useHolzen` fallbacks.
 

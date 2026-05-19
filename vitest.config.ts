@@ -37,14 +37,14 @@ export default defineConfig({
       // is renamed/removed and stops touching them — that way CI fails
       // loudly instead of silently dropping coverage.
       include: [
-        "src/components/CheckoutConfirmation.tsx",
-        "src/lib/checkout-suppression-window.ts",
+        "src/features/subscription/presentation/CheckoutConfirmation.tsx",
+        "src/features/subscription/application/checkout-suppression-window.ts",
       ],
       // Per-file thresholds, scoped to the two guard files. `100` for any
       // metric is a hard ceiling we don't want to lock in — leave a small
       // margin so trivial edits don't fail CI.
       thresholds: {
-        "src/components/CheckoutConfirmation.tsx": {
+        "src/features/subscription/presentation/CheckoutConfirmation.tsx": {
           // Measured baseline (Apr 2026): stmts 85.26 / branches 70.49 /
           // funcs 78.94 / lines 85.26. Floors set ~5pt below to absorb
           // benign edits without forcing a test for every cosmetic tweak.

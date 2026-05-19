@@ -8,9 +8,9 @@ import { ArrowLeft, ChevronUp } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Badge } from '@/components/ui/badge';
 import { PageMeta } from '@/app/components/PageMeta';
-import { PublicFooter } from '@/app/components/PublicFooter';
+import { PublicFooter } from '@/screens/marketing/components/PublicFooter';
 import { useInfiniteScroll } from '@/hooks/use-infinite-scroll';
-import { PageHeading } from '@/app/components/PageHeading';
+import { PageHeading } from '@/components/ui/page-heading';
 import {
   deleteRoadmapVote,
   getRoadmapItemsInfiniteQueryOptions,

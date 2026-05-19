@@ -6,7 +6,7 @@ import { getBlogPostBySlugQueryOptions } from '@/lib/blog-post-query';
 import { format } from 'date-fns';
 import { PageMeta } from '@/app/components/PageMeta';
 import { useTranslation } from 'react-i18next';
-import { PageHeading } from '@/app/components/PageHeading';
+import { PageHeading } from '@/components/ui/page-heading';
 
 const fade = (delay = 0) => ({
   initial: { opacity: 0, y: 14 },

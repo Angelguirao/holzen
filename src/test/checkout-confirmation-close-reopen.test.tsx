@@ -63,7 +63,7 @@ vi.mock('react-router-dom', async () => {
   return { ...actual, useNavigate: () => navigateMock };
 });
 
-import { CheckoutConfirmation } from '@/app/components/CheckoutConfirmation';
+import { CheckoutConfirmation } from '@/features/subscription/public';
 
 function renderAt(path: string) {
   return render(
