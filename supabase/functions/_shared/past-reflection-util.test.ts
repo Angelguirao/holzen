@@ -4,7 +4,7 @@ import {
   mergeUserWordsChronological,
   parseDirectionFromContext,
   pickPastReflection,
-} from "../../supabase/functions/_shared/past-reflection-util";
+} from "./past-reflection-util.ts";
 
 describe("parseDirectionFromContext", () => {
   it("extracts direction from common phrasings", () => {

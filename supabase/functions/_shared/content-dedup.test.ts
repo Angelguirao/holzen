@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { partitionArticleRefsByUrlInDb } from "../../supabase/functions/_shared/content-dedup.ts";
+import { partitionArticleRefsByUrlInDb } from "./content-dedup.ts";
 
 describe("partitionArticleRefsByUrlInDb", () => {
   it("keeps refs whose URLs are not in the DB set", () => {

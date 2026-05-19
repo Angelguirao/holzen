@@ -137,7 +137,7 @@ When `selectIntervention` picks **pattern** as the primary intervention:
 | Area | Path |
 |------|------|
 | Generator | `supabase/functions/_shared/generators/history.ts` |
-| Era pool + `pickEra` helper | `supabase/functions/_shared/history-util.ts` (pure, unit-tested in `src/test/history-util.test.ts`) |
+| Era pool + `pickEra` helper | `supabase/functions/_shared/history-util.ts` (pure, unit-tested in `supabase/functions/_shared/history-util.test.ts`) |
 | Orchestrator | `supabase/functions/companion-orchestrate/index.ts` |
 | Session intent | `supabase/functions/_shared/session-intent.ts` |
 | Quality gate | `supabase/functions/_shared/quality.ts` |

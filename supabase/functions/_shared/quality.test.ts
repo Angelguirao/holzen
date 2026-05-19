@@ -17,7 +17,7 @@ import {
   contentFingerprint,
   contentFingerprintSync,
   BANNED_PHRASES,
-} from '../../supabase/functions/_shared/quality';
+} from './quality.ts';
 
 describe('containsSlop', () => {
   it('detects banned phrases', () => {

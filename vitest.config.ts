@@ -8,7 +8,10 @@ export default defineConfig({
     environment: "jsdom",
     globals: true,
     setupFiles: ["./src/test/setup.ts"],
-    include: ["src/**/*.{test,spec}.{ts,tsx}"],
+    include: [
+      "src/**/*.{test,spec}.{ts,tsx}",
+      "supabase/functions/_shared/**/*.{test,spec}.{ts,tsx}",
+    ],
     exclude: ["src/legacy/**", "src/test/legacy/**", "node_modules/**"],
     /**
      * Coverage configuration — designed for CI (`npm run test:ci`).
@@ -25,7 +28,7 @@ export default defineConfig({
      * re-opens celebratory dialogs.
      *
      * The thresholds are intentionally just below the current measured
-     * coverage from `src/test/checkout-*` — high enough to catch regressions
+     * coverage from `CheckoutConfirmation.*.test.tsx` — high enough to catch regressions
      * (e.g. a new branch added without a matching test) but with a small
      * cushion so unrelated cosmetic edits don't trip CI.
      */

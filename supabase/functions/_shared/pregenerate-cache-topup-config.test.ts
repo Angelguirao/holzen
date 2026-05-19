@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 import {
   DEFAULT_PREGENERATE_CACHE_TOPUP,
   mergePregenerateCacheTopup,
-} from '../../supabase/functions/_shared/pregenerate-cache-topup-config.ts';
+} from './pregenerate-cache-topup-config.ts';
 
 describe('mergePregenerateCacheTopup', () => {
   it('returns defaults for null and non-objects', () => {
