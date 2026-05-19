@@ -11,8 +11,7 @@ import {
 } from '@/components/ui/sheet';
 import { cn } from '@/lib/utils';
 import { hapticFeedback } from '@/lib/haptics';
-import { pauseLogStep } from '@/features/pause/public-rpc';
-import { buildOutcomeLoggedPayload } from '@/features/pause/public';
+import { logRetrospectiveOutcome } from '@/features/pause/public-rpc';
 import { invalidatePauseStatsDataForUser } from '@/features/pause/public';
 import { supabase } from '@/integrations/supabase/client';
 import { trackEvent } from '@/lib/posthog';
@@ -38,11 +37,7 @@ export function ArchivePauseRetrospectiveOutcomeSheet({ row, open, onOpenChange,
       setSubmitting(true);
       try {
         hapticFeedback('medium');
-        await pauseLogStep({
-          instanceId: id,
-          stepType: 'outcome_logged',
-          payload: buildOutcomeLoggedPayload(outcome),
-        });
+        await logRetrospectiveOutcome({ instanceId: id, outcome });
         try {
           trackEvent('pause_outcome_retrospective', {
             pause_instance_id: id,

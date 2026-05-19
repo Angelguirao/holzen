@@ -4,9 +4,9 @@ import {
   type CompanionUiCompletionStep,
   type CompanionUiCompletionState,
 } from '@/features/pause/application/use-cases/companion/companion-ui-completion-types';
+import { persistCompanionUiStepCompletion as persistCompanionUiStepCompletionUseCase } from '@/features/pause/application/use-cases/companion/persist-ui-step-completion';
 import { invalidateCompanionUiCompletionQuery } from '@/features/pause/application/queries/companion-ui-completion-query-key';
-import { pauseLogCompanion, pauseLogStep } from '@/features/pause/public-rpc';
-import type { PauseStepType } from '@/features/pause/domain/pause-state';
+import { supabasePauseRepository } from '@/features/pause/infrastructure/supabase-pause-repository';
 
 export type { CompanionUiCompletionStep, CompanionUiCompletionState };
 export { EMPTY_COMPANION_UI_COMPLETION } from '@/features/pause/application/use-cases/companion/companion-ui-completion-types';
@@ -15,24 +15,6 @@ export {
   companionUiCompletionQueryKey,
   invalidateCompanionUiCompletionQuery,
 } from '@/features/pause/application/queries/companion-ui-completion-query-key';
-
-const STEP_TO_COMPANION_TYPE: Record<CompanionUiCompletionStep, string | null> = {
-  breathing: null,
-  haiku: 'haiku',
-  grounding: 'ground_nudge',
-  signal: 'signal',
-  zoomOut: 'zoom_out',
-  history: 'historical_insight',
-};
-
-const STEP_TO_STEP_TYPE: Record<CompanionUiCompletionStep, PauseStepType | null> = {
-  breathing: 'breath_completed',
-  haiku: null,
-  grounding: null,
-  signal: null,
-  zoomOut: null,
-  history: null,
-};
 
 export async function loadCompanionUiCompletionState(
   pauseInstanceId: string,
@@ -78,24 +60,11 @@ export async function persistCompanionUiStepCompletion(
   step: CompanionUiCompletionStep,
   options?: { entryPoint?: string },
 ): Promise<void> {
-  const stepType = STEP_TO_STEP_TYPE[step];
-  if (stepType) {
-    await pauseLogStep({
-      instanceId: pauseInstanceId,
-      stepType,
-    }).catch(() => undefined);
-    invalidateCompanionUiCompletionQuery(pauseInstanceId);
-    return;
-  }
-
-  const companionType = STEP_TO_COMPANION_TYPE[step];
-  if (!companionType) return;
-
-  await pauseLogCompanion({
-    instanceId: pauseInstanceId,
-    companionType,
-    action: 'complete',
-    entryPoint: options?.entryPoint ?? 'pause_flow',
-  }).catch(() => undefined);
+  await persistCompanionUiStepCompletionUseCase(
+    supabasePauseRepository,
+    pauseInstanceId,
+    step,
+    options,
+  );
   invalidateCompanionUiCompletionQuery(pauseInstanceId);
 }

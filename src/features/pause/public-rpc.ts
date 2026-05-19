@@ -17,6 +17,7 @@ export {
 export { ritualDepthUpgradedPayload } from './application/use-cases/session/ritual-depth-upgrade';
 export { supabasePauseRepository } from './infrastructure/supabase-pause-repository';
 
+import { logRetrospectiveOutcome as logRetrospectiveOutcomeUseCase } from './application/use-cases/archive/log-retrospective-outcome';
 import { logPauseRitualDepthUpgraded as logPauseRitualDepthUpgradedUseCase } from './application/use-cases/session/ritual-depth-upgrade';
 import {
   applyBulkHoldOutcomes as applyBulkHoldOutcomesUseCase,
@@ -25,6 +26,7 @@ import {
 import { supabasePauseRepository } from './infrastructure/supabase-pause-repository';
 import type { TFunction } from 'i18next';
 import type { BulkHoldOutcomeChoice, BulkHoldPendingPause } from './domain/bulk-hold';
+import type { PauseState } from './domain/pause-state';
 
 export type { BulkHoldApplyResult };
 
@@ -38,4 +40,12 @@ export function applyBulkHoldOutcomes(
   resolver: (p: BulkHoldPendingPause) => BulkHoldOutcomeChoice,
 ): Promise<BulkHoldApplyResult> {
   return applyBulkHoldOutcomesUseCase(supabasePauseRepository, rows, resolver);
+}
+
+/** Archive retrospective outcome — wired with default repository. */
+export function logRetrospectiveOutcome(params: {
+  instanceId: string;
+  outcome: string;
+}): Promise<PauseState | null> {
+  return logRetrospectiveOutcomeUseCase(supabasePauseRepository, params);
 }
