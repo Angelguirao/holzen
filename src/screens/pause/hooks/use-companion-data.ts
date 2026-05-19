@@ -23,7 +23,6 @@ import {
 import { companionUiCompletionQueryKey } from '@/features/pause/public';
 import { getRecencyHints } from '@/features/pause/public';
 import {
-  applyOrchestrateSlotLazyOrRegenerate,
   EMPTY_COMPANION_SLOT_RELAXATIONS,
   hydrateCompanionSlotsFromArtifactCache,
   hydrateOrchestrateSlotsFromInterventionResponse,
@@ -40,15 +39,16 @@ import {
   resetInterventionIdempotency,
   runOnceIntervention,
   companionSlotToGenerationTaxonomy,
-  isCompanionOrchestratePaywallCode,
   isOrchestratePayloadError,
+  resolveCompanionOrchestrateInvokeFailure,
   resolveOrchestrateInvokeUserMessage,
+  tryApplyOrchestrateSlotFromBody,
+  buildCompanionOrchestrateSessionFromRitual,
   buildInterventionOrchestrateBody,
   buildLazyFetchOrchestrateBody,
   buildRegenerateOrchestrateBody,
   setCompanionSlotError,
   setCompanionSlotLoading,
-  type CompanionOrchestrateSessionContext,
 } from '@/features/pause/public';
 import { useSubscription } from '@/features/subscription/public-hooks';
 import { useProGate } from '@/features/subscription/public-hooks';
@@ -316,15 +316,15 @@ export function useCompanionData({ companions, prefs, pauseInstanceId, context, 
         // Single-flight per `pauseInstanceId`: concurrent renders share the
         // same Promise, and on success a `sessionStorage` marker prevents
         // future remounts in the same tab session from re-issuing the call.
-        const orchestrateSession: CompanionOrchestrateSessionContext = {
+        const orchestrateSession = buildCompanionOrchestrateSessionFromRitual({
           pauseInstanceId,
-          context: context ?? '',
+          context,
           language,
-          reflectionMessage: reflectionMessage ?? '',
-          mood: mood ?? null,
-          severity: severityNumber ?? 0,
+          reflectionMessage,
+          mood,
+          severityNumber,
           moodHistory,
-        };
+        });
         const { data, error: fnError } = await runOnceIntervention(
           pauseInstanceId,
           () =>
@@ -425,15 +425,15 @@ export function useCompanionData({ companions, prefs, pauseInstanceId, context, 
       const signalSources = slot === 'signal' ? await loadActiveOrchestrateSources('signal') : undefined;
       const groundingSources = slot === 'grounding' ? await loadActiveOrchestrateSources('grounding') : undefined;
       const moodHistory = await loadMoodHistoryForOrchestrate();
-      const orchestrateSession: CompanionOrchestrateSessionContext = {
+      const orchestrateSession = buildCompanionOrchestrateSessionFromRitual({
         pauseInstanceId,
-        context: context ?? '',
+        context,
         language,
-        reflectionMessage: reflectionMessage ?? '',
-        mood: mood ?? null,
-        severity: severityNumber ?? 0,
+        reflectionMessage,
+        mood,
+        severityNumber,
         moodHistory,
-      };
+      });
 
       holzenLog.companion('lazy fetch orchestrate invoke', {
         slot,
@@ -455,25 +455,23 @@ export function useCompanionData({ companions, prefs, pauseInstanceId, context, 
       });
 
       const body = data as Record<string, unknown> | null;
-      if (isOrchestratePayloadError(fnError, body)) {
-        const { code, userMessage: msg } = await resolveOrchestrateInvokeUserMessage(
-          fnError,
-          body,
-          'This AI feature is temporarily unavailable. Please try again in a minute.',
-        );
+      const lazyFailure = await resolveCompanionOrchestrateInvokeFailure(
+        fnError,
+        body,
+        'lazy_fetch',
+        'This AI feature is temporarily unavailable. Please try again in a minute.',
+      );
+      if (lazyFailure) {
         holzenLog.companion('lazy fetch orchestrate failed', {
           slot,
           pause_instance_prefix: pauseInstanceId.slice(0, 8),
           fnError: fnError?.message ?? null,
-          bodyError: msg,
-          bodyCode: code,
+          bodyError: lazyFailure.userMessage,
+          bodyCode: lazyFailure.code,
         });
-        if (isCompanionOrchestratePaywallCode(code)) {
-          // Roll back the optimistic spend and route to the standard
-          // upsell so the very-first card tap that hits a paywall lands
-          // in the same place as regenerate.
+        if (lazyFailure.isPaywall) {
           fetchedSlotsRef.current.delete(slot);
-          if (code === 'companions_upgrade_required') {
+          if (lazyFailure.code === 'companions_upgrade_required') {
             requirePro('companions');
           } else {
             showLimitReachedToast({ feature: 'companion', startCheckout });
@@ -481,7 +479,7 @@ export function useCompanionData({ companions, prefs, pauseInstanceId, context, 
         } else {
           toast({
             title: 'Companion unavailable',
-            description: msg,
+            description: lazyFailure.userMessage,
             variant: 'destructive',
           });
         }
@@ -498,16 +496,17 @@ export function useCompanionData({ companions, prefs, pauseInstanceId, context, 
         setZoomOut,
         autoSaveToLibrary,
       };
-      const r = readOrchestrateSlotBody(body, slot);
-      if (isFilledOrchestrateSlot(r)) {
-        applyOrchestrateSlotLazyOrRegenerate(slot, r, setCacheIds, slotCommitters, setCacheRelaxations);
+      const filled = tryApplyOrchestrateSlotFromBody(
+        body,
+        slot,
+        setCacheIds,
+        slotCommitters,
+        setCacheRelaxations,
+      );
+      if (filled) {
         holzenLog.companion('lazy fetch slot filled', {
           slot,
           pause_instance_prefix: pauseInstanceId.slice(0, 8),
-          source: r.source,
-          latencyMs: r.latencyMs,
-          cacheRelaxation: r.cacheRelaxation ?? null,
-          hasCacheId: Boolean(r.cacheId),
         });
       } else {
         holzenLog.companion('lazy fetch empty or error slot', {
@@ -588,15 +587,15 @@ export function useCompanionData({ companions, prefs, pauseInstanceId, context, 
       const signalSources = slot === 'signal' ? await loadActiveOrchestrateSources('signal') : undefined;
       const groundingSources = slot === 'grounding' ? await loadActiveOrchestrateSources('grounding') : undefined;
       const moodHistory = await loadMoodHistoryForOrchestrate();
-      const orchestrateSession: CompanionOrchestrateSessionContext = {
+      const orchestrateSession = buildCompanionOrchestrateSessionFromRitual({
         pauseInstanceId,
-        context: context ?? '',
+        context,
         language,
-        reflectionMessage: reflectionMessage ?? '',
-        mood: mood ?? null,
-        severity: severityNumber ?? 0,
+        reflectionMessage,
+        mood,
+        severityNumber,
         moodHistory,
-      };
+      });
 
       holzenLog.companion('regenerate orchestrate invoke', {
         slot,
@@ -618,27 +617,34 @@ export function useCompanionData({ companions, prefs, pauseInstanceId, context, 
       });
 
       const body = data as Record<string, unknown> | null;
-      if (isOrchestratePayloadError(fnError, body)) {
-        const { code, userMessage: msg } = await resolveOrchestrateInvokeUserMessage(
-          fnError,
-          body,
-          'This AI feature is temporarily unavailable. Please try again in a minute.',
-        );
+      const regenerateFailure = await resolveCompanionOrchestrateInvokeFailure(
+        fnError,
+        body,
+        'regenerate',
+        'This AI feature is temporarily unavailable. Please try again in a minute.',
+      );
+      if (regenerateFailure) {
         holzenLog.companion('regenerate orchestrate failed', {
           slot,
           pause_instance_prefix: pauseInstanceId.slice(0, 8),
           fnError: fnError?.message ?? null,
           bodyError: typeof body?.error === 'string' ? body.error : null,
-          bodyCode: code,
+          bodyCode: regenerateFailure.code,
         });
-        if (isCompanionOrchestratePaywallCode(code)) {
+        if (regenerateFailure.isPaywall) {
           toast({
             title: 'Companion unavailable',
-            description: msg ?? 'This companion is outside your current plan allowance.',
+            description:
+              regenerateFailure.userMessage ??
+              'This companion is outside your current plan allowance.',
             variant: 'destructive',
           });
         } else {
-          toast({ title: 'Regenerate failed', description: msg, variant: 'destructive' });
+          toast({
+            title: 'Regenerate failed',
+            description: regenerateFailure.userMessage,
+            variant: 'destructive',
+          });
         }
         setCompanionSlotError(slot, companionSlotErrorSetters, true);
         return;
@@ -651,15 +657,17 @@ export function useCompanionData({ companions, prefs, pauseInstanceId, context, 
         setZoomOut,
         autoSaveToLibrary,
       };
-      const r = readOrchestrateSlotBody(body, slot);
-      if (isFilledOrchestrateSlot(r)) {
-        applyOrchestrateSlotLazyOrRegenerate(slot, r, setCacheIds, slotCommitters, setCacheRelaxations);
+      const filled = tryApplyOrchestrateSlotFromBody(
+        body,
+        slot,
+        setCacheIds,
+        slotCommitters,
+        setCacheRelaxations,
+      );
+      if (filled) {
         holzenLog.companion('regenerate slot filled', {
           slot,
           pause_instance_prefix: pauseInstanceId.slice(0, 8),
-          source: r.source,
-          latencyMs: r.latencyMs,
-          cacheRelaxation: r.cacheRelaxation ?? null,
         });
       } else {
         holzenLog.companion('regenerate empty slot', { slot, pause_instance_prefix: pauseInstanceId.slice(0, 8) });

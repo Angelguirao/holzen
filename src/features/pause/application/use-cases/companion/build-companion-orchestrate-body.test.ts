@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import {
+  buildCompanionOrchestrateSessionFromRitual,
   buildInterventionOrchestrateBody,
   buildLazyFetchOrchestrateBody,
   buildRegenerateOrchestrateBody,
@@ -25,6 +26,26 @@ const recency = {
   recentHistoryTitles: [],
   recentZoomOutTitles: [],
 };
+
+describe('buildCompanionOrchestrateSessionFromRitual', () => {
+  it('coalesces null ritual inputs to defaults', () => {
+    expect(
+      buildCompanionOrchestrateSessionFromRitual({
+        pauseInstanceId: 'p1',
+        language: 'en',
+        moodHistory: [],
+      }),
+    ).toEqual({
+      pauseInstanceId: 'p1',
+      context: '',
+      language: 'en',
+      reflectionMessage: '',
+      mood: null,
+      severity: 0,
+      moodHistory: [],
+    });
+  });
+});
 
 describe('buildInterventionOrchestrateBody', () => {
   it('requests intervention only with companions disabled', () => {

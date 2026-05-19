@@ -20,6 +20,36 @@ export function isCompanionOrchestratePaywallCode(
   return code === 'companions_quota_exceeded' || code === 'companions_upgrade_required';
 }
 
+export type CompanionOrchestrateInvokeFailureKind = 'lazy_fetch' | 'regenerate';
+
+export interface CompanionOrchestrateInvokeFailure {
+  kind: CompanionOrchestrateInvokeFailureKind;
+  code: string | null;
+  userMessage: string;
+  isPaywall: boolean;
+}
+
+/** When non-null, the invoke returned an error payload the UI should handle. */
+export async function resolveCompanionOrchestrateInvokeFailure(
+  fnError: unknown,
+  body: Record<string, unknown> | null,
+  kind: CompanionOrchestrateInvokeFailureKind,
+  fallbackMessage: string,
+): Promise<CompanionOrchestrateInvokeFailure | null> {
+  if (!isOrchestratePayloadError(fnError, body)) return null;
+  const { code, userMessage } = await resolveOrchestrateInvokeUserMessage(
+    fnError,
+    body,
+    fallbackMessage,
+  );
+  return {
+    kind,
+    code,
+    userMessage,
+    isPaywall: isCompanionOrchestratePaywallCode(code),
+  };
+}
+
 export async function resolveOrchestrateInvokeUserMessage(
   fnError: unknown,
   body: Record<string, unknown> | null,
