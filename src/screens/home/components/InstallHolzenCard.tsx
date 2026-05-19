@@ -3,7 +3,7 @@ import { Download, X, Smartphone } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useInstallPrompt } from '@/app/hooks/use-install-prompt';
 import { useAuth } from '@/features/auth/public';
-import { supabase } from '@/integrations/supabase/client';
+import { logPwaInstallAnalyticsEvent } from '@/screens/home/lib/log-pwa-install-analytics';
 import { cn } from '@/lib/utils';
 import type { PWAInstallElement } from '@/types/pwa-install';
 
@@ -15,11 +15,6 @@ interface Props {
   /** Compact variant for Settings (no dismiss button, smaller padding). */
   compact?: boolean;
   className?: string;
-}
-
-function insertPwaInstallAnalyticsEvent(userId: string | undefined, event: string, metadata?: Record<string, unknown>) {
-  if (!userId) return;
-  void supabase.from('analytics_events').insert([{ user_id: userId, event, metadata: (metadata ?? {}) as never }]);
 }
 
 export function InstallHolzenCard({ alwaysShow = false, compact = false, className }: Props) {
@@ -49,14 +44,14 @@ export function InstallHolzenCard({ alwaysShow = false, compact = false, classNa
   useEffect(() => {
     if (isInstalled || (!alwaysShow && dismissed) || shownRef.current) return;
     shownRef.current = true;
-    insertPwaInstallAnalyticsEvent(user?.id, 'pwa_install_prompt_shown', { surface: compact ? 'settings' : 'home' });
+    logPwaInstallAnalyticsEvent(user?.id, 'pwa_install_prompt_shown', { surface: compact ? 'settings' : 'home' });
   }, [isInstalled, dismissed, alwaysShow, compact, user?.id]);
 
   if (isInstalled) return null;
   if (!alwaysShow && dismissed) return null;
 
   const handleInstall = async () => {
-    insertPwaInstallAnalyticsEvent(user?.id, 'pwa_install_prompt_accepted', { surface: compact ? 'settings' : 'home', native: canInstall });
+    logPwaInstallAnalyticsEvent(user?.id, 'pwa_install_prompt_accepted', { surface: compact ? 'settings' : 'home', native: canInstall });
     if (canInstall) {
       // Native Android/Desktop Chrome path — use the captured beforeinstallprompt
       await install();
@@ -69,7 +64,7 @@ export function InstallHolzenCard({ alwaysShow = false, compact = false, classNa
   const handleDismiss = () => {
     try { localStorage.setItem(DISMISS_KEY, '1'); } catch { /* ignore */ }
     setDismissed(true);
-    insertPwaInstallAnalyticsEvent(user?.id, 'pwa_install_prompt_dismissed', { surface: 'home' });
+    logPwaInstallAnalyticsEvent(user?.id, 'pwa_install_prompt_dismissed', { surface: 'home' });
   };
 
   return (
