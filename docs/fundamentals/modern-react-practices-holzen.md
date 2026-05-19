@@ -51,7 +51,7 @@ The ecosystem moved **away from**:
 
 **Holzen target:** `packages/<context>/` + `apps/web/src/screens/` — see [frontend-module-layout.md](frontend-module-layout.md). **Pause** is the large context; companions live **inside** pause, not a separate domain package.
 
-**Holzen today (transitional):** flat `src/hooks/`, `src/lib/`, mixed `src/components/` — **misaligned**; migration in progress.
+**Holzen today:** `src/features/<context>/`, `src/screens/<route>/hooks/`, shared utilities in `src/lib/use-*` and `src/components/ui/` — root `src/hooks/` removed (May 2026); some `src/lib/` query shims still migrating to features.
 
 | Check | Target | Today |
 |-------|--------|-------|
@@ -69,7 +69,7 @@ The ecosystem moved **away from**:
 
 | Check | Target | Today |
 |-------|--------|-------|
-| Feature-specific hook not in root `hooks/` | ✅ | ❌ flat `src/hooks/` |
+| Feature-specific hook not in root `hooks/` | ✅ | ✅ `features/*/public-hooks` + screen hooks |
 | “Shared” justified in PR (2+ consumers) | ✅ | ⚠️ root `components/` clutter |
 | Archive/journey queries with pause reads | ✅ | ⚠️ scattered `*-query.ts` in `src/lib/` |
 
@@ -267,9 +267,9 @@ Add to [react-spa-review-template.md](../reviews/react-spa-review-template.md) f
 Order that satisfies **both** this doc and [frontend-module-layout.md](frontend-module-layout.md):
 
 1. **Screens** — `apps/web/src/screens/*` (Home, Archive, Pause, …).
-2. **`packages/pause`** — domain + use cases first; companions under `application/companion/`.
+2. **`packages/pause`** — domain + use cases first; companions under `application/use-cases/companion/`.
 3. **`packages/infrastructure`** — adapters; Query `queryOptions` factories move here.
-4. **Thin hooks** — screens call use cases; delete logic from root `src/hooks` as you go.
+4. **Thin hooks** — screens call use cases; keep orchestration in `screens/<route>/hooks/`, not a global hooks folder.
 5. **`contracts`** — when touching edge/RPC JSON.
 6. **CI** — `check:package-boundaries` / `check:feature-imports`.
 
