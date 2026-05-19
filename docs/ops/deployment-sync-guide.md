@@ -172,7 +172,7 @@ Some Edge functions assume columns already exist — e.g. **`fetch-source-feeds`
 
 **`npm run check:view-migrations`:** Runs `scripts/lint-view-migrations.mjs` — fails when a migration would break Postgres by renaming/dropping columns on `CREATE OR REPLACE VIEW` without a prior `DROP VIEW`. **`npm run check:prepush`** runs it first (after the edge release stamp).
 
-**`npm run check:edge-coverage-manifest`:** Runs `scripts/verify-edge-coverage-manifest.mjs` — every `[functions.<name>]` in `supabase/config.toml` must appear in `src/pages/EdgeCoverage.tsx` `COVERAGE` (and extras are forbidden). CI runs this via `npm run test:ci`. It is also included in **`npm run check:prepush`** (see **Combined local gate** above). Update the `COVERAGE` row flags when you change observability patterns in a function's `index.ts`.
+**`npm run check:edge-coverage-manifest`:** Runs `scripts/verify-edge-coverage-manifest.mjs` — every `[functions.<name>]` in `supabase/config.toml` must appear in `src/screens/ops/EdgeCoverageScreen.tsx` `COVERAGE` (and extras are forbidden). CI runs this via `npm run test:ci`. It is also included in **`npm run check:prepush`** (see **Combined local gate** above). Update the `COVERAGE` row flags when you change observability patterns in a function's `index.ts`.
 
 **`npm run check:version-sync`:** Runs `scripts/check-version-sync.mjs` — compares **`package.json` `version`** to the latest **`changelog_entries`** row (PostgREST). **`npm run build`** runs it automatically via the **`prebuild`** hook.
 

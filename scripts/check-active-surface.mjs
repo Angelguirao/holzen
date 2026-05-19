@@ -38,7 +38,7 @@ const FORBIDDEN_PATTERNS = [
   { re: /@\/lib\/pause-replay-thread/, label: '@/lib/pause-replay-thread (legacy full-shell)' },
 ];
 
-/** Tier B tables dropped at MVP cutover — no `.from('…')` in active src. */
+/** Tier B tables dropped at pause-first launch cutover — no `.from('…')` in active src. */
 const TIER_B_TABLES = [
   'practice_entries',
   'user_badges',

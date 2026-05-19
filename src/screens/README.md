@@ -29,6 +29,7 @@ screens/<route>/
 | `settings/` | Settings hub — **`SettingsStateLayout`**, `hooks/`, `components/`; thin `pages/settings/` | [README](settings/README.md) |
 | `marketing/` | Public pages — **`AboutScreen`**, landing **`components/`** | [README](marketing/README.md) |
 | `admin/` | `/admin` — **`AdminScreen`**, `hooks/`, **`components/`** | [README](admin/README.md) |
+| `ops/` | Dev/ops (`/smoke-test`, `/edge-coverage`, …) | [README](ops/README.md) |
 
 ## Rules
 
