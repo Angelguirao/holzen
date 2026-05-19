@@ -1,5 +1,5 @@
 import { useProfile } from '@/hooks/use-profile';
-import { useLanguageSync } from '@/hooks/use-language-sync';
+import { useLanguageSync } from '@/app/hooks/use-language-sync';
 
 /**
  * Profile fields the authenticated shell needs (header chrome, i18n).
