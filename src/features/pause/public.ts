@@ -264,7 +264,16 @@ export {
   stopPauseReflectFrameFocusAmbience,
 } from './application/use-cases/breathing/ritual-audio';
 export { getRecencyHints } from './application/use-cases/companion/recency-hints';
-export { trackCompanionServed } from './application/use-cases/companion/analytics';
+export {
+  companionSlotToGenerationTaxonomy,
+  trackCompanionServed,
+} from './application/use-cases/companion/analytics';
+export {
+  isCompanionOrchestratePaywallCode,
+  isOrchestratePayloadError,
+  resolveOrchestrateInvokeUserMessage,
+  type CompanionOrchestratePaywallCode,
+} from './application/use-cases/companion/orchestrate-invoke-error';
 export {
   companionUiCompletionQueryKey,
   invalidateCompanionUiCompletionQuery,
