@@ -61,7 +61,11 @@ if (failures.length) {
   process.exit(1);
 }
 
-for (const script of ['check-feature-imports.mjs', 'check-no-screens-in-features.mjs']) {
+for (const script of [
+  'check-feature-imports.mjs',
+  'check-no-screens-in-features.mjs',
+  'check-thin-pages.mjs',
+]) {
   const child = spawnSync(process.execPath, [`scripts/${script}`], {
     cwd: root,
     stdio: 'inherit',
@@ -70,5 +74,5 @@ for (const script of ['check-feature-imports.mjs', 'check-no-screens-in-features
 }
 
 console.log(
-  'check:architecture-alignment: OK (waves 0–4 — src/features/*, public APIs, legacy quarantined)',
+  'check:architecture-alignment: OK (waves 0–5 — features, screens, thin pages, legacy quarantined)',
 );

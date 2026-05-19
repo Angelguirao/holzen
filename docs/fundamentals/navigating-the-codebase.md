@@ -112,21 +112,27 @@ Do **not** add global **`QueryClient` defaultOptions** lightly: they affect ever
 
 ---
 
-## 7. Pages (`src/pages/`) — grouped by domain
+## 7. Screens and pages (post–wave 5)
 
-- **Core app:** `Home`, `Library`, `Profile` (Journey UI at `/journey/*`), `Settings`, `ToolsHub` (`/tools`).
-- **Auth / legal / marketing:** `Landing`, `Auth`, `ResetPassword`, `Terms`, `Privacy`, `About`, `Blog`, `BlogPost`, `Roadmap`, `Reserve`.
-- **Full-screen tools:** `PauseSession`, `Breathe`, `Ground` + `GroundHistory` (nested under `ToolsGroundLayout`), `PracticeCheckIn`, `PracticeJournal`, `PracticeBodyScan`, `PracticeReplay` — mounted at **`/tools/...`** in `App.tsx` (see **`src/lib/app-routes.ts`**). Stillness is **`/tools/breathe`** (the former Ambient surface was folded into that flow).
-- **Ops:** `Admin` (see below).
-- **Errors:** `NotFound`.
+**Implementation** lives under **`src/screens/<route>/`** (`*Screen.tsx`, `components/`, `hooks/`). **`src/pages/**/*.tsx`** are **thin re-exports only** (`npm run check:thin-pages`). **`App.tsx`** lazy-loads screen entrypoints.
+
+| Area | Screen folder | Notes |
+|------|---------------|--------|
+| Core tabs | `screens/home`, `archive`, `journey`, `settings` | Pause-first shell |
+| Pause + companions | `screens/pause` | `/pause`, `/companion/*` |
+| Public / marketing | `screens/marketing` | `/welcome`, `/auth`, legal, blog |
+| Admin | `screens/admin` | `/admin` |
+| Internal ops | `screens/ops` | Edge coverage, smoke test, Sentry alerts |
+
+Index: [src/screens/README.md](../../src/screens/README.md).
 
 ---
 
-## 8. Components (`src/components/`)
+## 8. Components and app shell
 
-- **`ui/`** — shadcn/Radix-style primitives (buttons, dialogs, forms, etc.). Reuse these before adding one-off styled divs.
-- **Feature folders** — e.g. `practice/`, `onboarding/`, `pause/`, `admin/`.
-- **Cross-cutting:** `AppLayout`, `BottomNav`, `ErrorBoundary`, `OfflineBanner`, `CookieConsent`, `NotificationBell`, companion and intervention UI, etc.
+- **`src/components/ui/`** — shadcn/Radix primitives only at the `components/` root (enforced by `check:no-root-components`).
+- **`src/app/components/`** — cross-route shell: `AppLayout`, `BottomNav`, `ErrorBoundary`, `CookieConsent`, checkout/feedback chrome, etc. See [src/app/README.md](../../src/app/README.md).
+- **Per-screen UI** — under `src/screens/<route>/components/`, not `src/components/<feature>/`.
 
 ---
 
