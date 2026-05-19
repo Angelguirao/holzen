@@ -49,7 +49,7 @@ Full diagram, metadata, boot-recovery, and domain notes: **[index-html-and-spa-s
 
 ## 4. Routing and layout (`src/App.tsx`)
 
-Routes are declared in **`src/App.tsx`**. Screen modules under **`src/screens/`** are **`React.lazy`**-loaded (some thin re-exports remain in `src/pages/` for stable paths). **`Suspense`** around **`Routes`** shows a small full-screen fallback while a chunk downloads. Two patterns matter:
+Routes are declared in **`src/App.tsx`**. Screen modules under **`src/screens/`** are **`React.lazy`**-loaded. **`Suspense`** around **`Routes`** shows a small full-screen fallback while a chunk downloads. Two patterns matter:
 
 - **`ProtectedRoute`** — If auth is still loading, show `AuthLoading` (`src/app/components/`). If no user, redirect to `/welcome`. Otherwise render children.
 - **`PublicOnlyRoute`** — Logged-in users are redirected to `/`.
@@ -112,9 +112,9 @@ Do **not** add global **`QueryClient` defaultOptions** lightly: they affect ever
 
 ---
 
-## 7. Screens (`src/screens/`) and thin `src/pages/` re-exports
+## 7. Screens (`src/screens/`)
 
-**Canonical UI** lives under **`src/screens/<route>/`** ([screens/README.md](../../src/screens/README.md)). **`App.tsx`** lazy-imports `*Screen.tsx` files directly. **`src/pages/*.tsx`** are mostly one-line re-exports for stable import paths — prefer editing the screen module.
+**Canonical UI** lives under **`src/screens/<route>/`** ([screens/README.md](../../src/screens/README.md)). **`App.tsx`** lazy-imports `*Screen.tsx` files directly — edit the screen module, not a separate pages shim.
 
 | Area | Screen module | Routes |
 |------|---------------|--------|
@@ -201,7 +201,7 @@ Each folder under **`supabase/functions/<name>/`** is a deployable function. Sha
 
 ---
 
-## 13. Admin (`src/pages/Admin.tsx`)
+## 13. Admin (`src/screens/admin/AdminScreen.tsx`)
 
 - Route `/admin` is **protected by login** like any other `ProtectedRoute`.
 - **Authorization:** `useIsAdmin` reads `profiles.is_admin` when present; if the column/query fails, it falls back to **`VITE_ADMIN_USER_IDS`** (comma-separated user UUIDs).
@@ -295,11 +295,11 @@ Stop when you can explain **in one sentence** each: what **`use-holzen`** does v
 
 ### Phase B — Whole app
 
-Goal: **map** the rest of the surface area without drowning in files. Use **§4** (routing) and **§6–7** (hooks + pages) in *this* doc as the index.
+Goal: **map** the rest of the surface area without drowning in files. Use **§4** (routing) and **§6–7** (hooks + screens) in *this* doc as the index.
 
 | Step | What to do |
 |------|------------|
-| 1. **Route map** | Re-read **§4** above — list every **main** route (`/`, `/archive`, `/journey/*`, `/settings`, `/tools`, `/pause`, immersive `/tools/*` practices, `/admin`, public routes). For each **bucket**, note the **page file** under `src/pages/`. |
+| 1. **Route map** | Re-read **§4** above — list every **main** route (`/`, `/archive`, `/journey/*`, `/settings`, `/tools`, `/pause`, immersive `/tools/*` practices, `/admin`, public routes). For each **bucket**, note the **screen module** under `src/screens/`. |
 | 2. **Auth shell** | **§5** — `use-auth`, `ProtectedRoute` / `PublicOnlyRoute`. Trace **`/welcome`** vs **`/`** once in `App.tsx`. Optional: [route-gating-system.md](../systems/routing/route-gating-system.md). |
 | 3. **Feature hooks** | **§6** table — for each row you care about, open the hook and **one** page that uses it (`use-library` + `Library`, `use-subscription` + billing/settings, `use-push-notifications`, etc.). |
 | 4. **Components** | **§8** — skim `components/ui/`, `app/components/`, and one `screens/<route>/components/` folder (e.g. `pause/`). |

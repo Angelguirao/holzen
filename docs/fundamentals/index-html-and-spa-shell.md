@@ -16,7 +16,7 @@ Related: [navigating-the-codebase.md](navigating-the-codebase.md) §3 (short boo
 | **Routes** | Same file for `/`, `/pause`, `/journey`, etc. (client router picks the screen) | `App.tsx` + `react-router` choose the screen |
 | **When it changes** | SEO/PWA meta, boot recovery, Vite entry | Almost all product work |
 
-You do **not** add new screens by adding new HTML files. You add pages under `src/pages/` and routes in `src/App.tsx`.
+You do **not** add new screens by adding new HTML files. You add a screen under `src/screens/<route>/` and wire the route in `src/App.tsx`.
 
 ---
 
@@ -108,7 +108,7 @@ When you change the canonical domain, set optional **`VITE_SITE_ORIGIN`** (build
 | Per-route SEO | `PageMeta` on the page + `SITE_ORIGIN` |
 | Private / app routes | `RobotsNoIndex`, `AppLayout`, or `noindex` on `PageMeta` |
 | Boot / cache recovery behavior | `index.html` inline script |
-| New screen or flow | `src/pages/`, `App.tsx` — not `index.html` |
+| New screen or flow | `src/screens/<route>/`, `App.tsx` — not `index.html` |
 | Faster third-party connections | `vite.config.ts` `preconnectHeadSnippet` |
 
 ---

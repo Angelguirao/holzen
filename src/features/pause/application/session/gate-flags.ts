@@ -6,7 +6,7 @@ import type { PauseSessionHydrationState } from '@/features/pause/application/se
  * Pure predicates for `/pause` gate UI: spinner while fetching instance by id, vs depth picker when
  * the user has a shell message but has not chosen brief/deep yet.
  *
- * **Wiring:** `src/pages/PauseSession.tsx` → `PauseSessionGate` / `PauseSessionGateContent`.
+ * **Wiring:** `src/screens/pause/PauseSessionScreen.tsx` → `PauseSessionGate` / `PauseSessionGateContent`.
  * **Hydration model:** `docs/systems/pause-system.md` section 7.2; **code map:** same doc, section 10.
  */
 

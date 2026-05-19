@@ -7,7 +7,7 @@ import { DEFAULT_COMPANIONS, DEFAULT_PREFS } from '@/features/pause/domain/sessi
  * (message, instance id, companions, prefs, severity). When `resolved` is null, severity falls back
  * to live Holzen; other fields use storage defaults.
  *
- * **Call site:** `src/pages/PauseSession.tsx` after `usePauseSessionShell`.
+ * **Call site:** `src/screens/pause/PauseSessionScreen.tsx` after `usePauseSessionShell`.
  * **Hydration:** `docs/systems/pause-system.md` section 7.2; **code map:** same doc, section 10.
  */
 

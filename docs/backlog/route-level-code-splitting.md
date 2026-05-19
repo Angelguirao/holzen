@@ -4,7 +4,7 @@
 
 ## What shipped
 
-- **`src/App.tsx`:** Every **`src/pages/*.tsx`** route component is loaded with **`React.lazy(() => import(...))`**.
+- **`src/App.tsx`:** Every shipped screen under **`src/screens/`** is loaded with **`React.lazy(() => import(...))`**.
 - **`Suspense`** wraps **`Routes`** with **`RouteChunkFallback`** — a minimal full-screen spinner (neutral **`aria-label="Loading"`**, not session-restore copy).
 - **`AppLayout`**, **`AuthLoading`**, guards, and shell providers stay **eager** so layout and auth gating behave as before.
 

@@ -9,7 +9,7 @@ Active Holzen frontend. **Pause ritual** is the product; Archive, Journey overvi
 | Home | `/` | `screens/home/HomeScreen.tsx` |
 | Archive | `/archive` | `screens/archive/ArchiveScreen.tsx` |
 | Journey | `/journey` | `screens/journey/JourneyOverviewScreen.tsx` |
-| Settings | `/settings/*` | `screens/settings/*` (+ thin `pages/settings/`) |
+| Settings | `/settings/*` | `screens/settings/*` |
 | Pause | `/pause`, `/companion/*` | `screens/pause/` |
 | Public | `/welcome`, `/auth`, legal, blog | `screens/marketing/*Screen` |
 

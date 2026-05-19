@@ -43,7 +43,7 @@ This phase is the second "mental model pass": after Phase 1 (who can reach `/pau
 
 ## Reviewed starting points (file-by-file)
 
-### `src/pages/Home.tsx` — manual entry + navigation contract
+### `src/screens/home/HomeScreen.tsx` — manual entry + navigation contract
 
 - Triggers `manualTrigger()` (with cooldown) and, when a pause is ready, navigates to `/pause` with `state`: `reflectionMessage`, `context`, `pauseInstanceId`, `companions`, `companionPrefs`, `severity`.
 - Defines the "happy path" shape that `PauseSession` expects when coming from Home.

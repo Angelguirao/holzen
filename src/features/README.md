@@ -16,7 +16,7 @@ features/<context>/
   public-queries.ts # optional: TanStack query modules for app hooks/screens
 ```
 
-**Screens** (Home, Archive, Journey, Settings, Pause, marketing, admin) live in [`src/screens/`](../screens/README.md) with thin re-exports under `src/pages/` where legacy import paths remain. **Design system** (`components/ui/`, `icons/`) and **app shell** (`app/components/`) are separate — see [components/README.md](../components/README.md) and [app/README.md](../app/README.md).
+**Screens** (Home, Archive, Journey, Settings, Pause, marketing, admin) live in [`src/screens/`](../screens/README.md). **Design system** (`components/ui/`, `icons/`) and **app shell** (`app/components/`) are separate — see [components/README.md](../components/README.md) and [app/README.md](../app/README.md).
 
 ## New code
 

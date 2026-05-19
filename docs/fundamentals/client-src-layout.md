@@ -42,7 +42,6 @@ flowchart TB
 | `src/components/ui/` | Design system | Primitives used on **2+** routes | [components/README.md](../../src/components/README.md) |
 | `src/components/icons/` | Design system | Shared mood/outcome glyphs | same |
 | `src/features/<context>/` | Domain + application | Bounded context rules, use cases, ports | [features/README.md](../../src/features/README.md) |
-| `src/pages/` | Shim | Thin re-exports only — `App.tsx` loads `screens/*` | — |
 | `src/hooks/`, `src/lib/` | Transitional | Shims and shared I/O until fully migrated | Prefer `features/*/public` |
 | `src/legacy/` | Archive | Pre-strip full IA — **never import** in active code | [legacy/README.md](../../src/legacy/README.md) |
 

@@ -46,7 +46,7 @@ function deepPauseMacroSubline(
  * Non-JSX scaffold props (macro index, session title) derived from ritual depth + step.
  * Complements scaffold ritual payloads (brief/deep body slots).
  *
- * **Call site:** `src/pages/PauseSession.tsx`. **Code map:** `docs/systems/pause-system.md` section 10.
+ * **Call site:** `src/screens/pause/PauseSessionScreen.tsx`. **Code map:** `docs/systems/pause-system.md` section 10.
  */
 
 /** Props fragment for `PauseSessionScaffold` that depend on brief vs deep ritual (not JSX slots). */
