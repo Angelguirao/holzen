@@ -20,6 +20,8 @@ screens/<route>/
   *Screen.tsx     # route entry (lazy-loaded from App.tsx)
 ```
 
+Co-locate Vitest hook/component tests beside the file under test (e.g. `hooks/use-pause-session-go-back.test.tsx`). Cross-route flows stay in [`src/test/integration/`](../test/integration/README.md).
+
 | Screen folder | Routes / product area | Screen map doc |
 |---------------|----------------------|----------------|
 | `home/` | `/` — **`HomeScreen`**, `components/`, `hooks/` (incl. `useHolzen`) | [docs/screens/home.md](../../docs/screens/home.md) |
