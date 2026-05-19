@@ -1,6 +1,6 @@
 import { AnimatePresence, motion } from 'framer-motion';
 import type { RefObject } from 'react';
-import type { CompanionData, CompanionPrefs } from '@/components/CompanionSection';
+import type { CompanionData, CompanionPrefs } from '@/screens/pause/components/CompanionSection';
 import type { MoodValue } from '@/components/MoodCheck';
 import { PauseRitualFeelStep } from '@/screens/pause/components/PauseRitualFeelStep';
 import type { FeelStepTile } from '@/screens/pause/components/pause-feel-types';

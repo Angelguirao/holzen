@@ -6,12 +6,12 @@ import { hapticFeedback } from '@/lib/haptics';
 import { useHolzen } from '@/hooks/use-holzen';
 import { useToast } from '@/hooks/use-toast';
 import { useCompanionLibraryFavorites } from '@/hooks/use-companion-library-favorites';
-import type { CompanionData, CompanionPrefs } from '@/components/CompanionSection';
+import type { CompanionData, CompanionPrefs } from '@/screens/pause/components/CompanionSection';
 import type { InterventionState, RegenerateCompanionSlot } from '@/features/pause/public';
 import { fetchParsedPauseArtifactCache } from '@/features/pause/public-queries';
-import type { ZoomOutData } from '@/components/ZoomOutDisplay';
+import type { ZoomOutData } from '@/screens/pause/components/ZoomOutDisplay';
 import { toZoomOutDisplayData, zoomOutLibraryAutosaveFromDisplayData } from '@/features/pause/public';
-import type { CachedHistoricalInsightShape } from '@/components/HistoricalInsightDisplay';
+import type { CachedHistoricalInsightShape } from '@/screens/pause/components/HistoricalInsightDisplay';
 import {
   EMPTY_COMPANION_UI_COMPLETION,
   getCompanionUiCompletionQueryOptions,

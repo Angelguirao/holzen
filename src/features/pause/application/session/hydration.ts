@@ -1,4 +1,4 @@
-import type { CompanionData, CompanionPrefs } from '@/components/CompanionSection';
+import type { CompanionData, CompanionPrefs } from '@/screens/pause/components/CompanionSection';
 import type { PauseSeverity } from './location-state';
 import {
   DEFAULT_COMPANIONS,

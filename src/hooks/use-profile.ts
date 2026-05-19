@@ -5,7 +5,7 @@ import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/use-auth';
 import { holzenLog } from '@/lib/holzen-console';
-import type { CompanionPrefs } from '@/components/CompanionSection';
+import type { CompanionPrefs } from '@/screens/pause/components/CompanionSection';
 import type { Database } from '@/integrations/supabase/types';
 import { normalizeTrackedAssetId } from '@/features/market/public';
 import {

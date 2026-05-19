@@ -1,5 +1,5 @@
 import type { RefObject } from 'react';
-import type { CompanionData, CompanionPrefs } from '@/components/CompanionSection';
+import type { CompanionData, CompanionPrefs } from '@/screens/pause/components/CompanionSection';
 import type { MoodValue } from '@/components/MoodCheck';
 import type { FeelStepTile } from '@/screens/pause/components/pause-feel-types';
 import type { PauseBreathingHandle } from '@/screens/pause/components/PauseBreathing';

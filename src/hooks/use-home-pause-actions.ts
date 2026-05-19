@@ -1,6 +1,6 @@
 import { useCallback } from 'react';
 import type { NavigateFunction } from 'react-router-dom';
-import type { CompanionData, CompanionPrefs } from '@/components/CompanionSection';
+import type { CompanionData, CompanionPrefs } from '@/screens/pause/components/CompanionSection';
 import type { BtcMoveSeverity } from '@/features/market/public';
 import { holzenLog } from '@/lib/holzen-console';
 import { canNavigateToPauseSession } from '@/lib/home-pause-navigate';

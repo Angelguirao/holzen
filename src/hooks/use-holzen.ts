@@ -17,7 +17,7 @@ import {
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/use-auth';
 import { useProfile } from '@/hooks/use-profile';
-import type { CompanionData } from '@/components/CompanionSection';
+import type { CompanionData } from '@/screens/pause/components/CompanionSection';
 import { holzenLog } from '@/lib/holzen-console';
 import { clearSession, reflectionPersistErrorMessage } from '@/features/pause/public';
 import {
