@@ -50,6 +50,7 @@ export {
 export {
   companionFeedbackVoteQueryKey,
   getCompanionFeedbackVoteQueryOptions,
+  logCompanionFeedbackVote,
 } from './infrastructure/queries/companion-feedback-vote-query';
 export {
   BULK_HOLD_PENDING_DISABLED_USER_ID,

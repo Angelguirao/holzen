@@ -2,14 +2,13 @@ import { ThumbsUp, ThumbsDown, RefreshCw } from 'lucide-react';
 import { useState, useEffect, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
-import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/features/auth/public';
 import { hapticFeedback } from '@/lib/haptics';
-import { FEEDBACK_TO_CACHE_TYPE } from '@/features/pause/public';
 import type { RegenerateCompanionSlot } from '@/features/pause/public';
 import {
   companionFeedbackVoteQueryKey,
   getCompanionFeedbackVoteQueryOptions,
+  logCompanionFeedbackVote,
 } from '@/features/pause/public-queries';
 import { useSubscription } from '@/features/subscription/public-hooks';
 import { useProGate } from '@/features/subscription/public-hooks';
@@ -86,20 +85,14 @@ export function CompanionFeedback({
     hapticFeedback('light');
 
     try {
-      const cacheType = FEEDBACK_TO_CACHE_TYPE[companionType];
-
-      const { error } = await supabase.from('analytics_events').insert({
-        user_id: userId,
-        event: 'companion_feedback',
-        metadata: {
-          companion_type: companionType,
-          cache_type: cacheType || companionType,
-          vote: type,
-          cache_id: cacheId || null,
-          pause_instance_id: pauseInstanceId || null,
-        },
+      const { ok } = await logCompanionFeedbackVote({
+        userId,
+        companionType,
+        vote: type,
+        cacheId,
+        pauseInstanceId,
       });
-      if (error) {
+      if (!ok) {
         setOptimisticVote(null);
         return;
       }

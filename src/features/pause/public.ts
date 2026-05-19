@@ -226,6 +226,7 @@ export {
 } from './application/use-cases/session/persist-snapshot';
 export { computePauseGoBackPlan } from './application/use-cases/session/go-back-plan';
 export { pauseStepSwipeDirection } from './application/use-cases/session/step-swipe-direction';
+export { isPauseReflectGenerationEnabled } from './application/use-cases/session/reflect-generation-enabled';
 export {
   buildPauseSessionStepTransitionConfig,
   PAUSE_SESSION_STEP_SLIDE_OFFSET_PX,
@@ -269,11 +270,28 @@ export {
   trackCompanionServed,
 } from './application/use-cases/companion/analytics';
 export {
+  buildCompanionFeedbackVoteMetadata,
+  type CompanionFeedbackVote,
+  type LogCompanionFeedbackVoteInput,
+} from './application/use-cases/companion/log-companion-feedback-vote';
+export {
   isCompanionOrchestratePaywallCode,
   isOrchestratePayloadError,
   resolveOrchestrateInvokeUserMessage,
   type CompanionOrchestratePaywallCode,
 } from './application/use-cases/companion/orchestrate-invoke-error';
+export {
+  buildInterventionOrchestrateBody,
+  buildLazyFetchOrchestrateBody,
+  buildRegenerateOrchestrateBody,
+  type CompanionOrchestrateSessionContext,
+} from './application/use-cases/companion/build-companion-orchestrate-body';
+export {
+  setCompanionSlotError,
+  setCompanionSlotLoading,
+  type CompanionSlotErrorSetters,
+  type CompanionSlotLoadingSetters,
+} from './application/use-cases/companion/companion-slot-ui-state';
 export {
   companionUiCompletionQueryKey,
   invalidateCompanionUiCompletionQuery,
@@ -282,6 +300,8 @@ export {
   applyOrchestrateSlotLazyOrRegenerate,
   EMPTY_COMPANION_SLOT_RELAXATIONS,
   hydrateOrchestrateSlotIfNew,
+  hydrateOrchestrateSlotsFromInterventionResponse,
+  INTERVENTION_RESPONSE_COMPANION_SLOTS,
   isFilledOrchestrateSlot,
   readOrchestrateSlotBody,
   type CompanionSlotAutosaveParams,
