@@ -5,18 +5,21 @@ import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { invokeEdge } from '@/lib/invoke-edge';
 import { useAuth } from '@/features/auth/public';
 import { holzenLog } from '@/lib/holzen-console';
-import { getCheckoutSuppressionWindowMs } from '@/features/subscription/public';
+import { getCheckoutSuppressionWindowMs } from '../application/checkout-suppression-window';
 import {
   canEngagePauseFromEntitlement,
   deriveEntitlement,
   type Entitlement,
-  type SubscriptionSnapshot,
-} from '@/features/subscription/public';
+} from '../domain/entitlement';
+import type {
+  SubscriptionBillingInterval,
+  SubscriptionSnapshot,
+} from '../domain/subscription-snapshot';
 import {
   fetchSubscriptionSnapshot,
   readSubCache,
   subscriptionQueryKey,
-} from '@/features/subscription/public-queries';
+} from '../public-queries';
 import { trackEvent } from '@/lib/posthog';
 
 const CHECKOUT_RETURN_KEY = 'holzen_checkout_started_at';
@@ -34,8 +37,8 @@ let subscriptionForceNext = false;
 type SubFetchSource = 'mount' | 'manual_retry' | 'focus' | 'interval' | 'invalidate';
 let subscriptionNextFetchSource: SubFetchSource | null = null;
 
-export type { SubscriptionBillingInterval } from '@/features/subscription/public';
-export type { Entitlement } from '@/features/subscription/public';
+export type { SubscriptionBillingInterval } from '../domain/subscription-snapshot';
+export type { Entitlement } from '../domain/entitlement';
 
 function checkoutReturnWantsForce(): boolean {
   const params = new URLSearchParams(window.location.search);

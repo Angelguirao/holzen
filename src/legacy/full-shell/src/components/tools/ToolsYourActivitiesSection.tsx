@@ -4,7 +4,7 @@ import { Pencil, Sparkles } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useHolzen } from '@/screens/home/hooks/use-holzen';
-import { useCompletedPauseCount } from '@/hooks/use-completed-pause-count';
+import { useCompletedPauseCount } from '@/features/pause/public-hooks';
 import { settingsSectionPath, TOOLS } from '@/lib/app-routes';
 import { groundingActivityLabel } from '@/lib/grounding-activity-label';
 

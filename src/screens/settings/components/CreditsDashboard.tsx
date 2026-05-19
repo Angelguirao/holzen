@@ -1,5 +1,5 @@
 import { useTranslation } from 'react-i18next';
-import { useSubscription } from '@/hooks/use-subscription';
+import { useSubscription } from '@/features/subscription/public-hooks';
 import { RefreshCw } from 'lucide-react';
 import { useState, useCallback } from 'react';
 import { LoadingButton } from '@/components/ui/loading-button';

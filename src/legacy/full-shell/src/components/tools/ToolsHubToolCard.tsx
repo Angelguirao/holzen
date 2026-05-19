@@ -2,7 +2,7 @@ import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { ChevronRight } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
-import { useProGate } from '@/hooks/use-pro-gate';
+import { useProGate } from '@/features/subscription/public-hooks';
 import { cn } from '@/lib/utils';
 import type { ToolCatalogEntry } from '@/lib/tools-catalog';
 

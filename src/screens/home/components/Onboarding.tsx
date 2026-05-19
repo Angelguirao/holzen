@@ -3,7 +3,7 @@ import { useState, useCallback } from 'react';
 import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
 import { OnboardingWhy } from '@/screens/home/components/onboarding/OnboardingWhy';
 import { OnboardingReady } from '@/screens/home/components/onboarding/OnboardingReady';
-import { useSubscription } from '@/hooks/use-subscription';
+import { useSubscription } from '@/features/subscription/public-hooks';
 import { trackEvent } from '@/lib/posthog';
 
 interface OnboardingResult {

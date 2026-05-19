@@ -41,8 +41,8 @@ import {
   resetInterventionIdempotency,
   runOnceIntervention,
 } from '@/features/pause/public';
-import { useSubscription } from '@/hooks/use-subscription';
-import { useProGate } from '@/hooks/use-pro-gate';
+import { useSubscription } from '@/features/subscription/public-hooks';
+import { useProGate } from '@/features/subscription/public-hooks';
 import { showLimitReachedToast, isPaidLimitReached } from '@/lib/limit-upsell';
 import { trackEvent } from '@/lib/posthog';
 import { trackCompanionServed } from '@/features/pause/public';

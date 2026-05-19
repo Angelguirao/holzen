@@ -1,5 +1,5 @@
 import { Lock, Sparkles, ArrowRight } from 'lucide-react';
-import { useProGate } from '@/hooks/use-pro-gate';
+import { useProGate } from '@/features/subscription/public-hooks';
 import { useTranslation } from 'react-i18next';
 import type { ProFeature } from '@/features/subscription/public';
 

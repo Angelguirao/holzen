@@ -4,7 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { AppVersionBadge } from '@/screens/settings/components/AppVersionBadge';
 import { Changelog } from '@/screens/settings/components/Changelog';
 import { FeedbackForm } from '@/screens/settings/components/FeedbackForm';
-import { useLatestChangelogVersion } from '@/hooks/use-latest-changelog-version';
+import { useLatestChangelogVersion } from '@/screens/settings/hooks/use-latest-changelog-version';
 import { PageHeading } from '@/components/ui/page-heading';
 
 /**

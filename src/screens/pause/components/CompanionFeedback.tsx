@@ -11,8 +11,8 @@ import {
   companionFeedbackVoteQueryKey,
   getCompanionFeedbackVoteQueryOptions,
 } from '@/features/pause/public-queries';
-import { useSubscription } from '@/hooks/use-subscription';
-import { useProGate } from '@/hooks/use-pro-gate';
+import { useSubscription } from '@/features/subscription/public-hooks';
+import { useProGate } from '@/features/subscription/public-hooks';
 import { showLimitReachedToast, isPaidLimitReached } from '@/lib/limit-upsell';
 import { isHolzenDebugEnabled } from '@/lib/holzen-console';
 /** Orchestrate regenerate — dev / non-production builds, or prod + Holzen debug opt-in (see holzen-console). */

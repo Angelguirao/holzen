@@ -18,7 +18,7 @@ import { trackEvent } from '@/lib/posthog';
 import { isPauseMoodValue, buildPostPauseEmotionLoggedPayload } from '@/features/pause/public';
 import { pauseLogStep } from '@/features/pause/public-rpc';
 import { showPauseStepSyncFailedToast } from '@/features/pause/public';
-import { useSubscription } from '@/hooks/use-subscription';
+import { useSubscription } from '@/features/subscription/public-hooks';
 
 interface PauseData {
   mood: string | null;

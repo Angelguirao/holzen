@@ -4,8 +4,8 @@ import { Sparkles, Download, Loader2 } from 'lucide-react';
 import { invokeEdge } from '@/lib/invoke-edge';
 import { toast } from 'sonner';
 import { parseEdgeFunctionError, toUserFacingAiErrorMessage } from '@/lib/edge-function-error';
-import { useSubscription } from '@/hooks/use-subscription';
-import { useProGate } from '@/hooks/use-pro-gate';
+import { useSubscription } from '@/features/subscription/public-hooks';
+import { useProGate } from '@/features/subscription/public-hooks';
 import { showLimitReachedToast, isPaidLimitReached } from '@/lib/limit-upsell';
 import {
   Dialog,

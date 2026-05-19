@@ -2,7 +2,7 @@ import { useCallback } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
 import { Waves, PenLine, Activity, History, Lock, ChevronRight, Sparkles } from 'lucide-react';
-import { useSubscription } from '@/hooks/use-subscription';
+import { useSubscription } from '@/features/subscription/public-hooks';
 import { useAuth } from '@/hooks/use-auth';
 import { getPracticeEntriesWeeklyCountQueryOptions } from '@/legacy/full-shell/src/lib/practice-entries-weekly-count-query';
 import { toast } from 'sonner';

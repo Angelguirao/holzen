@@ -18,7 +18,7 @@ vi.mock('@/features/auth/public', () => ({
   }),
 }));
 
-vi.mock('@/hooks/use-subscription', () => ({
+vi.mock('@/features/subscription/public-hooks', () => ({
   useSubscription: () => ({
     tier: 'free',
     loading: false,

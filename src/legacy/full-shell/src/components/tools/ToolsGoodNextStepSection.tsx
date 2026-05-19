@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { Pencil, Sparkles } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { Skeleton } from '@/components/ui/skeleton';
-import { useProGate } from '@/hooks/use-pro-gate';
+import { useProGate } from '@/features/subscription/public-hooks';
 import { TOOLS } from '@/lib/app-routes';
 import type { LastCheckInRow } from '@/lib/tools-hub-data-query';
 import type { PracticeSuggestion } from '@/legacy/full-shell/src/lib/practice-suggestion';
