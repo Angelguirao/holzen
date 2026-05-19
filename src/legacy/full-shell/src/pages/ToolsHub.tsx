@@ -2,7 +2,7 @@ import { useToolsHubData } from '@/hooks/use-tools-hub-data';
 import { ToolsGoodNextStepSection } from '@/legacy/full-shell/src/components/tools/ToolsGoodNextStepSection';
 import { ToolsPickGridSection } from '@/legacy/full-shell/src/components/tools/ToolsPickGridSection';
 import { ToolsYourActivitiesSection } from '@/legacy/full-shell/src/components/tools/ToolsYourActivitiesSection';
-import { CurrentPauseCard } from '@/components/library/CurrentPauseCard';
+import { CurrentPauseCard } from '@/screens/archive/components/library/CurrentPauseCard';
 
 /**
  * Tools hub: suggested next practices, last check-in, curated grid, and grounding

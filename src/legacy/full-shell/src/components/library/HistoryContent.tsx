@@ -9,7 +9,7 @@ import { invalidateHistoryCalendarActivities } from '@/legacy/full-shell/src/lib
 import { Skeleton } from '@/components/ui/skeleton';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
-import { HistoryCalendar } from '@/components/HistoryCalendar';
+import { HistoryCalendar } from '@/legacy/quarantine/root-components/HistoryCalendar';
 
 const HistoryContent = () => {
   const { t } = useTranslation();

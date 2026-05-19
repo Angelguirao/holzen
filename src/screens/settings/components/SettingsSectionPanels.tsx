@@ -1,12 +1,12 @@
 import { Link } from 'react-router-dom';
 import { QuietWindowsManager } from '@/app/components/QuietWindowsManager';
-import { SourceManagement } from '@/components/SourceManagement';
+import { SourceManagement } from '@/screens/settings/components/SourceManagement';
 import { ProLock } from '@/app/components/ProLock';
 import { PRICING } from '@/features/subscription/public';
 import { ThresholdSetting } from '@/app/components/ThresholdSetting';
-import { ReferralSection } from '@/components/ReferralSection';
-import { CreditsDashboard } from '@/components/CreditsDashboard';
-import { InstallHolzenCard } from '@/components/InstallHolzenCard';
+import { ReferralSection } from '@/screens/settings/components/ReferralSection';
+import { CreditsDashboard } from '@/screens/settings/components/CreditsDashboard';
+import { InstallHolzenCard } from '@/app/components/InstallHolzenCard';
 import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';

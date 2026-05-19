@@ -13,7 +13,7 @@ import { pauseStepLayout } from '@/screens/pause/components/pause-step-layout';
 import { Button } from '@/components/ui/button';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Slider } from '@/components/ui/slider';
-import { ShareReflection } from '@/components/ShareReflection';
+import { ShareReflection } from '@/screens/pause/components/ShareReflection';
 import { trackEvent } from '@/lib/posthog';
 import { isPauseMoodValue, buildPostPauseEmotionLoggedPayload } from '@/features/pause/public';
 import { pauseLogStep } from '@/features/pause/public-rpc';
