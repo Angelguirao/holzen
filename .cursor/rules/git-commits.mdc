@@ -1,13 +1,15 @@
 ---
 description: >-
   Holzen — after completing implementation work, create a git commit unless the user explicitly
-  asked for WIP-only or read-only exploration. Aligns agent behavior with repo workflow.
+  asked for WIP-only or read-only exploration. Takes precedence over generic "ask before commit" habits.
 alwaysApply: true
 ---
 
 # Git commits (Holzen)
 
-When you **finish** a task that **changes tracked code or project config** (features, fixes, refactors, tests, paired doc updates), **create a git commit** with a message that matches recent history (`feat(scope):`, `fix(scope):`, etc.).
+When you **finish** a task that **changes tracked code or project config** (features, fixes, refactors, tests, paired doc updates), **always create a git commit** with a message that matches recent history (`feat(scope):`, `fix(scope):`, `refactor(scope):`, etc.).
+
+**Default: commit.** Do not wait for the user to say "commit" unless they have opted out for this task.
 
 **Skip a commit** only when:
 
@@ -16,4 +18,6 @@ When you **finish** a task that **changes tracked code or project config** (feat
 
 **Never** commit secrets (`.env`, keys), and do not use `--no-verify` or force-push unless the user explicitly asks.
 
-If a pre-commit hook fails, fix the issue and create a **new** commit (do not amend a failed attempt unless the user’s commit rules allow it).
+If a pre-commit hook fails, fix the issue and create a **new** commit (do not amend a failed attempt unless the user's commit rules allow it).
+
+Use a HEREDOC for multi-line messages when helpful. Run `git status` after commit to confirm a clean tree.
