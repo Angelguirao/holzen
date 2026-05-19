@@ -198,6 +198,7 @@ export function useCompanionData({
     clearInterventionFetchDedupe();
     setCacheRelaxations(EMPTY_COMPANION_SLOT_RELAXATIONS);
     setRetryCount((c) => c + 1);
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- slot setters stable; ref reset intentional (parity with pre-split hook)
   }, [
     pauseInstanceId,
     setIntervention,
