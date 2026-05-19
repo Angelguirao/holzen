@@ -25,7 +25,7 @@ components/
 
 | Subfolder | Role |
 |-----------|------|
-| [`ui/`](ui/) | Import as `@/components/ui/<name>`. Prefer semantic tokens in `src/index.css` and `tailwind.config.ts` over one-off colors. |
+| [`ui/`](ui/) | Import as `@/components/ui/<name>`. Includes `use-toast` and `use-mobile` (shared UI hooks). Prefer semantic tokens in `src/index.css` and `tailwind.config.ts` over one-off colors. |
 | [`icons/`](icons/) | `MoodIcon`, `OutcomeIcon`, `MOOD_GLYPHS`, `MOOD_ICONS`, `OUTCOME_ICONS`. Used heavily by pause ritual screens. |
 
 ### Holzen composites (not upstream shadcn)
@@ -48,6 +48,10 @@ Extend these before inventing ad-hoc markup in screens:
 | `tag.tsx` | Selectable filter chips |
 
 Everything else under `ui/` is standard shadcn/Radix — add via the project’s shadcn workflow when possible.
+
+## Tests
+
+Co-locate Vitest with the module under test. Primitives in `ui/` rarely need dedicated tests; add them only when behavior is non-trivial. Cross-route flows use [`src/test/integration/`](../test/integration/README.md). Placement rules: [client-src-layout.md](../../docs/fundamentals/client-src-layout.md) (Testing), [src/test/README.md](../test/README.md).
 
 ## Rules
 
