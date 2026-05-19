@@ -7,11 +7,11 @@
  * fixture is injected at the `usePauseStatsData` hook layer only.
  */
 
-import type { PauseFullRow } from '@/lib/pause-stats-data-query';
+import type { PauseFullRow } from '@/legacy/full-shell/src/lib/pause-stats-data-query';
 import type {
   PauseStepEventRow,
   PauseCompanionEventRow,
-} from '@/lib/pause-state';
+} from '@/features/pause/public';
 
 const COMPANIONS = ['signal', 'grounding', 'zoom_out', 'history', 'haiku'];
 const REACTIVE = ['anxious', 'fearful', 'fomo', 'greedy', 'excited'] as const;

@@ -327,3 +327,8 @@ export {
   type PauseStepType,
   type PauseTemplateRow,
 } from './domain/pause-state';
+export type { PauseBreathingHandle } from './presentation/session/pause-breathing-handle';
+export type {
+  PauseSessionBriefRitualBodyProps,
+  PauseSessionDeepRitualBodyProps,
+} from './presentation/session/ritual-body-props';

@@ -54,7 +54,7 @@ Routes are declared in **`src/App.tsx`**. Screen modules under **`src/screens/`*
 - **`ProtectedRoute`** — If auth is still loading, show `AuthLoading` (`src/app/components/`). If no user, redirect to `/welcome`. Otherwise render children.
 - **`PublicOnlyRoute`** — Logged-in users are redirected to `/`.
 
-**Main shell (four tabs):** `/`, `/archive`, `/journey`, `/settings` (+ nested `/settings/about`, `/settings/billing-history`, `/settings/:section`) use **`AppLayout`** (`src/app/components/AppLayout.tsx`): max-width column, header (“Holzen” + `NotificationBell` from `features/user/presentation`), **`<main id="main-content">`** around **`Outlet`**, and **`BottomNav`** (Home, Archive, Journey, Settings). `AppLayout` uses `useShellProfile` + `ShellPauseChrome` (pause modal/banner; `useHolzen` only inside that component) and passes pause-ready state via outlet context; **`HolzenProvider`** wraps signed-in routes from `screens/home/hooks/use-holzen.ts`.
+**Main shell (four tabs):** `/`, `/archive`, `/journey`, `/settings` (+ nested `/settings/about`, `/settings/billing-history`, `/settings/:section`) use **`AppLayout`** (`src/app/components/AppLayout.tsx`): max-width column, header (“Holzen” + `NotificationBell` from `features/notifications/public-hooks`), **`<main id="main-content">`** around **`Outlet`**, and **`BottomNav`** (Home, Archive, Journey, Settings). `AppLayout` uses `useShellProfile` + `ShellPauseChrome` (pause modal/banner; `useHolzen` only inside that component) and passes pause-ready state via outlet context; **`HolzenProvider`** wraps signed-in routes from `screens/home/hooks/use-holzen.ts`.
 
 **Full-screen authenticated routes** (no `AppLayout`, `RobotsNoIndex`): `/pause`, companion deep links `/companion/{zoom-out,history,signal,grounding}/:pauseInstanceId`, `/admin`, `/admin/smoke-test`, `/admin/sentry-alerts`, `/admin/edge-coverage`.
 
@@ -87,7 +87,7 @@ The Supabase browser client is **`src/integrations/supabase/client.ts`** (typed 
 | Companion payloads for the active pause | `use-companion-data.ts` |
 | Subscription / Stripe checkout | `use-subscription.ts` |
 | Library content | `use-library.ts` |
-| Push (VAPID, registration) | `use-push-notifications.ts` |
+| Push (VAPID, registration) | `features/notifications/public-hooks` (`usePushNotifications`) |
 | Admin metrics | `use-admin-stats.ts` |
 
 TanStack Query is available app-wide (`QueryClient` in `App.tsx`); individual hooks may use `useEffect` + Supabase directly — follow the nearest feature.
@@ -184,7 +184,7 @@ Each folder under **`supabase/functions/<name>/`** is a deployable function. Sha
 | `holzen-number` | `HolzenNumber.tsx` |
 | `reflection-insights` | `AIInsightsPanel.tsx` |
 | `check-subscription`, `create-checkout`, `customer-portal` | `use-subscription.ts` |
-| `register-push` | `use-push-notifications.ts` |
+| `register-push` | `features/notifications` (`usePushNotifications`) |
 | `delete-account` | `Settings.tsx` |
 | `badge-notify` | `use-badge-sync.ts` |
 | `record-referral` | `use-auth.tsx` |

@@ -5,7 +5,7 @@ import { BottomNav, isPrimaryTabActive } from './BottomNav';
 import { ShellPauseChrome } from '@/app/components/ShellPauseChrome';
 import { CheckoutConfirmation } from '@/features/subscription/presentation/CheckoutConfirmation';
 import { PaywallSubscribedTracker } from '@/features/subscription/presentation/PaywallSubscribedTracker';
-import { NotificationBell } from '@/features/user/presentation/NotificationBell';
+import { NotificationBell } from '@/features/notifications/public-hooks';
 import { useShellProfile } from '@/app/hooks/use-shell-profile';
 import { useAutoTrigger } from '@/app/hooks/use-auto-trigger';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -75,7 +75,7 @@ function useTabChunkPrefetch() {
  * - `useShellProfile` — profile load errors + i18n (via `useProfile`, not Home’s `useHolzen`)
  * - `ShellPauseChrome` — pending offer modal + pause-ready banner (`useHolzen` isolated there)
  * - `CheckoutConfirmation` / `PaywallSubscribedTracker` — subscription return UX on any tab
- * - `NotificationBell` — inbox header (user presentation)
+ * - `NotificationBell` — inbox header (`features/notifications`)
  *
  * See [app/README.md](../README.md) placement table.
  */

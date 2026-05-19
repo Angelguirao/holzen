@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { mergeOrderWithDefaults, normalizeHomeSectionOrder } from './home-section-order-normalize';
+import { mergeOrderWithDefaults, normalizeHomeSectionOrder } from '@/lib/home-section-order-normalize';
 import { ALL_HOME_SECTION_IDS } from '@/lib/home-section-visibility-constants';
 
 const DEFAULT = [...ALL_HOME_SECTION_IDS];

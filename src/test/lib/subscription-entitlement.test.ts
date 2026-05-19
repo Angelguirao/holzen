@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 import {
   canEngagePauseFromEntitlement,
   deriveEntitlement,
-} from '@/features/subscription/domain/entitlement';
+} from '@/features/subscription/public';
 
 describe('deriveEntitlement', () => {
   it('maps trialing and active when subscribed', () => {

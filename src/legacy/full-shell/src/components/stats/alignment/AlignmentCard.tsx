@@ -2,8 +2,8 @@ import { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { ArrowRight } from 'lucide-react';
 import { ConfidenceChip } from '@/legacy/full-shell/src/components/stats/ConfidenceChip';
-import { sampleConfidence } from '@/lib/stats/confidence';
-import type { PauseFullRow } from '@/lib/pause-stats-data-query';
+import { sampleConfidence } from '@/legacy/full-shell/src/lib/stats/confidence';
+import type { PauseFullRow } from '@/legacy/full-shell/src/lib/pause-stats-data-query';
 
 interface HoldGoal {
   type: string | null;

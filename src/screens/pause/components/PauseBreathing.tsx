@@ -31,8 +31,8 @@ const HOLD_PHASE_LABEL_KEY = 'breathing.phases.hold';
 /** i18n: `breathing.triangleRotatingKickers` — advances every 2s in `PauseBreathing`, not per phase. */
 const TRIANGLE_ROTATING_KICKERS_I18N_KEY = 'breathing.triangleRotatingKickers';
 
-export type { PauseBreathingHandle } from '@/features/pause/presentation/session/pause-breathing-handle';
-import type { PauseBreathingHandle } from '@/features/pause/presentation/session/pause-breathing-handle';
+export type { PauseBreathingHandle } from '@/features/pause/public';
+import type { PauseBreathingHandle } from '@/features/pause/public';
 
 export type PauseBreathSegment = 'first' | 'second';
 

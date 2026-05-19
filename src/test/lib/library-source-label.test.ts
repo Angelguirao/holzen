@@ -1,6 +1,6 @@
 import { describe, it, expect, vi } from 'vitest';
 import type { TFunction } from 'i18next';
-import { librarySourceLabel } from './library-source-label';
+import { librarySourceLabel } from '@/lib/library-source-label';
 
 describe('librarySourceLabel', () => {
   it('uses default when source type is missing', () => {

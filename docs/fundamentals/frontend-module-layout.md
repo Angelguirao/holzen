@@ -28,7 +28,7 @@ Do **not** move the SPA to `apps/web` without passing the extraction gate in [AD
 
 | Kind | Lives in | Examples |
 |------|----------|----------|
-| **Bounded context** | `src/features/<context>/` (now) → `packages/<context>/` (later) | `pause`, `subscription`, `market`, `user`, `auth` |
+| **Bounded context** | `src/features/<context>/` (now) → `packages/<context>/` (later) | `pause`, `subscription`, `market`, `user`, `notifications`, `auth` |
 | **Screen / route** | `src/screens/<route>/` (now) → `apps/web/src/screens/` | Home, Archive, Journey, Settings, PauseSession, Companion* |
 | **Not a package** | — | `home`, `archive`, `journey`, `settings`, `companion` (companions are **inside** `pause`) |
 
@@ -399,7 +399,7 @@ Root `tsconfig.json` references project refs per package, or a single base + per
 |--------|------|---------|
 | `check:active-surface` | now | No legacy imports, shipped surface |
 | `check:feature-imports` | **now** (`scripts/check-feature-imports.mjs`) | Enforce §2 layer rules under `src/features/` |
-| `check:architecture-alignment` | **now** (`scripts/check-architecture-alignment.mjs`) | Waves 0–4 scaffold (five contexts, root Vite, legacy excluded); runs `check:feature-imports`; in **`test:ci`** |
+| `check:architecture-alignment` | **now** (`scripts/check-architecture-alignment.mjs`) | Waves 0–4 scaffold (six contexts, root Vite, legacy excluded); runs `check:feature-imports`; in **`test:ci`** |
 | `check:no-root-components` | **now** (`scripts/check-no-root-components.mjs`) | Blocks new `src/components/*.tsx` at repo root; allowlist shrinks during waves 5c–5i |
 | `check:package-boundaries` | post-monorepo | dependency-cruiser or eslint-plugin-boundaries on `@holzen/*` graph |
 | `test:ci` | always | Existing gate (includes `check:architecture-alignment`) |

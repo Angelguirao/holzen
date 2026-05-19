@@ -38,7 +38,7 @@ Cross-route chrome and providers: layout, bottom nav, document meta, error bound
 |----|----------|----------------|----------------------------|
 | `PublicFooter` | `screens/marketing/components/` | Marketing screens only | Public route footer, not app-root chrome |
 | `CheckoutConfirmation`, `PaywallSubscribedTracker` | `features/subscription/presentation/` | `AppLayout` via `@/features/subscription/public` | Subscription domain; shell only mounts globally for Stripe return on any tab |
-| `NotificationBell` | `features/user/presentation/` | `AppLayout` via `@/features/user/public` | Inbox logic + Supabase; header slot is shell |
+| `NotificationBell` | `features/notifications/presentation/` | `AppLayout` via `@/features/notifications/public-hooks` | Inbox + realtime; header slot is shell |
 | `PageHeading`, `ProLock` | `components/ui/` | Many routes | Shared presentation primitives |
 | `HoldGoalWidget`, `InstallHolzenCard`, `SubscriptionSkeleton`, `ThresholdFrequencyEstimator` | `screens/home/components/` | Home (+ Settings composes some) | Home/settings product UI, not shell |
 | `ThresholdSetting`, `QuietWindowsManager`, `AppVersionBadge` | `screens/settings/components/` | Settings | User prefs content |
@@ -52,7 +52,7 @@ Cross-route chrome and providers: layout, bottom nav, document meta, error bound
 | Tab / route UI | `screens/<route>/` |
 | Bottom nav, global banners, meta, feedback | `app/components/` |
 | Checkout modal / subscribe analytics | `features/subscription/public` (mounted in `AppLayout`) |
-| Notification inbox | `features/user/public` (mounted in `AppLayout`) |
+| Notification inbox / push hooks | `features/notifications/public-hooks` (bell in `AppLayout`; push in Settings) |
 | Marketing footer | `screens/marketing/components/PublicFooter` |
 | Primitives (`PageHeading`, `ProLock`, …) | `components/ui/` |
 | Route wiring | `App.tsx` → `src/screens/*` |

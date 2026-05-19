@@ -1,8 +1,8 @@
 import { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { ConfidenceChip } from '@/legacy/full-shell/src/components/stats/ConfidenceChip';
-import { sampleConfidence } from '@/lib/stats/confidence';
-import type { PauseFullRow } from '@/lib/pause-stats-data-query';
+import { sampleConfidence } from '@/legacy/full-shell/src/lib/stats/confidence';
+import type { PauseFullRow } from '@/legacy/full-shell/src/lib/pause-stats-data-query';
 
 // Live UI emits `held | bought | sold` only; legacy `nothing` rows fall through
 // (consistent with src/lib/badges/compute.ts).

@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import { computeHoldGoalCompactHeadline } from '@/features/user/application/hold-goal-headline';
+import { computeHoldGoalCompactHeadline } from '@/features/user/public';
 
 describe('computeHoldGoalCompactHeadline', () => {
   const t = (key: string, opts?: Record<string, unknown>) => {

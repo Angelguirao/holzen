@@ -107,7 +107,7 @@ An **application use case** is one coherent action: *log pause step*, *ensure tr
 
 ### P7 — Bounded contexts do not reach into each other’s guts
 
-Contexts such as **pause**, **subscription**, **companion**, **archive**, **settings**, **market** expose a **small public API** (`public.ts` or package `exports`). Internal folders are private.
+Contexts such as **pause**, **subscription**, **notifications**, **user**, **market**, **auth** expose a **small public API** (`public.ts`, `public-queries`, `public-hooks`). Internal folders are private.
 
 **Therefore:** Cross-context imports go through **published** symbols only; CI checks package/graph boundaries when available.
 
@@ -226,6 +226,7 @@ Three ideas often get conflated:
 | **subscription** | Entitlement, Stripe, trial, paywall, `user_can_engage_pause` projection | auth/billing + [active-surface.md](../ops/active-surface.md) |
 | **market** | BTC/volatility context, thresholds, display prefs; **creates** pause offers via cron | navigating-the-codebase, `check-volatility` |
 | **user** | Profile row, signal source prefs, quiet windows (settings **content**, not the settings shell) | settings + signals docs |
+| **notifications** | Multi-channel delivery: in-app inbox, web push registration, coordination with email; bell + settings channel UI | [notifications-delivery.md](../systems/notifications-delivery.md) |
 | **auth** | Session lifecycle | [auth-and-referral-system.md](../systems/auth/auth-and-referral-system.md) |
 | **roadmap** | Voting on roadmap items (small; may stay in `apps/web` only) | active-surface |
 | **admin** | Internal ops (supporting; not user product domain) | admin edges in manifest |
@@ -238,7 +239,7 @@ There is **no** `@holzen/home`, `@holzen/archive`, `@holzen/journey`, or `@holze
 
 | Screen | Composes |
 |--------|----------|
-| **Home** | pause (card, triggers), market, subscription, user, onboarding flow |
+| **Home** | pause (card, triggers), market, subscription, user, notifications (bell in shell), onboarding flow |
 | **Archive** | pause read models (past instances, collections) |
 | **Journey** | pause aggregates / overview |
 | **Settings** | user + subscription + presentation |

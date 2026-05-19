@@ -2,9 +2,9 @@ import { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { ResponsiveContainer, BarChart, Bar, XAxis, YAxis, Tooltip, ReferenceLine } from 'recharts';
 import { ConfidenceChip } from '@/legacy/full-shell/src/components/stats/ConfidenceChip';
-import { sampleConfidence } from '@/lib/stats/confidence';
-import type { PauseFullRow } from '@/lib/pause-stats-data-query';
-import { effectivePauseShiftMood, effectivePauseShiftIntensity } from '@/lib/pause-effective-emotion';
+import { sampleConfidence } from '@/legacy/full-shell/src/lib/stats/confidence';
+import type { PauseFullRow } from '@/legacy/full-shell/src/lib/pause-stats-data-query';
+import { effectivePauseShiftMood, effectivePauseShiftIntensity } from '@/features/pause/public';
 import { startOfWeek, format } from 'date-fns';
 
 const COMPOSURE: Record<string, number> = {
