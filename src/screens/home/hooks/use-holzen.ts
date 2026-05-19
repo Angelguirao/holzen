@@ -15,6 +15,10 @@ import {
   type BtcPriceData,
 } from '@/features/market/public';
 import { supabase } from '@/integrations/supabase/client';
+import {
+  fetchOpenPauseHomePreview,
+  persistReflectionArtifacts,
+} from '@/features/pause/public-queries';
 import { useAuth } from '@/features/auth/public';
 import { useProfile } from '@/features/user/public-hooks';
 import type { CompanionData } from '@/screens/pause/components/CompanionSection';
@@ -140,56 +144,21 @@ function useHolzenState() {
       clearOpenPausePreview();
       return;
     }
-    const { data } = await supabase
-      .from('v_pause_current' as never)
-      .select('id, created_at, context_snapshot, state')
-      .eq('user_id', user.id)
-      .maybeSingle();
+    const preview = await fetchOpenPauseHomePreview(user.id);
 
     if (dead()) return;
 
-    if (!data) {
+    if (!preview) {
       clearOpenPausePreview();
       return;
     }
 
-    const row = data as {
-      id: string;
-      created_at: string;
-      context_snapshot: Record<string, unknown> | null;
-      state?: string;
-    };
-    setLastPauseInstanceId(row.id);
-    setOpenPauseState(row.state === 'engaged' ? 'engaged' : row.state === 'active' ? 'active' : null);
-    setLastTriggerAt(row.created_at);
-    const ctxText = typeof row.context_snapshot?.context_text === 'string'
-      ? (row.context_snapshot.context_text as string)
-      : null;
-    setContext(ctxText);
-
-    const { data: artifacts } = await supabase
-      .from('pause_ai_artifacts' as never)
-      .select('kind, content')
-      .eq('pause_instance_id', row.id);
-
-    if (dead()) return;
-
-    let msg: string | null = null;
-    let haiku: string | null = null;
-    let groundingTitle: string | null = null;
-    let groundingBody: string | null = null;
-    for (const a of ((artifacts ?? []) as Array<{ kind: string; content: Record<string, unknown> }>)) {
-      if (a.kind === 'reflection_text' && typeof a.content?.message === 'string') {
-        msg = a.content.message as string;
-      } else if (a.kind === 'haiku' && typeof a.content?.haiku === 'string') {
-        haiku = a.content.haiku as string;
-      } else if (a.kind === 'ground_nudge') {
-        if (typeof a.content?.title === 'string') groundingTitle = a.content.title as string;
-        if (typeof a.content?.body === 'string') groundingBody = a.content.body as string;
-      }
-    }
-    setMessage(msg);
-    setCompanions({ haiku, groundingTitle, groundingBody });
+    setLastPauseInstanceId(preview.pauseInstanceId);
+    setOpenPauseState(preview.openPauseState);
+    setLastTriggerAt(preview.createdAt);
+    setContext(preview.contextText);
+    setMessage(preview.reflectionMessage);
+    setCompanions(preview.companions);
   }, [user, clearOpenPausePreview]);
 
   // Hydrate open pause on login; keep in sync when pause_instances changes (complete / dismiss / cron).
@@ -303,15 +272,12 @@ function useHolzenState() {
               /* no-op */
             }
           }
-          await supabase.from('pause_ai_artifacts' as never).upsert(
-            {
-              pause_instance_id: res.instance_id,
-              user_id: user.id,
-              kind: 'reflection_text',
-              content: { message: silentMsg, context: ctx },
-            } as never,
-            { onConflict: 'pause_instance_id,kind' } as never,
-          );
+          await persistReflectionArtifacts({
+            pauseInstanceId: res.instance_id,
+            userId: user.id,
+            context: ctx,
+            message: silentMsg,
+          });
           if (!isPendingOffer) {
             setMessage(silentMsg);
             setContext(ctx);
