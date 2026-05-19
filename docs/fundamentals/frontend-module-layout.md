@@ -353,7 +353,7 @@ Same dependency rules as §2–3 for layers that exist. `npm run check:feature-i
 | **5h** | Orchestration | **Done (shipped surfaces)** — `use-home-*` + `HolzenProvider`/`useHolzen` → `screens/home/hooks/` (active imports `@/screens/home/hooks/use-holzen`; root `@/hooks/use-holzen` shim for legacy only); `use-pause-session-*` + ritual hooks → `screens/pause/hooks/`; `HomeScreen` / `PauseSessionScreen` with thin `pages/` re-exports |
 | **5i** | Shrink global layers | **Done (shipped)** — allowlist **37** root shell/shared components (was 59); home market widgets + onboarding + `MoodCheck` under screens; domain `MoodValue` in `features/pause` |
 | **5j** | App shell | **Done (shipped)** — `src/app/components/` (layout, nav, meta, error boundary, checkout/subscribe chrome, auth loading); allowlist **0** at `src/components/*.tsx` (was 37; only `components/ui/` remains); `check:no-screens-in-features` |
-| **5j+** | Screen hooks + route entrypoints | **In progress (`cursor/5j-app-shell-4862`)** — pause/archive list hooks under `screens/*/hooks/`; settings `*Screen.tsx` routes; `@/hooks/*` shims for stable imports |
+| **5j+** | Screen hooks + route entrypoints | **Done (`cursor/5j-app-shell-4862`)** — pause/archive/home list & companion hooks under `screens/*/hooks/`; settings `*Screen.tsx` routes; `@/hooks/*` shims for stable imports |
 | **6** | **Gated:** `pnpm-workspace.yaml`, `apps/web`, `packages/*` extract | Only after ADR §8 trigger; `build` from `apps/web` |
 | **7** | `shared-kernel`, `contracts` (minimal), `packages/infrastructure` | Adapter smoke test |
 | **8+** | `apps/web/src/screens`; `check:package-boundaries` | Post-extraction only |

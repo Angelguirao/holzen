@@ -2,14 +2,14 @@
 
 **Pause-first shipped scope (2026-05):** full ritual on `/pause`; reflect artifact kind **`reflection_text`**; post-pause exits go Home/Archive (no Journey stats). Lapsed users see engagement block via entitlement. Manifest: [active-surface.md](../ops/active-surface.md).
 
-Authoritative orchestration: `[PauseSessionScreen.tsx](../../src/screens/pause/PauseSessionScreen.tsx)` (`[use-pause-session-screen.ts](../../src/screens/pause/hooks/use-pause-session-screen.ts)`); thin page `[PauseSession.tsx](../../src/pages/PauseSession.tsx)`.
+Authoritative orchestration: `[PauseSessionScreen.tsx](../../src/screens/pause/PauseSessionScreen.tsx)` (`[use-pause-session-screen.tsx](../../src/screens/pause/hooks/use-pause-session-screen.tsx)`); thin page `[PauseSession.tsx](../../src/pages/PauseSession.tsx)`.
 
 **Cross-screen patterns:** the same **thin page + named hooks + `src/lib` pure helpers** playbook as [Home](home.md) is spelled out in **[React screen orchestration](../fundamentals/react-screen-orchestration.md)**. Home **produces** navigation into this route; this doc is the **consumer** map for the full-screen volatility ritual.
 
 
 | Piece                                        | File                                                                                              |
 | -------------------------------------------- | ------------------------------------------------------------------------------------------------- |
-| Route screen + conductor hook                | `[PauseSessionScreen.tsx](../../src/screens/pause/PauseSessionScreen.tsx)`, `[use-pause-session-screen.ts](../../src/screens/pause/hooks/use-pause-session-screen.ts)` |
+| Route screen + conductor hook                | `[PauseSessionScreen.tsx](../../src/screens/pause/PauseSessionScreen.tsx)`, `[use-pause-session-screen.tsx](../../src/screens/pause/hooks/use-pause-session-screen.tsx)` |
 | Gate (hydration / fetch / profile)           | `[PauseSessionGate.tsx](../../src/screens/pause/components/PauseSessionGate.tsx)`                         |
 | Gate body: picker vs scaffold slot           | `[PauseSessionGateContent.tsx](../../src/screens/pause/components/PauseSessionGateContent.tsx)`           |
 | Depth picker + About pauses sheet            | `[PauseSessionDepthPickerStack.tsx](../../src/screens/pause/components/PauseSessionDepthPickerStack.tsx)` |
