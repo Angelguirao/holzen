@@ -29,8 +29,14 @@ export {
   type ReferralGrantedRewardRow,
 } from './infrastructure/queries/referral-query';
 export {
+  deleteQuietWindow,
+  insertQuietWindow,
+  updateQuietWindow,
+} from './infrastructure/queries/quiet-windows-mutations';
+export {
   getQuietWindowsQueryOptions,
   quietWindowsQueryKey,
+  type QuietWindow,
 } from './infrastructure/queries/quiet-windows-query';
 export {
   SIGNAL_SOURCES_CATALOG_QUERY_KEY,
