@@ -63,7 +63,7 @@ import { buildPauseSessionScaffoldRitualPayloads } from '@/features/pause/public
 import { JOURNEY_PREFIX } from '@/lib/app-routes';
 import { buildPauseSessionMountLogParams } from '@/features/pause/public';
 import { usePauseSessionPendingPauseOfferNavigation } from '@/screens/pause/hooks/use-pause-session-pending-pause-offer-navigation';
-import { usePendingPauseOffer } from '@/hooks/use-pending-pause-offer';
+import { usePendingPauseOffer } from '@/screens/pause/hooks/use-pending-pause-offer';
 import { usePauseSessionDepthPickerHandlers } from '@/screens/pause/hooks/use-pause-session-depth-picker-handlers';
 import { usePauseSessionFeelTilesSelect } from '@/screens/pause/hooks/use-pause-session-feel-tiles-select';
 import { usePauseReflectGeneration } from '@/screens/pause/hooks/use-pause-reflect-generation';
