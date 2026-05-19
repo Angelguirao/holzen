@@ -1,6 +1,6 @@
 import { useMemo, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { useIsAdmin } from "@/hooks/use-is-admin";
+import { useIsAdmin } from '@/app/hooks/use-is-admin';
 import {
   getEdgeCoverageHeartbeatsQueryOptions,
 } from "@/lib/edge-coverage-heartbeats-query";

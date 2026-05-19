@@ -27,8 +27,8 @@ screens/<route>/
 | `archive/` | Archive tab — **`ArchiveScreen`**, `hooks/`, `components/` (+ `library/`) | [README](archive/README.md), [IA](../../docs/design/information-architecture.md) |
 | `journey/` | Journey tab — **`components/` migrated (5e)** | [docs/screens/journey-overview.md](../../docs/screens/journey-overview.md) |
 | `settings/` | Settings hub — **`SettingsStateLayout`**, `hooks/`, `components/`; thin `pages/settings/` | [README](settings/README.md) |
-| `marketing/` | Landing, blog, legal — **`components/` migrated (5g)** | — |
-| `admin/` | `/admin` — **`components/` + screen (5g)** | — |
+| `marketing/` | Public pages — **`AboutScreen`**, landing **`components/`** | [README](marketing/README.md) |
+| `admin/` | `/admin` — **`AdminScreen`**, `hooks/`, **`components/`** | [README](admin/README.md) |
 
 ## Rules
 
