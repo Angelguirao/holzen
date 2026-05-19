@@ -1,5 +1,5 @@
 /**
- * Ensures `src/pages/EdgeCoverage.tsx` lists every `[functions.<name>]` from
+ * Ensures `src/screens/ops/EdgeCoverageScreen.tsx` lists every `[functions.<name>]` from
  * `supabase/config.toml` (and has no stray names). Prevents the admin UI drift
  * that missed new deployables.
  */
@@ -9,10 +9,10 @@ import { fileURLToPath } from "node:url";
 
 const root = join(dirname(fileURLToPath(import.meta.url)), "..");
 const configPath = join(root, "supabase", "config.toml");
-const coveragePath = join(root, "src", "pages", "EdgeCoverage.tsx");
+const coveragePath = join(root, "src", "screens", "ops", "EdgeCoverageScreen.tsx");
 
 if (!existsSync(configPath) || !existsSync(coveragePath)) {
-  console.error("[check:edge-coverage-manifest] Missing config or EdgeCoverage.tsx");
+  console.error("[check:edge-coverage-manifest] Missing config or EdgeCoverageScreen.tsx");
   process.exit(1);
 }
 

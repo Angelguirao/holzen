@@ -119,9 +119,9 @@ fi
 # ---- 3c. EdgeCoverage manifest vs config.toml -------------------------------
 if npm run | grep -qE "^\s+check:edge-coverage-manifest"; then
   if npm run check:edge-coverage-manifest --silent; then
-    ok "EdgeCoverage.tsx lists every config.toml edge function"
+    ok "EdgeCoverageScreen lists every config.toml edge function"
   else
-    fail_check "npm run check:edge-coverage-manifest failed — sync src/pages/EdgeCoverage.tsx with supabase/config.toml"
+    fail_check "npm run check:edge-coverage-manifest failed — sync src/screens/ops/EdgeCoverageScreen.tsx with supabase/config.toml"
   fi
 fi
 

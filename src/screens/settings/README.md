@@ -6,6 +6,7 @@
 | `SettingsSectionScreen.tsx` | Per-section route (`/:section`) |
 | `SettingsAboutScreen.tsx` | About, changelog, feedback (`/settings/about`) |
 | `BillingHistoryScreen.tsx` | Stripe billing history (`/settings/billing-history`) |
+| `SettingsRoot.tsx` | Pathless outlet for `/settings/*` |
 | `SettingsStateLayout.tsx` | Profile gate + `SettingsStateProvider` |
 | `hooks/use-settings-model.ts` | Settings hub orchestration |
 | `hooks/use-settings-state.ts` | Context consumer |
@@ -15,4 +16,4 @@
 | `components/` | Section panels, hub UI, email change |
 | `hooks/` | Screen-local hooks colocated under other screens; settings uses shared `src/hooks/` for auth/subscription |
 
-`pages/settings/*` — thin re-exports (`SettingsRoot`, `SettingsStateLayout`, `SettingsSectionPage`). `pages/BillingHistory.tsx` → `BillingHistoryScreen`.
+`pages/settings/SettingsSectionPage.tsx` — thin re-export only. `pages/BillingHistory.tsx` → `BillingHistoryScreen`.
