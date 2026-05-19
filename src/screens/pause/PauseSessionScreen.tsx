@@ -2,7 +2,7 @@ import { useState, useRef, useMemo, useCallback, useEffect, Fragment } from 'rea
 import { useReducedMotion } from 'framer-motion';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { useHolzen } from '@/hooks/use-holzen';
+import { useHolzen } from '@/screens/home/hooks/use-holzen';
 import { useSubscription } from '@/hooks/use-subscription';
 import { useProGate } from '@/hooks/use-pro-gate';
 import { PauseEngagementBlocked } from '@/screens/pause/components/PauseEngagementBlocked';

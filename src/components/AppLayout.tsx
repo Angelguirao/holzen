@@ -6,7 +6,7 @@ import { NotificationBell } from './NotificationBell';
 import { PauseReadyBanner } from './PauseReadyBanner';
 import { CheckoutConfirmation } from './CheckoutConfirmation';
 import { PaywallSubscribedTracker } from './PaywallSubscribedTracker';
-import { useHolzen } from '@/hooks/use-holzen';
+import { useHolzen } from '@/screens/home/hooks/use-holzen';
 import { PendingPauseOfferShell } from '@/screens/pause/components/PendingPauseOfferShell';
 import { useLanguageSync } from '@/hooks/use-language-sync';
 import { useAutoTrigger } from '@/hooks/use-auto-trigger';

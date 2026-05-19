@@ -1,5 +1,5 @@
 import { useTranslation } from 'react-i18next';
-import { useHolzen } from '@/hooks/use-holzen';
+import { useHolzen } from '@/screens/home/hooks/use-holzen';
 import AuthLoading from '@/components/AuthLoading';
 import { useSubscription } from '@/hooks/use-subscription';
 import { Onboarding } from '@/screens/home/components/Onboarding';
