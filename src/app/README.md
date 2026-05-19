@@ -27,8 +27,10 @@ Cross-route chrome and providers: layout, bottom nav, document meta, error bound
 | `components/PauseReadyBanner.tsx` | Cross-tab “pause ready” strip (non-Home) |
 | `components/AuthLoading.tsx` | Auth bootstrap spinner (router gates) |
 | `components/FeedbackWidget.tsx` | Global error-report sheet (signed-in) |
+| `components/ShellPauseChrome.tsx` | Pending pause offer + pause-ready banner (`useHolzen` isolated here) |
 
 | `hooks/use-is-admin.ts` | Client admin gate for `/admin` and ops pages |
+| `hooks/use-shell-profile.ts` | Profile load error + i18n for shell (no `useHolzen`) |
 
 ## Placement rationale (what lives elsewhere)
 
@@ -41,7 +43,7 @@ Cross-route chrome and providers: layout, bottom nav, document meta, error bound
 | `HoldGoalWidget`, `InstallHolzenCard`, `SubscriptionSkeleton`, `ThresholdFrequencyEstimator` | `screens/home/components/` | Home (+ Settings composes some) | Home/settings product UI, not shell |
 | `ThresholdSetting`, `QuietWindowsManager`, `AppVersionBadge` | `screens/settings/components/` | Settings | User prefs content |
 
-**`AppLayout` orchestration:** intentionally wires `useHolzen` (profile), `PendingPauseOfferShell` (pause), `useAutoTrigger` + `PauseReadyBanner` (market/cron), and subscription checkout trackers — see docblock in `AppLayout.tsx`.
+**`AppLayout` orchestration:** `useShellProfile` + `useAutoTrigger` (outlet context for Home), `ShellPauseChrome` (pause modal/banner), subscription checkout trackers, `NotificationBell` — see docblock in `AppLayout.tsx`.
 
 ## Navigation cheat sheet
 

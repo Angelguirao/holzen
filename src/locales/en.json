@@ -283,7 +283,12 @@
     "activityExplainer": "A chronological log of pauses and practices. Your saved reflection cards and collections live in Library — browse and search there.",
     "homeCardTitle": "Your journey",
     "homeCardSubtitle": "Stats, insights, badges, and activity",
-    "activityLoadFailed": "Could not load your activity timeline. Check your connection and try again."
+    "activityLoadFailed": "Could not load your activity timeline. Check your connection and try again.",
+    "overview": {
+      "title": "Journey",
+      "subtitle": "Your pause rhythm at a glance.",
+      "archiveCta": "Open your pause library"
+    }
   },
   "admin": {
     "subNavAria": "Admin sections",
