@@ -16,7 +16,7 @@ features/<context>/
   public-queries.ts # optional: TanStack query modules for app hooks/screens
 ```
 
-**Screens** (Home, Archive, Settings, Pause UI) stay in `src/pages/` and `src/components/` until a deliberate move to `src/screens/` — Lovable and existing checks assume root `src/`.
+**Screens** (Home, Archive, Journey, Settings, Pause, marketing, admin) live in [`src/screens/`](../screens/README.md) with thin re-exports under `src/pages/` where legacy import paths remain. **Design system** (`components/ui/`, `icons/`) and **app shell** (`app/components/`) are separate — see [components/README.md](../components/README.md) and [app/README.md](../app/README.md).
 
 ## New code
 
@@ -28,6 +28,6 @@ features/<context>/
 
 ## CI
 
-`npm run check:feature-imports` — layer rules on `src/features/**/*.ts`; blocks deep feature imports and migrated `@/lib/pause-*` shims in active `hooks/`, `pages/`, `components/`, and `test/`.
+`npm run check:feature-imports` — layer rules on `src/features/**/*.ts`; blocks deep feature imports and migrated `@/lib/pause-*` shims in active `hooks/`, `pages/`, `screens/`, `components/`, `app/`, and `test/`.
 
 `npm run check:architecture-alignment` — waves 0–4 scaffold gate (five contexts, legacy excluded, runs `check:feature-imports`); in **`test:ci`**.
