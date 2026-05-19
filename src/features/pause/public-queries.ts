@@ -53,6 +53,7 @@ export {
   logCompanionFeedbackVote,
 } from './infrastructure/queries/companion-feedback-vote-query';
 export {
+  insertPauseAnalyticsEvent,
   logCompanionFullviewOpened,
   type CompanionFullviewKind,
 } from './infrastructure/analytics-events';
