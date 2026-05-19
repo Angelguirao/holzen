@@ -2,7 +2,7 @@
  * `/pause` route orchestration — wires shell, ritual state, step handlers, and scaffold props.
  * Screen map: docs/screens/pause.md · Product model: docs/systems/pause-system.md
  */
-import { useState, useRef, useMemo, useCallback, useEffect } from 'react';
+import { useState, useRef, useMemo, useCallback } from 'react';
 import { useReducedMotion } from 'framer-motion';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
@@ -12,8 +12,6 @@ import { useProGate } from '@/features/subscription/public-hooks';
 import { type MoodValue } from '@/screens/pause/components/MoodCheck';
 import { type PauseStep } from '@/screens/pause/components/PauseProgress';
 import { isPauseSessionHeaderBackVisible } from '@/features/pause/public';
-import { briefSwitchToDeepPauseState } from '@/features/pause/public';
-import { logPauseRitualDepthUpgraded } from '@/features/pause/public-rpc';
 import {
   mapPersistedStep,
   initialRitualEntry,
@@ -47,6 +45,7 @@ import { usePauseSessionPersistToStorage } from '@/screens/pause/hooks/use-pause
 import { usePauseSessionRitualStorageSync } from '@/screens/pause/hooks/use-pause-session-ritual-storage-sync';
 import { usePauseSessionEntryPresentationEffects } from '@/screens/pause/hooks/use-pause-session-entry-presentation-effects';
 import { usePauseSessionBreathUi } from '@/screens/pause/hooks/use-pause-session-breath-ui';
+import { usePauseSessionBriefToDeep } from '@/screens/pause/hooks/use-pause-session-brief-to-deep';
 import { usePauseSessionDepthAndBriefCopy } from '@/screens/pause/hooks/use-pause-session-depth-and-brief-copy';
 import { usePauseSessionBreathSecondLabelVariant } from '@/screens/pause/hooks/use-pause-session-breath-second-label-variant';
 import type { PauseImpactData } from '@/features/pause/public';
@@ -280,13 +279,6 @@ export function usePauseSessionScreen() {
     isBriefRitual: ritualEntry === 'brief',
   });
 
-  useEffect(() => {
-    if (subLoading) return;
-    if (ritualEntry !== 'deep') return;
-    if (subscribed) return;
-    setRitualEntry('picker');
-  }, [subLoading, subscribed, ritualEntry]);
-
   usePauseSessionRitualStorageSync({
     pauseInstanceId,
     setRitualEntry,
@@ -421,30 +413,15 @@ export function usePauseSessionScreen() {
     setBriefIntegrateDone,
   });
 
-  const handleBriefSwitchToDeepPause = useCallback(async () => {
-    if (!requirePro('deep_pause')) return;
-    if (pauseInstanceId) {
-      const ok = await logPauseRitualDepthUpgraded(pauseInstanceId, t);
-      if (!ok) return;
-    }
-    const next = briefSwitchToDeepPauseState();
-    setSwipeDirection('forward');
-    setRitualEntry(next.ritualEntry);
-    setStep(next.step);
-    setBriefStep(next.briefStep);
-    setBriefIntegrateDone(next.briefIntegrateDone);
-    setBreathingFirstCompleted(next.breathingFirstCompleted);
-    setBreathingSecondCompleted(next.breathingSecondCompleted);
-    setBreathTimedActive(next.breathTimedActive);
-    setBreathFirstTimedPatternStarted(next.breathFirstTimedPatternStarted);
-    setFrameDone(next.frameDone);
-    setMoodAfterDone(next.moodAfterDone);
-  }, [
-    requirePro,
+  const { handleBriefSwitchToDeepPause } = usePauseSessionBriefToDeep({
+    subLoading,
+    subscribed,
+    ritualEntry,
     pauseInstanceId,
     t,
-    setSwipeDirection,
+    requirePro,
     setRitualEntry,
+    setSwipeDirection,
     setStep,
     setBriefStep,
     setBriefIntegrateDone,
@@ -454,7 +431,7 @@ export function usePauseSessionScreen() {
     setBreathFirstTimedPatternStarted,
     setFrameDone,
     setMoodAfterDone,
-  ]);
+  });
 
   const reflectGenEnabled = isPauseReflectGenerationEnabled(ritualEntry, step);
 
