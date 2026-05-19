@@ -2,7 +2,7 @@
  * `/pause` route orchestration — wires shell, ritual state, step handlers, and scaffold props.
  * Screen map: docs/screens/pause.md · Product model: docs/systems/pause-system.md
  */
-import { useRef, useCallback } from 'react';
+import { useCallback } from 'react';
 import { useReducedMotion } from 'framer-motion';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
@@ -22,9 +22,7 @@ import { usePauseFeelShiftLogDedupeRefs } from '@/screens/pause/hooks/use-pause-
 import { usePauseFavoriteToggle } from '@/screens/pause/hooks/use-pause-favorite-toggle';
 import { usePauseSessionInitialMoodHandlers } from '@/screens/pause/hooks/use-pause-session-initial-mood-handlers';
 import { usePauseShiftFrameDoneHandler } from '@/screens/pause/hooks/use-pause-shift-frame-done-handler';
-import { usePauseSessionDecideHandler } from '@/screens/pause/hooks/use-pause-session-decide-handler';
 import { usePauseSessionExitNavigation } from '@/screens/pause/hooks/use-pause-session-exit-navigation';
-import { isPauseReflectGenerationEnabled } from '@/features/pause/public';
 import { usePauseSessionBreathStepHandlers } from '@/screens/pause/hooks/use-pause-session-breath-step-handlers';
 import { usePauseSessionHeaderBackHandler } from '@/screens/pause/hooks/use-pause-session-header-back-handler';
 import { usePauseSessionPersistToStorage } from '@/screens/pause/hooks/use-pause-session-persist-to-storage';
@@ -47,8 +45,8 @@ import { usePauseSessionPendingLeaveSheet } from '@/screens/pause/hooks/use-paus
 import { usePendingPauseOffer } from '@/screens/pause/hooks/use-pending-pause-offer';
 import { usePauseSessionDepthPickerHandlers } from '@/screens/pause/hooks/use-pause-session-depth-picker-handlers';
 import { usePauseSessionFeelTilesSelect } from '@/screens/pause/hooks/use-pause-session-feel-tiles-select';
-import { usePauseReflectGeneration } from '@/screens/pause/hooks/use-pause-reflect-generation';
 import { clearSession } from '@/features/pause/public';
+import { usePauseSessionReflectAndDecide } from '@/screens/pause/hooks/use-pause-session-reflect-and-decide';
 import { usePauseSessionScaffoldChromeSlots } from '@/screens/pause/hooks/use-pause-session-scaffold-chrome-slots';
 
 export function usePauseSessionScreen() {
@@ -333,8 +331,6 @@ export function usePauseSessionScreen() {
     setStep,
   });
 
-  const decidingRef = useRef(false);
-
   const {
     breathingRef,
     breathTimedActive,
@@ -426,42 +422,32 @@ export function usePauseSessionScreen() {
     setMoodAfterDone,
   });
 
-  const reflectGenEnabled = isPauseReflectGenerationEnabled(ritualEntry, step);
-
   const {
-    reflectionMessage: generatedReflectionMessage,
-    loading: reflectionLoading,
-    error: reflectionError,
-    retry: retryReflection,
-  } = usePauseReflectGeneration({
+    effectiveReflectionMessage,
+    reflectionLoading,
+    reflectionError,
+    retryReflection,
+    handleDecide,
+  } = usePauseSessionReflectAndDecide({
+    t,
+    ritualEntry,
+    step,
     pauseInstanceId,
     context,
-    initialReflectionMessage: message,
-    severityAbsPct: Math.abs(btcData?.changePercent ?? 0),
-    enabled: reflectGenEnabled,
-  });
-
-  const effectiveReflectionMessage = generatedReflectionMessage.trim() || message;
-
-  const { handleDecide } = usePauseSessionDecideHandler({
-    decidingRef,
-    pauseInstanceId,
-    t,
+    message,
+    btcData,
+    companionsHaiku: companions.haiku ?? null,
+    dismissMessage,
     refreshSubscription,
     setDecision,
-    dismissMessage,
     setPauseImpactData,
     setPhase,
-    context,
     selectedMood,
     selectedMoodAfter,
-    ritualEntry,
     breathingFirstCompleted,
     breathingSecondCompleted,
     feelIntensity,
     shiftIntensity,
-    reflectionMessage: effectiveReflectionMessage,
-    haiku: companions.haiku ?? null,
   });
 
   const { depthContextLine } = usePauseSessionDepthAndBriefCopy({
