@@ -13,7 +13,7 @@ import {
   initialBreathSegmentRpcLoggedFlagsFromRestored,
   briefStepToPauseScienceStep,
 } from '@/features/pause/public';
-import { makeTestPersistedPauseSession } from '@/test/make-test-persisted-pause-session';
+import { makeTestPersistedPauseSession } from '@/test/fixtures/make-test-persisted-pause-session';
 import { type PersistedSession } from '@/features/pause/public';
 
 describe('mapPersistedStep', () => {
