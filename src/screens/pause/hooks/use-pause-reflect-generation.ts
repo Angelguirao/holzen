@@ -6,16 +6,12 @@ import {
   fetchOpeningMessageForPauseInstance,
   generateReflectionAtReflectStep,
 } from '@/features/pause/public-queries';
-import { reflectGenerationPrerequisite } from '@/features/pause/public';
-
-function isAbortLike(e: unknown): boolean {
-  if (e instanceof DOMException && e.name === 'AbortError') return true;
-  if (e instanceof Error && e.name === 'AbortError') return true;
-  if (typeof e === 'object' && e !== null && 'name' in e && (e as { name: unknown }).name === 'AbortError') {
-    return true;
-  }
-  return false;
-}
+import {
+  buildReflectGenerationEdgeInvokeInput,
+  isAbortLikeReflectError,
+  reflectGenerationPrerequisite,
+  reflectGenerationUserErrorMessage,
+} from '@/features/pause/public';
 
 export type UsePauseReflectGenerationParams = {
   pauseInstanceId: string | null;
@@ -106,35 +102,23 @@ export function usePauseReflectGeneration({
         return;
       }
 
-      const { message } = await generateReflectionAtReflectStep({
-        pauseInstanceId: instanceForThisRun,
-        userId: user.id,
-        context: context.trim(),
-        severity: severityAbsPct,
-        tone: profile.reflectionTone,
-        style: profile.reflectionStyle,
-        customPrompt: profile.customPrompt || undefined,
-        motivations: profile.motivations.length > 0 ? profile.motivations : undefined,
-        mantra: profile.mantra || undefined,
-        groundingActivities:
-          profile.groundingActivities.length > 0 ? profile.groundingActivities : undefined,
-        currency: profile.currency,
-        language: profile.language,
-        signal,
-      });
+      const { message } = await generateReflectionAtReflectStep(
+        buildReflectGenerationEdgeInvokeInput({
+          pauseInstanceId: instanceForThisRun,
+          userId: user.id,
+          context: context.trim(),
+          severityAbsPct,
+          profile,
+          signal,
+        }),
+      );
       if (ticket !== validityRef.current) return;
       setReflectionMessage(message);
     } catch (e: unknown) {
       if (ticket !== validityRef.current) return;
-      if (isAbortLike(e) || signal.aborted) return;
+      if (isAbortLikeReflectError(e) || signal.aborted) return;
       const raw = e instanceof Error ? e.message : String(e);
-      if (raw.includes('fetch') || raw.includes('network') || raw.includes('Failed to fetch')) {
-        setError('Could not reach Holzen. Check your connection.');
-      } else if (raw.includes('rate') || raw.includes('limit') || raw.includes('429')) {
-        setError('Too many requests — please wait a moment and try again.');
-      } else {
-        setError('Reflection unavailable right now. Try again shortly.');
-      }
+      setError(reflectGenerationUserErrorMessage(raw));
     } finally {
       if (activeRunRef.current === myRun) {
         setLoading(false);
@@ -148,14 +132,7 @@ export function usePauseReflectGeneration({
     context,
     initialReflectionMessage,
     severityAbsPct,
-    profile.reflectionTone,
-    profile.reflectionStyle,
-    profile.customPrompt,
-    profile.motivations,
-    profile.mantra,
-    profile.groundingActivities,
-    profile.currency,
-    profile.language,
+    profile,
   ]);
 
   useEffect(() => {
