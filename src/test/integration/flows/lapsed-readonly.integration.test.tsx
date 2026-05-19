@@ -3,6 +3,7 @@ import { render, screen, waitFor } from '@testing-library/react';
 import '@/i18n';
 import '../lapsed-app-mocks';
 import { renderShippedApp } from '../render-shipped-app';
+import { waitForRouteLoaded } from '../wait-for-route-loaded';
 import { PauseEngagementBlocked } from '@/screens/pause/components/PauseEngagementBlocked';
 
 describe('F4 — Lapsed read-only surfaces', () => {
