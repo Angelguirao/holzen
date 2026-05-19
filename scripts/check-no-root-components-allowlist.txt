@@ -1,3 +1,4 @@
+# One path per line — shrink as files migrate to src/screens/*/components/
 src/components/AppLayout.tsx
 src/components/AppVersionBadge.tsx
 src/components/AuthLoading.tsx

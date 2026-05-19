@@ -346,7 +346,7 @@ Same dependency rules as §2–3 for layers that exist. `npm run check:feature-i
 | **5a** | Domain contexts in `src/features/*` + `check:architecture-alignment` | **Done** on `feature/refactoring6` — see §10 |
 | **5b** | Presentation guardrails | **Done** — `src/screens/README.md`; `check:no-root-components` in `test:ci` |
 | **5c** | **Pause** screen pilot | **Done** — `components/pause/**` → `screens/pause/components/**`; [docs/screens/pause.md](../screens/pause.md) |
-| **5d** | **Home** screen | **Done** — `components/home/**` → `screens/home/components/`; `pages/Home.tsx` still orchestrates (thin split optional) |
+| **5d** | **Home** screen | **Done** — `components/home/**` → `screens/home/components/`; thin `pages/Home.tsx` → `HomeScreen` |
 | **5e** | **Archive, Journey, Settings** | **Done** — `screens/{archive,journey,settings}/components/` |
 | **5f** | Companion routes | **Done** — `/companion/*` pages + companion UI under `screens/pause/`; thin `pages/Companion*.tsx` re-exports |
 | **5g** | Marketing / admin | **Done** — `screens/marketing/components/`, `screens/admin/` |
