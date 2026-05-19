@@ -451,6 +451,7 @@ export function usePauseSessionScreen() {
     setBreathingFirstCompleted,
     setBreathingSecondCompleted,
     setBreathTimedActive,
+    setBreathFirstTimedPatternStarted,
     setFrameDone,
     setMoodAfterDone,
   ]);
