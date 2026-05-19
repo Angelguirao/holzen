@@ -13,21 +13,8 @@ import { useProGate } from '@/hooks/use-pro-gate';
 import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
 import { useCompanionData } from '@/screens/pause/hooks/use-companion-data';
 
-export interface CompanionData {
-  haiku: string | null;
-  groundingTitle: string | null;
-  groundingBody: string | null;
-}
-
-export interface CompanionPrefs {
-  breathing: boolean;
-  haiku: boolean;
-  /** Ground companion card; persisted as `profiles.companion_grounding`. */
-  grounding: boolean;
-  signal: boolean;
-  zoomOut: boolean;
-  history: boolean;
-}
+export type { CompanionData, CompanionPrefs } from '@/features/pause/public';
+import type { CompanionData, CompanionPrefs } from '@/features/pause/public';
 
 const SEVERITY_NUMBER: Record<string, number> = { mild: 3, moderate: 6, high: 10 };
 

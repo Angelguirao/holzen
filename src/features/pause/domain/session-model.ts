@@ -1,7 +1,7 @@
 import type { MoodValue } from '@/components/MoodCheck';
-import type { FeelStepTile } from '@/screens/pause/components/pause-feel-types';
-import type { CompanionData, CompanionPrefs } from '@/screens/pause/components/CompanionSection';
-import type { PauseStep } from '@/screens/pause/components/PauseProgress';
+import type { FeelStepTile } from '@/features/pause/domain/feel-step-tile';
+import type { CompanionData, CompanionPrefs } from '@/features/pause/domain/companion-card-types';
+import type { PauseStep } from '@/features/pause/domain/pause-ritual-steps';
 import type { PauseState } from '@/features/pause/domain/pause-state';
 import type { BriefPauseStep, RitualDepth } from '@/features/pause/domain/ritual-types';
 

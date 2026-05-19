@@ -1,5 +1,5 @@
 import { supabase } from '@/integrations/supabase/client';
-import type { CompanionData } from '@/screens/pause/components/CompanionSection';
+import type { CompanionData } from '@/features/pause/public';
 import { companionDataFromArtifacts } from '@/features/pause/application/companion/companion-data-from-artifacts';
 import { PAUSE_QUERY_PREFIX } from '@/features/pause/application/queries/pause-query-namespace';
 

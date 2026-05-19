@@ -1,5 +1,5 @@
 import { supabase } from '@/integrations/supabase/client';
-import type { CompanionData } from '@/screens/pause/components/CompanionSection';
+import type { CompanionData } from '@/features/pause/public';
 import { invokeEdge } from '@/lib/invoke-edge';
 import { loadReflectRecencyHints } from './load-reflect-recency-hints';
 

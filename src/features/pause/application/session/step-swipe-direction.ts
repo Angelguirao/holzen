@@ -1,4 +1,4 @@
-import { STEPS, type PauseStep } from '@/screens/pause/components/PauseProgress';
+import { STEPS, type PauseStep } from '@/features/pause/public';
 
 /**
  * Swipe transition direction for deep ritual navigation by `STEPS` index order.
