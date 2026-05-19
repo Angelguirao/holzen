@@ -82,7 +82,7 @@ Use this table to pick the **canonical narrative** for the slice you are touchin
 | Stats / badges UI | **Not in active bundle** — `src/legacy/full-shell/` + [active-surface.md](docs/ops/active-surface.md); `src/lib/stats/` may remain for tests |
 | Shared UI | `src/components/ui/` + `icons/` — [src/components/README.md](src/components/README.md); no new root `src/components/*.tsx` (`check:no-root-components`) |
 | Visual system (Nox + tokens) | **[DESIGN.md](DESIGN.md)** (agent-oriented); `src/index.css` + `tailwind.config.ts`; deep contract `docs/design/nox/` |
-| Auth state | `src/features/auth/public.ts` (`AuthProvider` / `useAuth`); shim `src/hooks/use-auth.tsx` |
+| Auth state | `src/features/auth/public.ts` (`AuthProvider` / `useAuth`) |
 | Supabase browser client | `src/integrations/supabase/client.ts` |
 | i18n | `src/i18n/`; `useTranslation()` where strings are already externalized |
 | PWA / service worker | `src/sw.ts`; registered via `vite-plugin-pwa` in `vite.config.ts` |

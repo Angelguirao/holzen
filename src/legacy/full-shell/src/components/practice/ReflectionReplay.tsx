@@ -13,7 +13,7 @@ import { practiceEntriesWeeklyCountQueryKey } from '@/legacy/full-shell/src/lib/
 import { practicePrimarySuggestionQueryKey } from '@/legacy/full-shell/src/lib/practice-primary-suggestion-query';
 import { toolsHubDataQueryKey } from '@/lib/tools-hub-data-query';
 import { invalidateHistoryCalendarActivities } from '@/legacy/full-shell/src/lib/history-calendar-activities-query-key';
-import { useAuth } from '@/hooks/use-auth';
+import { useAuth } from '@/features/auth/public';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { Textarea } from '@/components/ui/textarea';

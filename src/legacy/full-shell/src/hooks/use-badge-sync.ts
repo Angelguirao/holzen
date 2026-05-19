@@ -2,7 +2,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { invokeEdge } from '@/lib/invoke-edge';
-import { useAuth } from '@/hooks/use-auth';
+import { useAuth } from '@/features/auth/public';
 import { invalidateHistoryCalendarActivities } from '@/legacy/full-shell/src/lib/history-calendar-activities-query-key';
 import { getUserBadgeIdsQueryOptions, userBadgesIdsQueryKey } from '@/legacy/full-shell/src/lib/user-badge-ids-query';
 import type { NewBadge } from '@/legacy/full-shell/src/components/BadgeCelebration';

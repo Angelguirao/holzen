@@ -3,7 +3,7 @@ import { useAuth } from '@/features/auth/public';
 import { getProfileRowQueryOptions } from '@/features/user/public-queries';
 import { useHolzen } from '@/screens/home/hooks/use-holzen';
 import { useSubscription } from '@/features/subscription/public-hooks';
-import { useInstallPrompt } from '@/hooks/use-install-prompt';
+import { useInstallPrompt } from '@/app/hooks/use-install-prompt';
 import { usePushNotifications } from '@/features/notifications/public-hooks';
 import { useLatestChangelogVersion } from '@/screens/settings/hooks/use-latest-changelog-version';
 import { supabase } from '@/integrations/supabase/client';

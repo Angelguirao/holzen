@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { Download, X, Smartphone } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { useInstallPrompt } from '@/hooks/use-install-prompt';
+import { useInstallPrompt } from '@/app/hooks/use-install-prompt';
 import { useAuth } from '@/features/auth/public';
 import { supabase } from '@/integrations/supabase/client';
 import { cn } from '@/lib/utils';

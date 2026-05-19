@@ -79,7 +79,7 @@ const ALLOWED_DEEP_IMPORT_FILES = new Set([
   'src/features/subscription/presentation/CheckoutConfirmation.cross-tab.test.tsx',
   'src/features/subscription/presentation/CheckoutConfirmation.guard.test.tsx',
   'src/features/subscription/presentation/CheckoutConfirmation.refresh-state.test.tsx',
-  'src/test/no-refetch-on-back-nav.test.tsx',
+  'src/features/subscription/presentation/CheckoutConfirmation.no-refetch-on-back-nav.test.tsx',
   'src/app/components/AppLayout.tsx',
 ]);
 

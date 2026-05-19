@@ -3,7 +3,7 @@ import { useQueryClient } from '@tanstack/react-query';
 import { Sparkles } from 'lucide-react';
 import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
-import { useAuth } from '@/hooks/use-auth';
+import { useAuth } from '@/features/auth/public';
 import {
   DEMO_MODE_EVENT,
   DEMO_MODE_STORAGE_KEY,

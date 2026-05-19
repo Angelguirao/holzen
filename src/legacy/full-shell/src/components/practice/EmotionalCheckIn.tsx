@@ -7,7 +7,7 @@ import { practicePrimarySuggestionQueryKey } from '@/legacy/full-shell/src/lib/p
 import { toolsHubDataQueryKey } from '@/lib/tools-hub-data-query';
 import { invalidateHistoryCalendarActivities } from '@/legacy/full-shell/src/lib/history-calendar-activities-query-key';
 import { supabase } from '@/integrations/supabase/client';
-import { useAuth } from '@/hooks/use-auth';
+import { useAuth } from '@/features/auth/public';
 import { hapticFeedback } from '@/lib/haptics';
 import { toast } from 'sonner';
 import { Check } from 'lucide-react';

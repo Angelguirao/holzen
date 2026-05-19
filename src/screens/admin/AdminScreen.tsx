@@ -5,7 +5,7 @@ import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import { RefreshCw, Activity, Database, DollarSign, AlertTriangle, ThumbsUp, Clock, Loader2, ShieldX, ChevronDown, ChevronRight, Bell } from 'lucide-react';
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Cell } from 'recharts';
 import { useMemo, useState, useEffect, useCallback } from 'react';
-import { useToast } from '@/hooks/use-toast';
+import { useToast } from '@/components/ui/use-toast';
 import { label, shortModelName, serveSourceBadgeClass, PERIOD_OPTIONS, TAB_TRIGGER_CLASS, TYPE_COLORS } from '@/screens/admin/components/admin-constants';
 import { StatCard, TrendInfo } from '@/screens/admin/components/StatCard';
 import { FilterRow } from '@/screens/admin/components/FilterRow';

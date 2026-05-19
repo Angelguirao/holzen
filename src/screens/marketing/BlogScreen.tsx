@@ -8,7 +8,7 @@ import { getBlogPublishedPostsInfiniteQueryOptions, prefetchBlogPostBySlug } fro
 import { format } from 'date-fns';
 import { PageMeta } from '@/app/components/PageMeta';
 import { PublicFooter } from '@/screens/marketing/components/PublicFooter';
-import { useInfiniteScroll } from '@/hooks/use-infinite-scroll';
+import { useInfiniteScroll } from '@/lib/use-infinite-scroll';
 import { useTranslation } from 'react-i18next';
 import { PageHeading } from '@/components/ui/page-heading';
 

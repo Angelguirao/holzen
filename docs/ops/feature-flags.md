@@ -12,7 +12,7 @@ Feature flags run on **PostHog**. Evaluation is client-side only today; server-s
 ## Hook usage
 
 ```ts
-import { useFeatureFlag } from '@/hooks/use-feature-flag';
+import { useFeatureFlag } from '@/lib/use-feature-flag';
 
 const { value, ready } = useFeatureFlag('ui.home_v2', false);
 if (!ready) return <HomeClassic />;  // safe fallback while PostHog boots

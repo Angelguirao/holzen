@@ -2,7 +2,7 @@ import { useTranslation } from 'react-i18next';
 import { useEffect } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useNavigate, useParams } from 'react-router-dom';
-import { useAuth } from '@/hooks/use-auth';
+import { useAuth } from '@/features/auth/public';
 import { getCompletedPauseCountQueryOptions } from '@/features/pause/public-queries';
 import { useSubscription } from '@/features/subscription/public-hooks';
 import { useHoldGoalProfile } from '@/features/user/public-hooks';

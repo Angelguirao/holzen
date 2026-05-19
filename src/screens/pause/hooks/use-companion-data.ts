@@ -4,7 +4,7 @@ import { invokeEdge } from '@/lib/invoke-edge';
 import { toast as sonnerToast } from 'sonner';
 import { hapticFeedback } from '@/lib/haptics';
 import { useHolzen } from '@/screens/home/hooks/use-holzen';
-import { useToast } from '@/hooks/use-toast';
+import { useToast } from '@/components/ui/use-toast';
 import { useCompanionLibraryFavorites } from '@/screens/pause/hooks/use-companion-library-favorites';
 import type { CompanionData, CompanionPrefs } from '@/screens/pause/components/CompanionSection';
 import type { InterventionState, RegenerateCompanionSlot } from '@/features/pause/public';

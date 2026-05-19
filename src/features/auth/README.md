@@ -10,6 +10,6 @@ Session and identity projection.
 | Ports | `ports/session.ts` — scaffold for future adapter split |
 | Public API | `public.ts` — `AuthProvider`, `useAuth`, `AuthSessionState` |
 
-**App wiring:** `src/App.tsx` and screens import `AuthProvider` / `useAuth` from `@/features/auth/public`. `src/hooks/use-auth.tsx` remains a deprecated re-export for legacy paths only.
+**App wiring:** import `AuthProvider` / `useAuth` from `@/features/auth/public` only.
 
 See [docs/systems/auth/auth-and-referral-system.md](../../docs/systems/auth/auth-and-referral-system.md).

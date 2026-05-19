@@ -1,7 +1,7 @@
 import { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { ChevronDown, ChevronUp } from 'lucide-react';
-import { usePauseStatsData } from '@/hooks/use-pause-stats-data';
+import { usePauseStatsData } from '@/legacy/full-shell/src/hooks/use-pause-stats-data';
 import { SkillOverviewCard } from '@/legacy/full-shell/src/components/stats/SkillOverviewCard';
 import { MoodShiftChart } from '@/legacy/full-shell/src/components/stats/regulation/MoodShiftChart';
 import { MoodTrendChart } from '@/legacy/full-shell/src/components/stats/regulation/MoodTrendChart';
