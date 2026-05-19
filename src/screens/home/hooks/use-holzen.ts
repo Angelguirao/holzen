@@ -13,8 +13,8 @@ import {
   getHolzenMarketDisplayQueryOptions,
   holzenMarketDisplayQueryKey,
 } from '@/features/market/public';
-import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/features/auth/public';
+import { pauseDismissCurrent } from '@/features/pause/public-rpc';
 import { useProfile } from '@/features/user/public-hooks';
 import { holzenLog } from '@/lib/holzen-console';
 import { clearSession } from '@/features/pause/public';
@@ -207,7 +207,7 @@ function useHolzenState() {
     setOpenPauseState(null);
     if (!user) return;
     try {
-      await supabase.rpc('pause_dismiss_current' as never);
+      await pauseDismissCurrent();
     } catch {
       /* non-fatal */
     }
