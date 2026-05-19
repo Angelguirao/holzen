@@ -52,7 +52,7 @@ vi.mock('react-router-dom', async () => {
   };
 });
 
-import { CheckoutConfirmation } from '@/features/subscription/public';
+import { CheckoutConfirmation } from '@/features/subscription/presentation/CheckoutConfirmation';
 
 const CHECKOUT_CONFIRMED_KEY = 'holzen_checkout_confirmed';
 const CHECKOUT_STARTED_KEY = 'holzen_checkout_started_at';
