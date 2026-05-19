@@ -20,7 +20,7 @@ export function isCompanionOrchestratePaywallCode(
   return code === 'companions_quota_exceeded' || code === 'companions_upgrade_required';
 }
 
-export type CompanionOrchestrateInvokeFailureKind = 'lazy_fetch' | 'regenerate';
+export type CompanionOrchestrateInvokeFailureKind = 'intervention' | 'lazy_fetch' | 'regenerate';
 
 export interface CompanionOrchestrateInvokeFailure {
   kind: CompanionOrchestrateInvokeFailureKind;
