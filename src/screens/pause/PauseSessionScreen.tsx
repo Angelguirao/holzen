@@ -18,7 +18,7 @@ import { PauseSessionDepthPickerStack } from '@/screens/pause/components/PauseSe
 import { PauseBriefProgress } from '@/screens/pause/components/PauseBriefProgress';
 import { isPauseSessionHeaderBackVisible } from '@/features/pause/public';
 import { briefSwitchToDeepPauseState } from '@/features/pause/public';
-import { logPauseRitualDepthUpgraded } from '@/lib/pause-ritual-depth-upgrade';
+import { logPauseRitualDepthUpgraded } from '@/features/pause/public-rpc';
 import {
   mapPersistedStep,
   initialRitualEntry,

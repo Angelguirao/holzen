@@ -16,10 +16,10 @@ import { scheduleCheckoutGuardCleanup } from "@/features/subscription/public";
 import { ErrorBoundary } from "@/app/components/ErrorBoundary";
 import { OfflineBanner } from "@/app/components/OfflineBanner";
 import { CookieConsent } from "@/app/components/CookieConsent";
-import AuthLoading from "./components/AuthLoading";
+import AuthLoading from "@/app/components/AuthLoading";
 import { AppLayout } from "@/app/components/AppLayout";
 import { RobotsNoIndex } from "@/app/components/PageMeta";
-import { FeedbackWidget } from "./components/FeedbackWidget";
+import { FeedbackWidget } from "@/app/components/FeedbackWidget";
 
 const Home = lazy(() => import("./pages/Home"));
 const Archive = lazy(() => import("./pages/Archive"));
