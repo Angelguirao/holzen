@@ -52,7 +52,7 @@ function useTabChunkPrefetch() {
       void import('@/pages/Home').catch(() => {});
       void import('@/pages/Archive').catch(() => {});
       void import('@/pages/journey/JourneyOverview').catch(() => {});
-      void import('@/screens/settings/components/SettingsHub').catch(() => {});
+      void import('@/screens/settings/SettingsHubScreen').catch(() => {});
     };
     const ric = (window as Window & {
       requestIdleCallback?: (cb: () => void, opts?: { timeout: number }) => number;

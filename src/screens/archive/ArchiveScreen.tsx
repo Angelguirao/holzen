@@ -3,7 +3,7 @@ import { useQuery } from '@tanstack/react-query';
 import { useSearchParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { motion, AnimatePresence } from 'framer-motion';
-import { usePauseArchiveList } from '@/hooks/use-pause-archive-list';
+import { usePauseArchiveList } from '@/screens/archive/hooks/use-pause-archive-list';
 import type { PauseArchiveRow, PauseArchiveSegment } from '@/features/pause/public-queries';
 import { useInfiniteScroll } from '@/hooks/use-infinite-scroll';
 import { PageMeta } from '@/app/components/PageMeta';
