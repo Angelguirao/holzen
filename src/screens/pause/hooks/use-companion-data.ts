@@ -3,7 +3,7 @@ import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { invokeEdge } from '@/lib/invoke-edge';
 import { toast as sonnerToast } from 'sonner';
 import { hapticFeedback } from '@/lib/haptics';
-import { useHolzen } from '@/hooks/use-holzen';
+import { useHolzen } from '@/screens/home/hooks/use-holzen';
 import { useToast } from '@/hooks/use-toast';
 import { useCompanionLibraryFavorites } from '@/hooks/use-companion-library-favorites';
 import type { CompanionData, CompanionPrefs } from '@/screens/pause/components/CompanionSection';
