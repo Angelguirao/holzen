@@ -2,7 +2,7 @@ import { useState, type ReactNode } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ChevronLeft, Volume2, VolumeX, X } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
-import { PauseProgress, type PauseStep } from '@/components/pause/PauseProgress';
+import { PauseProgress, type PauseStep } from '@/screens/pause/components/PauseProgress';
 import { Button } from '@/components/ui/button';
 import { resumePauseAudioContext } from '@/features/pause/public';
 

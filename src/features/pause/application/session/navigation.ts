@@ -1,4 +1,4 @@
-import type { PauseStep } from '@/components/pause/PauseProgress';
+import type { PauseStep } from '@/screens/pause/components/PauseProgress';
 
 /**
  * Whether an implicit “advance to next step” gesture may leave the current pause step.

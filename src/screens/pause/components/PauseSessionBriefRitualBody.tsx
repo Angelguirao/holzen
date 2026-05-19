@@ -1,11 +1,11 @@
 import { AnimatePresence, motion } from 'framer-motion';
 import type { RefObject } from 'react';
 import type { MoodValue } from '@/components/MoodCheck';
-import { PauseBreathing, type PauseBreathingHandle } from '@/components/pause/PauseBreathing';
-import { PauseRitualFeelStep } from '@/components/pause/PauseRitualFeelStep';
-import type { FeelStepTile } from '@/components/pause/pause-feel-types';
-import { PauseBriefIntegrate } from '@/components/pause/PauseBriefIntegrate';
-import { PauseDecide } from '@/components/pause/PauseDecide';
+import { PauseBreathing, type PauseBreathingHandle } from '@/screens/pause/components/PauseBreathing';
+import { PauseRitualFeelStep } from '@/screens/pause/components/PauseRitualFeelStep';
+import type { FeelStepTile } from '@/screens/pause/components/pause-feel-types';
+import { PauseBriefIntegrate } from '@/screens/pause/components/PauseBriefIntegrate';
+import { PauseDecide } from '@/screens/pause/components/PauseDecide';
 import type { PauseSessionStepTransitionConfig } from '@/features/pause/public';
 import { type BriefPauseStep } from '@/features/pause/public';
 

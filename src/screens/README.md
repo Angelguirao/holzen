@@ -16,7 +16,7 @@ screens/<route>/
 | Screen folder | Routes / product area | Screen map doc |
 |---------------|----------------------|----------------|
 | `home/` | `/` Home | [docs/screens/home.md](../../docs/screens/home.md) |
-| `pause/` | `/pause`, companion full-screen | [docs/screens/pause.md](../../docs/screens/pause.md) |
+| `pause/` | `/pause`, companion full-screen — **`components/` migrated (5c)** | [docs/screens/pause.md](../../docs/screens/pause.md) |
 | `archive/` | Archive tab | [docs/design/information-architecture.md](../../docs/design/information-architecture.md) |
 | `journey/` | Journey tab | [docs/screens/journey-overview.md](../../docs/screens/journey-overview.md) |
 | `settings/` | Settings hub | settings pages under `src/pages/settings/` |

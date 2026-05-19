@@ -1,5 +1,5 @@
 import { useEffect, type Dispatch, type SetStateAction } from 'react';
-import type { PauseStep } from '@/components/pause/PauseProgress';
+import type { PauseStep } from '@/screens/pause/components/PauseProgress';
 import { type BriefPauseStep, type RitualDepth } from '@/features/pause/public';
 
 /**

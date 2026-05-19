@@ -1,9 +1,9 @@
 import type { ComponentProps } from 'react';
-import { PauseSessionScaffold } from '@/components/pause/PauseSessionScaffold';
+import { PauseSessionScaffold } from '@/screens/pause/components/PauseSessionScaffold';
 import {
   PauseSessionScaffoldBody,
   type PauseSessionScaffoldBodyProps,
-} from '@/components/pause/PauseSessionScaffoldBody';
+} from '@/screens/pause/components/PauseSessionScaffoldBody';
 
 export type PauseSessionScaffoldShellProps = Omit<ComponentProps<typeof PauseSessionScaffold>, 'children'> &
   PauseSessionScaffoldBodyProps;

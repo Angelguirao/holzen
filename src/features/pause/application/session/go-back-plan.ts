@@ -1,4 +1,4 @@
-import type { PauseStep } from '@/components/pause/PauseProgress';
+import type { PauseStep } from '@/screens/pause/components/PauseProgress';
 import { computeBriefRitualGoBack } from '@/features/pause/application/brief-ritual/brief-pause-go-back';
 import type { BriefPauseStep, RitualDepth } from '@/features/pause/domain/ritual-types';
 import { computeDeepRitualGoBackTarget } from './deep-go-back';

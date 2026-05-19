@@ -1,12 +1,12 @@
-import { PauseDone } from '@/components/pause/PauseDone';
+import { PauseDone } from '@/screens/pause/components/PauseDone';
 import {
   PauseSessionBriefRitualBody,
   type PauseSessionBriefRitualBodyProps,
-} from '@/components/pause/PauseSessionBriefRitualBody';
+} from '@/screens/pause/components/PauseSessionBriefRitualBody';
 import {
   PauseSessionDeepRitualBody,
   type PauseSessionDeepRitualBodyProps,
-} from '@/components/pause/PauseSessionDeepRitualBody';
+} from '@/screens/pause/components/PauseSessionDeepRitualBody';
 import type { PauseImpactData } from '@/features/pause/public';
 import { type RitualDepth } from '@/features/pause/public';
 

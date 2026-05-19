@@ -1,4 +1,4 @@
-import type { PauseStep } from '@/components/pause/PauseProgress';
+import type { PauseStep } from '@/screens/pause/components/PauseProgress';
 import type { BriefPauseStep, RitualDepth } from '@/features/pause/domain/ritual-types';
 
 /** Deep ritual step after brief Integrate → deep (first breathe already logged on the brief path). */

@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import { motion } from 'framer-motion';
 import { useTranslation } from 'react-i18next';
 import { RefreshCw, Sparkles } from 'lucide-react';
-import { pauseStepLayout } from '@/components/pause/pause-step-layout';
+import { pauseStepLayout } from '@/screens/pause/components/pause-step-layout';
 import { cn } from '@/lib/utils';
 
 const INTEGRATE_SECONDS = 20;

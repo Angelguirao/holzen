@@ -1,7 +1,7 @@
 import { useTranslation } from 'react-i18next';
 import { Wind, Heart, BookOpen, Compass, Target, ExternalLink } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import type { PauseStep } from '@/components/pause/PauseProgress';
+import type { PauseStep } from '@/screens/pause/components/PauseProgress';
 
 const STEPS = [
   {

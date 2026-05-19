@@ -1,7 +1,7 @@
 import { useCallback, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { toast } from 'sonner';
-import { PauseDecide } from '@/components/pause/PauseDecide';
+import { PauseDecide } from '@/screens/pause/components/PauseDecide';
 import {
   Sheet,
   SheetContent,

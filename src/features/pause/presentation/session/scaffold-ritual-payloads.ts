@@ -1,11 +1,11 @@
 import type { RefObject } from 'react';
 import type { CompanionData, CompanionPrefs } from '@/components/CompanionSection';
 import type { MoodValue } from '@/components/MoodCheck';
-import type { FeelStepTile } from '@/components/pause/pause-feel-types';
-import type { PauseBreathingHandle } from '@/components/pause/PauseBreathing';
-import type { PauseSessionBriefRitualBodyProps } from '@/components/pause/PauseSessionBriefRitualBody';
-import type { PauseSessionDeepRitualBodyProps } from '@/components/pause/PauseSessionDeepRitualBody';
-import type { PauseStep } from '@/components/pause/PauseProgress';
+import type { FeelStepTile } from '@/screens/pause/components/pause-feel-types';
+import type { PauseBreathingHandle } from '@/screens/pause/components/PauseBreathing';
+import type { PauseSessionBriefRitualBodyProps } from '@/screens/pause/components/PauseSessionBriefRitualBody';
+import type { PauseSessionDeepRitualBodyProps } from '@/screens/pause/components/PauseSessionDeepRitualBody';
+import type { PauseStep } from '@/screens/pause/components/PauseProgress';
 import type { BriefPauseStep } from '@/features/pause/domain/ritual-types';
 import type { PauseSessionStepTransitionConfig } from '@/features/pause/application/session/step-transition';
 
