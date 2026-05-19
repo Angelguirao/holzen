@@ -1,4 +1,4 @@
-import { migratePersistedPauseSession } from '@/features/pause/application/session/migrate-persisted-session';
+import { migratePersistedPauseSession } from '@/features/pause/application/use-cases/session/migrate-persisted-session';
 import { PAUSE_RITUAL_SCHEMA_VERSION } from '@/features/pause/domain/ritual-types';
 import type { PersistedSession } from '@/features/pause/domain/session-model';
 

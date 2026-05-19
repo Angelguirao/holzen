@@ -128,6 +128,24 @@ export {
   fetchOpeningMessageForPauseInstance,
   generateReflectionAtReflectStep,
 } from './infrastructure/reflect/reflection-artifact';
+export {
+  GROUNDING_ENRICHMENT_DISABLED_QUERY_KEY,
+  GROUNDING_ENRICHMENT_DISABLED_SEGMENT,
+  GROUNDING_ENRICHMENT_QUERY_PREFIX,
+  fetchGroundingEnrichment,
+  getGroundingEnrichmentQueryOptions,
+  groundingEnrichmentQueryKey,
+  type GroundingEnrichment,
+  type GroundingEnrichmentInput,
+} from './infrastructure/queries/grounding-enrichment-query';
+export {
+  RELATED_BIASES_GROUND_NUDGE_DISABLED_USER_ID,
+  RELATED_BIASES_GROUND_NUDGE_NONE_QUERY_KEY,
+  RELATED_BIASES_GROUND_NUDGE_QUERY_PREFIX,
+  fetchGroundNudgeArtifactsLast30d,
+  getRelatedBiasesGroundNudgeQueryOptions,
+  relatedBiasesGroundNudgeQueryKey,
+} from './infrastructure/queries/related-biases-ground-nudge-query';
 export { loadMoodHistoryForOrchestrate } from './infrastructure/companion/mood-history';
 export { loadActiveOrchestrateSources } from './infrastructure/companion/orchestrate-sources';
 export {

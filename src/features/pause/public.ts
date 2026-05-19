@@ -15,7 +15,7 @@ export {
   PAUSE_PERSIST_ERROR_MARKER,
   REFLECTION_PERSIST_ERROR_MARKER,
 } from './application/use-cases/reflection-persist-error';
-export { pauseArchiveRowAllowsRetrospectiveOutcome } from './application/archive/retrospective-outcome';
+export { pauseArchiveRowAllowsRetrospectiveOutcome } from './application/use-cases/archive/retrospective-outcome';
 export { pauseArchiveListQueryPrefix } from './application/queries/archive-query-keys';
 export type {
   Collection,
@@ -25,7 +25,7 @@ export type {
   LibraryListSortMode,
 } from './domain/library-bundle';
 export { buildOutcomeLoggedPayload } from './application/use-cases/outcome-log-payload';
-export { groupBulkHoldByLocalDay } from './application/bulk-hold/group-by-local-day';
+export { groupBulkHoldByLocalDay } from './application/use-cases/bulk-hold/group-by-local-day';
 export {
   bulkHoldMaxRows,
   bulkHoldQueryWindowIso,
@@ -41,29 +41,29 @@ export {
   resolvePauseBreathSecondLabelVariant,
   viteWantsPauseBreathSecondLabelShift,
   type PauseBreathSecondLabelVariant,
-} from './application/breathing/breath-second-label-variant';
+} from './application/use-cases/breathing/breath-second-label-variant';
 export {
   BRIEF_PAUSE_ORDER,
   computeBriefMacroProgressPosition,
-} from './application/brief-ritual/brief-pause-order';
+} from './domain/brief-ritual-steps';
 export {
   computeBriefRitualGoBack,
   type BriefRitualGoBackResult,
-} from './application/brief-ritual/brief-pause-go-back';
+} from './application/use-cases/ritual/brief/brief-pause-go-back';
 export {
   computeBriefPastStepClick,
   type BriefPastStepClickResult,
-} from './application/brief-ritual/brief-pause-past-step-click';
+} from './application/use-cases/ritual/brief/brief-pause-past-step-click';
 export {
   hasPersistablePauseSessionAnchor,
   hasPersistedPauseSessionPayload,
   type PersistedSessionAnchor,
-} from './application/session/persisted-session-guards';
+} from './application/use-cases/session/persisted-session-guards';
 export {
   TERMINAL_PAUSE_DB_STATES,
   isTerminalPauseDbState,
   persistedPauseSessionAllowsTerminalEntry,
-} from './application/session/terminal-entry-guard';
+} from './application/use-cases/session/terminal-entry-guard';
 export {
   MANUAL_PAUSE_TRIGGER_IDLE,
   type ManualPauseTriggerResult,
@@ -79,8 +79,8 @@ export {
   type FetchedPauseInstance,
   type PersistedSession,
 } from './domain/session-model';
-export { companionDataFromArtifacts } from './application/companion/companion-data-from-artifacts';
-export { migratePersistedPauseSession } from './application/session/migrate-persisted-session';
+export { companionDataFromArtifacts } from './application/use-cases/companion/companion-data-from-artifacts';
+export { migratePersistedPauseSession } from './application/use-cases/session/migrate-persisted-session';
 export {
   clearSession,
   loadSession,
@@ -92,17 +92,17 @@ export {
   resetInterventionIdempotency,
   runOnceIntervention,
   type InterventionIdempotencyDecision,
-} from './application/companion/intervention-idempotency';
+} from './application/use-cases/companion/intervention-idempotency';
 export {
   reflectGenerationPrerequisite,
   type ReflectGenerationPrerequisite,
-} from './application/reflect/generation-prerequisites';
+} from './application/use-cases/reflect/generation-prerequisites';
 export {
   BOX_BREATH_PHASE_COUNT,
   computeBreathingPhaseAdvance,
   resolveBreathingCompleted,
   type BreathingPhaseAdvanceResult,
-} from './application/breathing/phase-advance';
+} from './application/use-cases/breathing/phase-advance';
 export {
   effectivePauseShiftIntensity,
   effectivePauseShiftMood,
@@ -118,21 +118,21 @@ export {
   computePauseQualityScore,
   type PauseQualityBreakdown,
 } from './domain/pause-quality';
-export { showPauseFavoriteProHintToast } from './application/feedback/favorite-toast';
+export { showPauseFavoriteProHintToast } from './application/use-cases/feedback/favorite-toast';
 export {
   showPauseOutcomeNotCompletedToast,
   showPauseOutcomeSaveFailedToast,
-} from './application/feedback/outcome-toast';
-export { showPauseStepSyncFailedToast } from './application/feedback/step-sync-toast';
+} from './application/use-cases/feedback/outcome-toast';
+export { showPauseStepSyncFailedToast } from './application/use-cases/feedback/step-sync-toast';
 export {
   buildFetchedPauseInstanceFromFetch,
   type PauseAiArtifactKindRow,
   type PauseInstanceContextSnapshotRow,
-} from './application/session/fetched-instance-from-fetch';
+} from './application/use-cases/session/fetched-instance-from-fetch';
 export {
   computePauseStorageRitualSyncPatch,
   type PauseStorageRitualSyncPatch,
-} from './application/session/storage-ritual-sync';
+} from './application/use-cases/session/storage-ritual-sync';
 export type {
   CompanionOrchestrateSlotResult,
   CompanionSlotSource,
@@ -171,23 +171,23 @@ export {
   zoomOutLibraryAutosaveFromDisplayData,
   zoomOutSaveThisMomentSeed,
   zoomOutTotalCharsForReadTime,
-} from './application/companion/zoom-out-payload';
+} from './application/use-cases/companion/zoom-out-payload';
 export {
   type NotificationNavigateState,
   type PauseSessionLocationState,
   type PauseSessionNavParsed,
   type PauseSeverity,
   parsePauseSessionLocationState,
-} from './application/session/location-state';
+} from './application/use-cases/session/location-state';
 export {
   computePauseHeaderBackIntent,
   isPauseSessionHeaderBackVisible,
-} from './application/session/header-back';
+} from './application/use-cases/session/header-back';
 export {
   BRIEF_SWITCH_TO_DEEP_STEP,
   briefSwitchToDeepPauseState,
   type BriefSwitchToDeepPauseState,
-} from './application/session/brief-switch-to-deep';
+} from './application/use-cases/ritual/deep/brief-switch-to-deep';
 export {
   briefStepToPauseScienceStep,
   mapPersistedStep,
@@ -201,12 +201,12 @@ export {
   initialBreathingSecondCompletedFromRestored,
   initialFrameDoneFromRestored,
   initialBreathSegmentRpcLoggedFlagsFromRestored,
-} from './application/session/step-map';
-export { coalescePauseSessionShellViewModel } from './application/session/shell-view-model';
+} from './application/use-cases/session/step-map';
+export { coalescePauseSessionShellViewModel } from './application/use-cases/session/shell-view-model';
 export {
   isPauseSessionDepthPickerActive,
   isPauseSessionWaitingForInstanceFetch,
-} from './application/session/gate-flags';
+} from './application/use-cases/session/gate-flags';
 export {
   computePauseSessionHydration,
   computePauseSessionResolved,
@@ -214,18 +214,18 @@ export {
   type PauseSessionHydrationReady,
   type PauseSessionHydrationState,
   type PauseSessionResolvedInput,
-} from './application/session/hydration';
-export { buildPauseSessionScaffoldRitualDerived } from './application/session/scaffold-ritual-derived';
+} from './application/use-cases/session/hydration';
+export { buildPauseSessionScaffoldRitualDerived } from './application/use-cases/session/scaffold-ritual-derived';
 export {
   buildPauseSessionMountLogParams,
   type PauseSessionMountLogParams,
-} from './application/session/mount-log-params';
+} from './application/use-cases/session/mount-log-params';
 export {
   buildPauseSessionPersistSnapshot,
   type PauseSessionPersistSnapshotInput,
-} from './application/session/persist-snapshot';
-export { computePauseGoBackPlan } from './application/session/go-back-plan';
-export { pauseStepSwipeDirection } from './application/session/step-swipe-direction';
+} from './application/use-cases/session/persist-snapshot';
+export { computePauseGoBackPlan } from './application/use-cases/session/go-back-plan';
+export { pauseStepSwipeDirection } from './application/use-cases/session/step-swipe-direction';
 export {
   buildPauseSessionStepTransitionConfig,
   PAUSE_SESSION_STEP_SLIDE_OFFSET_PX,
@@ -234,16 +234,16 @@ export {
   PAUSE_SESSION_STEP_TRANSITION_EASE,
   type PauseSessionStepTransitionConfig,
   type PauseSessionSwipeDirection,
-} from './application/session/step-transition';
+} from './application/use-cases/session/step-transition';
 export {
   isPauseMoodValue,
   buildPostPauseEmotionLoggedPayload,
-} from './application/session/post-pause-emotion-log';
+} from './application/use-cases/session/post-pause-emotion-log';
 export { buildPauseScoreImpacts } from './application/use-cases/score-impacts';
 export {
   breathCompletedSegment1Payload,
   breathCompletedSegment2Payload,
-} from './application/breathing/breath-completed-payload';
+} from './application/use-cases/breathing/breath-completed-payload';
 export {
   BRIEF_TRIANGLE_CYCLE_COUNT,
   holdProgressWithinPhase,
@@ -255,16 +255,16 @@ export {
   secondsIntoTrianglePattern,
   TRIANGLE_PHASE_COUNT,
   type PauseRitualBreathingPatternMode,
-} from './application/breathing/ritual-pattern';
+} from './application/use-cases/breathing/ritual-pattern';
 export {
   playPauseBreathPatternCompleteCue,
   playPauseBreathPhaseCue,
   resumePauseAudioContext,
   startPauseReflectFrameFocusAmbience,
   stopPauseReflectFrameFocusAmbience,
-} from './application/breathing/ritual-audio';
-export { getRecencyHints } from './application/companion/recency-hints';
-export { trackCompanionServed } from './application/companion/analytics';
+} from './application/use-cases/breathing/ritual-audio';
+export { getRecencyHints } from './application/use-cases/companion/recency-hints';
+export { trackCompanionServed } from './application/use-cases/companion/analytics';
 export {
   companionUiCompletionQueryKey,
   invalidateCompanionUiCompletionQuery,
@@ -280,13 +280,19 @@ export {
   type CompanionSlotCommitters,
   type CompanionSlotRelaxationUi,
   type CompanionSlotRelaxations,
-} from './application/companion/orchestrate-slot-apply';
+} from './application/use-cases/companion/orchestrate-slot-apply';
 export { buildPauseSessionScaffoldRitualPayloads } from './presentation/session/scaffold-ritual-payloads';
-export type { PauseSessionShellViewModel } from './application/session/shell-view-model';
-export { canAdvanceFromPauseStep } from './application/session/navigation';
-export { computeDeepRitualGoBackTarget } from './application/session/deep-go-back';
-export { hostnameFromUrl } from './application/companion/url';
-export { deriveBreathingUiCompleteFromPayloads } from './application/companion/breathing-ui-complete';
+export type { PauseSessionShellViewModel } from './application/use-cases/session/shell-view-model';
+export { canAdvanceFromPauseStep } from './application/use-cases/session/navigation';
+export { computeDeepRitualGoBackTarget } from './application/use-cases/ritual/deep/deep-go-back';
+export { hostnameFromUrl } from './application/use-cases/companion/url';
+export {
+  dedupeBiases,
+  normalizeBiasTitle,
+  type RelatedBias,
+  type RelatedBiasesRow,
+} from './application/use-cases/companion/related-biases';
+export { deriveBreathingUiCompleteFromPayloads } from './application/use-cases/companion/breathing-ui-complete';
 export { ritualDepthUpgradedPayload } from './application/use-cases/ritual-depth-upgrade-payload';
 export {
   PAUSE_QUERY_PREFIX,
@@ -295,19 +301,19 @@ export {
   PAUSE_INSTANCE_QUERY_ROOT,
   pauseInstanceQueryPrefix,
 } from './application/queries/pause-instance-query-prefix';
-export { buildShiftEmotionFrameHubLogBundle } from './application/session/shift-emotion-log';
+export { buildShiftEmotionFrameHubLogBundle } from './application/use-cases/session/shift-emotion-log';
 export {
   buildInitialEmotionLoggedPayload,
   initialEmotionLogDedupeKey,
   initialEmotionSkippedLogDedupeKey,
   initialEmotionSkippedLoggedPayload,
   type InitialEmotionLogOpts,
-} from './application/session/initial-emotion-log';
+} from './application/use-cases/session/initial-emotion-log';
 export {
   formatPauseOpenMaxRemaining,
   pauseOpenMaxDeadlineMs,
   PAUSE_OPEN_MAX_AGE_MS,
-} from './application/session/open-max-countdown';
+} from './application/use-cases/session/open-max-countdown';
 export {
   collectStepTypes,
   computePauseState,
@@ -332,3 +338,20 @@ export type {
   PauseSessionBriefRitualBodyProps,
   PauseSessionDeepRitualBodyProps,
 } from './presentation/session/ritual-body-props';
+export type { ArchiveMainSegment } from './domain/archive-segment';
+export {
+  isArchiveEchoPause,
+  itemBelongsToEchoesTab,
+  itemBelongsToPausesTab,
+  type PauseInstanceArchiveMeta,
+  type PauseInstanceArchiveMetaGetter,
+} from './domain/archive-segment';
+export { getSessionQuote } from './application/use-cases/session/wisdom-quotes';
+export { librarySourceLabel } from './domain/library-source-label';
+export {
+  isMainPauseLibraryBookmark,
+  isPauseLibraryNote,
+  normalizeLibrarySourceType,
+} from './domain/normalize-library-source-type';
+export { normalizeLibraryItemUrl } from './domain/library-item-url';
+export { writingTextareaClassName } from './domain/writing-surface';

@@ -1,7 +1,7 @@
 import type { UseQueryOptions } from '@tanstack/react-query';
 import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
-import { sortMemberPauses } from '@/features/pause/application/library/sort-member-pauses';
+import { sortMemberPauses } from '@/features/pause/application/use-cases/library/sort-member-pauses';
 import {
   LIBRARY_BUNDLE_DISABLED_USER_ID,
   libraryBundleQueryPrefix,
@@ -19,7 +19,7 @@ export {
   LIBRARY_BUNDLE_QUERY_PREFIX,
   libraryBundleQueryPrefix,
 } from '@/features/pause/application/queries/library-bundle-keys';
-export { buildMemberCacheKey, sortMemberPauses } from '@/features/pause/application/library/sort-member-pauses';
+export { buildMemberCacheKey, sortMemberPauses } from '@/features/pause/application/use-cases/library/sort-member-pauses';
 export type {
   Collection,
   CollectionItem,

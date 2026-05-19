@@ -15,7 +15,7 @@ import {
   type PauseState,
   type RitualDepth,
 } from '@/features/pause/public';
-import { getSessionQuote } from '@/lib/wisdom-quotes';
+import { getSessionQuote } from '@/features/pause/public';
 
 export function usePauseSessionDecideHandler(input: {
   decidingRef: MutableRefObject<boolean>;

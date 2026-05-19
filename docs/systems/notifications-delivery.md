@@ -52,7 +52,7 @@ Import rules: screens and app use `@/features/notifications/public-hooks` and `p
 
 Post-claim **email + web push** for automatic pause offers: [`supabase/functions/_shared/notifications-deliver-pause-offer.ts`](../../supabase/functions/_shared/notifications-deliver-pause-offer.ts) (`deliverPauseOfferChannels`, `initWebPushVapidFromEnv`). Called from `check-volatility` after `pause_create_or_reuse_as`.
 
-Client policy mirror (which channels apply): `features/notifications/application/delivery-policy.ts` (`channelsForPauseOffer`, `buildPauseOfferNotifyIntent`).
+Client policy mirror (which channels apply): `features/notifications/application/use-cases/delivery/pause-offer-policy.ts` (`channelsForPauseOffer`, `buildPauseOfferNotifyIntent`).
 
 ## Follow-ups
 

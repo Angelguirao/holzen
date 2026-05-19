@@ -1,30 +1,46 @@
-# Pause feature module
-
-**Product truth:** [docs/systems/pause-system.md](../../../docs/systems/pause-system.md)  
-**Target use-case layout:** [frontend-module-layout.md](../../../docs/fundamentals/frontend-module-layout.md) §3
-
-Companions, reflect, and breathing are **inside this feature** (`application/companion/`, `application/reflect/`, `application/breathing/`), not a sibling `features/companion/`.
-
-## Layout
-
-```text
-features/pause/
-  domain/              # pure types + rules
-  application/         # session, brief-ritual, breathing, reflect, use-cases
-  infrastructure/      # Supabase, invokeEdge, queries
-  presentation/        # thin hooks re-exported via public-hooks.ts
-  public.ts            # cross-feature API (no eager Supabase)
-  public-queries.ts    # TanStack query modules
-  public-rpc.ts        # pause_log_step and RPC clients
-```
-
-Ritual UI stays in [`src/screens/pause/`](../../screens/pause/README.md) (hooks + components).
-
-## Tests
-
-Unit tests live **next to** `domain/` and `application/` modules (e.g. `application/session/gate-flags.test.ts`). Hook tests live under `screens/pause/hooks/`. Shipped journeys: `src/test/integration/flows/`.
-
-## `public.ts`
-
-Export only what other features (e.g. home screen) need — instance ids, trigger helpers, not internal step hooks.
-
+# Pause feature module
+
+**Product truth:** [docs/systems/pause-system.md](../../../docs/systems/pause-system.md)  
+**Layout:** [frontend-module-layout.md](../../../docs/fundamentals/frontend-module-layout.md) §3
+
+Companions, reflect, and breathing live **inside** this feature — not a separate `features/companion/`.
+
+## Folder map
+
+```text
+features/pause/
+  domain/                         # rules + vocabulary (no React, no Supabase)
+    ritual-types.ts               # RitualDepth ('brief' | 'deep'), BriefPauseStep
+    pause-ritual-steps.ts         # deep macro steps (feel → decide)
+    brief-ritual-steps.ts         # brief macro order
+    pause-state.ts                # engaged / complete gates
+    …
+  application/
+    use-cases/                    # named intentions (orchestration)
+      session/                    # hydrate, persist, shell VM, navigation
+      ritual/
+        brief/                    # brief-only navigation helpers
+        deep/                     # deep go-back, brief→deep upgrade
+      breathing/
+      reflect/
+      companion/
+      feedback/                   # toasts (thin; may move to presentation later)
+      archive/
+      bulk-hold/
+      library/
+      …                           # flat use-case files at use-cases/*.ts
+    queries/                      # query keys + invalidation (no Supabase in application)
+  infrastructure/                 # Supabase, invokeEdge, TanStack query modules
+  presentation/                   # thin hooks; ritual UI in src/screens/pause/
+  public.ts | public-queries.ts | public-rpc.ts | public-hooks.ts
+```
+
+**Brief vs deep:** one bounded context. Depth is `RitualDepth` on the instance / persisted session — not separate feature folders.
+
+## Tests
+
+Unit tests sit **next to** the module under `domain/` and `application/use-cases/`. Screen hook tests: `src/screens/pause/hooks/`. Flows: `src/test/integration/flows/`.
+
+## Imports
+
+Other features and screens use `@/features/pause/public` (and `public-queries` / `public-rpc` / `public-hooks`). Do not import deep paths from `application/use-cases/` outside this feature.
