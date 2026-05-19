@@ -343,9 +343,18 @@ Same dependency rules as §2–3 for layers that exist. `npm run check:feature-i
 | **2** | `subscription`, `market`, `user`, `auth` features + shrink root `hooks/`/`lib/` | Cross-feature: `public.ts` only; app hooks may use `public-queries.ts` where queries need Supabase |
 | **3** | Optional `src/features/*/infrastructure` adapters; keep Supabase types in `integrations/` until needed | Adapter tests |
 | **4** | `src/legacy` off main runtime path | **Done (transitional):** `tsconfig.app.json` + Vitest exclude `src/legacy/**`; `check:active-surface` blocks `@/legacy/*` in active tree; folder kept for `archive/full-ia-pre-strip` recovery only. Physical delete is optional / separate archive PR. |
-| **5** | **Gated:** `pnpm-workspace.yaml`, `apps/web`, `packages/*` extract | Only after ADR §8 trigger; `build` from `apps/web` |
-| **6** | `shared-kernel`, `contracts` (minimal), `packages/infrastructure` | Adapter smoke test |
-| **7+** | Screens move to `apps/web`; `check:package-boundaries` | Post-extraction only |
+| **5a** | Domain contexts in `src/features/*` + `check:architecture-alignment` | **Done** on `feature/refactoring6` — see §10 |
+| **5b** | Presentation guardrails | `src/screens/README.md`; `check:no-root-components` in `test:ci` |
+| **5c** | **Pause** screen pilot | `components/pause/**` → `screens/pause/components/**`; [docs/screens/pause.md](../screens/pause.md) paths updated |
+| **5d** | **Home** screen | `components/home/**` → `screens/home/`; thin `pages/Home.tsx` |
+| **5e** | **Archive, Journey, Settings** | Same colocation pattern per tab |
+| **5f** | Companion routes | `/companion/*` UI under `screens/pause/` |
+| **5g** | Marketing / admin | `screens/marketing/`, `screens/admin/` |
+| **5h** | Orchestration | Screen-local hooks; split god hooks (`use-holzen`, `use-companion-data`, …) |
+| **5i** | Shrink global layers | Empty `components/` shims; root `hooks/` only cross-screen |
+| **6** | **Gated:** `pnpm-workspace.yaml`, `apps/web`, `packages/*` extract | Only after ADR §8 trigger; `build` from `apps/web` |
+| **7** | `shared-kernel`, `contracts` (minimal), `packages/infrastructure` | Adapter smoke test |
+| **8+** | `apps/web/src/screens`; `check:package-boundaries` | Post-extraction only |
 
 **Per-PR rule:** mechanical moves + import updates only; behavior changes in separate PRs.
 
@@ -386,6 +395,7 @@ Root `tsconfig.json` references project refs per package, or a single base + per
 | `check:active-surface` | now | No legacy imports, shipped surface |
 | `check:feature-imports` | **now** (`scripts/check-feature-imports.mjs`) | Enforce §2 layer rules under `src/features/` |
 | `check:architecture-alignment` | **now** (`scripts/check-architecture-alignment.mjs`) | Waves 0–4 scaffold (five contexts, root Vite, legacy excluded); runs `check:feature-imports`; in **`test:ci`** |
+| `check:no-root-components` | **now** (`scripts/check-no-root-components.mjs`) | Blocks new `src/components/*.tsx` at repo root; allowlist shrinks during waves 5c–5i |
 | `check:package-boundaries` | post-monorepo | dependency-cruiser or eslint-plugin-boundaries on `@holzen/*` graph |
 | `test:ci` | always | Existing gate (includes `check:architecture-alignment`) |
 
