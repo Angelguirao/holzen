@@ -20,7 +20,7 @@ import {
   type SessionRow,
   type SignalSourceRow,
   type TimePeriod,
-} from '@/lib/admin-stats-bundle-query';
+} from '@/screens/admin/lib/admin-stats-bundle-query';
 
 export type {
   CacheEntryRow,
@@ -34,11 +34,11 @@ export type {
   SessionRow,
   LibraryEntryRow,
   AdminStatsBundle,
-} from '@/lib/admin-stats-bundle-query';
+} from '@/screens/admin/lib/admin-stats-bundle-query';
 
-export { ADMIN_STATS_QUERY_KEY } from '@/lib/admin-stats-bundle-query';
+export { ADMIN_STATS_QUERY_KEY } from '@/screens/admin/lib/admin-stats-bundle-query';
 
-export type { TimePeriod } from '@/lib/admin-stats-bundle-query';
+export type { TimePeriod } from '@/screens/admin/lib/admin-stats-bundle-query';
 
 export interface PeriodStats {
   serves: number;

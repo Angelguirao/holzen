@@ -43,7 +43,7 @@ import {
 } from '@/features/pause/public';
 import { useSubscription } from '@/features/subscription/public-hooks';
 import { useProGate } from '@/features/subscription/public-hooks';
-import { showLimitReachedToast, isPaidLimitReached } from '@/lib/limit-upsell';
+import { isPaidLimitReached, showLimitReachedToast } from '@/features/subscription/public-limits';
 import { trackEvent } from '@/lib/posthog';
 import { trackCompanionServed } from '@/features/pause/public';
 

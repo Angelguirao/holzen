@@ -1,5 +1,5 @@
 import { useEffect, useRef } from 'react';
-import { playNotificationTone, prefetchNotificationTone } from '@/lib/notification-tone';
+import { playNotificationTone, prefetchNotificationTone } from '@/screens/home/lib/notification-tone';
 
 function readSoundEnabled(): boolean {
   try {

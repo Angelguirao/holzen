@@ -1,6 +1,6 @@
 import { supabase } from '@/integrations/supabase/client';
-import type { TimePeriod } from '@/lib/admin-stats-bundle-query';
-import { ADMIN_QUERY_PREFIX } from '@/lib/admin-query-namespace';
+import type { TimePeriod } from '@/screens/admin/lib/admin-stats-bundle-query';
+import { ADMIN_QUERY_PREFIX } from '@/screens/admin/lib/admin-query-namespace';
 import { PRICING } from '@/features/subscription/public';
 
 /** Raw rows for admin cost aggregation (`generation_attempts`). */

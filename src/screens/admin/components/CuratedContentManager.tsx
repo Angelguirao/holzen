@@ -2,13 +2,13 @@ import { useState, useMemo, useCallback, useEffect } from 'react';
 import { ChevronDown, ChevronRight, ArrowUp, ArrowDown, Trash2, Loader2 } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/components/ui/use-toast';
-import type { CacheEntryRow } from '@/lib/admin-stats-bundle-query';
+import type { CacheEntryRow } from '@/screens/admin/lib/admin-stats-bundle-query';
 import { Checkbox } from '@/components/ui/checkbox';
 import { TYPE_COLORS, label } from './admin-constants';
 import { FilterRow } from './FilterRow';
 import { QualityBadge } from './QualityBadge';
 import { AdminBulkBar } from './AdminBulkBar';
-import { adminDeleteOneRow, adminDeleteRowsByIds } from '@/lib/admin-delete';
+import { adminDeleteOneRow, adminDeleteRowsByIds } from '@/screens/admin/lib/admin-delete';
 
 const QUALITY_OPTIONS = [
   { value: 'all', label: 'All' },

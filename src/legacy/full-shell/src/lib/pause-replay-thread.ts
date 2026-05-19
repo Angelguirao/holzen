@@ -1,5 +1,5 @@
 import { supabase } from '@/integrations/supabase/client';
-import { PRACTICE_QUERY_PREFIX } from '@/lib/practice-query-namespace';
+import { PRACTICE_QUERY_PREFIX } from '@/legacy/full-shell/src/lib/practice-query-namespace';
 import {
   combineNoteAndReplayWords,
   type PastReflectionWithWords,

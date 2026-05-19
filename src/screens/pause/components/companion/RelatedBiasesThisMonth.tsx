@@ -7,7 +7,7 @@ import {
   dedupeBiases,
   type RelatedBias,
 } from './related-biases-util';
-import { getRelatedBiasesGroundNudgeQueryOptions } from '@/lib/related-biases-ground-nudge-query';
+import { getRelatedBiasesGroundNudgeQueryOptions } from '@/features/pause/public-queries';
 
 interface Props {
   /** Pause instance currently viewed — excluded from the list. */

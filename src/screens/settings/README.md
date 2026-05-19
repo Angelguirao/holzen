@@ -14,6 +14,6 @@
 | `section-ids.ts` | Route section param types |
 | `read-thrown-message.ts` | Auth error message helper |
 | `components/` | Section panels, hub UI, email change |
-| `hooks/` | Screen-local hooks colocated under other screens; settings uses shared `src/hooks/` for auth/subscription |
+| `hooks/` | `use-settings-model.ts`, `use-latest-changelog-version.ts`; auth/subscription via `@/features/*/public` and `public-hooks` |
 
 `App.tsx` lazy-loads `SettingsSectionScreen`, `BillingHistoryScreen`, etc. from this folder.

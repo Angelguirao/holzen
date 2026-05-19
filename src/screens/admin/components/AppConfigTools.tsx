@@ -25,7 +25,7 @@ import {
   type ConfigState,
   type FeatureKey,
   type SpendSnapshot,
-} from '@/lib/admin-app-config-tools-query';
+} from '@/screens/admin/lib/admin-app-config-tools-query';
 
 const PREGENERATE_TOPUP_KEYS: PregenerateCacheTopupKey[] = [
   'ground_nudge',

@@ -9,12 +9,12 @@ import { RefreshCw, TrendingUp, Clock, Brain, Sparkles, Target, Loader2, Lock } 
 import { LoadingButton } from '@/components/ui/loading-button';
 import { toast } from 'sonner';
 import { format } from 'date-fns';
-import { useInfiniteScroll } from '@/lib/use-infinite-scroll';
+import { useInfiniteScroll } from '@/hooks/use-infinite-scroll';
 import { useSubscription } from '@/features/subscription/public-hooks';
 import { SubscriptionSkeleton } from '@/screens/home/components/SubscriptionSkeleton';
 import { parseEdgeFunctionError, toUserFacingAiErrorMessage } from '@/lib/edge-function-error';
 import { useProGate } from '@/features/subscription/public-hooks';
-import { showLimitReachedToast, isPaidLimitReached } from '@/lib/limit-upsell';
+import { isPaidLimitReached, showLimitReachedToast } from '@/features/subscription/public-limits';
 
 interface Insight {
   category: 'regulation' | 'tolerance' | 'alignment' | 'reappraisal' | 'awareness' | 'timing' | 'mood' | 'behavior' | 'engagement' | 'growth';

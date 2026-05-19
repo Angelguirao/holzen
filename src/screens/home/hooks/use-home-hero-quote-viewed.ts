@@ -1,6 +1,6 @@
 import { useEffect, useRef } from 'react';
 import { trackEvent } from '@/lib/posthog';
-import { heroQuoteIndexForDay, utcYmd } from '@/lib/home-hero-quote';
+import { heroQuoteIndexForDay, utcYmd } from '@/screens/home/lib/home-hero-quote';
 
 export function useHomeHeroQuoteViewed(profileLoaded: boolean, userId: string | undefined): void {
   const tracked = useRef(false);

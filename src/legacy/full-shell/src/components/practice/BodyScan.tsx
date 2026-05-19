@@ -4,7 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
 import { practiceEntriesWeeklyCountQueryKey } from '@/legacy/full-shell/src/lib/practice-entries-weekly-count-query';
 import { practicePrimarySuggestionQueryKey } from '@/legacy/full-shell/src/lib/practice-primary-suggestion-query';
-import { toolsHubDataQueryKey } from '@/lib/tools-hub-data-query';
+import { toolsHubDataQueryKey } from '@/legacy/full-shell/src/lib/tools-hub-data-query';
 import { invalidateHistoryCalendarActivities } from '@/legacy/full-shell/src/lib/history-calendar-activities-query-key';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/features/auth/public';

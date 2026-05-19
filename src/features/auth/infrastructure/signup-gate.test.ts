@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest';
-import { checkSignupGate, _resetSignupGateCache, SIGNUPS_ENABLED } from '@/lib/signup-gate';
+import { checkSignupGate, SIGNUPS_ENABLED, _resetSignupGateCache } from './signup-gate';
 
 type MockClient = { rpc: ReturnType<typeof vi.fn> };
 

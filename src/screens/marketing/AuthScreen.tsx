@@ -11,7 +11,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Separator } from '@/components/ui/separator';
 import { useTranslation } from 'react-i18next';
-import { checkSignupGate } from '@/lib/signup-gate';
+import { checkSignupGate } from '@/features/auth/public';
 import { PageHeading } from '@/components/ui/page-heading';
 
 type AuthView = 'sign-in' | 'sign-up' | 'forgot-password';

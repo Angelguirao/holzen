@@ -4,7 +4,7 @@ import { ChevronRight } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { useProGate } from '@/features/subscription/public-hooks';
 import { cn } from '@/lib/utils';
-import type { ToolCatalogEntry } from '@/lib/tools-catalog';
+import type { ToolCatalogEntry } from '@/legacy/full-shell/src/lib/tools-catalog';
 
 type Props = {
   entry: ToolCatalogEntry;

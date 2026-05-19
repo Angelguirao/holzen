@@ -5,14 +5,14 @@ import { Badge } from '@/components/ui/badge';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useProGate } from '@/features/subscription/public-hooks';
 import { TOOLS } from '@/lib/app-routes';
-import type { LastCheckInRow } from '@/lib/tools-hub-data-query';
+import type { LastCheckInRow } from '@/legacy/full-shell/src/lib/tools-hub-data-query';
 import type { PracticeSuggestion } from '@/legacy/full-shell/src/lib/practice-suggestion';
 import {
   TOOLS_PRACTICE_SUGGESTION_LABEL_KEY,
   TOOLS_PRACTICE_SUGGESTION_ROUTE,
   isToolsPracticeFree,
   visibleToolsPracticeSuggestions,
-} from '@/lib/tools-hub-practice-suggestions';
+} from '@/legacy/full-shell/src/lib/tools-hub-practice-suggestions';
 
 type Props = {
   loading: boolean;

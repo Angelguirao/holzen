@@ -1,5 +1,5 @@
 import { supabase } from '@/integrations/supabase/client';
-import { ADMIN_QUERY_PREFIX } from '@/lib/admin-query-namespace';
+import { ADMIN_QUERY_PREFIX } from '@/screens/admin/lib/admin-query-namespace';
 
 export const EDGE_COVERAGE_HEARTBEATS_QUERY_PREFIX = [...ADMIN_QUERY_PREFIX, 'edge-coverage'] as const;
 

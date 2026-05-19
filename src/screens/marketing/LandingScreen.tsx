@@ -17,7 +17,7 @@ import { LandingTestimonials } from '@/screens/marketing/components/LandingTesti
 import { LandingLanguageSwitcher } from '@/screens/marketing/components/LandingLanguageSwitcher';
 import { PRICING } from '@/features/subscription/public';
 import { prefetchCoingeckoBtcUsd } from '@/features/market/public';
-import { prefetchBlogPublishedFirstPage } from '@/lib/blog-post-query';
+import { prefetchBlogPublishedFirstPage } from '@/screens/marketing/lib/blog-post-query';
 
 function Section({ children, className = '', delay = 0 }: { children: React.ReactNode; className?: string; delay?: number }) {
   const ref = useRef(null);

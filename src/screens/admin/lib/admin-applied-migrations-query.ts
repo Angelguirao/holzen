@@ -1,5 +1,5 @@
 import { supabase } from '@/integrations/supabase/client';
-import { ADMIN_QUERY_PREFIX } from '@/lib/admin-query-namespace';
+import { ADMIN_QUERY_PREFIX } from '@/screens/admin/lib/admin-query-namespace';
 
 export interface AppliedMigrationRow {
   version: string;

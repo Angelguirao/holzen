@@ -3,7 +3,7 @@ import { useQuery } from "@tanstack/react-query";
 import { useIsAdmin } from '@/app/hooks/use-is-admin';
 import {
   getEdgeCoverageHeartbeatsQueryOptions,
-} from "@/lib/edge-coverage-heartbeats-query";
+} from "@/screens/ops/lib/edge-coverage-heartbeats-query";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";

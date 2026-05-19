@@ -51,7 +51,7 @@ The ecosystem moved **away from**:
 
 **Holzen target:** `packages/<context>/` + `apps/web/src/screens/` — see [frontend-module-layout.md](frontend-module-layout.md). **Pause** is the large context; companions live **inside** pause, not a separate domain package.
 
-**Holzen today:** `src/features/<context>/`, `src/screens/<route>/hooks/`, shared utilities in `src/lib/use-*` and `src/components/ui/` — root `src/hooks/` removed (May 2026); some `src/lib/` query shims still migrating to features.
+**Holzen today:** `src/features/<context>/`, `src/screens/<route>/hooks/`, cross-cutting hooks in `src/hooks/` (feature flags, pull-to-refresh), platform utilities in `src/lib/` (PostHog, Sentry, `invokeEdge`, routes), UI primitives in `src/components/ui/`.
 
 | Check | Target | Today |
 |-------|--------|-------|

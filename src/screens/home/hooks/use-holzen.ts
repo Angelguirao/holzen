@@ -27,7 +27,7 @@ import {
 } from '@/features/market/public';
 import { normalizeTrackedAssetId, trackedAssetSymbol } from '@/features/market/public';
 import { severityFromBtcChangePercent } from '@/features/market/public';
-import { millisecondsUntilNextQuarterHour } from '@/lib/next-cron-quarter';
+import { millisecondsUntilNextQuarterHour } from '@/screens/home/lib/next-cron-quarter';
 import {
   bucketChangePercent,
   computeContextFingerprint,

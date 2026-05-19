@@ -3,7 +3,7 @@ import type { NavigateFunction } from 'react-router-dom';
 import type { CompanionData, CompanionPrefs } from '@/screens/pause/components/CompanionSection';
 import type { BtcMoveSeverity } from '@/features/market/public';
 import { holzenLog } from '@/lib/holzen-console';
-import { canNavigateToPauseSession } from '@/lib/home-pause-navigate';
+import { canNavigateToPauseSession } from '@/screens/home/lib/home-pause-navigate';
 import { trackEvent } from '@/lib/posthog';
 import type { ManualPauseTriggerResult } from '@/features/pause/public';
 import { type PauseSessionLocationState } from '@/features/pause/public';

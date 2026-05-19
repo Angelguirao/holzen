@@ -4,13 +4,13 @@ import { supabase } from '@/integrations/supabase/client';
 import { invokeEdge } from '@/lib/invoke-edge';
 import type { Database } from '@/integrations/supabase/types';
 import { useToast } from '@/components/ui/use-toast';
-import type { LibraryEntryRow } from '@/lib/admin-stats-bundle-query';
+import type { LibraryEntryRow } from '@/screens/admin/lib/admin-stats-bundle-query';
 import { Checkbox } from '@/components/ui/checkbox';
 import { label } from './admin-constants';
 import { FilterRow } from './FilterRow';
 import { QualityBadge } from './QualityBadge';
 import { AdminBulkBar } from './AdminBulkBar';
-import { normalizeLibraryItemUrl } from '@/lib/library-item-url';
+import { normalizeLibraryItemUrl } from '@/features/pause/domain/library-item-url';
 import { normalizeTitleKey, urlDedupCandidates } from '../../../supabase/functions/_shared/content-dedup.ts';
 
 const UPDATE_CHUNK = 40;

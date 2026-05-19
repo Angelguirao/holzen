@@ -22,7 +22,7 @@ Dead IA (`/tools/*`, `/library`, `/journey/stats`, …) → `NotFound` (no legac
 | Router | `App.tsx`, `lib/app-routes.ts` |
 | Presentation layer | [screens/README.md](screens/README.md), [app/README.md](app/README.md), [components/README.md](components/README.md) |
 | Pause lifecycle | `features/pause/`, `screens/pause/` |
-| Subscription | `hooks/use-subscription.ts`, §5.4 in launch plan |
+| Subscription | `features/subscription/public-hooks` (`useSubscription`), §5.4 in launch plan |
 | Legacy full IA | [`legacy/README.md`](legacy/README.md) — **not imported** |
 | i18n | Shipped: `locales/en.json` only; archived langs in `legacy/locales/` |
 

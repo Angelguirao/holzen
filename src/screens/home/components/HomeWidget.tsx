@@ -1,5 +1,5 @@
 import { useState, useCallback, type ReactNode } from 'react';
-import { mergeOrderWithDefaults, normalizeHomeSectionOrder } from '@/lib/home-section-order-normalize';
+import { mergeOrderWithDefaults, normalizeHomeSectionOrder } from '@/screens/home/lib/home-section-order-normalize';
 import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
 import { GripVertical, ChevronDown } from 'lucide-react';
 import { useSortable } from '@dnd-kit/sortable';

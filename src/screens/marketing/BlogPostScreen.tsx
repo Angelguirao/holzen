@@ -2,7 +2,7 @@ import { Link, useParams } from 'react-router-dom';
 import { motion, useReducedMotion } from 'framer-motion';
 import { ArrowLeft } from 'lucide-react';
 import { useQuery } from '@tanstack/react-query';
-import { getBlogPostBySlugQueryOptions } from '@/lib/blog-post-query';
+import { getBlogPostBySlugQueryOptions } from '@/screens/marketing/lib/blog-post-query';
 import { format } from 'date-fns';
 import { PageMeta } from '@/app/components/PageMeta';
 import { useTranslation } from 'react-i18next';

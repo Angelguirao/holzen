@@ -7,7 +7,7 @@ import {
   pauseHomeErrorKind,
   pauseHomeErrorStrings,
   shouldSurfacePauseWidgetError,
-} from '@/lib/home-pause-widget-error';
+} from '@/screens/home/lib/home-pause-widget-error';
 
 const echoT: TFunction = ((key: string) => key) as TFunction;
 

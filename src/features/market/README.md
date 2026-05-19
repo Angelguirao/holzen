@@ -1,3 +1,35 @@
 # Market feature module
 
-BTC context, volatility, holzen triggers. Migrate from `src/hooks/use-holzen.ts` and market `src/lib/` helpers.
+**Product context:** BTC price, volatility thresholds, fear/greed, and pause trigger context on Home.  
+**Layout:** [frontend-module-layout.md](../../../docs/fundamentals/frontend-module-layout.md) §3
+
+Home orchestration stays in `screens/home/hooks/use-holzen.ts`; this module owns market **domain rules**, fetch/query adapters, and the public API other features may import.
+
+## Folder map
+
+```text
+features/market/
+  domain/
+    market-quote.ts           # BtcPriceData, currencies
+    btc-move-severity.ts      # severity from % move
+    volatility-thresholds.ts  # cumulative trigger thresholds (shared with edge)
+    tracked-assets.ts
+    coingecko-market-chart-point.ts
+  application/
+    pause-context-from-market.ts
+    pause-context-home-preview.ts
+    format-market-price.ts
+    manual-cooldown.ts
+    queries/                  # TanStack query keys only
+  infrastructure/
+    fetch-market-data.ts
+    queries/                    # coingecko, holzen display, breathe ambient BTC
+  ports/
+    market-data.ts            # fetch port (CoinGecko / holzen display)
+  public.ts
+```
+
+## Imports
+
+- Other features/screens: `@/features/market/public` only.
+- Do not import `infrastructure/` or `application/queries/` from outside this folder.

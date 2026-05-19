@@ -4,7 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { motion, AnimatePresence } from 'framer-motion';
 import { practiceEntriesWeeklyCountQueryKey } from '@/legacy/full-shell/src/lib/practice-entries-weekly-count-query';
 import { practicePrimarySuggestionQueryKey } from '@/legacy/full-shell/src/lib/practice-primary-suggestion-query';
-import { toolsHubDataQueryKey } from '@/lib/tools-hub-data-query';
+import { toolsHubDataQueryKey } from '@/legacy/full-shell/src/lib/tools-hub-data-query';
 import { invalidateHistoryCalendarActivities } from '@/legacy/full-shell/src/lib/history-calendar-activities-query-key';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/features/auth/public';
@@ -13,7 +13,7 @@ import { hapticFeedback } from '@/lib/haptics';
 import { toast } from 'sonner';
 import { Check, RefreshCw, Sparkles, Loader2 } from 'lucide-react';
 import { WritingField } from '@/legacy/quarantine/root-components/WritingField';
-import { getGuidedJournalPromptsQueryOptions } from '@/lib/guided-journal-prompts-query';
+import { getGuidedJournalPromptsQueryOptions } from '@/legacy/full-shell/src/lib/guided-journal-prompts-query';
 
 interface Props {
   onComplete: () => void;

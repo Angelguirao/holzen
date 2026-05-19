@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { canNavigateToPauseSession } from '@/lib/home-pause-navigate';
+import { canNavigateToPauseSession } from '@/screens/home/lib/home-pause-navigate';
 
 describe('canNavigateToPauseSession', () => {
   it('allows navigation with only pauseInstanceId (non-silent manual path)', () => {

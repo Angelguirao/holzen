@@ -74,7 +74,7 @@ These are the concepts that most directly help you review auth + routing correct
 - Defines how auth state is stored (localStorage) and refreshed (auto token refresh).
 - This determines whether the app can assume "user survives reload" behavior.
 
-### `src/hooks/use-auth.tsx` — source of truth for `useAuth()`
+### `@/features/auth/public` — `AuthProvider` / `useAuth()`
 
 - `AuthProvider` is the single shared authority for:
   - `user`

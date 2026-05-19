@@ -21,7 +21,7 @@ Pause lifecycle and ritual signals live in **`pause_instances`**, **`pause_step_
 
 ### Read path and client-side aggregation
 
-- [`usePauseStatsData`](../../src/hooks/use-pause-stats-data.ts) loads one **TanStack Query** bundle per user: `v_pause_full` (bounded) + `pause_step_events` + `pause_companion_events` via [`fetchPauseStatsData`](../../src/lib/pause-stats-data-query.ts). Home, Journey → Stats, and badges all reuse this cache.
+- [`usePauseStatsData`](../../src/legacy/full-shell/src/hooks/use-pause-stats-data.ts) loads one **TanStack Query** bundle per user (legacy only): `v_pause_full` (bounded) + `pause_step_events` + `pause_companion_events` via [`fetchPauseStatsData`](../../src/legacy/full-shell/src/lib/pause-stats-data-query.ts). Home, Journey → Stats, and badges all reuse this cache.
 - **Holzen Score and the five skill values** are computed **in the browser on read** by [`computePauseScore`](../../src/lib/stats/pause-score.ts) from that bundle (e.g. [`SkillOverviewCard`](../../src/legacy/full-shell/src/components/stats/SkillOverviewCard.tsx), [`HomeStatTiles`](../../src/screens/home/components/HomeStatTiles.tsx)).
 - After a pause reaches **`completed`** (and on a few related paths), [`invalidatePauseStatsDataForUser`](../../src/lib/pause-stats-invalidate.ts) **invalidates** the pause-stats query key (and several related keys). The next fetch supplies fresh rows; scores **recompute** because they are pure functions of fetched data — nothing is “stale” in a hidden server cache for those numbers.
 - **Brief ritual done** (shipped [`PauseDone`](../../src/screens/pause/components/PauseDone.tsx) + [`ScoreImpact`](../../src/screens/pause/components/ScoreImpact.tsx); full-IA badge recap in legacy [`PauseDoneBriefJourneyRecap`](../../src/legacy/full-shell/src/components/pause/PauseDoneBriefJourneyRecap.tsx)): qualitative hints via `buildPauseScoreImpacts` — reasons only, no fake +N. Numeric roll-ups lived in Journey → Stats (not shipped).
@@ -321,7 +321,7 @@ Historical `pause_step_events` rows may still carry `outcome = "nothing"` from a
 
 - Stats tab layout (legacy): [`StatsContentV2`](../../src/legacy/full-shell/src/components/stats/StatsContentV2.tsx) and `src/legacy/full-shell/src/components/stats/`.
 - Holzen + five skills: [`src/lib/stats/pause-score.ts`](../../src/lib/stats/pause-score.ts) (`computePauseScore`).
-- Data loader + cache keys: [`src/hooks/use-pause-stats-data.ts`](../../src/hooks/use-pause-stats-data.ts), [`src/lib/pause-stats-data-query.ts`](../../src/lib/pause-stats-data-query.ts), [`src/lib/pause-stats-invalidate.ts`](../../src/lib/pause-stats-invalidate.ts).
+- Data loader + cache keys (legacy): [`src/legacy/full-shell/src/hooks/use-pause-stats-data.ts`](../../src/legacy/full-shell/src/hooks/use-pause-stats-data.ts), [`src/legacy/full-shell/src/lib/pause-stats-data-query.ts`](../../src/legacy/full-shell/src/lib/pause-stats-data-query.ts).
 - Shared pause-count / “engaged” semantics where still used: [`src/lib/engaged-pause.ts`](../../src/lib/engaged-pause.ts).
 - Legacy `use-holzen-score` / `reflections` paths were removed at the Pause V2 cutover.
 

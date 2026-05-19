@@ -1,4 +1,4 @@
-import { useFeatureFlag } from '@/lib/use-feature-flag';
+import { useFeatureFlag } from '@/hooks/use-feature-flag';
 import {
   resolvePauseBreathSecondLabelVariant,
   type PauseBreathSecondLabelVariant,

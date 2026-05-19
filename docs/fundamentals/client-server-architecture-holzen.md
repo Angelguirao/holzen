@@ -45,7 +45,7 @@ The labels **domain / application / infrastructure** are useful **mental** bucke
 | Layer | Meaning here | Typical locations |
 |-------|----------------|-------------------|
 | **UI** | Components and screens: render state, forward user intent | `src/screens/<route>/`, `src/app/components/`, `src/components/ui/` (+ `icons/`) |
-| **Application** | Hooks that orchestrate: queries/mutations, navigation, composing multiple data sources | `src/screens/<route>/hooks/`, root `src/hooks/` (shims), `src/features/*/public-queries.ts` |
+| **Application** | Hooks that orchestrate: queries/mutations, navigation, composing multiple data sources | `src/screens/<route>/hooks/`, `src/features/*/public-hooks`, `src/app/hooks/`, `src/lib/use-*.ts` |
 | **Infrastructure** | Browser I/O: Supabase client, `invokeEdge`, `fetch`, `localStorage` | `src/integrations/supabase/`, `src/lib/*-api.ts` patterns |
 | **Domain (advisory)** | Pure helpers: “should we show this CTA?”, formatting, client-side validation **before** submit | `src/lib/` (unit-testable; **not** the final word on permission) |
 

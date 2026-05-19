@@ -8,7 +8,7 @@ Vitest discovers tests anywhere under `src/**/*.{test,spec}.{ts,tsx}` (see `vite
 
 | Kind | Location | Example |
 |------|----------|---------|
-| Domain / application pure logic | Next to source under `src/features/<ctx>/` | `application/session/gate-flags.test.ts` |
+| Domain / application pure logic | Next to source under `src/features/<ctx>/` | `application/use-cases/session/gate-flags.test.ts` |
 | Screen hooks / ritual orchestration | Next to hook under `src/screens/<route>/hooks/` | `use-pause-session-go-back.test.tsx` |
 | App shell component | Next to component under `src/app/components/` | `BottomNav.test.tsx` |
 | Transitional `src/lib` helper | Next to module | `home-subscription-gate.test.ts` |
