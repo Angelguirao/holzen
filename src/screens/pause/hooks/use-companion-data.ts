@@ -1,4 +1,4 @@
-import { useState, useCallback, useEffect, useLayoutEffect, useRef } from 'react';
+import { useState, useCallback, useEffect, useLayoutEffect, useMemo, useRef } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { invokeEdge } from '@/lib/invoke-edge';
 import { toast as sonnerToast } from 'sonner';
@@ -26,7 +26,7 @@ import { getRecencyHints } from '@/features/pause/public';
 import {
   applyOrchestrateSlotLazyOrRegenerate,
   EMPTY_COMPANION_SLOT_RELAXATIONS,
-  hydrateOrchestrateSlotIfNew,
+  hydrateOrchestrateSlotsFromInterventionResponse,
   isFilledOrchestrateSlot,
   readOrchestrateSlotBody,
   type CompanionSlotCacheIds,
@@ -43,6 +43,12 @@ import {
   isCompanionOrchestratePaywallCode,
   isOrchestratePayloadError,
   resolveOrchestrateInvokeUserMessage,
+  buildInterventionOrchestrateBody,
+  buildLazyFetchOrchestrateBody,
+  buildRegenerateOrchestrateBody,
+  setCompanionSlotError,
+  setCompanionSlotLoading,
+  type CompanionOrchestrateSessionContext,
 } from '@/features/pause/public';
 import { useSubscription } from '@/features/subscription/public-hooks';
 import { useProGate } from '@/features/subscription/public-hooks';
@@ -155,6 +161,25 @@ export function useCompanionData({ companions, prefs, pauseInstanceId, context, 
   const [historyInsight, setHistoryInsight] = useState<CachedHistoricalInsightShape | null>(null);
   const [historyLoading, setHistoryLoading] = useState(false);
   const [historyError, setHistoryError] = useState(false);
+
+  const companionSlotLoadingSetters = useMemo(
+    () => ({
+      setSignalLoading,
+      setNudgeLoading,
+      setHistoryLoading,
+      setZoomOutLoading,
+    }),
+    [setSignalLoading, setNudgeLoading, setHistoryLoading, setZoomOutLoading],
+  );
+  const companionSlotErrorSetters = useMemo(
+    () => ({
+      setSignalError,
+      setNudgeError,
+      setHistoryError,
+      setZoomOutError,
+    }),
+    [setSignalError, setNudgeError, setHistoryError, setZoomOutError],
+  );
 
   const [retryCount, setRetryCount] = useState(0);
   const fetchedRef = useRef<string | null>(null);
@@ -306,36 +331,37 @@ export function useCompanionData({ companions, prefs, pauseInstanceId, context, 
         // Single-flight per `pauseInstanceId`: concurrent renders share the
         // same Promise, and on success a `sessionStorage` marker prevents
         // future remounts in the same tab session from re-issuing the call.
+        const orchestrateSession: CompanionOrchestrateSessionContext = {
+          pauseInstanceId,
+          context: context ?? '',
+          language,
+          reflectionMessage: reflectionMessage ?? '',
+          mood: mood ?? null,
+          severity: severityNumber ?? 0,
+          moodHistory,
+        };
         const { data, error: fnError } = await runOnceIntervention(
           pauseInstanceId,
           () =>
             invokeEdge('companion-orchestrate', {
-              body: {
-                holzenInvokeSource: 'browser_pause_intervention',
-                pauseInstanceId,
-                context: context ?? '',
-                language,
-                reflectionMessage: reflectionMessage ?? '',
-                mood: mood ?? null,
-                severity: severityNumber ?? 0,
-                moodHistory,
-                enableSignal: false,
-                enableGrounding: false,
-                enableHistory: false,
-                enableZoomOut: false,
-                useIntervention: true,
-              },
+              body: buildInterventionOrchestrateBody(orchestrateSession),
             }),
         );
 
         if (cancelled) return;
 
         const body = data as Record<string, unknown> | null;
-        if (!!fnError || !body || Boolean(body.error)) {
+        if (isOrchestratePayloadError(fnError, body)) {
+          const { code, userMessage } = await resolveOrchestrateInvokeUserMessage(
+            fnError,
+            body,
+            'This AI feature is temporarily unavailable. Please try again in a minute.',
+          );
           holzenLog.companion('orchestrate intervention invoke failed', {
             pause_instance_prefix: pauseInstanceId.slice(0, 8),
             fnError: fnError?.message ?? null,
-            bodyError: typeof body?.error === 'string' ? body.error : null,
+            bodyError: userMessage,
+            bodyCode: code,
           });
           setInterventionError(true);
           setInterventionLoading(false);
@@ -364,36 +390,12 @@ export function useCompanionData({ companions, prefs, pauseInstanceId, context, 
           setZoomOut,
           autoSaveToLibrary,
         };
-        hydrateOrchestrateSlotIfNew(
-          'grounding',
-          readOrchestrateSlotBody(orchestrateBody, 'grounding'),
+        const sigSlot = hydrateOrchestrateSlotsFromInterventionResponse(
+          orchestrateBody,
           fetchedSlotsRef.current,
           slotCommitters,
           setCacheRelaxations,
         );
-        hydrateOrchestrateSlotIfNew(
-          'history',
-          readOrchestrateSlotBody(orchestrateBody, 'history'),
-          fetchedSlotsRef.current,
-          slotCommitters,
-          setCacheRelaxations,
-        );
-        hydrateOrchestrateSlotIfNew(
-          'zoomOut',
-          readOrchestrateSlotBody(orchestrateBody, 'zoomOut'),
-          fetchedSlotsRef.current,
-          slotCommitters,
-          setCacheRelaxations,
-        );
-        hydrateOrchestrateSlotIfNew(
-          'signal',
-          readOrchestrateSlotBody(orchestrateBody, 'signal'),
-          fetchedSlotsRef.current,
-          slotCommitters,
-          setCacheRelaxations,
-        );
-
-        const sigSlot = readOrchestrateSlotBody(orchestrateBody, 'signal');
         if (isFilledOrchestrateSlot(sigSlot)) {
           holzenLog.companion('hydrated signal from intervention response', {
             pause_instance_prefix: pauseInstanceId.slice(0, 8),
@@ -430,26 +432,23 @@ export function useCompanionData({ companions, prefs, pauseInstanceId, context, 
     // Reflect the spend instantly; refresh below reconciles with the server.
     applyOptimisticDecrement('companion');
 
-    const setLoading = (v: boolean) => {
-      if (slot === 'signal') setSignalLoading(v);
-      else if (slot === 'grounding') setNudgeLoading(v);
-      else if (slot === 'history') setHistoryLoading(v);
-      else setZoomOutLoading(v);
-    };
-    const setErr = (v: boolean) => {
-      if (slot === 'signal') setSignalError(v);
-      else if (slot === 'grounding') setNudgeError(v);
-      else if (slot === 'history') setHistoryError(v);
-      else setZoomOutError(v);
-    };
-    setLoading(true);
-    setErr(false);
+    setCompanionSlotLoading(slot, companionSlotLoadingSetters, true);
+    setCompanionSlotError(slot, companionSlotErrorSetters, false);
 
     try {
       const recency = getRecencyHints();
       const signalSources = slot === 'signal' ? await loadActiveOrchestrateSources('signal') : undefined;
       const groundingSources = slot === 'grounding' ? await loadActiveOrchestrateSources('grounding') : undefined;
       const moodHistory = await loadMoodHistoryForOrchestrate();
+      const orchestrateSession: CompanionOrchestrateSessionContext = {
+        pauseInstanceId,
+        context: context ?? '',
+        language,
+        reflectionMessage: reflectionMessage ?? '',
+        mood: mood ?? null,
+        severity: severityNumber ?? 0,
+        moodHistory,
+      };
 
       holzenLog.companion('lazy fetch orchestrate invoke', {
         slot,
@@ -463,24 +462,11 @@ export function useCompanionData({ companions, prefs, pauseInstanceId, context, 
       });
 
       const { data, error: fnError } = await invokeEdge('companion-orchestrate', {
-        body: {
-          holzenInvokeSource: 'browser_lazy_fetch',
-          pauseInstanceId,
-          context: context ?? '',
-          language,
-          reflectionMessage: reflectionMessage ?? '',
-          mood: mood ?? null,
-          severity: severityNumber ?? 0,
-          moodHistory,
+        body: buildLazyFetchOrchestrateBody(orchestrateSession, slot, {
+          recency,
           signalSources,
           groundingSources,
-          ...recency,
-          enableSignal: slot === 'signal',
-          enableGrounding: slot === 'grounding',
-          enableHistory: slot === 'history',
-          enableZoomOut: slot === 'zoomOut',
-          useIntervention: false,
-        },
+        }),
       });
 
       const body = data as Record<string, unknown> | null;
@@ -514,8 +500,8 @@ export function useCompanionData({ companions, prefs, pauseInstanceId, context, 
             variant: 'destructive',
           });
         }
-        setErr(true);
-        setLoading(false);
+        setCompanionSlotError(slot, companionSlotErrorSetters, true);
+        setCompanionSlotLoading(slot, companionSlotLoadingSetters, false);
         void refreshSubscription();
         return;
       }
@@ -543,13 +529,13 @@ export function useCompanionData({ companions, prefs, pauseInstanceId, context, 
           slot,
           pause_instance_prefix: pauseInstanceId.slice(0, 8),
         });
-        setErr(true);
+        setCompanionSlotError(slot, companionSlotErrorSetters, true);
       }
     } catch (e) {
       console.error('[useCompanionData] fetchCompanion failed', slot, e);
-      setErr(true);
+      setCompanionSlotError(slot, companionSlotErrorSetters, true);
     } finally {
-      setLoading(false);
+      setCompanionSlotLoading(slot, companionSlotLoadingSetters, false);
       void refreshSubscription();
     }
   }, [
@@ -566,6 +552,8 @@ export function useCompanionData({ companions, prefs, pauseInstanceId, context, 
     toast,
     requirePro,
     startCheckout,
+    companionSlotLoadingSetters,
+    companionSlotErrorSetters,
   ]);
 
   // ── Retry helpers ──
@@ -608,25 +596,22 @@ export function useCompanionData({ companions, prefs, pauseInstanceId, context, 
     if (!canAccessCompanion()) {
       return;
     }
-    const setLoading = (v: boolean) => {
-      if (slot === 'signal') setSignalLoading(v);
-      else if (slot === 'grounding') setNudgeLoading(v);
-      else if (slot === 'history') setHistoryLoading(v);
-      else setZoomOutLoading(v);
-    };
-    const setErr = (v: boolean) => {
-      if (slot === 'signal') setSignalError(v);
-      else if (slot === 'grounding') setNudgeError(v);
-      else if (slot === 'history') setHistoryError(v);
-      else setZoomOutError(v);
-    };
-    setLoading(true);
-    setErr(false);
+    setCompanionSlotLoading(slot, companionSlotLoadingSetters, true);
+    setCompanionSlotError(slot, companionSlotErrorSetters, false);
     try {
       const recency = getRecencyHints();
       const signalSources = slot === 'signal' ? await loadActiveOrchestrateSources('signal') : undefined;
       const groundingSources = slot === 'grounding' ? await loadActiveOrchestrateSources('grounding') : undefined;
       const moodHistory = await loadMoodHistoryForOrchestrate();
+      const orchestrateSession: CompanionOrchestrateSessionContext = {
+        pauseInstanceId,
+        context: context ?? '',
+        language,
+        reflectionMessage: reflectionMessage ?? '',
+        mood: mood ?? null,
+        severity: severityNumber ?? 0,
+        moodHistory,
+      };
 
       holzenLog.companion('regenerate orchestrate invoke', {
         slot,
@@ -640,20 +625,11 @@ export function useCompanionData({ companions, prefs, pauseInstanceId, context, 
       });
 
       const { data, error: fnError } = await invokeEdge('companion-orchestrate', {
-        body: {
-          holzenInvokeSource: 'browser_regenerate',
-          pauseInstanceId,
-          regenerateOnly: slot,
-          context: context ?? '',
-          language,
-          reflectionMessage: reflectionMessage ?? '',
-          mood: mood ?? null,
-          severity: severityNumber ?? 0,
-          moodHistory,
+        body: buildRegenerateOrchestrateBody(orchestrateSession, slot, {
+          recency,
           signalSources,
           groundingSources,
-          ...recency,
-        },
+        }),
       });
 
       const body = data as Record<string, unknown> | null;
@@ -679,7 +655,7 @@ export function useCompanionData({ companions, prefs, pauseInstanceId, context, 
         } else {
           toast({ title: 'Regenerate failed', description: msg, variant: 'destructive' });
         }
-        setErr(true);
+        setCompanionSlotError(slot, companionSlotErrorSetters, true);
         return;
       }
 
@@ -702,16 +678,28 @@ export function useCompanionData({ companions, prefs, pauseInstanceId, context, 
         });
       } else {
         holzenLog.companion('regenerate empty slot', { slot, pause_instance_prefix: pauseInstanceId.slice(0, 8) });
-        setErr(true);
+        setCompanionSlotError(slot, companionSlotErrorSetters, true);
       }
     } catch (e) {
       console.error('[useCompanionData] regenerateCompanion', e);
       toast({ title: 'Regenerate failed', description: 'Network error', variant: 'destructive' });
-      setErr(true);
+      setCompanionSlotError(slot, companionSlotErrorSetters, true);
     } finally {
-      setLoading(false);
+      setCompanionSlotLoading(slot, companionSlotLoadingSetters, false);
     }
-  }, [pauseInstanceId, context, reflectionMessage, mood, severityNumber, language, toast, autoSaveToLibrary, canAccessCompanion]);
+  }, [
+    pauseInstanceId,
+    context,
+    reflectionMessage,
+    mood,
+    severityNumber,
+    language,
+    toast,
+    autoSaveToLibrary,
+    canAccessCompanion,
+    companionSlotLoadingSetters,
+    companionSlotErrorSetters,
+  ]);
 
   return {
     favorites,

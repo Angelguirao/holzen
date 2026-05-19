@@ -1,3 +1,7 @@
+import {
+  buildCompanionFeedbackVoteMetadata,
+  type LogCompanionFeedbackVoteInput,
+} from '@/features/pause/application/use-cases/companion/log-companion-feedback-vote';
 import { supabase } from '@/integrations/supabase/client';
 import type { Json } from '@/integrations/supabase/types';
 
@@ -22,6 +26,31 @@ function voteFromMetadata(metadata: Json | null | undefined): 'up' | 'down' | nu
   if (!metadata || typeof metadata !== 'object' || Array.isArray(metadata)) return null;
   const v = (metadata as Record<string, unknown>).vote;
   return v === 'up' || v === 'down' ? v : null;
+}
+
+export async function insertCompanionFeedbackVote(params: {
+  userId: string;
+  metadata: Record<string, unknown>;
+}): Promise<{ ok: boolean }> {
+  try {
+    const { error } = await supabase.from('analytics_events').insert({
+      user_id: params.userId,
+      event: 'companion_feedback',
+      metadata: params.metadata as Json,
+    });
+    return { ok: !error };
+  } catch {
+    return { ok: false };
+  }
+}
+
+export async function logCompanionFeedbackVote(
+  input: LogCompanionFeedbackVoteInput,
+): Promise<{ ok: boolean }> {
+  return insertCompanionFeedbackVote({
+    userId: input.userId,
+    metadata: buildCompanionFeedbackVoteMetadata(input),
+  });
 }
 
 export async function fetchCompanionFeedbackVote(

@@ -153,6 +153,37 @@ function pushRecencyForOrchestrateSlot(slot: RegenerateCompanionSlot, data: unkn
   }
 }
 
+/** Slots the intervention orchestrate response may populate (order preserved for hydration). */
+export const INTERVENTION_RESPONSE_COMPANION_SLOTS: readonly RegenerateCompanionSlot[] = [
+  'grounding',
+  'history',
+  'zoomOut',
+  'signal',
+];
+
+/**
+ * Hydrate companion cards returned alongside an intervention-only orchestrate call
+ * (trap → grounding, pattern → history, secondary → zoomOut, etc.).
+ * Returns the signal slot body for optional debug logging.
+ */
+export function hydrateOrchestrateSlotsFromInterventionResponse(
+  orchestrateBody: Record<string, unknown>,
+  fetchedSlots: Set<string>,
+  committers: CompanionSlotCommitters,
+  setCacheRelaxations?: (fn: (prev: CompanionSlotRelaxations) => CompanionSlotRelaxations) => void,
+): CompanionOrchestrateSlotResult | null {
+  for (const slot of INTERVENTION_RESPONSE_COMPANION_SLOTS) {
+    hydrateOrchestrateSlotIfNew(
+      slot,
+      readOrchestrateSlotBody(orchestrateBody, slot),
+      fetchedSlots,
+      committers,
+      setCacheRelaxations,
+    );
+  }
+  return readOrchestrateSlotBody(orchestrateBody, 'signal');
+}
+
 /** Server returned a slot alongside intervention — no recency or cacheId updates. */
 export function hydrateOrchestrateSlotIfNew(
   slot: RegenerateCompanionSlot,
