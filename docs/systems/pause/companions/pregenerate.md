@@ -35,7 +35,7 @@ Yes, as an implemented and deployed path:
 
 When a user (or service job) invokes **`companion-orchestrate`**, the generators in `_shared/generators/{signal,grounding,history,zoom-out}.ts` can **read** matching rows from `companion_cache` according to [phase-config](../../../../supabase/functions/_shared/phase-config.ts). Pregenerate **feeds** that pool; it does not write to `pause_ai_artifacts` by itself.
 
-**Admin:** Companion cache table and hints about the warmer appear in the admin surface ([Admin.tsx](../../../../src/pages/Admin.tsx) copy references `pregenerate-companions`).
+**Admin:** Companion cache table and hints about the warmer appear in the admin surface ([Admin.tsx](../../../../src/screens/admin/AdminScreen.tsx) copy references `pregenerate-companions`).
 
 ## Ops and cost
 

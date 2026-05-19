@@ -204,6 +204,8 @@ sequenceDiagram
 
 ---
 
+**Client folder map (presentation layers):** [client-src-layout.md](client-src-layout.md) — Mermaid diagram, placement rules, PR alignment checklist.
+
 ## 7. Screens vs bounded contexts (read this before naming packages)
 
 Three ideas often get conflated:

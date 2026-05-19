@@ -283,8 +283,8 @@ Use this when moving files. Paths are indicative — adjust to actual filenames 
 | Current (transitional) | Target |
 |------------------------|--------|
 | `src/hooks/use-pause-*.ts` | `packages/pause` (§3 subdirs) + thin hooks in `apps/web` |
-| `src/hooks/use-companion-data.ts` | `packages/pause/application/companion/` |
-| `src/hooks/use-holzen.ts` | `packages/market` + `apps/web/screens/home` (wires pause triggers) |
+| `src/screens/pause/hooks/use-companion-data.ts` | `packages/pause/application/companion/` |
+| `src/screens/home/hooks/use-holzen.ts` | `packages/market` + `apps/web/screens/home` (wires pause triggers) |
 | `src/hooks/use-subscription.ts` | `packages/subscription` |
 | `src/hooks/use-auth.tsx` (re-export) | `features/auth/presentation/AuthProvider.tsx` → `packages/auth` |
 | `src/hooks/use-library.ts` | `packages/pause` queries (archive collections) |
@@ -294,7 +294,7 @@ Use this when moving files. Paths are indicative — adjust to actual filenames 
 | `src/screens/pause/components/*`, `Companion*.tsx` | `apps/web/src/screens/pause/` (5c); was `components/pause/*` |
 | `src/screens/home/components/*` | `apps/web/src/screens/home/` |
 | `src/pages/settings/*` | `apps/web/src/screens/settings/` + `packages/user` |
-| `src/pages/PauseSession.tsx` | `apps/web/pages` re-export + pause screen |
+| `src/screens/pause/PauseSessionScreen.tsx` | `apps/web` pause screen (+ optional thin `pages/` re-export) |
 | `src/integrations/supabase/types.ts` | Stay generated; consumed by infrastructure only |
 | `src/legacy/**` | Remove from `main`; git tag / archive branch only |
 
@@ -308,8 +308,12 @@ Use this when moving files. Paths are indicative — adjust to actual filenames 
 
 ```text
 src/
-  App.tsx, pages/, components/     # screens & UI (unchanged for Lovable)
-  hooks/, lib/                      # shrink as contexts migrate into features/
+  App.tsx
+  app/components/                  # cross-route shell (wave 5j)
+  screens/<route>/                 # *Screen.tsx, components/, hooks/
+  pages/                           # thin re-exports (check:thin-pages)
+  components/ui/, components/icons/  # design system only at components root
+  hooks/, lib/                      # shims; shrink as contexts migrate
   features/
     pause/
       domain/

@@ -144,7 +144,7 @@ The `partial` flag allows the card to render with whatever data succeeded (e.g.,
 |------|------|
 | Generator | `supabase/functions/_shared/generators/zoom-out.ts` |
 | Echo read model (edge) | `supabase/functions/_shared/past-reflections.ts` + pure helpers in `_shared/past-reflection-util.ts` |
-| Replay placeholder UI | `src/components/practice/ReflectionReplay.tsx` — V2 rebuild notice (no data fetch yet) |
+| Replay placeholder UI | `src/legacy/full-shell/src/components/practice/ReflectionReplay.tsx` — V2 rebuild notice (no data fetch yet) |
 | Orchestrator | `supabase/functions/companion-orchestrate/index.ts` |
 | Session intent | `supabase/functions/_shared/session-intent.ts` |
 | Quality gate | `supabase/functions/_shared/quality.ts` |
@@ -153,9 +153,9 @@ The `partial` flag allows the card to render with whatever data succeeded (e.g.,
 | BTC price cron | `supabase/functions/refresh-btc-prices/index.ts` |
 | BTC cache fill helper | `supabase/functions/_shared/btc-price-warm.ts` — shared by cron + zoom-out warm-on-read (bounded parallelism, 15-min dedupe) |
 | BTC cache backfill (ops) | `supabase/functions/backfill-btc-prices/index.ts` — manual range fill; chain **`resumeFrom`** or `scripts/backfill-btc-chain.mjs` for multi-year gaps |
-| Client invoke | `src/hooks/use-companion-data.ts` |
-| Full-screen view | `src/pages/CompanionZoomOutPage.tsx` — route `/companion/zoom-out/:pauseInstanceId` |
-| UI | `src/components/CompanionSection.tsx` (`ZoomOutDisplay`) |
+| Client invoke | `src/screens/pause/hooks/use-companion-data.ts` |
+| Full-screen view | `src/screens/pause/CompanionZoomOutPage.tsx` — route `/companion/zoom-out/:pauseInstanceId` |
+| UI | `src/screens/pause/components/CompanionSection.tsx` (`ZoomOutDisplay`) |
 
 ---
 

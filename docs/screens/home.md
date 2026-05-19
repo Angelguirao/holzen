@@ -26,18 +26,18 @@ Hooks (`src/screens/home/hooks/use-home-*.ts` / `use-home-*.tsx`): checkout welc
 
 ## Purpose
 
-Home is the signed-in landing surface after onboarding: hero quote, optional install CTA, customizable widgets (market, pause, goal/why, quick capture, journey pulse, evening reflection), subscription gates, and checkout return handling. It coordinates several hooks and must stay coherent with [`CheckoutConfirmation`](../../src/components/CheckoutConfirmation.tsx) for Stripe return URLs.
+Home is the signed-in landing surface after onboarding: hero quote, optional install CTA, customizable widgets (market, pause, goal/why, quick capture, journey pulse, evening reflection), subscription gates, and checkout return handling. It coordinates several hooks and must stay coherent with [`CheckoutConfirmation`](../../src/app/components/CheckoutConfirmation.tsx) for Stripe return URLs.
 
 ## Major dependencies
 
 | Area | Source | Notes |
 |------|--------|--------|
-| Open pause + market context | [`useHolzen`](../../src/hooks/use-holzen.ts) | `lastPauseInstanceId` / `hasOpenPause`, `context` (market line from `context_snapshot`), `message` only when a `reflection_text` artifact exists (post-Reflect or silent stub), `loading`, `error`, `btcData`, `manualTrigger`, cooldown helpers, companions; **`trackedAssetId`** is re-exported as `normalizeTrackedAssetId(profile.trackedAssetId)` (`TrackedAssetId`) |
+| Open pause + market context | [`useHolzen`](../../src/screens/home/hooks/use-holzen.ts) | `lastPauseInstanceId` / `hasOpenPause`, `context` (market line from `context_snapshot`), `message` only when a `reflection_text` artifact exists (post-Reflect or silent stub), `loading`, `error`, `btcData`, `manualTrigger`, cooldown helpers, companions; **`trackedAssetId`** is re-exported as `normalizeTrackedAssetId(profile.trackedAssetId)` (`TrackedAssetId`) |
 | Subscription / Pro | [`useSubscription`](../../src/hooks/use-subscription.ts) | `subscribed`, `monthlyRemaining`, `startCheckout`, `refresh` |
-| Layout + DnD order | [`useWidgetLayout`](../../src/components/HomeWidget.tsx) | Section order persisted per user expectations |
+| Layout + DnD order | [`useWidgetLayout`](../../src/screens/home/components/HomeWidget.tsx) | Section order persisted per user expectations |
 | Optional widgets | [`useHomeOptionalVisibility`](../../src/hooks/use-home-optional-visibility.ts) | Toggles + `JOURNEY_STAT_TILES_VISIBILITY_ID` + `HOME_WIDGET_DEFAULT_ORDER` for layout |
-| Shell | [`AppLayout`](../../src/components/AppLayout.tsx) outlet context | `pauseReady` / `dismissPauseReady` — refresh path when server pushes a pause |
-| Checkout UX | [`CheckoutConfirmation`](../../src/components/CheckoutConfirmation.tsx) | Owns stripping `?subscribed=true` / credits params and the confirmation dialog; Home may still run a lightweight refresh + welcome toast with a **stable Sonner id** so dev Strict Mode does not duplicate toasts |
+| Shell | [`AppLayout`](../../src/app/components/AppLayout.tsx) outlet context | `pauseReady` / `dismissPauseReady` — refresh path when server pushes a pause |
+| Checkout UX | [`CheckoutConfirmation`](../../src/app/components/CheckoutConfirmation.tsx) | Owns stripping `?subscribed=true` / credits params and the confirmation dialog; Home may still run a lightweight refresh + welcome toast with a **stable Sonner id** so dev Strict Mode does not duplicate toasts |
 
 ## Rendering and hooks
 

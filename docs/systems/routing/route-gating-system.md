@@ -79,4 +79,4 @@ Route gating is **UX and navigation policy** only. It does not replace:
 
 - `src/App.tsx` - `ProtectedRoute`, `PublicOnlyRoute`, route table
 - `src/hooks/use-auth.tsx` - `user`, `loading`
-- `src/components/AuthLoading.tsx` - loading UI used by both wrappers
+- `src/app/components/AuthLoading.tsx` - loading UI used by both wrappers

@@ -2,7 +2,7 @@
 
 **Scope:** Product-level organization of screens, routes, and primary navigation as implemented in the React app. This complements visual-system work under `docs/design/nox/` and product decisions in `docs/decisions/`.
 
-**Source of truth for URLs:** `src/App.tsx` (React Router). **Primary nav:** `src/components/BottomNav.tsx` + `src/components/AppLayout.tsx`.
+**Source of truth for URLs:** `src/App.tsx` (React Router). **Primary nav:** `src/app/components/BottomNav.tsx` + `src/app/components/AppLayout.tsx`. **Layer map:** [client-src-layout.md](../fundamentals/client-src-layout.md).
 
 **Pause-first shipped scope (2026-05):** The **shipped** product on `feature/mvpPauseCleanup` is a **4-tab shell** — Home, Archive, Journey (overview only), Settings — plus full-screen `/pause` and `/companion/*`. Tools, full Journey tabs (stats/badges/activity), Profile gamification, and `/library` are **not** in the active tree (404 on old bookmarks). Recovery snapshot: git tag `full-ia-pre-strip`. Canonical manifest: [docs/ops/active-surface.md](../ops/active-surface.md). **§1 below** still describes the **pre-MVP full IA** for reference when reading legacy code or the archive branch.
 
@@ -83,7 +83,7 @@ Under `/admin` and children (`/admin/smoke-test`, `/admin/sentry-alerts`, `/admi
 ### 1.7 Primary navigation (product analytics)
 
 - `navigation.primary_tab_opened` (PostHog) fires when the user **switches** to a **different** bottom tab (not on re-tap of the current tab, not on back/forward or deep link alone). Property: `tab: 'home' | 'library' | 'tools' | 'journey' | 'settings'`.
-- **Implementation:** `src/components/BottomNav.tsx` + `isPrimaryTabActive()`. **Taxonomy:** [docs/ops/event-taxonomy.md](../ops/event-taxonomy.md) § *navigation*.
+- **Implementation:** `src/app/components/BottomNav.tsx` + `isPrimaryTabActive()`. **Taxonomy:** [docs/ops/event-taxonomy.md](../ops/event-taxonomy.md) § *navigation*.
 - **Use for IA decisions:** compare relative tab usage (e.g. **Tools** vs other tabs), spot crowding, and validate follow-ups in **§3** / **§4**.
 
 ---

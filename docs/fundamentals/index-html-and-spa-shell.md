@@ -48,7 +48,7 @@ Sets Tailwind’s `dark:` variant before CSS/JS load so the first paint matches 
 ### `<head>` — document metadata
 
 - **Title and description** — browser tab and search snippets.
-- **Canonical, Open Graph, Twitter** — link previews when someone shares `https://holzen.app/...`. Default tags live here; per-route pages can override via `PageMeta` (`src/components/PageMeta.tsx`), which uses `SITE_ORIGIN` from `src/config/site.ts`.
+- **Canonical, Open Graph, Twitter** — link previews when someone shares `https://holzen.app/...`. Default tags live here; per-route pages can override via `PageMeta` (`src/app/components/PageMeta.tsx`), which uses `SITE_ORIGIN` from `src/config/site.ts`.
 - **`og:image` / `twitter:image`** — hosted preview image URLs (currently on R2/CDN; not required to match the site hostname).
 - **PWA** — `manifest.json`, theme color, Apple touch icon.
 - **JSON-LD** (`SoftwareApplication`) — structured data for crawlers; `url` should match the custom domain. Keep `offers.price` aligned with [`src/lib/pricing.ts`](../../src/lib/pricing.ts) (`4.99`) and trial-first copy in [`src/locales/en.json`](../../src/locales/en.json) (`landing.pricingDesc`).
@@ -121,7 +121,7 @@ When you change the canonical domain, set optional **`VITE_SITE_ORIGIN`** (build
 | `src/main.tsx` | JS entry, observability init, React mount |
 | `src/App.tsx` | Providers, router, layouts |
 | `src/config/site.ts` | `SITE_ORIGIN` / `SITE_HOST` for runtime canonical and share URLs |
-| `src/components/PageMeta.tsx` | Per-route title, description, canonical, OG |
+| `src/app/components/PageMeta.tsx` | Per-route title, description, canonical, OG |
 | `vite.config.ts` | `transformIndexHtml` → SEO placeholders + preconnects |
 | `src/config/site-seo-defaults.ts` | Default title/description/OG URL; JSON-LD offer helper |
 | `public/manifest.json` | PWA manifest (`start_url` is path-relative `/`) |
