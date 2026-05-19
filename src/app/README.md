@@ -4,6 +4,18 @@ Cross-route chrome and providers: layout, bottom nav, document meta, error bound
 
 **Screens** (`src/screens/<route>/`) own tab-specific UI and orchestration. **Features** (`src/features/*`) own domain truth.
 
+**Canonical:** [frontend-module-layout.md](../../docs/fundamentals/frontend-module-layout.md) wave **5j**.
+
+## Related folders
+
+| Folder | Role |
+|--------|------|
+| `src/screens/<route>/` | Route-scoped UI — [screens/README.md](../screens/README.md) |
+| `src/components/ui/` | Design system (shadcn + Holzen composites) — [components/README.md](../components/README.md) |
+| `src/features/*` | Domain truth — [features/README.md](../features/README.md) |
+
+## Components
+
 | Path | Role |
 |------|------|
 | `components/AppLayout.tsx` | Authenticated shell (header, outlet, bottom nav) |
@@ -31,4 +43,11 @@ Cross-route chrome and providers: layout, bottom nav, document meta, error bound
 
 Settings orchestration: `src/screens/settings/hooks/`, `SettingsStateLayout.tsx`.
 
-See [frontend-module-layout.md](../../docs/fundamentals/frontend-module-layout.md) wave **5j**.
+## Navigation cheat sheet
+
+| I need… | Start here |
+|---------|------------|
+| Tab / route UI | `screens/<route>/` |
+| Bottom nav, global banners, checkout | `app/components/` (this folder) |
+| Button, dialog, `LoadingButton` | `components/ui/` |
+| Route wiring | `src/pages/` + `App.tsx` |
