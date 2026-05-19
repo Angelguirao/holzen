@@ -1,5 +1,5 @@
 import { useCallback, type Dispatch, type SetStateAction } from 'react';
-import type { PauseStep } from '@/components/pause/PauseProgress';
+import type { PauseStep } from '@/screens/pause/components/PauseProgress';
 import { computePauseGoBackPlan } from '@/features/pause/public';
 import { hapticFeedback } from '@/lib/haptics';
 import { type BriefPauseStep, type RitualDepth } from '@/features/pause/public';

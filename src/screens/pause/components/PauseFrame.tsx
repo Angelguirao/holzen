@@ -10,7 +10,7 @@ import {
   ImageIcon,
   ZoomOut,
 } from 'lucide-react';
-import { pauseStepLayout } from '@/components/pause/pause-step-layout';
+import { pauseStepLayout } from '@/screens/pause/components/pause-step-layout';
 import { Button } from '@/components/ui/button';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import { hapticFeedback } from '@/lib/haptics';

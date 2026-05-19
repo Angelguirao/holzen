@@ -1,6 +1,6 @@
 import type { TFunction } from 'i18next';
-import type { PauseStep } from '@/components/pause/PauseProgress';
-import { PAUSE_DEEP_DISPLAY_STEP_COUNT, pauseDeepMacroStepNumber } from '@/components/pause/PauseProgress';
+import type { PauseStep } from '@/screens/pause/components/PauseProgress';
+import { PAUSE_DEEP_DISPLAY_STEP_COUNT, pauseDeepMacroStepNumber } from '@/screens/pause/components/PauseProgress';
 import { computeBriefMacroProgressPosition } from '@/features/pause/application/brief-ritual/brief-pause-order';
 import type { BriefPauseStep, RitualDepth } from '@/features/pause/domain/ritual-types';
 

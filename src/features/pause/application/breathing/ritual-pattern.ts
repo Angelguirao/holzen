@@ -1,4 +1,4 @@
-import type { FeelStepTile } from '@/components/pause/pause-feel-types';
+import type { FeelStepTile } from '@/screens/pause/components/pause-feel-types';
 
 /**
  * Ritual breathing (`PauseBreathing`) pattern selection.

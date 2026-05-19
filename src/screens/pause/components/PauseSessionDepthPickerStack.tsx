@@ -1,8 +1,8 @@
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { PauseAboutPausesBody } from '@/components/pause/PauseAboutPausesBody';
-import { PauseDepthPicker } from '@/components/pause/PauseDepthPicker';
-import { PauseScienceScrollBody } from '@/components/pause/PauseScienceSheet';
+import { PauseAboutPausesBody } from '@/screens/pause/components/PauseAboutPausesBody';
+import { PauseDepthPicker } from '@/screens/pause/components/PauseDepthPicker';
+import { PauseScienceScrollBody } from '@/screens/pause/components/PauseScienceSheet';
 import { Sheet, SheetContent, SheetTitle } from '@/components/ui/sheet';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 

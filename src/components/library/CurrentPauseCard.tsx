@@ -5,7 +5,7 @@ import { motion } from 'framer-motion';
 import { useCurrentPause } from '@/hooks/use-current-pause';
 import { usePendingPauseOffer } from '@/hooks/use-pending-pause-offer';
 import { pauseWindowShowsClockCountdown } from '@/features/pause/public';
-import { PauseEngagedOpenMaxCountdown } from '@/components/pause/PauseEngagedOpenMaxCountdown';
+import { PauseEngagedOpenMaxCountdown } from '@/screens/pause/components/PauseEngagedOpenMaxCountdown';
 import { cn } from '@/lib/utils';
 
 /**

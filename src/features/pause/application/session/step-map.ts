@@ -1,6 +1,6 @@
-import type { FeelStepTile } from '@/components/pause/pause-feel-types';
-import type { PauseStep } from '@/components/pause/PauseProgress';
-import { STEPS } from '@/components/pause/PauseProgress';
+import type { FeelStepTile } from '@/screens/pause/components/pause-feel-types';
+import type { PauseStep } from '@/screens/pause/components/PauseProgress';
+import { STEPS } from '@/screens/pause/components/PauseProgress';
 import type { BriefPauseStep, RitualDepth } from '@/features/pause/domain/ritual-types';
 import type { PersistedSession } from '@/features/pause/domain/session-model';
 import { hasPersistedPauseSessionPayload } from './persisted-session-guards';

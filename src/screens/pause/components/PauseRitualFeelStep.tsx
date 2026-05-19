@@ -4,11 +4,11 @@ import { ChevronRight } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { MoodIcon } from '@/components/icons/MoodIcon';
 import type { MoodValue } from '@/components/MoodCheck';
-import type { FeelStepTile } from '@/components/pause/pause-feel-types';
-import { PAUSE_FEEL_INTENSITY_KEYS } from '@/components/pause/pause-feel-intensity-labels';
+import type { FeelStepTile } from '@/screens/pause/components/pause-feel-types';
+import { PAUSE_FEEL_INTENSITY_KEYS } from '@/screens/pause/components/pause-feel-intensity-labels';
 import { Button } from '@/components/ui/button';
 import { Slider } from '@/components/ui/slider';
-import { pauseStepLayout } from '@/components/pause/pause-step-layout';
+import { pauseStepLayout } from '@/screens/pause/components/pause-step-layout';
 import { cn } from '@/lib/utils';
 
 const TILES: { tile: FeelStepTile; mood: MoodValue }[] = [

@@ -1,4 +1,4 @@
-import { STEPS, type PauseStep } from '@/components/pause/PauseProgress';
+import { STEPS, type PauseStep } from '@/screens/pause/components/PauseProgress';
 import type { BriefPauseStep, RitualDepth } from '@/features/pause/domain/ritual-types';
 
 export type PauseSessionHeaderBackInput = {

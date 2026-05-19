@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import { canAdvanceFromPauseStep } from '@/features/pause/public';
-import type { PauseStep } from '@/components/pause/PauseProgress';
+import type { PauseStep } from '@/screens/pause/components/PauseProgress';
 
 const base = {
   breathingFirstCompleted: false,

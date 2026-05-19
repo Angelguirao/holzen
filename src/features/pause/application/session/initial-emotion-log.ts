@@ -1,5 +1,5 @@
 import type { MoodValue } from '@/components/MoodCheck';
-import type { FeelStepTile } from '@/components/pause/pause-feel-types';
+import type { FeelStepTile } from '@/screens/pause/components/pause-feel-types';
 
 export type InitialEmotionLogOpts = {
   briefRitual?: boolean;

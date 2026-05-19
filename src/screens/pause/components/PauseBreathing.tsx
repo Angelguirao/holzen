@@ -2,8 +2,8 @@ import { useState, useEffect, useImperativeHandle, forwardRef, useRef, useLayout
 import { motion, useReducedMotion } from 'framer-motion';
 import { Play, RefreshCw, ChevronRight } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
-import type { FeelStepTile } from '@/components/pause/pause-feel-types';
-import { pauseStepLayout } from '@/components/pause/pause-step-layout';
+import type { FeelStepTile } from '@/screens/pause/components/pause-feel-types';
+import { pauseStepLayout } from '@/screens/pause/components/pause-step-layout';
 import { Button } from '@/components/ui/button';
 import { hapticFeedback } from '@/lib/haptics';
 import {
@@ -22,7 +22,7 @@ import {
   playPauseBreathPhaseCue,
   resumePauseAudioContext,
 } from '@/features/pause/public';
-import { BreathOrbVisual } from '@/components/pause/breath-orb-visual';
+import { BreathOrbVisual } from '@/screens/pause/components/breath-orb-visual';
 
 const EXPAND_KEYS = ['breathing.phases.inhale', 'breathing.phases.sip'];
 const CONTRACT_KEYS = ['breathing.phases.exhale'];

@@ -291,7 +291,7 @@ Use this when moving files. Paths are indicative — adjust to actual filenames 
 | `src/lib/pause-*.ts`, `src/lib/companion-*.ts` | Thin re-exports → `features/pause/public` or `public-queries` (until legacy removed) |
 | `src/lib/*-query.ts` (subscription, market, user) | Re-exports → owning `features/*/public-queries` |
 | `src/lib/posthog.ts`, `sentry.ts`, `invoke-edge.ts`, `cid.ts` | `packages/infrastructure` or `shared-kernel` |
-| `src/components/pause/*`, `Companion*.tsx` | `apps/web/src/screens/pause/` |
+| `src/screens/pause/components/*`, `Companion*.tsx` | `apps/web/src/screens/pause/` (5c); was `components/pause/*` |
 | `src/components/home/*` | `apps/web/src/screens/home/` |
 | `src/pages/settings/*` | `apps/web/src/screens/settings/` + `packages/user` |
 | `src/pages/PauseSession.tsx` | `apps/web/pages` re-export + pause screen |

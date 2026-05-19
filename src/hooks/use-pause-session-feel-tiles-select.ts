@@ -1,6 +1,6 @@
 import { useCallback } from 'react';
 import type { MoodValue } from '@/components/MoodCheck';
-import type { FeelStepTile } from '@/components/pause/pause-feel-types';
+import type { FeelStepTile } from '@/screens/pause/components/pause-feel-types';
 
 /**
  * Wraps `handleMoodSelect` for `PauseRitualFeelStep` (shared brief + deep Feel step).
