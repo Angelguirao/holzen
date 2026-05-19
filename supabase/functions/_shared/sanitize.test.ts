@@ -6,7 +6,7 @@ import { describe, it, expect } from 'vitest';
 import {
   sanitizePromptInput,
   sanitizePromptArray,
-} from '../../supabase/functions/_shared/sanitize';
+} from './sanitize.ts';
 
 describe('sanitizePromptInput', () => {
   it('passes clean text through', () => {

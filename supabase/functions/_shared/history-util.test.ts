@@ -4,7 +4,7 @@ import {
   eraRecentlySeenByKeywords,
   pickEra,
   type HistoricalEra,
-} from "../../supabase/functions/_shared/history-util";
+} from "./history-util.ts";
 
 describe("HISTORICAL_ERAS", () => {
   it("contains at least 20 eras covering all three mood tags", () => {

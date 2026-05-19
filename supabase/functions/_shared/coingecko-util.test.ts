@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { dateKeyToCoinGeckoHistory } from "../../supabase/functions/_shared/coingecko-util";
+import { dateKeyToCoinGeckoHistory } from "./coingecko-util.ts";
 
 describe("dateKeyToCoinGeckoHistory", () => {
   it("converts YYYY-MM-DD to DD-MM-YYYY (CoinGecko's /history format)", () => {

@@ -54,7 +54,7 @@ interface PastReflectionWithWords {
 }
 ```
 
-Pure helpers live in [`supabase/functions/_shared/past-reflection-util.ts`](../../../supabase/functions/_shared/past-reflection-util.ts) and are exercised by [`src/test/past-reflection-util.test.ts`](../../../src/test/past-reflection-util.test.ts).
+Pure helpers live in [`supabase/functions/_shared/past-reflection-util.ts`](../../../supabase/functions/_shared/past-reflection-util.ts) and are exercised by [`supabase/functions/_shared/past-reflection-util.test.ts`](../../../supabase/functions/_shared/past-reflection-util.test.ts).
 
 ---
 
@@ -107,7 +107,7 @@ Echo uses `v_pause_full` + `pause_step_events` / `practice_entries` only. There 
 | `src/legacy/full-shell/src/components/practice/ReflectionReplay.tsx` | Replay UI (legacy; not shipped). |
 | `src/screens/pause/components/ZoomOutDisplay.tsx` | Echo card with strict user-words policy + honest empty state. |
 | `src/locales/en.json` | `companions.echo*` + `practice.replay*` strings (see `echoEmptyBody`, `echoHolzenAsked`, `replayNoWordsYet`). |
-| `src/test/past-reflection-util.test.ts` | Tests for merge helpers, `parseDirectionFromContext`, and `pickPastReflection`. |
+| `supabase/functions/_shared/past-reflection-util.test.ts` | Tests for merge helpers, `parseDirectionFromContext`, and `pickPastReflection`. |
 
 ---
 

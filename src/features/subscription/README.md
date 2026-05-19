@@ -17,3 +17,7 @@ Stripe / entitlements / billing.
 |------|----------------|
 | `presentation/CheckoutConfirmation.tsx` | `AppLayout` — Stripe return modal on any authenticated tab |
 | `presentation/PaywallSubscribedTracker.tsx` | `AppLayout` — `paywall.subscribed` PostHog after checkout |
+
+## Tests
+
+Vitest files beside modules: `application/*.test.ts`, `presentation/CheckoutConfirmation.*.test.tsx` (guard + no-refetch regression). Coverage thresholds in `vitest.config.ts` target `CheckoutConfirmation.tsx` and `checkout-suppression-window.ts`.

@@ -17,9 +17,9 @@ import {
   ZOOM_OUT_FALLBACKS,
   REFLECTION_FALLBACKS,
   pickRandom,
-} from '../../supabase/functions/_shared/fallbacks';
+} from './fallbacks.ts';
 
-import { qualityGate, containsSlop, isValidUrl } from '../../supabase/functions/_shared/quality';
+import { qualityGate, containsSlop, isValidUrl } from './quality.ts';
 
 describe('SIGNAL_FALLBACKS', () => {
   it('has at least 5 entries', () => {

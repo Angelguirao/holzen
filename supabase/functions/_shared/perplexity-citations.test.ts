@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { normalizePerplexityCitations } from '../../supabase/functions/_shared/perplexity-client';
+import { normalizePerplexityCitations } from './perplexity-client.ts';
 
 describe('normalizePerplexityCitations', () => {
   it('merges search_results urls when citations is empty', () => {
