@@ -9,7 +9,7 @@ Route-scoped UI and thin orchestration live here. **Domain rules** stay in `src/
 | Folder | Role |
 |--------|------|
 | `src/app/components/` | Cross-route shell (layout, bottom nav, page meta) — see [src/app/README.md](../app/README.md) |
-| `src/components/ui/` | Design system (shadcn) |
+| `src/components/` | Design system (`ui/`) + shared icons — [components/README.md](../components/README.md) |
 
 ## Layout
 
@@ -47,4 +47,4 @@ screens/<route>/
 | Pause rules / RPC | `features/pause/` |
 | Home dashboard UI + hooks | `screens/home/components/` (incl. market widgets, onboarding), `hooks/` |
 | Route wiring | `src/pages/` + `App.tsx` |
-| Primitives | `components/ui/` |
+| Primitives / mood glyphs | [components/README.md](../components/README.md) (`ui/`, `icons/`) |
