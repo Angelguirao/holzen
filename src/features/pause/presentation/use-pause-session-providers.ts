@@ -4,7 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useSubscription } from '@/features/subscription/public-hooks';
 import { useProGate } from '@/features/subscription/public-hooks';
-import { usePauseSessionExitNavigation } from './use-pause-session-exit-navigation';
+import { usePauseSessionExitNavigation } from './session/use-pause-session-exit-navigation';
 import { usePauseSessionBreathSecondLabelVariant } from './use-pause-session-breath-second-label-variant';
 import { JOURNEY_PREFIX } from '@/lib/app-routes';
 import { clearSession } from '@/features/pause/infrastructure/session/persisted-session-storage';
