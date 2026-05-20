@@ -62,32 +62,32 @@ export {
   currentPauseQueryKey,
   type CurrentPauseRow,
 } from './presentation/use-current-pause';
-export { useOpenPauseHomePreview } from './presentation/use-open-pause-home-preview';
+export { useOpenPauseHomePreview } from './presentation/home/use-open-pause-home-preview';
 export {
   useManualPauseTrigger,
   type UseManualPauseTriggerParams,
-} from './presentation/use-manual-pause-trigger';
+} from './presentation/home/use-manual-pause-trigger';
 export {
   useHolzenManualTriggerOrchestration,
   type UseHolzenManualTriggerOrchestrationParams,
-} from './presentation/use-holzen-manual-trigger-orchestration';
+} from './presentation/home/use-holzen-manual-trigger-orchestration';
 export {
   useHomePauseActions,
   type PauseDismissAnalyticsSurface,
-} from './presentation/use-home-pause-actions';
-export { usePauseContextHomePreviews } from './presentation/use-pause-context-home-previews';
-export { useHolzenHomeContextState } from './presentation/use-holzen-home-context-state';
-export { usePauseArrivalAudio } from './presentation/use-pause-arrival-audio';
+} from './presentation/home/use-home-pause-actions';
+export { usePauseContextHomePreviews } from './presentation/home/use-pause-context-home-previews';
+export { useHolzenHomeContextState } from './presentation/home/use-holzen-home-context-state';
+export { usePauseArrivalAudio } from './presentation/home/use-pause-arrival-audio';
 export {
   usePauseCardProjection,
   type PauseCardProjection,
   type UsePauseCardProjectionParams,
-} from './presentation/use-pause-card-projection';
+} from './presentation/home/use-pause-card-projection';
 export {
   useZenModeHomeRouteProps,
   type BuildZenModeHomeRoutePropsInput,
   type ZenModeHomeRoutePropsProjection,
-} from './presentation/use-zen-mode-home-route-props';
+} from './presentation/home/use-zen-mode-home-route-props';
 export {
   usePauseReflectGeneration,
   type UsePauseReflectGenerationParams,

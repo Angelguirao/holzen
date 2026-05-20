@@ -3,9 +3,9 @@ import type { User } from '@supabase/supabase-js';
 import { dismissOpenPauseHome } from '@/features/pause/application/use-cases/dismiss/dismiss-open-pause-home';
 import { clearSession, type CompanionData } from '@/features/pause/public';
 import { pauseDismissCurrent } from '@/features/pause/public-rpc';
-import { fetchOpenPauseHomePreview } from '../public-queries';
-import { DEFAULT_COMPANIONS } from '../domain/session-model';
-import { usePauseInstancesRealtime } from './use-pause-instances-realtime';
+import { fetchOpenPauseHomePreview } from '../../public-queries';
+import { DEFAULT_COMPANIONS } from '../../domain/session-model';
+import { usePauseInstancesRealtime } from '../use-pause-instances-realtime';
 
 /**
  * Home open-pause preview from `v_pause_current` + reflection/companion artifacts.
