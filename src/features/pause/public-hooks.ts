@@ -375,7 +375,7 @@ export { usePauseSessionPendingLeaveSheet } from './presentation/session/use-pau
 export { usePauseSessionMoodChromeHandlers } from './presentation/reflect/use-pause-session-mood-chrome-handlers';
 export { usePauseSessionBreathReflectHandlers } from './presentation/reflect/use-pause-session-breath-reflect-handlers';
 export { usePauseSessionEntryPresentationEffects } from './presentation/use-pause-session-entry-presentation-effects';
-export { usePauseSessionTerminalEntryRedirect } from './presentation/use-pause-session-terminal-entry-redirect';
+export { usePauseSessionTerminalEntryRedirect } from './presentation/session/use-pause-session-terminal-entry-redirect';
 export { usePauseSessionStepTransition } from './presentation/use-pause-session-step-transition';
 export { usePauseSessionDepthAndBriefCopy } from './presentation/use-pause-session-depth-and-brief-copy';
 export {
@@ -397,7 +397,7 @@ export {
   usePauseSessionShellBootstrap,
   type UsePauseSessionShellBootstrapParams,
 } from './presentation/session/use-pause-session-shell-bootstrap';
-export { usePauseSessionRitualState } from './presentation/use-pause-session-ritual-state';
+export { usePauseSessionRitualState } from './presentation/session/use-pause-session-ritual-state';
 export {
   usePauseSessionShellRitual,
   type PauseSessionShellRitualProvidersSlice,
