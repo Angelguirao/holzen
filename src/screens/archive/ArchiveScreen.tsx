@@ -5,13 +5,13 @@ import { useTranslation } from 'react-i18next';
 import { motion, AnimatePresence } from 'framer-motion';
 import { usePauseArchiveList } from '@/screens/archive/hooks/use-pause-archive-list';
 import type { PauseArchiveRow, PauseArchiveSegment } from '@/features/pause/public-queries';
-import { useInfiniteScroll } from '@/hooks/use-infinite-scroll';
+import { useInfiniteScroll } from '@/app/hooks/use-infinite-scroll';
 import { PageMeta } from '@/app/components/PageMeta';
 import { Search, X, ArrowUpDown, RefreshCw, Loader2 } from 'lucide-react';
 import { ArchivePauseItems } from '@/screens/archive/components/ArchivePauseItems';
 import { ArchiveCollectionsSection } from '@/screens/archive/components/ArchiveCollectionsSection';
 import { CurrentPauseCard } from '@/screens/archive/components/library/CurrentPauseCard';
-import { usePullToRefresh } from '@/hooks/use-pull-to-refresh';
+import { usePullToRefresh } from '@/app/hooks/use-pull-to-refresh';
 
 import { Input } from '@/components/ui/input';
 import { Alert, AlertDescription } from '@/components/ui/alert';

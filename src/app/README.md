@@ -31,6 +31,10 @@ Cross-route chrome and providers: layout, bottom nav, document meta, error bound
 
 | `hooks/use-is-admin.ts` | Client admin gate for `/admin` and ops pages |
 | `hooks/use-shell-profile.ts` | Profile load error + i18n for shell (no `useHolzen`) |
+| `hooks/use-infinite-scroll.ts` | IntersectionObserver sentinel for infinite lists |
+| `hooks/use-pull-to-refresh.ts` | Touch pull-to-refresh (Archive, Home) |
+| `hooks/use-latest-ref.ts` | Stable ref to latest render value |
+| `hooks/use-feature-flag.ts` | PostHog feature flags (`ready` + default) |
 
 ## Placement rationale (what lives elsewhere)
 
