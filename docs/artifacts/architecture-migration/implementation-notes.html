@@ -360,6 +360,25 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-20</span>
+      <span>Phase A slice — frame leaf: intervention-idempotency-telemetry</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3><code>intervention-idempotency-telemetry</code> → <code>ritual/frame/</code></h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Reflect backlog #1 is complete; continue companion → <code>ritual/frame/</code> with PostHog + <code>[holzen:companion]</code> metric helper (module + test). Only consumer remains <code>intervention-idempotency</code> in <code>companion/</code>.</dd>
+      <dt>Deviation</dt>
+      <dd>None — matches spec §3.1 / §10.1 leaf-first pattern.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Could batch with <code>intervention-idempotency</code> orchestration; kept telemetry leaf separate so idempotency state machine stays in <code>companion/</code> until a larger cluster slice.</dd>
+      <dt>Open questions</dt>
+      <dd>Next slice: <code>artifact-cache-parse</code> cluster, <code>orchestrate-invoke-error</code> leaf, or <code>persist-ui-step-completion</code> + infrastructure sync.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
 </body>
 </html>
