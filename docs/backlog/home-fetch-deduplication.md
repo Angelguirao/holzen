@@ -1,6 +1,6 @@
 # Home (signed-in): dedupe redundant client fetches
 
-**Status:** partial — **subscription + market client dedupe shipped (2026-04)**; TanStack **`profiles`** row query **shipped** in `@/features/user/public-hooks` (`useProfile`, `PROFILE_QUERY_KEY`, shared cache across every `useHolzen()` instance).
+**Status:** core shipped (2026-04) — subscription, market, and **`profiles`** TanStack dedupe live; optional layout-level profile provider remains (see § Still optional).
 
 ## Progress
 
