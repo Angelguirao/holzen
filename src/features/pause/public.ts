@@ -391,7 +391,10 @@ export {
   PAUSE_INSTANCE_QUERY_ROOT,
   pauseInstanceQueryPrefix,
 } from './application/queries/pause-instance-query-prefix';
-export { buildShiftEmotionFrameHubLogBundle } from './application/use-cases/session/shift-emotion-log';
+export {
+  buildShiftEmotionFrameHubLogBundle,
+  runShiftEmotionFrameHubDone,
+} from './application/use-cases/session/shift-emotion-log';
 export {
   buildInitialEmotionLoggedPayload,
   initialEmotionLogDedupeKey,
