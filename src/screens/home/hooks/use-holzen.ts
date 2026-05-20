@@ -18,7 +18,7 @@ import { pauseDismissCurrent } from '@/features/pause/public-rpc';
 import { useProfile } from '@/features/user/public-hooks';
 import { holzenLog } from '@/lib/holzen-console';
 import { clearSession } from '@/features/pause/public';
-import { useOpenPauseHomePreview } from '@/screens/home/hooks/use-open-pause-home-preview';
+import { useOpenPauseHomePreview } from '@/features/pause/public-hooks';
 import {
   getManualReflectionCooldownMs,
   isHolzenDevMode,

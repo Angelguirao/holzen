@@ -11,7 +11,7 @@ import {
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
 import { Button } from '@/components/ui/button';
-import { usePendingPauseOffer } from '@/screens/pause/hooks/use-pending-pause-offer';
+import { usePendingPauseOffer } from '@/features/pause/public-hooks';
 import { pauseAdoptPendingOffer, pauseDeclinePendingOffer } from '@/features/pause/public-rpc';
 import { trackEvent } from '@/lib/posthog';
 

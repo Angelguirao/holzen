@@ -13,7 +13,7 @@ import {
 import { usePauseSessionMountLog } from '@/screens/pause/hooks/use-pause-session-mount-log';
 import { usePauseSessionPendingPauseOfferNavigation } from '@/screens/pause/hooks/use-pause-session-pending-pause-offer-navigation';
 import { usePauseSessionPendingLeaveSheet } from '@/screens/pause/hooks/use-pause-session-pending-leave-sheet';
-import { usePendingPauseOffer } from '@/screens/pause/hooks/use-pending-pause-offer';
+import { usePendingPauseOffer } from '@/features/pause/public-hooks';
 
 /**
  * `/pause` shell: nav parse, restore/hydrate/fetch, coalesced view model, pending-offer leave sheet.

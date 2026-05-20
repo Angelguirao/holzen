@@ -3,7 +3,7 @@ import type { TFunction } from 'i18next';
 import { toast } from 'sonner';
 import { trackEvent } from '@/lib/posthog';
 import { pauseAdoptPendingOffer, pauseDeclinePendingOffer } from '@/features/pause/public-rpc';
-import type { PendingPauseOfferRow } from '@/screens/pause/hooks/use-pending-pause-offer';
+import type { PendingPauseOfferRow } from '@/features/pause/public-hooks';
 
 export function usePauseSessionPendingLeaveSheet(options: {
   pending: PendingPauseOfferRow | null | undefined;
