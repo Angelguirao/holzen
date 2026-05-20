@@ -35,13 +35,6 @@ export {
   computeBriefMacroProgressPosition,
 } from './domain/brief-ritual-steps';
 export {
-  BRIEF_INTEGRATE_RING_CIRC,
-  BRIEF_INTEGRATE_RING_R,
-  BRIEF_INTEGRATE_SECONDS,
-  briefIntegrateRemainingProgress,
-  briefIntegrateRingDashOffset,
-} from './application/use-cases/ritual/brief/brief-integrate-timer';
-export {
   computeBriefRitualGoBack,
   type BriefRitualGoBackResult,
 } from './application/use-cases/ritual/brief/brief-pause-go-back';

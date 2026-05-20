@@ -1652,6 +1652,25 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-20</span>
+      <span>Phase A slice — peel brief-integrate ring helpers from public.ts (§6)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3><code>BRIEF_INTEGRATE_*</code> + ring progress → <code>public-hooks</code></h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code>) was already complete on <code>cursor/arch-migrate-src-ca70</code> — no further reflect folder moves this session. Continue backlog #3 §6 slim barrel: brief integrate ring constants and pure progress helpers export from <code>public-hooks.ts</code>; <code>PauseBriefIntegrateTimerRing</code> imports alongside other screen-facing presentation helpers. Countdown hook keeps direct <code>ritual/brief/brief-integrate-timer</code> import for <code>BRIEF_INTEGRATE_SECONDS</code>.</dd>
+      <dt>Deviation</dt>
+      <dd>None — same pattern as feel-step UI tokens and standalone breathing peel (May 2026).</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Did not peel <code>playPauseBreath*</code> or full <code>ritual-pattern</code> exports off <code>public.ts</code> in the same commit.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: wire <code>persistCompanionUiStepCompletion</code> on <code>public-rpc</code> (backlog #4), colocate <code>application/use-cases/breathing/</code> under <code>ritual/breathe/</code>, or peel ritual-pattern screen imports.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
 </body>
 </html>
