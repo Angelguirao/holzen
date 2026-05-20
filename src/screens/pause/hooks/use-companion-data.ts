@@ -1,20 +1,11 @@
 import { useState, useCallback } from 'react';
-import { useQuery, useQueryClient } from '@tanstack/react-query';
-import { hapticFeedback } from '@/lib/haptics';
 import { useHolzen } from '@/screens/home/hooks/use-holzen';
 import { useCompanionLibraryFavorites } from '@/screens/pause/hooks/use-companion-library-favorites';
 import type { CompanionData, CompanionPrefs } from '@/screens/pause/components/CompanionSection';
-import {
-  EMPTY_COMPANION_UI_COMPLETION,
-  getCompanionUiCompletionQueryOptions,
-  persistCompanionUiStepCompletion,
-  type CompanionUiCompletionStep,
-  type CompanionUiCompletionState,
-} from '@/features/pause/public-queries';
-import { companionUiCompletionQueryKey } from '@/features/pause/public';
 import { EMPTY_COMPANION_SLOT_RELAXATIONS } from '@/features/pause/public';
 import { resetInterventionIdempotency } from '@/features/pause/public';
 import { useCompanionAccess } from '@/screens/pause/hooks/use-companion-access';
+import { useCompanionUiCompletion } from '@/screens/pause/hooks/use-companion-ui-completion';
 import { useCompanionInterventionBootstrap } from '@/screens/pause/hooks/use-companion-intervention-bootstrap';
 import { useCompanionSlotUiState } from '@/screens/pause/hooks/use-companion-slot-ui-state';
 import { useCompanionSlotOrchestrateActions } from '@/screens/pause/hooks/use-companion-slot-orchestrate-actions';
@@ -47,7 +38,6 @@ export function useCompanionData({
   severityNumber,
 }: UseCompanionDataParams) {
   const { language } = useHolzen();
-  const queryClient = useQueryClient();
   const { toast } = useToast();
   const { favorites, toggleCompanionFavorite } = useCompanionLibraryFavorites(pauseInstanceId);
   const {
@@ -57,26 +47,7 @@ export function useCompanionData({
     requirePro,
     startCheckout,
   } = useCompanionAccess();
-
-  const completionQuery = useQuery(getCompanionUiCompletionQueryOptions(pauseInstanceId));
-  const completion = completionQuery.data ?? EMPTY_COMPANION_UI_COMPLETION;
-
-  const markCompleted = useCallback(
-    async (key: CompanionUiCompletionStep) => {
-      const id = pauseInstanceId;
-      if (!id) return;
-      const keyFull = companionUiCompletionQueryKey(id);
-      const snap =
-        queryClient.getQueryData<CompanionUiCompletionState>(keyFull) ??
-        completionQuery.data ??
-        EMPTY_COMPANION_UI_COMPLETION;
-      if (snap[key]) return;
-      queryClient.setQueryData<CompanionUiCompletionState>(keyFull, { ...snap, [key]: true });
-      hapticFeedback('light');
-      await persistCompanionUiStepCompletion(id, key);
-    },
-    [pauseInstanceId, queryClient, completionQuery.data],
-  );
+  const { completion, markCompleted } = useCompanionUiCompletion(pauseInstanceId);
 
   const [retryCount, setRetryCount] = useState(0);
 
