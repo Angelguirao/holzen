@@ -1,14 +1,13 @@
+import type { PauseSessionStepHandlersResult } from '@/features/pause/public-hooks';
 import { usePauseSessionScaffoldPresentation } from '@/screens/pause/hooks/use-pause-session-scaffold-presentation';
 import type { usePauseSessionProviders } from '@/screens/pause/hooks/use-pause-session-providers';
-import type { usePauseSessionStepHandlers } from '@/screens/pause/hooks/use-pause-session-step-handlers';
 
 type PauseSessionProviders = ReturnType<typeof usePauseSessionProviders>;
-type PauseSessionStepHandlers = ReturnType<typeof usePauseSessionStepHandlers>;
 
 /** Scaffold slots and ritual payloads for `PauseSessionScaffoldShell`. */
 export function usePauseSessionScaffoldVm(
   p: PauseSessionProviders,
-  step: PauseSessionStepHandlers,
+  step: PauseSessionStepHandlersResult,
 ) {
   const { mantra, btcData, trackedAssetId, prefersReducedMotion, breathSecondLabelVariant, t } = p;
   const { shell, ritual, mood, breath, reflect, toggleFavorite, handleFrameImDone, subscribed } =

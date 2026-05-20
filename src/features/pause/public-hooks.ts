@@ -145,3 +145,8 @@ export {
   type PauseSessionShellRitualProvidersSlice,
   type PauseSessionShellRitualResult,
 } from './presentation/use-pause-session-shell-ritual';
+export {
+  usePauseSessionStepHandlers,
+  type PauseSessionStepHandlersResult,
+} from './presentation/use-pause-session-step-handlers';
+export type { PauseSessionStepHandlersProvidersSlice } from './presentation/session/pause-session-step-handler-types';
