@@ -241,6 +241,11 @@ export {
   type PauseContextHomePreview,
 } from './application/use-cases/home/home-pause-card-body-props';
 export {
+  buildZenModeHomeRouteProps,
+  type BuildZenModeHomeRoutePropsInput,
+  type ZenModeHomeRoutePropsProjection,
+} from './application/use-cases/home/build-zen-mode-home-route-props';
+export {
   computePauseHeaderBackIntent,
   isPauseSessionHeaderBackVisible,
 } from './application/use-cases/session/header-back';

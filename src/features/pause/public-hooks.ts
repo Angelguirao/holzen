@@ -39,6 +39,11 @@ export {
   type UsePauseCardProjectionParams,
 } from './presentation/use-pause-card-projection';
 export {
+  useZenModeHomeRouteProps,
+  type BuildZenModeHomeRoutePropsInput,
+  type ZenModeHomeRoutePropsProjection,
+} from './presentation/use-zen-mode-home-route-props';
+export {
   usePauseReflectGeneration,
   type UsePauseReflectGenerationParams,
 } from './presentation/use-pause-reflect-generation';

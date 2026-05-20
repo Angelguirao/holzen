@@ -14,7 +14,12 @@ import { useHomeCompletedPauseCount } from '@/screens/home/hooks/use-home-comple
 import { useHomeOutletPauseReady } from '@/screens/home/hooks/use-home-outlet-pause-ready';
 import { useHomeDocumentTitle } from '@/screens/home/hooks/use-home-document-title';
 import { useHomeHeroQuoteViewed } from '@/screens/home/hooks/use-home-hero-quote-viewed';
-import { usePauseArrivalAudio } from '@/features/pause/public-hooks';
+import {
+  useHomePauseActions,
+  usePauseArrivalAudio,
+  usePauseContextHomePreviews,
+  useZenModeHomeRouteProps,
+} from '@/features/pause/public-hooks';
 import { useHomeMarketDisplayPreferences } from '@/screens/home/hooks/use-home-market-display-preferences';
 import { useState } from 'react';
 import { useOutletContext, useSearchParams, useNavigate, useLocation } from 'react-router-dom';
@@ -22,13 +27,10 @@ import { useAuth } from '@/features/auth/public';
 import { useHomeVisibleSections } from '@/screens/home/hooks/use-home-visible-sections';
 import { useHomeCustomizeBridge } from '@/screens/home/hooks/use-home-customize-bridge';
 import { useHomeMarketGoalHeaders } from '@/screens/home/hooks/use-home-market-goal-headers';
-import { useHomePauseActions } from '@/features/pause/public-hooks';
 import { useHomePauseCardProjection } from '@/screens/home/hooks/use-home-pause-card-projection';
 import { useHomeDashboardTodayWiring } from '@/screens/home/hooks/use-home-dashboard-today-wiring';
 import { getHomeSubscriptionGate } from '@/features/subscription/public';
-import { usePauseContextHomePreviews } from '@/features/pause/public-hooks';
 import { useHomePullFullReload } from '@/screens/home/hooks/use-home-pull-full-reload';
-import { useHomeZenModeRouteProps } from '@/screens/home/hooks/use-home-zen-route-props';
 import { useHomeDashboardLayoutProps } from '@/screens/home/hooks/use-home-dashboard-layout-props';
 import type { HomeAppLayoutOutletContext } from '@/screens/home/lib/home-app-layout-outlet';
 
@@ -216,7 +218,7 @@ const Home = () => {
     visibleOrderedSectionIds,
   );
 
-  const zenRouteProps = useHomeZenModeRouteProps({
+  const zenRouteProps = useZenModeHomeRouteProps({
     hasOpenPause,
     context,
     contextPreview: pauseContextHomePreview,
