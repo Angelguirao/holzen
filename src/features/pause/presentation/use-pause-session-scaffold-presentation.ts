@@ -7,7 +7,7 @@ import type { RitualDepth } from '@/features/pause/public-hooks';
 import type { PauseSessionScaffoldRitualPayloadsParams } from './session/scaffold-ritual-payloads';
 import { usePauseSessionDepthAndBriefCopy } from './use-pause-session-depth-and-brief-copy';
 import { usePauseSessionScaffoldRitual } from './use-pause-session-scaffold-ritual';
-import { usePauseSessionStepTransition } from './use-pause-session-step-transition';
+import { usePauseSessionStepTransition } from './session/use-pause-session-step-transition';
 
 export type UsePauseSessionScaffoldPresentationParams = Omit<
   PauseSessionScaffoldRitualPayloadsParams,

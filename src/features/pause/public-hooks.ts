@@ -376,7 +376,7 @@ export { usePauseSessionMoodChromeHandlers } from './presentation/reflect/use-pa
 export { usePauseSessionBreathReflectHandlers } from './presentation/reflect/use-pause-session-breath-reflect-handlers';
 export { usePauseSessionEntryPresentationEffects } from './presentation/session/use-pause-session-entry-presentation-effects';
 export { usePauseSessionTerminalEntryRedirect } from './presentation/session/use-pause-session-terminal-entry-redirect';
-export { usePauseSessionStepTransition } from './presentation/use-pause-session-step-transition';
+export { usePauseSessionStepTransition } from './presentation/session/use-pause-session-step-transition';
 export { usePauseSessionDepthAndBriefCopy } from './presentation/use-pause-session-depth-and-brief-copy';
 export {
   usePauseSessionScaffoldRitual,
