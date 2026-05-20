@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
+import { computeBreathingPhaseAdvance } from '@/features/pause/application/use-cases/breathing/phase-advance';
 import {
-  computeBreathingPhaseAdvance,
   playPauseBreathPatternCompleteCue,
   playPauseBreathPhaseCue,
   resolveBreathingCompleted,

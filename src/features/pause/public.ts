@@ -80,7 +80,6 @@ export {
 } from './infrastructure/session/persisted-session-storage';
 export {
   BOX_BREATH_PHASE_COUNT,
-  computeBreathingPhaseAdvance,
   resolveBreathingCompleted,
   resolveBreathingPhaseAdvanceOutcome,
   type BreathingPhaseAdvanceOutcome,
@@ -92,16 +91,6 @@ export {
   resolveTriangleKickerDisplay,
   type TriangleKickerDisplay,
 } from './application/use-cases/breathing/resolve-triangle-kicker-display';
-export {
-  STANDALONE_BREATHING_CYCLE_COUNT,
-  STANDALONE_BREATHING_PATTERNS,
-  resolveStandaloneBreathSeverityRingColors,
-  resolveSuggestedStandaloneBreathingPatternIndex,
-  type BreathingExerciseSeverity,
-  type StandaloneBreathingPattern,
-  type StandaloneBreathSeverityRingColors,
-  type StandaloneBreathingPhase,
-} from './application/use-cases/breathing/standalone-breathing-patterns';
 export {
   effectivePauseShiftIntensity,
   effectivePauseShiftMood,

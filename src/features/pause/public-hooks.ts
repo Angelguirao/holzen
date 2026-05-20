@@ -13,6 +13,17 @@ export type {
   ZoomOutOnThisDayEntry,
 } from './domain/zoom-out-display';
 export { resumePauseAudioContext } from './application/use-cases/breathing/ritual-audio';
+export { computeBreathingPhaseAdvance } from './application/use-cases/breathing/phase-advance';
+export {
+  STANDALONE_BREATHING_CYCLE_COUNT,
+  STANDALONE_BREATHING_PATTERNS,
+  resolveStandaloneBreathSeverityRingColors,
+  resolveSuggestedStandaloneBreathingPatternIndex,
+  type BreathingExerciseSeverity,
+  type StandaloneBreathingPattern,
+  type StandaloneBreathSeverityRingColors,
+  type StandaloneBreathingPhase,
+} from './application/use-cases/breathing/standalone-breathing-patterns';
 export type { PauseBreathingHandle } from './presentation/session/pause-breathing-handle';
 export type {
   PauseSessionBriefRitualBodyProps,

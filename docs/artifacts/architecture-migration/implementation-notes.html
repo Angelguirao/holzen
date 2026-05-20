@@ -1576,6 +1576,25 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-20</span>
+      <span>Phase A slice — peel standalone breathe helpers to public-hooks (§6)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>Standalone breathing + orb metrics → <code>public-hooks.ts</code></h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>reflect/</code> → <code>ritual/reflect/</code>) was already complete on this branch. Continue backlog #3 §6 slim barrel: screen-only standalone breathing patterns and <code>computeBreathingPhaseAdvance</code> for <code>BreathingExercise</code> export from <code>public-hooks.ts</code>; orb/kicker pure helpers stay on <code>public.ts</code> so <code>screens/pause/lib</code> unit tests avoid eager Supabase from the <code>public-hooks</code> barrel. Feature presentation keeps direct <code>application/use-cases/breathing/phase-advance</code> for timed-loop.</dd>
+      <dt>Deviation</dt>
+      <dd>None — same peel pattern as zoom-out types and session ritual props (May 2026).</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Did not colocate <code>application/use-cases/breathing/</code> under <code>ritual/breathe/</code> or move <code>session/ritual-depth-upgrade</code> under <code>ritual/brief/</code> in this commit.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: colocate <code>ritual-depth-upgrade</code> under <code>ritual/brief/</code>, peel more ritual-pattern exports off <code>public.ts</code>, or wire <code>persistCompanionUiStepCompletion</code> facade on <code>public-rpc</code>.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
 </body>
 </html>

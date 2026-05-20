@@ -9,7 +9,7 @@ import {
   resolveStandaloneBreathSeverityRingColors,
   resolveSuggestedStandaloneBreathingPatternIndex,
   type BreathingExerciseSeverity,
-} from '@/features/pause/public';
+} from '@/features/pause/public-hooks';
 import { BreathingExerciseOverlay } from '@/screens/pause/components/breathing-exercise-overlay';
 
 interface Props {
