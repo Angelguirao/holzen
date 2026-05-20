@@ -2699,6 +2699,25 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-20</span>
+      <span>Phase A slice — colocate breath segment RPC loggers in presentation/session/</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>Backlog #1 complete; Tier 4 session conductor grouping</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd><code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code> was already complete on <code>cursor/arch-migrate-src-ca70</code>. Pending-offer adopt/decline already wired via <code>application/use-cases/pending-offer/</code> on remote — no duplicate slice. Move <code>use-pause-breath-segment-rpc-loggers</code> (+ test) beside other session hooks under <code>presentation/session/</code>; <code>public-hooks</code> re-export path only.</dd>
+      <dt>Deviation</dt>
+      <dd>None — matches §3.2 / §10.1 session grouping after navigation peel.</dd>
+      <dt>Tradeoffs</dt>
+      <dd><code>use-pause-session-breath-handlers</code> remains flat until a later peel bundles breath UI + RPC conductors.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: colocate shell bootstrap + step-handler cluster under <code>presentation/session/</code>, or wire companion feedback vote through a port-backed use case (backlog #4 remainder).</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
 </body>
 </html>
