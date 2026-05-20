@@ -1,7 +1,7 @@
 import type { InterventionState } from '@/features/pause/domain/companion-orchestrate';
 import { trackCompanionServed } from '@/features/pause/application/use-cases/ritual/frame/companion-generation-telemetry';
 import type { ParsedPauseArtifactCache } from '@/features/pause/application/use-cases/ritual/frame/artifact-cache-parse';
-import type { CompanionSlotCommitters } from '@/features/pause/application/use-cases/companion/orchestrate-slot-apply';
+import type { CompanionSlotCommitters } from '@/features/pause/application/use-cases/ritual/frame/orchestrate-slot-apply';
 import {
   toZoomOutDisplayData,
   zoomOutLibraryAutosaveFromDisplayData,

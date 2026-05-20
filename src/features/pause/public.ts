@@ -488,7 +488,7 @@ export {
 export {
   hydrateCompanionSlotsFromArtifactCache,
   type HydrateCompanionSlotsFromArtifactCacheResult,
-} from './application/use-cases/companion/hydrate-companion-slots-from-artifact-cache';
+} from './application/use-cases/ritual/frame/hydrate-companion-slots-from-artifact-cache';
 export {
   buildPauseSessionScaffoldRitualPayloads,
   type PauseSessionScaffoldRitualPayloadsParams,
