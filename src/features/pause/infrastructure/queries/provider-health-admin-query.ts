@@ -1,5 +1,7 @@
 import { supabase } from '@/integrations/supabase/client';
-import { ADMIN_QUERY_PREFIX } from '@/screens/admin/lib/admin-query-namespace';
+
+/** Matches `screens/admin/lib/admin-query-namespace` — keep in sync if the prefix changes. */
+const ADMIN_QUERY_PREFIX = ['admin'] as const;
 
 export type Provider = 'perplexity' | 'lovable';
 
