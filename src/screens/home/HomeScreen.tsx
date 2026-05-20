@@ -10,11 +10,11 @@ import { useHomeOptionalVisibility } from '@/screens/home/hooks/use-home-optiona
 import { HOME_WIDGET_DEFAULT_ORDER } from '@/screens/home/lib/home-section-visibility-constants';
 import { useHomeCheckoutWelcomeToast } from '@/screens/home/hooks/use-home-checkout-welcome-toast';
 import { useHomeZenMode } from '@/screens/home/hooks/use-home-zen-mode';
-import { useHomeCompletedPauseCount } from '@/screens/home/hooks/use-home-completed-pause-count';
-import { useHomeOutletPauseReady } from '@/screens/home/hooks/use-home-outlet-pause-ready';
 import { useHomeDocumentTitle } from '@/screens/home/hooks/use-home-document-title';
 import { useHomeHeroQuoteViewed } from '@/screens/home/hooks/use-home-hero-quote-viewed';
 import {
+  useCompletedPauseCount,
+  useDismissOutletPauseReady,
   useHomePauseActions,
   usePauseArrivalAudio,
   usePauseContextHomePreviews,
@@ -94,7 +94,7 @@ const Home = () => {
   const outletCtx = useOutletContext<HomeAppLayoutOutletContext>();
   const pauseReady = outletCtx?.pauseReady ?? false;
   const dismissPauseReady = outletCtx?.dismissPauseReady;
-  useHomeOutletPauseReady(pauseReady, hasOpenPause, dismissPauseReady);
+  useDismissOutletPauseReady(pauseReady, hasOpenPause, dismissPauseReady);
   useHomeHeroQuoteViewed(profileLoaded, user?.id);
   usePauseArrivalAudio(newPauseArrival, lastPauseInstanceId, clearNewPauseArrival);
 
@@ -109,7 +109,7 @@ const Home = () => {
   } = useHomeMarketDisplayPreferences();
   const unitBasisModeSupported = trackedAssetId === 'bitcoin';
   const { zenMode, setZenModePersist } = useHomeZenMode(pathname);
-  const completedPauseCount = useHomeCompletedPauseCount(user);
+  const completedPauseCount = useCompletedPauseCount() ?? 0;
   const pauseContextHomePreview = usePauseContextHomePreviews(context);
 
   const [goalWhyHoldSummary, setGoalWhyHoldSummary] = useState<string | null>(null);

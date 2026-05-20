@@ -253,16 +253,16 @@ const Home = () => {
 
 ### Step 4 — Layout outlet + “always on” home behaviors
 
-```85:90:src/screens/home/HomeScreen.tsx
+```94:99:src/screens/home/HomeScreen.tsx
   const outletCtx = useOutletContext<HomeAppLayoutOutletContext>();
   const pauseReady = outletCtx?.pauseReady ?? false;
   const dismissPauseReady = outletCtx?.dismissPauseReady;
-  useHomeOutletPauseReady(pauseReady, message, loading, refreshProfile, dismissPauseReady);
+  useDismissOutletPauseReady(pauseReady, hasOpenPause, dismissPauseReady);
   useHomeHeroQuoteViewed(profileLoaded, user?.id);
-  useHomePauseAudio(newPauseArrival, message, clearNewPauseArrival);
+  usePauseArrivalAudio(newPauseArrival, lastPauseInstanceId, clearNewPauseArrival);
 ```
 
-**What to notice:** **`useOutletContext`** reads data from a **parent route layout** ([`AppLayout`](../../src/app/components/AppLayout.tsx)). The typed shape lives in [`src/lib/home-app-layout-outlet.ts`](../../src/lib/home-app-layout-outlet.ts). The following lines are small **effect-style** hooks (analytics, audio).
+**What to notice:** **`useOutletContext`** reads data from a **parent route layout** ([`AppLayout`](../../src/app/components/AppLayout.tsx)). The typed shape lives in [`src/screens/home/lib/home-app-layout-outlet.ts`](../../src/screens/home/lib/home-app-layout-outlet.ts). `useDismissOutletPauseReady` is exported from `@/features/pause/public-hooks`. The following lines are small **effect-style** hooks (analytics, audio).
 
 ---
 
