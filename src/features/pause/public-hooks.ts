@@ -10,6 +10,11 @@ export {
   briefIntegrateRemainingProgress,
   briefIntegrateRingDashOffset,
 } from './application/use-cases/ritual/brief/brief-integrate-timer';
+export {
+  formatPauseOpenMaxRemaining,
+  pauseOpenMaxDeadlineMs,
+  PAUSE_OPEN_MAX_AGE_MS,
+} from './application/use-cases/session/open-max-countdown';
 export { PAUSE_FEEL_STEP_TILE_ROWS } from './domain/pause-feel-step-tiles';
 export {
   PAUSE_FEEL_INTENSITY_KEYS,

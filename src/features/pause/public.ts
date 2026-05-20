@@ -297,11 +297,6 @@ export {
 export { initialEmotionResetUi } from './application/use-cases/ritual/feel/run-initial-emotion-log';
 export type { InitialEmotionUiState } from './application/use-cases/ritual/feel/run-initial-emotion-log';
 export {
-  formatPauseOpenMaxRemaining,
-  pauseOpenMaxDeadlineMs,
-  PAUSE_OPEN_MAX_AGE_MS,
-} from './application/use-cases/session/open-max-countdown';
-export {
   collectStepTypes,
   computePauseState,
   countedCompanionCount,

@@ -1709,6 +1709,25 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-20</span>
+      <span>Phase A slice — peel open-max countdown from public.ts (§6)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3><code>open-max-countdown</code> → <code>public-hooks</code></h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>reflect/</code> → <code>ritual/reflect/</code>) was already complete on this branch. Continue backlog #3 §6 slim barrel: <code>formatPauseOpenMaxRemaining</code>, <code>pauseOpenMaxDeadlineMs</code>, and <code>PAUSE_OPEN_MAX_AGE_MS</code> export from <code>public-hooks.ts</code>; <code>PauseEngagedOpenMaxCountdown</code> imports alongside other screen-facing presentation helpers.</dd>
+      <dt>Deviation</dt>
+      <dd>None — same pattern as brief-integrate ring and timed-loop breath peels (May 2026).</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Orb/kicker metrics and ritual-pattern exports remain on <code>public.ts</code> for screen/lib consumers.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: peel ritual-pattern screen imports to <code>public-hooks</code>, wire <code>persistCompanionUiStepCompletion</code> on <code>public-rpc</code> (backlog #4), or colocate <code>application/use-cases/breathing/</code> under <code>ritual/breathe/</code>.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
 </body>
 </html>
