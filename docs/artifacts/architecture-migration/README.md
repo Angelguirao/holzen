@@ -39,7 +39,7 @@ Index + full-`src` rings: [client-architecture-overview.md](../../fundamentals/c
 - [x] Collections strip → `src/legacy/archive-collections/` (spec §7)
 - [x] Move `application/use-cases/reflect/*` → `ritual/reflect/` (incremental)
 - [x] Move `application/use-cases/companion/*` → `ritual/frame/` (incremental)
-- [ ] Peel `public.ts` toward slim target + `public-rpc` (spec §6)
+- [x] Peel `public.ts` toward slim target + `public-rpc` (spec §6) — active tree done; legacy stats re-exports remain
 - [ ] Route remaining pause mutations through `PauseRepository` port (exists — wire call sites; spec §5, §8)
 - [x] Group archive queries under `infrastructure/queries/archive/` (spec §5.2)
 

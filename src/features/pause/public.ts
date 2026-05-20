@@ -4,18 +4,20 @@
  * domain / use-case modules directly. RPC: `public-rpc`. Hooks: `public-hooks`.
  */
 export type { NotificationNavigateState } from './application/use-cases/session/location-state';
+
+export type { PersistedSession } from './domain/session-model';
+
 export {
   effectivePauseShiftIntensity,
   effectivePauseShiftMood,
   hasPauseShiftOrPostEmotion,
   type PauseEmotionFields,
 } from './domain/effective-emotion';
-export {
-  type PauseCompanionEventRow,
-  type PauseCompanionNonCountingReason,
-  type PauseExpiredReason,
-  type PauseState,
-  type PauseStepEventRow,
-  type PauseStepType,
+export type {
+  PauseCompanionEventRow,
+  PauseCompanionNonCountingReason,
+  PauseExpiredReason,
+  PauseState,
+  PauseStepEventRow,
+  PauseStepType,
 } from './domain/pause-state';
-export type { PersistedSession } from './domain/session-model';
