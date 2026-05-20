@@ -60,3 +60,4 @@ export {
   useCompanionOrchestration,
   type UseCompanionOrchestrationParams,
 } from './presentation/use-companion-orchestration';
+export { useCompanionData, type UseCompanionDataParams } from './presentation/use-companion-data';

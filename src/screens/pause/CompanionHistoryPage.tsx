@@ -2,7 +2,7 @@ import { useCallback, useEffect, useMemo } from 'react';
 import { useNavigate, useParams, useLocation, Navigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useHolzen } from '@/screens/home/hooks/use-holzen';
-import { useCompanionData } from '@/screens/pause/hooks/use-companion-data';
+import { useCompanionData } from '@/features/pause/public-hooks';
 import { usePauseSessionCompanionSnapshot } from '@/screens/pause/hooks/use-pause-session-companion-snapshot';
 import { HistoricalInsightDisplay } from '@/screens/pause/components/HistoricalInsightDisplay';
 import { CompanionFeedback } from '@/screens/pause/components/CompanionFeedback';

@@ -1,12 +1,10 @@
-import { useHolzen } from '@/screens/home/hooks/use-holzen';
 import type { CompanionData, CompanionPrefs } from '@/features/pause/public';
-import {
-  useCompanionAccess,
-  useCompanionLibraryFavorites,
-  useCompanionOrchestration,
-  useCompanionUiCompletion,
-} from '@/features/pause/public-hooks';
+import { useProfile } from '@/features/user/public-hooks';
 import { useToast } from '@/components/ui/use-toast';
+import { useCompanionAccess } from './use-companion-access';
+import { useCompanionLibraryFavorites } from './use-companion-library-favorites';
+import { useCompanionOrchestration } from './use-companion-orchestration';
+import { useCompanionUiCompletion } from './use-companion-ui-completion';
 
 export type {
   RegenerateCompanionSlot,
@@ -15,7 +13,7 @@ export type {
   InterventionState,
 } from '@/features/pause/public';
 
-interface UseCompanionDataParams {
+export interface UseCompanionDataParams {
   companions: CompanionData;
   prefs: CompanionPrefs;
   pauseInstanceId?: string | null;
@@ -35,7 +33,7 @@ export function useCompanionData({
   mood,
   severityNumber,
 }: UseCompanionDataParams) {
-  const { language } = useHolzen();
+  const { language } = useProfile();
   const { toast } = useToast();
   const { favorites, toggleCompanionFavorite } = useCompanionLibraryFavorites(pauseInstanceId);
   const access = useCompanionAccess();
