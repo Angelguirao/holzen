@@ -1,4 +1,5 @@
-import type { PendingPauseOfferRow } from '@/features/pause/public-queries';
+import { getPendingPauseOfferDisplay } from '@/features/pause/public';
+import type { PendingPauseOfferRow } from '@/features/pause/public-hooks';
 import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sheet';
 import { useTranslation } from 'react-i18next';
@@ -33,12 +34,7 @@ export function PauseLeaveWithPendingSheet({
 }: PauseLeaveWithPendingSheetProps) {
   const { t } = useTranslation();
 
-  const preview = pending?.preview_message?.trim();
-  const ctx =
-    pending?.context_snapshot && typeof pending.context_snapshot.context_text === 'string'
-      ? (pending.context_snapshot.context_text as string)
-      : null;
-  const showPreviewLine = Boolean(preview && preview !== ctx?.trim());
+  const { contextText, previewMessage, showPreviewLine } = getPendingPauseOfferDisplay(pending);
 
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
@@ -58,10 +54,12 @@ export function PauseLeaveWithPendingSheet({
                 'A new pause is ready for the latest move. You can stay in this ritual, leave this screen, switch to a short brief pause, or open the new pause.',
             })}
           </p>
-          {ctx ? (
-            <p className="rounded-md border border-border/60 bg-muted/30 px-3 py-2 text-xs text-foreground/90">{ctx}</p>
+          {contextText ? (
+            <p className="rounded-md border border-border/60 bg-muted/30 px-3 py-2 text-xs text-foreground/90">{contextText}</p>
           ) : null}
-          {showPreviewLine ? <p className="line-clamp-4 text-xs leading-relaxed text-foreground/85">{preview}</p> : null}
+          {showPreviewLine && previewMessage ? (
+            <p className="line-clamp-4 text-xs leading-relaxed text-foreground/85">{previewMessage}</p>
+          ) : null}
         </div>
         <div className="mt-6 flex flex-col gap-2">
           <Button type="button" disabled={busy} className="w-full" onClick={onStay}>
