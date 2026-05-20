@@ -1,7 +1,8 @@
 import { useTranslation } from 'react-i18next';
 import { MoodIcon } from '@/components/icons/MoodIcon';
 import type { MoodValue } from '@/features/pause/public';
-import { PAUSE_FEEL_STEP_TILE_ROWS, type FeelStepTile } from '@/features/pause/public';
+import type { FeelStepTile } from '@/features/pause/public';
+import { PAUSE_FEEL_STEP_TILE_ROWS } from '@/features/pause/public-hooks';
 import { cn } from '@/lib/utils';
 
 export type PauseRitualFeelTileGridProps = {
