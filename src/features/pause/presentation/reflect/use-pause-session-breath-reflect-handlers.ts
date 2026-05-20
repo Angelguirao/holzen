@@ -1,5 +1,5 @@
 import { usePauseShiftFrameDoneHandler } from '../use-pause-shift-frame-done-handler';
-import { usePauseSessionBreathHandlers } from '../use-pause-session-breath-handlers';
+import { usePauseSessionBreathHandlers } from '../session/use-pause-session-breath-handlers';
 import { usePauseSessionReflectAndDecide } from './use-pause-session-reflect-and-decide';
 import type {
   PauseSessionBreathReflectMoodSlice,
