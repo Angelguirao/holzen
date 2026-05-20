@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { pauseArchiveRowAllowsRetrospectiveOutcome } from '@/features/pause/public';
+import { pauseArchiveRowAllowsRetrospectiveOutcome } from './retrospective-outcome';
 import type { PauseArchiveRow } from '@/features/pause/public-queries';
 
 function row(partial: Partial<PauseArchiveRow>): PauseArchiveRow {

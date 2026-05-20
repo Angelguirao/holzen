@@ -148,6 +148,7 @@ export {
   type PauseArchiveSegment,
   type UsePauseArchiveListOptions,
 } from './presentation/archive/use-pause-archive-list';
+export { pauseArchiveRowAllowsRetrospectiveOutcome } from './application/use-cases/archive/retrospective-outcome';
 export { getArchivePausesTabHasRowsQueryOptions } from './public-queries';
 export {
   useArchivePauseRetrospectiveOutcome,

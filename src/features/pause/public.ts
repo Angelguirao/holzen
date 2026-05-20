@@ -3,7 +3,6 @@
  * RPC mutations: `@/features/pause/public-rpc`.
  */
 export { pauseCreateSkippedUserMessage } from './application/use-cases/create-skipped-message';
-export { pauseArchiveRowAllowsRetrospectiveOutcome } from './application/use-cases/archive/retrospective-outcome';
 export { buildOutcomeLoggedPayload } from './application/use-cases/ritual/decide/outcome-log-payload';
 export {
   computeBriefRitualGoBack,
@@ -236,10 +235,3 @@ export {
   type PauseInstanceArchiveMetaGetter,
 } from './domain/archive-segment';
 export { getSessionQuote } from './application/use-cases/session/wisdom-quotes';
-export { librarySourceLabel } from './domain/library-source-label';
-export {
-  isMainPauseLibraryBookmark,
-  isPauseLibraryNote,
-  normalizeLibrarySourceType,
-} from './domain/normalize-library-source-type';
-export { normalizeLibraryItemUrl } from './domain/library-item-url';
