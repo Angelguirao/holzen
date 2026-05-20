@@ -187,6 +187,7 @@ export {
   companionLibraryFavoritesQueryKey,
   fetchCompanionLibraryFavorites,
   getCompanionLibraryFavoritesQueryOptions,
+  toggleCompanionLibraryFavorite,
 } from './infrastructure/queries/companion-library-favorites-query';
 export {
   fetchParsedPauseArtifactCache,
