@@ -2638,7 +2638,26 @@
       <dt>Tradeoffs</dt>
       <dd>Decline use case maps thrown RPC errors to <code>status: 'failed'</code> so the hook can toast without parsing Supabase errors.</dd>
       <dt>Open questions</dt>
-      <dd>Next: move <code>NotificationNavigateState</code> to notifications-facing types, or wire <code>pauseLogCompanion</code> analytics through a port-backed use case.</dd>
+      <dd>Next: wire <code>pauseLogCompanion</code> analytics through a port-backed use case (navigation peel landed in a follow-up slice).</dd>
+    </dl>
+  </article>
+
+  <article class="note">
+    <header>
+      <span>2026-05-20</span>
+      <span>Phase A slice — reflect backlog #1 verified; peel navigation off public.ts (§6)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>Backlog #1 complete on branch; backlog #3 navigation barrel</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd><code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code> was already complete on <code>cursor/arch-migrate-src-ca70</code> (no legacy path; automation push was §6 peel). Add <code>public-navigation.ts</code> for cross-context pause deep-link router types; <code>NotificationBell</code> imports it instead of <code>public.ts</code>. Domain/session aggregates stay on <code>public.ts</code> for legacy stats.</dd>
+      <dt>Deviation</dt>
+      <dd>None — fifth <code>public*</code> barrel documented in §6 (navigation-only, no Supabase).</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Notifications still depend on pause types for <code>/pause</code> action_state; a shared app-level nav type module is deferred until a second consumer appears.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: backlog #4 wire <code>pauseLogCompanion</code> / lifecycle RPC facades through use-case layer, or peel remaining domain-only exports from <code>public.ts</code> after legacy stats strip.</dd>
     </dl>
   </article>
 

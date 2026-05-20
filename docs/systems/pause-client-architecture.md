@@ -186,6 +186,7 @@ Shared reads live in `infrastructure/queries/`, exported via **`public-queries`*
 | Barrel | Purpose |
 |--------|---------|
 | `public.ts` | Types, constants, pure formatters — **no eager Supabase** |
+| `public-navigation.ts` | Router state for pause deep links (`NotificationNavigateState`, `parsePauseSessionLocationState`) |
 | `public-queries.ts` | `get*QueryOptions` factories |
 | `public-hooks.ts` | Screen-facing conductors |
 | `public-rpc.ts` | Wired mutations and edge invoke facades |
