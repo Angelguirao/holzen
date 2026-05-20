@@ -44,3 +44,11 @@ export {
   useCompanionSlotOrchestrateFailurePorts,
   type UseCompanionSlotOrchestrateFailurePortsParams,
 } from './presentation/use-companion-slot-orchestrate-failure-ports';
+export {
+  useCompanionInterventionBootstrap,
+  type UseCompanionInterventionBootstrapParams,
+} from './presentation/use-companion-intervention-bootstrap';
+export {
+  useCompanionSlotRunOrchestrate,
+  type UseCompanionSlotRunOrchestrateParams,
+} from './presentation/use-companion-slot-run-orchestrate';

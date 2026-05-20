@@ -7,7 +7,7 @@ import type {
 } from '@/features/pause/public';
 import { useCompanionSlotOrchestratePorts } from '@/features/pause/public-hooks';
 import { useCompanionSlotOrchestrateFailurePorts } from '@/features/pause/public-hooks';
-import { useCompanionSlotRunOrchestrate } from '@/screens/pause/hooks/use-companion-slot-run-orchestrate';
+import { useCompanionSlotRunOrchestrate } from '@/features/pause/public-hooks';
 
 export interface UseCompanionSlotOrchestrateActionsParams {
   pauseInstanceId?: string | null;
