@@ -15,7 +15,7 @@ import {
   PROVIDER_HEALTH_MIN_SAMPLE,
   PROVIDER_HEALTH_WINDOW_MINUTES,
   getProviderHealthQueryOptions,
-} from '@/features/pause/public-queries';
+} from '@/screens/admin/public-queries';
 
 export function ProviderHealthCard() {
   const { data: stats, isPending: loading } = useQuery(getProviderHealthQueryOptions());

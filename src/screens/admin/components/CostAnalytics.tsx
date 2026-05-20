@@ -35,7 +35,7 @@ import {
   type AdminCostAttemptRow as AttemptRow,
   type MrrSnapshot,
   type TimePeriod,
-} from '@/features/pause/public-queries';
+} from '@/screens/admin/public-queries';
 import { ProviderHealthCard } from '@/screens/admin/components/ProviderHealthCard';
 
 /** All AI features we expect to see logging in `generation_attempts`. */

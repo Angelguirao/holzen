@@ -22,7 +22,7 @@ import { CostAnalytics } from '@/screens/admin/components/CostAnalytics';
 import {
   deleteCompanionCacheRowsByIds,
   deleteGenerationAttemptRowsByIds,
-} from '@/features/pause/public-queries';
+} from '@/screens/admin/public-queries';
 
 function computeTrend(current: number, previous: number | null, invertColor: boolean): TrendInfo | undefined {
   if (previous === null || previous === undefined) return undefined;

@@ -14,7 +14,7 @@ import {
   updateCompanionFallbackPayload,
   type CompanionFallbackRow,
   type FallbackPoolType,
-} from '@/features/pause/public-queries';
+} from '@/screens/admin/public-queries';
 import { Button } from '@/components/ui/button';
 import {
   Dialog,

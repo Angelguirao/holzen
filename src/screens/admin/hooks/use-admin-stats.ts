@@ -22,7 +22,7 @@ import {
   type SessionRow,
   type SignalSourceRow,
   type TimePeriod,
-} from '@/features/pause/public-queries';
+} from '@/screens/admin/public-queries';
 
 export type {
   AdminStatsBundle,
@@ -36,11 +36,11 @@ export type {
   RejectionRow,
   SessionRow,
   SignalSourceRow,
-} from '@/features/pause/public-queries';
+} from '@/screens/admin/public-queries';
 
-export { ADMIN_STATS_QUERY_KEY } from '@/features/pause/public-queries';
+export { ADMIN_STATS_QUERY_KEY } from '@/screens/admin/public-queries';
 
-export type { TimePeriod } from '@/features/pause/public-queries';
+export type { TimePeriod } from '@/screens/admin/public-queries';
 
 export interface PeriodStats {
   serves: number;
