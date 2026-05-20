@@ -26,11 +26,6 @@ export {
   type BulkHoldReviewSection,
 } from './domain/bulk-hold';
 export {
-  resolvePauseBreathSecondLabelVariant,
-  viteWantsPauseBreathSecondLabelShift,
-  type PauseBreathSecondLabelVariant,
-} from './application/use-cases/breathing/breath-second-label-variant';
-export {
   BRIEF_PAUSE_ORDER,
   computeBriefMacroProgressPosition,
 } from './domain/brief-ritual-steps';

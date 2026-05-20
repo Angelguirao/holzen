@@ -1,6 +1,7 @@
 import type { ReactNode } from 'react';
 import type { TFunction } from 'i18next';
-import type { BtcPriceData, PauseBreathSecondLabelVariant } from '@/features/pause/public';
+import type { BtcPriceData } from '@/features/pause/public';
+import type { PauseBreathSecondLabelVariant } from '@/features/pause/application/use-cases/breathing/breath-second-label-variant';
 import type { PauseSessionStepHandlersProvidersSlice } from './pause-session-step-handler-types';
 
 /** Provider fields for scaffold VM (subset of `usePauseSessionProviders`). */
