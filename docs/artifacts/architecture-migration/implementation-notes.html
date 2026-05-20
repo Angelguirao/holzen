@@ -3079,6 +3079,25 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-20</span>
+      <span>Phase A slice — colocate reflect step-log use cases under ritual/reflect/steps/</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>Backlog #1 increment — reflect note/tag/reflection_step cluster</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>After <code>generation/</code>, group reflect ritual step logging (<code>run-pause-reflect-note-update</code>, <code>run-pause-reflect-tag-update</code>, <code>run-pause-reflection-step-log</code> + tests) under <code>ritual/reflect/steps/</code>; <code>public-rpc</code>, presentation, and <code>reflection-step-session-storage</code> import paths only.</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior-preserving <code>git mv</code>; RPC step types unchanged.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Telemetry, decide flow, frame focus, and favorite toggle remain at <code>ritual/reflect/</code> root until a later subfolder slice.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: colocate reflect telemetry/decide-flow subfolders, or colocate entry presentation effects + brief→deep under <code>presentation/session/</code>.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
 </body>
 </html>
