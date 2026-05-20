@@ -1,7 +1,7 @@
 import type { usePauseSessionProviders } from '@/screens/pause/hooks/use-pause-session-providers';
 import type { PauseSessionShellRitualResult } from '@/features/pause/public-hooks';
 import { usePauseSessionScaffoldVm } from '@/screens/pause/hooks/use-pause-session-scaffold-vm';
-import { usePauseSessionStepHandlers } from '@/screens/pause/hooks/use-pause-session-step-handlers';
+import { usePauseSessionStepHandlers } from '@/features/pause/public-hooks';
 
 type PauseSessionProviders = ReturnType<typeof usePauseSessionProviders>;
 

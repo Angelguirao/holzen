@@ -111,3 +111,7 @@ export type PauseSessionBreathReflectRitualSlice = {
 export type PauseSessionBreathReflectMoodSlice = {
   lastShiftLogKeyRef: MutableRefObject<string | null>;
 };
+
+/** Provider fields for mood + breath/reflect step handlers (subset of `usePauseSessionProviders`). */
+export type PauseSessionStepHandlersProvidersSlice = PauseSessionMoodChromeProvidersSlice &
+  PauseSessionBreathReflectProvidersSlice;
