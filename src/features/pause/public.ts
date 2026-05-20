@@ -357,7 +357,17 @@ export {
   runPostPauseEmotionLogIfDirty,
   type PostPauseFeelSnapshot,
 } from './application/use-cases/session/post-pause-emotion-log';
-export { buildPauseScoreImpacts } from './application/use-cases/score-impacts';
+export {
+  buildPauseScoreImpacts,
+  type PauseScoreImpactRow,
+} from './application/use-cases/score-impacts';
+export {
+  resolveScoreImpactDisplayImpacts,
+  resolveScoreImpactViewMode,
+  scoreImpactMotionDelaySec,
+  type ScoreImpactVariant,
+  type ScoreImpactViewMode,
+} from './application/use-cases/score-impact-presentation';
 export {
   breathCompletedSegment1Payload,
   breathCompletedSegment2Payload,

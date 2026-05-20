@@ -1,10 +1,16 @@
 import { useMemo } from 'react';
 import { motion } from 'framer-motion';
-import { TrendingUp, Minus } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { cn } from '@/lib/utils';
 import type { PauseImpactData } from '@/features/pause/public';
-import { buildPauseScoreImpacts } from '@/features/pause/public';
+import {
+  buildPauseScoreImpacts,
+  resolveScoreImpactDisplayImpacts,
+  resolveScoreImpactViewMode,
+  scoreImpactMotionDelaySec,
+} from '@/features/pause/public';
+import { ScoreImpactBriefEmpty } from '@/screens/pause/components/score-impact-brief-empty';
+import { ScoreImpactRowList } from '@/screens/pause/components/score-impact-row-list';
 
 export function ScoreImpact({
   data,
@@ -22,51 +28,36 @@ export function ScoreImpact({
 }) {
   const { t } = useTranslation();
 
-  const impacts = useMemo(
-    () => buildPauseScoreImpacts(data, t, variant),
-    [data, t, variant],
+  const impacts = useMemo(() => buildPauseScoreImpacts(data, t, variant), [data, t, variant]);
+  const displayImpacts = useMemo(
+    () => resolveScoreImpactDisplayImpacts(impacts, excludeFirstFromList),
+    [impacts, excludeFirstFromList],
   );
-
-  const sliced = excludeFirstFromList ? impacts.slice(1) : impacts;
-  /** Brief uses the same qualitative rows as default — no illustrative +N chips (see brief done + `computePauseScore` preview). */
-  const displayImpacts = sliced;
-
-  const motionDelay = variant === 'brief' ? 0.25 : 0.8;
-
-  if (impacts.length === 0 && variant !== 'brief') return null;
+  const viewMode = useMemo(
+    () => resolveScoreImpactViewMode({ impacts, variant, excludeFirstFromList }),
+    [impacts, variant, excludeFirstFromList],
+  );
+  const motionDelay = scoreImpactMotionDelaySec(variant);
 
   const title =
     variant === 'brief'
       ? t('pause.brief.done.contributionTitle', { defaultValue: 'How this pause contributes' })
       : t('scoreImpact.title', { defaultValue: 'Score impact' });
 
-  if (impacts.length === 0 && variant === 'brief') {
+  if (viewMode === 'hidden') return null;
+
+  if (viewMode === 'brief_empty') {
     return (
-      <motion.div
-        initial={{ opacity: 0, y: 8 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: motionDelay, duration: 0.45 }}
-        className={cn('w-full space-y-2', className)}
-      >
-        {!hideTitle ? (
-          <p className="text-center text-xs font-medium uppercase tracking-wide text-muted-foreground">{title}</p>
-        ) : null}
-        <p className="text-center text-sm leading-relaxed text-muted-foreground">
-          {t('pause.brief.done.contributionFallback', {
-            defaultValue: 'This pause is now part of your Journey.',
-          })}
-        </p>
-      </motion.div>
+      <ScoreImpactBriefEmpty
+        title={title}
+        motionDelay={motionDelay}
+        hideTitle={hideTitle}
+        className={className}
+      />
     );
   }
 
-  if (variant === 'brief' && excludeFirstFromList && impacts.length > 0 && displayImpacts.length === 0) {
-    return null;
-  }
-
-  if (variant === 'brief' && displayImpacts.length === 0) {
-    return null;
-  }
+  if (viewMode === 'brief_hidden') return null;
 
   return (
     <motion.div
@@ -78,21 +69,7 @@ export function ScoreImpact({
       {!hideTitle ? (
         <p className="text-center text-xs font-medium uppercase tracking-wide text-muted-foreground">{title}</p>
       ) : null}
-      <div className="space-y-2.5">
-        {displayImpacts.map((imp) => (
-          <div key={imp.key} className="flex items-start gap-2.5">
-            {imp.direction === 'up' ? (
-              <TrendingUp className="mt-0.5 h-4 w-4 shrink-0 text-nox-accent-green" />
-            ) : (
-              <Minus className="mt-0.5 h-4 w-4 shrink-0 text-muted-foreground" />
-            )}
-            <div className="min-w-0 flex-1 text-left text-sm leading-snug">
-              <span className="font-medium text-foreground">{imp.label}</span>
-              <span className="text-muted-foreground"> — {imp.reason}</span>
-            </div>
-          </div>
-        ))}
-      </div>
+      <ScoreImpactRowList impacts={displayImpacts} />
     </motion.div>
   );
 }
