@@ -136,6 +136,16 @@ export {
 } from './application/use-cases/breathing/phase-advance';
 export { resolveBreathOrbVisualMetrics } from './application/use-cases/breathing/pause-breath-orb-metrics';
 export {
+  STANDALONE_BREATHING_CYCLE_COUNT,
+  STANDALONE_BREATHING_PATTERNS,
+  resolveStandaloneBreathSeverityRingColors,
+  resolveSuggestedStandaloneBreathingPatternIndex,
+  type BreathingExerciseSeverity,
+  type StandaloneBreathingPattern,
+  type StandaloneBreathSeverityRingColors,
+  type StandaloneBreathingPhase,
+} from './application/use-cases/breathing/standalone-breathing-patterns';
+export {
   effectivePauseShiftIntensity,
   effectivePauseShiftMood,
   hasPauseShiftOrPostEmotion,
