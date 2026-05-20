@@ -13,15 +13,12 @@ import {
   setCompanionSlotError,
   setCompanionSlotLoading,
   tryApplyOrchestrateSlotFromBody,
-  buildCompanionOrchestrateSessionFromRitual,
   type CompanionSlotCacheIds,
   type CompanionSlotCommitters,
   type CompanionSlotRelaxations,
 } from '@/features/pause/public';
-import {
-  loadActiveOrchestrateSources,
-  loadMoodHistoryForOrchestrate,
-} from '@/features/pause/public-queries';
+import { loadActiveOrchestrateSources } from '@/features/pause/public-queries';
+import { useCompanionOrchestrateSession } from '@/screens/pause/hooks/use-companion-orchestrate-session';
 
 export interface UseCompanionSlotOrchestrateActionsParams {
   pauseInstanceId?: string | null;
@@ -91,19 +88,14 @@ export function useCompanionSlotOrchestrateActions({
     [],
   );
 
-  const buildOrchestrateSession = useCallback(async () => {
-    if (!pauseInstanceId) return null;
-    const moodHistory = await loadMoodHistoryForOrchestrate();
-    return buildCompanionOrchestrateSessionFromRitual({
-      pauseInstanceId,
-      context,
-      language,
-      reflectionMessage,
-      mood,
-      severityNumber,
-      moodHistory,
-    });
-  }, [pauseInstanceId, context, language, reflectionMessage, mood, severityNumber]);
+  const buildOrchestrateSession = useCompanionOrchestrateSession({
+    pauseInstanceId,
+    context,
+    reflectionMessage,
+    mood,
+    severityNumber,
+    language,
+  });
 
   const runSlotOrchestrate = useCallback(
     async (slot: RegenerateCompanionSlot, mode: 'lazy_fetch' | 'regenerate') => {

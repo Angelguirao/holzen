@@ -311,6 +311,11 @@ export {
   type CompanionOrchestrateSessionContext,
 } from './application/use-cases/companion/build-companion-orchestrate-body';
 export {
+  loadCompanionOrchestrateSession,
+  type LoadCompanionOrchestrateSessionInput,
+  type LoadCompanionOrchestrateSessionPorts,
+} from './application/use-cases/companion/load-companion-orchestrate-session';
+export {
   runCompanionSlotOrchestrate,
   type CompanionSlotOrchestrateMode,
   type RunCompanionSlotOrchestrateResult,
