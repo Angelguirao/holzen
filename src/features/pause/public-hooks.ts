@@ -330,8 +330,8 @@ export { usePauseBreathSegmentRpcLoggers } from './presentation/session/use-paus
 export { usePauseSessionMountLog } from './presentation/session/use-pause-session-mount-log';
 export { usePauseSessionGoBack } from './presentation/session/use-pause-session-go-back';
 export { usePauseSessionGoToStep } from './presentation/session/use-pause-session-go-to-step';
-export { usePauseSessionHeaderBackHandler } from './presentation/use-pause-session-header-back-handler';
-export { usePauseSessionBreathTimedActiveReset } from './presentation/use-pause-session-breath-timed-active-reset';
+export { usePauseSessionHeaderBackHandler } from './presentation/session/use-pause-session-header-back-handler';
+export { usePauseSessionBreathTimedActiveReset } from './presentation/session/use-pause-session-breath-timed-active-reset';
 export {
   usePauseBreathingTimedLoop,
   type PauseBreathingPhase,
@@ -340,12 +340,12 @@ export {
 export {
   usePauseSessionBreathUi,
   type UsePauseSessionBreathUiParams,
-} from './presentation/use-pause-session-breath-ui';
+} from './presentation/session/use-pause-session-breath-ui';
 export {
   usePauseSessionBriefToDeep,
   type UsePauseSessionBriefToDeepParams,
 } from './presentation/use-pause-session-brief-to-deep';
-export { usePauseSessionBreathStepHandlers } from './presentation/use-pause-session-breath-step-handlers';
+export { usePauseSessionBreathStepHandlers } from './presentation/session/use-pause-session-breath-step-handlers';
 export { usePauseShiftFrameDoneHandler } from './presentation/reflect/use-pause-shift-frame-done-handler';
 export { usePauseSessionDecideHandler } from './presentation/decide/use-pause-session-decide-handler';
 export {
@@ -364,7 +364,7 @@ export {
 export {
   usePauseSessionBreathNavigation,
   type UsePauseSessionBreathNavigationParams,
-} from './presentation/use-pause-session-breath-navigation';
+} from './presentation/session/use-pause-session-breath-navigation';
 export {
   usePauseSessionBreathHandlers,
   type UsePauseSessionBreathHandlersParams,
