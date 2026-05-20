@@ -1785,6 +1785,25 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-20</span>
+      <span>Phase A slice — peel ritual-pattern screen imports from public.ts (§6)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3><code>PauseBreathing</code> ritual-pattern helpers → <code>public-hooks</code></h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>reflect/</code> → <code>ritual/reflect/</code>) was already complete on <code>cursor/arch-migrate-src-ca70</code> — no reflect folder moves this session. Continue backlog #3 §6 slim barrel: <code>parseTriangleRotatingKickersI18n</code>, <code>resolveBreathCycleTotal</code>, and <code>resolvePauseBreathingPhases</code> export from <code>public-hooks.ts</code>; <code>PauseBreathing</code> imports them alongside <code>usePauseBreathingTimedLoop</code>. Removed the full <code>ritual-pattern</code> re-export block from <code>public.ts</code>; unit test imports the module directly.</dd>
+      <dt>Deviation</dt>
+      <dd>None — same peel pattern as breath-orb / triangle-kicker (May 2026).</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Did not colocate <code>application/use-cases/breathing/</code> under <code>ritual/breathe/</code> or peel <code>writingTextareaClassName</code> in the same commit.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: optional <code>breathing/</code> → <code>ritual/breathe/</code>, or peel <code>breath-completed-payload</code> screen/presentation imports off <code>public.ts</code>.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
 </body>
 </html>
