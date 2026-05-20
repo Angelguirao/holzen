@@ -1,5 +1,5 @@
-import type { CachedHistoricalInsightShape } from '@/features/pause/public';
-import type { ZoomOutData } from '@/features/pause/public';
+import type { CachedHistoricalInsightShape } from '@/features/pause/domain/historical-insight';
+import type { ZoomOutData } from '@/features/pause/domain/zoom-out-display';
 import { trackCompanionServed } from '@/features/pause/application/use-cases/ritual/frame/companion-generation-telemetry';
 import { updateRecencyHints } from '@/features/pause/application/use-cases/ritual/frame/recency-hints';
 import { hostnameFromUrl } from '@/features/pause/application/use-cases/ritual/frame/url';

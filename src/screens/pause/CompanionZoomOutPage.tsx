@@ -10,7 +10,7 @@ import { WhyThisCard } from '@/screens/pause/components/companion/WhyThisCard';
 import { HistoryThread } from '@/screens/pause/components/companion/HistoryThread';
 import { InterventionCrossRefBadge } from '@/screens/pause/components/companion/InterventionCrossRefBadge';
 import { PageMeta } from '@/app/components/PageMeta';
-import { zoomOutTotalCharsForReadTime } from '@/features/pause/public';
+import { zoomOutTotalCharsForReadTime } from '@/features/pause/public-hooks';
 
 export default function CompanionZoomOutPage() {
   const { pauseInstanceId: rid } = useParams<{ pauseInstanceId: string }>();

@@ -1234,6 +1234,25 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-20</span>
+      <span>Phase A slice — peel zoom-out payload helpers from public.ts (§6)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>Zoom-out frame helpers off <code>public.ts</code></h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>ritual/reflect/</code>) and #2 (<code>ritual/frame/</code>) are complete on this branch. Continue §6 slim-barrel peel: remove <code>toZoomOutDisplayData</code> and related frame helpers from <code>public.ts</code>; frame use cases import <code>domain/zoom-out-display</code> types directly; the one screen read-time helper (<code>zoomOutTotalCharsForReadTime</code>) re-exports via <code>public-hooks</code> so <code>CompanionZoomOutPage</code> stays on a public barrel.</dd>
+      <dt>Deviation</dt>
+      <dd><code>public-hooks</code> exports one pure formatter — minor stretch of “hooks only” naming; avoids a fifth barrel or deep screen import into <code>application/</code>.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Zoom-out display types remain on <code>public.ts</code> for pause screen components — peel helpers only in this slice.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: <code>presentation/home/</code> folder grouping or more <code>PauseRepository</code> call-site wiring (backlog #4).</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
 </body>
 </html>
