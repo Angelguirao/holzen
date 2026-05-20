@@ -1633,6 +1633,25 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-20</span>
+      <span>Phase A slice — mood/chrome feel helpers off session/ (Tier 5)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3><code>pause-session-mood-chrome-flow</code> → <code>ritual/feel/</code></h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>reflect/</code> → <code>ritual/reflect/</code>) was already complete on this branch. Colocate feel-tile log options, depth-picker ritual entry constants, and ritual header chrome-close pure helpers under <code>application/use-cases/ritual/feel/</code>; presentation hooks in <code>reflect/</code> and session step handlers import the new path. Behavior unchanged.</dd>
+      <dt>Deviation</dt>
+      <dd>Filename keeps <code>pause-session-*</code> prefix — rename deferred to avoid churn across grep/docs.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Chrome-close helpers are session-scoped UX but live beside feel-step logging for now; could split to <code>session/</code> later if session folder grows a chrome subcluster.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: §6 <code>public.ts</code> peel (score-impact + ritual-pattern screen imports → <code>public-hooks</code>) or wire <code>persistCompanionUiStepCompletion</code> on <code>public-rpc</code>.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
 </body>
 </html>
