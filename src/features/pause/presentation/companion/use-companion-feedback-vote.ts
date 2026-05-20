@@ -6,7 +6,7 @@ import {
   companionFeedbackVoteQueryKey,
   getCompanionFeedbackVoteQueryOptions,
   logCompanionFeedbackVote,
-} from '../public-queries';
+} from '../../public-queries';
 
 export function useCompanionFeedbackVote(options: {
   pauseInstanceId?: string | null;

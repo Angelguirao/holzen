@@ -1101,6 +1101,25 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-20</span>
+      <span>Phase A slice — companion leaf hooks into presentation/companion</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>Leaf companion conductors → <code>presentation/companion/</code></h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>ritual/reflect/</code>) and #2 (<code>ritual/frame/</code>) are complete on this branch. Mirror the reflect subfolder pattern: move leaf companion hooks (<code>useCompanionFeedbackVote</code>, <code>useRelatedBiasesThisMonth</code>, <code>useCompanionAccess</code>, <code>isCompanionRegenerateUiEnabled</code>) under <code>presentation/companion/</code>; screens still import via <code>public-hooks</code>.</dd>
+      <dt>Deviation</dt>
+      <dd>None — incremental folder grouping; orchestration hooks remain at <code>presentation/</code> root until a follow-up slice.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Did not move the larger orchestration cluster (<code>use-companion-orchestration</code>, slot runners, section expansion) in the same commit — keeps verification scoped to four files.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: move remaining companion presentation hooks into <code>presentation/companion/</code>, or §6 <code>public.ts</code> peel (unused zoom-out payload re-exports).</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
 </body>
 </html>
