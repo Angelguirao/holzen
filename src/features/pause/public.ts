@@ -300,6 +300,7 @@ export {
   logCompanionSlotOrchestrateFilled,
   logCompanionSlotOrchestrateInvoke,
 } from './application/use-cases/companion/companion-slot-orchestrate-telemetry';
+export { runCompanionInterventionBootstrap } from './application/use-cases/companion/run-companion-intervention-bootstrap';
 export {
   buildCompanionFeedbackVoteMetadata,
   type CompanionFeedbackVote,
