@@ -26,3 +26,4 @@ export { useCompanionSlotOrchestratePorts } from './presentation/use-companion-s
 export { usePauseReflectionStepLog } from './presentation/use-pause-reflection-step-log';
 export { useCompanionAccess } from './presentation/use-companion-access';
 export { useCompanionUiCompletion } from './presentation/use-companion-ui-completion';
+export { useCompanionLibraryFavorites } from './presentation/use-companion-library-favorites';
