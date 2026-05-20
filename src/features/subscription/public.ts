@@ -31,4 +31,5 @@ export type {
 } from './domain/subscription-snapshot';
 export type { CheckoutEvent } from './domain/checkout-event';
 export { PRICING, PRO_FEATURES, type ProFeature } from './domain/pricing';
+export { trackPaywallViewed, type PaywallViewedSource } from './application/paywall-telemetry';
 /** Shell-only — import from `@/features/subscription/presentation/*` in `app/components`. */
