@@ -1519,6 +1519,25 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-20</span>
+      <span>Phase A slice — feel emotion logs via PauseRepository (backlog #4)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3><code>runInitialEmotionSelect</code> / <code>runShiftEmotionFrameHubDone</code> → repository port</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>reflect/</code> → <code>ritual/reflect/</code>) is complete on this branch. Continue backlog #4: Feel-step select/skip and Frame hub shift emotion use cases take <code>PauseRepository</code> and call <code>logPauseStep</code>; <code>shift-emotion-log</code> colocated under <code>ritual/feel/</code>. Wired exports live on <code>public-rpc.ts</code>; presentation hooks import <code>public-rpc</code> only (no ad-hoc <code>logStep</code> callback ports).</dd>
+      <dt>Deviation</dt>
+      <dd>Removed <code>logInitialEmotionStep</code> / <code>logShiftEmotionStep</code> from <code>public-rpc</code> — superseded by wired use-case facades.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Did not wire <code>logPostPauseEmotionIfDirty</code> or breath segment logs through dedicated use cases in the same commit.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: §6 <code>public.ts</code> peel (more presentation-only exports) or <code>post-pause-emotion-log</code> under <code>ritual/done/</code>.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
 </body>
 </html>

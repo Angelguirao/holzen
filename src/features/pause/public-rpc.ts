@@ -51,6 +51,18 @@ import { runPauseOutcomeLog } from './application/use-cases/ritual/decide/run-pa
 import { reflectionStepSessionStorage } from './infrastructure/edge/reflect/reflection-step-session-storage';
 import { invalidateCompanionUiCompletionQuery } from './application/queries/companion-ui-completion-query-key';
 import type { BreathSegmentLogPorts } from './application/use-cases/breathing/run-breath-segment-log';
+import {
+  runInitialEmotionSelect as runInitialEmotionSelectUseCase,
+  runInitialEmotionSkip as runInitialEmotionSkipUseCase,
+  type InitialEmotionUiState,
+  type RunInitialEmotionSelectResult,
+  type RunInitialEmotionSkipResult,
+} from './application/use-cases/ritual/feel/run-initial-emotion-log';
+import {
+  runShiftEmotionFrameHubDone as runShiftEmotionFrameHubDoneUseCase,
+  type RunShiftEmotionFrameHubDoneResult,
+} from './application/use-cases/ritual/feel/shift-emotion-log';
+import type { InitialEmotionLogOpts } from './application/use-cases/ritual/feel/initial-emotion-log';
 
 /** Lifecycle + step mutations — default port is `PauseRepository`, not raw RPC client. */
 
@@ -97,6 +109,13 @@ function repositoryLogStep(
 
 export type { BulkHoldApplyResult };
 export type { PostPauseFeelSnapshot };
+export type {
+  InitialEmotionUiState,
+  RunInitialEmotionSelectResult,
+  RunInitialEmotionSkipResult,
+  RunShiftEmotionFrameHubDoneResult,
+};
+export type { InitialEmotionLogOpts };
 
 /** Home manual trigger — `pause_create_or_reuse` (+ silent reflection stub). */
 export function openManualPauseFromHome(params: OpenManualPauseFromHomeParams) {
@@ -153,28 +172,25 @@ export function logPauseReflectTags(params: { pauseInstanceId: string; tags: str
   return runPauseReflectTagUpdate(supabasePauseRepository, params);
 }
 
-/** Feel step — `initial_emotion_logged` RPC (wired for screen hooks). */
-export function logInitialEmotionStep(params: {
-  instanceId: string;
-  payload: Record<string, unknown>;
-}): Promise<void> {
-  return repositoryLogStep(
-    params.instanceId,
-    'initial_emotion_logged',
-    params.payload,
-  ).then(() => undefined);
+/** Feel step mood select — wired with default `PauseRepository`. */
+export function runInitialEmotionSelect(
+  input: Parameters<typeof runInitialEmotionSelectUseCase>[1],
+): Promise<RunInitialEmotionSelectResult> {
+  return runInitialEmotionSelectUseCase(supabasePauseRepository, input);
 }
 
-/** Frame hub shift — `shift_emotion_logged` RPC (wired for screen hooks). */
-export function logShiftEmotionStep(params: {
-  instanceId: string;
-  payload: Record<string, unknown>;
-}): Promise<void> {
-  return repositoryLogStep(
-    params.instanceId,
-    'shift_emotion_logged',
-    params.payload,
-  ).then(() => undefined);
+/** Feel step skip — wired with default `PauseRepository`. */
+export function runInitialEmotionSkip(
+  input: Parameters<typeof runInitialEmotionSkipUseCase>[1],
+): Promise<RunInitialEmotionSkipResult> {
+  return runInitialEmotionSkipUseCase(supabasePauseRepository, input);
+}
+
+/** Frame hub “I'm done” shift emotion — wired with default `PauseRepository`. */
+export function runShiftEmotionFrameHubDone(
+  input: Parameters<typeof runShiftEmotionFrameHubDoneUseCase>[1],
+): Promise<RunShiftEmotionFrameHubDoneResult> {
+  return runShiftEmotionFrameHubDoneUseCase(supabasePauseRepository, input);
 }
 
 /** Decide step — `outcome_logged` via repository port (wired for presentation). */

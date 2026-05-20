@@ -40,7 +40,7 @@ Presentation hooks (`src/features/pause/presentation/use-pause-session-*.ts`, `p
 | Reflection + open pause context | [`useHolzen`](../../src/app/components/HolzenProvider.tsx)                               | Message, companions, severity, `lastPauseInstanceId`, `dismissMessage`, `resyncOpenPauseFromDb`, etc.  |
 | Subscription / Pro              | `[useSubscription](../../src/features/subscription/public-hooks)`        | Decide path refresh; favorite toggle                                                                   |
 | Navigation in                   | `parsePauseSessionLocationState` ([`public`](../../src/features/pause/public.ts)) | `location.state` from Home / banners / manual flows — see [Home → Pause](home.md#navigation-to-pause) |
-| RPC mutations                   | [`public-rpc`](../../src/features/pause/public-rpc.ts) (`logInitialEmotionStep`, `pauseDismissCurrent`, …) | `PauseRepository` → `pause-rpc-client.ts`; canonical SQL in [pause-system §4](../systems/pause-system.md) |
+| RPC mutations                   | [`public-rpc`](../../src/features/pause/public-rpc.ts) (`runInitialEmotionSelect`, `pauseDismissCurrent`, …) | `PauseRepository` → `pause-rpc-client.ts`; canonical SQL in [pause-system §4](../systems/pause-system.md) |
 | Local resume                    | [`persisted-session-storage.ts`](../../src/features/pause/infrastructure/session/persisted-session-storage.ts) | `loadSession` / `saveSession`; hydrate helpers in `step-map.ts` |
 | Data + lifecycle contract       | [pause-system.md](../systems/pause-system.md)                              | Tables, state machine, `**v_pause_full`** / step events — **section 10** indexes this screen’s lib map |
 

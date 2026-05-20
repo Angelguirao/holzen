@@ -1,12 +1,9 @@
 import { useCallback, type Dispatch, type MutableRefObject, type SetStateAction } from 'react';
 import type { TFunction } from 'i18next';
 import { resolveShiftFrameHubDonePresentation } from '@/features/pause/application/use-cases/session/pause-shift-frame-hub-flow';
-import { logShiftEmotionStep } from '@/features/pause/public-rpc';
+import { runShiftEmotionFrameHubDone } from '@/features/pause/public-rpc';
 import { showPauseStepSyncFailedToast } from '@/features/pause/application/use-cases/feedback/step-sync-toast';
-import {
-  runShiftEmotionFrameHubDone,
-  type PauseStep,
-} from '@/features/pause/public';
+import type { PauseStep } from '@/features/pause/public';
 
 /**
  * Frame hub “I'm done” → optional `shift_emotion_logged` RPC (deduped) then advance to second breath.
@@ -23,10 +20,10 @@ export function usePauseShiftFrameDoneHandler(input: {
 
   const handleFrameImDone = useCallback(async () => {
     const flow = resolveShiftFrameHubDonePresentation(
-      await runShiftEmotionFrameHubDone(
-        { pauseInstanceId, lastShiftLogKey: lastShiftLogKeyRef.current },
-        { logStep: logShiftEmotionStep },
-      ),
+      await runShiftEmotionFrameHubDone({
+        pauseInstanceId,
+        lastShiftLogKey: lastShiftLogKeyRef.current,
+      }),
     );
 
     if (flow.kind === 'abort_sync_failed') {
