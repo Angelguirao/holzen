@@ -1823,6 +1823,25 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-20</span>
+      <span>Phase A slice — peel breath-segment payloads off public.ts (§6)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3><code>breath-completed-payload</code> + <code>applyBreathSegmentLogOutcome</code></h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>reflect/</code> → <code>ritual/reflect/</code>) was already complete on <code>cursor/arch-migrate-src-ca70</code>. Continue backlog #3 §6 slim barrel: remove <code>breathCompletedSegment*</code> and <code>applyBreathSegmentLogOutcome</code> from <code>public.ts</code>; presentation breath RPC hook and co-located tests import <code>application/use-cases/breathing/*</code> and <code>session/step-map</code> directly. Payload builders stay internal to <code>run-breath-segment-log</code>.</dd>
+      <dt>Deviation</dt>
+      <dd>None — presentation may import application use cases per pause-client-architecture §3.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Did not peel <code>getPendingPauseOfferDisplay</code> or <code>writingTextareaClassName</code> in the same commit.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: peel pending-offer display helpers for pause screens, optional <code>breathing/</code> → <code>ritual/breathe/</code>, or export <code>PauseImpactData</code> type via <code>public-hooks</code> for <code>ScoreImpact</code>.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
 </body>
 </html>

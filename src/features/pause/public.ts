@@ -238,11 +238,6 @@ export {
   isPostPauseEmotionDirty,
   type PostPauseFeelSnapshot,
 } from './application/use-cases/ritual/done/post-pause-emotion-log';
-export {
-  breathCompletedSegment1Payload,
-  breathCompletedSegment2Payload,
-} from './application/use-cases/breathing/breath-completed-payload';
-export { applyBreathSegmentLogOutcome } from './application/use-cases/breathing/run-breath-segment-log';
 export type { CompanionFeedbackVote } from './application/use-cases/ritual/frame/log-companion-feedback-vote';
 export type {
   CompanionSlotCacheIds,
