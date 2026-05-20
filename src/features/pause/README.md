@@ -45,7 +45,7 @@ features/pause/
 
 ## Tests
 
-Unit tests sit **next to** the module under `domain/` and `application/use-cases/`. Screen hook tests: `src/screens/pause/hooks/`. Flows: `src/test/integration/flows/`.
+Unit tests sit **next to** the module under `domain/`, `application/use-cases/`, and `presentation/` (hooks). `/pause` route-only chrome: `src/screens/pause/lib/`. Flows: `src/test/integration/flows/`.
 
 ## Imports
 

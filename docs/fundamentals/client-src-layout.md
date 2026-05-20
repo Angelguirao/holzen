@@ -101,22 +101,22 @@ Traces one **shipped** vertical slice: user starts a manual pause from Home and 
 | Step | Layer | Code |
 |------|-------|------|
 | Route | App | `App.tsx` lazy-loads `PauseSessionScreen` (full-screen, no `AppLayout`) |
-| Conductor | Screen hook | `usePauseSessionScreen` composes shell, ritual, step handlers |
+| Conductor | Feature `public-hooks` | `usePauseSessionScreen` (`presentation/`) + route chrome registry in `screens/pause/lib/` |
 | Subscription gate | Screen + feature | `useSubscription` / `useProGate`; blocks with `PauseEngagementBlocked` when `!canEngagePause` |
-| Hydration | Screen hooks + feature | `usePauseSessionShell`, location state, `v_pause_full` / session queries |
+| Hydration | Presentation + application | `usePauseSessionShellBootstrap`, location state (`public`), session fetch queries |
 | Ritual UI | Screen components | `PauseSessionGate` → depth picker or `PauseSessionScaffoldShell` → `PauseDecide`, etc. |
-| Step mutations | Screen hooks → feature | `pauseLogStep` / `pauseLogCompanion` via `features/pause/public-rpc` |
+| Step mutations | Presentation → `public-rpc` | `pauseLogStep` / `pauseLogCompanion` via `@/features/pause/public-rpc` |
 
-Step handlers under `screens/pause/hooks/` call **`pauseLogStep`** from `@/features/pause/public-rpc` (e.g. feel/shift, breath segments, decide outcome). Feature use cases such as **`logPauseStep`** (`application/use-cases/ritual/log-pause-step.ts`) go through **`PauseRepository`** (`ports/pause-repository.ts`, default adapter `infrastructure/supabase-pause-repository.ts`). RPC return value drives `engaged` / `completed` and PostHog `pause_engaged` / `pause_completed` inside `pause-rpc-client.ts`.
+Presentation hooks under `features/pause/presentation/` call **`pauseLogStep`** from `@/features/pause/public-rpc` (e.g. feel/shift, breath segments, decide outcome). Feature use cases such as **`logPauseStep`** (`application/use-cases/ritual/log-pause-step.ts`) go through **`PauseRepository`** (`ports/pause-repository.ts`, default adapter `infrastructure/supabase-pause-repository.ts`). RPC return value drives `engaged` / `completed` and PostHog `pause_engaged` / `pause_completed` inside `pause-rpc-client.ts`.
 
 ### 3. Deep ritual — AI (after instance exists)
 
 | Step | Layer | Code |
 |------|-------|------|
-| Reflect copy | Screen hook → feature | `usePauseReflectGeneration` → `generateReflectionAtReflectStep` |
+| Reflect copy | `public-hooks` → feature | `usePauseReflectGeneration` → `generateReflectionAtReflectStep` |
 | Edge | Feature infra | `invokeEdge('holzen-reflect', …)` (`x-cid` via `invoke-edge`) |
 | Persist artifacts | Feature infra | `pause_ai_artifacts` upsert (`reflection_text`, haiku, …) |
-| Companions | Screen hook → feature | `useCompanionData` → `invokeEdge('companion-orchestrate', …)` |
+| Companions | `public-hooks` → feature | `useCompanionData` → `invokeEdge('companion-orchestrate', …)` |
 | Full-view routes | Screen | `/companion/{signal,grounding,history,zoom-out}/:pauseInstanceId` |
 
 Brief ritual skips Frame/Reflect companions per [pause-system.md](../systems/pause-system.md); deep ritual runs reflect during the Reflect→Decide window and orchestrates companion slots per step.
