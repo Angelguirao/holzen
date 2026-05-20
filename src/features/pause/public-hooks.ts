@@ -30,11 +30,6 @@ export {
   resolveTriangleKickerDisplay,
   type TriangleKickerDisplay,
 } from './application/use-cases/breathing/resolve-triangle-kicker-display';
-export {
-  parseTriangleRotatingKickersI18n,
-  resolveBreathCycleTotal,
-  resolvePauseBreathingPhases,
-} from './application/use-cases/breathing/ritual-pattern';
 export { PAUSE_FEEL_STEP_TILE_ROWS } from './domain/pause-feel-step-tiles';
 export {
   PAUSE_FEEL_INTENSITY_KEYS,
@@ -51,6 +46,20 @@ export type {
 } from './domain/zoom-out-display';
 export { resumePauseAudioContext } from './application/use-cases/breathing/ritual-audio';
 export { computeBreathingPhaseAdvance } from './application/use-cases/breathing/phase-advance';
+export {
+  BRIEF_TRIANGLE_CYCLE_COUNT,
+  BOX_BREATH_PHASE_COUNT,
+  holdProgressWithinPhase,
+  parseTriangleRotatingKickersI18n,
+  PAUSE_RITUAL_BREATHING_PATTERN_MODE,
+  resolveBreathCycleTotal,
+  resolvePauseBreathingPhases,
+  rotatingKickerIndexFromElapsed,
+  RITUAL_TRIANGLE_KICKER_INTERVAL_SEC,
+  secondsIntoTrianglePattern,
+  TRIANGLE_PHASE_COUNT,
+  type PauseRitualBreathingPatternMode,
+} from './application/use-cases/breathing/ritual-pattern';
 export {
   STANDALONE_BREATHING_CYCLE_COUNT,
   STANDALONE_BREATHING_PATTERNS,

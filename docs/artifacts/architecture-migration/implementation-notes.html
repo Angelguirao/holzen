@@ -1769,19 +1769,19 @@
   <article class="note">
     <header>
       <span>2026-05-20</span>
-      <span>Phase A slice — peel breath orb + ritual-pattern screen helpers from public.ts (§6)</span>
+      <span>Phase A slice — peel breath orb + ritual-pattern from public.ts (§6)</span>
       <span class="status resolved">resolved</span>
     </header>
-    <h3><code>pause-breath-orb-metrics</code>, <code>resolve-triangle-kicker-display</code>, ritual-pattern phase helpers → <code>public-hooks</code></h3>
+    <h3><code>pause-breath-orb-metrics</code>, <code>resolve-triangle-kicker-display</code>, full <code>ritual-pattern</code> → <code>public-hooks</code></h3>
     <dl>
       <dt>Design decision</dt>
-      <dd>Backlog #1 (<code>reflect/</code> → <code>ritual/reflect/</code>) was already complete on <code>cursor/arch-migrate-src-ca70</code>. Continue backlog #3 §6 slim barrel: screen-facing breathing display helpers (<code>resolveBreathOrbVisualMetrics</code>, <code>resolveTriangleKickerDisplay</code>, <code>parseTriangleRotatingKickersI18n</code>, <code>resolveBreathCycleTotal</code>, <code>resolvePauseBreathingPhases</code>) export from <code>public-hooks.ts</code>; <code>PauseBreathing</code> and <code>BreathingExercise</code> import via <code>public-hooks</code>. Co-located application tests import <code>ritual-pattern</code> directly.</dd>
+      <dd>Backlog #1 (<code>reflect/</code> → <code>ritual/reflect/</code>) was already complete on <code>cursor/arch-migrate-src-ca70</code>. Continue backlog #3 §6 slim barrel: all screen-facing breathing display helpers export from <code>public-hooks.ts</code>; <code>PauseBreathing</code> and <code>BreathingExercise</code> import via <code>public-hooks</code>. Co-located application tests import <code>ritual-pattern</code> directly (avoids Supabase init from the hooks barrel).</dd>
       <dt>Deviation</dt>
-      <dd><code>resolve-pause-breathing-timed-display</code> imports orb/kicker use cases directly (allowlisted) so its unit test does not load the <code>public-hooks</code> barrel and Supabase client — not via <code>public-hooks</code> as an earlier partial peel attempted.</dd>
+      <dd><code>resolve-pause-breathing-timed-display</code> imports orb/kicker use cases directly (allowlisted) so its unit test does not load the <code>public-hooks</code> barrel and Supabase client.</dd>
       <dt>Tradeoffs</dt>
-      <dd>Remaining <code>ritual-pattern</code> constants (<code>BRIEF_TRIANGLE_CYCLE_COUNT</code>, <code>holdProgressWithinPhase</code>, etc.) stay on <code>public.ts</code> for presentation/session consumers until a follow-up peel.</dd>
+      <dd>Split across two commits on the branch (orb/kicker first, then remaining <code>ritual-pattern</code> constants). Optional <code>breathing/</code> → <code>ritual/breathe/</code> folder colocation deferred.</dd>
       <dt>Open questions</dt>
-      <dd>Next: optional <code>application/use-cases/breathing/</code> → <code>ritual/breathe/</code>, or wire more mutations exclusively via <code>public-rpc</code> facades.</dd>
+      <dd>Next: wire more mutations exclusively via <code>public-rpc</code> facades, or optional <code>application/use-cases/breathing/</code> → <code>ritual/breathe/</code>.</dd>
     </dl>
   </article>
 
