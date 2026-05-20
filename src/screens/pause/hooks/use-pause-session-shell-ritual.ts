@@ -1,5 +1,5 @@
 import { usePauseSessionRitualState } from '@/screens/pause/hooks/use-pause-session-ritual-state';
-import { usePauseSessionTerminalEntryRedirect } from '@/screens/pause/hooks/use-pause-session-terminal-entry-redirect';
+import { usePauseSessionTerminalEntryRedirect } from '@/features/pause/public-hooks';
 import { usePauseSessionShellBootstrap } from '@/screens/pause/hooks/use-pause-session-shell-bootstrap';
 import type { usePauseSessionProviders } from '@/screens/pause/hooks/use-pause-session-providers';
 

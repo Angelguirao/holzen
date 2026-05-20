@@ -11,8 +11,6 @@ import type { PauseState } from '@/features/pause/public';
 import { getPauseTerminalEntryStateQueryOptions } from '@/features/pause/public-queries';
 import { type FetchedPauseInstance, type PersistedSession } from '@/features/pause/public';
 
-export { pauseTerminalEntryStateQueryKey } from '@/features/pause/public-queries';
-
 /**
  * Blocks `/pause` when the instance is already terminal in Postgres unless the tab still has
  * local ritual storage for that same instance (user finishing after expiry, etc.).
