@@ -1,3 +1,14 @@
+import {
+  HOLZEN_MARKET_DISPLAY_COINGECKO_ERROR,
+  HOLZEN_MARKET_DISPLAY_RETRY_ERROR,
+} from './holzen-market-display-errors';
+
+export {
+  HOLZEN_MARKET_DISPLAY_COINGECKO_ERROR,
+  HOLZEN_MARKET_DISPLAY_RETRY_ERROR,
+  isHolzenMarketDisplayUserError,
+} from './holzen-market-display-errors';
+
 /** User-facing copy when Holzen market display query fails (Home `useHolzen` error slot). */
 export function mapHolzenMarketDisplayError(input: {
   profileLoaded: boolean;
@@ -8,7 +19,7 @@ export function mapHolzenMarketDisplayError(input: {
   if (!profileLoaded || !isError || !error) return null;
   const raw = error instanceof Error ? error.message : String(error);
   if (raw.includes('fetch') || raw.includes('Failed to fetch')) {
-    return 'Price data unavailable. CoinGecko may be down — retrying shortly.';
+    return HOLZEN_MARKET_DISPLAY_COINGECKO_ERROR;
   }
-  return 'Could not check market data. Will retry automatically.';
+  return HOLZEN_MARKET_DISPLAY_RETRY_ERROR;
 }
