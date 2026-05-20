@@ -2,6 +2,7 @@ import { describe, expect, it, vi, beforeEach } from 'vitest';
 import { renderHook, act } from '@testing-library/react';
 import type { TFunction } from 'i18next';
 import type { MutableRefObject } from 'react';
+import { showPauseStepSyncFailedToast } from '@/features/pause/application/use-cases/feedback/step-sync-toast';
 import { usePauseSessionInitialMoodHandlers } from './use-pause-session-initial-mood-handlers';
 
 const { pauseLogStepMock } = vi.hoisted(() => ({
@@ -17,13 +18,9 @@ vi.mock('@/features/pause/public-rpc', () => ({
     }).then(() => undefined),
 }));
 
-vi.mock('@/features/pause/public', async (importOriginal) => {
-  const actual = await importOriginal<typeof import('@/features/pause/public')>();
-  return {
-    ...actual,
-    showPauseStepSyncFailedToast: vi.fn(),
-  };
-});
+vi.mock('@/features/pause/application/use-cases/feedback/step-sync-toast', () => ({
+  showPauseStepSyncFailedToast: vi.fn(),
+}));
 
 vi.mock('@/lib/haptics', () => ({
   hapticFeedback: vi.fn(),

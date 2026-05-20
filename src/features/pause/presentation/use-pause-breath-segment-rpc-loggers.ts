@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useRef, type MutableRefObject } from 'react';
 import type { TFunction } from 'i18next';
+import { showPauseStepSyncFailedToast } from '@/features/pause/application/use-cases/feedback/step-sync-toast';
 import {
   applyBreathSegmentLogOutcome,
   initialBreathSegmentRpcLoggedFlagsFromRestored,
@@ -7,7 +8,6 @@ import {
   runEnsureBreathSegment2Logged,
   runLogBreathSegment1Skipped,
   runLogBreathSegment2Skipped,
-  showPauseStepSyncFailedToast,
   type PersistedSession,
 } from '@/features/pause/public';
 import { pauseBreathSegmentLogPorts } from '@/features/pause/public-rpc';

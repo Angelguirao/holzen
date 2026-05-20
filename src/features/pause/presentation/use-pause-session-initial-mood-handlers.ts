@@ -3,11 +3,11 @@ import type { TFunction } from 'i18next';
 import type { FeelStepTile, MoodValue } from '@/features/pause/public';
 import { hapticFeedback } from '@/lib/haptics';
 import { logInitialEmotionStep } from '@/features/pause/public-rpc';
+import { showPauseStepSyncFailedToast } from '@/features/pause/application/use-cases/feedback/step-sync-toast';
 import {
   initialEmotionResetUi,
   runInitialEmotionSelect,
   runInitialEmotionSkip,
-  showPauseStepSyncFailedToast,
   type InitialEmotionUiState,
 } from '@/features/pause/public';
 

@@ -9,10 +9,12 @@ import {
 import { runPauseOutcomeLog } from '@/features/pause/application/use-cases/ritual/decide/run-pause-outcome-log';
 import { logPauseOutcomeStep } from '@/features/pause/public-rpc';
 import {
-  clearSession,
-  getSessionQuote,
   showPauseOutcomeNotCompletedToast,
   showPauseOutcomeSaveFailedToast,
+} from '@/features/pause/application/use-cases/feedback/outcome-toast';
+import {
+  clearSession,
+  getSessionQuote,
   type MoodValue,
   type PauseImpactData,
   type RitualDepth,

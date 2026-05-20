@@ -2,9 +2,9 @@ import { useCallback, type Dispatch, type MutableRefObject, type SetStateAction 
 import type { TFunction } from 'i18next';
 import { resolveShiftFrameHubDonePresentation } from '@/features/pause/application/use-cases/session/pause-shift-frame-hub-flow';
 import { logShiftEmotionStep } from '@/features/pause/public-rpc';
+import { showPauseStepSyncFailedToast } from '@/features/pause/application/use-cases/feedback/step-sync-toast';
 import {
   runShiftEmotionFrameHubDone,
-  showPauseStepSyncFailedToast,
   type PauseStep,
 } from '@/features/pause/public';
 
