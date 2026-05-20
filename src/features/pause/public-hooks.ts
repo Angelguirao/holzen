@@ -56,6 +56,14 @@ export { logPwaInstallAnalyticsEvent } from './presentation/log-pwa-install-anal
 export { useSignalSourceTrustedHost } from './presentation/use-signal-source-trusted-host';
 export { useStaggeredReveal } from './presentation/use-staggered-reveal';
 export {
+  fetchSettingsDataExportBundle,
+  type SettingsDataExportBundle,
+  type SettingsExportAiArtifact,
+  type SettingsExportCompanionEvent,
+  type SettingsExportPauseRow,
+  type SettingsExportStepEvent,
+} from './presentation/load-settings-data-export-bundle';
+export {
   useCurrentPause,
   currentPauseQueryKey,
   type CurrentPauseRow,

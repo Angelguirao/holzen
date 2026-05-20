@@ -1,7 +1,7 @@
 import { useQueryClient } from '@tanstack/react-query';
 import { updateUserPassword, useAuth } from '@/features/auth/public';
 import { deleteAccount as invokeDeleteAccount } from '@/features/auth/public-rpc';
-import { fetchSettingsDataExportBundle } from '@/features/pause/public-queries';
+import { fetchSettingsDataExportBundle } from '@/features/pause/public-hooks';
 import { getProfileRowQueryOptions } from '@/features/user/public-queries';
 import { useHolzen } from '@/app/components/HolzenProvider';
 import { useSubscription } from '@/features/subscription/public-hooks';
