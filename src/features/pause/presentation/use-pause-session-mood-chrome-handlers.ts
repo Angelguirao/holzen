@@ -1,4 +1,8 @@
 import { useCallback } from 'react';
+import {
+  resolvePauseSessionChromeCloseAction,
+  runPauseSessionChromeCloseAction,
+} from '@/features/pause/application/use-cases/session/pause-session-mood-chrome-flow';
 import { usePauseFavoriteToggle } from './use-pause-favorite-toggle';
 import { usePauseSessionMoodAndPersist } from './use-pause-session-mood-and-persist';
 import type {
@@ -66,11 +70,10 @@ export function usePauseSessionMoodChromeHandlers(
   });
 
   const handlePauseSessionChromeClose = useCallback(() => {
-    if (phase === 'done') {
-      handleReturn();
-    } else {
-      requestExitPauseBeforeDone();
-    }
+    runPauseSessionChromeCloseAction(resolvePauseSessionChromeCloseAction(phase), {
+      onReturn: handleReturn,
+      onRequestExit: requestExitPauseBeforeDone,
+    });
   }, [phase, handleReturn, requestExitPauseBeforeDone]);
 
   const mood = usePauseSessionMoodAndPersist({
