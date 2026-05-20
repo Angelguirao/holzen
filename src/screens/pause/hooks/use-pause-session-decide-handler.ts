@@ -5,17 +5,23 @@ import { hapticFeedback } from '@/lib/haptics';
 import { useAuth } from '@/features/auth/public';
 import { pauseLogStep } from '@/features/pause/public-rpc';
 import {
-  buildOutcomeLoggedPayload,
   buildPauseImpactDataOnComplete,
   clearSession,
+  getSessionQuote,
   invalidatePauseStatsDataForUser,
+  runPauseOutcomeLog,
   showPauseOutcomeNotCompletedToast,
   showPauseOutcomeSaveFailedToast,
   type PauseImpactData,
-  type PauseState,
   type RitualDepth,
 } from '@/features/pause/public';
-import { getSessionQuote } from '@/features/pause/public';
+
+const logOutcomeStep = (params: { instanceId: string; payload: Record<string, unknown> }) =>
+  pauseLogStep({
+    instanceId: params.instanceId,
+    stepType: 'outcome_logged',
+    payload: params.payload,
+  });
 
 export function usePauseSessionDecideHandler(input: {
   decidingRef: MutableRefObject<boolean>;
@@ -65,26 +71,28 @@ export function usePauseSessionDecideHandler(input: {
       decidingRef.current = true;
       try {
         hapticFeedback('medium');
-        let outcomeState: PauseState | null = null;
-        if (pauseInstanceId) {
-          try {
-            outcomeState = await pauseLogStep({
-              instanceId: pauseInstanceId,
-              stepType: 'outcome_logged',
-              payload: buildOutcomeLoggedPayload(d),
-            });
-          } catch {
-            showPauseOutcomeSaveFailedToast(t);
-            return;
-          }
-          if (outcomeState !== 'completed') {
-            invalidatePauseStatsDataForUser(user?.id);
-            showPauseOutcomeNotCompletedToast(t);
-            void refreshSubscription();
-            return;
-          }
+
+        const outcome = await runPauseOutcomeLog(
+          { pauseInstanceId, decision: d },
+          { logOutcome: logOutcomeStep },
+        );
+
+        if (outcome.status === 'sync_failed') {
+          showPauseOutcomeSaveFailedToast(t);
+          return;
+        }
+
+        if (outcome.status === 'not_completed') {
+          invalidatePauseStatsDataForUser(user?.id);
+          showPauseOutcomeNotCompletedToast(t);
+          void refreshSubscription();
+          return;
+        }
+
+        if (outcome.status === 'completed') {
           void refreshSubscription();
         }
+
         setDecision(d);
         const q = getSessionQuote();
         setPauseImpactData(
