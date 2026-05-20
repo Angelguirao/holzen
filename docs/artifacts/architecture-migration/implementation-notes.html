@@ -1272,6 +1272,25 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-20</span>
+      <span>Phase A slice — presentation/home folder</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>Home conductors → <code>presentation/home/</code></h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>ritual/reflect/</code>) and #2 (<code>ritual/frame/</code>) are complete on this branch. Group ten Home-tab / <code>HolzenProvider</code> presentation hooks under <code>presentation/home/</code> to match §3 / §10.1; screens and <code>app/</code> still import via <code>public-hooks</code> only.</dd>
+      <dt>Deviation</dt>
+      <dd>None — mirrors <code>presentation/reflect/</code> and <code>presentation/companion/</code> subfolder pattern.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Did not move bulk-hold or pending-offer hooks in the same commit — they are home-adjacent but used from session shell paths too.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: §6 <code>public.ts</code> peel (frame read-time helpers) or <code>presentation/archive/</code> grouping.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
 </body>
 </html>
