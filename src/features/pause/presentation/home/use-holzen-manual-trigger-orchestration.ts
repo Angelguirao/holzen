@@ -21,7 +21,7 @@ import {
 import {
   MANUAL_PAUSE_TRIGGER_IDLE,
   type ManualPauseTriggerResult,
-} from '@/features/pause/public';
+} from '@/features/pause/domain/manual-pause-trigger-result';
 import { holzenLog } from '@/lib/holzen-console';
 
 export type UseHolzenManualTriggerOrchestrationParams = {

@@ -2561,6 +2561,25 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-20</span>
+      <span>Phase A slice — peel presentation session/home/terminal off public.ts (§6)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>Backlog #1 complete; continue backlog #3 slim <code>public.ts</code></h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd><code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code> was already complete. Peel remaining pause <code>presentation/</code> and co-located tests from <code>public.ts</code> to domain + use-case modules (terminal guards, session model types, manual trigger, post-pause feel snapshot, can-navigate). Feature internals no longer import the barrel; cross-context and legacy stats keep <code>public.ts</code> re-exports.</dd>
+      <dt>Deviation</dt>
+      <dd>None — matches §6 barrel split.</dd>
+      <dt>Tradeoffs</dt>
+      <dd><code>public.ts</code> still re-exports peeled symbols until a consumer audit drops duplicates.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: remove unused <code>public.ts</code> re-exports after consumer audit, or wire more mutations through <code>PauseRepository</code> (backlog #4).</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
 </body>
 </html>

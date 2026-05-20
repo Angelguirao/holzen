@@ -5,7 +5,10 @@ import { applyManualPauseOpenResult } from '@/features/pause/application/use-cas
 import { buildManualPauseOpenParams } from '@/features/pause/application/use-cases/trigger/build-manual-pause-open-params';
 import { markPauseManualStartedHomeOnce } from '@/features/pause/application/use-cases/trigger/manual-pause-trigger-telemetry';
 import { clearSession } from '@/features/pause/infrastructure/session/persisted-session-storage';
-import { MANUAL_PAUSE_TRIGGER_IDLE, type ManualPauseTriggerResult } from '@/features/pause/public';
+import {
+  MANUAL_PAUSE_TRIGGER_IDLE,
+  type ManualPauseTriggerResult,
+} from '@/features/pause/domain/manual-pause-trigger-result';
 import type { CompanionData } from '@/features/pause/public-hooks';
 import { openManualPauseFromHome } from '@/features/pause/public-rpc';
 import { holzenLog } from '@/lib/holzen-console';

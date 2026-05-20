@@ -4,10 +4,7 @@
  */
 import { describe, it, expect } from 'vitest';
 
-import {
-  COMPANION_TYPES,
-  FEEDBACK_TO_CACHE_TYPE,
-} from '@/features/pause/public';
+import { COMPANION_TYPES, FEEDBACK_TO_CACHE_TYPE } from './companion-types';
 
 describe('COMPANION_TYPES', () => {
   it('has all expected companion types', () => {

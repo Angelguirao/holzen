@@ -8,7 +8,7 @@ import { usePauseSessionExitNavigation } from './use-pause-session-exit-navigati
 import { usePauseSessionBreathSecondLabelVariant } from './use-pause-session-breath-second-label-variant';
 import { JOURNEY_PREFIX } from '@/lib/app-routes';
 import { clearSession } from '@/features/pause/infrastructure/session/persisted-session-storage';
-import type { PauseSessionShellHolzen } from '@/features/pause/public';
+import type { PauseSessionShellHolzen } from '@/features/pause/domain/pause-session-shell-holzen';
 import type {
   PauseSessionHolzenProvidersSlice,
   PauseSessionProviders,

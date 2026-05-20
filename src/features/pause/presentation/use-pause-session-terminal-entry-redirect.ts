@@ -6,10 +6,10 @@ import { toast } from 'sonner';
 import {
   isTerminalPauseDbState,
   persistedPauseSessionAllowsTerminalEntry,
-} from '@/features/pause/public';
-import type { PauseState } from '@/features/pause/public';
+} from '@/features/pause/application/use-cases/session/terminal-entry-guard';
+import type { PauseState } from '@/features/pause/domain/pause-state';
+import type { FetchedPauseInstance, PersistedSession } from '@/features/pause/domain/session-model';
 import { getPauseTerminalEntryStateQueryOptions } from '@/features/pause/public-queries';
-import { type FetchedPauseInstance, type PersistedSession } from '@/features/pause/public';
 
 /**
  * Blocks `/pause` when the instance is already terminal in Postgres unless the tab still has
