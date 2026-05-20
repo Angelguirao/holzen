@@ -297,7 +297,7 @@ Use this when moving files. Paths are indicative — adjust to actual filenames 
 | ~~`src/hooks/use-subscription`~~ → `features/subscription/public-hooks` | `packages/subscription` |
 | ~~`src/hooks/use-auth`~~ → `@/features/auth/public` | `packages/auth` |
 | Archive library hooks | `features/pause/public-queries` + `screens/archive/hooks/` |
-| `src/lib/pause-*.ts`, `src/lib/companion-*.ts` | Thin re-exports → `features/pause/public` or `public-queries` (until legacy removed) |
+| ~~`src/lib/pause-*.ts`, `src/lib/companion-*.ts`~~ | **Removed from active tree (May 2026)** — pause domain in `features/pause/`; legacy copies under `src/legacy/full-shell/src/lib/` for full-IA recovery only |
 | `src/lib/*-query.ts` (subscription, market, user) | Re-exports → owning `features/*/public-queries` |
 | `src/lib/posthog.ts`, `sentry.ts`, `invoke-edge.ts`, `cid.ts` | `packages/infrastructure` or `shared-kernel` |
 | `src/screens/pause/components/*`, `Companion*.tsx` | `apps/web/src/screens/pause/` (5c); was `components/pause/*` |

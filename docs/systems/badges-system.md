@@ -27,7 +27,7 @@
 
 ### After a pause completes
 
-[`invalidatePauseStatsDataForUser`](../../src/lib/pause-stats-invalidate.ts) (called from pause completion paths — see [`pause-api.ts`](../../src/lib/pause-api.ts) / decide handler) invalidates the pause-stats TanStack key. The bundle refetches → **`useBadges` recomputes** → **`useBadgeSync`** may insert new `user_badges` rows when eligibility crosses a threshold.
+[`invalidatePauseStatsDataForUser`](../../src/features/pause/application/queries/invalidate-pause-stats.ts) (exported from `@/features/pause/public`; called from pause completion paths — e.g. decide handler, RPC client) invalidates the pause-stats TanStack key. The bundle refetches → **`useBadges` recomputes** → **`useBadgeSync`** may insert new `user_badges` rows when eligibility crosses a threshold.
 
 **Brief ritual done** lists badges that are **newly eligible** (computed earned IDs not yet in `user_badges`) in [`PauseDoneBriefJourneyRecap`](../../src/legacy/full-shell/src/components/pause/PauseDoneBriefJourneyRecap.tsx); [`suppressBadgeCelebrationOverlayThisSession`](../../src/legacy/full-shell/src/hooks/use-badge-sync.ts) avoids duplicating the celebration overlay when the user later opens Journey → Badges (push / upsert still run from `useBadgeSync`).
 
@@ -293,7 +293,7 @@ In parallel, DB notifications feed also receives badge items via trigger on `use
 - **Pro-only definitions:** **3** (entire mastery family).
 - **Non-Pro definitions:** **21** (foundation + core ladders + legacy).
 - **Panel (legacy):** [`BadgesPanelV2`](../../src/legacy/full-shell/src/components/BadgesPanelV2.tsx); **compute:** [`computeBadges`](../../src/lib/badges/compute.ts); **sync:** [`useBadgeSync`](../../src/legacy/full-shell/src/hooks/use-badge-sync.ts) → `user_badges` (not in pause-first bundle).
-- **Refresh after pause:** same [`invalidatePauseStatsDataForUser`](../../src/lib/pause-stats-invalidate.ts) path as Stats (pause-stats query refetch → `useBadges` recomputes).
+- **Refresh after pause:** same [`invalidatePauseStatsDataForUser`](../../src/features/pause/application/queries/invalidate-pause-stats.ts) path as Stats (pause-stats query refetch → `useBadges` recomputes).
 
 ---
 

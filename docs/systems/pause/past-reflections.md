@@ -65,7 +65,7 @@ Pure helpers live in [`supabase/functions/_shared/past-reflection-util.ts`](../.
 | **Zoom Out (edge)** | `fetchPastReflectionWithWords` in `supabase/functions/_shared/past-reflections.ts`; invoked from `generators/zoom-out.ts` | Strict — returns `null` if the user has no past pauses with words ≥3 days old. |
 | **Replay (client)** | `ReflectionReplay.tsx` + `loadPauseReplayThread` | Full thread on **`/tools/practice/replay`**: picker or deep link from Echo; loads `v_pause_full` + events + `practice_entries`; saves new replay rows with `pause_instance_id`. |
 
-The edge path (`fetchPastReflectionWithWords`) and the replay screen (`loadPauseReplayThread` in `src/lib/pause-replay-thread.ts`) both build `PastReflectionWithWords`: notes from `pause_step_events`, replay lines from `practice_entries` (`type = 'replay'`, `pause_instance_id`), merged via `combineNoteAndReplayWords` in `past-reflection-util.ts`.
+The edge path (`fetchPastReflectionWithWords`) and the replay screen (`loadPauseReplayThread` in `src/legacy/full-shell/src/lib/pause-replay-thread.ts` — legacy full IA only) both build `PastReflectionWithWords`: notes from `pause_step_events`, replay lines from `practice_entries` (`type = 'replay'`, `pause_instance_id`), merged via `combineNoteAndReplayWords` in `past-reflection-util.ts`.
 
 ---
 
@@ -103,7 +103,7 @@ Echo uses `v_pause_full` + `pause_step_events` / `practice_entries` only. There 
 | `supabase/functions/_shared/past-reflection-util.ts` | Types (`PastReflectionWithWords`, `UserWord`); `combineNoteAndReplayWords`, `mergeUserWordsChronological`, `parseDirectionFromContext`, `pickPastReflection`. |
 | `supabase/functions/_shared/past-reflections.ts` | Edge DB helper `fetchPastReflectionWithWords`. |
 | `supabase/functions/_shared/generators/zoom-out.ts` | Calls the edge helper; projects into the Echo payload. |
-| `src/lib/pause-replay-thread.ts` | Client loader `loadPauseReplayThread` + pause picker query. |
+| `src/legacy/full-shell/src/lib/pause-replay-thread.ts` | Client loader `loadPauseReplayThread` + pause picker query (legacy; route **404** in pause-first). |
 | `src/legacy/full-shell/src/components/practice/ReflectionReplay.tsx` | Replay UI (legacy; not shipped). |
 | `src/screens/pause/components/ZoomOutDisplay.tsx` | Echo card with strict user-words policy + honest empty state. |
 | `src/locales/en.json` | `companions.echo*` + `practice.replay*` strings (see `echoEmptyBody`, `echoHolzenAsked`, `replayNoWordsYet`). |
