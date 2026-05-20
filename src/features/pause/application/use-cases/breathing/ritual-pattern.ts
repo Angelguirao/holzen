@@ -79,7 +79,7 @@ export const DEEP_TRIANGLE_FIRST_CYCLE_COUNT = 3;
 export const DEEP_TRIANGLE_SECOND_CYCLE_COUNT = 2;
 
 /** Legacy box pattern phase count (4-4-4-4); kept for tests and standalone overlay patterns. */
-export { BOX_BREATH_PHASE_COUNT } from './breathing-constants';
+export { BOX_BREATH_PHASE_COUNT } from '../ritual/breathe/breathing-constants';
 
 export function resolveBreathCycleTotal(
   ritualVariant: 'brief' | 'deep' | undefined,
