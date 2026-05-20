@@ -683,6 +683,25 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-20</span>
+      <span>Phase A slice — frame leaf: apply-companion-intervention-invoke-outcome</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3><code>apply-companion-intervention-invoke-outcome</code> → <code>ritual/frame/</code></h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Reflect → <code>ritual/reflect/</code> is complete (backlog #1). Next companion leaf is intervention invoke outcome applier (module + test): imports <code>orchestrate-slot-apply</code> hub still in <code>companion/</code>. <code>run-companion-intervention-bootstrap</code> stays in <code>companion/</code> until a larger intervention cluster slice.</dd>
+      <dt>Deviation</dt>
+      <dd>None — matches spec §3.1 / §10.1 leaf-first pattern after cache hydrate.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Could batch with <code>run-companion-intervention-bootstrap</code>; kept bootstrap in <code>companion/</code> for smaller diff — bootstrap is the next logical pair.</dd>
+      <dt>Open questions</dt>
+      <dd>Next slice: <code>run-companion-intervention-bootstrap</code> → <code>ritual/frame/</code>, or <code>orchestrate-slot-apply</code> hub + <code>intervention-response-hydrate.test</code>.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
 </body>
 </html>

@@ -7,8 +7,11 @@ vi.mock('@/features/pause/application/use-cases/ritual/frame/companion-intervent
   logCompanionInterventionSignalHydrated: vi.fn(),
 }));
 
-vi.mock('./orchestrate-slot-apply', async (importOriginal) => {
-  const actual = await importOriginal<typeof import('./orchestrate-slot-apply')>();
+vi.mock('@/features/pause/application/use-cases/companion/orchestrate-slot-apply', async (importOriginal) => {
+  const actual =
+    await importOriginal<
+      typeof import('@/features/pause/application/use-cases/companion/orchestrate-slot-apply')
+    >();
   return {
     ...actual,
     hydrateOrchestrateSlotsFromInterventionResponse: vi.fn(() => null),
