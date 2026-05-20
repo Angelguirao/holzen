@@ -2,7 +2,7 @@ import { useCallback, type Dispatch, type SetStateAction } from 'react';
 import {
   BRIEF_DEPTH_PICKER_RITUAL_ENTRY,
   DEEP_DEPTH_PICKER_RITUAL_ENTRY,
-} from '@/features/pause/application/use-cases/session/pause-session-mood-chrome-flow';
+} from '@/features/pause/application/use-cases/ritual/feel/pause-session-mood-chrome-flow';
 import { type BriefPauseStep, type RitualDepth } from '@/features/pause/public';
 
 /** `PauseDepthPicker` actions on `/pause` depth selection screen. */
