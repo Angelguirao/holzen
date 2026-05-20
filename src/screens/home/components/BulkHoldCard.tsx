@@ -10,7 +10,7 @@ import {
   groupBulkHoldByLocalDay,
   type BulkHoldOutcomeChoice,
   type BulkHoldPendingPause,
-} from '@/features/pause/public';
+} from '@/features/pause/public-hooks';
 import { Button } from '@/components/ui/button';
 import { homeInWidget } from '@/screens/home/components/home-widget-styles';
 import {

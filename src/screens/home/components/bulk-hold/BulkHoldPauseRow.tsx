@@ -8,7 +8,7 @@ import {
   parseBulkHoldChange24hPct,
   type BulkHoldOutcomeChoice,
   type BulkHoldPendingPause,
-} from '@/features/pause/public';
+} from '@/features/pause/public-hooks';
 import { cn } from '@/lib/utils';
 
 interface BulkHoldPauseRowProps {

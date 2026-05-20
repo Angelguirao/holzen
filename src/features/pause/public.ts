@@ -5,17 +5,6 @@
 export { pauseCreateSkippedUserMessage } from './application/use-cases/create-skipped-message';
 export { pauseArchiveRowAllowsRetrospectiveOutcome } from './application/use-cases/archive/retrospective-outcome';
 export { buildOutcomeLoggedPayload } from './application/use-cases/outcome-log-payload';
-export { groupBulkHoldByLocalDay } from './application/use-cases/bulk-hold/group-by-local-day';
-export {
-  bulkHoldMaxRows,
-  bulkHoldQueryWindowIso,
-  formatBulkHoldContextQuote,
-  formatBulkHoldLocalTime,
-  parseBulkHoldChange24hPct,
-  type BulkHoldOutcomeChoice,
-  type BulkHoldPendingPause,
-  type BulkHoldReviewSection,
-} from './domain/bulk-hold';
 export {
   computeBriefRitualGoBack,
   type BriefRitualGoBackResult,

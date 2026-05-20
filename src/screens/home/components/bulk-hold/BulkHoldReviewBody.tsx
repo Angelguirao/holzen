@@ -1,7 +1,7 @@
 import { useTranslation } from 'react-i18next';
 import { motion } from 'framer-motion';
 import { BulkHoldPauseRow } from '@/screens/home/components/bulk-hold/BulkHoldPauseRow';
-import type { BulkHoldOutcomeChoice, BulkHoldReviewSection } from '@/features/pause/public';
+import type { BulkHoldOutcomeChoice, BulkHoldReviewSection } from '@/features/pause/public-hooks';
 
 interface BulkHoldReviewBodyProps {
   sections: BulkHoldReviewSection[];
