@@ -1,7 +1,11 @@
 import { useState, useMemo, useCallback, useEffect } from 'react';
 import { ChevronDown, ChevronRight, ArrowUp, ArrowDown, Trash2, Loader2 } from 'lucide-react';
-import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/components/ui/use-toast';
+import {
+  demoteCompanionCacheEntry,
+  promoteCompanionCacheEntry,
+  setCompanionCacheSourceUntrusted as setCompanionCacheSourceUntrustedMutation,
+} from '@/features/pause/public-queries';
 import type { CacheEntryRow } from '@/screens/admin/lib/admin-stats-bundle-query';
 import { Checkbox } from '@/components/ui/checkbox';
 import { TYPE_COLORS, label } from './admin-constants';
@@ -58,17 +62,24 @@ export function CuratedContentManager({ entries, onRefresh }: { entries: CacheEn
 
   const promote = useCallback(async (id: string) => {
     setActing(id);
-    const { error } = await supabase.from('companion_cache').update({ quality_score: 3, expires_at: null }).eq('id', id);
-    if (error) { toast({ title: 'Promote failed', description: error.message, variant: 'destructive' }); setActing(null); return; }
+    const { ok, errorMessage } = await promoteCompanionCacheEntry(id);
+    if (!ok) {
+      toast({ title: 'Promote failed', description: errorMessage ?? 'Unknown error', variant: 'destructive' });
+      setActing(null);
+      return;
+    }
     await onRefresh();
     setActing(null);
   }, [onRefresh, toast]);
 
   const demote = useCallback(async (id: string) => {
     setActing(id);
-    const expires = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString();
-    const { error } = await supabase.from('companion_cache').update({ quality_score: 1, expires_at: expires }).eq('id', id);
-    if (error) { toast({ title: 'Demote failed', description: error.message, variant: 'destructive' }); setActing(null); return; }
+    const { ok, errorMessage } = await demoteCompanionCacheEntry(id);
+    if (!ok) {
+      toast({ title: 'Demote failed', description: errorMessage ?? 'Unknown error', variant: 'destructive' });
+      setActing(null);
+      return;
+    }
     await onRefresh();
     setActing(null);
   }, [onRefresh, toast]);
@@ -76,8 +87,12 @@ export function CuratedContentManager({ entries, onRefresh }: { entries: CacheEn
   /** Keep row in pool but deprioritize for cache picks (attribution treated as untrusted server-side). */
   const setSourceUntrusted = useCallback(async (id: string, untrusted: boolean) => {
     setActing(id);
-    const { error } = await supabase.from('companion_cache').update({ source_untrusted: untrusted }).eq('id', id);
-    if (error) { toast({ title: 'Update failed', description: error.message, variant: 'destructive' }); setActing(null); return; }
+    const { ok, errorMessage } = await setCompanionCacheSourceUntrustedMutation(id, untrusted);
+    if (!ok) {
+      toast({ title: 'Update failed', description: errorMessage ?? 'Unknown error', variant: 'destructive' });
+      setActing(null);
+      return;
+    }
     await onRefresh();
     setActing(null);
   }, [onRefresh, toast]);
