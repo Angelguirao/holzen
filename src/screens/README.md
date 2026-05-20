@@ -26,7 +26,7 @@ Co-locate Vitest hook/component tests beside the file under test (e.g. `hooks/us
 |---------------|----------------------|----------------|
 | `home/` | `/` — **`HomeScreen`**, `components/`, `hooks/` (incl. `useHolzen`) | [docs/screens/home.md](../../docs/screens/home.md) |
 | `pause/` | `/pause`, `/companion/*` — **`PauseSessionScreen`**, `components/`, `hooks/` | [docs/screens/pause.md](../../docs/screens/pause.md) |
-| `archive/` | Archive tab — **`ArchiveScreen`**, `hooks/`, `components/` (+ `library/`) | [README](archive/README.md), [IA](../../docs/design/information-architecture.md) |
+| `archive/` | Archive tab — **`ArchiveScreen`**, `hooks/`, `components/` (+ `library/` subfolder for pause cards) | [README](archive/README.md), [active-surface](../../docs/ops/active-surface.md), [IA](../../docs/design/information-architecture.md) |
 | `journey/` | Journey tab — **`components/` migrated (5e)** | [docs/screens/journey-overview.md](../../docs/screens/journey-overview.md) |
 | `settings/` | Settings hub — **`SettingsStateLayout`**, `hooks/`, `components/` | [README](settings/README.md) |
 | `marketing/` | Public pages — **`AboutScreen`**, landing **`components/`** | [README](marketing/README.md) |

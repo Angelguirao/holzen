@@ -20,7 +20,7 @@ This folder is the implementation contract for migrating Holzen to Nox.
 - Read `foundations/` first to map tokens and theme behavior.
 - Read `components/` to align UI primitives and states.
 - Read `patterns/` for Holzen-specific compositions that are Nox-styled extensions.
-- Track route rollout in `parity-board.md`.
+- Track route rollout in `parity-board.md` — **live shipped routes** → [active-surface.md](../../ops/active-surface.md); parity board includes full-IA legacy URLs for recovery audits.
 - Use `visual-parity-qa.md` for strict screenshot-based sign-off.
 - Read `extraction/` for raw ingestion snapshots from Figma MCP runs.
 

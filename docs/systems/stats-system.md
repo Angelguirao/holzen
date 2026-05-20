@@ -2,8 +2,8 @@
 
 > **Not in shipped pause-first scope (2026-05).** Reference implementation: git tag `full-ia-pre-strip` or `src/legacy/full-shell/`. Shipped surface: [active-surface.md](../ops/active-surface.md).
 
-> **Status:** the "Recommended target model (skills-first)" at the bottom of
-> this doc is **shipped**. `Profile > Stats` renders
+> **Status (legacy full shell only — tag `full-ia-pre-strip` / `src/legacy/full-shell/`):** the "Recommended target model (skills-first)" at the bottom of
+> this doc is **shipped there**. Journey → **Stats** (`Profile > Stats`) renders
 > [`StatsContentV2`](../../src/legacy/full-shell/src/components/stats/StatsContentV2.tsx) with all
 > 13 deep-dive / Journey / Advanced cards, reading exclusively from
 > `v_pause_full` + `pause_step_events` + `pause_companion_events`.

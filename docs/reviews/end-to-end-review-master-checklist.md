@@ -40,6 +40,8 @@ Use this slice when signing off **production** on `feature/mvpPauseCleanup` / po
 
 ## 1 — Tier A — Daily path (shell, home, library, journey, settings)
 
+> **Full-IA review archive (pre-strip — not pause-first shipped):** Tier A below is a **2026-04-30 trace** of the five-tab / Tools / Journey sub-tab product (`git tag full-ia-pre-strip`). For production sign-off on the live app, use **Shipped MVP only** above and [active-surface.md](../ops/active-surface.md). Individual rows may describe behavior **removed or 404** in pause-first (e.g. `/tools`, `/journey/stats`, Home journey-pulse widgets, Archive collections tab).
+
 ### Global shell (under `AppLayout` + shared providers)
 
 - [x] `AppLayout` / `BottomNav` / main chrome — *L1 2026-04-30: layout mounts `useHolzen` for `language` + `useAutoTrigger`; inner `Suspense` + `PageChunkFallback` (a11y status); tab chunk prefetch idle/timeout.*
@@ -58,7 +60,7 @@ Use this slice when signing off **production** on `feature/mvpPauseCleanup` / po
 
 ### Library
 
-- [x] `/archive` — `Archive` — *Supersedes `/library` (2026-05): pause lists use `usePauseArchiveList` (`v_pause_archive_*`); collections use `useLibrary` (`collections` + `collection_items` + `v_pause_full` for members). Pro/checkout gates may still apply on sub-surfaces; verify `useProGate` on heavy AI paths.*
+- [x] `/archive` — `Archive` — *2026-05 pause-first: Pauses + Echoes via `usePauseArchiveList` (`v_pause_archive_*`). **Collections tab stripped** — UI in `src/legacy/archive-collections/` (not MVP). Full-IA trace below also noted `useLibrary` for collections — legacy only.*
 
 ### Journey (hub tabs)
 

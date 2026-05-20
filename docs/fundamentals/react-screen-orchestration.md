@@ -177,7 +177,7 @@ import { useHolzen } from '@/app/components/HolzenProvider';
 import type { HomeAppLayoutOutletContext } from '@/screens/home/lib/home-app-layout-outlet';
 ```
 
-**What to notice:** almost everything is **imported** from hooks, components, or `src/lib/`. The page file is not where the heavy logic lives — it **orchestrates** named modules.
+**What to notice:** almost everything is **imported** from hooks, screen-local components, `@/features/<ctx>/public*`, or shared `src/lib/` utilities. The page file is not where the heavy logic lives — it **orchestrates** named modules.
 
 ---
 

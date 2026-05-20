@@ -1,33 +1,43 @@
 # Nox Parity Board
 
+**Pause-first shipped scope (2026-05):** Live routes and tabs → [active-surface.md](../../ops/active-surface.md). This board tracks **Nox migration status per URL** — including **pre-strip full-IA routes** kept for legacy recovery (`git tag full-ia-pre-strip`). Routes marked **legacy** below are **404** in the active app; Nox work there applies only if full IA returns or when auditing legacy code.
+
 Status keys:
 
-- `ready`: migrated and verified
+- `ready`: migrated and verified (for the route’s product era — see Notes)
 - `partial`: migrated core primitives/tokens, needs route polish
 - `blocked`: awaiting missing component/asset decision
+- `legacy`: full-IA route — not in pause-first bundle (404)
 
-## Batch 1 routes
+## Batch 1 — pause-first shipped + shared
 
 | Route | Status | Notes |
 |---|---|---|
 | `/` | ready | Nox header + token bridge + primitive updates applied |
-| `/library` | ready | Nox header + shared primitive migration in place |
-| `/journey` | ready | Journey hub (was profile-era route); token bridge + shared Nox primitives |
-| `/tools` | ready | tools hub (ToolsHub) in app shell |
+| `/archive` | ready | Pause-first Archive tab (Pauses + Echoes) |
+| `/journey` | ready | Pause-first Journey overview only (no sub-tabs) |
 | `/settings` | ready | token bridge + shared Nox primitives applied |
 | `/settings/about` | partial | sub-settings surface; matches Settings chrome |
 | `/pause` | ready | shared controls + token bridge aligned |
-| `/tools/ground` | ready | token bridge aligned (canonical grounding URL) |
-| `/tools/breathe` | Stillness (ex-Ambient) | canonical; no separate `/tools/ambient` route |
-| `/tools/practice/checkin` | ready | token bridge + form controls aligned |
-| `/tools/practice/journal` | ready | token bridge + tag/input alignment in shared flow |
+| `/companion/*` | ready | full-screen companion views (pause-first shipped) |
 
-## Batch 2 routes
+## Batch 1 — full-IA legacy (404 in pause-first)
 
 | Route | Status | Notes |
 |---|---|---|
-| `/tools/practice/bodyscan` | ready | token bridge active and shared controls aligned |
-| `/tools/practice/replay` | ready | token bridge active and shared controls aligned |
+| `/library` | legacy | Pre-strip Library tab — **404**; Nox verified on tag `full-ia-pre-strip` |
+| `/tools` | legacy | `ToolsHub` in five-tab shell — **404** |
+| `/tools/ground` | legacy | token bridge aligned on full-IA branch |
+| `/tools/breathe` | legacy | Stillness (ex-Ambient); **404** in pause-first |
+| `/tools/practice/checkin` | legacy | token bridge + form controls aligned on full-IA branch |
+| `/tools/practice/journal` | legacy | token bridge + tag/input alignment on full-IA branch |
+
+## Batch 2 — full-IA legacy tools + public (mixed)
+
+| Route | Status | Notes |
+|---|---|---|
+| `/tools/practice/bodyscan` | legacy | **404** in pause-first |
+| `/tools/practice/replay` | legacy | **404** in pause-first |
 | `/admin` | ready | token bridge and shared primitives applied where used |
 | `/welcome` | ready | token bridge and semantic color usage aligned |
 | `/auth` | ready | token bridge + shared controls aligned |
