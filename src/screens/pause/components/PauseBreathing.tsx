@@ -6,8 +6,8 @@ import {
   parseTriangleRotatingKickersI18n,
   resolveBreathCycleTotal,
   resolvePauseBreathingPhases,
-} from '@/features/pause/public';
-import { usePauseBreathingTimedLoop } from '@/features/pause/public-hooks';
+  usePauseBreathingTimedLoop,
+} from '@/features/pause/public-hooks';
 import type { PauseBreathSegment } from '@/screens/pause/components/pause-breath-intro';
 import { PauseBreathingBody } from '@/screens/pause/components/pause-breathing-body';
 import { resolvePauseBreathingTimedDisplay } from '@/screens/pause/lib/resolve-pause-breathing-timed-display';

@@ -251,10 +251,7 @@ export { applyBreathSegmentLogOutcome } from './application/use-cases/breathing/
 export {
   BRIEF_TRIANGLE_CYCLE_COUNT,
   holdProgressWithinPhase,
-  parseTriangleRotatingKickersI18n,
   PAUSE_RITUAL_BREATHING_PATTERN_MODE,
-  resolveBreathCycleTotal,
-  resolvePauseBreathingPhases,
   rotatingKickerIndexFromElapsed,
   RITUAL_TRIANGLE_KICKER_INTERVAL_SEC,
   secondsIntoTrianglePattern,
