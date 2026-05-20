@@ -25,6 +25,10 @@ export {
   type UseBulkHoldPendingOptions,
 } from './presentation/use-bulk-hold-pending';
 export {
+  useBulkHoldApplyOutcomes,
+  type UseBulkHoldApplyOutcomesParams,
+} from './presentation/use-bulk-hold-apply-outcomes';
+export {
   useCurrentPause,
   currentPauseQueryKey,
   type CurrentPauseRow,

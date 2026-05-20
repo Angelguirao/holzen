@@ -1,15 +1,13 @@
 import { useState, useMemo, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/features/auth/public';
-import { useBulkHoldPending } from '@/features/pause/public-hooks';
+import { useBulkHoldApplyOutcomes, useBulkHoldPending } from '@/features/pause/public-hooks';
 import { useTranslation } from 'react-i18next';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ChevronRight, Folder, List, X } from 'lucide-react';
 import { hapticFeedback } from '@/lib/haptics';
-import { applyBulkHoldOutcomes } from '@/features/pause/public-rpc';
 import {
   groupBulkHoldByLocalDay,
-  invalidatePauseStatsDataForUser,
   type BulkHoldOutcomeChoice,
   type BulkHoldPendingPause,
 } from '@/features/pause/public';
@@ -42,9 +40,7 @@ export function BulkHoldCard() {
   const [sheetOpen, setSheetOpen] = useState(false);
   const [sheetMode, setSheetMode] = useState<SheetMode>('prompt');
   const [heldCount, setHeldCount] = useState(0);
-  const [loading, setLoading] = useState(false);
   const [draftOutcomes, setDraftOutcomes] = useState<Record<string, BulkHoldOutcomeChoice>>({});
-  const [applyError, setApplyError] = useState<string | null>(null);
   const [refetchNonce, setRefetchNonce] = useState(0);
 
   const fetchEnabled = Boolean(user) && !dismissed && sheetMode !== 'success';
@@ -52,6 +48,27 @@ export function BulkHoldCard() {
     userId: user?.id,
     fetchEnabled,
     refetchNonce,
+  });
+
+  const { loading, applyError, setApplyError, applyOutcomesAndFinish } = useBulkHoldApplyOutcomes({
+    user,
+    setPending,
+    bumpRefetchNonce: () => setRefetchNonce((n) => n + 1),
+    t,
+    onSuccess: (count) => {
+      setHeldCount(count);
+      setDraftOutcomes({});
+      setSheetMode('success');
+    },
+    onPartial: (failedRows) => {
+      setDraftOutcomes((prev) => {
+        const next: Record<string, BulkHoldOutcomeChoice> = {};
+        for (const p of failedRows) {
+          if (prev[p.id]) next[p.id] = prev[p.id];
+        }
+        return next;
+      });
+    },
   });
 
   const sheetModeRef = useLatestRef(sheetMode);
@@ -73,51 +90,11 @@ export function BulkHoldCard() {
     setApplyError(null);
   }, []);
 
-  const applyOutcomesAndFinish = useCallback(
-    async (resolver: (p: BulkHoldPendingPause) => BulkHoldOutcomeChoice) => {
-      const rows = [...pendingRef.current];
-      if (!user || rows.length === 0) return;
-
-      setLoading(true);
-      setApplyError(null);
-      hapticFeedback('medium');
-
-      const result = await applyBulkHoldOutcomes(rows, resolver);
-
-      if (result.status === 'failed') {
-        hapticFeedback('warning');
-        setApplyError(t('bulkHold.applyFailed'));
-        setRefetchNonce((n) => n + 1);
-        setLoading(false);
-        return;
-      }
-
-      if (result.status === 'partial') {
-        hapticFeedback('warning');
-        setPending(result.failedRows);
-        setDraftOutcomes((prev) => {
-          const next: Record<string, BulkHoldOutcomeChoice> = {};
-          for (const p of result.failedRows) {
-            if (prev[p.id]) next[p.id] = prev[p.id];
-          }
-          return next;
-        });
-        setApplyError(t('bulkHold.applyPartialFailed', { count: result.failedRows.length }));
-        setLoading(false);
-        invalidatePauseStatsDataForUser(user.id);
-        return;
-      }
-
-      hapticFeedback('success');
-      setHeldCount(result.count);
-      setPending([]);
-      setDraftOutcomes({});
-      setApplyError(null);
-      setSheetMode('success');
-      setLoading(false);
-      invalidatePauseStatsDataForUser(user.id);
+  const runApply = useCallback(
+    (resolver: (p: BulkHoldPendingPause) => BulkHoldOutcomeChoice) => {
+      void applyOutcomesAndFinish([...pendingRef.current], resolver);
     },
-    [user, t, setPending, pendingRef],
+    [applyOutcomesAndFinish, pendingRef],
   );
 
   const handleSheetOpenChange = useCallback(
@@ -133,29 +110,27 @@ export function BulkHoldCard() {
       const draftKeys = Object.keys(drafts);
 
       if (sheetModeRef.current === 'review' && pend.length > 0 && draftKeys.length > 0) {
-        void (async () => {
-          setApplyError(null);
-          await applyOutcomesAndFinish((p) => drafts[p.id] ?? 'held');
-        })();
+        setApplyError(null);
+        runApply((p) => drafts[p.id] ?? 'held');
         return;
       }
 
       setSheetOpen(false);
       resetSheetUi();
     },
-    [applyOutcomesAndFinish, resetSheetUi, draftRef, loadingRef, pendingRef, sheetModeRef],
+    [runApply, resetSheetUi, draftRef, loadingRef, pendingRef, sheetModeRef, setApplyError],
   );
 
-  const handleHoldAll = useCallback(() => applyOutcomesAndFinish(() => 'held'), [applyOutcomesAndFinish]);
+  const handleHoldAll = useCallback(() => runApply(() => 'held'), [runApply]);
 
   const handleReviewHeldAll = useCallback(() => {
     setDraftOutcomes({});
-    return applyOutcomesAndFinish(() => 'held');
-  }, [applyOutcomesAndFinish]);
+    runApply(() => 'held');
+  }, [runApply]);
 
   const handleReviewHeldRest = useCallback(
-    () => applyOutcomesAndFinish((p) => draftRef.current[p.id] ?? 'held'),
-    [applyOutcomesAndFinish, draftRef],
+    () => runApply((p) => draftRef.current[p.id] ?? 'held'),
+    [runApply, draftRef],
   );
 
   const handleDismissTeaser = useCallback(
@@ -191,21 +166,22 @@ export function BulkHoldCard() {
     setApplyError(null);
     setDraftOutcomes({});
     setSheetMode('review');
-  }, []);
+  }, [setApplyError]);
 
   const exitReviewToPrompt = useCallback(() => {
     hapticFeedback('light');
     setSheetMode('prompt');
     setDraftOutcomes({});
     setApplyError(null);
-  }, []);
+  }, [setApplyError]);
 
   const handleDoneInReview = useCallback(() => {
     if (Object.keys(draftRef.current).length > 0) {
-      return applyOutcomesAndFinish((p) => draftRef.current[p.id] ?? 'held');
+      runApply((p) => draftRef.current[p.id] ?? 'held');
+      return;
     }
     exitReviewToPrompt();
-  }, [applyOutcomesAndFinish, exitReviewToPrompt, draftRef]);
+  }, [runApply, exitReviewToPrompt, draftRef]);
 
   const onOutcomeChange = useCallback((pauseId: string, outcome: BulkHoldOutcomeChoice) => {
     setDraftOutcomes((prev) => ({ ...prev, [pauseId]: outcome }));
