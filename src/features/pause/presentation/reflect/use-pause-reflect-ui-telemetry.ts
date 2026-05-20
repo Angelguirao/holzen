@@ -4,7 +4,7 @@ import {
   trackPauseReflectShareTap,
   trackPauseReflectWallpaperTap,
   type PauseReflectTelemetrySurface,
-} from '@/features/pause/application/use-cases/ritual/reflect/pause-reflect-ui-telemetry';
+} from '@/features/pause/application/use-cases/ritual/reflect/telemetry/pause-reflect-ui-telemetry';
 
 /** PostHog callbacks for Reflect step and Done share row — keep `trackEvent` out of `.tsx`. */
 export function usePauseReflectUiTelemetry(
