@@ -3,7 +3,7 @@ import type {
   PauseSessionScaffoldVmChromeSlots,
   PauseSessionScaffoldVmProvidersSlice,
 } from './session/pause-session-scaffold-vm-types';
-import type { PauseSessionStepHandlersResult } from './use-pause-session-step-handlers';
+import type { PauseSessionStepHandlersResult } from './session/use-pause-session-step-handlers';
 
 /** Scaffold slots and ritual payloads for `PauseSessionScaffoldShell` (chrome slots injected from screens). */
 export function usePauseSessionScaffoldVm(
