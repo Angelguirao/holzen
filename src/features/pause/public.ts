@@ -69,8 +69,6 @@ export {
   type RitualDepth,
 } from './domain/ritual-types';
 export {
-  DEFAULT_COMPANIONS,
-  DEFAULT_PREFS,
   type FetchedPauseInstance,
   type PersistedSession,
 } from './domain/session-model';

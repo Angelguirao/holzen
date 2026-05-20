@@ -1348,6 +1348,25 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-20</span>
+      <span>Phase A slice — peel session defaults from public.ts (§6)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3><code>DEFAULT_COMPANIONS</code> + <code>DEFAULT_PREFS</code> off <code>public.ts</code></h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>ritual/reflect/</code>) and #2 (<code>ritual/frame/</code>) are complete; <code>presentation/archive/</code> grouped. Continue backlog #3: remove companion session defaults from <code>public.ts</code> — presentation and application tests import <code>domain/session-model</code> directly; screens never used these constants via the barrel.</dd>
+      <dt>Deviation</dt>
+      <dd>None — <code>FetchedPauseInstance</code> and <code>PersistedSession</code> types remain on <code>public.ts</code> for screen/session contracts.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Did not peel orchestration domain types (<code>RegenerateCompanionSlot</code>, etc.) in the same commit.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: wire reflect metadata / favorite logs through <code>PauseRepository</code> (backlog #4) or peel zoom-out payload builders still unused on <code>public.ts</code>.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
 </body>
 </html>

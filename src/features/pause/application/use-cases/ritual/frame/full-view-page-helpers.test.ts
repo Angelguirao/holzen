@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { DEFAULT_PREFS } from '@/features/pause/public';
+import { DEFAULT_PREFS } from '@/features/pause/domain/session-model';
 import {
   COMPANION_FULL_VIEW_BREATHING_ROOM_MS,
   companionPrefsForFullViewSlot,

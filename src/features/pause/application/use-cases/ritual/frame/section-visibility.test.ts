@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { DEFAULT_COMPANIONS, DEFAULT_PREFS } from '@/features/pause/public';
+import { DEFAULT_COMPANIONS, DEFAULT_PREFS } from '@/features/pause/domain/session-model';
 import {
   getCompanionSectionVisibility,
   isCompanionSectionVisible,
