@@ -2594,11 +2594,11 @@
     <h3>Backlog #3 — slim barrel to cross-context surface</h3>
     <dl>
       <dt>Design decision</dt>
-      <dd>After presentation peeled to direct imports (<code>a803cd9c</code>), remove session guards, terminal guards, manual-trigger idle, <code>canNavigateToPauseSession</code>, and unused ritual shell types from <code>public.ts</code>. Barrel now targets notifications + legacy stats + shared domain types (<code>PersistedSession</code>, location state, pause-state aggregates).</dd>
+      <dd>After presentation peeled to direct imports (<code>a803cd9c</code>), consumer audit trims <code>public.ts</code> to notifications + legacy stats: <code>NotificationNavigateState</code>, pause event/state row types, effective-emotion helpers, <code>PersistedSession</code>. Dropped session guards, terminal helpers, manual-trigger idle, fingerprint/quality/pregenerate re-exports, and pause-state aggregate helpers — no <code>@/features/pause/public</code> importers.</dd>
       <dt>Deviation</dt>
       <dd>None — <code>public-hooks</code> / <code>public-rpc</code> unchanged.</dd>
       <dt>Tradeoffs</dt>
-      <dd><code>public.ts</code> ~60 LOC; legacy stats still import emotion/fingerprint/quality via <code>public</code> until Tier B strip.</dd>
+      <dd><code>public.ts</code> ~20 exports; legacy <code>PauseDoneBriefJourneyRecap</code> imports <code>PauseImpactData</code> from <code>public-hooks</code>.</dd>
       <dt>Open questions</dt>
       <dd>Next: backlog #4 wire next mutation cluster through <code>PauseRepository</code>, or move <code>NotificationNavigateState</code> to a notifications-facing type module.</dd>
     </dl>
