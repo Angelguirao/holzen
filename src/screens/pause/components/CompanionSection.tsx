@@ -11,11 +11,9 @@ import { CompanionFeedback } from './CompanionFeedback';
 import { Check, Heart, Lock, Feather, Anchor, BookOpenText, Mountain, Clock, Maximize2 } from 'lucide-react';
 import { useProGate } from '@/features/subscription/public-hooks';
 import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
-import { useCompanionData } from '@/features/pause/public-hooks';
+import { useCompanionSection } from '@/features/pause/public-hooks';
 
 import type { CompanionData, CompanionPrefs } from '@/features/pause/public';
-
-const SEVERITY_NUMBER: Record<string, number> = { mild: 3, moderate: 6, high: 10 };
 
 interface Props {
   companions: CompanionData;
@@ -148,28 +146,43 @@ export const CompanionSection = forwardRef<HTMLDivElement, Props>(function Compa
   const navigate = useNavigate();
 
   const {
-    favorites, toggleCompanionFavorite,
-    completion, markCompleted,
-    nudge, nudgeLoading, nudgeError, retryNudge,
-    signal, signalLoading, signalError, retrySignal,
-    zoomOut, zoomOutLoading, zoomOutError, retryZoomOut,
-    historyInsight, historyLoading, historyError, retryHistory,
+    labels,
+    visibility: { hasHaiku, hasGrounding, hasSignal, hasZoomOut, hasHistory },
+    showSection,
+    favorites,
+    toggleCompanionFavorite,
+    completion,
+    markCompleted,
+    nudge,
+    nudgeLoading,
+    nudgeError,
+    retryNudge,
+    signal,
+    signalLoading,
+    signalError,
+    retrySignal,
+    zoomOut,
+    zoomOutLoading,
+    zoomOutError,
+    retryZoomOut,
+    historyInsight,
+    historyLoading,
+    historyError,
+    retryHistory,
     cacheIds,
     cacheRelaxations,
     regenerateCompanion,
     canAccessCompanion,
     fetchCompanion,
-  } = useCompanionData({ companions, prefs, pauseInstanceId, context, reflectionMessage, mood, severityNumber: SEVERITY_NUMBER[severity] ?? 3 });
-
-  const labels = {
-    pause: i18nT('companions.pause'),
-    breathe: i18nT('companions.breathe'),
-    haiku: i18nT('companions.haiku'),
-    ground: i18nT('companions.ground'),
-    signal: i18nT('companions.signal'),
-    zoomOut: i18nT('companions.zoomOut'),
-    lookBack: i18nT('companions.lookBack'),
-  };
+  } = useCompanionSection({
+    companions,
+    prefs,
+    severity,
+    pauseInstanceId,
+    context,
+    reflectionMessage,
+    mood,
+  });
 
   const [expandedHaiku, setExpandedHaiku] = useState(false);
   const [expandedLearning, setExpandedLearning] = useState(false);
@@ -177,14 +190,7 @@ export const CompanionSection = forwardRef<HTMLDivElement, Props>(function Compa
   const [expandedZoomOut, setExpandedZoomOut] = useState(false);
   const [expandedHistory, setExpandedHistory] = useState(false);
 
-  const hasHaiku = prefs.haiku && companions.haiku;
-  /** Intervention still runs in `useCompanionData` for hydration/cache — not shown as its own block (less visual noise). */
-  const hasGrounding = prefs.grounding;
-  const hasSignal = prefs.signal && !!pauseInstanceId;
-  const hasZoomOut = prefs.zoomOut && !!pauseInstanceId;
-  const hasHistory = prefs.history && !!pauseInstanceId;
-
-  if (!hasHaiku && !hasGrounding && !hasSignal && !hasZoomOut && !hasHistory) return null;
+  if (!showSection) return null;
 
   return (
     <div ref={ref} className="space-y-2.5">

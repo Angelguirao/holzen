@@ -157,6 +157,10 @@ export {
   type UseCompanionFullViewPageParams,
 } from './presentation/use-companion-fullview-page';
 export {
+  useCompanionSection,
+  type UseCompanionSectionParams,
+} from './presentation/use-companion-section';
+export {
   useGroundingEnrichment,
   type GroundingEnrichment,
 } from './presentation/use-grounding-enrichment';
