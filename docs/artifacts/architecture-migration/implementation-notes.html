@@ -2165,6 +2165,25 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-20</span>
+      <span>Phase A slice — colocate breath-second-label-variant under ritual/breathe (Tier 5)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>Continue <code>breathing/</code> → <code>ritual/breathe/</code> after constants slice</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1–#2 reflect/frame moves are complete. Next smallest breathe cluster: pure <code>breath-second-label-variant</code> (+ tests) → <code>ritual/breathe/</code>; presentation breath-label hook and session VM types import the ritual path directly (no <code>public.ts</code> change).</dd>
+      <dt>Deviation</dt>
+      <dd>None — PostHog/Vite label resolution behavior unchanged.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Did not move <code>phase-advance</code>, <code>run-breath-segment-log</code>, or <code>ritual-pattern</code> in the same commit.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: move <code>phase-advance</code> or <code>breath-completed-payload</code> + <code>run-breath-segment-log</code> under <code>ritual/breathe/</code>, or continue §6 <code>public.ts</code> peel.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
 </body>
 </html>
