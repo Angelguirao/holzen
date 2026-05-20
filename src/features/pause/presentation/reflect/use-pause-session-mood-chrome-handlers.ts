@@ -4,7 +4,7 @@ import {
   runPauseSessionChromeCloseAction,
 } from '@/features/pause/application/use-cases/ritual/feel/pause-session-mood-chrome-flow';
 import { usePauseFavoriteToggle } from './use-pause-favorite-toggle';
-import { usePauseSessionMoodAndPersist } from '../use-pause-session-mood-and-persist';
+import { usePauseSessionMoodAndPersist } from './use-pause-session-mood-and-persist';
 import type {
   PauseSessionMoodChromeProvidersSlice,
   PauseSessionMoodChromeRitualSlice,

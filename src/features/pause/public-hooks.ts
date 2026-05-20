@@ -360,7 +360,7 @@ export { usePauseSessionRitualStorageSync } from './presentation/use-pause-sessi
 export {
   usePauseSessionMoodAndPersist,
   type UsePauseSessionMoodAndPersistParams,
-} from './presentation/use-pause-session-mood-and-persist';
+} from './presentation/reflect/use-pause-session-mood-and-persist';
 export {
   usePauseSessionBreathNavigation,
   type UsePauseSessionBreathNavigationParams,
