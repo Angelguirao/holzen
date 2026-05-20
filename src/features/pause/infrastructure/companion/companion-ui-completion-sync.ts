@@ -4,7 +4,7 @@ import {
   type CompanionUiCompletionStep,
   type CompanionUiCompletionState,
 } from '@/features/pause/application/use-cases/ritual/frame/companion-ui-completion-types';
-import { persistCompanionUiStepCompletion as persistCompanionUiStepCompletionUseCase } from '@/features/pause/application/use-cases/companion/persist-ui-step-completion';
+import { persistCompanionUiStepCompletion as persistCompanionUiStepCompletionUseCase } from '@/features/pause/application/use-cases/ritual/frame/persist-ui-step-completion';
 import { invalidateCompanionUiCompletionQuery } from '@/features/pause/application/queries/companion-ui-completion-query-key';
 import { supabasePauseRepository } from '@/features/pause/infrastructure/supabase-pause-repository';
 

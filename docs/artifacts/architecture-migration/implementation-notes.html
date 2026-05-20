@@ -512,6 +512,25 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-20</span>
+      <span>Phase A slice — frame leaf: persist-ui-step-completion</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3><code>persist-ui-step-completion</code> → <code>ritual/frame/</code></h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Reflect backlog #1 is complete; continue companion → <code>ritual/frame/</code> with Reflect-strip UI completion persistence (use case + test). <code>companion-ui-completion-sync</code> imports the use case from frame; public surface unchanged (<code>public-queries</code> still re-exports via infrastructure).</dd>
+      <dt>Deviation</dt>
+      <dd>None — matches spec §3.1 / §10.1 leaf-first pattern after <code>full-view-page-helpers</code>.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Could batch with <code>companion-ui-completion-sync</code> infrastructure move; kept infrastructure path stable — only application import path changed.</dd>
+      <dt>Open questions</dt>
+      <dd>Next slice: <code>companion-slot-orchestrate-telemetry</code> leaf, <code>intervention-idempotency</code> cluster, or slot orchestration cluster (<code>run-companion-slot-orchestrate</code>).</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
 </body>
 </html>
