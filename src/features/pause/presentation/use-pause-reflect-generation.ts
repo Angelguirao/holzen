@@ -2,15 +2,19 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '@/features/auth/public';
 import { useProfile } from '@/features/user/public-hooks';
+import { reflectGenerationPrerequisite } from '@/features/pause/application/use-cases/reflect/generation-prerequisites';
+import { reflectGenerationUserErrorMessage } from '@/features/pause/application/use-cases/reflect/reflect-generation-errors';
+import {
+  messageFromReflectGenerationResult,
+  resolveReflectGenerationPrefetch,
+  shouldClearReflectGenerationLoading,
+  shouldCommitReflectGeneration,
+} from '@/features/pause/application/use-cases/reflect/reflect-generation-hook-flow';
+import { runReflectGeneration } from '@/features/pause/application/use-cases/reflect/run-reflect-generation';
 import {
   fetchOpeningMessageForPauseInstance,
   generateReflectionAtReflectStep,
 } from '../public-queries';
-import {
-  reflectGenerationPrerequisite,
-  reflectGenerationUserErrorMessage,
-  runReflectGeneration,
-} from '@/features/pause/public';
 
 export type UsePauseReflectGenerationParams = {
   pauseInstanceId: string | null;
@@ -58,14 +62,18 @@ export function usePauseReflectGeneration({
   }, [pauseInstanceId, initialReflectionMessage]);
 
   const runGeneration = useCallback(async () => {
-    const prereq = reflectGenerationPrerequisite({
-      enabled,
-      pauseInstanceId,
-      userId: user?.id,
-      context,
-    });
-    if (prereq === 'idle') return;
-    if (prereq === 'missing_context') {
+    const prefetch = resolveReflectGenerationPrefetch(
+      reflectGenerationPrerequisite({
+        enabled,
+        pauseInstanceId,
+        userId: user?.id,
+        context,
+      }),
+      initialReflectionMessage,
+    );
+
+    if (prefetch.kind === 'stop') return;
+    if (prefetch.kind === 'missing_context') {
       setLoading(false);
       setError(
         t('pause.reflectMissingContext', {
@@ -75,21 +83,18 @@ export function usePauseReflectGeneration({
       );
       return;
     }
-
-    const seed = initialReflectionMessage.trim();
-    if (seed) {
-      setReflectionMessage(seed);
+    if (prefetch.kind === 'seed') {
+      setReflectionMessage(prefetch.message);
       setLoading(false);
       return;
     }
 
-    const ticket = validityRef.current;
-    const instanceForThisRun = pauseInstanceId;
-    const myRun = ++activeRunRef.current;
+    const validityTicket = validityRef.current;
+    const instanceForThisRun = pauseInstanceId!;
+    const runId = ++activeRunRef.current;
     reflectGenAbortRef.current?.abort();
     const ac = new AbortController();
     reflectGenAbortRef.current = ac;
-    const signal = ac.signal;
     setLoading(true);
     setError(null);
 
@@ -97,12 +102,12 @@ export function usePauseReflectGeneration({
       const result = await runReflectGeneration(
         {
           pauseInstanceId: instanceForThisRun,
-          userId: user.id,
-          context: context.trim(),
+          userId: user!.id,
+          context: context!.trim(),
           initialReflectionMessage,
           severityAbsPct,
           profile,
-          signal,
+          signal: ac.signal,
         },
         {
           fetchOpeningMessage: fetchOpeningMessageForPauseInstance,
@@ -112,28 +117,19 @@ export function usePauseReflectGeneration({
           },
         },
       );
-      if (ticket !== validityRef.current) return;
-      if (result.status === 'aborted') return;
-      setReflectionMessage(result.message);
+      if (!shouldCommitReflectGeneration(validityTicket, validityRef.current)) return;
+      const message = messageFromReflectGenerationResult(result);
+      if (message != null) setReflectionMessage(message);
     } catch (e: unknown) {
-      if (ticket !== validityRef.current) return;
+      if (!shouldCommitReflectGeneration(validityTicket, validityRef.current)) return;
       const raw = e instanceof Error ? e.message : String(e);
       setError(reflectGenerationUserErrorMessage(raw));
     } finally {
-      if (activeRunRef.current === myRun) {
+      if (shouldClearReflectGenerationLoading(runId, activeRunRef.current)) {
         setLoading(false);
       }
     }
-  }, [
-    t,
-    enabled,
-    pauseInstanceId,
-    user?.id,
-    context,
-    initialReflectionMessage,
-    severityAbsPct,
-    profile,
-  ]);
+  }, [t, enabled, pauseInstanceId, user, context, initialReflectionMessage, severityAbsPct, profile]);
 
   useEffect(() => {
     if (!enabled) {
