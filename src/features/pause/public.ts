@@ -375,11 +375,11 @@ export {
 } from './application/use-cases/breathing/ritual-audio';
 export { getRecencyHints } from './application/use-cases/companion/recency-hints';
 export { estimateReadTime } from './application/use-cases/companion/estimate-read-time';
+export { companionSlotToGenerationTaxonomy } from './application/use-cases/companion/generation-taxonomy';
 export {
-  companionSlotToGenerationTaxonomy,
   trackCompanionGenerationInitiated,
   trackCompanionServed,
-} from './application/use-cases/companion/analytics';
+} from './application/use-cases/companion/companion-generation-telemetry';
 export {
   applyCompanionSlotOrchestrateOutcome,
   type ApplyCompanionSlotOrchestrateOutcomeInput,

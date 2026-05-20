@@ -3,9 +3,7 @@ import type { CompanionSlotSource, RegenerateCompanionSlot } from '@/features/pa
 import { companionSlotToGenerationTaxonomy } from './generation-taxonomy';
 import type { CompanionSlotOrchestrateMode } from './run-companion-slot-orchestrate';
 
-export { companionSlotToGenerationTaxonomy } from './generation-taxonomy';
-
-/** Fires `generation.initiated` before `companion-orchestrate` lazy fetch / regenerate. */
+/** PostHog: companion-orchestrate lazy fetch / regenerate started (taxonomy: generation.initiated). */
 export function trackCompanionGenerationInitiated(
   slot: RegenerateCompanionSlot,
   mode: CompanionSlotOrchestrateMode,
@@ -20,7 +18,7 @@ export function trackCompanionGenerationInitiated(
   }
 }
 
-/** Fires `companion.served` (PostHog) when a card first renders with real content. */
+/** PostHog: companion card first renders with real content (taxonomy: companion.served). */
 export function trackCompanionServed(
   slot: RegenerateCompanionSlot,
   source: CompanionSlotSource,

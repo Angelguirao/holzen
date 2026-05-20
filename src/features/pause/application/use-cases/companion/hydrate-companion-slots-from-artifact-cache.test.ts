@@ -1,7 +1,7 @@
 import { describe, expect, it, vi } from 'vitest';
 import { hydrateCompanionSlotsFromArtifactCache } from './hydrate-companion-slots-from-artifact-cache';
 
-vi.mock('@/features/pause/application/use-cases/companion/analytics', () => ({
+vi.mock('@/features/pause/application/use-cases/companion/companion-generation-telemetry', () => ({
   trackCompanionServed: vi.fn(),
 }));
 
