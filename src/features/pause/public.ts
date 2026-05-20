@@ -77,25 +77,12 @@ export {
   type FetchedPauseInstance,
   type PersistedSession,
 } from './domain/session-model';
-export { companionDataFromArtifacts } from './application/use-cases/ritual/frame/companion-data-from-artifacts';
 export { migratePersistedPauseSession } from './application/use-cases/session/migrate-persisted-session';
 export {
   clearSession,
   loadSession,
   saveSession,
 } from './infrastructure/session/persisted-session-storage';
-export {
-  getInterventionIdempotencyDecision,
-  hasInvokedIntervention,
-  resetInterventionIdempotency,
-  runOnceIntervention,
-  type InterventionIdempotencyDecision,
-} from './application/use-cases/ritual/frame/intervention-idempotency';
-export {
-  applyCompanionOrchestrateRetryReset,
-  type CompanionOrchestrateRetryResetInput,
-  type CompanionOrchestrateRetryResetPorts,
-} from './application/use-cases/ritual/frame/apply-companion-orchestrate-retry-reset';
 export {
   BOX_BREATH_PHASE_COUNT,
   computeBreathingPhaseAdvance,
@@ -367,58 +354,7 @@ export {
   playPauseBreathPhaseCue,
   resumePauseAudioContext,
 } from './application/use-cases/breathing/ritual-audio';
-export { getRecencyHints } from './application/use-cases/ritual/frame/recency-hints';
 export { estimateReadTime } from './application/use-cases/ritual/frame/estimate-read-time';
-export { runCompanionInterventionBootstrap } from './application/use-cases/ritual/frame/run-companion-intervention-bootstrap';
-export {
-  buildCompanionFeedbackVoteMetadata,
-  type CompanionFeedbackVote,
-  type LogCompanionFeedbackVoteInput,
-} from './application/use-cases/ritual/frame/log-companion-feedback-vote';
-export {
-  isCompanionOrchestratePaywallCode,
-  isOrchestratePayloadError,
-  resolveCompanionOrchestrateInvokeFailure,
-  resolveOrchestrateInvokeUserMessage,
-  type CompanionOrchestrateInvokeFailure,
-  type CompanionOrchestrateInvokeFailureKind,
-  type CompanionOrchestratePaywallCode,
-} from './application/use-cases/ritual/frame/orchestrate-invoke-error';
-export {
-  parseEdgeFunctionError,
-  toUserFacingAiErrorMessage,
-  type ParsedEdgeFunctionError,
-} from './application/use-cases/edge/edge-function-error';
-export {
-  buildCompanionOrchestrateSessionFromRitual,
-  buildInterventionOrchestrateBody,
-  buildLazyFetchOrchestrateBody,
-  buildRegenerateOrchestrateBody,
-  type CompanionOrchestrateSessionContext,
-} from './application/use-cases/ritual/frame/build-companion-orchestrate-body';
-export {
-  companionUiCompletionQueryKey,
-  invalidateCompanionUiCompletionQuery,
-} from './application/queries/companion-ui-completion-query-key';
-export {
-  applyOrchestrateSlotLazyOrRegenerate,
-  EMPTY_COMPANION_SLOT_RELAXATIONS,
-  hydrateOrchestrateSlotIfNew,
-  hydrateOrchestrateSlotsFromInterventionResponse,
-  INTERVENTION_RESPONSE_COMPANION_SLOTS,
-  isFilledOrchestrateSlot,
-  readOrchestrateSlotBody,
-  tryApplyOrchestrateSlotFromBody,
-  type CompanionSlotAutosaveParams,
-  type CompanionSlotCacheIds,
-  type CompanionSlotCommitters,
-  type CompanionSlotRelaxationUi,
-  type CompanionSlotRelaxations,
-} from './application/use-cases/ritual/frame/orchestrate-slot-apply';
-export {
-  hydrateCompanionSlotsFromArtifactCache,
-  type HydrateCompanionSlotsFromArtifactCacheResult,
-} from './application/use-cases/ritual/frame/hydrate-companion-slots-from-artifact-cache';
 export {
   buildPauseSessionScaffoldRitualPayloads,
   type PauseSessionScaffoldRitualPayloadsParams,
