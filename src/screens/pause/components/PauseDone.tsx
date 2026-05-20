@@ -24,8 +24,6 @@ export function PauseDone({
   onSaveToJourney,
   pauseInstanceId,
 }: Props) {
-  const { subscribed } = useSubscription();
-
   if (doneVariant === 'brief') {
     return (
       <PauseDoneBrief
