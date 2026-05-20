@@ -136,12 +136,9 @@ export function logPauseFavoriteToggle(params: {
 /** Reflect progression — `reflection_step` once per instance (sessionStorage dedupe). */
 export function logPauseReflectionStepOnce(pauseInstanceId: string) {
   return runPauseReflectionStepLogOnce(
+    supabasePauseRepository,
     { pauseInstanceId },
-    {
-      storage: reflectionStepSessionStorage,
-      logStep: ({ instanceId, payload }) =>
-        repositoryLogStep(instanceId, 'reflection_step', payload),
-    },
+    { storage: reflectionStepSessionStorage },
   );
 }
 
