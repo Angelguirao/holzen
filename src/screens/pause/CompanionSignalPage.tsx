@@ -6,6 +6,7 @@ import { useCompanionData } from '@/features/pause/public-hooks';
 import {
   useFullviewTelemetry,
   usePauseSessionCompanionSnapshot,
+  useSignalSourceTrustedHost,
 } from '@/features/pause/public-hooks';
 import { CompanionFeedback } from '@/screens/pause/components/CompanionFeedback';
 import { CompanionFocusLayout } from '@/screens/pause/components/companion/CompanionFocusLayout';
@@ -86,6 +87,7 @@ export default function CompanionSignalPage() {
 
   const revealed = useStaggeredReveal(BREATHING_ROOM_MS);
   useFullviewTelemetry('signal', pauseInstanceId);
+  const { host, isTrusted } = useSignalSourceTrustedHost(signal?.url);
 
   const handleBack = useCallback(() => {
     const st = location.state as { from?: string } | undefined;
@@ -132,6 +134,8 @@ export default function CompanionSignalPage() {
           error={signalError}
           onRetry={retrySignal}
           mood={mood}
+          host={host}
+          isTrusted={isTrusted}
         />
 
         {signal && cacheRelaxations.signal && (
