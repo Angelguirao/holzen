@@ -151,6 +151,25 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-20</span>
+      <span>Phase A slice — reflect metadata + favorite</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>Reflect cluster complete: favorite + metadata → <code>ritual/reflect/</code></h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Finish Phase A reflect folder migration with the last legacy-path pair (<code>run-pause-favorite-toggle</code>, <code>run-pause-reflect-metadata-log</code> + tests) after <code>run-pause-reflection-step-log</code> — behavior-preserving <code>git mv</code> only; barrels updated in <code>public.ts</code> / <code>public-rpc.ts</code>.</dd>
+      <dt>Deviation</dt>
+      <dd>None — matches spec §3.1 / §10.1.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Could have moved favorite and metadata in separate commits; paired them as one small cluster (4 files) to clear <code>application/use-cases/reflect/</code> in one verification pass.</dd>
+      <dt>Open questions</dt>
+      <dd>Next Phase A slice: smallest <code>companion/</code> leaf cluster → <code>ritual/frame/</code>, or start <code>public.ts</code> peel per backlog #3.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
 </body>
 </html>
