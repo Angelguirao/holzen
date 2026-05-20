@@ -49,6 +49,10 @@ export {
   type UsePauseLibraryBundleOptions,
 } from './presentation/use-pause-library-bundle';
 export {
+  useJourneyPauseInstances,
+  type JourneyPauseRow,
+} from './presentation/use-journey-pause-instances';
+export {
   useCurrentPause,
   currentPauseQueryKey,
   type CurrentPauseRow,
