@@ -1,3 +1,6 @@
+import { logPauseStep } from '@/features/pause/application/use-cases/ritual/log-pause-step';
+import type { PauseRepository } from '@/features/pause/ports/pause-repository';
+
 /** RPC payload + dedupe key for Frame hub “I'm done” → `shift_emotion_logged`. */
 export function buildShiftEmotionFrameHubLogBundle(): {
   payload: Record<string, unknown>;
@@ -11,15 +14,10 @@ export type RunShiftEmotionFrameHubDoneResult =
   | { status: 'advance'; logKey: string }
   | { status: 'sync_failed' };
 
-type LogShiftEmotionStepPort = (params: {
-  instanceId: string;
-  payload: Record<string, unknown>;
-}) => Promise<void>;
-
 /** Frame hub “I'm done”: deduped `shift_emotion_logged` then advance to second breath. */
 export async function runShiftEmotionFrameHubDone(
+  repository: PauseRepository,
   input: { pauseInstanceId: string | null; lastShiftLogKey: string | null },
-  ports: { logStep: LogShiftEmotionStepPort },
 ): Promise<RunShiftEmotionFrameHubDoneResult> {
   const { payload, logKey } = buildShiftEmotionFrameHubLogBundle();
 
@@ -32,7 +30,11 @@ export async function runShiftEmotionFrameHubDone(
   }
 
   try {
-    await ports.logStep({ instanceId: input.pauseInstanceId, payload });
+    await logPauseStep(repository, {
+      instanceId: input.pauseInstanceId,
+      stepType: 'shift_emotion_logged',
+      payload,
+    });
     return { status: 'advance', logKey };
   } catch {
     return { status: 'sync_failed' };

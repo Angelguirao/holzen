@@ -337,22 +337,14 @@ export { canAdvanceFromPauseStep } from './application/use-cases/session/navigat
 export { computeDeepRitualGoBackTarget } from './application/use-cases/ritual/deep/deep-go-back';
 export { ritualDepthUpgradedPayload } from './application/use-cases/ritual-depth-upgrade-payload';
 export {
-  buildShiftEmotionFrameHubLogBundle,
-  runShiftEmotionFrameHubDone,
-} from './application/use-cases/session/shift-emotion-log';
-export {
   buildInitialEmotionLoggedPayload,
   initialEmotionLogDedupeKey,
   initialEmotionSkippedLogDedupeKey,
   initialEmotionSkippedLoggedPayload,
   type InitialEmotionLogOpts,
 } from './application/use-cases/ritual/feel/initial-emotion-log';
-export {
-  initialEmotionResetUi,
-  runInitialEmotionSelect,
-  runInitialEmotionSkip,
-  type InitialEmotionUiState,
-} from './application/use-cases/ritual/feel/run-initial-emotion-log';
+export { initialEmotionResetUi } from './application/use-cases/ritual/feel/run-initial-emotion-log';
+export type { InitialEmotionUiState } from './application/use-cases/ritual/feel/run-initial-emotion-log';
 export {
   formatPauseOpenMaxRemaining,
   pauseOpenMaxDeadlineMs,

@@ -1,5 +1,7 @@
 import type { FeelStepTile } from '@/features/pause/domain/feel-step-tile';
 import type { MoodValue } from '@/features/pause/domain/mood-value';
+import { logPauseStep } from '@/features/pause/application/use-cases/ritual/log-pause-step';
+import type { PauseRepository } from '@/features/pause/ports/pause-repository';
 import {
   buildInitialEmotionLoggedPayload,
   initialEmotionLogDedupeKey,
@@ -46,13 +48,9 @@ export type RunInitialEmotionSkipResult =
   | { status: 'local_only'; ui: Pick<InitialEmotionUiState, 'moodDone' | 'feelIntensity'> }
   | { status: 'sync_failed' };
 
-type LogInitialEmotionStepPort = (params: {
-  instanceId: string;
-  payload: Record<string, unknown>;
-}) => Promise<void>;
-
 /** Feel-step mood select: dedupe gate, optimistic UI, `initial_emotion_logged` RPC. */
 export async function runInitialEmotionSelect(
+  repository: PauseRepository,
   input: {
     pauseInstanceId: string | null;
     mood: MoodValue;
@@ -60,7 +58,6 @@ export async function runInitialEmotionSelect(
     opts?: InitialEmotionLogOpts;
     lastFeelLogKey: string | null;
   },
-  ports: { logStep: LogInitialEmotionStepPort },
 ): Promise<RunInitialEmotionSelectResult> {
   const { pauseInstanceId, mood, intensity, opts, lastFeelLogKey } = input;
   const payload = buildInitialEmotionLoggedPayload(mood, intensity, opts);
@@ -76,7 +73,11 @@ export async function runInitialEmotionSelect(
   }
 
   try {
-    await ports.logStep({ instanceId: pauseInstanceId, payload });
+    await logPauseStep(repository, {
+      instanceId: pauseInstanceId,
+      stepType: 'initial_emotion_logged',
+      payload,
+    });
     return { status: 'synced', ui, logKey };
   } catch {
     return { status: 'sync_failed', ui: ROLLBACK_UI };
@@ -85,8 +86,8 @@ export async function runInitialEmotionSelect(
 
 /** Feel-step skip: `initial_emotion_logged` with `{ skipped: true }`. */
 export async function runInitialEmotionSkip(
+  repository: PauseRepository,
   input: { pauseInstanceId: string | null },
-  ports: { logStep: LogInitialEmotionStepPort },
 ): Promise<RunInitialEmotionSkipResult> {
   const ui = { moodDone: true, feelIntensity: null } as const;
 
@@ -95,8 +96,9 @@ export async function runInitialEmotionSkip(
   }
 
   try {
-    await ports.logStep({
+    await logPauseStep(repository, {
       instanceId: input.pauseInstanceId,
+      stepType: 'initial_emotion_logged',
       payload: initialEmotionSkippedLoggedPayload(),
     });
     return { status: 'synced', logKey: initialEmotionSkippedLogDedupeKey(), ui };

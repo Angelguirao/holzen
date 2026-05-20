@@ -4,7 +4,7 @@ import {
   initialEmotionLogDedupeKey,
   initialEmotionSkippedLogDedupeKey,
   initialEmotionSkippedLoggedPayload,
-} from '@/features/pause/public';
+} from './initial-emotion-log';
 
 describe('buildInitialEmotionLoggedPayload', () => {
   it('omits intensity when undefined', () => {

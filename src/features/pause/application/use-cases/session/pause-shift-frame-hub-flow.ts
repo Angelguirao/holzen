@@ -1,5 +1,5 @@
 import type { PauseStep } from '@/features/pause/domain/pause-ritual-steps';
-import type { RunShiftEmotionFrameHubDoneResult } from '@/features/pause/application/use-cases/session/shift-emotion-log';
+import type { RunShiftEmotionFrameHubDoneResult } from '@/features/pause/application/use-cases/ritual/feel/shift-emotion-log';
 
 export const PAUSE_STEP_AFTER_FRAME_HUB_DONE = 'breath2' as const satisfies PauseStep;
 
