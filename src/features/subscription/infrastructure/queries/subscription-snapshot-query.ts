@@ -3,7 +3,7 @@
  * cache for offline / cold-start fallbacks.
  */
 
-import { invokeEdge } from '@/lib/invoke-edge';
+import { invokeCheckSubscription } from '../edge/subscription-query-edge';
 import type {
   SubCache,
   SubscriptionBillingInterval,
@@ -39,9 +39,7 @@ export async function fetchSubscriptionSnapshot(
   _userId: string,
   force: boolean,
 ): Promise<SubscriptionSnapshot> {
-  const { data, error } = await invokeEdge<Record<string, unknown>>('check-subscription', {
-    body: force ? { force: true } : undefined,
-  });
+  const { data, error } = await invokeCheckSubscription(force);
   if (error) throw error;
   const apiFlexCreditsBalance = Number(data?.flex_credits_balance) || 0;
 
