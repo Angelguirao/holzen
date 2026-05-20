@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useCompanionInterventionBootstrap } from '@/screens/pause/hooks/use-companion-intervention-bootstrap';
+import { useCompanionInterventionBootstrap } from '@/features/pause/public-hooks';
 import { useCompanionOrchestrateRetry } from '@/features/pause/public-hooks';
 import { useCompanionSlotOrchestrateActions } from '@/screens/pause/hooks/use-companion-slot-orchestrate-actions';
 import { useCompanionSlotUiState } from '@/features/pause/public-hooks';
