@@ -12,6 +12,12 @@ export type {
   ZoomOutEchoData,
   ZoomOutOnThisDayEntry,
 } from './domain/zoom-out-display';
+export { resumePauseAudioContext } from './application/use-cases/breathing/ritual-audio';
+export type { PauseBreathingHandle } from './presentation/session/pause-breathing-handle';
+export type {
+  PauseSessionBriefRitualBodyProps,
+  PauseSessionDeepRitualBodyProps,
+} from './presentation/session/ritual-body-props';
 export {
   useCompletedPauseCount,
   COMPLETED_PAUSE_COUNT_QUERY_KEY,

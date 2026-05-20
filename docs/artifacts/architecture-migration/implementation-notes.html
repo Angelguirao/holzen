@@ -1500,6 +1500,25 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-20</span>
+      <span>Phase A slice — peel session ritual presentation exports from public.ts (§6)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3><code>PauseBreathingHandle</code> / ritual body props / <code>resumePauseAudioContext</code> → <code>public-hooks</code></h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>ritual/reflect/</code>) is complete on this branch. Continue backlog #3 §6 slim barrel: screen-facing session ritual types and audio resume helper export from <code>public-hooks.ts</code>; pause screen components import alongside other presentation helpers. Feature presentation keeps direct <code>presentation/session/*</code> imports for conductors.</dd>
+      <dt>Deviation</dt>
+      <dd>None — same pattern as zoom-out types and <code>pauseStepLayout</code> (May 2026).</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Did not peel <code>writingTextareaClassName</code> — shared <code>components/ui/textarea</code> still uses <code>public</code> as a cross-cutting style token.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: move <code>shift-emotion-log</code> under <code>ritual/feel/</code> or wire more feel/decide step logs through dedicated use cases + repository-only paths.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
 </body>
 </html>

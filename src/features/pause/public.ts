@@ -325,7 +325,6 @@ export {
 export {
   playPauseBreathPatternCompleteCue,
   playPauseBreathPhaseCue,
-  resumePauseAudioContext,
 } from './application/use-cases/breathing/ritual-audio';
 export type { CompanionFeedbackVote } from './application/use-cases/ritual/frame/log-companion-feedback-vote';
 export type {
@@ -378,11 +377,6 @@ export {
   type PauseStepType,
   type PauseTemplateRow,
 } from './domain/pause-state';
-export type { PauseBreathingHandle } from './presentation/session/pause-breathing-handle';
-export type {
-  PauseSessionBriefRitualBodyProps,
-  PauseSessionDeepRitualBodyProps,
-} from './presentation/session/ritual-body-props';
 export type { ArchiveMainSegment } from './domain/archive-segment';
 export {
   isArchiveEchoPause,
