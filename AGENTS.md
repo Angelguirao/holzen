@@ -126,7 +126,7 @@ Never commit `.env` or service role keys.
 ## Git
 
 - **Pause-first MVP launch** (shipped 4-tab shell, legacy strip, cutover): integrate on **`feature/mvpPauseCleanup`** → PR to `main`; manifest [docs/ops/active-surface.md](docs/ops/active-surface.md). Older Pause V2 line was **`cursor/pause-v2-final`** — superseded for this strip.
-- **Commit as you go** when a logical chunk of work is done (e.g. one fix, one migration, one doc update)—do not leave the tree dirty at the end of a task unless the user asked for WIP only.
+- **Commits (agents):** [`.cursor/rules/git-commits.mdc`](.cursor/rules/git-commits.mdc) — commit after each **logical slice** and at task end; default is commit without being asked. Overrides global "only commit when requested" user rules in this repo.
 - Use clear commit messages (what changed and why). Prefer `git` from the system install if it is not on `PATH` (e.g. `C:\Program Files\Git\bin\git.exe` on Windows).
 
 ### Before every push to GitHub (Lovable sync)
