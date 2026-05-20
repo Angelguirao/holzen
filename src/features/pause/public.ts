@@ -78,8 +78,6 @@ export {
   initialEmotionSkippedLoggedPayload,
   type InitialEmotionLogOpts,
 } from './application/use-cases/ritual/feel/initial-emotion-log';
-export { initialEmotionResetUi } from './application/use-cases/ritual/feel/run-initial-emotion-log';
-export type { InitialEmotionUiState } from './application/use-cases/ritual/feel/run-initial-emotion-log';
 export {
   collectStepTypes,
   computePauseState,
