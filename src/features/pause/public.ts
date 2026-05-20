@@ -215,6 +215,14 @@ export {
   type PickPauseHolzenProvidersSliceSource,
 } from './application/use-cases/session/pause-holzen-providers-slice';
 export {
+  isLikelyPriceOnlyMarketError,
+  pauseHomeErrorKind,
+  pauseHomeErrorStrings,
+  shouldShowHomePauseSectionSnooze,
+  shouldSurfacePauseWidgetError,
+  type PauseHomeErrorKind,
+} from './application/use-cases/home/pause-home-widget-error';
+export {
   computePauseHeaderBackIntent,
   isPauseSessionHeaderBackVisible,
 } from './application/use-cases/session/header-back';
