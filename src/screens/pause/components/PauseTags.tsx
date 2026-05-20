@@ -4,7 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { Tag, X } from 'lucide-react';
 import { useAuth } from '@/features/auth/public';
 import { pauseArchiveListQueryPrefix } from '@/features/pause/public';
-import { pauseLogStep } from '@/features/pause/public-rpc';
+import { logPauseReflectTags } from '@/features/pause/public-rpc';
 import {
   getLatestPauseReflectTagsQueryOptions,
   PAUSE_REFLECT_STEP_TAGS,
@@ -31,11 +31,8 @@ export function PauseTags({ pauseInstanceId }: Props) {
   async function commit(next: string[]) {
     setTags(next);
     try {
-      await pauseLogStep({
-        instanceId: pauseInstanceId,
-        stepType: 'tag_updated',
-        payload: { tags: next },
-      });
+      const outcome = await logPauseReflectTags({ pauseInstanceId, tags: next });
+      if (outcome.status === 'sync_failed') return;
       if (user?.id) {
         void queryClient.invalidateQueries({ queryKey: pauseArchiveListQueryPrefix(user.id) });
       }

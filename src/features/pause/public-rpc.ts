@@ -43,6 +43,10 @@ import {
 } from './application/use-cases/session/post-pause-emotion-log';
 import type { MoodValue } from './domain/mood-value';
 import { pauseLogStep } from './infrastructure/pause-rpc-client';
+import {
+  runPauseReflectNoteUpdate,
+  runPauseReflectTagUpdate,
+} from './application/use-cases/reflect/run-pause-reflect-metadata-log';
 
 export type { BulkHoldApplyResult };
 export type { PostPauseFeelSnapshot };
@@ -73,6 +77,22 @@ export function logRetrospectiveOutcome(params: {
   outcome: string;
 }): Promise<PauseState | null> {
   return logRetrospectiveOutcomeUseCase(supabasePauseRepository, params);
+}
+
+/** Reflect post-it note — `note_updated` step. */
+export function logPauseReflectNote(params: { pauseInstanceId: string; text: string }) {
+  return runPauseReflectNoteUpdate(params, {
+    logStep: ({ instanceId, stepType, payload }) =>
+      pauseLogStep({ instanceId, stepType, payload }),
+  });
+}
+
+/** Reflect tags editor — `tag_updated` step. */
+export function logPauseReflectTags(params: { pauseInstanceId: string; tags: string[] }) {
+  return runPauseReflectTagUpdate(params, {
+    logStep: ({ instanceId, stepType, payload }) =>
+      pauseLogStep({ instanceId, stepType, payload }),
+  });
 }
 
 /** Brief done save — `post_pause_emotion_logged` when check-in differs from ritual snapshot. */

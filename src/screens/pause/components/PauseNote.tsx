@@ -4,7 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { Pencil } from 'lucide-react';
 import { useAuth } from '@/features/auth/public';
 import { pauseArchiveListQueryPrefix } from '@/features/pause/public';
-import { pauseLogStep } from '@/features/pause/public-rpc';
+import { logPauseReflectNote } from '@/features/pause/public-rpc';
 import {
   getLatestPauseReflectNoteQueryOptions,
   PAUSE_REFLECT_STEP_NOTE,
@@ -36,11 +36,8 @@ export function PauseNote({ pauseInstanceId }: Props) {
   async function commit(next: string) {
     setSaving(true);
     try {
-      await pauseLogStep({
-        instanceId: pauseInstanceId,
-        stepType: 'note_updated',
-        payload: { text: next },
-      });
+      const outcome = await logPauseReflectNote({ pauseInstanceId, text: next });
+      if (outcome.status === 'sync_failed') return;
       if (user?.id) {
         void queryClient.invalidateQueries({ queryKey: pauseArchiveListQueryPrefix(user.id) });
       }
