@@ -2946,6 +2946,25 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-20</span>
+      <span>Phase A slice — colocate pause-shift-frame-hub-flow under ritual/reflect/</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>Backlog #1 remainder — frame-hub done presentation pure flow</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Legacy <code>application/use-cases/reflect/</code> tree was already empty on <code>cursor/arch-migrate-src-ca70</code>. Smallest remaining reflect application cluster: move <code>pause-shift-frame-hub-flow</code> (+ test) from <code>session/</code> to <code>ritual/reflect/</code> beside shift-frame-done conductor; only consumer is <code>use-pause-shift-frame-done-handler</code>.</dd>
+      <dt>Deviation</dt>
+      <dd>None — pure presentation mapper; still delegates RPC to <code>ritual/feel/shift-emotion-log</code> via <code>public-rpc</code>.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Feel-domain logging stays in <code>ritual/feel/</code>; only the frame-hub→breath2 advance mapper colocates with reflect beat.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: colocate <code>use-pause-session-depth-picker-handlers</code> under <code>presentation/reflect/</code>, or flat session hooks (breath navigation bundle).</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
 </body>
 </html>
