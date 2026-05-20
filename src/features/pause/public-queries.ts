@@ -228,7 +228,7 @@ export {
   type PauseReflectStepLatestRow,
   type PauseReflectStepType,
 } from './infrastructure/queries/reflect-step-query';
-export { fetchHaikuTextForPauseInstance } from './infrastructure/queries/haiku-artifact-query';
+export { fetchHaikuTextForPauseInstance } from './infrastructure/queries/reflect/haiku-artifact-query';
 export {
   fetchOpeningMessageForPauseInstance,
   generateReflectionAtReflectStep,
