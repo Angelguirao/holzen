@@ -2412,6 +2412,25 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-20</span>
+      <span>Phase A slice — extract reflect-generation-edge-params to domain (Tier 5)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>Backlog #1 complete; edge invoke body builder → <code>domain/reflect-generation-edge-params.ts</code></h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd><code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code> was already complete on <code>cursor/arch-migrate-src-ca70</code>. Extract pure holzen-reflect invoke input shaping from <code>ritual/reflect/</code> to <code>domain/</code> so <code>run-reflect-generation</code> does not pull application→infrastructure (blocked by <code>check:feature-imports</code>). Infrastructure <code>holzen-reflect-edge</code> stays thin invoke wrapper.</dd>
+      <dt>Deviation</dt>
+      <dd>Initially placed under <code>infrastructure/edge/reflect/</code>; re-homed to <code>domain/</code> in the same slice after import-layer check failed.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Params file is not physically beside <code>holzen-reflect-edge.ts</code> — domain is the allowed home for pure edge body builders.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: colocate <code>reflection-persist-error</code> (domain or edge adapter), or backlog #3 §6 <code>public.ts</code> peel / backlog #4 <code>PauseRepository</code> wiring.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
 </body>
 </html>
