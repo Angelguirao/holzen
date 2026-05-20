@@ -1,6 +1,6 @@
 import { useCallback, useState } from 'react';
 import type { TFunction } from 'i18next';
-import { trackEvent } from '@/lib/posthog';
+import { trackPauseSessionAbandoned } from '@/features/pause/application/use-cases/session/pause-session-telemetry';
 import type { PendingPauseOfferRow } from './use-pending-pause-offer';
 import { usePendingPauseOfferMutations } from './use-pending-pause-offer-mutations';
 
@@ -34,13 +34,7 @@ export function usePauseSessionPendingLeaveSheet(options: {
   });
 
   const confirmLeavePauseSession = useCallback(() => {
-    try {
-      trackEvent('pause_session_abandoned', {
-        pause_instance_id: pauseInstanceIdForTerminal ?? undefined,
-      });
-    } catch {
-      /* no-op */
-    }
+    trackPauseSessionAbandoned(pauseInstanceIdForTerminal ?? undefined);
     setLeaveWithPendingOpen(false);
     handleClose();
   }, [handleClose, pauseInstanceIdForTerminal]);
