@@ -87,7 +87,7 @@ export {
   type FetchedPauseInstance,
   type PersistedSession,
 } from './domain/session-model';
-export { companionDataFromArtifacts } from './application/use-cases/companion/companion-data-from-artifacts';
+export { companionDataFromArtifacts } from './application/use-cases/ritual/frame/companion-data-from-artifacts';
 export { migratePersistedPauseSession } from './application/use-cases/session/migrate-persisted-session';
 export {
   clearSession,
