@@ -1,16 +1,21 @@
 import {
-  usePauseSessionFlowCore,
-  usePauseSessionRitualSurface,
+  usePauseSessionFlowThroughSteps,
+  usePauseSessionFlowWithChrome,
   type PauseSessionProviders,
 } from '@/features/pause/public-hooks';
-import { usePauseSessionScaffoldVm } from '@/screens/pause/hooks/use-pause-session-scaffold-vm';
+import { usePauseSessionScaffoldChromeSlots } from '@/screens/pause/hooks/use-pause-session-scaffold-chrome-slots';
 
 /**
- * `/pause` shell hydrate, ritual state, step handlers, and scaffold props (after providers).
- * Chrome slots stay in screens; merge logic lives in presentation.
+ * `/pause` flow conductor: core steps in presentation, chrome slots in screens.
  */
 export function usePauseSessionFlow(p: PauseSessionProviders) {
-  const { step } = usePauseSessionFlowCore(p);
-  const scaffoldVm = usePauseSessionScaffoldVm(p, step);
-  return usePauseSessionRitualSurface({ prefersReducedMotion: p.prefersReducedMotion }, step, scaffoldVm);
+  const { step } = usePauseSessionFlowThroughSteps(p);
+  const chrome = usePauseSessionScaffoldChromeSlots({
+    phase: step.ritual.phase,
+    ritualEntry: step.ritual.ritualEntry,
+    briefStep: step.ritual.briefStep,
+    fetchedInstance: step.shell.fetchedInstance,
+  });
+
+  return usePauseSessionFlowWithChrome(p, step, chrome);
 }
