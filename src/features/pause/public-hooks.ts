@@ -32,3 +32,7 @@ export {
   useCompanionOrchestrateSession,
   type UseCompanionOrchestrateSessionParams,
 } from './presentation/use-companion-orchestrate-session';
+export {
+  useCompanionInterventionFetch,
+  type UseCompanionInterventionFetchParams,
+} from './presentation/use-companion-intervention-fetch';
