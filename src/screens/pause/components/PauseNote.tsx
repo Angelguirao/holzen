@@ -1,15 +1,6 @@
-import { useEffect, useState } from 'react';
-import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
 import { Pencil } from 'lucide-react';
-import { useAuth } from '@/features/auth/public';
-import { pauseArchiveListQueryPrefix } from '@/features/pause/public';
-import { logPauseReflectNote } from '@/features/pause/public-rpc';
-import {
-  getLatestPauseReflectNoteQueryOptions,
-  PAUSE_REFLECT_STEP_NOTE,
-  pauseReflectStepLatestQueryKey,
-} from '@/features/pause/public-queries';
+import { usePauseReflectNote } from '@/features/pause/public-hooks';
 
 interface Props {
   pauseInstanceId: string;
@@ -22,34 +13,7 @@ interface Props {
  */
 export function PauseNote({ pauseInstanceId }: Props) {
   const { t } = useTranslation();
-  const { user } = useAuth();
-  const queryClient = useQueryClient();
-  const [note, setNote] = useState('');
-  const [saving, setSaving] = useState(false);
-
-  const { data: serverNote = '' } = useQuery(getLatestPauseReflectNoteQueryOptions(pauseInstanceId));
-
-  useEffect(() => {
-    setNote(serverNote);
-  }, [pauseInstanceId, serverNote]);
-
-  async function commit(next: string) {
-    setSaving(true);
-    try {
-      const outcome = await logPauseReflectNote({ pauseInstanceId, text: next });
-      if (outcome.status === 'sync_failed') return;
-      if (user?.id) {
-        void queryClient.invalidateQueries({ queryKey: pauseArchiveListQueryPrefix(user.id) });
-      }
-      void queryClient.invalidateQueries({
-        queryKey: pauseReflectStepLatestQueryKey(pauseInstanceId, PAUSE_REFLECT_STEP_NOTE),
-      });
-    } catch {
-      /* ignore */
-    } finally {
-      setSaving(false);
-    }
-  }
+  const { note, setNote, saving, commitOnBlur } = usePauseReflectNote(pauseInstanceId);
 
   return (
     <div className="space-y-1.5">
@@ -60,7 +24,7 @@ export function PauseNote({ pauseInstanceId }: Props) {
       <textarea
         value={note}
         onChange={(e) => setNote(e.target.value)}
-        onBlur={() => void commit(note)}
+        onBlur={commitOnBlur}
         placeholder={t('pause.reflect.notePlaceholder', {
           defaultValue: 'What felt important? What would you tell yourself tomorrow?',
         })}

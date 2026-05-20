@@ -1,15 +1,6 @@
-import { useEffect, useState } from 'react';
-import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
 import { Tag, X } from 'lucide-react';
-import { useAuth } from '@/features/auth/public';
-import { pauseArchiveListQueryPrefix } from '@/features/pause/public';
-import { logPauseReflectTags } from '@/features/pause/public-rpc';
-import {
-  getLatestPauseReflectTagsQueryOptions,
-  PAUSE_REFLECT_STEP_TAGS,
-  pauseReflectStepLatestQueryKey,
-} from '@/features/pause/public-queries';
+import { usePauseReflectTags } from '@/features/pause/public-hooks';
 
 interface Props {
   pauseInstanceId: string;
@@ -17,43 +8,7 @@ interface Props {
 
 export function PauseTags({ pauseInstanceId }: Props) {
   const { t } = useTranslation();
-  const { user } = useAuth();
-  const queryClient = useQueryClient();
-  const [tags, setTags] = useState<string[]>([]);
-  const [draft, setDraft] = useState('');
-
-  const { data: serverTags = [] } = useQuery(getLatestPauseReflectTagsQueryOptions(pauseInstanceId));
-
-  useEffect(() => {
-    setTags(serverTags);
-  }, [pauseInstanceId, serverTags]);
-
-  async function commit(next: string[]) {
-    setTags(next);
-    try {
-      const outcome = await logPauseReflectTags({ pauseInstanceId, tags: next });
-      if (outcome.status === 'sync_failed') return;
-      if (user?.id) {
-        void queryClient.invalidateQueries({ queryKey: pauseArchiveListQueryPrefix(user.id) });
-      }
-      void queryClient.invalidateQueries({
-        queryKey: pauseReflectStepLatestQueryKey(pauseInstanceId, PAUSE_REFLECT_STEP_TAGS),
-      });
-    } catch {
-      /* ignore */
-    }
-  }
-
-  function addDraft() {
-    const clean = draft.trim().toLowerCase().replace(/^#/, '');
-    if (!clean) return;
-    if (tags.includes(clean)) {
-      setDraft('');
-      return;
-    }
-    void commit([...tags, clean].slice(0, 8));
-    setDraft('');
-  }
+  const { tags, draft, setDraft, addDraft, removeTag } = usePauseReflectTags(pauseInstanceId);
 
   return (
     <div className="space-y-1.5">
@@ -70,7 +25,7 @@ export function PauseTags({ pauseInstanceId }: Props) {
             #{tag}
             <button
               type="button"
-              onClick={() => void commit(tags.filter((x) => x !== tag))}
+              onClick={() => removeTag(tag)}
               aria-label={`Remove ${tag}`}
               className="text-muted-foreground/60 hover:text-foreground"
             >
