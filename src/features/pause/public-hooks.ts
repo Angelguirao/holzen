@@ -39,12 +39,12 @@ export {
   type PauseArchiveRow,
   type PauseArchiveSegment,
   type UsePauseArchiveListOptions,
-} from './presentation/use-pause-archive-list';
+} from './presentation/archive/use-pause-archive-list';
 export { getArchivePausesTabHasRowsQueryOptions } from './public-queries';
 export {
   useArchivePauseRetrospectiveOutcome,
   type UseArchivePauseRetrospectiveOutcomeParams,
-} from './presentation/use-archive-pause-retrospective-outcome';
+} from './presentation/archive/use-archive-pause-retrospective-outcome';
 export {
   useJourneyPauseInstances,
   type JourneyPauseRow,
