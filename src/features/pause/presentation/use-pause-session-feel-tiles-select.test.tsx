@@ -1,6 +1,6 @@
 import { describe, expect, it, vi } from 'vitest';
 import { renderHook, act } from '@testing-library/react';
-import { usePauseSessionFeelTilesSelect } from '@/screens/pause/hooks/use-pause-session-feel-tiles-select';
+import { usePauseSessionFeelTilesSelect } from './use-pause-session-feel-tiles-select';
 
 describe('usePauseSessionFeelTilesSelect', () => {
   it('brief: forwards mood, intensity, brief ritual + face tile', async () => {

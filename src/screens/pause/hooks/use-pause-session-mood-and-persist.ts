@@ -5,9 +5,11 @@ import type { PauseStep } from '@/screens/pause/components/PauseProgress';
 import type { CompanionData, CompanionPrefs } from '@/features/pause/public';
 import { type BriefPauseStep, type FeelStepTile, type RitualDepth } from '@/features/pause/public';
 import { usePauseFeelShiftLogDedupeRefs } from '@/features/pause/public-hooks';
-import { usePauseSessionDepthPickerHandlers } from '@/screens/pause/hooks/use-pause-session-depth-picker-handlers';
-import { usePauseSessionInitialMoodHandlers } from '@/screens/pause/hooks/use-pause-session-initial-mood-handlers';
-import { usePauseSessionFeelTilesSelect } from '@/screens/pause/hooks/use-pause-session-feel-tiles-select';
+import {
+  usePauseSessionDepthPickerHandlers,
+  usePauseSessionFeelTilesSelect,
+  usePauseSessionInitialMoodHandlers,
+} from '@/features/pause/public-hooks';
 import { usePauseSessionPersistToStorage } from '@/screens/pause/hooks/use-pause-session-persist-to-storage';
 import { usePauseSessionRitualStorageSync } from '@/screens/pause/hooks/use-pause-session-ritual-storage-sync';
 
