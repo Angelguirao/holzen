@@ -1,11 +1,10 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { useTranslation } from 'react-i18next';
-import { ChevronLeft } from 'lucide-react';
 import { hapticFeedback } from '@/lib/haptics';
 import { pauseStepLayout } from '@/features/pause/public';
 import { PauseDecideChoices } from '@/screens/pause/components/pause-decide-choices';
 import { PauseDecideMirror } from '@/screens/pause/components/pause-decide-mirror';
+import { PauseRitualBackRow } from '@/screens/pause/components/pause-ritual-back-row';
 
 interface Props {
   onDecide: (decision: string) => void;
@@ -18,7 +17,6 @@ interface Props {
 }
 
 export function PauseDecide({ onDecide, onBack, introKicker, hideChoicesBack }: Props) {
-  const { t } = useTranslation();
   const [mirrorDecision, setMirrorDecision] = useState<string | null>(null);
 
   const introLine = introKicker != null && introKicker.trim() !== '' ? introKicker : null;
@@ -71,19 +69,7 @@ export function PauseDecide({ onDecide, onBack, introKicker, hideChoicesBack }: 
         )}
       </AnimatePresence>
 
-      {onBack && !mirrorDecision && !hideChoicesBack ? (
-        <motion.div
-          className={pauseStepLayout.backRow}
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 0.5, duration: 0.8 }}
-        >
-          <button type="button" onClick={onBack} className={pauseStepLayout.backButton}>
-            <ChevronLeft className="h-3 w-3" />
-            {t('pause.steps.back', { defaultValue: 'Back' })}
-          </button>
-        </motion.div>
-      ) : null}
+      {!mirrorDecision && !hideChoicesBack ? <PauseRitualBackRow onBack={onBack} /> : null}
     </motion.div>
   );
 }

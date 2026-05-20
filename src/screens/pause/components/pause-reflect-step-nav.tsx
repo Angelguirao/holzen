@@ -1,8 +1,9 @@
 import { motion } from 'framer-motion';
 import { useTranslation } from 'react-i18next';
-import { ChevronLeft, ChevronRight } from 'lucide-react';
+import { ChevronRight } from 'lucide-react';
 import { pauseStepLayout } from '@/features/pause/public';
 import { Button } from '@/components/ui/button';
+import { PauseRitualBackRow } from '@/screens/pause/components/pause-ritual-back-row';
 
 export type PauseReflectStepNavProps = {
   reflectionLoading: boolean;
@@ -42,19 +43,7 @@ export function PauseReflectStepNav({
         </Button>
       </motion.div>
 
-      {onBack ? (
-        <motion.div
-          className={pauseStepLayout.backRow}
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 0.35, duration: 0.5 }}
-        >
-          <button type="button" onClick={onBack} className={pauseStepLayout.backButton}>
-            <ChevronLeft className="h-3 w-3" />
-            {t('pause.steps.back', { defaultValue: 'Back' })}
-          </button>
-        </motion.div>
-      ) : null}
+      <PauseRitualBackRow onBack={onBack} transitionDelay={0.35} transitionDuration={0.5} />
     </>
   );
 }
