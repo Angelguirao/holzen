@@ -1,9 +1,11 @@
 import { supabase } from '@/integrations/supabase/client';
-import { ADMIN_QUERY_PREFIX } from '@/screens/admin/lib/admin-query-namespace';
 import {
   mergePregenerateCacheTopup,
   type PregenerateCacheTopupConfig,
-} from '../../../../supabase/functions/_shared/pregenerate-cache-topup-config.ts';
+} from '../../../../../supabase/functions/_shared/pregenerate-cache-topup-config.ts';
+
+/** Matches `screens/admin/lib/admin-query-namespace` — keep in sync if the prefix changes. */
+const ADMIN_QUERY_PREFIX = ['admin'] as const;
 
 export const FEATURE_KEYS = [
   'wallpaper',

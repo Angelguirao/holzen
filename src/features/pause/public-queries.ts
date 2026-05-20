@@ -115,6 +115,17 @@ export {
   type ProviderStat,
 } from './infrastructure/queries/provider-health-admin-query';
 export {
+  ADMIN_APP_CONFIG_TOOLS_QUERY_KEY,
+  DEFAULTS,
+  FEATURE_KEYS,
+  fetchAppConfigToolsBundle,
+  getAdminAppConfigToolsQueryOptions,
+  type ConfigState,
+  type FeatureKey,
+  type SpendSnapshot,
+} from './infrastructure/queries/app-config-admin-query';
+export { upsertAppConfigRow } from './infrastructure/queries/app-config-admin-mutations';
+export {
   BULK_HOLD_PENDING_DISABLED_USER_ID,
   BULK_HOLD_PENDING_QUERY_LEAF,
   BULK_HOLD_PENDING_QUERY_PREFIX,
