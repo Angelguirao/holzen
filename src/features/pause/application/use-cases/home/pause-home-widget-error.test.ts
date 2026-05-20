@@ -5,7 +5,7 @@ import {
   HOLZEN_MARKET_DISPLAY_RETRY_ERROR,
   type BtcPriceData,
 } from '@/features/market/public';
-import { PAUSE_PERSIST_ERROR_MARKER } from '@/features/pause/domain/reflection-persist-error';
+import { PAUSE_PERSIST_ERROR_MARKER } from '@/features/pause/domain/pause-persist-error';
 import {
   isLikelyPriceOnlyMarketError,
   pauseHomeErrorKind,
