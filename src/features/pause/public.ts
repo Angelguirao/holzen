@@ -210,6 +210,11 @@ export {
 } from './application/use-cases/session/build-home-pause-session-location-state';
 export { shouldNavigateAfterManualTrigger } from './application/use-cases/trigger/should-navigate-after-manual-trigger';
 export {
+  pickPauseHolzenProvidersSlice,
+  type PauseHolzenProvidersSlice,
+  type PickPauseHolzenProvidersSliceSource,
+} from './application/use-cases/session/pause-holzen-providers-slice';
+export {
   computePauseHeaderBackIntent,
   isPauseSessionHeaderBackVisible,
 } from './application/use-cases/session/header-back';

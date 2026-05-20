@@ -26,7 +26,7 @@ import { useHomePauseActions } from '@/features/pause/public-hooks';
 import { useHomePauseCardProjection } from '@/screens/home/hooks/use-home-pause-card-projection';
 import { useHomeDashboardTodayWiring } from '@/screens/home/hooks/use-home-dashboard-today-wiring';
 import { getHomeSubscriptionGate } from '@/features/subscription/public';
-import { useHomePauseContextPreviews } from '@/screens/home/hooks/use-home-pause-context-previews';
+import { usePauseContextHomePreviews } from '@/features/pause/public-hooks';
 import { useHomePullFullReload } from '@/screens/home/hooks/use-home-pull-full-reload';
 import { useHomeZenModeRouteProps } from '@/screens/home/hooks/use-home-zen-route-props';
 import { useHomeDashboardLayoutProps } from '@/screens/home/hooks/use-home-dashboard-layout-props';
@@ -108,7 +108,7 @@ const Home = () => {
   const unitBasisModeSupported = trackedAssetId === 'bitcoin';
   const { zenMode, setZenModePersist } = useHomeZenMode(pathname);
   const completedPauseCount = useHomeCompletedPauseCount(user);
-  const pauseContextHomePreview = useHomePauseContextPreviews(context);
+  const pauseContextHomePreview = usePauseContextHomePreviews(context);
 
   const [goalWhyHoldSummary, setGoalWhyHoldSummary] = useState<string | null>(null);
 
