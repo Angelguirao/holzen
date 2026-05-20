@@ -3136,6 +3136,25 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-20</span>
+      <span>Phase A slice — colocate entry effects + brief→deep under presentation/session/</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>Backlog #1 complete; Tier 4 session ritual entry cluster</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd><code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code> was already complete (<code>steps/</code>, <code>generation/</code>, <code>telemetry/</code> on branch). Move <code>use-pause-session-entry-presentation-effects</code> and <code>use-pause-session-brief-to-deep</code> (+ tests) beside shell-ritual and breath-handlers under <code>presentation/session/</code>; <code>public-hooks</code> re-export paths only.</dd>
+      <dt>Deviation</dt>
+      <dd>None — matches §3.2 / §10.1 session conductor grouping.</dd>
+      <dt>Tradeoffs</dt>
+      <dd><code>use-pause-session-brief-past-step</code> and scaffold/flow-core hooks remain flat until a later peel.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: colocate brief-past-step under <code>presentation/session/</code>, or reflect subfolders for decide-flow / frame-focus ambience.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
 </body>
 </html>

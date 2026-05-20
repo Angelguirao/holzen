@@ -344,7 +344,7 @@ export {
 export {
   usePauseSessionBriefToDeep,
   type UsePauseSessionBriefToDeepParams,
-} from './presentation/use-pause-session-brief-to-deep';
+} from './presentation/session/use-pause-session-brief-to-deep';
 export { usePauseSessionBreathStepHandlers } from './presentation/session/use-pause-session-breath-step-handlers';
 export { usePauseShiftFrameDoneHandler } from './presentation/reflect/use-pause-shift-frame-done-handler';
 export { usePauseSessionDecideHandler } from './presentation/decide/use-pause-session-decide-handler';
@@ -374,7 +374,7 @@ export { usePauseSessionPendingPauseOfferNavigation } from './presentation/sessi
 export { usePauseSessionPendingLeaveSheet } from './presentation/session/use-pause-session-pending-leave-sheet';
 export { usePauseSessionMoodChromeHandlers } from './presentation/reflect/use-pause-session-mood-chrome-handlers';
 export { usePauseSessionBreathReflectHandlers } from './presentation/reflect/use-pause-session-breath-reflect-handlers';
-export { usePauseSessionEntryPresentationEffects } from './presentation/use-pause-session-entry-presentation-effects';
+export { usePauseSessionEntryPresentationEffects } from './presentation/session/use-pause-session-entry-presentation-effects';
 export { usePauseSessionTerminalEntryRedirect } from './presentation/session/use-pause-session-terminal-entry-redirect';
 export { usePauseSessionStepTransition } from './presentation/use-pause-session-step-transition';
 export { usePauseSessionDepthAndBriefCopy } from './presentation/use-pause-session-depth-and-brief-copy';
