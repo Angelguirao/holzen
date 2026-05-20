@@ -2,12 +2,10 @@ import { useQuery } from '@tanstack/react-query';
 import { getPauseSessionFetchedInstanceQueryOptions } from '@/features/pause/public-queries';
 import { type FetchedPauseInstance } from '@/features/pause/public';
 
-export { pauseSessionFetchedInstanceQueryKey } from '@/features/pause/public-queries';
-
 /**
  * Loads `pause_instances` + `pause_ai_artifacts` when `/pause` opens with id-only navigation
  * (hydration `status === 'fetch'` from `computePauseSessionHydration`). Row shaping:
- * `src/lib/pause-session-fetched-instance.ts`.
+ * `buildFetchedPauseInstanceFromFetch` in the pause feature application layer.
  *
  * **Caller:** `screens/pause/hooks/use-pause-session-shell.ts`. **Contract:** `docs/systems/pause-system.md`
  * section 7.2; **code map:** same doc, section 10.
