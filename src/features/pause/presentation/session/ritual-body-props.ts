@@ -4,7 +4,7 @@ import type {
   CompanionData,
   CompanionPrefs,
   PauseStep,
-} from '@/features/pause/public';
+} from '@/features/pause/public-hooks';
 import type { FeelStepTile } from '../../domain/feel-step-tile';
 import type { MoodValue } from '../../domain/mood-value';
 import type { PauseSessionStepTransitionConfig } from '@/features/pause/application/use-cases/session/step-transition';

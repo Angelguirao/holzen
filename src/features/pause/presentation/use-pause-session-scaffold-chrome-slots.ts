@@ -1,5 +1,6 @@
 import { useMemo, type ReactNode } from 'react';
-import type { BriefPauseStep, FetchedPauseInstance, RitualDepth } from '@/features/pause/public';
+import type { FetchedPauseInstance } from '@/features/pause/public';
+import type { BriefPauseStep, RitualDepth } from '@/features/pause/public-hooks';
 import type { PauseScaffoldChromeRegistry } from './session/pause-session-scaffold-vm-types';
 
 export type UsePauseSessionScaffoldChromeSlotsParams = {

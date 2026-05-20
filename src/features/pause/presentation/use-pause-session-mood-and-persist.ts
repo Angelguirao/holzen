@@ -1,13 +1,13 @@
 import { useCallback, type Dispatch, type SetStateAction } from 'react';
 import type { TFunction } from 'i18next';
 import { runDeepPausePickerEntryIfPro } from '@/features/pause/application/use-cases/ritual/feel/pause-session-mood-chrome-flow';
-import {
-  type BriefPauseStep,
-  type CompanionData,
-  type CompanionPrefs,
-  type PauseStep,
-  type RitualDepth,
-} from '@/features/pause/public';
+import type {
+  BriefPauseStep,
+  CompanionData,
+  CompanionPrefs,
+  PauseStep,
+  RitualDepth,
+} from '@/features/pause/public-hooks';
 import type { FeelStepTile } from '../domain/feel-step-tile';
 import type { MoodValue } from '../domain/mood-value';
 import { usePauseFeelShiftLogDedupeRefs } from './use-pause-feel-shift-log-dedupe-refs';

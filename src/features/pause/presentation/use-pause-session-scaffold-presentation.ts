@@ -1,11 +1,8 @@
 import type { ReactNode } from 'react';
 import type { TFunction } from 'i18next';
 import type { BtcPriceData } from '@/features/market/public';
-import {
-  isPauseSessionDepthPickerActive,
-  type FetchedPauseInstance,
-  type RitualDepth,
-} from '@/features/pause/public';
+import { isPauseSessionDepthPickerActive, type FetchedPauseInstance } from '@/features/pause/public';
+import type { RitualDepth } from '@/features/pause/public-hooks';
 import type { PauseSessionScaffoldRitualPayloadsParams } from './session/scaffold-ritual-payloads';
 import { usePauseSessionDepthAndBriefCopy } from './use-pause-session-depth-and-brief-copy';
 import { usePauseSessionScaffoldRitual } from './use-pause-session-scaffold-ritual';

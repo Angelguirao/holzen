@@ -26,11 +26,6 @@ export {
   type ManualPauseTriggerResult,
 } from './domain/manual-pause-trigger-result';
 export {
-  PAUSE_RITUAL_SCHEMA_VERSION,
-  type BriefPauseStep,
-  type RitualDepth,
-} from './domain/ritual-types';
-export {
   type FetchedPauseInstance,
   type PersistedSession,
 } from './domain/session-model';

@@ -1,7 +1,7 @@
 import { useCallback, type Dispatch, type SetStateAction } from 'react';
 import { computeBriefPastStepClick } from '@/features/pause/public';
 import { hapticFeedback } from '@/lib/haptics';
-import { type BriefPauseStep } from '@/features/pause/public';
+import type { BriefPauseStep } from '@/features/pause/public-hooks';
 
 export type UsePauseSessionBriefPastStepParams = {
   briefStep: BriefPauseStep;

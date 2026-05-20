@@ -3,7 +3,7 @@ import type { TFunction } from 'i18next';
 import { resolveShiftFrameHubDonePresentation } from '@/features/pause/application/use-cases/session/pause-shift-frame-hub-flow';
 import { runShiftEmotionFrameHubDone } from '@/features/pause/public-rpc';
 import { showPauseStepSyncFailedToast } from '@/features/pause/application/use-cases/feedback/step-sync-toast';
-import type { PauseStep } from '@/features/pause/public';
+import type { PauseStep } from '@/features/pause/public-hooks';
 
 /**
  * Frame hub “I'm done” → optional `shift_emotion_logged` RPC (deduped) then advance to second breath.

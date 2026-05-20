@@ -7,7 +7,7 @@ import type {
   PauseSessionBriefRitualBodyProps,
   PauseSessionDeepRitualBodyProps,
 } from '@/features/pause/presentation/session/ritual-body-props';
-import type { PauseStep } from '@/features/pause/public';
+import type { PauseStep } from '@/features/pause/public-hooks';
 import type { BriefPauseStep } from '@/features/pause/domain/ritual-types';
 import type { PauseSessionStepTransitionConfig } from '@/features/pause/application/use-cases/session/step-transition';
 

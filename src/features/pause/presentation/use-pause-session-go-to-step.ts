@@ -1,5 +1,6 @@
 import { useCallback, type Dispatch, type SetStateAction } from 'react';
-import { pauseStepSwipeDirection, type PauseStep } from '@/features/pause/public';
+import { pauseStepSwipeDirection } from '@/features/pause/public';
+import type { PauseStep } from '@/features/pause/public-hooks';
 import { hapticFeedback } from '@/lib/haptics';
 
 /** Deep ritual: advance to next `PauseStep` with swipe direction + haptic. */

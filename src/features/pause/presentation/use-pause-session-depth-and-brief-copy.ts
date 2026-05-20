@@ -1,7 +1,7 @@
 import { useMemo } from 'react';
 import type { TFunction } from 'i18next';
 import { trackedAssetSymbol, type BtcPriceData } from '@/features/market/public';
-import { type RitualDepth } from '@/features/pause/public';
+import type { RitualDepth } from '@/features/pause/public-hooks';
 
 /** Depth-picker context line for the depth picker (`PauseSessionDepthPickerStack`). */
 export function usePauseSessionDepthAndBriefCopy(input: {

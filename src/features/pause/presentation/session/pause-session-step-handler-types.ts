@@ -2,14 +2,14 @@ import type { Dispatch, MutableRefObject, SetStateAction } from 'react';
 import type { TFunction } from 'i18next';
 import type { BtcPriceData } from '@/features/market/public';
 import type { PauseImpactData } from '@/features/pause/application/use-cases/ritual/decide/impact-data';
+import type { PersistedSession } from '@/features/pause/public';
 import type {
   BriefPauseStep,
   CompanionData,
   CompanionPrefs,
   PauseStep,
-  PersistedSession,
   RitualDepth,
-} from '@/features/pause/public';
+} from '@/features/pause/public-hooks';
 import type { FeelStepTile } from '../../domain/feel-step-tile';
 import type { MoodValue } from '../../domain/mood-value';
 
