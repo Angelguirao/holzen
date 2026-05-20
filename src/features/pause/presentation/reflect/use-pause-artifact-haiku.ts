@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import { fetchHaikuTextForPauseInstance } from '../public-queries';
+import { fetchHaikuTextForPauseInstance } from '../../public-queries';
 
 export type PauseArtifactHaikuFetchPhase = 'idle' | 'loading' | 'error' | 'done';
 

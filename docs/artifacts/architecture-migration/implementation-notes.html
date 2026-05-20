@@ -1063,6 +1063,25 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-20</span>
+      <span>Phase A slice — artifact haiku hook into presentation/reflect</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3><code>use-pause-artifact-haiku</code> → <code>presentation/reflect/</code></h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>ritual/reflect/</code> use cases) and the seven-hook reflect folder move are complete. Colocate <code>usePauseArtifactHaiku</code> (Reflect + Frame artifact read) with other reflect conductors; screens keep importing via <code>public-hooks</code>.</dd>
+      <dt>Deviation</dt>
+      <dd>None — same subfolder pattern as <code>presentation/session/</code>.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Hook still serves Frame step (<code>whenEnabled</code> trigger) but lives under reflect beat folder because artifact kind is shared with Reflect pipeline.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: <code>presentation/companion/</code> folder or §6 <code>public.ts</code> peel (zoom-out / feedback helpers).</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
 </body>
 </html>
