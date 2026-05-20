@@ -2108,6 +2108,25 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-20</span>
+      <span>Phase A slice — colocate breathing-constants under ritual/breathe (Tier 5)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>Backlog #1–#2 complete; start <code>breathing/</code> → <code>ritual/breathe/</code></h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd><code>reflect/</code> and <code>companion/</code> ritual moves are complete on <code>cursor/arch-migrate-src-ca70</code>. Smallest breathe-cluster move: <code>breathing-constants.ts</code> → <code>ritual/breathe/</code>; <code>ritual-pattern</code> and <code>phase-advance</code> re-export/import updated. Remaining <code>application/use-cases/breathing/*</code> stays until a later slice.</dd>
+      <dt>Deviation</dt>
+      <dd>None — <code>BOX_BREATH_PHASE_COUNT</code> behavior unchanged.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Did not move phase-advance, ritual-pattern, or segment-log modules in the same commit.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: move <code>breath-second-label-variant</code> or <code>run-breath-segment-log</code> under <code>ritual/breathe/</code>, or continue §6 <code>public.ts</code> peel.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
 </body>
 </html>

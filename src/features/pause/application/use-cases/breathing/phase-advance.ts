@@ -1,4 +1,4 @@
-export { BOX_BREATH_PHASE_COUNT } from '@/features/pause/application/use-cases/breathing/breathing-constants';
+export { BOX_BREATH_PHASE_COUNT } from '@/features/pause/application/use-cases/ritual/breathe/breathing-constants';
 
 /**
  * Parent `completed` is false while the segment is in progress; session-local completion

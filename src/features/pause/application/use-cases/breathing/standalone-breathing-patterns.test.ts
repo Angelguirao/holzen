@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { BOX_BREATH_PHASE_COUNT } from '@/features/pause/application/use-cases/breathing/breathing-constants';
+import { BOX_BREATH_PHASE_COUNT } from '@/features/pause/application/use-cases/ritual/breathe/breathing-constants';
 import {
   STANDALONE_BREATHING_PATTERNS,
   resolveSuggestedStandaloneBreathingPatternIndex,
