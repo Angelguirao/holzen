@@ -873,6 +873,25 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-20</span>
+      <span>Phase A slice — public.ts reflect peel</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>Drop reflect-generation re-exports from <code>public.ts</code></h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Reflect use cases and edge I/O already live under <code>ritual/reflect/</code> and <code>infrastructure/edge/reflect/</code>. Remove generation hook helpers from the bloated <code>public.ts</code> barrel — presentation and tests import <code>application/use-cases/ritual/reflect/*</code> directly; cross-context callers never needed these symbols.</dd>
+      <dt>Deviation</dt>
+      <dd>None — matches spec §6 slim <code>public.ts</code> (incremental peel, not full barrel split).</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Kept persist-error helpers and favorite pro-hint on <code>public.ts</code> for screen/trigger surfaces; broader peel deferred.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: peel companion/frame exports from <code>public.ts</code> or wire <code>pauseLogCompanion</code> through repository.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
 </body>
 </html>
