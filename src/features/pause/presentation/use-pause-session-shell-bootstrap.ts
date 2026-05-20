@@ -7,7 +7,7 @@ import {
 import { parsePauseSessionLocationState } from '@/features/pause/application/use-cases/session/location-state';
 import { coalescePauseSessionShellViewModel } from '@/features/pause/application/use-cases/session/shell-view-model';
 import type { PauseSessionShellHolzen } from '@/features/pause/domain/pause-session-shell-holzen';
-import { usePauseSessionMountLog } from './use-pause-session-mount-log';
+import { usePauseSessionMountLog } from './session/use-pause-session-mount-log';
 import { usePauseSessionPendingLeaveSheet } from './use-pause-session-pending-leave-sheet';
 import { usePauseSessionPendingPauseOfferNavigation } from './use-pause-session-pending-pause-offer-navigation';
 import { usePauseSessionShell } from './use-pause-session-shell';

@@ -2642,6 +2642,25 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-20</span>
+      <span>Phase A slice — colocate mount-log in presentation/session/</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>Backlog #1 complete; session conductor grouping</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd><code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code> was already complete on <code>cursor/arch-migrate-src-ca70</code>. Move <code>use-pause-session-mount-log</code> (+ test) beside other session presentation modules under <code>presentation/session/</code>; <code>public-hooks</code> re-export path only.</dd>
+      <dt>Deviation</dt>
+      <dd>None — matches §3.2 / §10.1 session conductor grouping.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Most session conductors remain flat under <code>presentation/</code> until incremental peels.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: colocate breath segment / go-back session hooks under <code>presentation/session/</code>, or wire <code>pauseLogCompanion</code> through a port-backed use case.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
 </body>
 </html>
