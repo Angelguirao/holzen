@@ -107,6 +107,12 @@ export {
   type ReflectGenerationProfileInput,
 } from './application/use-cases/reflect/reflect-generation-edge-params';
 export {
+  runReflectGeneration,
+  type RunReflectGenerationInput,
+  type RunReflectGenerationPorts,
+  type RunReflectGenerationResult,
+} from './application/use-cases/reflect/run-reflect-generation';
+export {
   BOX_BREATH_PHASE_COUNT,
   computeBreathingPhaseAdvance,
   resolveBreathingCompleted,
