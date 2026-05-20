@@ -1,6 +1,6 @@
 import { describe, expect, it, vi, beforeEach } from 'vitest';
 import { renderHook, act } from '@testing-library/react';
-import { usePauseSessionBreathStepHandlers } from '@/screens/pause/hooks/use-pause-session-breath-step-handlers';
+import { usePauseSessionBreathStepHandlers } from './use-pause-session-breath-step-handlers';
 
 function baseInput(overrides: Partial<Parameters<typeof usePauseSessionBreathStepHandlers>[0]> = {}) {
   return {

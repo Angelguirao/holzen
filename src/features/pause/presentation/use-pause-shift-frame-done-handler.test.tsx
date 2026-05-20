@@ -2,7 +2,7 @@ import { describe, expect, it, vi, beforeEach } from 'vitest';
 import { renderHook, act } from '@testing-library/react';
 import type { TFunction } from 'i18next';
 import type { MutableRefObject } from 'react';
-import { usePauseShiftFrameDoneHandler } from '@/screens/pause/hooks/use-pause-shift-frame-done-handler';
+import { usePauseShiftFrameDoneHandler } from './use-pause-shift-frame-done-handler';
 
 const { pauseLogStepMock } = vi.hoisted(() => ({
   pauseLogStepMock: vi.fn(),
