@@ -206,6 +206,8 @@ packages/pause/src/
 
 ## 5. Naming conventions
 
+**Canonical detail:** [naming-conventions-holzen.md](naming-conventions-holzen.md) (screens kebab files, `public*` barrels, branch patterns, anti-patterns). This table is the quick reference.
+
 | Artifact | Convention | Example |
 |----------|--------------|---------|
 | Use case file | `kebab-case` verb phrase | `log-pause-step.ts` |
@@ -215,6 +217,7 @@ packages/pause/src/
 | Query module | `*-query.ts` in `infrastructure` or context `infrastructure/queries/` | `pause-archive-list-query.ts` |
 | Query key factory | `getPauseArchiveListQueryOptions` | matches [data-fetching-conventions](../backlog/data-fetching-conventions.md) |
 | Screen | `PascalCase` + `Screen` suffix | `HomeScreen.tsx` under `apps/web/src/screens/` |
+| Route component (new) | `kebab-case` file, `PascalCase` export | `pause-depth-picker-header.tsx` |
 | Public API | `public.ts` at package root | 5–20 exports max |
 | Package name | `@holzen/<context>` | `@holzen/pause` |
 
