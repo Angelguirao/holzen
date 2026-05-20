@@ -322,6 +322,25 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-20</span>
+      <span>Phase A slice — frame leaf: log-pause-companion</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3><code>log-pause-companion</code> → <code>ritual/frame/</code></h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Reflect → <code>ritual/reflect/</code> is complete (backlog #1). Continue companion leaf-first with repository-port wrapper for <code>pause_log_companion</code> (single file; only consumer is <code>persist-ui-step-completion</code> in <code>companion/</code>).</dd>
+      <dt>Deviation</dt>
+      <dd>None — matches spec §3.1 / §10.1.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Could batch with <code>persist-ui-step-completion</code>; kept one file so orchestration stays in <code>companion/</code> until a larger cluster slice.</dd>
+      <dt>Open questions</dt>
+      <dd>Next slice: <code>persist-ui-step-completion</code> + <code>companion-ui-completion-sync</code>, <code>artifact-cache-parse</code> cluster, or <code>intervention-idempotency-telemetry</code> leaf.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
 </body>
 </html>
