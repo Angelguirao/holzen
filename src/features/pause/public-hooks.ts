@@ -219,7 +219,7 @@ export { usePauseSessionExitNavigation } from './presentation/use-pause-session-
 export { usePauseSessionPendingPauseOfferNavigation } from './presentation/use-pause-session-pending-pause-offer-navigation';
 export { usePauseSessionPendingLeaveSheet } from './presentation/use-pause-session-pending-leave-sheet';
 export { usePauseSessionMoodChromeHandlers } from './presentation/use-pause-session-mood-chrome-handlers';
-export { usePauseSessionBreathReflectHandlers } from './presentation/use-pause-session-breath-reflect-handlers';
+export { usePauseSessionBreathReflectHandlers } from './presentation/reflect/use-pause-session-breath-reflect-handlers';
 export { usePauseSessionEntryPresentationEffects } from './presentation/use-pause-session-entry-presentation-effects';
 export { usePauseSessionTerminalEntryRedirect } from './presentation/use-pause-session-terminal-entry-redirect';
 export { usePauseSessionStepTransition } from './presentation/use-pause-session-step-transition';

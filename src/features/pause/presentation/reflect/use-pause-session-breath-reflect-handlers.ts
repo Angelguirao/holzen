@@ -1,12 +1,12 @@
-import { usePauseShiftFrameDoneHandler } from './use-pause-shift-frame-done-handler';
-import { usePauseSessionBreathHandlers } from './use-pause-session-breath-handlers';
-import { usePauseSessionReflectAndDecide } from './reflect/use-pause-session-reflect-and-decide';
+import { usePauseShiftFrameDoneHandler } from '../use-pause-shift-frame-done-handler';
+import { usePauseSessionBreathHandlers } from '../use-pause-session-breath-handlers';
+import { usePauseSessionReflectAndDecide } from './use-pause-session-reflect-and-decide';
 import type {
   PauseSessionBreathReflectMoodSlice,
   PauseSessionBreathReflectProvidersSlice,
   PauseSessionBreathReflectRitualSlice,
   PauseSessionBreathReflectShellSlice,
-} from './session/pause-session-step-handler-types';
+} from '../session/pause-session-step-handler-types';
 
 /** Breath segment navigation, shift frame done, and reflect/decide for the pause session ritual. */
 export function usePauseSessionBreathReflectHandlers(
