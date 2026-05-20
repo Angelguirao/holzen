@@ -23,7 +23,12 @@ import { pauseInstanceQueryPrefix } from '@/features/pause/application/queries/p
 import { pauseTerminalEntryStateQueryKey } from '@/features/pause/infrastructure/queries/terminal-entry-state-query';
 import { pauseSessionCompanionSnapshotQueryKey } from '@/features/pause/infrastructure/queries/companion-session-snapshot-query';
 import { invalidateCompanionUiCompletionQuery } from '@/features/pause/application/queries/companion-ui-completion-query-key';
-import { trackEvent } from '@/lib/posthog';
+import {
+  trackPauseCompanionCounted,
+  trackPauseCompanionNotCounted,
+  trackPauseCompletedOnce,
+  trackPauseEngagedOnce,
+} from '@/features/pause/application/use-cases/session/pause-rpc-lifecycle-telemetry';
 import type {
   PauseAdoptPendingResult,
   PauseCreateOrReuseResult,
@@ -40,10 +45,6 @@ export type {
   PauseCreateOrReuseResult,
   PauseLogCompanionResult,
 } from '@/features/pause/domain/rpc-types';
-
-/** Dedupe PostHog pause lifecycle events (RPC can return the same state repeatedly). */
-const phPauseEngagedSent = new Set<string>();
-const phPauseCompletedSent = new Set<string>();
 
 function scheduleInvalidatePauseStatsOnCompleted(pauseInstanceId: string) {
   void supabase.auth.getUser().then(({ data: { user } }) => {
@@ -112,21 +113,10 @@ export async function pauseLogStep(params: {
       invalidatePauseStatsDataForUser(user?.id);
     });
   }
-  if (state === 'engaged' && !phPauseEngagedSent.has(params.instanceId)) {
-    phPauseEngagedSent.add(params.instanceId);
-    try {
-      trackEvent('pause_engaged', { pause_instance_id: params.instanceId });
-    } catch {
-      /* no-op */
-    }
+  if (state === 'engaged') {
+    trackPauseEngagedOnce(params.instanceId);
   }
-  if (state === 'completed' && !phPauseCompletedSent.has(params.instanceId)) {
-    phPauseCompletedSent.add(params.instanceId);
-    try {
-      trackEvent('pause_completed', { pause_instance_id: params.instanceId });
-    } catch {
-      /* no-op */
-    }
+  if (state === 'completed' && trackPauseCompletedOnce(params.instanceId)) {
     scheduleInvalidatePauseStatsOnCompleted(params.instanceId);
   }
   return state;
@@ -152,47 +142,33 @@ export async function pauseLogCompanion(params: {
   }) as PauseLogCompanionResult;
 
   if (params.action === 'complete') {
-    try {
-      if (params.instanceId) {
-        if (result.counts_for_pause) {
-          trackEvent('pause_companion_counted', {
-            pause_instance_id: params.instanceId,
-            companion_type: params.companionType,
-            entry_point: params.entryPoint,
-          });
-        } else {
-          trackEvent('pause_companion_not_counted', {
-            pause_instance_id: params.instanceId,
-            companion_type: params.companionType,
-            reason: result.non_counting_reason ?? 'no_active_pause',
-            entry_point: params.entryPoint,
-          });
-        }
+    if (params.instanceId) {
+      if (result.counts_for_pause) {
+        trackPauseCompanionCounted({
+          pauseInstanceId: params.instanceId,
+          companionType: params.companionType,
+          entryPoint: params.entryPoint,
+        });
       } else {
-        trackEvent('pause_companion_not_counted', {
-          companion_type: params.companionType,
+        trackPauseCompanionNotCounted({
+          pauseInstanceId: params.instanceId,
+          companionType: params.companionType,
           reason: result.non_counting_reason ?? 'no_active_pause',
-          entry_point: params.entryPoint,
+          entryPoint: params.entryPoint,
         });
       }
-    } catch {
-      /* no-op */
+    } else {
+      trackPauseCompanionNotCounted({
+        companionType: params.companionType,
+        reason: result.non_counting_reason ?? 'no_active_pause',
+        entryPoint: params.entryPoint,
+      });
     }
   }
 
   // Completion can be reached by the *last* counted companion (template requires ≥1) after all
   // step events — that transition is visible only on `pause_log_companion`’s `resulting_state`.
-  if (
-    params.instanceId &&
-    result.resulting_state === 'completed' &&
-    !phPauseCompletedSent.has(params.instanceId)
-  ) {
-    phPauseCompletedSent.add(params.instanceId);
-    try {
-      trackEvent('pause_completed', { pause_instance_id: params.instanceId });
-    } catch {
-      /* no-op */
-    }
+  if (params.instanceId && result.resulting_state === 'completed' && trackPauseCompletedOnce(params.instanceId)) {
     scheduleInvalidatePauseStatsOnCompleted(params.instanceId);
   }
 
