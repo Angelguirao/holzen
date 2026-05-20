@@ -1557,6 +1557,25 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-20</span>
+      <span>Phase A slice — post-pause emotion → ritual/done/ (Tier 5 + backlog #4)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3><code>post-pause-emotion-log</code> colocate + repository port</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>reflect/</code> → <code>ritual/reflect/</code>) was already complete on this branch. Next smallest ritual beat: move brief-done post-pause feel logging under <code>application/use-cases/ritual/done/</code>; <code>runPostPauseEmotionLogIfDirty</code> takes <code>PauseRepository</code> and calls <code>logPauseStep</code>; <code>logPostPauseEmotionIfDirty</code> on <code>public-rpc</code> passes <code>supabasePauseRepository</code>. Moved <code>isPauseMoodValue</code> to <code>domain/mood-value.ts</code> (screens still import via <code>public</code>).</dd>
+      <dt>Deviation</dt>
+      <dd>None — mechanical move + same repository pattern as feel/decide step logs (May 2026).</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Did not peel more §6 exports off <code>public.ts</code> in the same commit.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: §6 <code>public.ts</code> peel (presentation-only exports) or colocate <code>application/use-cases/breathing/</code> under <code>ritual/breathe/</code>.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
 </body>
 </html>

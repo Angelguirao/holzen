@@ -286,7 +286,7 @@ The repo is mid-migration. Expect:
 | Breathing / audio | `application/use-cases/breathing/` (phase cues + shared `pause-ritual-audio-context`), `ritual/breath/` | `ritual/breathe/` | Optional consolidate later |
 | Feel / initial emotion | `application/use-cases/ritual/feel/` (`initial-emotion-log`, `run-initial-emotion-log`, `shift-emotion-log`, `clamp-feel-intensity`) | `ritual/feel/` | Done (May 2026) |
 | Decide / outcome | `application/use-cases/ritual/decide/` (`run-pause-outcome-log`, `pause-decide-outcome-flow`) | `ritual/decide/` | Done (May 2026) |
-| Done / post-pause | `session/post-pause-emotion-log.ts` | `ritual/done/` | Optional later |
+| Done / post-pause | `application/use-cases/ritual/done/post-pause-emotion-log.ts` | `ritual/done/` | Done (May 2026) |
 | Session conductors | `presentation/*.ts` (flat + `presentation/session/` + `presentation/reflect/` + `presentation/decide/` + `presentation/companion/` + `presentation/home/` + `presentation/archive/`) — mood chrome + favorite in `reflect/`; archive list + retrospective in `archive/` | `presentation/session/`, `reflect/`, `decide/`, `companion/`, `home/`, `archive/` | Reflect + companion + decide + home + archive hooks grouped (May 2026); peel `public.ts` continues (§6) |
 | Archive queries | `infrastructure/queries/archive/` (`archive-list-query.ts`, `archive-pauses-tab-query.ts`) | `infrastructure/queries/archive/` | Done (May 2026) |
 | Reflect edge + artifact I/O | `infrastructure/edge/reflect/` (`holzen-reflect-edge`, `reflection-artifact`, `load-reflect-recency-hints`, `reflection-step-session-storage`) | under `infrastructure/edge/` (§3) | Done (May 2026) |
