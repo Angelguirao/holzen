@@ -14,7 +14,7 @@ import { useHomeCompletedPauseCount } from '@/screens/home/hooks/use-home-comple
 import { useHomeOutletPauseReady } from '@/screens/home/hooks/use-home-outlet-pause-ready';
 import { useHomeDocumentTitle } from '@/screens/home/hooks/use-home-document-title';
 import { useHomeHeroQuoteViewed } from '@/screens/home/hooks/use-home-hero-quote-viewed';
-import { useHomePauseAudio } from '@/screens/home/hooks/use-home-pause-audio';
+import { usePauseArrivalAudio } from '@/features/pause/public-hooks';
 import { useHomeMarketDisplayPreferences } from '@/screens/home/hooks/use-home-market-display-preferences';
 import { useState } from 'react';
 import { useOutletContext, useSearchParams, useNavigate, useLocation } from 'react-router-dom';
@@ -94,7 +94,7 @@ const Home = () => {
   const dismissPauseReady = outletCtx?.dismissPauseReady;
   useHomeOutletPauseReady(pauseReady, hasOpenPause, dismissPauseReady);
   useHomeHeroQuoteViewed(profileLoaded, user?.id);
-  useHomePauseAudio(newPauseArrival, lastPauseInstanceId, clearNewPauseArrival);
+  usePauseArrivalAudio(newPauseArrival, lastPauseInstanceId, clearNewPauseArrival);
 
   const {
     priceHidden,

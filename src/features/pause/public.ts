@@ -231,6 +231,10 @@ export {
   ZEN_MODE_HOME_COMPANION_PREFS,
 } from './application/use-cases/home/zen-mode-home-pause-snapshot';
 export {
+  resolvePauseArrivalToneAction,
+  type PauseArrivalToneAction,
+} from './application/use-cases/home/resolve-pause-arrival-tone-action';
+export {
   computePauseHeaderBackIntent,
   isPauseSessionHeaderBackVisible,
 } from './application/use-cases/session/header-back';
