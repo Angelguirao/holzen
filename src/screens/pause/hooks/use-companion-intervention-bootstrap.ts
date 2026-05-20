@@ -4,9 +4,8 @@ import { invokeEdge } from '@/lib/invoke-edge';
 import { holzenLog } from '@/lib/holzen-console';
 import type { InterventionState } from '@/features/pause/public';
 import { fetchParsedPauseArtifactCache } from '@/features/pause/public-queries';
-import { loadMoodHistoryForOrchestrate } from '@/features/pause/public-queries';
+import { useCompanionOrchestrateSession } from '@/screens/pause/hooks/use-companion-orchestrate-session';
 import {
-  buildCompanionOrchestrateSessionFromRitual,
   buildInterventionOrchestrateBody,
   hasInvokedIntervention,
   hydrateCompanionSlotsFromArtifactCache,
@@ -53,6 +52,15 @@ export function useCompanionInterventionBootstrap({
   const interventionFetchKeyRef = useRef<string | null>(null);
   const interventionSkippedRef = useRef(false);
   const pendingRetryConfirmRef = useRef<string | null>(null);
+
+  const loadOrchestrateSession = useCompanionOrchestrateSession({
+    pauseInstanceId,
+    context,
+    reflectionMessage,
+    mood,
+    severityNumber,
+    language,
+  });
 
   useLayoutEffect(() => {
     setIntervention(null);
@@ -115,22 +123,13 @@ export function useCompanionInterventionBootstrap({
           return;
         }
 
-        const moodHistory = await loadMoodHistoryForOrchestrate();
-
         holzenLog.companion('orchestrate invoke (intervention only)', {
           holzenInvokeSource: 'browser_pause_intervention',
           pause_instance_prefix: pauseInstanceId.slice(0, 8),
         });
 
-        const orchestrateSession = buildCompanionOrchestrateSessionFromRitual({
-          pauseInstanceId,
-          context,
-          language,
-          reflectionMessage,
-          mood,
-          severityNumber,
-          moodHistory,
-        });
+        const orchestrateSession = await loadOrchestrateSession();
+        if (!orchestrateSession) return;
         const { data, error: fnError } = await runOnceIntervention(pauseInstanceId, () =>
           invokeEdge('companion-orchestrate', {
             body: buildInterventionOrchestrateBody(orchestrateSession),
@@ -203,6 +202,7 @@ export function useCompanionInterventionBootstrap({
     mood,
     severityNumber,
     language,
+    loadOrchestrateSession,
     autoSaveToLibrary,
     slotCommitters,
     fetchedSlotsRef,
