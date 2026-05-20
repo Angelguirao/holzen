@@ -3193,6 +3193,25 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-20</span>
+      <span>Phase A slice — colocate pause-shift-frame-hub-flow under ritual/reflect/hub/</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>Backlog #1 increment — shift-frame hub presentation cluster</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Top-level <code>application/use-cases/reflect/</code> was already under <code>ritual/reflect/</code>. Group <code>pause-shift-frame-hub-flow</code> (+ test) under <code>ritual/reflect/hub/</code>; presentation shift-frame-done conductor import path only.</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior-preserving <code>git mv</code>.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Session reflect/decide flow remains at <code>ritual/reflect/</code> root until a later subfolder slice.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: colocate <code>pause-session-reflect-decide-flow</code>, or colocate brief-past-step under <code>presentation/session/</code>.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
 </body>
 </html>
