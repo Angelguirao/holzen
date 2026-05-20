@@ -2,14 +2,14 @@ import { supabase } from '@/integrations/supabase/client';
 import {
   parsePauseArtifactRows,
   type ParsedPauseArtifactCache,
-} from '@/features/pause/application/use-cases/companion/artifact-cache-parse';
+} from '@/features/pause/application/use-cases/ritual/frame/artifact-cache-parse';
 
 export type {
   CachedGroundingShape,
   CachedSignalShape,
   CachedZoomOutShape,
   ParsedPauseArtifactCache,
-} from '@/features/pause/application/use-cases/companion/artifact-cache-parse';
+} from '@/features/pause/application/use-cases/ritual/frame/artifact-cache-parse';
 
 export async function fetchParsedPauseArtifactCache(
   pauseInstanceId: string,
