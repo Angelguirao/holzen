@@ -952,19 +952,19 @@
   <article class="note">
     <header>
       <span>2026-05-20</span>
-      <span>Phase A slice — reflect ambience peel from public.ts</span>
+      <span>Phase A slice — reflect frame ambience cluster</span>
       <span class="status resolved">resolved</span>
     </header>
-    <h3>Reflect/frame focus ambience stays in <code>ritual-audio</code>; not re-exported from <code>public.ts</code></h3>
+    <h3>Reflect / Frame focus bed → <code>ritual/reflect/reflect-frame-focus-ambience.ts</code></h3>
     <dl>
       <dt>Design decision</dt>
-      <dd>After <code>pause-session-reflect-decide-flow</code> landed under <code>ritual/reflect/</code>, peel the reflect/frame focus ambience helpers (<code>startPauseReflectFrameFocusAmbience</code>, <code>stopPauseReflectFrameFocusAmbience</code>) off the bloated <code>public.ts</code> barrel. Only <code>usePauseReflectFrameFocusAmbience</code> needs them — import <code>application/use-cases/breathing/ritual-audio</code> directly; breath phase cues remain on <code>public.ts</code> for shared conductors.</dd>
+      <dd>Follow-up to peeling ambience off <code>public.ts</code>: extract shared <code>AudioContext</code> into <code>breathing/pause-ritual-audio-context.ts</code>, move start/stop helpers from <code>ritual-audio.ts</code> into <code>ritual/reflect/reflect-frame-focus-ambience.ts</code>. Presentation imports the reflect module directly; breath phase cues stay on <code>public.ts</code>.</dd>
       <dt>Deviation</dt>
-      <dd>None — incremental §6 slim <code>public.ts</code>; audio module path unchanged.</dd>
+      <dd>None — matches §3.1 reflect beat ownership; frame shares the same hook.</dd>
       <dt>Tradeoffs</dt>
-      <dd>Did not relocate ambience helpers into <code>ritual/reflect/</code> (they share the breathing <code>AudioContext</code> singleton with phase cues).</dd>
+      <dd>Shared singleton module avoids duplicating Web Audio setup between breathing cues and reflect/frame bed.</dd>
       <dt>Open questions</dt>
-      <dd>Next: peel companion/frame orchestration cluster from <code>public.ts</code> or group reflect presentation hooks under <code>presentation/reflect/</code>.</dd>
+      <dd>Next: peel companion/frame exports from <code>public.ts</code> or move feel/post-pause session logs to <code>ritual/feel/</code> / <code>ritual/done/</code>.</dd>
     </dl>
   </article>
 
