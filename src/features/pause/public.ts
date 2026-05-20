@@ -318,6 +318,7 @@ export {
 export {
   runCompanionSlotOrchestrate,
   type CompanionSlotOrchestrateMode,
+  type RunCompanionSlotOrchestratePorts,
   type RunCompanionSlotOrchestrateResult,
 } from './application/use-cases/companion/run-companion-slot-orchestrate';
 export {

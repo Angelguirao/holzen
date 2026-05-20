@@ -1,5 +1,4 @@
-import { useCallback, useMemo } from 'react';
-import { invokeEdge } from '@/lib/invoke-edge';
+import { useCallback } from 'react';
 import { holzenLog } from '@/lib/holzen-console';
 import { trackEvent } from '@/lib/posthog';
 import {
@@ -18,8 +17,8 @@ import {
   type CompanionSlotCommitters,
   type CompanionSlotRelaxations,
 } from '@/features/pause/public';
-import { loadActiveOrchestrateSources } from '@/features/pause/public-queries';
 import { useCompanionOrchestrateSession } from '@/screens/pause/hooks/use-companion-orchestrate-session';
+import { useCompanionSlotOrchestratePorts } from '@/screens/pause/hooks/use-companion-slot-orchestrate-ports';
 
 export interface UseCompanionSlotOrchestrateActionsParams {
   pauseInstanceId?: string | null;
@@ -79,15 +78,7 @@ export function useCompanionSlotOrchestrateActions({
   companionSlotLoadingSetters,
   companionSlotErrorSetters,
 }: UseCompanionSlotOrchestrateActionsParams) {
-  const slotOrchestratePorts = useMemo(
-    () => ({
-      loadSignalSources: () => loadActiveOrchestrateSources('signal'),
-      loadGroundingSources: () => loadActiveOrchestrateSources('grounding'),
-      invoke: (body: Record<string, unknown>) =>
-        invokeEdge('companion-orchestrate', { body }),
-    }),
-    [],
-  );
+  const slotOrchestratePorts = useCompanionSlotOrchestratePorts();
 
   const buildOrchestrateSession = useCompanionOrchestrateSession({
     pauseInstanceId,
