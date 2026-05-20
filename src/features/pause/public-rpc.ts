@@ -80,13 +80,15 @@ import {
 import type { InitialEmotionLogOpts } from './application/use-cases/ritual/feel/initial-emotion-log';
 import { logPauseStep } from './application/use-cases/ritual/log-pause-step';
 import { logPauseCompanion } from './application/use-cases/ritual/frame/log-pause-companion';
+import { runPauseCreateOrReuse } from './application/use-cases/session/run-pause-create-or-reuse';
+import { runPauseDismissCurrent } from './application/use-cases/session/run-pause-dismiss-current';
 
 /** Lifecycle + step mutations — default port is `PauseRepository`, not raw RPC client. */
 
 export function pauseCreateOrReuse(
   params: Parameters<typeof supabasePauseRepository.createOrReuse>[0],
 ) {
-  return supabasePauseRepository.createOrReuse(params);
+  return runPauseCreateOrReuse(supabasePauseRepository, params);
 }
 
 /** Pending offer — adopt via `PauseRepository` (wired for presentation). */
@@ -106,12 +108,12 @@ export function dismissOpenPauseHomePreview(
 ): Promise<void> {
   return dismissOpenPauseHome(hasUser, {
     clearPreview,
-    dismissCurrent: () => supabasePauseRepository.dismissCurrent(),
+    dismissCurrent: () => runPauseDismissCurrent(supabasePauseRepository),
   });
 }
 
 export function pauseDismissCurrent() {
-  return supabasePauseRepository.dismissCurrent();
+  return runPauseDismissCurrent(supabasePauseRepository);
 }
 
 export function pauseLogStep(
