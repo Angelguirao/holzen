@@ -15,6 +15,10 @@ export {
 } from './presentation/use-pending-pause-offer';
 export { usePendingPauseOfferMutations } from './presentation/use-pending-pause-offer-mutations';
 export {
+  usePauseBriefDoneCheckIn,
+  type UsePauseBriefDoneCheckInParams,
+} from './presentation/use-pause-brief-done-check-in';
+export {
   useBulkHoldPending,
   bulkHoldPendingQueryKey,
   type BulkHoldPendingPause,
