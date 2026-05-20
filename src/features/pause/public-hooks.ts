@@ -250,6 +250,7 @@ export {
   type PauseSessionScaffoldVmResult,
 } from './presentation/use-pause-session-scaffold-vm';
 export type {
+  PauseScaffoldChromeRegistry,
   PauseSessionScaffoldVmChromeSlots,
   PauseSessionScaffoldVmProvidersSlice,
 } from './presentation/session/pause-session-scaffold-vm-types';
@@ -272,10 +273,12 @@ export type {
   PauseSessionSubscriptionGateSlice,
 } from './presentation/session/pause-session-providers-types';
 export {
+  usePauseSessionFlow,
   usePauseSessionFlowThroughSteps,
   usePauseSessionFlowWithChrome,
 } from './presentation/use-pause-session-flow';
 export {
+  usePauseSessionScreen,
   usePauseSessionScreenViewModel,
   type PauseSessionScreenViewModel,
 } from './presentation/use-pause-session-screen';

@@ -1,14 +1,34 @@
 import { usePauseSessionFlowCore } from './use-pause-session-flow-core';
 import { usePauseSessionScaffoldVm } from './use-pause-session-scaffold-vm';
 import { usePauseSessionRitualSurface } from './use-pause-session-ritual-surface';
+import { usePauseSessionScaffoldChromeSlots } from './use-pause-session-scaffold-chrome-slots';
 import type { PauseSessionProviders } from './session/pause-session-providers-types';
-import type { PauseSessionScaffoldVmChromeSlots } from './session/pause-session-scaffold-vm-types';
+import type {
+  PauseScaffoldChromeRegistry,
+  PauseSessionScaffoldVmChromeSlots,
+} from './session/pause-session-scaffold-vm-types';
 import type { PauseSessionStepHandlersResult } from './use-pause-session-step-handlers';
 import type { PauseSessionRitualSurfaceResult } from './use-pause-session-ritual-surface';
 
+/** `/pause` flow: core steps + chrome slots from route registry. */
+export function usePauseSessionFlow(
+  p: PauseSessionProviders,
+  chromeRegistry: PauseScaffoldChromeRegistry,
+) {
+  const { step } = usePauseSessionFlowThroughSteps(p);
+  const chrome = usePauseSessionScaffoldChromeSlots(chromeRegistry, {
+    phase: step.ritual.phase,
+    ritualEntry: step.ritual.ritualEntry,
+    briefStep: step.ritual.briefStep,
+    fetchedInstance: step.shell.fetchedInstance,
+  });
+
+  return usePauseSessionFlowWithChrome(p, step, chrome);
+}
+
 /**
  * Step handlers, scaffold VM, and ritual surface merge.
- * Route chrome slots are built in screens and passed as `chrome`.
+ * Route chrome slots are built via `usePauseSessionScaffoldChromeSlots` + registry.
  */
 export function usePauseSessionFlowWithChrome(
   p: PauseSessionProviders,

@@ -5,11 +5,12 @@ import { PauseSessionScaffoldShell } from '@/screens/pause/components/PauseSessi
 import { PauseSessionGateContent } from '@/screens/pause/components/PauseSessionGateContent';
 import { PauseSessionDepthPickerStack } from '@/screens/pause/components/PauseSessionDepthPickerStack';
 import { PauseLeaveWithPendingSheet } from '@/screens/pause/components/PauseLeaveWithPendingSheet';
-import { usePauseSessionScreen } from '@/screens/pause/hooks/use-pause-session-screen';
+import { usePauseSessionScreen } from '@/features/pause/public-hooks';
+import { pauseSessionScaffoldChromeRegistry } from '@/screens/pause/lib/pause-scaffold-chrome-registry';
 
 /** `/pause` route — presentation only; orchestration in `usePauseSessionScreen`. */
 export default function PauseSessionScreen() {
-  const vm = usePauseSessionScreen();
+  const vm = usePauseSessionScreen(pauseSessionScaffoldChromeRegistry);
 
   if (!vm.subLoading && !vm.canEngagePause) {
     return (
