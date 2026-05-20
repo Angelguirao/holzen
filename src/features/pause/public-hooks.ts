@@ -89,3 +89,8 @@ export {
 } from './presentation/use-pause-session-brief-to-deep';
 export { usePauseSessionBreathStepHandlers } from './presentation/use-pause-session-breath-step-handlers';
 export { usePauseShiftFrameDoneHandler } from './presentation/use-pause-shift-frame-done-handler';
+export { usePauseSessionDecideHandler } from './presentation/use-pause-session-decide-handler';
+export {
+  usePauseSessionReflectAndDecide,
+  type UsePauseSessionReflectAndDecideParams,
+} from './presentation/use-pause-session-reflect-and-decide';

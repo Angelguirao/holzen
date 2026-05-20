@@ -1,6 +1,5 @@
 import { useCallback, type Dispatch, type MutableRefObject, type SetStateAction } from 'react';
 import type { TFunction } from 'i18next';
-import type { MoodValue } from '@/screens/pause/components/MoodCheck';
 import { hapticFeedback } from '@/lib/haptics';
 import { useAuth } from '@/features/auth/public';
 import { logPauseOutcomeStep } from '@/features/pause/public-rpc';
@@ -12,6 +11,7 @@ import {
   runPauseOutcomeLog,
   showPauseOutcomeNotCompletedToast,
   showPauseOutcomeSaveFailedToast,
+  type MoodValue,
   type PauseImpactData,
   type RitualDepth,
 } from '@/features/pause/public';
