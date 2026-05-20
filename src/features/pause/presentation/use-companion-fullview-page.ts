@@ -9,7 +9,7 @@ import {
   companionPrefsForFullViewSlot,
   isCompanionFullViewSlotSettled,
   pauseSeverityToOrchestrateNumber,
-} from '@/features/pause/application/use-cases/companion/full-view-page-helpers';
+} from '@/features/pause/application/use-cases/ritual/frame/full-view-page-helpers';
 import { useCompanionData } from './use-companion-data';
 import { useFullviewTelemetry, type FullviewCompanion } from './use-fullview-telemetry';
 import { usePauseSessionCompanionSnapshot } from './use-pause-session-companion-snapshot';

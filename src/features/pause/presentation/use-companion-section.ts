@@ -2,7 +2,7 @@ import { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import type { CompanionData, CompanionPrefs } from '@/features/pause/public';
 import type { PauseSeverity } from '@/features/pause/application/use-cases/session/location-state';
-import { pauseSeverityToOrchestrateNumber } from '@/features/pause/application/use-cases/companion/full-view-page-helpers';
+import { pauseSeverityToOrchestrateNumber } from '@/features/pause/application/use-cases/ritual/frame/full-view-page-helpers';
 import {
   getCompanionSectionVisibility,
   isCompanionSectionVisible,
