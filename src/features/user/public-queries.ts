@@ -63,6 +63,12 @@ export {
   type SignalSourceAdminMutationResult,
 } from './infrastructure/queries/signal-sources-admin-mutations';
 export {
+  ADMIN_PENDING_SOURCE_SUGGESTIONS_QUERY_KEY,
+  fetchPendingSourceSuggestionsRows,
+  getAdminPendingSourceSuggestionsQueryOptions,
+  type SourceSuggestionRow,
+} from './infrastructure/queries/signal-source-suggestions-admin-query';
+export {
   getThresholdVolatilityEstimatorQueryOptions,
   thresholdVolatilityEstimatorQueryKey,
 } from './infrastructure/queries/threshold-volatility-estimator-query';

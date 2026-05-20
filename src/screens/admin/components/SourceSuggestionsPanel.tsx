@@ -3,15 +3,13 @@ import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { Check, X, Loader2, RefreshCw } from 'lucide-react';
 import { useToast } from '@/components/ui/use-toast';
 import {
-  approveSignalSourceSuggestion,
-  rejectSignalSourceSuggestion,
-} from '@/features/user/public-queries';
-import {
   ADMIN_PENDING_SOURCE_SUGGESTIONS_QUERY_KEY,
+  approveSignalSourceSuggestion,
   fetchPendingSourceSuggestionsRows,
   getAdminPendingSourceSuggestionsQueryOptions,
+  rejectSignalSourceSuggestion,
   type SourceSuggestionRow,
-} from '@/screens/admin/lib/admin-source-suggestions-query';
+} from '@/features/user/public-queries';
 
 export type { SourceSuggestionRow };
 

@@ -4,11 +4,16 @@ import { ChevronDown, ChevronRight, Pencil, Trash2, Loader2, Plus, ArrowUp, Arro
 import type { Json } from '@/integrations/supabase/types';
 import { useToast } from '@/components/ui/use-toast';
 import {
+  ADMIN_COMPANION_FALLBACKS_QUERY_KEY,
   deleteCompanionFallback,
+  fetchCompanionFallbackRows,
+  getAdminCompanionFallbacksQueryOptions,
   insertCompanionFallbackEntry,
   setCompanionFallbackActive,
   swapCompanionFallbackSortOrder,
   updateCompanionFallbackPayload,
+  type CompanionFallbackRow,
+  type FallbackPoolType,
 } from '@/features/pause/public-queries';
 import { Button } from '@/components/ui/button';
 import {
@@ -19,14 +24,6 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog';
 import { Textarea } from '@/components/ui/textarea';
-import {
-  ADMIN_COMPANION_FALLBACKS_QUERY_KEY,
-  fetchCompanionFallbackRows,
-  getAdminCompanionFallbacksQueryOptions,
-  type CompanionFallbackRow,
-  type FallbackPoolType,
-} from '@/screens/admin/lib/admin-companion-fallbacks-query';
-
 export type { CompanionFallbackRow, FallbackPoolType };
 
 const POOL_LABELS: Record<FallbackPoolType, string> = {

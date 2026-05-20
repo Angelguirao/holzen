@@ -2,12 +2,12 @@ import { useState, useEffect } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { Zap } from 'lucide-react';
 import { useAuth } from '@/features/auth/public';
-import { logDevModeSetting } from '@/features/pause/public-queries';
 import {
   adminDevModeSettingQueryKey,
   getAdminDevModeSettingQueryOptions,
+  logDevModeSetting,
   readLocalDevMode,
-} from '@/screens/admin/lib/admin-dev-mode-setting-query';
+} from '@/features/pause/public-queries';
 
 export function DevModeToggle() {
   const { user } = useAuth();

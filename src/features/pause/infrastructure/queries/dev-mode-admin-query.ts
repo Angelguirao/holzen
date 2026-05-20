@@ -1,5 +1,7 @@
 import { supabase } from '@/integrations/supabase/client';
-import { ADMIN_QUERY_PREFIX } from '@/screens/admin/lib/admin-query-namespace';
+
+/** Matches `screens/admin/lib/admin-query-namespace` — keep in sync if the prefix changes. */
+const ADMIN_QUERY_PREFIX = ['admin'] as const;
 
 export function readLocalDevMode(): boolean {
   try {
@@ -22,6 +24,7 @@ export function adminDevModeSettingQueryKey(userId: string) {
   return [...ADMIN_DEV_MODE_SETTING_QUERY_PREFIX, userId] as const;
 }
 
+/** Admin: hydrate rapid-testing toggle from latest analytics_events row. */
 export async function fetchDevModeFromAnalytics(userId: string): Promise<boolean> {
   const { data, error } = await supabase
     .from('analytics_events')
