@@ -1,4 +1,4 @@
-import { useCallback, useLayoutEffect, useRef, useState } from 'react';
+import { useCallback, useState } from 'react';
 import { motion } from 'framer-motion';
 import { Flame, Pencil } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
@@ -15,9 +15,7 @@ import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover
 import { Slider } from '@/components/ui/slider';
 import { ShareReflection } from '@/screens/pause/components/ShareReflection';
 import { trackEvent } from '@/lib/posthog';
-import { isPauseMoodValue } from '@/features/pause/public';
-import { logPostPauseEmotionIfDirty } from '@/features/pause/public-rpc';
-import { showPauseStepSyncFailedToast } from '@/features/pause/public';
+import { usePauseBriefDoneCheckIn } from '@/features/pause/public-hooks';
 import { useSubscription } from '@/features/subscription/public-hooks';
 
 interface PauseData {
@@ -84,11 +82,6 @@ function PauseDoneReflectShareRow({
   );
 }
 
-function clampFeelIntensity(n: number | null | undefined): number {
-  if (typeof n === 'number' && n >= 1 && n <= 5) return n;
-  return 3;
-}
-
 export function PauseDone({
   decision,
   onReturn,
@@ -99,42 +92,22 @@ export function PauseDone({
 }: Props) {
   const { t } = useTranslation();
   const { subscribed } = useSubscription();
-
-  const [briefDoneMood, setBriefDoneMood] = useState<MoodValue | null>(null);
-  const [briefDoneIntensity, setBriefDoneIntensity] = useState(3);
-  const [moodEditorOpen, setMoodEditorOpen] = useState(false);
-  const [saveBusy, setSaveBusy] = useState(false);
-  const initialFeelSnapshotRef = useRef<{ mood: MoodValue | null; intensity: number } | null>(null);
-
-  useLayoutEffect(() => {
-    if (doneVariant !== 'brief' || !pauseData) return;
-    const m = isPauseMoodValue(pauseData.mood) ? pauseData.mood : null;
-    const int = clampFeelIntensity(pauseData.feelIntensity ?? null);
-    setBriefDoneMood(m);
-    setBriefDoneIntensity(int);
-    initialFeelSnapshotRef.current = { mood: m, intensity: int };
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- mood/feel fields only; full `pauseData` identity would reset in-progress edits
-  }, [doneVariant, pauseInstanceId, pauseData?.mood, pauseData?.feelIntensity]);
-
-  const handleSaveToJourney = async () => {
-    if (!onSaveToJourney) return;
-    setSaveBusy(true);
-    try {
-      const outcome = await logPostPauseEmotionIfDirty({
-        pauseInstanceId,
-        mood: briefDoneMood,
-        intensity: briefDoneIntensity,
-        initialSnapshot: initialFeelSnapshotRef.current,
-      });
-      if (outcome.status === 'sync_failed') {
-        showPauseStepSyncFailedToast(t);
-        return;
-      }
-      onSaveToJourney();
-    } finally {
-      setSaveBusy(false);
-    }
-  };
+  const {
+    briefDoneMood,
+    setBriefDoneMood,
+    briefDoneIntensity,
+    setBriefDoneIntensity,
+    moodEditorOpen,
+    setMoodEditorOpen,
+    saveBusy,
+    handleSaveToJourney,
+  } = usePauseBriefDoneCheckIn({
+    doneVariant,
+    pauseInstanceId,
+    pauseData,
+    onSaveToJourney,
+    t,
+  });
 
   if (doneVariant === 'brief') {
     const outcomeHeadline =
