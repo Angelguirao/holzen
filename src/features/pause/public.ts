@@ -442,7 +442,7 @@ export {
   buildLazyFetchOrchestrateBody,
   buildRegenerateOrchestrateBody,
   type CompanionOrchestrateSessionContext,
-} from './application/use-cases/companion/build-companion-orchestrate-body';
+} from './application/use-cases/ritual/frame/build-companion-orchestrate-body';
 export {
   loadCompanionOrchestrateSession,
   type LoadCompanionOrchestrateSessionInput,

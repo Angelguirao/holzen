@@ -626,6 +626,25 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-20</span>
+      <span>Phase A slice — frame leaf: build-companion-orchestrate-body</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3><code>build-companion-orchestrate-body</code> → <code>ritual/frame/</code></h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Reflect → <code>ritual/reflect/</code> is complete (backlog #1). Next companion leaf is pure wire-body builders (module + test) with no imports from other <code>companion/</code> modules — only domain + <code>ritual/frame/recency-hints</code>. <code>load-companion-orchestrate-session</code> and slot orchestration runners stay in <code>companion/</code> until their cluster moves.</dd>
+      <dt>Deviation</dt>
+      <dd>None — matches spec §3.1 / §10.1 leaf-first pattern.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Could pair with <code>load-companion-orchestrate-session</code>; kept body builders alone (2 files) for isolated review — session loader still depends on companion orchestration cluster.</dd>
+      <dt>Open questions</dt>
+      <dd>Next slice: <code>load-companion-orchestrate-session</code> + session context cluster, or <code>orchestrate-slot-apply</code> as hub before <code>run-companion-slot-orchestrate</code>.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
 </body>
 </html>

@@ -2,7 +2,7 @@ import { invokeEdge } from '@/lib/invoke-edge';
 import {
   buildInterventionOrchestrateBody,
   type CompanionOrchestrateSessionContext,
-} from '../../application/use-cases/companion/build-companion-orchestrate-body';
+} from '../../application/use-cases/ritual/frame/build-companion-orchestrate-body';
 import type { RunCompanionSlotOrchestratePorts } from '../../application/use-cases/companion/run-companion-slot-orchestrate';
 import { loadActiveOrchestrateSources } from '../companion/orchestrate-sources';
 
