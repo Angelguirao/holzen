@@ -1,7 +1,10 @@
 import { useMemo } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { useAuth } from '@/features/auth/public';
-import { dedupeBiases, type RelatedBias } from '@/features/pause/public';
+import {
+  dedupeBiases,
+  type RelatedBias,
+} from '@/features/pause/application/use-cases/ritual/frame/related-biases';
 import { getRelatedBiasesGroundNudgeQueryOptions } from '../public-queries';
 
 /** Grounding full view — distinct bias titles from recent `ground_nudge` artifacts. */

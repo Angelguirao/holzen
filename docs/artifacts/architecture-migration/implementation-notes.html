@@ -1044,6 +1044,25 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-20</span>
+      <span>Phase A slice — related-biases peel from public.ts</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>Related-biases + dead frame helpers off <code>public.ts</code></h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>reflect/</code> → <code>ritual/reflect/</code>) is complete on this branch — no further reflect folder moves. Continue backlog #3 (§6 slim barrel): drop <code>dedupeBiases</code> / <code>RelatedBias</code> re-exports and unused <code>hostnameFromUrl</code> + <code>deriveBreathingUiCompleteFromPayloads</code> from <code>public.ts</code>. <code>useRelatedBiasesThisMonth</code> imports <code>ritual/frame/related-biases</code> directly; screens still use <code>public-hooks</code>.</dd>
+      <dt>Deviation</dt>
+      <dd>None — incremental peel; screen-facing <code>estimateReadTime</code> and zoom-out types remain on <code>public.ts</code>.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Did not peel zoom-out payload helpers used by <code>CompanionZoomOutPage</code> in the same commit.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: peel remaining frame-only re-exports or wire more step logs through <code>PauseRepository</code> (backlog #4).</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
 </body>
 </html>
