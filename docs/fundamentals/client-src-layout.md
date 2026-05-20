@@ -41,7 +41,7 @@ flowchart TB
 | `src/screens/<route>/` | Presentation | Route UI, screen-only hooks | [screens/README.md](../../src/screens/README.md) |
 | `src/components/icons/` | Design system | Shared mood/outcome glyphs | [components/README.md](../../src/components/README.md) |
 | `src/features/<context>/` | Domain + application | Bounded context rules, use cases, ports | [features/README.md](../../src/features/README.md) |
-| `src/lib/` | Shared I/O + utilities | TanStack/query helpers, `use-feature-flag`, `use-pull-to-refresh`, `use-infinite-scroll`, `use-latest-ref`; prefer `features/*/public` for domain |
+| `src/lib/` | Shared I/O + utilities | TanStack/query helpers, `invokeEdge`, PostHog, routes; feature flags in `src/app/hooks/use-feature-flag.ts`; prefer `features/*/public` for domain |
 | `src/components/ui/` | Design system | Primitives + `use-toast`, `use-mobile` (see [components/README.md](../../src/components/README.md)) |
 | `src/app/hooks/` | Shell hooks | `use-auto-trigger`, `use-install-prompt`, `use-shell-profile`, … |
 | `src/legacy/` | Archive | Pre-strip full IA — **never import** in active code | [legacy/README.md](../../src/legacy/README.md) |

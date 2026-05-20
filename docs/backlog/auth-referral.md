@@ -5,7 +5,7 @@
 ### What shipped (2026-04)
 
 - **`referral_pending_jobs`** table: one row per referred user (`referred_user_id` unique), statuses `pending` → `processing` → `completed` / `failed`, with `attempts`, `next_attempt_at`, and `last_error`.
-- **Client** (`src/hooks/use-auth.tsx`): on `SIGNED_IN` with `holzen_ref`, inserts a queue row then invokes `record-referral`. Clears `holzen_ref` on `{ ok: true }` or invalid referral; keeps it on invoke/network failure so a repeat sign-in can retry the HTTP path.
+- **Client** (`src/features/auth/presentation/AuthProvider.tsx` / `useAuth`): on `SIGNED_IN` with `holzen_ref`, inserts a queue row then invokes `record-referral`. Clears `holzen_ref` on `{ ok: true }` or invalid referral; keeps it on invoke/network failure so a repeat sign-in can retry the HTTP path.
 - **`record-referral`**: uses shared **`applyReferralRecord`** in `supabase/functions/_shared/referral-record-core.ts` (idempotent referrals + **`referral_rewards`** checks prevent double grants).
 - **`process-referral-pending`**: cron worker with **`verifyServiceAuth`**; **`claim_referral_pending_jobs`** (SKIP LOCKED); stale `processing` rows requeued after 15 minutes; transient failures use backoff until `max_attempts`.
 - **Ops**: schedule in **`docs/ops/cron-setup.md`**; Bruno **`bruno/service-cron/process-referral-pending.bru`**.
@@ -18,7 +18,7 @@
 
 ### Related code pointers
 
-- Producer: `src/hooks/use-auth.tsx`
+- Producer: `src/features/auth/presentation/AuthProvider.tsx` (via `infrastructure/auth-signed-in-side-effects.ts`)
 - HTTP: `supabase/functions/record-referral/index.ts`
 - Core: `supabase/functions/_shared/referral-record-core.ts`
 - Worker: `supabase/functions/process-referral-pending/index.ts`

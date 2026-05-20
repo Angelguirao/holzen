@@ -84,7 +84,7 @@ When you change behavior, update the **one** doc that owns that slice (and ADRs 
 ## Screens (in-app surfaces)
 
 - `screens/home.md` — **`/`** dashboard: modes (zen vs full), widgets, subscription/checkout interplay, pause error surfacing, analytics touchpoints.
-- `screens/pause.md` — **`/pause`** full-screen volatility ritual: gate, depth picker, brief vs deep scaffold, `pause-api` wiring, exit navigation, analytics notes.
+- `screens/pause.md` — **`/pause`** full-screen volatility ritual: gate, depth picker, brief vs deep scaffold, `@/features/pause/public-rpc` wiring, exit navigation, analytics notes.
 
 ## Reports (snapshots)
 
@@ -108,7 +108,7 @@ When you change behavior, update the **one** doc that owns that slice (and ADRs 
 
 ## Backlog
 
-- `backlog/backlog.md` — pending improvements; **work queue (pick by goal)**, master table, quick finder by theme, alphabetical index. Individual tickets under `backlog/*.md` (includes **frontend structure** items: typed navigation state, page/hook splits, data-fetching conventions, Lighthouse a11y, preconnect, Recharts). Browser **360°** methodology: [fundamentals/browser-360-mcp-playbook.md](fundamentals/browser-360-mcp-playbook.md).
+- `backlog/backlog.md` — pending improvements; **work queue (pick by goal)**, master table, quick finder by theme, alphabetical index. Individual tickets under `backlog/*.md` (includes **frontend structure** items: typed navigation state, page/hook splits, data-fetching conventions, Lighthouse a11y, preconnect, Recharts). **Note:** backlog tickets may cite pre-migration paths (`src/hooks/`, `src/pages/`); verify against [client-src-layout.md](fundamentals/client-src-layout.md) and [pause-client-architecture.md](systems/pause-client-architecture.md) §10 before editing code. Browser **360°** methodology: [fundamentals/browser-360-mcp-playbook.md](fundamentals/browser-360-mcp-playbook.md).
 - `backlog/e2e-browser-automation.md` — **UI / journeys** (click-through pause, journal, settings): Playwright/Cypress or Vitest+RTL — not Bruno; see [bruno/SCOPE.md](../bruno/SCOPE.md) for HTTP vs full app.
 
 ## Reviews

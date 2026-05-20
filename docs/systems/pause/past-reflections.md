@@ -65,7 +65,7 @@ Pure helpers live in [`supabase/functions/_shared/past-reflection-util.ts`](../.
 | **Zoom Out (edge)** | `fetchPastReflectionWithWords` in `supabase/functions/_shared/past-reflections.ts`; invoked from `generators/zoom-out.ts` | Strict — returns `null` if the user has no past pauses with words ≥3 days old. |
 | **Replay (client)** | `ReflectionReplay.tsx` + `loadPauseReplayThread` | Full thread on **`/tools/practice/replay`**: picker or deep link from Echo; loads `v_pause_full` + events + `practice_entries`; saves new replay rows with `pause_instance_id`. |
 
-The edge path (`fetchPastReflectionWithWords`) and the replay screen (`loadPauseReplayThread` in `src/legacy/full-shell/src/lib/pause-replay-thread.ts` — legacy full IA only) both build `PastReflectionWithWords`: notes from `pause_step_events`, replay lines from `practice_entries` (`type = 'replay'`, `pause_instance_id`), merged via `combineNoteAndReplayWords` in `past-reflection-util.ts`.
+The edge path (`fetchPastReflectionWithWords`) and the replay screen (`loadPauseReplayThread` in `src/legacy/full-shell/src/lib/pause-replay-thread.ts` — legacy full IA only) both build `PastReflectionWithWords`: notes from `pause_step_events`, replay lines from `practice_entries` (`type = 'replay'`, `pause_instance_id`), merged via `combineNoteAndReplayWords` in `supabase/functions/_shared/past-reflection-util.ts`.
 
 ---
 

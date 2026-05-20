@@ -4,7 +4,7 @@
 
 ## Progress
 
-- **`profiles` — duplicate loads from auth object identity (done):** `useProfile` depends on **`[user?.id]`** only (`src/hooks/use-profile.ts`).
+- **`profiles` — duplicate loads from auth object identity (done):** `useProfile` depends on **`[user?.id]`** only (`src/features/user/presentation/` — see `@/features/user/public-hooks`).
 - **`check-subscription` — shared query (done):** `useSubscription` uses **`useQuery`** with **`queryKey: ['subscription', userId]`**. All consumers (Home, Settings, Profile, `useProGate`, PauseSession, etc.) share **one** in-flight request and cache; 5‑minute **`staleTime`** + interval + focus invalidate with **`force`** preserved via module flags. **`readSubCache()`** still seeds UI while the first fetch runs.
 - **Market / BTC — in-flight coalescing (done):** `fetchBtcData` in **`src/lib/btc.ts`** dedupes concurrent calls per **currency** (`Map` of promises) so interval + **`manualTrigger`** (or overlapping effects) do not double-hit CoinGecko / mempool / F&G in the same tick.
 
