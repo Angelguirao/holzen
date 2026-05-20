@@ -3269,6 +3269,25 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-20</span>
+      <span>Phase A slice — colocate step-transition under presentation/session/</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>Tier 4 session conductor grouping — ritual step panel motion config</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>After brief-past-step landed on remote, move <code>use-pause-session-step-transition</code> (+ test) under <code>presentation/session/</code>; <code>public-hooks</code> and scaffold-presentation import paths only.</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior-preserving <code>git mv</code>.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Scaffold VM/flow-core and persist/storage-sync hooks remain flat until incremental peels.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: colocate persist-to-storage or ritual-storage-sync under <code>presentation/session/</code>, or backlog #4 PauseRepository remainder.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
 </body>
 </html>
