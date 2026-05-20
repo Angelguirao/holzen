@@ -1,8 +1,11 @@
 import { useEffect, type Dispatch, type SetStateAction } from 'react';
-import type { FeelStepTile } from '@/screens/pause/components/pause-feel-types';
-import { computePauseStorageRitualSyncPatch } from '@/features/pause/public';
-import { type BriefPauseStep, type RitualDepth } from '@/features/pause/public';
-import { loadSession } from '@/features/pause/public';
+import {
+  computePauseStorageRitualSyncPatch,
+  loadSession,
+  type BriefPauseStep,
+  type FeelStepTile,
+  type RitualDepth,
+} from '@/features/pause/public';
 
 /**
  * When `pauseInstanceId` resolves, re-align brief/deep ritual UI from `holzen_pause_session` if it still matches that instance.

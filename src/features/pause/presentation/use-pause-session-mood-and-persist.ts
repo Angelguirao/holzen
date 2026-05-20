@@ -1,17 +1,20 @@
 import { useCallback, type Dispatch, type SetStateAction } from 'react';
 import type { TFunction } from 'i18next';
-import type { MoodValue } from '@/screens/pause/components/MoodCheck';
-import type { PauseStep } from '@/screens/pause/components/PauseProgress';
-import type { CompanionData, CompanionPrefs } from '@/features/pause/public';
-import { type BriefPauseStep, type FeelStepTile, type RitualDepth } from '@/features/pause/public';
-import { usePauseFeelShiftLogDedupeRefs } from '@/features/pause/public-hooks';
 import {
-  usePauseSessionDepthPickerHandlers,
-  usePauseSessionFeelTilesSelect,
-  usePauseSessionInitialMoodHandlers,
-} from '@/features/pause/public-hooks';
-import { usePauseSessionPersistToStorage } from '@/screens/pause/hooks/use-pause-session-persist-to-storage';
-import { usePauseSessionRitualStorageSync } from '@/screens/pause/hooks/use-pause-session-ritual-storage-sync';
+  type BriefPauseStep,
+  type CompanionData,
+  type CompanionPrefs,
+  type FeelStepTile,
+  type MoodValue,
+  type PauseStep,
+  type RitualDepth,
+} from '@/features/pause/public';
+import { usePauseFeelShiftLogDedupeRefs } from './use-pause-feel-shift-log-dedupe-refs';
+import { usePauseSessionDepthPickerHandlers } from './use-pause-session-depth-picker-handlers';
+import { usePauseSessionFeelTilesSelect } from './use-pause-session-feel-tiles-select';
+import { usePauseSessionInitialMoodHandlers } from './use-pause-session-initial-mood-handlers';
+import { usePauseSessionPersistToStorage } from './use-pause-session-persist-to-storage';
+import { usePauseSessionRitualStorageSync } from './use-pause-session-ritual-storage-sync';
 
 export interface UsePauseSessionMoodAndPersistParams {
   pauseInstanceId: string | null;
