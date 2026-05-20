@@ -62,6 +62,8 @@ export {
 } from './presentation/use-pause-artifact-haiku';
 export { useCompanionSlotOrchestratePorts } from './presentation/use-companion-slot-orchestrate-ports';
 export { usePauseReflectionStepLog } from './presentation/use-pause-reflection-step-log';
+export { usePauseReflectTags } from './presentation/use-pause-reflect-tags';
+export { usePauseReflectNote } from './presentation/use-pause-reflect-note';
 export { useCompanionAccess } from './presentation/use-companion-access';
 export { useCompanionUiCompletion } from './presentation/use-companion-ui-completion';
 export { useCompanionLibraryFavorites } from './presentation/use-companion-library-favorites';
