@@ -53,7 +53,6 @@ export function usePauseSessionScaffoldVm(
     handleContinueAfterSecondBreath: breath.handleContinueAfterSecondBreath,
     handleSkipFirstBreath: breath.handleSkipFirstBreath,
     handleSkipSecondBreath: breath.handleSkipSecondBreath,
-    prefersReducedMotion,
     companions: shell.companions,
     companionPrefs: shell.companionPrefs,
     pauseInstanceId: shell.pauseInstanceId,

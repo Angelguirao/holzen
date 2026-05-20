@@ -1,2 +1,59 @@
-/** @deprecated Import from `@/app/hooks/use-pull-to-refresh` (legacy shim). */
-export { usePullToRefresh } from '@/app/hooks/use-pull-to-refresh';
+import { useState, useRef, useCallback } from 'react';
+
+interface UsePullToRefreshOptions {
+  onRefresh: () => Promise<void>;
+  threshold?: number;
+}
+
+export function usePullToRefresh({ onRefresh, threshold = 80 }: UsePullToRefreshOptions) {
+  const [pulling, setPulling] = useState(false);
+  const [refreshing, setRefreshing] = useState(false);
+  const [pullDistance, setPullDistance] = useState(0);
+  const startY = useRef(0);
+  const containerRef = useRef<HTMLDivElement>(null);
+
+  const handleTouchStart = useCallback((e: React.TouchEvent) => {
+    if (window.scrollY > 0) return;
+    startY.current = e.touches[0].clientY;
+    setPulling(true);
+  }, []);
+
+  const handleTouchMove = useCallback(
+    (e: React.TouchEvent) => {
+      if (!pulling || refreshing) return;
+      const delta = e.touches[0].clientY - startY.current;
+      if (delta < 0) {
+        setPullDistance(0);
+        return;
+      }
+      setPullDistance(Math.min(delta * 0.4, threshold * 1.5));
+    },
+    [pulling, refreshing, threshold],
+  );
+
+  const handleTouchEnd = useCallback(async () => {
+    if (!pulling) return;
+    setPulling(false);
+
+    if (pullDistance >= threshold) {
+      setRefreshing(true);
+      try {
+        await onRefresh();
+      } finally {
+        setRefreshing(false);
+      }
+    }
+    setPullDistance(0);
+  }, [pulling, pullDistance, threshold, onRefresh]);
+
+  return {
+    containerRef,
+    pullDistance,
+    refreshing,
+    handlers: {
+      onTouchStart: handleTouchStart,
+      onTouchMove: handleTouchMove,
+      onTouchEnd: handleTouchEnd,
+    },
+  };
+}
