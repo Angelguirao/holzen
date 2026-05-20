@@ -1,11 +1,13 @@
 import { useCallback } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
-import { bulkHoldPendingQueryKey, getBulkHoldPendingQueryOptions } from '@/features/pause/public-queries';
-import type { BulkHoldPendingPause } from '@/features/pause/public';
+import type { BulkHoldPendingPause } from '../domain/bulk-hold';
+import {
+  bulkHoldPendingQueryKey,
+  getBulkHoldPendingQueryOptions,
+} from '../public-queries';
 
-export type { BulkHoldPendingPause } from '@/features/pause/public';
-
-export { bulkHoldPendingQueryKey } from '@/features/pause/public-queries';
+export type { BulkHoldPendingPause };
+export { bulkHoldPendingQueryKey };
 
 export interface UseBulkHoldPendingOptions {
   userId: string | undefined;
