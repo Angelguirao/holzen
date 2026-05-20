@@ -20,7 +20,7 @@ import {
   usePauseContextHomePreviews,
   useZenModeHomeRouteProps,
 } from '@/features/pause/public-hooks';
-import { useHomeMarketDisplayPreferences } from '@/screens/home/hooks/use-home-market-display-preferences';
+import { useMarketDisplayPreferences } from '@/features/market/public-hooks';
 import { useState } from 'react';
 import { useOutletContext, useSearchParams, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '@/features/auth/public';
@@ -106,7 +106,7 @@ const Home = () => {
     togglePriceHidden,
     toggleBtcMode,
     toggleMarketChartExpanded,
-  } = useHomeMarketDisplayPreferences();
+  } = useMarketDisplayPreferences();
   const unitBasisModeSupported = trackedAssetId === 'bitcoin';
   const { zenMode, setZenModePersist } = useHomeZenMode(pathname);
   const completedPauseCount = useCompletedPauseCount() ?? 0;
