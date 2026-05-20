@@ -2469,6 +2469,25 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-20</span>
+      <span>Phase A slice — reflect persist-error + edge-params tests in domain (Tier 5)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>Backlog #1 complete; <code>reflection-persist-error</code> → <code>domain/</code></h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Pure persist-error markers and holzen-reflect invoke body shaping live in <code>domain/</code> (<code>reflection-persist-error.ts</code>, <code>reflect-generation-edge-params.ts</code>) with colocated Vitest. Home/trigger use cases import domain directly; <code>ritual/reflect/</code> keeps orchestration only.</dd>
+      <dt>Deviation</dt>
+      <dd>None — matches §3 domain ring and prior edge-params re-home after <code>check:feature-imports</code>.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Did not peel remaining application session tests off <code>public.ts</code> in the same commit — separate §6 cluster.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: peel <code>PersistedSession</code> / hydration helpers in application tests off <code>public.ts</code>, or backlog #4 <code>PauseRepository</code> wiring for remaining mutations.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
 </body>
 </html>
