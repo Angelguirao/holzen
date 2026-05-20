@@ -5,7 +5,7 @@ import { useProfile } from '@/features/user/public-hooks';
 import {
   fetchOpeningMessageForPauseInstance,
   generateReflectionAtReflectStep,
-} from '@/features/pause/public-queries';
+} from '../public-queries';
 import {
   reflectGenerationPrerequisite,
   reflectGenerationUserErrorMessage,

@@ -8,7 +8,7 @@ import {
   type PauseImpactData,
   type RitualDepth,
 } from '@/features/pause/public';
-import { usePauseReflectGeneration } from '@/screens/pause/hooks/use-pause-reflect-generation';
+import { usePauseReflectGeneration } from '@/features/pause/public-hooks';
 import { usePauseSessionDecideHandler } from '@/screens/pause/hooks/use-pause-session-decide-handler';
 
 export interface UsePauseSessionReflectAndDecideParams {
