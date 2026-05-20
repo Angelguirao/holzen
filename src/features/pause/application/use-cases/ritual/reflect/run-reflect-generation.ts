@@ -1,9 +1,9 @@
-import { buildReflectGenerationEdgeInvokeInput } from '../ritual/reflect/reflect-generation-edge-params';
+import { buildReflectGenerationEdgeInvokeInput } from './reflect-generation-edge-params';
 import type {
   ReflectGenerationEdgeInvokeInput,
   ReflectGenerationProfileInput,
-} from '../ritual/reflect/reflect-generation-edge-params';
-import { isAbortLikeReflectError } from '../ritual/reflect/reflect-generation-errors';
+} from './reflect-generation-edge-params';
+import { isAbortLikeReflectError } from './reflect-generation-errors';
 
 export type RunReflectGenerationInput = {
   pauseInstanceId: string;
