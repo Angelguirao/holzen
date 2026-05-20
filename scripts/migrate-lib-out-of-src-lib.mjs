@@ -39,7 +39,7 @@ const MOVES = [
   // Marketing screen lib
   ['src/lib/blog-post-query.ts', 'src/features/user/infrastructure/queries/blog-post-query.ts'],
   ['src/lib/changelog-query.ts', 'src/features/user/infrastructure/queries/changelog-query.ts'],
-  ['src/lib/email-unsubscribe-query.ts', 'src/screens/marketing/lib/email-unsubscribe-query.ts'],
+  ['src/lib/email-unsubscribe-query.ts', 'src/features/auth/infrastructure/queries/email-unsubscribe-query.ts'],
   ['src/lib/landing-testimonials-query.ts', 'src/screens/marketing/lib/landing-testimonials-query.ts'],
   ['src/lib/roadmap-query.ts', 'src/screens/marketing/lib/roadmap-query.ts'],
   // Ops
