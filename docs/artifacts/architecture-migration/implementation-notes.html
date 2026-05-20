@@ -835,6 +835,25 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-20</span>
+      <span>Phase A slice — reflect RPC via PauseRepository</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>Reflect <code>public-rpc</code> facades → <code>PauseRepository.logStep</code></h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Reflect folder migration was complete; next incremental wiring: route <code>logPauseFavoriteToggle</code>, <code>logPauseReflectionStepOnce</code>, <code>logPauseReflectNote</code>, and <code>logPauseReflectTags</code> through <code>supabasePauseRepository</code> instead of importing <code>pauseLogStep</code> directly in those four facades. Use cases unchanged; only the default port in <code>public-rpc.ts</code>.</dd>
+      <dt>Deviation</dt>
+      <dd>None — matches spec §8 one mutation port; emotion/breath/outcome facades still call <code>pauseLogStep</code> until a later slice.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Thin <code>repositoryLogStep</code> helper in <code>public-rpc</code> rather than refactoring reflect use cases to accept <code>PauseRepository</code> — smaller diff, same runtime path (<code>supabasePauseRepository.logStep</code> delegates to <code>pauseLogStep</code>).</dd>
+      <dt>Open questions</dt>
+      <dd>Next slice: wire remaining <code>public-rpc</code> step logs (feel/shift/outcome/breath/post-pause) or peel more exports off bloated <code>public.ts</code>.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
 </body>
 </html>

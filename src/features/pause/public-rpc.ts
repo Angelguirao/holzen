@@ -58,6 +58,16 @@ import { runPauseReflectionStepLogOnce } from './application/use-cases/ritual/re
 import { reflectionStepSessionStorage } from './infrastructure/edge/reflect/reflection-step-session-storage';
 import { invalidateCompanionUiCompletionQuery } from './application/queries/companion-ui-completion-query-key';
 import type { BreathSegmentLogPorts } from './application/use-cases/breathing/run-breath-segment-log';
+import type { PauseStepType } from './domain/pause-state';
+
+/** Reflect + ritual step logs — default port is `PauseRepository`, not raw RPC client. */
+function repositoryLogStep(
+  instanceId: string,
+  stepType: PauseStepType,
+  payload?: Record<string, unknown>,
+) {
+  return supabasePauseRepository.logStep({ instanceId, stepType, payload });
+}
 
 export type { BulkHoldApplyResult };
 export type { PostPauseFeelSnapshot };
@@ -94,7 +104,7 @@ export function logRetrospectiveOutcome(params: {
 export function logPauseFavoriteToggle(params: { pauseInstanceId: string; isFavorite: boolean }) {
   return runPauseFavoriteToggle(params, {
     logStep: ({ instanceId, payload }) =>
-      pauseLogStep({ instanceId, stepType: 'favorite_toggled', payload }),
+      repositoryLogStep(instanceId, 'favorite_toggled', payload),
   });
 }
 
@@ -105,7 +115,7 @@ export function logPauseReflectionStepOnce(pauseInstanceId: string) {
     {
       storage: reflectionStepSessionStorage,
       logStep: ({ instanceId, payload }) =>
-        pauseLogStep({ instanceId, stepType: 'reflection_step', payload }),
+        repositoryLogStep(instanceId, 'reflection_step', payload),
     },
   );
 }
@@ -114,7 +124,7 @@ export function logPauseReflectionStepOnce(pauseInstanceId: string) {
 export function logPauseReflectNote(params: { pauseInstanceId: string; text: string }) {
   return runPauseReflectNoteUpdate(params, {
     logStep: ({ instanceId, stepType, payload }) =>
-      pauseLogStep({ instanceId, stepType, payload }),
+      repositoryLogStep(instanceId, stepType, payload),
   });
 }
 
@@ -122,7 +132,7 @@ export function logPauseReflectNote(params: { pauseInstanceId: string; text: str
 export function logPauseReflectTags(params: { pauseInstanceId: string; tags: string[] }) {
   return runPauseReflectTagUpdate(params, {
     logStep: ({ instanceId, stepType, payload }) =>
-      pauseLogStep({ instanceId, stepType, payload }),
+      repositoryLogStep(instanceId, stepType, payload),
   });
 }
 
