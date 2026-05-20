@@ -3,20 +3,6 @@
  * RPC mutations: `@/features/pause/public-rpc`.
  */
 export {
-  hasPersistablePauseSessionAnchor,
-  hasPersistedPauseSessionPayload,
-  type PersistedSessionAnchor,
-} from './application/use-cases/session/persisted-session-guards';
-export {
-  TERMINAL_PAUSE_DB_STATES,
-  isTerminalPauseDbState,
-  persistedPauseSessionAllowsTerminalEntry,
-} from './application/use-cases/session/terminal-entry-guard';
-export {
-  MANUAL_PAUSE_TRIGGER_IDLE,
-  type ManualPauseTriggerResult,
-} from './domain/manual-pause-trigger-result';
-export {
   type FetchedPauseInstance,
   type PersistedSession,
 } from './domain/session-model';
@@ -46,8 +32,6 @@ export type {
   PregenerateCacheTopupKey,
   PregenerateCacheTopupTypeConfig,
 } from './domain/pregenerate-cache-topup-config';
-export type { PauseStep } from './domain/pause-ritual-steps';
-export type { PauseSessionShellHolzen } from './domain/pause-session-shell-holzen';
 export {
   type NotificationNavigateState,
   type PauseSessionLocationState,
@@ -55,7 +39,6 @@ export {
   type PauseSeverity,
   parsePauseSessionLocationState,
 } from './application/use-cases/session/location-state';
-export { canNavigateToPauseSession } from './application/use-cases/session/can-navigate-to-pause-session';
 export {
   collectStepTypes,
   computePauseState,
