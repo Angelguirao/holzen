@@ -26,10 +26,13 @@ features/market/
     queries/                    # coingecko, holzen display, breathe ambient BTC
   ports/
     market-data.ts            # fetch port (CoinGecko / holzen display)
+  presentation/
+    use-market-display-preferences.ts  # Home market widget local prefs (price hide, BTC mode, chart expand)
   public.ts
+  public-hooks.ts
 ```
 
 ## Imports
 
-- Other features/screens: `@/features/market/public` only.
+- Other features/screens: `@/features/market/public` for types/helpers/queries; `@/features/market/public-hooks` for React hooks.
 - Do not import `infrastructure/` or `application/queries/` from outside this folder.

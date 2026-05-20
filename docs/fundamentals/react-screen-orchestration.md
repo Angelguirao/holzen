@@ -172,7 +172,7 @@ Open [`src/screens/home/HomeScreen.tsx`](../../src/screens/home/HomeScreen.tsx) 
 
 ```1:37:src/screens/home/HomeScreen.tsx
 import { useTranslation } from 'react-i18next';
-import { useHolzen } from '@/screens/home/hooks/use-holzen';
+import { useHolzen } from '@/app/components/HolzenProvider';
 // ... many use-home-* hooks and layout components ...
 import type { HomeAppLayoutOutletContext } from '@/screens/home/lib/home-app-layout-outlet';
 ```

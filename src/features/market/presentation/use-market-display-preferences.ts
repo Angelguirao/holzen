@@ -12,7 +12,7 @@ function readIsTrue(key: string): boolean {
 /**
  * Price visibility, BTC unit mode, and market chart expand state for the Home market widget.
  */
-export function useHomeMarketDisplayPreferences() {
+export function useMarketDisplayPreferences() {
   const [priceHidden, setPriceHidden] = useState(() => readIsTrue('holzen_hide_price'));
   const [btcMode, setBtcMode] = useState(() => readIsTrue('holzen_btc_mode'));
   const [marketChartExpanded, setMarketChartExpanded] = useState(false);
