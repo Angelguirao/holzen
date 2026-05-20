@@ -439,6 +439,11 @@ export {
   type CompanionOrchestratePaywallCode,
 } from './application/use-cases/companion/orchestrate-invoke-error';
 export {
+  parseEdgeFunctionError,
+  toUserFacingAiErrorMessage,
+  type ParsedEdgeFunctionError,
+} from './application/use-cases/edge/edge-function-error';
+export {
   buildCompanionOrchestrateSessionFromRitual,
   buildInterventionOrchestrateBody,
   buildLazyFetchOrchestrateBody,
