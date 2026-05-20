@@ -103,3 +103,11 @@ export {
   usePauseSessionMoodAndPersist,
   type UsePauseSessionMoodAndPersistParams,
 } from './presentation/use-pause-session-mood-and-persist';
+export {
+  usePauseSessionBreathNavigation,
+  type UsePauseSessionBreathNavigationParams,
+} from './presentation/use-pause-session-breath-navigation';
+export {
+  usePauseSessionBreathHandlers,
+  type UsePauseSessionBreathHandlersParams,
+} from './presentation/use-pause-session-breath-handlers';
