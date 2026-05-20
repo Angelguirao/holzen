@@ -3,10 +3,7 @@ import { useQuery } from '@tanstack/react-query';
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '@/features/auth/public';
-import {
-  dedupeBiases,
-  type RelatedBias,
-} from './related-biases-util';
+import { dedupeBiases, type RelatedBias } from '@/features/pause/public';
 import { getRelatedBiasesGroundNudgeQueryOptions } from '@/features/pause/public-queries';
 
 interface Props {

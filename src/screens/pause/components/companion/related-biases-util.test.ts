@@ -3,7 +3,7 @@ import {
   dedupeBiases,
   normalizeBiasTitle,
   type RelatedBiasesRow,
-} from '@/screens/pause/components/companion/related-biases-util';
+} from '@/features/pause/public';
 
 function row(partial: Partial<RelatedBiasesRow> & { title?: string; id: string }): RelatedBiasesRow {
   return {
