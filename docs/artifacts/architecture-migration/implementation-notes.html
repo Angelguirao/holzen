@@ -2771,7 +2771,26 @@
       <dt>Tradeoffs</dt>
       <dd><code>use-pause-session-shell-bootstrap</code> remains flat under <code>presentation/</code> until a follow-up peel.</dd>
       <dt>Open questions</dt>
-      <dd>Next: colocate shell bootstrap + breath-handlers under <code>presentation/session/</code>, lifecycle create/dismiss use cases on <code>public-rpc</code>, or port-backed companion feedback vote write path.</dd>
+      <dd>Next: colocate breath-handlers under <code>presentation/session/</code>, lifecycle create/dismiss use cases on <code>public-rpc</code>, or port-backed companion feedback vote write path.</dd>
+    </dl>
+  </article>
+
+  <article class="note">
+    <header>
+      <span>2026-05-20</span>
+      <span>Phase A slice — colocate breath-handlers conductor in presentation/session/</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>Backlog #1 verified; session breath conductor grouped</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd><code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code> was already complete on <code>cursor/arch-migrate-src-ca70</code>. Move <code>use-pause-session-breath-handlers</code> beside breath segment RPC loggers and step-handlers under <code>presentation/session/</code>; <code>public-hooks</code> + reflect breath wrapper import paths only.</dd>
+      <dt>Deviation</dt>
+      <dd>None — matches §3.2 / §10.1 session conductor grouping.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Breath navigation/step/brief-to-deep hooks remain flat under <code>presentation/</code> until a later peel bundles them with the conductor.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: colocate shell bootstrap under <code>presentation/session/</code>, thin lifecycle create/dismiss use cases on <code>public-rpc</code> (backlog #4), or port-backed companion feedback vote write path.</dd>
     </dl>
   </article>
 
