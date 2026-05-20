@@ -2,7 +2,7 @@ import type { Dispatch, SetStateAction } from 'react';
 import type { TFunction } from 'i18next';
 import type { PauseStep } from '@/screens/pause/components/PauseProgress';
 import type { BriefPauseStep, PersistedSession, RitualDepth } from '@/features/pause/public';
-import { usePauseBreathSegmentRpcLoggers } from '@/screens/pause/hooks/use-pause-breath-segment-rpc-loggers';
+import { usePauseBreathSegmentRpcLoggers } from '@/features/pause/public-hooks';
 import { usePauseSessionBreathNavigation } from '@/screens/pause/hooks/use-pause-session-breath-navigation';
 import { usePauseSessionBreathStepHandlers } from '@/screens/pause/hooks/use-pause-session-breath-step-handlers';
 import { usePauseSessionBriefToDeep } from '@/screens/pause/hooks/use-pause-session-brief-to-deep';

@@ -10,7 +10,7 @@ import {
   usePauseSessionShell,
   type PauseSessionShellHolzen,
 } from '@/screens/pause/hooks/use-pause-session-shell';
-import { usePauseSessionMountLog } from '@/screens/pause/hooks/use-pause-session-mount-log';
+import { usePauseSessionMountLog } from '@/features/pause/public-hooks';
 import { usePauseSessionPendingPauseOfferNavigation } from '@/screens/pause/hooks/use-pause-session-pending-pause-offer-navigation';
 import { usePauseSessionPendingLeaveSheet } from '@/screens/pause/hooks/use-pause-session-pending-leave-sheet';
 import { usePendingPauseOffer } from '@/features/pause/public-hooks';
