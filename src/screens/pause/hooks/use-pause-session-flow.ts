@@ -1,11 +1,9 @@
 import {
   usePauseSessionFlowCore,
   usePauseSessionRitualSurface,
+  type PauseSessionProviders,
 } from '@/features/pause/public-hooks';
 import { usePauseSessionScaffoldVm } from '@/screens/pause/hooks/use-pause-session-scaffold-vm';
-import type { usePauseSessionProviders } from '@/screens/pause/hooks/use-pause-session-providers';
-
-type PauseSessionProviders = ReturnType<typeof usePauseSessionProviders>;
 
 /**
  * `/pause` shell hydrate, ritual state, step handlers, and scaffold props (after providers).

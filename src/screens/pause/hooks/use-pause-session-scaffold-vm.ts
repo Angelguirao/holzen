@@ -1,12 +1,10 @@
 import {
   usePauseSessionScaffoldVm as usePauseSessionScaffoldVmPresentation,
+  type PauseSessionProviders,
   type PauseSessionScaffoldVmResult,
+  type PauseSessionStepHandlersResult,
 } from '@/features/pause/public-hooks';
 import { usePauseSessionScaffoldChromeSlots } from '@/screens/pause/hooks/use-pause-session-scaffold-chrome-slots';
-import type { PauseSessionStepHandlersResult } from '@/features/pause/public-hooks';
-import type { usePauseSessionProviders } from '@/screens/pause/hooks/use-pause-session-providers';
-
-type PauseSessionProviders = ReturnType<typeof usePauseSessionProviders>;
 
 /** Screen conductor: route chrome slots + presentation scaffold VM. */
 export function usePauseSessionScaffoldVm(
