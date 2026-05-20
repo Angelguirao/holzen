@@ -3060,6 +3060,25 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-20</span>
+      <span>Phase A slice — companion feedback vote read via PauseAnalyticsRepository</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>Backlog #4 — analytics read port (companion feedback)</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd><code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code> was already complete on <code>cursor/arch-migrate-src-ca70</code>. Route <code>fetchCompanionFeedbackVote</code> through <code>PauseAnalyticsRepository.fetchCompanionFeedbackVote</code> + <code>run-fetch-companion-feedback-vote</code>; Supabase select stays in <code>infrastructure/analytics-events.ts</code>.</dd>
+      <dt>Deviation</dt>
+      <dd>None — TanStack Query options still live in <code>infrastructure/queries/companion-feedback-vote-query.ts</code>; presentation unchanged.</dd>
+      <dt>Tradeoffs</dt>
+      <dd><code>logCompanionFullviewOpened</code> and other analytics reads still call infrastructure directly until a later slice.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: colocate entry presentation effects + brief→deep under <code>presentation/session/</code>, or wire more ritual mutations through <code>PauseRepository</code>.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
 </body>
 </html>
