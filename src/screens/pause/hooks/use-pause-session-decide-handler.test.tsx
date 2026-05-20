@@ -15,7 +15,12 @@ const { pauseLogStepMock, clearSessionMock, invalidatePauseStatsMock } = vi.hois
 }));
 
 vi.mock('@/features/pause/public-rpc', () => ({
-  pauseLogStep: (...args: unknown[]) => pauseLogStepMock(...args),
+  logPauseOutcomeStep: (params: { instanceId: string; payload: Record<string, unknown> }) =>
+    pauseLogStepMock({
+      instanceId: params.instanceId,
+      stepType: 'outcome_logged',
+      payload: params.payload,
+    }),
 }));
 
 vi.mock('@/lib/haptics', () => ({

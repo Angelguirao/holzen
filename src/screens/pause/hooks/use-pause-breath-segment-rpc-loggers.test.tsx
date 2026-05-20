@@ -11,7 +11,16 @@ const { pauseLogStepMock, invalidateCompanionUiCompletionQueryMock } = vi.hoiste
 }));
 
 vi.mock('@/features/pause/public-rpc', () => ({
-  pauseLogStep: (...args: unknown[]) => pauseLogStepMock(...args),
+  pauseBreathSegmentLogPorts: {
+    logStep: (params: { instanceId: string; payload: Record<string, unknown> }) =>
+      pauseLogStepMock({
+        instanceId: params.instanceId,
+        stepType: 'breath_completed',
+        payload: params.payload,
+      }).then(() => undefined),
+    invalidateCompanionCompletion: (...args: unknown[]) =>
+      invalidateCompanionUiCompletionQueryMock(...args),
+  },
 }));
 
 vi.mock('@/features/pause/public', async (importOriginal) => {

@@ -3,24 +3,14 @@ import type { TFunction } from 'i18next';
 import type { MoodValue } from '@/screens/pause/components/MoodCheck';
 import type { FeelStepTile } from '@/screens/pause/components/pause-feel-types';
 import { hapticFeedback } from '@/lib/haptics';
-import { pauseLogStep } from '@/features/pause/public-rpc';
+import { logInitialEmotionStep } from '@/features/pause/public-rpc';
 import {
   initialEmotionResetUi,
   runInitialEmotionSelect,
   runInitialEmotionSkip,
+  showPauseStepSyncFailedToast,
   type InitialEmotionUiState,
 } from '@/features/pause/public';
-import { showPauseStepSyncFailedToast } from '@/features/pause/public';
-
-const logInitialEmotionStep = (params: {
-  instanceId: string;
-  payload: Record<string, unknown>;
-}) =>
-  pauseLogStep({
-    instanceId: params.instanceId,
-    stepType: 'initial_emotion_logged',
-    payload: params.payload,
-  }).then(() => undefined);
 
 export function usePauseSessionInitialMoodHandlers(input: {
   pauseInstanceId: string | null;

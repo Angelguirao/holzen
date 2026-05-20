@@ -1,9 +1,8 @@
-import { useCallback, useEffect, useMemo, useRef, type MutableRefObject } from 'react';
+import { useCallback, useEffect, useRef, type MutableRefObject } from 'react';
 import type { TFunction } from 'i18next';
 import {
   applyBreathSegmentLogOutcome,
   initialBreathSegmentRpcLoggedFlagsFromRestored,
-  invalidateCompanionUiCompletionQuery,
   runEnsureBreathSegment1Logged,
   runEnsureBreathSegment2Logged,
   runLogBreathSegment1Skipped,
@@ -11,14 +10,7 @@ import {
   showPauseStepSyncFailedToast,
   type PersistedSession,
 } from '@/features/pause/public';
-import { pauseLogStep } from '@/features/pause/public-rpc';
-
-const logBreathCompletedStep = (params: { instanceId: string; payload: Record<string, unknown> }) =>
-  pauseLogStep({
-    instanceId: params.instanceId,
-    stepType: 'breath_completed',
-    payload: params.payload,
-  }).then(() => undefined);
+import { pauseBreathSegmentLogPorts } from '@/features/pause/public-rpc';
 
 /**
  * Dedupes `breath_completed` RPCs for deep + brief breath segments and resets when `pauseInstanceId` changes.
@@ -45,13 +37,7 @@ export function usePauseBreathSegmentRpcLoggers(input: {
   const breath2RpcDoneRef = useRef(segment2Logged);
   const prevPauseInstanceIdRef = useRef<string | null>(null);
 
-  const breathPorts = useMemo(
-    () => ({
-      logStep: logBreathCompletedStep,
-      invalidateCompanionCompletion: invalidateCompanionUiCompletionQuery,
-    }),
-    [],
-  );
+  const breathPorts = pauseBreathSegmentLogPorts;
 
   const handleBreathOutcome = useCallback(
     (outcome: Parameters<typeof applyBreathSegmentLogOutcome>[0], ref: MutableRefObject<boolean>) => {

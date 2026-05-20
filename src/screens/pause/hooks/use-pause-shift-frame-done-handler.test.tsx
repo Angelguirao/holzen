@@ -9,7 +9,12 @@ const { pauseLogStepMock } = vi.hoisted(() => ({
 }));
 
 vi.mock('@/features/pause/public-rpc', () => ({
-  pauseLogStep: (...args: unknown[]) => pauseLogStepMock(...args),
+  logShiftEmotionStep: (params: { instanceId: string; payload: Record<string, unknown> }) =>
+    pauseLogStepMock({
+      instanceId: params.instanceId,
+      stepType: 'shift_emotion_logged',
+      payload: params.payload,
+    }).then(() => undefined),
 }));
 
 vi.mock('@/features/pause/public', async (importOriginal) => {
