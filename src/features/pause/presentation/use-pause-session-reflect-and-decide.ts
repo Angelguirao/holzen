@@ -1,15 +1,15 @@
 import { useRef, type Dispatch, type SetStateAction } from 'react';
 import type { TFunction } from 'i18next';
 import type { BtcPriceData } from '@/features/market/public';
-import type { MoodValue } from '@/screens/pause/components/MoodCheck';
-import type { PauseStep } from '@/screens/pause/components/PauseProgress';
 import {
   isPauseReflectGenerationEnabled,
+  type MoodValue,
   type PauseImpactData,
+  type PauseStep,
   type RitualDepth,
 } from '@/features/pause/public';
-import { usePauseReflectGeneration } from '@/features/pause/public-hooks';
-import { usePauseSessionDecideHandler } from '@/screens/pause/hooks/use-pause-session-decide-handler';
+import { usePauseReflectGeneration } from './use-pause-reflect-generation';
+import { usePauseSessionDecideHandler } from './use-pause-session-decide-handler';
 
 export interface UsePauseSessionReflectAndDecideParams {
   t: TFunction;

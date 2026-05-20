@@ -1,6 +1,6 @@
 import { usePauseShiftFrameDoneHandler } from '@/features/pause/public-hooks';
 import { usePauseSessionBreathHandlers } from '@/screens/pause/hooks/use-pause-session-breath-handlers';
-import { usePauseSessionReflectAndDecide } from '@/screens/pause/hooks/use-pause-session-reflect-and-decide';
+import { usePauseSessionReflectAndDecide } from '@/features/pause/public-hooks';
 import type { usePauseSessionMoodAndPersist } from '@/screens/pause/hooks/use-pause-session-mood-and-persist';
 import type { usePauseSessionProviders } from '@/screens/pause/hooks/use-pause-session-providers';
 import type { usePauseSessionShellRitual } from '@/screens/pause/hooks/use-pause-session-shell-ritual';
