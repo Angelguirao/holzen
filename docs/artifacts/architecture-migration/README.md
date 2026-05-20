@@ -48,3 +48,5 @@ Index + full-`src` rings: [client-architecture-overview.md](../../fundamentals/c
 [implementation-notes.html](./implementation-notes.html) — design decisions, deviations, tradeoffs, open questions.
 
 Workflow: [implementation-notes-workflow.md](../../fundamentals/implementation-notes-workflow.md). Agent rule: [.cursor/rules/architecture-migration.mdc](../../../.cursor/rules/architecture-migration.mdc).
+
+**Doc reconciliation (May 2026):** migration docs aligned in commits through `c4714f4b` + follow-up IA/naming/screen-doc fixes. **Shipped routes/tabs:** always [active-surface.md](../../ops/active-surface.md) over [information-architecture.md](../../design/information-architecture.md) §1 / §4 full-IA bullets.

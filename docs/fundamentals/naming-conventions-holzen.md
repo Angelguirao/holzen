@@ -25,8 +25,8 @@ This doc is the **canonical naming guide** for the transitional `src/features/` 
 |------|---------|
 | Context = **product capability**, not nav tab | `pause`, `subscription`, `market`, `auth`, `user`, `notifications` |
 | **No** route-named packages | ❌ `features/home`, `features/archive`, `features/journey` |
-| Companions live in **pause** | `features/pause/.../companion/` — not `features/companion` |
-| Archive/journey **reads** for pause data stay in **pause** until a later split is ADR-approved | `use-cases/archive/`, `use-cases/library/` |
+| Companions live in **pause** (use cases) | `application/use-cases/ritual/frame/` — not `features/companion` |
+| Archive **reads** for pause data stay in **pause** until a later split is ADR-approved | `use-cases/archive/` (Pauses + Echoes — **not** user collections; collections → `src/legacy/archive-collections/`) |
 
 ---
 
@@ -52,7 +52,7 @@ Keep each barrel **small** (on the order of tens of exports, not hundreds). Pref
 | Port | `ports/<entity>-repository.ts` | `PascalCase` + role (`PauseRepository`) |
 | Domain types | `domain/` | `PascalCase` types; no React/Supabase |
 
-**Subfolders** group by ritual/session/companion/trigger — mirror [pause-system.md](../systems/pause-system.md) and [pause-client-architecture.md](../systems/pause-client-architecture.md) (`ritual/reflect/`, `ritual/frame/`, not top-level `companion/` + `reflect/` as peers):
+**Subfolders** group by ritual beat, session, or trigger — mirror [pause-system.md](../systems/pause-system.md) and [pause-client-architecture.md](../systems/pause-client-architecture.md) (`ritual/reflect/`, `ritual/frame/`, not top-level `companion/` + `reflect/` as peers):
 
 ```text
 application/use-cases/

@@ -2,11 +2,11 @@
 
 **Scope:** Product-level organization of screens, routes, and primary navigation as implemented in the React app. This complements visual-system work under `docs/design/nox/` and product decisions in `docs/decisions/`.
 
-**Source of truth for URLs:** `src/App.tsx` (React Router). **Primary nav:** `src/app/components/BottomNav.tsx` + `src/app/components/AppLayout.tsx`. **Layer map:** [client-src-layout.md](../fundamentals/client-src-layout.md).
+**Source of truth for URLs:** [active-surface.md](../ops/active-surface.md) (shipped manifest) + `src/App.tsx` (React Router). **Primary nav:** `src/app/components/BottomNav.tsx` + `src/app/components/AppLayout.tsx`. **Layer map:** [client-src-layout.md](../fundamentals/client-src-layout.md).
 
 **Pause-first shipped scope (2026-05):** The **shipped** product on `feature/mvpPauseCleanup` is a **4-tab shell** — Home, Archive, Journey (overview only), Settings — plus full-screen `/pause` and `/companion/*`. Archive MVP = **Pauses + Echoes** only; user **Collections** tab is **not** MVP ([pause-client-architecture.md](../systems/pause-client-architecture.md) §7). Tools, full Journey tabs (stats/badges/activity), Profile gamification, and `/library` are **not** in the active tree (404 on old bookmarks). Recovery snapshot: git tag `full-ia-pre-strip`. Canonical manifest: [docs/ops/active-surface.md](../ops/active-surface.md). **§1 below** still describes the **pre-MVP full IA** for reference when reading legacy code or the archive branch.
 
-**Document status:** **§1–§2** describe the **pre-strip full** shell and routes. **§3–§4** cover gaps, decisions, and alternatives; **§6** is the doc history. *Package/app version* for builds is the Git SHA / `VITE_APP_VERSION` — not duplicated here.
+**Document status:** **§1–§2** describe the **pre-strip full** shell and routes. **§3** covers gaps from that era. **§4** mixes **pause-first shipped** decisions (§4.5–§4.6) with **full-IA pre-strip reference** (§4.1–§4.4, §4.7) — see the §4 banner before trusting “Shipped” bullets. **§6** is the doc history. *Package/app version* for builds is the Git SHA / `VITE_APP_VERSION` — not duplicated here.
 
 ---
 
@@ -120,64 +120,72 @@ Under `/admin` and children (`/admin/smoke-test`, `/admin/sentry-alerts`, `/admi
 
 ## 4. Decision status + alternatives
 
-This section captures the **current state** and what we may reconsider next.
+> **Pause-first vs full-IA:** The **live product** matches [active-surface.md](../ops/active-surface.md) — **4 tabs** (Home, Archive, Journey overview, Settings), `/pause`, `/companion/*`. **§4.1–§4.4** and most of **§4.7** describe the **pre-strip full IA** (`git tag full-ia-pre-strip`) for legacy recovery — **not** the active tree (Tools tab, `/journey/:tab`, user collections, Journey → Activity are **404** or legacy). **§4.5–§4.6** remain **pause-first shipped**.
 
-### 4.1 Unify modalities under one parent
+This section captures decision history and what we may reconsider next.
 
-- **Shipped:** canonical `/tools/*` URL family for letters (future self), stillness (`/tools/breathe`), ground (with nested `history` for the grounding journal), practice.
-- **Shipped:** no alternate short routes; external links/bookmarks should use `/tools/...`.
-- **Shipped:** information entry point via `/tools` (`ToolsHub`: **single** list — no “Journey vs immersive” split on that screen) plus Home **Journey pulse** / **Quick capture** entry points.
-- **Shipped:** **Tools** as a **primary bottom tab** (five tabs total) for `/tools` and `/tools/letters` (shell); other full-screen `/tools/...` routes hide the tab bar.
-- **Shipped (measurement):** PostHog `navigation.primary_tab_opened` (see **§1.7**) so tab mix and Tools adoption are quantifiable.
+### 4.1 Unify modalities under one parent (full-IA — not pause-first shipped)
+
+- **Full-IA (pre-strip):** canonical `/tools/*` URL family for letters (future self), stillness (`/tools/breathe`), ground (with nested `history` for the grounding journal), practice.
+- **Full-IA (pre-strip):** no alternate short routes; external links/bookmarks should use `/tools/...`.
+- **Full-IA (pre-strip):** information entry point via `/tools` (`ToolsHub`: **single** list — no “Journey vs immersive” split on that screen) plus Home **Journey pulse** / **Quick capture** entry points.
+- **Full-IA (pre-strip):** **Tools** as a **primary bottom tab** (five tabs total) for `/tools` and `/tools/letters` (shell); other full-screen `/tools/...` routes hide the tab bar.
+- **Full-IA (pre-strip, measurement):** PostHog `navigation.primary_tab_opened` (see **§1.7**) so tab mix and Tools adoption are quantifiable.
 - **Alternative to revisit:** if five tabs feel crowded on small devices, revisit order/labeling or promote tools from Home only — use `navigation.primary_tab_opened` + qualitative feedback (e.g. short hallway tests).
+
+**Pause-first:** `/tools`, `/tools/*`, `/library` → **404** ([active-surface.md](../ops/active-surface.md)).
 
 ### 4.2 Split identity/account from progress/archive
 
-- **Shipped:** progress area is **Journey** at `/journey/...` (not “Profile” in primary IA).
-- **Shipped:** Settings section labels now use task-oriented wording.
-- **Shipped:** Home summary split into two lighter cards: **Journey pulse** (`HomeJourneyPulse`) and **Quick capture** (`HomeQuickCapture`), to keep a feeling-first home while still surfacing score/progress context and recent capture actions.
-- **Rationale:** one large summary card became dense. Splitting preserves quick scanability: `Pause` stays the hero, `Journey pulse` answers “how am I doing?”, and `Quick capture` answers “what can I log now?”.
-- **Alternative to revisit:** a **dedicated Stats tab** or heavier Home module only if analytics/interviews show demand; full skills-first **Stats** remains the Journey → **Stats** sub-tab.
+- **Pause-first shipped:** Settings section labels use task-oriented wording ([screens/settings](../screens/settings.md)).
+- **Pause-first shipped:** Journey tab at **`/journey`** — **overview only** (no `/journey/:tab` sub-routes).
+- **Pause-first shipped:** Home widgets are **goal-why**, **market**, **your-pause** only ([screens/home.md](../screens/home.md)).
+- **Full-IA (pre-strip):** progress area was **Journey** at `/journey/:tab` (stats, insights, badges, activity — legacy full shell).
+- **Full-IA (pre-strip):** Home **Journey pulse** (`HomeJourneyPulse`) and **Quick capture** (`HomeQuickCapture`) widgets.
+- **Alternative to revisit:** a **dedicated Stats tab** or heavier Home module only if analytics/interviews show demand; full skills-first **Stats** was the Journey → **Stats** sub-tab in full IA.
 
-### 4.3 Path-addressable Journey
+### 4.3 Path-addressable Journey (full-IA — not pause-first shipped)
 
-- **Shipped:** `/journey/:tab` for stats/insights/badges/activity.
-- **Shipped:** letters at `/tools/letters` with optional `?letter=<id>` (delivered letter scroll / notification).
-- **Shipped:** no `location.state` fallback for tab selection.
+- **Full-IA (pre-strip):** `/journey/:tab` for stats/insights/badges/activity.
+- **Full-IA (pre-strip):** letters at `/tools/letters` with optional `?letter=<id>` (delivered letter scroll / notification).
+- **Full-IA (pre-strip):** no `location.state` fallback for tab selection.
+
+**Pause-first:** `/journey/stats`, `/journey/:tab`, `/tools/letters` → **404** ([active-surface.md](../ops/active-surface.md)).
 
 ### 4.4 Clarify Archive vs Activity
 
-- **Shipped:** **Archive** = pause instances + optional collections. **Journey → Activity** = unified chronological log (pauses, practice, badges, letters) in `HistoryCalendar`.
+- **Pause-first shipped:** **Archive** = **Pauses + Echoes** tabs only — **no** user Collections tab ([pause-client-architecture.md](../systems/pause-client-architecture.md) §7; UI in `src/legacy/archive-collections/`).
+- **Full-IA (pre-strip):** Archive also included **optional user collections**; **Journey → Activity** was a unified chronological log (pauses, practice, badges, letters) in `HistoryCalendar`.
 - **Alternative to revisit:** if users still confuse surfaces, merge into one screen with view modes (`saved` / `timeline`) behind one information object.
 
-### 4.5 Settings IA by task
+### 4.5 Settings IA by task (pause-first shipped)
 
 - **Shipped:** task-oriented section groups (Account & profile, Pause behavior, App behavior, Content & data, Notifications & quiet hours, Subscription & Pro, Account & security).
 - **Shipped:** `/settings` as a **hub** (jump links; “About & feedback” card with “new” when an unseen changelog version exists); **`settingsSectionPath(id)`** in `app-routes.ts` → `/settings/<id>` for **dedicated section screens** (shared `useSettingsModel` + context). `/settings/about` and `/settings/billing-history` stay first-class routes **without** loading the heavy settings model.
 - **Shipped:** on the hub, `#settings-section-<id>` replaces into `/settings/<id>` for deep links from in-page jump links.
 - **Further improvement:** optional polish (skeletons per section, focus/scroll), or a **layout pass** on section screen typography/spacing.
 
-### 4.6 Admin IA
+### 4.6 Admin IA (pause-first shipped)
 
 - **Shipped:** admin remains isolated under `/admin*` and excluded from consumer navigation.
 - **Shipped:** `AdminSubNav` (horizontal links) on `/admin`, `/admin/smoke-test`, `/admin/sentry-alerts`, `/admin/edge-coverage` for quick movement between allowlisted admin screens.
 - **Further improvement:** if the admin surface grows, extend the same pattern (or a small layout wrapper) for new `/admin/...` routes.
 
-### 4.7 Summary — open alternatives and improvements
+### 4.7 Summary — open alternatives and improvements (mostly full-IA reference)
 
-Use this as a **checklist** when planning research or another IA pass. Detailed rationale stays in **§3** and **§4.1–4.6** above.
+Use this as a **checklist** when planning research or another IA pass — **cross-check [active-surface.md](../ops/active-surface.md)** before treating a row as live. Detailed rationale stays in **§3** and **§4.1–§4.6** above.
 
 
-| Theme                    | Shipped guardrails                                                   | Alternatives / improvements to consider                                                                     |
-| ------------------------ | -------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------- |
-| **Tools & shell**        | Canonical `/tools/*`, single `ToolsHub` list, Ground session+journal in `ToolsGroundLayout`, stillness at `/tools/breathe`; `navigation.primary_tab_opened` | Reorder tabs; further merge practice routes if the list still feels long                                  |
-| **Journey vs “profile”** | `/journey/:tab`, skills-first stats; **Home** shows Journey pulse + quick capture | Heavier Home module or a **dedicated Stats tab** if interviews + metrics justify it                         |
-| **Journey scope**        | One hub: stats, insights, badges, activity; letters under Tools      | Further **split tabs or routes** if one area dominates support load (product call)                          |
-| **Library vs Activity**  | Library tabs vs Journey → Activity calendar (includes **`library`** events) | **Single screen** with `saved` / `timeline` modes if users still mix them up                                |
-| **Settings**             | Hub + `/settings/<section>` + `/settings/about` & `/settings/billing-history` | Further **layout polish** on section pages if metrics still show users bail mid-task                          |
-| **Admin**                | Isolated `/admin*` + in-page `AdminSubNav` between admin routes        | Deeper **grouping** or layout wrapper if more tools ship there                                              |
-| **Companions vs tools**  | `/companion/...` vs `/tools/...`                                     | Keep two families; only consolidate if a future design unifies “instance” vs “tool” mentally                |
-| **Research**             | PostHog tab events                                                   | Short **hallway tests** or interviews for naming, tab crowding, “where is my past?” — complements analytics |
+| Theme                    | Full-IA guardrails (pre-strip)                                       | Pause-first today | Alternatives / improvements to consider                                                                     |
+| ------------------------ | -------------------------------------------------------------------- | ----------------- | ----------------------------------------------------------------------------------------------------------- |
+| **Tools & shell**        | Canonical `/tools/*`, single `ToolsHub` list, Ground session+journal in `ToolsGroundLayout`, stillness at `/tools/breathe`; `navigation.primary_tab_opened` | **404** — no Tools tab | Reorder tabs; further merge practice routes if the list still feels long (if full IA returns)                                  |
+| **Journey vs "profile"** | `/journey/:tab`, skills-first stats; **Home** shows Journey pulse + quick capture | **`/journey` overview only**; Home = goal/market/pause widgets | Heavier Home module or a **dedicated Stats tab** if interviews + metrics justify it                         |
+| **Journey scope**        | One hub: stats, insights, badges, activity; letters under Tools      | Overview only; stats/badges/activity **legacy**      | Further **split tabs or routes** if one area dominates support load (product call)                          |
+| **Library vs Activity**  | Library tabs vs Journey → Activity calendar (includes **`library`** events) | Archive **Pauses + Echoes**; no collections MVP; no Activity tab | **Single screen** with `saved` / `timeline` modes if users still mix them up                                |
+| **Settings**             | Hub + `/settings/<section>` + `/settings/about` & `/settings/billing-history` | **Same — shipped** | Further **layout polish** on section pages if metrics still show users bail mid-task                          |
+| **Admin**                | Isolated `/admin*` + in-page `AdminSubNav` between admin routes        | **Same — shipped** | Deeper **grouping** or layout wrapper if more tools ship there                                              |
+| **Companions vs tools**  | `/companion/...` vs `/tools/...`                                     | **`/companion/*` shipped**; `/tools/*` **404** | Keep two families; only consolidate if a future design unifies "instance" vs "tool" mentally                |
+| **Research**             | PostHog tab events                                                   | Tab events for **4-tab** shell | Short **hallway tests** or interviews for naming, tab crowding, "where is my past?" — complements analytics |
 
 
 **Other product analytics** (not IA-specific): see [event-taxonomy.md](../ops/event-taxonomy.md) for the full list — navigation (`navigation.primary_tab_opened`) and many pause/companion/paywall events are **wired**; any row still marked *planned* there is the source of truth.
@@ -189,7 +197,8 @@ Use this as a **checklist** when planning research or another IA pass. Detailed 
 
 | Doc                                                  | Relevance                                                                          |
 | ---------------------------------------------------- | ---------------------------------------------------------------------------------- |
-| `docs/decisions/2026-04-23-skills-first-stats-ia.md` | Stats organization inside **Journey** (was profile-tab era).                       |
+| [ops/active-surface.md](../ops/active-surface.md)    | **Canonical shipped routes/tabs** (pause-first 4-tab shell).                       |
+| `docs/decisions/2026-04-23-skills-first-stats-ia.md` | Stats organization inside **Journey** (full-IA era; stats not in pause-first bundle). |
 | `docs/systems/pause-system.md`                       | Pause lifecycle; informs companion and `/pause` placement.                         |
 | `docs/systems/stats-system.md`                       | Skills-first metrics model.                                                        |
 | `docs/design/nox/README.md`                          | Visual system; IA changes should still follow Nox patterns for nav/components.     |
@@ -216,7 +225,7 @@ Use this as a **checklist** when planning research or another IA pass. Detailed 
 | 2026-04-28 | —      | **Settings:** true per-section routes (`/settings/<id>`), hub, `useSettingsModel` + provider layout; `settingsSectionPath` points at `/settings/<id>`; hub hash → section route.          |
 | 2026-04-28 | —      | **Tools:** unified `ToolsHub` list (no Journey/activity on hub); **Ground** `ToolsGroundLayout` with Session + Journal; Ambient folded into Stillness at `/tools/breathe`; i18n “Stillness” no parenthetical. |
 | 2026-04-29 | —      | Removed legacy client URL aliases (`/journey/letters`, `/settings/section/*`, `/tools/ambient`); letter notifications and docs use **`/tools/letters`** only. |
-| 2026-04-30 | —      | **IA doc sync:** Home default widget order + `HomeJourneyPulse` / `HomeQuickCapture`; Library vs Activity wording matches shipped UI (no Library “Activity” tab, no `HistoryCrossLinks`); Activity log includes **`library`** events. |
+| 2026-04-30 | —      | **IA doc sync:** Home default widget order + `HomeJourneyPulse` / `HomeQuickCapture`; Library vs Activity wording matches full-IA UI (no Library “Activity” tab, no `HistoryCrossLinks`); Activity log includes **`library`** events. |
+| 2026-05-19 | —      | **Pause-first IA reconciliation:** §4 banner; relabel §4.1–§4.4 and §4.7 as full-IA vs pause-first; Archive collections stripped; `/journey/:tab` and Tools marked 404 in active tree. Canonical shipped routes: [active-surface.md](../ops/active-surface.md). |
 
-
-When routes, bottom-nav items, or nav-related analytics change, update **§1**, **§1.7**, **§4.1**, **§4.7**, **event-taxonomy.md** (if applicable), and a **Changelog** row in the same PR.
+When routes, bottom-nav items, or nav-related analytics change, update **[active-surface.md](../ops/active-surface.md)** (canonical shipped manifest), **§1**, **§1.7**, **§4**, **event-taxonomy.md** (if applicable), and a **Changelog** row in the same PR.
