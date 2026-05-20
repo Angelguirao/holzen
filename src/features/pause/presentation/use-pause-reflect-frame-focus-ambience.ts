@@ -2,7 +2,7 @@ import { useEffect, useRef } from 'react';
 import {
   startPauseReflectFrameFocusAmbience,
   stopPauseReflectFrameFocusAmbience,
-} from '@/features/pause/public';
+} from '@/features/pause/application/use-cases/breathing/ritual-audio';
 
 /**
  * Soft continuous low-frequency bed while Reflect or Frame is visible and ritual sound is on.
