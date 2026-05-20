@@ -9,7 +9,7 @@ import {
   resolveReflectGenerationPrefetch,
   shouldClearReflectGenerationLoading,
   shouldCommitReflectGeneration,
-} from '@/features/pause/application/use-cases/reflect/reflect-generation-hook-flow';
+} from '@/features/pause/application/use-cases/ritual/reflect/reflect-generation-hook-flow';
 import { runReflectGeneration } from '@/features/pause/application/use-cases/ritual/reflect/run-reflect-generation';
 import {
   fetchOpeningMessageForPauseInstance,
