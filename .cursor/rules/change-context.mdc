@@ -21,6 +21,7 @@ Non-trivial work should be **classified** against the **Change map** table in [A
 ## Full index
 
 - [docs/README.md](../../docs/README.md) — start-here order and **canonical sources** (single owner per kind of information).
+- Incremental `src/` migration sessions: [.cursor/rules/architecture-migration.mdc](architecture-migration.mdc) + [naming-conventions-holzen.md](../../docs/fundamentals/naming-conventions-holzen.md).
 - Flow-first review templates: [docs/reviews/react-spa-review-template.md](../../docs/reviews/react-spa-review-template.md), skill `holzen-flow-review`.
 
 If a doc and code disagree, **fix the doc in the same PR** when you changed behavior—or file a tiny follow-up only when scope is intentionally split.
