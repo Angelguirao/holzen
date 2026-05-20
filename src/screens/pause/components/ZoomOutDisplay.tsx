@@ -6,14 +6,14 @@ import { toast } from 'sonner';
 import { useHolzen } from '@/app/components/HolzenProvider';
 import { formatBtcPrice } from '@/features/market/public';
 import { useSubscription } from '@/features/subscription/public-hooks';
-import type { ZoomOutData } from '@/features/pause/public';
+import type { ZoomOutData } from '@/features/pause/public-hooks';
 import { companionHistoryPath } from '@/lib/app-routes';
 import { CompanionError } from '@/screens/pause/components/CompanionError';
 import { ZoomOutDeepTime } from '@/screens/pause/components/zoom-out-deep-time';
 import { ZoomOutEchoPanel } from '@/screens/pause/components/zoom-out-echo-panel';
 import { ZoomOutOnThisDay } from '@/screens/pause/components/zoom-out-on-this-day';
 
-export type { EchoUserWord, ZoomOutData, ZoomOutEchoData } from '@/features/pause/public';
+export type { EchoUserWord, ZoomOutData, ZoomOutEchoData } from '@/features/pause/public-hooks';
 
 interface Props {
   data: ZoomOutData | null;

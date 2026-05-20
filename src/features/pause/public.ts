@@ -166,12 +166,6 @@ export type { PauseSessionShellHolzen } from './domain/pause-session-shell-holze
 export type {
   CachedHistoricalInsightShape,
 } from './domain/historical-insight';
-export type {
-  EchoUserWord,
-  ZoomOutData,
-  ZoomOutEchoData,
-  ZoomOutOnThisDayEntry,
-} from './domain/zoom-out-display';
 export {
   type NotificationNavigateState,
   type PauseSessionLocationState,

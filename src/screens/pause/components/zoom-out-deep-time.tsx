@@ -1,5 +1,5 @@
 import { Globe } from 'lucide-react';
-import type { ZoomOutData } from '@/features/pause/public';
+import type { ZoomOutData } from '@/features/pause/public-hooks';
 
 export type ZoomOutDeepTimeProps = {
   deepTime: NonNullable<ZoomOutData['deepTime']>;
