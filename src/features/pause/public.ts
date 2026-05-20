@@ -14,7 +14,6 @@ export {
   getPendingPauseOfferDisplay,
   type PendingPauseOfferDisplay,
 } from './application/use-cases/pending-offer/pending-pause-offer-display';
-export { formatCompanionHistoryRelativeDay } from './application/use-cases/ritual/frame/format-companion-history-relative-day';
 export { groupBulkHoldByLocalDay } from './application/use-cases/bulk-hold/group-by-local-day';
 export {
   bulkHoldMaxRows,
@@ -337,7 +336,6 @@ export {
   playPauseBreathPhaseCue,
   resumePauseAudioContext,
 } from './application/use-cases/breathing/ritual-audio';
-export { estimateReadTime } from './application/use-cases/ritual/frame/estimate-read-time';
 export type { CompanionFeedbackVote } from './application/use-cases/ritual/frame/log-companion-feedback-vote';
 export type {
   CompanionSlotCacheIds,

@@ -1291,6 +1291,25 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-20</span>
+      <span>Phase A slice — peel frame read-time helpers from public.ts (§6)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3><code>estimateReadTime</code> + <code>formatCompanionHistoryRelativeDay</code> off <code>public.ts</code></h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>ritual/reflect/</code>) and #2 (<code>ritual/frame/</code>) are complete on this branch. Continue §6 slim-barrel peel: remove companion frame formatters from <code>public.ts</code>; <code>ReadTime</code> and <code>HistoryThread</code> import via <code>public-hooks</code> alongside <code>zoomOutTotalCharsForReadTime</code>. Dropped duplicate <code>zoomOutTotalCharsForReadTime</code> export at end of <code>public-hooks.ts</code>.</dd>
+      <dt>Deviation</dt>
+      <dd><code>public-hooks</code> carries pure formatters — same stretch as zoom-out read-time helper; avoids deep screen imports into <code>application/</code>.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Zoom-out display types remain on <code>public.ts</code> for pause screen components — peel helpers only.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: <code>presentation/archive/</code> grouping or more <code>PauseRepository</code> call-site wiring (backlog #4).</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
 </body>
 </html>

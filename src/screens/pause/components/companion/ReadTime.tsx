@@ -1,6 +1,6 @@
 import { BookOpen } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
-import { estimateReadTime } from '@/features/pause/public';
+import { estimateReadTime } from '@/features/pause/public-hooks';
 
 interface Props {
   /** Total character count of the content the user will read. */
