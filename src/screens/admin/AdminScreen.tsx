@@ -1,6 +1,5 @@
 import { useAdminStats } from '@/screens/admin/hooks/use-admin-stats';
 import { useIsAdmin } from '@/app/hooks/use-is-admin';
-import { supabase } from '@/integrations/supabase/client';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import { RefreshCw, Activity, Database, DollarSign, AlertTriangle, ThumbsUp, Clock, Loader2, ShieldX, ChevronDown, ChevronRight, Bell } from 'lucide-react';
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Cell } from 'recharts';

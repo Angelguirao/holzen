@@ -1,4 +1,5 @@
 import { supabase } from '@/integrations/supabase/client';
+import type { Json } from '@/integrations/supabase/types';
 import { pauseInstanceQueryPrefix } from '@/features/pause/application/queries/pause-instance-query-prefix';
 
 export const COMPANION_SLOT_FAVORITES_METADATA_KEY = 'companion_slot_favorites';
@@ -49,4 +50,35 @@ export function getCompanionLibraryFavoritesQueryOptions(pauseInstanceId: string
     staleTime: 0,
     refetchOnWindowFocus: false,
   } as const;
+}
+
+/** Toggle one companion slot favorite on `pause_instances.metadata` (RLS on instance row). */
+export async function toggleCompanionLibraryFavorite(
+  pauseInstanceId: string,
+  sourceType: string,
+  options?: {
+    /** Called with the new bucket before the persist write (optimistic UI). */
+    onBucketComputed?: (bucket: Record<string, boolean>) => void;
+  },
+): Promise<boolean> {
+  const { data: row, error: fetchErr } = await supabase
+    .from('pause_instances')
+    .select('metadata')
+    .eq('id', pauseInstanceId)
+    .single();
+  if (fetchErr || !row) return false;
+
+  const meta = { ...((row.metadata as Record<string, unknown>) ?? {}) };
+  const prevBucket = {
+    ...((meta[COMPANION_SLOT_FAVORITES_METADATA_KEY] as Record<string, boolean> | undefined) ?? {}),
+  };
+  const bucket = { ...prevBucket, [sourceType]: !prevBucket[sourceType] };
+  meta[COMPANION_SLOT_FAVORITES_METADATA_KEY] = bucket;
+  options?.onBucketComputed?.(bucket);
+
+  await supabase
+    .from('pause_instances')
+    .update({ metadata: meta as unknown as Json })
+    .eq('id', pauseInstanceId);
+  return true;
 }
