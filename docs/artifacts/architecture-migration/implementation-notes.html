@@ -2222,6 +2222,25 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-20</span>
+      <span>Phase A slice — colocate phase-advance under ritual/breathe (Tier 5)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>Continue <code>breathing/</code> → <code>ritual/breathe/</code> after label-variant slice</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>reflect/</code> → <code>ritual/reflect/</code>) is complete on <code>cursor/arch-migrate-src-ca70</code>. Next smallest breathe cluster: <code>phase-advance</code> (+ tests) → <code>ritual/breathe/</code>; <code>BOX_BREATH_PHASE_COUNT</code> re-export uses relative <code>./breathing-constants</code>. <code>public-hooks</code> still exports <code>computeBreathingPhaseAdvance</code> for <code>BreathingExercise</code>; timed-loop hook imports ritual path directly.</dd>
+      <dt>Deviation</dt>
+      <dd>None — phase tick / cycle / pattern-complete behavior unchanged.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Did not move <code>breath-completed-payload</code>, <code>run-breath-segment-log</code>, or <code>ritual-pattern</code> in the same commit.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: move breath segment log cluster under <code>ritual/breathe/</code>, or continue §6 <code>public.ts</code> peel (<code>RitualDepth</code> + session shell types).</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
 </body>
 </html>

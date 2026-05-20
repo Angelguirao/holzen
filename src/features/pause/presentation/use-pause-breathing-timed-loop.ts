@@ -3,7 +3,7 @@ import {
   computeBreathingPhaseAdvance,
   resolveBreathingCompleted,
   resolveBreathingPhaseAdvanceOutcome,
-} from '@/features/pause/application/use-cases/breathing/phase-advance';
+} from '@/features/pause/application/use-cases/ritual/breathe/phase-advance';
 import {
   playPauseBreathPatternCompleteCue,
   playPauseBreathPhaseCue,
