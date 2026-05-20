@@ -3,6 +3,13 @@ import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '@/features/auth/public';
 import {
+  collectionsContainingPauseInstance,
+  countCollectionItems,
+  hasCollectionMembership,
+  nextCollectionItemPosition,
+  sortedPauseInstanceIdsInCollection,
+} from '@/features/pause/application/use-cases/library/library-bundle-collection-helpers';
+import {
   buildLibraryBundlePlaceholder,
   isLibraryBundleInitialLoading,
 } from '@/features/pause/application/use-cases/library/library-bundle-placeholder';
@@ -120,17 +127,11 @@ export function usePauseLibraryBundle(options?: UsePauseLibraryBundleOptions) {
 
   const addToCollection = useCallback(
     async (collectionId: string, pauseInstanceId: string) => {
-      const exists = collectionItems.some(
-        (ci) => ci.collection_id === collectionId && ci.pause_instance_id === pauseInstanceId,
-      );
-      if (exists) return null;
-      const maxPos = collectionItems
-        .filter((ci) => ci.collection_id === collectionId)
-        .reduce((max, ci) => Math.max(max, ci.position), -1);
+      if (hasCollectionMembership(collectionItems, collectionId, pauseInstanceId)) return null;
       const data = await insertLibraryCollectionItem({
         collectionId,
         pauseInstanceId,
-        position: maxPos + 1,
+        position: nextCollectionItemPosition(collectionItems, collectionId),
       });
       if (!data) return null;
       bumpLibrary();
@@ -148,24 +149,18 @@ export function usePauseLibraryBundle(options?: UsePauseLibraryBundleOptions) {
   );
 
   const getCollectionItemIds = useCallback(
-    (collectionId: string) =>
-      collectionItems
-        .filter((ci) => ci.collection_id === collectionId)
-        .sort((a, b) => a.position - b.position)
-        .map((ci) => ci.pause_instance_id),
+    (collectionId: string) => sortedPauseInstanceIdsInCollection(collectionItems, collectionId),
     [collectionItems],
   );
 
   const getCollectionItemCount = useCallback(
-    (collectionId: string) => collectionItems.filter((ci) => ci.collection_id === collectionId).length,
+    (collectionId: string) => countCollectionItems(collectionItems, collectionId),
     [collectionItems],
   );
 
   const getItemCollections = useCallback(
-    (pauseInstanceId: string) => {
-      const colIds = collectionItems.filter((ci) => ci.pause_instance_id === pauseInstanceId).map((ci) => ci.collection_id);
-      return collections.filter((c) => colIds.includes(c.id));
-    },
+    (pauseInstanceId: string) =>
+      collectionsContainingPauseInstance(collections, collectionItems, pauseInstanceId),
     [collectionItems, collections],
   );
 
