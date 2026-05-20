@@ -41,10 +41,8 @@ import {
   type PostPauseFeelSnapshot,
 } from './application/use-cases/ritual/done/post-pause-emotion-log';
 import type { MoodValue } from './domain/mood-value';
-import {
-  runPauseReflectNoteUpdate,
-  runPauseReflectTagUpdate,
-} from './application/use-cases/ritual/reflect/run-pause-reflect-metadata-log';
+import { runPauseReflectNoteUpdate } from './application/use-cases/ritual/reflect/run-pause-reflect-note-update';
+import { runPauseReflectTagUpdate } from './application/use-cases/ritual/reflect/run-pause-reflect-tag-update';
 import { runPauseFavoriteToggle } from './application/use-cases/ritual/reflect/run-pause-favorite-toggle';
 import { runPauseReflectionStepLogOnce } from './application/use-cases/ritual/reflect/run-pause-reflection-step-log';
 import { runPauseOutcomeLog } from './application/use-cases/ritual/decide/run-pause-outcome-log';

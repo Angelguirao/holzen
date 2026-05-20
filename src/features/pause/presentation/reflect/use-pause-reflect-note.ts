@@ -7,7 +7,7 @@ import {
   getLatestPauseReflectNoteQueryOptions,
   PAUSE_REFLECT_STEP_NOTE,
   pauseReflectStepLatestQueryKey,
-} from '../../public-queries';
+} from '@/features/pause/public-queries';
 
 /** Reflect post-it note: hydrate from latest step event, commit on blur via `pause_log_step`. */
 export function usePauseReflectNote(pauseInstanceId: string) {
