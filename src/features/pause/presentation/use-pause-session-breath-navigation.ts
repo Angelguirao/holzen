@@ -1,16 +1,14 @@
 import type { Dispatch, SetStateAction } from 'react';
-import type { PauseStep } from '@/screens/pause/components/PauseProgress';
 import {
   isPauseSessionHeaderBackVisible,
   type BriefPauseStep,
+  type PauseStep,
   type RitualDepth,
 } from '@/features/pause/public';
-import { usePauseSessionBreathUi } from '@/features/pause/public-hooks';
-import {
-  usePauseSessionGoBack,
-  usePauseSessionGoToStep,
-  usePauseSessionHeaderBackHandler,
-} from '@/features/pause/public-hooks';
+import { usePauseSessionBreathUi } from './use-pause-session-breath-ui';
+import { usePauseSessionGoBack } from './use-pause-session-go-back';
+import { usePauseSessionGoToStep } from './use-pause-session-go-to-step';
+import { usePauseSessionHeaderBackHandler } from './use-pause-session-header-back-handler';
 
 export type UsePauseSessionBreathNavigationParams = {
   phase: 'session' | 'done';
