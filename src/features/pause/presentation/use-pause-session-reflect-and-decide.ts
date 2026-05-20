@@ -2,7 +2,11 @@ import { useRef, type Dispatch, type SetStateAction } from 'react';
 import type { TFunction } from 'i18next';
 import type { BtcPriceData } from '@/features/market/public';
 import {
-  isPauseReflectGenerationEnabled,
+  resolveEffectiveReflectionMessage,
+  resolveReflectGenerationSeverityAbsPct,
+  shouldRunPauseReflectGeneration,
+} from '@/features/pause/application/use-cases/session/pause-session-reflect-decide-flow';
+import {
   type MoodValue,
   type PauseImpactData,
   type PauseStep,
@@ -58,7 +62,7 @@ export function usePauseSessionReflectAndDecide({
   shiftIntensity,
 }: UsePauseSessionReflectAndDecideParams) {
   const decidingRef = useRef(false);
-  const reflectGenEnabled = isPauseReflectGenerationEnabled(ritualEntry, step);
+  const reflectGenEnabled = shouldRunPauseReflectGeneration(ritualEntry, step);
 
   const {
     reflectionMessage: generatedReflectionMessage,
@@ -69,11 +73,14 @@ export function usePauseSessionReflectAndDecide({
     pauseInstanceId,
     context,
     initialReflectionMessage: message,
-    severityAbsPct: Math.abs(btcData?.changePercent ?? 0),
+    severityAbsPct: resolveReflectGenerationSeverityAbsPct(btcData?.changePercent),
     enabled: reflectGenEnabled,
   });
 
-  const effectiveReflectionMessage = generatedReflectionMessage.trim() || message;
+  const effectiveReflectionMessage = resolveEffectiveReflectionMessage(
+    generatedReflectionMessage,
+    message,
+  );
 
   const { handleDecide } = usePauseSessionDecideHandler({
     decidingRef,
