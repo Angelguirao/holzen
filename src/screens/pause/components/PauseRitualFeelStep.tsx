@@ -7,7 +7,7 @@ import type { MoodValue } from '@/screens/pause/components/MoodCheck';
 import { PAUSE_FEEL_INTENSITY_KEYS, type FeelStepTile } from '@/features/pause/public';
 import { Button } from '@/components/ui/button';
 import { Slider } from '@/components/ui/slider';
-import { pauseStepLayout } from '@/screens/pause/components/pause-step-layout';
+import { pauseStepLayout } from '@/features/pause/public';
 import { cn } from '@/lib/utils';
 
 const TILES: { tile: FeelStepTile; mood: MoodValue }[] = [

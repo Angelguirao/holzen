@@ -4,7 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { ChevronLeft } from 'lucide-react';
 import { OutcomeIcon } from '@/components/icons/OutcomeIcon';
 import { hapticFeedback } from '@/lib/haptics';
-import { pauseStepLayout } from '@/screens/pause/components/pause-step-layout';
+import { pauseStepLayout } from '@/features/pause/public';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 
