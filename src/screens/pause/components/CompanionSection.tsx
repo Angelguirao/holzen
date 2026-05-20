@@ -11,7 +11,7 @@ import { CompanionFeedback } from './CompanionFeedback';
 import { Check, Heart, Lock, Feather, Anchor, BookOpenText, Mountain, Clock, Maximize2 } from 'lucide-react';
 import { useProGate } from '@/features/subscription/public-hooks';
 import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
-import { useCompanionData } from '@/screens/pause/hooks/use-companion-data';
+import { useCompanionData } from '@/features/pause/public-hooks';
 
 import type { CompanionData, CompanionPrefs } from '@/features/pause/public';
 
