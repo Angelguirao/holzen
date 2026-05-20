@@ -78,6 +78,20 @@ export {
   type CompanionFallbackAdminMutationResult,
 } from './infrastructure/queries/companion-fallbacks-admin-mutations';
 export {
+  ADMIN_COMPANION_FALLBACKS_QUERY_KEY,
+  fetchCompanionFallbackRows,
+  getAdminCompanionFallbacksQueryOptions,
+  type CompanionFallbackRow,
+  type FallbackPoolType,
+} from './infrastructure/queries/companion-fallbacks-admin-query';
+export {
+  ADMIN_DEV_MODE_SETTING_NONE_QUERY_KEY,
+  adminDevModeSettingQueryKey,
+  fetchDevModeFromAnalytics,
+  getAdminDevModeSettingQueryOptions,
+  readLocalDevMode,
+} from './infrastructure/queries/dev-mode-admin-query';
+export {
   BULK_HOLD_PENDING_DISABLED_USER_ID,
   BULK_HOLD_PENDING_QUERY_LEAF,
   BULK_HOLD_PENDING_QUERY_PREFIX,
