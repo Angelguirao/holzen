@@ -52,3 +52,11 @@ export {
   useCompanionSlotRunOrchestrate,
   type UseCompanionSlotRunOrchestrateParams,
 } from './presentation/use-companion-slot-run-orchestrate';
+export {
+  useCompanionSlotOrchestrateActions,
+  type UseCompanionSlotOrchestrateActionsParams,
+} from './presentation/use-companion-slot-orchestrate-actions';
+export {
+  useCompanionOrchestration,
+  type UseCompanionOrchestrationParams,
+} from './presentation/use-companion-orchestration';

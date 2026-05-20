@@ -1,8 +1,8 @@
 import { useState } from 'react';
-import { useCompanionInterventionBootstrap } from '@/features/pause/public-hooks';
-import { useCompanionOrchestrateRetry } from '@/features/pause/public-hooks';
-import { useCompanionSlotOrchestrateActions } from '@/screens/pause/hooks/use-companion-slot-orchestrate-actions';
-import { useCompanionSlotUiState } from '@/features/pause/public-hooks';
+import { useCompanionInterventionBootstrap } from './use-companion-intervention-bootstrap';
+import { useCompanionOrchestrateRetry } from './use-companion-orchestrate-retry';
+import { useCompanionSlotOrchestrateActions } from './use-companion-slot-orchestrate-actions';
+import { useCompanionSlotUiState } from './use-companion-slot-ui-state';
 
 export type UseCompanionOrchestrationParams = {
   pauseInstanceId?: string | null;

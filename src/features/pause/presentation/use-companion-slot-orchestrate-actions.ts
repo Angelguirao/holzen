@@ -5,9 +5,9 @@ import type {
   CompanionSlotCommitters,
   CompanionSlotRelaxations,
 } from '@/features/pause/public';
-import { useCompanionSlotOrchestratePorts } from '@/features/pause/public-hooks';
-import { useCompanionSlotOrchestrateFailurePorts } from '@/features/pause/public-hooks';
-import { useCompanionSlotRunOrchestrate } from '@/features/pause/public-hooks';
+import { useCompanionSlotOrchestratePorts } from './use-companion-slot-orchestrate-ports';
+import { useCompanionSlotOrchestrateFailurePorts } from './use-companion-slot-orchestrate-failure-ports';
+import { useCompanionSlotRunOrchestrate } from './use-companion-slot-run-orchestrate';
 
 export interface UseCompanionSlotOrchestrateActionsParams {
   pauseInstanceId?: string | null;
