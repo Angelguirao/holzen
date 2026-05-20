@@ -2908,6 +2908,25 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-20</span>
+      <span>Phase A slice — colocate shift-frame-done in presentation/reflect/</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>Backlog #1 complete; Tier 4 reflect frame-hub conductor</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd><code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code> was already complete on <code>cursor/arch-migrate-src-ca70</code>. Move <code>use-pause-shift-frame-done-handler</code> (+ test) beside breath-reflect and mood conductors under <code>presentation/reflect/</code>; <code>public-hooks</code> re-export path only.</dd>
+      <dt>Deviation</dt>
+      <dd>None — matches §3.2 / §10.1 reflect conductor grouping.</dd>
+      <dt>Tradeoffs</dt>
+      <dd><code>use-pause-session-shell</code> and pending-leave sheet remain flat until a later peel.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: colocate flat session hooks (<code>use-pause-session-shell</code>, breath navigation bundle), or port-backed analytics read adapter for feedback vote fetch.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
 </body>
 </html>
