@@ -8,7 +8,7 @@ import {
   logCompanionSlotOrchestrateEmpty,
   logCompanionSlotOrchestrateFailed,
   logCompanionSlotOrchestrateFilled,
-} from './companion-slot-orchestrate-telemetry';
+} from '@/features/pause/application/use-cases/ritual/frame/companion-slot-orchestrate-telemetry';
 import { tryApplyOrchestrateSlotFromBody } from './orchestrate-slot-apply';
 import type {
   CompanionSlotCacheIds,

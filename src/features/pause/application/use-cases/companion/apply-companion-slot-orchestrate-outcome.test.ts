@@ -1,7 +1,7 @@
 import { describe, expect, it, vi } from 'vitest';
 import { applyCompanionSlotOrchestrateOutcome } from './apply-companion-slot-orchestrate-outcome';
 
-vi.mock('./companion-slot-orchestrate-telemetry', () => ({
+vi.mock('@/features/pause/application/use-cases/ritual/frame/companion-slot-orchestrate-telemetry', () => ({
   logCompanionSlotOrchestrateFailed: vi.fn(),
   logCompanionSlotOrchestrateFilled: vi.fn(),
   logCompanionSlotOrchestrateEmpty: vi.fn(),
