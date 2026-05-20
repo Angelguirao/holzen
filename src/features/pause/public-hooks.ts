@@ -172,3 +172,10 @@ export {
   type PauseSessionRitualSurfaceMotionSlice,
   type PauseSessionRitualSurfaceResult,
 } from './presentation/use-pause-session-ritual-surface';
+export { usePauseSessionProviders } from './presentation/use-pause-session-providers';
+export type {
+  PauseSessionFlowConductorProvidersSlice,
+  PauseSessionHolzenProvidersSlice,
+  PauseSessionProviders,
+  PauseSessionSubscriptionGateSlice,
+} from './presentation/session/pause-session-providers-types';
