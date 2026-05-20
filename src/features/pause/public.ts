@@ -25,6 +25,7 @@ export type {
   LibraryListSortMode,
 } from './domain/library-bundle';
 export { buildOutcomeLoggedPayload } from './application/use-cases/outcome-log-payload';
+export { runPauseOutcomeLog } from './application/use-cases/session/run-pause-outcome-log';
 export { groupBulkHoldByLocalDay } from './application/use-cases/bulk-hold/group-by-local-day';
 export {
   bulkHoldMaxRows,
