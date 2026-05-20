@@ -1,5 +1,5 @@
 import type { InterventionState } from '@/features/pause/domain/companion-orchestrate';
-import type { ParsedPauseArtifactCache } from './artifact-cache-parse';
+import type { ParsedPauseArtifactCache } from '@/features/pause/application/use-cases/ritual/frame/artifact-cache-parse';
 import type { CompanionOrchestrateSessionContext } from './build-companion-orchestrate-body';
 import { applyCompanionInterventionInvokeOutcome } from './apply-companion-intervention-invoke-outcome';
 import {
