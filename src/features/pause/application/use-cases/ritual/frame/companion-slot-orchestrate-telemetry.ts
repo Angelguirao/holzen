@@ -1,7 +1,7 @@
 import { holzenLog } from '@/lib/holzen-console';
 import type { RegenerateCompanionSlot } from '@/features/pause/domain/companion-orchestrate';
 import type { CompanionOrchestrateInvokeFailure } from '@/features/pause/application/use-cases/ritual/frame/orchestrate-invoke-error';
-import type { CompanionSlotOrchestrateMode } from '@/features/pause/application/use-cases/companion/run-companion-slot-orchestrate';
+import type { CompanionSlotOrchestrateMode } from './run-companion-slot-orchestrate';
 
 function pauseInstancePrefix(pauseInstanceId: string): string {
   return pauseInstanceId.slice(0, 8);

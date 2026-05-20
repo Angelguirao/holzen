@@ -25,7 +25,7 @@ for (const ctx of contexts) {
   mustExist(`${base}/ports`, `${base}/ports/`);
 }
 
-mustExist('src/features/pause/application/use-cases/companion', 'pause/application/use-cases/companion/');
+mustExist('src/features/pause/application/use-cases/ritual/frame', 'pause/application/use-cases/ritual/frame/');
 mustExist('src/features/pause/application/use-cases/session', 'pause/application/use-cases/session/');
 mustExist('src/features/pause/application/use-cases/ritual/brief', 'pause/application/use-cases/ritual/brief/');
 mustExist('src/features/notifications/application/use-cases/delivery', 'notifications/application/use-cases/delivery/');

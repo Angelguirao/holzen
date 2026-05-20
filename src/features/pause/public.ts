@@ -409,7 +409,7 @@ export {
 export {
   applyCompanionSlotOrchestrateOutcome,
   type ApplyCompanionSlotOrchestrateOutcomeInput,
-} from './application/use-cases/companion/apply-companion-slot-orchestrate-outcome';
+} from './application/use-cases/ritual/frame/apply-companion-slot-orchestrate-outcome';
 export {
   logCompanionSlotOrchestrateEmpty,
   logCompanionSlotOrchestrateFailed,
@@ -453,7 +453,7 @@ export {
   type CompanionSlotOrchestrateMode,
   type RunCompanionSlotOrchestratePorts,
   type RunCompanionSlotOrchestrateResult,
-} from './application/use-cases/companion/run-companion-slot-orchestrate';
+} from './application/use-cases/ritual/frame/run-companion-slot-orchestrate';
 export {
   applyCompanionSlotOrchestrateFailureUi,
   resolveCompanionSlotOrchestrateFailureUi,
@@ -484,7 +484,7 @@ export {
   type CompanionSlotCommitters,
   type CompanionSlotRelaxationUi,
   type CompanionSlotRelaxations,
-} from './application/use-cases/companion/orchestrate-slot-apply';
+} from './application/use-cases/ritual/frame/orchestrate-slot-apply';
 export {
   hydrateCompanionSlotsFromArtifactCache,
   type HydrateCompanionSlotsFromArtifactCacheResult,

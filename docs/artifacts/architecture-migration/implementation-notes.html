@@ -740,6 +740,25 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-20</span>
+      <span>Phase A slice — frame cluster: slot orchestration hub</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>Companion orchestration cluster → <code>ritual/frame/</code> (clears <code>companion/</code>)</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Reflect backlog #1 was already complete on this branch. Finish Phase A companion folder migration by moving the last <code>companion/</code> cluster: <code>orchestrate-slot-apply</code> hub, <code>run-companion-slot-orchestrate</code>, <code>apply-companion-slot-orchestrate-outcome</code> (test file already co-located). Co-located frame modules use relative <code>./</code> imports; <code>public.ts</code> and edge adapter paths updated.</dd>
+      <dt>Deviation</dt>
+      <dd>None — matches spec §3.1 / §10.1.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Hub + runners in one commit after parallel agent moved hydrate test; <code>check-architecture-alignment</code> now asserts <code>ritual/frame/</code> instead of legacy <code>companion/</code>.</dd>
+      <dt>Open questions</dt>
+      <dd>Next Phase A slice: <code>public.ts</code> peel (backlog #3), <code>PauseRepository</code> wiring (#4), or archive query folder (#5).</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
 </body>
 </html>
