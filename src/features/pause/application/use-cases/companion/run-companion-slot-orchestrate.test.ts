@@ -3,7 +3,7 @@ import {
   runCompanionSlotOrchestrate,
   type RunCompanionSlotOrchestratePorts,
 } from './run-companion-slot-orchestrate';
-import type { CompanionOrchestrateSessionContext } from './build-companion-orchestrate-body';
+import type { CompanionOrchestrateSessionContext } from '../ritual/frame/build-companion-orchestrate-body';
 
 const session: CompanionOrchestrateSessionContext = {
   pauseInstanceId: 'pause-abc',
