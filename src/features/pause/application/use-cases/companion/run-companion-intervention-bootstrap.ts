@@ -5,7 +5,7 @@ import { applyCompanionInterventionInvokeOutcome } from './apply-companion-inter
 import {
   logCompanionInterventionInvoke,
   logCompanionInterventionSkippedIdempotency,
-} from './companion-intervention-telemetry';
+} from '@/features/pause/application/use-cases/ritual/frame/companion-intervention-telemetry';
 import { hydrateCompanionSlotsFromArtifactCache } from './hydrate-companion-slots-from-artifact-cache';
 import { hasInvokedIntervention, runOnceIntervention } from './intervention-idempotency';
 import type { CompanionSlotCommitters, CompanionSlotRelaxations } from './orchestrate-slot-apply';
