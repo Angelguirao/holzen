@@ -1,7 +1,10 @@
 import { useCallback, useState } from 'react';
 import type { TFunction } from 'i18next';
 import { toast } from 'sonner';
-import { trackEvent } from '@/lib/posthog';
+import {
+  trackPausePendingAdopted,
+  trackPausePendingDeclined,
+} from '@/features/pause/application/use-cases/trigger/pending-pause-offer-telemetry';
 import { pauseAdoptPendingOffer, pauseDeclinePendingOffer } from '@/features/pause/public-rpc';
 import type { PendingPauseOfferRow } from './use-pending-pause-offer';
 
@@ -24,11 +27,7 @@ export function usePendingPauseOfferMutations(options: {
         toast.error(t('pause.pendingAdoptFailed', { defaultValue: 'Could not switch to the new pause. Try again.' }));
         return false;
       }
-      try {
-        trackEvent('pause_pending_adopted', { pause_instance_id: r.instance_id });
-      } catch {
-        /* no-op */
-      }
+      trackPausePendingAdopted(r.instance_id);
       await Promise.resolve(onAfterMutation());
       navigateAfterAdopt?.(r.instance_id);
       await refreshPendingOffer();
@@ -46,11 +45,7 @@ export function usePendingPauseOfferMutations(options: {
     setBusy(true);
     try {
       await pauseDeclinePendingOffer();
-      try {
-        trackEvent('pause_pending_declined', { pause_instance_id: pending.id });
-      } catch {
-        /* no-op */
-      }
+      trackPausePendingDeclined(pending.id);
       await Promise.resolve(onAfterMutation());
       await refreshPendingOffer();
       return true;
