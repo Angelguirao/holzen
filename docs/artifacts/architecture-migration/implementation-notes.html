@@ -3174,6 +3174,25 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-20</span>
+      <span>Phase A slice — complete reflect steps/ cluster (favorite toggle)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>Backlog #1 increment — favorite toggle beside note/tag/reflection_step</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Prior slice moved note/tag/<code>reflection_step</code> under <code>ritual/reflect/steps/</code>; <code>run-pause-favorite-toggle</code> (+ test) was the last reflect step-log module at <code>ritual/reflect/</code> root. Colocate it in <code>steps/</code>; <code>public-rpc</code> and presentation import paths only.</dd>
+      <dt>Deviation</dt>
+      <dd>None — matches §3.1 / §10.1 reflect beat grouping.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Session reflect/decide flow and shift-frame hub flow remain at <code>ritual/reflect/</code> root.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: colocate <code>pause-session-reflect-decide-flow</code> or brief-past-step under <code>presentation/session/</code>.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
 </body>
 </html>
