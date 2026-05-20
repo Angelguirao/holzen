@@ -240,7 +240,7 @@ There is **no** `@holzen/home`, `@holzen/archive`, `@holzen/journey`, or `@holze
 | Screen | Composes |
 |--------|----------|
 | **Home** | pause (card, triggers), market, subscription, user, notifications (bell in shell), onboarding flow |
-| **Archive** | pause read models (past instances, collections) |
+| **Archive** | pause read models (past instances, echoes — **not** user collections; see [pause-client-architecture.md](../systems/pause-client-architecture.md) §7) |
 | **Journey** | pause aggregates / overview |
 | **Settings** | user + subscription + presentation |
 | **PauseSession** (`/pause`) | pause ritual (all steps) |
@@ -269,10 +269,12 @@ Treat **companion** as a **module inside `@holzen/pause`**, not a peer package �
 
 ### 8.1 Suggested interior of `@holzen/pause`
 
-Organize by **ritual concern**, not by old `src/hooks` filenames:
+**Canonical detail:** [pause-client-architecture.md](../systems/pause-client-architecture.md) (target tree, public barrels, collections → legacy, cross-context template).
+
+Organize by **ritual concern**, not by old `src/hooks` filenames or by “AI vs non-AI”:
 
 ```text
-packages/pause/src/
+packages/pause/src/   # today: src/features/pause/
   domain/
     instance.ts                 # states, transitions (mirrors pause-state.ts)
     ritual-steps.ts             # PauseStep, BriefPauseStep, canAdvanceFromStep
@@ -280,30 +282,28 @@ packages/pause/src/
     companion-slots.ts          # allowed types per template (volatility_v1)
   application/
     use-cases/
-      session/
-        hydrate-pause-session.ts
-        persist-session-snapshot.ts
-        exit-pause-session.ts
+      trigger/                  # manual open, pending offer
+      session/                  # hydrate, persist, exit
       ritual/
-        log-pause-step.ts
-        log-companion-event.ts
-        navigate-ritual-step.ts
-      breathing/
-        advance-breath-phase.ts
-      reflect/
-        generate-reflection.ts    # holzen-reflect
-      companions/
-        orchestrate-companion-slots.ts
-        fetch-grounding-enrichment.ts
-      terminal/
-        log-outcome-and-await-completed.ts
+        feel/
+        breathe/
+        reflect/                # reflection_step + holzen-reflect generation
+        frame/                  # intervention, slot orchestrate, grounding-enrich
+        decide/
+        done/
+      archive/                  # pauses/echoes reads (not user collections)
   ports/
     PauseRepository.ts
     ReflectGenerator.ts
     CompanionOrchestrator.ts
     PauseSessionStorage.ts
   public.ts
+  public-queries.ts
+  public-hooks.ts
+  public-rpc.ts
 ```
+
+**Do not** use peer top-level `companion/` and `reflect/` folders — both are ritual modules under `ritual/`. **Do not** keep user **library collections** in active MVP code ([pause-client-architecture.md](../systems/pause-client-architecture.md) §7).
 
 **Presentation** for ritual UI (`PauseBreathing`, `PauseFrame`, `PauseReflect`, …) can live in:
 
@@ -314,7 +314,7 @@ Full-screen `/companion/*` pages are **pause presentation** for a single slot (e
 
 ### 8.2 What about `companion-orchestrate` on the server?
 
-Edge functions remain in `supabase/functions/` — that is **infrastructure**. On the client, **`CompanionOrchestrator` port** + adapter in `packages/infrastructure` implements the HTTP call. The **use case** `orchestrateCompanionSlots` lives under **`pause/application/use-cases/companion/`**.
+Edge functions remain in `supabase/functions/` — that is **infrastructure**. On the client, **`CompanionOrchestrator` port** + adapter in `infrastructure/edge/` implements the HTTP call. Frame use cases (orchestrate, intervention, retry) live under **`pause/application/use-cases/ritual/frame/`** ([pause-client-architecture.md](../systems/pause-client-architecture.md) §3).
 
 Pipeline narrative stays in [ai-powered-pause-system.md](../systems/pause/ai-powered-pause-system.md); **ownership** stays under **pause**.
 
@@ -335,7 +335,11 @@ If the **edge** tree is huge, use `supabase/functions/_shared/pause/` and `_shar
 2. **One front door for mutations** — use cases call `pause_log_step` / `pause_log_companion`; components never RPC directly.  
 3. **Step-mapped use cases** — names match product beats (Feel, Breathe, Reflect, Frame, Decide) and RPC `step_type` where applicable.  
 4. **Companions subordinate to instance** — every orchestrate/reflect/grounding call includes `pauseInstanceId`; no global companion store.  
-5. **Read models explicit** — Archive/Journey queries live under `pause/infrastructure/queries/` (or `application/queries/`), not scattered in screen files.
+5. **Read models explicit** — Archive/Journey queries live under `pause/infrastructure/queries/` (or `application/queries/`), not scattered in screen files. User **collections** are not MVP — see [pause-client-architecture.md](../systems/pause-client-architecture.md) §7.
+
+### 8.5 Context module template (other bounded contexts)
+
+Pause is the **reference** client module. **`subscription`**, **`auth`**, **`market`**, **`user`**, and **`notifications`** should mirror the same skeleton (`domain` → `application/use-cases/<concern>/` → `ports` → `infrastructure` → `presentation` → `public*`) with use-case folders named from **`docs/systems/*` vocabulary**, not from nav tabs or transport layers. Full table: [pause-client-architecture.md](../systems/pause-client-architecture.md) §9.
 
 ---
 

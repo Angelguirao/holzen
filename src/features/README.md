@@ -2,7 +2,7 @@
 
 Holzen keeps **root Vite** (`vite.config.ts`, `src/`, Lovable publish) while adopting bounded-context structure under `src/features/<context>/`.
 
-**Canonical rules:** [docs/fundamentals/frontend-module-layout.md](../../docs/fundamentals/frontend-module-layout.md) (§0 Lovable, §10 transitional), [docs/fundamentals/holzen-application-architecture.md](../../docs/fundamentals/holzen-application-architecture.md), [naming-conventions-holzen.md](../../docs/fundamentals/naming-conventions-holzen.md).
+**Canonical rules:** [docs/fundamentals/frontend-module-layout.md](../../docs/fundamentals/frontend-module-layout.md) (§0 Lovable, §10 transitional), [docs/fundamentals/holzen-application-architecture.md](../../docs/fundamentals/holzen-application-architecture.md), [docs/systems/pause-client-architecture.md](../../docs/systems/pause-client-architecture.md) (pause reference module), [naming-conventions-holzen.md](../../docs/fundamentals/naming-conventions-holzen.md).
 
 ## Layout per context
 
@@ -21,7 +21,7 @@ features/<context>/
 
 ## New code
 
-- Put **pause ritual** logic in `features/pause/` (`application/use-cases/` — companions, reflect, breathing inside pause, not a separate feature).
+- Put **pause ritual** logic in `features/pause/` — interior target: [pause-client-architecture.md](../../docs/systems/pause-client-architecture.md) (`ritual/reflect/`, `ritual/frame/`; companions inside pause, not a separate feature).
 - Put **subscription**, **market**, **user**, **notifications**, **auth** in their own `features/<name>/` as you migrate.
 - **user** and **subscription** use `public-queries.ts` for profile/snapshot TanStack modules; `public.ts` stays Supabase-free.
 - **auth** — `AuthProvider` / `useAuth` exported from `features/auth/public.ts` (implementation in `presentation/`).

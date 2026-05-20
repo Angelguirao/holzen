@@ -32,6 +32,7 @@ This folder contains human-readable notes that complement the source code and in
 | **Lovable sync risk, staging, platform exit** | [ops/lovable-staging-and-platform-exit.md](ops/lovable-staging-and-platform-exit.md) | Why merges hit prod DB; CI gaps; phased exit / hybrid paths. Pairs with [deployment-sync-guide.md](ops/deployment-sync-guide.md). |
 | `index.html`, SPA shell, default SEO/PWA meta | [fundamentals/index-html-and-spa-shell.md](fundamentals/index-html-and-spa-shell.md) | Canonical origin `https://holzen.app`; pairs with §3 in navigating-the-codebase. |
 | Pause lifecycle (instances, events, artifacts, state machine) | [systems/pause-system.md](systems/pause-system.md) | Canonical **data model** and invariants (Pause V2). |
+| **Pause client module** (features/pause layout, ritual folders, public barrels, collections → legacy) | [systems/pause-client-architecture.md](systems/pause-client-architecture.md) | Pairs with pause-system (server) and [screens/pause.md](screens/pause.md); template for other contexts §9. |
 | Pause AI pipeline (triggers, edge functions, generators, storage, hooks) | [systems/pause/ai-powered-pause-system.md](systems/pause/ai-powered-pause-system.md) | **Current** Pause V2 pipeline narrative; complements `pause-system.md` (starts with a V2 banner — not a pre‑V2 archive). |
 | How a subsystem behaves (contracts, flows) | [systems/](systems/) | One primary doc per concern; cross-link related systems. |
 | Irreversible or costly-to-reverse choices | [decisions/](decisions/) | Short ADR-style notes; see [decisions/README.md](decisions/README.md). |
@@ -126,6 +127,7 @@ When you change behavior, update the **one** doc that owns that slice (and ADRs 
 - `systems/auth/auth-and-referral-system.md` — Auth system (Supabase) + optional referral side-effect
 - `systems/routing/route-gating-system.md` — protected vs public-only vs ungated routes; `ProtectedRoute` / `PublicOnlyRoute` contracts
 - `systems/pause-system.md` — end-to-end architecture of the Pause V2 lifecycle (instances, events, artifacts, stats, badges).
+- **`systems/pause-client-architecture.md`** — target **`features/pause`** layout (ritual/reflect, ritual/frame), public barrels, collections → legacy, module template for other contexts.
 - `systems/pause/ai-powered-pause-system.md` — Pause V2 **AI and edge** pipeline (triggers, `holzen-reflect`, `companion-orchestrate`, generators, cron); narrative companion to `pause-system.md`.
 - `systems/costs/ai-cost-model.md` — **canonical** cost + guardrail reference. All AI-powered edge functions, cost ceilings, panic mode, feature flags, scenario modeling, runbooks, auto-top-up.
 - `systems/pause/pause-session-cost-estimates.md` — pause-flow case study. Defer to `systems/costs/ai-cost-model.md` for anything cross-feature.

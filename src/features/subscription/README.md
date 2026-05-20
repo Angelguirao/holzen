@@ -2,6 +2,8 @@
 
 Stripe / entitlements / billing.
 
+**Module shape:** follow the shared context skeleton in [pause-client-architecture.md](../../docs/systems/pause-client-architecture.md) §9 (`domain` → `application/use-cases/<concern>/` → `ports` → `infrastructure` → `presentation` → `public*`).
+
 ## Hooks and shell UI
 
 | Import from | Contents |
