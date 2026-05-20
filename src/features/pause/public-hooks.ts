@@ -71,3 +71,5 @@ export {
   type FullviewCompanion,
 } from './presentation/use-fullview-telemetry';
 export { usePauseFavoriteToggle } from './presentation/use-pause-favorite-toggle';
+export { usePauseReflectFrameFocusAmbience } from './presentation/use-pause-reflect-frame-focus-ambience';
+export { usePauseFeelShiftLogDedupeRefs } from './presentation/use-pause-feel-shift-log-dedupe-refs';
