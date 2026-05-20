@@ -86,8 +86,9 @@ Pick the **highest-priority violation** in the **weakest area** (most imports of
 ## Git / branches
 
 - Base: **`feature/refactoring6`** unless user says otherwise.
-- New branches: `cursor/arch-migrate-<slice>-ca70` or `cursor/refactor-<ctx>-<topic>-ca70` (lowercase; suffix `-ca70` on Cloud Agent).
-- **Commit** each completed slice; **push**; create/update PR with accurate title (branch name may be legacy-narrow).
+- **One branch:** keep working on **`cursor/arch-migrate-src-ca70`** (or the user’s existing migration branch). Do **not** create a new branch per slice unless the user asks.
+- **Commit + push** after each completed slice; update the **same** open PR.
+- Rename a too-narrow branch once via `git branch -m` + push + GitHub branch rename (PR head follows).
 
 ## Hard stops
 

@@ -176,20 +176,26 @@ When adding a use case that maps to RPC/edge, **name the client function** after
 
 Cloud Agent branches use prefix **`cursor/`** and suffix **`-ca70`** (environment id).
 
+### One long-lived migration branch (preferred)
+
+Use **one** branch for the whole incremental migration (e.g. **`cursor/arch-migrate-src-ca70`**), not a new branch per slice. Land work as **many commits** on that branch; open **one** PR into `feature/refactoring6` and keep the PR description updated with slices merged.
+
+Rename the branch once if the old name was too narrow (GitHub updates open PRs when the head branch is renamed).
+
 | Pattern | When |
 |---------|------|
-| `cursor/arch-migrate-<slice>-ca70` | Cross-cutting or multi-area incremental migration (preferred for ongoing work) |
-| `cursor/refactor-<ctx>-<topic>-ca70` | Single bounded context (e.g. `refactor-pause-depth-picker-ca70`) |
+| `cursor/arch-migrate-src-ca70` | Default long-lived client architecture migration |
+| `cursor/refactor-<ctx>-<topic>-ca70` | Rare: isolated experiment you will merge quickly |
 | `cursor/fix-<area>-<issue>-ca70` | Behavior fix, not structure |
 
-**Avoid** branch names that imply a single file when the PR carries many slices (e.g. `pause-companion-orchestrate-extract` on a PR that also splits depth picker, reflect card, etc.). Either rename branch for the **next** tranche or keep branch and make **PR title/description** the source of truth for scope.
+**Avoid** spinning a new branch per session unless you intentionally want parallel review streams.
 
-**PR discipline:**
+**Commit discipline:**
 
-- One **vertical slice** per commit message when possible.
-- PR body lists slices landed; link [refactoring backlog](../backlog/react-page-and-hook-splitting.md) when updating checklist.
+- One **vertical slice** per commit when possible (`refactor(pause): …`, `refactor(admin): …`, `docs(architecture): …`).
+- PR title stays broad; **commit messages** carry slice detail.
 
-Base branch for migration work: **`feature/refactoring6`** (or successor named in AGENTS.md) unless the user specifies `main`.
+Base branch: **`feature/refactoring6`** (or successor in AGENTS.md) unless the user specifies `main`.
 
 ---
 
