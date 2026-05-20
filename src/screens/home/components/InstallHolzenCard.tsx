@@ -3,7 +3,7 @@ import { Download, X, Smartphone } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useInstallPrompt } from '@/app/hooks/use-install-prompt';
 import { useAuth } from '@/features/auth/public';
-import { logPwaInstallAnalyticsEvent } from '@/screens/home/lib/log-pwa-install-analytics';
+import { logPwaInstallAnalyticsEvent } from '@/features/pause/public-hooks';
 import { cn } from '@/lib/utils';
 import type { PWAInstallElement } from '@/types/pwa-install';
 

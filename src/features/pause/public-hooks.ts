@@ -52,6 +52,7 @@ export {
   useJourneyPauseInstances,
   type JourneyPauseRow,
 } from './presentation/use-journey-pause-instances';
+export { logPwaInstallAnalyticsEvent } from './presentation/log-pwa-install-analytics';
 export {
   useCurrentPause,
   currentPauseQueryKey,
