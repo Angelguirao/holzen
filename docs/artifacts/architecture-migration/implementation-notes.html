@@ -341,6 +341,25 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-20</span>
+      <span>Phase A slice — frame leaf: companion-data-from-artifacts</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3><code>companion-data-from-artifacts</code> → <code>ritual/frame/</code></h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Reflect backlog #1 is complete on this branch; continue companion → <code>ritual/frame/</code> with the smallest pure helper (haiku/grounding projection from artifact rows) — no imports from other <code>companion/</code> modules.</dd>
+      <dt>Deviation</dt>
+      <dd>None — matches spec §3.1 / §10.1 leaf-first pattern after <code>log-pause-companion</code>.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Could batch with <code>artifact-cache-parse</code>; kept one file (no test) for minimal diff — query/session call sites only.</dd>
+      <dt>Open questions</dt>
+      <dd>Next slice: <code>artifact-cache-parse</code> cluster, <code>intervention-idempotency-telemetry</code> leaf, or <code>persist-ui-step-completion</code> + infrastructure sync.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
 </body>
 </html>
