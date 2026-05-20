@@ -222,6 +222,8 @@ When active code no longer imports collection modules, update [active-surface.md
 
 Other shipped contexts (`subscription`, `auth`, `market`, `user`, `notifications`) should follow the **same module shape** where it makes sense — adapted to their vocabulary, not copied literally.
 
+**Client-architecture docs:** each context has a scaffold target doc — see [client-architecture-overview.md](../fundamentals/client-architecture-overview.md) §3. Expand scaffolds during Phase B slices; pause doc remains the reference depth.
+
 ### 9.1 Shared module skeleton
 
 ```text

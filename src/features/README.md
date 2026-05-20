@@ -2,7 +2,7 @@
 
 Holzen keeps **root Vite** (`vite.config.ts`, `src/`, Lovable publish) while adopting bounded-context structure under `src/features/<context>/`.
 
-**Canonical rules:** [docs/fundamentals/frontend-module-layout.md](../../docs/fundamentals/frontend-module-layout.md) (§0 Lovable, §10 transitional), [docs/fundamentals/holzen-application-architecture.md](../../docs/fundamentals/holzen-application-architecture.md), [docs/systems/pause-client-architecture.md](../../docs/systems/pause-client-architecture.md) (pause reference module), [naming-conventions-holzen.md](../../docs/fundamentals/naming-conventions-holzen.md).
+**Canonical rules:** [docs/fundamentals/frontend-module-layout.md](../../docs/fundamentals/frontend-module-layout.md) (§0 Lovable, §10 transitional), [docs/fundamentals/client-architecture-overview.md](../../docs/fundamentals/client-architecture-overview.md), [docs/fundamentals/holzen-application-architecture.md](../../docs/fundamentals/holzen-application-architecture.md), [docs/systems/pause-client-architecture.md](../../docs/systems/pause-client-architecture.md) (pause reference module), [naming-conventions-holzen.md](../../docs/fundamentals/naming-conventions-holzen.md).
 
 ## Layout per context
 

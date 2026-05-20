@@ -4,9 +4,9 @@
 
 ## North star
 
-Align **all active `src/`** with [holzen-application-architecture.md](../../fundamentals/holzen-application-architecture.md) and the shared module skeleton in [pause-client-architecture.md §9](../../systems/pause-client-architecture.md#9-applying-this-template-to-other-contexts).
+Align **all active `src/`** — not only `features/` — with [holzen-application-architecture.md](../../fundamentals/holzen-application-architecture.md) and [client-architecture-overview.md](../../fundamentals/client-architecture-overview.md) (app, screens, components, features, lib, integrations).
 
-**Pause** is the **reference implementation** (canonical tree: [pause-client-architecture.md](../../systems/pause-client-architecture.md)). Other contexts reuse the **shape**, not pause ritual folder names.
+**Pause** is the **reference implementation** ([pause-client-architecture.md](../../systems/pause-client-architecture.md)). Other contexts have scaffold client-architecture docs before Phase B.
 
 ## Scheduling: pause-first at each tier
 
@@ -14,11 +14,25 @@ At every slice tier (shims → god-hooks → inline Supabase → UI placement �
 
 ## Phases (one vertical slice = one commit)
 
-| Phase | Focus | Owner docs |
+| Phase | Focus | Read first |
 |-------|--------|------------|
-| **A — Pause convergence** | `ritual/reflect/` + `ritual/frame/` moves, `public*` peel, ports, archive reads, session conductors | [pause-client-architecture.md](../../systems/pause-client-architecture.md) |
-| **B — Cross-context template** | subscription, auth, market, user, notifications — same layers, context vocabulary | AGENTS change map + `src/features/<ctx>/README.md`; add `*-client-architecture.md` when a context needs its own narrative |
-| **C — Repo-wide hygiene** | `src/lib/*` shims, misplaced UI, non-pause inline Supabase | [client-src-layout.md](../../fundamentals/client-src-layout.md) |
+| **0 — Client-architecture docs** | [client-architecture-overview.md](../../fundamentals/client-architecture-overview.md) + per-context `*-client-architecture.md` scaffolds | Overview index |
+| **A — Pause convergence** | `features/pause` + pause/companion/archive screens | [pause-client-architecture.md](../../systems/pause-client-architecture.md) |
+| **B — Cross-context template** | `features/subscription`, `auth`, `market`, `user`, `notifications` + their screens | Matching `*-client-architecture.md` |
+| **C — Repo-wide presentation** | `app/`, `components/`, `lib/` shims, non-feature inline Supabase | [client-src-layout.md](../../fundamentals/client-src-layout.md) |
+
+## Per-context client architecture (Phase 0)
+
+| Doc | Context |
+|-----|---------|
+| [pause-client-architecture.md](../../systems/pause-client-architecture.md) | pause (reference) |
+| [subscription-client-architecture.md](../../systems/subscription-client-architecture.md) | subscription |
+| [auth-client-architecture.md](../../systems/auth-client-architecture.md) | auth |
+| [market-client-architecture.md](../../systems/market-client-architecture.md) | market |
+| [user-client-architecture.md](../../systems/user-client-architecture.md) | user |
+| [notifications-client-architecture.md](../../systems/notifications-client-architecture.md) | notifications |
+
+Index + full-`src` rings: [client-architecture-overview.md](../../fundamentals/client-architecture-overview.md).
 
 ## Pause backlog (Phase A — indicative)
 
