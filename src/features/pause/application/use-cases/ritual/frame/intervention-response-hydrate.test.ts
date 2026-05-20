@@ -2,7 +2,7 @@ import { describe, expect, it, vi } from 'vitest';
 import {
   hydrateOrchestrateSlotsFromInterventionResponse,
   INTERVENTION_RESPONSE_COMPANION_SLOTS,
-} from './orchestrate-slot-apply';
+} from '../../companion/orchestrate-slot-apply';
 
 describe('INTERVENTION_RESPONSE_COMPANION_SLOTS', () => {
   it('hydrates grounding through signal in a stable order', () => {

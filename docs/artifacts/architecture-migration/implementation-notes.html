@@ -721,6 +721,25 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-20</span>
+      <span>Phase A slice — frame test: intervention-response-hydrate</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3><code>intervention-response-hydrate.test</code> → <code>ritual/frame/</code></h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Co-locate intervention response hydrate tests with frame cluster; import hub <code>orchestrate-slot-apply</code> from <code>companion/</code> until hub slice lands.</dd>
+      <dt>Deviation</dt>
+      <dd>None — test-only move, behavior unchanged.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Could wait for <code>orchestrate-slot-apply</code> hub move; moved test first so <code>companion/</code> shrinks incrementally.</dd>
+      <dt>Open questions</dt>
+      <dd>Next slice: <code>orchestrate-slot-apply</code> hub, then slot orchestration runners.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
 </body>
 </html>
