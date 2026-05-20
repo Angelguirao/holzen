@@ -263,7 +263,8 @@ export {
   type PauseSessionRitualSurfaceMotionSlice,
   type PauseSessionRitualSurfaceResult,
 } from './presentation/use-pause-session-ritual-surface';
-export { usePauseSessionProviders } from './presentation/use-pause-session-providers';
+export { usePauseSessionProviders } from './presentation/use-pause-session-providers-conductor';
+export { usePauseSessionProvidersFromHolzenSlice } from './presentation/use-pause-session-providers';
 export type {
   PauseSessionFlowConductorProvidersSlice,
   PauseSessionHolzenProvidersSlice,
