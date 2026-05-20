@@ -1139,6 +1139,25 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-20</span>
+      <span>Phase A slice — companion section expansion into presentation/companion</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3><code>use-companion-section-expansion</code> → <code>presentation/companion/</code></h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>ritual/reflect/</code>) and #2 (<code>ritual/frame/</code>) are complete on this branch. Group the inline <code>CompanionSection</code> expand/lazy-fetch conductor with other companion presentation hooks; screens still import via <code>public-hooks</code>.</dd>
+      <dt>Deviation</dt>
+      <dd>None — single-file move; orchestration cluster remains at <code>presentation/</code> root until a follow-up slice.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Did not move <code>use-companion-section</code> or slot UI state in the same commit — keeps verification to one hook + barrel path.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: move companion orchestration cluster (<code>use-companion-orchestration</code>, slot runners) or §6 <code>public.ts</code> peel (zoom-out payload helpers).</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
 </body>
 </html>
