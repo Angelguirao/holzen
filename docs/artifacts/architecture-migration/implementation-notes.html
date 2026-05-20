@@ -1747,6 +1747,25 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-20</span>
+      <span>Phase A slice — peel mood groups + post-pause mutation off public.ts (§6)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3><code>PAUSE_MOOD_GROUPS</code> + <code>runPostPauseEmotionLogIfDirty</code></h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>ritual/reflect/</code>) unchanged — no file moves. <code>PAUSE_MOOD_GROUPS</code> exports from <code>public-hooks.ts</code>; <code>MoodCheck</code> imports it there. Remove <code>runPostPauseEmotionLogIfDirty</code> from <code>public.ts</code>; wired mutation remains <code>logPostPauseEmotionIfDirty</code> on <code>public-rpc</code>.</dd>
+      <dt>Deviation</dt>
+      <dd>None — mood types stay on <code>public.ts</code>.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Did not peel ritual-pattern exports in the same commit.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: peel breath-orb / triangle-kicker screen imports, or optional <code>breathing/</code> → <code>ritual/breathe/</code>.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
 </body>
 </html>

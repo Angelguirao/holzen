@@ -124,7 +124,6 @@ export type { MoodValue } from './domain/mood-value';
 export {
   isPauseMoodValue,
   PAUSE_MOOD_VALUES,
-  PAUSE_MOOD_GROUPS,
 } from './domain/mood-value';
 export {
   PAUSE_DEEP_RITUAL_STEPS,
@@ -247,7 +246,6 @@ export { pauseStepSwipeDirection } from './application/use-cases/session/step-sw
 export {
   buildPostPauseEmotionLoggedPayload,
   isPostPauseEmotionDirty,
-  runPostPauseEmotionLogIfDirty,
   type PostPauseFeelSnapshot,
 } from './application/use-cases/ritual/done/post-pause-emotion-log';
 export {
