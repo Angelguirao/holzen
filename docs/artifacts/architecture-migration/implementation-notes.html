@@ -816,6 +816,25 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-20</span>
+      <span>Phase A slice — holzen-reflect edge adapter</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3><code>holzen-reflect-edge.ts</code> → <code>infrastructure/edge/reflect/</code></h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Complete the reflect edge cluster: move <code>holzen-reflect-edge.ts</code> beside artifact persistence and recency hints so all holzen-reflect I/O lives under one folder.</dd>
+      <dt>Deviation</dt>
+      <dd>None.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Import-only change in <code>public-rpc</code> and <code>reflection-artifact</code>; no new barrel surface.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: <code>public.ts</code> peel or <code>PauseRepository</code> wiring.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
 </body>
 </html>
