@@ -16,7 +16,7 @@ import {
   type RegenerateCompanionSlot,
   type RunCompanionSlotOrchestratePorts,
 } from '@/features/pause/public';
-import { useCompanionOrchestrateSession } from '@/features/pause/public-hooks';
+import { useCompanionOrchestrateSession } from './use-companion-orchestrate-session';
 
 export type UseCompanionSlotRunOrchestrateParams = {
   pauseInstanceId?: string | null;
