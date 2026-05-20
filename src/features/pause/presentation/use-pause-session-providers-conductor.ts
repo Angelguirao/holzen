@@ -1,5 +1,5 @@
 import { useHolzen } from '@/app/components/HolzenProvider';
-import { pickPauseHolzenProvidersSlice } from '@/features/pause/public';
+import { pickPauseHolzenProvidersSlice } from '@/features/pause/application/use-cases/session/pause-holzen-providers-slice';
 import { usePauseSessionProvidersFromHolzenSlice } from './use-pause-session-providers';
 import type { PauseSessionProviders } from './session/pause-session-providers-types';
 

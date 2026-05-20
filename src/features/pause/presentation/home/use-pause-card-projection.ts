@@ -3,7 +3,7 @@ import {
   buildHomePauseCardBodyProps,
   type BuildHomePauseCardBodyPropsInput,
   type HomePauseCardBodyPropsProjection,
-} from '@/features/pause/public';
+} from '@/features/pause/application/use-cases/home/home-pause-card-body-props';
 import { shouldShowHomePauseSectionSnooze } from '@/features/pause/application/use-cases/home/pause-home-widget-error';
 
 export type UsePauseCardProjectionParams = BuildHomePauseCardBodyPropsInput & {

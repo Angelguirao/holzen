@@ -2,7 +2,6 @@
  * Public API for the pause bounded context (no Supabase eager load).
  * RPC mutations: `@/features/pause/public-rpc`.
  */
-export { pauseCreateSkippedUserMessage } from './application/use-cases/create-skipped-message';
 export { buildOutcomeLoggedPayload } from './application/use-cases/ritual/decide/outcome-log-payload';
 export {
   computeBriefRitualGoBack,
@@ -93,35 +92,6 @@ export {
   parsePauseSessionLocationState,
 } from './application/use-cases/session/location-state';
 export { canNavigateToPauseSession } from './application/use-cases/session/can-navigate-to-pause-session';
-export {
-  buildHomePauseSessionLocationState,
-  type BuildHomePauseSessionLocationStateInput,
-} from './application/use-cases/session/build-home-pause-session-location-state';
-export { shouldNavigateAfterManualTrigger } from './application/use-cases/trigger/should-navigate-after-manual-trigger';
-export {
-  pickPauseHolzenProvidersSlice,
-  type PauseHolzenProvidersSlice,
-  type PickPauseHolzenProvidersSliceSource,
-} from './application/use-cases/session/pause-holzen-providers-slice';
-export {
-  zenModeHomePauseSnapshot,
-  ZEN_MODE_HOME_COMPANION_PREFS,
-} from './application/use-cases/home/zen-mode-home-pause-snapshot';
-export {
-  resolvePauseArrivalToneAction,
-  type PauseArrivalToneAction,
-} from './application/use-cases/home/resolve-pause-arrival-tone-action';
-export {
-  buildHomePauseCardBodyProps,
-  type BuildHomePauseCardBodyPropsInput,
-  type HomePauseCardBodyPropsProjection,
-  type PauseContextHomePreview,
-} from './application/use-cases/home/home-pause-card-body-props';
-export {
-  buildZenModeHomeRouteProps,
-  type BuildZenModeHomeRoutePropsInput,
-  type ZenModeHomeRoutePropsProjection,
-} from './application/use-cases/home/build-zen-mode-home-route-props';
 export {
   computePauseHeaderBackIntent,
   isPauseSessionHeaderBackVisible,
