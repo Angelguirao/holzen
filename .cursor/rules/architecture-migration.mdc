@@ -16,8 +16,9 @@ alwaysApply: false
 2. Principles **P1–P9:** [holzen-application-architecture.md](../../docs/fundamentals/holzen-application-architecture.md).
 3. Placement: [client-src-layout.md](../../docs/fundamentals/client-src-layout.md), [frontend-module-layout.md](../../docs/fundamentals/frontend-module-layout.md) §10.
 4. **Naming (mandatory for new/moved files):** [naming-conventions-holzen.md](../../docs/fundamentals/naming-conventions-holzen.md).
-5. Screen/hook splits: [refactoring-strategy.md](../../docs/fundamentals/refactoring-strategy.md), [react-screen-orchestration.md](../../docs/fundamentals/react-screen-orchestration.md).
-6. Shipped scope: [active-surface.md](../../docs/ops/active-surface.md) — no `@/legacy/**`, no Tier B schema.
+5. **Pause client target (when touching pause):** [pause-client-architecture.md](../../docs/systems/pause-client-architecture.md) — ritual/reflect + ritual/frame; collections → legacy.
+6. Screen/hook splits: [refactoring-strategy.md](../../docs/fundamentals/refactoring-strategy.md), [react-screen-orchestration.md](../../docs/fundamentals/react-screen-orchestration.md).
+7. Shipped scope: [active-surface.md](../../docs/ops/active-surface.md) — no `@/legacy/**`, no Tier B schema.
 
 ## Pick ONE vertical slice (priority table)
 

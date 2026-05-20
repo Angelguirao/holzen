@@ -30,7 +30,7 @@ It complements:
 
 That is **appropriate** for a shipping product with a small surface area of “god” modules: you get **reviewability and test hooks** without destabilizing the app.
 
-**Default migration priority:** **pause** (`features/pause`, `screens/pause`, companion routes) until that area is clean at the current slice tier — then the same rules apply to subscription, auth, archive, admin, etc. Agent workflow: [.cursor/rules/architecture-migration.mdc](../../.cursor/rules/architecture-migration.mdc).
+**Default migration priority:** **pause** (`features/pause`, `screens/pause`, companion routes) until that area is clean at the current slice tier — layout target: [systems/pause-client-architecture.md](../systems/pause-client-architecture.md). Other contexts follow the same module skeleton (§9 of that doc). Agent workflow: [.cursor/rules/architecture-migration.mdc](../../.cursor/rules/architecture-migration.mdc).
 
 ---
 

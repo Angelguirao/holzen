@@ -52,14 +52,17 @@ Keep each barrel **small** (on the order of tens of exports, not hundreds). Pref
 | Port | `ports/<entity>-repository.ts` | `PascalCase` + role (`PauseRepository`) |
 | Domain types | `domain/` | `PascalCase` types; no React/Supabase |
 
-**Subfolders** group by ritual/session/companion/trigger — mirror [pause-system.md](../systems/pause-system.md) language:
+**Subfolders** group by ritual/session/companion/trigger — mirror [pause-system.md](../systems/pause-system.md) and [pause-client-architecture.md](../systems/pause-client-architecture.md) (`ritual/reflect/`, `ritual/frame/`, not top-level `companion/` + `reflect/` as peers):
 
 ```text
 application/use-cases/
-  ritual/brief/brief-integrate-timer.ts
-  companion/orchestrate-slot-apply.ts
+  ritual/reflect/run-reflect-generation.ts
+  ritual/frame/run-companion-slot-orchestrate.ts
   session/pause-decide-outcome-flow.ts
+  trigger/open-manual-pause-from-home.ts
 ```
+
+Other contexts: group by **system-doc vocabulary** ([pause-client-architecture.md](../systems/pause-client-architecture.md) §9) — e.g. `subscription/checkout/`, `auth/sign-in/`.
 
 **Do not** add `.tsx` under `application/` or `domain/`.
 

@@ -307,7 +307,7 @@ Use this when moving files. Paths are indicative — adjust to actual filenames 
 
 ## 10. Transitional layout (active — root Vite + `src/features/`)
 
-**This is the execution layout** while Lovable publish stays at the repo root. See `src/features/README.md` and `src/features/pause/`.
+**This is the execution layout** while Lovable publish stays at the repo root. See `src/features/README.md` and [pause-client-architecture.md](../systems/pause-client-architecture.md) for the reference pause module.
 
 ```text
 src/
@@ -319,22 +319,24 @@ src/
   components/ui/use-*.ts           # toast, mobile breakpoint
   app/hooks/                       # install prompt, auto-trigger, language sync
   features/
-    pause/
+    pause/                         # canonical interior: pause-client-architecture.md §3
       domain/
-      application/
-        use-cases/
-        companion/                 # ritual modules inside pause (§3)
-        reflect/
-        breathing/
+      application/use-cases/
+        trigger/ session/
+        ritual/feel|breathe|reflect|frame|decide|done/
+        archive/
       ports/
-      public.ts                    # cross-feature API (no eager Supabase)
-      public-queries.ts            # TanStack query modules (app hooks/screens)
+      infrastructure/
+      presentation/
+      public.ts public-queries.ts public-hooks.ts public-rpc.ts
     subscription/
     market/
     user/
     …
   integrations/supabase/           # until adapters move to features/*/infrastructure
 ```
+
+Other contexts follow the same **module skeleton**; group `use-cases/` by product concern from each context’s system doc ([pause-client-architecture.md](../systems/pause-client-architecture.md) §9).
 
 Same dependency rules as §2–3 for layers that exist. `npm run check:feature-imports` enforces layer rules under `src/features/**` and blocks deep `@/features/<ctx>/(application|infrastructure|domain|presentation)/` imports from active `src/lib`, `src/components`, `src/screens`, `src/app`, and `src/test` (allowed: `public`, `public-queries`, `public-rpc`, plus RPC lib shims `apply-bulk-hold-outcomes` / `pause-ritual-depth-upgrade`).
 
@@ -432,7 +434,7 @@ Root `tsconfig.json` references project refs per package, or a single base + per
 | `/` | `HomeScreen` | `pause`, `market`, `subscription`, `user` |
 | `/pause` | `PauseSessionScreen` | `pause` |
 | `/companion/*` | `Companion*Screen` | `pause` (slot presentation) |
-| `/archive` | `ArchiveScreen` | `pause` (read queries) |
+| `/archive` | `ArchiveScreen` | `pause` (read queries — Pauses/Echoes; not user collections MVP) |
 | `/journey` | `JourneyScreen` | `pause` (aggregates) |
 | `/settings/*` | `SettingsShell` | `user`, `subscription` |
 | `/welcome`, `/auth`, legal, blog | marketing/auth screens | `auth`, thin marketing |
@@ -457,6 +459,7 @@ Root `tsconfig.json` references project refs per package, or a single base + per
 | Doc | Role |
 |-----|------|
 | [holzen-application-architecture.md](holzen-application-architecture.md) | Principles, inspirations, anti-patterns |
+| [pause-client-architecture.md](../systems/pause-client-architecture.md) | **Pause client target** + context module template §9 |
 | [client-server-architecture-holzen.md](client-server-architecture-holzen.md) | Truth vs projection |
 | [react-screen-orchestration.md](react-screen-orchestration.md) | Thin screens, hook rules |
 | [refactoring-strategy.md](refactoring-strategy.md) | Small moves inside old tree until wave complete |
