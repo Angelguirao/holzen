@@ -888,7 +888,26 @@
       <dt>Tradeoffs</dt>
       <dd>Kept persist-error helpers and favorite pro-hint on <code>public.ts</code> for screen/trigger surfaces; broader peel deferred.</dd>
       <dt>Open questions</dt>
-      <dd>Next: peel companion/frame exports from <code>public.ts</code> or wire <code>pauseLogCompanion</code> through repository.</dd>
+      <dd>Next: peel companion/frame exports from <code>public.ts</code> or wire lifecycle RPC through repository.</dd>
+    </dl>
+  </article>
+
+  <article class="note">
+    <header>
+      <span>2026-05-20</span>
+      <span>Phase A slice — lifecycle RPC via PauseRepository</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>Create / dismiss / adopt / decline <code>public-rpc</code> → <code>PauseRepository</code></h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Reflect folder migration was already complete on this branch (no <code>application/use-cases/reflect/</code> left). Stop re-exporting raw <code>pause-rpc-client</code> lifecycle helpers from <code>public-rpc.ts</code>; thin facades delegate to <code>supabasePauseRepository</code> for <code>pauseCreateOrReuse</code>, <code>pauseDismissCurrent</code>, <code>pauseAdoptPendingOffer</code>, <code>pauseDeclinePendingOffer</code>, <code>pauseLogStep</code>, and <code>pauseLogCompanion</code>. <code>openManualPauseFromHome</code> injects <code>repository.createOrReuse</code>.</dd>
+      <dt>Deviation</dt>
+      <dd>None — matches spec §8 one mutation port; presentation import names unchanged.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Kept legacy export names for stable hook imports; runtime still hits <code>pause-rpc-client</code> only through the repository adapter.</dd>
+      <dt>Open questions</dt>
+      <dd>Next slice: continue peeling <code>public.ts</code> (companion/frame cluster) or optional ritual beat folder consolidation.</dd>
     </dl>
   </article>
 

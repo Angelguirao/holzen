@@ -5,7 +5,7 @@ export type DismissOpenPauseHomePorts = {
 
 /**
  * Clears Home open-pause preview state and dismisses the current instance via RPC.
- * RPC authority: `pause_dismiss_current` (see `pauseDismissCurrent` in public-rpc).
+ * RPC authority: `pause_dismiss_current` (see `pauseDismissCurrent` in `public-rpc` → `PauseRepository`).
  */
 export async function dismissOpenPauseHome(
   hasUser: boolean,
