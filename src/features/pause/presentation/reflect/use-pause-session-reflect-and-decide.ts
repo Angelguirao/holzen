@@ -7,11 +7,8 @@ import {
   shouldRunPauseReflectGeneration,
 } from '@/features/pause/application/use-cases/ritual/reflect/pause-session-reflect-decide-flow';
 import type { PauseImpactData } from '@/features/pause/application/use-cases/impact-data';
-import {
-  type MoodValue,
-  type PauseStep,
-  type RitualDepth,
-} from '@/features/pause/public';
+import { type PauseStep, type RitualDepth } from '@/features/pause/public';
+import type { MoodValue } from '../../domain/mood-value';
 import { usePauseReflectGeneration } from './use-pause-reflect-generation';
 import { usePauseSessionDecideHandler } from '../decide/use-pause-session-decide-handler';
 

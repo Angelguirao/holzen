@@ -1,4 +1,4 @@
-import { isPauseMoodValue } from '@/features/pause/public';
+import { isPauseMoodValue } from '@/features/pause/public-hooks';
 import { usePauseReflectUiTelemetry } from '@/features/pause/public-hooks';
 import { ShareReflection } from '@/screens/pause/components/ShareReflection';
 

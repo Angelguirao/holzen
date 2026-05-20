@@ -1,6 +1,6 @@
 import type { RefObject } from 'react';
 import type { CompanionData, CompanionPrefs } from '@/features/pause/public';
-import type { MoodValue } from '@/features/pause/public';
+import type { MoodValue } from '../../domain/mood-value';
 import type { FeelStepTile } from '@/features/pause/public';
 import type { PauseBreathingHandle } from '@/features/pause/presentation/session/pause-breathing-handle';
 import type {

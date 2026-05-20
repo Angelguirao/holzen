@@ -8,7 +8,7 @@ import { PauseDoneDefaultReinforcementCard } from '@/screens/pause/components/pa
 import { PauseDoneDefaultStreakHero } from '@/screens/pause/components/pause-done-default-streak-hero';
 import { PauseDoneReflectShareRow } from '@/screens/pause/components/pause-done-reflect-share-row';
 import type { PauseDonePauseData } from '@/screens/pause/components/pause-done-types';
-import { resolveDoneWallpaperMood } from '@/screens/pause/lib/resolve-done-wallpaper-mood';
+import { resolveDoneWallpaperMood } from '@/features/pause/public-hooks';
 
 export type PauseDoneDefaultProps = {
   decision: string | null;
