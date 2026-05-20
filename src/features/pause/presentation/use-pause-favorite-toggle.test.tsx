@@ -9,12 +9,15 @@ const { logPauseFavoriteToggleMock, invalidateQueriesMock } = vi.hoisted(() => (
   invalidateQueriesMock: vi.fn(),
 }));
 
+vi.mock('@/features/pause/public-queries', () => ({
+  pauseArchiveListQueryPrefix: (userId: string) => ['pause-archive', userId] as const,
+}));
+
 vi.mock('@/features/pause/public', async (importOriginal) => {
   const actual = await importOriginal<typeof import('@/features/pause/public')>();
   return {
     ...actual,
     showPauseFavoriteProHintToast: vi.fn(),
-    pauseArchiveListQueryPrefix: (userId: string) => ['pause-archive', userId] as const,
   };
 });
 

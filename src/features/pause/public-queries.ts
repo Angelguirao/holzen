@@ -169,6 +169,12 @@ export {
   pauseArchiveListQueryPrefix,
   pauseArchiveStorageCacheKey,
 } from './infrastructure/queries/archive/archive-list-query';
+export { invalidatePauseStatsDataForUser } from './application/queries/invalidate-pause-stats';
+export { PAUSE_QUERY_PREFIX } from './application/queries/pause-query-namespace';
+export {
+  PAUSE_INSTANCE_QUERY_ROOT,
+  pauseInstanceQueryPrefix,
+} from './application/queries/pause-instance-query-prefix';
 export {
   COMPANION_SLOT_FAVORITES_METADATA_KEY,
   COMPANION_LIBRARY_FAVORITES_NONE_QUERY_KEY,
