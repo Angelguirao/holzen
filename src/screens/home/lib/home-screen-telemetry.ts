@@ -39,3 +39,11 @@ export function trackHomeGoalWhyExpandToggled(expanded: boolean): void {
     /* no-op */
   }
 }
+
+export function trackOnboardingCompleted(stepsCompleted: number): void {
+  try {
+    trackEvent('onboarding.completed', { steps_completed: stepsCompleted });
+  } catch {
+    /* no-op */
+  }
+}
