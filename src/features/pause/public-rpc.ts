@@ -47,6 +47,7 @@ import {
   runPauseReflectNoteUpdate,
   runPauseReflectTagUpdate,
 } from './application/use-cases/reflect/run-pause-reflect-metadata-log';
+import { runPauseFavoriteToggle } from './application/use-cases/reflect/run-pause-favorite-toggle';
 import { runPauseReflectionStepLogOnce } from './application/use-cases/reflect/run-pause-reflection-step-log';
 import { reflectionStepSessionStorage } from './infrastructure/reflect/reflection-step-session-storage';
 
@@ -79,6 +80,14 @@ export function logRetrospectiveOutcome(params: {
   outcome: string;
 }): Promise<PauseState | null> {
   return logRetrospectiveOutcomeUseCase(supabasePauseRepository, params);
+}
+
+/** Reflect heart — `favorite_toggled` step. */
+export function logPauseFavoriteToggle(params: { pauseInstanceId: string; isFavorite: boolean }) {
+  return runPauseFavoriteToggle(params, {
+    logStep: ({ instanceId, payload }) =>
+      pauseLogStep({ instanceId, stepType: 'favorite_toggled', payload }),
+  });
 }
 
 /** Reflect progression — `reflection_step` once per instance (sessionStorage dedupe). */

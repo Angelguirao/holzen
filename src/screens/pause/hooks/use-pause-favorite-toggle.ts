@@ -2,10 +2,13 @@ import { useCallback, type Dispatch, type SetStateAction } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
 import type { TFunction } from 'i18next';
 import { useAuth } from '@/features/auth/public';
-import { pauseArchiveListQueryPrefix } from '@/features/pause/public';
+import {
+  pauseArchiveListQueryPrefix,
+  shouldShowFavoriteProHint,
+  showPauseFavoriteProHintToast,
+} from '@/features/pause/public';
+import { logPauseFavoriteToggle } from '@/features/pause/public-rpc';
 import { hapticFeedback } from '@/lib/haptics';
-import { pauseLogStep } from '@/features/pause/public-rpc';
-import { showPauseFavoriteProHintToast } from '@/features/pause/public';
 
 export function usePauseFavoriteToggle(input: {
   pauseInstanceId: string | null;
@@ -20,23 +23,23 @@ export function usePauseFavoriteToggle(input: {
 
   const toggleFavorite = useCallback(async () => {
     if (!pauseInstanceId) return;
-    const newVal = !isFavorite;
-    setIsFavorite(newVal);
+    const optimisticNext = !isFavorite;
+    setIsFavorite(optimisticNext);
     hapticFeedback('light');
-    try {
-      await pauseLogStep({
-        instanceId: pauseInstanceId,
-        stepType: 'favorite_toggled',
-        payload: { is_favorite: newVal },
-      });
-      if (user?.id) {
-        void queryClient.invalidateQueries({ queryKey: pauseArchiveListQueryPrefix(user.id) });
-      }
-      if (newVal && !subscribed) {
-        showPauseFavoriteProHintToast(t);
-      }
-    } catch {
-      setIsFavorite(!newVal);
+
+    const outcome = await logPauseFavoriteToggle({ pauseInstanceId, isFavorite });
+    if (outcome.status === 'no_instance') return;
+
+    if (outcome.status === 'sync_failed') {
+      setIsFavorite(!outcome.attemptedValue);
+      return;
+    }
+
+    if (user?.id) {
+      void queryClient.invalidateQueries({ queryKey: pauseArchiveListQueryPrefix(user.id) });
+    }
+    if (shouldShowFavoriteProHint(outcome.newValue, subscribed)) {
+      showPauseFavoriteProHintToast(t);
     }
   }, [pauseInstanceId, isFavorite, subscribed, t, setIsFavorite, user?.id, queryClient]);
 
