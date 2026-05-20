@@ -1,11 +1,24 @@
-import { useCallback, useEffect, useRef, type MutableRefObject } from 'react';
+import { useCallback, useEffect, useMemo, useRef, type MutableRefObject } from 'react';
 import type { TFunction } from 'i18next';
-import { invalidateCompanionUiCompletionQuery } from '@/features/pause/public';
+import {
+  applyBreathSegmentLogOutcome,
+  initialBreathSegmentRpcLoggedFlagsFromRestored,
+  invalidateCompanionUiCompletionQuery,
+  runEnsureBreathSegment1Logged,
+  runEnsureBreathSegment2Logged,
+  runLogBreathSegment1Skipped,
+  runLogBreathSegment2Skipped,
+  showPauseStepSyncFailedToast,
+  type PersistedSession,
+} from '@/features/pause/public';
 import { pauseLogStep } from '@/features/pause/public-rpc';
-import { breathCompletedSegment1Payload, breathCompletedSegment2Payload } from '@/features/pause/public';
-import { initialBreathSegmentRpcLoggedFlagsFromRestored } from '@/features/pause/public';
-import { showPauseStepSyncFailedToast } from '@/features/pause/public';
-import { type PersistedSession } from '@/features/pause/public';
+
+const logBreathCompletedStep = (params: { instanceId: string; payload: Record<string, unknown> }) =>
+  pauseLogStep({
+    instanceId: params.instanceId,
+    stepType: 'breath_completed',
+    payload: params.payload,
+  }).then(() => undefined);
 
 /**
  * Dedupes `breath_completed` RPCs for deep + brief breath segments and resets when `pauseInstanceId` changes.
@@ -32,6 +45,25 @@ export function usePauseBreathSegmentRpcLoggers(input: {
   const breath2RpcDoneRef = useRef(segment2Logged);
   const prevPauseInstanceIdRef = useRef<string | null>(null);
 
+  const breathPorts = useMemo(
+    () => ({
+      logStep: logBreathCompletedStep,
+      invalidateCompanionCompletion: invalidateCompanionUiCompletionQuery,
+    }),
+    [],
+  );
+
+  const handleBreathOutcome = useCallback(
+    (outcome: Parameters<typeof applyBreathSegmentLogOutcome>[0], ref: MutableRefObject<boolean>) => {
+      if (outcome.status === 'sync_failed') {
+        showPauseStepSyncFailedToast(t);
+        return false;
+      }
+      return applyBreathSegmentLogOutcome(outcome, ref);
+    },
+    [t],
+  );
+
   useEffect(() => {
     const prev = prevPauseInstanceIdRef.current;
     if (prev !== null && prev !== pauseInstanceId) {
@@ -43,85 +75,48 @@ export function usePauseBreathSegmentRpcLoggers(input: {
 
   const ensureBreathSegment1Logged = useCallback(
     async (briefRitual?: boolean): Promise<boolean> => {
-      if (!pauseInstanceId) return true;
-      if (breath1RpcDoneRef.current) return true;
-      try {
-        await pauseLogStep({
-          instanceId: pauseInstanceId,
-          stepType: 'breath_completed',
-          payload: breathCompletedSegment1Payload({ briefRitual: !!briefRitual }),
-        });
-        invalidateCompanionUiCompletionQuery(pauseInstanceId);
-        breath1RpcDoneRef.current = true;
-        return true;
-      } catch {
-        showPauseStepSyncFailedToast(t);
-        return false;
-      }
+      const outcome = await runEnsureBreathSegment1Logged(
+        {
+          pauseInstanceId,
+          segmentAlreadyLogged: breath1RpcDoneRef.current,
+          briefRitual,
+        },
+        breathPorts,
+      );
+      return handleBreathOutcome(outcome, breath1RpcDoneRef);
     },
-    [pauseInstanceId, t],
+    [pauseInstanceId, breathPorts, handleBreathOutcome],
   );
 
   const ensureBreathSegment2Logged = useCallback(async (): Promise<boolean> => {
-    if (!pauseInstanceId) return true;
-    if (breath2RpcDoneRef.current) return true;
-    try {
-      await pauseLogStep({
-        instanceId: pauseInstanceId,
-        stepType: 'breath_completed',
-        payload: breathCompletedSegment2Payload(),
-      });
-      invalidateCompanionUiCompletionQuery(pauseInstanceId);
-      breath2RpcDoneRef.current = true;
-      return true;
-    } catch {
-      showPauseStepSyncFailedToast(t);
-      return false;
-    }
-  }, [pauseInstanceId, t]);
+    const outcome = await runEnsureBreathSegment2Logged(
+      { pauseInstanceId, segmentAlreadyLogged: breath2RpcDoneRef.current },
+      breathPorts,
+    );
+    return handleBreathOutcome(outcome, breath2RpcDoneRef);
+  }, [pauseInstanceId, breathPorts, handleBreathOutcome]);
 
-  const logBreathSegment1Skipped = useCallback(
+  const logBreathSegment1SkippedHandler = useCallback(
     async (opts?: { briefRitual?: boolean }): Promise<boolean> => {
-      if (!pauseInstanceId) return true;
-      try {
-        await pauseLogStep({
-          instanceId: pauseInstanceId,
-          stepType: 'breath_completed',
-          payload: breathCompletedSegment1Payload({ skipped: true, ...opts }),
-        });
-        invalidateCompanionUiCompletionQuery(pauseInstanceId);
-        breath1RpcDoneRef.current = true;
-        return true;
-      } catch {
-        showPauseStepSyncFailedToast(t);
-        return false;
-      }
+      const outcome = await runLogBreathSegment1Skipped(
+        { pauseInstanceId, opts },
+        breathPorts,
+      );
+      return handleBreathOutcome(outcome, breath1RpcDoneRef);
     },
-    [pauseInstanceId, t],
+    [pauseInstanceId, breathPorts, handleBreathOutcome],
   );
 
-  const logBreathSegment2Skipped = useCallback(async (): Promise<boolean> => {
-    if (!pauseInstanceId) return true;
-    try {
-      await pauseLogStep({
-        instanceId: pauseInstanceId,
-        stepType: 'breath_completed',
-        payload: breathCompletedSegment2Payload({ skipped: true }),
-      });
-      invalidateCompanionUiCompletionQuery(pauseInstanceId);
-      breath2RpcDoneRef.current = true;
-      return true;
-    } catch {
-      showPauseStepSyncFailedToast(t);
-      return false;
-    }
-  }, [pauseInstanceId, t]);
+  const logBreathSegment2SkippedHandler = useCallback(async (): Promise<boolean> => {
+    const outcome = await runLogBreathSegment2Skipped({ pauseInstanceId }, breathPorts);
+    return handleBreathOutcome(outcome, breath2RpcDoneRef);
+  }, [pauseInstanceId, breathPorts, handleBreathOutcome]);
 
   return {
     ensureBreathSegment1Logged,
     ensureBreathSegment2Logged,
-    logBreathSegment1Skipped,
-    logBreathSegment2Skipped,
+    logBreathSegment1Skipped: logBreathSegment1SkippedHandler,
+    logBreathSegment2Skipped: logBreathSegment2SkippedHandler,
     breath1RpcDoneRef,
     breath2RpcDoneRef,
   };
