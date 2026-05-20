@@ -2813,6 +2813,25 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-20</span>
+      <span>Phase A slice — colocate go-to-step hook; fix public-hooks path</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>Session ritual navigation — complete go-back / go-to-step pairing</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Remote had moved <code>use-pause-session-go-back</code> but left <code>use-pause-session-go-to-step</code> flat while <code>public-hooks</code> pointed at <code>presentation/session/</code> (broken export). Move go-to-step (+ test) under <code>presentation/session/</code>; align <code>public-hooks</code> and <code>use-pause-session-breath-navigation</code> imports.</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior-preserving path fix only.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>None.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: colocate shell bootstrap + breath-handlers under <code>presentation/session/</code>, lifecycle create/dismiss use cases on <code>public-rpc</code>, or port-backed companion feedback vote write path.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
 </body>
 </html>
