@@ -126,11 +126,11 @@ export function logRetrospectiveOutcome(params: {
 }
 
 /** Reflect heart — `favorite_toggled` step. */
-export function logPauseFavoriteToggle(params: { pauseInstanceId: string; isFavorite: boolean }) {
-  return runPauseFavoriteToggle(params, {
-    logStep: ({ instanceId, payload }) =>
-      repositoryLogStep(instanceId, 'favorite_toggled', payload),
-  });
+export function logPauseFavoriteToggle(params: {
+  pauseInstanceId: string | null;
+  isFavorite: boolean;
+}) {
+  return runPauseFavoriteToggle(supabasePauseRepository, params);
 }
 
 /** Reflect progression — `reflection_step` once per instance (sessionStorage dedupe). */
