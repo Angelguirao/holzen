@@ -3,7 +3,6 @@ import {
   createElement,
   useContext,
   useState,
-  useEffect,
   useCallback,
   useMemo,
   type ReactNode,
@@ -16,21 +15,15 @@ import {
 import { useAuth } from '@/features/auth/public';
 import { pauseDismissCurrent } from '@/features/pause/public-rpc';
 import { useProfile } from '@/features/user/public-hooks';
-import { holzenLog } from '@/lib/holzen-console';
 import { clearSession } from '@/features/pause/public';
 import { useOpenPauseHomePreview } from '@/features/pause/public-hooks';
-import {
-  getManualReflectionCooldownMs,
-  isHolzenDevMode,
-} from '@/features/market/public';
 import { normalizeTrackedAssetId } from '@/features/market/public';
 import { severityFromBtcChangePercent } from '@/features/market/public';
 import { millisecondsUntilNextQuarterHour } from '@/screens/home/lib/next-cron-quarter';
 import {
-  MANUAL_PAUSE_TRIGGER_IDLE,
-  type ManualPauseTriggerResult,
-} from '@/features/pause/public';
-import { useManualPauseTrigger } from '@/features/pause/public-hooks';
+  useHolzenManualTriggerOrchestration,
+  useManualPauseTrigger,
+} from '@/features/pause/public-hooks';
 
 export { holzenMarketDisplayQueryKey };
 
@@ -123,80 +116,20 @@ function useHolzenState() {
     setLastTriggerAt,
   });
 
-  const manualCooldownKey = user ? `holzen_last_manual_at_${user.id}` : 'holzen_last_manual_at';
-  const [lastManualAt, setLastManualAt] = useState<number | null>(null);
-
-  useEffect(() => {
-    const stored = localStorage.getItem(manualCooldownKey);
-    setLastManualAt(stored ? Number(stored) : null);
-  }, [manualCooldownKey]);
-
-  useEffect(() => {
-    const onStorage = (e: StorageEvent) => {
-      if (e.key !== manualCooldownKey || e.storageArea !== localStorage) return;
-      setLastManualAt(e.newValue ? Number(e.newValue) : null);
-    };
-    window.addEventListener('storage', onStorage);
-    return () => window.removeEventListener('storage', onStorage);
-  }, [manualCooldownKey]);
-
-  const manualCooldownRemaining = useCallback(() => {
-    if (!lastManualAt) return 0;
-    const elapsed = Date.now() - lastManualAt;
-    return Math.max(0, getManualReflectionCooldownMs() - elapsed);
-  }, [lastManualAt]);
-
-  const autoCooldownRemaining = useCallback(() => {
-    if (!lastTriggerAt) return 0;
-    const cooldownMs = cooldownHours * 60 * 60 * 1000;
-    const elapsed = Date.now() - new Date(lastTriggerAt).getTime();
-    return Math.max(0, cooldownMs - elapsed);
-  }, [lastTriggerAt, cooldownHours]);
+  const { manualTrigger, manualCooldownRemaining, autoCooldownRemaining } =
+    useHolzenManualTriggerOrchestration({
+      user,
+      profileTrackedAssetId,
+      currency,
+      cooldownHours,
+      lastTriggerAt,
+      btcData: btcQuery.data,
+      queryClient,
+      generateMessage,
+      setError,
+    });
 
   const nextCronCheckIn = useCallback(() => millisecondsUntilNextQuarterHour(), []);
-
-  const manualTrigger = useCallback(
-    async (mood?: string): Promise<ManualPauseTriggerResult> => {
-      const remaining = manualCooldownRemaining();
-      if (remaining > 0) {
-        holzenLog.manual('manualTrigger: blocked by cooldown', {
-          remainingMs: remaining,
-          devMode: isHolzenDevMode(),
-        });
-        return MANUAL_PAUSE_TRIGGER_IDLE;
-      }
-
-      try {
-        const marketOpts = getHolzenMarketDisplayQueryOptions({
-          coinIdRaw: profileTrackedAssetId,
-          currency,
-          enabled: true,
-        });
-        const data =
-          btcQuery.data ??
-          (await queryClient.fetchQuery({
-            queryKey: marketOpts.queryKey,
-            queryFn: marketOpts.queryFn,
-          }));
-        const result = await generateMessage(data, mood);
-        if (result.opened) {
-          const now = Date.now();
-          setLastManualAt(now);
-          localStorage.setItem(manualCooldownKey, String(now));
-        }
-        return result;
-      } catch (e: unknown) {
-        const raw = e instanceof Error ? e.message : String(e);
-        if (raw.includes('fetch') || raw.includes('Failed to fetch')) {
-          setError('Could not connect. Check your internet and try again.');
-        } else {
-          setError('Could not start a pause right now. Try again in a moment.');
-        }
-        return MANUAL_PAUSE_TRIGGER_IDLE;
-      }
-    },
-    [btcQuery.data, generateMessage, manualCooldownRemaining, currency, manualCooldownKey, profileTrackedAssetId, queryClient],
-  );
 
   const dismissMessage = useCallback(async () => {
     clearSession();
