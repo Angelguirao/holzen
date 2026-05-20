@@ -1,6 +1,7 @@
 # Notifications feature module
 
 **Product truth:** [docs/systems/notifications-delivery.md](../../../docs/systems/notifications-delivery.md)  
+**Client target:** [docs/systems/notifications-client-architecture.md](../../../docs/systems/notifications-client-architecture.md)  
 **Architecture:** [holzen-application-architecture.md](../../../docs/fundamentals/holzen-application-architecture.md) §7.1
 
 Multi-channel delivery: in-app inbox, web push, email (server paths in `supabase/functions/_shared/notifications-deliver-pause-offer.ts`).

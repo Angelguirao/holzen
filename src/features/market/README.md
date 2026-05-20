@@ -1,7 +1,8 @@
 # Market feature module
 
 **Product context:** BTC price, volatility thresholds, fear/greed, and pause trigger context on Home.  
-**Layout:** [frontend-module-layout.md](../../../docs/fundamentals/frontend-module-layout.md) §3
+**Client target:** [docs/systems/market-client-architecture.md](../../../docs/systems/market-client-architecture.md)  
+**Repo map / waves:** [frontend-module-layout.md](../../../docs/fundamentals/frontend-module-layout.md) §10–11
 
 Home orchestration mounts via `app/components/HolzenProvider` (`useHolzenHomeContextState` in pause presentation); this module owns market **domain rules**, fetch/query adapters, and the public API other features may import.
 

@@ -4,7 +4,7 @@
 
 Authoritative orchestration: [`PauseSessionScreen.tsx`](../../src/screens/pause/PauseSessionScreen.tsx) → [`usePauseSessionScreen`](../../src/features/pause/public-hooks.ts) (presentation conductor + [`pause-scaffold-chrome-registry.tsx`](../../src/screens/pause/lib/pause-scaffold-chrome-registry.tsx) for route-only header slots).
 
-**Cross-screen patterns:** the same **thin page + named hooks + `src/lib` pure helpers** playbook as [Home](home.md) is spelled out in **[React screen orchestration](../fundamentals/react-screen-orchestration.md)**. Home **produces** navigation into this route; this doc is the **consumer** map for the full-screen volatility ritual.
+**Cross-screen patterns:** the same **thin page + named hooks + feature/screen pure helpers** playbook as [Home](home.md) is spelled out in **[React screen orchestration](../fundamentals/react-screen-orchestration.md)**. Home **produces** navigation into this route; this doc is the **consumer** map for the full-screen volatility ritual.
 
 
 | Piece                                        | File                                                                                              |
@@ -51,7 +51,7 @@ Presentation hooks (`src/features/pause/presentation/use-pause-session-*.ts`, co
 
 ## User-visible modes (high level)
 
-1. **Gate** — `PauseSessionGate`: profile not ready, instance fetch in flight, fetch failure, or “no shell message” vs waiting for hydration (see `[pause-session-gate-flags.ts](../../src/lib/pause-session-gate-flags.ts)`).
+1. **Gate** — `PauseSessionGate`: profile not ready, instance fetch in flight, fetch failure, or “no shell message” vs waiting for hydration (see [`gate-flags.ts`](../../src/features/pause/application/use-cases/session/gate-flags.ts) via `public`).
 2. **Depth picker** — user has a coalesced reflection message but `ritualEntry === 'picker'` (`PauseSessionDepthPickerStack`; gate flag in `gate-flags.ts`).
 3. **Brief ritual** — four macro steps (`BriefPauseStep`); body in `PauseSessionBriefRitualBody`.
 4. **Deep ritual** — full `PauseStep` rail; body in `PauseSessionDeepRitualBody` (Feel, Breathe, Reflect, Frame, second Breathe, Choose bridge, Decide).

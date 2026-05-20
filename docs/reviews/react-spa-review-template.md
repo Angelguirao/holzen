@@ -41,7 +41,7 @@ Do **not** try to fill every audit section for every PR. For PRs: pick the **one
 - [ ] Entry: route + root component/hook for this change
 - [ ] Trigger: what user action or effect starts the work?
 - [ ] State: local vs shared; server data via Query (not duplicated global store)? See [modern-react-practices-holzen.md](../fundamentals/modern-react-practices-holzen.md) §2.3–2.4.
-- [ ] Placement: feature/package ownership vs root `hooks/`/`lib/` dump? See [modern-react-practices-holzen.md](../fundamentals/modern-react-practices-holzen.md) §6.
+- [ ] Placement: feature/package ownership vs root `lib/` dump for bounded-context logic? Cross-cutting only in `src/lib/` or `src/app/hooks/`. See [modern-react-practices-holzen.md](../fundamentals/modern-react-practices-holzen.md) §6 and [architecture-migration.mdc](../../.cursor/rules/architecture-migration.mdc).
 - [ ] I/O: Supabase client, `functions.invoke` / `invokeEdge`, storage—errors handled?
 - [ ] UI: loading / error / empty states for new or changed async paths
 
@@ -54,7 +54,7 @@ Do **not** try to fill every audit section for every PR. For PRs: pick the **one
 **Smells in diff:**
 
 - [ ] Duplicated API/query logic that should reuse an existing hook or lib
-- [ ] Business rules embedded in JSX (prefer hook / `src/lib`) — and no **authoritative** lifecycle that exists only client-side (see [client-server-architecture-holzen.md](../fundamentals/client-server-architecture-holzen.md))
+- [ ] Business rules embedded in JSX (prefer named hook, `features/<ctx>/domain/` or `application/use-cases/`, or `screens/<route>/lib/` — not new `@/lib/<context>-*` shims) — and no **authoritative** lifecycle that exists only client-side (see [client-server-architecture-holzen.md](../fundamentals/client-server-architecture-holzen.md))
 - [ ] Magic strings for routes, event names, or edge function names (use existing constants or enums where the codebase already does)
 - [ ] New edge HTTP entrypoint without `withRequestLogging` (see `npm run check:edge-logging`)
 

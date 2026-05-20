@@ -1,5 +1,7 @@
 # Auth feature module
 
+**Client target:** [docs/systems/auth-client-architecture.md](../../../docs/systems/auth-client-architecture.md)
+
 Session and identity projection.
 
 | Layer | Path |
