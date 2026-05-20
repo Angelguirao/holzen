@@ -3,7 +3,7 @@ import { updateUserPassword, useAuth } from '@/features/auth/public';
 import { deleteAccount as invokeDeleteAccount } from '@/features/auth/public-rpc';
 import { fetchSettingsDataExportBundle } from '@/features/pause/public-queries';
 import { getProfileRowQueryOptions } from '@/features/user/public-queries';
-import { useHolzen } from '@/screens/home/hooks/use-holzen';
+import { useHolzen } from '@/app/components/HolzenProvider';
 import { useSubscription } from '@/features/subscription/public-hooks';
 import { useInstallPrompt } from '@/app/hooks/use-install-prompt';
 import { usePushNotifications } from '@/features/notifications/public-hooks';

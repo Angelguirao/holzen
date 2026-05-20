@@ -7,7 +7,7 @@ import { LoadingButton } from '@/components/ui/loading-button';
 import { Textarea } from '@/components/ui/textarea';
 import { useAuth } from '@/features/auth/public';
 import { submitUserTestimonial } from '@/features/user/public-queries';
-import { useHolzen } from '@/screens/home/hooks/use-holzen';
+import { useHolzen } from '@/app/components/HolzenProvider';
 import { toast } from 'sonner';
 
 const DISMISS_KEY = 'holzen_testimonial_dismissed';

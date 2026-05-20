@@ -1,4 +1,4 @@
-import { useHolzen } from '@/screens/home/hooks/use-holzen';
+import { useHolzen } from '@/app/components/HolzenProvider';
 import { pickPauseHolzenProvidersSlice } from '@/features/pause/public';
 import {
   usePauseSessionProviders as usePauseSessionProvidersPresentation,
