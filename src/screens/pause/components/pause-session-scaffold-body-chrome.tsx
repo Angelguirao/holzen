@@ -1,7 +1,7 @@
 import { ChevronLeft, Volume2, VolumeX } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { Button } from '@/components/ui/button';
-import { resumePauseAudioContext } from '@/features/pause/public';
+import { resumePauseAudioContext } from '@/features/pause/public-hooks';
 
 export type PauseSessionScaffoldBodyChromeProps = {
   onHeaderBack?: () => void;

@@ -1,7 +1,7 @@
 import { describe, expect, it, vi } from 'vitest';
 import { renderHook, act } from '@testing-library/react';
 import type { MutableRefObject } from 'react';
-import type { PauseBreathingHandle } from '@/features/pause/public';
+import type { PauseBreathingHandle } from '@/features/pause/presentation/session/pause-breathing-handle';
 import { usePauseSessionHeaderBackHandler } from './use-pause-session-header-back-handler';
 
 function baseInput(
