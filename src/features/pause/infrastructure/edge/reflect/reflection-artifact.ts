@@ -1,7 +1,7 @@
 import { supabase } from '@/integrations/supabase/client';
 import type { CompanionData } from '@/features/pause/domain/companion-card-types';
 import { invokeHolzenReflect } from './holzen-reflect-edge';
-import { loadReflectRecencyHints } from './load-reflect-recency-hints';
+import { loadReflectRecencyHints } from '../../queries/reflect/load-reflect-recency-hints';
 
 export type PersistReflectionArtifactsParams = {
   pauseInstanceId: string;
