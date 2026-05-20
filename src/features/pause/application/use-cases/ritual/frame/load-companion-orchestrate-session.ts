@@ -2,7 +2,7 @@ import {
   buildCompanionOrchestrateSessionFromRitual,
   type CompanionOrchestrateMoodHistoryEntry,
   type CompanionOrchestrateSessionContext,
-} from '../ritual/frame/build-companion-orchestrate-body';
+} from './build-companion-orchestrate-body';
 
 export type LoadCompanionOrchestrateSessionInput = {
   pauseInstanceId?: string | null;
