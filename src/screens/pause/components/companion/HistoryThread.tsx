@@ -1,7 +1,7 @@
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import type { RegenerateCompanionSlot } from '@/features/pause/public';
-import { formatCompanionHistoryRelativeDay } from '@/features/pause/public';
+import { formatCompanionHistoryRelativeDay } from '@/features/pause/public-hooks';
 import { useCompanionHistoryThread } from '@/features/pause/public-hooks';
 
 /**
