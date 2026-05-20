@@ -1,5 +1,5 @@
 import { useHolzen } from '@/screens/home/hooks/use-holzen';
-import type { CompanionData, CompanionPrefs } from '@/screens/pause/components/CompanionSection';
+import type { CompanionData, CompanionPrefs } from '@/features/pause/public';
 import { useCompanionOrchestration } from '@/screens/pause/hooks/use-companion-orchestration';
 import {
   useCompanionAccess,

@@ -16,7 +16,7 @@ import { openManualPauseFromHome } from '@/features/pause/public-rpc';
 import type { OpenManualPauseFromHomeResult } from '@/features/pause/public-rpc';
 import { holzenLog } from '@/lib/holzen-console';
 import { trackEvent } from '@/lib/posthog';
-import type { CompanionData } from '@/screens/pause/components/CompanionSection';
+import type { CompanionData } from '@/features/pause/public';
 
 const PAUSE_MANUAL_START_HOME = 'holzen_sess_pause_manual_started_home';
 

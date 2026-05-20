@@ -2,7 +2,7 @@ import { useCallback, type Dispatch, type SetStateAction } from 'react';
 import type { TFunction } from 'i18next';
 import type { MoodValue } from '@/screens/pause/components/MoodCheck';
 import type { PauseStep } from '@/screens/pause/components/PauseProgress';
-import type { CompanionData, CompanionPrefs } from '@/screens/pause/components/CompanionSection';
+import type { CompanionData, CompanionPrefs } from '@/features/pause/public';
 import { type BriefPauseStep, type FeelStepTile, type RitualDepth } from '@/features/pause/public';
 import { usePauseFeelShiftLogDedupeRefs } from '@/screens/pause/hooks/use-pause-feel-shift-log-dedupe-refs';
 import { usePauseSessionDepthPickerHandlers } from '@/screens/pause/hooks/use-pause-session-depth-picker-handlers';
