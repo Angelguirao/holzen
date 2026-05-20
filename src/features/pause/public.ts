@@ -234,7 +234,7 @@ export {
   zoomOutLibraryAutosaveFromDisplayData,
   zoomOutSaveThisMomentSeed,
   zoomOutTotalCharsForReadTime,
-} from './application/use-cases/companion/zoom-out-payload';
+} from './application/use-cases/ritual/frame/zoom-out-payload';
 export {
   type NotificationNavigateState,
   type PauseSessionLocationState,
