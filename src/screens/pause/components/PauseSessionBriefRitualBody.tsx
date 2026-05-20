@@ -3,7 +3,7 @@ import type { MoodValue } from '@/screens/pause/components/MoodCheck';
 import { PauseBreathing } from '@/screens/pause/components/PauseBreathing';
 import type { PauseBreathingHandle } from '@/features/pause/public-hooks';
 import { PauseRitualFeelStep } from '@/screens/pause/components/PauseRitualFeelStep';
-import type { FeelStepTile } from '@/features/pause/public';
+import type { FeelStepTile } from '@/features/pause/public-hooks';
 import { PauseBriefIntegrate } from '@/screens/pause/components/PauseBriefIntegrate';
 import { PauseDecide } from '@/screens/pause/components/PauseDecide';
 import type { PauseSessionStepTransitionConfig } from '@/features/pause/public-hooks';

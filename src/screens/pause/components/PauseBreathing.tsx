@@ -1,7 +1,7 @@
 import { useImperativeHandle, forwardRef, useMemo } from 'react';
 import { useReducedMotion } from 'framer-motion';
 import { useTranslation } from 'react-i18next';
-import type { FeelStepTile } from '@/features/pause/public';
+import type { FeelStepTile } from '@/features/pause/public-hooks';
 import {
   parseTriangleRotatingKickersI18n,
   resolveBreathCycleTotal,

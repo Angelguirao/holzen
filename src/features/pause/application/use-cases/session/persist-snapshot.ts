@@ -1,6 +1,6 @@
 import type { PauseStep } from '@/features/pause/public';
+import type { FeelStepTile } from '@/features/pause/domain/feel-step-tile';
 import type { MoodValue } from '@/features/pause/domain/mood-value';
-import type { FeelStepTile } from '@/features/pause/public';
 import type { CompanionData, CompanionPrefs } from '@/features/pause/public';
 import type { BriefPauseStep, RitualDepth } from '@/features/pause/domain/ritual-types';
 import type { PersistedSession } from '@/features/pause/domain/session-model';

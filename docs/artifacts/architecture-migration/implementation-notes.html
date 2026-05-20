@@ -1940,6 +1940,25 @@
   <article class="note">
     <header>
       <span>2026-05-20</span>
+      <span>Phase A slice — peel MoodCheck mood tokens off public.ts (§6)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3><code>MoodValue</code> / <code>PAUSE_MOOD_VALUES</code> / <code>isPauseMoodValue</code> → <code>public-hooks</code></h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>reflect/</code> → <code>ritual/reflect/</code>) was already complete — no reflect moves this session. Supersedes partial <code>PAUSE_MOOD_VALUES</code>-only peel: remove all mood domain exports from <code>public.ts</code>; colocate on <code>public-hooks.ts</code> for pause screens and <code>MoodCheck</code> re-exports. Feature presentation/application import <code>domain/mood-value</code> directly.</dd>
+      <dt>Deviation</dt>
+      <dd>Moved <code>resolveDoneWallpaperMood</code> from <code>screens/pause/lib</code> into <code>application/use-cases/ritual/done/</code> so screens import via <code>public-hooks</code> without deep domain paths.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Did not colocate <code>application/use-cases/breathing/</code> under <code>ritual/breathe/</code> in the same commit.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: move <code>writingTextareaClassName</code> to <code>components/ui</code> tokens (cross-context), peel more session/home helpers off <code>public.ts</code>, or optional <code>breathing/</code> → <code>ritual/breathe/</code>.</dd>
+    </dl>
+  </article>
+
+  <article class="note">
+    <header>
+      <span>2026-05-20</span>
       <span>Phase A slice — peel writingTextareaClassName to shared UI (§6)</span>
       <span class="status resolved">resolved</span>
     </header>
@@ -1953,25 +1972,6 @@
       <dd>Did not colocate <code>application/use-cases/breathing/</code> under <code>ritual/breathe/</code> in the same commit.</dd>
       <dt>Open questions</dt>
       <dd>Next: optional <code>breathing/</code> → <code>ritual/breathe/</code>, peel <code>FeelStepTile</code> screen types to <code>public-hooks</code>, or wire more archive/library helpers off <code>public.ts</code>.</dd>
-    </dl>
-  </article>
-
-  <article class="note">
-    <header>
-      <span>2026-05-20</span>
-      <span>Phase A slice — peel MoodCheck mood tokens off public.ts (§6)</span>
-      <span class="status resolved">resolved</span>
-    </header>
-    <h3><code>MoodValue</code> / <code>PAUSE_MOOD_VALUES</code> / <code>isPauseMoodValue</code> → <code>public-hooks</code></h3>
-    <dl>
-      <dt>Design decision</dt>
-      <dd>Backlog #1 (<code>reflect/</code> → <code>ritual/reflect/</code>) was already complete — no reflect moves this session. Supersedes partial <code>PAUSE_MOOD_VALUES</code>-only peel: remove all mood domain exports from <code>public.ts</code>; colocate on <code>public-hooks.ts</code> for pause screens and <code>MoodCheck</code> re-exports. Feature presentation/application import <code>domain/mood-value</code> directly.</dd>
-      <dt>Deviation</dt>
-      <dd>Moved <code>resolveDoneWallpaperMood</code> from <code>screens/pause/lib</code> into <code>application/use-cases/ritual/done/</code> so screens import via <code>public-hooks</code> without deep domain paths.</dd>
-      <dt>Tradeoffs</dt>
-      <dd>Did not colocate <code>application/use-cases/breathing/</code> under <code>ritual/breathe/</code> in the same commit.</dd>
-      <dt>Open questions</dt>
-      <dd>Next: peel <code>FeelStepTile</code> screen types to <code>public-hooks</code>, wire more archive/library helpers off <code>public.ts</code>, or optional <code>breathing/</code> → <code>ritual/breathe/</code>.</dd>
     </dl>
   </article>
 
@@ -2010,6 +2010,25 @@
       <dd>Did not peel <code>FeelStepTile</code> or <code>getSessionQuote</code> in the same commit.</dd>
       <dt>Open questions</dt>
       <dd>Next: peel <code>FeelStepTile</code> screen types to <code>public-hooks</code>, <code>millisecondsUntilNextQuarterHour</code> for home scheduling, or optional <code>breathing/</code> → <code>ritual/breathe/</code>.</dd>
+    </dl>
+  </article>
+
+  <article class="note">
+    <header>
+      <span>2026-05-20</span>
+      <span>Phase A slice — peel FeelStepTile off public.ts (§6)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3><code>FeelStepTile</code> type → <code>public-hooks</code> for screens</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>reflect/</code> → <code>ritual/reflect/</code>) and #2 (<code>companion/</code> → <code>ritual/frame/</code>) are complete on <code>cursor/arch-migrate-src-ca70</code> — no ritual folder moves this session. Continue backlog #3 §6 slim barrel: export <code>FeelStepTile</code> from <code>public-hooks.ts</code> beside <code>PAUSE_FEEL_STEP_TILE_ROWS</code>; pause feel-step screens import there. Feature presentation and application import <code>domain/feel-step-tile</code> directly.</dd>
+      <dt>Deviation</dt>
+      <dd>None — same pattern as <code>PauseImpactData</code> and mood token peels (May 2026).</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Did not colocate <code>breathing/</code> under <code>ritual/breathe/</code> in the same commit.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: peel <code>millisecondsUntilNextQuarterHour</code> for home scheduling, <code>getSessionQuote</code> for done screens, or optional <code>application/use-cases/breathing/</code> → <code>ritual/breathe/</code>.</dd>
     </dl>
   </article>
 

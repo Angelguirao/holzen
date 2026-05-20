@@ -9,8 +9,8 @@ import type {
   PauseStep,
   PersistedSession,
   RitualDepth,
-  FeelStepTile,
 } from '@/features/pause/public';
+import type { FeelStepTile } from '../../domain/feel-step-tile';
 import type { MoodValue } from '../../domain/mood-value';
 
 /** Subset of `usePauseSessionProviders` passed into mood chrome handlers. */

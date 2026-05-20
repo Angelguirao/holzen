@@ -56,6 +56,7 @@ export {
   resolveTriangleKickerDisplay,
   type TriangleKickerDisplay,
 } from './application/use-cases/breathing/resolve-triangle-kicker-display';
+export type { FeelStepTile } from './domain/feel-step-tile';
 export { PAUSE_FEEL_STEP_TILE_ROWS } from './domain/pause-feel-step-tiles';
 export {
   PAUSE_FEEL_INTENSITY_KEYS,

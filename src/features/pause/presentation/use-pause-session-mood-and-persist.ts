@@ -5,10 +5,10 @@ import {
   type BriefPauseStep,
   type CompanionData,
   type CompanionPrefs,
-  type FeelStepTile,
   type PauseStep,
   type RitualDepth,
 } from '@/features/pause/public';
+import type { FeelStepTile } from '../domain/feel-step-tile';
 import type { MoodValue } from '../domain/mood-value';
 import { usePauseFeelShiftLogDedupeRefs } from './use-pause-feel-shift-log-dedupe-refs';
 import { usePauseSessionDepthPickerHandlers } from './use-pause-session-depth-picker-handlers';

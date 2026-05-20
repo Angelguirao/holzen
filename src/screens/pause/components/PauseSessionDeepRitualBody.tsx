@@ -1,7 +1,7 @@
 import { AnimatePresence, motion } from 'framer-motion';
 import type { MoodValue } from '@/screens/pause/components/MoodCheck';
 import { PauseRitualFeelStep } from '@/screens/pause/components/PauseRitualFeelStep';
-import type { FeelStepTile } from '@/features/pause/public';
+import type { FeelStepTile } from '@/features/pause/public-hooks';
 import { PauseBreathing } from '@/screens/pause/components/PauseBreathing';
 import { PauseDecide } from '@/screens/pause/components/PauseDecide';
 import { PauseFrame } from '@/screens/pause/components/PauseFrame';

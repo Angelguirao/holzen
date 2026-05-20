@@ -1,4 +1,4 @@
-import type { FeelStepTile } from '@/features/pause/public';
+import type { FeelStepTile } from '@/features/pause/domain/feel-step-tile';
 import type { BriefPauseStep, RitualDepth } from '@/features/pause/domain/ritual-types';
 import type { PersistedSession } from '@/features/pause/domain/session-model';
 import { initialRitualEntry } from '@/features/pause/application/use-cases/session/step-map';
