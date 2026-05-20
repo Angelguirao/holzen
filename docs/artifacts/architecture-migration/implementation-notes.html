@@ -550,6 +550,25 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-20</span>
+      <span>Phase A slice — frame leaf: companion-slot-ui-state</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3><code>companion-slot-ui-state</code> → <code>ritual/frame/</code></h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Reflect → <code>ritual/reflect/</code> is complete (backlog #1). Move pure slot loading/error setter routing (module + test) to <code>ritual/frame/</code>; presentation continues to import via <code>public.ts</code> only.</dd>
+      <dt>Deviation</dt>
+      <dd>None — matches spec §3.1 / §10.1 leaf-first pattern after <code>full-view-page-helpers</code>.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Could batch with <code>companion-slot-orchestrate-telemetry</code>; kept two-file leaf so slot orchestration cluster can move together in a later slice.</dd>
+      <dt>Open questions</dt>
+      <dd>Next slice: <code>companion-slot-orchestrate-telemetry</code> leaf, <code>intervention-idempotency</code> cluster, or <code>run-companion-slot-orchestrate</code> cluster.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
 </body>
 </html>
