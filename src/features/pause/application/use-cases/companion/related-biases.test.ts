@@ -3,7 +3,7 @@ import {
   dedupeBiases,
   normalizeBiasTitle,
   type RelatedBiasesRow,
-} from '@/features/pause/public';
+} from './related-biases';
 
 function row(partial: Partial<RelatedBiasesRow> & { title?: string; id: string }): RelatedBiasesRow {
   return {
@@ -32,7 +32,7 @@ describe('dedupeBiases', () => {
     const rows = [
       row({ id: 'r3', title: 'Anchoring bias' }),
       row({ id: 'r2', title: 'Endowment effect' }),
-      row({ id: 'r1', title: 'Anchoring bias.' }), // same key → dropped (older)
+      row({ id: 'r1', title: 'Anchoring bias.' }),
     ];
     const out = dedupeBiases(rows, { currentPauseInstanceId: null, currentTitle: null, limit: 5 });
     expect(out.map((b) => b.pause_instance_id)).toEqual(['r3', 'r2']);
