@@ -17,12 +17,13 @@ Improve **maintainability and testability** by breaking up **oversized page modu
 
 ## Rationale
 
-The app already follows sound patterns (function components, custom hooks, route guards). Several **pages** carry most of a flow in one file (e.g. **`Home`**, **`PauseSession`**), and **`use-holzen`** bundles BTC context, reflection generation, cooldowns, and profile updates. That is **shippable** but makes **reviews, refactors, and unit tests** harder than necessary.
+The app already follows sound patterns (function components, custom hooks, route guards). Several **pages** carry most of a flow in one file (e.g. **`Home`**, **`PauseSession`**), and **`useCompanionData`** still bundles companion orchestration. That is **shippable** but makes **reviews, refactors, and unit tests** harder than necessary.
 
 ## Direction
 
 - **Screens:** Extract **presentational** subcomponents and small hooks under `src/screens/<route>/components/` and `hooks/` — follow `screens/pause/components/Pause*` patterns. See [client-src-layout.md](../fundamentals/client-src-layout.md).
-- **`use-holzen`:** Consider splitting only where boundaries are clear (e.g. cooldown helpers vs `generateMessage` vs BTC fetch), after tests or a stable API for callers.
+- **`useCompanionData`:** Continue peeling use cases toward `ritual/frame/` incrementally (Phase A backlog).
+- **`useHolzen`:** Producer split **shipped** — further splits only if caller boundaries justify them ([refactoring-strategy.md](../fundamentals/refactoring-strategy.md) §4).
 - **Scope:** Touch **one vertical slice per PR**; avoid drive-by renames across the tree.
 
 ## Related

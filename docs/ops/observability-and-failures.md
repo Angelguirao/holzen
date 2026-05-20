@@ -15,7 +15,7 @@ This doc is an **index and checklist**: where to document logs, metrics, retries
 | Area | Cron / triggers | Logs / debugging | Safe retry? | Owned doc |
 |------|-----------------|------------------|-------------|-----------|
 | Pause + companions | [cron-setup.md](cron-setup.md) | Edge: **`orchestrate_invoke`**, **`companion_slot_resolved`**, **`cache_serve`**, **`quality_gate_reject`**; client: **`[holzen:companion]`** — see [pause-signal-companion-logging-e2e.md](pause-signal-companion-logging-e2e.md) | Varies by step | [ai-powered-pause-system.md](../systems/pause/ai-powered-pause-system.md) |
-| Auth + referrals | — | Client: `use-auth`; server: referral edge function | Referral consume once | [auth-and-referral-system.md](../systems/auth/auth-and-referral-system.md) |
+| Auth + referrals | — | Client: `@/features/auth/public` (`useAuth`); server: referral edge function | Referral consume once | [auth-and-referral-system.md](../systems/auth/auth-and-referral-system.md) |
 | Stripe / billing | Webhooks | Edge function logs; Stripe dashboard | Webhook idempotency per Stripe docs | *(add systems doc or link to function README when introduced)* |
 
 Extend the table when you add pipelines. Keep **one** authoritative narrative per pipeline in `systems/` or the edge function folder.

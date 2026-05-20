@@ -19,7 +19,7 @@ It complements:
 
 ## Is the direction “correct”?
 
-**Yes, for this codebase.** The backlog explicitly rejects a **big-bang** rewrite in favor of **small, behavior-preserving extractions**. What has been shipped (Home chrome, PauseSession storage/scaffold, `use-holzen` pure helpers, `use-companion-data` in `features/pause/presentation/` with use cases under `application/use-cases/companion/` → target `ritual/frame/`) matches that contract:
+**Yes, for this codebase.** The backlog explicitly rejects a **big-bang** rewrite in favor of **small, behavior-preserving extractions**. What has been shipped (Home chrome, PauseSession storage/scaffold, **`useHolzen` producer split** into `features/pause/presentation/` + pure helpers in feature modules, `use-companion-data` in `features/pause/presentation/` with use cases under `application/use-cases/companion/` → target `ritual/frame/`) matches that contract:
 
 | Principle | How we’re applying it |
 |-----------|------------------------|
@@ -50,7 +50,7 @@ That is **appropriate** for a shipping product with a small surface area of “g
 
 - Pure helpers are **easy to unit test** without mounting React.
 - Avoids an explosion of tiny hooks that each need mock providers.
-- Keeps **one place** that owns subscription to profile/BTC/reflection lifecycle (`use-holzen`) while still shrinking the file.
+- Keeps **one place** that owns subscription to profile/BTC/reflection lifecycle (`useHolzenHomeContextState` via **`HolzenProvider`**) while still shrinking conductor files.
 - Matches the migration north star: **no new** `@/lib/pause-*` / `@/lib/companion-*` — peel existing shims toward `features/pause/public*`.
 
 **Legacy note:** Historical extractions landed in `src/lib/`; new work should **not** extend that pattern. Cross-cutting only: observability, Query client ref, feature flags, generic hooks in `src/lib/` or `src/app/hooks/`.
@@ -63,11 +63,11 @@ This aligns with **navigating-the-codebase §6.1**: not every concern needs `use
 
 **Why:** Isolates **side effects and serialization** from UI and from the main hook loop, so bugs are easier to localize (storage vs orchestrate vs render).
 
-### 4. **Defer “split `use-holzen` into three hooks” until the API is painful**
+### 4. **Further `useHolzen` hook splits only when the API is painful**
 
-**What:** The backlog **does not** require splitting `useHolzen()` into `useBtc`, `useReflection`, etc. immediately.
+**What:** The **`useHolzen` producer split shipped (2026-04):** `use-holzen-home-context-state.ts`, `use-holzen-manual-trigger-orchestration.ts`, and `use-manual-pause-trigger.ts` under `features/pause/presentation/`, exported as **`useHolzen()`** from **`HolzenProvider`**. The backlog **does not** require splitting into `useBtc`, `useReflection`, etc. immediately.
 
-**Why:** Child hooks that share lots of **tightly coupled state** often trade one large file for **prop drilling or context churn**. Clear **lib** boundaries give most of the benefit first; a future hook split can follow **real** caller needs (e.g. two routes needing only BTC).
+**Why:** Child hooks that share lots of **tightly coupled state** often trade one large file for **prop drilling or context churn**. Clear **domain/use-case** boundaries give most of the benefit first; a future hook split can follow **real** caller needs (e.g. two routes needing only BTC).
 
 ---
 
