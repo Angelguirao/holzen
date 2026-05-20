@@ -9,7 +9,7 @@ import { useProGate } from '@/features/subscription/public-hooks';
 import { useCompanionSection, useCompanionSectionExpansion } from '@/features/pause/public-hooks';
 import type { CompanionData, CompanionPrefs } from '@/features/pause/public';
 import { CompanionCard } from '@/screens/pause/components/companion/companion-card';
-import { CompanionOrchestratedSlotChrome } from '@/screens/pause/components/companion/companion-orchestrated-slot-chrome';
+import { CompanionOrchestratedCard } from '@/screens/pause/components/companion/companion-orchestrated-card';
 import { COMPANION_SECTION_ICONS } from '@/screens/pause/components/companion/companion-section-icons';
 
 interface Props {
@@ -129,139 +129,111 @@ export const CompanionSection = forwardRef<HTMLDivElement, Props>(function Compa
       ) : null}
 
       {hasSignal ? (
-        <CompanionCard
+        <CompanionOrchestratedCard
           id="signal"
           label={labels.signal}
           icon={COMPANION_SECTION_ICONS.signal}
           expanded={expandedSignal}
-          onToggle={() => {
-            toggleSignal();
-            if (!completion.signal) markCompleted('signal');
-          }}
+          onToggleExpand={toggleSignal}
           completed={completion.signal}
+          onFirstExpandComplete={() => markCompleted('signal')}
           loading={signalLoading}
+          pauseInstanceId={pauseInstanceId}
+          hasContent={Boolean(signal)}
+          relaxationKey={cacheRelaxations.signal}
+          companionType="signal"
+          cacheId={cacheIds.signal}
+          regenerateSlot="signal"
+          onRegenerate={() => regenerateCompanion('signal')}
+          routeSegment="signal"
           {...proFavorite('signal')}
         >
-          <CompanionOrchestratedSlotChrome
-            pauseInstanceId={pauseInstanceId}
-            hasContent={Boolean(signal)}
-            loading={signalLoading}
-            relaxationKey={cacheRelaxations.signal}
-            companionType="signal"
-            cacheId={cacheIds.signal}
-            regenerateSlot="signal"
-            onRegenerate={() => regenerateCompanion('signal')}
-            regenerating={signalLoading}
-            routeSegment="signal"
-          >
-            <SignalDisplay signal={signal} loading={signalLoading} error={signalError} onRetry={retrySignal} />
-          </CompanionOrchestratedSlotChrome>
-        </CompanionCard>
+          <SignalDisplay signal={signal} loading={signalLoading} error={signalError} onRetry={retrySignal} />
+        </CompanionOrchestratedCard>
       ) : null}
 
       {hasGrounding ? (
-        <CompanionCard
+        <CompanionOrchestratedCard
           id="grounding"
           label={labels.ground}
           icon={COMPANION_SECTION_ICONS.grounding}
           expanded={expandedLearning}
-          onToggle={() => {
-            toggleGrounding();
-            if (!completion.grounding) markCompleted('grounding');
-          }}
+          onToggleExpand={toggleGrounding}
           completed={completion.grounding}
+          onFirstExpandComplete={() => markCompleted('grounding')}
           loading={nudgeLoading}
+          pauseInstanceId={pauseInstanceId}
+          hasContent={Boolean(nudge)}
+          relaxationKey={cacheRelaxations.nudge}
+          companionType="grounding"
+          cacheId={cacheIds.nudge}
+          regenerateSlot="grounding"
+          onRegenerate={() => regenerateCompanion('grounding')}
+          routeSegment="grounding"
           {...proFavorite('grounding')}
         >
-          <CompanionOrchestratedSlotChrome
-            pauseInstanceId={pauseInstanceId}
-            hasContent={Boolean(nudge)}
-            loading={nudgeLoading}
-            relaxationKey={cacheRelaxations.nudge}
-            companionType="grounding"
-            cacheId={cacheIds.nudge}
-            regenerateSlot="grounding"
-            onRegenerate={() => regenerateCompanion('grounding')}
-            regenerating={nudgeLoading}
-            routeSegment="grounding"
-          >
-            <LearningInput
-              title={companions.groundingTitle ?? ''}
-              body={companions.groundingBody ?? ''}
-              nudge={nudge}
-              nudgeLoading={nudgeLoading}
-              nudgeError={nudgeError}
-              onRetry={retryNudge}
-            />
-          </CompanionOrchestratedSlotChrome>
-        </CompanionCard>
+          <LearningInput
+            title={companions.groundingTitle ?? ''}
+            body={companions.groundingBody ?? ''}
+            nudge={nudge}
+            nudgeLoading={nudgeLoading}
+            nudgeError={nudgeError}
+            onRetry={retryNudge}
+          />
+        </CompanionOrchestratedCard>
       ) : null}
 
       {hasZoomOut ? (
-        <CompanionCard
+        <CompanionOrchestratedCard
           id="zoomOut"
           label={labels.zoomOut}
           icon={COMPANION_SECTION_ICONS.zoomOut}
           expanded={expandedZoomOut}
-          onToggle={() => {
-            toggleZoomOut();
-            if (!completion.zoomOut) markCompleted('zoomOut');
-          }}
+          onToggleExpand={toggleZoomOut}
           completed={completion.zoomOut}
+          onFirstExpandComplete={() => markCompleted('zoomOut')}
           loading={zoomOutLoading}
+          pauseInstanceId={pauseInstanceId}
+          hasContent={Boolean(zoomOut)}
+          relaxationKey={cacheRelaxations.zoomOut}
+          companionType="zoom_out"
+          cacheId={cacheIds.zoomOut}
+          regenerateSlot="zoomOut"
+          onRegenerate={() => regenerateCompanion('zoomOut')}
+          routeSegment="zoom-out"
           {...proFavorite('zoom_out')}
         >
-          <CompanionOrchestratedSlotChrome
-            pauseInstanceId={pauseInstanceId}
-            hasContent={Boolean(zoomOut)}
-            loading={zoomOutLoading}
-            relaxationKey={cacheRelaxations.zoomOut}
-            companionType="zoom_out"
-            cacheId={cacheIds.zoomOut}
-            regenerateSlot="zoomOut"
-            onRegenerate={() => regenerateCompanion('zoomOut')}
-            regenerating={zoomOutLoading}
-            routeSegment="zoom-out"
-          >
-            <ZoomOutDisplay data={zoomOut} loading={zoomOutLoading} error={zoomOutError} onRetry={retryZoomOut} />
-          </CompanionOrchestratedSlotChrome>
-        </CompanionCard>
+          <ZoomOutDisplay data={zoomOut} loading={zoomOutLoading} error={zoomOutError} onRetry={retryZoomOut} />
+        </CompanionOrchestratedCard>
       ) : null}
 
       {hasHistory ? (
-        <CompanionCard
+        <CompanionOrchestratedCard
           id="history"
           label={labels.lookBack}
           icon={COMPANION_SECTION_ICONS.history}
           expanded={expandedHistory}
-          onToggle={() => {
-            toggleHistory();
-            if (!completion.history) markCompleted('history');
-          }}
+          onToggleExpand={toggleHistory}
           completed={completion.history}
+          onFirstExpandComplete={() => markCompleted('history')}
           loading={historyLoading}
+          pauseInstanceId={pauseInstanceId}
+          hasContent={Boolean(historyInsight)}
+          relaxationKey={cacheRelaxations.history}
+          companionType="history_insight"
+          cacheId={cacheIds.history}
+          regenerateSlot="history"
+          onRegenerate={() => regenerateCompanion('history')}
+          routeSegment="history"
           {...proFavorite('history_insight')}
         >
-          <CompanionOrchestratedSlotChrome
-            pauseInstanceId={pauseInstanceId}
-            hasContent={Boolean(historyInsight)}
+          <HistoricalInsightDisplay
+            data={historyInsight}
             loading={historyLoading}
-            relaxationKey={cacheRelaxations.history}
-            companionType="history_insight"
-            cacheId={cacheIds.history}
-            regenerateSlot="history"
-            onRegenerate={() => regenerateCompanion('history')}
-            regenerating={historyLoading}
-            routeSegment="history"
-          >
-            <HistoricalInsightDisplay
-              data={historyInsight}
-              loading={historyLoading}
-              error={historyError}
-              onRetry={retryHistory}
-            />
-          </CompanionOrchestratedSlotChrome>
-        </CompanionCard>
+            error={historyError}
+            onRetry={retryHistory}
+          />
+        </CompanionOrchestratedCard>
       ) : null}
     </div>
   );
