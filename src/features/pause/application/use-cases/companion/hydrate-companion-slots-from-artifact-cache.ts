@@ -5,7 +5,7 @@ import type { CompanionSlotCommitters } from '@/features/pause/application/use-c
 import {
   toZoomOutDisplayData,
   zoomOutLibraryAutosaveFromDisplayData,
-} from '@/features/pause/application/use-cases/companion/zoom-out-payload';
+} from '@/features/pause/application/use-cases/ritual/frame/zoom-out-payload';
 
 export interface HydrateCompanionSlotsFromArtifactCacheInput {
   cached: ParsedPauseArtifactCache;

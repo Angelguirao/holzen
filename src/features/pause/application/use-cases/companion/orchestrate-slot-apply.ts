@@ -7,7 +7,10 @@ import type {
   CompanionOrchestrateSlotResult,
   RegenerateCompanionSlot,
 } from '@/features/pause/domain/companion-orchestrate';
-import { toZoomOutDisplayData, zoomOutLibraryAutosaveFromDisplayData } from './zoom-out-payload';
+import {
+  toZoomOutDisplayData,
+  zoomOutLibraryAutosaveFromDisplayData,
+} from '@/features/pause/application/use-cases/ritual/frame/zoom-out-payload';
 
 /** Legacy hook name: companion slots no longer mirror rows into a bookmark table. */
 export type CompanionSlotAutosaveParams = {

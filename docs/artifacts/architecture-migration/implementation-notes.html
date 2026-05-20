@@ -303,6 +303,25 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-20</span>
+      <span>Phase A slice — frame leaf: zoom-out-payload</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3><code>zoom-out-payload</code> → <code>ritual/frame/</code></h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Reflect → <code>ritual/reflect/</code> is complete (backlog #1). Continue companion leaf-first with pure Zoom Out wire/cache coercion helpers (module + test; imports only from <code>public</code> types — no remaining <code>companion/</code> deps).</dd>
+      <dt>Deviation</dt>
+      <dd>None — matches spec §3.1 / §10.1.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Could batch with <code>artifact-cache-parse</code>; kept one leaf for minimal review after breathing-ui-complete cluster.</dd>
+      <dt>Open questions</dt>
+      <dd>Next slice: <code>artifact-cache-parse</code> cluster, <code>log-pause-companion</code> + <code>persist-ui-step-completion</code>, or <code>full-view-page-helpers</code> + <code>next-expanded-with-lazy-fetch</code>.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
 </body>
 </html>
