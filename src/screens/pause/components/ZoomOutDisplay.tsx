@@ -5,7 +5,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { TrendingUp, TrendingDown, Clock, Globe, CloudOff, PenLine, ChevronDown, ChevronUp } from 'lucide-react';
 import { CompanionError } from './CompanionError';
 import { format } from 'date-fns';
-import { useHolzen } from '@/screens/home/hooks/use-holzen';
+import { useHolzen } from '@/app/components/HolzenProvider';
 import { formatBtcPrice } from '@/features/market/public';
 import { useSubscription } from '@/features/subscription/public-hooks';
 import { toast } from 'sonner';

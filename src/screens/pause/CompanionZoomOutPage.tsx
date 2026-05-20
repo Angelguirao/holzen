@@ -1,7 +1,7 @@
 import { useCallback, useEffect } from 'react';
 import { useNavigate, useParams, useLocation, Navigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { useHolzen } from '@/screens/home/hooks/use-holzen';
+import { useHolzen } from '@/app/components/HolzenProvider';
 import { useCompanionData } from '@/features/pause/public-hooks';
 import {
   useFullviewTelemetry,

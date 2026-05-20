@@ -3,7 +3,7 @@ import { useState, useEffect, useCallback, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useAuth } from '@/features/auth/public';
-import { useHolzen } from '@/screens/home/hooks/use-holzen';
+import { useHolzen } from '@/app/components/HolzenProvider';
 import {
   clearProfileHoldGoal,
   getProfileRowQueryOptions,

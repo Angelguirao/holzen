@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { Pencil, Sparkles } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { Skeleton } from '@/components/ui/skeleton';
-import { useHolzen } from '@/screens/home/hooks/use-holzen';
+import { useHolzen } from '@/app/components/HolzenProvider';
 import { useCompletedPauseCount } from '@/features/pause/public-hooks';
 import { settingsSectionPath, TOOLS } from '@/lib/app-routes';
 import { groundingActivityLabel } from '@/legacy/full-shell/src/lib/grounding-activity-label';

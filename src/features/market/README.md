@@ -3,7 +3,7 @@
 **Product context:** BTC price, volatility thresholds, fear/greed, and pause trigger context on Home.  
 **Layout:** [frontend-module-layout.md](../../../docs/fundamentals/frontend-module-layout.md) §3
 
-Home orchestration stays in `screens/home/hooks/use-holzen.ts`; this module owns market **domain rules**, fetch/query adapters, and the public API other features may import.
+Home orchestration mounts via `app/components/HolzenProvider` (`useHolzenHomeContextState` in pause presentation); this module owns market **domain rules**, fetch/query adapters, and the public API other features may import.
 
 ## Folder map
 
