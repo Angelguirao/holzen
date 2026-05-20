@@ -118,3 +118,10 @@ export { usePauseSessionMoodChromeHandlers } from './presentation/use-pause-sess
 export { usePauseSessionBreathReflectHandlers } from './presentation/use-pause-session-breath-reflect-handlers';
 export { usePauseSessionEntryPresentationEffects } from './presentation/use-pause-session-entry-presentation-effects';
 export { usePauseSessionTerminalEntryRedirect } from './presentation/use-pause-session-terminal-entry-redirect';
+export { usePauseSessionStepTransition } from './presentation/use-pause-session-step-transition';
+export { usePauseSessionDepthAndBriefCopy } from './presentation/use-pause-session-depth-and-brief-copy';
+export {
+  usePauseSessionScaffoldRitual,
+  type UsePauseSessionScaffoldRitualParams,
+  type PauseSessionScaffoldRitualDerivedParams,
+} from './presentation/use-pause-session-scaffold-ritual';
