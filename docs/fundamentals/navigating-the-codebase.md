@@ -175,7 +175,7 @@ Each folder under **`supabase/functions/<name>/`** is a deployable function. Sha
 
 | Function | Call sites (representative) |
 |----------|-----------------------------|
-| `holzen-reflect` | `features/pause/presentation/use-pause-reflect-generation.ts` → `features/pause/infrastructure/reflect/reflection-artifact.ts` (`invokeEdge`) |
+| `holzen-reflect` | `features/pause/presentation/use-pause-reflect-generation.ts` → `features/pause/infrastructure/edge/reflect/reflection-artifact.ts` (`invokeEdge`) |
 | `companion-orchestrate` | `features/pause/presentation/use-companion-data.ts` |
 | `suggest-grounding` | **Legacy full IA** — `src/legacy/full-shell/src/pages/Ground.tsx` (route **404** pause-first) |
 | `journal-prompt` | **Legacy full IA** — `src/legacy/full-shell/src/components/practice/GuidedJournal.tsx` |

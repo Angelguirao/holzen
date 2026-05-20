@@ -289,6 +289,7 @@ The repo is mid-migration. Expect:
 | Done / post-pause | `session/post-pause-emotion-log.ts` | `ritual/done/` | Optional later |
 | Session conductors | `presentation/*.ts` (flat + `presentation/session/`) | `presentation/session/`, `companion/`, `home/`, `archive/` | Peel incrementally |
 | Archive queries | `infrastructure/queries/archive/` (`archive-list-query.ts`, `archive-pauses-tab-query.ts`) | `infrastructure/queries/archive/` | Done (May 2026) |
+| Reflect edge + artifact I/O | `infrastructure/edge/reflect/` (`reflection-artifact`, `load-reflect-recency-hints`, `reflection-step-session-storage`) | under `infrastructure/edge/` (§3) | Done (May 2026) |
 | Ports | `ports/pause-repository.ts` only | + ReflectGenerator, CompanionOrchestrator, … | Wire per slice |
 
 Do not big-bang rename folders; one vertical slice per commit ([refactoring-strategy.md](../fundamentals/refactoring-strategy.md)).

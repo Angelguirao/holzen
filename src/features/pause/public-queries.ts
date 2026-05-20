@@ -229,7 +229,7 @@ export {
   generateReflectionAtReflectStep,
   persistReflectionArtifacts,
   type PersistReflectionArtifactsParams,
-} from './infrastructure/reflect/reflection-artifact';
+} from './infrastructure/edge/reflect/reflection-artifact';
 export {
   fetchOpenPauseHomePreview,
   type OpenPauseHomePreview,
@@ -258,7 +258,7 @@ export {
   loadReflectRecencyHints,
   type ReflectMoodHistoryEntry,
   type ReflectRecencyHints,
-} from './infrastructure/reflect/load-reflect-recency-hints';
+} from './infrastructure/edge/reflect/load-reflect-recency-hints';
 export {
   fetchSettingsDataExportBundle,
   type SettingsDataExportBundle,
