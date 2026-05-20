@@ -9,7 +9,7 @@ export type {
 } from './infrastructure/pause-rpc-client';
 export type { OpenManualPauseFromHomeResult } from './application/use-cases/trigger/open-manual-pause-from-home';
 
-export { ritualDepthUpgradedPayload } from './application/use-cases/session/ritual-depth-upgrade';
+export { ritualDepthUpgradedPayload } from './application/use-cases/ritual/brief/ritual-depth-upgrade';
 export { supabasePauseRepository } from './infrastructure/supabase-pause-repository';
 export {
   createCompanionSlotOrchestratePorts,
@@ -24,7 +24,7 @@ export {
 export { invokeHolzenReflect, type HolzenReflectResponse } from './infrastructure/edge/reflect/holzen-reflect-edge';
 
 import { logRetrospectiveOutcome as logRetrospectiveOutcomeUseCase } from './application/use-cases/archive/log-retrospective-outcome';
-import { logPauseRitualDepthUpgraded as logPauseRitualDepthUpgradedUseCase } from './application/use-cases/session/ritual-depth-upgrade';
+import { logPauseRitualDepthUpgraded as logPauseRitualDepthUpgradedUseCase } from './application/use-cases/ritual/brief/ritual-depth-upgrade';
 import {
   applyBulkHoldOutcomes as applyBulkHoldOutcomesUseCase,
   type BulkHoldApplyResult,
