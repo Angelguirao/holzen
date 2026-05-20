@@ -10,7 +10,7 @@ import type { PauseSessionShellHolzen } from '@/features/pause/domain/pause-sess
 import { usePauseSessionMountLog } from './use-pause-session-mount-log';
 import { usePauseSessionPendingLeaveSheet } from '../use-pause-session-pending-leave-sheet';
 import { usePauseSessionPendingPauseOfferNavigation } from './use-pause-session-pending-pause-offer-navigation';
-import { usePauseSessionShell } from '../use-pause-session-shell';
+import { usePauseSessionShell } from './use-pause-session-shell';
 import { usePendingPauseOffer } from '../use-pending-pause-offer';
 
 export type UsePauseSessionShellBootstrapParams = {
