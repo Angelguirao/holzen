@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { buildPauseSessionMountLogParams } from '@/features/pause/public';
+import { buildPauseSessionMountLogParams } from './mount-log-params';
 import { makeTestPersistedPauseSession } from '@/test/fixtures/make-test-persisted-pause-session';
 import { type PersistedSession } from '@/features/pause/public';
 

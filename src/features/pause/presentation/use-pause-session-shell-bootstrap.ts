@@ -1,11 +1,11 @@
 import { useLocation, type NavigateFunction } from 'react-router-dom';
 import type { TFunction } from 'i18next';
 import {
-  buildPauseSessionMountLogParams,
   coalescePauseSessionShellViewModel,
   isPauseSessionWaitingForInstanceFetch,
   parsePauseSessionLocationState,
 } from '@/features/pause/public';
+import { buildPauseSessionMountLogParams } from '@/features/pause/application/use-cases/session/mount-log-params';
 import type { PauseSessionShellHolzen } from '@/features/pause/public';
 import { usePauseSessionMountLog } from './use-pause-session-mount-log';
 import { usePauseSessionPendingLeaveSheet } from './use-pause-session-pending-leave-sheet';

@@ -13,6 +13,15 @@ export {
   type PauseSessionSwipeDirection,
 } from './application/use-cases/session/step-transition';
 export {
+  buildPauseSessionMountLogParams,
+  type PauseSessionMountLogParams,
+} from './application/use-cases/session/mount-log-params';
+export {
+  buildPauseSessionPersistSnapshot,
+  type PauseSessionPersistSnapshotInput,
+} from './application/use-cases/session/persist-snapshot';
+export { computePauseGoBackPlan } from './application/use-cases/session/go-back-plan';
+export {
   BRIEF_INTEGRATE_RING_CIRC,
   BRIEF_INTEGRATE_RING_R,
   BRIEF_INTEGRATE_SECONDS,

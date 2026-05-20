@@ -4,7 +4,7 @@ import { hasPersistablePauseSessionAnchor } from '@/features/pause/public';
 import {
   buildPauseSessionPersistSnapshot,
   type PauseSessionPersistSnapshotInput,
-} from '@/features/pause/public';
+} from '@/features/pause/application/use-cases/session/persist-snapshot';
 
 /** Autosave ritual fields to `holzen_pause_session` when we have an instance id and/or reflection copy. */
 export function usePauseSessionPersistToStorage(p: PauseSessionPersistSnapshotInput): void {

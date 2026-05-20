@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { computePauseGoBackPlan } from '@/features/pause/public';
+import { computePauseGoBackPlan } from './go-back-plan';
 
 describe('computePauseGoBackPlan', () => {
   it('brief: none on first macro step', () => {

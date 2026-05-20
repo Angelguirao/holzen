@@ -121,15 +121,6 @@ export type {
   PauseSessionStepShellBundleInput,
   PauseSessionStepShellChromeInput,
 } from './application/use-cases/session/step-bundle-types';
-export {
-  buildPauseSessionMountLogParams,
-  type PauseSessionMountLogParams,
-} from './application/use-cases/session/mount-log-params';
-export {
-  buildPauseSessionPersistSnapshot,
-  type PauseSessionPersistSnapshotInput,
-} from './application/use-cases/session/persist-snapshot';
-export { computePauseGoBackPlan } from './application/use-cases/session/go-back-plan';
 export { pauseStepSwipeDirection } from './application/use-cases/session/step-swipe-direction';
 export {
   buildPostPauseEmotionLoggedPayload,
