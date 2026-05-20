@@ -16,9 +16,9 @@ import type {
 
 /**
  * Cross-route providers for `/pause`: i18n, subscription gates, exit nav, and injected Holzen snapshot.
- * Holzen context is read in screens (`useHolzen`) and passed as `holzen` to avoid features → screens imports.
+ * Route entry uses `usePauseSessionProviders` from `use-pause-session-providers-conductor.ts` (reads Holzen in presentation).
  */
-export function usePauseSessionProviders(
+export function usePauseSessionProvidersFromHolzenSlice(
   holzen: PauseSessionHolzenProvidersSlice,
 ): PauseSessionProviders {
   const { t } = useTranslation();
