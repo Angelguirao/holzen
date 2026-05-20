@@ -1,8 +1,11 @@
 import { useState, useCallback } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { Check, X, Loader2, RefreshCw } from 'lucide-react';
-import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/components/ui/use-toast';
+import {
+  approveSignalSourceSuggestion,
+  rejectSignalSourceSuggestion,
+} from '@/features/user/public-queries';
 import {
   ADMIN_PENDING_SOURCE_SUGGESTIONS_QUERY_KEY,
   fetchPendingSourceSuggestionsRows,
@@ -47,26 +50,20 @@ export function SourceSuggestionsPanel({ onCatalogChanged }: { onCatalogChanged?
 
   const approve = async (row: SourceSuggestionRow) => {
     setActing(row.id);
-    const url = row.suggested_url?.trim() || null;
-    const { error: insErr } = await supabase.from('signal_sources').insert({
-      name: row.suggested_name.trim(),
-      url,
-      type: row.suggested_type || 'blog',
+    const result = await approveSignalSourceSuggestion({
+      suggestionId: row.id,
+      suggested_name: row.suggested_name,
+      suggested_url: row.suggested_url,
+      suggested_type: row.suggested_type,
       category: row.category,
-      demoted_for_live: false,
     });
-    if (insErr) {
-      toast({ title: 'Add to catalog failed', description: insErr.message, variant: 'destructive' });
-      setActing(null);
-      return;
-    }
-    const { error: upErr } = await supabase
-      .from('signal_source_suggestions')
-      .update({ status: 'approved', reviewed_at: new Date().toISOString() })
-      .eq('id', row.id);
     setActing(null);
-    if (upErr) {
-      toast({ title: 'Marked approved failed', description: upErr.message, variant: 'destructive' });
+    if (!result.ok) {
+      toast({
+        title: result.failedStep === 'insert' ? 'Add to catalog failed' : 'Marked approved failed',
+        description: result.errorMessage,
+        variant: 'destructive',
+      });
       return;
     }
     toast({ title: 'Added to catalog', description: row.suggested_name });
@@ -76,13 +73,10 @@ export function SourceSuggestionsPanel({ onCatalogChanged }: { onCatalogChanged?
 
   const reject = async (row: SourceSuggestionRow) => {
     setActing(row.id);
-    const { error } = await supabase
-      .from('signal_source_suggestions')
-      .update({ status: 'rejected', reviewed_at: new Date().toISOString() })
-      .eq('id', row.id);
+    const { ok, errorMessage } = await rejectSignalSourceSuggestion(row.id);
     setActing(null);
-    if (error) {
-      toast({ title: 'Reject failed', description: error.message, variant: 'destructive' });
+    if (!ok) {
+      toast({ title: 'Reject failed', description: errorMessage ?? 'Unknown error', variant: 'destructive' });
       return;
     }
     await bumpSuggestions();

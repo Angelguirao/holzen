@@ -52,6 +52,15 @@ export {
   type CatalogSource,
 } from './infrastructure/queries/signal-sources-catalog-query';
 export {
+  approveSignalSourceSuggestion,
+  insertAdminSignalSource,
+  rejectSignalSourceSuggestion,
+  setSignalSourceDemotedForLive,
+  type ApproveSignalSourceSuggestionInput,
+  type ApproveSignalSourceSuggestionResult,
+  type SignalSourceAdminMutationResult,
+} from './infrastructure/queries/signal-sources-admin-mutations';
+export {
   getThresholdVolatilityEstimatorQueryOptions,
   thresholdVolatilityEstimatorQueryKey,
 } from './infrastructure/queries/threshold-volatility-estimator-query';
