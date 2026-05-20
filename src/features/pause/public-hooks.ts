@@ -31,6 +31,7 @@ export {
   type PauseDismissAnalyticsSurface,
 } from './presentation/use-home-pause-actions';
 export { usePauseContextHomePreviews } from './presentation/use-pause-context-home-previews';
+export { useHolzenHomeContextState } from './presentation/use-holzen-home-context-state';
 export {
   usePauseReflectGeneration,
   type UsePauseReflectGenerationParams,

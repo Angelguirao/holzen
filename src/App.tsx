@@ -8,7 +8,7 @@ import { setHolzenQueryClient } from "@/lib/holzen-query-client-ref";
 import { BrowserRouter, Routes, Route, Navigate, Outlet, useLocation } from "react-router-dom";
 import { reactRouterFutureFlags } from "@/lib/router-future";
 import { AuthProvider, useAuth } from "@/features/auth/public";
-import { HolzenProvider } from "@/screens/home/hooks/use-holzen";
+import { HolzenProvider } from "@/app/components/HolzenProvider";
 import { isAppShellPath } from "@/lib/app-routes";
 import { holzenLog } from "@/lib/holzen-console";
 import { attachHolzenQueryLogging } from "@/lib/holzen-query-logging";
