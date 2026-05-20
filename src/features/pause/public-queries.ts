@@ -21,6 +21,13 @@ export {
   libraryBundleQueryPrefix,
   sortMemberPauses,
 } from './infrastructure/queries/library-bundle-query';
+export {
+  deleteLibraryCollection,
+  insertLibraryCollection,
+  insertLibraryCollectionItem,
+  removeLibraryCollectionItem,
+  updateLibraryCollection,
+} from './infrastructure/queries/library-collections-mutations';
 export type {
   Collection,
   CollectionItem,
