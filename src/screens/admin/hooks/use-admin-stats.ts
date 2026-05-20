@@ -20,25 +20,25 @@ import {
   type SessionRow,
   type SignalSourceRow,
   type TimePeriod,
-} from '@/screens/admin/lib/admin-stats-bundle-query';
+} from '@/features/pause/public-queries';
 
 export type {
+  AdminStatsBundle,
   CacheEntryRow,
-  SignalSourceRow,
-  DailyServeRow,
   DailyFailureRow,
   DailyFeedbackRow,
   DailyNotificationRow,
-  RejectionRow,
-  RecentContentRow,
-  SessionRow,
+  DailyServeRow,
   LibraryEntryRow,
-  AdminStatsBundle,
-} from '@/screens/admin/lib/admin-stats-bundle-query';
+  RecentContentRow,
+  RejectionRow,
+  SessionRow,
+  SignalSourceRow,
+} from '@/features/pause/public-queries';
 
-export { ADMIN_STATS_QUERY_KEY } from '@/screens/admin/lib/admin-stats-bundle-query';
+export { ADMIN_STATS_QUERY_KEY } from '@/features/pause/public-queries';
 
-export type { TimePeriod } from '@/screens/admin/lib/admin-stats-bundle-query';
+export type { TimePeriod } from '@/features/pause/public-queries';
 
 export interface PeriodStats {
   serves: number;

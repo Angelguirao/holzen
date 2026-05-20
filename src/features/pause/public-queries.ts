@@ -139,6 +139,26 @@ export {
   type MrrSnapshot,
 } from './infrastructure/queries/cost-analytics-admin-query';
 export {
+  ADMIN_STATS_QUERY_KEY,
+  fetchAdminStatsBundle,
+  getAdminStatsBundleQueryOptions,
+  type AdminStatsBundle,
+  type CacheEntryRow,
+  type CacheHitRow,
+  type CostRow,
+  type DailyFeedbackRow,
+  type DailyFailureRow,
+  type DailyNotificationRow,
+  type DailyServeRow,
+  type FailureRow,
+  type FeedbackRow,
+  type LibraryEntryRow,
+  type RecentContentRow,
+  type RejectionRow,
+  type SessionRow,
+  type SignalSourceRow,
+} from './infrastructure/queries/stats-bundle-admin-query';
+export {
   BULK_HOLD_PENDING_DISABLED_USER_ID,
   BULK_HOLD_PENDING_QUERY_LEAF,
   BULK_HOLD_PENDING_QUERY_PREFIX,

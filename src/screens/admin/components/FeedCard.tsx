@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { ChevronDown, ChevronRight } from 'lucide-react';
-import type { RecentContentRow } from '@/screens/admin/lib/admin-stats-bundle-query';
+import type { RecentContentRow } from '@/features/pause/public-queries';
 import { Checkbox } from '@/components/ui/checkbox';
 import { TYPE_COLORS, label } from './admin-constants';
 import { QualityBadge } from './QualityBadge';
