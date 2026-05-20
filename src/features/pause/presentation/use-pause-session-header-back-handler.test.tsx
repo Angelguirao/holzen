@@ -1,8 +1,8 @@
 import { describe, expect, it, vi } from 'vitest';
 import { renderHook, act } from '@testing-library/react';
 import type { MutableRefObject } from 'react';
-import { usePauseSessionHeaderBackHandler } from '@/screens/pause/hooks/use-pause-session-header-back-handler';
-import type { PauseBreathingHandle } from '@/screens/pause/components/PauseBreathing';
+import type { PauseBreathingHandle } from '@/features/pause/public';
+import { usePauseSessionHeaderBackHandler } from './use-pause-session-header-back-handler';
 
 function baseInput(
   overrides: Partial<Parameters<typeof usePauseSessionHeaderBackHandler>[0]> = {},

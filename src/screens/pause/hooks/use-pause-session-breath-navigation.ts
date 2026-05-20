@@ -6,9 +6,11 @@ import {
   type RitualDepth,
 } from '@/features/pause/public';
 import { usePauseSessionBreathUi } from '@/screens/pause/hooks/use-pause-session-breath-ui';
-import { usePauseSessionGoBack } from '@/screens/pause/hooks/use-pause-session-go-back';
-import { usePauseSessionGoToStep } from '@/screens/pause/hooks/use-pause-session-go-to-step';
-import { usePauseSessionHeaderBackHandler } from '@/screens/pause/hooks/use-pause-session-header-back-handler';
+import {
+  usePauseSessionGoBack,
+  usePauseSessionGoToStep,
+  usePauseSessionHeaderBackHandler,
+} from '@/features/pause/public-hooks';
 
 export type UsePauseSessionBreathNavigationParams = {
   phase: 'session' | 'done';

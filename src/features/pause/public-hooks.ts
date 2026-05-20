@@ -75,3 +75,6 @@ export { usePauseReflectFrameFocusAmbience } from './presentation/use-pause-refl
 export { usePauseFeelShiftLogDedupeRefs } from './presentation/use-pause-feel-shift-log-dedupe-refs';
 export { usePauseBreathSegmentRpcLoggers } from './presentation/use-pause-breath-segment-rpc-loggers';
 export { usePauseSessionMountLog } from './presentation/use-pause-session-mount-log';
+export { usePauseSessionGoBack } from './presentation/use-pause-session-go-back';
+export { usePauseSessionGoToStep } from './presentation/use-pause-session-go-to-step';
+export { usePauseSessionHeaderBackHandler } from './presentation/use-pause-session-header-back-handler';

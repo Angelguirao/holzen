@@ -1,6 +1,6 @@
 import { describe, expect, it, vi, beforeEach } from 'vitest';
 import { renderHook, act } from '@testing-library/react';
-import { usePauseSessionGoBack } from '@/screens/pause/hooks/use-pause-session-go-back';
+import { usePauseSessionGoBack } from './use-pause-session-go-back';
 
 vi.mock('@/lib/haptics', () => ({
   hapticFeedback: vi.fn(),
