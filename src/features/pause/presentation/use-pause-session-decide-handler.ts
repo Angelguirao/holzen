@@ -2,9 +2,12 @@ import { useCallback, type Dispatch, type MutableRefObject, type SetStateAction 
 import type { TFunction } from 'i18next';
 import { hapticFeedback } from '@/lib/haptics';
 import { useAuth } from '@/features/auth/public';
+import {
+  formatReinforcementQuoteFromSession,
+  resolvePauseDecideOutcomeFlow,
+} from '@/features/pause/application/use-cases/session/pause-decide-outcome-flow';
 import { logPauseOutcomeStep } from '@/features/pause/public-rpc';
 import {
-  buildPauseImpactDataOnComplete,
   clearSession,
   getSessionQuote,
   invalidatePauseStatsDataForUser,
@@ -70,27 +73,10 @@ export function usePauseSessionDecideHandler(input: {
           { logOutcome: logPauseOutcomeStep },
         );
 
-        if (outcome.status === 'sync_failed') {
-          showPauseOutcomeSaveFailedToast(t);
-          return;
-        }
-
-        if (outcome.status === 'not_completed') {
-          invalidatePauseStatsDataForUser(user?.id);
-          showPauseOutcomeNotCompletedToast(t);
-          void refreshSubscription();
-          return;
-        }
-
-        if (outcome.status === 'completed') {
-          void refreshSubscription();
-        }
-
-        setDecision(d);
-        const q = getSessionQuote();
-        setPauseImpactData(
-          buildPauseImpactDataOnComplete({
-            decision: d,
+        const flow = resolvePauseDecideOutcomeFlow({
+          outcome,
+          decision: d,
+          ritualSnapshot: {
             context,
             selectedMood,
             selectedMoodAfter,
@@ -99,11 +85,30 @@ export function usePauseSessionDecideHandler(input: {
             breathingSecondCompleted,
             feelIntensity,
             shiftIntensity,
-            reinforcementQuote: `"${q.text}" — ${q.author}`,
             reflectionMessage,
             haiku,
-          }),
-        );
+          },
+          reinforcementQuote: formatReinforcementQuoteFromSession(getSessionQuote()),
+        });
+
+        if (flow.kind === 'abort_sync_failed') {
+          showPauseOutcomeSaveFailedToast(t);
+          return;
+        }
+
+        if (flow.kind === 'abort_not_completed') {
+          invalidatePauseStatsDataForUser(user?.id);
+          showPauseOutcomeNotCompletedToast(t);
+          void refreshSubscription();
+          return;
+        }
+
+        if (flow.refreshSubscription) {
+          void refreshSubscription();
+        }
+
+        setDecision(flow.decision);
+        setPauseImpactData(flow.pauseImpactData);
         // Must commit `done` before `await dismissMessage()` — otherwise React can paint an
         // intermediate frame where the DB is already `completed` but `pauseSessionPhase` is
         // still `session`, and `usePauseSessionTerminalEntryRedirect` toasts + routes to archive.
