@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { resolveTriangleKickerDisplay } from '@/features/pause/application/use-cases/breathing/resolve-triangle-kicker-display';
+import { resolveTriangleKickerDisplay } from './resolve-triangle-kicker-display';
 
 describe('resolveTriangleKickerDisplay', () => {
   const phaseDurationsSec = [4, 4, 4] as const;
