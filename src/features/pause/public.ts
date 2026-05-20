@@ -71,14 +71,6 @@ export {
   loadSession,
   saveSession,
 } from './infrastructure/session/persisted-session-storage';
-export {
-  BOX_BREATH_PHASE_COUNT,
-  resolveBreathingCompleted,
-  resolveBreathingPhaseAdvanceOutcome,
-  type BreathingPhaseAdvanceOutcome,
-  type BreathingPhaseAdvanceResult,
-  type BreathingTimedLoopState,
-} from './application/use-cases/breathing/phase-advance';
 export { resolveBreathOrbVisualMetrics } from './application/use-cases/breathing/pause-breath-orb-metrics';
 export {
   resolveTriangleKickerDisplay,
@@ -285,10 +277,6 @@ export {
   TRIANGLE_PHASE_COUNT,
   type PauseRitualBreathingPatternMode,
 } from './application/use-cases/breathing/ritual-pattern';
-export {
-  playPauseBreathPatternCompleteCue,
-  playPauseBreathPhaseCue,
-} from './application/use-cases/breathing/ritual-audio';
 export type { CompanionFeedbackVote } from './application/use-cases/ritual/frame/log-companion-feedback-vote';
 export type {
   CompanionSlotCacheIds,

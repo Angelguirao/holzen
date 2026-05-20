@@ -1671,6 +1671,25 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-20</span>
+      <span>Phase A slice — timed-loop breath imports off public.ts (§6)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3><code>use-pause-breathing-timed-loop</code> → application breathing modules</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>reflect/</code> → <code>ritual/reflect/</code>) was already complete; brief-integrate ring helpers were peeled in the prior commit on this branch. Continue backlog #3: presentation timed-loop imports <code>phase-advance</code> + <code>ritual-audio</code> directly; drop <code>resolveBreathingCompleted</code>, <code>resolveBreathingPhaseAdvanceOutcome</code>, and <code>playPauseBreath*</code> re-exports from <code>public.ts</code>.</dd>
+      <dt>Deviation</dt>
+      <dd>None — presentation may import application use cases per pause-client-architecture §3.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Orb/kicker metrics and ritual-pattern exports remain on <code>public.ts</code> for screen/lib consumers.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: peel open-max countdown or ritual-pattern screen imports to <code>public-hooks</code>, or wire <code>persistCompanionUiStepCompletion</code> on <code>public-rpc</code> (backlog #4).</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
 </body>
 </html>
