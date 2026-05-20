@@ -1,15 +1,15 @@
 import { supabase } from '@/integrations/supabase/client';
-import { deriveBreathingUiCompleteFromPayloads } from '@/features/pause/application/use-cases/companion/breathing-ui-complete';
+import { deriveBreathingUiCompleteFromPayloads } from '@/features/pause/application/use-cases/ritual/frame/breathing-ui-complete';
 import {
   type CompanionUiCompletionStep,
   type CompanionUiCompletionState,
-} from '@/features/pause/application/use-cases/companion/companion-ui-completion-types';
+} from '@/features/pause/application/use-cases/ritual/frame/companion-ui-completion-types';
 import { persistCompanionUiStepCompletion as persistCompanionUiStepCompletionUseCase } from '@/features/pause/application/use-cases/companion/persist-ui-step-completion';
 import { invalidateCompanionUiCompletionQuery } from '@/features/pause/application/queries/companion-ui-completion-query-key';
 import { supabasePauseRepository } from '@/features/pause/infrastructure/supabase-pause-repository';
 
 export type { CompanionUiCompletionStep, CompanionUiCompletionState };
-export { EMPTY_COMPANION_UI_COMPLETION } from '@/features/pause/application/use-cases/companion/companion-ui-completion-types';
+export { EMPTY_COMPANION_UI_COMPLETION } from '@/features/pause/application/use-cases/ritual/frame/companion-ui-completion-types';
 
 export {
   companionUiCompletionQueryKey,

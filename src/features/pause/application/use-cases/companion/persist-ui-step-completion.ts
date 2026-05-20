@@ -2,7 +2,7 @@ import { logPauseCompanion } from '@/features/pause/application/use-cases/compan
 import { logPauseStep } from '@/features/pause/application/use-cases/ritual/log-pause-step';
 import type { PauseStepType } from '@/features/pause/domain/pause-state';
 import type { PauseRepository } from '@/features/pause/ports/pause-repository';
-import type { CompanionUiCompletionStep } from './companion-ui-completion-types';
+import type { CompanionUiCompletionStep } from '@/features/pause/application/use-cases/ritual/frame/companion-ui-completion-types';
 
 const STEP_TO_COMPANION_TYPE: Record<CompanionUiCompletionStep, string | null> = {
   breathing: null,
