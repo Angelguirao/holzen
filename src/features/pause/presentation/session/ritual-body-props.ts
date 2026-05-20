@@ -3,9 +3,9 @@ import type {
   BriefPauseStep,
   CompanionData,
   CompanionPrefs,
-  FeelStepTile,
   PauseStep,
 } from '@/features/pause/public';
+import type { FeelStepTile } from '../../domain/feel-step-tile';
 import type { MoodValue } from '../../domain/mood-value';
 import type { PauseSessionStepTransitionConfig } from '@/features/pause/application/use-cases/session/step-transition';
 import type { PauseBreathingHandle } from '@/features/pause/presentation/session/pause-breathing-handle';

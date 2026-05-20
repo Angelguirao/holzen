@@ -3,9 +3,9 @@ import { loadSession } from '@/features/pause/infrastructure/session/persisted-s
 import {
   computePauseStorageRitualSyncPatch,
   type BriefPauseStep,
-  type FeelStepTile,
   type RitualDepth,
 } from '@/features/pause/public';
+import type { FeelStepTile } from '@/features/pause/domain/feel-step-tile';
 
 /**
  * When `pauseInstanceId` resolves, re-align brief/deep ritual UI from `holzen_pause_session` if it still matches that instance.
