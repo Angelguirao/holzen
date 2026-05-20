@@ -2604,6 +2604,25 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-20</span>
+      <span>Phase A slice — colocate mood-and-persist in presentation/reflect/</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>Backlog #1 application layer complete; presentation reflect grouping</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd><code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code> was already complete on <code>cursor/arch-migrate-src-ca70</code>. Move deferred <code>use-pause-session-mood-and-persist</code> beside <code>use-pause-session-mood-chrome-handlers</code> under <code>presentation/reflect/</code>; <code>public-hooks</code> re-export path only.</dd>
+      <dt>Deviation</dt>
+      <dd>None — matches §3.2 / §10.1 reflect conductor grouping.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Hook still composes session-level feel/persist helpers from flat <code>presentation/</code> — acceptable until a later session peel.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: backlog #4 wire next mutation cluster through <code>PauseRepository</code>, or colocate more flat session hooks under <code>presentation/session/</code>.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
 </body>
 </html>
