@@ -114,3 +114,5 @@ export {
 export { usePauseSessionExitNavigation } from './presentation/use-pause-session-exit-navigation';
 export { usePauseSessionPendingPauseOfferNavigation } from './presentation/use-pause-session-pending-pause-offer-navigation';
 export { usePauseSessionPendingLeaveSheet } from './presentation/use-pause-session-pending-leave-sheet';
+export { usePauseSessionMoodChromeHandlers } from './presentation/use-pause-session-mood-chrome-handlers';
+export { usePauseSessionBreathReflectHandlers } from './presentation/use-pause-session-breath-reflect-handlers';

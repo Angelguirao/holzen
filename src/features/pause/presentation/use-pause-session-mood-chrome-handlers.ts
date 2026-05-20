@@ -1,16 +1,22 @@
 import { useCallback } from 'react';
-import { usePauseFavoriteToggle } from '@/features/pause/public-hooks';
-import { usePauseSessionMoodAndPersist } from '@/features/pause/public-hooks';
-import type { usePauseSessionProviders } from '@/screens/pause/hooks/use-pause-session-providers';
-import type { usePauseSessionShellRitual } from '@/screens/pause/hooks/use-pause-session-shell-ritual';
-
-type PauseSessionProviders = ReturnType<typeof usePauseSessionProviders>;
-type PauseSessionShellRitual = ReturnType<typeof usePauseSessionShellRitual>;
+import { usePauseFavoriteToggle } from './use-pause-favorite-toggle';
+import { usePauseSessionMoodAndPersist } from './use-pause-session-mood-and-persist';
+import type {
+  PauseSessionMoodChromeProvidersSlice,
+  PauseSessionMoodChromeRitualSlice,
+  PauseSessionMoodChromeShellSlice,
+} from './session/pause-session-step-handler-types';
 
 /** Mood persistence, favorite toggle, and pause chrome close for the session ritual. */
 export function usePauseSessionMoodChromeHandlers(
-  p: Pick<PauseSessionProviders, 't' | 'handleReturn' | 'subscribed' | 'requirePro'>,
-  { shell, ritual }: PauseSessionShellRitual,
+  p: PauseSessionMoodChromeProvidersSlice,
+  {
+    shell,
+    ritual,
+  }: {
+    shell: PauseSessionMoodChromeShellSlice;
+    ritual: PauseSessionMoodChromeRitualSlice;
+  },
 ) {
   const { t, handleReturn, subscribed, requirePro } = p;
   const {
