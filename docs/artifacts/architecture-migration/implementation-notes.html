@@ -1994,6 +1994,25 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-20</span>
+      <span>Phase A slice — peel archive retrospective CTA off public.ts (§6)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3><code>pauseArchiveRowAllowsRetrospectiveOutcome</code> → <code>public-hooks</code>; drop orphan library re-exports</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>reflect/</code> → <code>ritual/reflect/</code>) was already complete on <code>cursor/arch-migrate-src-ca70</code> — no reflect folder moves this session. Continue backlog #3 §6: archive retrospective CTA helper exports beside <code>PauseArchiveRow</code> on <code>public-hooks.ts</code>; <code>ArchivePauseCard</code> imports one barrel. Removed unused <code>librarySourceLabel</code> / <code>normalizeLibrary*</code> re-exports from <code>public.ts</code> (no active <code>public</code> consumers; domain modules unchanged for legacy admin).</dd>
+      <dt>Deviation</dt>
+      <dd>None — archive screens already used <code>public-hooks</code> for row types.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Did not peel <code>FeelStepTile</code> or <code>getSessionQuote</code> in the same commit.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: peel <code>FeelStepTile</code> screen types to <code>public-hooks</code>, <code>millisecondsUntilNextQuarterHour</code> for home scheduling, or optional <code>breathing/</code> → <code>ritual/breathe/</code>.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
 </body>
 </html>
