@@ -6,7 +6,7 @@ import type {
   CompanionSlotRelaxations,
 } from '@/features/pause/public';
 import { useCompanionSlotOrchestratePorts } from '@/features/pause/public-hooks';
-import { useCompanionSlotOrchestrateFailurePorts } from '@/screens/pause/hooks/use-companion-slot-orchestrate-failure-ports';
+import { useCompanionSlotOrchestrateFailurePorts } from '@/features/pause/public-hooks';
 import { useCompanionSlotRunOrchestrate } from '@/screens/pause/hooks/use-companion-slot-run-orchestrate';
 
 export interface UseCompanionSlotOrchestrateActionsParams {
