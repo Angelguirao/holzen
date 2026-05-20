@@ -87,3 +87,5 @@ export {
   usePauseSessionBriefToDeep,
   type UsePauseSessionBriefToDeepParams,
 } from './presentation/use-pause-session-brief-to-deep';
+export { usePauseSessionBreathStepHandlers } from './presentation/use-pause-session-breath-step-handlers';
+export { usePauseShiftFrameDoneHandler } from './presentation/use-pause-shift-frame-done-handler';

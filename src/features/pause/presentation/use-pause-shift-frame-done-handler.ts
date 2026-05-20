@@ -1,8 +1,11 @@
 import { useCallback, type Dispatch, type MutableRefObject, type SetStateAction } from 'react';
 import type { TFunction } from 'i18next';
-import type { PauseStep } from '@/screens/pause/components/PauseProgress';
 import { logShiftEmotionStep } from '@/features/pause/public-rpc';
-import { runShiftEmotionFrameHubDone, showPauseStepSyncFailedToast } from '@/features/pause/public';
+import {
+  runShiftEmotionFrameHubDone,
+  showPauseStepSyncFailedToast,
+  type PauseStep,
+} from '@/features/pause/public';
 
 /**
  * Frame hub “I'm done” → optional `shift_emotion_logged` RPC (deduped) then advance to second breath.
