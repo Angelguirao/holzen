@@ -14,7 +14,7 @@ export {
   reflectionPersistErrorMessage,
   PAUSE_PERSIST_ERROR_MARKER,
   REFLECTION_PERSIST_ERROR_MARKER,
-} from './application/use-cases/reflection-persist-error';
+} from './application/use-cases/ritual/reflect/reflection-persist-error';
 export { pauseArchiveRowAllowsRetrospectiveOutcome } from './application/use-cases/archive/retrospective-outcome';
 export { pauseArchiveListQueryPrefix } from './application/queries/archive-query-keys';
 export { buildOutcomeLoggedPayload } from './application/use-cases/outcome-log-payload';

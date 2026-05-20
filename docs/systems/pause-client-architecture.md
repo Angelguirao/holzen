@@ -280,7 +280,7 @@ The repo is mid-migration. Expect:
 
 | Concern | On disk today (May 2026) | Target (§3) | Phase A slice |
 |---------|--------------------------|-------------|---------------|
-| Reflect generation | `application/use-cases/ritual/reflect/` | `ritual/reflect/` | Done (May 2026) |
+| Reflect generation + persist-error helpers | `application/use-cases/ritual/reflect/` | `ritual/reflect/` | Done (May 2026) |
 | Frame / companion slots | `application/use-cases/companion/` (+ `ritual/frame/estimate-read-time`) | `ritual/frame/` | Move incrementally (started May 2026) |
 | Partial ritual beats (brief/deep/breath/log) | `application/use-cases/ritual/` (`brief/`, `deep/`, `breath/`, `log-pause-step.ts`, …) | consolidate under `ritual/*/` | Optional later |
 | Breathing / audio | `application/use-cases/breathing/`, `ritual/breath/` | `ritual/breathe/` | Optional consolidate later |
