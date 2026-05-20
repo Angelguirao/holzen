@@ -90,7 +90,7 @@ export {
 export {
   usePauseReflectGeneration,
   type UsePauseReflectGenerationParams,
-} from './presentation/use-pause-reflect-generation';
+} from './presentation/reflect/use-pause-reflect-generation';
 export {
   usePauseArtifactHaiku,
   type PauseArtifactHaikuFetchPhase,
@@ -98,12 +98,12 @@ export {
   type UsePauseArtifactHaikuResult,
 } from './presentation/use-pause-artifact-haiku';
 export { useCompanionSlotOrchestratePorts } from './presentation/use-companion-slot-orchestrate-ports';
-export { usePauseReflectionStepLog } from './presentation/use-pause-reflection-step-log';
+export { usePauseReflectionStepLog } from './presentation/reflect/use-pause-reflection-step-log';
 export {
   usePauseReflectUiTelemetry,
-} from './presentation/use-pause-reflect-ui-telemetry';
-export { usePauseReflectTags } from './presentation/use-pause-reflect-tags';
-export { usePauseReflectNote } from './presentation/use-pause-reflect-note';
+} from './presentation/reflect/use-pause-reflect-ui-telemetry';
+export { usePauseReflectTags } from './presentation/reflect/use-pause-reflect-tags';
+export { usePauseReflectNote } from './presentation/reflect/use-pause-reflect-note';
 export {
   useCompanionHistoryThread,
   type HistoryThreadRow,
@@ -170,7 +170,7 @@ export {
   type FullviewCompanion,
 } from './presentation/use-fullview-telemetry';
 export { usePauseFavoriteToggle } from './presentation/use-pause-favorite-toggle';
-export { usePauseReflectFrameFocusAmbience } from './presentation/use-pause-reflect-frame-focus-ambience';
+export { usePauseReflectFrameFocusAmbience } from './presentation/reflect/use-pause-reflect-frame-focus-ambience';
 export { usePauseFeelShiftLogDedupeRefs } from './presentation/use-pause-feel-shift-log-dedupe-refs';
 export { usePauseBreathSegmentRpcLoggers } from './presentation/use-pause-breath-segment-rpc-loggers';
 export { usePauseSessionMountLog } from './presentation/use-pause-session-mount-log';
@@ -197,7 +197,7 @@ export { usePauseSessionDecideHandler } from './presentation/use-pause-session-d
 export {
   usePauseSessionReflectAndDecide,
   type UsePauseSessionReflectAndDecideParams,
-} from './presentation/use-pause-session-reflect-and-decide';
+} from './presentation/reflect/use-pause-session-reflect-and-decide';
 export { usePauseSessionDepthPickerHandlers } from './presentation/use-pause-session-depth-picker-handlers';
 export { usePauseSessionFeelTilesSelect } from './presentation/use-pause-session-feel-tiles-select';
 export { usePauseSessionInitialMoodHandlers } from './presentation/use-pause-session-initial-mood-handlers';

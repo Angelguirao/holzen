@@ -1025,6 +1025,25 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-20</span>
+      <span>Phase A slice — reflect presentation folder</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>Reflect conductors → <code>presentation/reflect/</code></h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Application reflect use cases already live under <code>ritual/reflect/</code> (backlog #1 done). Group seven reflect presentation hooks under <code>presentation/reflect/</code> to match §3 beat ownership; screens still import via <code>public-hooks</code>.</dd>
+      <dt>Deviation</dt>
+      <dd>None — mirrors existing <code>presentation/session/</code> subfolder pattern.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Reflect note/tags hooks import <code>pauseArchiveListQueryPrefix</code> from <code>application/queries/archive-query-keys</code> instead of <code>public.ts</code> (incremental barrel peel).</dd>
+      <dt>Open questions</dt>
+      <dd>Next: <code>presentation/companion/</code> folder or wire remaining metadata logs exclusively through <code>PauseRepository.logStep</code> injection at <code>public-rpc</code> facades.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
 </body>
 </html>

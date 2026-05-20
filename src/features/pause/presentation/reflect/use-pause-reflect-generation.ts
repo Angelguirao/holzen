@@ -14,7 +14,7 @@ import { runReflectGeneration } from '@/features/pause/application/use-cases/rit
 import {
   fetchOpeningMessageForPauseInstance,
   generateReflectionAtReflectStep,
-} from '../public-queries';
+} from '../../public-queries';
 
 export type UsePauseReflectGenerationParams = {
   pauseInstanceId: string | null;

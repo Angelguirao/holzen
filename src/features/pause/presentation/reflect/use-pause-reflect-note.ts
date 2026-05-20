@@ -1,13 +1,13 @@
 import { useCallback, useEffect, useState } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useAuth } from '@/features/auth/public';
-import { pauseArchiveListQueryPrefix } from '@/features/pause/public';
+import { pauseArchiveListQueryPrefix } from '@/features/pause/application/queries/archive-query-keys';
 import { logPauseReflectNote } from '@/features/pause/public-rpc';
 import {
   getLatestPauseReflectNoteQueryOptions,
   PAUSE_REFLECT_STEP_NOTE,
   pauseReflectStepLatestQueryKey,
-} from '../public-queries';
+} from '../../public-queries';
 
 /** Reflect post-it note: hydrate from latest step event, commit on blur via `pause_log_step`. */
 export function usePauseReflectNote(pauseInstanceId: string) {

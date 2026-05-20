@@ -13,7 +13,7 @@ import {
   type RitualDepth,
 } from '@/features/pause/public';
 import { usePauseReflectGeneration } from './use-pause-reflect-generation';
-import { usePauseSessionDecideHandler } from './use-pause-session-decide-handler';
+import { usePauseSessionDecideHandler } from '../use-pause-session-decide-handler';
 
 export interface UsePauseSessionReflectAndDecideParams {
   t: TFunction;
