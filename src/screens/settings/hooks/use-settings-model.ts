@@ -8,7 +8,7 @@ import { useSubscription } from '@/features/subscription/public-hooks';
 import { useInstallPrompt } from '@/app/hooks/use-install-prompt';
 import { usePushNotifications } from '@/features/notifications/public-hooks';
 import { useLatestChangelogVersion } from '@/screens/settings/hooks/use-latest-changelog-version';
-import { trackEvent } from '@/lib/posthog';
+import { trackPaywallViewed } from '@/features/subscription/public';
 import { toast } from 'sonner';
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -78,7 +78,7 @@ export function useSettingsModel() {
   } = useSubscription();
   const startCheckoutFromSettings = useCallback(
     (target: 'pro' | 'pro_plus' | 'flex_pack_s' | 'flex_pack_m' = 'pro') => {
-      trackEvent('paywall.viewed', { source: 'settings' });
+      trackPaywallViewed('settings');
       return startCheckout(target);
     },
     [startCheckout],
