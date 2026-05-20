@@ -5,13 +5,11 @@ import { LearningInput } from './LearningInput';
 import { SignalDisplay } from './SignalDisplay';
 import { ZoomOutDisplay } from './ZoomOutDisplay';
 import { HistoricalInsightDisplay } from './HistoricalInsightDisplay';
-import { CompanionFeedback } from './CompanionFeedback';
 import { useProGate } from '@/features/subscription/public-hooks';
 import { useCompanionSection, useCompanionSectionExpansion } from '@/features/pause/public-hooks';
 import type { CompanionData, CompanionPrefs } from '@/features/pause/public';
-import { CompanionCacheRelaxationNote } from '@/screens/pause/components/companion/companion-cache-relaxation-note';
 import { CompanionCard } from '@/screens/pause/components/companion/companion-card';
-import { CompanionOpenFullViewButton } from '@/screens/pause/components/companion/companion-open-full-view-button';
+import { CompanionOrchestratedSlotChrome } from '@/screens/pause/components/companion/companion-orchestrated-slot-chrome';
 import { COMPANION_SECTION_ICONS } from '@/screens/pause/components/companion/companion-section-icons';
 
 interface Props {
@@ -144,21 +142,20 @@ export const CompanionSection = forwardRef<HTMLDivElement, Props>(function Compa
           loading={signalLoading}
           {...proFavorite('signal')}
         >
-          <SignalDisplay signal={signal} loading={signalLoading} error={signalError} onRetry={retrySignal} />
-          {signal ? <CompanionCacheRelaxationNote relaxationKey={cacheRelaxations.signal} /> : null}
-          {signal ? (
-            <CompanionFeedback
-              pauseInstanceId={pauseInstanceId}
-              companionType="signal"
-              cacheId={cacheIds.signal}
-              regenerateSlot="signal"
-              onRegenerate={() => regenerateCompanion('signal')}
-              regenerating={signalLoading}
-            />
-          ) : null}
-          {pauseInstanceId && (signal || signalLoading) ? (
-            <CompanionOpenFullViewButton pauseInstanceId={pauseInstanceId} routeSegment="signal" />
-          ) : null}
+          <CompanionOrchestratedSlotChrome
+            pauseInstanceId={pauseInstanceId}
+            hasContent={Boolean(signal)}
+            loading={signalLoading}
+            relaxationKey={cacheRelaxations.signal}
+            companionType="signal"
+            cacheId={cacheIds.signal}
+            regenerateSlot="signal"
+            onRegenerate={() => regenerateCompanion('signal')}
+            regenerating={signalLoading}
+            routeSegment="signal"
+          >
+            <SignalDisplay signal={signal} loading={signalLoading} error={signalError} onRetry={retrySignal} />
+          </CompanionOrchestratedSlotChrome>
         </CompanionCard>
       ) : null}
 
@@ -176,28 +173,27 @@ export const CompanionSection = forwardRef<HTMLDivElement, Props>(function Compa
           loading={nudgeLoading}
           {...proFavorite('grounding')}
         >
-          <LearningInput
-            title={companions.groundingTitle ?? ''}
-            body={companions.groundingBody ?? ''}
-            nudge={nudge}
-            nudgeLoading={nudgeLoading}
-            nudgeError={nudgeError}
-            onRetry={retryNudge}
-          />
-          {nudge ? <CompanionCacheRelaxationNote relaxationKey={cacheRelaxations.nudge} /> : null}
-          {nudge ? (
-            <CompanionFeedback
-              pauseInstanceId={pauseInstanceId}
-              companionType="grounding"
-              cacheId={cacheIds.nudge}
-              regenerateSlot="grounding"
-              onRegenerate={() => regenerateCompanion('grounding')}
-              regenerating={nudgeLoading}
+          <CompanionOrchestratedSlotChrome
+            pauseInstanceId={pauseInstanceId}
+            hasContent={Boolean(nudge)}
+            loading={nudgeLoading}
+            relaxationKey={cacheRelaxations.nudge}
+            companionType="grounding"
+            cacheId={cacheIds.nudge}
+            regenerateSlot="grounding"
+            onRegenerate={() => regenerateCompanion('grounding')}
+            regenerating={nudgeLoading}
+            routeSegment="grounding"
+          >
+            <LearningInput
+              title={companions.groundingTitle ?? ''}
+              body={companions.groundingBody ?? ''}
+              nudge={nudge}
+              nudgeLoading={nudgeLoading}
+              nudgeError={nudgeError}
+              onRetry={retryNudge}
             />
-          ) : null}
-          {pauseInstanceId && (nudge || nudgeLoading) ? (
-            <CompanionOpenFullViewButton pauseInstanceId={pauseInstanceId} routeSegment="grounding" />
-          ) : null}
+          </CompanionOrchestratedSlotChrome>
         </CompanionCard>
       ) : null}
 
@@ -215,21 +211,20 @@ export const CompanionSection = forwardRef<HTMLDivElement, Props>(function Compa
           loading={zoomOutLoading}
           {...proFavorite('zoom_out')}
         >
-          <ZoomOutDisplay data={zoomOut} loading={zoomOutLoading} error={zoomOutError} onRetry={retryZoomOut} />
-          {zoomOut ? <CompanionCacheRelaxationNote relaxationKey={cacheRelaxations.zoomOut} /> : null}
-          {zoomOut ? (
-            <CompanionFeedback
-              pauseInstanceId={pauseInstanceId}
-              companionType="zoom_out"
-              cacheId={cacheIds.zoomOut}
-              regenerateSlot="zoomOut"
-              onRegenerate={() => regenerateCompanion('zoomOut')}
-              regenerating={zoomOutLoading}
-            />
-          ) : null}
-          {pauseInstanceId && (zoomOut || zoomOutLoading) ? (
-            <CompanionOpenFullViewButton pauseInstanceId={pauseInstanceId} routeSegment="zoom-out" />
-          ) : null}
+          <CompanionOrchestratedSlotChrome
+            pauseInstanceId={pauseInstanceId}
+            hasContent={Boolean(zoomOut)}
+            loading={zoomOutLoading}
+            relaxationKey={cacheRelaxations.zoomOut}
+            companionType="zoom_out"
+            cacheId={cacheIds.zoomOut}
+            regenerateSlot="zoomOut"
+            onRegenerate={() => regenerateCompanion('zoomOut')}
+            regenerating={zoomOutLoading}
+            routeSegment="zoom-out"
+          >
+            <ZoomOutDisplay data={zoomOut} loading={zoomOutLoading} error={zoomOutError} onRetry={retryZoomOut} />
+          </CompanionOrchestratedSlotChrome>
         </CompanionCard>
       ) : null}
 
@@ -247,28 +242,25 @@ export const CompanionSection = forwardRef<HTMLDivElement, Props>(function Compa
           loading={historyLoading}
           {...proFavorite('history_insight')}
         >
-          <HistoricalInsightDisplay
-            data={historyInsight}
+          <CompanionOrchestratedSlotChrome
+            pauseInstanceId={pauseInstanceId}
+            hasContent={Boolean(historyInsight)}
             loading={historyLoading}
-            error={historyError}
-            onRetry={retryHistory}
-          />
-          {historyInsight ? (
-            <CompanionCacheRelaxationNote relaxationKey={cacheRelaxations.history} />
-          ) : null}
-          {historyInsight ? (
-            <CompanionFeedback
-              pauseInstanceId={pauseInstanceId}
-              companionType="history_insight"
-              cacheId={cacheIds.history}
-              regenerateSlot="history"
-              onRegenerate={() => regenerateCompanion('history')}
-              regenerating={historyLoading}
+            relaxationKey={cacheRelaxations.history}
+            companionType="history_insight"
+            cacheId={cacheIds.history}
+            regenerateSlot="history"
+            onRegenerate={() => regenerateCompanion('history')}
+            regenerating={historyLoading}
+            routeSegment="history"
+          >
+            <HistoricalInsightDisplay
+              data={historyInsight}
+              loading={historyLoading}
+              error={historyError}
+              onRetry={retryHistory}
             />
-          ) : null}
-          {pauseInstanceId && (historyInsight || historyLoading) ? (
-            <CompanionOpenFullViewButton pauseInstanceId={pauseInstanceId} routeSegment="history" />
-          ) : null}
+          </CompanionOrchestratedSlotChrome>
         </CompanionCard>
       ) : null}
     </div>

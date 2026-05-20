@@ -13,18 +13,12 @@ export type PauseDoneDefaultProps = {
   onReturn: () => void;
   pauseData?: PauseDonePauseData | null;
   pauseInstanceId?: string | null;
-  subscribed: boolean;
 };
 
 /** Deep / default pause completion screen (streak celebration, score impact, return CTA). */
-export function PauseDoneDefault({
-  decision,
-  onReturn,
-  pauseData,
-  pauseInstanceId,
-  subscribed,
-}: PauseDoneDefaultProps) {
+export function PauseDoneDefault({ decision, onReturn, pauseData, pauseInstanceId }: PauseDoneDefaultProps) {
   const { t } = useTranslation();
+  const { subscribed } = useSubscription();
 
   const wallpaperMood =
     pauseData?.moodAfter && isPauseMoodValue(pauseData.moodAfter)
