@@ -5,12 +5,22 @@ import type { FeelStepTile } from '@/screens/pause/components/pause-feel-types';
 import { hapticFeedback } from '@/lib/haptics';
 import { pauseLogStep } from '@/features/pause/public-rpc';
 import {
-  buildInitialEmotionLoggedPayload,
-  initialEmotionLogDedupeKey,
-  initialEmotionSkippedLogDedupeKey,
-  initialEmotionSkippedLoggedPayload,
+  initialEmotionResetUi,
+  runInitialEmotionSelect,
+  runInitialEmotionSkip,
+  type InitialEmotionUiState,
 } from '@/features/pause/public';
 import { showPauseStepSyncFailedToast } from '@/features/pause/public';
+
+const logInitialEmotionStep = (params: {
+  instanceId: string;
+  payload: Record<string, unknown>;
+}) =>
+  pauseLogStep({
+    instanceId: params.instanceId,
+    stepType: 'initial_emotion_logged',
+    payload: params.payload,
+  }).then(() => undefined);
 
 export function usePauseSessionInitialMoodHandlers(input: {
   pauseInstanceId: string | null;
@@ -39,6 +49,16 @@ export function usePauseSessionInitialMoodHandlers(input: {
     setSelectedBriefFace,
   } = input;
 
+  const applyInitialEmotionUi = useCallback(
+    (ui: InitialEmotionUiState) => {
+      setMoodDone(ui.moodDone);
+      setSelectedMood(ui.selectedMood);
+      setFeelIntensity(ui.feelIntensity);
+      setSelectedBriefFace(ui.selectedBriefFace);
+    },
+    [setMoodDone, setSelectedMood, setFeelIntensity, setSelectedBriefFace],
+  );
+
   const handleMoodSelect = useCallback(
     async (
       mood: MoodValue,
@@ -46,72 +66,52 @@ export function usePauseSessionInitialMoodHandlers(input: {
       opts?: { briefRitual?: boolean; briefFace?: FeelStepTile },
     ) => {
       hapticFeedback('light');
-      const payload = buildInitialEmotionLoggedPayload(mood, intensity, opts);
-      const logKey = initialEmotionLogDedupeKey(payload, opts?.briefFace);
-      if (pauseInstanceId && lastFeelLogKeyRef.current === logKey) {
-        setMoodDone(true);
-        setSelectedMood(mood);
-        setFeelIntensity(typeof intensity === 'number' ? intensity : null);
-        if (opts?.briefFace) setSelectedBriefFace(opts.briefFace);
-        return;
+      const outcome = await runInitialEmotionSelect(
+        {
+          pauseInstanceId,
+          mood,
+          intensity,
+          opts,
+          lastFeelLogKey: lastFeelLogKeyRef.current,
+        },
+        { logStep: logInitialEmotionStep },
+      );
+
+      if (outcome.status === 'synced') {
+        lastFeelLogKeyRef.current = outcome.logKey;
+      } else if (outcome.status === 'sync_failed') {
+        lastFeelLogKeyRef.current = null;
+        showPauseStepSyncFailedToast(t);
       }
-      setMoodDone(true);
-      setSelectedMood(mood);
-      setFeelIntensity(typeof intensity === 'number' ? intensity : null);
-      if (opts?.briefFace) setSelectedBriefFace(opts.briefFace);
-      if (pauseInstanceId) {
-        try {
-          await pauseLogStep({
-            instanceId: pauseInstanceId,
-            stepType: 'initial_emotion_logged',
-            payload,
-          });
-          lastFeelLogKeyRef.current = logKey;
-        } catch {
-          lastFeelLogKeyRef.current = null;
-          setMoodDone(false);
-          setSelectedMood(null);
-          setFeelIntensity(null);
-          showPauseStepSyncFailedToast(t);
-        }
-      }
+
+      applyInitialEmotionUi(outcome.ui);
     },
-    [
-      pauseInstanceId,
-      t,
-      lastFeelLogKeyRef,
-      setMoodDone,
-      setSelectedMood,
-      setFeelIntensity,
-      setSelectedBriefFace,
-    ],
+    [pauseInstanceId, t, lastFeelLogKeyRef, applyInitialEmotionUi],
   );
 
   const handleMoodSkip = useCallback(async () => {
-    setFeelIntensity(null);
-    if (pauseInstanceId) {
-      try {
-        await pauseLogStep({
-          instanceId: pauseInstanceId,
-          stepType: 'initial_emotion_logged',
-          payload: initialEmotionSkippedLoggedPayload(),
-        });
-        lastFeelLogKeyRef.current = initialEmotionSkippedLogDedupeKey();
-      } catch {
-        showPauseStepSyncFailedToast(t);
-        return;
-      }
+    const outcome = await runInitialEmotionSkip(
+      { pauseInstanceId },
+      { logStep: logInitialEmotionStep },
+    );
+
+    if (outcome.status === 'sync_failed') {
+      showPauseStepSyncFailedToast(t);
+      return;
     }
-    setMoodDone(true);
+
+    if (outcome.status === 'synced') {
+      lastFeelLogKeyRef.current = outcome.logKey;
+    }
+
+    setFeelIntensity(outcome.ui.feelIntensity);
+    setMoodDone(outcome.ui.moodDone);
   }, [pauseInstanceId, t, lastFeelLogKeyRef, setFeelIntensity, setMoodDone]);
 
   const handleMoodReset = useCallback(() => {
     lastFeelLogKeyRef.current = null;
-    setMoodDone(false);
-    setSelectedMood(null);
-    setFeelIntensity(null);
-    setSelectedBriefFace(null);
-  }, [lastFeelLogKeyRef, setMoodDone, setSelectedMood, setFeelIntensity, setSelectedBriefFace]);
+    applyInitialEmotionUi(initialEmotionResetUi());
+  }, [lastFeelLogKeyRef, applyInitialEmotionUi]);
 
   return { handleMoodSelect, handleMoodSkip, handleMoodReset };
 }

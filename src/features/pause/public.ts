@@ -400,6 +400,12 @@ export {
   type InitialEmotionLogOpts,
 } from './application/use-cases/session/initial-emotion-log';
 export {
+  initialEmotionResetUi,
+  runInitialEmotionSelect,
+  runInitialEmotionSkip,
+  type InitialEmotionUiState,
+} from './application/use-cases/session/run-initial-emotion-log';
+export {
   formatPauseOpenMaxRemaining,
   pauseOpenMaxDeadlineMs,
   PAUSE_OPEN_MAX_AGE_MS,
