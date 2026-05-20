@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 import {
   isPauseSessionDepthPickerActive,
   isPauseSessionWaitingForInstanceFetch,
-} from '@/features/pause/public';
+} from './gate-flags';
 
 describe('isPauseSessionWaitingForInstanceFetch', () => {
   it('is true only in fetch hydration without failure and without instance', () => {

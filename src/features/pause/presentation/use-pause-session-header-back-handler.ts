@@ -1,5 +1,5 @@
 import { useCallback, type Dispatch, type MutableRefObject, type SetStateAction } from 'react';
-import { computePauseHeaderBackIntent } from '@/features/pause/public';
+import { computePauseHeaderBackIntent } from '@/features/pause/application/use-cases/session/header-back';
 import type { BriefPauseStep, PauseStep, RitualDepth } from '@/features/pause/public-hooks';
 import type { PauseBreathingHandle } from '@/features/pause/presentation/session/pause-breathing-handle';
 

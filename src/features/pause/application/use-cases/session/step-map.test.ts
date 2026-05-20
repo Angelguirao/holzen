@@ -1,20 +1,20 @@
 import { describe, it, expect } from 'vitest';
+import { makeTestPersistedPauseSession } from '@/test/fixtures/make-test-persisted-pause-session';
+import type { PersistedSession } from '@/features/pause/domain/session-model';
 import {
-  mapPersistedStep,
-  initialRitualEntry,
-  initialBriefPauseStepFromRestored,
-  initialBriefIntegrateDoneFromRestored,
-  initialSelectedBriefFaceFromRestored,
-  initialPhaseFromRestored,
-  initialDecisionFromRestored,
+  briefStepToPauseScienceStep,
   initialBreathingFirstCompletedFromRestored,
   initialBreathingSecondCompletedFromRestored,
-  initialFrameDoneFromRestored,
   initialBreathSegmentRpcLoggedFlagsFromRestored,
-  briefStepToPauseScienceStep,
-} from '@/features/pause/public';
-import { makeTestPersistedPauseSession } from '@/test/fixtures/make-test-persisted-pause-session';
-import { type PersistedSession } from '@/features/pause/public';
+  initialBriefIntegrateDoneFromRestored,
+  initialBriefPauseStepFromRestored,
+  initialDecisionFromRestored,
+  initialFrameDoneFromRestored,
+  initialPhaseFromRestored,
+  initialRitualEntry,
+  initialSelectedBriefFaceFromRestored,
+  mapPersistedStep,
+} from './step-map';
 
 describe('mapPersistedStep', () => {
   it('maps legacy and empty keys to feel', () => {

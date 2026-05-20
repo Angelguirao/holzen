@@ -8,7 +8,7 @@ import {
 import {
   computePauseSessionHydration,
   computePauseSessionResolved,
-} from '@/features/pause/public';
+} from './hydration';
 
 const holzenBase = {
   holzenMessage: null as string | null,

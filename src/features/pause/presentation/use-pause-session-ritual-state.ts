@@ -11,8 +11,8 @@ import {
   initialRitualEntry,
   initialSelectedBriefFaceFromRestored,
   mapPersistedStep,
-  type PersistedSession,
-} from '@/features/pause/public';
+} from '@/features/pause/application/use-cases/session/step-map';
+import type { PersistedSession } from '@/features/pause/domain/session-model';
 import type { BriefPauseStep, PauseStep, RitualDepth } from '@/features/pause/public-hooks';
 import type { MoodValue } from '../domain/mood-value';
 import { usePauseSessionEntryPresentationEffects } from './use-pause-session-entry-presentation-effects';
