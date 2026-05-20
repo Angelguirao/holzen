@@ -109,7 +109,7 @@ export {
   type StandaloneBreathingPattern,
   type StandaloneBreathSeverityRingColors,
   type StandaloneBreathingPhase,
-} from './application/use-cases/breathing/standalone-breathing-patterns';
+} from './application/use-cases/ritual/breathe/standalone-breathing-patterns';
 export type { PauseImpactData } from './application/use-cases/ritual/decide/impact-data';
 export {
   buildPauseScoreImpacts,
