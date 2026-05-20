@@ -14,8 +14,8 @@ import {
 } from '@/features/pause/application/use-cases/session/step-map';
 import type { PersistedSession } from '@/features/pause/domain/session-model';
 import type { BriefPauseStep, PauseStep, RitualDepth } from '@/features/pause/public-hooks';
-import type { MoodValue } from '../domain/mood-value';
-import { usePauseSessionEntryPresentationEffects } from './use-pause-session-entry-presentation-effects';
+import type { MoodValue } from '../../domain/mood-value';
+import { usePauseSessionEntryPresentationEffects } from '../use-pause-session-entry-presentation-effects';
 
 /**
  * In-session ritual UI state for `/pause` (step, mood, breath progress, depth picker).
