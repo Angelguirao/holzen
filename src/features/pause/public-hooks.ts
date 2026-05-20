@@ -369,8 +369,8 @@ export {
   usePauseSessionBreathHandlers,
   type UsePauseSessionBreathHandlersParams,
 } from './presentation/use-pause-session-breath-handlers';
-export { usePauseSessionExitNavigation } from './presentation/use-pause-session-exit-navigation';
-export { usePauseSessionPendingPauseOfferNavigation } from './presentation/use-pause-session-pending-pause-offer-navigation';
+export { usePauseSessionExitNavigation } from './presentation/session/use-pause-session-exit-navigation';
+export { usePauseSessionPendingPauseOfferNavigation } from './presentation/session/use-pause-session-pending-pause-offer-navigation';
 export { usePauseSessionPendingLeaveSheet } from './presentation/use-pause-session-pending-leave-sheet';
 export { usePauseSessionMoodChromeHandlers } from './presentation/reflect/use-pause-session-mood-chrome-handlers';
 export { usePauseSessionBreathReflectHandlers } from './presentation/reflect/use-pause-session-breath-reflect-handlers';

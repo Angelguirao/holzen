@@ -59,7 +59,7 @@ Presentation hooks (`src/features/pause/presentation/use-pause-session-*.ts`, `p
 
 ## Navigation out
 
-[`usePauseSessionExitNavigation`](../../src/features/pause/presentation/use-pause-session-exit-navigation.ts) (`public-hooks`) provides close/return handlers consumed by the gate and scaffold. Pending pause offers use [`usePauseSessionPendingPauseOfferNavigation`](../../src/features/pause/presentation/use-pause-session-pending-pause-offer-navigation.ts) for adopt/resync flows.
+[`usePauseSessionExitNavigation`](../../src/features/pause/presentation/session/use-pause-session-exit-navigation.ts) (`public-hooks`) provides close/return handlers consumed by the gate and scaffold. Pending pause offers use [`usePauseSessionPendingPauseOfferNavigation`](../../src/features/pause/presentation/session/use-pause-session-pending-pause-offer-navigation.ts) for adopt/resync flows.
 
 ## Analytics
 

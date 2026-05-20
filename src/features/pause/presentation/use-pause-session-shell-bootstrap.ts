@@ -9,7 +9,7 @@ import { coalescePauseSessionShellViewModel } from '@/features/pause/application
 import type { PauseSessionShellHolzen } from '@/features/pause/domain/pause-session-shell-holzen';
 import { usePauseSessionMountLog } from './session/use-pause-session-mount-log';
 import { usePauseSessionPendingLeaveSheet } from './use-pause-session-pending-leave-sheet';
-import { usePauseSessionPendingPauseOfferNavigation } from './use-pause-session-pending-pause-offer-navigation';
+import { usePauseSessionPendingPauseOfferNavigation } from './session/use-pause-session-pending-pause-offer-navigation';
 import { usePauseSessionShell } from './use-pause-session-shell';
 import { usePendingPauseOffer } from './use-pending-pause-offer';
 

@@ -2680,6 +2680,25 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-20</span>
+      <span>Phase A slice — colocate session navigation hooks under presentation/session/</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>Tier 5 presentation grouping — session exit + pending-offer navigation</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 <code>ritual/reflect/</code> was already complete on <code>cursor/arch-migrate-src-ca70</code>. Move <code>use-pause-session-exit-navigation</code> and <code>use-pause-session-pending-pause-offer-navigation</code> (+ tests) beside existing <code>presentation/session/</code> types; update <code>public-hooks</code> and shell bootstrap/providers imports only.</dd>
+      <dt>Deviation</dt>
+      <dd>None — matches §3.2 / §10.1 session conductor grouping.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Most session conductors remain flat under <code>presentation/</code> until a later peel (shell bootstrap, step handlers, breath bundle).</dd>
+      <dt>Open questions</dt>
+      <dd>Next: colocate shell bootstrap + mount log cluster, or wire companion feedback vote through a port-backed use case (backlog #4 remainder).</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
 </body>
 </html>
