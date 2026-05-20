@@ -1,5 +1,6 @@
 import { useQueryClient } from '@tanstack/react-query';
 import { updateUserPassword, useAuth } from '@/features/auth/public';
+import { deleteAccount as invokeDeleteAccount } from '@/features/auth/public-rpc';
 import { fetchSettingsDataExportBundle } from '@/features/pause/public-queries';
 import { getProfileRowQueryOptions } from '@/features/user/public-queries';
 import { useHolzen } from '@/screens/home/hooks/use-holzen';
@@ -7,7 +8,6 @@ import { useSubscription } from '@/features/subscription/public-hooks';
 import { useInstallPrompt } from '@/app/hooks/use-install-prompt';
 import { usePushNotifications } from '@/features/notifications/public-hooks';
 import { useLatestChangelogVersion } from '@/screens/settings/hooks/use-latest-changelog-version';
-import { invokeEdge } from '@/lib/invoke-edge';
 import { trackEvent } from '@/lib/posthog';
 import { toast } from 'sonner';
 import { useState, useEffect, useCallback, useRef } from 'react';
@@ -272,7 +272,7 @@ export function useSettingsModel() {
     if (!user) return;
     setDeleting(true);
     try {
-      const { error } = await invokeEdge('delete-account');
+      const { error } = await invokeDeleteAccount();
       if (error) throw error;
       toast.success('Account deleted');
       await signOut();
