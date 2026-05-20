@@ -1,6 +1,8 @@
 import { buildPauseSessionStepRitualBundle, buildPauseSessionStepShellBundle } from '@/screens/pause/hooks/pause-session-step-bundles';
-import { usePauseSessionBreathReflectHandlers } from '@/screens/pause/hooks/use-pause-session-breath-reflect-handlers';
-import { usePauseSessionMoodChromeHandlers } from '@/screens/pause/hooks/use-pause-session-mood-chrome-handlers';
+import {
+  usePauseSessionBreathReflectHandlers,
+  usePauseSessionMoodChromeHandlers,
+} from '@/features/pause/public-hooks';
 import type { usePauseSessionProviders } from '@/screens/pause/hooks/use-pause-session-providers';
 import type { usePauseSessionShellRitual } from '@/screens/pause/hooks/use-pause-session-shell-ritual';
 

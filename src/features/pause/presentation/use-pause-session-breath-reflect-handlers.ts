@@ -1,22 +1,24 @@
-import { usePauseShiftFrameDoneHandler } from '@/features/pause/public-hooks';
-import { usePauseSessionBreathHandlers } from '@/features/pause/public-hooks';
-import { usePauseSessionReflectAndDecide } from '@/features/pause/public-hooks';
-import type { usePauseSessionMoodAndPersist } from '@/features/pause/public-hooks';
-import type { usePauseSessionProviders } from '@/screens/pause/hooks/use-pause-session-providers';
-import type { usePauseSessionShellRitual } from '@/screens/pause/hooks/use-pause-session-shell-ritual';
-
-type PauseSessionProviders = ReturnType<typeof usePauseSessionProviders>;
-type PauseSessionShellRitual = ReturnType<typeof usePauseSessionShellRitual>;
-type PauseSessionMood = ReturnType<typeof usePauseSessionMoodAndPersist>;
+import { usePauseShiftFrameDoneHandler } from './use-pause-shift-frame-done-handler';
+import { usePauseSessionBreathHandlers } from './use-pause-session-breath-handlers';
+import { usePauseSessionReflectAndDecide } from './use-pause-session-reflect-and-decide';
+import type {
+  PauseSessionBreathReflectMoodSlice,
+  PauseSessionBreathReflectProvidersSlice,
+  PauseSessionBreathReflectRitualSlice,
+  PauseSessionBreathReflectShellSlice,
+} from './session/pause-session-step-handler-types';
 
 /** Breath segment navigation, shift frame done, and reflect/decide for the pause session ritual. */
 export function usePauseSessionBreathReflectHandlers(
-  p: Pick<
-    PauseSessionProviders,
-    't' | 'dismissMessage' | 'btcData' | 'subscribed' | 'subLoading' | 'requirePro' | 'refreshSubscription'
-  >,
-  { shell, ritual }: PauseSessionShellRitual,
-  mood: Pick<PauseSessionMood, 'lastShiftLogKeyRef'>,
+  p: PauseSessionBreathReflectProvidersSlice,
+  {
+    shell,
+    ritual,
+  }: {
+    shell: PauseSessionBreathReflectShellSlice;
+    ritual: PauseSessionBreathReflectRitualSlice;
+  },
+  mood: PauseSessionBreathReflectMoodSlice,
 ) {
   const { t, dismissMessage, btcData, subscribed, subLoading, requirePro, refreshSubscription } = p;
   const { restored, message, context, pauseInstanceId, companions } = shell;
