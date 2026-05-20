@@ -12,7 +12,7 @@ Existing UI already had skeletons for intervention (`InterventionSection`) and g
 
 ## Related code pointers
 
-- `src/screens/pause/hooks/use-companion-data.ts` — `useLayoutEffect` loader priming when `pauseInstanceId` is set
+- `features/pause/presentation/use-companion-data.ts` — `useLayoutEffect` loader priming when `pauseInstanceId` is set
 - `src/screens/pause/components/CompanionSection.tsx` — intervention + companion cards
 - `src/screens/pause/components/LearningInput.tsx` — grounding skeleton while nudge loads
 - `supabase/functions/check-volatility/index.ts` — pause instance + profile/notification writes on claim (**V2:** no orchestrate dispatch)

@@ -42,6 +42,6 @@ Grep: **`orchestrate_skip_cached`**.
 ## Related code
 
 - `supabase/functions/companion-orchestrate/index.ts`
-- `src/screens/pause/hooks/use-companion-data.ts`
+- `features/pause/presentation/use-companion-data.ts`
 - `supabase/functions/check-volatility/index.ts`
 - `docs/reviews/phase-3-server-cron-triggers.md`

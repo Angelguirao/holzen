@@ -1,6 +1,6 @@
 # Architecture migration — implementation artifacts
 
-**Branch:** `cursor/arch-migrate-src-ca70` → `feature/refactoring6`
+**Branch:** Integration target **`feature/refactoring6`**; migration working branch **`cursor/arch-migrate-src-ca70`** (one branch, many slices — see agent rule).
 
 ## North star
 
@@ -49,4 +49,4 @@ Index + full-`src` rings: [client-architecture-overview.md](../../fundamentals/c
 
 Workflow: [implementation-notes-workflow.md](../../fundamentals/implementation-notes-workflow.md). Agent rule: [.cursor/rules/architecture-migration.mdc](../../../.cursor/rules/architecture-migration.mdc).
 
-**Doc reconciliation (May 2026):** migration docs aligned in `c4714f4b`, `dd0bbae1`, `58d2cb53`, and fourth-pass pointer fixes (AGENTS change map, parity-board, stats/badges index, review templates). **Shipped routes/tabs:** always [active-surface.md](../../ops/active-surface.md) over [information-architecture.md](../../design/information-architecture.md) §1–§3 full-IA sections.
+**Doc reconciliation (May 2026):** migration + IA aligned through fourth-pass pointer fixes; **fifth-pass (pre–Phase A code):** wave 1/5h honesty, `pause-system.md` client paths, §10 interior map, screen/feature READMEs, stale hook/shim references. **Shipped routes/tabs:** always [active-surface.md](../../ops/active-surface.md) over [information-architecture.md](../../design/information-architecture.md) §1–§3 full-IA sections.

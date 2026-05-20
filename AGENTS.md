@@ -78,7 +78,7 @@ Use this table to pick the **canonical narrative** for the slice you are touchin
 | Routes | `src/App.tsx` — `ProtectedRoute` / `PublicOnlyRoute`, shell vs full-screen; helpers in `src/lib/app-routes.ts` (four-tab shell; dead `/tools/*` → `NotFound`) |
 | Screens (presentation) | `src/screens/<route>/` — [src/screens/README.md](src/screens/README.md); `App.tsx` lazy-loads `*Screen.tsx` |
 | App shell (layout, nav, chrome) | `src/app/components/`, `src/app/hooks/` — [src/app/README.md](src/app/README.md) |
-| Pause lifecycle | `src/features/pause/` + ritual UI in `src/screens/pause/`; `@/lib/pause-*` shims until removed. Canonical model: [docs/systems/pause-system.md](docs/systems/pause-system.md). Schema + RPCs: `202604232007*_pause_*.sql` … `20260423202000_pause_v2_destructive_cutover.sql`. |
+| Pause lifecycle | `src/features/pause/` + ritual UI in `src/screens/pause/`; import via `public*` barrels (active `@/lib/pause-*` shims removed May 2026). Canonical model: [docs/systems/pause-system.md](docs/systems/pause-system.md). Client layout: [pause-client-architecture.md](docs/systems/pause-client-architecture.md). Schema + RPCs: `202604232007*_pause_*.sql` … `20260423202000_pause_v2_destructive_cutover.sql`. |
 | Stats / badges UI | **Not in active bundle** — `src/legacy/full-shell/` + [active-surface.md](docs/ops/active-surface.md); `src/lib/stats/` may remain for tests |
 | Shared UI | `src/components/ui/` + `icons/` — [src/components/README.md](src/components/README.md); no new root `src/components/*.tsx` (`check:no-root-components`) |
 | Visual system (Nox + tokens) | **[DESIGN.md](DESIGN.md)** (agent-oriented); `src/index.css` + `tailwind.config.ts`; deep contract `docs/design/nox/` |

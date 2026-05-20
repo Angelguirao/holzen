@@ -16,17 +16,18 @@ Route-scoped UI and thin orchestration live here. **Domain rules** stay in `src/
 ```text
 screens/<route>/
   components/     # presentation for this route only
-  hooks/          # orchestration used only by this screen (optional)
+  hooks/          # screen-local orchestration (optional — Home, Settings; not pause)
+  lib/            # pure screen helpers (optional)
   *Screen.tsx     # route entry (lazy-loaded from App.tsx)
 ```
 
-Co-locate Vitest hook/component tests beside the file under test (e.g. `hooks/use-pause-session-go-back.test.tsx`). Cross-route flows stay in [`src/test/integration/`](../test/integration/README.md).
+Co-locate Vitest beside the file under test. **Pause:** ritual conductors live in `features/pause/presentation/` — import `@/features/pause/public-hooks` from `PauseSessionScreen` (no `screens/pause/hooks/`). Cross-route flows: [`src/test/integration/`](../test/integration/README.md).
 
 | Screen folder | Routes / product area | Screen map doc |
 |---------------|----------------------|----------------|
 | `home/` | `/` — **`HomeScreen`**, `components/`, `hooks/` (incl. `useHolzen`) | [docs/screens/home.md](../../docs/screens/home.md) |
-| `pause/` | `/pause`, `/companion/*` — **`PauseSessionScreen`**, `components/`, `hooks/` | [docs/screens/pause.md](../../docs/screens/pause.md) |
-| `archive/` | Archive tab — **`ArchiveScreen`**, `hooks/`, `components/` (+ `library/` subfolder for pause cards) | [README](archive/README.md), [active-surface](../../docs/ops/active-surface.md), [IA](../../docs/design/information-architecture.md) |
+| `pause/` | `/pause`, `/companion/*` — **`PauseSessionScreen`**, `components/`; orchestration → `@/features/pause/public-hooks` | [docs/screens/pause.md](../../docs/screens/pause.md) |
+| `archive/` | Archive tab — **`ArchiveScreen`**, `components/` (+ `components/library/` for current-pause card — not MVP Collections) | [README](archive/README.md), [active-surface](../../docs/ops/active-surface.md), [IA](../../docs/design/information-architecture.md) |
 | `journey/` | Journey tab — **`components/` migrated (5e)** | [docs/screens/journey-overview.md](../../docs/screens/journey-overview.md) |
 | `settings/` | Settings hub — **`SettingsStateLayout`**, `hooks/`, `components/` | [README](settings/README.md) |
 | `marketing/` | Public pages — **`AboutScreen`**, landing **`components/`** | [README](marketing/README.md) |

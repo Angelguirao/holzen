@@ -292,7 +292,7 @@ Use this when moving files. Paths are indicative — adjust to actual filenames 
 | Current (transitional) | Target |
 |------------------------|--------|
 | ~~`src/hooks/use-pause-*`~~ (removed) | `packages/pause` (§3 subdirs) + thin hooks in `apps/web` |
-| `src/screens/pause/hooks/use-companion-data.ts` | `packages/pause/application/use-cases/ritual/frame/` |
+| `features/pause/presentation/use-companion-data.ts` | `features/pause/application/use-cases/ritual/frame/` (target; packages path when extracted) |
 | `src/screens/home/hooks/use-holzen.ts` | `packages/market` + `apps/web/screens/home` (wires pause triggers) |
 | ~~`src/hooks/use-subscription`~~ → `features/subscription/public-hooks` | `packages/subscription` |
 | ~~`src/hooks/use-auth`~~ → `@/features/auth/public` | `packages/auth` |
@@ -355,7 +355,7 @@ Same dependency rules as §2–3 for layers that exist. `npm run check:feature-i
 | Wave | Scope | Exit criteria |
 |------|--------|----------------|
 | **0** | Docs + ADR (Lovable §) + `src/features/pause/` skeleton + `check:feature-imports` | `test:ci` green; root `npm run build` |
-| **1** | Migrate **pause** domain + use cases into `src/features/pause/` (small PRs) | Pause E2E green; reflect/companion use cases under `ritual/reflect/` + `ritual/frame/` ([pause-client-architecture.md](../systems/pause-client-architecture.md) §3) |
+| **1** | Migrate **pause** domain + use cases into `src/features/pause/` (small PRs) | **In progress (Phase A):** domain + presentation migrated; interior taxonomy incomplete — `reflect/` + `companion/` still at legacy paths; target `ritual/reflect/` + `ritual/frame/` ([pause-client-architecture.md](../systems/pause-client-architecture.md) §3, §10; [architecture-migration/README.md](../artifacts/architecture-migration/README.md)) |
 | **2** | `subscription`, `market`, `user`, `auth` features + shrink root `lib/` feature shims | Cross-feature: `public.ts` only; app hooks may use `public-queries.ts` where queries need Supabase |
 | **3** | Optional `src/features/*/infrastructure` adapters; keep Supabase types in `integrations/` until needed | Adapter tests |
 | **4** | `src/legacy` off main runtime path | **Done (transitional):** `tsconfig.app.json` + Vitest exclude `src/legacy/**`; `check:active-surface` blocks `@/legacy/*` in active tree; folder kept for `archive/full-ia-pre-strip` recovery only. Physical delete is optional / separate archive PR. |
@@ -366,7 +366,7 @@ Same dependency rules as §2–3 for layers that exist. `npm run check:feature-i
 | **5e** | **Archive, Journey, Settings** | **Done** — `screens/{archive,journey,settings}/components/` |
 | **5f** | Companion routes | **Done** — `/companion/*` + companion UI under `screens/pause/` |
 | **5g** | Marketing / admin | **Done** — `screens/marketing/*Screen` + `components/`; `screens/admin/AdminScreen` |
-| **5h** | Orchestration | **Done (shipped surfaces)** — `use-home-*` + `HolzenProvider`/`useHolzen` → `screens/home/hooks/`; `use-pause-session-*` + ritual hooks → `screens/pause/hooks/`; `HomeScreen` / `PauseSessionScreen` |
+| **5h** | Orchestration | **Partial (Home done; pause Phase A):** `use-home-*` + `HolzenProvider`/`useHolzen` → `screens/home/hooks/`; pause session/companion/reflect conductors → **`features/pause/presentation/`** (not `screens/pause/hooks/` — removed). Phase A still converges use cases toward `ritual/reflect/` + `ritual/frame/`. |
 | **5i** | Shrink global layers | **Done (shipped)** — allowlist **37** root shell/shared components (was 59); home market widgets + onboarding + `MoodCheck` under screens; domain `MoodValue` in `features/pause` |
 | **5j** | App shell | **Done (shipped)** — `src/app/components/` (layout, nav, meta, error boundary, checkout/subscribe chrome, auth loading); allowlist **0** at `src/components/*.tsx` (was 37; only `components/ui/` remains); `check:no-screens-in-features` |
 | **5j+** | Screen hooks + route entrypoints | **Done** — all shipped routes under `screens/*/*Screen`; removed `src/pages/` shim (May 2026); `screens/ops/` for internal tools; removed `src/hooks/` (May 2026); `App.tsx` lazy-loads screens |

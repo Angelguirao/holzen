@@ -68,7 +68,7 @@ This phase is the second "mental model pass": after Phase 1 (who can reach `/pau
 
 - Renders companion cards; uses `useCompanionData` internally (or passes through per codebase) for orchestration-driven content.
 
-### `src/screens/pause/hooks/use-companion-data.ts` — orchestration client
+### `features/pause/presentation/use-companion-data.ts` — orchestration client
 
 - Invokes `companion-orchestrate` with `pauseInstanceId`, context, prefs, mood, etc.; handles cache-oriented responses and regeneration paths.
 
