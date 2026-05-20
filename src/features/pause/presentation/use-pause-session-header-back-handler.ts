@@ -1,8 +1,11 @@
 import { useCallback, type Dispatch, type MutableRefObject, type SetStateAction } from 'react';
-import type { PauseBreathingHandle } from '@/screens/pause/components/PauseBreathing';
-import type { PauseStep } from '@/screens/pause/components/PauseProgress';
-import { computePauseHeaderBackIntent } from '@/features/pause/public';
-import { type BriefPauseStep, type RitualDepth } from '@/features/pause/public';
+import {
+  computePauseHeaderBackIntent,
+  type BriefPauseStep,
+  type PauseBreathingHandle,
+  type PauseStep,
+  type RitualDepth,
+} from '@/features/pause/public';
 
 export function usePauseSessionHeaderBackHandler(input: {
   breathingRef: MutableRefObject<PauseBreathingHandle | null>;
