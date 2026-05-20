@@ -1,5 +1,5 @@
 import type { InterventionState } from '@/features/pause/domain/companion-orchestrate';
-import type { CachedHistoricalInsightShape } from '@/features/pause/public';
+import type { CachedHistoricalInsightShape } from '@/features/pause/domain/historical-insight';
 
 export interface CachedSignalShape {
   title: string;
