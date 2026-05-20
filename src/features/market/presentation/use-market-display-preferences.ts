@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from 'react';
-import { trackEvent } from '@/lib/posthog';
+import { trackHomeMarketChartExpandToggled } from '@/features/market/application/market-display-telemetry';
 
 function readIsTrue(key: string): boolean {
   try {
@@ -51,7 +51,7 @@ export function useMarketDisplayPreferences() {
   const toggleMarketChartExpanded = useCallback(() => {
     setMarketChartExpanded((prev) => {
       const next = !prev;
-      trackEvent('home.market_chart_expand_toggled', { expanded: next });
+      trackHomeMarketChartExpandToggled(next);
       return next;
     });
   }, []);
