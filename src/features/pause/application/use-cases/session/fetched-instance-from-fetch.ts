@@ -1,4 +1,4 @@
-import { companionDataFromArtifacts } from '@/features/pause/application/use-cases/companion/companion-data-from-artifacts';
+import { companionDataFromArtifacts } from '@/features/pause/application/use-cases/ritual/frame/companion-data-from-artifacts';
 import type { FetchedPauseInstance } from '@/features/pause/domain/session-model';
 import type { PauseState } from '@/features/pause/domain/pause-state';
 

@@ -1,6 +1,6 @@
 import { supabase } from '@/integrations/supabase/client';
 import type { CompanionData } from '@/features/pause/public';
-import { companionDataFromArtifacts } from '@/features/pause/application/use-cases/companion/companion-data-from-artifacts';
+import { companionDataFromArtifacts } from '@/features/pause/application/use-cases/ritual/frame/companion-data-from-artifacts';
 
 export type OpenPauseHomePreview = {
   pauseInstanceId: string;
