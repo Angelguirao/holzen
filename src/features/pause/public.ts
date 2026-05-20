@@ -366,8 +366,6 @@ export {
   playPauseBreathPatternCompleteCue,
   playPauseBreathPhaseCue,
   resumePauseAudioContext,
-  startPauseReflectFrameFocusAmbience,
-  stopPauseReflectFrameFocusAmbience,
 } from './application/use-cases/breathing/ritual-audio';
 export { getRecencyHints } from './application/use-cases/ritual/frame/recency-hints';
 export { estimateReadTime } from './application/use-cases/ritual/frame/estimate-read-time';

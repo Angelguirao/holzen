@@ -949,6 +949,25 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-20</span>
+      <span>Phase A slice — reflect ambience peel from public.ts</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>Reflect/frame focus ambience stays in <code>ritual-audio</code>; not re-exported from <code>public.ts</code></h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>After <code>pause-session-reflect-decide-flow</code> landed under <code>ritual/reflect/</code>, peel the reflect/frame focus ambience helpers (<code>startPauseReflectFrameFocusAmbience</code>, <code>stopPauseReflectFrameFocusAmbience</code>) off the bloated <code>public.ts</code> barrel. Only <code>usePauseReflectFrameFocusAmbience</code> needs them — import <code>application/use-cases/breathing/ritual-audio</code> directly; breath phase cues remain on <code>public.ts</code> for shared conductors.</dd>
+      <dt>Deviation</dt>
+      <dd>None — incremental §6 slim <code>public.ts</code>; audio module path unchanged.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Did not relocate ambience helpers into <code>ritual/reflect/</code> (they share the breathing <code>AudioContext</code> singleton with phase cues).</dd>
+      <dt>Open questions</dt>
+      <dd>Next: peel companion/frame orchestration cluster from <code>public.ts</code> or group reflect presentation hooks under <code>presentation/reflect/</code>.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
 </body>
 </html>
