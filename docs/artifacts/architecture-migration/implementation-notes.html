@@ -3206,9 +3206,28 @@
       <dt>Deviation</dt>
       <dd>None — behavior-preserving <code>git mv</code>.</dd>
       <dt>Tradeoffs</dt>
-      <dd>Session reflect/decide flow remains at <code>ritual/reflect/</code> root until a later subfolder slice.</dd>
+      <dd>Session reflect/decide flow remained at <code>ritual/reflect/</code> root until the flows/ slice.</dd>
       <dt>Open questions</dt>
       <dd>Next: colocate <code>pause-session-reflect-decide-flow</code>, or colocate brief-past-step under <code>presentation/session/</code>.</dd>
+    </dl>
+  </article>
+
+  <article class="note">
+    <header>
+      <span>2026-05-20</span>
+      <span>Phase A slice — colocate session reflect/decide flow under ritual/reflect/flows/</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>Backlog #1 increment — reflect/decide progression helpers</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>After <code>hub/</code>, <code>steps/</code>, <code>telemetry/</code>, and <code>ambience/</code>, group <code>pause-session-reflect-decide-flow</code> (+ test) under <code>ritual/reflect/flows/</code> beside generation gating imports; presentation hook import path only.</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior-preserving <code>git mv</code>.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>No modules remain at <code>ritual/reflect/</code> root except subfolder clusters.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: colocate brief-past-step under <code>presentation/session/</code>, or Phase A backlog #4 (PauseRepository wiring).</dd>
     </dl>
   </article>
 
