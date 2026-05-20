@@ -1,24 +1,13 @@
 import { useCallback } from 'react';
-import { holzenLog } from '@/lib/holzen-console';
-import { trackEvent } from '@/lib/posthog';
-import {
-  showLimitReachedToast,
-} from '@/features/subscription/public-limits';
 import type { RegenerateCompanionSlot } from '@/features/pause/public';
-import {
-  applyCompanionSlotOrchestrateFailureUi,
-  companionSlotToGenerationTaxonomy,
-  resolveCompanionSlotOrchestrateFailureUi,
-  runCompanionSlotOrchestrate,
-  setCompanionSlotError,
-  setCompanionSlotLoading,
-  tryApplyOrchestrateSlotFromBody,
-  type CompanionSlotCacheIds,
-  type CompanionSlotCommitters,
-  type CompanionSlotRelaxations,
+import type {
+  CompanionSlotCacheIds,
+  CompanionSlotCommitters,
+  CompanionSlotRelaxations,
 } from '@/features/pause/public';
-import { useCompanionOrchestrateSession } from '@/screens/pause/hooks/use-companion-orchestrate-session';
+import { useCompanionSlotOrchestrateFailurePorts } from '@/screens/pause/hooks/use-companion-slot-orchestrate-failure-ports';
 import { useCompanionSlotOrchestratePorts } from '@/screens/pause/hooks/use-companion-slot-orchestrate-ports';
+import { useCompanionSlotRunOrchestrate } from '@/screens/pause/hooks/use-companion-slot-run-orchestrate';
 
 export interface UseCompanionSlotOrchestrateActionsParams {
   pauseInstanceId?: string | null;
@@ -58,141 +47,53 @@ export interface UseCompanionSlotOrchestrateActionsParams {
 /**
  * Lazy-fetch and regenerate companion slots via `companion-orchestrate` edge (`invokeEdge` + x-cid).
  */
-export function useCompanionSlotOrchestrateActions({
-  pauseInstanceId,
-  context,
-  reflectionMessage,
-  mood,
-  severityNumber,
-  language,
-  canAccessCompanion,
-  applyOptimisticDecrement,
-  refreshSubscription,
-  toast,
-  requirePro,
-  startCheckout,
-  fetchedSlotsRef,
-  setCacheIds,
-  setCacheRelaxations,
-  slotCommitters,
-  companionSlotLoadingSetters,
-  companionSlotErrorSetters,
-}: UseCompanionSlotOrchestrateActionsParams) {
-  const slotOrchestratePorts = useCompanionSlotOrchestratePorts();
-
-  const buildOrchestrateSession = useCompanionOrchestrateSession({
+export function useCompanionSlotOrchestrateActions(params: UseCompanionSlotOrchestrateActionsParams) {
+  const {
     pauseInstanceId,
     context,
     reflectionMessage,
     mood,
     severityNumber,
     language,
+    canAccessCompanion,
+    applyOptimisticDecrement,
+    refreshSubscription,
+    toast,
+    requirePro,
+    startCheckout,
+    fetchedSlotsRef,
+    setCacheIds,
+    setCacheRelaxations,
+    slotCommitters,
+    companionSlotLoadingSetters,
+    companionSlotErrorSetters,
+  } = params;
+
+  const slotOrchestratePorts = useCompanionSlotOrchestratePorts();
+  const failureUiPorts = useCompanionSlotOrchestrateFailurePorts({
+    fetchedSlotsRef,
+    requirePro,
+    startCheckout,
+    toast,
   });
 
-  const runSlotOrchestrate = useCallback(
-    async (slot: RegenerateCompanionSlot, mode: 'lazy_fetch' | 'regenerate') => {
-      if (!pauseInstanceId) return;
-
-      setCompanionSlotLoading(slot, companionSlotLoadingSetters, true);
-      setCompanionSlotError(slot, companionSlotErrorSetters, false);
-
-      try {
-        const orchestrateSession = await buildOrchestrateSession();
-        if (!orchestrateSession) return;
-
-        holzenLog.companion(mode === 'lazy_fetch' ? 'lazy fetch orchestrate invoke' : 'regenerate orchestrate invoke', {
-          slot,
-          holzenInvokeSource: mode === 'lazy_fetch' ? 'browser_lazy_fetch' : 'browser_regenerate',
-          pause_instance_prefix: pauseInstanceId.slice(0, 8),
-        });
-
-        trackEvent('generation.initiated', {
-          companion_type: companionSlotToGenerationTaxonomy(slot),
-          source: mode === 'lazy_fetch' ? 'lazy' : 'regenerate',
-        });
-
-        const result = await runCompanionSlotOrchestrate(
-          mode,
-          slot,
-          orchestrateSession,
-          slotOrchestratePorts,
-        );
-
-        if (result.status === 'failure') {
-          const failure = result.failure;
-          holzenLog.companion(
-            mode === 'lazy_fetch' ? 'lazy fetch orchestrate failed' : 'regenerate orchestrate failed',
-            {
-              slot,
-              pause_instance_prefix: pauseInstanceId.slice(0, 8),
-              bodyError: failure.userMessage,
-              bodyCode: failure.code,
-            },
-          );
-          applyCompanionSlotOrchestrateFailureUi(
-            resolveCompanionSlotOrchestrateFailureUi(failure, mode),
-            slot,
-            {
-              clearLazyFetchSlot: (s) => fetchedSlotsRef.current.delete(s),
-              requirePro: () => requirePro('companions'),
-              showLimitReached: () =>
-                showLimitReachedToast({ feature: 'companion', startCheckout }),
-              showErrorToast: (title, description) =>
-                toast({ title, description, variant: 'destructive' }),
-            },
-          );
-          setCompanionSlotError(slot, companionSlotErrorSetters, true);
-          return;
-        }
-
-        const filled = tryApplyOrchestrateSlotFromBody(
-          result.body,
-          slot,
-          setCacheIds,
-          slotCommitters,
-          setCacheRelaxations,
-        );
-        if (filled) {
-          holzenLog.companion(mode === 'lazy_fetch' ? 'lazy fetch slot filled' : 'regenerate slot filled', {
-            slot,
-            pause_instance_prefix: pauseInstanceId.slice(0, 8),
-          });
-        } else {
-          holzenLog.companion(mode === 'lazy_fetch' ? 'lazy fetch empty or error slot' : 'regenerate empty slot', {
-            slot,
-            pause_instance_prefix: pauseInstanceId.slice(0, 8),
-          });
-          setCompanionSlotError(slot, companionSlotErrorSetters, true);
-        }
-      } catch (e) {
-        console.error(`[useCompanionSlotOrchestrateActions] ${mode}`, slot, e);
-        if (mode === 'regenerate') {
-          toast({ title: 'Regenerate failed', description: 'Network error', variant: 'destructive' });
-        }
-        setCompanionSlotError(slot, companionSlotErrorSetters, true);
-      } finally {
-        setCompanionSlotLoading(slot, companionSlotLoadingSetters, false);
-        if (mode === 'lazy_fetch') {
-          void refreshSubscription();
-        }
-      }
-    },
-    [
-      pauseInstanceId,
-      buildOrchestrateSession,
-      slotOrchestratePorts,
-      companionSlotLoadingSetters,
-      companionSlotErrorSetters,
-      slotCommitters,
-      setCacheIds,
-      setCacheRelaxations,
-      fetchedSlotsRef,
-      requirePro,
-      startCheckout,
-      toast,
-      refreshSubscription,
-    ],
-  );
+  const { runSlotOrchestrate } = useCompanionSlotRunOrchestrate({
+    pauseInstanceId,
+    context,
+    reflectionMessage,
+    mood,
+    severityNumber,
+    language,
+    slotOrchestratePorts,
+    failureUiPorts,
+    toast,
+    refreshSubscription,
+    setCacheIds,
+    setCacheRelaxations,
+    slotCommitters,
+    companionSlotLoadingSetters,
+    companionSlotErrorSetters,
+  });
 
   const fetchCompanion = useCallback(
     async (slot: RegenerateCompanionSlot) => {
