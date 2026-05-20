@@ -19,7 +19,7 @@ import {
   roadmapVotesQueryKey,
   ROADMAP_ITEMS_QUERY_KEY,
   type RoadmapListItem,
-} from '@/screens/marketing/lib/roadmap-query';
+} from '@/features/user/public-queries';
 
 const CATEGORIES = ['all', 'self', 'together', 'intelligence', 'reach'] as const;
 

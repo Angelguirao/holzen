@@ -88,3 +88,16 @@ export {
   type ProfilesHoldGoalUpdate,
 } from './infrastructure/queries/profile-mutations';
 export { submitUserTestimonial } from './infrastructure/queries/testimonial-mutations';
+export {
+  deleteRoadmapVote,
+  fetchRoadmapItemsPage,
+  fetchRoadmapVotes,
+  getRoadmapItemsInfiniteQueryOptions,
+  getRoadmapVotesQueryOptions,
+  insertRoadmapVote,
+  roadmapVotesQueryKey,
+  ROADMAP_ITEMS_PAGE_SIZE,
+  ROADMAP_ITEMS_QUERY_KEY,
+  ROADMAP_VOTES_NONE_QUERY_KEY,
+  type RoadmapListItem,
+} from './infrastructure/queries/roadmap-query';
