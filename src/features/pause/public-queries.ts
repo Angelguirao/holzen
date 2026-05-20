@@ -141,6 +141,9 @@ export {
 export {
   ADMIN_STATS_QUERY_KEY,
   fetchAdminStatsBundle,
+  fetchAdminStatsCacheEntries,
+  fetchAdminStatsCompanionCacheUi,
+  fetchAdminStatsRejections,
   getAdminStatsBundleQueryOptions,
   type AdminStatsBundle,
   type CacheEntryRow,

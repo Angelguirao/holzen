@@ -4,6 +4,7 @@ const rpc = vi.fn(async () => ({
   data: { cache_hits: [], costs: [], failures: [], feedback: [] },
   error: null,
 }));
+const from = vi.fn(() => chainable());
 
 function chainable() {
   const chain: Record<string, unknown> = {};
@@ -19,7 +20,7 @@ function chainable() {
 vi.mock('@/integrations/supabase/client', () => ({
   supabase: {
     rpc,
-    from: () => chainable(),
+    from,
   },
 }));
 
@@ -33,5 +34,11 @@ describe('stats-bundle-admin-query', () => {
     const bundle = await fetchAdminStatsBundle();
     expect(rpc).toHaveBeenCalledWith('get_admin_stats');
     expect(bundle.libraryEntries).toEqual([]);
+  });
+
+  it('fetchAdminStatsCacheEntries queries companion_cache', async () => {
+    const { fetchAdminStatsCacheEntries } = await import('./stats-bundle-admin-query');
+    await fetchAdminStatsCacheEntries();
+    expect(from).toHaveBeenCalledWith('companion_cache');
   });
 });

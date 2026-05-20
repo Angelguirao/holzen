@@ -185,6 +185,66 @@ export interface AdminStatsBundle {
   notificationPerDay: DailyNotificationRow[];
 }
 
+const ADMIN_CACHE_ENTRY_SELECT =
+  'id, companion_type, title, quality_score, used_count, expires_at, thumbs_up, thumbs_down, created_at, content';
+
+const ADMIN_RECENT_CONTENT_SELECT =
+  'id, companion_type, content, quality_score, title, created_at, used_count, source_author';
+
+/** Partial refresh: curated cache table for admin monitor. */
+export async function fetchAdminStatsCacheEntries(): Promise<{
+  data: CacheEntryRow[] | null;
+  error: { message: string } | null;
+}> {
+  const { data, error } = await supabase
+    .from('companion_cache')
+    .select(ADMIN_CACHE_ENTRY_SELECT)
+    .order('quality_score', { ascending: false })
+    .order('used_count', { ascending: false })
+    .limit(200);
+  return {
+    data: error ? null : ((data ?? []) as CacheEntryRow[]),
+    error: error ?? null,
+  };
+}
+
+async function fetchAdminStatsRecentContent(): Promise<RecentContentRow[]> {
+  const { data: contentData } = await supabase
+    .from('companion_cache')
+    .select(ADMIN_RECENT_CONTENT_SELECT)
+    .order('created_at', { ascending: false })
+    .limit(20);
+  return (contentData ?? []) as RecentContentRow[];
+}
+
+/** Partial refresh: cache entries + recent feed rows after cache mutations. */
+export async function fetchAdminStatsCompanionCacheUi(): Promise<{
+  cacheEntries: CacheEntryRow[];
+  cacheError: boolean;
+  recentContent: RecentContentRow[];
+}> {
+  const [cacheResult, recentContent] = await Promise.all([
+    fetchAdminStatsCacheEntries(),
+    fetchAdminStatsRecentContent(),
+  ]);
+  return {
+    cacheEntries: (cacheResult.data ?? []) as CacheEntryRow[],
+    cacheError: Boolean(cacheResult.error),
+    recentContent,
+  };
+}
+
+/** Partial refresh: generation_attempts rejection log. */
+export async function fetchAdminStatsRejections(): Promise<RejectionRow[]> {
+  const { data: rejectData } = await supabase
+    .from('generation_attempts')
+    .select('id, companion_type, model, quality_gate_reason, error_message, status, created_at, latency_ms')
+    .in('status', ['quality_gate_failed', 'error', 'timeout', 'rate_limited'])
+    .order('created_at', { ascending: false })
+    .limit(50);
+  return (rejectData ?? []) as RejectionRow[];
+}
+
 export async function fetchAdminStatsBundle(): Promise<AdminStatsBundle> {
   const { data: adminData, error: rpcError } = await supabase.rpc('get_admin_stats' as never);
 
@@ -217,29 +277,12 @@ export async function fetchAdminStatsBundle(): Promise<AdminStatsBundle> {
   const dailyFeedback = fbDayRes.error ? [] : (fbDayRes.data ?? []);
   const dailyNotifications = notifRes.error ? [] : (notifRes.data ?? []);
 
-  const { data: cacheRows, error: cacheErr } = await supabase
-    .from('companion_cache')
-    .select('id, companion_type, title, quality_score, used_count, expires_at, thumbs_up, thumbs_down, created_at, content')
-    .order('quality_score', { ascending: false })
-    .order('used_count', { ascending: false })
-    .limit(200);
-
-  const cacheEntries = (!cacheErr ? (cacheRows ?? []) : []) as CacheEntryRow[];
-
-  const { data: rejectData } = await supabase
-    .from('generation_attempts')
-    .select('id, companion_type, model, quality_gate_reason, error_message, status, created_at, latency_ms')
-    .in('status', ['quality_gate_failed', 'error', 'timeout', 'rate_limited'])
-    .order('created_at', { ascending: false })
-    .limit(50);
-  const rejections = (rejectData ?? []) as RejectionRow[];
-
-  const { data: contentData } = await supabase
-    .from('companion_cache')
-    .select('id, companion_type, content, quality_score, title, created_at, used_count, source_author')
-    .order('created_at', { ascending: false })
-    .limit(20);
-  const recentContent = (contentData ?? []) as RecentContentRow[];
+  const [{ data: cacheEntriesData, error: cacheErr }, rejections, recentContent] = await Promise.all([
+    fetchAdminStatsCacheEntries(),
+    fetchAdminStatsRejections(),
+    fetchAdminStatsRecentContent(),
+  ]);
+  const cacheEntries = (!cacheErr ? (cacheEntriesData ?? []) : []) as CacheEntryRow[];
 
   const { data: sessionData } = await supabase
     .from('v_pause_full' as never)
