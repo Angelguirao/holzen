@@ -6,7 +6,7 @@ This document inventories **user-visible flows** and **cross-cutting areas** so 
 
 **How to read estimates:** Hours are for a **phase-style pass**: trace code, data, and edge calls; note failure modes and gaps—not a shallow skim. Treat ranges as **±30–40%** depending on depth (security vs UX-only). Merged reviews (e.g. all `/tools/practice/*` in one session) reduce wall-clock time.
 
-**Canonical route list:** `src/App.tsx`. **Edge names:** `bruno/functions-catalog.md` and `supabase/config.toml` under `[functions.<name>]`.
+**Canonical route list:** `src/App.tsx` for structure; **shipped pause-first routes/tabs** → [active-surface.md](../ops/active-surface.md). Tables below that list `/library`, `/tools`, or Journey sub-tabs describe **pre-strip full IA** (`git tag full-ia-pre-strip`) unless noted — use [end-to-end-review-master-checklist.md](end-to-end-review-master-checklist.md) **Shipped MVP only** for production sign-off.
 
 ## Table of contents
 
