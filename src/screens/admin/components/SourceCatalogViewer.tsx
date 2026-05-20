@@ -1,11 +1,15 @@
 import { useState, useMemo, useCallback, useEffect } from 'react';
 import { ChevronDown, ChevronRight, Trash2, Globe, BookOpen } from 'lucide-react';
 import { useToast } from '@/components/ui/use-toast';
-import { insertAdminSignalSource, setSignalSourceDemotedForLive } from '@/features/user/public-queries';
+import {
+  deleteSignalSourceRow,
+  deleteSignalSourceRowsByIds,
+  insertAdminSignalSource,
+  setSignalSourceDemotedForLive,
+} from '@/features/user/public-queries';
 import type { SignalSourceRow, LibraryEntryRow } from '@/screens/admin/lib/admin-stats-bundle-query';
 import { Checkbox } from '@/components/ui/checkbox';
 import { AdminBulkBar } from './AdminBulkBar';
-import { adminDeleteOneRow, adminDeleteRowsByIds } from '@/screens/admin/lib/admin-delete';
 
 const DELETE_CHUNK = 40;
 
@@ -95,7 +99,7 @@ export function SourceCatalogViewer({ sources, onRefresh, libraryEntries = [] }:
 
   const deleteSource = async (id: string, name: string) => {
     if (!window.confirm(`Remove "${name}" from sources?`)) return;
-    const { ok, errorMessage } = await adminDeleteOneRow('signal_sources', id);
+    const { ok, errorMessage } = await deleteSignalSourceRow(id);
     if (!ok) { toast({ title: 'Delete source failed', description: errorMessage ?? 'Unknown error', variant: 'destructive' }); return; }
     setSelectedIds((prev) => { const n = new Set(prev); n.delete(id); return n; });
     onRefresh();
@@ -116,7 +120,7 @@ export function SourceCatalogViewer({ sources, onRefresh, libraryEntries = [] }:
     if (!window.confirm(`Delete ${ids.length} source${ids.length === 1 ? '' : 's'}?`)) return;
     setBulkBusy(true);
     try {
-      const { deleted, errorMessage } = await adminDeleteRowsByIds('signal_sources', ids, DELETE_CHUNK);
+      const { deleted, errorMessage } = await deleteSignalSourceRowsByIds(ids, DELETE_CHUNK);
       if (errorMessage) {
         toast({ title: 'Bulk delete failed', description: errorMessage, variant: 'destructive' });
         return;

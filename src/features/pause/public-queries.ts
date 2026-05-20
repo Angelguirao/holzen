@@ -65,6 +65,11 @@ export {
   type CompanionCacheAdminMutationResult,
 } from './infrastructure/queries/companion-cache-admin-mutations';
 export {
+  deleteCompanionCacheRow,
+  deleteCompanionCacheRowsByIds,
+  deleteGenerationAttemptRowsByIds,
+} from './infrastructure/queries/pause-admin-delete-mutations';
+export {
   deleteCompanionFallback,
   insertCompanionFallbackEntry,
   setCompanionFallbackActive,

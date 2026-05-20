@@ -20,7 +20,10 @@ import { AdminSubNav } from '@/screens/admin/components/AdminSubNav';
 import { AppConfigTools } from '@/screens/admin/components/AppConfigTools';
 import { MigrationStatus } from '@/screens/admin/components/MigrationStatus';
 import { CostAnalytics } from '@/screens/admin/components/CostAnalytics';
-import { adminDeleteRowsByIds } from '@/screens/admin/lib/admin-delete';
+import {
+  deleteCompanionCacheRowsByIds,
+  deleteGenerationAttemptRowsByIds,
+} from '@/features/pause/public-queries';
 
 function computeTrend(current: number, previous: number | null, invertColor: boolean): TrendInfo | undefined {
   if (previous === null || previous === undefined) return undefined;
@@ -202,7 +205,7 @@ export default function Admin() {
     if (!window.confirm(`Delete ${ids.length} cache entr${ids.length === 1 ? 'y' : 'ies'}? This cannot be undone.`)) return;
     setFeedBulkBusy(true);
     try {
-      const { deleted, errorMessage } = await adminDeleteRowsByIds('companion_cache', ids, FEED_DELETE_CHUNK);
+      const { deleted, errorMessage } = await deleteCompanionCacheRowsByIds(ids, FEED_DELETE_CHUNK);
       if (errorMessage) {
         toast({ title: 'Bulk delete failed', description: errorMessage, variant: 'destructive' });
         return;
@@ -259,7 +262,7 @@ export default function Admin() {
     if (!window.confirm(`Permanently delete ${ids.length} generation attempt record${ids.length === 1 ? '' : 's'}?`)) return;
     setRejectionBulkBusy(true);
     try {
-      const { deleted, errorMessage } = await adminDeleteRowsByIds('generation_attempts', ids, REJECTION_DELETE_CHUNK);
+      const { deleted, errorMessage } = await deleteGenerationAttemptRowsByIds(ids, REJECTION_DELETE_CHUNK);
       if (errorMessage) {
         toast({ title: 'Bulk delete failed', description: errorMessage, variant: 'destructive' });
         return;
