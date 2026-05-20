@@ -3,6 +3,7 @@ import type { User } from '@supabase/supabase-js';
 import type { BtcPriceData } from '@/features/market/public';
 import { applyManualPauseOpenResult } from '@/features/pause/application/use-cases/trigger/apply-manual-pause-open-result';
 import { buildManualPauseOpenParams } from '@/features/pause/application/use-cases/trigger/build-manual-pause-open-params';
+import { markPauseManualStartedHomeOnce } from '@/features/pause/application/use-cases/trigger/manual-pause-trigger-telemetry';
 import { clearSession } from '@/features/pause/public';
 import {
   MANUAL_PAUSE_TRIGGER_IDLE,
@@ -11,20 +12,6 @@ import {
 } from '@/features/pause/public';
 import { openManualPauseFromHome } from '@/features/pause/public-rpc';
 import { holzenLog } from '@/lib/holzen-console';
-import { trackEvent } from '@/lib/posthog';
-
-const PAUSE_MANUAL_START_HOME = 'holzen_sess_pause_manual_started_home';
-
-/** Once per tab session: user kicked off a manual “Need a moment” (opens pause instance) from Home. */
-function markPauseManualStartedHomeOnce(): void {
-  try {
-    if (sessionStorage.getItem(PAUSE_MANUAL_START_HOME)) return;
-    sessionStorage.setItem(PAUSE_MANUAL_START_HOME, '1');
-    trackEvent('pause.manual_started', { surface: 'home' });
-  } catch {
-    /* sessionStorage */
-  }
-}
 
 export interface UseManualPauseTriggerParams {
   user: User | null;
