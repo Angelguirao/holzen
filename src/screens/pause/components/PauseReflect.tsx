@@ -8,8 +8,11 @@ import { PauseNote } from '@/screens/pause/components/PauseNote';
 import { PauseTags } from '@/screens/pause/components/PauseTags';
 import { pauseStepLayout } from '@/features/pause/public';
 import { Button } from '@/components/ui/button';
-import { trackEvent } from '@/lib/posthog';
-import { usePauseArtifactHaiku, usePauseReflectionStepLog } from '@/features/pause/public-hooks';
+import {
+  usePauseArtifactHaiku,
+  usePauseReflectionStepLog,
+  usePauseReflectUiTelemetry,
+} from '@/features/pause/public-hooks';
 import { hapticFeedback } from '@/lib/haptics';
 import { cn } from '@/lib/utils';
 
@@ -58,11 +61,13 @@ export function PauseReflect({
     reflectionError,
   });
 
+  const { onPostItOpen } = usePauseReflectUiTelemetry(pauseInstanceId, 'pause_reflect');
+
   const openPostIt = useCallback(() => {
     hapticFeedback('light');
     setPostItOpen(true);
-    trackEvent('pause_reflect_post_it_open', { surface: 'pause_reflect', has_pause_id: !!pauseInstanceId });
-  }, [pauseInstanceId]);
+    onPostItOpen();
+  }, [onPostItOpen]);
 
   return (
     <motion.div
