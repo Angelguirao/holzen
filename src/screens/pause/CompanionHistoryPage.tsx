@@ -1,12 +1,7 @@
-import { useCallback, useEffect, useMemo } from 'react';
-import { useNavigate, useParams, useLocation, Navigate } from 'react-router-dom';
+import { useParams, Navigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useHolzen } from '@/app/components/HolzenProvider';
-import { useCompanionData } from '@/features/pause/public-hooks';
-import {
-  useFullviewTelemetry,
-  usePauseSessionCompanionSnapshot,
-} from '@/features/pause/public-hooks';
+import { useCompanionFullViewPage } from '@/features/pause/public-hooks';
 import { HistoricalInsightDisplay } from '@/screens/pause/components/HistoricalInsightDisplay';
 import { CompanionFeedback } from '@/screens/pause/components/CompanionFeedback';
 import { CompanionFocusLayout } from '@/screens/pause/components/companion/CompanionFocusLayout';
@@ -14,77 +9,40 @@ import { ReadTime } from '@/screens/pause/components/companion/ReadTime';
 import { WhyThisCard } from '@/screens/pause/components/companion/WhyThisCard';
 import { HistoryThread } from '@/screens/pause/components/companion/HistoryThread';
 import { InterventionCrossRefBadge } from '@/screens/pause/components/companion/InterventionCrossRefBadge';
-import { useStaggeredReveal } from '@/features/pause/public-hooks';
 import { PageMeta } from '@/app/components/PageMeta';
-import { DEFAULT_COMPANIONS, DEFAULT_PREFS } from '@/features/pause/public';
-
-const SEVERITY_NUMBER: Record<string, number> = { mild: 3, moderate: 6, high: 10 };
-const BREATHING_ROOM_MS = 8000;
-
 
 export default function CompanionHistoryPage() {
   const { pauseInstanceId: rid } = useParams<{ pauseInstanceId: string }>();
-  const navigate = useNavigate();
-  const location = useLocation();
   const { t } = useTranslation();
   const { companionPrefs, severity } = useHolzen();
 
-  const { snapshot, isPending: snapshotPending, loadError } = usePauseSessionCompanionSnapshot(rid);
-
-  const pauseInstanceId = snapshot?.id ?? null;
-  const reflectionMessage = snapshot?.reflectionMessage ?? '';
-  const context = snapshot?.context ?? null;
-  const mood = snapshot?.mood ?? null;
-  const companions = snapshot?.companions ?? DEFAULT_COMPANIONS;
-  const prefs = companionPrefs ?? DEFAULT_PREFS;
-  const severityNumber = SEVERITY_NUMBER[severity] ?? 6;
-
   const {
-    historyInsight,
-    historyLoading,
-    historyError,
-    retryHistory,
-    fetchCompanion,
-    cacheIds,
-    cacheRelaxations,
-    regenerateCompanion,
-    interventionLoading,
-    intervention,
-  } = useCompanionData({
-    companions,
-    prefs: { ...prefs, history: true },
+    missingRouteId,
+    loadError,
+    snapshotPending,
+    snapshot,
     pauseInstanceId,
-    context,
-    reflectionMessage,
     mood,
-    severityNumber,
+    revealed,
+    handleBack,
+    companion: {
+      historyInsight,
+      historyLoading,
+      historyError,
+      retryHistory,
+      cacheIds,
+      cacheRelaxations,
+      regenerateCompanion,
+      intervention,
+    },
+  } = useCompanionFullViewPage({
+    routeInstanceId: rid,
+    slot: 'history',
+    companionPrefs,
+    severity,
   });
 
-  useEffect(() => {
-    if (!pauseInstanceId || !reflectionMessage) return;
-    if (interventionLoading) return;
-    if (historyInsight || historyLoading || historyError) return;
-    void fetchCompanion('history');
-  }, [
-    pauseInstanceId,
-    reflectionMessage,
-    interventionLoading,
-    historyInsight,
-    historyLoading,
-    historyError,
-    fetchCompanion,
-  ]);
-
-  const revealed = useStaggeredReveal(BREATHING_ROOM_MS);
-  useFullviewTelemetry('history', pauseInstanceId);
-
-  const handleBack = useCallback(() => {
-    const st = location.state as { from?: string } | undefined;
-    if (st?.from === 'archive') navigate('/archive');
-    else navigate(-1);
-  }, [location.state, navigate]);
-
-  if (!rid) return <Navigate to="/" replace />;
+  if (missingRouteId) return <Navigate to="/" replace />;
 
   if (loadError) {
     return (

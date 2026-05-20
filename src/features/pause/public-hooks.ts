@@ -153,6 +153,10 @@ export {
 } from './presentation/use-companion-orchestration';
 export { useCompanionData, type UseCompanionDataParams } from './presentation/use-companion-data';
 export {
+  useCompanionFullViewPage,
+  type UseCompanionFullViewPageParams,
+} from './presentation/use-companion-fullview-page';
+export {
   useGroundingEnrichment,
   type GroundingEnrichment,
 } from './presentation/use-grounding-enrichment';
