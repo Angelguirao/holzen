@@ -1,9 +1,8 @@
 import { useCallback, useState } from 'react';
 import type { TFunction } from 'i18next';
-import { toast } from 'sonner';
 import { trackEvent } from '@/lib/posthog';
-import { pauseAdoptPendingOffer, pauseDeclinePendingOffer } from '@/features/pause/public-rpc';
-import type { PendingPauseOfferRow } from '@/features/pause/public-hooks';
+import type { PendingPauseOfferRow } from './use-pending-pause-offer';
+import { usePendingPauseOfferMutations } from './use-pending-pause-offer-mutations';
 
 export function usePauseSessionPendingLeaveSheet(options: {
   pending: PendingPauseOfferRow | null | undefined;
@@ -25,7 +24,14 @@ export function usePauseSessionPendingLeaveSheet(options: {
   } = options;
 
   const [leaveWithPendingOpen, setLeaveWithPendingOpen] = useState(false);
-  const [leaveSheetBusy, setLeaveSheetBusy] = useState(false);
+
+  const { busy: leaveSheetBusy, handleAdopt, handleDecline } = usePendingPauseOfferMutations({
+    pending,
+    onAfterMutation: pendingOfferAfterMutation,
+    navigateAfterAdopt: pendingOfferNavigateAfterAdopt,
+    refreshPendingOffer,
+    t,
+  });
 
   const confirmLeavePauseSession = useCallback(() => {
     try {
@@ -48,56 +54,14 @@ export function usePauseSessionPendingLeaveSheet(options: {
   }, [pending, confirmLeavePauseSession]);
 
   const handleDeclinePendingFromLeaveSheet = useCallback(async () => {
-    if (!pending || leaveSheetBusy) return;
-    setLeaveSheetBusy(true);
-    try {
-      await pauseDeclinePendingOffer();
-      try {
-        trackEvent('pause_pending_declined', { pause_instance_id: pending.id });
-      } catch {
-        /* no-op */
-      }
-      await Promise.resolve(pendingOfferAfterMutation());
-      setLeaveWithPendingOpen(false);
-      await refreshPendingOffer();
-    } catch {
-      toast.error(t('pause.pendingDeclineFailed', { defaultValue: 'Could not dismiss the offer. Try again.' }));
-    } finally {
-      setLeaveSheetBusy(false);
-    }
-  }, [pending, leaveSheetBusy, t, pendingOfferAfterMutation, refreshPendingOffer]);
+    const ok = await handleDecline();
+    if (ok) setLeaveWithPendingOpen(false);
+  }, [handleDecline]);
 
   const handlePendingAdoptFromLeaveSheet = useCallback(async () => {
-    if (!pending || leaveSheetBusy) return;
-    setLeaveSheetBusy(true);
-    try {
-      const r = await pauseAdoptPendingOffer();
-      if (!r.ok || !r.instance_id) {
-        toast.error(t('pause.pendingAdoptFailed', { defaultValue: 'Could not switch to the new pause. Try again.' }));
-        return;
-      }
-      try {
-        trackEvent('pause_pending_adopted', { pause_instance_id: r.instance_id });
-      } catch {
-        /* no-op */
-      }
-      await Promise.resolve(pendingOfferAfterMutation());
-      pendingOfferNavigateAfterAdopt(r.instance_id);
-      setLeaveWithPendingOpen(false);
-      await refreshPendingOffer();
-    } catch {
-      toast.error(t('pause.pendingAdoptFailed', { defaultValue: 'Could not switch to the new pause. Try again.' }));
-    } finally {
-      setLeaveSheetBusy(false);
-    }
-  }, [
-    pending,
-    leaveSheetBusy,
-    t,
-    pendingOfferAfterMutation,
-    pendingOfferNavigateAfterAdopt,
-    refreshPendingOffer,
-  ]);
+    const ok = await handleAdopt();
+    if (ok) setLeaveWithPendingOpen(false);
+  }, [handleAdopt]);
 
   return {
     leaveWithPendingOpen,

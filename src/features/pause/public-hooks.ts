@@ -13,6 +13,7 @@ export {
   pendingPauseOfferQueryKey,
   type PendingPauseOfferRow,
 } from './presentation/use-pending-pause-offer';
+export { usePendingPauseOfferMutations } from './presentation/use-pending-pause-offer-mutations';
 export {
   useBulkHoldPending,
   bulkHoldPendingQueryKey,

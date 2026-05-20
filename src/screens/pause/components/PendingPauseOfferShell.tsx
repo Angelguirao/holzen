@@ -1,6 +1,4 @@
-import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { toast } from 'sonner';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -11,9 +9,8 @@ import {
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
 import { Button } from '@/components/ui/button';
-import { usePendingPauseOffer } from '@/features/pause/public-hooks';
-import { pauseAdoptPendingOffer, pauseDeclinePendingOffer } from '@/features/pause/public-rpc';
-import { trackEvent } from '@/lib/posthog';
+import { getPendingPauseOfferDisplay } from '@/features/pause/public';
+import { usePendingPauseOffer, usePendingPauseOfferMutations } from '@/features/pause/public-hooks';
 
 interface Props {
   /** After adopt or decline — e.g. resync `useHolzen` from `v_pause_current`. */
@@ -34,59 +31,16 @@ interface Props {
 export function PendingPauseOfferShell({ onAfterMutation, navigateAfterAdopt, autoOpen = true }: Props) {
   const { t } = useTranslation();
   const { pending, refresh } = usePendingPauseOffer();
-  const [busy, setBusy] = useState(false);
+  const { busy, handleAdopt, handleDecline } = usePendingPauseOfferMutations({
+    pending,
+    onAfterMutation,
+    navigateAfterAdopt,
+    refreshPendingOffer: refresh,
+    t,
+  });
 
   const open = autoOpen && !!pending;
-
-  const handleAdopt = async () => {
-    if (!pending || busy) return;
-    setBusy(true);
-    try {
-      const r = await pauseAdoptPendingOffer();
-      if (!r.ok || !r.instance_id) {
-        toast.error(t('pause.pendingAdoptFailed', { defaultValue: 'Could not switch to the new pause. Try again.' }));
-        return;
-      }
-      try {
-        trackEvent('pause_pending_adopted', { pause_instance_id: r.instance_id });
-      } catch {
-        /* no-op */
-      }
-      await Promise.resolve(onAfterMutation());
-      navigateAfterAdopt?.(r.instance_id);
-      await refresh();
-    } catch {
-      toast.error(t('pause.pendingAdoptFailed', { defaultValue: 'Could not switch to the new pause. Try again.' }));
-    } finally {
-      setBusy(false);
-    }
-  };
-
-  const handleDecline = async () => {
-    if (!pending || busy) return;
-    setBusy(true);
-    try {
-      await pauseDeclinePendingOffer();
-      try {
-        trackEvent('pause_pending_declined', { pause_instance_id: pending.id });
-      } catch {
-        /* no-op */
-      }
-      await Promise.resolve(onAfterMutation());
-      await refresh();
-    } catch {
-      toast.error(t('pause.pendingDeclineFailed', { defaultValue: 'Could not dismiss the offer. Try again.' }));
-    } finally {
-      setBusy(false);
-    }
-  };
-
-  const preview = pending?.preview_message?.trim();
-  const ctx =
-    pending?.context_snapshot && typeof pending.context_snapshot.context_text === 'string'
-      ? (pending.context_snapshot.context_text as string)
-      : null;
-  const showPreviewLine = Boolean(preview && preview !== ctx?.trim());
+  const { contextText, previewMessage, showPreviewLine } = getPendingPauseOfferDisplay(pending);
 
   return (
     <AlertDialog open={open}>
@@ -103,13 +57,13 @@ export function PendingPauseOfferShell({ onAfterMutation, navigateAfterAdopt, au
                     'There is a new pause for the latest move. You can keep your current pause or switch — switching ends the current ritual for this moment and opens the new one.',
                 })}
               </p>
-              {ctx ? (
+              {contextText ? (
                 <p className="rounded-md border border-border/60 bg-muted/30 px-3 py-2 text-xs text-foreground/90">
-                  {ctx}
+                  {contextText}
                 </p>
               ) : null}
-              {showPreviewLine ? (
-                <p className="line-clamp-4 text-xs leading-relaxed text-foreground/85">{preview}</p>
+              {showPreviewLine && previewMessage ? (
+                <p className="line-clamp-4 text-xs leading-relaxed text-foreground/85">{previewMessage}</p>
               ) : null}
             </div>
           </AlertDialogDescription>
