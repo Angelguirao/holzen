@@ -25,7 +25,7 @@ import {
 import { BulkHoldReviewBody } from '@/screens/home/components/bulk-hold/BulkHoldReviewBody';
 import { BulkHoldSuccessBody } from '@/screens/home/components/bulk-hold/BulkHoldSuccessBody';
 import { cn } from '@/lib/utils';
-import { useLatestRef } from '@/hooks/use-latest-ref';
+import { useLatestRef } from '@/app/hooks/use-latest-ref';
 
 type SheetMode = 'prompt' | 'review' | 'success';
 

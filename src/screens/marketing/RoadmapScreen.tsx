@@ -9,7 +9,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { Badge } from '@/components/ui/badge';
 import { PageMeta } from '@/app/components/PageMeta';
 import { PublicFooter } from '@/screens/marketing/components/PublicFooter';
-import { useInfiniteScroll } from '@/hooks/use-infinite-scroll';
+import { useInfiniteScroll } from '@/app/hooks/use-infinite-scroll';
 import { PageHeading } from '@/components/ui/page-heading';
 import {
   deleteRoadmapVote,
