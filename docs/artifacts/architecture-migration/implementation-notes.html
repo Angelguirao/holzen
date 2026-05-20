@@ -2127,6 +2127,25 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-20</span>
+      <span>Phase A slice — peel home pure helpers off public.ts (§6)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>Home card, zen route, arrival tone, manual-trigger nav, holzen providers slice</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1–#2 ritual moves are complete. Continue backlog #3 §6: remove home/session trigger pure helpers from <code>public.ts</code>; <code>presentation/home/*</code> and <code>use-pause-session-providers-conductor</code> import <code>application/use-cases/home/*</code> and <code>session/pause-holzen-providers-slice</code> directly. Drop unused <code>pauseCreateSkippedUserMessage</code> barrel re-export (only <code>open-manual-pause-from-home</code> uses it).</dd>
+      <dt>Deviation</dt>
+      <dd>None — screens already use <code>public-hooks</code> for home conductors; no screen import changes.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Did not move <code>breath-second-label-variant</code> or segment-log modules under <code>ritual/breathe/</code> in the same commit.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: move <code>breath-second-label-variant</code> or <code>run-breath-segment-log</code> under <code>ritual/breathe/</code>, or peel session shell/bundle exports still on <code>public.ts</code>.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
 </body>
 </html>

@@ -6,11 +6,9 @@ import type {
   CompanionPrefs,
   ManualPauseTriggerResult,
 } from '@/features/pause/public';
-import {
-  buildHomePauseSessionLocationState,
-  canNavigateToPauseSession,
-  shouldNavigateAfterManualTrigger,
-} from '@/features/pause/public';
+import { canNavigateToPauseSession } from '@/features/pause/public';
+import { buildHomePauseSessionLocationState } from '@/features/pause/application/use-cases/session/build-home-pause-session-location-state';
+import { shouldNavigateAfterManualTrigger } from '@/features/pause/application/use-cases/trigger/should-navigate-after-manual-trigger';
 import {
   trackHomePendingPauseBannerPauseOpened,
   trackPauseOpenDismissed,
