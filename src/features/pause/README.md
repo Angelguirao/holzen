@@ -22,7 +22,7 @@ features/pause/
   public.ts | public-queries.ts | public-rpc.ts | public-hooks.ts
 ```
 
-**Transitional paths (move incrementally):** reflect use cases under `application/use-cases/ritual/reflect/`; frame / companion slot orchestration under `application/use-cases/ritual/frame/` (legacy `companion/` root cleared May 2026). Remaining Phase A: peel `public.ts`, wire `PauseRepository`, group archive queries. User **collections** code is in `src/legacy/archive-collections/` (not shipped MVP).
+**Transitional paths (move incrementally):** reflect use cases under `application/use-cases/ritual/reflect/`; frame / companion slot orchestration under `application/use-cases/ritual/frame/` (legacy `companion/` root cleared May 2026). Remaining Phase A: peel `public.ts`, wire `PauseRepository`, group archive queries. Optional later: consolidate `ritual/brief/`, `deep/`, `breath/` beats per [pause-client-architecture.md](../../../docs/systems/pause-client-architecture.md) §10.1. User **collections** code is in `src/legacy/archive-collections/` (not shipped MVP).
 
 **Brief vs deep:** one bounded context. Depth is `RitualDepth` on the instance / persisted session — not separate feature folders.
 
