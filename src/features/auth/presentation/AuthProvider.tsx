@@ -8,7 +8,7 @@ import {
   identifyAuthenticatedUser,
   syncAuthObservability,
 } from '@/features/auth/application/auth-observability';
-import { runSignedInSideEffects } from '@/features/auth/infrastructure/auth-signed-in-side-effects';
+import { runSignedInSideEffects } from '../public-hooks';
 
 const AuthContext = createContext<AuthSessionState>({
   user: null,
