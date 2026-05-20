@@ -154,3 +154,21 @@ export {
   usePauseSessionScaffoldPresentation,
   type UsePauseSessionScaffoldPresentationParams,
 } from './presentation/use-pause-session-scaffold-presentation';
+export {
+  usePauseSessionScaffoldVm,
+  type PauseSessionScaffoldVmResult,
+} from './presentation/use-pause-session-scaffold-vm';
+export type {
+  PauseSessionScaffoldVmChromeSlots,
+  PauseSessionScaffoldVmProvidersSlice,
+} from './presentation/session/pause-session-scaffold-vm-types';
+export {
+  usePauseSessionFlowCore,
+  type PauseSessionFlowCoreProvidersSlice,
+  type PauseSessionFlowCoreResult,
+} from './presentation/use-pause-session-flow-core';
+export {
+  usePauseSessionRitualSurface,
+  type PauseSessionRitualSurfaceMotionSlice,
+  type PauseSessionRitualSurfaceResult,
+} from './presentation/use-pause-session-ritual-surface';

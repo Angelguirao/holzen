@@ -1,18 +1,17 @@
-import type { usePauseSessionProviders } from '@/screens/pause/hooks/use-pause-session-providers';
-import type { PauseSessionShellRitualResult } from '@/features/pause/public-hooks';
-import { usePauseSessionScaffoldVm } from '@/screens/pause/hooks/use-pause-session-scaffold-vm';
-import { usePauseSessionStepHandlers } from '@/features/pause/public-hooks';
+import type { PauseSessionScaffoldVmResult } from './use-pause-session-scaffold-vm';
+import type { PauseSessionStepHandlersResult } from './use-pause-session-step-handlers';
 
-type PauseSessionProviders = ReturnType<typeof usePauseSessionProviders>;
+export type PauseSessionRitualSurfaceMotionSlice = {
+  prefersReducedMotion: boolean | null;
+};
 
-/** Composes step handlers + scaffold VM for the pause session ritual surface. */
-export function usePauseSessionRitualHandlers(
-  p: PauseSessionProviders,
-  shellRitual: PauseSessionShellRitualResult,
+/** Merges step handlers + scaffold VM into props for the pause session ritual surface. */
+export function usePauseSessionRitualSurface(
+  motion: PauseSessionRitualSurfaceMotionSlice,
+  step: PauseSessionStepHandlersResult,
+  scaffoldVm: PauseSessionScaffoldVmResult,
 ) {
-  const { prefersReducedMotion } = p;
-  const step = usePauseSessionStepHandlers(p, shellRitual);
-  const scaffoldVm = usePauseSessionScaffoldVm(p, step);
+  const { prefersReducedMotion } = motion;
   const { shell, ritual } = step;
 
   return {
@@ -58,3 +57,5 @@ export function usePauseSessionRitualHandlers(
     pauseInstanceIdForTerminal: shell.pauseInstanceIdForTerminal,
   };
 }
+
+export type PauseSessionRitualSurfaceResult = ReturnType<typeof usePauseSessionRitualSurface>;
