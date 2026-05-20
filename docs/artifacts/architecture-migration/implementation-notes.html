@@ -2870,6 +2870,25 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-20</span>
+      <span>Phase A slice — colocate shell bootstrap under presentation/session/</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>Backlog #1 complete; Tier 5 session shell conductor grouped</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd><code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code> was already complete on <code>cursor/arch-migrate-src-ca70</code>. Move <code>use-pause-session-shell-bootstrap</code> beside mount log, ritual navigation, and step handlers under <code>presentation/session/</code>; <code>public-hooks</code> + <code>use-pause-session-shell-ritual</code> import paths only.</dd>
+      <dt>Deviation</dt>
+      <dd>None — matches §3.2 / §10.1 session conductor grouping.</dd>
+      <dt>Tradeoffs</dt>
+      <dd><code>use-pause-session-shell</code> and pending-leave sheet remain flat under <code>presentation/</code> until a later peel bundles fetch + leave sheet with the bootstrap conductor.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: thin <code>pauseCreateOrReuse</code> / <code>pauseDismissCurrent</code> use cases on <code>public-rpc</code> (backlog #4), or port-backed companion feedback vote write path.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
 </body>
 </html>
