@@ -3117,6 +3117,25 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-20</span>
+      <span>Phase A slice — colocate reflect UI telemetry under ritual/reflect/telemetry/</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>Backlog #1 increment — PostHog reflect telemetry cluster</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>After <code>steps/</code>, group <code>pause-reflect-ui-telemetry</code> (+ test) under <code>ritual/reflect/telemetry/</code>; presentation hook import path only — no PostHog event or property changes.</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior-preserving <code>git mv</code>.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Session reflect/decide flow, frame focus ambience, favorite toggle, and shift-frame hub flow remain at <code>ritual/reflect/</code> root until later subfolder slices.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: colocate <code>reflect-frame-focus-ambience</code> or <code>pause-session-reflect-decide-flow</code> subfolders, or colocate entry presentation effects + brief→deep under <code>presentation/session/</code>.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
 </body>
 </html>
