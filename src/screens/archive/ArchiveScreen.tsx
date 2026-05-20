@@ -4,6 +4,7 @@ import { useSearchParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
+  getArchivePausesTabHasRowsQueryOptions,
   usePauseArchiveList,
   type PauseArchiveRow,
   type PauseArchiveSegment,
@@ -21,7 +22,6 @@ import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import { useAuth } from '@/features/auth/public';
-import { getArchivePausesTabHasRowsQueryOptions } from '@/features/pause/public-queries';
 import type { ArchiveMainSegment } from '@/features/pause/public';
 
 type SortMode = 'newest' | 'oldest' | 'alphabetical';
