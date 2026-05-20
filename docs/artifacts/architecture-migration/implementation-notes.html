@@ -1538,6 +1538,25 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-20</span>
+      <span>Phase A slice — breath segment logs via PauseRepository (backlog #4)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3><code>runEnsureBreathSegment*</code> / skip → repository port</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>reflect/</code> → <code>ritual/reflect/</code>) was already complete on <code>cursor/arch-migrate-src-ca70</code>. Continue backlog #4: breath segment use cases take <code>PauseRepository</code> and call <code>logPauseStep</code> with <code>breath_completed</code>; companion UI cache invalidation stays an optional <code>onSegmentLogged</code> dep wired from <code>public-rpc</code>. Presentation hook imports wired <code>ensureBreathSegment*</code> / <code>logBreathSegment*Skipped</code> only — removed <code>pauseBreathSegmentLogPorts</code> and use-case exports from <code>public.ts</code>.</dd>
+      <dt>Deviation</dt>
+      <dd>None — same pattern as feel/decide wired facades (May 2026).</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Did not colocate <code>application/use-cases/breathing/</code> under <code>ritual/breathe/</code> in this commit.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: §6 <code>public.ts</code> peel (screen-only breathe helpers → <code>public-hooks</code>) or <code>post-pause-emotion-log</code> under <code>ritual/done/</code>.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
 </body>
 </html>

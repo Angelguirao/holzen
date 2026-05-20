@@ -10,17 +10,53 @@ const { pauseLogStepMock, invalidateCompanionUiCompletionQueryMock } = vi.hoiste
   invalidateCompanionUiCompletionQueryMock: vi.fn(),
 }));
 
+async function mockBreathSegmentLog(
+  input: { pauseInstanceId: string | null; segmentAlreadyLogged?: boolean },
+  payload: Record<string, unknown>,
+) {
+  if (!input.pauseInstanceId) return { status: 'no_instance' as const };
+  if (input.segmentAlreadyLogged) return { status: 'already_logged' as const };
+  try {
+    await pauseLogStepMock({
+      instanceId: input.pauseInstanceId,
+      stepType: 'breath_completed',
+      payload,
+    });
+    invalidateCompanionUiCompletionQueryMock(input.pauseInstanceId);
+    return { status: 'success' as const, markSegmentLogged: true as const };
+  } catch {
+    return { status: 'sync_failed' as const };
+  }
+}
+
 vi.mock('@/features/pause/public-rpc', () => ({
-  pauseBreathSegmentLogPorts: {
-    logStep: (params: { instanceId: string; payload: Record<string, unknown> }) =>
-      pauseLogStepMock({
-        instanceId: params.instanceId,
-        stepType: 'breath_completed',
-        payload: params.payload,
-      }).then(() => undefined),
-    invalidateCompanionCompletion: (...args: unknown[]) =>
-      invalidateCompanionUiCompletionQueryMock(...args),
-  },
+  ensureBreathSegment1Logged: (input: {
+    pauseInstanceId: string | null;
+    segmentAlreadyLogged: boolean;
+    briefRitual?: boolean;
+  }) =>
+    mockBreathSegmentLog(input, {
+      breath_segment: 1,
+      ...(input.briefRitual ? { brief_ritual: true } : {}),
+    }),
+  ensureBreathSegment2Logged: (input: {
+    pauseInstanceId: string | null;
+    segmentAlreadyLogged: boolean;
+  }) => mockBreathSegmentLog(input, { breath_segment: 2 }),
+  logBreathSegment1Skipped: (input: {
+    pauseInstanceId: string | null;
+    opts?: { briefRitual?: boolean };
+  }) =>
+    mockBreathSegmentLog(
+      { pauseInstanceId: input.pauseInstanceId },
+      {
+        breath_segment: 1,
+        skipped: true,
+        ...(input.opts?.briefRitual ? { brief_ritual: true } : {}),
+      },
+    ),
+  logBreathSegment2Skipped: (input: { pauseInstanceId: string | null }) =>
+    mockBreathSegmentLog(input, { breath_segment: 2, skipped: true }),
 }));
 
 vi.mock('@/features/pause/application/use-cases/feedback/step-sync-toast', () => ({

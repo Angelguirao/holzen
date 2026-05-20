@@ -1,4 +1,5 @@
 import { describe, expect, it, vi } from 'vitest';
+import type { PauseRepository } from '@/features/pause/ports/pause-repository';
 import {
   applyBreathSegmentLogOutcome,
   runEnsureBreathSegment1Logged,
@@ -7,13 +8,17 @@ import {
   runLogBreathSegment2Skipped,
 } from './run-breath-segment-log';
 
+function mockRepository(logStep = vi.fn().mockResolvedValue(null)): PauseRepository {
+  return { logStep } as unknown as PauseRepository;
+}
+
 describe('runEnsureBreathSegment1Logged', () => {
   it('returns no_instance without RPC', async () => {
     const logStep = vi.fn();
     expect(
       await runEnsureBreathSegment1Logged(
+        mockRepository(logStep),
         { pauseInstanceId: null, segmentAlreadyLogged: false },
-        { logStep },
       ),
     ).toEqual({ status: 'no_instance' });
     expect(logStep).not.toHaveBeenCalled();
@@ -23,42 +28,45 @@ describe('runEnsureBreathSegment1Logged', () => {
     const logStep = vi.fn();
     expect(
       await runEnsureBreathSegment1Logged(
+        mockRepository(logStep),
         { pauseInstanceId: 'i', segmentAlreadyLogged: true },
-        { logStep },
       ),
     ).toEqual({ status: 'already_logged' });
     expect(logStep).not.toHaveBeenCalled();
   });
 
   it('logs once and invalidates companion completion cache', async () => {
-    const logStep = vi.fn().mockResolvedValue(undefined);
-    const invalidateCompanionCompletion = vi.fn();
+    const logStep = vi.fn().mockResolvedValue(null);
+    const onSegmentLogged = vi.fn();
 
     const result = await runEnsureBreathSegment1Logged(
+      mockRepository(logStep),
       { pauseInstanceId: 'inst-1', segmentAlreadyLogged: false, briefRitual: true },
-      { logStep, invalidateCompanionCompletion },
+      { onSegmentLogged },
     );
 
     expect(result).toEqual({ status: 'success', markSegmentLogged: true });
     expect(logStep).toHaveBeenCalledWith({
       instanceId: 'inst-1',
+      stepType: 'breath_completed',
       payload: { breath_segment: 1, brief_ritual: true },
     });
-    expect(invalidateCompanionCompletion).toHaveBeenCalledWith('inst-1');
+    expect(onSegmentLogged).toHaveBeenCalledWith('inst-1');
   });
 });
 
 describe('runLogBreathSegment1Skipped', () => {
   it('sends skipped payload with brief ritual', async () => {
-    const logStep = vi.fn().mockResolvedValue(undefined);
+    const logStep = vi.fn().mockResolvedValue(null);
 
     await runLogBreathSegment1Skipped(
+      mockRepository(logStep),
       { pauseInstanceId: 'inst-1', opts: { briefRitual: true } },
-      { logStep },
     );
 
     expect(logStep).toHaveBeenCalledWith({
       instanceId: 'inst-1',
+      stepType: 'breath_completed',
       payload: { breath_segment: 1, brief_ritual: true, skipped: true },
     });
   });
@@ -66,12 +74,13 @@ describe('runLogBreathSegment1Skipped', () => {
 
 describe('runLogBreathSegment2Skipped', () => {
   it('sends segment 2 skipped payload', async () => {
-    const logStep = vi.fn().mockResolvedValue(undefined);
+    const logStep = vi.fn().mockResolvedValue(null);
 
-    await runLogBreathSegment2Skipped({ pauseInstanceId: 'inst-1' }, { logStep });
+    await runLogBreathSegment2Skipped(mockRepository(logStep), { pauseInstanceId: 'inst-1' });
 
     expect(logStep).toHaveBeenCalledWith({
       instanceId: 'inst-1',
+      stepType: 'breath_completed',
       payload: { breath_segment: 2, skipped: true },
     });
   });
@@ -82,8 +91,8 @@ describe('runEnsureBreathSegment2Logged', () => {
     const logStep = vi.fn().mockRejectedValue(new Error('network'));
 
     const result = await runEnsureBreathSegment2Logged(
+      mockRepository(logStep),
       { pauseInstanceId: 'inst-1', segmentAlreadyLogged: false },
-      { logStep },
     );
 
     expect(result).toEqual({ status: 'sync_failed' });
