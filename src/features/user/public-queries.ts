@@ -109,3 +109,18 @@ export {
   ROADMAP_VOTES_NONE_QUERY_KEY,
   type RoadmapListItem,
 } from './infrastructure/queries/roadmap-query';
+export {
+  CHANGELOG_ENTRIES_PAGE_SIZE,
+  CHANGELOG_ENTRIES_QUERY_KEY,
+  CHANGELOG_ENTRIES_QUERY_LEAF,
+  CHANGELOG_ENTRIES_QUERY_PREFIX,
+  CHANGELOG_LATEST_VERSION_QUERY_KEY,
+  CHANGELOG_LATEST_VERSION_QUERY_LEAF,
+  CHANGELOG_LATEST_VERSION_QUERY_PREFIX,
+  fetchChangelogEntriesPage,
+  fetchLatestChangelogVersion,
+  getChangelogEntriesInfiniteQueryOptions,
+  getLatestChangelogVersionQueryOptions,
+  prefetchChangelogEntriesFirstPage,
+  type ChangelogEntryRow,
+} from './infrastructure/queries/changelog-query';

@@ -5,7 +5,7 @@ import {
   CHANGELOG_ENTRIES_QUERY_KEY,
   getChangelogEntriesInfiniteQueryOptions,
   prefetchChangelogEntriesFirstPage,
-} from '@/screens/marketing/lib/changelog-query';
+} from '@/features/user/public-queries';
 import {
   AlertDialog,
   AlertDialogContent,
