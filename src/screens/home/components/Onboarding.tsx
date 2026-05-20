@@ -4,7 +4,7 @@ import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
 import { OnboardingWhy } from '@/screens/home/components/onboarding/OnboardingWhy';
 import { OnboardingReady } from '@/screens/home/components/onboarding/OnboardingReady';
 import { useSubscription } from '@/features/subscription/public-hooks';
-import { trackEvent } from '@/lib/posthog';
+import { trackOnboardingCompleted } from '@/screens/home/lib/home-screen-telemetry';
 
 interface OnboardingResult {
   threshold: number;
@@ -106,11 +106,7 @@ export function Onboarding({ onComplete }: Props) {
                         await onComplete(buildResult(), { setLocalOnboarded: false });
                         await ensureTrial();
                         await onComplete(buildResult());
-                        try {
-                          trackEvent('onboarding.completed', { steps_completed: 2 });
-                        } catch {
-                          /* no-op */
-                        }
+                        trackOnboardingCompleted(2);
                       } finally {
                         setStartingTrial(false);
                       }

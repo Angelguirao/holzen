@@ -5,6 +5,7 @@ import {
   trackHomeGoalWhyExpandToggled,
   trackHomeHeroQuoteViewed,
   trackHomeOptionalWidgetToggled,
+  trackOnboardingCompleted,
 } from './home-screen-telemetry';
 
 const trackEvent = vi.fn();
@@ -44,5 +45,10 @@ describe('home-screen-telemetry', () => {
   it('tracks goal-why expand toggle', () => {
     trackHomeGoalWhyExpandToggled(true);
     expect(trackEvent).toHaveBeenCalledWith('home.goal_why_expand_toggled', { expanded: true });
+  });
+
+  it('tracks onboarding completed', () => {
+    trackOnboardingCompleted(2);
+    expect(trackEvent).toHaveBeenCalledWith('onboarding.completed', { steps_completed: 2 });
   });
 });
