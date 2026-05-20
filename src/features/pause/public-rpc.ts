@@ -22,6 +22,12 @@ export {
   invokeCompanionIntervention,
   invokeCompanionOrchestrate,
 } from './infrastructure/edge/companion-orchestrate-edge';
+export {
+  invokeGroundingEnrich,
+  type GroundingEnrichBody,
+  type GroundingEnrichment,
+} from './infrastructure/edge/grounding-enrich-edge';
+export { invokeHolzenReflect, type HolzenReflectResponse } from './infrastructure/edge/holzen-reflect-edge';
 
 import { logRetrospectiveOutcome as logRetrospectiveOutcomeUseCase } from './application/use-cases/archive/log-retrospective-outcome';
 import { logPauseRitualDepthUpgraded as logPauseRitualDepthUpgradedUseCase } from './application/use-cases/session/ritual-depth-upgrade';
