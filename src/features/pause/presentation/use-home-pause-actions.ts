@@ -11,10 +11,14 @@ import {
   canNavigateToPauseSession,
   shouldNavigateAfterManualTrigger,
 } from '@/features/pause/public';
+import {
+  trackHomePendingPauseBannerPauseOpened,
+  trackPauseOpenDismissed,
+  type PauseDismissAnalyticsSurface,
+} from '@/features/pause/application/use-cases/trigger/home-pause-actions-telemetry';
 import { holzenLog } from '@/lib/holzen-console';
-import { trackEvent } from '@/lib/posthog';
 
-export type PauseDismissAnalyticsSurface = 'home_zen_reflection' | 'home_your_pause_widget';
+export type { PauseDismissAnalyticsSurface };
 
 export function useHomePauseActions(args: {
   message: string | null;
@@ -82,14 +86,7 @@ export function useHomePauseActions(args: {
   ]);
 
   const handleDismiss = useCallback(() => {
-    try {
-      trackEvent('pause_open_dismissed', {
-        surface: dismissAnalyticsSurface,
-        pause_instance_id: lastPauseInstanceId ?? undefined,
-      });
-    } catch {
-      /* no-op */
-    }
+    trackPauseOpenDismissed(dismissAnalyticsSurface, lastPauseInstanceId);
     void dismissMessage();
   }, [dismissMessage, dismissAnalyticsSurface, lastPauseInstanceId]);
 
@@ -119,14 +116,7 @@ export function useHomePauseActions(args: {
 
   const handleNavigatePauseWithThisFromPendingBanner = useCallback(() => {
     if (!canNavigateToPauseSession(message, lastPauseInstanceId)) return;
-    try {
-      trackEvent('home.pending_pause_banner_pause_opened', {
-        pause_instance_id: lastPauseInstanceId ?? undefined,
-        open_pause_state: openPauseState ?? undefined,
-      });
-    } catch {
-      /* no-op */
-    }
+    trackHomePendingPauseBannerPauseOpened(lastPauseInstanceId, openPauseState);
     handleNavigatePauseWithThis();
   }, [message, lastPauseInstanceId, openPauseState, handleNavigatePauseWithThis]);
 
