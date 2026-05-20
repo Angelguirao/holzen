@@ -61,3 +61,7 @@ export {
   type UseCompanionOrchestrationParams,
 } from './presentation/use-companion-orchestration';
 export { useCompanionData, type UseCompanionDataParams } from './presentation/use-companion-data';
+export {
+  useGroundingEnrichment,
+  type GroundingEnrichment,
+} from './presentation/use-grounding-enrichment';
