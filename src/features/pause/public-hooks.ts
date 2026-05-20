@@ -29,6 +29,13 @@ export {
   type UseBulkHoldApplyOutcomesParams,
 } from './presentation/use-bulk-hold-apply-outcomes';
 export {
+  usePauseArchiveList,
+  type PauseArchiveListSort,
+  type PauseArchiveRow,
+  type PauseArchiveSegment,
+  type UsePauseArchiveListOptions,
+} from './presentation/use-pause-archive-list';
+export {
   useCurrentPause,
   currentPauseQueryKey,
   type CurrentPauseRow,
