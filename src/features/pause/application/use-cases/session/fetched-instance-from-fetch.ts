@@ -6,7 +6,7 @@ import type { PauseState } from '@/features/pause/domain/pause-state';
  * Pure mapping from Supabase `pause_instances` + `pause_ai_artifacts` reads into `FetchedPauseInstance`
  * for id-only `/pause` hydration.
  *
- * **Caller:** `features/pause/presentation/use-pause-session-fetch.ts`. **Docs:** `docs/systems/pause-system.md` section 7.2 and
+ * **Caller:** `features/pause/presentation/session/use-pause-session-fetch.ts`. **Docs:** `docs/systems/pause-system.md` section 7.2 and
  * section 10 (shell hydration row lists this file).
  */
 
