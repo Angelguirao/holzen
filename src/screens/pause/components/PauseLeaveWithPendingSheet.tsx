@@ -1,4 +1,4 @@
-import { getPendingPauseOfferDisplay } from '@/features/pause/public';
+import { getPendingPauseOfferDisplay } from '@/features/pause/public-hooks';
 import type { PendingPauseOfferRow } from '@/features/pause/public-hooks';
 import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sheet';

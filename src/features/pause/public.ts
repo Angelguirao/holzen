@@ -10,10 +10,6 @@ export {
 } from './application/use-cases/impact-data';
 export { pauseArchiveRowAllowsRetrospectiveOutcome } from './application/use-cases/archive/retrospective-outcome';
 export { buildOutcomeLoggedPayload } from './application/use-cases/outcome-log-payload';
-export {
-  getPendingPauseOfferDisplay,
-  type PendingPauseOfferDisplay,
-} from './application/use-cases/pending-offer/pending-pause-offer-display';
 export { groupBulkHoldByLocalDay } from './application/use-cases/bulk-hold/group-by-local-day';
 export {
   bulkHoldMaxRows,
@@ -25,10 +21,6 @@ export {
   type BulkHoldPendingPause,
   type BulkHoldReviewSection,
 } from './domain/bulk-hold';
-export {
-  BRIEF_PAUSE_ORDER,
-  computeBriefMacroProgressPosition,
-} from './domain/brief-ritual-steps';
 export {
   computeBriefRitualGoBack,
   type BriefRitualGoBackResult,
@@ -115,14 +107,7 @@ export {
   isPauseMoodValue,
   PAUSE_MOOD_VALUES,
 } from './domain/mood-value';
-export {
-  PAUSE_DEEP_RITUAL_STEPS,
-  PAUSE_DEEP_DISPLAY_STEP_COUNT,
-  STEPS,
-  pauseDeepDisplayProgressIndex,
-  pauseDeepMacroStepNumber,
-  type PauseStep,
-} from './domain/pause-ritual-steps';
+export type { PauseStep } from './domain/pause-ritual-steps';
 export type { CompanionData, CompanionPrefs } from './domain/companion-card-types';
 export type { PauseSessionShellHolzen } from './domain/pause-session-shell-holzen';
 export type {

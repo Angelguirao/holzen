@@ -25,6 +25,23 @@ export {
   PAUSE_OPEN_MAX_AGE_MS,
 } from './application/use-cases/session/open-max-countdown';
 export { PAUSE_MOOD_GROUPS } from './domain/mood-value';
+export type { BriefPauseStep } from './domain/ritual-types';
+export {
+  BRIEF_PAUSE_ORDER,
+  computeBriefMacroProgressPosition,
+} from './domain/brief-ritual-steps';
+export {
+  PAUSE_DEEP_RITUAL_STEPS,
+  PAUSE_DEEP_DISPLAY_STEP_COUNT,
+  STEPS,
+  pauseDeepDisplayProgressIndex,
+  pauseDeepMacroStepNumber,
+  type PauseStep,
+} from './domain/pause-ritual-steps';
+export {
+  getPendingPauseOfferDisplay,
+  type PendingPauseOfferDisplay,
+} from './application/use-cases/pending-offer/pending-pause-offer-display';
 export { resolveBreathOrbVisualMetrics } from './application/use-cases/breathing/pause-breath-orb-metrics';
 export {
   resolveTriangleKickerDisplay,
