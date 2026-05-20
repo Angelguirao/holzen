@@ -92,6 +92,22 @@ export {
   readLocalDevMode,
 } from './infrastructure/queries/dev-mode-admin-query';
 export {
+  ADMIN_APPLIED_MIGRATIONS_QUERY_KEY,
+  fetchAppliedMigrations,
+  getAdminAppliedMigrationsQueryOptions,
+  type AppliedMigrationRow,
+} from './infrastructure/queries/applied-migrations-admin-query';
+export {
+  ADMIN_PROVIDER_HEALTH_QUERY_KEY,
+  fetchProviderHealthStats,
+  getProviderHealthQueryOptions,
+  PROVIDER_HEALTH_ERROR_RATE_THRESHOLD,
+  PROVIDER_HEALTH_MIN_SAMPLE,
+  PROVIDER_HEALTH_WINDOW_MINUTES,
+  type Provider,
+  type ProviderStat,
+} from './infrastructure/queries/provider-health-admin-query';
+export {
   BULK_HOLD_PENDING_DISABLED_USER_ID,
   BULK_HOLD_PENDING_QUERY_LEAF,
   BULK_HOLD_PENDING_QUERY_PREFIX,

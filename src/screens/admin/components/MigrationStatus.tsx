@@ -3,7 +3,7 @@ import { Database, RefreshCw } from 'lucide-react';
 import {
   getAdminAppliedMigrationsQueryOptions,
   type AppliedMigrationRow,
-} from '@/screens/admin/lib/admin-applied-migrations-query';
+} from '@/features/pause/public-queries';
 
 function formatVersion(v: string): string {
   // Supabase migration versions are timestamps like 20260425121947
