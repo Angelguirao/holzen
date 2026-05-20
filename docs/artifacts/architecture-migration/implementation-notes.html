@@ -2623,6 +2623,25 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-20</span>
+      <span>Phase A slice — pending offer + home dismiss via PauseRepository (§8)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>Backlog #4 — pending-offer mutation cluster</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #3 slim <code>public.ts</code> was already complete on remote (<code>7d274f2a</code>). Add <code>run-adopt-pending-pause-offer</code> and <code>run-decline-pending-pause-offer</code> under <code>application/use-cases/pending-offer/</code>; <code>public-rpc</code> facades <code>adoptPendingPauseOffer</code>, <code>declinePendingPauseOffer</code>, and <code>dismissOpenPauseHomePreview</code> wire <code>supabasePauseRepository</code>. Presentation hooks import facades only.</dd>
+      <dt>Deviation</dt>
+      <dd>Renamed exported RPC helpers (<code>pauseAdoptPendingOffer</code> → <code>adoptPendingPauseOffer</code>) — only in-repo consumer was <code>use-pending-pause-offer-mutations</code>.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Decline use case maps thrown RPC errors to <code>status: 'failed'</code> so the hook can toast without parsing Supabase errors.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: move <code>NotificationNavigateState</code> to notifications-facing types, or wire <code>pauseLogCompanion</code> analytics through a port-backed use case.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
 </body>
 </html>

@@ -1,9 +1,8 @@
 import { useCallback, useEffect, useState } from 'react';
 import type { User } from '@supabase/supabase-js';
-import { dismissOpenPauseHome } from '@/features/pause/application/use-cases/dismiss/dismiss-open-pause-home';
 import { clearSession } from '@/features/pause/infrastructure/session/persisted-session-storage';
 import type { CompanionData } from '@/features/pause/domain/companion-card-types';
-import { pauseDismissCurrent } from '@/features/pause/public-rpc';
+import { dismissOpenPauseHomePreview } from '@/features/pause/public-rpc';
 import { fetchOpenPauseHomePreview } from '../../public-queries';
 import { DEFAULT_COMPANIONS } from '../../domain/session-model';
 import { usePauseInstancesRealtime } from '../use-pause-instances-realtime';
@@ -72,11 +71,8 @@ export function useOpenPauseHomePreview(user: User | null) {
     },
   );
 
-  const dismissOpenPauseHomePreview = useCallback(async () => {
-    await dismissOpenPauseHome(!!user, {
-      clearPreview: clearOpenPausePreview,
-      dismissCurrent: pauseDismissCurrent,
-    });
+  const dismissOpenPauseHomePreviewAction = useCallback(async () => {
+    await dismissOpenPauseHomePreview(!!user, clearOpenPausePreview);
   }, [user, clearOpenPausePreview]);
 
   return {
@@ -93,7 +89,7 @@ export function useOpenPauseHomePreview(user: User | null) {
     setOpenPauseState,
     setLastTriggerAt,
     clearOpenPausePreview,
-    dismissOpenPauseHome: dismissOpenPauseHomePreview,
+    dismissOpenPauseHome: dismissOpenPauseHomePreviewAction,
     syncOpenPauseFromDb,
   };
 }

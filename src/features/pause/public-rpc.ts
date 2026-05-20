@@ -23,7 +23,16 @@ export {
 } from './infrastructure/edge/grounding-enrich-edge';
 export { invokeHolzenReflect, type HolzenReflectResponse } from './infrastructure/edge/reflect/holzen-reflect-edge';
 
+import { dismissOpenPauseHome } from './application/use-cases/dismiss/dismiss-open-pause-home';
 import { logRetrospectiveOutcome as logRetrospectiveOutcomeUseCase } from './application/use-cases/archive/log-retrospective-outcome';
+import {
+  runAdoptPendingPauseOffer,
+  type RunAdoptPendingPauseOfferResult,
+} from './application/use-cases/pending-offer/run-adopt-pending-pause-offer';
+import {
+  runDeclinePendingPauseOffer,
+  type RunDeclinePendingPauseOfferResult,
+} from './application/use-cases/pending-offer/run-decline-pending-pause-offer';
 import { logPauseRitualDepthUpgraded as logPauseRitualDepthUpgradedUseCase } from './application/use-cases/ritual/brief/ritual-depth-upgrade';
 import {
   applyBulkHoldOutcomes as applyBulkHoldOutcomesUseCase,
@@ -78,12 +87,25 @@ export function pauseCreateOrReuse(
   return supabasePauseRepository.createOrReuse(params);
 }
 
-export function pauseAdoptPendingOffer() {
-  return supabasePauseRepository.adoptPendingOffer();
+/** Pending offer — adopt via `PauseRepository` (wired for presentation). */
+export function adoptPendingPauseOffer(): Promise<RunAdoptPendingPauseOfferResult> {
+  return runAdoptPendingPauseOffer(supabasePauseRepository);
 }
 
-export function pauseDeclinePendingOffer() {
-  return supabasePauseRepository.declinePendingOffer();
+/** Pending offer — decline via `PauseRepository` (wired for presentation). */
+export function declinePendingPauseOffer(): Promise<RunDeclinePendingPauseOfferResult> {
+  return runDeclinePendingPauseOffer(supabasePauseRepository);
+}
+
+/** Home open-pause preview dismiss — clears local preview then `dismissCurrent` on the port. */
+export function dismissOpenPauseHomePreview(
+  hasUser: boolean,
+  clearPreview: () => void,
+): Promise<void> {
+  return dismissOpenPauseHome(hasUser, {
+    clearPreview,
+    dismissCurrent: () => supabasePauseRepository.dismissCurrent(),
+  });
 }
 
 export function pauseDismissCurrent() {
@@ -116,6 +138,7 @@ export type {
 export type { InitialEmotionLogOpts };
 export type { RunBreathSegmentLogResult };
 export type { CompanionUiCompletionStep };
+export type { RunAdoptPendingPauseOfferResult, RunDeclinePendingPauseOfferResult };
 
 /** Frame companion UI step completion — wired with default `PauseRepository`. */
 export function persistCompanionUiStepCompletion(
