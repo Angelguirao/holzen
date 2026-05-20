@@ -1,3 +1,6 @@
+import { logPauseStep } from '@/features/pause/application/use-cases/ritual/log-pause-step';
+import type { PauseRepository } from '@/features/pause/ports/pause-repository';
+
 export const REFLECTION_STEP_LOGGED_STORAGE_PREFIX = 'holzen_reflect_step_logged:';
 
 export function reflectionStepLoggedStorageKey(pauseInstanceId: string): string {
@@ -30,18 +33,14 @@ export type RunPauseReflectionStepLogResult =
   | { status: 'storage_unavailable' }
   | { status: 'sync_failed' };
 
-type LogReflectionStepPort = (params: {
-  instanceId: string;
-  payload: Record<string, unknown>;
-}) => Promise<unknown>;
-
 /**
  * Once per pause instance per tab — `reflection_step` after reflect copy is ready or failed.
  * Non-fatal on RPC error (caller may retry on revisit).
  */
 export async function runPauseReflectionStepLogOnce(
+  repository: PauseRepository,
   input: { pauseInstanceId: string },
-  ports: { storage: ReflectionStepLogStoragePort; logStep: LogReflectionStepPort },
+  ports: { storage: ReflectionStepLogStoragePort },
 ): Promise<RunPauseReflectionStepLogResult> {
   if (!ports.storage.canRead()) {
     return { status: 'storage_unavailable' };
@@ -53,8 +52,9 @@ export async function runPauseReflectionStepLogOnce(
   }
 
   try {
-    await ports.logStep({
+    await logPauseStep(repository, {
       instanceId: input.pauseInstanceId,
+      stepType: 'reflection_step',
       payload: { surface: 'pause_reflect' },
     });
     ports.storage.markLogged(storageKey);

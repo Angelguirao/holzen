@@ -1405,6 +1405,25 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-20</span>
+      <span>Phase A slice — reflection_step once-log via PauseRepository (backlog #4)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3><code>runPauseReflectionStepLogOnce</code> → repository port</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>ritual/reflect/</code>) is complete on this branch. Align <code>reflection_step</code> sessionStorage dedupe with other reflect step logs: use case takes <code>PauseRepository</code> and calls <code>logPauseStep</code>; <code>public-rpc</code> passes <code>supabasePauseRepository</code> + <code>reflectionStepSessionStorage</code>. Presentation hook unchanged (<code>logPauseReflectionStepOnce</code>).</dd>
+      <dt>Deviation</dt>
+      <dd>None — removed ad-hoc <code>logStep</code> callback port from the use case; storage port remains for tab dedupe.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Did not peel §6 helpers off <code>public.ts</code> in the same commit.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: §6 slim barrel (zoom-out / frame payload helpers) or wire <code>persist-ui-step-completion</code> call sites that still bypass repository tests.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
 </body>
 </html>
