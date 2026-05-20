@@ -1,8 +1,6 @@
-import {
-  buildCompanionFeedbackVoteMetadata,
-  type LogCompanionFeedbackVoteInput,
-} from '@/features/pause/application/use-cases/ritual/frame/log-companion-feedback-vote';
-import { insertPauseAnalyticsEvent } from '@/features/pause/infrastructure/analytics-events';
+import type { LogCompanionFeedbackVoteInput } from '@/features/pause/application/use-cases/ritual/frame/log-companion-feedback-vote';
+import { runLogCompanionFeedbackVote } from '@/features/pause/application/use-cases/ritual/frame/run-log-companion-feedback-vote';
+import { supabasePauseAnalyticsRepository } from '@/features/pause/infrastructure/supabase-pause-analytics-repository';
 import { supabase } from '@/integrations/supabase/client';
 import type { Json } from '@/integrations/supabase/types';
 
@@ -32,11 +30,7 @@ function voteFromMetadata(metadata: Json | null | undefined): 'up' | 'down' | nu
 export async function logCompanionFeedbackVote(
   input: LogCompanionFeedbackVoteInput,
 ): Promise<{ ok: boolean }> {
-  return insertPauseAnalyticsEvent({
-    userId: input.userId,
-    event: 'companion_feedback',
-    metadata: buildCompanionFeedbackVoteMetadata(input),
-  });
+  return runLogCompanionFeedbackVote(supabasePauseAnalyticsRepository, input);
 }
 
 export async function fetchCompanionFeedbackVote(
