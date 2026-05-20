@@ -2472,7 +2472,6 @@
   <article class="note">
     <header>
       <span>2026-05-20</span>
-<<<<<<< HEAD
       <span>Phase A slice — reflect pure error helpers → domain (backlog #1 tail)</span>
       <span class="status resolved">resolved</span>
     </header>
@@ -2504,22 +2503,9 @@
       <dt>Tradeoffs</dt>
       <dd>Session hydration / step-bundle exports remain on <code>public.ts</code> until the next peel cluster.</dd>
       <dt>Open questions</dt>
-      <dd>Next: peel session hydration + step-map restores off <code>public.ts</code> in application tests, or wire more mutations through <code>PauseRepository</code> (backlog #4).</dd>
-=======
-      <span>Phase A slice — reflect error helpers → domain; peel brief ritual off public.ts (§6)</span>
-      <span class="status resolved">resolved</span>
-    </header>
-    <h3>Backlog #1 complete on branch; reflect cluster + §6 brief peel</h3>
-    <dl>
-      <dt>Design decision</dt>
-      <dd><code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code> was already complete. Pure reflect persist/generation error helpers moved to <code>domain/reflection-persist-error.ts</code> and <code>domain/reflect-generation-errors.ts</code> (same pattern as <code>reflect-generation-edge-params</code>). Brief navigation helpers removed from <code>public.ts</code>; feature <code>presentation/</code> and application tests import <code>ritual/brief/*</code> and <code>ritual/deep/brief-switch-to-deep</code> directly. Fixed <code>pause-session-scaffold-vm-types</code> <code>BtcPriceData</code> import to <code>@/features/market/public</code>.</dd>
-      <dt>Deviation</dt>
-      <dd>None — user-visible copy and markers unchanged.</dd>
-      <dt>Tradeoffs</dt>
-      <dd>Cross-context callers still use <code>public.ts</code> for session/domain types; next peel targets hydration/step-bundles or backlog #4 repository wiring.</dd>
+      <dd>Also fixed <code>pause-session-scaffold-vm-types</code> <code>BtcPriceData</code> import to <code>@/features/market/public</code> (was incorrectly typed from <code>public.ts</code>).</dd>
       <dt>Open questions</dt>
-      <dd>Next: peel session scaffold bundles from <code>public.ts</code>, or wire remaining mutations through <code>PauseRepository</code>.</dd>
->>>>>>> 4c6a6db6 (refactor(pause): move reflect error helpers to domain; peel brief off public (§6))
+      <dd>Next: peel session hydration + step-map restores off <code>public.ts</code> in application tests, or wire more mutations through <code>PauseRepository</code> (backlog #4).</dd>
     </dl>
   </article>
 
