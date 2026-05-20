@@ -2594,7 +2594,7 @@
     <h3>Backlog #3 — slim barrel to cross-context surface</h3>
     <dl>
       <dt>Design decision</dt>
-      <dd>After presentation peeled to direct imports (<code>a803cd9c</code>), consumer audit trims <code>public.ts</code> to notifications + legacy stats: <code>NotificationNavigateState</code>, pause event/state row types, effective-emotion helpers, <code>PersistedSession</code>. Dropped session guards, terminal helpers, manual-trigger idle, fingerprint/quality/pregenerate re-exports, and pause-state aggregate helpers — no <code>@/features/pause/public</code> importers.</dd>
+      <dd>After presentation peeled to direct imports (<code>a803cd9c</code>), consumer audit trims <code>public.ts</code> to notifications + legacy stats: <code>NotificationNavigateState</code>, pause event/state row types, effective-emotion helpers, <code>PersistedSession</code>. Dropped session guards, terminal helpers, manual-trigger idle, fingerprint/quality/pregenerate re-exports, and pause-state aggregate helpers — no active <code>@/features/pause/public</code> importers in pause presentation or screens.</dd>
       <dt>Deviation</dt>
       <dd>None — <code>public-hooks</code> / <code>public-rpc</code> unchanged.</dd>
       <dt>Tradeoffs</dt>

@@ -273,7 +273,7 @@ The repo is mid-migration. Expect:
 - ~~Companion slot orchestration under `application/use-cases/companion/`~~ — **done:** under `ritual/frame/` (May 2026).
 - ~~Reflect use cases under `application/use-cases/reflect/`~~ — **done:** under `ritual/reflect/`.
 - Other ritual beats may live outside §3 folder names until Phase A slices land — see **interior map** below.
-- `public.ts` is **cross-context slim** (May 2026) — notifications + legacy stats types only; feature internals use domain / use-case paths; mutations in `public-rpc`.
+- `public.ts` is **cross-context slim** (May 2026) — notifications + legacy stats types only; feature internals use domain / use-case paths; hooks/queries/RPC via `public-hooks` / `public-queries` / `public-rpc`.
 - ~~Collection code in active tree~~ — **done:** moved to `src/legacy/archive-collections/` (§7).
 
 ### 10.1 Interior folder map (on disk → target)
