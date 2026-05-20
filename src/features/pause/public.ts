@@ -100,7 +100,7 @@ export {
   resetInterventionIdempotency,
   runOnceIntervention,
   type InterventionIdempotencyDecision,
-} from './application/use-cases/companion/intervention-idempotency';
+} from './application/use-cases/ritual/frame/intervention-idempotency';
 export {
   applyCompanionOrchestrateRetryReset,
   type CompanionOrchestrateRetryResetInput,

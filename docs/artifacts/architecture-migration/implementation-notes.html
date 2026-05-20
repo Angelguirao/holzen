@@ -588,6 +588,25 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-20</span>
+      <span>Phase A slice — frame cluster: intervention-idempotency</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3><code>intervention-idempotency</code> → <code>ritual/frame/</code></h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Co-locate per-tab intervention single-flight + sessionStorage guards with <code>intervention-idempotency-telemetry</code> under <code>ritual/frame/</code>. Module + contract tests; <code>run-companion-intervention-bootstrap</code> imports from frame; public barrel path updated only.</dd>
+      <dt>Deviation</dt>
+      <dd>None — matches spec §3.1 / §10.1 after <code>companion-slot-orchestrate-telemetry</code>.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Could batch with <code>run-companion-intervention-bootstrap</code>; kept bootstrap in <code>companion/</code> until slot orchestration cluster moves.</dd>
+      <dt>Open questions</dt>
+      <dd>Next slice: <code>companion-slot-orchestrate-failure-ui</code> leaf, slot orchestration cluster (<code>run-companion-slot-orchestrate</code>), or start <code>public.ts</code> peel.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
 </body>
 </html>
