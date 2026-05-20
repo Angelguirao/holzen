@@ -1,7 +1,5 @@
 import { useEffect } from 'react';
-import { invokeEdge } from '@/lib/invoke-edge';
 import {
-  buildInterventionOrchestrateBody,
   runCompanionInterventionBootstrap,
   type CompanionOrchestrateSessionContext,
   type CompanionSlotCommitters,
@@ -9,6 +7,7 @@ import {
   type InterventionState,
 } from '@/features/pause/public';
 import { fetchParsedPauseArtifactCache } from '@/features/pause/public-queries';
+import { invokeCompanionIntervention } from '@/features/pause/public-rpc';
 
 export type UseCompanionInterventionFetchParams = {
   pauseInstanceId?: string | null;
@@ -62,10 +61,7 @@ export function useCompanionInterventionFetch({
           {
             fetchArtifactCache: fetchParsedPauseArtifactCache,
             loadOrchestrateSession,
-            invokeIntervention: (session) =>
-              invokeEdge('companion-orchestrate', {
-                body: buildInterventionOrchestrateBody(session),
-              }),
+            invokeIntervention: invokeCompanionIntervention,
           },
         );
 

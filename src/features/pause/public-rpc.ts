@@ -17,6 +17,11 @@ export type { OpenManualPauseFromHomeResult } from './application/use-cases/trig
 
 export { ritualDepthUpgradedPayload } from './application/use-cases/session/ritual-depth-upgrade';
 export { supabasePauseRepository } from './infrastructure/supabase-pause-repository';
+export {
+  createCompanionSlotOrchestratePorts,
+  invokeCompanionIntervention,
+  invokeCompanionOrchestrate,
+} from './infrastructure/edge/companion-orchestrate-edge';
 
 import { logRetrospectiveOutcome as logRetrospectiveOutcomeUseCase } from './application/use-cases/archive/log-retrospective-outcome';
 import { logPauseRitualDepthUpgraded as logPauseRitualDepthUpgradedUseCase } from './application/use-cases/session/ritual-depth-upgrade';
