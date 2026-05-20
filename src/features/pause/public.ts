@@ -129,8 +129,12 @@ export {
   BOX_BREATH_PHASE_COUNT,
   computeBreathingPhaseAdvance,
   resolveBreathingCompleted,
+  resolveBreathingPhaseAdvanceOutcome,
+  type BreathingPhaseAdvanceOutcome,
   type BreathingPhaseAdvanceResult,
+  type BreathingTimedLoopState,
 } from './application/use-cases/breathing/phase-advance';
+export { resolveBreathOrbVisualMetrics } from './application/use-cases/breathing/pause-breath-orb-metrics';
 export {
   effectivePauseShiftIntensity,
   effectivePauseShiftMood,

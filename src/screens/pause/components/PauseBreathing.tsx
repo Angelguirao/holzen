@@ -6,10 +6,11 @@ import { pauseStepLayout } from '@/features/pause/public';
 import { hapticFeedback } from '@/lib/haptics';
 import {
   computeBreathingPhaseAdvance,
+  resolveBreathOrbVisualMetrics,
   resolveBreathingCompleted,
+  resolveBreathingPhaseAdvanceOutcome,
 } from '@/features/pause/public';
 import {
-  holdProgressWithinPhase,
   resolveBreathCycleTotal,
   resolvePauseBreathingPhases,
   rotatingKickerIndexFromElapsed,
@@ -25,10 +26,6 @@ import { DeepBreathPostPatternInterstitial } from '@/screens/pause/components/de
 import { PauseBreathIntro } from '@/screens/pause/components/pause-breath-intro';
 import type { PauseBreathSegment } from '@/screens/pause/components/pause-breath-intro';
 import { PauseBreathTimedLoop } from '@/screens/pause/components/pause-breath-timed-loop';
-
-const EXPAND_KEYS = ['breathing.phases.inhale', 'breathing.phases.sip'];
-const CONTRACT_KEYS = ['breathing.phases.exhale'];
-const HOLD_PHASE_LABEL_KEY = 'breathing.phases.hold';
 
 /** i18n: `breathing.triangleRotatingKickers` — advances every 2s in `PauseBreathing`, not per phase. */
 const TRIANGLE_ROTATING_KICKERS_I18N_KEY = 'breathing.triangleRotatingKickers';
@@ -203,48 +200,42 @@ export const PauseBreathing = forwardRef<PauseBreathingHandle, Props>(function P
       totalCycles,
     });
 
-    if (advance.kind === 'tick') {
+    const outcome = resolveBreathingPhaseAdvanceOutcome({
+      advance,
+      ritualVariant: ritualVariantRef.current,
+      current: { cycle, phaseIndex, elapsed, completedLocal },
+    });
+
+    if (outcome.kind === 'noop') {
       phaseAdvanceGuardRef.current = false;
       return;
     }
 
-    const playPhaseCue = () => {
-      const o = cueOptsRef.current;
-      playPauseBreathPhaseCue({ muted: o.muted, prefersReducedMotion: o.prefersReduced });
-    };
-
-    if (advance.kind === 'pattern_complete') {
-      const o = cueOptsRef.current;
+    const o = cueOptsRef.current;
+    if (outcome.playPatternCompleteCue) {
       playPauseBreathPatternCompleteCue({ muted: o.muted, prefersReducedMotion: o.prefersReduced });
-      if (ritualVariantRef.current !== 'brief') {
-        onPatternCompleteRef.current?.();
-      }
-      setCompletedLocal(true);
+    } else if (outcome.playPhaseCue) {
+      playPauseBreathPhaseCue({ muted: o.muted, prefersReducedMotion: o.prefersReduced });
+    }
+    if (outcome.notifyPatternComplete) {
+      onPatternCompleteRef.current?.();
+    }
+    if (outcome.hapticSuccess) {
       hapticFeedback('success');
-      setElapsed(0);
-      phaseAdvanceGuardRef.current = false;
-      return;
     }
-
-    playPhaseCue();
-    if (advance.kind === 'next_cycle') {
-      setCycle(advance.nextCycle);
-      setPhaseIndex(0);
-    } else {
-      setPhaseIndex(advance.nextPhaseIndex);
-    }
-    setElapsed(0);
+    setCycle(outcome.state.cycle);
+    setPhaseIndex(outcome.state.phaseIndex);
+    setElapsed(outcome.state.elapsed);
+    setCompletedLocal(outcome.state.completedLocal);
     phaseAdvanceGuardRef.current = false;
-  }, [started, completed, elapsed, phaseIndex, cycle, pattern, totalCycles]);
+  }, [started, completed, elapsed, phaseIndex, cycle, pattern, totalCycles, completedLocal]);
 
-  const progress = currentPhase.duration > 0 ? elapsed / currentPhase.duration : 0;
-  const isExpand = EXPAND_KEYS.includes(currentPhase.labelKey);
-  const isContract = CONTRACT_KEYS.includes(currentPhase.labelKey);
-  const scale = isExpand ? 0.5 + progress * 0.5 : isContract ? 1 - progress * 0.5 : 1;
-  const showHoldMandala = currentPhase.labelKey === HOLD_PHASE_LABEL_KEY;
-  const holdProgress = showHoldMandala
-    ? holdProgressWithinPhase(elapsed, currentPhase.duration)
-    : 0;
+  const { orbScale: scale, phaseProgress: progress, showHoldMandala, holdProgress } =
+    resolveBreathOrbVisualMetrics({
+      phaseLabelKey: currentPhase.labelKey,
+      elapsed,
+      phaseDuration: currentPhase.duration,
+    });
 
   return (
     <motion.div
