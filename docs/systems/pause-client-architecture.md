@@ -271,7 +271,7 @@ Pause is the **reference implementation** because it is the largest context; sub
 The repo is mid-migration. Expect:
 
 - Some use cases still under legacy paths (`application/use-cases/companion/` at root) — **move toward** `ritual/frame/` incrementally.
-- Some reflect use cases under `application/use-cases/reflect/` — **move toward** `ritual/reflect/`.
+- ~~Reflect use cases under `application/use-cases/reflect/`~~ — **done:** under `ritual/reflect/`.
 - Other ritual beats may live outside §3 folder names until Phase A slices land — see **interior map** below.
 - `public.ts` may exceed the slim target — **peel** into `public-queries` / `public-rpc`.
 - ~~Collection code in active tree~~ — **done:** moved to `src/legacy/archive-collections/` (§7).
@@ -280,7 +280,7 @@ The repo is mid-migration. Expect:
 
 | Concern | On disk today (May 2026) | Target (§3) | Phase A slice |
 |---------|--------------------------|-------------|---------------|
-| Reflect generation | `application/use-cases/reflect/` (partial: step logs migrating → `ritual/reflect/`; favorite + metadata remain) | `ritual/reflect/` | Move incrementally |
+| Reflect generation | `application/use-cases/ritual/reflect/` | `ritual/reflect/` | Done (May 2026) |
 | Frame / companion slots | `application/use-cases/companion/` | `ritual/frame/` | Move incrementally |
 | Partial ritual beats (brief/deep/breath/log) | `application/use-cases/ritual/` (`brief/`, `deep/`, `breath/`, `log-pause-step.ts`, …) | consolidate under `ritual/*/` | Optional later |
 | Breathing / audio | `application/use-cases/breathing/`, `ritual/breath/` | `ritual/breathe/` | Optional consolidate later |

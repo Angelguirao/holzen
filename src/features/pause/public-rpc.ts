@@ -52,8 +52,8 @@ import { pauseLogStep } from './infrastructure/pause-rpc-client';
 import {
   runPauseReflectNoteUpdate,
   runPauseReflectTagUpdate,
-} from './application/use-cases/reflect/run-pause-reflect-metadata-log';
-import { runPauseFavoriteToggle } from './application/use-cases/reflect/run-pause-favorite-toggle';
+} from './application/use-cases/ritual/reflect/run-pause-reflect-metadata-log';
+import { runPauseFavoriteToggle } from './application/use-cases/ritual/reflect/run-pause-favorite-toggle';
 import { runPauseReflectionStepLogOnce } from './application/use-cases/ritual/reflect/run-pause-reflection-step-log';
 import { reflectionStepSessionStorage } from './infrastructure/reflect/reflection-step-session-storage';
 import { invalidateCompanionUiCompletionQuery } from './application/queries/companion-ui-completion-query-key';
