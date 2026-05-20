@@ -14,8 +14,7 @@ import { Button } from '@/components/ui/button';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Slider } from '@/components/ui/slider';
 import { ShareReflection } from '@/screens/pause/components/ShareReflection';
-import { trackEvent } from '@/lib/posthog';
-import { usePauseBriefDoneCheckIn } from '@/features/pause/public-hooks';
+import { usePauseBriefDoneCheckIn, usePauseReflectUiTelemetry } from '@/features/pause/public-hooks';
 import { useSubscription } from '@/features/subscription/public-hooks';
 
 interface PauseData {
@@ -62,12 +61,7 @@ function PauseDoneReflectShareRow({
   pauseInstanceId?: string | null;
 }) {
   const msg = (reflectionMessage ?? '').trim();
-  const trackShareMenuOpen = useCallback(() => {
-    trackEvent('pause_reflect_share_tap', { surface: 'pause_done', has_pause_id: !!pauseInstanceId });
-  }, [pauseInstanceId]);
-  const trackWallpaperTap = useCallback(() => {
-    trackEvent('pause_reflect_wallpaper_tap', { surface: 'pause_done' });
-  }, []);
+  const { onShareMenuOpen } = usePauseReflectUiTelemetry(pauseInstanceId, 'pause_done');
   if (!subscribed || !msg) return null;
   const mood = wallpaperMood && isPauseMoodValue(wallpaperMood) ? wallpaperMood : null;
   return (
@@ -76,7 +70,7 @@ function PauseDoneReflectShareRow({
         message={msg}
         context={context ?? null}
         haiku={haiku ?? null}
-        onMenuOpen={trackShareMenuOpen}
+        onMenuOpen={onShareMenuOpen}
       />
     </div>
   );

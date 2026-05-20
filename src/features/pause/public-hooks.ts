@@ -106,6 +106,9 @@ export {
 } from './presentation/use-pause-artifact-haiku';
 export { useCompanionSlotOrchestratePorts } from './presentation/use-companion-slot-orchestrate-ports';
 export { usePauseReflectionStepLog } from './presentation/use-pause-reflection-step-log';
+export {
+  usePauseReflectUiTelemetry,
+} from './presentation/use-pause-reflect-ui-telemetry';
 export { usePauseReflectTags } from './presentation/use-pause-reflect-tags';
 export { usePauseReflectNote } from './presentation/use-pause-reflect-note';
 export {
