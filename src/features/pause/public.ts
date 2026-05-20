@@ -447,7 +447,7 @@ export {
   loadCompanionOrchestrateSession,
   type LoadCompanionOrchestrateSessionInput,
   type LoadCompanionOrchestrateSessionPorts,
-} from './application/use-cases/companion/load-companion-orchestrate-session';
+} from './application/use-cases/ritual/frame/load-companion-orchestrate-session';
 export {
   runCompanionSlotOrchestrate,
   type CompanionSlotOrchestrateMode,

@@ -645,6 +645,25 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-20</span>
+      <span>Phase A slice — frame leaf: load-companion-orchestrate-session</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3><code>load-companion-orchestrate-session</code> → <code>ritual/frame/</code></h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>After <code>build-companion-orchestrate-body</code>, move the session loader (module + test) beside its only dependency under <code>ritual/frame/</code>. Presentation still imports via <code>public.ts</code>; slot orchestration runners remain in <code>companion/</code>.</dd>
+      <dt>Deviation</dt>
+      <dd>None — matches spec §3.1 / §10.1 leaf-first pattern.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Could batch with <code>orchestrate-slot-apply</code> hub; kept loader alone (2 files) because it only depends on body builders already in frame.</dd>
+      <dt>Open questions</dt>
+      <dd>Next slice: <code>orchestrate-slot-apply</code> + <code>intervention-response-hydrate.test</code>, or <code>run-companion-slot-orchestrate</code> orchestration cluster.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
 </body>
 </html>
