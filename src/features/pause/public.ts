@@ -465,7 +465,7 @@ export {
   setCompanionSlotLoading,
   type CompanionSlotErrorSetters,
   type CompanionSlotLoadingSetters,
-} from './application/use-cases/companion/companion-slot-ui-state';
+} from './application/use-cases/ritual/frame/companion-slot-ui-state';
 export {
   companionUiCompletionQueryKey,
   invalidateCompanionUiCompletionQuery,
