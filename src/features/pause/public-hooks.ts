@@ -256,8 +256,8 @@ export { usePauseReflectionStepLog } from './presentation/reflect/use-pause-refl
 export {
   usePauseReflectUiTelemetry,
 } from './presentation/reflect/use-pause-reflect-ui-telemetry';
-export { usePauseReflectTags } from './presentation/reflect/use-pause-reflect-tags';
-export { usePauseReflectNote } from './presentation/reflect/use-pause-reflect-note';
+export { usePauseReflectTags } from './presentation/reflect/steps/use-pause-reflect-tags';
+export { usePauseReflectNote } from './presentation/reflect/steps/use-pause-reflect-note';
 export {
   useCompanionHistoryThread,
   type HistoryThreadRow,

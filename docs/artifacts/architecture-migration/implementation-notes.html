@@ -3288,6 +3288,25 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-20</span>
+      <span>Phase A slice — colocate reflect note/tags hooks under presentation/reflect/steps/</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>Backlog #1 complete; Tier 4 reflect metadata conductors mirror ritual/reflect/steps/</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd><code>application/use-cases/reflect/</code> → <code>ritual/reflect/steps/</code> was already complete on <code>cursor/arch-migrate-src-ca70</code>. Group <code>use-pause-reflect-note</code> and <code>use-pause-reflect-tags</code> under <code>presentation/reflect/steps/</code>; <code>public-hooks</code> re-export paths only — screens keep <code>public-hooks</code> imports.</dd>
+      <dt>Deviation</dt>
+      <dd>None — matches §3.2 reflect beat grouping; no new presentation subfolder beyond <code>steps/</code>.</dd>
+      <dt>Tradeoffs</dt>
+      <dd><code>use-pause-reflection-step-log</code> and favorite toggle remain at <code>presentation/reflect/</code> root until a later peel bundles all step-log conductors.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: colocate <code>use-pause-session-flow-core</code> + scaffold cluster under <code>presentation/session/</code>, or wire more ritual mutations through <code>PauseRepository</code> (backlog #4).</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
 </body>
 </html>
