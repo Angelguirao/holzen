@@ -3,7 +3,10 @@
  * via `invokeEdge` (anon + `x-cid`) to validate before the user confirms via POST.
  */
 
-import { invokeEdge } from '@/lib/invoke-edge';
+import {
+  confirmEmailUnsubscribe as confirmEmailUnsubscribeEdge,
+  fetchEmailUnsubscribeLink,
+} from '../edge/handle-email-unsubscribe-edge';
 
 export type EmailUnsubscribeLinkCheck = 'valid' | 'already' | 'invalid';
 
@@ -33,11 +36,7 @@ export async function fetchEmailUnsubscribeLinkCheck(
   signal?: AbortSignal,
 ): Promise<EmailUnsubscribeLinkCheck> {
   try {
-    const { data, error } = await invokeEdge<{ valid?: boolean; reason?: string }>('handle-email-unsubscribe', {
-      method: 'GET',
-      query: { token },
-      signal,
-    });
+    const { data, error } = await fetchEmailUnsubscribeLink(token, signal);
     if (error) return 'invalid';
     if (data?.valid) return 'valid';
     if (data?.reason === 'already_unsubscribed') return 'already';
@@ -60,7 +59,5 @@ export function getEmailUnsubscribeLinkQueryOptions(token: string | null) {
 
 /** POST confirm — same edge function; invalidates link check cache after success. */
 export function submitEmailUnsubscribe(token: string) {
-  return invokeEdge<{ success?: boolean; reason?: string }>('handle-email-unsubscribe', {
-    body: { token },
-  });
+  return confirmEmailUnsubscribeEdge(token);
 }
