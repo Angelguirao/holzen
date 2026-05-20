@@ -1,5 +1,6 @@
 import { useCallback, type Dispatch, type SetStateAction } from 'react';
 import type { TFunction } from 'i18next';
+import { runDeepPausePickerEntryIfPro } from '@/features/pause/application/use-cases/session/pause-session-mood-chrome-flow';
 import {
   type BriefPauseStep,
   type CompanionData,
@@ -94,8 +95,7 @@ export function usePauseSessionMoodAndPersist({
   });
 
   const handleDepthPickerDeep = useCallback(() => {
-    if (!requirePro('deep_pause')) return;
-    depthPickerOnDeep();
+    runDeepPausePickerEntryIfPro(requirePro, depthPickerOnDeep);
   }, [requirePro, depthPickerOnDeep]);
 
   const { handleMoodSelect } = usePauseSessionInitialMoodHandlers({
