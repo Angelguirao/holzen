@@ -1,5 +1,5 @@
 import { useQueryClient } from '@tanstack/react-query';
-import { useAuth } from '@/features/auth/public';
+import { updateUserPassword, useAuth } from '@/features/auth/public';
 import { getProfileRowQueryOptions } from '@/features/user/public-queries';
 import { useHolzen } from '@/screens/home/hooks/use-holzen';
 import { useSubscription } from '@/features/subscription/public-hooks';
@@ -169,7 +169,7 @@ export function useSettingsModel() {
     }
     setChangingPassword(true);
     try {
-      const { error } = await supabase.auth.updateUser({ password: newPassword });
+      const { error } = await updateUserPassword(newPassword);
       if (error) throw error;
       toast.success(t('auth.passwordUpdated'));
       setNewPassword('');

@@ -24,6 +24,7 @@ export {
   signInWithEmailPassword,
   signUpWithEmailPassword,
   subscribePasswordRecoveryReady,
+  updateUserEmail,
   updateUserPassword,
   type AuthMutationResult,
 } from './infrastructure/supabase-auth-operations';

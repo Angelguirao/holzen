@@ -1,6 +1,6 @@
 import { useState, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
-import { supabase } from '@/integrations/supabase/client';
+import { updateUserEmail } from '@/features/auth/public';
 import { toast } from 'sonner';
 import { readThrownMessage } from '@/screens/settings/read-thrown-message';
 import { Input } from '@/components/ui/input';
@@ -18,7 +18,7 @@ export function ChangeEmailSection() {
     }
     setChanging(true);
     try {
-      const { error } = await supabase.auth.updateUser({ email: newEmail });
+      const { error } = await updateUserEmail(newEmail);
       if (error) throw error;
       toast.success('Confirmation sent');
       setNewEmail('');

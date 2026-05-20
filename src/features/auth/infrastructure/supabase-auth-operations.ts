@@ -43,6 +43,11 @@ export async function updateUserPassword(password: string): Promise<AuthMutation
   return { error: error ?? null };
 }
 
+export async function updateUserEmail(email: string): Promise<AuthMutationResult> {
+  const { error } = await supabase.auth.updateUser({ email });
+  return { error: error ?? null };
+}
+
 /** Subscribe until `PASSWORD_RECOVERY`; returns unsubscribe. */
 export function subscribePasswordRecoveryReady(onRecovery: () => void): () => void {
   const {
