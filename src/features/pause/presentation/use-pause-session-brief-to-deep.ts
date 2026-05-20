@@ -1,9 +1,9 @@
 import { useCallback, useEffect, type Dispatch, type SetStateAction } from 'react';
 import type { TFunction } from 'i18next';
-import type { PauseStep } from '@/screens/pause/components/PauseProgress';
 import {
   briefSwitchToDeepPauseState,
   type BriefPauseStep,
+  type PauseStep,
   type RitualDepth,
 } from '@/features/pause/public';
 import { logPauseRitualDepthUpgraded } from '@/features/pause/public-rpc';

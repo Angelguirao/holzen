@@ -78,3 +78,12 @@ export { usePauseSessionMountLog } from './presentation/use-pause-session-mount-
 export { usePauseSessionGoBack } from './presentation/use-pause-session-go-back';
 export { usePauseSessionGoToStep } from './presentation/use-pause-session-go-to-step';
 export { usePauseSessionHeaderBackHandler } from './presentation/use-pause-session-header-back-handler';
+export { usePauseSessionBreathTimedActiveReset } from './presentation/use-pause-session-breath-timed-active-reset';
+export {
+  usePauseSessionBreathUi,
+  type UsePauseSessionBreathUiParams,
+} from './presentation/use-pause-session-breath-ui';
+export {
+  usePauseSessionBriefToDeep,
+  type UsePauseSessionBriefToDeepParams,
+} from './presentation/use-pause-session-brief-to-deep';

@@ -1,6 +1,6 @@
 import { describe, expect, it, vi } from 'vitest';
 import { renderHook } from '@testing-library/react';
-import { usePauseSessionBreathTimedActiveReset } from '@/screens/pause/hooks/use-pause-session-breath-timed-active-reset';
+import { usePauseSessionBreathTimedActiveReset } from './use-pause-session-breath-timed-active-reset';
 
 describe('usePauseSessionBreathTimedActiveReset', () => {
   it('clears timed active when brief ritual leaves breath macro', () => {

@@ -1,6 +1,6 @@
 import { describe, expect, it, vi, beforeEach } from 'vitest';
 import { renderHook, act, waitFor } from '@testing-library/react';
-import { usePauseSessionBriefToDeep } from '@/screens/pause/hooks/use-pause-session-brief-to-deep';
+import { usePauseSessionBriefToDeep } from './use-pause-session-brief-to-deep';
 
 vi.mock('@/features/pause/public-rpc', () => ({
   logPauseRitualDepthUpgraded: vi.fn().mockResolvedValue(true),
