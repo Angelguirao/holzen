@@ -10,7 +10,7 @@ import { HomePauseBlockingErrorPanel } from '@/screens/home/components/HomePause
 import { LoadingButton } from '@/components/ui/loading-button';
 import { Skeleton } from '@/components/ui/skeleton';
 import { SubscriptionSkeleton } from '@/screens/home/components/SubscriptionSkeleton';
-import type { CompanionData, CompanionPrefs } from '@/features/pause/public';
+import type { CompanionData, CompanionPrefs } from '@/features/pause/public-hooks';
 import type { BtcPriceData } from '@/features/market/public';
 import type { BtcMoveSeverity } from '@/features/market/public';
 import { shouldSurfacePauseWidgetError } from '@/features/pause/public-hooks';

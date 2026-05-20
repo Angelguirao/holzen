@@ -59,14 +59,6 @@ export {
   computePauseStorageRitualSyncPatch,
   type PauseStorageRitualSyncPatch,
 } from './application/use-cases/session/storage-ritual-sync';
-export type {
-  CompanionOrchestrateSlotResult,
-  CompanionSlotSource,
-  InterventionPrimary,
-  InterventionSecondary,
-  InterventionState,
-  RegenerateCompanionSlot,
-} from './domain/companion-orchestrate';
 export { COMPANION_TYPES, FEEDBACK_TO_CACHE_TYPE } from './domain/companion-types';
 export {
   DEFAULT_PREGENERATE_CACHE_TOPUP,
@@ -79,11 +71,7 @@ export type {
   PregenerateCacheTopupTypeConfig,
 } from './domain/pregenerate-cache-topup-config';
 export type { PauseStep } from './domain/pause-ritual-steps';
-export type { CompanionData, CompanionPrefs } from './domain/companion-card-types';
 export type { PauseSessionShellHolzen } from './domain/pause-session-shell-holzen';
-export type {
-  CachedHistoricalInsightShape,
-} from './domain/historical-insight';
 export {
   type NotificationNavigateState,
   type PauseSessionLocationState,
@@ -153,12 +141,7 @@ export {
   isPostPauseEmotionDirty,
   type PostPauseFeelSnapshot,
 } from './application/use-cases/ritual/done/post-pause-emotion-log';
-export type { CompanionFeedbackVote } from './application/use-cases/ritual/frame/log-companion-feedback-vote';
-export type {
-  CompanionSlotCacheIds,
-  CompanionSlotRelaxationUi,
-  CompanionSlotRelaxations,
-} from './application/use-cases/ritual/frame/orchestrate-slot-apply';
+export type { CompanionSlotRelaxationUi } from './application/use-cases/ritual/frame/orchestrate-slot-apply';
 export type { PauseSessionShellViewModel } from './application/use-cases/session/shell-view-model';
 export { canAdvanceFromPauseStep } from './application/use-cases/session/navigation';
 export { computeDeepRitualGoBackTarget } from './application/use-cases/ritual/deep/deep-go-back';

@@ -1,7 +1,7 @@
 import { useCallback, useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import type { CompanionPrefs } from '@/features/pause/public';
-import type { RegenerateCompanionSlot } from '@/features/pause/public';
+import type { CompanionPrefs } from '@/features/pause/domain/companion-card-types';
+import type { RegenerateCompanionSlot } from '@/features/pause/domain/companion-orchestrate';
 import type { PauseSeverity } from '@/features/pause/application/use-cases/session/location-state';
 import { DEFAULT_COMPANIONS, DEFAULT_PREFS } from '@/features/pause/domain/session-model';
 import {

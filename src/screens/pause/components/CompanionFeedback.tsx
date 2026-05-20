@@ -1,6 +1,6 @@
 import { useTranslation } from 'react-i18next';
 import { hapticFeedback } from '@/lib/haptics';
-import type { RegenerateCompanionSlot } from '@/features/pause/public';
+import type { RegenerateCompanionSlot } from '@/features/pause/public-hooks';
 import {
   isCompanionRegenerateUiEnabled,
   useCompanionFeedbackVote,

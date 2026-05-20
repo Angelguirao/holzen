@@ -1,4 +1,4 @@
-import type { CompanionData, CompanionPrefs } from '@/features/pause/public';
+import type { CompanionData, CompanionPrefs } from '@/features/pause/domain/companion-card-types';
 import { useProfile } from '@/features/user/public-hooks';
 import { useToast } from '@/components/ui/use-toast';
 import { useCompanionAccess } from './use-companion-access';
@@ -11,7 +11,7 @@ export type {
   InterventionPrimary,
   InterventionSecondary,
   InterventionState,
-} from '@/features/pause/public';
+} from '@/features/pause/domain/companion-orchestrate';
 
 export interface UseCompanionDataParams {
   companions: CompanionData;

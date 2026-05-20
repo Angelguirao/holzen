@@ -36,7 +36,18 @@ export {
   resolveDoneWallpaperMood,
   type DoneWallpaperMoodInput,
 } from './application/use-cases/ritual/done/resolve-done-wallpaper-mood';
-export type { BriefPauseStep } from './domain/ritual-types';
+export type { BriefPauseStep, RitualDepth } from './domain/ritual-types';
+export type { CompanionData, CompanionPrefs } from './domain/companion-card-types';
+export type { CachedHistoricalInsightShape } from './domain/historical-insight';
+export type {
+  InterventionState,
+  RegenerateCompanionSlot,
+} from './domain/companion-orchestrate';
+export type { CompanionFeedbackVote } from './application/use-cases/ritual/frame/log-companion-feedback-vote';
+export type {
+  CompanionSlotCacheIds,
+  CompanionSlotRelaxations,
+} from './application/use-cases/ritual/frame/orchestrate-slot-apply';
 export {
   BRIEF_PAUSE_ORDER,
   computeBriefMacroProgressPosition,

@@ -1,4 +1,4 @@
-import type { CompanionData, CompanionPrefs } from '@/features/pause/public';
+import type { CompanionData, CompanionPrefs } from '@/features/pause/domain/companion-card-types';
 import type { PauseSeverity } from './location-state';
 import {
   DEFAULT_COMPANIONS,
