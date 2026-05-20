@@ -18,6 +18,7 @@ export {
   usePauseBriefDoneCheckIn,
   type UsePauseBriefDoneCheckInParams,
 } from './presentation/use-pause-brief-done-check-in';
+export { usePauseBriefIntegrateCountdown } from './presentation/use-pause-brief-integrate-countdown';
 export {
   useBulkHoldPending,
   bulkHoldPendingQueryKey,
