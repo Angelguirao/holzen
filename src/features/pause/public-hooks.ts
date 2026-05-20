@@ -371,7 +371,7 @@ export {
 } from './presentation/session/use-pause-session-breath-handlers';
 export { usePauseSessionExitNavigation } from './presentation/session/use-pause-session-exit-navigation';
 export { usePauseSessionPendingPauseOfferNavigation } from './presentation/session/use-pause-session-pending-pause-offer-navigation';
-export { usePauseSessionPendingLeaveSheet } from './presentation/use-pause-session-pending-leave-sheet';
+export { usePauseSessionPendingLeaveSheet } from './presentation/session/use-pause-session-pending-leave-sheet';
 export { usePauseSessionMoodChromeHandlers } from './presentation/reflect/use-pause-session-mood-chrome-handlers';
 export { usePauseSessionBreathReflectHandlers } from './presentation/reflect/use-pause-session-breath-reflect-handlers';
 export { usePauseSessionEntryPresentationEffects } from './presentation/use-pause-session-entry-presentation-effects';
@@ -402,7 +402,7 @@ export {
   usePauseSessionShellRitual,
   type PauseSessionShellRitualProvidersSlice,
   type PauseSessionShellRitualResult,
-} from './presentation/use-pause-session-shell-ritual';
+} from './presentation/session/use-pause-session-shell-ritual';
 export {
   usePauseSessionStepHandlers,
   type PauseSessionStepHandlersResult,

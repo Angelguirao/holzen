@@ -2965,6 +2965,25 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-20</span>
+      <span>Phase A slice — colocate shell-ritual + pending-leave under presentation/session/</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>Backlog #1 complete; Tier 4 session shell ritual cluster</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd><code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code> was already complete. Move <code>use-pause-session-shell-ritual</code> and <code>use-pause-session-pending-leave-sheet</code> beside shell bootstrap/fetch under <code>presentation/session/</code>; <code>public-hooks</code> + sibling session imports only.</dd>
+      <dt>Deviation</dt>
+      <dd>None — matches §3.2 / §10.1 session conductor grouping.</dd>
+      <dt>Tradeoffs</dt>
+      <dd><code>use-pause-session-ritual-state</code> and terminal-entry redirect remain flat under <code>presentation/</code> until a later peel.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: port-backed analytics read adapter for feedback vote fetch (backlog #4), or colocate remaining flat session hooks (breath navigation bundle, ritual-state).</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
 </body>
 </html>

@@ -2,7 +2,7 @@ import {
   usePauseSessionShellRitual,
   type PauseSessionShellRitualProvidersSlice,
   type PauseSessionShellRitualResult,
-} from './use-pause-session-shell-ritual';
+} from './session/use-pause-session-shell-ritual';
 import {
   usePauseSessionStepHandlers,
   type PauseSessionStepHandlersProvidersSlice,
