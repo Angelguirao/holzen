@@ -30,8 +30,8 @@ For day-to-day orientation, prefer [navigating-the-codebase.md](./navigating-the
 
 Holzen is a **single-page React + TypeScript** app with:
 
-- **Routing, auth, and layout** centralized around `src/App.tsx` and `use-auth.tsx`.
-- **Many feature pages and hooks** (pause flow, library, profile, settings, admin, practice modes, etc.).
+- **Routing, auth, and layout** centralized around `src/App.tsx` and `@/features/auth/public` (`AuthProvider` / `useAuth`).
+- **Many feature screens and hooks** (pause flow, archive, journey overview, settings, admin, marketing, …). **Legacy full IA** (tools, library, stats/badges UI) lives under `src/legacy/`.
 - **Supabase**: **~140 migrations** (schema, RLS, views, functions) plus **27 edge function entrypoints** (`supabase/functions/*/index.ts`) and a sizable **`_shared`** layer (generators, quality gates, caching, auth helpers).
 
 So complexity is not just “lines of React” — it is **frontend + Postgres/RLS + Deno edge functions + third-party integrations** (Stripe, email hooks, push, external AI/search APIs as used in functions). That multiplies the number of concerns a “full stack” review must cover.

@@ -177,17 +177,17 @@ Each folder under **`supabase/functions/<name>/`** is a deployable function. Sha
 |----------|-----------------------------|
 | `holzen-reflect` | `features/pause/presentation/use-pause-reflect-generation.ts` → `features/pause/infrastructure/reflect/reflection-artifact.ts` (`invokeEdge`) |
 | `companion-orchestrate` | `features/pause/presentation/use-companion-data.ts` |
-| `suggest-grounding` | `Home.tsx`, `Ground.tsx` |
-| `journal-prompt` | `GuidedJournal.tsx` |
+| `suggest-grounding` | **Legacy full IA** — `src/legacy/full-shell/src/pages/Ground.tsx` (route **404** pause-first) |
+| `journal-prompt` | **Legacy full IA** — `src/legacy/full-shell/src/components/practice/GuidedJournal.tsx` |
 | `send-feedback` | `FeedbackForm.tsx`, `OfflineBanner.tsx` |
-| `generate-wallpaper` | `ReflectionWallpaper.tsx` |
-| `holzen-number` | `HolzenNumber.tsx` |
-| `reflection-insights` | `AIInsightsPanel.tsx` |
+| `generate-wallpaper` | **Legacy full IA** — `src/legacy/full-shell/src/components/ReflectionWallpaper.tsx` |
+| `holzen-number` | `screens/home/components/HolzenNumber.tsx` → `@/features/user/public-queries` / `public-rpc` |
+| `reflection-insights` | **Legacy full IA** — `src/legacy/full-shell/src/components/AIInsightsPanel.tsx` (route **404** pause-first) |
 | `check-subscription`, `create-checkout`, `customer-portal` | `@/features/subscription/public-hooks` |
-| `register-push` | `features/notifications` (`usePushNotifications`) |
-| `delete-account` | `Settings.tsx` |
-| `badge-notify` | `use-badge-sync.ts` |
-| `record-referral` | `use-auth.tsx` |
+| `register-push` | `@/features/notifications/public-hooks` (`usePushNotifications`) |
+| `delete-account` | `screens/settings/hooks/use-settings-model.ts` → `@/features/auth/public-rpc` |
+| `badge-notify` | **Legacy full IA** — `src/legacy/full-shell/src/hooks/use-badge-sync.ts` (edge unscheduled in pause-first) |
+| `record-referral` | `@/features/auth/public` (`AuthProvider` on `SIGNED_IN`) |
 
 **Cron / server / webhook style** (not an exhaustive list — see `cron-setup.md` and each `index.ts`): e.g. `check-volatility`, `refresh-btc-prices`, `backfill-btc-prices` (manual `btc_price_cache` gap fill), `fetch-source-feeds`, `weekly-digest`, `deliver-letters`, `auth-email-hook`, etc.
 

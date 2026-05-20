@@ -84,7 +84,7 @@ The ecosystem moved **away from**:
 | Data kind | Holzen pattern |
 |-----------|----------------|
 | Profiles, subscription, blog, many lists | `useQuery` / `queryOptions` |
-| Pause orchestration, `use-holzen`, `use-companion-data` | Often `useEffect` + Supabase (migrate opportunistically) |
+| Pause orchestration, `useHolzen` / `useCompanionData` | Often `useEffect` + Supabase (migrate opportunistically); `useHolzen` split across pause `presentation/` conductors |
 | Modal open, step UI, form drafts | `useState` / session storage |
 | **Forbidden** | Same entity in Query **and** a global client store |
 
@@ -136,7 +136,7 @@ Hooks should **not** grow unbounded RPC + navigation + analytics; extract **use 
 | Check | Target | Today |
 |-------|--------|-------|
 | Page/screen mostly composes | ✅ per [react-screen-orchestration.md](react-screen-orchestration.md) | ⚠️ some large pages |
-| God hook split (use case or sub-hook) | ✅ | ❌ `use-holzen`, `use-companion-data` |
+| God hook split (use case or sub-hook) | ✅ | ⚠️ `useHolzen` producer split shipped; `use-companion-data` still converging toward `ritual/frame/` use cases |
 | No `supabase.from` in `.tsx` | ✅ | ⚠️ audit on touch |
 
 ---
