@@ -3,7 +3,7 @@ import {
   applyCompanionSlotOrchestrateFailureUi,
   resolveCompanionSlotOrchestrateFailureUi,
 } from './companion-slot-orchestrate-failure-ui';
-import type { CompanionOrchestrateInvokeFailure } from './orchestrate-invoke-error';
+import type { CompanionOrchestrateInvokeFailure } from '@/features/pause/application/use-cases/ritual/frame/orchestrate-invoke-error';
 
 const baseFailure = (overrides: Partial<CompanionOrchestrateInvokeFailure>): CompanionOrchestrateInvokeFailure => ({
   kind: 'lazy_fetch',

@@ -430,7 +430,7 @@ export {
   type CompanionOrchestrateInvokeFailure,
   type CompanionOrchestrateInvokeFailureKind,
   type CompanionOrchestratePaywallCode,
-} from './application/use-cases/companion/orchestrate-invoke-error';
+} from './application/use-cases/ritual/frame/orchestrate-invoke-error';
 export {
   parseEdgeFunctionError,
   toUserFacingAiErrorMessage,

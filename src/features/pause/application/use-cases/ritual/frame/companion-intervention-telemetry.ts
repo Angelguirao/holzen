@@ -1,5 +1,5 @@
 import { holzenLog } from '@/lib/holzen-console';
-import type { CompanionOrchestrateInvokeFailure } from '@/features/pause/application/use-cases/companion/orchestrate-invoke-error';
+import type { CompanionOrchestrateInvokeFailure } from '@/features/pause/application/use-cases/ritual/frame/orchestrate-invoke-error';
 import type { CompanionOrchestrateSlotResult } from '@/features/pause/application/use-cases/companion/orchestrate-slot-apply';
 
 function pauseInstancePrefix(pauseInstanceId: string): string {

@@ -4,7 +4,7 @@ import {
   logCompanionInterventionInvokeOk,
   logCompanionInterventionSignalHydrated,
 } from '@/features/pause/application/use-cases/ritual/frame/companion-intervention-telemetry';
-import { resolveCompanionOrchestrateInvokeFailure } from './orchestrate-invoke-error';
+import { resolveCompanionOrchestrateInvokeFailure } from '@/features/pause/application/use-cases/ritual/frame/orchestrate-invoke-error';
 import {
   hydrateOrchestrateSlotsFromInterventionResponse,
   isFilledOrchestrateSlot,
