@@ -2,15 +2,15 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '@/features/auth/public';
 import { useProfile } from '@/features/user/public-hooks';
-import { reflectGenerationPrerequisite } from '@/features/pause/application/use-cases/ritual/reflect/generation-prerequisites';
+import { reflectGenerationPrerequisite } from '@/features/pause/application/use-cases/ritual/reflect/generation/generation-prerequisites';
 import { reflectGenerationUserErrorMessage } from '@/features/pause/domain/reflect-generation-errors';
 import {
   messageFromReflectGenerationResult,
   resolveReflectGenerationPrefetch,
   shouldClearReflectGenerationLoading,
   shouldCommitReflectGeneration,
-} from '@/features/pause/application/use-cases/ritual/reflect/reflect-generation-hook-flow';
-import { runReflectGeneration } from '@/features/pause/application/use-cases/ritual/reflect/run-reflect-generation';
+} from '@/features/pause/application/use-cases/ritual/reflect/generation/reflect-generation-hook-flow';
+import { runReflectGeneration } from '@/features/pause/application/use-cases/ritual/reflect/generation/run-reflect-generation';
 import {
   fetchOpeningMessageForPauseInstance,
   generateReflectionAtReflectStep,

@@ -3022,6 +3022,25 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-20</span>
+      <span>Phase A slice — colocate reflect generation use cases under ritual/reflect/generation/</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>Backlog #1 increment — holzen-reflect generation cluster</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Top-level <code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code> was already complete. Group the holzen-reflect generation leaf cluster (<code>generation-prerequisites</code>, <code>reflect-generation-enabled</code>, <code>reflect-generation-hook-flow</code>, <code>run-reflect-generation</code> + tests) under <code>ritual/reflect/generation/</code>; presentation and <code>pause-session-reflect-decide-flow</code> import paths only.</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior-preserving folder colocation; edge/query adapters unchanged.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Other reflect use cases (note/tag logs, telemetry, frame focus) stay at <code>ritual/reflect/</code> root until a later slice needs a subfolder.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: colocate breath navigation bundle under <code>presentation/session/</code>, or port-backed analytics read for companion feedback vote fetch (backlog #4).</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
 </body>
 </html>
