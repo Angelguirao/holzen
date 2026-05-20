@@ -1595,6 +1595,25 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-20</span>
+      <span>Phase A slice — ritual depth upgrade under ritual/brief/ (Tier 5)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3><code>ritual-depth-upgrade</code> + payload → <code>ritual/brief/</code></h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>reflect/</code> → <code>ritual/reflect/</code>) was already complete on this branch. Colocate brief → deep step log use case and payload under <code>application/use-cases/ritual/brief/</code> per §3 / §10.1; <code>public.ts</code> and <code>public-rpc</code> re-export paths updated; payload test lives beside module.</dd>
+      <dt>Deviation</dt>
+      <dd>None — mechanical move; <code>logPauseRitualDepthUpgraded</code> still wired via <code>public-rpc</code> + <code>PauseRepository</code>.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Did not consolidate <code>application/use-cases/breathing/</code> under <code>ritual/breathe/</code> or peel ritual-pattern exports off <code>public.ts</code> in the same commit.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: §6 <code>public.ts</code> peel (ritual-pattern / breath audio for presentation) or wire <code>persistCompanionUiStepCompletion</code> on <code>public-rpc</code>.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
 </body>
 </html>

@@ -321,7 +321,7 @@ export type {
 export type { PauseSessionShellViewModel } from './application/use-cases/session/shell-view-model';
 export { canAdvanceFromPauseStep } from './application/use-cases/session/navigation';
 export { computeDeepRitualGoBackTarget } from './application/use-cases/ritual/deep/deep-go-back';
-export { ritualDepthUpgradedPayload } from './application/use-cases/ritual-depth-upgrade-payload';
+export { ritualDepthUpgradedPayload } from './application/use-cases/ritual/brief/ritual-depth-upgrade-payload';
 export {
   buildInitialEmotionLoggedPayload,
   initialEmotionLogDedupeKey,

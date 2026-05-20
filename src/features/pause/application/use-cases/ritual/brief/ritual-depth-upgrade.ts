@@ -1,10 +1,10 @@
 import type { TFunction } from 'i18next';
 import { logPauseStep } from '@/features/pause/application/use-cases/ritual/log-pause-step';
-import { ritualDepthUpgradedPayload } from '@/features/pause/application/use-cases/ritual-depth-upgrade-payload';
 import { showPauseStepSyncFailedToast } from '@/features/pause/application/use-cases/feedback/step-sync-toast';
 import type { PauseRepository } from '@/features/pause/ports/pause-repository';
+import { ritualDepthUpgradedPayload } from './ritual-depth-upgrade-payload';
 
-export { ritualDepthUpgradedPayload } from '@/features/pause/application/use-cases/ritual-depth-upgrade-payload';
+export { ritualDepthUpgradedPayload } from './ritual-depth-upgrade-payload';
 
 /** Persists brief → deep upgrade so Postgres/analytics no longer treat the row as brief-only. */
 export async function logPauseRitualDepthUpgraded(

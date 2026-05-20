@@ -3,7 +3,6 @@ import {
   BRIEF_SWITCH_TO_DEEP_STEP,
   briefSwitchToDeepPauseState,
 } from '@/features/pause/public';
-import { ritualDepthUpgradedPayload } from '@/features/pause/public';
 import { pauseInstanceHasBriefRitualTag, type PauseStepEventRow } from '@/features/pause/public';
 
 describe('briefSwitchToDeepPauseState', () => {
@@ -16,12 +15,6 @@ describe('briefSwitchToDeepPauseState', () => {
     expect(s.breathingSecondCompleted).toBe(false);
     expect(s.frameDone).toBe(false);
     expect(s.briefIntegrateDone).toBe(false);
-  });
-});
-
-describe('ritualDepthUpgradedPayload', () => {
-  it('tags brief → deep for pause_log_step', () => {
-    expect(ritualDepthUpgradedPayload()).toEqual({ from: 'brief', to: 'deep' });
   });
 });
 
