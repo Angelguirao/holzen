@@ -245,15 +245,6 @@ export {
 export { computePauseGoBackPlan } from './application/use-cases/session/go-back-plan';
 export { pauseStepSwipeDirection } from './application/use-cases/session/step-swipe-direction';
 export {
-  buildPauseSessionStepTransitionConfig,
-  PAUSE_SESSION_STEP_SLIDE_OFFSET_PX,
-  PAUSE_SESSION_STEP_TRANSITION_DURATION_REDUCED_S,
-  PAUSE_SESSION_STEP_TRANSITION_DURATION_S,
-  PAUSE_SESSION_STEP_TRANSITION_EASE,
-  type PauseSessionStepTransitionConfig,
-  type PauseSessionSwipeDirection,
-} from './application/use-cases/session/step-transition';
-export {
   buildPostPauseEmotionLoggedPayload,
   isPostPauseEmotionDirty,
   runPostPauseEmotionLogIfDirty,
