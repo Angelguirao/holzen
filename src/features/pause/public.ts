@@ -223,6 +223,14 @@ export {
   type PauseHomeErrorKind,
 } from './application/use-cases/home/pause-home-widget-error';
 export {
+  millisecondsUntilNextQuarterHour,
+  PAUSE_CRON_QUARTER_INTERVAL_MS,
+} from './application/use-cases/scheduling/milliseconds-until-next-quarter-hour';
+export {
+  zenModeHomePauseSnapshot,
+  ZEN_MODE_HOME_COMPANION_PREFS,
+} from './application/use-cases/home/zen-mode-home-pause-snapshot';
+export {
   computePauseHeaderBackIntent,
   isPauseSessionHeaderBackVisible,
 } from './application/use-cases/session/header-back';

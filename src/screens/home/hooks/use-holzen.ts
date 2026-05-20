@@ -20,7 +20,7 @@ import {
   normalizeTrackedAssetId,
   severityFromBtcChangePercent,
 } from '@/features/market/public';
-import { millisecondsUntilNextQuarterHour } from '@/screens/home/lib/next-cron-quarter';
+import { millisecondsUntilNextQuarterHour } from '@/features/pause/public';
 import {
   useHolzenManualTriggerOrchestration,
   useManualPauseTrigger,
