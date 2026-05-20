@@ -1,6 +1,8 @@
 import { useCallback, useEffect, useState } from 'react';
 import type { User } from '@supabase/supabase-js';
+import { dismissOpenPauseHome } from '@/features/pause/application/use-cases/dismiss/dismiss-open-pause-home';
 import { clearSession, type CompanionData } from '@/features/pause/public';
+import { pauseDismissCurrent } from '@/features/pause/public-rpc';
 import { fetchOpenPauseHomePreview } from '../public-queries';
 import { DEFAULT_COMPANIONS } from '../domain/session-model';
 import { usePauseInstancesRealtime } from './use-pause-instances-realtime';
@@ -69,6 +71,13 @@ export function useOpenPauseHomePreview(user: User | null) {
     },
   );
 
+  const dismissOpenPauseHomePreview = useCallback(async () => {
+    await dismissOpenPauseHome(!!user, {
+      clearPreview: clearOpenPausePreview,
+      dismissCurrent: pauseDismissCurrent,
+    });
+  }, [user, clearOpenPausePreview]);
+
   return {
     message,
     context,
@@ -83,6 +92,7 @@ export function useOpenPauseHomePreview(user: User | null) {
     setOpenPauseState,
     setLastTriggerAt,
     clearOpenPausePreview,
+    dismissOpenPauseHome: dismissOpenPauseHomePreview,
     syncOpenPauseFromDb,
   };
 }

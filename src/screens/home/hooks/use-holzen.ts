@@ -13,9 +13,7 @@ import {
   holzenMarketDisplayQueryKey,
 } from '@/features/market/public';
 import { useAuth } from '@/features/auth/public';
-import { pauseDismissCurrent } from '@/features/pause/public-rpc';
 import { useProfile } from '@/features/user/public-hooks';
-import { clearSession } from '@/features/pause/public';
 import { useOpenPauseHomePreview } from '@/features/pause/public-hooks';
 import { normalizeTrackedAssetId } from '@/features/market/public';
 import { severityFromBtcChangePercent } from '@/features/market/public';
@@ -92,6 +90,7 @@ function useHolzenState() {
     setLastPauseInstanceId,
     setOpenPauseState,
     setLastTriggerAt,
+    dismissOpenPauseHome: dismissMessage,
     syncOpenPauseFromDb,
   } = useOpenPauseHomePreview(user);
 
@@ -130,21 +129,6 @@ function useHolzenState() {
     });
 
   const nextCronCheckIn = useCallback(() => millisecondsUntilNextQuarterHour(), []);
-
-  const dismissMessage = useCallback(async () => {
-    clearSession();
-    setMessage(null);
-    setContext(null);
-    setCompanions({ haiku: null, groundingTitle: null, groundingBody: null });
-    setLastPauseInstanceId(null);
-    setOpenPauseState(null);
-    if (!user) return;
-    try {
-      await pauseDismissCurrent();
-    } catch {
-      /* non-fatal */
-    }
-  }, [user, setMessage, setContext, setCompanions, setLastPauseInstanceId, setOpenPauseState]);
 
   const refreshProfile = useCallback(async () => {
     // No-op in V2; the realtime subscription on pause_instances handles
