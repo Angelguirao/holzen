@@ -1158,6 +1158,25 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-20</span>
+      <span>Phase A slice — companion presentation folder (orchestration cluster)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>Remaining frame conductors → <code>presentation/companion/</code></h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Completes the leaf-hook slice above: move remaining fifteen <code>use-companion-*</code> orchestration hooks into <code>presentation/companion/</code>; update <code>public-hooks</code> and parent imports (<code>use-fullview-telemetry</code>, session snapshot).</dd>
+      <dt>Deviation</dt>
+      <dd>None — mirrors <code>presentation/reflect/</code> subfolder pattern.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Left <code>use-pause-session-companion-snapshot</code> at <code>presentation/</code> root (session-scoped, not slot orchestration).</dd>
+      <dt>Open questions</dt>
+      <dd>Next: continue §6 <code>public.ts</code> peel (zoom-out payload helpers) or wire more metadata logs through <code>PauseRepository</code> (backlog #4).</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
 </body>
 </html>

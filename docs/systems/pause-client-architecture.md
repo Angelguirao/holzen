@@ -287,7 +287,7 @@ The repo is mid-migration. Expect:
 | Feel / initial emotion | `session/run-initial-emotion-log.ts`, `ritual/clamp-feel-intensity.ts` | `ritual/feel/` | Optional later |
 | Decide / outcome | `application/use-cases/ritual/decide/` (`run-pause-outcome-log`, `pause-decide-outcome-flow`) | `ritual/decide/` | Done (May 2026) |
 | Done / post-pause | `session/post-pause-emotion-log.ts` | `ritual/done/` | Optional later |
-| Session conductors | `presentation/*.ts` (flat + `presentation/session/` + `presentation/reflect/` + `presentation/companion/` incl. `use-companion-section-expansion`) | `presentation/session/`, `reflect/`, `companion/`, `home/`, `archive/` | Reflect beat hooks grouped incl. `use-pause-session-breath-reflect-handlers` (May 2026); move remaining companion orchestration hooks + peel `public.ts` next |
+| Session conductors | `presentation/*.ts` (flat + `presentation/session/` + `presentation/reflect/` + `presentation/companion/`) | `presentation/session/`, `reflect/`, `companion/`, `home/`, `archive/` | Reflect + companion hooks grouped (May 2026); peel `public.ts` + home/archive folders next |
 | Archive queries | `infrastructure/queries/archive/` (`archive-list-query.ts`, `archive-pauses-tab-query.ts`) | `infrastructure/queries/archive/` | Done (May 2026) |
 | Reflect edge + artifact I/O | `infrastructure/edge/reflect/` (`holzen-reflect-edge`, `reflection-artifact`, `load-reflect-recency-hints`, `reflection-step-session-storage`) | under `infrastructure/edge/` (§3) | Done (May 2026) |
 | Ports | `ports/pause-repository.ts`; `public-rpc` → `supabasePauseRepository` for step + lifecycle RPCs | + ReflectGenerator, CompanionOrchestrator, … | Default port wiring done (May 2026); peel `public.ts` next |
