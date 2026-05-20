@@ -1,4 +1,5 @@
 import { useCallback } from 'react';
+import { buildFeelTilesMoodLogOptions } from '@/features/pause/application/use-cases/session/pause-session-mood-chrome-flow';
 import type { FeelStepTile, MoodValue } from '@/features/pause/public';
 
 /**
@@ -17,7 +18,7 @@ export function usePauseSessionFeelTilesSelect(input: {
 
   const onFeelTilesSelect = useCallback(
     (mood: MoodValue, intensity: number, tile: FeelStepTile) => {
-      void handleMoodSelect(mood, intensity, isBriefRitual ? { briefRitual: true, briefFace: tile } : { briefFace: tile });
+      void handleMoodSelect(mood, intensity, buildFeelTilesMoodLogOptions(isBriefRitual, tile));
     },
     [handleMoodSelect, isBriefRitual],
   );
