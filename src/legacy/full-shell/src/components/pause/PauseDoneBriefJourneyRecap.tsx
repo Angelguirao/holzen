@@ -8,7 +8,7 @@ import { useHoldGoalProfile } from '@/features/user/public-hooks';
 import { usePauseStatsData } from '@/legacy/full-shell/src/hooks/use-pause-stats-data';
 import { suppressBadgeCelebrationOverlayThisSession } from '@/legacy/full-shell/src/hooks/use-badge-sync';
 import { getUserBadgeIdsQueryOptions } from '@/legacy/full-shell/src/lib/user-badge-ids-query';
-import type { PauseImpactData } from '@/features/pause/public';
+import type { PauseImpactData } from '@/features/pause/public-hooks';
 import { ScoreImpact } from './ScoreImpact';
 
 interface Props {
