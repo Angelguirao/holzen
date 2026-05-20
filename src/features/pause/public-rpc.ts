@@ -48,7 +48,6 @@ import {
   type PostPauseFeelSnapshot,
 } from './application/use-cases/session/post-pause-emotion-log';
 import type { MoodValue } from './domain/mood-value';
-import { pauseLogStep } from './infrastructure/pause-rpc-client';
 import {
   runPauseReflectNoteUpdate,
   runPauseReflectTagUpdate,
@@ -141,11 +140,11 @@ export function logInitialEmotionStep(params: {
   instanceId: string;
   payload: Record<string, unknown>;
 }): Promise<void> {
-  return pauseLogStep({
-    instanceId: params.instanceId,
-    stepType: 'initial_emotion_logged',
-    payload: params.payload,
-  }).then(() => undefined);
+  return repositoryLogStep(
+    params.instanceId,
+    'initial_emotion_logged',
+    params.payload,
+  ).then(() => undefined);
 }
 
 /** Frame hub shift — `shift_emotion_logged` RPC (wired for screen hooks). */
@@ -153,11 +152,11 @@ export function logShiftEmotionStep(params: {
   instanceId: string;
   payload: Record<string, unknown>;
 }): Promise<void> {
-  return pauseLogStep({
-    instanceId: params.instanceId,
-    stepType: 'shift_emotion_logged',
-    payload: params.payload,
-  }).then(() => undefined);
+  return repositoryLogStep(
+    params.instanceId,
+    'shift_emotion_logged',
+    params.payload,
+  ).then(() => undefined);
 }
 
 /** Decide step — `outcome_logged` RPC (wired for screen hooks). */
@@ -165,19 +164,11 @@ export function logPauseOutcomeStep(params: {
   instanceId: string;
   payload: Record<string, unknown>;
 }) {
-  return pauseLogStep({
-    instanceId: params.instanceId,
-    stepType: 'outcome_logged',
-    payload: params.payload,
-  });
+  return repositoryLogStep(params.instanceId, 'outcome_logged', params.payload);
 }
 
 const logBreathCompletedStep = (params: { instanceId: string; payload: Record<string, unknown> }) =>
-  pauseLogStep({
-    instanceId: params.instanceId,
-    stepType: 'breath_completed',
-    payload: params.payload,
-  }).then(() => undefined);
+  repositoryLogStep(params.instanceId, 'breath_completed', params.payload).then(() => undefined);
 
 /** Breath segment log ports — use with `runEnsureBreathSegment*Logged` from `public`. */
 export const pauseBreathSegmentLogPorts: BreathSegmentLogPorts = {
@@ -194,10 +185,6 @@ export function logPostPauseEmotionIfDirty(params: {
 }) {
   return runPostPauseEmotionLogIfDirty(params, {
     logStep: ({ instanceId, payload }) =>
-      pauseLogStep({
-        instanceId,
-        stepType: 'post_pause_emotion_logged',
-        payload,
-      }).then(() => undefined),
+      repositoryLogStep(instanceId, 'post_pause_emotion_logged', payload).then(() => undefined),
   });
 }

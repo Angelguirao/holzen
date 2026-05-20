@@ -854,6 +854,25 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-20</span>
+      <span>Phase A slice — session ritual steps via PauseRepository</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>Feel / shift / outcome / breath / post-pause <code>public-rpc</code> → <code>PauseRepository</code></h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Reflect facades already used <code>repositoryLogStep</code>. Complete the same default port for <code>logInitialEmotionStep</code>, <code>logShiftEmotionStep</code>, <code>logPauseOutcomeStep</code>, <code>pauseBreathSegmentLogPorts</code>, and <code>logPostPauseEmotionIfDirty</code> — behavior unchanged (<code>supabasePauseRepository.logStep</code> delegates to <code>pauseLogStep</code>).</dd>
+      <dt>Deviation</dt>
+      <dd>None — matches spec §8 one mutation port for step logs exposed from <code>public-rpc</code>.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Did not refactor presentation hooks to inject <code>PauseRepository</code>; facades remain the stable screen import surface.</dd>
+      <dt>Open questions</dt>
+      <dd>Next slice: peel <code>public.ts</code> (backlog #3) or wire <code>pauseLogCompanion</code> / create-dismiss paths through repository methods.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
 </body>
 </html>
