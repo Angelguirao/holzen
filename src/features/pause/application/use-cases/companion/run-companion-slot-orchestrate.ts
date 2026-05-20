@@ -8,7 +8,7 @@ import {
 import {
   resolveCompanionOrchestrateInvokeFailure,
   type CompanionOrchestrateInvokeFailure,
-} from './orchestrate-invoke-error';
+} from '@/features/pause/application/use-cases/ritual/frame/orchestrate-invoke-error';
 import { isFilledOrchestrateSlot, readOrchestrateSlotBody } from './orchestrate-slot-apply';
 import { getRecencyHints } from '@/features/pause/application/use-cases/ritual/frame/recency-hints';
 

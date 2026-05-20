@@ -1,5 +1,5 @@
 import type { RegenerateCompanionSlot } from '@/features/pause/domain/companion-orchestrate';
-import type { CompanionOrchestrateInvokeFailure } from './orchestrate-invoke-error';
+import type { CompanionOrchestrateInvokeFailure } from '@/features/pause/application/use-cases/ritual/frame/orchestrate-invoke-error';
 import type { CompanionSlotOrchestrateMode } from './run-companion-slot-orchestrate';
 
 const REGENERATE_PAYWALL_DEFAULT =

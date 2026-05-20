@@ -417,6 +417,25 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-20</span>
+      <span>Phase A slice — frame leaf: orchestrate-invoke-error</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3><code>orchestrate-invoke-error</code> → <code>ritual/frame/</code></h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Reflect backlog #1 is complete on this branch; continue companion → <code>ritual/frame/</code> with orchestrate invoke failure parsing (module + test). Consumers in <code>companion/</code> import via <code>@/features/pause/.../ritual/frame/</code> until those modules move in later slices.</dd>
+      <dt>Deviation</dt>
+      <dd>None — matches spec §3.1 / §10.1 leaf-first pattern after <code>next-expanded-with-lazy-fetch</code>.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Could batch with <code>run-companion-slot-orchestrate</code>; kept invoke-error leaf separate so orchestration cluster can move together later.</dd>
+      <dt>Open questions</dt>
+      <dd>Next slice: <code>artifact-cache-parse</code> cluster, <code>persist-ui-step-completion</code> + infrastructure sync, or <code>full-view-page-helpers</code> leaf.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
 </body>
 </html>
