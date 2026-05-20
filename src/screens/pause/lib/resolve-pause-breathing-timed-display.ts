@@ -1,4 +1,4 @@
-import { resolveBreathOrbVisualMetrics } from '@/features/pause/application/use-cases/breathing/pause-breath-orb-metrics';
+import { resolveBreathOrbVisualMetrics } from '@/features/pause/application/use-cases/ritual/breathe/pause-breath-orb-metrics';
 import { resolveTriangleKickerDisplay } from '@/features/pause/application/use-cases/breathing/resolve-triangle-kicker-display';
 
 export type PauseBreathingPhase = { labelKey: string; duration: number };
