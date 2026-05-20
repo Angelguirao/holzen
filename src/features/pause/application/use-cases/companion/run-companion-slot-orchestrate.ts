@@ -10,7 +10,7 @@ import {
   type CompanionOrchestrateInvokeFailure,
 } from './orchestrate-invoke-error';
 import { isFilledOrchestrateSlot, readOrchestrateSlotBody } from './orchestrate-slot-apply';
-import { getRecencyHints } from './recency-hints';
+import { getRecencyHints } from '@/features/pause/application/use-cases/ritual/frame/recency-hints';
 
 export type CompanionSlotOrchestrateMode = 'lazy_fetch' | 'regenerate';
 

@@ -1,5 +1,5 @@
 import type { RegenerateCompanionSlot } from '@/features/pause/domain/companion-orchestrate';
-import type { CompanionRecencyHintsPayload } from './recency-hints';
+import type { CompanionRecencyHintsPayload } from '@/features/pause/application/use-cases/ritual/frame/recency-hints';
 
 export type CompanionOrchestrateSourceWire = {
   name: string;
