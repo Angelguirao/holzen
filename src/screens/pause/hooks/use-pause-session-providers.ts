@@ -9,7 +9,7 @@ import { usePauseSessionExitNavigation } from '@/features/pause/public-hooks';
 import { usePauseSessionBreathSecondLabelVariant } from '@/features/pause/public-hooks';
 import { JOURNEY_PREFIX } from '@/lib/app-routes';
 import { clearSession } from '@/features/pause/public';
-import type { PauseSessionShellHolzen } from '@/screens/pause/hooks/use-pause-session-shell';
+import type { PauseSessionShellHolzen } from '@/features/pause/public';
 
 /**
  * Cross-route providers for `/pause`: i18n, Holzen home state, subscription gates, exit nav.

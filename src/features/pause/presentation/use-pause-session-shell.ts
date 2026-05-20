@@ -1,5 +1,5 @@
 import { useMemo } from 'react';
-import type { CompanionData, CompanionPrefs } from '@/features/pause/public';
+import type { PauseSessionShellHolzen } from '@/features/pause/domain/pause-session-shell-holzen';
 import { usePauseSessionFetch } from '@/features/pause/public-hooks';
 import {
   computePauseSessionHydration,
@@ -12,13 +12,10 @@ import type { PauseSessionNavParsed } from '@/features/pause/public';
 import { type FetchedPauseInstance, type PersistedSession } from '@/features/pause/public';
 import { loadSession } from '@/features/pause/public';
 
-export type PauseSessionShellHolzen = {
-  message: string | null;
-  context: string | null;
-  lastPauseInstanceId: string | null;
-  companions: CompanionData;
-  companionPrefs: CompanionPrefs;
-  severity: 'mild' | 'moderate' | 'high';
+export type UsePauseSessionShellParams = {
+  locationKey: string;
+  nav: PauseSessionNavParsed;
+  holzen: PauseSessionShellHolzen;
 };
 
 /**
@@ -26,13 +23,9 @@ export type PauseSessionShellHolzen = {
  * Keeps the same memo / fetch dependency behavior as the prior inline `PauseSession` block.
  *
  * **Contract:** `docs/systems/pause-system.md` section 7.2 (hydration); pure helpers in
- * `src/lib/pause-session-hydration.ts`. **Code map:** same doc, section 10.
+ * `features/pause/application/use-cases/session/hydration.ts`. **Code map:** same doc, section 10.
  */
-export function usePauseSessionShell(params: {
-  locationKey: string;
-  nav: PauseSessionNavParsed;
-  holzen: PauseSessionShellHolzen;
-}): {
+export function usePauseSessionShell(params: UsePauseSessionShellParams): {
   restored: PersistedSession | null;
   hydration: PauseSessionHydrationState;
   fetchPauseInstanceId: string | null;

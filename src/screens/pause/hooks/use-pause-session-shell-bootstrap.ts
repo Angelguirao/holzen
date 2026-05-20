@@ -6,10 +6,8 @@ import {
   isPauseSessionWaitingForInstanceFetch,
   parsePauseSessionLocationState,
 } from '@/features/pause/public';
-import {
-  usePauseSessionShell,
-  type PauseSessionShellHolzen,
-} from '@/screens/pause/hooks/use-pause-session-shell';
+import type { PauseSessionShellHolzen } from '@/features/pause/public';
+import { usePauseSessionShell } from '@/features/pause/public-hooks';
 import { usePauseSessionMountLog } from '@/features/pause/public-hooks';
 import {
   usePauseSessionPendingLeaveSheet,

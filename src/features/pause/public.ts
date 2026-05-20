@@ -177,6 +177,7 @@ export {
   type PauseStep,
 } from './domain/pause-ritual-steps';
 export type { CompanionData, CompanionPrefs } from './domain/companion-card-types';
+export type { PauseSessionShellHolzen } from './domain/pause-session-shell-holzen';
 export type {
   CachedHistoricalInsightShape,
 } from './domain/historical-insight';

@@ -131,3 +131,7 @@ export {
   usePauseSessionBriefPastStep,
   type UsePauseSessionBriefPastStepParams,
 } from './presentation/use-pause-session-brief-past-step';
+export {
+  usePauseSessionShell,
+  type UsePauseSessionShellParams,
+} from './presentation/use-pause-session-shell';
