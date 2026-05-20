@@ -179,3 +179,11 @@ export type {
   PauseSessionProviders,
   PauseSessionSubscriptionGateSlice,
 } from './presentation/session/pause-session-providers-types';
+export {
+  usePauseSessionFlowThroughSteps,
+  usePauseSessionFlowWithChrome,
+} from './presentation/use-pause-session-flow';
+export {
+  usePauseSessionScreenViewModel,
+  type PauseSessionScreenViewModel,
+} from './presentation/use-pause-session-screen';
