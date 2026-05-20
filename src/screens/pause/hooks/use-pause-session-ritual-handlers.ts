@@ -1,15 +1,14 @@
 import type { usePauseSessionProviders } from '@/screens/pause/hooks/use-pause-session-providers';
-import type { usePauseSessionShellRitual } from '@/screens/pause/hooks/use-pause-session-shell-ritual';
+import type { PauseSessionShellRitualResult } from '@/features/pause/public-hooks';
 import { usePauseSessionScaffoldVm } from '@/screens/pause/hooks/use-pause-session-scaffold-vm';
 import { usePauseSessionStepHandlers } from '@/screens/pause/hooks/use-pause-session-step-handlers';
 
 type PauseSessionProviders = ReturnType<typeof usePauseSessionProviders>;
-type PauseSessionShellRitual = ReturnType<typeof usePauseSessionShellRitual>;
 
 /** Composes step handlers + scaffold VM for the pause session ritual surface. */
 export function usePauseSessionRitualHandlers(
   p: PauseSessionProviders,
-  shellRitual: PauseSessionShellRitual,
+  shellRitual: PauseSessionShellRitualResult,
 ) {
   const { prefersReducedMotion } = p;
   const step = usePauseSessionStepHandlers(p, shellRitual);

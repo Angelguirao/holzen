@@ -140,3 +140,8 @@ export {
   type UsePauseSessionShellBootstrapParams,
 } from './presentation/use-pause-session-shell-bootstrap';
 export { usePauseSessionRitualState } from './presentation/use-pause-session-ritual-state';
+export {
+  usePauseSessionShellRitual,
+  type PauseSessionShellRitualProvidersSlice,
+  type PauseSessionShellRitualResult,
+} from './presentation/use-pause-session-shell-ritual';

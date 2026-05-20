@@ -7,15 +7,14 @@ import {
   usePauseSessionMoodChromeHandlers,
 } from '@/features/pause/public-hooks';
 import type { usePauseSessionProviders } from '@/screens/pause/hooks/use-pause-session-providers';
-import type { usePauseSessionShellRitual } from '@/screens/pause/hooks/use-pause-session-shell-ritual';
+import type { PauseSessionShellRitualResult } from '@/features/pause/public-hooks';
 
 type PauseSessionProviders = ReturnType<typeof usePauseSessionProviders>;
-type PauseSessionShellRitual = ReturnType<typeof usePauseSessionShellRitual>;
 
 /** Mood, breath, reflect/decide, and chrome handlers (inputs for scaffold assembly). */
 export function usePauseSessionStepHandlers(
   p: PauseSessionProviders,
-  shellRitual: PauseSessionShellRitual,
+  shellRitual: PauseSessionShellRitualResult,
 ) {
   const { subscribed, handleReturn } = p;
   const { mood, toggleFavorite, handlePauseSessionChromeClose } = usePauseSessionMoodChromeHandlers(

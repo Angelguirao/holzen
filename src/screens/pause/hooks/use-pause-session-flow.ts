@@ -1,6 +1,6 @@
 import type { usePauseSessionProviders } from '@/screens/pause/hooks/use-pause-session-providers';
 import { usePauseSessionRitualHandlers } from '@/screens/pause/hooks/use-pause-session-ritual-handlers';
-import { usePauseSessionShellRitual } from '@/screens/pause/hooks/use-pause-session-shell-ritual';
+import { usePauseSessionShellRitual } from '@/features/pause/public-hooks';
 
 type PauseSessionProviders = ReturnType<typeof usePauseSessionProviders>;
 
