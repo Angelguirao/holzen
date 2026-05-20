@@ -280,7 +280,7 @@ The repo is mid-migration. Expect:
 
 | Concern | On disk today (May 2026) | Target (§3) | Phase A slice |
 |---------|--------------------------|-------------|---------------|
-| Reflect generation + persist-error helpers | `application/use-cases/ritual/reflect/` | `ritual/reflect/` | Done (May 2026) |
+| Reflect generation, persist-error helpers, UI telemetry | `application/use-cases/ritual/reflect/` (`pause-reflect-ui-telemetry` included) | `ritual/reflect/` | Done (May 2026) |
 | Frame / companion slots | `application/use-cases/companion/` (+ `ritual/frame/estimate-read-time`, `url`, `signal-source-trusted`, `format-companion-history-relative-day`, `generation-taxonomy`, `related-biases`, `recency-hints`, `section-visibility`, `breathing-ui-complete`, `companion-ui-completion-types`, `zoom-out-payload`, `log-pause-companion`, `companion-data-from-artifacts`, `log-companion-feedback-vote`, `intervention-idempotency-telemetry`, `next-expanded-with-lazy-fetch`, `companion-intervention-telemetry`, `orchestrate-invoke-error`, `artifact-cache-parse`, `apply-companion-orchestrate-retry-reset`, `companion-generation-telemetry`, `full-view-page-helpers`, `persist-ui-step-completion`) | `ritual/frame/` | Move incrementally (started May 2026) |
 | Partial ritual beats (brief/deep/breath/log) | `application/use-cases/ritual/` (`brief/`, `deep/`, `breath/`, `log-pause-step.ts`, …) | consolidate under `ritual/*/` | Optional later |
 | Breathing / audio | `application/use-cases/breathing/`, `ritual/breath/` | `ritual/breathe/` | Optional consolidate later |
