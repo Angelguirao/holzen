@@ -6,9 +6,9 @@ import {
   resolveReflectGenerationSeverityAbsPct,
   shouldRunPauseReflectGeneration,
 } from '@/features/pause/application/use-cases/ritual/reflect/pause-session-reflect-decide-flow';
+import type { PauseImpactData } from '@/features/pause/application/use-cases/impact-data';
 import {
   type MoodValue,
-  type PauseImpactData,
   type PauseStep,
   type RitualDepth,
 } from '@/features/pause/public';

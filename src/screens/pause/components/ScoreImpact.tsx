@@ -2,9 +2,9 @@ import { useMemo } from 'react';
 import { motion } from 'framer-motion';
 import { useTranslation } from 'react-i18next';
 import { cn } from '@/lib/utils';
-import type { PauseImpactData } from '@/features/pause/public';
 import {
   buildPauseScoreImpacts,
+  type PauseImpactData,
   resolveScoreImpactDisplayImpacts,
   resolveScoreImpactViewMode,
   scoreImpactMotionDelaySec,

@@ -3,11 +3,6 @@
  * RPC mutations: `@/features/pause/public-rpc`.
  */
 export { pauseCreateSkippedUserMessage } from './application/use-cases/create-skipped-message';
-export {
-  buildPauseImpactDataOnComplete,
-  type BuildPauseImpactDataOnCompleteInput,
-  type PauseImpactData,
-} from './application/use-cases/impact-data';
 export { pauseArchiveRowAllowsRetrospectiveOutcome } from './application/use-cases/archive/retrospective-outcome';
 export { buildOutcomeLoggedPayload } from './application/use-cases/outcome-log-payload';
 export { groupBulkHoldByLocalDay } from './application/use-cases/bulk-hold/group-by-local-day';

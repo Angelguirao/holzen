@@ -91,6 +91,7 @@ export {
   buildPauseScoreImpacts,
   type PauseScoreImpactRow,
 } from './application/use-cases/score-impacts';
+export type { PauseImpactData } from './application/use-cases/impact-data';
 export {
   resolveScoreImpactDisplayImpacts,
   resolveScoreImpactViewMode,

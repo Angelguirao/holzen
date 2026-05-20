@@ -1899,6 +1899,25 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-20</span>
+      <span>Phase A slice — peel PauseImpactData off public.ts (§6)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3><code>PauseImpactData</code> type → <code>public-hooks</code>; impact builder off barrel</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>reflect/</code> → <code>ritual/reflect/</code>) was already complete — no reflect moves. Continue backlog #3 §6: remove <code>buildPauseImpactDataOnComplete</code> and <code>PauseImpactData</code> from <code>public.ts</code>; export <code>PauseImpactData</code> beside score-impact helpers on <code>public-hooks.ts</code> for <code>ScoreImpact</code> / scaffold screens. Presentation and decide flow import <code>impact-data</code> directly; co-located test imports the module path.</dd>
+      <dt>Deviation</dt>
+      <dd>None — builder never needed on the slim barrel; decide flow already imports from application.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Did not peel <code>MoodCheck</code> mood tokens or <code>writingTextareaClassName</code> in the same commit.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: peel <code>MoodCheck</code> mood tokens to <code>public-hooks</code>, move <code>writingTextareaClassName</code> to shared UI tokens, or optional <code>breathing/</code> → <code>ritual/breathe/</code>.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
 </body>
 </html>
