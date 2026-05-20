@@ -7,3 +7,8 @@ export {
   fetchCompletedPauseCount,
   getCompletedPauseCountQueryOptions,
 } from './presentation/use-completed-pause-count';
+export {
+  usePendingPauseOffer,
+  pendingPauseOfferQueryKey,
+  type PendingPauseOfferRow,
+} from './presentation/use-pending-pause-offer';
