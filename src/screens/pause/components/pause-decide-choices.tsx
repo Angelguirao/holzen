@@ -1,7 +1,7 @@
 import { motion } from 'framer-motion';
 import { useTranslation } from 'react-i18next';
 import { OutcomeIcon } from '@/components/icons/OutcomeIcon';
-import { pauseStepLayout } from '@/features/pause/public';
+import { pauseStepLayout } from '@/features/pause/public-hooks';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 

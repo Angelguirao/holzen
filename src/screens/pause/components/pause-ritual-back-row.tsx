@@ -1,7 +1,7 @@
 import { motion } from 'framer-motion';
 import { useTranslation } from 'react-i18next';
 import { ChevronLeft } from 'lucide-react';
-import { pauseStepLayout } from '@/features/pause/public';
+import { pauseStepLayout } from '@/features/pause/public-hooks';
 
 export type PauseRitualBackRowProps = {
   onBack?: () => void;

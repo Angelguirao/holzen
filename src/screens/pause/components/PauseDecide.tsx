@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { hapticFeedback } from '@/lib/haptics';
-import { pauseStepLayout } from '@/features/pause/public';
+import { pauseStepLayout } from '@/features/pause/public-hooks';
 import { PauseDecideChoices } from '@/screens/pause/components/pause-decide-choices';
 import { PauseDecideMirror } from '@/screens/pause/components/pause-decide-mirror';
 import { PauseRitualBackRow } from '@/screens/pause/components/pause-ritual-back-row';

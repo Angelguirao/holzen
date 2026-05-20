@@ -151,7 +151,6 @@ export {
   PAUSE_FEEL_INTENSITY_KEYS,
   type PauseFeelIntensityKey,
 } from './domain/pause-feel-intensity';
-export { pauseStepLayout } from './presentation/pause-step-layout';
 export type { MoodValue } from './domain/mood-value';
 export { PAUSE_MOOD_VALUES, PAUSE_MOOD_GROUPS } from './domain/mood-value';
 export {

@@ -1,6 +1,6 @@
 import { motion } from 'framer-motion';
 import { useTranslation } from 'react-i18next';
-import { pauseStepLayout } from '@/features/pause/public';
+import { pauseStepLayout } from '@/features/pause/public-hooks';
 import { usePauseBriefIntegrateCountdown } from '@/features/pause/public-hooks';
 import { PauseBriefIntegrateActions } from '@/screens/pause/components/pause-brief-integrate-actions';
 import { PauseBriefIntegrateTimerRing } from '@/screens/pause/components/pause-brief-integrate-timer-ring';

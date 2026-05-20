@@ -1424,6 +1424,25 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-20</span>
+      <span>Phase A slice — peel pauseStepLayout from public.ts (§6)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3><code>pauseStepLayout</code> → <code>public-hooks</code></h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>ritual/reflect/</code>) and reflect RPC port wiring (#4 for reflect step types) are complete on this branch. Continue backlog #3: export shared ritual layout tokens from <code>public-hooks.ts</code>; pause screen components import <code>pauseStepLayout</code> from <code>public-hooks</code> alongside hooks; domain/types stay on <code>public.ts</code>.</dd>
+      <dt>Deviation</dt>
+      <dd><code>public-hooks</code> carries a non-hook presentation constant — same pattern as <code>estimateReadTime</code> (May 2026).</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Did not peel zoom-out display types/helpers from <code>public.ts</code> in the same commit.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: peel zoom-out payload helpers or wire non-reflect ritual step logs through <code>PauseRepository</code>.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
 </body>
 </html>

@@ -2,6 +2,7 @@
  * Pause read-model React hooks — import from here in screens and tests.
  * Pure frame/format helpers used by pause screens also live here (§6 slim `public.ts`).
  */
+export { pauseStepLayout } from './presentation/pause-step-layout';
 export { estimateReadTime } from './application/use-cases/ritual/frame/estimate-read-time';
 export { formatCompanionHistoryRelativeDay } from './application/use-cases/ritual/frame/format-companion-history-relative-day';
 export { zoomOutTotalCharsForReadTime } from './application/use-cases/ritual/frame/zoom-out-payload';

@@ -1,7 +1,7 @@
 import { motion } from 'framer-motion';
 import { useTranslation } from 'react-i18next';
 import { ChevronRight } from 'lucide-react';
-import { pauseStepLayout } from '@/features/pause/public';
+import { pauseStepLayout } from '@/features/pause/public-hooks';
 import { Button } from '@/components/ui/button';
 import { PauseRitualBackRow } from '@/screens/pause/components/pause-ritual-back-row';
 
