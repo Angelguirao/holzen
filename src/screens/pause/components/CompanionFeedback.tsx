@@ -1,23 +1,14 @@
 import { ThumbsUp, ThumbsDown, RefreshCw } from 'lucide-react';
-import { useState, useEffect, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useQuery, useQueryClient } from '@tanstack/react-query';
-import { useAuth } from '@/features/auth/public';
 import { hapticFeedback } from '@/lib/haptics';
 import type { RegenerateCompanionSlot } from '@/features/pause/public';
 import {
-  companionFeedbackVoteQueryKey,
-  getCompanionFeedbackVoteQueryOptions,
-  logCompanionFeedbackVote,
-} from '@/features/pause/public-queries';
+  isCompanionRegenerateUiEnabled,
+  useCompanionFeedbackVote,
+} from '@/features/pause/public-hooks';
 import { useSubscription } from '@/features/subscription/public-hooks';
 import { useProGate } from '@/features/subscription/public-hooks';
 import { isPaidLimitReached, showLimitReachedToast } from '@/features/subscription/public-limits';
-import { isHolzenDebugEnabled } from '@/lib/holzen-console';
-/** Orchestrate regenerate — dev / non-production builds, or prod + Holzen debug opt-in (see holzen-console). */
-function isCompanionRegenerateUiEnabled(): boolean {
-  return !import.meta.env.PROD || isHolzenDebugEnabled();
-}
 
 interface Props {
   /** Reflection ID this companion belongs to */
@@ -48,94 +39,37 @@ export function CompanionFeedback({
   regenerating,
 }: Props) {
   const { t } = useTranslation();
-  const { user } = useAuth();
-  const userId = user?.id;
-  const queryClient = useQueryClient();
-  const [optimisticVote, setOptimisticVote] = useState<'up' | 'down' | null>(null);
-  const [loading, setLoading] = useState(false);
   const { isPro, requirePro, startCheckout } = useProGate();
-  const { companionRemaining, flexCreditsBalance, applyOptimisticDecrement, refresh: refreshSubscription } = useSubscription();
+  const { companionRemaining, flexCreditsBalance, applyOptimisticDecrement, refresh: refreshSubscription } =
+    useSubscription();
 
-  useEffect(() => {
-    setOptimisticVote(null);
-  }, [pauseInstanceId, companionType, userId]);
-
-  const { data: persistedVote = null } = useQuery(
-    getCompanionFeedbackVoteQueryOptions(userId, pauseInstanceId, companionType),
-  );
-
-  const vote = optimisticVote ?? persistedVote;
+  const regenBusy = Boolean(regenerating);
+  const { vote, loading, handleVote } = useCompanionFeedbackVote({
+    pauseInstanceId,
+    companionType,
+    cacheId,
+    interactionBlocked: regenBusy,
+  });
 
   const canRegenerate = Boolean(
     pauseInstanceId && regenerateSlot && onRegenerate && isCompanionRegenerateUiEnabled(),
   );
-  const regenBusy = Boolean(regenerating);
-  // Pro users hit a true wall when both the monthly companion bucket AND
-  // their flex credits are empty — gate the button visually then.
   const limitReached = isPro && isPaidLimitReached({
     remaining: companionRemaining,
     flexCreditsBalance,
   });
 
-  const handleVote = useCallback(async (type: 'up' | 'down') => {
-    if (vote || loading || regenBusy) return;
-    if (!userId) return;
-    setLoading(true);
-    setOptimisticVote(type);
-    hapticFeedback('light');
-
-    try {
-      const { ok } = await logCompanionFeedbackVote({
-        userId,
-        companionType,
-        vote: type,
-        cacheId,
-        pauseInstanceId,
-      });
-      if (!ok) {
-        setOptimisticVote(null);
-        return;
-      }
-      if (pauseInstanceId) {
-        queryClient.setQueryData<'up' | 'down' | null>(
-          companionFeedbackVoteQueryKey(userId, pauseInstanceId, companionType),
-          type,
-        );
-        setOptimisticVote(null);
-      }
-      // No pause_instance_id: prior UI kept local vote only (no server read key); leave optimistic set.
-    } catch {
-      setOptimisticVote(null);
-    } finally {
-      setLoading(false);
-    }
-  }, [
-    vote,
-    loading,
-    regenBusy,
-    userId,
-    pauseInstanceId,
-    companionType,
-    cacheId,
-    queryClient,
-  ]);
-
   const handleRegenerate = () => {
     if (!canRegenerate || regenBusy) return;
-    // Non-Pro: route through the standard Pro upsell toast.
     if (!isPro) {
       requirePro('companions');
       return;
     }
-    // Pro but out of allowance + flex credits: standard limit-reached toast.
     if (limitReached) {
       showLimitReachedToast({ feature: 'regenerate', startCheckout });
       return;
     }
     hapticFeedback('light');
-    // Optimistically reflect the spend in the UI immediately; the next
-    // subscription refresh reconciles with the server. If the regenerate
-    // fails, the refresh below restores accurate counts.
     applyOptimisticDecrement('companion');
     Promise.resolve(onRegenerate?.()).finally(() => {
       void refreshSubscription();
@@ -146,7 +80,7 @@ export function CompanionFeedback({
     return (
       <span className="inline-flex items-center gap-1">
         <button
-          onClick={() => handleVote('up')}
+          onClick={() => void handleVote('up')}
           disabled={!!vote || loading || regenBusy}
           className={`p-0.5 rounded transition-colors ${
             vote === 'up' ? 'text-nox-text-highlight/90' : vote ? 'text-muted-foreground/10' : 'text-muted-foreground/20 hover:text-nox-text-highlight/60'
@@ -156,7 +90,7 @@ export function CompanionFeedback({
           <ThumbsUp className="h-2.5 w-2.5" />
         </button>
         <button
-          onClick={() => handleVote('down')}
+          onClick={() => void handleVote('down')}
           disabled={!!vote || loading || regenBusy}
           className={`p-0.5 rounded transition-colors ${
             vote === 'down' ? 'text-destructive/70' : vote ? 'text-muted-foreground/10' : 'text-muted-foreground/20 hover:text-destructive/50'
@@ -185,7 +119,7 @@ export function CompanionFeedback({
     <div className="flex flex-wrap items-center gap-x-2 gap-y-1 mt-2">
       <span className="text-[9px] text-muted-foreground/30 font-mono">{t('companions.helpfulQuestion')}</span>
       <button
-        onClick={() => handleVote('up')}
+        onClick={() => void handleVote('up')}
         disabled={!!vote || loading || regenBusy}
         className={`p-1 rounded transition-colors ${
           vote === 'up'
@@ -199,7 +133,7 @@ export function CompanionFeedback({
         <ThumbsUp className="h-3 w-3" />
       </button>
       <button
-        onClick={() => handleVote('down')}
+        onClick={() => void handleVote('down')}
         disabled={!!vote || loading || regenBusy}
         className={`p-1 rounded transition-colors ${
           vote === 'down'
