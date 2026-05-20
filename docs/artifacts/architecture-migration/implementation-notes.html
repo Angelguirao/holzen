@@ -2889,6 +2889,25 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-20</span>
+      <span>Phase A slice — port-backed companion feedback vote write (backlog #4)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>Backlog #1 complete; analytics write behind PauseAnalyticsRepository</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd><code>ritual/reflect/</code> migration was already complete. Add <code>PauseAnalyticsRepository</code> + <code>run-log-companion-feedback-vote</code>; route <code>logCompanionFeedbackVote</code> in <code>companion-feedback-vote-query</code> through default <code>supabasePauseAnalyticsRepository</code> (read path unchanged). Metadata builder stays in <code>log-companion-feedback-vote.ts</code>.</dd>
+      <dt>Deviation</dt>
+      <dd>None — <code>public-queries</code> export name unchanged; presentation hook import path unchanged.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Fetch still uses <code>supabase.from('analytics_events')</code> in the query module; only the write path is port-backed this slice.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: colocate remaining flat session hooks (<code>use-pause-session-shell</code>, breath navigation bundle), or port-backed analytics read adapter for feedback vote fetch.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
 </body>
 </html>
