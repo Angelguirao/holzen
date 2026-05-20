@@ -287,8 +287,19 @@ export {
 export { getRecencyHints } from './application/use-cases/companion/recency-hints';
 export {
   companionSlotToGenerationTaxonomy,
+  trackCompanionGenerationInitiated,
   trackCompanionServed,
 } from './application/use-cases/companion/analytics';
+export {
+  applyCompanionSlotOrchestrateOutcome,
+  type ApplyCompanionSlotOrchestrateOutcomeInput,
+} from './application/use-cases/companion/apply-companion-slot-orchestrate-outcome';
+export {
+  logCompanionSlotOrchestrateEmpty,
+  logCompanionSlotOrchestrateFailed,
+  logCompanionSlotOrchestrateFilled,
+  logCompanionSlotOrchestrateInvoke,
+} from './application/use-cases/companion/companion-slot-orchestrate-telemetry';
 export {
   buildCompanionFeedbackVoteMetadata,
   type CompanionFeedbackVote,
