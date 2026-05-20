@@ -57,3 +57,10 @@ export function getEmailUnsubscribeLinkQueryOptions(token: string | null) {
     retry: false,
   } as const;
 }
+
+/** POST confirm — same edge function; invalidates link check cache after success. */
+export function submitEmailUnsubscribe(token: string) {
+  return invokeEdge<{ success?: boolean; reason?: string }>('handle-email-unsubscribe', {
+    body: { token },
+  });
+}

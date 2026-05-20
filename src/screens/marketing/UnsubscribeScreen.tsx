@@ -2,11 +2,11 @@ import { useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { Button } from '@/components/ui/button';
-import { invokeEdge } from '@/lib/invoke-edge';
 import {
   emailUnsubscribeLinkQueryKey,
   getEmailUnsubscribeLinkQueryOptions,
-} from '@/screens/marketing/lib/email-unsubscribe-query';
+  submitEmailUnsubscribe,
+} from '@/features/auth/public-queries';
 
 type ConfirmState =
   | { kind: 'idle' }
@@ -15,7 +15,7 @@ type ConfirmState =
   | { kind: 'already' }
   | { kind: 'error'; message: string };
 
-export { emailUnsubscribeLinkQueryKey } from '@/screens/marketing/lib/email-unsubscribe-query';
+export { emailUnsubscribeLinkQueryKey };
 
 export default function UnsubscribeScreen() {
   const [params] = useSearchParams();
@@ -28,9 +28,7 @@ export default function UnsubscribeScreen() {
   const onConfirm = async () => {
     if (!token) return;
     setConfirm({ kind: 'submitting' });
-    const { data, error } = await invokeEdge<{ success?: boolean; reason?: string }>('handle-email-unsubscribe', {
-      body: { token },
-    });
+    const { data, error } = await submitEmailUnsubscribe(token);
     if (error) {
       setConfirm({ kind: 'error', message: error.message });
       return;
