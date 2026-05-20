@@ -65,3 +65,8 @@ export {
   useGroundingEnrichment,
   type GroundingEnrichment,
 } from './presentation/use-grounding-enrichment';
+export { usePauseSessionCompanionSnapshot } from './presentation/use-pause-session-companion-snapshot';
+export {
+  useFullviewTelemetry,
+  type FullviewCompanion,
+} from './presentation/use-fullview-telemetry';
