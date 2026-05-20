@@ -1,6 +1,7 @@
 import { useMemo } from 'react';
 import type { ZenModeHomeProps } from '@/screens/home/components/ZenModeHome';
 import type { Entitlement } from '@/features/subscription/public';
+import { zenModeHomePauseSnapshot } from '@/features/pause/public';
 
 type CooldownFn = () => number;
 
@@ -67,17 +68,7 @@ export function useHomeZenModeRouteProps(args: {
       context,
       contextPreview,
       openPauseState,
-      companions: { haiku: null, groundingTitle: null, groundingBody: null },
-      companionPrefs: {
-        breathing: true,
-        haiku: false,
-        grounding: false,
-        signal: false,
-        zoomOut: false,
-        history: false,
-      },
-      severity: 'mild',
-      lastPauseInstanceId: null,
+      ...zenModeHomePauseSnapshot(),
       loading,
       error,
       btcData,
