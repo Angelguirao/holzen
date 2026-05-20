@@ -1724,7 +1724,26 @@
       <dt>Tradeoffs</dt>
       <dd>Orb/kicker metrics and ritual-pattern exports remain on <code>public.ts</code> for screen/lib consumers.</dd>
       <dt>Open questions</dt>
-      <dd>Next: peel ritual-pattern screen imports to <code>public-hooks</code>, wire <code>persistCompanionUiStepCompletion</code> on <code>public-rpc</code> (backlog #4), or colocate <code>application/use-cases/breathing/</code> under <code>ritual/breathe/</code>.</dd>
+      <dd>Next: peel ritual-pattern screen imports to <code>public-hooks</code>, or colocate <code>application/use-cases/breathing/</code> under <code>ritual/breathe/</code>.</dd>
+    </dl>
+  </article>
+
+  <article class="note">
+    <header>
+      <span>2026-05-20</span>
+      <span>Phase A slice — peel step-transition helpers from public.ts (§6)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3><code>buildPauseSessionStepTransitionConfig</code> + motion constants → <code>public-hooks</code></h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>reflect/</code> → <code>ritual/reflect/</code>) complete — skipped. Continue backlog #3 §6: Framer step-transition builder, duration/ease constants, and <code>PauseSessionStepTransitionConfig</code> type export from <code>public-hooks.ts</code>; brief ritual body screen imports via <code>public-hooks</code>. Presentation hook imports the use-case module directly to avoid pulling the full <code>public-hooks</code> barrel (Supabase init). <code>pauseStepSwipeDirection</code> stays on <code>public.ts</code>.</dd>
+      <dt>Deviation</dt>
+      <dd>None — same peel pattern as brief-integrate ring and feel-step tokens.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Did not peel breath-orb / triangle-kicker display helpers or <code>writingTextareaClassName</code> in the same commit.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: peel <code>resolveBreathOrbVisualMetrics</code> + <code>resolveTriangleKickerDisplay</code> for pause breathing screens, or colocate <code>breathing/</code> under <code>ritual/breathe/</code>.</dd>
     </dl>
   </article>
 
