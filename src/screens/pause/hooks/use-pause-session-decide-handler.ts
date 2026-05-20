@@ -3,7 +3,7 @@ import type { TFunction } from 'i18next';
 import type { MoodValue } from '@/screens/pause/components/MoodCheck';
 import { hapticFeedback } from '@/lib/haptics';
 import { useAuth } from '@/features/auth/public';
-import { pauseLogStep } from '@/features/pause/public-rpc';
+import { logPauseOutcomeStep } from '@/features/pause/public-rpc';
 import {
   buildPauseImpactDataOnComplete,
   clearSession,
@@ -15,13 +15,6 @@ import {
   type PauseImpactData,
   type RitualDepth,
 } from '@/features/pause/public';
-
-const logOutcomeStep = (params: { instanceId: string; payload: Record<string, unknown> }) =>
-  pauseLogStep({
-    instanceId: params.instanceId,
-    stepType: 'outcome_logged',
-    payload: params.payload,
-  });
 
 export function usePauseSessionDecideHandler(input: {
   decidingRef: MutableRefObject<boolean>;
@@ -74,7 +67,7 @@ export function usePauseSessionDecideHandler(input: {
 
         const outcome = await runPauseOutcomeLog(
           { pauseInstanceId, decision: d },
-          { logOutcome: logOutcomeStep },
+          { logOutcome: logPauseOutcomeStep },
         );
 
         if (outcome.status === 'sync_failed') {

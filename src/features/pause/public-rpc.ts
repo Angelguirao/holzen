@@ -50,6 +50,8 @@ import {
 import { runPauseFavoriteToggle } from './application/use-cases/reflect/run-pause-favorite-toggle';
 import { runPauseReflectionStepLogOnce } from './application/use-cases/reflect/run-pause-reflection-step-log';
 import { reflectionStepSessionStorage } from './infrastructure/reflect/reflection-step-session-storage';
+import { invalidateCompanionUiCompletionQuery } from './application/queries/companion-ui-completion-query-key';
+import type { BreathSegmentLogPorts } from './application/use-cases/breathing/run-breath-segment-log';
 
 export type { BulkHoldApplyResult };
 export type { PostPauseFeelSnapshot };
@@ -117,6 +119,55 @@ export function logPauseReflectTags(params: { pauseInstanceId: string; tags: str
       pauseLogStep({ instanceId, stepType, payload }),
   });
 }
+
+/** Feel step — `initial_emotion_logged` RPC (wired for screen hooks). */
+export function logInitialEmotionStep(params: {
+  instanceId: string;
+  payload: Record<string, unknown>;
+}): Promise<void> {
+  return pauseLogStep({
+    instanceId: params.instanceId,
+    stepType: 'initial_emotion_logged',
+    payload: params.payload,
+  }).then(() => undefined);
+}
+
+/** Frame hub shift — `shift_emotion_logged` RPC (wired for screen hooks). */
+export function logShiftEmotionStep(params: {
+  instanceId: string;
+  payload: Record<string, unknown>;
+}): Promise<void> {
+  return pauseLogStep({
+    instanceId: params.instanceId,
+    stepType: 'shift_emotion_logged',
+    payload: params.payload,
+  }).then(() => undefined);
+}
+
+/** Decide step — `outcome_logged` RPC (wired for screen hooks). */
+export function logPauseOutcomeStep(params: {
+  instanceId: string;
+  payload: Record<string, unknown>;
+}) {
+  return pauseLogStep({
+    instanceId: params.instanceId,
+    stepType: 'outcome_logged',
+    payload: params.payload,
+  });
+}
+
+const logBreathCompletedStep = (params: { instanceId: string; payload: Record<string, unknown> }) =>
+  pauseLogStep({
+    instanceId: params.instanceId,
+    stepType: 'breath_completed',
+    payload: params.payload,
+  }).then(() => undefined);
+
+/** Breath segment log ports — use with `runEnsureBreathSegment*Logged` from `public`. */
+export const pauseBreathSegmentLogPorts: BreathSegmentLogPorts = {
+  logStep: logBreathCompletedStep,
+  invalidateCompanionCompletion: invalidateCompanionUiCompletionQuery,
+};
 
 /** Brief done save — `post_pause_emotion_logged` when check-in differs from ritual snapshot. */
 export function logPostPauseEmotionIfDirty(params: {
