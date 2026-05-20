@@ -2260,6 +2260,25 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-20</span>
+      <span>Phase A slice — colocate ritual audio under ritual/breathe (Tier 5)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>Backlog #1 complete; <code>ritual-audio</code> + audio context → <code>ritual/breathe/</code></h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd><code>reflect/</code> → <code>ritual/reflect/</code> was already complete. After breath segment log cluster, move Web Audio cue helpers and shared <code>AudioContext</code> singleton beside other breathe modules; reflect frame ambience imports context from ritual path; timed-loop imports cues from ritual path; <code>public-hooks</code> re-export path only.</dd>
+      <dt>Deviation</dt>
+      <dd>None — breathing phase cues and reflect/frame ambience behavior unchanged.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Did not move <code>ritual-pattern</code> or orb metrics in the same commit.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: <code>ritual-pattern</code> hub under <code>ritual/breathe/</code>, or continue §6 <code>public.ts</code> peel.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
 </body>
 </html>

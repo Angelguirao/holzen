@@ -7,7 +7,7 @@ import {
 import {
   playPauseBreathPatternCompleteCue,
   playPauseBreathPhaseCue,
-} from '@/features/pause/application/use-cases/breathing/ritual-audio';
+} from '@/features/pause/application/use-cases/ritual/breathe/ritual-audio';
 import { hapticFeedback } from '@/lib/haptics';
 
 export type PauseBreathingPhase = {

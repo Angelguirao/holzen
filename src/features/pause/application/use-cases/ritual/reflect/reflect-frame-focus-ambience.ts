@@ -3,7 +3,7 @@
  * Shares the pause ritual `AudioContext` with breathing phase cues.
  */
 
-import { runPauseRitualAudioWhenReady } from '@/features/pause/application/use-cases/breathing/pause-ritual-audio-context';
+import { runPauseRitualAudioWhenReady } from '@/features/pause/application/use-cases/ritual/breathe/pause-ritual-audio-context';
 
 type AmbienceRuntime = {
   oscillators: OscillatorNode[];
