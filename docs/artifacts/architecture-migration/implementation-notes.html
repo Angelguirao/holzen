@@ -2231,7 +2231,7 @@
     <h3>Continue <code>breathing/</code> → <code>ritual/breathe/</code> after label-variant slice</h3>
     <dl>
       <dt>Design decision</dt>
-      <dd>Backlog #1 (<code>reflect/</code> → <code>ritual/reflect/</code>) is complete on <code>cursor/arch-migrate-src-ca70</code>. Next smallest breathe cluster: <code>phase-advance</code> (+ tests) → <code>ritual/breathe/</code>; <code>BOX_BREATH_PHASE_COUNT</code> re-export uses relative <code>./breathing-constants</code>. <code>public-hooks</code> still exports <code>computeBreathingPhaseAdvance</code> for <code>BreathingExercise</code>; timed-loop hook imports ritual path directly.</dd>
+      <dd>Backlog #1 (<code>reflect/</code> → <code>ritual/reflect/</code>) is complete on <code>cursor/arch-migrate-src-ca70</code>. Next smallest breathe cluster: <code>phase-advance</code> (+ tests) → <code>ritual/breathe/</code>; <code>BOX_BREATH_PHASE_COUNT</code> re-export uses relative <code>./breathing-constants</code>. <code>public-hooks</code> still exports <code>computeBreathingPhaseAdvance</code> for <code>BreathingExercise</code>; timed-loop hook imports ritual path directly. Test imports <code>ritual-pattern</code> via relative <code>../../breathing/</code> until that module moves.</dd>
       <dt>Deviation</dt>
       <dd>None — phase tick / cycle / pattern-complete behavior unchanged.</dd>
       <dt>Tradeoffs</dt>
