@@ -1674,6 +1674,25 @@
   <article class="note">
     <header>
       <span>2026-05-20</span>
+      <span>Phase A slice — wire companion UI completion persist on public-rpc (backlog #4)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3><code>persistCompanionUiStepCompletion</code> → <code>public-rpc</code></h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>reflect/</code> → <code>ritual/reflect/</code>) and brief-integrate §6 peel were already on <code>cursor/arch-migrate-src-ca70</code>. Move the companion UI completion mutation off <code>public-queries</code> onto <code>public-rpc</code> (§6: queries read, RPC barrel mutates); <code>useCompanionUiCompletion</code> imports persist from <code>public-rpc</code> and query options from <code>public-queries</code>. Infrastructure adapter still owns Supabase read + repository write.</dd>
+      <dt>Deviation</dt>
+      <dd><code>public-rpc</code> re-exports the existing infrastructure function rather than inlining a second facade — behavior unchanged, import surface corrected.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Did not move <code>loadCompanionUiCompletionState</code> or peel ritual-pattern exports in the same commit.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: peel <code>PAUSE_MOOD_GROUPS</code> for <code>MoodCheck</code>, ritual-pattern screen imports → <code>public-hooks</code>, or optional <code>breathing/</code> → <code>ritual/breathe/</code>.</dd>
+    </dl>
+  </article>
+
+  <article class="note">
+    <header>
+      <span>2026-05-20</span>
       <span>Phase A slice — timed-loop breath imports off public.ts (§6)</span>
       <span class="status resolved">resolved</span>
     </header>
@@ -1686,7 +1705,7 @@
       <dt>Tradeoffs</dt>
       <dd>Orb/kicker metrics and ritual-pattern exports remain on <code>public.ts</code> for screen/lib consumers.</dd>
       <dt>Open questions</dt>
-      <dd>Next: peel open-max countdown or ritual-pattern screen imports to <code>public-hooks</code>, or wire <code>persistCompanionUiStepCompletion</code> on <code>public-rpc</code> (backlog #4).</dd>
+      <dd>Next: peel open-max countdown or ritual-pattern screen imports to <code>public-hooks</code>.</dd>
     </dl>
   </article>
 

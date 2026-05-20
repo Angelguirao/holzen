@@ -50,6 +50,8 @@ import { runPauseReflectionStepLogOnce } from './application/use-cases/ritual/re
 import { runPauseOutcomeLog } from './application/use-cases/ritual/decide/run-pause-outcome-log';
 import { reflectionStepSessionStorage } from './infrastructure/edge/reflect/reflection-step-session-storage';
 import { invalidateCompanionUiCompletionQuery } from './application/queries/companion-ui-completion-query-key';
+import { persistCompanionUiStepCompletion as persistCompanionUiStepCompletionInfra } from './infrastructure/companion/companion-ui-completion-sync';
+import type { CompanionUiCompletionStep } from './application/use-cases/ritual/frame/companion-ui-completion-types';
 import {
   runEnsureBreathSegment1Logged,
   runEnsureBreathSegment2Logged,
@@ -115,6 +117,16 @@ export type {
 };
 export type { InitialEmotionLogOpts };
 export type { RunBreathSegmentLogResult };
+export type { CompanionUiCompletionStep };
+
+/** Frame companion UI step completion — wired with default `PauseRepository`. */
+export function persistCompanionUiStepCompletion(
+  pauseInstanceId: string,
+  step: CompanionUiCompletionStep,
+  options?: { entryPoint?: string },
+): Promise<void> {
+  return persistCompanionUiStepCompletionInfra(pauseInstanceId, step, options);
+}
 
 /** Home manual trigger — `pause_create_or_reuse` (+ silent reflection stub). */
 export function openManualPauseFromHome(params: OpenManualPauseFromHomeParams) {
