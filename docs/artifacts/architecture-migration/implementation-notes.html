@@ -1006,6 +1006,25 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-20</span>
+      <span>Phase A slice — intervention bootstrap peel from public.ts</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>Intervention fetch + slot UI types off <code>public.ts</code></h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>reflect/</code> → <code>ritual/reflect/</code>) is complete on this branch — no <code>application/use-cases/reflect/</code> remains. This slice continues backlog #3 (§6 slim barrel): presentation companion hooks import <code>runCompanionInterventionBootstrap</code>, retry reset, idempotency reset, and <code>EMPTY_COMPANION_SLOT_RELAXATIONS</code> from <code>ritual/frame/*</code> directly; <code>public.ts</code> keeps screen-facing slot types only (<code>CompanionSlotRelaxations</code>, <code>CompanionSlotCacheIds</code>).</dd>
+      <dt>Deviation</dt>
+      <dd>None — matches pause-client-architecture §10.1 (frame orchestration under <code>ritual/frame/</code>).</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Did not peel <code>buildCompanionOrchestrateBody</code> helpers or orchestrate invoke error mappers from <code>public.ts</code> in the same commit — they have no presentation consumers via the barrel today but may stay for cross-screen type stability.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: peel orchestrate invoke error / body-builder re-exports if still unused externally, or wire more mutations through <code>PauseRepository</code> (backlog #4).</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
 </body>
 </html>
