@@ -1,0 +1,19 @@
+import type { ReactNode } from 'react';
+import type { TFunction } from 'i18next';
+import type { BtcPriceData, PauseBreathSecondLabelVariant } from '@/features/pause/public';
+import type { PauseSessionStepHandlersProvidersSlice } from './pause-session-step-handler-types';
+
+/** Provider fields for scaffold VM (subset of `usePauseSessionProviders`). */
+export type PauseSessionScaffoldVmProvidersSlice = PauseSessionStepHandlersProvidersSlice & {
+  t: TFunction;
+  mantra: string;
+  btcData: BtcPriceData | null;
+  trackedAssetId: string;
+  prefersReducedMotion: boolean | null;
+  breathSecondLabelVariant: PauseBreathSecondLabelVariant;
+};
+
+export type PauseSessionScaffoldVmChromeSlots = {
+  briefStepperSlot: ReactNode;
+  engagedOpenMaxCountdownSlot: ReactNode;
+};
