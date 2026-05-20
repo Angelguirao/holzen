@@ -184,7 +184,7 @@ Use these as **stress bounds**, not typical behavior.
 
 ### 6.3 Manual repeat taps vs BTC refresh
 
-The **15-minute** cadence in ops docs is the **volatility cron** schedule and aligns with how often **eligibility** is re-checked. It is **not** the same as the **Home** client cooldown between successful manual “Need a moment” runs (**1 hour** in production; see `src/lib/holzen-manual-cooldown.ts`). **BTC spot prices** for Zoom Out are maintained on a separate schedule (`refresh-btc-prices`; comments in `zoom-out.ts` refer to ~15 minute freshness).
+The **15-minute** cadence in ops docs is the **volatility cron** schedule and aligns with how often **eligibility** is re-checked. It is **not** the same as the **Home** client cooldown between successful manual “Need a moment” runs (**1 hour** in production; see `src/features/market/application/manual-cooldown.ts`). **BTC spot prices** for Zoom Out are maintained on a separate schedule (`refresh-btc-prices`; comments in `zoom-out.ts` refer to ~15 minute freshness).
 
 ---
 

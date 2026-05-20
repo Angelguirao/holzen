@@ -14,7 +14,7 @@ The migration initiative aligns **all of active `src/`**, not only `src/features
 flowchart TB
   subgraph presentation["Presentation (no domain authority)"]
     App["src/app — shell, nav, global providers mount"]
-    Screens["src/screens — route UI, thin screen hooks"]
+    Screens["src/screens — route UI; screen-local hooks (Home/Settings); pause → features/pause/presentation"]
     Comp["src/components — ui/ + icons/"]
   end
 

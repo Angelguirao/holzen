@@ -49,4 +49,4 @@ Index + full-`src` rings: [client-architecture-overview.md](../../fundamentals/c
 
 Workflow: [implementation-notes-workflow.md](../../fundamentals/implementation-notes-workflow.md). Agent rule: [.cursor/rules/architecture-migration.mdc](../../../.cursor/rules/architecture-migration.mdc).
 
-**Doc reconciliation (May 2026):** through fifth-pass (wave/§10/pause paths, READMEs). **Sixth-pass (pre–Phase A):** feature-flag hook path, navigating edge call sites, backlog stale-path note, full-app-review Home widget banner. **Shipped routes/tabs:** always [active-surface.md](../../ops/active-surface.md) over [information-architecture.md](../../design/information-architecture.md) §1–§3.
+**Doc reconciliation (May 2026):** through sixth-pass. **Seventh-pass (pre–Phase A):** market/profile fetch paths in navigating + ai-powered-pause-system; pause-client §3 on-disk note; client-architecture-overview screen hook clarification. **Shipped routes/tabs:** always [active-surface.md](../../ops/active-surface.md) over [information-architecture.md](../../design/information-architecture.md) §1–§3.

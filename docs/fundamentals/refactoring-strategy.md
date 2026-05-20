@@ -59,7 +59,7 @@ This aligns with **navigating-the-codebase §6.1**: not every concern needs `use
 
 ### 3. **Extract “glue” that crosses HTTP/storage boundaries**
 
-**What:** e.g. `pause-session-storage.ts`, `companion-orchestrate-slot-apply.ts`, reflection companion cache parsing.
+**What:** e.g. `features/pause/infrastructure/session/persisted-session-storage.ts`, `features/pause/application/use-cases/companion/orchestrate-slot-apply.ts`, reflection companion cache parsing.
 
 **Why:** Isolates **side effects and serialization** from UI and from the main hook loop, so bugs are easier to localize (storage vs orchestrate vs render).
 
