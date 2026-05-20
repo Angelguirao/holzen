@@ -236,7 +236,7 @@ packages/shared-kernel/      # minimal shared types
 **Inside `packages/pause`** (colocation — **today:** same interior under `src/features/pause/`; on-disk vs target in [pause-client-architecture.md](../systems/pause-client-architecture.md) §10):
 
 ```text
-application/use-cases/ritual/reflect/   # target — reflect still at application/use-cases/reflect/ until Phase A
+application/use-cases/ritual/reflect/   # reflect use cases (Phase A complete May 2026)
 application/use-cases/ritual/frame/     # target — companion still at application/use-cases/companion/ until Phase A
 presentation/   OR   apps/web/src/screens/pause/
 ```
@@ -267,7 +267,7 @@ Add to [react-spa-review-template.md](../reviews/react-spa-review-template.md) f
 Order that satisfies **both** this doc and [frontend-module-layout.md](frontend-module-layout.md):
 
 1. **Screens** — `apps/web/src/screens/*` (Home, Archive, Pause, …).
-2. **`packages/pause`** (today: `src/features/pause/`) — domain + use cases first; reflect + frame **target** `application/use-cases/ritual/reflect/` and `ritual/frame/` — on disk still `application/use-cases/reflect/` + `companion/` until Phase A ([pause-client-architecture.md](../systems/pause-client-architecture.md) §3, §10).
+2. **`packages/pause`** (today: `src/features/pause/`) — domain + use cases first; reflect + frame **target** `application/use-cases/ritual/reflect/` and `ritual/frame/` — on disk still `application/use-cases/companion/` (orchestration hub) until Phase A companion slices finish ([pause-client-architecture.md](../systems/pause-client-architecture.md) §3, §10).
 3. **`packages/infrastructure`** — adapters; Query `queryOptions` factories move here.
 4. **Thin hooks** — screens call use cases. **Home/settings:** orchestration in `screens/<route>/hooks/` where screen-local. **Pause:** conductors in `features/pause/presentation/` per [pause-client-architecture.md](../systems/pause-client-architecture.md) §3.2 (no `screens/pause/hooks/`).
 5. **`contracts`** — when touching edge/RPC JSON.
