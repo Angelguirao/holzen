@@ -1,10 +1,9 @@
-import { useState, useCallback } from 'react';
+import { useState } from 'react';
 import { useHolzen } from '@/screens/home/hooks/use-holzen';
 import { useCompanionLibraryFavorites } from '@/screens/pause/hooks/use-companion-library-favorites';
 import type { CompanionData, CompanionPrefs } from '@/screens/pause/components/CompanionSection';
-import { EMPTY_COMPANION_SLOT_RELAXATIONS } from '@/features/pause/public';
-import { resetInterventionIdempotency } from '@/features/pause/public';
 import { useCompanionAccess } from '@/screens/pause/hooks/use-companion-access';
+import { useCompanionOrchestrateRetry } from '@/screens/pause/hooks/use-companion-orchestrate-retry';
 import { useCompanionUiCompletion } from '@/screens/pause/hooks/use-companion-ui-completion';
 import { useCompanionInterventionBootstrap } from '@/screens/pause/hooks/use-companion-intervention-bootstrap';
 import { useCompanionSlotUiState } from '@/screens/pause/hooks/use-companion-slot-ui-state';
@@ -134,34 +133,25 @@ export function useCompanionData({
     companionSlotErrorSetters,
   });
 
-  const retryOrchestrate = useCallback(() => {
-    if (pauseInstanceId) resetInterventionIdempotency(pauseInstanceId);
-    if (interventionSkippedRef.current && pauseInstanceId) {
-      pendingRetryConfirmRef.current = pauseInstanceId;
-    }
-    fetchedSlotsRef.current = new Set();
-    setSignal(null);
-    setSignalError(false);
-    setNudge(null);
-    setNudgeError(false);
-    setZoomOut(null);
-    setZoomOutError(false);
-    setHistoryInsight(null);
-    setHistoryError(false);
-    setIntervention(null);
-    setInterventionError(false);
-    clearInterventionFetchDedupe();
-    setCacheRelaxations(EMPTY_COMPANION_SLOT_RELAXATIONS);
-    setRetryCount((c) => c + 1);
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- slot setters stable; ref reset intentional (parity with pre-split hook)
-  }, [
+  const { retryOrchestrate } = useCompanionOrchestrateRetry({
     pauseInstanceId,
+    setRetryCount,
+    fetchedSlotsRef,
+    setSignal,
+    setSignalError,
+    setNudge,
+    setNudgeError,
+    setZoomOut,
+    setZoomOutError,
+    setHistoryInsight,
+    setHistoryError,
     setIntervention,
     setInterventionError,
     clearInterventionFetchDedupe,
     interventionSkippedRef,
     pendingRetryConfirmRef,
-  ]);
+    setCacheRelaxations,
+  });
 
   return {
     favorites,
