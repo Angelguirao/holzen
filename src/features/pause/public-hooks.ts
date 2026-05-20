@@ -36,3 +36,11 @@ export {
   useCompanionInterventionFetch,
   type UseCompanionInterventionFetchParams,
 } from './presentation/use-companion-intervention-fetch';
+export {
+  useCompanionOrchestrateRetry,
+  type UseCompanionOrchestrateRetryParams,
+} from './presentation/use-companion-orchestrate-retry';
+export {
+  useCompanionSlotOrchestrateFailurePorts,
+  type UseCompanionSlotOrchestrateFailurePortsParams,
+} from './presentation/use-companion-slot-orchestrate-failure-ports';
