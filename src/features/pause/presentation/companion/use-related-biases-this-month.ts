@@ -5,7 +5,7 @@ import {
   dedupeBiases,
   type RelatedBias,
 } from '@/features/pause/application/use-cases/ritual/frame/related-biases';
-import { getRelatedBiasesGroundNudgeQueryOptions } from '../public-queries';
+import { getRelatedBiasesGroundNudgeQueryOptions } from '../../public-queries';
 
 /** Grounding full view — distinct bias titles from recent `ground_nudge` artifacts. */
 export function useRelatedBiasesThisMonth(options: {
