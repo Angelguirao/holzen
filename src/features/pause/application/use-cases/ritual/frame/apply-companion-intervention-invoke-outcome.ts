@@ -10,7 +10,7 @@ import {
   isFilledOrchestrateSlot,
   type CompanionSlotCommitters,
   type CompanionSlotRelaxations,
-} from './orchestrate-slot-apply';
+} from '@/features/pause/application/use-cases/companion/orchestrate-slot-apply';
 
 const INTERVENTION_UNAVAILABLE =
   'This AI feature is temporarily unavailable. Please try again in a minute.';

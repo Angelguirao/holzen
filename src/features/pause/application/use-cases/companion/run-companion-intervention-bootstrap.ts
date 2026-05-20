@@ -1,7 +1,7 @@
 import type { InterventionState } from '@/features/pause/domain/companion-orchestrate';
 import type { ParsedPauseArtifactCache } from '@/features/pause/application/use-cases/ritual/frame/artifact-cache-parse';
 import type { CompanionOrchestrateSessionContext } from '../ritual/frame/build-companion-orchestrate-body';
-import { applyCompanionInterventionInvokeOutcome } from './apply-companion-intervention-invoke-outcome';
+import { applyCompanionInterventionInvokeOutcome } from '@/features/pause/application/use-cases/ritual/frame/apply-companion-intervention-invoke-outcome';
 import {
   logCompanionInterventionInvoke,
   logCompanionInterventionSkippedIdempotency,
