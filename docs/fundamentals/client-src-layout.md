@@ -62,6 +62,7 @@ Use this checklist when opening a PR that touches `src/` (human or agent). Full 
 | 4 | **Import direction?** | Screen → `@/features/<ctx>/public` | Feature → screen; `ui/` → feature |
 | 5 | **Shipped surface?** | Matches [active-surface.md](../ops/active-surface.md); no `@/legacy` | Tier B tables, dropped profile columns |
 | 6 | **Names match conventions?** | New files follow [naming-conventions-holzen.md](naming-conventions-holzen.md) | Route-as-package folder; new `@/lib/pause-*` shim |
+| 7 | **Spec + notes?** | Matches owner spec; ambiguous choices logged in [implementation-notes.html](../artifacts/architecture-migration/implementation-notes.html) if on migration branch | Silent deviation from [pause-client-architecture.md](../systems/pause-client-architecture.md) |
 
 **When docs drift:** update the **one owner** in [docs/README.md](../README.md) canonical table; update folder READMEs if placement rules change.
 

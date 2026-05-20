@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Holzen — architecture migration implementation notes</title>
+  <style>
+    :root { --muted: #64748b; --border: #e2e8f0; --accent: #0f766e; }
+    body { font-family: system-ui, sans-serif; line-height: 1.55; max-width: 52rem; margin: 2rem auto; padding: 0 1.25rem; color: #0f172a; }
+    h1 { font-size: 1.5rem; font-weight: 600; }
+    .meta { color: var(--muted); font-size: 0.9rem; margin-bottom: 2rem; }
+    .meta a { color: var(--accent); }
+    h2 { font-size: 1.1rem; margin-top: 2rem; border-bottom: 1px solid var(--border); padding-bottom: 0.35rem; }
+    article.note { border: 1px solid var(--border); border-radius: 8px; padding: 1rem 1.25rem; margin: 1rem 0; }
+    article.note header { display: flex; flex-wrap: wrap; gap: 0.5rem 1rem; font-size: 0.85rem; color: var(--muted); margin-bottom: 0.75rem; }
+    article.note .status { font-weight: 600; text-transform: uppercase; font-size: 0.75rem; }
+    article.note .status.open { color: #b45309; }
+    article.note .status.resolved { color: #15803d; }
+    article.note h3 { margin: 0 0 0.5rem; font-size: 1rem; }
+    article.note dl { margin: 0; }
+    article.note dt { font-weight: 600; margin-top: 0.65rem; font-size: 0.85rem; }
+    article.note dd { margin: 0.15rem 0 0 0; }
+    .toc ul { padding-left: 1.25rem; }
+  </style>
+</head>
+<body>
+  <h1>Architecture migration — implementation notes</h1>
+  <p class="meta">
+    <strong>Initiative:</strong> client <code>src/</code> alignment (pause-first)<br />
+    <strong>Branch:</strong> <code>cursor/arch-migrate-src-ca70</code><br />
+    <strong>Spec:</strong>
+    <a href="../../systems/pause-client-architecture.md">pause-client-architecture.md</a>,
+    <a href="../../fundamentals/holzen-application-architecture.md">holzen-application-architecture.md</a><br />
+    <strong>Workflow:</strong> <a href="../../fundamentals/implementation-notes-workflow.md">implementation-notes-workflow.md</a>
+  </p>
+
+  <nav class="toc">
+    <h2>Contents</h2>
+    <ul>
+      <li><a href="#agreed-baseline">Agreed baseline (2026-05)</a></li>
+      <li><a href="#notes">Running notes</a></li>
+    </ul>
+  </nav>
+
+  <h2 id="agreed-baseline">Agreed baseline (2026-05)</h2>
+  <p>Captured when <a href="../../systems/pause-client-architecture.md">pause-client-architecture.md</a> was accepted — not deviations; the interpretation we implement toward.</p>
+  <ul>
+    <li><strong>Ritual layout:</strong> <code>ritual/reflect/</code> and <code>ritual/frame/</code> — not peer top-level <code>companion/</code> + <code>reflect/</code> (organize by beat, not “AI”).</li>
+    <li><strong>Companions:</strong> inside <code>features/pause</code>; <code>/companion/*</code> routes are pause presentation.</li>
+    <li><strong>UI:</strong> JSX in <code>screens/pause/components/</code>; hooks in <code>features/pause/presentation/</code>.</li>
+    <li><strong>Collections:</strong> user Archive Collections tab <em>not MVP</em> — strip to legacy (spec §7); keep <code>companion_catalog</code> and slot favorites.</li>
+    <li><strong>Branch:</strong> one long-lived migration branch; one commit per vertical slice.</li>
+    <li><strong>Other contexts:</strong> same module skeleton as pause (spec §9).</li>
+  </ul>
+
+  <h2 id="notes">Running notes</h2>
+
+  <article class="note">
+    <header>
+      <span>2026-05-20</span>
+      <span>Spec §3, §10 (transitional)</span>
+      <span class="status open">open</span>
+    </header>
+    <h3>Legacy use-case folder names still on disk</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Incremental migration: new work uses <code>ritual/reflect/</code> and <code>ritual/frame/</code>; existing <code>application/use-cases/companion/</code> and <code>application/use-cases/reflect/</code> are moved slice-by-slice rather than a big-bang rename.</dd>
+      <dt>Deviation</dt>
+      <dd>Tree on disk temporarily does not match spec §3 literally — spec §10 documents this as transitional.</dd>
+      <dt>Tradeoffs</dt>
+      <dd><strong>Big-bang rename</strong> — cleaner tree, huge diff, hard review. <strong>Incremental</strong> — slower convergence, safer merges. Picked incremental.</dd>
+      <dt>Open questions</dt>
+      <dd>Should we add a CI warning when new files land in old top-level <code>companion/</code> or <code>reflect/</code> folders (not under <code>ritual/</code>)?</dd>
+    </dl>
+  </article>
+
+  <article class="note">
+    <header>
+      <span>2026-05-20</span>
+      <span>Spec §7</span>
+      <span class="status open">open</span>
+    </header>
+    <h3>Collections strip not yet executed in code</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Document Collections as non-MVP in <code>active-surface.md</code> and IA before removing Archive tab code — spec-first, then strip slice.</dd>
+      <dt>Deviation</dt>
+      <dd>Active <code>src/</code> still contains <code>usePauseLibraryBundle</code> and Archive collections UI until the next slice.</dd>
+      <dt>Tradeoffs</dt>
+      <dd><strong>Strip now</strong> — smaller active surface sooner. <strong>Spec then strip</strong> — reviewers agree on scope before deletion. Picked spec then strip.</dd>
+      <dt>Open questions</dt>
+      <dd>After UI strip: do <code>collections</code> / <code>collection_items</code> tables move to Tier B in <code>active-surface.md</code>, or stay in DB unused?</dd>
+    </dl>
+  </article>
+
+  <article class="note">
+    <header>
+      <span>2026-05-20</span>
+      <span>Spec §6 (public.ts)</span>
+      <span class="status open">open</span>
+    </header>
+    <h3><code>public.ts</code> still larger than slim target</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Continue exporting from <code>public.ts</code> for backward compatibility while migrating call sites; peel to <code>public-queries</code> / <code>public-rpc</code> per slice.</dd>
+      <dt>Deviations</dt>
+      <dd>None intentional — convergence in progress.</dd>
+      <dt>Tradeoffs</dt>
+      <dd><strong>Hard export cap in CI</strong> — forces splits quickly but noisy. <strong>Soft target in spec</strong> — flexible during migration. Picked soft target until migration completes.</dd>
+      <dt>Open questions</dt>
+      <dd>Add <code>check:public-barrel-size</code> when <code>public.ts</code> stabilizes?</dd>
+    </dl>
+  </article>
+
+  <!-- Append new <article class="note"> blocks above this line -->
+</body>
+</html>

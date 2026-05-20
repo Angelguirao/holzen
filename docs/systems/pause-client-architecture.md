@@ -287,3 +287,5 @@ Do not big-bang rename folders; one vertical slice per commit ([refactoring-stra
 | [.cursor/rules/architecture-migration.mdc](../../.cursor/rules/architecture-migration.mdc) | Agent session workflow |
 
 When client structure changes materially, update **this file** in the same PR.
+
+**During migration:** append interpretive deltas to [../artifacts/architecture-migration/implementation-notes.html](../artifacts/architecture-migration/implementation-notes.html) per [implementation-notes-workflow.md](../fundamentals/implementation-notes-workflow.md).

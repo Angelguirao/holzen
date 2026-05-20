@@ -80,11 +80,14 @@ npm run check:architecture-alignment
 
 ## Workflow
 
-1. **Discover** — list violations for chosen slice (see commands above).
-2. **Plan** — ≤5 files moved/created; behavior parity explicit; names per [naming-conventions-holzen.md](../../docs/fundamentals/naming-conventions-holzen.md).
-3. **Implement** — smallest diff; tests beside moved pure modules.
-4. **Verify:** `npm run test` (or targeted vitest), `check:feature-imports`, `check:architecture-alignment`, `check:active-surface`, `npx eslint` on touched paths only.
-5. **Flow check** — trace the **pause** journey when pause code changed (manual trigger → `/pause` → RPC → edge for reflect/companion); use skill `holzen-flow-review`. For non-pause slices, trace the relevant shipped journey instead.
+1. **Read spec** — [pause-client-architecture.md](../../docs/systems/pause-client-architecture.md) (+ change-map row in AGENTS).
+2. **Maintain notes** — append to [docs/artifacts/architecture-migration/implementation-notes.html](../../docs/artifacts/architecture-migration/implementation-notes.html) when you make design decisions, deviate from spec, trade off alternatives, or have open questions ([implementation-notes-workflow.md](../../docs/fundamentals/implementation-notes-workflow.md)).
+3. **Discover** — list violations for chosen slice (see commands above).
+4. **Plan** — ≤5 files moved/created; behavior parity explicit; names per [naming-conventions-holzen.md](../../docs/fundamentals/naming-conventions-holzen.md).
+5. **Implement** — smallest diff; tests beside moved pure modules.
+6. **Verify:** `npm run test` (or targeted vitest), `check:feature-imports`, `check:architecture-alignment`, `check:active-surface`, `npx eslint` on touched paths only.
+7. **Flow check** — trace the **pause** journey when pause code changed (manual trigger → `/pause` → RPC → edge for reflect/companion); use skill `holzen-flow-review`. For non-pause slices, trace the relevant shipped journey instead.
+8. **Commit** — include notes update in the same commit when a note entry was added.
 
 ## Output format
 
@@ -92,6 +95,7 @@ npm run check:architecture-alignment
 ## Changes  
 ## Checklist (client-src-layout 1–5)  
 ## Verification  
+## Implementation notes (if any new entries)  
 ## Follow-ups  
 
 ## Git / branches
