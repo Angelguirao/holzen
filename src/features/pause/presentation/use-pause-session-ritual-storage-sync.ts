@@ -1,7 +1,7 @@
 import { useEffect, type Dispatch, type SetStateAction } from 'react';
+import { loadSession } from '@/features/pause/infrastructure/session/persisted-session-storage';
 import {
   computePauseStorageRitualSyncPatch,
-  loadSession,
   type BriefPauseStep,
   type FeelStepTile,
   type RitualDepth,

@@ -6,13 +6,11 @@ const { clearSessionMock } = vi.hoisted(() => ({
   clearSessionMock: vi.fn(),
 }));
 
-vi.mock('@/features/pause/public', async (importOriginal) => {
-  const actual = await importOriginal<typeof import('@/features/pause/public')>();
-  return {
-    ...actual,
-    clearSession: () => clearSessionMock(),
-  };
-});
+vi.mock('@/features/pause/infrastructure/session/persisted-session-storage', () => ({
+  clearSession: () => clearSessionMock(),
+  loadSession: () => null,
+  saveSession: vi.fn(),
+}));
 
 describe('usePauseSessionExitNavigation', () => {
   beforeEach(() => {

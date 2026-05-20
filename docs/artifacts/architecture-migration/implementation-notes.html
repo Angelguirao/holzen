@@ -1861,6 +1861,25 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-20</span>
+      <span>Phase A slice — peel session storage off public.ts (§6)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3><code>clearSession</code> / <code>loadSession</code> / <code>saveSession</code> off <code>public.ts</code></h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>reflect/</code> → <code>ritual/reflect/</code>) already complete on <code>cursor/arch-migrate-src-ca70</code>. Continue backlog #3 §6: remove session localStorage I/O from <code>public.ts</code>; presentation hooks import <code>infrastructure/session/persisted-session-storage</code> directly (avoids <code>public-hooks</code> barrel + Supabase init in unit tests). <code>migratePersistedPauseSession</code> stays internal.</dd>
+      <dt>Deviation</dt>
+      <dd>Presentation→infra session I/O is allowlisted inside the bounded context (not exported to screens).</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Did not add a <code>public-session</code> shim — one infra module, presentation-only consumers.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: peel <code>writingTextareaClassName</code> for archive UI, or export <code>PauseImpactData</code> type via <code>public-hooks</code> for <code>ScoreImpact</code>.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
 </body>
 </html>

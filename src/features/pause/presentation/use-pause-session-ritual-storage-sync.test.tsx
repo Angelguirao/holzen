@@ -7,13 +7,11 @@ const { loadSessionMock } = vi.hoisted(() => ({
   loadSessionMock: vi.fn(),
 }));
 
-vi.mock('@/features/pause/public', async (importOriginal) => {
-  const actual = await importOriginal<typeof import('@/features/pause/public')>();
-  return {
-    ...actual,
-    loadSession: () => loadSessionMock(),
-  };
-});
+vi.mock('@/features/pause/infrastructure/session/persisted-session-storage', () => ({
+  clearSession: vi.fn(),
+  loadSession: () => loadSessionMock(),
+  saveSession: vi.fn(),
+}));
 
 const companions = { haiku: null, groundingTitle: null, groundingBody: null } as const;
 const companionPrefs = {
