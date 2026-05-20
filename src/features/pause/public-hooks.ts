@@ -70,3 +70,4 @@ export {
   useFullviewTelemetry,
   type FullviewCompanion,
 } from './presentation/use-fullview-telemetry';
+export { usePauseFavoriteToggle } from './presentation/use-pause-favorite-toggle';
