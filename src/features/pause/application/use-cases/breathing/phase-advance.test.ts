@@ -3,7 +3,7 @@ import {
   computeBreathingPhaseAdvance,
   resolveBreathingCompleted,
   resolveBreathingPhaseAdvanceOutcome,
-} from '@/features/pause/public';
+} from './phase-advance';
 import {
   BOX_BREATH_PHASE_COUNT,
   BRIEF_TRIANGLE_CYCLE_COUNT,
