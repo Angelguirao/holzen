@@ -54,6 +54,7 @@ export {
 } from './presentation/use-journey-pause-instances';
 export { logPwaInstallAnalyticsEvent } from './presentation/log-pwa-install-analytics';
 export { useSignalSourceTrustedHost } from './presentation/use-signal-source-trusted-host';
+export { useStaggeredReveal } from './presentation/use-staggered-reveal';
 export {
   useCurrentPause,
   currentPauseQueryKey,

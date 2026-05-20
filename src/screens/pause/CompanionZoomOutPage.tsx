@@ -14,7 +14,7 @@ import { ReadTime } from '@/screens/pause/components/companion/ReadTime';
 import { WhyThisCard } from '@/screens/pause/components/companion/WhyThisCard';
 import { HistoryThread } from '@/screens/pause/components/companion/HistoryThread';
 import { InterventionCrossRefBadge } from '@/screens/pause/components/companion/InterventionCrossRefBadge';
-import { useStaggeredReveal } from '@/screens/pause/components/companion/use-staggered-reveal';
+import { useStaggeredReveal } from '@/features/pause/public-hooks';
 import { PageMeta } from '@/app/components/PageMeta';
 import { zoomOutTotalCharsForReadTime } from '@/features/pause/public';
 import { DEFAULT_COMPANIONS, DEFAULT_PREFS } from '@/features/pause/public';
