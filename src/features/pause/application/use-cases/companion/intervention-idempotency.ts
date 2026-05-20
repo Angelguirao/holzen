@@ -57,7 +57,7 @@ const inFlight = new Map<string, Promise<unknown>>();
  */
 const memoryMarkers = new Set<string>();
 
-import { emitInterventionIdempotencyMetric } from '@/features/pause/application/use-cases/companion/intervention-idempotency-telemetry';
+import { emitInterventionIdempotencyMetric } from '@/features/pause/application/use-cases/ritual/frame/intervention-idempotency-telemetry';
 
 function pauseInstancePrefix(id: string): string {
   return id.slice(0, 8);
