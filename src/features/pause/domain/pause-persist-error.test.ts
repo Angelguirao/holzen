@@ -5,7 +5,7 @@ import {
   isPausePersistError,
   isReflectionPersistError,
   reflectionPersistErrorMessage,
-} from './reflection-persist-error';
+} from './pause-persist-error';
 
 describe('isReflectionPersistError', () => {
   it('matches pause and legacy reflection markers', () => {

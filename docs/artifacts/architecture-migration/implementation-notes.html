@@ -2472,19 +2472,19 @@
   <article class="note">
     <header>
       <span>2026-05-20</span>
-      <span>Phase A slice — reflect persist-error + edge-params tests in domain (Tier 5)</span>
+      <span>Phase A slice — reflect pure error helpers → domain (backlog #1 tail)</span>
       <span class="status resolved">resolved</span>
     </header>
-    <h3>Backlog #1 complete; <code>reflection-persist-error</code> → <code>domain/</code></h3>
+    <h3>Colocate persist + generation error copy in <code>domain/</code></h3>
     <dl>
       <dt>Design decision</dt>
-      <dd>Pure persist-error markers and holzen-reflect invoke body shaping live in <code>domain/</code> (<code>reflection-persist-error.ts</code>, <code>reflect-generation-edge-params.ts</code>) with colocated Vitest. Home/trigger use cases import domain directly; <code>ritual/reflect/</code> keeps orchestration only.</dd>
+      <dd>Backlog #1 folder move was already complete. Pure helpers live in <code>domain/</code> beside <code>reflect-generation-edge-params.ts</code>: <code>pause-persist-error.ts</code> (renamed from <code>reflection-persist-error</code> to match <code>PAUSE_PERSIST_ERROR_MARKER</code>), <code>reflect-generation-errors.ts</code>, and colocated Vitest. Home/trigger import domain directly; <code>ritual/reflect/</code> keeps orchestration only.</dd>
       <dt>Deviation</dt>
-      <dd>None — matches §3 domain ring and prior edge-params re-home after <code>check:feature-imports</code>.</dd>
+      <dd>None — <code>public.ts</code> never exported these helpers.</dd>
       <dt>Tradeoffs</dt>
-      <dd>Did not peel remaining application session tests off <code>public.ts</code> in the same commit — separate §6 cluster.</dd>
+      <dd>Filename rename is a second commit on the same concern — avoids two domain modules with identical exports.</dd>
       <dt>Open questions</dt>
-      <dd>Next: peel <code>PersistedSession</code> / hydration helpers in application tests off <code>public.ts</code>, or backlog #4 <code>PauseRepository</code> wiring for remaining mutations.</dd>
+      <dd>Next: peel <code>step-bundles</code> / <code>hydration</code> off <code>public.ts</code> (backlog #3), or wire remaining mutations through <code>PauseRepository</code> (backlog #4).</dd>
     </dl>
   </article>
 
