@@ -24,7 +24,7 @@ import {
   readSubCache,
   subscriptionQueryKey,
 } from '../public-queries';
-import { trackEvent } from '@/lib/posthog';
+import { trackTrialExpired, trackTrialStarted } from '../application/paywall-telemetry';
 
 const CHECKOUT_RETURN_KEY = 'holzen_checkout_started_at';
 /** Set when a checkout return includes `?subscribed=true` (timestamp for PaywallSubscribedTracker TTL) */
@@ -247,11 +247,7 @@ export function useSubscription() {
       if (error) throw error;
       if (!data?.ok) throw new Error('Trial not started');
       if (data.created) {
-        try {
-          trackEvent('trial.started', { source: 'ensure_trial' });
-        } catch {
-          /* no-op */
-        }
+        trackTrialStarted('ensure_trial');
       }
       subscriptionForceNext = true;
       subscriptionNextFetchSource = 'invalidate';
@@ -353,11 +349,7 @@ export function useSubscription() {
   useEffect(() => {
     const prev = prevEntitlementRef.current;
     if (prev && prev !== 'lapsed' && entitlement === 'lapsed') {
-      try {
-        trackEvent('trial.expired', {});
-      } catch {
-        /* no-op */
-      }
+      trackTrialExpired();
     }
     prevEntitlementRef.current = entitlement;
   }, [entitlement]);
