@@ -1,7 +1,7 @@
 ---
 description: >-
-  Incremental Holzen src/ architecture migration — one vertical slice, broad discovery
-  (not pause-only), naming per naming-conventions-holzen.md, behavior-preserving.
+  Incremental Holzen src/ architecture migration — one vertical slice, pause-first
+  priority with full-repo discovery, naming per naming-conventions-holzen.md.
   Use when refactoring features/screens/lib toward documented layers.
 alwaysApply: false
 ---
@@ -21,7 +21,13 @@ alwaysApply: false
 
 ## Pick ONE vertical slice (priority table)
 
-Work **one** slice per session unless the user names a target. **Discovery is repo-wide**, not pause-only.
+Work **one** slice per session unless the user names a target.
+
+**Default product priority:** **pause** (ritual, companions, reflect, session hooks, `/pause` and companion routes) — Holzen’s core shipped journey. When pause has open violations at the current slice tier, **pick pause first**.
+
+Only move to another bounded context (subscription, auth, admin, archive, app shell) when:
+- the user names a target, or
+- pause has **no** remaining violation at that priority tier (scan confirms pause is clean for shims / god-hooks / inline Supabase / UI splits / context placement).
 
 | Priority | Slice | Typical moves |
 |----------|--------|----------------|
@@ -33,28 +39,32 @@ Work **one** slice per session unless the user names a target. **Discovery is re
 
 **Do not** create `features/home`, `features/archive`, or route-named feature packages.
 
-## Discovery (run across active `src/`)
+## Discovery (pause-first, then repo)
 
-Use ripgrep / architecture scripts — **do not default to `screens/pause/` only**.
+Run discovery **across active `src/`**, but **filter and rank pause (`features/pause`, `screens/pause`, pause-related shims) before** other contexts.
 
 ```bash
-# Shims & forbidden lib patterns
+# Shims & forbidden lib patterns (pause/companion first in review)
 rg '@/lib/(pause|companion|holzen|subscription)-' src --glob '!**/legacy/**'
+rg "from '@/lib/[^']+'" src/screens/pause src/features/pause
 rg "from '@/lib/[^']+'" src/screens src/app src/components -g '!**/ui/**'
 
-# Presentation violations
+# Presentation violations — pause screens first
+rg 'supabase\.from' src/screens/pause --glob '*.tsx'
 rg 'supabase\.from' src --glob '*.tsx'
+rg '@/features/[^/]+/application' src/screens/pause src/features/pause/presentation
 rg '@/features/[^/]+/application' src/screens src/app src/components src/test
 
-# God hooks (>200 LOC) — any feature presentation or screen
-find src/features src/screens -name 'use-*.ts' -o -name 'use-*.tsx' | xargs wc -l | sort -rn | head -20
+# God hooks (>200 LOC) — pause presentation + pause screens first
+find src/features/pause src/screens/pause -name 'use-*.ts' -o -name 'use-*.tsx' | xargs wc -l 2>/dev/null | sort -rn | head -15
+find src/features src/screens -name 'use-*.ts' -o -name 'use-*.tsx' | xargs wc -l 2>/dev/null | sort -rn | head -15
 
 # Checks (baseline)
 npm run check:feature-imports
 npm run check:architecture-alignment
 ```
 
-Pick the **highest-priority violation** in the **weakest area** (most imports of shims, largest god-hook outside pause, or user-named target).
+**Pick order:** highest-priority slice tier → **largest pause violation** at that tier → user-named target → same tier in another context.
 
 ## Normative rules (mental PR reject)
 
@@ -73,7 +83,7 @@ Pick the **highest-priority violation** in the **weakest area** (most imports of
 2. **Plan** — ≤5 files moved/created; behavior parity explicit; names per [naming-conventions-holzen.md](../../docs/fundamentals/naming-conventions-holzen.md).
 3. **Implement** — smallest diff; tests beside moved pure modules.
 4. **Verify:** `npm run test` (or targeted vitest), `check:feature-imports`, `check:architecture-alignment`, `check:active-surface`, `npx eslint` on touched paths only.
-5. **Flow check** — one user journey through the change; skill `holzen-flow-review` if pause/auth/subscription/edge touched.
+5. **Flow check** — trace the **pause** journey when pause code changed (manual trigger → `/pause` → RPC → edge for reflect/companion); use skill `holzen-flow-review`. For non-pause slices, trace the relevant shipped journey instead.
 
 ## Output format
 
