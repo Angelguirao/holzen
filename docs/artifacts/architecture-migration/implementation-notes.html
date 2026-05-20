@@ -968,6 +968,25 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-20</span>
+      <span>Phase A slice — companion frame telemetry peel from public.ts</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>Companion generation + slot orchestrate PostHog helpers off <code>public.ts</code></h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Reflect → <code>ritual/reflect/</code> and companion → <code>ritual/frame/</code> are complete (backlog #1–#2). Next §6 peel: drop <code>companionSlotToGenerationTaxonomy</code>, <code>trackCompanion*</code>, and <code>logCompanionSlotOrchestrate*</code> from <code>public.ts</code> — no screen consumers; only <code>use-companion-slot-run-orchestrate</code> needed invoke + generation-initiated telemetry, now imported from <code>ritual/frame/*</code> directly.</dd>
+      <dt>Deviation</dt>
+      <dd>None — incremental slim barrel; telemetry modules unchanged.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Did not peel the larger orchestration runner cluster (<code>runCompanionSlotOrchestrate</code>, slot apply hub) in the same commit — keeps slice to dead re-exports + one presentation import path.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: peel companion orchestration exports from <code>public.ts</code> into presentation-only direct imports, or group companion hooks under <code>presentation/companion/</code>.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
 </body>
 </html>

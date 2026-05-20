@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { deriveBreathingUiCompleteFromPayloads } from '@/features/pause/public';
+import { deriveBreathingUiCompleteFromPayloads } from './breathing-ui-complete';
 
 describe('deriveBreathingUiCompleteFromPayloads', () => {
   it('returns false when there are no breath_completed rows', () => {

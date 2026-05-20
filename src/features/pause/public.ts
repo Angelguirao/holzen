@@ -369,21 +369,10 @@ export {
 } from './application/use-cases/breathing/ritual-audio';
 export { getRecencyHints } from './application/use-cases/ritual/frame/recency-hints';
 export { estimateReadTime } from './application/use-cases/ritual/frame/estimate-read-time';
-export { companionSlotToGenerationTaxonomy } from './application/use-cases/ritual/frame/generation-taxonomy';
-export {
-  trackCompanionGenerationInitiated,
-  trackCompanionServed,
-} from './application/use-cases/ritual/frame/companion-generation-telemetry';
 export {
   applyCompanionSlotOrchestrateOutcome,
   type ApplyCompanionSlotOrchestrateOutcomeInput,
 } from './application/use-cases/ritual/frame/apply-companion-slot-orchestrate-outcome';
-export {
-  logCompanionSlotOrchestrateEmpty,
-  logCompanionSlotOrchestrateFailed,
-  logCompanionSlotOrchestrateFilled,
-  logCompanionSlotOrchestrateInvoke,
-} from './application/use-cases/ritual/frame/companion-slot-orchestrate-telemetry';
 export { runCompanionInterventionBootstrap } from './application/use-cases/ritual/frame/run-companion-intervention-bootstrap';
 export {
   buildCompanionFeedbackVoteMetadata,

@@ -1,11 +1,11 @@
 import { useCallback } from 'react';
+import { logCompanionSlotOrchestrateInvoke } from '@/features/pause/application/use-cases/ritual/frame/companion-slot-orchestrate-telemetry';
+import { trackCompanionGenerationInitiated } from '@/features/pause/application/use-cases/ritual/frame/companion-generation-telemetry';
 import {
   applyCompanionSlotOrchestrateOutcome,
-  logCompanionSlotOrchestrateInvoke,
   runCompanionSlotOrchestrate,
   setCompanionSlotError,
   setCompanionSlotLoading,
-  trackCompanionGenerationInitiated,
   type ApplyCompanionSlotOrchestrateFailureUiPorts,
   type CompanionSlotCacheIds,
   type CompanionSlotCommitters,
