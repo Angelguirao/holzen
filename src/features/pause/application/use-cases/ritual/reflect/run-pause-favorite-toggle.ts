@@ -6,20 +6,18 @@ export function shouldShowFavoriteProHint(newValue: boolean, subscribed: boolean
   return newValue && !subscribed;
 }
 
+import { logPauseStep } from '@/features/pause/application/use-cases/ritual/log-pause-step';
+import type { PauseRepository } from '@/features/pause/ports/pause-repository';
+
 export type RunPauseFavoriteToggleResult =
   | { status: 'no_instance' }
   | { status: 'success'; newValue: boolean }
   | { status: 'sync_failed'; attemptedValue: boolean };
 
-type LogFavoriteTogglePort = (params: {
-  instanceId: string;
-  payload: Record<string, unknown>;
-}) => Promise<unknown>;
-
 /** Reflect heart toggle — `favorite_toggled` step with optimistic UI handled by caller. */
 export async function runPauseFavoriteToggle(
+  repository: PauseRepository,
   input: { pauseInstanceId: string | null; isFavorite: boolean },
-  ports: { logStep: LogFavoriteTogglePort },
 ): Promise<RunPauseFavoriteToggleResult> {
   if (!input.pauseInstanceId) {
     return { status: 'no_instance' };
@@ -27,8 +25,9 @@ export async function runPauseFavoriteToggle(
 
   const newValue = computeFavoriteToggleNext(input.isFavorite);
   try {
-    await ports.logStep({
+    await logPauseStep(repository, {
       instanceId: input.pauseInstanceId,
+      stepType: 'favorite_toggled',
       payload: { is_favorite: newValue },
     });
     return { status: 'success', newValue };

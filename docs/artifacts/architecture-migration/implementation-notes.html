@@ -1367,6 +1367,25 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-20</span>
+      <span>Phase A slice — favorite toggle via PauseRepository (backlog #4)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3><code>runPauseFavoriteToggle</code> → <code>logPauseStep</code> + repository port</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>ritual/reflect/</code>) is complete on this branch. First incremental backlog #4 wiring: <code>runPauseFavoriteToggle</code> takes <code>PauseRepository</code> and calls <code>logPauseStep</code> for <code>favorite_toggled</code>; <code>logPauseFavoriteToggle</code> in <code>public-rpc.ts</code> passes <code>supabasePauseRepository</code> (drops ad-hoc <code>logStep</code> port object).</dd>
+      <dt>Deviation</dt>
+      <dd>None — presentation hook still imports <code>public-rpc</code> only.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Did not migrate <code>runPauseReflectNoteUpdate</code> / <code>runPauseReflectTagUpdate</code> / <code>runPauseReflectionStepLogOnce</code> in the same commit — same pattern, separate slices.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: wire remaining reflect metadata step logs through <code>PauseRepository</code>, or §6 <code>pauseStepLayout</code> peel off <code>public.ts</code>.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
 </body>
 </html>
