@@ -6,7 +6,7 @@ import { pauseSeverityToOrchestrateNumber } from '@/features/pause/application/u
 import {
   getCompanionSectionVisibility,
   isCompanionSectionVisible,
-} from '@/features/pause/application/use-cases/companion/section-visibility';
+} from '@/features/pause/application/use-cases/ritual/frame/section-visibility';
 import { useCompanionData } from './use-companion-data';
 
 export type UseCompanionSectionParams = {

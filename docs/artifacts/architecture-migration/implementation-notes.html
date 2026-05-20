@@ -265,6 +265,25 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-20</span>
+      <span>Phase A slice — frame leaf: section-visibility</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3><code>section-visibility</code> → <code>ritual/frame/</code></h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Reflect → <code>ritual/reflect/</code> is complete on this branch; continue companion leaf-first with pure <code>CompanionSection</code> visibility helpers (module + test, domain types only — no imports from remaining <code>companion/</code>).</dd>
+      <dt>Deviation</dt>
+      <dd>None — matches spec §3.1 / §10.1.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Could batch with <code>next-expanded-with-lazy-fetch</code>; kept two files isolated for minimal review after <code>recency-hints</code>.</dd>
+      <dt>Open questions</dt>
+      <dd>Next slice: <code>breathing-ui-complete</code> + <code>companion-ui-completion-types</code>, or <code>artifact-cache-parse</code> cluster.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
 </body>
 </html>
