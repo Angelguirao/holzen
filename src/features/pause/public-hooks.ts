@@ -97,7 +97,7 @@ export {
   type UsePauseArtifactHaikuParams,
   type UsePauseArtifactHaikuResult,
 } from './presentation/reflect/use-pause-artifact-haiku';
-export { useCompanionSlotOrchestratePorts } from './presentation/use-companion-slot-orchestrate-ports';
+export { useCompanionSlotOrchestratePorts } from './presentation/companion/use-companion-slot-orchestrate-ports';
 export { usePauseReflectionStepLog } from './presentation/reflect/use-pause-reflection-step-log';
 export {
   usePauseReflectUiTelemetry,
@@ -107,55 +107,55 @@ export { usePauseReflectNote } from './presentation/reflect/use-pause-reflect-no
 export {
   useCompanionHistoryThread,
   type HistoryThreadRow,
-} from './presentation/use-companion-history-thread';
+} from './presentation/companion/use-companion-history-thread';
 export { useRelatedBiasesThisMonth } from './presentation/companion/use-related-biases-this-month';
 export { useCompanionFeedbackVote } from './presentation/companion/use-companion-feedback-vote';
 export { isCompanionRegenerateUiEnabled } from './presentation/companion/is-companion-regenerate-ui-enabled';
 export { useCompanionAccess } from './presentation/companion/use-companion-access';
-export { useCompanionUiCompletion } from './presentation/use-companion-ui-completion';
-export { useCompanionLibraryFavorites } from './presentation/use-companion-library-favorites';
-export { useCompanionSlotUiState } from './presentation/use-companion-slot-ui-state';
+export { useCompanionUiCompletion } from './presentation/companion/use-companion-ui-completion';
+export { useCompanionLibraryFavorites } from './presentation/companion/use-companion-library-favorites';
+export { useCompanionSlotUiState } from './presentation/companion/use-companion-slot-ui-state';
 export {
   useCompanionOrchestrateSession,
   type UseCompanionOrchestrateSessionParams,
-} from './presentation/use-companion-orchestrate-session';
+} from './presentation/companion/use-companion-orchestrate-session';
 export {
   useCompanionInterventionFetch,
   type UseCompanionInterventionFetchParams,
-} from './presentation/use-companion-intervention-fetch';
+} from './presentation/companion/use-companion-intervention-fetch';
 export {
   useCompanionOrchestrateRetry,
   type UseCompanionOrchestrateRetryParams,
-} from './presentation/use-companion-orchestrate-retry';
+} from './presentation/companion/use-companion-orchestrate-retry';
 export {
   useCompanionSlotOrchestrateFailurePorts,
   type UseCompanionSlotOrchestrateFailurePortsParams,
-} from './presentation/use-companion-slot-orchestrate-failure-ports';
+} from './presentation/companion/use-companion-slot-orchestrate-failure-ports';
 export {
   useCompanionInterventionBootstrap,
   type UseCompanionInterventionBootstrapParams,
-} from './presentation/use-companion-intervention-bootstrap';
+} from './presentation/companion/use-companion-intervention-bootstrap';
 export {
   useCompanionSlotRunOrchestrate,
   type UseCompanionSlotRunOrchestrateParams,
-} from './presentation/use-companion-slot-run-orchestrate';
+} from './presentation/companion/use-companion-slot-run-orchestrate';
 export {
   useCompanionSlotOrchestrateActions,
   type UseCompanionSlotOrchestrateActionsParams,
-} from './presentation/use-companion-slot-orchestrate-actions';
+} from './presentation/companion/use-companion-slot-orchestrate-actions';
 export {
   useCompanionOrchestration,
   type UseCompanionOrchestrationParams,
-} from './presentation/use-companion-orchestration';
-export { useCompanionData, type UseCompanionDataParams } from './presentation/use-companion-data';
+} from './presentation/companion/use-companion-orchestration';
+export { useCompanionData, type UseCompanionDataParams } from './presentation/companion/use-companion-data';
 export {
   useCompanionFullViewPage,
   type UseCompanionFullViewPageParams,
-} from './presentation/use-companion-fullview-page';
+} from './presentation/companion/use-companion-fullview-page';
 export {
   useCompanionSection,
   type UseCompanionSectionParams,
-} from './presentation/use-companion-section';
+} from './presentation/companion/use-companion-section';
 export {
   useCompanionSectionExpansion,
   type UseCompanionSectionExpansionParams,

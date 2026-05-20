@@ -20,6 +20,7 @@ features/pause/
   infrastructure/                 # supabase, edge, queries/
   presentation/                   # React conductors only — ritual JSX in src/screens/pause/
     reflect/                      # holzen-reflect, post-it note/tags, reflect/decide conductor
+    companion/                    # frame slots, orchestrate, fullview, section, related biases
     session/                      # scaffold payloads, ritual body prop types
   public.ts | public-queries.ts | public-rpc.ts | public-hooks.ts
 ```

@@ -1,7 +1,7 @@
 import type { CompanionData, CompanionPrefs } from '@/features/pause/public';
 import { useProfile } from '@/features/user/public-hooks';
 import { useToast } from '@/components/ui/use-toast';
-import { useCompanionAccess } from './companion/use-companion-access';
+import { useCompanionAccess } from './use-companion-access';
 import { useCompanionLibraryFavorites } from './use-companion-library-favorites';
 import { useCompanionOrchestration } from './use-companion-orchestration';
 import { useCompanionUiCompletion } from './use-companion-ui-completion';
