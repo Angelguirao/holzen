@@ -3,13 +3,13 @@ import {
   resolvePauseSessionChromeCloseAction,
   runPauseSessionChromeCloseAction,
 } from '@/features/pause/application/use-cases/session/pause-session-mood-chrome-flow';
-import { usePauseFavoriteToggle } from './reflect/use-pause-favorite-toggle';
-import { usePauseSessionMoodAndPersist } from './use-pause-session-mood-and-persist';
+import { usePauseFavoriteToggle } from './use-pause-favorite-toggle';
+import { usePauseSessionMoodAndPersist } from '../use-pause-session-mood-and-persist';
 import type {
   PauseSessionMoodChromeProvidersSlice,
   PauseSessionMoodChromeRitualSlice,
   PauseSessionMoodChromeShellSlice,
-} from './session/pause-session-step-handler-types';
+} from '../session/pause-session-step-handler-types';
 
 /** Mood persistence, favorite toggle, and pause chrome close for the session ritual. */
 export function usePauseSessionMoodChromeHandlers(
