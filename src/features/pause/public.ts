@@ -368,14 +368,6 @@ export {
 export type { PauseSessionShellViewModel } from './application/use-cases/session/shell-view-model';
 export { canAdvanceFromPauseStep } from './application/use-cases/session/navigation';
 export { computeDeepRitualGoBackTarget } from './application/use-cases/ritual/deep/deep-go-back';
-export { hostnameFromUrl } from './application/use-cases/ritual/frame/url';
-export {
-  dedupeBiases,
-  normalizeBiasTitle,
-  type RelatedBias,
-  type RelatedBiasesRow,
-} from './application/use-cases/ritual/frame/related-biases';
-export { deriveBreathingUiCompleteFromPayloads } from './application/use-cases/ritual/frame/breathing-ui-complete';
 export { ritualDepthUpgradedPayload } from './application/use-cases/ritual-depth-upgrade-payload';
 export {
   PAUSE_QUERY_PREFIX,
