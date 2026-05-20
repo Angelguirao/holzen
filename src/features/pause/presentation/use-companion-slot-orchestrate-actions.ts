@@ -1,10 +1,10 @@
 import { useCallback } from 'react';
-import type { RegenerateCompanionSlot } from '@/features/pause/public';
 import type {
   CompanionSlotCacheIds,
   CompanionSlotCommitters,
   CompanionSlotRelaxations,
-} from '@/features/pause/public';
+} from '@/features/pause/application/use-cases/ritual/frame/orchestrate-slot-apply';
+import type { RegenerateCompanionSlot } from '@/features/pause/domain/companion-orchestrate';
 import { useCompanionSlotOrchestratePorts } from './use-companion-slot-orchestrate-ports';
 import { useCompanionSlotOrchestrateFailurePorts } from './use-companion-slot-orchestrate-failure-ports';
 import { useCompanionSlotRunOrchestrate } from './use-companion-slot-run-orchestrate';

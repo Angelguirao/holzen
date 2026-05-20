@@ -369,10 +369,6 @@ export {
 } from './application/use-cases/breathing/ritual-audio';
 export { getRecencyHints } from './application/use-cases/ritual/frame/recency-hints';
 export { estimateReadTime } from './application/use-cases/ritual/frame/estimate-read-time';
-export {
-  applyCompanionSlotOrchestrateOutcome,
-  type ApplyCompanionSlotOrchestrateOutcomeInput,
-} from './application/use-cases/ritual/frame/apply-companion-slot-orchestrate-outcome';
 export { runCompanionInterventionBootstrap } from './application/use-cases/ritual/frame/run-companion-intervention-bootstrap';
 export {
   buildCompanionFeedbackVoteMetadata,
@@ -400,29 +396,6 @@ export {
   buildRegenerateOrchestrateBody,
   type CompanionOrchestrateSessionContext,
 } from './application/use-cases/ritual/frame/build-companion-orchestrate-body';
-export {
-  loadCompanionOrchestrateSession,
-  type LoadCompanionOrchestrateSessionInput,
-  type LoadCompanionOrchestrateSessionPorts,
-} from './application/use-cases/ritual/frame/load-companion-orchestrate-session';
-export {
-  runCompanionSlotOrchestrate,
-  type CompanionSlotOrchestrateMode,
-  type RunCompanionSlotOrchestratePorts,
-  type RunCompanionSlotOrchestrateResult,
-} from './application/use-cases/ritual/frame/run-companion-slot-orchestrate';
-export {
-  applyCompanionSlotOrchestrateFailureUi,
-  resolveCompanionSlotOrchestrateFailureUi,
-  type ApplyCompanionSlotOrchestrateFailureUiPorts,
-  type CompanionSlotOrchestrateFailureUi,
-} from './application/use-cases/ritual/frame/companion-slot-orchestrate-failure-ui';
-export {
-  setCompanionSlotError,
-  setCompanionSlotLoading,
-  type CompanionSlotErrorSetters,
-  type CompanionSlotLoadingSetters,
-} from './application/use-cases/ritual/frame/companion-slot-ui-state';
 export {
   companionUiCompletionQueryKey,
   invalidateCompanionUiCompletionQuery,

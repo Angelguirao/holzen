@@ -1,6 +1,6 @@
 import { useMemo } from 'react';
 import { showLimitReachedToast } from '@/features/subscription/public-limits';
-import type { ApplyCompanionSlotOrchestrateFailureUiPorts } from '@/features/pause/public';
+import type { ApplyCompanionSlotOrchestrateFailureUiPorts } from '@/features/pause/application/use-cases/ritual/frame/companion-slot-orchestrate-failure-ui';
 
 export type UseCompanionSlotOrchestrateFailurePortsParams = {
   fetchedSlotsRef: React.MutableRefObject<Set<string>>;
