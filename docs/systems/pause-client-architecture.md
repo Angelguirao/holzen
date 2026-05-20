@@ -290,7 +290,7 @@ The repo is mid-migration. Expect:
 | Session conductors | `presentation/*.ts` (flat + `presentation/session/`) | `presentation/session/`, `companion/`, `home/`, `archive/` | Peel incrementally |
 | Archive queries | `infrastructure/queries/archive/` (`archive-list-query.ts`, `archive-pauses-tab-query.ts`) | `infrastructure/queries/archive/` | Done (May 2026) |
 | Reflect edge + artifact I/O | `infrastructure/edge/reflect/` (`holzen-reflect-edge`, `reflection-artifact`, `load-reflect-recency-hints`, `reflection-step-session-storage`) | under `infrastructure/edge/` (§3) | Done (May 2026) |
-| Ports | `ports/pause-repository.ts` only | + ReflectGenerator, CompanionOrchestrator, … | Wire per slice |
+| Ports | `ports/pause-repository.ts`; step logs in `public-rpc` → `supabasePauseRepository` | + ReflectGenerator, CompanionOrchestrator, … | Step logs done (May 2026); companion/create next |
 
 Do not big-bang rename folders; one vertical slice per commit ([refactoring-strategy.md](../fundamentals/refactoring-strategy.md)).
 
