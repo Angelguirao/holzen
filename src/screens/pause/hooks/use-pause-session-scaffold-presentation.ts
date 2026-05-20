@@ -6,10 +6,12 @@ import {
   type PauseSessionScaffoldRitualPayloadsParams,
   type RitualDepth,
 } from '@/features/pause/public';
-import { usePauseSessionDepthAndBriefCopy } from '@/screens/pause/hooks/use-pause-session-depth-and-brief-copy';
+import {
+  usePauseSessionDepthAndBriefCopy,
+  usePauseSessionScaffoldRitual,
+  usePauseSessionStepTransition,
+} from '@/features/pause/public-hooks';
 import { usePauseSessionScaffoldChromeSlots } from '@/screens/pause/hooks/use-pause-session-scaffold-chrome-slots';
-import { usePauseSessionScaffoldRitual } from '@/screens/pause/hooks/use-pause-session-scaffold-ritual';
-import { usePauseSessionStepTransition } from '@/screens/pause/hooks/use-pause-session-step-transition';
 
 export type UsePauseSessionScaffoldPresentationParams = Omit<
   PauseSessionScaffoldRitualPayloadsParams,
