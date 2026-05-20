@@ -1177,6 +1177,25 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-20</span>
+      <span>Phase A slice — favorite toggle hook into presentation/reflect</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3><code>use-pause-favorite-toggle</code> → <code>presentation/reflect/</code></h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code>) is complete on this branch. Colocate the archive favorite conductor with other reflect presentation hooks; it delegates to <code>ritual/reflect/run-pause-favorite-toggle</code> + <code>public-rpc</code>; screens still import via <code>public-hooks</code>.</dd>
+      <dt>Deviation</dt>
+      <dd>None — two-file move (hook + test); <code>use-pause-session-mood-chrome-handlers</code> imports from <code>reflect/</code> subfolder.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Did not move session mood chrome handler in the same commit — keeps slice scoped to favorite toggle only.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: §6 <code>public.ts</code> peel (zoom-out / feedback helpers) or wire more metadata logs through <code>PauseRepository</code> (backlog #4).</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
 </body>
 </html>

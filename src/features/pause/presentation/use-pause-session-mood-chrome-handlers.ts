@@ -3,7 +3,7 @@ import {
   resolvePauseSessionChromeCloseAction,
   runPauseSessionChromeCloseAction,
 } from '@/features/pause/application/use-cases/session/pause-session-mood-chrome-flow';
-import { usePauseFavoriteToggle } from './use-pause-favorite-toggle';
+import { usePauseFavoriteToggle } from './reflect/use-pause-favorite-toggle';
 import { usePauseSessionMoodAndPersist } from './use-pause-session-mood-and-persist';
 import type {
   PauseSessionMoodChromeProvidersSlice,
