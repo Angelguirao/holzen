@@ -84,7 +84,7 @@ export type {
   ZoomOutEchoData,
   ZoomOutOnThisDayEntry,
 } from './domain/zoom-out-display';
-export { resumePauseAudioContext } from './application/use-cases/breathing/ritual-audio';
+export { resumePauseAudioContext } from './application/use-cases/ritual/breathe/ritual-audio';
 export { computeBreathingPhaseAdvance } from './application/use-cases/ritual/breathe/phase-advance';
 export {
   BRIEF_TRIANGLE_CYCLE_COUNT,
