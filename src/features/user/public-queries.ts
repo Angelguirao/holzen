@@ -89,6 +89,14 @@ export {
 } from './infrastructure/queries/profile-mutations';
 export { submitUserTestimonial } from './infrastructure/queries/testimonial-mutations';
 export {
+  fetchLandingTestimonials,
+  getLandingTestimonialsQueryOptions,
+  LANDING_TESTIMONIALS_QUERY_KEY,
+  LANDING_TESTIMONIALS_QUERY_PARAMS,
+  LANDING_TESTIMONIALS_QUERY_PREFIX,
+  type LandingTestimonialRow,
+} from './infrastructure/queries/landing-testimonials-query';
+export {
   deleteRoadmapVote,
   fetchRoadmapItemsPage,
   fetchRoadmapVotes,
