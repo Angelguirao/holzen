@@ -3,6 +3,14 @@ import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '@/features/auth/public';
 import {
+  buildLibraryBundlePlaceholder,
+  isLibraryBundleInitialLoading,
+} from '@/features/pause/application/use-cases/library/library-bundle-placeholder';
+import {
+  persistLibraryBundleToLocalStorage,
+  readLibraryBundleCacheSnapshot,
+} from '@/features/pause/infrastructure/library-bundle-local-storage';
+import {
   buildMemberCacheKey,
   deleteLibraryCollection,
   getLibraryBundleDisabledQueryOptions,
@@ -11,7 +19,6 @@ import {
   insertLibraryCollectionItem,
   libraryBundleQueryPrefix,
   removeLibraryCollectionItem,
-  sortMemberPauses,
   updateLibraryCollection,
   type Collection,
   type CollectionItem,
@@ -27,29 +34,9 @@ export type {
   LibraryListSortMode,
 };
 
-const CACHE_KEY_COLLECTIONS = 'holzen_library_collections';
-const CACHE_KEY_COL_ITEMS = 'holzen_library_col_items';
-
 export type UsePauseLibraryBundleOptions = {
   listSort?: LibraryListSortMode;
 };
-
-function readCache<T>(key: string): T | null {
-  try {
-    const raw = localStorage.getItem(key);
-    return raw ? JSON.parse(raw) : null;
-  } catch {
-    return null;
-  }
-}
-
-function writeCache<T>(key: string, data: T) {
-  try {
-    localStorage.setItem(key, JSON.stringify(data));
-  } catch {
-    /* ignore */
-  }
-}
 
 /**
  * User collections; each membership row points at a `pause_instance_id`.
@@ -64,16 +51,8 @@ export function usePauseLibraryBundle(options?: UsePauseLibraryBundleOptions) {
 
   const placeholderData = useMemo((): LibraryBundle | undefined => {
     if (!user) return undefined;
-    const rawItems = readCache<CollectionMemberPause[]>(memberCacheKey) ?? [];
-    const cols = readCache<Collection[]>(CACHE_KEY_COLLECTIONS) ?? [];
-    const cis = readCache<CollectionItem[]>(CACHE_KEY_COL_ITEMS) ?? [];
-    if (rawItems.length === 0 && cols.length === 0 && cis.length === 0) return undefined;
-    return {
-      collections: cols,
-      collectionItems: cis,
-      items: sortMemberPauses(rawItems, listSort),
-      memberRowsLoadFailed: false,
-    };
+    const snapshot = readLibraryBundleCacheSnapshot(memberCacheKey);
+    return buildLibraryBundlePlaceholder({ listSort, ...snapshot });
   }, [user, memberCacheKey, listSort]);
 
   const query = useQuery({
@@ -92,21 +71,19 @@ export function usePauseLibraryBundle(options?: UsePauseLibraryBundleOptions) {
   const items = query.data?.items ?? [];
   const collections = query.data?.collections ?? [];
   const collectionItems = query.data?.collectionItems ?? [];
-  /** Match prior `fetchAll`: spinner only when nothing to show yet (no placeholder / empty cache). */
-  const loading =
-    Boolean(user) &&
-    query.isFetching &&
-    collections.length === 0 &&
-    collectionItems.length === 0 &&
-    items.length === 0;
+  const loading = isLibraryBundleInitialLoading({
+    hasUser: Boolean(user),
+    isFetching: query.isFetching,
+    collectionCount: collections.length,
+    collectionItemCount: collectionItems.length,
+    itemCount: items.length,
+  });
   const listLoadFailed = query.isError || Boolean(query.data?.memberRowsLoadFailed);
 
   useEffect(() => {
     const d = query.data;
     if (!d) return;
-    if (d.items.length > 0) writeCache(memberCacheKey, d.items);
-    writeCache(CACHE_KEY_COLLECTIONS, d.collections);
-    writeCache(CACHE_KEY_COL_ITEMS, d.collectionItems);
+    persistLibraryBundleToLocalStorage(memberCacheKey, d);
   }, [query.data, memberCacheKey]);
 
   const bumpLibrary = useCallback(() => {
