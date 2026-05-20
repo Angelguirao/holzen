@@ -1,15 +1,15 @@
 import { useMemo } from 'react';
 import type { PauseSessionShellHolzen } from '@/features/pause/domain/pause-session-shell-holzen';
-import { usePauseSessionFetch } from './use-pause-session-fetch';
+import type { FetchedPauseInstance, PersistedSession } from '@/features/pause/domain/session-model';
 import {
   computePauseSessionHydration,
   computePauseSessionResolved,
   type PauseSessionHydrationReady,
   type PauseSessionHydrationState,
-} from '@/features/pause/public';
-import { hasPersistedPauseSessionPayload } from '@/features/pause/public';
-import type { PauseSessionNavParsed } from '@/features/pause/public';
-import { type FetchedPauseInstance, type PersistedSession } from '@/features/pause/public';
+} from '@/features/pause/application/use-cases/session/hydration';
+import { hasPersistedPauseSessionPayload } from '@/features/pause/application/use-cases/session/persisted-session-guards';
+import type { PauseSessionNavParsed } from '@/features/pause/application/use-cases/session/location-state';
+import { usePauseSessionFetch } from './use-pause-session-fetch';
 import { loadSession } from '@/features/pause/infrastructure/session/persisted-session-storage';
 
 export type UsePauseSessionShellParams = {

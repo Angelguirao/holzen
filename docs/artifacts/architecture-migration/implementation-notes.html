@@ -2523,6 +2523,25 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-20</span>
+      <span>Phase A slice — peel session hydration + step-map off public.ts (§6)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>Backlog #1 complete; continue backlog #3 slim <code>public.ts</code></h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd><code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code> was already complete. Peel session hydration, step-map restores, step bundles, gate flags, header-back, storage ritual sync, and swipe direction from <code>public.ts</code> — <code>presentation/</code> and co-located application tests import <code>application/use-cases/session/*</code> directly; cross-context types (<code>PersistedSession</code>, location state) remain on <code>public.ts</code> for screens and legacy stats.</dd>
+      <dt>Deviation</dt>
+      <dd>None — matches §6 barrel split.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Feel/decide/fetched-instance exports and terminal guards still on <code>public.ts</code> until the next peel cluster.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: peel feel/decide session exports or wire more mutations through <code>PauseRepository</code> (backlog #4).</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
 </body>
 </html>

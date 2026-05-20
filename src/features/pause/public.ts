@@ -42,10 +42,6 @@ export {
   type PauseAiArtifactKindRow,
   type PauseInstanceContextSnapshotRow,
 } from './application/use-cases/session/fetched-instance-from-fetch';
-export {
-  computePauseStorageRitualSyncPatch,
-  type PauseStorageRitualSyncPatch,
-} from './application/use-cases/session/storage-ritual-sync';
 export { COMPANION_TYPES, FEEDBACK_TO_CACHE_TYPE } from './domain/companion-types';
 export {
   DEFAULT_PREGENERATE_CACHE_TOPUP,
@@ -68,53 +64,11 @@ export {
 } from './application/use-cases/session/location-state';
 export { canNavigateToPauseSession } from './application/use-cases/session/can-navigate-to-pause-session';
 export {
-  computePauseHeaderBackIntent,
-  isPauseSessionHeaderBackVisible,
-} from './application/use-cases/session/header-back';
-export {
-  briefStepToPauseScienceStep,
-  mapPersistedStep,
-  initialRitualEntry,
-  initialBriefPauseStepFromRestored,
-  initialBriefIntegrateDoneFromRestored,
-  initialSelectedBriefFaceFromRestored,
-  initialPhaseFromRestored,
-  initialDecisionFromRestored,
-  initialBreathingFirstCompletedFromRestored,
-  initialBreathingSecondCompletedFromRestored,
-  initialFrameDoneFromRestored,
-  initialBreathSegmentRpcLoggedFlagsFromRestored,
-} from './application/use-cases/session/step-map';
-export { coalescePauseSessionShellViewModel } from './application/use-cases/session/shell-view-model';
-export {
-  isPauseSessionDepthPickerActive,
-  isPauseSessionWaitingForInstanceFetch,
-} from './application/use-cases/session/gate-flags';
-export {
-  computePauseSessionHydration,
-  computePauseSessionResolved,
-  type PauseSessionHydrationInput,
-  type PauseSessionHydrationReady,
-  type PauseSessionHydrationState,
-  type PauseSessionResolvedInput,
-} from './application/use-cases/session/hydration';
-export {
-  buildPauseSessionStepRitualBundle,
-  buildPauseSessionStepShellBundle,
-} from './application/use-cases/session/step-bundles';
-export type {
-  PauseSessionStepRitualBundleInput,
-  PauseSessionStepShellBundleInput,
-  PauseSessionStepShellChromeInput,
-} from './application/use-cases/session/step-bundle-types';
-export { pauseStepSwipeDirection } from './application/use-cases/session/step-swipe-direction';
-export {
   buildPostPauseEmotionLoggedPayload,
   isPostPauseEmotionDirty,
   type PostPauseFeelSnapshot,
 } from './application/use-cases/ritual/done/post-pause-emotion-log';
 export type { CompanionSlotRelaxationUi } from './application/use-cases/ritual/frame/orchestrate-slot-apply';
-export type { PauseSessionShellViewModel } from './application/use-cases/session/shell-view-model';
 export { canAdvanceFromPauseStep } from './application/use-cases/session/navigation';
 export { ritualDepthUpgradedPayload } from './application/use-cases/ritual/brief/ritual-depth-upgrade-payload';
 export {
