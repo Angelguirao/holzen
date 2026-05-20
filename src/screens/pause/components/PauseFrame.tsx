@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { motion } from 'framer-motion';
 import { Activity, ChevronRight, ZoomOut } from 'lucide-react';
-import { pauseStepLayout } from '@/features/pause/public';
+import { pauseStepLayout } from '@/features/pause/public-hooks';
 import { Button } from '@/components/ui/button';
 import { usePauseArtifactHaiku } from '@/features/pause/public-hooks';
 import { hapticFeedback } from '@/lib/haptics';

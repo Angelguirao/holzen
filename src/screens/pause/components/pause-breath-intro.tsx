@@ -1,7 +1,7 @@
 import { motion } from 'framer-motion';
 import { Play } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
-import { pauseStepLayout } from '@/features/pause/public';
+import { pauseStepLayout } from '@/features/pause/public-hooks';
 import { Button } from '@/components/ui/button';
 import { hapticFeedback } from '@/lib/haptics';
 export type PauseBreathSegment = 'first' | 'second';
