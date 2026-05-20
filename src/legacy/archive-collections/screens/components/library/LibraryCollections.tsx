@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { CollectionCard } from './CollectionCard';
 import { NewCollectionForm } from './NewCollectionForm';
 import { CollectionDetail } from './CollectionDetail';
-import type { usePauseLibraryBundle } from '@/features/pause/public-hooks';
+import type { usePauseLibraryBundle } from '@/legacy/archive-collections/presentation/use-pause-library-bundle';
 
 interface Props {
   library: ReturnType<typeof usePauseLibraryBundle>;

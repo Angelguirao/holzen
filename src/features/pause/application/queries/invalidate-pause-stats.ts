@@ -1,4 +1,3 @@
-import { libraryBundleQueryPrefix } from './library-bundle-keys';
 import { pauseArchiveListQueryPrefix } from '@/features/pause/application/queries/archive-query-keys';
 import { journeyPauseInstancesQueryKey } from './journey-pause-instances-keys';
 import { COMPLETED_PAUSE_COUNT_QUERY_KEY } from './completed-pause-count-keys';
@@ -9,7 +8,7 @@ import { archivePausesTabHasRowsQueryPrefix } from './archive-pauses-tab-keys';
 
 /**
  * Call after a pause reaches `completed` so Home, Journey overview, completed-pause count,
- * Archive lists, library bundle, pending offer, and current open pause stay fresh.
+ * Archive lists, pending offer, and current open pause stay fresh.
  */
 export function invalidatePauseStatsDataForUser(userId: string | null | undefined): void {
   if (!userId) return;
@@ -19,7 +18,6 @@ export function invalidatePauseStatsDataForUser(userId: string | null | undefine
   void qc.invalidateQueries({ queryKey: COMPLETED_PAUSE_COUNT_QUERY_KEY(userId) });
   void qc.invalidateQueries({ queryKey: archivePausesTabHasRowsQueryPrefix(userId) });
   void qc.invalidateQueries({ queryKey: pauseArchiveListQueryPrefix(userId) });
-  void qc.invalidateQueries({ queryKey: libraryBundleQueryPrefix(userId) });
   void qc.invalidateQueries({ queryKey: pendingPauseOfferQueryKey(userId) });
   void qc.invalidateQueries({ queryKey: currentPauseQueryKey(userId) });
 }

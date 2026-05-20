@@ -1,5 +1,5 @@
 import { Trash2, FolderOpen } from 'lucide-react';
-import type { Collection } from '@/features/pause/public';
+import type { Collection } from '@/legacy/archive-collections/domain/library-bundle';
 
 interface Props {
   collection: Collection;

@@ -8,31 +8,35 @@ import {
   hasCollectionMembership,
   nextCollectionItemPosition,
   sortedPauseInstanceIdsInCollection,
-} from '@/features/pause/application/use-cases/library/library-bundle-collection-helpers';
+} from '@/legacy/archive-collections/application/use-cases/library/library-bundle-collection-helpers';
 import {
   buildLibraryBundlePlaceholder,
   isLibraryBundleInitialLoading,
-} from '@/features/pause/application/use-cases/library/library-bundle-placeholder';
+} from '@/legacy/archive-collections/application/use-cases/library/library-bundle-placeholder';
 import {
   persistLibraryBundleToLocalStorage,
   readLibraryBundleCacheSnapshot,
-} from '@/features/pause/infrastructure/library-bundle-local-storage';
+} from '@/legacy/archive-collections/infrastructure/library-bundle-local-storage';
+import { libraryBundleQueryPrefix } from '@/legacy/archive-collections/application/queries/library-bundle-keys';
+import type {
+  Collection,
+  CollectionItem,
+  CollectionMemberPause,
+  LibraryBundle,
+  LibraryListSortMode,
+} from '@/legacy/archive-collections/domain/library-bundle';
 import {
   buildMemberCacheKey,
-  deleteLibraryCollection,
   getLibraryBundleDisabledQueryOptions,
   getLibraryBundleQueryOptions,
+} from '@/legacy/archive-collections/infrastructure/queries/library-bundle-query';
+import {
+  deleteLibraryCollection,
   insertLibraryCollection,
   insertLibraryCollectionItem,
-  libraryBundleQueryPrefix,
   removeLibraryCollectionItem,
   updateLibraryCollection,
-  type Collection,
-  type CollectionItem,
-  type CollectionMemberPause,
-  type LibraryBundle,
-  type LibraryListSortMode,
-} from '../public-queries';
+} from '@/legacy/archive-collections/infrastructure/queries/library-collections-mutations';
 
 export type {
   Collection,

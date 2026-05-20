@@ -1,5 +1,5 @@
-import { usePauseLibraryBundle } from '@/features/pause/public-hooks';
-import { LibraryCollections } from '@/screens/archive/components/library/LibraryCollections';
+import { usePauseLibraryBundle } from '@/legacy/archive-collections/presentation/use-pause-library-bundle';
+import { LibraryCollections } from '@/legacy/archive-collections/screens/components/library/LibraryCollections';
 
 type Props = {
   listSort: 'newest' | 'oldest' | 'alphabetical';

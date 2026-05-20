@@ -3,7 +3,7 @@ import type {
   CollectionItem,
   CollectionMemberPause,
   LibraryBundle,
-} from '@/features/pause/domain/library-bundle';
+} from '@/legacy/archive-collections/domain/library-bundle';
 import { readJsonLocalStorage, writeJsonLocalStorage } from './json-local-storage';
 
 export const LIBRARY_CACHE_KEY_COLLECTIONS = 'holzen_library_collections';

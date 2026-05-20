@@ -45,8 +45,18 @@ const TIER_B_TABLES = [
   'night_reflections',
 ];
 
+/** User Archive collections — quarantined in `src/legacy/archive-collections/` (not MVP). */
+const CLIENT_QUARANTINED_TABLES = ['collections', 'collection_items'];
+
 const TIER_B_FROM_RES = TIER_B_TABLES.map(
   (t) => ({ re: new RegExp(`\\.from\\(['"]${t}['"]\\)`), label: `.from('${t}') (Tier B — use legacy/full-shell)` }),
+);
+
+const QUARANTINED_FROM_RES = CLIENT_QUARANTINED_TABLES.map(
+  (t) => ({
+    re: new RegExp(`\\.from\\(['"]${t}['"]\\)`),
+    label: `.from('${t}') (user collections — use legacy/archive-collections)`,
+  }),
 );
 
 const SKIP_TIER_B_FILES = new Set([
@@ -75,7 +85,7 @@ for (const file of walk(srcRoot)) {
     }
   }
   if (!SKIP_TIER_B_FILES.has(rel)) {
-    for (const { re, label } of TIER_B_FROM_RES) {
+    for (const { re, label } of [...TIER_B_FROM_RES, ...QUARANTINED_FROM_RES]) {
       if (re.test(text)) {
         violations.push({ file: rel, label });
       }

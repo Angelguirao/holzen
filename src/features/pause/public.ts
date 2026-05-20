@@ -17,13 +17,6 @@ export {
 } from './application/use-cases/reflection-persist-error';
 export { pauseArchiveRowAllowsRetrospectiveOutcome } from './application/use-cases/archive/retrospective-outcome';
 export { pauseArchiveListQueryPrefix } from './application/queries/archive-query-keys';
-export type {
-  Collection,
-  CollectionItem,
-  CollectionMemberPause,
-  LibraryBundle,
-  LibraryListSortMode,
-} from './domain/library-bundle';
 export { buildOutcomeLoggedPayload } from './application/use-cases/outcome-log-payload';
 export { runPauseOutcomeLog } from './application/use-cases/session/run-pause-outcome-log';
 export { shouldLogPauseReflectionStep } from './application/use-cases/reflect/run-pause-reflection-step-log';
