@@ -2,7 +2,6 @@
  * Public API for the pause bounded context (no Supabase eager load).
  * RPC mutations: `@/features/pause/public-rpc`.
  */
-export { buildOutcomeLoggedPayload } from './application/use-cases/ritual/decide/outcome-log-payload';
 export {
   hasPersistablePauseSessionAnchor,
   hasPersistedPauseSessionPayload,
@@ -21,7 +20,6 @@ export {
   type FetchedPauseInstance,
   type PersistedSession,
 } from './domain/session-model';
-export { migratePersistedPauseSession } from './application/use-cases/session/migrate-persisted-session';
 export {
   effectivePauseShiftIntensity,
   effectivePauseShiftMood,
@@ -37,11 +35,6 @@ export {
   computePauseQualityScore,
   type PauseQualityBreakdown,
 } from './domain/pause-quality';
-export {
-  buildFetchedPauseInstanceFromFetch,
-  type PauseAiArtifactKindRow,
-  type PauseInstanceContextSnapshotRow,
-} from './application/use-cases/session/fetched-instance-from-fetch';
 export { COMPANION_TYPES, FEEDBACK_TO_CACHE_TYPE } from './domain/companion-types';
 export {
   DEFAULT_PREGENERATE_CACHE_TOPUP,
@@ -63,21 +56,6 @@ export {
   parsePauseSessionLocationState,
 } from './application/use-cases/session/location-state';
 export { canNavigateToPauseSession } from './application/use-cases/session/can-navigate-to-pause-session';
-export {
-  buildPostPauseEmotionLoggedPayload,
-  isPostPauseEmotionDirty,
-  type PostPauseFeelSnapshot,
-} from './application/use-cases/ritual/done/post-pause-emotion-log';
-export type { CompanionSlotRelaxationUi } from './application/use-cases/ritual/frame/orchestrate-slot-apply';
-export { canAdvanceFromPauseStep } from './application/use-cases/session/navigation';
-export { ritualDepthUpgradedPayload } from './application/use-cases/ritual/brief/ritual-depth-upgrade-payload';
-export {
-  buildInitialEmotionLoggedPayload,
-  initialEmotionLogDedupeKey,
-  initialEmotionSkippedLogDedupeKey,
-  initialEmotionSkippedLoggedPayload,
-  type InitialEmotionLogOpts,
-} from './application/use-cases/ritual/feel/initial-emotion-log';
 export {
   collectStepTypes,
   computePauseState,

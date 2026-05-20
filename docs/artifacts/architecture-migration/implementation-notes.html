@@ -2531,12 +2531,17 @@
   <article class="note">
     <header>
       <span>2026-05-20</span>
+<<<<<<< HEAD
       <span>Phase A slice — peel feel initial-emotion UI off public.ts (§6)</span>
+=======
+      <span>Phase A slice — peel feel/done/fetched-instance off public.ts (§6)</span>
+>>>>>>> fed93f3c (refactor(pause): peel feel/done/fetched-instance off public.ts (§6))
       <span class="status resolved">resolved</span>
     </header>
     <h3>Backlog #1 complete; continue backlog #3 slim <code>public.ts</code></h3>
     <dl>
       <dt>Design decision</dt>
+<<<<<<< HEAD
       <dd>Session hydration + step-map peel landed on remote (<code>5bd337bc</code>). Peel <code>initialEmotionResetUi</code> / <code>InitialEmotionUiState</code> from <code>public.ts</code> — <code>use-pause-session-initial-mood-handlers</code> imports <code>ritual/feel/run-initial-emotion-log</code> directly; <code>public-rpc</code> keeps RPC-facing type re-exports.</dd>
       <dt>Deviation</dt>
       <dd>None — matches §6 barrel split.</dd>
@@ -2544,6 +2549,15 @@
       <dd><code>initial-emotion-log</code> payload builders remain on <code>public.ts</code> for cross-context consumers until a later peel.</dd>
       <dt>Open questions</dt>
       <dd>Next: peel <code>post-pause-emotion-log</code> / terminal guards off <code>public.ts</code>, or wire more mutations through <code>PauseRepository</code> (backlog #4).</dd>
+=======
+      <dd><code>ritual/reflect/</code> folder move was already complete. Peel feel UI reset types, post-pause feel snapshot, outcome/depth payload builders, session navigation advance, frame relaxation UI type, and fetched-instance builder from <code>public.ts</code> — <code>presentation/</code> and co-located tests import <code>application/use-cases/*</code> directly; cross-context domain/session types stay on <code>public.ts</code>. <code>CompanionPrefs</code> for user profile imports <code>public-hooks</code> (was a stale <code>public</code> path).</dd>
+      <dt>Deviation</dt>
+      <dd>None — matches §6 barrel split.</dd>
+      <dt>Tradeoffs</dt>
+      <dd><code>public-rpc</code> already owns ritual mutation facades; duplicate <code>ritualDepthUpgradedPayload</code> re-export removed from <code>public.ts</code>.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: peel remaining session guards / terminal types used only inside pause, or wire more mutations through <code>PauseRepository</code> (backlog #4).</dd>
+>>>>>>> fed93f3c (refactor(pause): peel feel/done/fetched-instance off public.ts (§6))
     </dl>
   </article>
 
