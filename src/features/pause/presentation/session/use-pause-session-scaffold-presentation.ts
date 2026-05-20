@@ -4,10 +4,10 @@ import type { BtcPriceData } from '@/features/market/public';
 import { isPauseSessionDepthPickerActive } from '@/features/pause/application/use-cases/session/gate-flags';
 import type { FetchedPauseInstance } from '@/features/pause/domain/session-model';
 import type { RitualDepth } from '@/features/pause/public-hooks';
-import type { PauseSessionScaffoldRitualPayloadsParams } from './session/scaffold-ritual-payloads';
-import { usePauseSessionDepthAndBriefCopy } from './use-pause-session-depth-and-brief-copy';
+import type { PauseSessionScaffoldRitualPayloadsParams } from './scaffold-ritual-payloads';
+import { usePauseSessionDepthAndBriefCopy } from '../use-pause-session-depth-and-brief-copy';
 import { usePauseSessionScaffoldRitual } from './use-pause-session-scaffold-ritual';
-import { usePauseSessionStepTransition } from './session/use-pause-session-step-transition';
+import { usePauseSessionStepTransition } from './use-pause-session-step-transition';
 
 export type UsePauseSessionScaffoldPresentationParams = Omit<
   PauseSessionScaffoldRitualPayloadsParams,
