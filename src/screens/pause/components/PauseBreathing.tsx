@@ -1,4 +1,4 @@
-import { useState, useEffect, useImperativeHandle, forwardRef, useRef, useLayoutEffect, useMemo } from 'react';
+import { useState, useEffect, useImperativeHandle, forwardRef, useRef, useMemo } from 'react';
 import { motion, useReducedMotion } from 'framer-motion';
 import { Play, RefreshCw, ChevronRight } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
@@ -22,6 +22,7 @@ import {
   playPauseBreathPhaseCue,
   resumePauseAudioContext,
 } from '@/features/pause/public';
+import { BriefBreathAdvanceToIntegrate } from '@/screens/pause/components/brief-breath-advance-to-integrate';
 import { BreathOrbVisual } from '@/screens/pause/components/breath-orb-visual';
 
 const EXPAND_KEYS = ['breathing.phases.inhale', 'breathing.phases.sip'];
@@ -67,30 +68,6 @@ interface Props {
   onRepeatDeepFirstBreathPattern?: () => void;
   /** Deep second Breathe post-pattern: same affordance as first interstitial (wireframe 330:23551). */
   onRepeatDeepSecondBreathPattern?: () => void;
-}
-
-/** Brief ritual: no post-pattern card; advance as soon as the timed cycles finish. */
-function BriefBreathAdvanceToIntegrate({
-  onContinue,
-  onAdvanceFailed,
-}: {
-  onContinue: () => void | Promise<unknown>;
-  onAdvanceFailed?: () => void;
-}) {
-  const onContinueRef = useRef(onContinue);
-  onContinueRef.current = onContinue;
-  const onAdvanceFailedRef = useRef(onAdvanceFailed);
-  onAdvanceFailedRef.current = onAdvanceFailed;
-  const firedRef = useRef(false);
-  useLayoutEffect(() => {
-    if (firedRef.current) return;
-    firedRef.current = true;
-    void Promise.resolve(onContinueRef.current()).catch(() => {
-      firedRef.current = false;
-      onAdvanceFailedRef.current?.();
-    });
-  }, []);
-  return null;
 }
 
 export const PauseBreathing = forwardRef<PauseBreathingHandle, Props>(function PauseBreathing(
