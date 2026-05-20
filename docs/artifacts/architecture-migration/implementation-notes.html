@@ -2718,6 +2718,25 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-20</span>
+      <span>Phase A slice — wire pauseLogStep / pauseLogCompanion facades via use cases (§8)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>Backlog #4 — ritual log facades on PauseRepository</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 <code>ritual/reflect/</code> was already complete on <code>cursor/arch-migrate-src-ca70</code>. Route <code>public-rpc</code> <code>pauseLogStep</code> and <code>pauseLogCompanion</code> through existing <code>logPauseStep</code> and <code>logPauseCompanion</code> use cases with default <code>supabasePauseRepository</code> — same pattern as pending-offer and breath/outcome facades. Add <code>log-pause-companion.test.ts</code> mirroring <code>log-pause-step</code>.</dd>
+      <dt>Deviation</dt>
+      <dd>None — no rename of exported facade names; behavior parity only.</dd>
+      <dt>Tradeoffs</dt>
+      <dd><code>pauseCreateOrReuse</code> / <code>pauseDismissCurrent</code> still call repository methods directly until thin lifecycle use cases land.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: lifecycle create/dismiss use cases on <code>public-rpc</code>, colocate shell bootstrap under <code>presentation/session/</code>, or port-backed companion feedback vote write path.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
 </body>
 </html>

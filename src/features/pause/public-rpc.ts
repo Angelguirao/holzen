@@ -78,6 +78,8 @@ import {
   type RunShiftEmotionFrameHubDoneResult,
 } from './application/use-cases/ritual/feel/shift-emotion-log';
 import type { InitialEmotionLogOpts } from './application/use-cases/ritual/feel/initial-emotion-log';
+import { logPauseStep } from './application/use-cases/ritual/log-pause-step';
+import { logPauseCompanion } from './application/use-cases/ritual/frame/log-pause-companion';
 
 /** Lifecycle + step mutations — default port is `PauseRepository`, not raw RPC client. */
 
@@ -115,7 +117,7 @@ export function pauseDismissCurrent() {
 export function pauseLogStep(
   params: Parameters<typeof supabasePauseRepository.logStep>[0],
 ) {
-  return supabasePauseRepository.logStep(params);
+  return logPauseStep(supabasePauseRepository, params);
 }
 
 export function pauseLogCompanion(params: {
@@ -124,7 +126,7 @@ export function pauseLogCompanion(params: {
   action: PauseCompanionAction;
   entryPoint: string;
 }) {
-  return supabasePauseRepository.logCompanion(params);
+  return logPauseCompanion(supabasePauseRepository, params);
 }
 
 export type { BulkHoldApplyResult };
