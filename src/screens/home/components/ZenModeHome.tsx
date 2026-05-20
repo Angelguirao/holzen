@@ -13,7 +13,7 @@ import { SubscriptionSkeleton } from '@/screens/home/components/SubscriptionSkel
 import type { CompanionData, CompanionPrefs } from '@/features/pause/public';
 import type { BtcPriceData } from '@/features/market/public';
 import type { BtcMoveSeverity } from '@/features/market/public';
-import { shouldSurfacePauseWidgetError } from '@/features/pause/public';
+import { shouldSurfacePauseWidgetError } from '@/features/pause/public-hooks';
 import type { Entitlement } from '@/features/subscription/public';
 
 export interface ZenModeHomeProps {
