@@ -1,5 +1,5 @@
 import { useCallback } from 'react';
-import { loadCompanionOrchestrateSession } from '@/features/pause/public';
+import { loadCompanionOrchestrateSession } from '@/features/pause/application/use-cases/ritual/frame/load-companion-orchestrate-session';
 import { loadMoodHistoryForOrchestrate } from '@/features/pause/public-queries';
 
 export type UseCompanionOrchestrateSessionParams = {

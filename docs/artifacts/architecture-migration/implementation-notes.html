@@ -987,6 +987,25 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-20</span>
+      <span>Phase A slice — companion slot orchestrate runner peel from public.ts</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>Slot lazy-fetch / regenerate runner off <code>public.ts</code></h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Reflect → <code>ritual/reflect/</code> backlog item #1 is complete on this branch. Next §6 peel: companion slot orchestrate runner (<code>runCompanionSlotOrchestrate</code>, outcome apply, session load, slot UI setters, failure-ui port types) — presentation imports <code>ritual/frame/*</code> directly; screens keep domain/types on <code>public.ts</code>.</dd>
+      <dt>Deviation</dt>
+      <dd>None — incremental slim barrel; intervention bootstrap / orchestrate-slot-apply hub still re-exported for mixed consumers.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Did not peel intervention bootstrap or <code>orchestrate-slot-apply</code> helpers in the same commit — keeps slice to the slot-run orchestration path only.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: peel intervention / slot-apply cluster from <code>public.ts</code> or move feel/post-pause session logs to <code>ritual/feel/</code> / <code>ritual/done/</code>.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
 </body>
 </html>
