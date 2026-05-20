@@ -3,7 +3,10 @@ import { useNavigate, useParams, useLocation, Navigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next';
 import { useHolzen } from '@/screens/home/hooks/use-holzen';
 import { useCompanionData } from '@/features/pause/public-hooks';
-import { usePauseSessionCompanionSnapshot } from '@/screens/pause/hooks/use-pause-session-companion-snapshot';
+import {
+  useFullviewTelemetry,
+  usePauseSessionCompanionSnapshot,
+} from '@/features/pause/public-hooks';
 import { CompanionFeedback } from '@/screens/pause/components/CompanionFeedback';
 import { CompanionFocusLayout } from '@/screens/pause/components/companion/CompanionFocusLayout';
 import { GroundingFullView } from '@/screens/pause/components/companion/GroundingFullView';
@@ -11,7 +14,6 @@ import { GroundingEnrichment } from '@/screens/pause/components/companion/Ground
 import { HistoryThread } from '@/screens/pause/components/companion/HistoryThread';
 import { RelatedBiasesThisMonth } from '@/screens/pause/components/companion/RelatedBiasesThisMonth';
 import { useGroundingEnrichment } from '@/features/pause/public-hooks';
-import { useFullviewTelemetry } from '@/screens/pause/hooks/use-fullview-telemetry';
 import { InterventionCrossRefBadge } from '@/screens/pause/components/companion/InterventionCrossRefBadge';
 import { useStaggeredReveal } from '@/screens/pause/components/companion/use-staggered-reveal';
 import { PageMeta } from '@/app/components/PageMeta';

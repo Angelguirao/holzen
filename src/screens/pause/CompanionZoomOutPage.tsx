@@ -3,7 +3,10 @@ import { useNavigate, useParams, useLocation, Navigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next';
 import { useHolzen } from '@/screens/home/hooks/use-holzen';
 import { useCompanionData } from '@/features/pause/public-hooks';
-import { usePauseSessionCompanionSnapshot } from '@/screens/pause/hooks/use-pause-session-companion-snapshot';
+import {
+  useFullviewTelemetry,
+  usePauseSessionCompanionSnapshot,
+} from '@/features/pause/public-hooks';
 import { ZoomOutDisplay } from '@/screens/pause/components/ZoomOutDisplay';
 import { CompanionFeedback } from '@/screens/pause/components/CompanionFeedback';
 import { CompanionFocusLayout } from '@/screens/pause/components/companion/CompanionFocusLayout';
@@ -12,7 +15,6 @@ import { WhyThisCard } from '@/screens/pause/components/companion/WhyThisCard';
 import { HistoryThread } from '@/screens/pause/components/companion/HistoryThread';
 import { InterventionCrossRefBadge } from '@/screens/pause/components/companion/InterventionCrossRefBadge';
 import { useStaggeredReveal } from '@/screens/pause/components/companion/use-staggered-reveal';
-import { useFullviewTelemetry } from '@/screens/pause/hooks/use-fullview-telemetry';
 import { PageMeta } from '@/app/components/PageMeta';
 import { zoomOutTotalCharsForReadTime } from '@/features/pause/public';
 import { DEFAULT_COMPANIONS, DEFAULT_PREFS } from '@/features/pause/public';
