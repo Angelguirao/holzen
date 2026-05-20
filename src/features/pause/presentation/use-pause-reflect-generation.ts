@@ -10,7 +10,7 @@ import {
   shouldClearReflectGenerationLoading,
   shouldCommitReflectGeneration,
 } from '@/features/pause/application/use-cases/reflect/reflect-generation-hook-flow';
-import { runReflectGeneration } from '@/features/pause/application/use-cases/reflect/run-reflect-generation';
+import { runReflectGeneration } from '@/features/pause/application/use-cases/ritual/reflect/run-reflect-generation';
 import {
   fetchOpeningMessageForPauseInstance,
   generateReflectionAtReflectStep,

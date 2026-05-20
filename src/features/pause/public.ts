@@ -124,7 +124,7 @@ export {
   type RunReflectGenerationInput,
   type RunReflectGenerationPorts,
   type RunReflectGenerationResult,
-} from './application/use-cases/reflect/run-reflect-generation';
+} from './application/use-cases/ritual/reflect/run-reflect-generation';
 export {
   BOX_BREATH_PHASE_COUNT,
   computeBreathingPhaseAdvance,
