@@ -1,4 +1,4 @@
-import type { CompanionData } from '@/features/pause/public';
+import type { CompanionData } from '@/features/pause/domain/companion-card-types';
 
 export function companionDataFromArtifacts(
   rows: Array<{ kind: string; content: Record<string, unknown> }>,

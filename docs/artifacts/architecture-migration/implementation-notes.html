@@ -2396,19 +2396,19 @@
   <article class="note">
     <header>
       <span>2026-05-20</span>
-      <span>Phase A slice — peel PauseStep imports off public.ts for application (§6)</span>
+      <span>Phase A slice — peel application domain types off public.ts (§6)</span>
       <span class="status resolved">resolved</span>
     </header>
-    <h3>Backlog #1–#2 complete; session/ritual application imports domain <code>PauseStep</code></h3>
+    <h3>Backlog #1–#2 complete; session/frame application imports <code>domain/*</code></h3>
     <dl>
       <dt>Design decision</dt>
-      <dd><code>reflect/</code> → <code>ritual/reflect/</code> and breathe hub colocation were already complete on <code>cursor/arch-migrate-src-ca70</code>. Continue backlog #3 §6: session + brief-switch use cases import <code>PauseStep</code> from <code>domain/pause-ritual-steps</code> instead of the <code>public.ts</code> barrel; <code>navigation.test</code> imports <code>canAdvanceFromPauseStep</code> from sibling module.</dd>
+      <dd><code>reflect/</code> → <code>ritual/reflect/</code> was already complete on <code>cursor/arch-migrate-src-ca70</code>. Continue backlog #3 §6: session + brief-switch use cases import <code>PauseStep</code> from <code>domain/pause-ritual-steps</code>; <code>shell-view-model</code> and frame parsers import <code>CompanionData</code>, <code>CompanionPrefs</code>, and <code>CachedHistoricalInsightShape</code> from <code>domain/*</code> — not the <code>public.ts</code> barrel. <code>navigation.test</code> imports <code>canAdvanceFromPauseStep</code> from sibling module.</dd>
       <dt>Deviation</dt>
-      <dd>None — ritual step typing unchanged; <code>public.ts</code> still re-exports <code>PauseStep</code> for screens.</dd>
+      <dd>None — typing unchanged; <code>public.ts</code> still re-exports symbols for screens.</dd>
       <dt>Tradeoffs</dt>
       <dd>Other application tests still import helpers via <code>public.ts</code> until a later peel cluster.</dd>
       <dt>Open questions</dt>
-      <dd>Next: peel <code>PersistedSession</code> / companion types for application tests, or backlog #4 <code>PauseRepository</code> wiring for remaining mutations.</dd>
+      <dd>Next: peel remaining application test imports off <code>public.ts</code>, or backlog #4 <code>PauseRepository</code> wiring for remaining mutations.</dd>
     </dl>
   </article>
 
