@@ -1,4 +1,3 @@
-import { ThumbsUp, ThumbsDown, RefreshCw } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { hapticFeedback } from '@/lib/haptics';
 import type { RegenerateCompanionSlot } from '@/features/pause/public';
@@ -9,6 +8,9 @@ import {
 import { useSubscription } from '@/features/subscription/public-hooks';
 import { useProGate } from '@/features/subscription/public-hooks';
 import { isPaidLimitReached, showLimitReachedToast } from '@/features/subscription/public-limits';
+import { CompanionFeedbackRegenerateButton } from '@/screens/pause/components/companion/companion-feedback-regenerate-button';
+import { CompanionFeedbackVoteButtons } from '@/screens/pause/components/companion/companion-feedback-vote-buttons';
+import { resolveCompanionRegenerateClick } from '@/screens/pause/lib/companion-feedback-regenerate';
 
 interface Props {
   /** Reflection ID this companion belongs to */
@@ -59,16 +61,25 @@ export function CompanionFeedback({
     flexCreditsBalance,
   });
 
+  const voteDisabled = Boolean(vote) || loading || regenBusy;
+
   const handleRegenerate = () => {
-    if (!canRegenerate || regenBusy) return;
-    if (!isPro) {
+    const outcome = resolveCompanionRegenerateClick({
+      canRegenerate,
+      regenBusy,
+      isPro,
+      limitReached,
+    });
+    if (outcome.action === 'require_pro') {
       requirePro('companions');
       return;
     }
-    if (limitReached) {
+    if (outcome.action === 'limit_reached') {
       showLimitReachedToast({ feature: 'regenerate', startCheckout });
       return;
     }
+    if (outcome.action !== 'run') return;
+
     hapticFeedback('light');
     applyOptimisticDecrement('companion');
     Promise.resolve(onRegenerate?.()).finally(() => {
@@ -79,38 +90,16 @@ export function CompanionFeedback({
   if (compact) {
     return (
       <span className="inline-flex items-center gap-1">
-        <button
-          onClick={() => void handleVote('up')}
-          disabled={!!vote || loading || regenBusy}
-          className={`p-0.5 rounded transition-colors ${
-            vote === 'up' ? 'text-nox-text-highlight/90' : vote ? 'text-muted-foreground/10' : 'text-muted-foreground/20 hover:text-nox-text-highlight/60'
-          }`}
-          aria-label="Thumbs up"
-        >
-          <ThumbsUp className="h-2.5 w-2.5" />
-        </button>
-        <button
-          onClick={() => void handleVote('down')}
-          disabled={!!vote || loading || regenBusy}
-          className={`p-0.5 rounded transition-colors ${
-            vote === 'down' ? 'text-destructive/70' : vote ? 'text-muted-foreground/10' : 'text-muted-foreground/20 hover:text-destructive/50'
-          }`}
-          aria-label="Thumbs down"
-        >
-          <ThumbsDown className="h-2.5 w-2.5" />
-        </button>
-        {canRegenerate && (
-          <button
-            type="button"
-            onClick={handleRegenerate}
-            disabled={regenBusy}
-            className="p-0.5 rounded transition-colors text-muted-foreground/25 hover:text-nox-text-link/70 disabled:opacity-30"
-            aria-label={t('companions.regenerate')}
-            title={t('companions.regenerate')}
-          >
-            <RefreshCw className={`h-2.5 w-2.5 ${regenBusy ? 'animate-spin' : ''}`} />
-          </button>
-        )}
+        <CompanionFeedbackVoteButtons
+          vote={vote}
+          loading={loading}
+          disabled={voteDisabled}
+          onVote={(type) => void handleVote(type)}
+          compact
+        />
+        {canRegenerate ? (
+          <CompanionFeedbackRegenerateButton compact regenBusy={regenBusy} onClick={handleRegenerate} />
+        ) : null}
       </span>
     );
   }
@@ -118,53 +107,20 @@ export function CompanionFeedback({
   return (
     <div className="flex flex-wrap items-center gap-x-2 gap-y-1 mt-2">
       <span className="text-[9px] text-muted-foreground/30 font-mono">{t('companions.helpfulQuestion')}</span>
-      <button
-        onClick={() => void handleVote('up')}
-        disabled={!!vote || loading || regenBusy}
-        className={`p-1 rounded transition-colors ${
-          vote === 'up'
-            ? 'text-nox-text-highlight/90'
-            : vote
-            ? 'text-muted-foreground/10'
-            : 'text-muted-foreground/25 hover:text-nox-text-highlight/60'
-        }`}
-        aria-label="Thumbs up"
-      >
-        <ThumbsUp className="h-3 w-3" />
-      </button>
-      <button
-        onClick={() => void handleVote('down')}
-        disabled={!!vote || loading || regenBusy}
-        className={`p-1 rounded transition-colors ${
-          vote === 'down'
-            ? 'text-destructive/70'
-            : vote
-            ? 'text-muted-foreground/10'
-            : 'text-muted-foreground/25 hover:text-destructive/50'
-        }`}
-        aria-label="Thumbs down"
-      >
-        <ThumbsDown className="h-3 w-3" />
-      </button>
-      {vote && (
+      <CompanionFeedbackVoteButtons
+        vote={vote}
+        loading={loading}
+        disabled={voteDisabled}
+        onVote={(type) => void handleVote(type)}
+      />
+      {vote ? (
         <span className="text-[9px] text-muted-foreground/30 font-mono">
           {vote === 'up' ? t('companions.feedbackThanksUp') : t('companions.feedbackThanksDown')}
         </span>
-      )}
-      {canRegenerate && (
-        <>
-          <span className="text-[9px] text-muted-foreground/20 font-mono hidden sm:inline">·</span>
-          <button
-            type="button"
-            onClick={handleRegenerate}
-            disabled={regenBusy}
-            className="inline-flex items-center gap-1 text-[9px] font-sans font-medium text-muted-foreground/40 hover:text-nox-text-link/80 disabled:opacity-40 transition-colors"
-          >
-            <RefreshCw className={`h-3 w-3 ${regenBusy ? 'animate-spin' : ''}`} />
-            {regenBusy ? t('companions.regenerating') : t('companions.regenerate')}
-          </button>
-        </>
-      )}
+      ) : null}
+      {canRegenerate ? (
+        <CompanionFeedbackRegenerateButton regenBusy={regenBusy} onClick={handleRegenerate} />
+      ) : null}
     </div>
   );
 }
