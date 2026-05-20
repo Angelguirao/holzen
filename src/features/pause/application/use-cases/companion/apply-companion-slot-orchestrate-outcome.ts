@@ -3,7 +3,7 @@ import {
   applyCompanionSlotOrchestrateFailureUi,
   resolveCompanionSlotOrchestrateFailureUi,
   type ApplyCompanionSlotOrchestrateFailureUiPorts,
-} from './companion-slot-orchestrate-failure-ui';
+} from '@/features/pause/application/use-cases/ritual/frame/companion-slot-orchestrate-failure-ui';
 import {
   logCompanionSlotOrchestrateEmpty,
   logCompanionSlotOrchestrateFailed,

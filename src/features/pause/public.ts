@@ -459,7 +459,7 @@ export {
   resolveCompanionSlotOrchestrateFailureUi,
   type ApplyCompanionSlotOrchestrateFailureUiPorts,
   type CompanionSlotOrchestrateFailureUi,
-} from './application/use-cases/companion/companion-slot-orchestrate-failure-ui';
+} from './application/use-cases/ritual/frame/companion-slot-orchestrate-failure-ui';
 export {
   setCompanionSlotError,
   setCompanionSlotLoading,
