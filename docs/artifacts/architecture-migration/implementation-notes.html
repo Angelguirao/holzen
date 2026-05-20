@@ -1804,6 +1804,25 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-20</span>
+      <span>Phase A slice — drop orphaned ritual-pattern + breath-label exports from public.ts (§6)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>Backlog #1 skipped; peel dead <code>public.ts</code> re-exports</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd><code>reflect/</code> → <code>ritual/reflect/</code> was already complete on <code>cursor/arch-migrate-src-ca70</code>. Continue backlog #3 §6: remove <code>ritual-pattern</code> timing helpers and <code>breath-second-label-variant</code> from <code>public.ts</code> (no screen consumers via the barrel after prior peels). <code>ritual-pattern.ts</code> imports <code>FeelStepTile</code> from <code>domain/feel-step-tile</code> to break an application→public cycle. Presentation breath-label hook and session VM types import the use-case module directly.</dd>
+      <dt>Deviation</dt>
+      <dd>None — display helpers for breathing already live on <code>public-hooks.ts</code>.</dd>
+      <dt>Tradeoffs</dt>
+      <dd><code>writingTextareaClassName</code> and session storage helpers remain on <code>public.ts</code> for cross-surface consumers.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: peel <code>writingTextareaClassName</code> to a shared UI token, optional <code>breathing/</code> → <code>ritual/breathe/</code>, or wire more mutations exclusively via <code>PauseRepository</code> facades.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
 </body>
 </html>
