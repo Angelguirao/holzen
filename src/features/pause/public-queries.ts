@@ -229,8 +229,8 @@ export {
   type PauseReflectStepType,
 } from './infrastructure/queries/reflect-step-query';
 export { fetchHaikuTextForPauseInstance } from './infrastructure/queries/reflect/haiku-artifact-query';
+export { fetchOpeningMessageForPauseInstance } from './infrastructure/queries/reflect/opening-message-artifact-query';
 export {
-  fetchOpeningMessageForPauseInstance,
   generateReflectionAtReflectStep,
   persistReflectionArtifacts,
   type PersistReflectionArtifactsParams,
