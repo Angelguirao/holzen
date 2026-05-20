@@ -2,7 +2,7 @@
 
 > **Pre-strip / security reference (2026-05).** Shipped product scope: [active-surface.md](../ops/active-surface.md).
 
-> **Pause V2 (current):** `use-holzen` opens the pause via `pause_create_or_reuse` on Home; **`holzen-reflect`** runs from **`use-pause-reflect-generation`** / **`generateReflectionAtReflectStep`** once the deep ritual reaches **Reflect** (**`PauseSession`** keeps that hook enabled through **Frame**, second **Breathe**, and **Decide**), not from `use-holzen` on the non-silent path. Silent mode still writes a stub `reflection_text` on trigger.
+> **Pause V2 (current):** `useHolzenHomeContextState` (via **`HolzenProvider`** → **`useHolzen()`**) opens the pause via `pause_create_or_reuse` on Home; **`holzen-reflect`** runs from **`use-pause-reflect-generation`** / **`generateReflectionAtReflectStep`** once the deep ritual reaches **Reflect** (**`PauseSession`** keeps that hook enabled through **Frame**, second **Breathe**, and **Decide**), not from Home on the non-silent path. Silent mode still writes a stub `reflection_text` on trigger.
 
 This phase is the second "mental model pass": after Phase 1 (who can reach `/pause` and how auth works), we trace **how a manual pause is produced** (reflection + DB writes) and **how the pause UI consumes it** (`PauseSession`, companions, edge functions). If this contract is wrong, users see empty pause screens, wrong companions, or duplicate work.
 
@@ -49,10 +49,11 @@ This phase is the second "mental model pass": after Phase 1 (who can reach `/pau
 - Defines the "happy path" shape that `PauseSession` expects when coming from Home.
 - Maintainer-oriented overview (widgets, zen mode, checkout params, error helpers): [screens/home.md](../screens/home.md).
 
-### `src/screens/home/hooks/use-holzen.ts` — producer for pause state
+### `src/features/pause/presentation/use-holzen-home-context-state.ts` (+ `use-holzen-manual-trigger-orchestration.ts`) — producer for pause state
 
-- `manualTrigger` -> `generateMessage`: builds context from BTC data; **`pause_create_or_reuse`** (non-silent: no `holzen-reflect` on Home); **silent**: stub `reflection_text` upsert; sets `context`, `lastPauseInstanceId`, and **`message`** only when a reflection exists (silent or hydrated from DB).
-- Cooldown: `manualCooldownRemaining` + `localStorage` key per user.
+- Exposed as **`useHolzen()`** from **`HolzenProvider`** (`src/app/components/HolzenProvider.tsx`).
+- `manualTrigger` → `generateMessage`: builds context from BTC data; **`pause_create_or_reuse`** (non-silent: no `holzen-reflect` on Home); **silent**: stub `reflection_text` upsert; sets `context`, `lastPauseInstanceId`, and **`message`** only when a reflection exists (silent or hydrated from DB).
+- Cooldown: `manualCooldownRemaining` + `localStorage` key per user (`features/market/application/manual-cooldown.ts`).
 
 ### `src/screens/pause/PauseSessionScreen.tsx` — pause UI orchestration + restoration
 
@@ -83,7 +84,7 @@ This phase is the second "mental model pass": after Phase 1 (who can reach `/pau
 ## Runtime touchpoints: endpoints, events, and side effects
 
 - **Edge function: `holzen-reflect`**
-  - Client: `invokeEdge('holzen-reflect', …)` from **`src/features/pause/infrastructure/reflect/reflection-artifact.ts`** (`generateReflectionAtReflectStep`), used by **`use-pause-reflect-generation.ts`** from **`PauseSession`** once the deep ritual reaches **Reflect** (the hook stays enabled on **Frame**, second **Breathe**, and **Decide**). **`use-holzen`** does **not** invoke it on the non-silent Home path.
+  - Client: `invokeEdge('holzen-reflect', …)` from **`src/features/pause/infrastructure/reflect/reflection-artifact.ts`** (`generateReflectionAtReflectStep`), used by **`use-pause-reflect-generation.ts`** from **`PauseSession`** once the deep ritual reaches **Reflect** (the hook stays enabled on **Frame**, second **Breathe**, and **Decide**). **`useHolzenHomeContextState`** does **not** invoke it on the non-silent Home path.
 - **Edge function: `companion-orchestrate`**
   - Client: `invokeEdge('companion-orchestrate', …)` from `use-companion-data.ts` (multiple call sites for load/regenerate).
 - **Direct Supabase client writes (browser)**:
@@ -95,8 +96,8 @@ This phase is the second "mental model pass": after Phase 1 (who can reach `/pau
 ## Data models affected
 
 - **`pause_instances`**: inserted on manual generate; `PauseSession` logs step events for mood/outcome/note/etc.
-- **`profiles`**: `last_context` / `last_trigger_at` are **not** written by **`use-holzen`** on the manual path today; automatic / cron paths update `last_context` and `last_trigger_at` as documented in the pause AI doc.
-- **`collections` / `collection_items`**: optional user-defined groupings keyed by `pause_instance_id` (see `use-library.ts`).
+- **`profiles`**: `last_context` / `last_trigger_at` are **not** written by **`useHolzenHomeContextState`** on the manual path today; automatic / cron paths update `last_context` and `last_trigger_at` as documented in the pause AI doc.
+- **`collections` / `collection_items`**: **legacy full IA only** — user Archive Collections tab stripped; code in `src/legacy/archive-collections/` (not pause-first MVP).
 - **Companion-related tables** (server-side via orchestrate): `pause_ai_artifacts`, `companion_cache`, `companion_serves`, etc.
 
 ## Systems that emerge from this review
