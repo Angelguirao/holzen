@@ -1,7 +1,7 @@
 import {
   rotatingKickerIndexFromElapsed,
   secondsIntoTrianglePattern,
-} from '@/features/pause/application/use-cases/breathing/ritual-pattern';
+} from '@/features/pause/application/use-cases/ritual/breathe/ritual-pattern';
 
 export type ResolveTriangleKickerDisplayInput = {
   kickers: readonly string[];

@@ -2279,6 +2279,25 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-20</span>
+      <span>Phase A slice — colocate ritual-pattern under ritual/breathe (Tier 5)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>Backlog #1 complete; <code>ritual-pattern</code> → <code>ritual/breathe/</code></h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd><code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code> was already complete on <code>cursor/arch-migrate-src-ca70</code>. This slice moves the ritual breathing pattern hub (<code>ritual-pattern.ts</code> + test) beside other breathe modules; <code>public-hooks</code>, orb metrics, and triangle kicker helpers import the ritual path; <code>phase-advance.test</code> uses sibling <code>./ritual-pattern</code>.</dd>
+      <dt>Deviation</dt>
+      <dd>None — triangle/box phase resolution unchanged.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Did not move orb metrics or standalone patterns in the same commit.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: continue §6 <code>public.ts</code> peel (<code>RitualDepth</code> for session presentation conductors), or backlog #4 <code>PauseRepository</code> wiring.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
 </body>
 </html>
