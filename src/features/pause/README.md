@@ -22,7 +22,7 @@ features/pause/
   public.ts | public-queries.ts | public-rpc.ts | public-hooks.ts
 ```
 
-**Transitional paths (move incrementally):** reflect generation pipeline is under `application/use-cases/ritual/reflect/`; step-log use cases (`run-pause-reflection-step-log`, `run-pause-favorite-toggle`, `run-pause-reflect-metadata-log`) still at `application/use-cases/reflect/`. Companion use cases still at `application/use-cases/companion/` → target `ritual/frame/`. User **collections** code is in `src/legacy/archive-collections/` (not shipped MVP).
+**Transitional paths (move incrementally):** reflect generation pipeline + `run-pause-reflection-step-log` are under `application/use-cases/ritual/reflect/`; `run-pause-favorite-toggle` and `run-pause-reflect-metadata-log` still at `application/use-cases/reflect/`. Companion use cases still at `application/use-cases/companion/` → target `ritual/frame/`. User **collections** code is in `src/legacy/archive-collections/` (not shipped MVP).
 
 **Brief vs deep:** one bounded context. Depth is `RitualDepth` on the instance / persisted session — not separate feature folders.
 

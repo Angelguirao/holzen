@@ -1,4 +1,4 @@
-import type { ReflectionStepLogStoragePort } from '../../application/use-cases/reflect/run-pause-reflection-step-log';
+import type { ReflectionStepLogStoragePort } from '../../application/use-cases/ritual/reflect/run-pause-reflection-step-log';
 
 /** Tab-scoped dedupe for `reflection_step` progression logging. */
 export const reflectionStepSessionStorage: ReflectionStepLogStoragePort = {
