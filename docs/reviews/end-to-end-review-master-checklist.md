@@ -242,7 +242,8 @@ Use when **§0–§10** are fully **`[x]`** but you still want a **flow-first** 
 |-----|------|
 | [full-app-review-backlog.md](full-app-review-backlog.md) | Hour estimates, sequencing narrative, dependencies |
 | [react-spa-review-template.md](react-spa-review-template.md) | PR + audit questions per slice |
-| [design/information-architecture.md](../design/information-architecture.md) | Product IA vs routes |
+| [design/information-architecture.md](../design/information-architecture.md) | Product IA narrative (§1–§3 full-IA reference) |
+| [ops/active-surface.md](../ops/active-surface.md) | **Canonical shipped routes/tabs** (pause-first) |
 
 ---
 
