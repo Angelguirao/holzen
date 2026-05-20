@@ -3,62 +3,49 @@
  * Screen map: docs/screens/pause.md · Product model: docs/systems/pause-system.md
  */
 import { useCallback } from 'react';
-import { useReducedMotion } from 'framer-motion';
-import { useNavigate } from 'react-router-dom';
-import { useTranslation } from 'react-i18next';
-import { useHolzen } from '@/screens/home/hooks/use-holzen';
-import { useSubscription } from '@/features/subscription/public-hooks';
-import { useProGate } from '@/features/subscription/public-hooks';
 import { usePauseFavoriteToggle } from '@/screens/pause/hooks/use-pause-favorite-toggle';
 import { usePauseShiftFrameDoneHandler } from '@/screens/pause/hooks/use-pause-shift-frame-done-handler';
-import { usePauseSessionExitNavigation } from '@/screens/pause/hooks/use-pause-session-exit-navigation';
 import { usePauseSessionMoodAndPersist } from '@/screens/pause/hooks/use-pause-session-mood-and-persist';
 import { usePauseSessionRitualState } from '@/screens/pause/hooks/use-pause-session-ritual-state';
 import { usePauseSessionScaffoldPresentation } from '@/screens/pause/hooks/use-pause-session-scaffold-presentation';
-import { usePauseSessionBreathSecondLabelVariant } from '@/screens/pause/hooks/use-pause-session-breath-second-label-variant';
 import { usePauseSessionTerminalEntryRedirect } from '@/screens/pause/hooks/use-pause-session-terminal-entry-redirect';
 import { usePauseSessionShellBootstrap } from '@/screens/pause/hooks/use-pause-session-shell-bootstrap';
 import { usePauseSessionBreathHandlers } from '@/screens/pause/hooks/use-pause-session-breath-handlers';
-import { JOURNEY_PREFIX } from '@/lib/app-routes';
-import { clearSession } from '@/features/pause/public';
 import { usePauseSessionReflectAndDecide } from '@/screens/pause/hooks/use-pause-session-reflect-and-decide';
+import { usePauseSessionProviders } from '@/screens/pause/hooks/use-pause-session-providers';
 
 export function usePauseSessionScreen() {
-  const { t } = useTranslation();
-  const navigate = useNavigate();
-  const { handleReturn, handleClose } = usePauseSessionExitNavigation(navigate);
-  const handleBriefSaveToJourney = useCallback(() => {
-    clearSession();
-    navigate(JOURNEY_PREFIX, { replace: true });
-  }, [navigate]);
-  const prefersReducedMotion = useReducedMotion();
-  const breathSecondLabelVariant = usePauseSessionBreathSecondLabelVariant();
   const {
+    t,
+    navigate,
+    handleReturn,
+    handleClose,
+    handleBriefSaveToJourney,
+    prefersReducedMotion,
+    breathSecondLabelVariant,
+    holzenForShell,
     mantra,
     dismissMessage,
-    message: holzenMessage,
-    context: holzenContext,
-    companions: holzenCompanions,
-    lastPauseInstanceId: holzenLastPauseInstanceId,
-    companionPrefs: holzenCompanionPrefs,
-    severity: holzenSeverity,
+    message,
+    context,
+    companions,
+    companionPrefs,
+    severity,
     profileLoaded,
     resyncOpenPauseFromDb,
     btcData,
     trackedAssetId,
-  } = useHolzen();
-  const {
     subscribed,
-    loading: subLoading,
+    subLoading,
     entitlement,
     canEngagePause,
     checkoutLoading,
     trialLoading,
     ensureTrial,
     startReactivationCheckout,
-    refresh: refreshSubscription,
-  } = useSubscription();
-  const { requirePro } = useProGate();
+    refreshSubscription,
+    requirePro,
+  } = usePauseSessionProviders();
 
   const {
     restored,
@@ -85,14 +72,7 @@ export function usePauseSessionScreen() {
     hasCoalescedShellSession,
     waitingForFetch,
   } = usePauseSessionShellBootstrap({
-    holzen: {
-      message: holzenMessage,
-      context: holzenContext,
-      lastPauseInstanceId: holzenLastPauseInstanceId,
-      companions: holzenCompanions,
-      companionPrefs: holzenCompanionPrefs,
-      severity: holzenSeverity,
-    },
+    holzen: holzenForShell,
     navigate,
     resyncOpenPauseFromDb,
     handleClose,
