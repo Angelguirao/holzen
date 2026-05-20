@@ -161,6 +161,10 @@ export {
   type UseCompanionSectionParams,
 } from './presentation/use-companion-section';
 export {
+  useCompanionSectionExpansion,
+  type UseCompanionSectionExpansionParams,
+} from './presentation/use-companion-section-expansion';
+export {
   useGroundingEnrichment,
   type GroundingEnrichment,
 } from './presentation/use-grounding-enrichment';
