@@ -270,3 +270,11 @@ export {
   type ReflectMoodHistoryEntry,
   type ReflectRecencyHints,
 } from './infrastructure/reflect/load-reflect-recency-hints';
+export {
+  fetchSettingsDataExportBundle,
+  type SettingsDataExportBundle,
+  type SettingsExportAiArtifact,
+  type SettingsExportCompanionEvent,
+  type SettingsExportPauseRow,
+  type SettingsExportStepEvent,
+} from './infrastructure/queries/settings-data-export-query';
