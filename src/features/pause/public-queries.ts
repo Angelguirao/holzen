@@ -59,6 +59,12 @@ export {
   type CompanionFullviewKind,
 } from './infrastructure/analytics-events';
 export {
+  demoteCompanionCacheEntry,
+  promoteCompanionCacheEntry,
+  setCompanionCacheSourceUntrusted,
+  type CompanionCacheAdminMutationResult,
+} from './infrastructure/queries/companion-cache-admin-mutations';
+export {
   BULK_HOLD_PENDING_DISABLED_USER_ID,
   BULK_HOLD_PENDING_QUERY_LEAF,
   BULK_HOLD_PENDING_QUERY_PREFIX,
