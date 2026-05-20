@@ -416,7 +416,7 @@ export {
   logCompanionSlotOrchestrateFilled,
   logCompanionSlotOrchestrateInvoke,
 } from './application/use-cases/ritual/frame/companion-slot-orchestrate-telemetry';
-export { runCompanionInterventionBootstrap } from './application/use-cases/companion/run-companion-intervention-bootstrap';
+export { runCompanionInterventionBootstrap } from './application/use-cases/ritual/frame/run-companion-intervention-bootstrap';
 export {
   buildCompanionFeedbackVoteMetadata,
   type CompanionFeedbackVote,
