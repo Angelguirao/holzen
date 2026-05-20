@@ -140,7 +140,7 @@ Exact behavior in code changes with **`PROMPT_VERSION`** and the files in **§6*
 | Perplexity client | `supabase/functions/_shared/perplexity-client.ts` |
 | Session angles | `supabase/functions/_shared/session-intent.ts` |
 | Orchestrator | `supabase/functions/companion-orchestrate/index.ts` |
-| Client invoke + recency | `src/screens/pause/hooks/use-companion-data.ts` |
+| Client invoke + recency | `src/features/pause/presentation/use-companion-data.ts` (export: `public-hooks`) |
 | Attribution | `supabase/functions/_shared/source-validation.ts` |
 | Quality gate | `supabase/functions/_shared/quality.ts` |
 | Full View page | `src/screens/pause/CompanionSignalPage.tsx` (route `/companion/signal/:pauseInstanceId`) |
