@@ -71,11 +71,6 @@ export {
   loadSession,
   saveSession,
 } from './infrastructure/session/persisted-session-storage';
-export { resolveBreathOrbVisualMetrics } from './application/use-cases/breathing/pause-breath-orb-metrics';
-export {
-  resolveTriangleKickerDisplay,
-  type TriangleKickerDisplay,
-} from './application/use-cases/breathing/resolve-triangle-kicker-display';
 export {
   effectivePauseShiftIntensity,
   effectivePauseShiftMood,
