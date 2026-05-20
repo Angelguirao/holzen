@@ -8,7 +8,7 @@ import {
 } from '@/features/market/public';
 import { useAuth } from '@/features/auth/public';
 import { useProfile } from '@/features/user/public-hooks';
-import { millisecondsUntilNextQuarterHour } from '@/features/pause/public';
+import { millisecondsUntilNextQuarterHour } from '@/features/pause/application/use-cases/scheduling/milliseconds-until-next-quarter-hour';
 import { useOpenPauseHomePreview } from './use-open-pause-home-preview';
 import { useHolzenManualTriggerOrchestration } from './use-holzen-manual-trigger-orchestration';
 import { useManualPauseTrigger } from './use-manual-pause-trigger';

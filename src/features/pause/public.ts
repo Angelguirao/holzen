@@ -104,10 +104,6 @@ export {
   type PickPauseHolzenProvidersSliceSource,
 } from './application/use-cases/session/pause-holzen-providers-slice';
 export {
-  millisecondsUntilNextQuarterHour,
-  PAUSE_CRON_QUARTER_INTERVAL_MS,
-} from './application/use-cases/scheduling/milliseconds-until-next-quarter-hour';
-export {
   zenModeHomePauseSnapshot,
   ZEN_MODE_HOME_COMPANION_PREFS,
 } from './application/use-cases/home/zen-mode-home-pause-snapshot';
@@ -233,4 +229,3 @@ export {
   type PauseInstanceArchiveMeta,
   type PauseInstanceArchiveMetaGetter,
 } from './domain/archive-segment';
-export { getSessionQuote } from './application/use-cases/session/wisdom-quotes';
