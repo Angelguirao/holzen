@@ -1,6 +1,6 @@
 import type { TFunction } from 'i18next';
 import { isHolzenMarketDisplayUserError, type BtcPriceData } from '@/features/market/public';
-import { isPausePersistError } from '../reflection-persist-error';
+import { isPausePersistError } from '../ritual/reflect/reflection-persist-error';
 
 /** Buckets for Home pause widget + zen error copy (aligned with `useHolzen` setError strings). */
 export type PauseHomeErrorKind = 'persist' | 'network' | 'ai' | 'generic';
