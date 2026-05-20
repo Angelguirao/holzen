@@ -263,7 +263,7 @@ export {
   loadReflectRecencyHints,
   type ReflectMoodHistoryEntry,
   type ReflectRecencyHints,
-} from './infrastructure/edge/reflect/load-reflect-recency-hints';
+} from './infrastructure/queries/reflect/load-reflect-recency-hints';
 export {
   fetchSettingsDataExportBundle,
   type SettingsDataExportBundle,

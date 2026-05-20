@@ -2146,6 +2146,25 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-20</span>
+      <span>Phase A slice — group reflect recency reads under queries/reflect (Tier 5)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>Backlog #1 complete; <code>loadReflectRecencyHints</code> → <code>queries/reflect/</code></h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd><code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code> was already complete. Colocate Supabase recency reads with other reflect artifact queries; <code>infrastructure/edge/reflect/</code> keeps invoke + persist + session-storage only.</dd>
+      <dt>Deviation</dt>
+      <dd>None — <code>public-queries</code> re-export path only; <code>generateReflectionAtReflectStep</code> behavior unchanged.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Did not move <code>reflection-step-session-storage</code> (browser session port, not DB) in the same commit.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: continue §6 <code>public.ts</code> peel or next <code>ritual/breathe/</code> cluster.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
 </body>
 </html>

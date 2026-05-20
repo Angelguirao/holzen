@@ -155,7 +155,7 @@ Tone, reflection style, custom prompt, motivations, mantra, grounding activities
 **2. `moodHistory` — “how have they been feeling lately?”**  
 Canonical source in Pause V2 is **`pause_step_events`**: pair **`initial_emotion_logged`** with **`outcome_logged`** per `pause_instance_id`, then sort newest-first (`**pause-cron-parity.ts**` → `**pauseRecencyInputs**` on the server; **`loadMoodHistoryForOrchestrate`** in the browser for **`companion-orchestrate`**). The **`generateUnifiedReflection`** prompt uses `moodHistory` when the **caller passes it**.
 
-- **Manual (reflect step):** **`use-pause-reflect-generation`** / **`generateReflectionAtReflectStep`** loads the same shapes as cron via **`loadReflectRecencyHints`** (`src/features/pause/infrastructure/edge/reflect/load-reflect-recency-hints.ts`) and passes `moodHistory` / `recentMessages` / `recentHaikus` into **`holzen-reflect`** when present (parity with **`pauseRecencyInputs`** in **`check-volatility`**).  
+- **Manual (reflect step):** **`use-pause-reflect-generation`** / **`generateReflectionAtReflectStep`** loads the same shapes as cron via **`loadReflectRecencyHints`** (`src/features/pause/infrastructure/queries/reflect/load-reflect-recency-hints.ts`) and passes `moodHistory` / `recentMessages` / `recentHaikus` into **`holzen-reflect`** when present (parity with **`pauseRecencyInputs`** in **`check-volatility`**).  
 - **Manual (orchestrator):** **`useCompanionData`** loads `moodHistory` from **`pause_step_events`** (`**loadMoodHistoryForOrchestrate`**) and sends it to **`companion-orchestrate`** (intervention + lazy slots).  
 - **Automatic (claim-time):** `**check-volatility`** calls `**pauseRecencyInputs**` to optionally set **`last_reported_mood`** in the **`context_snapshot`** when creating the pause row; the reflection LLM still runs only at **Reflect** in the client.
 
@@ -783,7 +783,7 @@ supabase/functions/
     ├── phase-config.ts              # library → cache → live phase toggles (COMPANION_PHASE_*)
     ├── quality.ts, sanitize.ts, cache.ts, content-library.ts, observe.ts, ratelimit.ts, fallbacks.ts
 
-src/features/pause/infrastructure/edge/reflect/load-reflect-recency-hints.ts   # browser holzen-reflect: moodHistory + dedup pools (parity with pauseRecencyInputs on claim)
+src/features/pause/infrastructure/queries/reflect/load-reflect-recency-hints.ts   # browser holzen-reflect: moodHistory + dedup pools (parity with pauseRecencyInputs on claim)
 src/features/market/infrastructure/fetch-market-data.ts                 # fetchBtcData (browser market context)
 src/app/components/HolzenProvider.tsx   # Home manual trigger → openManualPauseFromHome (public-rpc)
 src/features/pause/presentation/use-holzen-home-context-state.ts
