@@ -44,6 +44,12 @@ export function holdProgressWithinPhase(elapsedSec: number, durationSec: number)
   return Math.min(1, Math.max(0, elapsedSec / (durationSec - 1)));
 }
 
+/** Parses `breathing.triangleRotatingKickers` i18n `returnObjects` payload. */
+export function parseTriangleRotatingKickersI18n(raw: unknown): string[] {
+  if (!Array.isArray(raw)) return [];
+  return raw.filter((x): x is string => typeof x === 'string');
+}
+
 /** Which kicker string to show (0-based), holding the last line for any tail time. */
 export function rotatingKickerIndexFromElapsed(
   secondsIntoPattern: number,
