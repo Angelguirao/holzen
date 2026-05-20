@@ -1,9 +1,9 @@
 import { useHolzen } from '@/screens/home/hooks/use-holzen';
-import { useCompanionLibraryFavorites } from '@/screens/pause/hooks/use-companion-library-favorites';
 import type { CompanionData, CompanionPrefs } from '@/screens/pause/components/CompanionSection';
 import { useCompanionOrchestration } from '@/screens/pause/hooks/use-companion-orchestration';
 import {
   useCompanionAccess,
+  useCompanionLibraryFavorites,
   useCompanionUiCompletion,
 } from '@/features/pause/public-hooks';
 import { useToast } from '@/components/ui/use-toast';
