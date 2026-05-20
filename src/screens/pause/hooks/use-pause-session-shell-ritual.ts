@@ -1,6 +1,8 @@
-import { usePauseSessionRitualState } from '@/screens/pause/hooks/use-pause-session-ritual-state';
-import { usePauseSessionTerminalEntryRedirect } from '@/features/pause/public-hooks';
-import { usePauseSessionShellBootstrap } from '@/screens/pause/hooks/use-pause-session-shell-bootstrap';
+import {
+  usePauseSessionRitualState,
+  usePauseSessionShellBootstrap,
+  usePauseSessionTerminalEntryRedirect,
+} from '@/features/pause/public-hooks';
 import type { usePauseSessionProviders } from '@/screens/pause/hooks/use-pause-session-providers';
 
 type PauseSessionProviders = ReturnType<typeof usePauseSessionProviders>;

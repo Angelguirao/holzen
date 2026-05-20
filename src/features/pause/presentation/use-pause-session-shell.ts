@@ -1,6 +1,6 @@
 import { useMemo } from 'react';
 import type { PauseSessionShellHolzen } from '@/features/pause/domain/pause-session-shell-holzen';
-import { usePauseSessionFetch } from '@/features/pause/public-hooks';
+import { usePauseSessionFetch } from './use-pause-session-fetch';
 import {
   computePauseSessionHydration,
   computePauseSessionResolved,
