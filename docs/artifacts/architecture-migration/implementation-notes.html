@@ -3231,6 +3231,25 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-20</span>
+      <span>Phase A slice — colocate brief-past-step hook under presentation/session/</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>Backlog #1 complete; Tier 4 session brief ritual entry</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd><code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code> subfolders (<code>steps/</code>, <code>hub/</code>, <code>flows/</code>, …) is complete on <code>cursor/arch-migrate-src-ca70</code> — parallel agent landed <code>flows/</code> before this session. This slice moves <code>use-pause-session-brief-past-step</code> (+ test) beside entry effects and brief→deep under <code>presentation/session/</code>; <code>public-hooks</code> re-export path only.</dd>
+      <dt>Deviation</dt>
+      <dd>None — matches §3.2 / §10.1 session conductor grouping.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Scaffold/flow-core hooks remain flat under <code>presentation/</code> until a later peel.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: colocate scaffold/flow-core under <code>presentation/session/</code>, or wire more ritual mutations through <code>PauseRepository</code> (backlog #4).</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
 </body>
 </html>

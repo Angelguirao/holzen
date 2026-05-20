@@ -388,7 +388,7 @@ export { usePauseSessionFetch } from './presentation/session/use-pause-session-f
 export {
   usePauseSessionBriefPastStep,
   type UsePauseSessionBriefPastStepParams,
-} from './presentation/use-pause-session-brief-past-step';
+} from './presentation/session/use-pause-session-brief-past-step';
 export {
   usePauseSessionShell,
   type UsePauseSessionShellParams,
