@@ -7,6 +7,7 @@ import {
 } from '@/features/subscription/public-limits';
 import type { RegenerateCompanionSlot } from '@/features/pause/public';
 import {
+  applyCompanionSlotOrchestrateFailureUi,
   companionSlotToGenerationTaxonomy,
   resolveCompanionSlotOrchestrateFailureUi,
   runCompanionSlotOrchestrate,
@@ -137,20 +138,18 @@ export function useCompanionSlotOrchestrateActions({
               bodyCode: failure.code,
             },
           );
-          const failureUi = resolveCompanionSlotOrchestrateFailureUi(failure, mode);
-          if (failureUi.action === 'lazy_paywall_upgrade_required') {
-            fetchedSlotsRef.current.delete(slot);
-            requirePro('companions');
-          } else if (failureUi.action === 'lazy_paywall_limit_reached') {
-            fetchedSlotsRef.current.delete(slot);
-            showLimitReachedToast({ feature: 'companion', startCheckout });
-          } else {
-            toast({
-              title: failureUi.title,
-              description: failureUi.description,
-              variant: 'destructive',
-            });
-          }
+          applyCompanionSlotOrchestrateFailureUi(
+            resolveCompanionSlotOrchestrateFailureUi(failure, mode),
+            slot,
+            {
+              clearLazyFetchSlot: (s) => fetchedSlotsRef.current.delete(s),
+              requirePro: () => requirePro('companions'),
+              showLimitReached: () =>
+                showLimitReachedToast({ feature: 'companion', startCheckout }),
+              showErrorToast: (title, description) =>
+                toast({ title, description, variant: 'destructive' }),
+            },
+          );
           setCompanionSlotError(slot, companionSlotErrorSetters, true);
           return;
         }
