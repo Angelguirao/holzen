@@ -1,6 +1,6 @@
 import { describe, it, expect, vi } from 'vitest';
 import { createRef } from 'react';
-import { buildPauseSessionScaffoldRitualPayloads } from '@/features/pause/public';
+import { buildPauseSessionScaffoldRitualPayloads } from './scaffold-ritual-payloads';
 import { buildPauseSessionStepTransitionConfig } from '@/features/pause/public';
 import type { PauseBreathingHandle } from '@/features/pause/public';
 import { DEFAULT_COMPANIONS, DEFAULT_PREFS } from '@/features/pause/public';

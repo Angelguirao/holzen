@@ -290,7 +290,7 @@ The repo is mid-migration. Expect:
 | Session conductors | `presentation/*.ts` (flat + `presentation/session/` + `presentation/reflect/` + `presentation/decide/` + `presentation/companion/` + `presentation/home/`) — mood chrome + favorite in `reflect/` | `presentation/session/`, `reflect/`, `decide/`, `companion/`, `home/`, `archive/` | Reflect + companion + decide + home hooks grouped (May 2026); `use-pause-session-mood-chrome-handlers` in `reflect/` (May 2026); peel `public.ts` + `presentation/archive/` next |
 | Archive queries | `infrastructure/queries/archive/` (`archive-list-query.ts`, `archive-pauses-tab-query.ts`) | `infrastructure/queries/archive/` | Done (May 2026) |
 | Reflect edge + artifact I/O | `infrastructure/edge/reflect/` (`holzen-reflect-edge`, `reflection-artifact`, `load-reflect-recency-hints`, `reflection-step-session-storage`) | under `infrastructure/edge/` (§3) | Done (May 2026) |
-| Ports | `ports/pause-repository.ts`; `public-rpc` → `supabasePauseRepository` for step + lifecycle RPCs | + ReflectGenerator, CompanionOrchestrator, … | Default port wiring done (May 2026); §6 peel in progress (feedback toasts, zoom-out payload helpers, frame read-time/history formatters off `public.ts` → `public-hooks`, May 2026) |
+| Ports | `ports/pause-repository.ts`; `public-rpc` → `supabasePauseRepository` for step + lifecycle RPCs | + ReflectGenerator, CompanionOrchestrator, … | Default port wiring done (May 2026); §6 peel in progress (feedback toasts, zoom-out payload helpers, frame read-time/history formatters off `public.ts` → `public-hooks`, scaffold ritual payloads presentation-local, May 2026) |
 
 Do not big-bang rename folders; one vertical slice per commit ([refactoring-strategy.md](../fundamentals/refactoring-strategy.md)).
 

@@ -1,8 +1,8 @@
+import { buildPauseSessionScaffoldRitualDerived } from '@/features/pause/public';
 import {
-  buildPauseSessionScaffoldRitualDerived,
   buildPauseSessionScaffoldRitualPayloads,
   type PauseSessionScaffoldRitualPayloadsParams,
-} from '@/features/pause/public';
+} from './session/scaffold-ritual-payloads';
 
 export type PauseSessionScaffoldRitualDerivedParams = Parameters<
   typeof buildPauseSessionScaffoldRitualDerived
