@@ -2756,6 +2756,25 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-20</span>
+      <span>Phase A slice — colocate go-back session hook under presentation/session/</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>Tier 5 presentation grouping — backlog #1 already complete</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd><code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code> was already complete on <code>cursor/arch-migrate-src-ca70</code> (no legacy path). Move <code>use-pause-session-go-back</code> (+ test) beside other session conductors under <code>presentation/session/</code>; <code>public-hooks</code> re-export path only; <code>use-pause-session-breath-navigation</code> imports sibling path.</dd>
+      <dt>Deviation</dt>
+      <dd>None — matches §3.2 / §10.1 session conductor grouping.</dd>
+      <dt>Tradeoffs</dt>
+      <dd><code>use-pause-session-shell-bootstrap</code> remains flat under <code>presentation/</code> until a follow-up peel.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: colocate shell bootstrap + breath-handlers under <code>presentation/session/</code>, lifecycle create/dismiss use cases on <code>public-rpc</code>, or port-backed companion feedback vote write path.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
 </body>
 </html>
