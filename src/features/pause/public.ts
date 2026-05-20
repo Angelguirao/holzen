@@ -54,11 +54,6 @@ export {
 } from './domain/session-model';
 export { migratePersistedPauseSession } from './application/use-cases/session/migrate-persisted-session';
 export {
-  clearSession,
-  loadSession,
-  saveSession,
-} from './infrastructure/session/persisted-session-storage';
-export {
   effectivePauseShiftIntensity,
   effectivePauseShiftMood,
   hasPauseShiftOrPostEmotion,

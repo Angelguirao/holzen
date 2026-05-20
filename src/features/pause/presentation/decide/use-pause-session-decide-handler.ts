@@ -11,8 +11,8 @@ import {
   showPauseOutcomeNotCompletedToast,
   showPauseOutcomeSaveFailedToast,
 } from '@/features/pause/application/use-cases/feedback/outcome-toast';
+import { clearSession } from '@/features/pause/infrastructure/session/persisted-session-storage';
 import {
-  clearSession,
   getSessionQuote,
   type MoodValue,
   type PauseImpactData,

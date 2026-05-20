@@ -32,12 +32,17 @@ vi.mock('@/features/pause/application/use-cases/feedback/outcome-toast', () => (
   showPauseOutcomeNotCompletedToast: vi.fn(),
 }));
 
+vi.mock('@/features/pause/infrastructure/session/persisted-session-storage', () => ({
+  clearSession: () => clearSessionMock(),
+  loadSession: () => null,
+  saveSession: vi.fn(),
+}));
+
 vi.mock('@/features/pause/public', async (importOriginal) => {
   const actual = await importOriginal<typeof import('@/features/pause/public')>();
   return {
     ...actual,
     getSessionQuote: () => ({ text: 'Q', author: 'A' }),
-    clearSession: () => clearSessionMock(),
   };
 });
 
