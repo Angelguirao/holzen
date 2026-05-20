@@ -2374,6 +2374,25 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-20</span>
+      <span>Phase A slice — reflect note/tag use cases under ritual/reflect (Tier 5)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>Backlog #1 complete; split <code>run-pause-reflect-metadata-log</code> into note + tag modules</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd><code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code> was already complete on <code>cursor/arch-migrate-src-ca70</code>. Smallest remaining reflect cluster: one concern per file — <code>run-pause-reflect-note-update</code> and <code>run-pause-reflect-tag-update</code> (+ tests) replace combined metadata module; <code>public-rpc</code> facades unchanged.</dd>
+      <dt>Deviation</dt>
+      <dd>None — matches §3.1 / §10.1 reflect beat grouping.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Did not rename <code>logPauseReflectNote</code> / <code>logPauseReflectTags</code> RPC exports — presentation import paths unchanged.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: continue backlog #3 §6 <code>public.ts</code> peel for application/session types, or backlog #4 <code>PauseRepository</code> wiring for remaining mutations.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
 </body>
 </html>

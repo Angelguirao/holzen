@@ -7,7 +7,7 @@ import {
   getLatestPauseReflectTagsQueryOptions,
   PAUSE_REFLECT_STEP_TAGS,
   pauseReflectStepLatestQueryKey,
-} from '../../public-queries';
+} from '@/features/pause/public-queries';
 
 /** Reflect post-it tags: hydrate from latest step event, commit via `pause_log_step`. */
 export function usePauseReflectTags(pauseInstanceId: string) {
