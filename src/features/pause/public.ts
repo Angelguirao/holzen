@@ -357,6 +357,7 @@ export {
 export {
   BRIEF_TRIANGLE_CYCLE_COUNT,
   holdProgressWithinPhase,
+  parseTriangleRotatingKickersI18n,
   PAUSE_RITUAL_BREATHING_PATTERN_MODE,
   resolveBreathCycleTotal,
   resolvePauseBreathingPhases,

@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest';
 import {
   BRIEF_TRIANGLE_CYCLE_COUNT,
   holdProgressWithinPhase,
+  parseTriangleRotatingKickersI18n,
   PAUSE_RITUAL_BREATHING_PATTERN_MODE,
   resolveBreathCycleTotal,
   resolvePauseBreathingPhases,
@@ -50,6 +51,11 @@ describe('pause-breathing-pattern', () => {
         phaseDurationsSec: d,
       }),
     ).toBe(12 + 8 + 3);
+  });
+
+  it('parseTriangleRotatingKickersI18n keeps string entries only', () => {
+    expect(parseTriangleRotatingKickersI18n(['a', 1, 'b'])).toEqual(['a', 'b']);
+    expect(parseTriangleRotatingKickersI18n(null)).toEqual([]);
   });
 
   it('holdProgressWithinPhase maps discrete seconds to 0→1 within a hold', () => {

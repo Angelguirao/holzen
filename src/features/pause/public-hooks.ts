@@ -186,6 +186,11 @@ export { usePauseSessionGoToStep } from './presentation/use-pause-session-go-to-
 export { usePauseSessionHeaderBackHandler } from './presentation/use-pause-session-header-back-handler';
 export { usePauseSessionBreathTimedActiveReset } from './presentation/use-pause-session-breath-timed-active-reset';
 export {
+  usePauseBreathingTimedLoop,
+  type PauseBreathingPhase,
+  type UsePauseBreathingTimedLoopInput,
+} from './presentation/use-pause-breathing-timed-loop';
+export {
   usePauseSessionBreathUi,
   type UsePauseSessionBreathUiParams,
 } from './presentation/use-pause-session-breath-ui';
