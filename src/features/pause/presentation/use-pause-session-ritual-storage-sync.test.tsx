@@ -1,7 +1,7 @@
 import { describe, expect, it, vi, beforeEach } from 'vitest';
 import { renderHook } from '@testing-library/react';
 import { usePauseSessionRitualStorageSync } from './use-pause-session-ritual-storage-sync';
-import { type PersistedSession } from '@/features/pause/public';
+import type { PersistedSession } from '@/features/pause/domain/session-model';
 
 const { loadSessionMock } = vi.hoisted(() => ({
   loadSessionMock: vi.fn(),

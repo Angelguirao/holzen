@@ -1,6 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
 import { getPauseSessionFetchedInstanceQueryOptions } from '@/features/pause/public-queries';
-import { type FetchedPauseInstance } from '@/features/pause/public';
+import type { FetchedPauseInstance } from '@/features/pause/domain/session-model';
 
 /**
  * Loads `pause_instances` + `pause_ai_artifacts` when `/pause` opens with id-only navigation

@@ -1,7 +1,7 @@
 import { describe, it, expect } from 'vitest';
 import { buildPauseSessionMountLogParams } from './mount-log-params';
 import { makeTestPersistedPauseSession } from '@/test/fixtures/make-test-persisted-pause-session';
-import { type PersistedSession } from '@/features/pause/public';
+import type { PersistedSession } from '@/features/pause/domain/session-model';
 
 function restoredBrief(overrides: Partial<PersistedSession> = {}): PersistedSession {
   return makeTestPersistedPauseSession({

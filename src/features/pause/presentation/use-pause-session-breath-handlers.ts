@@ -1,6 +1,6 @@
 import type { Dispatch, SetStateAction } from 'react';
 import type { TFunction } from 'i18next';
-import type { PersistedSession } from '@/features/pause/public';
+import type { PersistedSession } from '@/features/pause/domain/session-model';
 import type { BriefPauseStep, PauseStep, RitualDepth } from '@/features/pause/public-hooks';
 import { usePauseBreathSegmentRpcLoggers } from './use-pause-breath-segment-rpc-loggers';
 import { usePauseSessionBreathNavigation } from './use-pause-session-breath-navigation';

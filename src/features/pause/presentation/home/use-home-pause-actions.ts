@@ -1,9 +1,9 @@
 import { useCallback } from 'react';
 import type { NavigateFunction } from 'react-router-dom';
 import type { BtcMoveSeverity } from '@/features/market/public';
-import type { ManualPauseTriggerResult } from '@/features/pause/public';
+import type { ManualPauseTriggerResult } from '@/features/pause/domain/manual-pause-trigger-result';
 import type { CompanionData, CompanionPrefs } from '@/features/pause/public-hooks';
-import { canNavigateToPauseSession } from '@/features/pause/public';
+import { canNavigateToPauseSession } from '@/features/pause/application/use-cases/session/can-navigate-to-pause-session';
 import { buildHomePauseSessionLocationState } from '@/features/pause/application/use-cases/session/build-home-pause-session-location-state';
 import { shouldNavigateAfterManualTrigger } from '@/features/pause/application/use-cases/trigger/should-navigate-after-manual-trigger';
 import {

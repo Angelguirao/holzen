@@ -1,6 +1,6 @@
 import { useEffect } from 'react';
 import { saveSession } from '@/features/pause/infrastructure/session/persisted-session-storage';
-import { hasPersistablePauseSessionAnchor } from '@/features/pause/public';
+import { hasPersistablePauseSessionAnchor } from '@/features/pause/application/use-cases/session/persisted-session-guards';
 import {
   buildPauseSessionPersistSnapshot,
   type PauseSessionPersistSnapshotInput,
