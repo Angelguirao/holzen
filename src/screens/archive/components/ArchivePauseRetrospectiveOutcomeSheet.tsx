@@ -11,9 +11,9 @@ import {
 } from '@/components/ui/sheet';
 import { cn } from '@/lib/utils';
 import { hapticFeedback } from '@/lib/haptics';
+import { useAuth } from '@/features/auth/public';
 import { logRetrospectiveOutcome } from '@/features/pause/public-rpc';
 import { invalidatePauseStatsDataForUser } from '@/features/pause/public';
-import { supabase } from '@/integrations/supabase/client';
 import { trackEvent } from '@/lib/posthog';
 import type { PauseArchiveRow } from '@/features/pause/public-queries';
 
@@ -26,6 +26,7 @@ type Props = {
 
 export function ArchivePauseRetrospectiveOutcomeSheet({ row, open, onOpenChange, onSuccess }: Props) {
   const { t } = useTranslation();
+  const { user } = useAuth();
   const [submitting, setSubmitting] = useState(false);
   const submittingRef = useRef(false);
   const id = row.id;
@@ -47,9 +48,7 @@ export function ArchivePauseRetrospectiveOutcomeSheet({ row, open, onOpenChange,
         } catch {
           /* no-op */
         }
-        void supabase.auth.getUser().then(({ data: { user } }) => {
-          invalidatePauseStatsDataForUser(user?.id);
-        });
+        invalidatePauseStatsDataForUser(user?.id);
         hapticFeedback('success');
         toast.success(
           t('archive.retrospectiveOutcomeSaved', { defaultValue: 'Decision saved for this pause.' }),
@@ -68,7 +67,7 @@ export function ArchivePauseRetrospectiveOutcomeSheet({ row, open, onOpenChange,
         setSubmitting(false);
       }
     },
-    [id, onOpenChange, onSuccess, t],
+    [id, onOpenChange, onSuccess, t, user?.id],
   );
 
   const handleDecide = useCallback(
