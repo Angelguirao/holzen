@@ -1,5 +1,5 @@
 import { ThumbsUp, ThumbsDown } from 'lucide-react';
-import type { CompanionFeedbackVote } from '@/features/pause/public';
+import type { CompanionFeedbackVote } from '@/features/pause/public-hooks';
 
 export type CompanionFeedbackVoteButtonsProps = {
   vote: CompanionFeedbackVote | null;

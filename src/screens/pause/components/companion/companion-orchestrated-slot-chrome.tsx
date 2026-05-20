@@ -1,4 +1,4 @@
-import type { RegenerateCompanionSlot } from '@/features/pause/public';
+import type { RegenerateCompanionSlot } from '@/features/pause/public-hooks';
 import { CompanionCacheRelaxationNote } from '@/screens/pause/components/companion/companion-cache-relaxation-note';
 import { CompanionFeedback } from '@/screens/pause/components/CompanionFeedback';
 import {

@@ -1,4 +1,4 @@
-import type { RegenerateCompanionSlot } from '@/features/pause/public';
+import type { RegenerateCompanionSlot } from '@/features/pause/public-hooks';
 import { CompanionCard, type CompanionCardProps } from '@/screens/pause/components/companion/companion-card';
 import { CompanionOrchestratedSlotChrome } from '@/screens/pause/components/companion/companion-orchestrated-slot-chrome';
 import type { CompanionFullViewRouteSegment } from '@/screens/pause/components/companion/companion-open-full-view-button';

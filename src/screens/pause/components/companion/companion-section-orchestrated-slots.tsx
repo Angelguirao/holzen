@@ -4,7 +4,7 @@ import type {
   CompanionSlotCacheIds,
   CompanionSlotRelaxations,
   RegenerateCompanionSlot,
-} from '@/features/pause/public';
+} from '@/features/pause/public-hooks';
 import type { ZoomOutData } from '@/features/pause/public-hooks';
 import type {
   CompanionUiCompletionState,

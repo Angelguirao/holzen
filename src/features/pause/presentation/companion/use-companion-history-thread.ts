@@ -1,7 +1,7 @@
 import { useMemo } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { useAuth } from '@/features/auth/public';
-import type { RegenerateCompanionSlot } from '@/features/pause/public';
+import type { RegenerateCompanionSlot } from '@/features/pause/domain/companion-orchestrate';
 import {
   getHistoryThreadQueryOptions,
   type HistoryThreadRow,

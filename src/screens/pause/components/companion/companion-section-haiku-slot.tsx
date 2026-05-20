@@ -1,4 +1,4 @@
-import type { CompanionData } from '@/features/pause/public';
+import type { CompanionData } from '@/features/pause/public-hooks';
 import { HaikuDisplay } from '@/screens/pause/components/HaikuDisplay';
 import { CompanionCard } from '@/screens/pause/components/companion/companion-card';
 import { COMPANION_SECTION_ICONS } from '@/screens/pause/components/companion/companion-section-icons';

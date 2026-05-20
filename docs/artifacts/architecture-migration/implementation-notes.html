@@ -2168,6 +2168,7 @@
   <article class="note">
     <header>
       <span>2026-05-20</span>
+<<<<<<< HEAD
       <span>Phase A slice — colocate breath-second-label-variant under ritual/breathe (Tier 5)</span>
       <span class="status resolved">resolved</span>
     </header>
@@ -2181,6 +2182,21 @@
       <dd>Did not move <code>phase-advance</code>, <code>run-breath-segment-log</code>, or <code>ritual-pattern</code> in the same commit.</dd>
       <dt>Open questions</dt>
       <dd>Next: move <code>phase-advance</code> or <code>breath-completed-payload</code> + <code>run-breath-segment-log</code> under <code>ritual/breathe/</code>, or continue §6 <code>public.ts</code> peel.</dd>
+=======
+      <span>Phase A slice — peel companion/frame screen types off public.ts (§6)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>CompanionData, RegenerateCompanionSlot, slot relaxations → <code>public-hooks</code></h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>ritual/reflect/</code>) and #2 (<code>ritual/frame/</code> use cases) are complete on <code>cursor/arch-migrate-src-ca70</code>. Continue backlog #3 §6: screen-facing companion/frame types export from <code>public-hooks.ts</code>; pause + home screen components import types there. Feature internals (companion conductors, session hydration, queries) import <code>domain/companion-card-types</code> and <code>domain/companion-orchestrate</code> directly. <code>RitualDepth</code> also on <code>public-hooks</code> for scaffold/brief screen bodies; presentation conductors still use <code>public.ts</code> for <code>RitualDepth</code> until a later peel.</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior unchanged.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Did not peel <code>RitualDepth</code> / session types from <code>public.ts</code> for presentation in the same commit.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: peel <code>RitualDepth</code> + session shell types for presentation, optional <code>breathing/</code> → <code>ritual/breathe/</code>, or wire more mutations through <code>PauseRepository</code>.</dd>
+>>>>>>> ef4f9f96 (refactor(pause): peel companion/frame screen types off public.ts (§6))
     </dl>
   </article>
 

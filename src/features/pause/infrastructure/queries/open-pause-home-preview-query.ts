@@ -1,5 +1,5 @@
 import { supabase } from '@/integrations/supabase/client';
-import type { CompanionData } from '@/features/pause/public';
+import type { CompanionData } from '@/features/pause/domain/companion-card-types';
 import { companionDataFromArtifacts } from '@/features/pause/application/use-cases/ritual/frame/companion-data-from-artifacts';
 
 export type OpenPauseHomePreview = {
