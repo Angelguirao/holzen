@@ -6,7 +6,7 @@ import { Link } from 'react-router-dom';
 import { PAUSE_MOOD_VALUES, type MoodValue } from '@/screens/pause/components/MoodCheck';
 import { MoodIcon } from '@/components/icons/MoodIcon';
 import { OutcomeIcon } from '@/components/icons/OutcomeIcon';
-import { PAUSE_FEEL_INTENSITY_KEYS } from '@/screens/pause/components/pause-feel-intensity-labels';
+import { PAUSE_FEEL_INTENSITY_KEYS } from '@/features/pause/public';
 import { cn } from '@/lib/utils';
 import { ScoreImpact } from './ScoreImpact';
 import { pauseStepLayout } from '@/screens/pause/components/pause-step-layout';
