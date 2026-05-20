@@ -99,7 +99,7 @@ export {
   secondsIntoTrianglePattern,
   TRIANGLE_PHASE_COUNT,
   type PauseRitualBreathingPatternMode,
-} from './application/use-cases/breathing/ritual-pattern';
+} from './application/use-cases/ritual/breathe/ritual-pattern';
 export {
   STANDALONE_BREATHING_CYCLE_COUNT,
   STANDALONE_BREATHING_PATTERNS,

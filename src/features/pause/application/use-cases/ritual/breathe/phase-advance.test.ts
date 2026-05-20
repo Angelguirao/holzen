@@ -8,7 +8,7 @@ import {
   BOX_BREATH_PHASE_COUNT,
   BRIEF_TRIANGLE_CYCLE_COUNT,
   TRIANGLE_PHASE_COUNT,
-} from '../../breathing/ritual-pattern';
+} from './ritual-pattern';
 
 describe('resolveBreathingCompleted', () => {
   it('uses session-local completion when parent prop is false', () => {
