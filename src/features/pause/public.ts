@@ -269,6 +269,13 @@ export {
   breathCompletedSegment2Payload,
 } from './application/use-cases/breathing/breath-completed-payload';
 export {
+  applyBreathSegmentLogOutcome,
+  runEnsureBreathSegment1Logged,
+  runEnsureBreathSegment2Logged,
+  runLogBreathSegment1Skipped,
+  runLogBreathSegment2Skipped,
+} from './application/use-cases/breathing/run-breath-segment-log';
+export {
   BRIEF_TRIANGLE_CYCLE_COUNT,
   holdProgressWithinPhase,
   PAUSE_RITUAL_BREATHING_PATTERN_MODE,
