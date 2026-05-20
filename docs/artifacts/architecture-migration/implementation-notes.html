@@ -246,6 +246,25 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-20</span>
+      <span>Phase A slice — frame leaf: recency-hints</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3><code>recency-hints</code> → <code>ritual/frame/</code></h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Continue companion leaf-first after <code>related-biases</code> with browser localStorage dedup helpers for companion-orchestrate (<code>getRecencyHints</code>, <code>updateRecencyHints</code>) — no imports from remaining <code>companion/</code> modules.</dd>
+      <dt>Deviation</dt>
+      <dd>None — matches spec §3.1 / §10.1.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Could batch with <code>section-visibility</code>; kept one file for minimal diff and isolated review.</dd>
+      <dt>Open questions</dt>
+      <dd>Next slice: <code>section-visibility</code> + test, or <code>artifact-cache-parse</code> cluster (queries + hydrate).</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
 </body>
 </html>
