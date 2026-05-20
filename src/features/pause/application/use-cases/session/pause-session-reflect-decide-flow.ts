@@ -1,4 +1,4 @@
-import { isPauseReflectGenerationEnabled } from '@/features/pause/application/use-cases/session/reflect-generation-enabled';
+import { isPauseReflectGenerationEnabled } from '@/features/pause/application/use-cases/ritual/reflect/reflect-generation-enabled';
 import type { PauseStep } from '@/features/pause/domain/pause-ritual-steps';
 import type { RitualDepth } from '@/features/pause/domain/ritual-types';
 

@@ -797,6 +797,25 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-20</span>
+      <span>Phase A slice — reflect gate flag</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3><code>reflect-generation-enabled</code> → <code>ritual/reflect/</code></h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>After the main reflect folder migration, the last reflect-specific pure helper still lived under <code>session/</code>. Move <code>reflect-generation-enabled</code> (+ test) beside other reflect use cases — behavior unchanged; <code>public.ts</code> and <code>pause-session-reflect-decide-flow</code> import paths updated.</dd>
+      <dt>Deviation</dt>
+      <dd>None — matches spec §3.1 / §10.1 (reflect concern grouped under <code>ritual/reflect/</code>).</dd>
+      <dt>Tradeoffs</dt>
+      <dd><code>pause-session-reflect-decide-flow</code> stays in <code>session/</code> (orchestration); only the gate predicate moved.</dd>
+      <dt>Open questions</dt>
+      <dd>Next Phase A slice: <code>public.ts</code> peel (backlog #3) or wire mutations through <code>PauseRepository</code> (#4).</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
 </body>
 </html>
