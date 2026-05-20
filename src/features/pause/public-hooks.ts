@@ -69,6 +69,10 @@ export { useCompanionSlotOrchestratePorts } from './presentation/use-companion-s
 export { usePauseReflectionStepLog } from './presentation/use-pause-reflection-step-log';
 export { usePauseReflectTags } from './presentation/use-pause-reflect-tags';
 export { usePauseReflectNote } from './presentation/use-pause-reflect-note';
+export {
+  useCompanionHistoryThread,
+  type HistoryThreadRow,
+} from './presentation/use-companion-history-thread';
 export { useCompanionAccess } from './presentation/use-companion-access';
 export { useCompanionUiCompletion } from './presentation/use-companion-ui-completion';
 export { useCompanionLibraryFavorites } from './presentation/use-companion-library-favorites';

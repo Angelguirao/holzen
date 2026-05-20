@@ -1,10 +1,8 @@
-import { useMemo } from 'react';
-import { useQuery } from '@tanstack/react-query';
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { useAuth } from '@/features/auth/public';
 import type { RegenerateCompanionSlot } from '@/features/pause/public';
-import { getHistoryThreadQueryOptions, type HistoryThreadRow } from '@/features/pause/public-queries';
+import { formatCompanionHistoryRelativeDay } from '@/features/pause/public';
+import { useCompanionHistoryThread } from '@/features/pause/public-hooks';
 
 /**
  * Maps an internal orchestrator slot name to the Full View route prefix.
@@ -36,20 +34,7 @@ export function HistoryThread({
   className = '',
 }: Props) {
   const { t } = useTranslation();
-  const { user } = useAuth();
-  const userId = user?.id;
-
-  const { data: rawRows } = useQuery(
-    getHistoryThreadQueryOptions({ userId, companion, limit }),
-  );
-
-  const rows = useMemo((): HistoryThreadRow[] | null => {
-    if (!userId) return null;
-    if (rawRows === undefined) return null;
-    return rawRows
-      .filter((r) => r.pause_instance_id !== currentPauseInstanceId)
-      .slice(0, limit);
-  }, [userId, rawRows, currentPauseInstanceId, limit]);
+  const { rows } = useCompanionHistoryThread({ companion, currentPauseInstanceId, limit });
 
   if (!rows || rows.length === 0) return null;
 
@@ -61,7 +46,7 @@ export function HistoryThread({
       <ul className="space-y-1.5">
         {rows.map((r) => {
           const title = r.content?.title ?? t('companions.fullview.thread.untitled');
-          const when = r.created_at ? formatRelativeDay(r.created_at) : '';
+          const when = r.created_at ? formatCompanionHistoryRelativeDay(r.created_at) : '';
           return (
             <li key={r.id}>
               <Link
@@ -80,19 +65,4 @@ export function HistoryThread({
       </ul>
     </section>
   );
-}
-
-function formatRelativeDay(iso: string): string {
-  const then = new Date(iso).getTime();
-  if (Number.isNaN(then)) return '';
-  const diffMs = Date.now() - then;
-  const day = 86_400_000;
-  if (diffMs < day) return 'today';
-  if (diffMs < 2 * day) return 'yesterday';
-  const days = Math.floor(diffMs / day);
-  if (days < 30) return `${days}d ago`;
-  const months = Math.floor(days / 30);
-  if (months < 12) return `${months}mo ago`;
-  const years = Math.floor(days / 365);
-  return `${years}y ago`;
 }
