@@ -1462,6 +1462,25 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-20</span>
+      <span>Phase A slice — peel zoom-out display types from public.ts (§6)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3><code>ZoomOutData</code> / echo types → <code>public-hooks</code></h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>ritual/reflect/</code>) is complete on this branch — no <code>application/use-cases/reflect/</code> paths remain. Continue backlog #3 §6 slim barrel: frame/zoom-out presentation types (<code>EchoUserWord</code>, <code>ZoomOutData</code>, <code>ZoomOutEchoData</code>, <code>ZoomOutOnThisDayEntry</code>) export from <code>public-hooks.ts</code>; pause screen components import types alongside <code>zoomOutTotalCharsForReadTime</code>. Domain module unchanged; feature internals keep <code>domain/zoom-out-display</code> imports.</dd>
+      <dt>Deviation</dt>
+      <dd>None — same pattern as <code>pauseStepLayout</code> on <code>public-hooks</code> (May 2026).</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Did not export <code>toZoomOutDisplayData</code> / other frame payload coercers to screens — they stay internal to <code>ritual/frame/</code>.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: wire <code>logInitialEmotionStep</code> / <code>logShiftEmotionStep</code> through use cases + <code>PauseRepository</code>, or peel more presentation-only exports off <code>public.ts</code>.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
 </body>
 </html>

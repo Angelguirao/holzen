@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { format } from 'date-fns';
 import { ChevronDown, ChevronUp, Clock, PenLine } from 'lucide-react';
-import type { ZoomOutEchoData } from '@/features/pause/public';
+import type { ZoomOutEchoData } from '@/features/pause/public-hooks';
 
 const OUTCOME_LABELS: Record<string, string> = {
   held: 'Held',

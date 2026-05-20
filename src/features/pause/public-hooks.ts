@@ -6,6 +6,12 @@ export { pauseStepLayout } from './presentation/pause-step-layout';
 export { estimateReadTime } from './application/use-cases/ritual/frame/estimate-read-time';
 export { formatCompanionHistoryRelativeDay } from './application/use-cases/ritual/frame/format-companion-history-relative-day';
 export { zoomOutTotalCharsForReadTime } from './application/use-cases/ritual/frame/zoom-out-payload';
+export type {
+  EchoUserWord,
+  ZoomOutData,
+  ZoomOutEchoData,
+  ZoomOutOnThisDayEntry,
+} from './domain/zoom-out-display';
 export {
   useCompletedPauseCount,
   COMPLETED_PAUSE_COUNT_QUERY_KEY,
