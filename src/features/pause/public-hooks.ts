@@ -12,3 +12,9 @@ export {
   pendingPauseOfferQueryKey,
   type PendingPauseOfferRow,
 } from './presentation/use-pending-pause-offer';
+export {
+  useCurrentPause,
+  currentPauseQueryKey,
+  type CurrentPauseRow,
+} from './presentation/use-current-pause';
+export { useOpenPauseHomePreview } from './presentation/use-open-pause-home-preview';

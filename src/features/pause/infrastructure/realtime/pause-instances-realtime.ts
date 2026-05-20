@@ -23,6 +23,8 @@ export function subscribePauseInstancesForUser(
     .subscribe();
 
   return () => {
-    supabase.removeChannel(channel);
+    if (typeof supabase.removeChannel === 'function') {
+      supabase.removeChannel(channel);
+    }
   };
 }
