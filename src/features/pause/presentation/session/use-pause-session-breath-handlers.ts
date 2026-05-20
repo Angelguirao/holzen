@@ -5,7 +5,7 @@ import type { BriefPauseStep, PauseStep, RitualDepth } from '@/features/pause/pu
 import { usePauseBreathSegmentRpcLoggers } from './use-pause-breath-segment-rpc-loggers';
 import { usePauseSessionBreathNavigation } from './use-pause-session-breath-navigation';
 import { usePauseSessionBreathStepHandlers } from './use-pause-session-breath-step-handlers';
-import { usePauseSessionBriefToDeep } from '../use-pause-session-brief-to-deep';
+import { usePauseSessionBriefToDeep } from './use-pause-session-brief-to-deep';
 
 export interface UsePauseSessionBreathHandlersParams {
   pauseInstanceId: string | null;
