@@ -1,6 +1,10 @@
 import { describe, expect, it } from 'vitest';
 import type { TFunction } from 'i18next';
-import type { BtcPriceData } from '@/features/market/public';
+import {
+  HOLZEN_MARKET_DISPLAY_COINGECKO_ERROR,
+  HOLZEN_MARKET_DISPLAY_RETRY_ERROR,
+  type BtcPriceData,
+} from '@/features/market/public';
 import { PAUSE_PERSIST_ERROR_MARKER } from '@/features/pause/public';
 import {
   isLikelyPriceOnlyMarketError,
@@ -22,15 +26,11 @@ const sampleBtc: BtcPriceData = {
 
 describe('isLikelyPriceOnlyMarketError', () => {
   it('matches CoinGecko copy from useHolzen', () => {
-    expect(
-      isLikelyPriceOnlyMarketError('Price data unavailable. CoinGecko may be down — retrying shortly.'),
-    ).toBe(true);
+    expect(isLikelyPriceOnlyMarketError(HOLZEN_MARKET_DISPLAY_COINGECKO_ERROR)).toBe(true);
   });
 
   it('matches generic market check copy', () => {
-    expect(isLikelyPriceOnlyMarketError('Could not check market data. Will retry automatically.')).toBe(
-      true,
-    );
+    expect(isLikelyPriceOnlyMarketError(HOLZEN_MARKET_DISPLAY_RETRY_ERROR)).toBe(true);
   });
 
   it('does not match reflection / manual trigger errors', () => {
@@ -83,21 +83,11 @@ describe('shouldSurfacePauseWidgetError', () => {
   });
 
   it('hides price-only errors when btcData exists', () => {
-    expect(
-      shouldSurfacePauseWidgetError(
-        'Price data unavailable. CoinGecko may be down — retrying shortly.',
-        sampleBtc,
-      ),
-    ).toBe(false);
+    expect(shouldSurfacePauseWidgetError(HOLZEN_MARKET_DISPLAY_COINGECKO_ERROR, sampleBtc)).toBe(false);
   });
 
   it('shows price errors when there is no cached btcData', () => {
-    expect(
-      shouldSurfacePauseWidgetError(
-        'Price data unavailable. CoinGecko may be down — retrying shortly.',
-        null,
-      ),
-    ).toBe(true);
+    expect(shouldSurfacePauseWidgetError(HOLZEN_MARKET_DISPLAY_COINGECKO_ERROR, null)).toBe(true);
   });
 
   it('shows AI / connectivity errors even with cached btcData', () => {

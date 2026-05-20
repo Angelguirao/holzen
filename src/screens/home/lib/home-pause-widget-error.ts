@@ -1,5 +1,5 @@
 import type { TFunction } from 'i18next';
-import type { BtcPriceData } from '@/features/market/public';
+import { isHolzenMarketDisplayUserError, type BtcPriceData } from '@/features/market/public';
 import { isPausePersistError } from '@/features/pause/public';
 
 /** Buckets for Home pause widget + zen error copy (aligned with `useHolzen` setError strings). */
@@ -61,12 +61,7 @@ export function pauseHomeErrorStrings(
  * `btcData` we can show in the market widget, so the pause strip should not steal focus.
  */
 export function isLikelyPriceOnlyMarketError(error: string): boolean {
-  const e = error.toLowerCase();
-  return (
-    e.includes('coingecko') ||
-    e.includes('could not check market data') ||
-    (e.includes('market data') && e.includes('retry'))
-  );
+  return isHolzenMarketDisplayUserError(error);
 }
 
 /**
