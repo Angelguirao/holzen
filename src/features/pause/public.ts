@@ -405,7 +405,7 @@ export { companionSlotToGenerationTaxonomy } from './application/use-cases/ritua
 export {
   trackCompanionGenerationInitiated,
   trackCompanionServed,
-} from './application/use-cases/companion/companion-generation-telemetry';
+} from './application/use-cases/ritual/frame/companion-generation-telemetry';
 export {
   applyCompanionSlotOrchestrateOutcome,
   type ApplyCompanionSlotOrchestrateOutcomeInput,
