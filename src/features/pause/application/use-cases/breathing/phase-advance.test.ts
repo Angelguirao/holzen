@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest';
 import {
   computeBreathingPhaseAdvance,
   resolveBreathingCompleted,
+  resolveBreathingPhaseAdvanceOutcome,
 } from '@/features/pause/public';
 import {
   BOX_BREATH_PHASE_COUNT,
@@ -72,6 +73,64 @@ describe('computeBreathingPhaseAdvance', () => {
         cycle: 2,
       }),
     ).toEqual({ kind: 'next_phase', nextPhaseIndex: 2 });
+  });
+});
+
+describe('resolveBreathingPhaseAdvanceOutcome', () => {
+  const current = { cycle: 1, phaseIndex: 2, elapsed: 4, completedLocal: false };
+
+  it('returns noop for tick advances', () => {
+    expect(
+      resolveBreathingPhaseAdvanceOutcome({
+        advance: { kind: 'tick' },
+        ritualVariant: 'deep',
+        current,
+      }),
+    ).toEqual({ kind: 'noop' });
+  });
+
+  it('marks pattern complete and notifies parent for deep ritual', () => {
+    expect(
+      resolveBreathingPhaseAdvanceOutcome({
+        advance: { kind: 'pattern_complete' },
+        ritualVariant: 'deep',
+        current,
+      }),
+    ).toEqual({
+      kind: 'advanced',
+      state: { ...current, elapsed: 0, completedLocal: true },
+      playPhaseCue: false,
+      playPatternCompleteCue: true,
+      notifyPatternComplete: true,
+      hapticSuccess: true,
+    });
+  });
+
+  it('skips pattern-complete parent notify for brief ritual', () => {
+    expect(
+      resolveBreathingPhaseAdvanceOutcome({
+        advance: { kind: 'pattern_complete' },
+        ritualVariant: 'brief',
+        current,
+      }),
+    ).toMatchObject({ kind: 'advanced', notifyPatternComplete: false });
+  });
+
+  it('advances cycle and requests phase cue', () => {
+    expect(
+      resolveBreathingPhaseAdvanceOutcome({
+        advance: { kind: 'next_cycle', nextCycle: 2 },
+        ritualVariant: 'deep',
+        current,
+      }),
+    ).toEqual({
+      kind: 'advanced',
+      state: { ...current, cycle: 2, phaseIndex: 0, elapsed: 0 },
+      playPhaseCue: true,
+      playPatternCompleteCue: false,
+      notifyPatternComplete: false,
+      hapticSuccess: false,
+    });
   });
 });
 
