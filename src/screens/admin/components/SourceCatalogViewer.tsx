@@ -7,7 +7,7 @@ import {
   insertAdminSignalSource,
   setSignalSourceDemotedForLive,
 } from '@/features/user/public-queries';
-import type { SignalSourceRow, LibraryEntryRow } from '@/screens/admin/lib/admin-stats-bundle-query';
+import type { LibraryEntryRow, SignalSourceRow } from '@/features/pause/public-queries';
 import { Checkbox } from '@/components/ui/checkbox';
 import { AdminBulkBar } from './AdminBulkBar';
 

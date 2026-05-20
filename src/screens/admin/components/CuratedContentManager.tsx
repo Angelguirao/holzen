@@ -8,7 +8,7 @@ import {
   promoteCompanionCacheEntry,
   setCompanionCacheSourceUntrusted as setCompanionCacheSourceUntrustedMutation,
 } from '@/features/pause/public-queries';
-import type { CacheEntryRow } from '@/screens/admin/lib/admin-stats-bundle-query';
+import type { CacheEntryRow } from '@/features/pause/public-queries';
 import { Checkbox } from '@/components/ui/checkbox';
 import { TYPE_COLORS, label } from './admin-constants';
 import { FilterRow } from './FilterRow';

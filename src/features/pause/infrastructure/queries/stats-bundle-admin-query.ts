@@ -6,9 +6,8 @@
 import { supabase } from '@/integrations/supabase/client';
 import type { Json } from '@/integrations/supabase/types';
 import type { UseQueryOptions } from '@tanstack/react-query';
-import { ADMIN_QUERY_PREFIX } from '@/screens/admin/lib/admin-query-namespace';
-
-export type { TimePeriod } from '@/features/pause/public-queries';
+/** Matches `screens/admin/lib/admin-query-namespace` — keep in sync if the prefix changes. */
+const ADMIN_QUERY_PREFIX = ['admin'] as const;
 
 // ── Row types (bundle + client-side period aggregation) ──
 
