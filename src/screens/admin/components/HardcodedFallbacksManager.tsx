@@ -1,9 +1,15 @@
 import { useState, useCallback, useMemo } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { ChevronDown, ChevronRight, Pencil, Trash2, Loader2, Plus, ArrowUp, ArrowDown, Eye, EyeOff } from 'lucide-react';
-import { supabase } from '@/integrations/supabase/client';
 import type { Json } from '@/integrations/supabase/types';
 import { useToast } from '@/components/ui/use-toast';
+import {
+  deleteCompanionFallback,
+  insertCompanionFallbackEntry,
+  setCompanionFallbackActive,
+  swapCompanionFallbackSortOrder,
+  updateCompanionFallbackPayload,
+} from '@/features/pause/public-queries';
 import { Button } from '@/components/ui/button';
 import {
   Dialog,
@@ -89,13 +95,10 @@ export function HardcodedFallbacksManager({ onRefresh }: { onRefresh?: () => voi
 
   const savePayload = async (row: CompanionFallbackRow, payload: Record<string, unknown>) => {
     setActing(row.id);
-    const { error } = await supabase
-      .from('companion_fallbacks')
-      .update({ payload: payload as Json, updated_at: new Date().toISOString() })
-      .eq('id', row.id);
+    const { ok, errorMessage } = await updateCompanionFallbackPayload(row.id, payload as Json);
     setActing(null);
-    if (error) {
-      toast({ title: 'Save failed', description: error.message, variant: 'destructive' });
+    if (!ok) {
+      toast({ title: 'Save failed', description: errorMessage ?? 'Unknown error', variant: 'destructive' });
       return;
     }
     toast({ title: 'Saved' });
@@ -105,13 +108,10 @@ export function HardcodedFallbacksManager({ onRefresh }: { onRefresh?: () => voi
 
   const toggleActive = async (row: CompanionFallbackRow) => {
     setActing(row.id);
-    const { error } = await supabase
-      .from('companion_fallbacks')
-      .update({ is_active: !row.is_active, updated_at: new Date().toISOString() })
-      .eq('id', row.id);
+    const { ok, errorMessage } = await setCompanionFallbackActive(row.id, !row.is_active);
     setActing(null);
-    if (error) {
-      toast({ title: 'Update failed', description: error.message, variant: 'destructive' });
+    if (!ok) {
+      toast({ title: 'Update failed', description: errorMessage ?? 'Unknown error', variant: 'destructive' });
       return;
     }
     await bumpFallbacks();
@@ -121,10 +121,10 @@ export function HardcodedFallbacksManager({ onRefresh }: { onRefresh?: () => voi
   const remove = async (row: CompanionFallbackRow) => {
     if (!window.confirm('Delete this fallback entry? Generation will use bundled file seed if the pool becomes empty.')) return;
     setActing(row.id);
-    const { error } = await supabase.from('companion_fallbacks').delete().eq('id', row.id);
+    const { ok, errorMessage } = await deleteCompanionFallback(row.id);
     setActing(null);
-    if (error) {
-      toast({ title: 'Delete failed', description: error.message, variant: 'destructive' });
+    if (!ok) {
+      toast({ title: 'Delete failed', description: errorMessage ?? 'Unknown error', variant: 'destructive' });
       return;
     }
     toast({ title: 'Deleted' });
@@ -139,11 +139,10 @@ export function HardcodedFallbacksManager({ onRefresh }: { onRefresh?: () => voi
     const a = list[index];
     const b = list[j];
     setActing('reorder');
-    const { error: e1 } = await supabase.from('companion_fallbacks').update({ sort_order: b.sort_order }).eq('id', a.id);
-    const { error: e2 } = await supabase.from('companion_fallbacks').update({ sort_order: a.sort_order }).eq('id', b.id);
+    const { ok, errorMessage } = await swapCompanionFallbackSortOrder(a, b);
     setActing(null);
-    if (e1 || e2) {
-      toast({ title: 'Reorder failed', description: (e1 ?? e2)?.message ?? 'Unknown', variant: 'destructive' });
+    if (!ok) {
+      toast({ title: 'Reorder failed', description: errorMessage ?? 'Unknown', variant: 'destructive' });
       return;
     }
     await bumpFallbacks();
@@ -161,15 +160,15 @@ export function HardcodedFallbacksManager({ onRefresh }: { onRefresh?: () => voi
       reflection: { message: '', haiku: '' },
     };
     setActing('new');
-    const { error } = await supabase.from('companion_fallbacks').insert({
+    const { ok, errorMessage } = await insertCompanionFallbackEntry({
       pool_type: pool,
       sort_order: nextOrder,
       payload: templates[pool] as Json,
       is_active: true,
     });
     setActing(null);
-    if (error) {
-      toast({ title: 'Add failed', description: error.message, variant: 'destructive' });
+    if (!ok) {
+      toast({ title: 'Add failed', description: errorMessage ?? 'Unknown error', variant: 'destructive' });
       return;
     }
     setAddPool(null);
