@@ -1386,6 +1386,25 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-20</span>
+      <span>Phase A slice — reflect metadata logs via PauseRepository (backlog #4)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3><code>runPauseReflectNoteUpdate</code> + <code>runPauseReflectTagUpdate</code> → repository port</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>ritual/reflect/</code> use cases) is complete on this branch — no legacy <code>application/use-cases/reflect/</code> paths remain. Continue backlog #4 after favorite toggle: note/tag metadata step logs take <code>PauseRepository</code> and call <code>logPauseStep</code>; <code>public-rpc</code> passes <code>supabasePauseRepository</code>. Presentation hooks still import <code>public-rpc</code> only.</dd>
+      <dt>Deviation</dt>
+      <dd>None — same pattern as <code>runPauseFavoriteToggle</code> (May 2026).</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Did not migrate <code>runPauseReflectionStepLogOnce</code> in the same commit — still uses storage port + ad-hoc log callback until a dedicated slice.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: wire <code>reflection_step</code> once-log through repository, or §6 peel zoom-out payload helpers still on <code>public.ts</code>.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
 </body>
 </html>

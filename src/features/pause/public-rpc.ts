@@ -147,18 +147,12 @@ export function logPauseReflectionStepOnce(pauseInstanceId: string) {
 
 /** Reflect post-it note — `note_updated` step. */
 export function logPauseReflectNote(params: { pauseInstanceId: string; text: string }) {
-  return runPauseReflectNoteUpdate(params, {
-    logStep: ({ instanceId, stepType, payload }) =>
-      repositoryLogStep(instanceId, stepType, payload),
-  });
+  return runPauseReflectNoteUpdate(supabasePauseRepository, params);
 }
 
 /** Reflect tags editor — `tag_updated` step. */
 export function logPauseReflectTags(params: { pauseInstanceId: string; tags: string[] }) {
-  return runPauseReflectTagUpdate(params, {
-    logStep: ({ instanceId, stepType, payload }) =>
-      repositoryLogStep(instanceId, stepType, payload),
-  });
+  return runPauseReflectTagUpdate(supabasePauseRepository, params);
 }
 
 /** Feel step — `initial_emotion_logged` RPC (wired for screen hooks). */

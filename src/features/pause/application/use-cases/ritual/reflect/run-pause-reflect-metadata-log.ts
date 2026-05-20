@@ -1,20 +1,17 @@
+import { logPauseStep } from '@/features/pause/application/use-cases/ritual/log-pause-step';
+import type { PauseRepository } from '@/features/pause/ports/pause-repository';
+
 export type RunPauseReflectMetadataLogResult =
   | { status: 'success' }
   | { status: 'sync_failed' };
 
-type LogPauseStepPort = (params: {
-  instanceId: string;
-  stepType: 'note_updated' | 'tag_updated';
-  payload: Record<string, unknown>;
-}) => Promise<unknown>;
-
 /** Reflect post-it note blur — `note_updated` step. */
 export async function runPauseReflectNoteUpdate(
+  repository: PauseRepository,
   input: { pauseInstanceId: string; text: string },
-  ports: { logStep: LogPauseStepPort },
 ): Promise<RunPauseReflectMetadataLogResult> {
   try {
-    await ports.logStep({
+    await logPauseStep(repository, {
       instanceId: input.pauseInstanceId,
       stepType: 'note_updated',
       payload: { text: input.text },
@@ -27,11 +24,11 @@ export async function runPauseReflectNoteUpdate(
 
 /** Reflect tags commit — `tag_updated` step. */
 export async function runPauseReflectTagUpdate(
+  repository: PauseRepository,
   input: { pauseInstanceId: string; tags: string[] },
-  ports: { logStep: LogPauseStepPort },
 ): Promise<RunPauseReflectMetadataLogResult> {
   try {
-    await ports.logStep({
+    await logPauseStep(repository, {
       instanceId: input.pauseInstanceId,
       stepType: 'tag_updated',
       payload: { tags: input.tags },
