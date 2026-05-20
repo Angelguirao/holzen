@@ -930,6 +930,25 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-20</span>
+      <span>Phase A slice — decide ritual cluster + public peel</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3><code>run-pause-outcome-log</code> + <code>pause-decide-outcome-flow</code> → <code>ritual/decide/</code>; drop <code>runPauseOutcomeLog</code> from <code>public.ts</code></h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Reflect folder migration was already complete; next smallest ritual-beat cluster is Decide (pairs with reflect conductor). Move outcome log use case + decide flow mapper off <code>session/</code>. Presentation imports <code>ritual/decide/*</code> and keeps <code>logPauseOutcomeStep</code> from <code>public-rpc</code> as the wired port.</dd>
+      <dt>Deviation</dt>
+      <dd>None — matches §3 interior / §10.1 decide row.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Did not add a <code>public-rpc</code> facade for <code>runPauseOutcomeLog</code>; in-feature conductor injects <code>logPauseOutcomeStep</code> directly (same pattern as reflect metadata logs).</dd>
+      <dt>Open questions</dt>
+      <dd>Next: peel companion/frame exports from <code>public.ts</code> or move feel/post-pause session logs to <code>ritual/feel/</code> / <code>ritual/done/</code>.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
 </body>
 </html>

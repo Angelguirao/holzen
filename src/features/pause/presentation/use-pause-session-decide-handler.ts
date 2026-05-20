@@ -5,13 +5,13 @@ import { useAuth } from '@/features/auth/public';
 import {
   formatReinforcementQuoteFromSession,
   resolvePauseDecideOutcomeFlow,
-} from '@/features/pause/application/use-cases/session/pause-decide-outcome-flow';
+} from '@/features/pause/application/use-cases/ritual/decide/pause-decide-outcome-flow';
+import { runPauseOutcomeLog } from '@/features/pause/application/use-cases/ritual/decide/run-pause-outcome-log';
 import { logPauseOutcomeStep } from '@/features/pause/public-rpc';
 import {
   clearSession,
   getSessionQuote,
   invalidatePauseStatsDataForUser,
-  runPauseOutcomeLog,
   showPauseOutcomeNotCompletedToast,
   showPauseOutcomeSaveFailedToast,
   type MoodValue,
