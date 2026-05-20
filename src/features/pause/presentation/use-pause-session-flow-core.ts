@@ -7,7 +7,7 @@ import {
   usePauseSessionStepHandlers,
   type PauseSessionStepHandlersProvidersSlice,
   type PauseSessionStepHandlersResult,
-} from './use-pause-session-step-handlers';
+} from './session/use-pause-session-step-handlers';
 
 export type PauseSessionFlowCoreProvidersSlice = PauseSessionShellRitualProvidersSlice &
   PauseSessionStepHandlersProvidersSlice;

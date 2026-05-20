@@ -406,7 +406,7 @@ export {
 export {
   usePauseSessionStepHandlers,
   type PauseSessionStepHandlersResult,
-} from './presentation/use-pause-session-step-handlers';
+} from './presentation/session/use-pause-session-step-handlers';
 export type { PauseSessionStepHandlersProvidersSlice } from './presentation/session/pause-session-step-handler-types';
 export {
   usePauseSessionScaffoldPresentation,

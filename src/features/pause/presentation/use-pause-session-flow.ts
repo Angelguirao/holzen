@@ -7,7 +7,7 @@ import type {
   PauseScaffoldChromeRegistry,
   PauseSessionScaffoldVmChromeSlots,
 } from './session/pause-session-scaffold-vm-types';
-import type { PauseSessionStepHandlersResult } from './use-pause-session-step-handlers';
+import type { PauseSessionStepHandlersResult } from './session/use-pause-session-step-handlers';
 import type { PauseSessionRitualSurfaceResult } from './use-pause-session-ritual-surface';
 
 /** `/pause` flow: core steps + chrome slots from route registry. */

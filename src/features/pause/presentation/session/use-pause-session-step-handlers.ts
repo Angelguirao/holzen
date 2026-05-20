@@ -2,10 +2,10 @@ import {
   buildPauseSessionStepRitualBundle,
   buildPauseSessionStepShellBundle,
 } from '@/features/pause/application/use-cases/session/step-bundles';
-import type { PauseSessionShellRitualResult } from './use-pause-session-shell-ritual';
-import type { PauseSessionStepHandlersProvidersSlice } from './session/pause-session-step-handler-types';
-import { usePauseSessionBreathReflectHandlers } from './reflect/use-pause-session-breath-reflect-handlers';
-import { usePauseSessionMoodChromeHandlers } from './reflect/use-pause-session-mood-chrome-handlers';
+import type { PauseSessionShellRitualResult } from '../use-pause-session-shell-ritual';
+import type { PauseSessionStepHandlersProvidersSlice } from './pause-session-step-handler-types';
+import { usePauseSessionBreathReflectHandlers } from '../reflect/use-pause-session-breath-reflect-handlers';
+import { usePauseSessionMoodChromeHandlers } from '../reflect/use-pause-session-mood-chrome-handlers';
 
 /** Mood, breath, reflect/decide, and chrome handlers (inputs for scaffold assembly). */
 export function usePauseSessionStepHandlers(
