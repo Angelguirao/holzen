@@ -45,14 +45,14 @@ Very large page files tend to:
 - **Good:** `Home.tsx` mostly says *which* hooks run and *which* child components receive *which* props.  
 - **Bad:** hundreds of lines of `if` / `switch` / inline calculations inside one return.
 
-If the file feels like a “kitchen sink,” **extract**: move chunks into **`useHomeSomething`** hooks or **`src/lib/something.ts`** helpers.
+If the file feels like a “kitchen sink,” **extract**: move chunks into **`useHomeSomething`** hooks, **`features/<ctx>/application/use-cases/`**, **`features/<ctx>/domain/`**, or **`screens/<route>/lib/`** for route-only UI rules. Reserve **`src/lib/`** for cross-cutting platform utilities (not new `@/lib/<context>-*` shims — see [architecture-migration.mdc](../../.cursor/rules/architecture-migration.mdc)).
 
 ### 2. Give behavior a name
 
 When logic has a **name** (`useHomePauseActions`, `getHomeSubscriptionGate`), you can:
 
 - **find** it later;
-- **test** it (especially pure functions in `src/lib/` with Vitest);
+- **test** it (especially pure functions in **`features/<ctx>/domain/`** or **`application/use-cases/`** with Vitest, or **`screens/<route>/lib/`** for UI rules);
 - **reuse** it from another screen if it fits.
 
 Anonymous logic buried in JSX is hard to test and easy to duplicate.
@@ -136,8 +136,8 @@ Holzen **`Home`** keeps many hooks **above** `if (!profileLoaded)` so order neve
 | The same `useMemo` deps repeated for related UI | One hook returning **one bundle** (e.g. `useHomeDashboardTodayWiring`) | “One place updates when those inputs change.” |
 | A big subtree re-renders when **unrelated** parent state changes | **`React.memo`** on the subtree + **stable props** | “Child ignores parent noise when its inputs did not change.” |
 | A **rare** mode (Zen, admin modal) | **`lazy` + `Suspense`** | “Don’t load that code until we might need it.” |
-| Rules from API / subscription booleans | **Pure `src/lib/` helpers + tests** | “Spreadsheet-style logic: same inputs → same outputs; easy to test.” |
-| `useOutletContext` shapes | **Shared TypeScript type** in `src/lib/` or `src/types/` | “One type definition, many readers.” |
+| Rules from API / subscription booleans | **Pure helpers in owning feature `domain/` or `screens/<route>/lib/` + tests** | “Spreadsheet-style logic: same inputs → same outputs; easy to test.” |
+| `useOutletContext` shapes | **Shared TypeScript type** in `features/<ctx>/domain/` or route `lib/` | “One type definition, many readers.” |
 | New PostHog events | **Update** [event taxonomy](../ops/event-taxonomy.md) | “Analytics is part of the contract.” |
 
 ---
@@ -146,7 +146,7 @@ Holzen **`Home`** keeps many hooks **above** `if (!profileLoaded)` so order neve
 
 1. **Name the modes** (loading, logged-out, empty, main, error).  
 2. **All hooks above any `return`** that depends on mode — or use a **child** for the signed-in tree.  
-3. **Move stable rules** to `src/lib/` + tests when they stop changing every week.  
+3. **Move stable rules** to **`features/<ctx>/domain/`** or **`screens/<route>/lib/`** + tests when they stop changing every week.  
 4. **Group related hooks** with clear names (`useSettingsForm`, `usePauseSession…`).  
 5. **One layout component per major visual** (dashboard vs compact), with **typed props** exported.  
 6. **Write `docs/screens/<name>.md`** with modes, main hooks, and odd tradeoffs.

@@ -16,7 +16,7 @@ At every slice tier (shims → god-hooks → inline Supabase → UI placement �
 
 | Phase | Focus | Read first |
 |-------|--------|------------|
-| **0 — Client-architecture docs** | [client-architecture-overview.md](../../fundamentals/client-architecture-overview.md) + per-context `*-client-architecture.md` scaffolds | Overview index |
+| **0 — Client-architecture docs** ✅ | [client-architecture-overview.md](../../fundamentals/client-architecture-overview.md) + per-context `*-client-architecture.md` scaffolds | Overview index |
 | **A — Pause convergence** | `features/pause` + pause/companion/archive screens | [pause-client-architecture.md](../../systems/pause-client-architecture.md) |
 | **B — Cross-context template** | `features/subscription`, `auth`, `market`, `user`, `notifications` + their screens | Matching `*-client-architecture.md` |
 | **C — Repo-wide presentation** | `app/`, `components/`, `lib/` shims, non-feature inline Supabase | [client-src-layout.md](../../fundamentals/client-src-layout.md) |
@@ -40,7 +40,7 @@ Index + full-`src` rings: [client-architecture-overview.md](../../fundamentals/c
 - [ ] Move `application/use-cases/reflect/*` → `ritual/reflect/` (incremental)
 - [ ] Move `application/use-cases/companion/*` → `ritual/frame/` (incremental)
 - [ ] Peel `public.ts` toward slim target + `public-rpc` (spec §6)
-- [ ] Introduce / wire `PauseRepository` port (spec §5, §8)
+- [ ] Route remaining pause mutations through `PauseRepository` port (exists — wire call sites; spec §5, §8)
 - [ ] Group archive queries under `infrastructure/queries/archive/` (spec §5.2)
 
 ## Running log

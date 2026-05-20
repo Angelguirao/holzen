@@ -51,7 +51,7 @@ The ecosystem moved **away from**:
 
 **Holzen target:** `packages/<context>/` + `apps/web/src/screens/` — see [frontend-module-layout.md](frontend-module-layout.md). **Pause** is the large context; companions live **inside** pause, not a separate domain package.
 
-**Holzen today:** `src/features/<context>/`, `src/screens/<route>/hooks/`, cross-cutting hooks in `src/hooks/` (feature flags, pull-to-refresh), platform utilities in `src/lib/` (PostHog, Sentry, `invokeEdge`, routes), UI primitives in `src/components/ui/`.
+**Holzen today:** `src/features/<context>/`, `src/screens/<route>/hooks/`, cross-cutting hooks in `src/app/hooks/` (install prompt, auto-trigger, language sync; **`src/hooks/` removed May 2026**), platform utilities in `src/lib/` (PostHog, Sentry, `invokeEdge`, routes), UI primitives in `src/components/ui/`.
 
 | Check | Target | Today |
 |-------|--------|-------|
@@ -236,12 +236,12 @@ packages/shared-kernel/      # minimal shared types
 **Inside `packages/pause`** (colocation):
 
 ```text
-application/use-cases/ritual/
-application/use-cases/companion/
+application/use-cases/ritual/reflect/
+application/use-cases/ritual/frame/
 presentation/   OR   apps/web/src/screens/pause/
 ```
 
-Pick **one** presentation rule — [frontend-module-layout.md](frontend-module-layout.md) §3.
+Pick **one** presentation rule — [pause-client-architecture.md](../systems/pause-client-architecture.md) §3 (canonical) and [frontend-module-layout.md](frontend-module-layout.md) §3 (north-star packages).
 
 ---
 
@@ -267,7 +267,7 @@ Add to [react-spa-review-template.md](../reviews/react-spa-review-template.md) f
 Order that satisfies **both** this doc and [frontend-module-layout.md](frontend-module-layout.md):
 
 1. **Screens** — `apps/web/src/screens/*` (Home, Archive, Pause, …).
-2. **`packages/pause`** — domain + use cases first; companions under `application/use-cases/companion/`.
+2. **`packages/pause`** — domain + use cases first; reflect + frame under `application/use-cases/ritual/reflect/` and `ritual/frame/` ([pause-client-architecture.md](../systems/pause-client-architecture.md) §3).
 3. **`packages/infrastructure`** — adapters; Query `queryOptions` factories move here.
 4. **Thin hooks** — screens call use cases; keep orchestration in `screens/<route>/hooks/`, not a global hooks folder.
 5. **`contracts`** — when touching edge/RPC JSON.

@@ -420,7 +420,7 @@ Flag in PR review when you see:
 
 - [ ] **Authoritative transition** implemented only in React (no RPC/RLS/edge backstop).
 - [ ] **`supabase.from` or `functions.invoke` in a component** (presentation bypassing application).
-- [ ] **God hook** (>~150 lines) mixing fetch, navigation, analytics, and policy — extract use case.
+- [ ] **God hook** (>~200 lines) mixing fetch, navigation, analytics, and policy — extract use case.
 - [ ] **Types exported from `.tsx`** imported by `lib/` or other contexts — move to `domain/types` or `contracts`.
 - [ ] **Deep import** across contexts (`@/features/pause/infrastructure/...` from settings).
 - [ ] **Duplicate cache**: TanStack Query + global store for the same entity.
@@ -458,7 +458,7 @@ holzen-application-architecture.md     ← you are here (principles)
         ├── decisions/2026-05-17-modular-monolith-hexagonal-client.md
         ├── modern-react-practices-holzen.md       (React industry norms vs Holzen)
         ├── react-screen-orchestration.md          (React mechanics)
-        ├── refactoring-strategy.md                (incremental moves; superseded for greenfield by §9)
+        ├── refactoring-strategy.md                (incremental moves; superseded for greenfield by §10)
         ├── docs/systems/*                         (per-context behavior)
         └── ops/active-surface.md                  (shipped manifest)
 ```
@@ -476,7 +476,7 @@ When **behavior** of pause changes, update **`pause-system.md`**. When **why we 
 | Principle amendment | PR discussion + edit this doc + ADR if structure-wide |
 | Folder-only refactor | Update [frontend-module-layout.md](frontend-module-layout.md); no principle edit |
 
-**Supersession:** [refactoring-strategy.md](refactoring-strategy.md) remains valid for **small extractions** inside the old tree until the monorepo migration completes; greenfield work should follow §9.
+**Supersession:** [refactoring-strategy.md](refactoring-strategy.md) remains valid for **small extractions** inside the transitional tree until the monorepo migration completes; greenfield work should follow **§10** (target repository shape) and per-context [pause-client-architecture.md](../systems/pause-client-architecture.md) §9.
 
 ---
 

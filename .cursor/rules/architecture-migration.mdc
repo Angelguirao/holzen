@@ -25,12 +25,36 @@ Two ideas — do not conflate them:
 
 ## Constitution (read before editing)
 
+**Conflict hierarchy** — when docs disagree, prefer the higher row:
+
+| Priority | Doc | Owns |
+|----------|-----|------|
+| 1 | [docs/README.md](../../docs/README.md) canonical table | Which doc is source of truth per topic |
+| 2 | [pause-client-architecture.md](../../docs/systems/pause-client-architecture.md) §3 | Pause **interior** folder taxonomy (`ritual/reflect/`, `ritual/frame/`) |
+| 3 | [client-src-layout.md](../../docs/fundamentals/client-src-layout.md) | app / screens / features placement |
+| 4 | [active-surface.md](../../docs/ops/active-surface.md) | Shipped routes, tables, legacy quarantine |
+| 5 | **This rule** + [architecture-migration README](../../docs/artifacts/architecture-migration/README.md) | Slice workflow, scheduling, backlog |
+| 6 | [implementation-notes.html](../../docs/artifacts/architecture-migration/implementation-notes.html) | Resolved deviations during migration |
+| 7 | [frontend-module-layout.md](../../docs/fundamentals/frontend-module-layout.md) | CI checks, migration waves, monorepo north star — **not** pause interior naming |
+| 8 | [refactoring-strategy.md](../../docs/fundamentals/refactoring-strategy.md) | Split mechanics only — extract to **features**, not new `@/lib/<context>-*` |
+
+**Mandatory reads (every slice):**
+
+1. [architecture-migration/README.md](../../docs/artifacts/architecture-migration/README.md) backlog + [implementation-notes.html](../../docs/artifacts/architecture-migration/implementation-notes.html)
+2. [client-architecture-overview.md](../../docs/fundamentals/client-architecture-overview.md) + [docs/README.md](../../docs/README.md) canonical table
+3. [client-src-layout.md](../../docs/fundamentals/client-src-layout.md), [client-server-architecture-holzen.md](../../docs/fundamentals/client-server-architecture-holzen.md), [implementation-notes-workflow.md](../../docs/fundamentals/implementation-notes-workflow.md), [active-surface.md](../../docs/ops/active-surface.md)
+4. **Pause slices:** [pause-client-architecture.md](../../docs/systems/pause-client-architecture.md) — overrides `frontend-module-layout.md` §3 for pause interior
+5. **Fetch/cache slices:** [navigating-the-codebase.md](../../docs/fundamentals/navigating-the-codebase.md) §6.1
+6. **Phase B (non-pause):** matching `*-client-architecture.md` + `src/features/<ctx>/README.md`
+
+Then:
+
 1. Skim matching row in [AGENTS.md](../../AGENTS.md) → **Change map**.
 2. Principles **P1–P9:** [holzen-application-architecture.md](../../docs/fundamentals/holzen-application-architecture.md).
 3. Placement: [client-src-layout.md](../../docs/fundamentals/client-src-layout.md), [frontend-module-layout.md](../../docs/fundamentals/frontend-module-layout.md) §10.
 4. **Naming (mandatory for new/moved files):** [naming-conventions-holzen.md](../../docs/fundamentals/naming-conventions-holzen.md).
 5. **Pause client target (when touching pause):** [pause-client-architecture.md](../../docs/systems/pause-client-architecture.md) — ritual/reflect + ritual/frame; collections → legacy.
-6. Screen/hook splits: [refactoring-strategy.md](../../docs/fundamentals/refactoring-strategy.md), [react-screen-orchestration.md](../../docs/fundamentals/react-screen-orchestration.md).
+6. Screen/hook splits: [refactoring-strategy.md](../../docs/fundamentals/refactoring-strategy.md), [react-screen-orchestration.md](../../docs/fundamentals/react-screen-orchestration.md) — extract to **features**, not new context shims in `src/lib/`.
 7. Shipped scope: [active-surface.md](../../docs/ops/active-surface.md) — no `@/legacy/**`, no Tier B schema.
 
 ## Pick ONE vertical slice (priority table)
@@ -71,7 +95,7 @@ rg 'supabase\.from' src --glob '*.tsx'
 rg '@/features/[^/]+/application' src/screens/pause src/features/pause/presentation
 rg '@/features/[^/]+/application' src/screens src/app src/components src/test
 
-# God hooks (>200 LOC) — pause presentation + pause screens first
+# God hooks (>~200 LOC) — pause presentation + pause screens first
 find src/features/pause src/screens/pause -name 'use-*.ts' -o -name 'use-*.tsx' | xargs wc -l 2>/dev/null | sort -rn | head -15
 find src/features src/screens -name 'use-*.ts' -o -name 'use-*.tsx' | xargs wc -l 2>/dev/null | sort -rn | head -15
 

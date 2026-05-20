@@ -59,6 +59,10 @@ flowchart TB
 
 **Normative import direction:** `app` → `screens` → (`components` | `features`). Features do **not** import screens. Details: [client-src-layout.md](client-src-layout.md).
 
+### Cross-context barrels
+
+Most contexts export **`public.ts`**, **`public-queries.ts`**, **`public-hooks.ts`**, **`public-rpc.ts`**. Subscription also exports **`public-limits.ts`** (flex-pack toasts + companion access gate — separate from `public.ts` to avoid eager i18n in checkout/tests). Pause imports `@/features/subscription/public-limits` for orchestrate failure UX.
+
 ---
 
 ## 2. Two doc layers (do not merge)
@@ -95,7 +99,7 @@ Read the **client** doc before non-trivial edits in that context. Pause is the r
 
 | Phase | Scope | Read first |
 |-------|--------|------------|
-| **0 — Doc scaffolds** | Per-context `*-client-architecture.md` + this overview | This file |
+| **0 — Doc scaffolds** ✅ | Per-context `*-client-architecture.md` + this overview | This file |
 | **A — Pause convergence** | `features/pause` interior + pause screens | [pause-client-architecture.md](../systems/pause-client-architecture.md) |
 | **B — Cross-context** | Other `features/<ctx>/` + their screens | Matching `*-client-architecture.md` |
 | **C — Repo-wide presentation** | `app/`, misplaced UI, `lib/` shims, inline Supabase in screens | [client-src-layout.md](client-src-layout.md) |
@@ -103,6 +107,8 @@ Read the **client** doc before non-trivial edits in that context. Pause is the r
 **Scheduling:** pause-first **at each slice tier** within Phases A–C — not “pause-only until the branch merges.”
 
 Track backlog: [artifacts/architecture-migration/README.md](../artifacts/architecture-migration/README.md).
+
+**Doc conflict hierarchy** (when docs disagree): [docs/README.md](../README.md) canonical table → pause-client-architecture §3 (pause interior) → client-src-layout → active-surface → architecture-migration rule/README → implementation-notes → frontend-module-layout (waves/CI) → refactoring-strategy (split mechanics only).
 
 ---
 

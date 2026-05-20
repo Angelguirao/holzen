@@ -1,45 +1,28 @@
 # Pause feature module
 
 **Product truth:** [docs/systems/pause-system.md](../../../docs/systems/pause-system.md)  
-**Layout:** [frontend-module-layout.md](../../../docs/fundamentals/frontend-module-layout.md) §3
+**Client target (canonical interior):** [docs/systems/pause-client-architecture.md](../../../docs/systems/pause-client-architecture.md) §3  
+**Repo map / waves:** [frontend-module-layout.md](../../../docs/fundamentals/frontend-module-layout.md) §10–11
 
 Companions, reflect, and breathing live **inside** this feature — not a separate `features/companion/`.
 
-## Folder map
+## Folder map (target)
 
 ```text
 features/pause/
   domain/                         # rules + vocabulary (no React, no Supabase)
-    ritual-types.ts               # RitualDepth ('brief' | 'deep'), BriefPauseStep
-    pause-ritual-steps.ts         # deep macro steps (feel → decide)
-    brief-ritual-steps.ts         # brief macro order
-    pause-state.ts                # engaged / complete gates
-    …
-  application/
-    use-cases/                    # named intentions (orchestration)
-      session/                    # hydrate, persist, shell VM, navigation
-      ritual/
-        brief/                    # brief-only navigation helpers
-        deep/                     # deep go-back, brief→deep upgrade
-      breathing/
-      reflect/
-      companion/                  # UI completion, orchestration helpers
-      ritual/log-pause-step.ts    # port-backed pause_log_step
-      archive/log-retrospective-outcome.ts
-      feedback/                   # toasts (thin; may move to presentation later)
-      archive/
-      bulk-hold/
-      library/
-      …                           # flat use-case files at use-cases/*.ts
-    queries/                      # query keys + invalidation (no Supabase in application)
-  infrastructure/                 # Supabase, invokeEdge, TanStack query modules
-    pause-rpc-client.ts           # RPC implementations + analytics side effects
-    supabase-pause-repository.ts  # default PauseRepository adapter
-  ports/
-    pause-repository.ts           # mutation port (create, logStep, logCompanion, …)
-  presentation/                   # thin hooks; ritual UI in src/screens/pause/
+  application/use-cases/
+    trigger/ session/
+    ritual/
+      feel/ breathe/ reflect/ frame/ decide/ done/
+    archive/                      # Pauses + Echoes reads (not user collections — legacy)
+  ports/                          # PauseRepository, ReflectGenerator, …
+  infrastructure/                 # supabase, edge, queries/
+  presentation/                   # React conductors only — ritual JSX in src/screens/pause/
   public.ts | public-queries.ts | public-rpc.ts | public-hooks.ts
 ```
+
+**Transitional paths (move incrementally):** some use cases still live at `application/use-cases/reflect/` and `application/use-cases/companion/` — target is `ritual/reflect/` and `ritual/frame/`. User **collections** code is in `src/legacy/archive-collections/` (not shipped MVP).
 
 **Brief vs deep:** one bounded context. Depth is `RitualDepth` on the instance / persisted session — not separate feature folders.
 
