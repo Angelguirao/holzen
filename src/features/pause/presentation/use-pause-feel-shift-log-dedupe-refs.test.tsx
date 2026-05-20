@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { renderHook, act } from '@testing-library/react';
-import { usePauseFeelShiftLogDedupeRefs } from '@/screens/pause/hooks/use-pause-feel-shift-log-dedupe-refs';
+import { usePauseFeelShiftLogDedupeRefs } from './use-pause-feel-shift-log-dedupe-refs';
 
 describe('usePauseFeelShiftLogDedupeRefs', () => {
   it('clears both refs when pauseInstanceId changes', () => {

@@ -6,7 +6,7 @@ import { PauseBreathing } from '@/screens/pause/components/PauseBreathing';
 import { PauseDecide } from '@/screens/pause/components/PauseDecide';
 import { PauseFrame } from '@/screens/pause/components/PauseFrame';
 import { PauseReflect } from '@/screens/pause/components/PauseReflect';
-import { usePauseReflectFrameFocusAmbience } from '@/screens/pause/hooks/use-pause-reflect-frame-focus-ambience';
+import { usePauseReflectFrameFocusAmbience } from '@/features/pause/public-hooks';
 
 export type { PauseSessionDeepRitualBodyProps } from '@/features/pause/public';
 import type { PauseSessionDeepRitualBodyProps } from '@/features/pause/public';
