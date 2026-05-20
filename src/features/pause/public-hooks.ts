@@ -126,3 +126,4 @@ export {
   type PauseSessionScaffoldRitualDerivedParams,
 } from './presentation/use-pause-session-scaffold-ritual';
 export { usePauseSessionBreathSecondLabelVariant } from './presentation/use-pause-session-breath-second-label-variant';
+export { usePauseSessionFetch } from './presentation/use-pause-session-fetch';
