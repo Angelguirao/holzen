@@ -9,7 +9,7 @@ import {
 } from '@/features/pause/application/use-cases/session/hydration';
 import { hasPersistedPauseSessionPayload } from '@/features/pause/application/use-cases/session/persisted-session-guards';
 import type { PauseSessionNavParsed } from '@/features/pause/application/use-cases/session/location-state';
-import { usePauseSessionFetch } from '../use-pause-session-fetch';
+import { usePauseSessionFetch } from './use-pause-session-fetch';
 import { loadSession } from '@/features/pause/infrastructure/session/persisted-session-storage';
 
 export type UsePauseSessionShellParams = {
