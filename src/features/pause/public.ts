@@ -4,14 +4,6 @@
  */
 export { buildOutcomeLoggedPayload } from './application/use-cases/ritual/decide/outcome-log-payload';
 export {
-  computeBriefRitualGoBack,
-  type BriefRitualGoBackResult,
-} from './application/use-cases/ritual/brief/brief-pause-go-back';
-export {
-  computeBriefPastStepClick,
-  type BriefPastStepClickResult,
-} from './application/use-cases/ritual/brief/brief-pause-past-step-click';
-export {
   hasPersistablePauseSessionAnchor,
   hasPersistedPauseSessionPayload,
   type PersistedSessionAnchor,
@@ -80,11 +72,6 @@ export {
   isPauseSessionHeaderBackVisible,
 } from './application/use-cases/session/header-back';
 export {
-  BRIEF_SWITCH_TO_DEEP_STEP,
-  briefSwitchToDeepPauseState,
-  type BriefSwitchToDeepPauseState,
-} from './application/use-cases/ritual/deep/brief-switch-to-deep';
-export {
   briefStepToPauseScienceStep,
   mapPersistedStep,
   initialRitualEntry,
@@ -111,7 +98,6 @@ export {
   type PauseSessionHydrationState,
   type PauseSessionResolvedInput,
 } from './application/use-cases/session/hydration';
-export { buildPauseSessionScaffoldRitualDerived } from './application/use-cases/session/scaffold-ritual-derived';
 export {
   buildPauseSessionStepRitualBundle,
   buildPauseSessionStepShellBundle,
@@ -130,7 +116,6 @@ export {
 export type { CompanionSlotRelaxationUi } from './application/use-cases/ritual/frame/orchestrate-slot-apply';
 export type { PauseSessionShellViewModel } from './application/use-cases/session/shell-view-model';
 export { canAdvanceFromPauseStep } from './application/use-cases/session/navigation';
-export { computeDeepRitualGoBackTarget } from './application/use-cases/ritual/deep/deep-go-back';
 export { ritualDepthUpgradedPayload } from './application/use-cases/ritual/brief/ritual-depth-upgrade-payload';
 export {
   buildInitialEmotionLoggedPayload,

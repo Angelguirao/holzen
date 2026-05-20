@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { computeBriefPastStepClick } from '@/features/pause/public';
+import { computeBriefPastStepClick } from './brief-pause-past-step-click';
 
 describe('computeBriefPastStepClick', () => {
   it('returns null when target is current or later', () => {
