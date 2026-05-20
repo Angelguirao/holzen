@@ -1,11 +1,11 @@
 import { useState, useEffect, useLayoutEffect, useRef } from 'react';
 import { toast as sonnerToast } from 'sonner';
-import type { InterventionState } from '@/features/pause/public';
+import type { InterventionState } from '@/features/pause/domain/companion-orchestrate';
 import type {
   CompanionSlotAutosaveParams,
   CompanionSlotCommitters,
   CompanionSlotRelaxations,
-} from '@/features/pause/public';
+} from '@/features/pause/application/use-cases/ritual/frame/orchestrate-slot-apply';
 import { useCompanionOrchestrateSession } from './use-companion-orchestrate-session';
 import { useCompanionInterventionFetch } from './use-companion-intervention-fetch';
 

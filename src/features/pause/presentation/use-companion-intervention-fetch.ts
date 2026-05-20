@@ -1,11 +1,11 @@
 import { useEffect } from 'react';
-import {
-  runCompanionInterventionBootstrap,
-  type CompanionOrchestrateSessionContext,
-  type CompanionSlotCommitters,
-  type CompanionSlotRelaxations,
-  type InterventionState,
-} from '@/features/pause/public';
+import type { CompanionOrchestrateSessionContext } from '@/features/pause/application/use-cases/ritual/frame/build-companion-orchestrate-body';
+import { runCompanionInterventionBootstrap } from '@/features/pause/application/use-cases/ritual/frame/run-companion-intervention-bootstrap';
+import type {
+  CompanionSlotCommitters,
+  CompanionSlotRelaxations,
+} from '@/features/pause/application/use-cases/ritual/frame/orchestrate-slot-apply';
+import type { InterventionState } from '@/features/pause/domain/companion-orchestrate';
 import { fetchParsedPauseArtifactCache } from '@/features/pause/public-queries';
 import { invokeCompanionIntervention } from '@/features/pause/public-rpc';
 
