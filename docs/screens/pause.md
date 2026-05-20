@@ -2,14 +2,14 @@
 
 **Pause-first shipped scope (2026-05):** full ritual on `/pause`; reflect artifact kind **`reflection_text`**; post-pause exits go Home/Archive (no Journey stats). Lapsed users see engagement block via entitlement. Manifest: [active-surface.md](../ops/active-surface.md).
 
-Authoritative orchestration: [`PauseSessionScreen.tsx`](../../src/screens/pause/PauseSessionScreen.tsx) ([`use-pause-session-screen.tsx`](../../src/screens/pause/hooks/use-pause-session-screen.tsx)).
+Authoritative orchestration: [`PauseSessionScreen.tsx`](../../src/screens/pause/PauseSessionScreen.tsx) → [`usePauseSessionScreen`](../../src/features/pause/public-hooks.ts) (presentation conductor + [`pause-scaffold-chrome-registry.tsx`](../../src/screens/pause/lib/pause-scaffold-chrome-registry.tsx) for route-only header slots).
 
 **Cross-screen patterns:** the same **thin page + named hooks + `src/lib` pure helpers** playbook as [Home](home.md) is spelled out in **[React screen orchestration](../fundamentals/react-screen-orchestration.md)**. Home **produces** navigation into this route; this doc is the **consumer** map for the full-screen volatility ritual.
 
 
 | Piece                                        | File                                                                                              |
 | -------------------------------------------- | ------------------------------------------------------------------------------------------------- |
-| Route screen + conductor hook                | `[PauseSessionScreen.tsx](../../src/screens/pause/PauseSessionScreen.tsx)`, `[use-pause-session-screen.tsx](../../src/screens/pause/hooks/use-pause-session-screen.tsx)` |
+| Route screen + conductor hook                | `[PauseSessionScreen.tsx](../../src/screens/pause/PauseSessionScreen.tsx)`, `[usePauseSessionScreen](../../src/features/pause/presentation/use-pause-session-screen.ts)` (export: `public-hooks`) |
 | Gate (hydration / fetch / profile)           | `[PauseSessionGate.tsx](../../src/screens/pause/components/PauseSessionGate.tsx)`                         |
 | Gate body: picker vs scaffold slot           | `[PauseSessionGateContent.tsx](../../src/screens/pause/components/PauseSessionGateContent.tsx)`           |
 | Depth picker + About pauses sheet            | `[PauseSessionDepthPickerStack.tsx](../../src/screens/pause/components/PauseSessionDepthPickerStack.tsx)` |
@@ -20,12 +20,13 @@ Authoritative orchestration: [`PauseSessionScreen.tsx`](../../src/screens/pause/
 | Brief ritual beats (Framer transitions)      | `[PauseSessionBriefRitualBody.tsx](../../src/screens/pause/components/PauseSessionBriefRitualBody.tsx)`   |
 | Deep ritual beats                            | `[PauseSessionDeepRitualBody.tsx](../../src/screens/pause/components/PauseSessionDeepRitualBody.tsx)`     |
 | Brief macro stepper (read-only)              | `[PauseBriefProgress.tsx](../../src/screens/pause/components/PauseBriefProgress.tsx)`                     |
-| Header back visibility (pure)                | `[pause-session-header-back.ts](../../src/lib/pause-session-header-back.ts)`                      |
+| Header back visibility (pure)                | `[header-back.ts](../../src/features/pause/application/use-cases/session/header-back.ts)` (`isPauseSessionHeaderBackVisible` via `public`) |
+| Scaffold chrome registry (route JSX)         | `[pause-scaffold-chrome-registry.tsx](../../src/screens/pause/lib/pause-scaffold-chrome-registry.tsx)` |
 
 
-**Lib helpers (representative):** shell hydration and fetch (`[pause-session-hydration.ts](../../src/lib/pause-session-hydration.ts)`, `[use-pause-session-shell.ts](../../src/screens/pause/hooks/use-pause-session-shell.ts)`, `[use-pause-session-fetch.ts](../../src/screens/pause/hooks/use-pause-session-fetch.ts)`, `[pause-session-fetched-instance.ts](../../src/lib/pause-session-fetched-instance.ts)`), coalesced shell (`[pause-session-shell-view-model.ts](../../src/lib/pause-session-shell-view-model.ts)`), gate predicates (`[pause-session-gate-flags.ts](../../src/lib/pause-session-gate-flags.ts)`), local restore / step hydrate (`[pause-session-step-map.ts](../../src/lib/pause-session-step-map.ts)`), scaffold derived props + ritual payloads (`[pause-session-scaffold-ritual-props.ts](../../src/lib/pause-session-scaffold-ritual-props.ts)`, `[pause-session-scaffold-ritual-payloads.ts](../../src/lib/pause-session-scaffold-ritual-payloads.ts)`), mount log snapshot (`[pause-session-mount-log-params.ts](../../src/lib/pause-session-mount-log-params.ts)`, `[use-pause-session-mount-log.ts](../../src/screens/pause/hooks/use-pause-session-mount-log.ts)`), navigation state (`[router-location-state.ts](../../src/lib/router-location-state.ts)` — `PauseSessionLocationState`).
+**Feature module (representative):** pure hydration (`[hydration.ts](../../src/features/pause/application/use-cases/session/hydration.ts)`), shell bootstrap (`[use-pause-session-shell-bootstrap.ts](../../src/features/pause/presentation/use-pause-session-shell-bootstrap.ts)`), fetch (`[use-pause-session-fetch.ts](../../src/features/pause/presentation/use-pause-session-fetch.ts)`), fetched instance (`[fetched-instance-from-fetch.ts](../../src/features/pause/application/use-cases/session/fetched-instance-from-fetch.ts)`), coalesced shell (`[shell-view-model.ts](../../src/features/pause/application/use-cases/session/shell-view-model.ts)`), gate predicates (`[gate-flags.ts](../../src/features/pause/application/use-cases/session/gate-flags.ts)`), local restore / step hydrate (`[step-map.ts](../../src/features/pause/application/use-cases/session/step-map.ts)`), scaffold ritual payloads (`[scaffold-ritual-payloads.ts](../../src/features/pause/presentation/session/scaffold-ritual-payloads.ts)`), mount log (`[pause-session-mount-log-params.ts](../../src/features/pause/application/use-cases/session/pause-session-mount-log-params.ts)`, `[use-pause-session-mount-log.ts](../../src/features/pause/presentation/use-pause-session-mount-log.ts)`), navigation state (`parsePauseSessionLocationState` in `public`).
 
-Hooks (`src/screens/pause/hooks/use-pause-session-*.ts`, `use-pause-*` where pause-specific): shell, mount log, step transition, breath segment RPC loggers, feel/shift dedupe refs, favorite toggle, initial mood, shift frame done, decide, exit navigation, breath step handlers, header back, persist to storage, ritual storage sync, entry presentation, breath timed active reset, depth/brief copy, breath second label variant, brief past step, go back / go to step, pending pause offer navigation, depth picker handlers, brief feel select — plus shared [`useHolzen`](../../src/app/components/HolzenProvider.tsx) / `[useSubscription](../../src/features/subscription/public-hooks)` for shell + Decide.
+Presentation hooks (`src/features/pause/presentation/use-pause-session-*.ts`, companion `use-companion-data.ts`, `use-pause-reflect-generation.ts`): shell, mount log, step transition, breath handlers, decide, exit navigation, persist/storage sync, depth picker, pending offer navigation, etc. Import from [`public-hooks`](../../src/features/pause/public-hooks.ts) — not deep `application/` / `infrastructure/`. Shared [`useHolzen`](../../src/app/components/HolzenProvider.tsx) / [`useSubscription`](../../src/features/subscription/public-hooks) for shell + Decide.
 
 ## Purpose
 
@@ -38,9 +39,9 @@ Hooks (`src/screens/pause/hooks/use-pause-session-*.ts`, `use-pause-*` where pau
 | ------------------------------- | -------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------ |
 | Reflection + open pause context | [`useHolzen`](../../src/app/components/HolzenProvider.tsx)                               | Message, companions, severity, `lastPauseInstanceId`, `dismissMessage`, `resyncOpenPauseFromDb`, etc.  |
 | Subscription / Pro              | `[useSubscription](../../src/features/subscription/public-hooks)`        | Decide path refresh; favorite toggle                                                                   |
-| Navigation in                   | `[parsePauseSessionLocationState](../../src/lib/router-location-state.ts)` | `location.state` from Home / banners / manual flows — see [Home → Pause](home.md#navigation-to-pause)  |
-| RPC mutations                   | `[pause-api.ts](../../src/lib/pause-api.ts)`                               | Typed wrappers; canonical SQL in migrations — doc: [pause-system §4](../systems/pause-system.md)       |
-| Local resume                    | `[pause-session-storage.ts](../../src/lib/pause-session-storage.ts)`       | `loadSession` / `saveSession`; hydrate helpers in `pause-session-step-map.ts`                          |
+| Navigation in                   | `parsePauseSessionLocationState` ([`public`](../../src/features/pause/public.ts)) | `location.state` from Home / banners / manual flows — see [Home → Pause](home.md#navigation-to-pause) |
+| RPC mutations                   | [`public-rpc`](../../src/features/pause/public-rpc.ts) (`pauseLogStep`, …) | `infrastructure/pause-rpc-client.ts`; canonical SQL in migrations — [pause-system §4](../systems/pause-system.md) |
+| Local resume                    | [`persisted-session-storage.ts`](../../src/features/pause/infrastructure/session/persisted-session-storage.ts) | `loadSession` / `saveSession`; hydrate helpers in `step-map.ts` |
 | Data + lifecycle contract       | [pause-system.md](../systems/pause-system.md)                              | Tables, state machine, `**v_pause_full`** / step events — **section 10** indexes this screen’s lib map |
 
 
@@ -51,14 +52,14 @@ Hooks (`src/screens/pause/hooks/use-pause-session-*.ts`, `use-pause-*` where pau
 ## User-visible modes (high level)
 
 1. **Gate** — `PauseSessionGate`: profile not ready, instance fetch in flight, fetch failure, or “no shell message” vs waiting for hydration (see `[pause-session-gate-flags.ts](../../src/lib/pause-session-gate-flags.ts)`).
-2. **Depth picker** — user has a coalesced reflection message but `ritualEntry === 'picker'` (`PauseSessionDepthPickerStack`).
+2. **Depth picker** — user has a coalesced reflection message but `ritualEntry === 'picker'` (`PauseSessionDepthPickerStack`; gate flag in `gate-flags.ts`).
 3. **Brief ritual** — four macro steps (`BriefPauseStep`); body in `PauseSessionBriefRitualBody`.
 4. **Deep ritual** — full `PauseStep` rail; body in `PauseSessionDeepRitualBody` (Feel, Breathe, Reflect, Frame, second Breathe, Choose bridge, Decide).
 5. **Done** — `phase === 'done'`; `PauseDone` with impact data after successful outcome path (see [pause-system §7.5](../systems/pause-system.md)).
 
 ## Navigation out
 
-`[usePauseSessionExitNavigation](../../src/screens/pause/hooks/use-pause-session-exit-navigation.ts)` provides close/return handlers consumed by the gate and scaffold. Pending pause offers use `[usePauseSessionPendingPauseOfferNavigation](../../src/screens/pause/hooks/use-pause-session-pending-pause-offer-navigation.ts)` for adopt/resync flows.
+[`usePauseSessionExitNavigation`](../../src/features/pause/presentation/use-pause-session-exit-navigation.ts) (`public-hooks`) provides close/return handlers consumed by the gate and scaffold. Pending pause offers use [`usePauseSessionPendingPauseOfferNavigation`](../../src/features/pause/presentation/use-pause-session-pending-pause-offer-navigation.ts) for adopt/resync flows.
 
 ## Analytics
 
@@ -66,7 +67,7 @@ Do **not** add new PostHog events here without updating `[docs/ops/event-taxonom
 
 ## Best practices for edits
 
-- Keep **pure** branch logic and restores in `src/lib/` with **Vitest** (`pause-session-`*, `pause-api` boundaries typed here).
+- Keep **pure** branch logic in `features/pause/application/use-cases/` with **Vitest** co-located; screens stay presentation-only.
 - Prefer **named hooks** over growing `PauseSession.tsx` — one vertical slice per concern (already split: shell, breath, decide, gate, etc.).
 - **i18n:** use `t('pause…')` where the tree already externalizes strings.
 - **RPC ordering:** Decide / dismiss / `completed` wait semantics are easy to break — read [pause-system §7.5](../systems/pause-system.md) before changing Decide handlers.
