@@ -1,3 +1,4 @@
+import type { ReactNode } from 'react';
 import type { TFunction } from 'i18next';
 import type { BtcPriceData } from '@/features/market/public';
 import {
@@ -6,12 +7,9 @@ import {
   type PauseSessionScaffoldRitualPayloadsParams,
   type RitualDepth,
 } from '@/features/pause/public';
-import {
-  usePauseSessionDepthAndBriefCopy,
-  usePauseSessionScaffoldRitual,
-  usePauseSessionStepTransition,
-} from '@/features/pause/public-hooks';
-import { usePauseSessionScaffoldChromeSlots } from '@/screens/pause/hooks/use-pause-session-scaffold-chrome-slots';
+import { usePauseSessionDepthAndBriefCopy } from './use-pause-session-depth-and-brief-copy';
+import { usePauseSessionScaffoldRitual } from './use-pause-session-scaffold-ritual';
+import { usePauseSessionStepTransition } from './use-pause-session-step-transition';
 
 export type UsePauseSessionScaffoldPresentationParams = Omit<
   PauseSessionScaffoldRitualPayloadsParams,
@@ -27,10 +25,14 @@ export type UsePauseSessionScaffoldPresentationParams = Omit<
   swipeDirection: 'forward' | 'back';
   /** Framer Motion preference — coerced to boolean for ritual body props. */
   prefersReducedMotion: boolean | null;
+  /** Built in screens (route components); injected to avoid features → screens imports. */
+  briefStepperSlot: ReactNode;
+  engagedOpenMaxCountdownSlot: ReactNode;
 };
 
 /**
- * Depth-picker copy, step transitions, chrome slots, and brief/deep ritual scaffold props.
+ * Depth-picker copy, step transitions, and brief/deep ritual scaffold props.
+ * Chrome slots are supplied by the screen conductor (`usePauseSessionScaffoldChromeSlots`).
  */
 export function usePauseSessionScaffoldPresentation(params: UsePauseSessionScaffoldPresentationParams) {
   const {
@@ -43,6 +45,8 @@ export function usePauseSessionScaffoldPresentation(params: UsePauseSessionScaff
     fetchedInstance,
     swipeDirection,
     prefersReducedMotion,
+    briefStepperSlot,
+    engagedOpenMaxCountdownSlot,
     ...ritualPayloads
   } = params;
 
@@ -62,13 +66,6 @@ export function usePauseSessionScaffoldPresentation(params: UsePauseSessionScaff
     phase,
     ritualEntry,
     hasShellMessage: hasCoalescedShellSession,
-  });
-
-  const { briefStepperSlot, engagedOpenMaxCountdownSlot } = usePauseSessionScaffoldChromeSlots({
-    phase,
-    ritualEntry,
-    briefStep: ritualPayloads.briefStep,
-    fetchedInstance,
   });
 
   const { scaffoldRitualDerived, briefRitual, deepRitual } = usePauseSessionScaffoldRitual({

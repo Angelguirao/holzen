@@ -1,5 +1,6 @@
 import type { PauseSessionStepHandlersResult } from '@/features/pause/public-hooks';
-import { usePauseSessionScaffoldPresentation } from '@/screens/pause/hooks/use-pause-session-scaffold-presentation';
+import { usePauseSessionScaffoldPresentation } from '@/features/pause/public-hooks';
+import { usePauseSessionScaffoldChromeSlots } from '@/screens/pause/hooks/use-pause-session-scaffold-chrome-slots';
 import type { usePauseSessionProviders } from '@/screens/pause/hooks/use-pause-session-providers';
 
 type PauseSessionProviders = ReturnType<typeof usePauseSessionProviders>;
@@ -13,6 +14,13 @@ export function usePauseSessionScaffoldVm(
   const { shell, ritual, mood, breath, reflect, toggleFavorite, handleFrameImDone, subscribed } =
     step;
 
+  const { briefStepperSlot, engagedOpenMaxCountdownSlot } = usePauseSessionScaffoldChromeSlots({
+    phase: ritual.phase,
+    ritualEntry: ritual.ritualEntry,
+    briefStep: ritual.briefStep,
+    fetchedInstance: shell.fetchedInstance,
+  });
+
   const scaffold = usePauseSessionScaffoldPresentation({
     t,
     btcData,
@@ -23,6 +31,8 @@ export function usePauseSessionScaffoldVm(
     fetchedInstance: shell.fetchedInstance,
     swipeDirection: ritual.swipeDirection,
     prefersReducedMotion,
+    briefStepperSlot,
+    engagedOpenMaxCountdownSlot,
     briefStep: ritual.briefStep,
     step: ritual.step,
     moodDone: ritual.moodDone,

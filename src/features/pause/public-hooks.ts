@@ -150,3 +150,7 @@ export {
   type PauseSessionStepHandlersResult,
 } from './presentation/use-pause-session-step-handlers';
 export type { PauseSessionStepHandlersProvidersSlice } from './presentation/session/pause-session-step-handler-types';
+export {
+  usePauseSessionScaffoldPresentation,
+  type UsePauseSessionScaffoldPresentationParams,
+} from './presentation/use-pause-session-scaffold-presentation';
