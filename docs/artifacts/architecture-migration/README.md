@@ -49,4 +49,4 @@ Index + full-`src` rings: [client-architecture-overview.md](../../fundamentals/c
 
 Workflow: [implementation-notes-workflow.md](../../fundamentals/implementation-notes-workflow.md). Agent rule: [.cursor/rules/architecture-migration.mdc](../../../.cursor/rules/architecture-migration.mdc).
 
-**Doc reconciliation (May 2026):** migration docs aligned in `c4714f4b`, `dd0bbae1`, and follow-up IA/stats/home fixes. **Shipped routes/tabs:** always [active-surface.md](../../ops/active-surface.md) over [information-architecture.md](../../design/information-architecture.md) §1–§3 full-IA sections.
+**Doc reconciliation (May 2026):** migration docs aligned in `c4714f4b`, `dd0bbae1`, `58d2cb53`, and fourth-pass pointer fixes (AGENTS change map, parity-board, stats/badges index, review templates). **Shipped routes/tabs:** always [active-surface.md](../../ops/active-surface.md) over [information-architecture.md](../../design/information-architecture.md) §1–§3 full-IA sections.
