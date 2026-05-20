@@ -496,7 +496,7 @@ export {
 export type { PauseSessionShellViewModel } from './application/use-cases/session/shell-view-model';
 export { canAdvanceFromPauseStep } from './application/use-cases/session/navigation';
 export { computeDeepRitualGoBackTarget } from './application/use-cases/ritual/deep/deep-go-back';
-export { hostnameFromUrl } from './application/use-cases/companion/url';
+export { hostnameFromUrl } from './application/use-cases/ritual/frame/url';
 export {
   dedupeBiases,
   normalizeBiasTitle,
