@@ -4,7 +4,10 @@ import { motion, useReducedMotion } from 'framer-motion';
 import { ArrowLeft, ArrowRight } from 'lucide-react';
 import { useInfiniteQuery, useQueryClient } from '@tanstack/react-query';
 import { toast } from 'sonner';
-import { getBlogPublishedPostsInfiniteQueryOptions, prefetchBlogPostBySlug } from '@/screens/marketing/lib/blog-post-query';
+import {
+  getBlogPublishedPostsInfiniteQueryOptions,
+  prefetchBlogPostBySlug,
+} from '@/features/user/public-queries';
 import { format } from 'date-fns';
 import { PageMeta } from '@/app/components/PageMeta';
 import { PublicFooter } from '@/screens/marketing/components/PublicFooter';

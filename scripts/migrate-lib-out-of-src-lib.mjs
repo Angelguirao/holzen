@@ -37,7 +37,7 @@ const MOVES = [
   ['src/lib/admin-source-suggestions-query.ts', 'src/screens/admin/lib/admin-source-suggestions-query.ts'],
   ['src/lib/admin-stats-bundle-query.ts', 'src/screens/admin/lib/admin-stats-bundle-query.ts'],
   // Marketing screen lib
-  ['src/lib/blog-post-query.ts', 'src/screens/marketing/lib/blog-post-query.ts'],
+  ['src/lib/blog-post-query.ts', 'src/features/user/infrastructure/queries/blog-post-query.ts'],
   ['src/lib/changelog-query.ts', 'src/features/user/infrastructure/queries/changelog-query.ts'],
   ['src/lib/email-unsubscribe-query.ts', 'src/screens/marketing/lib/email-unsubscribe-query.ts'],
   ['src/lib/landing-testimonials-query.ts', 'src/screens/marketing/lib/landing-testimonials-query.ts'],
