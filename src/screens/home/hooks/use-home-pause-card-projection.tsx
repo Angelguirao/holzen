@@ -4,7 +4,10 @@ import { HomePauseCardBody } from '@/screens/home/components/HomePauseCardBody';
 import type { Entitlement } from '@/features/subscription/public';
 import { SnoozeToolbarControl } from '@/screens/home/components/SnoozeControl';
 import type { BtcPriceData } from '@/features/market/public';
-import type { ManualPauseTriggerResult } from '@/features/pause/public';
+import {
+  shouldShowHomePauseSectionSnooze,
+  type ManualPauseTriggerResult,
+} from '@/features/pause/public';
 
 /** Shape returned by {@link parsePauseContextForHomePreview}. */
 type PauseContextPreview = {
@@ -68,7 +71,7 @@ export function useHomePauseCardProjection(args: {
   } = args;
 
   const pauseSectionHeaderRight = useMemo(() => {
-    if (!subscriptionReady || !hasAccess) return undefined;
+    if (!shouldShowHomePauseSectionSnooze(subscriptionReady, hasAccess)) return undefined;
     return <SnoozeToolbarControl />;
   }, [subscriptionReady, hasAccess]);
 

@@ -1,6 +1,6 @@
 import type { TFunction } from 'i18next';
 import { isHolzenMarketDisplayUserError, type BtcPriceData } from '@/features/market/public';
-import { isPausePersistError } from '@/features/pause/public';
+import { isPausePersistError } from '../reflection-persist-error';
 
 /** Buckets for Home pause widget + zen error copy (aligned with `useHolzen` setError strings). */
 export type PauseHomeErrorKind = 'persist' | 'network' | 'ai' | 'generic';
@@ -77,4 +77,12 @@ export function shouldSurfacePauseWidgetError(
   if (isPausePersistError(error)) return true;
   if (!btcData) return true;
   return !isLikelyPriceOnlyMarketError(error);
+}
+
+/** Whether the Home pause section shows the snooze toolbar control (subscribed + entitled). */
+export function shouldShowHomePauseSectionSnooze(
+  subscriptionReady: boolean,
+  hasAccess: boolean,
+): boolean {
+  return subscriptionReady && hasAccess;
 }

@@ -10,8 +10,9 @@ import {
   isLikelyPriceOnlyMarketError,
   pauseHomeErrorKind,
   pauseHomeErrorStrings,
+  shouldShowHomePauseSectionSnooze,
   shouldSurfacePauseWidgetError,
-} from '@/screens/home/lib/home-pause-widget-error';
+} from './pause-home-widget-error';
 
 const echoT: TFunction = ((key: string) => key) as TFunction;
 
@@ -23,6 +24,14 @@ const sampleBtc: BtcPriceData = {
   direction: 'up',
   currency: 'USD',
 };
+
+describe('shouldShowHomePauseSectionSnooze', () => {
+  it('shows snooze only when subscription is ready and user has access', () => {
+    expect(shouldShowHomePauseSectionSnooze(true, true)).toBe(true);
+    expect(shouldShowHomePauseSectionSnooze(false, true)).toBe(false);
+    expect(shouldShowHomePauseSectionSnooze(true, false)).toBe(false);
+  });
+});
 
 describe('isLikelyPriceOnlyMarketError', () => {
   it('matches CoinGecko copy from useHolzen', () => {
