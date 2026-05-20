@@ -170,6 +170,25 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-20</span>
+      <span>Phase A slice — frame leaf: signal-source-trusted</span>
+      <span class="status open">open</span>
+    </header>
+    <h3><code>signal-source-trusted</code> → <code>ritual/frame/</code></h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Reflect folder migration is complete on this branch; next companion leaf is pure Signal full-view trust helpers (no imports from other <code>companion/</code> modules) — mirrors <code>url</code> / <code>estimate-read-time</code> leaf-first pattern.</dd>
+      <dt>Deviation</dt>
+      <dd>None — matches spec §3.1 / §10.1 incremental plan.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Could batch with <code>format-companion-history-relative-day</code>; kept one leaf (2 files) for isolated review and verification.</dd>
+      <dt>Open questions</dt>
+      <dd>Next slice: another standalone <code>companion/</code> formatter/helper, or <code>format-companion-history-relative-day</code> + <code>generation-taxonomy</code> cluster.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
 </body>
 </html>

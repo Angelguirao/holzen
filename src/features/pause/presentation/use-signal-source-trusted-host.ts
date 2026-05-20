@@ -4,7 +4,7 @@ import { getSignalSourcesCatalogQueryOptions } from '@/features/user/public-quer
 import {
   extractSignalSourceHost,
   resolveSignalSourceTrustedBadge,
-} from '../application/use-cases/companion/signal-source-trusted';
+} from '../application/use-cases/ritual/frame/signal-source-trusted';
 
 /** Signal full view — trusted-source badge from curated `signal_sources` catalog. */
 export function useSignalSourceTrustedHost(signalUrl: string | null | undefined) {
