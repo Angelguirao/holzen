@@ -1,6 +1,6 @@
 import { supabase } from '@/integrations/supabase/client';
 import type { CompanionData } from '@/features/pause/public';
-import { invokeEdge } from '@/lib/invoke-edge';
+import { invokeHolzenReflect } from '../edge/holzen-reflect-edge';
 import { loadReflectRecencyHints } from './load-reflect-recency-hints';
 
 /** Reads persisted reflect-step copy (`pause_ai_artifacts.kind === 'reflection_text'`). */
@@ -114,16 +114,8 @@ export async function generateReflectionAtReflectStep(
 ): Promise<GenerateReflectionAtReflectResult> {
   const { moodHistory, recentMessages, recentHaikus } = await loadReflectRecencyHints();
 
-  const { data: fnData, error: fnError } = await invokeEdge<{
-    message?: string;
-    haiku?: string | null;
-    grounding_title?: string | null;
-    grounding_body?: string | null;
-    grounding_citation?: string | null;
-    grounding_url?: string | null;
-  }>('holzen-reflect', {
-    signal: params.signal,
-    body: {
+  const { data: fnData, error: fnError } = await invokeHolzenReflect(
+    {
       context: params.context,
       tone: params.tone,
       customPrompt: params.customPrompt || undefined,
@@ -141,7 +133,8 @@ export async function generateReflectionAtReflectStep(
       ...(recentMessages && recentMessages.length > 0 ? { recentMessages } : {}),
       ...(recentHaikus && recentHaikus.length > 0 ? { recentHaikus } : {}),
     },
-  });
+    params.signal,
+  );
   if (fnError) throw fnError;
 
   const message = fnData?.message?.trim();
