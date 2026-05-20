@@ -1,6 +1,4 @@
 import { useState } from 'react';
-import { type MoodValue } from '@/screens/pause/components/MoodCheck';
-import { type PauseStep } from '@/screens/pause/components/PauseProgress';
 import {
   initialBreathingFirstCompletedFromRestored,
   initialBreathingSecondCompletedFromRestored,
@@ -13,11 +11,13 @@ import {
   initialSelectedBriefFaceFromRestored,
   mapPersistedStep,
   type BriefPauseStep,
+  type MoodValue,
   type PauseImpactData,
+  type PauseStep,
   type PersistedSession,
   type RitualDepth,
 } from '@/features/pause/public';
-import { usePauseSessionEntryPresentationEffects } from '@/screens/pause/hooks/use-pause-session-entry-presentation-effects';
+import { usePauseSessionEntryPresentationEffects } from '@/features/pause/public-hooks';
 
 /**
  * In-session ritual UI state for `/pause` (step, mood, breath progress, depth picker).

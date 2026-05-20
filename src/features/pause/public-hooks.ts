@@ -116,3 +116,4 @@ export { usePauseSessionPendingPauseOfferNavigation } from './presentation/use-p
 export { usePauseSessionPendingLeaveSheet } from './presentation/use-pause-session-pending-leave-sheet';
 export { usePauseSessionMoodChromeHandlers } from './presentation/use-pause-session-mood-chrome-handlers';
 export { usePauseSessionBreathReflectHandlers } from './presentation/use-pause-session-breath-reflect-handlers';
+export { usePauseSessionEntryPresentationEffects } from './presentation/use-pause-session-entry-presentation-effects';
