@@ -1766,6 +1766,25 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-20</span>
+      <span>Phase A slice — peel breath orb + triangle kicker from public.ts (§6)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3><code>resolveBreathOrbVisualMetrics</code> + <code>resolveTriangleKickerDisplay</code> → <code>public-hooks</code></h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>reflect/</code> → <code>ritual/reflect/</code>) complete — skipped. Continue backlog #3 §6: screen-facing breathing display helpers export from <code>public-hooks.ts</code>; <code>resolve-pause-breathing-timed-display</code> and standalone <code>BreathingExercise</code> import via <code>public-hooks</code>. Ritual-pattern exports (<code>parseTriangleRotatingKickersI18n</code>, etc.) remain on <code>public.ts</code> for <code>PauseBreathing</code> until a follow-up peel.</dd>
+      <dt>Deviation</dt>
+      <dd>None — same peel pattern as step-transition and open-max countdown (May 2026).</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Did not peel ritual-pattern screen imports in the same commit.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: peel ritual-pattern screen imports (<code>PauseBreathing</code>) to <code>public-hooks</code>, or optional <code>breathing/</code> → <code>ritual/breathe/</code>.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
 </body>
 </html>

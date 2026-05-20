@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback, useMemo } from 'react';
 import { AnimatePresence } from 'framer-motion';
 import { useTranslation } from 'react-i18next';
-import { resolveBreathOrbVisualMetrics } from '@/features/pause/public';
+import { resolveBreathOrbVisualMetrics } from '@/features/pause/public-hooks';
 import {
   STANDALONE_BREATHING_CYCLE_COUNT,
   STANDALONE_BREATHING_PATTERNS,
