@@ -27,13 +27,16 @@ vi.mock('@/lib/haptics', () => ({
   hapticFeedback: vi.fn(),
 }));
 
+vi.mock('@/features/pause/public-queries', () => ({
+  invalidatePauseStatsDataForUser: (...args: unknown[]) => invalidatePauseStatsMock(...args),
+}));
+
 vi.mock('@/features/pause/public', async (importOriginal) => {
   const actual = await importOriginal<typeof import('@/features/pause/public')>();
   return {
     ...actual,
     getSessionQuote: () => ({ text: 'Q', author: 'A' }),
     clearSession: () => clearSessionMock(),
-    invalidatePauseStatsDataForUser: (...args: unknown[]) => invalidatePauseStatsMock(...args),
     showPauseOutcomeSaveFailedToast: vi.fn(),
     showPauseOutcomeNotCompletedToast: vi.fn(),
   };

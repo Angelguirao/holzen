@@ -1082,6 +1082,25 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-20</span>
+      <span>Phase A slice — query invalidation peel from public.ts</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>Archive invalidation + query key prefixes off <code>public.ts</code></h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1–#2 (reflect/frame folder moves) are complete. Continue backlog #3 (§6): move <code>invalidatePauseStatsDataForUser</code>, duplicate <code>pauseArchiveListQueryPrefix</code>, and unused <code>PAUSE_QUERY_PREFIX</code> / <code>pauseInstanceQueryPrefix</code> re-exports from <code>public.ts</code> to <code>public-queries.ts</code>. Presentation hooks import <code>public-queries</code>; screens keep frame formatters like <code>formatCompanionHistoryRelativeDay</code> on <code>public.ts</code> per screen import rules.</dd>
+      <dt>Deviation</dt>
+      <dd>None — matches pause-client-architecture §6 barrel split.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Left screen-facing frame formatters on <code>public.ts</code>; did not peel zoom-out payload helpers in the same commit.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: <code>presentation/companion/</code> folder grouping or wire more step logs through <code>PauseRepository</code> (backlog #4).</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
 </body>
 </html>

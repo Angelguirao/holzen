@@ -2,11 +2,8 @@ import { useCallback, useState } from 'react';
 import type { User } from '@supabase/supabase-js';
 import type { TFunction } from 'i18next';
 import { hapticFeedback } from '@/lib/haptics';
-import {
-  invalidatePauseStatsDataForUser,
-  type BulkHoldOutcomeChoice,
-  type BulkHoldPendingPause,
-} from '@/features/pause/public';
+import type { BulkHoldOutcomeChoice, BulkHoldPendingPause } from '@/features/pause/public';
+import { invalidatePauseStatsDataForUser } from '@/features/pause/public-queries';
 import { applyBulkHoldOutcomes } from '@/features/pause/public-rpc';
 
 export type UseBulkHoldApplyOutcomesParams = {

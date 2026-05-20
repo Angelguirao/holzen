@@ -11,13 +11,13 @@ import { logPauseOutcomeStep } from '@/features/pause/public-rpc';
 import {
   clearSession,
   getSessionQuote,
-  invalidatePauseStatsDataForUser,
   showPauseOutcomeNotCompletedToast,
   showPauseOutcomeSaveFailedToast,
   type MoodValue,
   type PauseImpactData,
   type RitualDepth,
 } from '@/features/pause/public';
+import { invalidatePauseStatsDataForUser } from '@/features/pause/public-queries';
 
 export function usePauseSessionDecideHandler(input: {
   decidingRef: MutableRefObject<boolean>;

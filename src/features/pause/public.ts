@@ -9,7 +9,6 @@ export {
   type PauseImpactData,
 } from './application/use-cases/impact-data';
 export { pauseArchiveRowAllowsRetrospectiveOutcome } from './application/use-cases/archive/retrospective-outcome';
-export { pauseArchiveListQueryPrefix } from './application/queries/archive-query-keys';
 export { buildOutcomeLoggedPayload } from './application/use-cases/outcome-log-payload';
 export {
   getPendingPauseOfferDisplay,
@@ -27,7 +26,6 @@ export {
   type BulkHoldPendingPause,
   type BulkHoldReviewSection,
 } from './domain/bulk-hold';
-export { invalidatePauseStatsDataForUser } from './application/queries/invalidate-pause-stats';
 export {
   resolvePauseBreathSecondLabelVariant,
   viteWantsPauseBreathSecondLabelShift,
@@ -369,13 +367,6 @@ export type { PauseSessionShellViewModel } from './application/use-cases/session
 export { canAdvanceFromPauseStep } from './application/use-cases/session/navigation';
 export { computeDeepRitualGoBackTarget } from './application/use-cases/ritual/deep/deep-go-back';
 export { ritualDepthUpgradedPayload } from './application/use-cases/ritual-depth-upgrade-payload';
-export {
-  PAUSE_QUERY_PREFIX,
-} from './application/queries/pause-query-namespace';
-export {
-  PAUSE_INSTANCE_QUERY_ROOT,
-  pauseInstanceQueryPrefix,
-} from './application/queries/pause-instance-query-prefix';
 export {
   buildShiftEmotionFrameHubLogBundle,
   runShiftEmotionFrameHubDone,
