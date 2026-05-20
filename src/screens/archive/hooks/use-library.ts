@@ -1,15 +1,18 @@
 import { useEffect, useCallback, useMemo } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
-import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/features/auth/public';
-import type { Database } from '@/integrations/supabase/types';
 import {
   buildMemberCacheKey,
+  deleteLibraryCollection,
   getLibraryBundleDisabledQueryOptions,
   getLibraryBundleQueryOptions,
+  insertLibraryCollection,
+  insertLibraryCollectionItem,
   libraryBundleQueryPrefix,
+  removeLibraryCollectionItem,
   sortMemberPauses,
+  updateLibraryCollection,
   type Collection,
   type CollectionItem,
   type CollectionMemberPause,
@@ -24,9 +27,6 @@ export type {
   LibraryListSortMode,
 };
 export { libraryBundleQueryPrefix };
-
-type CollectionsInsert = Database['public']['Tables']['collections']['Insert'];
-type CollectionsUpdate = Database['public']['Tables']['collections']['Update'];
 
 const CACHE_KEY_COLLECTIONS = 'holzen_library_collections';
 const CACHE_KEY_COL_ITEMS = 'holzen_library_col_items';
@@ -118,21 +118,17 @@ export function useLibrary(options?: UseLibraryOptions) {
   const addCollection = useCallback(
     async (col: Partial<Collection>) => {
       if (!user) return null;
-      const { data, error } = await supabase
-        .from('collections')
-        .insert({ ...col, user_id: user.id } as CollectionsInsert)
-        .select()
-        .single();
-      if (error) return null;
+      const data = await insertLibraryCollection(user.id, col);
+      if (!data) return null;
       bumpLibrary();
-      return data as unknown as Collection;
+      return data;
     },
     [user, bumpLibrary],
   );
 
   const updateCollection = useCallback(
     async (id: string, updates: Partial<Collection>) => {
-      await supabase.from('collections').update(updates as CollectionsUpdate).eq('id', id);
+      await updateLibraryCollection(id, updates);
       bumpLibrary();
     },
     [bumpLibrary],
@@ -140,7 +136,7 @@ export function useLibrary(options?: UseLibraryOptions) {
 
   const deleteCollection = useCallback(
     async (id: string) => {
-      await supabase.from('collections').delete().eq('id', id);
+      await deleteLibraryCollection(id);
       bumpLibrary();
     },
     [bumpLibrary],
@@ -155,29 +151,21 @@ export function useLibrary(options?: UseLibraryOptions) {
       const maxPos = collectionItems
         .filter((ci) => ci.collection_id === collectionId)
         .reduce((max, ci) => Math.max(max, ci.position), -1);
-      const { data, error } = await supabase
-        .from('collection_items')
-        .insert({
-          collection_id: collectionId,
-          pause_instance_id: pauseInstanceId,
-          position: maxPos + 1,
-        } as never)
-        .select()
-        .single();
-      if (error) return null;
+      const data = await insertLibraryCollectionItem({
+        collectionId,
+        pauseInstanceId,
+        position: maxPos + 1,
+      });
+      if (!data) return null;
       bumpLibrary();
-      return data as unknown as CollectionItem;
+      return data;
     },
     [collectionItems, bumpLibrary],
   );
 
   const removeFromCollection = useCallback(
     async (collectionId: string, pauseInstanceId: string) => {
-      await supabase
-        .from('collection_items')
-        .delete()
-        .eq('collection_id', collectionId)
-        .eq('pause_instance_id', pauseInstanceId);
+      await removeLibraryCollectionItem(collectionId, pauseInstanceId);
       bumpLibrary();
     },
     [bumpLibrary],
