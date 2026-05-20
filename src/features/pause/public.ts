@@ -340,7 +340,7 @@ export {
 } from './application/use-cases/session/persist-snapshot';
 export { computePauseGoBackPlan } from './application/use-cases/session/go-back-plan';
 export { pauseStepSwipeDirection } from './application/use-cases/session/step-swipe-direction';
-export { isPauseReflectGenerationEnabled } from './application/use-cases/session/reflect-generation-enabled';
+export { isPauseReflectGenerationEnabled } from './application/use-cases/ritual/reflect/reflect-generation-enabled';
 export {
   buildPauseSessionStepTransitionConfig,
   PAUSE_SESSION_STEP_SLIDE_OFFSET_PX,
