@@ -259,6 +259,9 @@ export {
 export {
   isPauseMoodValue,
   buildPostPauseEmotionLoggedPayload,
+  isPostPauseEmotionDirty,
+  runPostPauseEmotionLogIfDirty,
+  type PostPauseFeelSnapshot,
 } from './application/use-cases/session/post-pause-emotion-log';
 export { buildPauseScoreImpacts } from './application/use-cases/score-impacts';
 export {

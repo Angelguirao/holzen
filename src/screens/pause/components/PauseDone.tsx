@@ -15,8 +15,8 @@ import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover
 import { Slider } from '@/components/ui/slider';
 import { ShareReflection } from '@/screens/pause/components/ShareReflection';
 import { trackEvent } from '@/lib/posthog';
-import { isPauseMoodValue, buildPostPauseEmotionLoggedPayload } from '@/features/pause/public';
-import { pauseLogStep } from '@/features/pause/public-rpc';
+import { isPauseMoodValue } from '@/features/pause/public';
+import { logPostPauseEmotionIfDirty } from '@/features/pause/public-rpc';
 import { showPauseStepSyncFailedToast } from '@/features/pause/public';
 import { useSubscription } from '@/features/subscription/public-hooks';
 
@@ -120,20 +120,17 @@ export function PauseDone({
     if (!onSaveToJourney) return;
     setSaveBusy(true);
     try {
-      const snap = initialFeelSnapshotRef.current;
-      const feelDirty =
-        briefDoneMood != null &&
-        (!snap || briefDoneMood !== snap.mood || briefDoneIntensity !== snap.intensity);
-      if (pauseInstanceId && feelDirty) {
-        await pauseLogStep({
-          instanceId: pauseInstanceId,
-          stepType: 'post_pause_emotion_logged',
-          payload: buildPostPauseEmotionLoggedPayload(briefDoneMood!, briefDoneIntensity),
-        });
+      const outcome = await logPostPauseEmotionIfDirty({
+        pauseInstanceId,
+        mood: briefDoneMood,
+        intensity: briefDoneIntensity,
+        initialSnapshot: initialFeelSnapshotRef.current,
+      });
+      if (outcome.status === 'sync_failed') {
+        showPauseStepSyncFailedToast(t);
+        return;
       }
       onSaveToJourney();
-    } catch {
-      showPauseStepSyncFailedToast(t);
     } finally {
       setSaveBusy(false);
     }

@@ -37,8 +37,15 @@ import type { OpenManualPauseFromHomeParams } from './application/use-cases/trig
 import type { TFunction } from 'i18next';
 import type { BulkHoldOutcomeChoice, BulkHoldPendingPause } from './domain/bulk-hold';
 import type { PauseState } from './domain/pause-state';
+import {
+  runPostPauseEmotionLogIfDirty,
+  type PostPauseFeelSnapshot,
+} from './application/use-cases/session/post-pause-emotion-log';
+import type { MoodValue } from './domain/mood-value';
+import { pauseLogStep } from './infrastructure/pause-rpc-client';
 
 export type { BulkHoldApplyResult };
+export type { PostPauseFeelSnapshot };
 
 /** Home manual trigger — `pause_create_or_reuse` (+ silent reflection stub). */
 export function openManualPauseFromHome(params: OpenManualPauseFromHomeParams) {
@@ -66,4 +73,21 @@ export function logRetrospectiveOutcome(params: {
   outcome: string;
 }): Promise<PauseState | null> {
   return logRetrospectiveOutcomeUseCase(supabasePauseRepository, params);
+}
+
+/** Brief done save — `post_pause_emotion_logged` when check-in differs from ritual snapshot. */
+export function logPostPauseEmotionIfDirty(params: {
+  pauseInstanceId: string | null;
+  mood: MoodValue | null;
+  intensity: number;
+  initialSnapshot: PostPauseFeelSnapshot | null;
+}) {
+  return runPostPauseEmotionLogIfDirty(params, {
+    logStep: ({ instanceId, payload }) =>
+      pauseLogStep({
+        instanceId,
+        stepType: 'post_pause_emotion_logged',
+        payload,
+      }).then(() => undefined),
+  });
 }
