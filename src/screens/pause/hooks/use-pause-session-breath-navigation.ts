@@ -5,7 +5,7 @@ import {
   type BriefPauseStep,
   type RitualDepth,
 } from '@/features/pause/public';
-import { usePauseSessionBreathUi } from '@/screens/pause/hooks/use-pause-session-breath-ui';
+import { usePauseSessionBreathUi } from '@/features/pause/public-hooks';
 import {
   usePauseSessionGoBack,
   usePauseSessionGoToStep,

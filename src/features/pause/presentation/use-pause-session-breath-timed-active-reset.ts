@@ -1,6 +1,5 @@
 import { useEffect, type Dispatch, type SetStateAction } from 'react';
-import type { PauseStep } from '@/screens/pause/components/PauseProgress';
-import { type BriefPauseStep, type RitualDepth } from '@/features/pause/public';
+import { type BriefPauseStep, type PauseStep, type RitualDepth } from '@/features/pause/public';
 
 /**
  * Clears timed-breathing UI state when leaving the macro step that owns the timed pattern (brief vs deep).
