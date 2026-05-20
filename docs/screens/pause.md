@@ -30,7 +30,7 @@ Presentation hooks (`src/features/pause/presentation/use-pause-session-*.ts`, co
 
 ## Purpose
 
-`/pause` is the **full-screen** volatility ritual: choose **brief** vs **deep** (or resume from local storage), walk Feel → … → Decide, log steps through `**pause-api`** RPCs, and finish on **Done** when Postgres reports `**completed`**. The page stays a **conductor**: props and callbacks are assembled from hooks and pure builders, not inlined business rules.
+`/pause` is the **full-screen** volatility ritual: choose **brief** vs **deep** (or resume from local storage), walk Feel → … → Decide, log steps through **`public-rpc`** (`pauseLogStep`, …), and finish on **Done** when Postgres reports **`completed`**. The page stays a **conductor**: props and callbacks are assembled from hooks and pure builders, not inlined business rules.
 
 ## Major dependencies
 

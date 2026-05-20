@@ -1,8 +1,9 @@
 import { useMemo } from 'react';
 import {
-  JOURNEY_STAT_TILES_VISIBILITY_ID,
-  isHomeSectionAlwaysVisibleInLayout,
-} from '@/screens/home/lib/home-section-visibility-constants';
+  computeShowJourneyStatTiles,
+  computeTodaySectionIds,
+  computeVisibleOrderedSectionIds,
+} from '@/screens/home/lib/compute-home-visible-sections';
 
 export function useHomeVisibleSections(args: {
   order: string[];
@@ -15,21 +16,21 @@ export function useHomeVisibleSections(args: {
 
   const visibleOrderedSectionIds = useMemo(
     () =>
-      order.filter((id) => {
-        if (isHomeSectionAlwaysVisibleInLayout(id)) return true;
-        if (!sectionVisible[id]) return false;
-        if (id === 'night' && (!subscribed || !hasNightReflection)) return false;
-        return true;
+      computeVisibleOrderedSectionIds({
+        order,
+        sectionVisible,
+        subscribed,
+        hasNightReflection,
       }),
     [order, sectionVisible, subscribed, hasNightReflection],
   );
 
   const todaySectionIds = useMemo(
-    () => visibleOrderedSectionIds.filter((id) => id !== 'goal-why'),
+    () => computeTodaySectionIds(visibleOrderedSectionIds),
     [visibleOrderedSectionIds],
   );
 
-  const showJourneyStatTiles = !!sectionVisible[JOURNEY_STAT_TILES_VISIBILITY_ID];
+  const showJourneyStatTiles = computeShowJourneyStatTiles(sectionVisible);
 
   return { visibleOrderedSectionIds, todaySectionIds, showJourneyStatTiles };
 }
