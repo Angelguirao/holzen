@@ -396,7 +396,7 @@ export {
 export {
   usePauseSessionShellBootstrap,
   type UsePauseSessionShellBootstrapParams,
-} from './presentation/use-pause-session-shell-bootstrap';
+} from './presentation/session/use-pause-session-shell-bootstrap';
 export { usePauseSessionRitualState } from './presentation/use-pause-session-ritual-state';
 export {
   usePauseSessionShellRitual,

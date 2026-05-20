@@ -2,7 +2,7 @@ import type { NavigateFunction } from 'react-router-dom';
 import type { TFunction } from 'i18next';
 import type { PauseSessionShellHolzen } from '@/features/pause/domain/pause-session-shell-holzen';
 import { usePauseSessionRitualState } from './use-pause-session-ritual-state';
-import { usePauseSessionShellBootstrap } from './use-pause-session-shell-bootstrap';
+import { usePauseSessionShellBootstrap } from './session/use-pause-session-shell-bootstrap';
 import { usePauseSessionTerminalEntryRedirect } from './use-pause-session-terminal-entry-redirect';
 
 /** Subset of `usePauseSessionProviders` for shell + ritual bootstrap. */
