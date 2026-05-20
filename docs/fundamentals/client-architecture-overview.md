@@ -51,7 +51,7 @@ flowchart TB
 | **Screens** | `src/screens/<route>/` | Route JSX + thin hooks; **no** `supabase.from`; import `features/*/public*` only |
 | **Design system** | `src/components/ui/`, `icons/` | Props in, events out; never import features |
 | **Bounded contexts** | `src/features/<context>/` | Use cases, ports, infrastructure, `public*` — see per-context client-architecture docs |
-| **Shared lib** | `src/lib/` | Observability, Query client ref, feature flags, generic hooks — **no new** `@/lib/<context>-*` shims |
+| **Shared lib** | `src/lib/` | Observability, Query client ref, cross-cutting utilities — **no new** `@/lib/<context>-*` shims; feature flags live in `src/app/hooks/use-feature-flag.ts` |
 | **Integrations** | `src/integrations/supabase/` | Browser client factory; types from `gen:types` |
 | **i18n** | `src/i18n/`, `src/locales/` | Keys for active surfaces; optional `check:i18n-active-keys` |
 | **PWA** | `src/sw.ts`, Vite PWA plugin | Service worker; not a bounded context |
