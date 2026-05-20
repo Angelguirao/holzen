@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { reflectGenerationPrerequisite } from '@/features/pause/public';
+import { reflectGenerationPrerequisite } from './generation-prerequisites';
 
 describe('reflectGenerationPrerequisite', () => {
   it('returns idle when hook is disabled or ids missing', () => {

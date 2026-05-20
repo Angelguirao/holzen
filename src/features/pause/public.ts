@@ -19,7 +19,6 @@ export { pauseArchiveRowAllowsRetrospectiveOutcome } from './application/use-cas
 export { pauseArchiveListQueryPrefix } from './application/queries/archive-query-keys';
 export { buildOutcomeLoggedPayload } from './application/use-cases/outcome-log-payload';
 export { runPauseOutcomeLog } from './application/use-cases/session/run-pause-outcome-log';
-export { shouldLogPauseReflectionStep } from './application/use-cases/ritual/reflect/run-pause-reflection-step-log';
 export {
   getPendingPauseOfferDisplay,
   type PendingPauseOfferDisplay,
@@ -106,25 +105,6 @@ export {
   type CompanionOrchestrateRetryResetInput,
   type CompanionOrchestrateRetryResetPorts,
 } from './application/use-cases/ritual/frame/apply-companion-orchestrate-retry-reset';
-export {
-  reflectGenerationPrerequisite,
-  type ReflectGenerationPrerequisite,
-} from './application/use-cases/ritual/reflect/generation-prerequisites';
-export {
-  isAbortLikeReflectError,
-  reflectGenerationUserErrorMessage,
-} from './application/use-cases/ritual/reflect/reflect-generation-errors';
-export {
-  buildReflectGenerationEdgeInvokeInput,
-  type ReflectGenerationEdgeInvokeInput,
-  type ReflectGenerationProfileInput,
-} from './application/use-cases/ritual/reflect/reflect-generation-edge-params';
-export {
-  runReflectGeneration,
-  type RunReflectGenerationInput,
-  type RunReflectGenerationPorts,
-  type RunReflectGenerationResult,
-} from './application/use-cases/ritual/reflect/run-reflect-generation';
 export {
   BOX_BREATH_PHASE_COUNT,
   computeBreathingPhaseAdvance,
@@ -340,7 +320,6 @@ export {
 } from './application/use-cases/session/persist-snapshot';
 export { computePauseGoBackPlan } from './application/use-cases/session/go-back-plan';
 export { pauseStepSwipeDirection } from './application/use-cases/session/step-swipe-direction';
-export { isPauseReflectGenerationEnabled } from './application/use-cases/ritual/reflect/reflect-generation-enabled';
 export {
   buildPauseSessionStepTransitionConfig,
   PAUSE_SESSION_STEP_SLIDE_OFFSET_PX,
