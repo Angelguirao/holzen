@@ -1,4 +1,5 @@
 import { useHolzen } from '@/screens/home/hooks/use-holzen';
+import { pickPauseHolzenProvidersSlice } from '@/features/pause/public';
 import {
   usePauseSessionProviders as usePauseSessionProvidersPresentation,
   type PauseSessionProviders,
@@ -9,19 +10,5 @@ export type { PauseSessionProviders };
 /** Screen conductor: Holzen context + presentation pause session providers. */
 export function usePauseSessionProviders(): PauseSessionProviders {
   const holzen = useHolzen();
-
-  return usePauseSessionProvidersPresentation({
-    mantra: holzen.mantra,
-    dismissMessage: holzen.dismissMessage,
-    message: holzen.message,
-    context: holzen.context,
-    companions: holzen.companions,
-    lastPauseInstanceId: holzen.lastPauseInstanceId,
-    companionPrefs: holzen.companionPrefs,
-    severity: holzen.severity,
-    profileLoaded: holzen.profileLoaded,
-    resyncOpenPauseFromDb: holzen.resyncOpenPauseFromDb,
-    btcData: holzen.btcData,
-    trackedAssetId: holzen.trackedAssetId,
-  });
+  return usePauseSessionProvidersPresentation(pickPauseHolzenProvidersSlice(holzen));
 }
