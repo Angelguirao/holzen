@@ -2775,6 +2775,25 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-20</span>
+      <span>Phase A slice — colocate feel/shift log dedupe refs in presentation/reflect/</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>Backlog #1 complete; Tier 4 reflect conductor grouping</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd><code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code> was already complete on <code>cursor/arch-migrate-src-ca70</code>. Move <code>use-pause-feel-shift-log-dedupe-refs</code> (+ test) beside <code>use-pause-session-mood-and-persist</code> under <code>presentation/reflect/</code>; <code>public-hooks</code> re-export path only.</dd>
+      <dt>Deviation</dt>
+      <dd>None — matches §3.2 / §10.1 reflect conductor grouping.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Feel-step tile handlers remain flat until a later peel bundles initial-mood + feel-select conductors.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: lifecycle <code>pauseCreateOrReuse</code> / <code>pauseDismissCurrent</code> use cases on <code>public-rpc</code>, colocate shell bootstrap under <code>presentation/session/</code>, or port-backed companion feedback vote write path.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
 </body>
 </html>
