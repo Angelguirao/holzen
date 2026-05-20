@@ -24,7 +24,7 @@ export {
   getPendingPauseOfferDisplay,
   type PendingPauseOfferDisplay,
 } from './application/use-cases/pending-offer/pending-pause-offer-display';
-export { formatCompanionHistoryRelativeDay } from './application/use-cases/companion/format-companion-history-relative-day';
+export { formatCompanionHistoryRelativeDay } from './application/use-cases/ritual/frame/format-companion-history-relative-day';
 export { shouldShowFavoriteProHint } from './application/use-cases/ritual/reflect/run-pause-favorite-toggle';
 export { groupBulkHoldByLocalDay } from './application/use-cases/bulk-hold/group-by-local-day';
 export {

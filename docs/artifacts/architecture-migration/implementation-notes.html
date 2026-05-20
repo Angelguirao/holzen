@@ -189,6 +189,25 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-20</span>
+      <span>Phase A slice — frame leaf: format-companion-history-relative-day</span>
+      <span class="status open">open</span>
+    </header>
+    <h3><code>format-companion-history-relative-day</code> → <code>ritual/frame/</code></h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Reflect backlog item #1 is complete on this branch; continue companion → <code>ritual/frame/</code> with a single-file leaf (history thread relative-day formatter) exported only via <code>public.ts</code> — no internal companion cross-imports.</dd>
+      <dt>Deviation</dt>
+      <dd>None — matches spec §3.1 / §10.1 leaf-first pattern after <code>signal-source-trusted</code>.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Could pair with <code>generation-taxonomy</code>; kept one file for minimal diff and isolated verification.</dd>
+      <dt>Open questions</dt>
+      <dd>Next slice: <code>generation-taxonomy</code> + <code>recency-hints</code> cluster, or another standalone companion helper.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
 </body>
 </html>
