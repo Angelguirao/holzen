@@ -531,6 +531,25 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-20</span>
+      <span>Phase A slice — reflect leaf: pause-reflect-ui-telemetry</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3><code>pause-reflect-ui-telemetry</code> → <code>ritual/reflect/</code></h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 left one reflect PostHog helper pair at <code>ritual/</code> root; move into <code>ritual/reflect/</code> with generation/step-log modules so all reflect beat telemetry shares one folder.</dd>
+      <dt>Deviation</dt>
+      <dd>None — matches spec §3.1 / §10.1.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Could defer until a broader <code>ritual/</code> root cleanup; kept as a 2-file leaf for isolated review after companion-generation-telemetry slice.</dd>
+      <dt>Open questions</dt>
+      <dd>Next slice: <code>companion-slot-orchestrate-telemetry</code> leaf, <code>intervention-idempotency</code> cluster, or start <code>public.ts</code> peel.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
 </body>
 </html>
