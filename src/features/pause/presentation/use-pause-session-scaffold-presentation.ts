@@ -25,14 +25,14 @@ export type UsePauseSessionScaffoldPresentationParams = Omit<
   swipeDirection: 'forward' | 'back';
   /** Framer Motion preference — coerced to boolean for ritual body props. */
   prefersReducedMotion: boolean | null;
-  /** Built in screens (route components); injected to avoid features → screens imports. */
+  /** Built via `PauseScaffoldChromeRegistry` from `screens/pause/lib/`; injected to avoid features → screens imports. */
   briefStepperSlot: ReactNode;
   engagedOpenMaxCountdownSlot: ReactNode;
 };
 
 /**
  * Depth-picker copy, step transitions, and brief/deep ritual scaffold props.
- * Chrome slots are supplied by the screen conductor (`usePauseSessionScaffoldChromeSlots`).
+ * Chrome slots are supplied by `usePauseSessionScaffoldChromeSlots` + route registry.
  */
 export function usePauseSessionScaffoldPresentation(params: UsePauseSessionScaffoldPresentationParams) {
   const {

@@ -17,3 +17,9 @@ export type PauseSessionScaffoldVmChromeSlots = {
   briefStepperSlot: ReactNode;
   engagedOpenMaxCountdownSlot: ReactNode;
 };
+
+/** Route-owned React for scaffold header slots — injected from `screens/pause/lib/`. */
+export type PauseScaffoldChromeRegistry = {
+  renderBriefStepper: (briefStep: import('@/features/pause/public').BriefPauseStep) => ReactNode;
+  renderEngagedOpenMaxCountdown: (engagedAtIso: string) => ReactNode;
+};
