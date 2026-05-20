@@ -7,10 +7,9 @@ import {
   generateReflectionAtReflectStep,
 } from '@/features/pause/public-queries';
 import {
-  buildReflectGenerationEdgeInvokeInput,
-  isAbortLikeReflectError,
   reflectGenerationPrerequisite,
   reflectGenerationUserErrorMessage,
+  runReflectGeneration,
 } from '@/features/pause/public';
 
 export type UsePauseReflectGenerationParams = {
@@ -95,28 +94,29 @@ export function usePauseReflectGeneration({
     setError(null);
 
     try {
-      const cached = await fetchOpeningMessageForPauseInstance(instanceForThisRun);
-      if (ticket !== validityRef.current) return;
-      if (cached) {
-        setReflectionMessage(cached);
-        return;
-      }
-
-      const { message } = await generateReflectionAtReflectStep(
-        buildReflectGenerationEdgeInvokeInput({
+      const result = await runReflectGeneration(
+        {
           pauseInstanceId: instanceForThisRun,
           userId: user.id,
           context: context.trim(),
+          initialReflectionMessage,
           severityAbsPct,
           profile,
           signal,
-        }),
+        },
+        {
+          fetchOpeningMessage: fetchOpeningMessageForPauseInstance,
+          generateReflection: async (params) => {
+            const { message } = await generateReflectionAtReflectStep(params);
+            return { message };
+          },
+        },
       );
       if (ticket !== validityRef.current) return;
-      setReflectionMessage(message);
+      if (result.status === 'aborted') return;
+      setReflectionMessage(result.message);
     } catch (e: unknown) {
       if (ticket !== validityRef.current) return;
-      if (isAbortLikeReflectError(e) || signal.aborted) return;
       const raw = e instanceof Error ? e.message : String(e);
       setError(reflectGenerationUserErrorMessage(raw));
     } finally {
