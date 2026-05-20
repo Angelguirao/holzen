@@ -3155,6 +3155,25 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-20</span>
+      <span>Phase A slice — colocate reflect frame focus ambience under ritual/reflect/ambience/</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>Backlog #1 increment — reflect/frame focus audio bed cluster</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Top-level <code>application/use-cases/reflect/</code> was already under <code>ritual/reflect/</code>. Group <code>reflect-frame-focus-ambience</code> (+ test) under <code>ritual/reflect/ambience/</code>; presentation hook and <code>ritual-audio</code> comment import paths only.</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior-preserving <code>git mv</code>; shared ritual <code>AudioContext</code> unchanged.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Session reflect/decide flow, favorite toggle, and shift-frame hub flow remain at <code>ritual/reflect/</code> root until later subfolder slices.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: colocate <code>pause-session-reflect-decide-flow</code> or <code>pause-shift-frame-hub-flow</code>, or colocate brief-past-step under <code>presentation/session/</code>.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
 </body>
 </html>
