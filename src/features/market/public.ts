@@ -3,6 +3,7 @@ export {
   getManualReflectionCooldownMs,
   isHolzenDevMode,
 } from './application/manual-cooldown';
+export { mapHolzenMarketDisplayError } from './application/map-holzen-market-display-error';
 export {
   buildPauseContextFromBtc,
   buildPauseContextFromMarket,

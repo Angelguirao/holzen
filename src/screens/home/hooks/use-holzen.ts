@@ -15,8 +15,11 @@ import {
 import { useAuth } from '@/features/auth/public';
 import { useProfile } from '@/features/user/public-hooks';
 import { useOpenPauseHomePreview } from '@/features/pause/public-hooks';
-import { normalizeTrackedAssetId } from '@/features/market/public';
-import { severityFromBtcChangePercent } from '@/features/market/public';
+import {
+  mapHolzenMarketDisplayError,
+  normalizeTrackedAssetId,
+  severityFromBtcChangePercent,
+} from '@/features/market/public';
 import { millisecondsUntilNextQuarterHour } from '@/screens/home/lib/next-cron-quarter';
 import {
   useHolzenManualTriggerOrchestration,
@@ -140,14 +143,15 @@ function useHolzenState() {
 
   const severity = severityFromBtcChangePercent(btcData?.changePercent);
 
-  const marketFetchError = useMemo(() => {
-    if (!profileLoaded || !btcQuery.isError || !btcQuery.error) return null;
-    const raw = btcQuery.error instanceof Error ? btcQuery.error.message : String(btcQuery.error);
-    if (raw.includes('fetch') || raw.includes('Failed to fetch')) {
-      return 'Price data unavailable. CoinGecko may be down — retrying shortly.';
-    }
-    return 'Could not check market data. Will retry automatically.';
-  }, [profileLoaded, btcQuery.isError, btcQuery.error]);
+  const marketFetchError = useMemo(
+    () =>
+      mapHolzenMarketDisplayError({
+        profileLoaded,
+        isError: btcQuery.isError,
+        error: btcQuery.error,
+      }),
+    [profileLoaded, btcQuery.isError, btcQuery.error],
+  );
 
   return {
     ...profile,
