@@ -175,7 +175,7 @@ Each folder under **`supabase/functions/<name>/`** is a deployable function. Sha
 
 | Function | Call sites (representative) |
 |----------|-----------------------------|
-| `holzen-reflect` | `features/pause/presentation/use-pause-reflect-generation.ts` → `features/pause/infrastructure/edge/reflect/reflection-artifact.ts` (`invokeEdge`) |
+| `holzen-reflect` | `features/pause/presentation/reflect/use-pause-reflect-generation.ts` → `features/pause/infrastructure/edge/reflect/reflection-artifact.ts` (`invokeEdge`) |
 | `companion-orchestrate` | `features/pause/presentation/use-companion-data.ts` |
 | `suggest-grounding` | **Legacy full IA** — `src/legacy/full-shell/src/pages/Ground.tsx` (route **404** pause-first) |
 | `journal-prompt` | **Legacy full IA** — `src/legacy/full-shell/src/components/practice/GuidedJournal.tsx` |
@@ -283,7 +283,7 @@ Goal: one **vertical slice** you can trace in **docs → code → Network tab** 
 |------|------------|
 | 1. **Docs** | Read [ai-powered-pause-system.md](../systems/pause/ai-powered-pause-system.md) **§1–2** (skim), **§4–5** (focus). Optional: [phase-2-manual-pause-pipeline.md](../reviews/phase-2-manual-pause-pipeline.md) for producer/consumer contracts. |
 | 2. **Routes** | In `src/App.tsx`, find **`/pause`** → `screens/pause/PauseSessionScreen.tsx`. Trace Home → Pause layers in [client-src-layout.md](client-src-layout.md) § Reference flow. |
-| 3. **Hooks** | Read in order: [`HolzenProvider`](../../src/app/components/HolzenProvider.tsx) / `useHolzenHomeContextState` → [`usePauseReflectGeneration`](../../src/features/pause/presentation/use-pause-reflect-generation.ts) (**`holzen-reflect`** on the deep ritual **Reflect → Frame → second Breathe → Decide** window) → [`useCompanionData`](../../src/features/pause/presentation/use-companion-data.ts) (orchestrator invoke). Import from **`@/features/pause/public-hooks`** in screens — not `screens/pause/hooks/` (removed). Open **`PauseSessionScreen.tsx`** (`usePauseSessionScreen` + `screens/pause/lib/pause-scaffold-chrome-registry.tsx`) and `screens/pause/components/`. |
+| 3. **Hooks** | Read in order: [`HolzenProvider`](../../src/app/components/HolzenProvider.tsx) / `useHolzenHomeContextState` → [`usePauseReflectGeneration`](../../src/features/pause/presentation/reflect/use-pause-reflect-generation.ts) (**`holzen-reflect`** on the deep ritual **Reflect → Frame → second Breathe → Decide** window) → [`useCompanionData`](../../src/features/pause/presentation/use-companion-data.ts) (orchestrator invoke). Import from **`@/features/pause/public-hooks`** in screens — not `screens/pause/hooks/` (removed). Open **`PauseSessionScreen.tsx`** (`usePauseSessionScreen` + `screens/pause/lib/pause-scaffold-chrome-registry.tsx`) and `screens/pause/components/`. |
 | 4. **Edge** | In this doc **§12**, confirm **`holzen-reflect`** and **`companion-orchestrate`** invoke map. Optionally open `supabase/functions/holzen-reflect/index.ts` and `companion-orchestrate/index.ts` **headers only** (auth, entry). |
 | 5. **Click + Network** | With the app running, go to **`/pause`**, run a **non-silent** manual pause, advance the **deep** ritual to **Reflect**. In DevTools **Network**, expect **`holzen-reflect`** to start around **Reflect** (the request may still be **in flight** or complete while you are on **Frame**, second **Breathe**, or **Decide**) and **`companion-orchestrate`** per the pause system doc (§4.1). |
 | 6. **DB** | Skim **`supabase/migrations/`** for `profiles`, `pause_instances`, `pause_ai_artifacts` — name recognition only. |

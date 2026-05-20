@@ -788,7 +788,7 @@ src/features/market/infrastructure/fetch-market-data.ts                 # fetchB
 src/app/components/HolzenProvider.tsx   # Home manual trigger → openManualPauseFromHome (public-rpc)
 src/features/pause/presentation/use-holzen-home-context-state.ts
 src/features/pause/presentation/use-companion-data.ts   # useCompanionData — public-hooks
-src/features/pause/presentation/use-pause-reflect-ui-telemetry.ts
+src/features/pause/presentation/reflect/use-pause-reflect-ui-telemetry.ts
 src/screens/pause/PauseSessionScreen.tsx   # usePauseSessionScreen (public-hooks)
 src/screens/pause/components/CompanionSection.tsx   # useCompanionSection + useCompanionSectionExpansion
 src/screens/admin/AdminScreen.tsx     # ops UI (Monitor, Content, Sources, …) — adjacent tooling, not pause pipeline
