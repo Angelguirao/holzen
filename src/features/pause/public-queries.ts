@@ -38,12 +38,12 @@ export {
   getCompanionFeedbackVoteQueryOptions,
   logCompanionFeedbackVote,
 } from './infrastructure/queries/companion-feedback-vote-query';
+export { insertPauseAnalyticsEvent, logDevModeSetting } from './infrastructure/analytics-events';
 export {
-  insertPauseAnalyticsEvent,
   logCompanionFullviewOpened,
-  logDevModeSetting,
   type CompanionFullviewKind,
-} from './infrastructure/analytics-events';
+  type LogCompanionFullviewOpenedInput,
+} from './infrastructure/queries/companion-fullview-analytics';
 export {
   demoteCompanionCacheEntry,
   promoteCompanionCacheEntry,

@@ -3250,6 +3250,25 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-20</span>
+      <span>Phase A slice — port-back companion fullview open analytics write</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>Backlog #4 — PauseAnalyticsRepository (fullview open)</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Reflect subfolder migration (<code>ritual/reflect/*</code>) is complete on <code>cursor/arch-migrate-src-ca70</code>. Route <code>logCompanionFullviewOpened</code> through <code>run-log-companion-fullview-opened</code> + default <code>supabasePauseAnalyticsRepository</code>; metadata builder in <code>ritual/frame/log-companion-fullview-opened</code>; facade in <code>infrastructure/queries/companion-fullview-analytics.ts</code>. Presentation <code>use-fullview-telemetry</code> still imports <code>public-queries</code> only.</dd>
+      <dt>Deviation</dt>
+      <dd>None — same <code>companion_fullview_opened</code> event + metadata shape.</dd>
+      <dt>Tradeoffs</dt>
+      <dd><code>logDevModeSetting</code> and <code>insertPauseAnalyticsEvent</code> remain direct infrastructure exports until a later slice.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: colocate scaffold/flow-core under <code>presentation/session/</code>, or port-back dev-mode analytics write.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
 </body>
 </html>

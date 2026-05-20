@@ -25,22 +25,4 @@ describe('pause analytics_events inserts', () => {
     );
   });
 
-  it('inserts companion_fullview_opened row', async () => {
-    const { logCompanionFullviewOpened } = await import('./analytics-events');
-    await logCompanionFullviewOpened({
-      userId: 'user-1',
-      companion: 'history',
-      pauseInstanceId: 'pause-2',
-    });
-    expect(insert).toHaveBeenCalledWith(
-      expect.objectContaining({
-        user_id: 'user-1',
-        event: 'companion_fullview_opened',
-        metadata: expect.objectContaining({
-          companion: 'history',
-          pause_instance_id: 'pause-2',
-        }),
-      }),
-    );
-  });
 });
