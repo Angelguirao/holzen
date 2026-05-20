@@ -1,7 +1,10 @@
 import { useParams, Navigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useHolzen } from '@/app/components/HolzenProvider';
-import { useCompanionFullViewPage } from '@/features/pause/public-hooks';
+import {
+  useCompanionFullViewPage,
+  zoomOutTotalCharsForReadTime,
+} from '@/features/pause/public-hooks';
 import { ZoomOutDisplay } from '@/screens/pause/components/ZoomOutDisplay';
 import { CompanionFeedback } from '@/screens/pause/components/CompanionFeedback';
 import { CompanionFocusLayout } from '@/screens/pause/components/companion/CompanionFocusLayout';
@@ -10,7 +13,6 @@ import { WhyThisCard } from '@/screens/pause/components/companion/WhyThisCard';
 import { HistoryThread } from '@/screens/pause/components/companion/HistoryThread';
 import { InterventionCrossRefBadge } from '@/screens/pause/components/companion/InterventionCrossRefBadge';
 import { PageMeta } from '@/app/components/PageMeta';
-import { zoomOutTotalCharsForReadTime } from '@/features/pause/public-hooks';
 
 export default function CompanionZoomOutPage() {
   const { pauseInstanceId: rid } = useParams<{ pauseInstanceId: string }>();

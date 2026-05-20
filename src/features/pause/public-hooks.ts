@@ -296,3 +296,4 @@ export {
   usePauseSessionScreenViewModel,
   type PauseSessionScreenViewModel,
 } from './presentation/use-pause-session-screen';
+export { zoomOutTotalCharsForReadTime } from './application/use-cases/ritual/frame/zoom-out-payload';
