@@ -1,7 +1,7 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { renderHook, waitFor } from '@testing-library/react';
 import { holzenLog } from '@/lib/holzen-console';
-import { usePauseSessionMountLog } from '@/screens/pause/hooks/use-pause-session-mount-log';
+import { usePauseSessionMountLog } from './use-pause-session-mount-log';
 
 describe('usePauseSessionMountLog', () => {
   let pauseSpy: ReturnType<typeof vi.spyOn>;

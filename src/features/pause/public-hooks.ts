@@ -73,3 +73,5 @@ export {
 export { usePauseFavoriteToggle } from './presentation/use-pause-favorite-toggle';
 export { usePauseReflectFrameFocusAmbience } from './presentation/use-pause-reflect-frame-focus-ambience';
 export { usePauseFeelShiftLogDedupeRefs } from './presentation/use-pause-feel-shift-log-dedupe-refs';
+export { usePauseBreathSegmentRpcLoggers } from './presentation/use-pause-breath-segment-rpc-loggers';
+export { usePauseSessionMountLog } from './presentation/use-pause-session-mount-log';
