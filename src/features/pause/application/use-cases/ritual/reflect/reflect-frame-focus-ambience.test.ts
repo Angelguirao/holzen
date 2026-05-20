@@ -2,9 +2,9 @@ import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import {
   startPauseReflectFrameFocusAmbience,
   stopPauseReflectFrameFocusAmbience,
-} from './ritual-audio';
+} from './reflect-frame-focus-ambience';
 
-describe('pause-ritual-audio reflect/frame ambience', () => {
+describe('reflect-frame-focus-ambience', () => {
   const resume = vi.fn().mockResolvedValue(undefined);
   let connectCalls: number;
 

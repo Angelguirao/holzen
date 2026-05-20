@@ -280,10 +280,10 @@ The repo is mid-migration. Expect:
 
 | Concern | On disk today (May 2026) | Target (§3) | Phase A slice |
 |---------|--------------------------|-------------|---------------|
-| Reflect generation, persist-error helpers, UI telemetry, generation gate, session reflect/decide flow | `application/use-cases/ritual/reflect/` (`pause-reflect-ui-telemetry`, `reflect-generation-enabled`, `pause-session-reflect-decide-flow` included) | `ritual/reflect/` | Done (May 2026) |
+| Reflect generation, persist-error helpers, UI telemetry, generation gate, session reflect/decide flow, reflect/frame focus ambience | `application/use-cases/ritual/reflect/` (`reflect-frame-focus-ambience`, `pause-reflect-ui-telemetry`, `reflect-generation-enabled`, `pause-session-reflect-decide-flow` included) | `ritual/reflect/` | Done (May 2026) |
 | Frame / companion slots | `application/use-cases/ritual/frame/` (orchestration hub: `orchestrate-slot-apply`, `run-companion-slot-orchestrate`, `apply-companion-slot-orchestrate-outcome`, intervention bootstrap/invoke, body builders, cache hydrate, telemetry, UI helpers) | `ritual/frame/` | Done (May 2026) |
 | Partial ritual beats (brief/deep/breath/log) | `application/use-cases/ritual/` (`brief/`, `deep/`, `breath/`, `log-pause-step.ts`, …) | consolidate under `ritual/*/` | Optional later |
-| Breathing / audio | `application/use-cases/breathing/`, `ritual/breath/` | `ritual/breathe/` | Optional consolidate later |
+| Breathing / audio | `application/use-cases/breathing/` (phase cues + shared `pause-ritual-audio-context`), `ritual/breath/` | `ritual/breathe/` | Optional consolidate later |
 | Feel / initial emotion | `session/run-initial-emotion-log.ts`, `ritual/clamp-feel-intensity.ts` | `ritual/feel/` | Optional later |
 | Decide / outcome | `application/use-cases/ritual/decide/` (`run-pause-outcome-log`, `pause-decide-outcome-flow`) | `ritual/decide/` | Done (May 2026) |
 | Done / post-pause | `session/post-pause-emotion-log.ts` | `ritual/done/` | Optional later |
