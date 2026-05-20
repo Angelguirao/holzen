@@ -23,3 +23,19 @@ export function trackHomeCustomizeOpened(): void {
     /* no-op */
   }
 }
+
+export function trackHomeHeroQuoteViewed(quoteIndex: number, utcYmd: string): void {
+  try {
+    trackEvent('home.hero_quote_viewed', { quote_index: quoteIndex, utc_ymd: utcYmd });
+  } catch {
+    /* no-op */
+  }
+}
+
+export function trackHomeGoalWhyExpandToggled(expanded: boolean): void {
+  try {
+    trackEvent('home.goal_why_expand_toggled', { expanded });
+  } catch {
+    /* no-op */
+  }
+}
