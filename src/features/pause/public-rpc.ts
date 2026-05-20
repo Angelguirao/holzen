@@ -58,7 +58,7 @@ import {
   runLogBreathSegment1Skipped,
   runLogBreathSegment2Skipped,
   type RunBreathSegmentLogResult,
-} from './application/use-cases/breathing/run-breath-segment-log';
+} from './application/use-cases/ritual/breathe/run-breath-segment-log';
 import {
   runInitialEmotionSelect as runInitialEmotionSelectUseCase,
   runInitialEmotionSkip as runInitialEmotionSkipUseCase,

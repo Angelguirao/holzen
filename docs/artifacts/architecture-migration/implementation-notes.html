@@ -2241,6 +2241,25 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-20</span>
+      <span>Phase A slice — colocate breath segment log cluster under ritual/breathe (Tier 5)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>Continue <code>breathing/</code> → <code>ritual/breathe/</code> after phase-advance slice</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>reflect/</code> → <code>ritual/reflect/</code>) is complete. Next smallest breathe cluster: pure <code>breath-completed-payload</code> + <code>run-breath-segment-log</code> (+ tests) → <code>ritual/breathe/</code>; <code>public-rpc</code> re-export path only; presentation breath-segment hook imports ritual path directly.</dd>
+      <dt>Deviation</dt>
+      <dd>None — <code>breath_completed</code> RPC payloads and dedupe behavior unchanged.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Did not move <code>ritual-pattern</code>, <code>pause-breath-orb-metrics</code>, or <code>pause-ritual-audio-context</code> in the same commit.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: move <code>ritual-pattern</code> hub under <code>ritual/breathe/</code>, or continue §6 <code>public.ts</code> peel (<code>RitualDepth</code> + session shell types).</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
 </body>
 </html>
