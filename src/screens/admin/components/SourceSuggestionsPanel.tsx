@@ -9,7 +9,7 @@ import {
   getAdminPendingSourceSuggestionsQueryOptions,
   rejectSignalSourceSuggestion,
   type SourceSuggestionRow,
-} from '@/features/user/public-queries';
+} from '@/screens/admin/public-queries';
 
 export type { SourceSuggestionRow };
 

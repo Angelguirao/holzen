@@ -7,7 +7,7 @@ import {
   getAdminDevModeSettingQueryOptions,
   logDevModeSetting,
   readLocalDevMode,
-} from '@/features/pause/public-queries';
+} from '@/screens/admin/public-queries';
 
 export function DevModeToggle() {
   const { user } = useAuth();

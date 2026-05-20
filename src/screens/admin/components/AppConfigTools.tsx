@@ -21,7 +21,7 @@ import {
   type ConfigState,
   type FeatureKey,
   type SpendSnapshot,
-} from '@/features/pause/public-queries';
+} from '@/screens/admin/public-queries';
 import {
   mergePregenerateCacheTopup,
   type PregenerateCacheTopupKey,

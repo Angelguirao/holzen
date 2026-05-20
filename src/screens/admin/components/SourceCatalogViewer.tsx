@@ -6,8 +6,8 @@ import {
   deleteSignalSourceRowsByIds,
   insertAdminSignalSource,
   setSignalSourceDemotedForLive,
-} from '@/features/user/public-queries';
-import type { LibraryEntryRow, SignalSourceRow } from '@/features/pause/public-queries';
+} from '@/screens/admin/public-queries';
+import type { LibraryEntryRow, SignalSourceRow } from '@/screens/admin/public-queries';
 import { Checkbox } from '@/components/ui/checkbox';
 import { AdminBulkBar } from './AdminBulkBar';
 

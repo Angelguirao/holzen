@@ -1,5 +1,5 @@
 import { Clock } from 'lucide-react';
-import type { RejectionRow } from '@/features/pause/public-queries';
+import type { RejectionRow } from '@/screens/admin/public-queries';
 import { Checkbox } from '@/components/ui/checkbox';
 import { TYPE_COLORS, label } from './admin-constants';
 
