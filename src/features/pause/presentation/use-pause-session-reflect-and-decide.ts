@@ -5,7 +5,7 @@ import {
   resolveEffectiveReflectionMessage,
   resolveReflectGenerationSeverityAbsPct,
   shouldRunPauseReflectGeneration,
-} from '@/features/pause/application/use-cases/session/pause-session-reflect-decide-flow';
+} from '@/features/pause/application/use-cases/ritual/reflect/pause-session-reflect-decide-flow';
 import {
   type MoodValue,
   type PauseImpactData,

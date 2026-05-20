@@ -280,7 +280,7 @@ The repo is mid-migration. Expect:
 
 | Concern | On disk today (May 2026) | Target (§3) | Phase A slice |
 |---------|--------------------------|-------------|---------------|
-| Reflect generation, persist-error helpers, UI telemetry, generation gate | `application/use-cases/ritual/reflect/` (`pause-reflect-ui-telemetry`, `reflect-generation-enabled` included) | `ritual/reflect/` | Done (May 2026) |
+| Reflect generation, persist-error helpers, UI telemetry, generation gate, session reflect/decide flow | `application/use-cases/ritual/reflect/` (`pause-reflect-ui-telemetry`, `reflect-generation-enabled`, `pause-session-reflect-decide-flow` included) | `ritual/reflect/` | Done (May 2026) |
 | Frame / companion slots | `application/use-cases/ritual/frame/` (orchestration hub: `orchestrate-slot-apply`, `run-companion-slot-orchestrate`, `apply-companion-slot-orchestrate-outcome`, intervention bootstrap/invoke, body builders, cache hydrate, telemetry, UI helpers) | `ritual/frame/` | Done (May 2026) |
 | Partial ritual beats (brief/deep/breath/log) | `application/use-cases/ritual/` (`brief/`, `deep/`, `breath/`, `log-pause-step.ts`, …) | consolidate under `ritual/*/` | Optional later |
 | Breathing / audio | `application/use-cases/breathing/`, `ritual/breath/` | `ritual/breathe/` | Optional consolidate later |
