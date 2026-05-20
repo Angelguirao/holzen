@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import type { PauseImpactData } from '@/features/pause/application/use-cases/impact-data';
 import {
   initialBreathingFirstCompletedFromRestored,
   initialBreathingSecondCompletedFromRestored,
@@ -16,7 +17,6 @@ import {
   type PersistedSession,
   type RitualDepth,
 } from '@/features/pause/public';
-import type { PauseImpactData } from '@/features/pause/application/use-cases/impact-data';
 import { usePauseSessionEntryPresentationEffects } from './use-pause-session-entry-presentation-effects';
 
 /**

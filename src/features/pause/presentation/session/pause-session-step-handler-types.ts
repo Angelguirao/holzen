@@ -1,6 +1,7 @@
 import type { Dispatch, MutableRefObject, SetStateAction } from 'react';
 import type { TFunction } from 'i18next';
 import type { BtcPriceData } from '@/features/market/public';
+import type { PauseImpactData } from '@/features/pause/application/use-cases/impact-data';
 import type {
   BriefPauseStep,
   CompanionData,
@@ -11,7 +12,6 @@ import type {
   RitualDepth,
   FeelStepTile,
 } from '@/features/pause/public';
-import type { PauseImpactData } from '@/features/pause/application/use-cases/impact-data';
 
 /** Subset of `usePauseSessionProviders` passed into mood chrome handlers. */
 export type PauseSessionMoodChromeProvidersSlice = {
