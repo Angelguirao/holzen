@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { ArrowRight, Pause } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { useCurrentPause, usePendingPauseOffer } from '@/features/pause/public-hooks';
-import { pauseWindowShowsClockCountdown } from '@/features/pause/public';
+import { pauseWindowShowsClockCountdown } from '@/features/pause/public-hooks';
 import { PauseEngagedOpenMaxCountdown } from '@/screens/pause/components/PauseEngagedOpenMaxCountdown';
 import { cn } from '@/lib/utils';
 

@@ -2089,6 +2089,25 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-20</span>
+      <span>Phase A slice — peel archive clock + segment type off public.ts (§6)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3><code>pauseWindowShowsClockCountdown</code> + <code>ArchiveMainSegment</code> → <code>public-hooks</code></h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1–#2 ritual moves are complete on <code>cursor/arch-migrate-src-ca70</code>. Continue backlog #3 §6: archive UI helpers are screen-facing, so <code>CurrentPauseCard</code> and <code>ArchiveScreen</code> import from <code>public-hooks</code>. Remove unused <code>isArchiveEchoPause</code> / <code>itemBelongsTo*</code> re-exports from <code>public.ts</code> (SQL views own tab filtering; domain module + tests remain canonical).</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior unchanged.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Did not peel companion screen types (<code>CompanionData</code>, <code>RegenerateCompanionSlot</code>) in the same commit.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: peel companion/frame types to <code>public-hooks</code>, optional <code>breathing/</code> → <code>ritual/breathe/</code>, or wire more mutations through <code>PauseRepository</code>.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
 </body>
 </html>

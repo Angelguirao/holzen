@@ -208,7 +208,6 @@ export {
   countedCompanionCount,
   decideCronFire,
   pauseInstanceHasBriefRitualTag,
-  pauseWindowShowsClockCountdown,
   shouldCountCompanion,
   type CronFireDecision,
   type PauseCompanionAction,
@@ -221,11 +220,3 @@ export {
   type PauseStepType,
   type PauseTemplateRow,
 } from './domain/pause-state';
-export type { ArchiveMainSegment } from './domain/archive-segment';
-export {
-  isArchiveEchoPause,
-  itemBelongsToEchoesTab,
-  itemBelongsToPausesTab,
-  type PauseInstanceArchiveMeta,
-  type PauseInstanceArchiveMetaGetter,
-} from './domain/archive-segment';

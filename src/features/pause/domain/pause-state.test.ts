@@ -5,12 +5,12 @@ import {
   decideCronFire,
   collectStepTypes,
   countedCompanionCount,
-  pauseWindowShowsClockCountdown,
   type PauseInstanceRow,
   type PauseTemplateRow,
   type PauseStepEventRow,
   type PauseCompanionEventRow,
 } from '@/features/pause/public';
+import { pauseWindowShowsClockCountdown } from './pause-state';
 
 const NOW = new Date('2026-04-23T20:00:00.000Z');
 
