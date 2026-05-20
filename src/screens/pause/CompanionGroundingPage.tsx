@@ -1,101 +1,54 @@
-import { useCallback, useEffect, useMemo } from 'react';
-import { useNavigate, useParams, useLocation, Navigate } from 'react-router-dom';
+import { useParams, Navigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useHolzen } from '@/app/components/HolzenProvider';
-import { useCompanionData } from '@/features/pause/public-hooks';
-import {
-  useFullviewTelemetry,
-  usePauseSessionCompanionSnapshot,
-} from '@/features/pause/public-hooks';
+import { useCompanionFullViewPage, useGroundingEnrichment } from '@/features/pause/public-hooks';
 import { CompanionFeedback } from '@/screens/pause/components/CompanionFeedback';
 import { CompanionFocusLayout } from '@/screens/pause/components/companion/CompanionFocusLayout';
 import { GroundingFullView } from '@/screens/pause/components/companion/GroundingFullView';
 import { GroundingEnrichment } from '@/screens/pause/components/companion/GroundingEnrichment';
 import { HistoryThread } from '@/screens/pause/components/companion/HistoryThread';
 import { RelatedBiasesThisMonth } from '@/screens/pause/components/companion/RelatedBiasesThisMonth';
-import { useGroundingEnrichment } from '@/features/pause/public-hooks';
 import { InterventionCrossRefBadge } from '@/screens/pause/components/companion/InterventionCrossRefBadge';
-import { useStaggeredReveal } from '@/features/pause/public-hooks';
 import { PageMeta } from '@/app/components/PageMeta';
-import { DEFAULT_COMPANIONS, DEFAULT_PREFS } from '@/features/pause/public';
 
-const SEVERITY_NUMBER: Record<string, number> = { mild: 3, moderate: 6, high: 10 };
-const BREATHING_ROOM_MS = 8000;
-
-
-/**
- * Full-screen Grounding chapter. Mirrors `CompanionHistoryPage` / `SignalPage`.
- * Leaves `enrichmentSlot` wire-through as `undefined` in PR 1 — PR 2 plugs in
- * the `grounding-enrich` edge-function output here via `use-grounding-enrichment`.
- */
+/** Full-screen Grounding chapter — mirrors History / Signal full-view routes. */
 export default function CompanionGroundingPage() {
   const { pauseInstanceId: rid } = useParams<{ pauseInstanceId: string }>();
-  const navigate = useNavigate();
-  const location = useLocation();
   const { t } = useTranslation();
   const { companionPrefs, severity } = useHolzen();
 
-  const { snapshot, isPending: snapshotPending, loadError } = usePauseSessionCompanionSnapshot(rid);
-
-  const pauseInstanceId = snapshot?.id ?? null;
-  const reflectionMessage = snapshot?.reflectionMessage ?? '';
-  const context = snapshot?.context ?? null;
-  const mood = snapshot?.mood ?? null;
-  const companions = snapshot?.companions ?? DEFAULT_COMPANIONS;
-  const prefs = companionPrefs ?? DEFAULT_PREFS;
-  const severityNumber = SEVERITY_NUMBER[severity] ?? 6;
-
   const {
-    nudge,
-    nudgeLoading,
-    nudgeError,
-    retryNudge,
-    fetchCompanion,
-    cacheIds,
-    cacheRelaxations,
-    regenerateCompanion,
-    interventionLoading,
-    intervention,
-  } = useCompanionData({
-    companions,
-    prefs: { ...prefs, grounding: true },
+    missingRouteId,
+    loadError,
+    snapshotPending,
+    snapshot,
     pauseInstanceId,
-    context,
-    reflectionMessage,
     mood,
-    severityNumber,
+    revealed,
+    handleBack,
+    companion: {
+      nudge,
+      nudgeLoading,
+      nudgeError,
+      retryNudge,
+      cacheIds,
+      cacheRelaxations,
+      regenerateCompanion,
+      intervention,
+    },
+  } = useCompanionFullViewPage({
+    routeInstanceId: rid,
+    slot: 'grounding',
+    companionPrefs,
+    severity,
   });
-
-  useEffect(() => {
-    if (!pauseInstanceId || !reflectionMessage) return;
-    if (interventionLoading) return;
-    if (nudge || nudgeLoading || nudgeError) return;
-    void fetchCompanion('grounding');
-  }, [
-    pauseInstanceId,
-    reflectionMessage,
-    interventionLoading,
-    nudge,
-    nudgeLoading,
-    nudgeError,
-    fetchCompanion,
-  ]);
-
-  const revealed = useStaggeredReveal(BREATHING_ROOM_MS);
-  useFullviewTelemetry('grounding', pauseInstanceId);
 
   const enrichmentQuery = useGroundingEnrichment({
     citation: nudge?.citation ?? null,
     url: nudge?.url ?? null,
   });
 
-  const handleBack = useCallback(() => {
-    const st = location.state as { from?: string } | undefined;
-    if (st?.from === 'archive') navigate('/archive');
-    else navigate(-1);
-  }, [location.state, navigate]);
-
-  if (!rid) return <Navigate to="/" replace />;
+  if (missingRouteId) return <Navigate to="/" replace />;
 
   if (loadError) {
     return (
