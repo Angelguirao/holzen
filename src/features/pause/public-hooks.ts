@@ -96,7 +96,7 @@ export {
   type PauseArtifactHaikuFetchPhase,
   type UsePauseArtifactHaikuParams,
   type UsePauseArtifactHaikuResult,
-} from './presentation/use-pause-artifact-haiku';
+} from './presentation/reflect/use-pause-artifact-haiku';
 export { useCompanionSlotOrchestratePorts } from './presentation/use-companion-slot-orchestrate-ports';
 export { usePauseReflectionStepLog } from './presentation/reflect/use-pause-reflection-step-log';
 export {
