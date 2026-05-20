@@ -35,6 +35,7 @@ export {
   type PauseArchiveSegment,
   type UsePauseArchiveListOptions,
 } from './presentation/use-pause-archive-list';
+export { getArchivePausesTabHasRowsQueryOptions } from './public-queries';
 export {
   useArchivePauseRetrospectiveOutcome,
   type UseArchivePauseRetrospectiveOutcomeParams,

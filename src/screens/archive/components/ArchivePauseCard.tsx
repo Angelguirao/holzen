@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { formatDistanceToNow } from 'date-fns';
 import { ChevronDown, Pause } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import type { PauseArchiveRow } from '@/features/pause/public-queries';
+import type { PauseArchiveRow } from '@/features/pause/public-hooks';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import { Button } from '@/components/ui/button';
 import { ArchivePauseRetrospectiveOutcomeSheet } from '@/screens/archive/components/ArchivePauseRetrospectiveOutcomeSheet';
