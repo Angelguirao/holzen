@@ -1,4 +1,4 @@
-import type { PauseScoreImpactRow } from '@/features/pause/application/use-cases/score-impacts';
+import type { PauseScoreImpactRow } from '@/features/pause/application/use-cases/ritual/decide/score-impacts';
 
 export type ScoreImpactVariant = 'default' | 'brief';
 

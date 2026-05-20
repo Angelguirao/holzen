@@ -4,7 +4,7 @@
  */
 export { pauseCreateSkippedUserMessage } from './application/use-cases/create-skipped-message';
 export { pauseArchiveRowAllowsRetrospectiveOutcome } from './application/use-cases/archive/retrospective-outcome';
-export { buildOutcomeLoggedPayload } from './application/use-cases/outcome-log-payload';
+export { buildOutcomeLoggedPayload } from './application/use-cases/ritual/decide/outcome-log-payload';
 export {
   computeBriefRitualGoBack,
   type BriefRitualGoBackResult,

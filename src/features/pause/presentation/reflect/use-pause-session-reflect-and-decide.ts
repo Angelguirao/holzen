@@ -6,9 +6,10 @@ import {
   resolveReflectGenerationSeverityAbsPct,
   shouldRunPauseReflectGeneration,
 } from '@/features/pause/application/use-cases/ritual/reflect/pause-session-reflect-decide-flow';
-import type { PauseImpactData } from '@/features/pause/application/use-cases/impact-data';
-import { type PauseStep, type RitualDepth } from '@/features/pause/public';
-import type { MoodValue } from '../../domain/mood-value';
+import type { PauseImpactData } from '@/features/pause/application/use-cases/ritual/decide/impact-data';
+import type { MoodValue } from '@/features/pause/domain/mood-value';
+import type { PauseStep } from '@/features/pause/domain/pause-ritual-steps';
+import type { RitualDepth } from '@/features/pause/domain/ritual-types';
 import { usePauseReflectGeneration } from './use-pause-reflect-generation';
 import { usePauseSessionDecideHandler } from '../decide/use-pause-session-decide-handler';
 

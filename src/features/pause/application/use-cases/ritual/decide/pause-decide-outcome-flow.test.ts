@@ -3,7 +3,7 @@ import {
   formatReinforcementQuoteFromSession,
   resolvePauseDecideOutcomeFlow,
 } from './pause-decide-outcome-flow';
-import type { BuildPauseImpactDataOnCompleteInput } from '@/features/pause/application/use-cases/impact-data';
+import type { BuildPauseImpactDataOnCompleteInput } from '@/features/pause/application/use-cases/ritual/decide/impact-data';
 
 const ritualSnapshot: Omit<BuildPauseImpactDataOnCompleteInput, 'decision' | 'reinforcementQuote'> = {
   context: 'BTC',
