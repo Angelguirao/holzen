@@ -1,7 +1,7 @@
 import { describe, expect, it, vi } from 'vitest';
 import { applyCompanionInterventionInvokeOutcome } from './apply-companion-intervention-invoke-outcome';
 
-vi.mock('./companion-intervention-telemetry', () => ({
+vi.mock('@/features/pause/application/use-cases/ritual/frame/companion-intervention-telemetry', () => ({
   logCompanionInterventionInvokeFailed: vi.fn(),
   logCompanionInterventionInvokeOk: vi.fn(),
   logCompanionInterventionSignalHydrated: vi.fn(),

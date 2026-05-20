@@ -3,7 +3,7 @@ import {
   logCompanionInterventionInvokeFailed,
   logCompanionInterventionInvokeOk,
   logCompanionInterventionSignalHydrated,
-} from './companion-intervention-telemetry';
+} from '@/features/pause/application/use-cases/ritual/frame/companion-intervention-telemetry';
 import { resolveCompanionOrchestrateInvokeFailure } from './orchestrate-invoke-error';
 import {
   hydrateOrchestrateSlotsFromInterventionResponse,
