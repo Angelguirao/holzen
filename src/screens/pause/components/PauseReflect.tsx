@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useState } from 'react';
 import { motion } from 'framer-motion';
 import { useTranslation } from 'react-i18next';
 import { ChevronLeft, ChevronRight, CirclePlus, Heart, Loader2 } from 'lucide-react';
@@ -9,9 +9,8 @@ import { PauseTags } from '@/screens/pause/components/PauseTags';
 import { pauseStepLayout } from '@/screens/pause/components/pause-step-layout';
 import { Button } from '@/components/ui/button';
 import { trackEvent } from '@/lib/posthog';
-import { usePauseReflectionStepLog } from '@/features/pause/public-hooks';
+import { usePauseArtifactHaiku, usePauseReflectionStepLog } from '@/features/pause/public-hooks';
 import { hapticFeedback } from '@/lib/haptics';
-import { fetchHaikuTextForPauseInstance } from '@/features/pause/public-queries';
 import { cn } from '@/lib/utils';
 
 interface Props {
@@ -46,21 +45,11 @@ export function PauseReflect({
 }: Props) {
   const { t } = useTranslation();
   const [postItOpen, setPostItOpen] = useState(false);
-  const [artifactHaiku, setArtifactHaiku] = useState<string | null>(null);
-
-  useEffect(() => {
-    setArtifactHaiku(null);
-    if (!pauseInstanceId || !companionHaikuEnabled) return;
-    const myId = pauseInstanceId;
-    let cancelled = false;
-    void fetchHaikuTextForPauseInstance(myId).then((h) => {
-      if (cancelled) return;
-      setArtifactHaiku(h);
-    });
-    return () => {
-      cancelled = true;
-    };
-  }, [pauseInstanceId, companionHaikuEnabled]);
+  const { artifactHaiku } = usePauseArtifactHaiku({
+    pauseInstanceId,
+    companionHaikuEnabled,
+    trigger: 'immediate',
+  });
 
   usePauseReflectionStepLog({
     pauseInstanceId,

@@ -282,10 +282,10 @@ const Home = () => {
   } = useHomeMarketDisplayPreferences();
   const unitBasisModeSupported = trackedAssetId === 'bitcoin';
   const { zenMode, setZenModePersist } = useHomeZenMode(pathname);
-  const completedPauseCount = useHomeCompletedPauseCount(user);
+  const completedPauseCount = useCompletedPauseCount() ?? 0;
 ```
 
-**What to notice:** each line group is **one concern**. `unitBasisModeSupported` is a **simple derived boolean** from `trackedAssetId` (no hook needed). `pathname` only exists to drive Zen mode persistence tied to the route. Reflection copy for the pause widget comes from **`useHolzen`** (`message`) and **`pause_ai_artifacts`** after **Reflect** — there is no Home “pinned preview” inset anymore.
+**What to notice:** each line group is **one concern**. `unitBasisModeSupported` is a **simple derived boolean** from `trackedAssetId` (no hook needed). `pathname` only exists to drive Zen mode persistence tied to the route. `useCompletedPauseCount` (pause `public-hooks`) shares the TanStack cache with other surfaces; Home coerces `null` to `0` for testimonial gating. Reflection copy for the pause widget comes from **`useHolzen`** and **`pause_ai_artifacts`** after **Reflect** — there is no Home “pinned preview” inset anymore.
 
 ---
 
