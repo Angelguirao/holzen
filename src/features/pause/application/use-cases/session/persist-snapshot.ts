@@ -1,4 +1,4 @@
-import type { PauseStep } from '@/features/pause/public';
+import type { PauseStep } from '@/features/pause/domain/pause-ritual-steps';
 import type { FeelStepTile } from '@/features/pause/domain/feel-step-tile';
 import type { MoodValue } from '@/features/pause/domain/mood-value';
 import type { CompanionData, CompanionPrefs } from '@/features/pause/domain/companion-card-types';

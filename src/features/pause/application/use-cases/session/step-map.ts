@@ -1,5 +1,5 @@
 import type { FeelStepTile } from '@/features/pause/domain/feel-step-tile';
-import type { PauseStep } from '@/features/pause/public';
+import type { PauseStep } from '@/features/pause/domain/pause-ritual-steps';
 import { STEPS } from '@/features/pause/domain/pause-ritual-steps';
 import type { BriefPauseStep, RitualDepth } from '@/features/pause/domain/ritual-types';
 import type { PersistedSession } from '@/features/pause/domain/session-model';

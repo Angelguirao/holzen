@@ -1,4 +1,4 @@
-import type { PauseStep } from '@/features/pause/public';
+import type { PauseStep } from '@/features/pause/domain/pause-ritual-steps';
 
 /**
  * Whether an implicit “advance to next step” gesture may leave the current pause step.
