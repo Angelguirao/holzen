@@ -31,7 +31,7 @@ docs/artifacts/<initiative-slug>/
 
 | Initiative | Path | Spec (owner) |
 |------------|------|--------------|
-| Client architecture migration | [docs/artifacts/architecture-migration/](../artifacts/architecture-migration/) | [pause-client-architecture.md](../systems/pause-client-architecture.md) + [holzen-application-architecture.md](holzen-application-architecture.md) |
+| Client architecture migration | [docs/artifacts/architecture-migration/](../artifacts/architecture-migration/) | [pause-client-architecture.md](../systems/pause-client-architecture.md) (reference impl + §9 template) + [holzen-application-architecture.md](holzen-application-architecture.md) (full `src/` north star) |
 
 Commit the notes file **in the same PR** as the code when you add a decision, deviation, tradeoff, or open question. Empty sections are fine until something worth recording appears.
 

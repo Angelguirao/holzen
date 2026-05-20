@@ -26,7 +26,7 @@
 <body>
   <h1>Architecture migration — implementation notes</h1>
   <p class="meta">
-    <strong>Initiative:</strong> client <code>src/</code> alignment (pause-first)<br />
+    <strong>Initiative:</strong> full active <code>src/</code> alignment — pause is reference impl; scheduling is pause-first per tier<br />
     <strong>Branch:</strong> <code>cursor/arch-migrate-src-ca70</code><br />
     <strong>Spec:</strong>
     <a href="../../systems/pause-client-architecture.md">pause-client-architecture.md</a>,
@@ -50,7 +50,8 @@
     <li><strong>UI:</strong> JSX in <code>screens/pause/components/</code>; hooks in <code>features/pause/presentation/</code>.</li>
     <li><strong>Collections:</strong> user Archive Collections tab <em>not MVP</em> — strip to legacy (spec §7); keep <code>companion_catalog</code> and slot favorites.</li>
     <li><strong>Branch:</strong> one long-lived migration branch; one commit per vertical slice.</li>
-    <li><strong>Other contexts:</strong> same module skeleton as pause (spec §9).</li>
+    <li><strong>Scope vs priority:</strong> north star = all bounded contexts on the §9 skeleton; <em>scheduling</em> = pause-first at each slice tier, then subscription/auth/market/… (see <a href="README.md">README.md</a> phases).</li>
+    <li><strong>Other contexts:</strong> same module skeleton as pause (spec §9) — not a separate initiative.</li>
   </ul>
 
   <h2 id="notes">Running notes</h2>
@@ -109,6 +110,25 @@
       <dd><strong>Hard export cap in CI</strong> — forces splits quickly but noisy. <strong>Soft target in spec</strong> — flexible during migration. Picked soft target until migration completes.</dd>
       <dt>Open questions</dt>
       <dd>Add <code>check:public-barrel-size</code> when <code>public.ts</code> stabilizes?</dd>
+    </dl>
+  </article>
+
+  <article class="note">
+    <header>
+      <span>2026-05-20</span>
+      <span>Initiative scope</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>Pause-first scheduling ≠ pause-only initiative</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd><strong>North star:</strong> align all active <code>src/</code> and extend the pause module template (spec §9) to subscription, auth, market, user, notifications. <strong>Scheduling:</strong> at each slice tier, finish pause violations before the same tier in another context — pause is reference impl, not the sole domain.</dd>
+      <dt>Deviation</dt>
+      <dd>None — clarifies wording that was easy to read as “only touch pause until the branch merges.”</dd>
+      <dt>Tradeoffs</dt>
+      <dd><strong>Pause-only until done</strong> — fastest ritual convergence, delays cross-context debt. <strong>Strict tier rotation</strong> (pause tier 1, then auth tier 1, …) — spreads patterns early, fragments pause ritual moves. Picked pause-first per tier with explicit Phase B/C in migration README.</dd>
+      <dt>Open questions</dt>
+      <dd>Before Phase B slices: add per-context client-architecture docs (e.g. <code>subscription-client-architecture.md</code>) or rely on AGENTS change map + feature READMEs until a context needs a full narrative?</dd>
     </dl>
   </article>
 
