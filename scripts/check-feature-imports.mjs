@@ -80,7 +80,6 @@ const ALLOWED_DEEP_IMPORT_FILES = new Set([
   'src/features/subscription/presentation/CheckoutConfirmation.guard.test.tsx',
   'src/features/subscription/presentation/CheckoutConfirmation.refresh-state.test.tsx',
   'src/test/subscription-checkout-no-refetch-on-back-nav.test.tsx',
-  'src/app/components/AppLayout.tsx',
 ]);
 
 /** Migrated pause/companion domain — active app must use feature public APIs, not lib shims. */
