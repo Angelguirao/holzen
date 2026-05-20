@@ -8,9 +8,9 @@ import {
 import {
   resolveCompanionOrchestrateInvokeFailure,
   type CompanionOrchestrateInvokeFailure,
-} from '@/features/pause/application/use-cases/ritual/frame/orchestrate-invoke-error';
+} from './orchestrate-invoke-error';
 import { isFilledOrchestrateSlot, readOrchestrateSlotBody } from './orchestrate-slot-apply';
-import { getRecencyHints } from '@/features/pause/application/use-cases/ritual/frame/recency-hints';
+import { getRecencyHints } from './recency-hints';
 
 export type CompanionSlotOrchestrateMode = 'lazy_fetch' | 'regenerate';
 
