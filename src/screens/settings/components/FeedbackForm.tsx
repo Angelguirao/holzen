@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { Send, Bug, Lightbulb, HelpCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
-import { invokeEdge } from '@/lib/invoke-edge';
+import { sendFeedback } from '@/features/user/public-rpc';
 import { toast } from 'sonner';
 import { enqueueAction } from '@/lib/offline-queue';
 import { useTranslation } from 'react-i18next';
@@ -42,9 +42,7 @@ export function FeedbackForm() {
     }
 
     setSubmitting(true);
-    const { error } = await invokeEdge('send-feedback', {
-      body: payload,
-    });
+    const { error } = await sendFeedback(payload);
     setSubmitting(false);
     if (error) {
       toast.error(t('feedback.failedToSend'), { description: t('feedback.tryAgainLater') });
