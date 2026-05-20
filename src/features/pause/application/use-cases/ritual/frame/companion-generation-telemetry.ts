@@ -1,7 +1,7 @@
 import { trackEvent } from '@/lib/posthog';
 import type { CompanionSlotSource, RegenerateCompanionSlot } from '@/features/pause/domain/companion-orchestrate';
 import { companionSlotToGenerationTaxonomy } from '@/features/pause/application/use-cases/ritual/frame/generation-taxonomy';
-import type { CompanionSlotOrchestrateMode } from './run-companion-slot-orchestrate';
+import type { CompanionSlotOrchestrateMode } from '@/features/pause/application/use-cases/companion/run-companion-slot-orchestrate';
 
 /** PostHog: companion-orchestrate lazy fetch / regenerate started (taxonomy: generation.initiated). */
 export function trackCompanionGenerationInitiated(
