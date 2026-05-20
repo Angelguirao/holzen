@@ -293,7 +293,7 @@ Use this when moving files. Paths are indicative — adjust to actual filenames 
 |------------------------|--------|
 | ~~`src/hooks/use-pause-*`~~ (removed) | `packages/pause` (§3 subdirs) + thin hooks in `apps/web` |
 | `features/pause/presentation/use-companion-data.ts` | `features/pause/application/use-cases/ritual/frame/` (target; packages path when extracted) |
-| `src/screens/home/hooks/use-holzen.ts` | `packages/market` + `apps/web/screens/home` (wires pause triggers) |
+| ~~`src/screens/home/hooks/use-holzen.ts`~~ → `features/pause/presentation/use-holzen-home-context-state.ts` (+ manual-trigger orchestration) | `packages/market` + `apps/web/screens/home` (wires pause triggers) |
 | ~~`src/hooks/use-subscription`~~ → `features/subscription/public-hooks` | `packages/subscription` |
 | ~~`src/hooks/use-auth`~~ → `@/features/auth/public` | `packages/auth` |
 | Archive library hooks | `features/pause/public-queries` + `screens/archive/hooks/` |

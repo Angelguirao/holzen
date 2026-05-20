@@ -299,9 +299,9 @@ Goal: **map** the rest of the surface area without drowning in files. Use **§4*
 
 | Step | What to do |
 |------|------------|
-| 1. **Route map** | Re-read **§4** above — list every **main** route (`/`, `/archive`, `/journey/*`, `/settings`, `/tools`, `/pause`, immersive `/tools/*` practices, `/admin`, public routes). For each **bucket**, note the **screen module** under `src/screens/`. |
-| 2. **Auth shell** | **§5** — `use-auth`, `ProtectedRoute` / `PublicOnlyRoute`. Trace **`/welcome`** vs **`/`** once in `App.tsx`. Optional: [route-gating-system.md](../systems/routing/route-gating-system.md). |
-| 3. **Feature hooks** | **§6** table — for each row you care about, open the hook and **one** page that uses it (`use-library` + `Library`, `use-subscription` + billing/settings, `use-push-notifications`, etc.). |
+| 1. **Route map** | Re-read **§4** above — list every **shipped** route (`/`, `/archive`, `/journey`, `/settings`, `/pause`, companion deep links, `/admin`, public marketing). **Dead IA** (`/tools/*`, `/library`, …) → **404** — see [active-surface.md](../ops/active-surface.md). |
+| 2. **Auth shell** | **§5** — `@/features/auth/public` (`useAuth`, `AuthProvider`), `ProtectedRoute` / `PublicOnlyRoute`. Trace **`/welcome`** vs **`/`** once in `App.tsx`. Optional: [route-gating-system.md](../systems/routing/route-gating-system.md). |
+| 3. **Feature hooks** | **§6** table — for each row you care about, open the hook and **one** screen that uses it (`useSubscription` + Settings billing, `useProfile` + Settings, `usePushNotifications` + bell/settings, `useHolzen` + Home pause card). |
 | 4. **Components** | **§8** — skim `components/ui/`, `app/components/`, and one `screens/<route>/components/` folder (e.g. `pause/`). |
 | 5. **Edge functions** | **§12** — read the full table once; you do not need every `index.ts` until you touch a feature. [cron-setup.md](../ops/cron-setup.md) when you move to **server-triggered** pause and workers. |
 | 6. **Systems docs** | [docs/README.md](../README.md) — pick **auth**, **routing**, **pause** when you need depth; phased **reviews** in order if you care about security/pipeline history. |
