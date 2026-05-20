@@ -2431,6 +2431,25 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-20</span>
+      <span>Phase A slice — peel companion domain types off public.ts in application (§6)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>Backlog #3 — frame + shell application imports domain companion types</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>After <code>PauseStep</code> peel, ritual/frame artifact helpers and session shell view model import <code>CompanionData</code> / <code>CompanionPrefs</code> from <code>domain/companion-card-types</code> and <code>CachedHistoricalInsightShape</code> from <code>domain/historical-insight</code>; <code>shell-view-model.test</code> imports use-case modules directly.</dd>
+      <dt>Deviation</dt>
+      <dd>None — <code>public.ts</code> and <code>public-hooks</code> still re-export types for screens.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Application tests still import session helpers via <code>public.ts</code> until next peel cluster.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: peel <code>PersistedSession</code> / hydration types in application tests, or backlog #4 <code>PauseRepository</code> wiring.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
 </body>
 </html>
