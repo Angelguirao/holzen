@@ -282,6 +282,7 @@ The repo is mid-migration. Expect:
 |---------|--------------------------|-------------|---------------|
 | Reflect generation | `application/use-cases/reflect/` | `ritual/reflect/` | Move incrementally |
 | Frame / companion slots | `application/use-cases/companion/` | `ritual/frame/` | Move incrementally |
+| Partial ritual beats (brief/deep/breath/log) | `application/use-cases/ritual/` (`brief/`, `deep/`, `breath/`, `log-pause-step.ts`, …) | consolidate under `ritual/*/` | Optional later |
 | Breathing / audio | `application/use-cases/breathing/`, `ritual/breath/` | `ritual/breathe/` | Optional consolidate later |
 | Feel / initial emotion | `session/run-initial-emotion-log.ts`, `ritual/clamp-feel-intensity.ts` | `ritual/feel/` | Optional later |
 | Decide / outcome | `session/run-pause-outcome-log.ts` | `ritual/decide/` | Optional later |
