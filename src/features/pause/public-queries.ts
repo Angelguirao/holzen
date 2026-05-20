@@ -65,6 +65,14 @@ export {
   type CompanionCacheAdminMutationResult,
 } from './infrastructure/queries/companion-cache-admin-mutations';
 export {
+  deleteCompanionFallback,
+  insertCompanionFallbackEntry,
+  setCompanionFallbackActive,
+  swapCompanionFallbackSortOrder,
+  updateCompanionFallbackPayload,
+  type CompanionFallbackAdminMutationResult,
+} from './infrastructure/queries/companion-fallbacks-admin-mutations';
+export {
   BULK_HOLD_PENDING_DISABLED_USER_ID,
   BULK_HOLD_PENDING_QUERY_LEAF,
   BULK_HOLD_PENDING_QUERY_PREFIX,
