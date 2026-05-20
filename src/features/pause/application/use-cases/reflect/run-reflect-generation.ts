@@ -3,7 +3,7 @@ import type {
   ReflectGenerationEdgeInvokeInput,
   ReflectGenerationProfileInput,
 } from './reflect-generation-edge-params';
-import { isAbortLikeReflectError } from './reflect-generation-errors';
+import { isAbortLikeReflectError } from '../ritual/reflect/reflect-generation-errors';
 
 export type RunReflectGenerationInput = {
   pauseInstanceId: string;

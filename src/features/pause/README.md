@@ -22,7 +22,7 @@ features/pause/
   public.ts | public-queries.ts | public-rpc.ts | public-hooks.ts
 ```
 
-**Transitional paths (move incrementally):** some use cases still live at `application/use-cases/reflect/` and `application/use-cases/companion/` — target is `ritual/reflect/` and `ritual/frame/`. User **collections** code is in `src/legacy/archive-collections/` (not shipped MVP).
+**Transitional paths (move incrementally):** reflect use cases are moving from `application/use-cases/reflect/` → `ritual/reflect/` (first slice: `reflect-generation-errors`); companion use cases still at `application/use-cases/companion/` → target `ritual/frame/`. User **collections** code is in `src/legacy/archive-collections/` (not shipped MVP).
 
 **Brief vs deep:** one bounded context. Depth is `RitualDepth` on the instance / persisted session — not separate feature folders.
 

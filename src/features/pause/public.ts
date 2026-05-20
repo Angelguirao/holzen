@@ -113,7 +113,7 @@ export {
 export {
   isAbortLikeReflectError,
   reflectGenerationUserErrorMessage,
-} from './application/use-cases/reflect/reflect-generation-errors';
+} from './application/use-cases/ritual/reflect/reflect-generation-errors';
 export {
   buildReflectGenerationEdgeInvokeInput,
   type ReflectGenerationEdgeInvokeInput,

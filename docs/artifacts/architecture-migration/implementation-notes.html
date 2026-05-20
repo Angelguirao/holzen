@@ -132,6 +132,25 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-19</span>
+      <span>Phase A slice #1 — reflect cluster</span>
+      <span class="status open">open</span>
+    </header>
+    <h3>First reflect leaf: <code>reflect-generation-errors</code> → <code>ritual/reflect/</code></h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Start Phase A reflect migration with the smallest leaf cluster (pure error helpers + unit test) — no cross-imports from other reflect use cases — before moving <code>run-reflect-generation</code> and hook-flow files.</dd>
+      <dt>Deviation</dt>
+      <dd>None — matches spec §3 / §10 incremental plan.</dd>
+      <dt>Tradeoffs</dt>
+      <dd><strong>Move whole reflect folder</strong> — one commit, large diff. <strong>Leaf-first</strong> — more commits, easier review and import churn isolation. Picked leaf-first.</dd>
+      <dt>Open questions</dt>
+      <dd>Next slice: <code>generation-prerequisites</code> + <code>reflect-generation-edge-params</code>, or <code>run-reflect-generation</code> as a cluster?</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
 </body>
 </html>
