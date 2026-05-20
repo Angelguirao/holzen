@@ -27,6 +27,10 @@ export {
   type UseHolzenManualTriggerOrchestrationParams,
 } from './presentation/use-holzen-manual-trigger-orchestration';
 export {
+  useHomePauseActions,
+  type PauseDismissAnalyticsSurface,
+} from './presentation/use-home-pause-actions';
+export {
   usePauseReflectGeneration,
   type UsePauseReflectGenerationParams,
 } from './presentation/use-pause-reflect-generation';

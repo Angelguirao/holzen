@@ -22,7 +22,7 @@ import { useAuth } from '@/features/auth/public';
 import { useHomeVisibleSections } from '@/screens/home/hooks/use-home-visible-sections';
 import { useHomeCustomizeBridge } from '@/screens/home/hooks/use-home-customize-bridge';
 import { useHomeMarketGoalHeaders } from '@/screens/home/hooks/use-home-market-goal-headers';
-import { useHomePauseActions } from '@/screens/home/hooks/use-home-pause-actions';
+import { useHomePauseActions } from '@/features/pause/public-hooks';
 import { useHomePauseCardProjection } from '@/screens/home/hooks/use-home-pause-card-projection';
 import { useHomeDashboardTodayWiring } from '@/screens/home/hooks/use-home-dashboard-today-wiring';
 import { getHomeSubscriptionGate } from '@/features/subscription/public';

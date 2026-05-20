@@ -203,6 +203,12 @@ export {
   type PauseSeverity,
   parsePauseSessionLocationState,
 } from './application/use-cases/session/location-state';
+export { canNavigateToPauseSession } from './application/use-cases/session/can-navigate-to-pause-session';
+export {
+  buildHomePauseSessionLocationState,
+  type BuildHomePauseSessionLocationStateInput,
+} from './application/use-cases/session/build-home-pause-session-location-state';
+export { shouldNavigateAfterManualTrigger } from './application/use-cases/trigger/should-navigate-after-manual-trigger';
 export {
   computePauseHeaderBackIntent,
   isPauseSessionHeaderBackVisible,
