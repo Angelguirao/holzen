@@ -2298,6 +2298,25 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-20</span>
+      <span>Phase A slice — colocate pause-breath-orb-metrics under ritual/breathe (Tier 5)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>Backlog #1 complete; orb visual metrics → <code>ritual/breathe/</code></h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd><code>reflect/</code> → <code>ritual/reflect/</code> was already complete. Smallest remaining breathe cluster: <code>pause-breath-orb-metrics</code> (+ test) beside <code>ritual-pattern</code>; sibling import <code>./ritual-pattern</code>; <code>public-hooks</code> and <code>screens/pause/lib/resolve-pause-breathing-timed-display</code> paths updated.</dd>
+      <dt>Deviation</dt>
+      <dd>None — orb scale / hold mandala behavior unchanged.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Did not move triangle kicker or standalone patterns in the same commit.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: <code>resolve-triangle-kicker-display</code> under <code>ritual/breathe/</code>, or §6 <code>public.ts</code> peel / backlog #4 <code>PauseRepository</code> wiring.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
 </body>
 </html>

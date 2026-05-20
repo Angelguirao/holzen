@@ -64,7 +64,7 @@ export {
   getPendingPauseOfferDisplay,
   type PendingPauseOfferDisplay,
 } from './application/use-cases/pending-offer/pending-pause-offer-display';
-export { resolveBreathOrbVisualMetrics } from './application/use-cases/breathing/pause-breath-orb-metrics';
+export { resolveBreathOrbVisualMetrics } from './application/use-cases/ritual/breathe/pause-breath-orb-metrics';
 export {
   resolveTriangleKickerDisplay,
   type TriangleKickerDisplay,

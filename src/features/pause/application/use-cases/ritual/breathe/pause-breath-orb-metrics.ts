@@ -1,4 +1,4 @@
-import { holdProgressWithinPhase } from '@/features/pause/application/use-cases/ritual/breathe/ritual-pattern';
+import { holdProgressWithinPhase } from './ritual-pattern';
 
 /** Triangle inhale / sip phases — orb expands with elapsed progress. */
 export const PAUSE_BREATH_EXPAND_PHASE_LABEL_KEYS = [
