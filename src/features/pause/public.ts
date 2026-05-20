@@ -280,17 +280,6 @@ export {
   type PostPauseFeelSnapshot,
 } from './application/use-cases/ritual/done/post-pause-emotion-log';
 export {
-  buildPauseScoreImpacts,
-  type PauseScoreImpactRow,
-} from './application/use-cases/score-impacts';
-export {
-  resolveScoreImpactDisplayImpacts,
-  resolveScoreImpactViewMode,
-  scoreImpactMotionDelaySec,
-  type ScoreImpactVariant,
-  type ScoreImpactViewMode,
-} from './application/use-cases/score-impact-presentation';
-export {
   breathCompletedSegment1Payload,
   breathCompletedSegment2Payload,
 } from './application/use-cases/breathing/breath-completed-payload';
