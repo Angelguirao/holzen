@@ -1,6 +1,6 @@
 import { useState, useEffect, useImperativeHandle, forwardRef, useRef, useMemo } from 'react';
 import { motion, useReducedMotion } from 'framer-motion';
-import { Play, RefreshCw, ChevronRight } from 'lucide-react';
+import { Play } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import type { FeelStepTile } from '@/features/pause/public';
 import { pauseStepLayout } from '@/features/pause/public';
@@ -23,6 +23,7 @@ import {
   resumePauseAudioContext,
 } from '@/features/pause/public';
 import { BriefBreathAdvanceToIntegrate } from '@/screens/pause/components/brief-breath-advance-to-integrate';
+import { DeepBreathPostPatternInterstitial } from '@/screens/pause/components/deep-breath-post-pattern-interstitial';
 import { BreathOrbVisual } from '@/screens/pause/components/breath-orb-visual';
 
 const EXPAND_KEYS = ['breathing.phases.inhale', 'breathing.phases.sip'];
@@ -389,113 +390,18 @@ export const PauseBreathing = forwardRef<PauseBreathingHandle, Props>(function P
             phaseAdvanceGuardRef.current = false;
           }}
         />
-      ) : ritualVariant === 'deep' && breathSegment === 'first' ? (
-        <motion.div
-          initial={{ opacity: 0, y: 8 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8 }}
-          className="flex max-w-md flex-col items-center gap-6 px-2 text-center"
-        >
-          <p className={pauseStepLayout.screenTitle}>
-            {t('pause.deep.breathFirstInterstitialTitle', { defaultValue: 'Three breaths' })}
-          </p>
-          <p className={`${pauseStepLayout.screenSubtitle} max-w-sm`}>
-            {t('pause.deep.breathFirstInterstitialBody', { defaultValue: "You've arrived" })}
-          </p>
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 0.35, duration: 0.6 }}
-            className="flex flex-wrap items-center justify-center gap-3 pt-1 sm:gap-6"
-          >
-            {onRepeatDeepFirstBreathPattern ? (
-              <Button
-                type="button"
-                variant="ghost"
-                className="gap-2 font-semibold text-primary hover:bg-primary/5 hover:text-primary"
-                onClick={() => {
-                  hapticFeedback('light');
-                  onRepeatDeepFirstBreathPattern();
-                }}
-              >
-                <RefreshCw className="h-4 w-4 shrink-0" aria-hidden />
-                {t('pause.deep.breathFirstRepeatCta', { defaultValue: 'Three more' })}
-              </Button>
-            ) : null}
-            <Button
-              type="button"
-              variant="outline"
-              size="default"
-              className={pauseStepLayout.ritualPrimaryOutlineCta}
-              onClick={() => {
-                hapticFeedback('light');
-                onContinueAfterBreath();
-              }}
-            >
-              {t('pause.steps.continue', { defaultValue: 'Continue' })}
-              <ChevronRight className="ml-1 h-4 w-4 shrink-0" aria-hidden />
-            </Button>
-          </motion.div>
-        </motion.div>
-      ) : (
-        <motion.div
-          initial={{ opacity: 0, y: 8 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8 }}
-          className="flex max-w-md flex-col items-center gap-6 px-2 text-center"
-        >
-          <motion.div
-            className="flex shrink-0 items-center justify-center"
-            animate={prefersReduced ? {} : { scale: [1, 1.04, 1] }}
-            transition={{ duration: 6, repeat: Infinity, ease: 'easeInOut' }}
-          >
-            <BreathOrbVisual
-              orbScale={1}
-              phaseProgress={1}
-              showHoldMandala
-              holdProgress={1}
-              prefersReducedMotion={!!prefersReduced}
-            />
-          </motion.div>
-          <p className={pauseStepLayout.screenTitle}>
-            {t('pause.deep.breathSecondInterstitialTitle', { defaultValue: 'You already know' })}
-          </p>
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 0.35, duration: 0.6 }}
-            className="flex flex-wrap items-center justify-center gap-3 pt-1 sm:gap-6"
-          >
-            {onRepeatDeepSecondBreathPattern ? (
-              <Button
-                type="button"
-                variant="ghost"
-                className="gap-2 font-semibold text-primary hover:bg-primary/5 hover:text-primary"
-                onClick={() => {
-                  hapticFeedback('light');
-                  onRepeatDeepSecondBreathPattern();
-                }}
-              >
-                <RefreshCw className="h-4 w-4 shrink-0" aria-hidden />
-                {t('pause.deep.breathSecondRepeatCta', { defaultValue: 'Three more' })}
-              </Button>
-            ) : null}
-            <Button
-              type="button"
-              variant="outline"
-              size="default"
-              className={pauseStepLayout.ritualPrimaryOutlineCta}
-              onClick={() => {
-                hapticFeedback('light');
-                onContinueAfterBreath();
-              }}
-            >
-              {t('pause.steps.continue', { defaultValue: 'Continue' })}
-              <ChevronRight className="ml-1 h-4 w-4 shrink-0" aria-hidden />
-            </Button>
-          </motion.div>
-        </motion.div>
-      )}
+      ) : ritualVariant === 'deep' ? (
+        <DeepBreathPostPatternInterstitial
+          segment={breathSegment}
+          prefersReducedMotion={!!prefersReduced}
+          onContinueAfterBreath={onContinueAfterBreath}
+          onRepeatPattern={
+            breathSegment === 'first'
+              ? onRepeatDeepFirstBreathPattern
+              : onRepeatDeepSecondBreathPattern
+          }
+        />
+      ) : null}
 
     </motion.div>
   );
