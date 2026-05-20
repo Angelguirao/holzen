@@ -3,7 +3,7 @@ import { BOX_BREATH_PHASE_COUNT } from '@/features/pause/application/use-cases/r
 import {
   STANDALONE_BREATHING_PATTERNS,
   resolveSuggestedStandaloneBreathingPatternIndex,
-} from '@/features/pause/application/use-cases/breathing/standalone-breathing-patterns';
+} from '@/features/pause/application/use-cases/ritual/breathe/standalone-breathing-patterns';
 
 describe('standalone-breathing-patterns', () => {
   it('box pattern matches legacy phase count', () => {

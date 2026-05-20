@@ -2355,6 +2355,25 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-20</span>
+      <span>Phase A slice — colocate standalone-breathing-patterns under ritual/breathe (Tier 5)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>Backlog #1 complete; clear legacy <code>application/use-cases/breathing/</code></h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>After triangle kicker colocation, move <code>standalone-breathing-patterns</code> (+ test) beside other breathe modules; <code>public-hooks</code> re-export path only. Removes the last files under legacy <code>breathing/</code> — shipped ritual breathe hub is entirely under <code>ritual/breathe/</code>.</dd>
+      <dt>Deviation</dt>
+      <dd>None — overlay pattern catalog and severity-based default index unchanged.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Did not peel additional <code>public.ts</code> session types in the same commit.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: §6 <code>public.ts</code> peel (application session types), or backlog #4 <code>PauseRepository</code> wiring for remaining direct RPC call sites.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
 </body>
 </html>
