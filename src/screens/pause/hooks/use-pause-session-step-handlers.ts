@@ -1,7 +1,6 @@
-import { useCallback } from 'react';
-import { usePauseFavoriteToggle } from '@/screens/pause/hooks/use-pause-favorite-toggle';
+import { buildPauseSessionStepRitualBundle, buildPauseSessionStepShellBundle } from '@/screens/pause/hooks/pause-session-step-bundles';
 import { usePauseSessionBreathReflectHandlers } from '@/screens/pause/hooks/use-pause-session-breath-reflect-handlers';
-import { usePauseSessionMoodAndPersist } from '@/screens/pause/hooks/use-pause-session-mood-and-persist';
+import { usePauseSessionMoodChromeHandlers } from '@/screens/pause/hooks/use-pause-session-mood-chrome-handlers';
 import type { usePauseSessionProviders } from '@/screens/pause/hooks/use-pause-session-providers';
 import type { usePauseSessionShellRitual } from '@/screens/pause/hooks/use-pause-session-shell-ritual';
 
@@ -11,187 +10,22 @@ type PauseSessionShellRitual = ReturnType<typeof usePauseSessionShellRitual>;
 /** Mood, breath, reflect/decide, and chrome handlers (inputs for scaffold assembly). */
 export function usePauseSessionStepHandlers(
   p: PauseSessionProviders,
-  { shell, ritual }: PauseSessionShellRitual,
+  shellRitual: PauseSessionShellRitual,
 ) {
-  const {
-    t,
-    handleReturn,
-    subscribed,
-    requirePro,
-  } = p;
-
-  const {
-    restored,
-    message,
-    context,
-    pauseInstanceId,
-    companions,
-    companionPrefs,
-    severity,
-    fetchedInstance,
-    pauseInstanceIdForTerminal,
-    pending,
-    leaveWithPendingOpen,
-    setLeaveWithPendingOpen,
-    leaveSheetBusy,
-    confirmLeavePauseSession,
-    requestExitPauseBeforeDone,
-    handleDeclinePendingFromLeaveSheet,
-    handlePendingAdoptFromLeaveSheet,
-    hasCoalescedShellSession,
-    hydration,
-    fetchFailed,
-    waitingForFetch,
-  } = shell;
-
-  const {
-    step,
-    setStep,
-    phase,
-    setPhase,
-    decision,
-    setDecision,
-    isFavorite,
-    setIsFavorite,
-    moodDone,
-    setMoodDone,
-    moodAfterDone,
-    setMoodAfterDone,
-    selectedMood,
-    setSelectedMood,
-    selectedMoodAfter,
-    setSelectedMoodAfter,
-    feelIntensity,
-    setFeelIntensity,
-    shiftIntensity,
-    setShiftIntensity,
-    breathingFirstCompleted,
-    setBreathingFirstCompleted,
-    breathingSecondCompleted,
-    setBreathingSecondCompleted,
-    frameDone,
-    setFrameDone,
-    curtainLifted,
-    pauseImpactData,
-    setPauseImpactData,
-    ritualEntry,
-    setRitualEntry,
-    briefStep,
-    setBriefStep,
-    briefIntegrateDone,
-    setBriefIntegrateDone,
-    selectedBriefFace,
-    setSelectedBriefFace,
-    swipeDirection,
-    setSwipeDirection,
-    soundMuted,
-    setSoundMuted,
-  } = ritual;
-
-  const { toggleFavorite } = usePauseFavoriteToggle({
-    pauseInstanceId,
-    isFavorite,
-    setIsFavorite,
-    subscribed,
-    t,
-  });
-
-  const handlePauseSessionChromeClose = useCallback(() => {
-    if (phase === 'done') {
-      handleReturn();
-    } else {
-      requestExitPauseBeforeDone();
-    }
-  }, [phase, handleReturn, requestExitPauseBeforeDone]);
-
-  const mood = usePauseSessionMoodAndPersist({
-    pauseInstanceId,
-    t,
-    requirePro,
-    ritualEntry,
-    message,
-    context,
-    companions,
-    companionPrefs,
-    severity,
-    moodDone,
-    moodAfterDone,
-    selectedMood,
-    selectedMoodAfter,
-    feelIntensity,
-    shiftIntensity,
-    phase,
-    decision,
-    step,
-    breathingFirstCompleted,
-    breathingSecondCompleted,
-    frameDone,
-    briefStep,
-    briefIntegrateDone,
-    selectedBriefFace,
-    setRitualEntry,
-    setBriefStep,
-    setBriefIntegrateDone,
-    setSelectedBriefFace,
-    setMoodDone,
-    setSelectedMood,
-    setFeelIntensity,
-  });
-
+  const { subscribed, handleReturn } = p;
+  const { mood, toggleFavorite, handlePauseSessionChromeClose } = usePauseSessionMoodChromeHandlers(
+    p,
+    shellRitual,
+  );
   const { breath, reflect, handleFrameImDone } = usePauseSessionBreathReflectHandlers(
     p,
-    { shell, ritual },
+    shellRitual,
     mood,
   );
 
   return {
-    shell: {
-      handleReturn,
-      leaveWithPendingOpen,
-      setLeaveWithPendingOpen,
-      pending,
-      leaveSheetBusy,
-      confirmLeavePauseSession,
-      requestExitPauseBeforeDone,
-      handleDeclinePendingFromLeaveSheet,
-      handlePendingAdoptFromLeaveSheet,
-      hasCoalescedShellSession,
-      hydration,
-      fetchFailed,
-      waitingForFetch,
-      pauseInstanceIdForTerminal,
-      fetchedInstance,
-      companions,
-      companionPrefs,
-      severity,
-      context,
-      pauseInstanceId,
-    },
-    ritual: {
-      step,
-      setStep,
-      setRitualEntry,
-      setBriefStep,
-      phase,
-      curtainLifted,
-      soundMuted,
-      setSoundMuted,
-      ritualEntry,
-      decision,
-      pauseImpactData,
-      isFavorite,
-      moodDone,
-      selectedMood,
-      selectedBriefFace,
-      feelIntensity,
-      briefStep,
-      briefIntegrateDone,
-      breathingFirstCompleted,
-      setBreathingFirstCompleted,
-      breathingSecondCompleted,
-      setBreathingSecondCompleted,
-      swipeDirection,
-    },
+    shell: buildPauseSessionStepShellBundle(shellRitual.shell, { handleReturn }),
+    ritual: buildPauseSessionStepRitualBundle(shellRitual.ritual),
     mood,
     breath,
     reflect,
