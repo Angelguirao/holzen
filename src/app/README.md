@@ -27,6 +27,7 @@ Cross-route chrome and providers: layout, bottom nav, document meta, error bound
 | `components/PauseReadyBanner.tsx` | Cross-tab “pause ready” strip (non-Home) |
 | `components/AuthLoading.tsx` | Auth bootstrap spinner (router gates) |
 | `components/FeedbackWidget.tsx` | Global error-report sheet (signed-in) |
+| `components/HolzenProvider.tsx` | Shared pause/profile/market context (`useHolzen`) for signed-in shell |
 | `components/ShellPauseChrome.tsx` | Pending pause offer + pause-ready banner (`useHolzen` isolated here) |
 
 | `hooks/use-is-admin.ts` | Client admin gate for `/admin` and ops pages |
