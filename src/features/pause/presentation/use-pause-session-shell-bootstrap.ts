@@ -7,13 +7,19 @@ import {
   parsePauseSessionLocationState,
 } from '@/features/pause/public';
 import type { PauseSessionShellHolzen } from '@/features/pause/public';
-import { usePauseSessionShell } from '@/features/pause/public-hooks';
-import { usePauseSessionMountLog } from '@/features/pause/public-hooks';
-import {
-  usePauseSessionPendingLeaveSheet,
-  usePauseSessionPendingPauseOfferNavigation,
-} from '@/features/pause/public-hooks';
-import { usePendingPauseOffer } from '@/features/pause/public-hooks';
+import { usePauseSessionMountLog } from './use-pause-session-mount-log';
+import { usePauseSessionPendingLeaveSheet } from './use-pause-session-pending-leave-sheet';
+import { usePauseSessionPendingPauseOfferNavigation } from './use-pause-session-pending-pause-offer-navigation';
+import { usePauseSessionShell } from './use-pause-session-shell';
+import { usePendingPauseOffer } from './use-pending-pause-offer';
+
+export type UsePauseSessionShellBootstrapParams = {
+  holzen: PauseSessionShellHolzen;
+  navigate: NavigateFunction;
+  resyncOpenPauseFromDb: () => void | Promise<void>;
+  handleClose: () => void;
+  t: TFunction;
+};
 
 /**
  * `/pause` shell: nav parse, restore/hydrate/fetch, coalesced view model, pending-offer leave sheet.
@@ -24,13 +30,7 @@ export function usePauseSessionShellBootstrap({
   resyncOpenPauseFromDb,
   handleClose,
   t,
-}: {
-  holzen: PauseSessionShellHolzen;
-  navigate: NavigateFunction;
-  resyncOpenPauseFromDb: () => void | Promise<void>;
-  handleClose: () => void;
-  t: TFunction;
-}) {
+}: UsePauseSessionShellBootstrapParams) {
   const location = useLocation();
   const nav = parsePauseSessionLocationState(location.state);
 

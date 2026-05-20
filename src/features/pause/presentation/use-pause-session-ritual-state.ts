@@ -17,7 +17,7 @@ import {
   type PersistedSession,
   type RitualDepth,
 } from '@/features/pause/public';
-import { usePauseSessionEntryPresentationEffects } from '@/features/pause/public-hooks';
+import { usePauseSessionEntryPresentationEffects } from './use-pause-session-entry-presentation-effects';
 
 /**
  * In-session ritual UI state for `/pause` (step, mood, breath progress, depth picker).
