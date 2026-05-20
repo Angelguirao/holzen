@@ -24,3 +24,4 @@ export {
 } from './presentation/use-pause-reflect-generation';
 export { useCompanionSlotOrchestratePorts } from './presentation/use-companion-slot-orchestrate-ports';
 export { usePauseReflectionStepLog } from './presentation/use-pause-reflection-step-log';
+export { useCompanionAccess } from './presentation/use-companion-access';
