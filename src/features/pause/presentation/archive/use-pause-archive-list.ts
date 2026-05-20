@@ -19,7 +19,7 @@ import {
   type PauseArchiveListSort,
   type PauseArchiveRow,
   type PauseArchiveSegment,
-} from '../public-queries';
+} from '../../public-queries';
 
 export type { PauseArchiveRow, PauseArchiveListSort, PauseArchiveSegment };
 

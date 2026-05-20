@@ -1329,6 +1329,25 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-20</span>
+      <span>Phase A slice — archive presentation folder</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>Archive conductors → <code>presentation/archive/</code></h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>ritual/reflect/</code>) and #2 (<code>ritual/frame/</code>) are complete on this branch — no further reflect use-case folder moves. Group <code>usePauseArchiveList</code> and <code>useArchivePauseRetrospectiveOutcome</code> under <code>presentation/archive/</code> to match §3 / §10.1; screens still import via <code>public-hooks</code> only.</dd>
+      <dt>Deviation</dt>
+      <dd>None — mirrors <code>presentation/reflect/</code> subfolder pattern.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Left <code>use-journey-pause-instances</code> flat under <code>presentation/</code> — journey tab is adjacent but not archive-only.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: §6 <code>public.ts</code> peel (zoom-out / feedback helpers) or wire more mutations through <code>PauseRepository</code> (backlog #4).</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
 </body>
 </html>
