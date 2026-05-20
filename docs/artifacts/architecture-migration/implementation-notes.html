@@ -2307,7 +2307,7 @@
     <h3>Backlog #1 complete; orb visual metrics → <code>ritual/breathe/</code></h3>
     <dl>
       <dt>Design decision</dt>
-      <dd><code>reflect/</code> → <code>ritual/reflect/</code> was already complete. Smallest remaining breathe cluster: <code>pause-breath-orb-metrics</code> (+ test) beside <code>ritual-pattern</code>; sibling import <code>./ritual-pattern</code>; <code>public-hooks</code> and <code>screens/pause/lib/resolve-pause-breathing-timed-display</code> paths updated.</dd>
+      <dd><code>reflect/</code> → <code>ritual/reflect/</code> was already complete. Smallest remaining breathe cluster: <code>pause-breath-orb-metrics</code> (+ test) beside <code>ritual-pattern</code>; sibling import <code>./ritual-pattern</code>; <code>public-hooks</code> re-export path updated.</dd>
       <dt>Deviation</dt>
       <dd>None — orb scale / hold mandala behavior unchanged.</dd>
       <dt>Tradeoffs</dt>
@@ -2333,6 +2333,25 @@
       <dd>Application/session use cases still import some types from <code>public.ts</code> until a later peel.</dd>
       <dt>Open questions</dt>
       <dd>Next: peel remaining <code>public.ts</code> session types for application layer, or backlog #4 <code>PauseRepository</code> wiring.</dd>
+    </dl>
+  </article>
+
+  <article class="note">
+    <header>
+      <span>2026-05-20</span>
+      <span>Phase A slice — colocate triangle kicker display under ritual/breathe (Tier 5)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>Backlog #1 complete; <code>resolve-triangle-kicker-display</code> → <code>ritual/breathe/</code></h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd><code>reflect/</code> → <code>ritual/reflect/</code> and <code>ritual-pattern</code> hub moves were already complete. Colocate triangle kicker display (+ test) beside <code>ritual-pattern</code>; <code>public-hooks</code> re-export path only. <code>resolve-pause-breathing-timed-display</code> imports orb + kicker via <code>public-hooks</code> (no deep <code>application/</code> from screen lib).</dd>
+      <dt>Deviation</dt>
+      <dd>None — 2s rotating kicker cadence unchanged.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Did not move <code>standalone-breathing-patterns</code> in the same commit.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: <code>standalone-breathing-patterns</code> under <code>ritual/breathe/</code>, or backlog #4 <code>PauseRepository</code> wiring.</dd>
     </dl>
   </article>
 
