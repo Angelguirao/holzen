@@ -1215,6 +1215,25 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-20</span>
+      <span>Phase A slice — decide outcome conductor into presentation/decide</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3><code>use-pause-session-decide-handler</code> → <code>presentation/decide/</code></h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1–#2 (ritual use-case folders) are complete on this branch. Add a <code>presentation/decide/</code> subfolder for the outcome conductor that delegates to <code>ritual/decide/*</code>; <code>use-pause-session-reflect-and-decide</code> imports from the decide subpath; screens still use <code>public-hooks</code>.</dd>
+      <dt>Deviation</dt>
+      <dd>None — mirrors reflect/companion presentation grouping.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Did not peel zoom-out helpers from <code>public.ts</code> in the same commit — keeps verification scoped to decide conductor move.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: §6 <code>public.ts</code> peel (zoom-out payload exports) or wire more step logs through <code>PauseRepository</code> (backlog #4).</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
 </body>
 </html>
