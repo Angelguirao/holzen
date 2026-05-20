@@ -321,7 +321,9 @@ export {
   type RunCompanionSlotOrchestrateResult,
 } from './application/use-cases/companion/run-companion-slot-orchestrate';
 export {
+  applyCompanionSlotOrchestrateFailureUi,
   resolveCompanionSlotOrchestrateFailureUi,
+  type ApplyCompanionSlotOrchestrateFailureUiPorts,
   type CompanionSlotOrchestrateFailureUi,
 } from './application/use-cases/companion/companion-slot-orchestrate-failure-ui';
 export {

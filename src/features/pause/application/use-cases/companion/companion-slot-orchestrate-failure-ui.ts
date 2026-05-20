@@ -1,3 +1,4 @@
+import type { RegenerateCompanionSlot } from '@/features/pause/domain/companion-orchestrate';
 import type { CompanionOrchestrateInvokeFailure } from './orchestrate-invoke-error';
 import type { CompanionSlotOrchestrateMode } from './run-companion-slot-orchestrate';
 
@@ -40,4 +41,30 @@ export function resolveCompanionSlotOrchestrateFailureUi(
     title: mode === 'lazy_fetch' ? 'Companion unavailable' : 'Regenerate failed',
     description: failure.userMessage,
   };
+}
+
+export type ApplyCompanionSlotOrchestrateFailureUiPorts = {
+  clearLazyFetchSlot: (slot: RegenerateCompanionSlot) => void;
+  requirePro: () => void;
+  showLimitReached: () => void;
+  showErrorToast: (title: string, description: string) => void;
+};
+
+/** Applies resolved failure UI via injected screen/subscription adapters. */
+export function applyCompanionSlotOrchestrateFailureUi(
+  failureUi: CompanionSlotOrchestrateFailureUi,
+  slot: RegenerateCompanionSlot,
+  ports: ApplyCompanionSlotOrchestrateFailureUiPorts,
+): void {
+  if (failureUi.action === 'lazy_paywall_upgrade_required') {
+    ports.clearLazyFetchSlot(slot);
+    ports.requirePro();
+    return;
+  }
+  if (failureUi.action === 'lazy_paywall_limit_reached') {
+    ports.clearLazyFetchSlot(slot);
+    ports.showLimitReached();
+    return;
+  }
+  ports.showErrorToast(failureUi.title, failureUi.description);
 }
