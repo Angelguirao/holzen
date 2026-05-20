@@ -1,5 +1,5 @@
 import type { PauseState } from '@/features/pause/domain/pause-state';
-import { buildOutcomeLoggedPayload } from '../outcome-log-payload';
+import { buildOutcomeLoggedPayload } from '../../outcome-log-payload';
 
 export type RunPauseOutcomeLogResult =
   | { status: 'no_instance' }

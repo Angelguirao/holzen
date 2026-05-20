@@ -285,7 +285,7 @@ The repo is mid-migration. Expect:
 | Partial ritual beats (brief/deep/breath/log) | `application/use-cases/ritual/` (`brief/`, `deep/`, `breath/`, `log-pause-step.ts`, …) | consolidate under `ritual/*/` | Optional later |
 | Breathing / audio | `application/use-cases/breathing/`, `ritual/breath/` | `ritual/breathe/` | Optional consolidate later |
 | Feel / initial emotion | `session/run-initial-emotion-log.ts`, `ritual/clamp-feel-intensity.ts` | `ritual/feel/` | Optional later |
-| Decide / outcome | `session/run-pause-outcome-log.ts` | `ritual/decide/` | Optional later |
+| Decide / outcome | `application/use-cases/ritual/decide/` (`run-pause-outcome-log`, `pause-decide-outcome-flow`) | `ritual/decide/` | Done (May 2026) |
 | Done / post-pause | `session/post-pause-emotion-log.ts` | `ritual/done/` | Optional later |
 | Session conductors | `presentation/*.ts` (flat + `presentation/session/`) | `presentation/session/`, `companion/`, `home/`, `archive/` | Peel incrementally |
 | Archive queries | `infrastructure/queries/archive/` (`archive-list-query.ts`, `archive-pauses-tab-query.ts`) | `infrastructure/queries/archive/` | Done (May 2026) |

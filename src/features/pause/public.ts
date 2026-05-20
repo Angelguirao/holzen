@@ -11,7 +11,6 @@ export {
 export { pauseArchiveRowAllowsRetrospectiveOutcome } from './application/use-cases/archive/retrospective-outcome';
 export { pauseArchiveListQueryPrefix } from './application/queries/archive-query-keys';
 export { buildOutcomeLoggedPayload } from './application/use-cases/outcome-log-payload';
-export { runPauseOutcomeLog } from './application/use-cases/session/run-pause-outcome-log';
 export {
   getPendingPauseOfferDisplay,
   type PendingPauseOfferDisplay,

@@ -3,7 +3,7 @@ import {
   type BuildPauseImpactDataOnCompleteInput,
   type PauseImpactData,
 } from '@/features/pause/application/use-cases/impact-data';
-import type { RunPauseOutcomeLogResult } from '@/features/pause/application/use-cases/session/run-pause-outcome-log';
+import type { RunPauseOutcomeLogResult } from '@/features/pause/application/use-cases/ritual/decide/run-pause-outcome-log';
 import type { WisdomQuote } from '@/features/pause/application/use-cases/session/wisdom-quotes';
 
 export type PauseDecideOutcomeFlow =
