@@ -1937,6 +1937,25 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-20</span>
+      <span>Phase A slice — peel bulk-hold helpers off public.ts (§6)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3><code>bulk-hold</code> formatters + grouping → <code>public-hooks</code></h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>reflect/</code> → <code>ritual/reflect/</code>) and #2 (<code>companion/</code> → <code>ritual/frame/</code>) are complete on <code>cursor/arch-migrate-src-ca70</code>. Continue backlog #3 §6: remove <code>groupBulkHoldByLocalDay</code>, bulk-hold formatters, and outcome/review types from <code>public.ts</code>; home bulk-hold screens import from <code>public-hooks.ts</code>. <code>BulkHoldPendingPause</code> stays on the hook export; internal tests use <code>domain/bulk-hold</code>.</dd>
+      <dt>Deviation</dt>
+      <dd>None — query infra already imports <code>bulkHoldMaxRows</code> from domain.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Did not peel <code>writingTextareaClassName</code>, archive retrospective CTA, or <code>millisecondsUntilNextQuarterHour</code> in the same commit.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: peel <code>writingTextareaClassName</code> for shared textarea, or <code>pauseArchiveRowAllowsRetrospectiveOutcome</code> for archive screens.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
 </body>
 </html>

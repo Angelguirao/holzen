@@ -185,6 +185,14 @@ export {
   shouldSurfacePauseWidgetError,
   type PauseHomeErrorKind,
 } from './application/use-cases/home/pause-home-widget-error';
+export { groupBulkHoldByLocalDay } from './application/use-cases/bulk-hold/group-by-local-day';
+export {
+  formatBulkHoldContextQuote,
+  formatBulkHoldLocalTime,
+  parseBulkHoldChange24hPct,
+  type BulkHoldOutcomeChoice,
+  type BulkHoldReviewSection,
+} from './domain/bulk-hold';
 export { usePauseArrivalAudio } from './presentation/home/use-pause-arrival-audio';
 export {
   usePauseCardProjection,
