@@ -1,6 +1,6 @@
 import { useCallback } from 'react';
 import { usePauseFavoriteToggle } from '@/features/pause/public-hooks';
-import { usePauseSessionMoodAndPersist } from '@/screens/pause/hooks/use-pause-session-mood-and-persist';
+import { usePauseSessionMoodAndPersist } from '@/features/pause/public-hooks';
 import type { usePauseSessionProviders } from '@/screens/pause/hooks/use-pause-session-providers';
 import type { usePauseSessionShellRitual } from '@/screens/pause/hooks/use-pause-session-shell-ritual';
 

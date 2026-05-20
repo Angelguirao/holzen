@@ -1,6 +1,6 @@
 import { describe, expect, it, vi, beforeEach } from 'vitest';
 import { renderHook } from '@testing-library/react';
-import { usePauseSessionPersistToStorage } from '@/screens/pause/hooks/use-pause-session-persist-to-storage';
+import { usePauseSessionPersistToStorage } from './use-pause-session-persist-to-storage';
 import type { PauseSessionPersistSnapshotInput } from '@/features/pause/public';
 import { buildPauseSessionPersistSnapshot } from '@/features/pause/public';
 
