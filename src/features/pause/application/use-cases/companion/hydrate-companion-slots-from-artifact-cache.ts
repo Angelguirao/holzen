@@ -1,5 +1,5 @@
 import type { InterventionState } from '@/features/pause/domain/companion-orchestrate';
-import { trackCompanionServed } from '@/features/pause/application/use-cases/companion/analytics';
+import { trackCompanionServed } from '@/features/pause/application/use-cases/companion/companion-generation-telemetry';
 import type { ParsedPauseArtifactCache } from '@/features/pause/application/use-cases/companion/artifact-cache-parse';
 import type { CompanionSlotCommitters } from '@/features/pause/application/use-cases/companion/orchestrate-slot-apply';
 import {

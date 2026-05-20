@@ -1,6 +1,6 @@
 import type { CachedHistoricalInsightShape } from '@/features/pause/public';
 import type { ZoomOutData } from '@/features/pause/public';
-import { trackCompanionServed } from '@/features/pause/application/use-cases/companion/analytics';
+import { trackCompanionServed } from '@/features/pause/application/use-cases/companion/companion-generation-telemetry';
 import { updateRecencyHints } from '@/features/pause/application/use-cases/companion/recency-hints';
 import { hostnameFromUrl } from '@/features/pause/application/use-cases/companion/url';
 import type {
