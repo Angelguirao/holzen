@@ -18,7 +18,7 @@ import {
   type CollectionMemberPause,
   type LibraryBundle,
   type LibraryListSortMode,
-} from '@/features/pause/public-queries';
+} from '../public-queries';
 
 export type {
   Collection,
@@ -26,12 +26,11 @@ export type {
   CollectionMemberPause,
   LibraryListSortMode,
 };
-export { libraryBundleQueryPrefix };
 
 const CACHE_KEY_COLLECTIONS = 'holzen_library_collections';
 const CACHE_KEY_COL_ITEMS = 'holzen_library_col_items';
 
-export type UseLibraryOptions = {
+export type UsePauseLibraryBundleOptions = {
   listSort?: LibraryListSortMode;
 };
 
@@ -56,7 +55,7 @@ function writeCache<T>(key: string, data: T) {
  * User collections; each membership row points at a `pause_instance_id`.
  * Loads `v_pause_full` rows for members only (no `library_items`).
  */
-export function useLibrary(options?: UseLibraryOptions) {
+export function usePauseLibraryBundle(options?: UsePauseLibraryBundleOptions) {
   const { t } = useTranslation();
   const { user } = useAuth();
   const queryClient = useQueryClient();

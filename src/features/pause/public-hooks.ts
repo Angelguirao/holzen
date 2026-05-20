@@ -41,6 +41,14 @@ export {
   type UseArchivePauseRetrospectiveOutcomeParams,
 } from './presentation/use-archive-pause-retrospective-outcome';
 export {
+  usePauseLibraryBundle,
+  type Collection,
+  type CollectionItem,
+  type CollectionMemberPause,
+  type LibraryListSortMode,
+  type UsePauseLibraryBundleOptions,
+} from './presentation/use-pause-library-bundle';
+export {
   useCurrentPause,
   currentPauseQueryKey,
   type CurrentPauseRow,
