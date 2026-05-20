@@ -3,7 +3,7 @@ import { createRef } from 'react';
 import { buildPauseSessionScaffoldRitualPayloads } from './scaffold-ritual-payloads';
 import { buildPauseSessionStepTransitionConfig } from '@/features/pause/public';
 import type { PauseBreathingHandle } from '@/features/pause/public';
-import { DEFAULT_COMPANIONS, DEFAULT_PREFS } from '@/features/pause/public';
+import { DEFAULT_COMPANIONS, DEFAULT_PREFS } from '@/features/pause/domain/session-model';
 
 function transition() {
   return buildPauseSessionStepTransitionConfig({ swipeDirection: 'forward', prefersReducedMotion: true });

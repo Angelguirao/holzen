@@ -4,7 +4,7 @@ import {
   DEFAULT_PREFS,
   type FetchedPauseInstance,
   type PersistedSession,
-} from '@/features/pause/public';
+} from '@/features/pause/domain/session-model';
 import {
   computePauseSessionHydration,
   computePauseSessionResolved,
