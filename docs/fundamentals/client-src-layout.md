@@ -2,7 +2,7 @@
 
 **Status:** accepted (post wave 5j, May 2026)  
 **Audience:** contributors and agents placing UI or client domain code  
-**Pairs with:** [client-server-architecture-holzen.md](client-server-architecture-holzen.md) (truth vs projection), [frontend-module-layout.md](frontend-module-layout.md) (waves, CI, monorepo north star), [holzen-application-architecture.md](holzen-application-architecture.md) (principles §7–8), [naming-conventions-holzen.md](naming-conventions-holzen.md) (file/export names)
+**Pairs with:** [client-server-architecture-holzen.md](client-server-architecture-holzen.md) (truth vs projection), [client-architecture-overview.md](client-architecture-overview.md) (full `src/` rings + per-context index), [frontend-module-layout.md](frontend-module-layout.md) (waves, CI, monorepo north star), [holzen-application-architecture.md](holzen-application-architecture.md) (principles §7–8), [naming-conventions-holzen.md](naming-conventions-holzen.md) (file/export names)
 
 This doc is the **folder-level map** of active `src/`. It does **not** replace subsystem behavior docs under `docs/systems/` or the C4 **external** view in [architecture/c4-holzen.md](../architecture/c4-holzen.md).
 

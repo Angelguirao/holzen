@@ -16,12 +16,12 @@ Two ideas — do not conflate them:
 
 | | Meaning |
 |---|---------|
-| **Initiative scope (north star)** | Align **all active `src/`** with [holzen-application-architecture.md](../../docs/fundamentals/holzen-application-architecture.md) P1–P9 and the shared module skeleton ([pause-client-architecture.md](../../docs/systems/pause-client-architecture.md) §9). Every shipped bounded context converges on `domain/` → `application/use-cases/` → `ports/` → `infrastructure/` → `presentation/` → `public*`. |
+| **Initiative scope (north star)** | Align **all active `src/`** — app, screens, components, features, lib ([client-architecture-overview.md](../../docs/fundamentals/client-architecture-overview.md)) — with P1–P9 and the shared module skeleton ([pause-client-architecture.md](../../docs/systems/pause-client-architecture.md) §9). |
 | **Scheduling priority (what to do next)** | **Pause-first** at each slice tier: finish pause violations at the current tier before taking the same tier in another context — unless the user names a different target. |
 
 **Pause is the reference implementation** (largest context). It is **not** the only domain on this branch. After pause is clean at a tier, apply the same slice pattern to subscription, auth, market, etc.
 
-**Phases** (same branch): (A) pause convergence → (B) cross-context template → (C) repo-wide hygiene. Backlog: [docs/artifacts/architecture-migration/README.md](../../docs/artifacts/architecture-migration/README.md).
+**Phases** (same branch): (0) client-architecture doc scaffolds → (A) pause convergence → (B) cross-context → (C) app/screens/lib hygiene. Backlog: [docs/artifacts/architecture-migration/README.md](../../docs/artifacts/architecture-migration/README.md).
 
 ## Constitution (read before editing)
 
@@ -43,7 +43,7 @@ Only move to another bounded context (subscription, auth, market, user, notifica
 - the user names a target, or
 - pause has **no** remaining violation at that priority tier (scan confirms pause is clean for shims / god-hooks / inline Supabase / UI splits / context placement / ritual folder targets).
 
-When working a **non-pause** context slice, read that context’s AGENTS change-map row and any `src/features/<ctx>/README.md`; use pause §9 as the structural template, not pause ritual folder names.
+When working a **non-pause** context slice, read that context’s **`*-client-architecture.md`** ([client-architecture-overview.md](../../docs/fundamentals/client-architecture-overview.md) index), AGENTS change-map row, and `src/features/<ctx>/README.md`; use pause §9 as structural template, not pause ritual folder names.
 
 | Priority | Slice | Typical moves |
 |----------|--------|----------------|
