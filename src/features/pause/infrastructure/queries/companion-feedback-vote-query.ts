@@ -1,7 +1,7 @@
 import {
   buildCompanionFeedbackVoteMetadata,
   type LogCompanionFeedbackVoteInput,
-} from '@/features/pause/application/use-cases/companion/log-companion-feedback-vote';
+} from '@/features/pause/application/use-cases/ritual/frame/log-companion-feedback-vote';
 import { insertPauseAnalyticsEvent } from '@/features/pause/infrastructure/analytics-events';
 import { supabase } from '@/integrations/supabase/client';
 import type { Json } from '@/integrations/supabase/types';

@@ -421,7 +421,7 @@ export {
   buildCompanionFeedbackVoteMetadata,
   type CompanionFeedbackVote,
   type LogCompanionFeedbackVoteInput,
-} from './application/use-cases/companion/log-companion-feedback-vote';
+} from './application/use-cases/ritual/frame/log-companion-feedback-vote';
 export {
   isCompanionOrchestratePaywallCode,
   isOrchestratePayloadError,
