@@ -73,6 +73,7 @@ export {
   useCompanionHistoryThread,
   type HistoryThreadRow,
 } from './presentation/use-companion-history-thread';
+export { useRelatedBiasesThisMonth } from './presentation/use-related-biases-this-month';
 export { useCompanionAccess } from './presentation/use-companion-access';
 export { useCompanionUiCompletion } from './presentation/use-companion-ui-completion';
 export { useCompanionLibraryFavorites } from './presentation/use-companion-library-favorites';
