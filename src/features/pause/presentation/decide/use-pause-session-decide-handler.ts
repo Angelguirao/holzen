@@ -6,8 +6,7 @@ import {
   formatReinforcementQuoteFromSession,
   resolvePauseDecideOutcomeFlow,
 } from '@/features/pause/application/use-cases/ritual/decide/pause-decide-outcome-flow';
-import { runPauseOutcomeLog } from '@/features/pause/application/use-cases/ritual/decide/run-pause-outcome-log';
-import { logPauseOutcomeStep } from '@/features/pause/public-rpc';
+import { logPauseOutcome } from '@/features/pause/public-rpc';
 import {
   showPauseOutcomeNotCompletedToast,
   showPauseOutcomeSaveFailedToast,
@@ -70,10 +69,7 @@ export function usePauseSessionDecideHandler(input: {
       try {
         hapticFeedback('medium');
 
-        const outcome = await runPauseOutcomeLog(
-          { pauseInstanceId, decision: d },
-          { logOutcome: logPauseOutcomeStep },
-        );
+        const outcome = await logPauseOutcome({ pauseInstanceId, decision: d });
 
         const flow = resolvePauseDecideOutcomeFlow({
           outcome,

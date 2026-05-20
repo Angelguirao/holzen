@@ -1,4 +1,6 @@
 import type { PauseState } from '@/features/pause/domain/pause-state';
+import { logPauseStep } from '@/features/pause/application/use-cases/ritual/log-pause-step';
+import type { PauseRepository } from '@/features/pause/ports/pause-repository';
 import { buildOutcomeLoggedPayload } from '../../outcome-log-payload';
 
 export type RunPauseOutcomeLogResult =
@@ -7,23 +9,19 @@ export type RunPauseOutcomeLogResult =
   | { status: 'not_completed'; outcomeState: PauseState }
   | { status: 'sync_failed' };
 
-type LogOutcomeStepPort = (params: {
-  instanceId: string;
-  payload: Record<string, unknown>;
-}) => Promise<PauseState | null>;
-
 /** Decide step — `outcome_logged` RPC and completion state gate. */
 export async function runPauseOutcomeLog(
+  repository: PauseRepository,
   input: { pauseInstanceId: string | null; decision: string },
-  ports: { logOutcome: LogOutcomeStepPort },
 ): Promise<RunPauseOutcomeLogResult> {
   if (!input.pauseInstanceId) {
     return { status: 'no_instance' };
   }
 
   try {
-    const outcomeState = await ports.logOutcome({
+    const outcomeState = await logPauseStep(repository, {
       instanceId: input.pauseInstanceId,
+      stepType: 'outcome_logged',
       payload: buildOutcomeLoggedPayload(input.decision),
     });
     if (outcomeState !== 'completed') {

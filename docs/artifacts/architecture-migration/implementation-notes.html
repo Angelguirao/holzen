@@ -1481,6 +1481,25 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-20</span>
+      <span>Phase A slice — decide outcome via PauseRepository (backlog #4)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3><code>runPauseOutcomeLog</code> → repository port</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>ritual/reflect/</code>) is complete on this branch. Align decide <code>outcome_logged</code> with reflect step logs: <code>runPauseOutcomeLog</code> takes <code>PauseRepository</code> and calls <code>logPauseStep</code>; <code>public-rpc</code> exports <code>logPauseOutcome</code> wired with <code>supabasePauseRepository</code>. Decide presentation imports <code>public-rpc</code> only (no ad-hoc <code>logOutcome</code> port injection).</dd>
+      <dt>Deviation</dt>
+      <dd>None — <code>logPauseOutcomeStep</code> remains for low-level step writes; decide flow uses <code>logPauseOutcome</code>.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Did not wire <code>initial_emotion_logged</code> / <code>shift_emotion_logged</code> use cases in the same commit — still use <code>repositoryLogStep</code> facades on <code>public-rpc</code>.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: §6 peel zoom-out/frame helpers off <code>public.ts</code>, or emotion-step use cases with repository-first tests.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
 </body>
 </html>
