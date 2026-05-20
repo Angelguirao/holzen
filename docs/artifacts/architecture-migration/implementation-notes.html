@@ -208,6 +208,25 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-20</span>
+      <span>Phase A slice — frame leaf: generation-taxonomy</span>
+      <span class="status open">open</span>
+    </header>
+    <h3><code>generation-taxonomy</code> → <code>ritual/frame/</code></h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Reflect → <code>ritual/reflect/</code> is complete on this branch; continue companion leaf-first with PostHog slot→taxonomy mapping (pure, single downstream in <code>companion-generation-telemetry</code>).</dd>
+      <dt>Deviation</dt>
+      <dd>None — matches spec §3.1 / §10.1.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Could batch with <code>recency-hints</code>; kept one file to mirror prior frame leaf slices.</dd>
+      <dt>Open questions</dt>
+      <dd>Next slice: <code>recency-hints</code> or <code>log-pause-companion</code> + <code>persist-ui-step-completion</code> cluster.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
 </body>
 </html>

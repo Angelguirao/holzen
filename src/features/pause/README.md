@@ -22,7 +22,7 @@ features/pause/
   public.ts | public-queries.ts | public-rpc.ts | public-hooks.ts
 ```
 
-**Transitional paths (move incrementally):** reflect use cases (generation, step log, favorite toggle, metadata log, persist-error helpers) are under `application/use-cases/ritual/reflect/`. Companion use cases still at `application/use-cases/companion/` → target `ritual/frame/` (leaves: `estimate-read-time`, `url`, `signal-source-trusted`, `format-companion-history-relative-day` moved). User **collections** code is in `src/legacy/archive-collections/` (not shipped MVP).
+**Transitional paths (move incrementally):** reflect use cases (generation, step log, favorite toggle, metadata log, persist-error helpers) are under `application/use-cases/ritual/reflect/`. Companion use cases still at `application/use-cases/companion/` → target `ritual/frame/` (leaves: `estimate-read-time`, `url`, `signal-source-trusted`, `format-companion-history-relative-day`, `generation-taxonomy` moved). User **collections** code is in `src/legacy/archive-collections/` (not shipped MVP).
 
 **Brief vs deep:** one bounded context. Depth is `RitualDepth` on the instance / persisted session — not separate feature folders.
 
