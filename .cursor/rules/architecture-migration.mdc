@@ -33,7 +33,7 @@ Two ideas — do not conflate them:
 | 2 | [pause-client-architecture.md](../../docs/systems/pause-client-architecture.md) §3 | Pause **interior** folder taxonomy (`ritual/reflect/`, `ritual/frame/`) |
 | 3 | [client-src-layout.md](../../docs/fundamentals/client-src-layout.md) | app / screens / features placement |
 | 4 | [active-surface.md](../../docs/ops/active-surface.md) | Shipped routes, tables, legacy quarantine |
-| 4b | [information-architecture.md](../../docs/design/information-architecture.md) | Product IA narrative — **§1 / §4.1–§4.4 are full-IA reference**; cross-check active-surface for live routes |
+| 4b | [information-architecture.md](../../docs/design/information-architecture.md) | Product IA narrative — **§1–§3 = full-IA reference**; live routes → active-surface |
 | 5 | **This rule** + [architecture-migration README](../../docs/artifacts/architecture-migration/README.md) | Slice workflow, scheduling, backlog |
 | 6 | [implementation-notes.html](../../docs/artifacts/architecture-migration/implementation-notes.html) | Resolved deviations during migration |
 | 7 | [frontend-module-layout.md](../../docs/fundamentals/frontend-module-layout.md) | CI checks, migration waves, monorepo north star — **not** pause interior naming |

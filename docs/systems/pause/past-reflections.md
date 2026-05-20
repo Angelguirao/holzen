@@ -84,9 +84,9 @@ When the pool is empty, Echo returns `null` and the card renders an honest empty
 
 ---
 
-## 5. Replay thread view
+## 5. Replay thread view (full-IA — not pause-first shipped)
 
-**Shipped:** `/tools/practice/replay` shows a **pause picker** (recent completed pauses) or opens a specific pause from Echo (`navigate` state). UI: date + context, **`Holzen asked`** (`aiPrompt`), chronological **notes and replays**, textarea to append a **`practice_entries`** row (`type = 'replay'`, `pause_instance_id` set). Empty user-word threads still show the prompt and invite a first replay line.
+**Full-IA (pre-strip):** `/tools/practice/replay` showed a **pause picker** (recent completed pauses) or opened a specific pause from Echo (`navigate` state). UI: date + context, **`Holzen asked`** (`aiPrompt`), chronological **notes and replays**, textarea to append a **`practice_entries`** row (`type = 'replay'`, `pause_instance_id` set). *Route **404** in pause-first bundle; `practice_entries` dropped in cutover.*
 
 ---
 

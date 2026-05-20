@@ -35,7 +35,7 @@ Home is the signed-in landing surface after onboarding: hero quote, optional ins
 | Open pause + market context | [`HolzenProvider`](../../src/app/components/HolzenProvider.tsx) (`useHolzenHomeContextState` in pause presentation) | `lastPauseInstanceId` / `hasOpenPause`, `context` (market line from `context_snapshot`), `message` only when a `reflection_text` artifact exists (post-Reflect or silent stub), `loading`, `error`, `btcData`, `manualTrigger`, cooldown helpers, companions; **`trackedAssetId`** is re-exported as `normalizeTrackedAssetId(profile.trackedAssetId)` (`TrackedAssetId`) |
 | Subscription / Pro | [`useSubscription`](../../src/features/subscription/public-hooks) | `subscribed`, `monthlyRemaining`, `startCheckout`, `refresh` |
 | Layout + DnD order | [`useWidgetLayout`](../../src/screens/home/components/HomeWidget.tsx) | Section order persisted per user expectations |
-| Optional widgets | [`useHomeOptionalVisibility`](../../src/screens/home/hooks/use-home-optional-visibility.ts) | Toggles + `JOURNEY_STAT_TILES_VISIBILITY_ID` + `HOME_WIDGET_DEFAULT_ORDER` for layout |
+| Section visibility (Customize) | [`useHomeOptionalVisibility`](../../src/screens/home/hooks/use-home-optional-visibility.ts) | Toggles for legacy section ids still in storage keys — see **Layout section ids** below |
 | Shell | [`AppLayout`](../../src/app/components/AppLayout.tsx) outlet context | `pauseReady` / `dismissPauseReady` — refresh path when server pushes a pause |
 | Checkout UX | [`CheckoutConfirmation`](../../src/features/subscription/presentation/CheckoutConfirmation.tsx) | Owns stripping `?subscribed=true` / credits params and the confirmation dialog; Home may still run a lightweight refresh + welcome toast with a **stable Sonner id** so dev Strict Mode does not duplicate toasts |
 
@@ -48,7 +48,11 @@ Home is the signed-in landing surface after onboarding: hero quote, optional ins
 1. **Loading** — `!profileLoaded` → `AuthLoading`.
 2. **Onboarding** — `!hasOnboarded` → `Onboarding`.
 3. **Zen mode** — `localStorage.holzen_zen_mode`; one-time migration cleared a stale default (`holzen_zen_mode_reset_v1`). When an open pause exists, Zen shows **market context meta** (+ optional context line) and the same **Continue pause** / dismiss CTAs as the dashboard widget (not the AI reflection paragraph — that appears in `/pause` at Reflect). Otherwise: loading, **blocking errors** (persist, AI, connectivity — not price-only when cached market data exists), subscription skeleton, or empty flow. Cross-tab: `storage` listener syncs zen flag.
-4. **Full dashboard** — Hero quote, pull-to-refresh (full reload), “Today” sections driven by `visibleOrderedSectionIds` (pause-first: goal, market, pause widgets), customize sheet, testimonial prompt.
+4. **Full dashboard** — Hero quote, pull-to-refresh (full reload), “Today” sections driven by `visibleOrderedSectionIds` (pause-first: **goal-why**, **market**, **your-pause** only), customize sheet, testimonial prompt.
+
+## Layout section ids (pause-first)
+
+Shipped widgets render only **`goal-why`**, **`market`**, **`your-pause`** ([`render-home-dashboard-section.tsx`](../../src/screens/home/components/render-home-dashboard-section.tsx)). Legacy ids **`journey-pulse`**, **`quick-capture`**, and **`night`** may still appear in persisted layout order / Customize storage ([`home-section-visibility-constants.ts`](../../src/screens/home/lib/home-section-visibility-constants.ts)) but **`renderHomeDashboardSection` returns `null`** for them — no UI. Phase C hygiene may remove dead ids from constants and storage migrations.
 
 ## Pause widget error surfacing
 

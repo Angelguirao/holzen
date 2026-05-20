@@ -1,4 +1,4 @@
-# Holzen information architecture (current state + recommendations)
+# Holzen information architecture (full-IA reference + pause-first notes)
 
 **Scope:** Product-level organization of screens, routes, and primary navigation as implemented in the React app. This complements visual-system work under `docs/design/nox/` and product decisions in `docs/decisions/`.
 
@@ -78,17 +78,20 @@ Under `/admin` and children (`/admin/smoke-test`, `/admin/sentry-alerts`, `/admi
 ### 1.6 Cross-cutting behaviors
 
 - **Global chrome:** `NotificationBell` (header, `features/notifications/public-hooks`), `FeedbackWidget` (signed-in, `app/components`), `CheckoutConfirmation` (`features/subscription/presentation`, mounted in `AppLayout`), `PauseReadyBanner` on non-Home when auto-trigger fires.
-- **Library vs Journey → Activity:** **Library** is the browsable, filterable collection of saved items. **Journey → Activity** is the unified chronological log (pauses, letters, badges, practice, **and library saves**) rendered by `HistoryContent` / `HistoryCalendar`. There is **no** `HistoryCrossLinks` strip anymore — navigation is primary tabs + in-page links (e.g. Home **Journey pulse** → Activity).
+- **Library vs Journey → Activity (full-IA reference):** In pre-strip IA, **Library** was browsable saved items; **Journey → Activity** was the unified log (`HistoryCalendar`). *Not in pause-first bundle.* Shipped Archive = **Pauses + Echoes** only ([active-surface.md](../ops/active-surface.md)).
 
 ### 1.7 Primary navigation (product analytics)
 
-- `navigation.primary_tab_opened` (PostHog) fires when the user **switches** to a **different** bottom tab (not on re-tap of the current tab, not on back/forward or deep link alone). Property: `tab: 'home' | 'library' | 'tools' | 'journey' | 'settings'`.
-- **Implementation:** `src/app/components/BottomNav.tsx` + `isPrimaryTabActive()`. **Taxonomy:** [docs/ops/event-taxonomy.md](../ops/event-taxonomy.md) § *navigation*.
-- **Use for IA decisions:** compare relative tab usage (e.g. **Tools** vs other tabs), spot crowding, and validate follow-ups in **§3** / **§4**.
+- **Pause-first shipped:** `navigation.primary_tab_opened` (PostHog) fires when the user **switches** to a **different** bottom tab (not on re-tap of the current tab, not on back/forward or deep link alone). Property: `tab: 'home' | 'archive' | 'journey' | 'settings'` — see [event-taxonomy.md](../ops/event-taxonomy.md) and `src/app/components/BottomNav.tsx`.
+- **Full-IA (pre-strip):** the same event previously used five tabs including `'library'` and `'tools'`; do not reintroduce those enum values without a product decision.
+- **Implementation:** `BottomNav.tsx` + `isPrimaryTabActive()` + `APP_SHELL_TABS` in `src/lib/app-routes.ts`.
+- **Use for IA decisions:** compare relative tab usage on the **4-tab** shell; full-IA Tools/Library comparisons are historical only.
 
 ---
 
-## 2. Assessment: what works
+## 2. Assessment: what works (full-IA era — not pause-first shipped)
+
+> **Reference only.** Pause-first shipped shell: [active-surface.md](../ops/active-surface.md). Items below describe the **pre-strip five-tab** product unless noted in §4.
 
 1. **Clear hub:** Home as the main entry for daily use fits a mindfulness + BTC-volatility product.
 2. **Full-screen tool separation:** Full-screen routes protect focus (pause, breathe, ground, practice) without fighting the **five-tab** shell.
@@ -98,7 +101,9 @@ Under `/admin` and children (`/admin/smoke-test`, `/admin/sentry-alerts`, `/admi
 
 ---
 
-## 3. Gaps and pain points (IA)
+## 3. Gaps and pain points (IA — full-IA era reference)
+
+> **Reference only.** Not pause-first shipped — see [active-surface.md](../ops/active-surface.md) for live routes. Companion vs `/tools/*` URL families remain valid; **Tools tab and Journey sub-tabs are 404** in the active tree.
 
 1. **Companion URLs vs tools (intentional)**
   Companions use instance-scoped routes under `COMPANION_PREFIX` in `app-routes.ts` (e.g. `/companion/...` per pause) while the regulation / practice / letters namespace is `TOOLS_PREFIX` (`/tools/...`). Two URL families, one mental model each — not a bug to “merge.”
@@ -108,11 +113,11 @@ Under `/admin` and children (`/admin/smoke-test`, `/admin/sentry-alerts`, `/admi
   - Library: saved artifacts and collections.  
   - Journey → activity (chronological log).  
   - Grounding-specific history: **`/tools/ground/history`**, reached from the **Journal** tab inside the Ground full-screen experience (grouped with the session, not a separate “mode” in the tools list).  
-   **Mitigation shipped:** **Journey → Activity** calendar now includes **library saves** alongside pauses/practice/badges/letters so “what happened when?” has fewer blind spots. Grounding session history remains under **Tools → Ground → Journal** (`/tools/ground/history`); the underlying three-surface model (Library saved vs Activity timeline vs Ground journal) remains intentional.
+   **Mitigation (full-IA):** **Journey → Activity** calendar included **library saves** alongside pauses/practice/badges/letters. Grounding session history was under **Tools → Ground → Journal** (`/tools/ground/history`). *Not in pause-first bundle.*
 4. **Settings is multi-purpose**
   Pro, referrals, haptics, push, quiet hours, content sources, danger zone — still a lot to cover, but low-frequency **changelog / version / feedback** is on `/settings/about`, and the main settings experience is a **hub** plus **per-section routes** under `/settings/<section>`.
-5. **Discoverability of full-screen tools**
-  **Mitigation shipped:** **Tools** is a **bottom tab** pointing at `/tools` (`ToolsHub`). Home draggable widgets + deep links remain; full-screen tool routes still hide the shell; `/tools/letters` stays in the shell.
+5. **Discoverability of full-screen tools (full-IA)**
+  **Mitigation (full-IA):** **Tools** was a **bottom tab** pointing at `/tools` (`ToolsHub`). *Not in pause-first bundle — `/tools` → 404.*
 6. **Marketing vs app boundary**
   Public pages (`/about`, `/blog`, `/reserve`) are consistent; `/roadmap` is a small stub page so inbound links don’t rot or drop users on welcome with no explanation.
 
@@ -226,6 +231,6 @@ Use this as a **checklist** when planning research or another IA pass — **cros
 | 2026-04-28 | —      | **Tools:** unified `ToolsHub` list (no Journey/activity on hub); **Ground** `ToolsGroundLayout` with Session + Journal; Ambient folded into Stillness at `/tools/breathe`; i18n “Stillness” no parenthetical. |
 | 2026-04-29 | —      | Removed legacy client URL aliases (`/journey/letters`, `/settings/section/*`, `/tools/ambient`); letter notifications and docs use **`/tools/letters`** only. |
 | 2026-04-30 | —      | **IA doc sync:** Home default widget order + `HomeJourneyPulse` / `HomeQuickCapture`; Library vs Activity wording matches full-IA UI (no Library “Activity” tab, no `HistoryCrossLinks`); Activity log includes **`library`** events. |
-| 2026-05-19 | —      | **Pause-first IA reconciliation:** §4 banner; relabel §4.1–§4.4 and §4.7 as full-IA vs pause-first; Archive collections stripped; `/journey/:tab` and Tools marked 404 in active tree. Canonical shipped routes: [active-surface.md](../ops/active-surface.md). |
+| 2026-05-19 | —      | **Pause-first IA reconciliation:** §4 banner; relabel §4.1–§4.7; fix §1.7 PostHog tab enum (`archive` not `library`/`tools`); §2–§3 full-IA banners; stats-system + past-reflections legacy labels; home.md dead section ids; docs/README + hierarchy sync. Canonical routes: [active-surface.md](../ops/active-surface.md). |
 
 When routes, bottom-nav items, or nav-related analytics change, update **[active-surface.md](../ops/active-surface.md)** (canonical shipped manifest), **§1**, **§1.7**, **§4**, **event-taxonomy.md** (if applicable), and a **Changelog** row in the same PR.
