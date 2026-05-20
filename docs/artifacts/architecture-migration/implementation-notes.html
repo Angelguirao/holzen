@@ -3282,9 +3282,28 @@
       <dt>Deviation</dt>
       <dd>None — behavior-preserving <code>git mv</code>.</dd>
       <dt>Tradeoffs</dt>
-      <dd>Scaffold VM/flow-core and persist/storage-sync hooks remain flat until incremental peels.</dd>
+      <dd>Scaffold VM/flow-core and persist/storage-sync hooks remained flat until the scaffold/flow peel.</dd>
       <dt>Open questions</dt>
-      <dd>Next: colocate persist-to-storage or ritual-storage-sync under <code>presentation/session/</code>, or backlog #4 PauseRepository remainder.</dd>
+      <dd>Next: colocate scaffold/flow cluster under <code>presentation/session/</code>.</dd>
+    </dl>
+  </article>
+
+  <article class="note">
+    <header>
+      <span>2026-05-20</span>
+      <span>Phase A slice — colocate scaffold/flow-core under presentation/session/</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>Backlog #1 complete; Tier 4 session scaffold + flow conductors</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd><code>ritual/reflect/</code> application clusters are complete on <code>cursor/arch-migrate-src-ca70</code>. Move scaffold chrome slots, scaffold VM/presentation/ritual, flow-core, and flow (+ chrome-slots test) under <code>presentation/session/</code> beside step-transition; <code>public-hooks</code> and <code>use-pause-session-screen</code> import paths only.</dd>
+      <dt>Deviation</dt>
+      <dd>None — matches §3.2 / §10.1 session conductor grouping.</dd>
+      <dt>Tradeoffs</dt>
+      <dd><code>use-pause-session-screen</code>, depth/brief copy, and ritual-surface merge remain flat under <code>presentation/</code> until a later peel.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: colocate screen conductor + ritual-surface under <code>presentation/session/</code>, or port-back dev-mode analytics write (backlog #4).</dd>
     </dl>
   </article>
 

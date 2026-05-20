@@ -2,12 +2,12 @@ import {
   usePauseSessionShellRitual,
   type PauseSessionShellRitualProvidersSlice,
   type PauseSessionShellRitualResult,
-} from './session/use-pause-session-shell-ritual';
+} from './use-pause-session-shell-ritual';
 import {
   usePauseSessionStepHandlers,
   type PauseSessionStepHandlersProvidersSlice,
   type PauseSessionStepHandlersResult,
-} from './session/use-pause-session-step-handlers';
+} from './use-pause-session-step-handlers';
 
 export type PauseSessionFlowCoreProvidersSlice = PauseSessionShellRitualProvidersSlice &
   PauseSessionStepHandlersProvidersSlice;

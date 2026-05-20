@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { renderHook } from '@testing-library/react';
 import type { ReactNode } from 'react';
-import type { PauseScaffoldChromeRegistry } from './session/pause-session-scaffold-vm-types';
+import type { PauseScaffoldChromeRegistry } from './pause-session-scaffold-vm-types';
 import {
   usePauseSessionScaffoldChromeSlots,
   type UsePauseSessionScaffoldChromeSlotsParams,
