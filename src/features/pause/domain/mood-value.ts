@@ -26,5 +26,9 @@ export type MoodValue = (typeof ALL_MOODS)[number]['value'];
 
 export const PAUSE_MOOD_VALUES: readonly MoodValue[] = ALL_MOODS.map((m) => m.value);
 
+export function isPauseMoodValue(s: string | null | undefined): s is MoodValue {
+  return s != null && (PAUSE_MOOD_VALUES as readonly string[]).includes(s);
+}
+
 /** For `MoodCheck` presentation — mood groups with i18n keys. */
 export const PAUSE_MOOD_GROUPS = MOOD_GROUPS;

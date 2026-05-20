@@ -1,11 +1,8 @@
 import type { MoodValue } from '@/features/pause/domain/mood-value';
-import { PAUSE_MOOD_VALUES } from '@/features/pause/domain/mood-value';
+import { logPauseStep } from '@/features/pause/application/use-cases/ritual/log-pause-step';
+import type { PauseRepository } from '@/features/pause/ports/pause-repository';
 
-export function isPauseMoodValue(s: string | null | undefined): s is MoodValue {
-  return s != null && (PAUSE_MOOD_VALUES as readonly string[]).includes(s);
-}
-
-/** Payload for `pauseLogStep` with `stepType: 'post_pause_emotion_logged'` (after `outcome_logged`). */
+/** Payload for `pause_log_step` with `stepType: 'post_pause_emotion_logged'` (after `outcome_logged`). */
 export function buildPostPauseEmotionLoggedPayload(
   mood: MoodValue,
   intensity: number,
@@ -31,20 +28,15 @@ export type RunPostPauseEmotionLogResult =
   | { status: 'logged' }
   | { status: 'sync_failed' };
 
-type LogPostPauseEmotionStepPort = (params: {
-  instanceId: string;
-  payload: Record<string, unknown>;
-}) => Promise<void>;
-
 /** Brief done “Save to journey” — logs only when feel check-in changed from ritual snapshot. */
 export async function runPostPauseEmotionLogIfDirty(
+  repository: PauseRepository,
   input: {
     pauseInstanceId: string | null;
     mood: MoodValue | null;
     intensity: number;
     initialSnapshot: PostPauseFeelSnapshot | null;
   },
-  ports: { logStep: LogPostPauseEmotionStepPort },
 ): Promise<RunPostPauseEmotionLogResult> {
   if (!input.pauseInstanceId || input.mood == null) {
     return { status: 'skipped' };
@@ -60,8 +52,9 @@ export async function runPostPauseEmotionLogIfDirty(
   }
 
   try {
-    await ports.logStep({
+    await logPauseStep(repository, {
       instanceId: input.pauseInstanceId,
+      stepType: 'post_pause_emotion_logged',
       payload: buildPostPauseEmotionLoggedPayload(input.mood, input.intensity),
     });
     return { status: 'logged' };

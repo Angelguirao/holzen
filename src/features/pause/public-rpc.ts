@@ -39,7 +39,7 @@ import type { PauseCompanionAction, PauseState, PauseStepType } from './domain/p
 import {
   runPostPauseEmotionLogIfDirty,
   type PostPauseFeelSnapshot,
-} from './application/use-cases/session/post-pause-emotion-log';
+} from './application/use-cases/ritual/done/post-pause-emotion-log';
 import type { MoodValue } from './domain/mood-value';
 import {
   runPauseReflectNoteUpdate,
@@ -249,14 +249,12 @@ export function logBreathSegment2Skipped(
 }
 
 /** Brief done save — `post_pause_emotion_logged` when check-in differs from ritual snapshot. */
+/** Brief done “Save to journey” — `post_pause_emotion_logged` when feel changed. */
 export function logPostPauseEmotionIfDirty(params: {
   pauseInstanceId: string | null;
   mood: MoodValue | null;
   intensity: number;
   initialSnapshot: PostPauseFeelSnapshot | null;
 }) {
-  return runPostPauseEmotionLogIfDirty(params, {
-    logStep: ({ instanceId, payload }) =>
-      repositoryLogStep(instanceId, 'post_pause_emotion_logged', payload).then(() => undefined),
-  });
+  return runPostPauseEmotionLogIfDirty(supabasePauseRepository, params);
 }
