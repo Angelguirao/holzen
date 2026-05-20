@@ -1,6 +1,6 @@
 import { describe, expect, it, vi, beforeEach } from 'vitest';
 import { renderHook, act } from '@testing-library/react';
-import { usePauseSessionExitNavigation } from '@/screens/pause/hooks/use-pause-session-exit-navigation';
+import { usePauseSessionExitNavigation } from './use-pause-session-exit-navigation';
 
 const { clearSessionMock } = vi.hoisted(() => ({
   clearSessionMock: vi.fn(),
