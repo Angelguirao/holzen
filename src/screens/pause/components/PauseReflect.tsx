@@ -9,7 +9,7 @@ import { PauseTags } from '@/screens/pause/components/PauseTags';
 import { pauseStepLayout } from '@/screens/pause/components/pause-step-layout';
 import { Button } from '@/components/ui/button';
 import { trackEvent } from '@/lib/posthog';
-import { pauseLogStep } from '@/features/pause/public-rpc';
+import { usePauseReflectionStepLog } from '@/features/pause/public-hooks';
 import { hapticFeedback } from '@/lib/haptics';
 import { fetchHaikuTextForPauseInstance } from '@/features/pause/public-queries';
 import { cn } from '@/lib/utils';
@@ -62,38 +62,12 @@ export function PauseReflect({
     };
   }, [pauseInstanceId, companionHaikuEnabled]);
 
-  /** Records that the user reached Reflect (analytics / progression) after copy is ready or failed to load. */
-  useEffect(() => {
-    if (!pauseInstanceId) return;
-    if (reflectionLoading) return;
-    if (!reflectionMessage.trim() && !reflectionError) return;
-    const storageKey = `holzen_reflect_step_logged:${pauseInstanceId}`;
-    try {
-      if (sessionStorage.getItem(storageKey)) return;
-    } catch {
-      return;
-    }
-    let cancelled = false;
-    void pauseLogStep({
-      instanceId: pauseInstanceId,
-      stepType: 'reflection_step',
-      payload: { surface: 'pause_reflect' },
-    })
-      .then(() => {
-        if (cancelled) return;
-        try {
-          sessionStorage.setItem(storageKey, '1');
-        } catch {
-          /* no-op */
-        }
-      })
-      .catch(() => {
-        /* non-fatal — user can revisit Reflect to retry */
-      });
-    return () => {
-      cancelled = true;
-    };
-  }, [pauseInstanceId, reflectionLoading, reflectionMessage, reflectionError]);
+  usePauseReflectionStepLog({
+    pauseInstanceId,
+    reflectionLoading,
+    reflectionMessage,
+    reflectionError,
+  });
 
   const openPostIt = useCallback(() => {
     hapticFeedback('light');
