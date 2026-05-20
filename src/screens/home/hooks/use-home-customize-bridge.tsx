@@ -1,7 +1,12 @@
 import type { TFunction } from 'i18next';
 import { useCallback, useMemo, useState } from 'react';
-import { trackEvent } from '@/lib/posthog';
+import { applyHomeWidgetVisibilityChange } from '@/screens/home/lib/apply-home-widget-visibility-change';
 import { getHomeCustomizeSectionDescription, getHomeCustomizeSectionTitle } from '@/screens/home/lib/home-customize-section-copy';
+import {
+  trackHomeCustomizeOpened,
+  trackHomeCustomizeResetLayout,
+  trackHomeOptionalWidgetToggled,
+} from '@/screens/home/lib/home-customize-telemetry';
 import type { HomeDashboardLayoutCustomizeProps } from '@/screens/home/components/HomeDashboardLayout';
 import { isHomeSectionAlwaysVisibleInLayout } from '@/screens/home/lib/home-section-visibility-constants';
 
@@ -42,17 +47,16 @@ export function useHomeCustomizeBridge(args: {
   const onSetVisible = useCallback(
     (id: string, value: boolean) => {
       if (isHomeSectionAlwaysVisibleInLayout(id)) return;
-      trackEvent('home.optional_widget_toggled', { widget_id: id, visible: value });
+      trackHomeOptionalWidgetToggled(id, value);
       setVisible(id, value);
-      if (value && !order.includes(id)) {
-        reorder([...order, id]);
-      }
+      const nextOrder = applyHomeWidgetVisibilityChange({ id, value, order });
+      if (nextOrder !== order) reorder(nextOrder);
     },
     [setVisible, order, reorder],
   );
 
   const onResetAll = useCallback(() => {
-    trackEvent('home.customize_reset_layout', {});
+    trackHomeCustomizeResetLayout();
     resetLayout();
     resetSectionVisibility();
     setZenModePersist(false);
@@ -60,7 +64,7 @@ export function useHomeCustomizeBridge(args: {
   }, [resetLayout, resetSectionVisibility, setZenModePersist]);
 
   const onOpenChange = useCallback((next: boolean) => {
-    if (next) trackEvent('home.customize_opened', {});
+    if (next) trackHomeCustomizeOpened();
     setOpen(next);
   }, []);
 
