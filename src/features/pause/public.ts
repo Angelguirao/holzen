@@ -170,6 +170,16 @@ export type {
   RegenerateCompanionSlot,
 } from './domain/companion-orchestrate';
 export { COMPANION_TYPES, FEEDBACK_TO_CACHE_TYPE } from './domain/companion-types';
+export {
+  DEFAULT_PREGENERATE_CACHE_TOPUP,
+  PREGENERATE_CACHE_TOPUP_KEYS,
+  mergePregenerateCacheTopup,
+} from './domain/pregenerate-cache-topup-config';
+export type {
+  PregenerateCacheTopupConfig,
+  PregenerateCacheTopupKey,
+  PregenerateCacheTopupTypeConfig,
+} from './domain/pregenerate-cache-topup-config';
 export type { FeelStepTile } from './domain/feel-step-tile';
 export {
   PAUSE_FEEL_INTENSITY_KEYS,

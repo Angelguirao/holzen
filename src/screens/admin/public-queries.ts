@@ -42,6 +42,9 @@ export {
   swapCompanionFallbackSortOrder,
   updateCompanionFallbackPayload,
   upsertAppConfigRow,
+  DEFAULT_PREGENERATE_CACHE_TOPUP,
+  PREGENERATE_CACHE_TOPUP_KEYS,
+  mergePregenerateCacheTopup,
 } from '@/features/pause/public-queries';
 
 export {
@@ -83,6 +86,9 @@ export type {
   SignalSourceRow,
   SpendSnapshot,
   TimePeriod,
+  PregenerateCacheTopupConfig,
+  PregenerateCacheTopupKey,
+  PregenerateCacheTopupTypeConfig,
 } from '@/features/pause/public-queries';
 
 export type { SourceSuggestionRow } from '@/features/user/public-queries';

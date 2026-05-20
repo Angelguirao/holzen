@@ -124,6 +124,16 @@ export {
   type FeatureKey,
   type SpendSnapshot,
 } from './infrastructure/queries/app-config-admin-query';
+export {
+  DEFAULT_PREGENERATE_CACHE_TOPUP,
+  PREGENERATE_CACHE_TOPUP_KEYS,
+  mergePregenerateCacheTopup,
+} from './domain/pregenerate-cache-topup-config';
+export type {
+  PregenerateCacheTopupConfig,
+  PregenerateCacheTopupKey,
+  PregenerateCacheTopupTypeConfig,
+} from './domain/pregenerate-cache-topup-config';
 export { upsertAppConfigRow } from './infrastructure/queries/app-config-admin-mutations';
 export type { TimePeriod } from './domain/admin-time-period';
 export {

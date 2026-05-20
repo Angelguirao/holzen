@@ -21,18 +21,12 @@ import {
   type ConfigState,
   type FeatureKey,
   type SpendSnapshot,
-} from '@/screens/admin/public-queries';
-import {
   mergePregenerateCacheTopup,
+  PREGENERATE_CACHE_TOPUP_KEYS,
   type PregenerateCacheTopupKey,
-} from '../../../../supabase/functions/_shared/pregenerate-cache-topup-config.ts';
+} from '@/screens/admin/public-queries';
 
-const PREGENERATE_TOPUP_KEYS: PregenerateCacheTopupKey[] = [
-  'ground_nudge',
-  'signal',
-  'historical_insight',
-  'zoom_out_deep_time',
-];
+const PREGENERATE_TOPUP_KEYS: PregenerateCacheTopupKey[] = [...PREGENERATE_CACHE_TOPUP_KEYS];
 
 const PREGENERATE_TOPUP_LABELS: Record<PregenerateCacheTopupKey, string> = {
   ground_nudge: 'Grounding',
