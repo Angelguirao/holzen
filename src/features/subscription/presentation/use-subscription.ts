@@ -2,8 +2,12 @@ import { useState, useEffect, useCallback, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { toast } from 'sonner';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
-import { invokeEdge } from '@/lib/invoke-edge';
 import { useAuth } from '@/features/auth/public';
+import {
+  createCheckoutSession,
+  ensureTrialSubscription,
+  openCustomerPortal,
+} from '../public-rpc';
 import { holzenLog } from '@/lib/holzen-console';
 import { getCheckoutSuppressionWindowMs } from '../application/checkout-suppression-window';
 import {
@@ -197,15 +201,15 @@ export function useSubscription() {
     try {
       sessionStorage.setItem(CHECKOUT_RETURN_KEY, String(Date.now()));
       const isPack = target === 'flex_pack_s' || target === 'flex_pack_m';
-      const { data, error } = await invokeEdge<{ url?: string }>('create-checkout', {
-        body: isPack
+      const { data, error } = await createCheckoutSession(
+        isPack
           ? { checkoutKind: target }
           : {
               checkoutKind: 'subscription',
               planTier: target,
               reactivation: options?.reactivation === true,
             },
-      });
+      );
       if (error) throw error;
 
       if (data?.url) {
@@ -239,12 +243,7 @@ export function useSubscription() {
     holzenLog.subscription('trial', { action: 'ensure' });
     setTrialLoading(true);
     try {
-      const { data, error } = await invokeEdge<{ ok?: boolean; created?: boolean }>(
-        'ensure-trial-subscription',
-        {
-          body: {},
-        },
-      );
+      const { data, error } = await ensureTrialSubscription();
       if (error) throw error;
       if (!data?.ok) throw new Error('Trial not started');
       if (data.created) {
@@ -271,7 +270,7 @@ export function useSubscription() {
   const openPortal = useCallback(async () => {
     holzenLog.subscription('portal', { action: 'open' });
     try {
-      const { data, error } = await invokeEdge<{ url?: string }>('customer-portal');
+      const { data, error } = await openCustomerPortal();
       if (error) throw error;
       if (data?.url) {
         window.open(data.url, '_blank');
