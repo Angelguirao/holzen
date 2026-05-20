@@ -34,6 +34,11 @@ export { usePauseContextHomePreviews } from './presentation/use-pause-context-ho
 export { useHolzenHomeContextState } from './presentation/use-holzen-home-context-state';
 export { usePauseArrivalAudio } from './presentation/use-pause-arrival-audio';
 export {
+  usePauseCardProjection,
+  type PauseCardProjection,
+  type UsePauseCardProjectionParams,
+} from './presentation/use-pause-card-projection';
+export {
   usePauseReflectGeneration,
   type UsePauseReflectGenerationParams,
 } from './presentation/use-pause-reflect-generation';

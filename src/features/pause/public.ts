@@ -235,6 +235,12 @@ export {
   type PauseArrivalToneAction,
 } from './application/use-cases/home/resolve-pause-arrival-tone-action';
 export {
+  buildHomePauseCardBodyProps,
+  type BuildHomePauseCardBodyPropsInput,
+  type HomePauseCardBodyPropsProjection,
+  type PauseContextHomePreview,
+} from './application/use-cases/home/home-pause-card-body-props';
+export {
   computePauseHeaderBackIntent,
   isPauseSessionHeaderBackVisible,
 } from './application/use-cases/session/header-back';
