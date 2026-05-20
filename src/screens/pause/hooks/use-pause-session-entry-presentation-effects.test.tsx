@@ -1,6 +1,6 @@
 import { describe, expect, it, vi, beforeEach, afterEach } from 'vitest';
 import { renderHook, act } from '@testing-library/react';
-import { usePauseSessionEntryPresentationEffects } from '@/screens/pause/hooks/use-pause-session-entry-presentation-effects';
+import { usePauseSessionEntryPresentationEffects } from '@/features/pause/presentation/use-pause-session-entry-presentation-effects';
 
 describe('usePauseSessionEntryPresentationEffects', () => {
   beforeEach(() => {
