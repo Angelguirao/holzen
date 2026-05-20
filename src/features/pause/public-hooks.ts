@@ -27,3 +27,4 @@ export { usePauseReflectionStepLog } from './presentation/use-pause-reflection-s
 export { useCompanionAccess } from './presentation/use-companion-access';
 export { useCompanionUiCompletion } from './presentation/use-companion-ui-completion';
 export { useCompanionLibraryFavorites } from './presentation/use-companion-library-favorites';
+export { useCompanionSlotUiState } from './presentation/use-companion-slot-ui-state';
