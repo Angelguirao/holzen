@@ -1598,6 +1598,25 @@
   <article class="note">
     <header>
       <span>2026-05-20</span>
+      <span>Phase A slice — peel feel-step UI tokens from public.ts (§6)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3><code>PAUSE_FEEL_*</code> constants → <code>public-hooks</code></h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>reflect/</code> → <code>ritual/reflect/</code>) was already complete on this branch. Continue backlog #3 §6 slim barrel: ritual Feel presentation constants (<code>PAUSE_FEEL_STEP_TILE_ROWS</code>, <code>PAUSE_FEEL_INTENSITY_KEYS</code>) export from <code>public-hooks.ts</code>; pause screen components import alongside hooks. Domain types (<code>FeelStepTile</code>, <code>MoodValue</code>) stay on <code>public.ts</code>. Removed unused <code>logPauseOutcomeStep</code> and private <code>repositoryLogStep</code> from <code>public-rpc</code> — decide uses <code>logPauseOutcome</code> only.</dd>
+      <dt>Deviation</dt>
+      <dd>None — same pattern as <code>pauseStepLayout</code> / zoom-out types (May 2026).</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Did not peel <code>PAUSE_MOOD_GROUPS</code> or brief-integrate constants in the same commit.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: colocate <code>application/use-cases/breathing/</code> under <code>ritual/breathe/</code>, or peel more screen-only helpers off <code>public.ts</code>.</dd>
+    </dl>
+  </article>
+
+  <article class="note">
+    <header>
+      <span>2026-05-20</span>
       <span>Phase A slice — ritual depth upgrade under ritual/brief/ (Tier 5)</span>
       <span class="status resolved">resolved</span>
     </header>

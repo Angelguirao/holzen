@@ -3,6 +3,11 @@
  * Pure frame/format helpers used by pause screens also live here (§6 slim `public.ts`).
  */
 export { pauseStepLayout } from './presentation/pause-step-layout';
+export { PAUSE_FEEL_STEP_TILE_ROWS } from './domain/pause-feel-step-tiles';
+export {
+  PAUSE_FEEL_INTENSITY_KEYS,
+  type PauseFeelIntensityKey,
+} from './domain/pause-feel-intensity';
 export { estimateReadTime } from './application/use-cases/ritual/frame/estimate-read-time';
 export { formatCompanionHistoryRelativeDay } from './application/use-cases/ritual/frame/format-companion-history-relative-day';
 export { zoomOutTotalCharsForReadTime } from './application/use-cases/ritual/frame/zoom-out-payload';

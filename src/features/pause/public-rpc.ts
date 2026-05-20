@@ -35,7 +35,7 @@ import { persistReflectionArtifacts } from './infrastructure/edge/reflect/reflec
 import type { OpenManualPauseFromHomeParams } from './application/use-cases/trigger/open-manual-pause-from-home';
 import type { TFunction } from 'i18next';
 import type { BulkHoldOutcomeChoice, BulkHoldPendingPause } from './domain/bulk-hold';
-import type { PauseCompanionAction, PauseState, PauseStepType } from './domain/pause-state';
+import type { PauseCompanionAction, PauseState } from './domain/pause-state';
 import {
   runPostPauseEmotionLogIfDirty,
   type PostPauseFeelSnapshot,
@@ -103,14 +103,6 @@ export function pauseLogCompanion(params: {
   entryPoint: string;
 }) {
   return supabasePauseRepository.logCompanion(params);
-}
-
-function repositoryLogStep(
-  instanceId: string,
-  stepType: PauseStepType,
-  payload?: Record<string, unknown>,
-) {
-  return supabasePauseRepository.logStep({ instanceId, stepType, payload });
 }
 
 export type { BulkHoldApplyResult };
@@ -206,14 +198,6 @@ export function logPauseOutcome(params: {
   decision: string;
 }) {
   return runPauseOutcomeLog(supabasePauseRepository, params);
-}
-
-/** Low-level `outcome_logged` step — prefer `logPauseOutcome` for decide flow. */
-export function logPauseOutcomeStep(params: {
-  instanceId: string;
-  payload: Record<string, unknown>;
-}) {
-  return repositoryLogStep(params.instanceId, 'outcome_logged', params.payload);
 }
 
 const breathSegmentLogDeps = {

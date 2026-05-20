@@ -135,11 +135,6 @@ export type {
   PregenerateCacheTopupTypeConfig,
 } from './domain/pregenerate-cache-topup-config';
 export type { FeelStepTile } from './domain/feel-step-tile';
-export { PAUSE_FEEL_STEP_TILE_ROWS } from './domain/pause-feel-step-tiles';
-export {
-  PAUSE_FEEL_INTENSITY_KEYS,
-  type PauseFeelIntensityKey,
-} from './domain/pause-feel-intensity';
 export type { MoodValue } from './domain/mood-value';
 export {
   isPauseMoodValue,
