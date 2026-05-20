@@ -81,8 +81,6 @@ export type {
   PregenerateCacheTopupTypeConfig,
 } from './domain/pregenerate-cache-topup-config';
 export type { FeelStepTile } from './domain/feel-step-tile';
-export type { MoodValue } from './domain/mood-value';
-export { isPauseMoodValue } from './domain/mood-value';
 export type { PauseStep } from './domain/pause-ritual-steps';
 export type { CompanionData, CompanionPrefs } from './domain/companion-card-types';
 export type { PauseSessionShellHolzen } from './domain/pause-session-shell-holzen';

@@ -1,4 +1,4 @@
-import { isPauseMoodValue, type MoodValue } from '@/features/pause/public';
+import { isPauseMoodValue, type MoodValue } from '@/features/pause/domain/mood-value';
 
 export type DoneWallpaperMoodInput = {
   mood?: string | null;

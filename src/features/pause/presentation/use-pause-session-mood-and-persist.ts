@@ -6,10 +6,10 @@ import {
   type CompanionData,
   type CompanionPrefs,
   type FeelStepTile,
-  type MoodValue,
   type PauseStep,
   type RitualDepth,
 } from '@/features/pause/public';
+import type { MoodValue } from '../domain/mood-value';
 import { usePauseFeelShiftLogDedupeRefs } from './use-pause-feel-shift-log-dedupe-refs';
 import { usePauseSessionDepthPickerHandlers } from './use-pause-session-depth-picker-handlers';
 import { usePauseSessionFeelTilesSelect } from './use-pause-session-feel-tiles-select';

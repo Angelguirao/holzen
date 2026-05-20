@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { resolveDoneWallpaperMood } from '@/screens/pause/lib/resolve-done-wallpaper-mood';
+import { resolveDoneWallpaperMood } from './resolve-done-wallpaper-mood';
 
 describe('resolveDoneWallpaperMood', () => {
   it('prefers moodAfter when valid', () => {

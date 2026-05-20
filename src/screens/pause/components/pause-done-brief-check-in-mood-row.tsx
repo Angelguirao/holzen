@@ -2,7 +2,7 @@ import { Pencil } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { PAUSE_MOOD_VALUES } from '@/screens/pause/components/MoodCheck';
 import { MoodIcon } from '@/components/icons/MoodIcon';
-import type { MoodValue } from '@/features/pause/public';
+import type { MoodValue } from '@/features/pause/public-hooks';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';

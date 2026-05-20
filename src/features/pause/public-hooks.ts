@@ -24,7 +24,16 @@ export {
   pauseOpenMaxDeadlineMs,
   PAUSE_OPEN_MAX_AGE_MS,
 } from './application/use-cases/session/open-max-countdown';
-export { PAUSE_MOOD_GROUPS, PAUSE_MOOD_VALUES } from './domain/mood-value';
+export {
+  PAUSE_MOOD_GROUPS,
+  PAUSE_MOOD_VALUES,
+  isPauseMoodValue,
+} from './domain/mood-value';
+export type { MoodValue } from './domain/mood-value';
+export {
+  resolveDoneWallpaperMood,
+  type DoneWallpaperMoodInput,
+} from './application/use-cases/ritual/done/resolve-done-wallpaper-mood';
 export type { BriefPauseStep } from './domain/ritual-types';
 export {
   BRIEF_PAUSE_ORDER,
