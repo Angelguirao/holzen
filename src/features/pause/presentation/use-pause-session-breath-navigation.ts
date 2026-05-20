@@ -3,7 +3,7 @@ import { isPauseSessionHeaderBackVisible } from '@/features/pause/application/us
 import type { BriefPauseStep, PauseStep, RitualDepth } from '@/features/pause/public-hooks';
 import { usePauseSessionBreathUi } from './use-pause-session-breath-ui';
 import { usePauseSessionGoBack } from './session/use-pause-session-go-back';
-import { usePauseSessionGoToStep } from './use-pause-session-go-to-step';
+import { usePauseSessionGoToStep } from './session/use-pause-session-go-to-step';
 import { usePauseSessionHeaderBackHandler } from './use-pause-session-header-back-handler';
 
 export type UsePauseSessionBreathNavigationParams = {

@@ -329,7 +329,7 @@ export { usePauseFeelShiftLogDedupeRefs } from './presentation/reflect/use-pause
 export { usePauseBreathSegmentRpcLoggers } from './presentation/session/use-pause-breath-segment-rpc-loggers';
 export { usePauseSessionMountLog } from './presentation/session/use-pause-session-mount-log';
 export { usePauseSessionGoBack } from './presentation/session/use-pause-session-go-back';
-export { usePauseSessionGoToStep } from './presentation/use-pause-session-go-to-step';
+export { usePauseSessionGoToStep } from './presentation/session/use-pause-session-go-to-step';
 export { usePauseSessionHeaderBackHandler } from './presentation/use-pause-session-header-back-handler';
 export { usePauseSessionBreathTimedActiveReset } from './presentation/use-pause-session-breath-timed-active-reset';
 export {
