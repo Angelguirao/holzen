@@ -13,7 +13,7 @@ import { CompanionFocusLayout } from '@/screens/pause/components/companion/Compa
 import { SignalFullView } from '@/screens/pause/components/companion/SignalFullView';
 import { HistoryThread } from '@/screens/pause/components/companion/HistoryThread';
 import { InterventionCrossRefBadge } from '@/screens/pause/components/companion/InterventionCrossRefBadge';
-import { useStaggeredReveal } from '@/screens/pause/components/companion/use-staggered-reveal';
+import { useStaggeredReveal } from '@/features/pause/public-hooks';
 import { PageMeta } from '@/app/components/PageMeta';
 import { DEFAULT_COMPANIONS, DEFAULT_PREFS } from '@/features/pause/public';
 
