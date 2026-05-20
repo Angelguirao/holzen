@@ -1880,6 +1880,25 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-20</span>
+      <span>Phase A slice — peel home pause widget errors from public.ts (§6)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3><code>pause-home-widget-error</code> screen helpers → <code>public-hooks</code></h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>reflect/</code> → <code>ritual/reflect/</code>) was already complete on <code>cursor/arch-migrate-src-ca70</code> — no reflect folder moves. Prior commit on the branch peeled pending-offer + ritual progress. Continue backlog #3 §6: <code>pauseHomeErrorKind</code>, <code>pauseHomeErrorStrings</code>, and <code>shouldSurfacePauseWidgetError</code> export from <code>public-hooks.ts</code> for home pause screens; <code>usePauseCardProjection</code> imports <code>shouldShowHomePauseSectionSnooze</code> from the use-case module directly.</dd>
+      <dt>Deviation</dt>
+      <dd>None — presentation may import application use cases per pause-client-architecture §3.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Did not peel <code>PauseImpactData</code> for <code>ScoreImpact</code> or <code>writingTextareaClassName</code> in the same commit.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: export <code>PauseImpactData</code> type via <code>public-hooks</code> for pause screens, peel <code>MoodCheck</code> mood tokens off <code>public.ts</code>, or optional <code>breathing/</code> → <code>ritual/breathe/</code>.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
 </body>
 </html>

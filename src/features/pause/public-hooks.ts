@@ -178,6 +178,12 @@ export {
 } from './presentation/home/use-home-pause-actions';
 export { usePauseContextHomePreviews } from './presentation/home/use-pause-context-home-previews';
 export { useHolzenHomeContextState } from './presentation/home/use-holzen-home-context-state';
+export {
+  pauseHomeErrorKind,
+  pauseHomeErrorStrings,
+  shouldSurfacePauseWidgetError,
+  type PauseHomeErrorKind,
+} from './application/use-cases/home/pause-home-widget-error';
 export { usePauseArrivalAudio } from './presentation/home/use-pause-arrival-audio';
 export {
   usePauseCardProjection,

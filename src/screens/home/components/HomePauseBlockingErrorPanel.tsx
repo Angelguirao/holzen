@@ -2,7 +2,10 @@ import { useTranslation } from 'react-i18next';
 import { AlertCircle } from 'lucide-react';
 import { homeInWidget } from '@/screens/home/components/home-widget-styles';
 import { holzenLog } from '@/lib/holzen-console';
-import { pauseHomeErrorKind, pauseHomeErrorStrings } from '@/features/pause/public';
+import {
+  pauseHomeErrorKind,
+  pauseHomeErrorStrings,
+} from '@/features/pause/public-hooks';
 import { cn } from '@/lib/utils';
 
 const tryAgainClassName =

@@ -127,14 +127,6 @@ export {
   type PickPauseHolzenProvidersSliceSource,
 } from './application/use-cases/session/pause-holzen-providers-slice';
 export {
-  isLikelyPriceOnlyMarketError,
-  pauseHomeErrorKind,
-  pauseHomeErrorStrings,
-  shouldShowHomePauseSectionSnooze,
-  shouldSurfacePauseWidgetError,
-  type PauseHomeErrorKind,
-} from './application/use-cases/home/pause-home-widget-error';
-export {
   millisecondsUntilNextQuarterHour,
   PAUSE_CRON_QUARTER_INTERVAL_MS,
 } from './application/use-cases/scheduling/milliseconds-until-next-quarter-hour';
