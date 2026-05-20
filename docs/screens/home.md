@@ -32,7 +32,7 @@ Home is the signed-in landing surface after onboarding: hero quote, optional ins
 
 | Area | Source | Notes |
 |------|--------|--------|
-| Open pause + market context | [`useHolzen`](../../src/screens/home/hooks/use-holzen.ts) | `lastPauseInstanceId` / `hasOpenPause`, `context` (market line from `context_snapshot`), `message` only when a `reflection_text` artifact exists (post-Reflect or silent stub), `loading`, `error`, `btcData`, `manualTrigger`, cooldown helpers, companions; **`trackedAssetId`** is re-exported as `normalizeTrackedAssetId(profile.trackedAssetId)` (`TrackedAssetId`) |
+| Open pause + market context | [`HolzenProvider`](../../src/app/components/HolzenProvider.tsx) (`useHolzenHomeContextState` in pause presentation) | `lastPauseInstanceId` / `hasOpenPause`, `context` (market line from `context_snapshot`), `message` only when a `reflection_text` artifact exists (post-Reflect or silent stub), `loading`, `error`, `btcData`, `manualTrigger`, cooldown helpers, companions; **`trackedAssetId`** is re-exported as `normalizeTrackedAssetId(profile.trackedAssetId)` (`TrackedAssetId`) |
 | Subscription / Pro | [`useSubscription`](../../src/features/subscription/public-hooks) | `subscribed`, `monthlyRemaining`, `startCheckout`, `refresh` |
 | Layout + DnD order | [`useWidgetLayout`](../../src/screens/home/components/HomeWidget.tsx) | Section order persisted per user expectations |
 | Optional widgets | [`useHomeOptionalVisibility`](../../src/screens/home/hooks/use-home-optional-visibility.ts) | Toggles + `JOURNEY_STAT_TILES_VISIBILITY_ID` + `HOME_WIDGET_DEFAULT_ORDER` for layout |
