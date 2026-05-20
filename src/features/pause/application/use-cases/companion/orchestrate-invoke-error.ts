@@ -1,7 +1,7 @@
 import {
   parseEdgeFunctionError,
   toUserFacingAiErrorMessage,
-} from '@/lib/edge-function-error';
+} from '@/features/pause/application/use-cases/edge/edge-function-error';
 
 export type CompanionOrchestratePaywallCode =
   | 'companions_quota_exceeded'
