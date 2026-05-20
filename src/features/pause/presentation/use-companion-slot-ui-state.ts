@@ -1,12 +1,12 @@
 import { useLayoutEffect, useMemo, useRef, useState } from 'react';
-import type { ZoomOutData } from '@/screens/pause/components/ZoomOutDisplay';
-import type { CachedHistoricalInsightShape } from '@/screens/pause/components/HistoricalInsightDisplay';
 import {
   EMPTY_COMPANION_SLOT_RELAXATIONS,
+  type CachedHistoricalInsightShape,
   type CompanionSlotAutosaveParams,
   type CompanionSlotCacheIds,
   type CompanionSlotCommitters,
   type CompanionSlotRelaxations,
+  type ZoomOutData,
 } from '@/features/pause/public';
 
 interface NudgeData {

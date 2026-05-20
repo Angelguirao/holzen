@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { useCompanionInterventionBootstrap } from '@/screens/pause/hooks/use-companion-intervention-bootstrap';
 import { useCompanionOrchestrateRetry } from '@/screens/pause/hooks/use-companion-orchestrate-retry';
 import { useCompanionSlotOrchestrateActions } from '@/screens/pause/hooks/use-companion-slot-orchestrate-actions';
-import { useCompanionSlotUiState } from '@/screens/pause/hooks/use-companion-slot-ui-state';
+import { useCompanionSlotUiState } from '@/features/pause/public-hooks';
 
 export type UseCompanionOrchestrationParams = {
   pauseInstanceId?: string | null;
