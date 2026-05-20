@@ -11,8 +11,10 @@ import {
   type PauseSessionShellHolzen,
 } from '@/screens/pause/hooks/use-pause-session-shell';
 import { usePauseSessionMountLog } from '@/features/pause/public-hooks';
-import { usePauseSessionPendingPauseOfferNavigation } from '@/screens/pause/hooks/use-pause-session-pending-pause-offer-navigation';
-import { usePauseSessionPendingLeaveSheet } from '@/screens/pause/hooks/use-pause-session-pending-leave-sheet';
+import {
+  usePauseSessionPendingLeaveSheet,
+  usePauseSessionPendingPauseOfferNavigation,
+} from '@/features/pause/public-hooks';
 import { usePendingPauseOffer } from '@/features/pause/public-hooks';
 
 /**

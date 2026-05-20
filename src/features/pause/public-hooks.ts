@@ -111,3 +111,6 @@ export {
   usePauseSessionBreathHandlers,
   type UsePauseSessionBreathHandlersParams,
 } from './presentation/use-pause-session-breath-handlers';
+export { usePauseSessionExitNavigation } from './presentation/use-pause-session-exit-navigation';
+export { usePauseSessionPendingPauseOfferNavigation } from './presentation/use-pause-session-pending-pause-offer-navigation';
+export { usePauseSessionPendingLeaveSheet } from './presentation/use-pause-session-pending-leave-sheet';
