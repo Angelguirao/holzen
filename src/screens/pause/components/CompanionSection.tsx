@@ -1,4 +1,4 @@
-import { useState, forwardRef } from 'react';
+import { forwardRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 
@@ -11,7 +11,7 @@ import { CompanionFeedback } from './CompanionFeedback';
 import { Check, Heart, Lock, Feather, Anchor, BookOpenText, Mountain, Clock, Maximize2 } from 'lucide-react';
 import { useProGate } from '@/features/subscription/public-hooks';
 import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
-import { useCompanionSection } from '@/features/pause/public-hooks';
+import { useCompanionSection, useCompanionSectionExpansion } from '@/features/pause/public-hooks';
 
 import type { CompanionData, CompanionPrefs } from '@/features/pause/public';
 
@@ -184,11 +184,33 @@ export const CompanionSection = forwardRef<HTMLDivElement, Props>(function Compa
     mood,
   });
 
-  const [expandedHaiku, setExpandedHaiku] = useState(false);
-  const [expandedLearning, setExpandedLearning] = useState(false);
-  const [expandedSignal, setExpandedSignal] = useState(false);
-  const [expandedZoomOut, setExpandedZoomOut] = useState(false);
-  const [expandedHistory, setExpandedHistory] = useState(false);
+  const {
+    expandedHaiku,
+    expandedLearning,
+    expandedSignal,
+    expandedZoomOut,
+    expandedHistory,
+    toggleHaiku,
+    toggleSignal,
+    toggleGrounding,
+    toggleZoomOut,
+    toggleHistory,
+  } = useCompanionSectionExpansion({
+    signal,
+    signalLoading,
+    signalError,
+    nudge,
+    nudgeLoading,
+    nudgeError,
+    zoomOut,
+    zoomOutLoading,
+    zoomOutError,
+    historyInsight,
+    historyLoading,
+    historyError,
+    fetchCompanion,
+    canAccessCompanion,
+  });
 
   if (!showSection) return null;
 
@@ -205,7 +227,7 @@ export const CompanionSection = forwardRef<HTMLDivElement, Props>(function Compa
           icon={COMPANION_ICONS.haiku}
           expanded={expandedHaiku}
           onToggle={() => {
-            setExpandedHaiku((v) => !v);
+            toggleHaiku();
             if (!completion.haiku) markCompleted('haiku');
           }}
           completed={completion.haiku}
@@ -223,14 +245,7 @@ export const CompanionSection = forwardRef<HTMLDivElement, Props>(function Compa
           icon={COMPANION_ICONS.signal}
           expanded={expandedSignal}
           onToggle={() => {
-            setExpandedSignal((v) => {
-              const next = !v;
-              if (next && !signal && !signalLoading && !signalError) {
-                if (!canAccessCompanion()) return v;
-                void fetchCompanion('signal');
-              }
-              return next;
-            });
+            toggleSignal();
             if (!completion.signal) markCompleted('signal');
           }}
           completed={completion.signal}
@@ -283,14 +298,7 @@ export const CompanionSection = forwardRef<HTMLDivElement, Props>(function Compa
           icon={COMPANION_ICONS.grounding}
           expanded={expandedLearning}
           onToggle={() => {
-            setExpandedLearning((v) => {
-              const next = !v;
-              if (next && !nudge && !nudgeLoading && !nudgeError) {
-                if (!canAccessCompanion()) return v;
-                void fetchCompanion('grounding');
-              }
-              return next;
-            });
+            toggleGrounding();
             if (!completion.grounding) markCompleted('grounding');
           }}
           completed={completion.grounding}
@@ -345,14 +353,7 @@ export const CompanionSection = forwardRef<HTMLDivElement, Props>(function Compa
           icon={COMPANION_ICONS.zoomOut}
           expanded={expandedZoomOut}
           onToggle={() => {
-            setExpandedZoomOut((v) => {
-              const next = !v;
-              if (next && !zoomOut && !zoomOutLoading && !zoomOutError) {
-                if (!canAccessCompanion()) return v;
-                void fetchCompanion('zoomOut');
-              }
-              return next;
-            });
+            toggleZoomOut();
             if (!completion.zoomOut) markCompleted('zoomOut');
           }}
           completed={completion.zoomOut}
@@ -405,14 +406,7 @@ export const CompanionSection = forwardRef<HTMLDivElement, Props>(function Compa
           icon={COMPANION_ICONS.history}
           expanded={expandedHistory}
           onToggle={() => {
-            setExpandedHistory((v) => {
-              const next = !v;
-              if (next && !historyInsight && !historyLoading && !historyError) {
-                if (!canAccessCompanion()) return v;
-                void fetchCompanion('history');
-              }
-              return next;
-            });
+            toggleHistory();
             if (!completion.history) markCompleted('history');
           }}
           completed={completion.history}
