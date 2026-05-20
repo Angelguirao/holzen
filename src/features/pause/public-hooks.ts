@@ -392,7 +392,7 @@ export {
 export {
   usePauseSessionShell,
   type UsePauseSessionShellParams,
-} from './presentation/use-pause-session-shell';
+} from './presentation/session/use-pause-session-shell';
 export {
   usePauseSessionShellBootstrap,
   type UsePauseSessionShellBootstrapParams,
