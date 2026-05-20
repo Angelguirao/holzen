@@ -1,5 +1,5 @@
 import { supabase } from '@/integrations/supabase/client';
-import type { CompanionData } from '@/features/pause/public';
+import type { CompanionData } from '@/features/pause/domain/companion-card-types';
 import { invokeHolzenReflect } from './holzen-reflect-edge';
 import { loadReflectRecencyHints } from './load-reflect-recency-hints';
 

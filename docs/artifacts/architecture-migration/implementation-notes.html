@@ -2032,6 +2032,25 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-20</span>
+      <span>Phase A slice — group reflect haiku artifact read under queries/reflect (Tier 5)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>Backlog #1 complete; <code>haiku-artifact-query</code> → <code>infrastructure/queries/reflect/</code></h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd><code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code> was already complete on <code>cursor/arch-migrate-src-ca70</code>. Colocate persisted haiku reads with other reflect artifact I/O (edge <code>reflect/</code>, archive-style <code>queries/archive/</code>). <code>public-queries</code> re-export path only; <code>reflection-artifact.ts</code> imports <code>CompanionData</code> from <code>domain/companion-card-types</code> (no <code>public.ts</code> barrel).</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior unchanged; lazy hydrate for Reflect / Frame steps unchanged.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Did not add a <code>fetchOpeningMessage</code> query module (still inline in <code>reflection-artifact.ts</code>) in the same commit.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: peel <code>getSessionQuote</code> off <code>public.ts</code>, optional <code>breathing/</code> → <code>ritual/breathe/</code>, or extract opening-message read to <code>queries/reflect/</code>.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
 </body>
 </html>
