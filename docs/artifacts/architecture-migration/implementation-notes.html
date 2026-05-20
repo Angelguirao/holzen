@@ -759,6 +759,25 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-20</span>
+      <span>Phase A slice — archive query folder</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>Archive queries → <code>infrastructure/queries/archive/</code></h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Reflect and companion folder migrations were already complete on this branch. Next backlog item: group <code>archive-list-query</code> and <code>archive-pauses-tab-query</code> under <code>infrastructure/queries/archive/</code>; barrels in <code>public-queries.ts</code> only — no behavior change.</dd>
+      <dt>Deviation</dt>
+      <dd>None — matches spec §5.2 / §10.1.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Could move additional archive-adjacent queries (e.g. history-thread) later; kept slice to the two modules named in the backlog.</dd>
+      <dt>Open questions</dt>
+      <dd>Fixed broken <code>retrospective-outcome.test.ts</code> type import (typo concatenated path). Next slice: <code>public.ts</code> peel or <code>PauseRepository</code> wiring.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
 </body>
 </html>

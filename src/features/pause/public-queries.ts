@@ -2,7 +2,7 @@
  * Pause TanStack query modules (imports Supabase). App hooks/screens only —
  * other features should use `@/features/pause/public` (no eager Supabase).
  */
-export { getArchivePausesTabHasRowsQueryOptions } from './infrastructure/queries/archive-pauses-tab-query';
+export { getArchivePausesTabHasRowsQueryOptions } from './infrastructure/queries/archive/archive-pauses-tab-query';
 export {
   COMPLETED_PAUSE_COUNT_QUERY_KEY,
   fetchCompletedPauseCount,
@@ -28,7 +28,7 @@ export {
   type PauseArchiveListSort,
   type PauseArchiveRow,
   type PauseArchiveSegment,
-} from './infrastructure/queries/archive-list-query';
+} from './infrastructure/queries/archive/archive-list-query';
 export {
   getHistoryThreadQueryOptions,
   type HistoryThreadRow,
@@ -168,7 +168,7 @@ export {
   pauseArchiveInfiniteQueryKey,
   pauseArchiveListQueryPrefix,
   pauseArchiveStorageCacheKey,
-} from './infrastructure/queries/archive-list-query';
+} from './infrastructure/queries/archive/archive-list-query';
 export {
   COMPANION_SLOT_FAVORITES_METADATA_KEY,
   COMPANION_LIBRARY_FAVORITES_NONE_QUERY_KEY,

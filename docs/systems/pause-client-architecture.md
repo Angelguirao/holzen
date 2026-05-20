@@ -288,7 +288,7 @@ The repo is mid-migration. Expect:
 | Decide / outcome | `session/run-pause-outcome-log.ts` | `ritual/decide/` | Optional later |
 | Done / post-pause | `session/post-pause-emotion-log.ts` | `ritual/done/` | Optional later |
 | Session conductors | `presentation/*.ts` (flat + `presentation/session/`) | `presentation/session/`, `companion/`, `home/`, `archive/` | Peel incrementally |
-| Archive queries | `infrastructure/queries/archive-list-query.ts`, `archive-pauses-tab-query.ts`, … | `infrastructure/queries/archive/` | Group folder slice |
+| Archive queries | `infrastructure/queries/archive/` (`archive-list-query.ts`, `archive-pauses-tab-query.ts`) | `infrastructure/queries/archive/` | Done (May 2026) |
 | Ports | `ports/pause-repository.ts` only | + ReflectGenerator, CompanionOrchestrator, … | Wire per slice |
 
 Do not big-bang rename folders; one vertical slice per commit ([refactoring-strategy.md](../fundamentals/refactoring-strategy.md)).
