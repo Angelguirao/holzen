@@ -177,15 +177,6 @@ export type {
   ZoomOutOnThisDayEntry,
 } from './domain/zoom-out-display';
 export {
-  ZOOM_OUT_DEFAULT_BODY_PLACEHOLDER,
-  ZOOM_OUT_DEFAULT_LABEL,
-  toZoomOutDisplayData,
-  zoomOutBodyPreviewFromJsonString,
-  zoomOutLibraryAutosaveFromDisplayData,
-  zoomOutSaveThisMomentSeed,
-  zoomOutTotalCharsForReadTime,
-} from './application/use-cases/ritual/frame/zoom-out-payload';
-export {
   type NotificationNavigateState,
   type PauseSessionLocationState,
   type PauseSessionNavParsed,

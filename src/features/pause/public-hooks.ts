@@ -1,6 +1,7 @@
 /**
  * Pause read-model React hooks — import from here in screens and tests.
  */
+export { zoomOutTotalCharsForReadTime } from './application/use-cases/ritual/frame/zoom-out-payload';
 export {
   useCompletedPauseCount,
   COMPLETED_PAUSE_COUNT_QUERY_KEY,

@@ -1,4 +1,4 @@
-import type { EchoUserWord, ZoomOutData, ZoomOutEchoData } from '@/features/pause/public';
+import type { EchoUserWord, ZoomOutData, ZoomOutEchoData } from '@/features/pause/domain/zoom-out-display';
 
 /** Default short label (empty preview line, library bookmark title when no deep-time title). */
 export const ZOOM_OUT_DEFAULT_LABEL = 'Zoom Out';
