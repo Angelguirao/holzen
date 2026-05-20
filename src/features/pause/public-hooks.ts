@@ -36,6 +36,10 @@ export {
   type UsePauseArchiveListOptions,
 } from './presentation/use-pause-archive-list';
 export {
+  useArchivePauseRetrospectiveOutcome,
+  type UseArchivePauseRetrospectiveOutcomeParams,
+} from './presentation/use-archive-pause-retrospective-outcome';
+export {
   useCurrentPause,
   currentPauseQueryKey,
   type CurrentPauseRow,
