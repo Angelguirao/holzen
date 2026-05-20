@@ -1,5 +1,5 @@
 import type { Entitlement } from '@/features/subscription/public';
-import type { PauseBreathSecondLabelVariant } from '@/features/pause/application/use-cases/breathing/breath-second-label-variant';
+import type { PauseBreathSecondLabelVariant } from '@/features/pause/application/use-cases/ritual/breathe/breath-second-label-variant';
 import type { PauseHolzenProvidersSlice } from '@/features/pause/application/use-cases/session/pause-holzen-providers-slice';
 import type { PauseSessionFlowCoreProvidersSlice } from '../use-pause-session-flow-core';
 import type { PauseSessionScaffoldVmProvidersSlice } from './pause-session-scaffold-vm-types';
