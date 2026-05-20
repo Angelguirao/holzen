@@ -1,8 +1,8 @@
 import { useCallback, useRef, useState } from 'react';
 import type { TFunction } from 'i18next';
 import { toast } from 'sonner';
+import { trackPauseOutcomeRetrospective } from '@/features/pause/application/use-cases/archive/archive-retrospective-telemetry';
 import { hapticFeedback } from '@/lib/haptics';
-import { trackEvent } from '@/lib/posthog';
 import { invalidatePauseStatsDataForUser } from '@/features/pause/public';
 import { logRetrospectiveOutcome } from '@/features/pause/public-rpc';
 
@@ -33,15 +33,7 @@ export function useArchivePauseRetrospectiveOutcome({
       try {
         hapticFeedback('medium');
         await logRetrospectiveOutcome({ instanceId, outcome });
-        try {
-          trackEvent('pause_outcome_retrospective', {
-            pause_instance_id: instanceId,
-            outcome,
-            surface: 'archive',
-          });
-        } catch {
-          /* no-op */
-        }
+        trackPauseOutcomeRetrospective({ pauseInstanceId: instanceId, outcome });
         invalidatePauseStatsDataForUser(userId);
         hapticFeedback('success');
         toast.success(
