@@ -502,7 +502,7 @@ export {
   normalizeBiasTitle,
   type RelatedBias,
   type RelatedBiasesRow,
-} from './application/use-cases/companion/related-biases';
+} from './application/use-cases/ritual/frame/related-biases';
 export { deriveBreathingUiCompleteFromPayloads } from './application/use-cases/companion/breathing-ui-complete';
 export { ritualDepthUpgradedPayload } from './application/use-cases/ritual-depth-upgrade-payload';
 export {
