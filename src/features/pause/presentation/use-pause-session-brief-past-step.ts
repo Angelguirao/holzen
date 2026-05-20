@@ -3,13 +3,17 @@ import { computeBriefPastStepClick } from '@/features/pause/public';
 import { hapticFeedback } from '@/lib/haptics';
 import { type BriefPauseStep } from '@/features/pause/public';
 
-/** Navigate to an earlier brief macro (haptics + optional integrate flag clear). Not used from the read-only header stepper. */
-export function usePauseSessionBriefPastStep(input: {
+export type UsePauseSessionBriefPastStepParams = {
   briefStep: BriefPauseStep;
   setBriefStep: Dispatch<SetStateAction<BriefPauseStep>>;
   setBriefIntegrateDone: Dispatch<SetStateAction<boolean>>;
   setSwipeDirection: Dispatch<SetStateAction<'forward' | 'back'>>;
-}): { goToBriefPastStep: (target: BriefPauseStep) => void } {
+};
+
+/** Navigate to an earlier brief macro (haptics + optional integrate flag clear). Not used from the read-only header stepper. */
+export function usePauseSessionBriefPastStep(
+  input: UsePauseSessionBriefPastStepParams,
+): { goToBriefPastStep: (target: BriefPauseStep) => void } {
   const { briefStep, setBriefStep, setBriefIntegrateDone, setSwipeDirection } = input;
 
   const goToBriefPastStep = useCallback(
