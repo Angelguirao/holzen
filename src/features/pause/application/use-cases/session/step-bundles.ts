@@ -1,13 +1,13 @@
-import type { usePauseSessionShellRitual } from '@/screens/pause/hooks/use-pause-session-shell-ritual';
-
-type PauseSessionShellRitual = ReturnType<typeof usePauseSessionShellRitual>;
-type Shell = PauseSessionShellRitual['shell'];
-type Ritual = PauseSessionShellRitual['ritual'];
+import type {
+  PauseSessionStepRitualBundleInput,
+  PauseSessionStepShellBundleInput,
+  PauseSessionStepShellChromeInput,
+} from '@/features/pause/application/use-cases/session/step-bundle-types';
 
 /** Subset of shell fields passed to scaffold VM and ritual handlers. */
 export function buildPauseSessionStepShellBundle(
-  shell: Shell,
-  sessionChrome: { handleReturn: () => void },
+  shell: PauseSessionStepShellBundleInput,
+  sessionChrome: PauseSessionStepShellChromeInput,
 ) {
   const {
     leaveWithPendingOpen,
@@ -56,7 +56,7 @@ export function buildPauseSessionStepShellBundle(
 }
 
 /** Subset of ritual fields passed to scaffold presentation. */
-export function buildPauseSessionStepRitualBundle(ritual: Ritual) {
+export function buildPauseSessionStepRitualBundle(ritual: PauseSessionStepRitualBundleInput) {
   const {
     step,
     setStep,

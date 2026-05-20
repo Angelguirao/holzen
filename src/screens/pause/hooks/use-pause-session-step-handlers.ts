@@ -1,4 +1,7 @@
-import { buildPauseSessionStepRitualBundle, buildPauseSessionStepShellBundle } from '@/screens/pause/hooks/pause-session-step-bundles';
+import {
+  buildPauseSessionStepRitualBundle,
+  buildPauseSessionStepShellBundle,
+} from '@/features/pause/public';
 import {
   usePauseSessionBreathReflectHandlers,
   usePauseSessionMoodChromeHandlers,

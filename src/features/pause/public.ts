@@ -240,6 +240,15 @@ export {
 } from './application/use-cases/session/hydration';
 export { buildPauseSessionScaffoldRitualDerived } from './application/use-cases/session/scaffold-ritual-derived';
 export {
+  buildPauseSessionStepRitualBundle,
+  buildPauseSessionStepShellBundle,
+} from './application/use-cases/session/step-bundles';
+export type {
+  PauseSessionStepRitualBundleInput,
+  PauseSessionStepShellBundleInput,
+  PauseSessionStepShellChromeInput,
+} from './application/use-cases/session/step-bundle-types';
+export {
   buildPauseSessionMountLogParams,
   type PauseSessionMountLogParams,
 } from './application/use-cases/session/mount-log-params';
