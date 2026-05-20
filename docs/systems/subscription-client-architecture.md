@@ -44,7 +44,7 @@ features/subscription/
     use-pro-gate.ts
     CheckoutConfirmation.tsx    # shell-only
     PaywallSubscribedTracker.tsx  # shell-only
-  public.ts | public-queries.ts | public-hooks.ts
+  public.ts | public-queries.ts | public-hooks.ts | public-limits.ts
 ```
 
 Group `use-cases/` by **billing lifecycle**, not route names.
@@ -58,6 +58,7 @@ Group `use-cases/` by **billing lifecycle**, not route names.
 | `public.ts` | Types, pure entitlement helpers — no eager Supabase |
 | `public-queries.ts` | Subscription snapshot query options |
 | `public-hooks.ts` | `useSubscription`, `useProGate` |
+| `public-limits.ts` | Flex-pack limit toasts + companion access gate helpers — **separate from `public.ts`** so checkout/tests do not eager-load i18n; pause imports this for orchestrate failure UX |
 | `public-rpc.ts` | *(future)* checkout / portal invoke facades |
 
 ---

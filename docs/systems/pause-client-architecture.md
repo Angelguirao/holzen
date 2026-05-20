@@ -271,7 +271,7 @@ The repo is mid-migration. Expect:
 - Some use cases still under legacy paths (`application/use-cases/companion/` at root) — **move toward** `ritual/frame/` incrementally.
 - Some reflect use cases under `application/use-cases/reflect/` — **move toward** `ritual/reflect/`.
 - `public.ts` may exceed the slim target — **peel** into `public-queries` / `public-rpc`.
-- Collection code still in active tree until a dedicated strip PR — treat as **non-shipped** per §7. *(Collections strip completed — see `src/legacy/archive-collections/`.)*
+- ~~Collection code in active tree~~ — **done:** moved to `src/legacy/archive-collections/` (§7).
 
 Do not big-bang rename folders; one vertical slice per commit ([refactoring-strategy.md](../fundamentals/refactoring-strategy.md)).
 
