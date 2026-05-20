@@ -7,7 +7,7 @@ import { type FetchedPauseInstance } from '@/features/pause/public';
  * (hydration `status === 'fetch'` from `computePauseSessionHydration`). Row shaping:
  * `buildFetchedPauseInstanceFromFetch` in the pause feature application layer.
  *
- * **Caller:** `screens/pause/hooks/use-pause-session-shell.ts`. **Contract:** `docs/systems/pause-system.md`
+ * **Caller:** `features/pause/presentation/use-pause-session-shell.ts`. **Contract:** `docs/systems/pause-system.md`
  * section 7.2; **code map:** same doc, section 10.
  */
 export function usePauseSessionFetch(fetchPauseInstanceId: string | null): {
