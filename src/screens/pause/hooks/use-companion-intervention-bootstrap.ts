@@ -6,7 +6,7 @@ import type {
   CompanionSlotCommitters,
   CompanionSlotRelaxations,
 } from '@/features/pause/public';
-import { useCompanionOrchestrateSession } from '@/screens/pause/hooks/use-companion-orchestrate-session';
+import { useCompanionOrchestrateSession } from '@/features/pause/public-hooks';
 import { useCompanionInterventionFetch } from '@/screens/pause/hooks/use-companion-intervention-fetch';
 
 export interface UseCompanionInterventionBootstrapParams {
