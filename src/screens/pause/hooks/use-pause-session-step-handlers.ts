@@ -1,9 +1,7 @@
 import { useCallback } from 'react';
 import { usePauseFavoriteToggle } from '@/screens/pause/hooks/use-pause-favorite-toggle';
-import { usePauseShiftFrameDoneHandler } from '@/screens/pause/hooks/use-pause-shift-frame-done-handler';
+import { usePauseSessionBreathReflectHandlers } from '@/screens/pause/hooks/use-pause-session-breath-reflect-handlers';
 import { usePauseSessionMoodAndPersist } from '@/screens/pause/hooks/use-pause-session-mood-and-persist';
-import { usePauseSessionBreathHandlers } from '@/screens/pause/hooks/use-pause-session-breath-handlers';
-import { usePauseSessionReflectAndDecide } from '@/screens/pause/hooks/use-pause-session-reflect-and-decide';
 import type { usePauseSessionProviders } from '@/screens/pause/hooks/use-pause-session-providers';
 import type { usePauseSessionShellRitual } from '@/screens/pause/hooks/use-pause-session-shell-ritual';
 
@@ -18,12 +16,8 @@ export function usePauseSessionStepHandlers(
   const {
     t,
     handleReturn,
-    dismissMessage,
-    btcData,
     subscribed,
-    subLoading,
     requirePro,
-    refreshSubscription,
   } = p;
 
   const {
@@ -144,60 +138,11 @@ export function usePauseSessionStepHandlers(
     setFeelIntensity,
   });
 
-  const breath = usePauseSessionBreathHandlers({
-    pauseInstanceId,
-    restored,
-    t,
-    subLoading,
-    subscribed,
-    requirePro,
-    phase,
-    ritualEntry,
-    briefStep,
-    step,
-    breathingFirstCompleted,
-    breathingSecondCompleted,
-    setSwipeDirection,
-    setStep,
-    setBriefStep,
-    setBriefIntegrateDone,
-    setBreathingFirstCompleted,
-    setBreathingSecondCompleted,
-    setRitualEntry,
-    setFrameDone,
-    setMoodAfterDone,
-  });
-
-  const { handleFrameImDone } = usePauseShiftFrameDoneHandler({
-    pauseInstanceId,
-    t,
-    lastShiftLogKeyRef: mood.lastShiftLogKeyRef,
-    setFrameDone,
-    setMoodAfterDone,
-    goToStep: breath.goToStep,
-  });
-
-  const reflect = usePauseSessionReflectAndDecide({
-    t,
-    ritualEntry,
-    step,
-    pauseInstanceId,
-    context,
-    message,
-    btcData,
-    companionsHaiku: companions.haiku ?? null,
-    dismissMessage,
-    refreshSubscription,
-    setDecision,
-    setPauseImpactData,
-    setPhase,
-    selectedMood,
-    selectedMoodAfter,
-    breathingFirstCompleted,
-    breathingSecondCompleted,
-    feelIntensity,
-    shiftIntensity,
-  });
+  const { breath, reflect, handleFrameImDone } = usePauseSessionBreathReflectHandlers(
+    p,
+    { shell, ritual },
+    mood,
+  );
 
   return {
     shell: {
