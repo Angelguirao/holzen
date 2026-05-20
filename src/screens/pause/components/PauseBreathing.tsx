@@ -1,21 +1,16 @@
 import { useImperativeHandle, forwardRef, useMemo } from 'react';
-import { motion, useReducedMotion } from 'framer-motion';
+import { useReducedMotion } from 'framer-motion';
 import { useTranslation } from 'react-i18next';
 import type { FeelStepTile } from '@/features/pause/public';
 import {
-  pauseStepLayout,
   parseTriangleRotatingKickersI18n,
-  resolveBreathOrbVisualMetrics,
   resolveBreathCycleTotal,
   resolvePauseBreathingPhases,
-  resolveTriangleKickerDisplay,
-  resumePauseAudioContext,
 } from '@/features/pause/public';
 import { usePauseBreathingTimedLoop } from '@/features/pause/public-hooks';
-import { PauseBreathIntro } from '@/screens/pause/components/pause-breath-intro';
 import type { PauseBreathSegment } from '@/screens/pause/components/pause-breath-intro';
-import { PauseBreathTimedLoop } from '@/screens/pause/components/pause-breath-timed-loop';
-import { PauseBreathingCompletion } from '@/screens/pause/components/pause-breathing-completion';
+import { PauseBreathingBody } from '@/screens/pause/components/pause-breathing-body';
+import { resolvePauseBreathingTimedDisplay } from '@/screens/pause/lib/resolve-pause-breathing-timed-display';
 
 /** i18n: `breathing.triangleRotatingKickers` — advances every 2s in `PauseBreathing`, not per phase. */
 const TRIANGLE_ROTATING_KICKERS_I18N_KEY = 'breathing.triangleRotatingKickers';
@@ -80,14 +75,13 @@ export const PauseBreathing = forwardRef<PauseBreathingHandle, Props>(function P
   const prefersReduced = useReducedMotion();
 
   const ritualVar: 'brief' | 'deep' = ritualVariant ?? 'deep';
-  const pattern = useMemo(
-    () => ({
-      phases: resolvePauseBreathingPhases({
+  const phases = useMemo(
+    () =>
+      resolvePauseBreathingPhases({
         ritualVariant: ritualVar,
         feelTile,
         severity,
       }),
-    }),
     [ritualVar, feelTile, severity],
   );
   const totalCycles = resolveBreathCycleTotal(ritualVariant, breathSegment);
@@ -107,7 +101,7 @@ export const PauseBreathing = forwardRef<PauseBreathingHandle, Props>(function P
     resetToIntro,
     phaseAdvanceGuardRef,
   } = usePauseBreathingTimedLoop({
-    phases: pattern.phases,
+    phases,
     totalCycles,
     completedProp,
     ritualVariant,
@@ -117,8 +111,6 @@ export const PauseBreathing = forwardRef<PauseBreathingHandle, Props>(function P
     onTimedBreathingChange,
   });
 
-  const phaseDurationsSec = useMemo(() => pattern.phases.map((p) => p.duration), [pattern.phases]);
-
   const triangleRotatingKickers = useMemo(
     (): string[] =>
       parseTriangleRotatingKickersI18n(
@@ -127,81 +119,47 @@ export const PauseBreathing = forwardRef<PauseBreathingHandle, Props>(function P
     [t],
   );
 
-  const { line: triangleKickerLine, index: triangleKickerIndex, hasKickers: hasTriangleKickers } =
-    useMemo(
-      () =>
-        resolveTriangleKickerDisplay({
-          kickers: triangleRotatingKickers,
-          cycle,
-          phaseIndex,
-          elapsedInCurrentPhase: elapsed,
-          phaseDurationsSec,
-        }),
-      [triangleRotatingKickers, cycle, phaseIndex, elapsed, phaseDurationsSec],
-    );
+  const timedDisplay = useMemo(
+    () =>
+      resolvePauseBreathingTimedDisplay({
+        phases,
+        currentPhase,
+        elapsed,
+        cycle,
+        phaseIndex,
+        triangleRotatingKickers,
+      }),
+    [phases, currentPhase, elapsed, cycle, phaseIndex, triangleRotatingKickers],
+  );
 
   useImperativeHandle(ref, () => ({ resetToIntro }), [resetToIntro]);
 
-  const { orbScale: scale, phaseProgress: progress, showHoldMandala, holdProgress } =
-    resolveBreathOrbVisualMetrics({
-      phaseLabelKey: currentPhase.labelKey,
-      elapsed,
-      phaseDuration: currentPhase.duration,
-    });
-
   return (
-    <motion.div
-      className={pauseStepLayout.columnCenter}
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      exit={{ opacity: 0 }}
-      transition={{ duration: 0.8 }}
-    >
-      {!started ? (
-        <PauseBreathIntro
-          breathSegment={breathSegment}
-          mantra={mantra}
-          ritualVariant={ritualVar}
-          prefersReducedMotion={!!prefersReduced}
-          onStart={() => {
-            void resumePauseAudioContext();
-            setStarted(true);
-          }}
-          onSkipBreath={onSkipBreath}
-        />
-      ) : !completed ? (
-        <PauseBreathTimedLoop
-          orbScale={scale}
-          phaseProgress={progress}
-          showHoldMandala={showHoldMandala}
-          holdProgress={holdProgress}
-          prefersReducedMotion={!!prefersReduced}
-          phaseLabelKey={currentPhase.labelKey}
-          phaseSecondCountsUp={phaseSecondCountsUp}
-          elapsed={elapsed}
-          phaseDuration={currentPhase.duration}
-          showPhaseHints={showPhaseHints}
-          triangleKickerLine={triangleKickerLine}
-          triangleKickerIndex={triangleKickerIndex}
-          hasTriangleKickers={hasTriangleKickers}
-          cycle={cycle}
-          totalCycles={totalCycles}
-          phaseIndex={phaseIndex}
-        />
-      ) : (
-        <PauseBreathingCompletion
-          ritualVariant={ritualVariant}
-          breathSegment={breathSegment}
-          prefersReducedMotion={!!prefersReduced}
-          onContinueAfterBreath={onContinueAfterBreath}
-          onAdvanceFailed={() => {
-            setCompletedLocal(false);
-            phaseAdvanceGuardRef.current = false;
-          }}
-          onRepeatDeepFirstBreathPattern={onRepeatDeepFirstBreathPattern}
-          onRepeatDeepSecondBreathPattern={onRepeatDeepSecondBreathPattern}
-        />
-      )}
-    </motion.div>
+    <PauseBreathingBody
+      started={started}
+      completed={completed}
+      breathSegment={breathSegment}
+      mantra={mantra}
+      ritualVariant={ritualVariant}
+      ritualVar={ritualVar}
+      prefersReducedMotion={!!prefersReduced}
+      showPhaseHints={showPhaseHints}
+      phaseSecondCountsUp={phaseSecondCountsUp}
+      currentPhase={currentPhase}
+      elapsed={elapsed}
+      cycle={cycle}
+      phaseIndex={phaseIndex}
+      totalCycles={totalCycles}
+      timedDisplay={timedDisplay}
+      onStart={() => setStarted(true)}
+      onSkipBreath={onSkipBreath}
+      onContinueAfterBreath={onContinueAfterBreath}
+      onAdvanceFailed={() => {
+        setCompletedLocal(false);
+        phaseAdvanceGuardRef.current = false;
+      }}
+      onRepeatDeepFirstBreathPattern={onRepeatDeepFirstBreathPattern}
+      onRepeatDeepSecondBreathPattern={onRepeatDeepSecondBreathPattern}
+    />
   );
 });
