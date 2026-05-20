@@ -270,8 +270,23 @@ The repo is mid-migration. Expect:
 
 - Some use cases still under legacy paths (`application/use-cases/companion/` at root) — **move toward** `ritual/frame/` incrementally.
 - Some reflect use cases under `application/use-cases/reflect/` — **move toward** `ritual/reflect/`.
+- Other ritual beats may live outside §3 folder names until Phase A slices land — see **interior map** below.
 - `public.ts` may exceed the slim target — **peel** into `public-queries` / `public-rpc`.
 - ~~Collection code in active tree~~ — **done:** moved to `src/legacy/archive-collections/` (§7).
+
+### 10.1 Interior folder map (on disk → target)
+
+| Concern | On disk today (May 2026) | Target (§3) | Phase A slice |
+|---------|--------------------------|-------------|---------------|
+| Reflect generation | `application/use-cases/reflect/` | `ritual/reflect/` | Move incrementally |
+| Frame / companion slots | `application/use-cases/companion/` | `ritual/frame/` | Move incrementally |
+| Breathing / audio | `application/use-cases/breathing/`, `ritual/breath/` | `ritual/breathe/` | Optional consolidate later |
+| Feel / initial emotion | `session/run-initial-emotion-log.ts`, `ritual/clamp-feel-intensity.ts` | `ritual/feel/` | Optional later |
+| Decide / outcome | `session/run-pause-outcome-log.ts` | `ritual/decide/` | Optional later |
+| Done / post-pause | `session/post-pause-emotion-log.ts` | `ritual/done/` | Optional later |
+| Session conductors | `presentation/*.ts` (flat + `presentation/session/`) | `presentation/session/`, `companion/`, `home/`, `archive/` | Peel incrementally |
+| Archive queries | `infrastructure/queries/archive-*-query.ts` | `infrastructure/queries/archive/` | Group folder slice |
+| Ports | `ports/pause-repository.ts` only | + ReflectGenerator, CompanionOrchestrator, … | Wire per slice |
 
 Do not big-bang rename folders; one vertical slice per commit ([refactoring-strategy.md](../fundamentals/refactoring-strategy.md)).
 

@@ -269,7 +269,7 @@ Order that satisfies **both** this doc and [frontend-module-layout.md](frontend-
 1. **Screens** — `apps/web/src/screens/*` (Home, Archive, Pause, …).
 2. **`packages/pause`** — domain + use cases first; reflect + frame under `application/use-cases/ritual/reflect/` and `ritual/frame/` ([pause-client-architecture.md](../systems/pause-client-architecture.md) §3).
 3. **`packages/infrastructure`** — adapters; Query `queryOptions` factories move here.
-4. **Thin hooks** — screens call use cases; keep orchestration in `screens/<route>/hooks/`, not a global hooks folder.
+4. **Thin hooks** — screens call use cases. **Home/settings:** orchestration in `screens/<route>/hooks/` where screen-local. **Pause:** conductors in `features/pause/presentation/` per [pause-client-architecture.md](../systems/pause-client-architecture.md) §3.2 (no `screens/pause/hooks/`).
 5. **`contracts`** — when touching edge/RPC JSON.
 6. **CI** — `check:package-boundaries` / `check:feature-imports`.
 

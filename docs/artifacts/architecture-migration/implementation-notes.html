@@ -81,12 +81,12 @@
       <span>Spec §7</span>
       <span class="status resolved">resolved</span>
     </header>
-    <h3>Collections strip not yet executed in code</h3>
+    <h3>Collections strip — resolved (2026-05-20)</h3>
     <dl>
-      <dt>Design decision</dt>
-      <dd>Document Collections as non-MVP in <code>active-surface.md</code> and IA before removing Archive tab code — spec-first, then strip slice.</dd>
-      <dt>Resolution (2026-05-20)</dt>
+      <dt>Resolution</dt>
       <dd>Stripped Archive Collections tab; moved <code>usePauseLibraryBundle</code> + UI to <code>src/legacy/archive-collections/</code>; <code>check:active-surface</code> blocks <code>.from('collections'|'collection_items')</code> in active <code>src/</code>; <code>?seg=collections</code> redirects to Pauses.</dd>
+      <dt>Design decision (historical)</dt>
+      <dd>Document Collections as non-MVP in <code>active-surface.md</code> and IA before removing Archive tab code — spec-first, then strip slice.</dd>
       <dt>Tradeoffs</dt>
       <dd><strong>Strip now</strong> — smaller active surface sooner. <strong>Spec then strip</strong> — reviewers agree on scope before deletion. Picked spec then strip.</dd>
       <dt>Open questions</dt>

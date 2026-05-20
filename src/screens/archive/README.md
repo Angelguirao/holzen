@@ -9,4 +9,4 @@
 
 User **Collections** UI lives in `@/legacy/archive-collections/` (not MVP).
 
-Thin page: `pages/Archive.tsx` → `ArchiveScreen`.
+Route entry: `ArchiveScreen.tsx` (lazy-loaded from `App.tsx`).

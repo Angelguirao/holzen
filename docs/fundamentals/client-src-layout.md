@@ -169,7 +169,7 @@ Vitest runs `src/**/*.{test,spec}.{ts,tsx}` (jsdom, `src/test/setup.ts`). **Do n
 | Layer under test | Put the test file… |
 |------------------|-------------------|
 | `features/<ctx>/domain` or `application` | Beside the module (e.g. `gate-flags.test.ts` next to `gate-flags.ts`) |
-| `screens/<route>/hooks` or screen-only helpers | Beside the hook (e.g. `use-pause-session-go-back.test.tsx`) |
+| `features/<ctx>/presentation` or screen-only hooks | Beside the hook (e.g. `features/pause/presentation/use-pause-session-go-back.test.tsx`; Home: `screens/home/hooks/use-home-*.test.tsx`) |
 | `app/components` shell | Beside the component |
 | Transitional `src/lib/*` | Beside the lib file until the shim is removed |
 | **Shipped user journeys** (auth → home → pause, lapsed, settings) | `src/test/integration/flows/*.integration.test.tsx` |

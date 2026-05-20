@@ -19,7 +19,7 @@ It complements:
 
 ## Is the direction “correct”?
 
-**Yes, for this codebase.** The backlog explicitly rejects a **big-bang** rewrite in favor of **small, behavior-preserving extractions**. What has been shipped (Home chrome, PauseSession storage/scaffold, `use-holzen` pure helpers, `use-companion-data` + `src/lib/companion-*`) matches that contract:
+**Yes, for this codebase.** The backlog explicitly rejects a **big-bang** rewrite in favor of **small, behavior-preserving extractions**. What has been shipped (Home chrome, PauseSession storage/scaffold, `use-holzen` pure helpers, `use-companion-data` in `features/pause/presentation/` with use cases under `application/use-cases/companion/` → target `ritual/frame/`) matches that contract:
 
 | Principle | How we’re applying it |
 |-----------|------------------------|

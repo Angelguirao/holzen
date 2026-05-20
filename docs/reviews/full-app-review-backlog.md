@@ -62,6 +62,8 @@ Treat Phases **1–2** as the **product spine** for pause; **3–8** as the **ba
 
 ## Main shell pages
 
+> **Full-IA review archive:** `/library`, `/tools`, Journey sub-tabs — **404** in pause-first. Shipped shell: Home, Archive, Journey overview, Settings ([active-surface.md](../ops/active-surface.md)).
+
 | Route | Est. (h) | Notes |
 |-------|----------|--------|
 | `/library` | 4–7 | |

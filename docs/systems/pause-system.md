@@ -6,6 +6,8 @@ This document is the **canonical data and lifecycle reference** for Pause V2: ta
 
 For **how reflection and companions are produced** (edge functions, orchestrator, cron, hooks), read **[pause/ai-powered-pause-system.md](pause/ai-powered-pause-system.md)** first or in parallel. That file is the narrative pipeline; this file is the **contract** the pipeline and UI must satisfy.
 
+**Client module layout:** [`pause-client-architecture.md`](pause-client-architecture.md) — active `src/features/pause/` paths and transitional interior map (§10).
+
 ---
 
 ## Table of contents
@@ -74,7 +76,7 @@ stateDiagram-v2
 
 **Brief vs deep (`volatility_v1`):** only `**active` → `engaged`** depends on `**brief_ritual**` (**Feel-only** gate vs **Feel + first Breathe** gate — see above). `**completed**` is the same for both: `**outcome_logged**` present. Companion count is not used for completion on this slug.
 
-Exact rules (open max age, supersede, window elapsed) live in `**pause_evaluate_transitions**` and the batch helper `**pause_sweep_window_elapsed**` in `supabase/migrations/` (search those names for the latest definition). **`open_max_age`** applies only to **`engaged`** rows: **12 hours** after `**COALESCE(engaged_at, created_at)**`. **`active`** rows are **not** time-expired by `**open_max_age**` (they end via context change, supersede, dismiss, clock window when bound, etc.). The client mirror is `**computePauseState**` / `**shouldCountCompanion**` in `**src/lib/pause-state.ts**`.
+Exact rules (open max age, supersede, window elapsed) live in `**pause_evaluate_transitions**` and the batch helper `**pause_sweep_window_elapsed**` in `supabase/migrations/` (search those names for the latest definition). **`open_max_age`** applies only to **`engaged`** rows: **12 hours** after `**COALESCE(engaged_at, created_at)**`. **`active`** rows are **not** time-expired by `**open_max_age**` (they end via context change, supersede, dismiss, clock window when bound, etc.). The client mirror is `**computePauseState**` / `**shouldCountCompanion**` in `**src/features/pause/domain/pause-state.ts**`.
 
 ### 3.1 Product vocabulary ↔ Postgres (single row per pause)
 
@@ -93,7 +95,7 @@ Holzen stores **one `pause_instances` row per pause**. Product language below ma
 | **Completed** — terminal “choice recorded” for `**volatility_v1**`: any `**outcome_logged**` row (§5.1). Other templates use their row’s `**required_for_completed**` + companion rules.                                                                                                                                                                                                                   | `**state = completed**`.                                                                                                                                       |
 
 
-**Note:** the column `**engaged_at**` means **“the row reached the `engaged` milestone in the state machine”**, not literally “opened Reflect.” For **deep**, that milestone is normally hit **after** first Breathe (Feel already done); the **Echoes** tab treats `**engaged_at IS NULL**` on terminal `expired` / `dismissed` rows as a proxy for **“ended before that milestone”** (see `**src/lib/archive-segment.ts**`).
+**Note:** the column `**engaged_at**` means **“the row reached the `engaged` milestone in the state machine”**, not literally “opened Reflect.” For **deep**, that milestone is normally hit **after** first Breathe (Feel already done); the **Echoes** tab treats `**engaged_at IS NULL**` on terminal `expired` / `dismissed` rows as a proxy for **“ended before that milestone”** (see `**src/features/pause/domain/archive-segment.ts**`).
 
 ---
 
@@ -172,7 +174,7 @@ Companion `**counts_for_pause**` is **not** read for completion on `**volatility
 
 **Breath payload:** the client logs a **single** first-segment completion (and optional skip) with `**breath_segment: 1**` and `**brief_ritual: true**` on the `**breath_completed**` payload for traceability (see `**ensureBreathSegment1Logged**` / brief skip handlers in `**PauseSession.tsx**`).
 
-**Client mirror:** `**src/lib/pause-state.ts**` `**computePauseState**` follows the same `**volatility_v1**` rules (brief/deep for **engaged** only; **completed** = `**outcome_logged**`; `**open_max_age**` as above) so the UI can optimistically match Postgres before the RPC returns.
+**Client mirror:** `**src/features/pause/domain/pause-state.ts**` `**computePauseState**` follows the same `**volatility_v1**` rules (brief/deep for **engaged** only; **completed** = `**outcome_logged**`; `**open_max_age**` as above) so the UI can optimistically match Postgres before the RPC returns.
 
 ---
 
@@ -215,11 +217,11 @@ Optional PostHog flag `**pause.step5_breath_label_shift**` renames the second-br
 
 **Product defaults (Figma alignment):** macro step 4 is labeled **Frame** (not the wireframe **Explore** title variant). After the second **Breathe** segment completes (or is skipped), the client advances straight to **Decide**. **Decide** back returns to **second Breathe** (`**breath2**`). Legacy local snapshots that stored the removed client-only `**choose**` step are migrated to `**decide**` on load (`**migratePersistedPauseSession**`).
 
-**Brief pause (quick ritual)** — four product steps, separate UI state (`**BriefPauseStep**` in `**src/lib/pause-session-storage.ts**`): **Feel → Breathe → Integrate → Decide**. There is no Reflect/Frame/second breath; **Integrate** is a client-only quiet window (no companion RPC). In the **happy path**, RPCs follow that order: `**initial_emotion_logged**` (with `**brief_ritual**`), then one `**breath_completed**`, then `**outcome_logged**` on Decide (§7.3.1). Postgres `**completed**` still keys only off `**outcome_logged**` (§5.1).
+**Brief pause (quick ritual)** — four product steps, separate UI state (`**BriefPauseStep**` in `**src/features/pause/infrastructure/session/persisted-session-storage.ts**`): **Feel → Breathe → Integrate → Decide**. There is no Reflect/Frame/second breath; **Integrate** is a client-only quiet window (no companion RPC). In the **happy path**, RPCs follow that order: `**initial_emotion_logged**` (with `**brief_ritual**`), then one `**breath_completed**`, then `**outcome_logged**` on Decide (§7.3.1). Postgres `**completed**` still keys only off `**outcome_logged**` (§5.1).
 
-**Ritual audio:** the pause shell mute (below the stepper, wireframe-aligned) drives `**src/lib/pause-ritual-audio.ts**` on the same `**AudioContext**` singleton. `**PauseBreathing**` plays soft phase ticks + a short pattern-complete swell. **Deep pause only:** while **Reflect** and **Frame** are visible, a **continuous low sine focus bed** runs when sound is on (one uninterrupted bed across Reflect → Frame). **Default is muted** until the user turns sound on. All ritual audio is off when muted or when the user prefers reduced motion (`**PauseSessionDeepRitualBody**` + `**usePauseReflectFrameFocusAmbience**`).
+**Ritual audio:** the pause shell mute (below the stepper, wireframe-aligned) drives `**src/features/pause/application/use-cases/breathing/ritual-audio.ts**` on the same `**AudioContext**` singleton. `**PauseBreathing**` plays soft phase ticks + a short pattern-complete swell. **Deep pause only:** while **Reflect** and **Frame** are visible, a **continuous low sine focus bed** runs when sound is on (one uninterrupted bed across Reflect → Frame). **Default is muted** until the user turns sound on. All ritual audio is off when muted or when the user prefers reduced motion (`**PauseSessionDeepRitualBody**` + `**usePauseReflectFrameFocusAmbience**`).
 
-**Reflection + haiku (deep):** `**holzen-reflect**` runs in the browser when the deep ritual reaches **Reflect** (manual and cron-created pauses defer AI until then). `**PauseSession`** keeps `**use-pause-reflect-generation**` enabled through **Reflect → Frame → second Breathe → Decide** so the call can complete while the user is past the Reflect card. Output is persisted as `**pause_ai_artifacts**` (`**kind: reflection_text**`, optional `**haiku**`, optional `**ground_nudge**`). `**PauseFrame`** lazy-hydrates haiku when the card opens (`**fetchHaikuTextForPauseInstance**` in `**src/lib/pause-haiku-artifact.ts**`). Signal / grounding / history / zoom-out still use `**companion-orchestrate**` lazy fetch via `**useCompanionData**`.
+**Reflection + haiku (deep):** `**holzen-reflect**` runs in the browser when the deep ritual reaches **Reflect** (manual and cron-created pauses defer AI until then). `**PauseSession`** keeps `**use-pause-reflect-generation**` enabled through **Reflect → Frame → second Breathe → Decide** so the call can complete while the user is past the Reflect card. Output is persisted as `**pause_ai_artifacts**` (`**kind: reflection_text**`, optional `**haiku**`, optional `**ground_nudge**`). `**PauseFrame`** lazy-hydrates haiku when the card opens (`**fetchHaikuTextForPauseInstance**` in `**src/features/pause/infrastructure/queries/haiku-artifact-query.ts**`). Signal / grounding / history / zoom-out still use `**companion-orchestrate**` lazy fetch via `**useCompanionData**`.
 
 **Brief-vs-deep:** both paths are implemented in `**src/screens/pause/PauseSessionScreen.tsx**`. Persisted session snapshots use `**ritualDepth**` (`**brief**` / `**deep**`); live UI state uses `**ritualEntry**`, which may be `**picker**` until the user chooses a depth. The paths share RPCs and storage but use different steppers and transition graphs. **Deep pause** is gated to **Holzen Pro** (Stripe `**active**` / `**trialing**` — same `**subscribed**` flag as `**check-subscription**`); free users stay on the depth picker with a paywall toast if they tap Deep, and any restored `**ritualDepth: deep**` session is reset to `**picker**` once subscription state is known.
 
@@ -228,7 +230,7 @@ Optional PostHog flag `**pause.step5_breath_label_shift**` renames the second-br
 ### 7.2 Hydration and local persistence
 
 - **Input:** `useHolzen()`, navigation `**location.state`**, and optional fetch-by-id when only `**pauseInstanceId`** is present.
-- **Resilience:** `src/lib/pause-session-storage.ts` `**saveSession` / `loadSession`** persist step, moods, intensities, `**breathingFirstCompleted`**, `**breathingSecondCompleted**`, `**frameDone**`, optional `**decideOnBackStep**` (`**breath2**` when on **Decide** for resume), `**ritualDepth**` (`**brief**` / `**deep**`), brief-only fields (`**briefStep**`, `**briefIntegrateDone**`, optional `**brief_face**`), and `**pauseRitualSchema**` (v3) so a reload mid-ritual can resume. Autosave runs when `**pauseInstanceId**` and/or non-empty reflection copy exist (`**hasPersistablePauseSessionAnchor**` — same predicate as restore), so deep pauses without `**reflection_text**` yet still persist Feel/Breathe position. Older keys (`**breathingCompleted**`, five-step `**shift**`, schema v2) are migrated on load.
+- **Resilience:** `src/features/pause/infrastructure/session/persisted-session-storage.ts` `**saveSession` / `loadSession`** persist step, moods, intensities, `**breathingFirstCompleted`**, `**breathingSecondCompleted**`, `**frameDone**`, optional `**decideOnBackStep**` (`**breath2**` when on **Decide** for resume), `**ritualDepth**` (`**brief**` / `**deep**`), brief-only fields (`**briefStep**`, `**briefIntegrateDone**`, optional `**brief_face**`), and `**pauseRitualSchema**` (v3) so a reload mid-ritual can resume. Autosave runs when `**pauseInstanceId**` and/or non-empty reflection copy exist (`**hasPersistablePauseSessionAnchor**` — same predicate as restore), so deep pauses without `**reflection_text**` yet still persist Feel/Breathe position. Older keys (`**breathingCompleted**`, five-step `**shift**`, schema v2) are migrated on load.
 
 ### 7.3 When each RPC runs (happy path)
 
@@ -248,7 +250,7 @@ Optional PostHog flag `**pause.step5_breath_label_shift**` renames the second-br
 
 #### 7.3.1 Brief ritual (happy path)
 
-UI order: **Feel** → **Breathe** → **Integrate** (client-only quiet window; **no** companion RPC) → **Decide**. Canonical sequence `**BRIEF_PAUSE_ORDER`**: `src/lib/brief-pause-order.ts` (progress UI: `src/screens/pause/components/PauseBriefProgress.tsx`).
+UI order: **Feel** → **Breathe** → **Integrate** (client-only quiet window; **no** companion RPC) → **Decide**. Canonical sequence **`BRIEF_PAUSE_ORDER`**: `src/features/pause/domain/brief-ritual-steps.ts` (progress UI: `src/screens/pause/components/PauseBriefProgress.tsx`).
 
 
 | UI step                                  | RPC / behavior                                                                                                                                                                                                                                                                       |
@@ -325,7 +327,7 @@ The Library **Echoes** tab is **not** a separate database entity. It is a **deri
 | **Brief vs deep on archive cards**              | Same row shape as `**v_pause_full`**: archive list queries use `**v_pause_archive_***` (`**SELECT vf.* …**`), so `**is_brief_ritual**` is available for badges or filters once the migration that extends `**v_pause_full**` has been applied (§8).                                                                                                                                                   |
 
 
-**Predicate (canonical):** matches `**isArchiveEchoPause`** in `src/lib/archive-segment.ts` and the SQL predicates on `**public.v_pause_archive_echoes`** / `**public.v_pause_archive_pauses**` (see `**20260508120000_pause_archive_instance_views.sql**`, `**20260511120000_v_pause_full_is_brief_ritual.sql**`, and `**20260518120000_pause_archive_exclude_pending_churn.sql**`). Legacy views `**library_archive_echo_items**` / `**library_archive_pauses_tab_items**` were **dropped** in that migration; do not reference them in new code or docs. When you change echo vs Pauses rules, update **SQL and TS together**.
+**Predicate (canonical):** matches `**isArchiveEchoPause`** in `src/features/pause/domain/archive-segment.ts` and the SQL predicates on `**public.v_pause_archive_echoes`** / `**public.v_pause_archive_pauses**` (see `**20260508120000_pause_archive_instance_views.sql**`, `**20260511120000_v_pause_full_is_brief_ritual.sql**`, and `**20260518120000_pause_archive_exclude_pending_churn.sql**`). Legacy views `**library_archive_echo_items**` / `**library_archive_pauses_tab_items**` were **dropped** in that migration; do not reference them in new code or docs. When you change echo vs Pauses rules, update **SQL and TS together**.
 
 ### 9.1 Pending offers vs archive visibility
 
