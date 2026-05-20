@@ -37,7 +37,7 @@ import {
 } from './application/use-cases/apply-bulk-hold-outcomes';
 import { supabasePauseRepository } from './infrastructure/supabase-pause-repository';
 import { openManualPauseFromHome as openManualPauseFromHomeUseCase } from './application/use-cases/trigger/open-manual-pause-from-home';
-import { persistReflectionArtifacts } from './infrastructure/reflect/reflection-artifact';
+import { persistReflectionArtifacts } from './infrastructure/edge/reflect/reflection-artifact';
 import { pauseCreateOrReuse } from './infrastructure/pause-rpc-client';
 import type { OpenManualPauseFromHomeParams } from './application/use-cases/trigger/open-manual-pause-from-home';
 import type { TFunction } from 'i18next';
@@ -55,7 +55,7 @@ import {
 } from './application/use-cases/ritual/reflect/run-pause-reflect-metadata-log';
 import { runPauseFavoriteToggle } from './application/use-cases/ritual/reflect/run-pause-favorite-toggle';
 import { runPauseReflectionStepLogOnce } from './application/use-cases/ritual/reflect/run-pause-reflection-step-log';
-import { reflectionStepSessionStorage } from './infrastructure/reflect/reflection-step-session-storage';
+import { reflectionStepSessionStorage } from './infrastructure/edge/reflect/reflection-step-session-storage';
 import { invalidateCompanionUiCompletionQuery } from './application/queries/companion-ui-completion-query-key';
 import type { BreathSegmentLogPorts } from './application/use-cases/breathing/run-breath-segment-log';
 

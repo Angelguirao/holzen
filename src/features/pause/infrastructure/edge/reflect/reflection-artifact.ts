@@ -1,6 +1,6 @@
 import { supabase } from '@/integrations/supabase/client';
 import type { CompanionData } from '@/features/pause/public';
-import { invokeHolzenReflect } from '../edge/holzen-reflect-edge';
+import { invokeHolzenReflect } from '../holzen-reflect-edge';
 import { loadReflectRecencyHints } from './load-reflect-recency-hints';
 
 /** Reads persisted reflect-step copy (`pause_ai_artifacts.kind === 'reflection_text'`). */

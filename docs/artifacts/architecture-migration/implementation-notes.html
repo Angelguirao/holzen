@@ -778,6 +778,25 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-20</span>
+      <span>Phase A slice — reflect infrastructure</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3><code>infrastructure/reflect/</code> → <code>infrastructure/edge/reflect/</code></h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Application reflect use cases were already under <code>ritual/reflect/</code> on this branch. Colocate holzen-reflect invoke + artifact persistence + recency hints with other edge adapters under <code>infrastructure/edge/reflect/</code>; remove empty legacy <code>application/use-cases/reflect/</code> placeholder.</dd>
+      <dt>Deviation</dt>
+      <dd>None — matches §3 <code>infrastructure/edge/</code> layout; barrels only import path change.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Could split recency-hints into <code>queries/</code>; kept the three-file cluster together for one verification pass and parity with existing <code>holzen-reflect-edge.ts</code> sibling.</dd>
+      <dt>Open questions</dt>
+      <dd>Next Phase A slice: <code>public.ts</code> peel (backlog #3) or <code>PauseRepository</code> wiring (#4).</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
 </body>
 </html>
