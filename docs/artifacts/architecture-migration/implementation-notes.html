@@ -2984,6 +2984,25 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-20</span>
+      <span>Phase A slice — colocate depth-picker handlers in presentation/reflect/</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>Backlog #1 complete; Tier 4 reflect mood/depth conductor</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd><code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code> was already complete on <code>cursor/arch-migrate-src-ca70</code>. Move <code>use-pause-session-depth-picker-handlers</code> (+ test) beside <code>use-pause-session-mood-and-persist</code> under <code>presentation/reflect/</code>; <code>public-hooks</code> re-export path only.</dd>
+      <dt>Deviation</dt>
+      <dd>None — matches §3.2 / §10.1 reflect conductor grouping.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Breath navigation and ritual-state hooks remain flat under <code>presentation/</code> until a later session peel.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: port-backed analytics read adapter for feedback vote fetch (backlog #4), or colocate breath navigation bundle under <code>presentation/session/</code>.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
 </body>
 </html>

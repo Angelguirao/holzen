@@ -352,7 +352,7 @@ export {
   usePauseSessionReflectAndDecide,
   type UsePauseSessionReflectAndDecideParams,
 } from './presentation/reflect/use-pause-session-reflect-and-decide';
-export { usePauseSessionDepthPickerHandlers } from './presentation/use-pause-session-depth-picker-handlers';
+export { usePauseSessionDepthPickerHandlers } from './presentation/reflect/use-pause-session-depth-picker-handlers';
 export { usePauseSessionFeelTilesSelect } from './presentation/reflect/use-pause-session-feel-tiles-select';
 export { usePauseSessionInitialMoodHandlers } from './presentation/reflect/use-pause-session-initial-mood-handlers';
 export { usePauseSessionPersistToStorage } from './presentation/use-pause-session-persist-to-storage';
