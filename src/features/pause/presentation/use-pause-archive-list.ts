@@ -1,7 +1,15 @@
 import { useMemo, useCallback, useEffect } from 'react';
-import { useInfiniteQuery, type InfiniteData } from '@tanstack/react-query';
+import { useInfiniteQuery } from '@tanstack/react-query';
 import { toast } from 'sonner';
 import { useAuth } from '@/features/auth/public';
+import {
+  buildPauseArchiveInfiniteInitialData,
+  isPauseArchiveListInitialLoading,
+} from '@/features/pause/application/use-cases/archive/pause-archive-list-ui-state';
+import {
+  readJsonLocalStorage,
+  writeJsonLocalStorage,
+} from '@/features/pause/infrastructure/library-bundle-local-storage';
 import {
   PAUSE_ARCHIVE_PAGE_SIZE,
   fetchPauseArchivePage,
@@ -23,23 +31,6 @@ export type UsePauseArchiveListOptions = {
   enabled?: boolean;
 };
 
-function readCache(key: string): PauseArchiveRow[] | null {
-  try {
-    const raw = localStorage.getItem(key);
-    return raw ? (JSON.parse(raw) as PauseArchiveRow[]) : null;
-  } catch {
-    return null;
-  }
-}
-
-function writeCache(key: string, data: PauseArchiveRow[]) {
-  try {
-    localStorage.setItem(key, JSON.stringify(data));
-  } catch {
-    /* ignore */
-  }
-}
-
 /** Infinite pause/echo archive lists (`v_pause_archive_*`) with optional localStorage seed. */
 export function usePauseArchiveList(options: UsePauseArchiveListOptions) {
   const { user } = useAuth();
@@ -57,12 +48,10 @@ export function usePauseArchiveList(options: UsePauseArchiveListOptions) {
     return pauseArchiveInfiniteQueryKey(userId, segment, favoritesOnly, listSort);
   }, [userId, enabled, segment, favoritesOnly, listSort]);
 
-  const initialData = useMemo((): InfiniteData<PauseArchiveRow[], number> | undefined => {
+  const initialData = useMemo(() => {
     if (!queryEnabled || !userId) return undefined;
-    const cached = readCache(storageKey);
-    if (!cached?.length) return undefined;
-    const page0 = cached.length > PAUSE_ARCHIVE_PAGE_SIZE ? cached.slice(0, PAUSE_ARCHIVE_PAGE_SIZE) : cached;
-    return { pages: [page0], pageParams: [0] };
+    const cached = readJsonLocalStorage<PauseArchiveRow[]>(storageKey);
+    return buildPauseArchiveInfiniteInitialData(cached, PAUSE_ARCHIVE_PAGE_SIZE);
   }, [queryEnabled, userId, storageKey]);
 
   const {
@@ -88,13 +77,19 @@ export function usePauseArchiveList(options: UsePauseArchiveListOptions) {
     return data?.pages.flat() ?? [];
   }, [queryEnabled, data]);
 
-  const loading = queryEnabled && !isError && rows.length === 0 && (isPending || isFetching);
+  const loading = isPauseArchiveListInitialLoading({
+    queryEnabled,
+    isError,
+    rowCount: rows.length,
+    isPending,
+    isFetching,
+  });
   const listLoadFailed = queryEnabled && isError;
   const loadingMore = isFetchingNextPage;
   const hasMore = Boolean(hasNextPage);
 
   useEffect(() => {
-    if (enabled && rows.length > 0) writeCache(storageKey, rows);
+    if (enabled && rows.length > 0) writeJsonLocalStorage(storageKey, rows);
   }, [rows, storageKey, enabled]);
 
   const loadMore = useCallback(async () => {
