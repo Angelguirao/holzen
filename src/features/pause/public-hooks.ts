@@ -7,6 +7,7 @@ export {
   fetchCompletedPauseCount,
   getCompletedPauseCountQueryOptions,
 } from './presentation/use-completed-pause-count';
+export { useDismissOutletPauseReady } from './presentation/use-dismiss-outlet-pause-ready';
 export {
   usePendingPauseOffer,
   pendingPauseOfferQueryKey,
