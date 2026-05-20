@@ -2200,6 +2200,25 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-20</span>
+      <span>Phase A slice — group reflect step-event reads under queries/reflect (Tier 5)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>Backlog #1 complete; <code>reflect-step-query</code> → <code>queries/reflect/</code></h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd><code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code> was already complete on <code>cursor/arch-migrate-src-ca70</code>. Colocate latest <code>note_updated</code> / <code>tag_updated</code> step-event reads with other reflect query modules; <code>public-queries</code> re-export path only. Presentation hooks still import via <code>public-queries</code>.</dd>
+      <dt>Deviation</dt>
+      <dd>None — TanStack keys and select helpers unchanged.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Did not move <code>reflection-step-session-storage</code> (browser session port) in the same commit.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: continue §6 <code>public.ts</code> peel or next <code>ritual/breathe/</code> cluster (<code>phase-advance</code>, <code>run-breath-segment-log</code>).</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
 </body>
 </html>
