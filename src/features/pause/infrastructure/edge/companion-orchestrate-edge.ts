@@ -3,7 +3,7 @@ import {
   buildInterventionOrchestrateBody,
   type CompanionOrchestrateSessionContext,
 } from '../../application/use-cases/ritual/frame/build-companion-orchestrate-body';
-import type { RunCompanionSlotOrchestratePorts } from '../../application/use-cases/companion/run-companion-slot-orchestrate';
+import type { RunCompanionSlotOrchestratePorts } from '../../application/use-cases/ritual/frame/run-companion-slot-orchestrate';
 import { loadActiveOrchestrateSources } from '../companion/orchestrate-sources';
 
 /** `companion-orchestrate` edge invoke (`invokeEdge` preserves `x-cid`). */

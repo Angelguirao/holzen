@@ -8,7 +8,7 @@ import {
 } from './companion-intervention-telemetry';
 import { hydrateCompanionSlotsFromArtifactCache } from './hydrate-companion-slots-from-artifact-cache';
 import { hasInvokedIntervention, runOnceIntervention } from './intervention-idempotency';
-import type { CompanionSlotCommitters, CompanionSlotRelaxations } from '../../companion/orchestrate-slot-apply';
+import type { CompanionSlotCommitters, CompanionSlotRelaxations } from './orchestrate-slot-apply';
 
 export type RunCompanionInterventionBootstrapResult =
   | { status: 'cached' }

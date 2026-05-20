@@ -4,7 +4,7 @@ import {
   buildRegenerateOrchestrateBody,
   type CompanionOrchestrateSessionContext,
   type CompanionOrchestrateSourceWire,
-} from '../ritual/frame/build-companion-orchestrate-body';
+} from './build-companion-orchestrate-body';
 import {
   resolveCompanionOrchestrateInvokeFailure,
   type CompanionOrchestrateInvokeFailure,

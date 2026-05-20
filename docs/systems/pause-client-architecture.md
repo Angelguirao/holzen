@@ -270,7 +270,7 @@ Pause is the **reference implementation** because it is the largest context; sub
 
 The repo is mid-migration. Expect:
 
-- Some use cases still under legacy paths (`application/use-cases/companion/` at root) — **move toward** `ritual/frame/` incrementally.
+- ~~Companion slot orchestration under `application/use-cases/companion/`~~ — **done:** under `ritual/frame/` (May 2026).
 - ~~Reflect use cases under `application/use-cases/reflect/`~~ — **done:** under `ritual/reflect/`.
 - Other ritual beats may live outside §3 folder names until Phase A slices land — see **interior map** below.
 - `public.ts` may exceed the slim target — **peel** into `public-queries` / `public-rpc`.
@@ -281,7 +281,7 @@ The repo is mid-migration. Expect:
 | Concern | On disk today (May 2026) | Target (§3) | Phase A slice |
 |---------|--------------------------|-------------|---------------|
 | Reflect generation, persist-error helpers, UI telemetry | `application/use-cases/ritual/reflect/` (`pause-reflect-ui-telemetry` included) | `ritual/reflect/` | Done (May 2026) |
-| Frame / companion slots | `application/use-cases/companion/` (slot orchestration runners + `orchestrate-slot-apply` hub) + `ritual/frame/` (`run-companion-intervention-bootstrap`, `apply-companion-intervention-invoke-outcome`, `build-companion-orchestrate-body`, `load-companion-orchestrate-session`, `hydrate-companion-slots-from-artifact-cache`, `estimate-read-time`, `url`, `signal-source-trusted`, `format-companion-history-relative-day`, `generation-taxonomy`, `related-biases`, `recency-hints`, `section-visibility`, `breathing-ui-complete`, `companion-ui-completion-types`, `zoom-out-payload`, `log-pause-companion`, `companion-data-from-artifacts`, `log-companion-feedback-vote`, `intervention-idempotency`, `intervention-idempotency-telemetry`, `next-expanded-with-lazy-fetch`, `companion-intervention-telemetry`, `orchestrate-invoke-error`, `artifact-cache-parse`, `apply-companion-orchestrate-retry-reset`, `companion-generation-telemetry`, `full-view-page-helpers`, `persist-ui-step-completion`, `companion-slot-ui-state`, `companion-slot-orchestrate-telemetry`, `companion-slot-orchestrate-failure-ui`) | `ritual/frame/` | Move incrementally (started May 2026) |
+| Frame / companion slots | `application/use-cases/ritual/frame/` (orchestration hub: `orchestrate-slot-apply`, `run-companion-slot-orchestrate`, `apply-companion-slot-orchestrate-outcome`, intervention bootstrap/invoke, body builders, cache hydrate, telemetry, UI helpers) | `ritual/frame/` | Done (May 2026) |
 | Partial ritual beats (brief/deep/breath/log) | `application/use-cases/ritual/` (`brief/`, `deep/`, `breath/`, `log-pause-step.ts`, …) | consolidate under `ritual/*/` | Optional later |
 | Breathing / audio | `application/use-cases/breathing/`, `ritual/breath/` | `ritual/breathe/` | Optional consolidate later |
 | Feel / initial emotion | `session/run-initial-emotion-log.ts`, `ritual/clamp-feel-intensity.ts` | `ritual/feel/` | Optional later |
