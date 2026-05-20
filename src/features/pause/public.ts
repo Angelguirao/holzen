@@ -342,10 +342,6 @@ export type {
   CompanionSlotRelaxationUi,
   CompanionSlotRelaxations,
 } from './application/use-cases/ritual/frame/orchestrate-slot-apply';
-export {
-  buildPauseSessionScaffoldRitualPayloads,
-  type PauseSessionScaffoldRitualPayloadsParams,
-} from './presentation/session/scaffold-ritual-payloads';
 export type { PauseSessionShellViewModel } from './application/use-cases/session/shell-view-model';
 export { canAdvanceFromPauseStep } from './application/use-cases/session/navigation';
 export { computeDeepRitualGoBackTarget } from './application/use-cases/ritual/deep/deep-go-back';
