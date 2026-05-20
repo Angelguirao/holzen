@@ -664,6 +664,25 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-20</span>
+      <span>Phase A slice — frame leaf: hydrate-companion-slots-from-artifact-cache</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3><code>hydrate-companion-slots-from-artifact-cache</code> → <code>ritual/frame/</code></h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Reflect → <code>ritual/reflect/</code> is complete (backlog #1). Smallest remaining companion leaf is cache hydrate (module + test): only imports <code>ritual/frame/*</code> and types from <code>orchestrate-slot-apply</code> (still in <code>companion/</code>). Slot orchestration runners stay in <code>companion/</code> until hub moves.</dd>
+      <dt>Deviation</dt>
+      <dd>None — matches spec §3.1 / §10.1 leaf-first pattern.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Could move <code>orchestrate-slot-apply</code> first as hub; picked hydrate (2 files, 2 import sites) for smaller diff before touching orchestration cluster.</dd>
+      <dt>Open questions</dt>
+      <dd>Next slice: <code>orchestrate-slot-apply</code> + <code>intervention-response-hydrate.test</code>, or <code>run-companion-slot-orchestrate</code> cluster.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
 </body>
 </html>
