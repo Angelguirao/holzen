@@ -1,9 +1,9 @@
 import { motion } from 'framer-motion';
 import { useTranslation } from 'react-i18next';
-import { ChevronLeft } from 'lucide-react';
 import { pauseStepLayout } from '@/features/pause/public';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
+import { PauseRitualBackRow } from '@/screens/pause/components/pause-ritual-back-row';
 
 export type PauseDecideMirrorProps = {
   mirrorDecision: 'sold' | 'bought';
@@ -77,19 +77,7 @@ export function PauseDecideMirror({ mirrorDecision, onConfirm, onCancel, onBack 
         </button>
       </motion.div>
 
-      {onBack ? (
-        <motion.div
-          className={pauseStepLayout.backRow}
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 2.6, duration: 0.8 }}
-        >
-          <button type="button" onClick={onBack} className={pauseStepLayout.backButton}>
-            <ChevronLeft className="h-3 w-3" />
-            {t('pause.steps.back', { defaultValue: 'Back' })}
-          </button>
-        </motion.div>
-      ) : null}
+      <PauseRitualBackRow onBack={onBack} transitionDelay={2.6} />
     </motion.div>
   );
 }
