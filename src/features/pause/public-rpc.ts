@@ -50,7 +50,13 @@ import { runPauseReflectionStepLogOnce } from './application/use-cases/ritual/re
 import { runPauseOutcomeLog } from './application/use-cases/ritual/decide/run-pause-outcome-log';
 import { reflectionStepSessionStorage } from './infrastructure/edge/reflect/reflection-step-session-storage';
 import { invalidateCompanionUiCompletionQuery } from './application/queries/companion-ui-completion-query-key';
-import type { BreathSegmentLogPorts } from './application/use-cases/breathing/run-breath-segment-log';
+import {
+  runEnsureBreathSegment1Logged,
+  runEnsureBreathSegment2Logged,
+  runLogBreathSegment1Skipped,
+  runLogBreathSegment2Skipped,
+  type RunBreathSegmentLogResult,
+} from './application/use-cases/breathing/run-breath-segment-log';
 import {
   runInitialEmotionSelect as runInitialEmotionSelectUseCase,
   runInitialEmotionSkip as runInitialEmotionSkipUseCase,
@@ -116,6 +122,7 @@ export type {
   RunShiftEmotionFrameHubDoneResult,
 };
 export type { InitialEmotionLogOpts };
+export type { RunBreathSegmentLogResult };
 
 /** Home manual trigger — `pause_create_or_reuse` (+ silent reflection stub). */
 export function openManualPauseFromHome(params: OpenManualPauseFromHomeParams) {
@@ -209,14 +216,37 @@ export function logPauseOutcomeStep(params: {
   return repositoryLogStep(params.instanceId, 'outcome_logged', params.payload);
 }
 
-const logBreathCompletedStep = (params: { instanceId: string; payload: Record<string, unknown> }) =>
-  repositoryLogStep(params.instanceId, 'breath_completed', params.payload).then(() => undefined);
-
-/** Breath segment log ports — use with `runEnsureBreathSegment*Logged` from `public`. */
-export const pauseBreathSegmentLogPorts: BreathSegmentLogPorts = {
-  logStep: logBreathCompletedStep,
-  invalidateCompanionCompletion: invalidateCompanionUiCompletionQuery,
+const breathSegmentLogDeps = {
+  onSegmentLogged: invalidateCompanionUiCompletionQuery,
 };
+
+/** Breath segment 1 — `breath_completed` via repository port (wired for presentation). */
+export function ensureBreathSegment1Logged(
+  input: Parameters<typeof runEnsureBreathSegment1Logged>[1],
+) {
+  return runEnsureBreathSegment1Logged(supabasePauseRepository, input, breathSegmentLogDeps);
+}
+
+/** Breath segment 2 — `breath_completed` via repository port (wired for presentation). */
+export function ensureBreathSegment2Logged(
+  input: Parameters<typeof runEnsureBreathSegment2Logged>[1],
+) {
+  return runEnsureBreathSegment2Logged(supabasePauseRepository, input, breathSegmentLogDeps);
+}
+
+/** Breath segment 1 skip — wired with default `PauseRepository`. */
+export function logBreathSegment1Skipped(
+  input: Parameters<typeof runLogBreathSegment1Skipped>[1],
+) {
+  return runLogBreathSegment1Skipped(supabasePauseRepository, input, breathSegmentLogDeps);
+}
+
+/** Breath segment 2 skip — wired with default `PauseRepository`. */
+export function logBreathSegment2Skipped(
+  input: Parameters<typeof runLogBreathSegment2Skipped>[1],
+) {
+  return runLogBreathSegment2Skipped(supabasePauseRepository, input, breathSegmentLogDeps);
+}
 
 /** Brief done save — `post_pause_emotion_logged` when check-in differs from ritual snapshot. */
 export function logPostPauseEmotionIfDirty(params: {

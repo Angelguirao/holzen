@@ -302,13 +302,7 @@ export {
   breathCompletedSegment1Payload,
   breathCompletedSegment2Payload,
 } from './application/use-cases/breathing/breath-completed-payload';
-export {
-  applyBreathSegmentLogOutcome,
-  runEnsureBreathSegment1Logged,
-  runEnsureBreathSegment2Logged,
-  runLogBreathSegment1Skipped,
-  runLogBreathSegment2Skipped,
-} from './application/use-cases/breathing/run-breath-segment-log';
+export { applyBreathSegmentLogOutcome } from './application/use-cases/breathing/run-breath-segment-log';
 export {
   BRIEF_TRIANGLE_CYCLE_COUNT,
   holdProgressWithinPhase,

@@ -1,3 +1,5 @@
+import { logPauseStep } from '@/features/pause/application/use-cases/ritual/log-pause-step';
+import type { PauseRepository } from '@/features/pause/ports/pause-repository';
 import {
   breathCompletedSegment1Payload,
   breathCompletedSegment2Payload,
@@ -10,42 +12,38 @@ export type RunBreathSegmentLogResult =
   | { status: 'no_instance' }
   | { status: 'sync_failed' };
 
-type LogBreathCompletedPort = (params: {
-  instanceId: string;
-  payload: Record<string, unknown>;
-}) => Promise<void>;
-
-export type BreathSegmentLogPorts = {
-  logStep: LogBreathCompletedPort;
-  invalidateCompanionCompletion?: (pauseInstanceId: string) => void;
+export type BreathSegmentLogDeps = {
+  onSegmentLogged?: (pauseInstanceId: string) => void;
 };
 
 function afterSuccessfulLog(
   pauseInstanceId: string,
-  ports: BreathSegmentLogPorts,
+  deps?: BreathSegmentLogDeps,
 ): RunBreathSegmentLogResult {
-  ports.invalidateCompanionCompletion?.(pauseInstanceId);
+  deps?.onSegmentLogged?.(pauseInstanceId);
   return { status: 'success', markSegmentLogged: true };
 }
 
 /** First `breath_completed` RPC (deduped per segment ref). */
 export async function runEnsureBreathSegment1Logged(
+  repository: PauseRepository,
   input: {
     pauseInstanceId: string | null;
     segmentAlreadyLogged: boolean;
     briefRitual?: boolean;
   },
-  ports: BreathSegmentLogPorts,
+  deps?: BreathSegmentLogDeps,
 ): Promise<RunBreathSegmentLogResult> {
   if (!input.pauseInstanceId) return { status: 'no_instance' };
   if (input.segmentAlreadyLogged) return { status: 'already_logged' };
 
   try {
-    await ports.logStep({
+    await logPauseStep(repository, {
       instanceId: input.pauseInstanceId,
+      stepType: 'breath_completed',
       payload: breathCompletedSegment1Payload({ briefRitual: !!input.briefRitual }),
     });
-    return afterSuccessfulLog(input.pauseInstanceId, ports);
+    return afterSuccessfulLog(input.pauseInstanceId, deps);
   } catch {
     return { status: 'sync_failed' };
   }
@@ -53,18 +51,20 @@ export async function runEnsureBreathSegment1Logged(
 
 /** Second `breath_completed` RPC (deduped per segment ref). */
 export async function runEnsureBreathSegment2Logged(
+  repository: PauseRepository,
   input: { pauseInstanceId: string | null; segmentAlreadyLogged: boolean },
-  ports: BreathSegmentLogPorts,
+  deps?: BreathSegmentLogDeps,
 ): Promise<RunBreathSegmentLogResult> {
   if (!input.pauseInstanceId) return { status: 'no_instance' };
   if (input.segmentAlreadyLogged) return { status: 'already_logged' };
 
   try {
-    await ports.logStep({
+    await logPauseStep(repository, {
       instanceId: input.pauseInstanceId,
+      stepType: 'breath_completed',
       payload: breathCompletedSegment2Payload(),
     });
-    return afterSuccessfulLog(input.pauseInstanceId, ports);
+    return afterSuccessfulLog(input.pauseInstanceId, deps);
   } catch {
     return { status: 'sync_failed' };
   }
@@ -72,17 +72,19 @@ export async function runEnsureBreathSegment2Logged(
 
 /** Segment 1 skip — always invokes when instance id present; marks segment logged on success. */
 export async function runLogBreathSegment1Skipped(
+  repository: PauseRepository,
   input: { pauseInstanceId: string | null; opts?: BreathCompletedSegment1Options },
-  ports: BreathSegmentLogPorts,
+  deps?: BreathSegmentLogDeps,
 ): Promise<RunBreathSegmentLogResult> {
   if (!input.pauseInstanceId) return { status: 'no_instance' };
 
   try {
-    await ports.logStep({
+    await logPauseStep(repository, {
       instanceId: input.pauseInstanceId,
+      stepType: 'breath_completed',
       payload: breathCompletedSegment1Payload({ skipped: true, ...input.opts }),
     });
-    return afterSuccessfulLog(input.pauseInstanceId, ports);
+    return afterSuccessfulLog(input.pauseInstanceId, deps);
   } catch {
     return { status: 'sync_failed' };
   }
@@ -90,17 +92,19 @@ export async function runLogBreathSegment1Skipped(
 
 /** Segment 2 skip — always invokes when instance id present; marks segment logged on success. */
 export async function runLogBreathSegment2Skipped(
+  repository: PauseRepository,
   input: { pauseInstanceId: string | null },
-  ports: BreathSegmentLogPorts,
+  deps?: BreathSegmentLogDeps,
 ): Promise<RunBreathSegmentLogResult> {
   if (!input.pauseInstanceId) return { status: 'no_instance' };
 
   try {
-    await ports.logStep({
+    await logPauseStep(repository, {
       instanceId: input.pauseInstanceId,
+      stepType: 'breath_completed',
       payload: breathCompletedSegment2Payload({ skipped: true }),
     });
-    return afterSuccessfulLog(input.pauseInstanceId, ports);
+    return afterSuccessfulLog(input.pauseInstanceId, deps);
   } catch {
     return { status: 'sync_failed' };
   }
