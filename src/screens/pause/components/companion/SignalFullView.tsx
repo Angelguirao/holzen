@@ -1,9 +1,6 @@
-import { useMemo } from 'react';
-import { useQuery } from '@tanstack/react-query';
 import { ExternalLink, ShieldCheck } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { Skeleton } from '@/components/ui/skeleton';
-import { getSignalSourcesCatalogQueryOptions } from '@/features/user/public-queries';
 import { CompanionError } from '../CompanionError';
 import { ReadTime } from './ReadTime';
 import { WhyThisCard } from './WhyThisCard';
@@ -25,6 +22,10 @@ interface Props {
   mood?: string | null;
   marketDirection?: 'up' | 'down' | 'neutral' | null;
   preferredBias?: string | null;
+  /** Normalized URL host for favicon + trusted badge (from `useSignalSourceTrustedHost`). */
+  host?: string | null;
+  /** From `useSignalSourceTrustedHost`; `null` while catalog loads or host unknown. */
+  isTrusted?: boolean | null;
 }
 
 /**
@@ -48,27 +49,10 @@ export function SignalFullView({
   mood,
   marketDirection,
   preferredBias,
+  host = null,
+  isTrusted = null,
 }: Props) {
   const { t } = useTranslation();
-
-  const host = extractHost(signal?.url);
-
-  const { data: catalog = [], isPending, isError } = useQuery(
-    getSignalSourcesCatalogQueryOptions(Boolean(host)),
-  );
-
-  const isTrusted = useMemo((): boolean | null => {
-    if (!host) return null;
-    if (isPending) return null;
-    if (isError) return false;
-    if (catalog.length === 0) return false;
-    const trustedHosts = new Set<string>();
-    for (const row of catalog) {
-      const h = extractHost(row.url);
-      if (h) trustedHosts.add(h);
-    }
-    return trustedHosts.has(host);
-  }, [host, catalog, isPending, isError]);
 
   if (loading) {
     return (
@@ -140,19 +124,4 @@ export function SignalFullView({
       </div>
     </div>
   );
-}
-
-/**
- * Extract a normalized host (lowercase, no `www.`) from a URL-looking string.
- * Returns `null` for invalid input; callers render no host-dependent UI in
- * that case.
- */
-function extractHost(url?: string | null): string | null {
-  if (!url) return null;
-  try {
-    const u = new URL(url);
-    return u.hostname.toLowerCase().replace(/^www\./, '');
-  } catch {
-    return null;
-  }
 }
