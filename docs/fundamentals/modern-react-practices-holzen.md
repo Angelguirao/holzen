@@ -55,7 +55,7 @@ The ecosystem moved **away from**:
 
 | Check | Target | Today |
 |-------|--------|-------|
-| New ritual logic lands under pause package/feature | ✅ required | ⚠️ often `src/lib/pause-*` + `use-pause-*` |
+| New ritual logic lands under pause feature module | ✅ required | ⚠️ converging — some use cases still at `application/use-cases/companion/` / `reflect/` (target `ritual/frame/` + `ritual/reflect/`) |
 | Nav tabs are screens, not packages | ✅ | ⚠️ naming implied otherwise in old layout |
 | Delete a feature = delete one folder/package | ✅ | ❌ cross-cutting imports |
 

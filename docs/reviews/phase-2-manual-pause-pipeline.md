@@ -83,7 +83,7 @@ This phase is the second "mental model pass": after Phase 1 (who can reach `/pau
 ## Runtime touchpoints: endpoints, events, and side effects
 
 - **Edge function: `holzen-reflect`**
-  - Client: `invokeEdge('holzen-reflect', …)` from **`src/lib/pause-reflect-artifact.ts`** (`generateReflectionAtReflectStep`), used by **`use-pause-reflect-generation.ts`** from **`PauseSession`** once the deep ritual reaches **Reflect** (the hook stays enabled on **Frame**, second **Breathe**, and **Decide**). **`use-holzen`** does **not** invoke it on the non-silent Home path.
+  - Client: `invokeEdge('holzen-reflect', …)` from **`src/features/pause/infrastructure/reflect/reflection-artifact.ts`** (`generateReflectionAtReflectStep`), used by **`use-pause-reflect-generation.ts`** from **`PauseSession`** once the deep ritual reaches **Reflect** (the hook stays enabled on **Frame**, second **Breathe**, and **Decide**). **`use-holzen`** does **not** invoke it on the non-silent Home path.
 - **Edge function: `companion-orchestrate`**
   - Client: `invokeEdge('companion-orchestrate', …)` from `use-companion-data.ts` (multiple call sites for load/regenerate).
 - **Direct Supabase client writes (browser)**:
