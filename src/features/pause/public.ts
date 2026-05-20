@@ -355,6 +355,7 @@ export {
   stopPauseReflectFrameFocusAmbience,
 } from './application/use-cases/breathing/ritual-audio';
 export { getRecencyHints } from './application/use-cases/companion/recency-hints';
+export { estimateReadTime } from './application/use-cases/companion/estimate-read-time';
 export {
   companionSlotToGenerationTaxonomy,
   trackCompanionGenerationInitiated,
