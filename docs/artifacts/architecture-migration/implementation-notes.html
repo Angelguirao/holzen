@@ -911,6 +911,25 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-20</span>
+      <span>Phase A slice — reflect decide flow + public peel</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3><code>pause-session-reflect-decide-flow</code> → <code>ritual/reflect/</code>; peel persist-error + favorite hint from <code>public.ts</code></h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Last reflect-specific pure helpers still under <code>session/</code> after <code>reflect-generation-enabled</code> move: relocate <code>pause-session-reflect-decide-flow</code> (+ test) beside other reflect use cases. Remove <code>reflection-persist-error</code> and <code>shouldShowFavoriteProHint</code> from bloated <code>public.ts</code> — in-feature callers import <code>ritual/reflect/*</code> directly.</dd>
+      <dt>Deviation</dt>
+      <dd>None — matches §3.1 / §10.1; incremental <code>public.ts</code> peel (§6).</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Presentation conductor still orchestrates reflect + decide; only pure flow helpers moved off <code>session/</code>.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: peel companion/frame exports from <code>public.ts</code> or wire <code>pauseLogCompanion</code> through <code>PauseRepository</code>.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
 </body>
 </html>

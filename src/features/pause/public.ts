@@ -8,13 +8,6 @@ export {
   type BuildPauseImpactDataOnCompleteInput,
   type PauseImpactData,
 } from './application/use-cases/impact-data';
-export {
-  isPausePersistError,
-  isReflectionPersistError,
-  reflectionPersistErrorMessage,
-  PAUSE_PERSIST_ERROR_MARKER,
-  REFLECTION_PERSIST_ERROR_MARKER,
-} from './application/use-cases/ritual/reflect/reflection-persist-error';
 export { pauseArchiveRowAllowsRetrospectiveOutcome } from './application/use-cases/archive/retrospective-outcome';
 export { pauseArchiveListQueryPrefix } from './application/queries/archive-query-keys';
 export { buildOutcomeLoggedPayload } from './application/use-cases/outcome-log-payload';
@@ -24,7 +17,6 @@ export {
   type PendingPauseOfferDisplay,
 } from './application/use-cases/pending-offer/pending-pause-offer-display';
 export { formatCompanionHistoryRelativeDay } from './application/use-cases/ritual/frame/format-companion-history-relative-day';
-export { shouldShowFavoriteProHint } from './application/use-cases/ritual/reflect/run-pause-favorite-toggle';
 export { groupBulkHoldByLocalDay } from './application/use-cases/bulk-hold/group-by-local-day';
 export {
   bulkHoldMaxRows,
