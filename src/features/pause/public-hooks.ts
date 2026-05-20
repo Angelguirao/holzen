@@ -193,6 +193,10 @@ export {
 export { usePauseContextHomePreviews } from './presentation/home/use-pause-context-home-previews';
 export { useHolzenHomeContextState } from './presentation/home/use-holzen-home-context-state';
 export {
+  millisecondsUntilNextQuarterHour,
+  PAUSE_CRON_QUARTER_INTERVAL_MS,
+} from './application/use-cases/scheduling/milliseconds-until-next-quarter-hour';
+export {
   pauseHomeErrorKind,
   pauseHomeErrorStrings,
   shouldSurfacePauseWidgetError,

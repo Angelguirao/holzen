@@ -2060,9 +2060,9 @@
     <h3><code>getSessionQuote</code> + <code>millisecondsUntilNextQuarterHour</code> off slim barrel</h3>
     <dl>
       <dt>Design decision</dt>
-      <dd>Backlog #1–#2 ritual moves are complete; <code>FeelStepTile</code> peel landed on remote in parallel. Continue backlog #3 §6: remove decide/home scheduling helpers from <code>public.ts</code>. <code>use-pause-session-decide-handler</code> and <code>use-holzen-home-context-state</code> import application modules directly (presentation-only consumers).</dd>
+      <dd>Backlog #1–#2 ritual moves are complete; <code>FeelStepTile</code> peel landed on remote in parallel. Continue backlog #3 §6: remove decide/home scheduling helpers from <code>public.ts</code>. <code>use-pause-session-decide-handler</code> and <code>use-holzen-home-context-state</code> import application modules directly (presentation-only consumers). Follow-up: re-export <code>millisecondsUntilNextQuarterHour</code> and <code>PAUSE_CRON_QUARTER_INTERVAL_MS</code> on <code>public-hooks.ts</code> for screen-facing API; <code>HomePauseChrome</code> keeps a local 15-minute constant with a sync comment (importing <code>public-hooks</code> in that test graph eagerly loads Supabase auth).</dd>
       <dt>Deviation</dt>
-      <dd>None — did not add <code>public-hooks</code> re-exports (no screen imports these symbols).</dd>
+      <dd>Presentation conductors avoid <code>public-hooks</code> for scheduling (cycle with <code>useHolzenHomeContextState</code> export).</dd>
       <dt>Tradeoffs</dt>
       <dd>Did not colocate <code>breathing/</code> under <code>ritual/breathe/</code> in the same commit.</dd>
       <dt>Open questions</dt>
