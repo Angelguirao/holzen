@@ -118,7 +118,7 @@ export {
   buildReflectGenerationEdgeInvokeInput,
   type ReflectGenerationEdgeInvokeInput,
   type ReflectGenerationProfileInput,
-} from './application/use-cases/reflect/reflect-generation-edge-params';
+} from './application/use-cases/ritual/reflect/reflect-generation-edge-params';
 export {
   runReflectGeneration,
   type RunReflectGenerationInput,

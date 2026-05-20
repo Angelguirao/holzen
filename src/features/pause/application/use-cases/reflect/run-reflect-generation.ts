@@ -1,8 +1,8 @@
-import { buildReflectGenerationEdgeInvokeInput } from './reflect-generation-edge-params';
+import { buildReflectGenerationEdgeInvokeInput } from '../ritual/reflect/reflect-generation-edge-params';
 import type {
   ReflectGenerationEdgeInvokeInput,
   ReflectGenerationProfileInput,
-} from './reflect-generation-edge-params';
+} from '../ritual/reflect/reflect-generation-edge-params';
 import { isAbortLikeReflectError } from '../ritual/reflect/reflect-generation-errors';
 
 export type RunReflectGenerationInput = {
