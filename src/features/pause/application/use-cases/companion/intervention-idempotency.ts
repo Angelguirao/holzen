@@ -57,34 +57,7 @@ const inFlight = new Map<string, Promise<unknown>>();
  */
 const memoryMarkers = new Set<string>();
 
-// ── Metrics ──────────────────────────────────────────────────────────────────
-// We instrument the idempotency layer itself so every caller (current and
-// future) is observed without needing to remember to log at the call-site.
-//
-//  - `intervention_idempotency_skip` — caller asked, marker already set.
-//  - `intervention_idempotency_dedup` — concurrent caller joined the in-flight
-//    Promise (StrictMode double-invoke, fast remounts).
-//  - `intervention_first_call_latency` — wall-clock latency of the *first*
-//    real invocation per pause instance id, captured on success or failure.
-//
-// Events are forwarded to PostHog via `trackEvent` (no-op when PostHog is
-// disabled) and mirrored to the `[holzen:companion]` console channel so
-// they show up in dev / VITE_HOLZEN_DEBUG=1 builds.
-import { trackEvent } from '@/lib/posthog';
-import { holzenLog } from '@/lib/holzen-console';
-
-function emit(event: string, props: Record<string, unknown>): void {
-  try {
-    trackEvent(event, props);
-  } catch {
-    /* posthog itself swallows errors — this is belt-and-suspenders */
-  }
-  try {
-    holzenLog.companion(event, props);
-  } catch {
-    /* ignore */
-  }
-}
+import { emitInterventionIdempotencyMetric } from '@/features/pause/application/use-cases/companion/intervention-idempotency-telemetry';
 
 function pauseInstancePrefix(id: string): string {
   return id.slice(0, 8);
@@ -124,7 +97,7 @@ export function hasInvokedIntervention(pauseInstanceId: string): boolean {
   const id = normalizePauseInstanceId(pauseInstanceId);
   if (!id) return false;
   if (inFlight.has(id)) {
-    emit('intervention_idempotency_skip', {
+    emitInterventionIdempotencyMetric('intervention_idempotency_skip', {
       pause_instance_prefix: pauseInstancePrefix(id),
       layer: 'in_flight',
     });
@@ -133,14 +106,14 @@ export function hasInvokedIntervention(pauseInstanceId: string): boolean {
   try {
     const hit = sessionStorage.getItem(storageKey(id)) === '1';
     if (hit) {
-      emit('intervention_idempotency_skip', {
+      emitInterventionIdempotencyMetric('intervention_idempotency_skip', {
         pause_instance_prefix: pauseInstancePrefix(id),
         layer: 'session_storage',
       });
       return true;
     }
   } catch (err) {
-    emit('intervention_idempotency_storage_error', {
+    emitInterventionIdempotencyMetric('intervention_idempotency_storage_error', {
       pause_instance_prefix: pauseInstancePrefix(id),
       op: 'getItem',
       error_name: (err as { name?: string } | null)?.name ?? 'unknown',
@@ -148,11 +121,11 @@ export function hasInvokedIntervention(pauseInstanceId: string): boolean {
     /* fall through to in-memory fallback */
   }
   if (memoryMarkers.has(id)) {
-    emit('intervention_idempotency_skip', {
+    emitInterventionIdempotencyMetric('intervention_idempotency_skip', {
       pause_instance_prefix: pauseInstancePrefix(id),
       layer: 'memory_fallback',
     });
-    emit('intervention_idempotency_fallback_used', {
+    emitInterventionIdempotencyMetric('intervention_idempotency_fallback_used', {
       pause_instance_prefix: pauseInstancePrefix(id),
       phase: 'read',
     });
@@ -178,7 +151,7 @@ export async function runOnceIntervention<T>(
   const key = normalizePauseInstanceId(pauseInstanceId);
   const existing = inFlight.get(key) as Promise<T> | undefined;
   if (existing) {
-    emit('intervention_idempotency_dedup', {
+    emitInterventionIdempotencyMetric('intervention_idempotency_dedup', {
       pause_instance_prefix: pauseInstancePrefix(key),
     });
     return existing;
@@ -198,18 +171,18 @@ export async function runOnceIntervention<T>(
       try {
         sessionStorage.setItem(storageKey(key), '1');
       } catch (err) {
-        emit('intervention_idempotency_storage_error', {
+        emitInterventionIdempotencyMetric('intervention_idempotency_storage_error', {
           pause_instance_prefix: pauseInstancePrefix(key),
           op: 'setItem',
           error_name: (err as { name?: string } | null)?.name ?? 'unknown',
         });
-        emit('intervention_idempotency_fallback_used', {
+        emitInterventionIdempotencyMetric('intervention_idempotency_fallback_used', {
           pause_instance_prefix: pauseInstancePrefix(key),
           phase: 'write',
         });
         /* private mode / storage full — best-effort */
       }
-      emit('intervention_first_call_latency', {
+      emitInterventionIdempotencyMetric('intervention_first_call_latency', {
         pause_instance_prefix: pauseInstancePrefix(key),
         latency_ms: Math.round(
           (typeof performance !== 'undefined' && typeof performance.now === 'function'
@@ -226,13 +199,13 @@ export async function runOnceIntervention<T>(
       try {
         sessionStorage.removeItem(storageKey(key));
       } catch (err) {
-        emit('intervention_idempotency_storage_error', {
+        emitInterventionIdempotencyMetric('intervention_idempotency_storage_error', {
           pause_instance_prefix: pauseInstancePrefix(key),
           op: 'removeItem',
           error_name: (err as { name?: string } | null)?.name ?? 'unknown',
         });
       }
-      emit('intervention_first_call_latency', {
+      emitInterventionIdempotencyMetric('intervention_first_call_latency', {
         pause_instance_prefix: pauseInstancePrefix(key),
         latency_ms: Math.round(
           (typeof performance !== 'undefined' && typeof performance.now === 'function'
