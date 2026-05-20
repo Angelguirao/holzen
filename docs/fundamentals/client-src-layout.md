@@ -2,7 +2,7 @@
 
 **Status:** accepted (post wave 5j, May 2026)  
 **Audience:** contributors and agents placing UI or client domain code  
-**Pairs with:** [client-server-architecture-holzen.md](client-server-architecture-holzen.md) (truth vs projection), [frontend-module-layout.md](frontend-module-layout.md) (waves, CI, monorepo north star), [holzen-application-architecture.md](holzen-application-architecture.md) (principles §7–8)
+**Pairs with:** [client-server-architecture-holzen.md](client-server-architecture-holzen.md) (truth vs projection), [frontend-module-layout.md](frontend-module-layout.md) (waves, CI, monorepo north star), [holzen-application-architecture.md](holzen-application-architecture.md) (principles §7–8), [naming-conventions-holzen.md](naming-conventions-holzen.md) (file/export names)
 
 This doc is the **folder-level map** of active `src/`. It does **not** replace subsystem behavior docs under `docs/systems/` or the C4 **external** view in [architecture/c4-holzen.md](../architecture/c4-holzen.md).
 
@@ -61,6 +61,7 @@ Use this checklist when opening a PR that touches `src/` (human or agent). Full 
 | 3 | **Which presentation bucket?** | Single route → `screens/…/components/`; shared primitive → `ui/`; shell → `app/` | New root `src/components/Foo.tsx` |
 | 4 | **Import direction?** | Screen → `@/features/<ctx>/public` | Feature → screen; `ui/` → feature |
 | 5 | **Shipped surface?** | Matches [active-surface.md](../ops/active-surface.md); no `@/legacy` | Tier B tables, dropped profile columns |
+| 6 | **Names match conventions?** | New files follow [naming-conventions-holzen.md](naming-conventions-holzen.md) | Route-as-package folder; new `@/lib/pause-*` shim |
 
 **When docs drift:** update the **one owner** in [docs/README.md](../README.md) canonical table; update folder READMEs if placement rules change.
 

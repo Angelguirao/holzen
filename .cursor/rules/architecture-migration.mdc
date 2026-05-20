@@ -1,0 +1,95 @@
+---
+description: >-
+  Incremental Holzen src/ architecture migration — one vertical slice, broad discovery
+  (not pause-only), naming per naming-conventions-holzen.md, behavior-preserving.
+  Use when refactoring features/screens/lib toward documented layers.
+alwaysApply: false
+---
+
+# Architecture migration session (Holzen)
+
+**Incremental, behavior-preserving** alignment of active `src/` with documented architecture — not a big-bang rewrite. **Lovable:** Vite root stays at repo root; do **not** move SPA to `apps/web` or extract `packages/*` unless explicitly asked.
+
+## Constitution (read before editing)
+
+1. Skim matching row in [AGENTS.md](../../AGENTS.md) → **Change map**.
+2. Principles **P1–P9:** [holzen-application-architecture.md](../../docs/fundamentals/holzen-application-architecture.md).
+3. Placement: [client-src-layout.md](../../docs/fundamentals/client-src-layout.md), [frontend-module-layout.md](../../docs/fundamentals/frontend-module-layout.md) §10.
+4. **Naming (mandatory for new/moved files):** [naming-conventions-holzen.md](../../docs/fundamentals/naming-conventions-holzen.md).
+5. Screen/hook splits: [refactoring-strategy.md](../../docs/fundamentals/refactoring-strategy.md), [react-screen-orchestration.md](../../docs/fundamentals/react-screen-orchestration.md).
+6. Shipped scope: [active-surface.md](../../docs/ops/active-surface.md) — no `@/legacy/**`, no Tier B schema.
+
+## Pick ONE vertical slice (priority table)
+
+Work **one** slice per session unless the user names a target. **Discovery is repo-wide**, not pause-only.
+
+| Priority | Slice | Typical moves |
+|----------|--------|----------------|
+| 1 | `src/lib/*` shims | Re-export from `features/<ctx>/public*`; delete shim when call sites updated |
+| 2 | Screen god-hooks | Pure logic → `application` use cases; I/O → ports + `infrastructure`; thin conductor |
+| 3 | Inline Supabase/edge in screens | Feature use case + adapter; screen imports `public*` only |
+| 4 | Misplaced UI | Route → `screens/<route>/components/`; shell → `app/components/`; primitive → `components/ui/` |
+| 5 | Wrong bounded context | e.g. companions in `features/pause`, not `features/home` / `features/companion` |
+
+**Do not** create `features/home`, `features/archive`, or route-named feature packages.
+
+## Discovery (run across active `src/`)
+
+Use ripgrep / architecture scripts — **do not default to `screens/pause/` only**.
+
+```bash
+# Shims & forbidden lib patterns
+rg '@/lib/(pause|companion|holzen|subscription)-' src --glob '!**/legacy/**'
+rg "from '@/lib/[^']+'" src/screens src/app src/components -g '!**/ui/**'
+
+# Presentation violations
+rg 'supabase\.from' src --glob '*.tsx'
+rg '@/features/[^/]+/application' src/screens src/app src/components src/test
+
+# God hooks (>200 LOC) — any feature presentation or screen
+find src/features src/screens -name 'use-*.ts' -o -name 'use-*.tsx' | xargs wc -l | sort -rn | head -20
+
+# Checks (baseline)
+npm run check:feature-imports
+npm run check:architecture-alignment
+```
+
+Pick the **highest-priority violation** in the **weakest area** (most imports of shims, largest god-hook outside pause, or user-named target).
+
+## Normative rules (mental PR reject)
+
+- **Layers:** `app` → `screens` → (`components` | `features`). Features never import screens. `components/ui` never imports features.
+- **Cross-context:** only `@/features/<ctx>/public`, `public-queries`, `public-hooks`, `public-rpc`.
+- **No** new root `src/components/*.tsx` (except `ui/` + allowlist).
+- **No** new `src/lib/<feature>-*` for bounded contexts.
+- **Authority (P1):** RLS/RPC/edge — not button `disabled` only. `invokeEdge` + **`x-cid`**.
+- **Presentation (P5):** no `supabase.from` in `.tsx`; named use cases behind ports.
+- **Reads (P6):** TanStack Query via `public-queries`; no duplicate `useEffect`+Supabase fetch.
+- **Observability:** new/renamed PostHog → `event-taxonomy.md`; new flags → `feature-flags.md`.
+
+## Workflow
+
+1. **Discover** — list violations for chosen slice (see commands above).
+2. **Plan** — ≤5 files moved/created; behavior parity explicit; names per [naming-conventions-holzen.md](../../docs/fundamentals/naming-conventions-holzen.md).
+3. **Implement** — smallest diff; tests beside moved pure modules.
+4. **Verify:** `npm run test` (or targeted vitest), `check:feature-imports`, `check:architecture-alignment`, `check:active-surface`, `npx eslint` on touched paths only.
+5. **Flow check** — one user journey through the change; skill `holzen-flow-review` if pause/auth/subscription/edge touched.
+
+## Output format
+
+## Slice  
+## Changes  
+## Checklist (client-src-layout 1–5)  
+## Verification  
+## Follow-ups  
+
+## Git / branches
+
+- Base: **`feature/refactoring6`** unless user says otherwise.
+- New branches: `cursor/arch-migrate-<slice>-ca70` or `cursor/refactor-<ctx>-<topic>-ca70` (lowercase; suffix `-ca70` on Cloud Agent).
+- **Commit** each completed slice; **push**; create/update PR with accurate title (branch name may be legacy-narrow).
+
+## Hard stops
+
+- No `@/legacy/**`, Tier B tables/columns, `apps/web`, monorepo packages without explicit instruction.
+- No whole-repo format/lint drive-by.

@@ -6,6 +6,7 @@ This document is the **canonical description** of how Holzen approaches **increm
 
 It complements:
 
+- **[`docs/fundamentals/naming-conventions-holzen.md`](naming-conventions-holzen.md)** — file/export names for features, screens, `public*` barrels, and migration branches.
 - **[`docs/fundamentals/react-screen-orchestration.md`](react-screen-orchestration.md)** — **reusable playbook** for any large screen: conductor pattern, Rules of Hooks + early returns, lazy branches, memoized props, pure gates + tests (distilled from Home).
 - **[`docs/reviews/react-spa-review-template.md`](../reviews/react-spa-review-template.md)** — flow-first **review** checklist (PR + audit); use before deciding *what* to extract (includes Supabase / edge context).
 - **[`docs/backlog/react-page-and-hook-splitting.md`](../backlog/react-page-and-hook-splitting.md)** — living checklist of **slices shipped** and remaining opportunities.
