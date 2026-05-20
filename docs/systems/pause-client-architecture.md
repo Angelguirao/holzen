@@ -169,7 +169,7 @@ Leaf hooks call **use cases** or **`public-rpc` wired helpers** — not `infrast
 |----------------|-------------------------|-----------|
 | Start manual pause | `trigger/open-manual-pause-from-home` | `pause_create_or_reuse` |
 | Log ritual step | `logPauseStep` → `PauseRepository` | `pause_log_step` |
-| Reflect generation | `ritual/reflect/run-reflect-generation` | `holzen-reflect` |
+| Reflect generation | `ritual/reflect/generation/run-reflect-generation` | `holzen-reflect` |
 | Frame slot / intervention | `ritual/frame/run-companion-slot-orchestrate` | `companion-orchestrate` |
 | Decide outcome | `ritual/decide/run-pause-outcome-log` | `pause_log_step` |
 
