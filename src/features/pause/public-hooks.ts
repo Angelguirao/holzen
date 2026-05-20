@@ -3,6 +3,13 @@
  * Pure frame/format helpers used by pause screens also live here (§6 slim `public.ts`).
  */
 export { pauseStepLayout } from './presentation/pause-step-layout';
+export {
+  BRIEF_INTEGRATE_RING_CIRC,
+  BRIEF_INTEGRATE_RING_R,
+  BRIEF_INTEGRATE_SECONDS,
+  briefIntegrateRemainingProgress,
+  briefIntegrateRingDashOffset,
+} from './application/use-cases/ritual/brief/brief-integrate-timer';
 export { PAUSE_FEEL_STEP_TILE_ROWS } from './domain/pause-feel-step-tiles';
 export {
   PAUSE_FEEL_INTENSITY_KEYS,

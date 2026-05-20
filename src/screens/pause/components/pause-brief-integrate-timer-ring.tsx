@@ -4,7 +4,7 @@ import {
   BRIEF_INTEGRATE_RING_R,
   briefIntegrateRemainingProgress,
   briefIntegrateRingDashOffset,
-} from '@/features/pause/public';
+} from '@/features/pause/public-hooks';
 
 export type PauseBriefIntegrateTimerRingProps = {
   remaining: number;
