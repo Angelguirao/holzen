@@ -8,7 +8,16 @@ import {
   computeAutoCooldownRemainingMs,
   computeManualCooldownRemainingMs,
 } from '@/features/pause/application/use-cases/trigger/compute-pause-trigger-cooldowns';
+import {
+  buildManualTriggerCooldownStorageKey,
+  isManualTriggerBlockedByCooldown,
+  parseManualTriggerCooldownFromStorageEvent,
+} from '@/features/pause/application/use-cases/trigger/manual-trigger-cooldown-flow';
 import { mapManualTriggerStartError } from '@/features/pause/application/use-cases/trigger/map-manual-trigger-start-error';
+import {
+  readManualTriggerCooldownAtMs,
+  writeManualTriggerCooldownAtMs,
+} from '@/features/pause/infrastructure/manual-trigger-cooldown-storage';
 import {
   MANUAL_PAUSE_TRIGGER_IDLE,
   type ManualPauseTriggerResult,
@@ -42,18 +51,21 @@ export function useHolzenManualTriggerOrchestration({
   generateMessage,
   setError,
 }: UseHolzenManualTriggerOrchestrationParams) {
-  const manualCooldownKey = user ? `holzen_last_manual_at_${user.id}` : 'holzen_last_manual_at';
+  const manualCooldownKey = buildManualTriggerCooldownStorageKey(user?.id);
   const [lastManualAt, setLastManualAt] = useState<number | null>(null);
 
   useEffect(() => {
-    const stored = localStorage.getItem(manualCooldownKey);
-    setLastManualAt(stored ? Number(stored) : null);
+    setLastManualAt(readManualTriggerCooldownAtMs(manualCooldownKey));
   }, [manualCooldownKey]);
 
   useEffect(() => {
     const onStorage = (e: StorageEvent) => {
-      if (e.key !== manualCooldownKey || e.storageArea !== 'localStorage') return;
-      setLastManualAt(e.newValue ? Number(e.newValue) : null);
+      const parsed = parseManualTriggerCooldownFromStorageEvent(
+        { key: e.key, storageArea: e.storageArea, newValue: e.newValue },
+        manualCooldownKey,
+      );
+      if (parsed === 'ignore') return;
+      setLastManualAt(parsed);
     };
     window.addEventListener('storage', onStorage);
     return () => window.removeEventListener('storage', onStorage);
@@ -72,7 +84,7 @@ export function useHolzenManualTriggerOrchestration({
   const manualTrigger = useCallback(
     async (mood?: string): Promise<ManualPauseTriggerResult> => {
       const remaining = manualCooldownRemaining();
-      if (remaining > 0) {
+      if (isManualTriggerBlockedByCooldown(remaining)) {
         holzenLog.manual('manualTrigger: blocked by cooldown', {
           remainingMs: remaining,
           devMode: isHolzenDevMode(),
@@ -96,7 +108,7 @@ export function useHolzenManualTriggerOrchestration({
         if (result.opened) {
           const now = Date.now();
           setLastManualAt(now);
-          localStorage.setItem(manualCooldownKey, String(now));
+          writeManualTriggerCooldownAtMs(manualCooldownKey, now);
         }
         return result;
       } catch (e: unknown) {
