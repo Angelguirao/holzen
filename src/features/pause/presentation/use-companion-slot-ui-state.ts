@@ -1,4 +1,6 @@
 import { useLayoutEffect, useMemo, useRef, useState } from 'react';
+import type { CachedHistoricalInsightShape } from '@/features/pause/domain/historical-insight';
+import type { ZoomOutData } from '@/features/pause/domain/zoom-out-display';
 import {
   EMPTY_COMPANION_SLOT_RELAXATIONS,
   type CompanionSlotAutosaveParams,
@@ -6,8 +8,6 @@ import {
   type CompanionSlotCommitters,
   type CompanionSlotRelaxations,
 } from '@/features/pause/application/use-cases/ritual/frame/orchestrate-slot-apply';
-import type { CachedHistoricalInsightShape } from '@/features/pause/domain/historical-insight';
-import type { ZoomOutData } from '@/features/pause/domain/zoom-out-display';
 
 interface NudgeData {
   title: string;

@@ -355,6 +355,12 @@ export {
   resumePauseAudioContext,
 } from './application/use-cases/breathing/ritual-audio';
 export { estimateReadTime } from './application/use-cases/ritual/frame/estimate-read-time';
+export type { CompanionFeedbackVote } from './application/use-cases/ritual/frame/log-companion-feedback-vote';
+export type {
+  CompanionSlotCacheIds,
+  CompanionSlotRelaxationUi,
+  CompanionSlotRelaxations,
+} from './application/use-cases/ritual/frame/orchestrate-slot-apply';
 export {
   buildPauseSessionScaffoldRitualPayloads,
   type PauseSessionScaffoldRitualPayloadsParams,
