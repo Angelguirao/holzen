@@ -14,15 +14,10 @@ import {
 import { companionUiCompletionQueryKey } from '@/features/pause/public';
 import { EMPTY_COMPANION_SLOT_RELAXATIONS } from '@/features/pause/public';
 import { resetInterventionIdempotency } from '@/features/pause/public';
+import { useCompanionAccess } from '@/screens/pause/hooks/use-companion-access';
 import { useCompanionInterventionBootstrap } from '@/screens/pause/hooks/use-companion-intervention-bootstrap';
 import { useCompanionSlotUiState } from '@/screens/pause/hooks/use-companion-slot-ui-state';
 import { useCompanionSlotOrchestrateActions } from '@/screens/pause/hooks/use-companion-slot-orchestrate-actions';
-import { useSubscription } from '@/features/subscription/public-hooks';
-import { useProGate } from '@/features/subscription/public-hooks';
-import {
-  classifyCompanionAccessDenied,
-  showLimitReachedToast,
-} from '@/features/subscription/public-limits';
 import { useToast } from '@/components/ui/use-toast';
 
 export type {
@@ -55,24 +50,13 @@ export function useCompanionData({
   const queryClient = useQueryClient();
   const { toast } = useToast();
   const { favorites, toggleCompanionFavorite } = useCompanionLibraryFavorites(pauseInstanceId);
-  const { isPro, requirePro, startCheckout } = useProGate();
-  const { companionRemaining, flexCreditsBalance, applyOptimisticDecrement, refresh: refreshSubscription } =
-    useSubscription();
-
-  const canAccessCompanion = useCallback(() => {
-    const denied = classifyCompanionAccessDenied({
-      isPro,
-      companionRemaining,
-      flexCreditsBalance,
-    });
-    if (!denied) return true;
-    if (denied === 'upgrade_required') {
-      requirePro('companions');
-    } else {
-      showLimitReachedToast({ feature: 'companion', startCheckout });
-    }
-    return false;
-  }, [isPro, requirePro, companionRemaining, flexCreditsBalance, startCheckout]);
+  const {
+    canAccessCompanion,
+    applyOptimisticDecrement,
+    refreshSubscription,
+    requirePro,
+    startCheckout,
+  } = useCompanionAccess();
 
   const completionQuery = useQuery(getCompanionUiCompletionQueryOptions(pauseInstanceId));
   const completion = completionQuery.data ?? EMPTY_COMPANION_UI_COMPLETION;
