@@ -88,7 +88,7 @@ export function BulkHoldCard() {
     setHeldCount(0);
     setDraftOutcomes({});
     setApplyError(null);
-  }, []);
+  }, [setApplyError]);
 
   const runApply = useCallback(
     (resolver: (p: BulkHoldPendingPause) => BulkHoldOutcomeChoice) => {

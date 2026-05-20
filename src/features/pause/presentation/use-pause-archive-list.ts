@@ -11,10 +11,9 @@ import {
   type PauseArchiveListSort,
   type PauseArchiveRow,
   type PauseArchiveSegment,
-} from '@/features/pause/public-queries';
+} from '../public-queries';
 
 export type { PauseArchiveRow, PauseArchiveListSort, PauseArchiveSegment };
-export { pauseArchiveListQueryPrefix } from '@/features/pause/public-queries';
 
 export type UsePauseArchiveListOptions = {
   segment: PauseArchiveSegment;
@@ -41,6 +40,7 @@ function writeCache(key: string, data: PauseArchiveRow[]) {
   }
 }
 
+/** Infinite pause/echo archive lists (`v_pause_archive_*`) with optional localStorage seed. */
 export function usePauseArchiveList(options: UsePauseArchiveListOptions) {
   const { user } = useAuth();
   const enabled = options.enabled ?? true;

@@ -3,8 +3,11 @@ import { useQuery } from '@tanstack/react-query';
 import { useSearchParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { motion, AnimatePresence } from 'framer-motion';
-import { usePauseArchiveList } from '@/screens/archive/hooks/use-pause-archive-list';
-import type { PauseArchiveRow, PauseArchiveSegment } from '@/features/pause/public-queries';
+import {
+  usePauseArchiveList,
+  type PauseArchiveRow,
+  type PauseArchiveSegment,
+} from '@/features/pause/public-hooks';
 import { useInfiniteScroll } from '@/app/hooks/use-infinite-scroll';
 import { PageMeta } from '@/app/components/PageMeta';
 import { Search, X, ArrowUpDown, RefreshCw, Loader2 } from 'lucide-react';
