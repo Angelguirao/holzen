@@ -284,7 +284,7 @@ The repo is mid-migration. Expect:
 | Frame / companion slots | `application/use-cases/ritual/frame/` (orchestration hub: `orchestrate-slot-apply`, `run-companion-slot-orchestrate`, `apply-companion-slot-orchestrate-outcome`, intervention bootstrap/invoke, body builders, cache hydrate, telemetry, UI helpers) | `ritual/frame/` | Done (May 2026) |
 | Partial ritual beats (brief/deep/breath/log) | `application/use-cases/ritual/` (`brief/`, `deep/`, `breath/`, `log-pause-step.ts`, …) | consolidate under `ritual/*/` | Optional later |
 | Breathing / audio | `application/use-cases/breathing/` (phase cues + shared `pause-ritual-audio-context`), `ritual/breath/` | `ritual/breathe/` | Optional consolidate later |
-| Feel / initial emotion | `session/run-initial-emotion-log.ts`, `ritual/clamp-feel-intensity.ts` | `ritual/feel/` | Optional later |
+| Feel / initial emotion | `application/use-cases/ritual/feel/` (`initial-emotion-log`, `run-initial-emotion-log`, `clamp-feel-intensity`) | `ritual/feel/` | Done (May 2026) |
 | Decide / outcome | `application/use-cases/ritual/decide/` (`run-pause-outcome-log`, `pause-decide-outcome-flow`) | `ritual/decide/` | Done (May 2026) |
 | Done / post-pause | `session/post-pause-emotion-log.ts` | `ritual/done/` | Optional later |
 | Session conductors | `presentation/*.ts` (flat + `presentation/session/` + `presentation/reflect/` + `presentation/decide/` + `presentation/companion/` + `presentation/home/` + `presentation/archive/`) — mood chrome + favorite in `reflect/`; archive list + retrospective in `archive/` | `presentation/session/`, `reflect/`, `decide/`, `companion/`, `home/`, `archive/` | Reflect + companion + decide + home + archive hooks grouped (May 2026); peel `public.ts` continues (§6) |
