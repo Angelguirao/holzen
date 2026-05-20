@@ -2,6 +2,8 @@ import { useState, useMemo, useCallback, useEffect } from 'react';
 import { ChevronDown, ChevronRight, ArrowUp, ArrowDown, Trash2, Loader2 } from 'lucide-react';
 import { useToast } from '@/components/ui/use-toast';
 import {
+  deleteCompanionCacheRow,
+  deleteCompanionCacheRowsByIds,
   demoteCompanionCacheEntry,
   promoteCompanionCacheEntry,
   setCompanionCacheSourceUntrusted as setCompanionCacheSourceUntrustedMutation,
@@ -12,7 +14,6 @@ import { TYPE_COLORS, label } from './admin-constants';
 import { FilterRow } from './FilterRow';
 import { QualityBadge } from './QualityBadge';
 import { AdminBulkBar } from './AdminBulkBar';
-import { adminDeleteOneRow, adminDeleteRowsByIds } from '@/screens/admin/lib/admin-delete';
 
 const QUALITY_OPTIONS = [
   { value: 'all', label: 'All' },
@@ -100,7 +101,7 @@ export function CuratedContentManager({ entries, onRefresh }: { entries: CacheEn
   const remove = useCallback(async (id: string) => {
     if (!window.confirm('Delete this cache entry? This cannot be undone.')) return;
     setActing(id);
-    const { ok, errorMessage } = await adminDeleteOneRow('companion_cache', id);
+    const { ok, errorMessage } = await deleteCompanionCacheRow(id);
     if (!ok) { toast({ title: 'Delete failed', description: errorMessage ?? 'Unknown error', variant: 'destructive' }); setActing(null); return; }
     setSelectedIds((prev) => { const n = new Set(prev); n.delete(id); return n; });
     await onRefresh();
@@ -128,7 +129,7 @@ export function CuratedContentManager({ entries, onRefresh }: { entries: CacheEn
     if (!window.confirm(`Delete ${ids.length} cache entr${ids.length === 1 ? 'y' : 'ies'}? This cannot be undone.`)) return;
     setBulkBusy(true);
     try {
-      const { deleted, errorMessage } = await adminDeleteRowsByIds('companion_cache', ids, DELETE_CHUNK);
+      const { deleted, errorMessage } = await deleteCompanionCacheRowsByIds(ids, DELETE_CHUNK);
       if (errorMessage) {
         toast({ title: 'Bulk delete failed', description: errorMessage, variant: 'destructive' });
         return;

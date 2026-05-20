@@ -53,6 +53,8 @@ export {
 } from './infrastructure/queries/signal-sources-catalog-query';
 export {
   approveSignalSourceSuggestion,
+  deleteSignalSourceRow,
+  deleteSignalSourceRowsByIds,
   insertAdminSignalSource,
   rejectSignalSourceSuggestion,
   setSignalSourceDemotedForLive,
