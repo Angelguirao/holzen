@@ -4,7 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { JourneyStreakCard } from '@/screens/journey/components/JourneyStreakCard';
 import { Button } from '@/components/ui/button';
 import { useJourneyPauseInstances } from '@/features/pause/public-hooks';
-import { trackEvent } from '@/lib/posthog';
+import { trackJourneyOverviewViewed } from '@/screens/journey/lib/journey-screen-telemetry';
 import { Skeleton } from '@/components/ui/skeleton';
 
 export default function JourneyOverview() {
@@ -15,7 +15,7 @@ export default function JourneyOverview() {
   useEffect(() => {
     if (viewedRef.current || isLoading) return;
     viewedRef.current = true;
-    trackEvent('journey.overview_viewed', {
+    trackJourneyOverviewViewed({
       streak_days: streakDays,
       completed_pause_count: completedCount,
     });
