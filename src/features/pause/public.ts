@@ -248,16 +248,6 @@ export {
   breathCompletedSegment2Payload,
 } from './application/use-cases/breathing/breath-completed-payload';
 export { applyBreathSegmentLogOutcome } from './application/use-cases/breathing/run-breath-segment-log';
-export {
-  BRIEF_TRIANGLE_CYCLE_COUNT,
-  holdProgressWithinPhase,
-  PAUSE_RITUAL_BREATHING_PATTERN_MODE,
-  rotatingKickerIndexFromElapsed,
-  RITUAL_TRIANGLE_KICKER_INTERVAL_SEC,
-  secondsIntoTrianglePattern,
-  TRIANGLE_PHASE_COUNT,
-  type PauseRitualBreathingPatternMode,
-} from './application/use-cases/breathing/ritual-pattern';
 export type { CompanionFeedbackVote } from './application/use-cases/ritual/frame/log-companion-feedback-vote';
 export type {
   CompanionSlotCacheIds,
