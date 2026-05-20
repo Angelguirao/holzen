@@ -2,8 +2,8 @@ import { describe, expect, it } from 'vitest';
 import {
   resolveScoreImpactDisplayImpacts,
   resolveScoreImpactViewMode,
-} from '@/features/pause/application/use-cases/score-impact-presentation';
-import type { PauseScoreImpactRow } from '@/features/pause/application/use-cases/score-impacts';
+} from './score-impact-presentation';
+import type { PauseScoreImpactRow } from './score-impacts';
 
 const row = (key: string): PauseScoreImpactRow => ({
   key,

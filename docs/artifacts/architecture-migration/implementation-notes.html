@@ -1972,6 +1972,25 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-20</span>
+      <span>Phase A slice — colocate decide impact + outcome payload under ritual/decide (Tier 5)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>Backlog #1 complete; <code>impact-data</code> / score-impact / <code>outcome-log-payload</code> → <code>ritual/decide/</code></h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd><code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code> was already complete on <code>cursor/arch-migrate-src-ca70</code>. Colocate post-<code>outcome_logged</code> builders and score-impact presentation helpers beside <code>pause-decide-outcome-flow</code> under <code>ritual/decide/</code>. Reflect conductor <code>use-pause-session-reflect-and-decide</code> imports domain types directly (no <code>public.ts</code> barrel). <code>impact-data</code> imports <code>MoodValue</code> from <code>domain/mood-value</code> (breaks application→public cycle).</dd>
+      <dt>Deviation</dt>
+      <dd>None — matches §3 ritual beat grouping (decide, not top-level <code>impact-data</code>).</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Did not peel <code>writingTextareaClassName</code> or colocate <code>breathing/</code> under <code>ritual/breathe/</code> in the same commit.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: peel <code>writingTextareaClassName</code> to shared UI tokens, optional <code>breathing/</code> → <code>ritual/breathe/</code>, or continue §6 <code>public.ts</code> peel.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
 </body>
 </html>

@@ -1,7 +1,7 @@
 import type { PauseState } from '@/features/pause/domain/pause-state';
 import { logPauseStep } from '@/features/pause/application/use-cases/ritual/log-pause-step';
 import type { PauseRepository } from '@/features/pause/ports/pause-repository';
-import { buildOutcomeLoggedPayload } from '../../outcome-log-payload';
+import { buildOutcomeLoggedPayload } from './outcome-log-payload';
 
 export type RunPauseOutcomeLogResult =
   | { status: 'no_instance' }

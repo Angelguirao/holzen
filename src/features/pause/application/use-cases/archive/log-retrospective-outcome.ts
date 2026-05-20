@@ -1,5 +1,5 @@
 import { logPauseStep } from '@/features/pause/application/use-cases/ritual/log-pause-step';
-import { buildOutcomeLoggedPayload } from '@/features/pause/application/use-cases/outcome-log-payload';
+import { buildOutcomeLoggedPayload } from '@/features/pause/application/use-cases/ritual/decide/outcome-log-payload';
 import type { PauseState } from '@/features/pause/domain/pause-state';
 import type { PauseRepository } from '@/features/pause/ports/pause-repository';
 

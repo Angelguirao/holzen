@@ -96,18 +96,18 @@ export {
   type StandaloneBreathSeverityRingColors,
   type StandaloneBreathingPhase,
 } from './application/use-cases/breathing/standalone-breathing-patterns';
-export type { PauseImpactData } from './application/use-cases/impact-data';
+export type { PauseImpactData } from './application/use-cases/ritual/decide/impact-data';
 export {
   buildPauseScoreImpacts,
   type PauseScoreImpactRow,
-} from './application/use-cases/score-impacts';
+} from './application/use-cases/ritual/decide/score-impacts';
 export {
   resolveScoreImpactDisplayImpacts,
   resolveScoreImpactViewMode,
   scoreImpactMotionDelaySec,
   type ScoreImpactVariant,
   type ScoreImpactViewMode,
-} from './application/use-cases/score-impact-presentation';
+} from './application/use-cases/ritual/decide/score-impact-presentation';
 export type { PauseBreathingHandle } from './presentation/session/pause-breathing-handle';
 export type {
   PauseSessionBriefRitualBodyProps,

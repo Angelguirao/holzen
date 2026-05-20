@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import type { PauseImpactData } from '@/features/pause/application/use-cases/impact-data';
+import type { PauseImpactData } from '@/features/pause/application/use-cases/ritual/decide/impact-data';
 import {
   initialBreathingFirstCompletedFromRestored,
   initialBreathingSecondCompletedFromRestored,
