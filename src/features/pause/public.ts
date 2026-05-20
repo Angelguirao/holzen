@@ -120,12 +120,6 @@ export {
   computePauseQualityScore,
   type PauseQualityBreakdown,
 } from './domain/pause-quality';
-export { showPauseFavoriteProHintToast } from './application/use-cases/feedback/favorite-toast';
-export {
-  showPauseOutcomeNotCompletedToast,
-  showPauseOutcomeSaveFailedToast,
-} from './application/use-cases/feedback/outcome-toast';
-export { showPauseStepSyncFailedToast } from './application/use-cases/feedback/step-sync-toast';
 export {
   buildFetchedPauseInstanceFromFetch,
   type PauseAiArtifactKindRow,

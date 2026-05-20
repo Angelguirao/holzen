@@ -1196,6 +1196,25 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-20</span>
+      <span>Phase A slice — peel feedback toasts from public.ts (§6)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>Feedback toast helpers off <code>public.ts</code></h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>reflect/</code> → <code>ritual/reflect/</code>) and #2 (<code>companion/</code> → <code>ritual/frame/</code>) are complete on this branch. Start §6 slim-barrel peel: remove <code>showPause*Toast</code> re-exports from <code>public.ts</code>; presentation and application call sites import <code>application/use-cases/feedback/*</code> directly (including <code>presentation/reflect/use-pause-favorite-toggle</code>).</dd>
+      <dt>Deviation</dt>
+      <dd>None — screens never imported toast helpers from <code>public</code>; no new barrel.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Left zoom-out payload helpers and other frame/session exports on <code>public.ts</code> for a follow-up peel — keeps this slice to four toast modules + import paths.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: peel zoom-out display helpers from <code>public.ts</code> (frame cluster) or <code>presentation/home/</code> folder grouping.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
 </body>
 </html>

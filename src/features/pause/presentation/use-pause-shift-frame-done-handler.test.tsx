@@ -2,6 +2,7 @@ import { describe, expect, it, vi, beforeEach } from 'vitest';
 import { renderHook, act } from '@testing-library/react';
 import type { TFunction } from 'i18next';
 import type { MutableRefObject } from 'react';
+import { showPauseStepSyncFailedToast } from '@/features/pause/application/use-cases/feedback/step-sync-toast';
 import { usePauseShiftFrameDoneHandler } from './use-pause-shift-frame-done-handler';
 
 const { pauseLogStepMock } = vi.hoisted(() => ({
@@ -17,19 +18,16 @@ vi.mock('@/features/pause/public-rpc', () => ({
     }).then(() => undefined),
 }));
 
-vi.mock('@/features/pause/public', async (importOriginal) => {
-  const actual = await importOriginal<typeof import('@/features/pause/public')>();
-  return {
-    ...actual,
-    showPauseStepSyncFailedToast: vi.fn(),
-  };
-});
+vi.mock('@/features/pause/application/use-cases/feedback/step-sync-toast', () => ({
+  showPauseStepSyncFailedToast: vi.fn(),
+}));
 
 const t = ((k: string) => k) as TFunction;
 
 beforeEach(() => {
   pauseLogStepMock.mockReset();
   pauseLogStepMock.mockResolvedValue(undefined);
+  vi.mocked(showPauseStepSyncFailedToast).mockClear();
 });
 
 describe('usePauseShiftFrameDoneHandler', () => {

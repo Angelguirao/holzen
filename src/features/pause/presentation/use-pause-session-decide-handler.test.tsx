@@ -6,7 +6,7 @@ import { usePauseSessionDecideHandler } from './use-pause-session-decide-handler
 import {
   showPauseOutcomeNotCompletedToast,
   showPauseOutcomeSaveFailedToast,
-} from '@/features/pause/public';
+} from '@/features/pause/application/use-cases/feedback/outcome-toast';
 
 const { pauseLogStepMock, clearSessionMock, invalidatePauseStatsMock } = vi.hoisted(() => ({
   pauseLogStepMock: vi.fn(),
@@ -31,14 +31,17 @@ vi.mock('@/features/pause/public-queries', () => ({
   invalidatePauseStatsDataForUser: (...args: unknown[]) => invalidatePauseStatsMock(...args),
 }));
 
+vi.mock('@/features/pause/application/use-cases/feedback/outcome-toast', () => ({
+  showPauseOutcomeSaveFailedToast: vi.fn(),
+  showPauseOutcomeNotCompletedToast: vi.fn(),
+}));
+
 vi.mock('@/features/pause/public', async (importOriginal) => {
   const actual = await importOriginal<typeof import('@/features/pause/public')>();
   return {
     ...actual,
     getSessionQuote: () => ({ text: 'Q', author: 'A' }),
     clearSession: () => clearSessionMock(),
-    showPauseOutcomeSaveFailedToast: vi.fn(),
-    showPauseOutcomeNotCompletedToast: vi.fn(),
   };
 });
 
