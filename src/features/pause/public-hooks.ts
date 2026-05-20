@@ -147,8 +147,8 @@ export {
   usePendingPauseOffer,
   pendingPauseOfferQueryKey,
   type PendingPauseOfferRow,
-} from './presentation/use-pending-pause-offer';
-export { usePendingPauseOfferMutations } from './presentation/use-pending-pause-offer-mutations';
+} from './presentation/session/use-pending-pause-offer';
+export { usePendingPauseOfferMutations } from './presentation/session/use-pending-pause-offer-mutations';
 export {
   usePauseBriefDoneCheckIn,
   type UsePauseBriefDoneCheckInParams,

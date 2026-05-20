@@ -3098,6 +3098,25 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-20</span>
+      <span>Phase A slice — colocate pending-offer hooks under presentation/session/</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>Backlog #1 complete; Tier 4 session pending-offer cluster</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd><code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code> was already complete on <code>cursor/arch-migrate-src-ca70</code> — no reflect path move this slice. Move <code>use-pending-pause-offer</code> and <code>use-pending-pause-offer-mutations</code> beside shell bootstrap and pending-leave sheet under <code>presentation/session/</code>; <code>public-hooks</code> re-export paths only; screens still import via <code>public-hooks</code>.</dd>
+      <dt>Deviation</dt>
+      <dd>None — matches §3.2 / §10.1 session conductor grouping.</dd>
+      <dt>Tradeoffs</dt>
+      <dd><code>use-pause-instances-realtime</code> stays flat under <code>presentation/</code> (shared by journey/home reads).</dd>
+      <dt>Open questions</dt>
+      <dd>Next: colocate entry presentation effects + brief→deep under <code>presentation/session/</code>, or wire more ritual mutations through <code>PauseRepository</code>.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
 </body>
 </html>
