@@ -47,6 +47,7 @@ import {
 } from './application/use-cases/ritual/reflect/run-pause-reflect-metadata-log';
 import { runPauseFavoriteToggle } from './application/use-cases/ritual/reflect/run-pause-favorite-toggle';
 import { runPauseReflectionStepLogOnce } from './application/use-cases/ritual/reflect/run-pause-reflection-step-log';
+import { runPauseOutcomeLog } from './application/use-cases/ritual/decide/run-pause-outcome-log';
 import { reflectionStepSessionStorage } from './infrastructure/edge/reflect/reflection-step-session-storage';
 import { invalidateCompanionUiCompletionQuery } from './application/queries/companion-ui-completion-query-key';
 import type { BreathSegmentLogPorts } from './application/use-cases/breathing/run-breath-segment-log';
@@ -176,7 +177,15 @@ export function logShiftEmotionStep(params: {
   ).then(() => undefined);
 }
 
-/** Decide step — `outcome_logged` RPC (wired for screen hooks). */
+/** Decide step — `outcome_logged` via repository port (wired for presentation). */
+export function logPauseOutcome(params: {
+  pauseInstanceId: string | null;
+  decision: string;
+}) {
+  return runPauseOutcomeLog(supabasePauseRepository, params);
+}
+
+/** Low-level `outcome_logged` step — prefer `logPauseOutcome` for decide flow. */
 export function logPauseOutcomeStep(params: {
   instanceId: string;
   payload: Record<string, unknown>;
