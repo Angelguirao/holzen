@@ -136,6 +136,10 @@ export {
 } from './application/use-cases/breathing/phase-advance';
 export { resolveBreathOrbVisualMetrics } from './application/use-cases/breathing/pause-breath-orb-metrics';
 export {
+  resolveTriangleKickerDisplay,
+  type TriangleKickerDisplay,
+} from './application/use-cases/breathing/resolve-triangle-kicker-display';
+export {
   STANDALONE_BREATHING_CYCLE_COUNT,
   STANDALONE_BREATHING_PATTERNS,
   resolveStandaloneBreathSeverityRingColors,

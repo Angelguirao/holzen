@@ -2,22 +2,20 @@ import { useImperativeHandle, forwardRef, useMemo } from 'react';
 import { motion, useReducedMotion } from 'framer-motion';
 import { useTranslation } from 'react-i18next';
 import type { FeelStepTile } from '@/features/pause/public';
-import { pauseStepLayout } from '@/features/pause/public';
 import {
+  pauseStepLayout,
   parseTriangleRotatingKickersI18n,
   resolveBreathOrbVisualMetrics,
   resolveBreathCycleTotal,
   resolvePauseBreathingPhases,
-  rotatingKickerIndexFromElapsed,
-  secondsIntoTrianglePattern,
+  resolveTriangleKickerDisplay,
+  resumePauseAudioContext,
 } from '@/features/pause/public';
-import { resumePauseAudioContext } from '@/features/pause/public';
 import { usePauseBreathingTimedLoop } from '@/features/pause/public-hooks';
-import { BriefBreathAdvanceToIntegrate } from '@/screens/pause/components/brief-breath-advance-to-integrate';
-import { DeepBreathPostPatternInterstitial } from '@/screens/pause/components/deep-breath-post-pattern-interstitial';
 import { PauseBreathIntro } from '@/screens/pause/components/pause-breath-intro';
 import type { PauseBreathSegment } from '@/screens/pause/components/pause-breath-intro';
 import { PauseBreathTimedLoop } from '@/screens/pause/components/pause-breath-timed-loop';
+import { PauseBreathingCompletion } from '@/screens/pause/components/pause-breathing-completion';
 
 /** i18n: `breathing.triangleRotatingKickers` — advances every 2s in `PauseBreathing`, not per phase. */
 const TRIANGLE_ROTATING_KICKERS_I18N_KEY = 'breathing.triangleRotatingKickers';
@@ -129,24 +127,18 @@ export const PauseBreathing = forwardRef<PauseBreathingHandle, Props>(function P
     [t],
   );
 
-  const secondsIntoTrianglePatternMemo = useMemo(
-    () =>
-      secondsIntoTrianglePattern({
-        cycle,
-        phaseIndex,
-        elapsedInCurrentPhase: elapsed,
-        phaseDurationsSec,
-      }),
-    [cycle, phaseIndex, elapsed, phaseDurationsSec],
-  );
-
-  const triangleKickerIndex = useMemo(
-    () => rotatingKickerIndexFromElapsed(secondsIntoTrianglePatternMemo, triangleRotatingKickers.length),
-    [secondsIntoTrianglePatternMemo, triangleRotatingKickers.length],
-  );
-
-  const triangleKickerLine =
-    triangleRotatingKickers.length > 0 ? (triangleRotatingKickers[triangleKickerIndex] ?? '') : '';
+  const { line: triangleKickerLine, index: triangleKickerIndex, hasKickers: hasTriangleKickers } =
+    useMemo(
+      () =>
+        resolveTriangleKickerDisplay({
+          kickers: triangleRotatingKickers,
+          cycle,
+          phaseIndex,
+          elapsedInCurrentPhase: elapsed,
+          phaseDurationsSec,
+        }),
+      [triangleRotatingKickers, cycle, phaseIndex, elapsed, phaseDurationsSec],
+    );
 
   useImperativeHandle(ref, () => ({ resetToIntro }), [resetToIntro]);
 
@@ -191,32 +183,25 @@ export const PauseBreathing = forwardRef<PauseBreathingHandle, Props>(function P
           showPhaseHints={showPhaseHints}
           triangleKickerLine={triangleKickerLine}
           triangleKickerIndex={triangleKickerIndex}
-          hasTriangleKickers={triangleRotatingKickers.length > 0}
+          hasTriangleKickers={hasTriangleKickers}
           cycle={cycle}
           totalCycles={totalCycles}
           phaseIndex={phaseIndex}
         />
-      ) : ritualVariant === 'brief' ? (
-        <BriefBreathAdvanceToIntegrate
-          onContinue={onContinueAfterBreath}
+      ) : (
+        <PauseBreathingCompletion
+          ritualVariant={ritualVariant}
+          breathSegment={breathSegment}
+          prefersReducedMotion={!!prefersReduced}
+          onContinueAfterBreath={onContinueAfterBreath}
           onAdvanceFailed={() => {
             setCompletedLocal(false);
             phaseAdvanceGuardRef.current = false;
           }}
+          onRepeatDeepFirstBreathPattern={onRepeatDeepFirstBreathPattern}
+          onRepeatDeepSecondBreathPattern={onRepeatDeepSecondBreathPattern}
         />
-      ) : ritualVariant === 'deep' ? (
-        <DeepBreathPostPatternInterstitial
-          segment={breathSegment}
-          prefersReducedMotion={!!prefersReduced}
-          onContinueAfterBreath={onContinueAfterBreath}
-          onRepeatPattern={
-            breathSegment === 'first'
-              ? onRepeatDeepFirstBreathPattern
-              : onRepeatDeepSecondBreathPattern
-          }
-        />
-      ) : null}
-
+      )}
     </motion.div>
   );
 });
