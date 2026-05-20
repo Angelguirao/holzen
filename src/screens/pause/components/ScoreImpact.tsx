@@ -4,7 +4,6 @@ import { useTranslation } from 'react-i18next';
 import { cn } from '@/lib/utils';
 import {
   buildPauseScoreImpacts,
-  type PauseImpactData,
   resolveScoreImpactDisplayImpacts,
   resolveScoreImpactViewMode,
   scoreImpactMotionDelaySec,
