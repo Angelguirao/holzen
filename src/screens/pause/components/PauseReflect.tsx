@@ -6,7 +6,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { HomePauseBlockingErrorPanel } from '@/screens/home/components/HomePauseBlockingErrorPanel';
 import { PauseNote } from '@/screens/pause/components/PauseNote';
 import { PauseTags } from '@/screens/pause/components/PauseTags';
-import { pauseStepLayout } from '@/screens/pause/components/pause-step-layout';
+import { pauseStepLayout } from '@/features/pause/public';
 import { Button } from '@/components/ui/button';
 import { trackEvent } from '@/lib/posthog';
 import { usePauseArtifactHaiku, usePauseReflectionStepLog } from '@/features/pause/public-hooks';

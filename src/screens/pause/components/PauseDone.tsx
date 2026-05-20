@@ -9,7 +9,7 @@ import { OutcomeIcon } from '@/components/icons/OutcomeIcon';
 import { PAUSE_FEEL_INTENSITY_KEYS } from '@/features/pause/public';
 import { cn } from '@/lib/utils';
 import { ScoreImpact } from './ScoreImpact';
-import { pauseStepLayout } from '@/screens/pause/components/pause-step-layout';
+import { pauseStepLayout } from '@/features/pause/public';
 import { Button } from '@/components/ui/button';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Slider } from '@/components/ui/slider';

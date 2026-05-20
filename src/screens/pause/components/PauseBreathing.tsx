@@ -3,7 +3,7 @@ import { motion, useReducedMotion } from 'framer-motion';
 import { Play, RefreshCw, ChevronRight } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import type { FeelStepTile } from '@/features/pause/public';
-import { pauseStepLayout } from '@/screens/pause/components/pause-step-layout';
+import { pauseStepLayout } from '@/features/pause/public';
 import { Button } from '@/components/ui/button';
 import { hapticFeedback } from '@/lib/haptics';
 import {
