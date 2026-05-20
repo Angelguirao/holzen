@@ -52,7 +52,7 @@ import {
 import type { MoodValue } from './domain/mood-value';
 import { runPauseReflectNoteUpdate } from './application/use-cases/ritual/reflect/steps/run-pause-reflect-note-update';
 import { runPauseReflectTagUpdate } from './application/use-cases/ritual/reflect/steps/run-pause-reflect-tag-update';
-import { runPauseFavoriteToggle } from './application/use-cases/ritual/reflect/run-pause-favorite-toggle';
+import { runPauseFavoriteToggle } from './application/use-cases/ritual/reflect/steps/run-pause-favorite-toggle';
 import { runPauseReflectionStepLogOnce } from './application/use-cases/ritual/reflect/steps/run-pause-reflection-step-log';
 import { runPauseOutcomeLog } from './application/use-cases/ritual/decide/run-pause-outcome-log';
 import { reflectionStepSessionStorage } from './infrastructure/edge/reflect/reflection-step-session-storage';
