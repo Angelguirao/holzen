@@ -1,6 +1,6 @@
 import { describe, expect, it, vi } from 'vitest';
 import { runReflectGeneration } from './run-reflect-generation';
-import type { ReflectGenerationProfileInput } from './reflect-generation-edge-params';
+import type { ReflectGenerationProfileInput } from '@/features/pause/domain/reflect-generation-edge-params';
 
 const profile: ReflectGenerationProfileInput = {
   reflectionTone: 'calm',
