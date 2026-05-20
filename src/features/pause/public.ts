@@ -94,6 +94,11 @@ export {
   type InterventionIdempotencyDecision,
 } from './application/use-cases/companion/intervention-idempotency';
 export {
+  applyCompanionOrchestrateRetryReset,
+  type CompanionOrchestrateRetryResetInput,
+  type CompanionOrchestrateRetryResetPorts,
+} from './application/use-cases/companion/apply-companion-orchestrate-retry-reset';
+export {
   reflectGenerationPrerequisite,
   type ReflectGenerationPrerequisite,
 } from './application/use-cases/reflect/generation-prerequisites';
