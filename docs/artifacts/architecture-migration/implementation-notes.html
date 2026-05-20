@@ -2051,6 +2051,25 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-20</span>
+      <span>Phase A slice — peel session quote + cron scheduling off public.ts (§6)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3><code>getSessionQuote</code> + <code>millisecondsUntilNextQuarterHour</code> off slim barrel</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1–#2 ritual moves are complete; <code>FeelStepTile</code> peel landed on remote in parallel. Continue backlog #3 §6: remove decide/home scheduling helpers from <code>public.ts</code>. <code>use-pause-session-decide-handler</code> and <code>use-holzen-home-context-state</code> import application modules directly (presentation-only consumers).</dd>
+      <dt>Deviation</dt>
+      <dd>None — did not add <code>public-hooks</code> re-exports (no screen imports these symbols).</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Did not colocate <code>breathing/</code> under <code>ritual/breathe/</code> in the same commit.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: continue §6 <code>public.ts</code> peel (session/home pure helpers) or optional <code>breathing/</code> → <code>ritual/breathe/</code>.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
 </body>
 </html>

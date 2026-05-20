@@ -13,7 +13,8 @@ import {
 } from '@/features/pause/application/use-cases/feedback/outcome-toast';
 import type { PauseImpactData } from '@/features/pause/application/use-cases/ritual/decide/impact-data';
 import { clearSession } from '@/features/pause/infrastructure/session/persisted-session-storage';
-import { getSessionQuote, type RitualDepth } from '@/features/pause/public';
+import type { RitualDepth } from '@/features/pause/public';
+import { getSessionQuote } from '@/features/pause/application/use-cases/session/wisdom-quotes';
 import type { MoodValue } from '../../domain/mood-value';
 import { invalidatePauseStatsDataForUser } from '@/features/pause/public-queries';
 
