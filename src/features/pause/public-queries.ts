@@ -198,7 +198,6 @@ export {
 export {
   EMPTY_COMPANION_UI_COMPLETION,
   loadCompanionUiCompletionState,
-  persistCompanionUiStepCompletion,
   type CompanionUiCompletionState,
   type CompanionUiCompletionStep,
 } from './infrastructure/companion/companion-ui-completion-sync';

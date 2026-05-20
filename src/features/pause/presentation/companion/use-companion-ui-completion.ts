@@ -4,10 +4,10 @@ import { hapticFeedback } from '@/lib/haptics';
 import {
   EMPTY_COMPANION_UI_COMPLETION,
   getCompanionUiCompletionQueryOptions,
-  persistCompanionUiStepCompletion,
   type CompanionUiCompletionStep,
   type CompanionUiCompletionState,
 } from '@/features/pause/public-queries';
+import { persistCompanionUiStepCompletion } from '@/features/pause/public-rpc';
 import { companionUiCompletionQueryKey } from '@/features/pause/application/queries/companion-ui-completion-query-key';
 
 /**
