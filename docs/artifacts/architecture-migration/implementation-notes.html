@@ -1956,6 +1956,25 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-20</span>
+      <span>Phase A slice — peel writingTextareaClassName to shared UI (§6)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3><code>writingTextareaClassName</code> → <code>components/ui/writing-textarea</code></h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>reflect/</code> → <code>ritual/reflect/</code>) was already complete on <code>cursor/arch-migrate-src-ca70</code> — no reflect folder moves. Continue backlog #3 §6 slim barrel: cross-route writing styles live in <code>src/components/ui/writing-textarea.ts</code>; <code>Textarea</code> and legacy <code>WritingField</code> import there. Removed <code>features/pause/domain/writing-surface.ts</code> and the <code>public.ts</code> re-export so pause barrel no longer owns a shared UI token.</dd>
+      <dt>Deviation</dt>
+      <dd>None — components may not import features; token is presentation-only.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Did not colocate <code>application/use-cases/breathing/</code> under <code>ritual/breathe/</code> in the same commit.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: optional <code>breathing/</code> → <code>ritual/breathe/</code>, peel <code>FeelStepTile</code> screen types to <code>public-hooks</code>, or wire more archive/library helpers off <code>public.ts</code>.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
 </body>
 </html>

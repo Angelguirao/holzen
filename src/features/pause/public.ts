@@ -245,4 +245,3 @@ export {
   normalizeLibrarySourceType,
 } from './domain/normalize-library-source-type';
 export { normalizeLibraryItemUrl } from './domain/library-item-url';
-export { writingTextareaClassName } from './domain/writing-surface';
