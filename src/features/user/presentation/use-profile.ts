@@ -4,7 +4,7 @@ import { toast } from 'sonner';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useAuth } from '@/features/auth/public';
 import { holzenLog } from '@/lib/holzen-console';
-import type { CompanionPrefs } from '@/features/pause/public';
+import type { CompanionPrefs } from '@/features/pause/public-hooks';
 import { normalizeTrackedAssetId } from '@/features/market/public';
 import {
   fetchProfileLastTriggerAt,
