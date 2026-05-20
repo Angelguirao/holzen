@@ -11,11 +11,11 @@ import {
   showPauseOutcomeNotCompletedToast,
   showPauseOutcomeSaveFailedToast,
 } from '@/features/pause/application/use-cases/feedback/outcome-toast';
+import type { PauseImpactData } from '@/features/pause/application/use-cases/impact-data';
 import { clearSession } from '@/features/pause/infrastructure/session/persisted-session-storage';
 import {
   getSessionQuote,
   type MoodValue,
-  type PauseImpactData,
   type RitualDepth,
 } from '@/features/pause/public';
 import { invalidatePauseStatsDataForUser } from '@/features/pause/public-queries';

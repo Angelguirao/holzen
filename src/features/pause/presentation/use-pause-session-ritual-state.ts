@@ -12,11 +12,11 @@ import {
   mapPersistedStep,
   type BriefPauseStep,
   type MoodValue,
-  type PauseImpactData,
   type PauseStep,
   type PersistedSession,
   type RitualDepth,
 } from '@/features/pause/public';
+import type { PauseImpactData } from '@/features/pause/application/use-cases/impact-data';
 import { usePauseSessionEntryPresentationEffects } from './use-pause-session-entry-presentation-effects';
 
 /**

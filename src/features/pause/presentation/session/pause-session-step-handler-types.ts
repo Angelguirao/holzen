@@ -6,12 +6,12 @@ import type {
   CompanionData,
   CompanionPrefs,
   MoodValue,
-  PauseImpactData,
   PauseStep,
   PersistedSession,
   RitualDepth,
   FeelStepTile,
 } from '@/features/pause/public';
+import type { PauseImpactData } from '@/features/pause/application/use-cases/impact-data';
 
 /** Subset of `usePauseSessionProviders` passed into mood chrome handlers. */
 export type PauseSessionMoodChromeProvidersSlice = {
