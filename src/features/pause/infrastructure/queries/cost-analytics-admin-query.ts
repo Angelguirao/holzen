@@ -1,7 +1,9 @@
 import { supabase } from '@/integrations/supabase/client';
-import type { TimePeriod } from '@/screens/admin/lib/admin-stats-bundle-query';
-import { ADMIN_QUERY_PREFIX } from '@/screens/admin/lib/admin-query-namespace';
+import type { TimePeriod } from '@/features/pause/domain/admin-time-period';
 import { PRICING } from '@/features/subscription/public';
+
+/** Matches `screens/admin/lib/admin-query-namespace` — keep in sync if the prefix changes. */
+const ADMIN_QUERY_PREFIX = ['admin'] as const;
 
 /** Raw rows for admin cost aggregation (`generation_attempts`). */
 export interface AttemptRow {
