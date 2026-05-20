@@ -14,7 +14,7 @@ import { LoadingSpinner } from '@/components/ui/loading-spinner';
 import { useSubscription } from '@/features/subscription/public-hooks';
 import { PRICING } from '@/features/subscription/public';
 import { fetchCheckoutEvents } from '@/features/subscription/public-queries';
-import { invokeEdge } from '@/lib/invoke-edge';
+import { notifyCheckoutConfirmation, retryFlexCredit } from '@/features/subscription/public-rpc';
 import { toast } from 'sonner';
 import {
   getCheckoutSuppressionWindowMs,
@@ -977,11 +977,7 @@ export function CheckoutConfirmation() {
             newBalance: projectedBalance,
           };
 
-    void invokeEdge<{
-      emailed?: boolean;
-      pushed?: number;
-      skipped?: string | null;
-    }>('notify-checkout-confirmation', { body: payload })
+    void notifyCheckoutConfirmation(payload)
       .then(({ data, error }) => {
         if (cancelled) return;
         settled = true;
@@ -1055,7 +1051,7 @@ export function CheckoutConfirmation() {
     //                     / server call itself rejected. User-facing
     //                     "nothing to do" responses are NOT errors.
     try {
-      const { data, error } = await invokeEdge<{ applied?: unknown; scanned?: unknown }>('retry-flex-credit');
+      const { data, error } = await retryFlexCredit();
       if (error) throw error;
       const applied = Number(data?.applied) || 0;
       const scanned = Number(data?.scanned) || 0;
