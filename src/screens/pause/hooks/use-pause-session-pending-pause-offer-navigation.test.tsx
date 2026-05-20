@@ -4,9 +4,13 @@ import { usePauseSessionPendingPauseOfferNavigation } from '@/screens/pause/hook
 
 const clearSessionMock = vi.fn();
 
-vi.mock('@/features/pause/infrastructure/session/persisted-session-storage', () => ({
-  clearSession: (...args: unknown[]) => clearSessionMock(...args),
-}));
+vi.mock('@/features/pause/public', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('@/features/pause/public')>();
+  return {
+    ...actual,
+    clearSession: (...args: unknown[]) => clearSessionMock(...args),
+  };
+});
 
 describe('usePauseSessionPendingPauseOfferNavigation', () => {
   beforeEach(() => {
