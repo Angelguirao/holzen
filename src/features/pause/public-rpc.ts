@@ -47,6 +47,8 @@ import {
   runPauseReflectNoteUpdate,
   runPauseReflectTagUpdate,
 } from './application/use-cases/reflect/run-pause-reflect-metadata-log';
+import { runPauseReflectionStepLogOnce } from './application/use-cases/reflect/run-pause-reflection-step-log';
+import { reflectionStepSessionStorage } from './infrastructure/reflect/reflection-step-session-storage';
 
 export type { BulkHoldApplyResult };
 export type { PostPauseFeelSnapshot };
@@ -77,6 +79,18 @@ export function logRetrospectiveOutcome(params: {
   outcome: string;
 }): Promise<PauseState | null> {
   return logRetrospectiveOutcomeUseCase(supabasePauseRepository, params);
+}
+
+/** Reflect progression — `reflection_step` once per instance (sessionStorage dedupe). */
+export function logPauseReflectionStepOnce(pauseInstanceId: string) {
+  return runPauseReflectionStepLogOnce(
+    { pauseInstanceId },
+    {
+      storage: reflectionStepSessionStorage,
+      logStep: ({ instanceId, payload }) =>
+        pauseLogStep({ instanceId, stepType: 'reflection_step', payload }),
+    },
+  );
 }
 
 /** Reflect post-it note — `note_updated` step. */

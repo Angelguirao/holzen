@@ -23,3 +23,4 @@ export {
   type UsePauseReflectGenerationParams,
 } from './presentation/use-pause-reflect-generation';
 export { useCompanionSlotOrchestratePorts } from './presentation/use-companion-slot-orchestrate-ports';
+export { usePauseReflectionStepLog } from './presentation/use-pause-reflection-step-log';
