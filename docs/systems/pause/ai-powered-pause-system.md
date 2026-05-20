@@ -279,7 +279,7 @@ This section is **client-centric** (Home open → ritual → companions): `**use
 
 ### 4.1 Manual pause — request order (click path)
 
-`manualTrigger` → `generateMessage` in `**src/screens/home/hooks/use-holzen.ts**` → Pause UI + `**src/screens/pause/hooks/use-companion-data.ts**`.
+`manualTrigger` → `openManualPauseFromHome` via **`HolzenProvider`** / `useHolzenManualTriggerOrchestration` (`public-hooks` / `public-rpc`) → Pause UI + **`useCompanionData`** (`features/pause/presentation/use-companion-data.ts`).
 
 | Step | Where | What happens |
 | ---- | ----- | -------------- |
@@ -784,9 +784,9 @@ supabase/functions/
     ├── quality.ts, sanitize.ts, cache.ts, content-library.ts, observe.ts, ratelimit.ts, fallbacks.ts
 
 src/lib/load-reflect-recency-hints.ts   # browser holzen-reflect: moodHistory + dedup pools (parity with pauseRecencyInputs on claim)
-src/screens/home/hooks/use-holzen.ts
-src/screens/pause/hooks/use-companion-data.ts
-src/screens/pause/components/CompanionSection.tsx
+src/app/components/HolzenProvider.tsx   # Home manual trigger → openManualPauseFromHome (public-rpc)
+src/features/pause/presentation/use-companion-data.ts   # export: public-hooks
+src/screens/pause/components/CompanionSection.tsx   # useCompanionSection (public-hooks)
 src/screens/admin/AdminScreen.tsx     # ops UI (Monitor, Content, Sources, …) — adjacent tooling, not pause pipeline
 ```
 
