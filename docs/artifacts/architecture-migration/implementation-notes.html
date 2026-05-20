@@ -2450,6 +2450,25 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-20</span>
+      <span>Phase A slice — peel session mount/persist/go-back to public-hooks (§6)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>Backlog #1 complete; continue backlog #3 slim <code>public.ts</code></h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd><code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code> was already complete (note/tag split landed prior). Peel session mount/persist/go-back from <code>public.ts</code> — re-export on <code>public-hooks.ts</code> for screens; feature <code>presentation/</code> imports use-case modules directly (avoids eager Supabase from the hooks barrel in unit tests). Domain/session guards stay on <code>public.ts</code>.</dd>
+      <dt>Deviation</dt>
+      <dd>None — matches §6 barrel split (presentation helpers on <code>public-hooks</code>).</dd>
+      <dt>Tradeoffs</dt>
+      <dd><code>public-hooks</code> carries non-hook pure builders — same pattern as <code>pauseStepLayout</code> and brief integrate ring helpers (May 2026).</dd>
+      <dt>Open questions</dt>
+      <dd>Next: peel remaining session scaffold bundles (<code>step-bundles</code>, <code>hydration</code>) or wire <code>persisted-session-storage</code> through a port (backlog #4).</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
 </body>
 </html>
