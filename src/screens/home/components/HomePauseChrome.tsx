@@ -79,7 +79,8 @@ function writePersistedSnapshot(snap: CooldownSnapshot): void {
   } catch { void 0; }
 }
 
-const CRON_INTERVAL_MS = 15 * 60_000; // matches `millisecondsUntilNextQuarterHour` cadence
+/** Keep in sync with `PAUSE_CRON_QUARTER_INTERVAL_MS` (`public-hooks` / scheduling use case). */
+const CRON_INTERVAL_MS = 15 * 60_000;
 
 /**
  * Compute the wall-clock instant of the first cron check that can actually
