@@ -35,3 +35,12 @@ export async function logCompanionFullviewOpened(input: {
     },
   });
 }
+
+/** Persists admin rapid-testing toggle for cross-device dev-mode hydration. */
+export async function logDevModeSetting(userId: string, enabled: boolean): Promise<void> {
+  await insertPauseAnalyticsEvent({
+    userId,
+    event: 'dev_mode_setting',
+    metadata: { enabled },
+  });
+}

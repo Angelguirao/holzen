@@ -55,6 +55,7 @@ export {
 export {
   insertPauseAnalyticsEvent,
   logCompanionFullviewOpened,
+  logDevModeSetting,
   type CompanionFullviewKind,
 } from './infrastructure/analytics-events';
 export {

@@ -8,9 +8,21 @@ vi.mock('@/integrations/supabase/client', () => ({
   },
 }));
 
-describe('logCompanionFullviewOpened', () => {
+describe('pause analytics_events inserts', () => {
   beforeEach(() => {
     insert.mockClear();
+  });
+
+  it('inserts dev_mode_setting row', async () => {
+    const { logDevModeSetting } = await import('./analytics-events');
+    await logDevModeSetting('user-1', true);
+    expect(insert).toHaveBeenCalledWith(
+      expect.objectContaining({
+        user_id: 'user-1',
+        event: 'dev_mode_setting',
+        metadata: { enabled: true },
+      }),
+    );
   });
 
   it('inserts companion_fullview_opened row', async () => {
