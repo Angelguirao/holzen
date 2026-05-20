@@ -3,20 +3,6 @@ import type { CompanionData } from '@/features/pause/domain/companion-card-types
 import { invokeHolzenReflect } from './holzen-reflect-edge';
 import { loadReflectRecencyHints } from './load-reflect-recency-hints';
 
-/** Reads persisted reflect-step copy (`pause_ai_artifacts.kind === 'reflection_text'`). */
-export async function fetchOpeningMessageForPauseInstance(pauseInstanceId: string): Promise<string | null> {
-  const { data, error } = await supabase
-    .from('pause_ai_artifacts' as never)
-    .select('content')
-    .eq('pause_instance_id', pauseInstanceId)
-    .eq('kind', 'reflection_text')
-    .maybeSingle();
-  if (error || !data) return null;
-  const row = data as { content: unknown };
-  const c = row.content as Record<string, unknown> | null;
-  return typeof c?.message === 'string' ? (c.message as string).trim() || null : null;
-}
-
 export type PersistReflectionArtifactsParams = {
   pauseInstanceId: string;
   userId: string;

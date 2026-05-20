@@ -2070,6 +2070,25 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-20</span>
+      <span>Phase A slice — group reflect opening-message read under queries/reflect (Tier 5)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>Backlog #1 complete; <code>fetchOpeningMessageForPauseInstance</code> → <code>opening-message-artifact-query</code></h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd><code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code> was already complete on <code>cursor/arch-migrate-src-ca70</code>. Colocate persisted <code>reflection_text</code> reads beside <code>haiku-artifact-query</code>; <code>reflection-artifact.ts</code> keeps edge invoke + upsert only. <code>public-queries</code> re-export path only; presentation still imports via <code>public-queries</code>.</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior unchanged; lazy hydrate for Reflect step unchanged.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Did not colocate <code>breathing/</code> under <code>ritual/breathe/</code> in the same commit.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: continue §6 <code>public.ts</code> peel (session/home pure helpers) or optional <code>breathing/</code> → <code>ritual/breathe/</code>.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
 </body>
 </html>
