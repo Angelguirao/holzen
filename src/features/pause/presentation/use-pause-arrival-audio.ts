@@ -1,7 +1,8 @@
 import { useEffect, useRef } from 'react';
-import { playNotificationTone, prefetchNotificationTone } from '@/screens/home/lib/notification-tone';
+import { playNotificationTone, prefetchNotificationTone } from '@/lib/notification-tone';
+import { resolvePauseArrivalToneAction } from '@/features/pause/public';
 
-function readSoundEnabled(): boolean {
+function readHolzenSoundEnabled(): boolean {
   try {
     return localStorage.getItem('holzen_sound_enabled') !== 'false';
   } catch {
@@ -10,7 +11,7 @@ function readSoundEnabled(): boolean {
 }
 
 /** Prefetch tone once; play once per distinct open pause when `newPauseArrival` fires. */
-export function useHomePauseAudio(
+export function usePauseArrivalAudio(
   newPauseArrival: boolean,
   pauseInstanceId: string | null,
   clearNewPauseArrival: () => void,
@@ -22,14 +23,19 @@ export function useHomePauseAudio(
   }, []);
 
   useEffect(() => {
-    if (!newPauseArrival || !pauseInstanceId) return;
-    if (pauseInstanceId === lastToneInstanceRef.current) {
+    const action = resolvePauseArrivalToneAction(
+      newPauseArrival,
+      pauseInstanceId,
+      lastToneInstanceRef.current,
+    );
+    if (action === 'none') return;
+    if (action === 'clear-only') {
       clearNewPauseArrival();
       return;
     }
     lastToneInstanceRef.current = pauseInstanceId;
-    if (readSoundEnabled()) {
-      playNotificationTone();
+    if (readHolzenSoundEnabled()) {
+      void playNotificationTone();
     }
     clearNewPauseArrival();
   }, [newPauseArrival, pauseInstanceId, clearNewPauseArrival]);
