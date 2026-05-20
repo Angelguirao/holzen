@@ -39,9 +39,11 @@ Treat Phases **1–2** as the **product spine** for pause; **3–8** as the **ba
 
 ## Protected shell and home
 
+> **Pause-first (2026-05):** shipped Home widgets are **goal-why**, **market**, **your-pause** only — not journey-pulse, quick-capture, or evening/night ([home.md](../screens/home.md), [active-surface.md](../ops/active-surface.md)). Rows below may describe full-IA widget inventory for historical review.
+
 | Slice | Scope (indicative) | Est. (h) | Notes |
 |-------|---------------------|----------|--------|
-| **Home dashboard** | `Home.tsx`, widgets (pause-first, market, goal, journey pulse, quick capture, evening), onboarding, Pro gating, ordering, pull-to-refresh, query params (e.g. `subscribed`) | 8–14 | Highest coupling; consider one doc with subsections per widget |
+| **Home dashboard** | `HomeScreen.tsx`, widgets (**pause-first:** goal-why, market, your-pause; *full-IA also had journey pulse, quick capture, evening*), onboarding, subscription gating, ordering, pull-to-refresh, query params (e.g. `subscribed`) | 8–14 | Highest coupling; see [home.md](../screens/home.md) for shipped widget set |
 | **Global shell** | `AppLayout`, `BottomNav`, `NotificationBell`, `PauseReadyBanner`, `useLanguageSync` | 3–5 | Overlaps notifications and auto-trigger |
 | **Auto-trigger → pause** | `useAutoTrigger`, navigation to `/pause`, interaction with home chrome | 2–4 | Overlap with Phase 2 if reviewed together |
 
