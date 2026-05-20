@@ -1,12 +1,18 @@
 import { useCallback } from 'react';
 import type { NavigateFunction } from 'react-router-dom';
-import type { CompanionData, CompanionPrefs } from '@/features/pause/public';
 import type { BtcMoveSeverity } from '@/features/market/public';
+import type {
+  CompanionData,
+  CompanionPrefs,
+  ManualPauseTriggerResult,
+} from '@/features/pause/public';
+import {
+  buildHomePauseSessionLocationState,
+  canNavigateToPauseSession,
+  shouldNavigateAfterManualTrigger,
+} from '@/features/pause/public';
 import { holzenLog } from '@/lib/holzen-console';
-import { canNavigateToPauseSession } from '@/screens/home/lib/home-pause-navigate';
 import { trackEvent } from '@/lib/posthog';
-import type { ManualPauseTriggerResult } from '@/features/pause/public';
-import { type PauseSessionLocationState } from '@/features/pause/public';
 
 export type PauseDismissAnalyticsSurface = 'home_zen_reflection' | 'home_your_pause_widget';
 
@@ -51,15 +57,15 @@ export function useHomePauseActions(args: {
     }
     holzenLog.home('Need a moment: invoking manualTrigger');
     const result = await manualTrigger();
-    if (!result.opened || result.pendingOffer || !result.instanceId) return;
-    const navState: PauseSessionLocationState = {
-      reflectionMessage: message ?? '',
+    if (!shouldNavigateAfterManualTrigger(result)) return;
+    const navState = buildHomePauseSessionLocationState({
+      message,
       context: result.context ?? context,
-      pauseInstanceId: result.instanceId,
+      pauseInstanceId: result.instanceId ?? undefined,
       companions,
       companionPrefs,
       severity,
-    };
+    });
     holzenLog.home('Navigate to /pause after Need a moment', {
       pauseInstanceId: result.instanceId,
     });
@@ -89,14 +95,14 @@ export function useHomePauseActions(args: {
 
   const handleNavigatePauseWithThis = useCallback(() => {
     if (!canNavigateToPauseSession(message, lastPauseInstanceId)) return;
-    const navState: PauseSessionLocationState = {
-      reflectionMessage: message ?? '',
+    const navState = buildHomePauseSessionLocationState({
+      message,
       context,
       pauseInstanceId: lastPauseInstanceId ?? undefined,
       companions,
       companionPrefs,
       severity,
-    };
+    });
     holzenLog.home('Navigate to /pause (pause with this message)', {
       pauseInstanceId: lastPauseInstanceId,
       severity,
