@@ -1,12 +1,12 @@
 import { useQueryClient } from '@tanstack/react-query';
 import { updateUserPassword, useAuth } from '@/features/auth/public';
+import { fetchSettingsDataExportBundle } from '@/features/pause/public-queries';
 import { getProfileRowQueryOptions } from '@/features/user/public-queries';
 import { useHolzen } from '@/screens/home/hooks/use-holzen';
 import { useSubscription } from '@/features/subscription/public-hooks';
 import { useInstallPrompt } from '@/app/hooks/use-install-prompt';
 import { usePushNotifications } from '@/features/notifications/public-hooks';
 import { useLatestChangelogVersion } from '@/screens/settings/hooks/use-latest-changelog-version';
-import { supabase } from '@/integrations/supabase/client';
 import { invokeEdge } from '@/lib/invoke-edge';
 import { trackEvent } from '@/lib/posthog';
 import { toast } from 'sonner';
@@ -186,36 +186,15 @@ export function useSettingsModel() {
     setExporting(true);
     try {
       const userId = user.id;
-      const [
-        profile,
-        { data: pauses },
-        { data: stepEvents },
-        { data: companionEvents },
-        { data: artifacts },
-      ] = await Promise.all([
+      const [profile, exportBundle] = await Promise.all([
         queryClient.fetchQuery(getProfileRowQueryOptions(userId)),
-        supabase
-          .from('v_pause_full' as never)
-          .select('*')
-          .eq('user_id', user.id)
-          .order('created_at', { ascending: false }),
-        supabase
-          .from('pause_step_events' as never)
-          .select('pause_instance_id, step_type, payload, created_at')
-          .eq('user_id', user.id),
-        supabase
-          .from('pause_companion_events' as never)
-          .select(
-            'pause_instance_id, companion_type, action, counts_for_pause, non_counting_reason, entry_point, created_at',
-          )
-          .eq('user_id', user.id),
-        supabase
-          .from('pause_ai_artifacts' as never)
-          .select('pause_instance_id, kind, content, created_at')
-          .eq('user_id', user.id),
+        fetchSettingsDataExportBundle(userId),
       ]);
 
-      const pauseRows = (pauses ?? []) as Record<string, unknown>[];
+      const pauseRows = exportBundle.pauses;
+      const stepEvents = exportBundle.stepEvents;
+      const companionEvents = exportBundle.companionEvents;
+      const artifacts = exportBundle.aiArtifacts;
       const dateStr = new Date().toISOString().slice(0, 10);
 
       if (format === 'csv') {
@@ -266,9 +245,9 @@ export function useSettingsModel() {
               }
             : null,
           pauses: pauseRows,
-          step_events: stepEvents ?? [],
-          companion_events: companionEvents ?? [],
-          ai_artifacts: artifacts ?? [],
+          step_events: stepEvents,
+          companion_events: companionEvents,
+          ai_artifacts: artifacts,
         };
 
         const blob = new Blob([JSON.stringify(exportPayload, null, 2)], {
