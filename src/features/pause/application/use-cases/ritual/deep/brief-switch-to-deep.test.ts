@@ -1,9 +1,9 @@
 import { describe, expect, it } from 'vitest';
+import { pauseInstanceHasBriefRitualTag, type PauseStepEventRow } from '@/features/pause/domain/pause-state';
 import {
   BRIEF_SWITCH_TO_DEEP_STEP,
   briefSwitchToDeepPauseState,
-} from '@/features/pause/public';
-import { pauseInstanceHasBriefRitualTag, type PauseStepEventRow } from '@/features/pause/public';
+} from './brief-switch-to-deep';
 
 describe('briefSwitchToDeepPauseState', () => {
   it('lands on Reflect with first breath treated complete (brief breath already RPC-logged)', () => {

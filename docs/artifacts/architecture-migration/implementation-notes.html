@@ -2488,6 +2488,25 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-20</span>
+      <span>Phase A slice — peel ritual brief/deep navigation off public.ts (§6)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>Backlog #1 complete; continue backlog #3 slim <code>public.ts</code></h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd><code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code> was already complete on <code>cursor/arch-migrate-src-ca70</code>. Peel brief go-back, past-step click, brief→deep switch, deep go-back, and scaffold ritual derived from <code>public.ts</code> — feature <code>presentation/</code> and co-located application tests import use-case modules directly; no screen-facing re-export needed (conductors only).</dd>
+      <dt>Deviation</dt>
+      <dd>None — matches §6 barrel split.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Session hydration / step-bundle exports remain on <code>public.ts</code> until the next peel cluster.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: peel session hydration + step-map restores off <code>public.ts</code> in application tests, or wire more mutations through <code>PauseRepository</code> (backlog #4).</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
 </body>
 </html>
