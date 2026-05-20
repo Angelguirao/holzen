@@ -1253,6 +1253,25 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-20</span>
+      <span>Phase A slice — mood chrome conductor into presentation/reflect</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3><code>use-pause-session-mood-chrome-handlers</code> → <code>presentation/reflect/</code></h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code>) is complete on this branch. Colocate the session mood + favorite + chrome-close conductor with other reflect presentation hooks; <code>use-pause-session-step-handlers</code> imports from <code>reflect/</code>; screens still use <code>public-hooks</code>.</dd>
+      <dt>Deviation</dt>
+      <dd>None — single-file move; mood persistence hook remains at <code>presentation/</code> root until a broader session subfolder slice.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Did not move <code>use-pause-session-mood-and-persist</code> in the same commit — keeps slice to one conductor file.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: peel <code>formatCompanionHistoryRelativeDay</code> / <code>estimateReadTime</code> from <code>public.ts</code> (frame screen helpers) or <code>presentation/home/</code> folder grouping.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
 </body>
 </html>
