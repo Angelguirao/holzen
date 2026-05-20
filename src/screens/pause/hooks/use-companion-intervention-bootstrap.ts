@@ -1,22 +1,13 @@
 import { useState, useEffect, useLayoutEffect, useRef } from 'react';
 import { toast as sonnerToast } from 'sonner';
-import { invokeEdge } from '@/lib/invoke-edge';
-import { holzenLog } from '@/lib/holzen-console';
 import type { InterventionState } from '@/features/pause/public';
-import { fetchParsedPauseArtifactCache } from '@/features/pause/public-queries';
-import { useCompanionOrchestrateSession } from '@/screens/pause/hooks/use-companion-orchestrate-session';
-import {
-  buildInterventionOrchestrateBody,
-  hasInvokedIntervention,
-  hydrateCompanionSlotsFromArtifactCache,
-  hydrateOrchestrateSlotsFromInterventionResponse,
-  isFilledOrchestrateSlot,
-  resolveCompanionOrchestrateInvokeFailure,
-  runOnceIntervention,
-  type CompanionSlotAutosaveParams,
-  type CompanionSlotCommitters,
-  type CompanionSlotRelaxations,
+import type {
+  CompanionSlotAutosaveParams,
+  CompanionSlotCommitters,
+  CompanionSlotRelaxations,
 } from '@/features/pause/public';
+import { useCompanionOrchestrateSession } from '@/screens/pause/hooks/use-companion-orchestrate-session';
+import { useCompanionInterventionFetch } from '@/screens/pause/hooks/use-companion-intervention-fetch';
 
 export interface UseCompanionInterventionBootstrapParams {
   pauseInstanceId?: string | null;
@@ -87,127 +78,19 @@ export function useCompanionInterventionBootstrap({
     interventionSkippedRef.current = false;
   }, [intervention, pauseInstanceId]);
 
-  useEffect(() => {
-    if (!pauseInstanceId) return;
-
-    const key = `${pauseInstanceId}:${retryCount}`;
-    if (interventionFetchKeyRef.current === key) return;
-    interventionFetchKeyRef.current = key;
-
-    let cancelled = false;
-    setInterventionLoading(true);
-    setInterventionError(false);
-
-    (async () => {
-      try {
-        const cached = await fetchParsedPauseArtifactCache(pauseInstanceId);
-        if (cancelled) return;
-
-        const { hasCachedIntervention } = hydrateCompanionSlotsFromArtifactCache({
-          cached,
-          fetchedSlots: fetchedSlotsRef.current,
-          committers: slotCommitters,
-          setIntervention,
-        });
-        if (hasCachedIntervention) {
-          setInterventionLoading(false);
-          return;
-        }
-
-        if (hasInvokedIntervention(pauseInstanceId)) {
-          holzenLog.companion('orchestrate intervention skipped (idempotency)', {
-            pause_instance_prefix: pauseInstanceId.slice(0, 8),
-          });
-          interventionSkippedRef.current = true;
-          setInterventionLoading(false);
-          return;
-        }
-
-        holzenLog.companion('orchestrate invoke (intervention only)', {
-          holzenInvokeSource: 'browser_pause_intervention',
-          pause_instance_prefix: pauseInstanceId.slice(0, 8),
-        });
-
-        const orchestrateSession = await loadOrchestrateSession();
-        if (!orchestrateSession) return;
-        const { data, error: fnError } = await runOnceIntervention(pauseInstanceId, () =>
-          invokeEdge('companion-orchestrate', {
-            body: buildInterventionOrchestrateBody(orchestrateSession),
-          }),
-        );
-
-        if (cancelled) return;
-
-        const body = data as Record<string, unknown> | null;
-        const interventionFailure = await resolveCompanionOrchestrateInvokeFailure(
-          fnError,
-          body,
-          'intervention',
-          'This AI feature is temporarily unavailable. Please try again in a minute.',
-        );
-        if (interventionFailure) {
-          holzenLog.companion('orchestrate intervention invoke failed', {
-            pause_instance_prefix: pauseInstanceId.slice(0, 8),
-            fnError: fnError?.message ?? null,
-            bodyError: interventionFailure.userMessage,
-            bodyCode: interventionFailure.code,
-          });
-          setInterventionError(true);
-          setInterventionLoading(false);
-          return;
-        }
-
-        if (body?.intervention) {
-          setIntervention(body.intervention as InterventionState);
-        } else {
-          setInterventionError(true);
-        }
-        setInterventionLoading(false);
-
-        holzenLog.companion('orchestrate intervention ok', {
-          pause_instance_prefix: pauseInstanceId.slice(0, 8),
-          hasIntervention: Boolean(body?.intervention),
-        });
-
-        const orchestrateBody = (data ?? {}) as Record<string, unknown>;
-        const sigSlot = hydrateOrchestrateSlotsFromInterventionResponse(
-          orchestrateBody,
-          fetchedSlotsRef.current,
-          slotCommitters,
-          setCacheRelaxations,
-        );
-        if (isFilledOrchestrateSlot(sigSlot)) {
-          holzenLog.companion('hydrated signal from intervention response', {
-            pause_instance_prefix: pauseInstanceId.slice(0, 8),
-            source: sigSlot.source,
-            cacheRelaxation: sigSlot.cacheRelaxation ?? null,
-          });
-        }
-      } catch (e) {
-        console.error('[useCompanionInterventionBootstrap] intervention fetch failed', e);
-        setInterventionError(true);
-      } finally {
-        if (!cancelled) setInterventionLoading(false);
-      }
-    })();
-
-    return () => {
-      cancelled = true;
-    };
-  }, [
+  useCompanionInterventionFetch({
     pauseInstanceId,
     retryCount,
-    context,
-    reflectionMessage,
-    mood,
-    severityNumber,
-    language,
+    interventionFetchKeyRef,
+    interventionSkippedRef,
+    setInterventionLoading,
+    setInterventionError,
+    setIntervention,
     loadOrchestrateSession,
-    autoSaveToLibrary,
     slotCommitters,
     fetchedSlotsRef,
     setCacheRelaxations,
-  ]);
+  });
 
   return {
     intervention,
