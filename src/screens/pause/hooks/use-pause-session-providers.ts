@@ -6,7 +6,7 @@ import { useHolzen } from '@/screens/home/hooks/use-holzen';
 import { useSubscription } from '@/features/subscription/public-hooks';
 import { useProGate } from '@/features/subscription/public-hooks';
 import { usePauseSessionExitNavigation } from '@/features/pause/public-hooks';
-import { usePauseSessionBreathSecondLabelVariant } from '@/screens/pause/hooks/use-pause-session-breath-second-label-variant';
+import { usePauseSessionBreathSecondLabelVariant } from '@/features/pause/public-hooks';
 import { JOURNEY_PREFIX } from '@/lib/app-routes';
 import { clearSession } from '@/features/pause/public';
 import type { PauseSessionShellHolzen } from '@/screens/pause/hooks/use-pause-session-shell';
