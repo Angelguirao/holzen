@@ -109,7 +109,7 @@ export {
 export {
   reflectGenerationPrerequisite,
   type ReflectGenerationPrerequisite,
-} from './application/use-cases/reflect/generation-prerequisites';
+} from './application/use-cases/ritual/reflect/generation-prerequisites';
 export {
   isAbortLikeReflectError,
   reflectGenerationUserErrorMessage,

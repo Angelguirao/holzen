@@ -1,4 +1,4 @@
-import type { ReflectGenerationPrerequisite } from './generation-prerequisites';
+import type { ReflectGenerationPrerequisite } from '../ritual/reflect/generation-prerequisites';
 import type { RunReflectGenerationResult } from './run-reflect-generation';
 
 export type ReflectGenerationPrefetch =

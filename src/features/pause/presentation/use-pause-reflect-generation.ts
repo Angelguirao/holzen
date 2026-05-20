@@ -2,7 +2,7 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '@/features/auth/public';
 import { useProfile } from '@/features/user/public-hooks';
-import { reflectGenerationPrerequisite } from '@/features/pause/application/use-cases/reflect/generation-prerequisites';
+import { reflectGenerationPrerequisite } from '@/features/pause/application/use-cases/ritual/reflect/generation-prerequisites';
 import { reflectGenerationUserErrorMessage } from '@/features/pause/application/use-cases/ritual/reflect/reflect-generation-errors';
 import {
   messageFromReflectGenerationResult,
