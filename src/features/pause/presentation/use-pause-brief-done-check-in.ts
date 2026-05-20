@@ -1,6 +1,6 @@
 import { useCallback, useLayoutEffect, useRef, useState } from 'react';
 import type { TFunction } from 'i18next';
-import { clampFeelIntensity } from '../application/use-cases/ritual/clamp-feel-intensity';
+import { clampFeelIntensity } from '@/features/pause/application/use-cases/ritual/feel/clamp-feel-intensity';
 import type { MoodValue } from '../domain/mood-value';
 import { showPauseStepSyncFailedToast } from '@/features/pause/application/use-cases/feedback/step-sync-toast';
 import { isPauseMoodValue } from '@/features/pause/public';

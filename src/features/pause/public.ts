@@ -353,13 +353,13 @@ export {
   initialEmotionSkippedLogDedupeKey,
   initialEmotionSkippedLoggedPayload,
   type InitialEmotionLogOpts,
-} from './application/use-cases/session/initial-emotion-log';
+} from './application/use-cases/ritual/feel/initial-emotion-log';
 export {
   initialEmotionResetUi,
   runInitialEmotionSelect,
   runInitialEmotionSkip,
   type InitialEmotionUiState,
-} from './application/use-cases/session/run-initial-emotion-log';
+} from './application/use-cases/ritual/feel/run-initial-emotion-log';
 export {
   formatPauseOpenMaxRemaining,
   pauseOpenMaxDeadlineMs,

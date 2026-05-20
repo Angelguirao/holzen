@@ -1,5 +1,5 @@
-import type { MoodValue } from '@/features/pause/public';
-import type { FeelStepTile } from '@/features/pause/public';
+import type { FeelStepTile } from '@/features/pause/domain/feel-step-tile';
+import type { MoodValue } from '@/features/pause/domain/mood-value';
 
 export type InitialEmotionLogOpts = {
   briefRitual?: boolean;

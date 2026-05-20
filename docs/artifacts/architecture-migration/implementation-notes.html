@@ -1443,6 +1443,25 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-20</span>
+      <span>Phase A slice — feel ritual cluster → ritual/feel/ (Tier 5)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3><code>initial-emotion-log</code> + <code>run-initial-emotion-log</code> + <code>clamp-feel-intensity</code></h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>reflect/</code> → <code>ritual/reflect/</code>) was already complete on this branch. Next interior beat: colocate Feel-step payload builders, select/skip use cases, and intensity clamp under <code>application/use-cases/ritual/feel/</code> per §3 / §10.1. <code>public.ts</code> re-exports unchanged for screens; presentation <code>use-pause-brief-done-check-in</code> imports clamp from <code>ritual/feel/</code> directly.</dd>
+      <dt>Deviation</dt>
+      <dd>None — mechanical move; fixed <code>initial-emotion-log</code> to import mood/tile types from <code>domain/</code> instead of <code>public</code> (layer hygiene).</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Did not move <code>shift-emotion-log</code> or <code>post-pause-emotion-log</code> in the same commit — separate <code>ritual/feel/</code> vs <code>ritual/done/</code> slices.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: §6 <code>public.ts</code> peel (zoom-out types) or wire <code>runInitialEmotionSelect</code> to take <code>PauseRepository</code> in the use case (presentation already uses <code>logInitialEmotionStep</code> via <code>public-rpc</code>).</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
 </body>
 </html>
