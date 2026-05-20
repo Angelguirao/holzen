@@ -29,7 +29,7 @@ The authoritative list of PostHog events Holzen emits. Deliberate events only â€
 |------|------|------------|
 | `intervention_idempotency_skip` | Idempotency layer skips a duplicate `companion-orchestrate` intervention call | `{ pause_instance_id, layer }` |
 | `intervention_idempotency_dedup` | Two callers joined the in-flight request | `{ pause_instance_id, â€¦ }` |
-| `intervention_idempotency_storage_error` / `intervention_idempotency_fallback_used` / `intervention_first_call_latency` | Storage / latency instrumentation | (see `src/features/pause/application/use-cases/companion/intervention-idempotency.ts`) |
+| `intervention_idempotency_storage_error` / `intervention_idempotency_fallback_used` / `intervention_first_call_latency` | Storage / latency instrumentation | (see `src/features/pause/application/use-cases/ritual/frame/intervention-idempotency.ts`) |
 
 ## Active events
 
