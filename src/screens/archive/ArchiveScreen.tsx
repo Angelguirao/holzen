@@ -21,7 +21,7 @@ import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import { useAuth } from '@/features/auth/public';
-import type { ArchiveMainSegment } from '@/features/pause/public';
+import type { ArchiveMainSegment } from '@/features/pause/public-hooks';
 
 type SortMode = 'newest' | 'oldest' | 'alphabetical';
 

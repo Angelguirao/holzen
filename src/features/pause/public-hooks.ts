@@ -24,6 +24,8 @@ export {
   pauseOpenMaxDeadlineMs,
   PAUSE_OPEN_MAX_AGE_MS,
 } from './application/use-cases/session/open-max-countdown';
+export { pauseWindowShowsClockCountdown } from './domain/pause-state';
+export type { ArchiveMainSegment } from './domain/archive-segment';
 export {
   PAUSE_MOOD_GROUPS,
   PAUSE_MOOD_VALUES,
