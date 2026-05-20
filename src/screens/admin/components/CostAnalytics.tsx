@@ -25,17 +25,17 @@ import {
   Wallet,
 } from 'lucide-react';
 import { PERIOD_OPTIONS, TAB_TRIGGER_CLASS, label } from '@/screens/admin/components/admin-constants';
-import type { TimePeriod } from '@/screens/admin/lib/admin-stats-bundle-query';
 import { PRICING } from '@/features/subscription/public';
 import {
   ADMIN_COST_GENERATION_ATTEMPTS_QUERY_PREFIX,
   ADMIN_COST_MRR_SNAPSHOT_QUERY_KEY,
-  type AttemptRow,
   getAdminCostGenerationAttempts7dShadowQueryOptions,
   getAdminCostGenerationAttemptsQueryOptions,
   getAdminCostMrrSnapshotQueryOptions,
+  type AdminCostAttemptRow as AttemptRow,
   type MrrSnapshot,
-} from '@/screens/admin/lib/admin-cost-analytics-query';
+  type TimePeriod,
+} from '@/features/pause/public-queries';
 import { ProviderHealthCard } from '@/screens/admin/components/ProviderHealthCard';
 
 /** All AI features we expect to see logging in `generation_attempts`. */

@@ -125,6 +125,19 @@ export {
   type SpendSnapshot,
 } from './infrastructure/queries/app-config-admin-query';
 export { upsertAppConfigRow } from './infrastructure/queries/app-config-admin-mutations';
+export type { TimePeriod } from './domain/admin-time-period';
+export {
+  ADMIN_COST_GENERATION_ATTEMPTS_QUERY_PREFIX,
+  ADMIN_COST_MRR_SNAPSHOT_QUERY_KEY,
+  adminCostGenerationAttemptsQueryKey,
+  fetchCostAnalyticsMrrSnapshot,
+  fetchGenerationAttemptsForPeriod,
+  getAdminCostGenerationAttempts7dShadowQueryOptions,
+  getAdminCostGenerationAttemptsQueryOptions,
+  getAdminCostMrrSnapshotQueryOptions,
+  type AttemptRow as AdminCostAttemptRow,
+  type MrrSnapshot,
+} from './infrastructure/queries/cost-analytics-admin-query';
 export {
   BULK_HOLD_PENDING_DISABLED_USER_ID,
   BULK_HOLD_PENDING_QUERY_LEAF,
