@@ -1,4 +1,4 @@
-import { insertPauseAnalyticsEvent } from '@/features/pause/public-queries';
+import { insertPauseAnalyticsEvent } from '../public-queries';
 
 /** Fire-and-forget PWA install funnel events (`analytics_events` table). */
 export function logPwaInstallAnalyticsEvent(
