@@ -4,26 +4,10 @@ import type {
   CollectionMemberPause,
   LibraryBundle,
 } from '@/features/pause/domain/library-bundle';
+import { readJsonLocalStorage, writeJsonLocalStorage } from './json-local-storage';
 
 export const LIBRARY_CACHE_KEY_COLLECTIONS = 'holzen_library_collections';
 export const LIBRARY_CACHE_KEY_COLLECTION_ITEMS = 'holzen_library_col_items';
-
-export function readJsonLocalStorage<T>(key: string): T | null {
-  try {
-    const raw = localStorage.getItem(key);
-    return raw ? (JSON.parse(raw) as T) : null;
-  } catch {
-    return null;
-  }
-}
-
-export function writeJsonLocalStorage<T>(key: string, data: T): void {
-  try {
-    localStorage.setItem(key, JSON.stringify(data));
-  } catch {
-    /* ignore */
-  }
-}
 
 export function readLibraryBundleCacheSnapshot(memberCacheKey: string): {
   items: CollectionMemberPause[];

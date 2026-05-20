@@ -9,7 +9,7 @@ import {
 import {
   readJsonLocalStorage,
   writeJsonLocalStorage,
-} from '@/features/pause/infrastructure/library-bundle-local-storage';
+} from '@/features/pause/infrastructure/json-local-storage';
 import {
   PAUSE_ARCHIVE_PAGE_SIZE,
   fetchPauseArchivePage,
