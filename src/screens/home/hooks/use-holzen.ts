@@ -30,7 +30,7 @@ import {
   MANUAL_PAUSE_TRIGGER_IDLE,
   type ManualPauseTriggerResult,
 } from '@/features/pause/public';
-import { useManualPauseTrigger } from '@/screens/home/hooks/use-manual-pause-trigger';
+import { useManualPauseTrigger } from '@/features/pause/public-hooks';
 
 export { holzenMarketDisplayQueryKey };
 

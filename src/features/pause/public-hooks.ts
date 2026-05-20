@@ -19,6 +19,10 @@ export {
 } from './presentation/use-current-pause';
 export { useOpenPauseHomePreview } from './presentation/use-open-pause-home-preview';
 export {
+  useManualPauseTrigger,
+  type UseManualPauseTriggerParams,
+} from './presentation/use-manual-pause-trigger';
+export {
   usePauseReflectGeneration,
   type UsePauseReflectGenerationParams,
 } from './presentation/use-pause-reflect-generation';

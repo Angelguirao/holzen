@@ -10,13 +10,13 @@ import {
 import { clearSession } from '@/features/pause/public';
 import {
   MANUAL_PAUSE_TRIGGER_IDLE,
+  type CompanionData,
   type ManualPauseTriggerResult,
 } from '@/features/pause/public';
 import { openManualPauseFromHome } from '@/features/pause/public-rpc';
 import type { OpenManualPauseFromHomeResult } from '@/features/pause/public-rpc';
 import { holzenLog } from '@/lib/holzen-console';
 import { trackEvent } from '@/lib/posthog';
-import type { CompanionData } from '@/features/pause/public';
 
 const PAUSE_MANUAL_START_HOME = 'holzen_sess_pause_manual_started_home';
 
@@ -49,7 +49,7 @@ export interface UseManualPauseTriggerParams {
 
 /**
  * Home manual “Need a moment”: market context → `openManualPauseFromHome` → Home preview state.
- * Reflection AI runs later in the deep ritual (`holzen-reflect`).
+ * Called from `useHolzen` in screens; RPC authority stays in `openManualPauseFromHome` use case.
  */
 export function useManualPauseTrigger({
   user,
