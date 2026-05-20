@@ -569,6 +569,25 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-20</span>
+      <span>Phase A slice — frame leaf: companion-slot-orchestrate-telemetry</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3><code>companion-slot-orchestrate-telemetry</code> → <code>ritual/frame/</code></h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Reflect backlog #1 is complete. Holzen console telemetry for companion-orchestrate invoke/outcome lives under <code>ritual/frame/</code>; slot orchestration modules remain in <code>companion/</code>.</dd>
+      <dt>Deviation</dt>
+      <dd>None — matches spec §3.1 / §10.1 leaf-first pattern after <code>companion-slot-ui-state</code>.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Imports <code>CompanionSlotOrchestrateMode</code> from <code>companion/run-companion-slot-orchestrate</code> until that cluster moves. Kept as a single-file leaf for isolated review.</dd>
+      <dt>Open questions</dt>
+      <dd>Next slice: <code>intervention-idempotency</code> cluster, slot orchestration cluster (<code>run-companion-slot-orchestrate</code>), or start <code>public.ts</code> peel.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
 </body>
 </html>
