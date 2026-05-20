@@ -9,7 +9,7 @@ import {
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
 import { Button } from '@/components/ui/button';
-import { getPendingPauseOfferDisplay } from '@/features/pause/public';
+import { getPendingPauseOfferDisplay } from '@/features/pause/public-hooks';
 import { usePendingPauseOffer, usePendingPauseOfferMutations } from '@/features/pause/public-hooks';
 
 interface Props {

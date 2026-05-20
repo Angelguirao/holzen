@@ -1842,6 +1842,25 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-20</span>
+      <span>Phase A slice — peel ritual progress + pending-offer from public.ts (§6)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3><code>PauseProgress</code> / <code>PauseBriefProgress</code> / pending-offer shells → <code>public-hooks</code></h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>reflect/</code> → <code>ritual/reflect/</code>) was already complete on this branch — no reflect folder moves. Continue backlog #3 §6 slim barrel: deep/brief ritual stepper constants (<code>PAUSE_DEEP_*</code>, <code>BRIEF_PAUSE_ORDER</code>) and <code>getPendingPauseOfferDisplay</code> export from <code>public-hooks.ts</code>; pause screen components import there. <code>public.ts</code> keeps <code>PauseStep</code> type only from <code>pause-ritual-steps</code>; session use cases import <code>STEPS</code> / macro helpers from domain modules.</dd>
+      <dt>Deviation</dt>
+      <dd>None — screens use <code>public-hooks</code>; feature internals use domain paths per §3.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Did not peel <code>MoodCheck</code> mood tokens or colocate <code>breathing/</code> under <code>ritual/breathe/</code> in the same commit.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: peel <code>MoodCheck</code> mood tokens, <code>writingTextareaClassName</code>, or export <code>PauseImpactData</code> type via <code>public-hooks</code> for <code>ScoreImpact</code>.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
 </body>
 </html>

@@ -1,4 +1,4 @@
-import { STEPS, type PauseStep } from '@/features/pause/public';
+import { STEPS, type PauseStep } from '@/features/pause/domain/pause-ritual-steps';
 
 /**
  * Previous deep-ritual step in `STEPS` order, or `null` on the first step.

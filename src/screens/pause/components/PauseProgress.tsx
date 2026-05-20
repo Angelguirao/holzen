@@ -4,14 +4,14 @@ import {
   PAUSE_DEEP_RITUAL_STEPS,
   pauseDeepDisplayProgressIndex,
   type PauseStep,
-} from '@/features/pause/public';
+} from '@/features/pause/public-hooks';
 
-export type { PauseStep } from '@/features/pause/public';
+export type { PauseStep } from '@/features/pause/public-hooks';
 export {
   PAUSE_DEEP_DISPLAY_STEP_COUNT,
   pauseDeepMacroStepNumber,
   STEPS,
-} from '@/features/pause/public';
+} from '@/features/pause/public-hooks';
 
 const PAUSE_DEEP_DISPLAY_STEPS = PAUSE_DEEP_RITUAL_STEPS;
 
