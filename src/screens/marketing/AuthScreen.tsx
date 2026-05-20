@@ -3,7 +3,6 @@ import { useSearchParams } from 'react-router-dom';
 import { Trans } from 'react-i18next';
 import { Link } from 'react-router-dom';
 import { X, Info } from 'lucide-react';
-import { supabase } from '@/integrations/supabase/client';
 import { lovable } from '@/integrations/lovable/index';
 import { Button } from '@/components/ui/button';
 import { LoadingButton } from '@/components/ui/loading-button';
@@ -11,7 +10,12 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Separator } from '@/components/ui/separator';
 import { useTranslation } from 'react-i18next';
-import { checkSignupGate } from '@/features/auth/public';
+import {
+  checkSignupGateForApp,
+  resetPasswordForEmail,
+  signInWithEmailPassword,
+  signUpWithEmailPassword,
+} from '@/features/auth/public';
 import { PageHeading } from '@/components/ui/page-heading';
 
 type AuthView = 'sign-in' | 'sign-up' | 'forgot-password';
@@ -38,7 +42,7 @@ const AuthScreen = () => {
     setLoading(true);
     try {
       if (view === 'sign-up') {
-        const gate = await checkSignupGate(supabase);
+        const gate = await checkSignupGateForApp();
         if (!gate.allow) {
           if (gate.reason === 'daily_cap') {
             setError(t(
@@ -53,11 +57,11 @@ const AuthScreen = () => {
           setLoading(false);
           return;
         }
-        const { error } = await supabase.auth.signUp({ email, password, options: { emailRedirectTo: window.location.origin } });
+        const { error } = await signUpWithEmailPassword(email, password, window.location.origin);
         if (error) throw error;
         setConfirmSent(true);
       } else {
-        const { error } = await supabase.auth.signInWithPassword({ email, password });
+        const { error } = await signInWithEmailPassword(email, password);
         if (error) throw error;
       }
     } catch (e: unknown) {
@@ -72,7 +76,7 @@ const AuthScreen = () => {
     setError(null);
     setLoading(true);
     try {
-      const { error } = await supabase.auth.resetPasswordForEmail(email, { redirectTo: `${window.location.origin}/reset-password` });
+      const { error } = await resetPasswordForEmail(email, `${window.location.origin}/reset-password`);
       if (error) throw error;
       setResetSent(true);
     } catch (e: unknown) {

@@ -18,3 +18,12 @@ export {
   checkSignupGate,
   type SignupGateStatus,
 } from './infrastructure/signup-gate';
+export {
+  checkSignupGateForApp,
+  resetPasswordForEmail,
+  signInWithEmailPassword,
+  signUpWithEmailPassword,
+  subscribePasswordRecoveryReady,
+  updateUserPassword,
+  type AuthMutationResult,
+} from './infrastructure/supabase-auth-operations';
