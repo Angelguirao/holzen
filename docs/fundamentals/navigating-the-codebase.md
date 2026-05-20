@@ -82,19 +82,19 @@ The Supabase browser client is **`src/integrations/supabase/client.ts`** (typed 
 
 | Concern | Typical location |
 |--------|-------------------|
-| User profile, language, pause AI prefs (`reflection_style` / `reflection_tone` on `profiles`), thresholds | `use-profile.ts` + `profiles` table |
-| BTC context, manual pause, companion orchestration triggers | `HolzenProvider` / `useHolzenHomeContextState` (`features/pause/public-hooks`) |
-| Companion payloads for the active pause | `useCompanionData` (`features/pause/public-hooks`) |
-| Subscription / Stripe checkout | `use-subscription.ts` |
-| Library content | `use-library.ts` |
-| Push (VAPID, registration) | `features/notifications/public-hooks` (`usePushNotifications`) |
-| Admin metrics | `use-admin-stats.ts` |
+| User profile, language, pause AI prefs (`reflection_style` / `reflection_tone` on `profiles`), thresholds | `@/features/user/public-hooks` (`useProfile`) + `profiles` table |
+| BTC context, manual pause, companion orchestration triggers | `HolzenProvider` / `useHolzenHomeContextState` (`@/features/pause/public-hooks`) |
+| Companion payloads for the active pause | `useCompanionData` (`@/features/pause/public-hooks`) |
+| Subscription / Stripe checkout | `@/features/subscription/public-hooks` (`useSubscription`) |
+| User collections (legacy full IA) | `src/legacy/archive-collections/` — **not** pause-first MVP |
+| Push (VAPID, registration) | `@/features/notifications/public-hooks` (`usePushNotifications`) |
+| Admin metrics | `screens/admin/hooks/` (or `@/features/*` as migrated) |
 
 TanStack Query is available app-wide (`QueryClient` in `App.tsx`); individual hooks may use `useEffect` + Supabase directly — follow the nearest feature.
 
 **Architecture (truth vs projection):** [client-server-architecture-holzen.md](client-server-architecture-holzen.md) — how Postgres/RLS/edge relate to the SPA cache and UI-only state. **Folder layers:** [client-src-layout.md](client-src-layout.md).
 
-**Shared client fetch patterns (dedupe):** subscription status is centralized in **`use-subscription.ts`** (`useQuery` so all consumers share one `check-subscription` request/cache). BTC / market reads go through **`fetchBtcData`** in **`src/lib/btc.ts`**, which coalesces concurrent calls per currency. **`use-profile.ts`** loads the signed-in **`profiles`** row via TanStack Query (`getProfileRowQueryOptions` / `PROFILE_QUERY_KEY` / `['profile', userId]`) so every **`useHolzen()`** tree shares one in-flight fetch and cache entry; **`HomeGoalWhyCard`** subscribes with the same options (no second `profiles` read for hold-goal header data). Successful **`profiles`** writes **`invalidateQueries`** that key so parallel trees refetch server truth (see [home-fetch-deduplication.md](../backlog/home-fetch-deduplication.md)).
+**Shared client fetch patterns (dedupe):** subscription status is centralized in **`@/features/subscription/public-hooks`** (`useSubscription` + `useQuery` so all consumers share one `check-subscription` request/cache). BTC / market reads go through **`fetchBtcData`** in **`src/features/market/infrastructure/fetch-market-data.ts`** (export `@/features/market/public`), which coalesces concurrent calls per currency. Profile row loads via **`@/features/user/public-hooks`** (`useProfile` + `getProfileRowQueryOptions`) so every **`useHolzen()`** tree shares one in-flight fetch and cache entry; **`HomeGoalWhyCard`** subscribes with the same options (no second `profiles` read for hold-goal header data). Successful **`profiles`** writes **`invalidateQueries`** that key so parallel trees refetch server truth (see [home-fetch-deduplication.md](../backlog/home-fetch-deduplication.md)).
 
 ### 6.1 TanStack Query vs `useEffect` + Supabase
 
@@ -183,7 +183,7 @@ Each folder under **`supabase/functions/<name>/`** is a deployable function. Sha
 | `generate-wallpaper` | `ReflectionWallpaper.tsx` |
 | `holzen-number` | `HolzenNumber.tsx` |
 | `reflection-insights` | `AIInsightsPanel.tsx` |
-| `check-subscription`, `create-checkout`, `customer-portal` | `use-subscription.ts` |
+| `check-subscription`, `create-checkout`, `customer-portal` | `@/features/subscription/public-hooks` |
 | `register-push` | `features/notifications` (`usePushNotifications`) |
 | `delete-account` | `Settings.tsx` |
 | `badge-notify` | `use-badge-sync.ts` |

@@ -116,6 +116,8 @@ features/pause/
   public-rpc.ts              # wired mutations + edge facades
 ```
 
+> **On disk (May 2026):** only `ports/pause-repository.ts` exists today. Session persistence adapter: `infrastructure/session/persisted-session-storage.ts` (port split is Phase A optional). Presentation subfolders (`session/`, `companion/`, …) are **targets** — most conductors still live flat under `presentation/` (§10.1).
+
 ### 3.1 Why `ritual/reflect/` and `ritual/frame/` — not top-level `reflect/` + `companion/`
 
 Both call edges and write `pause_ai_artifacts`, but they are **different ritual beats**, not separate product domains:
