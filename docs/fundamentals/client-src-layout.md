@@ -94,7 +94,7 @@ Traces one **shipped** vertical slice: user starts a manual pause from Home and 
 | RPC (authority) | Feature infra | `pauseCreateOrReuse` → Postgres `pause_create_or_reuse` |
 | Route change | Router | `navigate('/pause', { state: PauseSessionLocationState })` |
 
-`generateMessage` (in `use-holzen.ts`) builds context from BTC data (`features/market` query + `buildPauseContextFromMarket`, fingerprint helpers in `features/pause`), then calls **`pauseCreateOrReuse`** — it does **not** call `holzen-reflect` on Home. Non-silent manual opens clear the Home reflection stub and pass `pauseInstanceId` + context through location state.
+`useHolzenHomeContextState` / `useHolzenManualTriggerOrchestration` builds context from BTC data (`features/market` + `buildPauseContextFromMarket`, fingerprint helpers in `features/pause`), then calls **`pauseCreateOrReuse`** — it does **not** call `holzen-reflect` on Home. Non-silent manual opens clear the Home reflection stub and pass `pauseInstanceId` + context through location state.
 
 ### 2. `/pause` screen
 

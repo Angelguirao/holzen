@@ -83,8 +83,8 @@ The Supabase browser client is **`src/integrations/supabase/client.ts`** (typed 
 | Concern | Typical location |
 |--------|-------------------|
 | User profile, language, pause AI prefs (`reflection_style` / `reflection_tone` on `profiles`), thresholds | `use-profile.ts` + `profiles` table |
-| BTC context, manual pause, companion orchestration triggers | `use-holzen.ts` |
-| Companion payloads for the active pause | `use-companion-data.ts` |
+| BTC context, manual pause, companion orchestration triggers | `HolzenProvider` / `useHolzenHomeContextState` (`features/pause/public-hooks`) |
+| Companion payloads for the active pause | `useCompanionData` (`features/pause/public-hooks`) |
 | Subscription / Stripe checkout | `use-subscription.ts` |
 | Library content | `use-library.ts` |
 | Push (VAPID, registration) | `features/notifications/public-hooks` (`usePushNotifications`) |
@@ -105,7 +105,7 @@ Both are valid. Use this to choose and to match nearby code:
 | Prefer | When |
 |--------|------|
 | **`useQuery` / `useMutation`** | Data is **shared across routes or components**, benefits from a **stable cache key**, or needs **invalidation** after mutations (e.g. subscription status — **`use-subscription.ts`**; signed-in **`profiles`** row — **`use-profile.ts`**; blog posts — **`Blog.tsx`**, **`BlogPost.tsx`**). |
-| **`useEffect` + `supabase` (or `fetch`)** | State is **owned by one hook/screen** with **no shared cache benefit**, or logic is **tightly coupled** to non-cache concerns (orchestration in **`use-holzen.ts`**, companion pipeline in **`use-companion-data.ts`**). **`use-profile.ts`** still maps the loaded row into many `useState` fields via an effect after the **`profiles`** query succeeds. |
+| **`useEffect` + `supabase` (or `fetch`)** | State is **owned by one hook/screen** with **no shared cache benefit**, or logic is **tightly coupled** to non-cache concerns (orchestration in **`useHolzenHomeContextState`**, companion pipeline in **`useCompanionData`**). **`use-profile.ts`** still maps the loaded row into many `useState` fields via an effect after the **`profiles`** query succeeds. |
 | **Module-level coalescing** | Heavy **third-party** reads where Query is not yet adopted — **`fetchBtcData`** dedupes in-flight requests per currency without a shared query cache. |
 
 Do **not** add global **`QueryClient` defaultOptions** lightly: they affect every future `useQuery`. Prefer explicit options on each query until team-wide defaults are agreed ([data-fetching-conventions.md](../backlog/data-fetching-conventions.md)). **Migrate opportunistically** when editing a feature, not in a standalone rewrite.
@@ -289,7 +289,7 @@ Goal: one **vertical slice** you can trace in **docs → code → Network tab** 
 | 6. **DB** | Skim **`supabase/migrations/`** for `profiles`, `pause_instances`, `pause_ai_artifacts` — name recognition only. |
 | 7. **HTTP-only** (optional) | [bruno/README.md](../../bruno/README.md) `pause-pipeline/`: same functions in isolation; **not** a full UI substitute. |
 
-Stop when you can explain **in one sentence** each: what **`use-holzen`** does vs what **`use-companion-data`** does, and **where** **`holzen-reflect`** runs (deep ritual: **Reflect → Frame → second Breathe → Decide** hook window in **`PauseSession`**) vs **`companion-orchestrate`**.
+Stop when you can explain **in one sentence** each: what **`useHolzenHomeContextState`** does vs what **`useCompanionData`** does, and **where** **`holzen-reflect`** runs (deep ritual: **Reflect → Frame → second Breathe → Decide** hook window in **`PauseSession`**) vs **`companion-orchestrate`**.
 
 ---
 
