@@ -1,14 +1,17 @@
 import type { InterventionState } from '@/features/pause/domain/companion-orchestrate';
 import type { ParsedPauseArtifactCache } from '@/features/pause/application/use-cases/ritual/frame/artifact-cache-parse';
-import type { CompanionOrchestrateSessionContext } from '../ritual/frame/build-companion-orchestrate-body';
-import { applyCompanionInterventionInvokeOutcome } from '@/features/pause/application/use-cases/ritual/frame/apply-companion-intervention-invoke-outcome';
+import type { CompanionOrchestrateSessionContext } from './build-companion-orchestrate-body';
+import { applyCompanionInterventionInvokeOutcome } from './apply-companion-intervention-invoke-outcome';
 import {
   logCompanionInterventionInvoke,
   logCompanionInterventionSkippedIdempotency,
 } from '@/features/pause/application/use-cases/ritual/frame/companion-intervention-telemetry';
 import { hydrateCompanionSlotsFromArtifactCache } from '@/features/pause/application/use-cases/ritual/frame/hydrate-companion-slots-from-artifact-cache';
 import { hasInvokedIntervention, runOnceIntervention } from '@/features/pause/application/use-cases/ritual/frame/intervention-idempotency';
-import type { CompanionSlotCommitters, CompanionSlotRelaxations } from './orchestrate-slot-apply';
+import type {
+  CompanionSlotCommitters,
+  CompanionSlotRelaxations,
+} from '@/features/pause/application/use-cases/companion/orchestrate-slot-apply';
 
 export type RunCompanionInterventionBootstrapResult =
   | { status: 'cached' }

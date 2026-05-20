@@ -702,6 +702,25 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-20</span>
+      <span>Phase A slice — frame leaf: run-companion-intervention-bootstrap</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3><code>run-companion-intervention-bootstrap</code> → <code>ritual/frame/</code></h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>After <code>apply-companion-intervention-invoke-outcome</code> moved to <code>ritual/frame/</code>, co-locate bootstrap beside frame dependencies (relative imports to body builders + invoke outcome). Hub <code>orchestrate-slot-apply</code> remains in <code>companion/</code>.</dd>
+      <dt>Deviation</dt>
+      <dd>None — matches spec §3.1 / §10.1.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Could batch with hub move; kept bootstrap alone (1 module) after parallel agent already landed invoke-outcome leaf.</dd>
+      <dt>Open questions</dt>
+      <dd>Next slice: <code>orchestrate-slot-apply</code> + <code>intervention-response-hydrate.test</code>, or slot orchestration cluster.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
 </body>
 </html>
