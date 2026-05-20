@@ -2528,6 +2528,25 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-20</span>
+      <span>Phase A slice — peel feel initial-emotion UI off public.ts (§6)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>Backlog #1 complete; continue backlog #3 slim <code>public.ts</code></h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Session hydration + step-map peel landed on remote (<code>5bd337bc</code>). Peel <code>initialEmotionResetUi</code> / <code>InitialEmotionUiState</code> from <code>public.ts</code> — <code>use-pause-session-initial-mood-handlers</code> imports <code>ritual/feel/run-initial-emotion-log</code> directly; <code>public-rpc</code> keeps RPC-facing type re-exports.</dd>
+      <dt>Deviation</dt>
+      <dd>None — matches §6 barrel split.</dd>
+      <dt>Tradeoffs</dt>
+      <dd><code>initial-emotion-log</code> payload builders remain on <code>public.ts</code> for cross-context consumers until a later peel.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: peel <code>post-pause-emotion-log</code> / terminal guards off <code>public.ts</code>, or wire more mutations through <code>PauseRepository</code> (backlog #4).</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
 </body>
 </html>

@@ -11,7 +11,7 @@ import { showPauseStepSyncFailedToast } from '@/features/pause/application/use-c
 import {
   initialEmotionResetUi,
   type InitialEmotionUiState,
-} from '@/features/pause/public';
+} from '@/features/pause/application/use-cases/ritual/feel/run-initial-emotion-log';
 
 export function usePauseSessionInitialMoodHandlers(input: {
   pauseInstanceId: string | null;
