@@ -4,7 +4,9 @@ import {
   buildFeelTilesMoodLogOptions,
   DEEP_DEPTH_PICKER_RITUAL_ENTRY,
   isBriefRitualEntry,
+  resolvePauseSessionChromeCloseAction,
   runDeepPausePickerEntryIfPro,
+  runPauseSessionChromeCloseAction,
 } from './pause-session-mood-chrome-flow';
 
 describe('pause-session-mood-chrome-flow', () => {
@@ -21,6 +23,22 @@ describe('pause-session-mood-chrome-flow', () => {
       briefFace: 'calm',
     });
     expect(buildFeelTilesMoodLogOptions(false, 'anxious')).toEqual({ briefFace: 'anxious' });
+  });
+
+  it('resolves chrome close to return or request exit', () => {
+    expect(resolvePauseSessionChromeCloseAction('done')).toBe('return');
+    expect(resolvePauseSessionChromeCloseAction('session')).toBe('request_exit');
+
+    const onReturn = vi.fn();
+    const onRequestExit = vi.fn();
+    runPauseSessionChromeCloseAction('return', { onReturn, onRequestExit });
+    expect(onReturn).toHaveBeenCalledTimes(1);
+    expect(onRequestExit).not.toHaveBeenCalled();
+
+    onReturn.mockClear();
+    runPauseSessionChromeCloseAction('request_exit', { onReturn, onRequestExit });
+    expect(onRequestExit).toHaveBeenCalledTimes(1);
+    expect(onReturn).not.toHaveBeenCalled();
   });
 
   it('gates deep picker entry on pro access', () => {
