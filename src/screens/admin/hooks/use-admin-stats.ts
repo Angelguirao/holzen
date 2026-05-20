@@ -1,8 +1,10 @@
 import { useState, useCallback, useMemo } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
-import { supabase } from '@/integrations/supabase/client';
 import {
   ADMIN_STATS_QUERY_KEY,
+  fetchAdminStatsCacheEntries,
+  fetchAdminStatsCompanionCacheUi,
+  fetchAdminStatsRejections,
   getAdminStatsBundleQueryOptions,
   type AdminStatsBundle,
   type CacheEntryRow,
@@ -317,12 +319,7 @@ export function useAdminStats(enabled = true): AdminStats {
   }, []);
 
   const refreshCacheEntries = useCallback(async () => {
-    const { data, error: err } = await supabase
-      .from('companion_cache')
-      .select('id, companion_type, title, quality_score, used_count, expires_at, thumbs_up, thumbs_down, created_at, content')
-      .order('quality_score', { ascending: false })
-      .order('used_count', { ascending: false })
-      .limit(200);
+    const { data, error: err } = await fetchAdminStatsCacheEntries();
     queryClient.setQueryData<AdminStatsBundle>(ADMIN_STATS_QUERY_KEY, (prev) => {
       if (!prev || err) return prev;
       return { ...prev, cacheEntries: (data ?? []) as CacheEntryRow[] };
@@ -330,36 +327,21 @@ export function useAdminStats(enabled = true): AdminStats {
   }, [queryClient]);
 
   const refreshCompanionCacheUi = useCallback(async () => {
-    const { data: cacheRows, error: cacheErr } = await supabase
-      .from('companion_cache')
-      .select('id, companion_type, title, quality_score, used_count, expires_at, thumbs_up, thumbs_down, created_at, content')
-      .order('quality_score', { ascending: false })
-      .order('used_count', { ascending: false })
-      .limit(200);
-    const { data: contentData } = await supabase
-      .from('companion_cache')
-      .select('id, companion_type, content, quality_score, title, created_at, used_count, source_author')
-      .order('created_at', { ascending: false })
-      .limit(20);
+    const { cacheEntries, cacheError, recentContent } = await fetchAdminStatsCompanionCacheUi();
     queryClient.setQueryData<AdminStatsBundle>(ADMIN_STATS_QUERY_KEY, (prev) => {
       if (!prev) return prev;
       return {
         ...prev,
-        cacheEntries: (!cacheErr ? (cacheRows ?? []) : prev.cacheEntries) as CacheEntryRow[],
-        recentContent: (contentData ?? prev.recentContent) as RecentContentRow[],
+        cacheEntries: (!cacheError ? cacheEntries : prev.cacheEntries) as CacheEntryRow[],
+        recentContent: recentContent as RecentContentRow[],
       };
     });
   }, [queryClient]);
 
   const refreshRejections = useCallback(async () => {
-    const { data: rejectData } = await supabase
-      .from('generation_attempts')
-      .select('id, companion_type, model, quality_gate_reason, error_message, status, created_at, latency_ms')
-      .in('status', ['quality_gate_failed', 'error', 'timeout', 'rate_limited'])
-      .order('created_at', { ascending: false })
-      .limit(50);
+    const rejections = await fetchAdminStatsRejections();
     queryClient.setQueryData<AdminStatsBundle>(ADMIN_STATS_QUERY_KEY, (prev) =>
-      prev ? { ...prev, rejections: (rejectData ?? []) as RejectionRow[] } : prev,
+      prev ? { ...prev, rejections } : prev,
     );
   }, [queryClient]);
 
