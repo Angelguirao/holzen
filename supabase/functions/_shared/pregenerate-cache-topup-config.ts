@@ -1,6 +1,8 @@
 /**
  * Need-based top-up thresholds for `pregenerate-companions` (see `app_config.pregenerate_cache_topup`).
  * Loaded by `loadAppConfig`; editable in Admin → Tools without redeploy.
+ *
+ * Edge canonical — keep in sync with `src/features/pause/domain/pregenerate-cache-topup-config.ts`.
  */
 
 export type PregenerateCacheTopupKey =
