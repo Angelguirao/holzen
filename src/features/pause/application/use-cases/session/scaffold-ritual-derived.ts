@@ -1,5 +1,5 @@
 import type { TFunction } from 'i18next';
-import type { PauseStep } from '@/features/pause/public';
+import type { PauseStep } from '@/features/pause/domain/pause-ritual-steps';
 import {
   PAUSE_DEEP_DISPLAY_STEP_COUNT,
   pauseDeepMacroStepNumber,
