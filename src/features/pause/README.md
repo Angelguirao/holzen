@@ -22,7 +22,7 @@ features/pause/
   public.ts | public-queries.ts | public-rpc.ts | public-hooks.ts
 ```
 
-**Transitional paths (move incrementally):** reflect use cases under `application/use-cases/ritual/reflect/`; holzen-reflect I/O under `infrastructure/edge/reflect/`; frame / companion slot orchestration under `application/use-cases/ritual/frame/` (legacy `companion/` root cleared May 2026). **Ritual step RPC facades** in `public-rpc.ts` default to `supabasePauseRepository.logStep` (reflect, feel, shift, outcome, breath, post-pause — May 2026). Remaining Phase A: peel `public.ts`; companion/create/dismiss RPCs still re-export raw client where needed. Optional later: consolidate `ritual/brief/`, `deep/`, `breath/` beats per [pause-client-architecture.md](../../../docs/systems/pause-client-architecture.md) §10.1. User **collections** code is in `src/legacy/archive-collections/` (not shipped MVP).
+**Transitional paths (move incrementally):** reflect use cases under `application/use-cases/ritual/reflect/`; holzen-reflect I/O under `infrastructure/edge/reflect/`; frame / companion slot orchestration under `application/use-cases/ritual/frame/` (legacy `companion/` root cleared May 2026). **RPC facades** in `public-rpc.ts` default to `supabasePauseRepository` (step logs, create/dismiss/adopt/decline, companion log — May 2026). Remaining Phase A: peel `public.ts`. Optional later: consolidate `ritual/brief/`, `deep/`, `breath/` beats per [pause-client-architecture.md](../../../docs/systems/pause-client-architecture.md) §10.1. User **collections** code is in `src/legacy/archive-collections/` (not shipped MVP).
 
 **Brief vs deep:** one bounded context. Depth is `RitualDepth` on the instance / persisted session — not separate feature folders.
 

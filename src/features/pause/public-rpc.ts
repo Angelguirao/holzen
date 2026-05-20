@@ -2,16 +2,10 @@
  * Pause RPC mutations (loads Supabase client). Import from here in hooks/tests —
  * not from `public.ts`, which stays free of infrastructure side effects.
  */
-export {
-  pauseAdoptPendingOffer,
-  pauseCreateOrReuse,
-  pauseDeclinePendingOffer,
-  pauseDismissCurrent,
-  pauseLogCompanion,
-  pauseLogStep,
-  type PauseAdoptPendingResult,
-  type PauseCreateOrReuseResult,
-  type PauseLogCompanionResult,
+export type {
+  PauseAdoptPendingResult,
+  PauseCreateOrReuseResult,
+  PauseLogCompanionResult,
 } from './infrastructure/pause-rpc-client';
 export type { OpenManualPauseFromHomeResult } from './application/use-cases/trigger/open-manual-pause-from-home';
 
@@ -38,11 +32,10 @@ import {
 import { supabasePauseRepository } from './infrastructure/supabase-pause-repository';
 import { openManualPauseFromHome as openManualPauseFromHomeUseCase } from './application/use-cases/trigger/open-manual-pause-from-home';
 import { persistReflectionArtifacts } from './infrastructure/edge/reflect/reflection-artifact';
-import { pauseCreateOrReuse } from './infrastructure/pause-rpc-client';
 import type { OpenManualPauseFromHomeParams } from './application/use-cases/trigger/open-manual-pause-from-home';
 import type { TFunction } from 'i18next';
 import type { BulkHoldOutcomeChoice, BulkHoldPendingPause } from './domain/bulk-hold';
-import type { PauseState } from './domain/pause-state';
+import type { PauseCompanionAction, PauseState, PauseStepType } from './domain/pause-state';
 import {
   runPostPauseEmotionLogIfDirty,
   type PostPauseFeelSnapshot,
@@ -57,9 +50,42 @@ import { runPauseReflectionStepLogOnce } from './application/use-cases/ritual/re
 import { reflectionStepSessionStorage } from './infrastructure/edge/reflect/reflection-step-session-storage';
 import { invalidateCompanionUiCompletionQuery } from './application/queries/companion-ui-completion-query-key';
 import type { BreathSegmentLogPorts } from './application/use-cases/breathing/run-breath-segment-log';
-import type { PauseStepType } from './domain/pause-state';
 
-/** Reflect + ritual step logs — default port is `PauseRepository`, not raw RPC client. */
+/** Lifecycle + step mutations — default port is `PauseRepository`, not raw RPC client. */
+
+export function pauseCreateOrReuse(
+  params: Parameters<typeof supabasePauseRepository.createOrReuse>[0],
+) {
+  return supabasePauseRepository.createOrReuse(params);
+}
+
+export function pauseAdoptPendingOffer() {
+  return supabasePauseRepository.adoptPendingOffer();
+}
+
+export function pauseDeclinePendingOffer() {
+  return supabasePauseRepository.declinePendingOffer();
+}
+
+export function pauseDismissCurrent() {
+  return supabasePauseRepository.dismissCurrent();
+}
+
+export function pauseLogStep(
+  params: Parameters<typeof supabasePauseRepository.logStep>[0],
+) {
+  return supabasePauseRepository.logStep(params);
+}
+
+export function pauseLogCompanion(params: {
+  instanceId: string | null;
+  companionType: string;
+  action: PauseCompanionAction;
+  entryPoint: string;
+}) {
+  return supabasePauseRepository.logCompanion(params);
+}
+
 function repositoryLogStep(
   instanceId: string,
   stepType: PauseStepType,
@@ -74,7 +100,7 @@ export type { PostPauseFeelSnapshot };
 /** Home manual trigger — `pause_create_or_reuse` (+ silent reflection stub). */
 export function openManualPauseFromHome(params: OpenManualPauseFromHomeParams) {
   return openManualPauseFromHomeUseCase(
-    { createOrReuse: pauseCreateOrReuse, persistReflectionArtifacts },
+    { createOrReuse: supabasePauseRepository.createOrReuse, persistReflectionArtifacts },
     params,
   );
 }
