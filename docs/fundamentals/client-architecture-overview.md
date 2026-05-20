@@ -108,7 +108,7 @@ Read the **client** doc before non-trivial edits in that context. Pause is the r
 
 Track backlog: [artifacts/architecture-migration/README.md](../artifacts/architecture-migration/README.md).
 
-**Doc conflict hierarchy** (when docs disagree): [docs/README.md](../README.md) canonical table → pause-client-architecture §3 (pause interior) → client-src-layout → active-surface → architecture-migration rule/README → implementation-notes → frontend-module-layout (waves/CI) → refactoring-strategy (split mechanics only).
+**Doc conflict hierarchy** (when docs disagree): [docs/README.md](../README.md) canonical table → pause-client-architecture §3 (pause interior) → client-src-layout → active-surface → [information-architecture.md](../design/information-architecture.md) (§1–§3 full-IA reference; §4.5–§4.6 pause-first) → architecture-migration rule/README → implementation-notes → frontend-module-layout (waves/CI) → refactoring-strategy (split mechanics only).
 
 ---
 
