@@ -1,32 +1,32 @@
 import type { UseQueryOptions } from '@tanstack/react-query';
 import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
-import { sortMemberPauses } from '@/features/pause/application/use-cases/library/sort-member-pauses';
+import { sortMemberPauses } from '@/legacy/archive-collections/application/use-cases/library/sort-member-pauses';
 import {
   LIBRARY_BUNDLE_DISABLED_USER_ID,
   libraryBundleQueryPrefix,
-} from '@/features/pause/application/queries/library-bundle-keys';
+} from '@/legacy/archive-collections/application/queries/library-bundle-keys';
 import type {
   Collection,
   CollectionItem,
   CollectionMemberPause,
   LibraryBundle,
   LibraryListSortMode,
-} from '@/features/pause/domain/library-bundle';
+} from '@/legacy/archive-collections/domain/library-bundle';
 
 export {
   LIBRARY_BUNDLE_DISABLED_USER_ID,
   LIBRARY_BUNDLE_QUERY_PREFIX,
   libraryBundleQueryPrefix,
-} from '@/features/pause/application/queries/library-bundle-keys';
-export { buildMemberCacheKey, sortMemberPauses } from '@/features/pause/application/use-cases/library/sort-member-pauses';
+} from '@/legacy/archive-collections/application/queries/library-bundle-keys';
+export { buildMemberCacheKey, sortMemberPauses } from '@/legacy/archive-collections/application/use-cases/library/sort-member-pauses';
 export type {
   Collection,
   CollectionItem,
   CollectionMemberPause,
   LibraryBundle,
   LibraryListSortMode,
-} from '@/features/pause/domain/library-bundle';
+} from '@/legacy/archive-collections/domain/library-bundle';
 
 const PAUSE_IN_CHUNK = 80;
 

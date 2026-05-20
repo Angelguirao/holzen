@@ -32,11 +32,11 @@ Example: `WHERE created_at >= '2026-05-21T20:00:00.000Z'` on truncated tables is
 | Surface | MVP shipped | Notes |
 | --- | --- | --- |
 | Archive **Pauses** / **Echoes** | Yes | `v_pause_archive_*`, `usePauseArchiveList` |
-| Archive **Collections** tab | **No (strip target)** | User `collections` / `collection_items` UI → `src/legacy/`; do not add active imports. Target: [pause-client-architecture.md](../systems/pause-client-architecture.md) §7 |
+| Archive **Collections** tab | **No (stripped)** | User `collections` / `collection_items` UI in `src/legacy/archive-collections/`; `npm run check:active-surface` blocks `.from('collections'|'collection_items')` in active `src/`. See [pause-client-architecture.md](../systems/pause-client-architecture.md) §7 |
 | **`companion_catalog`** | Yes | Curated companion pool — **not** user collections |
 | **`useCompanionLibraryFavorites`** | Yes | Slot hearts on `pause_instances.metadata` — misleading “library” name |
 
-Until the strip lands, collection code may still exist in the tree; treat it as **non-shipped** for new work and reviews.
+**DB:** `collections` / `collection_items` tables remain (account deletion, RLS); only the **client UI** was quarantined.
 
 ## Subscription
 

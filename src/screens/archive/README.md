@@ -2,10 +2,11 @@
 
 | Path | Role |
 |------|------|
-| `ArchiveScreen.tsx` | Main tab route |
+| `ArchiveScreen.tsx` | Main tab route (Pauses + Echoes) |
 | `@/features/pause/public-hooks` → `usePauseArchiveList` | Paginated pause/echo lists (`v_pause_archive_*`) |
-| `@/features/pause/public-hooks` → `usePauseLibraryBundle` | User collections + member pauses |
 | `@/features/pause/public-hooks` (`useCurrentPause`) | Open pause row for banners/cards |
-| `components/` | Tab UI, library collections, filters |
+| `components/` | Tab UI, filters, pause cards |
+
+User **Collections** UI lives in `@/legacy/archive-collections/` (not MVP).
 
 Thin page: `pages/Archive.tsx` → `ArchiveScreen`.

@@ -78,18 +78,18 @@
     <header>
       <span>2026-05-20</span>
       <span>Spec §7</span>
-      <span class="status open">open</span>
+      <span class="status resolved">resolved</span>
     </header>
     <h3>Collections strip not yet executed in code</h3>
     <dl>
       <dt>Design decision</dt>
       <dd>Document Collections as non-MVP in <code>active-surface.md</code> and IA before removing Archive tab code — spec-first, then strip slice.</dd>
-      <dt>Deviation</dt>
-      <dd>Active <code>src/</code> still contains <code>usePauseLibraryBundle</code> and Archive collections UI until the next slice.</dd>
+      <dt>Resolution (2026-05-20)</dt>
+      <dd>Stripped Archive Collections tab; moved <code>usePauseLibraryBundle</code> + UI to <code>src/legacy/archive-collections/</code>; <code>check:active-surface</code> blocks <code>.from('collections'|'collection_items')</code> in active <code>src/</code>; <code>?seg=collections</code> redirects to Pauses.</dd>
       <dt>Tradeoffs</dt>
       <dd><strong>Strip now</strong> — smaller active surface sooner. <strong>Spec then strip</strong> — reviewers agree on scope before deletion. Picked spec then strip.</dd>
       <dt>Open questions</dt>
-      <dd>After UI strip: do <code>collections</code> / <code>collection_items</code> tables move to Tier B in <code>active-surface.md</code>, or stay in DB unused?</dd>
+      <dd>After UI strip: do <code>collections</code> / <code>collection_items</code> tables move to Tier B in <code>active-surface.md</code>, or stay in DB unused? <strong>Decision:</strong> tables stay in DB (delete-account, RLS); client queries quarantined — not Tier B.</dd>
     </dl>
   </article>
 

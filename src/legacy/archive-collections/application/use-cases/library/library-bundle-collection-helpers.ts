@@ -1,4 +1,4 @@
-import type { Collection, CollectionItem } from '@/features/pause/domain/library-bundle';
+import type { Collection, CollectionItem } from '@/legacy/archive-collections/domain/library-bundle';
 
 export function hasCollectionMembership(
   collectionItems: CollectionItem[],

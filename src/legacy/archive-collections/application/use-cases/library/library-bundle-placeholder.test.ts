@@ -3,7 +3,7 @@ import {
   buildLibraryBundlePlaceholder,
   isLibraryBundleInitialLoading,
 } from './library-bundle-placeholder';
-import type { CollectionMemberPause } from '@/features/pause/domain/library-bundle';
+import type { CollectionMemberPause } from '@/legacy/archive-collections/domain/library-bundle';
 
 const memberRow = {
   id: 'pause-1',

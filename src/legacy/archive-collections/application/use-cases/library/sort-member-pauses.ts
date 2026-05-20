@@ -1,4 +1,4 @@
-import type { CollectionMemberPause, LibraryListSortMode } from '@/features/pause/domain/library-bundle';
+import type { CollectionMemberPause, LibraryListSortMode } from '@/legacy/archive-collections/domain/library-bundle';
 
 export function buildMemberCacheKey(listSort: LibraryListSortMode): string {
   return `holzen_collection_member_pauses:${listSort}`;

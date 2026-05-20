@@ -198,9 +198,9 @@ Screens, `app/`, and `components/` import **`public*` only**. Tests follow the s
 
 | Still shipped | Out of MVP (move to `src/legacy/` when stripped) |
 |---------------|--------------------------------------------------|
-| Archive **Pauses** / **Echoes** tabs | `usePauseLibraryBundle`, collection mutations |
-| `companion_catalog` (curated pool) | `LibraryCollections`, Archive collections segment |
-| Companion slot favorites (`pause_instances.metadata`) | `application/use-cases/library/*`, `domain/library-bundle` (collections-only) |
+| Archive **Pauses** / **Echoes** tabs | `usePauseLibraryBundle`, collection mutations *(moved to `src/legacy/archive-collections/`)* |
+| `companion_catalog` (curated pool) | `LibraryCollections`, Archive collections segment *(legacy)* |
+| Companion slot favorites (`pause_instances.metadata`) | `application/use-cases/library/*`, `domain/library-bundle` *(legacy archive-collections)* |
 
 **Naming trap:** `companion_catalog` and `useCompanionLibraryFavorites` are **not** user collections — do not delete them during the collections strip.
 

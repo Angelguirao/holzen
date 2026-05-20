@@ -1,6 +1,6 @@
 import { supabase } from '@/integrations/supabase/client';
 import type { Database } from '@/integrations/supabase/types';
-import type { Collection, CollectionItem } from '@/features/pause/domain/library-bundle';
+import type { Collection, CollectionItem } from '@/legacy/archive-collections/domain/library-bundle';
 
 type CollectionsInsert = Database['public']['Tables']['collections']['Insert'];
 type CollectionsUpdate = Database['public']['Tables']['collections']['Update'];

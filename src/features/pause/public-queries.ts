@@ -15,27 +15,6 @@ export {
   type JourneyPauseRow,
 } from './infrastructure/queries/journey-pause-instances-query';
 export {
-  buildMemberCacheKey,
-  getLibraryBundleDisabledQueryOptions,
-  getLibraryBundleQueryOptions,
-  libraryBundleQueryPrefix,
-  sortMemberPauses,
-} from './infrastructure/queries/library-bundle-query';
-export {
-  deleteLibraryCollection,
-  insertLibraryCollection,
-  insertLibraryCollectionItem,
-  removeLibraryCollectionItem,
-  updateLibraryCollection,
-} from './infrastructure/queries/library-collections-mutations';
-export type {
-  Collection,
-  CollectionItem,
-  CollectionMemberPause,
-  LibraryBundle,
-  LibraryListSortMode,
-} from './domain/library-bundle';
-export {
   currentPauseQueryKey,
   getCurrentPauseQueryOptions,
   type CurrentPauseRow,

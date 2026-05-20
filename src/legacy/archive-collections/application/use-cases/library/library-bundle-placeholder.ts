@@ -4,7 +4,7 @@ import type {
   CollectionMemberPause,
   LibraryBundle,
   LibraryListSortMode,
-} from '@/features/pause/domain/library-bundle';
+} from '@/legacy/archive-collections/domain/library-bundle';
 import { sortMemberPauses } from './sort-member-pauses';
 
 export function buildLibraryBundlePlaceholder(opts: {
