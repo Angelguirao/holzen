@@ -17610,7 +17610,26 @@
       <dt>Tradeoffs</dt>
       <dd>Unit tests mock <code>run-pause-reflection-step-log</code> and <code>run-pause-favorite-toggle</code> directly; domain gates exercised without mock in re-export smoke tests.</dd>
       <dt>Open questions</dt>
-      <dd>Next: <code>pause-reflect-mood-io</code> peel from <code>pause-reflect-mood-flow</code>, or <code>pause-reflect-flows-io</code> preflight/post-generation import from <code>domain/reflect/flows/</code>.</dd>
+      <dd>Next: hub/ambience I/O anchor peel, or <code>pause-session-decide-io</code> session/decide boundary.</dd>
+    </dl>
+  </article>
+
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — hub/ambience I/O cluster anchors (backlog #1 verified, Tier 5)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3><code>pause-reflect-hub-io</code> + <code>pause-reflect-ambience-io</code> off domain paths</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>ritual/reflect/</code>) remains complete — no folder moves. Mood I/O peel (<code>pause-reflect-mood-flow</code>) already on branch. Add <code>pause-reflect-hub-flow</code> for shift-frame presentation + RPC use case; ambience I/O imports <code>application/use-cases/ritual/reflect/ambience/reflect-frame-focus-ambience</code>.</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior parity; conductors still import only presentation I/O modules.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Hub test mocks hub-flow with <code>importOriginal</code> so presentation mapping stays real while RPC is stubbed.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: <code>pause-session-decide-io</code> session/decide boundary peel, or Phase B cross-context Tier 1 shim (subscription/auth).</dd>
     </dl>
   </article>
 
