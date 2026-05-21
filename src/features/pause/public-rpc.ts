@@ -241,6 +241,14 @@ export { resolveShiftFrameHubDonePresentation } from './domain/reflect/hub/shift
 
 export { showPauseStepSyncFailedToast } from './application/use-cases/ritual/step-sync-toast';
 export { initialEmotionResetUi };
+export {
+  BRIEF_DEPTH_PICKER_RITUAL_ENTRY,
+  DEEP_DEPTH_PICKER_RITUAL_ENTRY,
+  buildFeelTilesMoodLogOptions,
+  resolvePauseSessionChromeCloseAction,
+  runPauseSessionChromeCloseAction,
+  runDeepPausePickerEntryIfPro,
+} from './application/use-cases/ritual/feel/pause-session-mood-chrome-flow';
 
 export type {
   CompanionFeedbackVote,

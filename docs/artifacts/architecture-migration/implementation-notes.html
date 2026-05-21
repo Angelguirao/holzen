@@ -6512,7 +6512,7 @@
       <dt>Deviation</dt>
       <dd>None — behavior parity; domain tests colocated; use-case tests unchanged expectations.</dd>
       <dt>Tradeoffs</dt>
-      <dd><code>InitialEmotionLogOpts</code> type re-exported from <code>public-rpc</code> for cross-layer callers; mood chrome flow still in <code>ritual/feel/pause-session-mood-chrome-flow</code>.</dd>
+      <dd><code>InitialEmotionLogOpts</code> type re-exported from <code>public-rpc</code> for cross-layer callers; mood chrome flow helpers re-exported on <code>public-rpc</code> in a follow-up slice.</dd>
       <dt>Open questions</dt>
       <dd>Next: peel mood chrome / feel-tiles conductors through <code>public-rpc</code>, or backlog #4 pending-offer / archive retrospective facades.</dd>
     </dl>
@@ -6531,9 +6531,28 @@
       <dt>Deviation</dt>
       <dd>None — behavior parity; no dedicated hook test.</dd>
       <dt>Tradeoffs</dt>
-      <dd>Reflect mood chrome conductors still import <code>pause-session-mood-chrome-flow</code> from application until peeled.</dd>
+      <dd>Mood chrome conductors peeled in the next slice on this branch.</dd>
       <dt>Open questions</dt>
       <dd>Next: peel depth-picker / feel-tiles / mood-chrome handlers through <code>public-rpc</code> or move chrome-flow pure helpers to <code>domain/ritual/feel/</code>.</dd>
+    </dl>
+  </article>
+
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — reflect mood chrome-flow via public-rpc (backlog #1 done, #3)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>Peel presentation/reflect/mood from pause-session-mood-chrome-flow application path</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd><code>ritual/reflect/</code> folder move is complete. Re-export pure feel chrome helpers (<code>buildFeelTilesMoodLogOptions</code>, depth-picker ritual entry constants, session chrome close, <code>runDeepPausePickerEntryIfPro</code>) on <code>public-rpc</code>; all four <code>presentation/reflect/mood/</code> conductors that imported <code>pause-session-mood-chrome-flow</code> now use the barrel only.</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior parity; use-case unit tests remain beside <code>pause-session-mood-chrome-flow.ts</code>.</dd>
+      <dt>Tradeoffs</dt>
+      <dd><code>use-pause-session-reflect-and-decide</code> still imports <code>PauseImpactData</code> type from <code>ritual/decide/impact-data</code> until a type re-export lands on <code>public-hooks</code> or <code>public-rpc</code>.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: export <code>PauseImpactData</code> for reflect/decide flow conductor, or companion orchestrate hooks through <code>public-rpc</code> only.</dd>
     </dl>
   </article>
 
