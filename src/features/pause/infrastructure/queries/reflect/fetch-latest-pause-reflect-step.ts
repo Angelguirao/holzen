@@ -4,7 +4,7 @@ import type {
   PauseReflectStepType,
 } from '@/features/pause/domain/reflect/steps/reflect-step-latest';
 
-/** Supabase read for latest reflect note/tags step event — used by `ReflectGenerator` adapter. */
+/** Supabase read for latest reflect note/tags step event — TanStack query + `ReflectGenerator` adapter. */
 export async function fetchLatestPauseReflectStepFromSupabase(
   pauseInstanceId: string,
   stepType: PauseReflectStepType,
