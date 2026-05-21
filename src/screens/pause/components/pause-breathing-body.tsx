@@ -1,6 +1,6 @@
 import { motion } from 'framer-motion';
 import { resumePauseAudioContext } from '@/features/pause/public-hooks';
-import { pauseStepLayout } from '@/features/pause/public-session';
+import { pauseStepLayout } from '@/features/pause/public-hooks';
 import { PauseBreathIntro } from '@/screens/pause/components/pause-breath-intro';
 import type { PauseBreathSegment } from '@/screens/pause/components/pause-breath-intro';
 import { PauseBreathTimedLoop } from '@/screens/pause/components/pause-breath-timed-loop';

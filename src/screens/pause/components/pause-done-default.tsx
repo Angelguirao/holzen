@@ -1,7 +1,7 @@
 import { motion } from 'framer-motion';
 import { useTranslation } from 'react-i18next';
 import { resolveDoneWallpaperMood } from '@/features/pause/public-ritual-done';
-import { pauseStepLayout } from '@/features/pause/public-session';
+import { pauseStepLayout } from '@/features/pause/public-hooks';
 import { useSubscription } from '@/features/subscription/public-hooks';
 import { Button } from '@/components/ui/button';
 import { ScoreImpact } from '@/screens/pause/components/ScoreImpact';
