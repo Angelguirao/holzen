@@ -9590,9 +9590,28 @@
       <dt>Deviation</dt>
       <dd>None — router state shape and navigate guards unchanged.</dd>
       <dt>Tradeoffs</dt>
-      <dd><code>use-holzen-manual-trigger-orchestration</code> still imported cooldown helpers from <code>application/use-cases/trigger/</code> until the cooldown peel slice.</dd>
+      <dd>Cooldown helpers briefly re-exported on <code>public-rpc</code> before <code>public-trigger.ts</code> split (same commit series).</dd>
       <dt>Open questions</dt>
-      <dd>Next backlog #3/#4: peel manual-trigger cooldown cluster on <code>use-holzen-manual-trigger-orchestration</code> or wire stray ritual <code>logPauseStep</code> call sites through <code>public-rpc</code> only.</dd>
+      <dd>Next backlog #3/#4: dedupe cooldown re-exports on <code>public-rpc</code> → <code>public-trigger</code> only, or wire stray ritual mutations through <code>public-rpc</code> facades.</dd>
+    </dl>
+  </article>
+
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — manual-trigger cooldown on public-trigger (backlog #1 done, #3)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>ritual/reflect/ verified; home orchestration drops application/infrastructure imports</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>ritual/reflect/</code>) complete — no folder moves. Add side-effect-free <code>public-trigger.ts</code> (cooldown math, localStorage keys, error mapping); <code>use-holzen-manual-trigger-orchestration</code> imports the barrel instead of <code>public-rpc</code> / <code>application/use-cases/trigger/*</code> (mirrors <code>public-navigation.ts</code>).</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior parity.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Helpers remain under <code>application/</code> + <code>infrastructure/</code>; <code>public-rpc</code> still re-exports cooldown math until a dedupe slice.</dd>
+      <dt>Open questions</dt>
+      <dd>Next backlog #4: point <code>public-rpc</code> cooldown re-exports at <code>public-trigger</code> or audit remaining presentation <code>application/</code> imports.</dd>
     </dl>
   </article>
 

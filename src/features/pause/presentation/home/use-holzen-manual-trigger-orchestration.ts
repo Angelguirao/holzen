@@ -11,11 +11,9 @@ import {
   isManualTriggerBlockedByCooldown,
   mapManualTriggerStartError,
   parseManualTriggerCooldownFromStorageEvent,
-} from '@/features/pause/public-rpc';
-import {
   readManualTriggerCooldownAtMs,
   writeManualTriggerCooldownAtMs,
-} from '@/features/pause/infrastructure/manual-trigger-cooldown-storage';
+} from '@/features/pause/public-trigger';
 import {
   MANUAL_PAUSE_TRIGGER_IDLE,
   type ManualPauseTriggerResult,

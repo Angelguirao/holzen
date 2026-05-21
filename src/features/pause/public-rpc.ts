@@ -210,14 +210,12 @@ export { buildManualPauseOpenParams } from './application/use-cases/trigger/buil
 export {
   computeAutoCooldownRemainingMs,
   computeManualCooldownRemainingMs,
-} from './application/use-cases/trigger/compute-pause-trigger-cooldowns';
-export {
   buildManualTriggerCooldownStorageKey,
   isManualTriggerBlockedByCooldown,
   parseManualTriggerCooldownFromStorageEvent,
+  mapManualTriggerStartError,
   type ManualTriggerCooldownStorageEvent,
-} from './application/use-cases/trigger/manual-trigger-cooldown-flow';
-export { mapManualTriggerStartError } from './application/use-cases/trigger/map-manual-trigger-start-error';
+} from './public-trigger';
 
 export type {
   RunInitialEmotionSelectResult,
