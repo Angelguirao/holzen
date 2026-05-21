@@ -6578,6 +6578,7 @@
   <article class="note">
     <header>
       <span>2026-05-21</span>
+<<<<<<< HEAD
       <span>Phase A slice — PauseImpactData via public-hooks (backlog #1 done, #3)</span>
       <span class="status resolved">resolved</span>
     </header>
@@ -6591,6 +6592,21 @@
       <dd><code>use-pause-session-decide-handler</code> still imports <code>pause-decide-outcome-flow</code> and outcome toasts from application until a later peel.</dd>
       <dt>Open questions</dt>
       <dd>Next: peel decide outcome flow helpers through <code>public-rpc</code>, or port-backed analytics read for companion feedback vote fetch (backlog #4).</dd>
+=======
+      <span>Phase A slice — reflect/decide flow via public barrels (backlog #1 done, #3)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>Peel use-pause-session-reflect-and-decide and decide handler from application imports</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd><code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code> was already complete on <code>cursor/arch-migrate-src-ca70</code>. Re-export decide outcome flow helpers, outcome toasts, and <code>getSessionQuote</code> on <code>public-rpc</code>; <code>PauseImpactData</code> type via <code>public-hooks</code>; <code>presentation/reflect/flows/</code>, <code>presentation/decide/</code>, and session ritual-state import barrels only (decide handler test keeps partial <code>public-rpc</code> mock).</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior parity.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Companion orchestrate presentation hooks still import <code>ritual/frame/</code> application paths until a frame peel slice.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: companion slot/intervention conductors through <code>public-rpc</code> only, or backlog #4 stray <code>PauseRepository</code> call sites.</dd>
+>>>>>>> 26129a48 (refactor(pause): peel reflect/decide flow conductors to public barrels)
     </dl>
   </article>
 

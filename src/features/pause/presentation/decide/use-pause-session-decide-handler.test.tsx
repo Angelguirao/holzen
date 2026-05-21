@@ -4,11 +4,11 @@ import type { TFunction } from 'i18next';
 import type { MutableRefObject } from 'react';
 import type { PauseRepository } from '@/features/pause/ports/pause-repository';
 import { runPauseOutcomeLog } from '@/features/pause/application/use-cases/ritual/decide/run-pause-outcome-log';
-import { usePauseSessionDecideHandler } from './use-pause-session-decide-handler';
 import {
   showPauseOutcomeNotCompletedToast,
   showPauseOutcomeSaveFailedToast,
-} from '@/features/pause/application/use-cases/ritual/decide/outcome-toast';
+} from '@/features/pause/public-rpc';
+import { usePauseSessionDecideHandler } from './use-pause-session-decide-handler';
 
 const { logStepMock, clearSessionMock, invalidatePauseStatsMock, mockRepository } = vi.hoisted(() => {
   const logStepMock = vi.fn();
@@ -20,11 +20,6 @@ const { logStepMock, clearSessionMock, invalidatePauseStatsMock, mockRepository 
   };
 });
 
-vi.mock('@/features/pause/public-rpc', () => ({
-  logPauseOutcome: (params: Parameters<typeof runPauseOutcomeLog>[1]) =>
-    runPauseOutcomeLog(mockRepository, params),
-}));
-
 vi.mock('@/lib/haptics', () => ({
   hapticFeedback: vi.fn(),
 }));
@@ -33,19 +28,24 @@ vi.mock('@/features/pause/public-queries', () => ({
   invalidatePauseStatsDataForUser: (...args: unknown[]) => invalidatePauseStatsMock(...args),
 }));
 
-vi.mock('@/features/pause/application/use-cases/ritual/decide/outcome-toast', () => ({
-  showPauseOutcomeSaveFailedToast: vi.fn(),
-  showPauseOutcomeNotCompletedToast: vi.fn(),
-}));
+vi.mock('@/features/pause/public-rpc', async () => {
+  const decideFlow = await vi.importActual<
+    typeof import('@/features/pause/application/use-cases/ritual/decide/pause-decide-outcome-flow')
+  >('@/features/pause/application/use-cases/ritual/decide/pause-decide-outcome-flow');
+  return {
+    ...decideFlow,
+    logPauseOutcome: (params: Parameters<typeof runPauseOutcomeLog>[1]) =>
+      runPauseOutcomeLog(mockRepository, params),
+    showPauseOutcomeSaveFailedToast: vi.fn(),
+    showPauseOutcomeNotCompletedToast: vi.fn(),
+    getSessionQuote: () => ({ text: 'Q', author: 'A' }),
+  };
+});
 
 vi.mock('@/features/pause/infrastructure/session/persisted-session-storage', () => ({
   clearSession: () => clearSessionMock(),
   loadSession: () => null,
   saveSession: vi.fn(),
-}));
-
-vi.mock('@/features/pause/application/use-cases/session/wisdom-quotes', () => ({
-  getSessionQuote: () => ({ text: 'Q', author: 'A' }),
 }));
 
 vi.mock('@/features/auth/public', () => ({
