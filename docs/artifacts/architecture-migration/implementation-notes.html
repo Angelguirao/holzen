@@ -7886,4 +7886,23 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — reflect mood/hub step-sync toast via public-rpc (backlog #1 done, #3)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>Peel showPauseStepSyncFailedToast in reflect presentation conductors</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code>) is complete on <code>cursor/arch-migrate-src-ca70</code> (including <code>buildFeelTilesMoodLogOptions</code> on remote). Align <code>use-pause-session-initial-mood-handlers</code> and <code>use-pause-shift-frame-done-handler</code> with prior reflect peel pattern: import <code>showPauseStepSyncFailedToast</code> from <code>public-rpc</code>; tests mock the barrel.</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior parity.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Feel-step use cases still import <code>run-initial-emotion-log</code> application module + <code>public-ports</code> repository directly.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: wired <code>runInitialEmotionSelect</code> / <code>runShiftEmotionFrameHubDone</code> facades on <code>public-rpc</code>, or port-backed analytics read for companion feedback vote fetch.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->

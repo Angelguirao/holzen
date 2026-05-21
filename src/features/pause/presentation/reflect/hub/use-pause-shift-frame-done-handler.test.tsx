@@ -18,7 +18,7 @@ vi.mock('@/features/pause/public-ports', () => ({
   supabasePauseRepository: mockRepository,
 }));
 
-vi.mock('@/features/pause/application/use-cases/ritual/step-sync-toast', () => ({
+vi.mock('@/features/pause/public-rpc', () => ({
   showPauseStepSyncFailedToast,
 }));
 

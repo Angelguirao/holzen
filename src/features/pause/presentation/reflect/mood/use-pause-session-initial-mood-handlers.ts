@@ -9,7 +9,7 @@ import {
   runInitialEmotionSkip,
   type InitialEmotionUiState,
 } from '@/features/pause/application/use-cases/ritual/reflect/mood/run-initial-emotion-log';
-import { showPauseStepSyncFailedToast } from '@/features/pause/application/use-cases/ritual/step-sync-toast';
+import { showPauseStepSyncFailedToast } from '@/features/pause/public-rpc';
 import { supabasePauseRepository } from '@/features/pause/public-ports';
 
 export function usePauseSessionInitialMoodHandlers(input: {
