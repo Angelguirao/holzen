@@ -8589,4 +8589,23 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — breath-segment presentation test mocks public-rpc (backlog #1 done, Tier 3)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>Align session breath RPC logger test with mood/hub pattern</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>ritual/reflect/</code>) is complete — no reflect path moves. <code>use-pause-breath-segment-rpc-loggers.test</code> mocks <code>ensureBreathSegment*</code> / <code>logBreathSegment*Skipped</code> on <code>public-rpc</code> instead of delegating through use cases + <code>PauseRepository</code>; keeps real <code>applyBreathSegmentLogOutcome</code> and <code>initialBreathSegmentRpcLoggedFlagsFromRestored</code> for ref/outcome wiring.</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior parity; presentation test surface only.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Companion cache invalidation on segment log is not asserted in the presentation test (covered in <code>run-breath-segment-log</code> unit tests).</dd>
+      <dt>Open questions</dt>
+      <dd>Next backlog #4: fold <code>public-ports.ts</code> into <code>public-rpc</code>, or companion orchestrate thin runners on <code>public-rpc</code>.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
