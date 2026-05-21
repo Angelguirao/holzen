@@ -1,3 +1,4 @@
+import { applyCompanionOrchestrateRetryReset } from '@/features/pause/application/use-cases/ritual/frame/apply-companion-orchestrate-retry-reset';
 import { applyCompanionSlotOrchestrateOutcome } from '@/features/pause/application/use-cases/ritual/frame/apply-companion-slot-orchestrate-outcome';
 import type { CompanionOrchestrateSessionContext } from '@/features/pause/application/use-cases/ritual/frame/build-companion-orchestrate-body';
 import { logCompanionSlotOrchestrateInvoke } from '@/features/pause/application/use-cases/ritual/frame/companion-slot-orchestrate-telemetry';
@@ -9,11 +10,13 @@ import {
   type CompanionSlotErrorSetters,
   type CompanionSlotLoadingSetters,
 } from '@/features/pause/application/use-cases/ritual/frame/companion-slot-ui-state';
-import type {
-  CompanionSlotAutosaveParams,
-  CompanionSlotCacheIds,
-  CompanionSlotCommitters,
-  CompanionSlotRelaxations,
+import { resetInterventionIdempotency } from '@/features/pause/application/use-cases/ritual/frame/intervention-idempotency';
+import {
+  EMPTY_COMPANION_SLOT_RELAXATIONS,
+  type CompanionSlotAutosaveParams,
+  type CompanionSlotCacheIds,
+  type CompanionSlotCommitters,
+  type CompanionSlotRelaxations,
 } from '@/features/pause/application/use-cases/ritual/frame/orchestrate-slot-apply';
 import {
   runCompanionSlotOrchestrate,
@@ -38,8 +41,11 @@ export type {
 };
 
 export {
+  applyCompanionOrchestrateRetryReset,
   applyCompanionSlotOrchestrateOutcome,
+  EMPTY_COMPANION_SLOT_RELAXATIONS,
   logCompanionSlotOrchestrateInvoke,
+  resetInterventionIdempotency,
   runCompanionInterventionBootstrap,
   runCompanionSlotOrchestrate,
   setCompanionSlotError,

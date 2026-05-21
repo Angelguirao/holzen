@@ -15353,4 +15353,23 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — companion orchestrate retry via pause-companion-orchestrate-io</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>Tier 4 — align retry conductor with slot/intervention I/O module</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1–#2 complete on this branch. <code>use-companion-orchestrate-retry</code> imports <code>applyCompanionOrchestrateRetryReset</code>, <code>resetInterventionIdempotency</code>, and <code>EMPTY_COMPANION_SLOT_RELAXATIONS</code> from <code>presentation/companion/pause-companion-orchestrate-io.ts</code> (same pattern as <code>use-companion-slot-run-orchestrate</code> / <code>use-companion-intervention-fetch</code>).</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior parity; hook file stays under <code>presentation/companion/</code>; <code>public-ritual-frame</code> re-export unchanged.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>I/O module grows slightly; avoids deep <code>application/</code> imports from presentation hooks.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: lifecycle create/dismiss thin use cases on <code>public-rpc</code>, or Phase B cross-context Tier 1 shim.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
