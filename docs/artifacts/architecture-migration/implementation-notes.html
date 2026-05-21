@@ -7293,7 +7293,7 @@
       <dt>Tradeoffs</dt>
       <dd>Module still uses <code>document</code> / canvas APIs (not pure domain); acceptable in application until a port abstraction is needed.</dd>
       <dt>Open questions</dt>
-      <dd>Next: peel <code>use-open-pause-home-preview</code> / companion feedback vote off <code>public-rpc</code>, or backlog #4 remaining mutation call sites.</dd>
+      <dd>Next: peel companion feedback vote off <code>public-rpc</code>, or backlog #4 remaining mutation call sites.</dd>
     </dl>
   </article>
 
@@ -7310,9 +7310,28 @@
       <dt>Deviation</dt>
       <dd>None — behavior parity.</dd>
       <dt>Tradeoffs</dt>
-      <dd>Companion orchestrate session and home preview hooks still import <code>public-rpc</code> facades.</dd>
+      <dd>Companion orchestrate session and home preview hooks still imported <code>public-rpc</code> facades until home dismiss peel.</dd>
       <dt>Open questions</dt>
-      <dd>Next: peel <code>use-companion-orchestrate-session</code> or <code>use-open-pause-home-preview</code> off <code>public-rpc</code>, or backlog #4 companion feedback vote read adapter.</dd>
+      <dd>Next: peel <code>use-companion-orchestrate-session</code> or companion feedback vote off <code>public-rpc</code>.</dd>
+    </dl>
+  </article>
+
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — peel home open-pause dismiss off public-rpc (backlog #3)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>use-open-pause-home-preview → dismissOpenPauseHome + PauseRepository</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>ritual/reflect/</code>) is complete on <code>cursor/arch-migrate-src-ca70</code>. <code>use-open-pause-home-preview</code> calls <code>dismissOpenPauseHome</code> with <code>runPauseDismissCurrent(supabasePauseRepository)</code> from <code>public-ports.ts</code>; <code>dismissOpenPauseHomePreview</code> facade on <code>public-rpc.ts</code> unchanged for cross-context callers.</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior parity.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Companion presentation hooks and <code>use-manual-pause-trigger</code> still import <code>public-rpc</code> facades.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: peel <code>use-companion-feedback-vote</code> or <code>use-companion-ui-completion</code> off <code>public-rpc</code>, or backlog #4 remaining mutation call sites.</dd>
     </dl>
   </article>
 
