@@ -160,7 +160,7 @@ export {
   type ScoreImpactVariant,
   type ScoreImpactViewMode,
 } from './application/use-cases/ritual/decide/score-impact-presentation';
-export type { PauseBreathingHandle } from './presentation/session/pause-breathing-handle';
+export type { PauseBreathingHandle } from './presentation/session/breath/pause-breathing-handle';
 export type {
   PauseSessionBriefRitualBodyProps,
   PauseSessionDeepRitualBodyProps,
@@ -398,11 +398,11 @@ export { usePauseSessionMountLog } from './presentation/session/use-pause-sessio
 export { usePauseSessionGoBack } from './presentation/session/use-pause-session-go-back';
 export { usePauseSessionGoToStep } from './presentation/session/use-pause-session-go-to-step';
 export { usePauseSessionHeaderBackHandler } from './presentation/session/use-pause-session-header-back-handler';
-export { usePauseSessionBreathTimedActiveReset } from './presentation/session/use-pause-session-breath-timed-active-reset';
+export { usePauseSessionBreathTimedActiveReset } from './presentation/session/breath/use-pause-session-breath-timed-active-reset';
 export {
   usePauseSessionBreathUi,
   type UsePauseSessionBreathUiParams,
-} from './presentation/session/use-pause-session-breath-ui';
+} from './presentation/session/breath/use-pause-session-breath-ui';
 export {
   usePauseSessionBriefToDeep,
   type UsePauseSessionBriefToDeepParams,
@@ -413,7 +413,7 @@ export { usePauseSessionRitualStorageSync } from './presentation/session/use-pau
 export {
   usePauseSessionBreathNavigation,
   type UsePauseSessionBreathNavigationParams,
-} from './presentation/session/use-pause-session-breath-navigation';
+} from './presentation/session/breath/use-pause-session-breath-navigation';
 export { usePauseSessionExitNavigation } from './presentation/session/use-pause-session-exit-navigation';
 export { usePauseSessionPendingPauseOfferNavigation } from './presentation/session/use-pause-session-pending-pause-offer-navigation';
 export { usePauseSessionPendingLeaveSheet } from './presentation/session/use-pause-session-pending-leave-sheet';
@@ -425,7 +425,7 @@ export {
   type UsePauseSessionScaffoldRitualParams,
   type PauseSessionScaffoldRitualDerivedParams,
 } from './presentation/session/use-pause-session-scaffold-ritual';
-export { usePauseSessionBreathSecondLabelVariant } from './presentation/session/use-pause-session-breath-second-label-variant';
+export { usePauseSessionBreathSecondLabelVariant } from './presentation/session/breath/use-pause-session-breath-second-label-variant';
 export { usePauseSessionFetch } from './presentation/session/use-pause-session-fetch';
 export {
   usePauseSessionBriefPastStep,

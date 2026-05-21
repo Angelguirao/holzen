@@ -12902,4 +12902,23 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — colocate flat session breath UI under presentation/session/breath/</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>Backlog #1 complete; finish session/breath presentation subcluster</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd><code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code> was already complete on <code>cursor/arch-migrate-src-ca70</code>. After breath-handlers + breath-reflect compose, colocate remaining flat breath modules (<code>pause-breathing-handle</code>, navigation, UI, timed-active reset, second-label variant, breathing timed loop + tests) under <code>presentation/session/breath/</code>; <code>public-hooks</code> / <code>public-ritual-breathe</code> re-export paths only.</dd>
+      <dt>Deviation</dt>
+      <dd>None — session grouping wins over scattering breath UI across <code>presentation/session/</code> root per §3.2.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>CI forbids flat <code>presentation/session/</code> import strings for moved breath UI modules; optional next: <code>presentation/session/scaffold/</code> CI subclusters or Phase B subscription/auth shims.</dd>
+      <dt>Open questions</dt>
+      <dd>Phase B: subscription/auth <code>src/lib/*</code> shims using pause as template.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->

@@ -7,7 +7,7 @@ export { initialBreathSegmentRpcLoggedFlagsFromRestored } from './domain/ritual/
 export {
   usePauseBreathingTimedLoop,
   type UsePauseBreathingTimedLoopInput,
-} from './presentation/session/use-pause-breathing-timed-loop';
+} from './presentation/session/breath/use-pause-breathing-timed-loop';
 export { resolveBreathOrbVisualMetrics } from './application/use-cases/ritual/breathe/pause-breath-orb-metrics';
 export {
   resolvePauseBreathingTimedDisplay,

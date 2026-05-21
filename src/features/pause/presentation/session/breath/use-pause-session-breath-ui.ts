@@ -1,7 +1,7 @@
 import { useState, useRef, useCallback, useEffect } from 'react';
 import type { PauseStep } from '@/features/pause/domain/pause-ritual-steps';
 import type { BriefPauseStep, RitualDepth } from '@/features/pause/domain/ritual-types';
-import type { PauseBreathingHandle } from '@/features/pause/presentation/session/pause-breathing-handle';
+import type { PauseBreathingHandle } from './pause-breathing-handle';
 import { usePauseSessionBreathTimedActiveReset } from './use-pause-session-breath-timed-active-reset';
 
 export interface UsePauseSessionBreathUiParams {
