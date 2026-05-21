@@ -10755,4 +10755,23 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — depth-and-brief + breath hooks barrel (backlog #1 verified, §6)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>ritual/reflect/ complete; finish §6 reflect presentation peel on public-ritual-reflect</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 verified — use cases under <code>ritual/reflect/</code>. Export <code>usePauseSessionDepthAndBriefCopy</code> and re-export breath step/handlers from <code>public-ritual-reflect.ts</code> only (no duplicate direct paths on <code>public-hooks</code>).</dd>
+      <dt>Deviation</dt>
+      <dd>None — scaffold depth context line behavior unchanged.</dd>
+      <dt>Tradeoffs</dt>
+      <dd><code>PauseSessionStepHandlersProvidersSlice</code> type remains on <code>public-hooks</code> (session orchestration, not reflect beat).</dd>
+      <dt>Open questions</dt>
+      <dd>Next backlog #4: optional <code>pause-rpc-client</code> import guard in <code>check:architecture-alignment</code>; Phase B subscription/auth shims.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
