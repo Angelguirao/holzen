@@ -10264,7 +10264,6 @@
   <article class="note">
     <header>
       <span>2026-05-21</span>
-<<<<<<< HEAD
       <span>Phase A slice — home dismiss via PauseRepository (backlog #1 verified, #4)</span>
       <span class="status resolved">resolved</span>
     </header>
@@ -10297,7 +10296,12 @@
       <dd>Most reflect hooks still export from <code>public-hooks</code>; further §6 peel can group generation/mood hooks on <code>public-ritual-reflect</code> when screens need them without the full hooks barrel.</dd>
       <dt>Open questions</dt>
       <dd>Next backlog #3/#4: <code>public-ritual-breathe</code> or <code>public-session</code> peel for <code>use-pause-breathing-timed-loop</code>; remaining <code>PauseRepository</code> stray call-site audit.</dd>
-=======
+    </dl>
+  </article>
+
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
       <span>Phase A slice — step-map restore helpers on public-session (backlog #1 verified, #3)</span>
       <span class="status resolved">resolved</span>
     </header>
@@ -10311,7 +10315,6 @@
       <dd><code>initial-breath-segment-rpc-flags</code> still imports <code>mapPersistedStep</code> from application (shared with <code>storage-ritual-sync</code>); optional follow-up to import via <code>public-session</code> inside feature only.</dd>
       <dt>Open questions</dt>
       <dd>Next backlog #3: re-export <code>resolvePauseBreathingPhases</code> / ritual-pattern helpers on <code>public-session</code> or a dedicated breathe barrel; backlog #4: remaining <code>PauseRepository</code> stray call-site audit.</dd>
->>>>>>> 40c8f0ec (refactor(pause): export step-map restore helpers on public-session)
     </dl>
   </article>
 
