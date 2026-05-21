@@ -3797,7 +3797,7 @@
       <dt>Tradeoffs</dt>
       <dd><code>use-dismiss-outlet-pause-ready</code> and <code>use-staggered-reveal</code> remain flat under <code>presentation/</code>.</dd>
       <dt>Open questions</dt>
-      <dd>Next: colocate <code>use-dismiss-outlet-pause-ready</code> (home vs session), or backlog #4 ritual log RPCs on <code>PauseRepository</code>.</dd>
+      <dd>Next: colocate <code>use-fullview-telemetry</code> beside grounding enrichment.</dd>
     </dl>
   </article>
 
@@ -3835,7 +3835,26 @@
       <dt>Tradeoffs</dt>
       <dd>Did not add <code>presentation/home/bulk-hold/</code> subfolder — presentation hooks stay flat under <code>home/</code> until a later peel.</dd>
       <dt>Open questions</dt>
-      <dd>Next: colocate <code>use-dismiss-outlet-pause-ready</code> or <code>use-staggered-reveal</code>, or backlog #4 ritual log RPCs on <code>PauseRepository</code>.</dd>
+      <dd>Next: colocate <code>use-fullview-telemetry</code> beside grounding enrichment.</dd>
+    </dl>
+  </article>
+
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — colocate fullview telemetry hook under presentation/companion/</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>Tier 4 — companion Full View analytics conductor</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd><code>use-grounding-enrichment</code> was already under <code>presentation/companion/</code> on remote. Move <code>use-fullview-telemetry</code> beside it; <code>public-hooks</code> re-export path only; <code>use-companion-fullview-page</code> imports sibling <code>./use-fullview-telemetry</code>.</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior-preserving <code>git mv</code>.</dd>
+      <dt>Tradeoffs</dt>
+      <dd><code>use-dismiss-outlet-pause-ready</code> and <code>use-staggered-reveal</code> remain flat under <code>presentation/</code>.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: colocate <code>use-dismiss-outlet-pause-ready</code> or backlog #4 analytics read port wiring.</dd>
     </dl>
   </article>
 

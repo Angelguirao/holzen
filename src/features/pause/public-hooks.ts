@@ -322,7 +322,7 @@ export { usePauseSessionCompanionSnapshot } from './presentation/companion/use-p
 export {
   useFullviewTelemetry,
   type FullviewCompanion,
-} from './presentation/use-fullview-telemetry';
+} from './presentation/companion/use-fullview-telemetry';
 export { usePauseFavoriteToggle } from './presentation/reflect/steps/use-pause-favorite-toggle';
 export { usePauseReflectFrameFocusAmbience } from './presentation/reflect/ambience/use-pause-reflect-frame-focus-ambience';
 export { usePauseFeelShiftLogDedupeRefs } from './presentation/reflect/mood/use-pause-feel-shift-log-dedupe-refs';
