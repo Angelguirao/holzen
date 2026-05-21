@@ -130,7 +130,6 @@ import {
   type RunInitialEmotionSelectResult,
   type RunInitialEmotionSkipResult,
 } from './application/use-cases/ritual/reflect/mood/run-initial-emotion-log';
-import type { InitialEmotionUiState } from './domain/reflect/mood/initial-emotion-presentation';
 import {
   runShiftEmotionFrameHubDone,
   type RunShiftEmotionFrameHubDoneResult,
@@ -144,7 +143,6 @@ import type { ReflectGenerationResult } from './domain/reflect/generation/reflec
 export type {
   RunInitialEmotionSelectResult,
   RunInitialEmotionSkipResult,
-  InitialEmotionUiState,
   RunShiftEmotionFrameHubDoneResult,
 };
 export type { RunReflectGenerationInput, ReflectGenerationResult };
