@@ -18450,4 +18450,23 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — reflect share I/O direct domain + run-* (backlog #1 verified, Tier 5)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3><code>pause-reflect-share-io</code> off <code>pause-reflect-share-flow</code> anchor</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>ritual/reflect/</code>) remains complete — no folder moves. Align share presentation I/O with steps/hub/mood peels: channel/text builders from <code>domain/reflect/share/</code>; PNG orchestration from <code>run-reflection-share-image</code>. Keep <code>pause-reflect-share-flow.ts</code> as CI cluster anchor only.</dd>
+      <dt>Deviation</dt>
+      <dd>Reverts route-through-flow on branch tip (commit <code>dd6da18fa</code>) — import boundary only; behavior parity.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Unit test mocks <code>run-reflection-share-image</code> directly (same seam as steps/hub I/O).</dd>
+      <dt>Open questions</dt>
+      <dd>Next: <code>pause-reflect-generation-io</code> peel verification, companion orchestrate-io peel, or Phase B cross-context Tier 1 shim (auth/subscription).</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
