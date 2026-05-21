@@ -5938,13 +5938,13 @@
     <h3>Peel reflect note/tag/favorite/reflection_step conductors from direct use-case imports</h3>
     <dl>
       <dt>Design decision</dt>
-      <dd><code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code> is complete. <code>presentation/reflect/steps/</code> hooks call wired <code>public-rpc</code> facades (<code>logPauseReflectNote</code>, <code>logPauseReflectTags</code>, <code>logPauseFavoriteToggle</code>, <code>logPauseReflectionStepOnce</code>) instead of importing use cases + <code>supabasePauseRepository</code> / session storage from <code>public-ports</code>. Pro-hint toast stays on the use-case module (UI-only).</dd>
+      <dd><code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code> is complete. <code>presentation/reflect/steps/</code> hooks call wired <code>public-rpc</code> facades (<code>logPauseReflectNote</code>, <code>logPauseReflectTags</code>, <code>logPauseFavoriteToggle</code>, <code>logPauseReflectionStepOnce</code>) instead of importing use cases + <code>supabasePauseRepository</code> / session storage from <code>public-ports</code>. Pro-hint toast was still under <code>ritual/reflect/steps/</code> until the follow-up hygiene slice below.</dd>
       <dt>Deviation</dt>
       <dd>None — behavior parity; favorite toggle test mocks <code>public-rpc</code> facade outcomes.</dd>
       <dt>Tradeoffs</dt>
       <dd>Reflect mood/feel/hub/telemetry conductors still import <code>application/use-cases/ritual/*</code> directly until peeled.</dd>
       <dt>Open questions</dt>
-      <dd>Next: peel <code>persistCompanionUiStepCompletion</code> or reflect mood conductors through <code>public-rpc</code> / ports.</dd>
+      <dd>Next: move pro-hint toast to <code>presentation/reflect/steps/</code>, then port-backed companion feedback vote read.</dd>
     </dl>
   </article>
 
@@ -5983,6 +5983,25 @@
       <dd>Companion orchestrate and feedback-vote presentation still import <code>public-rpc</code> until peeled.</dd>
       <dt>Open questions</dt>
       <dd>Next: port-backed companion feedback vote read or peel companion orchestrate hooks from <code>public-rpc</code>.</dd>
+    </dl>
+  </article>
+
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — reflect pro-hint toast → presentation (backlog #1 hygiene)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>Colocate Sonner toast helper with favorite-toggle conductor</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd><code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code> is complete on <code>cursor/arch-migrate-src-ca70</code> — no folder move this slice. Move <code>pause-favorite-pro-hint-toast</code> (+ test) from <code>ritual/reflect/steps/</code> to <code>presentation/reflect/steps/</code>; toast is UI side-effect, not a use case. Favorite toggle hook already uses <code>logPauseFavoriteToggle</code> from <code>public-rpc</code>.</dd>
+      <dt>Deviation</dt>
+      <dd>§10.1 previously listed the toast under application <code>ritual/reflect/steps/</code>; owner doc row updated to presentation path.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Favorite toggle use case stays in <code>ritual/reflect/steps/</code>; only the toast helper moved.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: port-backed companion feedback vote read in <code>use-companion-feedback-vote</code>, or peel home <code>openManualPauseFromHome</code>.</dd>
     </dl>
   </article>
 
