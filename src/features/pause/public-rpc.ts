@@ -236,7 +236,6 @@ export function logRetrospectiveOutcome(params: {
   return logRetrospectiveOutcomeUseCase(supabasePauseRepository, params);
 }
 
-export { showPauseStepSyncFailedToast } from './application/use-cases/ritual/step-sync-toast';
 export {
   showPauseOutcomeNotCompletedToast,
   showPauseOutcomeSaveFailedToast,
