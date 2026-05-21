@@ -5,7 +5,7 @@ import { useCompanionSection, useCompanionSectionExpansion } from '@/features/pa
 import type { CompanionData, CompanionPrefs } from '@/features/pause/public-hooks';
 import { CompanionSectionHaikuSlot } from '@/screens/pause/components/companion/companion-section-haiku-slot';
 import { CompanionSectionOrchestratedSlots } from '@/screens/pause/components/companion/companion-section-orchestrated-slots';
-import { companionSectionProFavoriteProps } from '@/screens/pause/lib/companion-section-pro-favorite';
+import { companionSectionProFavoriteProps } from '@/features/pause/public-hooks';
 
 interface Props {
   companions: CompanionData;

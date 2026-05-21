@@ -5283,4 +5283,23 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — companion pro-favorite props in ritual/frame (backlog #2 adjacent, Tier 4)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3><code>companionSectionProFavoriteProps</code> out of <code>screens/pause/lib/</code></h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>ritual/reflect/</code>) and share canvas/text peels are complete on this branch. Move Pro-only companion card favorite prop builder to <code>application/use-cases/ritual/frame/companion-section-pro-favorite.ts</code>; pause screen components import via <code>public-hooks</code>.</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior-preserving move; tests colocated with use case.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Pure helper lives in application (not domain) because it shapes React prop spreads for companion section UI.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: backlog #4 analytics/port stragglers, or peel <code>companion-feedback-regenerate</code> / breath-orb helpers from <code>screens/pause/lib/</code>.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->

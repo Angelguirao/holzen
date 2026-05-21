@@ -30,7 +30,7 @@ import { ZoomOutDisplay } from '@/screens/pause/components/ZoomOutDisplay';
 import { HistoricalInsightDisplay } from '@/screens/pause/components/HistoricalInsightDisplay';
 import { CompanionOrchestratedCard } from '@/screens/pause/components/companion/companion-orchestrated-card';
 import { COMPANION_SECTION_ICONS } from '@/screens/pause/components/companion/companion-section-icons';
-import type { CompanionSectionProFavoriteProps } from '@/screens/pause/lib/companion-section-pro-favorite';
+import type { CompanionSectionProFavoriteProps } from '@/features/pause/public-hooks';
 
 export type CompanionSectionOrchestratedSlotsProps = {
   labels: {
