@@ -10109,4 +10109,23 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — holzen providers slice on public-session (backlog #1 verified, #3)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>ritual/reflect/ complete; peel Holzen→pause provider mapping</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 verified — zero <code>application/use-cases/reflect/</code> paths. Export <code>pickPauseHolzenProvidersSlice</code> and <code>PauseHolzenProvidersSlice</code> on <code>public-session.ts</code>; <code>use-pause-session-providers-conductor</code> and provider types import the barrel.</dd>
+      <dt>Deviation</dt>
+      <dd>None — mantra default and market slice fields unchanged.</dd>
+      <dt>Tradeoffs</dt>
+      <dd><code>step-map</code> restore helpers remain on direct application imports; presentation realtime/archive still use <code>infrastructure/*</code> until backlog #4.</dd>
+      <dt>Open questions</dt>
+      <dd>Next backlog #4: audit presentation <code>infrastructure/*</code> imports (realtime, archive json-local-storage); optional <code>step-map</code> restore exports on <code>public-session</code>.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
