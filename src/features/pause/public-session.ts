@@ -52,3 +52,7 @@ export {
   buildPauseSessionStepRitualBundle,
   buildPauseSessionStepShellBundle,
 } from './application/use-cases/session/step-bundles';
+export {
+  isTerminalPauseDbState,
+  persistedPauseSessionAllowsTerminalEntry,
+} from './application/use-cases/session/terminal-entry-guard';
