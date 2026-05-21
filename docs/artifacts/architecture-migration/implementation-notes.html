@@ -14479,4 +14479,23 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — Home manual open params via pause-home-io</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>Reflect cluster follow-up — presentation I/O barrel</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 remains complete. After colocating <code>buildManualPauseOpenParams</code> under <code>ritual/reflect/generation/</code>, re-export it from <code>presentation/home/pause-home-io.ts</code> so <code>use-manual-pause-trigger</code> matches reflect ambience/telemetry I/O import style (single Home barrel for manual-open cluster).</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior parity.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Use case module still uses absolute import for market-context sibling; only the conductor path goes through <code>pause-home-io</code>.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: bind <code>use-reflection-share-handlers</code> or <code>use-pause-reflect-generation</code> through cluster I/O modules.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
