@@ -105,7 +105,6 @@ import { supabasePauseAnalyticsRepository } from './infrastructure/supabase-paus
 import {
   runInitialEmotionSelect,
   runInitialEmotionSkip,
-  initialEmotionResetUi,
   type RunInitialEmotionSelectResult,
   type RunInitialEmotionSkipResult,
   type InitialEmotionUiState,
@@ -127,7 +126,6 @@ export type {
   RunShiftEmotionFrameHubDoneResult,
 };
 export type { RunReflectGenerationInput, ReflectGenerationResult };
-export { initialEmotionResetUi };
 
 /** Lifecycle + ritual mutations — wired facades only; no generic `pauseLogStep` export. */
 

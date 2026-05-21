@@ -8627,4 +8627,23 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — reflect mood §6 peel initialEmotionResetUi off public-rpc (backlog #1 done, #3)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>Backlog #1 verified; mood conductor imports domain presentation helpers directly</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd><code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code> was already complete on <code>cursor/arch-migrate-src-ca70</code>. Peel pure <code>initialEmotionResetUi</code> off <code>public-rpc</code>; <code>use-pause-session-initial-mood-handlers</code> imports from <code>domain/reflect/mood/initial-emotion-presentation</code>. RPC facades (<code>logPauseInitialEmotion*</code>, <code>showPauseStepSyncFailedToast</code>) stay on <code>public-rpc</code>.</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior parity.</dd>
+      <dt>Tradeoffs</dt>
+      <dd><code>InitialEmotionUiState</code> type remains re-exported on <code>public-rpc</code> for cross-hook result typing; reset helper is domain-only.</dd>
+      <dt>Open questions</dt>
+      <dd>Next backlog #4: drop unused <code>fetchPauseCompanionFeedbackVote</code> from <code>public-rpc</code> if unreferenced, or companion orchestrate thin runners on <code>public-rpc</code>.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->

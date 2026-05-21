@@ -2,13 +2,15 @@ import { useCallback, type Dispatch, type MutableRefObject, type SetStateAction 
 import type { TFunction } from 'i18next';
 import type { FeelStepTile } from '@/features/pause/domain/feel-step-tile';
 import type { MoodValue } from '@/features/pause/domain/mood-value';
-import { hapticFeedback } from '@/lib/haptics';
 import {
   initialEmotionResetUi,
+  type InitialEmotionUiState,
+} from '@/features/pause/domain/reflect/mood/initial-emotion-presentation';
+import { hapticFeedback } from '@/lib/haptics';
+import {
   logPauseInitialEmotionSelect,
   logPauseInitialEmotionSkip,
   showPauseStepSyncFailedToast,
-  type InitialEmotionUiState,
 } from '@/features/pause/public-rpc';
 
 export function usePauseSessionInitialMoodHandlers(input: {
