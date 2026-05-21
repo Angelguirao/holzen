@@ -15581,4 +15581,23 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — reflect generation hook-flow anchor (backlog #1 verified)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>ritual/reflect/generation hook helpers via application anchor</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code>) remains complete on <code>cursor/arch-migrate-src-ca70</code> — no legacy folder moves. Add <code>pause-reflect-generation-hook-flow.ts</code> beside <code>run-reflect-generation</code> (same pattern as <code>pause-session-reflect-and-decide-flow</code> / <code>pause-shift-frame-hub-flow</code>); <code>pause-reflect-generation-io</code> imports hook helpers through the anchor instead of deep <code>domain/</code>.</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior parity; re-exports only.</dd>
+      <dt>Tradeoffs</dt>
+      <dd><code>use-pause-reflect-generation</code> still imports some domain generation helpers directly (prerequisites, errors, copy) until a follow-up peel.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: lifecycle create/dismiss facades on <code>public-rpc</code> (if any call sites remain), or Phase B cross-context Tier 1 shim.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
