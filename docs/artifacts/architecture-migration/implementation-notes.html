@@ -59,13 +59,32 @@
   <article class="note">
     <header>
       <span>2026-05-21</span>
+      <span>Phase A slice — remove unused pause-reflect-generation-run-flow anchor (Tier 5)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>Delete orphan <code>pause-reflect-generation-run-flow</code> after generation I/O peel</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Prior slice routed <code>pause-reflect-generation-io</code> through <code>run-reflect-generation</code> + <code>pause-reflect-generation-hook-flow</code>. No remaining imports of <code>pause-reflect-generation-run-flow</code> — remove the thin re-export module.</dd>
+      <dt>Deviation</dt>
+      <dd>None.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Hook-flow application anchor remains for domain helper cluster; hub I/O still uses <code>pause-shift-frame-hub-flow</code> until follow-up peel.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: hub I/O import <code>run-shift-emotion-frame-hub-done</code> + domain presentation directly, or companion orchestration-io peel.</dd>
+    </dl>
+  </article>
+
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
       <span>Phase A slice — reflect generation I/O direct run-reflect-generation (backlog #1 follow-up, Tier 5)</span>
       <span class="status resolved">resolved</span>
     </header>
     <h3><code>pause-reflect-generation-io</code> imports <code>runReflectGeneration</code> from sibling use case</h3>
     <dl>
       <dt>Design decision</dt>
-      <dd>Backlog #1 (<code>ritual/reflect/</code> folder move) remains complete. <code>pause-reflect-generation-io</code> imports hook helpers through <code>pause-reflect-generation-hook-flow</code> (prior slice) and <code>runReflectGeneration</code> from <code>run-reflect-generation</code> instead of <code>pause-reflect-generation-run-flow</code> CI anchor. Application anchor files stay for <code>check:architecture-alignment</code>.</dd>
+      <dd>Backlog #1 (<code>ritual/reflect/</code> folder move) remains complete. <code>pause-reflect-generation-io</code> imports hook helpers through <code>pause-reflect-generation-hook-flow</code> (prior slice) and <code>runReflectGeneration</code> from <code>run-reflect-generation</code> instead of <code>pause-reflect-generation-run-flow</code> CI anchor.</dd>
       <dt>Deviation</dt>
       <dd>None — behavior parity; import boundary only.</dd>
       <dt>Tradeoffs</dt>
