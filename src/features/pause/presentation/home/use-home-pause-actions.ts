@@ -2,7 +2,7 @@ import { useCallback } from 'react';
 import type { NavigateFunction } from 'react-router-dom';
 import type { BtcMoveSeverity } from '@/features/market/public';
 import type { ManualPauseTriggerResult } from '@/features/pause/domain/manual-pause-trigger-result';
-import type { CompanionData, CompanionPrefs } from '@/features/pause/public-hooks';
+import type { CompanionData, CompanionPrefs } from '@/features/pause/domain/companion-card-types';
 import {
   buildHomePauseSessionLocationState,
   canNavigateToPauseSession,
