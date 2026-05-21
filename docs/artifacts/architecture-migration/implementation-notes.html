@@ -17462,4 +17462,23 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — reflect share I/O imports domain + run-* (backlog #1 follow-up, Tier 5)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3><code>pause-reflect-share-io</code> off <code>pause-reflection-share-flow</code> anchor</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>ritual/reflect/</code>) remains complete — no folder moves. Align share presentation I/O with steps cluster: channel URL builders + plain text from <code>domain/reflect/share/</code>; PNG orchestration from <code>run-reflection-share-image</code>. Keep <code>pause-reflection-share-flow.ts</code> as CI cluster anchor only.</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior parity; presentation no longer imports application re-export barrel.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Unit test mocks <code>run-reflection-share-image</code> directly; domain URL builders exercised without mock in re-export smoke test.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: <code>pause-reflect-flows-io</code> preflight/post-generation import from <code>domain/reflect/flows/</code>, or decide portions via <code>pause-session-decide-flow</code>.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
