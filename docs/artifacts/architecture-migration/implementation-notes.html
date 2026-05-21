@@ -4884,4 +4884,23 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — companion feedback vote via public-rpc (backlog #3 §6)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>Backlog #1 complete; analytics vote I/O on presentation hook</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd><code>ritual/reflect/</code> and companion orchestrator §6 peel were already complete on <code>cursor/arch-migrate-src-ca70</code>. Add <code>fetchPauseCompanionFeedbackVote</code> + <code>logPauseCompanionFeedbackVote</code> on <code>public-rpc.ts</code>; <code>use-companion-feedback-vote</code> logs via <code>public-rpc</code>; TanStack query module delegates fetch/log to the same facades (query keys unchanged on <code>public-queries</code>).</dd>
+      <dt>Deviation</dt>
+      <dd>None — <code>logCompanionFeedbackVote</code> name kept on <code>public-queries</code> re-export for any external callers; presentation uses wired facades.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Other analytics helpers (fullview, PWA install, dev-mode) still import <code>public-ports</code> until peeled.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: explicit <code>runPauseCreateOrReuse</code> / <code>runPauseDismissCurrent</code> facades on <code>public-rpc</code> (backlog #4), or Phase B cross-context slice.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->

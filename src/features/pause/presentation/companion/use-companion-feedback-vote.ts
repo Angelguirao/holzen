@@ -2,10 +2,10 @@ import { useCallback, useEffect, useState } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useAuth } from '@/features/auth/public';
 import { hapticFeedback } from '@/lib/haptics';
+import { logPauseCompanionFeedbackVote } from '@/features/pause/public-rpc';
 import {
   companionFeedbackVoteQueryKey,
   getCompanionFeedbackVoteQueryOptions,
-  logCompanionFeedbackVote,
 } from '../../public-queries';
 
 export function useCompanionFeedbackVote(options: {
@@ -41,7 +41,7 @@ export function useCompanionFeedbackVote(options: {
       hapticFeedback('light');
 
       try {
-        const { ok } = await logCompanionFeedbackVote({
+        const { ok } = await logPauseCompanionFeedbackVote({
           userId,
           companionType,
           vote: type,
