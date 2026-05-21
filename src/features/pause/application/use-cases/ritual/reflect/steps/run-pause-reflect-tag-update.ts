@@ -1,4 +1,5 @@
 import { logPauseStep } from '@/features/pause/application/use-cases/ritual/log/log-pause-step';
+import { buildReflectTagUpdatedPayload } from '@/features/pause/domain/reflect/steps/reflect-note-tag-payload';
 import type { PauseRepository } from '@/features/pause/ports/pause-repository';
 
 export type RunPauseReflectTagUpdateResult =
@@ -14,7 +15,7 @@ export async function runPauseReflectTagUpdate(
     await logPauseStep(repository, {
       instanceId: input.pauseInstanceId,
       stepType: 'tag_updated',
-      payload: { tags: input.tags },
+      payload: buildReflectTagUpdatedPayload(input.tags),
     });
     return { status: 'success' };
   } catch {
