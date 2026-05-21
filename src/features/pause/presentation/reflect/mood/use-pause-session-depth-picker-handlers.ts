@@ -3,7 +3,7 @@ import {
   BRIEF_DEPTH_PICKER_RITUAL_ENTRY,
   DEEP_DEPTH_PICKER_RITUAL_ENTRY,
 } from '@/features/pause/domain/reflect/mood/pause-session-mood-chrome-flow';
-import type { BriefPauseStep, RitualDepth } from '@/features/pause/public-hooks';
+import type { BriefPauseStep, RitualDepth } from '@/features/pause/domain/ritual-types';
 
 /** `PauseDepthPicker` actions on `/pause` depth selection screen. */
 export function usePauseSessionDepthPickerHandlers(input: {
