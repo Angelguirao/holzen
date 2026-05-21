@@ -16585,4 +16585,23 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — reflect hub presentation mapping via hub flow anchor (backlog #1 verified, Tier 5)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3><code>pause-reflect-hub-io</code> presentation imports only <code>pause-shift-frame-hub-flow</code></h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>ritual/reflect/</code>) remains complete — no folder moves. Follow-up to hub RPC peel: <code>resolveShiftFrameHubDonePresentation</code> re-exported through the hub cluster anchor so the I/O module has a single application import (no direct <code>domain/reflect/hub/</code>).</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior parity; domain still owns pure mapping.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Reflect mood and flows presentation I/O still re-export domain helpers directly until incremental peels.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: reflect flows I/O anchor peel or session scaffold presentation I/O flow anchors.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
