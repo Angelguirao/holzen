@@ -11230,4 +11230,23 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — brief done check-in off public-rpc (backlog #4 / §6)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>use-pause-brief-done-check-in → ritual/done/post-pause-emotion-log + PauseRepository</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>ritual/reflect/</code>) is complete — no folder move. After brief→deep peel on remote (<code>d7f0e143</code>), <code>use-pause-brief-done-check-in</code> imports <code>runPostPauseEmotionLogIfDirty</code> with <code>supabasePauseRepository</code> and step-sync toast from <code>presentation/ritual/</code>. Removed <code>logPostPauseEmotionIfDirty</code> from <code>public-rpc.ts</code>; <code>PostPauseFeelSnapshot</code> type re-export remains for cross-context callers.</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior unchanged; test default outcome fixed to <code>logged</code> (was invalid <code>ok</code>).</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Session/decide/companion hooks still import remaining ritual log facades on <code>public-rpc</code> where they are sole consumers.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: peel <code>use-pause-session-decide-handler</code> outcome path or audit companion/archive facades on <code>public-rpc</code>.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
