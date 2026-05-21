@@ -1,11 +1,11 @@
 import { useCallback, useEffect, useRef, type MutableRefObject } from 'react';
 import type { TFunction } from 'i18next';
 import type { PersistedSession } from '@/features/pause/domain/session-model';
-import { applyBreathSegmentLogOutcome } from '@/features/pause/application/use-cases/ritual/breathe/run-breath-segment-log';
-import { initialBreathSegmentRpcLoggedFlagsFromRestored } from '@/features/pause/application/use-cases/session/step-map';
 import {
+  applyBreathSegmentLogOutcome,
   ensureBreathSegment1Logged,
   ensureBreathSegment2Logged,
+  initialBreathSegmentRpcLoggedFlagsFromRestored,
   logBreathSegment1Skipped,
   logBreathSegment2Skipped,
   showPauseStepSyncFailedToast,

@@ -8266,4 +8266,23 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — breath segment RPC loggers via public-rpc (backlog #1 done, #4)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>Peel breath segment loggers off public-ports in session presentation</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>ritual/reflect/</code>) is complete on this branch. <code>use-pause-breath-segment-rpc-loggers</code> calls existing <code>ensureBreathSegment1Logged</code> / <code>ensureBreathSegment2Logged</code> / <code>logBreathSegment1Skipped</code> / <code>logBreathSegment2Skipped</code> facades on <code>public-rpc.ts</code> (wired <code>PauseRepository</code> + companion UI invalidation); toast via <code>showPauseStepSyncFailedToast</code> re-export.</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior parity.</dd>
+      <dt>Tradeoffs</dt>
+      <dd><code>use-pause-brief-done-check-in</code> and pending-offer mutations still inject <code>public-ports</code> until next peel slices.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: <code>use-pause-brief-done-check-in</code> → <code>logPostPauseEmotionIfDirty</code>, or pending-offer adopt/decline facades on <code>public-rpc</code>.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
