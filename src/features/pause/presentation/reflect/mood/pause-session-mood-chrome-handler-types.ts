@@ -1,12 +1,8 @@
 import type { Dispatch, SetStateAction } from 'react';
 import type { TFunction } from 'i18next';
-import type {
-  BriefPauseStep,
-  CompanionData,
-  CompanionPrefs,
-  PauseStep,
-  RitualDepth,
-} from '@/features/pause/public-hooks';
+import type { CompanionData, CompanionPrefs } from '@/features/pause/domain/companion-card-types';
+import type { PauseStep } from '@/features/pause/domain/pause-ritual-steps';
+import type { BriefPauseStep, RitualDepth } from '@/features/pause/domain/ritual-types';
 import type { FeelStepTile } from '@/features/pause/domain/feel-step-tile';
 import type { MoodValue } from '@/features/pause/domain/mood-value';
 

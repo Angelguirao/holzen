@@ -2,7 +2,7 @@ import { useMemo } from 'react';
 import type { TFunction } from 'i18next';
 import type { BtcPriceData } from '@/features/market/public';
 import { resolvePauseDepthContextLineParams } from '@/features/pause/domain/reflect/mood/resolve-pause-depth-context-line-params';
-import type { RitualDepth } from '@/features/pause/public-hooks';
+import type { RitualDepth } from '@/features/pause/domain/ritual-types';
 
 /** Depth-picker context line for the depth picker (`PauseSessionDepthPickerStack`). */
 export function usePauseSessionDepthAndBriefCopy(input: {
