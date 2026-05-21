@@ -231,17 +231,7 @@ export {
   type PauseReflectStepLatestRow,
   type PauseReflectStepType,
 } from './infrastructure/queries/reflect/reflect-step-query';
-export { supabaseReflectGenerator } from './infrastructure/supabase-reflect-generator';
-export type {
-  ReflectMoodHistoryEntry,
-  ReflectRecencyHints,
-} from './domain/reflect-recency-hints';
 export { supabaseCompanionOrchestrator } from './infrastructure/supabase-companion-orchestrator';
-export {
-  generateReflectionAtReflectStep,
-  persistReflectionArtifacts,
-  type PersistReflectionArtifactsParams,
-} from './infrastructure/edge/reflect/reflection-artifact';
 export {
   fetchOpenPauseHomePreview,
   type OpenPauseHomePreview,

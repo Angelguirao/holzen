@@ -11,7 +11,7 @@ import {
   shouldCommitReflectGeneration,
 } from '@/features/pause/application/use-cases/ritual/reflect/generation/reflect-generation-hook-flow';
 import { runReflectGeneration } from '@/features/pause/application/use-cases/ritual/reflect/generation/run-reflect-generation';
-import { supabaseReflectGenerator } from '@/features/pause/public-queries';
+import { supabaseReflectGenerator } from '@/features/pause/public-ports';
 
 export type UsePauseReflectGenerationParams = {
   pauseInstanceId: string | null;

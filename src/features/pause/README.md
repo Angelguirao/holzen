@@ -22,10 +22,10 @@ features/pause/
     reflect/                      # holzen-reflect, post-it note/tags, reflect/decide conductor
     companion/                    # frame slots, orchestrate, fullview, section, related biases
     session/                      # scaffold payloads, ritual body prop types
-  public.ts | public-queries.ts | public-rpc.ts | public-hooks.ts
+  public.ts | public-queries.ts | public-ports.ts | public-rpc.ts | public-hooks.ts
 ```
 
-**Transitional paths (move incrementally):** reflect use cases under `application/use-cases/ritual/reflect/`; holzen-reflect + artifact reads via `ports/reflect-generator.ts` (`supabaseReflectGenerator` → edge + `queries/reflect/`; presentation uses port, not raw query exports); frame / companion slot + intervention orchestration under `application/use-cases/ritual/frame/` + `ports/companion-orchestrator.ts` (`supabaseCompanionOrchestrator` — slot `invoke` + intervention `invokeIntervention`). **RPC facades** in `public-rpc.ts` default to `supabasePauseRepository` (step logs, create/dismiss/adopt/decline, companion log — May 2026). **`public.ts`** is slim (cross-context nav + legacy stats types only — May 2026); screens/hooks use `public-hooks` / `public-queries` / `public-rpc`. Remaining Phase A: wire any stray mutations still bypassing `PauseRepository`. User **collections** code is in `src/legacy/archive-collections/` (not shipped MVP).
+**Transitional paths (move incrementally):** reflect use cases under `application/use-cases/ritual/reflect/`; holzen-reflect + artifact reads via `ports/reflect-generator.ts` (`supabaseReflectGenerator` in `public-ports.ts` → edge + `queries/reflect/`; presentation uses `public-ports`, not `public-queries`); frame / companion slot + intervention orchestration under `application/use-cases/ritual/frame/` + `ports/companion-orchestrator.ts` (`supabaseCompanionOrchestrator` — slot `invoke` + intervention `invokeIntervention`). **RPC facades** in `public-rpc.ts` default to `supabasePauseRepository` (step logs, create/dismiss/adopt/decline, companion log — May 2026). **`public.ts`** is slim (cross-context nav + legacy stats types only — May 2026); screens/hooks use `public-hooks` / `public-queries` / `public-rpc`. Remaining Phase A: wire any stray mutations still bypassing `PauseRepository`. User **collections** code is in `src/legacy/archive-collections/` (not shipped MVP).
 
 **Brief vs deep:** one bounded context. Depth is `RitualDepth` on the instance / persisted session — not separate feature folders.
 

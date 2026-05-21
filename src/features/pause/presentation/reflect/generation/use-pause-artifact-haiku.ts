@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import { supabaseReflectGenerator } from '../../../public-queries';
+import { supabaseReflectGenerator } from '@/features/pause/public-ports';
 
 export type PauseArtifactHaikuFetchPhase = 'idle' | 'loading' | 'error' | 'done';
 
