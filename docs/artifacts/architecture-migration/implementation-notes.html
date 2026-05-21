@@ -3475,6 +3475,25 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — colocate reflect frame-focus ambience under presentation/reflect/ambience/</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>Backlog #1 complete; Tier 4 reflect ambience mirrors ritual/reflect/ambience/</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd><code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code> was already complete on <code>cursor/arch-migrate-src-ca70</code>. Move <code>use-pause-reflect-frame-focus-ambience</code> into <code>presentation/reflect/ambience/</code> beside <code>ritual/reflect/ambience/reflect-frame-focus-ambience</code>; <code>public-hooks</code> re-export path only — screens keep <code>public-hooks</code>.</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior-preserving <code>git mv</code>; matches §3 / §10.1 <code>ritual/reflect/ambience/</code> taxonomy.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Session reflect/decide, shift-frame hub, and flows conductors remain at <code>presentation/reflect/</code> root until later peels (<code>hub/</code>, <code>flows/</code>).</dd>
+      <dt>Open questions</dt>
+      <dd>Next: colocate <code>use-pause-shift-frame-done-handler</code> under <code>presentation/reflect/hub/</code>, or route <code>persistCompanionUiStepCompletion</code> through <code>public-rpc</code> (backlog #4).</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
 </body>
 </html>
