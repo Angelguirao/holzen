@@ -227,6 +227,7 @@ export type {
   CompanionFullviewKind,
   LogCompanionFullviewOpenedInput,
 } from './application/use-cases/ritual/frame/log-companion-fullview-opened';
+export type { LogPwaInstallAnalyticsEventInput } from './application/use-cases/home/run-log-pwa-install-analytics-event';
 
 /** Companion feedback vote read — wired `PauseAnalyticsRepository.fetchCompanionFeedbackVote`. */
 export function fetchPauseCompanionFeedbackVote(
@@ -272,19 +273,7 @@ export function logPausePwaInstallAnalyticsEvent(
   return runLogPwaInstallAnalyticsEvent(supabasePauseAnalyticsRepository, input);
 }
 
-/** Admin rapid-testing toggle write — wired `PauseAnalyticsRepository.insertEvent`. */
-export function logPauseDevModeSetting(
-  input: LogDevModeSettingInput,
-): Promise<{ ok: boolean }> {
-  return runLogDevModeSetting(supabasePauseAnalyticsRepository, input);
-}
-
-/** Admin rapid-testing toggle read — wired `PauseAnalyticsRepository.fetchDevModeSetting`. */
-export function fetchPauseDevModeSetting(userId: string): Promise<boolean | null> {
-  return runFetchDevModeSetting(supabasePauseAnalyticsRepository, userId);
-}
-
-/** PWA install funnel — fire-and-forget screen helper (delegates to `logPausePwaInstallAnalyticsEvent`). */
+/** Fire-and-forget PWA install funnel events — screens import via `public-hooks` / `public-rpc`. */
 export function logPwaInstallAnalyticsEvent(
   userId: string | undefined,
   event: string,
@@ -296,6 +285,18 @@ export function logPwaInstallAnalyticsEvent(
     event,
     metadata: metadata ?? {},
   });
+}
+
+/** Admin rapid-testing toggle write — wired `PauseAnalyticsRepository.insertEvent`. */
+export function logPauseDevModeSetting(
+  input: LogDevModeSettingInput,
+): Promise<{ ok: boolean }> {
+  return runLogDevModeSetting(supabasePauseAnalyticsRepository, input);
+}
+
+/** Admin rapid-testing toggle read — wired `PauseAnalyticsRepository.fetchDevModeSetting`. */
+export function fetchPauseDevModeSetting(userId: string): Promise<boolean | null> {
+  return runFetchDevModeSetting(supabasePauseAnalyticsRepository, userId);
 }
 
 /** Admin rapid-testing toggle write — screen helper (delegates to `logPauseDevModeSetting`). */
