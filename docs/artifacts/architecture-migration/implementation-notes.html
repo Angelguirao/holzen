@@ -10264,7 +10264,6 @@
   <article class="note">
     <header>
       <span>2026-05-21</span>
-<<<<<<< HEAD
       <span>Phase A slice — home dismiss via PauseRepository (backlog #1 verified, #4)</span>
       <span class="status resolved">resolved</span>
     </header>
@@ -10278,7 +10277,12 @@
       <dd><code>openManualPauseFromHome</code> still uses <code>Pick&lt;PauseRepository, 'createOrReuse'&gt;</code> — separate slice if we unify home/trigger port shapes.</dd>
       <dt>Open questions</dt>
       <dd>Next backlog #4: audit remaining partial port shapes (manual trigger, lifecycle telemetry).</dd>
-=======
+    </dl>
+  </article>
+
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
       <span>Phase A slice — public-ritual-reflect barrel (backlog #1 verified, #3)</span>
       <span class="status resolved">resolved</span>
     </header>
@@ -10292,7 +10296,6 @@
       <dd>Most reflect hooks still export from <code>public-hooks</code>; further §6 peel can group generation/mood hooks on <code>public-ritual-reflect</code> when screens need them without the full hooks barrel.</dd>
       <dt>Open questions</dt>
       <dd>Next backlog #3/#4: <code>public-ritual-breathe</code> or <code>public-session</code> peel for <code>use-pause-breathing-timed-loop</code>; remaining <code>PauseRepository</code> stray call-site audit.</dd>
->>>>>>> 12b531a7 (refactor(pause): add public-ritual-reflect barrel for screen copy helpers)
     </dl>
   </article>
 
