@@ -1,11 +1,13 @@
 import { useEffect } from 'react';
 import type { InterventionState } from '@/features/pause/domain/companion-orchestrate';
-import {
-  runPauseCompanionInterventionBootstrap,
-  type CompanionOrchestrateSessionContext,
-  type CompanionSlotCommitters,
-  type CompanionSlotRelaxations,
-} from '@/features/pause/public-rpc';
+import type { CompanionOrchestrateSessionContext } from '@/features/pause/application/use-cases/ritual/frame/build-companion-orchestrate-body';
+import { runCompanionInterventionBootstrap } from '@/features/pause/application/use-cases/ritual/frame/run-companion-intervention-bootstrap';
+import type {
+  CompanionSlotCommitters,
+  CompanionSlotRelaxations,
+} from '@/features/pause/application/use-cases/ritual/frame/orchestrate-slot-apply';
+import { fetchParsedPauseArtifactCache } from '@/features/pause/infrastructure/queries/artifact-cache-query';
+import { supabaseCompanionOrchestrator } from '@/features/pause/infrastructure/supabase-companion-orchestrator';
 
 export type UseCompanionInterventionFetchParams = {
   pauseInstanceId?: string | null;
@@ -48,7 +50,7 @@ export function useCompanionInterventionFetch({
 
     (async () => {
       try {
-        const result = await runPauseCompanionInterventionBootstrap(
+        const result = await runCompanionInterventionBootstrap(
           {
             pauseInstanceId,
             fetchedSlots: fetchedSlotsRef.current,
@@ -56,7 +58,12 @@ export function useCompanionInterventionFetch({
             setCacheRelaxations,
             setIntervention,
           },
-          loadOrchestrateSession,
+          {
+            fetchArtifactCache: fetchParsedPauseArtifactCache,
+            loadOrchestrateSession,
+            invokeIntervention: (session) =>
+              supabaseCompanionOrchestrator.invokeIntervention(session),
+          },
         );
 
         if (cancelled) return;

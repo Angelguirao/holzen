@@ -3,7 +3,7 @@ import type {
   CompanionSlotCacheIds,
   CompanionSlotCommitters,
   CompanionSlotRelaxations,
-} from '@/features/pause/public-rpc';
+} from '@/features/pause/application/use-cases/ritual/frame/orchestrate-slot-apply';
 import type { RegenerateCompanionSlot } from '@/features/pause/domain/companion-orchestrate';
 import { useCompanionSlotOrchestrateFailurePorts } from './use-companion-slot-orchestrate-failure-ports';
 import { useCompanionSlotRunOrchestrate } from './use-companion-slot-run-orchestrate';
