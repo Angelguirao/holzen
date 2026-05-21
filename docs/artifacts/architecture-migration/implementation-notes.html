@@ -59,13 +59,13 @@
   <article class="note">
     <header>
       <span>2026-05-21</span>
-      <span>Phase A slice — Home reflect telemetry I/O via home telemetry flow anchor (backlog #1 verified, Tier 5)</span>
+      <span>Phase A — backlog #1 verified; reflect telemetry I/O peels aligned (Tier 5)</span>
       <span class="status resolved">resolved</span>
     </header>
-    <h3><code>pause-home-reflect-telemetry-io</code> imports Home PostHog trackers through <code>pause-home-reflect-telemetry-flow</code></h3>
+    <h3>Session + Home PostHog presentation I/O import sibling telemetry modules directly</h3>
     <dl>
       <dt>Design decision</dt>
-      <dd>Backlog #1 (<code>ritual/reflect/</code> folder move) remains complete. Route <code>pause-home-reflect-telemetry-io</code> through <code>pause-home-reflect-telemetry-flow</code> instead of deep <code>home-pause-actions-telemetry</code> / <code>manual-pause-trigger-telemetry</code> paths. Session reflect UI (<code>pause-reflect-telemetry-io</code>) imports <code>pause-reflect-session-ui-telemetry</code> directly (off flow CI anchor; parity with steps/hub).</dd>
+      <dd>Backlog #1 (<code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code>) is complete on branch tip. <code>pause-reflect-telemetry-io</code> and <code>pause-home-reflect-telemetry-io</code> both peel to leaf telemetry modules; <code>pause-reflect-telemetry-flow</code> / <code>pause-home-reflect-telemetry-flow</code> remain CI anchors only. Owner doc §10.1 row updated for Home direct-import wording.</dd>
       <dt>Deviation</dt>
       <dd>None — behavior parity; import boundary only.</dd>
       <dt>Tradeoffs</dt>
