@@ -59,6 +59,25 @@
   <article class="note">
     <header>
       <span>2026-05-21</span>
+      <span>Phase A slice — session shell header-back presentation I/O</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3><code>pause-session-shell-io</code> for header back visibility + intent</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>ritual/reflect/</code>) folder move is complete. Added <code>presentation/session/pause-session-shell-io.ts</code> so <code>use-pause-session-breath-navigation</code> and <code>use-pause-session-header-back-handler</code> import <code>isPauseSessionHeaderBackVisible</code> / <code>computePauseHeaderBackIntent</code> through presentation I/O instead of deep <code>application/use-cases/session/header-back</code>.</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior parity; <code>header-back.ts</code> remains under application for tests and <code>check:architecture-alignment</code>.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Shell I/O barrel can absorb mount-log / shell-view-model re-exports in a follow-up slice.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: scaffold persist + derived props through <code>presentation/session/scaffold/</code> I/O, or reflect flows decide toasts from domain.</dd>
+    </dl>
+  </article>
+
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
       <span>Phase A slice — reflect share I/O pure builders from domain (backlog #1 follow-up)</span>
       <span class="status resolved">resolved</span>
     </header>
