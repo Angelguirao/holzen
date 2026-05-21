@@ -59,6 +59,25 @@
   <article class="note">
     <header>
       <span>2026-05-21</span>
+      <span>Phase A slice — reflect share I/O via share flow anchor (backlog #1 verified, Tier 5)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3><code>pause-reflection-share-flow</code> for share orchestration + channel builders</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code>) remains complete — no folder moves. <code>pause-reflect-share-io</code> imports <code>runReflectionShareImage</code>, <code>DeliverReflectionShareImageDeps</code>, and channel URL builders through <code>pause-reflection-share-flow</code> instead of deep <code>run-reflection-share-image</code> / <code>domain/reflect/share/</code> paths (mirrors hub and steps mutation anchors).</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior parity; import boundary only.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Reflect flows I/O still binds some decide domain helpers directly until incremental peels.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: reflect flows I/O anchor peel (preflight/post-generation), or companion orchestration-io peel.</dd>
+    </dl>
+  </article>
+
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
       <span>Phase A slice — reflect steps I/O direct run-* + domain gates (backlog #1 follow-up, Tier 5)</span>
       <span class="status resolved">resolved</span>
     </header>
