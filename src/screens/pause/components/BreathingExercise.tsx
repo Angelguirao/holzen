@@ -2,14 +2,14 @@ import { useState, useEffect, useCallback, useMemo } from 'react';
 import { AnimatePresence } from 'framer-motion';
 import { useTranslation } from 'react-i18next';
 import { resolveBreathOrbVisualMetrics } from '@/features/pause/public-hooks';
+import { computeBreathingPhaseAdvance } from '@/features/pause/public-session';
 import {
   STANDALONE_BREATHING_CYCLE_COUNT,
   STANDALONE_BREATHING_PATTERNS,
-  computeBreathingPhaseAdvance,
   resolveStandaloneBreathSeverityRingColors,
   resolveSuggestedStandaloneBreathingPatternIndex,
   type BreathingExerciseSeverity,
-} from '@/features/pause/public-hooks';
+} from '@/features/pause/public-ritual-breathe';
 import { BreathingExerciseOverlay } from '@/screens/pause/components/breathing-exercise-overlay';
 
 interface Props {

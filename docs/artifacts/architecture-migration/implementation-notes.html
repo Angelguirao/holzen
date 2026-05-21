@@ -10394,4 +10394,23 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — public-ritual-breathe barrel (backlog #1 verified, #3)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>ritual/reflect/ complete; screen-facing breathe pure helpers off public-hooks</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 verified — 14 modules under <code>ritual/reflect/</code>, zero <code>application/use-cases/reflect/</code> in active <code>src/</code>. Add <code>public-ritual-breathe.ts</code> (mirrors <code>public-ritual-reflect.ts</code> / <code>public-ritual-brief.ts</code>) for ritual-pattern, timed-display, triangle kicker, and standalone breathing helpers; <code>PauseBreathing</code> and <code>BreathingExercise</code> import the barrel; <code>public-hooks</code> re-exports for backward compatibility.</dd>
+      <dt>Deviation</dt>
+      <dd>None — orb metrics/geometry and <code>usePauseBreathingTimedLoop</code> remain on <code>public-hooks</code> / <code>public-session</code> until a later peel.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Most pause screens still import breathe helpers via <code>public-hooks</code>; further §6 peel can move orb helpers onto <code>public-ritual-breathe</code> when breath UI components switch barrels.</dd>
+      <dt>Open questions</dt>
+      <dd>Next backlog #4: <code>PauseRepository</code> stray call-site audit (e.g. <code>openManualPauseFromHome</code> <code>Pick</code> port shape); optional orb cluster on <code>public-ritual-breathe</code>.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
