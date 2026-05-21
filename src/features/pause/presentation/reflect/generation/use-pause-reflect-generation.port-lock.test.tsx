@@ -10,12 +10,22 @@ const { pauseReflectGenerationMock, mockReflectGenerator } = vi.hoisted(() => ({
 
 vi.mock('./pause-reflect-generation-io', async () => {
   const hookFlow = await vi.importActual<
-    typeof import('@/features/pause/application/use-cases/ritual/reflect/generation/pause-reflect-generation-hook-flow')
-  >(
-    '@/features/pause/application/use-cases/ritual/reflect/generation/pause-reflect-generation-hook-flow',
-  );
+    typeof import('@/features/pause/domain/reflect/generation/reflect-generation-hook-flow')
+  >('@/features/pause/domain/reflect/generation/reflect-generation-hook-flow');
+  const { reflectGenerationPrerequisite } = await vi.importActual<
+    typeof import('@/features/pause/domain/reflect/generation/reflect-generation-prerequisites')
+  >('@/features/pause/domain/reflect/generation/reflect-generation-prerequisites');
+  const { reflectGenerationUserErrorMessage } = await vi.importActual<
+    typeof import('@/features/pause/domain/reflect/generation/reflect-generation-errors')
+  >('@/features/pause/domain/reflect/generation/reflect-generation-errors');
+  const { resolveEffectiveReflectionCopy } = await vi.importActual<
+    typeof import('@/features/pause/domain/reflect/generation/resolve-effective-reflection-copy')
+  >('@/features/pause/domain/reflect/generation/resolve-effective-reflection-copy');
   return {
     ...hookFlow,
+    reflectGenerationPrerequisite,
+    reflectGenerationUserErrorMessage,
+    resolveEffectiveReflectionCopy,
     reflectGenerator: mockReflectGenerator,
     pauseReflectGeneration: pauseReflectGenerationMock,
   };
