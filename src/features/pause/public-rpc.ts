@@ -167,9 +167,9 @@ import {
   runReflectGeneration,
   type RunReflectGenerationInput,
 } from './application/use-cases/ritual/reflect/generation/run-reflect-generation';
-import type { ReflectGenerationResult } from './domain/reflect/generation/reflect-generation-result';
 import { runReflectionShareImage } from './application/use-cases/ritual/reflect/share/run-reflection-share-image';
 import type { DeliverReflectionShareImageOutcome } from './application/use-cases/ritual/reflect/share/deliver-reflection-share-image';
+import type { ReflectGenerationResult } from './domain/reflect/generation/reflect-generation-result';
 import { showPauseStepSyncFailedToast } from './presentation/ritual/pause-step-sync-toast';
 export {
   trackPauseReflectPostItOpen,
