@@ -18260,4 +18260,23 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — reflect telemetry I/O direct sibling imports (backlog #1 verified, Tier 5)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>Home + session reflect PostHog I/O off flow anchors</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code>) remains complete — no folder moves. Peel <code>pause-home-reflect-telemetry-io</code> to <code>home-pause-actions-telemetry</code> and <code>manual-pause-trigger-telemetry</code>; peel <code>pause-reflect-telemetry-io</code> to <code>pause-reflect-session-ui-telemetry</code> (parity with steps/mood/hub/share presentation I/O). Keep <code>pause-home-reflect-telemetry-flow</code> and <code>pause-reflect-telemetry-flow</code> as CI cluster anchors only.</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior parity; automation push had only resolved implementation-notes conflict markers.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Smoke test on home telemetry I/O re-exports; session telemetry test unchanged.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: <code>pause-session-brief-io</code> already off brief-flow anchor; companion orchestrate-io already direct <code>ritual/frame/*</code>; Phase B cross-context Tier 1 shim (auth/subscription).</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
