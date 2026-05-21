@@ -8152,4 +8152,23 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — decide outcome wired public-rpc (backlog #1 done, #4)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>Peel decide handler off public-ports for outcome_logged</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>ritual/reflect/</code>) is complete; reflect step metadata already uses <code>public-rpc</code> on this branch. <code>use-pause-session-decide-handler</code> calls <code>logPauseOutcome</code> and imports decide flow/toasts from <code>public-rpc</code> only (no <code>supabasePauseRepository</code>).</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior parity.</dd>
+      <dt>Tradeoffs</dt>
+      <dd><code>getSessionQuote</code> stays a direct application import (pure read, no repository I/O).</dd>
+      <dt>Open questions</dt>
+      <dd>Next: wire breath segment RPC loggers, brief done check-in, or pending-offer mutations via existing <code>public-rpc</code> facades.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
