@@ -4,8 +4,7 @@ import type { TFunction } from 'i18next';
 import { hapticFeedback } from '@/lib/haptics';
 import type { BulkHoldOutcomeChoice, BulkHoldPendingPause } from '@/features/pause/public-hooks';
 import { invalidatePauseStatsDataForUser } from '@/features/pause/public-queries';
-import { applyBulkHoldOutcomes as applyBulkHoldOutcomesUseCase } from '@/features/pause/application/use-cases/home/bulk-hold/apply-bulk-hold-outcomes';
-import { supabasePauseRepository } from '@/features/pause/public-ports';
+import { applyBulkHoldOutcomes } from '@/features/pause/public-rpc';
 
 export type UseBulkHoldApplyOutcomesParams = {
   user: User | null;
@@ -36,7 +35,7 @@ export function useBulkHoldApplyOutcomes({
       setApplyError(null);
       hapticFeedback('medium');
 
-      const result = await applyBulkHoldOutcomesUseCase(supabasePauseRepository, rows, resolver);
+      const result = await applyBulkHoldOutcomes(rows, resolver);
 
       if (result.status === 'failed') {
         hapticFeedback('warning');
