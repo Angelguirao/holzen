@@ -100,6 +100,7 @@ export {
 } from './application/use-cases/ritual/breathe/resolve-triangle-kicker-display';
 export {
   resolvePauseBreathingTimedDisplay,
+  type PauseBreathingPhase,
   type PauseBreathingTimedDisplay,
 } from './application/use-cases/ritual/breathe/resolve-pause-breathing-timed-display';
 export type { FeelStepTile } from './domain/feel-step-tile';
@@ -373,7 +374,6 @@ export { usePauseSessionHeaderBackHandler } from './presentation/session/use-pau
 export { usePauseSessionBreathTimedActiveReset } from './presentation/session/use-pause-session-breath-timed-active-reset';
 export {
   usePauseBreathingTimedLoop,
-  type PauseBreathingPhase,
   type UsePauseBreathingTimedLoopInput,
 } from './presentation/session/use-pause-breathing-timed-loop';
 export {

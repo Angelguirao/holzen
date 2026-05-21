@@ -5473,4 +5473,23 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — unify PauseBreathingPhase type (Tier 5 breathe)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>Single source for timed-loop + timed-display phase shape</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>ritual/reflect/</code>) is complete on this branch. After <code>resolve-pause-breathing-timed-display</code> landed on remote, dedupe <code>PauseBreathingPhase</code>: canonical type in <code>ritual/breathe/resolve-pause-breathing-timed-display.ts</code>; <code>use-pause-breathing-timed-loop</code> re-exports for hook consumers; <code>public-hooks</code> exports the type from the breathe use case (not the presentation hook).</dd>
+      <dt>Deviation</dt>
+      <dd>None — structural typing unchanged (<code>labelKey</code> + <code>duration</code>).</dd>
+      <dt>Tradeoffs</dt>
+      <dd><code>resolvePauseBreathingPhases</code> still returns an inline array type; can alias to <code>PauseBreathingPhase</code> in a follow-up.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: peel <code>pause-science-step-highlight</code> from <code>screens/pause/lib/</code>, or backlog #4 stray analytics reads.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
