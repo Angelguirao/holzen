@@ -47,7 +47,8 @@ export function PauseFrame({
   const zoomHref = pauseInstanceId ? `/companion/zoom-out/${pauseInstanceId}` : '/pause';
   const signalHref = pauseInstanceId ? `/companion/signal/${pauseInstanceId}` : '/pause';
 
-  const showHaikuCard = companionHaikuEnabled && Boolean(pauseInstanceId) && Boolean(reflectionMessage.trim());
+  /** Haiku is optional and lazy-loaded — do not require nav reflection seed (matches Reflect artifact pattern). */
+  const showHaikuCard = companionHaikuEnabled && Boolean(pauseInstanceId);
   const displayHaikuBody = resolveFrameHaikuDisplayBody({
     artifactHaiku,
     haikuFetch,

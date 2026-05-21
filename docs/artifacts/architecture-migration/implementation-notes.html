@@ -5112,4 +5112,23 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — Frame haiku row without nav reflection seed (backlog #1 adjacent)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>Reflect artifact parity on Frame hub</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code>) is complete on <code>cursor/arch-migrate-src-ca70</code>. After generation-hook artifact prefetch, <code>PauseFrame</code> no longer gates the haiku card on <code>reflectionMessage.trim()</code> — users with persisted haiku can expand the card even when the nav seed is empty; fetch stays <code>whenEnabled</code> on open.</dd>
+      <dt>Deviation</dt>
+      <dd>None — aligns with Reflect immediate haiku read; display body still uses <code>resolveFrameHaikuDisplayBody</code>.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Haiku card chrome may appear before copy is known; collapsed card until user opens it.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: backlog #4 stray <code>PauseRepository</code> audit, or unit test for <code>usePauseReflectGeneration</code> artifact prefetch.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
