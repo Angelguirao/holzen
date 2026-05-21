@@ -97,6 +97,25 @@
   <article class="note">
     <header>
       <span>2026-05-21</span>
+      <span>Phase A slice — reflect flows I/O via flows-flow anchor (backlog #1 verified, Tier 5)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3><code>pause-reflect-flows-io</code> imports reflect+decide helpers through <code>pause-reflect-flows-flow</code></h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>ritual/reflect/</code> folder move) remains complete — no folder moves. <code>pause-reflect-flows-io</code> imports preflight/post-generation, decide flow mapping, outcome RPC, toasts, and session quotes through <code>pause-reflect-flows-flow</code> instead of split <code>domain/reflect/flows/</code>, <code>domain/decide/</code>, and <code>ritual/decide/*</code> paths (parity with share/hub/steps I/O anchors on branch tip).</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior parity; import boundary only.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Generation I/O still imports domain hook helpers directly; mood I/O still imports <code>run-initial-emotion-log</code> directly until a mood-flow peel.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: mood I/O through <code>pause-reflect-mood-flow</code>, generation I/O through application hook-flow anchor, or Phase B cross-context Tier 1 shim.</dd>
+    </dl>
+  </article>
+
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
       <span>Phase A slice — session reflect telemetry through telemetry flow anchor (backlog #1 verified, Tier 5)</span>
       <span class="status resolved">resolved</span>
     </header>
