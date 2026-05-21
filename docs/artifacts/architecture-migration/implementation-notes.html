@@ -59,6 +59,25 @@
   <article class="note">
     <header>
       <span>2026-05-21</span>
+      <span>Phase B slice — holzen QueryClient lib shim (Tier 1)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3><code>src/lib/holzen-query-client-ref.ts</code> re-exports pause query client registration</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Phase A pause interior backlog is complete on this branch. Add Tier 1 cross-cutting shim: <code>App.tsx</code> registers the TanStack <code>QueryClient</code> via <code>@/lib/holzen-query-client-ref</code> instead of importing <code>@/features/pause/public-queries</code> at boot (implementation still lives in pause infrastructure; lib is the stable app↔pause seam).</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior parity; import path only for app shell.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Pause feature internals still import <code>infrastructure/holzen-query-client-ref</code> directly; only app shell uses the lib shim today.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: <code>pause-companion-analytics-io</code> flow anchor peel, or subscription Tier 1 shim following the same pattern.</dd>
+    </dl>
+  </article>
+
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
       <span>Phase A slice — reflect steps I/O via steps flow anchor (backlog #1 verified, Tier 5)</span>
       <span class="status resolved">resolved</span>
     </header>
@@ -71,7 +90,7 @@
       <dt>Tradeoffs</dt>
       <dd>Flow anchor is a thin re-export barrel for <code>check:architecture-alignment</code> reflect steps cluster detection.</dd>
       <dt>Open questions</dt>
-      <dd>Next: <code>pause-reflect-telemetry-io</code> flow peel, <code>pause-companion-analytics-io</code> flow anchor, or Phase B cross-context Tier 1 shim.</dd>
+      <dd>Next: <code>pause-reflect-telemetry-io</code> flow peel or companion analytics I/O peel.</dd>
     </dl>
   </article>
 
@@ -90,7 +109,11 @@
       <dt>Tradeoffs</dt>
       <dd>Hub flow anchor stays a thin re-export barrel for <code>check:architecture-alignment</code> reflect hub cluster detection.</dd>
       <dt>Open questions</dt>
+<<<<<<< HEAD
       <dd>Next: <code>pause-reflect-telemetry-io</code> flow peel, share I/O flow-anchor parity, or Phase B cross-context Tier 1 shim.</dd>
+=======
+      <dd>Next: <code>pause-reflect-telemetry-io</code> flow peel, or companion analytics I/O peel.</dd>
+>>>>>>> 3f2700271 (refactor(app): register QueryClient via lib holzen-query-client-ref shim)
     </dl>
   </article>
 
@@ -109,7 +132,7 @@
       <dt>Tradeoffs</dt>
       <dd>Application anchor remains a thin re-export for <code>check:architecture-alignment</code> ambience cluster detection.</dd>
       <dt>Open questions</dt>
-      <dd>Next: <code>pause-reflect-telemetry-io</code> flow peel, or Phase B cross-context Tier 1 shim.</dd>
+      <dd>Next: <code>pause-reflect-telemetry-io</code> flow peel, or companion analytics I/O peel.</dd>
     </dl>
   </article>
 
@@ -166,7 +189,7 @@
       <dt>Tradeoffs</dt>
       <dd>Umbrella mood flow anchor is thin re-exports for <code>check:architecture-alignment</code> mood cluster detection.</dd>
       <dt>Open questions</dt>
-      <dd>Next: Phase B cross-context Tier 1 shim, or session/companion presentation I/O anchor peels.</dd>
+      <dd>Next: session/companion presentation I/O anchor peels.</dd>
     </dl>
   </article>
 
@@ -185,7 +208,7 @@
       <dt>Tradeoffs</dt>
       <dd><code>pause-reflect-generation-hook-flow.ts</code> remains for <code>check:architecture-alignment</code>.</dd>
       <dt>Open questions</dt>
-      <dd>Next: reconcile mood I/O direct-import vs flow-anchor pattern, or Phase B cross-context Tier 1 shim.</dd>
+      <dd>Next: reconcile mood I/O direct-import vs flow-anchor pattern on branch tip.</dd>
     </dl>
   </article>
 
