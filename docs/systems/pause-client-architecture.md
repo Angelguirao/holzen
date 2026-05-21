@@ -192,6 +192,8 @@ Shared reads live in `infrastructure/queries/`, exported via **`public-queries`*
 | `public-scheduling.ts` | Quarter-hour scheduling math for Home context refresh (no Supabase) |
 | `public-session.ts` | Session shell pure helpers (header-back, mount-log, step-transition, persist snapshot/guards, gate predicates, hydration merge, shell view-model coalesce, step bundles, terminal-entry guards, scaffold-ritual-derived, storage-ritual-sync, holzen providers slice, `step-map` restore initializers, breath segment dedupe + second-label variant, timed-loop phase advance + breath cues, …) — no Supabase |
 | `public-ritual-brief.ts` | Brief ritual pure helpers (integrate timer, `computePauseGoBackPlan`, `computeBriefPastStepClick`, `briefSwitchToDeepPauseState`) — no Supabase |
+| `public-ritual-reflect.ts` | Reflect ritual beat — mood/feel constants, reflect hooks, share handlers — screens import here instead of `public-hooks` for reflect UI |
+| `public-ritual-done.ts` | Post-pause done step — `usePauseBriefDoneCheckIn`, `resolveDoneWallpaperMood` (RPC-backed hook; keep off `public-session` so pure session imports stay Supabase-free) |
 | `public-trigger.ts` | Manual-trigger cooldown math, localStorage keys, error mapping — no Supabase |
 | `public-queries.ts` | `get*QueryOptions` factories |
 | `public-hooks.ts` | Screen-facing conductors |
