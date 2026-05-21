@@ -59,6 +59,7 @@
   <article class="note">
     <header>
       <span>2026-05-21</span>
+<<<<<<< HEAD
       <span>Phase A slice — session shell I/O direct session use cases (backlog #1 follow-up, Tier 5)</span>
       <span class="status resolved">resolved</span>
     </header>
@@ -72,6 +73,21 @@
       <dd><code>pause-session-shell-flow.ts</code> remains for <code>check:architecture-alignment</code>; scaffold/brief/decide session I/O anchors unchanged this slice.</dd>
       <dt>Open questions</dt>
       <dd>Next: peel <code>pause-session-scaffold-io</code>, <code>pause-session-brief-io</code>, or <code>pause-session-decide-io</code> from session flow anchors.</dd>
+=======
+      <span>Phase A slice — session decide I/O direct restored-decide-ritual-state (backlog #1 follow-up, Tier 5)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3><code>pause-session-decide-io</code> imports decide hydration from ritual/decide use case</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>ritual/reflect/</code>) remains complete. <code>pause-session-decide-io</code> imports <code>initialDecisionFromRestored</code> and <code>initialPhaseFromRestored</code> from <code>ritual/decide/restored-decide-ritual-state</code> instead of <code>pause-session-decide-flow</code> session CI anchor (parity with <code>pause-session-frame-io</code> peel).</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior parity; import boundary only.</dd>
+      <dt>Tradeoffs</dt>
+      <dd><code>pause-session-decide-flow.ts</code> remains for <code>check:architecture-alignment</code>; presentation no longer routes through it.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: <code>pause-session-shell-io</code> or <code>pause-session-scaffold-io</code> direct sibling imports.</dd>
+>>>>>>> 4cc5001b (refactor(pause): peel session decide I/O off flow anchor)
     </dl>
   </article>
 
@@ -109,7 +125,7 @@
       <dt>Tradeoffs</dt>
       <dd><code>pause-reflect-generation-manual-open-flow.ts</code> remains for <code>check:architecture-alignment</code> only.</dd>
       <dt>Open questions</dt>
-      <dd>Next: peel <code>pause-reflect-steps-io</code> or <code>pause-reflect-mood-io</code> from flow anchors, or session shell/scaffold I/O anchor peels.</dd>
+      <dd>Next: peel <code>pause-reflect-mood-io</code> from flow anchors, or session shell/scaffold I/O anchor peels.</dd>
     </dl>
   </article>
 
@@ -128,7 +144,7 @@
       <dt>Tradeoffs</dt>
       <dd><code>pause-reflect-generation-hook-flow.ts</code> remains for <code>check:architecture-alignment</code>; presentation no longer depends on it.</dd>
       <dt>Open questions</dt>
-      <dd>Next: peel <code>pause-reflect-steps-io</code> or <code>pause-reflect-mood-io</code> from flow anchors, or session conductor flow-anchor peels.</dd>
+      <dd>Next: peel <code>pause-reflect-mood-io</code> from flow anchors, or session conductor flow-anchor peels.</dd>
     </dl>
   </article>
 
