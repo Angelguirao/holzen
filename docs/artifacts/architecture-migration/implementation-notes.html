@@ -4219,6 +4219,25 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — ReflectionStepLogStoragePort in ports/ (reflect §5)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>Backlog #1 complete; fix infrastructure → application import for reflection_step dedupe</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd><code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code> was already complete. Move <code>ReflectionStepLogStoragePort</code> to <code>ports/reflection-step-log-storage.ts</code> so <code>infrastructure/edge/reflect/reflection-step-session-storage.ts</code> no longer imports application types. Re-export type from the use case for stable test imports. Peel unused <code>invokeHolzenReflect</code> re-export from <code>public-rpc.ts</code> (holzen-reflect only via <code>ReflectGenerator</code> / <code>reflection-artifact</code>).</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior parity; sessionStorage adapter unchanged.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Presentation hooks still import some reflect pure helpers from <code>application/use-cases/ritual/reflect/</code> until a later <code>public-hooks</code> peel.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: <code>CompanionOrchestrator</code> port (backlog #4 remainder), or extend <code>ReflectGenerator</code> with haiku artifact read.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
 </body>
 </html>

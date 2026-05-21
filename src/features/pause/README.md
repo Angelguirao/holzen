@@ -16,7 +16,7 @@ features/pause/
     ritual/
       feel/ breathe/ reflect/ frame/ decide/ done/
     archive/                      # Pauses + Echoes reads (not user collections — legacy)
-  ports/                          # PauseRepository, ReflectGenerator, …
+  ports/                          # PauseRepository, ReflectGenerator, ReflectionStepLogStorage, …
   infrastructure/                 # supabase, edge, queries/
   presentation/                   # React conductors only — ritual JSX in src/screens/pause/
     reflect/                      # holzen-reflect, post-it note/tags, reflect/decide conductor
