@@ -9558,4 +9558,23 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — reflect share orchestrator in domain (backlog #1 verified, Tier 5)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>ritual/reflect/ folder map complete; colocate PNG share flow under domain/reflect/share</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code>) verified complete — zero legacy paths. Move pure <code>runReflectionShareImage</code> (+ test) from <code>application/use-cases/ritual/reflect/share/</code> to <code>domain/reflect/share/</code> beside <code>reflection-share-canvas</code> and <code>deliver-reflection-share-image</code>; <code>public-rpc</code> re-export path only.</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior parity.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Port-backed use cases remain under <code>application/use-cases/ritual/reflect/</code> (generation, steps, mood, hub).</dd>
+      <dt>Open questions</dt>
+      <dd>Next backlog #4: peel remaining session/home presentation imports of <code>application/use-cases/*</code> where RPC facades exist.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
