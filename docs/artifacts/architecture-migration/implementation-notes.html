@@ -15660,6 +15660,25 @@
   <article class="note">
     <header>
       <span>2026-05-21</span>
+      <span>Phase A slice — favorite pro-hint toast via reflect steps I/O (backlog #1 follow-up)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>Peel <code>showPauseFavoriteProHintToast</code> through <code>pause-reflect-steps-io</code></h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 remains complete — no folder moves. Re-export <code>showPauseFavoriteProHintToast</code> from <code>pause-reflect-steps-io</code> alongside <code>shouldShowFavoriteProHint</code> (via <code>pause-favorite-toggle-flow</code>); <code>use-pause-favorite-toggle</code> imports gate + toast + RPC facade from steps I/O only.</dd>
+      <dt>Deviation</dt>
+      <dd>None — toast module stays under <code>presentation/reflect/steps/</code> per §10.1.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Mood chrome still composes <code>usePauseFavoriteToggle</code> directly.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: peel session breath navigation through <code>pause-session-breath-io</code>, port-backed companion feedback vote, or Phase B cross-context Tier 1 shim.</dd>
+    </dl>
+  </article>
+
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
       <span>Phase A slice — dismiss-open-pause-home under ritual/reflect/generation (backlog #1 cluster)</span>
       <span class="status resolved">resolved</span>
     </header>

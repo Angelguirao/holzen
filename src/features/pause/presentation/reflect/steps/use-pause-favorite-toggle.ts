@@ -2,11 +2,11 @@ import { useCallback, type Dispatch, type SetStateAction } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
 import type { TFunction } from 'i18next';
 import { useAuth } from '@/features/auth/public';
-import { showPauseFavoriteProHintToast } from '@/features/pause/presentation/reflect/steps/pause-favorite-pro-hint-toast';
 import { pauseArchiveListQueryPrefix } from '@/features/pause/public-queries';
 import {
   pauseReflectFavoriteToggle,
   shouldShowFavoriteProHint,
+  showPauseFavoriteProHintToast,
 } from './pause-reflect-steps-io';
 import { hapticFeedback } from '@/lib/haptics';
 
