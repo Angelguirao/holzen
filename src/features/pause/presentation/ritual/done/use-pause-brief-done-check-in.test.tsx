@@ -5,9 +5,11 @@ import { usePauseBriefDoneCheckIn } from './use-pause-brief-done-check-in';
 
 const {
   runPostPauseEmotionLogIfDirtyMock,
+  mockPauseRepository,
   showPauseStepSyncFailedToast,
 } = vi.hoisted(() => ({
   runPostPauseEmotionLogIfDirtyMock: vi.fn(),
+  mockPauseRepository: { port: 'supabasePauseRepository' },
   showPauseStepSyncFailedToast: vi.fn(),
 }));
 
@@ -16,7 +18,7 @@ vi.mock('@/features/pause/application/use-cases/ritual/done/post-pause-emotion-l
 }));
 
 vi.mock('@/features/pause/infrastructure/supabase-pause-repository', () => ({
-  supabasePauseRepository: {},
+  supabasePauseRepository: mockPauseRepository,
 }));
 
 vi.mock('@/features/pause/presentation/ritual/pause-step-sync-toast', () => ({
@@ -49,7 +51,14 @@ describe('usePauseBriefDoneCheckIn', () => {
       await result.current.handleSaveToJourney();
     });
 
-    expect(runPostPauseEmotionLogIfDirtyMock).toHaveBeenCalledOnce();
+    expect(runPostPauseEmotionLogIfDirtyMock).toHaveBeenCalledWith(
+      mockPauseRepository,
+      expect.objectContaining({
+        pauseInstanceId: 'inst-1',
+        mood: 'calm',
+        intensity: 3,
+      }),
+    );
     expect(onSaveToJourney).toHaveBeenCalledOnce();
     expect(showPauseStepSyncFailedToast).not.toHaveBeenCalled();
   });
@@ -75,7 +84,13 @@ describe('usePauseBriefDoneCheckIn', () => {
       await result.current.handleSaveToJourney();
     });
 
-    expect(runPostPauseEmotionLogIfDirtyMock).toHaveBeenCalledOnce();
+    expect(runPostPauseEmotionLogIfDirtyMock).toHaveBeenCalledWith(
+      mockPauseRepository,
+      expect.objectContaining({
+        pauseInstanceId: 'inst-1',
+        mood: 'anxious',
+      }),
+    );
     expect(onSaveToJourney).not.toHaveBeenCalled();
     expect(showPauseStepSyncFailedToast).toHaveBeenCalledWith(t);
   });

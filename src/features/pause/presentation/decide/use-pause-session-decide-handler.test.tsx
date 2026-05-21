@@ -7,18 +7,18 @@ import type { UsePauseSessionDecideHandlerParams } from './pause-session-decide-
 
 const {
   runPauseOutcomeLogMock,
+  mockPauseRepository,
   clearSessionMock,
   invalidatePauseStatsMock,
   showPauseOutcomeSaveFailedToast,
   showPauseOutcomeNotCompletedToast,
-  mockPauseRepository,
 } = vi.hoisted(() => ({
   runPauseOutcomeLogMock: vi.fn(),
+  mockPauseRepository: { port: 'supabasePauseRepository' },
   clearSessionMock: vi.fn(),
   invalidatePauseStatsMock: vi.fn(),
   showPauseOutcomeSaveFailedToast: vi.fn(),
   showPauseOutcomeNotCompletedToast: vi.fn(),
-  mockPauseRepository: { port: 'supabasePauseRepository' },
 }));
 
 vi.mock('@/features/pause/application/use-cases/ritual/decide/run-pause-outcome-log', () => ({
