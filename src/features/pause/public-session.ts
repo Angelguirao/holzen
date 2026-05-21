@@ -100,10 +100,10 @@ export {
   initialDecisionFromRestored,
   initialFrameDoneFromRestored,
   initialPhaseFromRestored,
-  initialRitualEntry,
   initialSelectedBriefFaceFromRestored,
   mapPersistedStep,
 } from './application/use-cases/session/step-map';
+export { initialRitualEntry } from './application/use-cases/ritual/reflect/scaffold/initial-ritual-entry';
 export { getSessionQuote, type WisdomQuote } from './application/use-cases/ritual/decide/wisdom-quotes';
 export {
   formatReinforcementQuoteFromSession,
