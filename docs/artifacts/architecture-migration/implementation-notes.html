@@ -12408,4 +12408,23 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — reflect UI telemetry under ritual/reflect/telemetry/ (backlog #1)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3><code>pause-reflect-ui-telemetry</code> off domain</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Legacy <code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code> was already complete. PostHog side effects are not domain policy — colocate trackers under <code>application/use-cases/ritual/reflect/telemetry/</code>; <code>use-pause-reflect-ui-telemetry</code> imports the use-case module directly (off <code>public-rpc</code>).</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior unchanged.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Two files moved + presentation import updates; empty <code>domain/reflect/telemetry/</code> removed.</dd>
+      <dt>Open questions</dt>
+      <dd>Next backlog #4: archive retrospective PostHog behind analytics port, or Phase B subscription/auth template slice.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
