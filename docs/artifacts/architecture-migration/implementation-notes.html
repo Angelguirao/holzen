@@ -8418,4 +8418,23 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — home manual trigger via public-rpc (backlog #4)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>Peel use-manual-pause-trigger off public-ports</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>ritual/reflect/</code>) and holzen-reflect generation (<code>runPauseReflectGeneration</code>) are complete. <code>use-manual-pause-trigger</code> calls wired <code>openManualPauseFromHome</code> on <code>public-rpc</code> instead of the use case + <code>supabasePauseRepository</code> / <code>supabaseReflectGenerator</code> from <code>public-ports</code>. Market param build + preview apply stay on application imports (no repository I/O).</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior parity; import surface only.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Companion orchestrate + fullview telemetry still inject <code>public-ports</code>; breath segment loggers already use <code>public-rpc</code>.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: reflect mood/shift presentation tests mock <code>public-rpc</code> only, or peel companion slot orchestrate off <code>public-ports</code>.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
