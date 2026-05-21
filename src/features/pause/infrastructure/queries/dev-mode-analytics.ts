@@ -1,5 +1,5 @@
 import { runLogDevModeSetting } from '@/features/pause/application/use-cases/admin/run-log-dev-mode-setting';
-import { supabasePauseAnalyticsRepository } from '@/features/pause/infrastructure/supabase-pause-analytics-repository';
+import { supabasePauseAnalyticsRepository } from '@/features/pause/public-ports';
 
 export type { LogDevModeSettingInput } from '@/features/pause/application/use-cases/admin/run-log-dev-mode-setting';
 
