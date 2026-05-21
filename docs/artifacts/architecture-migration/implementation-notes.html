@@ -17674,19 +17674,19 @@
   <article class="note">
     <header>
       <span>2026-05-21</span>
-      <span>Phase A slice — reflect flows I/O via reflect-and-decide flow anchor (backlog #1 verified, Tier 5)</span>
+      <span>Phase A slice — reflect flows I/O direct domain + decide modules (backlog #1 verified, Tier 5)</span>
       <span class="status resolved">resolved</span>
     </header>
-    <h3><code>pause-reflect-flows-io</code> → <code>pause-session-reflect-and-decide-flow</code></h3>
+    <h3><code>pause-reflect-flows-io</code> off reflect-and-decide + decide flow anchors</h3>
     <dl>
       <dt>Design decision</dt>
-      <dd>Backlog #1 (<code>ritual/reflect/</code>) remains complete — no folder moves. Presentation flows I/O imports reflect-and-decide preflight/post-generation through the application cluster anchor instead of deep <code>domain/reflect/flows/</code> (decide outcome RPC/toasts already use decide cluster anchors).</dd>
+      <dd>Backlog #1 (<code>ritual/reflect/</code>) remains complete. Presentation flows I/O imports preflight/post-generation from <code>domain/reflect/flows/</code>, decide flow + quotes from <code>domain/decide/</code>, Sonner toasts from <code>outcome-toast</code>, and <code>runPauseOutcomeLog</code> from <code>run-pause-outcome-log</code> (supersedes parallel slice that routed preflight through <code>pause-session-reflect-and-decide-flow</code> CI anchor).</dd>
       <dt>Deviation</dt>
       <dd>None — behavior parity; import boundary only.</dd>
       <dt>Tradeoffs</dt>
-      <dd>Domain module unchanged; anchor exists for <code>check:architecture-alignment</code> cluster detection.</dd>
+      <dd>Application cluster anchors remain for <code>check:architecture-alignment</code>; presentation I/O no longer imports them.</dd>
       <dt>Open questions</dt>
-      <dd>Next: <code>pause-home-reflect-telemetry-io</code> direct telemetry imports, companion orchestrate-io peel, or Phase B cross-context Tier 1 shim.</dd>
+      <dd>Next: <code>pause-session-decide-io</code> peel <code>pause-session-decide-flow</code>, or companion orchestration-io session-load direct import.</dd>
     </dl>
   </article>
 
