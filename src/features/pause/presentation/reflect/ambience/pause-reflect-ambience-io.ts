@@ -1,8 +1,8 @@
 /**
  * Reflect/Frame focus-bed presentation I/O.
- * Imports through `reflect-frame-focus-ambience` application anchor (parity with mood/flows I/O clusters).
+ * Imports Web Audio helpers from domain directly (off `reflect-frame-focus-ambience` CI anchor).
  */
 export {
   startPauseReflectFrameFocusAmbience,
   stopPauseReflectFrameFocusAmbience,
-} from '@/features/pause/application/use-cases/ritual/reflect/ambience/reflect-frame-focus-ambience';
+} from '@/features/pause/domain/ritual/breathe/reflect-frame-focus-ambience';
