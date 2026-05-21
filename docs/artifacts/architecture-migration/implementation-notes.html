@@ -5039,19 +5039,19 @@
   <article class="note">
     <header>
       <span>2026-05-21</span>
-      <span>Phase A slice — reflect artifact read hook (backlog #1 adjacent)</span>
+      <span>Phase A slice — reflect artifact text domain + read hook (backlog #1 follow-up)</span>
       <span class="status resolved">resolved</span>
     </header>
-    <h3><code>use-pause-artifact-reflection-text</code> beside haiku hook</h3>
+    <h3><code>reflection_text</code> parse helper + <code>usePauseArtifactReflectionText</code></h3>
     <dl>
       <dt>Design decision</dt>
-      <dd>After <code>pause-session-reflect-decide-flow</code> landed under <code>ritual/reflect/flows/</code>, add a presentation hook mirroring <code>use-pause-artifact-haiku</code> for persisted <code>reflection_text</code> reads via <code>fetchPauseReflectReflectionText</code> (<code>ReflectGenerator</code> port). Export from <code>public-hooks</code>; no screen wiring this slice — avoids changing Reflect generation prefetch.</dd>
+      <dd>Backlog #1 (<code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code>) was already complete. Centralize <code>reflection_text</code> message parsing in <code>domain/reflect/generation/reflection-text-from-artifact-rows.ts</code>; batch reads in home preview + companion snapshot + single-row artifact query use the helper. Presentation hook mirrors <code>usePauseArtifactHaiku</code> (<code>fetchPauseReflectReflectionText</code> via <code>ReflectGenerator</code> / <code>public-rpc</code>); export from <code>public-hooks</code>.</dd>
       <dt>Deviation</dt>
-      <dd>None — matches §3 / §10.1 generation cluster grouping.</dd>
+      <dd>None — behavior parity; snapshot still defaults missing copy to <code>''</code>, home preview to <code>null</code>.</dd>
       <dt>Tradeoffs</dt>
-      <dd>Hook is available for Frame fallback / deferred hydration; consumers can adopt in a follow-up without touching <code>use-pause-reflect-generation</code>.</dd>
+      <dd>Hook is available for Frame fallback / deferred hydration; <code>PauseReflectCard</code> still uses session conductor + <code>usePauseReflectGeneration</code> for live copy.</dd>
       <dt>Open questions</dt>
-      <dd>Next: wire Frame or Reflect card to fall back to artifact text when session seed is empty, or backlog #4 stray RPC audit.</dd>
+      <dd>Next: wire Frame or Reflect card to fall back to artifact text when session seed is empty, or backlog #4 stray <code>PauseRepository</code> audit.</dd>
     </dl>
   </article>
 

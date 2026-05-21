@@ -29,6 +29,7 @@ export type UsePauseArtifactReflectionTextResult = {
 
 /**
  * Loads persisted `reflection_text` from `pause_ai_artifacts` for Reflect / Frame steps.
+ * Mirrors `usePauseArtifactHaiku` — artifact-only hydrate without `holzen-reflect`.
  */
 export function usePauseArtifactReflectionText(
   params: UsePauseArtifactReflectionTextParams,

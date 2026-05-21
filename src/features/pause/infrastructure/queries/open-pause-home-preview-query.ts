@@ -1,5 +1,6 @@
 import { supabase } from '@/integrations/supabase/client';
 import type { CompanionData } from '@/features/pause/domain/companion-card-types';
+import { reflectionTextMessageFromArtifactRows } from '@/features/pause/domain/reflect/generation/reflection-text-from-artifact-rows';
 import { companionDataFromArtifacts } from '@/features/pause/application/use-cases/ritual/frame/companion-data-from-artifacts';
 
 export type OpenPauseHomePreview = {
@@ -47,13 +48,7 @@ export async function fetchOpenPauseHomePreview(userId: string): Promise<OpenPau
 
   const artifactRows = (artifacts ?? []) as Array<{ kind: string; content: Record<string, unknown> }>;
 
-  let reflectionMessage: string | null = null;
-  for (const a of artifactRows) {
-    if (a.kind === 'reflection_text' && typeof a.content?.message === 'string') {
-      reflectionMessage = a.content.message as string;
-      break;
-    }
-  }
+  const reflectionMessage = reflectionTextMessageFromArtifactRows(artifactRows);
 
   return {
     pauseInstanceId: row.id,
