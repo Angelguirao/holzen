@@ -196,7 +196,7 @@ export {
   useCurrentPause,
   currentPauseQueryKey,
   type CurrentPauseRow,
-} from './presentation/use-current-pause';
+} from './presentation/archive/use-current-pause';
 export { useOpenPauseHomePreview } from './presentation/home/use-open-pause-home-preview';
 export {
   useManualPauseTrigger,
