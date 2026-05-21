@@ -9,8 +9,8 @@ export {
 export {
   initialDecisionFromRestored,
   initialPhaseFromRestored,
-} from '@/features/pause/application/use-cases/ritual/decide/restored-decide-ritual-state';
-export { initialFrameDoneFromRestored } from '@/features/pause/application/use-cases/ritual/frame/restored-frame-ritual-state';
+} from '@/features/pause/presentation/session/pause-session-decide-io';
+export { initialFrameDoneFromRestored } from '@/features/pause/presentation/session/pause-session-frame-io';
 export {
   initialBriefIntegrateDoneFromRestored,
   initialBriefPauseStepFromRestored,
