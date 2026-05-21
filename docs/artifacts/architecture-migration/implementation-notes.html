@@ -5343,6 +5343,7 @@
   <article class="note">
     <header>
       <span>2026-05-21</span>
+<<<<<<< HEAD
       <span>Phase A slice — reflect generation hook-flow beside conductor (backlog #1 adjacent, Tier 2)</span>
       <span class="status resolved">resolved</span>
     </header>
@@ -5356,6 +5357,21 @@
       <dd>Pure helpers live in presentation because only the reflect generation conductor imports them; domain types unchanged.</dd>
       <dt>Open questions</dt>
       <dd>Next: backlog #4 wire <code>companion-fullview-analytics</code> / <code>pwa-install-analytics</code> / <code>companion-feedback-vote-query</code> through <code>public-ports</code> (same pattern as dev-mode), or peel remaining <code>screens/pause/lib/</code> helpers.</dd>
+=======
+      <span>Phase A slice — depth picker card chrome in presentation/reflect/mood (Tier 4)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>Backlog #1 complete; reflect mood UI token colocated</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd><code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code> was already complete on <code>cursor/arch-migrate-src-ca70</code>. Move <code>PAUSE_DEPTH_PICKER_CARD_BUTTON_CLASS</code> from <code>screens/pause/lib/</code> beside depth-picker conductors under <code>presentation/reflect/mood/</code>; <code>PauseDepthPickerDepthCards</code> imports via <code>public-hooks</code>.</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior-preserving move; Tailwind <code>cn()</code> stays in presentation (not domain).</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Route-only science/breath/companion helpers remain in <code>screens/pause/lib/</code> until their tiers land.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: backlog #4 wire <code>companion-feedback-vote-query</code> through <code>PauseAnalyticsRepository</code> without <code>public-rpc</code> re-import, or peel breath-orb / breathing timed-display helpers from <code>screens/pause/lib/</code>.</dd>
+>>>>>>> 6684b6e8 (refactor(pause): colocate depth picker card chrome in reflect mood)
     </dl>
   </article>
 
