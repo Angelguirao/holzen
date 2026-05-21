@@ -5847,7 +5847,26 @@
       <dt>Deviation</dt>
       <dd>None — behavior parity; no dedicated hook test (thin save callback only).</dd>
       <dt>Tradeoffs</dt>
-      <dd>Companion UI completion, home triggers, and reflect generation still import <code>public-rpc</code> until peeled slice-by-slice.</dd>
+      <dd>Companion UI completion and home triggers still import <code>public-rpc</code> until peeled slice-by-slice.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: peel <code>persistCompanionUiStepCompletion</code> or <code>use-archive-pause-retrospective-outcome</code> from <code>public-rpc</code>, or port-backed companion feedback vote read.</dd>
+    </dl>
+  </article>
+
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — reflect generation hooks via ReflectGenerator port (backlog #1 verified, #4)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>Peel holzen-reflect + artifact reads from public-rpc in presentation/reflect/generation</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd><code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code> was already complete on <code>cursor/arch-migrate-src-ca70</code>. <code>use-pause-reflect-generation</code>, <code>use-pause-artifact-haiku</code>, and <code>use-pause-artifact-reflection-text</code> call <code>runReflectGeneration</code> / <code>supabaseReflectGenerator.fetchHaikuText</code> / <code>fetchReflectionText</code> via <code>public-ports.ts</code> — same pattern as breath segment loggers + reflect note/tag hooks. Screen-facing facades stay on <code>public-rpc.ts</code>.</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior parity; co-located tests mock use-case + port instead of <code>public-rpc</code>.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Companion orchestration and archive retrospective hooks still import <code>public-rpc</code> until peeled.</dd>
       <dt>Open questions</dt>
       <dd>Next: peel <code>persistCompanionUiStepCompletion</code> or <code>use-archive-pause-retrospective-outcome</code> from <code>public-rpc</code>, or port-backed companion feedback vote read.</dd>
     </dl>
