@@ -1,7 +1,5 @@
-export type DismissOpenPauseHomePorts = {
-  clearPreview: () => void;
-  dismissCurrent: () => Promise<unknown>;
-};
+import { runPauseDismissCurrent } from '@/features/pause/application/use-cases/session/run-pause-dismiss-current';
+import type { PauseRepository } from '@/features/pause/ports/pause-repository';
 
 /**
  * Clears Home open-pause preview state and dismisses the current instance via RPC.
@@ -9,12 +7,12 @@ export type DismissOpenPauseHomePorts = {
  */
 export async function dismissOpenPauseHome(
   hasUser: boolean,
-  ports: DismissOpenPauseHomePorts,
+  ports: { clearPreview: () => void; repository: PauseRepository },
 ): Promise<void> {
   ports.clearPreview();
   if (!hasUser) return;
   try {
-    await ports.dismissCurrent();
+    await runPauseDismissCurrent(ports.repository);
   } catch {
     /* non-fatal — preview already cleared locally */
   }

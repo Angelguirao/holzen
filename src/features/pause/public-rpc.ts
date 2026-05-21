@@ -246,7 +246,7 @@ export function dismissOpenPauseHomePreview(
 ): Promise<void> {
   return dismissOpenPauseHome(hasUser, {
     clearPreview,
-    dismissCurrent: () => pauseDismissCurrent(),
+    repository: supabasePauseRepository,
   });
 }
 
