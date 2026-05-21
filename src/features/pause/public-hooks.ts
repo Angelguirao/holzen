@@ -157,11 +157,9 @@ export {
   bulkHoldPendingQueryKey,
   type BulkHoldPendingPause,
   type UseBulkHoldPendingOptions,
-} from './presentation/home/use-bulk-hold-pending';
-export {
   useBulkHoldApplyOutcomes,
   type UseBulkHoldApplyOutcomesParams,
-} from './presentation/home/use-bulk-hold-apply-outcomes';
+} from './public-home';
 export {
   usePauseArchiveList,
   type PauseArchiveListSort,
@@ -223,14 +221,14 @@ export {
   type PauseContextHomePreview,
   type PauseHomeErrorKind,
 } from './public-home';
-export { groupBulkHoldByLocalDay } from './application/use-cases/home/bulk-hold/group-by-local-day';
 export {
+  groupBulkHoldByLocalDay,
   formatBulkHoldContextQuote,
   formatBulkHoldLocalTime,
   parseBulkHoldChange24hPct,
   type BulkHoldOutcomeChoice,
   type BulkHoldReviewSection,
-} from './domain/bulk-hold';
+} from './public-home';
 export {
   usePauseArrivalAudio,
   usePauseCardProjection,

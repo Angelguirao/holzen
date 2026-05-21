@@ -1,16 +1,17 @@
 import { useState, useMemo, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/features/auth/public';
-import { useBulkHoldApplyOutcomes, useBulkHoldPending } from '@/features/pause/public-hooks';
+import {
+  groupBulkHoldByLocalDay,
+  useBulkHoldApplyOutcomes,
+  useBulkHoldPending,
+  type BulkHoldOutcomeChoice,
+  type BulkHoldPendingPause,
+} from '@/features/pause/public-home';
 import { useTranslation } from 'react-i18next';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ChevronRight, Folder, List, X } from 'lucide-react';
 import { hapticFeedback } from '@/lib/haptics';
-import {
-  groupBulkHoldByLocalDay,
-  type BulkHoldOutcomeChoice,
-  type BulkHoldPendingPause,
-} from '@/features/pause/public-hooks';
 import { Button } from '@/components/ui/button';
 import { homeInWidget } from '@/screens/home/components/home-widget-styles';
 import {
