@@ -4,7 +4,7 @@ import { usePauseSessionPersistToStorage } from './use-pause-session-persist-to-
 import {
   buildPauseSessionPersistSnapshot,
   type PauseSessionPersistSnapshotInput,
-} from '@/features/pause/application/use-cases/ritual/reflect/scaffold/persist-snapshot';
+} from '@/features/pause/application/use-cases/session/persist-snapshot';
 
 const { saveSessionMock } = vi.hoisted(() => ({
   saveSessionMock: vi.fn(),

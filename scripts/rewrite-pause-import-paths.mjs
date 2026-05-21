@@ -24,8 +24,16 @@ const REPLACEMENTS = [
   ['@/features/pause/application/use-cases/companion/', '@/features/pause/application/use-cases/ritual/frame/'],
   ['@/features/pause/application/use-cases/reflect/', '@/features/pause/application/use-cases/ritual/reflect/'],
   [
-    '@/features/pause/application/use-cases/session/persist-snapshot',
     '@/features/pause/application/use-cases/ritual/reflect/scaffold/persist-snapshot',
+    '@/features/pause/application/use-cases/session/persist-snapshot',
+  ],
+  [
+    '@/features/pause/application/use-cases/ritual/reflect/scaffold/storage-ritual-sync',
+    '@/features/pause/application/use-cases/session/storage-ritual-sync',
+  ],
+  [
+    '@/features/pause/application/use-cases/ritual/reflect/scaffold/migrate-persisted-session',
+    '@/features/pause/application/use-cases/session/migrate-persisted-session',
   ],
   [
     '@/features/pause/application/use-cases/ritual/feel/run-shift-emotion-frame-hub-done',
@@ -43,8 +51,16 @@ const REPLACEMENTS = [
   ['./application/use-cases/companion/', './application/use-cases/ritual/frame/'],
   ['./application/use-cases/reflect/', './application/use-cases/ritual/reflect/'],
   [
-    './application/use-cases/session/persist-snapshot',
     './application/use-cases/ritual/reflect/scaffold/persist-snapshot',
+    './application/use-cases/session/persist-snapshot',
+  ],
+  [
+    './application/use-cases/ritual/reflect/scaffold/storage-ritual-sync',
+    './application/use-cases/session/storage-ritual-sync',
+  ],
+  [
+    './application/use-cases/ritual/reflect/scaffold/migrate-persisted-session',
+    './application/use-cases/session/migrate-persisted-session',
   ],
   [
     './application/use-cases/ritual/feel/run-shift-emotion-frame-hub-done',
@@ -62,8 +78,16 @@ const REPLACEMENTS = [
   ['application/use-cases/companion/', 'application/use-cases/ritual/frame/'],
   ['application/use-cases/reflect/', 'application/use-cases/ritual/reflect/'],
   [
-    'application/use-cases/session/persist-snapshot',
     'application/use-cases/ritual/reflect/scaffold/persist-snapshot',
+    'application/use-cases/session/persist-snapshot',
+  ],
+  [
+    'application/use-cases/ritual/reflect/scaffold/storage-ritual-sync',
+    'application/use-cases/session/storage-ritual-sync',
+  ],
+  [
+    'application/use-cases/ritual/reflect/scaffold/migrate-persisted-session',
+    'application/use-cases/session/migrate-persisted-session',
   ],
   [
     'application/use-cases/ritual/feel/run-shift-emotion-frame-hub-done',

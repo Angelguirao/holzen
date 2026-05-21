@@ -1,6 +1,6 @@
 /**
  * Reflect ritual beat — screen-facing pure helpers and presentation hooks.
- * Mutations/edge stay on `public-rpc.ts`; tab session I/O via `infrastructure/session/persisted-session-storage` in reflect scaffold hooks.
+ * Mutations/edge stay on `public-rpc.ts`; tab autosave/sync conductors live under `presentation/session/scaffold/` (re-exported here for reflect mood bundle).
  */
 export {
   clampFeelIntensity,
@@ -60,8 +60,8 @@ export {
 } from './presentation/reflect/flows/use-pause-session-reflect-and-decide';
 export { usePauseSessionDecideHandler } from './presentation/reflect/flows/use-pause-session-decide-handler';
 export { usePauseSessionDepthAndBriefCopy } from './presentation/reflect/mood/use-pause-session-depth-and-brief-copy';
-export { usePauseSessionPersistToStorage } from './presentation/reflect/scaffold/use-pause-session-persist-to-storage';
-export { usePauseSessionRitualStorageSync } from './presentation/reflect/scaffold/use-pause-session-ritual-storage-sync';
+export { usePauseSessionPersistToStorage } from './presentation/session/scaffold/use-pause-session-persist-to-storage';
+export { usePauseSessionRitualStorageSync } from './presentation/session/scaffold/use-pause-session-ritual-storage-sync';
 
 export { PAUSE_DEPTH_PICKER_CARD_BUTTON_CLASS } from './presentation/reflect/mood/pause-depth-picker-styles';
 export { usePauseFeelShiftLogDedupeRefs } from './presentation/reflect/mood/use-pause-feel-shift-log-dedupe-refs';

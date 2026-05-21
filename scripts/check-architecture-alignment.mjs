@@ -170,21 +170,21 @@ const LEGACY_PAUSE_USE_CASE_IMPORTS = [
   '@/features/pause/application/use-cases/reflect/',
   '@/features/pause/application/use-cases/companion/',
   '@/features/pause/application/use-cases/session/scaffold-ritual-derived',
-  '@/features/pause/application/use-cases/session/storage-ritual-sync',
-  '@/features/pause/application/use-cases/session/persist-snapshot',
-  '@/features/pause/application/use-cases/session/migrate-persisted-session',
+  '@/features/pause/application/use-cases/ritual/reflect/scaffold/storage-ritual-sync',
+  '@/features/pause/application/use-cases/ritual/reflect/scaffold/persist-snapshot',
+  '@/features/pause/application/use-cases/ritual/reflect/scaffold/migrate-persisted-session',
   "from './application/use-cases/reflect/",
   "from './application/use-cases/companion/",
   "from './application/use-cases/session/scaffold-ritual-derived'",
-  "from './application/use-cases/session/storage-ritual-sync'",
-  "from './application/use-cases/session/persist-snapshot'",
-  "from './application/use-cases/session/migrate-persisted-session'",
+  "from './application/use-cases/ritual/reflect/scaffold/storage-ritual-sync'",
+  "from './application/use-cases/ritual/reflect/scaffold/persist-snapshot'",
+  "from './application/use-cases/ritual/reflect/scaffold/migrate-persisted-session'",
   "from '../application/use-cases/reflect/",
   "from '../application/use-cases/companion/",
   "from '../application/use-cases/session/scaffold-ritual-derived'",
-  "from '../application/use-cases/session/storage-ritual-sync'",
-  "from '../application/use-cases/session/persist-snapshot'",
-  "from '../application/use-cases/session/migrate-persisted-session'",
+  "from '../application/use-cases/ritual/reflect/scaffold/storage-ritual-sync'",
+  "from '../application/use-cases/ritual/reflect/scaffold/persist-snapshot'",
+  "from '../application/use-cases/ritual/reflect/scaffold/migrate-persisted-session'",
 ];
 
 /** Flat presentation/reflect paths — use subclusters (generation/, steps/, mood/, …). */
@@ -271,18 +271,24 @@ const LEGACY_PAUSE_PRESENTATION_SESSION_SCAFFOLD_IMPORTS = [
   "from '../presentation/session/pause-session-scaffold-vm-types'",
 ];
 
-/** Flat presentation/session ritual-storage-sync — use presentation/reflect/scaffold/. */
+/** Flat presentation/session ritual-storage-sync — use presentation/session/scaffold/. */
 const LEGACY_PAUSE_PRESENTATION_SESSION_RITUAL_STORAGE_SYNC_IMPORTS = [
   '@/features/pause/presentation/session/use-pause-session-ritual-storage-sync',
+  '@/features/pause/presentation/reflect/scaffold/use-pause-session-ritual-storage-sync',
   "from './presentation/session/use-pause-session-ritual-storage-sync'",
   "from '../presentation/session/use-pause-session-ritual-storage-sync'",
+  "from './presentation/reflect/scaffold/use-pause-session-ritual-storage-sync'",
+  "from '../presentation/reflect/scaffold/use-pause-session-ritual-storage-sync'",
 ];
 
-/** Flat presentation/session persist-to-storage — use presentation/reflect/scaffold/. */
+/** Flat presentation/session persist-to-storage — use presentation/session/scaffold/. */
 const LEGACY_PAUSE_PRESENTATION_SESSION_PERSIST_TO_STORAGE_IMPORTS = [
   '@/features/pause/presentation/session/use-pause-session-persist-to-storage',
+  '@/features/pause/presentation/reflect/scaffold/use-pause-session-persist-to-storage',
   "from './presentation/session/use-pause-session-persist-to-storage'",
   "from '../presentation/session/use-pause-session-persist-to-storage'",
+  "from './presentation/reflect/scaffold/use-pause-session-persist-to-storage'",
+  "from '../presentation/reflect/scaffold/use-pause-session-persist-to-storage'",
 ];
 
 const PAUSE_RPC_CLIENT_ALLOWLIST = new Set([
