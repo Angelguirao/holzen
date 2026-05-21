@@ -11,18 +11,25 @@ import { usePauseSessionInitialMoodHandlers } from './use-pause-session-initial-
 const CALM_LOG_KEY = '{"mood":"calm","intensity":3}';
 
 const {
-  logPauseInitialEmotionSelectMock,
-  logPauseInitialEmotionSkipMock,
+  runInitialEmotionSelectMock,
+  runInitialEmotionSkipMock,
   showPauseStepSyncFailedToast,
 } = vi.hoisted(() => ({
-  logPauseInitialEmotionSelectMock: vi.fn(),
-  logPauseInitialEmotionSkipMock: vi.fn(),
+  runInitialEmotionSelectMock: vi.fn(),
+  runInitialEmotionSkipMock: vi.fn(),
   showPauseStepSyncFailedToast: vi.fn(),
 }));
 
-vi.mock('@/features/pause/public-rpc', () => ({
-  logPauseInitialEmotionSelect: logPauseInitialEmotionSelectMock,
-  logPauseInitialEmotionSkip: logPauseInitialEmotionSkipMock,
+vi.mock('@/features/pause/application/use-cases/ritual/reflect/mood/run-initial-emotion-log', () => ({
+  runInitialEmotionSelect: runInitialEmotionSelectMock,
+  runInitialEmotionSkip: runInitialEmotionSkipMock,
+}));
+
+vi.mock('@/features/pause/infrastructure/supabase-pause-repository', () => ({
+  supabasePauseRepository: {},
+}));
+
+vi.mock('@/features/pause/presentation/ritual/pause-step-sync-toast', () => ({
   showPauseStepSyncFailedToast,
 }));
 
@@ -33,8 +40,8 @@ vi.mock('@/lib/haptics', () => ({
 const t = ((k: string) => k) as TFunction;
 
 beforeEach(() => {
-  logPauseInitialEmotionSelectMock.mockReset();
-  logPauseInitialEmotionSkipMock.mockReset();
+  runInitialEmotionSelectMock.mockReset();
+  runInitialEmotionSkipMock.mockReset();
   vi.mocked(showPauseStepSyncFailedToast).mockClear();
 });
 
@@ -48,8 +55,8 @@ function stableMoodSetters() {
 }
 
 describe('usePauseSessionInitialMoodHandlers', () => {
-  it('dedupes identical mood select so logPauseInitialEmotionSelect runs twice but only syncs once', async () => {
-    logPauseInitialEmotionSelectMock.mockImplementation(async (input) => {
+  it('dedupes identical mood select so runInitialEmotionSelect runs twice but only syncs once', async () => {
+    runInitialEmotionSelectMock.mockImplementation(async (_repo, input) => {
       if (input.lastFeelLogKey === CALM_LOG_KEY) {
         return {
           status: 'deduped' as const,
@@ -86,17 +93,17 @@ describe('usePauseSessionInitialMoodHandlers', () => {
     await act(async () => {
       await result.current.handleMoodSelect('calm', 3);
     });
-    expect(logPauseInitialEmotionSelectMock).toHaveBeenCalledTimes(1);
+    expect(runInitialEmotionSelectMock).toHaveBeenCalledTimes(1);
     expect(lastFeelLogKeyRef.current).toBe(CALM_LOG_KEY);
     await act(async () => {
       await result.current.handleMoodSelect('calm', 3);
     });
-    expect(logPauseInitialEmotionSelectMock).toHaveBeenCalledTimes(2);
+    expect(runInitialEmotionSelectMock).toHaveBeenCalledTimes(2);
     expect(lastFeelLogKeyRef.current).toBe(CALM_LOG_KEY);
   });
 
   it('logs skipped initial emotion on skip when instance id present', async () => {
-    logPauseInitialEmotionSkipMock.mockResolvedValue({
+    runInitialEmotionSkipMock.mockResolvedValue({
       status: 'synced',
       logKey: '{"skipped":true}',
       ui: { moodDone: true, feelIntensity: null },
@@ -115,12 +122,12 @@ describe('usePauseSessionInitialMoodHandlers', () => {
     await act(async () => {
       await result.current.handleMoodSkip();
     });
-    expect(logPauseInitialEmotionSkipMock).toHaveBeenCalledTimes(1);
+    expect(runInitialEmotionSkipMock).toHaveBeenCalledTimes(1);
     expect(deps.setMoodDone).toHaveBeenCalledWith(true);
   });
 
   it('shows step-sync toast when select RPC fails', async () => {
-    logPauseInitialEmotionSelectMock.mockResolvedValue({
+    runInitialEmotionSelectMock.mockResolvedValue({
       status: 'sync_failed',
       ui: initialEmotionSelectRollbackUi(),
     });
