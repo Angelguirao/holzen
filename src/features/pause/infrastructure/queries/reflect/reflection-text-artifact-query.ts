@@ -1,3 +1,4 @@
+import { reflectionTextMessageFromContent } from '@/features/pause/domain/reflect/generation/reflection-text-from-artifact-rows';
 import { supabase } from '@/integrations/supabase/client';
 
 /**
@@ -13,6 +14,5 @@ export async function fetchReflectionTextForPauseInstance(pauseInstanceId: strin
     .maybeSingle();
   if (error || !data) return null;
   const row = data as { content: unknown };
-  const c = row.content as Record<string, unknown> | null;
-  return typeof c?.message === 'string' ? (c.message as string).trim() || null : null;
+  return reflectionTextMessageFromContent(row.content);
 }
