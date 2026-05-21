@@ -13263,4 +13263,23 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — peel reflect scaffold persist/sync from public-session</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>Backlog #1 follow-up; §6 slim public-session</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>After <code>mount-log-params</code> peeled to direct imports, move <code>buildPauseSessionPersistSnapshot</code> and <code>computePauseStorageRitualSyncPatch</code> off <code>public-session</code> / <code>public-hooks</code>. Reflect scaffold conductors <code>use-pause-session-persist-to-storage</code> and <code>use-pause-session-ritual-storage-sync</code> import <code>ritual/reflect/scaffold/*</code> directly; session I/O (<code>saveSession</code>, <code>loadSession</code>) stays on <code>public-session</code>; resume guards from <code>domain/session/persisted-session-guards</code>.</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior-preserving export peel only.</dd>
+      <dt>Tradeoffs</dt>
+      <dd><code>scaffold-ritual-derived</code> and other session shell helpers remain on <code>public-session</code> until incremental peels.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: peel <code>buildPauseSessionScaffoldRitualDerived</code> when scaffold conductors import use cases directly, or Phase B <code>src/lib/*</code> shims.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->

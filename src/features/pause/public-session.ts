@@ -21,10 +21,6 @@ export {
 } from './application/use-cases/session/step-transition';
 export { pauseStepSwipeDirection } from './application/use-cases/session/step-swipe-direction';
 export {
-  buildPauseSessionPersistSnapshot,
-  type PauseSessionPersistSnapshotInput,
-} from './application/use-cases/ritual/reflect/scaffold/persist-snapshot';
-export {
   hasPersistablePauseSessionAnchor,
   hasPersistedPauseSessionPayload,
   type PersistedSessionAnchor,
@@ -55,10 +51,6 @@ export {
   buildPauseSessionScaffoldRitualDerived,
   type PauseSessionScaffoldRitualDerived,
 } from './application/use-cases/ritual/reflect/scaffold/scaffold-ritual-derived';
-export {
-  computePauseStorageRitualSyncPatch,
-  type PauseStorageRitualSyncPatch,
-} from './application/use-cases/ritual/reflect/scaffold/storage-ritual-sync';
 export {
   pickPauseHolzenProvidersSlice,
   type PauseHolzenProvidersSlice,
