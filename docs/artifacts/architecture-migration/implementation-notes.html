@@ -59,6 +59,7 @@
   <article class="note">
     <header>
       <span>2026-05-21</span>
+<<<<<<< HEAD
       <span>Phase A slice — reflect steps I/O off steps-flow anchor (backlog #1 verified, Tier 5)</span>
       <span class="status resolved">resolved</span>
     </header>
@@ -72,6 +73,21 @@
       <dd><code>pause-reflect-steps-flow.ts</code> remains for <code>check:architecture-alignment</code> steps cluster detection.</dd>
       <dt>Open questions</dt>
       <dd>Next: <code>pause-reflect-telemetry-io</code> flow peel, or companion analytics I/O peel.</dd>
+=======
+      <span>Phase A slice — companion analytics I/O via analytics-flow anchor (backlog #2 verified, Tier 5)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3><code>pause-companion-analytics-io</code> imports analytics use cases through <code>pause-companion-analytics-flow</code></h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>ritual/reflect/</code>) and #2 (<code>ritual/frame/</code>) folder moves remain complete. Route <code>pause-companion-analytics-io</code> through <code>pause-companion-analytics-flow</code> instead of deep <code>run-log-companion-*</code> and <code>log-companion-*</code> paths (parity with <code>pause-companion-frame-ui-io</code> → <code>pause-companion-frame-ui-flow</code>).</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior parity; import boundary only.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Flow anchor is a thin re-export barrel for <code>check:architecture-alignment</code> frame analytics cluster detection.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: peel <code>pause-reflect-steps-io</code> off steps-flow for mood/hub parity, or subscription Tier 1 shim following <code>holzen-query-client-ref</code>.</dd>
+>>>>>>> 180556bc9 (refactor(pause): route companion analytics I/O through flow anchor)
     </dl>
   </article>
 
