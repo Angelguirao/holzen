@@ -4289,7 +4289,7 @@
       <dt>Deviation</dt>
       <dd>None — behavior parity; slot orchestrate path unchanged.</dd>
       <dt>Tradeoffs</dt>
-      <dd><code>invokeCompanionIntervention</code> remains on <code>public-rpc</code> for tests and non-presentation call sites.</dd>
+      <dd><code>invokeCompanionIntervention</code> removed from <code>public-rpc</code>; presentation uses <code>supabaseCompanionOrchestrator.invokeIntervention</code> only.</dd>
       <dt>Open questions</dt>
       <dd>Next: port-backed analytics read for companion feedback vote fetch, or further <code>ritual/brief/</code> beat grouping per §10.1.</dd>
     </dl>
