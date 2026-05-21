@@ -11,7 +11,7 @@ export {
   PAUSE_SESSION_STEP_TRANSITION_EASE,
   type PauseSessionStepTransitionConfig,
   type PauseSessionSwipeDirection,
-} from './public-session';
+} from './application/use-cases/session/step-transition';
 export { computePauseGoBackPlan } from './public-ritual-brief';
 export {
   BRIEF_INTEGRATE_RING_CIRC,
