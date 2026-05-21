@@ -5796,4 +5796,23 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — decide handler via public-ports (backlog #4)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>Peel outcome_logged from public-rpc in presentation</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd><code>use-pause-session-decide-handler</code> calls <code>runPauseOutcomeLog</code> with <code>supabasePauseRepository</code> from <code>public-ports.ts</code>; <code>logPauseOutcome</code> facade remains on <code>public-rpc</code> for screens.</dd>
+      <dt>Deviation</dt>
+      <dd>None.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Brief depth-upgrade and post-pause emotion hooks still use <code>public-rpc</code> until peeled.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: peel <code>use-pause-session-brief-to-deep</code> or archive retrospective outcome conductor.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
