@@ -9140,4 +9140,23 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — frame full-view + section visibility on public-rpc (#1 done, #4)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>ritual/reflect/ verified; companion section + fullview hooks peel frame helpers</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 complete — no reflect moves. Re-export pure frame UI helpers (<code>pauseSeverityToOrchestrateNumber</code>, full-view prefs/settled checks, section visibility) on <code>public-rpc</code>; <code>use-companion-section</code> and <code>use-companion-fullview-page</code> import from the barrel instead of <code>ritual/frame/*</code> directly.</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior parity.</dd>
+      <dt>Tradeoffs</dt>
+      <dd><code>PauseSeverity</code> still from <code>session/location-state</code> in presentation (session concern, not re-exported).</dd>
+      <dt>Open questions</dt>
+      <dd>Next backlog #4: peel <code>use-companion-slot-run-orchestrate</code> apply/telemetry imports onto <code>public-rpc</code>.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
