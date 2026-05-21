@@ -3,9 +3,9 @@ import {
   persistReflectionArtifacts,
 } from '@/features/pause/infrastructure/edge/reflect/reflection-artifact';
 import { fetchLatestPauseReflectStepFromSupabase } from '@/features/pause/infrastructure/queries/reflect/steps/fetch-latest-pause-reflect-step';
-import { fetchHaikuTextForPauseInstance } from '@/features/pause/infrastructure/queries/reflect/haiku-artifact-query';
-import { fetchReflectionTextForPauseInstance } from '@/features/pause/infrastructure/queries/reflect/reflection-text-artifact-query';
-import { loadReflectRecencyHints } from '@/features/pause/infrastructure/queries/reflect/load-reflect-recency-hints';
+import { fetchHaikuTextForPauseInstance } from '@/features/pause/infrastructure/queries/reflect/generation/haiku-artifact-query';
+import { fetchReflectionTextForPauseInstance } from '@/features/pause/infrastructure/queries/reflect/generation/reflection-text-artifact-query';
+import { loadReflectRecencyHints } from '@/features/pause/infrastructure/queries/reflect/generation/load-reflect-recency-hints';
 import type { ReflectGenerator } from '@/features/pause/ports/reflect-generator';
 
 /** Default `ReflectGenerator` — Supabase artifact reads + `holzen-reflect` via `invokeEdge`. */
