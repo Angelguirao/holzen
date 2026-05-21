@@ -17326,4 +17326,23 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — reflect steps I/O run-* imports after anchor deletion (backlog #1 follow-up, Tier 5)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>Complete <code>pause-reflect-steps-io</code> wiring after orphan flow removal</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Prior commit deleted <code>pause-reflect-steps-mutation-flow</code> (and sibling step gate anchors) but left <code>pause-reflect-steps-io</code> importing the removed module. Import <code>run-pause-favorite-toggle</code>, <code>run-pause-reflect-note-update</code>, <code>run-pause-reflect-tag-update</code>, and <code>run-pause-reflection-step-log</code> directly; domain gates stay on <code>domain/reflect/steps/</code>.</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior parity; fixes broken build from incomplete prior slice.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>No application cluster anchor under <code>ritual/reflect/steps/</code> besides <code>run-*</code> use cases (intended end state).</dd>
+      <dt>Open questions</dt>
+      <dd>Next: companion orchestrate-io direct <code>ritual/frame/*</code> imports, or orchestration-io peel off <code>pause-companion-orchestration-flow</code>.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
