@@ -93,14 +93,16 @@ export {
 export type { PauseStep } from './domain/pause-ritual-steps';
 export type { BriefPauseStep, RitualDepth } from './domain/ritual-types';
 export {
-  initialBreathingFirstCompletedFromRestored,
-  initialBreathingSecondCompletedFromRestored,
   initialBriefIntegrateDoneFromRestored,
   initialBriefPauseStepFromRestored,
+  initialSelectedBriefFaceFromRestored,
+} from './application/use-cases/ritual/reflect/scaffold/restored-brief-ritual-state';
+export {
+  initialBreathingFirstCompletedFromRestored,
+  initialBreathingSecondCompletedFromRestored,
   initialDecisionFromRestored,
   initialFrameDoneFromRestored,
   initialPhaseFromRestored,
-  initialSelectedBriefFaceFromRestored,
   mapPersistedStep,
 } from './application/use-cases/session/step-map';
 export { initialRitualEntry } from './application/use-cases/ritual/reflect/scaffold/initial-ritual-entry';
