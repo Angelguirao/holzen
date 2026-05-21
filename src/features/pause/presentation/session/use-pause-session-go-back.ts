@@ -1,7 +1,8 @@
 import { useCallback, type Dispatch, type SetStateAction } from 'react';
 import { computePauseGoBackPlan } from '@/features/pause/public-ritual-brief';
 import { hapticFeedback } from '@/lib/haptics';
-import type { BriefPauseStep, PauseStep, RitualDepth } from '@/features/pause/public-hooks';
+import type { PauseStep } from '@/features/pause/domain/pause-ritual-steps';
+import type { BriefPauseStep, RitualDepth } from '@/features/pause/domain/ritual-types';
 
 /** Header / hardware back one step: brief macro order or deep `STEPS` (haptic + swipe direction). */
 export function usePauseSessionGoBack(input: {
