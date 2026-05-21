@@ -1,7 +1,6 @@
 import { useCallback } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
-import { runToggleCompanionLibraryFavorite } from '@/features/pause/application/use-cases/ritual/frame/run-toggle-companion-library-favorite';
-import { companionPauseRepository } from './pause-companion-orchestration-io';
+import { pauseToggleCompanionLibraryFavorite } from './pause-companion-orchestration-io';
 import {
   companionLibraryFavoritesQueryKey,
   getCompanionLibraryFavoritesQueryOptions,
@@ -20,7 +19,7 @@ export function useCompanionLibraryFavorites(pauseInstanceId: string | null | un
     async (sourceType: string) => {
       if (!pauseInstanceId) return;
       const key = companionLibraryFavoritesQueryKey(pauseInstanceId);
-      await runToggleCompanionLibraryFavorite(companionPauseRepository, {
+      await pauseToggleCompanionLibraryFavorite({
         pauseInstanceId,
         sourceType,
         onBucketComputed: (bucket) => {

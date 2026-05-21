@@ -59,6 +59,25 @@
   <article class="note">
     <header>
       <span>2026-05-21</span>
+      <span>Phase A slice — companion library favorites presentation I/O</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3><code>pauseToggleCompanionLibraryFavorite</code> on orchestration-io</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 <code>ritual/reflect/</code> and #2 <code>ritual/frame/</code> folder moves are complete. Bind <code>use-companion-library-favorites</code> through <code>pause-companion-orchestration-io.ts</code> (default <code>PauseRepository</code>) instead of deep <code>application/</code> import. Resolved stray merge markers in <code>pause-home-io.ts</code> exports.</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior parity; TanStack query options still from <code>public-queries</code>.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Query read path unchanged; toggle write path only on I/O module.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: bind <code>use-pause-session-decide-handler</code> decide-cluster imports through flows-io, or lifecycle create/dismiss thin use cases on <code>public-rpc</code>.</dd>
+    </dl>
+  </article>
+
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
       <span>Phase A slice — reflect mood initial-emotion I/O binding (backlog #1 follow-up)</span>
       <span class="status resolved">resolved</span>
     </header>
