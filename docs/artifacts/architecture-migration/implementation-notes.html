@@ -4279,6 +4279,7 @@
   <article class="note">
     <header>
       <span>2026-05-21</span>
+<<<<<<< HEAD
       <span>Phase A slice — CompanionOrchestrator invokeIntervention (backlog #4)</span>
       <span class="status resolved">resolved</span>
     </header>
@@ -4292,6 +4293,21 @@
       <dd><code>invokeCompanionIntervention</code> remains on <code>public-rpc</code> for tests and non-presentation call sites.</dd>
       <dt>Open questions</dt>
       <dd>Next: port-backed analytics read for companion feedback vote fetch, or further <code>ritual/brief/</code> beat grouping per §10.1.</dd>
+=======
+      <span>Phase A slice — ReflectGenerator loadRecencyHints (backlog #4)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>Backlog #1 complete; holzen-reflect dedup hints on reflect port</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Rebased on remote slices (<code>fetchHaikuText</code>, <code>CompanionOrchestrator</code>, <code>ritual/deep</code> → <code>ritual/brief</code>). Extend <code>ReflectGenerator</code> with <code>loadRecencyHints()</code>; hint types in <code>domain/reflect-recency-hints.ts</code>; <code>generateReflectionAtReflectStep</code> receives <code>recencyHints</code> from the adapter (no query import in edge helper).</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior-preserving port wiring.</dd>
+      <dt>Tradeoffs</dt>
+      <dd><code>runReflectGeneration</code> still does not call <code>loadRecencyHints</code> (only the edge path needs hints today).</dd>
+      <dt>Open questions</dt>
+      <dd>Next: unify intervention invoke on <code>CompanionOrchestrator</code>, or wire remaining stray <code>PauseRepository</code> call sites.</dd>
+>>>>>>> cf1631e9 (refactor(pause): extend ReflectGenerator with recency hints load)
     </dl>
   </article>
 
