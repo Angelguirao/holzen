@@ -173,6 +173,25 @@
   <article class="note">
     <header>
       <span>2026-05-21</span>
+      <span>Phase A slice — reflect telemetry subcluster import paths (backlog #1 tail, Tier 5)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>Fix I/O + flow anchors after <code>telemetry/{home,manual-open,session}/</code> move</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>ritual/reflect/</code>) folder move remains complete. Subcluster directories already existed on branch tip; this slice updates <code>pause-home-reflect-telemetry-io</code>, <code>pause-reflect-telemetry-io</code>, and both telemetry flow anchors to import from <code>home/</code>, <code>manual-open/</code>, and <code>session/</code> sibling paths (presentation still peels off flow anchors per prior slices).</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior parity; import path repair only.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Tests mock the new subcluster module paths so Vitest stays aligned with production imports.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: Phase B cross-context Tier 1 shim (subscription/auth) or session brief I/O peel off flow anchor.</dd>
+    </dl>
+  </article>
+
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
       <span>Phase A slice — reflect steps I/O off steps-flow anchor (backlog #1 verified, Tier 5)</span>
       <span class="status resolved">resolved</span>
     </header>
