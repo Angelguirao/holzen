@@ -14,3 +14,12 @@ export {
   type BuildPauseSessionMountLogParamsInput,
   type PauseSessionMountLogParams,
 } from './application/use-cases/session/mount-log-params';
+export {
+  buildPauseSessionStepTransitionConfig,
+  PAUSE_SESSION_STEP_SLIDE_OFFSET_PX,
+  PAUSE_SESSION_STEP_TRANSITION_DURATION_REDUCED_S,
+  PAUSE_SESSION_STEP_TRANSITION_DURATION_S,
+  PAUSE_SESSION_STEP_TRANSITION_EASE,
+  type PauseSessionStepTransitionConfig,
+  type PauseSessionSwipeDirection,
+} from './application/use-cases/session/step-transition';
