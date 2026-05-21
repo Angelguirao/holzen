@@ -110,3 +110,4 @@ export {
   resolvePauseDecideOutcomeFlow,
   type PauseDecideOutcomeFlow,
 } from './application/use-cases/ritual/decide/pause-decide-outcome-flow';
+export { clearSession } from './infrastructure/session/persisted-session-storage';

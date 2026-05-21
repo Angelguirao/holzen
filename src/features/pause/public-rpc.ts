@@ -18,11 +18,13 @@ import { supabasePauseAnalyticsRepository } from './infrastructure/supabase-paus
 import { supabasePauseRepository } from './infrastructure/supabase-pause-repository';
 import { supabaseCompanionOrchestrator } from './infrastructure/supabase-companion-orchestrator';
 import { supabaseReflectGenerator } from './infrastructure/supabase-reflect-generator';
+import { reflectionStepSessionStorage } from './infrastructure/edge/reflect/reflection-step-session-storage';
 export {
   supabasePauseRepository,
   supabaseCompanionOrchestrator,
   supabasePauseAnalyticsRepository,
   supabaseReflectGenerator,
+  reflectionStepSessionStorage,
 };
 export {
   invokeGroundingEnrich,

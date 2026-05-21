@@ -11,9 +11,6 @@ const { runPauseReflectionStepLogOnceMock, mockPauseRepository, mockReflectionSt
 
 vi.mock('@/features/pause/public-rpc', () => ({
   supabasePauseRepository: mockPauseRepository,
-}));
-
-vi.mock('@/features/pause/infrastructure/edge/reflect/reflection-step-session-storage', () => ({
   reflectionStepSessionStorage: mockReflectionStepStorage,
 }));
 
