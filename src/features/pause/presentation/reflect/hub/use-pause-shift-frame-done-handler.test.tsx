@@ -103,6 +103,35 @@ describe('usePauseShiftFrameDoneHandler', () => {
     expect(showPauseStepSyncFailedToast).toHaveBeenCalledWith(t);
   });
 
+  it('routes shift frame hub RPC through the default PauseRepository port adapter', async () => {
+    runShiftEmotionFrameHubDoneMock.mockResolvedValue({
+      status: 'advance',
+      logKey: SHIFT_LOG_KEY,
+    });
+
+    const lastShiftLogKeyRef: MutableRefObject<string | null> = { current: null };
+    const { result } = renderHook(() =>
+      usePauseShiftFrameDoneHandler({
+        pauseInstanceId: 'pi-1',
+        t,
+        lastShiftLogKeyRef,
+        setFrameDone: vi.fn(),
+        setMoodAfterDone: vi.fn(),
+        goToStep: vi.fn(),
+      }),
+    );
+
+    await act(async () => {
+      await result.current.handleFrameImDone();
+    });
+
+    expect(runShiftEmotionFrameHubDoneMock).toHaveBeenCalledWith(mockPauseRepository, {
+      pauseInstanceId: 'pi-1',
+      lastShiftLogKey: null,
+    });
+    expect(mockPauseRepository.port).toBe('supabasePauseRepository');
+  });
+
   it('advances without RPC when no pause instance id', async () => {
     runShiftEmotionFrameHubDoneMock.mockResolvedValue({
       status: 'advance',

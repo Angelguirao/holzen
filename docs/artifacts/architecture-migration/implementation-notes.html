@@ -11986,7 +11986,26 @@
       <dt>Tradeoffs</dt>
       <dd>Test-only — closes weak <code>{}</code> orchestrator mocks on core Frame beat conductors.</dd>
       <dt>Open questions</dt>
-      <dd>Next backlog #4: <code>use-fullview-telemetry</code> analytics port sentinel, or Phase B subscription/auth template slice.</dd>
+      <dd>Next backlog #4: reflect mood/hub PauseRepository port sentinels, or Phase B subscription/auth template slice.</dd>
+    </dl>
+  </article>
+
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — lock reflect mood + hub handlers to PauseRepository (backlog #1 verified, backlog #4)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>ritual/reflect/mood + ritual/reflect/hub presentation port-lock</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code>) verified complete — no folder move. Add explicit port-sentinel tests on <code>use-pause-session-initial-mood-handlers</code> and <code>use-pause-shift-frame-done-handler</code> (matches artifact hydrate + holzen-reflect generation guardrails).</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior unchanged.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Test-only — both hooks already passed <code>mockPauseRepository</code> in existing cases; new tests name the default adapter contract explicitly.</dd>
+      <dt>Open questions</dt>
+      <dd>Next backlog #4: optional PostHog analytics-port consolidation, or Phase B subscription/auth template slice.</dd>
     </dl>
   </article>
 
