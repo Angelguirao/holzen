@@ -10122,9 +10122,9 @@
       <dt>Deviation</dt>
       <dd>None — mantra default and market slice fields unchanged.</dd>
       <dt>Tradeoffs</dt>
-      <dd><code>step-map</code> restore helpers remain on direct application imports; presentation realtime/archive still use <code>infrastructure/*</code> until backlog #4.</dd>
+      <dd>Presentation realtime/archive still use <code>infrastructure/*</code> until backlog #4.</dd>
       <dt>Open questions</dt>
-      <dd>Next backlog #4: audit presentation <code>infrastructure/*</code> imports (realtime, archive json-local-storage); optional <code>step-map</code> restore exports on <code>public-session</code>.</dd>
+      <dd>Next backlog #4: audit presentation <code>infrastructure/*</code> imports (realtime, archive json-local-storage).</dd>
     </dl>
   </article>
 
@@ -10137,13 +10137,13 @@
     <h3>ritual/reflect/ complete; breath hook splits session vs RPC barrels</h3>
     <dl>
       <dt>Design decision</dt>
-      <dd>Backlog #1 verified — no reflect moves. Pure breath dedupe helpers on <code>public-session</code>; <code>use-pause-breath-segment-rpc-loggers</code> imports RPC facades from <code>public-rpc</code> only. Test mocks <code>public-rpc</code> without <code>importOriginal</code> (no Supabase client load).</dd>
+      <dd>Backlog #1 verified — no reflect moves. Pure breath dedupe helpers on <code>public-session</code>; <code>use-pause-breath-segment-rpc-loggers</code> imports RPC facades from <code>public-rpc</code> and pure helpers from <code>public-session</code>. Test mocks <code>public-rpc</code> only (no Supabase client load).</dd>
       <dt>Deviation</dt>
       <dd>None — segment log behavior unchanged.</dd>
       <dt>Tradeoffs</dt>
       <dd>Removed duplicate re-exports from <code>public-rpc</code>; other presentation tests may still deep-mock application paths until audited.</dd>
       <dt>Open questions</dt>
-      <dd>Next backlog #4: audit decide/outcome presentation tests and <code>infrastructure/*</code> imports in presentation.</dd>
+      <dd>Colocate restore-flag implementation under <code>ritual/breathe/</code> (follow-up slice on same branch).</dd>
     </dl>
   </article>
 
@@ -10201,6 +10201,25 @@
       <dd><code>public-queries</code> still loads Supabase client (existing contract). Session breathe helpers still import <code>application/use-cases/ritual/breathe/*</code> directly.</dd>
       <dt>Open questions</dt>
       <dd>Next backlog #4: optional <code>public-session</code> peel for breathe presentation imports; remaining <code>PauseRepository</code> stray call-site audit.</dd>
+    </dl>
+  </article>
+
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — breath restore flags in ritual/breathe (backlog #1 verified, #4)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>ritual/reflect/ complete; colocate segment dedupe beside breath segment log</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 verified — 14 modules under <code>ritual/reflect/</code>, zero <code>application/use-cases/reflect/</code>. Move <code>initialBreathSegmentRpcLoggedFlagsFromRestored</code> from <code>session/step-map</code> to <code>ritual/breathe/initial-breath-segment-rpc-flags</code>; <code>public-session</code> re-exports from the ritual path (composes with breath hook split: pure helpers on <code>public-session</code>, RPC on <code>public-rpc</code>).</dd>
+      <dt>Deviation</dt>
+      <dd>Still imports <code>mapPersistedStep</code> from <code>session/step-map</code> — shared step vocabulary; avoids duplicating legacy step keys.</dd>
+      <dt>Tradeoffs</dt>
+      <dd><code>step-map</code> remains the owner for persisted-step mapping; breath module owns breath-RPC restore dedupe only.</dd>
+      <dt>Open questions</dt>
+      <dd>Next backlog #3: breathe timed-loop cluster on <code>public-session</code>; backlog #4: remaining <code>PauseRepository</code> stray call-site audit.</dd>
     </dl>
   </article>
 
