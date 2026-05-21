@@ -8893,4 +8893,23 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — fullview telemetry via public-rpc facade (backlog #1 verified, #4)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>ritual/reflect/ complete; use-fullview-telemetry uses logPauseCompanionFullviewOpened</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code>) verified complete — no reflect folder moves. Align <code>use-fullview-telemetry</code> with companion feedback vote write: import <code>logPauseCompanionFullviewOpened</code> + <code>CompanionFullviewKind</code> from <code>public-rpc</code> instead of use case + <code>supabasePauseAnalyticsRepository</code>.</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior parity.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Hook loads <code>public-rpc</code> barrel (Supabase side effects) — acceptable for presentation companion cluster; vote read still uses query module + analytics adapter.</dd>
+      <dt>Open questions</dt>
+      <dd>Next backlog #4: audit stray mutations bypassing <code>PauseRepository</code>, or peel remaining companion <code>ritual/frame/*</code> presentation imports.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
