@@ -59,6 +59,25 @@
   <article class="note">
     <header>
       <span>2026-05-21</span>
+      <span>Phase A — Holzen manual-trigger orchestration via public-trigger (backlog #1 verified, Tier 1)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3><code>useHolzenManualTriggerOrchestration</code> cooldown imports <code>public-trigger</code></h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>ritual/reflect/</code> folder move) remains complete. Route Home manual-trigger gate cooldown math, localStorage read/write, and <code>mapManualTriggerStartError</code> through <code>public-trigger.ts</code> instead of <code>pause-home-reflect-io</code>. Reflect I/O keeps manual-open use cases, dismiss preview, ports, and <code>applyManualPauseOpenResult</code> only (cooldown helpers dropped from reflect I/O re-exports).</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior parity; import boundary only.</dd>
+      <dt>Tradeoffs</dt>
+      <dd><code>pause-reflect-generation-manual-open-flow</code> CI anchor still bundles cooldown domain exports for alignment checks; presentation orchestration no longer depends on reflect I/O for pure trigger helpers.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: Phase B subscription pricing lib shim, or peel remaining Home conductors off aggregate <code>pause-home-io</code>.</dd>
+    </dl>
+  </article>
+
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
       <span>Phase A — Home manual-open generation flow anchor (backlog #1 verified, Tier 5)</span>
       <span class="status resolved">resolved</span>
     </header>

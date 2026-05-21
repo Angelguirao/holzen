@@ -13,7 +13,7 @@ import {
   parseManualTriggerCooldownFromStorageEvent,
   readManualTriggerCooldownAtMs,
   writeManualTriggerCooldownAtMs,
-} from './pause-home-reflect-io';
+} from '@/features/pause/public-trigger';
 import {
   MANUAL_PAUSE_TRIGGER_IDLE,
   type ManualPauseTriggerResult,
