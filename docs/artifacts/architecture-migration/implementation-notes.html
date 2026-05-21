@@ -6651,4 +6651,23 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — session step-map via public-hooks (backlog #3)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>Peel use-pause-session-ritual-state from application/session/step-map</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Re-export persisted-session hydration helpers (<code>mapPersistedStep</code>, <code>initialRitualEntry</code>, breath/brief/decision seeds) on <code>public-hooks</code>; <code>use-pause-session-ritual-state</code> imports the barrel only.</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior parity.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Other session conductors still import <code>step-map</code> or sibling use cases from application until peeled incrementally.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: companion orchestrate presentation cluster through <code>public-rpc</code> re-exports, or backlog #4 analytics read call sites.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
