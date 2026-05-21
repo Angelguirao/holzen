@@ -9552,7 +9552,7 @@
       <dt>Deviation</dt>
       <dd>None — PostHog events and Home preview mapping unchanged; <code>apply-manual-pause-open-result</code> still imports telemetry from application (use-case layer).</dd>
       <dt>Tradeoffs</dt>
-      <dd>Hook test mocks <code>public-rpc</code> for open, session clear, telemetry, and param/result helpers. <code>use-holzen-manual-trigger-orchestration</code> still imports cooldown helpers from <code>application/use-cases/trigger/</code>.</dd>
+      <dd>Hook test mocks <code>public-rpc</code> for open, session clear, telemetry, and param/result helpers. <code>use-holzen-manual-trigger-orchestration</code> still imports cooldown helpers from <code>application/use-cases/trigger/</code> until the cooldown peel slice.</dd>
       <dt>Open questions</dt>
       <dd>Next: re-export <code>buildHomePauseSessionLocationState</code> / <code>canNavigateToPauseSession</code> on <code>public-navigation</code> for <code>use-home-pause-actions</code>, or audit archive presentation hooks still importing <code>application/use-cases/archive/*</code>.</dd>
     </dl>
@@ -9590,9 +9590,28 @@
       <dt>Deviation</dt>
       <dd>None — router state shape and navigate guards unchanged.</dd>
       <dt>Tradeoffs</dt>
-      <dd><code>use-holzen-manual-trigger-orchestration</code> still imports cooldown helpers from <code>application/use-cases/trigger/</code> and infrastructure storage directly.</dd>
+      <dd><code>use-holzen-manual-trigger-orchestration</code> still imported cooldown helpers from <code>application/use-cases/trigger/</code> until the cooldown peel slice.</dd>
       <dt>Open questions</dt>
       <dd>Next backlog #3/#4: peel manual-trigger cooldown cluster on <code>use-holzen-manual-trigger-orchestration</code> or wire stray ritual <code>logPauseStep</code> call sites through <code>public-rpc</code> only.</dd>
+    </dl>
+  </article>
+
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — manual-trigger cooldown on public-rpc (backlog #1 verified, #3)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>ritual/reflect/ verified; use-holzen-manual-trigger-orchestration imports barrel only</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 verified — zero <code>application/use-cases/reflect/</code> paths. Re-export manual-trigger cooldown pure helpers on <code>public-rpc</code>; <code>use-holzen-manual-trigger-orchestration</code> drops direct <code>application/use-cases/trigger/*</code> imports (storage I/O stays on <code>infrastructure/manual-trigger-cooldown-storage</code>).</dd>
+      <dt>Deviation</dt>
+      <dd>None — cooldown math and cross-tab parse unchanged.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Composes with <code>public-navigation</code> home peel and manual-open cluster on <code>use-manual-pause-trigger</code>.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: session presentation <code>application/</code> imports or remaining <code>logPauseStep</code> call sites through <code>public-rpc</code> only.</dd>
     </dl>
   </article>
 
