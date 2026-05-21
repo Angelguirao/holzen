@@ -4067,6 +4067,25 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — colocate settings export bundle under presentation/settings/</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>Backlog #1 complete; Tier 4 settings export re-export</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd><code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code> was already complete on <code>cursor/arch-migrate-src-ca70</code> (no legacy path). Move <code>load-settings-data-export-bundle</code> beside other cross-route presentation helpers; Settings screen still imports via <code>public-hooks</code> only.</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior-preserving <code>git mv</code>; relative <code>public-queries</code> import depth updated.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Flat <code>presentation/</code> root is now empty (all conductors grouped under subfolders).</dd>
+      <dt>Open questions</dt>
+      <dd>Next: backlog #4 remainder (optional analytics read adapters), or <code>ritual/brief/</code> beat consolidation per §10.1.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
 </body>
 </html>

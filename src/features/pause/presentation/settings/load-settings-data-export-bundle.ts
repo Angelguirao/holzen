@@ -5,7 +5,7 @@ import {
   type SettingsExportCompanionEvent,
   type SettingsExportPauseRow,
   type SettingsExportStepEvent,
-} from '../public-queries';
+} from '../../public-queries';
 
 export type {
   SettingsDataExportBundle,
