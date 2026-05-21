@@ -24,20 +24,20 @@ const baseInput = {
 
 const emptyRecencyHints = { moodHistory: [], recentMessages: [], recentHaikus: [] };
 
-const noopReflectPortExtras = {
+const noopReflectGeneratorExtras = {
   fetchHaikuText: vi.fn(),
   fetchLatestReflectStep: vi.fn(),
   loadRecencyHints: vi.fn().mockResolvedValue(emptyRecencyHints),
 };
 
 describe('runReflectGeneration', () => {
-  it('returns seed without calling ports', async () => {
+  it('returns seed without calling generator', async () => {
     const fetchReflectionText = vi.fn();
     const generateReflection = vi.fn();
 
     const result = await runReflectGeneration(
       { ...baseInput, initialReflectionMessage: '  seeded  ' },
-      { fetchReflectionText, generateReflection, ...noopReflectPortExtras },
+      { fetchReflectionText, generateReflection, ...noopReflectGeneratorExtras },
     );
 
     expect(result).toEqual({ status: 'seed', message: 'seeded' });
@@ -51,7 +51,7 @@ describe('runReflectGeneration', () => {
       {
         fetchReflectionText: vi.fn().mockResolvedValue('from cache'),
         generateReflection: vi.fn(),
-        ...noopReflectPortExtras,
+        ...noopReflectGeneratorExtras,
       },
     );
 
@@ -65,7 +65,7 @@ describe('runReflectGeneration', () => {
     const result = await runReflectGeneration(
       { ...baseInput, initialReflectionMessage: '' },
       {
-        ...noopReflectPortExtras,
+        ...noopReflectGeneratorExtras,
         fetchReflectionText: vi.fn().mockResolvedValue(null),
         loadRecencyHints,
         generateReflection,
@@ -93,7 +93,7 @@ describe('runReflectGeneration', () => {
       {
         fetchReflectionText: vi.fn().mockResolvedValue(null),
         generateReflection: vi.fn().mockRejectedValue(new DOMException('aborted', 'AbortError')),
-        ...noopReflectPortExtras,
+        ...noopReflectGeneratorExtras,
       },
     );
 
