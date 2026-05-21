@@ -12256,4 +12256,23 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — colocate breath-reflect compose hook under presentation/session/ (backlog #1 verified, Tier 4)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3><code>use-pause-session-breath-reflect-handlers</code> beside step-handlers conductor</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code>) verified complete — no use-case move. After <code>pause-session-breath-reflect-handler-types</code> colocation, move <code>use-pause-session-breath-reflect-handlers</code> (+ test) from <code>presentation/reflect/flows/</code> to <code>presentation/session/</code> beside <code>use-pause-session-step-handlers</code>; <code>use-pause-session-reflect-and-decide</code> stays in <code>reflect/flows/</code>.</dd>
+      <dt>Deviation</dt>
+      <dd>Prior note kept compose in <code>reflect/flows/</code> for beat ownership — reversed to match breath-handlers/step-handlers session cluster (§10.1).</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Session conductor imports reflect leaf hooks via relative paths; <code>public-ritual-reflect</code> re-export path only.</dd>
+      <dt>Open questions</dt>
+      <dd>Next backlog #4: companion orchestrate-session port-lock, optional PostHog analytics-port consolidation, or Phase B subscription/auth template slice.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->

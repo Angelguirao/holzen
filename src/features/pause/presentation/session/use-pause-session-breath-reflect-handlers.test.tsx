@@ -52,15 +52,15 @@ const {
   };
 });
 
-vi.mock('../../session/use-pause-session-breath-handlers', () => ({
+vi.mock('./use-pause-session-breath-handlers', () => ({
   usePauseSessionBreathHandlers: usePauseSessionBreathHandlersMock,
 }));
 
-vi.mock('./use-pause-session-reflect-and-decide', () => ({
+vi.mock('../reflect/flows/use-pause-session-reflect-and-decide', () => ({
   usePauseSessionReflectAndDecide: usePauseSessionReflectAndDecideMock,
 }));
 
-vi.mock('../hub/use-pause-shift-frame-done-handler', () => ({
+vi.mock('../reflect/hub/use-pause-shift-frame-done-handler', () => ({
   usePauseShiftFrameDoneHandler: usePauseShiftFrameDoneHandlerMock,
 }));
 
