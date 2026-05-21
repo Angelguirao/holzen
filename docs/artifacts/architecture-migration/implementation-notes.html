@@ -17579,17 +17579,17 @@
   <article class="note">
     <header>
       <span>2026-05-21</span>
-      <span>Phase A slice — delete unused reflect mood umbrella anchor (backlog #1 verified, Tier 5)</span>
+      <span>Phase A slice — reflect mood I/O cluster anchor (backlog #1 verified, Tier 5)</span>
       <span class="status resolved">resolved</span>
     </header>
-    <h3>Remove <code>pause-reflect-mood-flow</code> (presentation already uses sibling modules)</h3>
+    <h3><code>pause-reflect-mood-io</code> imports <code>pause-reflect-mood-flow</code></h3>
     <dl>
       <dt>Design decision</dt>
-      <dd>Backlog #1 (<code>ritual/reflect/</code>) remains complete. <code>pause-reflect-mood-io</code> already imports domain mood helpers and <code>run-initial-emotion-log</code> directly; the umbrella <code>pause-reflect-mood-flow</code> re-export had zero consumers. Decide anchor peel on <code>pause-reflect-flows-io</code> landed on remote in the same window — no additional flows I/O edits in this commit.</dd>
+      <dd>Backlog #1 (<code>ritual/reflect/</code>) remains complete. Route mood presentation I/O through the mood umbrella anchor (depth-picker, feel-tiles, initial-emotion, chrome-close sub-flows) instead of deep domain/application paths — matches generation/flows cluster pattern. Attempted deletion of <code>pause-reflect-mood-flow</code> in the same push window was reverted (broke mood I/O resolution).</dd>
       <dt>Deviation</dt>
-      <dd>None.</dd>
+      <dd>None — behavior parity.</dd>
       <dt>Tradeoffs</dt>
-      <dd>Mood subcluster anchors (<code>pause-initial-emotion-log-flow</code>, etc.) remain for CI; only the unused umbrella file is removed.</dd>
+      <dd>Umbrella anchor is thin re-exports; presentation hooks keep importing <code>pause-reflect-mood-io</code> only.</dd>
       <dt>Open questions</dt>
       <dd>Next: companion orchestrate-io direct <code>ritual/frame/*</code> imports, or Phase B cross-context Tier 1 shim.</dd>
     </dl>
