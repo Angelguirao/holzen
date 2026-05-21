@@ -9,21 +9,21 @@ const {
   markPauseManualStartedHomeOnceMock,
   trackManualPauseInstanceCreatedMock,
   trackPauseManualCompletedMock,
-  mockPauseRepository,
-  mockReflectGenerator,
+  mockPauseHomeManualOpenPorts,
 } = vi.hoisted(() => ({
   openManualPauseFromHomeMock: vi.fn(),
   clearSessionMock: vi.fn(),
   markPauseManualStartedHomeOnceMock: vi.fn(),
   trackManualPauseInstanceCreatedMock: vi.fn(),
   trackPauseManualCompletedMock: vi.fn(),
-  mockPauseRepository: { port: 'supabasePauseRepository' },
-  mockReflectGenerator: { port: 'supabaseReflectGenerator' },
+  mockPauseHomeManualOpenPorts: {
+    repository: { port: 'supabasePauseRepository' },
+    reflect: { port: 'supabaseReflectGenerator' },
+  },
 }));
 
-vi.mock('@/features/pause/public-rpc', () => ({
-  supabasePauseRepository: mockPauseRepository,
-  supabaseReflectGenerator: mockReflectGenerator,
+vi.mock('./pause-home-io', () => ({
+  pauseHomeManualOpenPorts: mockPauseHomeManualOpenPorts,
 }));
 
 vi.mock('@/features/pause/presentation/session/pause-persisted-tab-session-io', () => ({
@@ -114,10 +114,7 @@ describe('useManualPauseTrigger', () => {
     });
 
     expect(openManualPauseFromHomeMock).toHaveBeenCalledWith(
-      {
-        repository: mockPauseRepository,
-        reflect: mockReflectGenerator,
-      },
+      mockPauseHomeManualOpenPorts,
       expect.objectContaining({
         userId: 'user-1',
         silentMode: true,

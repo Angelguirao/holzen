@@ -14,17 +14,9 @@ import {
   trackPauseManualCompleted,
 } from '@/features/pause/application/use-cases/trigger/manual-pause-trigger-telemetry';
 import { openManualPauseFromHome } from '@/features/pause/application/use-cases/trigger/open-manual-pause-from-home';
-import {
-  supabasePauseRepository,
-  supabaseReflectGenerator,
-} from '@/features/pause/public-rpc';
+import { pauseHomeManualOpenPorts } from './pause-home-io';
 import { clearPausePersistedTabSession } from '@/features/pause/presentation/session/pause-persisted-tab-session-io';
 import { holzenLog } from '@/lib/holzen-console';
-
-const manualPauseOpenPorts = {
-  repository: supabasePauseRepository,
-  reflect: supabaseReflectGenerator,
-} as const;
 
 export interface UseManualPauseTriggerParams {
   user: User | null;
@@ -107,7 +99,7 @@ export function useManualPauseTrigger({
 
       if (silentMode) {
         holzenLog.manual('generateMessage: silent mode');
-        const result = await openManualPauseFromHome(manualPauseOpenPorts, openParams);
+        const result = await openManualPauseFromHome(pauseHomeManualOpenPorts, openParams);
         if (result.outcome === 'error') {
           holzenLog.manual('generateMessage: silent pause create failed', {
             message: result.userMessage,
@@ -119,7 +111,7 @@ export function useManualPauseTrigger({
       setLoading(true);
       setError(null);
       try {
-        const result = await openManualPauseFromHome(manualPauseOpenPorts, openParams);
+        const result = await openManualPauseFromHome(pauseHomeManualOpenPorts, openParams);
         if (result.outcome === 'idle') {
           holzenLog.manual('generateMessage: reuse/skip');
         }

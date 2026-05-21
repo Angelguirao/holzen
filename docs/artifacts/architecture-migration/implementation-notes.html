@@ -13776,4 +13776,23 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — bind home manual + preview dismiss I/O (reflect backlog #1 verified)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>Home presentation — openManualPauseFromHome ports + dismiss off public-rpc</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd><code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code> was already complete on <code>cursor/arch-migrate-src-ca70</code>. Add <code>presentation/home/pause-home-io.ts</code> with <code>pauseHomeManualOpenPorts</code> and <code>pauseDismissOpenPauseHomePreview</code> for <code>use-manual-pause-trigger</code> and <code>use-open-pause-home-preview</code> (mirrors session I/O modules). Preview fetch stays on <code>public-queries</code>.</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior-preserving wiring only.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Bulk-hold apply and archive retrospective still import <code>public-rpc</code> directly.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: <code>presentation/home/pause-home-bulk-hold-io.ts</code> or <code>public-ritual-frame</code> barrel peel, or Phase B <code>src/lib/holzen-query-client-ref</code> shim.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->

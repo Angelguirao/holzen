@@ -3,18 +3,13 @@ import { renderHook, act } from '@testing-library/react';
 import type { User } from '@supabase/supabase-js';
 import { useOpenPauseHomePreview } from './use-open-pause-home-preview';
 
-const { dismissOpenPauseHomeMock, clearSessionMock, mockPauseRepository } = vi.hoisted(() => ({
-  dismissOpenPauseHomeMock: vi.fn(),
+const { pauseDismissOpenPauseHomePreviewMock, clearSessionMock } = vi.hoisted(() => ({
+  pauseDismissOpenPauseHomePreviewMock: vi.fn(),
   clearSessionMock: vi.fn(),
-  mockPauseRepository: { port: 'supabasePauseRepository' },
 }));
 
-vi.mock('@/features/pause/application/use-cases/home/dismiss-open-pause-home', () => ({
-  dismissOpenPauseHome: dismissOpenPauseHomeMock,
-}));
-
-vi.mock('@/features/pause/public-rpc', () => ({
-  supabasePauseRepository: mockPauseRepository,
+vi.mock('./pause-home-io', () => ({
+  pauseDismissOpenPauseHomePreview: pauseDismissOpenPauseHomePreviewMock,
 }));
 
 vi.mock('@/features/pause/presentation/session/pause-persisted-tab-session-io', () => ({
@@ -32,7 +27,7 @@ vi.mock('../../public-queries', () => ({
 }));
 
 beforeEach(() => {
-  dismissOpenPauseHomeMock.mockReset().mockResolvedValue(undefined);
+  pauseDismissOpenPauseHomePreviewMock.mockReset().mockResolvedValue(undefined);
 });
 
 describe('useOpenPauseHomePreview dismiss', () => {
@@ -44,9 +39,9 @@ describe('useOpenPauseHomePreview dismiss', () => {
       await result.current.dismissOpenPauseHome();
     });
 
-    expect(dismissOpenPauseHomeMock).toHaveBeenCalledWith(true, {
+    expect(pauseDismissOpenPauseHomePreviewMock).toHaveBeenCalledWith({
+      hasUser: true,
       clearPreview: expect.any(Function),
-      repository: mockPauseRepository,
     });
   });
 
@@ -57,9 +52,9 @@ describe('useOpenPauseHomePreview dismiss', () => {
       await result.current.dismissOpenPauseHome();
     });
 
-    expect(dismissOpenPauseHomeMock).toHaveBeenCalledWith(false, {
+    expect(pauseDismissOpenPauseHomePreviewMock).toHaveBeenCalledWith({
+      hasUser: false,
       clearPreview: expect.any(Function),
-      repository: mockPauseRepository,
     });
   });
 });
