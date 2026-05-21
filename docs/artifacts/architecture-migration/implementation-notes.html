@@ -15860,9 +15860,9 @@
       <dt>Deviation</dt>
       <dd>None — behavior parity; domain still owns the pure builder.</dd>
       <dt>Tradeoffs</dt>
-      <dd>Depth picker, initial-emotion presentation, and depth-context copy conductors still import domain mood modules directly — peel incrementally.</dd>
+      <dd>Initial-emotion presentation and depth-context copy conductors still import domain mood modules directly — peel incrementally.</dd>
       <dt>Open questions</dt>
-      <dd>Next: route depth-picker apply helpers through mood I/O, or Phase B cross-context Tier 1 shim.</dd>
+      <dd>Next: peel initial-emotion presentation through mood I/O (depth-picker apply helpers landed in a follow-up slice).</dd>
     </dl>
   </article>
 
@@ -15882,6 +15882,25 @@
       <dd><code>pause-session-ritual-restore-io</code> still re-exports decide/frame restore helpers directly until a later peel.</dd>
       <dt>Open questions</dt>
       <dd>Next: route decide/frame restore through session decide/frame I/O barrels, or Phase B cross-context Tier 1 shim.</dd>
+    </dl>
+  </article>
+
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — depth-picker ritual entry via reflect mood I/O (backlog #1 verified, Tier 4)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>Re-export <code>apply-*-depth-picker-ritual-entry</code> on <code>pause-reflect-mood-io</code></h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code>) remains complete — no folder moves. Re-export brief/deep depth-picker apply helpers on <code>pause-reflect-mood-io</code>; <code>use-pause-session-depth-picker-handlers</code> imports mood I/O only (alongside chrome close + deep pro gate and feel-tiles log options).</dd>
+      <dt>Deviation</dt>
+      <dd>None — domain still owns pure helpers; behavior parity.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Initial-emotion presentation types still import domain directly — peel incrementally.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: peel initial-emotion presentation through reflect mood I/O, or <code>applyBreathSegmentLogOutcome</code> through session breath I/O.</dd>
     </dl>
   </article>
 
