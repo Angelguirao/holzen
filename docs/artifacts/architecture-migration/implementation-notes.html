@@ -10413,4 +10413,23 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — home dismiss via PauseRepository (backlog #4)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>dismissOpenPauseHome calls repository.dismissCurrent directly</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd><code>dismiss-open-pause-home</code> invokes <code>PauseRepository.dismissCurrent</code> instead of the thin <code>runPauseDismissCurrent</code> delegate — port is the mutation boundary; session use case stays for <code>public-rpc</code> facade wiring.</dd>
+      <dt>Deviation</dt>
+      <dd>None — RPC and preview clear behavior unchanged.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Other lifecycle use cases still wrap the port for single <code>public-rpc</code> entrypoints; further audit can inline where only one caller exists.</dd>
+      <dt>Open questions</dt>
+      <dd>Next #4: scan presentation for any remaining direct <code>pause-rpc-client</code> imports; optional <code>mapPersistedStep</code> import via <code>public-session</code> inside breathe helpers.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
