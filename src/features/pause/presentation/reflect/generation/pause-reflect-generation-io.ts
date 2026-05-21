@@ -11,7 +11,7 @@ import {
 import {
   runReflectGeneration,
   type RunReflectGenerationInput,
-} from '@/features/pause/application/use-cases/ritual/reflect/generation/pause-reflect-generation-run-flow';
+} from '@/features/pause/application/use-cases/ritual/reflect/generation/run-reflect-generation';
 
 export {
   messageFromReflectGenerationResult,
