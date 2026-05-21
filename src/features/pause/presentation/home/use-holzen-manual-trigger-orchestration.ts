@@ -9,11 +9,11 @@ import {
   computeAutoCooldownRemainingMs,
   computeManualCooldownRemainingMs,
   isManualTriggerBlockedByCooldown,
+  mapManualTriggerStartError,
   parseManualTriggerCooldownFromStorageEvent,
   readManualTriggerCooldownAtMs,
   writeManualTriggerCooldownAtMs,
-} from '@/features/pause/public-trigger';
-import { mapManualTriggerStartError } from './pause-home-reflect-io';
+} from './pause-home-reflect-io';
 import {
   MANUAL_PAUSE_TRIGGER_IDLE,
   type ManualPauseTriggerResult,

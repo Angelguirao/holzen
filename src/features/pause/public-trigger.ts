@@ -5,13 +5,13 @@
 export {
   computeAutoCooldownRemainingMs,
   computeManualCooldownRemainingMs,
-} from './application/use-cases/trigger/compute-pause-trigger-cooldowns';
+} from './domain/reflect/generation/compute-pause-trigger-cooldowns';
 export {
   buildManualTriggerCooldownStorageKey,
   isManualTriggerBlockedByCooldown,
   parseManualTriggerCooldownFromStorageEvent,
   type ManualTriggerCooldownStorageEvent,
-} from './application/use-cases/trigger/manual-trigger-cooldown-flow';
+} from './domain/reflect/generation/manual-trigger-cooldown-flow';
 export { mapManualTriggerStartError } from './domain/reflect/generation/map-manual-trigger-start-error';
 export {
   readManualTriggerCooldownAtMs,

@@ -31,9 +31,22 @@ export { runOpenManualPauseSilentModeAfterCreate } from '@/features/pause/applic
 export { runPersistSilentReflectionStub } from '@/features/pause/application/use-cases/ritual/reflect/generation/run-persist-silent-reflection-stub';
 export { mapManualTriggerStartError } from '@/features/pause/domain/reflect/generation/map-manual-trigger-start-error';
 export {
+  computeAutoCooldownRemainingMs,
+  computeManualCooldownRemainingMs,
+} from '@/features/pause/domain/reflect/generation/compute-pause-trigger-cooldowns';
+export {
+  buildManualTriggerCooldownStorageKey,
+  isManualTriggerBlockedByCooldown,
+  parseManualTriggerCooldownFromStorageEvent,
+  type ManualTriggerCooldownStorageEvent,
+} from '@/features/pause/domain/reflect/generation/manual-trigger-cooldown-flow';
+export {
+  readManualTriggerCooldownAtMs,
+  writeManualTriggerCooldownAtMs,
+} from '@/features/pause/infrastructure/manual-trigger-cooldown-storage';
+export {
   applyManualPauseOpenResult,
   type ApplyManualPauseOpenResultInput,
   type ManualPauseHomePreviewPorts,
 } from './apply-manual-pause-open-result';
-export { mapManualTriggerStartError } from '@/features/pause/domain/reflect/generation/map-manual-trigger-start-error';
 export { shouldNavigateAfterManualTrigger } from '@/features/pause/application/use-cases/ritual/reflect/generation/should-navigate-after-manual-trigger';
