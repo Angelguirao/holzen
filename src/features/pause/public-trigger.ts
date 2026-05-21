@@ -12,7 +12,7 @@ export {
   parseManualTriggerCooldownFromStorageEvent,
   type ManualTriggerCooldownStorageEvent,
 } from './application/use-cases/trigger/manual-trigger-cooldown-flow';
-export { mapManualTriggerStartError } from './application/use-cases/trigger/map-manual-trigger-start-error';
+export { mapManualTriggerStartError } from './domain/reflect/generation/map-manual-trigger-start-error';
 export {
   readManualTriggerCooldownAtMs,
   writeManualTriggerCooldownAtMs,
