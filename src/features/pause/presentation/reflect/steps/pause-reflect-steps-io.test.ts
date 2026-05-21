@@ -6,12 +6,16 @@ const runPauseReflectionStepLogOnceMock = vi.hoisted(() => vi.fn());
 const runPauseFavoriteToggleMock = vi.hoisted(() => vi.fn());
 
 vi.mock(
-  '@/features/pause/application/use-cases/ritual/reflect/steps/pause-reflect-steps-flow',
+  '@/features/pause/application/use-cases/ritual/reflect/steps/run-pause-reflection-step-log',
   () => ({
     runPauseReflectionStepLogOnce: runPauseReflectionStepLogOnceMock,
+  }),
+);
+
+vi.mock(
+  '@/features/pause/application/use-cases/ritual/reflect/steps/run-pause-favorite-toggle',
+  () => ({
     runPauseFavoriteToggle: runPauseFavoriteToggleMock,
-    shouldLogPauseReflectionStep,
-    shouldShowFavoriteProHint,
   }),
 );
 

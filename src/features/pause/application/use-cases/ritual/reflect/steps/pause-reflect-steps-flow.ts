@@ -1,7 +1,7 @@
 /**
  * CI cluster anchor for ritual reflect steps presentation I/O (§3 / check:architecture-alignment).
  * Re-exports mutation use cases and domain step gates for a single presentation import surface.
- * Presentation: `pause-reflect-steps-io.ts` imports through this anchor.
+ * Presentation: `pause-reflect-steps-io.ts` imports sibling run-* and domain gates directly.
  */
 export { runPauseFavoriteToggle } from './run-pause-favorite-toggle';
 export { runPauseReflectNoteUpdate } from './run-pause-reflect-note-update';
