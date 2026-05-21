@@ -38,17 +38,6 @@ export type {
 export { EMPTY_COMPANION_SLOT_RELAXATIONS } from './application/use-cases/ritual/frame/orchestrate-slot-apply';
 export { applyCompanionOrchestrateRetryReset } from './application/use-cases/ritual/frame/apply-companion-orchestrate-retry-reset';
 export { resetInterventionIdempotency } from './application/use-cases/ritual/frame/intervention-idempotency';
-export {
-  COMPANION_FULL_VIEW_BREATHING_ROOM_MS,
-  companionPrefsForFullViewSlot,
-  isCompanionFullViewSlotSettled,
-  pauseSeverityToOrchestrateNumber,
-} from './application/use-cases/ritual/frame/full-view-page-helpers';
-export {
-  getCompanionSectionVisibility,
-  isCompanionSectionVisible,
-} from './application/use-cases/ritual/frame/section-visibility';
-export type { CompanionSectionVisibility } from './application/use-cases/ritual/frame/section-visibility';
 export { nextExpandedWithLazyFetch } from './application/use-cases/ritual/frame/next-expanded-with-lazy-fetch';
 export { applyCompanionSlotOrchestrateOutcome } from './application/use-cases/ritual/frame/apply-companion-slot-orchestrate-outcome';
 export type { ApplyCompanionSlotOrchestrateFailureUiPorts } from './application/use-cases/ritual/frame/companion-slot-orchestrate-failure-ui';
