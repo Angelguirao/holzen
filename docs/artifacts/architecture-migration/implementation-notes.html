@@ -9938,4 +9938,23 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — public-hooks go-back via public-ritual-brief (backlog #1 verified, #3)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>ritual/reflect/ complete; dedupe public-session re-exports</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 verified — no reflect moves. After parallel step-transition peels on remote, consolidate <code>public-hooks</code>: single <code>public-session</code> export block; <code>computePauseGoBackPlan</code> re-export from <code>public-ritual-brief</code> instead of <code>application/use-cases/ritual/brief/go-back-plan</code>.</dd>
+      <dt>Deviation</dt>
+      <dd>None — screen-facing export names unchanged.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Presentation hooks already imported <code>public-session</code> on remote; this slice is barrel hygiene only.</dd>
+      <dt>Open questions</dt>
+      <dd>Next backlog #3: <code>persist-snapshot</code> cluster on <code>public-session</code>; backlog #4: breath segment RPC audit via <code>public-rpc</code> only.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->

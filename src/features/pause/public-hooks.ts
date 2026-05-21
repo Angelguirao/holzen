@@ -4,17 +4,15 @@
  */
 export { pauseStepLayout } from './presentation/session/pause-step-layout';
 export {
+  buildPauseSessionMountLogParams,
   buildPauseSessionStepTransitionConfig,
   PAUSE_SESSION_STEP_SLIDE_OFFSET_PX,
   PAUSE_SESSION_STEP_TRANSITION_DURATION_REDUCED_S,
   PAUSE_SESSION_STEP_TRANSITION_DURATION_S,
   PAUSE_SESSION_STEP_TRANSITION_EASE,
+  type PauseSessionMountLogParams,
   type PauseSessionStepTransitionConfig,
   type PauseSessionSwipeDirection,
-} from './public-session';
-export {
-  buildPauseSessionMountLogParams,
-  type PauseSessionMountLogParams,
 } from './public-session';
 export {
   buildPauseSessionPersistSnapshot,
