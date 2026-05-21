@@ -1,4 +1,5 @@
 import { invalidateCompanionUiCompletionQuery } from '@/features/pause/application/queries/companion-ui-completion-query-key';
+import { runToggleCompanionLibraryFavorite } from '@/features/pause/application/use-cases/ritual/frame/run-toggle-companion-library-favorite';
 import { persistCompanionUiStepCompletion } from '@/features/pause/application/use-cases/ritual/frame/persist-ui-step-completion';
 import type { CompanionUiCompletionStep } from '@/features/pause/application/use-cases/ritual/frame/companion-ui-completion-types';
 import {
@@ -21,3 +22,10 @@ export function pauseCompanionUiStepCompletion(
 }
 
 export { invalidateCompanionUiCompletionQuery };
+
+/** Default port + use case: per-slot companion card favorites on pause instance metadata. */
+export function pauseToggleCompanionLibraryFavorite(
+  input: Parameters<typeof runToggleCompanionLibraryFavorite>[1],
+): ReturnType<typeof runToggleCompanionLibraryFavorite> {
+  return runToggleCompanionLibraryFavorite(companionPauseRepository, input);
+}

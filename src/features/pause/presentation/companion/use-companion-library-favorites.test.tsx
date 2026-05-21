@@ -2,25 +2,13 @@ import { describe, expect, it, vi, beforeEach } from 'vitest';
 import { renderHook, act } from '@testing-library/react';
 import { useCompanionLibraryFavorites } from './use-companion-library-favorites';
 
-const {
-  runToggleCompanionLibraryFavoriteMock,
-  mockPauseRepository,
-  setQueryDataMock,
-} = vi.hoisted(() => ({
-  runToggleCompanionLibraryFavoriteMock: vi.fn().mockResolvedValue(true),
-  mockPauseRepository: { port: 'supabasePauseRepository' },
+const { pauseToggleCompanionLibraryFavoriteMock, setQueryDataMock } = vi.hoisted(() => ({
+  pauseToggleCompanionLibraryFavoriteMock: vi.fn().mockResolvedValue(true),
   setQueryDataMock: vi.fn(),
 }));
 
-vi.mock(
-  '@/features/pause/application/use-cases/ritual/frame/run-toggle-companion-library-favorite',
-  () => ({
-    runToggleCompanionLibraryFavorite: runToggleCompanionLibraryFavoriteMock,
-  }),
-);
-
 vi.mock('./pause-companion-orchestration-io', () => ({
-  companionPauseRepository: mockPauseRepository,
+  pauseToggleCompanionLibraryFavorite: pauseToggleCompanionLibraryFavoriteMock,
 }));
 
 vi.mock('@/features/pause/public-queries', () => ({
@@ -39,7 +27,7 @@ vi.mock('@tanstack/react-query', () => ({
 }));
 
 beforeEach(() => {
-  runToggleCompanionLibraryFavoriteMock.mockReset().mockResolvedValue(true);
+  pauseToggleCompanionLibraryFavoriteMock.mockReset().mockResolvedValue(true);
   setQueryDataMock.mockReset();
 });
 
@@ -51,25 +39,23 @@ describe('useCompanionLibraryFavorites', () => {
       await result.current.toggleCompanionFavorite('article');
     });
 
-    expect(runToggleCompanionLibraryFavoriteMock).not.toHaveBeenCalled();
+    expect(pauseToggleCompanionLibraryFavoriteMock).not.toHaveBeenCalled();
   });
 
-  it('toggles via runToggleCompanionLibraryFavorite + PauseRepository', async () => {
+  it('toggles via pauseToggleCompanionLibraryFavorite presentation I/O', async () => {
     const { result } = renderHook(() => useCompanionLibraryFavorites('inst-1'));
 
     await act(async () => {
       await result.current.toggleCompanionFavorite('article');
     });
 
-    expect(runToggleCompanionLibraryFavoriteMock).toHaveBeenCalledTimes(1);
-    expect(runToggleCompanionLibraryFavoriteMock).toHaveBeenCalledWith(
-      mockPauseRepository,
+    expect(pauseToggleCompanionLibraryFavoriteMock).toHaveBeenCalledTimes(1);
+    expect(pauseToggleCompanionLibraryFavoriteMock).toHaveBeenCalledWith(
       expect.objectContaining({
         pauseInstanceId: 'inst-1',
         sourceType: 'article',
         onBucketComputed: expect.any(Function),
       }),
     );
-    expect(mockPauseRepository.port).toBe('supabasePauseRepository');
   });
 });
