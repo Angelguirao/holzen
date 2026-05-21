@@ -4,11 +4,9 @@ import type { FeelStepTile } from '@/features/pause/domain/feel-step-tile';
 import type { MoodValue } from '@/features/pause/domain/mood-value';
 import {
   initialEmotionResetUi,
-  type InitialEmotionUiState,
-} from '@/features/pause/domain/reflect/mood/initial-emotion-presentation';
-import {
   pauseInitialEmotionSelect,
   pauseInitialEmotionSkip,
+  type InitialEmotionUiState,
 } from './pause-reflect-mood-io';
 import { showPauseStepSyncFailedToast } from '@/features/pause/presentation/ritual/pause-step-sync-toast';
 import { hapticFeedback } from '@/lib/haptics';

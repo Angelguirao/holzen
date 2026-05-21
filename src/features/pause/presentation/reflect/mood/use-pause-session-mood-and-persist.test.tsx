@@ -9,14 +9,16 @@ const { pauseInitialEmotionSelectMock } = vi.hoisted(() => ({
   pauseInitialEmotionSelectMock: vi.fn(),
 }));
 
-vi.mock('./pause-reflect-mood-io', async () => {
-  const { buildFeelTilesMoodLogOptions } = await import(
-    '@/features/pause/domain/reflect/mood/build-feel-tiles-mood-log-options'
-  );
+vi.mock('@/features/pause/public-rpc', () => ({
+  supabasePauseRepository: { port: 'reflectPauseRepository' },
+}));
+
+vi.mock('./pause-reflect-mood-io', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('./pause-reflect-mood-io')>();
   return {
+    ...actual,
     pauseInitialEmotionSelect: pauseInitialEmotionSelectMock,
     pauseInitialEmotionSkip: vi.fn(),
-    buildFeelTilesMoodLogOptions,
   };
 });
 
