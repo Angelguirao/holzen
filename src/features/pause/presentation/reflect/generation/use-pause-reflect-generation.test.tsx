@@ -13,11 +13,11 @@ vi.mock('@/features/pause/public-rpc', () => ({
 }));
 
 vi.mock('./pause-reflect-generation-io', async () => {
-  const hookFlow = await vi.importActual<
-    typeof import('@/features/pause/application/use-cases/ritual/reflect/generation/pause-reflect-generation-hook-flow')
-  >('@/features/pause/application/use-cases/ritual/reflect/generation/pause-reflect-generation-hook-flow');
+  const actual = await vi.importActual<typeof import('./pause-reflect-generation-io')>(
+    './pause-reflect-generation-io',
+  );
   return {
-    ...hookFlow,
+    ...actual,
     reflectGenerator: mockReflectGenerator,
     pauseReflectGeneration: pauseReflectGenerationMock,
   };
