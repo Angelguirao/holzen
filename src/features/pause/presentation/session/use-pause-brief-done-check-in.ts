@@ -5,8 +5,9 @@ import {
   isPauseMoodValue,
   type MoodValue,
 } from '@/features/pause/domain/mood-value';
+import type { PostPauseFeelSnapshot } from '@/features/pause/domain/ritual/done/post-pause-emotion-log';
 import { showPauseStepSyncFailedToast } from '@/features/pause/application/use-cases/ritual/step-sync-toast';
-import { logPostPauseEmotionIfDirty, type PostPauseFeelSnapshot } from '@/features/pause/public-rpc';
+import { logPostPauseEmotionIfDirty } from '@/features/pause/public-rpc';
 
 export type UsePauseBriefDoneCheckInParams = {
   doneVariant: 'default' | 'brief';

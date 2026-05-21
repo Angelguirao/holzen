@@ -82,10 +82,8 @@ import type { OpenManualPauseFromHomeParams } from './application/use-cases/trig
 import type { TFunction } from 'i18next';
 import type { BulkHoldOutcomeChoice, BulkHoldPendingPause } from './domain/bulk-hold';
 import type { PauseState } from './domain/pause-state';
-import {
-  runPostPauseEmotionLogIfDirty,
-  type PostPauseFeelSnapshot,
-} from './application/use-cases/ritual/done/post-pause-emotion-log';
+import { runPostPauseEmotionLogIfDirty } from './application/use-cases/ritual/done/post-pause-emotion-log';
+import type { PostPauseFeelSnapshot } from './domain/ritual/done/post-pause-emotion-log';
 import type { MoodValue } from './domain/mood-value';
 import { runPauseOutcomeLog } from './application/use-cases/ritual/decide/run-pause-outcome-log';
 import {
