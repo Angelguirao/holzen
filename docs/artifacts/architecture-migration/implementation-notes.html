@@ -11249,4 +11249,23 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — decide handler off public-rpc (backlog #1 verified / #4)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>use-pause-session-decide-handler → ritual/decide/run-pause-outcome-log + PauseRepository</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code>) is complete — no folder move. Continue backlog #4 §6 slim <code>public-rpc</code>: <code>use-pause-session-decide-handler</code> calls <code>runPauseOutcomeLog(supabasePauseRepository, …)</code> and imports decide outcome toasts from <code>application/use-cases/ritual/decide/outcome-toast.ts</code>; <code>clearSession</code> from <code>persisted-session-storage</code>. Removed sole-consumer <code>logPauseOutcome</code> facade from <code>public-rpc.ts</code>.</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior unchanged.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Outcome toasts still re-exported on <code>public-rpc</code> for any cross-context callers; decide hook imports the use-case module directly.</dd>
+      <dt>Open questions</dt>
+      <dd>Next backlog #4: audit companion/archive <code>public-rpc</code> imports; peel breath segment loggers or remaining ritual facades where hooks are sole consumers.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
