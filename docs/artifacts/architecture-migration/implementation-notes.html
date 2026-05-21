@@ -5805,7 +5805,7 @@
     <h3>Peel outcome_logged from public-rpc in presentation</h3>
     <dl>
       <dt>Design decision</dt>
-      <dd><code>use-pause-session-decide-handler</code> calls <code>runPauseOutcomeLog</code> with <code>supabasePauseRepository</code> from <code>public-ports.ts</code>; <code>logPauseOutcome</code> facade remains on <code>public-rpc</code> for screens.</dd>
+      <dd><code>use-pause-session-decide-handler</code> calls <code>runPauseOutcomeLog</code> with <code>supabasePauseRepository</code> from <code>public-ports.ts</code>; <code>logPauseOutcome</code> facade remains on <code>public-rpc</code> for screens. Decide-handler test mocks <code>public-ports</code> repository <code>logStep</code> (integration-style) instead of stubbing the use-case module.</dd>
       <dt>Deviation</dt>
       <dd>None.</dd>
       <dt>Tradeoffs</dt>
