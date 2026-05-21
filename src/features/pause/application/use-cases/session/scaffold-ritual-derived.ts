@@ -6,6 +6,7 @@ import {
 } from '@/features/pause/domain/pause-ritual-steps';
 import { computeBriefMacroProgressPosition } from '@/features/pause/domain/brief-ritual-steps';
 import type { BriefPauseStep, RitualDepth } from '@/features/pause/domain/ritual-types';
+import { deepReflectOrFrameMacroSubline } from '@/features/pause/domain/reflect/scaffold/deep-reflect-frame-macro-subline';
 
 type PauseSeverity = 'mild' | 'moderate' | 'high';
 
@@ -33,12 +34,8 @@ function deepPauseMacroSubline(
       ? macroProgressStepCompletedLine(t)
       : t('pause.deep.breath2StepDurationHint', { defaultValue: '< 30 sec' });
   }
-  if (step === 'reflect') {
-    return t('pause.deep.reflectStepDurationHint', { defaultValue: '~ 3 min' });
-  }
-  if (step === 'frame') {
-    return t('pause.reflect.subtitle', { defaultValue: 'Take your time' });
-  }
+  const reflectOrFrame = deepReflectOrFrameMacroSubline(step, t);
+  if (reflectOrFrame != null) return reflectOrFrame;
   if (step === 'decide') {
     return t('pause.brief.decideStepDurationHint', { defaultValue: '< 15 sec' });
   }
