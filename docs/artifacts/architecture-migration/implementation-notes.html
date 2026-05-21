@@ -11629,4 +11629,23 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — peel unused public-rpc facades (backlog #1 verified, backlog #4)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>ritual/reflect/ complete; slim public-rpc to adapters + PWA analytics</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code>) verified complete — no folder move. Remove unused <code>logPauseCompanion</code> facade from <code>public-rpc</code> (call sites use <code>log-pause-companion</code> + <code>supabasePauseRepository</code> directly). Move admin <code>logDevModeSetting</code> to <code>infrastructure/queries/dev-mode-admin-query.ts</code> and export via <code>public-queries</code>; <code>screens/admin/public-queries</code> re-exports from pause queries (not <code>public-rpc</code>).</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior unchanged.</dd>
+      <dt>Tradeoffs</dt>
+      <dd><code>logPwaInstallAnalyticsEvent</code> remains on <code>public-rpc</code> for Home cross-context via <code>public-hooks</code>.</dd>
+      <dt>Open questions</dt>
+      <dd>Next backlog #4: audit remaining ritual mutations for direct <code>PauseRepository</code> wiring consistency, or peel PWA analytics if a dedicated home query module is preferred.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->

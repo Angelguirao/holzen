@@ -43,10 +43,9 @@ export {
   upsertAppConfigRow,
   DEFAULT_PREGENERATE_CACHE_TOPUP,
   PREGENERATE_CACHE_TOPUP_KEYS,
+  logDevModeSetting,
   mergePregenerateCacheTopup,
 } from '@/features/pause/public-queries';
-
-export { logDevModeSetting } from '@/features/pause/public-rpc';
 
 export {
   ADMIN_PENDING_SOURCE_SUGGESTIONS_QUERY_KEY,

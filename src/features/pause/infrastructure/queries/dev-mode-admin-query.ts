@@ -1,4 +1,5 @@
 import { runFetchDevModeSetting } from '@/features/pause/application/use-cases/admin/run-fetch-dev-mode-setting';
+import { runLogDevModeSetting } from '@/features/pause/application/use-cases/admin/run-log-dev-mode-setting';
 import { supabasePauseAnalyticsRepository } from '@/features/pause/infrastructure/supabase-pause-analytics-repository';
 
 /** Matches `screens/admin/lib/admin-query-namespace` — keep in sync if the prefix changes. */
@@ -49,4 +50,9 @@ export function getAdminDevModeSettingQueryOptions(userId: string | undefined) {
     refetchOnWindowFocus: false,
     retry: false,
   } as const;
+}
+
+/** Admin rapid-testing toggle write — wired `PauseAnalyticsRepository.insertEvent`. */
+export async function logDevModeSetting(userId: string, enabled: boolean): Promise<void> {
+  await runLogDevModeSetting(supabasePauseAnalyticsRepository, { userId, enabled });
 }

@@ -16,7 +16,7 @@ describe('logDevModeSetting', () => {
   });
 
   it('routes dev_mode_setting through PauseAnalyticsRepository', async () => {
-    const { logDevModeSetting } = await import('@/features/pause/public-rpc');
+    const { logDevModeSetting } = await import('@/features/pause/infrastructure/queries/dev-mode-admin-query');
     await logDevModeSetting('user-1', true);
     expect(insertEvent).toHaveBeenCalledWith({
       userId: 'user-1',
