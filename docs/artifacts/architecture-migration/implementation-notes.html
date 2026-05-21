@@ -12104,4 +12104,23 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — lock mood chrome composite to domain + child hooks (backlog #1 verified, backlog #4)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3><code>use-pause-session-mood-chrome-handlers</code> presentation guardrail</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code>) verified complete — no folder move. Add composite tests asserting chrome close delegates to <code>pause-session-mood-chrome-flow</code> (return vs request_exit) and composes <code>usePauseSessionMoodAndPersist</code> + <code>usePauseFavoriteToggle</code> (PauseRepository paths locked on child hooks).</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior unchanged.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Test-only — child hooks mocked; documents session step-handler compose contract without re-testing RPC adapters.</dd>
+      <dt>Open questions</dt>
+      <dd>Next backlog #4: optional PostHog analytics-port consolidation, or Phase B subscription/auth template slice.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
