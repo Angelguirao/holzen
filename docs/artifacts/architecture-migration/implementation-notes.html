@@ -9402,7 +9402,7 @@
       <dt>Tradeoffs</dt>
       <dd><code>log-retrospective-outcome</code> use case stays in <code>application/use-cases/archive/</code> (port I/O).</dd>
       <dt>Open questions</dt>
-      <dd>Next backlog #4: port-backed companion feedback vote read, or move archive list UI helpers from application to domain when a second consumer appears.</dd>
+      <dd>Archive list UI helpers moved to <code>domain/archive/</code> (same day).</dd>
     </dl>
   </article>
 
@@ -9441,6 +9441,25 @@
       <dd>Home pause actions still import <code>buildHomePauseSessionLocationState</code> from <code>application/use-cases/session/</code> — acceptable until a home-specific peel.</dd>
       <dt>Open questions</dt>
       <dd>Next backlog #4: audit remaining presentation hooks importing <code>application/use-cases/archive/*</code> or ritual mutations outside <code>public-rpc</code> facades.</dd>
+    </dl>
+  </article>
+
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — archive list UI helpers in domain (backlog #1 verified)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>ritual/reflect/ complete; public-queries re-exports from domain/archive</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code>) verified — zero legacy paths. Move <code>buildPauseArchiveInfiniteInitialData</code> and <code>isPauseArchiveListInitialLoading</code> to <code>domain/archive/pause-archive-list-ui-state.ts</code>; <code>public-queries</code> re-export path updated; <code>use-pause-archive-list</code> already imports query barrel only.</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior parity.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Pairs with <code>domain/archive/retrospective-outcome-eligibility.ts</code> — archive pure logic colocated under <code>domain/archive/</code>.</dd>
+      <dt>Open questions</dt>
+      <dd>Next backlog #4: audit remaining presentation hooks importing <code>application/use-cases/*</code> (session/home/decide).</dd>
     </dl>
   </article>
 
