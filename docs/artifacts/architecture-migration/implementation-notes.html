@@ -12693,4 +12693,23 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — reflect-generation-hook-flow → ritual/reflect/generation (backlog #1)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>Peel holzen-reflect conductor helpers out of <code>domain/reflect/generation/</code></h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code>) folder moves were already complete. Move prefetch/stale-run guards (<code>reflect-generation-hook-flow</code> + test) beside <code>run-reflect-generation</code> under <code>application/use-cases/ritual/reflect/generation/</code>; domain keeps prereq/result/edge-params only. <code>use-pause-reflect-generation</code> imports application hook-flow + domain prereq.</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior parity; presentation still imports application directly (in-feature, not <code>public*</code>).</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Did not add <code>public-ritual-reflect</code> re-exports for hook-flow — matches other reflect conductors.</dd>
+      <dt>Open questions</dt>
+      <dd>Phase B: subscription/auth <code>src/lib/*</code> shims using pause as template.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
