@@ -273,6 +273,7 @@ export {
 } from './domain/reflect/generation/resolve-pause-reflect-message-view';
 export { buildReflectionShareText } from './domain/reflect/share/reflection-share-text';
 export { generateReflectionShareImage } from './presentation/reflect/share/reflection-share-canvas';
+export { PAUSE_DEPTH_PICKER_CARD_BUTTON_CLASS } from './presentation/reflect/mood/pause-depth-picker-styles';
 export { useCompanionSlotOrchestratePorts } from './presentation/companion/use-companion-slot-orchestrate-ports';
 export { usePauseReflectionStepLog } from './presentation/reflect/steps/use-pause-reflection-step-log';
 export {

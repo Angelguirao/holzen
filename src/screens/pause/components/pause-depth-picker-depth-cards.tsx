@@ -1,6 +1,6 @@
 import { useTranslation } from 'react-i18next';
 import { cn } from '@/lib/utils';
-import { PAUSE_DEPTH_PICKER_CARD_BUTTON_CLASS } from '@/screens/pause/lib/pause-depth-picker-styles';
+import { PAUSE_DEPTH_PICKER_CARD_BUTTON_CLASS } from '@/features/pause/public-hooks';
 
 type PauseDepthPickerDepthCardsProps = {
   onBrief: () => void;
