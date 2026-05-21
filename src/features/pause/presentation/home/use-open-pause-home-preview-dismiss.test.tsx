@@ -3,9 +3,10 @@ import { renderHook, act } from '@testing-library/react';
 import type { User } from '@supabase/supabase-js';
 import { useOpenPauseHomePreview } from './use-open-pause-home-preview';
 
-const { dismissOpenPauseHomeMock, clearSessionMock } = vi.hoisted(() => ({
+const { dismissOpenPauseHomeMock, clearSessionMock, mockPauseRepository } = vi.hoisted(() => ({
   dismissOpenPauseHomeMock: vi.fn(),
   clearSessionMock: vi.fn(),
+  mockPauseRepository: { port: 'supabasePauseRepository' },
 }));
 
 vi.mock('@/features/pause/application/use-cases/home/dismiss-open-pause-home', () => ({
@@ -13,7 +14,7 @@ vi.mock('@/features/pause/application/use-cases/home/dismiss-open-pause-home', (
 }));
 
 vi.mock('@/features/pause/infrastructure/supabase-pause-repository', () => ({
-  supabasePauseRepository: {},
+  supabasePauseRepository: mockPauseRepository,
 }));
 
 vi.mock('@/features/pause/infrastructure/session/persisted-session-storage', () => ({
@@ -43,7 +44,7 @@ describe('useOpenPauseHomePreview dismiss', () => {
 
     expect(dismissOpenPauseHomeMock).toHaveBeenCalledWith(true, {
       clearPreview: expect.any(Function),
-      repository: expect.anything(),
+      repository: mockPauseRepository,
     });
   });
 
@@ -56,7 +57,7 @@ describe('useOpenPauseHomePreview dismiss', () => {
 
     expect(dismissOpenPauseHomeMock).toHaveBeenCalledWith(false, {
       clearPreview: expect.any(Function),
-      repository: expect.anything(),
+      repository: mockPauseRepository,
     });
   });
 });
