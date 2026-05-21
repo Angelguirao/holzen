@@ -14298,7 +14298,7 @@
     <h3>Reflect → ritual/reflect/ complete; §6 session barrel peel</h3>
     <dl>
       <dt>Design decision</dt>
-      <dd>Backlog #1 (<code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code>) verified — zero legacy reflect use-case paths; <code>run-persist-silent-reflection-stub</code> already under <code>ritual/reflect/generation/</code>. Continue backlog #3 §6: export <code>usePendingPauseOfferMutations</code> from <code>public-session.ts</code>; <code>PendingPauseOfferShell</code> imports <code>public-session</code>; <code>public-hooks</code> re-exports for transitional callers.</dd>
+      <dd>Backlog #1 (<code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code>) verified — zero legacy reflect use-case paths; <code>run-persist-silent-reflection-stub</code> already under <code>ritual/reflect/generation/</code>. Continue backlog #3 §6: session adopt/decline on <code>public-session.ts</code> (removed duplicate export from <code>public-home.ts</code> after rebase); <code>PendingPauseOfferShell</code> reads via <code>public-home</code>, mutations via <code>public-session</code>; <code>public-hooks</code> re-exports from <code>public-session</code>.</dd>
       <dt>Deviation</dt>
       <dd>None — import paths only; I/O still bound in <code>presentation/session/pause-session-pending-offer-io.ts</code>.</dd>
       <dt>Tradeoffs</dt>
