@@ -18165,4 +18165,23 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — reflect flows I/O through decide + reflect flow anchors (backlog #1 verified, Tier 5)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3><code>pause-reflect-flows-io</code> off deep decide and domain reflect imports</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>ritual/reflect/</code>) remains complete — no folder moves. Align <code>pause-reflect-flows-io</code> with <code>pause-reflect-mood-io</code>: preflight/post-generation via <code>pause-session-reflect-and-decide-flow</code>; decide mapping via <code>pause-decide-outcome-flow</code>; quotes via <code>wisdom-quotes</code>; Sonner toasts via <code>pause-decide-outcome-toast-flow</code>; <code>outcome_logged</code> RPC via <code>pause-decide-outcome-log-flow</code>. Presentation conductors keep importing only <code>pause-reflect-flows-io</code>.</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior parity; bound <code>pauseReflectOutcomeLog</code> facades unchanged.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Unit test mocks <code>pause-decide-outcome-log-flow</code> (same seam as prior <code>run-pause-outcome-log</code> mock).</dd>
+      <dt>Open questions</dt>
+      <dd>Next: <code>pause-reflect-steps-io</code> through <code>pause-reflect-steps-flow</code> (mood parity), <code>pause-session-brief-io</code> off brief-flow anchor, companion orchestrate-io peel, or Phase B cross-context Tier 1 shim.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
