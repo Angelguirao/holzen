@@ -4,8 +4,8 @@ import { usePauseBreathingTimedLoop } from './use-pause-breathing-timed-loop';
 
 vi.mock('./pause-session-breath-io', async () => {
   const phaseAdvance = await vi.importActual<
-    typeof import('@/features/pause/application/use-cases/ritual/breathe/phase-advance')
-  >('@/features/pause/application/use-cases/ritual/breathe/phase-advance');
+    typeof import('@/features/pause/domain/ritual/breathe/phase-advance')
+  >('@/features/pause/domain/ritual/breathe/phase-advance');
   return {
     ...phaseAdvance,
     playPauseBreathPhaseCue: vi.fn(),
