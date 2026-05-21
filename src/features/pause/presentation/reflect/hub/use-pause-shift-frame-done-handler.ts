@@ -4,7 +4,7 @@ import { runShiftEmotionFrameHubDone } from '@/features/pause/application/use-ca
 import { showPauseStepSyncFailedToast } from '@/features/pause/application/use-cases/ritual/step-sync-toast';
 import { resolveShiftFrameHubDonePresentation } from '@/features/pause/domain/reflect/hub/shift-frame-hub-done-presentation';
 import { supabasePauseRepository } from '@/features/pause/infrastructure/supabase-pause-repository';
-import type { PauseStep } from '@/features/pause/public-hooks';
+import type { PauseStep } from '@/features/pause/domain/pause-ritual-steps';
 
 /**
  * Frame hub “I'm done” → optional `shift_emotion_logged` RPC (deduped) then advance to second breath.
