@@ -10717,4 +10717,23 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — usePauseShiftFrameDoneHandler on public-ritual-reflect (backlog #1 verified, #3)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>ritual/reflect/ complete; shift-frame hub hook on reflect barrel</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 verified — reflect use cases under <code>ritual/reflect/</code>. Export <code>usePauseShiftFrameDoneHandler</code> on <code>public-ritual-reflect.ts</code> after parallel mood-hook peels; <code>public-hooks</code> ritual-reflect import block re-exports (RPC still via <code>public-rpc</code> inside the hook).</dd>
+      <dt>Deviation</dt>
+      <dd>None.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Session reflect/decide conductor still imports hub hook via relative path internally.</dd>
+      <dt>Open questions</dt>
+      <dd>Next backlog #4: pending-offer <code>PauseRepository</code> wiring; peel session flow hooks (<code>usePauseSessionReflectAndDecide</code>) when §6 barrel grows.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->

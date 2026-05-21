@@ -323,7 +323,6 @@ export {
   initialBreathSegmentRpcLoggedFlagsFromRestored,
   usePauseBreathSegmentRpcLoggers,
   usePauseFeelShiftLogDedupeRefs,
-  usePauseShiftFrameDoneHandler,
 } from './public-ritual-reflect';
 export {
   useCompanionHistoryThread,
