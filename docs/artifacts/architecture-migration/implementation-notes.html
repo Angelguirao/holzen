@@ -59,6 +59,25 @@
   <article class="note">
     <header>
       <span>2026-05-21</span>
+      <span>Phase A slice — reflect mood I/O direct domain + run-initial-emotion-log (backlog #1 follow-up, Tier 5)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3><code>pause-reflect-mood-io</code> imports mood helpers off <code>pause-reflect-mood-flow</code> CI anchor</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>ritual/reflect/</code> folder move) remains complete. <code>pause-reflect-mood-io</code> imports depth-picker, feel-tiles, presentation rollback, and session chrome from <code>domain/reflect/mood/*</code> and <code>runInitialEmotion*</code> from <code>run-initial-emotion-log</code> (parity with hub and steps I/O peels).</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior parity; import boundary only.</dd>
+      <dt>Tradeoffs</dt>
+      <dd><code>pause-reflect-mood-flow.ts</code> and mood subcluster flow anchors remain for <code>check:architecture-alignment</code>; presentation I/O no longer routes through the umbrella anchor.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: reconcile presentation I/O direct-import vs flow-anchor routing per subcluster, or Phase B cross-context Tier 1 shim.</dd>
+    </dl>
+  </article>
+
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
       <span>Phase A slice — companion orchestrate I/O via orchestrate-flow anchor (backlog #1–2 verified, Tier 5)</span>
       <span class="status resolved">resolved</span>
     </header>
@@ -490,25 +509,6 @@
       <dd>Replaces four direct presentation imports with one cluster anchor; application <code>reflect-frame-focus-ambience.ts</code> remains for <code>check:architecture-alignment</code>.</dd>
       <dt>Open questions</dt>
       <dd>Next: session conductor flow-anchor peels, or generation I/O peel from hook-flow anchor.</dd>
-    </dl>
-  </article>
-
-  <article class="note">
-    <header>
-      <span>2026-05-21</span>
-      <span>Phase A slice — reflect mood I/O direct domain + run-initial-emotion-log (backlog #1 follow-up, Tier 5)</span>
-      <span class="status resolved">resolved</span>
-    </header>
-    <h3><code>pause-reflect-mood-io</code> imports mood helpers from domain and sibling use case</h3>
-    <dl>
-      <dt>Design decision</dt>
-      <dd>Backlog #1 (<code>ritual/reflect/</code> folder move) remains complete. Peel presentation I/O to import depth-picker, feel-tiles, presentation rollback, and session chrome from <code>domain/reflect/mood/*</code> and <code>runInitialEmotion*</code> from <code>run-initial-emotion-log</code> (mirrors steps and generation I/O peels).</dd>
-      <dt>Deviation</dt>
-      <dd>None — behavior parity; import boundary only.</dd>
-      <dt>Tradeoffs</dt>
-      <dd><code>pause-reflect-mood-flow</code> remains as application cluster anchor for <code>check:architecture-alignment</code>; presentation I/O no longer routes through it.</dd>
-      <dt>Open questions</dt>
-      <dd>Next: <code>pause-home-reflect-telemetry-io</code> direct telemetry imports, or session conductor flow-anchor peels.</dd>
     </dl>
   </article>
 
