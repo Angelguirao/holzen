@@ -29,13 +29,16 @@ const {
   };
 });
 
-vi.mock('@/features/pause/public-rpc', () => ({
-  logPauseOutcome: (params: Parameters<typeof runPauseOutcomeLog>[1]) =>
-    runPauseOutcomeLog(mockRepository, params),
+vi.mock('@/features/pause/public-ports', () => ({
+  supabasePauseRepository: mockRepository,
+}));
+
+vi.mock('@/features/pause/application/use-cases/ritual/decide/outcome-toast', () => ({
   showPauseOutcomeSaveFailedToast,
   showPauseOutcomeNotCompletedToast,
-  formatReinforcementQuoteFromSession,
-  resolvePauseDecideOutcomeFlow,
+}));
+
+vi.mock('@/features/pause/application/use-cases/session/wisdom-quotes', () => ({
   getSessionQuote: () => ({ text: 'Q', author: 'A' }),
 }));
 

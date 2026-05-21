@@ -7088,4 +7088,23 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — peel decide handler off public-rpc (backlog #3)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>use-pause-session-decide-handler port-backed</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>ritual/reflect/</code>) is complete; reflect generation cluster already peeled on remote. <code>use-pause-session-decide-handler</code> calls <code>runPauseOutcomeLog(supabasePauseRepository, …)</code> and imports decide flow + outcome toasts + <code>getSessionQuote</code> from application modules; <code>logPauseOutcome</code> facade on <code>public-rpc</code> unchanged for cross-context callers.</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior parity.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Tests mock <code>public-ports</code> + outcome toasts; real <code>runPauseOutcomeLog</code> runs against the mock repository.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: peel brief-to-deep / brief-done-check-in hooks off <code>public-rpc</code>, or backlog #4 companion feedback vote read adapter.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
