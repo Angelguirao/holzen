@@ -17294,6 +17294,25 @@
   <article class="note">
     <header>
       <span>2026-05-21</span>
+      <span>Phase A slice — home reflect telemetry I/O direct sibling modules (backlog #1 follow-up, Tier 5)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3><code>pause-home-reflect-telemetry-io</code> imports <code>home-pause-actions-telemetry</code> + <code>manual-pause-trigger-telemetry</code></h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>ritual/reflect/</code>) remains complete — no folder moves. Peel Home PostHog presentation I/O to import dismiss/banner trackers and manual-open telemetry from sibling modules instead of <code>pause-home-reflect-telemetry-flow</code> (mirrors mood, steps, and manual-open I/O peels).</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior parity; import boundary only.</dd>
+      <dt>Tradeoffs</dt>
+      <dd><code>pause-home-reflect-telemetry-flow.ts</code> remains for <code>check:architecture-alignment</code> telemetry cluster detection.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: reflect flows I/O decide anchor peel, session pending-offer I/O through <code>pause-session-pending-offer-flow</code>, or Phase B cross-context Tier 1 shim.</dd>
+    </dl>
+  </article>
+
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
       <span>Phase A slice — remove orphan reflect steps flow anchors (backlog #1 follow-up, Tier 5)</span>
       <span class="status resolved">resolved</span>
     </header>
@@ -17306,7 +17325,7 @@
       <dt>Tradeoffs</dt>
       <dd>Steps presentation I/O is the import surface; no application cluster anchor in <code>ritual/reflect/steps/</code> besides <code>run-*</code> use cases.</dd>
       <dt>Open questions</dt>
-      <dd>Next: share I/O via <code>pause-reflection-share-flow</code>, session pending-offer I/O through <code>pause-session-pending-offer-flow</code>, or Phase B cross-context Tier 1 shim.</dd>
+      <dd>Next: reflect flows I/O anchor peel (preflight/post-generation), session pending-offer I/O through <code>pause-session-pending-offer-flow</code>, or Phase B cross-context Tier 1 shim.</dd>
     </dl>
   </article>
 
@@ -17325,7 +17344,7 @@
       <dt>Tradeoffs</dt>
       <dd><code>mount-log-params</code> still imports <code>initialPhaseFromRestored</code> from <code>ritual/decide/</code> directly until a session application peel.</dd>
       <dt>Open questions</dt>
-      <dd>Next: share I/O via <code>pause-reflection-share-flow</code>, <code>pause-companion-frame-ui-flow</code> / analytics flow anchors, or Phase B cross-context Tier 1 shim.</dd>
+      <dd>Next: <code>pause-companion-frame-ui-flow</code> / analytics flow anchors, or Phase B cross-context Tier 1 shim.</dd>
     </dl>
   </article>
 
