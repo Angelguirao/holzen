@@ -1,5 +1,5 @@
 import type { ReflectGenerationPrerequisite } from '@/features/pause/domain/reflect-generation-prerequisites';
-import type { RunReflectGenerationResult } from './run-reflect-generation';
+import type { ReflectGenerationResult } from '@/features/pause/domain/reflect-generation-result';
 
 export type ReflectGenerationPrefetch =
   | { kind: 'stop' }
@@ -30,7 +30,7 @@ export function shouldClearReflectGenerationLoading(runId: number, activeRunId: 
 }
 
 export function messageFromReflectGenerationResult(
-  result: RunReflectGenerationResult,
+  result: ReflectGenerationResult,
 ): string | null {
   if (result.status === 'aborted') return null;
   return result.message;

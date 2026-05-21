@@ -1,6 +1,7 @@
 import { buildReflectGenerationEdgeInvokeInput } from '@/features/pause/domain/reflect-generation-edge-params';
 import type { ReflectGenerationProfileInput } from '@/features/pause/domain/reflect-generation-edge-params';
 import { isAbortLikeReflectError } from '@/features/pause/domain/reflect-generation-errors';
+import type { ReflectGenerationResult } from '@/features/pause/domain/reflect-generation-result';
 import type { ReflectGenerator } from '@/features/pause/ports/reflect-generator';
 
 export type RunReflectGenerationInput = {
@@ -16,11 +17,8 @@ export type RunReflectGenerationInput = {
 /** @deprecated Prefer `ReflectGenerator` from `ports/reflect-generator.ts`. */
 export type RunReflectGenerationPorts = ReflectGenerator;
 
-export type RunReflectGenerationResult =
-  | { status: 'seed'; message: string }
-  | { status: 'cached'; message: string }
-  | { status: 'generated'; message: string }
-  | { status: 'aborted' };
+/** @deprecated Prefer `ReflectGenerationResult` from `domain/reflect-generation-result.ts`. */
+export type RunReflectGenerationResult = ReflectGenerationResult;
 
 /**
  * Reflect-step copy: nav seed → artifact cache → edge `holzen-reflect`.
@@ -29,7 +27,7 @@ export type RunReflectGenerationResult =
 export async function runReflectGeneration(
   input: RunReflectGenerationInput,
   ports: RunReflectGenerationPorts,
-): Promise<RunReflectGenerationResult> {
+): Promise<ReflectGenerationResult> {
   const seed = input.initialReflectionMessage.trim();
   if (seed) {
     return { status: 'seed', message: seed };
