@@ -252,7 +252,7 @@ export {
   type UsePauseArtifactHaikuResult,
 } from './presentation/reflect/use-pause-artifact-haiku';
 export { useCompanionSlotOrchestratePorts } from './presentation/companion/use-companion-slot-orchestrate-ports';
-export { usePauseReflectionStepLog } from './presentation/reflect/use-pause-reflection-step-log';
+export { usePauseReflectionStepLog } from './presentation/reflect/steps/use-pause-reflection-step-log';
 export {
   usePauseReflectUiTelemetry,
 } from './presentation/reflect/use-pause-reflect-ui-telemetry';
@@ -323,7 +323,7 @@ export {
   useFullviewTelemetry,
   type FullviewCompanion,
 } from './presentation/use-fullview-telemetry';
-export { usePauseFavoriteToggle } from './presentation/reflect/use-pause-favorite-toggle';
+export { usePauseFavoriteToggle } from './presentation/reflect/steps/use-pause-favorite-toggle';
 export { usePauseReflectFrameFocusAmbience } from './presentation/reflect/use-pause-reflect-frame-focus-ambience';
 export { usePauseFeelShiftLogDedupeRefs } from './presentation/reflect/use-pause-feel-shift-log-dedupe-refs';
 export { usePauseBreathSegmentRpcLoggers } from './presentation/session/use-pause-breath-segment-rpc-loggers';

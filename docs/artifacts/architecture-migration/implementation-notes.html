@@ -3345,6 +3345,25 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-20</span>
+      <span>Phase A slice — colocate reflection_step + favorite hooks under presentation/reflect/steps/</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>Tier 4 reflect beat — bundle step-log presentation conductors</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>application/use-cases/reflect/</code> → <code>ritual/reflect/steps/</code>) is complete. After note/tags landed under <code>presentation/reflect/steps/</code>, move <code>use-pause-reflection-step-log</code> and <code>use-pause-favorite-toggle</code> (+ test) into the same subfolder; <code>public-hooks</code> and mood-chrome handler import paths only — screens keep <code>public-hooks</code>.</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior-preserving <code>git mv</code>.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Generation, telemetry, and session reflect/decide conductors remain at <code>presentation/reflect/</code> root until later peels.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: colocate <code>use-pause-session-flow-core</code> + scaffold cluster under <code>presentation/session/</code>, or port-back <code>logDevModeSetting</code> (backlog #4).</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
 </body>
 </html>
