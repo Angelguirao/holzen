@@ -3858,6 +3858,25 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — colocate dismiss-outlet hook under presentation/home/</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>Backlog #1 complete; Tier 4 home outlet conductor</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd><code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code> was already complete on <code>cursor/arch-migrate-src-ca70</code>. Move <code>use-dismiss-outlet-pause-ready</code> beside other home conductors — only consumer is <code>HomeScreen</code> via <code>public-hooks</code>.</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior-preserving <code>git mv</code>.</dd>
+      <dt>Tradeoffs</dt>
+      <dd><code>use-staggered-reveal</code> remains flat under <code>presentation/</code> (companion fullview only).</dd>
+      <dt>Open questions</dt>
+      <dd>Next: colocate <code>use-staggered-reveal</code> under <code>presentation/companion/</code>, or backlog #4 optional analytics read port wiring.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
 </body>
 </html>

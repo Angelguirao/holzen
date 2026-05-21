@@ -142,7 +142,7 @@ export {
   fetchCompletedPauseCount,
   getCompletedPauseCountQueryOptions,
 } from './presentation/home/use-completed-pause-count';
-export { useDismissOutletPauseReady } from './presentation/use-dismiss-outlet-pause-ready';
+export { useDismissOutletPauseReady } from './presentation/home/use-dismiss-outlet-pause-ready';
 export {
   usePendingPauseOffer,
   pendingPauseOfferQueryKey,
