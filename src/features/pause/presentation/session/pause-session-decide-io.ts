@@ -5,4 +5,4 @@
 export {
   initialDecisionFromRestored,
   initialPhaseFromRestored,
-} from '@/features/pause/application/use-cases/ritual/decide/restored-decide-ritual-state';
+} from '@/features/pause/application/use-cases/session/pause-session-decide-flow';

@@ -17199,6 +17199,7 @@
   <article class="note">
     <header>
       <span>2026-05-21</span>
+<<<<<<< HEAD
       <span>Phase A slice — remove orphan reflect steps flow anchors (backlog #1 follow-up, Tier 5)</span>
       <span class="status resolved">resolved</span>
     </header>
@@ -17212,6 +17213,21 @@
       <dd>Steps presentation I/O is the import surface; no application cluster anchor in <code>ritual/reflect/steps/</code> besides <code>run-*</code> use cases.</dd>
       <dt>Open questions</dt>
       <dd>Next: reflect flows I/O anchor peel (preflight/post-generation), session pending-offer I/O through <code>pause-session-pending-offer-flow</code>, or Phase B cross-context Tier 1 shim.</dd>
+=======
+      <span>Phase A slice — session decide I/O via decide flow anchor (backlog #1 verified, Tier 5)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3><code>pause-session-decide-flow</code> on <code>pause-session-decide-io</code></h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>ritual/reflect/</code>) remains complete — no folder moves. Add session decide hydration cluster anchor (mirrors <code>pause-session-frame-flow</code>); <code>pause-session-decide-io</code> imports <code>initialDecisionFromRestored</code> and <code>initialPhaseFromRestored</code> through the anchor instead of deep <code>ritual/decide/restored-decide-ritual-state</code>. <code>pause-session-ritual-restore-io</code> unchanged (still imports decide I/O module).</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior parity; import boundary only.</dd>
+      <dt>Tradeoffs</dt>
+      <dd><code>mount-log-params</code> still imports <code>initialPhaseFromRestored</code> from <code>ritual/decide/</code> directly until a session application peel.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: <code>pause-companion-frame-ui-flow</code> / analytics flow anchors, or Phase B cross-context Tier 1 shim.</dd>
+>>>>>>> 17fac6ee (refactor(pause): route session decide I/O through decide flow anchor)
     </dl>
   </article>
 
