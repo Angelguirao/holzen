@@ -1,42 +1,13 @@
 import type { BtcPriceData } from '@/features/market/public';
 import {
-  buildPauseContextFromMarket,
-  normalizeTrackedAssetId,
-  severityFromBtcChangePercent,
-  trackedAssetSymbol,
-} from '@/features/market/public';
-import { buildSilentReflectionStubMessage } from '@/features/pause/domain/reflect/generation/build-silent-reflection-stub-message';
+  buildManualPauseMarketContext,
+  type ManualPauseMarketContext,
+} from '@/features/pause/application/use-cases/ritual/reflect/generation/build-manual-pause-market-context';
 import type { OpenManualPauseFromHomeParams } from './open-manual-pause-from-home';
 
-export type ManualPauseMarketContext = {
-  assetId: string;
-  ctx: string;
-  severityBand: string;
-  onChainBand: string | null;
-  silentMsg: string;
-};
+export type { ManualPauseMarketContext };
 
-/** Market snapshot → pause context string, severity band, and RPC payload fields. */
-export function buildManualPauseMarketContext(
-  data: BtcPriceData,
-  cumulativeThreshold: number,
-  profileTrackedAssetId: string,
-): ManualPauseMarketContext {
-  const assetId = normalizeTrackedAssetId(profileTrackedAssetId);
-  const assetSym = trackedAssetSymbol(assetId);
-  const ctx = buildPauseContextFromMarket(data, cumulativeThreshold, assetSym);
-  const severityBand = severityFromBtcChangePercent(data.changePercent) ?? 'mild';
-  const onChainBand =
-    assetId === 'bitcoin' && data.onChain
-      ? ([data.onChain.mempoolSize, data.onChain.fastestFee, data.onChain.medianFee].filter(
-          (x) => typeof x === 'number' && Number.isFinite(x),
-        ) as number[]).join(':') || null
-      : null;
-  const silentMsg = buildSilentReflectionStubMessage(assetSym);
-
-  return { assetId, ctx, severityBand, onChainBand, silentMsg };
-}
-
+/** Full `openManualPauseFromHome` params from Home market data + profile. */
 export type BuildManualPauseOpenParamsInput = {
   userId: string;
   silentMode: boolean;
@@ -46,7 +17,6 @@ export type BuildManualPauseOpenParamsInput = {
   profileTrackedAssetId: string;
 };
 
-/** Full `openManualPauseFromHome` params from Home market data + profile. */
 export function buildManualPauseOpenParams(
   input: BuildManualPauseOpenParamsInput,
 ): OpenManualPauseFromHomeParams & ManualPauseMarketContext {
