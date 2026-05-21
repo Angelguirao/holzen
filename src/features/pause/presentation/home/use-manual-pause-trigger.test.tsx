@@ -9,12 +9,16 @@ const {
   markPauseManualStartedHomeOnceMock,
   trackManualPauseInstanceCreatedMock,
   trackPauseManualCompletedMock,
+  mockPauseRepository,
+  mockReflectGenerator,
 } = vi.hoisted(() => ({
   openManualPauseFromHomeMock: vi.fn(),
   clearSessionMock: vi.fn(),
   markPauseManualStartedHomeOnceMock: vi.fn(),
   trackManualPauseInstanceCreatedMock: vi.fn(),
   trackPauseManualCompletedMock: vi.fn(),
+  mockPauseRepository: { port: 'supabasePauseRepository' },
+  mockReflectGenerator: { port: 'supabaseReflectGenerator' },
 }));
 
 vi.mock('@/features/pause/infrastructure/session/persisted-session-storage', () => ({
@@ -22,11 +26,11 @@ vi.mock('@/features/pause/infrastructure/session/persisted-session-storage', () 
 }));
 
 vi.mock('@/features/pause/infrastructure/supabase-pause-repository', () => ({
-  supabasePauseRepository: { repository: 'mock-repo' },
+  supabasePauseRepository: mockPauseRepository,
 }));
 
 vi.mock('@/features/pause/infrastructure/supabase-reflect-generator', () => ({
-  supabaseReflectGenerator: { reflect: 'mock-reflect' },
+  supabaseReflectGenerator: mockReflectGenerator,
 }));
 
 vi.mock('@/features/pause/application/use-cases/trigger/open-manual-pause-from-home', () => ({
@@ -112,8 +116,8 @@ describe('useManualPauseTrigger', () => {
 
     expect(openManualPauseFromHomeMock).toHaveBeenCalledWith(
       {
-        repository: { repository: 'mock-repo' },
-        reflect: { reflect: 'mock-reflect' },
+        repository: mockPauseRepository,
+        reflect: mockReflectGenerator,
       },
       expect.objectContaining({
         userId: 'user-1',
