@@ -412,11 +412,17 @@ for (const file of walkTs(join(root, 'src'))) {
       }
     }
   }
-  if (!PAUSE_PERSISTED_SESSION_STORAGE_ALLOWLIST.has(rel)) {
+  const pausePresentationMayImportPersistedSessionStorage = rel.startsWith(
+    'src/features/pause/presentation/',
+  );
+  if (
+    !PAUSE_PERSISTED_SESSION_STORAGE_ALLOWLIST.has(rel) &&
+    !pausePresentationMayImportPersistedSessionStorage
+  ) {
     for (const needle of PAUSE_PERSISTED_SESSION_STORAGE_IMPORT_NEEDLES) {
       if (text.includes(needle)) {
         failures.push(
-          `${rel}: direct persisted-session-storage import (${needle}) — use public-session`,
+          `${rel}: direct persisted-session-storage import (${needle}) — use public-session (presentation may import infrastructure/session/persisted-session-storage directly)`,
         );
         break;
       }
