@@ -6629,4 +6629,23 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — feel-tiles select imports domain mood chrome (backlog #1 done, #3)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>Peel use-pause-session-feel-tiles-select from public-rpc</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd><code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code> was already complete on <code>cursor/arch-migrate-src-ca70</code>. Smallest reflect presentation peel: <code>buildFeelTilesMoodLogOptions</code> is pure domain (<code>domain/reflect/mood/pause-session-mood-chrome-flow</code>); hook imports domain directly; test drops <code>public-rpc</code> mock.</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior parity.</dd>
+      <dt>Tradeoffs</dt>
+      <dd><code>public-rpc</code> still re-exports <code>buildFeelTilesMoodLogOptions</code> for other callers; other mood conductors still use <code>public-rpc</code> facades.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: peel initial-mood / depth-picker / mood-chrome handlers from <code>public-rpc</code>, or companion orchestrate presentation imports on <code>application/ritual/frame/*</code>.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
