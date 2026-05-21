@@ -7,7 +7,7 @@ import { usePauseSessionMoodAndPersist } from './use-pause-session-mood-and-pers
 
 const { runInitialEmotionSelectMock, mockPauseRepository } = vi.hoisted(() => ({
   runInitialEmotionSelectMock: vi.fn(),
-  mockPauseRepository: { port: 'supabasePauseRepository' },
+  mockPauseRepository: { port: 'reflectPauseRepository' },
 }));
 
 vi.mock('@/features/pause/application/use-cases/ritual/reflect/mood/run-initial-emotion-log', () => ({
@@ -15,8 +15,8 @@ vi.mock('@/features/pause/application/use-cases/ritual/reflect/mood/run-initial-
   runInitialEmotionSkip: vi.fn(),
 }));
 
-vi.mock('@/features/pause/public-rpc', () => ({
-  supabasePauseRepository: mockPauseRepository,
+vi.mock('./pause-reflect-mood-io', () => ({
+  reflectPauseRepository: mockPauseRepository,
 }));
 
 vi.mock('../scaffold/use-pause-session-ritual-storage-sync', () => ({
@@ -93,7 +93,7 @@ beforeEach(() => {
 });
 
 describe('usePauseSessionMoodAndPersist', () => {
-  it('routes feel-tile mood select through default PauseRepository adapter', async () => {
+  it('routes feel-tile mood select through pause-reflect-mood-io', async () => {
     const { result } = renderHook(() => usePauseSessionMoodAndPersist(baseParams()));
 
     await act(async () => {
@@ -107,7 +107,7 @@ describe('usePauseSessionMoodAndPersist', () => {
       opts: { briefFace: 'calm' },
       lastFeelLogKey: null,
     });
-    expect(mockPauseRepository.port).toBe('supabasePauseRepository');
+    expect(mockPauseRepository.port).toBe('reflectPauseRepository');
   });
 
   it('brief ritual adds briefRitual to feel-tile mood log options', async () => {

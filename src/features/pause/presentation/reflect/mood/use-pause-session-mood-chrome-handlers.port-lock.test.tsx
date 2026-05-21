@@ -5,28 +5,29 @@ import type { CompanionData, CompanionPrefs } from '@/features/pause/domain/comp
 import type { PauseStep } from '@/features/pause/domain/pause-ritual-steps';
 import { usePauseSessionMoodChromeHandlers } from './use-pause-session-mood-chrome-handlers';
 
-const { runInitialEmotionSelectMock, runPauseFavoriteToggleMock, invalidateQueriesMock, mockPauseRepository } =
-  vi.hoisted(() => ({
-    runInitialEmotionSelectMock: vi.fn(),
-    runPauseFavoriteToggleMock: vi.fn(),
-    invalidateQueriesMock: vi.fn(),
-    mockPauseRepository: { port: 'supabasePauseRepository' },
-  }));
+const {
+  runInitialEmotionSelectMock,
+  pauseReflectFavoriteToggleMock,
+  invalidateQueriesMock,
+  mockPauseRepository,
+} = vi.hoisted(() => ({
+  runInitialEmotionSelectMock: vi.fn(),
+  pauseReflectFavoriteToggleMock: vi.fn(),
+  invalidateQueriesMock: vi.fn(),
+  mockPauseRepository: { port: 'reflectPauseRepository' },
+}));
 
 vi.mock('@/features/pause/application/use-cases/ritual/reflect/mood/run-initial-emotion-log', () => ({
   runInitialEmotionSelect: runInitialEmotionSelectMock,
   runInitialEmotionSkip: vi.fn(),
 }));
 
-vi.mock(
-  '@/features/pause/application/use-cases/ritual/reflect/steps/run-pause-favorite-toggle',
-  () => ({
-    runPauseFavoriteToggle: runPauseFavoriteToggleMock,
-  }),
-);
+vi.mock('./pause-reflect-mood-io', () => ({
+  reflectPauseRepository: mockPauseRepository,
+}));
 
-vi.mock('@/features/pause/public-rpc', () => ({
-  supabasePauseRepository: mockPauseRepository,
+vi.mock('../steps/pause-reflect-steps-io', () => ({
+  pauseReflectFavoriteToggle: pauseReflectFavoriteToggleMock,
 }));
 
 vi.mock('../scaffold/use-pause-session-ritual-storage-sync', () => ({
@@ -133,12 +134,12 @@ beforeEach(() => {
       selectedBriefFace: 'calm',
     },
   });
-  runPauseFavoriteToggleMock.mockReset().mockResolvedValue({ status: 'success', newValue: true });
+  pauseReflectFavoriteToggleMock.mockReset().mockResolvedValue({ status: 'success', newValue: true });
   invalidateQueriesMock.mockClear();
 });
 
 describe('usePauseSessionMoodChromeHandlers port-lock', () => {
-  it('routes favorite toggle through default PauseRepository adapter', async () => {
+  it('routes favorite toggle through pause-reflect-steps-io', async () => {
     const setIsFavorite = vi.fn();
     const { result } = renderHook(() =>
       usePauseSessionMoodChromeHandlers(baseProviders(), {
@@ -151,13 +152,13 @@ describe('usePauseSessionMoodChromeHandlers port-lock', () => {
       await result.current.toggleFavorite();
     });
 
-    expect(runPauseFavoriteToggleMock).toHaveBeenCalledWith(mockPauseRepository, {
+    expect(pauseReflectFavoriteToggleMock).toHaveBeenCalledWith({
       pauseInstanceId: 'pi-1',
       isFavorite: false,
     });
   });
 
-  it('routes feel-tile mood select through default PauseRepository adapter', async () => {
+  it('routes feel-tile mood select through pause-reflect-mood-io', async () => {
     const { result } = renderHook(() =>
       usePauseSessionMoodChromeHandlers(baseProviders(), {
         shell: baseShell(),
