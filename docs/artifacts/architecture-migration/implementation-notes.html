@@ -59,6 +59,25 @@
   <article class="note">
     <header>
       <span>2026-05-21</span>
+      <span>Phase A slice — reflect ambience presentation I/O (backlog #1 follow-up)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3><code>pause-reflect-ambience-io</code> beside <code>use-pause-reflect-frame-focus-ambience</code></h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code>) is complete — no folder move. Align the Reflect/Frame focus-bed conductor with telemetry/steps clusters: hook imports start/stop via <code>presentation/reflect/ambience/pause-reflect-ambience-io.ts</code> instead of deep <code>application/</code> paths.</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior parity; Web Audio helpers remain in <code>application/use-cases/ritual/reflect/ambience/reflect-frame-focus-ambience.ts</code>.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Thin re-export only (browser I/O, not RPC). Unit test mocks the presentation I/O module.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: bind reflect hub/share/generation hooks through cluster <code>*-io.ts</code> modules, or Phase B <code>holzen-query-client-ref</code> shim.</dd>
+    </dl>
+  </article>
+
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
       <span>Phase A slice — reflect telemetry presentation I/O (backlog #1 follow-up)</span>
       <span class="status resolved">resolved</span>
     </header>
