@@ -1,6 +1,5 @@
 import { useCallback } from 'react';
-import { loadCompanionOrchestrateSession } from '@/features/pause/application/use-cases/ritual/frame/load-companion-orchestrate-session';
-import { loadMoodHistoryForOrchestrate } from '@/features/pause/public-queries';
+import { loadPauseCompanionOrchestrateSession } from '@/features/pause/public-rpc';
 
 export type UseCompanionOrchestrateSessionParams = {
   pauseInstanceId?: string | null;
@@ -22,17 +21,14 @@ export function useCompanionOrchestrateSession({
 }: UseCompanionOrchestrateSessionParams) {
   return useCallback(
     () =>
-      loadCompanionOrchestrateSession(
-        {
-          pauseInstanceId,
-          context,
-          language,
-          reflectionMessage,
-          mood,
-          severityNumber,
-        },
-        { loadMoodHistory: loadMoodHistoryForOrchestrate },
-      ),
+      loadPauseCompanionOrchestrateSession({
+        pauseInstanceId,
+        context,
+        language,
+        reflectionMessage,
+        mood,
+        severityNumber,
+      }),
     [pauseInstanceId, context, language, reflectionMessage, mood, severityNumber],
   );
 }
