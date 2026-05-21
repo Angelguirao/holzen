@@ -4336,6 +4336,7 @@
   <article class="note">
     <header>
       <span>2026-05-21</span>
+<<<<<<< HEAD
       <span>Phase A slice — reflect steps import public-queries only (Tier 3)</span>
       <span class="status resolved">resolved</span>
     </header>
@@ -4368,6 +4369,21 @@
       <dd>Intervention body shaping stays in application use-case module (imported by infrastructure adapter only).</dd>
       <dt>Open questions</dt>
       <dd>Next: wire remaining stray <code>PauseRepository</code> call sites (backlog #4 remainder), or further <code>ritual/brief/</code> beat grouping per §10.1.</dd>
+=======
+      <span>Phase A slice — peel reflect artifact queries from public-queries (backlog #4)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>Backlog #1 complete; ReflectGenerator is the presentation read surface</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd><code>ritual/reflect/</code> migration was already complete on <code>cursor/arch-migrate-src-ca70</code>; <code>loadRecencyHints</code> already on <code>ReflectGenerator</code>. Remove <code>fetchHaikuTextForPauseInstance</code> and <code>fetchReflectionTextForPauseInstance</code> from <code>public-queries.ts</code> — adapters stay in <code>infrastructure/queries/reflect/</code>; hooks use <code>supabaseReflectGenerator</code> only.</dd>
+      <dt>Deviation</dt>
+      <dd>None — no active <code>src/</code> call sites imported the peeled exports.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Tests/docs that need direct query access import infrastructure paths explicitly.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: wire remaining stray <code>PauseRepository</code> call sites (backlog #4), or further <code>ritual/brief/</code> beat grouping per §10.1.</dd>
+>>>>>>> 64fe5d46 (refactor(pause): peel reflect artifact reads from public-queries)
     </dl>
   </article>
 
