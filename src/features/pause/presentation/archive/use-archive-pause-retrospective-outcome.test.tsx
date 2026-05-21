@@ -9,9 +9,16 @@ const { logRetrospectiveOutcomeMock, trackRetrospectiveMock, invalidateStatsMock
   }),
 );
 
-vi.mock('@/features/pause/public-rpc', () => ({
+vi.mock('@/features/pause/application/use-cases/archive/log-retrospective-outcome', () => ({
   logRetrospectiveOutcome: logRetrospectiveOutcomeMock,
+}));
+
+vi.mock('@/features/pause/application/use-cases/archive/archive-retrospective-telemetry', () => ({
   trackPauseOutcomeRetrospective: trackRetrospectiveMock,
+}));
+
+vi.mock('@/features/pause/infrastructure/supabase-pause-repository', () => ({
+  supabasePauseRepository: {},
 }));
 
 vi.mock('@/features/pause/public-queries', () => ({
@@ -38,7 +45,7 @@ beforeEach(() => {
 });
 
 describe('useArchivePauseRetrospectiveOutcome', () => {
-  it('handleDecide logs outcome via public-rpc facade', async () => {
+  it('handleDecide logs outcome via PauseRepository use case', async () => {
     const onOpenChange = vi.fn();
     const onSuccess = vi.fn();
     const { result } = renderHook(() =>
@@ -55,10 +62,10 @@ describe('useArchivePauseRetrospectiveOutcome', () => {
       result.current.handleDecide('held');
     });
 
-    expect(logRetrospectiveOutcomeMock).toHaveBeenCalledWith({
-      instanceId: 'inst-1',
-      outcome: 'held',
-    });
+    expect(logRetrospectiveOutcomeMock).toHaveBeenCalledWith(
+      {},
+      { instanceId: 'inst-1', outcome: 'held' },
+    );
     expect(trackRetrospectiveMock).toHaveBeenCalledWith({
       pauseInstanceId: 'inst-1',
       outcome: 'held',

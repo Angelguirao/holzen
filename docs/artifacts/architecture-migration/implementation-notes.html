@@ -11458,4 +11458,23 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — peel archive retrospective off public-rpc (backlog #1 verified, backlog #4)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>ritual/reflect/ complete; archive outcome conductor bypasses public-rpc</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code>) is complete — no folder move. After section expansion + UI completion peel (<code>7f46298d</code>), align <code>use-archive-pause-retrospective-outcome</code> with reflect step hooks: <code>logRetrospectiveOutcome(supabasePauseRepository, …)</code> + direct telemetry import; remove <code>logRetrospectiveOutcome</code> and <code>trackPauseOutcomeRetrospective</code> re-exports from <code>public-rpc</code>.</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior unchanged.</dd>
+      <dt>Tradeoffs</dt>
+      <dd><code>toggleCompanionLibraryFavorite</code> and companion orchestrate cluster still on <code>public-rpc</code>.</dd>
+      <dt>Open questions</dt>
+      <dd>Next backlog #4: peel <code>use-companion-library-favorites</code> or orchestrate presentation hooks off <code>public-rpc</code>.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->

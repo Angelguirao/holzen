@@ -72,7 +72,6 @@ export {
   type GroundingEnrichment,
 } from './infrastructure/edge/grounding-enrich-edge';
 import { dismissOpenPauseHome } from './application/use-cases/home/dismiss-open-pause-home';
-import { logRetrospectiveOutcome as logRetrospectiveOutcomeUseCase } from './application/use-cases/archive/log-retrospective-outcome';
 import {
   runAdoptPendingPauseOffer,
   type RunAdoptPendingPauseOfferResult,
@@ -109,10 +108,6 @@ import { runFetchDevModeSetting } from './application/use-cases/admin/run-fetch-
 import type { RunReflectGenerationInput } from './application/use-cases/ritual/reflect/generation/run-reflect-generation';
 import type { ReflectGenerationResult } from './domain/reflect/generation/reflect-generation-result';
 import { showPauseStepSyncFailedToast } from './presentation/ritual/pause-step-sync-toast';
-export {
-  trackPauseOutcomeRetrospective,
-  type PauseOutcomeRetrospectiveSurface,
-} from './application/use-cases/archive/archive-retrospective-telemetry';
 export { trackPauseSessionAbandoned } from './application/use-cases/session/pause-session-telemetry';
 export {
   trackPausePendingAdopted,
@@ -199,14 +194,6 @@ export function applyBulkHoldOutcomes(
   resolver: (p: BulkHoldPendingPause) => BulkHoldOutcomeChoice,
 ): Promise<BulkHoldApplyResult> {
   return applyBulkHoldOutcomesUseCase(supabasePauseRepository, rows, resolver);
-}
-
-/** Archive retrospective outcome — wired with default repository. */
-export function logRetrospectiveOutcome(params: {
-  instanceId: string;
-  outcome: string;
-}): Promise<PauseState | null> {
-  return logRetrospectiveOutcomeUseCase(supabasePauseRepository, params);
 }
 
 export {

@@ -2,8 +2,10 @@ import { useCallback, useRef, useState } from 'react';
 import type { TFunction } from 'i18next';
 import { toast } from 'sonner';
 import { hapticFeedback } from '@/lib/haptics';
+import { logRetrospectiveOutcome } from '@/features/pause/application/use-cases/archive/log-retrospective-outcome';
+import { trackPauseOutcomeRetrospective } from '@/features/pause/application/use-cases/archive/archive-retrospective-telemetry';
+import { supabasePauseRepository } from '@/features/pause/infrastructure/supabase-pause-repository';
 import { invalidatePauseStatsDataForUser } from '@/features/pause/public-queries';
-import { logRetrospectiveOutcome, trackPauseOutcomeRetrospective } from '@/features/pause/public-rpc';
 
 export type UseArchivePauseRetrospectiveOutcomeParams = {
   instanceId: string | null | undefined;
@@ -31,7 +33,7 @@ export function useArchivePauseRetrospectiveOutcome({
       setSubmitting(true);
       try {
         hapticFeedback('medium');
-        await logRetrospectiveOutcome({ instanceId, outcome });
+        await logRetrospectiveOutcome(supabasePauseRepository, { instanceId, outcome });
         trackPauseOutcomeRetrospective({ pauseInstanceId: instanceId, outcome });
         invalidatePauseStatsDataForUser(userId);
         hapticFeedback('success');
