@@ -1,12 +1,9 @@
 import type { PauseRepository } from '@/features/pause/ports/pause-repository';
-import {
-  pauseDismissCurrent,
-  supabasePauseRepository,
-  supabaseReflectGenerator,
-} from '@/features/pause/public-rpc';
+import { pauseDismissCurrent } from '@/features/pause/public-rpc';
 export {
   applyManualPauseOpenResult,
   dismissOpenPauseHome,
+  pauseHomeManualOpenPorts,
   buildManualPauseCreateOrReuseParams,
   buildManualPauseMarketContext,
   buildManualPauseOpenParams,
@@ -36,12 +33,6 @@ export {
   type OpenPauseStateForAnalytics,
   type PauseDismissAnalyticsSurface,
 } from './pause-home-reflect-telemetry-io';
-
-/** Default ports for `openManualPauseFromHome` (Home manual trigger). */
-export const pauseHomeManualOpenPorts = {
-  repository: supabasePauseRepository,
-  reflect: supabaseReflectGenerator,
-} as const;
 
 /** Default facade: clear Home preview and dismiss current pause instance. */
 export async function pauseDismissOpenPauseHomePreview(ports: {
