@@ -1,5 +1,22 @@
 import { describe, expect, it, vi } from 'vitest';
 
+const runCompanionSlotOrchestrateMock = vi.hoisted(() => vi.fn());
+const runCompanionInterventionBootstrapMock = vi.hoisted(() => vi.fn());
+
+vi.mock(
+  '@/features/pause/application/use-cases/ritual/frame/run-companion-slot-orchestrate',
+  () => ({
+    runCompanionSlotOrchestrate: runCompanionSlotOrchestrateMock,
+  }),
+);
+
+vi.mock(
+  '@/features/pause/application/use-cases/ritual/frame/run-companion-intervention-bootstrap',
+  () => ({
+    runCompanionInterventionBootstrap: runCompanionInterventionBootstrapMock,
+  }),
+);
+
 vi.mock('./pause-companion-orchestration-io', () => ({
   companionOrchestrator: { port: 'companionOrchestrator' },
 }));
@@ -18,5 +35,10 @@ describe('pause-companion-orchestrate-io', () => {
       nudge: null,
       signal: null,
     });
+  });
+
+  it('imports slot orchestrate and intervention bootstrap from ritual/frame siblings', () => {
+    expect(runCompanionSlotOrchestrate).toBe(runCompanionSlotOrchestrateMock);
+    expect(runCompanionInterventionBootstrap).toBe(runCompanionInterventionBootstrapMock);
   });
 });
