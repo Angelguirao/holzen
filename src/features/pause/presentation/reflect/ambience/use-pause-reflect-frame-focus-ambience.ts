@@ -2,7 +2,7 @@ import { useEffect, useRef } from 'react';
 import {
   startPauseReflectFrameFocusAmbience,
   stopPauseReflectFrameFocusAmbience,
-} from './reflect-frame-focus-ambience';
+} from '@/features/pause/domain/reflect/ambience/reflect-frame-focus-ambience';
 
 /**
  * Soft continuous low-frequency bed while Reflect or Frame is visible and ritual sound is on.

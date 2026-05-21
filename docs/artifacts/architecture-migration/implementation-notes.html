@@ -10907,4 +10907,23 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — reflect frame-focus bed in domain/reflect/ambience (backlog #1 verified, Tier 5)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>Pure Reflect/Frame focus bed colocated with ritual AudioContext domain</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>ritual/reflect/</code> use cases) is complete. Move <code>reflect-frame-focus-ambience</code> (+ test) from <code>presentation/reflect/ambience/</code> to <code>domain/reflect/ambience/</code> — same pattern as PostHog trackers in <code>domain/reflect/telemetry/</code>. <code>use-pause-reflect-frame-focus-ambience</code> stays in presentation and imports domain directly (not <code>public-rpc</code>).</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior unchanged.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Bed helpers are not on <code>public-ritual-reflect</code>; screens use the hook export only.</dd>
+      <dt>Open questions</dt>
+      <dd>Next backlog #4: presentation <code>PauseRepository</code> audit; optional <code>analytics-events</code> import guard.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
