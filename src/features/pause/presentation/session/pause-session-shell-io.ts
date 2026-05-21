@@ -4,11 +4,15 @@
  */
 export {
   buildPauseSessionMountLogParams,
+  buildPauseSessionStepTransitionConfig,
   coalescePauseSessionShellViewModel,
   computePauseHeaderBackIntent,
   isPauseSessionHeaderBackVisible,
+  pauseStepSwipeDirection,
   type PauseHeaderBackIntent,
   type PauseHeaderBackIntentInput,
   type PauseSessionHeaderBackInput,
   type PauseSessionMountLogParams,
+  type PauseSessionStepTransitionConfig,
+  type PauseSessionSwipeDirection,
 } from '@/features/pause/application/use-cases/session/pause-session-shell-flow';

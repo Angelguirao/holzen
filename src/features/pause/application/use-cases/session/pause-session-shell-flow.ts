@@ -14,3 +14,9 @@ export {
   type PauseSessionMountLogParams,
 } from './mount-log-params';
 export { coalescePauseSessionShellViewModel } from './shell-view-model';
+export {
+  buildPauseSessionStepTransitionConfig,
+  type PauseSessionStepTransitionConfig,
+  type PauseSessionSwipeDirection,
+} from './step-transition';
+export { pauseStepSwipeDirection } from './step-swipe-direction';

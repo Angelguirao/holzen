@@ -84,13 +84,32 @@
     <h3><code>pause-home-reflect-telemetry-io</code> imports PostHog helpers via <code>pause-home-reflect-telemetry-flow</code></h3>
     <dl>
       <dt>Design decision</dt>
-      <dd>Backlog #1 (<code>ritual/reflect/</code>) folder move remains complete. Add telemetry cluster anchor for Home manual-open + dismiss/banner trackers; presentation telemetry I/O imports through the anchor instead of two deep <code>application/.../telemetry/*</code> modules.</dd>
+      <dd>Backlog #1 (<code>ritual/reflect/</code> folder move) remains complete. Add telemetry cluster anchor for Home manual-open + dismiss/banner trackers; presentation telemetry I/O imports through the anchor instead of two deep <code>application/.../telemetry/*</code> modules.</dd>
       <dt>Deviation</dt>
       <dd>None — behavior parity.</dd>
       <dt>Tradeoffs</dt>
       <dd>Session reflect UI telemetry (<code>pause-reflect-telemetry-io</code> → infrastructure) unchanged this slice.</dd>
       <dt>Open questions</dt>
       <dd>Next: companion frame UI pure helpers through frame UI flow anchors, or session conductors still importing deep <code>application/use-cases/session/*</code> outside shell/scaffold I/O.</dd>
+    </dl>
+  </article>
+
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — session step nav via shell flow anchor (backlog #1 verified, Tier 5)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3><code>pause-session-shell-flow</code> for step transition + swipe direction</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>ritual/reflect/</code> folder move) remains complete. Extend <code>pause-session-shell-flow</code> with <code>buildPauseSessionStepTransitionConfig</code> and <code>pauseStepSwipeDirection</code>; <code>use-pause-session-step-transition</code> and <code>use-pause-session-go-to-step</code> import through <code>pause-session-shell-io</code>.</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior parity; import boundary only.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Hub I/O unified anchor landed in a prior slice on this branch; session brief/pending-offer presentation I/O still bind application paths directly.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: reflect flows I/O anchor peel for preflight/post-generation, or Phase B cross-context Tier 1 shim.</dd>
     </dl>
   </article>
 
