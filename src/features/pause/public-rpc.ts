@@ -81,7 +81,7 @@ import {
   runShiftEmotionFrameHubDone as runShiftEmotionFrameHubDoneUseCase,
   type RunShiftEmotionFrameHubDoneResult,
 } from './application/use-cases/ritual/feel/shift-emotion-log';
-import type { InitialEmotionLogOpts } from './application/use-cases/ritual/feel/initial-emotion-log';
+import type { InitialEmotionLogOpts } from './domain/reflect/mood/initial-emotion-log';
 import { runPauseCreateOrReuse } from './application/use-cases/session/run-pause-create-or-reuse';
 import { runPauseDismissCurrent } from './application/use-cases/session/run-pause-dismiss-current';
 import type { LogCompanionFeedbackVoteInput } from './application/use-cases/ritual/frame/log-companion-feedback-vote';

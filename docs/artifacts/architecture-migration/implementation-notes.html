@@ -6499,4 +6499,23 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — initial-emotion log + presentation → domain/reflect/mood (backlog #1)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>Peel Feel-step mood payload and UI from ritual/feel use case</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd><code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code> was already complete. Mirror shift-frame hub peel: pure <code>initial-emotion-log</code> (payload + dedupe keys) and <code>initial-emotion-presentation</code> (optimistic/rollback/skip UI) live under <code>domain/reflect/mood/</code>; <code>run-initial-emotion-log</code> keeps RPC orchestration in <code>ritual/feel/</code>; <code>public-rpc</code> facades unchanged.</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior parity; domain tests colocated; use-case tests unchanged expectations.</dd>
+      <dt>Tradeoffs</dt>
+      <dd><code>InitialEmotionLogOpts</code> type re-exported from <code>public-rpc</code> for cross-layer callers; mood chrome flow still in <code>ritual/feel/pause-session-mood-chrome-flow</code>.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: peel mood chrome / feel-tiles conductors through <code>public-rpc</code>, or backlog #4 pending-offer / archive retrospective facades.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
