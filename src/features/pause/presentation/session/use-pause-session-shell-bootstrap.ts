@@ -1,6 +1,6 @@
 import { useLocation, type NavigateFunction } from 'react-router-dom';
 import type { TFunction } from 'i18next';
-import { buildPauseSessionMountLogParams } from '@/features/pause/application/use-cases/ritual/reflect/scaffold/mount-log-params';
+import { buildPauseSessionMountLogParams } from '@/features/pause/application/use-cases/session/mount-log-params';
 import { coalescePauseSessionShellViewModel } from '@/features/pause/application/use-cases/session/shell-view-model';
 import { isPauseSessionWaitingForInstanceFetch } from '@/features/pause/domain/session/waiting-for-instance-fetch';
 import { parsePauseSessionLocationState } from '@/features/pause/public-navigation';
