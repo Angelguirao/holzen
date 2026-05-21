@@ -1,4 +1,4 @@
-import { generateReflectionShareImage } from '@/features/pause/domain/reflect/share/reflection-share-canvas';
+import { generateReflectionShareImage } from './reflection-share-canvas';
 import {
   deliverReflectionShareImage,
   type DeliverReflectionShareImageDeps,
