@@ -6898,4 +6898,23 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — reflection_step payload → domain (backlog #1)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>Peel reflection_step step payload from ritual/reflect use case</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code>) was already complete on <code>cursor/arch-migrate-src-ca70</code>. Smallest reflect domain peel after <code>favorite_toggled</code>: <code>buildReflectReflectionStepPayload</code> in <code>domain/reflect/steps/reflection-step-log.ts</code>; <code>run-pause-reflection-step-log</code> keeps RPC + sessionStorage dedupe only.</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior parity.</dd>
+      <dt>Tradeoffs</dt>
+      <dd><code>public-rpc</code> <code>logPauseReflectionStepOnce</code> facade unchanged for presentation.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: peel shift-frame hub / feel-tiles conductors off <code>public-rpc</code>, or backlog #4 companion feedback vote read wiring.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->

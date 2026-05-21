@@ -1,5 +1,8 @@
 import { describe, expect, it, vi } from 'vitest';
-import { reflectionStepLoggedStorageKey } from '@/features/pause/domain/reflect/steps/reflection-step-log';
+import {
+  buildReflectReflectionStepPayload,
+  reflectionStepLoggedStorageKey,
+} from '@/features/pause/domain/reflect/steps/reflection-step-log';
 import type { PauseRepository } from '@/features/pause/ports/pause-repository';
 import { runPauseReflectionStepLogOnce } from './run-pause-reflection-step-log';
 
@@ -35,7 +38,7 @@ describe('runPauseReflectionStepLogOnce', () => {
     expect(logStep).toHaveBeenCalledWith({
       instanceId: 'inst-1',
       stepType: 'reflection_step',
-      payload: { surface: 'pause_reflect' },
+      payload: buildReflectReflectionStepPayload(),
     });
     expect(markLogged).toHaveBeenCalledWith(reflectionStepLoggedStorageKey('inst-1'));
   });

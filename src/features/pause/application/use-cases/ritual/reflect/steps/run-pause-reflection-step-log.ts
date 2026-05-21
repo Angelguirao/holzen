@@ -1,5 +1,8 @@
 import { logPauseStep } from '@/features/pause/application/use-cases/ritual/log/log-pause-step';
-import { reflectionStepLoggedStorageKey } from '@/features/pause/domain/reflect/steps/reflection-step-log';
+import {
+  buildReflectReflectionStepPayload,
+  reflectionStepLoggedStorageKey,
+} from '@/features/pause/domain/reflect/steps/reflection-step-log';
 import type { PauseRepository } from '@/features/pause/ports/pause-repository';
 import type { ReflectionStepLogStoragePort } from '@/features/pause/ports/reflection-step-log-storage';
 
@@ -31,7 +34,7 @@ export async function runPauseReflectionStepLogOnce(
     await logPauseStep(repository, {
       instanceId: input.pauseInstanceId,
       stepType: 'reflection_step',
-      payload: { surface: 'pause_reflect' },
+      payload: buildReflectReflectionStepPayload(),
     });
     ports.storage.markLogged(storageKey);
     return { status: 'logged' };
