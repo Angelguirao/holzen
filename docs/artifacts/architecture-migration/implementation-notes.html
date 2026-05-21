@@ -59,6 +59,25 @@
   <article class="note">
     <header>
       <span>2026-05-21</span>
+      <span>Phase A slice — unify reflect mood I/O on pause-reflect-mood-flow (backlog #1 verified, Tier 5)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3><code>pause-reflect-mood-flow</code> single import on <code>pause-reflect-mood-io</code></h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>ritual/reflect/</code> folder move) remains complete — no relocations. Add <code>pause-reflect-mood-flow.ts</code> as one application cluster re-export (depth-picker, feel-tiles, initial-emotion RPC, presentation rollback, session chrome) so <code>pause-reflect-mood-io</code> has a single import surface (parity with <code>pause-session-brief-flow</code> and other session reflect I/O anchors).</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior parity; consolidates existing mood subcluster anchors only.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Reflect flows I/O on remote peeled to direct domain/decide imports; mood I/O consolidates the opposite direction on one anchor. Unit test mocks the unified anchor and overrides <code>runInitialEmotion*</code> only.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: companion orchestration-io flow anchor for frame orchestrate helpers, or session conductor flow anchors outside shell/scaffold/brief I/O.</dd>
+    </dl>
+  </article>
+
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
       <span>Phase A slice — reflect generation I/O direct domain hook helpers (backlog #1 follow-up, Tier 5)</span>
       <span class="status resolved">resolved</span>
     </header>
@@ -107,7 +126,7 @@
       <dt>Deviation</dt>
       <dd>None — behavior parity; import boundary only.</dd>
       <dt>Tradeoffs</dt>
-      <dd><code>pause-reflect-flows-flow</code> remains the cluster anchor for <code>check:architecture-alignment</code>; companion orchestration-io may still re-export orchestrate session load until a follow-up peel.</dd>
+      <dd>Orphan <code>pause-reflect-flows-flow</code> removed when unused; companion orchestration-io may still re-export orchestrate session load until a follow-up peel.</dd>
       <dt>Open questions</dt>
       <dd>Next: companion orchestration-io consolidate <code>load-companion-orchestrate-session</code> imports, or session pending-offer I/O peel.</dd>
     </dl>
