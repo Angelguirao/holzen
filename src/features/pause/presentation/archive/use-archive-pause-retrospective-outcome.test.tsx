@@ -13,14 +13,8 @@ const {
 
 vi.mock('./pause-archive-io', () => ({
   pauseArchiveLogRetrospectiveOutcome: pauseArchiveLogRetrospectiveOutcomeMock,
+  trackPauseOutcomeRetrospective: trackRetrospectiveMock,
 }));
-
-vi.mock(
-  '@/features/pause/application/use-cases/ritual/decide/pause-outcome-retrospective-telemetry',
-  () => ({
-    trackPauseOutcomeRetrospective: trackRetrospectiveMock,
-  }),
-);
 
 vi.mock('@/features/pause/public-queries', () => ({
   invalidatePauseStatsDataForUser: invalidateStatsMock,

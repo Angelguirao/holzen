@@ -2,9 +2,11 @@ import { useCallback, useRef, useState } from 'react';
 import type { TFunction } from 'i18next';
 import { toast } from 'sonner';
 import { hapticFeedback } from '@/lib/haptics';
-import { trackPauseOutcomeRetrospective } from '@/features/pause/application/use-cases/ritual/decide/pause-outcome-retrospective-telemetry';
 import { invalidatePauseStatsDataForUser } from '@/features/pause/public-queries';
-import { pauseArchiveLogRetrospectiveOutcome } from './pause-archive-io';
+import {
+  pauseArchiveLogRetrospectiveOutcome,
+  trackPauseOutcomeRetrospective,
+} from './pause-archive-io';
 
 export type UseArchivePauseRetrospectiveOutcomeParams = {
   instanceId: string | null | undefined;

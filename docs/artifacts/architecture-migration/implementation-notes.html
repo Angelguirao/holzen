@@ -15391,4 +15391,23 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — archive retrospective I/O (backlog #1 verified, Tier 4)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3><code>pause-archive-io</code> wraps RPC + PostHog for archive retrospective conductor</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code>) remains complete — no folder moves. <code>use-archive-pause-retrospective-outcome</code> imports <code>pauseArchiveLogRetrospectiveOutcome</code> and <code>trackPauseOutcomeRetrospective</code> from <code>presentation/archive/pause-archive-io.ts</code> only (mirrors reflect mood/hub/generation I/O modules).</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior parity; PostHog stays direct <code>trackEvent</code> (not <code>PauseAnalyticsRepository</code>).</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Companion <code>use-companion-slot-ui-state</code> slot types import <code>pause-companion-orchestrate-io</code> in the same session (separate commit) — backlog #2 presentation alignment.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: remaining companion presentation hooks (<code>use-companion-section</code>, <code>use-companion-fullview-page</code>, …) through frame I/O modules, or Phase B cross-context Tier 1 shim.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
