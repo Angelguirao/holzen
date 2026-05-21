@@ -17443,4 +17443,23 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — generation I/O imports hook-flow cluster anchor (backlog #1 verified, Tier 5)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3><code>pause-reflect-generation-io</code> → <code>pause-reflect-generation-hook-flow</code></h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>ritual/reflect/</code>) remains complete — no folder moves. Presentation generation I/O imports pure hook helpers, prereq/errors/copy, and <code>runReflectGeneration</code> through the generation hook-flow anchor (matches hub/steps/flows cluster pattern). Resolve committed merge conflict in implementation-notes (orphan steps anchors + session decide flow notes kept as separate articles).</dd>
+      <dt>Deviation</dt>
+      <dd>Unit test mocks the hook-flow module with partial <code>importOriginal</code> so pure helpers stay real while <code>runReflectGeneration</code> is stubbed.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Holzen-reflect use case module remains the Vitest seam target only when tests import it directly; generation I/O tests mock hook-flow.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: reflect flows I/O decide peel via <code>pause-reflect-flows-flow</code>, mood I/O direct sibling imports, or Phase B cross-context Tier 1 shim.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
