@@ -17,7 +17,7 @@ vi.mock('@/features/pause/application/use-cases/ritual/done/post-pause-emotion-l
   runPostPauseEmotionLogIfDirty: runPostPauseEmotionLogIfDirtyMock,
 }));
 
-vi.mock('@/features/pause/infrastructure/supabase-pause-repository', () => ({
+vi.mock('@/features/pause/public-rpc', () => ({
   supabasePauseRepository: mockPauseRepository,
 }));
 

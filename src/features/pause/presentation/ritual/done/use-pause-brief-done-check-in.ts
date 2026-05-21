@@ -7,7 +7,7 @@ import {
 } from '@/features/pause/domain/mood-value';
 import { runPostPauseEmotionLogIfDirty } from '@/features/pause/application/use-cases/ritual/done/post-pause-emotion-log';
 import type { PostPauseFeelSnapshot } from '@/features/pause/domain/ritual/done/post-pause-emotion-log';
-import { supabasePauseRepository } from '@/features/pause/infrastructure/supabase-pause-repository';
+import { supabasePauseRepository } from '@/features/pause/public-rpc';
 import { showPauseStepSyncFailedToast } from '@/features/pause/presentation/ritual/pause-step-sync-toast';
 
 export type UsePauseBriefDoneCheckInParams = {

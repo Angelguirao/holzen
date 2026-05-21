@@ -7,7 +7,7 @@ import {
   trackPausePendingAdopted,
   trackPausePendingDeclined,
 } from '@/features/pause/application/use-cases/trigger/pending-pause-offer-telemetry';
-import { supabasePauseRepository } from '@/features/pause/infrastructure/supabase-pause-repository';
+import { supabasePauseRepository } from '@/features/pause/public-rpc';
 import type { PendingPauseOfferRow } from './use-pending-pause-offer';
 
 export function usePendingPauseOfferMutations(options: {
