@@ -59,6 +59,25 @@
   <article class="note">
     <header>
       <span>2026-05-21</span>
+      <span>Phase A slice — reflect mood I/O direct domain + run-initial-emotion-log (backlog #1 follow-up, Tier 5)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3><code>pause-reflect-mood-io</code> imports mood helpers from domain and sibling use case</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>ritual/reflect/</code> folder move) remains complete. Peel presentation I/O to import depth-picker, feel-tiles, presentation rollback, and session chrome from <code>domain/reflect/mood/*</code> and <code>runInitialEmotion*</code> from <code>run-initial-emotion-log</code> (mirrors steps and generation I/O peels).</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior parity; import boundary only.</dd>
+      <dt>Tradeoffs</dt>
+      <dd><code>pause-reflect-mood-flow</code> remains as application cluster anchor for <code>check:architecture-alignment</code>; presentation I/O no longer routes through it.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: <code>pause-home-reflect-telemetry-io</code> direct telemetry imports, or session conductor flow-anchor peels.</dd>
+    </dl>
+  </article>
+
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
       <span>Phase A slice — re-apply reflect steps I/O direct run-* peel (backlog #1 follow-up, Tier 5)</span>
       <span class="status resolved">resolved</span>
     </header>
@@ -71,7 +90,7 @@
       <dt>Tradeoffs</dt>
       <dd>Mutation-flow anchor kept for <code>check:architecture-alignment</code> only.</dd>
       <dt>Open questions</dt>
-      <dd>Next: <code>pause-home-reflect-telemetry-io</code> direct telemetry imports, or reflect mood I/O peel from <code>pause-reflect-mood-flow</code>.</dd>
+      <dd>Next: <code>pause-home-reflect-telemetry-io</code> direct telemetry imports, or session conductor flow-anchor peels.</dd>
     </dl>
   </article>
 

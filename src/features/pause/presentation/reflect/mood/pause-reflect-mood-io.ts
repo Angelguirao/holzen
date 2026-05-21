@@ -1,19 +1,25 @@
 import {
   applyBriefDepthPickerRitualEntry,
   applyDeepDepthPickerRitualEntry,
-  buildFeelTilesMoodLogOptions,
+} from '@/features/pause/domain/reflect/mood/apply-depth-picker-ritual-entry';
+import { buildFeelTilesMoodLogOptions } from '@/features/pause/domain/reflect/mood/build-feel-tiles-mood-log-options';
+import {
   initialEmotionResetUi,
   initialEmotionSelectRollbackUi,
-  resolvePauseDepthContextLineParams,
+  type InitialEmotionUiState,
+} from '@/features/pause/domain/reflect/mood/initial-emotion-presentation';
+import {
   resolvePauseSessionChromeCloseAction,
   runDeepPausePickerEntryIfPro,
-  runInitialEmotionSelect,
-  runInitialEmotionSkip,
   runPauseSessionChromeCloseAction,
-  type InitialEmotionUiState,
   type PauseSessionChromeCloseAction,
   type PauseSessionPhase,
-} from '@/features/pause/application/use-cases/ritual/reflect/mood/pause-reflect-mood-flow';
+} from '@/features/pause/domain/reflect/mood/pause-session-mood-chrome-flow';
+import { resolvePauseDepthContextLineParams } from '@/features/pause/domain/reflect/mood/resolve-pause-depth-context-line-params';
+import {
+  runInitialEmotionSelect,
+  runInitialEmotionSkip,
+} from '@/features/pause/application/use-cases/ritual/reflect/mood/run-initial-emotion-log';
 import { supabasePauseRepository } from '@/features/pause/public-rpc';
 
 export {
