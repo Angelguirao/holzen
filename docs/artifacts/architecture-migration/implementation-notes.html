@@ -13928,4 +13928,23 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — move mount-log-params to session use-cases</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>Reflect scaffold cleanup — session mount diagnostics off ritual/reflect/</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code>) was already complete on <code>cursor/arch-migrate-src-ca70</code>. <code>buildPauseSessionMountLogParams</code> is shell-first-paint diagnostics for <code>/pause</code>, not reflect ritual logic — colocate with <code>hydration</code> / <code>shell-view-model</code> under <code>application/use-cases/session/</code>. Still imports reflect scaffold restore helpers (<code>initial-ritual-entry</code>, <code>restored-brief-ritual-state</code>) for first-paint snapshot fields.</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior-preserving move only.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Session use case depends on reflect scaffold modules for restore-derived fields; acceptable until restore helpers move to <code>domain/session/</code> or shared ritual restore package.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: Phase B <code>src/lib/holzen-query-client-ref</code> shim or peel remaining session hooks still re-exported only on <code>public-hooks</code>.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
