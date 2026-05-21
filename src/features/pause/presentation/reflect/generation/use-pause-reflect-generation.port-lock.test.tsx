@@ -15,8 +15,8 @@ vi.mock(
   }),
 );
 
-vi.mock('@/features/pause/public-rpc', () => ({
-  supabaseReflectGenerator: mockReflectGenerator,
+vi.mock('./pause-reflect-generation-io', () => ({
+  reflectGenerator: mockReflectGenerator,
 }));
 
 vi.mock('./use-pause-artifact-reflection-text', () => ({
