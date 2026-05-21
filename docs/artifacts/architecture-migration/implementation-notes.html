@@ -17960,4 +17960,23 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — reflect generation I/O direct domain + run-* (backlog #1 follow-up, Tier 5)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3><code>pause-reflect-generation-io</code> off <code>pause-reflect-generation-hook-flow</code> anchor</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>ritual/reflect/</code>) remains complete — no folder moves. Align generation presentation I/O with steps/mood/share peels: prefetch/commit/clear helpers and prerequisites from <code>domain/reflect/generation/*</code>; <code>runReflectGeneration</code> from sibling use-case module. Keep <code>pause-reflect-generation-hook-flow.ts</code> as CI cluster anchor only.</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior parity; import boundary only.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Unit test mocks <code>run-reflect-generation</code> directly (same seam as prior hook-flow mock).</dd>
+      <dt>Open questions</dt>
+      <dd>Next: <code>pause-session-brief-io</code> peel from brief-flow anchor, <code>pause-reflect-flows-io</code> decide outcome direct imports, companion orchestrate-io peel, or Phase B cross-context Tier 1 shim.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
