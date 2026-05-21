@@ -3548,9 +3548,28 @@
       <dt>Deviation</dt>
       <dd>None — mirrors infrastructure realtime folder naming.</dd>
       <dt>Tradeoffs</dt>
-      <dd>Bulk-hold and breathing-timed-loop hooks remain flat under <code>presentation/</code>.</dd>
+      <dd>Bulk-hold hooks remain flat under <code>presentation/</code>; breathing timed loop colocated next slice.</dd>
       <dt>Open questions</dt>
-      <dd>Next: colocate <code>use-pause-session-reflect-and-decide</code> under <code>presentation/reflect/flows/</code>, or port PWA install analytics through <code>PauseAnalyticsRepository</code>.</dd>
+      <dd>Next: colocate breathing timed loop under <code>presentation/session/</code>, or port PWA install analytics through <code>PauseAnalyticsRepository</code>.</dd>
+    </dl>
+  </article>
+
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — colocate breathing timed loop under presentation/session/</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>Tier 4 — in-ritual breath timing conductor</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Move <code>use-pause-breathing-timed-loop</code> (+ test) beside breath navigation and brief ritual hooks under <code>presentation/session/</code>; delegates phase advance to <code>ritual/breathe/phase-advance</code>. <code>public-hooks</code> re-export path only — <code>PauseBreathing</code> screen unchanged.</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior-preserving <code>git mv</code>.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Entry-presentation effects and bulk-hold hooks remain flat until a later peel.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: colocate <code>use-pause-session-reflect-and-decide</code> under <code>presentation/reflect/flows/</code>, or port-back <code>insertPauseAnalyticsEvent</code> via <code>PauseAnalyticsRepository</code>.</dd>
     </dl>
   </article>
 
