@@ -8437,4 +8437,23 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — reflect-step-query direct read (backlog #1 done, Tier 3)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>reflect-step-query → fetch-latest-pause-reflect-step</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>ritual/reflect/</code>) is complete; home/archive/bulk-hold <code>public-rpc</code> peels landed on remote. TanStack note/tags latest-step reads call <code>fetchLatestPauseReflectStepFromSupabase</code> directly instead of routing through <code>supabaseReflectGenerator</code>; port adapter still delegates to the same module.</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior parity.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Presentation companion hooks still import <code>public-ports</code> orchestrator/analytics adapters.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: <code>use-manual-pause-trigger</code> → <code>openManualPauseFromHome</code> on <code>public-rpc</code>, or companion feedback vote on <code>public-queries</code>.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
