@@ -5625,4 +5625,23 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — favorite pro-hint toast in ritual/reflect/steps (Tier 5)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>Pure favorite pro-hint helper beside run-pause-favorite-toggle</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code>) is complete on <code>cursor/arch-migrate-src-ca70</code>. Move <code>pause-favorite-pro-hint-toast</code> (+ test) from <code>presentation/reflect/steps/</code> to <code>application/use-cases/ritual/reflect/steps/</code> beside <code>run-pause-favorite-toggle</code>; <code>use-pause-favorite-toggle</code> imports the use-case module directly.</dd>
+      <dt>Deviation</dt>
+      <dd>None — Sonner toast is ritual-step UX policy, not a React conductor; presentation keeps the hook only.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Toast helper still depends on <code>i18next</code> + <code>sonner</code> at application layer (acceptable for thin UX policy next to favorite toggle use case).</dd>
+      <dt>Open questions</dt>
+      <dd>Next: backlog #4 audit stray <code>analytics_events</code> reads, or peel <code>pause-reflect-ui-telemetry</code> pure trackers to <code>ritual/reflect/telemetry/</code>.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
