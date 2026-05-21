@@ -2,7 +2,18 @@ import {
   runInitialEmotionSelect,
   runInitialEmotionSkip,
 } from '@/features/pause/application/use-cases/ritual/reflect/mood/run-initial-emotion-log';
+import {
+  resolvePauseSessionChromeCloseAction,
+  runDeepPausePickerEntryIfPro,
+  runPauseSessionChromeCloseAction,
+} from '@/features/pause/application/use-cases/ritual/reflect/mood/pause-session-mood-chrome-flow';
 import { supabasePauseRepository } from '@/features/pause/public-rpc';
+
+export {
+  resolvePauseSessionChromeCloseAction,
+  runDeepPausePickerEntryIfPro,
+  runPauseSessionChromeCloseAction,
+};
 
 /** Default `PauseRepository` for reflect mood presentation hooks. */
 export const reflectPauseRepository = supabasePauseRepository;

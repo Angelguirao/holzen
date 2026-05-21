@@ -2,7 +2,7 @@ import { useCallback } from 'react';
 import {
   resolvePauseSessionChromeCloseAction,
   runPauseSessionChromeCloseAction,
-} from '@/features/pause/domain/reflect/mood/pause-session-mood-chrome-flow';
+} from './pause-reflect-mood-io';
 import { usePauseFavoriteToggle } from '../steps/use-pause-favorite-toggle';
 import { usePauseSessionMoodAndPersist } from './use-pause-session-mood-and-persist';
 import type {
