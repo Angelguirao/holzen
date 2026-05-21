@@ -3500,6 +3500,7 @@
   <article class="note">
     <header>
       <span>2026-05-21</span>
+<<<<<<< HEAD
       <span>Phase A slice — colocate shift-frame hub hook under presentation/reflect/hub/</span>
       <span class="status resolved">resolved</span>
     </header>
@@ -3513,6 +3514,21 @@
       <dd>Session reflect/decide and flows conductors remain at <code>presentation/reflect/</code> root until later peels (<code>flows/</code>).</dd>
       <dt>Open questions</dt>
       <dd>Next: colocate <code>use-pause-session-reflect-and-decide</code> under <code>presentation/reflect/flows/</code>, port-back PWA install analytics via <code>PauseAnalyticsRepository</code>, or colocate <code>use-journey-pause-instances</code> under <code>presentation/archive/</code>.</dd>
+=======
+      <span>Phase A slice — colocate brief integrate + done hooks under presentation/session/</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>Tier 4 — brief ritual presentation cluster</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Move <code>use-pause-brief-integrate-countdown</code> and <code>use-pause-brief-done-check-in</code> beside brief→deep and brief-past-step under <code>presentation/session/</code>; <code>public-hooks</code> re-export paths only.</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior-preserving <code>git mv</code>.</dd>
+      <dt>Tradeoffs</dt>
+      <dd><code>use-pause-breathing-timed-loop</code> and <code>use-pause-instances-realtime</code> remain flat.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: colocate breathing timed loop or port-back generic <code>insertPauseAnalyticsEvent</code>.</dd>
+>>>>>>> 955bca57 (refactor(pause): colocate brief integrate and done hooks under presentation/session/)
     </dl>
   </article>
 

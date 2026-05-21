@@ -152,8 +152,8 @@ export { usePendingPauseOfferMutations } from './presentation/session/use-pendin
 export {
   usePauseBriefDoneCheckIn,
   type UsePauseBriefDoneCheckInParams,
-} from './presentation/use-pause-brief-done-check-in';
-export { usePauseBriefIntegrateCountdown } from './presentation/use-pause-brief-integrate-countdown';
+} from './presentation/session/use-pause-brief-done-check-in';
+export { usePauseBriefIntegrateCountdown } from './presentation/session/use-pause-brief-integrate-countdown';
 export {
   useBulkHoldPending,
   bulkHoldPendingQueryKey,
