@@ -9,11 +9,17 @@ const runInitialEmotionSelectMock = vi.hoisted(() => vi.fn());
 const runInitialEmotionSkipMock = vi.hoisted(() => vi.fn());
 
 vi.mock(
-  '@/features/pause/application/use-cases/ritual/reflect/mood/run-initial-emotion-log',
-  () => ({
-    runInitialEmotionSelect: runInitialEmotionSelectMock,
-    runInitialEmotionSkip: runInitialEmotionSkipMock,
-  }),
+  '@/features/pause/application/use-cases/ritual/reflect/mood/pause-reflect-mood-flow',
+  async (importOriginal) => {
+    const actual = await importOriginal<
+      typeof import('@/features/pause/application/use-cases/ritual/reflect/mood/pause-reflect-mood-flow')
+    >();
+    return {
+      ...actual,
+      runInitialEmotionSelect: runInitialEmotionSelectMock,
+      runInitialEmotionSkip: runInitialEmotionSkipMock,
+    };
+  },
 );
 
 vi.mock('@/features/pause/public-rpc', () => ({

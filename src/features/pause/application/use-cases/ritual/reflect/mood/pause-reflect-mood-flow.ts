@@ -1,7 +1,7 @@
 /**
  * CI cluster anchor for ritual reflect mood presentation I/O (§3 / check:architecture-alignment).
  * Re-exports mood helpers and run-* use cases for application-layer imports.
- * Presentation: `pause-reflect-mood-io.ts` imports domain mood helpers and `run-initial-emotion-log` directly (off this CI anchor).
+ * Presentation: `pause-reflect-mood-io.ts` imports via `pause-reflect-mood-flow`.
  */
 export {
   runInitialEmotionSelect,
