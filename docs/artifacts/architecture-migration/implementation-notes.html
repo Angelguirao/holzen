@@ -59,21 +59,6 @@
   <article class="note">
     <header>
       <span>2026-05-21</span>
-<<<<<<< HEAD
-      <span>Phase A slice — companion orchestration I/O via orchestration-flow anchor (backlog #1–2 verified, Tier 5)</span>
-      <span class="status resolved">resolved</span>
-    </header>
-    <h3><code>pause-companion-orchestration-io</code> imports session load and favorites through <code>pause-companion-orchestration-flow</code></h3>
-    <dl>
-      <dt>Design decision</dt>
-      <dd>Backlog #1 (<code>ritual/reflect/</code>) and #2 (<code>ritual/frame/</code>) remain complete — no folder moves. Route <code>pause-companion-orchestration-io</code> through <code>pause-companion-orchestration-flow</code> instead of deep <code>ritual/frame/*</code> imports (pairs with <code>pause-companion-orchestrate-io</code> → <code>pause-companion-orchestrate-flow</code>). Query-key invalidation stays on <code>application/queries/</code>.</dd>
-      <dt>Deviation</dt>
-      <dd>None — behavior parity; import boundary only.</dd>
-      <dt>Tradeoffs</dt>
-      <dd>Flow anchor stays a thin re-export barrel for <code>check:architecture-alignment</code> frame orchestration cluster detection.</dd>
-      <dt>Open questions</dt>
-      <dd>Next: <code>pause-companion-frame-ui-io</code> / <code>pause-companion-analytics-io</code> flow peels, <code>pause-session-decide-flow</code> on decide I/O, or Phase B cross-context Tier 1 shim.</dd>
-=======
       <span>Phase A slice — holzen-reflect generation subcluster (backlog #1 follow-up, Tier 5)</span>
       <span class="status resolved">resolved</span>
     </header>
@@ -87,7 +72,25 @@
       <dd><code>pause-reflect-generation-hook-flow.ts</code> stays at <code>generation/</code> root as CI cluster anchor until a peel/delete slice.</dd>
       <dt>Open questions</dt>
       <dd>Next: peel <code>pause-reflect-generation-io</code> off hook-flow to domain + holzen-reflect path, or Phase B cross-context Tier 1 shim.</dd>
->>>>>>> e489bec6b (refactor(pause): colocate holzen-reflect generation under generation/holzen-reflect)
+    </dl>
+  </article>
+
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — companion orchestration I/O via orchestration-flow anchor (backlog #1–2 verified, Tier 5)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3><code>pause-companion-orchestration-io</code> imports session load and favorites through <code>pause-companion-orchestration-flow</code></h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>ritual/reflect/</code>) and #2 (<code>ritual/frame/</code>) remain complete — no folder moves. Route <code>pause-companion-orchestration-io</code> through <code>pause-companion-orchestration-flow</code> instead of deep <code>ritual/frame/*</code> imports (pairs with <code>pause-companion-orchestrate-io</code> → <code>pause-companion-orchestrate-flow</code>). Query-key invalidation stays on <code>application/queries/</code>.</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior parity; import boundary only.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Flow anchor stays a thin re-export barrel for <code>check:architecture-alignment</code> frame orchestration cluster detection.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: <code>pause-companion-frame-ui-io</code> / <code>pause-companion-analytics-io</code> flow peels, <code>pause-session-decide-flow</code> on decide I/O, or Phase B cross-context Tier 1 shim.</dd>
     </dl>
   </article>
 
