@@ -91,6 +91,8 @@ export {
   playPauseBreathPhaseCue,
   resumePauseAudioContext,
 } from './application/use-cases/ritual/breathe/ritual-audio';
+export type { PauseStep } from './domain/pause-ritual-steps';
+export type { BriefPauseStep, RitualDepth } from './domain/ritual-types';
 export {
   initialBreathingFirstCompletedFromRestored,
   initialBreathingSecondCompletedFromRestored,
