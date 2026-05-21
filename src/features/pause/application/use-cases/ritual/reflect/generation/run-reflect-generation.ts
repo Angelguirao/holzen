@@ -1,7 +1,7 @@
-import { buildReflectGenerationEdgeInvokeInput } from '@/features/pause/domain/reflect-generation-edge-params';
-import type { ReflectGenerationProfileInput } from '@/features/pause/domain/reflect-generation-edge-params';
-import { isAbortLikeReflectError } from '@/features/pause/domain/reflect-generation-errors';
-import type { ReflectGenerationResult } from '@/features/pause/domain/reflect-generation-result';
+import { buildReflectGenerationEdgeInvokeInput } from '@/features/pause/domain/reflect/generation/reflect-generation-edge-params';
+import type { ReflectGenerationProfileInput } from '@/features/pause/domain/reflect/generation/reflect-generation-edge-params';
+import { isAbortLikeReflectError } from '@/features/pause/domain/reflect/generation/reflect-generation-errors';
+import type { ReflectGenerationResult } from '@/features/pause/domain/reflect/generation/reflect-generation-result';
 import type { ReflectGenerator } from '@/features/pause/ports/reflect-generator';
 
 export type RunReflectGenerationInput = {
@@ -17,7 +17,7 @@ export type RunReflectGenerationInput = {
 /** @deprecated Prefer `ReflectGenerator` from `ports/reflect-generator.ts`. */
 export type RunReflectGenerationPorts = ReflectGenerator;
 
-/** @deprecated Prefer `ReflectGenerationResult` from `domain/reflect-generation-result.ts`. */
+/** @deprecated Prefer `ReflectGenerationResult` from `domain/reflect/generation/reflect-generation-result.ts`. */
 export type RunReflectGenerationResult = ReflectGenerationResult;
 
 /**

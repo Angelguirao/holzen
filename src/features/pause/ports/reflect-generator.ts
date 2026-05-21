@@ -1,5 +1,5 @@
 import type { ReflectArtifactPersistInput } from '@/features/pause/domain/reflect-artifact-persist';
-import type { ReflectGenerationEdgeInvokeInput } from '@/features/pause/domain/reflect-generation-edge-params';
+import type { ReflectGenerationEdgeInvokeInput } from '@/features/pause/domain/reflect/generation/reflect-generation-edge-params';
 import type { ReflectRecencyHints } from '@/features/pause/domain/reflect-recency-hints';
 import type {
   PauseReflectStepLatestRow,

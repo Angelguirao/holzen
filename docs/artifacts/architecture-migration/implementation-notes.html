@@ -4808,4 +4808,23 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — reflect generation domain cluster under domain/reflect/generation (Tier 5)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>Backlog #1 complete; colocate holzen-reflect pure generation rules</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd><code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code> was already complete. Move <code>reflect-generation-*</code> modules (+ tests) from <code>domain/</code> root to <code>domain/reflect/generation/</code> beside <code>ritual/reflect/generation/</code> and <code>presentation/reflect/generation/</code>; import paths only.</dd>
+      <dt>Deviation</dt>
+      <dd><code>reflect-recency-hints</code>, <code>reflect-artifact-persist</code>, and <code>reflect-step-latest</code> remain at <code>domain/</code> root until a later slice.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Incremental domain taxonomy — avoids one commit moving all reflect domain modules.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: group remaining <code>domain/reflect-*</code> root files under <code>domain/reflect/</code>, or wire <code>PauseRepository</code> stragglers (backlog #4).</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->

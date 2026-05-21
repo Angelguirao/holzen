@@ -1,5 +1,5 @@
-import type { ReflectGenerationPrerequisite } from '@/features/pause/domain/reflect-generation-prerequisites';
-import type { ReflectGenerationResult } from '@/features/pause/domain/reflect-generation-result';
+import type { ReflectGenerationPrerequisite } from './reflect-generation-prerequisites';
+import type { ReflectGenerationResult } from './reflect-generation-result';
 
 export type ReflectGenerationPrefetch =
   | { kind: 'stop' }
