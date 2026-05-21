@@ -107,6 +107,10 @@ import type { PauseState } from './domain/pause-state';
 import type { PostPauseFeelSnapshot } from './domain/ritual/done/post-pause-emotion-log';
 import type { RunPauseFavoriteToggleResult } from './application/use-cases/ritual/reflect/steps/run-pause-favorite-toggle';
 import type { RunPauseReflectTagUpdateResult } from './application/use-cases/ritual/reflect/steps/run-pause-reflect-tag-update';
+import {
+  runPauseReflectionStepLogOnce,
+  type RunPauseReflectionStepLogResult,
+} from './application/use-cases/ritual/reflect/steps/run-pause-reflection-step-log';
 import { invalidateCompanionUiCompletionQuery } from './application/queries/companion-ui-completion-query-key';
 import { persistCompanionUiStepCompletion as persistCompanionUiStepCompletionUseCase } from './application/use-cases/ritual/frame/persist-ui-step-completion';
 import type { CompanionUiCompletionStep } from './application/use-cases/ritual/frame/companion-ui-completion-types';
@@ -202,6 +206,18 @@ export type { PostPauseFeelSnapshot };
 export type { CompanionUiCompletionStep };
 export type { RunAdoptPendingPauseOfferResult, RunDeclinePendingPauseOfferResult };
 export type { RunPauseFavoriteToggleResult, RunPauseReflectTagUpdateResult };
+export type { RunPauseReflectionStepLogResult };
+
+/** Reflect beat — `reflection_step` once per tab after copy settles (wired repository + storage). */
+export function logPauseReflectionStepOnce(
+  pauseInstanceId: string,
+): Promise<RunPauseReflectionStepLogResult> {
+  return runPauseReflectionStepLogOnce(
+    supabasePauseRepository,
+    { pauseInstanceId },
+    { storage: reflectionStepSessionStorage },
+  );
+}
 
 /** Frame companion UI step completion — wired with default `PauseRepository`. */
 export async function persistCompanionUiStepCompletion(
@@ -371,10 +387,3 @@ export async function logDevModeSetting(userId: string, enabled: boolean): Promi
 }
 
 export { showPauseStepSyncFailedToast };
-
-/** Tab-local pause ritual snapshot (localStorage) — presentation imports via this barrel only. */
-export {
-  clearSession,
-  loadSession,
-  saveSession,
-} from './infrastructure/session/persisted-session-storage';
