@@ -34,6 +34,7 @@ export { usePauseReflectionStepLog } from './presentation/reflect/steps/use-paus
 export { usePauseReflectUiTelemetry } from './presentation/reflect/telemetry/use-pause-reflect-ui-telemetry';
 export { usePauseReflectTags } from './presentation/reflect/steps/use-pause-reflect-tags';
 export { usePauseReflectNote } from './presentation/reflect/steps/use-pause-reflect-note';
+export { usePauseFavoriteToggle } from './presentation/reflect/steps/use-pause-favorite-toggle';
 export { usePauseReflectFrameFocusAmbience } from './presentation/reflect/ambience/use-pause-reflect-frame-focus-ambience';
 
 export { PAUSE_DEPTH_PICKER_CARD_BUTTON_CLASS } from './presentation/reflect/mood/pause-depth-picker-styles';

@@ -10565,4 +10565,23 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — usePauseFavoriteToggle on public-ritual-reflect (backlog #1 verified, #3)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>ritual/reflect/ complete; favorite toggle on ritual reflect barrel</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 verified — zero <code>application/use-cases/reflect/</code> paths. Export <code>usePauseFavoriteToggle</code> on <code>public-ritual-reflect.ts</code> beside note/tags/step-log hooks; <code>use-pause-session-mood-chrome-handlers</code> imports the barrel; <code>public-hooks</code> re-exports for backward compatibility.</dd>
+      <dt>Deviation</dt>
+      <dd>None — RPC still via <code>logPauseFavoriteToggle</code> on <code>public-rpc</code>.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Mood/flow conductors (<code>usePauseSessionMood*</code>, breath handlers) remain on <code>public-hooks</code> until a later peel.</dd>
+      <dt>Open questions</dt>
+      <dd>Next backlog #4: pending-offer mutations via repository in presentation (optional §6 peel); group remaining breathe-only helpers on <code>public-ritual-breathe</code>.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
