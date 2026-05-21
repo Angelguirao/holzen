@@ -59,6 +59,25 @@
   <article class="note">
     <header>
       <span>2026-05-21</span>
+      <span>Phase A slice — reflect generation I/O via generation hook-flow anchor (backlog #1 verified, Tier 5)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3><code>pause-reflect-generation-io</code> imports hook helpers and <code>runReflectGeneration</code> through <code>pause-reflect-generation-hook-flow</code></h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>ritual/reflect/</code> folder move) remains complete. <code>pause-reflect-generation-io</code> imports prefetch/commit helpers and holzen-reflect use case through <code>pause-reflect-generation-hook-flow</code> instead of split <code>run-reflect-generation</code> + <code>domain/reflect/generation/*</code> imports (parity with mood, hub, and flows I/O peels).</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior parity; import boundary only.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Domain <code>reflect-generation-hook-flow</code> remains the pure-helper source; application anchor re-exports for CI + presentation single import.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: <code>pause-companion-orchestrate-io</code> through <code>pause-companion-orchestrate-flow</code>, or Phase B cross-context Tier 1 shim.</dd>
+    </dl>
+  </article>
+
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
       <span>Phase A slice — session shell I/O hydration + pending-offer test hygiene (Tier 5)</span>
       <span class="status resolved">resolved</span>
     </header>
@@ -71,7 +90,7 @@
       <dt>Tradeoffs</dt>
       <dd><code>pause-session-shell-flow.ts</code> remains for <code>check:architecture-alignment</code> shell cluster detection.</dd>
       <dt>Open questions</dt>
-      <dd>Next: reflect flows I/O decide/toast anchor peel, or Phase B cross-context Tier 1 shim.</dd>
+      <dd>Next: companion orchestrate-io through <code>pause-companion-orchestrate-flow</code>, or Phase B cross-context Tier 1 shim.</dd>
     </dl>
   </article>
 
@@ -90,7 +109,7 @@
       <dt>Tradeoffs</dt>
       <dd>Flow anchors remain for <code>check:architecture-alignment</code> telemetry cluster detection (parity with mood/hub flow routing).</dd>
       <dt>Open questions</dt>
-      <dd>Next: reflect flows I/O decide/toast anchor peel, companion orchestrate-io direct <code>ritual/frame/*</code> imports, or Phase B cross-context Tier 1 shim.</dd>
+      <dd>Next: companion orchestrate-io direct <code>ritual/frame/*</code> imports, or Phase B cross-context Tier 1 shim.</dd>
     </dl>
   </article>
 
