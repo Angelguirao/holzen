@@ -7,7 +7,7 @@ import type {
   OpenManualPauseFromHomeParams,
   OpenManualPauseFromHomePorts,
   OpenManualPauseFromHomeResult,
-} from '@/features/pause/application/use-cases/ritual/reflect/generation/open-manual-pause-from-home-types';
+} from './open-manual-pause-from-home-types';
 
 export type {
   OpenManualPauseFromHomeError,
@@ -16,7 +16,7 @@ export type {
   OpenManualPauseFromHomePorts,
   OpenManualPauseFromHomeResult,
   OpenManualPauseFromHomeSuccess,
-} from '@/features/pause/application/use-cases/ritual/reflect/generation/open-manual-pause-from-home-types';
+} from './open-manual-pause-from-home-types';
 
 const VOLATILITY_TEMPLATE = 'volatility_v1';
 

@@ -12,8 +12,7 @@ import {
   trackManualPauseInstanceCreated,
   trackPauseManualCompleted,
 } from '@/features/pause/application/use-cases/trigger/manual-pause-trigger-telemetry';
-import { openManualPauseFromHome } from '@/features/pause/application/use-cases/trigger/open-manual-pause-from-home';
-import { buildManualPauseOpenParams, pauseHomeManualOpenPorts } from './pause-home-io';
+import { buildManualPauseOpenParams, openManualPauseFromHome, pauseHomeManualOpenPorts } from './pause-home-io';
 import { clearPausePersistedTabSession } from '@/features/pause/presentation/session/pause-persisted-tab-session-io';
 import { holzenLog } from '@/lib/holzen-console';
 
