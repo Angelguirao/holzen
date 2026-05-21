@@ -6917,4 +6917,23 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — companion slot run-orchestrate via public-rpc (backlog #3)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>Peel use-companion-slot-run-orchestrate application imports</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 <code>ritual/reflect/</code> is complete. Continue backlog #3 (§6): re-export slot orchestrate use cases and UI-state helpers on <code>public-rpc</code>; <code>use-companion-slot-run-orchestrate</code> imports the barrel only (types already peeled for <code>use-companion-slot-orchestrate-actions</code>).</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior parity; re-export only.</dd>
+      <dt>Tradeoffs</dt>
+      <dd><code>use-companion-orchestrate-retry</code> and failure-port hooks still import <code>ritual/frame/*</code> application paths until follow-up peels.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: peel companion retry / intervention presentation cluster, or backlog #4 stray <code>PauseRepository</code> call sites.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
