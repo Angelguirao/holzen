@@ -264,11 +264,7 @@ export function logPauseCompanionFeedbackVote(
   return runLogCompanionFeedbackVote(supabasePauseAnalyticsRepository, input);
 }
 
-<<<<<<< HEAD
 /** Companion fullview open — wired `PauseAnalyticsRepository.insertEvent` (presentation telemetry). */
-=======
-/** Companion fullview open — wired `PauseAnalyticsRepository.insertEvent` (observation only). */
->>>>>>> 4923cdd7 (refactor(pause): wire companion fullview telemetry via public-rpc)
 export function logPauseCompanionFullviewOpened(
   input: LogCompanionFullviewOpenedInput,
 ): Promise<{ ok: boolean }> {
