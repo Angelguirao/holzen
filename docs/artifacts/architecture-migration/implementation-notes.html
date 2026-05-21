@@ -12883,4 +12883,23 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — complete session/breath presentation subcluster (backlog #1 follow-up)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>Colocate breath step + breath↔reflect compose under presentation/session/breath/</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code>) was already complete on <code>cursor/arch-migrate-src-ca70</code>. After segment RPC loggers + <code>use-pause-session-breath-handlers</code>, colocate <code>use-pause-session-breath-step-handlers</code>, <code>use-pause-session-breath-reflect-handlers</code> (+ tests), and <code>pause-session-breath-reflect-handler-types.ts</code> under <code>presentation/session/breath/</code>; breath-reflect still composes <code>reflect/flows</code> + <code>reflect/hub</code> via relative imports. <code>public-ritual-reflect</code> and <code>use-pause-session-step-handlers</code> import paths only.</dd>
+      <dt>Deviation</dt>
+      <dd>None — session grouping wins over <code>reflect/flows/</code> for breath↔reflect compose per §3.2 (prior notes that parked handlers in <code>reflect/flows/</code> are superseded).</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Flat breath navigation/UI hooks remain under <code>presentation/session/</code> until a follow-up peel; CI forbids flat <code>presentation/session/use-pause-session-breath-*</code> import strings for moved modules.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: optional <code>presentation/session/scaffold/</code> CI subclusters, Phase B subscription/auth shims, or peel remaining flat breath UI hooks into <code>session/breath/</code>.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->

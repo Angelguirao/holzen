@@ -1,4 +1,4 @@
-import type { PauseSessionBreathReflectProvidersSlice } from './pause-session-breath-reflect-handler-types';
+import type { PauseSessionBreathReflectProvidersSlice } from './breath/pause-session-breath-reflect-handler-types';
 import type { PauseSessionMoodChromeProvidersSlice } from '../reflect/mood/pause-session-mood-chrome-handler-types';
 
 export type {
@@ -6,7 +6,7 @@ export type {
   PauseSessionBreathReflectProvidersSlice,
   PauseSessionBreathReflectRitualSlice,
   PauseSessionBreathReflectShellSlice,
-} from './pause-session-breath-reflect-handler-types';
+} from './breath/pause-session-breath-reflect-handler-types';
 
 export type {
   PauseSessionMoodChromeProvidersSlice,
