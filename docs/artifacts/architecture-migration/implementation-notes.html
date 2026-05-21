@@ -10723,10 +10723,10 @@
       <span>Phase A slice — usePauseShiftFrameDoneHandler on public-ritual-reflect (backlog #1 verified, #3)</span>
       <span class="status resolved">resolved</span>
     </header>
-    <h3>ritual/reflect/ complete; shift-frame hub hook on reflect barrel</h3>
+    <h3>ritual/reflect/ complete; dedupe shift-frame + consolidate public-hooks barrel</h3>
     <dl>
       <dt>Design decision</dt>
-      <dd>Backlog #1 verified — reflect use cases under <code>ritual/reflect/</code>. Export <code>usePauseShiftFrameDoneHandler</code> on <code>public-ritual-reflect.ts</code> after parallel mood-hook peels; <code>public-hooks</code> ritual-reflect import block re-exports (RPC still via <code>public-rpc</code> inside the hook).</dd>
+      <dd>Rebased onto parallel peels (mood hooks, <code>usePauseSessionReflectAndDecide</code>, feel-shift dedupe). Removed duplicate <code>usePauseShiftFrameDoneHandler</code> exports in <code>public-ritual-reflect.ts</code> and <code>public-hooks</code> import block; single barrel export remains.</dd>
       <dt>Deviation</dt>
       <dd>None.</dd>
       <dt>Tradeoffs</dt>
