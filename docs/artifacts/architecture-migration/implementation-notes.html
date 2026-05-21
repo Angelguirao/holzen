@@ -13681,4 +13681,23 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — bind session brief→deep RPC I/O (ritual/reflect verified)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>Session presentation — ritual_depth_upgraded off public-rpc</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code>) was already complete; remote already had <code>pause-reflect-flows-io.ts</code> for decide outcome. Add <code>presentation/session/pause-session-brief-io.ts</code> with <code>pauseBriefRitualDepthUpgraded</code> for <code>use-pause-session-brief-to-deep</code> (mirrors <code>pause-reflect-flows-io.ts</code> / steps-io pattern).</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior-preserving wiring only.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Breath segment loggers, pending-offer mutations, home manual trigger, and ritual done check-in still import <code>public-rpc</code> directly.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: <code>presentation/session/breath/pause-session-breath-io.ts</code>, <code>public-ritual-frame</code> barrel peel, or Phase B <code>src/lib/holzen-query-client-ref</code> shim.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
