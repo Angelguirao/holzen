@@ -59,21 +59,6 @@
   <article class="note">
     <header>
       <span>2026-05-21</span>
-<<<<<<< HEAD
-      <span>Phase A slice — session shell I/O direct session use cases (backlog #1 follow-up, Tier 5)</span>
-      <span class="status resolved">resolved</span>
-    </header>
-    <h3><code>pause-session-shell-io</code> imports shell chrome use cases directly</h3>
-    <dl>
-      <dt>Design decision</dt>
-      <dd>Backlog #1 (<code>ritual/reflect/</code> folder move) remains complete. Peel <code>pause-session-shell-io</code> to sibling <code>application/use-cases/session/*</code> modules instead of <code>pause-session-shell-flow</code> CI anchor (parity with reflect presentation I/O peels).</dd>
-      <dt>Deviation</dt>
-      <dd>None — behavior parity; import boundary only.</dd>
-      <dt>Tradeoffs</dt>
-      <dd><code>pause-session-shell-flow.ts</code> remains for <code>check:architecture-alignment</code>; scaffold/brief/decide session I/O anchors unchanged this slice.</dd>
-      <dt>Open questions</dt>
-      <dd>Next: peel <code>pause-session-scaffold-io</code>, <code>pause-session-brief-io</code>, or <code>pause-session-decide-io</code> from session flow anchors.</dd>
-=======
       <span>Phase A slice — session decide I/O direct restored-decide-ritual-state (backlog #1 follow-up, Tier 5)</span>
       <span class="status resolved">resolved</span>
     </header>
@@ -86,8 +71,26 @@
       <dt>Tradeoffs</dt>
       <dd><code>pause-session-decide-flow.ts</code> remains for <code>check:architecture-alignment</code>; presentation no longer routes through it.</dd>
       <dt>Open questions</dt>
-      <dd>Next: <code>pause-session-shell-io</code> or <code>pause-session-scaffold-io</code> direct sibling imports.</dd>
->>>>>>> 4cc5001b (refactor(pause): peel session decide I/O off flow anchor)
+      <dd>Next: peel <code>pause-session-scaffold-io</code> or <code>pause-session-brief-io</code> from session flow anchors.</dd>
+    </dl>
+  </article>
+
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — session shell I/O direct session use cases (backlog #1 follow-up, Tier 5)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3><code>pause-session-shell-io</code> imports shell chrome use cases directly</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>ritual/reflect/</code> folder move) remains complete. Peel <code>pause-session-shell-io</code> to sibling <code>application/use-cases/session/*</code> modules instead of <code>pause-session-shell-flow</code> CI anchor (parity with reflect presentation I/O peels).</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior parity; import boundary only.</dd>
+      <dt>Tradeoffs</dt>
+      <dd><code>pause-session-shell-flow.ts</code> remains for <code>check:architecture-alignment</code>; scaffold/brief session I/O anchors unchanged this slice.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: peel <code>pause-session-scaffold-io</code> or <code>pause-session-brief-io</code> from session flow anchors.</dd>
     </dl>
   </article>
 
@@ -17804,7 +17807,6 @@
   <article class="note">
     <header>
       <span>2026-05-21</span>
-<<<<<<< HEAD
       <span>Phase A slice — reflect generation I/O via hook-flow anchor (backlog #1 verified, Tier 5)</span>
       <span class="status resolved">resolved</span>
     </header>
@@ -17817,22 +17819,7 @@
       <dt>Tradeoffs</dt>
       <dd>Unit test mocks <code>runReflectGeneration</code> on the hook-flow module path.</dd>
       <dt>Open questions</dt>
-      <dd>Next: <code>pause-home-reflect-telemetry-io</code> direct telemetry imports, companion orchestrate-io peel, or Phase B cross-context Tier 1 shim.</dd>
-=======
-      <span>Phase A slice — session decide I/O off pause-session-decide-flow (backlog #1 verified, Tier 5)</span>
-      <span class="status resolved">resolved</span>
-    </header>
-    <h3><code>pause-session-decide-io</code> imports <code>restored-decide-ritual-state</code> directly</h3>
-    <dl>
-      <dt>Design decision</dt>
-      <dd>Backlog #1 (<code>ritual/reflect/</code>) remains complete — no folder moves. Align session decide presentation I/O with hub/flows peels: <code>initialDecisionFromRestored</code> and <code>initialPhaseFromRestored</code> from <code>ritual/decide/restored-decide-ritual-state</code> instead of <code>pause-session-decide-flow</code> CI anchor. <code>pause-session-ritual-restore-io</code> unchanged.</dd>
-      <dt>Deviation</dt>
-      <dd>None — behavior parity; application session anchor remains for <code>check:architecture-alignment</code> only.</dd>
-      <dt>Tradeoffs</dt>
-      <dd>Single consumer module; no new unit test (pure re-export smoke covered by restore-io tests).</dd>
-      <dt>Open questions</dt>
-      <dd>Next: companion orchestration-io session-load direct import, session shell/scaffold flow-anchor peels, or Phase B cross-context Tier 1 shim.</dd>
->>>>>>> aa7aa551 (refactor(pause): peel session decide I/O off pause-session-decide-flow anchor)
+      <dd>Next: companion orchestrate-io peel, session scaffold/brief flow-anchor peels, or Phase B cross-context Tier 1 shim.</dd>
     </dl>
   </article>
 
