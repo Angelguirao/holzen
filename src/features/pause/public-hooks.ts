@@ -251,6 +251,12 @@ export {
   type UsePauseArtifactHaikuParams,
   type UsePauseArtifactHaikuResult,
 } from './presentation/reflect/generation/use-pause-artifact-haiku';
+export {
+  usePauseArtifactReflectionText,
+  type PauseArtifactReflectionTextFetchPhase,
+  type UsePauseArtifactReflectionTextParams,
+  type UsePauseArtifactReflectionTextResult,
+} from './presentation/reflect/generation/use-pause-artifact-reflection-text';
 export { useCompanionSlotOrchestratePorts } from './presentation/companion/use-companion-slot-orchestrate-ports';
 export { usePauseReflectionStepLog } from './presentation/reflect/steps/use-pause-reflection-step-log';
 export {
