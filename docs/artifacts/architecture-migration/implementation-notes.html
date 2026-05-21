@@ -8095,4 +8095,23 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — reflect step logs wired public-rpc (backlog #1 done, #4)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>Peel note/tag/favorite/reflection_step mutations off public-ports in presentation</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code>) is complete. Add <code>logPauseReflectNoteUpdate</code>, <code>logPauseReflectTagUpdate</code>, <code>logPauseFavoriteToggle</code>, and <code>logPauseReflectionStepOnce</code> on <code>public-rpc</code> (wired <code>PauseRepository</code> + session storage for <code>reflection_step</code>); <code>presentation/reflect/steps/*</code> imports facades only.</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior parity.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Holzen-reflect generation + artifact reads still use <code>public-ports</code> <code>ReflectGenerator</code> adapter (edge I/O, not step logs).</dd>
+      <dt>Open questions</dt>
+      <dd>Next: port-backed companion feedback vote fetch query path, or remaining ritual log <code>PauseRepository</code> call sites outside reflect.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->

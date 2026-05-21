@@ -54,11 +54,6 @@ import {
   runPostPauseEmotionLogIfDirty,
   type PostPauseFeelSnapshot,
 } from './application/use-cases/ritual/done/post-pause-emotion-log';
-import {
-  runInitialEmotionSelect,
-  runInitialEmotionSkip,
-} from './application/use-cases/ritual/reflect/mood/run-initial-emotion-log';
-import { runShiftEmotionFrameHubDone } from './application/use-cases/ritual/reflect/hub/run-shift-emotion-frame-hub-done';
 import type { MoodValue } from './domain/mood-value';
 import { runPauseOutcomeLog } from './application/use-cases/ritual/decide/run-pause-outcome-log';
 import {
