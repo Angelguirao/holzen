@@ -118,6 +118,8 @@ export {
   usePauseBreathingTimedLoop,
   type UsePauseBreathingTimedLoopInput,
   resolveBreathOrbVisualMetrics,
+  applyBreathSegmentLogOutcome,
+  initialBreathSegmentRpcLoggedFlagsFromRestored,
 } from './public-ritual-breathe';
 export {
   PAUSE_SCIENCE_STEPS,
@@ -319,8 +321,6 @@ export {
   usePauseSessionFeelTilesSelect,
   usePauseSessionInitialMoodHandlers,
   PAUSE_DEPTH_PICKER_CARD_BUTTON_CLASS,
-  applyBreathSegmentLogOutcome,
-  initialBreathSegmentRpcLoggedFlagsFromRestored,
   usePauseBreathSegmentRpcLoggers,
   usePauseFeelShiftLogDedupeRefs,
   usePauseSessionBreathStepHandlers,

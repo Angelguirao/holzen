@@ -8,8 +8,8 @@ import {
   runLogBreathSegment1Skipped,
   runLogBreathSegment2Skipped,
 } from '@/features/pause/application/use-cases/ritual/breathe/run-breath-segment-log';
-import { applyBreathSegmentLogOutcome } from '@/features/pause/domain/reflect/flows/apply-breath-segment-log-outcome';
-import { initialBreathSegmentRpcLoggedFlagsFromRestored } from '@/features/pause/domain/reflect/flows/initial-breath-segment-rpc-flags';
+import { applyBreathSegmentLogOutcome } from '@/features/pause/domain/ritual/breathe/apply-breath-segment-log-outcome';
+import { initialBreathSegmentRpcLoggedFlagsFromRestored } from '@/features/pause/domain/ritual/breathe/initial-breath-segment-rpc-flags';
 import { supabasePauseRepository } from '@/features/pause/infrastructure/supabase-pause-repository';
 import { showPauseStepSyncFailedToast } from '@/features/pause/presentation/ritual/pause-step-sync-toast';
 

@@ -11857,4 +11857,23 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — breath segment RPC domain off reflect/flows (backlog #1 verified)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3><code>apply-breath-segment-log-outcome</code> + <code>initial-breath-segment-rpc-flags</code> → <code>domain/ritual/breathe/</code></h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code>) verified complete on <code>cursor/arch-migrate-src-ca70</code> — no application folder move. Narrow <code>domain/reflect/flows/</code> to reflect/decide view only: relocate breath-segment RPC dedupe/outcome pure helpers beside other breathe domain modules; re-export from <code>public-ritual-breathe</code> instead of <code>public-ritual-reflect</code>.</dd>
+      <dt>Deviation</dt>
+      <dd>None — matches §3.1 beat ownership (breathe segment RPCs are not Reflect beat logic).</dd>
+      <dt>Tradeoffs</dt>
+      <dd><code>use-pause-breath-segment-rpc-loggers</code> stays under <code>presentation/reflect/flows/</code> (session conductor wiring); only domain + barrel paths changed.</dd>
+      <dt>Open questions</dt>
+      <dd>Next backlog #4: <code>use-pause-reflect-generation</code> ReflectGenerator port sentinel, optional PostHog analytics-port consolidation, or Phase B subscription/auth template slice.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->

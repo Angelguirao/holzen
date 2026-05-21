@@ -1,7 +1,9 @@
 /**
  * Breathe ritual beat — screen-facing pure helpers and presentation hooks.
- * Phase advance + segment RPC flags stay on `public-session.ts`; mutations on `public-rpc.ts`.
+ * Segment RPC dedupe/outcome helpers live here; mutations on `public-rpc.ts`.
  */
+export { applyBreathSegmentLogOutcome } from './domain/ritual/breathe/apply-breath-segment-log-outcome';
+export { initialBreathSegmentRpcLoggedFlagsFromRestored } from './domain/ritual/breathe/initial-breath-segment-rpc-flags';
 export {
   usePauseBreathingTimedLoop,
   type UsePauseBreathingTimedLoopInput,
