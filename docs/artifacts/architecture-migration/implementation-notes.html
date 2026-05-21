@@ -12826,4 +12826,23 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — colocate reflect step queries under queries/reflect/steps/</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>Backlog #1 complete; Tier 5 reflect I/O subcluster</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd><code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code> was already complete on <code>cursor/arch-migrate-src-ca70</code>. Colocate <code>reflect-step-query</code> and <code>fetch-latest-pause-reflect-step</code> under <code>infrastructure/queries/reflect/steps/</code> beside <code>domain/reflect/steps/</code>; <code>public-queries</code> and <code>supabaseReflectGenerator</code> import paths only.</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior-preserving move; generation artifact queries remain flat under <code>queries/reflect/</code> until a follow-up slice.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>CI <code>mustExist</code> for <code>queries/reflect/steps/</code> only — haiku/reflection-text/recency modules not subclustered yet.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: optional <code>queries/reflect/generation/</code> for artifact reads, <code>presentation/session/</code> CI subclusters, or Phase B subscription/auth shims.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->

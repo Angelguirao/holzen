@@ -242,7 +242,7 @@ export {
   getLatestPauseReflectTagsQueryOptions,
   PAUSE_REFLECT_STEP_QUERY_PREFIX,
   pauseReflectStepLatestQueryKey,
-} from './infrastructure/queries/reflect/reflect-step-query';
+} from './infrastructure/queries/reflect/steps/reflect-step-query';
 export {
   fetchOpenPauseHomePreview,
   type OpenPauseHomePreview,
