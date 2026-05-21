@@ -9,10 +9,16 @@ const { pauseInitialEmotionSelectMock } = vi.hoisted(() => ({
   pauseInitialEmotionSelectMock: vi.fn(),
 }));
 
-vi.mock('./pause-reflect-mood-io', () => ({
-  pauseInitialEmotionSelect: pauseInitialEmotionSelectMock,
-  pauseInitialEmotionSkip: vi.fn(),
-}));
+vi.mock('./pause-reflect-mood-io', async () => {
+  const { buildFeelTilesMoodLogOptions } = await import(
+    '@/features/pause/domain/reflect/mood/build-feel-tiles-mood-log-options'
+  );
+  return {
+    pauseInitialEmotionSelect: pauseInitialEmotionSelectMock,
+    pauseInitialEmotionSkip: vi.fn(),
+    buildFeelTilesMoodLogOptions,
+  };
+});
 
 vi.mock('@/features/pause/presentation/session/scaffold/use-pause-session-ritual-storage-sync', () => ({
   usePauseSessionRitualStorageSync: vi.fn(),
