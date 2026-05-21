@@ -2,6 +2,7 @@
  * Pause session shell pure helpers (no Supabase).
  * Presentation hooks import from here instead of deep `application/use-cases/session/*`.
  */
+export { pauseStepLayout } from './presentation/session/pause-step-layout';
 export {
   computePauseHeaderBackIntent,
   isPauseSessionHeaderBackVisible,

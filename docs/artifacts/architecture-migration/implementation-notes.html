@@ -10926,4 +10926,23 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — reflect screens peel off public-hooks (backlog #1 verified, §6)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>Reflect route components use public-ritual-reflect + public-session barrels</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>ritual/reflect/</code> use cases) is complete. Continue §6: export <code>pauseStepLayout</code> on <code>public-session</code> and <code>isPauseMoodValue</code> / <code>MoodValue</code> on <code>public-ritual-reflect</code>; update <code>PauseReflect</code>, <code>pause-reflect-step-nav</code>, and <code>pause-done-reflect-share-row</code> so reflect screens do not import the session-wide <code>public-hooks</code> barrel for layout or mood guards.</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior unchanged; <code>public-hooks</code> still re-exports the same symbols for other routes.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Other pause screens still use <code>public-hooks</code> for <code>pauseStepLayout</code> until peeled incrementally.</dd>
+      <dt>Open questions</dt>
+      <dd>Next backlog #4: optional <code>analytics-events</code> import guard; bulk <code>pauseStepLayout</code> screen peel to <code>public-session</code>.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->

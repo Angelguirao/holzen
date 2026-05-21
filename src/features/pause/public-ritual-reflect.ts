@@ -2,6 +2,11 @@
  * Reflect ritual beat — screen-facing pure helpers and presentation hooks.
  * Mutations/edge stay on `public-rpc.ts`; session shell on `public-session.ts`.
  */
+export {
+  isPauseMoodValue,
+  PAUSE_MOOD_VALUES,
+  type MoodValue,
+} from './domain/mood-value';
 export { resolveEffectiveReflectionCopy } from './domain/reflect/generation/resolve-effective-reflection-copy';
 export { resolveFrameHaikuDisplayBody } from './domain/reflect/generation/resolve-frame-haiku-display-body';
 export {
