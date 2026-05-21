@@ -9216,4 +9216,23 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — signal-source-trusted in domain/companion (backlog #1 done, Tier 5)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>ritual/reflect/ complete; last companion presentation ritual/frame import removed</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>ritual/reflect/</code>) verified complete — no reflect moves. Move pure signal trusted-host helpers from <code>ritual/frame/signal-source-trusted</code> to <code>domain/companion/signal-source-trusted.ts</code> (same pattern as <code>related-biases</code>); <code>use-signal-source-trusted-host</code> imports domain only — zero <code>ritual/frame/*</code> imports left under <code>presentation/companion/</code>.</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior parity.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Catalog fetch still via <code>user/public-queries</code> — cross-context read unchanged.</dd>
+      <dt>Open questions</dt>
+      <dd>Next backlog #4: audit mutations bypassing <code>PauseRepository</code> outside <code>public-rpc</code> facades.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
