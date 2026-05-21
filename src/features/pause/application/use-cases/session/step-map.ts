@@ -1,8 +1,7 @@
 import type { FeelStepTile } from '@/features/pause/domain/feel-step-tile';
-import type { BriefPauseStep, RitualDepth } from '@/features/pause/domain/ritual-types';
+import type { BriefPauseStep } from '@/features/pause/domain/ritual-types';
 import type { PersistedSession } from '@/features/pause/domain/session-model';
 import { mapPersistedStep } from '@/features/pause/domain/session/map-persisted-step';
-import { hasPersistedPauseSessionPayload } from './persisted-session-guards';
 
 export { mapPersistedStep };
 
@@ -10,21 +9,11 @@ export { mapPersistedStep };
  * Pause route helpers: map persisted step strings and derive initial ritual UI from `PersistedSession`.
  *
  * **Persistence contract:** `docs/systems/pause-system.md` section 7.2 (hydration / local snapshot).
+ * **Depth picker entry:** `initialRitualEntry` in `application/use-cases/ritual/reflect/scaffold/initial-ritual-entry.ts`.
  * **Ritual sync caveat:** `computePauseStorageRitualSyncPatch` in `application/use-cases/ritual/reflect/scaffold/storage-ritual-sync.ts`
  * may intentionally omit `briefStep` when syncing — see `initialBriefPauseStepFromRestored` note below.
  * **Code map:** same pause doc, section 10 (Related docs and code).
  */
-
-/**
- * Initial depth-picker vs brief/deep from restored local session.
- * Call with `null` when there is no compatible restore payload.
- */
-export function initialRitualEntry(restored: PersistedSession | null): RitualDepth | 'picker' {
-  if (!hasPersistedPauseSessionPayload(restored)) return 'picker';
-  if (restored.ritualDepth === 'brief' || restored.ritualDepth === 'deep') return restored.ritualDepth;
-  if (restored.moodDone || restored.phase === 'done' || restored.step !== 'feel') return 'deep';
-  return 'picker';
-}
 
 /**
  * Initial brief sub-step when hydrating `/pause` from local storage.
