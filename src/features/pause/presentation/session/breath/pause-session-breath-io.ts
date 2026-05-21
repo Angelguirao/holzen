@@ -23,7 +23,7 @@ export {
   resolvePauseBreathSecondLabelVariant,
   viteWantsPauseBreathSecondLabelShift,
   type PauseBreathSecondLabelVariant,
-} from '@/features/pause/application/use-cases/ritual/breathe/breath-second-label-variant';
+} from '@/features/pause/domain/ritual/breathe/breath-second-label-variant';
 
 import { invalidateCompanionUiCompletionQuery } from '@/features/pause/application/queries/companion-ui-completion-query-key';
 import {
