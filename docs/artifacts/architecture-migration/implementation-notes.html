@@ -5663,4 +5663,23 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — companion feedback vote write via public-rpc (backlog #4)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>Presentation conductor uses wired analytics facade</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code>) was already complete on <code>cursor/arch-migrate-src-ca70</code> (prior push: <code>pause-shift-frame-hub-flow</code> → <code>ritual/feel/</code>). Continue backlog #4: <code>useCompanionFeedbackVote</code> writes via <code>logPauseCompanionFeedbackVote</code> on <code>public-rpc.ts</code>; <code>companion-feedback-vote-query</code> keeps read/query keys only.</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior parity; removed duplicate <code>logCompanionFeedbackVote</code> export from <code>public-queries</code> (writes belong on <code>public-rpc</code>, reads on <code>public-queries</code>).</dd>
+      <dt>Tradeoffs</dt>
+      <dd><code>pwa-install-analytics</code> and <code>companion-fullview-analytics</code> query modules still delegate via use cases + <code>public-ports</code> until a follow-up peel.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: route <code>logPwaInstallAnalyticsEvent</code> / <code>logDevModeSetting</code> screen paths through <code>public-rpc</code> only, or audit remaining <code>PauseRepository</code> stragglers.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
