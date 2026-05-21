@@ -8304,4 +8304,23 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — pending-offer mutations via public-rpc (backlog #4)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>use-pending-pause-offer-mutations → adopt/decline facades</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>ritual/reflect/</code>) is complete. Continue backlog #4: pending-offer adopt/decline conductor calls <code>adoptPendingPauseOffer</code> and <code>declinePendingPauseOffer</code> from <code>public-rpc.ts</code> instead of use cases + <code>supabasePauseRepository</code> from <code>public-ports</code>. PostHog telemetry stays on direct application import (no repository I/O).</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior parity; import surface only.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Home bulk-hold, open-pause preview dismiss, and archive retrospective still inject <code>public-ports</code> until peeled.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: <code>use-archive-pause-retrospective-outcome</code> → <code>logRetrospectiveOutcome</code>, or home open-pause dismiss → <code>pauseDismissCurrent</code>.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
