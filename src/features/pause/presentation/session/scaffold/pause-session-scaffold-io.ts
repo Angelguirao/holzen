@@ -1,6 +1,6 @@
 /**
  * Presentation I/O for `/pause` session scaffold (persist snapshot, storage ritual sync, derived VM).
- * Scaffold conductors import here instead of deep `application/use-cases/session/*`.
+ * Imports session scaffold use cases directly instead of `pause-session-scaffold-flow` CI anchor.
  */
 export {
   buildPauseSessionPersistSnapshot,
