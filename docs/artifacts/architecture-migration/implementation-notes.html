@@ -6366,4 +6366,23 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — breath segment RPC loggers via public-rpc (backlog #4)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>Peel use-pause-breath-segment-rpc-loggers from public-ports</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>ritual/reflect/</code>) is complete — no folder move. <code>use-pause-breath-segment-rpc-loggers</code> calls wired <code>ensureBreathSegment*</code> / <code>logBreathSegment*Skipped</code> on <code>public-rpc</code> instead of use cases + <code>supabasePauseRepository</code> from <code>public-ports</code>; test mocks <code>public-rpc</code> while delegating to use cases with stub <code>PauseRepository</code>.</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior parity.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Pending-offer mutations and archive retrospective outcome still use <code>public-ports</code> until peeled.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: peel <code>use-pending-pause-offer-mutations</code> or <code>use-archive-pause-retrospective-outcome</code> through <code>public-rpc</code>.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
