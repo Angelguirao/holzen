@@ -6461,4 +6461,23 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — presentation port peels via public-rpc (backlog #4)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>Remove last public-ports imports from pause presentation</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>ritual/reflect/</code>) is complete — no folder move. Wire <code>use-companion-ui-completion</code>, <code>use-archive-pause-retrospective-outcome</code>, <code>use-companion-feedback-vote</code>, and <code>use-fullview-telemetry</code> through existing <code>public-rpc</code> facades (<code>persistCompanionUiStepCompletion</code>, <code>logRetrospectiveOutcome</code>, <code>logPauseCompanionFeedbackVote</code>, <code>logPauseCompanionFullviewOpened</code>) instead of use cases + <code>supabasePauseRepository</code> / <code>supabasePauseAnalyticsRepository</code> from <code>public-ports</code>. Companion UI completion hook drops duplicate query invalidation — the facade already invalidates.</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior parity.</dd>
+      <dt>Tradeoffs</dt>
+      <dd><code>public-ports</code> remains for infrastructure query adapters only; presentation has zero <code>public-ports</code> imports.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: peel reflect mood conductors that still import <code>application/</code> paths, or companion orchestrate hooks through <code>public-rpc</code> re-exports.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
