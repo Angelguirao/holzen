@@ -5872,4 +5872,23 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — archive retrospective outcome via PauseRepository (backlog #4)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>Peel retrospective outcome_logged from public-rpc in presentation</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>ritual/reflect/</code>) is complete on <code>cursor/arch-migrate-src-ca70</code>. Wire <code>use-archive-pause-retrospective-outcome</code> through <code>logRetrospectiveOutcome</code> + <code>supabasePauseRepository</code> from <code>public-ports.ts</code>; <code>logRetrospectiveOutcome</code> facade on <code>public-rpc</code> unchanged for cross-context callers.</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior parity; no dedicated hook test (toast + invalidate flow unchanged).</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Companion UI completion, home triggers, and reflect generation still import <code>public-rpc</code> until peeled slice-by-slice.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: peel <code>persistCompanionUiStepCompletion</code> in <code>use-companion-ui-completion</code> or port-backed companion feedback vote read.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
