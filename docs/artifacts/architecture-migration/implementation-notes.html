@@ -59,6 +59,25 @@
   <article class="note">
     <header>
       <span>2026-05-21</span>
+      <span>Phase A slice — reflect flows presentation I/O (backlog #1 follow-up)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3><code>pause-reflect-flows-io</code> for reflect+decide conductor</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 folder move is complete. Re-export preflight/post-generation helpers from <code>presentation/reflect/flows/pause-reflect-session-flow-io.ts</code> (no <code>public-rpc</code> — keeps unit tests free of Supabase init) so <code>use-pause-session-reflect-and-decide</code> does not import <code>application/</code> directly. RPC outcome log stays on <code>pause-reflect-flows-io.ts</code>.</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior parity; pure flow helpers stay in <code>application/use-cases/ritual/reflect/flows/pause-session-reflect-and-decide-flow.ts</code>.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Thin re-export only — no RPC port on preflight/post-generation path.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: peel <code>use-companion-library-favorites</code> through orchestration I/O; or bind <code>use-pause-session-decide-handler</code> decide-cluster imports through flows-io.</dd>
+    </dl>
+  </article>
+
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
       <span>Phase A slice — companion UI completion presentation I/O</span>
       <span class="status resolved">resolved</span>
     </header>
