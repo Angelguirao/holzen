@@ -5948,4 +5948,23 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — peel companion UI completion through PauseRepository (backlog #4)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>Backlog #1 complete; frame reflect-strip completion on port</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd><code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code> is complete on <code>cursor/arch-migrate-src-ca70</code> — no folder move this slice. <code>use-companion-ui-completion</code> calls <code>persistCompanionUiStepCompletion</code> with <code>supabasePauseRepository</code> from <code>public-ports.ts</code> and invalidates via <code>companion-ui-completion-query-key</code>; <code>persistCompanionUiStepCompletion</code> facade on <code>public-rpc</code> unchanged for cross-context callers.</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior parity; no dedicated hook test (optimistic cache + RPC persist unchanged).</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Companion feedback vote, home triggers, and pending-offer hooks still import <code>public-rpc</code> until peeled slice-by-slice.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: port-backed companion feedback vote read in <code>use-companion-feedback-vote</code>, or peel home <code>openManualPauseFromHome</code> / pending-offer presentation imports.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
