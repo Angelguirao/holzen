@@ -1,15 +1,7 @@
-import type { FeelStepTile, RitualDepth } from '@/features/pause/domain/ritual-types';
+import type { RitualDepth } from '@/features/pause/domain/ritual-types';
 
 export function isBriefRitualEntry(ritualEntry: RitualDepth | 'picker'): ritualEntry is 'brief' {
   return ritualEntry === 'brief';
-}
-
-/** Options for `initial_emotion_logged` when the Feel tiles row fires. */
-export function buildFeelTilesMoodLogOptions(
-  isBriefRitual: boolean,
-  tile: FeelStepTile,
-): { briefRitual?: boolean; briefFace: FeelStepTile } {
-  return isBriefRitual ? { briefRitual: true, briefFace: tile } : { briefFace: tile };
 }
 
 /** Pro gate for depth picker → deep ritual; returns whether deep entry ran. */

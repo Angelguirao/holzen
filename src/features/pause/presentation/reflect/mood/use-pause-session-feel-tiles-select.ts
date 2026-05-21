@@ -1,5 +1,5 @@
 import { useCallback } from 'react';
-import { buildFeelTilesMoodLogOptions } from '@/features/pause/domain/reflect/mood/pause-session-mood-chrome-flow';
+import { buildFeelTilesMoodLogOptions } from '@/features/pause/application/use-cases/ritual/reflect/mood/build-feel-tiles-mood-log-options';
 import type { FeelStepTile } from '@/features/pause/domain/feel-step-tile';
 import type { MoodValue } from '@/features/pause/domain/mood-value';
 
