@@ -84,13 +84,13 @@
     <h3><code>pauseDismissOpenPauseHomePreview</code> on <code>pause-home-reflect-io</code></h3>
     <dl>
       <dt>Design decision</dt>
-      <dd>Backlog #1 (<code>ritual/reflect/</code>) remains complete. Follow-up to <code>pauseHomeManualOpenPorts</code> on reflect I/O: move <code>pauseDismissOpenPauseHomePreview</code> off aggregate <code>pause-home-io</code>; <code>use-open-pause-home-preview</code> imports reflect cluster directly. <code>pause-home-io.ts</code> is re-exports only.</dd>
+      <dd>Backlog #1 (<code>ritual/reflect/generation/manual-open/</code>) remains complete. Move <code>pauseDismissOpenPauseHomePreview</code> off aggregate <code>pause-home-io</code>; <code>use-open-pause-home-preview</code> imports reflect cluster directly. Production dismiss binds via <code>dismissOpenPauseHome</code> + <code>pauseHomeManualOpenPorts.repository</code> (not <code>pauseDismissCurrent()</code> facade). <code>pause-home-io.ts</code> is re-exports only.</dd>
       <dt>Deviation</dt>
-      <dd>None — behavior parity; import boundary only.</dd>
+      <dd>None — behavior parity; import boundary + repository port wiring.</dd>
       <dt>Tradeoffs</dt>
       <dd>Aggregate barrel and <code>pause-home-io.test.ts</code> still smoke-test re-exports.</dd>
       <dt>Open questions</dt>
-      <dd>Superseded by manual-open flow anchor slice for import consolidation; dismiss facade unchanged.</dd>
+      <dd>Superseded by manual-open flow anchor slice for import consolidation; dismiss facade uses <code>dismissOpenPauseHome</code> + repository port.</dd>
     </dl>
   </article>
 
