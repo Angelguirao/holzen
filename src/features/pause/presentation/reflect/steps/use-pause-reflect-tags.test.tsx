@@ -55,5 +55,6 @@ describe('usePauseReflectTags', () => {
       pauseInstanceId: 'pause-1',
       tags: ['calm'],
     });
+    expect(mockPauseRepository.port).toBe('supabasePauseRepository');
   });
 });

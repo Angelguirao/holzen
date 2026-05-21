@@ -56,5 +56,6 @@ describe('usePauseReflectNote', () => {
         text: 'steady breath',
       });
     });
+    expect(mockPauseRepository.port).toBe('supabasePauseRepository');
   });
 });

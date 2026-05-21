@@ -91,6 +91,7 @@ describe('usePauseFavoriteToggle', () => {
       pauseInstanceId: 'pi-1',
       isFavorite: false,
     });
+    expect(mockPauseRepository.port).toBe('supabasePauseRepository');
     expect(showPauseFavoriteProHintToast).toHaveBeenCalledWith(t);
     expect(invalidateQueriesMock).toHaveBeenCalledWith({
       queryKey: archiveListPrefix('archive-user-1'),
