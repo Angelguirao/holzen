@@ -49,7 +49,8 @@ export async function runReflectGeneration(
       profile: input.profile,
       signal: input.signal,
     });
-    const { message } = await ports.generateReflection(edgeInput);
+    const recencyHints = await ports.loadRecencyHints();
+    const { message } = await ports.generateReflection(edgeInput, recencyHints);
     return { status: 'generated', message };
   } catch (e: unknown) {
     if (isAbortLikeReflectError(e) || input.signal.aborted) {
