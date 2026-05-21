@@ -1,9 +1,7 @@
 import { useRef, type Dispatch, type SetStateAction } from 'react';
 import type { TFunction } from 'i18next';
 import type { BtcPriceData } from '@/features/market/public';
-import { isPauseReflectGenerationEnabled } from '@/features/pause/domain/reflect/generation/reflect-generation-enabled';
-import { resolveEffectiveReflectionMessage } from '@/features/pause/domain/reflect/generation/resolve-effective-reflection-message';
-import { resolveReflectGenerationSeverityAbsPct } from '@/features/pause/domain/reflect/generation/reflect-generation-severity-abs-pct';
+import { buildPauseSessionReflectAndDecideView } from '@/features/pause/application/use-cases/ritual/reflect/flows/pause-session-reflect-and-decide-view';
 import type { PauseImpactData } from '@/features/pause/public-hooks';
 import type { MoodValue } from '@/features/pause/domain/mood-value';
 import type { PauseStep } from '@/features/pause/domain/pause-ritual-steps';
@@ -58,7 +56,13 @@ export function usePauseSessionReflectAndDecide({
   shiftIntensity,
 }: UsePauseSessionReflectAndDecideParams) {
   const decidingRef = useRef(false);
-  const reflectGenEnabled = isPauseReflectGenerationEnabled(ritualEntry, step);
+  const { reflectGenEnabled, severityAbsPct } = buildPauseSessionReflectAndDecideView({
+    ritualEntry,
+    step,
+    seedMessage: message,
+    generatedReflectionMessage: message,
+    btcData,
+  });
 
   const {
     reflectionMessage: generatedReflectionMessage,
@@ -69,14 +73,17 @@ export function usePauseSessionReflectAndDecide({
     pauseInstanceId,
     context,
     initialReflectionMessage: message,
-    severityAbsPct: resolveReflectGenerationSeverityAbsPct(btcData?.changePercent),
+    severityAbsPct,
     enabled: reflectGenEnabled,
   });
 
-  const effectiveReflectionMessage = resolveEffectiveReflectionMessage(
+  const { effectiveReflectionMessage } = buildPauseSessionReflectAndDecideView({
+    ritualEntry,
+    step,
+    seedMessage: message,
     generatedReflectionMessage,
-    message,
-  );
+    btcData,
+  });
 
   const { handleDecide } = usePauseSessionDecideHandler({
     decidingRef,

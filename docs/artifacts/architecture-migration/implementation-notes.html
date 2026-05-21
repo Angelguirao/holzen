@@ -7316,4 +7316,23 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — reflect flows view helper (backlog #1)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3><code>buildPauseSessionReflectAndDecideView</code> under <code>ritual/reflect/flows/</code></h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 folder move was already complete; the session reflect/decide conductor still inlined domain gates. Extract <code>buildPauseSessionReflectAndDecideView</code> (+ test) to <code>application/use-cases/ritual/reflect/flows/</code>; <code>use-pause-session-reflect-and-decide</code> calls it for generation enablement/severity before the holzen-reflect hook and again for effective copy after generation state updates.</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior parity.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Two calls to the pure helper (pre/post generation) keep hook order unchanged without splitting the builder API.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: backlog #4 stray <code>PauseRepository</code> call sites or peel <code>use-open-pause-home-preview</code> off <code>public-rpc</code>.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
