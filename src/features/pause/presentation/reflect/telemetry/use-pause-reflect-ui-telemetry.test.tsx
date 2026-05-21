@@ -12,14 +12,11 @@ const {
   trackPauseReflectWallpaperTapMock: vi.fn(),
 }));
 
-vi.mock(
-  '@/features/pause/application/use-cases/ritual/reflect/telemetry/pause-reflect-ui-telemetry',
-  () => ({
-    trackPauseReflectPostItOpen: trackPauseReflectPostItOpenMock,
-    trackPauseReflectShareTap: trackPauseReflectShareTapMock,
-    trackPauseReflectWallpaperTap: trackPauseReflectWallpaperTapMock,
-  }),
-);
+vi.mock('./pause-reflect-telemetry-io', () => ({
+  trackPauseReflectPostItOpen: trackPauseReflectPostItOpenMock,
+  trackPauseReflectShareTap: trackPauseReflectShareTapMock,
+  trackPauseReflectWallpaperTap: trackPauseReflectWallpaperTapMock,
+}));
 
 beforeEach(() => {
   trackPauseReflectPostItOpenMock.mockReset();

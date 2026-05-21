@@ -58,6 +58,25 @@
 
   <article class="note">
     <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — reflect telemetry presentation I/O (backlog #1 follow-up)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3><code>pause-reflect-telemetry-io</code> beside <code>use-pause-reflect-ui-telemetry</code></h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code>) is complete — no folder move. Align the reflect telemetry conductor with other reflect presentation clusters (generation/mood/hub/steps): hook imports PostHog trackers via <code>presentation/reflect/telemetry/pause-reflect-telemetry-io.ts</code> instead of deep <code>application/</code> paths.</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior parity; trackers remain in <code>application/use-cases/ritual/reflect/telemetry/</code>.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Thin re-export only (no port binding — analytics is not RPC). Keeps <code>check:feature-imports</code> presentation→application boundary explicit in one file per cluster.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: peel <code>use-companion-ui-completion</code> through <code>pause-companion-orchestration-io</code> only, or Phase B cross-context slice.</dd>
+    </dl>
+  </article>
+
+  <article class="note">
+    <header>
       <span>2026-05-20</span>
       <span>Spec §3, §10 (transitional)</span>
       <span class="status resolved">resolved</span>
