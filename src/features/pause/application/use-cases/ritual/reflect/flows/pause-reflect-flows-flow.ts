@@ -1,7 +1,7 @@
 /**
  * CI cluster anchor for ritual reflect+decide flows presentation I/O (§3 / check:architecture-alignment).
- * Re-exports reflect preflight/post-generation and decide outcome helpers for a single presentation import surface.
- * Presentation: `pause-reflect-flows-io.ts` imports through this anchor.
+ * Re-exports reflect preflight/post-generation and decide outcome helpers for application-layer imports.
+ * Presentation: `pause-reflect-flows-io.ts` imports sibling decide + reflect flow modules directly.
  */
 export {
   resolvePauseSessionReflectAndDecideAfterGeneration,
