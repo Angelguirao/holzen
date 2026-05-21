@@ -103,3 +103,9 @@ export {
   initialSelectedBriefFaceFromRestored,
   mapPersistedStep,
 } from './application/use-cases/session/step-map';
+export { getSessionQuote, type WisdomQuote } from './application/use-cases/ritual/decide/wisdom-quotes';
+export {
+  formatReinforcementQuoteFromSession,
+  resolvePauseDecideOutcomeFlow,
+  type PauseDecideOutcomeFlow,
+} from './application/use-cases/ritual/decide/pause-decide-outcome-flow';

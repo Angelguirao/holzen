@@ -4,11 +4,13 @@ import { useAuth } from '@/features/auth/public';
 import {
   formatReinforcementQuoteFromSession,
   getSessionQuote,
-  logPauseOutcome,
   resolvePauseDecideOutcomeFlow,
+} from '@/features/pause/public-session';
+import {
+  clearSession,
+  logPauseOutcome,
   showPauseOutcomeNotCompletedToast,
   showPauseOutcomeSaveFailedToast,
-  clearSession,
 } from '@/features/pause/public-rpc';
 import { invalidatePauseStatsDataForUser } from '@/features/pause/public-queries';
 import type { UsePauseSessionDecideHandlerParams } from './pause-session-decide-handler-types';

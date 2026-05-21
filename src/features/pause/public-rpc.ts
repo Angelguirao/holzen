@@ -313,12 +313,6 @@ export function logRetrospectiveOutcome(params: {
   return logRetrospectiveOutcomeUseCase(supabasePauseRepository, params);
 }
 
-export { getSessionQuote } from './application/use-cases/ritual/decide/wisdom-quotes';
-export {
-  formatReinforcementQuoteFromSession,
-  resolvePauseDecideOutcomeFlow,
-  type PauseDecideOutcomeFlow,
-} from './application/use-cases/ritual/decide/pause-decide-outcome-flow';
 export {
   showPauseOutcomeNotCompletedToast,
   showPauseOutcomeSaveFailedToast,

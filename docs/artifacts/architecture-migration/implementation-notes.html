@@ -10337,4 +10337,23 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — decide handler pure helpers on public-session (backlog #1 verified, #3/#4)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>ritual/reflect/ complete; split decide conductor RPC vs pure session barrel</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 verified — zero <code>application/use-cases/reflect/</code> paths. After <code>wisdom-quotes</code> colocation under <code>ritual/decide/</code>, export decide flow + quote helpers on <code>public-session.ts</code>; conductor imports pure helpers from session barrel and mutations/toasts from <code>public-rpc</code>. Unit test mocks <code>public-rpc</code> only.</dd>
+      <dt>Deviation</dt>
+      <dd>None — decide flow mapping and outcome RPC behavior unchanged.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Removed pure decide re-exports from <code>public-rpc</code> so tests avoid loading Supabase client.</dd>
+      <dt>Open questions</dt>
+      <dd>Next backlog #4: remaining <code>PauseRepository</code> stray call-site audit; optional ritual-pattern cluster on <code>public-session</code>.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
