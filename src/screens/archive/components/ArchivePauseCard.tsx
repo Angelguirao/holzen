@@ -6,7 +6,7 @@ import { cn } from '@/lib/utils';
 import {
   pauseArchiveRowAllowsRetrospectiveOutcome,
   type PauseArchiveRow,
-} from '@/features/pause/public-hooks';
+} from '@/features/pause/public-queries';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import { Button } from '@/components/ui/button';
 import { ArchivePauseRetrospectiveOutcomeSheet } from '@/screens/archive/components/ArchivePauseRetrospectiveOutcomeSheet';
