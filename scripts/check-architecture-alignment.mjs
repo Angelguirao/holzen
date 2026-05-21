@@ -317,6 +317,7 @@ const PAUSE_ANALYTICS_REPOSITORY_IMPORT_NEEDLES = [
 
 const PAUSE_PERSISTED_SESSION_STORAGE_ALLOWLIST = new Set([
   'src/features/pause/infrastructure/session/persisted-session-storage.ts',
+  'src/features/pause/infrastructure/persisted-tab-session-storage-adapter.ts',
   'src/features/pause/public-session.ts',
 ]);
 const PAUSE_PERSISTED_SESSION_STORAGE_IMPORT_NEEDLES = [
@@ -412,17 +413,11 @@ for (const file of walkTs(join(root, 'src'))) {
       }
     }
   }
-  const pausePresentationMayImportPersistedSessionStorage = rel.startsWith(
-    'src/features/pause/presentation/',
-  );
-  if (
-    !PAUSE_PERSISTED_SESSION_STORAGE_ALLOWLIST.has(rel) &&
-    !pausePresentationMayImportPersistedSessionStorage
-  ) {
+  if (!PAUSE_PERSISTED_SESSION_STORAGE_ALLOWLIST.has(rel)) {
     for (const needle of PAUSE_PERSISTED_SESSION_STORAGE_IMPORT_NEEDLES) {
       if (text.includes(needle)) {
         failures.push(
-          `${rel}: direct persisted-session-storage import (${needle}) — use public-session (presentation may import infrastructure/session/persisted-session-storage directly)`,
+          `${rel}: direct persisted-session-storage import (${needle}) — use application/use-cases/session/persisted-tab-session or public-session`,
         );
         break;
       }

@@ -11,7 +11,8 @@ import {
   resolvePauseDecideOutcomeFlow,
 } from '@/features/pause/application/use-cases/ritual/decide/pause-decide-outcome-flow';
 import { getSessionQuote } from '@/features/pause/application/use-cases/ritual/decide/wisdom-quotes';
-import { clearSession } from '@/features/pause/infrastructure/session/persisted-session-storage';
+import { clearPersistedTabSession } from '@/features/pause/application/use-cases/session/persisted-tab-session';
+import { persistedTabSessionStorage } from '@/features/pause/public-rpc';
 import { supabasePauseRepository } from '@/features/pause/public-rpc';
 import { invalidatePauseStatsDataForUser } from '@/features/pause/public-queries';
 import type { UsePauseSessionDecideHandlerParams } from './pause-session-decide-handler-types';
@@ -97,7 +98,7 @@ export function usePauseSessionDecideHandler(
         setPhase('done');
         await dismissMessage();
         hapticFeedback('success');
-        clearSession();
+        clearPersistedTabSession(persistedTabSessionStorage);
       } finally {
         decidingRef.current = false;
       }

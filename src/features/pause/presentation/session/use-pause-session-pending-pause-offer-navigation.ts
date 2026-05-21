@@ -1,6 +1,7 @@
 import { useCallback } from 'react';
 import type { NavigateFunction } from 'react-router-dom';
-import { clearSession } from '@/features/pause/infrastructure/session/persisted-session-storage';
+import { clearPersistedTabSession } from '@/features/pause/application/use-cases/session/persisted-tab-session';
+import { persistedTabSessionStorage } from '@/features/pause/public-rpc';
 
 /** After adopt on `/pause`: resync Holzen + hard navigation to the new instance (`PauseLeaveWithPendingSheet`). */
 export function usePauseSessionPendingPauseOfferNavigation(input: {
@@ -18,7 +19,7 @@ export function usePauseSessionPendingPauseOfferNavigation(input: {
 
   const navigateAfterAdopt = useCallback(
     (instanceId: string) => {
-      clearSession();
+      clearPersistedTabSession(persistedTabSessionStorage);
       navigate('/pause', { state: { pauseInstanceId: instanceId }, replace: true });
     },
     [navigate],

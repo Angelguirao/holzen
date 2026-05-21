@@ -21,13 +21,16 @@ const {
   mockReflectGenerator: { port: 'supabaseReflectGenerator' },
 }));
 
-vi.mock('@/features/pause/infrastructure/session/persisted-session-storage', () => ({
-  clearSession: clearSessionMock,
-}));
-
 vi.mock('@/features/pause/public-rpc', () => ({
+  persistedTabSessionStorage: { load: vi.fn(), save: vi.fn(), clear: vi.fn() },
   supabasePauseRepository: mockPauseRepository,
   supabaseReflectGenerator: mockReflectGenerator,
+}));
+
+vi.mock('@/features/pause/application/use-cases/session/persisted-tab-session', () => ({
+  clearPersistedTabSession: () => clearSessionMock(),
+  loadPersistedTabSession: () => null,
+  savePersistedTabSession: vi.fn(),
 }));
 
 vi.mock('@/features/pause/application/use-cases/trigger/open-manual-pause-from-home', () => ({

@@ -4,8 +4,14 @@ import { usePauseSessionPendingPauseOfferNavigation } from './use-pause-session-
 
 const clearSessionMock = vi.fn();
 
-vi.mock('@/features/pause/infrastructure/session/persisted-session-storage', () => ({
-  clearSession: (...args: unknown[]) => clearSessionMock(...args),
+vi.mock('@/features/pause/public-rpc', () => ({
+  persistedTabSessionStorage: { load: vi.fn(), save: vi.fn(), clear: vi.fn() },
+}));
+
+vi.mock('@/features/pause/application/use-cases/session/persisted-tab-session', () => ({
+  clearPersistedTabSession: () => clearSessionMock(),
+  loadPersistedTabSession: () => null,
+  savePersistedTabSession: vi.fn(),
 }));
 
 describe('usePauseSessionPendingPauseOfferNavigation', () => {

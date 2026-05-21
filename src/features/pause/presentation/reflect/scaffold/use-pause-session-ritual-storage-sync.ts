@@ -1,6 +1,7 @@
 import { useEffect, type Dispatch, type SetStateAction } from 'react';
 import { computePauseStorageRitualSyncPatch } from '@/features/pause/application/use-cases/ritual/reflect/scaffold/storage-ritual-sync';
-import { loadSession } from '@/features/pause/infrastructure/session/persisted-session-storage';
+import { loadPersistedTabSession } from '@/features/pause/application/use-cases/session/persisted-tab-session';
+import { persistedTabSessionStorage } from '@/features/pause/public-rpc';
 import type { BriefPauseStep, RitualDepth } from '@/features/pause/domain/ritual-types';
 import type { FeelStepTile } from '@/features/pause/domain/feel-step-tile';
 
@@ -18,7 +19,10 @@ export function usePauseSessionRitualStorageSync(input: {
 
   useEffect(() => {
     if (!pauseInstanceId) return;
-    const patch = computePauseStorageRitualSyncPatch(pauseInstanceId, loadSession());
+    const patch = computePauseStorageRitualSyncPatch(
+      pauseInstanceId,
+      loadPersistedTabSession(persistedTabSessionStorage),
+    );
     if (!patch) return;
     setRitualEntry(patch.ritualEntry);
     if (patch.briefStep !== undefined) setBriefStep(patch.briefStep);

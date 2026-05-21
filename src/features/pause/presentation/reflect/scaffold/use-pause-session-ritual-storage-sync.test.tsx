@@ -7,10 +7,14 @@ const { loadSessionMock } = vi.hoisted(() => ({
   loadSessionMock: vi.fn(),
 }));
 
-vi.mock('@/features/pause/infrastructure/session/persisted-session-storage', () => ({
-  clearSession: vi.fn(),
-  loadSession: () => loadSessionMock(),
-  saveSession: vi.fn(),
+vi.mock('@/features/pause/public-rpc', () => ({
+  persistedTabSessionStorage: { load: vi.fn(), save: vi.fn(), clear: vi.fn() },
+}));
+
+vi.mock('@/features/pause/application/use-cases/session/persisted-tab-session', () => ({
+  clearPersistedTabSession: vi.fn(),
+  loadPersistedTabSession: () => loadSessionMock(),
+  savePersistedTabSession: vi.fn(),
 }));
 
 const companions = { haiku: null, groundingTitle: null, groundingBody: null } as const;

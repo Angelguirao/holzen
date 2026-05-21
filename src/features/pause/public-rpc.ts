@@ -19,12 +19,14 @@ import { supabasePauseRepository } from './infrastructure/supabase-pause-reposit
 import { supabaseCompanionOrchestrator } from './infrastructure/supabase-companion-orchestrator';
 import { supabaseReflectGenerator } from './infrastructure/supabase-reflect-generator';
 import { reflectionStepSessionStorage } from './infrastructure/edge/reflect/reflection-step-session-storage';
+import { persistedTabSessionStorage } from './infrastructure/persisted-tab-session-storage-adapter';
 export {
   supabasePauseRepository,
   supabaseCompanionOrchestrator,
   supabasePauseAnalyticsRepository,
   supabaseReflectGenerator,
   reflectionStepSessionStorage,
+  persistedTabSessionStorage,
 };
 export {
   invokeGroundingEnrich,
