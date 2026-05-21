@@ -7,7 +7,7 @@
 import {
   resumePauseAudioContext,
   runPauseRitualAudioWhenReady,
-} from './pause-ritual-audio-context';
+} from '@/features/pause/domain/ritual/breathe/pause-ritual-audio-context';
 
 export { resumePauseAudioContext };
 
