@@ -2,15 +2,9 @@ import { describe, expect, it, vi } from 'vitest';
 
 const logPauseRitualDepthUpgradedMock = vi.hoisted(() => vi.fn());
 
-vi.mock('@/features/pause/application/use-cases/session/pause-session-brief-flow', async (importOriginal) => {
-  const actual = await importOriginal<
-    typeof import('@/features/pause/application/use-cases/session/pause-session-brief-flow')
-  >();
-  return {
-    ...actual,
-    logPauseRitualDepthUpgraded: logPauseRitualDepthUpgradedMock,
-  };
-});
+vi.mock('@/features/pause/application/use-cases/ritual/brief/ritual-depth-upgrade', () => ({
+  logPauseRitualDepthUpgraded: logPauseRitualDepthUpgradedMock,
+}));
 
 vi.mock('@/features/pause/public-rpc', () => ({
   supabasePauseRepository: { port: 'briefRepository' },
