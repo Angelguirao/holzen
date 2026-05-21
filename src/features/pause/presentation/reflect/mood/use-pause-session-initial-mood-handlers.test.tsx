@@ -161,6 +161,43 @@ describe('usePauseSessionInitialMoodHandlers', () => {
     expect(lastFeelLogKeyRef.current).toBeNull();
   });
 
+  it('routes initial emotion RPC through the default PauseRepository port adapter', async () => {
+    runInitialEmotionSelectMock.mockResolvedValue({
+      status: 'synced',
+      logKey: CALM_LOG_KEY,
+      ui: {
+        moodDone: true,
+        selectedMood: 'calm',
+        feelIntensity: 3,
+        selectedBriefFace: null,
+      },
+    });
+
+    const lastFeelLogKeyRef: MutableRefObject<string | null> = { current: null };
+    const deps = stableMoodSetters();
+    const { result } = renderHook(() =>
+      usePauseSessionInitialMoodHandlers({
+        pauseInstanceId: 'pi-1',
+        t,
+        lastFeelLogKeyRef,
+        ...deps,
+      }),
+    );
+
+    await act(async () => {
+      await result.current.handleMoodSelect('calm', 3);
+    });
+
+    expect(runInitialEmotionSelectMock).toHaveBeenCalledWith(mockPauseRepository, {
+      pauseInstanceId: 'pi-1',
+      mood: 'calm',
+      intensity: 3,
+      opts: undefined,
+      lastFeelLogKey: null,
+    });
+    expect(mockPauseRepository.port).toBe('supabasePauseRepository');
+  });
+
   it('handleMoodReset clears dedupe ref and mood fields', () => {
     const lastFeelLogKeyRef: MutableRefObject<string | null> = { current: 'x' };
     const deps = stableMoodSetters();
