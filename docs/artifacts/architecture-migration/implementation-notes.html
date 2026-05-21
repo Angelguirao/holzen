@@ -16493,4 +16493,23 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — reflect steps gates via flow anchors (backlog #1 verified, Tier 5)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3><code>pause-reflect-steps-io</code> → favorite + reflection_step flow anchors</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>ritual/reflect/</code>) remains complete — no folder moves. Route <code>shouldShowFavoriteProHint</code> and <code>shouldLogPauseReflectionStep</code> through <code>pause-favorite-toggle-flow</code> and <code>pause-reflection-step-flow</code>; <code>pause-reflect-steps-io</code> no longer deep-imports <code>domain/reflect/steps/</code> for gates (RPC mutations already on <code>pause-reflect-steps-mutation-flow</code>).</dd>
+      <dt>Deviation</dt>
+      <dd>None — domain still owns pure gates; behavior parity.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Reflect flows I/O still binds <code>domain/reflect/flows/</code> and decide domain helpers directly — follow-up peel.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: reflect flows I/O anchor peel (preflight/post-generation + decide outcome flow), or Phase B cross-context Tier 1 shim.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
