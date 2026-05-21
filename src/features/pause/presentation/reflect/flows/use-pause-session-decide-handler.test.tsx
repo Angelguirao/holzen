@@ -19,14 +19,19 @@ const {
   showPauseOutcomeNotCompletedToast: vi.fn(),
 }));
 
-vi.mock('./pause-reflect-flows-io', () => ({
-  pauseReflectOutcomeLog: pauseReflectOutcomeLogMock,
+vi.mock('@/features/pause/public-rpc', () => ({
+  supabasePauseRepository: { port: 'reflectPauseRepository' },
 }));
 
-vi.mock('@/features/pause/application/use-cases/ritual/decide/outcome-toast', () => ({
-  showPauseOutcomeSaveFailedToast,
-  showPauseOutcomeNotCompletedToast,
-}));
+vi.mock('./pause-reflect-flows-io', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('./pause-reflect-flows-io')>();
+  return {
+    ...actual,
+    pauseReflectOutcomeLog: pauseReflectOutcomeLogMock,
+    showPauseOutcomeSaveFailedToast,
+    showPauseOutcomeNotCompletedToast,
+  };
+});
 
 vi.mock('@/features/pause/presentation/session/pause-persisted-tab-session-io', () => ({
   clearPausePersistedTabSession: () => clearSessionMock(),
