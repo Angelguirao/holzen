@@ -10147,4 +10147,23 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — breath second label on public-session (backlog #1 verified, #3)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>ritual/reflect/ complete; peel step-5 breath label variant onto session barrel</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 verified — zero <code>application/use-cases/reflect/</code> paths. Export <code>resolvePauseBreathSecondLabelVariant</code>, <code>viteWantsPauseBreathSecondLabelShift</code>, and <code>PauseBreathSecondLabelVariant</code> on <code>public-session.ts</code>; breath-second-label hook and scaffold/provider types import the barrel.</dd>
+      <dt>Deviation</dt>
+      <dd>None — PostHog flag + Vite override resolution unchanged.</dd>
+      <dt>Tradeoffs</dt>
+      <dd><code>use-pause-breathing-timed-loop</code> still imports <code>phase-advance</code>, <code>ritual-audio</code>, and <code>pause-breathing-phase</code> from application.</dd>
+      <dt>Open questions</dt>
+      <dd>Next backlog #3: breathe timed-loop cluster on <code>public-session</code> or a dedicated breathe barrel; backlog #4: optional <code>public-queries</code> wrappers for archive/realtime infrastructure imports.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
