@@ -1,7 +1,7 @@
 import { usePauseSessionProviders } from './use-pause-session-providers-conductor';
-import { usePauseSessionFlow } from './session/use-pause-session-flow';
-import type { PauseScaffoldChromeRegistry } from './session/pause-session-scaffold-vm-types';
-import type { PauseSessionProviders } from './session/pause-session-providers-types';
+import { usePauseSessionFlow } from './use-pause-session-flow';
+import type { PauseScaffoldChromeRegistry } from './pause-session-scaffold-vm-types';
+import type { PauseSessionProviders } from './pause-session-providers-types';
 import type { PauseSessionRitualSurfaceResult } from './use-pause-session-ritual-surface';
 
 /** View-model for `PauseSessionScreen` — subscription shell + ritual surface props. */

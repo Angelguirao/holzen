@@ -9,7 +9,7 @@ Authoritative orchestration: [`PauseSessionScreen.tsx`](../../src/screens/pause/
 
 | Piece                                        | File                                                                                              |
 | -------------------------------------------- | ------------------------------------------------------------------------------------------------- |
-| Route screen + conductor hook                | `[PauseSessionScreen.tsx](../../src/screens/pause/PauseSessionScreen.tsx)`, `[usePauseSessionScreen](../../src/features/pause/presentation/use-pause-session-screen.ts)` (export: `public-hooks`) |
+| Route screen + conductor hook                | `[PauseSessionScreen.tsx](../../src/screens/pause/PauseSessionScreen.tsx)`, `[usePauseSessionScreen](../../src/features/pause/presentation/session/use-pause-session-screen.ts)` (export: `public-hooks`) |
 | Gate (hydration / fetch / profile)           | `[PauseSessionGate.tsx](../../src/screens/pause/components/PauseSessionGate.tsx)`                         |
 | Gate body: picker vs scaffold slot           | `[PauseSessionGateContent.tsx](../../src/screens/pause/components/PauseSessionGateContent.tsx)`           |
 | Depth picker + About pauses sheet            | `[PauseSessionDepthPickerStack.tsx](../../src/screens/pause/components/PauseSessionDepthPickerStack.tsx)` |

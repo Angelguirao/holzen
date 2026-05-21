@@ -3360,7 +3360,26 @@
       <dt>Tradeoffs</dt>
       <dd>Generation, telemetry, and session reflect/decide conductors remain at <code>presentation/reflect/</code> root until later peels.</dd>
       <dt>Open questions</dt>
-      <dd>Next: colocate <code>use-pause-session-flow-core</code> + scaffold cluster under <code>presentation/session/</code>, or port-back <code>logDevModeSetting</code> (backlog #4).</dd>
+      <dd>Next: colocate screen conductor under <code>presentation/session/</code>, or port-back <code>logDevModeSetting</code> (backlog #4).</dd>
+    </dl>
+  </article>
+
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — colocate screen conductor under presentation/session/</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>Backlog #1 complete; Tier 4 session route conductor cluster</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd><code>application/use-cases/ritual/reflect/</code> migration is complete — no reflect use-case moves. Group <code>use-pause-session-screen</code>, ritual-surface merge, providers conductor + Holzen slice, depth/brief copy (+ test), and breath-second label variant under <code>presentation/session/</code> beside scaffold/flow; <code>public-hooks</code> re-export paths only.</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior-preserving <code>git mv</code>.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Cross-route hooks (<code>companion-snapshot</code>, <code>instances-realtime</code>, bulk-hold, journey list) remain flat under <code>presentation/</code>.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: port-back <code>logDevModeSetting</code> via <code>PauseAnalyticsRepository</code> (backlog #4), or colocate remaining flat session-adjacent hooks.</dd>
     </dl>
   </article>
 
