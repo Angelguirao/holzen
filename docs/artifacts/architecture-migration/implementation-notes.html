@@ -4542,6 +4542,25 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — reflect hook-flow + result type in domain/ (Tier 5)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>Peel prefetch/async guards and generation outcome union from ritual/reflect/generation/</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Move <code>resolveReflectGenerationPrefetch</code>, stale-run guards, and <code>messageFromReflectGenerationResult</code> to <code>domain/reflect-generation-hook-flow.ts</code>; extract <code>ReflectGenerationResult</code> to <code>domain/reflect-generation-result.ts</code> so domain does not import application. <code>run-reflect-generation</code> keeps a deprecated <code>RunReflectGenerationResult</code> alias; presentation hook imports domain.</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior parity.</dd>
+      <dt>Tradeoffs</dt>
+      <dd><code>run-reflect-generation</code> remains the I/O orchestration use case under <code>ritual/reflect/generation/</code>.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: wire remaining stray <code>PauseRepository</code> call sites (backlog #4).</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
 </body>
 </html>
