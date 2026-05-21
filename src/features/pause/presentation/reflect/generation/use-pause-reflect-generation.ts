@@ -11,6 +11,7 @@ import {
   shouldCommitReflectGeneration,
 } from '@/features/pause/domain/reflect/generation/reflect-generation-hook-flow';
 import { runPauseReflectGeneration } from '@/features/pause/public-rpc';
+import { usePauseArtifactReflectionText } from './use-pause-artifact-reflection-text';
 
 export type UsePauseReflectGenerationParams = {
   pauseInstanceId: string | null;
@@ -47,6 +48,13 @@ export function usePauseReflectGeneration({
   /** Aborts the in-flight `holzen-reflect` when superseded, `pauseInstanceId` changes, `enabled` turns false, or the effect cleans up. */
   const reflectGenAbortRef = useRef<AbortController | null>(null);
 
+  const navSeedEmpty = !initialReflectionMessage.trim();
+  const { artifactReflectionText } = usePauseArtifactReflectionText({
+    pauseInstanceId,
+    trigger: 'whenEnabled',
+    fetchEnabled: enabled && navSeedEmpty,
+  });
+
   useEffect(() => {
     reflectGenAbortRef.current?.abort();
     validityRef.current += 1;
@@ -56,6 +64,12 @@ export function usePauseReflectGeneration({
     setReflectionMessage(initialReflectionMessage);
     setError(null);
   }, [pauseInstanceId, initialReflectionMessage]);
+
+  /** Show persisted `reflection_text` while holzen-reflect runs (nav seed empty). */
+  useEffect(() => {
+    if (!enabled || !navSeedEmpty || !artifactReflectionText) return;
+    setReflectionMessage((prev) => (prev.trim() ? prev : artifactReflectionText));
+  }, [enabled, navSeedEmpty, artifactReflectionText]);
 
   const runGeneration = useCallback(async () => {
     const prefetch = resolveReflectGenerationPrefetch(
