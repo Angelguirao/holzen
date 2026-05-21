@@ -18586,19 +18586,19 @@
   <article class="note">
     <header>
       <span>2026-05-21</span>
-      <span>Phase A slice — reflect flows I/O direct decide + reflect flow modules (backlog #1 verified, Tier 5)</span>
+      <span>Phase A slice — reflect flows I/O direct domain + run-* (backlog #1 verified, Tier 5)</span>
       <span class="status resolved">resolved</span>
     </header>
-    <h3><code>pause-reflect-flows-io</code> off <code>pause-reflect-flows-flow</code> anchor</h3>
+    <h3><code>pause-reflect-flows-io</code> off decide/reflect flow anchors</h3>
     <dl>
       <dt>Design decision</dt>
-      <dd>Backlog #1 (<code>ritual/reflect/</code>) remains complete — no folder moves. Align flows presentation I/O with generation/steps/hub/share peels: preflight/post-generation via <code>pause-session-reflect-and-decide-flow</code>; decide mapping via <code>pause-decide-outcome-flow</code>; quotes via <code>wisdom-quotes</code>; Sonner toasts via <code>pause-decide-outcome-toast-flow</code>; <code>outcome_logged</code> RPC via <code>pause-decide-outcome-log-flow</code>. Keep <code>pause-reflect-flows-flow.ts</code> as CI cluster anchor only.</dd>
+      <dd>Backlog #1 (<code>ritual/reflect/</code>) remains complete — no folder moves. After peeling off unified <code>pause-reflect-flows-flow</code> (commit <code>c4bb3fe5d</code>), align flows presentation I/O with mood/steps/share: preflight/post-generation from <code>domain/reflect/flows/pause-session-reflect-and-decide-flow</code>; decide mapping from <code>domain/decide/pause-decide-outcome-flow</code>; quotes from <code>wisdom-quotes</code>; toasts from <code>outcome-toast</code>; <code>outcome_logged</code> RPC from <code>run-pause-outcome-log</code>. Keep <code>pause-reflect-flows-flow.ts</code> and decide flow modules as CI cluster anchors only.</dd>
       <dt>Deviation</dt>
-      <dd>Reverts route-through-flow on branch tip (commit <code>fa0f2b182</code>) — presentation I/O matches generation peel pattern.</dd>
+      <dd>None — behavior parity; import boundary only.</dd>
       <dt>Tradeoffs</dt>
-      <dd>Unit test already mocks <code>pause-decide-outcome-log-flow</code> directly (unchanged seam).</dd>
+      <dd>Unit test mocks <code>run-pause-outcome-log</code> directly (same seam as steps/hub I/O).</dd>
       <dt>Open questions</dt>
-      <dd>Next: companion orchestrate-io peel, or Phase B cross-context Tier 1 shim.</dd>
+      <dd>Next: <code>pause-companion-frame-ui-io</code> peel from <code>pause-companion-frame-ui-flow</code>, or Phase B cross-context Tier 1 shim (auth/subscription).</dd>
     </dl>
   </article>
 
