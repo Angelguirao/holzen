@@ -11043,6 +11043,7 @@
   <article class="note">
     <header>
       <span>2026-05-21</span>
+<<<<<<< HEAD
       <span>Phase A slice — reflect breath segment RPC loggers off public-rpc (backlog #1 verified, §6)</span>
       <span class="status resolved">resolved</span>
     </header>
@@ -11075,6 +11076,21 @@
       <dd>Tag, favorite, and <code>reflection_step</code> hooks still use <code>public-rpc</code> facades until peeled incrementally.</dd>
       <dt>Open questions</dt>
       <dd>Next: peel <code>use-pause-reflect-tags</code>, <code>use-pause-favorite-toggle</code>, or <code>use-pause-reflection-step-log</code> off <code>public-rpc</code>; bulk <code>pauseStepLayout</code> screen peel to <code>public-session</code>.</dd>
+=======
+      <span>Phase A slice — pauseStepLayout peel to public-session; done screens to public-ritual-done (§6)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>Ritual step chrome imports session barrel; feel types stay on reflect barrel</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>ritual/reflect/</code>) is complete. Continue §6: new <code>public-ritual-done.ts</code> for <code>usePauseBriefDoneCheckIn</code> and <code>resolveDoneWallpaperMood</code> (keeps <code>public-session</code> free of RPC-backed hooks so pure session tests do not load Supabase). All remaining pause ritual screens that imported <code>pauseStepLayout</code> from <code>public-hooks</code> now use <code>public-session</code>. Brief/deep ritual bodies and <code>PauseBreathing</code> import <code>FeelStepTile</code> from <code>public-ritual-reflect</code>.</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior unchanged.</dd>
+      <dt>Tradeoffs</dt>
+      <dd><code>public-hooks</code> still exports <code>pauseStepLayout</code> and done helpers for non-peeled call sites.</dd>
+      <dt>Open questions</dt>
+      <dd>Next backlog #4: presentation <code>PauseRepository</code> audit; peel more done-step screens off <code>public-hooks</code>.</dd>
+>>>>>>> 189e35d2 (refactor(pause): peel pauseStepLayout and done screens to ritual barrels)
     </dl>
   </article>
 

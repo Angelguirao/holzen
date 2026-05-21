@@ -1,6 +1,7 @@
 import { motion } from 'framer-motion';
 import { useTranslation } from 'react-i18next';
-import { pauseStepLayout } from '@/features/pause/public-hooks';
+import { resolveDoneWallpaperMood } from '@/features/pause/public-ritual-done';
+import { pauseStepLayout } from '@/features/pause/public-session';
 import { useSubscription } from '@/features/subscription/public-hooks';
 import { Button } from '@/components/ui/button';
 import { ScoreImpact } from '@/screens/pause/components/ScoreImpact';
@@ -8,8 +9,6 @@ import { PauseDoneDefaultReinforcementCard } from '@/screens/pause/components/pa
 import { PauseDoneDefaultStreakHero } from '@/screens/pause/components/pause-done-default-streak-hero';
 import { PauseDoneReflectShareRow } from '@/screens/pause/components/pause-done-reflect-share-row';
 import type { PauseDonePauseData } from '@/screens/pause/components/pause-done-types';
-import { resolveDoneWallpaperMood } from '@/features/pause/public-hooks';
-
 export type PauseDoneDefaultProps = {
   decision: string | null;
   onReturn: () => void;

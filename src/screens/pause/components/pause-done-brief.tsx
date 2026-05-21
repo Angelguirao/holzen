@@ -1,7 +1,7 @@
 import { motion } from 'framer-motion';
 import { useTranslation } from 'react-i18next';
-import { pauseStepLayout } from '@/features/pause/public-hooks';
-import { usePauseBriefDoneCheckIn } from '@/features/pause/public-hooks';
+import { usePauseBriefDoneCheckIn } from '@/features/pause/public-ritual-done';
+import { pauseStepLayout } from '@/features/pause/public-session';
 import { useSubscription } from '@/features/subscription/public-hooks';
 import { PauseDoneBriefCheckInPanel } from '@/screens/pause/components/pause-done-brief-check-in-panel';
 import { PauseDoneBriefJourneyCopy } from '@/screens/pause/components/pause-done-brief-journey-copy';
