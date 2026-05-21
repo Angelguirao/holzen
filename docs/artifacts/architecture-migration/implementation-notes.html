@@ -13434,4 +13434,23 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — peel breath helpers from public-session</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>Backlog #1 complete; §6 slim public-session follow-up</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd><code>ritual/reflect/</code> migration was already complete. After terminal-entry peeled, session breath conductors import <code>ritual/breathe/*</code> directly; <code>public-hooks</code> re-exports <code>computeBreathingPhaseAdvance</code> and <code>resumePauseAudioContext</code> for screens (<code>BreathingExercise</code>). <code>public-session</code> keeps layout, persisted guards, gate predicates, session I/O, and ritual step types only.</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior-preserving export peel only.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Depth-picker gate and waiting-for-instance predicate remain on <code>public-session</code> until a follow-up peel.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: peel depth-picker / instance-fetch gates when conductors import domain directly, or Phase B <code>src/lib/*</code> shims (subscription/auth).</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
