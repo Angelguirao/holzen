@@ -1,12 +1,12 @@
 import { runReflectionShareImage } from '@/features/pause/application/use-cases/ritual/reflect/share/run-reflection-share-image';
 import type { DeliverReflectionShareImageDeps } from '@/features/pause/application/use-cases/ritual/reflect/share/deliver-reflection-share-image';
 
+export { buildReflectionShareText } from '@/features/pause/domain/reflect/share/reflection-share-text';
 export {
-  buildReflectionShareText,
   buildReflectionShareTelegramUrl,
   buildReflectionShareTweetUrl,
   buildReflectionShareWhatsAppUrl,
-} from '@/features/pause/application/use-cases/ritual/reflect/share/pause-reflection-share-flow';
+} from '@/features/pause/domain/reflect/share/reflection-share-channel-urls';
 
 /** Branded PNG render + native share or download (browser APIs). */
 export function pauseReflectionShareImage(
