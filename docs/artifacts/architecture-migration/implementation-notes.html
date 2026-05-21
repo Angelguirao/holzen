@@ -9238,6 +9238,7 @@
   <article class="note">
     <header>
       <span>2026-05-21</span>
+<<<<<<< HEAD
       <span>Phase A slice — brief depth-upgrade outcome on public-rpc (#3, backlog #1 done)</span>
       <span class="status resolved">resolved</span>
     </header>
@@ -9251,6 +9252,21 @@
       <dd>Presentation still imports <code>briefSwitchToDeepPauseState</code> from <code>ritual/brief/</code> (pure navigation, not RPC).</dd>
       <dt>Open questions</dt>
       <dd>Next backlog #4: audit mutations bypassing <code>PauseRepository</code> outside <code>public-rpc</code> facades.</dd>
+=======
+      <span>Phase A slice — PauseSeverity via public-navigation (backlog #1 done, #3)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>Companion presentation stops importing session location-state directly</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>ritual/reflect/</code>) verified complete. <code>use-companion-section</code> and <code>use-companion-fullview-page</code> import <code>PauseSeverity</code> from <code>public-navigation</code> (already exports session router types) instead of <code>application/use-cases/session/location-state</code>.</dd>
+      <dt>Deviation</dt>
+      <dd>None — type-only import; behavior parity.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Feature-internal session hooks still import <code>location-state</code> directly — acceptable until a broader session-types peel.</dd>
+      <dt>Open questions</dt>
+      <dd>Next backlog #4: audit ritual mutations still calling <code>logPauseStep</code> outside <code>public-rpc</code> facades from presentation.</dd>
+>>>>>>> f06f60b8 (refactor(pause): companion hooks use public-navigation for PauseSeverity)
     </dl>
   </article>
 
