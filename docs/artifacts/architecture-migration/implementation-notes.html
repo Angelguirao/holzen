@@ -5093,4 +5093,23 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — session hydration uses reflection_text domain helper</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3><code>buildFetchedPauseInstanceFromFetch</code> → <code>reflectionTextMessageFromArtifactRows</code></h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>reflect/</code> → <code>ritual/reflect/</code>) and the prior <code>reflection_text</code> domain helper commit left one inline parser in session id-only hydration. Reuse <code>domain/reflect/generation/reflection-text-from-artifact-rows.ts</code> so preview, companion snapshot, artifact query, and <code>/pause</code> fetch mapping share trim/empty rules.</dd>
+      <dt>Deviation</dt>
+      <dd>Whitespace-only artifact messages now map to <code>''</code> (was <code>'   '</code>) — aligned with home preview and batch reads.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Did not refactor <code>load-reflect-recency-hints</code> (collects all messages, not first-only) in the same commit.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: backlog #4 <code>PauseRepository</code> stragglers, or Frame deferred haiku when <code>reflectionMessage</code> prop is empty.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
