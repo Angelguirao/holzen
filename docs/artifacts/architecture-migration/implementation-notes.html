@@ -11325,4 +11325,23 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — peel loadSession/saveSession cluster off public-rpc (backlog #1 verified, #3 / §6)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>Shell hydration + ritual sync + autosave → persisted-session-storage</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code>) is complete on <code>cursor/arch-migrate-src-ca70</code> — no folder move. Continue §6 after <code>clearSession</code> peel: <code>use-pause-session-shell</code>, <code>use-pause-session-ritual-storage-sync</code>, and <code>use-pause-session-persist-to-storage</code> import <code>loadSession</code> / <code>saveSession</code> from <code>infrastructure/session/persisted-session-storage</code>. <code>public-rpc</code> keeps re-exports for any cross-context callers until a later audit removes them.</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior unchanged.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Session storage helpers remain on <code>public-rpc</code> as re-exports; presentation no longer depends on the barrel for load/save.</dd>
+      <dt>Open questions</dt>
+      <dd>Next §6: audit companion/archive <code>public-rpc</code> sole-consumer facades; backlog #4 wire remaining mutations through ports where hooks still call facades directly.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
