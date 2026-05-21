@@ -18963,4 +18963,23 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — reflect mood CI anchor matches presentation I/O paths (backlog #1 verified, Tier 5)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3><code>pause-reflect-mood-flow</code> re-exports align with <code>pause-reflect-mood-io</code></h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>ritual/reflect/</code>) remains complete — no folder moves. <code>pause-reflect-mood-io</code> already imports domain mood helpers and <code>run-initial-emotion-log</code> directly; update <code>pause-reflect-mood-flow.ts</code> CI anchor to the same paths so cluster detection matches on-disk presentation imports (parity with flows-flow alignment on <code>658b44e53</code>).</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior parity; re-export paths only. Mood subcluster flow anchors (<code>pause-depth-picker-mood-flow</code>, etc.) stay on disk for granular CI detection.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Top-level mood flow anchor no longer chains through sub-flow re-exports; sub-flow modules remain for mood subcluster checks.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: align remaining reflect flow anchors (steps/share/hub/generation) if drift appears, or Phase B cross-context Tier 1 shim (subscription).</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
