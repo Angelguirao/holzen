@@ -14,8 +14,8 @@ import { usePauseFeelShiftLogDedupeRefs } from './use-pause-feel-shift-log-dedup
 import { usePauseSessionDepthPickerHandlers } from './use-pause-session-depth-picker-handlers';
 import { usePauseSessionFeelTilesSelect } from './use-pause-session-feel-tiles-select';
 import { usePauseSessionInitialMoodHandlers } from './use-pause-session-initial-mood-handlers';
-import { usePauseSessionPersistToStorage } from '../use-pause-session-persist-to-storage';
-import { usePauseSessionRitualStorageSync } from '../use-pause-session-ritual-storage-sync';
+import { usePauseSessionPersistToStorage } from '../session/use-pause-session-persist-to-storage';
+import { usePauseSessionRitualStorageSync } from '../session/use-pause-session-ritual-storage-sync';
 
 export interface UsePauseSessionMoodAndPersistParams {
   pauseInstanceId: string | null;

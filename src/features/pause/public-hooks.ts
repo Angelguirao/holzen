@@ -355,8 +355,8 @@ export {
 export { usePauseSessionDepthPickerHandlers } from './presentation/reflect/use-pause-session-depth-picker-handlers';
 export { usePauseSessionFeelTilesSelect } from './presentation/reflect/use-pause-session-feel-tiles-select';
 export { usePauseSessionInitialMoodHandlers } from './presentation/reflect/use-pause-session-initial-mood-handlers';
-export { usePauseSessionPersistToStorage } from './presentation/use-pause-session-persist-to-storage';
-export { usePauseSessionRitualStorageSync } from './presentation/use-pause-session-ritual-storage-sync';
+export { usePauseSessionPersistToStorage } from './presentation/session/use-pause-session-persist-to-storage';
+export { usePauseSessionRitualStorageSync } from './presentation/session/use-pause-session-ritual-storage-sync';
 export {
   usePauseSessionMoodAndPersist,
   type UsePauseSessionMoodAndPersistParams,
