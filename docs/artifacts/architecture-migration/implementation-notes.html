@@ -59,6 +59,25 @@
   <article class="note">
     <header>
       <span>2026-05-21</span>
+      <span>Phase A slice — reflect generation I/O direct domain + run-reflect-generation (backlog #1 verified, Tier 5)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3><code>pause-reflect-generation-io</code> off <code>pause-reflect-generation-hook-flow</code> anchor</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>ritual/reflect/</code> folder move) remains complete — no folder moves. Peel <code>pause-reflect-generation-io</code> to domain hook helpers and sibling <code>run-reflect-generation</code> (under <code>generation/holzen-reflect/</code> on branch tip) instead of <code>pause-reflect-generation-hook-flow</code>. Steps and hub use flow anchors; mood and session telemetry use direct sibling imports.</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior parity; <code>pauseReflectGeneration</code> still binds default <code>reflectGenerator</code> from <code>public-rpc</code>.</dd>
+      <dt>Tradeoffs</dt>
+      <dd><code>pause-reflect-generation-hook-flow.ts</code> remains for <code>check:architecture-alignment</code>.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: reconcile mood I/O direct-import vs flow-anchor pattern, or Phase B cross-context Tier 1 shim.</dd>
+    </dl>
+  </article>
+
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
       <span>Phase A slice — reflect share I/O via share flow anchor (backlog #1 verified, Tier 5)</span>
       <span class="status resolved">resolved</span>
     </header>
@@ -90,7 +109,7 @@
       <dt>Tradeoffs</dt>
       <dd><code>pause-reflect-generation-hook-flow.ts</code> stays at <code>generation/</code> root as CI cluster anchor until a peel/delete slice.</dd>
       <dt>Open questions</dt>
-      <dd>Next: peel <code>pause-reflect-generation-io</code> off hook-flow to domain + holzen-reflect path, or Phase B cross-context Tier 1 shim.</dd>
+      <dd>Next: Phase B cross-context Tier 1 shim, or reconcile presentation I/O flow-anchor vs direct-import per reflect subcluster.</dd>
     </dl>
   </article>
 
@@ -147,7 +166,7 @@
       <dt>Tradeoffs</dt>
       <dd>Flow anchor kept for <code>check:architecture-alignment</code>; unit tests mock leaf <code>run-pause-*</code> modules.</dd>
       <dt>Open questions</dt>
-      <dd>Next: <code>pause-reflect-share-io</code> through a share flow anchor, or Phase B cross-context Tier 1 shim.</dd>
+      <dd>Next: Phase B cross-context Tier 1 shim, or reconcile mood I/O direct-import vs flow-anchor pattern.</dd>
     </dl>
   </article>
 
@@ -164,7 +183,7 @@
       <dt>Deviation</dt>
       <dd>None — behavior parity; import boundary only.</dd>
       <dt>Tradeoffs</dt>
-      <dd><code>pause-reflect-telemetry-flow.ts</code> remains for <code>check:architecture-alignment</code>; home telemetry I/O still uses <code>pause-home-reflect-telemetry-flow</code>.</dd>
+      <dd><code>pause-reflect-telemetry-flow.ts</code> and <code>pause-home-reflect-telemetry-flow.ts</code> remain for <code>check:architecture-alignment</code>; both home and session presentation I/O import sibling telemetry modules directly.</dd>
       <dt>Open questions</dt>
       <dd>Next: peel <code>pause-home-reflect-telemetry-io</code> off its flow anchor, or Phase B cross-context Tier 1 shim.</dd>
     </dl>
