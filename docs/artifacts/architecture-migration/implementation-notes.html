@@ -10869,4 +10869,23 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — reflect UI telemetry off public-rpc (backlog #1 verified, §6)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>PostHog reflect trackers: presentation → domain/reflect/telemetry</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>ritual/reflect/</code> use cases) is complete on <code>cursor/arch-migrate-src-ca70</code>. Continue §6 slim <code>public-rpc</code>: <code>use-pause-reflect-ui-telemetry</code> imports <code>trackPauseReflect*</code> from <code>domain/reflect/telemetry/pause-reflect-ui-telemetry.ts</code> (no RPC). Screens still use <code>usePauseReflectUiTelemetry</code> via <code>public-ritual-reflect</code>.</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior unchanged.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Analytics helpers are not re-exported on <code>public-rpc</code>; cross-context consumers should use the hook or domain module.</dd>
+      <dt>Open questions</dt>
+      <dd>Next backlog #4: presentation <code>PauseRepository</code> audit; optional <code>analytics-events</code> import guard.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
