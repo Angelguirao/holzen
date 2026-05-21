@@ -1,5 +1,14 @@
 import { describe, expect, it } from 'vitest';
-import { shouldLogPauseReflectionStep } from './reflection-step-log';
+import {
+  buildReflectReflectionStepPayload,
+  shouldLogPauseReflectionStep,
+} from './reflection-step-log';
+
+describe('buildReflectReflectionStepPayload', () => {
+  it('uses pause_reflect surface', () => {
+    expect(buildReflectReflectionStepPayload()).toEqual({ surface: 'pause_reflect' });
+  });
+});
 
 describe('shouldLogPauseReflectionStep', () => {
   it('requires instance id and settled reflection state', () => {
