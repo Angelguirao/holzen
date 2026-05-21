@@ -6328,4 +6328,23 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — reflection_step log hook test (backlog #1 done, #4)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>Cover use-pause-reflection-step-log public-rpc facade</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>ritual/reflect/</code>) is complete. Add <code>use-pause-reflection-step-log.test.tsx</code> mocking <code>logPauseReflectionStepOnce</code>; assert gate when copy ready vs loading/empty.</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior parity.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Reflect/decide flow helpers now live under <code>domain/reflect/generation/</code> (prior slice).</dd>
+      <dt>Open questions</dt>
+      <dd>Next: peel breath segment RPC loggers or companion orchestrate hooks through <code>public-rpc</code>.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
