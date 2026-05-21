@@ -7,9 +7,7 @@ export {
   trackPauseOpenDismissed,
   type OpenPauseStateForAnalytics,
   type PauseDismissAnalyticsSurface,
-} from '@/features/pause/application/use-cases/ritual/reflect/telemetry/home-pause-actions-telemetry';
-export {
   markPauseManualStartedHomeOnce,
   trackManualPauseInstanceCreated,
   trackPauseManualCompleted,
-} from '@/features/pause/application/use-cases/ritual/reflect/telemetry/manual-pause-trigger-telemetry';
+} from '@/features/pause/application/use-cases/ritual/reflect/telemetry/pause-home-reflect-telemetry-flow';
