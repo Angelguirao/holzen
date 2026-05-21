@@ -9295,6 +9295,7 @@
   <article class="note">
     <header>
       <span>2026-05-21</span>
+<<<<<<< HEAD
       <span>Phase A slice — archive list UI helpers on public-queries (backlog #1 done, #3)</span>
       <span class="status resolved">resolved</span>
     </header>
@@ -9308,6 +9309,21 @@
       <dd>Helpers remain in <code>application/use-cases/archive/</code> — barrel re-export only, no domain move (UI projection for TanStack infinite lists).</dd>
       <dt>Open questions</dt>
       <dd>Next backlog #4: port-backed analytics read for companion feedback vote fetch, or audit ritual mutations outside <code>public-rpc</code> facades.</dd>
+=======
+      <span>Phase A slice — inline reflect-and-decide params (backlog #1 done, Tier 4)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>ritual/reflect/ verified; colocate reflect+decide conductor types</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code>) has no remaining path moves. Inline <code>UsePauseSessionReflectAndDecideParams</code> into <code>use-pause-session-reflect-and-decide.ts</code>; delete sibling types-only module. <code>public-hooks</code> re-export unchanged.</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior parity.</dd>
+      <dt>Tradeoffs</dt>
+      <dd><code>pause-session-breath-reflect-handler-types.ts</code> stays split — shared by step-handlers bundle and breath-reflect hook.</dd>
+      <dt>Open questions</dt>
+      <dd>Next backlog #4: audit mutations bypassing <code>PauseRepository</code> outside <code>public-rpc</code> facades.</dd>
+>>>>>>> b8d73503 (refactor(pause): inline reflect-and-decide conductor params)
     </dl>
   </article>
 
