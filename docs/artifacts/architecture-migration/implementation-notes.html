@@ -8988,4 +8988,23 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — reflect backlog verified; session breath/brief on public-rpc (#1 done, #4)</span>
+      <span class="status resolved">resolved</status>
+    </header>
+    <h3>No reflect folder moves; breath segment + brief done presentation peel</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code>) verified complete — zero legacy reflect use-case paths. Continue backlog #4: <code>use-pause-breath-segment-rpc-loggers</code> imports port-backed <code>applyBreathSegmentLogOutcome</code> from <code>public-rpc</code>; <code>initialBreathSegmentRpcLoggedFlagsFromRestored</code> stays on <code>session/step-map</code> (pure hydration — avoids loading Supabase in jsdom when mocking <code>public-rpc</code>). <code>use-pause-brief-done-check-in</code> imports <code>PostPauseFeelSnapshot</code> from <code>public-rpc</code> alongside <code>logPostPauseEmotionIfDirty</code>.</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior parity.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Step-sync toast still imports <code>ritual/step-sync-toast</code> directly (presentation-only UX; avoids <code>public-rpc</code> Supabase load in unit tests).</dd>
+      <dt>Open questions</dt>
+      <dd>Next backlog #4: audit remaining presentation imports of <code>ritual/frame/*</code>, or wire other session conductors off deep application paths.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
