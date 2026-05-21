@@ -69,6 +69,7 @@ export {
   adminDevModeSettingQueryKey,
   fetchDevModeFromAnalytics,
   getAdminDevModeSettingQueryOptions,
+  logDevModeSetting,
   readLocalDevMode,
 } from './infrastructure/queries/dev-mode-admin-query';
 export {
