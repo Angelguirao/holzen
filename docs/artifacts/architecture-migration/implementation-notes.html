@@ -13453,4 +13453,23 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — slim public-session to tab I/O only (backlog #1 complete)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>§6 peel — layout on public-hooks; gates/guards off barrel</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd><code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code> was already complete. After breath helpers peeled, remove dead <code>public-session</code> re-exports (depth-picker gate, instance-fetch wait, persisted guards, ritual step types). Pause screen components import <code>pauseStepLayout</code> from <code>public-hooks</code>; <code>public-session</code> keeps <code>loadSession</code>/<code>saveSession</code>/<code>clearSession</code> + <code>PersistedSessionAnchor</code> only.</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior-preserving export peel only.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Feature presentation still uses <code>public-session</code> for session I/O until a follow-up routes those hooks through domain/infrastructure paths directly.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: Phase B <code>src/lib/*</code> shims (subscription/auth) or port-backed companion feedback vote write path.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->

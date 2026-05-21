@@ -4,7 +4,7 @@ import { ChevronRight } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import type { FeelStepTile, MoodValue } from '@/features/pause/public-ritual-reflect';
 import { PAUSE_FEEL_STEP_TILE_ROWS } from '@/features/pause/public-ritual-reflect';
-import { pauseStepLayout } from '@/features/pause/public-session';
+import { pauseStepLayout } from '@/features/pause/public-hooks';
 import { Button } from '@/components/ui/button';
 import { PauseRitualFeelIntensitySlider } from '@/screens/pause/components/pause-ritual-feel-intensity-slider';
 import { PauseRitualFeelTileGrid } from '@/screens/pause/components/pause-ritual-feel-tile-grid';

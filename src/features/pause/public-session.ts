@@ -1,17 +1,8 @@
 /**
- * Pause session shell pure helpers (no Supabase).
- * Presentation hooks import from here instead of deep `application/use-cases/session/*`.
+ * Tab session I/O for pause (no Supabase eager load).
+ * Layout tokens and ritual step types: `public-hooks`. Domain gates: import `domain/*` directly.
  */
-export { pauseStepLayout } from './presentation/session/pause-step-layout';
-export {
-  hasPersistablePauseSessionAnchor,
-  hasPersistedPauseSessionPayload,
-  type PersistedSessionAnchor,
-} from './domain/session/persisted-session-guards';
-export { isPauseSessionDepthPickerActive } from './domain/reflect/mood/pause-depth-picker-active';
-export { isPauseSessionWaitingForInstanceFetch } from './domain/session/waiting-for-instance-fetch';
-export type { PauseStep } from './domain/pause-ritual-steps';
-export type { BriefPauseStep, RitualDepth } from './domain/ritual-types';
+export type { PersistedSessionAnchor } from './domain/session/persisted-session-guards';
 export {
   clearSession,
   loadSession,
