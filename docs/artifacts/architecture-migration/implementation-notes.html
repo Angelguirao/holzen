@@ -6141,6 +6141,7 @@
   <article class="note">
     <header>
       <span>2026-05-21</span>
+<<<<<<< HEAD
       <span>Phase A slice — reflect note hook test (backlog #1 done, #4)</span>
       <span class="status resolved">resolved</span>
     </header>
@@ -6154,6 +6155,21 @@
       <dd>Tags hook still has no dedicated test.</dd>
       <dt>Open questions</dt>
       <dd>Next: peel companion orchestrate hooks from <code>public-rpc</code> or add tags hook test.</dd>
+=======
+      <span>Phase A slice — home manual trigger via public-rpc (backlog #1 done, #4)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>Backlog #1 complete; peel openManualPauseFromHome from public-ports in presentation</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd><code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code> is complete on <code>cursor/arch-migrate-src-ca70</code> — no folder move. <code>use-manual-pause-trigger</code> calls wired <code>openManualPauseFromHome</code> on <code>public-rpc</code> instead of injecting <code>supabasePauseRepository</code> + <code>supabaseReflectGenerator</code> from <code>public-ports</code>. Use case + port wiring unchanged inside the facade.</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior parity (silent + loading paths).</dd>
+      <dt>Tradeoffs</dt>
+      <dd><code>use-bulk-hold-apply-outcomes</code> still imports <code>public-rpc</code> facades directly; no dedicated hook test for manual trigger.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: peel bulk-hold apply through <code>public-ports</code> or companion orchestrate hooks from <code>public-rpc</code>.</dd>
+>>>>>>> 239af48f (refactor(pause): wire home manual trigger through public-rpc)
     </dl>
   </article>
 
