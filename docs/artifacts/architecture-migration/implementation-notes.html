@@ -11686,4 +11686,23 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — colocate pause-rpc lifecycle telemetry in infrastructure (backlog #1 verified, backlog #4)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>ritual/reflect/ complete; fix infra→application import for RPC PostHog dedupe</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code>) verified complete — no folder move. Move <code>pause-rpc-lifecycle-telemetry</code> (+ test) from <code>application/use-cases/session/</code> to <code>infrastructure/</code> beside <code>pause-rpc-client.ts</code> (only consumer). Stops infrastructure importing application layer for PostHog side effects after RPC success.</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior unchanged; still uses <code>trackEvent</code> from <code>@/lib/posthog</code>, not <code>PauseAnalyticsRepository</code> (PostHog taxonomy events, not <code>analytics_events</code> rows).</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Broader analytics-port consolidation remains optional; this slice is layering only.</dd>
+      <dt>Open questions</dt>
+      <dd>Next backlog #4: audit any remaining presentation→RPC paths without use-case + <code>PauseRepository</code>, or Phase B subscription/auth template slice.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
