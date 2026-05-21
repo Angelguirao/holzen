@@ -49,18 +49,6 @@ vi.mock('./use-pause-session-decide-handler', () => ({
   usePauseSessionDecideHandler: usePauseSessionDecideHandlerMock,
 }));
 
-vi.mock('@/features/pause/domain/reflect/flows/pause-session-reflect-and-decide-flow', async () => {
-  const flow = await import(
-    '@/features/pause/domain/reflect/flows/pause-session-reflect-and-decide-flow'
-  );
-  return {
-    resolvePauseSessionReflectAndDecideAfterGeneration:
-      flow.resolvePauseSessionReflectAndDecideAfterGeneration,
-    resolvePauseSessionReflectAndDecidePreflight:
-      flow.resolvePauseSessionReflectAndDecidePreflight,
-  };
-});
-
 const t = ((key: string) => key) as TFunction;
 
 function baseParams(
