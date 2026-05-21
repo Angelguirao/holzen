@@ -2,41 +2,34 @@ import { describe, expect, it, vi, beforeEach } from 'vitest';
 import { renderHook, act } from '@testing-library/react';
 import type { TFunction } from 'i18next';
 import type { PauseRepository } from '@/features/pause/ports/pause-repository';
-import {
-  applyBreathSegmentLogOutcome,
-  runEnsureBreathSegment1Logged,
-  runEnsureBreathSegment2Logged,
-  runLogBreathSegment1Skipped,
-  runLogBreathSegment2Skipped,
-} from '@/features/pause/application/use-cases/ritual/breathe/run-breath-segment-log';
-import { initialBreathSegmentRpcLoggedFlagsFromRestored } from '@/features/pause/application/use-cases/session/step-map';
 import { usePauseBreathSegmentRpcLoggers } from './use-pause-breath-segment-rpc-loggers';
 import { makeTestPersistedPauseSession } from '@/test/fixtures/make-test-persisted-pause-session';
 
-const { logStepMock, showPauseStepSyncFailedToast, mockRepository } = vi.hoisted(() => {
+const {
+  logStepMock,
+  showPauseStepSyncFailedToast,
+  mockRepository,
+  invalidateCompanionUiCompletionQueryMock,
+} = vi.hoisted(() => {
   const logStepMock = vi.fn();
   return {
     logStepMock,
     showPauseStepSyncFailedToast: vi.fn(),
     mockRepository: { logStep: logStepMock } as unknown as PauseRepository,
+    invalidateCompanionUiCompletionQueryMock: vi.fn(),
   };
 });
 
-const breathSegmentLogDeps = {
-  onSegmentLogged: vi.fn(),
-};
+vi.mock('@/features/pause/public-ports', () => ({
+  supabasePauseRepository: mockRepository,
+}));
 
-vi.mock('@/features/pause/public-rpc', () => ({
-  ensureBreathSegment1Logged: (input: Parameters<typeof runEnsureBreathSegment1Logged>[1]) =>
-    runEnsureBreathSegment1Logged(mockRepository, input, breathSegmentLogDeps),
-  ensureBreathSegment2Logged: (input: Parameters<typeof runEnsureBreathSegment2Logged>[1]) =>
-    runEnsureBreathSegment2Logged(mockRepository, input, breathSegmentLogDeps),
-  logBreathSegment1Skipped: (input: Parameters<typeof runLogBreathSegment1Skipped>[1]) =>
-    runLogBreathSegment1Skipped(mockRepository, input, breathSegmentLogDeps),
-  logBreathSegment2Skipped: (input: Parameters<typeof runLogBreathSegment2Skipped>[1]) =>
-    runLogBreathSegment2Skipped(mockRepository, input, breathSegmentLogDeps),
-  applyBreathSegmentLogOutcome,
-  initialBreathSegmentRpcLoggedFlagsFromRestored,
+vi.mock('@/features/pause/application/queries/companion-ui-completion-query-key', () => ({
+  invalidateCompanionUiCompletionQuery: (...args: unknown[]) =>
+    invalidateCompanionUiCompletionQueryMock(...args),
+}));
+
+vi.mock('@/features/pause/application/use-cases/ritual/step-sync-toast', () => ({
   showPauseStepSyncFailedToast,
 }));
 
@@ -45,7 +38,7 @@ const t = ((k: string) => k) as TFunction;
 beforeEach(() => {
   logStepMock.mockReset();
   logStepMock.mockResolvedValue(null);
-  breathSegmentLogDeps.onSegmentLogged.mockReset();
+  invalidateCompanionUiCompletionQueryMock.mockReset();
   vi.mocked(showPauseStepSyncFailedToast).mockClear();
 });
 
@@ -63,7 +56,7 @@ describe('usePauseBreathSegmentRpcLoggers', () => {
       expect(ok).toBe(true);
     });
     expect(logStepMock).not.toHaveBeenCalled();
-    expect(breathSegmentLogDeps.onSegmentLogged).not.toHaveBeenCalled();
+    expect(invalidateCompanionUiCompletionQueryMock).not.toHaveBeenCalled();
   });
 
   it('logs segment 1 once then short-circuits', async () => {
@@ -83,8 +76,8 @@ describe('usePauseBreathSegmentRpcLoggers', () => {
       instanceId: 'inst-1',
       stepType: 'breath_completed',
     });
-    expect(breathSegmentLogDeps.onSegmentLogged).toHaveBeenCalledTimes(1);
-    expect(breathSegmentLogDeps.onSegmentLogged).toHaveBeenCalledWith('inst-1');
+    expect(invalidateCompanionUiCompletionQueryMock).toHaveBeenCalledTimes(1);
+    expect(invalidateCompanionUiCompletionQueryMock).toHaveBeenCalledWith('inst-1');
   });
 
   it('resets dedupe when pauseInstanceId changes', async () => {
@@ -107,9 +100,9 @@ describe('usePauseBreathSegmentRpcLoggers', () => {
     });
     expect(logStepMock).toHaveBeenCalledTimes(2);
     expect(logStepMock.mock.calls[1][0]).toMatchObject({ instanceId: 'b' });
-    expect(breathSegmentLogDeps.onSegmentLogged).toHaveBeenCalledTimes(2);
-    expect(breathSegmentLogDeps.onSegmentLogged).toHaveBeenNthCalledWith(1, 'a');
-    expect(breathSegmentLogDeps.onSegmentLogged).toHaveBeenNthCalledWith(2, 'b');
+    expect(invalidateCompanionUiCompletionQueryMock).toHaveBeenCalledTimes(2);
+    expect(invalidateCompanionUiCompletionQueryMock).toHaveBeenNthCalledWith(1, 'a');
+    expect(invalidateCompanionUiCompletionQueryMock).toHaveBeenNthCalledWith(2, 'b');
   });
 
   it('logBreathSegment1Skipped returns true without RPC when no instance id', async () => {
@@ -176,7 +169,7 @@ describe('usePauseBreathSegmentRpcLoggers', () => {
       expect(await result.current.logBreathSegment1Skipped()).toBe(false);
     });
     expect(showPauseStepSyncFailedToast).toHaveBeenCalledWith(t);
-    expect(breathSegmentLogDeps.onSegmentLogged).not.toHaveBeenCalled();
+    expect(invalidateCompanionUiCompletionQueryMock).not.toHaveBeenCalled();
   });
 
   it('logBreathSegment2Skipped sends segment 2 skipped payload', async () => {
