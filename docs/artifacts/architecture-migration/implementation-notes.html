@@ -5378,4 +5378,23 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — reflect/decide flow helpers beside conductor (backlog #1 adjacent, Tier 2)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3><code>pause-session-reflect-decide-flow</code> → <code>presentation/reflect/flows/</code></h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code>) was already complete on <code>cursor/arch-migrate-src-ca70</code>. Colocate hook-only reflect/decide prefetch helpers with <code>use-pause-session-reflect-and-decide</code>; <code>run-reflect-generation</code> and <code>pause-shift-frame-hub-flow</code> stay in application use cases.</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior-preserving move; tests colocated with conductor.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Pure helpers live in presentation because only the reflect/decide conductor imports them; domain gate (<code>reflect-generation-enabled</code>) unchanged.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: colocate <code>pause-shift-frame-hub-flow</code> under <code>presentation/reflect/hub/</code> (same peel pattern), backlog #4 analytics query port wiring, or peel <code>screens/pause/lib/</code> breathe helpers.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
