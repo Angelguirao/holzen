@@ -17,6 +17,13 @@ export { supabasePauseRepository } from './infrastructure/supabase-pause-reposit
 export { invokeCompanionOrchestrate } from './infrastructure/edge/companion-orchestrate-edge';
 export type { CompanionOrchestrator } from './ports/companion-orchestrator';
 export { supabaseCompanionOrchestrator } from './infrastructure/supabase-companion-orchestrator';
+export type { CompanionOrchestrateSessionContext } from './application/use-cases/ritual/frame/build-companion-orchestrate-body';
+export type { LoadCompanionOrchestrateSessionInput } from './application/use-cases/ritual/frame/load-companion-orchestrate-session';
+import {
+  loadCompanionOrchestrateSession as loadCompanionOrchestrateSessionUseCase,
+  type LoadCompanionOrchestrateSessionInput,
+} from './application/use-cases/ritual/frame/load-companion-orchestrate-session';
+import { loadMoodHistoryForOrchestrate } from './infrastructure/companion/mood-history';
 export {
   invokeGroundingEnrich,
   type GroundingEnrichBody,
@@ -303,6 +310,13 @@ export function logPauseCompanionFullviewOpened(
   input: LogCompanionFullviewOpenedInput,
 ): Promise<{ ok: boolean }> {
   return runLogCompanionFullviewOpened(supabasePauseAnalyticsRepository, input);
+}
+
+/** Frame slot orchestrate — ritual session payload + mood history (wired for presentation). */
+export function loadPauseCompanionOrchestrateSession(input: LoadCompanionOrchestrateSessionInput) {
+  return loadCompanionOrchestrateSessionUseCase(input, {
+    loadMoodHistory: loadMoodHistoryForOrchestrate,
+  });
 }
 
 /** Frame / companion UI — `pause_log_companion` via `PauseRepository` (wired for presentation). */
