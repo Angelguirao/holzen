@@ -130,14 +130,12 @@ import { invalidateCompanionUiCompletionQuery } from './application/queries/comp
 import { persistCompanionUiStepCompletion as persistCompanionUiStepCompletionUseCase } from './application/use-cases/ritual/frame/persist-ui-step-completion';
 import type { CompanionUiCompletionStep } from './application/use-cases/ritual/frame/companion-ui-completion-types';
 import {
-  applyBreathSegmentLogOutcome,
   runEnsureBreathSegment1Logged,
   runEnsureBreathSegment2Logged,
   runLogBreathSegment1Skipped,
   runLogBreathSegment2Skipped,
   type RunBreathSegmentLogResult,
 } from './application/use-cases/ritual/breathe/run-breath-segment-log';
-import { initialBreathSegmentRpcLoggedFlagsFromRestored } from './application/use-cases/session/step-map';
 import { runPauseCreateOrReuse } from './application/use-cases/session/run-pause-create-or-reuse';
 import { runPauseDismissCurrent } from './application/use-cases/session/run-pause-dismiss-current';
 import type { LogCompanionFeedbackVoteInput } from './application/use-cases/ritual/frame/log-companion-feedback-vote';
@@ -510,11 +508,7 @@ export function fetchHaikuTextForPauseInstance(pauseInstanceId: string): Promise
   return supabaseReflectGenerator.fetchHaikuText(pauseInstanceId);
 }
 
-export {
-  applyBreathSegmentLogOutcome,
-  initialBreathSegmentRpcLoggedFlagsFromRestored,
-  showPauseStepSyncFailedToast,
-};
+export { showPauseStepSyncFailedToast };
 export type { RunBreathSegmentLogResult };
 
 const breathSegmentLogDeps = {
