@@ -7126,4 +7126,23 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — fix reflect-step-payloads import paths</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>reflection_step log imports reflect-step-payloads.ts</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Prior rename left <code>run-pause-reflection-step-log</code> importing deleted <code>reflect-note-tag-payload</code>; point at <code>reflect-step-payloads.ts</code>.</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior parity.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>N/A — import fix only.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: peel brief-to-deep / brief-done-check-in hooks off <code>public-rpc</code>, or companion intervention presentation cluster.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
