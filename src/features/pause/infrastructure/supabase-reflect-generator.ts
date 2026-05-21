@@ -11,8 +11,7 @@ export const supabaseReflectGenerator: ReflectGenerator = {
   fetchHaikuText: fetchHaikuTextForPauseInstance,
   fetchLatestReflectStep: fetchLatestPauseReflectStepFromSupabase,
   loadRecencyHints: loadReflectRecencyHints,
-  generateReflection: async (params) => {
-    const recencyHints = await loadReflectRecencyHints();
+  generateReflection: async (params, recencyHints) => {
     const { message } = await generateReflectionAtReflectStep({ ...params, recencyHints });
     return { message };
   },

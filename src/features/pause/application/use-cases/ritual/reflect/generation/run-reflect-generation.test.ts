@@ -22,10 +22,12 @@ const baseInput = {
   signal: new AbortController().signal,
 };
 
+const emptyRecencyHints = { moodHistory: [], recentMessages: [], recentHaikus: [] };
+
 const noopReflectPortExtras = {
   fetchHaikuText: vi.fn(),
   fetchLatestReflectStep: vi.fn(),
-  loadRecencyHints: vi.fn(),
+  loadRecencyHints: vi.fn().mockResolvedValue(emptyRecencyHints),
 };
 
 describe('runReflectGeneration', () => {
@@ -57,24 +59,28 @@ describe('runReflectGeneration', () => {
   });
 
   it('invokes holzen-reflect when cache empty', async () => {
+    const loadRecencyHints = vi.fn().mockResolvedValue(emptyRecencyHints);
     const generateReflection = vi.fn().mockResolvedValue({ message: 'fresh' });
 
     const result = await runReflectGeneration(
       { ...baseInput, initialReflectionMessage: '' },
       {
-        fetchReflectionText: vi.fn().mockResolvedValue(null),
-        generateReflection,
         ...noopReflectPortExtras,
+        fetchReflectionText: vi.fn().mockResolvedValue(null),
+        loadRecencyHints,
+        generateReflection,
       },
     );
 
     expect(result).toEqual({ status: 'generated', message: 'fresh' });
+    expect(loadRecencyHints).toHaveBeenCalledTimes(1);
     expect(generateReflection).toHaveBeenCalledWith(
       expect.objectContaining({
         pauseInstanceId: 'pi-1',
         userId: 'user-1',
         context: 'btc dip',
       }),
+      emptyRecencyHints,
     );
   });
 

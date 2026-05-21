@@ -14,5 +14,8 @@ export interface ReflectGenerator {
     stepType: PauseReflectStepType,
   ): Promise<PauseReflectStepLatestRow | null>;
   loadRecencyHints(): Promise<ReflectRecencyHints>;
-  generateReflection(params: ReflectGenerationEdgeInvokeInput): Promise<{ message: string }>;
+  generateReflection(
+    params: ReflectGenerationEdgeInvokeInput,
+    recencyHints: ReflectRecencyHints,
+  ): Promise<{ message: string }>;
 }
