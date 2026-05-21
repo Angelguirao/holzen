@@ -9,13 +9,6 @@ import {
 import { supabaseReflectGenerator } from '@/features/pause/infrastructure/supabase-reflect-generator';
 import { PAUSE_QUERY_PREFIX } from '@/features/pause/application/queries/pause-query-namespace';
 
-export {
-  PAUSE_REFLECT_STEP_NOTE,
-  PAUSE_REFLECT_STEP_TAGS,
-  type PauseReflectStepLatestRow,
-  type PauseReflectStepType,
-};
-
 export const PAUSE_REFLECT_STEP_QUERY_PREFIX = [...PAUSE_QUERY_PREFIX, 'reflect-step', 'latest'] as const;
 
 export function pauseReflectStepLatestQueryKey(pauseInstanceId: string, stepType: PauseReflectStepType) {
@@ -28,8 +21,6 @@ export async function fetchLatestPauseReflectStep(
 ): Promise<PauseReflectStepLatestRow | null> {
   return supabaseReflectGenerator.fetchLatestReflectStep(pauseInstanceId, stepType);
 }
-
-export { noteTextFromReflectRow, tagsFromReflectRow };
 
 export function getLatestPauseReflectNoteQueryOptions(pauseInstanceId: string) {
   return {
