@@ -7563,4 +7563,23 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — depth context params in domain/reflect/mood (backlog #1 incremental)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3><code>resolvePauseDepthContextLineParams</code> → <code>domain/reflect/mood/</code></h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code>) is complete. Prior slice placed the depth-picker market context helper under <code>ritual/reflect/mood/</code> application; it has no I/O — colocate with <code>initial-emotion-presentation</code> and mood chrome flow in <code>domain/reflect/mood/</code>. <code>use-pause-session-depth-and-brief-copy</code> imports domain path; <code>t()</code> stays in presentation.</dd>
+      <dt>Deviation</dt>
+      <dd>None — aligns §10.1 feel/initial-emotion row (pure helpers in <code>domain/reflect/mood/</code>).</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Domain module imports <code>@/features/market/public</code> for <code>trackedAssetSymbol</code> (same as presentation hook did via the helper).</dd>
+      <dt>Open questions</dt>
+      <dd>Next: move <code>pause-favorite-pro-hint-toast</code> to <code>presentation/reflect/steps/</code> per §10.1, or backlog #4 peel <code>use-companion-ui-completion</code> off <code>public-rpc</code>.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
