@@ -2,16 +2,19 @@ import { describe, expect, it, vi, beforeEach } from 'vitest';
 import { renderHook, waitFor } from '@testing-library/react';
 import { usePauseReflectionStepLog } from './use-pause-reflection-step-log';
 
-const { runPauseReflectionStepLogOnceMock } = vi.hoisted(() => ({
-  runPauseReflectionStepLogOnceMock: vi.fn(),
-}));
+const { runPauseReflectionStepLogOnceMock, mockPauseRepository, mockReflectionStepStorage } =
+  vi.hoisted(() => ({
+    runPauseReflectionStepLogOnceMock: vi.fn(),
+    mockPauseRepository: { port: 'supabasePauseRepository' },
+    mockReflectionStepStorage: { port: 'reflectionStepSessionStorage' },
+  }));
 
 vi.mock('@/features/pause/infrastructure/supabase-pause-repository', () => ({
-  supabasePauseRepository: {},
+  supabasePauseRepository: mockPauseRepository,
 }));
 
 vi.mock('@/features/pause/infrastructure/edge/reflect/reflection-step-session-storage', () => ({
-  reflectionStepSessionStorage: {},
+  reflectionStepSessionStorage: mockReflectionStepStorage,
 }));
 
 vi.mock(
@@ -38,9 +41,9 @@ describe('usePauseReflectionStepLog', () => {
 
     await waitFor(() => {
       expect(runPauseReflectionStepLogOnceMock).toHaveBeenCalledWith(
-        {},
+        mockPauseRepository,
         { pauseInstanceId: 'pause-1' },
-        { storage: {} },
+        { storage: mockReflectionStepStorage },
       );
     });
   });
