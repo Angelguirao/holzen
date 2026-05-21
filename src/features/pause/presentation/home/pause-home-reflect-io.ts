@@ -13,6 +13,17 @@ export {
 } from '@/features/pause/domain/reflect/generation/build-manual-pause-market-context';
 export type {
   OpenManualPauseFromHomeParams,
+  OpenManualPauseFromHomePorts,
   OpenManualPauseFromHomeResult,
 } from '@/features/pause/domain/reflect/generation/open-manual-pause-from-home-types';
 export { openManualPauseFromHome } from '@/features/pause/application/use-cases/ritual/reflect/generation/open-manual-pause-from-home';
+export {
+  runOpenManualPauseSilentModeAfterCreate,
+  type RunOpenManualPauseSilentModeAfterCreateInput,
+  type RunOpenManualPauseSilentModeAfterCreateResult,
+} from '@/features/pause/application/use-cases/ritual/reflect/generation/run-open-manual-pause-silent-mode-after-create';
+export {
+  runPersistSilentReflectionStub,
+  type PersistSilentReflectionStubInput,
+  type PersistSilentReflectionStubResult,
+} from '@/features/pause/application/use-cases/ritual/reflect/generation/run-persist-silent-reflection-stub';
