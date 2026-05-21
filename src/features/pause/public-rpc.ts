@@ -31,7 +31,6 @@ export {
   type GroundingEnrichBody,
   type GroundingEnrichment,
 } from './infrastructure/edge/grounding-enrich-edge';
-import { dismissOpenPauseHome } from './application/use-cases/home/dismiss-open-pause-home';
 import {
   runAdoptPendingPauseOffer,
   type RunAdoptPendingPauseOfferResult,
@@ -118,17 +117,6 @@ export function adoptPendingPauseOffer(): Promise<RunAdoptPendingPauseOfferResul
 /** Pending offer — decline via `PauseRepository` (wired for presentation). */
 export function declinePendingPauseOffer(): Promise<RunDeclinePendingPauseOfferResult> {
   return runDeclinePendingPauseOffer(supabasePauseRepository);
-}
-
-/** Home open-pause preview dismiss — clears local preview then `dismissCurrent` on the port. */
-export function dismissOpenPauseHomePreview(
-  hasUser: boolean,
-  clearPreview: () => void,
-): Promise<void> {
-  return dismissOpenPauseHome(hasUser, {
-    clearPreview,
-    repository: supabasePauseRepository,
-  });
 }
 
 export type { BulkHoldApplyResult };

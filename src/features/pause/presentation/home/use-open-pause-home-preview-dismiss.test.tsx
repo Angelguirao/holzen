@@ -3,13 +3,17 @@ import { renderHook, act } from '@testing-library/react';
 import type { User } from '@supabase/supabase-js';
 import { useOpenPauseHomePreview } from './use-open-pause-home-preview';
 
-const { dismissOpenPauseHomePreviewMock, clearSessionMock } = vi.hoisted(() => ({
-  dismissOpenPauseHomePreviewMock: vi.fn(),
+const { dismissOpenPauseHomeMock, clearSessionMock } = vi.hoisted(() => ({
+  dismissOpenPauseHomeMock: vi.fn(),
   clearSessionMock: vi.fn(),
 }));
 
-vi.mock('@/features/pause/public-rpc', () => ({
-  dismissOpenPauseHomePreview: dismissOpenPauseHomePreviewMock,
+vi.mock('@/features/pause/application/use-cases/home/dismiss-open-pause-home', () => ({
+  dismissOpenPauseHome: dismissOpenPauseHomeMock,
+}));
+
+vi.mock('@/features/pause/infrastructure/supabase-pause-repository', () => ({
+  supabasePauseRepository: {},
 }));
 
 vi.mock('@/features/pause/infrastructure/session/persisted-session-storage', () => ({
@@ -25,11 +29,11 @@ vi.mock('../../public-queries', () => ({
 }));
 
 beforeEach(() => {
-  dismissOpenPauseHomePreviewMock.mockReset().mockResolvedValue(undefined);
+  dismissOpenPauseHomeMock.mockReset().mockResolvedValue(undefined);
 });
 
 describe('useOpenPauseHomePreview dismiss', () => {
-  it('dismisses via public-rpc facade when user is signed in', async () => {
+  it('dismisses via dismissOpenPauseHome + PauseRepository when user is signed in', async () => {
     const user = { id: 'user-1' } as User;
     const { result } = renderHook(() => useOpenPauseHomePreview(user));
 
@@ -37,10 +41,10 @@ describe('useOpenPauseHomePreview dismiss', () => {
       await result.current.dismissOpenPauseHome();
     });
 
-    expect(dismissOpenPauseHomePreviewMock).toHaveBeenCalledWith(
-      true,
-      expect.any(Function),
-    );
+    expect(dismissOpenPauseHomeMock).toHaveBeenCalledWith(true, {
+      clearPreview: expect.any(Function),
+      repository: expect.anything(),
+    });
   });
 
   it('clears preview without RPC when user is null', async () => {
@@ -50,9 +54,9 @@ describe('useOpenPauseHomePreview dismiss', () => {
       await result.current.dismissOpenPauseHome();
     });
 
-    expect(dismissOpenPauseHomePreviewMock).toHaveBeenCalledWith(
-      false,
-      expect.any(Function),
-    );
+    expect(dismissOpenPauseHomeMock).toHaveBeenCalledWith(false, {
+      clearPreview: expect.any(Function),
+      repository: expect.anything(),
+    });
   });
 });
