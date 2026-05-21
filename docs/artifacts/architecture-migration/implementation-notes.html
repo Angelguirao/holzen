@@ -7525,4 +7525,23 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — reflect flows types + companion analytics port peel (backlog #1 done, #3/#4)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>Colocate breath/reflect handler slices; wire companion vote + fullview through PauseAnalyticsRepository</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code>) was already complete on <code>cursor/arch-migrate-src-ca70</code>. Colocate <code>PauseSessionBreathReflect*</code> slice types with <code>presentation/reflect/flows/</code> (re-export from <code>pause-session-step-handler-types</code> for session step bundle). <code>use-companion-feedback-vote</code> and <code>use-fullview-telemetry</code> call <code>runLogCompanionFeedbackVote</code> / <code>runLogCompanionFullviewOpened</code> with <code>supabasePauseAnalyticsRepository</code>; <code>public-rpc</code> facades unchanged for cross-context callers.</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior parity.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Companion orchestrate session/expansion hooks still import <code>public-rpc</code>; home manual trigger unchanged.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: peel <code>use-manual-pause-trigger</code> or companion orchestrate hooks off <code>public-rpc</code>.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
