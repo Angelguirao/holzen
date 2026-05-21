@@ -13016,4 +13016,23 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — colocate persist-to-storage conductor under presentation/reflect/scaffold/</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>Backlog #1 follow-up; presentation reflect scaffold subcluster</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>After <code>use-pause-session-ritual-storage-sync</code> landed in <code>presentation/reflect/scaffold/</code>, colocate <code>use-pause-session-persist-to-storage</code> (+ test) beside it; <code>public-hooks</code> re-export path only. <code>use-pause-session-mood-and-persist</code> imports sibling scaffold paths for both persist hooks.</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior-preserving move; hook still uses <code>buildPauseSessionPersistSnapshot</code> / <code>saveSession</code> via <code>public-session</code>.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>CI forbids flat <code>presentation/session/use-pause-session-persist-to-storage</code> import strings.</dd>
+      <dt>Open questions</dt>
+      <dd>Phase B: subscription/auth <code>src/lib/*</code> shims using pause as template.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
