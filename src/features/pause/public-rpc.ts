@@ -10,7 +10,6 @@ export type {
 export type { PauseCompanionAction, PauseState } from './domain/pause-state';
 import type { PauseCompanionAction } from './domain/pause-state';
 export type { OpenManualPauseFromHomeResult } from './application/use-cases/trigger/open-manual-pause-from-home';
-export type { RunReflectGenerationInput };
 
 export { ritualDepthUpgradedPayload } from './application/use-cases/ritual/brief/ritual-depth-upgrade';
 export { supabasePauseRepository } from './infrastructure/supabase-pause-repository';
@@ -57,10 +56,6 @@ import {
 } from './application/use-cases/ritual/done/post-pause-emotion-log';
 import type { MoodValue } from './domain/mood-value';
 import { runPauseOutcomeLog } from './application/use-cases/ritual/decide/run-pause-outcome-log';
-import {
-  runReflectGeneration as runReflectGenerationUseCase,
-  type RunReflectGenerationInput,
-} from './application/use-cases/ritual/reflect/generation/run-reflect-generation';
 import { invalidateCompanionUiCompletionQuery } from './application/queries/companion-ui-completion-query-key';
 import { persistCompanionUiStepCompletion as persistCompanionUiStepCompletionUseCase } from './application/use-cases/ritual/frame/persist-ui-step-completion';
 import type { CompanionUiCompletionStep } from './application/use-cases/ritual/frame/companion-ui-completion-types';
@@ -177,23 +172,6 @@ export function logRetrospectiveOutcome(params: {
   outcome: string;
 }): Promise<PauseState | null> {
   return logRetrospectiveOutcomeUseCase(supabasePauseRepository, params);
-}
-
-/** Reflect holzen-reflect generation — wired with default `ReflectGenerator`. */
-export function runPauseReflectGeneration(input: RunReflectGenerationInput) {
-  return runReflectGenerationUseCase(input, supabaseReflectGenerator);
-}
-
-/** Persisted haiku artifact read for Reflect / Frame — wired `ReflectGenerator.fetchHaikuText`. */
-export function fetchPauseReflectHaiku(pauseInstanceId: string): Promise<string | null> {
-  return supabaseReflectGenerator.fetchHaikuText(pauseInstanceId);
-}
-
-/** Persisted reflection_text artifact read — wired `ReflectGenerator.fetchReflectionText`. */
-export function fetchPauseReflectReflectionText(
-  pauseInstanceId: string,
-): Promise<string | null> {
-  return supabaseReflectGenerator.fetchReflectionText(pauseInstanceId);
 }
 
 export { showPauseStepSyncFailedToast } from './application/use-cases/ritual/step-sync-toast';
