@@ -15011,4 +15011,23 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — create-or-reuse params on pause-home-reflect-io</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>Reflect backlog #1 follow-up — Home reflect I/O re-export</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>ritual/reflect/</code>) remains complete. Re-export <code>buildManualPauseCreateOrReuseParams</code> from <code>domain/reflect/generation/</code> on <code>presentation/home/pause-home-reflect-io.ts</code>; aggregate <code>pause-home-io</code> re-exports for Home conductors and tests (no new behavior).</dd>
+      <dt>Deviation</dt>
+      <dd>None — orchestration stays in <code>open-manual-pause-from-home</code>; presentation only widens the seam.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Home tests can mock create-or-reuse shaping without importing <code>domain/reflect/generation/</code> paths directly from conductors.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: companion slot orchestrate presentation I/O barrel or <code>public-ritual-frame</code>.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
