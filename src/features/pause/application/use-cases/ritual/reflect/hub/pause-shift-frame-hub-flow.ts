@@ -1,5 +1,5 @@
 /**
- * CI cluster anchor for ritual reflect hub flows (§3 / check:architecture-alignment).
+ * CI cluster anchor for ritual reflect hub (§3 / check:architecture-alignment).
  * Pure shift-frame hub outcome mapping lives in domain; re-export for application-layer imports.
  */
 export {
