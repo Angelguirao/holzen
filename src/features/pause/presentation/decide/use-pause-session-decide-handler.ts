@@ -2,12 +2,11 @@ import { useCallback, type Dispatch, type MutableRefObject, type SetStateAction 
 import type { TFunction } from 'i18next';
 import { hapticFeedback } from '@/lib/haptics';
 import { useAuth } from '@/features/auth/public';
-import { runPauseOutcomeLog } from '@/features/pause/application/use-cases/ritual/decide/run-pause-outcome-log';
 import {
   formatReinforcementQuoteFromSession,
   resolvePauseDecideOutcomeFlow,
 } from '@/features/pause/application/use-cases/ritual/decide/pause-decide-outcome-flow';
-import { supabasePauseRepository } from '@/features/pause/public-ports';
+import { logPauseOutcome } from '@/features/pause/public-rpc';
 import {
   showPauseOutcomeNotCompletedToast,
   showPauseOutcomeSaveFailedToast,
@@ -68,7 +67,7 @@ export function usePauseSessionDecideHandler(input: {
       try {
         hapticFeedback('medium');
 
-        const outcome = await runPauseOutcomeLog(supabasePauseRepository, {
+        const outcome = await logPauseOutcome({
           pauseInstanceId,
           decision: d,
         });
