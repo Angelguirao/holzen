@@ -3763,6 +3763,25 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — colocate completed-pause-count under presentation/home/</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>Backlog #1 complete; Tier 4 home query conductor</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd><code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code> and presentation feel/bulk-hold grouping were already complete on <code>cursor/arch-migrate-src-ca70</code>. Move <code>use-completed-pause-count</code> beside other home conductors; <code>public-hooks</code> re-export path only. <code>HomeScreen</code> import unchanged.</dd>
+      <dt>Deviation</dt>
+      <dd>None — matches §3.2 home conductor grouping.</dd>
+      <dt>Tradeoffs</dt>
+      <dd><code>use-dismiss-outlet-pause-ready</code> and <code>use-staggered-reveal</code> remain flat under <code>presentation/</code>.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: colocate <code>use-dismiss-outlet-pause-ready</code> (home vs session), or backlog #4 ritual log RPCs on <code>PauseRepository</code>.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
 </body>
 </html>

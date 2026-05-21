@@ -4,7 +4,7 @@ import {
   COMPLETED_PAUSE_COUNT_QUERY_KEY,
   fetchCompletedPauseCount,
   getCompletedPauseCountQueryOptions,
-} from '../public-queries';
+} from '../../public-queries';
 
 export {
   COMPLETED_PAUSE_COUNT_QUERY_KEY,
