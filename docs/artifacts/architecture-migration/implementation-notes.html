@@ -7031,4 +7031,23 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — rename reflect step payload module (backlog #1 done)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>reflect-note-tag-payload → reflect-step-payloads</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code>) was already complete. After <code>reflection_step</code> payload moved to <code>reflection-step-log.ts</code>, rename <code>domain/reflect/steps/reflect-note-tag-payload.ts</code> to <code>reflect-step-payloads.ts</code> for note/tag/favorite builders; use cases import path only.</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior parity.</dd>
+      <dt>Tradeoffs</dt>
+      <dd><code>reflection_step</code> payload stays in <code>reflection-step-log.ts</code> (separate step type module).</dd>
+      <dt>Open questions</dt>
+      <dd>Next: peel <code>use-pause-reflect-generation</code> off <code>public-rpc</code>, or companion retry presentation cluster.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
