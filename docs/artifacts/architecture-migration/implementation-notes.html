@@ -13833,4 +13833,23 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Automation — Phase A reflect backlog #1 verified (no code move)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>Reflect → ritual/reflect/ already on branch; presentation I/O wave complete</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Triggered slice targeted backlog #1, but <code>application/use-cases/reflect/</code> is gone — all reflect use cases live under <code>ritual/reflect/</code> with CI guards. Parallel commits on <code>cursor/arch-migrate-src-ca70</code> already added home/session/archive <code>*-io.ts</code> bindings; hooks no longer import <code>public-rpc</code> except through those modules.</dd>
+      <dt>Deviation</dt>
+      <dd>This session shipped a doc-only README alignment instead of duplicating landed I/O commits.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>None.</dd>
+      <dt>Open questions</dt>
+      <dd>Next code slice: <code>public-ritual-frame</code> barrel peel (backlog #3) or Phase B cross-context shim.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
