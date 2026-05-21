@@ -38,7 +38,6 @@ export type {
 export { EMPTY_COMPANION_SLOT_RELAXATIONS } from './application/use-cases/ritual/frame/orchestrate-slot-apply';
 export { applyCompanionOrchestrateRetryReset } from './application/use-cases/ritual/frame/apply-companion-orchestrate-retry-reset';
 export { resetInterventionIdempotency } from './application/use-cases/ritual/frame/intervention-idempotency';
-export { nextExpandedWithLazyFetch } from './application/use-cases/ritual/frame/next-expanded-with-lazy-fetch';
 export { applyCompanionSlotOrchestrateOutcome } from './application/use-cases/ritual/frame/apply-companion-slot-orchestrate-outcome';
 export type { ApplyCompanionSlotOrchestrateFailureUiPorts } from './application/use-cases/ritual/frame/companion-slot-orchestrate-failure-ui';
 export { logCompanionSlotOrchestrateInvoke } from './application/use-cases/ritual/frame/companion-slot-orchestrate-telemetry';
@@ -93,8 +92,6 @@ import type { PauseState } from './domain/pause-state';
 import type { PostPauseFeelSnapshot } from './domain/ritual/done/post-pause-emotion-log';
 import type { RunPauseFavoriteToggleResult } from './application/use-cases/ritual/reflect/steps/run-pause-favorite-toggle';
 import type { RunPauseReflectTagUpdateResult } from './application/use-cases/ritual/reflect/steps/run-pause-reflect-tag-update';
-import { invalidateCompanionUiCompletionQuery } from './application/queries/companion-ui-completion-query-key';
-import { persistCompanionUiStepCompletion as persistCompanionUiStepCompletionUseCase } from './application/use-cases/ritual/frame/persist-ui-step-completion';
 import type { CompanionUiCompletionStep } from './application/use-cases/ritual/frame/companion-ui-completion-types';
 import { runPauseCreateOrReuse } from './application/use-cases/session/run-pause-create-or-reuse';
 import { runPauseDismissCurrent } from './application/use-cases/session/run-pause-dismiss-current';
@@ -185,21 +182,6 @@ export type { PostPauseFeelSnapshot };
 export type { CompanionUiCompletionStep };
 export type { RunAdoptPendingPauseOfferResult, RunDeclinePendingPauseOfferResult };
 export type { RunPauseFavoriteToggleResult, RunPauseReflectTagUpdateResult };
-
-/** Frame companion UI step completion — wired with default `PauseRepository`. */
-export async function persistCompanionUiStepCompletion(
-  pauseInstanceId: string,
-  step: CompanionUiCompletionStep,
-  options?: { entryPoint?: string },
-): Promise<void> {
-  await persistCompanionUiStepCompletionUseCase(
-    supabasePauseRepository,
-    pauseInstanceId,
-    step,
-    options,
-  );
-  invalidateCompanionUiCompletionQuery(pauseInstanceId);
-}
 
 /** Home manual trigger — `pause_create_or_reuse` (+ silent reflection stub). */
 export function openManualPauseFromHome(params: OpenManualPauseFromHomeParams) {

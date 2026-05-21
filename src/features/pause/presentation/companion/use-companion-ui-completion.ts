@@ -8,7 +8,9 @@ import {
   type CompanionUiCompletionStep,
   type CompanionUiCompletionState,
 } from '@/features/pause/public-queries';
-import { persistCompanionUiStepCompletion } from '@/features/pause/public-rpc';
+import { persistCompanionUiStepCompletion } from '@/features/pause/application/use-cases/ritual/frame/persist-ui-step-completion';
+import { invalidateCompanionUiCompletionQuery } from '@/features/pause/application/queries/companion-ui-completion-query-key';
+import { supabasePauseRepository } from '@/features/pause/infrastructure/supabase-pause-repository';
 
 /**
  * Per-pause-instance companion UI step completion (TanStack Query + RPC persist).
@@ -30,7 +32,8 @@ export function useCompanionUiCompletion(pauseInstanceId?: string | null) {
       if (snap[key]) return;
       queryClient.setQueryData<CompanionUiCompletionState>(keyFull, { ...snap, [key]: true });
       hapticFeedback('light');
-      await persistCompanionUiStepCompletion(id, key);
+      await persistCompanionUiStepCompletion(supabasePauseRepository, id, key);
+      invalidateCompanionUiCompletionQuery(id);
     },
     [pauseInstanceId, queryClient, completionQuery.data],
   );
