@@ -12,11 +12,12 @@ import { useHomeCheckoutWelcomeToast } from '@/screens/home/hooks/use-home-check
 import { useHomeZenMode } from '@/screens/home/hooks/use-home-zen-mode';
 import { useHomeDocumentTitle } from '@/screens/home/hooks/use-home-document-title';
 import { useHomeHeroQuoteViewed } from '@/screens/home/hooks/use-home-hero-quote-viewed';
-import { useHomePauseActions, usePauseContextHomePreviews } from '@/features/pause/public-hooks';
 import {
   useCompletedPauseCount,
   useDismissOutletPauseReady,
+  useHomePauseActions,
   usePauseArrivalAudio,
+  usePauseContextHomePreviews,
   useZenModeHomeRouteProps,
 } from '@/features/pause/public-home';
 import { useMarketDisplayPreferences } from '@/features/market/public-hooks';

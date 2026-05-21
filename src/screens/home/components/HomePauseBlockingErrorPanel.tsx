@@ -5,7 +5,7 @@ import { holzenLog } from '@/lib/holzen-console';
 import {
   pauseHomeErrorKind,
   pauseHomeErrorStrings,
-} from '@/features/pause/public-hooks';
+} from '@/features/pause/public-home';
 import { cn } from '@/lib/utils';
 
 const tryAgainClassName =
