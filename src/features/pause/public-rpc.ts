@@ -34,15 +34,15 @@ export {
 export type { CompanionOrchestrateSessionContext } from './application/use-cases/ritual/frame/build-companion-orchestrate-body';
 export type { LoadCompanionOrchestrateSessionInput } from './application/use-cases/ritual/frame/load-companion-orchestrate-session';
 import {
+  runCompanionInterventionBootstrap as runCompanionInterventionBootstrapUseCase,
+  type RunCompanionInterventionBootstrapInput,
+  type RunCompanionInterventionBootstrapResult,
+} from './application/use-cases/ritual/frame/run-companion-intervention-bootstrap';
+import {
   runCompanionSlotOrchestrate,
   type CompanionSlotOrchestrateMode,
   type RunCompanionSlotOrchestrateResult,
 } from './application/use-cases/ritual/frame/run-companion-slot-orchestrate';
-import {
-  runCompanionInterventionBootstrap,
-  type RunCompanionInterventionBootstrapInput,
-  type RunCompanionInterventionBootstrapResult,
-} from './application/use-cases/ritual/frame/run-companion-intervention-bootstrap';
 import { fetchParsedPauseArtifactCache } from './infrastructure/queries/artifact-cache-query';
 import type { RegenerateCompanionSlot } from './domain/companion-orchestrate';
 import {
@@ -296,7 +296,7 @@ export function runPauseCompanionInterventionBootstrap(
   input: RunCompanionInterventionBootstrapInput,
   loadOrchestrateSession: () => Promise<CompanionOrchestrateSessionContext | null>,
 ): Promise<RunCompanionInterventionBootstrapResult> {
-  return runCompanionInterventionBootstrap(input, {
+  return runCompanionInterventionBootstrapUseCase(input, {
     fetchArtifactCache: fetchParsedPauseArtifactCache,
     loadOrchestrateSession,
     invokeIntervention: (session) => supabaseCompanionOrchestrator.invokeIntervention(session),
