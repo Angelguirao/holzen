@@ -17025,4 +17025,23 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — companion orchestration I/O via frame flow anchor (backlog #1–2 verified, Tier 5)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3><code>pause-companion-orchestration-flow</code> on <code>pause-companion-orchestration-io</code></h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1–2 (<code>ritual/reflect/</code>, <code>ritual/frame/</code>) remain complete — no folder moves. Add frame cluster anchor for companion orchestration presentation I/O; <code>pause-companion-orchestration-io</code> imports session load, favorites, UI completion, and expansion helpers through the anchor instead of deep <code>ritual/frame/*</code> modules. Query-key invalidation stays on <code>application/queries/</code>.</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior parity; import boundary only.</dd>
+      <dt>Tradeoffs</dt>
+      <dd><code>pause-companion-orchestrate-io</code> still binds many <code>ritual/frame/*</code> paths directly until a follow-up orchestrate flow anchor.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: <code>pause-companion-orchestrate-io</code> flow anchor, or Phase B cross-context Tier 1 shim.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
