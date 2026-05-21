@@ -19289,6 +19289,7 @@
   <article class="note">
     <header>
       <span>2026-05-21</span>
+<<<<<<< HEAD
       <span>Phase A — applyManualPauseOpenResult telemetry via flow anchor (backlog #1 verified, Tier 5)</span>
       <span class="status resolved">resolved</span>
     </header>
@@ -19321,6 +19322,21 @@
       <dd><code>pause-reflect-generation-hook-flow.ts</code> remains CI cluster anchor only; unit test mocks <code>run-reflect-generation</code> directly.</dd>
       <dt>Open questions</dt>
       <dd>Next: <code>pause-session-brief-io</code> peel from brief-flow anchor, companion orchestrate-io peel, or Phase B subscription Tier 1 shim (<code>subscription-checkout-guard-ref</code>).</dd>
+=======
+      <span>Phase A slice — Home reflect I/O off manual-open flow anchor (backlog #1 verified, Tier 5)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3><code>pause-home-reflect-io</code> imports <code>generation/manual-open/</code> directly</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>ritual/reflect/</code>) remains complete — no folder moves. Align Home manual-open presentation I/O with generation/steps/share peels: import <code>generation/manual-open/</code> use cases and <code>domain/reflect/generation/</code> builders directly; keep <code>pause-reflect-generation-manual-open-flow.ts</code> as CI cluster anchor only.</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior parity; import paths only.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Unit tests mock <code>manual-open/dismiss-open-pause-home</code> instead of the flow anchor module.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: align remaining reflect subcluster flow anchors if drift appears, or Phase B subscription Tier 1 shim.</dd>
+>>>>>>> a2cd5e7df (refactor(pause): peel Home reflect I/O off manual-open flow anchor)
     </dl>
   </article>
 
