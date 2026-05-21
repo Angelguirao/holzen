@@ -1,6 +1,6 @@
 /**
  * Lightweight Web Audio for pause rituals: breathing cues (phase ticks + pattern-complete “bowl”).
- * Reflect / Frame focus bed lives in `application/use-cases/ritual/reflect/ambience/reflect-frame-focus-ambience.ts`.
+ * Reflect / Frame focus bed lives in `domain/ritual/breathe/reflect-frame-focus-ambience.ts` (re-exported under `ritual/reflect/ambience/`).
  * Respects mute (header) and prefers-reduced-motion (no audio).
  */
 
