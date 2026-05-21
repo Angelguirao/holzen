@@ -1,11 +1,13 @@
 import { useCallback, useLayoutEffect, useRef, useState } from 'react';
 import type { TFunction } from 'i18next';
-import { clampFeelIntensity } from '@/features/pause/application/use-cases/ritual/feel/clamp-feel-intensity';
-import type { MoodValue } from '../domain/mood-value';
-import { showPauseStepSyncFailedToast } from '@/features/pause/application/use-cases/ritual/step-sync-toast';
-import { isPauseMoodValue } from '@/features/pause/domain/mood-value';
+import {
+  clampFeelIntensity,
+  isPauseMoodValue,
+  type MoodValue,
+} from '@/features/pause/domain/mood-value';
 import {
   logPostPauseEmotionIfDirty,
+  showPauseStepSyncFailedToast,
   type PostPauseFeelSnapshot,
 } from '@/features/pause/public-rpc';
 

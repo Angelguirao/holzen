@@ -6502,6 +6502,7 @@
   <article class="note">
     <header>
       <span>2026-05-21</span>
+<<<<<<< HEAD
       <span>Phase A slice — initial-emotion log + presentation → domain/reflect/mood (backlog #1)</span>
       <span class="status resolved">resolved</span>
     </header>
@@ -6515,6 +6516,21 @@
       <dd><code>InitialEmotionLogOpts</code> type re-exported from <code>public-rpc</code> for cross-layer callers; mood chrome flow still in <code>ritual/feel/pause-session-mood-chrome-flow</code>.</dd>
       <dt>Open questions</dt>
       <dd>Next: peel mood chrome / feel-tiles conductors through <code>public-rpc</code>, or backlog #4 pending-offer / archive retrospective facades.</dd>
+=======
+      <span>Phase A slice — brief done check-in via public-rpc (backlog #1 done, #3)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>Peel use-pause-brief-done-check-in from application imports</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd><code>ritual/reflect/</code> migration is complete on <code>cursor/arch-migrate-src-ca70</code>. <code>use-pause-brief-done-check-in</code> imports <code>showPauseStepSyncFailedToast</code> and <code>logPostPauseEmotionIfDirty</code> from <code>public-rpc</code> only; pure <code>clampFeelIntensity</code> colocated with <code>MoodValue</code> in <code>domain/mood-value.ts</code> (removed <code>ritual/feel/clamp-feel-intensity.ts</code>).</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior parity; no dedicated hook test.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Reflect mood chrome conductors still import <code>pause-session-mood-chrome-flow</code> from application until peeled.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: peel depth-picker / feel-tiles / mood-chrome handlers through <code>public-rpc</code> or move chrome-flow pure helpers to <code>domain/ritual/feel/</code>.</dd>
+>>>>>>> cf71f178 (refactor(pause): peel brief-done check-in through public-rpc)
     </dl>
   </article>
 
