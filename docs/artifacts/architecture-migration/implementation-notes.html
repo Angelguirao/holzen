@@ -3778,6 +3778,25 @@
       <dt>Tradeoffs</dt>
       <dd><code>use-dismiss-outlet-pause-ready</code> and <code>use-staggered-reveal</code> remain flat under <code>presentation/</code>.</dd>
       <dt>Open questions</dt>
+      <dd>Next: colocate grounding enrichment or dismiss-outlet hook.</dd>
+    </dl>
+  </article>
+
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — colocate grounding enrichment hook under presentation/companion/</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>Tier 4 — frame/grounding presentation</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1–#2 and bulk-hold home peel are complete on <code>cursor/arch-migrate-src-ca70</code>. Move <code>use-grounding-enrichment</code> beside other companion presentation hooks; <code>CompanionGroundingPage</code> still imports via <code>public-hooks</code>.</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior-preserving <code>git mv</code>.</dd>
+      <dt>Tradeoffs</dt>
+      <dd><code>use-dismiss-outlet-pause-ready</code> and <code>use-staggered-reveal</code> remain flat under <code>presentation/</code>.</dd>
+      <dt>Open questions</dt>
       <dd>Next: colocate <code>use-dismiss-outlet-pause-ready</code> (home vs session), or backlog #4 ritual log RPCs on <code>PauseRepository</code>.</dd>
     </dl>
   </article>
