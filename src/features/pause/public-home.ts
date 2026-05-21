@@ -1,6 +1,7 @@
 /**
  * Home pause widget read-model helpers (no Supabase).
- * Scheduling quarter-hour math: `public-scheduling`. Presentation imports barrels, not `application/*`.
+ * Scheduling quarter-hour math: `public-scheduling`. Pending-offer read + completed count + dismiss outlet live here (§6 peel).
+ * Presentation imports barrels, not `application/*`.
  */
 export {
   resolvePauseArrivalToneAction,
