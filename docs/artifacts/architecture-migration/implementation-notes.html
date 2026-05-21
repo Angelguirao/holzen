@@ -7122,7 +7122,26 @@
       <dt>Tradeoffs</dt>
       <dd>Intervention fetch/bootstrap hooks still import <code>application/ritual/frame/*</code> until a follow-up peel.</dd>
       <dt>Open questions</dt>
-      <dd>Next: peel companion intervention presentation cluster, decide/brief session hooks off <code>public-rpc</code>, or backlog #4 stray mutation call sites.</dd>
+      <dd>Next: peel companion intervention presentation cluster, brief-done-check-in off <code>public-rpc</code>, or backlog #4 stray mutation call sites.</dd>
+    </dl>
+  </article>
+
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — peel brief-to-deep off public-rpc (backlog #1 done, #3)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>use-pause-session-brief-to-deep → ritual-depth-upgrade + public-ports</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code>) is complete. Continue §6 slim barrel: <code>use-pause-session-brief-to-deep</code> calls <code>logPauseRitualDepthUpgraded(supabasePauseRepository, …)</code> from <code>ritual/brief/ritual-depth-upgrade</code>; <code>logPauseRitualDepthUpgraded</code> facade on <code>public-rpc</code> unchanged for cross-context callers.</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior parity.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Hook stays under <code>presentation/session/</code> (brief ritual beat); only import path changed. Fixed stale <code>reflect-note-tag-payload</code> imports after <code>reflect-step-payloads</code> rename.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: peel <code>use-pause-brief-done-check-in</code> off <code>public-rpc</code>, companion intervention presentation cluster, or backlog #4 companion feedback vote write via repository port.</dd>
     </dl>
   </article>
 
