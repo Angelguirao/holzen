@@ -1,41 +1,17 @@
-import type { FeelStepTile } from '@/features/pause/domain/feel-step-tile';
-import type { BriefPauseStep } from '@/features/pause/domain/ritual-types';
 import type { PersistedSession } from '@/features/pause/domain/session-model';
 import { mapPersistedStep } from '@/features/pause/domain/session/map-persisted-step';
 
 export { mapPersistedStep };
 
 /**
- * Pause route helpers: map persisted step strings and derive initial ritual UI from `PersistedSession`.
+ * Pause route helpers: map persisted step strings and derive session-level UI from `PersistedSession`.
  *
  * **Persistence contract:** `docs/systems/pause-system.md` section 7.2 (hydration / local snapshot).
- * **Depth picker entry:** `initialRitualEntry` in `application/use-cases/ritual/reflect/scaffold/initial-ritual-entry.ts`.
- * **Ritual sync caveat:** `computePauseStorageRitualSyncPatch` in `application/use-cases/ritual/reflect/scaffold/storage-ritual-sync.ts`
- * may intentionally omit `briefStep` when syncing — see `initialBriefPauseStepFromRestored` note below.
+ * **Brief ritual restore:** `application/use-cases/ritual/reflect/scaffold/restored-brief-ritual-state.ts`.
+ * **Depth picker entry:** `application/use-cases/ritual/reflect/scaffold/initial-ritual-entry.ts`.
+ * **Ritual sync caveat:** `computePauseStorageRitualSyncPatch` in `application/use-cases/ritual/reflect/scaffold/storage-ritual-sync.ts`.
  * **Code map:** same pause doc, section 10 (Related docs and code).
  */
-
-/**
- * Initial brief sub-step when hydrating `/pause` from local storage.
- * When `ritualDepth` is not `brief`, callers still mount at `'feel'` until the user picks depth.
- *
- * Note: `computePauseStorageRitualSyncPatch` may leave `briefStep` undefined for a brief row
- * missing `briefStep` so React state is not clobbered — that is intentionally different.
- */
-export function initialBriefPauseStepFromRestored(restored: PersistedSession | null): BriefPauseStep {
-  if (restored?.ritualDepth === 'brief' && restored.briefStep) return restored.briefStep;
-  return 'feel';
-}
-
-/** Hydrate brief “integrate” completion from local storage (defaults false). */
-export function initialBriefIntegrateDoneFromRestored(restored: PersistedSession | null): boolean {
-  return restored?.briefIntegrateDone ?? false;
-}
-
-/** Hydrate Feel-step tile from local storage (`PersistedSession.briefFace`, brief ritual saves only). */
-export function initialSelectedBriefFaceFromRestored(restored: PersistedSession | null): FeelStepTile | null {
-  return restored?.briefFace ?? null;
-}
 
 /** Session vs Done screen when hydrating `/pause` from local storage. */
 export function initialPhaseFromRestored(restored: PersistedSession | null): 'session' | 'done' {
