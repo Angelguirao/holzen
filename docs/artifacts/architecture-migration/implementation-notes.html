@@ -11534,4 +11534,23 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — peel home open-pause dismiss off public-rpc (backlog #1 verified, backlog #4)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>ritual/reflect/ complete; Home preview dismiss conductor bypasses public-rpc</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code>) is complete — no folder move. After companion slot orchestrate peel (<code>9109b31a</code>), align <code>use-open-pause-home-preview</code> with other home/session conductors: <code>dismissOpenPauseHome</code> + <code>supabasePauseRepository</code>; remove <code>dismissOpenPauseHomePreview</code> from <code>public-rpc</code> (no cross-context callers).</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior unchanged.</dd>
+      <dt>Tradeoffs</dt>
+      <dd><code>openManualPauseFromHome</code>, pending-offer adopt/decline, and bulk-hold facades remain on <code>public-rpc</code> for cross-context / multi-port wiring.</dd>
+      <dt>Open questions</dt>
+      <dd>Next backlog #4: peel <code>use-bulk-hold-apply-outcomes</code> or pending-offer mutations off <code>public-rpc</code>.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
