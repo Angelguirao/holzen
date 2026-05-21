@@ -5511,4 +5511,23 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — PauseScienceStepKey aliases PauseStep (backlog #1 complete)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>Dedupe science sheet step keys with deep ritual</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>ritual/reflect/</code>) and science-sheet peel to <code>domain/pause-science/</code> were already complete on remote. Drop duplicate <code>PAUSE_SCIENCE_STEP_KEYS</code> — <code>PauseScienceStepKey</code> aliases <code>PauseStep</code> from <code>pause-ritual-steps</code>.</dd>
+      <dt>Deviation</dt>
+      <dd>None — citation config unchanged; removed unused barrel export.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Call sites that needed the key array must use <code>PAUSE_DEEP_RITUAL_STEPS</code> from <code>public-hooks</code> instead.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: backlog #4 audit remaining direct RPC/analytics stragglers, or peel <code>pause-scaffold-chrome-registry</code>.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
