@@ -1,47 +1,7 @@
 import { describe, expect, it, vi } from 'vitest';
+import { reflectionStepLoggedStorageKey } from '@/features/pause/domain/reflection-step-log';
 import type { PauseRepository } from '@/features/pause/ports/pause-repository';
-import {
-  reflectionStepLoggedStorageKey,
-  runPauseReflectionStepLogOnce,
-  shouldLogPauseReflectionStep,
-} from './run-pause-reflection-step-log';
-
-describe('shouldLogPauseReflectionStep', () => {
-  it('requires instance id and settled reflection state', () => {
-    expect(
-      shouldLogPauseReflectionStep({
-        pauseInstanceId: null,
-        reflectionLoading: false,
-        reflectionMessage: 'hi',
-        reflectionError: null,
-      }),
-    ).toBe(false);
-    expect(
-      shouldLogPauseReflectionStep({
-        pauseInstanceId: 'i',
-        reflectionLoading: true,
-        reflectionMessage: 'hi',
-        reflectionError: null,
-      }),
-    ).toBe(false);
-    expect(
-      shouldLogPauseReflectionStep({
-        pauseInstanceId: 'i',
-        reflectionLoading: false,
-        reflectionMessage: '',
-        reflectionError: null,
-      }),
-    ).toBe(false);
-    expect(
-      shouldLogPauseReflectionStep({
-        pauseInstanceId: 'i',
-        reflectionLoading: false,
-        reflectionMessage: '',
-        reflectionError: 'err',
-      }),
-    ).toBe(true);
-  });
-});
+import { runPauseReflectionStepLogOnce } from './run-pause-reflection-step-log';
 
 describe('runPauseReflectionStepLogOnce', () => {
   it('skips when storage cannot be read', async () => {
