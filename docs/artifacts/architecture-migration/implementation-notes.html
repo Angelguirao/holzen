@@ -13871,4 +13871,23 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — public-ritual-frame hooks peel (cluster 2)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>Frame beat — companion hooks off public-hooks for pause screens</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code>) was already complete. Extend <code>public-ritual-frame.ts</code> with presentation hooks (cluster 2); all pause companion + <code>/companion/*</code> screens import Frame surface from the ritual barrel; <code>public-hooks.ts</code> re-exports for cross-context callers.</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior-preserving export peel only.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Session/home/archive hooks remain on <code>public-hooks</code>; feature <code>presentation/companion/</code> still imports use cases directly.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: Phase B <code>src/lib/holzen-query-client-ref</code> shim or extend I/O modules with use-case wrappers (vs export-only).</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->

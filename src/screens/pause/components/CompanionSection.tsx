@@ -1,11 +1,11 @@
 import { forwardRef, useCallback } from 'react';
 
 import { useProGate } from '@/features/subscription/public-hooks';
-import { useCompanionSection, useCompanionSectionExpansion } from '@/features/pause/public-hooks';
-import type { CompanionData, CompanionPrefs } from '@/features/pause/public-hooks';
+import { useCompanionSection, useCompanionSectionExpansion } from '@/features/pause/public-ritual-frame';
+import type { CompanionData, CompanionPrefs } from '@/features/pause/public-ritual-frame';
 import { CompanionSectionHaikuSlot } from '@/screens/pause/components/companion/companion-section-haiku-slot';
 import { CompanionSectionOrchestratedSlots } from '@/screens/pause/components/companion/companion-section-orchestrated-slots';
-import { companionSectionProFavoriteProps } from '@/features/pause/public-hooks';
+import { companionSectionProFavoriteProps } from '@/features/pause/public-ritual-frame';
 
 interface Props {
   companions: CompanionData;

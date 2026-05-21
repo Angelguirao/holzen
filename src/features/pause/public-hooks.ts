@@ -39,27 +39,6 @@ export {
 } from './application/use-cases/ritual/done/resolve-done-wallpaper-mood';
 export type { BriefPauseStep, RitualDepth } from './domain/ritual-types';
 export {
-  companionSectionProFavoriteProps,
-  estimateReadTime,
-  formatCompanionHistoryRelativeDay,
-  resolveCompanionRegenerateClick,
-  zoomOutTotalCharsForReadTime,
-  type CachedHistoricalInsightShape,
-  type CompanionData,
-  type CompanionFeedbackVote,
-  type CompanionPrefs,
-  type CompanionRegenerateClickResult,
-  type CompanionSectionProFavoriteProps,
-  type CompanionSlotCacheIds,
-  type CompanionSlotRelaxations,
-  type EchoUserWord,
-  type InterventionState,
-  type RegenerateCompanionSlot,
-  type ZoomOutData,
-  type ZoomOutEchoData,
-  type ZoomOutOnThisDayEntry,
-} from './public-ritual-frame';
-export {
   BRIEF_PAUSE_ORDER,
   computeBriefMacroProgressPosition,
 } from './domain/brief-ritual-steps';
@@ -201,8 +180,6 @@ export {
   type JourneyPauseRow,
 } from './presentation/archive/use-journey-pause-instances';
 export { logPwaInstallAnalyticsEvent } from './public-queries';
-export { useSignalSourceTrustedHost } from './presentation/companion/use-signal-source-trusted-host';
-export { useStaggeredReveal } from './presentation/companion/use-staggered-reveal';
 export {
   fetchSettingsDataExportBundle,
   type SettingsDataExportBundle,
@@ -311,71 +288,69 @@ export {
   type UsePauseSessionBreathHandlersParams,
   usePauseSessionBreathReflectHandlers,
 } from './public-ritual-breathe';
+export type {
+  CachedHistoricalInsightShape,
+  CompanionData,
+  CompanionFeedbackVote,
+  CompanionPrefs,
+  CompanionRegenerateClickResult,
+  CompanionSectionProFavoriteProps,
+  CompanionSlotCacheIds,
+  CompanionSlotRelaxations,
+  EchoUserWord,
+  FullviewCompanion,
+  GroundingEnrichment,
+  HistoryThreadRow,
+  InterventionState,
+  RegenerateCompanionSlot,
+  UseCompanionDataParams,
+  UseCompanionFullViewPageParams,
+  UseCompanionInterventionBootstrapParams,
+  UseCompanionInterventionFetchParams,
+  UseCompanionOrchestrateRetryParams,
+  UseCompanionOrchestrateSessionParams,
+  UseCompanionOrchestrationParams,
+  UseCompanionSectionExpansionParams,
+  UseCompanionSectionParams,
+  UseCompanionSlotOrchestrateActionsParams,
+  UseCompanionSlotOrchestrateFailurePortsParams,
+  UseCompanionSlotRunOrchestrateParams,
+  ZoomOutData,
+  ZoomOutEchoData,
+  ZoomOutOnThisDayEntry,
+} from './public-ritual-frame';
 export {
-  useCompanionHistoryThread,
-  type HistoryThreadRow,
-} from './presentation/companion/use-companion-history-thread';
-export { useRelatedBiasesThisMonth } from './presentation/companion/use-related-biases-this-month';
-export { useCompanionFeedbackVote } from './presentation/companion/use-companion-feedback-vote';
-export { isCompanionRegenerateUiEnabled } from './presentation/companion/is-companion-regenerate-ui-enabled';
-export { useCompanionAccess } from './presentation/companion/use-companion-access';
-export { useCompanionUiCompletion } from './presentation/companion/use-companion-ui-completion';
-export { useCompanionLibraryFavorites } from './presentation/companion/use-companion-library-favorites';
-export { useCompanionSlotUiState } from './presentation/companion/use-companion-slot-ui-state';
-export {
-  useCompanionOrchestrateSession,
-  type UseCompanionOrchestrateSessionParams,
-} from './presentation/companion/use-companion-orchestrate-session';
-export {
-  useCompanionInterventionFetch,
-  type UseCompanionInterventionFetchParams,
-} from './presentation/companion/use-companion-intervention-fetch';
-export {
-  useCompanionOrchestrateRetry,
-  type UseCompanionOrchestrateRetryParams,
-} from './presentation/companion/use-companion-orchestrate-retry';
-export {
-  useCompanionSlotOrchestrateFailurePorts,
-  type UseCompanionSlotOrchestrateFailurePortsParams,
-} from './presentation/companion/use-companion-slot-orchestrate-failure-ports';
-export {
-  useCompanionInterventionBootstrap,
-  type UseCompanionInterventionBootstrapParams,
-} from './presentation/companion/use-companion-intervention-bootstrap';
-export {
-  useCompanionSlotRunOrchestrate,
-  type UseCompanionSlotRunOrchestrateParams,
-} from './presentation/companion/use-companion-slot-run-orchestrate';
-export {
-  useCompanionSlotOrchestrateActions,
-  type UseCompanionSlotOrchestrateActionsParams,
-} from './presentation/companion/use-companion-slot-orchestrate-actions';
-export {
-  useCompanionOrchestration,
-  type UseCompanionOrchestrationParams,
-} from './presentation/companion/use-companion-orchestration';
-export { useCompanionData, type UseCompanionDataParams } from './presentation/companion/use-companion-data';
-export {
+  companionSectionProFavoriteProps,
+  estimateReadTime,
+  formatCompanionHistoryRelativeDay,
+  isCompanionRegenerateUiEnabled,
+  resolveCompanionRegenerateClick,
+  useCompanionAccess,
+  useCompanionData,
+  useCompanionFeedbackVote,
   useCompanionFullViewPage,
-  type UseCompanionFullViewPageParams,
-} from './presentation/companion/use-companion-fullview-page';
-export {
+  useCompanionHistoryThread,
+  useCompanionInterventionBootstrap,
+  useCompanionInterventionFetch,
+  useCompanionLibraryFavorites,
+  useCompanionOrchestrateRetry,
+  useCompanionOrchestrateSession,
+  useCompanionOrchestration,
   useCompanionSection,
-  type UseCompanionSectionParams,
-} from './presentation/companion/use-companion-section';
-export {
   useCompanionSectionExpansion,
-  type UseCompanionSectionExpansionParams,
-} from './presentation/companion/use-companion-section-expansion';
-export {
-  useGroundingEnrichment,
-  type GroundingEnrichment,
-} from './presentation/companion/use-grounding-enrichment';
-export { usePauseSessionCompanionSnapshot } from './presentation/companion/use-pause-session-companion-snapshot';
-export {
+  useCompanionSlotOrchestrateActions,
+  useCompanionSlotOrchestrateFailurePorts,
+  useCompanionSlotRunOrchestrate,
+  useCompanionSlotUiState,
+  useCompanionUiCompletion,
   useFullviewTelemetry,
-  type FullviewCompanion,
-} from './presentation/companion/use-fullview-telemetry';
+  useGroundingEnrichment,
+  usePauseSessionCompanionSnapshot,
+  useRelatedBiasesThisMonth,
+  useSignalSourceTrustedHost,
+  useStaggeredReveal,
+  zoomOutTotalCharsForReadTime,
+} from './public-ritual-frame';
 export { usePauseSessionMountLog } from './presentation/session/use-pause-session-mount-log';
 export { usePauseSessionGoBack } from './presentation/session/use-pause-session-go-back';
 export { usePauseSessionGoToStep } from './presentation/session/use-pause-session-go-to-step';

@@ -1,8 +1,8 @@
-import type { CompanionData } from '@/features/pause/public-hooks';
+import type { CompanionData } from '@/features/pause/public-ritual-frame';
 import { HaikuDisplay } from '@/screens/pause/components/HaikuDisplay';
 import { CompanionCard } from '@/screens/pause/components/companion/companion-card';
 import { COMPANION_SECTION_ICONS } from '@/screens/pause/components/companion/companion-section-icons';
-import type { CompanionSectionProFavoriteProps } from '@/features/pause/public-hooks';
+import type { CompanionSectionProFavoriteProps } from '@/features/pause/public-ritual-frame';
 
 export type CompanionSectionHaikuSlotProps = {
   haiku: NonNullable<CompanionData['haiku']>;

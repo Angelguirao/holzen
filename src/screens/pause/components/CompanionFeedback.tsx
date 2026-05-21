@@ -1,11 +1,11 @@
 import { useTranslation } from 'react-i18next';
 import { hapticFeedback } from '@/lib/haptics';
-import type { RegenerateCompanionSlot } from '@/features/pause/public-hooks';
+import type { RegenerateCompanionSlot } from '@/features/pause/public-ritual-frame';
 import {
   isCompanionRegenerateUiEnabled,
   resolveCompanionRegenerateClick,
   useCompanionFeedbackVote,
-} from '@/features/pause/public-hooks';
+} from '@/features/pause/public-ritual-frame';
 import { useSubscription } from '@/features/subscription/public-hooks';
 import { useProGate } from '@/features/subscription/public-hooks';
 import { isPaidLimitReached, showLimitReachedToast } from '@/features/subscription/public-limits';

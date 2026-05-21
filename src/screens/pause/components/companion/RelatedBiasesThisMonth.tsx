@@ -1,6 +1,6 @@
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { useRelatedBiasesThisMonth } from '@/features/pause/public-hooks';
+import { useRelatedBiasesThisMonth } from '@/features/pause/public-ritual-frame';
 
 interface Props {
   /** Pause instance currently viewed — excluded from the list. */
