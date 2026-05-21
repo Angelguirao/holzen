@@ -17268,7 +17268,7 @@
       <dt>Tradeoffs</dt>
       <dd>Steps presentation I/O is the import surface; no application cluster anchor in <code>ritual/reflect/steps/</code> besides <code>run-*</code> use cases.</dd>
       <dt>Open questions</dt>
-      <dd>Next: reflect flows I/O anchor peel (preflight/post-generation), session pending-offer I/O through <code>pause-session-pending-offer-flow</code>, or Phase B cross-context Tier 1 shim.</dd>
+      <dd>Next: share I/O via <code>pause-reflection-share-flow</code>, session pending-offer I/O through <code>pause-session-pending-offer-flow</code>, or Phase B cross-context Tier 1 shim.</dd>
     </dl>
   </article>
 
@@ -17287,7 +17287,7 @@
       <dt>Tradeoffs</dt>
       <dd><code>mount-log-params</code> still imports <code>initialPhaseFromRestored</code> from <code>ritual/decide/</code> directly until a session application peel.</dd>
       <dt>Open questions</dt>
-      <dd>Next: <code>pause-companion-frame-ui-flow</code> / analytics flow anchors, or Phase B cross-context Tier 1 shim.</dd>
+      <dd>Next: share I/O via <code>pause-reflection-share-flow</code>, <code>pause-companion-frame-ui-flow</code> / analytics flow anchors, or Phase B cross-context Tier 1 shim.</dd>
     </dl>
   </article>
 
@@ -17325,7 +17325,26 @@
       <dt>Tradeoffs</dt>
       <dd>No new application re-export anchors in <code>ritual/reflect/steps/</code>; steps cluster stays <code>run-*</code> + presentation I/O only.</dd>
       <dt>Open questions</dt>
-      <dd>Next: <code>pause-session-decide-flow</code> on decide portions of flows I/O, share I/O via <code>pause-reflection-share-flow</code>, or Phase B cross-context Tier 1 shim.</dd>
+      <dd>Next: decide cluster anchors on <code>pause-reflect-flows-io</code>, share I/O via <code>pause-reflection-share-flow</code>, or Phase B cross-context Tier 1 shim.</dd>
+    </dl>
+  </article>
+
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — reflect flows I/O via decide cluster anchors (backlog #1 verified, Tier 5)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3><code>pause-reflect-flows-io</code> decide imports through ritual/decide flow anchors</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>ritual/reflect/</code>) remains complete — no folder moves. <code>pause-reflect-flows-io</code> imports outcome RPC (<code>pause-decide-outcome-log-flow</code>), Sonner toasts (<code>pause-decide-outcome-toast-flow</code>), flow mapping (<code>pause-decide-outcome-flow</code>), and session quotes (<code>wisdom-quotes</code>) through existing decide cluster anchors instead of deep <code>run-pause-outcome-log</code>, <code>outcome-toast</code>, or <code>domain/decide/*</code>. Reflect-and-decide preflight/post-generation unchanged (already via <code>pause-session-reflect-and-decide-flow</code>).</dd>
+      <dt>Deviation</dt>
+      <dd>Resolved merge conflict in implementation-notes (orphan steps anchor removal + session decide I/O notes kept as separate articles).</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Decide I/O test still mocks <code>pause-decide-outcome-log-flow</code> (Vitest module hoist) — same seam as <code>run-pause-outcome-log</code>.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: share I/O via <code>pause-reflection-share-flow</code>, home reflect I/O through <code>pause-reflect-generation-manual-open-flow</code>, or Phase B cross-context Tier 1 shim.</dd>
     </dl>
   </article>
 
