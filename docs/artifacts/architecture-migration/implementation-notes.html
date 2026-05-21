@@ -9656,7 +9656,7 @@
   <article class="note">
     <header>
       <span>2026-05-21</span>
-      <span>Phase A slice — home arrival tone on public-hooks (backlog #1 verified, #3)</span>
+      <span>Phase A slice — home arrival tone on public.ts (backlog #1 verified, #3)</span>
       <span class="status resolved">resolved</span>
     </header>
     <h3>ritual/reflect/ verified; use-pause-arrival-audio imports public only</h3>
@@ -9668,7 +9668,26 @@
       <dt>Tradeoffs</dt>
       <dd>Pure helper stays under <code>application/use-cases/home/</code>; barrel is presentation import surface.</dd>
       <dt>Open questions</dt>
-      <dd>Next: peel remaining Home/session <code>application/</code> imports (<code>use-pause-card-projection</code>, brief integrate constant via domain, or session step-transition cluster on <code>public-hooks</code>).</dd>
+      <dd>Next: peel <code>use-pause-card-projection</code> onto <code>public-home.ts</code> (card body + snooze gate).</dd>
+    </dl>
+  </article>
+
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — home pause card on public-home (backlog #1 verified, #3)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>ritual/reflect/ complete; use-pause-card-projection peels application imports</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>ritual/reflect/</code>) verified complete — no folder moves. Add <code>public-home.ts</code> for pause card body projection + snooze gate (mirrors <code>public-navigation</code> / <code>public-trigger</code>); arrival tone stays on <code>public.ts</code>. <code>use-pause-card-projection</code> imports <code>public-home</code> only.</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior parity.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Pure helpers remain under <code>application/use-cases/home/</code>; zen-mode route props and scheduling quarter-hour still import application directly.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: peel <code>use-zen-mode-home-route-props</code> / <code>use-holzen-home-context-state</code>, or backlog #4 ritual mutations audit.</dd>
     </dl>
   </article>
 
