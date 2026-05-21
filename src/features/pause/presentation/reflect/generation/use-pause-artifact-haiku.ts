@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import { supabaseReflectGenerator } from '@/features/pause/public-ports';
+import { fetchHaikuTextForPauseInstance } from '@/features/pause/public-queries';
 
 export type PauseArtifactHaikuFetchPhase = 'idle' | 'loading' | 'error' | 'done';
 
@@ -60,7 +60,7 @@ export function usePauseArtifactHaiku(params: UsePauseArtifactHaikuParams): UseP
       setHaikuFetch('loading');
     }
 
-    void supabaseReflectGenerator.fetchHaikuText(myId)
+    void fetchHaikuTextForPauseInstance(myId)
       .then((h) => {
         if (cancelled) return;
         if (trigger === 'whenEnabled' && fetchedForPauseRef.current !== myId) return;
