@@ -18640,4 +18640,23 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — reflect hub I/O direct domain + run-* (backlog #1 verified, Tier 5)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3><code>pause-reflect-hub-io</code> off <code>pause-reflect-hub-flow</code> anchor</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>ritual/reflect/</code>) remains complete — no folder moves. Align hub presentation I/O with mood/steps/share/flows/generation peels: <code>resolveShiftFrameHubDonePresentation</code> from <code>domain/reflect/hub/</code>; <code>shift_emotion_logged</code> RPC from <code>run-shift-emotion-frame-hub-done</code>. Keep <code>pause-reflect-hub-flow.ts</code> as CI cluster anchor only.</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior parity; import boundary only.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Unit test mocks <code>run-shift-emotion-frame-hub-done</code> directly (same seam as mood/steps I/O).</dd>
+      <dt>Open questions</dt>
+      <dd>Next: <code>pause-companion-frame-ui-io</code> peel, Phase B cross-context Tier 1 shim (auth/subscription), or backlog #3 remaining <code>public.ts</code> peels.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->

@@ -1,12 +1,12 @@
 /**
  * Reflect hub presentation I/O (shift-frame done RPC + presentation mapping).
- * Imports through `pause-reflect-hub-flow` (parity with mood/share/flows presentation I/O anchors).
+ * Imports domain mapping and run-* use case directly (off `pause-reflect-hub-flow` CI anchor).
  */
+import { runShiftEmotionFrameHubDone } from '@/features/pause/application/use-cases/ritual/reflect/hub/run-shift-emotion-frame-hub-done';
 import {
   resolveShiftFrameHubDonePresentation,
-  runShiftEmotionFrameHubDone,
   type ShiftFrameHubDonePresentation,
-} from '@/features/pause/application/use-cases/ritual/reflect/hub/pause-reflect-hub-flow';
+} from '@/features/pause/domain/reflect/hub/shift-frame-hub-done-presentation';
 import { supabasePauseRepository } from '@/features/pause/public-rpc';
 
 export {
