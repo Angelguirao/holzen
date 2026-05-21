@@ -11762,4 +11762,23 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — lock ritual/reflect/steps + breath RPC loggers to PauseRepository (backlog #1 verified, backlog #4)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>ritual/reflect/ complete; reflect metadata + breath segment presentation tests</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code>) verified complete — no folder move. Strengthen <code>use-pause-favorite-toggle</code>, <code>use-pause-reflect-note</code>, <code>use-pause-reflect-tags</code>, and <code>use-pause-breath-segment-rpc-loggers</code> tests to assert the default <code>supabasePauseRepository</code> sentinel is passed into ritual reflect/breathe use cases (matches companion UI completion + pending-offer patterns).</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior unchanged.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Four presentation test files in one commit — same reflect-strip port-lock cluster; avoids empty <code>{}</code> repository mocks that hid wiring regressions.</dd>
+      <dt>Open questions</dt>
+      <dd>Next backlog #4: <code>use-pause-reflection-step-log</code> / shift-frame hub / initial-mood handlers port assertions, or analytics-port consolidation.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->

@@ -2,12 +2,13 @@ import { describe, expect, it, vi, beforeEach } from 'vitest';
 import { renderHook, act, waitFor } from '@testing-library/react';
 import { usePauseReflectNote } from './use-pause-reflect-note';
 
-const { runPauseReflectNoteUpdateMock } = vi.hoisted(() => ({
+const { runPauseReflectNoteUpdateMock, mockPauseRepository } = vi.hoisted(() => ({
   runPauseReflectNoteUpdateMock: vi.fn(),
+  mockPauseRepository: { port: 'supabasePauseRepository' },
 }));
 
 vi.mock('@/features/pause/infrastructure/supabase-pause-repository', () => ({
-  supabasePauseRepository: {},
+  supabasePauseRepository: mockPauseRepository,
 }));
 
 vi.mock(
@@ -50,13 +51,10 @@ describe('usePauseReflectNote', () => {
     });
 
     await waitFor(() => {
-      expect(runPauseReflectNoteUpdateMock).toHaveBeenCalledWith(
-        {},
-        {
-          pauseInstanceId: 'pause-1',
-          text: 'steady breath',
-        },
-      );
+      expect(runPauseReflectNoteUpdateMock).toHaveBeenCalledWith(mockPauseRepository, {
+        pauseInstanceId: 'pause-1',
+        text: 'steady breath',
+      });
     });
   });
 });
