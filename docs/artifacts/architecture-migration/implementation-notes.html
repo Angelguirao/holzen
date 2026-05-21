@@ -7810,4 +7810,23 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — depth-picker ritual entry in domain/reflect/mood (backlog #1 follow-up)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3><code>apply-depth-picker-ritual-entry</code> → <code>domain/reflect/mood/</code></h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>ritual/reflect/</code>) folder migration is complete. <code>depth-picker-ritual-entries</code> constants and <code>applyBriefDepthPickerRitualEntry</code> / <code>applyDeepDepthPickerRitualEntry</code> have no I/O — colocate in <code>domain/reflect/mood/</code> beside <code>pause-session-mood-chrome-flow.ts</code>, matching prior move of <code>resolvePauseDepthContextLineParams</code> to domain.</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior parity.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Presentation depth-picker hook imports domain directly (pure setter ports; no <code>PauseRepository</code>).</dd>
+      <dt>Open questions</dt>
+      <dd>Next: port-backed analytics read for companion feedback vote fetch, or remaining wired <code>public-rpc</code> facades audit.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
