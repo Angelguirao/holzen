@@ -11439,4 +11439,23 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — peel section expansion + UI completion off public-rpc (backlog #1 verified, backlog #4)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>ritual/reflect/ complete; frame lazy-expand + UI completion conductors bypass public-rpc</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code>) is complete — no folder move. After fullview page peel (<code>12d189dc</code>), align <code>use-companion-section-expansion</code> with reflect step hooks: import pure <code>nextExpandedWithLazyFetch</code> from <code>ritual/frame/</code>. Align <code>use-companion-ui-completion</code> with favorite toggle: <code>persistCompanionUiStepCompletion(supabasePauseRepository, …)</code> + <code>invalidateCompanionUiCompletionQuery</code>; remove wired facades from <code>public-rpc</code>.</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior unchanged.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Companion orchestrate cluster (<code>invokeCompanionSlotOrchestrate</code>, intervention bootstrap, slot run-orchestrate apply/telemetry) still on <code>public-rpc</code>.</dd>
+      <dt>Open questions</dt>
+      <dd>Next backlog #4: peel <code>use-companion-slot-run-orchestrate</code> / <code>use-companion-orchestrate-session</code> or home/archive facades on <code>public-rpc</code>.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
