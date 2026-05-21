@@ -4257,6 +4257,25 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — CompanionOrchestrator port (backlog #4)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>Backlog #1 complete; companion-orchestrate I/O behind port</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd><code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code> and <code>ritual/deep/</code> → <code>ritual/brief/</code> were already complete on <code>cursor/arch-migrate-src-ca70</code>. Add <code>ports/companion-orchestrator.ts</code> + <code>supabaseCompanionOrchestrator</code>; <code>runCompanionSlotOrchestrate</code> accepts <code>CompanionOrchestrator</code>; presentation hook passes default adapter via <code>public-queries</code> (mirrors ReflectGenerator).</dd>
+      <dt>Deviation</dt>
+      <dd>Intervention bootstrap still calls <code>invokeCompanionIntervention</code> from <code>public-rpc</code> directly — not folded into the port in this slice.</dd>
+      <dt>Tradeoffs</dt>
+      <dd><code>RunCompanionSlotOrchestratePorts</code> kept as deprecated alias; <code>createCompanionSlotOrchestratePorts</code> re-exported from <code>public-rpc</code> for tests.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: unify intervention invoke on <code>CompanionOrchestrator</code>, or wire remaining stray <code>PauseRepository</code> call sites.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
 </body>
 </html>

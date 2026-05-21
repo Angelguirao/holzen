@@ -1,9 +1,9 @@
 import type { RegenerateCompanionSlot } from '@/features/pause/domain/companion-orchestrate';
+import type { CompanionOrchestrator } from '@/features/pause/ports/companion-orchestrator';
 import {
   buildLazyFetchOrchestrateBody,
   buildRegenerateOrchestrateBody,
   type CompanionOrchestrateSessionContext,
-  type CompanionOrchestrateSourceWire,
 } from './build-companion-orchestrate-body';
 import {
   resolveCompanionOrchestrateInvokeFailure,
@@ -32,18 +32,15 @@ export type RunCompanionSlotOrchestrateResult =
   | RunCompanionSlotOrchestrateSuccess
   | RunCompanionSlotOrchestrateFailure;
 
-export interface RunCompanionSlotOrchestratePorts {
-  loadSignalSources?: () => Promise<CompanionOrchestrateSourceWire[] | undefined>;
-  loadGroundingSources?: () => Promise<CompanionOrchestrateSourceWire[] | undefined>;
-  invoke: (body: Record<string, unknown>) => Promise<{ data: unknown; error: unknown }>;
-}
+/** @deprecated Prefer `CompanionOrchestrator` from `ports/companion-orchestrator.ts`. */
+export type RunCompanionSlotOrchestratePorts = CompanionOrchestrator;
 
 /** Shared lazy-fetch / regenerate `companion-orchestrate` invoke (body build + failure classify). */
 export async function runCompanionSlotOrchestrate(
   mode: CompanionSlotOrchestrateMode,
   slot: RegenerateCompanionSlot,
   session: CompanionOrchestrateSessionContext,
-  ports: RunCompanionSlotOrchestratePorts,
+  ports: CompanionOrchestrator,
 ): Promise<RunCompanionSlotOrchestrateResult> {
   const recency = getRecencyHints();
   const signalSources =

@@ -11,8 +11,8 @@ export type { OpenManualPauseFromHomeResult } from './application/use-cases/trig
 
 export { ritualDepthUpgradedPayload } from './application/use-cases/ritual/brief/ritual-depth-upgrade';
 export { supabasePauseRepository } from './infrastructure/supabase-pause-repository';
+export { createCompanionSlotOrchestratePorts } from './infrastructure/supabase-companion-orchestrator';
 export {
-  createCompanionSlotOrchestratePorts,
   invokeCompanionIntervention,
   invokeCompanionOrchestrate,
 } from './infrastructure/edge/companion-orchestrate-edge';
