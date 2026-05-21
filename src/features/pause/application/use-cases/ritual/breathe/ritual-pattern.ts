@@ -1,5 +1,5 @@
 import type { FeelStepTile } from '@/features/pause/domain/feel-step-tile';
-import type { PauseBreathingPhase } from './resolve-pause-breathing-timed-display';
+import type { PauseBreathingPhase } from './pause-breathing-phase';
 
 /**
  * Ritual breathing (`PauseBreathing`) pattern selection.
@@ -62,11 +62,11 @@ export function rotatingKickerIndexFromElapsed(
 }
 
 /** Inhale → hold → exhale per round (triangle / “partial box”). */
-export const TRIANGLE_BREATH_PHASES = [
+export const TRIANGLE_BREATH_PHASES: readonly PauseBreathingPhase[] = [
   { labelKey: 'breathing.phases.inhale', duration: 4 },
   { labelKey: 'breathing.phases.hold', duration: 4 },
   { labelKey: 'breathing.phases.exhale', duration: 4 },
-] as const;
+];
 
 export const TRIANGLE_PHASE_COUNT = TRIANGLE_BREATH_PHASES.length;
 
@@ -117,5 +117,5 @@ export function resolvePauseBreathingPhases(
     void input.ritualVariant;
   }
 
-  return [...TRIANGLE_BREATH_PHASES];
+  return TRIANGLE_BREATH_PHASES;
 }

@@ -98,9 +98,9 @@ export {
   resolveTriangleKickerDisplay,
   type TriangleKickerDisplay,
 } from './application/use-cases/ritual/breathe/resolve-triangle-kicker-display';
+export type { PauseBreathingPhase } from './application/use-cases/ritual/breathe/pause-breathing-phase';
 export {
   resolvePauseBreathingTimedDisplay,
-  type PauseBreathingPhase,
   type PauseBreathingTimedDisplay,
 } from './application/use-cases/ritual/breathe/resolve-pause-breathing-timed-display';
 export {

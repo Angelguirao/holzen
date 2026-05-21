@@ -5571,19 +5571,19 @@
   <article class="note">
     <header>
       <span>2026-05-21</span>
-      <span>Phase A slice — resolvePauseBreathingPhases returns PauseBreathingPhase (Tier 5 breathe)</span>
+      <span>Phase A slice — PauseBreathingPhase module + typed resolvePauseBreathingPhases (Tier 5 breathe)</span>
       <span class="status resolved">resolved</span>
     </header>
-    <h3>Breathing phase union shared with timed display</h3>
+    <h3>Breathing phase union for Feel → Breathe → Reflect</h3>
     <dl>
       <dt>Design decision</dt>
-      <dd>Backlog #1 (<code>ritual/reflect/</code>) is complete on <code>cursor/arch-migrate-src-ca70</code>; science sheet + scaffold registry peels landed on remote. Alias <code>resolvePauseBreathingPhases</code> return type to <code>PauseBreathingPhase</code> from <code>resolve-pause-breathing-timed-display.ts</code> (canonical shape after prior unify slice).</dd>
+      <dd>Backlog #1 (<code>ritual/reflect/</code>) is complete on <code>cursor/arch-migrate-src-ca70</code>. After remote aliased <code>resolvePauseBreathingPhases</code> to <code>PauseBreathingPhase</code>, extract the type to <code>ritual/breathe/pause-breathing-phase.ts</code> so <code>ritual-pattern</code> and timed-display do not cross-import; <code>public-hooks</code> exports the shared type from that module.</dd>
       <dt>Deviation</dt>
-      <dd>None — structural typing unchanged.</dd>
+      <dd>None — structural typing unchanged; triangle phase durations unchanged.</dd>
       <dt>Tradeoffs</dt>
-      <dd><code>ritual-pattern.ts</code> imports a type from a sibling breathe module; extract a <code>pause-breathing-phase.ts</code> if the folder grows more phase producers.</dd>
+      <dd>One extra file in <code>ritual/breathe/</code> vs importing the type from timed-display only.</dd>
       <dt>Open questions</dt>
-      <dd>Next: backlog #4 audit optional <code>PauseRepository</code> call sites outside use-case facades.</dd>
+      <dd>Next: move <code>pause-shift-frame-hub-flow</code> to application <code>ritual/reflect/</code> or <code>ritual/feel/</code>, or backlog #4 port audit.</dd>
     </dl>
   </article>
 
