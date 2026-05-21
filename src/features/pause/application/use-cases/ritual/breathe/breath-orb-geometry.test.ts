@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 import {
   resolveHoldMandalaLayerWeights,
   windowProgress,
-} from '@/screens/pause/lib/breath-orb-geometry';
+} from './breath-orb-geometry';
 
 describe('breath-orb-geometry', () => {
   it('windowProgress clamps to 0–1 across the window', () => {

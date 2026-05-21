@@ -5416,4 +5416,23 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — breath-orb geometry in ritual/breathe (backlog #1 complete; Tier 5)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3><code>breath-orb-geometry</code> out of <code>screens/pause/lib/</code></h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code>) is complete on <code>cursor/arch-migrate-src-ca70</code> — no legacy reflect paths remain. Move hold-mandala / progress-ring pure helpers to <code>application/use-cases/ritual/breathe/breath-orb-geometry.ts</code>; pause screen orb components import via <code>public-hooks</code> (same pattern as <code>pause-breath-orb-metrics</code>).</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior-preserving move; Vitest colocated with use case.</dd>
+      <dt>Tradeoffs</dt>
+      <dd><code>resolve-pause-breathing-timed-display</code> remains in <code>screens/pause/lib/</code> until a follow-up peel.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: peel <code>resolve-pause-breathing-timed-display</code>, or port-backed reads for stray <code>analytics_events</code> query modules.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
