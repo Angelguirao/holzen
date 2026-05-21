@@ -95,7 +95,6 @@ import type { CompanionUiCompletionStep } from './application/use-cases/ritual/f
 import { runPauseCreateOrReuse } from './application/use-cases/session/run-pause-create-or-reuse';
 import { runPauseDismissCurrent } from './application/use-cases/session/run-pause-dismiss-current';
 import { logPauseCompanion as logPauseCompanionUseCase } from './application/use-cases/ritual/log/log-pause-companion';
-import { runToggleCompanionLibraryFavorite } from './application/use-cases/ritual/frame/run-toggle-companion-library-favorite';
 import {
   runLogPwaInstallAnalyticsEvent,
   type LogPwaInstallAnalyticsEventInput,
@@ -249,21 +248,6 @@ export function logPauseCompanion(params: {
   entryPoint: string;
 }): Promise<PauseLogCompanionResult> {
   return logPauseCompanionUseCase(supabasePauseRepository, params);
-}
-
-/** Companion slot heart — `pause_instances.metadata` via `PauseRepository` (wired for presentation). */
-export function toggleCompanionLibraryFavorite(
-  pauseInstanceId: string,
-  sourceType: string,
-  options?: {
-    onBucketComputed?: (bucket: Record<string, boolean>) => void;
-  },
-): Promise<boolean> {
-  return runToggleCompanionLibraryFavorite(supabasePauseRepository, {
-    pauseInstanceId,
-    sourceType,
-    onBucketComputed: options?.onBucketComputed,
-  });
 }
 
 /** PWA install funnel — wired `PauseAnalyticsRepository.insertEvent` (Home / settings). */
