@@ -65,7 +65,7 @@ export {
 export {
   computePauseStorageRitualSyncPatch,
   type PauseStorageRitualSyncPatch,
-} from './application/use-cases/session/storage-ritual-sync';
+} from './application/use-cases/ritual/reflect/scaffold/storage-ritual-sync';
 export {
   pickPauseHolzenProvidersSlice,
   type PauseHolzenProvidersSlice,

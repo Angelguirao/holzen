@@ -10,7 +10,7 @@ export { mapPersistedStep };
  * Pause route helpers: map persisted step strings and derive initial ritual UI from `PersistedSession`.
  *
  * **Persistence contract:** `docs/systems/pause-system.md` section 7.2 (hydration / local snapshot).
- * **Ritual sync caveat:** `computePauseStorageRitualSyncPatch` in `application/use-cases/session/storage-ritual-sync.ts`
+ * **Ritual sync caveat:** `computePauseStorageRitualSyncPatch` in `application/use-cases/ritual/reflect/scaffold/storage-ritual-sync.ts`
  * may intentionally omit `briefStep` when syncing — see `initialBriefPauseStepFromRestored` note below.
  * **Code map:** same pause doc, section 10 (Related docs and code).
  */

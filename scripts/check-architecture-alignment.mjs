@@ -166,12 +166,15 @@ const LEGACY_PAUSE_USE_CASE_IMPORTS = [
   '@/features/pause/application/use-cases/reflect/',
   '@/features/pause/application/use-cases/companion/',
   '@/features/pause/application/use-cases/session/scaffold-ritual-derived',
+  '@/features/pause/application/use-cases/session/storage-ritual-sync',
   "from './application/use-cases/reflect/",
   "from './application/use-cases/companion/",
   "from './application/use-cases/session/scaffold-ritual-derived'",
+  "from './application/use-cases/session/storage-ritual-sync'",
   "from '../application/use-cases/reflect/",
   "from '../application/use-cases/companion/",
   "from '../application/use-cases/session/scaffold-ritual-derived'",
+  "from '../application/use-cases/session/storage-ritual-sync'",
 ];
 
 /** Flat presentation/reflect paths — use subclusters (generation/, steps/, mood/, …). */
